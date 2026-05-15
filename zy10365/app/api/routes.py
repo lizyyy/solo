@@ -164,20 +164,38 @@ async def start_replay(
             detail="Replay already in progress"
         )
 
+    if gray_version.status == models.VerificationStatus.RELEASED:
+        raise HTTPException(
+            status_code=409,
+            detail="Version already released"
+        )
+
+    request_count = db.query(models.HistoryRequest).filter(
+        models.HistoryRequest.gray_version_id == gray_version.id
+    ).count()
+    
+    if request_count == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="No requests found for this version, add requests first"
+        )
+
     replay_service = ReplayService(db)
     
     async def run_replay():
-        await replay_service.replay_all_requests(gray_version)
-        diff_service = DiffService(db)
-        diff_service.calculate_all_diffs(gray_version)
-        tolerance_service = ToleranceService(db)
-        tolerance_service.apply_tolerance_rules(gray_version)
+        result = await replay_service.replay_all_requests(gray_version)
+        if "error" not in result:
+            diff_service = DiffService(db)
+            diff_service.calculate_all_diffs(gray_version)
+            tolerance_service = ToleranceService(db)
+            tolerance_service.apply_tolerance_rules(gray_version)
 
     background_tasks.add_task(run_replay)
 
     return {
         "status": "started",
         "version": version,
+        "request_count": request_count,
         "message": "Replay started in background"
     }
 
@@ -313,12 +331,15 @@ def release_version(
         raise HTTPException(status_code=404, detail="Gray version not found")
 
     release_service = ReleaseService(db)
-    conclusion = release_service.create_release_conclusion(
-        gray_version.id,
-        request.get("conclusion_type", "release"),
-        request.get("summary", ""),
-        request.get("released_by", "system")
-    )
+    try:
+        conclusion = release_service.create_release_conclusion(
+            gray_version.id,
+            request.get("conclusion_type", "release"),
+            request.get("summary", ""),
+            request.get("released_by", "system")
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     return conclusion
 

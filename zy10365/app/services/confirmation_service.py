@@ -182,7 +182,41 @@ class ReleaseService:
         if not gray_version:
             raise ValueError(f"Gray version {gray_version_id} not found")
 
+        if gray_version.status == VerificationStatus.RELEASED:
+            raise ValueError("Version already released")
+
+        if gray_version.status == VerificationStatus.PENDING:
+            raise ValueError("Version not started yet, run replay first")
+
+        if gray_version.status == VerificationStatus.REPLAYING:
+            raise ValueError("Replay in progress, please wait")
+
+        if gray_version.status == VerificationStatus.FAILED:
+            raise ValueError("Replay failed, cannot release")
+
         stats = self._calculate_statistics(gray_version_id)
+
+        if stats["total_requests"] == 0:
+            raise ValueError("No requests found for this version, add requests first")
+
+        if stats["success_requests"] == 0:
+            raise ValueError("No successful requests found, cannot release")
+
+        untolerated_critical_diffs = stats["critical_diffs"] - stats["tolerated_diffs"]
+        if untolerated_critical_diffs > 0:
+            raise ValueError(f"Found {untolerated_critical_diffs} untolerated critical diffs, cannot release")
+
+        confirmers = self.db.query(Confirmer).filter(
+            Confirmer.gray_version_id == gray_version_id
+        ).all()
+
+        if len(confirmers) == 0:
+            raise ValueError("No confirmers found, add confirmers first")
+
+        unconfirmed = [c for c in confirmers if not c.confirmed]
+        if len(unconfirmed) > 0:
+            unconfirmed_names = [c.user_name for c in unconfirmed]
+            raise ValueError(f"Confirmers not approved: {', '.join(unconfirmed_names)}")
 
         conclusion = ReleaseConclusion(
             gray_version_id=gray_version_id,

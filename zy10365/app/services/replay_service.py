@@ -85,6 +85,16 @@ class ReplayService:
             "details": []
         }
         
+        if len(requests) == 0:
+            results["error"] = "No requests to replay"
+            self._add_timeline(
+                gray_version_id=gray_version.id,
+                action="replay_skipped",
+                actor="system",
+                details={"reason": "No requests to replay"}
+            )
+            return results
+        
         gray_version.status = VerificationStatus.REPLAYING
         self.db.commit()
         
@@ -110,7 +120,15 @@ class ReplayService:
                 "result": result
             })
         
-        gray_version.status = VerificationStatus.DIFFING
+        if results["failed"] > 0:
+            if results["success"] == 0:
+                gray_version.status = VerificationStatus.FAILED
+                results["error"] = "All requests failed to replay"
+            else:
+                gray_version.status = VerificationStatus.DIFFING
+        else:
+            gray_version.status = VerificationStatus.DIFFING
+        
         self.db.commit()
         
         self._add_timeline(
