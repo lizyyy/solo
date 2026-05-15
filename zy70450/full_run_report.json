@@ -1,0 +1,248 @@
+{
+  "batch_info": {
+    "batch_id": "batch_20260515_205516",
+    "started_at": "2026-05-15T20:55:16.015649",
+    "completed_at": "2026-05-15T20:55:16.027247",
+    "statistics": {
+      "total_records": 13,
+      "success_count": 11,
+      "failed_count": 2,
+      "diff_count": 0
+    }
+  },
+  "failed_records": [
+    {
+      "record_id": "7ba21921-2576-403b-98a2-30ca8ad78365",
+      "order_id": "WO2024051012",
+      "error_type": "VALIDATION_ERROR",
+      "error_message": "缺少必填字段: report_date; 缺少必填字段: repair_type",
+      "input_data": {
+        "order_id": "WO2024051012",
+        "source_system": "物业系统C",
+        "description": "边界测试-缺少report_date字段",
+        "status": "待处理",
+        "building": "B栋",
+        "room": "301",
+        "_meta": {
+          "description": {
+            "source": "测试数据",
+            "source_type": "manual"
+          }
+        }
+      },
+      "field_sources": [
+        {
+          "field_path": "order_id",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "WO2024051012",
+          "processed_value": "WO2024051012"
+        },
+        {
+          "field_path": "source_system",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "物业系统C",
+          "processed_value": "物业系统C"
+        },
+        {
+          "field_path": "description",
+          "source": "测试数据",
+          "source_type": "manual",
+          "processing_rule": null,
+          "raw_value": "边界测试-缺少report_date字段",
+          "processed_value": "边界测试-缺少report_date字段"
+        },
+        {
+          "field_path": "status",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "待处理",
+          "processed_value": "待处理"
+        },
+        {
+          "field_path": "building",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "B栋",
+          "processed_value": "B栋"
+        },
+        {
+          "field_path": "room",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "301",
+          "processed_value": "301"
+        },
+        {
+          "field_path": "_meta.description.source",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "测试数据",
+          "processed_value": "测试数据"
+        },
+        {
+          "field_path": "_meta.description.source_type",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "manual",
+          "processed_value": "manual"
+        }
+      ],
+      "failed_at": "2026-05-15T20:55:16.026172",
+      "suggestion": "请检查必填字段是否完整，日期格式是否正确"
+    },
+    {
+      "record_id": "7286534a-127e-42dc-b4f0-4960781daf86",
+      "order_id": "WO12",
+      "error_type": "VALIDATION_ERROR",
+      "error_message": "order_id格式不正确，长度至少5位; report_date格式不正确，应为YYYY-MM-DD",
+      "input_data": {
+        "order_id": "WO12",
+        "source_system": "物业系统D",
+        "report_date": "2024/05/11",
+        "created_at": "2024-05-11T10:00:00",
+        "repair_type": "空调",
+        "building": "C栋",
+        "room": "502",
+        "description": "边界测试-日期格式错误+order_id太短",
+        "status": "待处理",
+        "_meta": {
+          "report_date": {
+            "source": "Excel导入",
+            "source_type": "import",
+            "rule": "格式转换失败"
+          },
+          "order_id": {
+            "source": "手动编号",
+            "source_type": "manual"
+          }
+        }
+      },
+      "field_sources": [
+        {
+          "field_path": "order_id",
+          "source": "手动编号",
+          "source_type": "manual",
+          "processing_rule": null,
+          "raw_value": "WO12",
+          "processed_value": "WO12"
+        },
+        {
+          "field_path": "source_system",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "物业系统D",
+          "processed_value": "物业系统D"
+        },
+        {
+          "field_path": "report_date",
+          "source": "Excel导入",
+          "source_type": "import",
+          "processing_rule": "格式转换失败",
+          "raw_value": "2024/05/11",
+          "processed_value": "2024/05/11"
+        },
+        {
+          "field_path": "created_at",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "2024-05-11T10:00:00",
+          "processed_value": "2024-05-11T10:00:00"
+        },
+        {
+          "field_path": "repair_type",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "空调",
+          "processed_value": "空调"
+        },
+        {
+          "field_path": "building",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "C栋",
+          "processed_value": "C栋"
+        },
+        {
+          "field_path": "room",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "502",
+          "processed_value": "502"
+        },
+        {
+          "field_path": "description",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "边界测试-日期格式错误+order_id太短",
+          "processed_value": "边界测试-日期格式错误+order_id太短"
+        },
+        {
+          "field_path": "status",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "待处理",
+          "processed_value": "待处理"
+        },
+        {
+          "field_path": "_meta.report_date.source",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "Excel导入",
+          "processed_value": "Excel导入"
+        },
+        {
+          "field_path": "_meta.report_date.source_type",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "import",
+          "processed_value": "import"
+        },
+        {
+          "field_path": "_meta.report_date.rule",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "格式转换失败",
+          "processed_value": "格式转换失败"
+        },
+        {
+          "field_path": "_meta.order_id.source",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "手动编号",
+          "processed_value": "手动编号"
+        },
+        {
+          "field_path": "_meta.order_id.source_type",
+          "source": "unknown",
+          "source_type": "direct",
+          "processing_rule": null,
+          "raw_value": "manual",
+          "processed_value": "manual"
+        }
+      ],
+      "failed_at": "2026-05-15T20:55:16.026804",
+      "suggestion": "请检查必填字段是否完整，日期格式是否正确"
+    }
+  ],
+  "diff_records": []
+}

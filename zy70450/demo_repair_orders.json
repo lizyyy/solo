@@ -1,0 +1,341 @@
+[
+  {
+    "order_id": "WO2024051001",
+    "source_system": "物业系统B",
+    "report_date": "2024-05-12",
+    "created_at": "2024-05-12T12:28:00",
+    "repair_type": "电梯",
+    "building": "B栋",
+    "room": "7541",
+    "description": "空调不制冷",
+    "status": "已完成",
+    "assignee": null,
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    },
+    "completed_at": "2024-05-14T00:28:00"
+  },
+  {
+    "order_id": "WO2024051002",
+    "source_system": "报修小程序",
+    "report_date": "2024-05-11",
+    "created_at": "2024-05-11T08:07:00",
+    "repair_type": "电梯",
+    "building": "A栋",
+    "room": "1841",
+    "description": "门锁损坏",
+    "status": "已完成",
+    "assignee": "张师傅",
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    },
+    "completed_at": "2024-05-12T11:07:00"
+  },
+  {
+    "order_id": "WO2024051003",
+    "source_system": "物业系统A",
+    "report_date": "2024-05-11",
+    "created_at": "2024-05-11T15:40:00",
+    "repair_type": "消防",
+    "building": "A栋",
+    "room": "15299",
+    "description": "卫生间漏水",
+    "status": "处理中",
+    "assignee": "王师傅",
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    }
+  },
+  {
+    "order_id": "WO2024051004",
+    "source_system": "报修小程序",
+    "report_date": "2024-05-10",
+    "created_at": "2024-05-10T12:14:00",
+    "repair_type": "电梯",
+    "building": "C栋",
+    "room": "15823",
+    "description": "卫生间漏水",
+    "status": "已取消",
+    "assignee": "王师傅",
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    }
+  },
+  {
+    "order_id": "WO2024051005",
+    "source_system": "报修小程序",
+    "report_date": "2024-05-10",
+    "created_at": "2024-05-10T10:31:00",
+    "repair_type": "电梯",
+    "building": "D栋",
+    "room": "8979",
+    "description": "门锁损坏",
+    "status": "已取消",
+    "assignee": "张师傅",
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    }
+  },
+  {
+    "order_id": "WO2024051006",
+    "source_system": "人工录入",
+    "report_date": "2024-05-12",
+    "created_at": "2024-05-12T16:42:00",
+    "repair_type": "水电",
+    "building": "A栋",
+    "room": "4328",
+    "description": "卫生间漏水",
+    "status": "处理中",
+    "assignee": null,
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    }
+  },
+  {
+    "order_id": "WO2024051007",
+    "source_system": "报修小程序",
+    "report_date": "2024-05-12",
+    "created_at": "2024-05-12T17:47:00",
+    "repair_type": "消防",
+    "building": "D栋",
+    "room": "8838",
+    "description": "电梯异响",
+    "status": "处理中",
+    "assignee": null,
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    }
+  },
+  {
+    "order_id": "WO2024051008",
+    "source_system": "物业系统A",
+    "report_date": "2024-05-12",
+    "created_at": "2024-05-12T17:08:00",
+    "repair_type": "水电",
+    "building": "A栋",
+    "room": "19309",
+    "description": "门锁损坏",
+    "status": "已完成",
+    "assignee": "张师傅",
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    },
+    "completed_at": "2024-05-14T17:08:00"
+  },
+  {
+    "order_id": "WO2024051009",
+    "source_system": "报修小程序",
+    "report_date": "2024-05-12",
+    "created_at": "2024-05-12T14:59:00",
+    "repair_type": "电梯",
+    "building": "C栋",
+    "room": "1586",
+    "description": "空调不制冷",
+    "status": "处理中",
+    "assignee": "张师傅",
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    }
+  },
+  {
+    "order_id": "WO2024051010",
+    "source_system": "报修小程序",
+    "report_date": "2024-05-11",
+    "created_at": "2024-05-11T12:47:00",
+    "repair_type": "电梯",
+    "building": "A栋",
+    "room": "18879",
+    "description": "空调不制冷",
+    "status": "待处理",
+    "assignee": "张师傅",
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment",
+        "rule": "WO+日期+序号"
+      },
+      "description": {
+        "source": "用户报修",
+        "source_type": "user_input"
+      },
+      "status": {
+        "source": "工单系统",
+        "source_type": "workflow"
+      }
+    }
+  },
+  {
+    "order_id": "WO2024051011",
+    "source_system": "混合来源",
+    "report_date": "2024-05-11",
+    "created_at": "2024-05-11T14:30:00",
+    "repair_type": "水电",
+    "building": "A栋",
+    "room": "1205",
+    "description": "厨房水管漏水，需要紧急处理",
+    "status": "处理中",
+    "assignee": "赵师傅",
+    "_meta": {
+      "order_id": {
+        "source": "物业系统A",
+        "source_type": "auto_increment"
+      },
+      "description": {
+        "source": "电话报修",
+        "source_type": "人工转录"
+      },
+      "assignee": {
+        "source": "调度系统B",
+        "source_type": "自动分配"
+      },
+      "status": {
+        "source": "移动端APP",
+        "source_type": "师傅更新"
+      }
+    }
+  },
+  {
+    "order_id": "WO2024051012",
+    "source_system": "物业系统C",
+    "description": "边界测试-缺少report_date字段",
+    "status": "待处理",
+    "building": "B栋",
+    "room": "301",
+    "_meta": {
+      "description": {
+        "source": "测试数据",
+        "source_type": "manual"
+      }
+    }
+  },
+  {
+    "order_id": "WO12",
+    "source_system": "物业系统D",
+    "report_date": "2024/05/11",
+    "created_at": "2024-05-11T10:00:00",
+    "repair_type": "空调",
+    "building": "C栋",
+    "room": "502",
+    "description": "边界测试-日期格式错误+order_id太短",
+    "status": "待处理",
+    "_meta": {
+      "report_date": {
+        "source": "Excel导入",
+        "source_type": "import",
+        "rule": "格式转换失败"
+      },
+      "order_id": {
+        "source": "手动编号",
+        "source_type": "manual"
+      }
+    }
+  }
+]
