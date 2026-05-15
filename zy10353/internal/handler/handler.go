@@ -51,7 +51,7 @@ func (h *Handler) respondError(w http.ResponseWriter, err error) {
 		status = http.StatusNotFound
 	case "TASK_ALREADY_EXISTS", "DUPLICATE_TASK":
 		status = http.StatusConflict
-	case "INVALID_STATUS", "VALIDATION_FAILED":
+	case "INVALID_STATUS", "VALIDATION_FAILED", "VALIDATION_ERROR", "INVALID_REQUEST":
 		status = http.StatusBadRequest
 	case "PATH_TRAVERSAL", "FILE_TOO_LARGE", "TOTAL_SIZE_EXCEEDED", "TOO_MANY_FILES", "BLOCKED_EXTENSION", "BLOCKED_PATTERN":
 		status = http.StatusBadRequest
@@ -172,9 +172,9 @@ func (h *Handler) ExportResult(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.respondJSON(w, http.StatusOK, map[string]interface{}{
-		"task":   taskResp.Task,
-		"result": result,
-		"risks":  risks,
+		"task":        taskResp.Task,
+		"result":      result,
+		"risks":       risks,
 		"exported_at": result.CompletedAt,
 	})
 }

@@ -24,17 +24,36 @@ func NewUnpackService(store store.Store) *UnpackService {
 	return &UnpackService{
 		store: store,
 		rules: model.UnpackRule{
-			MaxFileSize:       100 * 1024 * 1024,
-			MaxTotalSize:      1 * 1024 * 1024 * 1024,
-			MaxFileCount:      10000,
+			MaxFileSize:        100 * 1024 * 1024,
+			MaxTotalSize:       1 * 1024 * 1024 * 1024,
+			MaxFileCount:       10000,
 			AllowPathTraversal: false,
-			BlockedExtensions: []string{".exe", ".bat", ".cmd", ".ps1", ".sh", ".vbs", ".js"},
-			BlockedPatterns:   []string{"../", "..\\", "/etc/", "/root/", "C:\\Windows\\"},
+			BlockedExtensions:  []string{".exe", ".bat", ".cmd", ".ps1", ".sh", ".vbs", ".js"},
+			BlockedPatterns:    []string{"../", "..\\", "/etc/", "/root/", "C:\\Windows\\"},
 		},
 	}
 }
 
 func (s *UnpackService) CreateTask(req *model.CreateTaskRequest) (*model.ArchiveTask, error) {
+	if req.ArchiveName == "" {
+		return nil, errors.NewAppError("VALIDATION_ERROR", "archive_name is required", nil)
+	}
+
+	if req.ArchiveType != model.ArchiveZip &&
+		req.ArchiveType != model.ArchiveRar &&
+		req.ArchiveType != model.ArchiveTar &&
+		req.ArchiveType != model.ArchiveGz {
+		return nil, errors.NewAppError("VALIDATION_ERROR", "invalid archive_type, must be one of: zip, rar, tar, tar.gz", nil)
+	}
+
+	if req.ArchiveSize <= 0 {
+		return nil, errors.NewAppError("VALIDATION_ERROR", "archive_size must be positive", nil)
+	}
+
+	if req.FileHash == "" {
+		return nil, errors.NewAppError("VALIDATION_ERROR", "file_hash is required", nil)
+	}
+
 	existingTask, err := s.store.GetTaskByHash(req.FileHash)
 	if err != nil {
 		return nil, err
@@ -47,14 +66,14 @@ func (s *UnpackService) CreateTask(req *model.CreateTaskRequest) (*model.Archive
 	now := time.Now()
 
 	task := &model.ArchiveTask{
-		TaskID:      taskID,
-		ArchiveName: req.ArchiveName,
-		ArchiveType: req.ArchiveType,
-		ArchiveSize: req.ArchiveSize,
-		FileHash:    req.FileHash,
-		Status:      model.StatusCreated,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		TaskID:       taskID,
+		ArchiveName:  req.ArchiveName,
+		ArchiveType:  req.ArchiveType,
+		ArchiveSize:  req.ArchiveSize,
+		FileHash:     req.FileHash,
+		Status:       model.StatusCreated,
+		CreatedAt:    now,
+		UpdatedAt:    now,
 		IsolationDir: filepath.Join(os.TempDir(), "secure-unpack", taskID),
 	}
 
@@ -143,8 +162,8 @@ func (s *UnpackService) ProcessTask(taskID string, simulateFiles []model.FileEnt
 		return nil, errors.ErrTaskNotFound
 	}
 
-	if task.Status != model.StatusValidated && task.Status != model.StatusCreated {
-		return nil, errors.ErrInvalidStatus
+	if task.Status != model.StatusValidated {
+		return nil, errors.NewAppError("INVALID_STATUS", "task must be validated before processing", nil)
 	}
 
 	task.Status = model.StatusProcessing
@@ -155,16 +174,47 @@ func (s *UnpackService) ProcessTask(taskID string, simulateFiles []model.FileEnt
 	}
 
 	result := &model.ProcessResult{
-		TaskID:      taskID,
-		Status:      model.StatusProcessing,
-		StartedAt:   time.Now(),
-		OutputDir:   task.IsolationDir,
+		TaskID:    taskID,
+		Status:    model.StatusProcessing,
+		StartedAt: time.Now(),
+		OutputDir: task.IsolationDir,
 	}
 
 	var risks []*model.RiskItem
 	var totalSize int64
 
+	if len(simulateFiles) > s.rules.MaxFileCount {
+		risks = append(risks, s.createRisk(taskID, "", "too_many_files", model.RiskHigh,
+			fmt.Sprintf("File count %d exceeds max file count %d", len(simulateFiles), s.rules.MaxFileCount)))
+		result.Status = model.StatusFailed
+		result.TotalFiles = len(simulateFiles)
+		result.RiskCount = len(risks)
+		result.CompletedAt = time.Now()
+
+		task.Status = result.Status
+		task.UpdatedAt = time.Now()
+		err = s.store.UpdateTask(task)
+		if err != nil {
+			return nil, err
+		}
+
+		err = s.store.SaveResult(result)
+		if err != nil {
+			return nil, err
+		}
+
+		var riskItems []model.RiskItem
+		for _, r := range risks {
+			riskItems = append(riskItems, *r)
+		}
+		result.Risks = riskItems
+
+		return result, nil
+	}
+
 	for _, file := range simulateFiles {
+		totalSize += file.FileSize
+
 		risk, err := s.validateFile(taskID, file)
 		if err != nil {
 			risks = append(risks, risk)
@@ -174,9 +224,13 @@ func (s *UnpackService) ProcessTask(taskID string, simulateFiles []model.FileEnt
 			risks = append(risks, risk)
 		}
 
-		totalSize += file.FileSize
 		result.TotalFiles++
 		result.FileList = append(result.FileList, file)
+	}
+
+	if totalSize > s.rules.MaxTotalSize {
+		risks = append(risks, s.createRisk(taskID, "", "total_size_exceeded", model.RiskHigh,
+			fmt.Sprintf("Total size %d exceeds max total size %d", totalSize, s.rules.MaxTotalSize)))
 	}
 
 	result.TotalSize = totalSize

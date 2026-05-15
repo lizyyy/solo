@@ -39,6 +39,76 @@ func TestCreateTask(t *testing.T) {
 	}
 }
 
+func TestCreateTaskValidation(t *testing.T) {
+	s := NewUnpackService(store.NewMemoryStore())
+
+	tests := []struct {
+		name    string
+		req     *model.CreateTaskRequest
+		wantErr bool
+	}{
+		{
+			name: "missing archive_name",
+			req: &model.CreateTaskRequest{
+				ArchiveName: "",
+				ArchiveType: model.ArchiveZip,
+				ArchiveSize: 1024,
+				FileHash:    "abc123",
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid archive_type",
+			req: &model.CreateTaskRequest{
+				ArchiveName: "test.zip",
+				ArchiveType: "invalid",
+				ArchiveSize: 1024,
+				FileHash:    "abc123",
+			},
+			wantErr: true,
+		},
+		{
+			name: "zero archive_size",
+			req: &model.CreateTaskRequest{
+				ArchiveName: "test.zip",
+				ArchiveType: model.ArchiveZip,
+				ArchiveSize: 0,
+				FileHash:    "abc123",
+			},
+			wantErr: true,
+		},
+		{
+			name: "negative archive_size",
+			req: &model.CreateTaskRequest{
+				ArchiveName: "test.zip",
+				ArchiveType: model.ArchiveZip,
+				ArchiveSize: -1,
+				FileHash:    "abc123",
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing file_hash",
+			req: &model.CreateTaskRequest{
+				ArchiveName: "test.zip",
+				ArchiveType: model.ArchiveZip,
+				ArchiveSize: 1024,
+				FileHash:    "",
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := s.CreateTask(tt.req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CreateTask() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestValidateTask(t *testing.T) {
 	s := NewUnpackService(store.NewMemoryStore())
 
@@ -82,6 +152,11 @@ func TestProcessTask(t *testing.T) {
 
 	task, _ := s.CreateTask(req)
 
+	_, err := s.ValidateTask(task.TaskID)
+	if err != nil {
+		t.Fatalf("ValidateTask failed: %v", err)
+	}
+
 	files := []model.FileEntry{
 		{
 			Path:     "dir/file.txt",
@@ -106,6 +181,33 @@ func TestProcessTask(t *testing.T) {
 	}
 }
 
+func TestProcessTaskWithoutValidation(t *testing.T) {
+	s := NewUnpackService(store.NewMemoryStore())
+
+	req := &model.CreateTaskRequest{
+		ArchiveName: "test.zip",
+		ArchiveType: model.ArchiveZip,
+		ArchiveSize: 1024,
+		FileHash:    "abc123",
+	}
+
+	task, _ := s.CreateTask(req)
+
+	files := []model.FileEntry{
+		{
+			Path:     "dir/file.txt",
+			FileName: "file.txt",
+			FileSize: 1024,
+			IsDir:    false,
+		},
+	}
+
+	_, err := s.ProcessTask(task.TaskID, files)
+	if err == nil {
+		t.Error("Expected error for processing unvalidated task")
+	}
+}
+
 func TestProcessTaskWithRisks(t *testing.T) {
 	s := NewUnpackService(store.NewMemoryStore())
 
@@ -117,6 +219,11 @@ func TestProcessTaskWithRisks(t *testing.T) {
 	}
 
 	task, _ := s.CreateTask(req)
+
+	_, err := s.ValidateTask(task.TaskID)
+	if err != nil {
+		t.Fatalf("ValidateTask failed: %v", err)
+	}
 
 	files := []model.FileEntry{
 		{
@@ -162,6 +269,103 @@ func TestProcessTaskWithRisks(t *testing.T) {
 	}
 	if !foundBlockedExt {
 		t.Error("Expected blocked_extension or file_too_large risk")
+	}
+}
+
+func TestProcessTaskMaxFileCount(t *testing.T) {
+	s := NewUnpackService(store.NewMemoryStore())
+
+	req := &model.CreateTaskRequest{
+		ArchiveName: "test.zip",
+		ArchiveType: model.ArchiveZip,
+		ArchiveSize: 1024,
+		FileHash:    "abc123",
+	}
+
+	task, _ := s.CreateTask(req)
+
+	_, err := s.ValidateTask(task.TaskID)
+	if err != nil {
+		t.Fatalf("ValidateTask failed: %v", err)
+	}
+
+	files := make([]model.FileEntry, 10001)
+	for i := 0; i < 10001; i++ {
+		files[i] = model.FileEntry{
+			Path:     "dir/file" + string(rune(i)) + ".txt",
+			FileName: "file" + string(rune(i)) + ".txt",
+			FileSize: 1024,
+			IsDir:    false,
+		}
+	}
+
+	result, err := s.ProcessTask(task.TaskID, files)
+	if err != nil {
+		t.Fatalf("ProcessTask failed: %v", err)
+	}
+	if result.Status != model.StatusFailed {
+		t.Errorf("Expected status %s, got %s", model.StatusFailed, result.Status)
+	}
+	if result.RiskCount != 1 {
+		t.Errorf("Expected 1 risk, got %d", result.RiskCount)
+	}
+	if result.Risks[0].RiskType != "too_many_files" {
+		t.Errorf("Expected too_many_files risk, got %s", result.Risks[0].RiskType)
+	}
+}
+
+func TestProcessTaskTotalSizeLimit(t *testing.T) {
+	s := NewUnpackService(store.NewMemoryStore())
+
+	req := &model.CreateTaskRequest{
+		ArchiveName: "test.zip",
+		ArchiveType: model.ArchiveZip,
+		ArchiveSize: 1024,
+		FileHash:    "abc123",
+	}
+
+	task, _ := s.CreateTask(req)
+
+	_, err := s.ValidateTask(task.TaskID)
+	if err != nil {
+		t.Fatalf("ValidateTask failed: %v", err)
+	}
+
+	files := []model.FileEntry{
+		{
+			Path:     "large/file1.txt",
+			FileName: "file1.txt",
+			FileSize: 600 * 1024 * 1024,
+			IsDir:    false,
+		},
+		{
+			Path:     "large/file2.txt",
+			FileName: "file2.txt",
+			FileSize: 600 * 1024 * 1024,
+			IsDir:    false,
+		},
+	}
+
+	result, err := s.ProcessTask(task.TaskID, files)
+	if err != nil {
+		t.Fatalf("ProcessTask failed: %v", err)
+	}
+	if result.Status != model.StatusFailed {
+		t.Errorf("Expected status %s, got %s", model.StatusFailed, result.Status)
+	}
+	if result.RiskCount != 3 {
+		t.Errorf("Expected 3 risks (2 file_too_large + 1 total_size_exceeded), got %d", result.RiskCount)
+	}
+
+	foundTotalSizeExceeded := false
+	for _, risk := range result.Risks {
+		if risk.RiskType == "total_size_exceeded" {
+			foundTotalSizeExceeded = true
+			break
+		}
+	}
+	if !foundTotalSizeExceeded {
+		t.Error("Expected total_size_exceeded risk")
 	}
 }
 

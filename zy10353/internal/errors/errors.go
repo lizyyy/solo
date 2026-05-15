@@ -3,19 +3,19 @@ package errors
 import "errors"
 
 var (
-	ErrTaskNotFound     = errors.New("task not found")
+	ErrTaskNotFound      = errors.New("task not found")
 	ErrTaskAlreadyExists = errors.New("task already exists")
-	ErrInvalidStatus    = errors.New("invalid task status")
-	ErrInvalidArchive   = errors.New("invalid archive")
-	ErrPathTraversal    = errors.New("path traversal detected")
-	ErrFileTooLarge     = errors.New("file too large")
+	ErrInvalidStatus     = errors.New("invalid task status")
+	ErrInvalidArchive    = errors.New("invalid archive")
+	ErrPathTraversal     = errors.New("path traversal detected")
+	ErrFileTooLarge      = errors.New("file too large")
 	ErrTotalSizeExceeded = errors.New("total size exceeded")
-	ErrTooManyFiles     = errors.New("too many files")
-	ErrBlockedExtension = errors.New("blocked file extension")
-	ErrBlockedPattern   = errors.New("blocked file pattern")
-	ErrValidationFailed = errors.New("validation failed")
-	ErrProcessingFailed = errors.New("processing failed")
-	ErrDuplicateTask    = errors.New("duplicate task")
+	ErrTooManyFiles      = errors.New("too many files")
+	ErrBlockedExtension  = errors.New("blocked file extension")
+	ErrBlockedPattern    = errors.New("blocked file pattern")
+	ErrValidationFailed  = errors.New("validation failed")
+	ErrProcessingFailed  = errors.New("processing failed")
+	ErrDuplicateTask     = errors.New("duplicate task")
 )
 
 type AppError struct {
@@ -50,6 +50,9 @@ func NewAppErrorWithDetail(code, message, detail string, err error) *AppError {
 }
 
 func MapToErrorCode(err error) string {
+	if appErr, ok := err.(*AppError); ok {
+		return appErr.Code
+	}
 	switch {
 	case errors.Is(err, ErrTaskNotFound):
 		return "TASK_NOT_FOUND"
