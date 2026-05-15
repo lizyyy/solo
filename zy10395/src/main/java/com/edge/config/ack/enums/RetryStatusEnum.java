@@ -17,4 +17,13 @@ public enum RetryStatusEnum {
         this.code = code;
         this.desc = desc;
     }
+
+    public static RetryStatusEnum of(Integer code) {
+        for (RetryStatusEnum e : values()) {
+            if (e.getCode().equals(code)) {
+                return e;
+            }
+        }
+        return null;
+    }
 }

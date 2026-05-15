@@ -18,9 +18,10 @@
     <description>边缘节点配置签收、生效校验、失败补发系统</description>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>1.8</java.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <poi.version>5.2.3</poi.version>
+        <maven-wrapper.version>3.2.0</maven-wrapper.version>
     </properties>
 
     <dependencies>
@@ -83,6 +84,14 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-wrapper-plugin</artifactId>
+                <version>${maven-wrapper.version}</version>
+                <configuration>
+                    <mavenVersion>3.8.8</mavenVersion>
                 </configuration>
             </plugin>
         </plugins>

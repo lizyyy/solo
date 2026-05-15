@@ -4,22 +4,43 @@
 边缘节点配置签收API系统，提供配置下发、签收确认、生效校验、失败补发、版本对账等核心功能。
 
 ## 技术栈
-- Java 11
+- Java 8+ (兼容 Java 8, 9, 10, 11)
 - Spring Boot 2.7.18
 - MyBatis Plus 3.5.3.1
 - H2 Database (内存数据库)
 - Apache POI 5.2.3
 
-## 启动说明
+## 快速启动
+
+### 方式一：一键启动（推荐）
 ```bash
+./start.sh
+```
+脚本会自动：
+- 检查 Java 环境
+- 自动下载 Maven（如需要）
+- 编译项目
+- 启动 Spring Boot 服务
+
+### 方式二：使用 Maven
+```bash
+./mvnw clean spring-boot:run
+# 或
 mvn clean spring-boot:run
 ```
+
 服务启动后访问: http://localhost:8080
 
 H2控制台: http://localhost:8080/h2-console
 - JDBC URL: jdbc:h2:mem:edge_config
 - Username: sa
 - Password: (空)
+
+## API 测试脚本
+项目启动后，运行测试脚本验证所有接口：
+```bash
+./test-api.sh
+```
 
 ## 预置测试数据
 - 边缘节点: NODE1 ~ NODE5

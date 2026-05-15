@@ -15,4 +15,13 @@ public enum CheckResultEnum {
         this.code = code;
         this.desc = desc;
     }
+
+    public static CheckResultEnum of(Integer code) {
+        for (CheckResultEnum e : values()) {
+            if (e.getCode().equals(code)) {
+                return e;
+            }
+        }
+        return null;
+    }
 }

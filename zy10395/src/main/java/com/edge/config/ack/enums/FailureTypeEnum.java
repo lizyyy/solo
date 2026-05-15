@@ -14,4 +14,13 @@ public enum FailureTypeEnum {
         this.code = code;
         this.desc = desc;
     }
+
+    public static FailureTypeEnum of(Integer code) {
+        for (FailureTypeEnum e : values()) {
+            if (e.getCode().equals(code)) {
+                return e;
+            }
+        }
+        return null;
+    }
 }

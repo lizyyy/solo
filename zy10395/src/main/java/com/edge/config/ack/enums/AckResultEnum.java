@@ -14,4 +14,13 @@ public enum AckResultEnum {
         this.code = code;
         this.desc = desc;
     }
+
+    public static AckResultEnum of(Integer code) {
+        for (AckResultEnum e : values()) {
+            if (e.getCode().equals(code)) {
+                return e;
+            }
+        }
+        return null;
+    }
 }
