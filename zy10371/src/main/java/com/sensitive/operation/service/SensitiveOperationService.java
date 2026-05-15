@@ -60,7 +60,12 @@ public class SensitiveOperationService {
     public SensitiveOperation createOperation(CreateOperationRequest request) {
         if (repository.existsById(request.getRequestId())) {
             log.info("操作ID已存在，幂等返回: {}", request.getRequestId());
-            return repository.findById(request.getRequestId()).orElseThrow();
+            return repository.findById(request.getRequestId()).orElseThrow(new java.util.function.Supplier<RuntimeException>() {
+                @Override
+                public RuntimeException get() {
+                    return new javax.persistence.EntityNotFoundException("操作不存在: " + request.getRequestId());
+                }
+            });
         }
 
         int expireMinutes = getExpireMinutes(request);
