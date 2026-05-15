@@ -1,16 +1,16 @@
 {
-  "reportId": "RPT1778797911475",
-  "generatedAt": "2026-05-14T22:31:51.475Z",
-  "batchId": "BATCH1778797911470",
+  "reportId": "RPT1778841301802",
+  "generatedAt": "2026-05-15T10:35:01.802Z",
+  "batchId": "BATCH1778841301798",
   "operator": "张医生",
   "summary": {
-    "totalBusinessNos": 11,
-    "totalAnomalies": 11,
+    "totalBusinessNos": 4,
+    "totalAnomalies": 4,
     "gatewayErrors": 1,
     "byLevel": {
       "critical": 2,
       "high": 1,
-      "medium": 8,
+      "medium": 1,
       "low": 0
     }
   },
@@ -18,12 +18,14 @@
     {
       "code": "GW001",
       "message": "网关超时",
-      "detectedAt": "2026-05-14T22:31:51.475Z"
+      "businessNo": null,
+      "rawLog": "GW001 timeout connecting to server",
+      "detectedAt": "2026-05-15T10:35:01.802Z"
     }
   ],
   "businessNoSummaries": [
     {
-      "businessNo": "BATCH-BATCH1778797911470",
+      "businessNo": "BATCH-BATCH1778841301798",
       "anomalyCount": 1,
       "hasGatewayError": true,
       "conclusionLevel": "critical",
@@ -34,6 +36,7 @@
           "code": "GW001",
           "message": "网关超时",
           "rawContent": null,
+          "rawLog": "GW001 timeout connecting to server",
           "sampleId": null,
           "field": null,
           "value": null,
@@ -49,7 +52,7 @@
       ]
     },
     {
-      "businessNo": "LAB202605141123",
+      "businessNo": "LAB202605156934",
       "anomalyCount": 1,
       "hasGatewayError": false,
       "conclusionLevel": "critical",
@@ -60,6 +63,7 @@
           "code": null,
           "message": "该行数据格式异常，字段缺失严重，被系统自动过滤",
           "rawContent": "LAB202605150099,S000051,异常患者,,男,,,张医生,2026-05-15T08:30:00.000Z",
+          "rawLog": null,
           "sampleId": null,
           "field": null,
           "value": null,
@@ -75,7 +79,7 @@
       ]
     },
     {
-      "businessNo": "LAB202605147511",
+      "businessNo": "LAB202605151870",
       "anomalyCount": 1,
       "hasGatewayError": false,
       "conclusionLevel": "high",
@@ -86,6 +90,7 @@
           "code": null,
           "message": "字段数量不匹配，后续字段截断",
           "rawContent": "LAB202605150100,S000052,测试不完整,30,男,血液,血常规",
+          "rawLog": null,
           "sampleId": null,
           "field": null,
           "value": null,
@@ -101,7 +106,7 @@
       ]
     },
     {
-      "businessNo": "LAB202605140724",
+      "businessNo": "LAB202605150968",
       "anomalyCount": 1,
       "hasGatewayError": false,
       "conclusionLevel": "medium",
@@ -112,189 +117,8 @@
           "code": null,
           "message": "接收时间早于采集时间",
           "rawContent": null,
-          "sampleId": "S000002",
-          "field": null,
-          "value": null,
-          "missingFields": [],
-          "isGatewayError": false
-        }
-      ],
-      "corrections": [
-        {
-          "anomalyType": "data_anomaly",
-          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
-        }
-      ]
-    },
-    {
-      "businessNo": "LAB202605146140",
-      "anomalyCount": 1,
-      "hasGatewayError": false,
-      "conclusionLevel": "medium",
-      "conclusion": "存在数据异常，建议在下次批量处理前修正",
-      "anomalies": [
-        {
-          "type": "data_anomaly",
-          "code": null,
-          "message": "接收时间早于采集时间",
-          "rawContent": null,
-          "sampleId": "S000007",
-          "field": null,
-          "value": null,
-          "missingFields": [],
-          "isGatewayError": false
-        }
-      ],
-      "corrections": [
-        {
-          "anomalyType": "data_anomaly",
-          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
-        }
-      ]
-    },
-    {
-      "businessNo": "LAB202605146420",
-      "anomalyCount": 1,
-      "hasGatewayError": false,
-      "conclusionLevel": "medium",
-      "conclusion": "存在数据异常，建议在下次批量处理前修正",
-      "anomalies": [
-        {
-          "type": "data_anomaly",
-          "code": null,
-          "message": "接收时间早于采集时间",
-          "rawContent": null,
-          "sampleId": "S000008",
-          "field": null,
-          "value": null,
-          "missingFields": [],
-          "isGatewayError": false
-        }
-      ],
-      "corrections": [
-        {
-          "anomalyType": "data_anomaly",
-          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
-        }
-      ]
-    },
-    {
-      "businessNo": "LAB202605143248",
-      "anomalyCount": 1,
-      "hasGatewayError": false,
-      "conclusionLevel": "medium",
-      "conclusion": "存在数据异常，建议在下次批量处理前修正",
-      "anomalies": [
-        {
-          "type": "data_anomaly",
-          "code": null,
-          "message": "接收时间早于采集时间",
-          "rawContent": null,
-          "sampleId": "S000014",
-          "field": null,
-          "value": null,
-          "missingFields": [],
-          "isGatewayError": false
-        }
-      ],
-      "corrections": [
-        {
-          "anomalyType": "data_anomaly",
-          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
-        }
-      ]
-    },
-    {
-      "businessNo": "LAB202605142738",
-      "anomalyCount": 1,
-      "hasGatewayError": false,
-      "conclusionLevel": "medium",
-      "conclusion": "存在数据异常，建议在下次批量处理前修正",
-      "anomalies": [
-        {
-          "type": "data_anomaly",
-          "code": null,
-          "message": "接收时间早于采集时间",
-          "rawContent": null,
-          "sampleId": "S000018",
-          "field": null,
-          "value": null,
-          "missingFields": [],
-          "isGatewayError": false
-        }
-      ],
-      "corrections": [
-        {
-          "anomalyType": "data_anomaly",
-          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
-        }
-      ]
-    },
-    {
-      "businessNo": "LAB202605141278",
-      "anomalyCount": 1,
-      "hasGatewayError": false,
-      "conclusionLevel": "medium",
-      "conclusion": "存在数据异常，建议在下次批量处理前修正",
-      "anomalies": [
-        {
-          "type": "data_anomaly",
-          "code": null,
-          "message": "接收时间早于采集时间",
-          "rawContent": null,
-          "sampleId": "S000019",
-          "field": null,
-          "value": null,
-          "missingFields": [],
-          "isGatewayError": false
-        }
-      ],
-      "corrections": [
-        {
-          "anomalyType": "data_anomaly",
-          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
-        }
-      ]
-    },
-    {
-      "businessNo": "LAB202605140878",
-      "anomalyCount": 1,
-      "hasGatewayError": false,
-      "conclusionLevel": "medium",
-      "conclusion": "存在数据异常，建议在下次批量处理前修正",
-      "anomalies": [
-        {
-          "type": "data_anomaly",
-          "code": null,
-          "message": "接收时间早于采集时间",
-          "rawContent": null,
-          "sampleId": "S000026",
-          "field": null,
-          "value": null,
-          "missingFields": [],
-          "isGatewayError": false
-        }
-      ],
-      "corrections": [
-        {
-          "anomalyType": "data_anomaly",
-          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
-        }
-      ]
-    },
-    {
-      "businessNo": "LAB202605140214",
-      "anomalyCount": 1,
-      "hasGatewayError": false,
-      "conclusionLevel": "medium",
-      "conclusion": "存在数据异常，建议在下次批量处理前修正",
-      "anomalies": [
-        {
-          "type": "data_anomaly",
-          "code": null,
-          "message": "接收时间早于采集时间",
-          "rawContent": null,
-          "sampleId": "S000030",
+          "rawLog": null,
+          "sampleId": "S000001",
           "field": null,
           "value": null,
           "missingFields": [],
@@ -309,5 +133,5 @@
       ]
     }
   ],
-  "exportTime": "2026-05-14T22:31:51.475Z"
+  "exportTime": "2026-05-15T10:35:01.802Z"
 }

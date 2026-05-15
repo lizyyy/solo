@@ -19,6 +19,8 @@ const GATEWAY_ERROR_PATTERNS = [
   { code: 'GW005', pattern: /network error/i, message: '网络错误' }
 ];
 
+const BUSINESS_NO_PATTERN = /LAB\d{12}/i;
+
 function detectMissingFields(parsedFields) {
   const missing = [];
   for (const field of REQUIRED_FIELDS) {
@@ -59,15 +61,30 @@ function detectDataAnomalies(sample) {
 
 function detectGatewayErrors(logContent) {
   const errors = [];
-  for (const { code, pattern, message } of GATEWAY_ERROR_PATTERNS) {
-    if (pattern.test(logContent)) {
-      errors.push({
-        code,
-        message,
-        detectedAt: new Date().toISOString()
-      });
+  const lines = logContent.split('\n');
+  
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    
+    let businessNo = null;
+    const businessMatch = line.match(BUSINESS_NO_PATTERN);
+    if (businessMatch) {
+      businessNo = businessMatch[0].toUpperCase();
+    }
+    
+    for (const { code, pattern, message } of GATEWAY_ERROR_PATTERNS) {
+      if (pattern.test(line)) {
+        errors.push({
+          code,
+          message,
+          businessNo,
+          rawLog: line.trim(),
+          detectedAt: new Date().toISOString()
+        });
+      }
     }
   }
+  
   return errors;
 }
 

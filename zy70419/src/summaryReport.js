@@ -17,18 +17,39 @@ function groupAnomaliesByBusinessNo(auditResult, gatewayErrors = []) {
   }
   
   if (gatewayErrors.length > 0) {
-    const gatewayBusinessNo = `BATCH-${auditResult.batchId || '系统级'}`;
-    if (!grouped.has(gatewayBusinessNo)) {
-      grouped.set(gatewayBusinessNo, []);
-    }
+    const systemGatewayErrors = [];
+    
     for (const error of gatewayErrors) {
-      grouped.get(gatewayBusinessNo).push({
+      const gatewayAnomaly = {
         type: 'gateway_error',
         code: error.code,
         message: error.message,
+        businessNo: error.businessNo || null,
+        rawLog: error.rawLog || null,
         detectedAt: error.detectedAt,
         isGatewayError: true
-      });
+      };
+      
+      if (error.businessNo && grouped.has(error.businessNo)) {
+        grouped.get(error.businessNo).push(gatewayAnomaly);
+      } else if (error.businessNo) {
+        if (!grouped.has(error.businessNo)) {
+          grouped.set(error.businessNo, []);
+        }
+        grouped.get(error.businessNo).push(gatewayAnomaly);
+      } else {
+        systemGatewayErrors.push(gatewayAnomaly);
+      }
+    }
+    
+    if (systemGatewayErrors.length > 0) {
+      const gatewayBusinessNo = `BATCH-${auditResult.batchId || '系统级'}`;
+      if (!grouped.has(gatewayBusinessNo)) {
+        grouped.set(gatewayBusinessNo, []);
+      }
+      for (const error of systemGatewayErrors) {
+        grouped.get(gatewayBusinessNo).push(error);
+      }
     }
   }
   
@@ -143,6 +164,7 @@ function generateSummaryReport(auditResult, gatewayLogs = '') {
         code: a.code || null,
         message: a.message,
         rawContent: a.rawContent || null,
+        rawLog: a.rawLog || null,
         sampleId: a.sampleId || null,
         field: a.field || null,
         value: a.value || null,
@@ -208,6 +230,9 @@ function summaryReportToMarkdown(report) {
     for (const anomaly of summary.anomalies) {
       const typeLabel = anomaly.isGatewayError ? '网关错误' : anomaly.type;
       md += `- **${typeLabel}**${anomaly.code ? ` [${anomaly.code}]` : ''}: ${anomaly.message}\n`;
+      if (anomaly.rawLog) {
+        md += `  - 原始日志: \`${anomaly.rawLog}\`\n`;
+      }
       if (anomaly.rawContent) {
         md += `  - 原始内容: \`${anomaly.rawContent}\`\n`;
       }
