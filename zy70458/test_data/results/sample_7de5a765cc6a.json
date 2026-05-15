@@ -1,0 +1,23 @@
+{
+  "sample_id": "sample_7de5a765cc6a",
+  "batch_id": "batch_20260516_061026_e329d6",
+  "rule_version": "v1.0.0",
+  "risk_level": "critical",
+  "is_anomaly": true,
+  "conclusion": "【复用】端口443为保留端口，连接数200超过阈值100，端口风险等级: critical",
+  "port_status": "系统端口",
+  "details": {
+    "port_risk": "critical",
+    "high_connections": true,
+    "port_in_reserved": true,
+    "rule_description": "初始版本规则：系统端口CRITICAL，注册端口MEDIUM，动态端口LOW"
+  },
+  "reviewed": false,
+  "reviewer": null,
+  "review_time": null,
+  "review_notes": null,
+  "is_reused": true,
+  "original_sample_id": "sample_08ae397aca0a",
+  "original_batch_id": "batch_20260516_061020_4b253b",
+  "conflict_info": null
+}

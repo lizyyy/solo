@@ -1,0 +1,27 @@
+{
+  "sample_id": "sample_b6754c2f03ec",
+  "batch_id": "batch_20260516_061020_4b253b",
+  "source_file": "test_samples_normal.xlsx",
+  "row_number": 4,
+  "ip_address": "192.168.1.102",
+  "port": 3306,
+  "protocol": "TCP",
+  "process_name": "mysql",
+  "connection_count": 80,
+  "supplier": "腾讯科技",
+  "supplier_original": "腾讯",
+  "supplier_corrected": "腾讯科技",
+  "department": "数据部",
+  "business_line": "数据库服务",
+  "inspection_time": "2026-05-16 06:10:20.196242",
+  "raw_data": {
+    "IP地址": "192.168.1.102",
+    "端口": 3306,
+    "协议": "TCP",
+    "进程名": "mysql",
+    "连接数": 80,
+    "供应商": "腾讯",
+    "部门": "数据部",
+    "业务线": "数据库服务"
+  }
+}

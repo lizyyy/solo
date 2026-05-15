@@ -1,0 +1,27 @@
+{
+  "sample_id": "sample_be8db4ad7e67",
+  "batch_id": "batch_20260516_061026_e329d6",
+  "source_file": "test_samples_normal.xlsx",
+  "row_number": 7,
+  "ip_address": "192.168.1.105",
+  "port": 22,
+  "protocol": "TCP",
+  "process_name": "sshd",
+  "connection_count": 5,
+  "supplier": "阿里巴巴",
+  "supplier_original": "阿里云计算",
+  "supplier_corrected": "阿里巴巴",
+  "department": "运维组",
+  "business_line": "运维服务",
+  "inspection_time": "2026-05-16 06:10:26.516691",
+  "raw_data": {
+    "IP地址": "192.168.1.105",
+    "端口": 22,
+    "协议": "TCP",
+    "进程名": "sshd",
+    "连接数": 5,
+    "供应商": "阿里云计算",
+    "部门": "运维组",
+    "业务线": "运维服务"
+  }
+}

@@ -29,6 +29,12 @@ class Exporter:
         for result in anomaly_results:
             sample = self.storage.get_sample(result.sample_id)
             if sample:
+                status = '正常'
+                if result.is_reused:
+                    status = '复用'
+                elif result.conflict_info:
+                    status = '冲突'
+
                 rows.append({
                     '样本ID': sample.sample_id,
                     '批次ID': sample.batch_id,
@@ -49,6 +55,9 @@ class Exporter:
                     '是否异常': '是' if result.is_anomaly else '否',
                     '结论': result.conclusion,
                     '端口状态': result.port_status,
+                    '样本状态': status,
+                    '原始样本ID': result.original_sample_id or '',
+                    '原始批次ID': result.original_batch_id or '',
                     '是否复核': '是' if result.reviewed else '否',
                     '复核人': result.reviewer or '',
                     '复核时间': result.review_time or '',
@@ -71,6 +80,12 @@ class Exporter:
         for result in results:
             sample = self.storage.get_sample(result.sample_id)
             if sample:
+                status = '正常'
+                if result.is_reused:
+                    status = '复用'
+                elif result.conflict_info:
+                    status = '冲突'
+
                 rows.append({
                     '样本ID': sample.sample_id,
                     '批次ID': sample.batch_id,
@@ -91,7 +106,13 @@ class Exporter:
                     '是否异常': '是' if result.is_anomaly else '否',
                     '结论': result.conclusion,
                     '端口状态': result.port_status,
+                    '样本状态': status,
+                    '原始样本ID': result.original_sample_id or '',
+                    '原始批次ID': result.original_batch_id or '',
                     '是否复核': '是' if result.reviewed else '否',
+                    '复核人': result.reviewer or '',
+                    '复核时间': result.review_time or '',
+                    '复核备注': result.review_notes or '',
                 })
 
         df = pd.DataFrame(rows)
@@ -113,6 +134,12 @@ class Exporter:
         for result in results:
             sample = self.storage.get_sample(result.sample_id)
             if sample:
+                status = '正常'
+                if result.is_reused:
+                    status = '复用'
+                elif result.conflict_info:
+                    status = '冲突'
+
                 rows.append({
                     '样本ID': sample.sample_id,
                     '批次ID': sample.batch_id,
@@ -131,7 +158,13 @@ class Exporter:
                     '规则版本': result.rule_version,
                     '风险等级': result.risk_level.value,
                     '结论': result.conclusion,
+                    '样本状态': status,
+                    '原始样本ID': result.original_sample_id or '',
+                    '原始批次ID': result.original_batch_id or '',
                     '是否复核': '是' if result.reviewed else '否',
+                    '复核人': result.reviewer or '',
+                    '复核时间': result.review_time or '',
+                    '复核备注': result.review_notes or '',
                 })
 
         df = pd.DataFrame(rows)

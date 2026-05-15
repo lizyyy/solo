@@ -1,0 +1,28 @@
+{
+  "sample_id": "sample_fdcfb0696c39",
+  "batch_id": "batch_20260516_061038_cffc59",
+  "rule_version": "v2.0.0",
+  "risk_level": "safe",
+  "is_anomaly": false,
+  "conclusion": "【冲突】新结论: 端口风险等级: safe",
+  "port_status": "动态端口",
+  "details": {
+    "port_risk": "safe",
+    "high_connections": false,
+    "port_in_reserved": false,
+    "rule_description": "v2.0版本：降低系统端口等级为HIGH，注册端口为LOW，新增常用端口"
+  },
+  "reviewed": false,
+  "reviewer": null,
+  "review_time": null,
+  "review_notes": null,
+  "is_reused": false,
+  "original_sample_id": null,
+  "original_batch_id": null,
+  "conflict_info": {
+    "old_risk": "low",
+    "old_rule": "v1.0.0",
+    "new_risk": "safe",
+    "new_rule": "v2.0.0"
+  }
+}

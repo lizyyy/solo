@@ -59,6 +59,10 @@ class InspectionResult(BaseModel):
     reviewer: Optional[str] = None
     review_time: Optional[datetime] = None
     review_notes: Optional[str] = None
+    is_reused: bool = False
+    original_sample_id: Optional[str] = None
+    original_batch_id: Optional[str] = None
+    conflict_info: Optional[Dict[str, Any]] = None
 
 
 class BatchInfo(BaseModel):

@@ -1,0 +1,28 @@
+{
+  "sample_id": "sample_a67d86a32dc6",
+  "batch_id": "batch_20260516_061026_e329d6",
+  "rule_version": "v1.0.0",
+  "risk_level": "low",
+  "is_anomaly": false,
+  "conclusion": "【冲突】新结论: 端口风险等级: low",
+  "port_status": "动态端口",
+  "details": {
+    "port_risk": "low",
+    "high_connections": false,
+    "port_in_reserved": false,
+    "rule_description": "初始版本规则：系统端口CRITICAL，注册端口MEDIUM，动态端口LOW"
+  },
+  "reviewed": false,
+  "reviewer": null,
+  "review_time": null,
+  "review_notes": null,
+  "is_reused": false,
+  "original_sample_id": null,
+  "original_batch_id": null,
+  "conflict_info": {
+    "old_risk": "low",
+    "old_rule": "v1.0.0",
+    "new_risk": "low",
+    "new_rule": "v1.0.0"
+  }
+}

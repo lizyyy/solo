@@ -1,0 +1,27 @@
+{
+  "sample_id": "sample_c82d78dd2ab0",
+  "batch_id": "batch_20260516_061020_4b253b",
+  "source_file": "test_samples_normal.xlsx",
+  "row_number": 9,
+  "ip_address": "192.168.1.107",
+  "port": 50001,
+  "protocol": "TCP",
+  "process_name": "app_service2",
+  "connection_count": 15,
+  "supplier": "自研",
+  "supplier_original": "自研",
+  "supplier_corrected": null,
+  "department": "应用组",
+  "business_line": "自研应用",
+  "inspection_time": "2026-05-16 06:10:20.196242",
+  "raw_data": {
+    "IP地址": "192.168.1.107",
+    "端口": 50001,
+    "协议": "TCP",
+    "进程名": "app_service2",
+    "连接数": 15,
+    "供应商": "自研",
+    "部门": "应用组",
+    "业务线": "自研应用"
+  }
+}

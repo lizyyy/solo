@@ -1,0 +1,27 @@
+{
+  "sample_id": "sample_54ab624b645c",
+  "batch_id": "batch_20260516_061026_e329d6",
+  "source_file": "test_samples_normal.xlsx",
+  "row_number": 6,
+  "ip_address": "192.168.1.104",
+  "port": 8080,
+  "protocol": "TCP",
+  "process_name": "tomcat",
+  "connection_count": 30,
+  "supplier": "腾讯科技",
+  "supplier_original": "腾讯云",
+  "supplier_corrected": "腾讯科技",
+  "department": "应用组",
+  "business_line": "应用服务",
+  "inspection_time": "2026-05-16 06:10:26.516691",
+  "raw_data": {
+    "IP地址": "192.168.1.104",
+    "端口": 8080,
+    "协议": "TCP",
+    "进程名": "tomcat",
+    "连接数": 30,
+    "供应商": "腾讯云",
+    "部门": "应用组",
+    "业务线": "应用服务"
+  }
+}

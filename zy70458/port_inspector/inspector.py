@@ -145,17 +145,56 @@ class PortInspector:
 
         for sample in samples:
             is_dup, old_result, status = self.check_duplicate_sample(sample)
-            if is_dup and status == "reused":
-                reused_samples.append(sample.sample_id)
-                continue
-            elif is_dup and status == "conflict":
-                conflict_samples.append({
-                    "sample_id": sample.sample_id,
-                    "old_risk": old_result.risk_level.value if old_result else None,
-                    "old_rule": old_result.rule_version if old_result else None,
-                })
+            
+            if is_dup and old_result:
+                if status == "reused":
+                    reused_samples.append(sample.sample_id)
+                    clean_conclusion = old_result.conclusion.replace("【复用】", "").replace("【冲突】", "")
+                    result = InspectionResult(
+                        sample_id=sample.sample_id,
+                        batch_id=batch_id,
+                        rule_version=old_result.rule_version,
+                        risk_level=old_result.risk_level,
+                        is_anomaly=old_result.is_anomaly,
+                        conclusion=f"【复用】{clean_conclusion}",
+                        port_status=old_result.port_status,
+                        details=old_result.details,
+                        reviewed=old_result.reviewed,
+                        reviewer=old_result.reviewer,
+                        review_time=old_result.review_time,
+                        review_notes=old_result.review_notes,
+                        is_reused=True,
+                        original_sample_id=old_result.original_sample_id or old_result.sample_id,
+                        original_batch_id=old_result.original_batch_id or old_result.batch_id
+                    )
+                elif status == "conflict":
+                    new_result = self.inspect_sample(sample, rule_version)
+                    conflict_info = {
+                        "old_risk": old_result.risk_level.value,
+                        "old_rule": old_result.rule_version,
+                        "new_risk": new_result.risk_level.value,
+                        "new_rule": rule_version
+                    }
+                    conflict_samples.append({
+                        "sample_id": sample.sample_id,
+                        **conflict_info
+                    })
+                    result = InspectionResult(
+                        sample_id=sample.sample_id,
+                        batch_id=batch_id,
+                        rule_version=rule_version,
+                        risk_level=new_result.risk_level,
+                        is_anomaly=new_result.is_anomaly,
+                        conclusion=f"【冲突】新结论: {new_result.conclusion}",
+                        port_status=new_result.port_status,
+                        details=new_result.details,
+                        conflict_info=conflict_info
+                    )
+                else:
+                    result = self.inspect_sample(sample, rule_version)
+            else:
+                result = self.inspect_sample(sample, rule_version)
 
-            result = self.inspect_sample(sample, rule_version)
             if result.is_anomaly:
                 anomaly_count += 1
 

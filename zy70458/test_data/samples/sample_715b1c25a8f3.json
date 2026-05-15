@@ -1,0 +1,27 @@
+{
+  "sample_id": "sample_715b1c25a8f3",
+  "batch_id": "batch_20260516_061026_e329d6",
+  "source_file": "test_samples_normal.xlsx",
+  "row_number": 5,
+  "ip_address": "192.168.1.103",
+  "port": 6379,
+  "protocol": "TCP",
+  "process_name": "redis",
+  "connection_count": 50,
+  "supplier": "百度在线",
+  "supplier_original": "百度",
+  "supplier_corrected": "百度在线",
+  "department": "缓存组",
+  "business_line": "缓存服务",
+  "inspection_time": "2026-05-16 06:10:26.516691",
+  "raw_data": {
+    "IP地址": "192.168.1.103",
+    "端口": 6379,
+    "协议": "TCP",
+    "进程名": "redis",
+    "连接数": 50,
+    "供应商": "百度",
+    "部门": "缓存组",
+    "业务线": "缓存服务"
+  }
+}

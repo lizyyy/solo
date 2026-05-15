@@ -1,0 +1,27 @@
+{
+  "sample_id": "sample_9e31472bafa5",
+  "batch_id": "batch_20260516_061026_e329d6",
+  "source_file": "test_samples_normal.xlsx",
+  "row_number": 2,
+  "ip_address": "192.168.1.100",
+  "port": 80,
+  "protocol": "TCP",
+  "process_name": "nginx",
+  "connection_count": 150,
+  "supplier": "阿里巴巴",
+  "supplier_original": "阿里",
+  "supplier_corrected": "阿里巴巴",
+  "department": "技术部",
+  "business_line": "电商平台",
+  "inspection_time": "2026-05-16 06:10:26.516691",
+  "raw_data": {
+    "IP地址": "192.168.1.100",
+    "端口": 80,
+    "协议": "TCP",
+    "进程名": "nginx",
+    "连接数": 150,
+    "供应商": "阿里",
+    "部门": "技术部",
+    "业务线": "电商平台"
+  }
+}
