@@ -1,0 +1,15 @@
+{
+  "name": "inventory-reservation-statemachine",
+  "version": "1.0.0",
+  "description": "库存预占状态机系统",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "init:db": "cd backend && npm run init:db",
+    "test": "cd backend && npm test"
+  },
+  "keywords": ["inventory", "reservation", "statemachine"],
+  "author": "",
+  "license": "MIT"
+}
