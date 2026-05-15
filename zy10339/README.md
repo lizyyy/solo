@@ -4,12 +4,21 @@
 
 ## 技术栈
 
-- Java 11+
+### Spring Boot版本（完整功能）
+- Java 8+
 - Spring Boot 2.7.x
 - Spring Data JPA
 - H2 内存数据库
 - Lombok
 - Thymeleaf（管理页面）
+
+### 独立服务器版本（零依赖）
+- Java 8+ 纯JDK内置HttpServer
+- 无任何外部依赖
+- 内置内存存储
+
+### Python离线验证版本
+- Python 3.6+ 标准库
 
 ## 核心特性
 
