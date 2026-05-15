@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ff6c8ff9-3204-4473-a43e-6f678e2c2ce7",
+    "recordId": null,
+    "operation": "create_meeting_record",
+    "errorCode": "INTERNAL_ERROR",
+    "errorMessage": "Cannot read properties of undefined (reading 'map')",
+    "inputData": {
+      "title": "测试会议-财务管理部",
+      "department": "财务管理部",
+      "meetingDate": "2024-06-20",
+      "summary": "测试缓存未刷新场景"
+    },
+    "timestamp": "2026-05-15T11:07:35.126Z",
+    "handled": false,
+    "handlerNote": null
+  },
+  {
+    "id": "bd11560c-5431-4cb5-b955-75b5571c3c65",
+    "recordId": null,
+    "operation": "create_meeting_record",
+    "errorCode": "CACHE_STALE_NO_REFRESH",
+    "errorMessage": "部门鉴权路径缓存已过期且未刷新，无法自动补全路径",
+    "inputData": {
+      "department": "财务管理部",
+      "title": "测试会议-财务管理部"
+    },
+    "timestamp": "2026-05-15T11:09:34.589Z",
+    "handled": false,
+    "handlerNote": null
+  }
+]

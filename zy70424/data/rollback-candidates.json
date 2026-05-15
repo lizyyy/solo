@@ -1,0 +1,53 @@
+[
+  {
+    "id": "359ad73a-4d21-47c6-99c5-e35f9c397cf5",
+    "operationType": "bulk_delete",
+    "criteria": {
+      "status": "completed",
+      "dateRange": {
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+      }
+    },
+    "items": [],
+    "generatedAt": "2026-05-15T11:10:16.472Z",
+    "approved": false,
+    "executed": false
+  },
+  {
+    "id": "159f1c40-a177-4059-a352-5a75fff16559",
+    "operationType": "bulk_delete",
+    "criteria": {
+      "status": "completed"
+    },
+    "items": [
+      {
+        "id": "49931400-5ae9-4d4b-b3d3-c2c26e017023",
+        "title": "2024年Q2信息科技部季度评审会议纪要",
+        "department": "信息科技部",
+        "createdAt": "2026-05-15T11:06:16.974Z",
+        "impact": "删除0个附件",
+        "risk": "high"
+      },
+      {
+        "id": "07f3422f-2c89-4fdf-ad9a-7161301fc3b9",
+        "title": "关于财务系统用户权限调整的专题会议",
+        "department": "财务管理部",
+        "createdAt": "2026-05-15T11:06:16.975Z",
+        "impact": "删除0个附件",
+        "risk": "high"
+      },
+      {
+        "id": "e2da1c31-c67a-496e-b220-345cec389ee1",
+        "title": "人力资源部薪酬管理系统上线协调会",
+        "department": "人力资源部",
+        "createdAt": "2026-05-15T11:06:16.976Z",
+        "impact": "删除0个附件",
+        "risk": "high"
+      }
+    ],
+    "generatedAt": "2026-05-15T11:10:28.244Z",
+    "approved": false,
+    "executed": false
+  }
+]

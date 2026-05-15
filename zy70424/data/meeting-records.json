@@ -1,0 +1,74 @@
+[
+  {
+    "id": "49931400-5ae9-4d4b-b3d3-c2c26e017023",
+    "title": "2024年Q2信息科技部季度评审会议纪要",
+    "department": "信息科技部",
+    "meetingDate": "2024-06-15",
+    "attendees": [
+      "张三",
+      "李四",
+      "王五",
+      "赵六"
+    ],
+    "summary": "本次会议审议了Q2系统升级方案，确定了三季度系统迭代计划。重点讨论了鉴权系统重构的技术路线，同意采用微服务架构进行升级。",
+    "attachments": [],
+    "authPaths": [],
+    "status": "completed",
+    "createdAt": "2026-05-15T11:06:16.974Z",
+    "updatedAt": "2026-05-15T11:06:16.975Z",
+    "processedAt": "2026-05-15T11:06:16.974Z"
+  },
+  {
+    "id": "07f3422f-2c89-4fdf-ad9a-7161301fc3b9",
+    "title": "关于财务系统用户权限调整的专题会议",
+    "department": "财务管理部",
+    "meetingDate": "2024-06-10",
+    "attendees": [
+      "财务A",
+      "财务B",
+      "IT支持"
+    ],
+    "summary": "会议审议了财务人员岗位调整后的权限变更申请。确定了新的权限矩阵，涉及3个岗位共12人的权限调整。",
+    "attachments": [],
+    "authPaths": [],
+    "status": "completed",
+    "createdAt": "2026-05-15T11:06:16.975Z",
+    "updatedAt": "2026-05-15T11:06:16.975Z",
+    "processedAt": "2026-05-15T11:06:16.975Z"
+  },
+  {
+    "id": "e2da1c31-c67a-496e-b220-345cec389ee1",
+    "title": "人力资源部薪酬管理系统上线协调会",
+    "department": "人力资源部",
+    "meetingDate": "2024-06-08",
+    "attendees": [
+      "HR张",
+      "HR李",
+      "IT开发组"
+    ],
+    "summary": "协调薪酬系统上线前的各项准备工作，明确数据迁移方案和员工信息同步机制。",
+    "attachments": [],
+    "authPaths": [],
+    "status": "completed",
+    "createdAt": "2026-05-15T11:06:16.976Z",
+    "updatedAt": "2026-05-15T11:06:16.976Z",
+    "processedAt": "2026-05-15T11:06:16.976Z"
+  },
+  {
+    "id": "e45dfb9a-422e-4431-99d6-aff0a384bc54",
+    "title": "测试会议-财务管理部",
+    "department": "财务管理部",
+    "meetingDate": "2024-06-20",
+    "attendees": [],
+    "summary": "测试缓存刷新后正常流程",
+    "attachments": [],
+    "authPaths": [
+      "/api/auth/finance/**",
+      "/api/auth/level-2/finance/*"
+    ],
+    "status": "pending",
+    "createdAt": "2026-05-15T11:10:06.488Z",
+    "updatedAt": "2026-05-15T11:10:06.489Z",
+    "processedAt": "2026-05-15T11:10:06.489Z"
+  }
+]

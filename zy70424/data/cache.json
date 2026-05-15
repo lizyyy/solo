@@ -1,0 +1,19 @@
+{
+  "dept:信息科技部:auth_paths": {
+    "value": [
+      "/api/auth/dept-it/**",
+      "/api/auth/level-2/it/*",
+      "/api/auth/devops/read"
+    ],
+    "expiresAt": 1778843476968,
+    "createdAt": "2026-05-15T11:06:16.968Z"
+  },
+  "dept:财务管理部:auth_paths": {
+    "value": [
+      "/api/auth/finance/**",
+      "/api/auth/level-2/finance/*"
+    ],
+    "expiresAt": 1778843700925,
+    "createdAt": "2026-05-15T11:10:00.925Z"
+  }
+}
