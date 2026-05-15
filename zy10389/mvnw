@@ -1,0 +1,39 @@
+#!/bin/sh
+# Maven Wrapper - Simple version
+# This script will attempt to use system mvn or download maven wrapper jar
+
+set -e
+
+# Check if mvn is available
+if command -v mvn >/dev/null 2>&1; then
+    exec mvn "$@"
+fi
+
+# Try to download and use Maven Wrapper
+BASE_DIR=`pwd`
+WRAPPER_JAR="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
+WRAPPER_PROPS="$BASE_DIR/.mvn/wrapper/maven-wrapper.properties"
+
+if [ ! -f "$WRAPPER_JAR" ]; then
+    echo "Maven not found, downloading Maven Wrapper..." >&2
+    mkdir -p "$BASE_DIR/.mvn/wrapper"
+    
+    # Try to download with curl
+    if command -v curl >/dev/null 2>&1; then
+        curl -f -L -sS -o "$WRAPPER_JAR" "https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -q -O "$WRAPPER_JAR" "https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+    else
+        echo "Error: Neither 'mvn', 'curl' nor 'wget' found in PATH." >&2
+        echo "Please install Maven first: https://maven.apache.org/install.html" >&2
+        exit 1
+    fi
+fi
+
+# Use Java to run the wrapper
+if command -v java >/dev/null 2>&1; then
+    exec java -jar "$WRAPPER_JAR" "$@"
+else
+    echo "Error: Java is not installed." >&2
+    exit 1
+fi

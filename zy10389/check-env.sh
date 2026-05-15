@@ -1,0 +1,78 @@
+#!/bin/bash
+# 环境检查脚本
+
+echo "========================================"
+echo "  API 可观测标签校验系统 - 环境检查"
+echo "========================================"
+echo ""
+
+# 检查 Java
+echo "[1/3] 检查 Java 环境..."
+if command -v java >/dev/null 2>&1; then
+    JAVA_VERSION=$(java -version 2>&1 | head -1 | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+    JAVA_MAJOR=$(echo $JAVA_VERSION | cut -d. -f1)
+    
+    # Java 8 显示 1.8.x，Java 9+ 直接显示版本号
+    if [ "$JAVA_MAJOR" = "1" ]; then
+        JAVA_MAJOR=$(echo $JAVA_VERSION | cut -d. -f2)
+    fi
+    
+    echo "  ✓ Java 已安装: $JAVA_VERSION"
+    if [ "$JAVA_MAJOR" -ge 17 ]; then
+        echo "  ✓ Java 版本符合要求 (>= 17)"
+        JAVA_OK=true
+    else
+        echo "  ✗ Java 版本不符合要求，需要 >= 17，当前 $JAVA_MAJOR"
+        JAVA_OK=false
+    fi
+else
+    echo "  ✗ Java 未安装"
+    JAVA_OK=false
+fi
+echo ""
+
+# 检查 Maven 或 mvnw
+echo "[2/3] 检查 Maven 环境..."
+if command -v mvn >/dev/null 2>&1; then
+    echo "  ✓ 系统 Maven 已安装: $(mvn -v | head -1 | awk '{print $3}')"
+    MVN_OK=true
+elif [ -f "./mvnw" ]; then
+    echo "  ✓ 项目 Maven Wrapper 已存在"
+    MVN_OK=true
+else
+    echo "  ✗ 未找到 Maven 或 Maven Wrapper"
+    MVN_OK=false
+fi
+echo ""
+
+# 检查 curl (用于测试 API)
+echo "[3/3] 检查 curl 环境..."
+if command -v curl >/dev/null 2>&1; then
+    echo "  ✓ curl 已安装: $(curl --version | head -1 | awk '{print $2}')"
+    CURL_OK=true
+else
+    echo "  ✗ curl 未安装（无法运行测试脚本）"
+    CURL_OK=false
+fi
+echo ""
+
+echo "========================================"
+echo "  检查结果汇总"
+echo "========================================"
+echo "  Java:   $($JAVA_OK && echo ✓ 就绪 || echo ✗ 需升级)"
+echo "  Maven:  $($MVN_OK && echo ✓ 就绪 || echo ✗ 需配置)"
+echo "  curl:   $($CURL_OK && echo ✓ 就绪 || echo ✗ 需安装)"
+echo ""
+
+if $JAVA_OK && $MVN_OK; then
+    echo "  ✓ 环境检查通过！"
+    echo ""
+    echo "  下一步："
+    echo "    1. 编译: ./mvnw clean package -DskipTests"
+    echo "    2. 启动: ./mvnw spring-boot:run"
+    echo "    3. 测试: ./test_demo.sh"
+else
+    echo "  ✗ 环境存在问题，请先解决上述问题"
+    exit 1
+fi
+echo ""

@@ -2,6 +2,22 @@
 
 基于 Spring Boot 的 API 可观测性标签校验服务，提供标签白名单管理、样本校验、违规聚合、修复建议等核心功能。
 
+## 🚀 快速开始（3步）
+
+```bash
+# 1. 检查环境
+./check-env.sh
+
+# 2. 编译项目
+./mvnw clean package -DskipTests
+
+# 3. 启动服务
+./mvnw spring-boot:run
+
+# 新开终端，运行完整测试
+./test_demo.sh
+```
+
 ## 核心特性
 
 - ✅ **标签白名单管理** - 支持配置允许的标签键、允许值、正则校验、必填标记
@@ -15,36 +31,55 @@
 
 ## 技术栈
 
-- Java 17
+- **Java 17+** (必须) - Spring Boot 3.x 最低要求
 - Spring Boot 3.2.x
 - Spring Data JPA
 - H2 Database (内存)
 - Lombok
 - Apache Commons CSV
 
+### 环境检查
+
+运行前请检查 Java 版本：
+```bash
+java -version
+# 需要 >= 17.0.0
+```
+
+如版本不符，请先安装 JDK 17：
+- macOS: `brew install openjdk@17`
+- Linux: `sudo apt install openjdk-17-jdk`
+- Windows: 下载 [Oracle JDK 17](https://www.oracle.com/java/technologies/downloads/#java17)
+
 ## 快速开始
 
 ### 1. 编译项目
 
+**推荐：使用项目内置 Maven Wrapper（无需安装 Maven）**
+```bash
+./mvnw clean package -DskipTests
+```
+
+**或使用系统 Maven（如已安装）**
 ```bash
 mvn clean package -DskipTests
 ```
 
 ### 2. 启动服务
 
+**方法一：使用 Maven Wrapper 直接运行**
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
-或直接运行 jar 包：
-
+**方法二：运行编译好的 jar 包**
 ```bash
 java -jar target/api-tag-validation-1.0.0.jar
 ```
 
 服务启动后访问：
 - API 地址: http://localhost:8080/api
-- H2 控制台: http://localhost:8080/api/h2-console
+- H2 控制台: http://localhost:8080/h2-console
   - JDBC URL: jdbc:h2:mem:tag_validation_db
   - 用户名: sa
   - 密码: (空)
