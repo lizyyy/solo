@@ -6,43 +6,89 @@
 
 ## 核心特性
 
-- **命令生命周期管理**: 创建 -> 校验 -> 下发 -> 确认 -> 完成
+- **命令生命周期管理**: 创建 → 校验 → 下发 → 确认 → 完成
 - **超时自动补发**: 超过确认时间自动重试，可配置重试次数
 - **状态历史追踪**: 记录每次状态变更，支持完整链路查询
 - **幂等性保障**: 重复提交不会产生脏数据
-- **持久化存储**: 使用 H2 数据库，数据文件持久化，重启不丢失
+- **持久化存储**: 使用 H2 文件数据库，重启服务数据不丢失
 
 ## 技术栈
 
-- Java 11
+- Java 8+ (兼容 JRE，无需 JDK)
 - Spring Boot 2.7.x
 - Spring Data JPA
-- H2 Database
+- H2 Database (文件持久化)
 - Lombok
 
 ## 快速开始
 
-### 1. 编译项目
+### 🚀 方案一：一键启动（推荐）
 
+**macOS/Linux:**
 ```bash
-mvn clean package
+chmod +x start.sh test-api.sh
+./start.sh
 ```
 
-### 2. 启动服务
+**Windows:**
+双击 `start.bat` 或在命令行执行：
+```cmd
+start.bat
+```
+
+脚本自动完成：
+1. ✅ 检查 Java 8+ 环境
+2. ✅ 自动下载 Maven（无需预装）
+3. ✅ 编译项目
+4. ✅ 启动 API 服务
+
+### 💻 方案二：纯 JRE 启动（无需 JDK/Maven）
 
 ```bash
+chmod +x run.sh
+./run.sh
+```
+
+此方案使用 Eclipse ECJ 编译器，仅需 JRE 即可运行。
+
+### 🔧 方案三：手动编译（有 Maven 环境）
+
+```bash
+mvn clean package -DskipTests
 java -jar target/device-command-confirmation-api-1.0.0.jar
 ```
 
-服务启动后访问: http://localhost:8080
+## 服务访问
 
-### 3. 访问 H2 控制台
+启动成功后：
+- **API 服务**: http://localhost:8080
+- **H2 数据库控制台**: http://localhost:8080/h2-console
+  - JDBC URL: `jdbc:h2:file:./data/devicedb`
+  - 用户名: `sa`
+  - 密码: (空)
 
-http://localhost:8080/h2-console
+## 功能验证
 
-- JDBC URL: `jdbc:h2:file:./data/devicedb
-- 用户名: `sa`
-- 密码: (空)
+服务启动后，新开终端执行测试：
+
+**macOS/Linux:**
+```bash
+./test-api.sh
+```
+
+自动验证以下场景：
+1. ✅ **成功流**：创建 → 校验 → 下发 → 确认执行成功
+2. ✅ **失败流**：确认执行失败，状态正确流转
+3. ✅ **幂等性**：重复创建相同批次号，返回原有数据
+4. ✅ **按设备查询**：查询某设备的所有命令记录
+5. ✅ **完整链路**：查询单条命令的所有状态变更历史、确认记录等
+
+## 持久化验证
+
+重启服务后数据不会丢失，再次查询验证：
+```bash
+curl http://localhost:8080/api/commands/{batchNo}/full-trace
+```
 
 ## API 接口
 
@@ -112,7 +158,7 @@ GET /api/commands/{batchNo}/status-history
 GET /api/commands/{batchNo}/full-trace
 ```
 
-返回包含:
+返回包含：
 - command: 命令基本信息
 - statusHistory: 状态变更历史
 - confirmRecords: 确认记录
@@ -161,56 +207,26 @@ RETRYING (补发中) → 循环直到达到最大重试次数
 - 超时类型、原因编码
 - 原因描述、详情信息
 
-## 测试用例
-
-项目包含4个核心测试场景：
-
-1. **成功流测试** (`testSuccessFlow`): 正常创建-校验-下发-确认流程
-2. **超时补发流测试** (`testTimeoutRetryFlow`): 超时后自动补发，直到最大重试次数
-3. **幂等性测试** (`testIdempotentCreate`): 重复创建返回相同批次号，保证数据一致性
-4. **失败流测试** (`testFailedFlow`): 确认失败场景
-
-运行测试：
-```bash
-mvn test
-```
-
 ## 核心设计要点
 
 1. **幂等性处理**：通过 batchNo 唯一约束，重复提交返回已有记录
 2. **状态机校验**：每个状态变更都有前置状态校验，非法状态流转被拒绝
 3. **乐观锁机制**：使用 @Version 防止并发更新冲突
-4. **定时任务**：每10秒扫描超时命令，自动触发补发
+4. **定时任务**：每 10 秒扫描超时命令，自动触发补发
 5. **全链路追踪**：所有操作记录处理人，支持审计追溯
 
-## 配置说明
-
-`application.yml` 主要配置项：
-
-```yaml
-server:
-  port: 8080
-
-spring:
-  datasource:
-    url: jdbc:h2:file:./data/devicedb  # 数据文件持久化
-  jpa:
-    hibernate:
-      ddl-auto: update  # 自动更新表结构
-```
-
-## 目录结构
+## 项目结构
 
 ```
 src/main/java/com/devicecommand/
 ├── DeviceCommandApplication.java    # 启动类
 ├── controller/                       # 控制层
 ├── service/                          # 业务逻辑层
-├── repository/                     # 数据访问层
-├── entity/                         # 数据实体
-├── dto/                            # 数据传输对象
-├── enums/                          # 枚举定义
-├── config/                         # 配置类
-├── scheduler/                      # 定时任务
-└── exception/                      # 异常处理
+├── repository/                       # 数据访问层
+├── entity/                           # 数据实体
+├── dto/                              # 数据传输对象
+├── enums/                            # 枚举定义
+├── config/                           # 配置类
+├── scheduler/                        # 定时任务
+└── exception/                        # 异常处理
 ```

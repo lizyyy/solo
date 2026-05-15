@@ -1,0 +1,18 @@
+# 编译产物
+target/
+lib/
+.maven/
+data/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 临时文件
+sources.txt
+*.log
