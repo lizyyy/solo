@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iot-proxy-cli"
+version = "0.1.0"
+authors = [
+  { name="IoT Team", email="iot@example.com" }
+]
+description = "本地端口代理命令行工具 - IoT设备回执处理"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "click>=8.0",
+  "pydantic>=2.0",
+  "python-dateutil>=2.8",
+  "pytz>=2023.3",
+  "rich>=13.0",
+]
+
+[project.scripts]
+iot-proxy = "iot_proxy.main:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,79 @@
+{
+  "batch_id": "c8a4b5f9cd592ff1",
+  "total_count": 5,
+  "normal_count": 2,
+  "abnormal_count": 2,
+  "failed_count": 1,
+  "processed_at": "2026-05-16T07:18:47.543529",
+  "receipts": [
+    {
+      "device_id": "DEV001",
+      "receipt_id": "RCP001",
+      "receipt_type": "temperature",
+      "timestamp": "2026-05-16T10:30:00+08:00",
+      "parsed_time": "2026-05-16T10:30:00+08:00",
+      "timezone_offset": 480,
+      "data": {
+        "temperature": 25.5,
+        "unit": "celsius"
+      },
+      "status": "normal",
+      "error_message": null
+    },
+    {
+      "device_id": "DEV001",
+      "receipt_id": "RCP002",
+      "receipt_type": "humidity",
+      "timestamp": "2026-05-16T10:30:00+08:00",
+      "parsed_time": "2026-05-16T10:30:00+08:00",
+      "timezone_offset": 480,
+      "data": {
+        "humidity": 65,
+        "unit": "percent"
+      },
+      "status": "normal",
+      "error_message": null
+    },
+    {
+      "device_id": "DEV002",
+      "receipt_id": "RCP003",
+      "receipt_type": "door",
+      "timestamp": "2026-05-16T02:30:00+00:00",
+      "parsed_time": "2026-05-16T02:30:00Z",
+      "timezone_offset": 0,
+      "data": {
+        "status": "open"
+      },
+      "status": "abnormal",
+      "error_message": "时区偏移异常: 预期480分钟，实际0分钟"
+    },
+    {
+      "device_id": "DEV002",
+      "receipt_id": "RCP004",
+      "receipt_type": "power",
+      "timestamp": "2026-05-16T10:30:00-05:00",
+      "parsed_time": "2026-05-16T10:30:00-05:00",
+      "timezone_offset": -300,
+      "data": {
+        "voltage": 220,
+        "current": 5.5
+      },
+      "status": "abnormal",
+      "error_message": "时区偏移异常: 预期480分钟，实际-300分钟"
+    },
+    {
+      "device_id": "DEV003",
+      "receipt_id": "RCP005",
+      "receipt_type": "temperature",
+      "timestamp": "2026-05-16T10:30:00",
+      "parsed_time": null,
+      "timezone_offset": null,
+      "data": {
+        "temperature": 28.0
+      },
+      "status": "failed",
+      "error_message": "时间戳缺少时区信息"
+    }
+  ],
+  "is_cached": false
+}

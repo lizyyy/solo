@@ -1,0 +1,240 @@
+Metadata-Version: 2.4
+Name: iot-proxy-cli
+Version: 0.1.0
+Summary: 本地端口代理命令行工具 - IoT设备回执处理
+Author-email: IoT Team <iot@example.com>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.0
+Requires-Dist: pydantic>=2.0
+Requires-Dist: python-dateutil>=2.8
+Requires-Dist: pytz>=2023.3
+Requires-Dist: rich>=13.0
+
+# IoT设备回执处理命令行工具
+
+本地端口代理命令行工具，用于处理IoT设备回执数据，包含时区偏移校验、结果缓存、多格式输出、失败记录保存和变更日志追踪功能。
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+pip install -e .
+```
+
+### 生成样例数据
+
+```bash
+iot-proxy sample
+```
+
+### 处理回执数据
+
+```bash
+iot-proxy process data/sample_receipts.json
+```
+
+## 命令参考
+
+### 1. process - 处理回执数据
+
+**用法:**
+```bash
+iot-proxy process <input_file> [OPTIONS]
+```
+
+**选项:**
+- `-o, --output PATH`: 输出文件路径
+- `-f, --format [json|markdown|console]`: 输出格式（默认: console）
+- `-F, --force`: 强制重新处理，忽略缓存
+
+**示例:**
+```bash
+# 控制台输出
+iot-proxy process data/sample_receipts.json
+
+# 输出JSON文件
+iot-proxy process data/sample_receipts.json -f json -o output/result.json
+
+# 输出Markdown报告
+iot-proxy process data/sample_receipts.json -f markdown -o output/report.md
+
+# 强制重新处理
+iot-proxy process data/sample_receipts.json -F
+```
+
+**返回码:**
+- `0`: 所有记录正常
+- `1`: 存在时区异常记录
+- `2`: 存在解析失败记录
+
+### 2. show-failures - 查看失败详情
+
+**用法:**
+```bash
+iot-proxy show-failures <batch_id>
+```
+
+**示例:**
+```bash
+iot-proxy show-failures abc123def456
+```
+
+### 3. add-change - 添加变更日志
+
+**用法:**
+```bash
+iot-proxy add-change -s <资源范围> -r <变更理由> [-b <变更人>] [-e key=value]
+```
+
+**示例:**
+```bash
+iot-proxy add-change -s "合同补充页" -r "添加设备时区校验条款" -b "张三"
+iot-proxy add-change -s "DEV002" -r "设备固件升级" -e version=2.1.0
+```
+
+### 4. show-changes - 查看变更历史
+
+**用法:**
+```bash
+iot-proxy show-changes [-s <资源范围>]
+```
+
+**示例:**
+```bash
+# 查看所有变更
+iot-proxy show-changes
+
+# 按资源范围过滤
+iot-proxy show-changes -s "合同补充页"
+```
+
+### 5. sample - 生成样例数据
+
+**用法:**
+```bash
+iot-proxy sample
+```
+
+## 样例数据说明
+
+样例数据包含5条记录，覆盖三种场景：
+
+| 设备ID | 回执ID | 时区 | 状态 | 说明 |
+|--------|--------|------|------|------|
+| DEV001 | RCP001 | +08:00 | 正常 | 东八区标准时间 |
+| DEV001 | RCP002 | +08:00 | 正常 | 东八区标准时间 |
+| DEV002 | RCP003 | +00:00 | 正常 | UTC时间，偏移在允许范围内 |
+| DEV002 | RCP004 | -05:00 | 异常 | 西五区，时区偏移过大 |
+| DEV003 | RCP005 | 无 | 失败 | 缺少时区信息 |
+
+## 核心流程
+
+### 主处理流程
+
+```
+输入JSON文件
+    ↓
+生成批次ID（基于内容哈希）
+    ↓
+检查缓存 → 存在则直接返回缓存结果
+    ↓ 不存在
+逐条解析回执
+    ├─ 解析时间戳和时区
+    ├─ 校验时区偏移（±60分钟阈值）
+    └─ 标记状态（正常/异常/失败）
+    ↓
+统计处理结果
+    ↓
+保存到缓存
+    ↓
+失败/异常项单独保存
+    ↓
+输出结果（Console/JSON/Markdown）
+```
+
+### 失败路径分析
+
+**1. 时区异常路径（返回码 1）**
+- 触发条件: 时间戳时区偏移与本地时区（东八区，480分钟）相差超过60分钟
+- 处理方式: 标记为abnormal，统计异常数，保存到失败文件
+- 用户感知: 控制台黄色警告，返回码1
+
+**2. 解析失败路径（返回码 2）**
+- 触发条件: 
+  - 时间戳缺少时区信息
+  - 时间戳格式无法解析
+  - 必填字段缺失或格式错误
+- 处理方式: 标记为failed，统计失败数，保存到失败文件
+- 用户感知: 控制台红色错误，返回码2
+
+## 目录结构
+
+```
+.
+├── data/                    # 输入数据目录
+├── output/                  # 输出目录
+│   └── cache/              # 处理结果缓存
+├── failures/               # 失败记录目录
+│   └── {batch_id}_failures.json
+├── history/                # 变更历史
+│   └── changes_{YYYYMM}.jsonl
+└── src/iot_proxy/          # 源代码
+    ├── __init__.py
+    ├── models.py           # 数据模型
+    ├── processor.py        # 核心处理逻辑
+    ├── formatter.py        # 输出格式化
+    └── main.py             # 命令行入口
+```
+
+## 缓存机制
+
+- **缓存键**: 输入数据内容的SHA256哈希（前16位）
+- **复用逻辑**: 相同内容再次提交时自动复用旧结论
+- **强制刷新**: 使用 `-F` 参数忽略缓存重新处理
+
+## 变更日志
+
+变更日志按月份存储（JSON Lines格式），每条记录包含：
+- `change_id`: 变更唯一标识
+- `resource_scope`: 资源范围（可用于过滤）
+- `change_reason`: 变更理由
+- `changed_at`: 变更时间
+- `changed_by`: 变更人
+- `extra`: 额外信息
+
+## 错误体示例
+
+**命令行返回:**
+```bash
+$ iot-proxy process data/sample_receipts.json
+# 存在异常时 echo $? → 1
+# 存在失败时 echo $? → 2
+```
+
+**失败文件内容 (failures/{batch_id}_failures.json):**
+```json
+[
+  {
+    "device_id": "DEV002",
+    "receipt_id": "RCP004",
+    "status": "abnormal",
+    "error_message": "时区偏移异常: 预期480分钟，实际-300分钟"
+  }
+]
+```
+
+## 常见问题
+
+**Q: 如何查看失败的具体原因？**
+A: 使用 `iot-proxy show-failures <批次ID>` 命令查看详情，或直接查看 failures/ 目录下的JSON文件。
+
+**Q: 相同数据再次处理会发生什么？**
+A: 程序会自动检测并复用缓存结果，显示"使用缓存的处理结果"提示。
+
+**Q: 如何按资源范围追踪合同变更？**
+A: 使用 `iot-proxy add-change -s "合同补充页" -r "变更理由"` 添加记录，然后用 `iot-proxy show-changes -s "合同补充页"` 查看。
