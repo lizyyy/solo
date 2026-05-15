@@ -61,22 +61,47 @@ public class MetadataRepairService {
 
         updateStatus(batch, RepairStatus.VALIDATING, operator, "开始校验");
 
-        List<String> invalidFiles = new ArrayList<>();
+        int validationErrorCount = 0;
         for (String fileId : batch.getAttachmentFileIds()) {
             Attachment attachment = attachmentRepository.findByFileId(fileId).orElse(null);
             if (attachment == null) {
-                invalidFiles.add(fileId);
+                validationErrorCount++;
                 saveException(batchNo, fileId, "VALIDATION_FAILED", "附件不存在", null, "VALIDATION");
+                continue;
+            }
+
+            List<String> missingFields = new ArrayList<>();
+            
+            if (attachment.getBusinessNo() == null || attachment.getBusinessNo().trim().isEmpty()) {
+                missingFields.add("业务单号(businessNo)");
+            }
+            
+            if (attachment.getFileName() == null || attachment.getFileName().trim().isEmpty()) {
+                missingFields.add("文件名(fileName)");
+            }
+
+            if (!missingFields.isEmpty()) {
+                validationErrorCount++;
+                String errorMsg = "关键元数据缺失: " + String.join(", ", missingFields);
+                saveException(batchNo, fileId, "MISSING_CRITICAL_METADATA", errorMsg, null, "VALIDATION");
+                log.warn("附件 {} 校验失败: {}", fileId, errorMsg);
             }
         }
 
-        batch.setFailedCount(invalidFiles.size());
-        batch.setSuccessCount(batch.getTotalCount() - invalidFiles.size());
+        batch.setFailedCount(validationErrorCount);
+        batch.setSuccessCount(batch.getTotalCount() - validationErrorCount);
 
-        updateStatus(batch, RepairStatus.VALIDATED, operator, "校验完成，无效文件: " + invalidFiles.size());
+        String resultMsg;
+        if (validationErrorCount > 0) {
+            resultMsg = "校验完成，发现 " + validationErrorCount + " 个附件存在元数据问题";
+        } else {
+            resultMsg = "校验完成，所有附件元数据完整";
+        }
+        
+        updateStatus(batch, RepairStatus.VALIDATED, operator, resultMsg);
 
-        log.info("批次校验完成: {}, 无效文件: {}", batchNo, invalidFiles.size());
-        return ApiResponse.success("校验完成", convertToBatchResponse(batch));
+        log.info("批次校验完成: {}, 异常数: {}", batchNo, validationErrorCount);
+        return ApiResponse.success(resultMsg, convertToBatchResponse(batch));
     }
 
     @Transactional
@@ -97,6 +122,7 @@ public class MetadataRepairService {
         int successCount = 0;
         int failedCount = 0;
         int skippedCount = 0;
+        int partialFixedCount = 0;
         List<String> successFiles = new ArrayList<>();
 
         for (String fileId : batch.getAttachmentFileIds()) {
@@ -112,89 +138,142 @@ public class MetadataRepairService {
                     continue;
                 }
 
-                performMetadataRepair(attachment);
-                performPermissionInference(attachment);
+                List<String> repairResults = new ArrayList<>();
+                List<String> repairFailures = new ArrayList<>();
 
-                attachment.setMetadataComplete(true);
-                attachmentRepository.save(attachment);
+                boolean criticalFixed = performCriticalMetadataRepair(attachment, repairResults, repairFailures);
+                performOptionalMetadataRepair(attachment, repairResults);
+                performPermissionInference(attachment, repairResults);
 
-                successCount++;
-                successFiles.add(fileId);
+                if (criticalFixed) {
+                    attachment.setMetadataComplete(repairFailures.isEmpty());
+                    attachmentRepository.save(attachment);
+                    
+                    if (repairFailures.isEmpty()) {
+                        successCount++;
+                        successFiles.add(fileId);
+                        log.info("附件 {} 修复完成: {}", fileId, String.join("; ", repairResults));
+                    } else {
+                        partialFixedCount++;
+                        String errorMsg = "部分元数据无法自动修复: " + String.join(", ", repairFailures);
+                        saveException(batchNo, fileId, "PARTIAL_REPAIR_FAILED", errorMsg, null, "REPAIR");
+                        log.warn("附件 {} 部分修复失败: {}", fileId, errorMsg);
+                    }
+                } else {
+                    failedCount++;
+                    String errorMsg = "关键元数据修复失败，存在不可恢复的缺失";
+                    saveException(batchNo, fileId, "CRITICAL_REPAIR_FAILED", errorMsg, null, "REPAIR");
+                    log.error("附件 {} 修复失败: {}", fileId, errorMsg);
+                }
+
             } catch (Exception e) {
                 failedCount++;
-                saveException(batchNo, fileId, "REPAIR_FAILED", e.getMessage(),
+                saveException(batchNo, fileId, "REPAIR_EXCEPTION", "修复过程异常: " + e.getMessage(),
                         Arrays.toString(e.getStackTrace()), "REPAIR");
-                log.error("修复失败: {}, 错误: {}", fileId, e.getMessage());
+                log.error("附件 {} 修复异常: {}", fileId, e.getMessage(), e);
             }
         }
 
         batch.setSuccessCount(successCount);
-        batch.setFailedCount(failedCount);
+        batch.setFailedCount(failedCount + partialFixedCount);
         batch.setSkippedCount(skippedCount);
         batch.setCompletedAt(LocalDateTime.now());
 
         RepairStatus finalStatus;
-        if (failedCount == 0 && skippedCount == 0) {
+        String statusRemark;
+        if (failedCount == 0 && partialFixedCount == 0 && skippedCount == 0) {
             finalStatus = RepairStatus.SUCCESS;
+            statusRemark = "全部修复成功";
         } else if (successCount > 0) {
             finalStatus = RepairStatus.PARTIAL_SUCCESS;
+            statusRemark = String.format("部分修复成功: %d个成功, %d个失败, %d个跳过", successCount, failedCount + partialFixedCount, skippedCount);
         } else {
             finalStatus = RepairStatus.FAILED;
+            statusRemark = "全部修复失败";
         }
 
-        updateStatus(batch, finalStatus, operator, "修复完成，成功: " + successCount + ", 失败: " + failedCount);
+        updateStatus(batch, finalStatus, operator, statusRemark);
 
         log.info("批次修复完成: {}, 状态: {}", batchNo, finalStatus);
-        return ApiResponse.success("修复完成", convertToBatchResponse(batch));
+        return ApiResponse.success(statusRemark, convertToBatchResponse(batch));
     }
 
-    private void performMetadataRepair(Attachment attachment) {
-        if (attachment.getFileName() == null && attachment.getFileId() != null) {
-            attachment.setFileName("file_" + attachment.getFileId() + ".dat");
+    private boolean performCriticalMetadataRepair(Attachment attachment, List<String> results, List<String> failures) {
+        if (attachment.getBusinessNo() == null || attachment.getBusinessNo().trim().isEmpty()) {
+            failures.add("业务单号缺失，无法自动推断");
         }
 
+        if (attachment.getFileName() == null || attachment.getFileName().trim().isEmpty()) {
+            if (attachment.getFileId() != null) {
+                attachment.setFileName("file_" + attachment.getFileId() + ".dat");
+                results.add("文件名自动补全为: " + attachment.getFileName());
+            } else {
+                failures.add("文件名缺失且无法补全（缺少FileId）");
+            }
+        }
+
+        return failures.isEmpty();
+    }
+
+    private void performOptionalMetadataRepair(Attachment attachment, List<String> results) {
         if (attachment.getFileType() == null && attachment.getFileName() != null) {
             String fileName = attachment.getFileName();
             if (fileName.contains(".")) {
                 attachment.setFileType(fileName.substring(fileName.lastIndexOf(".") + 1).toUpperCase());
+                results.add("文件类型自动推断为: " + attachment.getFileType());
             } else {
                 attachment.setFileType("UNKNOWN");
+                results.add("文件类型设为: UNKNOWN");
             }
         }
 
         if (attachment.getUploadTime() == null) {
             attachment.setUploadTime(LocalDateTime.now());
+            results.add("上传时间设为当前时间");
         }
 
         if (attachment.getFileSize() == null) {
             attachment.setFileSize(0L);
+            results.add("文件大小设为: 0");
         }
     }
 
-    private void performPermissionInference(Attachment attachment) {
+    private void performPermissionInference(Attachment attachment, List<String> results) {
         if (attachment.getPermissionLevel() != null) {
             return;
         }
 
-        String businessNo = attachment.getBusinessNo();
         SourceSystem source = attachment.getSourceSystem();
         String fileName = attachment.getFileName();
+        String businessNo = attachment.getBusinessNo();
+
+        PermissionLevel inferredLevel;
 
         if (source == SourceSystem.FINANCE ||
                 (fileName != null && (fileName.contains("财务") || fileName.contains("budget") || fileName.contains("finance")))) {
-            attachment.setPermissionLevel(PermissionLevel.CONFIDENTIAL);
+            inferredLevel = PermissionLevel.CONFIDENTIAL;
+            results.add("权限级别推断为: CONFIDENTIAL (财务系统)");
         } else if (source == SourceSystem.EHR ||
                 (fileName != null && (fileName.contains("人事") || fileName.contains("salary") || fileName.contains("employee")))) {
-            attachment.setPermissionLevel(PermissionLevel.RESTRICTED);
+            inferredLevel = PermissionLevel.RESTRICTED;
+            results.add("权限级别推断为: RESTRICTED (人事系统)");
         } else if (source == SourceSystem.CRM ||
                 (fileName != null && (fileName.contains("客户") || fileName.contains("customer")))) {
-            attachment.setPermissionLevel(PermissionLevel.INTERNAL);
+            inferredLevel = PermissionLevel.INTERNAL;
+            results.add("权限级别推断为: INTERNAL (客户系统)");
+        } else if (source == SourceSystem.OA || source == SourceSystem.ERP) {
+            inferredLevel = PermissionLevel.INTERNAL;
+            results.add("权限级别推断为: INTERNAL (办公/ERP系统)");
         } else {
-            attachment.setPermissionLevel(PermissionLevel.INTERNAL);
+            inferredLevel = PermissionLevel.INTERNAL;
+            results.add("权限级别默认设为: INTERNAL");
         }
+
+        attachment.setPermissionLevel(inferredLevel);
 
         if (source == null) {
             attachment.setSourceSystem(SourceSystem.UNKNOWN);
+            results.add("来源系统默认设为: UNKNOWN");
         }
     }
 
@@ -236,6 +315,7 @@ public class MetadataRepairService {
         List<String> failedFiles = exceptions.stream()
                 .map(RepairException::getFileId)
                 .filter(Objects::nonNull)
+                .distinct()
                 .collect(Collectors.toList());
 
         List<String> successFiles = new ArrayList<>(batch.getAttachmentFileIds());
