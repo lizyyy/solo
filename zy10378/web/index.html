@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外部回调白名单 API 管理控制台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 30px; text-align: center; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h2 { color: #555; margin-bottom: 15px; font-size: 18px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; font-weight: 500; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 10px; }
+        button:hover { background: #0056b3; }
+        button.danger { background: #dc3545; }
+        button.success { background: #28a745; }
+        button.warning { background: #ffc107; color: #333; }
+        .result { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 4px; font-family: monospace; font-size: 13px; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .status-badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-draft { background: #e2e3e5; color: #383d41; }
+        .status-testing { background: #fff3cd; color: #856404; }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-inactive { background: #f8d7da; color: #721c24; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .nav-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #ddd; }
+        .nav-tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; }
+        .nav-tab.active { border-bottom-color: #007bff; color: #007bff; font-weight: 500; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 外部回调白名单 API 管理控制台</h1>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('party')">回调方管理</div>
+            <div class="nav-tab" onclick="switchTab('rule')">规则管理</div>
+            <div class="nav-tab" onclick="switchTab('verify')">验证测试</div>
+            <div class="nav-tab" onclick="switchTab('history')">历史记录</div>
+        </div>
+
+        <div id="party" class="tab-content active">
+            <div class="card">
+                <h2>创建回调方</h2>
+                <div class="form-group">
+                    <label>名称</label>
+                    <input type="text" id="partyName" placeholder="例如：支付系统">
+                </div>
+                <div class="form-group">
+                    <label>AppID</label>
+                    <input type="text" id="partyAppId" placeholder="例如：pay_001">
+                </div>
+                <button onclick="createParty()">创建回调方</button>
+                <div id="partyResult" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div id="rule" class="tab-content">
+            <div class="card">
+                <h2>创建白名单规则</h2>
+                <div class="form-group">
+                    <label>回调方 ID</label>
+                    <input type="text" id="rulePartyId" placeholder="从上方复制 Party ID">
+                </div>
+                <div class="form-group">
+                    <label>规则名称</label>
+                    <input type="text" id="ruleName" placeholder="例如：支付回调规则">
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <textarea id="ruleDesc" rows="2" placeholder="规则描述"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>源 IP 规则（CIDR 或单个 IP，逗号分隔）</label>
+                    <input type="text" id="sourceRules" placeholder="例如：192.168.1.0/24, 10.0.0.1">
+                </div>
+                <div class="form-group">
+                    <label>路径规则（正则表达式，逗号分隔）</label>
+                    <input type="text" id="pathRules" placeholder="例如：/webhook/.*, /callback">
+                </div>
+                <div class="form-group">
+                    <label>方法规则（逗号分隔）</label>
+                    <input type="text" id="methodRules" placeholder="例如：POST, PUT">
+                </div>
+                <div class="form-group">
+                    <label>必需请求头（逗号分隔）</label>
+                    <input type="text" id="headerRules" placeholder="例如：X-Signature">
+                </div>
+                <button onclick="createRule()">创建规则</button>
+                <div id="ruleResult" class="result" style="display:none;"></div>
+            </div>
+
+            <div class="card">
+                <h2>规则状态流转</h2>
+                <div class="form-group">
+                    <label>规则 ID</label>
+                    <input type="text" id="statusRuleId">
+                </div>
+                <div class="form-group">
+                    <label>目标状态</label>
+                    <select id="targetStatus">
+                        <option value="draft">草稿</option>
+                        <option value="testing">测试中</option>
+                        <option value="active">已激活</option>
+                        <option value="inactive">已停用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>变更说明</label>
+                    <input type="text" id="statusComment" placeholder="状态变更原因">
+                </div>
+                <button onclick="updateRuleStatus()">更新状态</button>
+                <div id="statusResult" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div id="verify" class="tab-content">
+            <div class="card">
+                <h2>回调验证测试</h2>
+                <div class="form-group">
+                    <label>规则 ID</label>
+                    <input type="text" id="verifyRuleId">
+                </div>
+                <div class="form-group">
+                    <label>回调方 ID</label>
+                    <input type="text" id="verifyPartyId">
+                </div>
+                <div class="form-group">
+                    <label>源 IP</label>
+                    <input type="text" id="verifySourceIp" value="192.168.1.100">
+                </div>
+                <div class="form-group">
+                    <label>请求路径</label>
+                    <input type="text" id="verifyPath" value="/webhook/test">
+                </div>
+                <div class="form-group">
+                    <label>请求方法</label>
+                    <input type="text" id="verifyMethod" value="POST">
+                </div>
+                <div class="form-group">
+                    <label>请求头（JSON 格式）</label>
+                    <textarea id="verifyHeaders" rows="3">{"X-Signature": "test-signature"}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="isDryRun" checked> 试运行模式（不校验规则状态）
+                    </label>
+                </div>
+                <button onclick="verifyCallback()" class="success">执行验证</button>
+                <div id="verifyResult" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div id="history" class="tab-content">
+            <div class="card">
+                <h2>拒绝记录查询</h2>
+                <div class="form-group">
+                    <label>回调方 ID（可选）</label>
+                    <input type="text" id="filterPartyId">
+                </div>
+                <button onclick="getRejections()">查询拒绝记录</button>
+                <div id="rejectionsResult" class="result" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/v1';
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        async function apiCall(method, endpoint, data = null) {
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (data) options.body = JSON.stringify(data);
+            const res = await fetch(`${API_BASE}${endpoint}`, options);
+            return await res.json();
+        }
+
+        async function createParty() {
+            const result = await apiCall('POST', '/parties', {
+                name: document.getElementById('partyName').value,
+                app_id: document.getElementById('partyAppId').value
+            });
+            const div = document.getElementById('partyResult');
+            div.style.display = 'block';
+            div.textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function createRule() {
+            const result = await apiCall('POST', '/rules', {
+                party_id: document.getElementById('rulePartyId').value,
+                name: document.getElementById('ruleName').value,
+                description: document.getElementById('ruleDesc').value,
+                source_rules: document.getElementById('sourceRules').value.split(',').map(s => s.trim()).filter(s => s),
+                path_rules: document.getElementById('pathRules').value.split(',').map(s => s.trim()).filter(s => s),
+                method_rules: document.getElementById('methodRules').value.split(',').map(s => s.trim()).filter(s => s),
+                header_rules: document.getElementById('headerRules').value.split(',').map(s => s.trim()).filter(s => s)
+            });
+            const div = document.getElementById('ruleResult');
+            div.style.display = 'block';
+            div.textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function updateRuleStatus() {
+            const ruleId = document.getElementById('statusRuleId').value;
+            const result = await apiCall('PUT', `/rules/${ruleId}/status`, {
+                status: document.getElementById('targetStatus').value,
+                comment: document.getElementById('statusComment').value
+            });
+            const div = document.getElementById('statusResult');
+            div.style.display = 'block';
+            div.textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function verifyCallback() {
+            let headers = {};
+            try {
+                headers = JSON.parse(document.getElementById('verifyHeaders').value);
+            } catch (e) {}
+            const result = await apiCall('POST', '/verify', {
+                rule_id: document.getElementById('verifyRuleId').value,
+                party_id: document.getElementById('verifyPartyId').value,
+                source_ip: document.getElementById('verifySourceIp').value,
+                request_path: document.getElementById('verifyPath').value,
+                request_method: document.getElementById('verifyMethod').value,
+                headers: headers,
+                is_dry_run: document.getElementById('isDryRun').checked
+            });
+            const div = document.getElementById('verifyResult');
+            div.style.display = 'block';
+            div.textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function getRejections() {
+            const partyId = document.getElementById('filterPartyId').value;
+            const url = partyId ? `/rejections?party_id=${partyId}` : '/rejections';
+            const result = await apiCall('GET', url);
+            const div = document.getElementById('rejectionsResult');
+            div.style.display = 'block';
+            div.textContent = JSON.stringify(result, null, 2);
+        }
+    </script>
+</body>
+</html>
