@@ -46,27 +46,17 @@ java -jar target/priority-queue-api-1.0.0.jar
 ### 问题 1: "Unable to access jarfile"
 **原因**: JAR 文件未生成，但类文件已预编译
 
-**解决**: 使用方式 1 直接启动，无需 JAR:
-```bash
-./一键启动.sh
-# 或
-./smart_start.sh
-```
+**解决**: ✅ **直接使用 `./完整启动.sh` 启动，无需 JAR**
 
-### 问题 2: 缺少某些依赖 JAR
-**原因**: 本地 Maven 仓库缺少部分依赖
+### 问题 2: "NoClassDefFoundError" 或缺少依赖
+**原因**: 缺少部分 Spring Boot / Hibernate 依赖
 
-**解决**: 下载完整依赖:
-```bash
-./download_deps.sh
-```
+**解决**: ✅ **运行 `./完整启动.sh`，它会自动下载所有 50+ 个必需的 JAR**
 
 ### 问题 3: "No compiler is provided in this environment"
 **原因**: 只有 JRE，没有完整 JDK（仅在需要重新编译时出现）
 
-**解决**: 
-- ✅ **无需解决，使用 `./一键启动.sh` 直接启动，无需编译**
-- 或安装完整 JDK: https://adoptium.net/temurin/releases/?version=8
+**解决**: ✅ **无需安装 JDK，使用 `./完整启动.sh` 直接启动，无需重新编译**
 
 ### 问题 4: 端口 8080 被占用
 **解决**: 修改 `src/main/resources/application.yml`:
