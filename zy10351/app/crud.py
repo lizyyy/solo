@@ -94,7 +94,10 @@ class TaskService:
                 return task
             raise ValueError(f"任务 {task_number} 已登记输出，不允许重复提交不同文件")
 
-        if task.status not in [TaskStatus.CREATED, TaskStatus.REVOKED]:
+        if task.status == TaskStatus.REVOKED:
+            raise ValueError(f"任务 {task_number} 已撤销，不允许重新登记输出")
+
+        if task.status != TaskStatus.CREATED:
             raise ValueError(f"任务 {task_number} 当前状态 {task.status} 不允许登记输出")
 
         self._check_permission(task, register_in.operator, "write")
@@ -249,7 +252,7 @@ class TaskService:
         if task.status != TaskStatus.ARCHIVED:
             raise ValueError(f"任务 {task_number} 当前状态 {task.status} 不允许标记过期")
 
-        if operator and operator != "system":
+        if operator != "system":
             self._check_permission(task, operator, "write")
 
         status_before = task.status
@@ -281,7 +284,7 @@ class TaskService:
         if task.status not in [TaskStatus.EXPIRED, TaskStatus.REVOKED]:
             raise ValueError(f"任务 {task_number} 当前状态 {task.status} 不允许清理")
 
-        if operator and operator != "system":
+        if operator != "system":
             self._check_permission(task, operator, "admin")
 
         status_before = task.status
