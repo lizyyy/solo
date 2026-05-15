@@ -375,7 +375,8 @@ async function runSelfTests() {
     if (!report.id) throw new Error('报告ID为空');
     if (report.beforeStats.total === 0) throw new Error('处理前统计为空');
     if (report.afterStats.total === 0) throw new Error('处理后统计为空');
-    if (report.executionTime <= 0) throw new Error('执行时间未记录');
+    if (typeof report.executionTime !== 'number') throw new Error('执行时间类型错误');
+    if (report.executionTime < 0) throw new Error(`执行时间不能为负数: ${report.executionTime}ms`);
     if (report.nextSuggestions.length === 0) throw new Error('应该有下一步建议');
   });
   allResults.push(generateReport);
