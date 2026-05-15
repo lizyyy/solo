@@ -1,0 +1,54 @@
+[
+  {
+    "batch_id": "BATCH20260515202842",
+    "timestamp": "2026-05-15T20:28:42.708133",
+    "operator": "lisi",
+    "zip_path": "/nonexistent/path.zip",
+    "success": false,
+    "errors": [
+      {
+        "code": "E002",
+        "module": "压缩包处理",
+        "message": "压缩包路径不存在",
+        "risk_level": "high",
+        "covered": true,
+        "path": "/nonexistent/path.zip"
+      }
+    ],
+    "warnings": [],
+    "risk_type": [
+      "压缩包路径异常"
+    ]
+  },
+  {
+    "batch_id": "BATCH20260515202913",
+    "timestamp": "2026-05-15T20:29:13.966523",
+    "operator": "zhangsan",
+    "zip_path": "/tmp/test.zip",
+    "success": false,
+    "errors": [
+      {
+        "code": "E004",
+        "module": "压缩包处理",
+        "message": "压缩包已损坏",
+        "risk_level": "high",
+        "covered": false,
+        "path": "/tmp/test.zip"
+      }
+    ],
+    "warnings": [],
+    "risk_type": [
+      "压缩包损坏"
+    ]
+  },
+  {
+    "batch_id": "BATCH20260515202935",
+    "timestamp": "2026-05-15T20:29:35.464427",
+    "operator": "wangwu",
+    "zip_path": "/tmp/valid_test.zip",
+    "success": true,
+    "errors": [],
+    "warnings": [],
+    "risk_type": []
+  }
+]
