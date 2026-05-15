@@ -3,8 +3,8 @@ package com.lineage.dto;
 import com.lineage.enums.FieldType;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -29,10 +29,13 @@ public class FieldLineageCreateRequest {
 
     private String exampleValue;
 
+    @Valid
     private List<SourceTableDto> sourceTables;
 
+    @Valid
     private CalculationRuleDto calculationRule;
 
+    @Valid
     private List<DependentApiDto> dependentApis;
 
     @NotBlank(message = "创建人不能为空")
