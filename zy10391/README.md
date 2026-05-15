@@ -41,27 +41,46 @@
 ## 启动方式
 
 ### 环境要求
-- JDK 8+ (推荐 JDK 1.8)
-- Maven 3.6+ (系统已安装)
+- **JDK 8+** (需要完整 JDK，仅 JRE 无法编译。推荐 JDK 1.8 或更高)
+- Maven 3.6+ (项目自带 Maven Wrapper，无需系统安装)
+
+#### 验证环境
+```bash
+# 检查是否有完整 JDK
+javac -version
+
+# 如果显示 "command not found"，需要安装 JDK
+# macOS: brew install openjdk@8 或从 Oracle 官网下载
+# Linux: apt-get install openjdk-8-jdk
+```
 
 ### 编译运行
+
+#### 使用 Maven Wrapper (推荐，无需系统安装 Maven)
 ```bash
 # 编译项目
-mvn clean package -DskipTests
+./mvnw clean package -DskipTests
 
 # 运行应用
 java -jar target/multi-source-identity-verification-1.0.0.jar
 ```
 
-### 开发模式运行
-```bash
-mvn spring-boot:run
+#### Windows 用户
+```cmd
+mvnw.cmd clean package -DskipTests
+java -jar target\multi-source-identity-verification-1.0.0.jar
 ```
 
-### 注意事项
-- 如果系统没有 `mvn` 命令，请先安装 Apache Maven 3.6+
-- 当前项目使用系统已安装的 Maven，无需 Maven Wrapper
-- 确保 JAVA_HOME 环境变量指向 JDK 8 或更高版本
+### 开发模式运行
+```bash
+./mvnw spring-boot:run
+```
+
+### Maven Wrapper 工作原理
+- 首次运行 `./mvnw` 时，脚本会自动检测系统 Maven
+- 如果系统无 Maven，将自动下载 Maven Wrapper JAR (~60KB)
+- 需要网络连接，支持 curl 或 wget
+- 后续运行无需重复下载
 
 ### 访问地址
 - 应用端口: http://localhost:8080

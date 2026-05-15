@@ -1,0 +1,56 @@
+#!/bin/sh
+# Maven Wrapper Bootstrap Script
+# 兼容 Java 8 和没有系统 Maven 的环境
+
+set -e
+
+# 项目根目录
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+WRAPPER_JAR="$ROOT_DIR/.mvn/wrapper/maven-wrapper.jar"
+WRAPPER_PROPERTIES="$ROOT_DIR/.mvn/wrapper/maven-wrapper.properties"
+
+# 检查是否有系统 Maven
+if command -v mvn >/dev/null 2>&1; then
+    echo "使用系统 Maven: $(mvn -version | head -1)"
+    exec mvn "$@"
+fi
+
+# 检查 Maven wrapper jar 是否存在
+if [ -f "$WRAPPER_JAR" ]; then
+    echo "使用 Maven Wrapper: $WRAPPER_JAR"
+    exec java -Dmaven.multiModuleProjectDirectory="$ROOT_DIR" -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"
+fi
+
+# 如果都没有，尝试下载 Maven wrapper jar
+echo "系统未安装 Maven，且 Maven Wrapper JAR 不存在"
+echo "尝试自动下载 Maven Wrapper..."
+
+# 创建目录
+mkdir -p "$(dirname "$WRAPPER_JAR")"
+
+# 从配置文件获取下载地址
+WRAPPER_URL=$(grep '^wrapperUrl=' "$WRAPPER_PROPERTIES" 2>/dev/null | cut -d'=' -f2-)
+if [ -z "$WRAPPER_URL" ]; then
+    WRAPPER_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.1/maven-wrapper-3.1.1.jar"
+fi
+
+echo "下载地址: $WRAPPER_URL"
+
+# 尝试使用 curl 或 wget 下载
+if command -v curl >/dev/null 2>&1; then
+    curl -L -o "$WRAPPER_JAR" "$WRAPPER_URL"
+elif command -v wget >/dev/null 2>&1; then
+    wget -O "$WRAPPER_JAR" "$WRAPPER_URL"
+else
+    echo "错误: 未找到 curl 或 wget，无法下载 Maven Wrapper"
+    echo "请手动安装 Maven 3.6+，或者下载 $WRAPPER_URL 到 $WRAPPER_JAR"
+    exit 1
+fi
+
+if [ -f "$WRAPPER_JAR" ]; then
+    echo "Maven Wrapper 下载完成"
+    exec java -Dmaven.multiModuleProjectDirectory="$ROOT_DIR" -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"
+else
+    echo "Maven Wrapper 下载失败"
+    exit 1
+fi

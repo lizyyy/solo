@@ -30,7 +30,8 @@ public class VerificationService {
     @Transactional
     public ResponseEntity<ApiResponse<VerificationResult>> createVerification(CreateVerificationRequest request) {
         if (taskRepository.existsByRequestId(request.getRequestId())) {
-            VerificationTask existingTask = taskRepository.findByRequestId(request.getRequestId()).orElseThrow();
+            VerificationTask existingTask = taskRepository.findByRequestId(request.getRequestId())
+                    .orElseThrow(() -> new RuntimeException("校验任务不存在"));
             return ApiResponse.duplicateRequestEntity(buildResult(existingTask));
         }
 

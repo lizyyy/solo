@@ -1,8 +1,51 @@
 # 兼容性变更说明
 
-## 问题修复摘要
+## 第二轮修复 (2026-05-16)
 
-### 1. Java 版本降级
+### 新增修复的问题
+
+#### 5. Optional.orElseThrow() Java 8 不兼容
+**问题**: `VerificationService.java:33` 使用了无参的 `orElseThrow()`，这是 Java 10+ 才支持的语法
+```java
+// Java 10+ 才支持
+VerificationTask existingTask = taskRepository.findByRequestId(requestId).orElseThrow();
+```
+
+**修复**: 添加 Supplier 参数，改为 Java 8 兼容的写法：
+```java
+// Java 8 兼容
+VerificationTask existingTask = taskRepository.findByRequestId(requestId)
+        .orElseThrow(() -> new RuntimeException("校验任务不存在"));
+```
+
+**影响文件**:
+- `src/main/java/com/identity/verification/service/VerificationService.java`
+
+#### 6. 缺少 Maven 环境
+**问题**: 当前环境没有安装 `mvn` 命令，项目也没有 `mvnw` 或 `target/*.jar`
+
+**修复**:
+- 添加 Maven Wrapper 脚本：
+  - `mvnw` (Linux/macOS)
+  - `mvnw.cmd` (Windows)
+  - `.mvn/wrapper/maven-wrapper.properties`
+- 脚本特性：
+  - 优先使用系统已安装的 Maven
+  - 如无系统 Maven，自动下载 Maven Wrapper JAR (~60KB)
+  - 支持 curl 和 wget 两种下载方式
+
+**新增文件**:
+- `mvnw` (可执行 shell 脚本)
+- `mvnw.cmd` (Windows 批处理脚本)
+- `.mvn/wrapper/maven-wrapper.properties`
+
+---
+
+## 第一轮修复 (2026-05-15)
+
+### 问题修复摘要
+
+#### 1. Java 版本降级
 **问题**: 原 pom.xml 要求 Java 17，但系统只有 Java 1.8
 **修复**: 
 - `pom.xml` 中 Java 版本降级为 1.8
