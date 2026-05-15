@@ -1,0 +1,130 @@
+[
+  {
+    "id": "ad240522-ea68-4df0-949b-46f793c5aed9",
+    "meetingTitle": "2024年Q1研发部门预算评审会议（修订版）",
+    "meetingDate": "2024-03-15",
+    "department": "技术研发部",
+    "attendees": [
+      "张三",
+      "李四",
+      "王五",
+      "赵六"
+    ],
+    "topics": [],
+    "decisions": [],
+    "actionItems": [],
+    "attachments": [
+      {
+        "id": "bee50190-fa9e-4e3d-98a3-21d1f0ffdd9d",
+        "fileName": "Q1预算提案.pdf",
+        "fileType": "application/pdf",
+        "uploadTime": "2026-05-15T23:15:03.632Z",
+        "uploader": "张三",
+        "contentHash": "ebe54e74e73eac7fb8d936d2bc29e0abec171968050b8a5bc0adec54dd08a4c5",
+        "originalInput": {
+          "source": "OA系统审批",
+          "approvalId": "OA-2024-0315-001",
+          "submitter": "张三",
+          "department": "技术研发部",
+          "budgetYear": 2024,
+          "budgetQuarter": "Q1",
+          "totalAmount": 5000000,
+          "items": [
+            {
+              "category": "人员成本",
+              "amount": 3000000
+            },
+            {
+              "category": "设备采购",
+              "amount": 1500000
+            },
+            {
+              "category": "其他",
+              "amount": 500000
+            }
+          ]
+        }
+      }
+    ],
+    "evidenceChain": {
+      "id": "09785bc6-30b8-4cce-9f17-58124c0671d3",
+      "meetingId": "ad240522-ea68-4df0-949b-46f793c5aed9",
+      "items": [
+        {
+          "id": "ad953d85-7151-4430-af96-94005371b8b5",
+          "type": "attachment",
+          "source": "Q1预算提案.pdf",
+          "description": "附件上传: Q1预算提案.pdf",
+          "timestamp": "2026-05-15T23:15:03.632Z",
+          "verified": true,
+          "verificationMethod": "content_hash"
+        },
+        {
+          "id": "9235bb4e-044e-4048-bc1d-d3cd06b2d9c4",
+          "type": "manual",
+          "source": "李四",
+          "description": "人工修正: meetingTitle 从 \"2024年Q1研发部门预算评审会议\" 改为 \"2024年Q1研发部门预算评审会议（修订版）\"",
+          "timestamp": "2026-05-15T23:15:03.633Z",
+          "verified": true,
+          "verificationMethod": "manual_approval"
+        }
+      ],
+      "status": "complete"
+    },
+    "corrections": [
+      {
+        "id": "0b98e744-d02f-4bd6-963d-588616c132cf",
+        "fieldName": "meetingTitle",
+        "originalValue": "2024年Q1研发部门预算评审会议",
+        "correctedValue": "2024年Q1研发部门预算评审会议（修订版）",
+        "reason": "会议标题需要更准确，注明修订情况",
+        "corrector": "李四",
+        "timestamp": "2026-05-15T23:15:03.633Z",
+        "systemJudgment": "2024年Q1研发部门预算评审会议"
+      }
+    ],
+    "searchTermReports": [
+      {
+        "searchTerm": "预算",
+        "occurrences": 1,
+        "locations": [
+          "第1行"
+        ],
+        "reviewSample": {
+          "context": "2024年Q1预算总额500万，其中研发人员成本300万，设备采购150万，其他50万...",
+          "verified": false
+        }
+      }
+    ],
+    "status": "draft",
+    "createdAt": "2026-05-15T23:15:03.631Z",
+    "updatedAt": "2026-05-15T23:15:03.633Z"
+  },
+  {
+    "id": "29cfec04-133e-48fe-b5c7-ec677796b6ba",
+    "meetingTitle": "市场推广方案讨论会",
+    "meetingDate": "2024-03-20",
+    "department": "市场营销部",
+    "attendees": [
+      "钱七",
+      "孙八"
+    ],
+    "topics": [],
+    "decisions": [],
+    "actionItems": [],
+    "attachments": [],
+    "evidenceChain": {
+      "id": "a4b8b03c-afb3-4ff6-aa72-2e7a37f99bbd",
+      "meetingId": "29cfec04-133e-48fe-b5c7-ec677796b6ba",
+      "items": [],
+      "status": "broken",
+      "brokenAt": 0,
+      "brokenReason": "关键审批文件缺失，无法追溯决策依据"
+    },
+    "corrections": [],
+    "searchTermReports": [],
+    "status": "draft",
+    "createdAt": "2026-05-15T23:15:03.633Z",
+    "updatedAt": "2026-05-15T23:15:03.633Z"
+  }
+]

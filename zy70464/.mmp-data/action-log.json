@@ -1,0 +1,32 @@
+[
+  {
+    "type": "create",
+    "description": "创建会议纪要: 2024年Q1研发部门预算评审会议",
+    "timestamp": "2026-05-15T23:15:03.631Z",
+    "meetingId": "ad240522-ea68-4df0-949b-46f793c5aed9"
+  },
+  {
+    "type": "add_attachment",
+    "description": "添加附件: Q1预算提案.pdf",
+    "timestamp": "2026-05-15T23:15:03.632Z",
+    "meetingId": "ad240522-ea68-4df0-949b-46f793c5aed9"
+  },
+  {
+    "type": "correction",
+    "description": "人工修正字段: meetingTitle",
+    "timestamp": "2026-05-15T23:15:03.633Z",
+    "meetingId": "ad240522-ea68-4df0-949b-46f793c5aed9"
+  },
+  {
+    "type": "create",
+    "description": "创建会议纪要: 市场推广方案讨论会",
+    "timestamp": "2026-05-15T23:15:03.633Z",
+    "meetingId": "29cfec04-133e-48fe-b5c7-ec677796b6ba"
+  },
+  {
+    "type": "break_chain",
+    "description": "证据链断开: 关键审批文件缺失，无法追溯决策依据",
+    "timestamp": "2026-05-15T23:15:03.633Z",
+    "meetingId": "29cfec04-133e-48fe-b5c7-ec677796b6ba"
+  }
+]

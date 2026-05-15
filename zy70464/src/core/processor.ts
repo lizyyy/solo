@@ -10,16 +10,11 @@ import {
   QueryFilter,
   SearchTermReport,
 } from '../types';
-import { FileStorage } from './storage';
+import { FileStorage, ActionLogEntry } from './storage';
 
 export class MeetingMinutesProcessor {
   private meetings: Map<string, MeetingMinutes> = new Map();
-  private actionLog: Array<{
-    type: string;
-    description: string;
-    timestamp: string;
-    meetingId?: string;
-  }> = [];
+  private actionLog: Array<ActionLogEntry> = [];
   private storage?: FileStorage;
   private dataDir?: string;
 
@@ -38,6 +33,7 @@ export class MeetingMinutesProcessor {
     meetings.forEach((m) => {
       this.meetings.set(m.id, m);
     });
+    this.actionLog = this.storage.loadAllActions();
   }
 
   private saveToStorage(): void {
@@ -442,9 +438,14 @@ export class MeetingMinutesProcessor {
     const meeting = this.meetings.get(meetingId);
     if (!meeting) return null;
 
-    const relevantActions = this.actionLog.filter(
-      (a) => a.meetingId === meetingId
-    );
+    let relevantActions: ActionLogEntry[];
+    if (this.storage) {
+      relevantActions = this.storage.loadActionsByMeetingId(meetingId);
+    } else {
+      relevantActions = this.actionLog.filter(
+        (a) => a.meetingId === meetingId
+      );
+    }
 
     return {
       input: {
@@ -479,7 +480,11 @@ export class MeetingMinutesProcessor {
     timestamp: string,
     meetingId?: string
   ): void {
-    this.actionLog.push({ type, description, timestamp, meetingId });
+    const action: ActionLogEntry = { type, description, timestamp, meetingId };
+    this.actionLog.push(action);
+    if (this.storage) {
+      this.storage.appendAction(action);
+    }
   }
 
   getAllMeetings(): MeetingMinutes[] {

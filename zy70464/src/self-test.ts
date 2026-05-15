@@ -194,6 +194,65 @@ function runTests(): void {
     return retrieved !== undefined && retrieved.evidenceChain.status === 'broken';
   });
 
+  suite.test('操作日志可以持久化保存', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mmp-test-'));
+    
+    const processor1 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const meeting = processor1.createMeetingMinutes('日志测试', '2024-01-01', '测试部门', ['张三']);
+    processor1.addAttachment(meeting.id, '附件1.pdf', 'application/pdf', '张三', '内容', {});
+    
+    const processor2 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const summary = processor2.generateExportSummary(meeting.id);
+    
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    
+    return summary !== null && summary.actions.length >= 2;
+  });
+
+  suite.test('跨进程操作日志完整无丢失', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mmp-test-'));
+    
+    const processor1 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const meeting = processor1.createMeetingMinutes('跨进程测试', '2024-01-01', '测试部门', ['张三']);
+    processor1.addAttachment(meeting.id, '附件1.pdf', 'application/pdf', '张三', '内容1', {});
+    
+    const processor2 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    processor2.addAttachment(meeting.id, '附件2.pdf', 'application/pdf', '李四', '内容2', {});
+    processor2.applyManualCorrection(meeting.id, 'meetingTitle', '修正后的标题', '测试原因', '王五');
+    
+    const processor3 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const summary = processor3.generateExportSummary(meeting.id);
+    
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    
+    return (
+      summary !== null &&
+      summary.actions.length === 4 && // create + addAttachment + addAttachment + correction
+      summary.conclusion.correctionsCount === 1
+    );
+  });
+
+  suite.test('导出摘要操作日志按时间顺序排列', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mmp-test-'));
+    
+    const processor1 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const meeting = processor1.createMeetingMinutes('排序测试', '2024-01-01', '测试部门', ['张三']);
+    processor1.addAttachment(meeting.id, '附件1.pdf', 'application/pdf', '张三', '内容1', {});
+    processor1.applyManualCorrection(meeting.id, 'meetingTitle', '修正后的标题', '测试原因', '王五');
+    
+    const summary = processor1.generateExportSummary(meeting.id);
+    
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    
+    if (!summary || summary.actions.length !== 3) return false;
+    
+    const timestamps = summary.actions.map(a => new Date(a.timestamp).getTime());
+    return (
+      timestamps[0] <= timestamps[1] &&
+      timestamps[1] <= timestamps[2]
+    );
+  });
+
   suite.section('附件补录功能测试');
 
   suite.test('添加附件成功', () => {
