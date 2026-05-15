@@ -1,15 +1,12 @@
 {
   "batch_id": "LOGISTICS-INTERCEPT-20240515-HALF-003",
-  "validation_time": "2026-05-16T05:52:45.919711",
+  "validation_time": "2026-05-16T06:09:42.988744",
   "overall_status": "partial",
-  "success_count": 1,
-  "failed_count": 3,
+  "success_count": 2,
+  "failed_count": 2,
   "partial_count": 0,
   "total_slices": 4,
   "failure_groups": {
-    "checksum_mismatch": [
-      "intercept_20240515_success_01.parquet"
-    ],
     "missing_slice": [
       "intercept_20240515_missing_03.parquet"
     ],
@@ -24,13 +21,11 @@
     {
       "file_name": "intercept_20240515_success_01.parquet",
       "slice_index": 1,
-      "status": "failed",
+      "status": "success",
       "details": {
-        "error": "校验和不匹配",
-        "expected": "DIFFERENT_CHECKSUM_HERE",
-        "actual": "eb1bf68bef6bf329"
-      },
-      "failure_type": "checksum_mismatch"
+        "actual_size": 1048576,
+        "actual_checksum": "eb1bf68bef6bf329"
+      }
     },
     {
       "file_name": "intercept_20240515_success_02.parquet",
@@ -63,6 +58,6 @@
       "failure_type": "size_mismatch"
     }
   ],
-  "submission_hash": "071008e324364b0c",
+  "submission_hash": "6a57c740ac53b8f1",
   "has_conflict": false
 }
