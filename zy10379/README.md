@@ -41,20 +41,31 @@
 cd /path/to/project
 
 # 运行启动脚本，会自动检测环境并提供多种运行方式
-chmod +x start.sh
+chmod +x start.sh setup-mvnw.sh
 ./start.sh
 ```
 
-#### 方式 2: 使用 Maven
-```bash
-# 直接使用全局 Maven
-mvn clean spring-boot:run
+脚本提供以下选项：
+1. 自动检测并启动（推荐）
+2. 仅安装 Maven Wrapper
+3. 查看 IDE 运行指南
+4. 查看系统 Maven 安装指南
 
-# 或使用 Maven wrapper（如果已安装 Maven）
-./mvnw clean spring-boot:run
+#### 方式 2: 手动安装 Maven Wrapper
+```bash
+# 运行自动安装脚本（需要 curl 或 wget）
+./setup-mvnw.sh
+
+# 然后启动应用
+./mvnw spring-boot:run
 ```
 
-#### 方式 3: 使用 IDE（无需 Maven）
+#### 方式 3: 使用系统 Maven
+```bash
+mvn clean spring-boot:run
+```
+
+#### 方式 4: 使用 IDE（无需 Maven）
 详细步骤请参考: `IDE_QUICKSTART.md`
 
 1. 用 IntelliJ IDEA / Eclipse / VS Code 打开项目
