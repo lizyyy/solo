@@ -1,0 +1,49 @@
+{
+  "total_failures": 1,
+  "failures": [
+    {
+      "batch_id": "BATCH2024999",
+      "contract_id": "CTR2024999",
+      "failure_type": "time_order_error",
+      "error_message": "时间顺序错误: 乙方签署时间(2024-01-20 11:00:00)早于甲方签署时间(2024-01-20 14:00:00)",
+      "submission_data": {
+        "batch_id": "BATCH2024999",
+        "contract_id": "CTR2024999",
+        "contract_name": "测试合同-时间顺序反转",
+        "party_a": "测试甲方",
+        "party_b": "测试乙方",
+        "sign_time_a": "2024-01-20 14:00:00",
+        "sign_time_b": "2024-01-20 11:00:00",
+        "create_time": "2024-01-18 14:00:00",
+        "supplements": [
+          {
+            "contract_id": "CTR2024999",
+            "supplement_id": "SUPCTR2024999_01",
+            "supplement_type": "补充协议",
+            "content": "这是一条故意时间顺序错误的合同，用于复核测试",
+            "create_time": "2024-01-19 14:00:00",
+            "operator": "测试人员"
+          }
+        ],
+        "payment_receipts": [
+          {
+            "receipt_id": "RCPCTR2024999_01",
+            "contract_id": "CTR2024999",
+            "payment_channel": "微信支付",
+            "amount": 50000.0,
+            "payment_time": "2024-01-22 14:00:00",
+            "manual_remark": "时间顺序测试合同，故意设置乙方签署时间早于甲方",
+            "caller": "test_service_001",
+            "create_time": "2026-05-16 07:19:27.739005"
+          }
+        ],
+        "submitter": "测试人员",
+        "submit_time": "2026-05-16 07:19:27.739021"
+      },
+      "timestamp": "2026-05-16 07:19:27.741629",
+      "reviewer": null,
+      "review_status": "pending"
+    }
+  ],
+  "exported_at": "2026-05-16T07:19:27.742829"
+}
