@@ -1,0 +1,552 @@
+{
+  "records": {
+    "hash_4aca0207": {
+      "result": {
+        "itemId": "sample-001",
+        "item": {
+          "id": "sample-001",
+          "content": "这是一条正常的用户评论，内容积极向上，没有任何违规内容。",
+          "contentType": "text",
+          "metadata": {
+            "source": "comment",
+            "userId": "user-123"
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0.061,
+            "label": "normal",
+            "confidence": 0.967,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0.01837666395686949,
+                "adult": 0.015313886630724576,
+                "political": 0.012251109304579661,
+                "fraud": 0.009188331978434746,
+                "other": 0.006125554652289831
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0,
+            "label": "normal",
+            "confidence": 0.856,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0,
+                "adult": 0,
+                "political": 0,
+                "fraud": 0,
+                "other": 0
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0,
+            "label": "normal",
+            "confidence": 0.833,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0,
+                "adult": 0,
+                "political": 0,
+                "fraud": 0,
+                "other": 0
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": false,
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": false,
+            "severity": "low"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "pass",
+        "overallConfidence": 0.885,
+        "timestamp": 1778849286384
+      },
+      "corrections": [],
+      "status": "pending"
+    },
+    "hash_2e886716": {
+      "result": {
+        "itemId": "sample-002",
+        "item": {
+          "id": "sample-002",
+          "content": "联系方式：加微信13800138000获取更多优惠信息，快来抢购吧！",
+          "contentType": "text",
+          "metadata": {
+            "source": "post",
+            "userId": "user-456"
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0.037,
+            "label": "normal",
+            "confidence": 0.973,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0.010962580618003336,
+                "adult": 0.009135483848336113,
+                "political": 0.00730838707866889,
+                "fraud": 0.005481290309001668,
+                "other": 0.003654193539334445
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0.111,
+            "label": "normal",
+            "confidence": 0.843,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0.03329571831964853,
+                "adult": 0.027746431933040445,
+                "political": 0.02219714554643236,
+                "fraud": 0.016647859159824266,
+                "other": 0.01109857277321618
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0.036,
+            "label": "normal",
+            "confidence": 0.834,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0.010876726320914529,
+                "adult": 0.009063938600762107,
+                "political": 0.007251150880609686,
+                "fraud": 0.0054383631604572645,
+                "other": 0.003625575440304843
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": true,
+            "matchContent": "微信",
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": true,
+            "matchContent": "13800138000",
+            "severity": "low"
+          },
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "review",
+        "overallConfidence": 0.707,
+        "timestamp": 1778849286398
+      },
+      "corrections": [
+        {
+          "id": "c1870609-e7c1-4afa-8b7c-8705c05b5d75",
+          "resultId": "sample-002",
+          "handler": "zhangsan",
+          "originalDecision": "review",
+          "newDecision": "pass",
+          "remark": "内容为正常联系方式，误判",
+          "timestamp": 1778849301789
+        }
+      ],
+      "status": "corrected",
+      "finalDecision": "pass"
+    },
+    "hash_34351baa": {
+      "result": {
+        "itemId": "sample-003",
+        "item": {
+          "id": "sample-003",
+          "content": "这里包含违禁词，涉及违法违规内容，绝对不能通过审核。",
+          "contentType": "text",
+          "metadata": {
+            "source": "comment",
+            "userId": "user-789"
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0.534,
+            "label": "medium_risk",
+            "confidence": 0.951,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0.160117436436182,
+                "adult": 0.1334311970301517,
+                "political": 0.10674495762412135,
+                "fraud": 0.080058718218091,
+                "other": 0.05337247881206068
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0.507,
+            "label": "medium_risk",
+            "confidence": 0.875,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0.15202029219645094,
+                "adult": 0.1266835768303758,
+                "political": 0.10134686146430064,
+                "fraud": 0.07601014609822547,
+                "other": 0.05067343073215032
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0.625,
+            "label": "medium_risk",
+            "confidence": 0.762,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0.18746540119213745,
+                "adult": 0.15622116766011454,
+                "political": 0.12497693412809163,
+                "fraud": 0.09373270059606872,
+                "other": 0.062488467064045816
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": true,
+            "matchContent": "违禁词",
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": false,
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": false,
+            "severity": "low"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "reject",
+        "overallConfidence": 0.776,
+        "timestamp": 1778849286409
+      },
+      "corrections": [],
+      "status": "pending"
+    },
+    "hash_62dc558e": {
+      "result": {
+        "itemId": "sample-004",
+        "item": {
+          "id": "sample-004",
+          "content": "正常的商品描述，质量很好，性价比高，推荐购买。",
+          "contentType": "text",
+          "metadata": {
+            "source": "product",
+            "userId": "user-101"
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0,
+            "label": "normal",
+            "confidence": 0.867,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0,
+                "adult": 0,
+                "political": 0,
+                "fraud": 0,
+                "other": 0
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0.002,
+            "label": "normal",
+            "confidence": 0.753,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0.0004905696021401257,
+                "adult": 0.00040880800178343807,
+                "political": 0.00032704640142675045,
+                "fraud": 0.00024528480107006284,
+                "other": 0.00016352320071337523
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0.038,
+            "label": "normal",
+            "confidence": 0.953,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0.011506756151091346,
+                "adult": 0.009588963459242789,
+                "political": 0.007671170767394231,
+                "fraud": 0.005753378075545673,
+                "other": 0.0038355853836971156
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": false,
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": false,
+            "severity": "low"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "pass",
+        "overallConfidence": 0.858,
+        "timestamp": 1778849286421
+      },
+      "corrections": [],
+      "status": "pending"
+    },
+    "hash_24dd618d": {
+      "result": {
+        "itemId": "sample-005",
+        "item": {
+          "id": "sample-005",
+          "content": "暴力内容：打架、杀人、砍人等行为都是违法犯罪行为。",
+          "contentType": "text",
+          "metadata": {
+            "source": "post",
+            "userId": "user-102"
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0.541,
+            "label": "medium_risk",
+            "confidence": 0.809,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0.16224477629854656,
+                "adult": 0.1352039802487888,
+                "political": 0.10816318419903104,
+                "fraud": 0.08112238814927328,
+                "other": 0.05408159209951552
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0.564,
+            "label": "medium_risk",
+            "confidence": 0.702,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0.16920580884468758,
+                "adult": 0.14100484070390631,
+                "political": 0.11280387256312506,
+                "fraud": 0.08460290442234379,
+                "other": 0.05640193628156253
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0.5,
+            "label": "medium_risk",
+            "confidence": 0.753,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0.15005426930134322,
+                "adult": 0.125045224417786,
+                "political": 0.10003617953422882,
+                "fraud": 0.07502713465067161,
+                "other": 0.05001808976711441
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": true,
+            "matchContent": "违法",
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": true,
+            "matchContent": "暴力内容：打架、杀人、砍人等行为都是违",
+            "severity": "high"
+          },
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": false,
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": false,
+            "severity": "low"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "reject",
+        "overallConfidence": 0.604,
+        "timestamp": 1778849286432
+      },
+      "corrections": [],
+      "status": "pending"
+    }
+  },
+  "idToHash": {
+    "sample-001": "hash_4aca0207",
+    "sample-002": "hash_2e886716",
+    "sample-003": "hash_34351baa",
+    "sample-004": "hash_62dc558e",
+    "sample-005": "hash_24dd618d"
+  },
+  "handlerIndex": {
+    "zhangsan": [
+      "sample-002"
+    ]
+  }
+}

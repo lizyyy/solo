@@ -1,0 +1,47 @@
+[
+  {
+    "id": "overreach-001",
+    "content": "微信扫码关注公众号获取更多信息，电话13800138000咨询详情，加QQ群123456一起交流讨论。",
+    "contentType": "text",
+    "metadata": {
+      "note": "包含多个联系方式，可能触发多条规则，造成误判",
+      "expected": "should trigger multiple contact rules"
+    }
+  },
+  {
+    "id": "overreach-002",
+    "content": "这篇文章中提到了微信公众号推广，同时还有手机号13999998888，以及QQ号88888888。",
+    "contentType": "text",
+    "metadata": {
+      "note": "正常的文章引用，但包含多个联系方式可能被误判",
+      "expected": "may be over-flagged by contact detection"
+    }
+  },
+  {
+    "id": "overreach-003",
+    "content": "客服联系方式：微信customer_service，电话400-888-8888，工作时间周一至周五9:00-18:00。",
+    "contentType": "text",
+    "metadata": {
+      "note": "正常的客服信息展示，但可能被规则过严判定",
+      "expected": "legitimate customer service info, but may trigger rules"
+    }
+  },
+  {
+    "id": "overreach-004",
+    "content": "产品咨询请致电：13800001111，或者添加微信号：product_demo了解更多详情。",
+    "contentType": "text",
+    "metadata": {
+      "note": "正常的商业推广，规则可能过度反应",
+      "expected": "commercial content, potential overreach"
+    }
+  },
+  {
+    "id": "overreach-005",
+    "content": "联系人：张先生，手机号13555555555，微信同号，欢迎来电咨询合作事宜。",
+    "contentType": "text",
+    "metadata": {
+      "note": "正常的商务联系方式，但可能被多重规则命中",
+      "expected": "business contact, potential multiple rule hits"
+    }
+  }
+]

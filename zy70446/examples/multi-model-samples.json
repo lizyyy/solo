@@ -1,0 +1,47 @@
+[
+  {
+    "id": "sample-001",
+    "content": "这是一条正常的用户评论，内容积极向上，没有任何违规内容。",
+    "contentType": "text",
+    "metadata": {
+      "source": "comment",
+      "userId": "user-123"
+    }
+  },
+  {
+    "id": "sample-002",
+    "content": "联系方式：加微信13800138000获取更多优惠信息，快来抢购吧！",
+    "contentType": "text",
+    "metadata": {
+      "source": "post",
+      "userId": "user-456"
+    }
+  },
+  {
+    "id": "sample-003",
+    "content": "这里包含违禁词，涉及违法违规内容，绝对不能通过审核。",
+    "contentType": "text",
+    "metadata": {
+      "source": "comment",
+      "userId": "user-789"
+    }
+  },
+  {
+    "id": "sample-004",
+    "content": "正常的商品描述，质量很好，性价比高，推荐购买。",
+    "contentType": "text",
+    "metadata": {
+      "source": "product",
+      "userId": "user-101"
+    }
+  },
+  {
+    "id": "sample-005",
+    "content": "暴力内容：打架、杀人、砍人等行为都是违法犯罪行为。",
+    "contentType": "text",
+    "metadata": {
+      "source": "post",
+      "userId": "user-102"
+    }
+  }
+]
