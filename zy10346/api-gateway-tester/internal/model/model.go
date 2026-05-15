@@ -7,7 +7,7 @@ import (
 type MatchCondition struct {
 	ID        string    `json:"id" gorm:"primaryKey"`
 	RuleID    string    `json:"rule_id"`
-	Type      string    `json:"type"` 
+	Type      string    `json:"type"`
 	Key       string    `json:"key"`
 	Operator  string    `json:"operator"`
 	Value     string    `json:"value"`
@@ -67,28 +67,29 @@ const (
 )
 
 type TrialResult struct {
-	ID               string      `json:"id" gorm:"primaryKey"`
-	RequestID        string      `json:"request_id"`
-	RequestSample    RequestSample `json:"request_sample" gorm:"foreignKey:RequestID"`
-	MatchedRuleID    *string     `json:"matched_rule_id"`
-	MatchedRule      *RouteRule  `json:"matched_rule" gorm:"foreignKey:MatchedRuleID"`
-	Status           TrialStatus `json:"status"`
-	ConflictDetected bool        `json:"conflict_detected"`
+	ID               string         `json:"id" gorm:"primaryKey"`
+	TrialRequestID   string         `json:"trial_request_id"`
+	RequestSampleID  string         `json:"request_sample_id"`
+	RequestSample    RequestSample  `json:"request_sample" gorm:"foreignKey:RequestSampleID"`
+	MatchedRuleID    *string        `json:"matched_rule_id"`
+	MatchedRule      *RouteRule     `json:"matched_rule" gorm:"foreignKey:MatchedRuleID"`
+	Status           TrialStatus    `json:"status"`
+	ConflictDetected bool           `json:"conflict_detected"`
 	Conflicts        []ConflictRule `json:"conflicts" gorm:"many2many:trial_conflicts;"`
-	Explanation      string      `json:"explanation"`
-	Error            string      `json:"error"`
-	DurationMs       int64       `json:"duration_ms"`
-	CreatedAt        time.Time   `json:"created_at"`
-	CompletedAt      *time.Time  `json:"completed_at"`
+	Explanation      string         `json:"explanation"`
+	Error            string         `json:"error"`
+	DurationMs       int64          `json:"duration_ms"`
+	CreatedAt        time.Time      `json:"created_at"`
+	CompletedAt      *time.Time     `json:"completed_at"`
 }
 
 type TrialRequest struct {
-	ID             string   `json:"id" gorm:"primaryKey"`
-	IdempotencyKey string   `json:"idempotency_key" gorm:"uniqueIndex"`
-	RequestSampleID string  `json:"request_sample_id"`
-	RuleIDs        []string `json:"rule_ids" gorm:"serializer:json"`
-	Status         TrialStatus `json:"status"`
-	CreatedAt      time.Time `json:"created_at"`
+	ID              string      `json:"id" gorm:"primaryKey"`
+	IdempotencyKey  string      `json:"idempotency_key" gorm:"uniqueIndex"`
+	RequestSampleID string      `json:"request_sample_id"`
+	RuleIDs         []string    `json:"rule_ids" gorm:"serializer:json"`
+	Status          TrialStatus `json:"status"`
+	CreatedAt       time.Time   `json:"created_at"`
 }
 
 type ErrorResponse struct {

@@ -9,6 +9,7 @@ import (
 
 	"api-gateway-tester/internal/model"
 	"api-gateway-tester/internal/repository"
+
 	"gorm.io/gorm"
 )
 
@@ -241,7 +242,7 @@ func (s *Service) DetectConflicts(rules []model.RouteRule) ([]model.ConflictRule
 func (s *Service) StartTrial(req *model.StartTrialRequest) (*model.TrialResult, error) {
 	existingRequest, err := s.repo.GetTrialRequestByIdempotencyKey(req.IdempotencyKey)
 	if err == nil && existingRequest != nil {
-		result, err := s.repo.GetTrialResultByRequestID(existingRequest.ID)
+		result, err := s.repo.GetTrialResultByTrialRequestID(existingRequest.ID)
 		if err == nil {
 			return result, nil
 		}
@@ -298,7 +299,7 @@ func (s *Service) StartTrial(req *model.StartTrialRequest) (*model.TrialResult, 
 			continue
 		}
 		if matched {
-			if matchedRule == nil || rule.Priority > matchedRule.Priority || 
+			if matchedRule == nil || rule.Priority > matchedRule.Priority ||
 				(rule.Priority == matchedRule.Priority && score > bestMatchScore) {
 				matchedRule = &rule
 				bestMatchScore = score
@@ -330,7 +331,8 @@ func (s *Service) StartTrial(req *model.StartTrialRequest) (*model.TrialResult, 
 	}
 
 	result := &model.TrialResult{
-		RequestID:        trialRequest.ID,
+		TrialRequestID:   trialRequest.ID,
+		RequestSampleID:  req.RequestSampleID,
 		MatchedRuleID:    matchedRuleID,
 		Status:           model.TrialStatusCompleted,
 		ConflictDetected: len(conflicts) > 0,

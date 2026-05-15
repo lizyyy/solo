@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"api-gateway-tester/internal/model"
+
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -166,9 +167,9 @@ func (r *Repository) GetTrialResultByID(id string) (*model.TrialResult, error) {
 	return &result, nil
 }
 
-func (r *Repository) GetTrialResultByRequestID(requestID string) (*model.TrialResult, error) {
+func (r *Repository) GetTrialResultByTrialRequestID(trialRequestID string) (*model.TrialResult, error) {
 	var result model.TrialResult
-	err := r.db.Preload("RequestSample").Preload("MatchedRule").Preload("MatchedRule.Conditions").Preload("Conflicts").Where("request_id = ?", requestID).First(&result).Error
+	err := r.db.Preload("RequestSample").Preload("MatchedRule").Preload("MatchedRule.Conditions").Preload("Conflicts").Where("trial_request_id = ?", trialRequestID).First(&result).Error
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +178,7 @@ func (r *Repository) GetTrialResultByRequestID(requestID string) (*model.TrialRe
 
 func (r *Repository) QueryTrialHistory(query *model.TrialHistoryQuery) ([]model.TrialResult, int64, error) {
 	db := r.db.Model(&model.TrialResult{})
-	
+
 	if query.Status != nil {
 		db = db.Where("status = ?", *query.Status)
 	}
