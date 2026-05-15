@@ -24,19 +24,28 @@ public class ArchiveTaskService {
     private final LifecycleRuleRepository ruleRepository;
     private final AuditLogService auditLogService;
     private final ExecutionProofService proofService;
+    private final RuleMatcherService ruleMatcherService;
 
     @Transactional
     public ArchiveTask createTask(CreateArchiveTaskRequest request) {
         if (taskRepository.findByTaskId(request.getTaskId()).isPresent()) {
-            throw new BusinessException(400, "任务ID已存在: " + request.getTaskId());
+            throw new BusinessException(409, "任务ID已存在: " + request.getTaskId());
         }
 
         LifecycleRule rule = ruleRepository.findById(request.getRuleId())
                 .orElseThrow(() -> new BusinessException(404, "规则不存在"));
 
+        if (rule.getStatus() != com.object.lifecycle.enums.RuleStatus.ACTIVE) {
+            throw new BusinessException(400, "只有ACTIVE状态的规则才能创建归档任务，当前规则状态: " + rule.getStatus());
+        }
+
+        if (!ruleMatcherService.isObjectMatchRule(rule, request.getObjectKey(), request.getBucketName())) {
+            throw new BusinessException(400, "对象与规则不匹配: objectKey=" + request.getObjectKey() + ", bucketName=" + request.getBucketName());
+        }
+
         if (taskRepository.existsByRuleIdAndObjectKeyAndBucketName(
                 request.getRuleId(), request.getObjectKey(), request.getBucketName())) {
-            throw new BusinessException(400, "该规则下已存在相同对象的归档任务");
+            throw new BusinessException(409, "该规则下已存在相同对象的归档任务");
         }
 
         ArchiveTask task = new ArchiveTask();

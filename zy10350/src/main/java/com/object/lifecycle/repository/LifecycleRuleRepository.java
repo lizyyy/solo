@@ -20,6 +20,6 @@ public interface LifecycleRuleRepository extends JpaRepository<LifecycleRule, Lo
 
     boolean existsByRuleId(String ruleId);
 
-    @Query("SELECT r FROM LifecycleRule r WHERE r.objectPrefix.id = :prefixId AND r.enabled = true")
+    @Query("SELECT r FROM LifecycleRule r WHERE r.objectPrefix.id = :prefixId AND r.enabled = true AND r.status = 'ACTIVE'")
     List<LifecycleRule> findActiveRulesByPrefixId(Long prefixId);
 }

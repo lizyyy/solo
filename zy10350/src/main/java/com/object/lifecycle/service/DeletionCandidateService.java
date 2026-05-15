@@ -25,11 +25,20 @@ public class DeletionCandidateService {
     private final AuditLogService auditLogService;
     private final RetentionExceptionService exceptionService;
     private final ExecutionProofService proofService;
+    private final RuleMatcherService ruleMatcherService;
 
     @Transactional
     public DeletionCandidate createCandidate(CreateDeletionCandidateRequest request) {
         LifecycleRule rule = ruleRepository.findById(request.getRuleId())
                 .orElseThrow(() -> new BusinessException(404, "规则不存在"));
+
+        if (rule.getStatus() != com.object.lifecycle.enums.RuleStatus.ACTIVE) {
+            throw new BusinessException(400, "只有ACTIVE状态的规则才能创建删除候选，当前规则状态: " + rule.getStatus());
+        }
+
+        if (!ruleMatcherService.isObjectMatchRule(rule, request.getObjectKey(), request.getBucketName())) {
+            throw new BusinessException(400, "对象与规则不匹配: objectKey=" + request.getObjectKey() + ", bucketName=" + request.getBucketName());
+        }
 
         if (exceptionService.hasActiveException(request.getObjectKey(), request.getBucketName())) {
             throw new BusinessException(400, "该对象存在保留例外，不能加入删除候选");
@@ -37,7 +46,7 @@ public class DeletionCandidateService {
 
         if (candidateRepository.existsByRuleIdAndObjectKeyAndBucketName(
                 request.getRuleId(), request.getObjectKey(), request.getBucketName())) {
-            throw new BusinessException(400, "该规则下已存在相同对象的删除候选");
+            throw new BusinessException(409, "该规则下已存在相同对象的删除候选");
         }
 
         DeletionCandidate candidate = new DeletionCandidate();
