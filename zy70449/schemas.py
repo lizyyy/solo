@@ -17,7 +17,7 @@ class RuleVersionResponse(RuleVersionBase):
     is_active: bool
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class BatchBase(BaseModel):
     batch_no: str
@@ -40,7 +40,7 @@ class BatchResponse(BatchBase):
     rule_version: Optional[RuleVersionResponse] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class InquiryFormBase(BaseModel):
     form_no: str
@@ -78,13 +78,13 @@ class InquiryFormProcessed(InquiryFormBase):
     processed_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class BatchWithForms(BatchResponse):
     inquiry_forms: List[InquiryFormProcessed] = []
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProcessingResult(BaseModel):
     batch_no: str

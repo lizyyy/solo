@@ -66,7 +66,7 @@ def test_price_validation(db):
     assert result["is_valid"] == True
     assert result["is_swallowed"] == False
     
-    form_invalid = form_valid.copy(update={"quoted_price": -10.0})
+    form_invalid = form_valid.model_copy(update={"quoted_price": -10.0})
     result = engine.process_form(form_invalid)
     assert result["is_valid"] == False
     assert result["primary_risk_type"] == RiskType.PRICE_ABNORMAL

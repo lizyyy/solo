@@ -12,7 +12,7 @@ from schemas import (
 from noise_reduction import NoiseReductionEngine
 from data_generator import generate_batch_data, generate_multiple_batches
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter()
 
 @router.post("/batch/process", response_model=ProcessingResult)
 def process_batch(batch_data: BatchCreate, forms: List[InquiryFormCreate], db: Session = Depends(get_db)):
