@@ -154,11 +154,26 @@ class RollbackManager {
     return await storage.readJSON(ROLLBACK_CANDIDATES_FILE, []);
   }
 
+  static async approveCandidate(candidateId, approver, approvalNote) {
+    const allCandidates = await storage.readJSON(ROLLBACK_CANDIDATES_FILE, []);
+    const candidate = allCandidates.find(c => c.id === candidateId);
+    if (!candidate) throw new Error('候选清单不存在');
+    if (candidate.executed) throw new Error('候选清单已执行，无法重复审批');
+    
+    candidate.approved = true;
+    candidate.approvedAt = new Date().toISOString();
+    candidate.approver = approver || 'system';
+    candidate.approvalNote = approvalNote || '';
+    await storage.writeJSON(ROLLBACK_CANDIDATES_FILE, allCandidates);
+    return candidate;
+  }
+
   static async executeRollback(candidateId) {
     const allCandidates = await storage.readJSON(ROLLBACK_CANDIDATES_FILE, []);
     const candidate = allCandidates.find(c => c.id === candidateId);
     if (!candidate) throw new Error('候选清单不存在');
-    if (!candidate.approved) throw new Error('候选清单未审批');
+    if (!candidate.approved) throw new Error('候选清单未审批，请先调用审批接口');
+    if (candidate.executed) throw new Error('候选清单已执行，无法重复执行');
     
     for (const item of candidate.items) {
       await MeetingRecord.update(item.id, { status: 'rolled_back' });

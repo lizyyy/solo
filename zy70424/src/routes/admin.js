@@ -129,9 +129,9 @@ router.get('/rollback/candidates', async (req, res) => {
   }
 });
 
-router.post('/rollback/execute', async (req, res) => {
+router.post('/rollback/approve', async (req, res) => {
   try {
-    const { candidateId, approved } = req.body;
+    const { candidateId, approver, approvalNote } = req.body;
 
     if (!candidateId) {
       return res.status(400).json({
@@ -140,11 +140,37 @@ router.post('/rollback/execute', async (req, res) => {
       });
     }
 
-    if (!approved) {
+    const result = await RollbackManager.approveCandidate(candidateId, approver, approvalNote);
+
+    res.json({
+      code: 'CANDIDATE_APPROVED',
+      message: '候选清单审批通过，可执行回滚',
+      data: {
+        candidateId: result.id,
+        approved: result.approved,
+        approvedAt: result.approvedAt,
+        approver: result.approver,
+        itemsCount: result.items.length
+      }
+    });
+
+  } catch (error) {
+    res.status(400).json({
+      code: 'APPROVAL_FAILED',
+      message: error.message,
+      details: { candidateId: req.body.candidateId }
+    });
+  }
+});
+
+router.post('/rollback/execute', async (req, res) => {
+  try {
+    const { candidateId } = req.body;
+
+    if (!candidateId) {
       return res.status(400).json({
-        code: 'APPROVAL_REQUIRED',
-        message: '必须确认审批才能执行回滚操作',
-        details: { setApprovedToTrue: '请设置 approved: true 确认操作' }
+        code: 'CANDIDATE_ID_REQUIRED',
+        message: '请指定候选清单ID'
       });
     }
 

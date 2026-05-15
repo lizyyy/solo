@@ -28,5 +28,19 @@
     "timestamp": "2026-05-15T11:09:34.589Z",
     "handled": false,
     "handlerNote": null
+  },
+  {
+    "id": "1d7da6be-e8ef-431c-a713-834877a44d80",
+    "recordId": null,
+    "operation": "create_meeting_record",
+    "errorCode": "CACHE_STALE_NO_REFRESH",
+    "errorMessage": "部门鉴权路径缓存已过期且未刷新，无法自动补全路径",
+    "inputData": {
+      "department": "审计部",
+      "title": "验收测试会议"
+    },
+    "timestamp": "2026-05-15T11:36:02.096Z",
+    "handled": false,
+    "handlerNote": null
   }
 ]

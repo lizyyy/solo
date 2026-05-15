@@ -70,5 +70,22 @@
     "createdAt": "2026-05-15T11:10:06.488Z",
     "updatedAt": "2026-05-15T11:10:06.489Z",
     "processedAt": "2026-05-15T11:10:06.489Z"
+  },
+  {
+    "id": "1b3c4260-3ffd-4479-ab54-44b5f01d315c",
+    "title": "审计部季度工作会议",
+    "department": "审计部",
+    "meetingDate": "2024-06-15",
+    "attendees": [],
+    "summary": "讨论季度审计工作计划",
+    "attachments": [],
+    "authPaths": [
+      "/api/auth/audit/**",
+      "/api/auth/level-3/audit/*"
+    ],
+    "status": "rolled_back",
+    "createdAt": "2026-05-15T11:36:02.108Z",
+    "updatedAt": "2026-05-15T11:36:02.122Z",
+    "processedAt": "2026-05-15T11:36:02.110Z"
   }
 ]

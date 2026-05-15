@@ -15,5 +15,13 @@
     ],
     "expiresAt": 1778843700925,
     "createdAt": "2026-05-15T11:10:00.925Z"
+  },
+  "dept:审计部:auth_paths": {
+    "value": [
+      "/api/auth/audit/**",
+      "/api/auth/level-3/audit/*"
+    ],
+    "expiresAt": 1778845262105,
+    "createdAt": "2026-05-15T11:36:02.105Z"
   }
 }

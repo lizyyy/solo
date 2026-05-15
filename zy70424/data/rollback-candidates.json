@@ -49,5 +49,29 @@
     "generatedAt": "2026-05-15T11:10:28.244Z",
     "approved": false,
     "executed": false
+  },
+  {
+    "id": "7c9d8e69-93b8-4cd9-a6ef-c95a824cb178",
+    "operationType": "bulk_rollback",
+    "criteria": {
+      "department": "审计部"
+    },
+    "items": [
+      {
+        "id": "1b3c4260-3ffd-4479-ab54-44b5f01d315c",
+        "title": "审计部季度工作会议",
+        "department": "审计部",
+        "createdAt": "2026-05-15T11:36:02.108Z",
+        "impact": "删除0个附件",
+        "risk": "low"
+      }
+    ],
+    "generatedAt": "2026-05-15T11:36:02.115Z",
+    "approved": true,
+    "executed": true,
+    "approvedAt": "2026-05-15T11:36:02.119Z",
+    "approver": "测试验收员",
+    "approvalNote": "验收测试，确认回滚",
+    "executedAt": "2026-05-15T11:36:02.123Z"
   }
 ]
