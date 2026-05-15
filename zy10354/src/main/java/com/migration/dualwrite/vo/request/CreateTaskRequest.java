@@ -2,10 +2,10 @@ package com.migration.dualwrite.vo.request;
 
 import com.migration.dualwrite.dto.DataSourceConfig;
 import com.migration.dualwrite.dto.MigrationField;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;

@@ -1,16 +1,24 @@
 package com.migration.dualwrite.controller;
 
 import com.migration.dualwrite.dto.MigrationTask;
+import com.migration.dualwrite.service.ExportService;
 import com.migration.dualwrite.service.IdempotentService;
 import com.migration.dualwrite.service.MigrationTaskService;
 import com.migration.dualwrite.vo.request.CreateTaskRequest;
 import com.migration.dualwrite.vo.request.SwitchRequest;
 import com.migration.dualwrite.vo.response.ApiResponse;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -21,6 +29,8 @@ public class MigrationTaskController {
 
     private final MigrationTaskService migrationTaskService;
     private final IdempotentService idempotentService;
+    private final ExportService exportService;
+    private static final DateTimeFormatter FILE_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     @PostMapping("/tasks")
     public ApiResponse<MigrationTask> createTask(@Valid @RequestBody CreateTaskRequest request) {
@@ -128,5 +138,70 @@ public class MigrationTaskController {
         log.info("清空缓存");
         idempotentService.clearCache();
         return ApiResponse.success("缓存已清空", null);
+    }
+
+    @GetMapping("/tasks/{taskId}/export/json")
+    public ResponseEntity<String> exportTaskAsJson(@PathVariable String taskId) {
+        log.info("导出任务JSON: taskId={}", taskId);
+        MigrationTask task = migrationTaskService.getTask(taskId);
+        String json = exportService.exportTaskAsJson(task);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"task_" + taskId + ".json\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(json);
+    }
+
+    @GetMapping("/tasks/{taskId}/export/csv")
+    public ResponseEntity<byte[]> exportTaskAsCsv(@PathVariable String taskId) {
+        log.info("导出任务CSV: taskId={}", taskId);
+        MigrationTask task = migrationTaskService.getTask(taskId);
+        byte[] csv = exportService.exportTaskAsCsv(task);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"task_" + taskId + ".csv\"")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(csv);
+    }
+
+    @GetMapping("/tasks/export/json")
+    public ResponseEntity<String> exportAllTasksAsJson() {
+        log.info("导出所有任务JSON");
+        List<MigrationTask> tasks = migrationTaskService.getAllTasks();
+        String json = exportService.exportAllTasksAsJson(tasks);
+        String filename = "migration_tasks_" + LocalDateTime.now().format(FILE_DATE_FORMAT) + ".json";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(json);
+    }
+
+    @GetMapping("/tasks/export/csv")
+    public ResponseEntity<byte[]> exportAllTasksAsCsv() {
+        log.info("导出所有任务CSV");
+        List<MigrationTask> tasks = migrationTaskService.getAllTasks();
+        byte[] csv = exportService.exportAllTasksAsCsv(tasks);
+        String filename = "migration_tasks_" + LocalDateTime.now().format(FILE_DATE_FORMAT) + ".csv";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(csv);
+    }
+
+    @GetMapping("/tasks/{taskId}/report")
+    public ApiResponse<String> generateDiffReport(@PathVariable String taskId) {
+        log.info("生成比对报告: taskId={}", taskId);
+        MigrationTask task = migrationTaskService.getTask(taskId);
+        String report = exportService.generateDiffReport(task);
+        return ApiResponse.success("报告生成成功", report);
+    }
+
+    @GetMapping("/tasks/{taskId}/report/download")
+    public ResponseEntity<String> downloadDiffReport(@PathVariable String taskId) {
+        log.info("下载比对报告: taskId={}", taskId);
+        MigrationTask task = migrationTaskService.getTask(taskId);
+        String report = exportService.generateDiffReport(task);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"report_" + taskId + ".txt\"")
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(report);
     }
 }

@@ -27,3 +27,11 @@ management:
   endpoint:
     health:
       show-details: always
+
+storage:
+  data-dir: ./data
+
+dualwrite:
+  simulate-delay-ms: 50
+  old-failure-rate: 0
+  new-failure-rate: 0

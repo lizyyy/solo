@@ -1,6 +1,6 @@
 package com.migration.dualwrite.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
