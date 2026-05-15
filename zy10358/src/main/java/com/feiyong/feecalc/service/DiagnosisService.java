@@ -62,7 +62,9 @@ public class DiagnosisService {
             try {
                 summary.setExtraParams(JSON.parseObject(request.getExtraParams(), Map.class));
             } catch (Exception e) {
-                summary.setExtraParams(Map.of("raw", request.getExtraParams()));
+                Map<String, Object> rawMap = new HashMap<>();
+                rawMap.put("raw", request.getExtraParams());
+                summary.setExtraParams(rawMap);
             }
         }
 
@@ -95,7 +97,9 @@ public class DiagnosisService {
             return vo;
         }).collect(Collectors.toList()));
 
-        lockCertificateRepository.findByRequestNoAndValidTrue(requestNo).ifPresentOrElse(cert -> {
+        java.util.Optional<PriceLockCertificate> validCert = lockCertificateRepository.findByRequestNoAndValidTrue(requestNo);
+        if (validCert.isPresent()) {
+            PriceLockCertificate cert = validCert.get();
             summary.setCertificateNo(cert.getCertificateNo());
             summary.setLockedAmount(cert.getLockedAmount());
             summary.setLockedAt(cert.getLockedAt());
@@ -103,20 +107,21 @@ public class DiagnosisService {
             summary.setCertificateValid(cert.getValid());
             summary.setChargedBy(cert.getChargedBy());
             summary.setChargedAt(cert.getChargedAt());
-        }, () -> {
-            lockCertificateRepository.findAll().stream()
+        } else {
+            java.util.Optional<PriceLockCertificate> anyCert = lockCertificateRepository.findAll().stream()
                     .filter(c -> c.getRequestNo().equals(requestNo))
-                    .findFirst()
-                    .ifPresent(cert -> {
-                        summary.setCertificateNo(cert.getCertificateNo());
-                        summary.setLockedAmount(cert.getLockedAmount());
-                        summary.setLockedAt(cert.getLockedAt());
-                        summary.setExpiredAt(cert.getExpiredAt());
-                        summary.setCertificateValid(cert.getValid());
-                        summary.setChargedBy(cert.getChargedBy());
-                        summary.setChargedAt(cert.getChargedAt());
-                    });
-        });
+                    .findFirst();
+            if (anyCert.isPresent()) {
+                PriceLockCertificate cert = anyCert.get();
+                summary.setCertificateNo(cert.getCertificateNo());
+                summary.setLockedAmount(cert.getLockedAmount());
+                summary.setLockedAt(cert.getLockedAt());
+                summary.setExpiredAt(cert.getExpiredAt());
+                summary.setCertificateValid(cert.getValid());
+                summary.setChargedBy(cert.getChargedBy());
+                summary.setChargedAt(cert.getChargedAt());
+            }
+        }
 
         List<ActionTimeline> timelines = timelineRepository.findByRequestNoOrderByActionTimeAsc(requestNo);
         summary.setTimeline(timelines.stream().map(t -> {

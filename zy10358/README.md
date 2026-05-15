@@ -35,55 +35,68 @@
 
 ## 快速开始
 
-### 🚀 一键启动（推荐）
+### ✅ 环境要求
+
+- **Java**: 1.8 或更高版本（已测试兼容Java 8, 11, 17）
+- **Maven**: 无需预装 - 项目已包含 Maven Wrapper
+
+---
+
+### 🚀 方式一：一键启动脚本（推荐）
 
 ```bash
 ./start.sh
 ```
 
 **脚本功能**:
-- ✅ 自动检测Java版本（支持1.8, 11, 17等）
-- ✅ 优先使用系统Maven
-- ✅ 无Maven时自动安装Maven Wrapper
+- ✅ 自动检测Java版本
+- ✅ 优先使用系统Maven（如已安装）
+- ✅ 自动使用预生成的Maven Wrapper
 - ✅ 显示访问地址和使用说明
 
-### 💡 IDE快速运行（无需Maven）
+---
 
-如果不想安装Maven，可以直接在IDE中运行：
+### 💡 方式二：直接使用 Maven Wrapper
 
-1. 用IDEA或Eclipse打开项目
-2. 找到类: `src/main/java/com/feiyong/feecalc/FeeCalculationApplication.java`
-3. 右键 -> Run 'FeeCalculationApplication'
-
-### 📦 手动安装Maven Wrapper
-
-如果 `./start.sh` 中Maven下载失败，可以手动运行：
+项目已预生成完整Maven Wrapper，可直接运行：
 
 ```bash
-./install-mvnw.sh   # 安装Maven Wrapper
+# 直接启动（会自动下载依赖）
 ./mvnw spring-boot:run
-```
 
-### 🔧 编译打包
-
-```bash
-# 使用系统Maven
-mvn clean package
-
-# 或使用Maven Wrapper
-./mvnw clean package
-
-# 运行jar包
+# 或编译打包
+./mvnw clean package -DskipTests
 java -jar target/fee-calculation-api-1.0.0.jar
 ```
 
-### 访问地址
+> **首次运行**: Maven Wrapper会自动下载依赖，请保持网络连接。
 
-启动后访问：
+---
+
+### 🎯 方式三：IDE运行（最简单、无需构建工具）
+
+**完全不需要Maven，直接在IDE中运行：**
+
+1. 用 **IntelliJ IDEA** 或 **Eclipse** 打开项目目录
+2. 找到启动类：
+   ```
+   src/main/java/com/feiyong/feecalc/FeeCalculationApplication.java
+   ```
+3. 右键 → **Run 'FeeCalculationApplication'**
+
+这是最简单的方式，IDE会自动处理所有依赖！
+
+---
+
+### 🌐 访问地址
+
+服务启动后访问：
 
 - **管理控制台**: http://localhost:8080
-  - 可视化操作所有API
-  - 支持费用试算、锁价、扣费、导出等
+  - ✅ 创建费用试算
+  - ✅ 价格锁定
+  - ✅ 执行扣费
+  - ✅ 导出排查报告
   
 - **H2数据库控制台**: http://localhost:8080/h2-console
   - JDBC URL: `jdbc:h2:mem:fee_calc_db`

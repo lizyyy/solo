@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,8 +62,10 @@ public class FeeCalculationController {
     @PostMapping("/lock/{requestNo}")
     public ApiResponse<Map<String, String>> lockPrice(@PathVariable String requestNo, @RequestParam(required = false) String operator) {
         try {
-            var certificate = feeCalculationService.lockPrice(requestNo, operator);
-            return ApiResponse.success(Map.of("certificateNo", certificate.getCertificateNo()));
+            com.feiyong.feecalc.entity.PriceLockCertificate certificate = feeCalculationService.lockPrice(requestNo, operator);
+            Map<String, String> resultMap = new HashMap<>();
+            resultMap.put("certificateNo", certificate.getCertificateNo());
+            return ApiResponse.success(resultMap);
         } catch (Exception e) {
             log.error("锁价失败", e);
             return ApiResponse.fail(e.getMessage());
