@@ -328,6 +328,10 @@ app.post('/api/prescriptions/:id/export', (req, res) => {
     return res.status(400).json({ success: false, message: '请先完成脱敏归档' });
   }
   
+  if (prescription.exported) {
+    return res.json({ success: true, data: prescription, message: '已完成监管导出' });
+  }
+  
   const previousExported = prescription.exported;
   const previousExportedAt = prescription.exportedAt;
   
@@ -350,6 +354,10 @@ app.put('/api/prescriptions/:id/attachment', (req, res) => {
   
   if (!attachment) {
     return res.status(400).json({ success: false, message: '附件信息不能为空' });
+  }
+  
+  if (prescription.exported) {
+    return res.status(400).json({ success: false, message: '已完成监管导出的处方不允许更新附件' });
   }
   
   const previousAttachment = prescription.attachment;
