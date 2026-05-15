@@ -29,18 +29,25 @@ func (e *exportService) Export(req *model.ExportRequest) (*model.ExportResponse,
 	}
 
 	msgReq := &model.MessageQueryRequest{
-		SessionID:  req.SessionID,
+		SessionID:   req.SessionID,
 		CursorStart: req.CursorStart,
 		CursorEnd:   req.CursorEnd,
-	}
-
-	if !req.IncludeAcked {
-		msgReq.Status = model.MessageStatusPending
 	}
 
 	msgResp, err := e.store.Message().Query(msgReq)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to query messages")
+	}
+
+	var filteredMessages []*model.Message
+	for _, msg := range msgResp.Messages {
+		if req.IncludeAcked {
+			filteredMessages = append(filteredMessages, msg)
+		} else {
+			if msg.Status == model.MessageStatusPending || msg.Status == model.MessageStatusDelivered {
+				filteredMessages = append(filteredMessages, msg)
+			}
+		}
 	}
 
 	receipts, err := e.store.Receipt().GetBySessionID(req.SessionID)
@@ -50,9 +57,9 @@ func (e *exportService) Export(req *model.ExportRequest) (*model.ExportResponse,
 
 	return &model.ExportResponse{
 		Session:      session,
-		Messages:     msgResp.Messages,
+		Messages:     filteredMessages,
 		Receipts:     receipts,
 		ExportedAt:   time.Now(),
-		MessageCount: len(msgResp.Messages),
+		MessageCount: len(filteredMessages),
 	}, nil
 }

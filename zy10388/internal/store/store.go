@@ -19,6 +19,7 @@ type MessageStore interface {
 	Create(message *model.Message) error
 	GetByID(id string) (*model.Message, error)
 	GetBySessionID(sessionID string, fromCursor int64, limit int) ([]*model.Message, error)
+	GetByCursor(sessionID string, cursor int64) (*model.Message, error)
 	GetPendingBySessionID(sessionID string, limit int) ([]*model.Message, error)
 	Update(message *model.Message) error
 	UpdateStatusByCursor(sessionID string, cursors []int64, status model.MessageStatus) (int, error)

@@ -158,31 +158,53 @@ func (m *messageService) AckMessages(req *model.AckRequest) (*model.AckResponse,
 		return nil, errors.ErrSessionNotActive
 	}
 
-	count, err := m.store.Message().UpdateStatusByCursor(req.SessionID, req.Cursors, model.MessageStatusAcked)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to update message status")
-	}
+	now := time.Now()
+	count := 0
+	maxCursor := session.LastAckCursor
 
-	receiptID, _ := generateID()
 	for _, cursor := range req.Cursors {
+		exists, err := m.store.Receipt().ExistsByCursor(req.SessionID, cursor)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to check receipt existence")
+		}
+		if exists {
+			continue
+		}
+
+		msg, err := m.store.Message().GetByCursor(req.SessionID, cursor)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get message by cursor")
+		}
+		if msg == nil || msg.Status == model.MessageStatusAcked {
+			continue
+		}
+
+		msg.Status = model.MessageStatusAcked
+		msg.AckedAt = &now
+		if err := m.store.Message().Update(msg); err != nil {
+			return nil, errors.Wrap(err, "failed to update message status")
+		}
+
+		receiptID, _ := generateID()
 		receipt := &model.DeliveryReceipt{
 			ID:         receiptID,
 			SessionID:  req.SessionID,
+			MessageID:  msg.ID,
 			Cursor:     cursor,
-			ReceivedAt: time.Now(),
+			ReceivedAt: now,
 		}
-		m.store.Receipt().Create(receipt)
-	}
+		if err := m.store.Receipt().Create(receipt); err != nil {
+			return nil, errors.Wrap(err, "failed to create delivery receipt")
+		}
 
-	maxCursor := session.LastAckCursor
-	for _, cursor := range req.Cursors {
+		count++
 		if cursor > maxCursor {
 			maxCursor = cursor
 		}
 	}
 
 	session.LastAckCursor = maxCursor
-	session.UpdatedAt = time.Now()
+	session.UpdatedAt = now
 	m.store.Session().Update(session)
 
 	return &model.AckResponse{

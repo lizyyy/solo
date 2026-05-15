@@ -245,6 +245,17 @@ func (m *memoryMessageStore) GetBySessionID(sessionID string, fromCursor int64, 
 	return result, nil
 }
 
+func (m *memoryMessageStore) GetByCursor(sessionID string, cursor int64) (*model.Message, error) {
+	m.store.mu.RLock()
+	defer m.store.mu.RUnlock()
+	for _, msg := range m.store.messages[sessionID] {
+		if msg.Cursor == cursor {
+			return msg, nil
+		}
+	}
+	return nil, nil
+}
+
 func (m *memoryMessageStore) GetPendingBySessionID(sessionID string, limit int) ([]*model.Message, error) {
 	m.store.mu.RLock()
 	defer m.store.mu.RUnlock()
