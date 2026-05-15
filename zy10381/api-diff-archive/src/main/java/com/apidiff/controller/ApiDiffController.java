@@ -75,4 +75,26 @@ public class ApiDiffController {
                 .headers(headers)
                 .body(csvData);
     }
+
+    @GetMapping("/{id}/fields")
+    public ResponseEntity<ApiResponse<List<DiffFieldDTO>>> getDiffFields(@PathVariable Long id) {
+        List<DiffFieldDTO> fields = apiDiffService.getDiffFieldsByRecordId(id);
+        return ResponseEntity.ok(ApiResponse.success(fields));
+    }
+
+    @PutMapping("/{id}/fields/attribution")
+    public ResponseEntity<ApiResponse<DiffFieldDTO>> updateFieldAttribution(
+            @PathVariable Long id,
+            @Valid @RequestBody FieldAttributionRequest request) {
+        DiffFieldDTO response = apiDiffService.updateFieldAttribution(id, request);
+        return ResponseEntity.ok(ApiResponse.success("字段归因更新成功", response));
+    }
+
+    @PutMapping("/{id}/fields/attribution/batch")
+    public ResponseEntity<ApiResponse<List<DiffFieldDTO>>> batchUpdateFieldAttribution(
+            @PathVariable Long id,
+            @Valid @RequestBody BatchFieldAttributionRequest request) {
+        List<DiffFieldDTO> response = apiDiffService.batchUpdateFieldAttribution(id, request);
+        return ResponseEntity.ok(ApiResponse.success("批量字段归因更新成功", response));
+    }
 }

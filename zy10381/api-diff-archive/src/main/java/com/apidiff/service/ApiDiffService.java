@@ -209,7 +209,9 @@ public class ApiDiffService {
                     request.getRequestBody() != null ? request.getRequestBody() : "",
                     request.getQueryParams() != null ? request.getQueryParams() : "",
                     request.getVersionA(),
-                    request.getVersionB()
+                    request.getVersionB(),
+                    stringify(request.getResponseA()),
+                    stringify(request.getResponseB())
             );
 
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -321,6 +323,74 @@ public class ApiDiffService {
         dto.setAttributedAt(field.getAttributedAt());
         dto.setCreatedAt(field.getCreatedAt());
         return dto;
+    }
+
+    @Transactional
+    public DiffFieldDTO updateFieldAttribution(Long recordId, FieldAttributionRequest request) {
+        ApiDiffRecord record = diffRecordRepository.findById(recordId)
+                .orElseThrow(() -> new RuntimeException("差异记录不存在: " + recordId));
+
+        DiffField diffField = diffFieldRepository.findById(request.getFieldId())
+                .orElseThrow(() -> new RuntimeException("差异字段不存在: " + request.getFieldId()));
+
+        if (!diffField.getDiffRecord().getId().equals(recordId)) {
+            throw new RuntimeException("差异字段不属于该记录");
+        }
+
+        String oldNote = diffField.getAttributionNote();
+        diffField.setAttributionNote(request.getAttributionNote());
+        diffField.setAttributedBy(request.getOperatedBy());
+        diffField.setAttributedAt(LocalDateTime.now());
+
+        diffField = diffFieldRepository.save(diffField);
+
+        recordOperation(recordId, "FIELD_ATTRIBUTION",
+                oldNote,
+                request.getAttributionNote(),
+                request.getRemark() != null ? request.getRemark() : "字段归因更新: " + diffField.getFieldPath(),
+                request.getOperatedBy());
+
+        return convertToFieldDTO(diffField);
+    }
+
+    @Transactional
+    public List<DiffFieldDTO> batchUpdateFieldAttribution(Long recordId, BatchFieldAttributionRequest request) {
+        ApiDiffRecord record = diffRecordRepository.findById(recordId)
+                .orElseThrow(() -> new RuntimeException("差异记录不存在: " + recordId));
+
+        List<DiffFieldDTO> result = new ArrayList<>();
+        for (FieldAttributionRequest fieldRequest : request.getFields()) {
+            DiffField diffField = diffFieldRepository.findById(fieldRequest.getFieldId())
+                    .orElseThrow(() -> new RuntimeException("差异字段不存在: " + fieldRequest.getFieldId()));
+
+            if (!diffField.getDiffRecord().getId().equals(recordId)) {
+                throw new RuntimeException("差异字段不属于该记录: " + fieldRequest.getFieldId());
+            }
+
+            String oldNote = diffField.getAttributionNote();
+            diffField.setAttributionNote(fieldRequest.getAttributionNote());
+            diffField.setAttributedBy(request.getOperatedBy() != null ? request.getOperatedBy() : fieldRequest.getOperatedBy());
+            diffField.setAttributedAt(LocalDateTime.now());
+
+            diffField = diffFieldRepository.save(diffField);
+            result.add(convertToFieldDTO(diffField));
+
+            recordOperation(recordId, "FIELD_ATTRIBUTION",
+                    oldNote,
+                    fieldRequest.getAttributionNote(),
+                    fieldRequest.getRemark() != null ? fieldRequest.getRemark() : "字段归因更新: " + diffField.getFieldPath(),
+                    request.getOperatedBy() != null ? request.getOperatedBy() : fieldRequest.getOperatedBy());
+        }
+
+        return result;
+    }
+
+    public List<DiffFieldDTO> getDiffFieldsByRecordId(Long recordId) {
+        if (!diffRecordRepository.existsById(recordId)) {
+            throw new RuntimeException("差异记录不存在: " + recordId);
+        }
+        List<DiffField> fields = diffFieldRepository.findByDiffRecordIdOrderByFieldPath(recordId);
+        return fields.stream().map(this::convertToFieldDTO).collect(Collectors.toList());
     }
 
     private void recordOperation(Long recordId, String type, String oldValue, String newValue, String remark, String operatedBy) {

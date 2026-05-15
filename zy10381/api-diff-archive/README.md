@@ -136,6 +136,46 @@ Content-Type: application/json
 }
 ```
 
+#### 8. 查询差异字段列表
+```
+GET /diffs/{id}/fields
+```
+
+#### 9. 更新单个字段归因备注
+```
+PUT /diffs/{id}/fields/attribution
+Content-Type: application/json
+
+{
+  "fieldId": 1,
+  "attributionNote": "该字段变更为预期的业务调整",
+  "operatedBy": "analyst",
+  "remark": "已与产品经理确认"
+}
+```
+
+#### 10. 批量更新字段归因备注
+```
+PUT /diffs/{id}/fields/attribution/batch
+Content-Type: application/json
+
+{
+  "fields": [
+    {
+      "fieldId": 1,
+      "attributionNote": "字段1变更原因",
+      "operatedBy": "analyst"
+    },
+    {
+      "fieldId": 2,
+      "attributionNote": "字段2变更原因",
+      "operatedBy": "analyst"
+    }
+  ],
+  "operatedBy": "batch-operator"
+}
+```
+
 ## 状态枚举
 
 | 状态值 | 说明 |
@@ -233,10 +273,18 @@ api-diff-archive/
 ## 特性说明
 
 ### 重复提交防重
-系统通过对请求关键信息（API路径、HTTP方法、请求体、查询参数、版本号）计算 SHA-256 哈希值，实现重复提交的识别，避免脏数据产生。
+系统通过对请求关键信息（API路径、HTTP方法、请求体、查询参数、版本号、版本A响应、版本B响应）计算 SHA-256 哈希值，实现重复提交的识别。**当响应内容发生变化时，会创建新的差异记录，确保差异归档不会丢失**。
+
+### 字段级归因备注
+支持对每个差异字段进行单独的归因备注，记录每个字段的变更原因、操作人和时间。同时支持批量更新多个字段的归因信息。
+
+### 记录级+字段级双闭环
+- **记录级状态**：整体确认差异记录的处理状态（待处理、分析中、已确认、已拒绝、已归档）
+- **字段级归因**：每个差异字段可单独标注变更原因和备注
+形成完整的"差异字段、归因备注、确认闭环"业务流程。
 
 ### 完整操作审计
-所有状态变更和删除操作都会记录操作日志，包括操作人、操作时间、前后值等信息。
+所有状态变更、字段归因更新和删除操作都会记录操作日志，包括操作人、操作时间、前后值等信息。
 
 ### 灵活的查询条件
 支持按状态、API路径、是否有差异、时间范围等多维度组合查询。

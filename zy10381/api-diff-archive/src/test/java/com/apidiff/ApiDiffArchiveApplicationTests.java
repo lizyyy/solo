@@ -1,8 +1,6 @@
 package com.apidiff;
 
-import com.apidiff.dto.ApiDiffRequest;
-import com.apidiff.dto.ApiDiffResponse;
-import com.apidiff.dto.StatusUpdateRequest;
+import com.apidiff.dto.*;
 import com.apidiff.entity.enums.ConfirmationStatus;
 import com.apidiff.service.ApiDiffService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -124,6 +124,84 @@ class ApiDiffArchiveApplicationTests {
 
         assertNotNull(csvData);
         assertTrue(csvData.length > 0);
+    }
+
+    @Test
+    void testResponseChangeCreatesNewRecord() {
+        ApiDiffRequest request1 = createTestRequest();
+        ApiDiffResponse response1 = apiDiffService.createDiffRecord(request1);
+
+        ApiDiffRequest request2 = createTestRequest();
+        Map<String, Object> newResponseB = new HashMap<>();
+        newResponseB.put("id", "1");
+        newResponseB.put("name", "张三");
+        newResponseB.put("age", "27");
+        newResponseB.put("phone", "13800000000");
+        request2.setResponseB(newResponseB);
+
+        ApiDiffResponse response2 = apiDiffService.createDiffRecord(request2);
+
+        assertNotEquals(response1.getId(), response2.getId());
+    }
+
+    @Test
+    void testGetDiffFieldsByRecordId() {
+        ApiDiffRequest request = createTestRequest();
+        ApiDiffResponse createResponse = apiDiffService.createDiffRecord(request);
+
+        List<DiffFieldDTO> fields = apiDiffService.getDiffFieldsByRecordId(createResponse.getId());
+
+        assertNotNull(fields);
+        assertFalse(fields.isEmpty());
+        assertTrue(fields.size() >= 2);
+    }
+
+    @Test
+    void testUpdateFieldAttribution() {
+        ApiDiffRequest request = createTestRequest();
+        ApiDiffResponse createResponse = apiDiffService.createDiffRecord(request);
+
+        List<DiffFieldDTO> fields = apiDiffService.getDiffFieldsByRecordId(createResponse.getId());
+        DiffFieldDTO field = fields.get(0);
+
+        FieldAttributionRequest attributionRequest = new FieldAttributionRequest();
+        attributionRequest.setFieldId(field.getId());
+        attributionRequest.setAttributionNote("这是一个预期的字段变更，属于业务调整");
+        attributionRequest.setOperatedBy("analyst");
+        attributionRequest.setRemark("已与产品确认");
+
+        DiffFieldDTO updatedField = apiDiffService.updateFieldAttribution(createResponse.getId(), attributionRequest);
+
+        assertNotNull(updatedField);
+        assertEquals("这是一个预期的字段变更，属于业务调整", updatedField.getAttributionNote());
+        assertEquals("analyst", updatedField.getAttributedBy());
+        assertNotNull(updatedField.getAttributedAt());
+    }
+
+    @Test
+    void testBatchUpdateFieldAttribution() {
+        ApiDiffRequest request = createTestRequest();
+        ApiDiffResponse createResponse = apiDiffService.createDiffRecord(request);
+
+        List<DiffFieldDTO> fields = apiDiffService.getDiffFieldsByRecordId(createResponse.getId());
+
+        BatchFieldAttributionRequest batchRequest = new BatchFieldAttributionRequest();
+        batchRequest.setOperatedBy("analyst");
+        List<FieldAttributionRequest> fieldRequests = new ArrayList<>();
+
+        for (int i = 0; i < Math.min(2, fields.size()); i++) {
+            FieldAttributionRequest fr = new FieldAttributionRequest();
+            fr.setFieldId(fields.get(i).getId());
+            fr.setAttributionNote("批量归因备注 - 字段" + (i + 1));
+            fieldRequests.add(fr);
+        }
+        batchRequest.setFields(fieldRequests);
+
+        List<DiffFieldDTO> updatedFields = apiDiffService.batchUpdateFieldAttribution(createResponse.getId(), batchRequest);
+
+        assertNotNull(updatedFields);
+        assertEquals(2, updatedFields.size());
+        assertEquals("analyst", updatedFields.get(0).getAttributedBy());
     }
 
     private ApiDiffRequest createTestRequest() {
