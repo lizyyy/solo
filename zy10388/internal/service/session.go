@@ -64,7 +64,7 @@ func (s *sessionService) CreateSession(req *model.CreateSessionRequest) (*model.
 		Metadata:       req.Metadata,
 	}
 
-	if err := s.store.Session().Create(session); err != nil {
+	if err := s.store.Session().Create(session, req.IdempotencyKey); err != nil {
 		return nil, errors.Wrap(err, "failed to create session")
 	}
 

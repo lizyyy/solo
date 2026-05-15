@@ -44,16 +44,16 @@ func (m *messageService) PushMessage(req *model.PushMessageRequest) (*model.Push
 	}
 
 	message := &model.Message{
-		ID:          messageID,
-		SessionID:   req.SessionID,
-		Cursor:      cursor,
-		Payload:     req.Payload,
-		Status:      model.MessageStatusPending,
-		Priority:    req.Priority,
-		Type:        req.Type,
-		CreatedAt:   time.Now(),
+		ID:            messageID,
+		SessionID:     req.SessionID,
+		Cursor:        cursor,
+		Payload:       req.Payload,
+		Status:        model.MessageStatusPending,
+		Priority:      req.Priority,
+		Type:          req.Type,
+		CreatedAt:     time.Now(),
 		DeliveryCount: 0,
-		MaxDelivery: maxDelivery,
+		MaxDelivery:   maxDelivery,
 	}
 
 	if err := m.store.Message().Create(message); err != nil {
@@ -90,39 +90,51 @@ func (m *messageService) PollMessages(req *model.PollRequest) (*model.PollRespon
 		batchSize = 100
 	}
 
-	messages, err := m.store.Message().GetBySessionID(req.SessionID, req.LastCursor, batchSize)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get messages")
+	waitTimeout := time.Duration(req.WaitTimeout) * time.Second
+	if waitTimeout <= 0 {
+		waitTimeout = 30 * time.Second
 	}
 
-	now := time.Now()
-	for _, msg := range messages {
-		if msg.Status == model.MessageStatusPending {
-			msg.Status = model.MessageStatusDelivered
-			msg.DeliveryCount++
-			msg.DeliveredAt = &now
-			m.store.Message().Update(msg)
+	for {
+		messages, err := m.store.Message().GetBySessionID(req.SessionID, req.LastCursor, batchSize)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get messages")
 		}
+
+		if len(messages) > 0 {
+			now := time.Now()
+			for _, msg := range messages {
+				if msg.Status == model.MessageStatusPending {
+					msg.Status = model.MessageStatusDelivered
+					msg.DeliveryCount++
+					msg.DeliveredAt = &now
+					m.store.Message().Update(msg)
+				}
+			}
+
+			hasMore := false
+			if len(messages) == batchSize {
+				hasMore = true
+			}
+
+			lastCursor := req.LastCursor
+			if len(messages) > 0 {
+				lastCursor = messages[len(messages)-1].Cursor
+			}
+
+			session.LastActiveAt = now
+			m.store.Session().Update(session)
+
+			return &model.PollResponse{
+				Messages: messages,
+				Cursor:   lastCursor,
+				HasMore:  hasMore,
+			}, nil
+		}
+
+		waitCh := m.store.Message().WaitForMessage(req.SessionID, waitTimeout)
+		<-waitCh
 	}
-
-	hasMore := false
-	if len(messages) == batchSize {
-		hasMore = true
-	}
-
-	lastCursor := req.LastCursor
-	if len(messages) > 0 {
-		lastCursor = messages[len(messages)-1].Cursor
-	}
-
-	session.LastActiveAt = now
-	m.store.Session().Update(session)
-
-	return &model.PollResponse{
-		Messages: messages,
-		Cursor:   lastCursor,
-		HasMore:  hasMore,
-	}, nil
 }
 
 func (m *messageService) AckMessages(req *model.AckRequest) (*model.AckResponse, error) {

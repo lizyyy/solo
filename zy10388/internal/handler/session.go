@@ -79,3 +79,32 @@ func (h *Handler) revokeSession(w http.ResponseWriter, r *http.Request, sessionI
 	}
 	h.jsonResponse(w, http.StatusOK, resp)
 }
+
+func (h *Handler) handleReconnect(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req model.ReconnectRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.SessionID == "" || req.ClientID == "" {
+		http.Error(w, "session_id and client_id are required", http.StatusBadRequest)
+		return
+	}
+
+	session, err := h.service.Session.ReconnectSession(req.SessionID, req.ClientID)
+	if err != nil {
+		h.errorResponse(w, err)
+		return
+	}
+
+	h.jsonResponse(w, http.StatusOK, &model.ReconnectResponse{
+		Session: session,
+		Success: true,
+	})
+}

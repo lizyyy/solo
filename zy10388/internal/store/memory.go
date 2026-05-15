@@ -14,6 +14,7 @@ type MemoryStore struct {
 	messageByID   map[string]*model.Message
 	receipts      map[string][]*model.DeliveryReceipt
 	cursors       map[string]int64
+	notifyCh      map[string]chan struct{}
 	mu            sync.RWMutex
 }
 
@@ -25,6 +26,7 @@ func NewMemoryStore() *MemoryStore {
 		messageByID:   make(map[string]*model.Message),
 		receipts:      make(map[string][]*model.DeliveryReceipt),
 		cursors:       make(map[string]int64),
+		notifyCh:      make(map[string]chan struct{}),
 	}
 }
 
@@ -48,10 +50,13 @@ type memorySessionStore struct {
 	store *MemoryStore
 }
 
-func (s *memorySessionStore) Create(session *model.Session) error {
+func (s *memorySessionStore) Create(session *model.Session, idempotencyKey string) error {
 	s.store.mu.Lock()
 	defer s.store.mu.Unlock()
 	s.store.sessions[session.ID] = session
+	if idempotencyKey != "" {
+		s.store.sessionsByKey[idempotencyKey] = session.ID
+	}
 	return nil
 }
 
@@ -181,7 +186,31 @@ func (m *memoryMessageStore) Create(message *model.Message) error {
 	if message.Cursor > m.store.cursors[message.SessionID] {
 		m.store.cursors[message.SessionID] = message.Cursor
 	}
+	if ch, ok := m.store.notifyCh[message.SessionID]; ok {
+		close(ch)
+		delete(m.store.notifyCh, message.SessionID)
+	}
 	return nil
+}
+
+func (m *memoryMessageStore) WaitForMessage(sessionID string, timeout time.Duration) <-chan struct{} {
+	m.store.mu.Lock()
+	defer m.store.mu.Unlock()
+	ch, ok := m.store.notifyCh[sessionID]
+	if !ok {
+		ch = make(chan struct{})
+		m.store.notifyCh[sessionID] = ch
+		go func() {
+			time.Sleep(timeout)
+			m.store.mu.Lock()
+			defer m.store.mu.Unlock()
+			if c, exists := m.store.notifyCh[sessionID]; exists && c == ch {
+				close(c)
+				delete(m.store.notifyCh, sessionID)
+			}
+		}()
+	}
+	return ch
 }
 
 func (m *memoryMessageStore) GetByID(id string) (*model.Message, error) {

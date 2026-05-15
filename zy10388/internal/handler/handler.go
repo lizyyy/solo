@@ -20,6 +20,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	mux.HandleFunc("/api/sessions", h.handleSessions)
 	mux.HandleFunc("/api/sessions/", h.handleSession)
+	mux.HandleFunc("/api/sessions/reconnect", h.handleReconnect)
 	mux.HandleFunc("/api/messages", h.handleMessages)
 	mux.HandleFunc("/api/messages/poll", h.handlePoll)
 	mux.HandleFunc("/api/messages/ack", h.handleAck)

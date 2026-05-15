@@ -2,10 +2,11 @@ package store
 
 import (
 	"longpoll-session-api/internal/model"
+	"time"
 )
 
 type SessionStore interface {
-	Create(session *model.Session) error
+	Create(session *model.Session, idempotencyKey string) error
 	GetByID(id string) (*model.Session, error)
 	GetByClientID(clientID string) ([]*model.Session, error)
 	Update(session *model.Session) error
@@ -23,6 +24,7 @@ type MessageStore interface {
 	UpdateStatusByCursor(sessionID string, cursors []int64, status model.MessageStatus) (int, error)
 	Query(req *model.MessageQueryRequest) (*model.MessageQueryResponse, error)
 	GetNextCursor(sessionID string) (int64, error)
+	WaitForMessage(sessionID string, timeout time.Duration) <-chan struct{}
 }
 
 type ReceiptStore interface {
