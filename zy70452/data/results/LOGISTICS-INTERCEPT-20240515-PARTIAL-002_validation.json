@@ -1,0 +1,62 @@
+{
+  "batch_id": "LOGISTICS-INTERCEPT-20240515-PARTIAL-002",
+  "validation_time": "2026-05-15T21:46:59.964166",
+  "overall_status": "failed",
+  "success_count": 0,
+  "failed_count": 4,
+  "partial_count": 0,
+  "total_slices": 4,
+  "failure_groups": {
+    "checksum_mismatch": [
+      "intercept_20240515_cold_01.parquet"
+    ],
+    "missing_slice": [
+      "intercept_20240515_cold_02.parquet",
+      "intercept_20240515_large_01.parquet",
+      "intercept_20240515_large_02.parquet"
+    ]
+  },
+  "validated_slices": [
+    {
+      "file_name": "intercept_20240515_cold_01.parquet",
+      "slice_index": 1,
+      "status": "failed",
+      "details": {
+        "error": "校验和不匹配",
+        "expected": "fakechecksum12345",
+        "actual": "918780b90550bf34"
+      },
+      "failure_type": "checksum_mismatch"
+    },
+    {
+      "file_name": "intercept_20240515_cold_02.parquet",
+      "slice_index": 2,
+      "status": "failed",
+      "details": {
+        "error": "文件不存在",
+        "expected_path": "samples/data/intercept_20240515_cold_02.parquet"
+      },
+      "failure_type": "missing_slice"
+    },
+    {
+      "file_name": "intercept_20240515_large_01.parquet",
+      "slice_index": 3,
+      "status": "failed",
+      "details": {
+        "error": "文件不存在",
+        "expected_path": "samples/data/missing_file.parquet"
+      },
+      "failure_type": "missing_slice"
+    },
+    {
+      "file_name": "intercept_20240515_large_02.parquet",
+      "slice_index": 4,
+      "status": "failed",
+      "details": {
+        "error": "文件不存在",
+        "expected_path": "samples/data/intercept_20240515_large_02.parquet"
+      },
+      "failure_type": "missing_slice"
+    }
+  ]
+}
