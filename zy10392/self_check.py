@@ -15,6 +15,9 @@ from app.models.base import (
     InterfaceStatus,
     RestoreRequestStatus,
     ConclusionType,
+    NotificationStatus,
+    NotificationType,
+    NotificationChannel,
     BatchPhase,
     ObservationMetric,
 )
@@ -22,6 +25,8 @@ from app.models.schemas import (
     CreateBatchRequest,
     CreateRestoreRequest,
     CreateConclusionRequest,
+    CreateNotificationRequest,
+    UpdateNotificationStatusRequest,
 )
 from app.services.batch_service import BatchService
 
@@ -304,6 +309,82 @@ def run_self_check():
     except Exception as e:
         all_passed = False
         print_test("状态转换矩阵定义完整", False, str(e))
+
+    print_section("6. 客户通知测试")
+
+    try:
+        request = CreateBatchRequest(
+            name="Notification Test Batch",
+            phases=[
+                BatchPhase(
+                    phase_number=1,
+                    interface_ids=["api-1"],
+                    customer_group_ids=["group-1"],
+                )
+            ],
+            created_by="test-user",
+        )
+        batch = service.create_batch(request)
+
+        notification_request = CreateNotificationRequest(
+            phase_id=1,
+            customer_group_id="group-1",
+            notification_type=NotificationType.PHASE_START,
+            channel=NotificationChannel.EMAIL,
+            subject="Test Notification",
+            content="Test Content",
+        )
+        notification = service.create_notification(batch.id, notification_request)
+        assert notification.id is not None
+        assert notification.status == NotificationStatus.PENDING
+        print_test("创建客户通知成功", True)
+
+        notifications, total = service.list_notifications(batch.id)
+        assert total == 1
+        print_test("列出客户通知成功", True)
+
+        update_request = UpdateNotificationStatusRequest(
+            status=NotificationStatus.SENT,
+            updated_by="test-user",
+        )
+        updated = service.update_notification_status(batch.id, notification.id, update_request)
+        assert updated.status == NotificationStatus.SENT
+        assert updated.sent_at is not None
+        print_test("更新客户通知状态成功", True)
+
+        auto_notification = service.auto_create_phase_notification(
+            batch.id,
+            1,
+            NotificationType.PHASE_COMPLETE,
+        )
+        assert auto_notification.id is not None
+        print_test("自动创建阶段通知成功", True)
+        
+    except Exception as e:
+        all_passed = False
+        print_test("客户通知功能测试", False, str(e))
+
+    print_section("7. ErrorResponse 验证 (必填 error_code)")
+    
+    try:
+        from app.models.schemas import ErrorResponse, ErrorCode
+        
+        error_response = ErrorResponse(
+            error_code=ErrorCode.BATCH_NOT_FOUND,
+            message="Test error message",
+        )
+        assert error_response.error_code is not None
+        assert error_response.timestamp is not None
+        print_test("ErrorResponse 包含必填 error_code 字段", True)
+        
+        assert hasattr(ErrorCode, 'BATCH_NOT_FOUND')
+        assert hasattr(ErrorCode, 'INVALID_STATE_TRANSITION')
+        assert hasattr(ErrorCode, 'VALIDATION_ERROR')
+        print_test("ErrorCode 枚举定义完整", True)
+        
+    except Exception as e:
+        all_passed = False
+        print_test("ErrorResponse 验证失败", False, str(e))
 
     print_section("自检结果")
     

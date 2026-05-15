@@ -8,17 +8,23 @@ from app.models.base import (
     InterfaceStatus,
     RestoreRequestStatus,
     ConclusionType,
+    NotificationStatus,
+    NotificationType,
+    NotificationChannel,
     ShutdownBatch,
     BatchPhase,
     ObservationMetric,
     RestoreRequest,
     DecommissionConclusion,
+    CustomerNotification,
 )
 from app.models.schemas import (
     CreateBatchRequest,
     UpdateBatchRequest,
     CreateRestoreRequest,
     CreateConclusionRequest,
+    CreateNotificationRequest,
+    UpdateNotificationStatusRequest,
     BatchHistoryItem,
 )
 
@@ -395,3 +401,153 @@ class BatchService:
         if batch_id not in self._batches:
             raise ValueError(f"Batch {batch_id} not found")
         return self._history.get(batch_id, [])
+
+    def create_notification(
+        self,
+        batch_id: str,
+        request: CreateNotificationRequest,
+    ) -> CustomerNotification:
+        batch = self.get_batch(batch_id)
+        if not batch:
+            raise ValueError(f"Batch {batch_id} not found")
+
+        if request.phase_id is not None:
+            phase = next((p for p in batch.phases if p.phase_number == request.phase_id), None)
+            if not phase:
+                raise ValueError(f"Phase {request.phase_id} not found in batch")
+
+        notification = CustomerNotification(
+            id=self._generate_id(),
+            batch_id=batch_id,
+            phase_id=request.phase_id,
+            customer_group_id=request.customer_group_id,
+            customer_ids=request.customer_ids or [],
+            notification_type=request.notification_type,
+            channel=request.channel,
+            subject=request.subject,
+            content=request.content,
+        )
+
+        batch.notifications.append(notification)
+        batch.updated_at = datetime.now()
+
+        self._record_history(
+            batch_id=batch_id,
+            action="NOTIFICATION_CREATED",
+            performed_by="system",
+            details={"notification_id": notification.id, "type": request.notification_type},
+        )
+
+        return notification
+
+    def get_notification(
+        self,
+        batch_id: str,
+        notification_id: str,
+    ) -> Optional[CustomerNotification]:
+        batch = self.get_batch(batch_id)
+        if not batch:
+            return None
+        return next((n for n in batch.notifications if n.id == notification_id), None)
+
+    def list_notifications(
+        self,
+        batch_id: str,
+        status: Optional[NotificationStatus] = None,
+        notification_type: Optional[NotificationType] = None,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> Tuple[List[CustomerNotification], int]:
+        batch = self.get_batch(batch_id)
+        if not batch:
+            raise ValueError(f"Batch {batch_id} not found")
+
+        notifications = batch.notifications
+        if status:
+            notifications = [n for n in notifications if n.status == status]
+        if notification_type:
+            notifications = [n for n in notifications if n.notification_type == notification_type]
+
+        notifications.sort(key=lambda n: n.created_at, reverse=True)
+        total = len(notifications)
+
+        start = (page - 1) * page_size
+        end = start + page_size
+        return notifications[start:end], total
+
+    def update_notification_status(
+        self,
+        batch_id: str,
+        notification_id: str,
+        request: UpdateNotificationStatusRequest,
+    ) -> CustomerNotification:
+        notification = self.get_notification(batch_id, notification_id)
+        if not notification:
+            raise ValueError(f"Notification {notification_id} not found")
+
+        notification.status = request.status
+        if request.status == NotificationStatus.SENT:
+            notification.sent_at = datetime.now()
+        if request.status == NotificationStatus.ACKNOWLEDGED and request.updated_by:
+            notification.acknowledged_by = request.updated_by
+            notification.acknowledged_at = datetime.now()
+        if request.error_message:
+            notification.error_message = request.error_message
+
+        batch = self.get_batch(batch_id)
+        if batch:
+            batch.updated_at = datetime.now()
+
+        self._record_history(
+            batch_id=batch_id,
+            action="NOTIFICATION_UPDATED",
+            performed_by=request.updated_by or "system",
+            details={"notification_id": notification_id, "status": request.status},
+        )
+
+        return notification
+
+    def auto_create_phase_notification(
+        self,
+        batch_id: str,
+        phase_id: int,
+        notification_type: NotificationType,
+    ) -> CustomerNotification:
+        batch = self.get_batch(batch_id)
+        if not batch:
+            raise ValueError(f"Batch {batch_id} not found")
+
+        phase = next((p for p in batch.phases if p.phase_number == phase_id), None)
+        if not phase:
+            raise ValueError(f"Phase {phase_id} not found")
+
+        subject_map = {
+            NotificationType.PHASE_START: f"Service Phase {phase_id} Started - {batch.name}",
+            NotificationType.PHASE_COMPLETE: f"Service Phase {phase_id} Completed - {batch.name}",
+            NotificationType.SERVICE_RESTORED: f"Service Restored - {batch.name}",
+            NotificationType.DECOMMISSION_COMPLETE: f"Decommission Complete - {batch.name}",
+            NotificationType.ALERT_TRIGGERED: f"Alert Triggered - {batch.name}",
+            NotificationType.BATCH_CANCELLED: f"Batch Cancelled - {batch.name}",
+        }
+
+        content_map = {
+            NotificationType.PHASE_START: f"Phase {phase_id} of batch '{batch.name}' has started. Interfaces: {', '.join(phase.interface_ids)}",
+            NotificationType.PHASE_COMPLETE: f"Phase {phase_id} of batch '{batch.name}' has completed successfully.",
+            NotificationType.SERVICE_RESTORED: f"Service has been restored for batch '{batch.name}'.",
+            NotificationType.DECOMMISSION_COMPLETE: f"Decommission for batch '{batch.name}' is complete.",
+            NotificationType.ALERT_TRIGGERED: f"An alert was triggered for batch '{batch.name}'.",
+            NotificationType.BATCH_CANCELLED: f"Batch '{batch.name}' has been cancelled.",
+        }
+
+        for customer_group_id in phase.customer_group_ids:
+            request = CreateNotificationRequest(
+                phase_id=phase_id,
+                customer_group_id=customer_group_id,
+                notification_type=notification_type,
+                channel=NotificationChannel.EMAIL,
+                subject=subject_map[notification_type],
+                content=content_map[notification_type],
+            )
+            return self.create_notification(batch_id, request)
+
+        raise ValueError("No customer groups found in phase")

@@ -4,6 +4,29 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, validator
 
 
+class NotificationStatus(str, Enum):
+    PENDING = "pending"
+    SENT = "sent"
+    FAILED = "failed"
+    ACKNOWLEDGED = "acknowledged"
+
+
+class NotificationChannel(str, Enum):
+    EMAIL = "email"
+    SMS = "sms"
+    IN_APP = "in_app"
+    WEBHOOK = "webhook"
+
+
+class NotificationType(str, Enum):
+    PHASE_START = "phase_start"
+    PHASE_COMPLETE = "phase_complete"
+    SERVICE_RESTORED = "service_restored"
+    DECOMMISSION_COMPLETE = "decommission_complete"
+    ALERT_TRIGGERED = "alert_triggered"
+    BATCH_CANCELLED = "batch_cancelled"
+
+
 class BatchStatus(str, Enum):
     DRAFT = "draft"
     VALIDATED = "validated"
@@ -91,6 +114,25 @@ class DecommissionConclusion(BaseModel):
     notes: Optional[str] = None
 
 
+class CustomerNotification(BaseModel):
+    id: str
+    batch_id: str
+    phase_id: Optional[int] = None
+    customer_group_id: str
+    customer_ids: List[str] = Field(default_factory=list)
+    notification_type: NotificationType
+    channel: NotificationChannel
+    subject: str
+    content: str
+    status: NotificationStatus = NotificationStatus.PENDING
+    sent_at: Optional[datetime] = None
+    acknowledged_by: Optional[str] = None
+    acknowledged_at: Optional[datetime] = None
+    error_message: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    retry_count: int = 0
+
+
 class BatchPhase(BaseModel):
     phase_number: int
     interface_ids: List[str]
@@ -108,6 +150,7 @@ class ShutdownBatch(BaseModel):
     phases: List[BatchPhase] = Field(default_factory=list)
     metrics: List[ObservationMetric] = Field(default_factory=list)
     restore_requests: List[RestoreRequest] = Field(default_factory=list)
+    notifications: List[CustomerNotification] = Field(default_factory=list)
     conclusion: Optional[DecommissionConclusion] = None
     created_by: str
     created_at: datetime = Field(default_factory=datetime.now)
