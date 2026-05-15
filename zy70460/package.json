@@ -1,0 +1,29 @@
+{
+  "name": "duplicate-detector",
+  "version": "1.0.0",
+  "description": "重复文件定位命令行工具",
+  "main": "dist/index.js",
+  "bin": {
+    "dupdetect": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/json2csv": "^5.0.7",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1"
+  },
+  "keywords": ["duplicate", "detection", "cli"],
+  "author": "",
+  "license": "MIT"
+}

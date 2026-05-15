@@ -1,0 +1,14 @@
+[
+  {
+    "batchId": "BATCH20260502",
+    "groupId": "GRP-DEMO001",
+    "itemId": "SMP006",
+    "operator": "张经理",
+    "remark": "经核查，该记录为系统导入时字段被截断，实际完整商品名称应为\"运动跑鞋男款透气减震防滑\"，与SMP007为同款商品不同场次重复录入",
+    "action": "merge",
+    "source": "直播样品表人工复核",
+    "basis": "根据历史直播记录核对，SMP006与SMP007商品ID、SKU、价格、库存等字段完全一致，仅商品名称因导入时截断",
+    "correctionId": "COR-68923333",
+    "correctedAt": "2026-05-15T14:05:55.156Z"
+  }
+]
