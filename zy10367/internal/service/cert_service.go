@@ -4,6 +4,7 @@ import (
 	"cert-renewal/internal/model"
 	"cert-renewal/internal/repository"
 	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -247,6 +248,10 @@ func (s *certService) Rollback(req *model.RollbackRequest) (*model.RollbackRecor
 	rollbackCert, err := s.certRepo.GetByID(req.CertID)
 	if err != nil {
 		return nil, err
+	}
+
+	if rollbackCert.PartnerID != req.PartnerID {
+		return nil, fmt.Errorf("rollback certificate does not belong to partner: %s", req.PartnerID)
 	}
 
 	rollbackRecord := &model.RollbackRecord{

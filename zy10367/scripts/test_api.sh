@@ -91,7 +91,26 @@ VERIFY_RESP=$(curl -s -X POST "$BASE_URL/verifications/verify" \
 echo "响应: $VERIFY_RESP"
 echo ""
 
-echo "6. 先全量启用旧证书作为当前证书..."
+echo "6. 先灰度启用旧证书(50%)..."
+OLD_GRAY_RESP=$(curl -s -X POST "$BASE_URL/certs/gray-enable" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"cert_id\": \"$CERT1_ID\",
+    \"gray_percent\": 50,
+    \"operator\": \"admin\",
+    \"reason\": \"灰度启用旧证书\",
+    \"request_id\": \"req_gray_old_001\"
+  }")
+echo "响应: $OLD_GRAY_RESP"
+OLD_GRAY_CODE=$(echo $OLD_GRAY_RESP | jq -r '.code')
+if [ "$OLD_GRAY_CODE" != "0" ]; then
+  echo "错误: 灰度启用旧证书失败，code: $OLD_GRAY_CODE"
+  exit 1
+fi
+echo "成功: 旧证书已灰度启用"
+echo ""
+
+echo "7. 全量启用旧证书作为当前证书..."
 OLD_FULL_RESP=$(curl -s -X POST "$BASE_URL/certs/full-enable" \
   -H "Content-Type: application/json" \
   -d "{
@@ -101,9 +120,15 @@ OLD_FULL_RESP=$(curl -s -X POST "$BASE_URL/certs/full-enable" \
     \"request_id\": \"req_full_old_001\"
   }")
 echo "响应: $OLD_FULL_RESP"
+OLD_FULL_CODE=$(echo $OLD_FULL_RESP | jq -r '.code')
+if [ "$OLD_FULL_CODE" != "0" ]; then
+  echo "错误: 全量启用旧证书失败，code: $OLD_FULL_CODE"
+  exit 1
+fi
+echo "成功: 旧证书已全量启用"
 echo ""
 
-echo "7. 灰度启用新证书(50%)..."
+echo "8. 灰度启用新证书(50%)..."
 GRAY_RESP=$(curl -s -X POST "$BASE_URL/certs/gray-enable" \
   -H "Content-Type: application/json" \
   -d "{
@@ -114,9 +139,15 @@ GRAY_RESP=$(curl -s -X POST "$BASE_URL/certs/gray-enable" \
     \"request_id\": \"req_gray_001\"
   }")
 echo "响应: $GRAY_RESP"
+GRAY_CODE=$(echo $GRAY_RESP | jq -r '.code')
+if [ "$GRAY_CODE" != "0" ]; then
+  echo "错误: 灰度启用新证书失败，code: $GRAY_CODE"
+  exit 1
+fi
+echo "成功: 新证书已灰度启用"
 echo ""
 
-echo "8. 全量启用新证书..."
+echo "9. 全量启用新证书..."
 FULL_RESP=$(curl -s -X POST "$BASE_URL/certs/full-enable" \
   -H "Content-Type: application/json" \
   -d "{
@@ -126,14 +157,20 @@ FULL_RESP=$(curl -s -X POST "$BASE_URL/certs/full-enable" \
     \"request_id\": \"req_full_001\"
   }")
 echo "响应: $FULL_RESP"
+FULL_CODE=$(echo $FULL_RESP | jq -r '.code')
+if [ "$FULL_CODE" != "0" ]; then
+  echo "错误: 全量启用新证书失败，code: $FULL_CODE"
+  exit 1
+fi
+echo "成功: 新证书已全量启用"
 echo ""
 
-echo "9. 查看启用历史..."
+echo "10. 查看启用历史..."
 HISTORY_RESP=$(curl -s -X GET "$BASE_URL/renewal/history?partner_id=$PARTNER_ID")
 echo "响应: $HISTORY_RESP"
 echo ""
 
-echo "10. 测试幂等性(重复创建合作方)..."
+echo "11. 测试幂等性(重复创建合作方)..."
 DUP_RESP=$(curl -s -X POST "$BASE_URL/partners" \
   -H "Content-Type: application/json" \
   -d '{
@@ -148,7 +185,7 @@ DUP_RESP=$(curl -s -X POST "$BASE_URL/partners" \
 echo "响应: $DUP_RESP"
 echo ""
 
-echo "11. 触发续租提醒(提前30天)..."
+echo "12. 触发续租提醒(提前30天)..."
 REMINDER_RESP=$(curl -s -X POST "$BASE_URL/renewal/reminders/trigger" \
   -H "Content-Type: application/json" \
   -d "{
@@ -159,12 +196,12 @@ REMINDER_RESP=$(curl -s -X POST "$BASE_URL/renewal/reminders/trigger" \
 echo "响应: $REMINDER_RESP"
 echo ""
 
-echo "12. 查询待发送提醒..."
+echo "13. 查询待发送提醒..."
 LIST_REMINDER_RESP=$(curl -s -X GET "$BASE_URL/renewal/reminders?partner_id=$PARTNER_ID&is_sent=false")
 echo "响应: $LIST_REMINDER_RESP"
 echo ""
 
-echo "13. 回退到旧证书..."
+echo "14. 回退到旧证书..."
 ROLLBACK_RESP=$(curl -s -X POST "$BASE_URL/renewal/rollback" \
   -H "Content-Type: application/json" \
   -d "{
@@ -175,14 +212,20 @@ ROLLBACK_RESP=$(curl -s -X POST "$BASE_URL/renewal/rollback" \
     \"request_id\": \"req_rollback_001\"
   }")
 echo "响应: $ROLLBACK_RESP"
+ROLLBACK_CODE=$(echo $ROLLBACK_RESP | jq -r '.code')
+if [ "$ROLLBACK_CODE" != "0" ]; then
+  echo "错误: 回退到旧证书失败，code: $ROLLBACK_CODE"
+  exit 1
+fi
+echo "成功: 已回退到旧证书"
 echo ""
 
-echo "14. 导出证书列表CSV..."
+echo "15. 导出证书列表CSV..."
 curl -s -X GET "$BASE_URL/export/certs?partner_id=$PARTNER_ID" -o /tmp/certs_export.csv
 echo "导出完成，文件大小: $(wc -l /tmp/certs_export.csv)"
 echo ""
 
-echo "15. 导出启用历史CSV..."
+echo "16. 导出启用历史CSV..."
 curl -s -X GET "$BASE_URL/export/history?partner_id=$PARTNER_ID" -o /tmp/history_export.csv
 echo "导出完成，文件大小: $(wc -l /tmp/history_export.csv)"
 echo ""
