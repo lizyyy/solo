@@ -37,10 +37,26 @@ func IsValidHitStatus(status HitStatus) bool {
 }
 
 func IsValidStatusTransition(current, new HitStatus) bool {
-	if current == HitStatusRevoked {
+	if current == new {
+		return true
+	}
+
+	switch current {
+	case HitStatusPending:
+		return new == HitStatusCorrect || new == HitStatusIncorrect || new == HitStatusRevoked
+
+	case HitStatusCorrect:
+		return new == HitStatusRevoked
+
+	case HitStatusIncorrect:
+		return new == HitStatusRevoked
+
+	case HitStatusRevoked:
+		return false
+
+	default:
 		return false
 	}
-	return IsValidHitStatus(new)
 }
 
 func IsValidCorrectionAction(action CorrectionAction) bool {
