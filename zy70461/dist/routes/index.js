@@ -1,0 +1,36 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const SubmissionController_1 = require("../controllers/SubmissionController");
+const RuleController_1 = require("../controllers/RuleController");
+const ReportController_1 = require("../controllers/ReportController");
+const DependencyChangeController_1 = require("../controllers/DependencyChangeController");
+const router = (0, express_1.Router)();
+router.get('/health', (req, res) => {
+    res.json({ success: true, message: '依赖器合约服务运行正常', timestamp: new Date().toISOString() });
+});
+router.post('/submissions', SubmissionController_1.SubmissionController.createSubmission);
+router.get('/submissions', SubmissionController_1.SubmissionController.getSubmissions);
+router.get('/submissions/:id', SubmissionController_1.SubmissionController.getSubmission);
+router.post('/submissions/:id/process', SubmissionController_1.SubmissionController.processSubmission);
+router.patch('/submissions/:id', SubmissionController_1.SubmissionController.updateSubmissionField);
+router.get('/batches', SubmissionController_1.SubmissionController.getAllBatches);
+router.get('/batches/:batchId/stats', SubmissionController_1.SubmissionController.getBatchStats);
+router.get('/batches/:batchId/preview/:actionType', SubmissionController_1.SubmissionController.previewBatchAction);
+router.post('/batches/:batchId/process', SubmissionController_1.SubmissionController.processBatch);
+router.post('/rules', RuleController_1.RuleController.createRule);
+router.get('/rules', RuleController_1.RuleController.getAllRules);
+router.get('/rules/active', RuleController_1.RuleController.getActiveRule);
+router.get('/rules/by-date', RuleController_1.RuleController.getRuleByDate);
+router.get('/rules/:id', RuleController_1.RuleController.getRule);
+router.get('/reports', ReportController_1.ReportController.getAllReports);
+router.get('/reports/:id', ReportController_1.ReportController.getReport);
+router.get('/reports/batch/:batchId', ReportController_1.ReportController.getReportsByBatch);
+router.post('/reports/batch/:batchId/generate', ReportController_1.ReportController.generateBatchReport);
+router.post('/dependency-changes', DependencyChangeController_1.DependencyChangeController.createChange);
+router.get('/dependency-changes', DependencyChangeController_1.DependencyChangeController.getAllChanges);
+router.get('/dependency-changes/:id', DependencyChangeController_1.DependencyChangeController.getChange);
+router.post('/dependency-changes/:id/approve', DependencyChangeController_1.DependencyChangeController.approveChange);
+router.post('/dependency-changes/:id/reject', DependencyChangeController_1.DependencyChangeController.rejectChange);
+exports.default = router;
+//# sourceMappingURL=index.js.map

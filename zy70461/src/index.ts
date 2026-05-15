@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import routes from './routes';
-import { initDatabase } from '../scripts/init-db';
 
 const PORT = process.env.PORT || 3000;
 const app = express();

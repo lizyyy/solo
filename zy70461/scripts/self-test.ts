@@ -415,6 +415,37 @@ async function runSelfTests() {
   allResults.push(getBatchStats);
   printResult(getBatchStats);
 
+  printHeader('边界情况测试 - 报告稳定性');
+
+  const reportWithZeroPending = await runTest('报告：无待处理提交时生成报告', async () => {
+    const report = await ReportService.generateBatchReport('BATCH-001', 'test-user');
+    if (!report.id) throw new Error('报告ID为空');
+    if (report.executionTime < 0) throw new Error(`执行时间异常: ${report.executionTime}ms`);
+  });
+  allResults.push(reportWithZeroPending);
+  printResult(reportWithZeroPending);
+
+  const emptyBatchReport = await runTest('报告：空批次生成报告', async () => {
+    const report = await ReportService.generateBatchReport('EMPTY-BATCH', 'test-user');
+    if (!report.id) throw new Error('报告ID为空');
+    if (report.beforeStats.total !== 0) throw new Error('空批次统计应为0');
+    if (report.afterStats.total !== 0) throw new Error('空批次统计应为0');
+  });
+  allResults.push(emptyBatchReport);
+  printResult(emptyBatchReport);
+
+  const reportExecutionTimeCheck = await runTest('报告：执行时间正确记录', async () => {
+    const reports = ReportService.getAllReports();
+    if (reports.length === 0) throw new Error('没有报告');
+    
+    for (const report of reports) {
+      if (typeof report.executionTime !== 'number') throw new Error('执行时间类型错误');
+      if (report.executionTime < 0) throw new Error(`执行时间不能为负数: ${report.executionTime}`);
+    }
+  });
+  allResults.push(reportExecutionTimeCheck);
+  printResult(reportExecutionTimeCheck);
+
   printHeader('测试结果汇总');
   
   const passed = allResults.filter(r => r.passed).length;
