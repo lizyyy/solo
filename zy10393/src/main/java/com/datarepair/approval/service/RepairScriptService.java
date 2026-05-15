@@ -35,12 +35,20 @@ public class RepairScriptService {
     private final ExecutionBatchMapper executionBatchMapper;
     private final RollbackRecordMapper rollbackRecordMapper;
     private final TimelineService timelineService;
+    private final IdempotencyService idempotencyService;
 
     @Transactional(rollbackFor = Exception.class)
     public RepairScript create(RepairScriptCreateDTO dto) {
+        String requestId = dto.getRequestId();
+        if (idempotencyService.isProcessed(requestId)) {
+            log.info("幂等校验：重复提交，直接返回已有记录: requestId={}", requestId);
+            return (RepairScript) idempotencyService.getResult(requestId);
+        }
+
         RepairScript existing = repairScriptMapper.selectByRequestId(dto.getRequestId());
         if (existing != null) {
             log.info("重复提交，直接返回已有记录: requestId={}", dto.getRequestId());
+            idempotencyService.markAsProcessed(requestId, existing);
             return existing;
         }
 
@@ -82,6 +90,7 @@ public class RepairScriptService {
                 null, ScriptStatus.DRAFT, dto.getApplicant(), dto.getApplicantDept(),
                 "创建修复脚本", "脚本名称: " + dto.getScriptName());
 
+        idempotencyService.markAsProcessed(requestId, script);
         return script;
     }
 
@@ -108,6 +117,12 @@ public class RepairScriptService {
 
     @Transactional(rollbackFor = Exception.class)
     public DryRunResult dryRun(DryRunDTO dto) {
+        String requestId = dto.getRequestId();
+        if (idempotencyService.isProcessed(requestId)) {
+            log.info("幂等校验：重复试跑，直接返回已有结果: requestId={}", requestId);
+            return (DryRunResult) idempotencyService.getResult(requestId);
+        }
+
         RepairScript script = getById(dto.getScriptId());
         validateStatus(script, ScriptStatus.SUBMITTED, ScriptStatus.VALIDATED);
 
@@ -145,11 +160,18 @@ public class RepairScriptService {
                 fromStatus, script.getStatus(), dto.getOperator(), null,
                 "试跑执行", result.getSuccess() ? "试跑成功" : "试跑失败: " + result.getErrorMessage());
 
+        idempotencyService.markAsProcessed(requestId, result);
         return result;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void approve(ApprovalDTO dto) {
+        String requestId = dto.getRequestId();
+        if (idempotencyService.isProcessed(requestId)) {
+            log.info("幂等校验：重复审批，直接返回: requestId={}", requestId);
+            return;
+        }
+
         RepairScript script = getById(dto.getScriptId());
 
         if (dto.getAction() == ApprovalAction.APPROVE) {
@@ -183,10 +205,18 @@ public class RepairScriptService {
         timelineService.record(dto.getScriptId(), null, dto.getAction(),
                 fromStatus, toStatus, dto.getApprover(), dto.getApproverDept(),
                 dto.getPassed() ? "审批通过" : "审批拒绝", dto.getOpinion());
+
+        idempotencyService.markAsProcessed(requestId, null);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public ExecutionBatch execute(ExecuteDTO dto) {
+        String requestId = dto.getRequestId();
+        if (idempotencyService.isProcessed(requestId)) {
+            log.info("幂等校验：重复执行，直接返回已有结果: requestId={}", requestId);
+            return (ExecutionBatch) idempotencyService.getResult(requestId);
+        }
+
         RepairScript script = getById(dto.getScriptId());
         validateStatus(script, ScriptStatus.APPROVED);
 
@@ -228,11 +258,17 @@ public class RepairScriptService {
                 fromStatus, script.getStatus(), dto.getOperator(), null,
                 batch.getSuccess() ? "执行成功" : "执行失败", batch.getExecutionLog());
 
+        idempotencyService.markAsProcessed(requestId, batch);
         return batch;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public RollbackRecord rollback(RollbackDTO dto) {
+        String requestId = dto.getRequestId();
+        if (idempotencyService.isProcessed(requestId)) {
+            log.info("幂等校验：重复回滚，直接返回已有结果: requestId={}", requestId);
+            return (RollbackRecord) idempotencyService.getResult(requestId);
+        }
         RepairScript script = getById(dto.getScriptId());
         validateStatus(script, ScriptStatus.EXECUTE_SUCCESS, ScriptStatus.EXECUTE_FAILED);
 
@@ -277,6 +313,7 @@ public class RepairScriptService {
                 fromStatus, script.getStatus(), dto.getOperator(), null,
                 record.getSuccess() ? "回滚成功" : "回滚失败", record.getRollbackLog());
 
+        idempotencyService.markAsProcessed(requestId, record);
         return record;
     }
 

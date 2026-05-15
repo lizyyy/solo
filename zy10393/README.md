@@ -15,8 +15,8 @@
 
 ### 前置要求
 
-- JDK 11+
-- Maven 3.6+
+- JDK 8+
+- Maven 3.6+（可通过 `./mvnw` 使用内置Maven Wrapper）
 
 ### 启动方式
 
