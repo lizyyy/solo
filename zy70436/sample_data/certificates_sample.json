@@ -1,0 +1,141 @@
+{
+  "certificates": [
+    {
+      "cert_id": "CERT-FIN-001",
+      "cert_no": "税字第2024-00123456号",
+      "cert_type": "增值税专用发票",
+      "holder": "北京科技有限公司",
+      "issue_date": "2024-05-20",
+      "expiry_date": "2026-05-20",
+      "issuer": "北京市税务局",
+      "status": "有效",
+      "data_source": "财务系统",
+      "batch_no": "BATCH-FIN-20260515-001",
+      "department": "财务部-税务组",
+      "invoice_redemption_ref": "RED-2026-0001",
+      "original_input_ref": "INPUT-FIN-20260515-001",
+      "processing_basis": "财税[2024]36号文件"
+    },
+    {
+      "cert_id": "CERT-FIN-002",
+      "cert_no": "税字第2024-00123457号",
+      "cert_type": "增值税普通发票",
+      "holder": "上海贸易有限公司",
+      "issue_date": "2024-06-15",
+      "expiry_date": "2026-04-15",
+      "issuer": "上海市税务局",
+      "status": "有效",
+      "data_source": "财务系统",
+      "batch_no": "BATCH-FIN-20260515-001",
+      "department": "财务部-税务组"
+    },
+    {
+      "cert_id": "CERT-FIN-003",
+      "cert_no": "税字第2023-00098765号",
+      "cert_type": "海关进口增值税专用缴款书",
+      "holder": "广州进出口贸易公司",
+      "issue_date": "2023-12-01",
+      "expiry_date": "2025-12-01",
+      "issuer": "广州海关",
+      "status": "已过期",
+      "data_source": "财务系统",
+      "batch_no": "BATCH-FIN-20260515-001",
+      "department": "财务部-税务组"
+    },
+    {
+      "cert_id": "CERT-TAX-001",
+      "cert_no": "完税证明2026-0001",
+      "cert_type": "完税证明",
+      "holder": "深圳电子科技集团",
+      "issue_date": "2026-01-10",
+      "expiry_date": "2026-06-10",
+      "issuer": "深圳市税务局",
+      "status": "有效",
+      "data_source": "税务系统",
+      "batch_no": "BATCH-TAX-20260515-001",
+      "department": "税务总局-征管科"
+    },
+    {
+      "cert_id": "CERT-TAX-002",
+      "cert_no": "完税证明2026-0002",
+      "cert_type": "企业所得税完税证明",
+      "holder": "杭州互联网有限公司",
+      "issue_date": "2026-02-01",
+      "expiry_date": "2026-06-01",
+      "issuer": "杭州市税务局",
+      "status": "有效",
+      "data_source": "税务系统",
+      "batch_no": "BATCH-TAX-20260515-001",
+      "department": "税务总局-征管科"
+    },
+    {
+      "cert_id": "CERT-ERP-001",
+      "cert_no": "ERP-LICENSE-2024-001",
+      "cert_type": "ERP软件授权证书",
+      "holder": "总部信息中心",
+      "issue_date": "2024-05-01",
+      "expiry_date": "2026-05-01",
+      "issuer": "SAP中国",
+      "status": "有效",
+      "data_source": "ERP系统",
+      "batch_no": "BATCH-ERP-20260515-001",
+      "department": "信息中心-ERP运维组"
+    },
+    {
+      "cert_id": "CERT-ERP-002",
+      "cert_no": "ERP-LICENSE-2024-002",
+      "cert_type": "数据库授权证书",
+      "holder": "总部信息中心",
+      "issue_date": "2024-03-15",
+      "expiry_date": "2026-03-15",
+      "issuer": "Oracle中国",
+      "status": "已过期",
+      "data_source": "ERP系统",
+      "batch_no": "BATCH-ERP-20260515-001",
+      "department": "信息中心-ERP运维组"
+    },
+    {
+      "cert_id": "CERT-CRM-001",
+      "cert_no": "CRM-SERVICE-2025-088",
+      "cert_type": "客户服务等级证书",
+      "holder": "VIP客户-中国工商银行",
+      "issue_date": "2025-01-01",
+      "expiry_date": "2026-12-31",
+      "issuer": "客户服务中心",
+      "status": "有效",
+      "data_source": "CRM系统",
+      "batch_no": "BATCH-CRM-20260515-001",
+      "department": "销售部-客户管理组"
+    },
+    {
+      "cert_id": "CERT-SCM-001",
+      "cert_no": "SCM-SUPPLIER-2025-A001",
+      "cert_type": "合格供应商证书",
+      "holder": "武汉钢铁集团",
+      "issue_date": "2025-06-01",
+      "expiry_date": "2026-06-01",
+      "issuer": "供应链管理部",
+      "status": "有效",
+      "data_source": "供应链系统",
+      "batch_no": "BATCH-SCM-20260515-001",
+      "department": "供应链管理部-采购组"
+    },
+    {
+      "cert_id": "CERT-SCM-002",
+      "cert_no": "SCM-SUPPLIER-2025-A002",
+      "cert_type": "合格供应商证书",
+      "holder": "重庆汽车零部件公司",
+      "issue_date": "2025-07-01",
+      "expiry_date": "2026-05-25",
+      "issuer": "供应链管理部",
+      "status": "有效",
+      "data_source": "供应链系统",
+      "batch_no": "BATCH-SCM-20260515-001",
+      "department": "供应链管理部-采购组"
+    }
+  ],
+  "metadata": {
+    "total": 10,
+    "data_date": "2026-05-14"
+  }
+}

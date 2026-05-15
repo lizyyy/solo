@@ -1,0 +1,76 @@
+{
+  "records": [
+    {
+      "record_id": "RED-2026-0001",
+      "invoice_no": "1100241540-00012345",
+      "redemption_date": "2026-04-15",
+      "amount": 125800.50,
+      "operator": "张明",
+      "department": "财务部-税务组",
+      "environment": "生产环境",
+      "original_input": {
+        "original_invoice_no": "1100241540-00012345",
+        "original_amount": 125800.50,
+        "original_date": "2026-03-20",
+        "buyer": "北京科技有限公司",
+        "seller": "我们公司",
+        "goods_description": "技术服务费用",
+        "upload_channel": "金税四期接口",
+        "upload_time": "2026-03-21T09:30:00"
+      },
+      "processing_basis": "根据《增值税专用发票使用规定》第二十五条，因开票有误购买方拒收专用发票的，销售方须在专用发票认证期限内向主管税务机关填报申请单",
+      "related_cert_ids": ["CERT-FIN-001"],
+      "batch_no": "BATCH-FIN-20260515-001"
+    },
+    {
+      "record_id": "RED-2026-0002",
+      "invoice_no": "3100241540-00098765",
+      "redemption_date": "2026-04-20",
+      "amount": 89600.00,
+      "operator": "刘婷",
+      "department": "财务部-资金组",
+      "environment": "UAT环境",
+      "original_input": {
+        "original_invoice_no": "3100241540-00098765",
+        "original_amount": 89600.00,
+        "original_date": "2026-04-01",
+        "buyer": "上海贸易有限公司",
+        "seller": "我们公司",
+        "goods_description": "咨询服务费用",
+        "upload_channel": "手工导入",
+        "upload_time": "2026-04-02T14:20:00",
+        "attachment_ref": "ATT-FIN-20260402-001"
+      },
+      "processing_basis": "根据国家税务总局公告2024年第47号，增值税一般纳税人开具增值税专用发票后，发生销货退回、开票有误、应税服务中止等情形但不符合发票作废条件",
+      "related_cert_ids": ["CERT-FIN-002"],
+      "batch_no": "BATCH-FIN-20260515-002"
+    },
+    {
+      "record_id": "RED-2026-0003",
+      "invoice_no": "4403241540-00055667",
+      "redemption_date": "2026-05-02",
+      "amount": 256800.75,
+      "operator": "孙磊",
+      "department": "税务总局-票证中心",
+      "environment": "UAT环境",
+      "original_input": {
+        "original_invoice_no": "4403241540-00055667",
+        "original_amount": 256800.75,
+        "original_date": "2026-04-15",
+        "buyer": "广州进出口贸易公司",
+        "seller": "我们公司",
+        "goods_description": "设备采购款",
+        "upload_channel": "电子税务局批量导入",
+        "upload_time": "2026-04-16T11:45:00"
+      },
+      "processing_basis": "根据《国家税务总局关于红字增值税发票开具有关问题的公告》（国家税务总局公告2016年第47号），需要开具红字专用发票的处理规定",
+      "related_cert_ids": ["CERT-FIN-003"],
+      "batch_no": "BATCH-TAX-20260515-002"
+    }
+  ],
+  "metadata": {
+    "total_records": 3,
+    "total_amount": 472201.25,
+    "generate_time": "2026-05-15T10:30:00"
+  }
+}

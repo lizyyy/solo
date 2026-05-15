@@ -1,0 +1,182 @@
+{
+  "history": [
+    {
+      "batch_id": "INSPECT-20260515203207-debf25",
+      "inspector": "测试巡检员",
+      "inspection_time": "2026-05-15T20:32:07.126918",
+      "total_certs": 10,
+      "expired_count": 4,
+      "expiring_soon_count": 5,
+      "batch_conflicts": [
+        {
+          "batch_no": "BATCH-FIN-20260515-001",
+          "conflict_count": 2,
+          "partitions": [
+            {
+              "partition_id": "PART-202605-001",
+              "department": "财务部-税务组",
+              "submitter": "张明",
+              "environment": "生产环境"
+            },
+            {
+              "partition_id": "PART-202605-CONFLICT-001",
+              "department": "财务部-资金组",
+              "submitter": "刘婷",
+              "environment": "UAT环境"
+            }
+          ],
+          "risk_type": "批次号冲突"
+        },
+        {
+          "batch_no": "BATCH-TAX-20260515-001",
+          "conflict_count": 2,
+          "partitions": [
+            {
+              "partition_id": "PART-202605-002",
+              "department": "税务总局-征管科",
+              "submitter": "李华",
+              "environment": "生产环境"
+            },
+            {
+              "partition_id": "PART-202605-CONFLICT-002",
+              "department": "税务总局-票证中心",
+              "submitter": "孙磊",
+              "environment": "UAT环境"
+            }
+          ],
+          "risk_type": "批次号冲突"
+        },
+        {
+          "batch_no": "BATCH-ERP-20260515-001",
+          "conflict_count": 2,
+          "partitions": [
+            {
+              "partition_id": "PART-202605-003",
+              "department": "信息中心-ERP运维组",
+              "submitter": "王强",
+              "environment": "生产环境"
+            },
+            {
+              "partition_id": "PART-202605-CONFLICT-003",
+              "department": "信息中心-数据治理组",
+              "submitter": "周杰",
+              "environment": "开发环境"
+            }
+          ],
+          "risk_type": "批次号冲突"
+        }
+      ],
+      "risk_details": [
+        {
+          "cert_id": "CERT-FIN-001",
+          "cert_no": "税字第2024-00123456号",
+          "cert_type": "增值税专用发票",
+          "holder": "北京科技有限公司",
+          "expiry_date": "2026-05-20",
+          "days_until_expiry": 5,
+          "risk_type": "即将过期",
+          "department": "财务部-税务组",
+          "data_source": "财务系统",
+          "batch_no": "BATCH-FIN-20260515-001"
+        },
+        {
+          "cert_id": "CERT-FIN-002",
+          "cert_no": "税字第2024-00123457号",
+          "cert_type": "增值税普通发票",
+          "holder": "上海贸易有限公司",
+          "expiry_date": "2026-04-15",
+          "days_until_expiry": -30,
+          "risk_type": "已过期",
+          "department": "财务部-税务组",
+          "data_source": "财务系统",
+          "batch_no": "BATCH-FIN-20260515-001"
+        },
+        {
+          "cert_id": "CERT-FIN-003",
+          "cert_no": "税字第2023-00098765号",
+          "cert_type": "海关进口增值税专用缴款书",
+          "holder": "广州进出口贸易公司",
+          "expiry_date": "2025-12-01",
+          "days_until_expiry": -165,
+          "risk_type": "已过期",
+          "department": "财务部-税务组",
+          "data_source": "财务系统",
+          "batch_no": "BATCH-FIN-20260515-001"
+        },
+        {
+          "cert_id": "CERT-TAX-001",
+          "cert_no": "完税证明2026-0001",
+          "cert_type": "完税证明",
+          "holder": "深圳电子科技集团",
+          "expiry_date": "2026-06-10",
+          "days_until_expiry": 26,
+          "risk_type": "即将过期",
+          "department": "税务总局-征管科",
+          "data_source": "税务系统",
+          "batch_no": "BATCH-TAX-20260515-001"
+        },
+        {
+          "cert_id": "CERT-TAX-002",
+          "cert_no": "完税证明2026-0002",
+          "cert_type": "企业所得税完税证明",
+          "holder": "杭州互联网有限公司",
+          "expiry_date": "2026-06-01",
+          "days_until_expiry": 17,
+          "risk_type": "即将过期",
+          "department": "税务总局-征管科",
+          "data_source": "税务系统",
+          "batch_no": "BATCH-TAX-20260515-001"
+        },
+        {
+          "cert_id": "CERT-ERP-001",
+          "cert_no": "ERP-LICENSE-2024-001",
+          "cert_type": "ERP软件授权证书",
+          "holder": "总部信息中心",
+          "expiry_date": "2026-05-01",
+          "days_until_expiry": -14,
+          "risk_type": "已过期",
+          "department": "信息中心-ERP运维组",
+          "data_source": "ERP系统",
+          "batch_no": "BATCH-ERP-20260515-001"
+        },
+        {
+          "cert_id": "CERT-ERP-002",
+          "cert_no": "ERP-LICENSE-2024-002",
+          "cert_type": "数据库授权证书",
+          "holder": "总部信息中心",
+          "expiry_date": "2026-03-15",
+          "days_until_expiry": -61,
+          "risk_type": "已过期",
+          "department": "信息中心-ERP运维组",
+          "data_source": "ERP系统",
+          "batch_no": "BATCH-ERP-20260515-001"
+        },
+        {
+          "cert_id": "CERT-SCM-001",
+          "cert_no": "SCM-SUPPLIER-2025-A001",
+          "cert_type": "合格供应商证书",
+          "holder": "武汉钢铁集团",
+          "expiry_date": "2026-06-01",
+          "days_until_expiry": 17,
+          "risk_type": "即将过期",
+          "department": "供应链管理部-采购组",
+          "data_source": "供应链系统",
+          "batch_no": "BATCH-SCM-20260515-001"
+        },
+        {
+          "cert_id": "CERT-SCM-002",
+          "cert_no": "SCM-SUPPLIER-2025-A002",
+          "cert_type": "合格供应商证书",
+          "holder": "重庆汽车零部件公司",
+          "expiry_date": "2026-05-25",
+          "days_until_expiry": 10,
+          "risk_type": "即将过期",
+          "department": "供应链管理部-采购组",
+          "data_source": "供应链系统",
+          "batch_no": "BATCH-SCM-20260515-001"
+        }
+      ],
+      "manual_corrections": []
+    }
+  ]
+}

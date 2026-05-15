@@ -1,0 +1,110 @@
+{
+  "partitions": [
+    {
+      "partition_id": "PART-202605-001",
+      "data_source": "财务系统",
+      "batch_no": "BATCH-FIN-20260515-001",
+      "department": "财务部-税务组",
+      "submitter": "张明",
+      "submit_date": "2026-05-15",
+      "cert_count": 45,
+      "data_date": "2026-05-14",
+      "environment": "生产环境"
+    },
+    {
+      "partition_id": "PART-202605-002",
+      "data_source": "税务系统",
+      "batch_no": "BATCH-TAX-20260515-001",
+      "department": "税务总局-征管科",
+      "submitter": "李华",
+      "submit_date": "2026-05-15",
+      "cert_count": 128,
+      "data_date": "2026-05-14",
+      "environment": "生产环境"
+    },
+    {
+      "partition_id": "PART-202605-003",
+      "data_source": "ERP系统",
+      "batch_no": "BATCH-ERP-20260515-001",
+      "department": "信息中心-ERP运维组",
+      "submitter": "王强",
+      "submit_date": "2026-05-15",
+      "cert_count": 256,
+      "data_date": "2026-05-14",
+      "environment": "生产环境"
+    },
+    {
+      "partition_id": "PART-202605-004",
+      "data_source": "CRM系统",
+      "batch_no": "BATCH-CRM-20260515-001",
+      "department": "销售部-客户管理组",
+      "submitter": "赵芳",
+      "submit_date": "2026-05-15",
+      "cert_count": 89,
+      "data_date": "2026-05-14",
+      "environment": "生产环境"
+    },
+    {
+      "partition_id": "PART-202605-005",
+      "data_source": "供应链系统",
+      "batch_no": "BATCH-SCM-20260515-001",
+      "department": "供应链管理部-采购组",
+      "submitter": "陈伟",
+      "submit_date": "2026-05-15",
+      "cert_count": 167,
+      "data_date": "2026-05-14",
+      "environment": "生产环境"
+    },
+    {
+      "partition_id": "PART-202605-CONFLICT-001",
+      "data_source": "财务系统",
+      "batch_no": "BATCH-FIN-20260515-001",
+      "department": "财务部-资金组",
+      "submitter": "刘婷",
+      "submit_date": "2026-05-15",
+      "cert_count": 34,
+      "data_date": "2026-05-14",
+      "environment": "UAT环境"
+    },
+    {
+      "partition_id": "PART-202605-CONFLICT-002",
+      "data_source": "税务系统",
+      "batch_no": "BATCH-TAX-20260515-001",
+      "department": "税务总局-票证中心",
+      "submitter": "孙磊",
+      "submit_date": "2026-05-15",
+      "cert_count": 203,
+      "data_date": "2026-05-14",
+      "environment": "UAT环境"
+    },
+    {
+      "partition_id": "PART-202605-CONFLICT-003",
+      "data_source": "ERP系统",
+      "batch_no": "BATCH-ERP-20260515-001",
+      "department": "信息中心-数据治理组",
+      "submitter": "周杰",
+      "submit_date": "2026-05-15",
+      "cert_count": 178,
+      "data_date": "2026-05-14",
+      "environment": "开发环境"
+    },
+    {
+      "partition_id": "PART-202605-009",
+      "data_source": "财务系统",
+      "batch_no": "BATCH-FIN-20260515-003",
+      "department": "财务部-预算组",
+      "submitter": "吴敏",
+      "submit_date": "2026-05-15",
+      "cert_count": 67,
+      "data_date": "2026-05-14",
+      "environment": "生产环境"
+    }
+  ],
+  "metadata": {
+    "total_partitions": 9,
+    "total_certificates": 1167,
+    "generate_time": "2026-05-15T10:30:00",
+    "version": "v1.0-conflict",
+    "note": "此版本包含批次号冲突，用于测试冲突检测功能"
+  }
+}
