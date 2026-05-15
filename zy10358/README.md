@@ -35,22 +35,56 @@
 
 ## 快速开始
 
-### 启动服务
+### 🚀 一键启动（推荐）
 
 ```bash
-mvn clean package
-java -jar target/fee-calculation-api-1.0.0.jar
+./start.sh
 ```
 
-或者直接运行：
+**脚本功能**:
+- ✅ 自动检测Java版本（支持1.8, 11, 17等）
+- ✅ 优先使用系统Maven
+- ✅ 无Maven时自动安装Maven Wrapper
+- ✅ 显示访问地址和使用说明
+
+### 💡 IDE快速运行（无需Maven）
+
+如果不想安装Maven，可以直接在IDE中运行：
+
+1. 用IDEA或Eclipse打开项目
+2. 找到类: `src/main/java/com/feiyong/feecalc/FeeCalculationApplication.java`
+3. 右键 -> Run 'FeeCalculationApplication'
+
+### 📦 手动安装Maven Wrapper
+
+如果 `./start.sh` 中Maven下载失败，可以手动运行：
 
 ```bash
-mvn spring-boot:run
+./install-mvnw.sh   # 安装Maven Wrapper
+./mvnw spring-boot:run
+```
+
+### 🔧 编译打包
+
+```bash
+# 使用系统Maven
+mvn clean package
+
+# 或使用Maven Wrapper
+./mvnw clean package
+
+# 运行jar包
+java -jar target/fee-calculation-api-1.0.0.jar
 ```
 
 ### 访问地址
 
+启动后访问：
+
 - **管理控制台**: http://localhost:8080
+  - 可视化操作所有API
+  - 支持费用试算、锁价、扣费、导出等
+  
 - **H2数据库控制台**: http://localhost:8080/h2-console
   - JDBC URL: `jdbc:h2:mem:fee_calc_db`
   - 用户名: `sa`
@@ -101,6 +135,54 @@ curl -X POST http://localhost:8080/api/fee/charge/LOCK123456789
 ```bash
 curl http://localhost:8080/api/fee/timeline/FEE123456789
 ```
+
+### 7. 生成问题排查汇总
+
+```bash
+curl http://localhost:8080/api/fee/diagnosis/FEE123456789
+```
+
+### 8. 导出文本报告
+
+```bash
+curl -O -J http://localhost:8080/api/fee/export/text/FEE123456789
+```
+
+### 9. 导出JSON报告
+
+```bash
+curl -O -J http://localhost:8080/api/fee/export/json/FEE123456789
+```
+
+## 功能验证
+
+服务启动后，运行验证脚本测试所有功能：
+
+```bash
+./verify.sh
+```
+
+**验证内容**（共9项）:
+1. ✅ 创建费用试算
+2. ✅ 查询试算结果
+3. ✅ 锁定价格
+4. ✅ 校验锁价凭证
+5. ✅ 查询操作时间线
+6. ✅ 生成问题排查汇总
+7. ✅ 执行扣费
+8. ✅ 导出文本报告
+9. ✅ 导出JSON报告
+
+## 问题排查汇总导出说明
+
+导出的汇总报告包含：
+
+- **基本信息**: 请求号、业务单号、状态、价格规则、数量
+- **费用明细**: 原价、折扣、最终金额
+- **费用构成**: 每条费用项的名称、金额、说明
+- **锁价凭证**: 凭证号、锁定金额、锁定时间、过期状态、扣费信息
+- **操作时间线**: 完整的操作记录，包括时间、动作、操作者
+- **排查建议**: 根据状态给出对应的处理建议
 
 ## 预置数据
 
