@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接口延迟事故板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .severity-info { background-color: #10b981; }
+        .severity-warning { background-color: #f59e0b; }
+        .severity-error { background-color: #ef4444; }
+        .severity-critical { background-color: #7c3aed; }
+        .severity-fatal { background-color: #000000; color: white; }
+        
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            position: absolute;
+            left: -6px;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e5e7eb;
+        }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .sample-row:hover {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div id="app">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-chart-line text-3xl"></i>
+                        <div>
+                            <h1 class="text-2xl font-bold">接口延迟事故板</h1>
+                            <p class="text-indigo-200 text-sm">API Latency Incident Dashboard</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="showBatchImport()" class="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition">
+                            <i class="fas fa-file-import mr-2"></i>批量导入
+                        </button>
+                        <button onclick="exportReport()" class="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition">
+                            <i class="fas fa-download mr-2"></i>导出报告
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="stats-cards">
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="max-w-7xl mx-auto px-4 pb-6">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4"><i class="fas fa-filter mr-2"></i>筛选条件</h3>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">状态</label>
+                        <select id="filter-status" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <option value="">全部</option>
+                            <option value="DETECTED">已发现</option>
+                            <option value="INVESTIGATING">排查中</option>
+                            <option value="ESCALATED">已升级</option>
+                            <option value="RESOLVED">已恢复</option>
+                            <option value="FALSE_POSITIVE">误报</option>
+                            <option value="CLOSED">已关闭</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">严重程度</label>
+                        <select id="filter-severity" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <option value="">全部</option>
+                            <option value="info">提示</option>
+                            <option value="warning">警告</option>
+                            <option value="error">错误</option>
+                            <option value="critical">严重</option>
+                            <option value="fatal">致命</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">接口路径</label>
+                        <input type="text" id="filter-api-path" placeholder="输入接口路径关键词" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">开始时间（起）</label>
+                        <input type="datetime-local" id="filter-start-from" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">开始时间（止）</label>
+                        <input type="datetime-local" id="filter-start-to" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end space-x-3">
+                    <button onclick="resetFilters()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition">
+                        重置
+                    </button>
+                    <button onclick="applyFilters()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                        <i class="fas fa-search mr-2"></i>查询
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incident List -->
+        <div class="max-w-7xl mx-auto px-4 pb-6">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-700">
+                            <i class="fas fa-list mr-2"></i>事故列表
+                            <span id="total-count" class="text-sm font-normal text-gray-500 ml-2"></span>
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">每页显示</span>
+                            <select id="page-size" onchange="changePageSize()" class="border border-gray-300 rounded px-2 py-1 text-sm">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">事故ID</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">接口路径</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">严重度</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P99延迟</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">受影响租户</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">开始时间</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incident-list" class="divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-4 border-t border-gray-200 flex items-center justify-between">
+                    <div class="text-sm text-gray-500" id="pagination-info"></div>
+                    <div class="flex space-x-2" id="pagination-buttons">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeDetailModal()"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+                <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-gray-800" id="modal-title">事故详情</h3>
+                    <button onclick="closeDetailModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="overflow-y-auto max-h-[calc(90vh-80px)]">
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="space-y-6">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-700 mb-3"><i class="fas fa-info-circle mr-2"></i>基本信息</h4>
+                                    <div class="grid grid-cols-2 gap-4 text-sm" id="incident-basic-info">
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-700 mb-3"><i class="fas fa-exchange-alt mr-2"></i>状态更新</h4>
+                                    <div class="flex items-center space-x-3">
+                                        <select id="new-status" class="flex-1 border border-gray-300 rounded-lg px-3 py-2">
+                                            <option value="">选择新状态</option>
+                                        </select>
+                                        <input type="text" id="operator" placeholder="操作人" class="w-32 border border-gray-300 rounded-lg px-3 py-2">
+                                        <button onclick="updateStatus()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                                            更新
+                                        </button>
+                                    </div>
+                                    <input type="text" id="status-notes" placeholder="备注说明" class="mt-3 w-full border border-gray-300 rounded-lg px-3 py-2">
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-700 mb-3"><i class="fas fa-list mr-2"></i>慢请求样本</h4>
+                                    <div class="max-h-64 overflow-y-auto" id="slow-samples">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-6">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-700 mb-3"><i class="fas fa-stream mr-2"></i>事件时间线</h4>
+                                    <div class="relative pl-6" id="timeline-container">
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-700 mb-3"><i class="fas fa-comments mr-2"></i>排查备注</h4>
+                                    <div class="mb-4 flex space-x-2">
+                                        <input type="text" id="remark-author" placeholder="作者" class="w-24 border border-gray-300 rounded-lg px-3 py-2">
+                                        <input type="text" id="remark-content" placeholder="输入备注内容" class="flex-1 border border-gray-300 rounded-lg px-3 py-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="is-resolution" class="mr-1">
+                                            <span class="text-sm text-gray-600">解决方案</span>
+                                        </label>
+                                        <button onclick="addRemark()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                            添加
+                                        </button>
+                                    </div>
+                                    <div id="remarks-container" class="space-y-2 max-h-48 overflow-y-auto">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Import Modal -->
+    <div id="batch-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeBatchModal()"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
+                <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-file-import mr-2"></i>批量导入事故</h3>
+                    <button onclick="closeBatchModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-600 mb-2">操作人</label>
+                        <input type="text" id="batch-operator" placeholder="输入操作人姓名" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-600 mb-2">导入数据 (JSON格式)</label>
+                        <textarea id="batch-data" rows="10" class="w-full border border-gray-300 rounded-lg px-3 py-2 font-mono text-sm" placeholder='[{"api_path": "/api/v1/test", "avg_latency": 1000, "p95_latency": 1500, "p99_latency": 2000, "total_requests": 1000, "slow_requests": 50, "start_time": "2024-01-01T00:00:00", "tenant_ids": ["TENANT1", "TENANT2"]}]'></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="closeBatchModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition">
+                            取消
+                        </button>
+                        <button onclick="executeBatchImport()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                            导入
+                        </button>
+                    </div>
+                    <div id="batch-result" class="mt-4 hidden">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentPage = 1;
+        let pageSize = 20;
+        let currentFilters = {};
+        let currentIncidentId = null;
+        const STATUS_LABELS = {
+            'DETECTED': '已发现',
+            'INVESTIGATING': '排查中',
+            'ESCALATED': '已升级',
+            'RESOLVED': '已恢复',
+            'FALSE_POSITIVE': '误报',
+            'CLOSED': '已关闭'
+        };
+        const STATUS_COLORS = {
+            'DETECTED': 'bg-blue-100 text-blue-800',
+            'INVESTIGATING': 'bg-yellow-100 text-yellow-800',
+            'ESCALATED': 'bg-red-100 text-red-800',
+            'RESOLVED': 'bg-green-100 text-green-800',
+            'FALSE_POSITIVE': 'bg-gray-100 text-gray-800',
+            'CLOSED': 'bg-gray-200 text-gray-600'
+        };
+        const SEVERITY_LABELS = {
+            'info': '提示',
+            'warning': '警告',
+            'error': '错误',
+            'critical': '严重',
+            'fatal': '致命'
+        };
+        const SEVERITY_COLORS = {
+            'info': 'bg-green-500',
+            'warning': 'bg-yellow-500',
+            'error': 'bg-red-500',
+            'critical': 'bg-purple-500',
+            'fatal': 'bg-black'
+        };
+
+        async function fetchStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/stats/summary`);
+                const data = await response.json();
+                
+                document.getElementById('stats-cards').innerHTML = `
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">总事故数</p>
+                                <p class="text-3xl font-bold text-gray-800">${data.total_incidents}</p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <i class="fas fa-list text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">进行中</p>
+                                <p class="text-3xl font-bold text-orange-600">${data.open_incidents}</p>
+                            </div>
+                            <div class="bg-orange-100 p-3 rounded-full">
+                                <i class="fas fa-spinner text-orange-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">今日新增</p>
+                                <p class="text-3xl font-bold text-green-600">${data.today_incidents}</p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-plus-circle text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-5">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">严重事故</p>
+                                <p class="text-3xl font-bold text-red-600">${(data.by_severity['critical'] || 0) + (data.by_severity['fatal'] || 0)}</p>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-full">
+                                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to fetch stats:', error);
+            }
+        }
+
+        async function fetchIncidents() {
+            try {
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    page_size: pageSize,
+                    ...currentFilters
+                });
+                
+                const response = await fetch(`${API_BASE}/api/incidents?${params}`);
+                const data = await response.json();
+                
+                renderIncidentList(data.incidents);
+                renderPagination(data.total);
+                document.getElementById('total-count').textContent = `共 ${data.total} 条`;
+            } catch (error) {
+                console.error('Failed to fetch incidents:', error);
+            }
+        }
+
+        function renderIncidentList(incidents) {
+            const tbody = document.getElementById('incident-list');
+            
+            if (incidents.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-4 py-12 text-center text-gray-500">
+                            <i class="fas fa-inbox text-4xl mb-3"></i>
+                            <p>暂无数据</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = incidents.map(incident => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-4 py-4">
+                        <span class="font-mono text-sm text-indigo-600">${incident.incident_id}</span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <code class="text-sm bg-gray-100 px-2 py-1 rounded">${incident.api_path}</code>
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="status-badge ${STATUS_COLORS[incident.status]}">${STATUS_LABELS[incident.status]}</span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="inline-flex items-center">
+                            <span class="w-3 h-3 rounded-full ${SEVERITY_COLORS[incident.severity]} mr-2"></span>
+                            ${SEVERITY_LABELS[incident.severity]}
+                        </span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="font-semibold ${incident.p99_latency > 3000 ? 'text-red-600' : 'text-gray-800'}">${incident.p99_latency.toFixed(0)}ms</span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="text-sm text-gray-600">${incident.affected_tenants} 个</span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="text-sm text-gray-600">${formatDateTime(incident.start_time)}</span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <button onclick="viewDetail('${incident.incident_id}')" class="text-indigo-600 hover:text-indigo-800 mr-3" title="查看详情">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination(total) {
+            const totalPages = Math.ceil(total / pageSize);
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, total);
+            
+            document.getElementById('pagination-info').textContent = 
+                total > 0 ? `显示 ${start}-${end} 条，共 ${total} 条` : '暂无数据';
+            
+            let buttons = '';
+            
+            if (currentPage > 1) {
+                buttons += `<button onclick="goToPage(${currentPage - 1})" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition">上一页</button>`;
+            }
+            
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                buttons += `
+                    <button onclick="goToPage(${i})" class="px-3 py-1 border rounded transition ${
+                        i === currentPage ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-300 hover:bg-gray-50'
+                    }">${i}</button>
+                `;
+            }
+            
+            if (currentPage < totalPages) {
+                buttons += `<button onclick="goToPage(${currentPage + 1})" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition">下一页</button>`;
+            }
+            
+            document.getElementById('pagination-buttons').innerHTML = buttons;
+        }
+
+        async function viewDetail(incidentId) {
+            currentIncidentId = incidentId;
+            try {
+                const response = await fetch(`${API_BASE}/api/incidents/${incidentId}`);
+                const data = await response.json();
+                
+                document.getElementById('modal-title').textContent = `事故详情 - ${data.incident.incident_id}`;
+                
+                document.getElementById('incident-basic-info').innerHTML = `
+                    <div><span class="text-gray-500">事故ID:</span><br><span class="font-mono">${data.incident.incident_id}</span></div>
+                    <div><span class="text-gray-500">状态:</span><br><span class="status-badge ${STATUS_COLORS[data.incident.status]}">${STATUS_LABELS[data.incident.status]}</span></div>
+                    <div><span class="text-gray-500">严重度:</span><br><span class="inline-flex items-center"><span class="w-2 h-2 rounded-full ${SEVERITY_COLORS[data.incident.severity]} mr-1"></span>${SEVERITY_LABELS[data.incident.severity]}</span></div>
+                    <div><span class="text-gray-500">延迟分桶:</span><br>${data.incident.current_bucket}</div>
+                    <div><span class="text-gray-500">平均延迟:</span><br><strong>${data.incident.avg_latency.toFixed(0)}ms</strong></div>
+                    <div><span class="text-gray-500">P95延迟:</span><br><strong>${data.incident.p95_latency.toFixed(0)}ms</strong></div>
+                    <div><span class="text-gray-500">P99延迟:</span><br><strong class="text-red-600">${data.incident.p99_latency.toFixed(0)}ms</strong></div>
+                    <div><span class="text-gray-500">受影响租户:</span><br>${data.incident.affected_tenants} 个</div>
+                    <div><span class="text-gray-500">租户列表:</span><br><span class="text-xs">${data.incident.tenant_list}</span></div>
+                    <div><span class="text-gray-500">开始时间:</span><br>${formatDateTime(data.incident.start_time)}</div>
+                    <div class="col-span-2"><span class="text-gray-500">接口路径:</span><br><code class="bg-gray-100 px-2 py-1 text-sm">${data.incident.api_path}</code></div>
+                `;
+                
+                const validTransitions = getValidTransitions(data.incident.status);
+                document.getElementById('new-status').innerHTML = `
+                    <option value="">选择新状态</option>
+                    ${validTransitions.map(s => `<option value="${s}">${STATUS_LABELS[s]}</option>`).join('')}
+                `;
+                
+                renderTimeline(data.timeline);
+                renderSlowSamples(data.samples);
+                renderRemarks(data.remarks);
+                
+                document.getElementById('detail-modal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Failed to fetch detail:', error);
+                alert('获取详情失败');
+            }
+        }
+
+        function getValidTransitions(currentStatus) {
+            const transitions = {
+                'DETECTED': ['INVESTIGATING', 'FALSE_POSITIVE'],
+                'INVESTIGATING': ['ESCALATED', 'RESOLVED', 'FALSE_POSITIVE'],
+                'ESCALATED': ['RESOLVED', 'FALSE_POSITIVE'],
+                'RESOLVED': ['CLOSED'],
+                'FALSE_POSITIVE': ['CLOSED'],
+                'CLOSED': []
+            };
+            return transitions[currentStatus] || [];
+        }
+
+        function renderTimeline(timeline) {
+            const container = document.getElementById('timeline-container');
+            
+            if (timeline.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">暂无事件</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="timeline-line"></div>
+                ${timeline.map(event => `
+                    <div class="relative pb-4">
+                        <div class="timeline-dot bg-indigo-500 top-1"></div>
+                        <div class="ml-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-800">${event.event_type}</span>
+                                <span class="text-xs text-gray-500">${formatDateTime(event.timestamp)}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">${event.event_message}</p>
+                            <div class="flex items-center mt-1 space-x-3 text-xs text-gray-500">
+                                ${event.from_status ? `<span>从: ${STATUS_LABELS[event.from_status]}</span>` : ''}
+                                ${event.to_status ? `<span>到: ${STATUS_LABELS[event.to_status]}</span>` : ''}
+                                ${event.operator ? `<span><i class="fas fa-user mr-1"></i>${event.operator}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function renderSlowSamples(samples) {
+            const container = document.getElementById('slow-samples');
+            
+            if (samples.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">暂无慢请求样本</p>';
+                return;
+            }
+            
+            container.innerHTML = samples.map(sample => `
+                <div class="sample-row p-3 border-b border-gray-200 last:border-0">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs text-indigo-600">${sample.request_id}</span>
+                        <span class="font-bold ${sample.latency > 3000 ? 'text-red-600' : 'text-orange-600'}">${sample.latency.toFixed(0)}ms</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-1 text-xs text-gray-500">
+                        <span><span class="bg-gray-200 px-1 rounded mr-1">${sample.http_method}</span>租户: ${sample.tenant_id}</span>
+                        <span>状态码: ${sample.status_code}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRemarks(remarks) {
+            const container = document.getElementById('remarks-container');
+            
+            if (remarks.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">暂无排查备注</p>';
+                return;
+            }
+            
+            container.innerHTML = remarks.map(remark => `
+                <div class="bg-white p-3 rounded-lg border ${remark.is_resolution ? 'border-green-300 bg-green-50' : 'border-gray-200'}">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">${remark.author}</span>
+                        <span class="text-xs text-gray-500">${formatDateTime(remark.timestamp)}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">${remark.content}</p>
+                    ${remark.is_resolution ? '<span class="text-xs text-green-600"><i class="fas fa-check-circle mr-1"></i>标记为解决方案</span>' : ''}
+                </div>
+            `).join('');
+        }
+
+        async function updateStatus() {
+            const newStatus = document.getElementById('new-status').value;
+            const operator = document.getElementById('operator').value;
+            const notes = document.getElementById('status-notes').value;
+            
+            if (!newStatus) {
+                alert('请选择新状态');
+                return;
+            }
+            if (!operator) {
+                alert('请输入操作人');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/incidents/${currentIncidentId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ new_status: newStatus, operator: operator, notes: notes })
+                });
+                
+                if (response.ok) {
+                    alert('状态更新成功');
+                    viewDetail(currentIncidentId);
+                    fetchStats();
+                    fetchIncidents();
+                } else {
+                    const error = await response.json();
+                    alert('更新失败: ' + (error.detail || '未知错误'));
+                }
+            } catch (error) {
+                alert('更新失败: ' + error.message);
+            }
+        }
+
+        async function addRemark() {
+            const author = document.getElementById('remark-author').value;
+            const content = document.getElementById('remark-content').value;
+            const isResolution = document.getElementById('is-resolution').checked;
+            
+            if (!author || !content) {
+                alert('请填写作者和备注内容');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/incidents/${currentIncidentId}/remarks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ author: author, content: content, is_resolution: isResolution })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('remark-content').value = '';
+                    viewDetail(currentIncidentId);
+                } else {
+                    alert('添加备注失败');
+                }
+            } catch (error) {
+                alert('添加备注失败: ' + error.message);
+            }
+        }
+
+        function applyFilters() {
+            currentFilters = {
+                status: document.getElementById('filter-status').value,
+                severity: document.getElementById('filter-severity').value,
+                api_path: document.getElementById('filter-api-path').value,
+                start_time_from: document.getElementById('filter-start-from').value,
+                start_time_to: document.getElementById('filter-start-to').value
+            };
+            
+            Object.keys(currentFilters).forEach(key => {
+                if (!currentFilters[key]) delete currentFilters[key];
+            });
+            
+            currentPage = 1;
+            fetchIncidents();
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-severity').value = '';
+            document.getElementById('filter-api-path').value = '';
+            document.getElementById('filter-start-from').value = '';
+            document.getElementById('filter-start-to').value = '';
+            currentFilters = {};
+            currentPage = 1;
+            fetchIncidents();
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            fetchIncidents();
+        }
+
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('page-size').value);
+            currentPage = 1;
+            fetchIncidents();
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+            currentIncidentId = null;
+        }
+
+        function showBatchImport() {
+            document.getElementById('batch-modal').classList.remove('hidden');
+        }
+
+        function closeBatchModal() {
+            document.getElementById('batch-modal').classList.add('hidden');
+            document.getElementById('batch-result').classList.add('hidden');
+        }
+
+        async function executeBatchImport() {
+            const operator = document.getElementById('batch-operator').value;
+            const dataStr = document.getElementById('batch-data').value;
+            
+            if (!operator) {
+                alert('请输入操作人');
+                return;
+            }
+            
+            try {
+                const items = JSON.parse(dataStr);
+                
+                const response = await fetch(`${API_BASE}/api/incidents/batch`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: items, operator: operator })
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById('batch-result').innerHTML = `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <p class="text-green-700 font-medium">导入成功！共导入 ${result.imported} 条记录</p>
+                        <ul class="mt-2 text-sm text-green-600">
+                            ${result.results.map(r => `<li>• ${r.incident_id} - ${r.api_path} (${STATUS_LABELS[r.status]})</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                document.getElementById('batch-result').classList.remove('hidden');
+                
+                fetchStats();
+                fetchIncidents();
+            } catch (error) {
+                document.getElementById('batch-result').innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p class="text-red-700 font-medium">导入失败: ${error.message}</p>
+                    </div>
+                `;
+                document.getElementById('batch-result').classList.remove('hidden');
+            }
+        }
+
+        function exportReport() {
+            const params = new URLSearchParams(currentFilters);
+            window.open(`${API_BASE}/api/incidents/export/report?${params}`, '_blank');
+        }
+
+        function formatDateTime(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function init() {
+            fetchStats();
+            fetchIncidents();
+        }
+
+        init();
+    </script>
+</body>
+</html>
