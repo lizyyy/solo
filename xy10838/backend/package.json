@@ -1,0 +1,24 @@
+{
+  "name": "data-retention-deletion-backend",
+  "version": "1.0.0",
+  "description": "数据保留删除 API 后端",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "test": "node tests/run-tests.js",
+    "self-check": "node scripts/self-check.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1",
+    "joi": "^17.11.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

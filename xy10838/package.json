@@ -1,0 +1,16 @@
+{
+  "name": "data-retention-deletion-api",
+  "version": "1.0.0",
+  "description": "数据保留删除 API 全栈应用",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd backend && npm run dev",
+    "dev:client": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "test": "cd backend && npm test",
+    "self-check": "cd backend && node scripts/self-check.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
