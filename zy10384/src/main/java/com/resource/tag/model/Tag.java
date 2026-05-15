@@ -1,6 +1,6 @@
 package com.resource.tag.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
