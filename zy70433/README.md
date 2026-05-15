@@ -92,15 +92,16 @@ curl -X POST http://localhost:3000/api/quota/allocate \
   }'
 ```
 
-**返回结果**:
+**返回结果** (金融科技部有200万白名单额度 + 合同补充页加成):
+- 计算过程: 300万(基础) + 200万 × 1.2(白名单) = 540万 → × 1.15(合同) = 621万
 ```json
 {
   "success": true,
   "data": {
     "batchId": "xxx",
     "beforeQuota": 0,
-    "afterQuota": 5796000,
-    "changeAmount": 5796000,
+    "afterQuota": 6210000,
+    "changeAmount": 6210000,
     "executionDuration": 45
   }
 }

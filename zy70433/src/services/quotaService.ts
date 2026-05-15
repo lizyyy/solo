@@ -29,10 +29,10 @@ export class QuotaService {
 
   private async getDepartmentQuota(departmentId: string) {
     const records = await runQuery(
-      'SELECT SUM(after_quota) as total FROM allocation_records WHERE department_id = ? AND status = ?',
+      'SELECT after_quota FROM allocation_records WHERE department_id = ? AND status = ? ORDER BY executed_at DESC LIMIT 1',
       [departmentId, 'success']
     );
-    return records[0]?.total || 0;
+    return records[0]?.after_quota || 0;
   }
 
   private async getActiveWhitelistAmount(departmentId: string) {

@@ -62,8 +62,8 @@ const temporaryWhitelist = [
     reason: '核心系统紧急升级，需临时增加资源配额用于压力测试',
     quota_amount: 2000000,
     is_revoked: 0,
-    effective_date: '2024-05-01 00:00:00',
-    expiry_date: '2024-08-01 23:59:59',
+    effective_date: '2026-01-01 00:00:00',
+    expiry_date: '2026-12-31 23:59:59',
   },
   {
     id: uuidv4(),
@@ -72,8 +72,8 @@ const temporaryWhitelist = [
     reason: '季度营销活动临时配额',
     quota_amount: 500000,
     is_revoked: 1,
-    effective_date: '2024-04-01 00:00:00',
-    expiry_date: '2024-04-30 23:59:59',
+    effective_date: '2026-04-01 00:00:00',
+    expiry_date: '2026-04-30 23:59:59',
   },
   {
     id: uuidv4(),
@@ -82,8 +82,8 @@ const temporaryWhitelist = [
     reason: '风险模型训练专项临时配额-未撤销-复核专用',
     quota_amount: 1500000,
     is_revoked: 0,
-    effective_date: '2024-05-10 00:00:00',
-    expiry_date: '2024-11-10 23:59:59',
+    effective_date: '2026-01-10 00:00:00',
+    expiry_date: '2026-12-10 23:59:59',
   },
 ];
 
