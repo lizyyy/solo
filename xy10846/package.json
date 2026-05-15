@@ -1,0 +1,20 @@
+{
+  "name": "doc-slicing-strategy-console",
+  "version": "1.0.0",
+  "description": "文档切片策略台 - 知识库问答效果优化管理平台",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "init-db": "node server/database/init.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "keywords": ["document", "slicing", "rag", "knowledge-base"],
+  "author": "Dev Team",
+  "license": "MIT"
+}
