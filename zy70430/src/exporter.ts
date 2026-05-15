@@ -14,9 +14,10 @@ export class ReportExporter {
   }
 
   generateReport(generator: string, recordIds?: string[]): ExportReport {
+    const allRecords = this.guardrail.getAllRecords();
     const records = recordIds
       ? recordIds.map(id => this.guardrail.getRecordById(id)).filter(Boolean) as any
-      : this.guardrail.getPendingRecords();
+      : allRecords.filter((r: any) => r.fieldIssues.length > 0);
 
     const report: ExportReport = {
       reportId: `RPT-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,

@@ -1,4 +1,7 @@
 {
+  "reportId": "RPT-1778845302416-49YP",
+  "generatedAt": "2026-05-15T11:41:42.416Z",
+  "generator": "test-runner",
   "records": [
     {
       "id": "REC-1778845302414-MP0FUX",
@@ -54,39 +57,6 @@
       "status": "pending",
       "metadata": {
         "batch": "BATCH-202405-1"
-      }
-    },
-    {
-      "id": "REC-1778845302414-YU5DE6",
-      "requestHash": "377495f3bc2c25b08e23814f0f5d947a94f4611b75d00a75eeb632249087c30a",
-      "timestamp": "2026-05-15T11:41:42.414Z",
-      "source": "灰度发布系统",
-      "requestType": "跨天灰度发布备忘",
-      "originalInput": {
-        "projectName": "社区团购系统",
-        "version": "1.8.0",
-        "releaseDate": "2024-05-14",
-        "grayStartTime": "2024-05-14 10:00:00",
-        "grayEndTime": "2024-05-15 18:00:00",
-        "targetUsers": "试点小区团长",
-        "features": [
-          {
-            "name": "团长佣金结算优化",
-            "description": "支持T+1自动结算和账单明细导出功能",
-            "riskLevel": "low",
-            "rollbackPlan": "手动计算佣金"
-          }
-        ],
-        "changeLog": "优化团长端界面，增加数据统计面板",
-        "operator": "wangfang",
-        "approver": "chenjian",
-        "status": "completed"
-      },
-      "fieldIssues": [],
-      "corrections": [],
-      "status": "reviewed",
-      "metadata": {
-        "batch": "BATCH-202405-2"
       }
     },
     {
@@ -329,5 +299,10 @@
       "metadata": {}
     }
   ],
-  "savedAt": "2026-05-15T11:41:42.416Z"
+  "summary": {
+    "totalRecords": 9,
+    "withIssues": 9,
+    "corrected": 1,
+    "pendingReview": 8
+  }
 }
