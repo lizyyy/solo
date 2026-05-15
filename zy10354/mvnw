@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Maven Wrapper 启动脚本
+# 无需系统安装 Maven，自动下载并使用指定版本
+
+MAVEN_VERSION="3.8.8"
+WRAPPER_JAR=".mvn/wrapper/maven-wrapper.jar"
+WRAPPER_PROPERTIES=".mvn/wrapper/maven-wrapper.properties"
+
+cd "$(dirname "$0")"
+
+# 确保 .mvn/wrapper 目录存在
+mkdir -p .mvn/wrapper
+
+# 如果 wrapper jar 不存在，下载它
+if [ ! -f "$WRAPPER_JAR" ]; then
+    echo "正在下载 Maven Wrapper..."
+    
+    # 使用国内镜像加速下载
+    MAVEN_WRAPPER_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+    
+    if command -v curl > /dev/null 2>&1; then
+        curl -s -L -o "$WRAPPER_JAR" "$MAVEN_WRAPPER_URL"
+    elif command -v wget > /dev/null 2>&1; then
+        wget -q -O "$WRAPPER_JAR" "$MAVEN_WRAPPER_URL"
+    else
+        echo "错误: 需要 curl 或 wget 来下载 Maven Wrapper"
+        exit 1
+    fi
+    
+    if [ $? -ne 0 ]; then
+        echo "Maven Wrapper 下载失败"
+        exit 1
+    fi
+    echo "✓ Maven Wrapper 下载完成"
+fi
+
+# 写入 wrapper properties
+cat > "$WRAPPER_PROPERTIES" << EOF
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.zip
+wrapperUrl=https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar
+EOF
+
+# 使用 Java 执行 Maven Wrapper
+exec java -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"

@@ -272,12 +272,12 @@ public class MigrationTaskService {
         rollbackRecord.setRollbackTime(LocalDateTime.now());
         rollbackRecord.setOperator(request.getOperator());
         rollbackRecord.setRollbackReason(request.getRemark());
-        rollbackRecord.setRollbackSteps(List.of(
-                "停止新库流量",
-                "恢复旧库配置",
-                "验证旧库功能",
-                "确认回滚完成"
-        ));
+        List<String> rollbackSteps = new ArrayList<>();
+        rollbackSteps.add("停止新库流量");
+        rollbackSteps.add("恢复旧库配置");
+        rollbackSteps.add("验证旧库功能");
+        rollbackSteps.add("确认回滚完成");
+        rollbackRecord.setRollbackSteps(rollbackSteps);
         rollbackRecord.setRollbackSuccess(true);
         rollbackRecord.setRollbackResult("回滚成功，流量已切回旧库");
 
