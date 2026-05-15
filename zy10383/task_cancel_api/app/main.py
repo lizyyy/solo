@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.database import get_db, Base, engine
@@ -35,7 +36,7 @@ async def http_exception_handler(request, exc):
     )
     return JSONResponse(
         status_code=exc.status_code,
-        content=error_response.model_dump()
+        content=jsonable_encoder(error_response)
     )
 
 
@@ -103,8 +104,9 @@ def cancel_task(request: TaskCancelRequest, db: Session = Depends(get_db)):
         suppress_notification=request.suppress_notification
     )
     
-    if not result.get("success") and "valid" in result and not result["valid"]:
-        raise HTTPException(status_code=400, detail=result.get("error_message", "Cancel initiation failed"))
+    if "valid" in result and not result["valid"]:
+        status_code = 404 if result.get("error_code") == "TASK_NOT_FOUND" else 400
+        raise HTTPException(status_code=status_code, detail=result.get("error_message", "Cancel initiation failed"))
     
     if request.idempotency_key:
         engine.store_idempotent_result("/tasks/cancel", request.idempotency_key, json.dumps(result))
