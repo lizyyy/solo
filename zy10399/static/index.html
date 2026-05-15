@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异常配置回滚判定 API - 管理控制台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #303133;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #409eff;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-PENDING { background: #909399; color: white; }
+        .status-RUNNING { background: #409eff; color: white; }
+        .status-OBSERVING { background: #e6a23c; color: white; }
+        .status-SUCCESS { background: #67c23a; color: white; }
+        .status-ROLLBACK { background: #f56c6c; color: white; }
+        .status-FAILED { background: #909399; color: white; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ebeef5;
+        }
+        th {
+            background: #f5f7fa;
+            color: #606266;
+            font-weight: 500;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        .btn-primary { background: #409eff; color: white; }
+        .btn-success { background: #67c23a; color: white; }
+        .btn-danger { background: #f56c6c; color: white; }
+        .btn:disabled { background: #c0c4cc; cursor: not-allowed; }
+        .flow-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: #f9fafc;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .flow-step {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #dcdfe6;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .flow-arrow {
+            color: #909399;
+        }
+        .api-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .api-item {
+            padding: 15px;
+            background: #f9fafc;
+            border-radius: 6px;
+            border-left: 4px solid #409eff;
+        }
+        .api-method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .method-POST { background: #e6a23c; color: white; }
+        .method-GET { background: #67c23a; color: white; }
+        .api-path {
+            font-family: monospace;
+            color: #303133;
+        }
+        .refresh-btn {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 异常配置回滚判定 API 管理控制台</h1>
+
+        <div class="card">
+            <h2>📊 状态流转图</h2>
+            <div class="flow-diagram">
+                <div class="flow-step">📝 PENDING</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">🚀 RUNNING</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">👀 OBSERVING</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">✅ SUCCESS</div>
+                <div class="flow-arrow">/</div>
+                <div class="flow-step">🔄 ROLLBACK</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📦 配置发布列表</h2>
+            <button class="btn btn-primary refresh-btn" onclick="loadReleases()">🔄 刷新</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>配置名</th>
+                        <th>版本</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="releases-table">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>📜 判定历史</h2>
+            <button class="btn btn-primary refresh-btn" onclick="loadDecisions()">🔄 刷新</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>发布ID</th>
+                        <th>判定类型</th>
+                        <th>从状态</th>
+                        <th>到状态</th>
+                        <th>原因</th>
+                        <th>操作人</th>
+                        <th>时间</th>
+                    </tr>
+                </thead>
+                <tbody id="decisions-table">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🔌 API 接口列表</h2>
+            <div class="api-list">
+                <div class="api-item">
+                    <span class="api-method method-POST">POST</span>
+                    <span class="api-path">/api/releases</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">创建配置发布</p>
+                </div>
+                <div class="api-item">
+                    <span class="api-method method-GET">GET</span>
+                    <span class="api-path">/api/releases</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">列出所有发布</p>
+                </div>
+                <div class="api-item">
+                    <span class="api-method method-POST">POST</span>
+                    <span class="api-path">/api/releases/{id}/start</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">启动发布</p>
+                </div>
+                <div class="api-item">
+                    <span class="api-method method-POST">POST</span>
+                    <span class="api-path">/api/releases/{id}/baseline</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">设置基线窗口</p>
+                </div>
+                <div class="api-item">
+                    <span class="api-method method-POST">POST</span>
+                    <span class="api-path">/api/releases/{id}/threshold</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">设置异常阈值</p>
+                </div>
+                <div class="api-item">
+                    <span class="api-method method-POST">POST</span>
+                    <span class="api-path">/api/releases/{id}/observe/start</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">开始指标观察</p>
+                </div>
+                <div class="api-item">
+                    <span class="api-method method-POST">POST</span>
+                    <span class="api-path">/api/releases/{id}/observe</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">提交指标数据</p>
+                </div>
+                <div class="api-item">
+                    <span class="api-method method-POST">POST</span>
+                    <span class="api-path">/api/releases/{id}/success</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">确认发布成功</p>
+                </div>
+                <div class="api-item">
+                    <span class="api-method method-POST">POST</span>
+                    <span class="api-path">/api/releases/{id}/rollback</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">手动回滚</p>
+                </div>
+                <div class="api-item">
+                    <span class="api-method method-GET">GET</span>
+                    <span class="api-path">/api/releases/{id}/decisions</span>
+                    <p style="margin-top:8px;color:#606266;font-size:13px;">获取判定历史</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function loadReleases() {
+            try {
+                const response = await fetch(`${API_BASE}/releases`);
+                const releases = await response.json();
+                const tbody = document.getElementById('releases-table');
+                tbody.innerHTML = releases.map(release => `
+                    <tr>
+                        <td style="font-family:monospace;font-size:12px;">${release.id.substring(0, 12)}...</td>
+                        <td>${release.config_name}</td>
+                        <td>${release.version}</td>
+                        <td><span class="status-badge status-${release.status}">${release.status}</span></td>
+                        <td>${new Date(release.created_at).toLocaleString()}</td>
+                        <td>
+                            ${release.status === 'PENDING' ? `<button class="btn btn-primary" onclick="startRelease('${release.id}')">启动</button>` : ''}
+                            ${release.status === 'OBSERVING' ? `<button class="btn btn-success" onclick="confirmSuccess('${release.id}')">确认成功</button>` : ''}
+                            ${!['SUCCESS', 'ROLLBACK', 'FAILED'].includes(release.status) ? `<button class="btn btn-danger" onclick="manualRollback('${release.id}')">回滚</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('加载发布列表失败:', error);
+            }
+        }
+
+        async function loadDecisions() {
+            try {
+                const response = await fetch(`${API_BASE}/decisions`);
+                const decisions = await response.json();
+                const tbody = document.getElementById('decisions-table');
+                tbody.innerHTML = decisions.map(d => `
+                    <tr>
+                        <td style="font-family:monospace;font-size:12px;">${d.release_id.substring(0, 12)}...</td>
+                        <td>${d.decision_type}</td>
+                        <td><span class="status-badge status-${d.from_status || 'NONE'}">${d.from_status || '-'}</span></td>
+                        <td><span class="status-badge status-${d.to_status}">${d.to_status}</span></td>
+                        <td>${d.reason}</td>
+                        <td>${d.operator}</td>
+                        <td>${new Date(d.decided_at).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('加载判定历史失败:', error);
+            }
+        }
+
+        async function startRelease(id) {
+            await fetch(`${API_BASE}/releases/${id}/start`, { method: 'POST' });
+            loadReleases();
+        }
+
+        async function confirmSuccess(id) {
+            await fetch(`${API_BASE}/releases/${id}/success`, { method: 'POST' });
+            loadReleases();
+        }
+
+        async function manualRollback(id) {
+            const reason = prompt('请输入回滚原因:');
+            if (reason) {
+                await fetch(`${API_BASE}/releases/${id}/rollback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                loadReleases();
+            }
+        }
+
+        loadReleases();
+        loadDecisions();
+    </script>
+</body>
+</html>
