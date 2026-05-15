@@ -1,6 +1,6 @@
 {
   "batch_id": "LOGISTICS-INTERCEPT-20240515-PARTIAL-002",
-  "validation_time": "2026-05-15T21:46:59.964166",
+  "validation_time": "2026-05-16T05:52:16.842857",
   "overall_status": "failed",
   "success_count": 0,
   "failed_count": 4,
@@ -58,5 +58,7 @@
       },
       "failure_type": "missing_slice"
     }
-  ]
+  ],
+  "submission_hash": "a99257e1b25e95ce",
+  "has_conflict": false
 }

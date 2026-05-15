@@ -1,5 +1,6 @@
 import os
 import hashlib
+import json
 import xxhash
 from datetime import datetime
 from pathlib import Path
@@ -89,8 +90,37 @@ class SliceValidator:
         return 0 < success_count < total
 
     def validate_batch(self, batch: BatchSubmission, base_dir: str = "", force_revalidate: bool = False) -> ValidationResult:
+        current_submission_hash = self.calculate_submission_hash(batch)
         previous_result = self.check_previous_result(batch.batch_id)
+        
+        has_conflict = False
         if previous_result and not force_revalidate:
+            has_conflict, _ = self.check_content_conflict(batch, previous_result)
+            if has_conflict:
+                failure_groups = defaultdict(list)
+                failure_groups[FailureType.CONTENT_CONFLICT].append(
+                    f"批次 {batch.batch_id} 提交内容与上一次校验时不一致，请使用 -F 参数强制重新校验"
+                )
+                failure_groups[FailureType.CONTENT_CONFLICT].append(
+                    f"上次校验哈希: {previous_result.get('submission_hash', 'N/A')}"
+                )
+                failure_groups[FailureType.CONTENT_CONFLICT].append(
+                    f"本次提交哈希: {current_submission_hash}"
+                )
+                
+                return ValidationResult(
+                    batch_id=batch.batch_id,
+                    overall_status=SliceStatus.CONFLICT,
+                    success_count=previous_result.get("success_count", 0),
+                    failed_count=previous_result.get("failed_count", 0),
+                    partial_count=previous_result.get("partial_count", 0),
+                    total_slices=len(batch.slices),
+                    failure_groups=dict(failure_groups),
+                    validated_slices=previous_result.get("validated_slices", []),
+                    submission_hash=current_submission_hash,
+                    has_conflict=True,
+                )
+            
             return ValidationResult(**previous_result)
 
         results = []
@@ -123,10 +153,10 @@ class SliceValidator:
         failed_count = sum(1 for r in results if r[0] == SliceStatus.FAILED)
         partial_count = len(batch.slices) - success_count - failed_count
 
-        if failed_count > 0 or FailureType.PARTIAL_SUCCESS in failure_groups:
-            overall_status = SliceStatus.PARTIAL if partial_count > 0 else SliceStatus.FAILED
-            if FailureType.PARTIAL_SUCCESS in failure_groups:
-                overall_status = SliceStatus.PARTIAL
+        if FailureType.PARTIAL_SUCCESS in failure_groups:
+            overall_status = SliceStatus.PARTIAL
+        elif failed_count > 0:
+            overall_status = SliceStatus.FAILED
         else:
             overall_status = SliceStatus.SUCCESS
 
@@ -139,6 +169,8 @@ class SliceValidator:
             total_slices=len(batch.slices),
             failure_groups=dict(failure_groups),
             validated_slices=validated_slices,
+            submission_hash=current_submission_hash,
+            has_conflict=False,
         )
 
         self._save_validation_result(validation_result)
@@ -150,6 +182,33 @@ class SliceValidator:
         result_file = self.results_dir / f"{result.batch_id}_validation.json"
         with open(result_file, "w", encoding="utf-8") as f:
             json.dump(result.model_dump(mode="json"), f, ensure_ascii=False, indent=2)
+
+    def calculate_submission_hash(self, batch: BatchSubmission) -> str:
+        slices_data = []
+        for slice_file in batch.slices:
+            slice_dict = {
+                "file_name": slice_file.file_name,
+                "file_path": slice_file.file_path,
+                "file_size": slice_file.file_size,
+                "slice_index": slice_file.slice_index,
+                "checksum": slice_file.checksum,
+                "record_count": slice_file.record_count,
+            }
+            slices_data.append(slice_dict)
+        
+        content = json.dumps(slices_data, sort_keys=True, ensure_ascii=False)
+        h = xxhash.xxh3_64()
+        h.update(content.encode("utf-8"))
+        return h.hexdigest()
+
+    def check_content_conflict(self, batch: BatchSubmission, previous_result: Dict) -> Tuple[bool, str]:
+        current_hash = self.calculate_submission_hash(batch)
+        previous_hash = previous_result.get("submission_hash", "")
+        
+        if previous_hash and current_hash != previous_hash:
+            return True, current_hash
+        
+        return False, current_hash
 
     def filter_by_failure_type(self, batch_id: str, failure_type: FailureType) -> List[Dict]:
         result = self.check_previous_result(batch_id)

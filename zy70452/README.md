@@ -95,29 +95,72 @@ python main.py confirm-partition LOGISTICS-INTERCEPT-20240515-001 samples/partit
 
 ## 失败路径演示
 
-### 场景：部分成功（只成功一半）
+### 场景1：部分成功（只成功一半）
 
-使用 `logistics_batch_partial.json` 演示典型的失败路径：
+使用 `logistics_batch_half_success.json` 演示"只成功一半"的失败路径：
 
 ```bash
-python main.py validate samples/logistics_batch_partial.json
+python3 main.py validate samples/logistics_batch_half_success.json
 ```
 
-预期失败类型：
+**预期结果：**
+- `overall_status = partial`
+- 成功 2 个，失败 2 个（正好 50%）
+- 出现 `partial_success` 分组
+- 程序明确识别出"部分成功"状态，需要人工介入
 
-1. **checksum_mismatch** - 校验和不匹配（数据损坏）
-2. **missing_slice** - 切片文件缺失（传输中断）
-3. **size_mismatch** - 文件大小不匹配（不完整写入）
-4. **partial_success** - 部分切片成功，部分失败
+### 场景2：同批次内容冲突
+
+当同一 batch_id 但内容不同再次提交时，程序会检测到冲突：
+
+```bash
+# 第一次提交
+python3 main.py validate samples/logistics_batch_half_success.json
+
+# 第二次提交（内容已修改）
+python3 main.py validate samples/logistics_batch_modified.json
+```
+
+**预期结果：**
+- `overall_status = conflict`
+- 出现 `content_conflict` 分组
+- 显示两次提交的哈希对比
+- 提示用户使用 `-F` 参数强制重新校验
+
+### 场景3：复用历史结果
+
+完全相同的内容再次提交时，程序自动复用旧结果：
+
+```bash
+# 多次提交同一文件
+python3 main.py validate samples/logistics_batch_half_success.json
+python3 main.py validate samples/logistics_batch_half_success.json
+```
+
+**预期结果：**
+- 不会重复执行校验
+- 直接返回之前的校验结果
+- 没有 `content_conflict` 警告
+
+### 强制重新校验
+
+当确实需要重新校验时：
+
+```bash
+python3 main.py validate samples/logistics_batch_modified.json -F
+```
 
 ### 按失败类型过滤查询
 
 ```bash
 # 查看所有缺失的切片
-python main.py filter LOGISTICS-INTERCEPT-20240515-PARTIAL-002 missing_slice
+python3 main.py filter LOGISTICS-INTERCEPT-20240515-HALF-003 missing_slice
 
 # 查看校验和错误的文件
-python main.py filter LOGISTICS-INTERCEPT-20240515-PARTIAL-002 checksum_mismatch
+python3 main.py filter LOGISTICS-INTERCEPT-20240515-HALF-003 checksum_mismatch
+
+# 查看大小不匹配的文件
+python3 main.py filter LOGISTICS-INTERCEPT-20240515-HALF-003 size_mismatch
 ```
 
 ## 回滚与候选清单

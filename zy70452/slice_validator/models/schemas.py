@@ -20,6 +20,7 @@ class FailureType(str, Enum):
     TIMEOUT = "timeout"
     DUPLICATE_RECORD = "duplicate_record"
     PARTIAL_SUCCESS = "partial_success"
+    CONTENT_CONFLICT = "content_conflict"
 
 
 class PartitionInfo(BaseModel):
@@ -60,6 +61,8 @@ class ValidationResult(BaseModel):
     total_slices: int
     failure_groups: Dict[FailureType, List[str]]
     validated_slices: List[Dict[str, Any]]
+    submission_hash: str
+    has_conflict: bool = False
 
 
 class CandidateAction(BaseModel):
