@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
+from io import BytesIO, StringIO
 
 from database import init_db, get_db, DutyRecord, SamplingRule, ProcessingBatch, OperationLog, CleanupCandidate
 from schemas import (
@@ -19,14 +21,15 @@ from sampling_service import (
     create_duty_record, batch_create_duty_records,
     sample_call_chain, log_operation,
     create_cleanup_candidate, approve_cleanup_candidate, execute_cleanup,
-    get_operation_logs_by_time, get_batch_raw_records, generate_batch_id
+    get_operation_logs_by_time, get_batch_raw_records, generate_batch_id,
+    generate_sampling_export_csv, generate_sampling_export_excel
 )
 from demo_data import init_all_demo_data
 
 app = FastAPI(
     title="调用链采样导出服务",
-    description="研发值班记录调用链采样导出后端服务，支持规则版本化、脏数据处理、数据安全清理",
-    version="1.0.0"
+    description="研发值班记录调用链采样导出后端服务，支持规则版本化、脏数据处理、数据安全清理、CSV/Excel多格式导出",
+    version="1.1.0"
 )
 
 app.add_middleware(
@@ -229,6 +232,84 @@ def trace_cleanup_by_time(start_time: datetime, end_time: datetime, db: Session 
 @app.post("/api/utils/generate-batch-id", summary="生成批次ID", tags=["工具"])
 def gen_batch_id(department: str, date_str: str):
     return {"batch_id": generate_batch_id(department, date_str)}
+
+
+@app.get("/api/export/{batch_id}/csv", summary="导出批次采样结果CSV", tags=["导出管理"])
+def export_batch_csv(batch_id: str, sampled_only: bool = True, operator: str = Query("unknown"), db: Session = Depends(get_db)):
+    try:
+        csv_content, summary = generate_sampling_export_csv(db, batch_id, sampled_only)
+        
+        log_operation(db, "export_csv", batch_id, None, operator, summary)
+        
+        output = StringIO()
+        output.write(csv_content)
+        output.seek(0)
+        
+        filename = f"result_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/export/{batch_id}/excel", summary="导出批次采样结果Excel", tags=["导出管理"])
+def export_batch_excel(batch_id: str, sampled_only: bool = True, operator: str = Query("unknown"), db: Session = Depends(get_db)):
+    try:
+        excel_content, summary = generate_sampling_export_excel(db, batch_id, sampled_only)
+        
+        log_operation(db, "export_excel", batch_id, None, operator, summary)
+        
+        output = BytesIO(excel_content)
+        output.seek(0)
+        
+        filename = f"result_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/export/{batch_id}/summary", summary="获取批次导出摘要信息", tags=["导出管理"])
+def get_export_summary(batch_id: str, db: Session = Depends(get_db)):
+    batch = db.query(ProcessingBatch).filter(ProcessingBatch.batch_id == batch_id).first()
+    if not batch:
+        raise HTTPException(status_code=404, detail="批次不存在")
+    
+    logs = db.query(OperationLog).filter(
+        OperationLog.batch_id == batch_id,
+        OperationLog.operation_type.in_(["export_csv", "export_excel"])
+    ).order_by(OperationLog.operation_time.desc()).all()
+    
+    return {
+        "batch_id": batch_id,
+        "department": batch.department,
+        "date_range": f"{batch.start_date} ~ {batch.end_date}",
+        "total_records": batch.total_records,
+        "sampled_count": batch.sampled_count,
+        "status": batch.status,
+        "rule_snapshot": batch.rule_snapshot,
+        "export_history": [
+            {
+                "export_time": log.operation_time,
+                "export_format": log.details.get("export_format", ""),
+                "operator": log.operator,
+                "exported_count": log.details.get("sampled_count", 0)
+            }
+            for log in logs
+        ]
+    }
 
 
 @app.get("/", summary="服务健康检查", tags=["系统"])

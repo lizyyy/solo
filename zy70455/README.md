@@ -82,6 +82,18 @@ python main.py
 - `GET /api/logs` - 查询操作日志
 - `GET /api/logs/trace` - 根据执行时间追溯数据擦除申请
 
+### 导出管理
+- `GET /api/export/{batch_id}/csv` - 导出批次采样结果为CSV文件
+  - 支持 `sampled_only` 参数，`True` 仅导采样结果，`False` 导出全部记录
+  - 自动记录导出审计日志
+- `GET /api/export/{batch_id}/excel` - 导出批次采样结果为Excel文件
+  - 包含3个Sheet：采样结果、采样规则、事件详情
+  - 晚到回执自动标红高亮显示
+  - 支持 `sampled_only` 参数
+- `GET /api/export/{batch_id}/summary` - 获取批次导出摘要信息
+  - 显示批次基本信息
+  - 显示历史导出记录（格式、时间、操作人）
+
 ## 核心业务流程
 
 ### 1. 典型采样流程

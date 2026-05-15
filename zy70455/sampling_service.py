@@ -297,3 +297,173 @@ def get_operation_logs_by_time(db: Session, start_time: datetime, end_time: date
 
 def get_batch_raw_records(db: Session, batch_id: str) -> List[DutyRecord]:
     return db.query(DutyRecord).filter(DutyRecord.batch_id == batch_id).all()
+
+
+def generate_sampling_export_csv(db: Session, batch_id: str, sampled_only: bool = True) -> Tuple[str, Dict[str, Any]]:
+    batch = db.query(ProcessingBatch).filter(ProcessingBatch.batch_id == batch_id).first()
+    if not batch:
+        raise ValueError(f"Batch {batch_id} not found")
+    
+    if sampled_only:
+        records, summary = sample_call_chain(db, batch_id)
+    else:
+        records = get_batch_raw_records(db, batch_id)
+        summary = {
+            "total_records": len(records),
+            "sampled_count": len(records),
+            "export_all": True
+        }
+    
+    import csv
+    from io import StringIO
+    
+    output = StringIO()
+    writer = csv.writer(output)
+    
+    headers = [
+        "记录ID", "批次ID", "值班日期", "部门", "值班人员", 
+        "联系电话", "事件数量", "外部回执状态",
+        "回执时间", "创建时间", "更新时间"
+    ]
+    writer.writerow(headers)
+    
+    for record in records:
+        writer.writerow([
+            record.id,
+            record.batch_id,
+            record.duty_date,
+            record.department,
+            record.duty_person,
+            record.phone,
+            record.incident_count,
+            record.external_receipt_status,
+            record.external_receipt_time.strftime("%Y-%m-%d %H:%M:%S") if record.external_receipt_time else "",
+            record.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            record.updated_at.strftime("%Y-%m-%d %H:%M:%S")
+        ])
+    
+    csv_content = output.getvalue()
+    output.close()
+    
+    export_summary = {
+        **summary,
+        "export_format": "CSV",
+        "export_time": datetime.utcnow().isoformat(),
+        "batch_id": batch_id,
+        "department": batch.department,
+        "date_range": f"{batch.start_date} ~ {batch.end_date}"
+    }
+    
+    return csv_content, export_summary
+
+
+def generate_sampling_export_excel(db: Session, batch_id: str, sampled_only: bool = True) -> Tuple[bytes, Dict[str, Any]]:
+    batch = db.query(ProcessingBatch).filter(ProcessingBatch.batch_id == batch_id).first()
+    if not batch:
+        raise ValueError(f"Batch {batch_id} not found")
+    
+    if sampled_only:
+        records, summary = sample_call_chain(db, batch_id)
+    else:
+        records = get_batch_raw_records(db, batch_id)
+        summary = {
+            "total_records": len(records),
+            "sampled_count": len(records),
+            "export_all": True
+        }
+    
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment
+    from io import BytesIO
+    
+    output = BytesIO()
+    wb = Workbook()
+    
+    ws = wb.active
+    ws.title = "采样结果"
+    
+    headers = [
+        "记录ID", "批次ID", "值班日期", "部门", "值班人员",
+        "联系电话", "事件数量", "外部回执状态",
+        "回执时间", "创建时间", "更新时间"
+    ]
+    
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal="center")
+    
+    for row, record in enumerate(records, 2):
+        ws.cell(row=row, column=1, value=record.id)
+        ws.cell(row=row, column=2, value=record.batch_id)
+        ws.cell(row=row, column=3, value=record.duty_date)
+        ws.cell(row=row, column=4, value=record.department)
+        ws.cell(row=row, column=5, value=record.duty_person)
+        ws.cell(row=row, column=6, value=record.phone)
+        ws.cell(row=row, column=7, value=record.incident_count)
+        ws.cell(row=row, column=8, value=record.external_receipt_status)
+        ws.cell(row=row, column=9, value=record.external_receipt_time.strftime("%Y-%m-%d %H:%M:%S") if record.external_receipt_time else "")
+        ws.cell(row=row, column=10, value=record.created_at.strftime("%Y-%m-%d %H:%M:%S"))
+        ws.cell(row=row, column=11, value=record.updated_at.strftime("%Y-%m-%d %H:%M:%S"))
+        
+        if record.external_receipt_status == "late":
+            late_fill = PatternFill(start_color="FFC7CE", end_color="FFC7CE", fill_type="solid")
+            for col in range(1, 12):
+                ws.cell(row=row, column=col).fill = late_fill
+    
+    for col in range(1, 12):
+        ws.column_dimensions[chr(64 + col)].width = 18
+    
+    ws_rules = wb.create_sheet(title="采样规则")
+    if batch.rule_snapshot:
+        rule_headers = ["规则版本", "规则名称", "采样率", "最小事件数阈值", "回执超时小时"]
+        for col, header in enumerate(rule_headers, 1):
+            cell = ws_rules.cell(row=1, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+        
+        ws_rules.cell(row=2, column=1, value=batch.rule_snapshot.get("version", ""))
+        ws_rules.cell(row=2, column=2, value=batch.rule_snapshot.get("name", ""))
+        ws_rules.cell(row=2, column=3, value=batch.rule_snapshot.get("sampling_rate", 0))
+        ws_rules.cell(row=2, column=4, value=batch.rule_snapshot.get("min_incidents", 0))
+        ws_rules.cell(row=2, column=5, value=batch.rule_snapshot.get("receipt_timeout_hours", 0))
+    
+    ws_incidents = wb.create_sheet(title="事件详情")
+    incident_headers = ["记录ID", "事件ID", "事件类型", "级别", "开始时间", "处理人", "描述"]
+    for col, header in enumerate(incident_headers, 1):
+        cell = ws_incidents.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+    
+    incident_row = 2
+    for record in records:
+        if record.incidents:
+            for incident in record.incidents:
+                ws_incidents.cell(row=incident_row, column=1, value=record.id)
+                ws_incidents.cell(row=incident_row, column=2, value=incident.get("incident_id", ""))
+                ws_incidents.cell(row=incident_row, column=3, value=incident.get("type", ""))
+                ws_incidents.cell(row=incident_row, column=4, value=incident.get("level", ""))
+                ws_incidents.cell(row=incident_row, column=5, value=incident.get("start_time", ""))
+                ws_incidents.cell(row=incident_row, column=6, value=incident.get("handler", ""))
+                ws_incidents.cell(row=incident_row, column=7, value=incident.get("description", ""))
+                incident_row += 1
+    
+    wb.save(output)
+    excel_content = output.getvalue()
+    output.close()
+    
+    export_summary = {
+        **summary,
+        "export_format": "Excel",
+        "export_time": datetime.utcnow().isoformat(),
+        "batch_id": batch_id,
+        "department": batch.department,
+        "date_range": f"{batch.start_date} ~ {batch.end_date}",
+        "sheets": ["采样结果", "采样规则", "事件详情"]
+    }
+    
+    return excel_content, export_summary
