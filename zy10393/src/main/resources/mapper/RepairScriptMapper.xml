@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datarepair.approval.mapper.RepairScriptMapper">
+
+    <select id="queryPage" resultType="com.datarepair.approval.entity.RepairScript">
+        SELECT * FROM repair_script
+        WHERE deleted = 0
+        <if test="query.scriptNo != null and query.scriptNo != ''">
+            AND script_no LIKE CONCAT('%', #{query.scriptNo}, '%')
+        </if>
+        <if test="query.scriptName != null and query.scriptName != ''">
+            AND script_name LIKE CONCAT('%', #{query.scriptName}, '%')
+        </if>
+        <if test="query.scriptType != null and query.scriptType != ''">
+            AND script_type = #{query.scriptType}
+        </if>
+        <if test="query.status != null">
+            AND status = #{query.status}
+        </if>
+        <if test="query.businessSystem != null and query.businessSystem != ''">
+            AND business_system LIKE CONCAT('%', #{query.businessSystem}, '%')
+        </if>
+        <if test="query.applicant != null and query.applicant != ''">
+            AND applicant LIKE CONCAT('%', #{query.applicant}, '%')
+        </if>
+        <if test="query.startTime != null">
+            AND create_time >= #{query.startTime}
+        </if>
+        <if test="query.endTime != null">
+            AND create_time <= #{query.endTime}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectByRequestId" resultType="com.datarepair.approval.entity.RepairScript">
+        SELECT * FROM repair_script
+        WHERE request_id = #{requestId}
+        AND deleted = 0
+        LIMIT 1
+    </select>
+
+</mapper>

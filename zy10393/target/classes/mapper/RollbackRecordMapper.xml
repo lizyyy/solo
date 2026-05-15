@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datarepair.approval.mapper.RollbackRecordMapper">
+
+    <select id="selectByScriptId" resultType="com.datarepair.approval.entity.RollbackRecord">
+        SELECT * FROM rollback_record
+        WHERE script_id = #{scriptId}
+        AND deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectByExecutionBatchId" resultType="com.datarepair.approval.entity.RollbackRecord">
+        SELECT * FROM rollback_record
+        WHERE execution_batch_id = #{executionBatchId}
+        AND deleted = 0
+        LIMIT 1
+    </select>
+
+</mapper>

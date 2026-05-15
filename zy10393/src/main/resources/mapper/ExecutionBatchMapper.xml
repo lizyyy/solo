@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datarepair.approval.mapper.ExecutionBatchMapper">
+
+    <select id="selectByScriptId" resultType="com.datarepair.approval.entity.ExecutionBatch">
+        SELECT * FROM execution_batch
+        WHERE script_id = #{scriptId}
+        AND deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectLatestByScriptId" resultType="com.datarepair.approval.entity.ExecutionBatch">
+        SELECT * FROM execution_batch
+        WHERE script_id = #{scriptId}
+        AND deleted = 0
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectByBatchNo" resultType="com.datarepair.approval.entity.ExecutionBatch">
+        SELECT * FROM execution_batch
+        WHERE batch_no = #{batchNo}
+        AND deleted = 0
+        LIMIT 1
+    </select>
+
+</mapper>
