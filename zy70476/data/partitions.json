@@ -1,0 +1,104 @@
+[
+  {
+    "id": "1662b80e-bd89-4f71-98b5-f387807034ec",
+    "source_system": "ERP",
+    "environment": "prod",
+    "database_name": "finance",
+    "table_name": "invoices",
+    "partition_column": "dt",
+    "partition_value": "2024-01-15",
+    "data_date": "2024-01-15",
+    "record_count": 15000,
+    "file_size": 256.5,
+    "creation_time": "2026-05-14 07:37:43.623166",
+    "update_time": "2026-05-15 07:37:43.623184",
+    "original_input": {
+      "source": "ERP_finance_invoices",
+      "load_time": "2024-01-16 03:00:00",
+      "etl_job": "job_001",
+      "source_count": 15000
+    }
+  },
+  {
+    "id": "137f1a16-2dfb-4bd8-8aca-2917bd9801aa",
+    "source_system": "CRM",
+    "environment": "prod",
+    "database_name": "customer",
+    "table_name": "orders",
+    "partition_column": "dt",
+    "partition_value": "2024-01-15",
+    "data_date": "2024-01-15",
+    "record_count": 8500,
+    "file_size": 128.3,
+    "creation_time": "2026-05-14 07:37:43.623261",
+    "update_time": "2026-05-15 07:37:43.623266",
+    "original_input": {
+      "source": "CRM_customer_orders",
+      "load_time": "2024-01-16 04:00:00",
+      "etl_job": "job_002",
+      "source_count": 8500
+    }
+  },
+  {
+    "id": "2e284ce9-0cd6-46ff-9df6-cd8362134238",
+    "source_system": "HRS",
+    "environment": "test",
+    "database_name": "employee",
+    "table_name": "attendance",
+    "partition_column": "dt",
+    "partition_value": "2024-01-15",
+    "data_date": "2024-01-15",
+    "record_count": 0,
+    "file_size": 0.1,
+    "creation_time": "2026-05-14 07:37:43.623285",
+    "update_time": "2026-05-15 07:37:43.623286",
+    "original_input": {
+      "source": "HRS_employee_attendance",
+      "load_time": "2024-01-16 05:00:00",
+      "etl_job": "job_003",
+      "source_count": 0,
+      "note": "测试环境数据"
+    }
+  },
+  {
+    "id": "49864b42-956e-4d63-9ce0-be2e8c5c0ef5",
+    "source_system": "OMS",
+    "environment": "prod",
+    "database_name": "order",
+    "table_name": "order_detail",
+    "partition_column": "dt",
+    "partition_value": "2023-12-01",
+    "data_date": "2023-12-01",
+    "record_count": 50000,
+    "file_size": 512.8,
+    "creation_time": "2026-04-01 07:37:43.623295",
+    "update_time": "2026-04-02 07:37:43.623296",
+    "original_input": {
+      "source": "OMS_order_order_detail",
+      "load_time": "2023-12-02 03:00:00",
+      "etl_job": "job_004",
+      "source_count": 50000
+    }
+  },
+  {
+    "id": "d20254c1-7223-4aed-8d2b-76a97b8332d5",
+    "source_system": "WMS",
+    "environment": "uat",
+    "database_name": "inventory",
+    "table_name": "stock",
+    "partition_column": "dt",
+    "partition_value": "2024-01-10",
+    "data_date": "2024-01-10",
+    "record_count": 3200,
+    "file_size": 45.2,
+    "creation_time": "2026-05-10 07:37:43.623307",
+    "update_time": "2026-05-11 07:37:43.623308",
+    "original_input": {
+      "source": "WMS_inventory_stock",
+      "load_time": "2024-01-11 06:00:00",
+      "etl_job": "job_005",
+      "source_count": 3200,
+      "uat_tester": "zhang_san"
+    }
+  }
+]

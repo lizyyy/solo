@@ -1,0 +1,47 @@
+[
+  {
+    "id": "35399a17-4695-4a30-9660-bbcce4547d5a",
+    "environment": "prod",
+    "invoice_no": "INV-2024-001234",
+    "red冲_date": "2024-01-15",
+    "amount": 12500.5,
+    "status": "completed",
+    "original_input": {
+      "original_invoice_no": "INV-2024-001001",
+      "reason": "客户退货",
+      "operator": "wang_wu",
+      "approval_time": "2024-01-15 14:30:00"
+    },
+    "source_partition_id": null
+  },
+  {
+    "id": "9189cfa5-9319-4650-a5cf-82de721d5ae1",
+    "environment": "test",
+    "invoice_no": "INV-TEST-000567",
+    "red冲_date": "2024-01-10",
+    "amount": 3200.0,
+    "status": "pending",
+    "original_input": {
+      "original_invoice_no": "INV-TEST-000456",
+      "reason": "测试红冲",
+      "operator": "test_user",
+      "approval_time": null
+    },
+    "source_partition_id": null
+  },
+  {
+    "id": "d258e1e3-43bb-45de-b61c-e8261bed84f5",
+    "environment": "prod",
+    "invoice_no": "INV-2024-001235",
+    "red冲_date": "2024-01-14",
+    "amount": 8900.0,
+    "status": "completed",
+    "original_input": {
+      "original_invoice_no": "INV-2024-001005",
+      "reason": "金额调整",
+      "operator": "li_liu",
+      "approval_time": "2024-01-14 10:15:00"
+    },
+    "source_partition_id": null
+  }
+]

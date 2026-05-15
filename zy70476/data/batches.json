@@ -1,0 +1,28 @@
+[
+  {
+    "batch_id": "da612ab4-a2f5-4cdd-989d-77586ebffd32",
+    "rule_version": "1.0.0",
+    "rule_type": "normal",
+    "start_time": "2026-05-16 07:37:43.625063",
+    "end_time": "2026-05-16 07:37:43.630767",
+    "total_count": 5,
+    "pass_count": 0,
+    "fail_count": 1,
+    "warning_count": 4,
+    "status": "completed",
+    "executed_by": "test_user"
+  },
+  {
+    "batch_id": "13d10b83-503a-4aba-8898-f2bb4b0d7522",
+    "rule_version": "1.0.0-wide",
+    "rule_type": "wide",
+    "start_time": "2026-05-16 07:37:43.631594",
+    "end_time": "2026-05-16 07:37:43.632893",
+    "total_count": 5,
+    "pass_count": 0,
+    "fail_count": 1,
+    "warning_count": 4,
+    "status": "completed",
+    "executed_by": "test_user"
+  }
+]

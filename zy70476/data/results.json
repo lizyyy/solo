@@ -1,0 +1,255 @@
+[
+  {
+    "batch_id": "da612ab4-a2f5-4cdd-989d-77586ebffd32",
+    "partition_id": "1662b80e-bd89-4f71-98b5-f387807034ec",
+    "status": "warning",
+    "rule_id": "rule_001",
+    "rule_version": "1.0.0",
+    "details": {
+      "partition_id": "1662b80e-bd89-4f71-98b5-f387807034ec",
+      "rule_applied": "rule_001",
+      "rule_version": "1.0.0",
+      "record_count": 15000,
+      "file_size_mb": 256.5,
+      "data_date": "2024-01-15",
+      "days_since_data_date": 852,
+      "check_results": {
+        "record_count": true,
+        "file_size": true,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "数据日期(2024-01-15)距今852天，超过容忍阈值(7天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.628164"
+  },
+  {
+    "batch_id": "da612ab4-a2f5-4cdd-989d-77586ebffd32",
+    "partition_id": "137f1a16-2dfb-4bd8-8aca-2917bd9801aa",
+    "status": "warning",
+    "rule_id": "rule_001",
+    "rule_version": "1.0.0",
+    "details": {
+      "partition_id": "137f1a16-2dfb-4bd8-8aca-2917bd9801aa",
+      "rule_applied": "rule_001",
+      "rule_version": "1.0.0",
+      "record_count": 8500,
+      "file_size_mb": 128.3,
+      "data_date": "2024-01-15",
+      "days_since_data_date": 852,
+      "check_results": {
+        "record_count": true,
+        "file_size": true,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "数据日期(2024-01-15)距今852天，超过容忍阈值(7天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.628828"
+  },
+  {
+    "batch_id": "da612ab4-a2f5-4cdd-989d-77586ebffd32",
+    "partition_id": "2e284ce9-0cd6-46ff-9df6-cd8362134238",
+    "status": "fail",
+    "rule_id": "rule_001",
+    "rule_version": "1.0.0",
+    "details": {
+      "partition_id": "2e284ce9-0cd6-46ff-9df6-cd8362134238",
+      "rule_applied": "rule_001",
+      "rule_version": "1.0.0",
+      "record_count": 0,
+      "file_size_mb": 0.1,
+      "data_date": "2024-01-15",
+      "days_since_data_date": 852,
+      "check_results": {
+        "record_count": false,
+        "file_size": null,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "分区记录数为0，请检查数据同步是否正常",
+      "文件大小(0.1MB)低于最小值阈值(1.0MB)",
+      "数据日期(2024-01-15)距今852天，超过容忍阈值(7天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.629195"
+  },
+  {
+    "batch_id": "da612ab4-a2f5-4cdd-989d-77586ebffd32",
+    "partition_id": "49864b42-956e-4d63-9ce0-be2e8c5c0ef5",
+    "status": "warning",
+    "rule_id": "rule_001",
+    "rule_version": "1.0.0",
+    "details": {
+      "partition_id": "49864b42-956e-4d63-9ce0-be2e8c5c0ef5",
+      "rule_applied": "rule_001",
+      "rule_version": "1.0.0",
+      "record_count": 50000,
+      "file_size_mb": 512.8,
+      "data_date": "2023-12-01",
+      "days_since_data_date": 897,
+      "check_results": {
+        "record_count": true,
+        "file_size": true,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "数据日期(2023-12-01)距今897天，超过容忍阈值(7天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.629676"
+  },
+  {
+    "batch_id": "da612ab4-a2f5-4cdd-989d-77586ebffd32",
+    "partition_id": "d20254c1-7223-4aed-8d2b-76a97b8332d5",
+    "status": "warning",
+    "rule_id": "rule_001",
+    "rule_version": "1.0.0",
+    "details": {
+      "partition_id": "d20254c1-7223-4aed-8d2b-76a97b8332d5",
+      "rule_applied": "rule_001",
+      "rule_version": "1.0.0",
+      "record_count": 3200,
+      "file_size_mb": 45.2,
+      "data_date": "2024-01-10",
+      "days_since_data_date": 857,
+      "check_results": {
+        "record_count": true,
+        "file_size": true,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "数据日期(2024-01-10)距今857天，超过容忍阈值(7天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.630132"
+  },
+  {
+    "batch_id": "13d10b83-503a-4aba-8898-f2bb4b0d7522",
+    "partition_id": "1662b80e-bd89-4f71-98b5-f387807034ec",
+    "status": "warning",
+    "rule_id": "rule_002",
+    "rule_version": "1.0.0-wide",
+    "details": {
+      "partition_id": "1662b80e-bd89-4f71-98b5-f387807034ec",
+      "rule_applied": "rule_002",
+      "rule_version": "1.0.0-wide",
+      "record_count": 15000,
+      "file_size_mb": 256.5,
+      "data_date": "2024-01-15",
+      "days_since_data_date": 852,
+      "check_results": {
+        "record_count": true,
+        "file_size": true,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "数据日期(2024-01-15)距今852天，超过容忍阈值(90天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.631768"
+  },
+  {
+    "batch_id": "13d10b83-503a-4aba-8898-f2bb4b0d7522",
+    "partition_id": "137f1a16-2dfb-4bd8-8aca-2917bd9801aa",
+    "status": "warning",
+    "rule_id": "rule_002",
+    "rule_version": "1.0.0-wide",
+    "details": {
+      "partition_id": "137f1a16-2dfb-4bd8-8aca-2917bd9801aa",
+      "rule_applied": "rule_002",
+      "rule_version": "1.0.0-wide",
+      "record_count": 8500,
+      "file_size_mb": 128.3,
+      "data_date": "2024-01-15",
+      "days_since_data_date": 852,
+      "check_results": {
+        "record_count": true,
+        "file_size": true,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "数据日期(2024-01-15)距今852天，超过容忍阈值(90天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.632005"
+  },
+  {
+    "batch_id": "13d10b83-503a-4aba-8898-f2bb4b0d7522",
+    "partition_id": "2e284ce9-0cd6-46ff-9df6-cd8362134238",
+    "status": "fail",
+    "rule_id": "rule_002",
+    "rule_version": "1.0.0-wide",
+    "details": {
+      "partition_id": "2e284ce9-0cd6-46ff-9df6-cd8362134238",
+      "rule_applied": "rule_002",
+      "rule_version": "1.0.0-wide",
+      "record_count": 0,
+      "file_size_mb": 0.1,
+      "data_date": "2024-01-15",
+      "days_since_data_date": 852,
+      "check_results": {
+        "record_count": false,
+        "file_size": true,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "分区记录数为0，请检查数据同步是否正常",
+      "数据日期(2024-01-15)距今852天，超过容忍阈值(90天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.632217"
+  },
+  {
+    "batch_id": "13d10b83-503a-4aba-8898-f2bb4b0d7522",
+    "partition_id": "49864b42-956e-4d63-9ce0-be2e8c5c0ef5",
+    "status": "warning",
+    "rule_id": "rule_002",
+    "rule_version": "1.0.0-wide",
+    "details": {
+      "partition_id": "49864b42-956e-4d63-9ce0-be2e8c5c0ef5",
+      "rule_applied": "rule_002",
+      "rule_version": "1.0.0-wide",
+      "record_count": 50000,
+      "file_size_mb": 512.8,
+      "data_date": "2023-12-01",
+      "days_since_data_date": 897,
+      "check_results": {
+        "record_count": true,
+        "file_size": true,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "数据日期(2023-12-01)距今897天，超过容忍阈值(90天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.632432"
+  },
+  {
+    "batch_id": "13d10b83-503a-4aba-8898-f2bb4b0d7522",
+    "partition_id": "d20254c1-7223-4aed-8d2b-76a97b8332d5",
+    "status": "warning",
+    "rule_id": "rule_002",
+    "rule_version": "1.0.0-wide",
+    "details": {
+      "partition_id": "d20254c1-7223-4aed-8d2b-76a97b8332d5",
+      "rule_applied": "rule_002",
+      "rule_version": "1.0.0-wide",
+      "record_count": 3200,
+      "file_size_mb": 45.2,
+      "data_date": "2024-01-10",
+      "days_since_data_date": 857,
+      "check_results": {
+        "record_count": true,
+        "file_size": true,
+        "data_date": null
+      }
+    },
+    "suggestions": [
+      "数据日期(2024-01-10)距今857天，超过容忍阈值(90天)"
+    ],
+    "detected_at": "2026-05-16 07:37:43.632649"
+  }
+]
