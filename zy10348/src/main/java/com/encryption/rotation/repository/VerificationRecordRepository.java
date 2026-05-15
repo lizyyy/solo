@@ -11,4 +11,5 @@ public interface VerificationRecordRepository extends JpaRepository<Verification
     List<VerificationRecord> findByBatchIdOrderByCreatedAtDesc(String batchId);
     List<VerificationRecord> findByTaskIdOrderByCreatedAtDesc(String taskId);
     List<VerificationRecord> findByBatchIdAndIsSampledTrue(String batchId);
+    long countByBatchId(String batchId);
 }

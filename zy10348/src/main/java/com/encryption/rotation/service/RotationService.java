@@ -220,12 +220,39 @@ public class RotationService {
     public RotationBatch startVerification(String batchId, String operator) {
         RotationBatch batch = getBatchOrThrow(batchId);
         
+        if (batch.getStatus() == RotationStatus.VERIFYING) {
+            log.info("批次{}已处于验证状态，直接返回", batchId);
+            return batch;
+        }
+        
         stateMachine.validateTransition(batch.getStatus(), RotationStatus.VERIFYING);
         batch.setStatus(RotationStatus.VERIFYING);
         batch = batchRepository.save(batch);
 
+        createVerificationSamples(batch, operator);
+        return batch;
+    }
+
+    private void createVerificationSamples(RotationBatch batch) {
+        createVerificationSamples(batch, "system");
+    }
+
+    private void createVerificationSamples(RotationBatch batch, String operator) {
+        String batchId = batch.getId();
+        
+        long existingRecords = verificationRecordRepository.countByBatchId(batchId);
+        if (existingRecords > 0) {
+            log.info("批次{}已有验证记录，跳过抽样创建", batchId);
+            return;
+        }
+
         List<ReEncryptionTask> successTasks = taskRepository.findByBatchIdAndStatusOrderByCreatedAt(
             batchId, TaskStatus.SUCCESS);
+        
+        if (successTasks.isEmpty()) {
+            log.info("批次{}无成功任务，跳过验证抽样", batchId);
+            return;
+        }
         
         int sampleSize = Math.max(1, (int) Math.ceil(successTasks.size() * 0.1));
         Random random = new Random();
@@ -244,8 +271,7 @@ public class RotationService {
             verificationRecordRepository.save(record);
         }
 
-        log.info("批次{}开始验证，抽样任务数: {}", batchId, sampleSize);
-        return batch;
+        log.info("批次{}验证抽样完成，抽样任务数: {}", batchId, sampleSize);
     }
 
     @Transactional
@@ -366,6 +392,7 @@ public class RotationService {
             if (totalProcessed >= batch.getTotalTaskCount()) {
                 if (failedCount == 0) {
                     batch.setStatus(RotationStatus.VERIFYING);
+                    createVerificationSamples(batch);
                 } else {
                     batch.setStatus(RotationStatus.PARTIAL_SUCCESS);
                 }

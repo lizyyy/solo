@@ -1,7 +1,17 @@
 #!/bin/sh
-# Maven Wrapper - 优先使用系统 Maven
+#
+# Maven Wrapper - 自动下载并运行 Maven，无需系统安装
+#
+# 使用方式: ./mvnw [maven 命令]
+# 示例: ./mvnw spring-boot:run
 
 set -e
+
+# 配置
+MAVEN_VERSION="3.8.8"
+MAVEN_BASE_URL="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
+MAVEN_HOME="$HOME/.m2/wrapper/dists/apache-maven-${MAVEN_VERSION}"
+WRAPPER_JAR=".mvn/wrapper/maven-wrapper.jar"
 
 # 颜色输出
 RED='\033[0;31m'
@@ -21,16 +31,92 @@ log_error() {
     echo "${RED}[ERROR]${NC} $1"
 }
 
-# 检查并使用系统 Maven
-if command -v mvn >/dev/null 2>&1; then
-    log_info "使用系统 Maven"
-    exec mvn "$@"
-else
-    log_error "未找到系统 Maven"
-    echo ""
-    echo "请安装 Maven 后重试，或访问以下方式安装："
-    echo "  macOS: brew install maven"
-    echo "  Linux: sudo apt install maven 或 sudo yum install maven"
-    echo "  或访问: https://maven.apache.org/download.cgi"
-    exit 1
-fi
+# 检查 Java
+check_java() {
+    if ! command -v java >/dev/null 2>&1; then
+        log_error "未找到 Java，请安装 JDK 8 或更高版本"
+        exit 1
+    fi
+    log_info "Java 版本: $(java -version 2>&1 | head -n 1)"
+}
+
+# 下载文件
+download_file() {
+    local url="$1"
+    local output="$2"
+    
+    mkdir -p "$(dirname "$output")"
+    
+    if command -v curl >/dev/null 2>&1; then
+        curl -L -o "$output" "$url" 2>/dev/null
+        return $?
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "$output" "$url" 2>/dev/null
+        return $?
+    else
+        log_error "未找到 curl 或 wget，无法下载文件"
+        return 1
+    fi
+}
+
+# 安装本地 Maven
+install_maven() {
+    if [ -d "$MAVEN_HOME" ] && [ -x "$MAVEN_HOME/bin/mvn" ]; then
+        return 0
+    fi
+    
+    log_info "正在下载 Maven ${MAVEN_VERSION}..."
+    local tar_file="/tmp/apache-maven-${MAVEN_VERSION}.tar.gz"
+    
+    if ! download_file "$MAVEN_BASE_URL" "$tar_file"; then
+        log_error "Maven 下载失败"
+        exit 1
+    fi
+    
+    log_info "正在安装 Maven..."
+    mkdir -p "$(dirname "$MAVEN_HOME")"
+    tar -xzf "$tar_file" -C "$(dirname "$MAVEN_HOME")" 2>/dev/null
+    
+    # 处理可能的目录名差异
+    if [ ! -d "$MAVEN_HOME" ]; then
+        local extracted_dir=$(ls -d "$(dirname "$MAVEN_HOME")"/apache-maven-* 2>/dev/null | head -n 1)
+        if [ -n "$extracted_dir" ] && [ "$extracted_dir" != "$MAVEN_HOME" ]; then
+            mv "$extracted_dir" "$MAVEN_HOME"
+        fi
+    fi
+    
+    rm -f "$tar_file"
+    
+    chmod +x "$MAVEN_HOME/bin/mvn" 2>/dev/null || true
+    log_info "Maven 安装完成: $MAVEN_HOME"
+}
+
+# 主流程
+main() {
+    check_java
+    
+    # 优先使用系统 Maven
+    if command -v mvn >/dev/null 2>&1; then
+        log_info "使用系统 Maven"
+        exec mvn "$@"
+        exit $?
+    fi
+    
+    # 使用本地安装的 Maven
+    log_warn "系统未安装 Maven，使用 Maven Wrapper"
+    install_maven
+    
+    if [ -x "$MAVEN_HOME/bin/mvn" ]; then
+        log_info "使用本地 Maven: $MAVEN_HOME"
+        exec "$MAVEN_HOME/bin/mvn" "$@"
+    else
+        log_error "Maven 安装失败，请手动安装 Maven 后重试"
+        echo ""
+        echo "安装方式:"
+        echo "  macOS: brew install maven"
+        echo "  Linux: sudo apt install maven 或 sudo yum install maven"
+        exit 1
+    fi
+}
+
+main "$@"

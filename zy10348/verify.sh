@@ -222,25 +222,37 @@ fi
 echo ""
 
 # 最终状态判断
-if [ "$CODE_CHECKS_PASSED" = true ] && { [ "$COMPILE_TESTED" = false ] || [ "$COMPILE_SUCCESS" = true ]; }; then
-    ALL_VALID=true
-    echo -e "${GREEN}✓ 代码验证通过！${NC}"
-    echo ""
-    echo "启动项目命令:"
-    if [ "$MAVEN_AVAILABLE" = true ]; then
-        echo "  mvn spring-boot:run"
-    else
-        echo "  请先安装 Maven，然后运行: mvn spring-boot:run"
-    fi
-    echo ""
-    echo "测试重复提交保护:"
-    echo "  1. 先 POST /api/rotation 创建批次"
-    echo "  2. 再次 POST 相同请求，应返回同一批次 ID"
+echo ""
+echo "=========================================="
+echo "最终验证结论"
+echo "=========================================="
+
+if [ "$CODE_CHECKS_PASSED" = true ] && [ "$COMPILE_TESTED" = true ] && [ "$COMPILE_SUCCESS" = true ]; then
+    echo -e "${GREEN}✓ 完全验证通过！代码正确且可编译运行${NC}"
     EXIT_CODE=0
+elif [ "$CODE_CHECKS_PASSED" = true ]; then
+    echo -e "${YELLOW}⚠️  代码检查通过，但未进行编译验证${NC}"
+    echo "   原因: 未检测到可用 Maven"
+    echo ""
+    echo "   提示: 安装 Maven 后重新运行 ./verify.sh"
+    echo "         可获得完整的编译验证结果"
+    EXIT_CODE=2  # 部分通过
 else
-    echo -e "${RED}✗ 验证失败，请检查上述问题${NC}"
+    echo -e "${RED}✗ 代码验证失败，请检查上述问题${NC}"
     EXIT_CODE=1
 fi
+
+echo ""
+echo "启动项目命令:"
+if [ "$MAVEN_AVAILABLE" = true ]; then
+    echo "  mvn spring-boot:run"
+else
+    echo "  ./mvnw spring-boot:run (自动下载 Maven)"
+fi
+echo ""
+echo "测试重复提交保护:"
+echo "  1. 先 POST /api/rotation 创建批次"
+echo "  2. 再次 POST 相同请求，应返回同一批次 ID"
 
 echo "=========================================="
 exit $EXIT_CODE

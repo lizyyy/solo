@@ -111,6 +111,8 @@ JDBC URL: jdbc:h2:mem:rotationdb
 Header:
 - `X-User-Id`: 操作人ID
 
+**注意**: 当所有任务处理完成且全部成功时，系统会自动将批次状态转换为 `VERIFYING`，并自动创建验证抽样记录。此时调用此接口可直接返回当前批次状态，不会重复创建抽样记录。
+
 ### 6. 完成轮换
 
 **POST** `/api/rotation/{batchId}/complete`
