@@ -15,9 +15,9 @@ function printSection(title) {
   console.log('  ' + '-'.repeat(50));
 }
 
-function test(name, fn) {
+async function test(name, fn) {
   try {
-    fn();
+    await fn();
     console.log(`    ✅ ${name}`);
     passCount++;
   } catch (error) {
@@ -69,16 +69,16 @@ async function runTests() {
   const result1 = await reservationService.createReservation(normalReservation);
   reservationIds.normal = result1.reservation._id;
 
-  test('预留编号生成正确', () => {
+  await test('预留编号生成正确', () => {
     assert(result1.reservation.reservationNo.startsWith('RES'), '编号格式错误');
   });
-  test('申请人信息正确', () => {
+  await test('申请人信息正确', () => {
     assert(result1.reservation.applicant === '张三', '申请人错误');
   });
-  test('初始状态为待审批', () => {
+  await test('初始状态为待审批', () => {
     assert(result1.reservation.status === 'pending', '状态错误');
   });
-  test('第一条预留无冲突', () => {
+  await test('第一条预留无冲突', () => {
     assert(result1.conflicts.length === 0, '不应有冲突');
   });
 
@@ -91,10 +91,10 @@ async function runTests() {
     comment: '审批通过，同意使用'
   });
 
-  test('审批后状态变为已批准', () => {
+  await test('审批后状态变为已批准', () => {
     assert(approved.status === 'approved', '审批状态错误');
   });
-  test('审批人信息正确记录', () => {
+  await test('审批人信息正确记录', () => {
     assert(approved.approval.approver === '李四', '审批人错误');
   });
 
@@ -123,13 +123,13 @@ async function runTests() {
   const result2 = await reservationService.createReservation(overlappingReservation);
   reservationIds.overlapping = result2.reservation._id;
 
-  test('检测到资源冲突', () => {
+  await test('检测到资源冲突', () => {
     assert(result2.conflicts.length > 0, '应检测到冲突');
   });
-  test('冲突信息包含被占用预留编号', () => {
+  await test('冲突信息包含被占用预留编号', () => {
     assert(result2.conflicts[0].reservationNo, '缺少冲突预留编号');
   });
-  test('冲突信息包含重叠窗口', () => {
+  await test('冲突信息包含重叠窗口', () => {
     assert(result2.conflicts[0].overlappedWindow, '缺少重叠窗口');
   });
 
@@ -170,7 +170,7 @@ async function runTests() {
     comment: '演练审批'
   });
 
-  test('到期预留状态为已批准', () => {
+  await test('到期预留状态为已批准', async () => {
     const r = await reservationService.getReservationById(reservationIds.expired);
     assert(r.status === 'approved', '状态应为已批准');
   });
@@ -179,7 +179,7 @@ async function runTests() {
 
   printSection('1. 通过预留ID查询冲突');
   const conflicts = await reservationService.getConflicts(reservationIds.overlapping);
-  test('查询到冲突数量正确', () => {
+  await test('查询到冲突数量正确', () => {
     assert(conflicts.length === 1, '冲突数量错误');
   });
 
@@ -189,7 +189,7 @@ async function runTests() {
     new Date('2026-06-01T13:00:00'),
     [{ name: 'environment', value: 'production' }]
   );
-  test('时间窗口检测到冲突', () => {
+  await test('时间窗口检测到冲突', () => {
     assert(windowConflicts.length > 0, '应检测到冲突');
   });
 
@@ -201,13 +201,13 @@ async function runTests() {
     reason: '演练提前完成'
   });
 
-  test('释放后状态变为已释放', () => {
+  await test('释放后状态变为已释放', () => {
     assert(released.status === 'released', '释放状态错误');
   });
-  test('释放人信息正确记录', () => {
+  await test('释放人信息正确记录', () => {
     assert(released.release.releasedBy === '管理员', '释放人错误');
   });
-  test('释放原因正确记录', () => {
+  await test('释放原因正确记录', () => {
     assert(released.release.reason === '演练提前完成', '释放原因错误');
   });
 
@@ -218,13 +218,13 @@ async function runTests() {
   printSection('1. 生成占用证明');
   const proof = await reservationService.generateOccupancyProof(reservationIds.normal);
 
-  test('占用证明包含预留编号', () => {
+  await test('占用证明包含预留编号', () => {
     assert(proof.reservationNo, '缺少预留编号');
   });
-  test('占用证明包含演练窗口', () => {
+  await test('占用证明包含演练窗口', () => {
     assert(proof.drillWindow.start && proof.drillWindow.end, '缺少演练窗口');
   });
-  test('占用证明包含审批信息', () => {
+  await test('占用证明包含审批信息', () => {
     assert(proof.approval && proof.approval.approver, '缺少审批信息');
   });
 
@@ -240,7 +240,7 @@ async function runTests() {
 
   printSection('2. 导出为 JSON 格式（内存演示）');
   const jsonProof = JSON.stringify(proof, null, 2);
-  test('JSON导出成功', () => {
+  await test('JSON导出成功', () => {
     assert(jsonProof.length > 0, 'JSON导出失败');
   });
   console.log(`     JSON 大小: ${jsonProof.length} 字符`);
@@ -283,10 +283,10 @@ async function runTests() {
   const inquiry = await inquiryService.createInquiry(inquiryData);
   const inquiryId = inquiry._id;
 
-  test('询价单编号生成正确', () => {
+  await test('询价单编号生成正确', () => {
     assert(inquiry.inquiryNo.startsWith('INQ'), '询价单编号格式错误');
   });
-  test('询价单包含3条明细', () => {
+  await test('询价单包含3条明细', () => {
     assert(inquiry.items.length === 3, '明细数量错误');
   });
 
@@ -296,11 +296,11 @@ async function runTests() {
   await inquiryService.addItemRemark(inquiryId, 1, '需要预装CentOS 7操作系统');
   await inquiryService.addItemRemark(inquiryId, 2, '需要远程管理卡，支持IPMI');
 
-  test('行号1备注正确添加', async () => {
+  await test('行号1备注正确添加', async () => {
     const item = await inquiryService.getItemByLineNumber(inquiryId, 1);
     assert(item.manualRemark === '需要预装CentOS 7操作系统', '备注内容错误');
   });
-  test('行号2备注正确添加', async () => {
+  await test('行号2备注正确添加', async () => {
     const item = await inquiryService.getItemByLineNumber(inquiryId, 2);
     assert(item.manualRemark === '需要远程管理卡，支持IPMI', '备注内容错误');
   });
@@ -319,10 +319,10 @@ async function runTests() {
   printSection('5. 生成询价单报告');
   const report = await inquiryService.generateInquiryReport(inquiryId);
 
-  test('报告包含整体备注', () => {
+  await test('报告包含整体备注', () => {
     assert(report.overallRemark, '缺少整体备注');
   });
-  test('报告明细包含行备注', () => {
+  await test('报告明细包含行备注', () => {
     assert(report.items[0].manualRemark, '明细缺少备注');
   });
 
@@ -341,12 +341,12 @@ async function runTests() {
     console.log(`       ${r.reservationNo} - ${r.applicant} - ${r.status}`);
   });
 
-  test('正常预留无冲突', async () => {
+  await test('正常预留无冲突', async () => {
     const conflicts = await reservationService.getConflicts(reservationIds.normal);
     assert(conflicts.length === 0, '正常预留不应有冲突');
   });
 
-  test('重叠预留正确解释冲突来源', async () => {
+  await test('重叠预留正确解释冲突来源', async () => {
     const conflicts = await reservationService.getConflicts(reservationIds.overlapping);
     assert(conflicts.length === 1, '应检测到1个冲突');
     assert(conflicts[0].applicant === '张三', '冲突来源申请人错误');

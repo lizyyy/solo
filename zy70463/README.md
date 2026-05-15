@@ -2,7 +2,7 @@
 
 资源预留管理系统，支持压测资源申请、机器标签管理、演练窗口规划、冲突检测、审批流程、资源释放和占用证明导出。
 
-## 功能特性
+## ✨ 功能特性
 
 - ✅ **创建预留** - 提交压测资源申请，指定机器标签和演练窗口
 - ✅ **冲突检测** - 自动检测同一资源被多组人员同时占用的情况
@@ -12,24 +12,70 @@
 - ✅ **采购询价单** - 采购询价单人工备注入库，按原始行号查询
 - ✅ **冲突说明** - 显示占用窗口和释放计划
 
-## 技术栈
+## 🚀 两种运行模式
 
-- Node.js + Express
-- MongoDB + Mongoose
-- Joi 参数验证
-- json2csv 导出
+### 模式一：零依赖内存模式（推荐快速验证）
 
-## 项目结构
+**无需安装任何 npm 包，无需 MongoDB，直接运行！**
+
+```bash
+# 直接运行核心功能验证
+node verify_standalone.js
+# 或使用 npm 脚本
+npm test
+npm run test:standalone
+```
+
+此模式使用纯内存存储，可验证所有核心业务逻辑：
+- 创建预留、冲突检测、审批、释放
+- 占用证明生成
+- 采购询价单备注管理
+- 冲突来源解释
+
+### 模式二：完整 Web 服务模式（需要依赖）
+
+需要安装 npm 依赖和 MongoDB 数据库：
+
+#### 前置要求
+
+- Node.js >= 14
+- MongoDB >= 4.4
+
+#### 安装依赖
+
+```bash
+npm install
+```
+
+#### 启动服务
+
+```bash
+npm start
+```
+
+服务将在 http://localhost:3000 启动
+
+#### 运行 MongoDB 版本验证
+
+```bash
+npm run test:mongodb
+```
+
+## 📁 项目结构
 
 ```
 resource-reservation-service/
 ├── src/
 │   ├── models/
-│   │   ├── Reservation.js          # 预留记录模型
-│   │   └── PurchaseInquiry.js      # 采购询价单模型
+│   │   ├── Reservation.js          # 预留记录模型（MongoDB）
+│   │   └── PurchaseInquiry.js      # 采购询价单模型（MongoDB）
 │   ├── services/
-│   │   ├── reservationService.js   # 预留服务逻辑
-│   │   └── inquiryService.js       # 询价单服务逻辑
+│   │   ├── reservationService.js           # 预留服务逻辑（MongoDB）
+│   │   ├── reservationServiceStandalone.js # 预留服务逻辑（内存版）
+│   │   ├── inquiryService.js               # 询价单服务逻辑（MongoDB）
+│   │   └── inquiryServiceStandalone.js     # 询价单服务逻辑（内存版）
+│   ├── storage/
+│   │   └── memoryStore.js           # 纯内存数据存储
 │   ├── routes/
 │   │   ├── reservationRoutes.js    # 预留API路由
 │   │   └── inquiryRoutes.js        # 询价单API路由
@@ -38,36 +84,22 @@ resource-reservation-service/
 │   ├── config.js                    # 配置文件
 │   └── app.js                       # 应用入口
 ├── tests/
-│   └── verify.js                    # 功能验证脚本
+│   └── verify.js                    # MongoDB版本验证脚本
+├── verify_standalone.js             # ✨ 零依赖内存版验证脚本
 └── package.json
 ```
 
-## 快速开始
+## 🔧 技术栈
 
-### 前置要求
+**完整模式：**
+- Node.js + Express
+- MongoDB + Mongoose
+- Joi 参数验证
+- json2csv 导出
 
-- Node.js >= 14
-- MongoDB >= 4.4
-
-### 安装依赖
-
-```bash
-npm install
-```
-
-### 启动服务
-
-```bash
-npm start
-```
-
-服务将在 http://localhost:3000 启动
-
-### 运行功能验证
-
-```bash
-npm test
-```
+**内存模式：**
+- 纯原生 JavaScript
+- 零外部依赖
 
 ## API 文档
 

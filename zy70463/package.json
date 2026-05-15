@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "node tests/verify.js"
+    "test": "node verify_standalone.js",
+    "test:standalone": "node verify_standalone.js",
+    "test:mongodb": "node tests/verify.js"
   },
   "dependencies": {
     "express": "^4.18.2",

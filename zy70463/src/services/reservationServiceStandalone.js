@@ -47,7 +47,6 @@ function hasMatchingLabels(labels1, labels2) {
 
 async function detectConflicts(newReservation, excludeId = null) {
   const activeStatuses = [
-    RESERVATION_STATUS.PENDING,
     RESERVATION_STATUS.APPROVED,
     RESERVATION_STATUS.ACTIVE
   ];
