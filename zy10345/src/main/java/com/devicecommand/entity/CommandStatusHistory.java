@@ -1,20 +1,12 @@
 package com.devicecommand.entity;
 
 import com.devicecommand.enums.CommandStatus;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "t_command_status_history")
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class CommandStatusHistory {
 
     @Id
@@ -50,8 +42,25 @@ public class CommandStatusHistory {
     @PrePersist
     protected void onCreate() {
         createTime = LocalDateTime.now();
-        if (changeTime == null) {
-            changeTime = LocalDateTime.now();
-        }
+        if (changeTime == null) changeTime = LocalDateTime.now();
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getBatchId() { return batchId; }
+    public void setBatchId(Long batchId) { this.batchId = batchId; }
+    public String getBatchNo() { return batchNo; }
+    public void setBatchNo(String batchNo) { this.batchNo = batchNo; }
+    public CommandStatus getFromStatus() { return fromStatus; }
+    public void setFromStatus(CommandStatus fromStatus) { this.fromStatus = fromStatus; }
+    public CommandStatus getToStatus() { return toStatus; }
+    public void setToStatus(CommandStatus toStatus) { this.toStatus = toStatus; }
+    public String getChangeReason() { return changeReason; }
+    public void setChangeReason(String changeReason) { this.changeReason = changeReason; }
+    public LocalDateTime getChangeTime() { return changeTime; }
+    public void setChangeTime(LocalDateTime changeTime) { this.changeTime = changeTime; }
+    public String getHandler() { return handler; }
+    public void setHandler(String handler) { this.handler = handler; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }

@@ -5,7 +5,8 @@ import com.devicecommand.dto.CreateCommandRequest;
 import com.devicecommand.entity.*;
 import com.devicecommand.enums.CommandStatus;
 import com.devicecommand.repository.*;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
 public class CommandService {
+
+    private static final Logger log = LoggerFactory.getLogger(CommandService.class);
 
     @Autowired
     private CommandBatchRepository commandBatchRepository;
@@ -49,20 +51,19 @@ public class CommandService {
         Device device = deviceRepository.findById(request.getDeviceId())
                 .orElseThrow(() -> new RuntimeException("设备不存在"));
 
-        CommandBatch command = CommandBatch.builder()
-                .batchNo(request.getBatchNo())
-                .commandCode(request.getCommandCode())
-                .commandName(request.getCommandName())
-                .commandParams(request.getCommandParams())
-                .deviceId(request.getDeviceId())
-                .deviceCode(request.getDeviceCode())
-                .channelId(request.getChannelId())
-                .channelCode(request.getChannelCode())
-                .timeoutSeconds(request.getTimeoutSeconds())
-                .maxRetryCount(request.getMaxRetryCount())
-                .handler(request.getHandler())
-                .status(CommandStatus.CREATED)
-                .build();
+        CommandBatch command = new CommandBatch();
+        command.setBatchNo(request.getBatchNo());
+        command.setCommandCode(request.getCommandCode());
+        command.setCommandName(request.getCommandName());
+        command.setCommandParams(request.getCommandParams());
+        command.setDeviceId(request.getDeviceId());
+        command.setDeviceCode(request.getDeviceCode());
+        command.setChannelId(request.getChannelId());
+        command.setChannelCode(request.getChannelCode());
+        command.setTimeoutSeconds(request.getTimeoutSeconds());
+        command.setMaxRetryCount(request.getMaxRetryCount());
+        command.setHandler(request.getHandler());
+        command.setStatus(CommandStatus.CREATED);
 
         command = commandBatchRepository.save(command);
         saveStatusHistory(command, null, CommandStatus.CREATED, "创建命令", request.getHandler());
@@ -119,20 +120,19 @@ public class CommandService {
         }
 
         String confirmNo = "CFM" + UUID.randomUUID().toString().replace("-", "").substring(0, 20);
-        ExecutionConfirm confirm = ExecutionConfirm.builder()
-                .batchId(command.getId())
-                .batchNo(command.getBatchNo())
-                .confirmNo(confirmNo)
-                .deviceId(command.getDeviceId())
-                .deviceCode(command.getDeviceCode())
-                .confirmSource(request.getConfirmSource())
-                .confirmResult(request.getConfirmResult())
-                .resultCode(request.getResultCode())
-                .resultMessage(request.getResultMessage())
-                .resultDetail(request.getResultDetail())
-                .confirmTime(LocalDateTime.now())
-                .handler(request.getHandler())
-                .build();
+        ExecutionConfirm confirm = new ExecutionConfirm();
+        confirm.setBatchId(command.getId());
+        confirm.setBatchNo(command.getBatchNo());
+        confirm.setConfirmNo(confirmNo);
+        confirm.setDeviceId(command.getDeviceId());
+        confirm.setDeviceCode(command.getDeviceCode());
+        confirm.setConfirmSource(request.getConfirmSource());
+        confirm.setConfirmResult(request.getConfirmResult());
+        confirm.setResultCode(request.getResultCode());
+        confirm.setResultMessage(request.getResultMessage());
+        confirm.setResultDetail(request.getResultDetail());
+        confirm.setConfirmTime(LocalDateTime.now());
+        confirm.setHandler(request.getHandler());
         executionConfirmRepository.save(confirm);
 
         command.setConfirmTime(LocalDateTime.now());
@@ -165,18 +165,17 @@ public class CommandService {
     public void processTimeout(CommandBatch command) {
         log.info("检测到命令超时: batchNo={}", command.getBatchNo());
 
-        TimeoutReason timeoutReason = TimeoutReason.builder()
-                .batchId(command.getId())
-                .batchNo(command.getBatchNo())
-                .deviceId(command.getDeviceId())
-                .deviceCode(command.getDeviceCode())
-                .timeoutType("CONFIRM_TIMEOUT")
-                .reasonCode("T001")
-                .reasonDescription("设备确认超时")
-                .detailInfo("超过预计确认时间: " + command.getExpectedConfirmTime())
-                .detectTime(LocalDateTime.now())
-                .handler("SYSTEM")
-                .build();
+        TimeoutReason timeoutReason = new TimeoutReason();
+        timeoutReason.setBatchId(command.getId());
+        timeoutReason.setBatchNo(command.getBatchNo());
+        timeoutReason.setDeviceId(command.getDeviceId());
+        timeoutReason.setDeviceCode(command.getDeviceCode());
+        timeoutReason.setTimeoutType("CONFIRM_TIMEOUT");
+        timeoutReason.setReasonCode("T001");
+        timeoutReason.setReasonDescription("设备确认超时");
+        timeoutReason.setDetailInfo("超过预计确认时间: " + command.getExpectedConfirmTime());
+        timeoutReason.setDetectTime(LocalDateTime.now());
+        timeoutReason.setHandler("SYSTEM");
         timeoutReasonRepository.save(timeoutReason);
 
         if (command.getCurrentRetryCount() < command.getMaxRetryCount()) {
@@ -195,20 +194,19 @@ public class CommandService {
         command.setCurrentRetryCount(command.getCurrentRetryCount() + 1);
 
         String retryNo = "RTY" + UUID.randomUUID().toString().replace("-", "").substring(0, 20);
-        RetryRecord retryRecord = RetryRecord.builder()
-                .batchId(command.getId())
-                .batchNo(command.getBatchNo())
-                .retryNo(retryNo)
-                .deviceId(command.getDeviceId())
-                .deviceCode(command.getDeviceCode())
-                .retryCount(command.getCurrentRetryCount())
-                .channelId(command.getChannelId())
-                .channelCode(command.getChannelCode())
-                .retryReason(reason)
-                .retryTime(LocalDateTime.now())
-                .expectedConfirmTime(LocalDateTime.now().plusSeconds(command.getTimeoutSeconds()))
-                .handler("SYSTEM")
-                .build();
+        RetryRecord retryRecord = new RetryRecord();
+        retryRecord.setBatchId(command.getId());
+        retryRecord.setBatchNo(command.getBatchNo());
+        retryRecord.setRetryNo(retryNo);
+        retryRecord.setDeviceId(command.getDeviceId());
+        retryRecord.setDeviceCode(command.getDeviceCode());
+        retryRecord.setRetryCount(command.getCurrentRetryCount());
+        retryRecord.setChannelId(command.getChannelId());
+        retryRecord.setChannelCode(command.getChannelCode());
+        retryRecord.setRetryReason(reason);
+        retryRecord.setRetryTime(LocalDateTime.now());
+        retryRecord.setExpectedConfirmTime(LocalDateTime.now().plusSeconds(command.getTimeoutSeconds()));
+        retryRecord.setHandler("SYSTEM");
         retryRecordRepository.save(retryRecord);
 
         command.setExpectedConfirmTime(retryRecord.getExpectedConfirmTime());
@@ -229,14 +227,13 @@ public class CommandService {
 
     private void saveStatusHistory(CommandBatch command, CommandStatus fromStatus, CommandStatus toStatus, 
                                    String reason, String handler) {
-        CommandStatusHistory history = CommandStatusHistory.builder()
-                .batchId(command.getId())
-                .batchNo(command.getBatchNo())
-                .fromStatus(fromStatus)
-                .toStatus(toStatus)
-                .changeReason(reason)
-                .handler(handler)
-                .build();
+        CommandStatusHistory history = new CommandStatusHistory();
+        history.setBatchId(command.getId());
+        history.setBatchNo(command.getBatchNo());
+        history.setFromStatus(fromStatus);
+        history.setToStatus(toStatus);
+        history.setChangeReason(reason);
+        history.setHandler(handler);
         statusHistoryRepository.save(history);
     }
 

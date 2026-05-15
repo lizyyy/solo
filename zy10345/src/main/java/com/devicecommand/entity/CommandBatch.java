@@ -1,20 +1,12 @@
 package com.devicecommand.entity;
 
 import com.devicecommand.enums.CommandStatus;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "t_command_batch")
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class CommandBatch {
 
     @Id
@@ -92,22 +84,61 @@ public class CommandBatch {
     protected void onCreate() {
         createTime = LocalDateTime.now();
         updateTime = LocalDateTime.now();
-        if (currentRetryCount == null) {
-            currentRetryCount = 0;
-        }
-        if (maxRetryCount == null) {
-            maxRetryCount = 3;
-        }
-        if (timeoutSeconds == null) {
-            timeoutSeconds = 300;
-        }
-        if (status == null) {
-            status = CommandStatus.CREATED;
-        }
+        if (currentRetryCount == null) currentRetryCount = 0;
+        if (maxRetryCount == null) maxRetryCount = 3;
+        if (timeoutSeconds == null) timeoutSeconds = 300;
+        if (status == null) status = CommandStatus.CREATED;
     }
 
     @PreUpdate
     protected void onUpdate() {
         updateTime = LocalDateTime.now();
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getBatchNo() { return batchNo; }
+    public void setBatchNo(String batchNo) { this.batchNo = batchNo; }
+    public String getCommandCode() { return commandCode; }
+    public void setCommandCode(String commandCode) { this.commandCode = commandCode; }
+    public String getCommandName() { return commandName; }
+    public void setCommandName(String commandName) { this.commandName = commandName; }
+    public String getCommandParams() { return commandParams; }
+    public void setCommandParams(String commandParams) { this.commandParams = commandParams; }
+    public Long getDeviceId() { return deviceId; }
+    public void setDeviceId(Long deviceId) { this.deviceId = deviceId; }
+    public String getDeviceCode() { return deviceCode; }
+    public void setDeviceCode(String deviceCode) { this.deviceCode = deviceCode; }
+    public Long getChannelId() { return channelId; }
+    public void setChannelId(Long channelId) { this.channelId = channelId; }
+    public String getChannelCode() { return channelCode; }
+    public void setChannelCode(String channelCode) { this.channelCode = channelCode; }
+    public CommandStatus getStatus() { return status; }
+    public void setStatus(CommandStatus status) { this.status = status; }
+    public Integer getTimeoutSeconds() { return timeoutSeconds; }
+    public void setTimeoutSeconds(Integer timeoutSeconds) { this.timeoutSeconds = timeoutSeconds; }
+    public Integer getMaxRetryCount() { return maxRetryCount; }
+    public void setMaxRetryCount(Integer maxRetryCount) { this.maxRetryCount = maxRetryCount; }
+    public Integer getCurrentRetryCount() { return currentRetryCount; }
+    public void setCurrentRetryCount(Integer currentRetryCount) { this.currentRetryCount = currentRetryCount; }
+    public LocalDateTime getDispatchTime() { return dispatchTime; }
+    public void setDispatchTime(LocalDateTime dispatchTime) { this.dispatchTime = dispatchTime; }
+    public LocalDateTime getExpectedConfirmTime() { return expectedConfirmTime; }
+    public void setExpectedConfirmTime(LocalDateTime expectedConfirmTime) { this.expectedConfirmTime = expectedConfirmTime; }
+    public LocalDateTime getConfirmTime() { return confirmTime; }
+    public void setConfirmTime(LocalDateTime confirmTime) { this.confirmTime = confirmTime; }
+    public String getResultCode() { return resultCode; }
+    public void setResultCode(String resultCode) { this.resultCode = resultCode; }
+    public String getResultMessage() { return resultMessage; }
+    public void setResultMessage(String resultMessage) { this.resultMessage = resultMessage; }
+    public String getFinalConclusion() { return finalConclusion; }
+    public void setFinalConclusion(String finalConclusion) { this.finalConclusion = finalConclusion; }
+    public String getHandler() { return handler; }
+    public void setHandler(String handler) { this.handler = handler; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public LocalDateTime getUpdateTime() { return updateTime; }
+    public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
+    public Integer getVersion() { return version; }
+    public void setVersion(Integer version) { this.version = version; }
 }

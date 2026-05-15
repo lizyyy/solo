@@ -1,19 +1,10 @@
 package com.devicecommand.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "t_execution_confirm")
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class ExecutionConfirm {
 
     @Id
@@ -63,4 +54,33 @@ public class ExecutionConfirm {
     protected void onCreate() {
         createTime = LocalDateTime.now();
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getBatchId() { return batchId; }
+    public void setBatchId(Long batchId) { this.batchId = batchId; }
+    public String getBatchNo() { return batchNo; }
+    public void setBatchNo(String batchNo) { this.batchNo = batchNo; }
+    public String getConfirmNo() { return confirmNo; }
+    public void setConfirmNo(String confirmNo) { this.confirmNo = confirmNo; }
+    public Long getDeviceId() { return deviceId; }
+    public void setDeviceId(Long deviceId) { this.deviceId = deviceId; }
+    public String getDeviceCode() { return deviceCode; }
+    public void setDeviceCode(String deviceCode) { this.deviceCode = deviceCode; }
+    public String getConfirmSource() { return confirmSource; }
+    public void setConfirmSource(String confirmSource) { this.confirmSource = confirmSource; }
+    public String getConfirmResult() { return confirmResult; }
+    public void setConfirmResult(String confirmResult) { this.confirmResult = confirmResult; }
+    public String getResultCode() { return resultCode; }
+    public void setResultCode(String resultCode) { this.resultCode = resultCode; }
+    public String getResultMessage() { return resultMessage; }
+    public void setResultMessage(String resultMessage) { this.resultMessage = resultMessage; }
+    public String getResultDetail() { return resultDetail; }
+    public void setResultDetail(String resultDetail) { this.resultDetail = resultDetail; }
+    public LocalDateTime getConfirmTime() { return confirmTime; }
+    public void setConfirmTime(LocalDateTime confirmTime) { this.confirmTime = confirmTime; }
+    public String getHandler() { return handler; }
+    public void setHandler(String handler) { this.handler = handler; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }

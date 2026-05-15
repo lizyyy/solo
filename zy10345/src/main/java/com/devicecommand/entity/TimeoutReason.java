@@ -1,19 +1,10 @@
 package com.devicecommand.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "t_timeout_reason")
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class TimeoutReason {
 
     @Id
@@ -57,4 +48,29 @@ public class TimeoutReason {
     protected void onCreate() {
         createTime = LocalDateTime.now();
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getBatchId() { return batchId; }
+    public void setBatchId(Long batchId) { this.batchId = batchId; }
+    public String getBatchNo() { return batchNo; }
+    public void setBatchNo(String batchNo) { this.batchNo = batchNo; }
+    public Long getDeviceId() { return deviceId; }
+    public void setDeviceId(Long deviceId) { this.deviceId = deviceId; }
+    public String getDeviceCode() { return deviceCode; }
+    public void setDeviceCode(String deviceCode) { this.deviceCode = deviceCode; }
+    public String getTimeoutType() { return timeoutType; }
+    public void setTimeoutType(String timeoutType) { this.timeoutType = timeoutType; }
+    public String getReasonCode() { return reasonCode; }
+    public void setReasonCode(String reasonCode) { this.reasonCode = reasonCode; }
+    public String getReasonDescription() { return reasonDescription; }
+    public void setReasonDescription(String reasonDescription) { this.reasonDescription = reasonDescription; }
+    public String getDetailInfo() { return detailInfo; }
+    public void setDetailInfo(String detailInfo) { this.detailInfo = detailInfo; }
+    public LocalDateTime getDetectTime() { return detectTime; }
+    public void setDetectTime(LocalDateTime detectTime) { this.detectTime = detectTime; }
+    public String getHandler() { return handler; }
+    public void setHandler(String handler) { this.handler = handler; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }
