@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户身份合并 API 控制台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3); }
+        h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .subtitle { opacity: 0.9; font-size: 14px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-value { font-size: 32px; font-weight: 700; color: #667eea; margin-bottom: 4px; }
+        .stat-label { font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tabs { display: flex; gap: 4px; background: white; padding: 8px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .tab { flex: 1; padding: 12px 20px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-size: 14px; font-weight: 500; color: #666; transition: all 0.2s; }
+        .tab.active { background: #667eea; color: white; }
+        .tab:hover:not(.active) { background: #f0f0f0; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .toolbar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .search-box { flex: 1; min-width: 200px; padding: 10px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border-color 0.2s; }
+        .search-box:focus { outline: none; border-color: #667eea; }
+        .filter-select { padding: 10px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: white; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd6; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #0da874; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #e0910a; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden; }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .card-title { font-size: 16px; font-weight: 600; }
+        .card-body { padding: 20px; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        .table th { background: #f8f9fa; font-weight: 600; font-size: 13px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .table tr:hover { background: #f8f9fa; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-approved { background: #dbeafe; color: #2563eb; }
+        .badge-completed { background: #d1fae5; color: #059669; }
+        .badge-failed { background: #fee2e2; color: #dc2626; }
+        .badge-undone { background: #f3e8ff; color: #9333ea; }
+        .badge-app { background: #dbeafe; color: #2563eb; }
+        .badge-web { background: #d1fae5; color: #059669; }
+        .badge-cs { background: #fce7f3; color: #db2777; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 18px; font-weight: 600; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; }
+        .form-input { width: 100%; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+        .form-input:focus { outline: none; border-color: #667eea; }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .detail-item { padding: 12px; background: #f8f9fa; border-radius: 8px; }
+        .detail-label { font-size: 12px; color: #666; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-value { font-size: 14px; font-weight: 500; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .timeline { position: relative; padding-left: 24px; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e0e0e0; }
+        .timeline-item { position: relative; margin-bottom: 20px; }
+        .timeline-dot { position: absolute; left: -20px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #667eea; border: 3px solid white; box-shadow: 0 0 0 2px #667eea; }
+        .timeline-content { background: #f8f9fa; padding: 12px 16px; border-radius: 8px; }
+        .timeline-time { font-size: 12px; color: #999; margin-bottom: 4px; }
+        .timeline-action { font-weight: 600; margin-bottom: 4px; }
+        .timeline-details { font-size: 13px; color: #666; }
+        .progress-bar { height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 4px; transition: width 0.3s; }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; padding: 8px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; }
+        .checkbox-wrapper input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .conflict-item { padding: 12px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0; margin-bottom: 12px; }
+        .conflict-field { font-weight: 600; color: #d97706; margin-bottom: 8px; }
+        .conflict-values { display: flex; gap: 12px; flex-wrap: wrap; }
+        .conflict-value { padding: 6px 12px; background: white; border-radius: 6px; font-size: 13px; }
+        .action-buttons { display: flex; gap: 8px; }
+        .loading { display: inline-block; width: 20px; height: 20px; border: 2px solid #f0f0f0; border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 20px; background: #333; color: white; border-radius: 8px; z-index: 2000; display: none; animation: slideIn 0.3s ease; }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #667eea; }
+        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔗 客户身份合并 API 控制台</h1>
+            <p class="subtitle">统一管理 App、官网、客服系统等多渠道客户身份，实现身份识别、合并与溯源</p>
+        </header>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="statTotal">-</div>
+                <div class="stat-label">总身份数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statMerged">-</div>
+                <div class="stat-label">已合并</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statPending">-</div>
+                <div class="stat-label">待处理合并</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statMaster">-</div>
+                <div class="stat-label">主客户</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-panel="identities">身份管理</button>
+            <button class="tab" data-panel="merges">合并事务</button>
+            <button class="tab" data-panel="audit">审计日志</button>
+        </div>
+
+        <div id="identitiesPanel" class="panel active">
+            <div class="toolbar">
+                <input type="text" class="search-box" id="identitySearch" placeholder="搜索姓名、邮箱、电话、外部ID...">
+                <select class="filter-select" id="sourceFilter">
+                    <option value="">全部来源</option>
+                    <option value="app">App</option>
+                    <option value="web">官网</option>
+                    <option value="cs">客服系统</option>
+                </select>
+                <button class="btn btn-primary" onclick="showCreateIdentityModal()">+ 新增身份</button>
+                <button class="btn btn-success" onclick="initiateMergeFromSelection()">合并选中</button>
+                <button class="btn btn-warning" onclick="exportIdentities()">导出 CSV</button>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table" id="identitiesTable">
+                        <thead>
+                            <tr>
+                                <th width="40"><input type="checkbox" id="selectAllIdentities"></th>
+                                <th>身份ID</th>
+                                <th>外部ID</th>
+                                <th>来源</th>
+                                <th>姓名</th>
+                                <th>邮箱</th>
+                                <th>电话</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="mergesPanel" class="panel">
+            <div class="toolbar">
+                <input type="text" class="search-box" id="mergeSearch" placeholder="搜索事务ID...">
+                <select class="filter-select" id="statusFilter">
+                    <option value="">全部状态</option>
+                    <option value="pending">待审批</option>
+                    <option value="approved">已审批</option>
+                    <option value="completed">已完成</option>
+                    <option value="undone">已撤销</option>
+                </select>
+                <button class="btn btn-warning" onclick="exportMerges()">导出 CSV</button>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table" id="mergesTable">
+                        <thead>
+                            <tr>
+                                <th>事务ID</th>
+                                <th>匹配分数</th>
+                                <th>状态</th>
+                                <th>身份数量</th>
+                                <th>操作人</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="auditPanel" class="panel">
+            <div class="toolbar">
+                <select class="filter-select" id="actionFilter">
+                    <option value="">全部操作</option>
+                    <option value="create_identity">创建身份</option>
+                    <option value="initiate_merge">发起合并</option>
+                    <option value="approve_merge">审批合并</option>
+                    <option value="execute_merge">执行合并</option>
+                    <option value="undo_merge">撤销合并</option>
+                </select>
+                <button class="btn btn-warning" onclick="exportFullData()">导出完整数据</button>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="timeline" id="auditTimeline"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="identityDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">身份详情</span>
+                <button class="modal-close" onclick="closeModal('identityDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="identityDetailContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="mergeDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">合并事务详情</span>
+                <button class="modal-close" onclick="closeModal('mergeDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="mergeDetailContent"></div>
+            <div class="modal-footer" id="mergeDetailActions"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="createIdentityModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <span class="modal-title">新增身份</span>
+                <button class="modal-close" onclick="closeModal('createIdentityModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">外部ID *</label>
+                    <input type="text" class="form-input" id="newExternalId" placeholder="例如: USER_001">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">来源 *</label>
+                    <select class="form-input" id="newSource">
+                        <option value="app">App</option>
+                        <option value="web">官网</option>
+                        <option value="cs">客服系统</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">姓名</label>
+                    <input type="text" class="form-input" id="newName" placeholder="姓名">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">邮箱</label>
+                    <input type="email" class="form-input" id="newEmail" placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">电话</label>
+                    <input type="tel" class="form-input" id="newPhone" placeholder="手机号码">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('createIdentityModal')">取消</button>
+                <button class="btn btn-primary" onclick="createIdentity()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/api';
+        let selectedIdentities = new Set();
+
+        async function init() {
+            await loadStats();
+            await loadIdentities();
+            await loadMerges();
+            await loadAudit();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.panel + 'Panel').classList.add('active');
+                });
+            });
+
+            document.getElementById('identitySearch').addEventListener('input', debounce(loadIdentities, 300));
+            document.getElementById('sourceFilter').addEventListener('change', loadIdentities);
+            document.getElementById('mergeSearch').addEventListener('input', debounce(loadMerges, 300));
+            document.getElementById('statusFilter').addEventListener('change', loadMerges);
+            document.getElementById('actionFilter').addEventListener('change', loadAudit);
+            document.getElementById('selectAllIdentities').addEventListener('change', toggleSelectAll);
+        }
+
+        async function apiCall(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                return await response.json();
+            } catch (error) {
+                showToast('请求失败: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        async function loadStats() {
+            const result = await apiCall(API_BASE + '/audit/statistics');
+            if (result.success) {
+                const stats = result.data;
+                document.getElementById('statTotal').textContent = stats.totalIdentities;
+                document.getElementById('statMerged').textContent = stats.mergedIdentities;
+                document.getElementById('statPending').textContent = stats.transactionsByStatus.pending;
+                document.getElementById('statMaster').textContent = stats.totalMasterCustomers;
+            }
+        }
+
+        async function loadIdentities() {
+            const search = document.getElementById('identitySearch').value;
+            const source = document.getElementById('sourceFilter').value;
+            const params = new URLSearchParams();
+            if (search) params.set('search', search);
+            if (source) params.set('source', source);
+
+            const result = await apiCall(API_BASE + '/identities?' + params);
+            if (result.success) {
+                renderIdentities(result.data);
+            }
+        }
+
+        function renderIdentities(identities) {
+            const tbody = document.querySelector('#identitiesTable tbody');
+            if (identities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📭</div><div>暂无身份数据</div></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = identities.map(id => `
+                <tr>
+                    <td><input type="checkbox" class="identity-checkbox" value="${id.id}" ${selectedIdentities.has(id.id) ? 'checked' : ''} onchange="toggleIdentitySelection('${id.id}')"></td>
+                    <td><code style="font-size: 11px;">${id.id.substring(0, 8)}...</code></td>
+                    <td>${id.externalId}</td>
+                    <td><span class="badge badge-${id.source}">${getSourceLabel(id.source)}</span></td>
+                    <td>${id.name || '-'}</td>
+                    <td>${id.email || '-'}</td>
+                    <td>${id.phone || '-'}</td>
+                    <td>${id.masterCustomerId ? '<span class="badge badge-completed">已合并</span>' : '<span class="badge badge-pending">未合并</span>'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="showIdentityDetail('${id.id}')">详情</button>
+                        <button class="btn btn-sm btn-success" onclick="findMatches('${id.id}')">匹配</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadMerges() {
+            const search = document.getElementById('mergeSearch').value;
+            const status = document.getElementById('statusFilter').value;
+            const params = new URLSearchParams();
+            if (search) params.set('search', search);
+            if (status) params.set('status', status);
+
+            const result = await apiCall(API_BASE + '/merges?' + params);
+            if (result.success) {
+                renderMerges(result.data);
+            }
+        }
+
+        function renderMerges(merges) {
+            const tbody = document.querySelector('#mergesTable tbody');
+            if (merges.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📭</div><div>暂无合并事务</div></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = merges.map(m => `
+                <tr>
+                    <td><code style="font-size: 11px;">${m.id.substring(0, 12)}...</code></td>
+                    <td>
+                        <div style="text-align: center;">
+                            <strong>${m.matchScore || 0}</strong>
+                            <div class="progress-bar"><div class="progress-fill" style="width: ${Math.min(m.matchScore || 0, 100)}%"></div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-${m.status}">${getStatusLabel(m.status)}</span></td>
+                    <td>${m.identityIds?.length || 0} 个</td>
+                    <td>${m.operator || '-'}</td>
+                    <td>${formatDate(m.createdAt)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="showMergeDetail('${m.id}')">详情</button>
+                        ${m.status === 'pending' ? `<button class="btn btn-sm btn-success" onclick="approveMerge('${m.id}')">审批</button>` : ''}
+                        ${m.status === 'approved' ? `<button class="btn btn-sm btn-success" onclick="executeMerge('${m.id}')">执行</button>` : ''}
+                        ${m.status === 'completed' ? `<button class="btn btn-sm btn-danger" onclick="undoMerge('${m.id}')">撤销</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadAudit() {
+            const action = document.getElementById('actionFilter').value;
+            const params = new URLSearchParams();
+            if (action) params.set('action', action);
+            params.set('limit', 50);
+
+            const result = await apiCall(API_BASE + '/audit?' + params);
+            if (result.success) {
+                renderAudit(result.data);
+            }
+        }
+
+        function renderAudit(logs) {
+            const timeline = document.getElementById('auditTimeline');
+            if (logs.length === 0) {
+                timeline.innerHTML = '<div class="empty-state"><div class="empty-icon">📜</div><div>暂无审计日志</div></div>';
+                return;
+            }
+
+            timeline.innerHTML = logs.map(log => `
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">${formatDate(log.timestamp)}</div>
+                        <div class="timeline-action">${getActionLabel(log.action)} - ${log.operator}</div>
+                        <div class="timeline-details">${JSON.stringify(log.details || {}).substring(0, 100)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function showIdentityDetail(id) {
+            const result = await apiCall(API_BASE + '/identities/' + id);
+            if (result.success) {
+                const identity = result.data;
+                const matchesResult = await apiCall(API_BASE + '/identities/' + id + '/matches');
+                const matches = matchesResult.success ? matchesResult.data : [];
+
+                document.getElementById('identityDetailContent').innerHTML = `
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">身份ID</div>
+                            <div class="detail-value"><code>${identity.id}</code></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">外部ID</div>
+                            <div class="detail-value">${identity.externalId}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">来源</div>
+                            <div class="detail-value"><span class="badge badge-${identity.source}">${getSourceLabel(identity.source)}</span></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">姓名</div>
+                            <div class="detail-value">${identity.name || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">邮箱</div>
+                            <div class="detail-value">${identity.email || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">电话</div>
+                            <div class="detail-value">${identity.phone || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">主客户ID</div>
+                            <div class="detail-value">${identity.masterCustomerId ? `<code>${identity.masterCustomerId.substring(0, 12)}...</code>` : '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">创建时间</div>
+                            <div class="detail-value">${formatDate(identity.createdAt)}</div>
+                        </div>
+                    </div>
+                    ${matches.length > 0 ? `
+                        <h4 style="margin: 20px 0 12px;">🔍 潜在匹配 (${matches.length})</h4>
+                        ${matches.map(m => `
+                            <div class="conflict-item" style="background: #f0fdf4; border-left-color: #10b981;">
+                                <div class="conflict-field" style="color: #059669;">匹配分数: ${m.matchScore}</div>
+                                <div><strong>${m.identity.name || m.identity.externalId}</strong> (${getSourceLabel(m.identity.source)})</div>
+                                <div style="margin-top: 8px; font-size: 12px; color: #666;">
+                                    证据: ${m.evidences.map(e => e.type).join(', ')}
+                                </div>
+                                <button class="btn btn-sm btn-primary" style="margin-top: 12px;" onclick="quickMerge('${id}', '${m.identity.id}'); closeModal('identityDetailModal');">
+                                    立即合并
+                                </button>
+                            </div>
+                        `).join('')}
+                    ` : ''}
+                `;
+                document.getElementById('identityDetailModal').classList.add('active');
+            }
+        }
+
+        async function showMergeDetail(id) {
+            const result = await apiCall(API_BASE + '/merges/' + id);
+            if (result.success) {
+                const merge = result.data;
+                document.getElementById('mergeDetailContent').innerHTML = `
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">事务ID</div>
+                            <div class="detail-value"><code>${merge.id}</code></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">状态</div>
+                            <div class="detail-value"><span class="badge badge-${merge.status}">${getStatusLabel(merge.status)}</span></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">匹配分数</div>
+                            <div class="detail-value">${merge.matchScore || 0}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">原因</div>
+                            <div class="detail-value">${merge.reason || '-'}</div>
+                        </div>
+                    </div>
+                    <h4 style="margin: 20px 0 12px;">👥 涉及身份 (${merge.identities?.length || 0})</h4>
+                    ${merge.identities?.map(i => `
+                        <div class="checkbox-wrapper">
+                            <div>
+                                <strong>${i.name || i.externalId}</strong>
+                                <span class="badge badge-${i.source}" style="margin-left: 8px;">${getSourceLabel(i.source)}</span>
+                            </div>
+                            <div style="font-size: 12px; color: #666;">${i.email || i.phone || '-'}</div>
+                        </div>
+                    `).join('') || '-'}
+                    ${merge.conflicts?.length > 0 ? `
+                        <h4 style="margin: 20px 0 12px;">⚠️ 字段冲突 (${merge.conflicts.length})</h4>
+                        ${merge.conflicts.map(c => `
+                            <div class="conflict-item">
+                                <div class="conflict-field">${c.fieldName}</div>
+                                <div class="conflict-values">
+                                    ${c.sourceIdentities?.map(s => `
+                                        <div class="conflict-value">
+                                            <span class="badge badge-${s.source}" style="margin-right: 6px;">${getSourceLabel(s.source)}</span>
+                                            ${s.value}
+                                        </div>
+                                    `).join('') || ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    ` : ''}
+                    ${merge.evidences?.length > 0 ? `
+                        <h4 style="margin: 20px 0 12px;">📋 合并证据 (${merge.evidences.length})</h4>
+                        ${merge.evidences.map(e => `
+                            <div class="checkbox-wrapper">
+                                <strong>${e.type}</strong>
+                                <span style="margin-left: auto;">权重: ${e.weight}</span>
+                            </div>
+                        `).join('')}
+                    ` : ''}
+                `;
+
+                let actionsHtml = '';
+                if (merge.status === 'pending') {
+                    actionsHtml = `<button class="btn btn-success" onclick="approveMerge('${merge.id}'); closeModal('mergeDetailModal');">审批通过</button>`;
+                } else if (merge.status === 'approved') {
+                    actionsHtml = `<button class="btn btn-success" onclick="executeMerge('${merge.id}'); closeModal('mergeDetailModal');">执行合并</button>`;
+                } else if (merge.status === 'completed') {
+                    actionsHtml = `
+                        <button class="btn btn-warning" onclick="exportImpact('${merge.id}')">导出影响</button>
+                        <button class="btn btn-danger" onclick="undoMerge('${merge.id}'); closeModal('mergeDetailModal');">撤销合并</button>
+                    `;
+                }
+                actionsHtml += `<button class="btn" onclick="closeModal('mergeDetailModal');">关闭</button>`;
+                document.getElementById('mergeDetailActions').innerHTML = actionsHtml;
+
+                document.getElementById('mergeDetailModal').classList.add('active');
+            }
+        }
+
+        async function createIdentity() {
+            const data = {
+                externalId: document.getElementById('newExternalId').value,
+                source: document.getElementById('newSource').value,
+                name: document.getElementById('newName').value,
+                email: document.getElementById('newEmail').value,
+                phone: document.getElementById('newPhone').value
+            };
+
+            if (!data.externalId) {
+                showToast('请填写外部ID', 'error');
+                return;
+            }
+
+            const result = await apiCall(API_BASE + '/identities', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+
+            if (result.success) {
+                showToast('创建成功', 'success');
+                closeModal('createIdentityModal');
+                loadIdentities();
+                loadStats();
+                document.getElementById('newExternalId').value = '';
+                document.getElementById('newName').value = '';
+                document.getElementById('newEmail').value = '';
+                document.getElementById('newPhone').value = '';
+            } else {
+                showToast(result.error || '创建失败', 'error');
+            }
+        }
+
+        async function findMatches(id) {
+            const result = await apiCall(API_BASE + '/identities/' + id + '/matches');
+            if (result.success && result.data.length > 0) {
+                showIdentityDetail(id);
+            } else {
+                showToast('未找到匹配的身份', 'info');
+            }
+        }
+
+        async function quickMerge(id1, id2) {
+            const result = await apiCall(API_BASE + '/merges', {
+                method: 'POST',
+                body: JSON.stringify({
+                    identityIds: [id1, id2],
+                    reason: '快速匹配合并',
+                    operator: 'admin'
+                })
+            });
+
+            if (result.success) {
+                showToast('合并事务已创建', 'success');
+                loadMerges();
+                loadStats();
+            } else {
+                showToast(result.error || '创建失败', 'error');
+            }
+        }
+
+        async function initiateMergeFromSelection() {
+            const ids = Array.from(selectedIdentities);
+            if (ids.length < 2) {
+                showToast('请至少选择2个身份', 'error');
+                return;
+            }
+
+            const result = await apiCall(API_BASE + '/merges', {
+                method: 'POST',
+                body: JSON.stringify({
+                    identityIds: ids,
+                    reason: '批量选择合并',
+                    operator: 'admin'
+                })
+            });
+
+            if (result.success) {
+                showToast('合并事务已创建', 'success');
+                selectedIdentities.clear();
+                loadMerges();
+                loadStats();
+                loadIdentities();
+            } else {
+                showToast(result.error || '创建失败', 'error');
+            }
+        }
+
+        async function approveMerge(id) {
+            const result = await apiCall(API_BASE + '/merges/' + id + '/approve', {
+                method: 'POST',
+                body: JSON.stringify({ operator: 'admin' })
+            });
+
+            if (result.success) {
+                showToast('审批通过', 'success');
+                loadMerges();
+                loadStats();
+            } else {
+                showToast(result.error || '操作失败', 'error');
+            }
+        }
+
+        async function executeMerge(id) {
+            const result = await apiCall(API_BASE + '/merges/' + id + '/execute', {
+                method: 'POST',
+                body: JSON.stringify({ operator: 'admin', resolutionStrategy: 'latest' })
+            });
+
+            if (result.success) {
+                showToast('合并执行成功！主客户ID: ' + result.data.masterCustomer.masterNumber, 'success');
+                loadMerges();
+                loadIdentities();
+                loadStats();
+                loadAudit();
+            } else {
+                showToast(result.error || '操作失败', 'error');
+            }
+        }
+
+        async function undoMerge(id) {
+            const reason = prompt('请输入撤销原因：');
+            if (!reason) return;
+
+            const result = await apiCall(API_BASE + '/merges/' + id + '/undo', {
+                method: 'POST',
+                body: JSON.stringify({ operator: 'admin', reason })
+            });
+
+            if (result.success) {
+                showToast('撤销成功', 'success');
+                loadMerges();
+                loadIdentities();
+                loadStats();
+                loadAudit();
+            } else {
+                showToast(result.error || '操作失败', 'error');
+            }
+        }
+
+        function toggleIdentitySelection(id) {
+            if (selectedIdentities.has(id)) {
+                selectedIdentities.delete(id);
+            } else {
+                selectedIdentities.add(id);
+            }
+        }
+
+        function toggleSelectAll(e) {
+            const checkboxes = document.querySelectorAll('.identity-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = e.target.checked;
+                if (e.target.checked) {
+                    selectedIdentities.add(cb.value);
+                } else {
+                    selectedIdentities.delete(cb.value);
+                }
+            });
+        }
+
+        function exportIdentities() {
+            window.open(API_BASE + '/export/identities', '_blank');
+        }
+
+        function exportMerges() {
+            window.open(API_BASE + '/export/merges', '_blank');
+        }
+
+        function exportImpact(transactionId) {
+            window.open(API_BASE + '/export/impact/' + transactionId, '_blank');
+        }
+
+        function exportFullData() {
+            window.open(API_BASE + '/export/full', '_blank');
+        }
+
+        function showCreateIdentityModal() {
+            document.getElementById('createIdentityModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function getSourceLabel(source) {
+            const labels = { app: 'App', web: '官网', cs: '客服系统' };
+            return labels[source] || source;
+        }
+
+        function getStatusLabel(status) {
+            const labels = { pending: '待审批', approved: '已审批', completed: '已完成', failed: '失败', undone: '已撤销' };
+            return labels[status] || status;
+        }
+
+        function getActionLabel(action) {
+            const labels = {
+                create_identity: '创建身份',
+                update_identity: '更新身份',
+                initiate_merge: '发起合并',
+                approve_merge: '审批合并',
+                execute_merge: '执行合并',
+                undo_merge: '撤销合并',
+                resolve_conflict: '解决冲突'
+            };
+            return labels[action] || action;
+        }
+
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleString('zh-CN');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function debounce(fn, delay) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        init();
+    </script>
+</body>
+</html>
