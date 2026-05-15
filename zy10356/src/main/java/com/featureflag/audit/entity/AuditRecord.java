@@ -38,7 +38,6 @@ public class AuditRecord {
     private String overrideType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private HitResult hitResult;
 
     @Enumerated(EnumType.STRING)
