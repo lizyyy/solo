@@ -285,6 +285,7 @@ func (s *certService) Rollback(req *model.RollbackRequest) (*model.RollbackRecor
 		}
 		rollbackCert.Status = model.CertStatusEnabled
 		rollbackCert.IsRollback = true
+		rollbackCert.IsCurrent = true
 		if err := s.certRepo.Update(rollbackCert, tx); err != nil {
 			return err
 		}
