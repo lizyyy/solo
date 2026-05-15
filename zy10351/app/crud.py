@@ -27,11 +27,22 @@ class TaskService:
         self.db.flush()
 
     def _check_permission(self, task: Task, operator: str, require_level: str = "read") -> bool:
+        """
+        权限校验：
+        - read: 仅查询，任何用户均可查看
+        - write: 可登记、归档等修改操作，非 owner 无 write 权限
+        - admin: 可撤销、清理等高危操作，只有 owner 有权限
+        """
         if not operator:
+            raise PermissionError("操作人不能为空")
+        
+        if require_level == "read":
             return True
-        if task.access_level == "admin" and operator != task.owner:
-            return False
-        return True
+        
+        if operator == task.owner:
+            return True
+        
+        raise PermissionError(f"用户 {operator} 无 {require_level} 权限操作任务 {task.task_number}")
 
     def get_task_by_number(self, task_number: str) -> Optional[Task]:
         return self.db.query(Task).filter(Task.task_number == task_number).first()
@@ -75,6 +86,9 @@ class TaskService:
         if not task:
             raise ValueError(f"任务编号 {task_number} 不存在")
 
+        if register_in.output_file_size <= 0:
+            raise ValueError(f"文件大小必须为正数，当前值: {register_in.output_file_size}")
+
         if task.status in [TaskStatus.REGISTERED, TaskStatus.ARCHIVED]:
             if task.output_file_hash == register_in.output_file_hash:
                 return task
@@ -82,6 +96,8 @@ class TaskService:
 
         if task.status not in [TaskStatus.CREATED, TaskStatus.REVOKED]:
             raise ValueError(f"任务 {task_number} 当前状态 {task.status} 不允许登记输出")
+
+        self._check_permission(task, register_in.operator, "write")
 
         status_before = task.status
         
@@ -125,8 +141,7 @@ class TaskService:
         if task.status != TaskStatus.REGISTERED:
             raise ValueError(f"任务 {task_number} 当前状态 {task.status} 不允许归档")
 
-        if not self._check_permission(task, archive_in.operator, "write"):
-            raise PermissionError(f"无权限归档任务 {task_number}")
+        self._check_permission(task, archive_in.operator, "write")
 
         status_before = task.status
         
@@ -174,8 +189,7 @@ class TaskService:
         if task.status not in [TaskStatus.CREATED, TaskStatus.REGISTERED, TaskStatus.ARCHIVED]:
             raise ValueError(f"任务 {task_number} 当前状态 {task.status} 不允许撤销")
 
-        if not self._check_permission(task, revoke_in.operator, "admin"):
-            raise PermissionError(f"无权限撤销任务 {task_number}")
+        self._check_permission(task, revoke_in.operator, "admin")
 
         status_before = task.status
         task.status = TaskStatus.REVOKED
@@ -200,9 +214,6 @@ class TaskService:
         task = self.get_task_by_number(task_number)
         if not task:
             raise ValueError(f"任务编号 {task_number} 不存在")
-
-        if not self._check_permission(task, operator, "read"):
-            raise PermissionError(f"无权限查看任务 {task_number}")
 
         return task
 
@@ -238,6 +249,9 @@ class TaskService:
         if task.status != TaskStatus.ARCHIVED:
             raise ValueError(f"任务 {task_number} 当前状态 {task.status} 不允许标记过期")
 
+        if operator and operator != "system":
+            self._check_permission(task, operator, "write")
+
         status_before = task.status
         task.status = TaskStatus.EXPIRED
         
@@ -266,6 +280,9 @@ class TaskService:
 
         if task.status not in [TaskStatus.EXPIRED, TaskStatus.REVOKED]:
             raise ValueError(f"任务 {task_number} 当前状态 {task.status} 不允许清理")
+
+        if operator and operator != "system":
+            self._check_permission(task, operator, "admin")
 
         status_before = task.status
         

@@ -11,7 +11,7 @@ class TaskBase(BaseModel):
     archive_strategy: ArchiveStrategy = Field(default=ArchiveStrategy.DELAYED, description="归档策略")
     access_level: AccessLevel = Field(default=AccessLevel.READ, description="访问权限级别")
     owner: str = Field(..., description="任务所有者")
-    expire_days: Optional[int] = Field(90, description="过期天数")
+    expire_days: Optional[int] = Field(90, gt=0, description="过期天数，必须为正数")
 
 
 class TaskCreate(TaskBase):
@@ -21,7 +21,7 @@ class TaskCreate(TaskBase):
 class TaskRegister(BaseModel):
     output_file_path: str = Field(..., description="输出文件路径")
     output_file_name: str = Field(..., description="输出文件名")
-    output_file_size: int = Field(..., description="文件大小（字节）")
+    output_file_size: int = Field(..., gt=0, description="文件大小（字节），必须为正数")
     output_file_hash: str = Field(..., description="文件哈希值")
     operator: Optional[str] = Field(None, description="操作人")
 

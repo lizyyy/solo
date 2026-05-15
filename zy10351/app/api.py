@@ -27,7 +27,7 @@ def create_task(task_in: TaskCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail={"code": "TASK_EXISTS", "message": str(e)})
 
 
-@router.post("/tasks/{task_number}/register", response_model=TaskResponse, responses={400: {"model": ErrorResponse}, 404: {"model": ErrorResponse}})
+@router.post("/tasks/{task_number}/register", response_model=TaskResponse, responses={400: {"model": ErrorResponse}, 403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}})
 def register_output(task_number: str, register_in: TaskRegister, db: Session = Depends(get_db)):
     """登记任务输出文件 - 重复提交相同文件不会产生脏数据"""
     try:
@@ -38,6 +38,8 @@ def register_output(task_number: str, register_in: TaskRegister, db: Session = D
         if "不存在" in str(e):
             raise HTTPException(status_code=404, detail={"code": "TASK_NOT_FOUND", "message": str(e)})
         raise HTTPException(status_code=400, detail={"code": "INVALID_STATUS", "message": str(e)})
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail={"code": "PERMISSION_DENIED", "message": str(e)})
 
 
 @router.post("/tasks/{task_number}/archive", response_model=TaskResponse, responses={400: {"model": ErrorResponse}, 403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}})
@@ -108,7 +110,7 @@ def get_task_timelines(task_number: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail={"code": "TASK_NOT_FOUND", "message": str(e)})
 
 
-@router.post("/tasks/{task_number}/expire", response_model=TaskResponse, responses={400: {"model": ErrorResponse}, 404: {"model": ErrorResponse}})
+@router.post("/tasks/{task_number}/expire", response_model=TaskResponse, responses={400: {"model": ErrorResponse}, 403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}})
 def expire_task(task_number: str, operator: Optional[str] = None, db: Session = Depends(get_db)):
     """标记任务过期"""
     try:
@@ -119,9 +121,11 @@ def expire_task(task_number: str, operator: Optional[str] = None, db: Session = 
         if "不存在" in str(e):
             raise HTTPException(status_code=404, detail={"code": "TASK_NOT_FOUND", "message": str(e)})
         raise HTTPException(status_code=400, detail={"code": "INVALID_STATUS", "message": str(e)})
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail={"code": "PERMISSION_DENIED", "message": str(e)})
 
 
-@router.post("/tasks/{task_number}/cleanup", response_model=TaskResponse, responses={400: {"model": ErrorResponse}, 404: {"model": ErrorResponse}})
+@router.post("/tasks/{task_number}/cleanup", response_model=TaskResponse, responses={400: {"model": ErrorResponse}, 403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}})
 def cleanup_task(task_number: str, operator: Optional[str] = None, reason: str = "manual", db: Session = Depends(get_db)):
     """清理任务文件"""
     try:
@@ -132,6 +136,8 @@ def cleanup_task(task_number: str, operator: Optional[str] = None, reason: str =
         if "不存在" in str(e):
             raise HTTPException(status_code=404, detail={"code": "TASK_NOT_FOUND", "message": str(e)})
         raise HTTPException(status_code=400, detail={"code": "INVALID_STATUS", "message": str(e)})
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail={"code": "PERMISSION_DENIED", "message": str(e)})
 
 
 @router.post("/tasks/cleanup/batch", response_model=List[TaskResponse])
