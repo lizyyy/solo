@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum ConfigStatus {
+  DRAFT
+  PUBLISHED
+  DEPRECATED
+}
+
+enum InstanceStatus {
+  ONLINE
+  OFFLINE
+  UNHEALTHY
+}
+
+enum PullStatus {
+  SUCCESS
+  FAILED
+  PENDING
+  TIMEOUT
+}
+
+enum EffectiveStatus {
+  EFFECTIVE
+  NOT_EFFECTIVE
+  PARTIAL
+  UNKNOWN
+}
+
+enum CompensateStatus {
+  NOT_NEEDED
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+model ConfigItem {
+  id          String       @id @default(cuid())
+  key         String
+  value       String
+  description String?
+  status      ConfigStatus @default(DRAFT)
+  version     Int          @default(1)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  createdBy   String?
+  
+  versions   DistributionVersion[]
+  pullRecords PullRecord[]
+  diffReports DiffReport[]
+  
+  @@unique([key, version])
+  @@index([status])
+}
+
+model ServiceInstance {
+  id          String         @id @default(cuid())
+  instanceId  String
+  serviceName String
+  ipAddress   String
+  hostname    String?
+  env         String
+  status      InstanceStatus @default(ONLINE)
+  lastHeartbeat DateTime   @default(now())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  pullRecords  PullRecord[]
+  effectiveStates EffectiveState[]
+  
+  @@unique([instanceId, env])
+  @@index([serviceName, env])
+  @@index([status])
+}
+
+model DistributionVersion {
+  id          String     @id @default(cuid())
+  configId    String
+  version     Int
+  releasedBy  String?
+  releaseNote String?
+  isForce     Boolean    @default(false)
+  releasedAt  DateTime   @default(now())
+  createdAt   DateTime   @default(now())
+  
+  configItem ConfigItem   @relation(fields: [configId], references: [id], onDelete: Cascade)
+  pullRecords PullRecord[]
+  
+  @@unique([configId, version])
+  @@index([releasedAt])
+}
+
+model PullRecord {
+  id              String     @id @default(cuid())
+  configId        String
+  instanceId      String
+  distributionId  String?
+  requestedVersion Int
+  actualVersion   Int?
+  pullStatus      PullStatus @default(PENDING)
+  errorMessage    String?
+  retryCount      Int        @default(0)
+  pulledAt        DateTime   @default(now())
+  nextRetryAt     DateTime?
+  
+  configItem       ConfigItem           @relation(fields: [configId], references: [id], onDelete: Cascade)
+  serviceInstance  ServiceInstance      @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  distributionVersion DistributionVersion? @relation(fields: [distributionId], references: [id], onDelete: SetNull)
+  effectiveState   EffectiveState?
+  
+  @@index([configId, pullStatus])
+  @@index([instanceId, pulledAt])
+  @@index([pullStatus, nextRetryAt])
+}
+
+model EffectiveState {
+  id              String          @id @default(cuid())
+  configId        String
+  instanceId      String
+  currentVersion  Int
+  effectiveStatus EffectiveStatus @default(UNKNOWN)
+  checkedAt       DateTime        @default(now())
+  lastConfirmedAt DateTime?
+  compensatedAt   DateTime?
+  compensateStatus CompensateStatus @default(NOT_NEEDED)
+  compensateNote  String?
+  
+  configItem      ConfigItem      @relation(fields: [configId], references: [id], onDelete: Cascade)
+  serviceInstance ServiceInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  pullRecord      PullRecord?     @relation(fields: [pullRecordId], references: [id], onDelete: SetNull)
+  pullRecordId    String?
+  
+  @@unique([configId, instanceId])
+  @@index([effectiveStatus])
+  @@index([compensateStatus])
+}
+
+model DiffReport {
+  id              String   @id @default(cuid())
+  configId        String
+  baseVersion     Int
+  targetVersion   Int
+  diffContent     String
+  affectedInstances Int
+  generatedBy     String?
+  generatedAt     DateTime @default(now())
+  exportedAt      DateTime?
+  
+  configItem ConfigItem @relation(fields: [configId], references: [id], onDelete: Cascade)
+  
+  @@index([configId, generatedAt])
+}
+
+model RequestLock {
+  id          String   @id @default(cuid())
+  requestKey  String   @unique
+  lockedAt    DateTime @default(now())
+  lockedBy    String?
+  expiresAt   DateTime
+  
+  @@index([expiresAt])
+}
