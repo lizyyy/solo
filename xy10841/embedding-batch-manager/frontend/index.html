@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedding Batch Manager - 批处理管家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-running { background-color: #dbeafe; color: #1e40af; }
+        .status-paused { background-color: #f3e8ff; color: #6b21a8; }
+        .status-completed { background-color: #d1fae5; color: #065f46; }
+        .status-failed { background-color: #fee2e2; color: #991b1b; }
+        .status-partial { background-color: #ffedd5; color: #9a3412; }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h1 class="ml-3 text-xl font-semibold text-gray-900">Embedding Batch Manager</h1>
+                    <span class="ml-2 text-sm text-gray-500">批处理管家</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="refreshData()" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        刷新
+                    </button>
+                    <button onclick="openCreateBatchModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        创建批次
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">总批次数</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900" id="stat-total-batches">0</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">运行中</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-blue-600" id="stat-running-batches">0</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">已完成</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-green-600" id="stat-completed-batches">0</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">失败/异常</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-red-600" id="stat-failed-batches">0</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg mb-6">
+            <div class="p-4 border-b border-gray-200">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1 max-w-md">
+                        <label for="search-input" class="sr-only">搜索批次</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="搜索批次名称...">
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div>
+                            <label for="status-filter" class="sr-only">状态筛选</label>
+                            <select id="status-filter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">所有状态</option>
+                                <option value="pending">待处理</option>
+                                <option value="running">运行中</option>
+                                <option value="paused">已暂停</option>
+                                <option value="completed">已完成</option>
+                                <option value="failed">失败</option>
+                                <option value="partial">部分完成</option>
+                            </select>
+                        </div>
+                        <button onclick="cleanupDirtyData()" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            清理脏数据
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">批次名称</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">进度</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">任务统计</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建时间</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batches-table-body" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <p class="mt-2">暂无批次数据</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="batch-detail-modal" class="fixed inset-0 hidden z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 modal-overlay transition-opacity" onclick="closeBatchDetailModal()"></div>
+            <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden fade-in">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-gray-900" id="modal-batch-name">批次详情</h3>
+                    <button onclick="closeBatchDetailModal()" class="text-gray-400 hover:text-gray-500">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="px-6 py-4 overflow-y-auto scrollbar-thin max-h-[calc(90vh-140px)]" id="modal-content">
+                </div>
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+                    <button onclick="closeBatchDetailModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-batch-modal" class="fixed inset-0 hidden z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 modal-overlay transition-opacity" onclick="closeCreateBatchModal()"></div>
+            <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full fade-in">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-gray-900">创建新批次</h3>
+                    <button onclick="closeCreateBatchModal()" class="text-gray-400 hover:text-gray-500">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <form id="create-batch-form" class="px-6 py-4">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="batch-name" class="block text-sm font-medium text-gray-700">批次名称 *</label>
+                            <input type="text" id="batch-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="batch-source" class="block text-sm font-medium text-gray-700">来源类型</label>
+                            <input type="text" id="batch-source" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="如: PDF, Web, Markdown">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="total-docs" class="block text-sm font-medium text-gray-700">文档数量</label>
+                                <input type="number" id="total-docs" min="0" value="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="total-chunks" class="block text-sm font-medium text-gray-700">切片数量</label>
+                                <input type="number" id="total-chunks" min="0" value="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="strategy-id" class="block text-sm font-medium text-gray-700">切片策略</label>
+                            <select id="strategy-id" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">无</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="batch-metadata" class="block text-sm font-medium text-gray-700">元数据 (JSON格式)</label>
+                            <textarea id="batch-metadata" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder='{"project": "example", "author": "user"}'></textarea>
+                        </div>
+                    </div>
+                </form>
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+                    <button onclick="closeCreateBatchModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        取消
+                    </button>
+                    <button onclick="submitCreateBatch()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        创建
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        let batches = [];
+        let strategies = [];
+
+        const STATUS_LABELS = {
+            'pending': '待处理',
+            'running': '运行中',
+            'paused': '已暂停',
+            'completed': '已完成',
+            'failed': '失败',
+            'partial': '部分完成'
+        };
+
+        function showToast(message, type = 'info') {
+            const colors = {
+                'success': 'bg-green-500',
+                'error': 'bg-red-500',
+                'info': 'bg-blue-500',
+                'warning': 'bg-yellow-500'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `${colors[type]} text-white px-4 py-3 rounded-md shadow-lg fade-in flex items-center`;
+            toast.innerHTML = `
+                <span class="flex-1">${message}</span>
+                <button onclick="this.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            `;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        async function apiRequest(url, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${url}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.detail || `HTTP ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast(error.message || '请求失败', 'error');
+                throw error;
+            }
+        }
+
+        async function loadStrategies() {
+            try {
+                strategies = await apiRequest('/strategies/');
+                const select = document.getElementById('strategy-id');
+                select.innerHTML = '<option value="">无</option>';
+                strategies.forEach(s => {
+                    const option = document.createElement('option');
+                    option.value = s.id;
+                    option.textContent = `${s.name} (${s.chunk_size}/${s.chunk_overlap})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Failed to load strategies:', error);
+            }
+        }
+
+        async function loadBatches() {
+            try {
+                const search = document.getElementById('search-input').value;
+                const status = document.getElementById('status-filter').value;
+                
+                let url = '/batches/?limit=100';
+                if (search) url += `&search=${encodeURIComponent(search)}`;
+                if (status) url += `&status=${status}`;
+                
+                batches = await apiRequest(url);
+                renderBatches();
+                updateStats();
+            } catch (error) {
+                console.error('Failed to load batches:', error);
+            }
+        }
+
+        function renderBatches() {
+            const tbody = document.getElementById('batches-table-body');
+            
+            if (batches.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="mt-2">暂无批次数据</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = batches.map(batch => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">${escapeHtml(batch.batch_name)}</div>
+                                <div class="text-xs text-gray-500">${escapeHtml(batch.source_type || '未知来源')}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium status-${batch.status}">
+                            ${STATUS_LABELS[batch.status] || batch.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div class="w-24 bg-gray-200 rounded-full h-2 mr-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${batch.progress}%"></div>
+                            </div>
+                            <span class="text-sm text-gray-600">${batch.progress.toFixed(1)}%</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        ${batch.total_documents} 文档 / ${batch.total_chunks} 切片
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        ${formatDate(batch.created_at)}
+                    </td>
+                    <td class="px-6 py-4 text-right text-sm font-medium">
+                        <div class="flex justify-end space-x-2">
+                            <button onclick="viewBatchDetail(${batch.id})" class="text-blue-600 hover:text-blue-900">查看</button>
+                            ${batch.status === 'pending' ? `<button onclick="startBatch(${batch.id})" class="text-green-600 hover:text-green-900">启动</button>` : ''}
+                            ${batch.status === 'running' ? `<button onclick="pauseBatch(${batch.id})" class="text-yellow-600 hover:text-yellow-900">暂停</button>` : ''}
+                            ${batch.status === 'paused' ? `<button onclick="resumeBatch(${batch.id})" class="text-green-600 hover:text-green-900">恢复</button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total-batches').textContent = batches.length;
+            document.getElementById('stat-running-batches').textContent = batches.filter(b => b.status === 'running').length;
+            document.getElementById('stat-completed-batches').textContent = batches.filter(b => b.status === 'completed').length;
+            document.getElementById('stat-failed-batches').textContent = batches.filter(b => ['failed', 'partial'].includes(b.status)).length;
+        }
+
+        async function viewBatchDetail(batchId) {
+            try {
+                const [detail, report, tasks, failedChunks, retryQueue] = await Promise.all([
+                    apiRequest(`/batches/${batchId}`),
+                    apiRequest(`/batches/${batchId}/report`),
+                    apiRequest(`/batches/${batchId}/tasks/?limit=50`),
+                    apiRequest(`/batches/${batchId}/failed-chunks/`),
+                    apiRequest(`/batches/${batchId}/retry-queue/`)
+                ]);
+
+                document.getElementById('modal-batch-name').textContent = detail.batch_name;
+                
+                const modalContent = document.getElementById('modal-content');
+                modalContent.innerHTML = `
+                    <div class="space-y-6 text-left">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-gray-700 mb-3">批次信息</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-xs text-gray-500">状态</span>
+                                    <p class="text-sm font-medium">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium status-${detail.status}">
+                                            ${STATUS_LABELS[detail.status] || detail.status}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500">进度</span>
+                                    <p class="text-sm font-medium">${detail.progress.toFixed(1)}%</p>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500">总任务数</span>
+                                    <p class="text-sm font-medium">${detail.task_count || 0}</p>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500">完成数</span>
+                                    <p class="text-sm font-medium text-green-600">${detail.completed_count || 0}</p>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500">失败数</span>
+                                    <p class="text-sm font-medium text-red-600">${detail.failed_count || 0}</p>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500">重试队列</span>
+                                    <p class="text-sm font-medium text-yellow-600">${detail.retry_count || 0}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2">
+                            ${detail.status === 'pending' ? `<button onclick="startBatch(${batchId}); closeBatchDetailModal();" class="px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">启动批次</button>` : ''}
+                            ${detail.status === 'running' ? `<button onclick="pauseBatch(${batchId}); closeBatchDetailModal();" class="px-3 py-1.5 text-sm font-medium text-white bg-yellow-600 rounded-md hover:bg-yellow-700">暂停批次</button>` : ''}
+                            ${detail.status === 'paused' ? `<button onclick="resumeBatch(${batchId}); closeBatchDetailModal();" class="px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">恢复批次</button>` : ''}
+                            <button onclick="processRetryQueue(${batchId})" class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">处理重试队列</button>
+                            <button onclick="exportBatch(${batchId})" class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">导出数据</button>
+                            <button onclick="cleanupBatch(${batchId})" class="px-3 py-1.5 text-sm font-medium text-red-700 bg-white border border-red-300 rounded-md hover:bg-red-50">清理脏数据</button>
+                        </div>
+
+                        ${failedChunks.length > 0 ? `
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-700 mb-3">失败片段 (${failedChunks.length})</h4>
+                                <div class="bg-red-50 rounded-lg overflow-hidden">
+                                    <div class="max-h-60 overflow-y-auto scrollbar-thin">
+                                        ${failedChunks.map((chunk, i) => `
+                                            <div class="p-3 ${i > 0 ? 'border-t border-red-100' : ''}">
+                                                <div class="flex justify-between items-start">
+                                                    <div class="flex-1">
+                                                        <p class="text-sm font-medium text-red-800">${escapeHtml(chunk.error_type || 'Unknown Error')}</p>
+                                                        <p class="text-xs text-red-600 mt-1">${escapeHtml(chunk.error_message)}</p>
+                                                        <p class="text-xs text-gray-500 mt-1">文档: ${chunk.document_id || 'N/A'} | 切片: #${chunk.chunk_index || 'N/A'}</p>
+                                                    </div>
+                                                    ${!chunk.resolved ? `<button onclick="resolveFailedChunk(${chunk.id})" class="ml-3 px-2 py-1 text-xs text-white bg-green-600 rounded hover:bg-green-700">标记已解决</button>` : '<span class="ml-3 px-2 py-1 text-xs text-green-700 bg-green-100 rounded">已解决</span>'}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${tasks.length > 0 ? `
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-700 mb-3">最近任务 (显示前20个)</h4>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">任务ID</th>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">文档ID</th>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">状态</th>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">重试次数</th>
+                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            ${tasks.slice(0, 20).map(task => `
+                                                <tr>
+                                                    <td class="px-3 py-2 text-xs text-gray-900">${task.id}</td>
+                                                    <td class="px-3 py-2 text-xs text-gray-500">${task.document_id || 'N/A'}</td>
+                                                    <td class="px-3 py-2">
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium status-${task.status}">
+                                                            ${task.status}
+                                                        </span>
+                                                    </td>
+                                                    <td class="px-3 py-2 text-xs text-gray-500">${task.retry_count}/${task.max_retries}</td>
+                                                    <td class="px-3 py-2">
+                                                        ${task.status === 'failed' && task.retry_count < task.max_retries ? `<button onclick="retryTask(${task.id})" class="text-xs text-blue-600 hover:text-blue-900">重试</button>` : ''}
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                document.getElementById('batch-detail-modal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Failed to load batch detail:', error);
+            }
+        }
+
+        function closeBatchDetailModal() {
+            document.getElementById('batch-detail-modal').classList.add('hidden');
+        }
+
+        function openCreateBatchModal() {
+            document.getElementById('create-batch-modal').classList.remove('hidden');
+        }
+
+        function closeCreateBatchModal() {
+            document.getElementById('create-batch-modal').classList.add('hidden');
+            document.getElementById('create-batch-form').reset();
+        }
+
+        async function submitCreateBatch() {
+            const name = document.getElementById('batch-name').value.trim();
+            const source = document.getElementById('batch-source').value.trim();
+            const totalDocs = parseInt(document.getElementById('total-docs').value) || 0;
+            const totalChunks = parseInt(document.getElementById('total-chunks').value) || 0;
+            const strategyId = document.getElementById('strategy-id').value;
+            const metadataStr = document.getElementById('batch-metadata').value.trim();
+
+            if (!name) {
+                showToast('请输入批次名称', 'error');
+                return;
+            }
+
+            let metadata = null;
+            if (metadataStr) {
+                try {
+                    metadata = JSON.parse(metadataStr);
+                } catch (e) {
+                    showToast('元数据格式错误，请输入有效的JSON', 'error');
+                    return;
+                }
+            }
+
+            try {
+                const requestId = 'batch-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                await apiRequest(`/batches/?request_id=${requestId}`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        batch_name: name,
+                        source_type: source || null,
+                        total_documents: totalDocs,
+                        total_chunks: totalChunks,
+                        strategy_id: strategyId ? parseInt(strategyId) : null,
+                        metadata: metadata
+                    })
+                });
+
+                showToast('批次创建成功', 'success');
+                closeCreateBatchModal();
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        async function startBatch(batchId) {
+            try {
+                await apiRequest(`/batches/${batchId}/start`, { method: 'POST' });
+                showToast('批次已启动', 'success');
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        async function pauseBatch(batchId) {
+            try {
+                await apiRequest(`/batches/${batchId}/pause`, { method: 'POST' });
+                showToast('批次已暂停', 'success');
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        async function resumeBatch(batchId) {
+            try {
+                await apiRequest(`/batches/${batchId}/resume`, { method: 'POST' });
+                showToast('批次已恢复', 'success');
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        async function retryTask(taskId) {
+            try {
+                await apiRequest(`/tasks/${taskId}/retry`, { method: 'POST' });
+                showToast('任务已加入重试队列', 'success');
+                setTimeout(() => loadBatches(), 500);
+            } catch (error) {
+            }
+        }
+
+        async function resolveFailedChunk(chunkId) {
+            try {
+                await apiRequest(`/failed-chunks/${chunkId}/resolve`, { method: 'POST' });
+                showToast('失败片段已标记为已解决', 'success');
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        async function processRetryQueue(batchId) {
+            try {
+                const result = await apiRequest(`/batches/${batchId}/retry-queue/process`, { method: 'POST' });
+                showToast(`已处理 ${result.processed} 个重试任务`, 'success');
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        async function exportBatch(batchId) {
+            try {
+                const data = await apiRequest(`/batches/${batchId}/export`);
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `batch-${batchId}-export-${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('导出成功', 'success');
+            } catch (error) {
+            }
+        }
+
+        async function cleanupBatch(batchId) {
+            try {
+                const result = await apiRequest(`/batches/${batchId}/cleanup`, { method: 'POST' });
+                showToast(`已清理: ${result.stuck_processing || 0} 个卡住的任务`, 'success');
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        async function cleanupDirtyData() {
+            try {
+                const result = await apiRequest('/admin/cleanup-all', { method: 'POST' });
+                showToast(`全局清理完成: ${result.stuck_processing || 0} 个卡住的任务`, 'success');
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        function refreshData() {
+            loadBatches();
+            showToast('数据已刷新', 'info');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        document.getElementById('search-input').addEventListener('input', debounce(loadBatches, 300));
+        document.getElementById('status-filter').addEventListener('change', loadBatches);
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStrategies();
+            loadBatches();
+        });
+    </script>
+</body>
+</html>
