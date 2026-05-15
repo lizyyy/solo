@@ -1,11 +1,11 @@
 ================================================================================
-路径归并处理报告 - 批次 VERIFY_001
-生成时间: 2026-05-15 21:29:57
+路径归并处理报告 - 批次 FINAL_001
+生成时间: 2026-05-15 21:39:25
 ================================================================================
 
 【执行概览】
-  处理时间: 2026-05-15 21:29:57 -> 2026-05-15 21:29:57
-  执行耗时: 1.77 ms
+  处理时间: 2026-05-15 21:39:25 -> 2026-05-15 21:39:25
+  执行耗时: 1.59 ms
   总记录数: 8
   成功: 1 条
   失败: 7 条
@@ -27,13 +27,13 @@
 【处理详情 - 前后对比】
 --------------------------------------------------------------------------------
 
-记录 1: VERIFY_001_001
+记录 1: FINAL_001_001
   录音ID: REC_20240515_0900_A001
   坐席ID: AGENT_001
   客户ID: CUST_10001
   时间: 2024-05-15 09:00:00 -> 2024-05-15 09:15:00
   状态: failed
-  处理耗时: 0.03 ms
+  处理耗时: 0.02 ms
   权限路径 (3):
     1. /customer/profile/basic
     2. /customer/service/history
@@ -53,7 +53,7 @@
     2. [low] Path length mismatch: permission(3) vs actual(4)
 
 
-记录 2: VERIFY_001_002
+记录 2: FINAL_001_002
   录音ID: REC_20240515_0920_A001
   坐席ID: AGENT_001
   客户ID: CUST_10002
@@ -81,7 +81,7 @@
     2. [low] Path length mismatch: permission(3) vs actual(5)
 
 
-记录 3: VERIFY_001_003
+记录 3: FINAL_001_003
   录音ID: REC_20240515_2330_A002
   坐席ID: AGENT_002
   客户ID: CUST_10003
@@ -105,7 +105,7 @@
     3. [low] Path length mismatch: permission(2) vs actual(3)
 
 
-记录 4: VERIFY_001_004
+记录 4: FINAL_001_004
   录音ID: REC_20240515_1000_A003
   坐席ID: AGENT_003
   客户ID: CUST_10004
@@ -132,7 +132,7 @@
     2. [low] Path length mismatch: permission(2) vs actual(5)
 
 
-记录 5: VERIFY_001_005
+记录 5: FINAL_001_005
   录音ID: REC_20240515_1030_A003
   坐席ID: AGENT_003
   客户ID: CUST_10005
@@ -149,7 +149,7 @@
     2. [low] Path length mismatch: permission(1) vs actual(0)
 
 
-记录 6: VERIFY_001_006
+记录 6: FINAL_001_006
   录音ID: REC_20240515_1100_A004
   坐席ID: AGENT_004
   客户ID: CUST_10006
@@ -170,7 +170,7 @@
     3. /exchange/apply
 
 
-记录 7: VERIFY_001_007
+记录 7: FINAL_001_007
   录音ID: REC_20240515_1400_A005
   坐席ID: AGENT_005
   客户ID: CUST_10007
@@ -195,7 +195,7 @@
     2. [low] Path length mismatch: permission(2) vs actual(4)
 
 
-记录 8: VERIFY_001_008
+记录 8: FINAL_001_008
   录音ID: REC_20240514_1600_A001
   坐席ID: AGENT_001
   客户ID: CUST_10008
@@ -205,7 +205,7 @@
   【人工修正】
     修正时间: 2024-05-15 07:00:00
     修正原因: 人工审核确认：高级客服主管有权限处理客诉关闭，此前误判为权限放大
-    来源批次: VERIFY_001
+    来源批次: FINAL_001
   权限路径 (2):
     1. /customer/profile/basic
     2. /complaint/review

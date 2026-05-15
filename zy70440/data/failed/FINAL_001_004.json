@@ -1,7 +1,23 @@
 {
-  "record_id": "VERIFY_001_004",
-  "batch_id": "VERIFY_001",
-  "file_hash": "6cd5a00c322278ad099cd8fb97425412d34d385ffa1f09548d3eb8155e8d40ec",
+  "record_id": "FINAL_001_004",
+  "batch_id": "FINAL_001",
+  "source": "after_sales_recording",
+  "recording_id": "REC_20240515_1000_A003",
+  "agent_id": "AGENT_003",
+  "customer_id": "CUST_10004",
+  "start_time": "2024-05-15 10:00:00",
+  "end_time": "2024-05-15 10:20:00",
+  "permission_path": [
+    "/customer/profile/basic",
+    "/warranty/check"
+  ],
+  "actual_path": [
+    "/customer/profile/basic",
+    "/customer/profile/sensitive",
+    "/warranty/check",
+    "/warranty/claim",
+    "/admin/system/access"
+  ],
   "merged_path": [
     "/customer/profile/basic",
     "/customer/profile/sensitive",
@@ -10,7 +26,6 @@
     "/admin/system/access"
   ],
   "status": "failed",
-  "processed_time": "2026-05-15 21:29:57.045487",
   "issues": [
     {
       "type": "permission_over_grant",
@@ -29,5 +44,11 @@
       "message": "Path length mismatch: permission(2) vs actual(5)",
       "severity": "low"
     }
-  ]
+  ],
+  "is_manual_fix": false,
+  "fix_reason": null,
+  "fix_time": null,
+  "processed_time": "2026-05-15 21:39:25.032962",
+  "execution_time_ms": 0.011920928955078125,
+  "metadata": {}
 }

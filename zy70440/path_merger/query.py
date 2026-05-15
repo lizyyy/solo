@@ -22,13 +22,17 @@ class QueryEngine:
             batch_records = self._load_batch_records(batch_file)
             records.extend(batch_records)
 
-        for failed_file in self.failed_dir.glob("*.json"):
-            with open(failed_file, 'r', encoding='utf-8') as f:
+        for manual_file in self.manual_dir.glob("*.json"):
+            with open(manual_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 record = PathRecord(**data)
                 records.append(record)
 
-        return self._apply_filter(records, filter)
+        unique_records = {}
+        for record in records:
+            unique_records[record.record_id] = record
+
+        return self._apply_filter(list(unique_records.values()), filter)
 
     def _load_batch_records(self, batch_file: Path) -> List[PathRecord]:
         with open(batch_file, 'r', encoding='utf-8') as f:
@@ -147,3 +151,32 @@ class QueryEngine:
                 data['records'] = records
                 return MergeResult(**data)
         return None
+
+    def _recalculate_result_stats(self, result: MergeResult) -> MergeResult:
+        success_count = sum(1 for r in result.records if r.status == PathStatus.SUCCESS)
+        failed_count = sum(1 for r in result.records if r.status == PathStatus.FAILED)
+        conflict_count = sum(1 for r in result.records if r.status == PathStatus.CONFLICT)
+        skipped_count = sum(1 for r in result.records if r.status == PathStatus.SKIPPED)
+        manual_fix_count = sum(1 for r in result.records if r.status == PathStatus.MANUAL_FIX)
+
+        result.success_count = success_count
+        result.failed_count = failed_count
+        result.conflict_count = conflict_count
+        result.skipped_count = skipped_count
+        result.manual_fix_count = manual_fix_count
+
+        return result
+
+    def update_record_and_save(self, record: PathRecord) -> bool:
+        result = self.load_result(record.batch_id)
+        if not result:
+            return False
+
+        for i, r in enumerate(result.records):
+            if r.record_id == record.record_id:
+                result.records[i] = record
+                break
+
+        self._recalculate_result_stats(result)
+        self.save_result(result)
+        return True

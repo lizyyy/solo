@@ -229,14 +229,7 @@ def fix(record_id, fixed_path, reason, batch_id):
     fixed_path_list = list(fixed_path)
 
     PathMerger.apply_manual_fix(record, fixed_path_list, reason)
-
-    result = query_engine.load_result(record.batch_id)
-    if result:
-        for i, r in enumerate(result.records):
-            if r.record_id == record_id:
-                result.records[i] = record
-                break
-        query_engine.save_result(result)
+    query_engine.update_record_and_save(record)
 
     click.echo(f"记录 {record_id} 已人工修正")
     click.echo(f"修正原因: {reason}")
