@@ -30,7 +30,20 @@
 
 ## 快速启动
 
-### 方式一：使用 Maven Wrapper（推荐，无需安装 Maven）
+### 方式一：一键启动脚本（推荐，无需安装 Maven）
+
+```bash
+# 给脚本添加执行权限并启动
+chmod +x start.sh && ./start.sh
+```
+
+脚本会自动：
+1. 检查 Java 环境（需要 Java 8 或更高）
+2. 如果没有 Maven 则自动下载
+3. 编译项目
+4. 启动服务
+
+### 方式二：使用 Maven Wrapper
 
 ```bash
 # 编译项目
@@ -40,7 +53,7 @@
 ./mvnw spring-boot:run
 ```
 
-### 方式二：使用已安装的 Maven
+### 方式三：使用已安装的 Maven
 
 ```bash
 # 编译项目

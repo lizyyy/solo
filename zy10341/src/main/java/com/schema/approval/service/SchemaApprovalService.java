@@ -32,7 +32,8 @@ public class SchemaApprovalService {
     public SchemaVersion registerSchema(SchemaRegisterRequest request) {
         if (schemaVersionRepository.existsByRequestId(request.getRequestId())) {
             log.info("Duplicate request detected, returning existing schema for requestId: {}", request.getRequestId());
-            return schemaVersionRepository.findByRequestId(request.getRequestId()).orElseThrow();
+            return schemaVersionRepository.findByRequestId(request.getRequestId())
+                    .orElseThrow(new RuntimeException("Schema version not found for duplicate request"));
         }
 
         EventTopic topic = eventTopicService.getTopicOrThrow(request.getTopicName());

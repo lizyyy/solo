@@ -1,6 +1,6 @@
 package com.schema.approval.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
