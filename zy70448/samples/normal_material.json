@@ -1,0 +1,65 @@
+{
+  "permission_items": [
+    {
+      "device_id": "POS-GF-001",
+      "device_name": "高峰广场店收银机01号",
+      "store_name": "高峰广场店",
+      "permission_type": "目录访问",
+      "permission_target": "//fileserver/gf_store/pos01/sales_data",
+      "applicant": "张三",
+      "application_reason": "日常销售数据同步和对账需求"
+    },
+    {
+      "device_id": "POS-GF-002",
+      "device_name": "高峰广场店收银机02号",
+      "store_name": "高峰广场店",
+      "permission_type": "目录访问",
+      "permission_target": "//fileserver/gf_store/pos02/sales_data",
+      "applicant": "李四",
+      "application_reason": "日常销售数据同步和对账需求"
+    },
+    {
+      "device_id": "INV-GF-001",
+      "device_name": "高峰广场店库存查询终端",
+      "store_name": "高峰广场店",
+      "permission_type": "只读访问",
+      "permission_target": "//fileserver/gf_store/inventory/read_only",
+      "applicant": "王五",
+      "application_reason": "库存实时查询需求，便于及时补货"
+    }
+  ],
+  "approval_nodes": [
+    {
+      "node_id": "N001",
+      "node_name": "门店经理审批",
+      "approver": "赵经理",
+      "status": "approved",
+      "comment": "同意，符合门店运营需求",
+      "approved_at": "2026-05-10T09:30:00"
+    },
+    {
+      "node_id": "N002",
+      "node_name": "区域总监审批",
+      "approver": "钱总监",
+      "status": "approved",
+      "comment": "同意，请IT部门配合实施",
+      "approved_at": "2026-05-11T14:20:00"
+    },
+    {
+      "node_id": "N003",
+      "node_name": "IT安全审核",
+      "approver": "孙工程师",
+      "status": "approved",
+      "comment": "已完成安全评估，权限范围符合最小权限原则",
+      "approved_at": "2026-05-12T11:45:00"
+    }
+  ],
+  "meeting_attachments": [
+    {
+      "file_name": "高峰门店5月权限评审会议纪要_v1.docx",
+      "content_before": "原计划仅开放收银机POS01的访问权限",
+      "content_after": "根据实际运营需要，新增POS02和库存查询终端的权限申请",
+      "modification_note": "根据5月10日门店运营会议决议调整"
+    }
+  ]
+}

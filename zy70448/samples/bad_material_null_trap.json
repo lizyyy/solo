@@ -1,0 +1,65 @@
+{
+  "permission_items": [
+    {
+      "device_id": "POS-GF-001",
+      "device_name": "高峰广场店收银机01号",
+      "store_name": "高峰广场店",
+      "permission_type": "目录访问",
+      "permission_target": "//fileserver/gf_store/pos01/sales_data",
+      "applicant": "张三",
+      "application_reason": "日常销售数据同步和对账需求"
+    },
+    {
+      "device_id": "POS-GF-003",
+      "device_name": "高峰广场店收银机03号",
+      "store_name": "高峰广场店",
+      "permission_type": "目录访问",
+      "permission_target": "",
+      "applicant": "赵六",
+      "application_reason": "后台管理系统维护需求"
+    },
+    {
+      "device_id": "MGR-GF-001",
+      "device_name": "高峰广场店经理办公电脑",
+      "store_name": "高峰广场店",
+      "permission_type": "完全控制",
+      "permission_target": "",
+      "applicant": "钱七",
+      "application_reason": "门店管理报表生成和数据分析"
+    }
+  ],
+  "approval_nodes": [
+    {
+      "node_id": "N001",
+      "node_name": "门店经理审批",
+      "approver": "",
+      "status": "approved",
+      "comment": "",
+      "approved_at": null
+    },
+    {
+      "node_id": "N002",
+      "node_name": "区域总监审批",
+      "approver": "钱总监",
+      "status": "approved",
+      "comment": "情况特殊，请尽快处理",
+      "approved_at": "2026-05-13T10:15:00"
+    },
+    {
+      "node_id": "N003",
+      "node_name": "IT安全审核",
+      "approver": "",
+      "status": "approved",
+      "comment": "",
+      "approved_at": null
+    }
+  ],
+  "meeting_attachments": [
+    {
+      "file_name": "高峰门店紧急权限申请说明.docx",
+      "content_before": null,
+      "content_after": "因系统升级需要，紧急申请收银机03和经理办公电脑的特殊权限",
+      "modification_note": ""
+    }
+  ]
+}
