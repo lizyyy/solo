@@ -63,7 +63,7 @@ public class SlimmingExecuteService {
         try {
             Optional<SlimmingRule> ruleOpt = sceneMatcher.matchRule(request.getApiPath(), request.getSceneCode());
 
-            if (ruleOpt.isEmpty()) {
+            if (!ruleOpt.isPresent()) {
                 log.info("未找到匹配的瘦身规则，返回原始响应: {}", request.getApiPath());
                 result.setSlimmedResponse(request.getOriginalResponse());
                 result.setOriginalSize(fieldSlimmingEngine.calculateSize(request.getOriginalResponse()));
