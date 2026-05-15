@@ -77,7 +77,8 @@ class RuleVersion(RuleVersionBase):
         from_attributes = True
 
 class ReplayResultBase(BaseModel):
-    status: str
+    replay_status: str
+    approval_status: Optional[str] = None
     execution_time_ms: float
     before_data: Dict[str, Any]
     after_data: Dict[str, Any]

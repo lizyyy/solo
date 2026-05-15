@@ -78,10 +78,10 @@ def _generate_before_summary(extracts: List[GatewayErrorExtract]) -> Dict[str, A
 
 def _generate_after_summary(results: List[ReplayResult]) -> Dict[str, Any]:
     total = len(results)
-    success = len([r for r in results if r.status == "success"])
-    blocked = len([r for r in results if r.status == "blocked"])
-    approved = len([r for r in results if r.status == "approved"])
-    rejected = len([r for r in results if r.status == "rejected"])
+    success = len([r for r in results if r.replay_status == "success"])
+    blocked = len([r for r in results if r.replay_status == "blocked" and r.approval_status != "approved"])
+    approved = len([r for r in results if r.approval_status == "approved"])
+    rejected = len([r for r in results if r.approval_status == "rejected"])
     approval_opinion_missing = len([r for r in results if r.approval_opinion_missing])
     
     matched_rules = {}
@@ -135,13 +135,15 @@ def generate_report(
     }
     
     for r in results:
-        if r.status == "blocked":
+        if r.replay_status == "blocked" and r.approval_status != "approved":
             extract = db.query(GatewayErrorExtract).filter(GatewayErrorExtract.id == r.error_extract_id).first()
             content["blocked_details"].append({
                 "trace_id": extract.trace_id if extract else None,
                 "error_code": extract.error_code if extract else None,
                 "block_code": r.block_code,
                 "block_reason": r.block_reason,
+                "replay_status": r.replay_status,
+                "approval_status": r.approval_status,
                 "approval_opinion_missing": r.approval_opinion_missing,
                 "matched_rules": r.matched_rules
             })

@@ -181,7 +181,8 @@ class ReplayEngine:
         
         return ReplayResult(
             error_extract_id=extract.id,
-            status=status,
+            replay_status=status,
+            approval_status=None,
             execution_time_ms=execution_time_ms,
             before_data=before_data,
             after_data=after_data,
@@ -222,9 +223,9 @@ class ReplayEngine:
             
             total_execution_time += result.execution_time_ms
             
-            if result.status == ReplayStatus.SUCCESS:
+            if result.replay_status == ReplayStatus.SUCCESS:
                 success_count += 1
-            elif result.status == ReplayStatus.BLOCKED:
+            elif result.replay_status == ReplayStatus.BLOCKED:
                 blocked_count += 1
             else:
                 failed_count += 1

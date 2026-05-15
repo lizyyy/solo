@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List
 from database import get_db
 from models import (
@@ -63,17 +64,17 @@ def get_batch_detail(batch_id: int, db: Session = Depends(get_db)):
     
     success_items = db.query(ReplayResult).filter(
         ReplayResult.batch_id == batch_id,
-        ReplayResult.status == ReplayStatus.SUCCESS
+        ReplayResult.replay_status == ReplayStatus.SUCCESS
     ).all()
     
     failed_items = db.query(ReplayResult).filter(
         ReplayResult.batch_id == batch_id,
-        ReplayResult.status == ReplayStatus.FAILED
+        ReplayResult.replay_status == ReplayStatus.FAILED
     ).all()
     
     blocked_items = db.query(ReplayResult).filter(
         ReplayResult.batch_id == batch_id,
-        ReplayResult.status == ReplayStatus.BLOCKED
+        ReplayResult.replay_status == ReplayStatus.BLOCKED
     ).all()
     
     approval_records = db.query(ApprovalRecord).filter(
@@ -135,7 +136,10 @@ def query_results(request: QueryRequest, db: Session = Depends(get_db)):
     if request.batch_id:
         query = query.filter(ReplayResult.batch_id == request.batch_id)
     if request.status:
-        query = query.filter(ReplayResult.status == request.status)
+        query = query.filter(
+            (ReplayResult.replay_status == request.status) | 
+            (ReplayResult.approval_status == request.status)
+        )
     if request.trace_id:
         query = query.filter(GatewayErrorExtract.trace_id == request.trace_id)
     if request.error_code:
@@ -177,7 +181,7 @@ def create_rule_version(rule_data: RuleVersionCreate, db: Session = Depends(get_
         raise HTTPException(status_code=400, detail=f"规则版本 {rule_data.version} 已存在")
     
     db.query(RuleVersion).filter(RuleVersion.is_active == True).update(
-        {RuleVersion.is_active: False, RuleVersion.effective_to: db.func.now()}
+        {RuleVersion.is_active: False, RuleVersion.effective_to: func.now()}
     )
     
     rule_version = RuleVersion(**rule_data.dict(), is_active=True)

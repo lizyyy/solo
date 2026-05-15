@@ -66,14 +66,14 @@ def create_approval(
     if not replay_result:
         raise HTTPException(status_code=404, detail="重放结果不存在")
     
-    previous_status = replay_result.status
+    previous_approval_status = replay_result.approval_status
     
     if approval_data.action == ApprovalAction.APPROVE:
-        new_status = ReplayStatus.APPROVED
+        new_approval_status = ReplayStatus.APPROVED
     elif approval_data.action == ApprovalAction.REJECT:
-        new_status = ReplayStatus.REJECTED
+        new_approval_status = ReplayStatus.REJECTED
     else:
-        new_status = previous_status
+        new_approval_status = previous_approval_status
     
     if approval_data.warehouse_handover_id:
         handover = db.query(WarehouseHandover).filter(
@@ -85,13 +85,13 @@ def create_approval(
     approval = ApprovalRecord(
         **approval_data.dict(),
         batch_id=replay_result.batch_id,
-        previous_status=previous_status,
-        new_status=new_status
+        previous_status=previous_approval_status,
+        new_status=new_approval_status
     )
     
     db.add(approval)
     
-    replay_result.status = new_status
+    replay_result.approval_status = new_approval_status
     
     db.commit()
     db.refresh(approval)
@@ -114,13 +114,13 @@ def _update_batch_status(batch_id: int, db: Session):
     rejected_count = 0
     
     for r in results:
-        if r.status == ReplayStatus.SUCCESS:
+        if r.replay_status == ReplayStatus.SUCCESS:
             success_count += 1
-        elif r.status == ReplayStatus.APPROVED:
+        elif r.approval_status == ReplayStatus.APPROVED:
             approved_count += 1
-        elif r.status == ReplayStatus.BLOCKED:
+        elif r.replay_status == ReplayStatus.BLOCKED and r.approval_status != ReplayStatus.APPROVED:
             blocked_count += 1
-        elif r.status == ReplayStatus.REJECTED:
+        elif r.approval_status == ReplayStatus.REJECTED:
             rejected_count += 1
     
     batch.success_count = success_count + approved_count
