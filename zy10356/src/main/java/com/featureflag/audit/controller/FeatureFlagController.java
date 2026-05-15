@@ -5,7 +5,7 @@ import com.featureflag.audit.dto.EvaluateResponse;
 import com.featureflag.audit.entity.AuditRecord;
 import com.featureflag.audit.service.AuditService;
 import com.featureflag.audit.service.FeatureFlagService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

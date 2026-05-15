@@ -285,30 +285,30 @@ MVNW_SCRIPT
 
 # ==================== 清理旧的编译产物 ====================
 clean_target() {
-    if [ -d "$PROJECT_DIR/target" ]; then
-        info "清理旧的编译产物..."
-        rm -rf "$PROJECT_DIR/target"
-        success "清理完成"
-    fi
+    info "强制清理旧的编译产物 (防止 Java 17 class 残留)..."
+    rm -rf "$PROJECT_DIR/target"
+    rm -rf "$PROJECT_DIR/.mvn/wrapper/maven-wrapper.jar"
+    success "清理完成"
 }
 
 # ==================== 构建项目 ====================
 build_project() {
-    info "开始构建项目..."
+    info "开始构建项目 (Java 8 兼容模式)..."
     echo ""
     echo "  这可能需要几分钟，取决于网络速度..."
     echo "  (首次运行会下载 Maven 和所有依赖)"
     echo ""
     
     cd "$PROJECT_DIR"
-    if ! ./mvnw compile -DskipTests -q; then
+    # 使用 clean compile 确保从干净状态重新编译
+    if ! ./mvnw clean compile -DskipTests -q; then
         error "构建失败！"
         echo ""
         echo "尝试使用以下命令查看详细错误:"
-        echo "  ./mvnw compile"
+        echo "  ./mvnw clean compile"
         exit 1
     fi
-    success "项目构建完成"
+    success "项目构建完成 (Java 8 字节码)"
 }
 
 # ==================== 启动服务 ====================

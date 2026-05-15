@@ -151,19 +151,32 @@ public class FeatureFlagService {
         String ruleValue = rule.getAttributeValue();
         HitRule.Operator operator = rule.getOperator();
 
-        return switch (operator) {
-            case EQUALS -> attributeValue.equals(ruleValue);
-            case NOT_EQUALS -> !attributeValue.equals(ruleValue);
-            case CONTAINS -> attributeValue.contains(ruleValue);
-            case NOT_CONTAINS -> !attributeValue.contains(ruleValue);
-            case GREATER_THAN -> compareNumeric(attributeValue, ruleValue) > 0;
-            case LESS_THAN -> compareNumeric(attributeValue, ruleValue) < 0;
-            case GREATER_THAN_OR_EQUAL -> compareNumeric(attributeValue, ruleValue) >= 0;
-            case LESS_THAN_OR_EQUAL -> compareNumeric(attributeValue, ruleValue) <= 0;
-            case IN -> Arrays.asList(ruleValue.split(",")).contains(attributeValue);
-            case NOT_IN -> !Arrays.asList(ruleValue.split(",")).contains(attributeValue);
-            case REGEX -> attributeValue.matches(ruleValue);
-        };
+        switch (operator) {
+            case EQUALS:
+                return attributeValue.equals(ruleValue);
+            case NOT_EQUALS:
+                return !attributeValue.equals(ruleValue);
+            case CONTAINS:
+                return attributeValue.contains(ruleValue);
+            case NOT_CONTAINS:
+                return !attributeValue.contains(ruleValue);
+            case GREATER_THAN:
+                return compareNumeric(attributeValue, ruleValue) > 0;
+            case LESS_THAN:
+                return compareNumeric(attributeValue, ruleValue) < 0;
+            case GREATER_THAN_OR_EQUAL:
+                return compareNumeric(attributeValue, ruleValue) >= 0;
+            case LESS_THAN_OR_EQUAL:
+                return compareNumeric(attributeValue, ruleValue) <= 0;
+            case IN:
+                return Arrays.asList(ruleValue.split(",")).contains(attributeValue);
+            case NOT_IN:
+                return !Arrays.asList(ruleValue.split(",")).contains(attributeValue);
+            case REGEX:
+                return attributeValue.matches(ruleValue);
+            default:
+                return false;
+        }
     }
 
     private int compareNumeric(String attrValue, String ruleValue) {
