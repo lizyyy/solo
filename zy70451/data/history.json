@@ -1,0 +1,230 @@
+[
+  {
+    "id": "35a31c1b-5ffe-4ea4-86aa-8033252b97f8",
+    "resourceType": "handover_form",
+    "resourceId": "59d8299a-3d16-4e2c-8483-a4febe26e5bb",
+    "resourceRange": "tenant:TENANT001",
+    "action": "create",
+    "reason": "创建交接单",
+    "operator": "张三",
+    "createdAt": "2026-05-15T13:49:43.224Z"
+  },
+  {
+    "id": "aed20ddb-2b75-4a1d-a7fd-dbf06608c5e1",
+    "resourceType": "handover_form",
+    "resourceId": "59d8299a-3d16-4e2c-8483-a4febe26e5bb",
+    "resourceRange": "tenant:TENANT001",
+    "action": "process",
+    "reason": "处理交接单，执行版本一致性校验",
+    "operator": "张三",
+    "beforeChange": {
+      "status": "pending",
+      "serviceRecords": [
+        {
+          "serviceName": "用户认证服务",
+          "status": "pending",
+          "versions": [
+            {
+              "serviceName": "auth-service",
+              "expectedVersion": "v2.1.0",
+              "actualVersion": "v2.1.0",
+              "isMatch": true
+            },
+            {
+              "serviceName": "oauth-provider",
+              "expectedVersion": "v1.5.0",
+              "actualVersion": "v1.5.0",
+              "isMatch": true
+            }
+          ],
+          "systemConclusion": "",
+          "id": "aff54dca-a944-49e5-920b-99176539a4f7",
+          "materialSummaries": [],
+          "remarks": [],
+          "createdAt": "2026-05-15T13:49:43.223Z",
+          "updatedAt": "2026-05-15T13:49:43.223Z"
+        },
+        {
+          "serviceName": "会员续费服务",
+          "status": "pending",
+          "versions": [
+            {
+              "serviceName": "membership-service",
+              "expectedVersion": "v3.2.0",
+              "actualVersion": "v3.1.5",
+              "isMatch": false
+            },
+            {
+              "serviceName": "payment-gateway",
+              "expectedVersion": "v2.0.0",
+              "actualVersion": "v2.0.0",
+              "isMatch": true
+            }
+          ],
+          "systemConclusion": "",
+          "id": "04fca38d-6fce-42ab-82c1-da46fa321bdd",
+          "materialSummaries": [],
+          "remarks": [],
+          "createdAt": "2026-05-15T13:49:43.223Z",
+          "updatedAt": "2026-05-15T13:49:43.223Z"
+        },
+        {
+          "serviceName": "订单管理服务",
+          "status": "pending",
+          "versions": [
+            {
+              "serviceName": "order-service",
+              "expectedVersion": "v4.0.0",
+              "actualVersion": "v4.0.0",
+              "isMatch": true
+            }
+          ],
+          "systemConclusion": "",
+          "id": "d406123e-168d-4a5e-8eaf-03c29faa4f4e",
+          "materialSummaries": [],
+          "remarks": [],
+          "createdAt": "2026-05-15T13:49:43.223Z",
+          "updatedAt": "2026-05-15T13:49:43.223Z"
+        }
+      ]
+    },
+    "afterChange": {
+      "status": "partial_success",
+      "serviceRecords": [
+        {
+          "serviceName": "用户认证服务",
+          "status": "normal",
+          "versions": [
+            {
+              "serviceName": "auth-service",
+              "expectedVersion": "v2.1.0",
+              "actualVersion": "v2.1.0",
+              "isMatch": true
+            },
+            {
+              "serviceName": "oauth-provider",
+              "expectedVersion": "v1.5.0",
+              "actualVersion": "v1.5.0",
+              "isMatch": true
+            }
+          ],
+          "systemConclusion": "所有服务版本校验通过",
+          "id": "aff54dca-a944-49e5-920b-99176539a4f7",
+          "materialSummaries": [],
+          "remarks": [],
+          "createdAt": "2026-05-15T13:49:43.223Z",
+          "updatedAt": "2026-05-15T13:49:43.224Z"
+        },
+        {
+          "serviceName": "会员续费服务",
+          "status": "abnormal",
+          "versions": [
+            {
+              "serviceName": "membership-service",
+              "expectedVersion": "v3.2.0",
+              "actualVersion": "v3.1.5",
+              "isMatch": false
+            },
+            {
+              "serviceName": "payment-gateway",
+              "expectedVersion": "v2.0.0",
+              "actualVersion": "v2.0.0",
+              "isMatch": true
+            }
+          ],
+          "systemConclusion": "版本不一致: membership-service(期望:v3.2.0,实际:v3.1.5)",
+          "id": "04fca38d-6fce-42ab-82c1-da46fa321bdd",
+          "materialSummaries": [],
+          "remarks": [],
+          "createdAt": "2026-05-15T13:49:43.223Z",
+          "updatedAt": "2026-05-15T13:49:43.224Z"
+        },
+        {
+          "serviceName": "订单管理服务",
+          "status": "normal",
+          "versions": [
+            {
+              "serviceName": "order-service",
+              "expectedVersion": "v4.0.0",
+              "actualVersion": "v4.0.0",
+              "isMatch": true
+            }
+          ],
+          "systemConclusion": "所有服务版本校验通过",
+          "id": "d406123e-168d-4a5e-8eaf-03c29faa4f4e",
+          "materialSummaries": [],
+          "remarks": [],
+          "createdAt": "2026-05-15T13:49:43.223Z",
+          "updatedAt": "2026-05-15T13:49:43.224Z"
+        }
+      ]
+    },
+    "createdAt": "2026-05-15T13:49:43.224Z"
+  },
+  {
+    "id": "73de3bce-dd46-4167-b82c-1ed85f498933",
+    "resourceType": "service_record",
+    "resourceId": "04fca38d-6fce-42ab-82c1-da46fa321bdd",
+    "resourceRange": "tenant:TENANT001,form:59d8299a-3d16-4e2c-8483-a4febe26e5bb",
+    "action": "manual_fix",
+    "reason": "与技术负责人王工确认，会员续费流水无需升级到v3.2.0，当前版本可满足业务需求",
+    "operator": "李四",
+    "beforeChange": {
+      "serviceName": "会员续费服务",
+      "status": "abnormal",
+      "versions": [
+        {
+          "serviceName": "membership-service",
+          "expectedVersion": "v3.2.0",
+          "actualVersion": "v3.1.5",
+          "isMatch": false
+        },
+        {
+          "serviceName": "payment-gateway",
+          "expectedVersion": "v2.0.0",
+          "actualVersion": "v2.0.0",
+          "isMatch": true
+        }
+      ],
+      "systemConclusion": "版本不一致: membership-service(期望:v3.2.0,实际:v3.1.5)",
+      "id": "04fca38d-6fce-42ab-82c1-da46fa321bdd",
+      "materialSummaries": [],
+      "remarks": [],
+      "createdAt": "2026-05-15T13:49:43.223Z",
+      "updatedAt": "2026-05-15T13:49:43.224Z"
+    },
+    "afterChange": {
+      "serviceName": "会员续费服务",
+      "status": "manual_fixed",
+      "versions": [
+        {
+          "serviceName": "membership-service",
+          "expectedVersion": "v3.2.0",
+          "actualVersion": "v3.1.5",
+          "isMatch": false
+        },
+        {
+          "serviceName": "payment-gateway",
+          "expectedVersion": "v2.0.0",
+          "actualVersion": "v2.0.0",
+          "isMatch": true
+        }
+      ],
+      "systemConclusion": "版本不一致: membership-service(期望:v3.2.0,实际:v3.1.5)",
+      "id": "04fca38d-6fce-42ab-82c1-da46fa321bdd",
+      "materialSummaries": [],
+      "remarks": [
+        {
+          "id": "98c431e9-51fc-4502-9e12-6c10a46c3852",
+          "content": "与技术负责人王工确认，会员续费流水无需升级到v3.2.0，当前版本可满足业务需求",
+          "operator": "李四",
+          "createdAt": "2026-05-15T13:50:58.277Z"
+        }
+      ],
+      "createdAt": "2026-05-15T13:49:43.223Z",
+      "updatedAt": "2026-05-15T13:50:58.277Z",
+      "manualConclusion": "人工确认：v3.1.5版本在该租户场景下功能完整，可正常使用"
+    },
+    "createdAt": "2026-05-15T13:50:58.277Z"
+  }
+]
