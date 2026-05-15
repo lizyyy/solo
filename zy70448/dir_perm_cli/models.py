@@ -1,7 +1,20 @@
+import uuid
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
+
+
+def generate_submission_id() -> str:
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    random_suffix = uuid.uuid4().hex[:6]
+    return f"SUB{timestamp}{random_suffix}"
+
+
+def generate_conclusion_id() -> str:
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    random_suffix = uuid.uuid4().hex[:6]
+    return f"CON{timestamp}{random_suffix}"
 
 
 class ApprovalStatus(str, Enum):
@@ -47,7 +60,7 @@ class MeetingAttachment(BaseModel):
 
 
 class SubmissionMaterial(BaseModel):
-    submission_id: str = Field(default_factory=lambda: f"SUB{datetime.now().strftime('%Y%m%d%H%M%S')}")
+    submission_id: str = Field(default_factory=generate_submission_id)
     batch_id: str
     title: str
     department: str
@@ -70,7 +83,7 @@ class CheckResult(BaseModel):
 
 
 class DriftConclusion(BaseModel):
-    conclusion_id: str
+    conclusion_id: str = Field(default_factory=generate_conclusion_id)
     submission_id: str
     batch_id: str
     overall_status: CheckStatus
