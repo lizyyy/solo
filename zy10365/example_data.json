@@ -1,0 +1,190 @@
+{
+  "gray_version": {
+    "version": "v2.0.0-demo",
+    "description": "用户中心 V2.0 灰度验证 - 示例数据",
+    "target_url": "http://httpbin.org",
+    "base_url": "http://httpbin.org",
+    "created_by": "demo_user"
+  },
+  
+  "requests": [
+    {
+      "request_id": "req_get_user_001",
+      "method": "GET",
+      "path": "/get",
+      "headers": {
+        "Authorization": "Bearer demo_token_123",
+        "X-Request-ID": "req_get_user_001"
+      },
+      "query_params": {
+        "user_id": "1001",
+        "fields": "id,name,email"
+      },
+      "base_response": {
+        "args": {
+          "user_id": "1001",
+          "fields": "id,name,email"
+        },
+        "headers": {
+          "Authorization": "Bearer demo_token_123",
+          "X-Request-ID": "req_get_user_001"
+        },
+        "url": "http://httpbin.org/get?user_id=1001&fields=id,name,email"
+      },
+      "base_status_code": 200,
+      "base_response_time": 145.5
+    },
+    {
+      "request_id": "req_post_user_001",
+      "method": "POST",
+      "path": "/post",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer demo_token_123"
+      },
+      "request_body": {
+        "name": "张三",
+        "email": "zhangsan@example.com",
+        "age": 28
+      },
+      "base_response": {
+        "json": {
+          "name": "张三",
+          "email": "zhangsan@example.com",
+          "age": 28,
+          "id": 2001
+        },
+        "status": "success"
+      },
+      "base_status_code": 200,
+      "base_response_time": 210.3
+    },
+    {
+      "request_id": "req_get_orders_001",
+      "method": "GET",
+      "path": "/get",
+      "headers": {
+        "Authorization": "Bearer demo_token_123"
+      },
+      "query_params": {
+        "user_id": "1001",
+        "status": "paid",
+        "page": "1",
+        "page_size": "20"
+      },
+      "base_response": {
+        "args": {
+          "user_id": "1001",
+          "status": "paid",
+          "page": "1",
+          "page_size": "20"
+        },
+        "data": {
+          "total": 56,
+          "items": [
+            {"order_id": "ORD001", "amount": 99.00},
+            {"order_id": "ORD002", "amount": 199.00}
+          ]
+        }
+      },
+      "base_status_code": 200,
+      "base_response_time": 188.7
+    },
+    {
+      "request_id": "req_put_profile_001",
+      "method": "PUT",
+      "path": "/put",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer demo_token_123"
+      },
+      "request_body": {
+        "nickname": "new_nickname",
+        "avatar": "http://example.com/avatar.jpg"
+      },
+      "base_response": {
+        "json": {
+          "nickname": "new_nickname",
+          "avatar": "http://example.com/avatar.jpg",
+          "updated_at": "2024-01-15T10:30:00Z"
+        },
+        "status": "success"
+      },
+      "base_status_code": 200,
+      "base_response_time": 156.2
+    },
+    {
+      "request_id": "req_delete_test_001",
+      "method": "DELETE",
+      "path": "/delete",
+      "headers": {
+        "Authorization": "Bearer demo_token_123"
+      },
+      "query_params": {
+        "id": "temp_001"
+      },
+      "base_response": {
+        "status": "success",
+        "message": "deleted"
+      },
+      "base_status_code": 200,
+      "base_response_time": 95.8
+    }
+  ],
+
+  "confirmers": [
+    {
+      "user_id": "dev_lead_001",
+      "user_name": "张三",
+      "role": "开发负责人"
+    },
+    {
+      "user_id": "test_lead_001",
+      "user_name": "李四",
+      "role": "测试负责人"
+    },
+    {
+      "user_id": "product_001",
+      "user_name": "王五",
+      "role": "产品负责人"
+    }
+  ],
+
+  "tolerance_rules": [
+    {
+      "name": "响应时间浮动 20%",
+      "description": "允许响应时间有 20% 的浮动差异",
+      "path_pattern": "response_time",
+      "diff_type": "values_changed",
+      "tolerance_type": "percentage",
+      "tolerance_value": {
+        "max_percent": 20
+      },
+      "is_active": true,
+      "created_by": "admin"
+    },
+    {
+      "name": "忽略时间戳字段",
+      "description": "所有时间戳字段的差异自动容忍",
+      "path_pattern": ".*(updated_at|created_at|timestamp).*",
+      "diff_type": "values_changed",
+      "tolerance_type": "always",
+      "tolerance_value": null,
+      "is_active": true,
+      "created_by": "admin"
+    },
+    {
+      "name": "数值范围容忍",
+      "description": "数值在合理范围内的浮动",
+      "path_pattern": ".*amount.*|.*total.*",
+      "diff_type": "values_changed",
+      "tolerance_type": "value_range",
+      "tolerance_value": {
+        "min": 0,
+        "max": 1000
+      },
+      "is_active": true,
+      "created_by": "admin"
+    }
+  ]
+}
