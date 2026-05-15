@@ -130,6 +130,24 @@ async function generateLabSamples(members) {
   return samples;
 }
 
+async function clearExistingData() {
+  console.log('清理现有数据...');
+  
+  const tables = ['operation_logs', 'batch_operations', 'lab_samples', 'renewal_transactions', 'members'];
+  
+  for (const table of tables) {
+    try {
+      await runQuery(`DELETE FROM ${table}`);
+    } catch (err) {
+      if (!err.message.includes('no such table')) {
+        throw err;
+      }
+    }
+  }
+  
+  console.log('现有数据清理完成');
+}
+
 async function initSystemSettings() {
   console.log('初始化系统设置...');
   
@@ -153,6 +171,8 @@ async function initSystemSettings() {
 async function seedAll() {
   try {
     console.log('=== 开始生成演示数据 ===\n');
+    
+    await clearExistingData();
     
     const members = await generateMembers();
     await generateRenewalTransactions(members);
