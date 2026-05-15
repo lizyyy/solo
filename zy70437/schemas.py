@@ -117,7 +117,7 @@ class ApprovalRecord(ApprovalRecordBase):
     id: int
     batch_id: int
     replay_result_id: int
-    previous_status: str
+    previous_status: Optional[str] = None
     new_status: str
     approved_at: datetime
     
