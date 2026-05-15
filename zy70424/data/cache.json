@@ -21,7 +21,15 @@
       "/api/auth/audit/**",
       "/api/auth/level-3/audit/*"
     ],
-    "expiresAt": 1778845262105,
-    "createdAt": "2026-05-15T11:36:02.105Z"
+    "expiresAt": 1778847026010,
+    "createdAt": "2026-05-15T12:05:26.010Z"
+  },
+  "dept:合规部:auth_paths": {
+    "value": [
+      "/api/auth/compliance/**",
+      "/api/auth/level-3/compliance/*"
+    ],
+    "expiresAt": 1778847098681,
+    "createdAt": "2026-05-15T12:06:38.681Z"
   }
 }

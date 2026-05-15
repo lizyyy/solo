@@ -73,5 +73,109 @@
     "approver": "测试验收员",
     "approvalNote": "验收测试，确认回滚",
     "executedAt": "2026-05-15T11:36:02.123Z"
+  },
+  {
+    "id": "c1720e6a-cb1c-48c4-83c2-76e36d7dfb26",
+    "operationType": "bulk_rollback",
+    "criteria": {
+      "department": "审计部"
+    },
+    "items": [
+      {
+        "id": "1b3c4260-3ffd-4479-ab54-44b5f01d315c",
+        "title": "审计部季度工作会议",
+        "department": "审计部",
+        "createdAt": "2026-05-15T11:36:02.108Z",
+        "impact": "删除0个附件",
+        "risk": "low"
+      },
+      {
+        "id": "615cb0b2-39f6-48c8-bbe5-02789d4fc948",
+        "title": "审计部季度工作会议",
+        "department": "审计部",
+        "createdAt": "2026-05-15T12:05:07.971Z",
+        "impact": "删除0个附件",
+        "risk": "high"
+      }
+    ],
+    "generatedAt": "2026-05-15T12:05:07.973Z",
+    "approved": true,
+    "executed": true,
+    "approvedAt": "2026-05-15T12:05:07.977Z",
+    "approver": "测试验收员",
+    "approvalNote": "验收测试，确认回滚",
+    "executedAt": "2026-05-15T12:05:07.981Z"
+  },
+  {
+    "id": "dcc0cb69-bee8-4ff3-b4dc-c49df3f3edc8",
+    "operationType": "bulk_rollback",
+    "criteria": {
+      "department": "审计部"
+    },
+    "items": [
+      {
+        "id": "1b3c4260-3ffd-4479-ab54-44b5f01d315c",
+        "title": "审计部季度工作会议",
+        "department": "审计部",
+        "createdAt": "2026-05-15T11:36:02.108Z",
+        "impact": "删除0个附件",
+        "risk": "low"
+      },
+      {
+        "id": "615cb0b2-39f6-48c8-bbe5-02789d4fc948",
+        "title": "审计部季度工作会议",
+        "department": "审计部",
+        "createdAt": "2026-05-15T12:05:07.971Z",
+        "impact": "删除0个附件",
+        "risk": "low"
+      },
+      {
+        "id": "e5443dbb-5c8d-472b-ab12-20186ec2e067",
+        "title": "验收测试会议",
+        "department": "审计部",
+        "createdAt": "2026-05-15T12:05:26.008Z",
+        "impact": "删除0个附件",
+        "risk": "high"
+      },
+      {
+        "id": "07df9747-17ce-404b-ad66-84a892487cfa",
+        "title": "审计部季度工作会议",
+        "department": "审计部",
+        "createdAt": "2026-05-15T12:05:26.011Z",
+        "impact": "删除0个附件",
+        "risk": "high"
+      }
+    ],
+    "generatedAt": "2026-05-15T12:05:26.016Z",
+    "approved": true,
+    "executed": true,
+    "approvedAt": "2026-05-15T12:05:26.023Z",
+    "approver": "测试验收员",
+    "approvalNote": "验收测试，确认回滚",
+    "executedAt": "2026-05-15T12:05:26.026Z"
+  },
+  {
+    "id": "8ea260a7-58f6-478a-85db-3c56f9f9fff3",
+    "operationType": "bulk_rollback",
+    "criteria": {
+      "department": "合规部"
+    },
+    "items": [
+      {
+        "id": "a411f295-393a-41e2-b5b0-0fc338b7bd27",
+        "title": "合规部季度工作会议",
+        "department": "合规部",
+        "createdAt": "2026-05-15T12:06:38.683Z",
+        "impact": "删除0个附件",
+        "risk": "high"
+      }
+    ],
+    "generatedAt": "2026-05-15T12:06:38.688Z",
+    "approved": true,
+    "executed": true,
+    "approvedAt": "2026-05-15T12:06:38.694Z",
+    "approver": "测试验收员",
+    "approvalNote": "验收测试，确认回滚",
+    "executedAt": "2026-05-15T12:06:38.696Z"
   }
 ]

@@ -18,7 +18,7 @@ class MeetingRecord {
       summary: data.summary,
       attachments: data.attachments || [],
       authPaths: data.authPaths || [],
-      status: 'pending',
+      status: data.status || 'pending',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       processedAt: null

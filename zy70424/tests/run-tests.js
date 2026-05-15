@@ -67,7 +67,7 @@ async function main() {
   results.push(await runTest('2. 主流程 - 补录会议纪要(无缓存异常)', async () => {
     const res = await request('POST', '/api/records', {
       title: '验收测试会议',
-      department: '审计部',
+      department: '合规部',
       meetingDate: '2024-06-15',
       summary: '测试缓存未刷新场景'
     });
@@ -91,8 +91,8 @@ async function main() {
 
   results.push(await runTest('4. 缓存刷新 - 刷新部门鉴权路径', async () => {
     const res = await request('POST', '/api/admin/cache/refresh', {
-      department: '审计部',
-      authPaths: ['/api/auth/audit/**', '/api/auth/level-3/audit/*']
+      department: '合规部',
+      authPaths: ['/api/auth/compliance/**', '/api/auth/level-3/compliance/*']
     });
     if (res.data.code !== 'CACHE_REFRESHED') {
       throw new Error(`期望错误码 CACHE_REFRESHED，实际: ${res.data.code}`);
@@ -101,25 +101,40 @@ async function main() {
     console.log(`   ✓ 路径数量: ${res.data.data.pathsCount}`);
   }));
 
+  let testRecordId = null;
   results.push(await runTest('5. 主流程 - 缓存刷新后正常补录会议', async () => {
     const res = await request('POST', '/api/records', {
-      title: '审计部季度工作会议',
-      department: '审计部',
+      title: '合规部季度工作会议',
+      department: '合规部',
       meetingDate: '2024-06-15',
-      summary: '讨论季度审计工作计划'
+      summary: '讨论季度合规工作计划'
     });
     if (res.data.code !== 'SUCCESS') {
       throw new Error(`期望错误码 SUCCESS，实际: ${res.data.code}`);
     }
+    testRecordId = res.data.data.recordId;
     console.log('   ✓ 会议补录成功');
-    console.log(`   ✓ 记录ID: ${res.data.data.recordId}`);
+    console.log(`   ✓ 记录ID: ${testRecordId}`);
+  }));
+
+  results.push(await runTest('5.1 状态验证 - 会议记录应为 completed 状态', async () => {
+    if (!testRecordId) throw new Error('缺少测试记录ID');
+    const res = await request('GET', `/api/records/${testRecordId}`);
+    if (res.data.data.status !== 'completed') {
+      throw new Error(`期望状态 completed，实际: ${res.data.data.status}`);
+    }
+    if (!res.data.data.processedAt) {
+      throw new Error('processedAt 未设置');
+    }
+    console.log(`   ✓ 记录状态: ${res.data.data.status}`);
+    console.log(`   ✓ 处理时间: ${res.data.data.processedAt}`);
   }));
 
   let candidateId = null;
   results.push(await runTest('6. 回滚流程 - 生成候选清单(防误伤)', async () => {
     const res = await request('POST', '/api/admin/rollback/candidates', {
       operationType: 'bulk_rollback',
-      criteria: { department: '审计部' }
+      criteria: { department: '合规部' }
     });
     if (res.data.code !== 'CANDIDATES_GENERATED') {
       throw new Error(`期望错误码 CANDIDATES_GENERATED，实际: ${res.data.code}`);
@@ -186,14 +201,14 @@ async function main() {
 
   results.push(await runTest('11. 搜索报告 - 创建+导出摘要', async () => {
     const records = await request('GET', '/api/records');
-    const record = records.data.data.find(r => r.department === '审计部');
+    const record = records.data.data.find(r => r.department === '合规部');
     if (!record) throw new Error('未找到测试会议记录');
 
     const res = await request('POST', '/api/admin/search-reports', {
-      searchTerm: '审计工作',
+      searchTerm: '合规工作',
       recordId: record.id,
       recordTitle: record.title,
-      matchedContent: '讨论季度审计工作计划',
+      matchedContent: '讨论季度合规工作计划',
       confidence: 0.92
     });
     if (res.data.code !== 'REPORT_CREATED') {
@@ -203,11 +218,13 @@ async function main() {
     console.log(`   ✓ 导出摘要: ${res.data.data.exportSummary}`);
   }));
 
-  results.push(await runTest('12. 数据持久化 - 查询会议记录', async () => {
+  results.push(await runTest('13. 数据持久化 - 查询会议记录', async () => {
     const res = await request('GET', '/api/records');
     if (res.status !== 200) throw new Error(`状态码: ${res.status}`);
+    const completed = res.data.data.filter(r => r.status === 'completed');
     const rolledBack = res.data.data.filter(r => r.status === 'rolled_back');
     console.log(`   ✓ 总记录数: ${res.data.total}`);
+    console.log(`   ✓ 已完成记录: ${completed.length}`);
     console.log(`   ✓ 已回滚记录: ${rolledBack.length}`);
   }));
 

@@ -96,7 +96,10 @@ router.post('/records', upload.array('attachments', 10), async (req, res) => {
       status: 'completed'
     });
 
-    await MeetingRecord.update(record.id, { processedAt: new Date().toISOString() });
+    await MeetingRecord.update(record.id, { 
+      status: 'completed',
+      processedAt: new Date().toISOString() 
+    });
 
     res.status(201).json({
       code: 'SUCCESS',

@@ -85,7 +85,75 @@
     ],
     "status": "rolled_back",
     "createdAt": "2026-05-15T11:36:02.108Z",
-    "updatedAt": "2026-05-15T11:36:02.122Z",
+    "updatedAt": "2026-05-15T12:05:26.025Z",
     "processedAt": "2026-05-15T11:36:02.110Z"
+  },
+  {
+    "id": "615cb0b2-39f6-48c8-bbe5-02789d4fc948",
+    "title": "审计部季度工作会议",
+    "department": "审计部",
+    "meetingDate": "2024-06-15",
+    "attendees": [],
+    "summary": "讨论季度审计工作计划",
+    "attachments": [],
+    "authPaths": [
+      "/api/auth/audit/**",
+      "/api/auth/level-3/audit/*"
+    ],
+    "status": "rolled_back",
+    "createdAt": "2026-05-15T12:05:07.971Z",
+    "updatedAt": "2026-05-15T12:05:26.025Z",
+    "processedAt": "2026-05-15T12:05:07.971Z"
+  },
+  {
+    "id": "e5443dbb-5c8d-472b-ab12-20186ec2e067",
+    "title": "验收测试会议",
+    "department": "审计部",
+    "meetingDate": "2024-06-15",
+    "attendees": [],
+    "summary": "测试缓存未刷新场景",
+    "attachments": [],
+    "authPaths": [
+      "/api/auth/audit/**",
+      "/api/auth/level-3/audit/*"
+    ],
+    "status": "rolled_back",
+    "createdAt": "2026-05-15T12:05:26.008Z",
+    "updatedAt": "2026-05-15T12:05:26.026Z",
+    "processedAt": "2026-05-15T12:05:26.009Z"
+  },
+  {
+    "id": "07df9747-17ce-404b-ad66-84a892487cfa",
+    "title": "审计部季度工作会议",
+    "department": "审计部",
+    "meetingDate": "2024-06-15",
+    "attendees": [],
+    "summary": "讨论季度审计工作计划",
+    "attachments": [],
+    "authPaths": [
+      "/api/auth/audit/**",
+      "/api/auth/level-3/audit/*"
+    ],
+    "status": "rolled_back",
+    "createdAt": "2026-05-15T12:05:26.011Z",
+    "updatedAt": "2026-05-15T12:05:26.026Z",
+    "processedAt": "2026-05-15T12:05:26.011Z"
+  },
+  {
+    "id": "a411f295-393a-41e2-b5b0-0fc338b7bd27",
+    "title": "合规部季度工作会议",
+    "department": "合规部",
+    "meetingDate": "2024-06-15",
+    "attendees": [],
+    "summary": "讨论季度合规工作计划",
+    "attachments": [],
+    "authPaths": [
+      "/api/auth/compliance/**",
+      "/api/auth/level-3/compliance/*"
+    ],
+    "status": "rolled_back",
+    "createdAt": "2026-05-15T12:06:38.683Z",
+    "updatedAt": "2026-05-15T12:06:38.695Z",
+    "processedAt": "2026-05-15T12:06:38.685Z"
   }
 ]
