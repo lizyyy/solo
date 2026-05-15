@@ -10,6 +10,7 @@ import {
   QueryFilter,
   SearchTermReport,
 } from '../types';
+import { FileStorage } from './storage';
 
 export class MeetingMinutesProcessor {
   private meetings: Map<string, MeetingMinutes> = new Map();
@@ -19,6 +20,52 @@ export class MeetingMinutesProcessor {
     timestamp: string;
     meetingId?: string;
   }> = [];
+  private storage?: FileStorage;
+  private dataDir?: string;
+
+  constructor(options?: { dataDir?: string; useStorage?: boolean }) {
+    if (options?.useStorage || options?.dataDir) {
+      this.dataDir = options.dataDir;
+      this.storage = new FileStorage(this.dataDir);
+      this.loadFromStorage();
+    }
+  }
+
+  private loadFromStorage(): void {
+    if (!this.storage) return;
+    const meetings = this.storage.loadAllMeetings();
+    this.meetings.clear();
+    meetings.forEach((m) => {
+      this.meetings.set(m.id, m);
+    });
+  }
+
+  private saveToStorage(): void {
+    if (!this.storage) return;
+    const meetings = Array.from(this.meetings.values());
+    meetings.forEach((m) => {
+      this.storage!.saveMeeting(m);
+    });
+  }
+
+  enableStorage(dataDir?: string): void {
+    this.dataDir = dataDir;
+    this.storage = new FileStorage(this.dataDir);
+    this.loadFromStorage();
+  }
+
+  disableStorage(): void {
+    this.storage = undefined;
+    this.dataDir = undefined;
+  }
+
+  isStorageEnabled(): boolean {
+    return this.storage !== undefined;
+  }
+
+  getStorage(): FileStorage | undefined {
+    return this.storage;
+  }
 
   generateId(): string {
     return crypto.randomUUID();
@@ -61,6 +108,7 @@ export class MeetingMinutesProcessor {
     };
 
     this.meetings.set(meetingId, meeting);
+    this.saveToStorage();
     this.logAction('create', `创建会议纪要: ${title}`, now, meetingId);
     return meeting;
   }
@@ -112,6 +160,7 @@ export class MeetingMinutesProcessor {
     meeting.evidenceChain.items.push(evidenceItem);
     this.verifyEvidenceChain(meeting);
     meeting.updatedAt = now;
+    this.saveToStorage();
 
     this.logAction(
       'add_attachment',
@@ -153,6 +202,7 @@ export class MeetingMinutesProcessor {
     meeting.evidenceChain.brokenAt = meeting.evidenceChain.items.length;
     meeting.evidenceChain.brokenReason = reason;
     meeting.updatedAt = now;
+    this.saveToStorage();
 
     this.logAction(
       'break_chain',
@@ -250,6 +300,7 @@ export class MeetingMinutesProcessor {
     meeting.evidenceChain.items.push(evidenceItem);
     this.verifyEvidenceChain(meeting);
     meeting.updatedAt = now;
+    this.saveToStorage();
 
     this.logAction(
       'correction',
@@ -335,6 +386,7 @@ export class MeetingMinutesProcessor {
     };
 
     meeting.searchTermReports.push(report);
+    this.saveToStorage();
     return report;
   }
 

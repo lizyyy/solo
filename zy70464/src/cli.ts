@@ -9,8 +9,12 @@ import { ReportGenerator } from './core/report-generator';
 import { QueryFilter } from './types';
 
 const program = new Command();
-const processor = new MeetingMinutesProcessor();
+const processor = new MeetingMinutesProcessor({ useStorage: true });
 const reportGenerator = new ReportGenerator();
+
+console.log(
+  chalk.gray(`数据存储位置: ${processor.getStorage()?.getDataDir() || '未启用'}`)
+);
 
 program
   .name('mmp')

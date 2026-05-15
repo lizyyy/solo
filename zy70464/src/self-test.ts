@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 
 import chalk = require('chalk');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 import { MeetingMinutesProcessor } from './core/processor';
 import { ReportGenerator } from './core/report-generator';
+import { FileStorage } from './core/storage';
 import { sampleMeetings } from './data/sample-data';
 
 class TestSuite {
@@ -13,6 +17,7 @@ class TestSuite {
   private errors: string[] = [];
 
   constructor() {
+    // 测试默认使用内存模式，不持久化
     this.processor = new MeetingMinutesProcessor();
     this.reportGenerator = new ReportGenerator();
   }
@@ -93,6 +98,100 @@ function runTests(): void {
   suite.test('获取不存在的会议返回undefined', () => {
     const retrieved = suite.processor.getMeeting('non-existent-id');
     return retrieved === undefined;
+  });
+
+  suite.test('默认不启用存储', () => {
+    return suite.processor.isStorageEnabled() === false;
+  });
+
+  suite.section('持久化存储测试');
+
+  suite.test('可以启用存储功能', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mmp-test-'));
+    const testProcessor = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const result = testProcessor.isStorageEnabled();
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    return result;
+  });
+
+  suite.test('数据可以持久化并正确加载', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mmp-test-'));
+    
+    // 第一个实例创建会议
+    const processor1 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const meeting = processor1.createMeetingMinutes(
+      '持久化测试会议',
+      '2024-01-01',
+      '测试部门',
+      ['张三', '李四']
+    );
+    const meetingId = meeting.id;
+    
+    // 第二个实例读取同一个数据目录
+    const processor2 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const retrieved = processor2.getMeeting(meetingId);
+    
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    
+    return retrieved !== undefined && retrieved.meetingTitle === '持久化测试会议';
+  });
+
+  suite.test('附件补录后可以持久化保存', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mmp-test-'));
+    
+    const processor1 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const meeting = processor1.createMeetingMinutes('附件持久化测试', '2024-01-01', '测试部门', ['张三']);
+    processor1.addAttachment(
+      meeting.id,
+      '测试附件.pdf',
+      'application/pdf',
+      '张三',
+      '测试内容',
+      { source: 'OA系统' }
+    );
+    
+    const processor2 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const retrieved = processor2.getMeeting(meeting.id);
+    
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    
+    return retrieved !== undefined && retrieved.attachments.length === 1;
+  });
+
+  suite.test('人工修正后可以持久化保存', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mmp-test-'));
+    
+    const processor1 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const meeting = processor1.createMeetingMinutes('修正持久化测试', '2024-01-01', '测试部门', ['张三']);
+    processor1.applyManualCorrection(
+      meeting.id,
+      'meetingTitle',
+      '修正后的标题',
+      '测试修正原因',
+      '张三'
+    );
+    
+    const processor2 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const retrieved = processor2.getMeeting(meeting.id);
+    
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    
+    return retrieved !== undefined && retrieved.corrections.length === 1;
+  });
+
+  suite.test('证据链断开状态可以持久化保存', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mmp-test-'));
+    
+    const processor1 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const meeting = processor1.createMeetingMinutes('断开测试', '2024-01-01', '测试部门', ['张三']);
+    processor1.simulateBrokenEvidenceChain(meeting.id, '测试断开原因');
+    
+    const processor2 = new MeetingMinutesProcessor({ dataDir: tempDir });
+    const retrieved = processor2.getMeeting(meeting.id);
+    
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    
+    return retrieved !== undefined && retrieved.evidenceChain.status === 'broken';
   });
 
   suite.section('附件补录功能测试');
