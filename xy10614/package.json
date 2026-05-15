@@ -5,11 +5,12 @@
   "main": "dist/server/index.js",
   "scripts": {
     "dev:server": "ts-node-dev --respawn --transpile-only server/index.ts",
-    "dev:client": "cd client && npm start",
-    "build:server": "tsc -p tsconfig.server.json",
+    "dev:client": "cd client && npm run dev",
+    "build:server": "tsc",
     "build:client": "cd client && npm run build",
     "build": "npm run build:server && npm run build:client",
-    "start": "node dist/server/index.js"
+    "start": "node dist/server/index.js",
+    "seed": "ts-node server/seed.ts"
   },
   "keywords": ["visitor", "management", "api"],
   "author": "",
@@ -29,6 +30,7 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.10.5",
     "@types/uuid": "^9.0.7",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
   }

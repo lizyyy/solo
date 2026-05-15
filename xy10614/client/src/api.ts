@@ -9,6 +9,11 @@ const api = axios.create({
 });
 
 export const visitorAPI = {
+  initDemo: async (): Promise<any> => {
+    const response = await api.post<APIResponse<any>>('/init-demo');
+    return response.data.data;
+  },
+
   getAll: async (): Promise<VisitorRecord[]> => {
     const response = await api.get<APIResponse<VisitorRecord[]>>('/visitors');
     return response.data.data || [];

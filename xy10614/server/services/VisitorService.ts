@@ -383,20 +383,23 @@ class VisitorService {
   }
 
   removeFromBlacklist(id: string, removedBy: string, operatorRole: string, reason: string): BlacklistRecord | undefined {
+    const allBlacklist = store.getAllBlacklist();
+    const originalRecord = allBlacklist.find(b => b.id === id);
+    
     const record = store.updateBlacklistRecord(id, {
       isActive: false,
       removedBy,
       removedAt: dayjs().toISOString()
     });
 
-    if (record) {
+    if (record && originalRecord) {
       store.addOperationLog({
         operationType: OperationType.BLACKLIST_REMOVE,
         operator: removedBy,
         operatorRole,
         description: `移除黑名单：${record.visitorName}，原因：${reason}`,
-        beforeValue: { isActive: true },
-        afterValue: { isActive: false }
+        beforeValue: { ...originalRecord },
+        afterValue: { ...record, isActive: false }
       });
     }
 

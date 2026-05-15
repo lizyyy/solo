@@ -72,6 +72,19 @@ function VisitorList() {
     }
   };
 
+  const handleInitDemo = async () => {
+    try {
+      setLoading(true);
+      const result = await visitorAPI.initDemo();
+      message.success(`演示场景初始化成功！${result.visitors} 条访客记录，${result.logs} 条操作日志`);
+      fetchVisitors();
+    } catch (error: any) {
+      message.error(error.response?.data?.error || '初始化失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       title: '访客姓名',
@@ -137,11 +150,21 @@ function VisitorList() {
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ margin: 0 }}>访客列表</h2>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
-          新建访客预约
-        </Button>
+        <Space>
+          <Button 
+            type="primary" 
+            danger
+            onClick={handleInitDemo}
+            loading={loading}
+          >
+            初始化演示场景
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+            新建访客预约
+          </Button>
+        </Space>
       </div>
 
       <Table

@@ -61,19 +61,22 @@ class ExportService {
           reason: log.afterValue.reason,
           affectedRecords: log.afterValue.affectedRecords || []
         });
-      } else if (log.operationType === 'blacklist_remove' && log.afterValue) {
-        const blacklistRecord = store.getAllBlacklist().find(b => b.affectedRecords.includes(log.afterValue.id) || false);
-        if (blacklistRecord) {
+      } else if (log.operationType === 'blacklist_remove') {
+        const blacklistRecord = log.beforeValue || log.afterValue;
+        if (blacklistRecord && blacklistRecord.id) {
+          const reasonMatch = log.description.match(/原因：(.*)$/);
+          const reason = reasonMatch ? reasonMatch[1] : '';
+          
           results.push({
             id: blacklistRecord.id,
-            visitorName: blacklistRecord.visitorName,
-            visitorPhone: blacklistRecord.visitorPhone,
+            visitorName: blacklistRecord.visitorName || '',
+            visitorPhone: blacklistRecord.visitorPhone || '',
             visitorIdCard: blacklistRecord.visitorIdCard,
             action: 'remove' as const,
             operator: log.operator,
             operationTime: log.createdAt,
-            reason: log.description.replace('移除黑名单：', '').split('，原因：')[1] || '',
-            affectedRecords: blacklistRecord.affectedRecords
+            reason: reason,
+            affectedRecords: blacklistRecord.affectedRecords || []
           });
         }
       }
