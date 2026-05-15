@@ -1,20 +1,47 @@
-#!/bin/sh
+#!/bin/bash
 
-# Maven Wrapper 启动脚本
-# 兼容 Java 8+
+# Maven 包装脚本 - 无需预先安装 Maven
+# 会自动下载 Maven 并运行
+
+set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-WRAPPER_JAR="$SCRIPT_DIR/.mvn/wrapper/maven-wrapper.jar"
-WRAPPER_PROPS="$SCRIPT_DIR/.mvn/wrapper/maven-wrapper.properties"
+MAVEN_VERSION="3.8.8"
+MAVEN_HOME="$HOME/.m2/wrapper/dists/apache-maven-${MAVEN_VERSION}"
 
-if [ ! -f "$WRAPPER_JAR" ]; then
-  echo "正在下载 Maven Wrapper..."
-  mkdir -p "$(dirname "$WRAPPER_JAR")"
-  WRAPPER_URL=$(grep '^wrapperUrl=' "$WRAPPER_PROPS" | cut -d'=' -f2)
-  curl -s -L -o "$WRAPPER_JAR" "$WRAPPER_URL"
+# 设置 JAVA_HOME
+if [ -z "$JAVA_HOME" ]; then
+  if command -v /usr/libexec/java_home >/dev/null 2>&1; then
+    export JAVA_HOME="$(/usr/libexec/java_home -v 1.8 2>/dev/null || /usr/libexec/java_home 2>/dev/null)"
+  fi
 fi
 
-exec java \
-  -Dmaven.multiModuleProjectDirectory="$SCRIPT_DIR" \
-  -jar "$WRAPPER_JAR" \
-  "$@"
+# 检查 Maven 是否已下载
+if [ ! -d "$MAVEN_HOME/bin" ]; then
+  echo "📦 正在下载 Maven $MAVEN_VERSION..."
+  mkdir -p "$(dirname "$MAVEN_HOME")"
+  
+  # 下载 Maven
+  MAVEN_URL="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
+  TAR_FILE="$HOME/.m2/wrapper/dists/apache-maven-${MAVEN_VERSION}.tar.gz"
+  
+  if command -v curl >/dev/null 2>&1; then
+    curl -s -L -o "$TAR_FILE" "$MAVEN_URL"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q -O "$TAR_FILE" "$MAVEN_URL"
+  else
+    echo "❌ 需要 curl 或 wget 才能下载 Maven"
+    exit 1
+  fi
+  
+  # 解压 Maven
+  echo "📦 正在解压 Maven..."
+  tar -xzf "$TAR_FILE" -C "$(dirname "$MAVEN_HOME")"
+  rm -f "$TAR_FILE"
+  
+  # 重命名目录
+  mv "$(dirname "$MAVEN_HOME")/apache-maven-${MAVEN_VERSION}" "$MAVEN_HOME"
+fi
+
+# 运行 Maven
+exec "$MAVEN_HOME/bin/mvn" "$@"
