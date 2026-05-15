@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单回调合并站</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
+        
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-value { font-size: 32px; font-weight: bold; color: #667eea; }
+        .stat-label { color: #666; font-size: 14px; margin-top: 5px; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .tab.active { background: #667eea; color: white; }
+        
+        .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filter-group label { font-size: 12px; color: #666; }
+        .filter-group input, .filter-group select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; min-width: 150px; }
+        
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-danger { background: #f56565; color: white; }
+        
+        .table-container { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; font-size: 13px; color: #333; }
+        tr:hover { background: #f8f9fa; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-paid { background: #c6f6d5; color: #22543d; }
+        .status-shipped { background: #bee3f8; color: #2a4365; }
+        .status-completed { background: #e9d8fd; color: #553c9a; }
+        .status-exception { background: #fed7d7; color: #742a2a; }
+        .status-pending { background: #feebc8; color: #744210; }
+        .status-cancelled { background: #e2e8f0; color: #4a5568; }
+        
+        .severity-critical { background: #fed7d7; color: #742a2a; }
+        .severity-warning { background: #feebc8; color: #744210; }
+        
+        .actions { display: flex; gap: 8px; }
+        .action-btn { padding: 4px 8px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 10px; max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 18px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h4 { margin-bottom: 10px; color: #333; font-size: 14px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .detail-item { display: flex; flex-direction: column; }
+        .detail-label { font-size: 12px; color: #666; }
+        .detail-value { font-size: 14px; font-weight: 500; }
+        
+        .json-preview { background: #f8f9fa; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+        
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .pagination button { padding: 8px 12px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination .page-info { padding: 8px 12px; color: #666; font-size: 14px; }
+        
+        .test-panel { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .test-panel h4 { margin-bottom: 15px; }
+        .test-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        .loading { text-align: center; padding: 40px; color: #666; }
+        
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state svg { width: 80px; height: 80px; margin-bottom: 15px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>订单回调合并站</h1>
+        <p>多平台订单数据统一管理 · 异常回执 · 重复事件去重</p>
+    </div>
+    
+    <div class="container">
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalOrders">-</div>
+                <div class="stat-label">总订单数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="exceptionOrders">-</div>
+                <div class="stat-label">异常订单</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="openExceptions">-</div>
+                <div class="stat-label">待处理异常</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="platformCount">-</div>
+                <div class="stat-label">接入平台</div>
+            </div>
+        </div>
+        
+        <div class="test-panel">
+            <h4>快速测试</h4>
+            <div class="test-buttons">
+                <button class="btn btn-success" onclick="testSuccess()">模拟成功回调</button>
+                <button class="btn btn-danger" onclick="testDuplicate()">模拟重复提交</button>
+                <button class="btn btn-warning" onclick="testException()">模拟异常订单</button>
+                <button class="btn btn-primary" onclick="generateTestData()">生成批量测试数据</button>
+                <button class="btn" onclick="refreshData()">刷新数据</button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="orders" onclick="switchTab('orders')">订单列表</button>
+            <button class="tab" data-tab="exceptions" onclick="switchTab('exceptions')">异常管理</button>
+            <button class="tab" data-tab="rules" onclick="switchTab('rules')">合并规则</button>
+        </div>
+        
+        <div id="tabOrders">
+            <div class="filters">
+                <div class="filter-group">
+                    <label>搜索</label>
+                    <input type="text" id="searchInput" placeholder="订单号/客户名">
+                </div>
+                <div class="filter-group">
+                    <label>状态</label>
+                    <select id="statusFilter">
+                        <option value="">全部状态</option>
+                        <option value="pending">待处理</option>
+                        <option value="pending_payment">待付款</option>
+                        <option value="paid">已付款</option>
+                        <option value="shipped">已发货</option>
+                        <option value="completed">已完成</option>
+                        <option value="cancelled">已取消</option>
+                        <option value="exception">异常</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>平台</label>
+                    <select id="platformFilter">
+                        <option value="">全部平台</option>
+                        <option value="taobao">淘宝</option>
+                        <option value="jd">京东</option>
+                        <option value="pdd">拼多多</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="justify-content: flex-end;">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="loadOrders()">查询</button>
+                </div>
+                <div class="filter-group" style="justify-content: flex-end;">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-success" onclick="exportOrders()">导出CSV</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>统一订单号</th>
+                            <th>状态</th>
+                            <th>金额</th>
+                            <th>客户</th>
+                            <th>平台订单数</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable">
+                        <tr><td colspan="7" class="loading">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination" id="ordersPagination"></div>
+        </div>
+        
+        <div id="tabExceptions" style="display: none;">
+            <div class="filters">
+                <div class="filter-group">
+                    <label>状态</label>
+                    <select id="exceptionStatusFilter" onchange="loadExceptions()">
+                        <option value="open">待处理</option>
+                        <option value="resolved">已解决</option>
+                        <option value="">全部</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>统一订单号</th>
+                            <th>异常类型</th>
+                            <th>严重程度</th>
+                            <th>消息</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exceptionsTable">
+                        <tr><td colspan="7" class="loading">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination" id="exceptionsPagination"></div>
+        </div>
+        
+        <div id="tabRules" style="display: none;">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>规则名称</th>
+                            <th>类型</th>
+                            <th>平台</th>
+                            <th>优先级</th>
+                            <th>状态</th>
+                            <th>配置</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rulesTable">
+                        <tr><td colspan="6" class="loading">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="orderDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>订单详情</h3>
+                <button class="close-btn" onclick="closeModal('orderDetailModal')">&times;</button>
+            </div>
+            <div id="orderDetailContent"></div>
+        </div>
+    </div>
+    
+    <div class="modal" id="statusModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>更新订单状态</h3>
+                <button class="close-btn" onclick="closeModal('statusModal')">&times;</button>
+            </div>
+            <div class="filter-group">
+                <label>新状态</label>
+                <select id="newStatusSelect">
+                    <option value="pending">待处理</option>
+                    <option value="pending_payment">待付款</option>
+                    <option value="paid">已付款</option>
+                    <option value="shipped">已发货</option>
+                    <option value="completed">已完成</option>
+                    <option value="cancelled">已取消</option>
+                </select>
+            </div>
+            <div class="filter-group" style="margin-top: 15px;">
+                <label>操作人</label>
+                <input type="text" id="operatorInput" value="operator" placeholder="操作人">
+            </div>
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn" onclick="closeModal('statusModal')">取消</button>
+                <button class="btn btn-primary" onclick="confirmUpdateStatus()">确认更新</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="resolveModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>解决异常</h3>
+                <button class="close-btn" onclick="closeModal('resolveModal')">&times;</button>
+            </div>
+            <div class="filter-group">
+                <label>解决备注</label>
+                <input type="text" id="resolutionNote" placeholder="请输入解决说明">
+            </div>
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn" onclick="closeModal('resolveModal')">取消</button>
+                <button class="btn btn-success" onclick="confirmResolve()">确认解决</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        let currentOrdersPage = 1;
+        let currentExceptionsPage = 1;
+        let currentOrderId = null;
+        let currentExceptionId = null;
+        
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                return await response.json();
+            } catch (e) {
+                console.error('API Error:', e);
+                return { error: e.message };
+            }
+        }
+        
+        async function loadStats() {
+            const data = await apiCall('/dashboard/stats');
+            if (!data.error) {
+                document.getElementById('totalOrders').textContent = data.total_orders || 0;
+                document.getElementById('exceptionOrders').textContent = data.exception_orders || 0;
+                document.getElementById('openExceptions').textContent = data.open_exceptions || 0;
+                document.getElementById('platformCount').textContent = Object.keys(data.platform_stats || {}).length;
+            }
+        }
+        
+        function getStatusClass(status) {
+            const map = {
+                'paid': 'status-paid',
+                'shipped': 'status-shipped',
+                'completed': 'status-completed',
+                'exception': 'status-exception',
+                'pending': 'status-pending',
+                'pending_payment': 'status-pending',
+                'cancelled': 'status-cancelled'
+            };
+            return map[status] || 'status-pending';
+        }
+        
+        function getStatusText(status) {
+            const map = {
+                'paid': '已付款',
+                'shipped': '已发货',
+                'completed': '已完成',
+                'exception': '异常',
+                'pending': '待处理',
+                'pending_payment': '待付款',
+                'cancelled': '已取消'
+            };
+            return map[status] || status;
+        }
+        
+        async function loadOrders() {
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            const platform = document.getElementById('platformFilter').value;
+            
+            let url = `/orders?page=${currentOrdersPage}&per_page=10`;
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+            if (status) url += `&status=${status}`;
+            if (platform) url += `&platform=${platform}`;
+            
+            const data = await apiCall(url);
+            const tbody = document.getElementById('ordersTable');
+            
+            if (data.error || !data.orders) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">加载失败</td></tr>';
+                return;
+            }
+            
+            if (data.orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无订单数据</td></tr>';
+            } else {
+                tbody.innerHTML = data.orders.map(order => `
+                    <tr>
+                        <td><strong>${order.unified_order_no}</strong></td>
+                        <td><span class="status-badge ${getStatusClass(order.status)}">${getStatusText(order.status)}</span></td>
+                        <td>¥${(order.amount || 0).toFixed(2)}</td>
+                        <td>${order.customer_info?.name || '-'}</td>
+                        <td>${order.platform_orders.length}</td>
+                        <td>${new Date(order.created_at).toLocaleString()}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn btn-primary" onclick="viewOrder(${order.id})">详情</button>
+                                <button class="action-btn btn-warning" onclick="openStatusModal(${order.id})">状态</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            renderPagination('ordersPagination', data, (page) => {
+                currentOrdersPage = page;
+                loadOrders();
+            });
+        }
+        
+        async function loadExceptions() {
+            const status = document.getElementById('exceptionStatusFilter').value;
+            let url = `/exceptions?page=${currentExceptionsPage}&per_page=10`;
+            if (status) url += `&status=${status}`;
+            
+            const data = await apiCall(url);
+            const tbody = document.getElementById('exceptionsTable');
+            
+            if (data.error || !data.exceptions) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">加载失败</td></tr>';
+                return;
+            }
+            
+            if (data.exceptions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无异常记录</td></tr>';
+            } else {
+                tbody.innerHTML = data.exceptions.map(exc => `
+                    <tr>
+                        <td>${exc.id}</td>
+                        <td>${exc.unified_order_no || '-'}</td>
+                        <td>${exc.exception_type}</td>
+                        <td><span class="status-badge severity-${exc.severity}">${exc.severity}</span></td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${exc.message}</td>
+                        <td>${new Date(exc.created_at).toLocaleString()}</td>
+                        <td>
+                            ${exc.status === 'open' ? `
+                                <button class="action-btn btn-success" onclick="openResolveModal(${exc.id})">解决</button>
+                            ` : '已解决'}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            renderPagination('exceptionsPagination', data, (page) => {
+                currentExceptionsPage = page;
+                loadExceptions();
+            });
+        }
+        
+        async function loadRules() {
+            const data = await apiCall('/rules');
+            const tbody = document.getElementById('rulesTable');
+            
+            if (data.error) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">加载失败</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map(rule => `
+                <tr>
+                    <td><strong>${rule.name}</strong></td>
+                    <td>${rule.rule_type}</td>
+                    <td>${rule.platform || '-'}</td>
+                    <td>${rule.priority}</td>
+                    <td>${rule.is_active ? '<span style="color: #48bb78;">✓ 启用</span>' : '<span style="color: #f56565;">✗ 禁用</span>'}</td>
+                    <td style="max-width: 400px;"><div class="json-preview">${JSON.stringify(rule.config, null, 2)}</div></td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderPagination(containerId, data, onPageChange) {
+            const container = document.getElementById(containerId);
+            if (data.pages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = `
+                <button onclick="(${onPageChange.toString()})(${data.page - 1})" ${data.page <= 1 ? 'disabled' : ''}>上一页</button>
+                <span class="page-info">第 ${data.page} / ${data.pages} 页 (共 ${data.total} 条)</span>
+                <button onclick="(${onPageChange.toString()})(${data.page + 1})" ${data.page >= data.pages ? 'disabled' : ''}>下一页</button>
+            `;
+        }
+        
+        async function viewOrder(orderId) {
+            const order = await apiCall(`/orders/${orderId}`);
+            if (order.error) return;
+            
+            const content = document.getElementById('orderDetailContent');
+            content.innerHTML = `
+                <div class="detail-section">
+                    <h4>基本信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">统一订单号</span><span class="detail-value">${order.unified_order_no}</span></div>
+                        <div class="detail-item"><span class="detail-label">状态</span><span class="detail-value"><span class="status-badge ${getStatusClass(order.status)}">${getStatusText(order.status)}</span></span></div>
+                        <div class="detail-item"><span class="detail-label">金额</span><span class="detail-value">¥${(order.amount || 0).toFixed(2)}</span></div>
+                        <div class="detail-item"><span class="detail-label">客户</span><span class="detail-value">${order.customer_info?.name || '-'}</span></div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>平台订单 (${order.platform_orders.length})</h4>
+                    ${order.platform_orders.map(po => `
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 8px;">
+                            <strong>${po.platform.toUpperCase()}</strong> - ${po.platform_order_id}
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="detail-section">
+                    <h4>回调记录 (${order.callbacks.length})</h4>
+                    ${order.callbacks.map(cb => `
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <strong>${cb.event_type}</strong>
+                                <span style="font-size: 12px; color: #666;">${new Date(cb.received_at).toLocaleString()}</span>
+                            </div>
+                            <div class="json-preview">${JSON.stringify(cb.payload, null, 2)}</div>
+                            ${cb.normalized_data ? `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;"><small>归一化数据:</small><div class="json-preview">${JSON.stringify(cb.normalized_data, null, 2)}</div></div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                
+                ${order.exceptions.length > 0 ? `
+                <div class="detail-section">
+                    <h4>异常记录 (${order.exceptions.length})</h4>
+                    ${order.exceptions.map(e => `
+                        <div style="background: #fed7d7; padding: 10px; border-radius: 6px; margin-bottom: 8px;">
+                            <strong>${e.exception_type}</strong> (${e.severity})
+                            <p style="margin-top: 5px; font-size: 14px;">${e.message}</p>
+                            <span style="font-size: 12px; color: #666;">${new Date(e.created_at).toLocaleString()}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('orderDetailModal').classList.add('active');
+        }
+        
+        function openStatusModal(orderId) {
+            currentOrderId = orderId;
+            document.getElementById('statusModal').classList.add('active');
+        }
+        
+        async function confirmUpdateStatus() {
+            const status = document.getElementById('newStatusSelect').value;
+            const operator = document.getElementById('operatorInput').value;
+            
+            await apiCall(`/orders/${currentOrderId}/status`, {
+                method: 'PUT',
+                body: JSON.stringify({ status, operator })
+            });
+            
+            closeModal('statusModal');
+            refreshData();
+        }
+        
+        function openResolveModal(exceptionId) {
+            currentExceptionId = exceptionId;
+            document.getElementById('resolveModal').classList.add('active');
+        }
+        
+        async function confirmResolve() {
+            const note = document.getElementById('resolutionNote').value;
+            
+            await apiCall(`/exceptions/${currentExceptionId}/resolve`, {
+                method: 'POST',
+                body: JSON.stringify({ resolved_by: 'operator', resolution_note: note })
+            });
+            
+            closeModal('resolveModal');
+            refreshData();
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+            
+            document.getElementById('tabOrders').style.display = tab === 'orders' ? 'block' : 'none';
+            document.getElementById('tabExceptions').style.display = tab === 'exceptions' ? 'block' : 'none';
+            document.getElementById('tabRules').style.display = tab === 'rules' ? 'block' : 'none';
+            
+            if (tab === 'rules') loadRules();
+            if (tab === 'exceptions') loadExceptions();
+        }
+        
+        function exportOrders() {
+            window.open(`${API_BASE}/orders/export?format=csv`, '_blank');
+        }
+        
+        async function testSuccess() {
+            const orderId = 'TB' + Date.now();
+            await apiCall('/callbacks', {
+                method: 'POST',
+                body: JSON.stringify({
+                    platform: 'taobao',
+                    platform_order_id: orderId,
+                    event_type: 'trade_success',
+                    event_id: 'EVT' + Date.now(),
+                    payload: {
+                        tid: orderId,
+                        payment: '199.00',
+                        buyer_nick: '测试用户',
+                        status: 'WAIT_SELLER_SEND_GOODS',
+                        created: new Date().toISOString()
+                    }
+                })
+            });
+            refreshData();
+            alert('成功回调已发送！');
+        }
+        
+        async function testDuplicate() {
+            const orderId = 'TB' + Date.now();
+            const eventId = 'EVT-DUP-' + Date.now();
+            
+            await apiCall('/callbacks', {
+                method: 'POST',
+                body: JSON.stringify({
+                    platform: 'taobao',
+                    platform_order_id: orderId,
+                    event_type: 'trade_success',
+                    event_id: eventId,
+                    payload: { tid: orderId, payment: '299.00', buyer_nick: '重复测试' }
+                })
+            });
+            
+            await new Promise(r => setTimeout(r, 500));
+            
+            const result = await apiCall('/callbacks', {
+                method: 'POST',
+                body: JSON.stringify({
+                    platform: 'taobao',
+                    platform_order_id: orderId,
+                    event_type: 'trade_success',
+                    event_id: eventId,
+                    payload: { tid: orderId, payment: '299.00', buyer_nick: '重复测试' }
+                })
+            });
+            
+            refreshData();
+            alert(result.is_duplicate ? '重复提交检测成功！' : '检测失败');
+        }
+        
+        async function testException() {
+            const orderId = 'JD' + Date.now();
+            
+            const result = await apiCall('/callbacks', {
+                method: 'POST',
+                body: JSON.stringify({
+                    platform: 'jd',
+                    platform_order_id: orderId,
+                    event_type: 'trade_create',
+                    event_id: 'EVT-EXC-' + Date.now(),
+                    payload: { orderId: orderId, orderPrice: '99.00', buyerName: '异常订单用户' }
+                })
+            });
+            
+            if (result.unified_order_id) {
+                await apiCall('/exceptions', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        unified_order_id: result.unified_order_id,
+                        exception_type: 'payment_mismatch',
+                        severity: 'critical',
+                        message: '支付金额与订单金额不匹配：期望 99.00，实际 89.00',
+                        callback_id: result.callback_id
+                    })
+                });
+            }
+            
+            refreshData();
+            alert('异常订单已创建！');
+        }
+        
+        async function generateTestData() {
+            const platforms = ['taobao', 'jd', 'pdd'];
+            const statuses = ['WAIT_SELLER_SEND_GOODS', 'WAIT_BUYER_CONFIRM_GOODS', 'TRADE_FINISHED'];
+            
+            for (let i = 0; i < 10; i++) {
+                const platform = platforms[Math.floor(Math.random() * platforms.length)];
+                const orderId = platform.toUpperCase() + Date.now() + i;
+                
+                let payload;
+                if (platform === 'taobao') {
+                    payload = {
+                        tid: orderId,
+                        payment: (Math.random() * 500 + 50).toFixed(2),
+                        buyer_nick: ['张三', '李四', '王五', '赵六'][i % 4],
+                        status: statuses[Math.floor(Math.random() * statuses.length)],
+                        created: new Date().toISOString()
+                    };
+                } else if (platform === 'jd') {
+                    payload = {
+                        orderId: orderId,
+                        orderPrice: (Math.random() * 500 + 50).toFixed(2),
+                        buyerName: ['京东用户A', '京东用户B', '京东用户C'][i % 3],
+                        orderState: ['PAID', 'DELIVERING', 'COMPLETED'][Math.floor(Math.random() * 3)],
+                        orderStartTime: new Date().toISOString()
+                    };
+                } else {
+                    payload = {
+                        orderSn: orderId,
+                        orderAmount: (Math.random() * 500 + 50).toFixed(2),
+                        buyerNick: ['拼友1号', '拼友2号', '拼友3号'][i % 3],
+                        orderStatus: Math.floor(Math.random() * 4) + 1,
+                        createdAt: new Date().toISOString()
+                    };
+                }
+                
+                await apiCall('/callbacks', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        platform: platform,
+                        platform_order_id: orderId,
+                        event_type: 'trade_notify',
+                        event_id: 'EVT-' + Date.now() + '-' + i,
+                        payload: payload
+                    })
+                });
+                
+                await new Promise(r => setTimeout(r, 200));
+            }
+            
+            refreshData();
+            alert('已生成10条测试订单！');
+        }
+        
+        function refreshData() {
+            loadStats();
+            loadOrders();
+            loadExceptions();
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshData();
+        });
+    </script>
+</body>
+</html>
