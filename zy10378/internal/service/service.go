@@ -80,14 +80,14 @@ func (s *Service) CreateRule(req *model.CreateRuleRequest) (*model.WhitelistRule
 		return s.store.GetRule(id)
 	}
 	rule := &model.WhitelistRule{
-		ID:           generateID(),
-		PartyID:      req.PartyID,
-		Name:         req.Name,
-		Description:  req.Description,
-		SourceRules:  req.SourceRules,
-		PathRules:    req.PathRules,
-		MethodRules:  req.MethodRules,
-		HeaderRules:  req.HeaderRules,
+		ID:             generateID(),
+		PartyID:        req.PartyID,
+		Name:           req.Name,
+		Description:    req.Description,
+		SourceRules:    req.SourceRules,
+		PathRules:      req.PathRules,
+		MethodRules:    req.MethodRules,
+		HeaderRules:    req.HeaderRules,
 		IdempotencyKey: idempotencyKey,
 	}
 	if err := s.store.CreateRule(rule, idempotencyKey); err != nil {
@@ -118,20 +118,39 @@ func (s *Service) UpdateRuleStatus(id string, req *model.UpdateRuleStatusRequest
 	if err != nil {
 		return nil, err
 	}
-	if err := s.store.UpdateRuleStatus(id, req.Status); err != nil {
+	oldStatus := rule.Status
+	newVersion, err := s.store.UpdateRuleStatus(id, req.Status)
+	if err != nil {
 		return nil, err
 	}
 	rv := &model.RuleVersion{
-		ID:        generateID(),
-		RuleID:    rule.ID,
-		Version:   rule.Version + 1,
-		PreviousID: rule.ID,
-		ChangeLog: fmt.Sprintf("Status changed from %s to %s: %s", rule.Status, req.Status, req.Comment),
-		Status:    req.Status,
-		CreatedBy: "system",
+		ID:          generateID(),
+		RuleID:      rule.ID,
+		Version:     newVersion,
+		PreviousID:  rule.ID,
+		ChangeLog:   fmt.Sprintf("Status changed from %s to %s: %s", oldStatus, req.Status, req.Comment),
+		Status:      req.Status,
+		CreatedBy:   "system",
+		SourceRules: append([]string{}, rule.SourceRules...),
+		PathRules:   append([]string{}, rule.PathRules...),
+		MethodRules: append([]string{}, rule.MethodRules...),
+		HeaderRules: append([]string{}, rule.HeaderRules...),
 	}
 	s.store.CreateRuleVersion(rv)
-	return s.store.GetRule(id)
+	updatedRule, _ := s.store.GetRule(id)
+	if req.Status == model.RuleStatusRollback {
+		versions := s.store.GetRuleVersions(id)
+		for i := len(versions) - 2; i >= 0; i-- {
+			if versions[i].Status == model.RuleStatusActive {
+				updatedRule.SourceRules = versions[i].SourceRules
+				updatedRule.PathRules = versions[i].PathRules
+				updatedRule.MethodRules = versions[i].MethodRules
+				updatedRule.HeaderRules = versions[i].HeaderRules
+				break
+			}
+		}
+	}
+	return updatedRule, nil
 }
 
 func (s *Service) GetRuleVersions(ruleID string) []*model.RuleVersion {
@@ -154,23 +173,43 @@ func (s *Service) VerifyCallback(req *model.VerifyCallbackRequest) (*model.Verif
 	if id, exists := s.store.CheckRequestIdempotency(idempotencyKey); exists {
 		return s.store.GetRequest(id)
 	}
+	if rid, exists := s.store.CheckRejectionIdempotency(idempotencyKey); exists {
+		rec, _ := s.store.GetRejection(rid)
+		var rejectErr error
+		switch rec.ReasonCode {
+		case "SOURCE_DENIED":
+			rejectErr = ErrSourceDenied
+		case "PATH_DENIED":
+			rejectErr = ErrPathDenied
+		case "METHOD_DENIED":
+			rejectErr = ErrMethodDenied
+		case "HEADER_DENIED":
+			rejectErr = ErrHeaderDenied
+		case "RULE_NOT_ACTIVE":
+			rejectErr = ErrRuleNotActive
+		default:
+			rejectErr = errors.New(rec.Reason)
+		}
+		return nil, rejectErr
+	}
 	if !req.IsDryRun && rule.Status != model.RuleStatusActive {
+		s.createRejection(req, rule, "RULE_NOT_ACTIVE", ErrRuleNotActive.Error(), idempotencyKey)
 		return nil, ErrRuleNotActive
 	}
 	if err := s.verifySourceIP(rule, req.SourceIP); err != nil {
-		s.createRejection(req, rule, "SOURCE_DENIED", err.Error())
+		s.createRejection(req, rule, "SOURCE_DENIED", err.Error(), idempotencyKey)
 		return nil, err
 	}
 	if err := s.verifyPath(rule, req.RequestPath); err != nil {
-		s.createRejection(req, rule, "PATH_DENIED", err.Error())
+		s.createRejection(req, rule, "PATH_DENIED", err.Error(), idempotencyKey)
 		return nil, err
 	}
 	if err := s.verifyMethod(rule, req.RequestMethod); err != nil {
-		s.createRejection(req, rule, "METHOD_DENIED", err.Error())
+		s.createRejection(req, rule, "METHOD_DENIED", err.Error(), idempotencyKey)
 		return nil, err
 	}
 	if err := s.verifyHeaders(rule, req.Headers); err != nil {
-		s.createRejection(req, rule, "HEADER_DENIED", err.Error())
+		s.createRejection(req, rule, "HEADER_DENIED", err.Error(), idempotencyKey)
 		return nil, err
 	}
 	vreq := &model.VerificationRequest{
@@ -250,18 +289,19 @@ func (s *Service) verifyHeaders(rule *model.WhitelistRule, headers map[string]st
 	return nil
 }
 
-func (s *Service) createRejection(req *model.VerifyCallbackRequest, rule *model.WhitelistRule, code, reason string) {
+func (s *Service) createRejection(req *model.VerifyCallbackRequest, rule *model.WhitelistRule, code, reason, idempotencyKey string) {
 	rec := &model.RejectionRecord{
-		ID:          generateID(),
-		RequestID:   generateID(),
-		RuleID:      req.RuleID,
-		PartyID:     req.PartyID,
-		ReasonCode:  code,
-		Reason:      reason,
-		SourceIP:    req.SourceIP,
-		RequestPath: req.RequestPath,
+		ID:             generateID(),
+		RequestID:      generateID(),
+		RuleID:         req.RuleID,
+		PartyID:        req.PartyID,
+		ReasonCode:     code,
+		Reason:         reason,
+		SourceIP:       req.SourceIP,
+		RequestPath:    req.RequestPath,
+		IdempotencyKey: idempotencyKey,
 	}
-	s.store.CreateRejection(rec)
+	s.store.CreateRejection(rec, idempotencyKey)
 }
 
 func (s *Service) GetRejections(filter map[string]interface{}) []*model.RejectionRecord {

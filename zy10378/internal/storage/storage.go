@@ -14,27 +14,29 @@ var (
 )
 
 type Storage struct {
-	mu               sync.RWMutex
-	parties          map[string]*model.CallbackParty
-	sourceAddresses  map[string]*model.SourceAddress
-	rules            map[string]*model.WhitelistRule
-	ruleVersions     map[string]*model.RuleVersion
-	requests         map[string]*model.VerificationRequest
-	rejections       map[string]*model.RejectionRecord
-	ruleIdempotency  map[string]string
-	requestIdempotency map[string]string
+	mu                   sync.RWMutex
+	parties              map[string]*model.CallbackParty
+	sourceAddresses      map[string]*model.SourceAddress
+	rules                map[string]*model.WhitelistRule
+	ruleVersions         map[string]*model.RuleVersion
+	requests             map[string]*model.VerificationRequest
+	rejections           map[string]*model.RejectionRecord
+	ruleIdempotency      map[string]string
+	requestIdempotency   map[string]string
+	rejectionIdempotency map[string]string
 }
 
 func NewStorage() *Storage {
 	return &Storage{
-		parties:          make(map[string]*model.CallbackParty),
-		sourceAddresses:  make(map[string]*model.SourceAddress),
-		rules:            make(map[string]*model.WhitelistRule),
-		ruleVersions:     make(map[string]*model.RuleVersion),
-		requests:         make(map[string]*model.VerificationRequest),
-		rejections:       make(map[string]*model.RejectionRecord),
-		ruleIdempotency:  make(map[string]string),
-		requestIdempotency: make(map[string]string),
+		parties:              make(map[string]*model.CallbackParty),
+		sourceAddresses:      make(map[string]*model.SourceAddress),
+		rules:                make(map[string]*model.WhitelistRule),
+		ruleVersions:         make(map[string]*model.RuleVersion),
+		requests:             make(map[string]*model.VerificationRequest),
+		rejections:           make(map[string]*model.RejectionRecord),
+		ruleIdempotency:      make(map[string]string),
+		requestIdempotency:   make(map[string]string),
+		rejectionIdempotency: make(map[string]string),
 	}
 }
 
@@ -49,6 +51,13 @@ func (s *Storage) CheckRequestIdempotency(key string) (string, bool) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	id, exists := s.requestIdempotency[key]
+	return id, exists
+}
+
+func (s *Storage) CheckRejectionIdempotency(key string) (string, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	id, exists := s.rejectionIdempotency[key]
 	return id, exists
 }
 
@@ -131,19 +140,20 @@ func (s *Storage) GetRulesByParty(partyID string) []*model.WhitelistRule {
 	return rules
 }
 
-func (s *Storage) UpdateRuleStatus(id string, status model.RuleStatus) error {
+func (s *Storage) UpdateRuleStatus(id string, status model.RuleStatus) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	rule, exists := s.rules[id]
 	if !exists {
-		return ErrNotFound
+		return 0, ErrNotFound
 	}
 	if !isValidStatusTransition(rule.Status, status) {
-		return ErrInvalidStatus
+		return 0, ErrInvalidStatus
 	}
+	rule.Version++
 	rule.Status = status
 	rule.UpdatedAt = time.Now()
-	return nil
+	return rule.Version, nil
 }
 
 func (s *Storage) CreateRuleVersion(rv *model.RuleVersion) error {
@@ -152,6 +162,16 @@ func (s *Storage) CreateRuleVersion(rv *model.RuleVersion) error {
 	rv.CreatedAt = time.Now()
 	s.ruleVersions[rv.ID] = rv
 	return nil
+}
+
+func (s *Storage) GetRejection(id string) (*model.RejectionRecord, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	rec, exists := s.rejections[id]
+	if !exists {
+		return nil, ErrNotFound
+	}
+	return rec, nil
 }
 
 func (s *Storage) GetRuleVersions(ruleID string) []*model.RuleVersion {
@@ -190,9 +210,15 @@ func (s *Storage) GetRequest(id string) (*model.VerificationRequest, error) {
 	return req, nil
 }
 
-func (s *Storage) CreateRejection(rec *model.RejectionRecord) error {
+func (s *Storage) CreateRejection(rec *model.RejectionRecord, idempotencyKey string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if idempotencyKey != "" {
+		if _, exists := s.rejectionIdempotency[idempotencyKey]; exists {
+			return ErrDuplicate
+		}
+		s.rejectionIdempotency[idempotencyKey] = rec.ID
+	}
 	rec.RejectedAt = time.Now()
 	s.rejections[rec.ID] = rec
 	return nil

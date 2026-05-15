@@ -36,35 +36,35 @@ const (
 )
 
 type WhitelistRule struct {
-	ID           string     `json:"id"`
-	PartyID      string     `json:"party_id"`
-	Version      int        `json:"version"`
-	Name         string     `json:"name"`
-	Description  string     `json:"description"`
-	SourceRules  []string   `json:"source_rules"`
-	PathRules    []string   `json:"path_rules"`
-	MethodRules  []string   `json:"method_rules"`
-	HeaderRules  []string   `json:"header_rules"`
-	Status       RuleStatus `json:"status"`
-	CreatedAt    time.Time  `json:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at"`
-	CreatedBy    string     `json:"created_by"`
-	IdempotencyKey string   `json:"-"`
+	ID             string     `json:"id"`
+	PartyID        string     `json:"party_id"`
+	Version        int        `json:"version"`
+	Name           string     `json:"name"`
+	Description    string     `json:"description"`
+	SourceRules    []string   `json:"source_rules"`
+	PathRules      []string   `json:"path_rules"`
+	MethodRules    []string   `json:"method_rules"`
+	HeaderRules    []string   `json:"header_rules"`
+	Status         RuleStatus `json:"status"`
+	CreatedAt      time.Time  `json:"created_at"`
+	UpdatedAt      time.Time  `json:"updated_at"`
+	CreatedBy      string     `json:"created_by"`
+	IdempotencyKey string     `json:"-"`
 }
 
 type VerificationRequest struct {
-	ID             string    `json:"id"`
-	RuleID         string    `json:"rule_id"`
-	RuleVersion    int       `json:"rule_version"`
-	PartyID        string    `json:"party_id"`
-	SourceIP       string    `json:"source_ip"`
-	RequestPath    string    `json:"request_path"`
-	RequestMethod  string    `json:"request_method"`
+	ID             string            `json:"id"`
+	RuleID         string            `json:"rule_id"`
+	RuleVersion    int               `json:"rule_version"`
+	PartyID        string            `json:"party_id"`
+	SourceIP       string            `json:"source_ip"`
+	RequestPath    string            `json:"request_path"`
+	RequestMethod  string            `json:"request_method"`
 	Headers        map[string]string `json:"headers"`
-	IsDryRun       bool      `json:"is_dry_run"`
-	IsApproved     bool      `json:"is_approved"`
-	VerifiedAt     time.Time `json:"verified_at"`
-	IdempotencyKey string    `json:"-"`
+	IsDryRun       bool              `json:"is_dry_run"`
+	IsApproved     bool              `json:"is_approved"`
+	VerifiedAt     time.Time         `json:"verified_at"`
+	IdempotencyKey string            `json:"-"`
 }
 
 type RejectionRecord struct {
@@ -77,6 +77,7 @@ type RejectionRecord struct {
 	SourceIP       string    `json:"source_ip"`
 	RequestPath    string    `json:"request_path"`
 	RejectedAt     time.Time `json:"rejected_at"`
+	IdempotencyKey string    `json:"-"`
 }
 
 type RuleVersion struct {
@@ -88,6 +89,10 @@ type RuleVersion struct {
 	Status      RuleStatus `json:"status"`
 	CreatedAt   time.Time  `json:"created_at"`
 	CreatedBy   string     `json:"created_by"`
+	SourceRules []string   `json:"source_rules"`
+	PathRules   []string   `json:"path_rules"`
+	MethodRules []string   `json:"method_rules"`
+	HeaderRules []string   `json:"header_rules"`
 }
 
 type ApiResponse struct {
