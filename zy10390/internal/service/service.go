@@ -4,10 +4,57 @@ import (
 	"db-pool-protect-api/internal/model"
 	"db-pool-protect-api/internal/store"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
+
+var (
+	ErrRuleNotFound     = errors.New("rule not found")
+	ErrInvalidStatus    = errors.New("invalid status")
+	ErrStatusTransition = errors.New("status transition not allowed")
+	ErrRevokedTerminal  = errors.New("revoked is terminal status, cannot be modified")
+	ErrFieldRequired    = errors.New("field is required")
+	ErrInvalidThreshold = errors.New("invalid threshold value")
+	ErrInvalidAction    = errors.New("invalid protection action")
+)
+
+var validActions = map[model.ProtectionAction]bool{
+	model.ActionCircuitBreak:  true,
+	model.ActionRejectNewConn: true,
+	model.ActionSlowDown:      true,
+}
+
+var validStatuses = map[model.RuleStatus]bool{
+	model.RuleStatusActive:    true,
+	model.RuleStatusPaused:    true,
+	model.RuleStatusTriggered: true,
+	model.RuleStatusRestored:  true,
+	model.RuleStatusRevoked:   true,
+}
+
+var allowedTransitions = map[model.RuleStatus]map[model.RuleStatus]bool{
+	model.RuleStatusActive: {
+		model.RuleStatusPaused:    true,
+		model.RuleStatusTriggered: true,
+		model.RuleStatusRevoked:   true,
+	},
+	model.RuleStatusPaused: {
+		model.RuleStatusActive:  true,
+		model.RuleStatusRevoked: true,
+	},
+	model.RuleStatusTriggered: {
+		model.RuleStatusRestored: true,
+		model.RuleStatusRevoked:  true,
+	},
+	model.RuleStatusRestored: {
+		model.RuleStatusActive:  true,
+		model.RuleStatusPaused:  true,
+		model.RuleStatusRevoked: true,
+	},
+}
 
 type ProtectService struct {
 	store store.DataStore
@@ -17,7 +64,63 @@ func NewProtectService(s store.DataStore) *ProtectService {
 	return &ProtectService{store: s}
 }
 
+func (s *ProtectService) validateCreateRule(req *CreateRuleRequest) error {
+	if strings.TrimSpace(req.Name) == "" {
+		return fmt.Errorf("%w: name", ErrFieldRequired)
+	}
+	if strings.TrimSpace(req.APIPath) == "" {
+		return fmt.Errorf("%w: api_path", ErrFieldRequired)
+	}
+	if strings.TrimSpace(req.PoolName) == "" {
+		return fmt.Errorf("%w: pool_name", ErrFieldRequired)
+	}
+
+	if req.Thresholds.MaxActiveConn <= 0 {
+		return fmt.Errorf("%w: max_active_conn must be positive", ErrInvalidThreshold)
+	}
+	if req.Thresholds.MaxWaitTimeMs <= 0 {
+		return fmt.Errorf("%w: max_wait_time_ms must be positive", ErrInvalidThreshold)
+	}
+	if req.Thresholds.SlowQueryTimeMs <= 0 {
+		return fmt.Errorf("%w: slow_query_time_ms must be positive", ErrInvalidThreshold)
+	}
+	if req.Thresholds.ErrorRateThreshold <= 0 || req.Thresholds.ErrorRateThreshold > 1 {
+		return fmt.Errorf("%w: error_rate_threshold must be between 0 and 1", ErrInvalidThreshold)
+	}
+
+	if !validActions[req.Action] {
+		return fmt.Errorf("%w: %s", ErrInvalidAction, req.Action)
+	}
+
+	return nil
+}
+
+func (s *ProtectService) validateStatusTransition(current, target model.RuleStatus) error {
+	if !validStatuses[target] {
+		return fmt.Errorf("%w: %s", ErrInvalidStatus, target)
+	}
+
+	if current == model.RuleStatusRevoked {
+		return ErrRevokedTerminal
+	}
+
+	allowed, ok := allowedTransitions[current]
+	if !ok {
+		return fmt.Errorf("%w: from %s to %s", ErrStatusTransition, current, target)
+	}
+
+	if !allowed[target] {
+		return fmt.Errorf("%w: from %s to %s", ErrStatusTransition, current, target)
+	}
+
+	return nil
+}
+
 func (s *ProtectService) CreateRule(req *CreateRuleRequest, operator string) (*model.ProtectionRule, error) {
+	if err := s.validateCreateRule(req); err != nil {
+		return nil, err
+	}
+
 	if req.RequestID != "" {
 		exists := s.store.CheckRequestID(req.RequestID)
 		if exists {
@@ -31,17 +134,20 @@ func (s *ProtectService) CreateRule(req *CreateRuleRequest, operator string) (*m
 	}
 
 	rule := &model.ProtectionRule{
-		ID:          model.NewUUID(),
-		Name:        req.Name,
-		APIPath:     req.APIPath,
-		PoolName:    req.PoolName,
-		Description: req.Description,
-		Status:      model.RuleStatusActive,
-		Thresholds:  req.Thresholds,
-		Action:      req.Action,
+		ID:           model.NewUUID(),
+		Name:         req.Name,
+		APIPath:      req.APIPath,
+		PoolName:     req.PoolName,
+		Description:  req.Description,
+		Status:       model.RuleStatusActive,
+		Thresholds:   req.Thresholds,
+		Action:       req.Action,
 		ActionParams: req.ActionParams,
-		CreatedBy:   operator,
-		RequestID:   req.RequestID,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+		CreatedBy:    operator,
+		RequestID:    req.RequestID,
+		Version:      1,
 	}
 
 	if err := s.store.CreateRule(rule); err != nil {
@@ -55,6 +161,7 @@ func (s *ProtectService) CreateRule(req *CreateRuleRequest, operator string) (*m
 		After:        rule,
 		Operator:     operator,
 		RequestID:    req.RequestID,
+		Timestamp:    time.Now(),
 	})
 
 	return rule, nil
@@ -74,11 +181,21 @@ func (s *ProtectService) UpdateRuleStatus(id string, status model.RuleStatus, op
 		return nil, err
 	}
 	if rule == nil {
-		return nil, fmt.Errorf("rule not found")
+		return nil, ErrRuleNotFound
+	}
+
+	if rule.Status == status {
+		return rule, nil
+	}
+
+	if err := s.validateStatusTransition(rule.Status, status); err != nil {
+		return nil, err
 	}
 
 	before := *rule
 	rule.Status = status
+	rule.UpdatedAt = time.Now()
+	rule.Version++
 
 	if err := s.store.UpdateRule(rule); err != nil {
 		return nil, err
@@ -91,6 +208,7 @@ func (s *ProtectService) UpdateRuleStatus(id string, status model.RuleStatus, op
 		Before:       before,
 		After:        rule,
 		Operator:     operator,
+		Timestamp:    time.Now(),
 	})
 
 	return rule, nil
@@ -102,7 +220,7 @@ func (s *ProtectService) DeleteRule(id string, operator string) error {
 		return err
 	}
 	if rule == nil {
-		return fmt.Errorf("rule not found")
+		return ErrRuleNotFound
 	}
 
 	if err := s.store.DeleteRule(id); err != nil {
@@ -115,23 +233,51 @@ func (s *ProtectService) DeleteRule(id string, operator string) error {
 		Action:       "delete",
 		Before:       rule,
 		Operator:     operator,
+		Timestamp:    time.Now(),
 	})
 
 	return nil
 }
 
 func (s *ProtectService) RecordConnectionStats(stats *model.ConnectionStats) error {
+	if stats.RuleID != "" {
+		rule, err := s.store.GetRule(stats.RuleID)
+		if err != nil {
+			return err
+		}
+		if rule == nil {
+			return fmt.Errorf("%w: %s", ErrRuleNotFound, stats.RuleID)
+		}
+	}
+
+	stats.ID = model.NewUUID()
+	stats.Timestamp = time.Now()
 	return s.store.RecordConnectionStats(stats)
 }
 
 func (s *ProtectService) RecordSlowQuery(record *model.SlowQueryRecord) error {
-	rules, _ := s.store.ListRules()
-	for _, rule := range rules {
-		if rule.APIPath == record.APIPath && rule.Status == model.RuleStatusActive {
-			record.RuleID = rule.ID
-			break
+	if record.RuleID != "" {
+		rule, err := s.store.GetRule(record.RuleID)
+		if err != nil {
+			return err
+		}
+		if rule == nil {
+			return fmt.Errorf("%w: %s", ErrRuleNotFound, record.RuleID)
 		}
 	}
+
+	if record.RuleID == "" {
+		rules, _ := s.store.ListRules()
+		for _, rule := range rules {
+			if rule.APIPath == record.APIPath && rule.Status == model.RuleStatusActive {
+				record.RuleID = rule.ID
+				break
+			}
+		}
+	}
+
+	record.ID = model.NewUUID()
+	record.Timestamp = time.Now()
 	return s.store.RecordSlowQuery(record)
 }
 
@@ -141,10 +287,10 @@ func (s *ProtectService) CheckAndTriggerProtection(ruleID string, operator strin
 		return nil, err
 	}
 	if rule == nil {
-		return nil, fmt.Errorf("rule not found")
+		return nil, ErrRuleNotFound
 	}
 	if rule.Status != model.RuleStatusActive {
-		return nil, fmt.Errorf("rule is not active")
+		return nil, fmt.Errorf("rule is not active, current status: %s", rule.Status)
 	}
 
 	statsList, _ := s.store.ListConnectionStats(ruleID, 10)
@@ -168,7 +314,12 @@ func (s *ProtectService) CheckAndTriggerProtection(ruleID string, operator strin
 		return nil, fmt.Errorf("no threshold exceeded")
 	}
 
+	if err := s.validateStatusTransition(rule.Status, model.RuleStatusTriggered); err != nil {
+		return nil, err
+	}
+
 	event := &model.ProtectionEvent{
+		ID:          model.NewUUID(),
 		RuleID:      rule.ID,
 		RuleVersion: rule.Version,
 		APIPath:     rule.APIPath,
@@ -176,6 +327,7 @@ func (s *ProtectService) CheckAndTriggerProtection(ruleID string, operator strin
 		Action:      rule.Action,
 		Reason:      triggerReason,
 		TriggerData: triggerData,
+		Timestamp:   time.Now(),
 		Operator:    operator,
 	}
 
@@ -185,6 +337,8 @@ func (s *ProtectService) CheckAndTriggerProtection(ruleID string, operator strin
 
 	before := *rule
 	rule.Status = model.RuleStatusTriggered
+	rule.UpdatedAt = time.Now()
+	rule.Version++
 	s.store.UpdateRule(rule)
 
 	s.store.AddHistory(&model.HistoryRecord{
@@ -194,6 +348,7 @@ func (s *ProtectService) CheckAndTriggerProtection(ruleID string, operator strin
 		Before:       before,
 		After:        rule,
 		Operator:     operator,
+		Timestamp:    time.Now(),
 	})
 
 	return event, nil
@@ -205,19 +360,29 @@ func (s *ProtectService) ConfirmRestore(ruleID string, eventID string, reason st
 		return nil, err
 	}
 	if rule == nil {
-		return nil, fmt.Errorf("rule not found")
+		return nil, ErrRuleNotFound
 	}
 	if rule.Status != model.RuleStatusTriggered {
-		return nil, fmt.Errorf("rule is not in triggered status")
+		return nil, fmt.Errorf("rule is not in triggered status, current status: %s", rule.Status)
+	}
+
+	if strings.TrimSpace(reason) == "" {
+		return nil, fmt.Errorf("%w: reason", ErrFieldRequired)
+	}
+
+	if err := s.validateStatusTransition(rule.Status, model.RuleStatusRestored); err != nil {
+		return nil, err
 	}
 
 	record := &model.RestoreRecord{
-		RuleID:    ruleID,
-		EventID:   eventID,
-		Reason:    reason,
-		CheckData: checkData,
-		Confirmed: true,
-		Operator:  operator,
+		ID:         model.NewUUID(),
+		RuleID:     ruleID,
+		EventID:    eventID,
+		Reason:     reason,
+		CheckData:  checkData,
+		Confirmed:  true,
+		Timestamp:  time.Now(),
+		Operator:   operator,
 	}
 
 	if err := s.store.CreateRestoreRecord(record); err != nil {
@@ -226,6 +391,8 @@ func (s *ProtectService) ConfirmRestore(ruleID string, eventID string, reason st
 
 	before := *rule
 	rule.Status = model.RuleStatusRestored
+	rule.UpdatedAt = time.Now()
+	rule.Version++
 	s.store.UpdateRule(rule)
 
 	s.store.AddHistory(&model.HistoryRecord{
@@ -235,6 +402,7 @@ func (s *ProtectService) ConfirmRestore(ruleID string, eventID string, reason st
 		Before:       before,
 		After:        rule,
 		Operator:     operator,
+		Timestamp:    time.Now(),
 	})
 
 	return record, nil
@@ -244,7 +412,7 @@ func (s *ProtectService) GetOverview() (*model.OverviewStats, error) {
 	rules, _ := s.store.ListRules()
 
 	stats := &model.OverviewStats{
-		TotalRules:     len(rules),
+		TotalRules: len(rules),
 	}
 
 	today := time.Now().Truncate(24 * time.Hour)
