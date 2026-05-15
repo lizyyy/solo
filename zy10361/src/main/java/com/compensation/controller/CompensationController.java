@@ -49,7 +49,7 @@ public class CompensationController {
     }
 
     @GetMapping("/{processId}/next")
-    public ApiResponse<List<CompensationInstruction>> getNextInstructions(@PathVariable String processId) {
+    public ApiResponse<Map<String, Object>> getNextInstructions(@PathVariable String processId) {
         return compensationService.getNextInstructions(processId);
     }
 

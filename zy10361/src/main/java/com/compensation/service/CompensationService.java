@@ -158,20 +158,34 @@ public class CompensationService {
     @Transactional(rollbackFor = Exception.class)
     public ApiResponse<String> executeInstruction(String instructionId, ExecuteInstructionRequest request) {
         if (executionRepository.existsByExecutionId(request.getExecutionId())) {
-            return ApiResponse.success("执行ID已存在，幂等处理", request.getExecutionId());
+            CompensationExecution existExec = executionRepository.findByExecutionId(request.getExecutionId())
+                    .orElseThrow(() -> new BusinessException("执行记录不存在"));
+            return ApiResponse.success("执行ID已存在，幂等处理", existExec.getInstructionId());
         }
 
         CompensationInstruction instruction = instructionRepository.findByInstructionId(instructionId)
                 .orElseThrow(() -> new BusinessException(404, "指令不存在"));
 
         if (instruction.getStatus() != InstructionStatus.PENDING) {
-            throw new BusinessException("当前状态不允许执行");
+            throw new BusinessException("当前状态不允许执行，状态: " + instruction.getStatus());
+        }
+
+        List<CompensationInstruction> allInstructions = instructionRepository
+                .findByProcessIdOrderByExecutionOrderAsc(instruction.getProcessId());
+        
+        for (CompensationInstruction prev : allInstructions) {
+            if (prev.getExecutionOrder() < instruction.getExecutionOrder()) {
+                if (prev.getStatus() != InstructionStatus.SUCCESS && prev.getStatus() != InstructionStatus.SKIPPED) {
+                    throw new BusinessException("前序指令未完成: " + prev.getInstructionId() 
+                            + " (顺序: " + prev.getExecutionOrder() + ", 状态: " + prev.getStatus() + ")");
+                }
+            }
         }
 
         instruction.setStatus(InstructionStatus.EXECUTING);
         instructionRepository.save(instruction);
 
-        boolean success = simulateExecution(instruction);
+        boolean success = executeCompensation(instruction, request.getForceFail());
         
         CompensationExecution execution = new CompensationExecution();
         execution.setInstructionId(instructionId);
@@ -199,11 +213,13 @@ public class CompensationService {
 
         updateProcessStatus(instruction.getProcessId());
 
-        return ApiResponse.success(success ? "执行成功" : "执行失败，等待重试", instructionId);
+        String msg = success ? "执行成功" : 
+                (instruction.getStatus() == InstructionStatus.FAILED ? "执行失败，已达最大重试次数" : "执行失败，等待重试");
+        return ApiResponse.success(msg, instructionId);
     }
 
-    private boolean simulateExecution(CompensationInstruction instruction) {
-        return new Random().nextInt(10) > 2;
+    private boolean executeCompensation(CompensationInstruction instruction, Boolean forceFail) {
+        return forceFail == null || !forceFail;
     }
 
     private void updateProcessStatus(String processId) {
@@ -341,9 +357,34 @@ public class CompensationService {
         return ApiResponse.success(sb.toString());
     }
 
-    public ApiResponse<List<CompensationInstruction>> getNextInstructions(String processId) {
-        List<CompensationInstruction> instructions = instructionRepository.findByProcessIdAndStatus(processId, InstructionStatus.PENDING);
-        instructions.sort(Comparator.comparing(CompensationInstruction::getExecutionOrder));
-        return ApiResponse.success(instructions);
+    public ApiResponse<Map<String, Object>> getNextInstructions(String processId) {
+        List<CompensationInstruction> allInstructions = instructionRepository
+                .findByProcessIdOrderByExecutionOrderAsc(processId);
+        
+        CompensationInstruction next = null;
+        List<String> blockingReasons = new ArrayList<>();
+        
+        for (CompensationInstruction inst : allInstructions) {
+            if (inst.getStatus() == InstructionStatus.SUCCESS || inst.getStatus() == InstructionStatus.SKIPPED) {
+                continue;
+            }
+            if (inst.getStatus() == InstructionStatus.WAITING_MANUAL_CONFIRM) {
+                blockingReasons.add(inst.getInstructionId() + " 等待人工确认 (顺序: " + inst.getExecutionOrder() + ")");
+            } else if (inst.getStatus() == InstructionStatus.FAILED) {
+                blockingReasons.add(inst.getInstructionId() + " 已失败 (顺序: " + inst.getExecutionOrder() + ")");
+            } else if (inst.getStatus() == InstructionStatus.PENDING) {
+                if (blockingReasons.isEmpty()) {
+                    next = inst;
+                }
+                blockingReasons.add(inst.getInstructionId() + " 待执行 (顺序: " + inst.getExecutionOrder() + ")");
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("next", next);
+        result.put("allPending", blockingReasons);
+        result.put("hasNext", next != null);
+        
+        return ApiResponse.success(result);
     }
 }

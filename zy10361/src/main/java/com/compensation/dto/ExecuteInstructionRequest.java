@@ -13,4 +13,6 @@ public class ExecuteInstructionRequest {
     private String executor;
 
     private String resultDetail;
+
+    private Boolean forceFail = false;
 }
