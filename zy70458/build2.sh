@@ -29,6 +29,8 @@ curl -sL "https://repo1.maven.org/maven2/org/apache/commons/commons-compress/1.2
 curl -sL "https://repo1.maven.org/maven2/commons-io/commons-io/2.13.0/commons-io-2.13.0.jar" -o target/dependency/poi/commons-io-2.13.0.jar
 curl -sL "https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.20.0/log4j-api-2.20.0.jar" -o target/dependency/poi/log4j-api-2.20.0.jar
 curl -sL "https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.20.0/log4j-core-2.20.0.jar" -o target/dependency/poi/log4j-core-2.20.0.jar
+curl -sL "https://repo1.maven.org/maven2/org/apache/poi/poi-ooxml-lite/5.2.4/poi-ooxml-lite-5.2.4.jar" -o target/dependency/poi/poi-ooxml-lite-5.2.4.jar
+curl -sL "https://repo1.maven.org/maven2/com/github/virtuald/curvesapi/1.07/curvesapi-1.07.jar" -o target/dependency/poi/curvesapi-1.07.jar
 
 echo "Compiling..."
 CLASSPATH="target/dependency/picocli/picocli-4.7.5.jar:target/dependency/jackson/*:target/dependency/poi/*"

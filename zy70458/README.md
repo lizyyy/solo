@@ -73,16 +73,47 @@ python3 -m port_inspector.cli list-rules
 
 ### 系统要求
 - JDK 11 或更高版本
-- Maven 3.6 或更高版本
+- bash (用于运行一键脚本)
 
-### Maven 构建
+### 一键运行（推荐，无需 Maven）
 
 ```bash
-# 使用 Maven 构建（推荐）
-mvn clean package -DskipTests
+# 给脚本添加执行权限（首次）
+chmod +x port-inspector
 
-# 运行
-java -jar target/port-inspector-1.0.0.jar --help
+# 直接运行（首次会自动下载依赖并编译）
+./port-inspector --help
+```
+
+### 命令示例
+
+```bash
+# 查看帮助
+./port-inspector --help
+
+# 查看版本
+./port-inspector --version
+
+# 列出所有规则版本
+./port-inspector --data-dir ./test-data list-rules
+
+# 执行端口巡检
+./port-inspector --data-dir ./test-data inspect test_samples_normal.xlsx --rule-version v1.0.0
+
+# 列出所有批次
+./port-inspector --data-dir ./test-data list-batches
+
+# 查看批次报告
+./port-inspector --data-dir ./test-data report <batch_id>
+
+# 导出异常样本
+./port-inspector --data-dir ./test-data export-anomalies <batch_id>
+
+# 按风险等级导出所有异常
+./port-inspector --data-dir ./test-data export-by-risk critical
+
+# 标记样本已复核
+./port-inspector --data-dir ./test-data review <sample_id> 张三 --notes "已确认无风险"
 ```
 
 ### Maven 项目结构

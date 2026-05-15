@@ -1,0 +1,1 @@
+{"version":"v2.0.0","portRanges":{"0-1023":"HIGH","1024-49151":"LOW","49152-65535":"SAFE"},"reservedPorts":[22,80,443,3306,5432,6379,27017,8080,8443],"thresholdConnections":50,"description":"v2.0版本：降低系统端口等级为HIGH，注册端口为LOW，新增常用端口"}

@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 
 @Command(name = "port-inspector", description = "端口占用巡检命令行工具",
+        mixinStandardHelpOptions = true,
+        version = "Port Inspector 1.0.0",
         subcommands = {
                 PortInspectorMain.InspectCommand.class,
                 PortInspectorMain.ReportCommand.class,
@@ -35,7 +37,7 @@ public class PortInspectorMain implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        System.out.println("端口占用巡检命令行工具");
+        System.out.println("端口占用巡检命令行工具 v1.0.0");
         System.out.println("使用 --help 查看帮助");
         return 0;
     }
@@ -44,7 +46,7 @@ public class PortInspectorMain implements Callable<Integer> {
         return new PortInspector(dataDir);
     }
 
-    @Command(name = "inspect", description = "执行端口占用巡检")
+    @Command(name = "inspect", description = "执行端口占用巡检", mixinStandardHelpOptions = true)
     static class InspectCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "Excel文件路径")
         private String excelFile;
@@ -95,7 +97,7 @@ public class PortInspectorMain implements Callable<Integer> {
         }
     }
 
-    @Command(name = "report", description = "查看批次巡检报告")
+    @Command(name = "report", description = "查看批次巡检报告", mixinStandardHelpOptions = true)
     static class ReportCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "批次ID")
         private String batchId;
@@ -147,7 +149,7 @@ public class PortInspectorMain implements Callable<Integer> {
         }
     }
 
-    @Command(name = "export", description = "导出批次完整报告")
+    @Command(name = "export", description = "导出批次完整报告", mixinStandardHelpOptions = true)
     static class ExportCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "批次ID")
         private String batchId;
@@ -173,7 +175,7 @@ public class PortInspectorMain implements Callable<Integer> {
         }
     }
 
-    @Command(name = "export-anomalies", description = "导出异常样本供复核")
+    @Command(name = "export-anomalies", description = "导出异常样本供复核", mixinStandardHelpOptions = true)
     static class ExportAnomaliesCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "批次ID")
         private String batchId;
@@ -202,7 +204,7 @@ public class PortInspectorMain implements Callable<Integer> {
         }
     }
 
-    @Command(name = "export-by-risk", description = "按风险等级导出所有异常样本")
+    @Command(name = "export-by-risk", description = "按风险等级导出所有异常样本", mixinStandardHelpOptions = true)
     static class ExportByRiskCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "风险等级")
         private String riskLevel;
@@ -228,7 +230,7 @@ public class PortInspectorMain implements Callable<Integer> {
         }
     }
 
-    @Command(name = "list-batches", description = "列出所有巡检批次")
+    @Command(name = "list-batches", description = "列出所有巡检批次", mixinStandardHelpOptions = true)
     static class ListBatchesCommand implements Callable<Integer> {
         @ParentCommand
         private PortInspectorMain parent;
@@ -262,7 +264,7 @@ public class PortInspectorMain implements Callable<Integer> {
         }
     }
 
-    @Command(name = "list-rules", description = "列出所有规则版本")
+    @Command(name = "list-rules", description = "列出所有规则版本", mixinStandardHelpOptions = true)
     static class ListRulesCommand implements Callable<Integer> {
         @ParentCommand
         private PortInspectorMain parent;
@@ -289,7 +291,7 @@ public class PortInspectorMain implements Callable<Integer> {
         }
     }
 
-    @Command(name = "review", description = "标记样本为已复核")
+    @Command(name = "review", description = "标记样本为已复核", mixinStandardHelpOptions = true)
     static class ReviewCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "样本ID")
         private String sampleId;

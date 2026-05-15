@@ -1,0 +1,23 @@
+#!/bin/bash
+
+PORT_INSPECTOR_HOME=$(cd "$(dirname "$0")" && pwd)
+
+cd "$PORT_INSPECTOR_HOME"
+
+if [ ! -d "target/dependency" ]; then
+    echo "正在下载依赖..."
+    bash build2.sh
+fi
+
+CLASSPATH="target/classes"
+for jar in target/dependency/picocli/*.jar; do
+    CLASSPATH="$CLASSPATH:$jar"
+done
+for jar in target/dependency/jackson/*.jar; do
+    CLASSPATH="$CLASSPATH:$jar"
+done
+for jar in target/dependency/poi/*.jar; do
+    CLASSPATH="$CLASSPATH:$jar"
+done
+
+java -cp "$CLASSPATH" com.portinspector.PortInspectorMain "$@"
