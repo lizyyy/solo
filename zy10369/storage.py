@@ -12,21 +12,32 @@ class InMemoryStorage:
         self.timeout_index: Dict[TimeoutCategory, List[str]] = defaultdict(list)
 
     def save_sample(self, sample: RequestSample) -> None:
-        old_sample = self.samples.get(sample.request_id)
+        request_id = sample.request_id
         
-        if old_sample:
-            if old_sample.api_name in self.api_index:
-                self.api_index[old_sample.api_name].remove(sample.request_id)
-            if old_sample.status in self.status_index:
-                self.status_index[old_sample.status].remove(sample.request_id)
-            if old_sample.timeout_category and old_sample.timeout_category in self.timeout_index:
-                self.timeout_index[old_sample.timeout_category].remove(sample.request_id)
+        if request_id in self.samples:
+            self._remove_from_all_indexes(request_id)
 
-        self.samples[sample.request_id] = sample
-        self.api_index[sample.api_name].append(sample.request_id)
-        self.status_index[sample.status].append(sample.request_id)
+        self.samples[request_id] = sample
+        self.api_index[sample.api_name].append(request_id)
+        self.status_index[sample.status].append(request_id)
         if sample.timeout_category:
-            self.timeout_index[sample.timeout_category].append(sample.request_id)
+            self.timeout_index[sample.timeout_category].append(request_id)
+    
+    def _remove_from_all_indexes(self, request_id: str) -> None:
+        for key in list(self.api_index.keys()):
+            self._safe_remove_from_index(self.api_index, key, request_id)
+        
+        for key in list(self.status_index.keys()):
+            self._safe_remove_from_index(self.status_index, key, request_id)
+        
+        for key in list(self.timeout_index.keys()):
+            self._safe_remove_from_index(self.timeout_index, key, request_id)
+    
+    def _safe_remove_from_index(self, index: dict, key, value: str) -> None:
+        if key in index and value in index[key]:
+            index[key].remove(value)
+            if len(index[key]) == 0:
+                del index[key]
 
     def get_sample(self, request_id: str) -> Optional[RequestSample]:
         return self.samples.get(request_id)
