@@ -92,9 +92,13 @@ class ExampleExtractor:
             method = method_match.group(1).upper()
         url_match = re.search(r'curl\s+["\']([^"\']+)["\']', curl_cmd)
         if not url_match:
+            url_match = re.search(r'curl\s+(https?://\S+)', curl_cmd)
+        if not url_match:
             url_match = re.search(r'["\'](https?://[^"\']+)["\']', curl_cmd)
+        if not url_match:
+            url_match = re.search(r'(https?://\S+)', curl_cmd)
         if url_match:
-            url = url_match.group(1)
+            url = url_match.group(1).rstrip('\\').strip()
         header_matches = re.findall(r'-H\s+["\']([^:]+):\s*([^"\']+)["\']', curl_cmd)
         for key, value in header_matches:
             headers[key.strip()] = value.strip()
