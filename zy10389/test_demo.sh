@@ -3,9 +3,29 @@
 
 BASE_URL="http://localhost:8080/api"
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
 echo "=========================================="
 echo "  API 可观测标签校验系统演示"
 echo "=========================================="
+echo ""
+
+# 检查服务是否启动
+echo -e "${YELLOW}检查服务是否启动...${NC}"
+if ! curl -s --connect-timeout 2 "$BASE_URL/list" > /dev/null 2>&1; then
+    echo -e "${RED}✗ 服务未启动或无法访问${NC}"
+    echo ""
+    echo "请先启动服务："
+    echo "  方式一: ./quick-start.sh"
+    echo "  方式二: ./mvnw spring-boot:run"
+    echo "  方式三: java -jar target/api-tag-validation-1.0.0.jar"
+    echo ""
+    exit 1
+fi
+echo -e "${GREEN}✓ 服务已启动${NC}"
 echo ""
 
 # 1. 创建 API

@@ -2,8 +2,18 @@
 
 基于 Spring Boot 的 API 可观测性标签校验服务，提供标签白名单管理、样本校验、违规聚合、修复建议等核心功能。
 
-## 🚀 快速开始（3步）
+## 🚀 快速开始（推荐：一键启动）
 
+### 方式一：自动启动脚本（最简单）
+```bash
+# 一键检测环境 + 自动选择最佳方式启动
+./quick-start.sh
+
+# 新开终端，运行完整测试
+./test_demo.sh
+```
+
+### 方式二：分步手动启动
 ```bash
 # 1. 检查环境
 ./check-env.sh
@@ -13,9 +23,12 @@
 
 # 3. 启动服务
 ./mvnw spring-boot:run
+```
 
-# 新开终端，运行完整测试
-./test_demo.sh
+### 方式三：直接运行预编译版本（如有）
+```bash
+# 如 target 目录已有 jar 包，可直接运行
+java -jar target/api-tag-validation-1.0.0.jar
 ```
 
 ## 核心特性
@@ -53,6 +66,14 @@ java -version
 
 ## ⚠ 网络/代理问题故障排除
 
+### 最简单方案：使用一键启动脚本
+```bash
+# 自动检测环境并选择最佳启动方式
+./quick-start.sh
+```
+
+---
+
 如果 `./mvnw` 下载失败（如 `curl: (7) Failed to connect`），请按以下步骤操作：
 
 ### 方案 1: 检查/设置代理
@@ -65,7 +86,7 @@ export http_proxy=http://your-proxy:port
 export https_proxy=http://your-proxy:port
 
 # 然后重试
-./mvnw spring-boot:run
+./quick-start.sh
 ```
 
 ### 方案 2: 手动下载 Maven Wrapper
@@ -85,38 +106,25 @@ curl -o .mvn/wrapper/maven-wrapper.jar \
 mvn spring-boot:run
 ```
 
-## 快速开始
-
-### 1. 编译项目
-
-**推荐：使用项目内置 Maven Wrapper（无需安装 Maven）**
-```bash
-./mvnw clean package -DskipTests
+### 方案 4: 使用 IDE 直接运行
+在 IDE 中直接运行主类：
+```
+com.observability.tagvalidation.TagValidationApplication
 ```
 
-**或使用系统 Maven（如已安装）**
-```bash
-mvn clean package -DskipTests
-```
+---
 
-### 2. 启动服务
+## 服务访问信息
 
-**方法一：使用 Maven Wrapper 直接运行**
-```bash
-./mvnw spring-boot:run
-```
+服务启动成功后，可访问以下地址：
 
-**方法二：运行编译好的 jar 包**
-```bash
-java -jar target/api-tag-validation-1.0.0.jar
-```
-
-服务启动后访问：
-- API 地址: http://localhost:8080/api
-- H2 控制台: http://localhost:8080/h2-console
-  - JDBC URL: jdbc:h2:mem:tag_validation_db
-  - 用户名: sa
-  - 密码: (空)
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| **API 地址** | http://localhost:8080/api | REST API 入口 |
+| **H2 控制台** | http://localhost:8080/h2-console | 内存数据库管理 |
+| | JDBC URL: `jdbc:h2:mem:tag_validation_db` | |
+| | 用户名: `sa` | |
+| | 密码: (空) | |
 
 ## API 接口列表
 
