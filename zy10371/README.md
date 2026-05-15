@@ -9,17 +9,38 @@
 ### 环境要求
 - **JDK 8+** (已验证兼容 Java 8)
 
-### ⚡ 一键启动（推荐）
+### 🎯 三步体验核心功能
 
-**macOS/Linux:**
+**步骤1: 立即体验业务逻辑（无需Maven）**
+```bash
+./demo.sh
+```
+> 无需任何依赖，直接运行8个核心场景演示
+
+**步骤2: 启动完整REST API服务**
 ```bash
 ./start.sh
 ```
+> 首次运行需要下载Maven和依赖，约100MB
 
-**Windows:**
-```cmd
-start.bat
+**步骤3: 验证API接口（服务启动后）**
+```bash
+./verify-api.sh
 ```
+> 自动测试创建→确认→执行完整流程
+
+---
+
+### ⚡ 多种启动方式
+
+| 方式 | 命令 | 说明 |
+|------|------|------|
+| **快速演示** | `./demo.sh` | 无需依赖，立即体验核心逻辑 |
+| **一键启动** | `./start.sh` | 自动编译，启动完整API服务 |
+| **手动编译** | `./mvnw clean package` | 使用Maven Wrapper编译项目 |
+| **运行JAR** | `java -jar target/*.jar` | 编译后直接运行 |
+
+---
 
 ### 📋 验证API功能
 
@@ -36,6 +57,13 @@ start.bat
 4. ✅ 申请人不能自我确认
 5. ✅ 执行凭证验证
 6. ✅ JSON/CSV数据导出
+
+### 访问地址
+- **API服务**: http://localhost:8080
+- **H2数据库控制台**: http://localhost:8080/h2-console
+  - JDBC URL: `jdbc:h2:mem:testdb`
+  - 用户名: `sa`
+  - 密码: (空)
 
 ### 手动启动方式
 

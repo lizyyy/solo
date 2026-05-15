@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -31,21 +33,28 @@ public class SensitiveOperationService {
     private final SensitiveOperationRepository repository;
     private final ConfirmationProperties properties;
 
-    private static final Set<OperationStatus> ALLOWED_CONFIRM_STATUSES = Set.of(
-            OperationStatus.PENDING, OperationStatus.CONFIRMING
-    );
+    private static final Set<OperationStatus> ALLOWED_CONFIRM_STATUSES;
+    private static final Set<OperationStatus> ALLOWED_REJECT_STATUSES;
+    private static final Set<OperationStatus> ALLOWED_CANCEL_STATUSES;
+    private static final Set<OperationStatus> ALLOWED_EXECUTE_STATUSES;
 
-    private static final Set<OperationStatus> ALLOWED_REJECT_STATUSES = Set.of(
-            OperationStatus.PENDING, OperationStatus.CONFIRMING
-    );
+    static {
+        ALLOWED_CONFIRM_STATUSES = new HashSet<>();
+        ALLOWED_CONFIRM_STATUSES.add(OperationStatus.PENDING);
+        ALLOWED_CONFIRM_STATUSES.add(OperationStatus.CONFIRMING);
 
-    private static final Set<OperationStatus> ALLOWED_CANCEL_STATUSES = Set.of(
-            OperationStatus.PENDING, OperationStatus.CONFIRMING, OperationStatus.CONFIRMED
-    );
+        ALLOWED_REJECT_STATUSES = new HashSet<>();
+        ALLOWED_REJECT_STATUSES.add(OperationStatus.PENDING);
+        ALLOWED_REJECT_STATUSES.add(OperationStatus.CONFIRMING);
 
-    private static final Set<OperationStatus> ALLOWED_EXECUTE_STATUSES = Set.of(
-            OperationStatus.CONFIRMED
-    );
+        ALLOWED_CANCEL_STATUSES = new HashSet<>();
+        ALLOWED_CANCEL_STATUSES.add(OperationStatus.PENDING);
+        ALLOWED_CANCEL_STATUSES.add(OperationStatus.CONFIRMING);
+        ALLOWED_CANCEL_STATUSES.add(OperationStatus.CONFIRMED);
+
+        ALLOWED_EXECUTE_STATUSES = new HashSet<>();
+        ALLOWED_EXECUTE_STATUSES.add(OperationStatus.CONFIRMED);
+    }
 
     @Transactional
     public SensitiveOperation createOperation(CreateOperationRequest request) {
@@ -240,7 +249,9 @@ public class SensitiveOperationService {
 
     @Transactional
     public void cleanupExpiredOperations() {
-        List<OperationStatus> activeStatuses = List.of(OperationStatus.PENDING, OperationStatus.CONFIRMING);
+        List<OperationStatus> activeStatuses = new ArrayList<>();
+        activeStatuses.add(OperationStatus.PENDING);
+        activeStatuses.add(OperationStatus.CONFIRMING);
         List<SensitiveOperation> expired = repository.findByExpireTimeBeforeAndStatusIn(
                 LocalDateTime.now(), activeStatuses);
 
