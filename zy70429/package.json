@@ -7,11 +7,11 @@
     "cache-analyzer": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "start": "node dist/cli.js",
-    "dev": "ts-node src/cli.ts",
-    "test": "ts-node src/self-check.ts",
-    "lint": "eslint src/**/*.ts"
+    "dev": "npx ts-node src/cli.ts",
+    "test": "npx ts-node src/self-check.ts",
+    "lint": "npx eslint src/**/*.ts"
   },
   "dependencies": {
     "commander": "^11.1.0",

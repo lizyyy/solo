@@ -24,16 +24,22 @@ npm test
 
 ### 执行完整分析流程
 
+数据默认持久化到 `./data/bus-reservations.json`，确保多命令间数据可复用：
+
 ```bash
-# 1. 生成测试数据
+# 1. 生成测试数据（自动包含并发覆盖场景，自动落盘）
 npm run dev -- generate
 
-# 2. 执行缓存分析
+# 2. 执行缓存分析（自动读取上一步生成的数据，可复现并发覆盖异常）
 npm run dev -- analyze --show-raw
 
-# 3. 生成最终摘要
+# 3. 生成最终摘要（同样自动读取已生成的数据）
 npm run dev -- summary
 ```
+
+> **重要提示**：`generate` 命令会自动将数据保存到默认文件，后续命令会自动读取该文件，确保完整流程可正确复现并发覆盖异常场景。
+
+> 也可使用 `-o` / `-i` 参数自定义文件路径。
 
 ## 命令说明
 
@@ -111,10 +117,22 @@ npm run dev -- execute --fix RES-CONFLICT-001
 
 ### 5. summary - 生成最终分析摘要
 
-生成包含培训环境清单异常、修正建议和结论的完整摘要。
+生成包含培训环境清单异常、修正建议和结论的完整摘要，默认从数据文件加载。
 
 ```bash
+npm run dev -- summary [选项]
+
+选项:
+  -i, --input <file>      从JSON文件加载数据 (默认: ./data/bus-reservations.json)
+```
+
+**样例:**
+```bash
+# 使用默认路径（自动读取 generate 生成的数据）
 npm run dev -- summary
+
+# 自定义路径
+npm run dev -- summary -i my-data.json
 ```
 
 ## 样例数据来源

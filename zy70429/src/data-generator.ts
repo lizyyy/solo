@@ -46,19 +46,19 @@ export function generateReservation(overrides: Partial<BusReservation> = {}): Bu
   const now = new Date().toISOString();
   
   return {
-    id: overrides.id || generateId(),
-    employeeId: overrides.employeeId || employee.employeeId,
-    employeeName: overrides.employeeName || employee.employeeName,
-    department: overrides.department || employee.department,
-    busRoute: overrides.busRoute || pickRandom(BUS_ROUTES),
-    busStop: overrides.busStop || pickRandom(BUS_STOPS),
-    date: overrides.date || pickRandom(DATES),
-    timeSlot: overrides.timeSlot || pickRandom(TIME_SLOTS),
-    status: overrides.status || 'confirmed',
-    createdAt: overrides.createdAt || now,
-    updatedAt: overrides.updatedAt || now,
-    source: overrides.source || 'web-portal',
-    version: overrides.version || 1,
+    id: overrides.id !== undefined ? overrides.id : generateId(),
+    employeeId: overrides.employeeId !== undefined ? overrides.employeeId : employee.employeeId,
+    employeeName: overrides.employeeName !== undefined ? overrides.employeeName : employee.employeeName,
+    department: overrides.department !== undefined ? overrides.department : employee.department,
+    busRoute: overrides.busRoute !== undefined ? overrides.busRoute : pickRandom(BUS_ROUTES),
+    busStop: overrides.busStop !== undefined ? overrides.busStop : pickRandom(BUS_STOPS),
+    date: overrides.date !== undefined ? overrides.date : pickRandom(DATES),
+    timeSlot: overrides.timeSlot !== undefined ? overrides.timeSlot : pickRandom(TIME_SLOTS),
+    status: overrides.status !== undefined ? overrides.status : 'confirmed',
+    createdAt: overrides.createdAt !== undefined ? overrides.createdAt : now,
+    updatedAt: overrides.updatedAt !== undefined ? overrides.updatedAt : now,
+    source: overrides.source !== undefined ? overrides.source : 'web-portal',
+    version: overrides.version !== undefined ? overrides.version : 1,
   };
 }
 

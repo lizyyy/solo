@@ -11,6 +11,29 @@ import * as path from 'path';
 const program = new Command();
 const analyzer = new CacheAnalyzer();
 
+const DEFAULT_DATA_FILE = path.resolve(process.cwd(), 'data', 'bus-reservations.json');
+
+function ensureDataDir() {
+  const dataDir = path.dirname(DEFAULT_DATA_FILE);
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+}
+
+function saveData(reservations: any[], filePath: string = DEFAULT_DATA_FILE) {
+  ensureDataDir();
+  fs.writeFileSync(filePath, JSON.stringify(reservations, null, 2));
+  return filePath;
+}
+
+function loadData(filePath: string = DEFAULT_DATA_FILE): any[] | null {
+  if (fs.existsSync(filePath)) {
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return data;
+  }
+  return null;
+}
+
 program
   .name('cache-analyzer')
   .description('缓存命中分析命令行工具')
@@ -20,7 +43,7 @@ program
   .command('generate')
   .description('生成班车预约测试数据')
   .option('-c, --count <number>', '生成数量', '20')
-  .option('-o, --output <file>', '输出文件')
+  .option('-o, --output <file>', `输出文件 (默认: ${DEFAULT_DATA_FILE})`)
   .option('--with-conflict', '包含并发冲突场景', true)
   .action((options) => {
     console.log(chalk.blue('=== 生成班车预约测试数据 ==='));
@@ -39,32 +62,30 @@ program
     analyzer.loadReservations(data.allReservations);
     console.log(chalk.green('✓ 数据已加载到缓存分析器'));
 
-    if (options.output) {
-      const outputPath = path.resolve(options.output);
-      fs.writeFileSync(outputPath, JSON.stringify(data.allReservations, null, 2));
-      console.log(chalk.green(`✓ 数据已保存到: ${outputPath}`));
-    }
+    const outputPath = options.output ? path.resolve(options.output) : DEFAULT_DATA_FILE;
+    saveData(data.allReservations, outputPath);
+    console.log(chalk.green(`✓ 数据已保存到: ${outputPath}`));
     console.log('');
   });
 
 program
   .command('analyze')
   .description('执行缓存命中分析')
-  .option('-i, --input <file>', '从JSON文件加载数据')
+  .option('-i, --input <file>', `从JSON文件加载数据 (默认: ${DEFAULT_DATA_FILE})`)
   .option('--show-raw', '显示原始数据')
   .action((options) => {
     console.log(chalk.blue('=== 执行缓存命中分析 ==='));
 
-    if (options.input) {
-      const inputPath = path.resolve(options.input);
-      if (fs.existsSync(inputPath)) {
-        const data = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
-        analyzer.loadReservations(data);
-        console.log(chalk.green(`✓ 从文件加载数据: ${inputPath}`));
-      } else {
-        console.log(chalk.red(`✗ 文件不存在: ${inputPath}`));
-        process.exit(1);
-      }
+    const inputPath = options.input ? path.resolve(options.input) : DEFAULT_DATA_FILE;
+    const data = loadData(inputPath);
+    
+    if (data) {
+      analyzer.loadReservations(data);
+      console.log(chalk.green(`✓ 从文件加载数据: ${inputPath}`));
+    } else {
+      console.log(chalk.yellow(`⚠ 未找到数据文件: ${inputPath}`));
+      console.log(chalk.yellow('  将使用内存中的空缓存进行分析'));
+      console.log(chalk.yellow('  提示: 请先运行 `generate` 命令生成测试数据'));
     }
 
     const result = analyzer.analyze();
@@ -140,12 +161,23 @@ program
 program
   .command('preview')
   .description('预览批量操作影响范围')
+  .option('-i, --input <file>', `从JSON文件加载数据 (默认: ${DEFAULT_DATA_FILE})`)
   .option('--cleanup', '预览清理异常记录')
   .option('--fix <id>', '预览修复指定异常记录')
   .action((options) => {
     console.log(chalk.blue('=== 预览批量操作 ==='));
 
-    analyzer.loadReservations(generateTrainingEnvironmentData().allReservations);
+    const inputPath = options.input ? path.resolve(options.input) : DEFAULT_DATA_FILE;
+    const data = loadData(inputPath);
+    
+    if (data) {
+      analyzer.loadReservations(data);
+      console.log(chalk.green(`✓ 从文件加载数据: ${inputPath}`));
+    } else {
+      const testData = generateTrainingEnvironmentData();
+      analyzer.loadReservations(testData.allReservations);
+      console.log(chalk.yellow(`⚠ 未找到数据文件，自动生成测试数据用于预览`));
+    }
 
     if (options.cleanup) {
       const preview = analyzer.previewCleanup();
@@ -176,13 +208,25 @@ program
 program
   .command('execute')
   .description('执行批量操作')
+  .option('-i, --input <file>', `从JSON文件加载数据 (默认: ${DEFAULT_DATA_FILE})`)
   .option('--fix-all', '修复所有异常记录')
   .option('--fix <id>', '修复指定异常记录')
   .option('--rollback-plan', '生成回滚计划')
   .action((options) => {
     console.log(chalk.blue('=== 执行批量操作 ==='));
 
-    analyzer.loadReservations(generateTrainingEnvironmentData().allReservations);
+    const inputPath = options.input ? path.resolve(options.input) : DEFAULT_DATA_FILE;
+    const data = loadData(inputPath);
+    
+    if (data) {
+      analyzer.loadReservations(data);
+      console.log(chalk.green(`✓ 从文件加载数据: ${inputPath}`));
+    } else {
+      const testData = generateTrainingEnvironmentData();
+      analyzer.loadReservations(testData.allReservations);
+      console.log(chalk.yellow(`⚠ 未找到数据文件，自动生成测试数据用于执行`));
+    }
+    
     const result = analyzer.analyze();
 
     if (options.rollbackPlan) {
@@ -223,8 +267,19 @@ program
 program
   .command('summary')
   .description('生成最终分析摘要')
-  .action(() => {
-    analyzer.loadReservations(generateTrainingEnvironmentData().allReservations);
+  .option('-i, --input <file>', `从JSON文件加载数据 (默认: ${DEFAULT_DATA_FILE})`)
+  .action((options) => {
+    const inputPath = options.input ? path.resolve(options.input) : DEFAULT_DATA_FILE;
+    const data = loadData(inputPath);
+    
+    if (data) {
+      analyzer.loadReservations(data);
+      console.log(chalk.green(`✓ 从文件加载数据: ${inputPath}`));
+    } else {
+      const testData = generateTrainingEnvironmentData();
+      analyzer.loadReservations(testData.allReservations);
+      console.log(chalk.yellow(`⚠ 未找到数据文件，自动生成测试数据用于分析`));
+    }
     
     for (let i = 0; i < 10; i++) {
       analyzer.get('RES-CONFLICT-001');
@@ -232,7 +287,7 @@ program
     analyzer.get('NON-EXISTENT-KEY');
 
     const result = analyzer.analyze();
-    console.log(generateSummary(result));
+    console.log('\n' + generateSummary(result));
   });
 
 program.parse(process.argv);
