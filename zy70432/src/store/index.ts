@@ -1,10 +1,11 @@
-import { SearchKeywordReport, RecordingSession, AuditEntry } from '../types';
+import { SearchKeywordReport, RecordingSession, AuditEntry, FailedRecord, FieldError } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import * as path from 'path';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const RECORDS_FILE = path.join(DATA_DIR, 'records.json');
+const FAILED_RECORDS_FILE = path.join(DATA_DIR, 'failed-records.json');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 const AUDIT_FILE = path.join(DATA_DIR, 'audit.json');
 
@@ -35,10 +36,12 @@ function writeJsonFile<T>(filePath: string, data: T): void {
 export class RecordStore {
   private records: Map<string, SearchKeywordReport>;
   private hashToId: Map<string, string>;
+  private failedRecords: Map<string, FailedRecord>;
 
   constructor() {
     this.records = new Map();
     this.hashToId = new Map();
+    this.failedRecords = new Map();
     this.load();
   }
 
@@ -49,11 +52,21 @@ export class RecordStore {
         this.records.set(record.id, record);
       }
     }
+    
+    const failedData = readJsonFile<FailedRecord[]>(FAILED_RECORDS_FILE, []);
+    for (const record of failedData) {
+      if (record.id) {
+        this.failedRecords.set(record.id, record);
+      }
+    }
   }
 
   private save(): void {
     const data = Array.from(this.records.values());
     writeJsonFile(RECORDS_FILE, data);
+    
+    const failedData = Array.from(this.failedRecords.values());
+    writeJsonFile(FAILED_RECORDS_FILE, failedData);
   }
 
   add(record: SearchKeywordReport, hash: string): string {
@@ -61,6 +74,21 @@ export class RecordStore {
     const newRecord = { ...record, id };
     this.records.set(id, newRecord);
     this.hashToId.set(hash, id);
+    this.save();
+    return id;
+  }
+
+  addFailed(record: SearchKeywordReport, errors: FieldError[], recordHash: string, submittedBy: string): string {
+    const id = uuidv4();
+    const failedRecord: FailedRecord = {
+      id,
+      record,
+      errors,
+      submittedAt: new Date().toISOString(),
+      submittedBy,
+      recordHash
+    };
+    this.failedRecords.set(id, failedRecord);
     this.save();
     return id;
   }
@@ -80,6 +108,16 @@ export class RecordStore {
 
   getAll(): SearchKeywordReport[] {
     return Array.from(this.records.values());
+  }
+
+  getAllFailed(): FailedRecord[] {
+    return Array.from(this.failedRecords.values());
+  }
+
+  getFailedByType(failureType: string): FailedRecord[] {
+    return Array.from(this.failedRecords.values()).filter(
+      fr => fr.errors.some(e => e.failureType === failureType)
+    );
   }
 
   updateHashMapping(hash: string, id: string): void {

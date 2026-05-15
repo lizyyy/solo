@@ -1,6 +1,14 @@
-import { SearchKeywordReport, PlaybackResult, PlaybackRecord, FailureType, FieldError } from '../types';
+import { SearchKeywordReport, PlaybackResult, PlaybackRecord, FailureType, FieldError, FailedRecord } from '../types';
 import { recordStore, auditStore } from '../store';
 import { generateRecordHash, validateSearchKeywordReport } from '../utils/validation';
+
+function failedRecordToPlaybackRecord(fr: FailedRecord): PlaybackRecord {
+  return {
+    originalRecord: fr.record,
+    status: 'failure',
+    errors: fr.errors
+  };
+}
 
 export class MockRecorderService {
   submitRecord(record: SearchKeywordReport, operator: string): {
@@ -13,9 +21,11 @@ export class MockRecorderService {
     const recordHash = generateRecordHash(record);
 
     if (errors.length > 0) {
+      const failedRecordId = recordStore.addFailed(record, errors, recordHash, operator);
+      
       auditStore.add({
         recordHash,
-        recordId: '',
+        recordId: failedRecordId,
         action: 'submit',
         operator,
         details: `验证失败: ${errors.map(e => e.message).join(', ')}`,
@@ -25,6 +35,7 @@ export class MockRecorderService {
 
       return {
         status: 'failure',
+        recordId: failedRecordId,
         errors,
         message: '记录验证失败'
       };
@@ -153,45 +164,22 @@ export class MockRecorderService {
   }
 
   queryByFailureType(failureType: FailureType): PlaybackRecord[] {
-    const allRecords = recordStore.getAll();
-    const results: PlaybackRecord[] = [];
-
-    for (const record of allRecords) {
-      const errors = validateSearchKeywordReport(record);
-      const matchingErrors = errors.filter(e => e.failureType === failureType);
-      
-      if (matchingErrors.length > 0) {
-        results.push({
-          originalRecord: record,
-          status: 'failure',
-          errors: matchingErrors
-        });
-      }
-    }
-
-    return results;
+    const failedRecords = recordStore.getFailedByType(failureType);
+    return failedRecords.map(failedRecordToPlaybackRecord);
   }
 
   getAllFailedRecords(): { records: PlaybackRecord[]; groupedByFailure: Record<FailureType, PlaybackRecord[]> } {
-    const allRecords = recordStore.getAll();
+    const allFailedRecords = recordStore.getAllFailed();
     const groupedByFailure = {} as Record<FailureType, PlaybackRecord[]>;
 
-    for (const record of allRecords) {
-      const errors = validateSearchKeywordReport(record);
+    for (const fr of allFailedRecords) {
+      const playbackRecord = failedRecordToPlaybackRecord(fr);
       
-      if (errors.length > 0) {
-        const playbackRecord: PlaybackRecord = {
-          originalRecord: record,
-          status: 'failure',
-          errors
-        };
-
-        for (const error of errors) {
-          if (!groupedByFailure[error.failureType]) {
-            groupedByFailure[error.failureType] = [];
-          }
-          groupedByFailure[error.failureType].push(playbackRecord);
+      for (const error of fr.errors) {
+        if (!groupedByFailure[error.failureType]) {
+          groupedByFailure[error.failureType] = [];
         }
+        groupedByFailure[error.failureType].push(playbackRecord);
       }
     }
 

@@ -85,3 +85,12 @@ export interface ExportOptions {
   filterByFailureType?: FailureType;
   groupByFailure?: boolean;
 }
+
+export interface FailedRecord {
+  id: string;
+  record: SearchKeywordReport;
+  errors: FieldError[];
+  submittedAt: string;
+  submittedBy: string;
+  recordHash: string;
+}
