@@ -192,12 +192,12 @@ def calculate_monthly_results(
     calculate_req: schemas.MonthlyResultCalculate,
     db: Session = Depends(get_db)
 ):
-    existing_result = crud.get_monthly_result_by_idempotency(db, idempotency_key=calculate_req.idempotency_key)
-    if existing_result:
+    existing_idempotent = crud.get_idempotent_record(db, key=calculate_req.idempotency_key)
+    if existing_idempotent:
         return schemas.SuccessResponse(
             success=True,
             message="Duplicate request, calculation already completed",
-            data={"result_id": existing_result.id, "idempotency_key": calculate_req.idempotency_key}
+            data={"idempotency_key": calculate_req.idempotency_key, "cached": True}
         )
     
     rule = crud.get_allocation_rule(db, rule_id=calculate_req.rule_id)
@@ -208,6 +208,12 @@ def calculate_monthly_results(
         aggregated_records = crud.aggregate_call_records(db, month=calculate_req.month)
         
         if not aggregated_records:
+            crud.create_idempotent_record(
+                db,
+                key=calculate_req.idempotency_key,
+                request_type="monthly_calculation",
+                response_data=json.dumps({"created_count": 0, "month": calculate_req.month})
+            )
             return schemas.SuccessResponse(
                 success=True,
                 message="No call records found for the specified month",

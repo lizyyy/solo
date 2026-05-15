@@ -32,7 +32,7 @@ def export_to_dataframe(
             "原始成本": result.raw_cost,
             "调整金额": adjustment_total,
             "分摊后成本": result.allocated_cost,
-            "状态": result.status.value,
+            "状态": result.status,
             "创建时间": result.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "更新时间": result.updated_at.strftime("%Y-%m-%d %H:%M:%S")
         })
