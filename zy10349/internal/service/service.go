@@ -226,8 +226,17 @@ func (s *SplitService) ApplyCorrection(id string, req *model.CorrectionRequest) 
 		return fmt.Errorf("invalid correction action: %s", req.Action)
 	}
 
-	if record.Status == model.HitStatusRevoked {
-		return fmt.Errorf("cannot apply correction to revoked record")
+	if record.Status != model.HitStatusPending {
+		return fmt.Errorf("cannot apply correction to record in %s status: only pending records can be corrected", record.Status)
+	}
+
+	newStatus := model.HitStatusIncorrect
+	if req.Action == model.CorrectionActionNone {
+		newStatus = model.HitStatusCorrect
+	}
+
+	if !model.IsValidStatusTransition(record.Status, newStatus) {
+		return fmt.Errorf("invalid status transition: cannot transition from %s to %s via correction", record.Status, newStatus)
 	}
 
 	return s.storage.UpdateHitRecordCorrection(id, req.Action, req.Note, req.UserID)
