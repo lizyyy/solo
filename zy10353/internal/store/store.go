@@ -19,11 +19,11 @@ type Store interface {
 }
 
 type MemoryStore struct {
-	tasks    map[string]*model.ArchiveTask
-	hashMap  map[string]*model.ArchiveTask
-	results  map[string]*model.ProcessResult
-	risks    map[string][]*model.RiskItem
-	mu       sync.RWMutex
+	tasks   map[string]*model.ArchiveTask
+	hashMap map[string]*model.ArchiveTask
+	results map[string]*model.ProcessResult
+	risks   map[string][]*model.RiskItem
+	mu      sync.RWMutex
 }
 
 func NewMemoryStore() *MemoryStore {
@@ -96,6 +96,10 @@ func (s *MemoryStore) ListTasks(status model.TaskStatus, limit, offset int) ([]*
 		if status == "" || task.Status == status {
 			tasks = append(tasks, task)
 		}
+	}
+
+	if offset < 0 {
+		offset = 0
 	}
 
 	if offset >= len(tasks) {

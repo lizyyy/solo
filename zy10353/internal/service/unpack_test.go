@@ -415,4 +415,12 @@ func TestListTasks(t *testing.T) {
 	if len(tasks) != 5 {
 		t.Errorf("Expected 5 tasks, got %d", len(tasks))
 	}
+
+	tasks, err = s.ListTasks("", 10, -1)
+	if err != nil {
+		t.Fatalf("ListTasks with negative offset failed: %v", err)
+	}
+	if len(tasks) != 5 {
+		t.Errorf("Expected 5 tasks with negative offset, got %d", len(tasks))
+	}
 }

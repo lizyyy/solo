@@ -120,7 +120,8 @@ func (h *Handler) ProcessTask(w http.ResponseWriter, r *http.Request) {
 
 	var req ProcessTaskRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		req.Files = []model.FileEntry{}
+		h.respondError(w, errors.NewAppError("INVALID_REQUEST", "Invalid request body", err))
+		return
 	}
 
 	result, err := h.service.ProcessTask(taskID, req.Files)
