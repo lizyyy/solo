@@ -1,8 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
-import db from '../database';
-import { initDatabase } from '../database';
+import { initDatabase, getDb, closeDb } from '../database';
 import ValidationService from '../services/validationService';
 
 const realLabSamples = [
@@ -131,11 +130,6 @@ const realLabSamples = [
 const seedDatabase = async () => {
   console.log('开始初始化数据库...');
   
-  const dataDir = path.join(__dirname, '../../data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-
   initDatabase();
 
   console.log('开始插入实验室样本数据...');
@@ -150,7 +144,7 @@ const seedDatabase = async () => {
     });
 
     await new Promise<void>((resolve, reject) => {
-      db.run(`
+      getDb().run(`
         INSERT INTO lab_samples (
           id, business_no, sample_no, patient_name, patient_id,
           sample_type, collect_time, receive_time, test_items,
@@ -224,7 +218,7 @@ const seedDatabase = async () => {
     console.log(`  - ${s.businessNo} (${s.patientName} - ${s.department})`);
   });
 
-  db.close();
+  closeDb();
 };
 
 seedDatabase().catch(console.error);

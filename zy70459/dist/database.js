@@ -1,26 +1,28 @@
-import sqlite3 from 'sqlite3';
-import path from 'path';
-import fs from 'fs';
-
-const dbPath = path.join(__dirname, '../data/freeze-validation.db');
-let db: sqlite3.Database | null = null;
-
-export const ensureDataDir = (): void => {
-  const dataDir = path.dirname(dbPath);
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-
-export const initDatabase = (): sqlite3.Database => {
-  ensureDataDir();
-  
-  if (!db) {
-    db = new sqlite3.Database(dbPath);
-  }
-
-  db.serialize(() => {
-    db!.run(`
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.closeDb = exports.getDb = exports.initDatabase = exports.ensureDataDir = void 0;
+const sqlite3_1 = __importDefault(require("sqlite3"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
+const dbPath = path_1.default.join(__dirname, '../data/freeze-validation.db');
+let db = null;
+const ensureDataDir = () => {
+    const dataDir = path_1.default.dirname(dbPath);
+    if (!fs_1.default.existsSync(dataDir)) {
+        fs_1.default.mkdirSync(dataDir, { recursive: true });
+    }
+};
+exports.ensureDataDir = ensureDataDir;
+const initDatabase = () => {
+    (0, exports.ensureDataDir)();
+    if (!db) {
+        db = new sqlite3_1.default.Database(dbPath);
+    }
+    db.serialize(() => {
+        db.run(`
       CREATE TABLE IF NOT EXISTS lab_samples (
         id TEXT PRIMARY KEY,
         business_no TEXT UNIQUE NOT NULL,
@@ -39,8 +41,7 @@ export const initDatabase = (): sqlite3.Database => {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
-
-    db!.run(`
+        db.run(`
       CREATE TABLE IF NOT EXISTS validation_records (
         id TEXT PRIMARY KEY,
         business_no TEXT NOT NULL,
@@ -55,8 +56,7 @@ export const initDatabase = (): sqlite3.Database => {
         FOREIGN KEY (sample_id) REFERENCES lab_samples(id)
       )
     `);
-
-    db!.run(`
+        db.run(`
       CREATE TABLE IF NOT EXISTS failure_records (
         id TEXT PRIMARY KEY,
         business_no TEXT NOT NULL,
@@ -75,8 +75,7 @@ export const initDatabase = (): sqlite3.Database => {
         FOREIGN KEY (validation_id) REFERENCES validation_records(id)
       )
     `);
-
-    db!.run(`
+        db.run(`
       CREATE TABLE IF NOT EXISTS anomaly_samples (
         id TEXT PRIMARY KEY,
         business_no TEXT NOT NULL,
@@ -88,8 +87,7 @@ export const initDatabase = (): sqlite3.Database => {
         FOREIGN KEY (sample_id) REFERENCES lab_samples(id)
       )
     `);
-
-    db!.run(`
+        db.run(`
       CREATE TABLE IF NOT EXISTS batch_operations (
         id TEXT PRIMARY KEY,
         operation_type TEXT NOT NULL,
@@ -101,33 +99,31 @@ export const initDatabase = (): sqlite3.Database => {
         executed_at DATETIME
       )
     `);
-
-    db!.run(`CREATE INDEX IF NOT EXISTS idx_lab_samples_business_no ON lab_samples(business_no)`);
-    db!.run(`CREATE INDEX IF NOT EXISTS idx_validation_records_business_no ON validation_records(business_no)`);
-    db!.run(`CREATE INDEX IF NOT EXISTS idx_failure_records_business_no ON failure_records(business_no)`);
-    db!.run(`CREATE INDEX IF NOT EXISTS idx_anomaly_samples_business_no ON anomaly_samples(business_no)`);
-  });
-
-  return db;
+        db.run(`CREATE INDEX IF NOT EXISTS idx_lab_samples_business_no ON lab_samples(business_no)`);
+        db.run(`CREATE INDEX IF NOT EXISTS idx_validation_records_business_no ON validation_records(business_no)`);
+        db.run(`CREATE INDEX IF NOT EXISTS idx_failure_records_business_no ON failure_records(business_no)`);
+        db.run(`CREATE INDEX IF NOT EXISTS idx_anomaly_samples_business_no ON anomaly_samples(business_no)`);
+    });
+    return db;
 };
-
-export const getDb = (): sqlite3.Database => {
-  if (!db) {
-    return initDatabase();
-  }
-  return db;
+exports.initDatabase = initDatabase;
+const getDb = () => {
+    if (!db) {
+        return (0, exports.initDatabase)();
+    }
+    return db;
 };
-
-export const closeDb = (): void => {
-  if (db) {
-    db.close();
-    db = null;
-  }
+exports.getDb = getDb;
+const closeDb = () => {
+    if (db) {
+        db.close();
+        db = null;
+    }
 };
-
-export default {
-  getDb,
-  initDatabase,
-  ensureDataDir,
-  closeDb
+exports.closeDb = closeDb;
+exports.default = {
+    getDb: exports.getDb,
+    initDatabase: exports.initDatabase,
+    ensureDataDir: exports.ensureDataDir,
+    closeDb: exports.closeDb
 };

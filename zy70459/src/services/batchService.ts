@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import db from '../database';
+import { getDb } from '../database';
 import ValidationService from './validationService';
 import { BatchOperation, ValidationResult } from '../types';
 
@@ -23,7 +23,7 @@ export class BatchService {
 
     for (const businessNo of businessNos) {
       const sampleExists = await new Promise<boolean>((resolve) => {
-        db.get('SELECT 1 FROM lab_samples WHERE business_no = ?', [businessNo], (err, row) => {
+        getDb().get('SELECT 1 FROM lab_samples WHERE business_no = ?', [businessNo], (err, row) => {
           resolve(!!row);
         });
       });
@@ -50,7 +50,7 @@ export class BatchService {
     };
 
     await new Promise<void>((resolve) => {
-      db.run(`
+      getDb().run(`
         INSERT INTO batch_operations (id, operation_type, status, affected_count, preview_data, operator, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `, [
@@ -80,7 +80,7 @@ export class BatchService {
     };
   }> {
     return new Promise((resolve, reject) => {
-      db.get('SELECT * FROM batch_operations WHERE id = ?', [operationId], async (err, row: any) => {
+      getDb().get('SELECT * FROM batch_operations WHERE id = ?', [operationId], async (err, row: any) => {
         if (err || !row) {
           reject(new Error('批量操作不存在'));
           return;
@@ -89,7 +89,7 @@ export class BatchService {
         const previewData = JSON.parse(row.preview_data);
         const businessNos = [...previewData.willSuccess, ...previewData.willFail.map((f: any) => f.businessNo)];
 
-        db.run('UPDATE batch_operations SET status = ?, executed_at = ? WHERE id = ?', 
+        getDb().run('UPDATE batch_operations SET status = ?, executed_at = ? WHERE id = ?', 
           ['executing', new Date().toISOString(), operationId]);
 
         const results: ValidationResult[] = [];
@@ -101,7 +101,7 @@ export class BatchService {
         const successCount = results.filter(r => r.success).length;
         const failedCount = results.filter(r => !r.success).length;
 
-        db.run('UPDATE batch_operations SET status = ? WHERE id = ?', 
+        getDb().run('UPDATE batch_operations SET status = ? WHERE id = ?', 
           ['completed', operationId]);
 
         resolve({
@@ -119,7 +119,7 @@ export class BatchService {
 
   static async getBatchOperation(operationId: string): Promise<BatchOperation | null> {
     return new Promise((resolve) => {
-      db.get('SELECT * FROM batch_operations WHERE id = ?', [operationId], (err, row) => {
+      getDb().get('SELECT * FROM batch_operations WHERE id = ?', [operationId], (err, row) => {
         if (err || !row) {
           resolve(null);
           return;
@@ -137,10 +137,10 @@ export class BatchService {
     const offset = (page - 1) * pageSize;
 
     return new Promise((resolve, reject) => {
-      db.get('SELECT COUNT(*) as total FROM batch_operations', [], (err, countRow: any) => {
+      getDb().get('SELECT COUNT(*) as total FROM batch_operations', [], (err, countRow: any) => {
         if (err) reject(err);
 
-        db.all(`
+        getDb().all(`
           SELECT * FROM batch_operations 
           ORDER BY created_at DESC
           LIMIT ? OFFSET ?

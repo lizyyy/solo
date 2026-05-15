@@ -1,31 +1,31 @@
-import db from '../database';
+import { getDb } from '../database';
 import { ValidationResult, LabSample, ValidationRecord, FailureRecord, AnomalySample } from '../types';
 
 export class QueryService {
   static async queryByBusinessNo(businessNo: string): Promise<ValidationResult & { anomalySamples?: AnomalySample[] }> {
     return new Promise((resolve, reject) => {
-      db.serialize(() => {
+      getDb().serialize(() => {
         let sample: any = null;
         let validationRecords: any[] = [];
         let failureRecords: any[] = [];
         let anomalySamples: any[] = [];
 
-        db.get('SELECT * FROM lab_samples WHERE business_no = ?', [businessNo], (err, row) => {
+        getDb().get('SELECT * FROM lab_samples WHERE business_no = ?', [businessNo], (err, row) => {
           if (err) reject(err);
           sample = row;
         });
 
-        db.all('SELECT * FROM validation_records WHERE business_no = ? ORDER BY created_at DESC', [businessNo], (err, rows) => {
+        getDb().all('SELECT * FROM validation_records WHERE business_no = ? ORDER BY created_at DESC', [businessNo], (err, rows) => {
           if (err) reject(err);
           validationRecords = rows;
         });
 
-        db.all('SELECT * FROM failure_records WHERE business_no = ? ORDER BY created_at DESC', [businessNo], (err, rows) => {
+        getDb().all('SELECT * FROM failure_records WHERE business_no = ? ORDER BY created_at DESC', [businessNo], (err, rows) => {
           if (err) reject(err);
           failureRecords = rows;
         });
 
-        db.all('SELECT * FROM anomaly_samples WHERE business_no = ? ORDER BY detected_at DESC', [businessNo], (err, rows) => {
+        getDb().all('SELECT * FROM anomaly_samples WHERE business_no = ? ORDER BY detected_at DESC', [businessNo], (err, rows) => {
           if (err) reject(err);
           anomalySamples = rows;
 
@@ -87,7 +87,7 @@ export class QueryService {
 
       const whereSQL = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
-      db.get(`
+      getDb().get(`
         SELECT COUNT(DISTINCT ls.business_no) as total 
         FROM lab_samples ls 
         LEFT JOIN validation_records vr ON ls.business_no = vr.business_no 
@@ -96,7 +96,7 @@ export class QueryService {
       `, queryParams, (err, countRow: any) => {
         if (err) reject(err);
 
-        db.all(`
+        getDb().all(`
           SELECT DISTINCT ls.business_no, 
                  ls.*,
                  vr.id as vr_id, vr.status as vr_status, vr.created_at as vr_created_at,
@@ -149,10 +149,10 @@ export class QueryService {
         queryParams.push(failureType);
       }
 
-      db.get(`SELECT COUNT(*) as total FROM failure_records ${whereSQL}`, queryParams, (err, countRow: any) => {
+      getDb().get(`SELECT COUNT(*) as total FROM failure_records ${whereSQL}`, queryParams, (err, countRow: any) => {
         if (err) reject(err);
 
-        db.all(`
+        getDb().all(`
           SELECT * FROM failure_records 
           ${whereSQL}
           ORDER BY created_at DESC
@@ -185,10 +185,10 @@ export class QueryService {
         queryParams.push(anomalyType);
       }
 
-      db.get(`SELECT COUNT(*) as total FROM anomaly_samples a ${whereSQL}`, queryParams, (err, countRow: any) => {
+      getDb().get(`SELECT COUNT(*) as total FROM anomaly_samples a ${whereSQL}`, queryParams, (err, countRow: any) => {
         if (err) reject(err);
 
-        db.all(`
+        getDb().all(`
           SELECT a.*, ls.* 
           FROM anomaly_samples a
           LEFT JOIN lab_samples ls ON a.sample_id = ls.id

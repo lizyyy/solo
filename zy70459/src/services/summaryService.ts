@@ -1,4 +1,4 @@
-import db from '../database';
+import { getDb } from '../database';
 import { SummaryItem } from '../types';
 
 export class SummaryService {
@@ -22,7 +22,7 @@ export class SummaryService {
         params = businessNos;
       }
 
-      db.all(`
+      getDb().all(`
         SELECT DISTINCT 
           fr.business_no,
           fr.gateway_error,
@@ -55,8 +55,7 @@ export class SummaryService {
         LEFT JOIN lab_samples ls ON vr.business_no = ls.business_no
         WHERE vr.status = 'success'
         ${businessNos && businessNos.length > 0 ? `AND vr.business_no IN (${params.map(() => '?').join(',')})` : ''}
-        ORDER BY business_no
-      `, [...params, ...params], (err, rows: any[]) => {
+      `, [...params, ...params], (err, rows: any[] | undefined) => {
         if (err) reject(err);
 
         const summaryMap = new Map<string, SummaryItem & { 
@@ -66,7 +65,7 @@ export class SummaryService {
           hasAnomaly?: boolean;
         }>();
 
-        for (const row of rows) {
+        for (const row of rows || []) {
           const businessNo = row.business_no;
           
           if (!summaryMap.has(businessNo)) {
@@ -158,7 +157,7 @@ export class SummaryService {
       const byErrorType: { [key: string]: number } = {};
       const byDepartment: { [key: string]: { total: number; failed: number } } = {};
 
-      db.all(`
+      getDb().all(`
         SELECT fr.failure_type, COUNT(*) as count
         FROM failure_records fr
         GROUP BY fr.failure_type
@@ -168,7 +167,7 @@ export class SummaryService {
           byErrorType[row.failure_type] = row.count;
         }
 
-        db.all(`
+        getDb().all(`
           SELECT 
             ls.department,
             COUNT(DISTINCT ls.business_no) as total,

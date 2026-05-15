@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import db from '../database';
+import { getDb } from '../database';
 import { ValidationRecord, FailureRecord, ValidationResult } from '../types';
 
 const freezeWindows = {
@@ -50,7 +50,7 @@ export class ValidationService {
 
   static async validateSample(businessNo: string, operator: string, simulateConcurrency: boolean = false): Promise<ValidationResult> {
     return new Promise((resolve) => {
-      db.get('SELECT * FROM lab_samples WHERE business_no = ?', [businessNo], async (err, sample: any) => {
+      getDb().get('SELECT * FROM lab_samples WHERE business_no = ?', [businessNo], async (err, sample: any) => {
         if (err || !sample) {
           const failureRecord = await this.recordFailure(
             businessNo,
@@ -114,7 +114,7 @@ export class ValidationService {
           createdAt: now
         };
 
-        db.run(`
+        getDb().run(`
           INSERT INTO validation_records (id, business_no, sample_id, validation_type, window_start, window_end, status, result, operator, created_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
@@ -130,7 +130,7 @@ export class ValidationService {
           now.toISOString()
         ]);
 
-        db.run('UPDATE lab_samples SET status = ?, updated_at = ? WHERE business_no = ?', 
+        getDb().run('UPDATE lab_samples SET status = ?, updated_at = ? WHERE business_no = ?', 
           ['validated', now.toISOString(), businessNo]);
 
         resolve({
@@ -218,7 +218,7 @@ export class ValidationService {
       const failureId = uuidv4();
       const now = new Date();
       
-      db.run(`
+      getDb().run(`
         INSERT INTO failure_records (
           id, business_no, sample_id, validation_id, failure_type, error_code, 
           error_message, gateway_error, correction_suggestion, conclusion, raw_payload, created_at
@@ -255,7 +255,7 @@ export class ValidationService {
   ): Promise<void> {
     return new Promise((resolve) => {
       const anomalyId = uuidv4();
-      db.run(`
+      getDb().run(`
         INSERT INTO anomaly_samples (id, business_no, sample_id, anomaly_type, description, original_record_id, detected_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `, [anomalyId, businessNo, sampleId, anomalyType, description, originalRecordId, new Date().toISOString()], () => {
