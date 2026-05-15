@@ -25,23 +25,23 @@
 ## 快速启动
 
 ### 环境要求
-- **JDK 17+**: Spring Boot 3.x 要求 Java 17 及以上版本
-  - 推荐: Temurin JDK 17 (https://adoptium.net/)
+- **JDK 8+**: Spring Boot 2.7.x 兼容 Java 8 及以上版本
+  - 推荐: Temurin JDK 8/11/17 (https://adoptium.net/)
   - 检查: `java -version`
-- **Maven 3.8+** (可选，项目提供启动脚本)
-  - 系统 Maven: `mvn -version`
-  - 或使用 Maven Wrapper (需下载 mvnw 脚本)
+- **网络连接**: 首次启动需要网络下载依赖
 
-### 启动方式
+### ⭐ 一键启动（推荐，无需预先安装 Maven）
 
-#### 方式一：使用启动脚本（推荐）
 ```bash
 # 进入项目目录
 cd feature-flag-audit
 
-# 执行启动脚本（自动检查 Java 版本）
-./start.sh
+# 执行自举启动脚本
+# 自动: 检查Java -> 下载Maven Wrapper -> 构建 -> 启动
+./bootstrap.sh
 ```
+
+### 其他启动方式
 
 #### 方式二：使用系统 Maven
 ```bash
@@ -50,21 +50,8 @@ mvn spring-boot:run
 ```
 
 #### 方式三：使用 Maven Wrapper
-如果已下载 `mvnw` 脚本（项目已包含配置文件）：
-
-**获取完整 Maven Wrapper**:
 ```bash
-# 方式1: 如果系统已安装 Maven，可在项目目录执行生成
-mvn wrapper:wrapper
-
-# 方式2: 手动下载脚本
-curl -sL https://raw.githubusercontent.com/apache/maven-wrapper/master/mvnw -o mvnw
-curl -sL https://raw.githubusercontent.com/apache/maven-wrapper/master/mvnw.cmd -o mvnw.cmd
-chmod +x mvnw
-```
-
-**使用 Maven Wrapper 启动**:
-```bash
+# 如果已获取完整 Maven Wrapper
 ./mvnw spring-boot:run
 ```
 
@@ -76,28 +63,50 @@ chmod +x mvnw
   - 用户名: `sa`
   - 密码: (空)
 
+### 验证功能
+
+服务启动后，新开一个终端：
+
+```bash
+# 运行完整功能测试
+./test.sh
+```
+
+测试脚本会自动验证：
+- ✅ 正常请求命中分桶
+- ✅ 重复请求拦截 (409)
+- ✅ QA用户强制命中
+- ✅ 管理员强制命中
+- ✅ 实验不存在错误处理
+- ✅ 失败记录查询
+- ✅ 人工补偿功能
+- ✅ CSV导出功能
+- ✅ 按RequestId查询审计记录
+
 ### 常见启动问题
 
-#### 1. UnsupportedClassVersionError
-```
-java.lang.UnsupportedClassVersionError: ... has been compiled by a more recent version of the Java Runtime
-```
-**原因**: Java 版本过低
-**解决**: 安装 JDK 17+，并设置 JAVA_HOME 环境变量
+#### 1. 首次启动慢
+**原因**: 首次启动需要下载 Maven 和所有依赖 jar
+**解决**: 耐心等待，后续启动会快很多
+
+#### 2. 下载失败
 ```bash
-# macOS/Linux
-export JAVA_HOME=/path/to/jdk-17
-./start.sh
+# 如果 maven-wrapper.jar 下载失败，可以手动下载:
+curl -sL https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar -o .mvn/wrapper/maven-wrapper.jar
 ```
 
-#### 2. mvn: command not found
-**原因**: 系统未安装 Maven
-**解决**: 
-- 下载 Maven Wrapper 脚本: https://maven.apache.org/wrapper/
-- 或直接安装 Maven: `brew install maven` (macOS)
-
-#### 3. 数据库持久化错误 (hitResult 为 null)
+#### 3. 核心评估接口持久化问题
 **已修复**: `AuditRecord.hitResult` 字段已移除非空约束，PENDING 状态可以正常入库
+
+#### 4. Java 版本兼容性
+**已修复**: 项目已降级到 Spring Boot 2.7.18，兼容 Java 8+
+
+## 技术栈
+- Spring Boot 2.7.18 (Java 8 兼容)
+- Spring Data JPA
+- H2 Database (内存数据库)
+- Lombok
+- Maven Wrapper (自动下载)
 
 ## 关键接口
 
