@@ -27,6 +27,43 @@ const (
 	HitStatusRevoked   HitStatus = "revoked"
 )
 
+func IsValidHitStatus(status HitStatus) bool {
+	switch status {
+	case HitStatusPending, HitStatusCorrect, HitStatusIncorrect, HitStatusRevoked:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsValidStatusTransition(current, new HitStatus) bool {
+	if current == HitStatusRevoked {
+		return false
+	}
+	return IsValidHitStatus(new)
+}
+
+func IsValidCorrectionAction(action CorrectionAction) bool {
+	switch action {
+	case CorrectionActionNone, CorrectionActionAdjust, CorrectionActionBlock, CorrectionActionManual:
+		return true
+	default:
+		return false
+	}
+}
+
+func QueryParamsEqual(a, b map[string]string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for k, v := range a {
+		if b[k] != v {
+			return false
+		}
+	}
+	return true
+}
+
 type CorrectionAction string
 
 const (

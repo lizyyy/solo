@@ -101,17 +101,24 @@ func (s *SplitService) ProcessRequest(req *model.ProcessRequest) (*model.Process
 			return nil, err
 		}
 		if existing != nil {
-			return &model.ProcessResponse{
-				RequestID:      existing.RequestID,
-				HitRecordID:    existing.ID,
-				Matched:        existing.StrategyID != "",
-				StrategyID:     existing.StrategyID,
-				OperationType:  existing.MatchedOperation,
-				DBRole:         existing.DBRoleUsed,
-				Status:         existing.Status,
-				NeedCorrection: existing.Status == model.HitStatusPending,
-				Message:        "duplicate request, returned existing result",
-			}, nil
+			isSameRequest := existing.Path == req.Path &&
+				existing.Method == req.Method &&
+				model.QueryParamsEqual(existing.QueryParams, req.QueryParams)
+
+			if isSameRequest {
+				return &model.ProcessResponse{
+					RequestID:      existing.RequestID,
+					HitRecordID:    existing.ID,
+					Matched:        existing.StrategyID != "",
+					StrategyID:     existing.StrategyID,
+					OperationType:  existing.MatchedOperation,
+					DBRole:         existing.DBRoleUsed,
+					Status:         existing.Status,
+					NeedCorrection: existing.Status == model.HitStatusPending,
+					Message:        "duplicate request, returned existing result",
+				}, nil
+			}
+			return nil, fmt.Errorf("request_id already exists with different request content")
 		}
 	}
 
@@ -195,6 +202,14 @@ func (s *SplitService) AdvanceStatus(id string, req *model.AdvanceStatusRequest)
 		return fmt.Errorf("hit record not found")
 	}
 
+	if !model.IsValidHitStatus(req.Status) {
+		return fmt.Errorf("invalid target status: %s", req.Status)
+	}
+
+	if !model.IsValidStatusTransition(record.Status, req.Status) {
+		return fmt.Errorf("invalid status transition: cannot transition from %s to %s", record.Status, req.Status)
+	}
+
 	return s.storage.UpdateHitRecordStatus(id, req.Status, req.UserID, req.Note)
 }
 
@@ -207,6 +222,14 @@ func (s *SplitService) ApplyCorrection(id string, req *model.CorrectionRequest) 
 		return fmt.Errorf("hit record not found")
 	}
 
+	if !model.IsValidCorrectionAction(req.Action) {
+		return fmt.Errorf("invalid correction action: %s", req.Action)
+	}
+
+	if record.Status == model.HitStatusRevoked {
+		return fmt.Errorf("cannot apply correction to revoked record")
+	}
+
 	return s.storage.UpdateHitRecordCorrection(id, req.Action, req.Note, req.UserID)
 }
 
@@ -217,6 +240,10 @@ func (s *SplitService) RevokeHitRecord(id string, userID string) error {
 	}
 	if record == nil {
 		return fmt.Errorf("hit record not found")
+	}
+
+	if record.Status == model.HitStatusRevoked {
+		return fmt.Errorf("record is already revoked")
 	}
 
 	return s.storage.RevokeHitRecord(id, userID)

@@ -522,28 +522,37 @@ func (s *SQLiteStorage) GetStatistics(startTime, endTime time.Time) (*model.Spli
 	report := &model.SplitReport{}
 	report.TimeRange.Start = startTime
 	report.TimeRange.End = endTime
+	report.StrategyBreakdown = make(map[string]int)
+	report.OperationBreakdown = make(map[string]int)
 
 	baseQuery := `
 	SELECT 
 		COUNT(*) as total,
-		SUM(CASE WHEN status = 'correct' THEN 1 ELSE 0 END) as correct,
-		SUM(CASE WHEN status = 'incorrect' THEN 1 ELSE 0 END) as incorrect,
-		SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-		SUM(CASE WHEN status = 'revoked' THEN 1 ELSE 0 END) as revoked
+		COALESCE(SUM(CASE WHEN status = 'correct' THEN 1 ELSE 0 END), 0) as correct,
+		COALESCE(SUM(CASE WHEN status = 'incorrect' THEN 1 ELSE 0 END), 0) as incorrect,
+		COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) as pending,
+		COALESCE(SUM(CASE WHEN status = 'revoked' THEN 1 ELSE 0 END), 0) as revoked
 	FROM hit_records
 	WHERE created_at >= ? AND created_at <= ?
 	`
 
+	var total, correct, incorrect, pending, revoked sql.NullInt64
 	err := s.db.QueryRow(baseQuery, startTime, endTime).Scan(
-		&report.TotalHits,
-		&report.CorrectHits,
-		&report.IncorrectHits,
-		&report.PendingHits,
-		&report.RevokedHits,
+		&total,
+		&correct,
+		&incorrect,
+		&pending,
+		&revoked,
 	)
 	if err != nil {
 		return nil, err
 	}
+
+	report.TotalHits = int(total.Int64)
+	report.CorrectHits = int(correct.Int64)
+	report.IncorrectHits = int(incorrect.Int64)
+	report.PendingHits = int(pending.Int64)
+	report.RevokedHits = int(revoked.Int64)
 
 	if report.TotalHits > 0 {
 		report.AccuracyRate = float64(report.CorrectHits) / float64(report.TotalHits) * 100

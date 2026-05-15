@@ -173,6 +173,13 @@ func (h *Handler) ProcessRequest(c *gin.Context) {
 
 	result, err := h.service.ProcessRequest(&req)
 	if err != nil {
+		if err.Error() == "request_id already exists with different request content" {
+			c.JSON(http.StatusConflict, model.Response{
+				Code:    http.StatusConflict,
+				Message: err.Error(),
+			})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, model.Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -281,8 +288,8 @@ func (h *Handler) AdvanceStatus(c *gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, model.Response{
-			Code:    http.StatusInternalServerError,
+		c.JSON(http.StatusBadRequest, model.Response{
+			Code:    http.StatusBadRequest,
 			Message: err.Error(),
 		})
 		return
@@ -313,8 +320,8 @@ func (h *Handler) ApplyCorrection(c *gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, model.Response{
-			Code:    http.StatusInternalServerError,
+		c.JSON(http.StatusBadRequest, model.Response{
+			Code:    http.StatusBadRequest,
 			Message: err.Error(),
 		})
 		return
@@ -341,8 +348,8 @@ func (h *Handler) RevokeHitRecord(c *gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, model.Response{
-			Code:    http.StatusInternalServerError,
+		c.JSON(http.StatusBadRequest, model.Response{
+			Code:    http.StatusBadRequest,
 			Message: err.Error(),
 		})
 		return
