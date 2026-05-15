@@ -32,9 +32,9 @@ CREATE TABLE IF NOT EXISTS payment_instructions (
     receiver_account_id INTEGER NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     channel VARCHAR(50) NOT NULL,
-    channel_order_no VARCHAR(128),
-    remark TEXT,
-    notify_url VARCHAR(256),
+    channel_order_no VARCHAR(128) DEFAULT '',
+    remark TEXT DEFAULT '',
+    notify_url VARCHAR(256) DEFAULT '',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (receiver_account_id) REFERENCES receiver_accounts(id)

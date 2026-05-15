@@ -5,22 +5,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/idempotent-payment-api/internal/model"
 	"github.com/idempotent-payment-api/internal/repository"
+	"github.com/jmoiron/sqlx"
 )
 
 type PaymentService struct {
-	db              *repository.Database
-	paymentRepo     *repository.PaymentInstructionRepository
-	receiverRepo    *repository.ReceiverAccountRepository
-	idempotentRepo  *repository.IdempotentKeyRepository
-	receiptRepo     *repository.ChannelReceiptRepository
-	cancelRepo      *repository.CancelApplicationRepository
-	timelineRepo    *repository.TimelineEventRepository
-	channelService  *ChannelService
+	db             *repository.Database
+	paymentRepo    *repository.PaymentInstructionRepository
+	receiverRepo   *repository.ReceiverAccountRepository
+	idempotentRepo *repository.IdempotentKeyRepository
+	receiptRepo    *repository.ChannelReceiptRepository
+	cancelRepo     *repository.CancelApplicationRepository
+	timelineRepo   *repository.TimelineEventRepository
+	channelService *ChannelService
 }
 
 func NewPaymentService(db *repository.Database) *PaymentService {
@@ -86,16 +88,16 @@ func (s *PaymentService) CreatePayment(req *model.CreatePaymentRequest) (*model.
 
 	paymentNo := generatePaymentNo()
 	payment := &model.PaymentInstruction{
-		PaymentNo:        paymentNo,
-		IdempotentKey:    req.IdempotentKey,
-		MerchantID:       req.MerchantID,
-		Amount:           req.Amount,
-		Currency:         req.Currency,
+		PaymentNo:         paymentNo,
+		IdempotentKey:     req.IdempotentKey,
+		MerchantID:        req.MerchantID,
+		Amount:            req.Amount,
+		Currency:          req.Currency,
 		ReceiverAccountID: receiverAccount.ID,
-		Status:           model.StatusPending,
-		Channel:          req.Channel,
-		Remark:           req.Remark,
-		NotifyURL:        req.NotifyURL,
+		Status:            model.StatusPending,
+		Channel:           req.Channel,
+		Remark:            req.Remark,
+		NotifyURL:         req.NotifyURL,
 	}
 	if err := s.paymentRepo.Create(tx, payment); err != nil {
 		_ = tx.Rollback()
@@ -452,7 +454,16 @@ func (s *PaymentService) ExportProblemSummary(req *model.ProblemSummaryRequest) 
 		return "", err
 	}
 
+	if err := os.MkdirAll("./data/export", 0755); err != nil {
+		return "", fmt.Errorf("create export dir failed: %w", err)
+	}
+
 	filename := fmt.Sprintf("problem_summary_%s.json", time.Now().Format("20060102_150405"))
+	fullpath := "./data/export/" + filename
+	if err := os.WriteFile(fullpath, data, 0644); err != nil {
+		return "", fmt.Errorf("write export file failed: %w", err)
+	}
+
 	return filename, nil
 }
 

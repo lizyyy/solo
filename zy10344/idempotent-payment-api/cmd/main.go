@@ -16,16 +16,16 @@ import (
 )
 
 func main() {
+	if err := os.MkdirAll("./data", 0755); err != nil {
+		log.Fatalf("Failed to create data directory: %v", err)
+	}
+
 	db, err := repository.NewDatabase("./data/payment.db")
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 	defer db.Close()
 	log.Println("Database initialized successfully")
-
-	if err := os.MkdirAll("./data", 0755); err != nil {
-		log.Fatalf("Failed to create data directory: %v", err)
-	}
 
 	paymentService := service.NewPaymentService(db)
 	paymentHandler := handler.NewPaymentHandler(paymentService)
