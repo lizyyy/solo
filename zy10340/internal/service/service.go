@@ -220,7 +220,7 @@ func (s *Service) CreatePlan(tenantID, ruleID, name string) (*model.ReplayPlan, 
 		return nil, ErrRuleNotFound
 	}
 
-	if rule.TenantID != tenantID {
+	if rule.ID == "" || rule.TenantID != tenantID {
 		return nil, ErrTenantMismatch
 	}
 

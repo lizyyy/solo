@@ -251,8 +251,10 @@ func (h *Handler) CreatePlan(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		case errors.Is(err, service.ErrTenantNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "tenant not found"})
-		case errors.Is(err, service.ErrNotFound):
+		case errors.Is(err, service.ErrRuleNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "rule not found"})
+		case errors.Is(err, service.ErrTenantMismatch):
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}

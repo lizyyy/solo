@@ -2,8 +2,18 @@
 import requests
 import json
 import time
+import os
 
-BASE_URL = "http://localhost:8080/api/v1"
+# 关闭代理
+os.environ['NO_PROXY'] = 'localhost,127.0.0.1'
+os.environ.pop('ALL_PROXY', None)
+os.environ.pop('HTTP_PROXY', None)
+os.environ.pop('HTTPS_PROXY', None)
+os.environ.pop('all_proxy', None)
+os.environ.pop('http_proxy', None)
+os.environ.pop('https_proxy', None)
+
+BASE_URL = "http://localhost:8888/api/v1"
 
 def run_tests():
     print("="*60)
@@ -69,45 +79,47 @@ def run_tests():
     print("开始安全验证测试")
     print("="*60)
 
-    # 测试1: 用租户2的规则在租户1下创建计划（应该失败）
-    print("\n测试1: 跨租户使用规则（应该失败）")
+    # 测试1: 用租户2的规则在租户1下创建计划（应该失败，返回403）
+    print("\n测试1: 跨租户使用规则（应该失败，返回403）")
     try:
         result = requests.post(f"{BASE_URL}/tenants/{t1}/plans", json={
             "name": "bad-plan", "rule_id": r2
         })
-        if "error" in result.json():
-            print(f"  [PASS] 跨租户规则被拒绝，错误信息: {result.json()['error']}")
+        result_json = result.json()
+        if result.status_code == 403 and "error" in result_json:
+            print(f"  [PASS] 跨租户规则被拒绝，状态码: {result.status_code}，错误信息: {result_json['error']}")
         else:
-            print(f"  [FAIL] 跨租户规则没有被拒绝！响应: {result.text}")
+            print(f"  [FAIL] 期望状态码403，实际: {result.status_code}，响应: {result.text}")
     except Exception as e:
         print(f"  [ERROR] 测试失败: {e}")
 
-    # 测试2: 用租户1自己的规则创建计划（应该成功）
-    print("\n测试2: 正常创建计划（应该成功）")
+    # 测试2: 用租户1自己的规则创建计划（应该成功，返回201）
+    print("\n测试2: 正常创建计划（应该成功，返回201）")
     try:
-        plan1 = requests.post(f"{BASE_URL}/tenants/{t1}/plans", json={
+        result = requests.post(f"{BASE_URL}/tenants/{t1}/plans", json={
             "name": "good-plan", "rule_id": r1
-        }).json()
-        if "id" in plan1:
+        })
+        plan1 = result.json()
+        if result.status_code == 201 and "id" in plan1:
             plan1_id = plan1["id"]
-            print(f"  [PASS] 同租户规则创建成功，PLAN1 = {plan1_id}")
+            print(f"  [PASS] 同租户规则创建成功，状态码: {result.status_code}，PLAN1 = {plan1_id}")
         else:
-            print(f"  [FAIL] 创建失败: {plan1}")
+            print(f"  [FAIL] 期望状态码201，实际: {result.status_code}，响应: {result.text}")
     except Exception as e:
         print(f"  [ERROR] 测试失败: {e}")
         return
 
-    # 测试3: 用租户2的sample启动租户1的计划（应该失败）
-    print("\n测试3: 跨租户使用sample启动计划（应该失败）")
+    # 测试3: 用租户2的sample启动租户1的计划（应该失败，返回400/403）
+    print("\n测试3: 跨租户使用sample启动计划（应该失败，返回403/400）")
     try:
         result = requests.post(f"{BASE_URL}/tenants/{t1}/plans/{plan1_id}/start", json={
             "sample_ids": [s2]
         })
         result_json = result.json()
-        if "error" in result_json:
-            print(f"  [PASS] 跨租户sample被拒绝，错误信息: {result_json['error']}")
+        if result.status_code in [400, 403] and "error" in result_json:
+            print(f"  [PASS] 跨租户sample被拒绝，状态码: {result.status_code}，错误信息: {result_json['error']}")
         else:
-            print(f"  [FAIL] 跨租户sample没有被拒绝！响应: {result.text}")
+            print(f"  [FAIL] 期望状态码400/403，实际: {result.status_code}，响应: {result.text}")
     except Exception as e:
         print(f"  [ERROR] 测试失败: {e}")
 
@@ -127,65 +139,77 @@ def run_tests():
 
     time.sleep(3)  # 等待回放完成
 
-    # 测试5: 租户2访问租户1的计划详情
-    print("\n测试5: 跨租户访问计划详情（应该失败）")
+    # 测试5: 租户2访问租户1的计划详情（应该失败，返回403）
+    print("\n测试5: 跨租户访问计划详情（应该失败，返回403）")
     try:
         result = requests.get(f"{BASE_URL}/tenants/{t2}/plans/{plan1_id}")
         result_json = result.json()
-        if "error" in result_json:
-            print(f"  [PASS] 跨租户计划详情被拒绝，错误信息: {result_json['error']}")
+        if result.status_code == 403 and "error" in result_json:
+            print(f"  [PASS] 跨租户计划详情被拒绝，状态码: {result.status_code}，错误信息: {result_json['error']}")
         else:
-            print(f"  [FAIL] 跨租户计划详情没有被拒绝！响应: {result.text}")
+            print(f"  [FAIL] 期望状态码403，实际: {result.status_code}，响应: {result.text}")
     except Exception as e:
         print(f"  [ERROR] 测试失败: {e}")
 
-    # 测试6: 租户2访问租户1的结果
-    print("\n测试6: 跨租户访问结果（应该失败）")
+    # 测试6: 租户2访问租户1的结果（应该失败，返回403）
+    print("\n测试6: 跨租户访问结果（应该失败，返回403）")
     try:
         result = requests.get(f"{BASE_URL}/tenants/{t2}/plans/{plan1_id}/results")
         result_json = result.json()
-        if "error" in result_json:
-            print(f"  [PASS] 跨租户结果被拒绝，错误信息: {result_json['error']}")
+        if result.status_code == 403 and "error" in result_json:
+            print(f"  [PASS] 跨租户结果被拒绝，状态码: {result.status_code}，错误信息: {result_json['error']}")
         else:
-            print(f"  [FAIL] 跨租户结果没有被拒绝！响应: {result.text}")
+            print(f"  [FAIL] 期望状态码403，实际: {result.status_code}，响应: {result.text}")
     except Exception as e:
         print(f"  [ERROR] 测试失败: {e}")
 
-    # 测试7: 租户1正常访问结果
-    print("\n测试7: 同租户访问结果（应该成功）")
+    # 测试7: 租户1正常访问结果（应该成功，返回200）
+    print("\n测试7: 同租户访问结果（应该成功，返回200）")
     try:
         result = requests.get(f"{BASE_URL}/tenants/{t1}/plans/{plan1_id}/results")
         result_json = result.json()
-        if "total" in result_json or "data" in result_json:
-            print(f"  [PASS] 同租户访问结果成功")
+        if result.status_code == 200 and ("total" in result_json or "data" in result_json):
+            print(f"  [PASS] 同租户访问结果成功，状态码: {result.status_code}")
         else:
-            print(f"  [INFO] 响应: {result.text}")
+            print(f"  [INFO] 状态码: {result.status_code}，响应: {result.text}")
     except Exception as e:
         print(f"  [ERROR] 测试失败: {e}")
 
-    # 测试8: 访问不存在的plan
+    # 测试8: 访问不存在的plan（应该返回404）
     print("\n测试8: 访问不存在的plan（应该返回404）")
     try:
         result = requests.get(f"{BASE_URL}/tenants/{t1}/plans/nonexistent-plan-id-123/export")
         result_json = result.json()
-        if "error" in result_json and "not found" in result_json["error"].lower():
-            print(f"  [PASS] 不存在plan返回404错误，错误信息: {result_json['error']}")
-        elif "error" in result_json:
-            print(f"  [PASS] 不存在plan返回错误: {result_json['error']}")
+        if result.status_code == 404 and "error" in result_json and "not found" in result_json["error"].lower():
+            print(f"  [PASS] 不存在plan返回404错误，状态码: {result.status_code}，错误信息: {result_json['error']}")
         else:
-            print(f"  [FAIL] 不存在plan没有返回404！响应: {result.text}")
+            print(f"  [FAIL] 期望状态码404，实际: {result.status_code}，响应: {result.text}")
     except Exception as e:
         print(f"  [ERROR] 测试失败: {e}")
 
-    # 测试9: 租户1正常访问统计
-    print("\n测试9: 同租户访问统计（应该成功）")
+    # 测试9: 租户1正常访问统计（应该成功，返回200）
+    print("\n测试9: 同租户访问统计（应该成功，返回200）")
     try:
         result = requests.get(f"{BASE_URL}/tenants/{t1}/plans/{plan1_id}/statistics")
         result_json = result.json()
-        if "total_count" in result_json or "error" not in result_json:
-            print(f"  [PASS] 同租户访问统计成功")
+        if result.status_code == 200 and ("total_count" in result_json or "error" not in result_json):
+            print(f"  [PASS] 同租户访问统计成功，状态码: {result.status_code}")
         else:
-            print(f"  [INFO] 响应: {result.text}")
+            print(f"  [INFO] 状态码: {result.status_code}，响应: {result.text}")
+    except Exception as e:
+        print(f"  [ERROR] 测试失败: {e}")
+
+    # 测试10: 使用不存在的rule_id创建计划（应该失败，返回404）
+    print("\n测试10: 使用不存在的rule_id创建计划（应该失败，返回404）")
+    try:
+        result = requests.post(f"{BASE_URL}/tenants/{t1}/plans", json={
+            "name": "bad-plan", "rule_id": "nonexistent-rule-id-123"
+        })
+        result_json = result.json()
+        if result.status_code == 404 and "error" in result_json:
+            print(f"  [PASS] 不存在rule返回404错误，状态码: {result.status_code}，错误信息: {result_json['error']}")
+        else:
+            print(f"  [FAIL] 期望状态码404，实际: {result.status_code}，响应: {result.text}")
     except Exception as e:
         print(f"  [ERROR] 测试失败: {e}")
 
