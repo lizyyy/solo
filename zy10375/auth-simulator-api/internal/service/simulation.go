@@ -17,9 +17,24 @@ func NewSimulationService(storage *storage.MemoryStorage) *SimulationService {
 	return &SimulationService{storage: storage}
 }
 
+func slicesEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func (s *SimulationService) CreateSimulation(req *model.CreateSimulationRequest) (*model.SimulationResult, error) {
 	if existingID, exists := s.storage.CheckIdempotency(req.IdempotencyKey); exists {
 		sim, _ := s.storage.GetSimulation(existingID)
+		if sim.PartnerID != req.PartnerID || !slicesEqual(sim.RequestedScopes, req.RequestedScopes) {
+			return nil, errors.New(model.ErrCodeIdempotencyConflict)
+		}
 		return sim, nil
 	}
 
@@ -209,13 +224,22 @@ func (s *SimulationService) ExportSimulation(simID string) (interface{}, error) 
 
 	exportData := map[string]interface{}{
 		"simulation_id":    sim.ID,
+		"idempotency_key":  sim.IdempotencyKey,
 		"partner_id":       sim.PartnerID,
 		"status":           sim.Status,
 		"requested_scopes": sim.RequestedScopes,
 		"resolved_scopes":  sim.ResolvedScopes,
+		"resource_samples": sim.ResourceSamples,
 		"risk_alerts":      sim.RiskAlerts,
 		"created_at":       sim.CreatedAt.Format(time.RFC3339),
+		"updated_at":       sim.UpdatedAt.Format(time.RFC3339),
 		"exported_at":      utils.Now().Format(time.RFC3339),
+	}
+
+	if sim.Status == model.StatusFailed {
+		exportData["error_code"] = sim.ErrorCode
+		exportData["error_message"] = sim.ErrorMessage
+		exportData["error_detail"] = sim.ErrorDetail
 	}
 
 	if sim.Status == model.StatusActivated && sim.Credential != nil {
