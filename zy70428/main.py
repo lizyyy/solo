@@ -10,8 +10,8 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="数据保留策略服务",
-    description="高峰发票红冲记录与短信发送记录的数据保留策略管理系统",
-    version="1.0.0"
+    description="高峰发票红冲记录与短信发送记录的数据保留策略管理系统 - 支持审批流、人工修正、口径变更处理、受保护的执行链路、完整导出功能",
+    version="2.0.0"
 )
 
 
@@ -83,6 +83,34 @@ def caliber_change(list_id: int, new_caliber: str, reason: str, db: Session = De
     return {"message": "口径变更处理成功", "data": result}
 
 
+@app.post("/execution/validate/")
+def validate_execution(list_id: int, db: Session = Depends(get_db)):
+    can_execute, message = crud.validate_execution_permission(db, list_id)
+    return {"can_execute": can_execute, "message": message}
+
+
+@app.post("/execution/execute/")
+def execute_list(request: schemas.ExecutionRequest, db: Session = Depends(get_db)):
+    result = crud.execute_candidate_list(db, request)
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result["message"])
+    return result
+
+
+@app.get("/execution/records/")
+def list_execution_records(list_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    records = crud.get_execution_records(db, list_id, skip, limit)
+    return {"count": len(records), "data": records}
+
+
+@app.get("/execution/{execution_id}/")
+def get_execution(execution_id: int, db: Session = Depends(get_db)):
+    record = crud.get_execution_detail(db, execution_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="执行记录不存在")
+    return record
+
+
 @app.post("/processing-conclusion/", response_model=schemas.ProcessingConclusion)
 def create_conclusion(conclusion: schemas.ProcessingConclusionCreate, db: Session = Depends(get_db)):
     return crud.create_processing_conclusion(db, conclusion)
@@ -117,4 +145,4 @@ def export_data(request: schemas.ExportRequest, db: Session = Depends(get_db)):
 
 @app.get("/health/")
 def health_check():
-    return {"status": "healthy", "service": "数据保留策略服务"}
+    return {"status": "healthy", "service": "数据保留策略服务", "version": "2.0.0"}

@@ -18,6 +18,14 @@ class ApprovalStatus(str, enum.Enum):
     CALIBER_CHANGED = "caliber_changed"
 
 
+class ExecutionStatus(str, enum.Enum):
+    NOT_EXECUTED = "not_executed"
+    EXECUTING = "executing"
+    EXECUTED = "executed"
+    PARTIALLY_EXECUTED = "partially_executed"
+    FAILED = "failed"
+
+
 class InvoiceReversalRecord(Base):
     __tablename__ = "invoice_reversal_records"
 
@@ -75,10 +83,13 @@ class CandidateList(Base):
     current_node = Column(String, default="待审批", comment="当前审批节点")
     summary = Column(Text, comment="材料摘要")
     failure_reason = Column(Text, comment="失败原因")
+    execution_status = Column(String, default=ExecutionStatus.NOT_EXECUTED, comment="执行状态")
+    can_execute = Column(Boolean, default=False, comment="是否可执行")
 
     items = relationship("CandidateItem", back_populates="candidate_list")
     approval_nodes = relationship("ApprovalNode", back_populates="candidate_list")
     modifications = relationship("ManualModification", back_populates="candidate_list")
+    execution_records = relationship("ExecutionRecord", backref="candidate_list")
 
 
 class CandidateItem(Base):
@@ -144,3 +155,39 @@ class ProcessingConclusion(Base):
     processed_by = Column(String, comment="处理人")
     processed_at = Column(DateTime(timezone=True), server_default=func.now())
     is_final = Column(Boolean, default=True)
+
+
+class ExecutionRecord(Base):
+    __tablename__ = "execution_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    candidate_list_id = Column(Integer, ForeignKey("candidate_lists.id"))
+    execution_type = Column(String, comment="执行类型: clean/rollback")
+    status = Column(String, default=ExecutionStatus.NOT_EXECUTED)
+    total_items = Column(Integer, comment="总项目数")
+    success_count = Column(Integer, default=0, comment="成功数")
+    failed_count = Column(Integer, default=0, comment="失败数")
+    executed_by = Column(String, comment="执行人")
+    executed_at = Column(DateTime(timezone=True))
+    completed_at = Column(DateTime(timezone=True))
+    error_message = Column(Text, comment="错误信息")
+    summary = Column(Text, comment="执行摘要")
+
+    details = relationship("ExecutionDetail", back_populates="execution_record")
+
+
+class ExecutionDetail(Base):
+    __tablename__ = "execution_details"
+
+    id = Column(Integer, primary_key=True, index=True)
+    execution_record_id = Column(Integer, ForeignKey("execution_records.id"))
+    candidate_item_id = Column(Integer, comment="候选项目ID")
+    record_type = Column(String, comment="记录类型: invoice/sms")
+    record_id = Column(Integer, comment="原始记录ID")
+    action_type = Column(String, comment="动作类型: keep/clean/rollback")
+    original_value = Column(Text, comment="原始值")
+    execution_result = Column(String, comment="执行结果: success/failed/skipped")
+    executed_at = Column(DateTime(timezone=True), server_default=func.now())
+    remark = Column(Text, comment="备注")
+
+    execution_record = relationship("ExecutionRecord", back_populates="details")

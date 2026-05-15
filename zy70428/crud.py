@@ -167,10 +167,12 @@ def process_approval(db: Session, approval: schemas.ApprovalRequest):
     if all_approved:
         candidate_list.approval_status = schemas.ApprovalStatus.APPROVED
         candidate_list.current_node = "已完成"
+        candidate_list.can_execute = True
     else:
         candidate_list.current_node = current_node_name
         if approval.approval_status == schemas.ApprovalStatus.REJECTED:
             candidate_list.approval_status = schemas.ApprovalStatus.REJECTED
+            candidate_list.can_execute = False
 
     db.commit()
     db.refresh(candidate_list)
@@ -225,6 +227,7 @@ def handle_caliber_change(db: Session, list_id: int, new_caliber: str, reason: s
     candidate_list.caliber_version = new_caliber
     candidate_list.approval_status = schemas.ApprovalStatus.CALIBER_CHANGED
     candidate_list.failure_reason = reason
+    candidate_list.can_execute = False
     candidate_list.summary = (candidate_list.summary or "") + f" | 口径变更: {new_caliber}, 原因: {reason}"
 
     for item in candidate_list.items:
@@ -234,6 +237,147 @@ def handle_caliber_change(db: Session, list_id: int, new_caliber: str, reason: s
     db.commit()
     db.refresh(candidate_list)
     return candidate_list
+
+
+def validate_execution_permission(db: Session, list_id: int):
+    candidate_list = get_candidate_list(db, list_id)
+    if not candidate_list:
+        return False, "候选清单不存在"
+    
+    if candidate_list.approval_status != schemas.ApprovalStatus.APPROVED:
+        return False, f"候选清单未通过审批，当前状态: {candidate_list.approval_status}"
+    
+    if not candidate_list.can_execute:
+        return False, "候选清单不可执行，请先完成审批流程"
+    
+    if candidate_list.execution_status == models.ExecutionStatus.EXECUTED:
+        return False, "候选清单已执行，不可重复执行"
+    
+    return True, "允许执行"
+
+
+def execute_candidate_list(db: Session, request: schemas.ExecutionRequest):
+    can_execute, message = validate_execution_permission(db, request.candidate_list_id)
+    if not can_execute:
+        return {"success": False, "message": message, "data": None}
+
+    candidate_list = get_candidate_list(db, request.candidate_list_id)
+    
+    execution_record = models.ExecutionRecord(
+        candidate_list_id=request.candidate_list_id,
+        execution_type=request.execution_type,
+        status=models.ExecutionStatus.EXECUTING,
+        total_items=len(candidate_list.items),
+        executed_by=request.executed_by,
+        executed_at=datetime.now()
+    )
+    db.add(execution_record)
+    db.flush()
+
+    success_count = 0
+    failed_count = 0
+    execution_details = []
+
+    for item in candidate_list.items:
+        try:
+            record_type = "invoice" if item.invoice_record_id else "sms"
+            record_id = item.invoice_record_id or item.sms_record_id
+            action = item.action_type or "keep"
+
+            if request.dry_run:
+                result = "skipped"
+                remark = "试运行模式，未实际执行"
+            else:
+                if action == "clean":
+                    result = "success"
+                    remark = f"已执行{request.execution_type}操作"
+                elif action == "rollback":
+                    result = "success"
+                    remark = f"已执行回滚操作"
+                else:
+                    result = "success"
+                    remark = "保留数据，无需执行清理"
+
+            detail = models.ExecutionDetail(
+                execution_record_id=execution_record.id,
+                candidate_item_id=item.id,
+                record_type=record_type,
+                record_id=record_id,
+                action_type=action,
+                original_value=item.final_value or item.original_value,
+                execution_result=result,
+                remark=remark
+            )
+            db.add(detail)
+            execution_details.append(detail)
+
+            if result == "success":
+                success_count += 1
+            else:
+                failed_count += 1
+
+        except Exception as e:
+            failed_count += 1
+            detail = models.ExecutionDetail(
+                execution_record_id=execution_record.id,
+                candidate_item_id=item.id,
+                record_type="unknown",
+                record_id=0,
+                action_type=item.action_type or "unknown",
+                original_value=item.final_value or item.original_value,
+                execution_result="failed",
+                remark=f"执行异常: {str(e)}"
+            )
+            db.add(detail)
+            execution_details.append(detail)
+
+    execution_record.success_count = success_count
+    execution_record.failed_count = failed_count
+    execution_record.completed_at = datetime.now()
+    
+    if failed_count == 0:
+        execution_record.status = models.ExecutionStatus.EXECUTED
+        candidate_list.execution_status = models.ExecutionStatus.EXECUTED
+    elif success_count > 0:
+        execution_record.status = models.ExecutionStatus.PARTIALLY_EXECUTED
+        candidate_list.execution_status = models.ExecutionStatus.PARTIALLY_EXECUTED
+    else:
+        execution_record.status = models.ExecutionStatus.FAILED
+        candidate_list.execution_status = models.ExecutionStatus.FAILED
+
+    execution_record.summary = (
+        f"{'试运行' if request.dry_run else '实际执行'}完成: "
+        f"总数{execution_record.total_items}, "
+        f"成功{success_count}, "
+        f"失败{failed_count}"
+    )
+
+    db.commit()
+    db.refresh(execution_record)
+
+    return {
+        "success": True,
+        "message": "执行完成",
+        "data": {
+            "execution_id": execution_record.id,
+            "status": execution_record.status,
+            "total": execution_record.total_items,
+            "success_count": success_count,
+            "failed_count": failed_count,
+            "dry_run": request.dry_run
+        }
+    }
+
+
+def get_execution_records(db: Session, list_id: int = None, skip: int = 0, limit: int = 100):
+    query = db.query(models.ExecutionRecord)
+    if list_id:
+        query = query.filter(models.ExecutionRecord.candidate_list_id == list_id)
+    return query.order_by(models.ExecutionRecord.executed_at.desc()).offset(skip).limit(limit).all()
+
+
+def get_execution_detail(db: Session, execution_id: int):
+    return db.query(models.ExecutionRecord).filter(models.ExecutionRecord.id == execution_id).first()
 
 
 def create_processing_conclusion(db: Session, conclusion: schemas.ProcessingConclusionCreate):
@@ -265,6 +409,8 @@ def get_export_data(db: Session, list_id: int, include_sms: bool = True, filter_
     if not candidate_list:
         return None
 
+    modifications = get_modifications_by_candidate_list(db, list_id)
+    
     export_data = {
         "list_info": {
             "id": candidate_list.id,
@@ -272,20 +418,26 @@ def get_export_data(db: Session, list_id: int, include_sms: bool = True, filter_
             "data_source": candidate_list.data_source,
             "caliber_version": candidate_list.caliber_version,
             "status": candidate_list.approval_status,
+            "execution_status": candidate_list.execution_status,
+            "can_execute": candidate_list.can_execute,
             "current_node": candidate_list.current_node,
             "summary": candidate_list.summary
         },
         "items": [],
+        "modifications_count": len(modifications),
         "modifications": [],
-        "approval_history": []
+        "approval_history": [],
+        "sms_details_count": 0
     }
 
+    sms_details_count = 0
     for item in candidate_list.items:
         item_data = {
             "id": item.id,
             "original_value": item.original_value,
             "suggested_value": item.suggested_value,
             "final_value": item.final_value,
+            "value_modified": item.original_value != item.final_value,
             "system_decision": item.system_decision,
             "manual_decision": item.manual_decision,
             "is_kept": item.is_kept,
@@ -296,25 +448,49 @@ def get_export_data(db: Session, list_id: int, include_sms: bool = True, filter_
         if include_sms and item.sms_record_id:
             sms = db.query(models.SMSSendRecord).filter(models.SMSSendRecord.id == item.sms_record_id).first()
             if sms:
+                sms_details_count += 1
                 item_data["sms_details"] = {
+                    "id": sms.id,
                     "batch_no": sms.batch_no,
                     "phone_number": sms.phone_number,
                     "sms_content": sms.sms_content,
                     "send_time": sms.send_time.isoformat() if sms.send_time else None,
-                    "send_status": sms.send_status
+                    "send_status": sms.send_status,
+                    "department": sms.department,
+                    "operator": sms.operator,
+                    "invoice_related": sms.invoice_related
                 }
+        elif include_sms and item.invoice_record_id:
+            invoice = db.query(models.InvoiceReversalRecord).filter(
+                models.InvoiceReversalRecord.id == item.invoice_record_id
+            ).first()
+            if invoice:
+                related_sms = db.query(models.SMSSendRecord).filter(
+                    models.SMSSendRecord.invoice_related == invoice.invoice_no
+                ).all()
+                if related_sms:
+                    sms_details_count += len(related_sms)
+                    item_data["related_sms"] = [{
+                        "id": s.id,
+                        "batch_no": s.batch_no,
+                        "phone_number": s.phone_number,
+                        "send_status": s.send_status
+                    } for s in related_sms]
 
         export_data["items"].append(item_data)
 
-    for mod in candidate_list.modifications:
+    export_data["sms_details_count"] = sms_details_count
+
+    for mod in modifications:
         export_data["modifications"].append({
             "id": mod.id,
             "candidate_item_id": mod.candidate_item_id,
             "field_name": mod.field_name,
             "original_value": mod.original_value,
             "modified_value": mod.modified_value,
+            "value_changed": mod.original_value != mod.modified_value,
             "modifier": mod.modifier,
-            "modification_time": mod.modification_time.isoformat(),
+            "modification_time": mod.modification_time.isoformat() if mod.modification_time else None,
             "modification_remark": mod.modification_remark,
             "reason": mod.reason
         })
@@ -330,5 +506,18 @@ def get_export_data(db: Session, list_id: int, include_sms: bool = True, filter_
             "approval_time": node.approval_time.isoformat() if node.approval_time else None,
             "approval_opinion": node.approval_opinion
         })
+
+    execution_records = get_execution_records(db, list_id)
+    export_data["execution_records"] = [{
+        "id": e.id,
+        "execution_type": e.execution_type,
+        "status": e.status,
+        "total_items": e.total_items,
+        "success_count": e.success_count,
+        "failed_count": e.failed_count,
+        "executed_by": e.executed_by,
+        "executed_at": e.executed_at.isoformat() if e.executed_at else None,
+        "summary": e.summary
+    } for e in execution_records]
 
     return export_data

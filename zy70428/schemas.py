@@ -17,6 +17,14 @@ class ApprovalStatus(str, Enum):
     CALIBER_CHANGED = "caliber_changed"
 
 
+class ExecutionStatus(str, Enum):
+    NOT_EXECUTED = "not_executed"
+    EXECUTING = "executing"
+    EXECUTED = "executed"
+    PARTIALLY_EXECUTED = "partially_executed"
+    FAILED = "failed"
+
+
 class InvoiceReversalRecordBase(BaseModel):
     invoice_no: str = Field(description="发票号码")
     invoice_code: Optional[str] = Field(None, description="发票代码")
@@ -160,6 +168,8 @@ class CandidateList(CandidateListBase):
     approval_status: ApprovalStatus
     current_node: str
     failure_reason: Optional[str]
+    execution_status: ExecutionStatus
+    can_execute: bool
     items: List[CandidateItem]
     approval_nodes: List[ApprovalNode]
     modifications: List[ManualModification]
@@ -220,3 +230,51 @@ class GenerateCandidateListRequest(BaseModel):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     department: Optional[str] = None
+
+
+class ExecutionRequest(BaseModel):
+    candidate_list_id: int
+    execution_type: str = Field(description="执行类型: clean/rollback")
+    executed_by: str = Field(description="执行人")
+    dry_run: bool = Field(True, description="是否试运行")
+
+
+class ExecutionDetailBase(BaseModel):
+    candidate_item_id: int
+    record_type: str
+    record_id: int
+    action_type: str
+    original_value: Optional[str] = None
+    execution_result: Optional[str] = None
+    remark: Optional[str] = None
+
+
+class ExecutionDetail(ExecutionDetailBase):
+    id: int
+    execution_record_id: int
+    executed_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ExecutionRecordBase(BaseModel):
+    candidate_list_id: int
+    execution_type: str
+    status: ExecutionStatus
+    total_items: Optional[int] = None
+    success_count: Optional[int] = None
+    failed_count: Optional[int] = None
+    executed_by: Optional[str] = None
+    error_message: Optional[str] = None
+    summary: Optional[str] = None
+
+
+class ExecutionRecord(ExecutionRecordBase):
+    id: int
+    executed_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    details: List[ExecutionDetail] = []
+
+    class Config:
+        from_attributes = True
