@@ -45,13 +45,25 @@ if %JAVA_MAJOR% LSS 8 (
 )
 echo    ✓ Java 版本符合要求
 
+:: 关键修复：真正验证 javac 可用，而不是只检查文件是否存在
+echo.
+echo 🔍 验证 JDK 编译器...
 set HAS_JAVAC=0
-javac -version >nul 2>&1
+where javac >nul 2>&1
 if not errorlevel 1 (
-    set HAS_JAVAC=1
-    echo    ✓ JDK 编译器已就绪
-) else (
-    echo    ⚠️  JRE 环境（无 javac 编译器）
+    :: 真正执行 javac -version 验证（关键！）
+    javac -version >nul 2>&1
+    if not errorlevel 1 (
+        set HAS_JAVAC=1
+        for /f "tokens=*" %%a in ('javac -version 2^>^&1') do set "JAVAC_VERSION=%%a"
+        echo    ✓ JDK 编译器可用: %JAVAC_VERSION%
+    ) else (
+        echo    ⚠️  检测到 javac 命令但无法执行（JDK 未正确安装）
+    )
+)
+
+if %HAS_JAVAC%==0 (
+    echo    ✗ JDK 编译器不可用
 )
 
 echo.
@@ -86,6 +98,7 @@ if %NEED_COMPILE%==1 (
     if %HAS_JAVAC%==1 (
         echo.
         echo 🔨 开始编译项目...
+        echo    正在下载依赖并编译（首次可能需要几分钟）...
         call mvnw.cmd clean package -DskipTests -q
         
         :: 再次查找 JAR
@@ -111,26 +124,45 @@ if %NEED_COMPILE%==1 (
         :jar_found3
         
         if "%JAR_FILE%"=="" (
+            echo.
             echo ❌ 编译失败或未生成 JAR 文件
-            echo    请尝试手动编译查看详细错误：
-            echo    mvnw.cmd clean package -DskipTests
+            echo.
+            echo 📋 故障排除建议：
+            echo    1. 确保网络连接正常（需要下载 Maven 依赖）
+            echo    2. 尝试手动编译查看详细错误：
+            echo       mvnw.cmd clean package -DskipTests
+            echo    3. 检查 Maven 下载镜像配置
             pause
             exit /b 1
         )
         echo    ✓ 编译完成
     ) else (
         echo.
-        echo ❌ 无法编译（当前是 JRE 环境）且没有预编译的 JAR 文件
+        echo ❌ 无法编译（没有可用的 JDK 编译器）且没有预编译的 JAR 文件
         echo.
+        echo ========================================
         echo 📋 解决方案（二选一）：
-        echo    方案一：安装完整 JDK 后重新运行 【推荐】
-        echo            下载地址: https://adoptium.net/
-        echo            安装后执行: javac -version 验证
+        echo ========================================
         echo.
-        echo    方案二：在有 JDK 的机器上预编译，复制 JAR 过来：
-        echo            1. 在有 JDK 的机器上执行: mvnw.cmd clean package -DskipTests
-        echo            2. 复制 target\data-access-approval-1.0.0.jar 到本机 target\ 目录
-        echo            3. 重新运行此脚本
+        echo 方案一：安装完整 JDK 后重新运行 【推荐】
+        echo.
+        echo    Windows 安装步骤：
+        echo    1. 访问: https://adoptium.net/
+        echo    2. 下载 Temurin 8 (LTS) 或更高版本
+        echo    3. 安装 msi 文件
+        echo    4. 重新打开 cmd 执行: javac -version 验证
+        echo    5. 再次运行: start.bat
+        echo.
+        echo 方案二：在有 JDK 的机器上预编译，复制 JAR 过来：
+        echo.
+        echo    1. 在有 JDK 的机器上执行:
+        echo       mvnw.cmd clean package -DskipTests
+        echo.
+        echo    2. 复制以下文件到本机 target\ 目录：
+        echo       target\data-access-approval-1.0.0.jar
+        echo.
+        echo    3. 重新运行此脚本
+        echo.
         pause
         exit /b 1
     )

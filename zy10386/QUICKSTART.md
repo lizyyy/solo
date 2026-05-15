@@ -3,19 +3,30 @@
 ## ✅ 前置条件检查
 
 启动前请确保：
-- 已安装 **JDK 8+**（不是 JRE，需要 javac 编译器）
+- 已安装 **完整 JDK 8+**（不是 JRE，需要 javac 编译器）
 - 至少 512MB 可用内存
 
-### 环境验证命令
+### 环境验证命令（必须执行！）
 ```bash
-# 检查 Java 版本
+# 1. 检查 Java 版本
 java -version
 
-# 检查是否有 javac 编译器（必须有！）
+# 2. 【关键】确认有可用的编译器（必须成功！）
 javac -version
 ```
 
-> 💡 **如果只有 JRE（没有 javac）**：请先安装完整 JDK，下载地址 https://adoptium.net/
+> ⚠️ **macOS 用户特别注意**：
+> 即使 `/usr/bin/javac` 文件存在也不代表有 JDK！
+> macOS 内置了 javac 占位命令，实际执行会报错：
+> ```
+> The operation couldn't be completed. Unable to locate a Java Runtime that supports javac.
+> ```
+> ✅ **只有当 `javac -version` 正常输出版本号时，才算有可用的 JDK**
+
+> 💡 **缺少 JDK？** 请安装完整 JDK：
+> - 下载地址：https://adoptium.net/
+> - 推荐版本：Temurin 8 (LTS) 或更高
+> - macOS 用户也可以用 Homebrew：`brew install temurin8`
 
 ---
 

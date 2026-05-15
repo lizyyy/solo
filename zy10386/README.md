@@ -41,13 +41,18 @@
 - 兼容 Java 8-21
 - 无需预先安装 Maven（已内置 Maven Wrapper）
 
-**环境检查命令：**
+**环境检查命令（必须执行！）：**
 ```bash
 java -version   # 检查 Java 版本
-javac -version  # 确认有编译器（必须有！）
+javac -version  # 确认有编译器（必须有！没有就装 JDK）
 ```
 
-> 💡 如果只有 JRE 没有 javac：请安装完整 JDK https://adoptium.net/
+> ⚠️ **macOS 用户特别注意**：即使 `/usr/bin/javac` 存在也不代表有 JDK！
+> macOS 有 javac 占位命令，执行会报错 "Unable to locate a Java Runtime"
+> 必须确保 `javac -version` 能正常输出版本号才算有可用的 JDK
+
+> 💡 **缺少 JDK？** 请安装完整 JDK：https://adoptium.net/
+> 推荐安装 Temurin 8 (LTS) 或更高版本
 
 ---
 

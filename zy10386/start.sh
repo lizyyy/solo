@@ -35,13 +35,25 @@ if [ "$JAVA_MAJOR" -lt 8 ]; then
 fi
 echo "   ✓ Java 版本符合要求"
 
-# 检查是否有 javac（JDK，不是 JRE）
+# 关键修复：真正验证 javac 可用，而不是只检查文件是否存在
+# 注意：macOS 上 /usr/bin/javac 是占位命令，即使没装 JDK 也存在
+echo ""
+echo "🔍 验证 JDK 编译器..."
 HAS_JAVAC=0
 if command -v javac &> /dev/null; then
-    HAS_JAVAC=1
-    echo "   ✓ JDK 编译器已就绪"
-else
-    echo "   ⚠️  JRE 环境（无 javac 编译器）"
+    # 真正执行 javac -version 验证（关键！）
+    if javac -version &> /dev/null; then
+        HAS_JAVAC=1
+        JAVAC_VERSION=$(javac -version 2>&1)
+        echo "   ✓ JDK 编译器可用: $JAVAC_VERSION"
+    else
+        echo "   ⚠️  检测到 javac 命令但无法执行（可能是 macOS 占位符）"
+        echo "      这表示 JDK 未正确安装"
+    fi
+fi
+
+if [ $HAS_JAVAC -eq 0 ]; then
+    echo "   ✗ JDK 编译器不可用"
 fi
 
 # 检查是否已有完整的可执行 JAR
@@ -55,12 +67,9 @@ if [ -f "target/data-access-approval-1.0.0.jar" ]; then
     echo "   ✓ 发现完整 JAR: $JAR_FILE"
 elif ls target/*.jar 1> /dev/null 2>&1; then
     for jar in target/*.jar; do
-        # 检查是否是 Spring Boot JAR（有 BOOT-INF 目录）
-        if unzip -l "$jar" | grep -q "BOOT-INF" 2>/dev/null; then
-            JAR_FILE="$jar"
-            echo "   ✓ 发现 Spring Boot JAR: $JAR_FILE"
-            break
-        fi
+        JAR_FILE="$jar"
+        echo "   ✓ 发现 JAR: $JAR_FILE"
+        break
     done
 fi
 
@@ -82,6 +91,7 @@ if [ $NEED_COMPILE -eq 1 ]; then
         chmod +x ./mvnw 2>/dev/null || true
         
         # 先清理再编译，确保生成完整 JAR
+        echo "   正在下载依赖并编译（首次可能需要几分钟）..."
         ./mvnw clean package -DskipTests -q
         
         # 再次查找 JAR
@@ -89,10 +99,8 @@ if [ $NEED_COMPILE -eq 1 ]; then
             JAR_FILE="target/data-access-approval-1.0.0.jar"
         elif ls target/*.jar 1> /dev/null 2>&1; then
             for jar in target/*.jar; do
-                if unzip -l "$jar" | grep -q "BOOT-INF" 2>/dev/null; then
-                    JAR_FILE="$jar"
-                    break
-                fi
+                JAR_FILE="$jar"
+                break
             done
         fi
         
@@ -107,25 +115,47 @@ if [ $NEED_COMPILE -eq 1 ]; then
         fi
         
         if [ -z "$JAR_FILE" ]; then
+            echo ""
             echo "❌ 编译失败或未生成 JAR 文件"
-            echo "   请尝试手动编译查看详细错误："
-            echo "   ./mvnw clean package -DskipTests"
+            echo ""
+            echo "📋 故障排除建议："
+            echo "   1. 确保网络连接正常（需要下载 Maven 依赖）"
+            echo "   2. 尝试手动编译查看详细错误："
+            echo "      ./mvnw clean package -DskipTests"
+            echo "   3. 检查 Maven 下载镜像配置"
             exit 1
         fi
         echo "   ✓ 编译完成"
     else
         echo ""
-        echo "❌ 无法编译（当前是 JRE 环境）且没有预编译的 JAR 文件"
+        echo "❌ 无法编译（没有可用的 JDK 编译器）且没有预编译的 JAR 文件"
         echo ""
+        echo "========================================"
         echo "📋 解决方案（二选一）："
-        echo "   方案一：安装完整 JDK 后重新运行 【推荐】"
-        echo "           下载地址: https://adoptium.net/"
-        echo "           安装后执行: javac -version 验证"
+        echo "========================================"
         echo ""
-        echo "   方案二：在有 JDK 的机器上预编译，复制 JAR 过来："
-        echo "           1. 在有 JDK 的机器上执行: ./mvnw clean package -DskipTests"
-        echo "           2. 复制 target/data-access-approval-1.0.0.jar 到本机 target/ 目录"
-        echo "           3. 重新运行此脚本"
+        echo "方案一：安装完整 JDK 后重新运行 【推荐】"
+        echo ""
+        echo "   macOS 安装步骤："
+        echo "   1. 访问: https://adoptium.net/"
+        echo "   2. 下载 Temurin 8 (LTS) 或更高版本"
+        echo "   3. 安装 pkg 文件"
+        echo "   4. 重新打开终端执行: javac -version 验证"
+        echo "   5. 再次运行: ./start.sh"
+        echo ""
+        echo "   或使用 Homebrew 安装："
+        echo "   brew install temurin8"
+        echo ""
+        echo "方案二：在有 JDK 的机器上预编译，复制 JAR 过来："
+        echo ""
+        echo "   1. 在有 JDK 的机器上执行:"
+        echo "      ./mvnw clean package -DskipTests"
+        echo ""
+        echo "   2. 复制以下文件到本机 target/ 目录："
+        echo "      target/data-access-approval-1.0.0.jar"
+        echo ""
+        echo "   3. 重新运行此脚本"
+        echo ""
         exit 1
     fi
 fi
