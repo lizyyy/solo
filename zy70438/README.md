@@ -83,8 +83,15 @@ python error_checker.py query --operator zhangsan
 
 # 按风险类型查询
 python error_checker.py query --risk-type "压缩包路径异常"
+
+# 按风险等级回查
+python error_checker.py query --risk-level high
+python error_checker.py query --risk-level normal
+
+# 组合查询
+python error_checker.py query --operator zhangsan --risk-level high
 ```
-*支持组合查询，成功路径和失败路径统一入口*
+*支持组合查询，成功路径和失败路径统一入口，支持按风险等级回查*
 
 ### 3. 候选清理清单 (candidates)
 ```bash
@@ -104,13 +111,20 @@ python error_checker.py uncovered
 
 ### 5. 导出结果 (export)
 ```bash
-# 导出Excel格式
+# 按批次导出（Excel格式）
 python error_checker.py export BATCH20260515120000 --format excel
 
-# 导出CSV格式
+# 按批次导出（CSV格式）
 python error_checker.py export BATCH20260515120000 --format csv
+
+# 按风险等级筛选导出（支持 high/medium/low/normal）
+python error_checker.py export --risk-level high --format csv
+
+# 导出所有记录
+python error_checker.py export --all --format csv
 ```
-*导出文件包含：字段名、修正前后值、风险等级、错误码*
+*导出文件包含：批次ID、字段名、修正前后值、风险等级、错误码、操作者、检查时间*
+*支持按风险等级回查并批量导出外包验收单*
 
 ## 验收要点
 

@@ -125,7 +125,7 @@ class ErrorCodeChecker:
         
         return candidates
     
-    def query_history(self, batch_id=None, operator=None, risk_type=None):
+    def query_history(self, batch_id=None, operator=None, risk_type=None, risk_level=None):
         results = self.history
         
         if batch_id:
@@ -136,6 +136,12 @@ class ErrorCodeChecker:
         
         if risk_type:
             results = [r for r in results if risk_type in r["risk_type"]]
+        
+        if risk_level:
+            if risk_level == "normal":
+                results = [r for r in results if not r["errors"]]
+            else:
+                results = [r for r in results if any(e.get("risk_level") == risk_level for e in r["errors"])]
         
         return results
     
@@ -149,27 +155,42 @@ class ErrorCodeChecker:
                 uncovered[module].append({"code": code, **info})
         return uncovered
     
-    def export_results(self, batch_id, output_format="excel"):
-        record = None
-        for r in self.history:
-            if r["batch_id"] == batch_id:
-                record = r
-                break
+    def export_results(self, batch_id=None, output_format="excel", risk_level=None, export_all=False):
+        records = []
         
-        if not record:
+        if batch_id:
+            for r in self.history:
+                if r["batch_id"] == batch_id:
+                    records.append(r)
+                    break
+        elif risk_level:
+            records = self.query_history(risk_level=risk_level)
+        else:
+            records = self.history
+        
+        if not records:
             return None
         
-        corrections = [
-            {
+        corrections = []
+        for record in records:
+            corrections.append({
+                "批次ID": record["batch_id"],
                 "字段": "压缩包路径",
                 "修正前": record.get("zip_path", ""),
                 "修正后": "/valid/path/to/file.zip" if record["success"] else "",
-                "风险等级": "high" if record["errors"] else "normal",
-                "错误码": ",".join([e["code"] for e in record["errors"]]) if record["errors"] else ""
-            }
-        ]
+                "风险等级": self._get_record_risk_level(record),
+                "错误码": ",".join([e["code"] for e in record["errors"]]) if record["errors"] else "",
+                "操作者": record["operator"],
+                "检查时间": record["timestamp"]
+            })
         
-        filename = f"check_result_{batch_id}"
+        if batch_id:
+            filename = f"check_result_{batch_id}"
+        elif risk_level:
+            filename = f"check_result_risk_{risk_level}"
+        else:
+            filename = f"check_result_all"
+        
         filepath = self.export_dir / filename
         
         if output_format == "excel":
@@ -184,6 +205,17 @@ class ErrorCodeChecker:
                 writer.writerows(corrections)
         
         return str(filepath)
+    
+    def _get_record_risk_level(self, record):
+        if not record["errors"]:
+            return "normal"
+        levels = [e.get("risk_level") for e in record["errors"]]
+        if "high" in levels:
+            return "high"
+        elif "medium" in levels:
+            return "medium"
+        else:
+            return "low"
 
 checker = ErrorCodeChecker()
 
@@ -244,10 +276,11 @@ def candidates(days, risk_level):
 @cli.command()
 @click.option('--batch-id', '-b', help='按批次ID查询')
 @click.option('--operator', '-o', help='按操作者查询')
-@click.option('--risk-type', '-r', help='按风险类型查询')
-def query(batch_id, operator, risk_type):
+@click.option('--risk-type', '-t', help='按风险类型查询')
+@click.option('--risk-level', '-r', type=click.Choice(['high', 'medium', 'low', 'normal']), help='按风险等级回查（high/medium/low/normal）')
+def query(batch_id, operator, risk_type, risk_level):
     """历史查询，支持多维度过滤"""
-    results = checker.query_history(batch_id, operator, risk_type)
+    results = checker.query_history(batch_id, operator, risk_type, risk_level)
     
     if not results:
         click.echo("未找到匹配的记录")
@@ -288,16 +321,35 @@ def uncovered():
     click.echo(f"\n总计未覆盖错误码: {total} 个")
 
 @cli.command()
-@click.argument('batch_id')
+@click.argument('batch_id', required=False)
 @click.option('--format', '-f', 'output_format', type=click.Choice(['excel', 'csv']), default='excel', help='导出格式')
-def export(batch_id, output_format):
-    """导出检查结果"""
-    filepath = checker.export_results(batch_id, output_format)
+@click.option('--risk-level', '-r', type=click.Choice(['high', 'medium', 'low', 'normal']), help='按风险等级筛选导出')
+@click.option('--all', '-a', 'export_all', is_flag=True, help='导出所有记录')
+def export(batch_id, output_format, risk_level, export_all):
+    """导出检查结果（支持按批次、风险等级或导出全部）"""
+    if not batch_id and not risk_level and not export_all:
+        click.echo("错误: 请指定 --batch-id、--risk-level 或 --all 中的一个")
+        click.echo("示例:")
+        click.echo("  export BATCH20260515120000          # 按批次导出")
+        click.echo("  export --risk-level high            # 按风险等级导出")
+        click.echo("  export --all                        # 导出所有记录")
+        sys.exit(1)
+    
+    if sum([1 for x in [batch_id, risk_level, export_all] if x]) > 1:
+        click.echo("错误: --batch-id、--risk-level、--all 不能同时使用")
+        sys.exit(1)
+    
+    filepath = checker.export_results(batch_id, output_format, risk_level, export_all)
     
     if filepath:
         click.echo(f"导出成功: {filepath}")
     else:
-        click.echo(f"未找到批次 {batch_id} 的记录")
+        if batch_id:
+            click.echo(f"未找到批次 {batch_id} 的记录")
+        elif risk_level:
+            click.echo(f"未找到风险等级为 {risk_level} 的记录")
+        else:
+            click.echo("未找到任何记录")
         sys.exit(1)
 
 if __name__ == "__main__":
