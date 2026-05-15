@@ -105,6 +105,7 @@ func (h *Handler) StartChecking(c *gin.Context) {
 
 type RegisterDependencyRequest struct {
 	DependencyID string `json:"dependency_id" binding:"required"`
+	Operator     string `json:"operator" binding:"required"`
 }
 
 func (h *Handler) RegisterDependency(c *gin.Context) {
@@ -115,7 +116,7 @@ func (h *Handler) RegisterDependency(c *gin.Context) {
 		return
 	}
 
-	result, err := h.service.RegisterDependency(id, req.DependencyID)
+	result, err := h.service.RegisterDependency(id, req.DependencyID, req.Operator)
 	if err != nil {
 		h.handleError(c, err)
 		return
@@ -125,7 +126,13 @@ func (h *Handler) RegisterDependency(c *gin.Context) {
 
 func (h *Handler) CheckPermissions(c *gin.Context) {
 	id := c.Param("id")
-	result, err := h.service.CheckPermissions(id)
+	var req model.PermissionCheckRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	result, err := h.service.CheckPermissions(id, &req)
 	if err != nil {
 		h.handleError(c, err)
 		return
@@ -135,7 +142,13 @@ func (h *Handler) CheckPermissions(c *gin.Context) {
 
 func (h *Handler) CheckQuota(c *gin.Context) {
 	id := c.Param("id")
-	result, err := h.service.CheckQuota(id)
+	var req model.QuotaCheckRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	result, err := h.service.CheckQuota(id, &req)
 	if err != nil {
 		h.handleError(c, err)
 		return
@@ -145,7 +158,13 @@ func (h *Handler) CheckQuota(c *gin.Context) {
 
 func (h *Handler) CheckAlerts(c *gin.Context) {
 	id := c.Param("id")
-	result, err := h.service.CheckAlerts(id)
+	var req model.AlertCheckRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	result, err := h.service.CheckAlerts(id, &req)
 	if err != nil {
 		h.handleError(c, err)
 		return

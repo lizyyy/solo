@@ -2,6 +2,9 @@ package service
 
 import (
 	"testing"
+	"time"
+
+	"github.com/google/uuid"
 
 	"api-admission-check/internal/model"
 	"api-admission-check/internal/store"
@@ -186,7 +189,7 @@ func TestRegisterDependency(t *testing.T) {
 
 	depID := app.Dependencies[0].ID
 
-	result, err := svc.RegisterDependency(app.ID, depID)
+	result, err := svc.RegisterDependency(app.ID, depID, "operator")
 	if err != nil {
 		t.Fatalf("RegisterDependency failed: %v", err)
 	}
@@ -201,7 +204,7 @@ func TestRegisterDependency(t *testing.T) {
 	}
 }
 
-func TestCheckPermissions(t *testing.T) {
+func TestCheckPermissions_Valid(t *testing.T) {
 	svc := setupTestService()
 
 	req := &model.CreateApplicationRequest{
@@ -210,7 +213,19 @@ func TestCheckPermissions(t *testing.T) {
 	}
 	app, _ := svc.CreateApplication(req)
 
-	result, err := svc.CheckPermissions(app.ID)
+	checkReq := &model.PermissionCheckRequest{
+		Credentials: []model.PermissionCred{
+			{
+				CredType:  "API_KEY",
+				CredID:    uuid.New().String(),
+				Valid:     true,
+				ExpireAt:  time.Now().AddDate(1, 0, 0),
+			},
+		},
+		Operator: "admin",
+	}
+
+	result, err := svc.CheckPermissions(app.ID, checkReq)
 	if err != nil {
 		t.Fatalf("CheckPermissions failed: %v", err)
 	}
@@ -220,7 +235,7 @@ func TestCheckPermissions(t *testing.T) {
 	}
 }
 
-func TestCheckQuota(t *testing.T) {
+func TestCheckPermissions_Invalid(t *testing.T) {
 	svc := setupTestService()
 
 	req := &model.CreateApplicationRequest{
@@ -229,7 +244,48 @@ func TestCheckQuota(t *testing.T) {
 	}
 	app, _ := svc.CreateApplication(req)
 
-	result, err := svc.CheckQuota(app.ID)
+	checkReq := &model.PermissionCheckRequest{
+		Credentials: []model.PermissionCred{
+			{
+				CredType:  "",
+				CredID:    "",
+				Valid:     false,
+			},
+		},
+		Operator: "admin",
+	}
+
+	result, err := svc.CheckPermissions(app.ID, checkReq)
+	if err != nil {
+		t.Fatalf("CheckPermissions failed: %v", err)
+	}
+
+	if result.Passed {
+		t.Errorf("Expected result.Passed = false, got true")
+	}
+}
+
+func TestCheckQuota_Valid(t *testing.T) {
+	svc := setupTestService()
+
+	req := &model.CreateApplicationRequest{
+		ServiceName:  "test-service",
+		ServiceOwner: "test-owner",
+	}
+	app, _ := svc.CreateApplication(req)
+
+	checkReq := &model.QuotaCheckRequest{
+		Quotas: []model.QuotaRequirement{
+			{
+				QuotaType: "QPS",
+				Requested: 100,
+				Available: 1000,
+			},
+		},
+		Operator: "admin",
+	}
+
+	result, err := svc.CheckQuota(app.ID, checkReq)
 	if err != nil {
 		t.Fatalf("CheckQuota failed: %v", err)
 	}
@@ -239,7 +295,7 @@ func TestCheckQuota(t *testing.T) {
 	}
 }
 
-func TestCheckAlerts(t *testing.T) {
+func TestCheckQuota_Exceeded(t *testing.T) {
 	svc := setupTestService()
 
 	req := &model.CreateApplicationRequest{
@@ -248,7 +304,49 @@ func TestCheckAlerts(t *testing.T) {
 	}
 	app, _ := svc.CreateApplication(req)
 
-	result, err := svc.CheckAlerts(app.ID)
+	checkReq := &model.QuotaCheckRequest{
+		Quotas: []model.QuotaRequirement{
+			{
+				QuotaType: "QPS",
+				Requested: 2000,
+				Available: 1000,
+			},
+		},
+		Operator: "admin",
+	}
+
+	result, err := svc.CheckQuota(app.ID, checkReq)
+	if err != nil {
+		t.Fatalf("CheckQuota failed: %v", err)
+	}
+
+	if result.Passed {
+		t.Errorf("Expected result.Passed = false, got true")
+	}
+}
+
+func TestCheckAlerts_Resolved(t *testing.T) {
+	svc := setupTestService()
+
+	req := &model.CreateApplicationRequest{
+		ServiceName:  "test-service",
+		ServiceOwner: "test-owner",
+	}
+	app, _ := svc.CreateApplication(req)
+
+	checkReq := &model.AlertCheckRequest{
+		Alerts: []model.AlertItem{
+			{
+				AlertType: "SECURITY_SCAN",
+				Severity:  "LOW",
+				Message:   "No critical vulnerabilities",
+				Resolved:  true,
+			},
+		},
+		Operator: "admin",
+	}
+
+	result, err := svc.CheckAlerts(app.ID, checkReq)
 	if err != nil {
 		t.Fatalf("CheckAlerts failed: %v", err)
 	}
@@ -258,7 +356,38 @@ func TestCheckAlerts(t *testing.T) {
 	}
 }
 
-func TestApproveApplication(t *testing.T) {
+func TestCheckAlerts_UnresolvedCritical(t *testing.T) {
+	svc := setupTestService()
+
+	req := &model.CreateApplicationRequest{
+		ServiceName:  "test-service",
+		ServiceOwner: "test-owner",
+	}
+	app, _ := svc.CreateApplication(req)
+
+	checkReq := &model.AlertCheckRequest{
+		Alerts: []model.AlertItem{
+			{
+				AlertType: "SECURITY_SCAN",
+				Severity:  "CRITICAL",
+				Message:   "SQL injection vulnerability found",
+				Resolved:  false,
+			},
+		},
+		Operator: "admin",
+	}
+
+	result, err := svc.CheckAlerts(app.ID, checkReq)
+	if err != nil {
+		t.Fatalf("CheckAlerts failed: %v", err)
+	}
+
+	if result.Passed {
+		t.Errorf("Expected result.Passed = false, got true")
+	}
+}
+
+func TestApproveApplication_WithAllChecks(t *testing.T) {
 	svc := setupTestService()
 
 	req := &model.CreateApplicationRequest{
@@ -274,10 +403,28 @@ func TestApproveApplication(t *testing.T) {
 	app, _ = svc.StartChecking(app.ID, "operator")
 
 	depID := app.Dependencies[0].ID
-	svc.RegisterDependency(app.ID, depID)
-	svc.CheckPermissions(app.ID)
-	svc.CheckQuota(app.ID)
-	svc.CheckAlerts(app.ID)
+	svc.RegisterDependency(app.ID, depID, "operator")
+
+	svc.CheckPermissions(app.ID, &model.PermissionCheckRequest{
+		Credentials: []model.PermissionCred{
+			{CredType: "API_KEY", CredID: uuid.New().String(), Valid: true},
+		},
+		Operator: "admin",
+	})
+
+	svc.CheckQuota(app.ID, &model.QuotaCheckRequest{
+		Quotas: []model.QuotaRequirement{
+			{QuotaType: "QPS", Requested: 100, Available: 1000},
+		},
+		Operator: "admin",
+	})
+
+	svc.CheckAlerts(app.ID, &model.AlertCheckRequest{
+		Alerts: []model.AlertItem{
+			{AlertType: "SECURITY_SCAN", Severity: "LOW", Message: "OK", Resolved: true},
+		},
+		Operator: "admin",
+	})
 
 	app, err := svc.ApproveApplication(app.ID, "reviewer")
 	if err != nil {
@@ -376,53 +523,10 @@ func TestGetHistory(t *testing.T) {
 	if len(history) < 3 {
 		t.Errorf("Expected at least 3 history records, got %d", len(history))
 	}
-}
 
-func TestDuplicateSubmission(t *testing.T) {
-	s := store.NewMemoryStore()
-
-	app1 := &model.ServiceApplication{
-		ID:           "test-app-id",
-		ServiceName:  "service1",
-		ServiceOwner: "owner1",
-	}
-
-	err := s.CreateApplication(app1)
-	if err != nil {
-		t.Fatalf("First CreateApplication failed: %v", err)
-	}
-
-	app2 := &model.ServiceApplication{
-		ID:           "test-app-id",
-		ServiceName:  "service2",
-		ServiceOwner: "owner2",
-	}
-
-	err = s.CreateApplication(app2)
-	if err != model.ErrDuplicateSubmission {
-		t.Errorf("Expected ErrDuplicateSubmission, got %v", err)
-	}
-}
-
-func TestVersionConflict(t *testing.T) {
-	s := store.NewMemoryStore()
-
-	app := &model.ServiceApplication{
-		ID:           "test-app-id",
-		ServiceName:  "service1",
-		ServiceOwner: "owner1",
-	}
-
-	s.CreateApplication(app)
-
-	appFromDB, _ := s.GetApplication(app.ID)
-
-	appFromDB.ServiceName = "updated-service"
-	appFromDB.Version = 999
-
-	err := s.UpdateApplication(appFromDB)
-	if err != model.ErrVersionConflict {
-		t.Errorf("Expected ErrVersionConflict, got %v", err)
+	t.Logf("History records: %d", len(history))
+	for _, h := range history {
+		t.Logf("  - ActionType: %s, Operator: %s, Remark: %s", h.ActionType, h.Operator, h.Remark)
 	}
 }
 

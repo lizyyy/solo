@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"api-admission-check/internal/api"
 	"api-admission-check/internal/service"
@@ -9,12 +12,20 @@ import (
 )
 
 func main() {
-	s := store.NewMemoryStore()
+	s, err := store.NewSQLiteStore()
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	defer s.Close()
+
 	svc := service.NewAdmissionService(s)
 	handler := api.NewHandler(svc)
 	r := api.SetupRouter(handler)
 
+	log.Println("=== API Dependency Admission Check Service ===")
+	log.Println("Database: SQLite (./data/admission.db)")
 	log.Println("Server starting on :8080")
+	log.Println("")
 	log.Println("API Endpoints:")
 	log.Println("  POST   /api/v1/applications                - Create application")
 	log.Println("  GET    /api/v1/applications                - List applications")
@@ -30,7 +41,15 @@ func main() {
 	log.Println("  POST   /api/v1/applications/:id/cancel     - Cancel application")
 	log.Println("  GET    /api/v1/applications/:id/history    - Get history")
 
-	if err := r.Run(":8080"); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
+	go func() {
+		if err := r.Run(":8080"); err != nil {
+			log.Fatalf("Failed to start server: %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("Shutting down server...")
 }

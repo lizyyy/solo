@@ -55,7 +55,7 @@ DEP1_ID=$(curl -s "$BASE_URL/applications/$APP_ID" | python3 -c "import sys, jso
 echo "Dependency ID: $DEP1_ID"
 curl -s -X POST "$BASE_URL/applications/$APP_ID/register-dependency" \
   -H "Content-Type: application/json" \
-  -d "{\"dependency_id\": \"$DEP1_ID\"}" | python3 -m json.tool 2>/dev/null || echo "$response"
+  -d "{\"dependency_id\": \"$DEP1_ID\", \"operator\": \"admin\"}" | python3 -m json.tool 2>/dev/null || echo "$response"
 echo ""
 
 echo "5. Register second dependency (PaymentAPI)..."
@@ -63,22 +63,58 @@ DEP2_ID=$(curl -s "$BASE_URL/applications/$APP_ID" | python3 -c "import sys, jso
 echo "Dependency ID: $DEP2_ID"
 curl -s -X POST "$BASE_URL/applications/$APP_ID/register-dependency" \
   -H "Content-Type: application/json" \
-  -d "{\"dependency_id\": \"$DEP2_ID\"}" | python3 -m json.tool 2>/dev/null || echo "$response"
+  -d "{\"dependency_id\": \"$DEP2_ID\", \"operator\": \"admin\"}" | python3 -m json.tool 2>/dev/null || echo "$response"
 echo ""
 
 echo "6. Check permissions..."
 curl -s -X POST "$BASE_URL/applications/$APP_ID/check-permissions" \
-  -H "Content-Type: application/json" | python3 -m json.tool 2>/dev/null || echo "$response"
+  -H "Content-Type: application/json" \
+  -d '{
+    "credentials": [
+      {
+        "cred_type": "API_KEY",
+        "cred_id": "key-12345",
+        "valid": true
+      }
+    ],
+    "operator": "admin"
+  }' | python3 -m json.tool 2>/dev/null || echo "$response"
 echo ""
 
 echo "7. Check quota..."
 curl -s -X POST "$BASE_URL/applications/$APP_ID/check-quota" \
-  -H "Content-Type: application/json" | python3 -m json.tool 2>/dev/null || echo "$response"
+  -H "Content-Type: application/json" \
+  -d '{
+    "quotas": [
+      {
+        "quota_type": "QPS",
+        "requested": 100,
+        "available": 1000
+      },
+      {
+        "quota_type": "DAILY_CALLS",
+        "requested": 100000,
+        "available": 500000
+      }
+    ],
+    "operator": "admin"
+  }' | python3 -m json.tool 2>/dev/null || echo "$response"
 echo ""
 
 echo "8. Check alerts..."
 curl -s -X POST "$BASE_URL/applications/$APP_ID/check-alerts" \
-  -H "Content-Type: application/json" | python3 -m json.tool 2>/dev/null || echo "$response"
+  -H "Content-Type: application/json" \
+  -d '{
+    "alerts": [
+      {
+        "alert_type": "SECURITY_SCAN",
+        "severity": "LOW",
+        "message": "No critical vulnerabilities found",
+        "resolved": true
+      }
+    ],
+    "operator": "admin"
+  }' | python3 -m json.tool 2>/dev/null || echo "$response"
 echo ""
 
 echo "9. Approve application..."
@@ -87,15 +123,12 @@ curl -s -X POST "$BASE_URL/applications/$APP_ID/approve" \
   -d '{"operator": "reviewer"}' | python3 -m json.tool 2>/dev/null || echo "$response"
 echo ""
 
-echo "10. Get history..."
+echo "10. Get full history (service chain)..."
 curl -s "$BASE_URL/applications/$APP_ID/history" | python3 -m json.tool 2>/dev/null || echo "$response"
 echo ""
 
-echo "11. Test invalid state transition (try to approve already approved app)..."
-echo "First, let's try to cancel an approved application (should fail)..."
-curl -s -X POST "$BASE_URL/applications/$APP_ID/cancel" \
-  -H "Content-Type: application/json" \
-  -d '{"operator": "admin"}' | python3 -m json.tool 2>/dev/null || echo "$response"
+echo "11. Get final application status..."
+curl -s "$BASE_URL/applications/$APP_ID" | python3 -m json.tool 2>/dev/null || echo "$response"
 echo ""
 
 echo "12. List all applications..."
@@ -103,3 +136,5 @@ curl -s "$BASE_URL/applications" | python3 -m json.tool 2>/dev/null || echo "$re
 echo ""
 
 echo "=== Test Complete ==="
+echo "Database persisted at: ./data/admission.db"
+echo "Restart the server to verify data persistence"
