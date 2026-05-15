@@ -16,6 +16,19 @@ def _json_serializer(obj):
     raise TypeError(f"Type {type(obj)} not serializable")
 
 
+STATUS_TRANSITION_RULES = {
+    ExportStatus.PENDING: [ExportStatus.VALIDATING, ExportStatus.REJECTED],
+    ExportStatus.VALIDATING: [ExportStatus.APPROVED, ExportStatus.REJECTED, ExportStatus.PENDING],
+    ExportStatus.APPROVED: [ExportStatus.GENERATING, ExportStatus.REJECTED],
+    ExportStatus.GENERATING: [ExportStatus.READY, ExportStatus.FAILED],
+    ExportStatus.READY: [ExportStatus.DOWNLOADED, ExportStatus.EXPIRED],
+    ExportStatus.DOWNLOADED: [],
+    ExportStatus.EXPIRED: [],
+    ExportStatus.REJECTED: [],
+    ExportStatus.FAILED: []
+}
+
+
 class CRUDOperations:
     def __init__(self, db: Session):
         self.db = db
@@ -107,6 +120,20 @@ class CRUDOperations:
             raise ValueError(f"Export request {request_id} not found")
         
         old_status = export_request.status
+        
+        if old_status == new_status:
+            return export_request
+        
+        if old_status not in STATUS_TRANSITION_RULES:
+            raise ValueError(f"未知的当前状态: {old_status}")
+        
+        allowed_transitions = STATUS_TRANSITION_RULES[old_status]
+        if new_status not in allowed_transitions:
+            raise ValueError(
+                f"非法的状态转换: {old_status} -> {new_status}，"
+                f"允许的目标状态: {', '.join(allowed_transitions)}"
+            )
+        
         export_request.status = new_status
         export_request.current_handler = operator_id
         
@@ -193,6 +220,16 @@ class CRUDOperations:
         
         if export_request.status != ExportStatus.READY:
             raise ValueError(f"Export request {request_id} is not ready for download")
+        
+        if not export_request.expiry_time:
+            raise ValueError(f"Export request {request_id} 未设置过期时间")
+        
+        if datetime.now() > export_request.expiry_time:
+            export_request.status = ExportStatus.EXPIRED
+            export_request.final_conclusion = "导出申请已过期"
+            self.db.commit()
+            self.db.refresh(export_request)
+            raise ValueError(f"Export request {request_id} 已过期，无法生成下载签名")
         
         expiry_policy = ExpiryPolicy(**export_request.expiry_policy)
         signature_result = DownloadSignatureGenerator.generate_signature(

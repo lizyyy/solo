@@ -65,6 +65,7 @@ async def create_export(
     db: Session = Depends(get_db)
 ):
     crud = CRUDOperations(db)
+    authorizer = FieldAuthorizer(db)
     
     try:
         cached_response = crud.check_idempotency(x_idempotency_key, request.model_dump())
@@ -87,6 +88,22 @@ async def create_export(
             message="导出申请已存在",
             data=response_data,
             timestamp=datetime.now()
+        )
+    
+    unauthorized_fields = []
+    for scope in request.field_scope:
+        for field in scope.fields:
+            if not authorizer.check_authorization(
+                request.requester_id,
+                request.data_source,
+                field
+            ):
+                unauthorized_fields.append(f"{scope.table_name}.{field}")
+    
+    if unauthorized_fields:
+        raise HTTPException(
+            status_code=403,
+            detail=f"以下字段未授权: {', '.join(unauthorized_fields)}"
         )
     
     export_request = crud.create_export_request(request)
