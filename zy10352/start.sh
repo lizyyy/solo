@@ -1,8 +1,6 @@
 #!/bin/bash
 # API 字段血缘服务启动脚本
 
-# 注意：移除 set -e，确保脚本不会在检查失败时静默退出
-
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$SCRIPT_DIR"
 DATA_DIR="$PROJECT_DIR/data"
@@ -40,45 +38,31 @@ check_java() {
     if ! command -v java &> /dev/null; then
         echo ""
         log_error "未找到 Java 命令！"
-        log_note "请安装 Java 11 或更高版本："
+        log_note "请安装 Java 8 或更高版本："
         log_note "  - 下载地址: https://adoptium.net/"
-        log_note "  - 或使用包管理器: brew install openjdk@11"
         echo ""
         exit 1
     fi
 
-    # 获取 Java 版本，处理不同版本输出格式
+    # 获取 Java 版本
     JAVA_VERSION_OUTPUT=$(java -version 2>&1)
     log_info "Java 版本信息: $JAVA_VERSION_OUTPUT"
     
-    # 尝试不同方式解析版本号
-    if echo "$JAVA_VERSION_OUTPUT" | grep -q 'version "1\.8'; then
-        JAVA_VERSION=8
-    elif echo "$JAVA_VERSION_OUTPUT" | grep -q 'version "11\.'; then
-        JAVA_VERSION=11
-    elif echo "$JAVA_VERSION_OUTPUT" | grep -q 'version "17\.'; then
-        JAVA_VERSION=17
+    # 解析主版本号，兼容不同格式
+    if echo "$JAVA_VERSION_OUTPUT" | grep -q 'version "1\.'; then
+        # Java 8 或更早: "1.8.0_xxx"
+        JAVA_VERSION=$(echo "$JAVA_VERSION_OUTPUT" | head -n 1 | sed 's/.*version "1\.\([0-9]*\).*/\1/')
     else
-        # 尝试提取主版本号
-        JAVA_VERSION=$(echo "$JAVA_VERSION_OUTPUT" | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1)
+        # Java 9+: "11.0.xxx" 或 "17.0.xxx"
+        JAVA_VERSION=$(echo "$JAVA_VERSION_OUTPUT" | head -n 1 | sed 's/.*version "\([0-9]*\).*/\1/')
     fi
     
     log_info "检测到的 Java 主版本: $JAVA_VERSION"
 
-    if [ "$JAVA_VERSION" -lt 11 ]; then
+    if [ "$JAVA_VERSION" -lt 8 ]; then
         echo ""
         log_error "Java 版本不符合要求！"
-        log_error "需要 Java 11 或更高版本，当前检测到: Java $JAVA_VERSION"
-        echo ""
-        log_note "解决方案:"
-        log_note "1) 升级 Java 版本:"
-        log_note "   - 下载地址: https://adoptium.net/"
-        log_note "   - macOS: brew install openjdk@11"
-        log_note "   - Ubuntu: sudo apt install openjdk-11-jdk"
-        echo ""
-        log_note "2) 使用已安装的高版本 Java:"
-        log_note "   export JAVA_HOME=/path/to/java11"
-        log_note "   export PATH=\$JAVA_HOME/bin:\$PATH"
+        log_error "需要 Java 8 或更高版本，当前检测到: Java $JAVA_VERSION"
         echo ""
         exit 1
     fi
@@ -96,6 +80,7 @@ check_maven() {
     if [ -f "$PROJECT_DIR/mvnw" ]; then
         MVN_CMD="$PROJECT_DIR/mvnw"
         log_info "使用项目 Maven Wrapper ✓"
+        chmod +x "$MVN_CMD" 2>/dev/null || true
         return 0
     fi
 
@@ -108,10 +93,8 @@ check_maven() {
 
     echo ""
     log_error "未找到可用的 Maven！"
-    log_note "请安装 Maven 3.6 或更高版本："
-    log_note "  - 下载地址: https://maven.apache.org/download.cgi"
-    log_note "  - macOS: brew install maven"
-    log_note "  - Ubuntu: sudo apt install maven"
+    log_note "项目已包含 Maven Wrapper (mvnw)，将在运行时自动下载 Maven"
+    log_note "请确保网络连接正常"
     echo ""
     exit 1
 }
@@ -131,7 +114,7 @@ build_project() {
         log_error "项目构建失败！"
         log_note "请检查:"
         log_note "1. 网络连接（Maven 需要下载依赖）"
-        log_note "2. Maven 配置（~/.m2/settings.xml"
+        log_note "2. Maven 配置（~/.m2/settings.xml）"
         echo ""
         exit 1
     fi

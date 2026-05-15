@@ -67,7 +67,7 @@ mvn clean package -DskipTests
 java -jar target/api-field-lineage-service-1.0.0-SNAPSHOT.jar
 ```
 
-### 方式三：使用 Maven Wrapper（如果有 mvnw 文件）
+### 方式三：使用 Maven Wrapper（项目已包含）
 
 ```bash
 # Linux / macOS
@@ -78,6 +78,8 @@ java -jar target/api-field-lineage-service-1.0.0-SNAPSHOT.jar
 mvnw.cmd clean package -DskipTests
 mvnw.cmd spring-boot:run
 ```
+
+**注意**: 首次运行时会自动下载 Maven Wrapper 和相关依赖，请确保网络连接正常。
 
 服务运行在 `http://localhost:8080`
 

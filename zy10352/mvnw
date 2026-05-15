@@ -1,42 +1,94 @@
 #!/bin/sh
-# Maven Wrapper 简化版
-# 如果系统有 mvn 则直接使用，否则提示安装
+# ----------------------------------------------------------------------------
+# Maven Start Up Batch script
+#
+# Required ENV vars:
+# ------------------
+#   JAVA_HOME - location of a JDK home dir
+#
+# Optional ENV vars
+# -----------------
+#   M2_HOME - location of maven2's installed home dir
+#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
+#     e.g. to debug Maven itself, use
+#       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+#   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+# ----------------------------------------------------------------------------
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false
+mingw=false
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  MINGW*) mingw=true ;;
+esac
 
-# 检查系统是否有 mvn
+set -e
+
+# 首先检查系统是否有 mvn
 if command -v mvn >/dev/null 2>&1; then
+    echo "[INFO] 使用系统 Maven"
     exec mvn "$@"
 fi
 
-# 如果没有 mvn，显示错误提示
-echo "========================================"
-echo "Maven Wrapper - Maven 未找到"
-echo "========================================"
-echo ""
-echo "错误：系统未安装 Maven！"
-echo ""
-echo "请使用以下方式之一安装："
-echo ""
-echo "1) macOS (使用 Homebrew):"
-echo "   brew install maven"
-echo ""
-echo "2) Ubuntu/Debian:"
-echo "   sudo apt update"
-echo "   sudo apt install maven"
-echo ""
-echo "3) CentOS/RHEL:"
-echo "   sudo yum install maven"
-echo ""
-echo "4) Windows (使用 Chocolatey):"
-echo "   choco install maven"
-echo ""
-echo "5) 手动下载:"
-echo "   https://maven.apache.org/download.cgi"
-echo ""
-echo "安装后再次运行此脚本。"
-echo ""
-echo "或者使用项目启动脚本:"
-echo "   ./start.sh build"
-echo ""
-exit 1
+echo "[INFO] 系统未安装 Maven，正在使用 Maven Wrapper..."
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+WRAPPER_JAR="$SCRIPT_DIR/.mvn/wrapper/maven-wrapper.jar"
+MAVEN_PROPERTIES="$SCRIPT_DIR/.mvn/wrapper/maven-wrapper.properties"
+
+# 检查 wrapper jar 是否存在
+if [ ! -f "$WRAPPER_JAR" ]; then
+    echo "[WARN] Maven Wrapper JAR 不存在，正在下载..."
+    
+    # 从 properties 文件中获取下载地址
+    if [ -f "$MAVEN_PROPERTIES" ]; then
+        WRAPPER_URL=$(grep '^wrapperUrl=' "$MAVEN_PROPERTIES" 2>/dev/null | cut -d'=' -f2-)
+        if [ -z "$WRAPPER_URL" ]; then
+            WRAPPER_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+        fi
+    else
+        WRAPPER_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+    fi
+    
+    echo "[INFO] 下载 Maven Wrapper: $WRAPPER_URL"
+    mkdir -p "$(dirname "$WRAPPER_JAR")"
+    
+    # 尝试使用 curl 或 wget 下载
+    if command -v curl >/dev/null 2>&1; then
+        curl -L -o "$WRAPPER_JAR" "$WRAPPER_URL"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "$WRAPPER_JAR" "$WRAPPER_URL"
+    else
+        echo "[ERROR] 未找到 curl 或 wget，请手动安装 Maven 或下载以下文件："
+        echo "        $WRAPPER_URL"
+        echo "        保存到: $WRAPPER_JAR"
+        exit 1
+    fi
+fi
+
+# 检查 Java
+if [ -z "$JAVA_HOME" ]; then
+    JAVA_EXECUTABLE="$(which java)"
+    if [ -z "$JAVA_EXECUTABLE" ]; then
+        echo "[ERROR] 未找到 Java 命令，请安装 Java 8 或更高版本"
+        exit 1
+    fi
+else
+    JAVA_EXECUTABLE="$JAVA_HOME/bin/java"
+    if [ ! -x "$JAVA_EXECUTABLE" ]; then
+        echo "[ERROR] JAVA_HOME 指向的路径无效: $JAVA_HOME"
+        exit 1
+    fi
+fi
+
+echo "[INFO] 使用 Java: $JAVA_EXECUTABLE"
+echo "[INFO] 使用 Maven Wrapper JAR: $WRAPPER_JAR"
+
+# 运行 Maven Wrapper
+exec "$JAVA_EXECUTABLE" \
+    $MAVEN_OPTS \
+    -classpath "$WRAPPER_JAR" \
+    -Dmaven.multiModuleProjectDirectory="$SCRIPT_DIR" \
+    org.apache.maven.wrapper.MavenWrapperMain \
+    "$@"
