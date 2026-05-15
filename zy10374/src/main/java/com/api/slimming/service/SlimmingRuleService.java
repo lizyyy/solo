@@ -55,6 +55,7 @@ public class SlimmingRuleService {
                     return ApiResult.success(existingRule).requestId(request.getRequestId());
                 }
             }
+            return ApiResult.fail(409, "重复请求，该requestId已处理过").requestId(request.getRequestId());
         }
 
         SlimmingRule rule = new SlimmingRule();
@@ -78,6 +79,16 @@ public class SlimmingRuleService {
 
         slimmingRuleMapper.insert(rule);
 
+        SlimmingRecord record = new SlimmingRecord();
+        record.setRequestId(request.getRequestId());
+        record.setRuleId(rule.getId());
+        record.setRuleNo(rule.getRuleNo());
+        record.setApiPath(request.getApiPath());
+        record.setSceneCode(request.getSceneCode());
+        record.setSuccess(true);
+        record.setRequestTime(LocalDateTime.now());
+        slimmingRecordMapper.insert(record);
+
         saveHistory(rule.getId(), rule.getRuleNo(), OperationTypeEnum.CREATE,
                 null, RuleStatusEnum.DRAFT.getCode(), request.getCreatedBy(), "创建规则", null, JSON.toJSONString(rule));
 
@@ -92,6 +103,9 @@ public class SlimmingRuleService {
             return ApiResult.fail(404, "规则不存在");
         }
 
+        String snapshotBefore = JSON.toJSONString(rule);
+        Integer previousStatus = rule.getStatus();
+
         ValidationResult validationResult = fieldSlimmingEngine.validateRule(request.getOriginalResponse(), rule);
 
         if (validationResult.getValid()) {
@@ -99,8 +113,8 @@ public class SlimmingRuleService {
             slimmingRuleMapper.updateById(rule);
 
             saveHistory(rule.getId(), rule.getRuleNo(), OperationTypeEnum.VALIDATE,
-                    RuleStatusEnum.DRAFT.getCode(), RuleStatusEnum.VALIDATING.getCode(),
-                    request.getOperator(), "规则校验通过", null, JSON.toJSONString(rule));
+                    previousStatus, RuleStatusEnum.VALIDATING.getCode(),
+                    request.getOperator(), "规则校验通过", snapshotBefore, JSON.toJSONString(rule));
         }
 
         return ApiResult.success(validationResult);
@@ -113,6 +127,7 @@ public class SlimmingRuleService {
             return ApiResult.fail(404, "规则不存在");
         }
 
+        String snapshotBefore = JSON.toJSONString(rule);
         Integer previousStatus = rule.getStatus();
 
         rule.setStatus(RuleStatusEnum.VALID.getCode());
@@ -121,7 +136,7 @@ public class SlimmingRuleService {
 
         saveHistory(rule.getId(), rule.getRuleNo(), OperationTypeEnum.ACTIVATE,
                 previousStatus, RuleStatusEnum.VALID.getCode(),
-                request.getOperator(), "激活规则", null, JSON.toJSONString(rule));
+                request.getOperator(), "激活规则", snapshotBefore, JSON.toJSONString(rule));
 
         return ApiResult.success(rule);
     }
@@ -133,6 +148,7 @@ public class SlimmingRuleService {
             return ApiResult.fail(404, "规则不存在");
         }
 
+        String snapshotBefore = JSON.toJSONString(rule);
         Integer previousStatus = rule.getStatus();
 
         rule.setStatus(RuleStatusEnum.INVALID.getCode());
@@ -141,7 +157,7 @@ public class SlimmingRuleService {
 
         saveHistory(rule.getId(), rule.getRuleNo(), OperationTypeEnum.DEACTIVATE,
                 previousStatus, RuleStatusEnum.INVALID.getCode(),
-                request.getOperator(), "停用规则", null, JSON.toJSONString(rule));
+                request.getOperator(), "停用规则", snapshotBefore, JSON.toJSONString(rule));
 
         return ApiResult.success(rule);
     }
@@ -163,26 +179,35 @@ public class SlimmingRuleService {
         }
 
         RuleHistory targetHistory = null;
+        SlimmingRule targetRule = null;
+
         for (RuleHistory history : historyList) {
-            if (history.getSnapshotBefore() != null) {
-                SlimmingRule beforeRule = JSON.parseObject(history.getSnapshotBefore(), SlimmingRule.class);
-                if (beforeRule != null && request.getTargetVersion().equals(beforeRule.getVersion())) {
-                    targetHistory = history;
-                    break;
-                }
+            SlimmingRule tempRule = null;
+
+            if (StrUtil.isNotBlank(history.getSnapshotAfter())) {
+                tempRule = JSON.parseObject(history.getSnapshotAfter(), SlimmingRule.class);
+            }
+
+            if (tempRule == null && StrUtil.isNotBlank(history.getSnapshotBefore())) {
+                tempRule = JSON.parseObject(history.getSnapshotBefore(), SlimmingRule.class);
+            }
+
+            if (tempRule != null && request.getTargetVersion().equals(tempRule.getVersion())) {
+                targetHistory = history;
+                targetRule = tempRule;
+                break;
             }
         }
 
-        if (targetHistory == null) {
-            return ApiResult.fail(500, "未找到目标版本");
+        if (targetRule == null) {
+            return ApiResult.fail(500, "未找到目标版本 " + request.getTargetVersion() + "，可用版本请查看历史记录");
         }
-
-        SlimmingRule beforeRule = JSON.parseObject(targetHistory.getSnapshotBefore(), SlimmingRule.class);
 
         String previousVersion = rule.getVersion();
         String previousJson = JSON.toJSONString(rule);
+        Integer previousStatus = rule.getStatus();
 
-        BeanUtils.copyProperties(beforeRule, rule, "id", "createTime", "updateTime", "deleted");
+        BeanUtils.copyProperties(targetRule, rule, "id", "createTime", "updateTime", "deleted");
         rule.setStatus(RuleStatusEnum.ROLLBACKED.getCode());
         rule.setVersion(increaseVersion(rule.getVersion()));
         rule.setPreviousVersion(previousVersion);
@@ -190,7 +215,7 @@ public class SlimmingRuleService {
         slimmingRuleMapper.updateById(rule);
 
         saveHistory(rule.getId(), rule.getRuleNo(), OperationTypeEnum.ROLLBACK,
-                RuleStatusEnum.VALID.getCode(), RuleStatusEnum.ROLLBACKED.getCode(),
+                previousStatus, RuleStatusEnum.ROLLBACKED.getCode(),
                 request.getOperator(), "回滚规则到版本" + request.getTargetVersion(), previousJson, JSON.toJSONString(rule));
 
         return ApiResult.success(rule);

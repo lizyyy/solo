@@ -6,7 +6,7 @@ API返回体瘦身服务是一个用于优化API响应体积的中间件服务�
 
 ## 技术栈
 
-- Java 11
+- Java 1.8
 - Spring Boot 2.7.18
 - MyBatis-Plus 3.5.3.1
 - H2 Database (内存数据库，开发环境)
@@ -101,33 +101,43 @@ api-response-slimming-service/
 
 ### 1. 环境要求
 
-- JDK 11+
-- Maven 3.6+
+- JDK 1.8+
 
-### 2. 构建项目
+### 2. 启动方式
+
+#### 方式一：IDE 直接启动（推荐，无需 Maven）
+
+1. 使用 IntelliJ IDEA 或 Eclipse 打开项目
+2. 找到 `src/main/java/com/api/slimming/ApiSlimmingApplication.java`
+3. 右键点击并选择 "Run 'ApiSlimmingApplication'"
+4. 等待启动完成，日志会显示：`Started ApiSlimmingApplication in X.XXX seconds`
+
+#### 方式二：Maven 启动（如有 Maven 环境）
+
+```bash
+mvn spring-boot:run
+```
+
+#### 方式三：构建 JAR 后启动（如有 Maven 环境）
 
 ```bash
 mvn clean package
-```
-
-### 3. 启动服务
-
-```bash
 java -jar target/api-response-slimming-service-1.0.0.jar
 ```
 
-服务默认启动在 `http://localhost:8080/api-slimming`
+### 3. 访问服务
 
-### 4. 访问 H2 控制台
+- 服务地址：`http://localhost:8080/api-slimming`
+- H2 数据库控制台：`http://localhost:8080/api-slimming/h2-console`
+  - JDBC URL: `jdbc:h2:mem:api_slimming`
+  - 用户名：`sa`
+  - 密码：（空）
 
-- 地址：`http://localhost:8080/api-slimming/h2-console`
-- JDBC URL: `jdbc:h2:mem:api_slimming`
-- 用户名：`sa`
-- 密码：（空）
+## 验收测试流程
 
-## 使用示例
+### 测试一：创建规则 + 幂等性验证
 
-### 1. 创建瘦身规则
+**步骤1：第一次创建规则**
 
 ```bash
 curl -X POST http://localhost:8080/api-slimming/api/rules \
@@ -136,45 +146,168 @@ curl -X POST http://localhost:8080/api-slimming/api/rules \
     "apiPath": "/api/v1/user/info",
     "excludeFields": ["data.extraInfo", "data.debugLog"],
     "includeFields": [],
-    "requestId": "req_001",
-    "createdBy": "admin",
-    "remark": "用户信息接口瘦身规则"
+    "requestId": "req_test_001",
+    "createdBy": "tester",
+    "remark": "测试规则"
   }'
 ```
 
-### 2. 校验规则
+**期望结果**：返回200，规则创建成功，状态为"草稿"(0)，版本号为"1.0"
+
+---
+
+**步骤2：使用相同 requestId 重复提交**
+
+```bash
+curl -X POST http://localhost:8080/api-slimming/api/rules \
+  -H "Content-Type: application/json" \
+  -d '{
+    "apiPath": "/api/v1/user/info",
+    "excludeFields": ["data.extraInfo", "data.debugLog"],
+    "includeFields": [],
+    "requestId": "req_test_001",
+    "createdBy": "tester",
+    "remark": "测试规则"
+  }'
+```
+
+**期望结果**：返回已创建的规则，不会重复创建新规则（返回409或直接返回已存在的规则）
+
+---
+
+**步骤3：查看数据库中保存的结果**
+
+访问 H2 控制台 `http://localhost:8080/api-slimming/h2-console`，执行 SQL：
+
+```sql
+SELECT * FROM slimming_rule;
+SELECT * FROM slimming_record;
+SELECT * FROM rule_history;
+```
+
+**期望结果**：
+- slimming_rule 表中只有 1 条记录（幂等生效）
+- slimming_record 表中 requestId = "req_test_001" 的记录存在，且关联了正确的 ruleId
+- rule_history 表中存在 CREATE 操作的历史记录
+
+---
+
+### 测试二：规则状态流转
+
+**步骤1：校验规则**
 
 ```bash
 curl -X POST http://localhost:8080/api-slimming/api/rules/validate \
   -H "Content-Type: application/json" \
   -d '{
     "ruleId": 1,
-    "originalResponse": "{\"code\":200,\"data\":{\"id\":1,\"name\":\"test\",\"extraInfo\":\"...\",\"debugLog\":\"...\"}}",
-    "operator": "admin"
+    "originalResponse": "{\"code\":200,\"data\":{\"id\":1,\"name\":\"test\",\"extraInfo\":\"大量冗余数据...\",\"debugLog\":\"调试日志...\"}}",
+    "operator": "tester"
   }'
 ```
 
-### 3. 激活规则
+**期望结果**：校验通过，valid=true，瘦身前后大小对比正确
+
+---
+
+**步骤2：激活规则**
 
 ```bash
 curl -X POST http://localhost:8080/api-slimming/api/rules/1/activate \
   -H "Content-Type: application/json" \
   -d '{
-    "operator": "admin"
+    "operator": "tester"
   }'
 ```
 
-### 4. 执行瘦身
+**期望结果**：规则状态变为"生效"(20)，版本号仍为"1.0"
+
+---
+
+**步骤3：查看历史变更**
+
+```bash
+curl http://localhost:8080/api-slimming/api/rules/1/history
+```
+
+**期望结果**：能看到 CREATE -> VALIDATE -> ACTIVATE 的完整操作历史，每个操作都有快照
+
+---
+
+### 测试三：执行瘦身
 
 ```bash
 curl -X POST http://localhost:8080/api-slimming/api/execute/slimming \
   -H "Content-Type: application/json" \
   -d '{
     "apiPath": "/api/v1/user/info",
-    "originalResponse": "{\"code\":200,\"data\":{\"id\":1,\"name\":\"test\",\"extraInfo\":\"大量冗余数据...\",\"debugLog\":\"调试日志...\"}}",
-    "requestId": "exec_001"
+    "originalResponse": "{\"code\":200,\"data\":{\"id\":1,\"name\":\"test\",\"extraInfo\":\"这是一段很长的冗余数据，应该被裁剪掉\",\"debugLog\":\"调试日志信息也应该被移除\"}}",
+    "requestId": "exec_test_001"
   }'
 ```
+
+**期望结果**：
+- slimmedResponse 中不包含 extraInfo 和 debugLog 字段
+- originalSize > slimmedSize
+- savedSize > 0，savedRatio > 0
+
+---
+
+**查看执行记录**
+
+```bash
+curl -X POST http://localhost:8080/api-slimming/api/records/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pageNum": 1,
+    "pageSize": 10
+  }'
+```
+
+---
+
+### 测试四：规则回滚
+
+**步骤1：先更新规则（模拟版本变化）**
+
+```bash
+# 先停用当前生效的规则
+curl -X POST http://localhost:8080/api-slimming/api/rules/1/deactivate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "operator": "tester"
+  }'
+```
+
+---
+
+**步骤2：查看历史版本列表**
+
+```bash
+curl http://localhost:8080/api-slimming/api/rules/1/history
+```
+
+查看 snapshotAfter 中的 version 字段，确定要回滚的目标版本（如 "1.0"）
+
+---
+
+**步骤3：执行回滚**
+
+```bash
+curl -X POST http://localhost:8080/api-slimming/api/rules/1/rollback \
+  -H "Content-Type: application/json" \
+  -d '{
+    "targetVersion": "1.0",
+    "operator": "tester"
+  }'
+```
+
+**期望结果**：
+- 规则状态变为"已回滚"(40)
+- 版本号升级为 "1.1"（在原版本基础上递增）
+- 字段配置等内容恢复到目标版本的状态
+
+---
 
 ## 状态流转
 
@@ -186,6 +319,13 @@ curl -X POST http://localhost:8080/api-slimming/api/execute/slimming \
                                     回滚(40)
 ```
 
+状态说明：
+- 0: 草稿（刚创建）
+- 10: 校验中（校验通过）
+- 20: 生效（激活后可用于瘦身匹配）
+- 30: 失效（停用后不再匹配）
+- 40: 已回滚（回滚到历史版本后的状态）
+
 ## 生产环境部署
 
 1. 修改 `application.yml` 中的数据库配置，切换到 MySQL
@@ -195,7 +335,8 @@ curl -X POST http://localhost:8080/api-slimming/api/execute/slimming \
 
 ## 注意事项
 
-1. 规则创建后需要校验并激活才能生效
-2. 嵌套字段路径使用点号（`.`）分隔
-3. 请求幂等依赖 `requestId` 参数，建议每次请求生成唯一ID
-4. 瘦身操作不会修改原始响应，仅返回瘦身后的响应
+1. **幂等性保证**：创建规则时必须传 `requestId`，相同 requestId 不会重复创建
+2. **版本管理**：每次状态变更都会保存快照，回滚依赖这些快照
+3. **规则生效**：规则需要先校验通过，再激活才能被瘦身引擎匹配
+4. **嵌套字段路径**：使用点号（`.`）分隔，如 `data.user.extraInfo`
+5. **瘦身执行**：不会修改原始响应，仅返回瘦身后的响应副本
