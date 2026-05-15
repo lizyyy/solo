@@ -1,11 +1,12 @@
 import sys
+from datetime import datetime
 from sqlalchemy.orm import Session
 
 sys.path.append(".")
 
 from app.database import SessionLocal, engine, Base
 from app.models import TaskBatch, TaskResult, EdgeNode, IoTReceipt, TaskStatus, RiskType
-from app.services.rule_engine import initialize_default_rules
+from app.services.rule_engine import initialize_default_rules, RuleEngine
 
 
 def init_sample_data():
@@ -36,8 +37,9 @@ def init_sample_data():
     print(f"创建了 {len(edge_nodes)} 个边缘节点")
 
     print("创建任务批次...")
+    batch_id = "BATCH-2024-001"
     batch_data = {
-        "batch_id": "BATCH-2024-001",
+        "batch_id": batch_id,
         "batch_name": "边缘节点配置更新任务",
         "operator": "张三",
         "status": TaskStatus.RUNNING,
@@ -45,7 +47,7 @@ def init_sample_data():
         "remarks": "批量更新边缘节点安全配置"
     }
 
-    existing_batch = db.query(TaskBatch).filter(TaskBatch.batch_id == batch_data["batch_id"]).first()
+    existing_batch = db.query(TaskBatch).filter(TaskBatch.batch_id == batch_id).first()
     if not existing_batch:
         batch = TaskBatch(**batch_data)
         db.add(batch)
@@ -54,13 +56,13 @@ def init_sample_data():
     else:
         batch = existing_batch
 
-    print(f"创建批次: {batch.batch_id}")
+    print(f"创建批次: {batch_id}")
 
-    print("创建任务结果（包含1条异常记录）...")
+    print("创建任务结果（包含2条提前终止记录）...")
     task_results = [
         {
             "task_id": "TASK-001",
-            "batch_id": batch.batch_id,
+            "batch_id": batch_id,
             "node_id": "NODE-001",
             "status": TaskStatus.SUCCESS,
             "is_early_terminated": False,
@@ -70,7 +72,7 @@ def init_sample_data():
         },
         {
             "task_id": "TASK-002",
-            "batch_id": batch.batch_id,
+            "batch_id": batch_id,
             "node_id": "NODE-002",
             "status": TaskStatus.EARLY_TERMINATED,
             "is_early_terminated": True,
@@ -80,7 +82,7 @@ def init_sample_data():
         },
         {
             "task_id": "TASK-003",
-            "batch_id": batch.batch_id,
+            "batch_id": batch_id,
             "node_id": "NODE-003",
             "status": TaskStatus.SUCCESS,
             "is_early_terminated": False,
@@ -90,7 +92,7 @@ def init_sample_data():
         },
         {
             "task_id": "TASK-004",
-            "batch_id": batch.batch_id,
+            "batch_id": batch_id,
             "node_id": "NODE-004",
             "status": TaskStatus.EARLY_TERMINATED,
             "is_early_terminated": True,
@@ -154,11 +156,41 @@ def init_sample_data():
     db.commit()
     print(f"创建了 {len(iot_receipts)} 条IoT回执记录")
 
+    print("完成批次并更新统计...")
+    batch = db.query(TaskBatch).filter(TaskBatch.batch_id == batch_id).first()
+    task_results = db.query(TaskResult).filter(TaskResult.batch_id == batch_id).all()
+    batch.total_tasks = len(task_results)
+    batch.success_count = sum(1 for t in task_results if t.status == TaskStatus.SUCCESS)
+    batch.failed_count = sum(1 for t in task_results if t.status != TaskStatus.SUCCESS)
+
+    if batch.success_count == batch.total_tasks:
+        batch.status = TaskStatus.SUCCESS
+    elif batch.failed_count == batch.total_tasks:
+        batch.status = TaskStatus.FAILED
+    else:
+        batch.status = TaskStatus.PARTIAL_SUCCESS
+
+    batch.completed_at = datetime.now()
+    db.commit()
+    print(f"批次统计更新完成: 总数={batch.total_tasks}, 成功={batch.success_count}, 失败={batch.failed_count}, 状态={batch.status.value}")
+
+    print("执行归因分析...")
+    rule_engine = RuleEngine(db)
+    attribution_results = rule_engine.analyze_batch(batch_id)
+    print(f"归因分析完成: 共 {len(attribution_results)} 条归因记录")
+
+    risk_types = [r.risk_type for r in attribution_results if r.risk_type != RiskType.UNKNOWN]
+    if risk_types:
+        batch.risk_type = max(set(risk_types), key=risk_types.count)
+        db.commit()
+        print(f"批次风险类型更新为: {batch.risk_type.value}")
+
     db.close()
     print("\n样例数据初始化完成！")
-    print(f"\n测试批次: {batch.batch_id}")
-    print("包含1条异常记录（TASK-002）：设备安全认证失败")
-    print("系统将识别该记录被 SEC_001 规则（安全认证失败）拦截")
+    print(f"\n测试批次: {batch_id}")
+    print("TASK-002: 安全认证失败，将被 SEC_001 规则拦截")
+    print("TASK-004: 网络连接超时，将被 NET_001 规则拦截")
+    print("访问 /api/v1/output/BATCH-2024-001/json 可查看完整归因结果")
 
 
 if __name__ == "__main__":

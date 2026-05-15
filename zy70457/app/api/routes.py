@@ -4,7 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from app.database import get_db
-from app.models import TaskBatch, TaskResult, AttributionResult, EdgeNode, IoTReceipt, TaskStatus, RiskType
+from app.models import TaskBatch, TaskResult, AttributionResult, AttributionRule, EdgeNode, IoTReceipt, TaskStatus, RiskType
 from app.schemas import (
     TaskBatchCreate, TaskBatch as TaskBatchSchema,
     TaskResultCreate, TaskResult as TaskResultSchema,
@@ -269,6 +269,7 @@ def get_node_iot_receipts(node_id: str, db: Session = Depends(get_db)):
 @router.get("/attribution/history")
 def get_attribution_history(
     batch_id: Optional[str] = None,
+    operator: Optional[str] = None,
     risk_type: Optional[RiskType] = None,
     is_manual_modified: Optional[bool] = None,
     db: Session = Depends(get_db)
@@ -281,6 +282,9 @@ def get_attribution_history(
         query = query.filter(AttributionResult.risk_type == risk_type)
     if is_manual_modified is not None:
         query = query.filter(AttributionResult.is_manual_modified == is_manual_modified)
+    if operator:
+        query = query.join(TaskBatch, TaskBatch.batch_id == AttributionResult.batch_id)
+        query = query.filter(TaskBatch.operator.contains(operator))
 
     results = query.order_by(AttributionResult.created_at.desc()).all()
 
