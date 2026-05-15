@@ -1,0 +1,83 @@
+{
+  "id": "7f290c4e-2df0-4f78-82ac-d4fcaa767ce4",
+  "version": "1.0.0",
+  "release_date": "2026-05-15",
+  "description": "灰度发布第一版",
+  "items": [
+    {
+      "id": "931ae04a-d2dd-49ab-927d-04584cd6aefe",
+      "file_summary": "用户协议更新",
+      "file_path": "/legal/user_agreement_v2.md",
+      "status": "success",
+      "comp_action_status": "executed",
+      "evidence_fields": [],
+      "failure_reason": null,
+      "model_review": null,
+      "manual_notes": []
+    },
+    {
+      "id": "750b1e60-94c3-433c-884e-c117ce6f7873",
+      "file_summary": "隐私政策合规检查",
+      "file_path": "/legal/privacy_policy_check.md",
+      "status": "failed",
+      "comp_action_status": "not_executed",
+      "evidence_fields": [
+        {
+          "key": "legal_check_result",
+          "value": "not_compliant",
+          "original_source": "法务系统API_20240515",
+          "trace_id": "947dad0b-1a20-4be8-bc96-ada85db0a847"
+        }
+      ],
+      "failure_reason": null,
+      "model_review": {
+        "id": "82c4c040-5bdf-434b-958b-71fcb8fcfbef",
+        "snippet_id": "snippet_001",
+        "snippet_content": "隐私政策第三条用户数据收集条款",
+        "model_name": "GPT-4-legal",
+        "model_result": {
+          "compliance_score": 0.75,
+          "issues_found": [
+            "数据保留期限未明确"
+          ]
+        },
+        "human_confirmed": true,
+        "confirmer": "资深法务李四",
+        "confirmed_at": "2026-05-15T20:42:25.940181",
+        "confirmation_notes": "模型识别准确，该问题确实需要修正"
+      },
+      "manual_notes": [
+        {
+          "id": "ba5c1242-3acb-44d1-be9d-6752e7c5e55e",
+          "author": "法务专员张三",
+          "content": "经人工复核，该条款符合最新法规，系统判断过于严格",
+          "created_at": "2026-05-15T20:42:10.086483",
+          "original_value": {
+            "system_judgment": "failed",
+            "human_judgment": "passed"
+          }
+        }
+      ]
+    }
+  ],
+  "overall_status": "partial",
+  "created_at": "2026-05-15T20:41:24.691503",
+  "updated_at": "2026-05-15T20:42:25.940187",
+  "failure_items": [
+    {
+      "id": "6f492a2a-023b-4430-873c-f13b39864a91",
+      "item_id": "750b1e60-94c3-433c-884e-c117ce6f7873",
+      "item_type": "release_item",
+      "reason": "处理失败",
+      "details": {
+        "file_summary": "隐私政策合规检查",
+        "file_path": "/legal/privacy_policy_check.md",
+        "status": "failed",
+        "comp_action": "not_executed"
+      },
+      "created_at": "2026-05-15T20:41:42.245133",
+      "assignee": null
+    }
+  ],
+  "material_summary": "法务证据材料汇总"
+}
