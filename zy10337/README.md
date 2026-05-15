@@ -178,7 +178,7 @@ PENDING → PROCESSING → SUCCESS / FAILED → REPLAYING → SUCCESS / FAILED
   - 回调完成后清空 `previousStatus`
   - 添加边界保护 `if (count < 0) count = 0`，防止计数为负数
 
-### 4. 重放状态过滤
+### 5. 重放状态过滤
 - 仅允许 FAILED 和 REPLAYING 状态的单据被重放
 - 成功单据的重放请求会被跳过并记录 warning
 - 避免状态流转混乱
