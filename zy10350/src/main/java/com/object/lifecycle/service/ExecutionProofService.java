@@ -65,4 +65,9 @@ public class ExecutionProofService {
     public List<ExecutionProof> getProofsByTimeRange(LocalDateTime start, LocalDateTime end) {
         return proofRepository.findByExecutionTimeBetweenOrderByExecutionTimeDesc(start, end);
     }
+
+    public ExecutionProof getProofById(String proofId) {
+        return proofRepository.findByProofId(proofId)
+                .orElseThrow(() -> new IllegalArgumentException("执行证明不存在: " + proofId));
+    }
 }

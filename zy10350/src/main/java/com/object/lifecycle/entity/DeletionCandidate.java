@@ -2,7 +2,7 @@ package com.object.lifecycle.entity;
 
 import com.object.lifecycle.common.BaseEntity;
 import com.object.lifecycle.enums.TaskStatus;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 

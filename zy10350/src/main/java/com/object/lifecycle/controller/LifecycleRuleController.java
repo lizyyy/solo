@@ -9,7 +9,7 @@ import com.object.lifecycle.enums.RuleStatus;
 import com.object.lifecycle.service.AuditLogService;
 import com.object.lifecycle.service.ExecutionProofService;
 import com.object.lifecycle.service.LifecycleRuleService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

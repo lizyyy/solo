@@ -44,7 +44,7 @@ public class LifecycleRuleService {
         rule.setEnabled(true);
 
         LifecycleRule saved = ruleRepository.save(rule);
-        auditLogService.logAction("LifecycleRule", saved.getId().toString(), "CREATE", null, null);
+        auditLogService.logAction("LifecycleRule", saved.getRuleId(), "CREATE", null, null);
         log.info("创建生命周期规则: {}", saved.getRuleId());
         return saved;
     }
@@ -79,7 +79,7 @@ public class LifecycleRuleService {
         RuleStatus oldStatus = rule.getStatus();
         rule.setStatus(RuleStatus.VERIFIED);
         LifecycleRule saved = ruleRepository.save(rule);
-        auditLogService.logAction("LifecycleRule", saved.getId().toString(), "VERIFY",
+        auditLogService.logAction("LifecycleRule", saved.getRuleId(), "VERIFY",
                 "status", oldStatus.name(), RuleStatus.VERIFIED.name());
         return saved;
     }
@@ -94,7 +94,7 @@ public class LifecycleRuleService {
         RuleStatus oldStatus = rule.getStatus();
         rule.setStatus(RuleStatus.ACTIVE);
         LifecycleRule saved = ruleRepository.save(rule);
-        auditLogService.logAction("LifecycleRule", saved.getId().toString(), "ACTIVATE",
+        auditLogService.logAction("LifecycleRule", saved.getRuleId(), "ACTIVATE",
                 "status", oldStatus.name(), RuleStatus.ACTIVE.name());
         return saved;
     }
@@ -109,7 +109,7 @@ public class LifecycleRuleService {
         RuleStatus oldStatus = rule.getStatus();
         rule.setStatus(RuleStatus.SUSPENDED);
         LifecycleRule saved = ruleRepository.save(rule);
-        auditLogService.logAction("LifecycleRule", saved.getId().toString(), "SUSPEND",
+        auditLogService.logAction("LifecycleRule", saved.getRuleId(), "SUSPEND",
                 "status", oldStatus.name(), RuleStatus.SUSPENDED.name());
         return saved;
     }
@@ -124,7 +124,7 @@ public class LifecycleRuleService {
         RuleStatus oldStatus = rule.getStatus();
         rule.setStatus(RuleStatus.CANCELLED);
         LifecycleRule saved = ruleRepository.save(rule);
-        auditLogService.logAction("LifecycleRule", saved.getId().toString(), "CANCEL",
+        auditLogService.logAction("LifecycleRule", saved.getRuleId(), "CANCEL",
                 "status", oldStatus.name(), RuleStatus.CANCELLED.name());
         return saved;
     }
