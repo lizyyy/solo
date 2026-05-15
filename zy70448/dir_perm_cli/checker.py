@@ -31,7 +31,6 @@ class PermissionDriftChecker:
         overall_status = self._calculate_overall_status(check_results)
         
         conclusion = DriftConclusion(
-            conclusion_id=f"CON{uuid.uuid4().hex[:12]}",
             submission_id=material.submission_id,
             batch_id=material.batch_id,
             overall_status=overall_status,

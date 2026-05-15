@@ -1,5 +1,6 @@
 import json
 import hashlib
+import tempfile
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from datetime import datetime
@@ -7,15 +8,34 @@ from tinydb import TinyDB, Query
 from .models import SubmissionMaterial, DriftConclusion, CheckStatus
 
 
+class StorageInitError(Exception):
+    """存储初始化失败异常"""
+    pass
+
+
 class StorageManager:
     def __init__(self, db_path: Optional[str] = None):
+        self._init_db(db_path)
+    
+    def _init_db(self, db_path: Optional[str] = None):
         if db_path is None:
-            home_dir = Path.home()
-            config_dir = home_dir / ".dir_perm_cli"
-            config_dir.mkdir(exist_ok=True)
-            db_path = str(config_dir / "db.json")
+            try:
+                home_dir = Path.home()
+                config_dir = home_dir / ".dir_perm_cli"
+                config_dir.mkdir(exist_ok=True)
+                db_path = str(config_dir / "db.json")
+            except (PermissionError, OSError) as e:
+                raise StorageInitError(
+                    f"无法创建数据目录 {config_dir}: {str(e)}。请检查主目录权限或使用 --db-path 指定可写路径。"
+                ) from e
         
-        self.db = TinyDB(db_path)
+        try:
+            self.db = TinyDB(db_path)
+        except (PermissionError, OSError) as e:
+            raise StorageInitError(
+                f"无法打开数据库文件 {db_path}: {str(e)}。请检查文件权限。"
+            ) from e
+        
         self.submissions_table = self.db.table("submissions")
         self.conclusions_table = self.db.table("conclusions")
         self.materials_table = self.db.table("materials")
@@ -49,7 +69,10 @@ class StorageManager:
     
     def save_submission(self, material: SubmissionMaterial) -> str:
         material_dict = json.loads(material.model_dump_json())
-        self.submissions_table.upsert(material_dict, Query().submission_id == material.submission_id)
+        existing = self.submissions_table.get(Query().submission_id == material.submission_id)
+        if existing:
+            raise ValueError(f"提交ID已存在: {material.submission_id}")
+        self.submissions_table.insert(material_dict)
         return material.submission_id
     
     def get_submission(self, submission_id: str) -> Optional[SubmissionMaterial]:
@@ -72,7 +95,10 @@ class StorageManager:
     
     def save_conclusion(self, conclusion: DriftConclusion) -> str:
         conclusion_dict = json.loads(conclusion.model_dump_json())
-        self.conclusions_table.upsert(conclusion_dict, Query().conclusion_id == conclusion.conclusion_id)
+        existing = self.conclusions_table.get(Query().conclusion_id == conclusion.conclusion_id)
+        if existing:
+            raise ValueError(f"结论ID已存在: {conclusion.conclusion_id}")
+        self.conclusions_table.insert(conclusion_dict)
         return conclusion.conclusion_id
     
     def get_conclusion(self, conclusion_id: str) -> Optional[DriftConclusion]:

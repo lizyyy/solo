@@ -9,12 +9,23 @@ from rich.tree import Tree
 from rich.text import Text
 from .__init__ import __version__
 from .processor import MaterialProcessor
-from .storage import StorageManager
+from .storage import StorageManager, StorageInitError
 from .models import CheckStatus
 
 
 console = Console()
-processor = MaterialProcessor()
+_processor = None
+
+
+def get_processor() -> MaterialProcessor:
+    global _processor
+    if _processor is None:
+        try:
+            _processor = MaterialProcessor()
+        except StorageInitError as e:
+            console.print(f"[red]存储初始化失败: {str(e)}[/red]")
+            raise click.Abort()
+    return _processor
 
 
 def print_status(status: CheckStatus) -> str:
@@ -46,6 +57,7 @@ def submit(file_path, batch_id, title, department, submitter):
         with open(file_path, 'r', encoding='utf-8') as f:
             raw_data = json.load(f)
         
+        processor = get_processor()
         result = processor.process_material(raw_data, batch_id, title, department, submitter)
         
         if result.is_duplicate:
@@ -105,6 +117,7 @@ def submit(file_path, batch_id, title, department, submitter):
 @click.option("--batch-id", help="按批次ID筛选")
 def list_submissions(batch_id):
     """列出所有提交记录"""
+    processor = get_processor()
     if batch_id:
         submissions = processor.storage.get_submissions_by_batch(batch_id)
     else:
@@ -141,6 +154,7 @@ def list_submissions(batch_id):
 @click.argument("submission_id")
 def show(submission_id):
     """查看单个提交的详细信息"""
+    processor = get_processor()
     submission = processor.get_submission_by_id(submission_id)
     if not submission:
         console.print(f"[red]未找到提交ID: {submission_id}[/red]")
@@ -220,6 +234,7 @@ def show(submission_id):
 @click.option("--batch-id", help="按批次ID筛选")
 def export(output, batch_id):
     """导出检测结果"""
+    processor = get_processor()
     result_json = processor.export_results(output_format="json", batch_id=batch_id)
     
     if output:
@@ -236,6 +251,7 @@ def export(output, batch_id):
 @click.option("--batch-id", help="按批次ID筛选")
 def query_node(node_id, node_name, batch_id):
     """按审批节点回查相关提交"""
+    processor = get_processor()
     results = processor.query_by_approval_node(node_id=node_id, node_name=node_name, batch_id=batch_id)
     
     if not results:
