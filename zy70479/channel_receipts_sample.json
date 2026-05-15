@@ -1,0 +1,165 @@
+[
+  {
+    "business_no": "PAY202605160001",
+    "channel_code": "CH001",
+    "amount": 1100.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160002",
+    "channel_code": "CH002",
+    "amount": 1200.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160003",
+    "channel_code": "CH003",
+    "amount": 1300.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160004",
+    "channel_code": "CH004",
+    "amount": 1400.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160005",
+    "channel_code": "CH005",
+    "amount": 1500.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160006",
+    "channel_code": "CH006",
+    "amount": 1600.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160007",
+    "channel_code": "CH007",
+    "amount": 1700.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160008",
+    "channel_code": "CH008",
+    "amount": 1800.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160009",
+    "channel_code": "CH009",
+    "amount": 1900.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160010",
+    "channel_code": "CH010",
+    "amount": 2000.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = ? AND channel_code = ?",
+    "description": "正确使用参数化查询",
+    "expected_result": "pass",
+    "source": "支付宝渠道回执"
+  },
+  {
+    "business_no": "PAY202605160011",
+    "channel_code": "CH011",
+    "amount": 5000.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE business_no = 'PAY202605160011'",
+    "description": "字符串拼接SQL - 注入风险",
+    "expected_result": "fail",
+    "source": "微信支付渠道回执"
+  },
+  {
+    "business_no": "PAY202605160012",
+    "channel_code": "CH012",
+    "amount": 3000.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE amount > 1000 AND status = 'success'",
+    "description": "f-string格式化SQL - 注入风险",
+    "expected_result": "fail",
+    "source": "银联渠道回执"
+  },
+  {
+    "business_no": "PAY202605160013",
+    "channel_code": "CH013",
+    "amount": 2500.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE channel_code = '%s'",
+    "description": "format方法格式化SQL - 注入风险",
+    "expected_result": "fail",
+    "source": "京东支付渠道回执"
+  },
+  {
+    "business_no": "PAY202605160014",
+    "channel_code": "CH014",
+    "amount": 8000.0,
+    "status": "success",
+    "sql": "SELECT * FROM payment_records WHERE id = 12345",
+    "description": "百分号格式化SQL - 注入风险",
+    "expected_result": "fail",
+    "source": "美团支付渠道回执"
+  },
+  {
+    "business_no": "DIRTY202605160099",
+    "channel_code": "DIRTY",
+    "amount": -99999.99,
+    "status": "异常",
+    "sql": "",
+    "description": "脏数据 - 金额为负，SQL为空，业务单号格式异常",
+    "expected_result": "skip",
+    "source": "边缘节点清册-异常回执",
+    "is_dirty": true
+  },
+  {
+    "business_no": "",
+    "channel_code": "CH016",
+    "amount": 1500.0,
+    "status": "success",
+    "sql": "SELECT * FROM orders WHERE id = ?",
+    "description": "脏数据 - 业务单号为空，会被吞掉",
+    "expected_result": "swallowed",
+    "source": "边缘节点清册-缺失业务单号",
+    "is_dirty": true,
+    "will_be_swallowed": true
+  }
+]
