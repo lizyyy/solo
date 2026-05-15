@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 调用成本分摊服务 - 管理面板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #5a67d8;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .api-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #667eea;
+            border-radius: 6px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .api-link:hover {
+            background: #667eea;
+            color: white;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>API 调用成本分摊服务</h1>
+        <p style="margin-top: 0.5rem; opacity: 0.9;">版本 1.0.0</p>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>系统状态</h2>
+            <div class="grid">
+                <div class="stat-item">
+                    <span class="status-badge status-healthy" id="systemStatus">检查中...</span>
+                    <p class="stat-label">服务状态</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="callerCount">-</div>
+                    <p class="stat-label">调用方数量</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="apiGroupCount">-</div>
+                    <p class="stat-label">接口组数量</p>
+                </div>
+            </div>
+            <button class="btn" onclick="checkHealth()">刷新状态</button>
+        </div>
+        
+        <div class="card">
+            <h2>API 文档</h2>
+            <a href="/docs" class="api-link" target="_blank">Swagger UI (交互式文档)</a>
+            <a href="/redoc" class="api-link" target="_blank">ReDoc (详细文档)</a>
+        </div>
+        
+        <div class="card">
+            <h2>快速开始 - Curl 示例</h2>
+            <p style="margin-bottom: 1rem;">点击按钮复制对应的 curl 命令：</p>
+            
+            <button class="btn btn-secondary" onclick="copyCommand('health')">健康检查</button>
+            <button class="btn btn-secondary" onclick="copyCommand('createCaller')">创建调用方</button>
+            <button class="btn btn-secondary" onclick="copyCommand('createApiGroup')">创建接口组</button>
+            <button class="btn btn-secondary" onclick="copyCommand('createPrice')">设置单价</button>
+            <button class="btn btn-secondary" onclick="copyCommand('createRule')">创建分摊规则</button>
+            <button class="btn btn-secondary" onclick="copyCommand('batchRecords')">批量提交调用记录</button>
+            <button class="btn btn-secondary" onclick="copyCommand('calculate')">计算月度分摊</button>
+            <button class="btn btn-secondary" onclick="copyCommand('trial')">成本试算</button>
+            <button class="btn btn-secondary" onclick="copyCommand('queryHistory')">历史查询</button>
+            <button class="btn btn-secondary" onclick="copyCommand('export')">导出数据</button>
+            
+            <div class="code-block" id="commandDisplay" style="margin-top: 1rem;">
+# 点击上方按钮查看对应 curl 命令
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>功能说明</h2>
+            <ul style="line-height: 2; padding-left: 1.5rem;">
+                <li><strong>调用方管理</strong> - 管理使用 API 的业务系统或团队</li>
+                <li><strong>接口组管理</strong> - 对 API 进行分组，便于统一计费</li>
+                <li><strong>资源单价</strong> - 设置不同接口组的调用单价，支持版本管理</li>
+                <li><strong>调用记录</strong> - 批量提交调用量，支持幂等性</li>
+                <li><strong>分摊规则</strong> - 定义成本分摊计算规则，支持版本管理</li>
+                <li><strong>月度分摊</strong> - 按月聚合调用量并计算分摊成本</li>
+                <li><strong>成本试算</strong> - 预览计算结果，不生成正式数据</li>
+                <li><strong>调整记录</strong> - 支持对分摊结果进行人工调整</li>
+                <li><strong>历史查询</strong> - 分页查询历史分摊结果</li>
+                <li><strong>数据导出</strong> - 导出为 Excel 格式，支持幂等性</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const commands = {
+            health: `curl -X GET "http://localhost:8000/health" -H "accept: application/json"`,
+            
+            createCaller: `curl -X POST "http://localhost:8000/callers/" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "code": "CALLER001",
+    "name": "电商平台",
+    "description": "主站电商业务系统",
+    "department": "技术部",
+    "is_active": true
+  }'`,
+            
+            createApiGroup: `curl -X POST "http://localhost:8000/api-groups/" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "code": "APIGRP001",
+    "name": "用户接口组",
+    "description": "用户相关的 API 接口",
+    "category": "基础服务",
+    "is_active": true
+  }'`,
+            
+            createPrice: `curl -X POST "http://localhost:8000/resource-prices/" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "api_group_id": 1,
+    "unit_price": 0.05,
+    "currency": "CNY",
+    "unit": "call",
+    "effective_date": "2024-01-01T00:00:00",
+    "is_active": true,
+    "created_by": "admin"
+  }'`,
+            
+            createRule: `curl -X POST "http://localhost:8000/allocation-rules/" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "默认分摊规则",
+    "description": "按实际调用量比例分摊",
+    "allocation_type": "proportional",
+    "rounding_precision": 2,
+    "effective_date": "2024-01-01T00:00:00",
+    "is_active": true,
+    "created_by": "admin"
+  }'`,
+            
+            batchRecords: `curl -X POST "http://localhost:8000/call-records/batch" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Idempotency-Key: batch_202401_001" \\
+  -d '{
+    "records": [
+      {
+        "caller_id": 1,
+        "api_group_id": 1,
+        "call_date": "2024-01-15T10:30:00",
+        "call_count": 10000,
+        "success_count": 9800,
+        "fail_count": 200
+      }
+    ],
+    "idempotency_key": "batch_202401_001"
+  }'`,
+            
+            calculate: `curl -X POST "http://localhost:8000/monthly-results/calculate" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "month": "2024-01",
+    "rule_id": 1,
+    "idempotency_key": "calc_202401_001"
+  }'`,
+            
+            trial: `curl -X POST "http://localhost:8000/cost-trial" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "month": "2024-01",
+    "rule_id": 1
+  }'`,
+            
+            queryHistory: `curl -X GET "http://localhost:8000/history/monthly-results?month=2024-01&page=1&page_size=50" \\
+  -H "accept: application/json"`,
+            
+            export: `curl -X POST "http://localhost:8000/export/xlsx" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "month": "2024-01",
+    "idempotency_key": "export_202401_001",
+    "format": "xlsx"
+  }' --output cost_allocation_202401.xlsx`
+        };
+        
+        function copyCommand(type) {
+            const command = commands[type];
+            document.getElementById('commandDisplay').textContent = command;
+            
+            navigator.clipboard.writeText(command).then(() => {
+                alert('命令已复制到剪贴板！');
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        }
+        
+        async function checkHealth() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                document.getElementById('systemStatus').textContent = '运行正常';
+                document.getElementById('systemStatus').className = 'status-badge status-healthy';
+                
+                const callersResponse = await fetch('/callers/?limit=1000');
+                const callers = await callersResponse.json();
+                document.getElementById('callerCount').textContent = callers.length;
+                
+                const groupsResponse = await fetch('/api-groups/?limit=1000');
+                const groups = await groupsResponse.json();
+                document.getElementById('apiGroupCount').textContent = groups.length;
+            } catch (error) {
+                document.getElementById('systemStatus').textContent = '连接失败';
+                document.getElementById('systemStatus').style.background = '#f8d7da';
+                document.getElementById('systemStatus').style.color = '#721c24';
+            }
+        }
+        
+        checkHealth();
+    </script>
+</body>
+</html>

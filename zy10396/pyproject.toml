@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "api-cost-allocation"
+version = "0.1.0"
+description = "API 调用成本分摊服务"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.109.0"
+uvicorn = { extras = ["standard"], version = "^0.27.0" }
+sqlalchemy = "^2.0.25"
+pydantic = "^2.5.3"
+pydantic-settings = "^2.1.0"
+python-multipart = "^0.0.6"
+python-dateutil = "^2.8.2"
+pandas = "^2.1.4"
+openpyxl = "^3.1.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
