@@ -1,0 +1,78 @@
+[
+  {
+    "id": "e0422902-063a-4fcb-8b00-7cad1ba17f93",
+    "batchId": "2860afb3",
+    "operationType": "cert-issue",
+    "operator": "system",
+    "timestamp": "2026-05-15T23:49:16.978Z",
+    "riskType": "low",
+    "success": true,
+    "details": {
+      "success": true,
+      "count": 4,
+      "message": "演示数据已加载",
+      "batchIds": [
+        "7b65050e",
+        "3ff9204f"
+      ]
+    }
+  },
+  {
+    "id": "0ddedfae-22ed-4d92-bb5a-0c6e2bb9d560",
+    "batchId": "594f23b3",
+    "operationType": "rollback",
+    "operator": "system",
+    "timestamp": "2026-05-15T23:49:35.145Z",
+    "riskType": "high",
+    "success": true,
+    "details": {
+      "success": true,
+      "successCount": 3,
+      "failedCount": 1,
+      "successItems": [
+        {
+          "id": "908450fb-7ca7-478a-9df2-a9fcbb85bb54",
+          "name": "服务器证书-001",
+          "batchId": "7b65050e"
+        },
+        {
+          "id": "4424eb1c-179e-4ae1-a25a-993bd5c1916d",
+          "name": "API网关证书-002",
+          "batchId": "7b65050e"
+        },
+        {
+          "id": "dc7d01cc-0df6-4413-b4e2-42bc8ebf7ef7",
+          "name": "数据库证书-003",
+          "batchId": "3ff9204f"
+        }
+      ],
+      "failedItems": [
+        {
+          "id": "d7197c6a-31ad-42d4-a795-a8d70cf963a7",
+          "name": "回滚测试证书-NOEVIDENCE",
+          "batchId": "7b65050e",
+          "error": "无审批证据，无法回滚",
+          "failedAt": "2026-05-15T23:49:35.144Z",
+          "operator": "operator2",
+          "hasEvidence": false,
+          "riskType": "high"
+        }
+      ],
+      "message": "回滚完成: 成功 3 项, 失败 1 项"
+    }
+  },
+  {
+    "id": "40e1a186-7f2f-45e4-a944-c931b4278393",
+    "batchId": "3268558a",
+    "operationType": "bus-import",
+    "operator": "system",
+    "timestamp": "2026-05-15T23:49:44.219Z",
+    "riskType": "low",
+    "success": true,
+    "details": {
+      "success": true,
+      "count": 5,
+      "message": "已加载演示班车预约数据"
+    }
+  }
+]

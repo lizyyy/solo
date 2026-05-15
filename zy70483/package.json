@@ -1,0 +1,22 @@
+{
+  "name": "dependency-manager-cli",
+  "version": "1.0.0",
+  "description": "依赖管理命令行工具 - 处理启动顺序、证书签发、回滚机制等",
+  "main": "src/index.js",
+  "bin": {
+    "depmgr": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "uuid": "^9.0.0"
+  },
+  "keywords": ["dependency", "cli", "certificate", "rollback"],
+  "author": "",
+  "license": "MIT"
+}
