@@ -27,35 +27,56 @@
 
 ## 技术栈
 
-- Java 17
-- Spring Boot 3.2
+- Java 8+ (兼容 Java 8-21)
+- Spring Boot 2.7.18
 - Spring Data JPA
-- H2 Database (内存)
+- H2 Database (文件持久化存储)
 - Lombok
 - Hibernate Validator
 
 ## 快速开始
 
-### 1. 编译项目
+### 环境要求
+- Java 8 或更高版本（兼容 Java 8-21）
+- 无需预先安装 Maven（已内置 Maven Wrapper）
 
+### 一键启动（推荐）
+
+**Mac/Linux:**
 ```bash
-mvn clean package -DskipTests
+chmod +x start.sh && ./start.sh
 ```
 
-### 2. 启动项目
-
-```bash
-mvn spring-boot:run
+**Windows:**
+```cmd
+start.bat
 ```
 
-服务启动后访问: http://localhost:8080
+### 手动启动方式
 
-### 3. H2 控制台
+使用 Maven Wrapper（无需本地安装 Maven）:
 
-访问: http://localhost:8080/h2-console
-- JDBC URL: `jdbc:h2:mem:approvaldb`
+```bash
+# 编译项目
+./mvnw clean package -DskipTests   # Mac/Linux
+mvnw.cmd clean package -DskipTests  # Windows
+
+# 启动项目
+java -jar target/*.jar
+```
+
+### 服务访问
+
+启动成功后访问:
+- API 服务: http://localhost:8080
+- H2 数据库控制台: http://localhost:8080/h2-console
+
+**数据库连接信息（持久化存储）:**
+- JDBC URL: `jdbc:h2:file:./data/approvaldb`
 - 用户名: `sa`
 - 密码: (空)
+
+> 💡 数据持久化说明：数据库文件存储在 `./data/` 目录下，重启服务后数据不会丢失
 
 ## API 接口说明
 

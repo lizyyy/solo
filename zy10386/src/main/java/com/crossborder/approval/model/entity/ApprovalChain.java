@@ -1,7 +1,7 @@
 package com.crossborder.approval.model.entity;
 
 import com.crossborder.approval.model.enums.ApprovalResult;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;

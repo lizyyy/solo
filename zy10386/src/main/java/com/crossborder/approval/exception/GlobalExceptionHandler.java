@@ -1,7 +1,7 @@
 package com.crossborder.approval.exception;
 
 import com.crossborder.approval.model.dto.ApiResponse;
-import jakarta.persistence.EntityNotFoundException;
+import javax.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;

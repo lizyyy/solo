@@ -1,8 +1,8 @@
 package com.crossborder.approval.model.dto;
 
 import com.crossborder.approval.model.enums.RegionType;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;

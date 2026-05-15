@@ -1,0 +1,34 @@
+#!/bin/sh
+# Maven Wrapper Bootstrap Script
+# This script will download and use the correct version of Maven
+
+set -e
+
+# Configuration
+MAVEN_VERSION="3.9.6"
+MAVEN_HOME="$HOME/.m2/wrapper/dists/apache-maven-$MAVEN_VERSION"
+MAVEN_URL="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/apache-maven-$MAVEN_VERSION-bin.tar.gz"
+
+# Check if Maven is already installed
+if [ ! -d "$MAVEN_HOME" ]; then
+    echo "Downloading Maven $MAVEN_VERSION..."
+    mkdir -p "$MAVEN_HOME"
+    
+    # Download Maven
+    if command -v curl > /dev/null 2>&1; then
+        curl -fL "$MAVEN_URL" -o "$MAVEN_HOME/maven.tar.gz"
+    elif command -v wget > /dev/null 2>&1; then
+        wget -O "$MAVEN_HOME/maven.tar.gz" "$MAVEN_URL"
+    else
+        echo "Error: Neither curl nor wget is available. Please install one of them."
+        exit 1
+    fi
+    
+    # Extract Maven
+    tar -xzf "$MAVEN_HOME/maven.tar.gz" -C "$MAVEN_HOME" --strip-components=1
+    rm "$MAVEN_HOME/maven.tar.gz"
+    echo "Maven $MAVEN_VERSION installed successfully."
+fi
+
+# Execute Maven
+exec "$MAVEN_HOME/bin/mvn" "$@"

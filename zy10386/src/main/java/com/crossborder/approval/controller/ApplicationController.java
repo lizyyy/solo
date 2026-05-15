@@ -12,7 +12,7 @@ import com.crossborder.approval.model.enums.ApplicationStatus;
 import com.crossborder.approval.model.enums.RegionType;
 import com.crossborder.approval.repository.AuditLogRepository;
 import com.crossborder.approval.service.*;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
