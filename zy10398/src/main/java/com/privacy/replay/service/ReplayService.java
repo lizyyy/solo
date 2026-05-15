@@ -180,7 +180,7 @@ public class ReplayService {
     }
 
     private BigDecimal calculateBudgetCost(List<String> sampleIds, MaskingLevel maskingLevel) {
-        int baseCost = sampleIds.size() * 10;
+        int baseCost = sampleIds.size() * 15;
         int levelMultiplier = maskingLevel.getLevel() + 1;
         return BigDecimal.valueOf(baseCost * levelMultiplier);
     }

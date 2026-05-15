@@ -29,16 +29,18 @@
 ### 启动命令
 
 ```bash
-# 编译项目
+# 1. 编译项目（首次运行必须执行）
 mvn clean package -DskipTests
 
-# 启动服务
+# 2. 启动服务（两种方式二选一）
+# 方式A：使用jar包启动
 java -jar target/api-replay-budget-1.0.0.jar
 
-# 或使用 Maven 直接启动
+# 方式B：使用Maven直接启动（推荐开发时）
 mvn spring-boot:run
 ```
 
+**注意**：首次运行必须先执行 `mvn clean package` 生成 jar 包。
 服务启动后访问：http://localhost:8080
 
 ### H2 数据库控制台
@@ -164,21 +166,22 @@ GET /api/replay/history?requesterId=user001
 ### 正常流程测试
 
 ```bash
-# 1. 先获取用户样本列表，拿到 sampleId
+# 1. 先获取用户样本列表，拿到真实的 sampleId
 curl "http://localhost:8080/api/sample/user/user001"
 
-# 2. 创建回放申请
+# 2. 从返回结果中提取样本ID（如 SMPxxxxxxxxxx），替换下方的 <sampleId>
+# 3. 创建回放申请
 curl -X POST "http://localhost:8080/api/replay/request" \
   -H "Content-Type: application/json" \
   -d '{
     "requestId": "TEST001",
     "requesterId": "user001",
     "purpose": "测试",
-    "sampleIds": ["SMPxxx1"],
+    "sampleIds": ["<sampleId>"],
     "maskingLevel": "MEDIUM"
   }'
 
-# 3. 审批申请
+# 4. 审批申请
 curl -X POST "http://localhost:8080/api/replay/approve" \
   -H "Content-Type: application/json" \
   -d '{
@@ -187,7 +190,7 @@ curl -X POST "http://localhost:8080/api/replay/approve" \
     "approved": true
   }'
 
-# 4. 执行申请
+# 5. 执行申请
 curl -X POST "http://localhost:8080/api/replay/execute" \
   -H "Content-Type: application/json" \
   -d '{"requestId": "TEST001"}'
@@ -198,16 +201,23 @@ curl -X POST "http://localhost:8080/api/replay/execute" \
 **预算不足的拦截示例**
 
 ```bash
-# user002 只有 500 预算
-# 执行一个高成本请求会被拦截
+# 成本计算公式：样本数 × 15 × (脱敏级别 + 1)
+# 10个HIGH样本成本 = 10 × 15 × (3 + 1) = 600
+# user002 只有 500 预算，请求会被拦截
 
+# 1. 先获取用户样本列表
+curl "http://localhost:8080/api/sample/user/user001"
+
+# 2. 从结果中提取4个真实样本ID，复制6次凑够10个ID
+#    示例：["id1", "id2", "id3", "id4", "id1", "id2", "id3", "id4", "id1", "id2"]
+# 3. 创建回放申请
 curl -X POST "http://localhost:8080/api/replay/request" \
   -H "Content-Type: application/json" \
   -d '{
     "requestId": "TEST_BLOCK_001",
     "requesterId": "user002",
     "purpose": "测试拦截",
-    "sampleIds": ["SMPxxx1", "SMPxxx2", "SMPxxx3", "SMPxxx4", "SMPxxx5", "SMPxxx6", "SMPxxx7", "SMPxxx8", "SMPxxx9", "SMPxxx10"],
+    "sampleIds": ["<id1>", "<id2>", "<id3>", "<id4>", "<id1>", "<id2>", "<id3>", "<id4>", "<id1>", "<id2>"],
     "maskingLevel": "HIGH"
   }'
 
@@ -218,27 +228,28 @@ curl -X POST "http://localhost:8080/api/replay/request" \
 ### 重复请求测试
 
 ```bash
-# 连续提交两次相同 requestId 的请求
-# 第二次会返回重复请求错误，或直接返回第一次的结果
+# 1. 先获取样本ID
+curl "http://localhost:8080/api/sample/user/user001"
 
+# 2. 第一次提交
 curl -X POST "http://localhost:8080/api/replay/request" \
   -H "Content-Type: application/json" \
   -d '{
     "requestId": "TEST_DUP_001",
     "requesterId": "user001",
     "purpose": "重复测试",
-    "sampleIds": ["SMPxxx1"],
+    "sampleIds": ["<sampleId>"],
     "maskingLevel": "MEDIUM"
   }'
 
-# 再次提交相同请求
+# 3. 再次提交相同请求（幂等性保护生效）
 curl -X POST "http://localhost:8080/api/replay/request" \
   -H "Content-Type: application/json" \
   -d '{
     "requestId": "TEST_DUP_001",
     "requesterId": "user001",
     "purpose": "重复测试",
-    "sampleIds": ["SMPxxx1"],
+    "sampleIds": ["<sampleId>"],
     "maskingLevel": "MEDIUM"
   }'
 ```
@@ -247,7 +258,7 @@ curl -X POST "http://localhost:8080/api/replay/request" \
 
 ```bash
 # user001 默认脱敏级别是 MEDIUM
-# 请求 LOW 级别会被拦截
+# 请求 LOW 级别会被拦截（只能请求 >= 默认级别）
 
 curl -X POST "http://localhost:8080/api/replay/request" \
   -H "Content-Type: application/json" \
@@ -255,7 +266,7 @@ curl -X POST "http://localhost:8080/api/replay/request" \
     "requestId": "TEST_MASK_001",
     "requesterId": "user001",
     "purpose": "脱敏级别测试",
-    "sampleIds": ["SMPxxx1"],
+    "sampleIds": ["<sampleId>"],
     "maskingLevel": "LOW"
   }'
 
@@ -265,30 +276,49 @@ curl -X POST "http://localhost:8080/api/replay/request" \
 
 ## 一条会被拦截的路径
 
-**预算不足拦截测试：**
+**预算不足拦截测试（可重复验证）：**
 
 ```bash
-# user002 用户预算只有 500
-# 执行包含10个样本的高级别回放，预算成本超过500，会被拦截
+# 成本计算：10个样本 × 15 × (HIGH级别3 + 1) = 600
+# user002 预算只有 500，600 > 500，触发拦截
 
+# 步骤1：获取user001的样本（样本可跨用户申请使用，预算从申请人扣除）
+curl "http://localhost:8080/api/sample/user/user001"
+
+# 步骤2：从返回结果中复制第一个样本的 sampleId
+#        格式类似："sampleId": "SMPabc123def456"
+
+# 步骤3：将下面命令中的 <sampleId> 全部替换为真实的样本ID
+#        复制粘贴同一个ID 10次即可（系统支持重复使用同一样本）
 curl -X POST "http://localhost:8080/api/replay/request" \
   -H "Content-Type: application/json" \
   -d '{
     "requestId": "BLOCK_DEMO_001",
     "requesterId": "user002",
     "purpose": "拦截演示",
-    "sampleIds": ["SMP001", "SMP002", "SMP003", "SMP004", "SMP005", "SMP006", "SMP007", "SMP008", "SMP009", "SMP010"],
+    "sampleIds": ["<sampleId>", "<sampleId>", "<sampleId>", "<sampleId>", "<sampleId>", "<sampleId>", "<sampleId>", "<sampleId>", "<sampleId>", "<sampleId>"],
     "maskingLevel": "HIGH"
   }'
 ```
 
-**预期拦截响应：**
+**预期拦截响应（100%可复现）：**
 ```json
 {
   "code": 2002,
   "message": "隐私预算不足",
   "success": false
 }
+```
+
+**验证公式：**
+```
+预算成本 = 样本数量 × 15 × (脱敏级别 + 1)
+        = 10 × 15 × (3 + 1)
+        = 10 × 15 × 4
+        = 600
+
+user002 预算 = 500
+600 > 500 → 拦截 ✅
 ```
 
 ## 项目结构

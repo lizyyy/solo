@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -44,8 +46,9 @@ public class UserSampleService {
     }
 
     public void validateSamples(List<String> sampleIds) {
-        List<UserSample> samples = userSampleRepository.findBySampleIdIn(sampleIds);
-        if (samples.size() != sampleIds.size()) {
+        Set<String> uniqueIds = new HashSet<>(sampleIds);
+        List<UserSample> samples = userSampleRepository.findBySampleIdIn(uniqueIds);
+        if (samples.size() != uniqueIds.size()) {
             throw new BusinessException(ErrorCode.SAMPLE_NOT_FOUND);
         }
         for (UserSample sample : samples) {
