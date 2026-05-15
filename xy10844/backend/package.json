@@ -1,0 +1,23 @@
+{
+  "name": "vector-index-rebuild-console-backend",
+  "version": "1.0.0",
+  "description": "向量索引重建控制台后端服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "init-db": "node src/scripts/initDb.js",
+    "seed-data": "node src/scripts/seedData.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1",
+    "json2csv": "^6.0.0-alpha.2",
+    "joi": "^17.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
