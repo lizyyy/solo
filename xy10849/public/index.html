@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG 来源新鲜度控制台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .stat-card h3 {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .stat-card .trend {
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        
+        .stat-card.success .value { color: #10b981; }
+        .stat-card.warning .value { color: #f59e0b; }
+        .stat-card.danger .value { color: #ef4444; }
+        .stat-card.info .value { color: #3b82f6; }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+        }
+        
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-secondary { background: #f3f4f6; color: #374151; }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .progress-bar .fill.success { background: #10b981; }
+        .progress-bar .fill.warning { background: #f59e0b; }
+        .progress-bar .fill.danger { background: #ef4444; }
+        
+        .error-detail {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        
+        .error-detail h4 {
+            color: #991b1b;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .error-detail pre {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-content h3 {
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .refresh-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 RAG 来源新鲜度控制台</h1>
+    </div>
+    
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="tab active" data-tab="overview">总览</button>
+            <button class="tab" data-tab="snippets">引用片段</button>
+            <button class="tab" data-tab="tasks">刷新任务</button>
+            <button class="tab" data-tab="alerts">告警记录</button>
+            <button class="tab" data-tab="sources">数据源</button>
+        </div>
+        
+        <div id="overview" class="section active">
+            <div class="stats-grid">
+                <div class="stat-card info">
+                    <h3>活跃数据源</h3>
+                    <div class="value" id="stat-data-sources">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>引用片段总数</h3>
+                    <div class="value" id="stat-total-snippets">-</div>
+                </div>
+                <div class="stat-card warning">
+                    <h3>过期片段</h3>
+                    <div class="value" id="stat-expired-snippets">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>新鲜度</h3>
+                    <div class="value" id="stat-freshness-rate">-%</div>
+                </div>
+                <div class="stat-card danger">
+                    <h3>失败任务</h3>
+                    <div class="value" id="stat-failed-tasks">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>活跃告警</h3>
+                    <div class="value" id="stat-active-alerts">-</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="section-title">数据源新鲜度详情</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>数据源</th>
+                            <th>类型</th>
+                            <th>片段总数</th>
+                            <th>过期数量</th>
+                            <th>平均新鲜度</th>
+                        </tr>
+                    </thead>
+                    <tbody id="freshness-table">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <div class="toolbar">
+                    <h3 class="section-title">待处理任务</h3>
+                    <button class="btn btn-primary btn-sm refresh-btn" onclick="loadOverview()">
+                        <span>🔄 刷新</span>
+                    </button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>任务ID</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-tasks-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="snippets" class="section">
+            <div class="card">
+                <div class="toolbar">
+                    <h3 class="section-title">引用片段列表</h3>
+                    <button class="btn btn-primary" onclick="exportReport()">导出报告</button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>片段ID</th>
+                            <th>数据源</th>
+                            <th>内容摘要</th>
+                            <th>新鲜度</th>
+                            <th>是否过期</th>
+                            <th>最后修改</th>
+                        </tr>
+                    </thead>
+                    <tbody id="snippets-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="tasks" class="section">
+            <div class="card">
+                <div class="toolbar">
+                    <h3 class="section-title">刷新任务列表</h3>
+                    <button class="btn btn-primary" onclick="showCreateTaskModal()">新建任务</button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>任务ID</th>
+                            <th>片段ID</th>
+                            <th>状态</th>
+                            <th>重试次数</th>
+                            <th>是否人工修复</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasks-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="alerts" class="section">
+            <div class="card">
+                <h3 class="section-title">告警记录</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>告警ID</th>
+                            <th>类型</th>
+                            <th>级别</th>
+                            <th>消息</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alerts-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="sources" class="section">
+            <div class="card">
+                <div class="toolbar">
+                    <h3 class="section-title">数据源管理</h3>
+                    <button class="btn btn-primary" onclick="showCreateSourceModal()">新增数据源</button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>名称</th>
+                            <th>类型</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sources-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div id="manualFixModal" class="modal">
+        <div class="modal-content">
+            <h3>人工修复任务</h3>
+            <div class="form-group">
+                <label>任务ID</label>
+                <input type="text" id="fix-task-id" readonly>
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="fix-operator" placeholder="请输入操作人姓名">
+            </div>
+            <div class="form-group">
+                <label>修复说明</label>
+                <textarea id="fix-note" placeholder="请输入修复说明"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('manualFixModal')">取消</button>
+                <button class="btn btn-success" onclick="submitManualFix()">确认修复</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="createTaskModal" class="modal">
+        <div class="modal-content">
+            <h3>创建刷新任务</h3>
+            <div class="form-group">
+                <label>片段ID</label>
+                <input type="text" id="new-task-snippet-id" placeholder="请输入片段ID">
+            </div>
+            <div class="form-group">
+                <label>数据源ID</label>
+                <input type="text" id="new-task-source-id" placeholder="请输入数据源ID">
+            </div>
+            <div class="form-group">
+                <label>优先级</label>
+                <select id="new-task-priority">
+                    <option value="low">低</option>
+                    <option value="normal" selected>普通</option>
+                    <option value="high">高</option>
+                    <option value="critical">紧急</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>幂等Key（防重复提交）</label>
+                <input type="text" id="new-task-idempotency" placeholder="可选，用于防止重复提交">
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('createTaskModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitCreateTask()">创建</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="createSourceModal" class="modal">
+        <div class="modal-content">
+            <h3>新增数据源</h3>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" id="new-source-name" placeholder="请输入数据源名称">
+            </div>
+            <div class="form-group">
+                <label>类型</label>
+                <select id="new-source-type">
+                    <option value="web">网页</option>
+                    <option value="api">API</option>
+                    <option value="database">数据库</option>
+                    <option value="file">文件</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>URL（可选）</label>
+                <input type="text" id="new-source-url" placeholder="请输入URL">
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('createSourceModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitCreateSource()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                if (tab.dataset.tab === 'overview') loadOverview();
+                if (tab.dataset.tab === 'snippets') loadSnippets();
+                if (tab.dataset.tab === 'tasks') loadTasks();
+                if (tab.dataset.tab === 'alerts') loadAlerts();
+                if (tab.dataset.tab === 'sources') loadSources();
+            });
+        });
+        
+        function getStatusBadge(status) {
+            const styles = {
+                'pending': 'badge-secondary',
+                'running': 'badge-info',
+                'completed': 'badge-success',
+                'failed': 'badge-danger',
+                'active': 'badge-success',
+                'inactive': 'badge-secondary'
+            };
+            return `<span class="badge ${styles[status] || 'badge-secondary'}">${status}</span>`;
+        }
+        
+        function getLevelBadge(level) {
+            const styles = {
+                'critical': 'badge-danger',
+                'high': 'badge-warning',
+                'medium': 'badge-info',
+                'low': 'badge-secondary'
+            };
+            return `<span class="badge ${styles[level] || 'badge-secondary'}">${level}</span>`;
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleString('zh-CN');
+        }
+        
+        async function loadOverview() {
+            try {
+                const res = await fetch(`${API_BASE}/reports/overview`);
+                const data = await res.json();
+                
+                document.getElementById('stat-data-sources').textContent = data.active_data_sources;
+                document.getElementById('stat-total-snippets').textContent = data.total_snippets;
+                document.getElementById('stat-expired-snippets').textContent = data.expired_snippets;
+                document.getElementById('stat-freshness-rate').textContent = data.freshness_rate + '%';
+                document.getElementById('stat-failed-tasks').textContent = data.failed_tasks;
+                document.getElementById('stat-active-alerts').textContent = data.active_alerts;
+                
+                const freshnessRes = await fetch(`${API_BASE}/reports/freshness`);
+                const freshnessData = await freshnessRes.json();
+                
+                const table = document.getElementById('freshness-table');
+                table.innerHTML = freshnessData.map(item => `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.type}</td>
+                        <td>${item.total_snippets || 0}</td>
+                        <td>${item.expired_snippets || 0}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="fill ${(item.avg_freshness_score || 0) > 70 ? 'success' : (item.avg_freshness_score || 0) > 40 ? 'warning' : 'danger'}" style="width: ${item.avg_freshness_score || 0}%"></div>
+                                </div>
+                                <span>${(item.avg_freshness_score || 0).toFixed(1)}</span>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                const tasksRes = await fetch(`${API_BASE}/refresh-tasks?status=pending&limit=10`);
+                const tasksData = await tasksRes.json();
+                
+                const tasksTable = document.getElementById('pending-tasks-table');
+                tasksTable.innerHTML = tasksData.map(task => `
+                    <tr>
+                        <td><code>${task.id.substring(0, 8)}...</code></td>
+                        <td>${getStatusBadge(task.status)}</td>
+                        <td>${formatDate(task.created_at)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="updateTaskStatus('${task.id}', 'running')">开始执行</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                if (tasksData.length === 0) {
+                    tasksTable.innerHTML = '<tr><td colspan="4" class="empty-state">暂无待处理任务</td></tr>';
+                }
+                
+            } catch (err) {
+                console.error('加载总览失败', err);
+            }
+        }
+        
+        async function loadSnippets() {
+            try {
+                const res = await fetch(`${API_BASE}/snippets?limit=50`);
+                const data = await res.json();
+                
+                const table = document.getElementById('snippets-table');
+                table.innerHTML = data.map(snippet => `
+                    <tr>
+                        <td><code>${snippet.id.substring(0, 8)}...</code></td>
+                        <td>${snippet.data_source_id.substring(0, 8)}</td>
+                        <td>${snippet.content.substring(0, 50)}...</td>
+                        <td>
+                            <span class="badge ${snippet.freshness_score > 70 ? 'badge-success' : snippet.freshness_score > 40 ? 'badge-warning' : 'badge-danger'}">
+                                ${snippet.freshness_score}
+                            </span>
+                        </td>
+                        <td>${snippet.is_expired ? '<span class="badge badge-danger">是</span>' : '<span class="badge badge-success">否</span>'}</td>
+                        <td>${formatDate(snippet.last_modified_at)}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('加载片段失败', err);
+            }
+        }
+        
+        async function loadTasks() {
+            try {
+                const res = await fetch(`${API_BASE}/refresh-tasks?limit=50`);
+                const data = await res.json();
+                
+                const table = document.getElementById('tasks-table');
+                table.innerHTML = data.map(task => `
+                    <tr>
+                        <td><code>${task.id.substring(0, 8)}...</code></td>
+                        <td><code>${task.snippet_id.substring(0, 8)}...</code></td>
+                        <td>${getStatusBadge(task.status)}</td>
+                        <td>${task.retry_count || 0}</td>
+                        <td>${task.is_manual_fix ? '<span class="badge badge-success">是</span>' : '-'}</td>
+                        <td>${formatDate(task.created_at)}</td>
+                        <td class="actions">
+                            ${task.status === 'pending' ? `<button class="btn btn-sm btn-primary" onclick="updateTaskStatus('${task.id}', 'running')">执行</button>` : ''}
+                            ${task.status === 'failed' ? `
+                                <button class="btn btn-sm btn-success" onclick="retryTask('${task.id}')">重试</button>
+                                <button class="btn btn-sm btn-warning" onclick="showManualFixModal('${task.id}')">人工修复</button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('加载任务失败', err);
+            }
+        }
+        
+        async function loadAlerts() {
+            try {
+                const res = await fetch(`${API_BASE}/alerts?limit=50`);
+                const data = await res.json();
+                
+                const table = document.getElementById('alerts-table');
+                table.innerHTML = data.map(alert => `
+                    <tr>
+                        <td><code>${alert.id.substring(0, 8)}...</code></td>
+                        <td>${alert.type}</td>
+                        <td>${getLevelBadge(alert.level)}</td>
+                        <td>${alert.message}</td>
+                        <td>${alert.is_resolved ? '<span class="badge badge-success">已解决</span>' : '<span class="badge badge-warning">未解决</span>'}</td>
+                        <td>${formatDate(alert.created_at)}</td>
+                        <td>
+                            ${!alert.is_resolved ? `<button class="btn btn-sm btn-success" onclick="resolveAlert('${alert.id}')">解决</button>` : '-'}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('加载告警失败', err);
+            }
+        }
+        
+        async function loadSources() {
+            try {
+                const res = await fetch(`${API_BASE}/data-sources?limit=50`);
+                const data = await res.json();
+                
+                const table = document.getElementById('sources-table');
+                table.innerHTML = data.map(source => `
+                    <tr>
+                        <td><code>${source.id.substring(0, 8)}...</code></td>
+                        <td>${source.name}</td>
+                        <td>${source.type}</td>
+                        <td>${getStatusBadge(source.status)}</td>
+                        <td>${formatDate(source.created_at)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteSource('${source.id}')">删除</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('加载数据源失败', err);
+            }
+        }
+        
+        async function updateTaskStatus(taskId, status) {
+            try {
+                const errorMsg = status === 'failed' ? '模拟失败：数据源连接超时' : null;
+                await fetch(`${API_BASE}/refresh-tasks/${taskId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, error_message: errorMsg })
+                });
+                loadTasks();
+                loadOverview();
+            } catch (err) {
+                alert('更新状态失败');
+            }
+        }
+        
+        async function retryTask(taskId) {
+            try {
+                await fetch(`${API_BASE}/refresh-tasks/${taskId}/retry`, { method: 'POST' });
+                loadTasks();
+                loadOverview();
+            } catch (err) {
+                alert('重试失败');
+            }
+        }
+        
+        function showManualFixModal(taskId) {
+            document.getElementById('fix-task-id').value = taskId;
+            document.getElementById('manualFixModal').classList.add('show');
+        }
+        
+        async function submitManualFix() {
+            const taskId = document.getElementById('fix-task-id').value;
+            const operator = document.getElementById('fix-operator').value;
+            const note = document.getElementById('fix-note').value;
+            
+            try {
+                await fetch(`${API_BASE}/refresh-tasks/${taskId}/manual-fix`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fixed_by: operator, fix_note: note })
+                });
+                closeModal('manualFixModal');
+                loadTasks();
+                loadOverview();
+                alert('人工修复成功！');
+            } catch (err) {
+                alert('操作失败');
+            }
+        }
+        
+        function showCreateTaskModal() {
+            document.getElementById('createTaskModal').classList.add('show');
+        }
+        
+        async function submitCreateTask() {
+            const snippetId = document.getElementById('new-task-snippet-id').value;
+            const sourceId = document.getElementById('new-task-source-id').value;
+            const priority = document.getElementById('new-task-priority').value;
+            const idempotency = document.getElementById('new-task-idempotency').value;
+            
+            try {
+                const res = await fetch(`${API_BASE}/refresh-tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        snippet_id: snippetId, 
+                        data_source_id: sourceId, 
+                        priority,
+                        idempotency_key: idempotency || undefined
+                    })
+                });
+                const data = await res.json();
+                
+                if (data.is_idempotent) {
+                    alert('重复提交，已返回幂等结果');
+                } else {
+                    alert('任务创建成功');
+                }
+                
+                closeModal('createTaskModal');
+                loadTasks();
+                loadOverview();
+            } catch (err) {
+                alert('创建失败');
+            }
+        }
+        
+        function showCreateSourceModal() {
+            document.getElementById('createSourceModal').classList.add('show');
+        }
+        
+        async function submitCreateSource() {
+            const name = document.getElementById('new-source-name').value;
+            const type = document.getElementById('new-source-type').value;
+            const url = document.getElementById('new-source-url').value;
+            
+            try {
+                await fetch(`${API_BASE}/data-sources`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, type, url })
+                });
+                closeModal('createSourceModal');
+                loadSources();
+                loadOverview();
+                alert('数据源创建成功');
+            } catch (err) {
+                alert('创建失败');
+            }
+        }
+        
+        async function deleteSource(id) {
+            if (!confirm('确定要删除这个数据源吗？')) return;
+            try {
+                await fetch(`${API_BASE}/data-sources/${id}`, { method: 'DELETE' });
+                loadSources();
+                loadOverview();
+            } catch (err) {
+                alert('删除失败');
+            }
+        }
+        
+        async function resolveAlert(id) {
+            try {
+                await fetch(`${API_BASE}/alerts/${id}/resolve`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resolved_by: 'admin', resolve_note: '已手动解决' })
+                });
+                loadAlerts();
+                loadOverview();
+            } catch (err) {
+                alert('操作失败');
+            }
+        }
+        
+        async function exportReport() {
+            try {
+                const res = await fetch(`${API_BASE}/reports/export`);
+                const data = await res.json();
+                alert(`导出成功！共 ${data.record_count} 条记录`);
+            } catch (err) {
+                alert('导出失败');
+            }
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        
+        loadOverview();
+    </script>
+</body>
+</html>
