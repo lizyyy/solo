@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特征开关命中审计 - 管理页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #555;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        textarea {
+            min-height: 120px;
+            font-family: monospace;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5a6fd6;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #5a6268;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .result.success {
+            border-left-color: #28a745;
+            background: #f0f9f4;
+        }
+        .result.error {
+            border-left-color: #dc3545;
+            background: #fef0f0;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-card.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .stat-card.error {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+        .stat-card.override {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        .status-PENDING { background: #fff3cd; color: #856404; }
+        .status-SUCCESS { background: #d4edda; color: #155724; }
+        .status-FAILED { background: #f8d7da; color: #721c24; }
+        .status-COMPENSATED { background: #d1ecf1; color: #0c5460; }
+        .status-EXPORTED { background: #e2e3e5; color: #383d41; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 特征开关命中审计</h1>
+            <p>Feature Flag Hit Audit Management Console</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCount">-</div>
+                <div class="stat-label">总请求数</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-number" id="successCount">-</div>
+                <div class="stat-label">成功命中</div>
+            </div>
+            <div class="stat-card error">
+                <div class="stat-number" id="failedCount">-</div>
+                <div class="stat-label">失败记录</div>
+            </div>
+            <div class="stat-card override">
+                <div class="stat-number" id="overrideCount">-</div>
+                <div class="stat-label">覆盖命中</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📝 特征开关评估</h2>
+            <div class="form-group">
+                <label>Request ID (幂等键)</label>
+                <input type="text" id="requestId" placeholder="例如: test_req_001">
+            </div>
+            <div class="form-group">
+                <label>Experiment Key</label>
+                <input type="text" id="experimentKey" value="button_color_test" placeholder="实验唯一标识">
+            </div>
+            <div class="form-group">
+                <label>User Identifier</label>
+                <input type="text" id="userIdentifier" value="test_user_001" placeholder="用户唯一标识">
+            </div>
+            <div class="form-group">
+                <label>User Attributes (JSON)</label>
+                <textarea id="userAttributes">{
+  "userId": "test_user_001",
+  "country": "CN",
+  "userSegment": "new",
+  "age": 25
+}</textarea>
+            </div>
+            <div class="btn-group">
+                <button onclick="evaluateFlag()">执行评估</button>
+                <button class="secondary" onclick="testDuplicate()">测试重复请求</button>
+                <button class="secondary" onclick="testQAOverride()">测试QA覆盖</button>
+                <button class="secondary" onclick="testAdminOverride()">测试管理员覆盖</button>
+            </div>
+            <div id="evaluateResult" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="card">
+            <h2>🔍 查询审计记录</h2>
+            <div class="form-group">
+                <label>按 Request ID 查询</label>
+                <input type="text" id="searchRequestId" placeholder="输入 Request ID">
+            </div>
+            <div class="btn-group">
+                <button onclick="searchByRequestId()">查询</button>
+                <button class="secondary" onclick="loadAuditRecords()">加载最近记录</button>
+                <button class="secondary" onclick="loadFailedRecords()">查看失败记录</button>
+                <button class="secondary" onclick="exportAudit()">导出CSV</button>
+            </div>
+            <div id="auditResult" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="card">
+            <h2>🔧 人工补偿</h2>
+            <div class="form-group">
+                <label>审计记录 ID</label>
+                <input type="number" id="compensateId" value="3" placeholder="输入审计记录ID">
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="compensatedBy" value="admin" placeholder="补偿操作人">
+            </div>
+            <button onclick="compensate()">执行补偿</button>
+            <div id="compensateResult" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1/feature-flag';
+
+        async function evaluateFlag() {
+            const data = {
+                requestId: document.getElementById('requestId').value,
+                experimentKey: document.getElementById('experimentKey').value,
+                userIdentifier: document.getElementById('userIdentifier').value,
+                userAttributes: JSON.parse(document.getElementById('userAttributes').value)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/evaluate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                const resultDiv = document.getElementById('evaluateResult');
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                loadStats();
+            } catch (e) {
+                showError('evaluateResult', e.message);
+            }
+        }
+
+        function testDuplicate() {
+            document.getElementById('requestId').value = 'dup_test_' + Date.now();
+            evaluateFlag().then(() => {
+                setTimeout(() => evaluateFlag(), 500);
+            });
+        }
+
+        function testQAOverride() {
+            document.getElementById('requestId').value = 'qa_test_' + Date.now();
+            document.getElementById('userIdentifier').value = 'qa_user_001';
+            evaluateFlag();
+        }
+
+        function testAdminOverride() {
+            document.getElementById('requestId').value = 'admin_test_' + Date.now();
+            document.getElementById('userIdentifier').value = 'admin_001';
+            evaluateFlag();
+        }
+
+        async function searchByRequestId() {
+            const requestId = document.getElementById('searchRequestId').value;
+            try {
+                const response = await fetch(`${API_BASE}/audit/request/${requestId}`);
+                const result = await response.json();
+                const resultDiv = document.getElementById('auditResult');
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (e) {
+                showError('auditResult', e.message);
+            }
+        }
+
+        async function loadAuditRecords() {
+            try {
+                const response = await fetch(`${API_BASE}/audit?page=0&size=10`);
+                const result = await response.json();
+                const resultDiv = document.getElementById('auditResult');
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (e) {
+                showError('auditResult', e.message);
+            }
+        }
+
+        async function loadFailedRecords() {
+            try {
+                const response = await fetch(`${API_BASE}/audit/failed`);
+                const result = await response.json();
+                const resultDiv = document.getElementById('auditResult');
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (e) {
+                showError('auditResult', e.message);
+            }
+        }
+
+        function exportAudit() {
+            window.location.href = `${API_BASE}/audit/export?experimentKey=button_color_test`;
+        }
+
+        async function compensate() {
+            const id = document.getElementById('compensateId').value;
+            const by = document.getElementById('compensatedBy').value;
+            try {
+                const response = await fetch(`${API_BASE}/audit/${id}/compensate?compensatedBy=${by}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                const resultDiv = document.getElementById('compensateResult');
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                loadStats();
+            } catch (e) {
+                showError('compensateResult', e.message);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/audit?page=0&size=100`);
+                const result = await response.json();
+                const records = result.content || [];
+
+                document.getElementById('totalCount').textContent = result.totalElements || records.length;
+                document.getElementById('successCount').textContent = records.filter(r => r.status === 'SUCCESS').length;
+                document.getElementById('failedCount').textContent = records.filter(r => r.status === 'FAILED').length;
+                document.getElementById('overrideCount').textContent = records.filter(r => r.hitResult === 'OVERRIDDEN').length;
+            } catch (e) {
+                console.error('加载统计失败', e);
+            }
+        }
+
+        function showError(elementId, message) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result error';
+            resultDiv.innerHTML = `<pre>错误: ${message}</pre>`;
+        }
+
+        // 初始化加载统计
+        loadStats();
+    </script>
+</body>
+</html>

@@ -59,30 +59,63 @@ check_java() {
     fi
 }
 
-# ==================== 下载 Maven Wrapper ====================
+# ==================== 下载并验证 Maven Wrapper ====================
 setup_maven_wrapper() {
-    if [ -f "$PROJECT_DIR/mvnw" ] && [ -f "$PROJECT_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
-        success "Maven Wrapper 已存在，跳过下载"
-        return 0
+    mkdir -p "$PROJECT_DIR/.mvn/wrapper"
+    local JAR_FILE="$PROJECT_DIR/.mvn/wrapper/maven-wrapper.jar"
+
+    # 检查现有 jar 是否有效
+    if [ -f "$JAR_FILE" ] && [ -f "$PROJECT_DIR/mvnw" ]; then
+        if java -jar "$JAR_FILE" --version 2>/dev/null | grep -q "Maven"; then
+            success "Maven Wrapper 已存在且有效，跳过下载"
+            return 0
+        else
+            warn "现有 Maven Wrapper 损坏，重新下载..."
+            rm -f "$JAR_FILE"
+        fi
     fi
 
     info "设置 Maven Wrapper..."
-    mkdir -p "$PROJECT_DIR/.mvn/wrapper"
 
-    # 下载 wrapper jar
-    if [ ! -f "$PROJECT_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
+    # 下载 wrapper jar (最多重试 3 次)
+    if [ ! -f "$JAR_FILE" ]; then
         info "下载 maven-wrapper.jar..."
-        if command -v curl &> /dev/null; then
-            curl -sL "$MVNW_URL" -o "$PROJECT_DIR/.mvn/wrapper/maven-wrapper.jar"
-        elif command -v wget &> /dev/null; then
-            wget -q "$MVNW_URL" -O "$PROJECT_DIR/.mvn/wrapper/maven-wrapper.jar"
-        else
-            error "未找到 curl 或 wget，无法下载 Maven Wrapper"
-            echo "请手动下载: $MVNW_URL"
-            exit 1
-        fi
-        success "maven-wrapper.jar 下载完成"
+        for attempt in 1 2 3; do
+            if command -v curl &> /dev/null; then
+                curl -sL "$MVNW_URL" -o "$JAR_FILE" && break
+            elif command -v wget &> /dev/null; then
+                wget -q "$MVNW_URL" -O "$JAR_FILE" && break
+            else
+                error "未找到 curl 或 wget，无法下载 Maven Wrapper"
+                echo "请手动下载: $MVNW_URL"
+                exit 1
+            fi
+            if [ $attempt -lt 3 ]; then
+                warn "下载失败，重试 $attempt/3..."
+                sleep 1
+            fi
+        done
     fi
+
+    # 验证 jar 文件完整性
+    if [ ! -f "$JAR_FILE" ] || [ ! -s "$JAR_FILE" ]; then
+        error "maven-wrapper.jar 下载失败或文件为空"
+        exit 1
+    fi
+
+    # 检查文件大小 (> 50KB)
+    FILE_SIZE=$(du -k "$JAR_FILE" | cut -f1)
+    if [ "$FILE_SIZE" -lt 50 ]; then
+        error "maven-wrapper.jar 文件异常 (大小: ${FILE_SIZE}KB)"
+        exit 1
+    fi
+
+    # 用 Java 验证是否能加载主类
+    if ! java -cp "$JAR_FILE" org.apache.maven.wrapper.MavenWrapperMain --version 2>/dev/null | grep -q "Apache Maven"; then
+        error "maven-wrapper.jar 无法正常加载"
+        exit 1
+    fi
+    success "maven-wrapper.jar 下载并验证完成 (${FILE_SIZE}KB)"
 
     # 创建 mvnw 脚本（不依赖网络下载，直接生成）
     if [ ! -f "$PROJECT_DIR/mvnw" ]; then
@@ -285,10 +318,9 @@ MVNW_SCRIPT
 
 # ==================== 清理旧的编译产物 ====================
 clean_target() {
-    info "强制清理旧的编译产物 (防止 Java 17 class 残留)..."
+    info "清理旧的编译产物 (防止 Java 17 class 残留)..."
     rm -rf "$PROJECT_DIR/target"
-    rm -rf "$PROJECT_DIR/.mvn/wrapper/maven-wrapper.jar"
-    success "清理完成"
+    success "target 目录已清理"
 }
 
 # ==================== 构建项目 ====================
@@ -331,13 +363,13 @@ start_service() {
 main() {
     check_java
     echo ""
-    setup_maven_wrapper
+    clean_target                    # 1. 先清理旧编译产物
     echo ""
-    clean_target
+    setup_maven_wrapper             # 2. 再下载/设置 Maven Wrapper
     echo ""
-    build_project
+    build_project                   # 3. 构建项目
     echo ""
-    start_service
+    start_service                   # 4. 启动服务
 }
 
 main "$@"
