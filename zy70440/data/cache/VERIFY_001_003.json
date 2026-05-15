@@ -1,14 +1,14 @@
 {
-  "record_id": "BATCH_20260515_203421_003",
-  "batch_id": "BATCH_20260515_203421",
-  "file_hash": "a0d1d5d4179cc094df9d3a146b2c5bfcdd5ebd59b44110952b09c061c10e0289",
+  "record_id": "VERIFY_001_003",
+  "batch_id": "VERIFY_001",
+  "file_hash": "b549bf7e9e9da4acb51e8ae9989822d1ab188a16910ad3d4520dd1b1378e6390",
   "merged_path": [
     "/customer/profile/basic",
     "/technical/support/basic",
     "/technical/support/advanced"
   ],
-  "status": "success",
-  "processed_time": "2026-05-15 20:34:21.808380",
+  "status": "failed",
+  "processed_time": "2026-05-15 21:29:57.045301",
   "issues": [
     {
       "type": "cross_day_boundary",

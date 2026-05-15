@@ -1,7 +1,7 @@
 {
-  "record_id": "TEST_CACHE_001_004",
-  "batch_id": "TEST_CACHE_001",
-  "file_hash": "7c72476d2862ad8c8e40cfc81001067339c60fb1fa864446740670daf39a9972",
+  "record_id": "VERIFY_001_004",
+  "batch_id": "VERIFY_001",
+  "file_hash": "6cd5a00c322278ad099cd8fb97425412d34d385ffa1f09548d3eb8155e8d40ec",
   "merged_path": [
     "/customer/profile/basic",
     "/customer/profile/sensitive",
@@ -9,8 +9,8 @@
     "/warranty/claim",
     "/admin/system/access"
   ],
-  "status": "success",
-  "processed_time": "2026-05-15 20:34:34.683923",
+  "status": "failed",
+  "processed_time": "2026-05-15 21:29:57.045487",
   "issues": [
     {
       "type": "permission_over_grant",

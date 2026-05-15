@@ -24,7 +24,15 @@ class PathMerger:
             self._detect_permission_over_grant(record)
             self._detect_path_mismatch(record)
 
-            if any(issue.get('type') == IssueType.FORMAT_ERROR for issue in record.issues):
+            high_risk_issues = {
+                IssueType.PERMISSION_OVER_GRANT,
+                IssueType.MISSING_DATA,
+                IssueType.FORMAT_ERROR,
+                IssueType.DUPLICATE_RECORD
+            }
+
+            has_high_risk = any(issue.get('type') in high_risk_issues for issue in record.issues)
+            if has_high_risk:
                 record.status = PathStatus.FAILED
             else:
                 record.status = PathStatus.SUCCESS

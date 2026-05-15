@@ -1,7 +1,7 @@
 {
-  "record_id": "BATCH_20260515_203421_002",
-  "batch_id": "BATCH_20260515_203421",
-  "file_hash": "3f15ab1733294c71b61ba8829521743831f3447a8686bb469b091085d7111b0f",
+  "record_id": "VERIFY_001_002",
+  "batch_id": "VERIFY_001",
+  "file_hash": "a2d81b25593cb79cf2562a4e6b9fca25c6e92087ed9b064be49a6015ca6f4416",
   "merged_path": [
     "/customer/profile/basic",
     "/customer/profile/contact",
@@ -9,8 +9,8 @@
     "/refund/approve",
     "/complaint/create"
   ],
-  "status": "success",
-  "processed_time": "2026-05-15 20:34:21.808074",
+  "status": "failed",
+  "processed_time": "2026-05-15 21:29:57.045084",
   "issues": [
     {
       "type": "permission_over_grant",

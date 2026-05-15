@@ -1,21 +1,21 @@
 {
-  "BATCH_20260515_203333_001": {
-    "record_id": "BATCH_20260515_203333_001",
-    "batch_id": "BATCH_20260515_203333",
-    "file_hash": "5cb6e7bd218c4bbbfbc5f62beb3ae9f80fb7058db80e6055e783db8690272f7a",
+  "VERIFY_001_001": {
+    "record_id": "VERIFY_001_001",
+    "batch_id": "VERIFY_001",
+    "file_hash": "3043ffc67e5941d309d5a142bb178369d4b97acd1b2267a2098b3ee84c2740a1",
     "merged_path": [
       "/customer/profile/basic",
       "/customer/service/history",
       "/order/query/basic",
       "/order/query/detail"
     ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:33:33.898954"
+    "status": "failed",
+    "processed_time": "2026-05-15T21:29:57.044624"
   },
-  "BATCH_20260515_203333_002": {
-    "record_id": "BATCH_20260515_203333_002",
-    "batch_id": "BATCH_20260515_203333",
-    "file_hash": "234160794af7e876bb179f76659d0d68f83598d56beb36611e5cccee132e36a7",
+  "VERIFY_001_002": {
+    "record_id": "VERIFY_001_002",
+    "batch_id": "VERIFY_001",
+    "file_hash": "a2d81b25593cb79cf2562a4e6b9fca25c6e92087ed9b064be49a6015ca6f4416",
     "merged_path": [
       "/customer/profile/basic",
       "/customer/profile/contact",
@@ -23,25 +23,25 @@
       "/refund/approve",
       "/complaint/create"
     ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:33:33.899698"
+    "status": "failed",
+    "processed_time": "2026-05-15T21:29:57.045084"
   },
-  "BATCH_20260515_203333_003": {
-    "record_id": "BATCH_20260515_203333_003",
-    "batch_id": "BATCH_20260515_203333",
-    "file_hash": "18cad515258bc4ddd849ba7cb16899d3d5eaff51d0eeb9527f8a5b82856f1444",
+  "VERIFY_001_003": {
+    "record_id": "VERIFY_001_003",
+    "batch_id": "VERIFY_001",
+    "file_hash": "b549bf7e9e9da4acb51e8ae9989822d1ab188a16910ad3d4520dd1b1378e6390",
     "merged_path": [
       "/customer/profile/basic",
       "/technical/support/basic",
       "/technical/support/advanced"
     ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:33:33.899918"
+    "status": "failed",
+    "processed_time": "2026-05-15T21:29:57.045301"
   },
-  "BATCH_20260515_203333_004": {
-    "record_id": "BATCH_20260515_203333_004",
-    "batch_id": "BATCH_20260515_203333",
-    "file_hash": "acc3afb4214d506dc4e836ab800d7172723220c908cd1666f43023cd4def4260",
+  "VERIFY_001_004": {
+    "record_id": "VERIFY_001_004",
+    "batch_id": "VERIFY_001",
+    "file_hash": "6cd5a00c322278ad099cd8fb97425412d34d385ffa1f09548d3eb8155e8d40ec",
     "merged_path": [
       "/customer/profile/basic",
       "/customer/profile/sensitive",
@@ -49,254 +49,54 @@
       "/warranty/claim",
       "/admin/system/access"
     ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:33:33.900119"
+    "status": "failed",
+    "processed_time": "2026-05-15T21:29:57.045487"
   },
-  "BATCH_20260515_203333_005": {
-    "record_id": "BATCH_20260515_203333_005",
-    "batch_id": "BATCH_20260515_203333",
-    "file_hash": "13b59db2fd011113c444cf94909bde8b6ec236c439b65bc24fa948e950b969a6",
+  "VERIFY_001_005": {
+    "record_id": "VERIFY_001_005",
+    "batch_id": "VERIFY_001",
+    "file_hash": "305f73f4bc45aed155f8d8838e08691077f30fd2f378c27e03ce9ebc6746d9fa",
     "merged_path": [
       "/customer/profile/basic"
     ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:33:33.900350"
+    "status": "failed",
+    "processed_time": "2026-05-15T21:29:57.045660"
   },
-  "BATCH_20260515_203333_006": {
-    "record_id": "BATCH_20260515_203333_006",
-    "batch_id": "BATCH_20260515_203333",
-    "file_hash": "c2ee72229e5cfa47367345622609f9859505de731d39785138464f7414550432",
+  "VERIFY_001_006": {
+    "record_id": "VERIFY_001_006",
+    "batch_id": "VERIFY_001",
+    "file_hash": "ea9b24184ec2e04e0935d125821e91d77a6703a01b7efb27cbe018186c5d9c75",
     "merged_path": [
       "/customer/profile/basic",
       "/return/process",
       "/exchange/apply"
     ],
     "status": "success",
-    "processed_time": "2026-05-15T20:33:33.900558"
+    "processed_time": "2026-05-15T21:29:57.045820"
   },
-  "BATCH_20260515_203333_007": {
-    "record_id": "BATCH_20260515_203333_007",
-    "batch_id": "BATCH_20260515_203333",
-    "file_hash": "51dade5d9b0fb999057f0354fe1f329f53fe21e3380941558f993ebd117b237a",
+  "VERIFY_001_007": {
+    "record_id": "VERIFY_001_007",
+    "batch_id": "VERIFY_001",
+    "file_hash": "7efb6b9f58dc78a77b97de0d8eb55ef5f014fdb4c3c0f20f21acf64b0b803e78",
     "merged_path": [
       "/customer/profile/basic",
       "/feedback/submit",
       "/feedback/escalate",
       "/manager/special/approval"
     ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:33:33.900778"
+    "status": "failed",
+    "processed_time": "2026-05-15T21:29:57.046020"
   },
-  "BATCH_20260515_203333_008": {
-    "record_id": "BATCH_20260515_203333_008",
-    "batch_id": "BATCH_20260515_203333",
-    "file_hash": "e544db2ed7b9b6cf86e13541f053696547b9f279e91ddb6f5f4a089e07b8e3fb",
+  "VERIFY_001_008": {
+    "record_id": "VERIFY_001_008",
+    "batch_id": "VERIFY_001",
+    "file_hash": "09402c8ba9c1e082c9efd8176d50396ad5562eae367245d297210938050f3d97",
     "merged_path": [
       "/customer/profile/basic",
       "/complaint/review",
       "/complaint/close"
     ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:33:33.900978"
-  },
-  "BATCH_20260515_203421_001": {
-    "record_id": "BATCH_20260515_203421_001",
-    "batch_id": "BATCH_20260515_203421",
-    "file_hash": "e2c6710b977df827d887ad958b0f2253f977b346e500d537f0bdaac53c56eb9c",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/customer/service/history",
-      "/order/query/basic",
-      "/order/query/detail"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:21.807170"
-  },
-  "BATCH_20260515_203421_002": {
-    "record_id": "BATCH_20260515_203421_002",
-    "batch_id": "BATCH_20260515_203421",
-    "file_hash": "3f15ab1733294c71b61ba8829521743831f3447a8686bb469b091085d7111b0f",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/customer/profile/contact",
-      "/refund/apply",
-      "/refund/approve",
-      "/complaint/create"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:21.808074"
-  },
-  "BATCH_20260515_203421_003": {
-    "record_id": "BATCH_20260515_203421_003",
-    "batch_id": "BATCH_20260515_203421",
-    "file_hash": "a0d1d5d4179cc094df9d3a146b2c5bfcdd5ebd59b44110952b09c061c10e0289",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/technical/support/basic",
-      "/technical/support/advanced"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:21.808380"
-  },
-  "BATCH_20260515_203421_004": {
-    "record_id": "BATCH_20260515_203421_004",
-    "batch_id": "BATCH_20260515_203421",
-    "file_hash": "dacd91c2298695eb262d645912f745d769589719ade36f2acbd2dc19db8ec568",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/customer/profile/sensitive",
-      "/warranty/check",
-      "/warranty/claim",
-      "/admin/system/access"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:21.808666"
-  },
-  "BATCH_20260515_203421_005": {
-    "record_id": "BATCH_20260515_203421_005",
-    "batch_id": "BATCH_20260515_203421",
-    "file_hash": "6777d0711b915b4c8a8873ff5feebc61eb4a98ba26543e414fcdbe2a3213eec4",
-    "merged_path": [
-      "/customer/profile/basic"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:21.808943"
-  },
-  "BATCH_20260515_203421_006": {
-    "record_id": "BATCH_20260515_203421_006",
-    "batch_id": "BATCH_20260515_203421",
-    "file_hash": "17aa10bc4584bdcb0234316926525b25da766ff7d99000acfc9c844c9cf91ea3",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/return/process",
-      "/exchange/apply"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:21.809283"
-  },
-  "BATCH_20260515_203421_007": {
-    "record_id": "BATCH_20260515_203421_007",
-    "batch_id": "BATCH_20260515_203421",
-    "file_hash": "da2fa940aebce7ee57279ede7456ca26599c59ad4998a7eff294bcca3823ef1f",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/feedback/submit",
-      "/feedback/escalate",
-      "/manager/special/approval"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:21.809539"
-  },
-  "BATCH_20260515_203421_008": {
-    "record_id": "BATCH_20260515_203421_008",
-    "batch_id": "BATCH_20260515_203421",
-    "file_hash": "b377b37b4d892b3b1fb3ff9cd8f9b47a1a970cd4ae87d5410ec9b8efa7e2564c",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/complaint/review",
-      "/complaint/close"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:21.809787"
-  },
-  "TEST_CACHE_001_001": {
-    "record_id": "TEST_CACHE_001_001",
-    "batch_id": "TEST_CACHE_001",
-    "file_hash": "688cd526e8caea9010fe8d3d0acab4c96c942602e10614ba670e77d3587b02b5",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/customer/service/history",
-      "/order/query/basic",
-      "/order/query/detail"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:34.682825"
-  },
-  "TEST_CACHE_001_002": {
-    "record_id": "TEST_CACHE_001_002",
-    "batch_id": "TEST_CACHE_001",
-    "file_hash": "c47c3653b0f0dad0fddf6d3fb7134462c746ebea7351f396c63d4c3c5cae9dfb",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/customer/profile/contact",
-      "/refund/apply",
-      "/refund/approve",
-      "/complaint/create"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:34.683312"
-  },
-  "TEST_CACHE_001_003": {
-    "record_id": "TEST_CACHE_001_003",
-    "batch_id": "TEST_CACHE_001",
-    "file_hash": "f454babca1be67e66db9d095414da285221cbb5bacec5564415fa4647af544fb",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/technical/support/basic",
-      "/technical/support/advanced"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:34.683636"
-  },
-  "TEST_CACHE_001_004": {
-    "record_id": "TEST_CACHE_001_004",
-    "batch_id": "TEST_CACHE_001",
-    "file_hash": "7c72476d2862ad8c8e40cfc81001067339c60fb1fa864446740670daf39a9972",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/customer/profile/sensitive",
-      "/warranty/check",
-      "/warranty/claim",
-      "/admin/system/access"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:34.683923"
-  },
-  "TEST_CACHE_001_005": {
-    "record_id": "TEST_CACHE_001_005",
-    "batch_id": "TEST_CACHE_001",
-    "file_hash": "fc9bfdceffdbc31a1cb0cf61a96001736d38843a3ddda9dee8c12129198b9be2",
-    "merged_path": [
-      "/customer/profile/basic"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:34.684220"
-  },
-  "TEST_CACHE_001_006": {
-    "record_id": "TEST_CACHE_001_006",
-    "batch_id": "TEST_CACHE_001",
-    "file_hash": "45193f032dac1ea413c72045186754abe4f789e926826a5dd32eb7e4734a5c40",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/return/process",
-      "/exchange/apply"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:34.684594"
-  },
-  "TEST_CACHE_001_007": {
-    "record_id": "TEST_CACHE_001_007",
-    "batch_id": "TEST_CACHE_001",
-    "file_hash": "695af74cbf345e90530738b2c0f8ee5d1142be115d26a1a45d2fdd2c01fce889",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/feedback/submit",
-      "/feedback/escalate",
-      "/manager/special/approval"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:34.684881"
-  },
-  "TEST_CACHE_001_008": {
-    "record_id": "TEST_CACHE_001_008",
-    "batch_id": "TEST_CACHE_001",
-    "file_hash": "695a8926f99a093c7fdc15e34ef8406de6d793f5f4ac734334b202dea5ca1478",
-    "merged_path": [
-      "/customer/profile/basic",
-      "/complaint/review",
-      "/complaint/close"
-    ],
-    "status": "success",
-    "processed_time": "2026-05-15T20:34:34.685156"
+    "status": "failed",
+    "processed_time": "2026-05-15T21:29:57.046191"
   }
 }

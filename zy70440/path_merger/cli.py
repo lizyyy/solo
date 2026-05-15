@@ -218,7 +218,7 @@ def fix(record_id, fixed_path, reason, batch_id):
     query_engine = QueryEngine()
     reporter = ReportGenerator()
 
-    filter = QueryFilter(record_id)
+    filter = QueryFilter(record_id=record_id, batch_id=batch_id)
     records = query_engine.query(filter)
 
     if not records:

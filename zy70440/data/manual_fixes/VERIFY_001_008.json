@@ -1,6 +1,6 @@
 {
-  "record_id": "BATCH_20260515_203421_008",
-  "batch_id": "BATCH_20260515_203421",
+  "record_id": "VERIFY_001_008",
+  "batch_id": "VERIFY_001",
   "source": "manual_fix",
   "recording_id": "REC_20240514_1600_A001",
   "agent_id": "AGENT_001",
@@ -21,7 +21,7 @@
     "/complaint/review",
     "/complaint/close"
   ],
-  "status": "success",
+  "status": "failed",
   "issues": [
     {
       "type": "permission_over_grant",
@@ -42,7 +42,7 @@
   "is_manual_fix": true,
   "fix_reason": "人工审核确认：高级客服主管有权限处理客诉关闭，此前误判为权限放大",
   "fix_time": "2024-05-15 07:00:00",
-  "processed_time": "2026-05-15 20:34:21.809787",
-  "execution_time_ms": 0.010251998901367188,
+  "processed_time": "2026-05-15 21:29:57.046191",
+  "execution_time_ms": 0.008821487426757812,
   "metadata": {}
 }

@@ -1,15 +1,15 @@
 {
-  "record_id": "BATCH_20260515_203421_001",
-  "batch_id": "BATCH_20260515_203421",
-  "file_hash": "e2c6710b977df827d887ad958b0f2253f977b346e500d537f0bdaac53c56eb9c",
+  "record_id": "VERIFY_001_001",
+  "batch_id": "VERIFY_001",
+  "file_hash": "3043ffc67e5941d309d5a142bb178369d4b97acd1b2267a2098b3ee84c2740a1",
   "merged_path": [
     "/customer/profile/basic",
     "/customer/service/history",
     "/order/query/basic",
     "/order/query/detail"
   ],
-  "status": "success",
-  "processed_time": "2026-05-15 20:34:21.807170",
+  "status": "failed",
+  "processed_time": "2026-05-15 21:29:57.044624",
   "issues": [
     {
       "type": "permission_over_grant",

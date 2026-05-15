@@ -1,14 +1,27 @@
 {
-  "record_id": "TEST_CACHE_001_003",
-  "batch_id": "TEST_CACHE_001",
-  "file_hash": "f454babca1be67e66db9d095414da285221cbb5bacec5564415fa4647af544fb",
+  "record_id": "VERIFY_001_003",
+  "batch_id": "VERIFY_001",
+  "source": "after_sales_recording",
+  "recording_id": "REC_20240515_2330_A002",
+  "agent_id": "AGENT_002",
+  "customer_id": "CUST_10003",
+  "start_time": "2024-05-15 23:30:00",
+  "end_time": "2024-05-16 00:15:00",
+  "permission_path": [
+    "/customer/profile/basic",
+    "/technical/support/basic"
+  ],
+  "actual_path": [
+    "/customer/profile/basic",
+    "/technical/support/basic",
+    "/technical/support/advanced"
+  ],
   "merged_path": [
     "/customer/profile/basic",
     "/technical/support/basic",
     "/technical/support/advanced"
   ],
-  "status": "success",
-  "processed_time": "2026-05-15 20:34:34.683636",
+  "status": "failed",
   "issues": [
     {
       "type": "cross_day_boundary",
@@ -32,5 +45,11 @@
       "message": "Path length mismatch: permission(2) vs actual(3)",
       "severity": "low"
     }
-  ]
+  ],
+  "is_manual_fix": false,
+  "fix_reason": null,
+  "fix_time": null,
+  "processed_time": "2026-05-15 21:29:57.045301",
+  "execution_time_ms": 0.014066696166992188,
+  "metadata": {}
 }

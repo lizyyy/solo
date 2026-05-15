@@ -1,18 +1,18 @@
 {
-  "batch_id": "TEST_CACHE_001",
+  "batch_id": "VERIFY_001",
   "total_records": 8,
-  "success_count": 0,
-  "failed_count": 0,
+  "success_count": 1,
+  "failed_count": 7,
   "conflict_count": 0,
-  "skipped_count": 8,
+  "skipped_count": 0,
   "manual_fix_count": 0,
-  "execution_time_ms": 1.0387897491455078,
-  "start_time": "2026-05-15 20:34:46.161433",
-  "end_time": "2026-05-15 20:34:46.162471",
+  "execution_time_ms": 1.7697811126708984,
+  "start_time": "2026-05-15 21:29:57.044606",
+  "end_time": "2026-05-15 21:29:57.046375",
   "records": [
     {
-      "record_id": "TEST_CACHE_001_001",
-      "batch_id": "TEST_CACHE_001",
+      "record_id": "VERIFY_001_001",
+      "batch_id": "VERIFY_001",
       "source": "after_sales_recording",
       "recording_id": "REC_20240515_0900_A001",
       "agent_id": "AGENT_001",
@@ -36,7 +36,7 @@
         "/order/query/basic",
         "/order/query/detail"
       ],
-      "status": "skipped",
+      "status": "failed",
       "issues": [
         {
           "type": "permission_over_grant",
@@ -57,15 +57,13 @@
       "is_manual_fix": false,
       "fix_reason": null,
       "fix_time": null,
-      "processed_time": "2026-05-15 20:34:34.682825",
-      "execution_time_ms": 0.0,
-      "metadata": {
-        "from_cache": true
-      }
+      "processed_time": "2026-05-15 21:29:57.044624",
+      "execution_time_ms": 0.028848648071289062,
+      "metadata": {}
     },
     {
-      "record_id": "TEST_CACHE_001_002",
-      "batch_id": "TEST_CACHE_001",
+      "record_id": "VERIFY_001_002",
+      "batch_id": "VERIFY_001",
       "source": "after_sales_recording",
       "recording_id": "REC_20240515_0920_A001",
       "agent_id": "AGENT_001",
@@ -91,7 +89,7 @@
         "/refund/approve",
         "/complaint/create"
       ],
-      "status": "skipped",
+      "status": "failed",
       "issues": [
         {
           "type": "permission_over_grant",
@@ -113,15 +111,13 @@
       "is_manual_fix": false,
       "fix_reason": null,
       "fix_time": null,
-      "processed_time": "2026-05-15 20:34:34.683312",
-      "execution_time_ms": 0.0,
-      "metadata": {
-        "from_cache": true
-      }
+      "processed_time": "2026-05-15 21:29:57.045084",
+      "execution_time_ms": 0.019073486328125,
+      "metadata": {}
     },
     {
-      "record_id": "TEST_CACHE_001_003",
-      "batch_id": "TEST_CACHE_001",
+      "record_id": "VERIFY_001_003",
+      "batch_id": "VERIFY_001",
       "source": "after_sales_recording",
       "recording_id": "REC_20240515_2330_A002",
       "agent_id": "AGENT_002",
@@ -142,7 +138,7 @@
         "/technical/support/basic",
         "/technical/support/advanced"
       ],
-      "status": "skipped",
+      "status": "failed",
       "issues": [
         {
           "type": "cross_day_boundary",
@@ -170,15 +166,13 @@
       "is_manual_fix": false,
       "fix_reason": null,
       "fix_time": null,
-      "processed_time": "2026-05-15 20:34:34.683636",
-      "execution_time_ms": 0.0,
-      "metadata": {
-        "from_cache": true
-      }
+      "processed_time": "2026-05-15 21:29:57.045301",
+      "execution_time_ms": 0.014066696166992188,
+      "metadata": {}
     },
     {
-      "record_id": "TEST_CACHE_001_004",
-      "batch_id": "TEST_CACHE_001",
+      "record_id": "VERIFY_001_004",
+      "batch_id": "VERIFY_001",
       "source": "after_sales_recording",
       "recording_id": "REC_20240515_1000_A003",
       "agent_id": "AGENT_003",
@@ -203,7 +197,7 @@
         "/warranty/claim",
         "/admin/system/access"
       ],
-      "status": "skipped",
+      "status": "failed",
       "issues": [
         {
           "type": "permission_over_grant",
@@ -226,15 +220,13 @@
       "is_manual_fix": false,
       "fix_reason": null,
       "fix_time": null,
-      "processed_time": "2026-05-15 20:34:34.683923",
-      "execution_time_ms": 0.0,
-      "metadata": {
-        "from_cache": true
-      }
+      "processed_time": "2026-05-15 21:29:57.045487",
+      "execution_time_ms": 0.011682510375976562,
+      "metadata": {}
     },
     {
-      "record_id": "TEST_CACHE_001_005",
-      "batch_id": "TEST_CACHE_001",
+      "record_id": "VERIFY_001_005",
+      "batch_id": "VERIFY_001",
       "source": "after_sales_recording",
       "recording_id": "REC_20240515_1030_A003",
       "agent_id": "AGENT_003",
@@ -248,7 +240,7 @@
       "merged_path": [
         "/customer/profile/basic"
       ],
-      "status": "skipped",
+      "status": "failed",
       "issues": [
         {
           "type": "missing_data",
@@ -265,15 +257,13 @@
       "is_manual_fix": false,
       "fix_reason": null,
       "fix_time": null,
-      "processed_time": "2026-05-15 20:34:34.684220",
-      "execution_time_ms": 0.0,
-      "metadata": {
-        "from_cache": true
-      }
+      "processed_time": "2026-05-15 21:29:57.045660",
+      "execution_time_ms": 0.007152557373046875,
+      "metadata": {}
     },
     {
-      "record_id": "TEST_CACHE_001_006",
-      "batch_id": "TEST_CACHE_001",
+      "record_id": "VERIFY_001_006",
+      "batch_id": "VERIFY_001",
       "source": "after_sales_recording",
       "recording_id": "REC_20240515_1100_A004",
       "agent_id": "AGENT_004",
@@ -291,24 +281,21 @@
         "/exchange/apply"
       ],
       "merged_path": [
-        "/customer/profile/basic",
-        "/return/process",
-        "/exchange/apply"
+        "/a",
+        "/b"
       ],
-      "status": "skipped",
+      "status": "manual_fix",
       "issues": [],
-      "is_manual_fix": false,
-      "fix_reason": null,
-      "fix_time": null,
-      "processed_time": "2026-05-15 20:34:34.684594",
-      "execution_time_ms": 0.0,
-      "metadata": {
-        "from_cache": true
-      }
+      "is_manual_fix": true,
+      "fix_reason": "测试修正",
+      "fix_time": "2026-05-15 21:32:12.803065",
+      "processed_time": "2026-05-15 21:29:57.045820",
+      "execution_time_ms": 0.008106231689453125,
+      "metadata": {}
     },
     {
-      "record_id": "TEST_CACHE_001_007",
-      "batch_id": "TEST_CACHE_001",
+      "record_id": "VERIFY_001_007",
+      "batch_id": "VERIFY_001",
       "source": "after_sales_recording",
       "recording_id": "REC_20240515_1400_A005",
       "agent_id": "AGENT_005",
@@ -331,7 +318,7 @@
         "/feedback/escalate",
         "/manager/special/approval"
       ],
-      "status": "skipped",
+      "status": "failed",
       "issues": [
         {
           "type": "permission_over_grant",
@@ -353,15 +340,13 @@
       "is_manual_fix": false,
       "fix_reason": null,
       "fix_time": null,
-      "processed_time": "2026-05-15 20:34:34.684881",
-      "execution_time_ms": 0.0,
-      "metadata": {
-        "from_cache": true
-      }
+      "processed_time": "2026-05-15 21:29:57.046020",
+      "execution_time_ms": 0.010013580322265625,
+      "metadata": {}
     },
     {
-      "record_id": "TEST_CACHE_001_008",
-      "batch_id": "TEST_CACHE_001",
+      "record_id": "VERIFY_001_008",
+      "batch_id": "VERIFY_001",
       "source": "manual_fix",
       "recording_id": "REC_20240514_1600_A001",
       "agent_id": "AGENT_001",
@@ -382,7 +367,7 @@
         "/complaint/review",
         "/complaint/close"
       ],
-      "status": "skipped",
+      "status": "failed",
       "issues": [
         {
           "type": "permission_over_grant",
@@ -403,15 +388,12 @@
       "is_manual_fix": true,
       "fix_reason": "人工审核确认：高级客服主管有权限处理客诉关闭，此前误判为权限放大",
       "fix_time": "2024-05-15 07:00:00",
-      "processed_time": "2026-05-15 20:34:34.685156",
-      "execution_time_ms": 0.0,
-      "metadata": {
-        "from_cache": true
-      }
+      "processed_time": "2026-05-15 21:29:57.046191",
+      "execution_time_ms": 0.008821487426757812,
+      "metadata": {}
     }
   ],
   "suggestions": [
-    "复用 8 条历史处理结果",
     "发现 6 条权限放大记录，建议审计权限配置",
     "发现 1 条跨天录音，建议检查会话分割逻辑",
     "发现 1 条数据缺失记录，建议检查数据源完整性"

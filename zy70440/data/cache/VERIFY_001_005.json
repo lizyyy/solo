@@ -1,12 +1,12 @@
 {
-  "record_id": "BATCH_20260515_203421_005",
-  "batch_id": "BATCH_20260515_203421",
-  "file_hash": "6777d0711b915b4c8a8873ff5feebc61eb4a98ba26543e414fcdbe2a3213eec4",
+  "record_id": "VERIFY_001_005",
+  "batch_id": "VERIFY_001",
+  "file_hash": "305f73f4bc45aed155f8d8838e08691077f30fd2f378c27e03ce9ebc6746d9fa",
   "merged_path": [
     "/customer/profile/basic"
   ],
-  "status": "success",
-  "processed_time": "2026-05-15 20:34:21.808943",
+  "status": "failed",
+  "processed_time": "2026-05-15 21:29:57.045660",
   "issues": [
     {
       "type": "missing_data",

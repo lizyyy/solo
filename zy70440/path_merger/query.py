@@ -38,6 +38,9 @@ class QueryEngine:
     def _apply_filter(self, records: List[PathRecord], filter: QueryFilter) -> List[PathRecord]:
         filtered = records
 
+        if filter.record_id:
+            filtered = [r for r in filtered if r.record_id == filter.record_id]
+
         if filter.batch_id:
             filtered = [r for r in filtered if r.batch_id == filter.batch_id]
 

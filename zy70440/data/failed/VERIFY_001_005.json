@@ -1,0 +1,37 @@
+{
+  "record_id": "VERIFY_001_005",
+  "batch_id": "VERIFY_001",
+  "source": "after_sales_recording",
+  "recording_id": "REC_20240515_1030_A003",
+  "agent_id": "AGENT_003",
+  "customer_id": "CUST_10005",
+  "start_time": "2024-05-15 10:30:00",
+  "end_time": "2024-05-15 11:00:00",
+  "permission_path": [
+    "/customer/profile/basic"
+  ],
+  "actual_path": [],
+  "merged_path": [
+    "/customer/profile/basic"
+  ],
+  "status": "failed",
+  "issues": [
+    {
+      "type": "missing_data",
+      "message": "actual_path is empty",
+      "severity": "high",
+      "field": "actual_path"
+    },
+    {
+      "type": "path_mismatch",
+      "message": "Path length mismatch: permission(1) vs actual(0)",
+      "severity": "low"
+    }
+  ],
+  "is_manual_fix": false,
+  "fix_reason": null,
+  "fix_time": null,
+  "processed_time": "2026-05-15 21:29:57.045660",
+  "execution_time_ms": 0.007152557373046875,
+  "metadata": {}
+}

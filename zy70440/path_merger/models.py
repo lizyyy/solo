@@ -69,6 +69,7 @@ class CacheEntry(BaseModel):
 
 
 class QueryFilter(BaseModel):
+    record_id: Optional[str] = None
     batch_id: Optional[str] = None
     status: Optional[PathStatus] = None
     issue_type: Optional[IssueType] = None

@@ -1,0 +1,32 @@
+{
+  "record_id": "VERIFY_001_006",
+  "batch_id": "VERIFY_001",
+  "source": "after_sales_recording",
+  "recording_id": "REC_20240515_1100_A004",
+  "agent_id": "AGENT_004",
+  "customer_id": "CUST_10006",
+  "start_time": "2024-05-15 11:00:00",
+  "end_time": "2024-05-15 11:25:00",
+  "permission_path": [
+    "/customer/profile/basic",
+    "/return/process",
+    "/exchange/apply"
+  ],
+  "actual_path": [
+    "/customer/profile/basic",
+    "/return/process",
+    "/exchange/apply"
+  ],
+  "merged_path": [
+    "/a",
+    "/b"
+  ],
+  "status": "manual_fix",
+  "issues": [],
+  "is_manual_fix": true,
+  "fix_reason": "测试修正",
+  "fix_time": "2026-05-15 21:32:12.803065",
+  "processed_time": "2026-05-15 21:29:57.045820",
+  "execution_time_ms": 0.008106231689453125,
+  "metadata": {}
+}

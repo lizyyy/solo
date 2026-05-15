@@ -1,15 +1,15 @@
 {
-  "record_id": "TEST_CACHE_001_007",
-  "batch_id": "TEST_CACHE_001",
-  "file_hash": "695af74cbf345e90530738b2c0f8ee5d1142be115d26a1a45d2fdd2c01fce889",
+  "record_id": "VERIFY_001_007",
+  "batch_id": "VERIFY_001",
+  "file_hash": "7efb6b9f58dc78a77b97de0d8eb55ef5f014fdb4c3c0f20f21acf64b0b803e78",
   "merged_path": [
     "/customer/profile/basic",
     "/feedback/submit",
     "/feedback/escalate",
     "/manager/special/approval"
   ],
-  "status": "success",
-  "processed_time": "2026-05-15 20:34:34.684881",
+  "status": "failed",
+  "processed_time": "2026-05-15 21:29:57.046020",
   "issues": [
     {
       "type": "permission_over_grant",
