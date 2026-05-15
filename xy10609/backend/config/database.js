@@ -1,10 +1,17 @@
-const Database = require('better-sqlite3');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 
-const dbPath = path.join(__dirname, '../data/precheck.db');
-const db = new Database(dbPath);
+const dataDir = path.join(__dirname, '../data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
 
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+const dbPath = path.join(dataDir, 'precheck.db');
+const db = new sqlite3.Database(dbPath);
+
+db.serialize(() => {
+  db.run('PRAGMA journal_mode = WAL');
+});
 
 module.exports = db;

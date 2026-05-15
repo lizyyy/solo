@@ -1,27 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
+const db = require('../config/dbUtils');
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const totalMatters = db.prepare('SELECT COUNT(*) as count FROM business_matters').get();
-    const totalGaps = db.prepare('SELECT COUNT(*) as count FROM material_gaps').get();
-    const unresolvedGaps = db.prepare('SELECT COUNT(*) as count FROM material_gaps WHERE is_resolved = 0').get();
-    const totalExceptions = db.prepare('SELECT COUNT(*) as count FROM exceptions').get();
-    const unresolvedExceptions = db.prepare('SELECT COUNT(*) as count FROM exceptions WHERE is_fixed = 0').get();
-    const expiredAttachments = db.prepare('SELECT COUNT(*) as count FROM attachments WHERE status = "expired"').get();
+    const totalMatters = await db.get('SELECT COUNT(*) as count FROM business_matters');
+    const totalGaps = await db.get('SELECT COUNT(*) as count FROM material_gaps');
+    const unresolvedGaps = await db.get('SELECT COUNT(*) as count FROM material_gaps WHERE is_resolved = 0');
+    const totalExceptions = await db.get('SELECT COUNT(*) as count FROM exceptions');
+    const unresolvedExceptions = await db.get('SELECT COUNT(*) as count FROM exceptions WHERE is_fixed = 0');
+    const expiredAttachments = await db.get('SELECT COUNT(*) as count FROM attachments WHERE status = "expired"');
 
-    const gapsByType = db.prepare(`
+    const gapsByType = await db.all(`
       SELECT gap_type as type, COUNT(*) as count 
       FROM material_gaps 
       GROUP BY gap_type
-    `).all();
+    `);
 
-    const gapsBySeverity = db.prepare(`
+    const gapsBySeverity = await db.all(`
       SELECT severity, COUNT(*) as count 
       FROM material_gaps 
       GROUP BY severity
-    `).all();
+    `);
 
     res.json({
       success: true,
