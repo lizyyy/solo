@@ -1,39 +1,87 @@
 #!/bin/sh
-# Maven Wrapper - Simple version
-# This script will attempt to use system mvn or download maven wrapper jar
+# Maven Wrapper - 增强版，支持网络/代理问题处理
 
 set -e
 
-# Check if mvn is available
+# 颜色输出
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# 检查是否有预编译的 jar 包，如果只是想运行项目，可以直接使用 java -jar
+if [ "$1" = "spring-boot:run" ] || [ "$1" = "run" ]; then
+    if [ -f "target/api-tag-validation-1.0.0.jar" ]; then
+        echo "${GREEN}发现预编译 jar 包，将直接启动...${NC}" >&2
+        exec java -jar target/api-tag-validation-1.0.0.jar
+    fi
+fi
+
+# 检查系统 Maven
 if command -v mvn >/dev/null 2>&1; then
     exec mvn "$@"
 fi
 
-# Try to download and use Maven Wrapper
-BASE_DIR=`pwd`
-WRAPPER_JAR="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
-WRAPPER_PROPS="$BASE_DIR/.mvn/wrapper/maven-wrapper.properties"
+# 尝试使用 Maven Wrapper
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+WRAPPER_JAR="$SCRIPT_DIR/.mvn/wrapper/maven-wrapper.jar"
+WRAPPER_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
 
 if [ ! -f "$WRAPPER_JAR" ]; then
-    echo "Maven not found, downloading Maven Wrapper..." >&2
-    mkdir -p "$BASE_DIR/.mvn/wrapper"
+    echo "${YELLOW}未发现 Maven，正在下载 Maven Wrapper...${NC}" >&2
+    echo "${YELLOW}如遇网络问题，请：${NC}" >&2
+    echo "${YELLOW}  1. 检查网络连接或代理设置${NC}" >&2
+    echo "${YELLOW}  2. 或手动下载 $WRAPPER_URL 到 $WRAPPER_JAR${NC}" >&2
+    echo "" >&2
+    mkdir -p "$SCRIPT_DIR/.mvn/wrapper"
     
-    # Try to download with curl
+    # 检查是否有代理设置
+    if [ -n "$http_proxy" ] || [ -n "$HTTP_PROXY" ]; then
+        echo "${YELLOW}检测到代理设置: ${http_proxy:-$HTTP_PROXY}${NC}" >&2
+    fi
+    
+    # 尝试下载
+    download_success=false
     if command -v curl >/dev/null 2>&1; then
-        curl -f -L -sS -o "$WRAPPER_JAR" "https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+        echo "使用 curl 下载 Maven Wrapper..." >&2
+        if curl -f -L -sS --connect-timeout 10 --max-time 60 -o "$WRAPPER_JAR" "$WRAPPER_URL"; then
+            download_success=true
+        fi
     elif command -v wget >/dev/null 2>&1; then
-        wget -q -O "$WRAPPER_JAR" "https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
-    else
-        echo "Error: Neither 'mvn', 'curl' nor 'wget' found in PATH." >&2
-        echo "Please install Maven first: https://maven.apache.org/install.html" >&2
+        echo "使用 wget 下载 Maven Wrapper..." >&2
+        if wget -q --timeout=60 -O "$WRAPPER_JAR" "$WRAPPER_URL"; then
+            download_success=true
+        fi
+    fi
+    
+    if [ "$download_success" = false ]; then
+        echo "" >&2
+        echo "${RED}========================================${NC}" >&2
+        echo "${RED}  Maven Wrapper 下载失败${NC}" >&2
+        echo "${RED}========================================${NC}" >&2
+        echo "" >&2
+        echo "可能的原因：" >&2
+        echo "  1. 网络连接问题" >&2
+        echo "  2. 代理设置不正确 (当前: ${http_proxy:-未设置})" >&2
+        echo "  3. Maven 中央仓库访问受限" >&2
+        echo "" >&2
+        echo "解决方案：" >&2
+        echo "  1. 手动下载: $WRAPPER_URL" >&2
+        echo "  2. 保存到: $WRAPPER_JAR" >&2
+        echo "  3. 然后重新运行本脚本" >&2
+        echo "" >&2
+        echo "或直接安装 Maven: https://maven.apache.org/install.html" >&2
         exit 1
     fi
+    
+    echo "${GREEN}✓ Maven Wrapper 下载成功${NC}" >&2
 fi
 
-# Use Java to run the wrapper
-if command -v java >/dev/null 2>&1; then
-    exec java -jar "$WRAPPER_JAR" "$@"
-else
-    echo "Error: Java is not installed." >&2
+# 检查 Java
+if ! command -v java >/dev/null 2>&1; then
+    echo "${RED}错误: 未找到 Java，请先安装 JDK 17+${NC}" >&2
     exit 1
 fi
+
+# 运行 Maven Wrapper
+exec java -jar "$WRAPPER_JAR" "$@"

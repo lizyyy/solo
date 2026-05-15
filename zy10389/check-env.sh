@@ -34,11 +34,24 @@ echo ""
 # 检查 Maven 或 mvnw
 echo "[2/3] 检查 Maven 环境..."
 if command -v mvn >/dev/null 2>&1; then
-    echo "  ✓ 系统 Maven 已安装: $(mvn -v | head -1 | awk '{print $3}')"
-    MVN_OK=true
+    if mvn -version >/dev/null 2>&1; then
+        echo "  ✓ 系统 Maven 已安装: $(mvn -v | head -1 | awk '{print $3}')"
+        MVN_OK=true
+    else
+        echo "  ✗ 系统 Maven 存在但无法执行"
+        MVN_OK=false
+    fi
 elif [ -f "./mvnw" ]; then
-    echo "  ✓ 项目 Maven Wrapper 已存在"
-    MVN_OK=true
+    echo "  ⚠  Maven Wrapper 脚本存在，将尝试首次运行..."
+    echo "     注意：首次运行需要联网下载依赖"
+    # 尝试执行 mvnw -version 检查是否真的可用
+    if ./mvnw -version >/dev/null 2>&1; then
+        echo "  ✓ Maven Wrapper 可用"
+        MVN_OK=true
+    else
+        echo "  ✗ Maven Wrapper 无法正常执行（可能是网络/代理问题）"
+        MVN_OK=false
+    fi
 else
     echo "  ✗ 未找到 Maven 或 Maven Wrapper"
     MVN_OK=false
@@ -71,6 +84,19 @@ if $JAVA_OK && $MVN_OK; then
     echo "    1. 编译: ./mvnw clean package -DskipTests"
     echo "    2. 启动: ./mvnw spring-boot:run"
     echo "    3. 测试: ./test_demo.sh"
+elif $JAVA_OK; then
+    echo "  ⚠  Java 就绪，但 Maven 不可用"
+    echo ""
+    echo "  备用方案："
+    echo "    方案 A: 手动下载 Maven Wrapper"
+    echo "      1. 访问: https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+    echo "      2. 保存到: .mvn/wrapper/maven-wrapper.jar"
+    echo "      3. 重新运行: ./mvnw spring-boot:run"
+    echo ""
+    echo "    方案 B: 检查网络/代理设置"
+    echo "      当前代理: ${http_proxy:-未设置}"
+    echo "      如需设置: export http_proxy=http://your-proxy:port"
+    exit 1
 else
     echo "  ✗ 环境存在问题，请先解决上述问题"
     exit 1

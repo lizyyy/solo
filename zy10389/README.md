@@ -51,6 +51,40 @@ java -version
 - Linux: `sudo apt install openjdk-17-jdk`
 - Windows: 下载 [Oracle JDK 17](https://www.oracle.com/java/technologies/downloads/#java17)
 
+## ⚠ 网络/代理问题故障排除
+
+如果 `./mvnw` 下载失败（如 `curl: (7) Failed to connect`），请按以下步骤操作：
+
+### 方案 1: 检查/设置代理
+```bash
+# 查看当前代理
+echo $http_proxy
+
+# 设置代理（如有）
+export http_proxy=http://your-proxy:port
+export https_proxy=http://your-proxy:port
+
+# 然后重试
+./mvnw spring-boot:run
+```
+
+### 方案 2: 手动下载 Maven Wrapper
+```bash
+# 手动下载 jar 文件
+mkdir -p .mvn/wrapper
+curl -o .mvn/wrapper/maven-wrapper.jar \
+  https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar
+
+# 然后重试
+./mvnw spring-boot:run
+```
+
+### 方案 3: 使用已安装的 Maven
+如果系统已有 Maven，可以直接使用：
+```bash
+mvn spring-boot:run
+```
+
 ## 快速开始
 
 ### 1. 编译项目
