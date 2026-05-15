@@ -328,13 +328,17 @@ public class TagInheritanceService {
     }
 
     private String determineResolvedValue(ConflictItem conflict, ConflictResolutionRequest request) {
-        return switch (request.getResolution()) {
-            case PARENT_WINS -> conflict.getConflictingValues().split("\\|")[0];
-            case CHILD_WINS -> conflict.getConflictingValues().split("\\|")[1];
-            case MANUAL_OVERRIDE -> request.getResolvedValue();
-            case SKIP -> null;
-            default -> null;
-        };
+        ConflictItem.ConflictResolution resolution = request.getResolution();
+        if (resolution == ConflictItem.ConflictResolution.PARENT_WINS) {
+            return conflict.getConflictingValues().split("\\|")[0];
+        } else if (resolution == ConflictItem.ConflictResolution.CHILD_WINS) {
+            return conflict.getConflictingValues().split("\\|")[1];
+        } else if (resolution == ConflictItem.ConflictResolution.MANUAL_OVERRIDE) {
+            return request.getResolvedValue();
+        } else if (resolution == ConflictItem.ConflictResolution.SKIP) {
+            return null;
+        }
+        return null;
     }
 
     private void updateCalculationResult(String taskId, ConflictItem conflict, String resolvedValue) {

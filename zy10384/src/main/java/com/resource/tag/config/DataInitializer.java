@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Arrays;
 
 @Slf4j
 @Component
@@ -45,7 +45,7 @@ public class DataInitializer implements CommandLineRunner {
 
         addTag(project, "backup_enabled", "false", 500);
 
-        nodeRepository.saveAll(List.of(org, dept, team, project));
+        nodeRepository.saveAll(Arrays.asList(org, dept, team, project));
     }
 
     private void initOverrideRules() {
@@ -69,7 +69,7 @@ public class DataInitializer implements CommandLineRunner {
         rule2.setDescription("Highest security level");
         rule2.setEnabled(true);
 
-        ruleRepository.saveAll(List.of(rule1, rule2));
+        ruleRepository.saveAll(Arrays.asList(rule1, rule2));
     }
 
     private ResourceNode createNode(String nodeId, String name, String parentId, String type) {

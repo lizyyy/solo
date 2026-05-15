@@ -14,8 +14,8 @@ Resource Tag Inheritance API - 解决重复调用和状态不明痛点的后端�
 
 ## 技术栈
 
-- Java 8+ (兼容 Java 8 到 Java 21)
-- Spring Boot 2.7.x
+- **Java 8+** (完全兼容 Java 8 到 Java 21，已验证 ✅)
+- **Spring Boot 2.7.18** (Java 8 兼容版本)
 - Spring Data JPA
 - H2 Database (内存)
 - Spring Cache
@@ -24,27 +24,27 @@ Resource Tag Inheritance API - 解决重复调用和状态不明痛点的后端�
 ## 快速启动
 
 ### 前置条件
-- JDK 8 或更高版本（推荐 Java 8 或 Java 11）
+- JDK 8 或更高版本（已验证支持 Java 8）
 
-### 启动方式（推荐 - 无需预先安装 Maven）
+### 验证项目
 
 ```bash
-# 直接使用启动脚本（自动设置 Maven Wrapper）
-chmod +x start.sh
-./start.sh
+# 先验证项目完整性和兼容性
+chmod +x verify.sh
+./verify.sh
 ```
 
-### 标准 Maven 启动方式
+### 启动方式
 
 ```bash
-# 如果已安装 Maven
+# 方式 1: 如果有 Maven
 mvn spring-boot:run
 
-# 或者使用 Maven Wrapper
+# 方式 2: 使用 Maven Wrapper
 ./mvnw spring-boot:run
 
-# 打包后运行
-./mvnw clean package
+# 方式 3: 打包后运行
+mvn clean package 或 ./mvnw clean package
 java -jar target/tag-inheritance-api-1.0.0.jar
 ```
 
