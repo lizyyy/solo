@@ -1,0 +1,33 @@
+{
+  "name": "multi-repo-change-index",
+  "version": "1.0.0",
+  "description": "多仓库变更索引命令行工具",
+  "main": "dist/index.js",
+  "bin": {
+    "mrc": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "invoice",
+    "red-flush",
+    "audit",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "date-fns": "^3.0.6",
+    "lowdb": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
