@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: finance-carrier
+Version: 1.0.0
+Summary: 财务结转表处理命令行工具
+Author: Finance Team
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0.0
+Requires-Dist: pandas>=1.5.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jsonschema>=4.0.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

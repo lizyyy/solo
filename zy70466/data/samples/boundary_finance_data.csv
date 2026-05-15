@@ -1,0 +1,6 @@
+batch_no,source_system,amount,carrier_date,account_code,description,processor,pharmacy_receipt_id
+,ERP-SystemA,5000.00,2024-05-03,ACC-001,边界测试-空批次号,test_user,PHARM-RCP-BOUND-001
+BATCH20240503002,,2000.00,2024-05-03,ACC-001,边界测试-空来源系统,test_user,PHARM-RCP-BOUND-002
+BATCH20240503003,ERP-SystemA,-100.00,2024-05-03,ACC-001,边界测试-负金额,test_user,PHARM-RCP-BOUND-003
+BATCH20240503004,ERP-SystemA,1000.00,,ACC-001,边界测试-空日期,test_user,PHARM-RCP-BOUND-004
+BATCH20240503005,ERP-SystemA,1000.00,2024-05-03,,边界测试-空科目编码,test_user,PHARM-RCP-BOUND-005

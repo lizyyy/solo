@@ -1,0 +1,7 @@
+batch_no,source_system,amount,carrier_date,account_code,description,processor,pharmacy_receipt_id
+MS-BATCH-001,HIS-System,125000.00,2024-05-10,ACC-HIS-001,住院结算结转,hospital_finance,PHARM-RCP-MS-001
+MS-BATCH-002,ERP-Finance,89000.50,2024-05-10,ACC-ERP-001,采购付款结转,purchase_dept,PHARM-RCP-MS-002
+MS-BATCH-003,CRM-System,45000.00,2024-05-10,ACC-CRM-001,客户退款结转,customer_service,PHARM-RCP-MS-003
+MS-BATCH-004,WMS-System,28000.75,2024-05-10,ACC-WMS-001,库存调整结转,warehouse_keeper,PHARM-RCP-MS-004
+MS-BATCH-005,OA-System,15000.00,2024-05-10,ACC-OA-001,报销付款结转,finance_audit,PHARM-RCP-MS-005
+MS-BATCH-006,HIS-System,230000.00,2024-05-10,ACC-HIS-002,门诊收费结转,hospital_finance,PHARM-RCP-MS-006

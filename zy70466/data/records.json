@@ -1,0 +1,68 @@
+[
+  {
+    "batch_no": "BATCH20240501001",
+    "source_system": "ERP-SystemA",
+    "amount": 15000.5,
+    "carrier_date": "2024-05-01",
+    "account_code": "ACC-001",
+    "description": "药品采购结转",
+    "processor": "zhang_san",
+    "pharmacy_receipt_id": "PHARM-RCP-20240501-001",
+    "created_at": "2026-05-16T07:08:22.119977"
+  },
+  {
+    "batch_no": "BATCH20240501002",
+    "source_system": "ERP-SystemB",
+    "amount": 28500.75,
+    "carrier_date": "2024-05-01",
+    "account_code": "ACC-002",
+    "description": "医疗器械结转",
+    "processor": "zhang_san",
+    "pharmacy_receipt_id": "PHARM-RCP-20240501-002",
+    "created_at": "2026-05-16T07:08:22.120330"
+  },
+  {
+    "batch_no": "BATCH20240501003",
+    "source_system": "ERP-SystemA",
+    "amount": 8900.0,
+    "carrier_date": "2024-05-01",
+    "account_code": "ACC-001",
+    "description": "耗材采购结转",
+    "processor": "zhang_san",
+    "pharmacy_receipt_id": "PHARM-RCP-20240501-003",
+    "created_at": "2026-05-16T07:08:22.120617"
+  },
+  {
+    "batch_no": "BATCH20240502001",
+    "source_system": "ERP-SystemC",
+    "amount": 45000.0,
+    "carrier_date": "2024-05-02",
+    "account_code": "ACC-003",
+    "description": "住院费用结转",
+    "processor": "zhang_san",
+    "pharmacy_receipt_id": "PHARM-RCP-20240502-001",
+    "created_at": "2026-05-16T07:08:22.120901"
+  },
+  {
+    "batch_no": "BATCH20240502002",
+    "source_system": "ERP-SystemB",
+    "amount": 12300.25,
+    "carrier_date": "2024-05-02",
+    "account_code": "ACC-002",
+    "description": "门诊费用结转",
+    "processor": "zhang_san",
+    "pharmacy_receipt_id": "PHARM-RCP-20240502-002",
+    "created_at": "2026-05-16T07:08:22.121194"
+  },
+  {
+    "batch_no": "BATCH20240501004",
+    "source_system": "ERP-SystemA",
+    "amount": 32000.5,
+    "carrier_date": "2024-05-01",
+    "account_code": "ACC-001",
+    "description": "新增正常记录",
+    "processor": "test_user",
+    "pharmacy_receipt_id": "PHARM-RCP-20240501-004",
+    "created_at": "2026-05-16T07:09:01.812130"
+  }
+]

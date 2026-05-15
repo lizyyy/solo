@@ -1,0 +1,44 @@
+[
+  {
+    "batch_no": "BATCH20240501001",
+    "source_system": "ERP-SystemA",
+    "action": "rollback",
+    "reason": "回滚候选",
+    "record_id": null
+  },
+  {
+    "batch_no": "BATCH20240501002",
+    "source_system": "ERP-SystemB",
+    "action": "rollback",
+    "reason": "回滚候选",
+    "record_id": null
+  },
+  {
+    "batch_no": "BATCH20240501003",
+    "source_system": "ERP-SystemA",
+    "action": "rollback",
+    "reason": "回滚候选",
+    "record_id": null
+  },
+  {
+    "batch_no": "BATCH20240502001",
+    "source_system": "ERP-SystemC",
+    "action": "rollback",
+    "reason": "回滚候选",
+    "record_id": null
+  },
+  {
+    "batch_no": "BATCH20240502002",
+    "source_system": "ERP-SystemB",
+    "action": "rollback",
+    "reason": "回滚候选",
+    "record_id": null
+  },
+  {
+    "batch_no": "BATCH20240501004",
+    "source_system": "ERP-SystemA",
+    "action": "rollback",
+    "reason": "回滚候选",
+    "record_id": null
+  }
+]
