@@ -1,11 +1,10 @@
 package com.metadata.repair.entity;
 
 import com.metadata.repair.enums.RepairStatus;
+
 import javax.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "repair_history")
 public class RepairHistory {
@@ -34,4 +33,19 @@ public class RepairHistory {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getBatchNo() { return batchNo; }
+    public void setBatchNo(String batchNo) { this.batchNo = batchNo; }
+    public RepairStatus getPreviousStatus() { return previousStatus; }
+    public void setPreviousStatus(RepairStatus previousStatus) { this.previousStatus = previousStatus; }
+    public RepairStatus getNewStatus() { return newStatus; }
+    public void setNewStatus(RepairStatus newStatus) { this.newStatus = newStatus; }
+    public String getOperator() { return operator; }
+    public void setOperator(String operator) { this.operator = operator; }
+    public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

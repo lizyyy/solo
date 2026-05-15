@@ -5,15 +5,19 @@ import com.metadata.repair.entity.RepairException;
 import com.metadata.repair.entity.RepairHistory;
 import com.metadata.repair.service.MetadataRepairService;
 import javax.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/repair")
-@RequiredArgsConstructor
 public class MetadataRepairController {
     private final MetadataRepairService metadataRepairService;
+
+    @Autowired
+    public MetadataRepairController(MetadataRepairService metadataRepairService) {
+        this.metadataRepairService = metadataRepairService;
+    }
 
     @PostMapping("/batch")
     public ApiResponse<BatchResponse> createBatch(@Valid @RequestBody CreateBatchRequest request) {

@@ -4,8 +4,9 @@ import com.metadata.repair.dto.*;
 import com.metadata.repair.entity.*;
 import com.metadata.repair.enums.*;
 import com.metadata.repair.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
@@ -13,14 +14,25 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class MetadataRepairService {
+    private static final Logger log = LoggerFactory.getLogger(MetadataRepairService.class);
+    
     private final AttachmentRepository attachmentRepository;
     private final RepairBatchRepository repairBatchRepository;
     private final RepairExceptionRepository repairExceptionRepository;
     private final RepairHistoryRepository repairHistoryRepository;
+
+    @Autowired
+    public MetadataRepairService(AttachmentRepository attachmentRepository,
+                                  RepairBatchRepository repairBatchRepository,
+                                  RepairExceptionRepository repairExceptionRepository,
+                                  RepairHistoryRepository repairHistoryRepository) {
+        this.attachmentRepository = attachmentRepository;
+        this.repairBatchRepository = repairBatchRepository;
+        this.repairExceptionRepository = repairExceptionRepository;
+        this.repairHistoryRepository = repairHistoryRepository;
+    }
 
     @Transactional
     public ApiResponse<BatchResponse> createBatch(CreateBatchRequest request) {

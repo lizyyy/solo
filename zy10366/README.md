@@ -29,15 +29,19 @@
 
 ## 快速开始
 
+### 环境要求
+- Java 8 或更高版本 (JDK或JRE均可)
+- Maven (可选，如果没有会自动下载依赖)
+
 ### 1. 启动服务
 
 ```bash
 # 赋予执行权限并启动
-chmod +x run.sh
-./run.sh
+chmod +x start.sh
+./start.sh
 ```
 
-脚本会自动下载依赖、编译源码并启动服务。
+脚本会自动检测环境、下载依赖、编译源码并启动服务。
 
 服务启动后访问:
 - API基础路径: `http://localhost:8080/api/repair`
