@@ -1,8 +1,17 @@
 const { execSync } = require('child_process');
 const chalk = require('chalk');
 const fs = require('fs');
+const path = require('path');
+
+const dataDir = path.join(__dirname, '../data');
 
 console.log(chalk.bold('=== 日志脱敏验证工具 - 功能测试 ===\n'));
+
+console.log(chalk.yellow('准备测试环境 - 清理旧数据库...'));
+if (fs.existsSync(dataDir)) {
+  fs.rmSync(dataDir, { recursive: true, force: true });
+  console.log(chalk.gray('  data/ 目录已删除'));
+}
 
 let failed = 0;
 let passed = 0;

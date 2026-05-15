@@ -9,6 +9,20 @@ const path = require('path');
 
 const ValidationService = require('./utils/service');
 
+async function safePrompt(questions) {
+  try {
+    if (!process.stdin.isTTY) {
+      throw new Error('非交互模式下需要通过命令行参数提供值');
+    }
+    return await inquirer.prompt(questions);
+  } catch (error) {
+    if (error.message && (error.message.includes('ERR_USE_AFTER_CLOSE') || error.message.includes('非交互模式'))) {
+      throw new Error('输入流已关闭，请在交互终端中运行此命令，或使用命令行参数提供所有必需值');
+    }
+    throw error;
+  }
+}
+
 const program = new Command();
 
 program
@@ -235,7 +249,10 @@ program
 program
   .command('candidate <batchId> <actionType>')
   .description('生成候选清单 (cleanup/rollback)')
-  .action(async (batchId, actionType) => {
+  .option('-o, --operator <operator>', '操作者')
+  .option('-y, --yes', '跳过确认直接执行')
+  .option('--no-execute', '仅生成不执行')
+  .action(async (batchId, actionType, options) => {
     try {
       if (!['cleanup', 'rollback'].includes(actionType)) {
         console.log(chalk.red('动作类型必须是 cleanup 或 rollback'));
@@ -244,13 +261,23 @@ program
 
       console.log(chalk.bold(`\n=== 生成${actionType === 'cleanup' ? '清理' : '回滚'}候选清单 ===\n`));
 
-      const { operator } = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'operator',
-          message: '操作者:'
+      let operator = options.operator;
+      if (!operator) {
+        try {
+          const answers = await safePrompt([
+            {
+              type: 'input',
+              name: 'operator',
+              message: '操作者:'
+            }
+          ]);
+          operator = answers.operator;
+        } catch (promptError) {
+          console.error(chalk.red('错误:'), promptError.message);
+          console.log(chalk.yellow('提示: 使用 -o <operator> 参数在非交互模式下指定操作者'));
+          process.exit(1);
         }
-      ]);
+      }
 
       const candidateList = await ValidationService.generateCandidateList(batchId, actionType, operator);
 
@@ -267,14 +294,33 @@ program
         console.log('');
       });
 
-      const { confirmExecute } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'confirmExecute',
-          message: '确认执行此候选清单? (建议先人工审核)',
-          default: false
+      let confirmExecute = false;
+      
+      if (options.yes) {
+        confirmExecute = true;
+        console.log(chalk.yellow('自动确认执行（-y 模式）'));
+      } else if (!options.execute) {
+        console.log(chalk.yellow('仅生成模式，不执行'));
+        console.log(`后续执行: ${chalk.cyan(`log-validator execute ${candidateList.id}`)}`);
+        return;
+      } else {
+        try {
+          const answers = await safePrompt([
+            {
+              type: 'confirm',
+              name: 'confirmExecute',
+              message: '确认执行此候选清单? (建议先人工审核)',
+              default: false
+            }
+          ]);
+          confirmExecute = answers.confirmExecute;
+        } catch (promptError) {
+          console.log(chalk.yellow('未执行操作'));
+          console.log(`后续执行: ${chalk.cyan(`log-validator execute ${candidateList.id}`)}`);
+          console.log(chalk.gray(`或使用: log-validator candidate ${batchId} ${actionType} -o ${operator} -y 自动执行`));
+          return;
         }
-      ]);
+      }
 
       if (confirmExecute) {
         const result = await ValidationService.executeCandidateList(candidateList.id);
@@ -292,7 +338,8 @@ program
 program
   .command('execute <candidateListId>')
   .description('执行候选清单')
-  .action(async (candidateListId) => {
+  .option('-y, --yes', '跳过确认直接执行')
+  .action(async (candidateListId, options) => {
     try {
       const candidateList = await ValidationService.getCandidateList(candidateListId);
 
@@ -317,16 +364,30 @@ program
         console.log(`  ${i + 1}. ${c.fileName}`);
       });
 
-      const { confirm } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'confirm',
-          message: '确认执行?',
-          default: false
+      let confirmed = false;
+      
+      if (options.yes) {
+        confirmed = true;
+        console.log(chalk.yellow('\n自动确认执行（-y 模式）'));
+      } else {
+        try {
+          const answers = await safePrompt([
+            {
+              type: 'confirm',
+              name: 'confirm',
+              message: '确认执行?',
+              default: false
+            }
+          ]);
+          confirmed = answers.confirm;
+        } catch (promptError) {
+          console.log(chalk.yellow('\n未执行操作。使用 -y 参数在非交互模式下自动确认执行'));
+          console.log(chalk.cyan(`示例: log-validator execute ${candidateListId} -y`));
+          return;
         }
-      ]);
+      }
 
-      if (confirm) {
+      if (confirmed) {
         const result = await ValidationService.executeCandidateList(candidateListId);
         console.log(chalk.green(`\n✓ 执行成功!`));
       }
@@ -387,15 +448,27 @@ program
 program
   .command('confirm <resultId>')
   .description('人工确认验证结果')
-  .action(async (resultId) => {
+  .option('-b, --by <confirmedBy>', '确认人')
+  .action(async (resultId, options) => {
     try {
-      const { confirmedBy } = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'confirmedBy',
-          message: '确认人:'
+      let confirmedBy = options.by;
+      
+      if (!confirmedBy) {
+        try {
+          const answers = await safePrompt([
+            {
+              type: 'input',
+              name: 'confirmedBy',
+              message: '确认人:'
+            }
+          ]);
+          confirmedBy = answers.confirmedBy;
+        } catch (promptError) {
+          console.error(chalk.red('错误:'), promptError.message);
+          console.log(chalk.yellow('提示: 使用 -b <确认人> 参数在非交互模式下指定'));
+          process.exit(1);
         }
-      ]);
+      }
 
       await ValidationService.confirmManual(resultId, confirmedBy);
       console.log(chalk.green('✓ 人工确认完成'));
