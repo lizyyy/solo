@@ -1,10 +1,11 @@
 package repository
 
 import (
+	"database/sql"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/idempotent-payment-api/internal/model"
+	"github.com/jmoiron/sqlx"
 )
 
 type ReceiverAccountRepository struct {
@@ -24,12 +25,22 @@ func (r *ReceiverAccountRepository) Create(tx *sqlx.Tx, account *model.ReceiverA
 	account.UpdatedAt = time.Now()
 
 	var err error
+	var result sql.Result
 	if tx != nil {
-		_, err = tx.NamedExec(query, account)
+		result, err = tx.NamedExec(query, account)
 	} else {
-		_, err = r.db.NamedExec(query, account)
+		result, err = r.db.NamedExec(query, account)
 	}
-	return err
+	if err != nil {
+		return err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	account.ID = id
+	return nil
 }
 
 func (r *ReceiverAccountRepository) GetByID(id int64) (*model.ReceiverAccount, error) {
@@ -58,12 +69,22 @@ func (r *PaymentInstructionRepository) Create(tx *sqlx.Tx, payment *model.Paymen
 	payment.UpdatedAt = time.Now()
 
 	var err error
+	var result sql.Result
 	if tx != nil {
-		_, err = tx.NamedExec(query, payment)
+		result, err = tx.NamedExec(query, payment)
 	} else {
-		_, err = r.db.NamedExec(query, payment)
+		result, err = r.db.NamedExec(query, payment)
 	}
-	return err
+	if err != nil {
+		return err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	payment.ID = id
+	return nil
 }
 
 func (r *PaymentInstructionRepository) GetByPaymentNo(paymentNo string) (*model.PaymentInstruction, error) {

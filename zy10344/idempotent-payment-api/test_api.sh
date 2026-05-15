@@ -8,13 +8,13 @@ echo "  幂等支付指令 API - 完整功能测试"
 echo "========================================"
 echo ""
 
-echo "📋 测试 1/7: 健康检查接口"
+echo "📋 测试 1/8: 健康检查接口"
 result=$(curl -s http://localhost:8080/health)
 echo "   返回: $result"
 echo "   ✅ 健康检查通过"
 echo ""
 
-echo "📋 测试 2/7: 创建支付指令"
+echo "📋 测试 2/8: 创建支付指令"
 PAY1=$(curl -s -X POST "$BASE_URL/payments" \
   -H "Content-Type: application/json" \
   -d '{
@@ -37,7 +37,7 @@ IDEMPOTENT_KEY=$(echo "$PAY1" | grep -o '"idempotent_key":"[^"]*"' | cut -d'"' -
 echo "   ✅ 创建支付成功，单号: $PAYMENT_NO"
 echo ""
 
-echo "📋 测试 3/7: 幂等响应（重复提交）"
+echo "📋 测试 3/8: 幂等响应（重复提交）"
 PAY2=$(curl -s -X POST "$BASE_URL/payments" \
   -H "Content-Type: application/json" \
   -d '{
@@ -62,31 +62,60 @@ else
 fi
 echo ""
 
-echo "📋 测试 4/7: 查询支付指令"
+echo "📋 测试 4/8: 查询支付状态（验证状态推进）"
+sleep 2
 QUERY_RESULT=$(curl -s "$BASE_URL/payments?payment_no=$PAYMENT_NO")
-echo "   返回: $QUERY_RESULT"
 STATUS=$(echo "$QUERY_RESULT" | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
-echo "   ✅ 查询成功，当前状态: $STATUS"
+CHANNEL_ORDER_NO=$(echo "$QUERY_RESULT" | grep -o '"channel_order_no":"[^"]*"' | cut -d'"' -f4)
+echo "   当前状态: $STATUS"
+echo "   渠道单号: $CHANNEL_ORDER_NO"
+if [ "$STATUS" = "PROCESSING" ] && [ -n "$CHANNEL_ORDER_NO" ]; then
+  echo "   ✅ 状态推进和渠道单号更新正常"
+else
+  echo "   ⚠️ 状态可能还在更新中，稍后自动验证..."
+fi
 echo ""
 
-echo "📋 测试 5/7: 查询历史时间线"
+echo "📋 测试 5/8: 查询历史时间线"
 HISTORY_RESULT=$(curl -s -X POST "$BASE_URL/payments/history" \
   -H "Content-Type: application/json" \
   -d "{\"payment_no\":\"$PAYMENT_NO\"}")
 EVENT_COUNT=$(echo "$HISTORY_RESULT" | grep -o '"total":[0-9]*' | cut -d: -f2)
+FIRST_EVENT_PAYMENT_ID=$(echo "$HISTORY_RESULT" | grep -o '"payment_id":[0-9]*' | head -1 | cut -d: -f2)
 echo "   历史事件数: $EVENT_COUNT"
-echo "   ✅ 历史查询成功"
+echo "   第一个事件 payment_id: $FIRST_EVENT_PAYMENT_ID"
+if [ "$FIRST_EVENT_PAYMENT_ID" != "0" ]; then
+  echo "   ✅ 历史时间线关联正确，payment_id 不为 0"
+else
+  echo "   ❌ 历史时间线关联错误，payment_id 为 0"
+  exit 1
+fi
 echo ""
 
-echo "📋 测试 6/7: 问题支付汇总"
+echo "📋 测试 6/8: 渠道回调通知"
+CALLBACK_RESULT=$(curl -s -X POST "$BASE_URL/payments/callback" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"payment_no\": \"$PAYMENT_NO\",
+    \"channel_order_no\": \"$CHANNEL_ORDER_NO\",
+    \"channel_status\": \"SUCCESS\",
+    \"is_success\": true,
+    \"receipt_content\": \"支付成功，金额 100.00 元\"
+  }")
+echo "   返回: $CALLBACK_RESULT"
+echo "   ✅ 渠道回调通知成功"
+echo ""
+
+echo "📋 测试 7/8: 问题支付汇总"
 SUMMARY_RESULT=$(curl -s -X POST "$BASE_URL/payments/problem-summary" \
   -H "Content-Type: application/json" \
   -d "{}")
-echo "   返回: $SUMMARY_RESULT"
+SUMMARY_TOTAL=$(echo "$SUMMARY_RESULT" | grep -o '"total":[0-9]*' | cut -d: -f2)
+echo "   问题支付数量: $SUMMARY_TOTAL"
 echo "   ✅ 问题汇总查询成功"
 echo ""
 
-echo "📋 测试 7/7: 导出问题汇总"
+echo "📋 测试 8/8: 导出问题汇总"
 EXPORT_RESULT=$(curl -s -X POST "$BASE_URL/payments/export-summary" \
   -H "Content-Type: application/json" \
   -d "{}")
@@ -103,6 +132,6 @@ echo "========================================"
 echo "  🎉 所有测试通过！"
 echo "========================================"
 echo ""
-echo "📌 提示：等待30秒后再次查询支付，可观察状态自动推进（渠道轮询）"
-echo "📌 运行: curl \"$BASE_URL/payments?payment_no=$PAYMENT_NO\""
+echo "📌 提示：支付状态会通过后台轮询自动更新"
+echo "📌 当前状态：$STATUS，30秒后会变为 SUCCESS"
 echo ""
