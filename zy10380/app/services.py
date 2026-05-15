@@ -14,6 +14,15 @@ import io
 class ImportService:
     @staticmethod
     def create_upload_package(filename, file_type, file_size, uploaded_by, file_content=None):
+        existing = UploadPackage.query.filter_by(
+            filename=filename,
+            file_size=file_size,
+            uploaded_by=uploaded_by
+        ).filter(UploadPackage.status.notin_(['ERROR', 'REVOKED'])).first()
+        
+        if existing:
+            return existing, False
+        
         package = UploadPackage(
             filename=filename,
             file_type=file_type,
