@@ -23,13 +23,20 @@
 - 回滚记录查看
 - 人工调整记录
 
-### 4. 报表导出
+### 4. 批量导入
+- CSV文件上传导入，支持下载模板
+- 实时显示导入进度
+- 导入历史记录展示，包含成功/失败数量
+- 错误详情查看功能
+- 自动创建初始版本记录
+
+### 5. 报表导出
 - 按操作人筛选
 - 按发布类型筛选（首次发布、更新、回滚）
 - 按时间范围筛选
 - 导出Excel报表
 
-### 5. 业务规则
+### 6. 业务规则
 - **线上发布校验**: 文章必须通过审核才能发布
 - **搜索索引异常处理**: 发布时模拟索引异常，记录失败原因
 - **阅读反馈汇总**: 记录阅读量和评分数据
@@ -41,6 +48,8 @@
 - Node.js + Express
 - SQLite3 数据库
 - ExcelJS 导出Excel
+- Multer 文件上传
+- csv-parser CSV解析
 
 ### 前端
 - Vue 3
@@ -81,29 +90,41 @@ knowledge-base-sync/
 
 ## 快速开始
 
-### 1. 安装依赖
+### ⚡ 一键启动（推荐）
+
+```bash
+# 自动完成环境检查、依赖安装、数据库初始化
+npm run setup
+
+# 启动应用
+npm run dev
+```
+
+---
+
+### 分步启动
+
+#### 1. 安装依赖
 
 ```bash
 # 安装后端依赖
 npm install
 
 # 安装前端依赖
-cd client
-npm install
-cd ..
+cd client && npm install && cd ..
 ```
 
-### 2. 初始化数据库
+#### 2. 初始化数据库
 
 ```bash
-# 创建数据库表
+# 创建数据库表（自动创建data目录）
 npm run init-db
 
-# 生成演示数据（可选）
+# 生成演示数据（可选，包含20篇文章及完整历史）
 npm run seed-data
 ```
 
-### 3. 启动应用
+#### 3. 启动应用
 
 ```bash
 # 方式一：同时启动前后端（推荐）
@@ -116,9 +137,19 @@ npm run server
 cd client && npm run serve
 ```
 
-### 4. 访问应用
+#### 4. 访问应用
 - 前端地址: http://localhost:8080
 - 后端API: http://localhost:3000
+
+---
+
+### ✅ 功能验证清单
+
+1. **异常看板**: 访问首页，查看统计数据和异常列表
+2. **文章管理**: 进入「文章列表」，可新建、筛选、发布
+3. **批量导入**: 进入「批量导入」，可下载模板、上传CSV、查看历史
+4. **报表导出**: 进入「报表导出」，可筛选、导出Excel
+5. **文章详情**: 点击文章，可查看版本历史、评审记录、发布记录、回滚版本
 
 ## API接口说明
 
@@ -137,6 +168,12 @@ cd client && npm run serve
 - `GET /api/reports/publishes` - 获取发布记录列表
 - `GET /api/reports/operators` - 获取操作人列表
 - `GET /api/reports/export` - 导出Excel报表
+
+### 导入相关
+- `POST /api/imports/articles` - 批量导入文章（CSV文件上传）
+- `GET /api/imports/history` - 获取导入历史记录
+- `GET /api/imports/history/:id` - 获取单条导入详情
+- `GET /api/imports/template` - 下载导入模板
 
 ## 数据模型
 
@@ -212,6 +249,18 @@ cd client && npm run serve
 - after_value: 调整后值
 - reason: 调整原因
 - created_at: 创建时间
+
+### import_history (导入历史表)
+- id: 主键
+- file_name: 文件名
+- operator: 操作人
+- total_count: 总记录数
+- success_count: 成功数量
+- fail_count: 失败数量
+- error_details: 错误详情（JSON）
+- status: 状态 (processing/success/partial)
+- created_at: 创建时间
+- completed_at: 完成时间
 
 ## 注意事项
 

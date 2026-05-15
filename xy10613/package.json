@@ -4,6 +4,7 @@
   "description": "知识库文章发布同步系统",
   "main": "server/index.js",
   "scripts": {
+    "setup": "chmod +x setup.sh && ./setup.sh",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon server/index.js",
     "client": "cd client && npm run serve",

@@ -11,6 +11,7 @@ if (!fs.existsSync(dataDir)) {
 
 const articlesRouter = require('./routes/articles');
 const reportsRouter = require('./routes/reports');
+const importsRouter = require('./routes/imports');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,7 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.use('/api/articles', articlesRouter);
 app.use('/api/reports', reportsRouter);
+app.use('/api/imports', importsRouter);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));

@@ -19,6 +19,10 @@
           <el-icon><Document /></el-icon>
           <span>文章列表</span>
         </el-menu-item>
+        <el-menu-item index="/import">
+          <el-icon><Upload /></el-icon>
+          <span>批量导入</span>
+        </el-menu-item>
         <el-menu-item index="/reports">
           <el-icon><DataAnalysis /></el-icon>
           <span>报表导出</span>
