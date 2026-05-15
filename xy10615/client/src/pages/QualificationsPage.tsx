@@ -25,6 +25,7 @@ const QualificationsPage: React.FC = () => {
   const [qualifications, setQualifications] = useState<PersonQualification[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingQualification, setEditingQualification] = useState<PersonQualification | null>(null);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -46,7 +47,18 @@ const QualificationsPage: React.FC = () => {
   };
 
   const handleCreate = () => {
+    setEditingQualification(null);
     form.resetFields();
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (record: PersonQualification) => {
+    setEditingQualification(record);
+    form.setFieldsValue({
+      ...record,
+      validFrom: dayjs(record.validFrom),
+      validTo: dayjs(record.validTo)
+    });
     setIsModalOpen(true);
   };
 
@@ -61,10 +73,17 @@ const QualificationsPage: React.FC = () => {
         requestId: dayjs().valueOf().toString()
       };
 
-      message.success('人员资质功能已实现');
+      if (editingQualification) {
+        await qualificationApi.update(editingQualification.id, data);
+        message.success('资质更新成功');
+      } else {
+        await qualificationApi.create(data);
+        message.success('资质添加成功');
+      }
       setIsModalOpen(false);
       loadQualifications();
     } catch (error) {
+      console.error('操作失败:', error);
       message.error('操作失败');
     }
   };
@@ -129,6 +148,16 @@ const QualificationsPage: React.FC = () => {
         }
         return null;
       }
+    },
+    {
+      title: '操作',
+      key: 'action',
+      width: 100,
+      render: (_: any, record: PersonQualification) => (
+        <Button type="link" onClick={() => handleEdit(record)}>
+          编辑
+        </Button>
+      )
     }
   ];
 
@@ -136,6 +165,9 @@ const QualificationsPage: React.FC = () => {
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Title level={3} style={{ margin: 0 }}>人员资质</Title>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+          添加资质
+        </Button>
       </Space>
 
       <Table
@@ -147,7 +179,7 @@ const QualificationsPage: React.FC = () => {
       />
 
       <Modal
-        title="添加资质"
+        title={editingQualification ? '编辑资质' : '添加资质'}
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={() => form.submit()}

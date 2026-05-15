@@ -412,6 +412,39 @@ app.get('/api/qualifications/person/:personId/valid', (req: Request, res: Respon
   }
 });
 
+app.post('/api/qualifications', (req: Request, res: Response) => {
+  try {
+    const { operator, operatorId, requestId, ...data } = req.body;
+    const qualification = qualificationService.addQualification(
+      data,
+      operator || '系统',
+      operatorId || 'SYS',
+      requestId || (req as any).requestId
+    );
+    successResponse(res, qualification, (req as any).requestId);
+  } catch (error) {
+    errorResponse(res, 'INTERNAL_ERROR', '添加资质失败', (req as any).requestId, 500);
+  }
+});
+
+app.put('/api/qualifications/:id', (req: Request, res: Response) => {
+  try {
+    const { operator, operatorId, ...updates } = req.body;
+    const qualification = qualificationService.updateQualification(
+      req.params.id,
+      updates,
+      operator || '系统',
+      operatorId || 'SYS'
+    );
+    successResponse(res, qualification, (req as any).requestId);
+  } catch (error) {
+    if ((error as Error).message === 'QUALIFICATION_NOT_FOUND') {
+      return errorResponse(res, 'NOT_FOUND', '资质不存在', (req as any).requestId, 404);
+    }
+    errorResponse(res, 'INTERNAL_ERROR', '更新资质失败', (req as any).requestId, 500);
+  }
+});
+
 app.post('/api/qualifications/:personId/check', (req: Request, res: Response) => {
   try {
     const { requiredTypes } = req.body;

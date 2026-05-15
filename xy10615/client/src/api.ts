@@ -72,6 +72,8 @@ export const qualificationApi = {
   getValidByPerson: (personId: string) => api.get<ApiResponse<PersonQualification[]>>(`/qualifications/person/${personId}/valid`),
   checkQualified: (personId: string, requiredTypes: string[]) =>
     api.post<ApiResponse<{ qualified: boolean; missingTypes: string[] }>>(`/qualifications/${personId}/check`, { requiredTypes }),
+  create: (data: Partial<PersonQualification>) => api.post<ApiResponse<PersonQualification>>('/qualifications', data),
+  update: (id: string, data: Partial<PersonQualification>) => api.put<ApiResponse<PersonQualification>>(`/qualifications/${id}`, data),
 };
 
 export const missingItemApi = {

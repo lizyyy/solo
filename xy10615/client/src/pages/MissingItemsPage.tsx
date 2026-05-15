@@ -77,13 +77,16 @@ const MissingItemsPage: React.FC = () => {
       };
 
       if (editingItem) {
+        await missingItemApi.update(editingItem.id, data);
         message.success('更新成功');
       } else {
+        await missingItemApi.create(data);
         message.success('创建成功');
       }
       setIsModalOpen(false);
       loadItems();
     } catch (error) {
+      console.error('操作失败:', error);
       message.error('操作失败');
     }
   };
