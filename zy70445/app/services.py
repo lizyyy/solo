@@ -208,16 +208,91 @@ def execute_candidate_list(
     executed_by: str
 ) -> Optional[CandidateList]:
     candidate = db.query(CandidateList).filter(CandidateList.id == candidate_id).first()
-    if candidate and candidate.approved:
+    if candidate and candidate.approved and not candidate.executed:
         candidate.executed = True
         candidate.executed_at = datetime.utcnow()
 
+        success_count = 0
+        failed_count = 0
+        processed_items = []
+
         if candidate.list_type == "rollback":
-            batch = db.query(Batch).filter(Batch.id == candidate.batch_id).first()
-            if batch:
-                batch.status = ProcessingStatus.ROLLBACK
-                for token in batch.tokens:
-                    token.status = TokenStatus.REVOKED
+            for item in candidate.items:
+                try:
+                    token_id = item.get("token_id")
+                    if token_id:
+                        token = db.query(Token).filter(
+                            Token.id == token_id,
+                            Token.batch_id == candidate.batch_id
+                        ).first()
+                        if token:
+                            token.status = TokenStatus.REVOKED
+                            success_count += 1
+                            processed_items.append({
+                                "token_id": token_id,
+                                "status": "revoked",
+                                "reason": item.get("reason", "")
+                            })
+                        else:
+                            failed_count += 1
+                            processed_items.append({
+                                "token_id": token_id,
+                                "status": "failed",
+                                "error": "Token not found in batch"
+                            })
+                except Exception as e:
+                    failed_count += 1
+                    processed_items.append({
+                        "token_id": item.get("token_id"),
+                        "status": "failed",
+                        "error": str(e)
+                    })
+
+        elif candidate.list_type == "cleanup":
+            for item in candidate.items:
+                try:
+                    token_id = item.get("token_id")
+                    if token_id:
+                        token = db.query(Token).filter(
+                            Token.id == token_id,
+                            Token.batch_id == candidate.batch_id
+                        ).first()
+                        if token:
+                            token.status = "cleaned"
+                            success_count += 1
+                            processed_items.append({
+                                "token_id": token_id,
+                                "status": "cleaned",
+                                "reason": item.get("reason", "")
+                            })
+                        else:
+                            failed_count += 1
+                            processed_items.append({
+                                "token_id": token_id,
+                                "status": "failed",
+                                "error": "Token not found in batch"
+                            })
+                except Exception as e:
+                    failed_count += 1
+                    processed_items.append({
+                        "token_id": item.get("token_id"),
+                        "status": "failed",
+                        "error": str(e)
+                    })
+
+        candidate.items = processed_items
+
+        create_processing_record(
+            db=db,
+            batch_id=candidate.batch_id,
+            record_type=f"{candidate.list_type}_execution",
+            content_before={"items_count": len(candidate.items)},
+            content_after={"success_count": success_count, "failed_count": failed_count},
+            status="success" if failed_count == 0 else "partial",
+            operator=executed_by,
+            execution_time_ms=0,
+            remarks=f"{candidate.list_type.capitalize()} execution: {success_count} success, {failed_count} failed"
+        )
 
         db.commit()
         db.refresh(candidate)
