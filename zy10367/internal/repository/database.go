@@ -50,6 +50,7 @@ func autoMigrate() error {
 		&model.RollbackRecord{},
 		&model.EnablementRecord{},
 		&model.IdempotentRequest{},
+		&model.RenewalReminder{},
 	)
 }
 

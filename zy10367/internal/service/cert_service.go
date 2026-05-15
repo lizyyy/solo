@@ -277,11 +277,13 @@ func (s *certService) Rollback(req *model.RollbackRequest) (*model.RollbackRecor
 		if err := s.enablementRepo.Create(enablementRecord, tx); err != nil {
 			return err
 		}
+		if err := s.certRepo.SetCurrentCert(req.PartnerID, rollbackCert.ID, tx); err != nil {
+			return err
+		}
 		if err := s.certRepo.UpdateStatus(currentCert.ID, model.CertStatusDisabled, tx); err != nil {
 			return err
 		}
 		rollbackCert.Status = model.CertStatusEnabled
-		rollbackCert.IsCurrent = true
 		rollbackCert.IsRollback = true
 		if err := s.certRepo.Update(rollbackCert, tx); err != nil {
 			return err

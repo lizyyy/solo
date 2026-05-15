@@ -13,14 +13,14 @@ type RenewalReminderService interface {
 }
 
 type reminderService struct {
-	certRepo      repository.CertRepository
-	reminderRepo  repository.ReminderRepository
+	certRepo     repository.CertRepository
+	reminderRepo repository.ReminderRepository
 }
 
 func NewRenewalReminderService() RenewalReminderService {
 	return &reminderService{
-		certRepo:      repository.NewCertRepository(),
-		reminderRepo:  repository.NewReminderRepository(),
+		certRepo:     repository.NewCertRepository(),
+		reminderRepo: repository.NewReminderRepository(),
 	}
 }
 
@@ -30,6 +30,10 @@ func (s *reminderService) TriggerReminders(req *model.TriggerReminderRequest) ([
 	certs, err := s.certRepo.ListExpiringCerts(req.PartnerID, expireDate)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(certs) == 0 {
+		return []model.RenewalReminder{}, nil
 	}
 
 	var reminders []model.RenewalReminder
@@ -48,7 +52,7 @@ func (s *reminderService) TriggerReminders(req *model.TriggerReminderRequest) ([
 		}
 
 		if err := s.reminderRepo.Create(&reminder, nil); err != nil {
-			continue
+			return nil, err
 		}
 		reminders = append(reminders, reminder)
 	}
