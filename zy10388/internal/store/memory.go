@@ -14,7 +14,7 @@ type MemoryStore struct {
 	messageByID   map[string]*model.Message
 	receipts      map[string][]*model.DeliveryReceipt
 	cursors       map[string]int64
-	notifyCh      map[string]chan struct{}
+	notifyCh      map[string][]chan bool
 	mu            sync.RWMutex
 }
 
@@ -26,7 +26,7 @@ func NewMemoryStore() *MemoryStore {
 		messageByID:   make(map[string]*model.Message),
 		receipts:      make(map[string][]*model.DeliveryReceipt),
 		cursors:       make(map[string]int64),
-		notifyCh:      make(map[string]chan struct{}),
+		notifyCh:      make(map[string][]chan bool),
 	}
 }
 
@@ -186,30 +186,40 @@ func (m *memoryMessageStore) Create(message *model.Message) error {
 	if message.Cursor > m.store.cursors[message.SessionID] {
 		m.store.cursors[message.SessionID] = message.Cursor
 	}
-	if ch, ok := m.store.notifyCh[message.SessionID]; ok {
-		close(ch)
+	if chans, ok := m.store.notifyCh[message.SessionID]; ok {
+		for _, ch := range chans {
+			ch <- true
+			close(ch)
+		}
 		delete(m.store.notifyCh, message.SessionID)
 	}
 	return nil
 }
 
-func (m *memoryMessageStore) WaitForMessage(sessionID string, timeout time.Duration) <-chan struct{} {
+func (m *memoryMessageStore) WaitForMessage(sessionID string, timeout time.Duration) <-chan bool {
 	m.store.mu.Lock()
-	defer m.store.mu.Unlock()
-	ch, ok := m.store.notifyCh[sessionID]
-	if !ok {
-		ch = make(chan struct{})
-		m.store.notifyCh[sessionID] = ch
-		go func() {
-			time.Sleep(timeout)
-			m.store.mu.Lock()
-			defer m.store.mu.Unlock()
-			if c, exists := m.store.notifyCh[sessionID]; exists && c == ch {
-				close(c)
-				delete(m.store.notifyCh, sessionID)
+	ch := make(chan bool, 1)
+	m.store.notifyCh[sessionID] = append(m.store.notifyCh[sessionID], ch)
+	m.store.mu.Unlock()
+
+	go func() {
+		time.Sleep(timeout)
+		m.store.mu.Lock()
+		defer m.store.mu.Unlock()
+		if chans, exists := m.store.notifyCh[sessionID]; exists {
+			for i, c := range chans {
+				if c == ch {
+					ch <- false
+					close(ch)
+					m.store.notifyCh[sessionID] = append(chans[:i], chans[i+1:]...)
+					if len(m.store.notifyCh[sessionID]) == 0 {
+						delete(m.store.notifyCh, sessionID)
+					}
+					return
+				}
 			}
-		}()
-	}
+		}
+	}()
 	return ch
 }
 

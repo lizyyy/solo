@@ -133,7 +133,15 @@ func (m *messageService) PollMessages(req *model.PollRequest) (*model.PollRespon
 		}
 
 		waitCh := m.store.Message().WaitForMessage(req.SessionID, waitTimeout)
-		<-waitCh
+		hasNewMessage := <-waitCh
+
+		if !hasNewMessage {
+			return &model.PollResponse{
+				Messages: []*model.Message{},
+				Cursor:   req.LastCursor,
+				HasMore:  false,
+			}, nil
+		}
 	}
 }
 

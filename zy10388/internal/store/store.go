@@ -24,7 +24,7 @@ type MessageStore interface {
 	UpdateStatusByCursor(sessionID string, cursors []int64, status model.MessageStatus) (int, error)
 	Query(req *model.MessageQueryRequest) (*model.MessageQueryResponse, error)
 	GetNextCursor(sessionID string) (int64, error)
-	WaitForMessage(sessionID string, timeout time.Duration) <-chan struct{}
+	WaitForMessage(sessionID string, timeout time.Duration) (hasNewMessage <-chan bool)
 }
 
 type ReceiptStore interface {

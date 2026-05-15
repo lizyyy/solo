@@ -18,6 +18,9 @@ func main() {
 	fmt.Println("\n2. 测试重连功能...")
 	testReconnect()
 
+	fmt.Println("\n3. 测试长轮询超时返回...")
+	testLongPollTimeout()
+
 	fmt.Println("\n=== 测试完成 ===")
 }
 
@@ -83,6 +86,43 @@ func testReconnect() {
 	}
 }
 
+func testLongPollTimeout() {
+	req := model.CreateSessionRequest{
+		ClientID: "client-003",
+	}
+	resp, err := createSession(req)
+	if err != nil {
+		fmt.Printf("  创建会话失败: %v\n", err)
+		return
+	}
+	sessionID := resp.SessionID
+	fmt.Printf("  创建会话 ID: %s\n", sessionID)
+
+	pollReq := model.PollRequest{
+		SessionID:   sessionID,
+		LastCursor:  0,
+		WaitTimeout: 2,
+	}
+
+	fmt.Println("  开始长轮询 (超时2秒)...")
+	start := time.Now()
+	pollResp, err := pollMessages(pollReq)
+	duration := time.Since(start)
+	if err != nil {
+		fmt.Printf("  长轮询失败: %v\n", err)
+		return
+	}
+
+	fmt.Printf("  长轮询返回耗时: %v, 消息数: %d, Cursor: %d, HasMore: %v\n",
+		duration.Round(time.Second), len(pollResp.Messages), pollResp.Cursor, pollResp.HasMore)
+
+	if len(pollResp.Messages) == 0 && !pollResp.HasMore && duration >= 2*time.Second {
+		fmt.Println("  ✓ 长轮询超时返回正常")
+	} else {
+		fmt.Println("  ✗ 长轮询超时返回异常")
+	}
+}
+
 func createSession(req model.CreateSessionRequest) (*model.CreateSessionResponse, error) {
 	body, _ := json.Marshal(req)
 	resp, err := http.Post("http://localhost:8080/api/sessions", "application/json", bytes.NewBuffer(body))
@@ -105,6 +145,19 @@ func reconnectSession(req model.ReconnectRequest) (*model.ReconnectResponse, err
 	defer resp.Body.Close()
 
 	var result model.ReconnectResponse
+	json.NewDecoder(resp.Body).Decode(&result)
+	return &result, nil
+}
+
+func pollMessages(req model.PollRequest) (*model.PollResponse, error) {
+	body, _ := json.Marshal(req)
+	resp, err := http.Post("http://localhost:8080/api/messages/poll", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result model.PollResponse
 	json.NewDecoder(resp.Body).Decode(&result)
 	return &result, nil
 }
