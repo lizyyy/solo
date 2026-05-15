@@ -219,3 +219,158 @@ class RegionReport(BaseModel):
     overdue_rectifications: int
     total_deduction: float
     avg_score: float
+
+
+class RollbackCandidateCreate(BaseModel):
+    candidate_type: str
+    source_id: Optional[str] = None
+    source_table: Optional[str] = None
+    title: str
+    description: Optional[str] = None
+    summary: Optional[str] = None
+    file_path: Optional[str] = None
+    file_hash: Optional[str] = None
+    file_size: Optional[int] = None
+    is_urgent: bool = False
+    created_by: Optional[str] = None
+
+
+class RollbackCandidateResponse(BaseModel):
+    id: int
+    candidate_type: str
+    source_id: Optional[str] = None
+    source_table: Optional[str] = None
+    title: str
+    description: Optional[str] = None
+    summary: Optional[str] = None
+    file_path: Optional[str] = None
+    file_hash: Optional[str] = None
+    file_size: Optional[int] = None
+    is_urgent: bool
+    status: str
+    approver: Optional[str] = None
+    approval_remark: Optional[str] = None
+    approved_at: Optional[datetime] = None
+    created_by: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class RollbackApproval(BaseModel):
+    approver: str
+    approval_remark: Optional[str] = None
+    is_approved: bool = True
+
+
+class RollbackExecuteRequest(BaseModel):
+    executor: str
+
+
+class RollbackExecutionResponse(BaseModel):
+    id: int
+    candidate_id: int
+    executor: Optional[str] = None
+    started_at: datetime
+    completed_at: Optional[datetime] = None
+    status: str
+    before_state: Optional[str] = None
+    after_state: Optional[str] = None
+    error_message: Optional[str] = None
+    execution_time_ms: Optional[int] = None
+    success_count: int
+    total_count: int
+    failed_records: Optional[str] = None
+    next_suggestion: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class NightlyInspectionCreate(BaseModel):
+    is_grayscale: bool = True
+    region: Optional[str] = None
+    target_type: Optional[str] = None
+    total_checks: int = 0
+    passed_checks: int = 0
+    failed_checks: int = 0
+    materials: Optional[str] = None
+    result_summary: Optional[str] = None
+    executed_by: Optional[str] = None
+
+
+class NightlyInspectionResponse(BaseModel):
+    id: int
+    inspection_date: datetime
+    is_grayscale: bool
+    region: Optional[str] = None
+    target_type: Optional[str] = None
+    total_checks: int
+    passed_checks: int
+    failed_checks: int
+    materials: Optional[str] = None
+    result_summary: Optional[str] = None
+    executed_by: Optional[str] = None
+    status: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FinancialCloseCreate(BaseModel):
+    close_period: str
+    total_amount: float = 0.0
+    record_count: int = 0
+    summary: Optional[str] = None
+    file_path: Optional[str] = None
+    created_by: Optional[str] = None
+
+
+class FinancialCloseResponse(BaseModel):
+    id: int
+    close_period: str
+    total_amount: float
+    record_count: int
+    summary: Optional[str] = None
+    file_path: Optional[str] = None
+    status: str
+    approver: Optional[str] = None
+    approval_remark: Optional[str] = None
+    approved_at: Optional[datetime] = None
+    manually_confirmed: bool
+    confirmed_by: Optional[str] = None
+    confirmed_at: Optional[datetime] = None
+    created_by: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FinancialConfirmRequest(BaseModel):
+    confirmed_by: str
+    confirm_remark: Optional[str] = None
+
+
+class RollbackComparisonResponse(BaseModel):
+    candidate_id: int
+    title: str
+    before_state: Optional[str] = None
+    after_state: Optional[str] = None
+    execution_time_ms: Optional[int] = None
+    status: str
+    success_count: int
+    total_count: int
+    next_suggestion: Optional[str] = None
+
+
+class RollbackCandidateFilter(BaseModel):
+    candidate_type: Optional[str] = None
+    status: Optional[str] = None
+    summary_keyword: Optional[str] = None
+    is_urgent: Optional[bool] = None

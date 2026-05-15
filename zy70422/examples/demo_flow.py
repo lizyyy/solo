@@ -115,6 +115,7 @@ def main():
     print_section("11. 复查不通过（演示重试场景）")
 
     recheck_data = {
+        "rechecker": "王复查员",
         "recheck_result": "不通过",
         "recheck_remark": "仍有个别死角未清洁干净，需要重新整改"
     }
@@ -158,6 +159,7 @@ def main():
         print_section("16. 重试任务 - 复查通过（含扣分计算）")
 
         recheck_data2 = {
+            "rechecker": "王复查员",
             "recheck_result": "通过",
             "recheck_remark": "本次检查符合标准，确认通过"
         }

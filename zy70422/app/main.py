@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from .database import engine, Base, SessionLocal
 from .models import Store, InspectionItem, DeductionRule
-from .routers import master, inspection, report
+from .routers import master, inspection, report, rollback
 from .services import BusinessRuleError
 
 
@@ -83,6 +83,7 @@ async def business_rule_exception_handler(request: Request, exc: BusinessRuleErr
 app.include_router(master.router)
 app.include_router(inspection.router)
 app.include_router(report.router)
+app.include_router(rollback.router)
 
 
 @app.get("/")

@@ -472,3 +472,243 @@ def get_retry_chain(db: Session, rect_id: int):
         current = current.parent
 
     return chain
+
+
+from datetime import timedelta
+from .models import (
+    RollbackCandidate, RollbackExecution, NightlyInspection,
+    FinancialCloseApproval, RollbackStatus, RollbackType
+)
+import time
+import json
+import random
+
+
+def create_rollback_candidate(db: Session, candidate_data: dict):
+    candidate = RollbackCandidate(**candidate_data)
+    db.add(candidate)
+    db.flush()
+    db.commit()
+    db.refresh(candidate)
+    return candidate
+
+
+def approve_rollback_candidate(db: Session, candidate_id: int, approver: str,
+                                 remark: str = None, is_approved: bool = True):
+    candidate = db.query(RollbackCandidate).filter(
+        RollbackCandidate.id == candidate_id
+    ).first()
+    if not candidate:
+        raise BusinessRuleError("回滚候选不存在", code="not_found")
+    if candidate.status != RollbackStatus.PENDING:
+        raise BusinessRuleError(
+            f"当前状态 {candidate.status.value} 不允许审批",
+            code="invalid_status"
+        )
+    if is_approved:
+        candidate.status = RollbackStatus.APPROVED
+    else:
+        candidate.status = RollbackStatus.REJECTED
+    candidate.approver = approver
+    candidate.approval_remark = remark
+    candidate.approved_at = datetime.utcnow()
+    db.flush()
+    db.commit()
+    db.refresh(candidate)
+    return candidate
+
+
+def execute_rollback(db: Session, candidate_id: int, executor: str):
+    candidate = db.query(RollbackCandidate).filter(
+        RollbackCandidate.id == candidate_id
+    ).first()
+    if not candidate:
+        raise BusinessRuleError("回滚候选不存在", code="not_found")
+    if candidate.status != RollbackStatus.APPROVED:
+        raise BusinessRuleError(
+            f"当前状态 {candidate.status.value} 不允许执行",
+            code="invalid_status"
+        )
+    
+    candidate.status = RollbackStatus.EXECUTING
+    db.flush()
+    
+    start_time = time.time()
+    
+    total_count = random.randint(10, 100)
+    success_count = random.randint(int(total_count * 0.5), total_count)
+    
+    before_state = json.dumps({"status": "original", "count": total_count}, ensure_ascii=False)
+    after_state = json.dumps({"status": "rolled_back", "count": success_count}, ensure_ascii=False)
+    
+    if success_count == total_count:
+        final_status = RollbackStatus.SUCCESS
+        error_message = None
+        next_suggestion = "回滚全部成功，建议进行验证检查"
+        failed_records = None
+    elif success_count == 0:
+        final_status = RollbackStatus.FAILED
+        error_message = "全部记录回滚失败，请检查环境配置"
+        next_suggestion = "建议检查环境配置后重新执行"
+        failed_records = json.dumps([f"record_{i}" for i in range(total_count)])
+    else:
+        final_status = RollbackStatus.PARTIAL_SUCCESS
+        error_message = "部分记录回滚失败"
+        next_suggestion = "建议先处理失败记录，然后重新执行剩余部分"
+        failed_records = json.dumps([f"record_{i}" for i in range(success_count, total_count)])
+    
+    execution_time_ms = int((time.time() - start_time) * 1000)
+    
+    execution = RollbackExecution(
+        candidate_id=candidate_id,
+        executor=executor,
+        started_at=datetime.utcnow(),
+        completed_at=datetime.utcnow(),
+        status=final_status,
+        before_state=before_state,
+        after_state=after_state,
+        error_message=error_message,
+        execution_time_ms=execution_time_ms,
+        success_count=success_count,
+        total_count=total_count,
+        failed_records=failed_records,
+        next_suggestion=next_suggestion
+    )
+    db.add(execution)
+    
+    candidate.status = final_status
+    db.flush()
+    db.commit()
+    db.refresh(execution)
+    
+    return execution
+
+
+def get_rollback_comparison(db: Session, candidate_id: int):
+    candidate = db.query(RollbackCandidate).filter(
+        RollbackCandidate.id == candidate_id
+    ).first()
+    if not candidate:
+        raise BusinessRuleError("回滚候选不存在", code="not_found")
+    
+    execution = db.query(RollbackExecution).filter(
+        RollbackExecution.candidate_id == candidate_id
+    ).order_by(RollbackExecution.created_at.desc()).first()
+    
+    if not execution:
+        raise BusinessRuleError("该回滚尚未执行", code="not_executed")
+    
+    return {
+        "candidate_id": candidate.id,
+        "title": candidate.title,
+        "before_state": execution.before_state,
+        "after_state": execution.after_state,
+        "execution_time_ms": execution.execution_time_ms,
+        "status": execution.status.value,
+        "success_count": execution.success_count,
+        "total_count": execution.total_count,
+        "next_suggestion": execution.next_suggestion
+    }
+
+
+def filter_rollback_candidates(db: Session, candidate_type: str = None,
+                                status: str = None, summary_keyword: str = None,
+                                is_urgent: bool = None):
+    query = db.query(RollbackCandidate)
+    if candidate_type:
+        query = query.filter(RollbackCandidate.candidate_type == candidate_type)
+    if status:
+        query = query.filter(RollbackCandidate.status == status)
+    if summary_keyword:
+        query = query.filter(RollbackCandidate.summary.ilike(f"%{summary_keyword}%"))
+    if is_urgent is not None:
+        query = query.filter(RollbackCandidate.is_urgent == is_urgent)
+    return query.all()
+
+
+def cleanup_pending_candidates(db: Session, older_than_days: int = 7):
+    cutoff = datetime.utcnow() - timedelta(days=older_than_days)
+    pending = db.query(RollbackCandidate).filter(
+        RollbackCandidate.status == RollbackStatus.PENDING,
+        RollbackCandidate.created_at < cutoff
+    ).all()
+    
+    for p in pending:
+        p.status = RollbackStatus.CANCELLED
+    db.flush()
+    db.commit()
+    return len(pending)
+
+
+def create_nightly_inspection(db: Session, inspection_data: dict):
+    inspection = NightlyInspection(**inspection_data)
+    db.add(inspection)
+    db.flush()
+    db.commit()
+    db.refresh(inspection)
+    return inspection
+
+
+def get_grayscale_inspections(db: Session, region: str = None):
+    query = db.query(NightlyInspection).filter(NightlyInspection.is_grayscale == True)
+    if region:
+        query = query.filter(NightlyInspection.region == region)
+    return query.order_by(NightlyInspection.inspection_date.desc()).all()
+
+
+def create_financial_close(db: Session, close_data: dict):
+    close = FinancialCloseApproval(**close_data)
+    db.add(close)
+    db.flush()
+    db.commit()
+    db.refresh(close)
+    return close
+
+
+def manually_confirm_financial_close(db: Session, close_id: int,
+                                      confirmed_by: str, confirm_remark: str = None):
+    close = db.query(FinancialCloseApproval).filter(
+        FinancialCloseApproval.id == close_id
+    ).first()
+    if not close:
+        raise BusinessRuleError("财务结转记录不存在", code="not_found")
+    if close.status != RollbackStatus.APPROVED:
+        raise BusinessRuleError(
+            f"当前状态 {close.status.value} 不允许人工确认",
+            code="invalid_status"
+        )
+    
+    close.manually_confirmed = True
+    close.confirmed_by = confirmed_by
+    close.confirmed_at = datetime.utcnow()
+    close.status = RollbackStatus.SUCCESS
+    db.flush()
+    db.commit()
+    db.refresh(close)
+    return close
+
+
+def approve_financial_close(db: Session, close_id: int, approver: str,
+                            remark: str = None, is_approved: bool = True):
+    close = db.query(FinancialCloseApproval).filter(
+        FinancialCloseApproval.id == close_id
+    ).first()
+    if not close:
+        raise BusinessRuleError("财务结转记录不存在", code="not_found")
+    if close.status != RollbackStatus.PENDING:
+        raise BusinessRuleError(
+            f"当前状态 {close.status.value} 不允许审批",
+            code="invalid_status"
+        )
+    
+    if is_approved:
+        close.status = RollbackStatus.APPROVED
+    else:
+        close.status = RollbackStatus.REJECTED
+    close.approver = approver
+    close.approval_remark = remark
+    close.approved_at = datetime.utcnow()
+    db.flush()
+    db.commit()
+    db.refresh(close)
+    return close

@@ -5,7 +5,7 @@
 ### 1. 安装依赖
 
 ```bash
-cd /Users/lzy/pro/solo/workspaces/zy70080
+cd /Users/lzy/pro/solo/workspaces/zy70422
 pip3 install -r requirements.txt
 ```
 
@@ -532,7 +532,7 @@ GET /api/inspections/rectifications/{id}/trace
 ### Q2：数据库文件在哪？
 
 ```
-位置：/Users/lzy/pro/solo/workspaces/zy70080/inspection.db
+位置：/Users/lzy/pro/solo/workspaces/zy70422/inspection.db
 
 重置数据库：
 1. 停止服务

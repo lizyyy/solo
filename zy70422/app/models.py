@@ -168,3 +168,105 @@ class DeductionRule(Base):
     description = Column(Text)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class RollbackStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    EXECUTING = "executing"
+    SUCCESS = "success"
+    PARTIAL_SUCCESS = "partial_success"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+class RollbackType(str, Enum):
+    FINANCIAL = "financial"
+    GRAYSCALE = "grayscale"
+    INSPECTION = "inspection"
+    GENERAL = "general"
+
+
+class RollbackCandidate(Base):
+    __tablename__ = "rollback_candidates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    candidate_type = Column(SQLEnum(RollbackType), nullable=False, index=True)
+    source_id = Column(String(100), index=True)
+    source_table = Column(String(100))
+    title = Column(String(500), nullable=False)
+    description = Column(Text)
+    summary = Column(Text)
+    file_path = Column(String(500))
+    file_hash = Column(String(100))
+    file_size = Column(Integer)
+    is_urgent = Column(Boolean, default=False)
+    status = Column(SQLEnum(RollbackStatus), default=RollbackStatus.PENDING, index=True)
+    approver = Column(String(100))
+    approval_remark = Column(Text)
+    approved_at = Column(DateTime)
+    created_by = Column(String(100))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class RollbackExecution(Base):
+    __tablename__ = "rollback_executions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    candidate_id = Column(Integer, ForeignKey("rollback_candidates.id"), nullable=False)
+    executor = Column(String(100))
+    started_at = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime)
+    status = Column(SQLEnum(RollbackStatus), default=RollbackStatus.EXECUTING)
+    before_state = Column(Text)
+    after_state = Column(Text)
+    error_message = Column(Text)
+    execution_time_ms = Column(Integer)
+    success_count = Column(Integer, default=0)
+    total_count = Column(Integer, default=0)
+    failed_records = Column(Text)
+    next_suggestion = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    candidate = relationship("RollbackCandidate")
+
+
+class NightlyInspection(Base):
+    __tablename__ = "nightly_inspections"
+
+    id = Column(Integer, primary_key=True, index=True)
+    inspection_date = Column(DateTime, default=datetime.utcnow)
+    is_grayscale = Column(Boolean, default=True, index=True)
+    region = Column(String(100), index=True)
+    target_type = Column(String(100))
+    total_checks = Column(Integer, default=0)
+    passed_checks = Column(Integer, default=0)
+    failed_checks = Column(Integer, default=0)
+    materials = Column(Text)
+    result_summary = Column(Text)
+    executed_by = Column(String(100))
+    status = Column(String(50), default="completed")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class FinancialCloseApproval(Base):
+    __tablename__ = "financial_close_approvals"
+
+    id = Column(Integer, primary_key=True, index=True)
+    close_period = Column(String(50), nullable=False, index=True)
+    total_amount = Column(Float, default=0.0)
+    record_count = Column(Integer, default=0)
+    summary = Column(Text)
+    file_path = Column(String(500))
+    status = Column(SQLEnum(RollbackStatus), default=RollbackStatus.PENDING, index=True)
+    approver = Column(String(100))
+    approval_remark = Column(Text)
+    approved_at = Column(DateTime)
+    manually_confirmed = Column(Boolean, default=False)
+    confirmed_by = Column(String(100))
+    confirmed_at = Column(DateTime)
+    created_by = Column(String(100))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
