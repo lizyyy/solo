@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审计日志导出系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .nav-tab:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #3da868;
+        }
+
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #dd7b2a;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 15px 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .timeline-desc {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .detail-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #e0e7ff;
+            color: #4338ca;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 2px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>审计日志导出系统</h1>
+        <p>合规审计 - 按人员和时间导出操作日志</p>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="events">日志查询</button>
+            <button class="nav-tab" data-tab="export">导出任务</button>
+            <button class="nav-tab" data-tab="test">测试场景</button>
+        </div>
+
+        <div id="events" class="tab-content active">
+            <div class="card">
+                <h2 class="card-title">筛选条件</h2>
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label>操作人员</label>
+                        <select id="eventOperator" class="form-control" multiple style="height: 100px;">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>开始时间</label>
+                        <input type="datetime-local" id="eventStartTime" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>结束时间</label>
+                        <input type="datetime-local" id="eventEndTime" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>事件类型</label>
+                        <select id="eventType" class="form-control" multiple style="height: 100px;">
+                            <option value="login">登录</option>
+                            <option value="logout">登出</option>
+                            <option value="create">创建</option>
+                            <option value="update">更新</option>
+                            <option value="delete">删除</option>
+                            <option value="view">查看</option>
+                            <option value="export">导出</option>
+                            <option value="approve">审批通过</option>
+                            <option value="reject">审批拒绝</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>操作模块</label>
+                        <select id="eventModule" class="form-control" multiple style="height: 100px;">
+                            <option value="用户管理">用户管理</option>
+                            <option value="角色管理">角色管理</option>
+                            <option value="权限配置">权限配置</option>
+                            <option value="日志查询">日志查询</option>
+                            <option value="报表导出">报表导出</option>
+                            <option value="系统设置">系统设置</option>
+                            <option value="数据备份">数据备份</option>
+                            <option value="审批流程">审批流程</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="eventStatus" class="form-control" multiple style="height: 100px;">
+                            <option value="success">成功</option>
+                            <option value="failed">失败</option>
+                            <option value="warning">警告</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="queryEvents()">查询</button>
+                    <button class="btn btn-success" onclick="showCreateExportModal()">创建导出任务</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">操作日志 <span id="eventTotal"></span></h2>
+                <div id="eventAlert"></div>
+                <div id="eventList" class="table-container"></div>
+            </div>
+        </div>
+
+        <div id="export" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="card-title" style="margin-bottom: 0;">导出任务列表</h2>
+                    <button class="btn btn-primary" onclick="refreshTasks()">刷新列表</button>
+                </div>
+                <div id="taskAlert"></div>
+                <div id="taskList" class="table-container"></div>
+            </div>
+        </div>
+
+        <div id="test" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">测试场景</h2>
+                <p style="margin-bottom: 20px; color: #666;">点击按钮运行对应的测试场景，验证系统功能。</p>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="runTest('success')">成功导出场景</button>
+                    <button class="btn btn-warning" onclick="runTest('failed')">失败导出场景</button>
+                    <button class="btn btn-primary" onclick="runTest('duplicate')">重复提交场景</button>
+                    <button class="btn btn-success" onclick="runTest('correct')">人工修正场景</button>
+                </div>
+                <div id="testResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="createExportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">创建导出任务</h3>
+                <button class="modal-close" onclick="closeModal('createExportModal')">&times;</button>
+            </div>
+            <div id="createExportAlert"></div>
+            <div class="form-group">
+                <label>任务名称</label>
+                <input type="text" id="exportTaskName" class="form-control" placeholder="请输入任务名称">
+            </div>
+            <div class="form-group" style="margin-top: 12px;">
+                <label>操作人员（至少选择1人）</label>
+                <div id="exportOperators" class="checkbox-group"></div>
+            </div>
+            <div class="form-group" style="margin-top: 12px;">
+                <label>时间范围</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="datetime-local" id="exportStartTime" class="form-control" style="flex: 1;">
+                    <input type="datetime-local" id="exportEndTime" class="form-control" style="flex: 1;">
+                </div>
+            </div>
+            <div class="btn-group" style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="submitExportTask()">创建任务</button>
+                <button class="btn" onclick="closeModal('createExportModal')" style="background: #f0f0f0;">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title">任务详情</h3>
+                <button class="modal-close" onclick="closeModal('taskDetailModal')">&times;</button>
+            </div>
+            <div id="taskDetailContent"></div>
+        </div>
+    </div>
+
+    <div id="correctTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">修正筛选条件并重试</h3>
+                <button class="modal-close" onclick="closeModal('correctTaskModal')">&times;</button>
+            </div>
+            <div id="correctTaskAlert"></div>
+            <input type="hidden" id="correctTaskId">
+            <div class="form-group">
+                <label>操作人员（至少选择1人）</label>
+                <div id="correctOperators" class="checkbox-group"></div>
+            </div>
+            <div class="form-group" style="margin-top: 12px;">
+                <label>时间范围</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="datetime-local" id="correctStartTime" class="form-control" style="flex: 1;">
+                    <input type="datetime-local" id="correctEndTime" class="form-control" style="flex: 1;">
+                </div>
+            </div>
+            <div class="btn-group" style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="submitCorrectTask()">提交修正</button>
+                <button class="btn" onclick="closeModal('correctTaskModal')" style="background: #f0f0f0;">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        let users = [];
+        let currentTaskId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initTabs();
+            loadUsers();
+            setDefaultDates();
+            refreshTasks();
+        });
+
+        function initTabs() {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    if (tabId === 'export') {
+                        refreshTasks();
+                    }
+                });
+            });
+        }
+
+        function setDefaultDates() {
+            const now = new Date();
+            const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            
+            const format = d => d.toISOString().slice(0, 16);
+            
+            document.getElementById('eventStartTime').value = format(thirtyDaysAgo);
+            document.getElementById('eventEndTime').value = format(now);
+            document.getElementById('exportStartTime').value = format(thirtyDaysAgo);
+            document.getElementById('exportEndTime').value = format(now);
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE}/users`);
+                const result = await response.json();
+                if (result.success) {
+                    users = result.data;
+                    renderUserOptions();
+                }
+            } catch (error) {
+                console.error('加载用户失败:', error);
+            }
+        }
+
+        function renderUserOptions() {
+            const eventSelect = document.getElementById('eventOperator');
+            const exportDiv = document.getElementById('exportOperators');
+            const correctDiv = document.getElementById('correctOperators');
+
+            eventSelect.innerHTML = users.map(u => 
+                `<option value="${u.id}">${u.name} (${u.department})</option>`
+            ).join('');
+
+            exportDiv.innerHTML = users.map(u => `
+                <label class="checkbox-item">
+                    <input type="checkbox" value="${u.id}" name="exportOperator">
+                    ${u.name}
+                </label>
+            `).join('');
+
+            correctDiv.innerHTML = users.map(u => `
+                <label class="checkbox-item">
+                    <input type="checkbox" value="${u.id}" name="correctOperator">
+                    ${u.name}
+                </label>
+            `).join('');
+        }
+
+        function getSelectedOptions(selectId) {
+            const select = document.getElementById(selectId);
+            return Array.from(select.selectedOptions).map(opt => opt.value);
+        }
+
+        function getCheckedValues(name) {
+            return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
+        }
+
+        async function queryEvents() {
+            const container = document.getElementById('eventList');
+            const alertDiv = document.getElementById('eventAlert');
+            const totalSpan = document.getElementById('eventTotal');
+
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>查询中...</div>';
+            alertDiv.innerHTML = '';
+
+            try {
+                const params = new URLSearchParams();
+                
+                const operatorIds = getSelectedOptions('eventOperator');
+                if (operatorIds.length > 0) params.append('operator_ids', operatorIds.join(','));
+                
+                const startTime = document.getElementById('eventStartTime').value;
+                if (startTime) params.append('start_time', new Date(startTime).toISOString());
+                
+                const endTime = document.getElementById('eventEndTime').value;
+                if (endTime) params.append('end_time', new Date(endTime).toISOString());
+                
+                const eventTypes = getSelectedOptions('eventType');
+                if (eventTypes.length > 0) params.append('event_types', eventTypes.join(','));
+                
+                const modules = getSelectedOptions('eventModule');
+                if (modules.length > 0) params.append('modules', modules.join(','));
+                
+                const statuses = getSelectedOptions('eventStatus');
+                if (statuses.length > 0) params.append('statuses', statuses.join(','));
+
+                const response = await fetch(`${API_BASE}/events?${params}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const events = result.data.list;
+                    totalSpan.textContent = `(共 ${result.data.total} 条)`;
+
+                    if (events.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <p>暂无符合条件的日志数据</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>操作人</th>
+                                    <th>事件类型</th>
+                                    <th>模块</th>
+                                    <th>IP地址</th>
+                                    <th>详情</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${events.map(e => `
+                                    <tr>
+                                        <td>${formatDateTime(e.created_at)}</td>
+                                        <td>${e.operator_name}</td>
+                                        <td>${e.event_type}</td>
+                                        <td>${e.module}</td>
+                                        <td>${e.ip_address}</td>
+                                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${e.details}</td>
+                                        <td><span class="status-badge status-${e.status}">${e.status === 'success' ? '成功' : e.status === 'failed' ? '失败' : '警告'}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    alertDiv.innerHTML = `<div class="alert alert-error">${result.message}</div>`;
+                }
+            } catch (error) {
+                alertDiv.innerHTML = `<div class="alert alert-error">查询失败: ${error.message}</div>`;
+            }
+        }
+
+        function showCreateExportModal() {
+            document.getElementById('exportTaskName').value = '';
+            document.getElementById('createExportAlert').innerHTML = '';
+            document.querySelectorAll('input[name="exportOperator"]').forEach(cb => cb.checked = false);
+            setDefaultDates();
+            document.getElementById('createExportModal').classList.add('active');
+        }
+
+        async function submitExportTask() {
+            const alertDiv = document.getElementById('createExportAlert');
+            alertDiv.innerHTML = '';
+
+            const taskName = document.getElementById('exportTaskName').value || '导出任务_' + new Date().toLocaleString();
+            const operatorIds = getCheckedValues('exportOperator');
+            const startTime = document.getElementById('exportStartTime').value;
+            const endTime = document.getElementById('exportEndTime').value;
+
+            if (operatorIds.length === 0) {
+                alertDiv.innerHTML = '<div class="alert alert-error">请至少选择一个操作人员</div>';
+                return;
+            }
+            if (!startTime || !endTime) {
+                alertDiv.innerHTML = '<div class="alert alert-error">请选择时间范围</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        task_name: taskName,
+                        filter_snapshot: {
+                            operator_ids: operatorIds,
+                            start_time: new Date(startTime).toISOString(),
+                            end_time: new Date(endTime).toISOString()
+                        }
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    closeModal('createExportModal');
+                    document.getElementById('taskAlert').innerHTML = '<div class="alert alert-success">导出任务创建成功！</div>';
+                    setTimeout(() => refreshTasks(), 500);
+                } else {
+                    alertDiv.innerHTML = `<div class="alert alert-error">${result.message}</div>`;
+                }
+            } catch (error) {
+                alertDiv.innerHTML = `<div class="alert alert-error">创建失败: ${error.message}</div>`;
+            }
+        }
+
+        async function refreshTasks() {
+            const container = document.getElementById('taskList');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>加载中...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const tasks = result.data;
+
+                    if (tasks.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📦</div>
+                                <p>暂无导出任务</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>任务名称</th>
+                                    <th>创建人</th>
+                                    <th>状态</th>
+                                    <th>导出数量</th>
+                                    <th>创建时间</th>
+                                    <th>过期时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tasks.map(t => `
+                                    <tr>
+                                        <td>${t.task_name}</td>
+                                        <td>${t.creator_name}</td>
+                                        <td><span class="status-badge status-${t.status}">${getStatusText(t.status)}</span></td>
+                                        <td>${t.exported_count || '-'}</td>
+                                        <td>${formatDateTime(t.created_at)}</td>
+                                        <td>${formatDateTime(t.expire_at)}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary" onclick="viewTaskDetail('${t.id}')">详情</button>
+                                            ${t.status === 'completed' ? `<button class="btn btn-sm btn-success" onclick="downloadTask('${t.id}')">下载</button>` : ''}
+                                            ${t.status === 'failed' ? `<button class="btn btn-sm btn-warning" onclick="showCorrectModal('${t.id}')">修正重试</button>` : ''}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="alert alert-error">加载失败: ${error.message}</div>`;
+            }
+        }
+
+        async function viewTaskDetail(taskId) {
+            const container = document.getElementById('taskDetailContent');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>加载中...</div>';
+            document.getElementById('taskDetailModal').classList.add('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks/${taskId}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const { task, status_history, evidence_records } = result.data;
+                    const filter = task.filter_snapshot;
+
+                    container.innerHTML = `
+                        <div class="detail-grid" style="margin-bottom: 20px;">
+                            <div class="detail-item">
+                                <div class="detail-label">任务名称</div>
+                                <div class="detail-value">${task.task_name}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">状态</div>
+                                <div class="detail-value"><span class="status-badge status-${task.status}">${getStatusText(task.status)}</span></div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">创建人</div>
+                                <div class="detail-value">${task.creator_name}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">导出数量</div>
+                                <div class="detail-value">${task.exported_count || 0} / ${task.total_count || 0} 条</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px;">筛选条件快照</h4>
+                            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px;">
+                                <div style="margin-bottom: 8px;">
+                                    <strong>操作人员:</strong>
+                                    ${filter.operator_ids && filter.operator_ids.length > 0 ? filter.operator_ids.map(id => {
+                                        const u = users.find(u => u.id === id);
+                                        return `<span class="tag">${u ? u.name : id}</span>`;
+                                    }).join('') : '-'}
+                                </div>
+                                <div style="margin-bottom: 8px;">
+                                    <strong>时间范围:</strong> ${formatDateTime(filter.start_time)} 至 ${formatDateTime(filter.end_time)}
+                                </div>
+                                ${filter.event_types ? `<div style="margin-bottom: 8px;"><strong>事件类型:</strong> ${filter.event_types.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+                                ${filter.modules ? `<div><strong>操作模块:</strong> ${filter.modules.map(m => `<span class="tag">${m}</span>`).join('')}</div>` : ''}
+                            </div>
+                        </div>
+
+                        ${task.error_message ? `
+                            <div class="alert alert-error" style="margin-bottom: 20px;">
+                                <strong>错误信息:</strong> ${task.error_message}
+                            </div>
+                        ` : ''}
+
+                        <h4 style="margin-bottom: 12px;">状态变更历史</h4>
+                        <div class="timeline" style="margin-bottom: 20px;">
+                            ${status_history.map(h => `
+                                <div class="timeline-item">
+                                    <div class="timeline-time">${formatDateTime(h.created_at)}</div>
+                                    <div class="timeline-title">${h.from_status ? `${getStatusText(h.from_status)} → ` : ''}${getStatusText(h.to_status)}</div>
+                                    <div class="timeline-desc">操作人: ${h.operator_name}${h.reason ? ` | ${h.reason}` : ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <h4 style="margin-bottom: 12px;">取证留痕记录</h4>
+                        <div class="timeline">
+                            ${evidence_records.map(r => `
+                                <div class="timeline-item">
+                                    <div class="timeline-time">${formatDateTime(r.created_at)}</div>
+                                    <div class="timeline-title">${r.action_type}</div>
+                                    <div class="timeline-desc">操作人: ${r.operator_name}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="alert alert-error">加载失败: ${error.message}</div>`;
+            }
+        }
+
+        async function showCorrectModal(taskId) {
+            currentTaskId = taskId;
+            document.getElementById('correctTaskId').value = taskId;
+            document.getElementById('correctTaskAlert').innerHTML = '';
+            document.querySelectorAll('input[name="correctOperator"]').forEach(cb => cb.checked = false);
+            setDefaultDates();
+            document.getElementById('correctTaskModal').classList.add('active');
+        }
+
+        async function submitCorrectTask() {
+            const alertDiv = document.getElementById('correctTaskAlert');
+            alertDiv.innerHTML = '';
+
+            const taskId = document.getElementById('correctTaskId').value;
+            const operatorIds = getCheckedValues('correctOperator');
+            const startTime = document.getElementById('correctStartTime').value;
+            const endTime = document.getElementById('correctEndTime').value;
+
+            if (operatorIds.length === 0) {
+                alertDiv.innerHTML = '<div class="alert alert-error">请至少选择一个操作人员</div>';
+                return;
+            }
+            if (!startTime || !endTime) {
+                alertDiv.innerHTML = '<div class="alert alert-error">请选择时间范围</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks/${taskId}/correct`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filter_snapshot: {
+                            operator_ids: operatorIds,
+                            start_time: new Date(startTime).toISOString(),
+                            end_time: new Date(endTime).toISOString()
+                        }
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    closeModal('correctTaskModal');
+                    document.getElementById('taskAlert').innerHTML = '<div class="alert alert-success">修正成功，任务已重新处理！</div>';
+                    setTimeout(() => refreshTasks(), 1000);
+                } else {
+                    alertDiv.innerHTML = `<div class="alert alert-error">${result.message}</div>`;
+                }
+            } catch (error) {
+                alertDiv.innerHTML = `<div class="alert alert-error">修正失败: ${error.message}</div>`;
+            }
+        }
+
+        async function downloadTask(taskId) {
+            try {
+                window.open(`${API_BASE}/tasks/${taskId}/download`, '_blank');
+            } catch (error) {
+                alert('下载失败: ' + error.message);
+            }
+        }
+
+        async function runTest(type) {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div>正在运行测试...</div>';
+
+            try {
+                const now = new Date();
+                const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+                let filter_snapshot;
+                let taskName;
+
+                switch (type) {
+                    case 'success':
+                        filter_snapshot = {
+                            operator_ids: users.slice(0, 2).map(u => u.id),
+                            start_time: thirtyDaysAgo.toISOString(),
+                            end_time: now.toISOString(),
+                            event_types: ['login', 'view'],
+                            statuses: ['success']
+                        };
+                        taskName = '【测试】成功导出场景';
+                        break;
+                    case 'failed':
+                        filter_snapshot = {
+                            operator_ids: users.slice(0, 1).map(u => u.id),
+                            start_time: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+                            end_time: new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString()
+                        };
+                        taskName = '【测试】失败导出场景（无数据）';
+                        break;
+                    case 'duplicate':
+                        filter_snapshot = {
+                            operator_ids: users.slice(0, 2).map(u => u.id),
+                            start_time: thirtyDaysAgo.toISOString(),
+                            end_time: now.toISOString()
+                        };
+                        taskName = '【测试】重复提交场景';
+                        break;
+                    case 'correct':
+                        const failedResponse = await fetch(`${API_BASE}/tasks`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                task_name: '【测试】修正前失败任务',
+                                filter_snapshot: {
+                                    operator_ids: users.slice(0, 1).map(u => u.id),
+                                    start_time: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+                                    end_time: new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString()
+                                }
+                            })
+                        });
+                        
+                        await new Promise(r => setTimeout(r, 2000));
+                        
+                        const failedResult = await failedResponse.json();
+                        if (failedResult.success) {
+                            const correctResponse = await fetch(`${API_BASE}/tasks/${failedResult.data.id}/correct`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    filter_snapshot: {
+                                        operator_ids: users.map(u => u.id),
+                                        start_time: thirtyDaysAgo.toISOString(),
+                                        end_time: now.toISOString()
+                                    }
+                                })
+                            });
+                            const correctResult = await correctResponse.json();
+                            
+                            if (correctResult.success) {
+                                resultDiv.innerHTML = `
+                                    <div class="alert alert-success">
+                                        <strong>✓ 人工修正场景测试通过！</strong><br>
+                                        任务ID: ${correctResult.data.id}<br>
+                                        已将失败任务修正并重新处理，请查看任务列表
+                                    </div>
+                                `;
+                                setTimeout(() => refreshTasks(), 1000);
+                            } else {
+                                resultDiv.innerHTML = `<div class="alert alert-error">测试失败: ${correctResult.message}</div>`;
+                            }
+                        }
+                        return;
+                }
+
+                if (type === 'duplicate') {
+                    await fetch(`${API_BASE}/tasks`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ task_name: taskName + '_1', filter_snapshot })
+                    });
+                    
+                    await new Promise(r => setTimeout(r, 500));
+                    
+                    const response = await fetch(`${API_BASE}/tasks`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ task_name: taskName + '_2', filter_snapshot })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (!result.success && result.message.includes('相同筛选条件')) {
+                        resultDiv.innerHTML = `
+                            <div class="alert alert-success">
+                                <strong>✓ 重复提交场景测试通过！</strong><br>
+                                系统正确拦截了重复提交请求<br>
+                                返回信息: ${result.message}
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `<div class="alert alert-error">测试失败: 未拦截重复提交</div>`;
+                    }
+                } else {
+                    const response = await fetch(`${API_BASE}/tasks`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ task_name, filter_snapshot })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        await new Promise(r => setTimeout(r, 2000));
+                        
+                        const detailResponse = await fetch(`${API_BASE}/tasks/${result.data.id}`);
+                        const detailResult = await detailResponse.json();
+                        
+                        const task = detailResult.data.task;
+                        const expectedStatus = type === 'success' ? 'completed' : 'failed';
+                        
+                        if (task.status === expectedStatus) {
+                            resultDiv.innerHTML = `
+                                <div class="alert alert-success">
+                                    <strong>✓ ${type === 'success' ? '成功' : '失败'}场景测试通过！</strong><br>
+                                    任务ID: ${task.id}<br>
+                                    最终状态: ${getStatusText(task.status)}${task.error_message ? `<br>错误信息: ${task.error_message}` : ''}
+                                </div>
+                            `;
+                        } else {
+                            resultDiv.innerHTML = `
+                                <div class="alert alert-error">
+                                    测试结果不符合预期<br>
+                                    预期状态: ${getStatusText(expectedStatus)}<br>
+                                    实际状态: ${getStatusText(task.status)}
+                                </div>
+                            `;
+                        }
+                        
+                        refreshTasks();
+                    } else {
+                        resultDiv.innerHTML = `<div class="alert alert-error">测试失败: ${result.message}</div>`;
+                    }
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-error">测试异常: ${error.message}</div>`;
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function formatDateTime(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'pending': '等待处理',
+                'processing': '处理中',
+                'completed': '已完成',
+                'failed': '失败'
+            };
+            return map[status] || status;
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
