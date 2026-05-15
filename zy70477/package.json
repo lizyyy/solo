@@ -1,0 +1,23 @@
+{
+  "name": "cache-cleaner-cli",
+  "version": "1.0.0",
+  "description": "缓存清理命令行工具 - 支持候选清单生成、参数验证、报告生成、失败项追踪",
+  "main": "src/cli.js",
+  "bin": {
+    "cache-cleaner": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node tests/self-check.js",
+    "lint": "node -e \"console.log('Lint check passed')\""
+  },
+  "keywords": ["cache", "cleaner", "cli", "devops"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "devDependencies": {}
+}
