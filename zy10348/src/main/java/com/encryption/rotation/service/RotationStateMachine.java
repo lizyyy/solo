@@ -5,17 +5,19 @@ import com.encryption.rotation.model.enums.RotationStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
 @Component
 public class RotationStateMachine {
 
-    private static final Set<RotationStatus> TERMINAL_STATUSES = Set.of(
+    private static final Set<RotationStatus> TERMINAL_STATUSES = new HashSet<>(Arrays.asList(
         RotationStatus.COMPLETED,
         RotationStatus.CANCELLED,
         RotationStatus.FAILED
-    );
+    ));
 
     public void validateTransition(RotationStatus currentStatus, RotationStatus targetStatus) {
         if (isTerminalStatus(currentStatus)) {
@@ -23,24 +25,36 @@ public class RotationStateMachine {
                 "当前状态[" + currentStatus + "]为终态，不允许状态变更");
         }
 
-        boolean isValid = switch (currentStatus) {
-            case PENDING -> targetStatus == RotationStatus.VALIDATING || 
-                           targetStatus == RotationStatus.CANCELLED;
-            case VALIDATING -> targetStatus == RotationStatus.IN_PROGRESS || 
-                              targetStatus == RotationStatus.FAILED ||
-                              targetStatus == RotationStatus.CANCELLED;
-            case IN_PROGRESS -> targetStatus == RotationStatus.PARTIAL_SUCCESS || 
-                               targetStatus == RotationStatus.VERIFYING ||
-                               targetStatus == RotationStatus.FAILED ||
-                               targetStatus == RotationStatus.CANCELLED;
-            case PARTIAL_SUCCESS -> targetStatus == RotationStatus.VERIFYING || 
-                                   targetStatus == RotationStatus.FAILED ||
-                                   targetStatus == RotationStatus.CANCELLED;
-            case VERIFYING -> targetStatus == RotationStatus.COMPLETED || 
-                             targetStatus == RotationStatus.FAILED ||
-                             targetStatus == RotationStatus.CANCELLED;
-            default -> false;
-        };
+        boolean isValid;
+        switch (currentStatus) {
+            case PENDING:
+                isValid = targetStatus == RotationStatus.VALIDATING || 
+                          targetStatus == RotationStatus.CANCELLED;
+                break;
+            case VALIDATING:
+                isValid = targetStatus == RotationStatus.IN_PROGRESS || 
+                          targetStatus == RotationStatus.FAILED ||
+                          targetStatus == RotationStatus.CANCELLED;
+                break;
+            case IN_PROGRESS:
+                isValid = targetStatus == RotationStatus.PARTIAL_SUCCESS || 
+                          targetStatus == RotationStatus.VERIFYING ||
+                          targetStatus == RotationStatus.FAILED ||
+                          targetStatus == RotationStatus.CANCELLED;
+                break;
+            case PARTIAL_SUCCESS:
+                isValid = targetStatus == RotationStatus.VERIFYING || 
+                          targetStatus == RotationStatus.FAILED ||
+                          targetStatus == RotationStatus.CANCELLED;
+                break;
+            case VERIFYING:
+                isValid = targetStatus == RotationStatus.COMPLETED || 
+                          targetStatus == RotationStatus.FAILED ||
+                          targetStatus == RotationStatus.CANCELLED;
+                break;
+            default:
+                isValid = false;
+        }
 
         if (!isValid) {
             throw new RotationException("INVALID_STATE_TRANSITION", 

@@ -20,7 +20,9 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -46,13 +48,13 @@ public class RotationService {
 
         String dataSignature = generateDataSignature(request.getDataIdentifiers());
         
-        Set<RotationStatus> activeStatuses = Set.of(
+        Set<RotationStatus> activeStatuses = new HashSet<>(Arrays.asList(
             RotationStatus.PENDING,
             RotationStatus.VALIDATING,
             RotationStatus.IN_PROGRESS,
             RotationStatus.PARTIAL_SUCCESS,
             RotationStatus.VERIFYING
-        );
+        ));
         
         RotationBatch existingBatch = batchRepository
             .findByTenantIdAndSourceKeyIdAndTargetKeyIdAndDataSignatureAndStatusIn(

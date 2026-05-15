@@ -1,7 +1,7 @@
 package com.encryption.rotation.model.entity;
 
 import com.encryption.rotation.model.enums.FailureType;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "failure_records")
 public class FailureRecord {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @org.hibernate.annotations.GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(nullable = false)

@@ -8,7 +8,7 @@ import com.encryption.rotation.model.entity.ReEncryptionTask;
 import com.encryption.rotation.model.entity.RotationBatch;
 import com.encryption.rotation.model.entity.VerificationRecord;
 import com.encryption.rotation.service.RotationService;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

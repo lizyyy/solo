@@ -1,6 +1,6 @@
 package com.encryption.rotation.model.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "tenants")
 public class Tenant {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @org.hibernate.annotations.GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(unique = true, nullable = false)
