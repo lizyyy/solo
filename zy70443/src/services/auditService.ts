@@ -24,6 +24,7 @@ export function detectTimeOrderAnomaly(certificates: Certificate[]): number[] {
 export interface AuditRecordResult {
   recordId: number;
   originalLineNo: number;
+  recordType: 'certificate' | 'bus_booking';
   status: 'success' | 'failed' | 'warning';
   errorCode?: string;
   errorMessage?: string;
@@ -65,6 +66,7 @@ export async function auditCertificates(batchId: string): Promise<{
       results.push({
         recordId: cert.id!,
         originalLineNo,
+        recordType: 'certificate',
         status: 'warning',
         errorCode: 'TIME_ANOMALY',
         errorMessage: '证书创建时间晚于签发时间，存在时间顺序异常',
@@ -80,6 +82,7 @@ export async function auditCertificates(batchId: string): Promise<{
       results.push({
         recordId: cert.id!,
         originalLineNo,
+        recordType: 'certificate',
         status: 'success',
         beforeData,
         afterData: JSON.stringify({ status: 'issued', updatedAt: new Date().toISOString() }),
@@ -90,6 +93,7 @@ export async function auditCertificates(batchId: string): Promise<{
       results.push({
         recordId: cert.id!,
         originalLineNo,
+        recordType: 'certificate',
         status: 'success',
         beforeData,
         remarks: '证书状态正常',
@@ -131,6 +135,7 @@ export async function auditBusBookings(batchId: string): Promise<{
       results.push({
         recordId: booking.id!,
         originalLineNo: booking.originalLineNo,
+        recordType: 'bus_booking',
         status: 'warning',
         errorCode: 'HAS_MANUAL_REMARK',
         errorMessage: `含有人工备注需要复核: ${booking.manualRemark}`,
@@ -142,6 +147,7 @@ export async function auditBusBookings(batchId: string): Promise<{
       results.push({
         recordId: booking.id!,
         originalLineNo: booking.originalLineNo,
+        recordType: 'bus_booking',
         status: 'success',
         beforeData,
         remarks: '预约信息正常',
@@ -183,11 +189,10 @@ export async function saveAuditBatch(
   );
 
   for (const result of allResults) {
-    const recordType = certResults.some(r => r.recordId === result.recordId) ? 'certificate' : 'bus_booking';
     await run(
       'INSERT INTO audit_results (batchId, recordId, recordType, originalLineNo, status, errorCode, errorMessage, beforeData, afterData, remarks, executedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
-        batchId, result.recordId, recordType, result.originalLineNo,
+        batchId, result.recordId, result.recordType, result.originalLineNo,
         result.status, result.errorCode || null, result.errorMessage || null,
         result.beforeData, result.afterData || null, result.remarks || null,
         new Date().toISOString()

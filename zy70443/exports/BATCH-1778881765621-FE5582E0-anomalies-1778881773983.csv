@@ -1,0 +1,5 @@
+原始行号,记录类型,状态,错误码,错误信息,处理前数据,备注,执行时间
+1,bus_booking,warning,HAS_MANUAL_REMARK,含有人工备注需要复核: 特殊情况：需预留前排座位,"{""employeeName"":""张三"",""employeeId"":""EMP001"",""route"":""线路A-科技园"",""bookingDate"":""2024-01-15"",""manualRemark"":""特殊情况：需预留前排座位""}",特殊情况：需预留前排座位,2026-05-15T21:49:25.625Z
+3,bus_booking,warning,HAS_MANUAL_REMARK,含有人工备注需要复核: 携带大件行李,"{""employeeName"":""王五"",""employeeId"":""EMP003"",""route"":""线路A-科技园"",""bookingDate"":""2024-01-15"",""manualRemark"":""携带大件行李""}",携带大件行李,2026-05-15T21:49:25.626Z
+4,bus_booking,warning,HAS_MANUAL_REMARK,含有人工备注需要复核: 需换乘，请确认时间,"{""employeeName"":""赵六"",""employeeId"":""EMP004"",""route"":""线路C-郊区"",""bookingDate"":""2024-01-16"",""manualRemark"":""需换乘，请确认时间""}",需换乘，请确认时间,2026-05-15T21:49:25.626Z
+5,certificate,warning,TIME_ANOMALY,证书创建时间晚于签发时间，存在时间顺序异常,"{""certificateNo"":""CERT-2024-005"",""applicant"":""钱七"",""issueDate"":""2026-04-17"",""status"":""issued"",""createdAt"":""2026-05-10T21:49:15.212Z""}",需要复核签发流程的时间记录,2026-05-15T21:49:25.625Z

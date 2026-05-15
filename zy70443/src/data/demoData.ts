@@ -3,46 +3,47 @@ import { Certificate, BusBooking } from '../types';
 
 export function generateDemoCertificates(): Certificate[] {
   const now = new Date();
+  const baseDate = new Date(now.getTime() - 86400000 * 30);
   const certificates: Certificate[] = [
     {
       certificateNo: 'CERT-2024-001',
       applicant: '张三',
-      issueDate: '2024-01-15',
+      issueDate: new Date(baseDate.getTime() + 86400000 * 5).toISOString().split('T')[0],
       status: 'issued',
-      createdAt: new Date(now.getTime() - 86400000 * 5).toISOString(),
-      updatedAt: new Date(now.getTime() - 86400000 * 5).toISOString(),
+      createdAt: new Date(baseDate.getTime() + 86400000 * 3).toISOString(),
+      updatedAt: new Date(baseDate.getTime() + 86400000 * 3).toISOString(),
     },
     {
       certificateNo: 'CERT-2024-002',
       applicant: '李四',
-      issueDate: '2024-01-20',
+      issueDate: new Date(baseDate.getTime() + 86400000 * 10).toISOString().split('T')[0],
       status: 'issued',
-      createdAt: new Date(now.getTime() - 86400000 * 4).toISOString(),
-      updatedAt: new Date(now.getTime() - 86400000 * 4).toISOString(),
+      createdAt: new Date(baseDate.getTime() + 86400000 * 7).toISOString(),
+      updatedAt: new Date(baseDate.getTime() + 86400000 * 7).toISOString(),
     },
     {
       certificateNo: 'CERT-2024-003',
       applicant: '王五',
-      issueDate: '2024-01-10',
+      issueDate: new Date(baseDate.getTime() + 86400000 * 15).toISOString().split('T')[0],
       status: 'issued',
-      createdAt: new Date(now.getTime() - 86400000 * 3).toISOString(),
-      updatedAt: new Date(now.getTime() - 86400000 * 3).toISOString(),
+      createdAt: new Date(baseDate.getTime() + 86400000 * 12).toISOString(),
+      updatedAt: new Date(baseDate.getTime() + 86400000 * 12).toISOString(),
     },
     {
       certificateNo: 'CERT-2024-004',
       applicant: '赵六',
-      issueDate: '2024-01-25',
+      issueDate: new Date(baseDate.getTime() + 86400000 * 20).toISOString().split('T')[0],
       status: 'pending',
-      createdAt: new Date(now.getTime() - 86400000 * 2).toISOString(),
-      updatedAt: new Date(now.getTime() - 86400000 * 2).toISOString(),
+      createdAt: new Date(baseDate.getTime() + 86400000 * 18).toISOString(),
+      updatedAt: new Date(baseDate.getTime() + 86400000 * 18).toISOString(),
     },
     {
       certificateNo: 'CERT-2024-005',
       applicant: '钱七',
-      issueDate: '2024-02-01',
+      issueDate: new Date(baseDate.getTime() + 86400000 * 2).toISOString().split('T')[0],
       status: 'issued',
-      createdAt: new Date(now.getTime() - 86400000 * 6).toISOString(),
-      updatedAt: new Date(now.getTime() - 86400000 * 6).toISOString(),
+      createdAt: new Date(baseDate.getTime() + 86400000 * 25).toISOString(),
+      updatedAt: new Date(baseDate.getTime() + 86400000 * 25).toISOString(),
     },
   ];
   return certificates;
