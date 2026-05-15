@@ -17,7 +17,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         .header {
@@ -226,13 +226,86 @@
             margin-bottom: 15px;
             opacity: 0.5;
         }
+        .task-detail-row {
+            background: #fafbfc !important;
+        }
+        .task-detail {
+            padding: 20px;
+        }
+        .history-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .history-timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: #e0e0e0;
+        }
+        .history-item {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .history-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 3px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+        .history-status {
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+        .history-note {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 3px;
+        }
+        .history-meta {
+            font-size: 11px;
+            color: #999;
+        }
+        .history-error {
+            font-size: 12px;
+            color: #dc3545;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background: #f8d7da;
+            border-radius: 4px;
+        }
+        .expand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            color: #667eea;
+            font-size: 16px;
+        }
+        .expand-btn:hover {
+            color: #764ba2;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>📄 文件预览转换 API</h1>
-            <p>一个小而完整的 API 状态闭环验证项目 · 支持任务排队、状态追踪、失败重试</p>
+            <p>一个小而完整的 API 状态闭环验证项目 · 支持任务排队、状态追踪、失败重试、历史记录</p>
         </div>
 
         <div class="upload-section">
@@ -259,6 +332,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th style="width: 30px;"></th>
                         <th>任务ID</th>
                         <th>文件名</th>
                         <th>状态</th>
@@ -272,9 +346,14 @@
                 <tbody>
                     {% for task in tasks %}
                     <tr>
+                        <td>
+                            <button class="expand-btn" onclick="toggleDetail('{{ task.id }}')">
+                                <span id="arrow-{{ task.id }}">▼</span>
+                            </button>
+                        </td>
                         <td><span class="task-id">{{ task.id[:8] }}...</span></td>
                         <td>{{ task.filename }}</td>
-                        <td><span class="status-badge status-{{ task.status.value }}">{{ task.status.value }}</span></td>
+                        <td><span class="status-badge status-{{ task.status }}">{{ task.status }}</span></td>
                         <td>{{ task.handler }}</td>
                         <td>{{ task.retry_count }}/{{ task.max_retries }}</td>
                         <td>
@@ -284,17 +363,44 @@
                             <span class="small-text">-</span>
                             {% endif %}
                         </td>
-                        <td><span class="small-text">{{ task.created_at.strftime('%H:%M:%S') }}</span></td>
+                        <td><span class="small-text">{{ task.created_at[:19] }}</span></td>
                         <td>
-                            {% if task.status.value == 'FAILED' and task.retry_count < task.max_retries %}
+                            {% if task.status == 'FAILED' and task.retry_count < task.max_retries %}
                             <form action="/api/tasks/{{ task.id }}/retry" method="post" style="display: inline;">
                                 <input type="hidden" name="handler" value="{{ task.handler }}">
                                 <button type="submit" class="btn btn-retry">重试</button>
                             </form>
                             {% endif %}
-                            {% if task.status.value == 'COMPLETED' %}
+                            {% if task.status == 'COMPLETED' %}
                             <a href="/api/tasks/{{ task.id }}/preview" target="_blank" class="btn-preview">预览</a>
                             {% endif %}
+                        </td>
+                    </tr>
+                    <tr class="task-detail-row hidden" id="detail-{{ task.id }}">
+                        <td colspan="9">
+                            <div class="task-detail">
+                                <h4 style="margin-bottom: 15px; color: #333;">📋 状态变更历史</h4>
+                                <div class="history-timeline">
+                                    {% for history in task.status_history %}
+                                    <div class="history-item">
+                                        <span class="status-badge history-status status-{{ history.new_status }}">
+                                            {{ history.new_status }}
+                                        </span>
+                                        {% if history.note %}
+                                        <div class="history-note">{{ history.note }}</div>
+                                        {% endif %}
+                                        {% if history.error_message %}
+                                        <div class="history-error">
+                                            ❌ {{ history.error_message }}
+                                        </div>
+                                        {% endif %}
+                                        <div class="history-meta">
+                                            处理人: {{ history.handler }} · {{ history.created_at[:19] }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -313,9 +419,22 @@
             </div>
             {% endif %}
             <div class="refresh-note">
-                🔄 页面不会自动刷新，请手动刷新查看最新状态
+                🔄 页面不会自动刷新，请手动刷新查看最新状态；点击▼可查看完整状态变更历史
             </div>
         </div>
     </div>
+    <script>
+        function toggleDetail(taskId) {
+            const detailRow = document.getElementById('detail-' + taskId);
+            const arrow = document.getElementById('arrow-' + taskId);
+            if (detailRow.classList.contains('hidden')) {
+                detailRow.classList.remove('hidden');
+                arrow.textContent = '▲';
+            } else {
+                detailRow.classList.add('hidden');
+                arrow.textContent = '▼';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -26,9 +26,13 @@ templates = Jinja2Templates(directory="templates")
 async def admin_page(request: Request, db: Session = Depends(get_db)):
     task_service = TaskService(db)
     tasks = task_service.get_all_tasks()
+    tasks_with_history = []
+    for task in tasks:
+        task_dict = task.to_dict(include_history=True)
+        tasks_with_history.append(task_dict)
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "tasks": tasks, "TaskStatus": TaskStatus}
+        {"request": request, "tasks": tasks_with_history, "TaskStatus": TaskStatus}
     )
 
 
@@ -40,9 +44,16 @@ async def create_task(
     db: Session = Depends(get_db)
 ):
     task_service = TaskService(db)
+    
+    file_hash, file_size, file_content = await task_service.calculate_file_hash_from_upload(file)
+    
+    existing_task = task_service.get_existing_task(file_hash, file.filename)
+    if existing_task:
+        return existing_task
+    
     task_id = str(uuid.uuid4())
     
-    file_path, file_size, file_hash = await task_service.save_uploaded_file(file, task_id)
+    file_path = await task_service.save_uploaded_file(file_content, file.filename, task_id)
     
     task_data = TaskCreate(
         filename=file.filename,
@@ -60,14 +71,15 @@ async def create_task(
     return task
 
 
-@app.get("/api/tasks", response_model=List[TaskResponse])
-def list_tasks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@app.get("/api/tasks", response_model=List[dict])
+def list_tasks(skip: int = 0, limit: int = 100, include_history: bool = False, db: Session = Depends(get_db)):
     task_service = TaskService(db)
-    return task_service.get_all_tasks(skip=skip, limit=limit)
+    tasks = task_service.get_all_tasks(skip=skip, limit=limit)
+    return [task.to_dict(include_history=include_history) for task in tasks]
 
 
-@app.get("/api/tasks/{task_id}", response_model=TaskResponse, responses={404: {"model": ErrorResponse}})
-def get_task(task_id: str, db: Session = Depends(get_db)):
+@app.get("/api/tasks/{task_id}", response_model=dict, responses={404: {"model": ErrorResponse}})
+def get_task(task_id: str, include_history: bool = True, db: Session = Depends(get_db)):
     task_service = TaskService(db)
     task = task_service.get_task(task_id)
     if not task:
@@ -75,10 +87,26 @@ def get_task(task_id: str, db: Session = Depends(get_db)):
             status_code=404,
             detail={"message": "任务不存在", "code": "TASK_NOT_FOUND", "task_id": task_id}
         )
-    return task
+    return task.to_dict(include_history=include_history)
 
 
-@app.post("/api/tasks/{task_id}/retry", response_model=TaskResponse, responses={400: {"model": ErrorResponse}, 404: {"model": ErrorResponse}})
+@app.get("/api/tasks/{task_id}/history", responses={404: {"model": ErrorResponse}})
+def get_task_history(task_id: str, db: Session = Depends(get_db)):
+    task_service = TaskService(db)
+    task = task_service.get_task(task_id)
+    if not task:
+        raise HTTPException(
+            status_code=404,
+            detail={"message": "任务不存在", "code": "TASK_NOT_FOUND", "task_id": task_id}
+        )
+    history = task_service.get_task_history(task_id)
+    return {
+        "task_id": task_id,
+        "history": [h.to_dict() for h in history]
+    }
+
+
+@app.post("/api/tasks/{task_id}/retry", response_model=dict, responses={400: {"model": ErrorResponse}, 404: {"model": ErrorResponse}})
 async def retry_task(
     task_id: str,
     background_tasks: BackgroundTasks,
@@ -105,7 +133,7 @@ async def retry_task(
     conversion_service = ConversionService(task_service)
     background_tasks.add_task(conversion_service.process_queue)
     
-    return task
+    return task.to_dict(include_history=True)
 
 
 @app.get("/api/tasks/{task_id}/preview", responses={404: {"model": ErrorResponse}, 400: {"model": ErrorResponse}})
@@ -146,6 +174,7 @@ async def get_task_status(task_id: str, db: Session = Depends(get_db)):
     task = task_service.get_task(task_id)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
+    history = task_service.get_task_history(task_id)
     return {
         "task_id": task.id,
         "status": task.status.value,
@@ -160,7 +189,8 @@ async def get_task_status(task_id: str, db: Session = Depends(get_db)):
         "retry_count": task.retry_count,
         "max_retries": task.max_retries,
         "failed_stage": task.failed_stage.value if task.failed_stage else None,
-        "error_message": task.error_message
+        "error_message": task.error_message,
+        "status_history": [h.to_dict() for h in history]
     }
 
 
