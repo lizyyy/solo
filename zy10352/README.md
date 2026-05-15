@@ -14,7 +14,7 @@
 
 ## 技术栈
 
-- Java 11
+- Java 8+
 - Spring Boot 2.7.x
 - Spring Data JPA
 - H2 Database (文件持久化)
@@ -22,12 +22,38 @@
 
 ## 环境要求
 
-- **Java**: 11 或更高版本
-- **Maven**: 3.6 或更高版本（或使用 Maven Wrapper）
+- **Java**: 8 或更高版本（脚本会自动检测并安装 JDK）
+- **网络**: 首次运行需要网络连接下载依赖
 
 ## 快速开始
 
-### 方式一：使用启动脚本（推荐）
+### 方式一：使用全能启动脚本（强烈推荐）
+
+**只需一条命令，自动完成：环境检测 → JDK 安装 → 依赖下载 → 构建 → 启动**
+
+#### Linux / macOS
+
+```bash
+# 一键启动（自动完成所有步骤）
+./run.sh
+
+# 或分步执行
+./run.sh build    # 仅构建项目
+./run.sh start    # 仅启动服务（需先构建）
+./run.sh setup    # 仅设置 JDK 环境
+./run.sh clean    # 清理构建文件
+
+# 查看帮助
+./run.sh help
+```
+
+**特性**:
+- 自动检测 Java 环境（区分 JRE 和 JDK）
+- 如无完整 JDK，自动下载 Adoptium Temurin JDK 11
+- 使用项目内置 Maven Wrapper 构建
+- 彩色日志输出，步骤清晰
+
+### 方式二：使用基础启动脚本
 
 #### Linux / macOS
 
