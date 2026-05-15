@@ -243,23 +243,29 @@
     <script>
         const API_BASE = '/api/v1/compensation';
 
+        function generateId(prefix) {
+            return prefix + '-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+        }
+
         function loadNormalTemplate() {
-            document.getElementById('requestId').value = 'REQ-NORMAL-' + Date.now();
+            const timestamp = Date.now();
+            const requestId = 'REQ-NORMAL-' + timestamp;
+            document.getElementById('requestId').value = requestId;
             document.getElementById('requestJson').value = JSON.stringify({
-                requestId: document.getElementById('requestId').value,
+                requestId: requestId,
                 businessType: "ORDER_PROCESS",
-                businessKey: "ORDER-12345",
+                businessKey: "ORDER-" + timestamp,
                 description: "正常订单处理流程",
                 maxRetry: 3,
                 actions: [
                     {
-                        actionId: "ACTION-001",
+                        actionId: "ACTION-" + timestamp + "-01",
                         actionName: "扣减库存",
                         actionOrder: 1,
                         inputData: "{\"skuId\":1001,\"qty\":2}",
                         items: [
                             {
-                                itemId: "ITEM-001",
+                                itemId: "ITEM-" + timestamp + "-01",
                                 itemType: "STOCK",
                                 itemKey: "SKU-1001",
                                 revocable: true,
@@ -269,7 +275,7 @@
                         ]
                     },
                     {
-                        actionId: "ACTION-002",
+                        actionId: "ACTION-" + timestamp + "-02",
                         actionName: "创建订单",
                         actionOrder: 2,
                         items: []
@@ -279,21 +285,23 @@
         }
 
         function loadFailTemplate() {
-            document.getElementById('requestId').value = 'REQ-FAIL-' + Date.now();
+            const timestamp = Date.now();
+            const requestId = 'REQ-FAIL-' + timestamp;
+            document.getElementById('requestId').value = requestId;
             document.getElementById('requestJson').value = JSON.stringify({
-                requestId: document.getElementById('requestId').value,
+                requestId: requestId,
                 businessType: "PAYMENT_PROCESS",
-                businessKey: "PAY-67890",
+                businessKey: "PAY-" + timestamp,
                 description: "模拟失败补偿流程",
                 maxRetry: 3,
                 actions: [
                     {
-                        actionId: "ACTION-001",
+                        actionId: "ACTION-" + timestamp + "-01",
                         actionName: "冻结账户",
                         actionOrder: 1,
                         items: [
                             {
-                                itemId: "ITEM-001",
+                                itemId: "ITEM-" + timestamp + "-01",
                                 itemType: "ACCOUNT",
                                 itemKey: "ACC-8888",
                                 revocable: true,
@@ -303,7 +311,7 @@
                         ]
                     },
                     {
-                        actionId: "ACTION-002",
+                        actionId: "ACTION-" + timestamp + "-02",
                         actionName: "FAIL_SIMULATION",
                         actionOrder: 2,
                         items: []

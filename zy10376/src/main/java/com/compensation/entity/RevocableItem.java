@@ -10,17 +10,19 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "revocable_item")
+@Table(name = "revocable_item", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"action_id", "itemId"})
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class RevocableItem {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(unique = true, nullable = false, length = 64)
+
+    @Column(nullable = false, length = 64)
     private String itemId;
     
     @ManyToOne(fetch = FetchType.LAZY)

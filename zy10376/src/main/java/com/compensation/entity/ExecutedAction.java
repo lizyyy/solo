@@ -13,17 +13,19 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "executed_action")
+@Table(name = "executed_action", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"request_id", "actionId"})
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ExecutedAction {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(unique = true, nullable = false, length = 64)
+
+    @Column(nullable = false, length = 64)
     private String actionId;
     
     @ManyToOne(fetch = FetchType.LAZY)

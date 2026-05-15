@@ -14,17 +14,42 @@
 ## 快速开始
 
 ### 环境要求
-- JDK 11+
-- Maven 3.6+
+- JDK 8+ (已兼容 Java 8，支持 JDK 8/11/17)
+- Maven 3.6+ (项目已内置 Maven Wrapper，无需单独安装)
+
+### 环境检查
+
+```bash
+# 检查 Java 版本
+java -version
+
+# 如使用 Maven Wrapper，Linux/Mac 需先添加执行权限
+chmod +x mvnw
+```
 
 ### 启动服务
 
+**方式一：使用 Maven Wrapper (推荐)**
 ```bash
-# 编译项目
-mvn clean package -DskipTests
+# Linux/Mac
+./mvnw clean package -DskipTests
+./mvnw spring-boot:run
 
-# 启动服务
+# Windows
+mvnw.cmd clean package -DskipTests
+mvnw.cmd spring-boot:run
+```
+
+**方式二：使用已安装的 Maven**
+```bash
+mvn clean package -DskipTests
 mvn spring-boot:run
+```
+
+**方式三：直接运行 JAR**
+```bash
+./mvnw clean package -DskipTests
+java -jar target/undo-compensation-api-1.0.0.jar
 ```
 
 服务启动后访问:
@@ -33,6 +58,77 @@ mvn spring-boot:run
   - JDBC URL: `jdbc:h2:file:./data/compensation`
   - 用户名: `sa`
   - 密码: (空)
+
+### 核心功能验证流程
+
+#### 验证 1：正常流程
+```bash
+# 1. 创建请求（使用管理控制台点击"正常流程"模板，然后点击创建）
+# 或使用 curl：
+curl -X POST http://localhost:8080/api/v1/compensation/requests \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requestId": "REQ-TEST-001",
+    "businessType": "ORDER_PROCESS",
+    "actions": [
+      {"actionId": "A001", "actionName": "扣减库存", "actionOrder": 1, "items": []},
+      {"actionId": "A002", "actionName": "创建订单", "actionOrder": 2, "items": []}
+    ]
+  }'
+
+# 2. 校验请求
+curl -X POST http://localhost:8080/api/v1/compensation/requests/REQ-TEST-001/validate
+
+# 3. 执行请求
+curl -X POST http://localhost:8080/api/v1/compensation/requests/REQ-TEST-001/execute
+
+# 4. 查看请求状态，应为 COMPLETED
+curl http://localhost:8080/api/v1/compensation/requests/REQ-TEST-001
+
+# 5. 导出完成证明
+curl http://localhost:8080/api/v1/compensation/requests/REQ-TEST-001/proof
+```
+
+#### 验证 2：失败补偿流程
+```bash
+# 1. 创建包含模拟失败的请求（使用管理控制台点击"失败补偿"模板）
+# 注意：动作名称 "FAIL_SIMULATION" 会触发执行失败，触发补偿流程
+
+# 2. 校验 → 执行
+
+# 3. 查看结果，应能看到：
+#    - 请求状态最终为 COMPLETED
+#    - 已生成补偿任务列表
+#    - 失败动作有对应的失败原因记录
+```
+
+#### 验证 3：幂等性（重复提交）
+```bash
+# 1. 重复提交相同 requestId 的请求
+curl -X POST http://localhost:8080/api/v1/compensation/requests \
+  -H "Content-Type: application/json" \
+  -d '{"requestId": "REQ-IDEMPOTENT-001", "businessType": "TEST", "actions": []}'
+
+# 2. 再次提交相同的 requestId，系统会返回已有记录，不会重复创建
+
+# 3. 查询列表确认只有一条记录
+curl http://localhost:8080/api/v1/compensation/requests
+```
+
+### 常见问题
+
+**Q: 提示 class file version 不兼容怎么办？**
+- 确保本地 Java 版本不低于编译时的版本，项目已配置为兼容 Java 8
+- 使用 `java -version` 检查当前 Java 版本
+
+**Q: Maven Wrapper 下载失败怎么办？**
+- 检查网络连接
+- 可以使用系统已安装的 Maven 直接执行 `mvn` 命令
+
+**Q: H2 数据库连接失败怎么办？**
+- 确保项目目录有读写权限
+- 检查 JDBC URL 是否正确
+- 确认服务已成功启动
 
 ## API 接口
 
