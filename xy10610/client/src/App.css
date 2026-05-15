@@ -72,3 +72,9 @@
 .gap-2 { gap: 8px; }
 .justify-between { justify-content: space-between; }
 .flex-wrap { flex-wrap: wrap; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 14px; font-weight: 500; color: #4a5568; margin-bottom: 8px; }
+.form-control { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+.form-control:focus { outline: none; border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
+.form-control:disabled { background: #f7fafc; cursor: not-allowed; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }

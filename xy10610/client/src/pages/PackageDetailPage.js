@@ -9,6 +9,17 @@ const PackageDetailPage = () => {
   const [timeline, setTimeline] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('info');
+  const [showTaxForm, setShowTaxForm] = useState(false);
+  const [taxCategory, setTaxCategory] = useState('general');
+  const [taxLoading, setTaxLoading] = useState(false);
+  const [showCallbackForm, setShowCallbackForm] = useState(false);
+  const [callbackForm, setCallbackForm] = useState({
+    callback_type: 'clearance_success',
+    status: 'success',
+    message: '',
+    customs_reference: ''
+  });
+  const [callbackLoading, setCallbackLoading] = useState(false);
 
   useEffect(() => {
     fetchPackageDetail();
@@ -32,6 +43,50 @@ const PackageDetailPage = () => {
       setTimeline(res.data);
     } catch (err) {
       console.error('获取时间线失败:', err);
+    }
+  };
+
+  const handleCalculateTax = async () => {
+    try {
+      setTaxLoading(true);
+      await axios.post(`/api/tax/calculate/${id}`, {
+        category: taxCategory,
+        operator: 'current_user'
+      });
+      await fetchPackageDetail();
+      setShowTaxForm(false);
+      alert('税费计算成功！');
+    } catch (err) {
+      console.error('税费计算失败:', err);
+      alert('税费计算失败，请重试');
+    } finally {
+      setTaxLoading(false);
+    }
+  };
+
+  const handleSendCallback = async () => {
+    try {
+      setCallbackLoading(true);
+      await axios.post(`/api/customs/callback/${id}`, {
+        ...callbackForm,
+        callback_data: {},
+        operator: 'current_user'
+      });
+      await fetchPackageDetail();
+      await fetchTimeline();
+      setShowCallbackForm(false);
+      setCallbackForm({
+        callback_type: 'clearance_success',
+        status: 'success',
+        message: '',
+        customs_reference: ''
+      });
+      alert('海关回调发送成功！');
+    } catch (err) {
+      console.error('海关回调发送失败:', err);
+      alert('海关回调发送失败，请重试');
+    } finally {
+      setCallbackLoading(false);
     }
   };
 
@@ -190,7 +245,41 @@ const PackageDetailPage = () => {
 
       {activeTab === 'tax' && (
         <div className="card">
-          <h2 className="section-title">税费计算记录</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 className="section-title" style={{ marginBottom: 0 }}>税费计算记录</h2>
+            <button className="btn btn-primary" onClick={() => setShowTaxForm(!showTaxForm)}>
+              {showTaxForm ? '取消' : '+ 试算税费'}
+            </button>
+          </div>
+
+          {showTaxForm && (
+            <div style={{ padding: '16px', background: '#f7fafc', borderRadius: '8px', marginBottom: '20px' }}>
+              <h4 style={{ marginBottom: '12px' }}>税费试算</h4>
+              <div className="form-group">
+                <label>商品品类</label>
+                <select
+                  className="form-control"
+                  value={taxCategory}
+                  onChange={(e) => setTaxCategory(e.target.value)}
+                >
+                  <option value="general">普通商品</option>
+                  <option value="electronics">电子产品</option>
+                  <option value="luxury">奢侈品</option>
+                  <option value="food">食品</option>
+                  <option value="cosmetics">化妆品</option>
+                </select>
+              </div>
+              <button
+                className="btn btn-primary"
+                onClick={handleCalculateTax}
+                disabled={taxLoading}
+                style={{ marginTop: '12px' }}
+              >
+                {taxLoading ? '计算中...' : '开始计算'}
+              </button>
+            </div>
+          )}
+
           {packageData.taxCalculations && packageData.taxCalculations.length > 0 ? (
             <table className="table">
               <thead>
@@ -224,7 +313,75 @@ const PackageDetailPage = () => {
 
       {activeTab === 'callbacks' && (
         <div className="card">
-          <h2 className="section-title">海关回调记录</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 className="section-title" style={{ marginBottom: 0 }}>海关回调记录</h2>
+            <button className="btn btn-primary" onClick={() => setShowCallbackForm(!showCallbackForm)}>
+              {showCallbackForm ? '取消' : '+ 发送海关回调'}
+            </button>
+          </div>
+
+          {showCallbackForm && (
+            <div style={{ padding: '16px', background: '#f7fafc', borderRadius: '8px', marginBottom: '20px' }}>
+              <h4 style={{ marginBottom: '12px' }}>发送海关回调</h4>
+              <div className="grid-2">
+                <div className="form-group">
+                  <label>回调类型</label>
+                  <select
+                    className="form-control"
+                    value={callbackForm.callback_type}
+                    onChange={(e) => setCallbackForm({ ...callbackForm, callback_type: e.target.value })}
+                  >
+                    <option value="clearance_success">清关成功</option>
+                    <option value="clearance_failed">清关失败</option>
+                    <option value="document_required">需补资料</option>
+                    <option value="tax_adjustment">税费调整</option>
+                    <option value="inspection_required">需查验</option>
+                    <option value="returned">已退单</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>状态</label>
+                  <select
+                    className="form-control"
+                    value={callbackForm.status}
+                    onChange={(e) => setCallbackForm({ ...callbackForm, status: e.target.value })}
+                  >
+                    <option value="success">成功</option>
+                    <option value="failed">失败</option>
+                    <option value="pending">待处理</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>海关参考号</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={callbackForm.customs_reference}
+                  onChange={(e) => setCallbackForm({ ...callbackForm, customs_reference: e.target.value })}
+                  placeholder="请输入海关参考号"
+                />
+              </div>
+              <div className="form-group">
+                <label>消息</label>
+                <textarea
+                  className="form-control"
+                  value={callbackForm.message}
+                  onChange={(e) => setCallbackForm({ ...callbackForm, message: e.target.value })}
+                  placeholder="请输入回调消息"
+                  rows="3"
+                />
+              </div>
+              <button
+                className="btn btn-primary"
+                onClick={handleSendCallback}
+                disabled={callbackLoading}
+              >
+                {callbackLoading ? '发送中...' : '发送回调'}
+              </button>
+            </div>
+          )}
+
           {packageData.customsCallbacks && packageData.customsCallbacks.length > 0 ? (
             <table className="table">
               <thead>

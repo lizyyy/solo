@@ -49,9 +49,30 @@ const ImportPage = () => {
     }
   };
 
+  const escapeCsvField = (field) => {
+    if (field.includes(',') || field.includes('"') || field.includes('\n')) {
+      return `"${field.replace(/"/g, '""')}"`;
+    }
+    return field;
+  };
+
   const downloadTemplate = () => {
     const header = 'tracking_number,sender_name,sender_country,receiver_name,receiver_address,weight,declared_value,currency,product_name,quantity,unit_price,category\n';
-    const sampleData = 'TEST001,Zhang Wei,China,John Smith,123 Main St, New York,2.5,150.00,USD,Smart Phone,1,150.00,electronics\n';
+    const sampleRow = [
+      'TEST001',
+      'Zhang Wei',
+      'China',
+      'John Smith',
+      '123 Main St, New York',
+      '2.5',
+      '150.00',
+      'USD',
+      'Smart Phone',
+      '1',
+      '150.00',
+      'electronics'
+    ];
+    const sampleData = sampleRow.map(escapeCsvField).join(',') + '\n';
     const csvContent = header + sampleData;
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
