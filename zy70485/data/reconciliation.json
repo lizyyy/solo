@@ -1,0 +1,293 @@
+{
+  "reconciliations": [
+    {
+      "id": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "batchNo": "FREEZE-20240515-001",
+      "configType": "版本冻结通知",
+      "source": "灰度发布系统",
+      "status": "partial_success",
+      "items": [
+        {
+          "id": "9d30c04b-8930-4a3d-a477-767fe829cb59",
+          "itemRef": "V2.4.1-FR-001",
+          "department": "风控合规部",
+          "owner": "张明",
+          "deadline": "2024-05-10 18:00:00",
+          "amount": 50000,
+          "description": "风控规则引擎v2.4.1版本冻结审批",
+          "status": "success",
+          "receipt": {
+            "itemRef": "V2.4.1-FR-001",
+            "receiptNo": "RCP-FR-20240510-001",
+            "approvedBy": "风控总监-刘总",
+            "approvedAt": "2024-05-10 17:30:00",
+            "status": "approved",
+            "comments": "风控规则已验证，同意冻结"
+          },
+          "receiptTime": "2026-05-15T23:55:11.668Z",
+          "validationResult": {
+            "itemRef": "V2.4.1-FR-001",
+            "success": true,
+            "validator": "对账系统-自动校验",
+            "validatedAt": "2024-05-15 10:00:00",
+            "checkItems": [
+              {
+                "name": "审批人权限校验",
+                "result": "pass"
+              },
+              {
+                "name": "审批时间有效性",
+                "result": "pass"
+              },
+              {
+                "name": "回执单格式校验",
+                "result": "pass"
+              }
+            ]
+          },
+          "validatedAt": "2026-05-15T23:55:11.670Z"
+        },
+        {
+          "id": "035300e9-1725-4bd7-b741-0a2c60eb7120",
+          "itemRef": "V2.4.1-OPS-002",
+          "department": "运维保障部",
+          "owner": "李强",
+          "deadline": "2024-05-10 18:00:00",
+          "amount": 80000,
+          "description": "生产环境变更窗口冻结申请",
+          "status": "success",
+          "receipt": {
+            "itemRef": "V2.4.1-OPS-002",
+            "receiptNo": "RCP-OPS-20240511-002",
+            "approvedBy": "运维经理-周明",
+            "approvedAt": "2024-05-11 09:15:00",
+            "status": "approved",
+            "comments": "运维窗口已协调，回执晚到一天"
+          },
+          "receiptTime": "2026-05-15T23:55:11.668Z",
+          "validationResult": {
+            "itemRef": "V2.4.1-OPS-002",
+            "success": true,
+            "validator": "对账系统-自动校验",
+            "validatedAt": "2024-05-15 10:01:00",
+            "checkItems": [
+              {
+                "name": "审批人权限校验",
+                "result": "pass"
+              },
+              {
+                "name": "审批时间有效性",
+                "result": "warning:超时"
+              },
+              {
+                "name": "回执单格式校验",
+                "result": "pass"
+              }
+            ]
+          },
+          "validatedAt": "2026-05-15T23:55:11.670Z"
+        },
+        {
+          "id": "d60e4479-e959-41fd-a043-504d8adec41e",
+          "itemRef": "V2.4.1-PRD-003",
+          "department": "产品研发部",
+          "owner": "王芳",
+          "deadline": "2024-05-11 12:00:00",
+          "amount": 120000,
+          "description": "新功能代码分支冻结审批",
+          "status": "failed",
+          "receipt": {
+            "itemRef": "V2.4.1-PRD-003",
+            "receiptNo": "RCP-PRD-20240511-003",
+            "approvedBy": "产品总监-吴总",
+            "approvedAt": "2024-05-11 11:45:00",
+            "status": "approved",
+            "comments": "代码评审通过"
+          },
+          "receiptTime": "2026-05-15T23:55:11.668Z",
+          "validationResult": {
+            "itemRef": "V2.4.1-PRD-003",
+            "success": false,
+            "reason": "回执单缺少版本号字段，审批附件不全",
+            "validator": "对账系统-自动校验",
+            "validatedAt": "2024-05-15 10:02:00",
+            "checkItems": [
+              {
+                "name": "审批人权限校验",
+                "result": "pass"
+              },
+              {
+                "name": "审批时间有效性",
+                "result": "pass"
+              },
+              {
+                "name": "回执单格式校验",
+                "result": "fail:字段缺失"
+              }
+            ]
+          },
+          "validatedAt": "2026-05-15T23:55:11.670Z"
+        },
+        {
+          "id": "d7607dde-7bae-49d9-9f43-29de6d4db2e0",
+          "itemRef": "V2.4.1-FIN-004",
+          "department": "财务结算部",
+          "owner": "赵静",
+          "deadline": "2024-05-12 23:59:59",
+          "amount": 200000,
+          "description": "月结期间系统版本临时冻结",
+          "status": "overdue",
+          "receipt": null,
+          "receiptTime": null
+        },
+        {
+          "id": "2bb961ca-9d71-40cf-b619-cdb8ebf28983",
+          "itemRef": "V2.4.1-SEC-005",
+          "department": "安全应急部",
+          "owner": "陈伟",
+          "deadline": "2024-05-09 20:00:00",
+          "amount": 150000,
+          "description": "安全扫描通过后版本发布冻结",
+          "status": "success",
+          "receipt": {
+            "itemRef": "V2.4.1-SEC-005",
+            "receiptNo": "RCP-SEC-20240510-005",
+            "approvedBy": "安全负责人-孙总",
+            "approvedAt": "2024-05-10 08:30:00",
+            "status": "approved",
+            "comments": "安全扫描已通过，提前完成"
+          },
+          "receiptTime": "2026-05-15T23:55:11.668Z",
+          "validationResult": {
+            "itemRef": "V2.4.1-SEC-005",
+            "success": true,
+            "validator": "对账系统-自动校验",
+            "validatedAt": "2024-05-15 10:03:00",
+            "checkItems": [
+              {
+                "name": "审批人权限校验",
+                "result": "pass"
+              },
+              {
+                "name": "审批时间有效性",
+                "result": "pass"
+              },
+              {
+                "name": "回执单格式校验",
+                "result": "pass"
+              }
+            ]
+          },
+          "validatedAt": "2026-05-15T23:55:11.670Z"
+        }
+      ],
+      "summary": {
+        "total": 5,
+        "matched": 4,
+        "success": 3,
+        "failed": 1,
+        "waiting": 0,
+        "overdue": 5
+      },
+      "materialSummary": {
+        "source": "灰度发布系统",
+        "itemCount": 5,
+        "departments": [
+          "风控合规部",
+          "运维保障部",
+          "产品研发部",
+          "财务结算部",
+          "安全应急部"
+        ],
+        "earliestDeadline": "2024-05-09 20:00:00",
+        "latestDeadline": "2024-05-12 23:59:59",
+        "totalAmount": 600000
+      },
+      "createdAt": "2026-05-15T23:55:11.667Z",
+      "updatedAt": "2026-05-15T23:55:11.670Z"
+    }
+  ],
+  "statusChanges": [
+    {
+      "id": "b1a44764-5ce6-43a5-83cc-5de96a249206",
+      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "fromStatus": null,
+      "toStatus": "pending",
+      "reason": "系统创建对账任务",
+      "changedAt": "2026-05-15T23:55:11.667Z"
+    },
+    {
+      "id": "98f89552-e08d-40d9-94ee-9d20ac89ddbe",
+      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "fromStatus": "pending",
+      "toStatus": "receipt_late",
+      "reason": "完成匹配，匹配成功4项",
+      "changedAt": "2026-05-15T23:55:11.668Z"
+    },
+    {
+      "id": "982e9597-d7c8-4887-a6ea-88d5d34d6e22",
+      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "fromStatus": "receipt_late",
+      "toStatus": "partial_success",
+      "reason": "完成校验，成功3项，失败1项",
+      "changedAt": "2026-05-15T23:55:11.670Z"
+    }
+  ],
+  "reminders": [
+    {
+      "id": "bad2ab8a-2199-47fb-a4b0-a1153a471035",
+      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "itemId": "9d30c04b-8930-4a3d-a477-767fe829cb59",
+      "type": "回执晚到",
+      "content": "项目V2.4.1-FR-001回执时间晚于截止时间2024-05-10 18:00:00",
+      "isResolved": false,
+      "createdAt": "2026-05-15T23:55:11.668Z"
+    },
+    {
+      "id": "305cd065-95ae-4dce-80e4-bc2cfc1f4798",
+      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "itemId": "035300e9-1725-4bd7-b741-0a2c60eb7120",
+      "type": "回执晚到",
+      "content": "项目V2.4.1-OPS-002回执时间晚于截止时间2024-05-10 18:00:00",
+      "isResolved": false,
+      "createdAt": "2026-05-15T23:55:11.668Z"
+    },
+    {
+      "id": "da1822a9-ac38-429a-af79-bfa6b20fa8b4",
+      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "itemId": "d60e4479-e959-41fd-a043-504d8adec41e",
+      "type": "回执晚到",
+      "content": "项目V2.4.1-PRD-003回执时间晚于截止时间2024-05-11 12:00:00",
+      "isResolved": false,
+      "createdAt": "2026-05-15T23:55:11.668Z"
+    },
+    {
+      "id": "19d7a05c-e991-47d8-be52-a91cba110c17",
+      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "itemId": "d7607dde-7bae-49d9-9f43-29de6d4db2e0",
+      "type": "回执逾期",
+      "content": "项目V2.4.1-FIN-004已超过截止时间2024-05-12 23:59:59，尚未收到回执",
+      "isResolved": false,
+      "createdAt": "2026-05-15T23:55:11.668Z"
+    },
+    {
+      "id": "0e830f58-d283-4e4f-8d8a-3245dfd2ad88",
+      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "itemId": "2bb961ca-9d71-40cf-b619-cdb8ebf28983",
+      "type": "回执晚到",
+      "content": "项目V2.4.1-SEC-005回执时间晚于截止时间2024-05-09 20:00:00",
+      "isResolved": false,
+      "createdAt": "2026-05-15T23:55:11.668Z"
+    },
+    {
+      "id": "13bf5d54-8f70-4d67-8374-ce0c79910046",
+      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "itemId": "d60e4479-e959-41fd-a043-504d8adec41e",
+      "type": "校验失败",
+      "content": "项目V2.4.1-PRD-003校验失败：回执单缺少版本号字段，审批附件不全",
+      "isResolved": false,
+      "createdAt": "2026-05-15T23:55:11.670Z"
+    }
+  ],
+  "manualNotes": []
+}

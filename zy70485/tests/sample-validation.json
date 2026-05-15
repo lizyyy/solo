@@ -1,0 +1,47 @@
+[
+  {
+    "itemRef": "V2.4.1-FR-001",
+    "success": true,
+    "validator": "对账系统-自动校验",
+    "validatedAt": "2024-05-15 10:00:00",
+    "checkItems": [
+      { "name": "审批人权限校验", "result": "pass" },
+      { "name": "审批时间有效性", "result": "pass" },
+      { "name": "回执单格式校验", "result": "pass" }
+    ]
+  },
+  {
+    "itemRef": "V2.4.1-OPS-002",
+    "success": true,
+    "validator": "对账系统-自动校验",
+    "validatedAt": "2024-05-15 10:01:00",
+    "checkItems": [
+      { "name": "审批人权限校验", "result": "pass" },
+      { "name": "审批时间有效性", "result": "warning:超时" },
+      { "name": "回执单格式校验", "result": "pass" }
+    ]
+  },
+  {
+    "itemRef": "V2.4.1-PRD-003",
+    "success": false,
+    "reason": "回执单缺少版本号字段，审批附件不全",
+    "validator": "对账系统-自动校验",
+    "validatedAt": "2024-05-15 10:02:00",
+    "checkItems": [
+      { "name": "审批人权限校验", "result": "pass" },
+      { "name": "审批时间有效性", "result": "pass" },
+      { "name": "回执单格式校验", "result": "fail:字段缺失" }
+    ]
+  },
+  {
+    "itemRef": "V2.4.1-SEC-005",
+    "success": true,
+    "validator": "对账系统-自动校验",
+    "validatedAt": "2024-05-15 10:03:00",
+    "checkItems": [
+      { "name": "审批人权限校验", "result": "pass" },
+      { "name": "审批时间有效性", "result": "pass" },
+      { "name": "回执单格式校验", "result": "pass" }
+    ]
+  }
+]

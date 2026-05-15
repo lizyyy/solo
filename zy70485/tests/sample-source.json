@@ -1,0 +1,47 @@
+{
+  "source": "灰度发布系统",
+  "batchNo": "FREEZE-20240515-001",
+  "configType": "版本冻结通知",
+  "items": [
+    {
+      "itemRef": "V2.4.1-FR-001",
+      "department": "风控合规部",
+      "owner": "张明",
+      "deadline": "2024-05-10 18:00:00",
+      "amount": 50000,
+      "description": "风控规则引擎v2.4.1版本冻结审批"
+    },
+    {
+      "itemRef": "V2.4.1-OPS-002",
+      "department": "运维保障部",
+      "owner": "李强",
+      "deadline": "2024-05-10 18:00:00",
+      "amount": 80000,
+      "description": "生产环境变更窗口冻结申请"
+    },
+    {
+      "itemRef": "V2.4.1-PRD-003",
+      "department": "产品研发部",
+      "owner": "王芳",
+      "deadline": "2024-05-11 12:00:00",
+      "amount": 120000,
+      "description": "新功能代码分支冻结审批"
+    },
+    {
+      "itemRef": "V2.4.1-FIN-004",
+      "department": "财务结算部",
+      "owner": "赵静",
+      "deadline": "2024-05-12 23:59:59",
+      "amount": 200000,
+      "description": "月结期间系统版本临时冻结"
+    },
+    {
+      "itemRef": "V2.4.1-SEC-005",
+      "department": "安全应急部",
+      "owner": "陈伟",
+      "deadline": "2024-05-09 20:00:00",
+      "amount": 150000,
+      "description": "安全扫描通过后版本发布冻结"
+    }
+  ]
+}

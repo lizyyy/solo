@@ -1,0 +1,34 @@
+[
+  {
+    "itemRef": "V2.4.1-FR-001",
+    "receiptNo": "RCP-FR-20240510-001",
+    "approvedBy": "风控总监-刘总",
+    "approvedAt": "2024-05-10 17:30:00",
+    "status": "approved",
+    "comments": "风控规则已验证，同意冻结"
+  },
+  {
+    "itemRef": "V2.4.1-OPS-002",
+    "receiptNo": "RCP-OPS-20240511-002",
+    "approvedBy": "运维经理-周明",
+    "approvedAt": "2024-05-11 09:15:00",
+    "status": "approved",
+    "comments": "运维窗口已协调，回执晚到一天"
+  },
+  {
+    "itemRef": "V2.4.1-PRD-003",
+    "receiptNo": "RCP-PRD-20240511-003",
+    "approvedBy": "产品总监-吴总",
+    "approvedAt": "2024-05-11 11:45:00",
+    "status": "approved",
+    "comments": "代码评审通过"
+  },
+  {
+    "itemRef": "V2.4.1-SEC-005",
+    "receiptNo": "RCP-SEC-20240510-005",
+    "approvedBy": "安全负责人-孙总",
+    "approvedAt": "2024-05-10 08:30:00",
+    "status": "approved",
+    "comments": "安全扫描已通过，提前完成"
+  }
+]
