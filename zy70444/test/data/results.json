@@ -1,0 +1,21 @@
+{
+  "TEST_BATCH_1778848908481": {
+    "{\"messageId\":\"MSG_1778848908479_pw70nbiix\",\"phone\":\"13800000001\",\"content\":\"测试内容\",\"templateId\":\"TPL001\",\"signMethod\":\"MD5\",\"timestamp\":1778848908479}": {
+      "message": {
+        "messageId": "MSG_1778848908479_pw70nbiix",
+        "phone": "13800000001",
+        "content": "测试内容",
+        "templateId": "TPL001",
+        "signMethod": "MD5",
+        "sign": "f7e869cbe5274c4b02825908c7989fad",
+        "timestamp": 1778848908479
+      },
+      "result": {
+        "valid": true,
+        "algorithm": "MD5",
+        "sign": "f7e869cbe5274c4b02825908c7989fad"
+      },
+      "timestamp": 1778848908482
+    }
+  }
+}

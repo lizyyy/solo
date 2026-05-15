@@ -1,0 +1,23 @@
+{
+  "name": "queue-message-checker",
+  "version": "1.0.0",
+  "description": "队列消息体检查命令行工具",
+  "main": "src/index.js",
+  "bin": {
+    "qmc": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-test.js",
+    "demo": "node src/cli.js --demo"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "crypto": "^1.0.1",
+    "inquirer": "^8.2.6"
+  },
+  "keywords": ["queue", "message", "checker", "sms", "signature"],
+  "author": "",
+  "license": "MIT"
+}

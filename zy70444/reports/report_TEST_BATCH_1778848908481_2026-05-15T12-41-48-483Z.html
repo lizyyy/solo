@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>队列消息体检查报告 - TEST_BATCH_1778848908481</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header .meta { opacity: 0.9; font-size: 14px; }
+        .summary { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; padding: 25px; background: #f8f9fa; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .stat-card .number { font-size: 32px; font-weight: bold; color: #333; }
+        .stat-card .label { font-size: 12px; color: #666; margin-top: 5px; }
+        .stat-card.success .number { color: #10b981; }
+        .stat-card.danger .number { color: #ef4444; }
+        .stat-card.warning .number { color: #f59e0b; }
+        .section { padding: 25px; border-bottom: 1px solid #eee; }
+        .section h2 { font-size: 18px; color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .section h2::before { content: ''; width: 4px; height: 18px; background: #667eea; border-radius: 2px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #333; }
+        tr:hover { background: #f8f9fa; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .screenshot-mock { background: #1a1a2e; border-radius: 8px; padding: 20px; color: #eee; font-family: monospace; margin-top: 15px; }
+        .screenshot-mock .window-bar { height: 24px; background: #2d2d44; border-radius: 6px 6px 0 0; margin: -20px -20px 15px -20px; padding: 0 15px; display: flex; align-items: center; gap: 8px; }
+        .screenshot-mock .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .screenshot-mock .dot.red { background: #ff5f57; }
+        .screenshot-mock .dot.yellow { background: #ffbd2e; }
+        .screenshot-mock .dot.green { background: #28ca42; }
+        .logistics-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; margin-top: 10px; }
+        .next-steps { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 0 8px 8px 0; }
+        .next-steps h3 { color: #92400e; margin-bottom: 10px; }
+        .next-steps ul { margin-left: 20px; color: #78350f; }
+        .next-steps li { margin: 8px 0; }
+        .hash-box { background: #1f2937; color: #10b981; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all; }
+        .export-btn { display: inline-block; background: #667eea; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; margin-top: 15px; }
+        .export-btn:hover { background: #5a67d8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 队列消息体检查报告</h1>
+            <div class="meta">批次ID: TEST_BATCH_1778848908481 | 生成时间: 2026/5/15 20:41:48 | 执行耗时: 100ms</div>
+        </div>
+        
+        <div class="summary">
+            <div class="stat-card"><div class="number">6</div><div class="label">消息总数</div></div>
+            <div class="stat-card success"><div class="number">5</div><div class="label">验证通过</div></div>
+            <div class="stat-card danger"><div class="number">1</div><div class="label">验证失败</div></div>
+            <div class="stat-card warning"><div class="number">1</div><div class="label">算法不一致</div></div>
+            <div class="stat-card"><div class="number">83.3%</div><div class="label">通过率</div></div>
+            <div class="stat-card"><div class="number">100ms</div><div class="label">执行时间</div></div>
+        </div>
+
+        <div class="section">
+            <h2>🔍 处理前后对比</h2>
+            <table>
+                <thead>
+                    <tr><th>消息ID</th><th>手机号</th><th>内容摘要</th><th>签名算法</th><th>处理前状态</th><th>处理后状态</th><th>问题说明</th></tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td><code>MSG_1778848908483_03gw85fh2</code></td>
+                        <td>13810000000</td>
+                        <td>【物流通知】您的快递已出库，运单号：SF...</td>
+                        <td><span class="badge badge-success">MD5</span></td>
+                        <td><span class="badge badge-warning">待验证</span></td>
+                        <td><span class="badge badge-success">通过</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>MSG_1778848908483_rmm402gjg</code></td>
+                        <td>13810000001</td>
+                        <td>【物流通知】您的包裹正在派送中，预计今日...</td>
+                        <td><span class="badge badge-success">MD5</span></td>
+                        <td><span class="badge badge-warning">待验证</span></td>
+                        <td><span class="badge badge-success">通过</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>MSG_1778848908483_96bky11cn</code></td>
+                        <td>13810000002</td>
+                        <td>【物流通知】快递已到达，请凭取件码123...</td>
+                        <td><span class="badge badge-success">MD5</span></td>
+                        <td><span class="badge badge-warning">待验证</span></td>
+                        <td><span class="badge badge-success">通过</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>MSG_1778848908483_pzsobtpxp</code></td>
+                        <td>13810000003</td>
+                        <td>【物流通知】您的订单已发货，请注意查收...</td>
+                        <td><span class="badge badge-success">MD5</span></td>
+                        <td><span class="badge badge-warning">待验证</span></td>
+                        <td><span class="badge badge-success">通过</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>MSG_1778848908483_byz03kv2t</code></td>
+                        <td>13810000004</td>
+                        <td>【验证码】您的验证码是：8888，5分钟...</td>
+                        <td><span class="badge badge-success">MD5</span></td>
+                        <td><span class="badge badge-warning">待验证</span></td>
+                        <td><span class="badge badge-success">通过</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><code>MSG_1778848908483_irpmzm65b</code></td>
+                        <td>13900009999</td>
+                        <td>【物流拦截】异常包裹需拦截，请核实...</td>
+                        <td><span class="badge badge-warning">SHA256</span></td>
+                        <td><span class="badge badge-warning">待验证</span></td>
+                        <td><span class="badge badge-danger">失败</span></td>
+                        <td>签名算法不一致: 期望 MD5, 实际 SHA256</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>⚠️ 签名算法不一致详情</h2>
+            <table>
+                <thead>
+                    <tr><th>消息ID</th><th>期望算法</th><th>实际算法</th><th>期望签名</th><th>实际签名</th></tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td><code>MSG_1778848908483_irpmzm65b</code></td>
+                        <td><span class="badge badge-success">MD5</span></td>
+                        <td><span class="badge badge-danger">SHA256</span></td>
+                        <td><code style="font-size:11px">42fcbf9251118587fd98944c8abf55eb...</code></td>
+                        <td><code style="font-size:11px">2ed0f8f0afb9a6cef5bccdbe1cee53f1...</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>📦 物流拦截复核样例</h2>
+            <div class="screenshot-mock">
+                <div class="window-bar">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                    <span style="margin-left: 10px; color: #999;">物流拦截管理系统 - 复核页面</span>
+                </div>
+                <div class="logistics-card">
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">📦 运单拦截复核</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <div style="color: #ccc; font-size: 11px;">运单号</div>
+                            <div style="font-size: 14px;">SF1234567890</div>
+                        </div>
+                        <div>
+                            <div style="color: #ccc; font-size: 11px;">当前状态</div>
+                            <div style="font-size: 14px; color: #fbbf24;">🔴 已拦截</div>
+                        </div>
+                        <div>
+                            <div style="color: #ccc; font-size: 11px;">收件人手机</div>
+                            <div style="font-size: 14px;">13900009999</div>
+                        </div>
+                        <div>
+                            <div style="color: #ccc; font-size: 11px;">拦截原因</div>
+                            <div style="font-size: 14px; color: #f87171;">签名算法异常</div>
+                        </div>
+                        <div>
+                            <div style="color: #ccc; font-size: 11px;">关联消息ID</div>
+                            <div style="font-size: 12px; font-family: monospace;">MSG_1778848908483_03gw85fh2</div>
+                        </div>
+                        <div>
+                            <div style="color: #ccc; font-size: 11px;">拦截时间</div>
+                            <div style="font-size: 14px;">2026/5/15 20:41:48</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 4px;">✅ 确认拦截</button>
+                        <button style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px;">🚚 放行</button>
+                        <button style="background: #f59e0b; color: white; border: none; padding: 8px 16px; border-radius: 4px;">👥 转人工复核</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔗 导出摘要 (输入-动作-结论)</h2>
+            <div class="hash-box">eyJpbnB1dCI6IntcInRvdGFsXCI6NixcImJhdGNoSWRcIjpcIlRFU1RfQkFUQ0hf</div>
+            <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                <strong>输入:</strong> 6 条消息 (批次 TEST_BATCH_1778848908481)<br>
+                <strong>动作:</strong> 签名算法验证与一致性检查<br>
+                <strong>结论:</strong> 通过 5 条, 失败 1 条 (其中算法不一致 1 条)
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="next-steps">
+                <h3>📋 下一步建议</h3>
+                <ul>
+                    
+                    <li><strong>导出异常样本:</strong> 使用 <code>qmc export --batch TEST_BATCH_1778848908481 --output abnormal.json</code> 导出给同事复核</li>
+                    <li><strong>检查算法配置:</strong> 联系开发团队确认为什么使用了错误的签名算法</li>
+                    <li><strong>重签名重发:</strong> 对异常消息使用正确算法重签名后重新提交验证</li>
+                    
+                    <li><strong>正常消息入队:</strong> 5 条验证通过的消息可以安全进入发送队列</li>
+                    <li><strong>查看历史记录:</strong> 使用 <code>qmc history</code> 查看所有历史处理批次</li>
+                    <li><strong>生成复核报告:</strong> 导出完整报告供质量团队审计</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

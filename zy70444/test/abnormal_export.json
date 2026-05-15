@@ -1,0 +1,25 @@
+{
+  "exportTime": "2026-05-15T12:41:48.544Z",
+  "count": 1,
+  "records": [
+    {
+      "message": {
+        "messageId": "MSG_1778848908483_irpmzm65b",
+        "phone": "13900009999",
+        "content": "【物流拦截】异常包裹需拦截，请核实",
+        "templateId": "TPL001",
+        "signMethod": "SHA256",
+        "sign": "2ed0f8f0afb9a6cef5bccdbe1cee53f15c4b9fa95412bf2f54f11fdf696bb3b9",
+        "timestamp": 1778848908483
+      },
+      "result": {
+        "valid": false,
+        "error": "签名算法不一致: 期望 MD5, 实际 SHA256",
+        "expectedAlgorithm": "MD5",
+        "actualAlgorithm": "SHA256",
+        "expectedSign": "42fcbf9251118587fd98944c8abf55eb",
+        "actualSign": "2ed0f8f0afb9a6cef5bccdbe1cee53f15c4b9fa95412bf2f54f11fdf696bb3b9"
+      }
+    }
+  ]
+}

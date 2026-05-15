@@ -1,0 +1,56 @@
+[
+  {
+    "messageId": "MSG_1778848867676_7kpl8r0i9",
+    "phone": "13810000000",
+    "content": "【物流通知】您的快递已出库，运单号：SF1234567890",
+    "templateId": "TPL001",
+    "signMethod": "MD5",
+    "sign": "51192a67ecfd1584065bceebfe286f39",
+    "timestamp": 1778848867676
+  },
+  {
+    "messageId": "MSG_1778848867681_lqkhg40bh",
+    "phone": "13810000001",
+    "content": "【物流通知】您的包裹正在派送中，预计今日送达",
+    "templateId": "TPL001",
+    "signMethod": "MD5",
+    "sign": "063b28b5ccd669253ca8bb2a8500bf82",
+    "timestamp": 1778848867681
+  },
+  {
+    "messageId": "MSG_1778848867681_crs9o887o",
+    "phone": "13810000002",
+    "content": "【物流通知】快递已到达，请凭取件码1234取件",
+    "templateId": "TPL001",
+    "signMethod": "MD5",
+    "sign": "849eac062ad64508040bc886ab9a15b2",
+    "timestamp": 1778848867681
+  },
+  {
+    "messageId": "MSG_1778848867681_jiryq6a84",
+    "phone": "13810000003",
+    "content": "【物流通知】您的订单已发货，请注意查收",
+    "templateId": "TPL001",
+    "signMethod": "MD5",
+    "sign": "682b2bcceb75b285c990e15624f9d498",
+    "timestamp": 1778848867681
+  },
+  {
+    "messageId": "MSG_1778848867681_hssp09x5x",
+    "phone": "13810000004",
+    "content": "【验证码】您的验证码是：8888，5分钟内有效",
+    "templateId": "TPL001",
+    "signMethod": "MD5",
+    "sign": "48e7a423a9d125c0cf2d421acbb056a3",
+    "timestamp": 1778848867681
+  },
+  {
+    "messageId": "MSG_1778848867681_ynf2ses5f",
+    "phone": "13900009999",
+    "content": "【物流拦截】异常包裹需拦截，请核实",
+    "templateId": "TPL001",
+    "signMethod": "SHA256",
+    "sign": "d95ce78dc6c9a6155a61071dc0b14d1842acc58c54be6d1ca808bda7538f9591",
+    "timestamp": 1778848867681
+  }
+]
