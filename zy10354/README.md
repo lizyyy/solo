@@ -1,87 +1,95 @@
 # 接口迁移双写比对 API
 
-基于 Spring Boot 2.x + Java 8 构建的接口迁移双写比对服务，用于系统迁移过程中的数据一致性验证。
+系统迁移数据一致性验证服务，支持研发和支持团队按同一套记录排查问题。
 
 ---
 
-## 技术栈
+## 🎯 两个版本
 
-- **框架**: Spring Boot 2.7.18
-- **JDK**: Java 8+
-- **数据存储**: 文件持久化 (JSON)
-- **导出格式**: JSON / CSV / 文本报告
+### ✅ 推荐：零依赖独立版本（Java 8+）
 
----
+**无需 Maven、无需任何外部依赖、一键启动**
 
-## 核心功能
+```bash
+# 直接启动（只需要 Java 8+ JDK）
+./start-standalone.sh
+```
 
-### 1. 任务生命周期管理
-- 创建迁移任务
-- 配置校验
-- 状态流转跟踪
-- 任务查询
-
-### 2. 双写与比对
-- 模拟旧库/新库双写
-- 字段级精细比对
-- 支持精度阈值配置
-- 差异归因分析
-
-### 3. 幂等性保障
-- 基于请求哈希的幂等键生成
-- 重复请求返回已有结果
-- 缓存自动清理
-
-### 4. 数据持久化
-- 文件系统持久化 (./data 目录)
-- 服务重启数据不丢失
-- 实时写入与加载
-
-### 5. 导出与报告
-- 单任务/全任务 JSON 导出
-- 单任务/全任务 CSV 导出
-- 差异比对文本报告
-- 下载支持
-
-### 6. 切换与回滚
-- 切换结论生成
-- 阻塞问题检测
-- 切换操作执行
-- 回滚记录跟踪
+**特性:**
+- 只需要 Java 8 JDK 或更高版本
+- 使用 JDK 内置 HttpServer，零外部依赖
+- 自动编译源码
+- 文件持久化，重启数据不丢失
 
 ---
 
-## 快速开始
+### Spring Boot 版本（可选）
 
-### 方式一：一键启动
+需要 Maven 和 Java 8+
 
 ```bash
 ./start.sh
 ```
 
-### 方式二：手动编译运行
+---
+
+## 🚀 快速验证步骤
+
+### 1. 启动服务
 
 ```bash
-# 编译
-mvn clean package -DskipTests
-
-# 运行
-java -jar target/dual-write-compare-api-1.0.0.jar
+./start-standalone.sh
 ```
 
-### 运行测试
+看到以下输出说明启动成功：
+```
+✓ Java 版本: 1.8.0_xxx (主版本: 8)
+✓ 编译成功
+✓ Class 文件就绪
+服务地址: http://localhost:8080
+健康检查: http://localhost:8080/actuator/health
+```
+
+### 2. 运行完整测试
+
+新开一个终端：
 
 ```bash
-# 先启动服务，然后运行完整测试
+# 等待服务启动后运行
 ./run-test.sh
+```
+
+该脚本会完整验证：
+- ✅ 服务健康检查
+- ✅ 创建迁移任务
+- ✅ 幂等性验证（重复创建返回同一任务）
+- ✅ 执行双写
+- ✅ 字段比对
+- ✅ 生成切换结论
+- ✅ 历史查询（查询所有任务）
+- ✅ JSON 导出
+- ✅ CSV 导出
+- ✅ 比对报告生成
+- ✅ 文件持久化验证（检查 `./data` 目录）
+
+### 3. 验证文件持久化
+
+```bash
+# 检查持久化文件
+ls -la ./data/
+
+# 停止服务（Ctrl+C），重新启动，再次查询历史任务，数据应该保留
 ```
 
 ---
 
-## API 接口清单
+## 📋 API 接口清单
+
+### 核心流程
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
+| POST | `/api/migration/tasks/full-flow` | 一键执行完整流程（推荐） |
 | POST | `/api/migration/tasks` | 创建迁移任务 |
 | POST | `/api/migration/tasks/{taskId}/validate` | 校验任务配置 |
 | POST | `/api/migration/tasks/{taskId}/dual-write` | 执行双写操作 |
@@ -89,60 +97,26 @@ java -jar target/dual-write-compare-api-1.0.0.jar
 | POST | `/api/migration/tasks/{taskId}/conclusion` | 生成切换结论 |
 | POST | `/api/migration/tasks/{taskId}/switch` | 执行切换 |
 | POST | `/api/migration/tasks/{taskId}/rollback` | 执行回滚 |
-| POST | `/api/migration/tasks/full-flow` | 一键执行完整流程 |
-| GET | `/api/migration/tasks/{taskId}` | 查询任务详情 |
+
+### 查询接口
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
 | GET | `/api/migration/tasks` | 查询所有任务 |
-| GET | `/api/migration/tasks/interface/{interfaceName}` | 按接口名查询 |
-| GET | `/api/migration/tasks/{taskId}/export/json` | 导出单任务 JSON |
-| GET | `/api/migration/tasks/{taskId}/export/csv` | 导出单任务 CSV |
-| GET | `/api/migration/tasks/export/json` | 导出所有任务 JSON |
-| GET | `/api/migration/tasks/export/csv` | 导出所有任务 CSV |
+| GET | `/api/migration/tasks/{taskId}` | 查询单个任务详情 |
+| GET | `/actuator/health` | 服务健康检查 |
+
+### 导出接口
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/migration/tasks/{taskId}/export/json` | 导出任务为 JSON |
+| GET | `/api/migration/tasks/{taskId}/export/csv` | 导出任务为 CSV |
 | GET | `/api/migration/tasks/{taskId}/report` | 生成比对报告 |
-| GET | `/api/migration/tasks/{taskId}/report/download` | 下载比对报告 |
-| DELETE | `/api/migration/cache` | 清空幂等缓存 |
 
 ---
 
-## 任务状态流转
-
-```
-CREATED (已创建)
-    ↓
-VALIDATING → VALIDATED (校验通过)
-    ↓
-DUAL_WRITING → DUAL_WRITE_COMPLETED (双写完成)
-    ↓
-COMPARING → COMPARE_COMPLETED (比对完成)
-    ↓
-SWITCH_READY (可切换) → SWITCHED (已切换)
-    ↓
-ROLLBACKED (已回滚)
-
-任何阶段失败 → FAILED (失败)
-```
-
----
-
-## 配置说明
-
-`application.yml` 核心配置:
-
-```yaml
-server:
-  port: 8080
-
-storage:
-  data-dir: ./data          # 数据持久化目录
-
-dualwrite:
-  simulate-delay-ms: 50     # 模拟写入延迟
-  old-failure-rate: 0       # 旧库失败率 0-1
-  new-failure-rate: 0       # 新库失败率 0-1
-```
-
----
-
-## 使用示例
+## 💻 手动调用示例
 
 ### 创建任务
 
@@ -151,79 +125,84 @@ curl -X POST http://localhost:8080/api/migration/tasks \
   -H "Content-Type: application/json" \
   -d '{
     "interfaceName": "user_order_create",
-    "businessKey": "order_001",
-    "createdBy": "developer",
+    "businessKey": "order_2024_001",
+    "createdBy": "tester",
     "oldDataSource": { "type": "mysql", "tableName": "t_order_old" },
     "newDataSource": { "type": "mysql", "tableName": "t_order_new" },
     "fields": [
       { "fieldName": "order_id", "primaryKey": true, "compareEnable": true },
       { "fieldName": "amount", "precisionThreshold": 0.01, "compareEnable": true }
     ],
-    "writeData": { "order_id": "ORD001", "amount": 99.99 }
+    "writeData": { "order_id": "ORD001", "amount": 99.99, "status": 1 }
   }'
 ```
 
-### 执行完整流程
+### 一键完整流程
 
 ```bash
 curl -X POST http://localhost:8080/api/migration/tasks/full-flow \
   -H "Content-Type: application/json" \
-  -d '{...}'  # 同上请求体
+  -d '{ ... 同上请求体 ... }'
 ```
 
 ### 导出任务
 
 ```bash
-# 导出单任务为 JSON
+# JSON 导出
 curl -O http://localhost:8080/api/migration/tasks/{taskId}/export/json
 
-# 导出所有任务为 CSV
-curl -O http://localhost:8080/api/migration/tasks/export/csv
+# CSV 导出
+curl -O http://localhost:8080/api/migration/tasks/{taskId}/export/csv
 ```
 
 ---
 
-## 目录结构
+## 📁 项目结构
 
 ```
 dual-write-compare-api/
-├── src/main/java/com/migration/dualwrite/
-│   ├── DualWriteCompareApplication.java    # 启动类
-│   ├── constant/                            # 常量定义
-│   ├── controller/                          # REST API
-│   ├── dto/                                 # 数据传输对象
-│   ├── enums/                               # 枚举
-│   ├── exception/                           # 异常处理
-│   └── service/                             # 业务逻辑
-├── src/main/resources/
-│   └── application.yml                      # 配置文件
-├── data/                                    # 持久化数据 (自动生成)
-├── test-output/                             # 测试输出 (自动生成)
-├── pom.xml
-├── start.sh                                 # 启动脚本
-├── run-test.sh                              # 测试脚本
-└── README.md
+├── standalone/                           # 零依赖独立版本
+│   └── src/main/java/com/migration/dualwrite/
+│       ├── StandaloneServer.java        # 服务器启动入口
+│       ├── TaskHandler.java             # API 处理器
+│       ├── TaskStorage.java             # 文件持久化存储
+│       ├── HealthHandler.java           # 健康检查处理器
+│       └── JsonUtil.java                # JSON 工具（零依赖）
+├── src/                                 # Spring Boot 版本（可选）
+│   └── main/java/com/migration/dualwrite/
+├── data/                                # 持久化数据目录（自动生成）
+├── start-standalone.sh                  # 独立版本启动脚本 ✅
+├── start.sh                             # Spring Boot 版本启动脚本
+├── run-test.sh                          # 完整测试脚本
+├── pom.xml                              # Spring Boot Maven 配置
+└── README.md                            # 本文档
 ```
 
 ---
 
-## 健康检查
+## ✅ 验收标准
 
-- 服务状态: `http://localhost:8080/actuator/health`
-- 服务信息: `http://localhost:8080/actuator/info`
+| 检查项 | 验证方法 | 期望结果 |
+|--------|----------|----------|
+| Java 版本识别 | 启动脚本输出 | 正确识别 1.8.x 为 Java 8 |
+| 服务启动 | 访问健康检查 | 返回 UP，端口 8080 监听 |
+| 任务创建 | 调用创建接口 | 返回 200，有 taskId |
+| 幂等性 | 重复创建相同任务 | 返回已有任务，idempotent=true |
+| 双写执行 | 调用双写接口 | 有 oldWriteResult/newWriteResult |
+| 字段比对 | 调用比对接口 | diffCount=0，diffPassed=true |
+| 历史查询 | 重启服务后查询 | 历史任务数据保留 |
+| JSON 导出 | 调用导出接口 | 可下载 JSON 文件 |
+| CSV 导出 | 调用导出接口 | 可下载 CSV 文件 |
+| 文件持久化 | 检查 ./data 目录 | 有 task_*.json 文件 |
 
 ---
 
-## 验证要点
+## 🎯 核心特性总结
 
-1. **幂等性**: 重复提交相同请求，返回同一任务
-2. **持久化**: 重启服务后，任务数据依然存在
-3. **导出一致性**: JSON/CSV 导出数据与查询结果一致
-4. **状态流转**: 任务状态按预期流转
-5. **错误处理**: 非法请求返回友好错误信息
-
----
-
-## License
-
-MIT
+1. ✅ **Java 8 兼容** - 支持 1.8.x 及以上版本
+2. ✅ **零依赖运行** - 独立版本无需任何外部依赖
+3. ✅ **文件持久化** - 重启数据不丢失
+4. ✅ **完整 API** - 创建、双写、比对、导出全流程
+5. ✅ **幂等性保障** - 重复请求不产生脏数据
+6. ✅ **多格式导出** - JSON、CSV、文本报告
+7. ✅ **全链路测试** - 一键运行所有验证点
