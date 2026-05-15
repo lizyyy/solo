@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能开关 API 控制台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .search-box {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 300px;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-disabled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-executed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .detail-section {
+            margin-bottom: 24px;
+        }
+        
+        .detail-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .change-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 16px;
+        }
+        
+        .change-before, .change-after {
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .change-before {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+        }
+        
+        .change-after {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+        }
+        
+        .change-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .json-preview {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: #333;
+            color: white;
+            border-radius: 8px;
+            z-index: 2000;
+            display: none;
+        }
+        
+        .toast.success {
+            background: #28a745;
+        }
+        
+        .toast.error {
+            background: #dc3545;
+        }
+        
+        .toast.active {
+            display: block;
+        }
+        
+        .version-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .version-info {
+            flex: 1;
+        }
+        
+        .version-number {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .version-desc {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚦 功能开关 API 控制台</h1>
+    </div>
+    
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="total-flags">0</div>
+                <div class="stat-label">总开关数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="enabled-flags">0</div>
+                <div class="stat-label">已启用</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-hits">0</div>
+                <div class="stat-label">命中次数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-reads">0</div>
+                <div class="stat-label">读取次数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pending-changes">0</div>
+                <div class="stat-label">待审批变更</div>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="tab active" data-tab="flags">功能开关</button>
+            <button class="tab" data-tab="changes">变更单</button>
+            <button class="tab" data-tab="hits">命中记录</button>
+            <button class="tab" data-tab="sources">读取来源</button>
+        </div>
+        
+        <div id="flags-tab" class="tab-content active">
+            <div class="toolbar">
+                <input type="text" class="search-box" placeholder="搜索开关名称或Key..." id="flag-search">
+                <button class="btn btn-primary" onclick="openCreateFlagModal()">+ 新建开关</button>
+            </div>
+            <div class="table-container">
+                <table id="flags-table">
+                    <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>Key</th>
+                            <th>状态</th>
+                            <th>灰度规则</th>
+                            <th>版本</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flags-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="changes-tab" class="tab-content">
+            <div class="toolbar">
+                <select class="search-box" id="change-status-filter">
+                    <option value="">全部状态</option>
+                    <option value="pending">待审批</option>
+                    <option value="executed">已执行</option>
+                    <option value="rejected">已拒绝</option>
+                </select>
+            </div>
+            <div class="table-container">
+                <table id="changes-table">
+                    <thead>
+                        <tr>
+                            <th>标题</th>
+                            <th>类型</th>
+                            <th>开关ID</th>
+                            <th>状态</th>
+                            <th>创建人</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="changes-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="hits-tab" class="tab-content">
+            <div class="table-container">
+                <table id="hits-table">
+                    <thead>
+                        <tr>
+                            <th>开关Key</th>
+                            <th>用户ID</th>
+                            <th>地区</th>
+                            <th>命中结果</th>
+                            <th>来源</th>
+                            <th>时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hits-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="sources-tab" class="tab-content">
+            <div class="toolbar">
+                <button class="btn btn-primary" onclick="openCreateSourceModal()">+ 新建来源</button>
+            </div>
+            <div class="table-container">
+                <table id="sources-table">
+                    <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>类型</th>
+                            <th>描述</th>
+                            <th>API Key</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sources-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div id="flag-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detail-modal-title">开关详情</h2>
+                <button class="close-btn" onclick="closeModal('flag-detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="flag-detail-content"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('flag-detail-modal')">关闭</button>
+                <button class="btn btn-primary" onclick="openEditFlagModal()">编辑</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="create-flag-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>新建功能开关</h2>
+                <button class="close-btn" onclick="closeModal('create-flag-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-flag-form">
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Key</label>
+                        <input type="text" name="key" required>
+                    </div>
+                    <div class="form-group">
+                        <label>描述</label>
+                        <textarea name="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select name="status">
+                            <option value="draft">草稿</option>
+                            <option value="active">激活</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="enabled"> 启用开关
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>灰度比例 (%)</label>
+                        <input type="number" name="gray_percentage" min="0" max="100" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>白名单用户 (逗号分隔)</label>
+                        <input type="text" name="gray_user_ids" placeholder="user_001, user_002">
+                    </div>
+                    <div class="form-group">
+                        <label>白名单地区 (逗号分隔)</label>
+                        <input type="text" name="gray_regions" placeholder="北京, 上海">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('create-flag-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitCreateFlag()">创建</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="edit-flag-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑功能开关</h2>
+                <button class="close-btn" onclick="closeModal('edit-flag-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-flag-form">
+                    <input type="hidden" name="id" id="edit-flag-id">
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="name" required id="edit-flag-name">
+                    </div>
+                    <div class="form-group">
+                        <label>描述</label>
+                        <textarea name="description" id="edit-flag-description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select name="status" id="edit-flag-status">
+                            <option value="draft">草稿</option>
+                            <option value="active">激活</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="enabled" id="edit-flag-enabled"> 启用开关
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>灰度比例 (%)</label>
+                        <input type="number" name="gray_percentage" id="edit-gray-percentage" min="0" max="100" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>白名单用户 (逗号分隔)</label>
+                        <input type="text" name="gray_user_ids" id="edit-gray-user-ids" placeholder="user_001, user_002">
+                    </div>
+                    <div class="form-group">
+                        <label>白名单地区 (逗号分隔)</label>
+                        <input type="text" name="gray_regions" id="edit-gray-regions" placeholder="北京, 上海">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('edit-flag-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitEditFlag()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="change-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>变更单详情</h2>
+                <button class="close-btn" onclick="closeModal('change-detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="change-detail-content"></div>
+            <div class="modal-footer" id="change-actions-footer"></div>
+        </div>
+    </div>
+    
+    <div id="rollback-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>回滚版本</h2>
+                <button class="close-btn" onclick="closeModal('rollback-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="rollback-content"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('rollback-modal')">取消</button>
+                <button class="btn btn-danger" onclick="confirmRollback()">确认回滚</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentFlag = null;
+        let currentChange = null;
+        let rollbackVersionId = null;
+        let currentFlagIdForRollback = null;
+
+        async function fetchAPI(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast('请求失败: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} active`;
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN');
+        }
+
+        function getStatusClass(status, enabled) {
+            if (status === 'active' && enabled) return 'status-active';
+            if (status === 'draft') return 'status-draft';
+            return 'status-disabled';
+        }
+
+        function getChangeStatusClass(status) {
+            if (status === 'pending') return 'status-pending';
+            if (status === 'executed') return 'status-executed';
+            if (status === 'rejected') return 'status-rejected';
+            return '';
+        }
+
+        async function loadStatistics() {
+            const stats = await fetchAPI('/statistics');
+            document.getElementById('total-flags').textContent = stats.total_flags;
+            document.getElementById('enabled-flags').textContent = stats.enabled_flags;
+            document.getElementById('total-hits').textContent = stats.total_hits;
+            document.getElementById('total-reads').textContent = stats.total_reads;
+            document.getElementById('pending-changes').textContent = stats.pending_changes;
+        }
+
+        async function loadFlags() {
+            const flags = await fetchAPI('/feature-flags');
+            const tbody = document.getElementById('flags-tbody');
+            
+            if (flags.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = flags.map(flag => `
+                <tr>
+                    <td><strong>${flag.name}</strong></td>
+                    <td><code>${flag.key}</code></td>
+                    <td><span class="status-badge ${getStatusClass(flag.status, flag.enabled)}">${flag.enabled ? '已启用' : '已禁用'} · ${flag.status}</span></td>
+                    <td>${flag.gray_rules.length > 0 ? flag.gray_rules.map(r => `${r.percentage > 0 ? r.percentage + '%' : ''} ${r.user_ids.length > 0 ? r.user_ids.length + '用户' : ''} ${r.regions.length > 0 ? r.regions.length + '地区' : ''}`).join(', ') : '无灰度规则'}</td>
+                    <td>v${flag.current_version}</td>
+                    <td>${formatDate(flag.created_at)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-secondary" onclick="viewFlagDetail(${flag.id})">详情</button>
+                            <button class="btn btn-sm btn-primary" onclick="editFlag(${flag.id})">编辑</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadChanges() {
+            const statusFilter = document.getElementById('change-status-filter').value;
+            const url = statusFilter ? `/change-orders?status=${statusFilter}` : '/change-orders';
+            const changes = await fetchAPI(url);
+            const tbody = document.getElementById('changes-tbody');
+            
+            if (changes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = changes.map(change => `
+                <tr>
+                    <td><strong>${change.title}</strong></td>
+                    <td>${change.order_type}</td>
+                    <td>#${change.feature_flag_id}</td>
+                    <td><span class="status-badge ${getChangeStatusClass(change.status)}">${change.status}</span></td>
+                    <td>${change.created_by || '-'}</td>
+                    <td>${formatDate(change.created_at)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-secondary" onclick="viewChangeDetail(${change.id})">查看</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadHits() {
+            const hits = await fetchAPI('/hit-records?limit=100');
+            const tbody = document.getElementById('hits-tbody');
+            
+            if (hits.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = hits.map(hit => `
+                <tr>
+                    <td><code>#${hit.feature_flag_id}</code></td>
+                    <td>${hit.user_id || '-'}</td>
+                    <td>${hit.region || '-'}</td>
+                    <td><span class="status-badge ${hit.hit_result ? 'status-active' : 'status-disabled'}">${hit.hit_result ? '命中' : '未命中'}</span></td>
+                    <td>${hit.source || '-'}</td>
+                    <td>${formatDate(hit.created_at)}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadSources() {
+            const sources = await fetchAPI('/read-sources');
+            const tbody = document.getElementById('sources-tbody');
+            
+            if (sources.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = sources.map(source => `
+                <tr>
+                    <td><strong>${source.name}</strong></td>
+                    <td>${source.source_type}</td>
+                    <td>${source.description || '-'}</td>
+                    <td><code style="font-size: 11px;">${source.api_key.substring(0, 20)}...</code></td>
+                    <td><span class="status-badge ${source.is_active ? 'status-active' : 'status-disabled'}">${source.is_active ? '活跃' : '停用'}</span></td>
+                    <td>${formatDate(source.created_at)}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function viewFlagDetail(flagId) {
+            const flag = await fetchAPI(`/feature-flags/${flagId}`);
+            currentFlag = flag;
+            
+            const [hitRecords, readAudits, versions] = await Promise.all([
+                fetchAPI(`/feature-flags/${flagId}/hit-records?limit=20`),
+                fetchAPI(`/feature-flags/${flagId}/read-audits?limit=20`),
+                fetchAPI(`/feature-flags/${flagId}/rollback-versions`)
+            ]);
+            
+            const content = document.getElementById('flag-detail-content');
+            content.innerHTML = `
+                <div class="detail-section">
+                    <h3>基本信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">名称</span>
+                            <span class="detail-value">${flag.name}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Key</span>
+                            <span class="detail-value"><code>${flag.key}</code></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">状态</span>
+                            <span class="detail-value"><span class="status-badge ${getStatusClass(flag.status, flag.enabled)}">${flag.enabled ? '已启用' : '已禁用'} · ${flag.status}</span></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">当前版本</span>
+                            <span class="detail-value">v${flag.current_version}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">创建时间</span>
+                            <span class="detail-value">${formatDate(flag.created_at)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">创建人</span>
+                            <span class="detail-value">${flag.created_by || '-'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>描述</h3>
+                    <p style="color: #666;">${flag.description || '无描述'}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>灰度规则</h3>
+                    ${flag.gray_rules.length > 0 ? flag.gray_rules.map(rule => `
+                        <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 8px;">
+                            <div style="margin-bottom: 8px;"><strong>类型:</strong> ${rule.rule_type}</div>
+                            ${rule.percentage > 0 ? `<div style="margin-bottom: 8px;"><strong>灰度比例:</strong> ${rule.percentage}%</div>` : ''}
+                            ${rule.user_ids.length > 0 ? `<div style="margin-bottom: 8px;"><strong>白名单用户:</strong> ${rule.user_ids.map(id => `<span class="tag">${id}</span>`).join('')}</div>` : ''}
+                            ${rule.user_groups.length > 0 ? `<div style="margin-bottom: 8px;"><strong>用户组:</strong> ${rule.user_groups.map(g => `<span class="tag">${g}</span>`).join('')}</div>` : ''}
+                            ${rule.regions.length > 0 ? `<div><strong>地区:</strong> ${rule.regions.map(r => `<span class="tag">${r}</span>`).join('')}</div>` : ''}
+                        </div>
+                    `).join('') : '<p style="color: #999;">无灰度规则，全量启用</p>'}
+                </div>
+                
+                <div class="detail-section">
+                    <h3>使用统计</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">命中次数</span>
+                            <span class="detail-value">${flag.hit_count}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">读取次数</span>
+                            <span class="detail-value">${flag.read_count}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">变更单数</span>
+                            <span class="detail-value">${flag.change_order_count}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>版本历史</h3>
+                    ${versions.map(v => `
+                        <div class="version-item">
+                            <div class="version-info">
+                                <div class="version-number">v${v.version}</div>
+                                <div class="version-desc">${v.description || '无描述'} · ${v.created_by || 'system'} · ${formatDate(v.created_at)}</div>
+                            </div>
+                            <button class="btn btn-sm btn-danger" onclick="openRollbackModal(${flagId}, ${v.id})">回滚</button>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="detail-section">
+                    <h3>最近命中记录</h3>
+                    ${hitRecords.length > 0 ? `
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            ${hitRecords.map(h => `
+                                <div style="padding: 8px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+                                    <span>${h.user_id || '匿名用户'}</span>
+                                    <span class="status-badge ${h.hit_result ? 'status-active' : 'status-disabled'}">${h.hit_result ? '命中' : '未命中'}</span>
+                                    <span style="color: #999; font-size: 12px;">${formatDate(h.created_at)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p style="color: #999;">暂无命中记录</p>'}
+                </div>
+            `;
+            
+            document.getElementById('flag-detail-modal').classList.add('active');
+        }
+
+        async function viewChangeDetail(changeId) {
+            const changes = await fetchAPI('/change-orders');
+            const change = changes.find(c => c.id === changeId);
+            if (!change) return;
+            
+            currentChange = change;
+            
+            const content = document.getElementById('change-detail-content');
+            content.innerHTML = `
+                <div class="detail-section">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">标题</span>
+                            <span class="detail-value">${change.title}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">类型</span>
+                            <span class="detail-value">${change.order_type}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">状态</span>
+                            <span class="detail-value"><span class="status-badge ${getChangeStatusClass(change.status)}">${change.status}</span></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">关联开关ID</span>
+                            <span class="detail-value">#${change.feature_flag_id}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">创建人</span>
+                            <span class="detail-value">${change.created_by || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">创建时间</span>
+                            <span class="detail-value">${formatDate(change.created_at)}</span>
+                        </div>
+                        ${change.approved_by ? `
+                            <div class="detail-item">
+                                <span class="detail-label">审批人</span>
+                                <span class="detail-value">${change.approved_by}</span>
+                            </div>
+                        ` : ''}
+                        ${change.approved_at ? `
+                            <div class="detail-item">
+                                <span class="detail-label">审批时间</span>
+                                <span class="detail-value">${formatDate(change.approved_at)}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>描述</h3>
+                    <p style="color: #666;">${change.description || '无描述'}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>变更内容对比</h3>
+                    <div class="change-compare">
+                        <div class="change-before">
+                            <div class="change-title">变更前</div>
+                            <div class="json-preview">${JSON.stringify(change.before_data || {}, null, 2)}</div>
+                        </div>
+                        <div class="change-after">
+                            <div class="change-title">变更后</div>
+                            <div class="json-preview">${JSON.stringify(change.after_data || {}, null, 2)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const footer = document.getElementById('change-actions-footer');
+            if (change.status === 'pending') {
+                footer.innerHTML = `
+                    <button class="btn btn-secondary" onclick="closeModal('change-detail-modal')">关闭</button>
+                    <button class="btn btn-danger" onclick="approveChange(false)">拒绝</button>
+                    <button class="btn btn-success" onclick="approveChange(true)">批准</button>
+                `;
+            } else {
+                footer.innerHTML = `
+                    <button class="btn btn-secondary" onclick="closeModal('change-detail-modal')">关闭</button>
+                `;
+            }
+            
+            document.getElementById('change-detail-modal').classList.add('active');
+        }
+
+        async function approveChange(approved) {
+            if (!currentChange) return;
+            
+            await fetchAPI(`/change-orders/${currentChange.id}/approve`, {
+                method: 'POST',
+                body: JSON.stringify({ approved, comment: approved ? '审批通过' : '审批拒绝' })
+            });
+            
+            showToast(approved ? '变更已批准执行' : '变更已拒绝');
+            closeModal('change-detail-modal');
+            await Promise.all([loadStatistics(), loadChanges()]);
+        }
+
+        function openCreateFlagModal() {
+            document.getElementById('create-flag-form').reset();
+            document.getElementById('create-flag-modal').classList.add('active');
+        }
+
+        async function submitCreateFlag() {
+            const form = document.getElementById('create-flag-form');
+            const formData = new FormData(form);
+            
+            const userIds = formData.get('gray_user_ids') ? formData.get('gray_user_ids').split(',').map(s => s.trim()).filter(s => s) : [];
+            const regions = formData.get('gray_regions') ? formData.get('gray_regions').split(',').map(s => s.trim()).filter(s => s) : [];
+            
+            const data = {
+                name: formData.get('name'),
+                key: formData.get('key'),
+                description: formData.get('description'),
+                status: formData.get('status'),
+                enabled: formData.get('enabled') === 'on',
+                gray_rules: [{
+                    rule_type: 'combined',
+                    percentage: parseFloat(formData.get('gray_percentage')) || 0,
+                    user_ids: userIds,
+                    user_groups: [],
+                    regions: regions,
+                    conditions: {}
+                }]
+            };
+            
+            await fetchAPI('/feature-flags', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            showToast('功能开关创建成功');
+            closeModal('create-flag-modal');
+            await Promise.all([loadStatistics(), loadFlags()]);
+        }
+
+        async function editFlag(flagId) {
+            const flag = await fetchAPI(`/feature-flags/${flagId}`);
+            currentFlag = flag;
+            
+            document.getElementById('edit-flag-id').value = flag.id;
+            document.getElementById('edit-flag-name').value = flag.name;
+            document.getElementById('edit-flag-description').value = flag.description || '';
+            document.getElementById('edit-flag-status').value = flag.status;
+            document.getElementById('edit-flag-enabled').checked = flag.enabled;
+            
+            if (flag.gray_rules.length > 0) {
+                const rule = flag.gray_rules[0];
+                document.getElementById('edit-gray-percentage').value = rule.percentage;
+                document.getElementById('edit-gray-user-ids').value = rule.user_ids.join(', ');
+                document.getElementById('edit-gray-regions').value = rule.regions.join(', ');
+            } else {
+                document.getElementById('edit-gray-percentage').value = 0;
+                document.getElementById('edit-gray-user-ids').value = '';
+                document.getElementById('edit-gray-regions').value = '';
+            }
+            
+            document.getElementById('edit-flag-modal').classList.add('active');
+        }
+
+        function openEditFlagModal() {
+            closeModal('flag-detail-modal');
+            if (currentFlag) {
+                editFlag(currentFlag.id);
+            }
+        }
+
+        async function submitEditFlag() {
+            const form = document.getElementById('edit-flag-form');
+            const formData = new FormData(form);
+            const flagId = parseInt(formData.get('id'));
+            
+            const userIds = formData.get('gray_user_ids') ? formData.get('gray_user_ids').split(',').map(s => s.trim()).filter(s => s) : [];
+            const regions = formData.get('gray_regions') ? formData.get('gray_regions').split(',').map(s => s.trim()).filter(s => s) : [];
+            
+            const data = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                status: formData.get('status'),
+                enabled: formData.get('enabled') === 'on',
+                gray_rules: [{
+                    rule_type: 'combined',
+                    percentage: parseFloat(formData.get('gray_percentage')) || 0,
+                    user_ids: userIds,
+                    user_groups: [],
+                    regions: regions,
+                    conditions: {}
+                }]
+            };
+            
+            await fetchAPI(`/feature-flags/${flagId}`, {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            });
+            
+            showToast('功能开关更新成功');
+            closeModal('edit-flag-modal');
+            await Promise.all([loadStatistics(), loadFlags()]);
+        }
+
+        function openRollbackModal(flagId, versionId) {
+            currentFlagIdForRollback = flagId;
+            rollbackVersionId = versionId;
+            
+            document.getElementById('rollback-content').innerHTML = `
+                <p style="margin-bottom: 16px;">确定要回滚到该版本吗？此操作将创建一个新的变更记录。</p>
+                <div class="form-group">
+                    <label>回滚原因（可选）</label>
+                    <textarea id="rollback-reason" placeholder="请输入回滚原因..."></textarea>
+                </div>
+            `;
+            
+            document.getElementById('rollback-modal').classList.add('active');
+        }
+
+        async function confirmRollback() {
+            if (!currentFlagIdForRollback || !rollbackVersionId) return;
+            
+            const reason = document.getElementById('rollback-reason').value;
+            
+            await fetchAPI(`/feature-flags/${currentFlagIdForRollback}/rollback`, {
+                method: 'POST',
+                body: JSON.stringify({ version_id: rollbackVersionId, reason: reason || '回滚到历史版本' })
+            });
+            
+            showToast('回滚成功');
+            closeModal('rollback-modal');
+            closeModal('flag-detail-modal');
+            await Promise.all([loadStatistics(), loadFlags(), loadChanges()]);
+        }
+
+        function openCreateSourceModal() {
+            showToast('功能开发中', 'error');
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const tabName = tab.dataset.tab;
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+                
+                if (tabName === 'flags') loadFlags();
+                if (tabName === 'changes') loadChanges();
+                if (tabName === 'hits') loadHits();
+                if (tabName === 'sources') loadSources();
+            });
+        });
+
+        document.getElementById('change-status-filter').addEventListener('change', loadChanges);
+
+        document.getElementById('flag-search').addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#flags-tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        });
+
+        async function init() {
+            await Promise.all([
+                loadStatistics(),
+                loadFlags()
+            ]);
+        }
+
+        init();
+    </script>
+</body>
+</html>
