@@ -75,7 +75,9 @@ async function processSingleSupplier(item, batchId, cacheVersion, rerunMarker) {
       batch_id: batchId,
       material_type: item.material.type,
       content: item.material.content,
-      cache_version: cacheVersion
+      cache_version: cacheVersion,
+      supplier: item.supplier,
+      material: item.material
     });
 
     await createProcessingRecord({

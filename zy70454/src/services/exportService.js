@@ -72,22 +72,45 @@ export async function exportByRerunMarker(rerunMarker, outputPath = null) {
     return { exported: 0, message: '未找到该重跑标记的数据' };
   }
 
-  const exportData = traceData.map(record => ({
-    rerun_marker: record.rerun_marker,
-    record_id: record.record_id,
-    action: record.action,
-    result: record.result,
-    conclusion: record.conclusion,
-    record_created_at: new Date(record.created_at).toISOString(),
-    material_id: record.material_id,
-    material_type: record.material_type,
-    material_status: record.status,
-    supplier_code: record.supplier_code,
-    supplier_name: record.supplier_name,
-    supplier_raw_input: record.supplier_raw_input,
-    material_raw_input: record.material_raw_input,
-    material_content: record.content.substring(0, 500)
-  }));
+  const exportData = traceData.map(record => {
+    let materialRaw = {};
+    let supplierRaw = {};
+    
+    if (record.material_raw_input) {
+      try {
+        const parsed = JSON.parse(record.material_raw_input);
+        materialRaw = parsed.material || parsed;
+        supplierRaw = parsed.supplier || {};
+      } catch (e) {
+        materialRaw = {};
+      }
+    }
+    
+    if (Object.keys(supplierRaw).length === 0 && record.supplier_raw_input) {
+      try {
+        supplierRaw = JSON.parse(record.supplier_raw_input);
+      } catch (e) {
+        supplierRaw = {};
+      }
+    }
+
+    return {
+      rerun_marker: record.rerun_marker,
+      record_id: record.record_id,
+      action: record.action,
+      result: record.result,
+      conclusion: record.conclusion,
+      record_created_at: new Date(record.created_at).toISOString(),
+      material_id: record.material_id || 'N/A',
+      material_type: record.material_type || 'N/A',
+      material_status: record.status || 'N/A',
+      supplier_code: record.supplier_code || 'N/A',
+      supplier_name: record.supplier_name || 'N/A',
+      supplier_raw_input: Object.keys(supplierRaw).length > 0 ? JSON.stringify(supplierRaw, null, 2) : 'N/A',
+      material_raw_input: Object.keys(materialRaw).length > 0 ? JSON.stringify(materialRaw, null, 2) : 'N/A',
+      material_content: record.content ? record.content.substring(0, 500) : 'N/A'
+    };
+  });
 
   const filePath = outputPath || path.join(config.paths.exports, `rerun_${rerunMarker}_${Date.now()}.csv`);
   

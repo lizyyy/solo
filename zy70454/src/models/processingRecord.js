@@ -58,8 +58,8 @@ export async function getFullTraceByRerunMarker(rerunMarker) {
       s.name as supplier_name,
       s.raw_input as supplier_raw_input
     FROM processing_records pr
-    JOIN materials m ON pr.material_id = m.id
-    JOIN suppliers s ON m.supplier_id = s.id
+    LEFT JOIN materials m ON pr.material_id = m.id
+    LEFT JOIN suppliers s ON m.supplier_id = s.id
     WHERE pr.rerun_marker = ?
     ORDER BY pr.created_at
   `, [rerunMarker]);

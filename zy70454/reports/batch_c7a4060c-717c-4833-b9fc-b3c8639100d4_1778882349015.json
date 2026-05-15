@@ -1,0 +1,334 @@
+{
+  "batchId": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+  "generatedAt": "2026-05-15T21:59:09.014Z",
+  "summary": {
+    "total": 4,
+    "success": 3,
+    "error": 1,
+    "pending": 0
+  },
+  "details": [
+    {
+      "materialId": "79618db6-3eac-4a44-949c-0a0a25d4aa8e",
+      "supplierCode": "SUP001",
+      "supplierName": "北京科技有限公司",
+      "materialType": "资质证明",
+      "status": "processed",
+      "summary": "摘要：营业执照副本复印件，统一社会信用代码：91110101MA001ABCDE，经营范围：技术开发、技术服务、技术咨询、技术转让，注册资本：1000万元人民币，成立日期：2020年1月1日，营业期限：长期...",
+      "errorMessage": null,
+      "isAbnormal": 0,
+      "cacheVersion": "69f8076e-6515-43eb-b83e-a04021aa46bc",
+      "supplierRawInput": {
+        "code": "SUP001",
+        "name": "北京科技有限公司",
+        "tax_id": "91110101MA001ABCDE",
+        "contact_person": "张三",
+        "phone": "13800138001",
+        "email": "zhangsan@bjtech.com",
+        "address": "北京市海淀区中关村大街1号"
+      },
+      "materialRawInput": {
+        "supplier_id": "fa7fd9d0-3382-4a2a-9004-3ff0b4eea55a",
+        "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+        "material_type": "资质证明",
+        "content": "营业执照副本复印件，统一社会信用代码：91110101MA001ABCDE，经营范围：技术开发、技术服务、技术咨询、技术转让，注册资本：1000万元人民币，成立日期：2020年1月1日，营业期限：长期。",
+        "cache_version": "69f8076e-6515-43eb-b83e-a04021aa46bc",
+        "supplier": {
+          "code": "SUP001",
+          "name": "北京科技有限公司",
+          "tax_id": "91110101MA001ABCDE",
+          "contact_person": "张三",
+          "phone": "13800138001",
+          "email": "zhangsan@bjtech.com",
+          "address": "北京市海淀区中关村大街1号"
+        },
+        "material": {
+          "type": "资质证明",
+          "content": "营业执照副本复印件，统一社会信用代码：91110101MA001ABCDE，经营范围：技术开发、技术服务、技术咨询、技术转让，注册资本：1000万元人民币，成立日期：2020年1月1日，营业期限：长期。"
+        }
+      }
+    },
+    {
+      "materialId": "8232dd38-0c08-4545-9880-7d12592024df",
+      "supplierCode": "SUP002",
+      "supplierName": "上海贸易有限公司",
+      "materialType": "资质证明",
+      "status": "processed",
+      "summary": "摘要：营业执照副本复印件，统一社会信用代码：91310101MA002FGHIJ，经营范围：货物进出口、技术进出口、国内贸易，注册资本：500万元人民币，成立日期：2019年6月15日，营业期限：20年。",
+      "errorMessage": null,
+      "isAbnormal": 0,
+      "cacheVersion": "69f8076e-6515-43eb-b83e-a04021aa46bc",
+      "supplierRawInput": {
+        "code": "SUP002",
+        "name": "上海贸易有限公司",
+        "tax_id": "91310101MA002FGHIJ",
+        "contact_person": "李四",
+        "phone": "13900139002",
+        "email": "lisi@shtrade.com",
+        "address": "上海市浦东新区陆家嘴金融贸易区"
+      },
+      "materialRawInput": {
+        "supplier_id": "23b31ba5-8ca2-46ff-9493-98d105cf00e0",
+        "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+        "material_type": "资质证明",
+        "content": "营业执照副本复印件，统一社会信用代码：91310101MA002FGHIJ，经营范围：货物进出口、技术进出口、国内贸易，注册资本：500万元人民币，成立日期：2019年6月15日，营业期限：20年。",
+        "cache_version": "69f8076e-6515-43eb-b83e-a04021aa46bc",
+        "supplier": {
+          "code": "SUP002",
+          "name": "上海贸易有限公司",
+          "tax_id": "91310101MA002FGHIJ",
+          "contact_person": "李四",
+          "phone": "13900139002",
+          "email": "lisi@shtrade.com",
+          "address": "上海市浦东新区陆家嘴金融贸易区"
+        },
+        "material": {
+          "type": "资质证明",
+          "content": "营业执照副本复印件，统一社会信用代码：91310101MA002FGHIJ，经营范围：货物进出口、技术进出口、国内贸易，注册资本：500万元人民币，成立日期：2019年6月15日，营业期限：20年。"
+        }
+      }
+    },
+    {
+      "materialId": "a5c55790-fca0-4211-89cb-aa0278617fc3",
+      "supplierCode": "SUP003",
+      "supplierName": "广州制造有限公司",
+      "materialType": "资质证明",
+      "status": "processed",
+      "summary": "摘要：营业执照副本复印件，统一社会信用代码：91440101MA003KLMNO，经营范围：机械设备制造、电子产品生产、销售，注册资本：2000万元人民币，成立日期：2018年3月20日，营业期限：长期。",
+      "errorMessage": null,
+      "isAbnormal": 0,
+      "cacheVersion": "69f8076e-6515-43eb-b83e-a04021aa46bc",
+      "supplierRawInput": {
+        "code": "SUP003",
+        "name": "广州制造有限公司",
+        "tax_id": "91440101MA003KLMNO",
+        "contact_person": "王五",
+        "phone": "13700137003",
+        "email": "wangwu@gzmanufacture.com",
+        "address": "广州市天河区珠江新城"
+      },
+      "materialRawInput": {
+        "supplier_id": "53e7b7e7-9b93-4ffe-84b7-6c1f4a5dd0c1",
+        "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+        "material_type": "资质证明",
+        "content": "营业执照副本复印件，统一社会信用代码：91440101MA003KLMNO，经营范围：机械设备制造、电子产品生产、销售，注册资本：2000万元人民币，成立日期：2018年3月20日，营业期限：长期。",
+        "cache_version": "69f8076e-6515-43eb-b83e-a04021aa46bc",
+        "supplier": {
+          "code": "SUP003",
+          "name": "广州制造有限公司",
+          "tax_id": "91440101MA003KLMNO",
+          "contact_person": "王五",
+          "phone": "13700137003",
+          "email": "wangwu@gzmanufacture.com",
+          "address": "广州市天河区珠江新城"
+        },
+        "material": {
+          "type": "资质证明",
+          "content": "营业执照副本复印件，统一社会信用代码：91440101MA003KLMNO，经营范围：机械设备制造、电子产品生产、销售，注册资本：2000万元人民币，成立日期：2018年3月20日，营业期限：长期。"
+        }
+      }
+    },
+    {
+      "materialId": "1669a945-80e7-463e-9fe6-3c63f9c405a5",
+      "supplierCode": "SUP004",
+      "supplierName": "深圳电子有限公司",
+      "materialType": "资质证明",
+      "status": "error",
+      "summary": null,
+      "errorMessage": "缓存版本不匹配: 预期 69f8076e-6515-43eb-b83e-a04021aa46bc, 实际 69f8076e-6515-43eb-b83e-a04021aa46bc_stale",
+      "isAbnormal": 1,
+      "cacheVersion": "69f8076e-6515-43eb-b83e-a04021aa46bc",
+      "supplierRawInput": {
+        "code": "SUP004",
+        "name": "深圳电子有限公司",
+        "tax_id": "91440301MA004PQRST",
+        "contact_person": "赵六",
+        "phone": "13600136004",
+        "email": "zhaoliu@szelec.com",
+        "address": "深圳市南山区科技园"
+      },
+      "materialRawInput": {
+        "supplier_id": "ecb459ea-1b37-483f-bb3d-301e5bd1d1bb",
+        "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+        "material_type": "资质证明",
+        "content": "营业执照副本复印件，统一社会信用代码：91440301MA004PQRST，经营范围：电子产品研发、生产、销售，注册资本：800万元人民币，成立日期：2021年5月10日，营业期限：长期。",
+        "cache_version": "69f8076e-6515-43eb-b83e-a04021aa46bc",
+        "supplier": {
+          "code": "SUP004",
+          "name": "深圳电子有限公司",
+          "tax_id": "91440301MA004PQRST",
+          "contact_person": "赵六",
+          "phone": "13600136004",
+          "email": "zhaoliu@szelec.com",
+          "address": "深圳市南山区科技园"
+        },
+        "material": {
+          "type": "资质证明",
+          "content": "营业执照副本复印件，统一社会信用代码：91440301MA004PQRST，经营范围：电子产品研发、生产、销售，注册资本：800万元人民币，成立日期：2021年5月10日，营业期限：长期。"
+        }
+      }
+    }
+  ],
+  "processingRecords": [
+    {
+      "id": "c96e48bd-6bbf-475c-bdb4-4137ce0d25f8",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "pre-check",
+      "action": "开始处理供应商",
+      "result": "initiated",
+      "conclusion": "开始处理供应商: 北京科技有限公司",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348976
+    },
+    {
+      "id": "2417b333-5da8-4376-8f20-9c64bc9aeb9b",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "supplier-creation",
+      "action": "创建供应商记录",
+      "result": "created",
+      "conclusion": "新建供应商: 北京科技有限公司",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348979
+    },
+    {
+      "id": "134db7d8-81b9-41c8-abdc-20329db1a337",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "79618db6-3eac-4a44-949c-0a0a25d4aa8e",
+      "action": "创建材料记录",
+      "result": "created",
+      "conclusion": "材料类型: 资质证明",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348980
+    },
+    {
+      "id": "700abca8-107b-4113-b7f6-951d4f991da0",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "79618db6-3eac-4a44-949c-0a0a25d4aa8e",
+      "action": "材料处理完成",
+      "result": "success",
+      "conclusion": "材料摘要生成完成",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348984
+    },
+    {
+      "id": "ab68012d-e533-4f9b-8375-fe623121750c",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "pre-check",
+      "action": "开始处理供应商",
+      "result": "initiated",
+      "conclusion": "开始处理供应商: 上海贸易有限公司",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348985
+    },
+    {
+      "id": "06d687d2-8f64-419f-9599-00724fc79c86",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "supplier-creation",
+      "action": "创建供应商记录",
+      "result": "created",
+      "conclusion": "新建供应商: 上海贸易有限公司",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348989
+    },
+    {
+      "id": "84ccf3ee-ab9c-4e70-bb7b-f28f7843ceda",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "8232dd38-0c08-4545-9880-7d12592024df",
+      "action": "创建材料记录",
+      "result": "created",
+      "conclusion": "材料类型: 资质证明",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348991
+    },
+    {
+      "id": "3c344b47-1d7e-4983-9ac8-587d99d5a1da",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "8232dd38-0c08-4545-9880-7d12592024df",
+      "action": "材料处理完成",
+      "result": "success",
+      "conclusion": "材料摘要生成完成",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348995
+    },
+    {
+      "id": "e5f49650-6073-4851-bb42-d4e7d23cf25c",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "pre-check",
+      "action": "开始处理供应商",
+      "result": "initiated",
+      "conclusion": "开始处理供应商: 广州制造有限公司",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348996
+    },
+    {
+      "id": "38cef73f-089d-4995-8f96-e469f3c43882",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "supplier-creation",
+      "action": "创建供应商记录",
+      "result": "created",
+      "conclusion": "新建供应商: 广州制造有限公司",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882348998
+    },
+    {
+      "id": "e0d05049-05a2-4c6c-ab9d-866049f7bdd6",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "a5c55790-fca0-4211-89cb-aa0278617fc3",
+      "action": "创建材料记录",
+      "result": "created",
+      "conclusion": "材料类型: 资质证明",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882349000
+    },
+    {
+      "id": "8f9fe619-d517-42be-ae71-fd3720a5a92e",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "a5c55790-fca0-4211-89cb-aa0278617fc3",
+      "action": "材料处理完成",
+      "result": "success",
+      "conclusion": "材料摘要生成完成",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882349002
+    },
+    {
+      "id": "747355a6-f6d3-4c83-8b2e-eecb2b8aa4be",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "pre-check",
+      "action": "开始处理供应商",
+      "result": "initiated",
+      "conclusion": "开始处理供应商: 深圳电子有限公司",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882349004
+    },
+    {
+      "id": "ac4ad7bb-297a-4eee-8396-1c49dd5f175e",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "supplier-creation",
+      "action": "创建供应商记录",
+      "result": "created",
+      "conclusion": "新建供应商: 深圳电子有限公司",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882349007
+    },
+    {
+      "id": "ddd80427-96f4-48a1-b06d-7185b498563a",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "1669a945-80e7-463e-9fe6-3c63f9c405a5",
+      "action": "创建材料记录",
+      "result": "created",
+      "conclusion": "材料类型: 资质证明",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882349009
+    },
+    {
+      "id": "40975f28-bab3-49eb-9df0-d70436a40b0b",
+      "batch_id": "c7a4060c-717c-4833-b9fc-b3c8639100d4",
+      "material_id": "1669a945-80e7-463e-9fe6-3c63f9c405a5",
+      "action": "缓存验证失败",
+      "result": "error",
+      "conclusion": "缓存未刷新: 预期版本 69f8076e-6515-43eb-b83e-a04021aa46bc",
+      "rerun_marker": "RERUN-1778882348975",
+      "created_at": 1778882349010
+    }
+  ]
+}

@@ -73,8 +73,24 @@ export async function generateLegalEvidenceReport(rerunMarker) {
   const evidenceItems = [];
   
   for (const record of traceData) {
-    const materialRaw = JSON.parse(record.material_raw_input || '{}');
-    const supplierRaw = JSON.parse(record.supplier_raw_input || '{}');
+    let materialRaw = {};
+    let supplierRaw = {};
+    
+    if (record.material_raw_input) {
+      try {
+        const parsed = JSON.parse(record.material_raw_input);
+        materialRaw = parsed.material || parsed;
+        supplierRaw = parsed.supplier || (record.supplier_raw_input ? JSON.parse(record.supplier_raw_input) : {});
+      } catch (e) {
+        materialRaw = {};
+      }
+    } else if (record.supplier_raw_input) {
+      try {
+        supplierRaw = JSON.parse(record.supplier_raw_input);
+      } catch (e) {
+        supplierRaw = {};
+      }
+    }
     
     evidenceItems.push({
       timestamp: new Date(record.created_at).toISOString(),
@@ -109,7 +125,10 @@ export async function generateLegalEvidenceReport(rerunMarker) {
     statistics: {
       totalRecords: traceData.length,
       successCount: traceData.filter(r => r.result === 'success').length,
-      errorCount: traceData.filter(r => r.result === 'error').length
+      errorCount: traceData.filter(r => r.result === 'error').length,
+      initiatedCount: traceData.filter(r => r.result === 'initiated').length,
+      createdCount: traceData.filter(r => r.result === 'created').length,
+      existingCount: traceData.filter(r => r.result === 'existing').length
     },
     disclaimer: '本报告中的所有数据均来自系统自动记录，原始输入已完整保存，可用于法务查证和审计追溯。'
   };
