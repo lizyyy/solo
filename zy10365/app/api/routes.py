@@ -212,10 +212,11 @@ def add_confirmers(
     if not gray_version:
         raise HTTPException(status_code=404, detail="Gray version not found")
 
+    from app.schemas import model_to_dict
     confirmation_service = ConfirmationService(db)
     new_confirmers = confirmation_service.add_confirmers(
         gray_version.id,
-        [c.model_dump() for c in confirmers]
+        [model_to_dict(c) for c in confirmers]
     )
 
     return new_confirmers
@@ -479,10 +480,11 @@ async def create_verification_job(
     db.bulk_save_objects(db_requests)
     db.commit()
 
+    from app.schemas import model_to_dict
     confirmation_service = ConfirmationService(db)
     confirmation_service.add_confirmers(
         db_gray_version.id,
-        [c.model_dump() for c in job.confirmers]
+        [model_to_dict(c) for c in job.confirmers]
     )
 
     async def run_verification():

@@ -4,6 +4,13 @@ from datetime import datetime
 from app.models import VerificationStatus, DiffLevel
 
 
+def model_to_dict(model):
+    try:
+        return model.model_dump()
+    except AttributeError:
+        return model.dict()
+
+
 class GrayVersionBase(BaseModel):
     version: str = Field(..., description="灰度版本号")
     description: Optional[str] = Field(None, description="版本描述")
@@ -30,6 +37,7 @@ class GrayVersion(GrayVersionBase):
     updated_at: Optional[datetime]
 
     class Config:
+        orm_mode = True
         from_attributes = True
 
 
@@ -59,6 +67,7 @@ class HistoryRequest(HistoryRequestBase):
     created_at: datetime
 
     class Config:
+        orm_mode = True
         from_attributes = True
 
 
@@ -82,6 +91,7 @@ class ResponseDiff(ResponseDiffBase):
     created_at: datetime
 
     class Config:
+        orm_mode = True
         from_attributes = True
 
 
@@ -106,6 +116,7 @@ class ToleranceRule(ToleranceRuleBase):
     updated_at: Optional[datetime]
 
     class Config:
+        orm_mode = True
         from_attributes = True
 
 
@@ -134,6 +145,7 @@ class Confirmer(ConfirmerBase):
     created_at: datetime
 
     class Config:
+        orm_mode = True
         from_attributes = True
 
 
@@ -163,6 +175,7 @@ class ReleaseConclusion(ReleaseConclusionBase):
     created_at: datetime
 
     class Config:
+        orm_mode = True
         from_attributes = True
 
 
@@ -184,6 +197,7 @@ class Timeline(TimelineBase):
     created_at: datetime
 
     class Config:
+        orm_mode = True
         from_attributes = True
 
 
