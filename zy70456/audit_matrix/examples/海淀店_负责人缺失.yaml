@@ -1,0 +1,43 @@
+environment_name: 海淀店
+items:
+  - item_id: DEV-101
+    item_name: POS收银机-A1台例行巡检记录
+    category: 门店设备台账
+    responsible_person: 刘铁军
+    department: 门店运维部
+    environment_name: 海淀店
+    source: 运维管理系统
+    purchase_date: 2024-05-20
+
+  - item_id: DEV-102
+    item_name: 自助结账终端-B2台安全审计日志
+    category: 门店设备台账
+    responsible_person: null
+    department: 信息安全部
+    environment_name: 海淀店
+    source: 安全审计平台
+    last_audit: 2024-11-15
+
+  - item_id: DEV-103
+    item_name: 网络交换机-C3台配置备份
+    category: 网络设备
+    responsible_person: 周大海
+    department: 网络技术部
+    environment_name: 海淀店
+    source: 网络管理系统
+
+  - item_id: DEV-104
+    item_name: 监控摄像头-D4台存储记录
+    category: 安防系统
+    responsible_person:
+    department: 安全保卫部
+    environment_name: 海淀店
+    source: 视频监控平台
+
+  - item_id: DEV-105
+    item_name: 电子价签-E5台数据同步
+    category: 卖场设备
+    responsible_person: 吴小燕
+    department: 卖场运营部
+    environment_name: 海淀店
+    source: 价签管理系统

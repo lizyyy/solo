@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "audit-matrix"
+version = "0.1.0"
+description = "多源审计取证参数矩阵命令行工具"
+authors = ["Your Name <your.email@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.0.0"
+pydantic = "^2.0.0"
+pyyaml = "^6.0"
+rich = "^13.0.0"
+
+[tool.poetry.scripts]
+audit-matrix = "audit_matrix.cmd.main:cli"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
