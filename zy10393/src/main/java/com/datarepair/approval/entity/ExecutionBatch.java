@@ -1,7 +1,9 @@
 package com.datarepair.approval.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.datarepair.approval.enums.ScriptStatus;
+import com.datarepair.approval.handler.CodeEnumTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -9,13 +11,14 @@ import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("execution_batch")
+@TableName(value = "execution_batch", autoResultMap = true)
 public class ExecutionBatch extends BaseEntity {
 
     private Long scriptId;
 
     private String batchNo;
 
+    @TableField(typeHandler = CodeEnumTypeHandler.class)
     private ScriptStatus batchType;
 
     private LocalDateTime startTime;
@@ -26,6 +29,7 @@ public class ExecutionBatch extends BaseEntity {
 
     private String executionLog;
 
+    @TableField(typeHandler = CodeEnumTypeHandler.class)
     private ScriptStatus status;
 
     private String operator;

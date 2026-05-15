@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:data_repair;DB_CLOSE_DELAY=-1;MODE=MySQL
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-h2.sql
+
+logging:
+  level:
+    com.datarepair: debug

@@ -1,5 +1,6 @@
 package com.datarepair.approval.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 @Getter
@@ -13,6 +14,7 @@ public enum ApprovalAction {
     CANCEL(6, "取消"),
     RE_SUBMIT(7, "重新提交");
 
+    @EnumValue
     private final Integer code;
     private final String desc;
 

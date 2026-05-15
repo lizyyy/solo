@@ -1,5 +1,6 @@
 package com.datarepair.approval.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 @Getter
@@ -22,6 +23,7 @@ public enum ScriptStatus {
     ROLLBACK_FAILED(14, "回滚失败"),
     CANCELLED(15, "已取消");
 
+    @EnumValue
     private final Integer code;
     private final String desc;
 
