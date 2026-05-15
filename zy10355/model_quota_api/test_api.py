@@ -126,6 +126,31 @@ def test_full_flow():
     print(f"✓ 错误码: {failed_req.error_code}")
     print(f"✓ 错误信息: {failed_req.error_message}")
 
+    print("\n--- 测试排队请求失败 ---")
+    req6 = engine.create_request(
+        idempotency_key=f"req_{uuid4()}",
+        party_id="party_001",
+        model_id="model_llama_v2",
+        priority=PriorityLevel.NORMAL,
+    )
+    req6 = engine.validate_and_process(req6.request_id)
+    print(f"✓ 创建排队请求状态: {req6.status}")
+    assert req6.status.value == "queued", "请求应该处于排队状态"
+
+    failed_queued_req = engine.fail_request(
+        req6.request_id,
+        error_code="CANCELLED_BY_USER",
+        error_message="用户取消",
+    )
+    print(f"✓ 排队请求失败后状态: {failed_queued_req.status}")
+    assert failed_queued_req.status.value == "failed", "排队请求失败后应该保持失败状态"
+    assert failed_queued_req.error_code == "CANCELLED_BY_USER", "错误码应该正确设置"
+
+    queue_after_fail = engine.get_queue("party_001", "model_llama_v2")
+    print(f"✓ 队列长度（失败后）: {len(queue_after_fail)}")
+    assert len(queue_after_fail) == 0, "失败的排队请求应该被移出队列"
+    print("✓ 排队请求失败处理验证通过")
+
     print("\n--- 测试记录查询 ---")
     usage = engine.get_usage_records(party_id="party_001")
     print(f"✓ 用量记录数: {len(usage)}")

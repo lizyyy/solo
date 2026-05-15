@@ -200,13 +200,29 @@ class QuotaEngine:
         if not request:
             raise QuotaEngineError("REQUEST_NOT_FOUND", f"请求 {request_id} 不存在")
 
+        original_status = request.status
+
+        if original_status in [RequestStatus.SUCCESS, RequestStatus.FAILED, RequestStatus.CANCELLED]:
+            raise QuotaEngineError("INVALID_STATUS", f"请求状态 {original_status} 不允许标记失败")
+
         request.status = RequestStatus.FAILED
         request.error_code = error_code
         request.error_message = error_message
         request.completed_at = datetime.now()
         request.updated_at = datetime.now()
 
-        self._return_quota(request.request_id, f"error:{error_code}")
+        if original_status == RequestStatus.RUNNING:
+            self._return_quota(request.request_id, f"error:{error_code}")
+        elif original_status == RequestStatus.QUEUED:
+            queue_key = (request.party_id, request.model_id)
+            queue = self.queues[queue_key]
+            if request_id in queue:
+                queue.remove(request_id)
+                for pos, req_id in enumerate(queue):
+                    req = self.requests[req_id]
+                    req.queue_position = pos + 1
+                    req.updated_at = datetime.now()
+
         self._process_queue(request.party_id, request.model_id)
 
         return request
