@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物流面单代理API - 记录详情</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-badge { font-size: 0.75rem; }
+        .card-header { background-color: #f8f9fa; }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #dee2e6;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a href="/" class="navbar-brand mb-0 h1 text-decoration-none">物流面单代理API</a>
+            <span class="navbar-text">记录详情</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">基本信息</h5>
+                        <span id="currentStatus"></span>
+                    </div>
+                    <div class="card-body" id="recordInfo">
+                        <div class="text-center py-3">加载中...</div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">状态变更记录</h5>
+                    </div>
+                    <div class="card-body" id="statusHistory">
+                        <div class="text-center py-3">加载中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">操作面板</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">手动更新状态</label>
+                            <select class="form-select" id="newStatus">
+                                <option value="created">已创建</option>
+                                <option value="generating">生成中</option>
+                                <option value="generated">已生成</option>
+                                <option value="printing">打印中</option>
+                                <option value="printed">已打印</option>
+                                <option value="failed">失败</option>
+                                <option value="exception">异常</option>
+                                <option value="cancelled">已取消</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">状态变更原因</label>
+                            <input type="text" class="form-control" id="statusReason" placeholder="请输入状态变更原因">
+                        </div>
+                        <button class="btn btn-primary w-100 mb-2" onclick="updateStatus()">更新状态</button>
+
+                        <hr>
+
+                        <div class="mb-3">
+                            <label class="form-label">重打原因</label>
+                            <input type="text" class="form-control" id="reprintReason" placeholder="请输入重打原因">
+                        </div>
+                        <button class="btn btn-warning w-100" onclick="reprintRecord()">申请重打</button>
+                        <div class="mt-2">
+                            <small class="text-muted">注：最多可重打3次</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">异常记录</h5>
+                    </div>
+                    <div class="card-body" id="exceptionList">
+                        <div class="text-center py-3">加载中...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">重打记录</h5>
+                    </div>
+                    <div class="card-body" id="reprintList">
+                        <div class="text-center py-3">暂无重打记录</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = '/api/v1';
+        const recordId = {{ record_id }};
+
+        function getStatusBadge(status) {
+            const badges = {
+                'pending': 'bg-secondary',
+                'processing': 'bg-info',
+                'completed': 'bg-success',
+                'partial_failed': 'bg-warning',
+                'failed': 'bg-danger',
+                'created': 'bg-secondary',
+                'generating': 'bg-info',
+                'generated': 'bg-primary',
+                'printing': 'bg-info',
+                'printed': 'bg-success',
+                'exception': 'bg-warning',
+                'cancelled': 'bg-dark'
+            };
+            const labels = {
+                'pending': '待处理',
+                'processing': '处理中',
+                'completed': '已完成',
+                'partial_failed': '部分失败',
+                'failed': '失败',
+                'created': '已创建',
+                'generating': '生成中',
+                'generated': '已生成',
+                'printing': '打印中',
+                'printed': '已打印',
+                'exception': '异常',
+                'cancelled': '已取消'
+            };
+            return `<span class="badge ${badges[status] || 'bg-secondary'} status-badge">${labels[status] || status}</span>`;
+        }
+
+        async function loadRecord() {
+            try {
+                const res = await fetch(`${API_BASE}/records/${recordId}`);
+                const record = await res.json();
+
+                document.getElementById('currentStatus').innerHTML = getStatusBadge(record.status);
+                document.getElementById('newStatus').value = record.status;
+
+                document.getElementById('recordInfo').innerHTML = `
+                    <table class="table table-sm">
+                        <tr><th style="width: 30%">记录编号</th><td>${record.record_no}</td></tr>
+                        <tr><th>订单号</th><td>${record.order_no || '-'}</td></tr>
+                        <tr><th>物流单号</th><td>${record.tracking_no || '-'}</td></tr>
+                        <tr><th>当前状态</th><td>${getStatusBadge(record.status)}</td></tr>
+                        <tr><th>状态说明</th><td>${record.status_reason || '-'}</td></tr>
+                        <tr><th>收件人</th><td>${record.receiver_name || '-'}</td></tr>
+                        <tr><th>联系电话</th><td>${record.receiver_phone || '-'}</td></tr>
+                        <tr><th>收件地址</th><td>${record.receiver_address || '-'}</td></tr>
+                        <tr><th>创建时间</th><td>${new Date(record.created_at).toLocaleString()}</td></tr>
+                        ${record.updated_at ? `<tr><th>更新时间</th><td>${new Date(record.updated_at).toLocaleString()}</td></tr>` : ''}
+                    </table>
+                `;
+
+                const history = record.status_history.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                if (history.length > 0) {
+                    document.getElementById('statusHistory').innerHTML = `
+                        <div class="timeline">
+                            ${history.map((h, i) => `
+                                <div class="timeline-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            ${h.from_status ? `<span class="badge bg-secondary me-1">${h.from_status}</span>` : ''}
+                                            ${h.from_status ? '<i class="bi bi-arrow-right"></i>' : ''}
+                                            ${getStatusBadge(h.to_status)}
+                                            <div class="mt-1"><small>${h.reason || '无说明'}</small></div>
+                                            <div><small class="text-muted">操作人: ${h.operator || 'system'}</small></div>
+                                        </div>
+                                        <small class="text-muted">${new Date(h.created_at).toLocaleString()}</small>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('statusHistory').innerHTML = '<div class="text-center py-3">暂无状态变更记录</div>';
+                }
+
+                if (record.exceptions.length > 0) {
+                    document.getElementById('exceptionList').innerHTML = record.exceptions.map(e => `
+                        <div class="card mb-2">
+                            <div class="card-body py-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <span class="badge bg-warning">${e.exception_type}</span>
+                                        <small class="text-muted ms-2">${new Date(e.created_at).toLocaleString()}</small>
+                                        <div class="mt-1"><strong>${e.error_code || '-'}</strong></div>
+                                        <div><small>${e.error_message || '-'}</small></div>
+                                        ${e.status === 'resolved' ? `<div class="mt-1"><span class="badge bg-success">已解决</span> <small>${e.resolution}</small></div>` : ''}
+                                    </div>
+                                    ${e.status === 'open' ? `
+                                        <div>
+                                            <button class="btn btn-sm btn-success" onclick="resolveException(${e.id})">解决</button>
+                                            <button class="btn btn-sm btn-secondary" onclick="archiveException(${e.id})">归档</button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('exceptionList').innerHTML = '<div class="text-center py-3">暂无异常记录</div>';
+                }
+
+                if (record.reprints.length > 0) {
+                    document.getElementById('reprintList').innerHTML = `
+                        <div class="alert alert-info mb-2">已重打 ${record.reprints.length}/3 次</div>
+                        ${record.reprints.map(r => `
+                            <div class="border-bottom pb-2 mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <span>第 ${r.reprint_count} 次重打</span>
+                                    <small class="text-muted">${new Date(r.created_at).toLocaleString()}</small>
+                                </div>
+                                <div><small>原因: ${r.reprint_reason || '-'}</small></div>
+                                <div><small class="text-muted">操作人: ${r.operator || 'system'}</small></div>
+                            </div>
+                        `).join('')}
+                    `;
+                }
+            } catch (e) {
+                console.error('加载记录失败', e);
+            }
+        }
+
+        async function updateStatus() {
+            try {
+                const body = {
+                    new_status: document.getElementById('newStatus').value,
+                    reason: document.getElementById('statusReason').value,
+                    operator: 'manual'
+                };
+                const res = await fetch(`${API_BASE}/records/${recordId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (res.ok) {
+                    alert('状态更新成功！');
+                    document.getElementById('statusReason').value = '';
+                    loadRecord();
+                }
+            } catch (e) {
+                alert('更新失败: ' + e.message);
+            }
+        }
+
+        async function reprintRecord() {
+            try {
+                const body = {
+                    reason: document.getElementById('reprintReason').value,
+                    operator: 'manual'
+                };
+                const res = await fetch(`${API_BASE}/records/${recordId}/reprint`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (res.ok) {
+                    alert('重打申请成功！');
+                    document.getElementById('reprintReason').value = '';
+                    loadRecord();
+                } else {
+                    const err = await res.json();
+                    alert('重打失败: ' + err.detail);
+                }
+            } catch (e) {
+                alert('重打失败: ' + e.message);
+            }
+        }
+
+        async function resolveException(exceptionId) {
+            const resolution = prompt('请输入解决方案:');
+            if (!resolution) return;
+            
+            try {
+                const body = { resolution, operator: 'manual' };
+                const res = await fetch(`${API_BASE}/exceptions/${exceptionId}/resolve`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (res.ok) {
+                    alert('异常已解决！');
+                    loadRecord();
+                }
+            } catch (e) {
+                alert('操作失败: ' + e.message);
+            }
+        }
+
+        async function archiveException(exceptionId) {
+            if (!confirm('确定要归档此异常吗？')) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/exceptions/${exceptionId}/archive`, { method: 'PUT' });
+                if (res.ok) {
+                    alert('异常已归档！');
+                    loadRecord();
+                }
+            } catch (e) {
+                alert('操作失败: ' + e.message);
+            }
+        }
+
+        loadRecord();
+    </script>
+</body>
+</html>
