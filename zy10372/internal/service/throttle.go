@@ -154,12 +154,23 @@ func (s *ThrottleService) CheckBacklog(req *model.CheckBacklogRequest) (*model.C
 			topic.Status = model.TopicStatusBacklog
 		default:
 			backlogLevel = "NORMAL"
-			topic.Status = model.TopicStatusNormal
+			if topic.Status == model.TopicStatusRecovered {
+				topic.Status = model.TopicStatusNormal
+			}
 		}
 	}
 
-	if prevStatus == model.TopicStatusThrottled && topic.Status != model.TopicStatusThrottled {
-		s.checkRecoveryCondition(topic)
+	if rule != nil && (topic.Status == model.TopicStatusThrottled || topic.Status == model.TopicStatusBacklog) {
+		if topic.CurrentSize <= rule.Thresholds.WarningThreshold {
+			s.checkRecoveryCondition(topic)
+		} else {
+			rc, _ := s.store.GetRecoveryCondition(topic.ID)
+			if rc != nil {
+				rc.CurrentCheckCount = 0
+				rc.LastStableTS = utils.GetCurrentTime()
+				s.store.UpdateRecoveryCondition(rc)
+			}
+		}
 	}
 
 	s.store.UpdateTopic(topic)
@@ -176,6 +187,15 @@ func (s *ThrottleService) CheckBacklog(req *model.CheckBacklogRequest) (*model.C
 	return resp, nil
 }
 
+func isValidPriority(p model.Priority) bool {
+	switch p {
+	case model.PriorityLow, model.PriorityMedium, model.PriorityHigh, model.PriorityCritical:
+		return true
+	default:
+		return false
+	}
+}
+
 func (s *ThrottleService) SubmitMessage(req *model.SubmitMessageRequest) (*model.SubmitMessageResponse, error) {
 	if cached, exists := s.store.GetCachedSubmitMessageResponse(req.RequestID); exists {
 		return cached, nil
@@ -183,6 +203,10 @@ func (s *ThrottleService) SubmitMessage(req *model.SubmitMessageRequest) (*model
 
 	if req.TopicID == "" || req.MessageID == "" {
 		return nil, model.ErrInvalidRequest
+	}
+
+	if !isValidPriority(req.Priority) {
+		return nil, model.ErrInvalidPriority
 	}
 
 	topic, err := s.store.GetTopic(req.TopicID)
@@ -211,8 +235,6 @@ func (s *ThrottleService) SubmitMessage(req *model.SubmitMessageRequest) (*model
 			delaySeconds = rule.MinDelaySeconds
 		case model.PriorityCritical:
 			delaySeconds = 0
-		default:
-			delaySeconds = rule.MaxDelaySeconds
 		}
 
 		if delaySeconds > 0 {
@@ -338,8 +360,8 @@ func (s *ThrottleService) CheckRecovery(topicID string) (bool, error) {
 		return false, err
 	}
 
-	if topic.Status != model.TopicStatusThrottled {
-		return false, model.ErrTopicNotThrottled
+	if topic.Status != model.TopicStatusThrottled && topic.Status != model.TopicStatusBacklog {
+		return false, nil
 	}
 
 	return s.checkRecoveryCondition(topic)

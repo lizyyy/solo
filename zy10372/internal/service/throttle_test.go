@@ -1,7 +1,9 @@
 package service
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"queue-backoff-api/internal/model"
 	"queue-backoff-api/internal/storage"
@@ -55,10 +57,10 @@ func TestCreateRule(t *testing.T) {
 	topicResp, _ := svc.CreateTopic(topicReq)
 
 	ruleReq := &model.CreateRuleRequest{
-		RequestID:     "test-req-rule-001",
-		TopicID:       topicResp.Topic.ID,
-		RuleName:      "test-rule",
-		Thresholds:    model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
+		RequestID:       "test-req-rule-001",
+		TopicID:         topicResp.Topic.ID,
+		RuleName:        "test-rule",
+		Thresholds:      model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
 		ThrottlePercent: 50,
 		MaxDelaySeconds: 60,
 		MinDelaySeconds: 10,
@@ -98,10 +100,10 @@ func TestCheckBacklog(t *testing.T) {
 	topicResp, _ := svc.CreateTopic(topicReq)
 
 	ruleReq := &model.CreateRuleRequest{
-		RequestID:     "test-req-rule-backlog",
-		TopicID:       topicResp.Topic.ID,
-		RuleName:      "test-rule-backlog",
-		Thresholds:    model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
+		RequestID:       "test-req-rule-backlog",
+		TopicID:         topicResp.Topic.ID,
+		RuleName:        "test-rule-backlog",
+		Thresholds:      model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
 		ThrottlePercent: 50,
 		MaxDelaySeconds: 60,
 		MinDelaySeconds: 10,
@@ -145,10 +147,10 @@ func TestSubmitMessage(t *testing.T) {
 	topicResp, _ := svc.CreateTopic(topicReq)
 
 	ruleReq := &model.CreateRuleRequest{
-		RequestID:     "test-req-rule-msg",
-		TopicID:       topicResp.Topic.ID,
-		RuleName:      "test-rule-msg",
-		Thresholds:    model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
+		RequestID:       "test-req-rule-msg",
+		TopicID:         topicResp.Topic.ID,
+		RuleName:        "test-rule-msg",
+		Thresholds:      model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
 		ThrottlePercent: 50,
 		MaxDelaySeconds: 60,
 		MinDelaySeconds: 10,
@@ -228,10 +230,10 @@ func TestCheckRecovery(t *testing.T) {
 	topicResp, _ := svc.CreateTopic(topicReq)
 
 	ruleReq := &model.CreateRuleRequest{
-		RequestID:     "test-req-rule-recovery",
-		TopicID:       topicResp.Topic.ID,
-		RuleName:      "test-rule-recovery",
-		Thresholds:    model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
+		RequestID:       "test-req-rule-recovery",
+		TopicID:         topicResp.Topic.ID,
+		RuleName:        "test-rule-recovery",
+		Thresholds:      model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
 		ThrottlePercent: 50,
 		MaxDelaySeconds: 60,
 		MinDelaySeconds: 10,
@@ -251,5 +253,106 @@ func TestCheckRecovery(t *testing.T) {
 	}
 	if recovered {
 		t.Error("Should not recover yet")
+	}
+}
+
+func TestInvalidPriorityReturnsError(t *testing.T) {
+	store := storage.NewMemoryStorage()
+	svc := NewThrottleService(store)
+
+	topicReq := &model.CreateTopicRequest{
+		RequestID:    "test-req-priority",
+		Name:         "test-topic-priority",
+		Priority:     model.PriorityHigh,
+		MaxQueueSize: 10000,
+	}
+	topicResp, _ := svc.CreateTopic(topicReq)
+
+	ruleReq := &model.CreateRuleRequest{
+		RequestID:       "test-req-rule-priority",
+		TopicID:         topicResp.Topic.ID,
+		RuleName:        "test-rule-priority",
+		Thresholds:      model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
+		ThrottlePercent: 50,
+		MaxDelaySeconds: 60,
+		MinDelaySeconds: 10,
+	}
+	svc.CreateRule(ruleReq)
+
+	msgReq := &model.SubmitMessageRequest{
+		RequestID: "msg-req-invalid-priority",
+		TopicID:   topicResp.Topic.ID,
+		MessageID: "msg-001",
+		Priority:  model.Priority("INVALID_PRIORITY"),
+	}
+
+	_, err := svc.SubmitMessage(msgReq)
+	if err != model.ErrInvalidPriority {
+		t.Errorf("Expected ErrInvalidPriority, got %v", err)
+	}
+}
+
+func TestRecoveryConditionAccumulation(t *testing.T) {
+	store := storage.NewMemoryStorage()
+	svc := NewThrottleService(store)
+
+	topicReq := &model.CreateTopicRequest{
+		RequestID:    "test-req-accumulate",
+		Name:         "test-topic-accumulate",
+		Priority:     model.PriorityHigh,
+		MaxQueueSize: 10000,
+	}
+	topicResp, _ := svc.CreateTopic(topicReq)
+
+	ruleReq := &model.CreateRuleRequest{
+		RequestID:       "test-req-rule-accumulate",
+		TopicID:         topicResp.Topic.ID,
+		RuleName:        "test-rule-accumulate",
+		Thresholds:      model.BacklogThreshold{WarningThreshold: 100, CriticalThreshold: 500, DangerThreshold: 1000},
+		ThrottlePercent: 50,
+		MaxDelaySeconds: 60,
+		MinDelaySeconds: 10,
+	}
+	svc.CreateRule(ruleReq)
+
+	checkReq := &model.CheckBacklogRequest{
+		RequestID:   "check-req-accumulate-throttled",
+		TopicID:     topicResp.Topic.ID,
+		CurrentSize: 1500,
+	}
+	svc.CheckBacklog(checkReq)
+
+	topicAfterThrottle, _ := store.GetTopic(topicResp.Topic.ID)
+	if topicAfterThrottle.Status != model.TopicStatusThrottled {
+		t.Errorf("Expected status THROTTLED, got %s", topicAfterThrottle.Status)
+	}
+
+	for i := 0; i < 3; i++ {
+		checkReq := &model.CheckBacklogRequest{
+			RequestID:   fmt.Sprintf("check-req-recovery-%d", i),
+			TopicID:     topicResp.Topic.ID,
+			CurrentSize: 50,
+		}
+		svc.CheckBacklog(checkReq)
+	}
+
+	rc, _ := store.GetRecoveryCondition(topicResp.Topic.ID)
+	if rc.CurrentCheckCount != 3 {
+		t.Errorf("Expected 3 consecutive checks, got %d", rc.CurrentCheckCount)
+	}
+
+	now := time.Now()
+	twoMinutesAgo := now.Add(-2 * time.Minute)
+	rc.LastStableTS = twoMinutesAgo
+	store.UpdateRecoveryCondition(rc)
+
+	recovered, _ := svc.CheckRecovery(topicResp.Topic.ID)
+	if !recovered {
+		t.Error("Expected topic to be recovered")
+	}
+
+	topicAfterRecovery, _ := store.GetTopic(topicResp.Topic.ID)
+	if topicAfterRecovery.Status != model.TopicStatusRecovered {
+		t.Errorf("Expected status RECOVERED after consecutive checks, got %s", topicAfterRecovery.Status)
 	}
 }
