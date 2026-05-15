@@ -37,28 +37,48 @@ program
   .option('-o, --operator <operator>', '操作者')
   .option('-f, --file <file>', '材料文件路径(JSON格式)')
   .option('-r, --risk <riskType>', '风险类型')
+  .option('-y, --yes', '非交互模式，跳过所有确认')
   .action(async (options) => {
     try {
-      const answers = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'name',
-          message: '批次名称:',
-          default: options.name || `灰度巡检-${new Date().toISOString().slice(0, 10)}`
-        },
-        {
-          type: 'input',
-          name: 'operator',
-          message: '操作者:',
-          default: options.operator || 'system'
-        },
-        {
-          type: 'input',
-          name: 'riskType',
-          message: '风险类型:',
-          default: options.risk || 'general'
+      const defaultName = options.name || `灰度巡检-${new Date().toISOString().slice(0, 10)}`;
+      const defaultOperator = options.operator || 'system';
+      const defaultRiskType = options.risk || 'general';
+      
+      let answers = {
+        name: defaultName,
+        operator: defaultOperator,
+        riskType: defaultRiskType
+      };
+      
+      const hasAllParams = options.operator && options.file;
+      const isNonInteractive = options.yes || !process.stdin.isTTY;
+      
+      if (!hasAllParams && !isNonInteractive) {
+        try {
+          answers = await safePrompt([
+            {
+              type: 'input',
+              name: 'name',
+              message: '批次名称:',
+              default: defaultName
+            },
+            {
+              type: 'input',
+              name: 'operator',
+              message: '操作者:',
+              default: defaultOperator
+            },
+            {
+              type: 'input',
+              name: 'riskType',
+              message: '风险类型:',
+              default: defaultRiskType
+            }
+          ]);
+        } catch (promptError) {
+          console.log(chalk.yellow('使用默认参数继续...'));
         }
-      ]);
+      }
 
       let materials = [];
       
