@@ -1,0 +1,127 @@
+===============================================================================
+                          会议纪要补录报告
+===============================================================================
+
+【基本信息】
+会议ID:     {{meeting.id}}
+会议标题:   {{meeting.meetingTitle}}
+会议日期:   {{meeting.meetingDate}}
+所属部门:   {{meeting.department}}
+参会人员:   {{join meeting.attendees ", "}}
+当前状态:   {{statusColor meeting.status}}
+创建时间:   {{formatDate meeting.createdAt}}
+更新时间:   {{formatDate meeting.updatedAt}}
+
+-------------------------------------------------------------------------------
+【议程与决议】
+议题:
+{{#each meeting.topics}}
+  - {{this}}
+{{else}}
+  (无)
+{{/each}}
+
+决议:
+{{#each meeting.decisions}}
+  - {{this}}
+{{else}}
+  (无)
+{{/each}}
+
+待办事项:
+{{#each meeting.actionItems}}
+  [{{this.status}}] {{this.description}}
+  负责人: {{this.assignee}} | 截止日期: {{this.deadline}}
+{{else}}
+  (无)
+{{/each}}
+
+-------------------------------------------------------------------------------
+【附件补录记录】
+{{#each meeting.attachments}}
+  附件 #{{@index}}:
+    文件名:   {{this.fileName}}
+    类型:     {{this.fileType}}
+    上传人:   {{this.uploader}}
+    上传时间: {{formatDate this.uploadTime}}
+    内容哈希: {{this.contentHash}}
+    原始输入:
+{{json this.originalInput}}
+{{else}}
+  (无附件)
+{{/each}}
+
+-------------------------------------------------------------------------------
+【证据链状态】
+状态: {{statusColor meeting.evidenceChain.status}}
+{{#ifEquals meeting.evidenceChain.status "broken"}}
+  ⚠  警告: 证据链已断开!
+  断开位置: 第 {{meeting.evidenceChain.brokenAt}} 项
+  断开原因: {{meeting.evidenceChain.brokenReason}}
+{{/ifEquals}}
+
+证据项:
+{{#each meeting.evidenceChain.items}}
+  {{@index}}. [{{this.type}}] {{this.description}}
+     来源: {{this.source}}
+     时间: {{formatDate this.timestamp}}
+     验证状态: {{#if this.verified}}✓ 已验证{{else}}✗ 未验证{{/if}}
+     验证方式: {{this.verificationMethod}}
+{{/each}}
+
+-------------------------------------------------------------------------------
+【人工修正记录】
+{{#each meeting.corrections}}
+  修正 #{{@index}}:
+    字段:       {{this.fieldName}}
+    系统判断:   {{json this.systemJudgment}}
+    修正值:     {{json this.correctedValue}}
+    修正原因:   {{this.reason}}
+    修正人:     {{this.corrector}}
+    修正时间:   {{formatDate this.timestamp}}
+{{else}}
+  (无人工修正)
+{{/each}}
+
+-------------------------------------------------------------------------------
+【搜索词报告 - 复核样例】
+{{#each meeting.searchTermReports}}
+  搜索词: "{{this.searchTerm}}"
+  出现次数: {{this.occurrences}}
+  位置: {{join this.locations ", "}}
+
+  复核样例:
+  ---------------------------------------------------
+  {{this.reviewSample.context}}
+  ---------------------------------------------------
+  复核状态: {{#if this.reviewSample.verified}}✓ 已复核{{else}}⚠ 待复核{{/if}}
+  {{#if this.reviewSample.reviewer}}
+  复核人: {{this.reviewSample.reviewer}}
+  复核时间: {{formatDate this.reviewSample.reviewTime}}
+  {{/if}}
+{{else}}
+  (无搜索词报告)
+{{/each}}
+
+-------------------------------------------------------------------------------
+【导出摘要】
+
+▶ 输入:
+  会议ID: {{exportSummary.input.meetingId}}
+  附件: {{join exportSummary.input.attachments ", "}}
+  字段: {{join exportSummary.input.fields ", "}}
+
+▶ 操作记录:
+{{#each exportSummary.actions}}
+  {{formatDate this.timestamp}} | [{{this.type}}] {{this.description}}
+{{/each}}
+
+▶ 结论:
+  最终状态: {{exportSummary.conclusion.status}}
+  证据链完整: {{#if exportSummary.conclusion.evidenceChainIntact}}✓ 是{{else}}✗ 否{{/if}}
+  人工修正数: {{exportSummary.conclusion.correctionsCount}}
+  报告生成: {{#if exportSummary.conclusion.finalReportGenerated}}✓ 是{{else}}✗ 否{{/if}}
+
+===============================================================================
+报告生成时间: {{formatDate generatedAt}}
+===============================================================================

@@ -1,0 +1,30 @@
+{
+  "name": "meeting-minutes-processor",
+  "version": "1.0.0",
+  "description": "会议纪要附件补录处理工具 - 配置模板渲染命令行工具",
+  "main": "dist/cli.js",
+  "bin": {
+    "mmp": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "ts-node src/self-test.ts",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["meeting", "minutes", "template", "renderer"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "handlebars": "^4.7.8",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  }
+}
