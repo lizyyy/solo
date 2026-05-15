@@ -106,7 +106,7 @@ curl -X POST http://localhost:8080/api/v1/tag-inheritance/tasks \
 
 ### 3.2 第二次请求（相同 requestId，会被拦截！）
 ```bash
-curl -X POST http://localhost:8080/api/v1/tag-inheritance/tasks \
+curl -v -X POST http://localhost:8080/api/v1/tag-inheritance/tasks \
   -H "Content-Type: application/json" \
   -d '{
     "requestId": "REQ_003",
@@ -115,8 +115,11 @@ curl -X POST http://localhost:8080/api/v1/tag-inheritance/tasks \
   }'
 ```
 
-**预期响应 (HTTP 409 Conflict)**:
-```json
+**预期响应 (真正的 HTTP 409 Conflict 状态码)**:
+```
+< HTTP/1.1 409 Conflict
+< Content-Type: application/json
+
 {
   "code": 409,
   "message": "Duplicate request - task already exists",
@@ -129,7 +132,7 @@ curl -X POST http://localhost:8080/api/v1/tag-inheritance/tasks \
 }
 ```
 
-**关键说明**: 重复提交不会产生脏数据！系统会检测到相同 requestId 并返回已有任务的状态，不会创建新任务。
+**关键说明**: 重复提交不会产生脏数据！系统会检测到相同 requestId 并返回 **真正的 HTTP 409 状态码**，同时返回已有任务的状态，**不会创建新任务**。
 
 ---
 

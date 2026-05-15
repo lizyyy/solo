@@ -6,16 +6,16 @@ Resource Tag Inheritance API - 解决重复调用和状态不明痛点的后端�
 
 这是一个基于 Spring Boot 的标签继承计算服务，主要用于资源节点的标签继承计算，具备以下核心特性：
 
-- **幂等性保证**: 基于 requestId 的重复请求拦截，防止脏数据产生
+- **幂等性保证**: 基于 requestId 的重复请求拦截，返回真正的 HTTP 409 状态码，防止脏数据产生
 - **状态机管理**: 清晰的任务状态推进（PENDING → VALIDATING → INHERITING → CONFLICT → COMPLETED/FAILED）
-- **冲突检测**: 自动检测标签值冲突并支持人工处理
+- **冲突检测**: 只有相同优先级不同值时才产生冲突，覆盖规则应用后自动清除冲突
 - **历史记录**: 完整的变更历史追踪与导出
 - **结果缓存**: 任务状态的缓存机制
 
 ## 技术栈
 
-- Java 17
-- Spring Boot 3.2.x
+- Java 8+ (兼容 Java 8 到 Java 21)
+- Spring Boot 2.7.x
 - Spring Data JPA
 - H2 Database (内存)
 - Spring Cache
@@ -24,19 +24,27 @@ Resource Tag Inheritance API - 解决重复调用和状态不明痛点的后端�
 ## 快速启动
 
 ### 前置条件
-- JDK 17+
-- Maven 3.8+
+- JDK 8 或更高版本（推荐 Java 8 或 Java 11）
 
-### 启动方式
+### 启动方式（推荐 - 无需预先安装 Maven）
 
 ```bash
-# 编译项目
-mvn clean package
+# 直接使用启动脚本（自动设置 Maven Wrapper）
+chmod +x start.sh
+./start.sh
+```
 
-# 运行项目
+### 标准 Maven 启动方式
+
+```bash
+# 如果已安装 Maven
 mvn spring-boot:run
 
-# 或者直接运行 jar
+# 或者使用 Maven Wrapper
+./mvnw spring-boot:run
+
+# 打包后运行
+./mvnw clean package
 java -jar target/tag-inheritance-api-1.0.0.jar
 ```
 
@@ -74,7 +82,7 @@ POST /api/v1/tag-inheritance/tasks
 }
 ```
 
-> **重要**: `requestId` 是幂等性的关键！相同 requestId 的重复请求会被拦截。
+> **重要**: `requestId` 是幂等性的关键！相同 requestId 的重复请求会被拦截，返回 **HTTP 409 Conflict** 真正的状态码。
 
 ### 2. 验证任务
 ```
@@ -140,8 +148,8 @@ GET /api/v1/tag-inheritance/tasks/{taskId}/history/export
 ### 标签继承规则
 1. 从根节点向下遍历到目标节点
 2. 相同 key 的标签，优先级高的值覆盖优先级低的
-3. 优先级相同但值不同 → 产生冲突
-4. 覆盖规则（OverrideRule）优先级最高
+3. **只有优先级相同且值不同时 → 才产生冲突**
+4. 覆盖规则（OverrideRule）优先级最高，应用后自动清除冲突
 
 ### 状态机流转
 ```
@@ -152,12 +160,17 @@ PENDING → VALIDATING → INHERITING → CONFLICT → (人工处理) → COMPLE
 
 ### 重复请求拦截路径
 
-**拦截位置**: `TagInheritanceService.createTask()
+**拦截位置**: `TagInheritanceService.createTask()`
 
 **拦截逻辑**:
 1. 检查数据库中是否存在相同 requestId 的任务
-2. 如果存在 → 返回 HTTP 409 Conflict，不创建新任务
-3. 如果不存在 → 正常创建任务
+2. 如果存在 → 返回 **真正的 HTTP 409 Conflict** 状态码，不创建新任务
+3. 如果不存在 → 正常创建任务，返回 HTTP 200
+
+**其他 HTTP 状态码**:
+- **400 Bad Request**: 参数验证失败、状态推进错误
+- **404 Not Found**: 任务不存在、节点不存在
+- **500 Internal Server Error**: 服务器内部错误
 
 **这是关键的幂等性保证！** 即使前端/调用方重复提交，系统不会产生脏数据。
 
@@ -224,10 +237,11 @@ src/main/java/com/resource/tag/
 | 特性 | 实现方式 |
 |------|----------|
 | 标签继承 | 祖先链遍历 + 优先级比较 |
-| 覆盖解析 | OverrideRule 最高优先级 |
-| 冲突提示 | 优先级相同值不同时记录 |
+| 覆盖解析 | OverrideRule 最高优先级，应用后清除冲突 |
+| 冲突提示 | **只有相同优先级不同值时**才记录冲突 |
 | 结果缓存 | Spring Cache + taskStatus |
 | 历史导出 | ChangeHistory 表查询 |
-| 重复拦截 | requestId 唯一索引 + 409 返回 |
+| 重复拦截 | requestId 检查 + **真正的 HTTP 409** 返回 |
 | 状态推进 | 状态机校验 + 状态更新 |
-| 异常处理 | GlobalExceptionHandler |
+| 异常处理 | GlobalExceptionHandler + 标准 HTTP 状态码 |
+| Java 兼容 | Spring Boot 2.7.x + Java 8+ |

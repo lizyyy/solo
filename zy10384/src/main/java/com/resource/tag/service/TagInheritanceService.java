@@ -381,17 +381,18 @@ public class TagInheritanceService {
         private String sourceNodeId;
         private int priority = -1;
         private boolean inherited;
-        private final List<String> values = new ArrayList<>();
+        private final Set<String> samePriorityValues = new HashSet<>();
 
         void addValue(String value, int priority, String sourceNodeId, boolean inherited) {
-            values.add(value);
             if (priority > this.priority) {
                 this.finalValue = value;
                 this.sourceNodeId = sourceNodeId;
                 this.priority = priority;
                 this.inherited = inherited;
-            } else if (priority == this.priority && !Objects.equals(this.finalValue, value)) {
-                this.values.add(value);
+                samePriorityValues.clear();
+                samePriorityValues.add(value);
+            } else if (priority == this.priority) {
+                samePriorityValues.add(value);
             }
         }
 
@@ -400,14 +401,16 @@ public class TagInheritanceService {
             this.priority = priority;
             this.sourceNodeId = "OVERRIDE_RULE";
             this.inherited = false;
+            samePriorityValues.clear();
+            samePriorityValues.add(value);
         }
 
         boolean hasConflict() {
-            return values.size() > 1;
+            return samePriorityValues.size() > 1;
         }
 
         List<String> getConflictingValues() {
-            return values;
+            return new ArrayList<>(samePriorityValues);
         }
 
         String getFinalValue() { return finalValue; }
