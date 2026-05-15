@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接口撤销补偿管理控制台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            min-height: 120px;
+            font-family: monospace;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #3fa067;
+        }
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d9772e;
+        }
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-CREATED { background: #e2e8f0; color: #4a5568; }
+        .status-VALIDATING { background: #bee3f8; color: #2b6cb0; }
+        .status-VALIDATED { background: #c6f6d5; color: #276749; }
+        .status-EXECUTING { background: #faf089; color: #744210; }
+        .status-COMPENSATING { background: #fed7d7; color: #c53030; }
+        .status-COMPLETED { background: #c6f6d5; color: #276749; }
+        .status-FAILED { background: #fed7d7; color: #c53030; }
+        .result-box {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .request-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .request-item {
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .request-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .request-item .id {
+            font-weight: 600;
+            color: #333;
+        }
+        .request-item .type {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔄 接口撤销补偿管理控制台</h1>
+        <p>Undo Compensation API - 分布式事务补偿服务</p>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>📝 创建补偿请求</h2>
+            
+            <div class="section">
+                <h3>快速模板</h3>
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="loadNormalTemplate()">正常流程</button>
+                    <button class="btn btn-warning" onclick="loadFailTemplate()">失败补偿</button>
+                    <button class="btn btn-success" onclick="clearForm()">清空</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>请求ID (requestId)</label>
+                <input type="text" id="requestId" value="REQ-001" placeholder="输入唯一请求ID">
+            </div>
+            
+            <div class="form-group">
+                <label>业务类型 (businessType)</label>
+                <input type="text" id="businessType" value="ORDER_PROCESS" placeholder="业务类型标识">
+            </div>
+
+            <div class="form-group">
+                <label>请求配置 (JSON)</label>
+                <textarea id="requestJson"></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="createRequest()">1. 创建请求</button>
+                <button class="btn btn-primary" onclick="validateRequest()">2. 校验请求</button>
+                <button class="btn btn-primary" onclick="executeRequest()">3. 执行请求</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 请求列表</h2>
+            <div class="form-group">
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="loadRequests()">刷新列表</button>
+                    <select id="statusFilter" onchange="loadRequests()">
+                        <option value="">全部状态</option>
+                        <option value="CREATED">CREATED</option>
+                        <option value="VALIDATED">VALIDATED</option>
+                        <option value="EXECUTING">EXECUTING</option>
+                        <option value="COMPENSATING">COMPENSATING</option>
+                        <option value="COMPLETED">COMPLETED</option>
+                        <option value="FAILED">FAILED</option>
+                    </select>
+                </div>
+            </div>
+            <div id="requestList" class="request-list"></div>
+        </div>
+
+        <div class="card" style="grid-column: span 2;">
+            <h2>🔍 请求详情 & 执行结果</h2>
+            <div class="btn-group" style="margin-bottom: 16px;">
+                <button class="btn btn-success" onclick="loadDetail()">查询详情</button>
+                <button class="btn btn-warning" onclick="exportProof()">导出证明</button>
+            </div>
+            <div id="resultBox" class="result-box">点击"查询详情"查看请求信息...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1/compensation';
+
+        function loadNormalTemplate() {
+            document.getElementById('requestId').value = 'REQ-NORMAL-' + Date.now();
+            document.getElementById('requestJson').value = JSON.stringify({
+                requestId: document.getElementById('requestId').value,
+                businessType: "ORDER_PROCESS",
+                businessKey: "ORDER-12345",
+                description: "正常订单处理流程",
+                maxRetry: 3,
+                actions: [
+                    {
+                        actionId: "ACTION-001",
+                        actionName: "扣减库存",
+                        actionOrder: 1,
+                        inputData: "{\"skuId\":1001,\"qty\":2}",
+                        items: [
+                            {
+                                itemId: "ITEM-001",
+                                itemType: "STOCK",
+                                itemKey: "SKU-1001",
+                                revocable: true,
+                                compensationMethod: "RESTORE_STOCK",
+                                compensationParams: "{\"skuId\":1001,\"qty\":2}"
+                            }
+                        ]
+                    },
+                    {
+                        actionId: "ACTION-002",
+                        actionName: "创建订单",
+                        actionOrder: 2,
+                        items: []
+                    }
+                ]
+            }, null, 2);
+        }
+
+        function loadFailTemplate() {
+            document.getElementById('requestId').value = 'REQ-FAIL-' + Date.now();
+            document.getElementById('requestJson').value = JSON.stringify({
+                requestId: document.getElementById('requestId').value,
+                businessType: "PAYMENT_PROCESS",
+                businessKey: "PAY-67890",
+                description: "模拟失败补偿流程",
+                maxRetry: 3,
+                actions: [
+                    {
+                        actionId: "ACTION-001",
+                        actionName: "冻结账户",
+                        actionOrder: 1,
+                        items: [
+                            {
+                                itemId: "ITEM-001",
+                                itemType: "ACCOUNT",
+                                itemKey: "ACC-8888",
+                                revocable: true,
+                                compensationMethod: "UNFREEZE",
+                                compensationParams: "{\"accountId\":8888}"
+                            }
+                        ]
+                    },
+                    {
+                        actionId: "ACTION-002",
+                        actionName: "FAIL_SIMULATION",
+                        actionOrder: 2,
+                        items: []
+                    }
+                ]
+            }, null, 2);
+        }
+
+        function clearForm() {
+            document.getElementById('requestId').value = '';
+            document.getElementById('businessType').value = '';
+            document.getElementById('requestJson').value = '';
+        }
+
+        async function createRequest() {
+            try {
+                const data = JSON.parse(document.getElementById('requestJson').value);
+                const res = await fetch(`${API_BASE}/requests`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                showResult(result);
+                loadRequests();
+            } catch (e) {
+                showResult({ error: e.message });
+            }
+        }
+
+        async function validateRequest() {
+            try {
+                const requestId = document.getElementById('requestId').value;
+                const res = await fetch(`${API_BASE}/requests/${requestId}/validate`, {
+                    method: 'POST'
+                });
+                const result = await res.json();
+                showResult(result);
+                loadRequests();
+            } catch (e) {
+                showResult({ error: e.message });
+            }
+        }
+
+        async function executeRequest() {
+            try {
+                const requestId = document.getElementById('requestId').value;
+                const res = await fetch(`${API_BASE}/requests/${requestId}/execute`, {
+                    method: 'POST'
+                });
+                const result = await res.json();
+                showResult(result);
+                loadRequests();
+            } catch (e) {
+                showResult({ error: e.message });
+            }
+        }
+
+        async function loadRequests() {
+            try {
+                const status = document.getElementById('statusFilter').value;
+                const url = status ? 
+                    `${API_BASE}/requests?status=${status}` : 
+                    `${API_BASE}/requests`;
+                const res = await fetch(url);
+                const result = await res.json();
+                
+                if (result.data && result.data.length > 0) {
+                    document.getElementById('requestList').innerHTML = 
+                        result.data.map(req => `
+                            <div class="request-item" onclick="selectRequest('${req.requestId}')">
+                                <div class="id">${req.requestId}</div>
+                                <div class="type">${req.businessType}</div>
+                                <span class="status-badge status-${req.status}">${req.status}</span>
+                            </div>
+                        `).join('');
+                } else {
+                    document.getElementById('requestList').innerHTML = 
+                        '<p style="color:#999;text-align:center;padding:20px;">暂无数据</p>';
+                }
+            } catch (e) {
+                document.getElementById('requestList').innerHTML = 
+                    `<p style="color:red;">加载失败: ${e.message}</p>`;
+            }
+        }
+
+        function selectRequest(requestId) {
+            document.getElementById('requestId').value = requestId;
+            loadDetail();
+        }
+
+        async function loadDetail() {
+            try {
+                const requestId = document.getElementById('requestId').value;
+                const res = await fetch(`${API_BASE}/requests/${requestId}`);
+                const result = await res.json();
+                showResult(result);
+            } catch (e) {
+                showResult({ error: e.message });
+            }
+        }
+
+        async function exportProof() {
+            try {
+                const requestId = document.getElementById('requestId').value;
+                const res = await fetch(`${API_BASE}/requests/${requestId}/proof`);
+                const result = await res.json();
+                showResult(result);
+            } catch (e) {
+                showResult({ error: e.message });
+            }
+        }
+
+        function showResult(data) {
+            document.getElementById('resultBox').textContent = 
+                JSON.stringify(data, null, 2);
+        }
+
+        loadNormalTemplate();
+        loadRequests();
+    </script>
+</body>
+</html>
