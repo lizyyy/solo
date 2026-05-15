@@ -7,7 +7,6 @@ const ora = require('ora');
 const fs = require('fs');
 const path = require('path');
 
-const { initDatabase } = require('./database/init');
 const ValidationService = require('./utils/service');
 
 const program = new Command();
@@ -131,61 +130,66 @@ program
   .command('query <batchId>')
   .description('查询批次详情')
   .action(async (batchId) => {
-    console.log(chalk.bold(`\n=== 批次详情: ${batchId} ===\n`));
-    
-    const detail = await ValidationService.getBatchDetail(batchId);
-    
-    if (!detail) {
-      console.log(chalk.red('批次不存在'));
-      return;
-    }
-
-    console.log(chalk.blue('批次信息:'));
-    console.log(`  名称: ${detail.batch.batch_name}`);
-    console.log(`  操作者: ${detail.batch.operator}`);
-    console.log(`  状态: ${detail.batch.status}`);
-    console.log(`  风险类型: ${detail.batch.risk_type}`);
-    console.log(`  创建时间: ${new Date(detail.batch.created_at).toLocaleString()}`);
-
-    console.log(chalk.blue(`\n材料列表 (${detail.materials.length}):`));
-    detail.materials.forEach(m => {
-      console.log(`  - ${m.file_name}`);
-      console.log(`    ${chalk.gray(m.file_summary)}`);
-    });
-
-    console.log(chalk.blue(`\n验证结果 (${detail.results.length}):`));
-    
-    const successResults = detail.results.filter(r => r.status === 'success');
-    const failureResults = detail.results.filter(r => r.status === 'failure');
-
-    console.log(chalk.green(`  成功路径: ${successResults.length} 个`));
-    successResults.forEach(r => {
-      console.log(`    ✓ ${r.file_name} [${r.risk_level}]`);
-    });
-
-    console.log(chalk.red(`\n  异常/失败路径: ${failureResults.length} 个`));
-    failureResults.forEach(r => {
-      console.log(`    ✗ ${r.file_name} [${r.risk_level}]`);
-      console.log(`      原因: ${r.failure_reason}`);
-      if (r.requires_manual_confirm) {
-        console.log(`      ${chalk.magenta('待人工确认')}`);
+    try {
+      console.log(chalk.bold(`\n=== 批次详情: ${batchId} ===\n`));
+      
+      const detail = await ValidationService.getBatchDetail(batchId);
+      
+      if (!detail) {
+        console.log(chalk.red('批次不存在'));
+        return;
       }
-    });
 
-    if (detail.candidateLists.length > 0) {
-      console.log(chalk.blue(`\n候选清单 (${detail.candidateLists.length}):`));
-      detail.candidateLists.forEach(cl => {
-        console.log(`  - ID: ${cl.id}`);
-        console.log(`    类型: ${cl.action_type}`);
-        console.log(`    数量: ${cl.candidates.length}`);
-        console.log(`    状态: ${cl.executed ? '已执行' : '待执行'}`);
+      console.log(chalk.blue('批次信息:'));
+      console.log(`  名称: ${detail.batch.batch_name}`);
+      console.log(`  操作者: ${detail.batch.operator}`);
+      console.log(`  状态: ${detail.batch.status}`);
+      console.log(`  风险类型: ${detail.batch.risk_type}`);
+      console.log(`  创建时间: ${new Date(detail.batch.created_at).toLocaleString()}`);
+
+      console.log(chalk.blue(`\n材料列表 (${detail.materials.length}):`));
+      detail.materials.forEach(m => {
+        console.log(`  - ${m.file_name}`);
+        console.log(`    ${chalk.gray(m.file_summary)}`);
       });
-    }
 
-    console.log('\n' + chalk.bold('=== 操作入口 ==='));
-    console.log(`生成清理候选清单: ${chalk.cyan(`log-validator candidate ${batchId} cleanup`)}`);
-    console.log(`生成回滚候选清单: ${chalk.cyan(`log-validator candidate ${batchId} rollback`)}`);
-    console.log(`按文件摘要过滤查询: ${chalk.cyan('log-validator search --summary "财务"')}`);
+      console.log(chalk.blue(`\n验证结果 (${detail.results.length}):`));
+      
+      const successResults = detail.results.filter(r => r.status === 'success');
+      const failureResults = detail.results.filter(r => r.status === 'failure');
+
+      console.log(chalk.green(`  成功路径: ${successResults.length} 个`));
+      successResults.forEach(r => {
+        console.log(`    ✓ ${r.file_name} [${r.risk_level}]`);
+      });
+
+      console.log(chalk.red(`\n  异常/失败路径: ${failureResults.length} 个`));
+      failureResults.forEach(r => {
+        console.log(`    ✗ ${r.file_name} [${r.risk_level}]`);
+        console.log(`      原因: ${r.failure_reason}`);
+        if (r.requires_manual_confirm) {
+          console.log(`      ${chalk.magenta('待人工确认')}`);
+        }
+      });
+
+      if (detail.candidateLists.length > 0) {
+        console.log(chalk.blue(`\n候选清单 (${detail.candidateLists.length}):`));
+        detail.candidateLists.forEach(cl => {
+          console.log(`  - ID: ${cl.id}`);
+          console.log(`    类型: ${cl.action_type}`);
+          console.log(`    数量: ${cl.candidates.length}`);
+          console.log(`    状态: ${cl.executed ? '已执行' : '待执行'}`);
+        });
+      }
+
+      console.log('\n' + chalk.bold('=== 操作入口 ==='));
+      console.log(`生成清理候选清单: ${chalk.cyan(`log-validator candidate ${batchId} cleanup`)}`);
+      console.log(`生成回滚候选清单: ${chalk.cyan(`log-validator candidate ${batchId} rollback`)}`);
+      console.log(`按文件摘要过滤查询: ${chalk.cyan('log-validator search --summary "财务"')}`);
+    } catch (error) {
+      console.error(chalk.red('错误:'), error.message);
+      process.exit(1);
+    }
   });
 
 program
@@ -195,83 +199,93 @@ program
   .option('-r, --risk <riskType>', '按风险类型过滤')
   .option('-s, --status <status>', '按状态过滤')
   .action(async (options) => {
-    console.log(chalk.bold('\n=== 历史查询 ===\n'));
-    
-    const filters = {};
-    if (options.operator) filters.operator = options.operator;
-    if (options.risk) filters.riskType = options.risk;
-    if (options.status) filters.status = options.status;
+    try {
+      console.log(chalk.bold('\n=== 历史查询 ===\n'));
+      
+      const filters = {};
+      if (options.operator) filters.operator = options.operator;
+      if (options.risk) filters.riskType = options.risk;
+      if (options.status) filters.status = options.status;
 
-    const history = await ValidationService.queryHistory(filters);
+      const history = await ValidationService.queryHistory(filters);
 
-    if (history.length === 0) {
-      console.log(chalk.yellow('无匹配记录'));
-      return;
+      if (history.length === 0) {
+        console.log(chalk.yellow('无匹配记录'));
+        return;
+      }
+
+      history.forEach(item => {
+        console.log(chalk.cyan(`批次: ${item.batch.id}`));
+        console.log(`  名称: ${item.batch.batch_name}`);
+        console.log(`  操作者: ${item.batch.operator}`);
+        console.log(`  风险类型: ${item.batch.risk_type}`);
+        console.log(`  结果: ${chalk.green(item.results.success)}成功 / ${chalk.red(item.results.failure)}失败`);
+        console.log(`  时间: ${new Date(item.batch.created_at).toLocaleString()}`);
+        console.log('');
+      });
+
+      console.log(`共 ${history.length} 条记录`);
+      console.log(`\n查看批次详情: ${chalk.cyan('log-validator query <batchId>')}`);
+    } catch (error) {
+      console.error(chalk.red('错误:'), error.message);
+      process.exit(1);
     }
-
-    history.forEach(item => {
-      console.log(chalk.cyan(`批次: ${item.batch.id}`));
-      console.log(`  名称: ${item.batch.batch_name}`);
-      console.log(`  操作者: ${item.batch.operator}`);
-      console.log(`  风险类型: ${item.batch.risk_type}`);
-      console.log(`  结果: ${chalk.green(item.results.success)}成功 / ${chalk.red(item.results.failure)}失败`);
-      console.log(`  时间: ${new Date(item.batch.created_at).toLocaleString()}`);
-      console.log('');
-    });
-
-    console.log(`共 ${history.length} 条记录`);
-    console.log(`\n查看批次详情: ${chalk.cyan('log-validator query <batchId>')}`);
   });
 
 program
   .command('candidate <batchId> <actionType>')
   .description('生成候选清单 (cleanup/rollback)')
   .action(async (batchId, actionType) => {
-    if (!['cleanup', 'rollback'].includes(actionType)) {
-      console.log(chalk.red('动作类型必须是 cleanup 或 rollback'));
-      return;
-    }
-
-    console.log(chalk.bold(`\n=== 生成${actionType === 'cleanup' ? '清理' : '回滚'}候选清单 ===\n`));
-
-    const { operator } = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'operator',
-        message: '操作者:'
+    try {
+      if (!['cleanup', 'rollback'].includes(actionType)) {
+        console.log(chalk.red('动作类型必须是 cleanup 或 rollback'));
+        return;
       }
-    ]);
 
-    const candidateList = await ValidationService.generateCandidateList(batchId, actionType, operator);
+      console.log(chalk.bold(`\n=== 生成${actionType === 'cleanup' ? '清理' : '回滚'}候选清单 ===\n`));
 
-    console.log(chalk.green(`候选清单生成成功: ${candidateList.id}`));
-    console.log(`包含 ${candidateList.count} 个候选项目:\n`);
+      const { operator } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'operator',
+          message: '操作者:'
+        }
+      ]);
 
-    candidateList.candidates.forEach((c, i) => {
-      console.log(`${i + 1}. ${c.fileName}`);
-      console.log(`   ${chalk.gray(c.fileSummary)}`);
-      console.log(`   风险等级: ${chalk.yellow(c.riskLevel)}`);
-      if (c.failureReason) {
-        console.log(`   原因: ${chalk.red(c.failureReason)}`);
+      const candidateList = await ValidationService.generateCandidateList(batchId, actionType, operator);
+
+      console.log(chalk.green(`候选清单生成成功: ${candidateList.id}`));
+      console.log(`包含 ${candidateList.count} 个候选项目:\n`);
+
+      candidateList.candidates.forEach((c, i) => {
+        console.log(`${i + 1}. ${c.fileName}`);
+        console.log(`   ${chalk.gray(c.fileSummary)}`);
+        console.log(`   风险等级: ${chalk.yellow(c.riskLevel)}`);
+        if (c.failureReason) {
+          console.log(`   原因: ${chalk.red(c.failureReason)}`);
+        }
+        console.log('');
+      });
+
+      const { confirmExecute } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'confirmExecute',
+          message: '确认执行此候选清单? (建议先人工审核)',
+          default: false
+        }
+      ]);
+
+      if (confirmExecute) {
+        const result = await ValidationService.executeCandidateList(candidateList.id);
+        console.log(chalk.green(`\n✓ 执行成功! 处理了 ${result.count} 个项目`));
+      } else {
+        console.log(chalk.yellow('\n已取消执行'));
+        console.log(`后续执行: ${chalk.cyan(`log-validator execute ${candidateList.id}`)}`);
       }
-      console.log('');
-    });
-
-    const { confirmExecute } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'confirmExecute',
-        message: '确认执行此候选清单? (建议先人工审核)',
-        default: false
-      }
-    ]);
-
-    if (confirmExecute) {
-      const result = await ValidationService.executeCandidateList(candidateList.id);
-      console.log(chalk.green(`\n✓ 执行成功! 处理了 ${result.count} 个项目`));
-    } else {
-      console.log(chalk.yellow('\n已取消执行'));
-      console.log(`后续执行: ${chalk.cyan(`log-validator execute ${candidateList.id}`)}`);
+    } catch (error) {
+      console.error(chalk.red('错误:'), error.message);
+      process.exit(1);
     }
   });
 
@@ -279,41 +293,46 @@ program
   .command('execute <candidateListId>')
   .description('执行候选清单')
   .action(async (candidateListId) => {
-    const candidateList = await ValidationService.getCandidateList(candidateListId);
+    try {
+      const candidateList = await ValidationService.getCandidateList(candidateListId);
 
-    if (!candidateList) {
-      console.log(chalk.red('候选清单不存在'));
-      return;
-    }
-
-    console.log(chalk.bold('\n=== 候选清单详情 ===\n'));
-    console.log(`ID: ${candidateList.id}`);
-    console.log(`类型: ${candidateList.action_type}`);
-    console.log(`数量: ${candidateList.candidates.length}`);
-    console.log(`状态: ${candidateList.executed ? '已执行' : '待执行'}`);
-
-    if (candidateList.executed) {
-      console.log(chalk.yellow('此候选清单已执行过'));
-      return;
-    }
-
-    console.log(chalk.yellow('\n候选项目:'));
-    candidateList.candidates.forEach((c, i) => {
-      console.log(`  ${i + 1}. ${c.fileName}`);
-    });
-
-    const { confirm } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'confirm',
-        message: '确认执行?',
-        default: false
+      if (!candidateList) {
+        console.log(chalk.red('候选清单不存在'));
+        return;
       }
-    ]);
 
-    if (confirm) {
-      const result = await ValidationService.executeCandidateList(candidateListId);
-      console.log(chalk.green(`\n✓ 执行成功!`));
+      console.log(chalk.bold('\n=== 候选清单详情 ===\n'));
+      console.log(`ID: ${candidateList.id}`);
+      console.log(`类型: ${candidateList.action_type}`);
+      console.log(`数量: ${candidateList.candidates.length}`);
+      console.log(`状态: ${candidateList.executed ? '已执行' : '待执行'}`);
+
+      if (candidateList.executed) {
+        console.log(chalk.yellow('此候选清单已执行过'));
+        return;
+      }
+
+      console.log(chalk.yellow('\n候选项目:'));
+      candidateList.candidates.forEach((c, i) => {
+        console.log(`  ${i + 1}. ${c.fileName}`);
+      });
+
+      const { confirm } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'confirm',
+          message: '确认执行?',
+          default: false
+        }
+      ]);
+
+      if (confirm) {
+        const result = await ValidationService.executeCandidateList(candidateListId);
+        console.log(chalk.green(`\n✓ 执行成功!`));
+      }
+    } catch (error) {
+      console.error(chalk.red('错误:'), error.message);
+      process.exit(1);
     }
   });
 
@@ -323,40 +342,45 @@ program
   .option('--summary <keyword>', '按文件摘要搜索')
   .option('--pending', '只显示待人工确认的项目')
   .action(async (options) => {
-    console.log(chalk.bold('\n=== 搜索结果 ===\n'));
+    try {
+      console.log(chalk.bold('\n=== 搜索结果 ===\n'));
 
-    if (options.pending) {
-      const pending = await ValidationService.getPendingManualConfirm();
-      console.log(chalk.magenta(`待人工确认项目 (${pending.length}):\n`));
-      
-      pending.forEach(p => {
-        console.log(`  ID: ${p.id}`);
-        console.log(`  文件名: ${p.file_name}`);
-        console.log(`  文件摘要: ${p.file_summary}`);
-        console.log(`  确认: ${chalk.cyan(`log-validator confirm ${p.id}`)}`);
-        console.log('');
-      });
-      return;
-    }
-
-    if (options.summary) {
-      const results = await ValidationService.queryByFileSummary(options.summary);
-      console.log(chalk.blue(`按文件摘要"${options.summary}"搜索到 ${results.length} 个结果:\n`));
-      
-      results.forEach(r => {
-        console.log(`  文件: ${r.material.file_name}`);
-        console.log(`  摘要: ${chalk.gray(r.material.file_summary)}`);
-        console.log(`  批次ID: ${r.material.batch_id}`);
+      if (options.pending) {
+        const pending = await ValidationService.getPendingManualConfirm();
+        console.log(chalk.magenta(`待人工确认项目 (${pending.length}):\n`));
         
-        r.validationResults.forEach(vr => {
-          const statusColor = vr.status === 'success' ? chalk.green : chalk.red;
-          console.log(`  结果: ${statusColor(vr.status)} [${vr.risk_level}]`);
-          if (vr.requires_manual_confirm && !vr.manually_confirmed) {
-            console.log(`  ${chalk.magenta('  ⚠ 待人工确认')}`);
-          }
+        pending.forEach(p => {
+          console.log(`  ID: ${p.id}`);
+          console.log(`  文件名: ${p.file_name}`);
+          console.log(`  文件摘要: ${p.file_summary}`);
+          console.log(`  确认: ${chalk.cyan(`log-validator confirm ${p.id}`)}`);
+          console.log('');
         });
-        console.log('');
-      });
+        return;
+      }
+
+      if (options.summary) {
+        const results = await ValidationService.queryByFileSummary(options.summary);
+        console.log(chalk.blue(`按文件摘要"${options.summary}"搜索到 ${results.length} 个结果:\n`));
+        
+        results.forEach(r => {
+          console.log(`  文件: ${r.material.file_name}`);
+          console.log(`  摘要: ${chalk.gray(r.material.file_summary)}`);
+          console.log(`  批次ID: ${r.material.batch_id}`);
+          
+          r.validationResults.forEach(vr => {
+            const statusColor = vr.status === 'success' ? chalk.green : chalk.red;
+            console.log(`  结果: ${statusColor(vr.status)} [${vr.risk_level}]`);
+            if (vr.requires_manual_confirm && !vr.manually_confirmed) {
+              console.log(`  ${chalk.magenta('  ⚠ 待人工确认')}`);
+            }
+          });
+          console.log('');
+        });
+      }
+    } catch (error) {
+      console.error(chalk.red('错误:'), error.message);
+      process.exit(1);
     }
   });
 
@@ -364,20 +388,24 @@ program
   .command('confirm <resultId>')
   .description('人工确认验证结果')
   .action(async (resultId) => {
-    const { confirmedBy } = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'confirmedBy',
-        message: '确认人:'
-      }
-    ]);
+    try {
+      const { confirmedBy } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'confirmedBy',
+          message: '确认人:'
+        }
+      ]);
 
-    await ValidationService.confirmManual(resultId, confirmedBy);
-    console.log(chalk.green('✓ 人工确认完成'));
+      await ValidationService.confirmManual(resultId, confirmedBy);
+      console.log(chalk.green('✓ 人工确认完成'));
+    } catch (error) {
+      console.error(chalk.red('错误:'), error.message);
+      process.exit(1);
+    }
   });
 
 async function main() {
-  await initDatabase();
   await program.parseAsync(process.argv);
 }
 

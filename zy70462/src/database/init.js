@@ -5,10 +5,6 @@ const fs = require('fs');
 const DB_PATH = path.join(__dirname, '../../data/validator.db');
 const DB_DIR = path.dirname(DB_PATH);
 
-if (!fs.existsSync(DB_DIR)) {
-  fs.mkdirSync(DB_DIR, { recursive: true });
-}
-
 function runQuery(db, sql, params = []) {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function(err) {
@@ -20,6 +16,10 @@ function runQuery(db, sql, params = []) {
 
 async function initDatabase() {
   return new Promise((resolve, reject) => {
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
+
     const db = new sqlite3.Database(DB_PATH, (err) => {
       if (err) {
         console.error('数据库连接失败:', err.message);
