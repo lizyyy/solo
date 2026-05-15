@@ -1,0 +1,134 @@
+# 端口占用巡检命令行工具
+
+支持版本化规则口径管理、样本去重复用/冲突检测、异常样本导出复核的端口占用巡检工具。
+
+## 功能特性
+
+- **版本化规则口径**：支持多版本规则并存，旧批次使用旧规则解释
+- **样本去重复用**：相同IP+端口+供应商的样本再次提交时复用旧结论
+- **冲突检测**：规则口径变更导致结论不同时标记为冲突
+- **供应商自动修正**：支持供应商名称标准化映射
+- **异常样本导出**：导出异常样本Excel供同事复核
+- **风险等级过滤**：按风险等级（critical/high/medium/low/safe）查询导出
+- **完整报告导出**：导出批次完整巡检报告
+
+## 安装
+
+```bash
+pip install -e .
+```
+
+或
+
+```bash
+pip install -r requirements.txt
+```
+
+## 快速开始
+
+### 1. 准备测试数据
+
+```bash
+python test_data_normal.py    # 创建正常样本
+python test_data_bad.py       # 创建会触发口径变更的坏样本
+```
+
+### 2. 执行巡检
+
+```bash
+# 使用默认最新规则巡检
+port-inspector inspect test_samples_normal.xlsx
+
+# 使用指定版本规则巡检
+port-inspector inspect test_samples_normal.xlsx --rule-version v1.0.0
+```
+
+### 3. 查看报告
+
+```bash
+# 列出所有批次
+port-inspector list-batches
+
+# 查看批次详情
+port-inspector report <batch_id>
+```
+
+### 4. 导出异常样本
+
+```bash
+# 导出批次异常样本
+port-inspector export-anomalies <batch_id>
+
+# 按风险等级过滤导出
+port-inspector export-anomalies <batch_id> --risk-level critical
+
+# 导出完整报告
+port-inspector export <batch_id>
+```
+
+### 5. 按风险等级导出所有异常
+
+```bash
+port-inspector export-by-risk critical
+```
+
+### 6. 标记样本已复核
+
+```bash
+port-inspector review <sample_id> 张三 --notes "已复核，确认无风险"
+```
+
+### 7. 查看规则版本
+
+```bash
+port-inspector list-rules
+```
+
+## 规则版本说明
+
+### v1.0.0 版本（原始口径）
+- 端口0-1023（系统端口）：CRITICAL
+- 端口1024-49151（注册端口）：MEDIUM
+- 端口49152-65535（动态端口）：LOW
+- 保留端口：22, 80, 443, 3306, 5432, 6379, 27017
+- 高连接阈值：100
+
+### v2.0.0 版本（新口径，降低风险等级）
+- 端口0-1023（系统端口）：HIGH
+- 端口1024-49151（注册端口）：LOW
+- 端口49152-65535（动态端口）：SAFE
+- 保留端口：22, 80, 443, 3306, 5432, 6379, 27017, 8080, 8443
+- 高连接阈值：50
+
+## 数据目录
+
+默认数据目录：`~/.port_inspector/data/`
+
+目录结构：
+- `rules/` - 规则版本定义
+- `samples/` - 巡检样本数据
+- `results/` - 巡检结果数据
+- `batches/` - 批次信息
+- `exports/` - 导出的报告文件
+
+## Excel输入字段说明
+
+| 字段 | 说明 |
+|------|------|
+| IP地址 | 服务器IP |
+| 端口 | 端口号 |
+| 协议 | TCP/UDP |
+| 进程名 | 运行进程名称 |
+| 连接数 | 当前连接数量 |
+| 供应商 | 供应商名称（支持自动修正） |
+| 部门 | 所属部门 |
+| 业务线 | 所属业务线 |
+
+## 供应商自动修正映射
+
+- "阿里" → "阿里巴巴"
+- "阿里云计算" → "阿里巴巴"
+- "腾讯" → "腾讯科技"
+- "腾讯云" → "腾讯科技"
+- "百度" → "百度在线"
+- "百度云" → "百度在线"
