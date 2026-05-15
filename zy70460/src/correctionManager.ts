@@ -84,7 +84,10 @@ export class CorrectionManager {
     
     switch (filterType) {
       case 'batch':
-        return histories.filter(h => h.batchId === value);
+        return histories.filter(h => {
+          const batchIds = h.batchId.split(',');
+          return batchIds.includes(value);
+        });
       case 'operator':
         return histories.filter(h => h.operator === value);
       case 'riskType':

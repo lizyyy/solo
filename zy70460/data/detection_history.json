@@ -178,5 +178,185 @@
     ],
     "historyId": "HST-81371c22",
     "detectedAt": "2026-05-15T14:06:59.832Z"
+  },
+  {
+    "batchId": "BATCH20260501,BATCH20260502",
+    "operator": "李测试",
+    "riskType": "has_duplicates",
+    "duplicateGroups": [
+      {
+        "groupId": "GRP-b19e1f8b",
+        "key": "PRD001",
+        "keyType": "composite",
+        "items": [
+          {
+            "sample": {
+              "id": "SMP001",
+              "batchId": "BATCH20260501",
+              "productId": "PRD001",
+              "productName": "高端护肤精华液50ml",
+              "sku": "SKU-PRD001-01",
+              "liveDate": "2026-05-01",
+              "anchorName": "美妆达人Lisa",
+              "platform": "抖音",
+              "price": 299,
+              "stock": 100,
+              "category": "美妆护肤",
+              "brand": "奢颜",
+              "createdAt": "2026-05-01T10:00:00Z",
+              "updatedAt": "2026-05-01T10:00:00Z"
+            },
+            "isTruncated": false,
+            "truncationFields": [],
+            "confidence": 0.95
+          },
+          {
+            "sample": {
+              "id": "SMP002",
+              "batchId": "BATCH20260501",
+              "productId": "PRD001",
+              "productName": "高端护肤精华液50ml",
+              "sku": "SKU-PRD001-01",
+              "liveDate": "2026-05-02",
+              "anchorName": "美妆达人Lisa",
+              "platform": "抖音",
+              "price": 299,
+              "stock": 150,
+              "category": "美妆护肤",
+              "brand": "奢颜",
+              "createdAt": "2026-05-02T09:00:00Z",
+              "updatedAt": "2026-05-02T09:00:00Z"
+            },
+            "isTruncated": false,
+            "truncationFields": [],
+            "confidence": 0.95
+          }
+        ],
+        "riskLevel": "high",
+        "detectedAt": "2026-05-15T22:19:25.743Z"
+      },
+      {
+        "groupId": "GRP-2dd66e21",
+        "key": "PRD003",
+        "keyType": "composite",
+        "items": [
+          {
+            "sample": {
+              "id": "SMP004",
+              "batchId": "BATCH20260501",
+              "productId": "PRD003",
+              "productName": "有机坚果礼盒装",
+              "sku": "SKU-PRD003-01",
+              "liveDate": "2026-05-03",
+              "anchorName": "美食推荐官",
+              "platform": "快手",
+              "price": 128,
+              "stock": 500,
+              "category": "食品生鲜",
+              "brand": "田园优选",
+              "createdAt": "2026-05-03T08:00:00Z",
+              "updatedAt": "2026-05-03T08:00:00Z"
+            },
+            "isTruncated": true,
+            "truncationFields": [
+              "productName"
+            ],
+            "confidence": 0.6
+          },
+          {
+            "sample": {
+              "id": "SMP005",
+              "batchId": "BATCH20260501",
+              "productId": "PRD003",
+              "productName": "有机坚果礼盒装1.5",
+              "sku": "SKU-PRD003-01",
+              "liveDate": "2026-05-04",
+              "anchorName": "美食推荐官",
+              "platform": "快手",
+              "price": 128,
+              "stock": 300,
+              "category": "食品生鲜",
+              "brand": "田园优选",
+              "createdAt": "2026-05-04T10:30:00Z",
+              "updatedAt": "2026-05-04T10:30:00Z"
+            },
+            "isTruncated": false,
+            "truncationFields": [],
+            "confidence": 0.95
+          }
+        ],
+        "riskLevel": "medium",
+        "detectedAt": "2026-05-15T22:19:25.744Z"
+      },
+      {
+        "groupId": "GRP-1e37854a",
+        "key": "PRD004",
+        "keyType": "composite",
+        "items": [
+          {
+            "sample": {
+              "id": "SMP006",
+              "batchId": "BATCH20260502",
+              "productId": "PRD004",
+              "productName": "运动跑鞋男款透气减",
+              "sku": "SKU-PRD004-01",
+              "liveDate": "2026-05-05",
+              "anchorName": "运动达人Mike",
+              "platform": "抖音",
+              "price": 459,
+              "stock": 80,
+              "category": "运动户外",
+              "brand": "飞驰",
+              "createdAt": "2026-05-05T16:00:00Z",
+              "updatedAt": "2026-05-05T16:00:00Z"
+            },
+            "isTruncated": true,
+            "truncationFields": [
+              "productName"
+            ],
+            "confidence": 0.6
+          },
+          {
+            "sample": {
+              "id": "SMP007",
+              "batchId": "BATCH20260502",
+              "productId": "PRD004",
+              "productName": "运动跑鞋男款透气减震防滑",
+              "sku": "SKU-PRD004-01",
+              "liveDate": "2026-05-05",
+              "anchorName": "运动达人Mike",
+              "platform": "抖音",
+              "price": 459,
+              "stock": 80,
+              "category": "运动户外",
+              "brand": "飞驰",
+              "createdAt": "2026-05-05T16:10:00Z",
+              "updatedAt": "2026-05-05T16:10:00Z"
+            },
+            "isTruncated": false,
+            "truncationFields": [],
+            "confidence": 0.95
+          }
+        ],
+        "riskLevel": "medium",
+        "detectedAt": "2026-05-15T22:19:25.744Z"
+      }
+    ],
+    "corrections": [
+      {
+        "batchId": "BATCH20260502",
+        "groupId": "GRP-DEMO001",
+        "itemId": "SMP006",
+        "operator": "张经理",
+        "remark": "经核查，该记录为系统导入时字段被截断，实际完整商品名称应为\"运动跑鞋男款透气减震防滑\"，与SMP007为同款商品不同场次重复录入",
+        "action": "merge",
+        "source": "直播样品表人工复核",
+        "basis": "根据历史直播记录核对，SMP006与SMP007商品ID、SKU、价格、库存等字段完全一致，仅商品名称因导入时截断",
+        "correctionId": "COR-68923333",
+        "correctedAt": "2026-05-15T14:05:55.156Z"
+      }
+    ],
+    "historyId": "HST-c7608a89",
+    "detectedAt": "2026-05-15T22:19:25.759Z"
   }
 ]
