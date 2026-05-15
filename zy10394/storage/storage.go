@@ -87,6 +87,15 @@ func (s *Storage) GetSubscriptionByID(id string) (*models.Subscription, error) {
 	return &sub, err
 }
 
+func (s *Storage) GetSubscriptionByIdempotentKey(key string) (*models.Subscription, error) {
+	var sub models.Subscription
+	err := s.db.Where("idempotent_key = ?", key).First(&sub).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &sub, err
+}
+
 func (s *Storage) GetSubscriptionsByTopicAndBusiness(topicID, businessID string) ([]models.Subscription, error) {
 	var subs []models.Subscription
 	err := s.db.Where("topic_id = ? AND business_id = ? AND enabled = ?", topicID, businessID, true).Find(&subs).Error

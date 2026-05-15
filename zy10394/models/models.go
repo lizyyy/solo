@@ -37,35 +37,36 @@ type BusinessObject struct {
 
 type Subscription struct {
 	BaseModel
-	TopicID      string `gorm:"type:varchar(36);index;not null" json:"topic_id"`
-	BusinessID   string `gorm:"type:varchar(36);index;not null" json:"business_id"`
-	SubscriberID string `gorm:"type:varchar(100);not null" json:"subscriber_id"`
-	Subscriber   string `gorm:"type:varchar(200)" json:"subscriber"`
-	Enabled      bool   `gorm:"default:true" json:"enabled"`
-	FilterExpr   string `gorm:"type:text" json:"filter_expr"`
+	TopicID       string `gorm:"type:varchar(36);index;not null" json:"topic_id"`
+	BusinessID    string `gorm:"type:varchar(36);index;not null" json:"business_id"`
+	SubscriberID  string `gorm:"type:varchar(100);not null" json:"subscriber_id"`
+	Subscriber    string `gorm:"type:varchar(200)" json:"subscriber"`
+	Enabled       bool   `gorm:"default:true" json:"enabled"`
+	FilterExpr    string `gorm:"type:text" json:"filter_expr"`
+	IdempotentKey string `gorm:"type:varchar(100);uniqueIndex;not null" json:"idempotent_key"`
 }
 
 type DeliveryPreference struct {
 	BaseModel
-	SubscriptionID string   `gorm:"type:varchar(36);uniqueIndex;not null" json:"subscription_id"`
-	Endpoint       string   `gorm:"type:varchar(500);not null" json:"endpoint"`
-	Method         string   `gorm:"type:varchar(10);default:'POST'" json:"method"`
-	Headers        string   `gorm:"type:text" json:"headers"`
-	Timeout        int      `gorm:"default:30" json:"timeout"`
-	RetryCount     int      `gorm:"default:3" json:"retry_count"`
-	RetryInterval  int      `gorm:"default:60" json:"retry_interval"`
+	SubscriptionID string `gorm:"type:varchar(36);uniqueIndex;not null" json:"subscription_id"`
+	Endpoint       string `gorm:"type:varchar(500);not null" json:"endpoint"`
+	Method         string `gorm:"type:varchar(10);default:'POST'" json:"method"`
+	Headers        string `gorm:"type:text" json:"headers"`
+	Timeout        int    `gorm:"default:30" json:"timeout"`
+	RetryCount     int    `gorm:"default:3" json:"retry_count"`
+	RetryInterval  int    `gorm:"default:60" json:"retry_interval"`
 }
 
 type StatusChange struct {
 	BaseModel
-	BusinessID     string    `gorm:"type:varchar(36);index;not null" json:"business_id"`
-	TopicID        string    `gorm:"type:varchar(36);index;not null" json:"topic_id"`
-	FromStatus     string    `gorm:"type:varchar(50)" json:"from_status"`
-	ToStatus       string    `gorm:"type:varchar(50);not null" json:"to_status"`
-	ChangeReason   string    `gorm:"type:text" json:"change_reason"`
-	OperatorID     string    `gorm:"type:varchar(100)" json:"operator_id"`
-	OperatorName   string    `gorm:"type:varchar(200)" json:"operator_name"`
-	IdempotentKey  string    `gorm:"type:varchar(100);uniqueIndex" json:"idempotent_key"`
+	BusinessID    string `gorm:"type:varchar(36);index;not null" json:"business_id"`
+	TopicID       string `gorm:"type:varchar(36);index;not null" json:"topic_id"`
+	FromStatus    string `gorm:"type:varchar(50)" json:"from_status"`
+	ToStatus      string `gorm:"type:varchar(50);not null" json:"to_status"`
+	ChangeReason  string `gorm:"type:text" json:"change_reason"`
+	OperatorID    string `gorm:"type:varchar(100)" json:"operator_id"`
+	OperatorName  string `gorm:"type:varchar(200)" json:"operator_name"`
+	IdempotentKey string `gorm:"type:varchar(100);uniqueIndex" json:"idempotent_key"`
 }
 
 type DeliveryRecord struct {
@@ -93,10 +94,10 @@ type SubscriptionSnapshot struct {
 }
 
 const (
-	DeliveryStatusPending   = "pending"
-	DeliveryStatusSuccess   = "success"
-	DeliveryStatusFailed    = "failed"
-	DeliveryStatusRetrying  = "retrying"
+	DeliveryStatusPending  = "pending"
+	DeliveryStatusSuccess  = "success"
+	DeliveryStatusFailed   = "failed"
+	DeliveryStatusRetrying = "retrying"
 )
 
 type ApiResponse struct {
@@ -106,19 +107,19 @@ type ApiResponse struct {
 }
 
 type CreateSubscriptionRequest struct {
-	TopicName      string `json:"topic_name" binding:"required"`
-	BusinessType   string `json:"business_type" binding:"required"`
-	BusinessID     string `json:"business_id" binding:"required"`
-	SubscriberID   string `json:"subscriber_id" binding:"required"`
-	Subscriber     string `json:"subscriber"`
-	FilterExpr     string `json:"filter_expr"`
-	Endpoint       string `json:"endpoint" binding:"required"`
-	Method         string `json:"method"`
-	Headers        map[string]string `json:"headers"`
-	Timeout        int    `json:"timeout"`
-	RetryCount     int    `json:"retry_count"`
-	RetryInterval  int    `json:"retry_interval"`
-	IdempotentKey  string `json:"idempotent_key" binding:"required"`
+	TopicName     string            `json:"topic_name" binding:"required"`
+	BusinessType  string            `json:"business_type" binding:"required"`
+	BusinessID    string            `json:"business_id" binding:"required"`
+	SubscriberID  string            `json:"subscriber_id" binding:"required"`
+	Subscriber    string            `json:"subscriber"`
+	FilterExpr    string            `json:"filter_expr"`
+	Endpoint      string            `json:"endpoint" binding:"required"`
+	Method        string            `json:"method"`
+	Headers       map[string]string `json:"headers"`
+	Timeout       int               `json:"timeout"`
+	RetryCount    int               `json:"retry_count"`
+	RetryInterval int               `json:"retry_interval"`
+	IdempotentKey string            `json:"idempotent_key" binding:"required"`
 }
 
 type StatusChangeRequest struct {

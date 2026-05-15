@@ -4,13 +4,13 @@
 
 ## 核心特性
 
-- **幂等性处理**：通过 idempotent_key 确保重复提交不会产生脏数据
+- **幂等性处理**：订阅和状态变更均支持 idempotent_key，确保重复提交不产生脏数据
 - **状态聚合**：统一管理业务对象的状态变更历史
-- **订阅过滤**：支持按条件过滤订阅通知
-- **投递调度**：定时任务处理待投递通知
-- **失败补发**：自动重试失败的投递，达到最大次数后标记为失败
-- **快照查询**：每个状态变更都生成快照，便于追溯
-- **持久化存储**：使用 SQLite 存储，重启后数据不丢失
+- **订阅过滤**：支持灵活的过滤表达式，如 `to_status=paid, from_status=pending`
+- **投递调度**：定时任务处理待投递通知，按订阅分配
+- **失败补发**：自动重试失败的投递，达到配置次数后标记为失败
+- **快照查询**：每个订阅的状态变更独立生成快照，按 subscription_id 正确关联查询
+- **持久化存储**：使用 SQLite 存储，重启后数据完整可查
 
 ## 技术栈
 
@@ -196,3 +196,40 @@ GET /api/v1/subscriptions/{subscription_id}/snapshots
 - `snapshot_at`: 快照时间
 - `snapshot_data`: 快照数据（JSON）
 - `conclusion`: 结论说明
+
+## 过滤表达式语法
+
+订阅时可以通过 `filter_expr` 配置过滤条件，只有满足条件的状态变更才会触发通知：
+
+```
+# 单条件：只通知状态变为 paid 的变更
+filter_expr: "to_status=paid"
+
+# 多条件（逗号分隔）：同时满足才通知
+filter_expr: "to_status=paid, from_status=pending"
+
+# 按操作人过滤
+filter_expr: "operator_id=user_001"
+```
+
+支持的过滤键：
+- `to_status` - 目标状态
+- `from_status` - 源状态
+- `operator_id` - 操作人ID
+- `topic_id` - 主题ID
+
+## 已修复问题
+
+### v1.1 修复内容
+
+1. **订阅幂等性问题**
+   - 问题：订阅的 idempotent_key 未持久化，重复创建产生脏数据
+   - 修复：Subscription 模型新增 IdempotentKey 字段，存储层新增 GetSubscriptionByIdempotentKey 查询
+
+2. **订阅过滤恒返回 true**
+   - 问题：matchFilter 函数直接返回 true，过滤配置不生效
+   - 修复：实现完整的过滤表达式解析引擎，支持多条件逗号分隔匹配
+
+3. **快照关联错误**
+   - 问题：createSnapshot 将 status_change.ID 写入 subscription_id，导致查询不到
+   - 修复：重构快照创建逻辑，在 createDeliveryRecords 循环内为每个订阅独立创建快照，使用真实的 sub.ID 关联

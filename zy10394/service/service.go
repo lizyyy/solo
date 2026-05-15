@@ -31,15 +31,12 @@ func NewService(storage *storage.Storage, logger *zap.Logger) *Service {
 }
 
 func (s *Service) CreateSubscription(req *models.CreateSubscriptionRequest) (*models.Subscription, error) {
-	existingChange, err := s.storage.GetStatusChangeByIdempotentKey(req.IdempotentKey)
+	existingSub, err := s.storage.GetSubscriptionByIdempotentKey(req.IdempotentKey)
 	if err != nil {
 		return nil, fmt.Errorf("check idempotent key failed: %w", err)
 	}
-	if existingChange != nil {
-		existingSub, err := s.storage.GetSubscriptionByID(existingChange.BusinessID)
-		if err == nil && existingSub != nil {
-			return existingSub, nil
-		}
+	if existingSub != nil {
+		return existingSub, nil
 	}
 
 	topic, err := s.storage.GetTopicByName(req.TopicName)
@@ -58,8 +55,8 @@ func (s *Service) CreateSubscription(req *models.CreateSubscriptionRequest) (*mo
 	}
 
 	business := &models.BusinessObject{
-		Type:       req.BusinessType,
-		Identifier: req.BusinessID,
+		Type:        req.BusinessType,
+		Identifier:  req.BusinessID,
 		DisplayName: fmt.Sprintf("%s-%s", req.BusinessType, req.BusinessID),
 	}
 	business, err = s.storage.CreateOrGetBusinessObject(business)
@@ -68,12 +65,13 @@ func (s *Service) CreateSubscription(req *models.CreateSubscriptionRequest) (*mo
 	}
 
 	sub := &models.Subscription{
-		TopicID:      topic.ID,
-		BusinessID:   business.ID,
-		SubscriberID: req.SubscriberID,
-		Subscriber:   req.Subscriber,
-		Enabled:      true,
-		FilterExpr:   req.FilterExpr,
+		TopicID:       topic.ID,
+		BusinessID:    business.ID,
+		SubscriberID:  req.SubscriberID,
+		Subscriber:    req.Subscriber,
+		Enabled:       true,
+		FilterExpr:    req.FilterExpr,
+		IdempotentKey: req.IdempotentKey,
 	}
 	if err := s.storage.CreateSubscription(sub); err != nil {
 		return nil, fmt.Errorf("create subscription failed: %w", err)
@@ -151,10 +149,6 @@ func (s *Service) ProcessStatusChange(req *models.StatusChangeRequest) (*models.
 		s.logger.Error("create delivery records failed", zap.Error(err))
 	}
 
-	if err := s.createSnapshot(change, business, topic); err != nil {
-		s.logger.Error("create snapshot failed", zap.Error(err))
-	}
-
 	return change, nil
 }
 
@@ -188,28 +182,118 @@ func (s *Service) createDeliveryRecords(change *models.StatusChange, topicID, bu
 		if err := s.storage.CreateDeliveryRecord(record); err != nil {
 			s.logger.Error("create delivery record failed", zap.Error(err))
 		}
+
+		if err := s.createSnapshot(change, sub.ID, topicID, businessID); err != nil {
+			s.logger.Error("create snapshot failed", zap.String("sub_id", sub.ID), zap.Error(err))
+		}
 	}
 
 	return nil
 }
 
 func (s *Service) matchFilter(filterExpr string, change *models.StatusChange) bool {
+	if filterExpr == "" {
+		return true
+	}
+
+	conditions := parseFilterConditions(filterExpr)
+	for key, expectedValue := range conditions {
+		var actualValue string
+		switch key {
+		case "to_status":
+			actualValue = change.ToStatus
+		case "from_status":
+			actualValue = change.FromStatus
+		case "operator_id":
+			actualValue = change.OperatorID
+		case "topic_id":
+			actualValue = change.TopicID
+		default:
+			s.logger.Warn("unknown filter key", zap.String("key", key))
+			continue
+		}
+
+		if actualValue != expectedValue {
+			s.logger.Info("filter not matched",
+				zap.String("key", key),
+				zap.String("expected", expectedValue),
+				zap.String("actual", actualValue))
+			return false
+		}
+	}
+
 	return true
 }
 
-func (s *Service) createSnapshot(change *models.StatusChange, business *models.BusinessObject, topic *models.SubscriptionTopic) error {
+func parseFilterConditions(expr string) map[string]string {
+	result := make(map[string]string)
+	conditions := splitAndTrim(expr, ",")
+
+	for _, cond := range conditions {
+		parts := splitAndTrim(cond, "=")
+		if len(parts) == 2 {
+			result[parts[0]] = parts[1]
+		}
+	}
+
+	return result
+}
+
+func splitAndTrim(s, sep string) []string {
+	var result []string
+	parts := splitIgnoreEmpty(s, sep)
+	for _, p := range parts {
+		if trimmed := trimSpaces(p); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
+}
+
+func splitIgnoreEmpty(s, sep string) []string {
+	var result []string
+	start := 0
+	for i := 0; i <= len(s)-len(sep); i++ {
+		if s[i:i+len(sep)] == sep {
+			if start < i {
+				result = append(result, s[start:i])
+			}
+			start = i + len(sep)
+			i = start - 1
+		}
+	}
+	if start < len(s) {
+		result = append(result, s[start:])
+	}
+	return result
+}
+
+func trimSpaces(s string) string {
+	start := 0
+	for start < len(s) && (s[start] == ' ' || s[start] == '\t') {
+		start++
+	}
+	end := len(s)
+	for end > start && (s[end-1] == ' ' || s[end-1] == '\t') {
+		end--
+	}
+	return s[start:end]
+}
+
+func (s *Service) createSnapshot(change *models.StatusChange, subscriptionID, topicID, businessID string) error {
 	snapshotData := map[string]interface{}{
-		"business":   business,
-		"topic":      topic,
-		"change":     change,
-		"snapshot_at": time.Now(),
+		"subscription_id": subscriptionID,
+		"topic_id":        topicID,
+		"business_id":     businessID,
+		"change":          change,
+		"snapshot_at":     time.Now(),
 	}
 	dataJSON, _ := json.Marshal(snapshotData)
 
 	snapshot := &models.SubscriptionSnapshot{
-		SubscriptionID: change.ID,
-		TopicID:        topic.ID,
-		BusinessID:     business.ID,
+		SubscriptionID: subscriptionID,
+		TopicID:        topicID,
+		BusinessID:     businessID,
 		SnapshotAt:     time.Now(),
 		SnapshotData:   string(dataJSON),
 		Conclusion:     fmt.Sprintf("Status changed from %s to %s by %s", change.FromStatus, change.ToStatus, change.OperatorName),
@@ -242,15 +326,15 @@ func (s *Service) deliveryWorker(record models.DeliveryRecord) {
 	}
 
 	payload := map[string]interface{}{
-		"id":             change.ID,
-		"business_id":    change.BusinessID,
-		"topic_id":       change.TopicID,
-		"from_status":    change.FromStatus,
-		"to_status":      change.ToStatus,
-		"change_reason":  change.ChangeReason,
-		"operator_id":    change.OperatorID,
-		"operator_name":  change.OperatorName,
-		"created_at":     change.CreatedAt,
+		"id":            change.ID,
+		"business_id":   change.BusinessID,
+		"topic_id":      change.TopicID,
+		"from_status":   change.FromStatus,
+		"to_status":     change.ToStatus,
+		"change_reason": change.ChangeReason,
+		"operator_id":   change.OperatorID,
+		"operator_name": change.OperatorName,
+		"created_at":    change.CreatedAt,
 	}
 
 	record.AttemptCount++
