@@ -26,6 +26,7 @@ public class RecalculateBatchService {
     private final StatusHistoryRepository statusHistoryRepository;
     private final ComparisonResultRepository comparisonResultRepository;
     private final ProcessingRuleRepository processingRuleRepository;
+    private final RevokeRecordRepository revokeRecordRepository;
 
     @Transactional
     public ApiResponse<BatchDetailResponse> createBatch(CreateBatchRequest request) {
@@ -478,6 +479,7 @@ public class RecalculateBatchService {
         record.setRevokedAt(LocalDateTime.now());
         record.setRecoveredEventCount(batch.getSuccessEventCount());
         record.setRecoveryDetail("所有事件已恢复到重算前状态");
+        revokeRecordRepository.save(record);
     }
 
     private void saveStatusHistory(RecalculateBatch batch, RecalculateStatus previous, RecalculateStatus current, String remark, String operator) {

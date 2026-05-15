@@ -1,6 +1,6 @@
 package com.business.recalculate.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;

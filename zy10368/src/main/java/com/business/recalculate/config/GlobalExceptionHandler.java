@@ -34,11 +34,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
             MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getAllErrors().forEach(error -> {
+        for (org.springframework.validation.ObjectError error : e.getBindingResult().getAllErrors()) {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
-        });
+        }
         log.warn("参数校验失败: {}", errors);
         return ResponseEntity.badRequest()
                 .body(ApiResponse.error("VALIDATION_ERROR", "参数校验失败"));
