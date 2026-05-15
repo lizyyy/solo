@@ -11,7 +11,7 @@ from schemas import (
     WarehouseHandoverCreate, WarehouseHandover as WarehouseHandoverSchema
 )
 
-router = APIRouter(prefix="/approvals", tags=["审批管理"])
+router = APIRouter(tags=["审批管理"])
 
 @router.post("/warehouse-handovers", response_model=WarehouseHandoverSchema)
 def create_warehouse_handover(

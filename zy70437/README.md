@@ -160,7 +160,7 @@ POST /api/approvals/warehouse-handovers
 }
 
 # 执行审批（关联交接单）
-POST /api/approvals
+POST /api/approval/
 {
   "replay_result_id": 1,
   "action": "approve",

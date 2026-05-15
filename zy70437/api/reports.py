@@ -5,7 +5,7 @@ from database import get_db
 from models import Report, Batch, ReplayResult, GatewayErrorExtract, RuleVersion
 from schemas import ReportCreate, Report as ReportSchema
 
-router = APIRouter(prefix="/reports", tags=["报告生成"])
+router = APIRouter(tags=["报告生成"])
 
 def _generate_next_steps(batch: Batch, results: List[ReplayResult]) -> List[Dict[str, Any]]:
     next_steps = []
@@ -20,7 +20,7 @@ def _generate_next_steps(batch: Batch, results: List[ReplayResult]) -> List[Dict
                 "affected_count": len(blocked_for_approval)
             })
     
-    other_blocked = [r for r in results if r.status == "blocked" and not r.approval_opinion_missing]
+    other_blocked = [r for r in results if r.replay_status == "blocked" and r.approval_status != "approved" and not r.approval_opinion_missing]
     if other_blocked:
         block_codes = {}
         for r in other_blocked:

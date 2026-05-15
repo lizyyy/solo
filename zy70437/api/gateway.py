@@ -5,7 +5,7 @@ from database import get_db
 from models import GatewayErrorExtract, Batch
 from schemas import GatewayErrorExtractCreate, GatewayErrorExtract as GatewayErrorExtractSchema
 
-router = APIRouter(prefix="/gateway-error-extracts", tags=["网关错误摘录"])
+router = APIRouter(tags=["网关错误摘录"])
 
 @router.post("/", response_model=List[GatewayErrorExtractSchema])
 def create_error_extracts(
