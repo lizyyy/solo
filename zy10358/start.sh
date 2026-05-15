@@ -32,6 +32,25 @@ if [ "$JAVA_MAJOR" -lt 8 ]; then
     exit 1
 fi
 
+# 尝试设置正确的JAVA_HOME（Mac上的JDK问题）
+if [ "$(uname)" = "Darwin" ]; then
+    if [ -x /usr/libexec/java_home ]; then
+        export JAVA_HOME=$(/usr/libexec/java_home)
+        echo "   已设置 JAVA_HOME: $JAVA_HOME"
+    fi
+fi
+
+# 检查javac是否可用
+if ! command -v javac &> /dev/null; then
+    echo ""
+    echo "⚠️  警告: 未找到 javac 编译器"
+    echo "   这表示当前是JRE而非完整JDK"
+    echo ""
+    echo "   推荐方案: 直接使用IDE运行（无需Maven编译）"
+    echo "   在IDEA/Eclipse中打开项目，直接运行 FeeCalculationApplication.java"
+    echo ""
+fi
+
 echo ""
 
 # 查找Maven命令

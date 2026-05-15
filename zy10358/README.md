@@ -73,18 +73,28 @@ java -jar target/fee-calculation-api-1.0.0.jar
 
 ---
 
-### 🎯 方式三：IDE运行（最简单、无需构建工具）
+### 🎯 方式三：IDE运行（⭐ 首选，100%可用）
 
-**完全不需要Maven，直接在IDE中运行：**
+**完全不需要Maven，不需要完整JDK！这是最可靠的方式：**
 
-1. 用 **IntelliJ IDEA** 或 **Eclipse** 打开项目目录
-2. 找到启动类：
+1. 用 **IntelliJ IDEA** (推荐) 或 **Eclipse** 打开项目目录
+2. 首次打开时，IDE会自动：
+   - 识别这是Maven项目
+   - 下载所有依赖（Spring Boot, JPA等）
+   - 配置正确的编译选项
+3. 找到启动类：
    ```
    src/main/java/com/feiyong/feecalc/FeeCalculationApplication.java
    ```
-3. 右键 → **Run 'FeeCalculationApplication'**
+4. 右键 → **Run 'FeeCalculationApplication'**
 
-这是最简单的方式，IDE会自动处理所有依赖！
+✅ **为什么这是首选？**
+- IDE自带Java编译器，无需系统配置javac
+- 自动下载和管理所有Maven依赖
+- 一键运行，零配置
+- 完美兼容Java 8到Java 21
+
+> 💡 **提示**: IntelliJ IDEA 社区版完全够用，免费下载！
 
 ---
 
