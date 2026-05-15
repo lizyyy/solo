@@ -1,7 +1,7 @@
 package com.schema.approval.entity;
 
 import com.schema.approval.enums.CompatibilityLevel;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

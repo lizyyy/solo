@@ -25,6 +25,8 @@ public class SchemaApprovalService {
     private final ApprovalRecordRepository approvalRecordRepository;
     private final ConsumerRepository consumerRepository;
     private final PublishRecordRepository publishRecordRepository;
+    private final CompatibilityCheckerService compatibilityCheckerService;
+    private final ConsumerNotificationRepository consumerNotificationRepository;
 
     @Transactional
     public SchemaVersion registerSchema(SchemaRegisterRequest request) {
@@ -65,39 +67,33 @@ public class SchemaApprovalService {
         schemaVersion.setUpdatedBy(operator);
         schemaVersionRepository.save(schemaVersion);
 
-        boolean checkPassed = performCompatibilityCheck(schemaVersion);
+        long startTime = System.currentTimeMillis();
+        CompatibilityCheckerService.CompatibilityCheckResult result = 
+                compatibilityCheckerService.checkCompatibility(schemaVersion);
+        long checkDuration = System.currentTimeMillis() - startTime;
 
         CompatibilityCheck checkRecord = new CompatibilityCheck();
         checkRecord.setSchemaVersion(schemaVersion);
-        checkRecord.setCheckResult(checkPassed);
-        checkRecord.setCheckDetails("Compatibility check performed at " + java.time.LocalDateTime.now());
+        checkRecord.setCheckResult(result.isCompatible());
+        checkRecord.setCheckDetails(result.getDetails());
         checkRecord.setCreatedBy(operator);
-        checkRecord.setCheckDurationMs(100L);
+        checkRecord.setCheckDurationMs(checkDuration);
         checkRecord.setCheckerService("schema-registry");
+        checkRecord.setComparedWithVersion(null);
         compatibilityCheckRepository.save(checkRecord);
 
-        if (checkPassed) {
+        if (result.isCompatible()) {
             schemaVersion.setStatus(SchemaStatus.COMPATIBILITY_CHECK_PASSED);
         } else {
             schemaVersion.setStatus(SchemaStatus.COMPATIBILITY_CHECK_FAILED);
             throw new BusinessException(
-                "Compatibility check failed",
+                result.getDetails(),
                 ErrorCode.COMPATIBILITY_CHECK_FAILED
             );
         }
 
         schemaVersion.setUpdatedBy(operator);
         return schemaVersionRepository.save(schemaVersion);
-    }
-
-    private boolean performCompatibilityCheck(SchemaVersion schemaVersion) {
-        log.info("Performing compatibility check for schema version: {}", schemaVersion.getId());
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        return true;
     }
 
     @Transactional
@@ -203,7 +199,21 @@ public class SchemaApprovalService {
         consumers.forEach(consumer -> {
             log.info("Notifying consumer: {} (service: {})",
                     consumer.getConsumerGroup(), consumer.getServiceName());
+
+            ConsumerNotification notification = new ConsumerNotification();
+            notification.setSchemaVersion(schemaVersion);
+            notification.setConsumer(consumer);
+            notification.setNotificationStatus("SENT");
+            notification.setNotificationDetails("Notification sent to consumer group: " 
+                    + consumer.getConsumerGroup() + ", service: " + consumer.getServiceName());
+            notification.setCreatedBy("system");
+            consumerNotificationRepository.save(notification);
         });
+    }
+
+    public List<ConsumerNotification> getConsumerNotificationHistory(Long schemaVersionId) {
+        SchemaVersion schemaVersion = getSchemaVersionOrThrow(schemaVersionId);
+        return consumerNotificationRepository.findBySchemaVersionOrderByCreatedAtDesc(schemaVersion);
     }
 
     public SchemaVersion getSchemaVersionOrThrow(Long schemaVersionId) {

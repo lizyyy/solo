@@ -1,9 +1,13 @@
 package com.schema.approval.controller;
 
 import com.schema.approval.dto.*;
-import com.schema.approval.entity.*;
+import com.schema.approval.entity.ApprovalRecord;
+import com.schema.approval.entity.CompatibilityCheck;
+import com.schema.approval.entity.ConsumerNotification;
+import com.schema.approval.entity.PublishRecord;
+import com.schema.approval.entity.SchemaVersion;
 import com.schema.approval.service.SchemaApprovalService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -97,6 +101,13 @@ public class SchemaApprovalController {
     public ResponseEntity<ApiResponse<List<PublishRecord>>> getPublishHistory(
             @PathVariable Long schemaVersionId) {
         List<PublishRecord> history = schemaApprovalService.getPublishHistory(schemaVersionId);
+        return ResponseEntity.ok(ApiResponse.success(history));
+    }
+
+    @GetMapping("/{schemaVersionId}/notification-history")
+    public ResponseEntity<ApiResponse<List<ConsumerNotification>>> getConsumerNotificationHistory(
+            @PathVariable Long schemaVersionId) {
+        List<ConsumerNotification> history = schemaApprovalService.getConsumerNotificationHistory(schemaVersionId);
         return ResponseEntity.ok(ApiResponse.success(history));
     }
 }

@@ -4,7 +4,7 @@ import com.schema.approval.dto.ApiResponse;
 import com.schema.approval.dto.TopicCreateRequest;
 import com.schema.approval.entity.EventTopic;
 import com.schema.approval.service.EventTopicService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

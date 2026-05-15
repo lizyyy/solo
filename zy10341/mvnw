@@ -1,0 +1,26 @@
+#!/bin/sh
+# Maven Wrapper bootstrap script
+set -e
+
+PRG="$0"
+while [ -h "$PRG" ] ; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+
+PRGDIR=`dirname "$PRG"`
+[ -z "$MAVEN_PROJECTBASEDIR" ] && MAVEN_PROJECTBASEDIR=`cd "$PRGDIR" > /dev/null; pwd`
+
+WRAPPER_JAR="$PRGDIR/.mvn/wrapper/maven-wrapper.jar"
+if [ -n "$MAVEN_WRAPPER_JAR" ]; then
+  WRAPPER_JAR="$MAVEN_WRAPPER_JAR"
+fi
+
+MAVEN_OPTS=" -Xmx1024m -XX:MaxPermSize=256m $MAVEN_OPTS"
+
+java $MAVEN_OPTS -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"
