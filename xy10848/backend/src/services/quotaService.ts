@@ -1,0 +1,341 @@
+import { v4 as uuidv4 } from 'uuid';
+import { getDb } from '../database';
+import { CreateGenerationRequest, GenerationRequest, QuotaPackage, FailureCredit } from '../types';
+
+export class QuotaService {
+  async findAvailablePackage(memberId: string, projectId: string, quotaNeeded: number): Promise<QuotaPackage | null> {
+    const db = await getDb();
+    const now = Date.now();
+    
+    const pkg = await db.get<QuotaPackage>(
+      `SELECT * FROM quota_packages 
+       WHERE member_id = ? 
+         AND (project_id IS NULL OR project_id = ?)
+         AND status = 'active'
+         AND remaining_quota >= ?
+         AND valid_from <= ?
+         AND valid_to >= ?
+       ORDER BY valid_to ASC, remaining_quota ASC
+       LIMIT 1`,
+      [memberId, projectId, quotaNeeded, now, now]
+    );
+    
+    return pkg || null;
+  }
+
+  async getRequestByIdempotencyKey(key: string): Promise<GenerationRequest | null> {
+    const db = await getDb();
+    const request = await db.get<GenerationRequest>(
+      'SELECT * FROM generation_requests WHERE idempotency_key = ?',
+      [key]
+    );
+    return request || null;
+  }
+
+  async createGenerationRequest(data: CreateGenerationRequest): Promise<{ success: boolean; request?: GenerationRequest; error?: string }> {
+    const db = await getDb();
+    
+    const existingRequest = await this.getRequestByIdempotencyKey(data.idempotency_key);
+    if (existingRequest) {
+      return { success: true, request: existingRequest };
+    }
+
+    const pkg = await this.findAvailablePackage(data.member_id, data.project_id, data.quota_amount);
+    if (!pkg) {
+      return { success: false, error: '可用额度不足或无有效额度包' };
+    }
+
+    const now = Date.now();
+    const requestId = uuidv4();
+
+    try {
+      await db.run('BEGIN TRANSACTION');
+
+      const newRemaining = pkg.remaining_quota - data.quota_amount;
+      const newStatus = newRemaining <= 0 ? 'depleted' : 'active';
+      
+      await db.run(
+        `UPDATE quota_packages 
+         SET remaining_quota = ?, status = ?, updated_at = ?
+         WHERE id = ?`,
+        [newRemaining, newStatus, now, pkg.id]
+      );
+
+      await db.run(
+        `INSERT INTO generation_requests (
+          id, idempotency_key, member_id, project_id, quota_package_id,
+          quota_consumed, prompt, status, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          requestId, data.idempotency_key, data.member_id, data.project_id, pkg.id,
+          data.quota_amount, data.prompt, 'processing', now, now
+        ]
+      );
+
+      await this.updateMonthlySummary(db, data.member_id, data.project_id, {
+        total_requests: 1,
+        quota_consumed: data.quota_amount,
+        net_quota_used: data.quota_amount
+      });
+
+      await db.run('COMMIT');
+
+      const request = await db.get<GenerationRequest>(
+        'SELECT * FROM generation_requests WHERE id = ?',
+        [requestId]
+      );
+
+      return { success: true, request: request! };
+    } catch (error) {
+      await db.run('ROLLBACK');
+      throw error;
+    }
+  }
+
+  async completeRequest(requestId: string): Promise<{ success: boolean; request?: GenerationRequest; error?: string }> {
+    const db = await getDb();
+    const now = Date.now();
+
+    const request = await db.get<GenerationRequest>(
+      'SELECT * FROM generation_requests WHERE id = ?',
+      [requestId]
+    );
+
+    if (!request) {
+      return { success: false, error: '请求不存在' };
+    }
+
+    if (request.status !== 'processing') {
+      return { success: true, request };
+    }
+
+    await db.run(
+      `UPDATE generation_requests 
+       SET status = 'completed', completed_at = ?, updated_at = ?
+       WHERE id = ?`,
+      [now, now, requestId]
+    );
+
+    await this.updateMonthlySummary(db, request.member_id, request.project_id, {
+      successful_requests: 1
+    });
+
+    const updatedRequest = await db.get<GenerationRequest>(
+      'SELECT * FROM generation_requests WHERE id = ?',
+      [requestId]
+    );
+
+    return { success: true, request: updatedRequest! };
+  }
+
+  async failRequest(requestId: string, errorMessage: string): Promise<{ success: boolean; request?: GenerationRequest; credit?: FailureCredit; error?: string }> {
+    const db = await getDb();
+    const now = Date.now();
+
+    const request = await db.get<GenerationRequest>(
+      'SELECT * FROM generation_requests WHERE id = ?',
+      [requestId]
+    );
+
+    if (!request) {
+      return { success: false, error: '请求不存在' };
+    }
+
+    if (request.status === 'failed' || request.status === 'refunded') {
+      return { success: true, request };
+    }
+
+    try {
+      await db.run('BEGIN TRANSACTION');
+
+      await db.run(
+        `UPDATE generation_requests 
+         SET status = 'failed', error_message = ?, updated_at = ?
+         WHERE id = ?`,
+        [errorMessage, now, requestId]
+      );
+
+      const creditId = uuidv4();
+      await db.run(
+        `INSERT INTO failure_credits (
+          id, request_id, member_id, quota_package_id, quota_returned,
+          reason, status, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          creditId, requestId, request.member_id, request.quota_package_id,
+          request.quota_consumed, errorMessage, 'pending', now
+        ]
+      );
+
+      await this.updateMonthlySummary(db, request.member_id, request.project_id, {
+        failed_requests: 1
+      });
+
+      await db.run('COMMIT');
+
+      const updatedRequest = await db.get<GenerationRequest>(
+        'SELECT * FROM generation_requests WHERE id = ?',
+        [requestId]
+      );
+      const credit = await db.get<FailureCredit>(
+        'SELECT * FROM failure_credits WHERE id = ?',
+        [creditId]
+      );
+
+      return { success: true, request: updatedRequest!, credit: credit! };
+    } catch (error) {
+      await db.run('ROLLBACK');
+      throw error;
+    }
+  }
+
+  async reviewCredit(creditId: string, status: 'approved' | 'rejected', reviewedBy: string, reviewNote?: string): Promise<{ success: boolean; credit?: FailureCredit; error?: string }> {
+    const db = await getDb();
+    const now = Date.now();
+
+    const credit = await db.get<FailureCredit>(
+      'SELECT * FROM failure_credits WHERE id = ?',
+      [creditId]
+    );
+
+    if (!credit) {
+      return { success: false, error: '退费记录不存在' };
+    }
+
+    if (credit.status !== 'pending') {
+      return { success: true, credit };
+    }
+
+    try {
+      await db.run('BEGIN TRANSACTION');
+
+      await db.run(
+        `UPDATE failure_credits 
+         SET status = ?, reviewed_by = ?, review_note = ?, reviewed_at = ?
+         WHERE id = ?`,
+        [status, reviewedBy, reviewNote || null, now, creditId]
+      );
+
+      if (status === 'approved') {
+        await db.run(
+          `UPDATE quota_packages 
+           SET remaining_quota = remaining_quota + ?, status = 'active', updated_at = ?
+           WHERE id = ?`,
+          [credit.quota_returned, now, credit.quota_package_id]
+        );
+
+        await db.run(
+          `UPDATE generation_requests 
+           SET status = 'refunded', updated_at = ?
+           WHERE id = ?`,
+          [now, credit.request_id]
+        );
+
+        await this.updateMonthlySummary(db, credit.member_id, undefined, {
+          quota_returned: credit.quota_returned,
+          net_quota_used: -credit.quota_returned
+        });
+      }
+
+      await db.run('COMMIT');
+
+      const updatedCredit = await db.get<FailureCredit>(
+        'SELECT * FROM failure_credits WHERE id = ?',
+        [creditId]
+      );
+
+      return { success: true, credit: updatedCredit! };
+    } catch (error) {
+      await db.run('ROLLBACK');
+      throw error;
+    }
+  }
+
+  private async updateMonthlySummary(db: any, memberId: string, projectId: string | undefined, increments: {
+    total_requests?: number;
+    successful_requests?: number;
+    failed_requests?: number;
+    quota_consumed?: number;
+    quota_returned?: number;
+    net_quota_used?: number;
+  }) {
+    const now = Date.now();
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+
+    const existing = await db.get(
+      `SELECT id FROM monthly_summaries 
+       WHERE member_id = ? AND (project_id = ? OR (project_id IS NULL AND ? IS NULL)) 
+         AND year = ? AND month = ?`,
+      [memberId, projectId, projectId, year, month]
+    );
+
+    if (existing) {
+      const updates: string[] = [];
+      const params: any[] = [];
+      
+      for (const [key, value] of Object.entries(increments)) {
+        if (value !== undefined) {
+          updates.push(`${key} = ${key} + ?`);
+          params.push(value);
+        }
+      }
+      updates.push('updated_at = ?');
+      params.push(now, existing.id);
+
+      await db.run(
+        `UPDATE monthly_summaries SET ${updates.join(', ')} WHERE id = ?`,
+        params
+      );
+    } else {
+      await db.run(
+        `INSERT INTO monthly_summaries (
+          id, member_id, project_id, year, month,
+          total_requests, successful_requests, failed_requests,
+          quota_consumed, quota_returned, net_quota_used,
+          created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          uuidv4(), memberId, projectId || null, year, month,
+          increments.total_requests || 0,
+          increments.successful_requests || 0,
+          increments.failed_requests || 0,
+          increments.quota_consumed || 0,
+          increments.quota_returned || 0,
+          increments.net_quota_used || 0,
+          now, now
+        ]
+      );
+    }
+  }
+
+  async getRequestWithHistory(requestId: string): Promise<any> {
+    const db = await getDb();
+    
+    const request = await db.get<GenerationRequest>(
+      'SELECT * FROM generation_requests WHERE id = ?',
+      [requestId]
+    );
+
+    if (!request) return null;
+
+    const credit = await db.get<FailureCredit>(
+      'SELECT * FROM failure_credits WHERE request_id = ?',
+      [requestId]
+    );
+
+    const pkg = await db.get<QuotaPackage>(
+      'SELECT * FROM quota_packages WHERE id = ?',
+      [request.quota_package_id]
+    );
+
+    return {
+      request,
+      credit,
+      quota_package: pkg
+    };
+  }
+}
+
+export const quotaService = new QuotaService();
