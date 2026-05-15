@@ -1,13 +1,15 @@
 # 文件病毒扫描编排 API
 
-基于 Spring Boot 3.x 的本地后端服务，用于管理文件病毒扫描任务的编排、状态跟踪和隔离管理。
+基于 Spring Boot 2.7.x 的本地后端服务，用于管理文件病毒扫描任务的编排、状态跟踪和隔离管理。
+
+**兼容 Java 8+**
 
 ## 技术栈
 
-- **框架**: Spring Boot 3.2.x
+- **框架**: Spring Boot 2.7.18 (兼容 Java 8)
 - **数据库**: H2 (嵌入式，持久化存储)
 - **ORM**: Spring Data JPA
-- **校验**: Jakarta Validation
+- **校验**: Java Validation
 - **测试**: JUnit 5
 
 ## 核心数据模型
@@ -77,50 +79,59 @@ PENDING → SCANNING → CLEAN
 
 ## 快速开始
 
-### 构建项目
+### 环境要求
+
+- Java 8 或更高版本（已测试通过 Java 8）
+
+### 一键启动服务（推荐）
 
 ```bash
-mvn clean package -DskipTests
+./start.sh
 ```
 
-### 启动服务
-
-```bash
-mvn spring-boot:run
-```
-
-服务启动后访问:
-- API 地址: http://localhost:8080/api
-- H2 控制台: http://localhost:8080/h2-console
-  - JDBC URL: jdbc:h2:file:./data/virus_scan_db
-  - 用户名: sa
-  - 密码: (空)
+脚本会自动：
+1. 使用 Maven Wrapper 构建项目（首次运行自动下载依赖）
+2. 启动 Spring Boot 服务
 
 ### 运行单元测试
 
 ```bash
-mvn test
+./test.sh
 ```
 
-### 运行自检脚本 (API 集成测试)
-
-先启动服务，然后执行:
+### 运行 API 自检脚本（需要先启动服务）
 
 ```bash
+# 先在一个终端启动服务
+./start.sh
+
+# 在另一个终端运行自检脚本
 ./self-check.sh
 ```
 
-自检脚本覆盖以下场景:
-- ✓ 创建扫描任务
-- ✓ 重复提交防脏数据（相同 requestId）
-- ✓ 同一文件多活跃任务检查
-- ✓ 状态推进 PENDING → SCANNING → INFECTED → QUARANTINED
-- ✓ 非法状态转换检测
-- ✓ 查询任务详情
-- ✓ 查询统计信息
-- ✓ 查询隔离文件列表
-- ✓ 放行隔离文件
-- ✓ 脏数据测试（查询不存在的任务）
+### 服务地址
+
+启动后访问：
+- API 地址: http://localhost:8080/api
+- H2 控制台: http://localhost:8080/h2-console
+  - JDBC URL: `jdbc:h2:file:./data/virus_scan_db`
+  - 用户名: `sa`
+  - 密码: (空)
+
+### 使用 Maven Wrapper
+
+如果需要直接使用 Maven 命令：
+
+```bash
+# 构建项目
+./mvnw clean package -DskipTests
+
+# 启动服务
+./mvnw spring-boot:run
+
+# 运行测试
+./mvnw test
+```
 
 ## API 示例
 
@@ -171,26 +182,35 @@ curl -X POST http://localhost:8080/api/quarantines/release \
 ## 项目结构
 
 ```
-src/
-├── main/
-│   ├── java/com/virusscan/
-│   │   ├── controller/        # REST 控制器
-│   │   ├── dto/              # 数据传输对象
-│   │   ├── entity/           # JPA 实体
-│   │   ├── enums/            # 枚举类型
-│   │   ├── exception/        # 异常处理
-│   │   ├── repository/       # 数据访问层
-│   │   ├── service/          # 业务逻辑层
-│   │   └── VirusScanApplication.java
-│   └── resources/
-│       └── application.yml   # 配置文件
-└── test/
-    └── java/com/virusscan/   # 单元测试
+├── mvnw                          # Maven Wrapper 脚本
+├── .mvn/wrapper/
+│   └── maven-wrapper.properties  # Maven Wrapper 配置
+├── start.sh                      # 一键启动脚本
+├── test.sh                       # 单元测试脚本
+├── self-check.sh                 # API 自检脚本
+├── pom.xml                       # Maven 配置
+├── build.gradle                  # Gradle 配置
+├── src/
+│   ├── main/
+│   │   ├── java/com/virusscan/
+│   │   │   ├── controller/       # REST 控制器
+│   │   │   ├── dto/             # 数据传输对象
+│   │   │   ├── entity/          # JPA 实体
+│   │   │   ├── enums/           # 枚举类型
+│   │   │   ├── exception/       # 异常处理
+│   │   │   ├── repository/      # 数据访问层
+│   │   │   ├── service/         # 业务逻辑层
+│   │   │   └── VirusScanApplication.java
+│   │   └── resources/
+│   │       └── application.yml   # 配置文件
+│   └── test/
+│       └── java/com/virusscan/  # 单元测试
+└── data/                         # H2 数据库文件（运行后生成）
 ```
 
 ## 配置说明
 
-主要配置项 (application.yml):
+主要配置项 (`application.yml`):
 
 ```yaml
 spring:
@@ -208,7 +228,16 @@ server:
 
 ## 注意事项
 
-1. **数据库**: 默认使用 H2 嵌入式数据库，数据文件存储在 ./data/ 目录
-2. **重试机制**: 任务失败后会自动重置为 PENDING 状态等待重试，直到达到 maxRetry
+1. **数据库**: 默认使用 H2 嵌入式数据库，数据文件存储在 `./data/` 目录
+2. **重试机制**: 任务失败后会自动重置为 PENDING 状态等待重试，直到达到最大重试次数
 3. **通知机制**: 任务状态变更时如果配置了 callbackUrl 会创建通知记录（可扩展实际发送逻辑）
 4. **幂等性**: 创建任务时建议传入 requestId 确保幂等
+
+## 异常返回说明
+
+| HTTP 状态码 | 场景 |
+|------------|------|
+| 404 | 任务不存在、文件不存在等 |
+| 409 | 状态转换冲突、同一文件有活跃任务等 |
+| 400 | 参数校验失败、非法请求等 |
+| 500 | 系统内部错误 |
