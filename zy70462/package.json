@@ -1,0 +1,25 @@
+{
+  "name": "log-desensitization-validator",
+  "version": "1.0.0",
+  "description": "日志脱敏验证命令行工具",
+  "main": "src/cli.js",
+  "bin": {
+    "log-validator": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node tests/test.js"
+  },
+  "keywords": ["log", "desensitization", "validator", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "crypto-js": "^4.2.0",
+    "inquirer": "^8.2.6",
+    "ora": "^5.4.1"
+  }
+}

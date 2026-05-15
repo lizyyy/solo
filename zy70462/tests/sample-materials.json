@@ -1,0 +1,26 @@
+[
+  {
+    "fileName": "灰度夜间巡检_用户信息.csv",
+    "content": "用户ID,姓名,手机号,邮箱\n1,张三,138******00,zhang***@example.com\n2,李四,139******00,li***@example.com",
+    "materialType": "user_data",
+    "downloadUrl": "https://example.com/download?token=valid_12345"
+  },
+  {
+    "fileName": "灰度夜间巡检_订单日志.log",
+    "content": "2024-01-15 10:00:00 INFO 订单号:ORD001 金额:100.00\n2024-01-15 10:00:01 INFO 订单号:ORD002 金额:200.00",
+    "materialType": "order_log",
+    "downloadUrl": "https://example.com/download?token=expired_67890"
+  },
+  {
+    "fileName": "灰度夜间巡检_财务结转表_2024Q1.xlsx",
+    "content": "报表期间: 2024年第一季度\n总收入: 10,000,000.00\n总支出: 6,000,000.00\n净利润: 4,000,000.00",
+    "materialType": "财务结转表",
+    "downloadUrl": "https://example.com/download?token=finance_2024q1"
+  },
+  {
+    "fileName": "灰度夜间巡检_敏感数据.txt",
+    "content": "姓名: 王五 身份证: 110101199001011234 银行卡: 6222021234567890123\n姓名: 赵六 身份证: 310101199002025678 手机号: 13812345678",
+    "materialType": "sensitive",
+    "downloadUrl": "https://example.com/download?token=sensitive_001"
+  }
+]
