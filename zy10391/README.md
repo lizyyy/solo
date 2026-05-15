@@ -1,11 +1,11 @@
 # 多源身份校验 API
 
-基于 Spring Boot 3.2 的多源身份校验系统，支持多数据源身份核验、冲突检测、可信评分及人工确认流程。
+基于 Spring Boot 2.7 的多源身份校验系统，支持多数据源身份核验、冲突检测、可信评分及人工确认流程。
 
 ## 技术栈
 
-- Java 17
-- Spring Boot 3.2
+- Java 8+ (JDK 1.8)
+- Spring Boot 2.7.x
 - Spring Data JPA
 - H2 Database (内存数据库)
 - Lombok
@@ -17,6 +17,7 @@
 - 支持多个身份数据源同时校验
 - 自动检测字段级冲突
 - 基于数据源权重计算可信评分
+- 字段值为空时自动处理，避免空指针异常
 
 ### 2. 可信评分
 - 每个数据源可配置信任权重 (0-100)
@@ -31,6 +32,7 @@
 ### 4. 幂等性保证
 - 基于 requestId 进行重复请求拦截
 - 重复请求直接返回已有结果，不产生脏数据
+- 重复请求返回 HTTP 409 Conflict 状态码
 
 ### 5. 导出功能
 - 支持校验结果 JSON 导出
@@ -39,13 +41,13 @@
 ## 启动方式
 
 ### 环境要求
-- JDK 17+
-- Maven 3.6+
+- JDK 8+ (推荐 JDK 1.8)
+- Maven 3.6+ (系统已安装)
 
 ### 编译运行
 ```bash
 # 编译项目
-mvn clean package
+mvn clean package -DskipTests
 
 # 运行应用
 java -jar target/multi-source-identity-verification-1.0.0.jar
@@ -55,6 +57,11 @@ java -jar target/multi-source-identity-verification-1.0.0.jar
 ```bash
 mvn spring-boot:run
 ```
+
+### 注意事项
+- 如果系统没有 `mvn` 命令，请先安装 Apache Maven 3.6+
+- 当前项目使用系统已安装的 Maven，无需 Maven Wrapper
+- 确保 JAVA_HOME 环境变量指向 JDK 8 或更高版本
 
 ### 访问地址
 - 应用端口: http://localhost:8080
@@ -173,8 +180,14 @@ GET /api/export/{taskId}/excel
 **行为**:
 - 不创建新的校验任务（避免脏数据）
 - 直接返回已有的校验结果
-- 响应状态码: 409 Conflict
+- HTTP 状态码: 409 Conflict
+- 业务响应 body 中的 code: 409
 - 响应消息: "重复请求，已返回已有结果"
+
+**实现机制**:
+- Controller 层返回 `ResponseEntity<ApiResponse<T>>`
+- Service 层调用 `ApiResponse.duplicateRequestEntity(data)` 返回正确的 HTTP 状态
+- 确保重复请求不会产生任何副作用
 
 **设计意图**:
 - 保证接口幂等性
@@ -183,8 +196,8 @@ GET /api/export/{taskId}/excel
 
 **示例**:
 ```
-第一次请求 requestId = "REQ-001" → 创建新任务，返回200
-第二次请求 requestId = "REQ-001" → 拦截，返回409和已有结果
+第一次请求 requestId = "REQ-001" → 创建新任务，HTTP 200 OK，业务 code 200
+第二次请求 requestId = "REQ-001" → 拦截，HTTP 409 Conflict，业务 code 409，返回已有结果
 数据库中始终只有一条记录
 ```
 

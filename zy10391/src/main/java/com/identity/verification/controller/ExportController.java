@@ -1,11 +1,14 @@
 package com.identity.verification.controller;
 
+import com.identity.verification.dto.ApiResponse;
 import com.identity.verification.service.ExportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/export")
@@ -15,8 +18,8 @@ public class ExportController {
     private final ExportService exportService;
 
     @GetMapping("/{taskId}/data")
-    public ResponseEntity<?> getExportData(@PathVariable Long taskId) {
-        return ResponseEntity.ok(exportService.getExportData(taskId));
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getExportData(@PathVariable Long taskId) {
+        return exportService.getExportData(taskId);
     }
 
     @GetMapping("/{taskId}/excel")

@@ -2,7 +2,7 @@ package com.identity.verification.model;
 
 import com.identity.verification.model.enums.TrustLevel;
 import com.identity.verification.model.enums.VerificationStatus;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 

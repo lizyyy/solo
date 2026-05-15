@@ -7,6 +7,7 @@ import com.identity.verification.model.enums.VerificationStatus;
 import com.identity.verification.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +28,10 @@ public class VerificationService {
     private final ConfirmationRecordRepository confirmationRepository;
 
     @Transactional
-    public ApiResponse<VerificationResult> createVerification(CreateVerificationRequest request) {
+    public ResponseEntity<ApiResponse<VerificationResult>> createVerification(CreateVerificationRequest request) {
         if (taskRepository.existsByRequestId(request.getRequestId())) {
             VerificationTask existingTask = taskRepository.findByRequestId(request.getRequestId()).orElseThrow();
-            return ApiResponse.duplicateRequest(buildResult(existingTask));
+            return ApiResponse.duplicateRequestEntity(buildResult(existingTask));
         }
 
         VerificationTask task = new VerificationTask();
@@ -59,7 +60,7 @@ public class VerificationService {
 
         performMultiSourceVerification(task, identifiers);
 
-        return ApiResponse.success("校验任务创建成功", buildResult(task));
+        return ApiResponse.successEntity("校验任务创建成功", buildResult(task));
     }
 
     private void performMultiSourceVerification(VerificationTask task, List<PersonIdentifier> identifiers) {
@@ -119,15 +120,30 @@ public class VerificationService {
     }
 
     private String getFieldValue(PersonIdentifier identifier, String field) {
-        return switch (field) {
-            case "name" -> identifier.getName();
-            case "gender" -> identifier.getGender();
-            case "birthDate" -> identifier.getBirthDate();
-            case "address" -> identifier.getAddress();
-            case "phoneNumber" -> identifier.getPhoneNumber();
-            case "email" -> identifier.getEmail();
-            default -> "";
-        };
+        String value;
+        switch (field) {
+            case "name":
+                value = identifier.getName();
+                break;
+            case "gender":
+                value = identifier.getGender();
+                break;
+            case "birthDate":
+                value = identifier.getBirthDate();
+                break;
+            case "address":
+                value = identifier.getAddress();
+                break;
+            case "phoneNumber":
+                value = identifier.getPhoneNumber();
+                break;
+            case "email":
+                value = identifier.getEmail();
+                break;
+            default:
+                value = "";
+        }
+        return value != null ? value : "";
     }
 
     private ConflictField createConflict(Long taskId, String fieldName, Map<String, List<PersonIdentifier>> valueGroups) {
@@ -191,25 +207,25 @@ public class VerificationService {
         return source;
     }
 
-    public ApiResponse<VerificationResult> getVerification(Long taskId) {
+    public ResponseEntity<ApiResponse<VerificationResult>> getVerification(Long taskId) {
         VerificationTask task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("校验任务不存在"));
-        return ApiResponse.success(buildResult(task));
+        return ApiResponse.successEntity(buildResult(task));
     }
 
-    public ApiResponse<VerificationResult> getVerificationByRequestId(String requestId) {
+    public ResponseEntity<ApiResponse<VerificationResult>> getVerificationByRequestId(String requestId) {
         VerificationTask task = taskRepository.findByRequestId(requestId)
                 .orElseThrow(() -> new RuntimeException("校验任务不存在"));
-        return ApiResponse.success(buildResult(task));
+        return ApiResponse.successEntity(buildResult(task));
     }
 
     @Transactional
-    public ApiResponse<VerificationResult> advanceVerification(Long taskId, AdvanceRequest request) {
+    public ResponseEntity<ApiResponse<VerificationResult>> advanceVerification(Long taskId, AdvanceRequest request) {
         VerificationTask task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("校验任务不存在"));
 
         if (task.getStatus() != VerificationStatus.PENDING_CONFIRM) {
-            return ApiResponse.error(400, "当前状态不允许推进操作");
+            return ApiResponse.errorEntity(400, "当前状态不允许推进操作");
         }
 
         List<ConflictField> unresolvedConflicts = conflictRepository.findByTaskIdAndResolved(taskId, false);
@@ -246,11 +262,11 @@ public class VerificationService {
         }
 
         taskRepository.save(task);
-        return ApiResponse.success("校验任务已推进", buildResult(task));
+        return ApiResponse.successEntity("校验任务已推进", buildResult(task));
     }
 
     @Transactional
-    public ApiResponse<VerificationResult> revokeVerification(Long taskId, String reason) {
+    public ResponseEntity<ApiResponse<VerificationResult>> revokeVerification(Long taskId, String reason) {
         VerificationTask task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("校验任务不存在"));
 
@@ -258,20 +274,20 @@ public class VerificationService {
         task.setDescription(task.getDescription() + " [撤销原因: " + reason + "]");
         taskRepository.save(task);
 
-        return ApiResponse.success("校验任务已撤销", buildResult(task));
+        return ApiResponse.successEntity("校验任务已撤销", buildResult(task));
     }
 
-    public ApiResponse<List<VerificationTask>> listTasks(String status) {
+    public ResponseEntity<ApiResponse<List<VerificationTask>>> listTasks(String status) {
         List<VerificationTask> tasks;
         if (status != null && !status.isEmpty()) {
             tasks = taskRepository.findByStatus(VerificationStatus.valueOf(status));
         } else {
             tasks = taskRepository.findAll();
         }
-        return ApiResponse.success(tasks);
+        return ApiResponse.successEntity(tasks);
     }
 
-    public ApiResponse<List<VerificationHistory>> getHistory(Long taskId) {
+    public ResponseEntity<ApiResponse<List<VerificationHistory>>> getHistory(Long taskId) {
         List<ConfirmationRecord> records = confirmationRepository.findByTaskId(taskId);
         List<VerificationHistory> history = records.stream()
                 .map(r -> {
@@ -285,7 +301,7 @@ public class VerificationService {
                     return h;
                 })
                 .collect(Collectors.toList());
-        return ApiResponse.success(history);
+        return ApiResponse.successEntity(history);
     }
 
     private VerificationResult buildResult(VerificationTask task) {

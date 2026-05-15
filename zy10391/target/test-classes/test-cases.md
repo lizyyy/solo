@@ -146,7 +146,11 @@ Content-Type: application/json
       "idType": "ID_CARD",
       "idValue": "110101199001011234",
       "name": "王五",
-      "gender": "男"
+      "gender": "男",
+      "birthDate": "1990-01-01",
+      "address": "北京市朝阳区xxx路xxx号",
+      "phoneNumber": "13800138000",
+      "email": "wangwu@example.com"
     }
   ]
 }
@@ -168,15 +172,21 @@ Content-Type: application/json
       "idType": "ID_CARD",
       "idValue": "110101199001011234",
       "name": "王五",
-      "gender": "男"
+      "gender": "男",
+      "birthDate": "1990-01-01",
+      "address": "北京市朝阳区xxx路xxx号",
+      "phoneNumber": "13800138000",
+      "email": "wangwu@example.com"
     }
   ]
 }
 ```
 
 ### 预期结果
-- 第一次请求: 状态码 200，创建新任务
-- 第二次请求: 状态码 409，返回已有结果，提示"重复请求，已返回已有结果"
+- 第一次请求: HTTP状态码 200，创建新任务，业务code 200
+- 第二次请求: HTTP状态码 409，返回已有结果，业务code 409，提示"重复请求，已返回已有结果"
+- 数据库中始终只有一条记录
+- 重复请求不会产生脏数据
 - 数据库中只创建一条记录
 
 ---

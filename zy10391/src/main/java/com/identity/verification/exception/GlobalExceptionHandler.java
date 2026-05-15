@@ -2,11 +2,11 @@ package com.identity.verification.exception;
 
 import com.identity.verification.dto.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import javax.validation.FieldError;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
@@ -17,28 +17,25 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiResponse<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return ApiResponse.error(400, "参数校验失败");
+        return ApiResponse.errorEntity(400, "参数校验失败");
     }
 
     @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiResponse<String> handleRuntimeException(RuntimeException ex) {
+    public ResponseEntity<ApiResponse<String>> handleRuntimeException(RuntimeException ex) {
         log.error("系统异常: ", ex);
-        return ApiResponse.error(500, ex.getMessage());
+        return ApiResponse.errorEntity(500, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiResponse<String> handleException(Exception ex) {
+    public ResponseEntity<ApiResponse<String>> handleException(Exception ex) {
         log.error("系统异常: ", ex);
-        return ApiResponse.error(500, "系统内部错误");
+        return ApiResponse.errorEntity(500, "系统内部错误");
     }
 }

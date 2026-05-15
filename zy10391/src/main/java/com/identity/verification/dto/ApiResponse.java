@@ -1,6 +1,9 @@
 package com.identity.verification.dto;
 
 import lombok.Data;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -44,5 +47,21 @@ public class ApiResponse<T> {
         response.setTimestamp(LocalDateTime.now());
         response.setSuccess(true);
         return response;
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> successEntity(T data) {
+        return ResponseEntity.ok(success(data));
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> successEntity(String message, T data) {
+        return ResponseEntity.ok(success(message, data));
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> errorEntity(Integer code, String message) {
+        return ResponseEntity.status(HttpStatus.valueOf(code)).body(error(code, message));
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> duplicateRequestEntity(T data) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateRequest(data));
     }
 }

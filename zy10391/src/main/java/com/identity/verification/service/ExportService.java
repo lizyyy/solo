@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -25,7 +26,7 @@ public class ExportService {
     private final MergeSuggestionRepository suggestionRepository;
     private final ConfirmationRecordRepository confirmationRepository;
 
-    public ApiResponse<Map<String, Object>> getExportData(Long taskId) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getExportData(Long taskId) {
         VerificationTask task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("校验任务不存在"));
 
@@ -36,7 +37,7 @@ public class ExportService {
         exportData.put("suggestions", suggestionRepository.findByTaskId(taskId));
         exportData.put("confirmations", confirmationRepository.findByTaskId(taskId));
 
-        return ApiResponse.success(exportData);
+        return ApiResponse.successEntity(exportData);
     }
 
     public byte[] exportToExcel(Long taskId) throws Exception {
