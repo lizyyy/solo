@@ -220,6 +220,103 @@
         </div>
 
         <div class="card">
+            <h2>⚙️ 管理 API (CRUD)</h2>
+            
+            <h3 style="margin: 20px 0 10px 0; color: #333;">📋 用户令牌管理</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/api/admin/user-tokens</span>
+                <div class="description">创建用户令牌</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/admin/user-tokens</span>
+                <div class="description">查询所有用户令牌</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/admin/user-tokens/{id}</span>
+                <div class="description">查询指定用户令牌</div>
+            </div>
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <span class="path">/api/admin/user-tokens/{id}</span>
+                <div class="description">更新用户令牌</div>
+            </div>
+            <div class="endpoint">
+                <span class="method delete">DELETE</span>
+                <span class="path">/api/admin/user-tokens/{id}</span>
+                <div class="description">删除用户令牌</div>
+            </div>
+
+            <h3 style="margin: 20px 0 10px 0; color: #333;">🔧 服务身份管理</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/api/admin/services</span>
+                <div class="description">创建服务身份</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/admin/services</span>
+                <div class="description">查询所有服务身份</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/admin/services/{serviceId}</span>
+                <div class="description">查询指定服务</div>
+            </div>
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <span class="path">/api/admin/services/{serviceId}</span>
+                <div class="description">更新服务身份</div>
+            </div>
+            <div class="endpoint">
+                <span class="method delete">DELETE</span>
+                <span class="path">/api/admin/services/{serviceId}</span>
+                <div class="description">删除服务身份</div>
+            </div>
+
+            <h3 style="margin: 20px 0 10px 0; color: #333;">🎬 交换场景管理</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/api/admin/scenarios</span>
+                <div class="description">创建交换场景</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/admin/scenarios</span>
+                <div class="description">查询所有交换场景</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/admin/scenarios/{scenarioCode}</span>
+                <div class="description">查询指定场景</div>
+            </div>
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <span class="path">/api/admin/scenarios/{scenarioCode}</span>
+                <div class="description">更新交换场景</div>
+            </div>
+            <div class="endpoint">
+                <span class="method delete">DELETE</span>
+                <span class="path">/api/admin/scenarios/{scenarioCode}</span>
+                <div class="description">删除交换场景</div>
+            </div>
+
+            <h3 style="margin: 20px 0 10px 0; color: #333;">🎫 短期令牌查询</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/admin/short-tokens</span>
+                <div class="description">查询所有短期令牌</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/admin/short-tokens/user/{userId}</span>
+                <div class="description">查询用户的短期令牌</div>
+            </div>
+        </div>
+
+        <div class="card">
             <h2>🛠️ 数据模型</h2>
             <div class="info-grid">
                 <div class="info-item">
