@@ -14,11 +14,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -39,6 +44,32 @@ public class RotationService {
         validateTenant(request.getTenantId());
         validateKeys(request.getTenantId(), request.getSourceKeyId(), request.getTargetKeyId());
 
+        String dataSignature = generateDataSignature(request.getDataIdentifiers());
+        
+        Set<RotationStatus> activeStatuses = Set.of(
+            RotationStatus.PENDING,
+            RotationStatus.VALIDATING,
+            RotationStatus.IN_PROGRESS,
+            RotationStatus.PARTIAL_SUCCESS,
+            RotationStatus.VERIFYING
+        );
+        
+        RotationBatch existingBatch = batchRepository
+            .findByTenantIdAndSourceKeyIdAndTargetKeyIdAndDataSignatureAndStatusIn(
+                request.getTenantId(),
+                request.getSourceKeyId(),
+                request.getTargetKeyId(),
+                dataSignature,
+                activeStatuses
+            )
+            .orElse(null);
+            
+        if (existingBatch != null) {
+            log.warn("检测到重复提交：租户{}、源密钥{}、目标密钥{}、相同数据标识的批次已存在，返回已有批次: {}",
+                request.getTenantId(), request.getSourceKeyId(), request.getTargetKeyId(), existingBatch.getBatchNumber());
+            return existingBatch;
+        }
+
         String batchNumber = generateBatchNumber();
         
         if (batchRepository.existsByBatchNumber(batchNumber)) {
@@ -53,6 +84,7 @@ public class RotationService {
         batch.setCreatedBy(request.getCreatedBy());
         batch.setReason(request.getReason());
         batch.setTotalTaskCount(request.getDataIdentifiers().size());
+        batch.setDataSignature(dataSignature);
         batch = batchRepository.save(batch);
 
         for (String dataIdentifier : request.getDataIdentifiers()) {
@@ -70,6 +102,29 @@ public class RotationService {
 
         log.info("创建轮换批次成功: {}, 任务数: {}", batchNumber, request.getDataIdentifiers().size());
         return batch;
+    }
+    
+    private String generateDataSignature(List<String> dataIdentifiers) {
+        try {
+            List<String> sortedIdentifiers = new java.util.ArrayList<>(dataIdentifiers);
+            Collections.sort(sortedIdentifiers);
+            String content = String.join(",", sortedIdentifiers);
+            
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(content.getBytes(StandardCharsets.UTF_8));
+            
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RotationException("SIGNATURE_ERROR", "生成数据签名失败: " + e.getMessage());
+        }
     }
 
     @Transactional

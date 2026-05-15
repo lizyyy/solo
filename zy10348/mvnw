@@ -1,0 +1,33 @@
+#!/bin/sh
+# Maven Wrapper script
+set -e
+
+# Java version check
+if [ -n "$JAVA_HOME" ]; then
+    JAVA_CMD="$JAVA_HOME/bin/java"
+else
+    JAVA_CMD="java"
+fi
+
+"$JAVA_CMD" -version 2>&1 | head -n 1
+
+# Check for maven wrapper jar
+if [ -f ".mvn/wrapper/maven-wrapper.jar" ]; then
+    MAVEN_PROJECTBASEDIR=${MAVEN_BASEDIR:-"$(pwd)"}
+    MAVEN_OPTS='-Xmx512m -Dfile.encoding=UTF-8'
+    
+    echo "Using Maven Wrapper..."
+    "$JAVA_CMD" $MAVEN_OPTS \
+        -classpath "$(dirname "$0")/.mvn/wrapper/maven-wrapper.jar" \
+        org.apache.maven.wrapper.MavenWrapperMain \
+        "$@"
+else
+    echo "Maven Wrapper JAR not found, trying system mvn..."
+    if command -v mvn >/dev/null 2>&1; then
+        mvn "$@"
+    else
+        echo "Error: Neither Maven Wrapper nor system mvn found!"
+        echo "Please install Maven or run this from a directory with .mvn/wrapper/"
+        exit 1
+    fi
+fi

@@ -253,7 +253,45 @@ curl -X POST http://localhost:8080/api/rotation/{batchId}/complete
 ## 核心业务规则
 
 1. **状态机约束**: 所有状态转换必须符合预定规则，终态不可变更
-2. **重复提交保护**: 同一批次下相同数据标识不会重复创建任务
-3. **失败隔离**: 单个任务失败不影响其他任务，自动记录失败详情
-4. **抽样验证**: 对成功任务自动抽取 10%（至少 1 个）进行验证
-5. **进度自动更新**: 任务处理完成后自动更新批次统计信息
+2. **重复提交保护**: 相同租户 + 源密钥 + 目标密钥 + 相同数据标识集合的请求，在批次未完成前返回同一批次
+3. **数据签名机制**: 通过 SHA-256 对排序后的数据标识生成签名，确保顺序无关的重复检测
+4. **失败隔离**: 单个任务失败不影响其他任务，自动记录失败详情
+5. **抽样验证**: 对成功任务自动抽取 10%（至少 1 个）进行验证
+6. **进度自动更新**: 任务处理完成后自动更新批次统计信息
+
+## 重复提交保护机制
+
+### 实现原理
+
+```
+CreateRotationRequest
+    │
+    ▼
+  排序 dataIdentifiers（确保顺序无关）
+    │
+    ▼
+  SHA-256 生成 dataSignature
+    │
+    ▼
+  查询: tenantId + sourceKeyId + targetKeyId + dataSignature
+        + 状态为非终态(PENDING/VALIDATING/IN_PROGRESS/PARTIAL_SUCCESS/VERIFYING)
+    │
+    ├─ 找到匹配批次 → 返回已有批次
+    └─ 未找到 → 创建新批次
+```
+
+### 测试方法
+
+```bash
+# 第一次创建
+curl -X POST http://localhost:8080/api/rotation \
+  -H "Content-Type: application/json" \
+  -d '{"tenantId":"tenant-001","sourceKeyId":"key-v1","targetKeyId":"key-v2","createdBy":"admin","dataIdentifiers":["a","b","c"]}'
+
+# 第二次相同请求 → 返回同一批次 ID
+curl -X POST http://localhost:8080/api/rotation \
+  -H "Content-Type: application/json" \
+  -d '{"tenantId":"tenant-001","sourceKeyId":"key-v1","targetKeyId":"key-v2","createdBy":"admin","dataIdentifiers":["c","b","a"]}'
+
+# 注意：即使 dataIdentifiers 顺序不同，也会识别为重复
+```

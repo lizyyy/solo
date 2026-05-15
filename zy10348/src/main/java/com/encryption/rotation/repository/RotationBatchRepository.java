@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface RotationBatchRepository extends JpaRepository<RotationBatch, String> {
@@ -14,4 +15,7 @@ public interface RotationBatchRepository extends JpaRepository<RotationBatch, St
     List<RotationBatch> findByTenantIdOrderByCreatedAtDesc(String tenantId);
     List<RotationBatch> findByTenantIdAndStatusOrderByCreatedAtDesc(String tenantId, RotationStatus status);
     boolean existsByBatchNumber(String batchNumber);
+    
+    Optional<RotationBatch> findByTenantIdAndSourceKeyIdAndTargetKeyIdAndDataSignatureAndStatusIn(
+            String tenantId, String sourceKeyId, String targetKeyId, String dataSignature, Set<RotationStatus> statuses);
 }

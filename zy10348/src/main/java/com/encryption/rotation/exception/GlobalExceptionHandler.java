@@ -1,7 +1,7 @@
 package com.encryption.rotation.exception;
 
 import com.encryption.rotation.model.dto.ApiResponse;
-import jakarta.validation.ConstraintViolationException;
+import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
