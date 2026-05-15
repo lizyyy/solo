@@ -201,6 +201,7 @@ class RollbackCandidate(Base):
     file_path = Column(String(500))
     file_hash = Column(String(100))
     file_size = Column(Integer)
+    materials = Column(Text)
     is_urgent = Column(Boolean, default=False)
     status = Column(SQLEnum(RollbackStatus), default=RollbackStatus.PENDING, index=True)
     approver = Column(String(100))

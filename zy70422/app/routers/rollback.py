@@ -65,7 +65,7 @@ def approve_candidate(candidate_id: int, data: RollbackApproval, db: Session = D
 @router.post("/candidates/{candidate_id}/execute", response_model=RollbackExecutionResponse)
 def execute_candidate(candidate_id: int, data: RollbackExecuteRequest, db: Session = Depends(get_db)):
     try:
-        return execute_rollback(db, candidate_id, data.executor)
+        return execute_rollback(db, candidate_id, data.executor, data.force_mode)
     except BusinessRuleError as e:
         raise HTTPException(status_code=400, detail=e.message)
 
@@ -125,6 +125,8 @@ def create_financial_close_record(data: FinancialCloseCreate, db: Session = Depe
 def list_financial_close(
     close_period: Optional[str] = None,
     status: Optional[str] = None,
+    summary_keyword: Optional[str] = None,
+    file_path_keyword: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(FinancialCloseApproval)
@@ -132,6 +134,10 @@ def list_financial_close(
         query = query.filter(FinancialCloseApproval.close_period == close_period)
     if status:
         query = query.filter(FinancialCloseApproval.status == status)
+    if summary_keyword:
+        query = query.filter(FinancialCloseApproval.summary.ilike(f"%{summary_keyword}%"))
+    if file_path_keyword:
+        query = query.filter(FinancialCloseApproval.file_path.ilike(f"%{file_path_keyword}%"))
     return query.order_by(FinancialCloseApproval.created_at.desc()).all()
 
 

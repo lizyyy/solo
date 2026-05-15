@@ -267,6 +267,7 @@ class RollbackApproval(BaseModel):
 
 class RollbackExecuteRequest(BaseModel):
     executor: str
+    force_mode: Optional[str] = None
 
 
 class RollbackExecutionResponse(BaseModel):

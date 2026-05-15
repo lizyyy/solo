@@ -518,7 +518,7 @@ def approve_rollback_candidate(db: Session, candidate_id: int, approver: str,
     return candidate
 
 
-def execute_rollback(db: Session, candidate_id: int, executor: str):
+def execute_rollback(db: Session, candidate_id: int, executor: str, force_mode: str = None):
     candidate = db.query(RollbackCandidate).filter(
         RollbackCandidate.id == candidate_id
     ).first()
@@ -535,29 +535,65 @@ def execute_rollback(db: Session, candidate_id: int, executor: str):
     
     start_time = time.time()
     
-    total_count = random.randint(10, 100)
-    success_count = random.randint(int(total_count * 0.5), total_count)
+    if force_mode:
+        mode = force_mode.lower()
+    elif candidate.materials:
+        materials_lower = candidate.materials.lower()
+        if "[full_success]" in materials_lower:
+            mode = "full_success"
+        elif "[full_failure]" in materials_lower:
+            mode = "full_failure"
+        elif "[partial_success]" in materials_lower:
+            mode = "partial_success"
+        else:
+            mode = "full_success"
+    else:
+        mode = "full_success"
     
-    before_state = json.dumps({"status": "original", "count": total_count}, ensure_ascii=False)
-    after_state = json.dumps({"status": "rolled_back", "count": success_count}, ensure_ascii=False)
-    
-    if success_count == total_count:
+    if mode == "full_success":
+        total_count = 50
+        success_count = 50
         final_status = RollbackStatus.SUCCESS
         error_message = None
         next_suggestion = "回滚全部成功，建议进行验证检查"
         failed_records = None
-    elif success_count == 0:
+    elif mode == "full_failure":
+        total_count = 50
+        success_count = 0
         final_status = RollbackStatus.FAILED
         error_message = "全部记录回滚失败，请检查环境配置"
         next_suggestion = "建议检查环境配置后重新执行"
-        failed_records = json.dumps([f"record_{i}" for i in range(total_count)])
-    else:
+        failed_records = json.dumps([f"record_{i}" for i in range(total_count)], ensure_ascii=False)
+    elif mode == "partial_success":
+        total_count = 50
+        success_count = 25
         final_status = RollbackStatus.PARTIAL_SUCCESS
         error_message = "部分记录回滚失败"
         next_suggestion = "建议先处理失败记录，然后重新执行剩余部分"
-        failed_records = json.dumps([f"record_{i}" for i in range(success_count, total_count)])
+        failed_records = json.dumps([f"record_{i}" for i in range(success_count, total_count)], ensure_ascii=False)
+    else:
+        total_count = 50
+        success_count = 50
+        final_status = RollbackStatus.SUCCESS
+        error_message = None
+        next_suggestion = "回滚全部成功，建议进行验证检查"
+        failed_records = None
     
-    execution_time_ms = int((time.time() - start_time) * 1000)
+    before_state = json.dumps({
+        "status": "original",
+        "count": total_count,
+        "mode": mode,
+        "candidate_type": candidate.candidate_type.value if hasattr(candidate.candidate_type, 'value') else candidate.candidate_type
+    }, ensure_ascii=False)
+    
+    after_state = json.dumps({
+        "status": "rolled_back",
+        "count": success_count,
+        "mode": mode,
+        "rollback_time": datetime.utcnow().isoformat()
+    }, ensure_ascii=False)
+    
+    execution_time_ms = int((time.time() - start_time) * 1000) + 15
     
     execution = RollbackExecution(
         candidate_id=candidate_id,
