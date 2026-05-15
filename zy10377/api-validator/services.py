@@ -102,9 +102,17 @@ class ExampleExtractor:
         header_matches = re.findall(r'-H\s+["\']([^:]+):\s*([^"\']+)["\']', curl_cmd)
         for key, value in header_matches:
             headers[key.strip()] = value.strip()
-        body_match = re.search(r'-d\s+["\']([^"\']+)["\']', curl_cmd)
-        if body_match:
-            body = body_match.group(1)
+        body_single_quote = re.search(r"-d\s+'([^']*)'", curl_cmd)
+        body_double_quote = re.search(r'-d\s+"((?:[^"\\]|\\.)*)"', curl_cmd)
+        body_no_quote = re.search(r'-d\s+(\S+)', curl_cmd)
+        if body_single_quote:
+            body = body_single_quote.group(1)
+            method = method if method != 'GET' else 'POST'
+        elif body_double_quote:
+            body = body_double_quote.group(1)
+            method = method if method != 'GET' else 'POST'
+        elif body_no_quote:
+            body = body_no_quote.group(1)
             method = method if method != 'GET' else 'POST'
         if url:
             return {
