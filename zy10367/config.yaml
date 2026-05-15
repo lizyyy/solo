@@ -1,0 +1,11 @@
+server:
+  port: "8080"
+  mode: "debug"
+
+database:
+  driver: "sqlite3"
+  dsn: "cert_renewal.db"
+
+log:
+  level: "info"
+  output: "stdout"
