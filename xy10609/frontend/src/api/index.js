@@ -39,6 +39,25 @@ export const exceptionsApi = {
   fixException: (id, data) => api.put(`/exceptions/${id}/fix`, data)
 }
 
+export const correctionOpinionsApi = {
+  getOpinions: (params) => api.get('/correction-opinions', { params }),
+  createOpinion: (data) => api.post('/correction-opinions', data),
+  updateOpinion: (id, data) => api.put(`/correction-opinions/${id}`, data),
+  deleteOpinion: (id) => api.delete(`/correction-opinions/${id}`)
+}
+
+export const windowAcceptancesApi = {
+  getAcceptances: (params) => api.get('/window-acceptances', { params }),
+  createAcceptance: (data) => api.post('/window-acceptances', data),
+  updateAcceptance: (id, data) => api.put(`/window-acceptances/${id}`, data),
+  deleteAcceptance: (id) => api.delete(`/window-acceptances/${id}`)
+}
+
+export const preReviewApi = {
+  calculate: (data) => api.post('/pre-review/calculate', data),
+  getSummary: (params) => api.get('/pre-review/summary', { params })
+}
+
 export const reportApi = {
   exportReport: (params) => api.get('/report/export', { params }),
   getSummary: (params) => api.get('/report/summary', { params })

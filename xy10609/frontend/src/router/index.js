@@ -7,6 +7,11 @@ const routes = [
     component: () => import('../views/Dashboard.vue')
   },
   {
+    path: '/pre-review',
+    name: 'PreReview',
+    component: () => import('../views/PreReview.vue')
+  },
+  {
     path: '/matters',
     name: 'Matters',
     component: () => import('../views/Matters.vue')
@@ -20,6 +25,16 @@ const routes = [
     path: '/attachments',
     name: 'Attachments',
     component: () => import('../views/Attachments.vue')
+  },
+  {
+    path: '/correction-opinions',
+    name: 'CorrectionOpinions',
+    component: () => import('../views/CorrectionOpinions.vue')
+  },
+  {
+    path: '/window-acceptances',
+    name: 'WindowAcceptances',
+    component: () => import('../views/WindowAcceptances.vue')
   },
   {
     path: '/gaps',

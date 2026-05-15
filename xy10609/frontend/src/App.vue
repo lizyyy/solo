@@ -16,6 +16,10 @@
           <el-icon><data-line /></el-icon>
           <span>数据概览</span>
         </el-menu-item>
+        <el-menu-item index="/pre-review">
+          <el-icon><calculator /></el-icon>
+          <span>预审补正计算</span>
+        </el-menu-item>
         <el-menu-item index="/matters">
           <el-icon><document /></el-icon>
           <span>办事事项</span>
@@ -27,6 +31,14 @@
         <el-menu-item index="/attachments">
           <el-icon><paperclip /></el-icon>
           <span>附件管理</span>
+        </el-menu-item>
+        <el-menu-item index="/correction-opinions">
+          <el-icon><edit /></el-icon>
+          <span>补正意见</span>
+        </el-menu-item>
+        <el-menu-item index="/window-acceptances">
+          <el-icon><office-building /></el-icon>
+          <span>窗口受理</span>
         </el-menu-item>
         <el-menu-item index="/gaps">
           <el-icon><warning /></el-icon>
@@ -65,9 +77,12 @@ const route = useRoute()
 const pageTitle = computed(() => {
   const titles = {
     '/': '数据概览',
+    '/pre-review': '预审补正计算',
     '/matters': '办事事项管理',
     '/identity': '身份类型管理',
     '/attachments': '附件管理',
+    '/correction-opinions': '补正意见管理',
+    '/window-acceptances': '窗口受理管理',
     '/gaps': '材料缺口管理',
     '/exceptions': '异常看板',
     '/report': '报表导出',

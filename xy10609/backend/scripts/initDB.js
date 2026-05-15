@@ -1,17 +1,34 @@
 const fs = require('fs');
 const path = require('path');
-const db = require('../config/database');
+const sqlite3 = require('sqlite3').verbose();
 
 const exportsDir = path.join(__dirname, '../exports');
 if (!fs.existsSync(exportsDir)) {
   fs.mkdirSync(exportsDir, { recursive: true });
 }
 
+const dataDir = path.join(__dirname, '../data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const dbPath = path.join(dataDir, 'precheck.db');
+const db = new sqlite3.Database(dbPath);
+
 const initTables = () => {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
+      db.run(`DROP TABLE IF EXISTS exceptions`);
+      db.run(`DROP TABLE IF EXISTS change_history`);
+      db.run(`DROP TABLE IF EXISTS material_gaps`);
+      db.run(`DROP TABLE IF EXISTS window_acceptances`);
+      db.run(`DROP TABLE IF EXISTS correction_opinions`);
+      db.run(`DROP TABLE IF EXISTS attachments`);
+      db.run(`DROP TABLE IF EXISTS identity_types`);
+      db.run(`DROP TABLE IF EXISTS business_matters`);
+
       db.run(`
-        CREATE TABLE IF NOT EXISTS business_matters (
+        CREATE TABLE business_matters (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           code TEXT UNIQUE NOT NULL,
           name TEXT NOT NULL,
@@ -23,7 +40,7 @@ const initTables = () => {
       `);
 
       db.run(`
-        CREATE TABLE IF NOT EXISTS identity_types (
+        CREATE TABLE identity_types (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           code TEXT UNIQUE NOT NULL,
           name TEXT NOT NULL,
@@ -35,7 +52,7 @@ const initTables = () => {
       `);
 
       db.run(`
-        CREATE TABLE IF NOT EXISTS attachments (
+        CREATE TABLE attachments (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
           matter_id INTEGER,
@@ -50,7 +67,7 @@ const initTables = () => {
       `);
 
       db.run(`
-        CREATE TABLE IF NOT EXISTS correction_opinions (
+        CREATE TABLE correction_opinions (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           matter_id INTEGER,
           attachment_id INTEGER,
@@ -65,7 +82,7 @@ const initTables = () => {
       `);
 
       db.run(`
-        CREATE TABLE IF NOT EXISTS window_acceptances (
+        CREATE TABLE window_acceptances (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           matter_id INTEGER,
           window_no TEXT,
@@ -79,7 +96,7 @@ const initTables = () => {
       `);
 
       db.run(`
-        CREATE TABLE IF NOT EXISTS material_gaps (
+        CREATE TABLE material_gaps (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           matter_id INTEGER,
           identity_type_id INTEGER,
@@ -98,7 +115,7 @@ const initTables = () => {
       `);
 
       db.run(`
-        CREATE TABLE IF NOT EXISTS change_history (
+        CREATE TABLE change_history (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           table_name TEXT NOT NULL,
           record_id INTEGER NOT NULL,
@@ -111,7 +128,7 @@ const initTables = () => {
       `);
 
       db.run(`
-        CREATE TABLE IF NOT EXISTS exceptions (
+        CREATE TABLE exceptions (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           matter_id INTEGER,
           exception_type TEXT NOT NULL,
@@ -136,100 +153,109 @@ const initTables = () => {
 
 const insertData = () => {
   return new Promise((resolve, reject) => {
-    const matters = [
-      ['BIZ001', '营业执照办理', '市场监管局', 'active'],
-      ['BIZ002', '税务登记证办理', '税务局', 'active'],
-      ['BIZ003', '社保开户', '社保局', 'active'],
-      ['BIZ004', '公积金开户', '公积金中心', 'active'],
-      ['BIZ005', '经营许可证办理', '商务局', 'active']
-    ];
+    db.serialize(() => {
+      const matters = [
+        ['BIZ001', '营业执照办理', '市场监管局', 'active'],
+        ['BIZ002', '税务登记证办理', '税务局', 'active'],
+        ['BIZ003', '社保开户', '社保局', 'active'],
+        ['BIZ004', '公积金开户', '公积金中心', 'active'],
+        ['BIZ005', '经营许可证办理', '商务局', 'active']
+      ];
 
-    const matterStmt = db.prepare(`
-      INSERT OR IGNORE INTO business_matters (code, name, department, status)
-      VALUES (?, ?, ?, ?)
-    `);
+      const matterStmt = db.prepare(`
+        INSERT INTO business_matters (code, name, department, status)
+        VALUES (?, ?, ?, ?)
+      `);
 
-    matters.forEach((matter) => {
-      matterStmt.run(matter);
-    });
-    matterStmt.finalize();
+      matters.forEach((matter) => {
+        matterStmt.run(matter);
+      });
+      matterStmt.finalize();
 
-    const identities = [
-      ['ID001', '企业法人', '企业法定代表人身份证明', 'active'],
-      ['ID002', '个体工商户', '个体工商户经营者身份证明', 'active'],
-      ['ID003', '事业单位法人', '事业单位法定代表人身份证明', 'active'],
-      ['ID004', '社会组织', '社会组织负责人身份证明', 'active'],
-      ['ID005', '自然人', '个人身份证明', 'active']
-    ];
+      const identities = [
+        ['ID001', '企业法人', '企业法定代表人身份证明', 'active'],
+        ['ID002', '个体工商户', '个体工商户经营者身份证明', 'active'],
+        ['ID003', '事业单位法人', '事业单位法定代表人身份证明', 'active'],
+        ['ID004', '社会组织', '社会组织负责人身份证明', 'active'],
+        ['ID005', '自然人', '个人身份证明', 'active']
+      ];
 
-    const identityStmt = db.prepare(`
-      INSERT OR IGNORE INTO identity_types (code, name, description, status)
-      VALUES (?, ?, ?, ?)
-    `);
+      const identityStmt = db.prepare(`
+        INSERT INTO identity_types (code, name, description, status)
+        VALUES (?, ?, ?, ?)
+      `);
 
-    identities.forEach((identity) => {
-      identityStmt.run(identity);
-    });
-    identityStmt.finalize();
+      identities.forEach((identity) => {
+        identityStmt.run(identity);
+      });
+      identityStmt.finalize();
 
-    const attachments = [
-      ['营业执照副本', 1, 1, '2025-12-31', 'valid'],
-      ['法人身份证', 1, 1, '2030-06-15', 'valid'],
-      ['组织机构代码证', 1, 1, '2024-06-30', 'expired'],
-      ['税务登记证', 2, 1, '2026-03-20', 'valid'],
-      ['经营场所证明', 2, 2, '2025-08-10', 'valid'],
-      ['社保登记证', 3, 1, '2024-11-05', 'expired'],
-      ['公积金缴存证明', 4, 3, '2025-04-18', 'valid'],
-      ['经营许可证', 5, 4, '2024-09-22', 'expired']
-    ];
+      const today = new Date();
+      const getDate = (daysFromNow) => {
+        const d = new Date(today);
+        d.setDate(d.getDate() + daysFromNow);
+        return d.toISOString().split('T')[0];
+      };
 
-    const attachmentStmt = db.prepare(`
-      INSERT OR IGNORE INTO attachments (name, matter_id, identity_type_id, expire_date, status)
-      VALUES (?, ?, ?, ?, ?)
-    `);
+      const attachments = [
+        ['营业执照副本', 1, 1, getDate(230), 'valid'],
+        ['法人身份证', 1, 1, getDate(2000), 'valid'],
+        ['组织机构代码证', 1, 1, getDate(-5), 'valid'],
+        ['税务登记证', 2, 1, getDate(300), 'valid'],
+        ['经营场所证明', 2, 2, getDate(17), 'valid'],
+        ['社保登记证', 3, 1, getDate(-25), 'valid'],
+        ['公积金缴存证明', 4, 3, getDate(10), 'valid'],
+        ['经营许可证', 5, 4, getDate(31), 'valid'],
+        ['银行开户许可证', 2, 1, getDate(5), 'valid']
+      ];
 
-    attachments.forEach((attachment) => {
-      attachmentStmt.run(attachment);
-    });
-    attachmentStmt.finalize();
+      const attachmentStmt = db.prepare(`
+        INSERT INTO attachments (name, matter_id, identity_type_id, expire_date, status)
+        VALUES (?, ?, ?, ?, ?)
+      `);
 
-    const gaps = [
-      [1, 1, 'expired', '组织机构代码证已过期，请更新', 3, 'high', 0],
-      [3, 1, 'expired', '社保登记证已过期，请更新', 6, 'high', 0],
-      [5, 4, 'expired', '经营许可证即将过期，请及时更新', 8, 'medium', 0],
-      [2, 1, 'missing', '缺少银行开户许可证', null, 'high', 0],
-      [4, 3, 'incomplete', '公积金缴存证明信息不完整', 7, 'medium', 0]
-    ];
+      attachments.forEach((attachment) => {
+        attachmentStmt.run(attachment);
+      });
+      attachmentStmt.finalize();
 
-    const gapStmt = db.prepare(`
-      INSERT OR IGNORE INTO material_gaps (matter_id, identity_type_id, gap_type, gap_description, attachment_id, severity, is_resolved)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
+      const correctionOpinions = [
+        [1, 3, '组织机构代码证有效期不足，请提供最新版本', '张审核', 'pending'],
+        [2, 9, '银行开户许可证缺少法人签字，请补正', '李审核', 'pending'],
+        [3, 6, '社保登记证地址信息不清晰，请重新扫描', '王审核', 'completed'],
+        [5, 8, '经营许可证经营范围需更新', '赵审核', 'pending']
+      ];
 
-    gaps.forEach((gap) => {
-      gapStmt.run(gap);
-    });
-    gapStmt.finalize();
+      const opinionStmt = db.prepare(`
+        INSERT INTO correction_opinions (matter_id, attachment_id, opinion, handler, status)
+        VALUES (?, ?, ?, ?, ?)
+      `);
 
-    const exceptions = [
-      [1, 'attachment_expired', '组织机构代码证有效期不足30天', 3, '张三', '2024-06-30', '2025-06-30', 1],
-      [2, 'material_missing', '银行开户许可证未上传', null, '李四', null, '已上传', 0],
-      [3, 'attachment_expired', '社保登记证已过期', 6, '王五', '2024-11-05', '2025-11-05', 1],
-      [4, 'info_incomplete', '公积金缴存证明缺少单位公章', 7, '赵六', '无公章', '有公章', 0],
-      [5, 'attachment_expired', '经营许可证即将过期', 8, null, null, null, 0]
-    ];
+      correctionOpinions.forEach((opinion) => {
+        opinionStmt.run(opinion);
+      });
+      opinionStmt.finalize();
 
-    const exceptionStmt = db.prepare(`
-      INSERT OR IGNORE INTO exceptions (matter_id, exception_type, reason, attachment_id, handler, before_value, after_value, is_fixed)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+      const windowAcceptances = [
+        [1, 'A01', '王窗口', 'passed', '材料齐全，受理通过'],
+        [2, 'A02', '李窗口', 'incomplete', '缺少银行开户许可证，请补正后再提交'],
+        [3, 'B01', '张窗口', 'rejected', '社保登记证已过期，需重新办理后再申请'],
+        [4, 'B02', '刘窗口', 'pending', '待审核'],
+        [5, 'A03', '陈窗口', 'incomplete', '经营许可证附件模糊，请重新上传清晰版本']
+      ];
 
-    exceptions.forEach((exception) => {
-      exceptionStmt.run(exception);
-    });
-    exceptionStmt.finalize((err) => {
-      if (err) reject(err);
-      else resolve();
+      const acceptanceStmt = db.prepare(`
+        INSERT INTO window_acceptances (matter_id, window_no, acceptor, material_check_result, remarks)
+        VALUES (?, ?, ?, ?, ?)
+      `);
+
+      windowAcceptances.forEach((acceptance) => {
+        acceptanceStmt.run(acceptance);
+      });
+      acceptanceStmt.finalize((err) => {
+        if (err) reject(err);
+        else resolve();
+      });
     });
   });
 };
