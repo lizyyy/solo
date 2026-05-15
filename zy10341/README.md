@@ -65,6 +65,16 @@ mvn spring-boot:run
 
 服务启动后访问: http://localhost:8080
 
+### 快速验证 API
+
+服务启动后，可以用一键验证脚本测试完整流程：
+
+```bash
+chmod +x verify.sh && ./verify.sh
+```
+
+脚本会自动测试：创建 Topic -> 注册 Schema -> 兼容性检查 -> 提交审批 -> 审批通过 -> 发布 Schema
+
 ### H2 控制台
 
 访问: http://localhost:8080/h2-console
