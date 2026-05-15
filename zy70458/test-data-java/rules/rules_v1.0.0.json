@@ -1,0 +1,1 @@
+{"version":"v1.0.0","portRanges":{"0-1023":"CRITICAL","1024-49151":"MEDIUM","49152-65535":"LOW"},"reservedPorts":[22,80,443,3306,5432,6379,27017],"thresholdConnections":100,"description":"初始版本规则：系统端口CRITICAL，注册端口MEDIUM，动态端口LOW"}
