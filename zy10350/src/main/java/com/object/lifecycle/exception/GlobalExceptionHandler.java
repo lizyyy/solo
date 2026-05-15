@@ -3,6 +3,7 @@ package com.object.lifecycle.exception;
 import com.object.lifecycle.dto.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,9 +18,10 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
-    public ApiResponse<Void> handleBusinessException(BusinessException e) {
-        log.error("业务异常: {}", e.getMessage());
-        return ApiResponse.error(e.getCode(), e.getMessage());
+    public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
+        log.error("业务异常: code={}, message={}", e.getCode(), e.getMessage());
+        HttpStatus httpStatus = HttpStatus.valueOf(e.getCode());
+        return new ResponseEntity<>(ApiResponse.error(e.getCode(), e.getMessage()), httpStatus);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
