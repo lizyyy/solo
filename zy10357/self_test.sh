@@ -5,10 +5,11 @@ echo "API 证书吊销列表服务 - 自检脚本"
 echo "==============================================="
 
 BASE_URL="http://localhost:8080/api/v1"
+HEALTH_URL="http://localhost:8080/health"
 
 echo ""
 echo "检查服务是否运行..."
-if ! curl -s -f "$BASE_URL/../health" > /dev/null 2>&1; then
+if ! curl -s -f "$HEALTH_URL" > /dev/null 2>&1; then
     echo "错误: 服务未运行，请先启动服务: go run main.go"
     exit 1
 fi

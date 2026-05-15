@@ -64,18 +64,18 @@ func (s *CRLService) RegisterRevocation(req RegisterRevocationRequest) (*databas
 		req.RequestID = uuid.New().String()
 	}
 
-	var existing database.CertificateRevocation
-	if err := s.db.Where("serial_number = ?", req.SerialNumber).First(&existing).Error; err == nil {
-		return &existing, ErrCertificateAlreadyRevoked
-	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("查询证书失败: %w", err)
-	}
-
 	var existingByReqID database.CertificateRevocation
 	if err := s.db.Where("request_id = ?", req.RequestID).First(&existingByReqID).Error; err == nil {
 		return &existingByReqID, ErrDuplicateRequest
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("查询请求ID失败: %w", err)
+	}
+
+	var existing database.CertificateRevocation
+	if err := s.db.Where("serial_number = ?", req.SerialNumber).First(&existing).Error; err == nil {
+		return &existing, ErrCertificateAlreadyRevoked
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("查询证书失败: %w", err)
 	}
 
 	if req.RevocationTime == 0 {
@@ -86,15 +86,15 @@ func (s *CRLService) RegisterRevocation(req RegisterRevocationRequest) (*databas
 	}
 
 	revocation := &database.CertificateRevocation{
-		SerialNumber:       req.SerialNumber,
-		Reason:             req.Reason,
-		Status:             database.StatusRegistered,
+		SerialNumber:        req.SerialNumber,
+		Reason:              req.Reason,
+		Status:              database.StatusRegistered,
 		DistributionVersion: 0,
-		ServiceConfirmed:   false,
-		CacheStatus:        "PENDING",
-		RevocationTime:     req.RevocationTime,
-		EffectiveTime:      req.EffectiveTime,
-		RequestID:          req.RequestID,
+		ServiceConfirmed:    false,
+		CacheStatus:         "PENDING",
+		RevocationTime:      req.RevocationTime,
+		EffectiveTime:       req.EffectiveTime,
+		RequestID:           req.RequestID,
 	}
 
 	if err := s.db.Create(revocation).Error; err != nil {
@@ -282,10 +282,10 @@ func (s *CRLService) GetRefreshReport() (map[string]interface{}, error) {
 	s.db.Model(&database.QueryLog{}).Count(&queryCount)
 
 	return map[string]interface{}{
-		"total_revocations":  total,
+		"total_revocations":   total,
 		"status_distribution": statusCounts,
-		"latest_version":     latestVersion,
-		"total_queries":      queryCount,
+		"latest_version":      latestVersion,
+		"total_queries":       queryCount,
 	}, nil
 }
 
