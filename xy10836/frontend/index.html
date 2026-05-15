@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短期密钥租约服务</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 短期密钥租约服务</h1>
+            <p class="subtitle">Temporary Key Lease Service</p>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>快捷操作</h3>
+                    <button class="btn btn-primary btn-block" onclick="showCreateModal()">➕ 申请租约</button>
+                    <button class="btn btn-secondary btn-block" onclick="exportLeases()">📥 导出数据</button>
+                    <button class="btn btn-info btn-block" onclick="refreshLeases()">🔄 刷新列表</button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>筛选条件</h3>
+                    <div class="filter-group">
+                        <label>申请人</label>
+                        <input type="text" id="filterApplicant" placeholder="输入申请人" oninput="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label>资源标识</label>
+                        <input type="text" id="filterResource" placeholder="输入资源ID" oninput="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label>状态</label>
+                        <select id="filterStatus" onchange="applyFilters()">
+                            <option value="">全部状态</option>
+                            <option value="ACTIVE">活跃</option>
+                            <option value="PENDING_APPROVAL">待审批</option>
+                            <option value="EXPIRED">已过期</option>
+                            <option value="REVOKED">已吊销</option>
+                            <option value="REJECTED">已拒绝</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>系统状态</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-label">总租约</span>
+                            <span class="stat-value" id="statTotal">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">活跃</span>
+                            <span class="stat-value active" id="statActive">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">待审批</span>
+                            <span class="stat-value pending" id="statPending">0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="content">
+                <div class="content-header">
+                    <h2>租约列表</h2>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="搜索租约..." oninput="applyFilters()">
+                    </div>
+                </div>
+
+                <div class="lease-list" id="leaseList">
+                    <div class="loading">加载中...</div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>申请新租约</h3>
+                <span class="close" onclick="closeModal('createModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="createForm">
+                    <div class="form-group">
+                        <label>申请人 *</label>
+                        <input type="text" id="applicant" required placeholder="申请人姓名/工号">
+                    </div>
+                    <div class="form-group">
+                        <label>资源标识 *</label>
+                        <input type="text" id="resourceId" required placeholder="数据库/服务标识">
+                    </div>
+                    <div class="form-group">
+                        <label>租约时长(小时) *</label>
+                        <input type="number" id="durationHours" required min="1" value="24">
+                    </div>
+                    <div class="form-group">
+                        <label>审批策略</label>
+                        <select id="approvalStrategy">
+                            <option value="AUTO">自动审批</option>
+                            <option value="MANUAL">人工审批</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>申请理由</label>
+                        <textarea id="reason" rows="3" placeholder="请说明申请理由"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitCreate()">提交申请</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>租约详情</h3>
+                <span class="close" onclick="closeModal('detailModal')">&times;</span>
+            </div>
+            <div class="modal-body" id="detailContent">
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
