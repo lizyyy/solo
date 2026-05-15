@@ -4,7 +4,6 @@ import (
 	"customer-probe-api/internal/models"
 	"customer-probe-api/pkg/database"
 	"customer-probe-api/pkg/utils"
-	"errors"
 )
 
 type EnvironmentRepository struct{}

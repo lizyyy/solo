@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -22,8 +21,8 @@ func NewExportService() *ExportService {
 }
 
 type EvidencePackage struct {
-	TaskID      string      `json:"task_id"`
-	ExportedAt  time.Time   `json:"exported_at"`
+	TaskID     string      `json:"task_id"`
+	ExportedAt time.Time   `json:"exported_at"`
 	Version    string      `json:"version"`
 	Data       interface{} `json:"data"`
 }
@@ -49,19 +48,19 @@ func (s *ExportService) ExportTaskEvidence(taskID string) ([]byte, string, error
 	var buf bytes.Buffer
 	zipWriter := zip.NewWriter(&buf)
 
-	taskInfo, ok := data["task"]
+	taskInfo := data["task"]
 	taskJSON, _ := json.MarshalIndent(taskInfo, "", "  ")
 	s.addFileToZip(zipWriter, "task.json", taskJSON)
 
-	networkResults, ok := data["network_results"]
+	networkResults := data["network_results"]
 	networkJSON, _ := json.MarshalIndent(networkResults, "", "  ")
 	s.addFileToZip(zipWriter, "network_results.json", networkJSON)
 
-	dnsRecords, ok := data["dns_records"]
+	dnsRecords := data["dns_records"]
 	dnsJSON, _ := json.MarshalIndent(dnsRecords, "", "  ")
 	s.addFileToZip(zipWriter, "dns_records.json", dnsJSON)
 
-	conclusion, ok := data["conclusion"]
+	conclusion := data["conclusion"]
 	conclusionJSON, _ := json.MarshalIndent(conclusion, "", "  ")
 	s.addFileToZip(zipWriter, "conclusion.json", conclusionJSON)
 
@@ -125,7 +124,7 @@ func (s *ExportService) ExportHistory(envID string, startTime, endTime time.Time
 		return nil, "", err
 	}
 
-	var fullData := make([]map[string]interface{}, 0, len(tasks))
+	fullData := make([]map[string]interface{}, 0, len(tasks))
 	for _, task := range tasks {
 		data, _ := s.taskService.GetTaskFullData(task.ID)
 		fullData = append(fullData, data)

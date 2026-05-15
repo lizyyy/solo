@@ -3,7 +3,6 @@ package handler
 import (
 	"customer-probe-api/internal/service"
 	"net/http"
-	"strings"
 )
 
 type ExportHandler struct {

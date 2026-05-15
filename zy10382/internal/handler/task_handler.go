@@ -5,7 +5,6 @@ import (
 	"customer-probe-api/internal/service"
 	"encoding/json"
 	"net/http"
-	"strings"
 )
 
 type TaskHandler struct {
@@ -34,9 +33,9 @@ func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	if isDuplicate {
 		w.Header().Set("X-Duplicate-Request", "true")
 		JSONResponse(w, http.StatusOK, map[string]interface{}{
-			"task":       task,
-			"duplicate":  true,
-			"message":    "task already exists with same idempotency key",
+			"task":      task,
+			"duplicate": true,
+			"message":   "task already exists with same idempotency key",
 		})
 		return
 	}
