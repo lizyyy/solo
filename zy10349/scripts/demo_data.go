@@ -235,8 +235,8 @@ func simulateManualCorrection() {
 	fmt.Printf("  Created record: %s\n", recordID)
 
 	correctionReq := map[string]interface{}{
-		"action": "adjust",
-		"note":   "Manual correction: This request should have been routed to reader role for validation first",
+		"action":  "adjust",
+		"note":    "Manual correction: This request should have been routed to reader role for validation first",
 		"user_id": "admin_001",
 	}
 	correctionBody, _ := json.Marshal(correctionReq)

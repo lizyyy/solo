@@ -21,19 +21,19 @@ const (
 type HitStatus string
 
 const (
-	HitStatusPending  HitStatus = "pending"
-	HitStatusCorrect  HitStatus = "correct"
+	HitStatusPending   HitStatus = "pending"
+	HitStatusCorrect   HitStatus = "correct"
 	HitStatusIncorrect HitStatus = "incorrect"
-	HitStatusRevoked  HitStatus = "revoked"
+	HitStatusRevoked   HitStatus = "revoked"
 )
 
 type CorrectionAction string
 
 const (
-	CorrectionActionNone    CorrectionAction = "none"
-	CorrectionActionAdjust  CorrectionAction = "adjust"
-	CorrectionActionBlock   CorrectionAction = "block"
-	CorrectionActionManual  CorrectionAction = "manual"
+	CorrectionActionNone   CorrectionAction = "none"
+	CorrectionActionAdjust CorrectionAction = "adjust"
+	CorrectionActionBlock  CorrectionAction = "block"
+	CorrectionActionManual CorrectionAction = "manual"
 )
 
 type Strategy struct {
@@ -51,21 +51,21 @@ type Strategy struct {
 }
 
 type HitRecord struct {
-	ID               string           `json:"id" db:"id"`
-	RequestID        string           `json:"request_id" db:"request_id"`
-	StrategyID       string           `json:"strategy_id" db:"strategy_id"`
-	Path             string           `json:"path" db:"path"`
-	Method           string           `json:"method" db:"method"`
+	ID               string            `json:"id" db:"id"`
+	RequestID        string            `json:"request_id" db:"request_id"`
+	StrategyID       string            `json:"strategy_id" db:"strategy_id"`
+	Path             string            `json:"path" db:"path"`
+	Method           string            `json:"method" db:"method"`
 	QueryParams      map[string]string `json:"query_params" db:"query_params"`
-	MatchedOperation OperationType    `json:"matched_operation" db:"matched_operation"`
-	ActualOperation  OperationType    `json:"actual_operation" db:"actual_operation"`
-	DBRoleUsed       string           `json:"db_role_used" db:"db_role_used"`
-	Status           HitStatus        `json:"status" db:"status"`
-	CorrectionAction CorrectionAction `json:"correction_action" db:"correction_action"`
-	CorrectionNote   string           `json:"correction_note" db:"correction_note"`
-	CorrectedBy      string           `json:"corrected_by" db:"corrected_by"`
-	CorrectedAt      *time.Time       `json:"corrected_at" db:"corrected_at"`
-	CreatedAt        time.Time        `json:"created_at" db:"created_at"`
+	MatchedOperation OperationType     `json:"matched_operation" db:"matched_operation"`
+	ActualOperation  OperationType     `json:"actual_operation" db:"actual_operation"`
+	DBRoleUsed       string            `json:"db_role_used" db:"db_role_used"`
+	Status           HitStatus         `json:"status" db:"status"`
+	CorrectionAction CorrectionAction  `json:"correction_action" db:"correction_action"`
+	CorrectionNote   string            `json:"correction_note" db:"correction_note"`
+	CorrectedBy      string            `json:"corrected_by" db:"corrected_by"`
+	CorrectedAt      *time.Time        `json:"corrected_at" db:"corrected_at"`
+	CreatedAt        time.Time         `json:"created_at" db:"created_at"`
 }
 
 type SplitReport struct {
@@ -105,15 +105,15 @@ type ProcessRequest struct {
 }
 
 type ProcessResponse struct {
-	RequestID        string        `json:"request_id"`
-	HitRecordID      string        `json:"hit_record_id"`
-	Matched          bool          `json:"matched"`
-	StrategyID       string        `json:"strategy_id,omitempty"`
-	OperationType    OperationType `json:"operation_type"`
-	DBRole           string        `json:"db_role"`
-	Status           HitStatus     `json:"status"`
-	NeedCorrection   bool          `json:"need_correction"`
-	Message          string        `json:"message"`
+	RequestID      string        `json:"request_id"`
+	HitRecordID    string        `json:"hit_record_id"`
+	Matched        bool          `json:"matched"`
+	StrategyID     string        `json:"strategy_id,omitempty"`
+	OperationType  OperationType `json:"operation_type"`
+	DBRole         string        `json:"db_role"`
+	Status         HitStatus     `json:"status"`
+	NeedCorrection bool          `json:"need_correction"`
+	Message        string        `json:"message"`
 }
 
 type CorrectionRequest struct {
@@ -123,9 +123,9 @@ type CorrectionRequest struct {
 }
 
 type AdvanceStatusRequest struct {
-	Status   HitStatus `json:"status" binding:"required"`
-	UserID   string    `json:"user_id" binding:"required"`
-	Note     string    `json:"note"`
+	Status HitStatus `json:"status" binding:"required"`
+	UserID string    `json:"user_id" binding:"required"`
+	Note   string    `json:"note"`
 }
 
 type QueryHitRecordsRequest struct {

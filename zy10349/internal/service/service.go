@@ -102,15 +102,15 @@ func (s *SplitService) ProcessRequest(req *model.ProcessRequest) (*model.Process
 		}
 		if existing != nil {
 			return &model.ProcessResponse{
-				RequestID:     existing.RequestID,
-				HitRecordID:   existing.ID,
-				Matched:       existing.StrategyID != "",
-				StrategyID:    existing.StrategyID,
-				OperationType: existing.MatchedOperation,
-				DBRole:        existing.DBRoleUsed,
-				Status:        existing.Status,
+				RequestID:      existing.RequestID,
+				HitRecordID:    existing.ID,
+				Matched:        existing.StrategyID != "",
+				StrategyID:     existing.StrategyID,
+				OperationType:  existing.MatchedOperation,
+				DBRole:         existing.DBRoleUsed,
+				Status:         existing.Status,
 				NeedCorrection: existing.Status == model.HitStatusPending,
-				Message:       "duplicate request, returned existing result",
+				Message:        "duplicate request, returned existing result",
 			}, nil
 		}
 	}
@@ -121,7 +121,7 @@ func (s *SplitService) ProcessRequest(req *model.ProcessRequest) (*model.Process
 
 	strategy, matched := s.MatchStrategy(req.Path, req.Method, req.QueryParams)
 
-	var matchedOp := model.OperationTypeRead
+	matchedOp := model.OperationTypeRead
 	dbRole := "reader"
 
 	if matched {
@@ -167,14 +167,14 @@ func (s *SplitService) ProcessRequest(req *model.ProcessRequest) (*model.Process
 
 	return &model.ProcessResponse{
 		RequestID:      record.RequestID,
-		HitRecordID:  record.ID,
-		Matched:      matched,
-		StrategyID:   record.StrategyID,
-		OperationType: record.MatchedOperation,
-		DBRole:        record.DBRoleUsed,
-		Status:        record.Status,
+		HitRecordID:    record.ID,
+		Matched:        matched,
+		StrategyID:     record.StrategyID,
+		OperationType:  record.MatchedOperation,
+		DBRole:         record.DBRoleUsed,
+		Status:         record.Status,
 		NeedCorrection: needCorrection,
-		Message:       message,
+		Message:        message,
 	}, nil
 }
 
