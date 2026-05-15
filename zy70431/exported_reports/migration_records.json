@@ -1,0 +1,189 @@
+[
+  {
+    "receipt_id": "945fc147-323c-4a90-bec6-59916fb3b168",
+    "device_id": "DEV-001",
+    "device_name": "温度传感器-001",
+    "receipt_type": "设备安装验收回执",
+    "received_date": "2026-05-15T19:43:50.189720",
+    "operator": "张三",
+    "original_input": {
+      "设备序列号": "SN-2024-001234",
+      "安装位置": "A栋3层机房",
+      "验收结论": "合格",
+      "验收人员签字": "张三",
+      "备注": "首次安装验收"
+    },
+    "attachments": [
+      {
+        "id": "e6512432-bf0f-47da-9c1c-4d52e01f642a",
+        "name": "设备验收报告.pdf",
+        "upload_date": "2026-04-15T19:43:50.189701",
+        "expire_date": "2027-05-15T19:43:50.189707",
+        "is_expired": false
+      },
+      {
+        "id": "132f0261-a805-4daf-b1ba-4f6b2eb990c6",
+        "name": "质量检测证书.pdf",
+        "upload_date": "2026-04-20T19:43:50.189714",
+        "expire_date": "2026-11-11T19:43:50.189715",
+        "is_expired": false
+      }
+    ],
+    "system_judgment": {
+      "status": "normal",
+      "issues": [],
+      "judgment_time": "2026-05-15T19:43:50.189729"
+    },
+    "manual_correction": {
+      "operator": null,
+      "correction_note": null,
+      "corrected_status": null,
+      "correction_time": null
+    },
+    "effective_status": "normal",
+    "material_summary": "该设备为2024年新采购的温度传感器，已完成现场安装验收，验收合格，附件齐全且在有效期内。",
+    "change_histories": []
+  },
+  {
+    "receipt_id": "6c88de5a-9e72-4c1c-a8ea-2bc48080d1dd",
+    "device_id": "DEV-002",
+    "device_name": "湿度传感器-002",
+    "receipt_type": "设备校准回执",
+    "received_date": "2026-05-15T19:43:50.190416",
+    "operator": "李四",
+    "original_input": {
+      "设备序列号": "SN-2024-005678",
+      "安装位置": "B栋2层配电室",
+      "校准结果": "偏差在允许范围内",
+      "校准人员": "李四",
+      "下次校准日期": "2026-08-13"
+    },
+    "attachments": [
+      {
+        "id": "7da7c14a-4f94-4496-9dbe-4899b14b7d41",
+        "name": "设备校准证书.pdf",
+        "upload_date": "2026-04-30T19:43:50.190400",
+        "expire_date": "2026-08-13T19:43:50.190402",
+        "is_expired": false
+      }
+    ],
+    "system_judgment": {
+      "status": "normal",
+      "issues": [],
+      "judgment_time": "2026-05-15T19:43:50.190422"
+    },
+    "manual_correction": {
+      "operator": null,
+      "correction_note": null,
+      "corrected_status": null,
+      "correction_time": null
+    },
+    "effective_status": "normal",
+    "material_summary": "该设备完成定期校准，校准结果合格，偏差在允许范围内，校准证书有效。",
+    "change_histories": []
+  },
+  {
+    "receipt_id": "2d180081-6ff5-44e3-82ab-d63d102fdf03",
+    "device_id": "DEV-003",
+    "device_name": "压力传感器-003",
+    "receipt_type": "日常巡检回执",
+    "received_date": "2026-05-15T19:43:50.190986",
+    "operator": "王五",
+    "original_input": {
+      "设备序列号": "SN-2024-009012",
+      "巡检位置": "C栋1层监控室",
+      "运行状态": "正常",
+      "巡检人员": "王五",
+      "异常情况": "无"
+    },
+    "attachments": [
+      {
+        "id": "47245297-888d-4532-ac3f-516f2ad196c0",
+        "name": "设备巡检记录.pdf",
+        "upload_date": "2026-05-10T19:43:50.190981",
+        "expire_date": null,
+        "is_expired": false
+      }
+    ],
+    "system_judgment": {
+      "status": "normal",
+      "issues": [],
+      "judgment_time": "2026-05-15T19:43:50.190992"
+    },
+    "manual_correction": {
+      "operator": null,
+      "correction_note": null,
+      "corrected_status": null,
+      "correction_time": null
+    },
+    "effective_status": "normal",
+    "material_summary": "设备日常巡检，运行状态正常，无异常情况记录。",
+    "change_histories": []
+  },
+  {
+    "receipt_id": "3c03c5a5-2c70-4584-8602-4b7307bbe90f",
+    "device_id": "DEV-004",
+    "device_name": "门禁控制器-004",
+    "receipt_type": "设备保修登记回执",
+    "received_date": "2026-05-15T19:43:50.191726",
+    "operator": "赵六",
+    "original_input": {
+      "设备序列号": "SN-2023-000999",
+      "安装位置": "D栋地下室设备间",
+      "保修状态": "已过期",
+      "登记人员": "赵六",
+      "备注": "设备已过保修期，需签订新的维保合同"
+    },
+    "attachments": [
+      {
+        "id": "a01b3d0f-8b3a-4343-b577-486ec4ced932",
+        "name": "设备保修卡.pdf",
+        "upload_date": "2025-04-10T19:43:50.191713",
+        "expire_date": "2026-04-10T19:43:50.191715",
+        "is_expired": true
+      },
+      {
+        "id": "c2bab8a2-3cc8-4185-aa9c-7d2c68b6a36b",
+        "name": "合同补充协议.pdf",
+        "upload_date": "2026-02-04T19:43:50.191720",
+        "expire_date": "2026-12-01T19:43:50.191721",
+        "is_expired": false
+      }
+    ],
+    "system_judgment": {
+      "status": "abnormal",
+      "issues": [
+        "附件[设备保修卡.pdf]已过期，过期日期: 2026-04-10"
+      ],
+      "judgment_time": "2026-05-15T19:43:50.191737"
+    },
+    "manual_correction": {
+      "operator": "审核员-陈七",
+      "correction_note": "系统判断附件过期属实，已通知业务部门跟进维保合同续签事宜，预计10个工作日内完成。",
+      "corrected_status": "normal",
+      "correction_time": "2026-05-15T19:43:50.192726"
+    },
+    "effective_status": "normal",
+    "material_summary": "该设备保修卡已过期35天，需尽快办理新的维保合同续签手续。合同补充协议仍在有效期内。",
+    "change_histories": [
+      {
+        "resource_scope": "manual_correction",
+        "change_type": "add_correction",
+        "change_reason": "人工修正备注",
+        "operator": "审核员-陈七",
+        "change_time": "2026-05-15T19:43:50.192731",
+        "previous_value": null,
+        "new_value": null
+      },
+      {
+        "resource_scope": "合同条款-保修期",
+        "change_type": "contract_supplement",
+        "change_reason": "补签合同补充页，延长设备保修期12个月",
+        "operator": "业务专员-周八",
+        "change_time": "2026-05-15T19:43:50.193270",
+        "previous_value": "已过期",
+        "new_value": "有效期至2025年"
+      }
+    ]
+  }
+]
