@@ -13,87 +13,126 @@ export class SummaryService {
     };
   }> {
     return new Promise((resolve, reject) => {
-      let whereSQL = '';
-      let params: any[] = [];
-      
-      if (businessNos && businessNos.length > 0) {
-        const placeholders = businessNos.map(() => '?').join(',');
-        whereSQL = `WHERE fr.business_no IN (${placeholders})`;
-        params = businessNos;
-      }
+      const summaryMap = new Map<string, SummaryItem & { 
+        patientName?: string; 
+        sampleNo?: string; 
+        department?: string;
+        hasAnomaly?: boolean;
+        isFailure?: boolean;
+      }>();
 
-      getDb().all(`
-        SELECT DISTINCT 
-          fr.business_no,
-          fr.gateway_error,
-          fr.correction_suggestion,
-          fr.conclusion,
-          fr.failure_type as status,
-          ls.patient_name,
-          ls.sample_no,
-          ls.department,
-          vr.status as validation_status,
-          CASE WHEN a.id IS NOT NULL THEN 1 ELSE 0 END as has_anomaly
-        FROM failure_records fr
-        LEFT JOIN lab_samples ls ON fr.business_no = ls.business_no
-        LEFT JOIN validation_records vr ON fr.business_no = vr.business_no
-        LEFT JOIN anomaly_samples a ON fr.business_no = a.business_no
-        ${whereSQL}
-        UNION
-        SELECT DISTINCT
-          vr.business_no,
-          NULL as gateway_error,
-          NULL as correction_suggestion,
-          '校验通过' as conclusion,
-          vr.status,
-          ls.patient_name,
-          ls.sample_no,
-          ls.department,
-          vr.status as validation_status,
-          0 as has_anomaly
-        FROM validation_records vr
-        LEFT JOIN lab_samples ls ON vr.business_no = ls.business_no
-        WHERE vr.status = 'success'
-        ${businessNos && businessNos.length > 0 ? `AND vr.business_no IN (${params.map(() => '?').join(',')})` : ''}
-      `, [...params, ...params], (err, rows: any[] | undefined) => {
-        if (err) reject(err);
+      const processFailures = () => {
+        let whereSQL = '';
+        let params: any[] = [];
+        
+        if (businessNos && businessNos.length > 0) {
+          const placeholders = businessNos.map(() => '?').join(',');
+          whereSQL = `WHERE fr.business_no IN (${placeholders})`;
+          params = businessNos;
+        }
 
-        const summaryMap = new Map<string, SummaryItem & { 
-          patientName?: string; 
-          sampleNo?: string; 
-          department?: string;
-          hasAnomaly?: boolean;
-        }>();
+        getDb().all(`
+          SELECT DISTINCT 
+            fr.business_no,
+            fr.gateway_error,
+            fr.correction_suggestion,
+            fr.conclusion,
+            fr.failure_type as status,
+            ls.patient_name,
+            ls.sample_no,
+            ls.department,
+            CASE WHEN a.id IS NOT NULL THEN 1 ELSE 0 END as has_anomaly
+          FROM failure_records fr
+          LEFT JOIN lab_samples ls ON fr.business_no = ls.business_no
+          LEFT JOIN anomaly_samples a ON fr.business_no = a.business_no
+          ${whereSQL}
+        `, params, (err, failureRows: any[] | undefined) => {
+          if (err) {
+            reject(err);
+            return;
+          }
 
-        for (const row of rows || []) {
-          const businessNo = row.business_no;
-          
-          if (!summaryMap.has(businessNo)) {
+          for (const row of failureRows || []) {
+            const businessNo = row.business_no;
             summaryMap.set(businessNo, {
               businessNo,
               gatewayError: row.gateway_error || undefined,
               correction: row.correction_suggestion || undefined,
-              conclusion: row.conclusion || '校验通过',
-              status: row.status || row.validation_status || 'unknown',
+              conclusion: row.conclusion || '校验失败',
+              status: row.status || 'unknown',
               patientName: row.patient_name,
               sampleNo: row.sample_no,
               department: row.department,
-              hasAnomaly: row.has_anomaly === 1
+              hasAnomaly: row.has_anomaly === 1,
+              isFailure: true
             });
-          } else {
-            const existing = summaryMap.get(businessNo)!;
-            if (row.gateway_error && !existing.gatewayError) {
-              existing.gatewayError = row.gateway_error;
-            }
-            if (row.correction_suggestion && !existing.correction) {
-              existing.correction = row.correction_suggestion;
-            }
-            if (row.has_anomaly === 1) {
-              existing.hasAnomaly = true;
-            }
           }
+
+          processSuccesses();
+        });
+      };
+
+      const processSuccesses = () => {
+        let whereSQL = '';
+        let params: any[] = [];
+        
+        if (businessNos && businessNos.length > 0) {
+          const placeholders = businessNos.map(() => '?').join(',');
+          whereSQL = `AND vr.business_no IN (${placeholders})`;
+          params = businessNos;
         }
 
+        getDb().all(`
+          SELECT DISTINCT
+            vr.business_no,
+            ls.patient_name,
+            ls.sample_no,
+            ls.department
+          FROM validation_records vr
+          LEFT JOIN lab_samples ls ON vr.business_no = ls.business_no
+          WHERE vr.status = 'success'
+          ${whereSQL}
+        `, params, (err, successRows: any[] | undefined) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          for (const row of successRows || []) {
+            const businessNo = row.business_no;
+            
+            if (!summaryMap.has(businessNo)) {
+              summaryMap.set(businessNo, {
+                businessNo,
+                gatewayError: undefined,
+                correction: undefined,
+                conclusion: '校验通过',
+                status: 'success',
+                patientName: row.patient_name,
+                sampleNo: row.sample_no,
+                department: row.department,
+                hasAnomaly: false,
+                isFailure: false
+              });
+            } else {
+              const existing = summaryMap.get(businessNo)!;
+              if (!existing.patientName && row.patient_name) {
+                existing.patientName = row.patient_name;
+              }
+              if (!existing.sampleNo && row.sample_no) {
+                existing.sampleNo = row.sample_no;
+              }
+              if (!existing.department && row.department) {
+                existing.department = row.department;
+              }
+            }
+          }
+
+          finishSummary();
+        });
+      };
+
+      const finishSummary = () => {
         const summary = Array.from(summaryMap.values());
 
         const statistics = {
@@ -108,7 +147,9 @@ export class SummaryService {
           summary,
           statistics
         });
-      });
+      };
+
+      processFailures();
     });
   }
 

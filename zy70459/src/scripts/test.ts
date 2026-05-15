@@ -61,7 +61,28 @@ const runTests = async () => {
   });
   console.log('   ✓ 错误统计完成\n');
 
-  console.log('8. 测试摘要报告生成...');
+  console.log('8. 测试 LAB20240515005 摘要正确性...');
+  const { summary: specificSummary } = await SummaryService.generateSummary(['LAB20240515005']);
+  const anomalySample = specificSummary.find(s => s.businessNo === 'LAB20240515005');
+  if (anomalySample) {
+    console.log(`   业务单号: ${anomalySample.businessNo}`);
+    console.log(`   状态: ${anomalySample.status}`);
+    console.log(`   结论: ${anomalySample.conclusion?.substring(0, 50)}...`);
+    console.log(`   含网关错误: ${!!anomalySample.gatewayError}`);
+    console.log(`   含修正建议: ${!!anomalySample.correction}`);
+    
+    if (anomalySample.status === 'success') {
+      console.error('   ✗ 错误: 异常样本状态不应为 success!');
+      throw new Error('异常样本状态错误');
+    }
+    if (anomalySample.conclusion === '校验通过') {
+      console.error('   ✗ 错误: 异常样本结论不应为"校验通过"!');
+      throw new Error('异常样本结论错误');
+    }
+  }
+  console.log('   ✓ LAB20240515005 摘要正确性验证完成\n');
+
+  console.log('9. 测试摘要报告生成...');
   const report = await SummaryService.generateSummaryReport(['LAB20240515001', 'LAB20240515005']);
   console.log(`   报告长度: ${report.length} 字符`);
   console.log('   ✓ 摘要报告生成完成\n');
