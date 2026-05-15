@@ -1,21 +1,21 @@
 {
   "records": [
     {
-      "id": "7f290c4e-2df0-4f78-82ac-d4fcaa767ce4",
-      "version": "1.0.0",
+      "id": "6f41bf96-97d7-4b81-a05f-7822bb6ee743",
+      "version": "1.0.2",
       "release_date": "2026-05-15",
-      "description": "灰度发布第一版",
-      "overall_status": "partial",
-      "material_summary": "法务证据材料汇总",
-      "updated_at": "2026-05-15T20:42:25.940187"
+      "description": "全成功测试",
+      "overall_status": "success",
+      "material_summary": "正常材料",
+      "updated_at": "2026-05-15T21:10:24.553486"
     }
   ],
   "file_summary_index": {
-    "用户协议更新": [
-      "7f290c4e-2df0-4f78-82ac-d4fcaa767ce4"
+    "项目1": [
+      "6f41bf96-97d7-4b81-a05f-7822bb6ee743"
     ],
-    "隐私政策合规检查": [
-      "7f290c4e-2df0-4f78-82ac-d4fcaa767ce4"
+    "项目2": [
+      "6f41bf96-97d7-4b81-a05f-7822bb6ee743"
     ]
   }
 }

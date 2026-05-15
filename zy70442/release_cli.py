@@ -14,15 +14,29 @@ storage = StorageManager()
 
 
 def calculate_overall_status(items: list) -> Status:
-    statuses = [item.status for item in items]
-    if all(s == Status.SUCCESS for s in statuses):
-        return Status.SUCCESS
-    elif all(s == Status.FAILED for s in statuses):
-        return Status.FAILED
-    elif any(s == Status.FAILED for s in statuses):
+    has_success = False
+    has_failure = False
+    has_needs_review = False
+    has_pending = False
+    
+    for item in items:
+        if item.status == Status.FAILED or item.comp_action_status == CompActionStatus.NOT_EXECUTED:
+            has_failure = True
+        elif item.status == Status.SUCCESS and item.comp_action_status != CompActionStatus.NOT_EXECUTED:
+            has_success = True
+        elif item.status == Status.NEEDS_REVIEW:
+            has_needs_review = True
+        else:
+            has_pending = True
+    
+    if has_failure and has_success:
         return Status.PARTIAL
-    elif any(s == Status.NEEDS_REVIEW for s in statuses):
+    elif has_failure:
+        return Status.FAILED
+    elif has_needs_review:
         return Status.NEEDS_REVIEW
+    elif has_success and not has_pending:
+        return Status.SUCCESS
     else:
         return Status.PENDING
 
@@ -304,11 +318,18 @@ def show(record_id: str):
     click.echo('项目明细:')
     click.echo('-' * 60)
     for item in record.items:
+        item_status = item.status.value
+        comp_status = item.comp_action_status.value
+        
+        is_failure_path = item.status == Status.FAILED or item.comp_action_status == CompActionStatus.NOT_EXECUTED
+        
         click.echo(f"  项目ID: {item.id}")
         click.echo(f"  文件摘要: {item.file_summary}")
         click.echo(f"  文件路径: {item.file_path}")
-        click.echo(f"  状态: {item.status.value}")
-        click.echo(f"  补偿动作: {item.comp_action_status.value}")
+        click.echo(f"  状态: {item_status}")
+        click.echo(f"  补偿动作: {comp_status}")
+        if is_failure_path:
+            click.echo(f"  ⚠️  失败路径: 是 - {'补偿动作漏执行' if item.comp_action_status == CompActionStatus.NOT_EXECUTED else '处理失败'}")
         
         if item.evidence_fields:
             click.echo('  证据字段:')

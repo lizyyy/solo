@@ -1,0 +1,35 @@
+{
+  "id": "6f41bf96-97d7-4b81-a05f-7822bb6ee743",
+  "version": "1.0.2",
+  "release_date": "2026-05-15",
+  "description": "全成功测试",
+  "items": [
+    {
+      "id": "3bb508ce-8ecd-416d-9b08-06887b04e231",
+      "file_summary": "项目1",
+      "file_path": "/legal/1.md",
+      "status": "success",
+      "comp_action_status": "executed",
+      "evidence_fields": [],
+      "failure_reason": null,
+      "model_review": null,
+      "manual_notes": []
+    },
+    {
+      "id": "bb61281f-44cc-4d78-a141-b33f05290a37",
+      "file_summary": "项目2",
+      "file_path": "/legal/2.md",
+      "status": "success",
+      "comp_action_status": "executed",
+      "evidence_fields": [],
+      "failure_reason": null,
+      "model_review": null,
+      "manual_notes": []
+    }
+  ],
+  "overall_status": "success",
+  "created_at": "2026-05-15T21:10:24.331847",
+  "updated_at": "2026-05-15T21:10:24.553486",
+  "failure_items": [],
+  "material_summary": "正常材料"
+}
