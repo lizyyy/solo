@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"runtime-guardrail/models"
 	"runtime-guardrail/services"
 	"strconv"
 
@@ -278,7 +277,7 @@ func ListChangeRequests(c *gin.Context) {
 }
 
 func GetAuditLogs(c *gin.Context) {
-	changeRequestID := c.Param("change_request_id")
+	changeRequestID := c.Param("id")
 
 	logs, err := services.GetAuditLogs(changeRequestID)
 	if err != nil {
@@ -296,7 +295,7 @@ func GetAuditLogs(c *gin.Context) {
 }
 
 func GetRollbackRecords(c *gin.Context) {
-	changeRequestID := c.Param("change_request_id")
+	changeRequestID := c.Param("id")
 
 	records, err := services.GetRollbackRecords(changeRequestID)
 	if err != nil {

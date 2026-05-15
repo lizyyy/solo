@@ -12,18 +12,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type CreateChangeRequestRequest struct {
-	RequestID       string `json:"request_id"`
-	ServiceName     string `json:"service_name" binding:"required"`
-	ParamKey        string `json:"param_key" binding:"required"`
-	OldValue        string `json:"old_value"`
-	NewValue        string `json:"new_value" binding:"required"`
-	RequestedBy     string `json:"requested_by" binding:"required"`
-	AutoRollbackHours int `json:"auto_rollback_hours"`
+	RequestID         string `json:"request_id"`
+	ServiceName       string `json:"service_name" binding:"required"`
+	ParamKey          string `json:"param_key" binding:"required"`
+	OldValue          string `json:"old_value"`
+	NewValue          string `json:"new_value" binding:"required"`
+	RequestedBy       string `json:"requested_by" binding:"required"`
+	AutoRollbackHours int    `json:"auto_rollback_hours"`
 }
 
 type ValidateChangeRequestRequest struct {
@@ -99,14 +98,14 @@ func CreateChangeRequest(req *CreateChangeRequestRequest) (*models.ChangeRequest
 	}
 
 	changeRequest := models.ChangeRequest{
-		RequestID:    req.RequestID,
-		ServiceName:  req.ServiceName,
-		ParamKey:     req.ParamKey,
-		OldValue:     req.OldValue,
-		NewValue:     req.NewValue,
-		RequestedBy:  req.RequestedBy,
-		RiskLevel:    riskLevel,
-		Status:       models.StatusPending,
+		RequestID:   req.RequestID,
+		ServiceName: req.ServiceName,
+		ParamKey:    req.ParamKey,
+		OldValue:    req.OldValue,
+		NewValue:    req.NewValue,
+		RequestedBy: req.RequestedBy,
+		RiskLevel:   riskLevel,
+		Status:      models.StatusPending,
 	}
 
 	if req.AutoRollbackHours > 0 {

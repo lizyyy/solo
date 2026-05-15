@@ -4,6 +4,7 @@ import (
 	"log"
 	"runtime-guardrail/database"
 	"runtime-guardrail/handlers"
+	"runtime-guardrail/services"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -41,8 +42,8 @@ func main() {
 			changeRequests.POST("/reject", handlers.RejectChangeRequest)
 			changeRequests.GET("", handlers.ListChangeRequests)
 			changeRequests.GET("/:id", handlers.GetChangeRequest)
-			changeRequests.GET("/:change_request_id/audit-logs", handlers.GetAuditLogs)
-			changeRequests.GET("/:change_request_id/rollback-records", handlers.GetRollbackRecords)
+			changeRequests.GET("/:id/audit-logs", handlers.GetAuditLogs)
+			changeRequests.GET("/:id/rollback-records", handlers.GetRollbackRecords)
 		}
 
 		api.POST("/auto-rollback/trigger", handlers.TriggerAutoRollback)
@@ -84,8 +85,8 @@ func main() {
 		}
 	}()
 
-	log.Println("Starting Runtime Guardrail API server on :8080...")
-	if err := r.Run(":8080"); err != nil {
+	log.Println("Starting Runtime Guardrail API server on :8083...")
+	if err := r.Run(":8083"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
