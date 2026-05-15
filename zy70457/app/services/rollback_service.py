@@ -124,11 +124,13 @@ class RollbackService:
             task_ids = c.task_ids.split(",")
             result.append({
                 "candidate_id": c.candidate_id,
+                "batch_id": c.batch_id,
                 "task_count": len(task_ids),
+                "task_ids": task_ids,
                 "reason": c.reason,
                 "risk_level": c.risk_level,
-                "is_approved": c.is_approved,
-                "created_at": c.created_at.isoformat() if c.created_at else None
+                "created_by": c.created_by,
+                "created_at": c.created_at
             })
 
         return result
