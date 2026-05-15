@@ -1,6 +1,7 @@
 from datetime import datetime
 from app import db
 import uuid
+import json
 
 class UploadPackage(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -11,6 +12,7 @@ class UploadPackage(db.Model):
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(50), default='UPLOADED')
     error_message = db.Column(db.Text)
+    file_content = db.Column(db.Text)
     
     parse_result = db.relationship('ParseResult', back_populates='upload_package', uselist=False)
     batches = db.relationship('WriteBatch', back_populates='upload_package', lazy='dynamic')
@@ -24,7 +26,8 @@ class UploadPackage(db.Model):
             'uploaded_by': self.uploaded_by,
             'uploaded_at': self.uploaded_at.isoformat(),
             'status': self.status,
-            'error_message': self.error_message
+            'error_message': self.error_message,
+            'has_content': self.file_content is not None
         }
 
 class ParseResult(db.Model):
@@ -186,4 +189,22 @@ class OperationHistory(db.Model):
             'from_status': self.from_status,
             'to_status': self.to_status,
             'details': self.details
+        }
+
+class SourceDataStore(db.Model):
+    id = db.Column(db.String(100), primary_key=True)
+    record_type = db.Column(db.String(50), default='user')
+    data_json = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'record_type': self.record_type,
+            'data': json.loads(self.data_json) if self.data_json else None,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+            'is_active': self.is_active
         }

@@ -14,18 +14,21 @@ def make_error_response(message, code, status_code):
 @bp.route('/packages', methods=['POST'])
 def create_package():
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         
         required_fields = ['filename', 'file_type', 'file_size', 'uploaded_by']
         for field in required_fields:
             if field not in data:
                 return make_error_response(f'Missing required field: {field}', 'MISSING_FIELD', 400)
         
+        file_content = data.get('content') or data.get('file_content')
+        
         package, created = ImportService.create_upload_package(
             filename=data['filename'],
             file_type=data['file_type'],
             file_size=data['file_size'],
-            uploaded_by=data['uploaded_by']
+            uploaded_by=data['uploaded_by'],
+            file_content=file_content
         )
         
         return jsonify({
@@ -174,6 +177,34 @@ def get_history():
             'success': True,
             'data': history,
             'count': len(history)
+        })
+    except Exception as e:
+        return make_error_response(str(e), 'INTERNAL_ERROR', 500)
+
+@bp.route('/source-data', methods=['GET'])
+def list_source_data():
+    try:
+        from app.models import SourceDataStore
+        records = SourceDataStore.query.filter_by(is_active=True).all()
+        return jsonify({
+            'success': True,
+            'data': [r.to_dict() for r in records],
+            'count': len(records)
+        })
+    except Exception as e:
+        return make_error_response(str(e), 'INTERNAL_ERROR', 500)
+
+@bp.route('/source-data/<record_id>', methods=['DELETE'])
+def delete_source_data(record_id):
+    try:
+        from app.models import SourceDataStore
+        record = SourceDataStore.query.get(record_id)
+        if record:
+            record.is_active = False
+            db.session.commit()
+        return jsonify({
+            'success': True,
+            'deleted': record is not None
         })
     except Exception as e:
         return make_error_response(str(e), 'INTERNAL_ERROR', 500)

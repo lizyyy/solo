@@ -2,30 +2,24 @@ from datetime import datetime, timedelta
 from app import db
 from app.models import (
     UploadPackage, ParseResult, PreviewDiff, ConfirmationToken,
-    WriteBatch, RevocationWindow, OperationHistory
+    WriteBatch, RevocationWindow, OperationHistory, SourceDataStore
 )
 from flask import current_app
 import hashlib
 import json
 import uuid
+import csv
+import io
 
 class ImportService:
     @staticmethod
-    def create_upload_package(filename, file_type, file_size, uploaded_by, raw_data=None):
-        existing = UploadPackage.query.filter_by(
-            filename=filename,
-            file_size=file_size,
-            uploaded_by=uploaded_by
-        ).first()
-        
-        if existing and existing.status not in ['ERROR', 'REVOKED']:
-            return existing, False
-        
+    def create_upload_package(filename, file_type, file_size, uploaded_by, file_content=None):
         package = UploadPackage(
             filename=filename,
             file_type=file_type,
             file_size=file_size,
             uploaded_by=uploaded_by,
+            file_content=file_content,
             status='UPLOADED'
         )
         db.session.add(package)
@@ -37,12 +31,12 @@ class ImportService:
             uploaded_by,
             None,
             'UPLOADED',
-            f'Created package for file: {filename}'
+            f'Created package for file: {filename}, has_content: {file_content is not None}'
         )
         
         db.session.commit()
         return package, True
-    
+
     @staticmethod
     def parse_package(package_id, parsed_by):
         package = UploadPackage.query.get(package_id)
@@ -73,7 +67,7 @@ class ImportService:
         db.session.flush()
         
         try:
-            parsed_data = ImportService._simulate_parsing(package)
+            parsed_data = ImportService._parse_real_content(package)
             
             parse_result.total_records = parsed_data['total']
             parse_result.valid_records = parsed_data['valid']
@@ -82,7 +76,7 @@ class ImportService:
             parse_result.validation_errors = json.dumps(parsed_data['errors'])
             parse_result.status = 'COMPLETED'
             
-            ImportService._generate_preview_diffs(parse_result, parsed_data['records'])
+            ImportService._generate_real_diffs(parse_result, parsed_data['records'])
             
             package.status = 'PARSED'
             
@@ -104,78 +98,174 @@ class ImportService:
             package.error_message = str(e)
             db.session.commit()
             raise
-    
+
     @staticmethod
-    def _deterministic_hash(value, seed=0):
-        import hashlib
-        combined = f"{value}-{seed}".encode('utf-8')
-        return int(hashlib.md5(combined).hexdigest(), 16)
-    
-    @staticmethod
-    def _simulate_parsing(package):
-        seed = ImportService._deterministic_hash(package.filename + str(package.file_size))
-        total = 100 + (seed % 101)
-        invalid = seed % 11
-        valid = total - invalid
-        
+    def _parse_real_content(package):
         records = []
         errors = []
         
-        for i in range(valid):
-            record_seed = ImportService._deterministic_hash(package.id, i)
-            records.append({
-                'id': f'rec-{package.id}-{i:04d}',
-                'name': f'{package.filename.split(".")[0]} Record {i + 1}',
-                'email': f'user{i + 1}@import.example.com',
-                'data': {'index': i + 1, 'source': package.filename}
-            })
-        
-        for i in range(invalid):
-            error_seed = ImportService._deterministic_hash(package.id, valid + i)
-            error_types = ['Invalid email format', 'Missing required field', 'Data type mismatch']
-            errors.append({
-                'record_index': valid + i,
-                'field': 'email' if error_seed % 3 == 0 else 'name',
-                'error': error_types[error_seed % 3]
-            })
+        if package.file_content:
+            if package.file_type.lower() == 'json':
+                try:
+                    data = json.loads(package.file_content)
+                    if isinstance(data, list):
+                        for idx, item in enumerate(data):
+                            record, error = ImportService._validate_record(item, idx)
+                            if error:
+                                errors.append(error)
+                            else:
+                                records.append(record)
+                    else:
+                        errors.append({
+                            'record_index': 0,
+                            'field': 'root',
+                            'error': 'JSON must be an array of records'
+                        })
+                except json.JSONDecodeError as e:
+                    errors.append({
+                        'record_index': 0,
+                        'field': 'content',
+                        'error': f'Invalid JSON: {str(e)}'
+                    })
+            
+            elif package.file_type.lower() == 'csv':
+                try:
+                    reader = csv.DictReader(io.StringIO(package.file_content))
+                    for idx, row in enumerate(reader):
+                        record, error = ImportService._validate_record(row, idx)
+                        if error:
+                            errors.append(error)
+                        else:
+                            records.append(record)
+                except Exception as e:
+                    errors.append({
+                        'record_index': 0,
+                        'field': 'content',
+                        'error': f'CSV parse error: {str(e)}'
+                    })
+        else:
+            seed = ImportService._deterministic_hash(package.filename + str(package.file_size))
+            total = 10 + (seed % 21)
+            for i in range(total):
+                record = {
+                    'id': f'user_{package.id}_{i:03d}',
+                    'name': f'{package.filename.split(".")[0]} User {i + 1}',
+                    'email': f'user{i + 1}@import.example.com',
+                    'status': 'active' if i % 5 != 0 else 'inactive'
+                }
+                if i % 7 == 0:
+                    errors.append({
+                        'record_index': i,
+                        'field': 'email' if i % 2 == 0 else 'name',
+                        'error': 'Simulated validation error for testing'
+                    })
+                else:
+                    records.append(record)
         
         return {
-            'total': total,
-            'valid': valid,
-            'invalid': invalid,
+            'total': len(records) + len(errors),
+            'valid': len(records),
+            'invalid': len(errors),
             'records': records,
             'errors': errors
         }
-    
+
     @staticmethod
-    def _generate_preview_diffs(parse_result, records):
+    def _validate_record(record, index):
+        errors = []
+        
+        record_id = record.get('id') or record.get('user_id') or record.get('record_id') or f'record_{index}'
+        
+        email = record.get('email', '')
+        if email and '@' not in email:
+            errors.append({
+                'record_index': index,
+                'field': 'email',
+                'error': f'Invalid email format: {email}'
+            })
+        
+        name = record.get('name', '')
+        if not name and not record.get('username'):
+            errors.append({
+                'record_index': index,
+                'field': 'name',
+                'error': 'Name field is required'
+            })
+        
+        if errors:
+            return None, errors[0]
+        
+        normalized = {
+            'id': str(record_id),
+            'name': name or record.get('username', ''),
+            'email': email,
+            'status': record.get('status', 'active'),
+            'raw_data': dict(record)
+        }
+        return normalized, None
+
+    @staticmethod
+    def _generate_real_diffs(parse_result, records):
         PreviewDiff.query.filter_by(parse_result_id=parse_result.id).delete()
         
-        diff_types = ['NEW', 'UPDATE', 'DELETE']
-        package = UploadPackage.query.get(parse_result.upload_package_id)
-        seed = ImportService._deterministic_hash(package.filename + str(package.file_size))
-        
-        for i, record in enumerate(records[:min(20, len(records))]):
-            type_idx = (seed + i) % 3
-            diff_type = diff_types[type_idx]
-            if diff_type == 'UPDATE':
-                current_val = json.dumps({'name': f'Old Name {i}', 'email': f'old{i}@example.com'})
-                new_val = json.dumps(record)
-            else:
-                current_val = json.dumps({}) if diff_type == 'NEW' else json.dumps(record)
-                new_val = json.dumps(record) if diff_type == 'NEW' else json.dumps({})
+        for record in records:
+            record_id = record['id']
+            existing = SourceDataStore.query.filter_by(id=record_id, is_active=True).first()
             
-            confidence = 0.7 + ((seed + i) % 31) / 100.0
-            diff = PreviewDiff(
-                parse_result_id=parse_result.id,
-                diff_type=diff_type,
-                record_identifier=record['id'],
-                current_value=current_val,
-                new_value=new_val,
-                confidence_score=confidence
-            )
-            db.session.add(diff)
-    
+            if existing:
+                existing_data = json.loads(existing.data_json)
+                if ImportService._records_different(existing_data, record):
+                    diff = PreviewDiff(
+                        parse_result_id=parse_result.id,
+                        diff_type='UPDATE',
+                        record_identifier=record_id,
+                        current_value=json.dumps(existing_data),
+                        new_value=json.dumps(record),
+                        confidence_score=ImportService._calculate_confidence(existing_data, record)
+                    )
+                    db.session.add(diff)
+            else:
+                diff = PreviewDiff(
+                    parse_result_id=parse_result.id,
+                    diff_type='NEW',
+                    record_identifier=record_id,
+                    current_value=json.dumps({}),
+                    new_value=json.dumps(record),
+                    confidence_score=1.0
+                )
+                db.session.add(diff)
+        
+        for existing in SourceDataStore.query.filter_by(is_active=True).all():
+            found = any(r['id'] == existing.id for r in records)
+            if not found:
+                diff = PreviewDiff(
+                    parse_result_id=parse_result.id,
+                    diff_type='DELETE',
+                    record_identifier=existing.id,
+                    current_value=existing.data_json,
+                    new_value=json.dumps({}),
+                    confidence_score=0.95
+                )
+                db.session.add(diff)
+
+    @staticmethod
+    def _records_different(old, new):
+        compare_fields = ['name', 'email', 'status']
+        for field in compare_fields:
+            if str(old.get(field, '')) != str(new.get(field, '')):
+                return True
+        return False
+
+    @staticmethod
+    def _calculate_confidence(old, new):
+        same_fields = sum(1 for f in ['name', 'email'] if old.get(f) == new.get(f))
+        return 0.7 + (same_fields * 0.15)
+
+    @staticmethod
+    def _deterministic_hash(value, seed=0):
+        combined = f"{value}-{seed}".encode('utf-8')
+        return int(hashlib.md5(combined).hexdigest(), 16)
+
     @staticmethod
     def get_preview_diff(package_id):
         package = UploadPackage.query.get(package_id)
@@ -200,7 +290,7 @@ class ImportService:
             'parse_result': parse_result.to_dict(),
             'diffs': [d.to_dict() for d in diffs]
         }
-    
+
     @staticmethod
     def create_confirmation_token(package_id, created_by):
         package = UploadPackage.query.get(package_id)
@@ -246,12 +336,12 @@ class ImportService:
         
         db.session.commit()
         return confirmation
-    
+
     @staticmethod
     def _generate_token():
         import secrets
         return hashlib.sha256(secrets.token_bytes(32)).hexdigest()
-    
+
     @staticmethod
     def confirm_and_write(package_id, token, confirmed_by):
         package = UploadPackage.query.get(package_id)
@@ -292,47 +382,41 @@ class ImportService:
         db.session.flush()
         
         parse_result = ParseResult.query.filter_by(upload_package_id=package_id).first()
+        records = json.loads(parse_result.raw_data) if parse_result.raw_data else []
         
-        batch_size = current_app.config['MAX_BATCH_SIZE']
-        total_records = parse_result.valid_records
-        num_batches = (total_records + batch_size - 1) // batch_size
-        
-        batches = []
-        for i in range(num_batches):
-            batch = WriteBatch(
-                upload_package_id=package_id,
-                batch_number=i + 1,
-                total_records=min(batch_size, total_records - i * batch_size),
-                written_by=confirmed_by,
-                status='PENDING'
-            )
-            db.session.add(batch)
-            batches.append(batch)
-        
+        batch = WriteBatch(
+            upload_package_id=package_id,
+            batch_number=1,
+            total_records=len(records),
+            written_by=confirmed_by,
+            status='WRITING'
+        )
+        db.session.add(batch)
         db.session.flush()
         
-        for batch in batches:
-            batch.status = 'WRITING'
+        success_count = 0
+        failed_count = 0
+        for record in records:
+            try:
+                ImportService._write_record(record)
+                success_count += 1
+            except Exception:
+                failed_count += 1
         
-        db.session.flush()
+        batch.success_records = success_count
+        batch.failed_records = failed_count
+        batch.completed_at = datetime.utcnow()
+        batch.status = 'COMPLETED'
         
-        import random
-        for batch in batches:
-            success = batch.total_records - random.randint(0, batch.total_records // 10)
-            batch.success_records = success
-            batch.failed_records = batch.total_records - success
-            batch.completed_at = datetime.utcnow()
-            batch.status = 'COMPLETED'
-            
-            revocation_expires = datetime.utcnow() + timedelta(
-                minutes=current_app.config['REVOCATION_WINDOW_MINUTES']
-            )
-            revocation = RevocationWindow(
-                write_batch_id=batch.id,
-                expires_at=revocation_expires,
-                status='ACTIVE'
-            )
-            db.session.add(revocation)
+        revocation_expires = datetime.utcnow() + timedelta(
+            minutes=current_app.config['REVOCATION_WINDOW_MINUTES']
+        )
+        revocation = RevocationWindow(
+            write_batch_id=batch.id,
+            expires_at=revocation_expires,
+            status='ACTIVE'
+        )
+        db.session.add(revocation)
         
         package.status = 'WRITTEN'
         
@@ -342,12 +426,29 @@ class ImportService:
             confirmed_by,
             'WRITING',
             'WRITTEN',
-            f'Completed writing {total_records} records in {num_batches} batches'
+            f'Completed writing {success_count} records, {failed_count} failed'
         )
         
         db.session.commit()
-        return batches
-    
+        return [batch]
+
+    @staticmethod
+    def _write_record(record):
+        existing = SourceDataStore.query.filter_by(id=record['id']).first()
+        record_data = {k: v for k, v in record.items() if k != 'raw_data'}
+        
+        if existing:
+            existing.data_json = json.dumps(record_data)
+            existing.is_active = True
+        else:
+            new_record = SourceDataStore(
+                id=record['id'],
+                record_type='user',
+                data_json=json.dumps(record_data),
+                is_active=True
+            )
+            db.session.add(new_record)
+
     @staticmethod
     def revoke_batch(batch_id, revoked_by, reason):
         batch = WriteBatch.query.get(batch_id)
@@ -368,6 +469,17 @@ class ImportService:
         
         batch.status = 'REVOKED'
         
+        parse_result = ParseResult.query.filter_by(upload_package_id=batch.upload_package_id).first()
+        if parse_result and parse_result.raw_data:
+            records = json.loads(parse_result.raw_data)
+            for record in records:
+                existing = SourceDataStore.query.filter_by(id=record['id']).first()
+                if existing:
+                    existing.is_active = False
+        
+        package = UploadPackage.query.get(batch.upload_package_id)
+        package.status = 'REVOKED'
+        
         ImportService._record_history(
             batch.upload_package_id,
             'REVOKE',
@@ -377,12 +489,9 @@ class ImportService:
             f'Revoked batch {batch_id}: {reason}'
         )
         
-        package = UploadPackage.query.get(batch.upload_package_id)
-        package.status = 'REVOKED'
-        
         db.session.commit()
         return revocation
-    
+
     @staticmethod
     def get_package_status(package_id):
         package = UploadPackage.query.get(package_id)
@@ -411,7 +520,7 @@ class ImportService:
             result['revocations'] = revocations
         
         return result
-    
+
     @staticmethod
     def get_history(package_id=None, operator=None, limit=100):
         query = OperationHistory.query
@@ -424,7 +533,7 @@ class ImportService:
         
         history = query.order_by(OperationHistory.operated_at.desc()).limit(limit).all()
         return [h.to_dict() for h in history]
-    
+
     @staticmethod
     def list_packages(status=None, uploaded_by=None, limit=50):
         query = UploadPackage.query
@@ -437,7 +546,7 @@ class ImportService:
         
         packages = query.order_by(UploadPackage.uploaded_at.desc()).limit(limit).all()
         return [p.to_dict() for p in packages]
-    
+
     @staticmethod
     def _record_history(package_id, operation, operator, from_status, to_status, details):
         history = OperationHistory(
