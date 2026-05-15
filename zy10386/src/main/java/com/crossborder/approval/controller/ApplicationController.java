@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -172,11 +173,11 @@ public class ApplicationController {
 
     @GetMapping("/statuses")
     public ApiResponse<List<ApplicationStatus>> getAllStatuses() {
-        return ApiResponse.success(List.of(ApplicationStatus.values()));
+        return ApiResponse.success(Arrays.asList(ApplicationStatus.values()));
     }
 
     @GetMapping("/regions")
     public ApiResponse<List<RegionType>> getAllRegions() {
-        return ApiResponse.success(List.of(RegionType.values()));
+        return ApiResponse.success(Arrays.asList(RegionType.values()));
     }
 }

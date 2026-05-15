@@ -36,11 +36,22 @@
 
 ## 快速开始
 
-### 环境要求
-- Java 8 或更高版本（兼容 Java 8-21）
+### ⚠️ 重要：环境要求
+- **必须是完整 JDK 8+**（不是 JRE，需要 javac 编译器）
+- 兼容 Java 8-21
 - 无需预先安装 Maven（已内置 Maven Wrapper）
 
-### 一键启动（推荐）
+**环境检查命令：**
+```bash
+java -version   # 检查 Java 版本
+javac -version  # 确认有编译器（必须有！）
+```
+
+> 💡 如果只有 JRE 没有 javac：请安装完整 JDK https://adoptium.net/
+
+---
+
+### 🚀 一键启动（推荐）
 
 **Mac/Linux:**
 ```bash
@@ -52,31 +63,48 @@ chmod +x start.sh && ./start.sh
 start.bat
 ```
 
-### 手动启动方式
+脚本会自动：
+1. ✅ 检查 Java 环境
+2. ✅ 自动下载 Maven（首次运行）
+3. ✅ 编译项目
+4. ✅ 启动服务
+
+---
+
+### 🔧 手动启动方式
 
 使用 Maven Wrapper（无需本地安装 Maven）:
 
 ```bash
-# 编译项目
+# 1. 编译项目（需要 JDK）
 ./mvnw clean package -DskipTests   # Mac/Linux
 mvnw.cmd clean package -DskipTests  # Windows
 
-# 启动项目
-java -jar target/*.jar
+# 2. 启动服务
+java -jar target/data-access-approval-1.0.0.jar
 ```
 
-### 服务访问
+---
+
+### 🌐 服务访问
 
 启动成功后访问:
-- API 服务: http://localhost:8080
-- H2 数据库控制台: http://localhost:8080/h2-console
+- **API 服务**: http://localhost:8080
+- **API 快速测试**: http://localhost:8080/api/applications/statuses
+- **H2 数据库控制台**: http://localhost:8080/h2-console
 
 **数据库连接信息（持久化存储）:**
 - JDBC URL: `jdbc:h2:file:./data/approvaldb`
 - 用户名: `sa`
 - 密码: (空)
 
-> 💡 数据持久化说明：数据库文件存储在 `./data/` 目录下，重启服务后数据不会丢失
+> 💡 数据持久化说明：数据库文件存储在 `./data/` 目录下，重启服务后所有申请、审批记录、令牌、审计日志都会保留
+
+---
+
+### 📖 详细启动指南
+
+更多启动方式、常见问题解决方案请查看 **[QUICKSTART.md](QUICKSTART.md)**
 
 ## API 接口说明
 

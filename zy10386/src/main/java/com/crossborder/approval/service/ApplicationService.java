@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -149,7 +150,7 @@ public class ApplicationService {
     }
 
     public List<RegionType> getRestrictedRegions() {
-        return List.of(
+        return Arrays.asList(
                 RegionType.UNITED_STATES,
                 RegionType.EUROPEAN_UNION,
                 RegionType.HONG_KONG

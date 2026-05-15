@@ -81,11 +81,15 @@ public class ApprovalService {
             return 3;
         }
         int sensitivityLevel = dataDomain.getSensitivityLevel() != null ? dataDomain.getSensitivityLevel() : 2;
-        return switch (sensitivityLevel) {
-            case 1 -> 1;
-            case 2 -> 2;
-            case 3 -> 3;
-            default -> 2;
-        };
+        switch (sensitivityLevel) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 3:
+                return 3;
+            default:
+                return 2;
+        }
     }
 }

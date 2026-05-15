@@ -22,13 +22,21 @@ public class ExportService {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    private String repeatString(String str, int times) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < times; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+
     public String exportTroubleshootingReport(String applicationNo) {
         DataAccessApplication application = applicationService.getApplicationByNo(applicationNo);
 
         StringBuilder report = new StringBuilder();
-        report.append("=".repeat(80)).append("\n");
+        report.append(repeatString("=", 80)).append("\n");
         report.append("跨境数据访问审批 - 问题排查汇总报告\n");
-        report.append("=".repeat(80)).append("\n\n");
+        report.append(repeatString("=", 80)).append("\n\n");
 
         report.append("【1. 申请基本信息】\n");
         report.append("申请编号: ").append(application.getApplicationNo()).append("\n");
@@ -109,9 +117,9 @@ public class ExportService {
             }
         }
 
-        report.append("=".repeat(80)).append("\n");
+        report.append(repeatString("=", 80)).append("\n");
         report.append("报告生成时间: ").append(java.time.LocalDateTime.now().format(FORMATTER)).append("\n");
-        report.append("=".repeat(80)).append("\n");
+        report.append(repeatString("=", 80)).append("\n");
 
         log.info("问题排查报告已导出: {}", applicationNo);
         return report.toString();
