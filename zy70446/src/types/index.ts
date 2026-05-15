@@ -46,6 +46,8 @@ export interface AuditRecord {
   corrections: ManualCorrection[];
   status: 'pending' | 'confirmed' | 'corrected';
   finalDecision?: 'pass' | 'reject' | 'review';
+  handler?: string;
+  auditTimestamp?: number;
 }
 
 export interface PreviewResult {

@@ -1,66 +1,71 @@
 {
   "records": {
-    "hash_4aca0207": {
+    "hash_172bdd72": {
       "result": {
-        "itemId": "sample-001",
+        "itemId": "img-001",
         "item": {
-          "id": "sample-001",
-          "content": "这是一条正常的用户评论，内容积极向上，没有任何违规内容。",
-          "contentType": "text",
+          "id": "img-001",
+          "content": "https://example.com/images/normal-product.jpg",
+          "contentType": "image",
           "metadata": {
-            "source": "comment",
-            "userId": "user-123"
+            "filename": "normal-product.jpg",
+            "fileSize": 2048576,
+            "imageWidth": 800,
+            "imageHeight": 600,
+            "source": "product-upload",
+            "uploaderId": "user-1001",
+            "description": "正常商品展示图片"
           }
         },
         "modelResults": [
           {
             "modelName": "SafetyModel-A",
-            "score": 0.061,
+            "score": 0.116,
             "label": "normal",
-            "confidence": 0.967,
+            "confidence": 0.819,
             "details": {
               "provider": "Vendor-A",
               "version": "v2.1",
               "categories": {
-                "violence": 0.01837666395686949,
-                "adult": 0.015313886630724576,
-                "political": 0.012251109304579661,
-                "fraud": 0.009188331978434746,
-                "other": 0.006125554652289831
+                "violence": 0.034832498218614755,
+                "adult": 0.02902708184884563,
+                "political": 0.023221665479076503,
+                "fraud": 0.017416249109307377,
+                "other": 0.011610832739538252
               }
             }
           },
           {
             "modelName": "ContentShield-B",
-            "score": 0,
+            "score": 0.141,
             "label": "normal",
-            "confidence": 0.856,
+            "confidence": 0.868,
             "details": {
               "provider": "Vendor-B",
               "version": "v1.5",
               "categories": {
-                "violence": 0,
-                "adult": 0,
-                "political": 0,
-                "fraud": 0,
-                "other": 0
+                "violence": 0.04244124894563952,
+                "adult": 0.0353677074546996,
+                "political": 0.028294165963759683,
+                "fraud": 0.02122062447281976,
+                "other": 0.014147082981879841
               }
             }
           },
           {
             "modelName": "HarmDetector-C",
-            "score": 0,
+            "score": 0.102,
             "label": "normal",
-            "confidence": 0.833,
+            "confidence": 0.744,
             "details": {
               "provider": "Vendor-C",
               "version": "v3.0",
               "categories": {
-                "violence": 0,
-                "adult": 0,
-                "political": 0,
-                "fraud": 0,
-                "other": 0
+                "violence": 0.03046271772438807,
+                "adult": 0.025385598103656728,
+                "political": 0.020308478482925385,
+                "fraud": 0.015231358862194035,
+                "other": 0.010154239241462693
               }
             }
           }
@@ -98,11 +103,575 @@
           }
         ],
         "overallDecision": "pass",
-        "overallConfidence": 0.885,
-        "timestamp": 1778849286384
+        "overallConfidence": 0.81,
+        "timestamp": 1778850869074
       },
       "corrections": [],
-      "status": "pending"
+      "status": "pending",
+      "handler": "image-auditor-02",
+      "auditTimestamp": 1778850869074
+    },
+    "hash_6ee9404d": {
+      "result": {
+        "itemId": "img-002",
+        "item": {
+          "id": "img-002",
+          "content": "https://example.com/images/sensitive-logo.png",
+          "contentType": "image",
+          "metadata": {
+            "filename": "sensitive-logo.png",
+            "fileSize": 512000,
+            "imageWidth": 400,
+            "imageHeight": 400,
+            "source": "user-avatar",
+            "uploaderId": "user-1002",
+            "description": "包含敏感标识的头像图片",
+            "detectionTags": [
+              "logo-sensitive",
+              "brand-unauthorized"
+            ]
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0.081,
+            "label": "normal",
+            "confidence": 0.739,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0.0243053112250981,
+                "adult": 0.020254426020915085,
+                "political": 0.01620354081673207,
+                "fraud": 0.01215265561254905,
+                "other": 0.008101770408366035
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0.116,
+            "label": "normal",
+            "confidence": 0.764,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0.034921745084926466,
+                "adult": 0.02910145423743872,
+                "political": 0.02328116338995098,
+                "fraud": 0.017460872542463233,
+                "other": 0.01164058169497549
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0.117,
+            "label": "normal",
+            "confidence": 0.775,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0.03520147845583558,
+                "adult": 0.02933456537986298,
+                "political": 0.023467652303890387,
+                "fraud": 0.01760073922791779,
+                "other": 0.011733826151945194
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": false,
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": false,
+            "severity": "low"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "pass",
+        "overallConfidence": 0.759,
+        "timestamp": 1778850869086
+      },
+      "corrections": [],
+      "status": "pending",
+      "handler": "image-auditor-02",
+      "auditTimestamp": 1778850869086
+    },
+    "hash_33bb963d": {
+      "result": {
+        "itemId": "img-003",
+        "item": {
+          "id": "img-003",
+          "content": "https://example.com/images/violence-scene.jpg",
+          "contentType": "image",
+          "metadata": {
+            "filename": "violence-scene.jpg",
+            "fileSize": 3145728,
+            "imageWidth": 1024,
+            "imageHeight": 768,
+            "source": "comment-image",
+            "uploaderId": "user-1003",
+            "description": "包含暴力内容的图片",
+            "detectionTags": [
+              "violence",
+              "bloody",
+              "weapon"
+            ]
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0.068,
+            "label": "normal",
+            "confidence": 0.96,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0.0205138716296837,
+                "adult": 0.017094893024736418,
+                "political": 0.013675914419789135,
+                "fraud": 0.01025693581484185,
+                "other": 0.006837957209894567
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0.094,
+            "label": "normal",
+            "confidence": 0.793,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0.028281243567919598,
+                "adult": 0.02356770297326633,
+                "political": 0.018854162378613065,
+                "fraud": 0.014140621783959799,
+                "other": 0.009427081189306533
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0.007,
+            "label": "normal",
+            "confidence": 0.911,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0.002090765157141737,
+                "adult": 0.0017423042976181143,
+                "political": 0.0013938434380944915,
+                "fraud": 0.0010453825785708686,
+                "other": 0.0006969217190472458
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": false,
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": false,
+            "severity": "low"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "pass",
+        "overallConfidence": 0.888,
+        "timestamp": 1778850869098
+      },
+      "corrections": [],
+      "status": "pending",
+      "handler": "image-auditor-02",
+      "auditTimestamp": 1778850869098
+    },
+    "hash_47421953": {
+      "result": {
+        "itemId": "img-004",
+        "item": {
+          "id": "img-004",
+          "content": "https://example.com/images/ad-banner.jpg",
+          "contentType": "image",
+          "metadata": {
+            "filename": "ad-banner.jpg",
+            "fileSize": 1048576,
+            "imageWidth": 1200,
+            "imageHeight": 300,
+            "source": "banner-upload",
+            "uploaderId": "user-1004",
+            "description": "可能包含广告联系方式的图片",
+            "hasText": true,
+            "extractedText": "微信: contact123 电话:13800138000"
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0.074,
+            "label": "normal",
+            "confidence": 0.763,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0.02205057367456179,
+                "adult": 0.018375478062134826,
+                "political": 0.014700382449707861,
+                "fraud": 0.011025286837280894,
+                "other": 0.0073501912248539305
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0.135,
+            "label": "normal",
+            "confidence": 0.961,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0.04046786982453991,
+                "adult": 0.03372322485378326,
+                "political": 0.026978579883026613,
+                "fraud": 0.020233934912269956,
+                "other": 0.013489289941513306
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0.029,
+            "label": "normal",
+            "confidence": 0.829,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0.008810068420078398,
+                "adult": 0.0073417236833986654,
+                "political": 0.005873378946718933,
+                "fraud": 0.004405034210039199,
+                "other": 0.0029366894733594663
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": false,
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": false,
+            "severity": "low"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "pass",
+        "overallConfidence": 0.851,
+        "timestamp": 1778850869108
+      },
+      "corrections": [],
+      "status": "pending",
+      "handler": "image-auditor-02",
+      "auditTimestamp": 1778850869108
+    },
+    "hash_6f6116e1": {
+      "result": {
+        "itemId": "img-005",
+        "item": {
+          "id": "img-005",
+          "content": "https://example.com/images/user-photo.png",
+          "contentType": "image",
+          "metadata": {
+            "filename": "user-photo.png",
+            "fileSize": 768000,
+            "imageWidth": 500,
+            "imageHeight": 500,
+            "source": "profile-photo",
+            "uploaderId": "user-1005",
+            "description": "正常用户头像照片"
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0.03,
+            "label": "normal",
+            "confidence": 0.706,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0.008892900345015454,
+                "adult": 0.007410750287512879,
+                "political": 0.005928600230010303,
+                "fraud": 0.004446450172507727,
+                "other": 0.0029643001150051517
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0.101,
+            "label": "normal",
+            "confidence": 0.742,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0.03031689971721033,
+                "adult": 0.025264083097675277,
+                "political": 0.020211266478140224,
+                "fraud": 0.015158449858605165,
+                "other": 0.010105633239070112
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0.078,
+            "label": "normal",
+            "confidence": 0.836,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0.023471058026742618,
+                "adult": 0.019559215022285515,
+                "political": 0.015647372017828412,
+                "fraud": 0.011735529013371309,
+                "other": 0.007823686008914206
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": false,
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": false,
+            "severity": "low"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "pass",
+        "overallConfidence": 0.761,
+        "timestamp": 1778850869120
+      },
+      "corrections": [],
+      "status": "pending",
+      "handler": "image-auditor-02",
+      "auditTimestamp": 1778850869120
+    },
+    "hash_4aca0207": {
+      "result": {
+        "itemId": "sample-001",
+        "item": {
+          "id": "sample-001",
+          "content": "这是一条正常的用户评论，内容积极向上，没有任何违规内容。",
+          "contentType": "text",
+          "metadata": {
+            "source": "comment",
+            "userId": "user-123"
+          }
+        },
+        "modelResults": [
+          {
+            "modelName": "SafetyModel-A",
+            "score": 0,
+            "label": "normal",
+            "confidence": 0.731,
+            "details": {
+              "provider": "Vendor-A",
+              "version": "v2.1",
+              "categories": {
+                "violence": 0,
+                "adult": 0,
+                "political": 0,
+                "fraud": 0,
+                "other": 0
+              }
+            }
+          },
+          {
+            "modelName": "ContentShield-B",
+            "score": 0.096,
+            "label": "normal",
+            "confidence": 0.787,
+            "details": {
+              "provider": "Vendor-B",
+              "version": "v1.5",
+              "categories": {
+                "violence": 0.028762697679638686,
+                "adult": 0.02396891473303224,
+                "political": 0.019175131786425794,
+                "fraud": 0.014381348839819343,
+                "other": 0.009587565893212897
+              }
+            }
+          },
+          {
+            "modelName": "HarmDetector-C",
+            "score": 0.052,
+            "label": "normal",
+            "confidence": 0.805,
+            "details": {
+              "provider": "Vendor-C",
+              "version": "v3.0",
+              "categories": {
+                "violence": 0.015503649696073393,
+                "adult": 0.012919708080061161,
+                "political": 0.01033576646404893,
+                "fraud": 0.0077518248480366965,
+                "other": 0.005167883232024465
+              }
+            }
+          }
+        ],
+        "ruleResults": [
+          {
+            "ruleId": "R001",
+            "ruleName": "敏感词检测",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R002",
+            "ruleName": "暴力内容规则",
+            "matched": false,
+            "severity": "high"
+          },
+          {
+            "ruleId": "R003",
+            "ruleName": "广告内容检测",
+            "matched": false,
+            "severity": "medium"
+          },
+          {
+            "ruleId": "R004",
+            "ruleName": "联系方式提取",
+            "matched": false,
+            "severity": "low"
+          },
+          {
+            "ruleId": "R005",
+            "ruleName": "政治敏感词",
+            "matched": false,
+            "severity": "high"
+          }
+        ],
+        "overallDecision": "pass",
+        "overallConfidence": 0.774,
+        "timestamp": 1778850878439
+      },
+      "corrections": [],
+      "status": "confirmed",
+      "handler": "text-auditor-01",
+      "auditTimestamp": 1778850878439,
+      "finalDecision": "pass"
     },
     "hash_2e886716": {
       "result": {
@@ -119,52 +688,52 @@
         "modelResults": [
           {
             "modelName": "SafetyModel-A",
-            "score": 0.037,
+            "score": 0.012,
             "label": "normal",
-            "confidence": 0.973,
+            "confidence": 0.98,
             "details": {
               "provider": "Vendor-A",
               "version": "v2.1",
               "categories": {
-                "violence": 0.010962580618003336,
-                "adult": 0.009135483848336113,
-                "political": 0.00730838707866889,
-                "fraud": 0.005481290309001668,
-                "other": 0.003654193539334445
+                "violence": 0.0036624678106588534,
+                "adult": 0.003052056508882378,
+                "political": 0.002441645207105903,
+                "fraud": 0.0018312339053294267,
+                "other": 0.0012208226035529514
               }
             }
           },
           {
             "modelName": "ContentShield-B",
-            "score": 0.111,
-            "label": "normal",
-            "confidence": 0.843,
+            "score": 0.2,
+            "label": "low_risk",
+            "confidence": 0.994,
             "details": {
               "provider": "Vendor-B",
               "version": "v1.5",
               "categories": {
-                "violence": 0.03329571831964853,
-                "adult": 0.027746431933040445,
-                "political": 0.02219714554643236,
-                "fraud": 0.016647859159824266,
-                "other": 0.01109857277321618
+                "violence": 0.05985468623228603,
+                "adult": 0.049878905193571695,
+                "political": 0.03990312415485736,
+                "fraud": 0.029927343116143014,
+                "other": 0.01995156207742868
               }
             }
           },
           {
             "modelName": "HarmDetector-C",
-            "score": 0.036,
-            "label": "normal",
-            "confidence": 0.834,
+            "score": 0.188,
+            "label": "low_risk",
+            "confidence": 0.749,
             "details": {
               "provider": "Vendor-C",
               "version": "v3.0",
               "categories": {
-                "violence": 0.010876726320914529,
-                "adult": 0.009063938600762107,
-                "political": 0.007251150880609686,
-                "fraud": 0.0054383631604572645,
-                "other": 0.003625575440304843
+                "violence": 0.05647634268400503,
+                "adult": 0.04706361890333753,
+                "political": 0.03765089512267003,
+                "fraud": 0.028238171342002516,
+                "other": 0.018825447561335015
               }
             }
           }
@@ -204,22 +773,13 @@
           }
         ],
         "overallDecision": "review",
-        "overallConfidence": 0.707,
-        "timestamp": 1778849286398
+        "overallConfidence": 0.726,
+        "timestamp": 1778850878451
       },
-      "corrections": [
-        {
-          "id": "c1870609-e7c1-4afa-8b7c-8705c05b5d75",
-          "resultId": "sample-002",
-          "handler": "zhangsan",
-          "originalDecision": "review",
-          "newDecision": "pass",
-          "remark": "内容为正常联系方式，误判",
-          "timestamp": 1778849301789
-        }
-      ],
-      "status": "corrected",
-      "finalDecision": "pass"
+      "corrections": [],
+      "status": "pending",
+      "handler": "text-auditor-01",
+      "auditTimestamp": 1778850878451
     },
     "hash_34351baa": {
       "result": {
@@ -236,52 +796,52 @@
         "modelResults": [
           {
             "modelName": "SafetyModel-A",
-            "score": 0.534,
+            "score": 0.688,
             "label": "medium_risk",
-            "confidence": 0.951,
+            "confidence": 0.946,
             "details": {
               "provider": "Vendor-A",
               "version": "v2.1",
               "categories": {
-                "violence": 0.160117436436182,
-                "adult": 0.1334311970301517,
-                "political": 0.10674495762412135,
-                "fraud": 0.080058718218091,
-                "other": 0.05337247881206068
+                "violence": 0.2063813076425133,
+                "adult": 0.17198442303542777,
+                "political": 0.13758753842834223,
+                "fraud": 0.10319065382125665,
+                "other": 0.06879376921417112
               }
             }
           },
           {
             "modelName": "ContentShield-B",
-            "score": 0.507,
+            "score": 0.612,
             "label": "medium_risk",
-            "confidence": 0.875,
+            "confidence": 0.897,
             "details": {
               "provider": "Vendor-B",
               "version": "v1.5",
               "categories": {
-                "violence": 0.15202029219645094,
-                "adult": 0.1266835768303758,
-                "political": 0.10134686146430064,
-                "fraud": 0.07601014609822547,
-                "other": 0.05067343073215032
+                "violence": 0.18345323569452263,
+                "adult": 0.1528776964121022,
+                "political": 0.12230215712968176,
+                "fraud": 0.09172661784726131,
+                "other": 0.06115107856484088
               }
             }
           },
           {
             "modelName": "HarmDetector-C",
-            "score": 0.625,
+            "score": 0.53,
             "label": "medium_risk",
-            "confidence": 0.762,
+            "confidence": 0.99,
             "details": {
               "provider": "Vendor-C",
               "version": "v3.0",
               "categories": {
-                "violence": 0.18746540119213745,
-                "adult": 0.15622116766011454,
-                "political": 0.12497693412809163,
-                "fraud": 0.09373270059606872,
-                "other": 0.062488467064045816
+                "violence": 0.15888456601265888,
+                "adult": 0.13240380501054907,
+                "political": 0.10592304400843927,
+                "fraud": 0.07944228300632944,
+                "other": 0.052961522004219636
               }
             }
           }
@@ -320,11 +880,24 @@
           }
         ],
         "overallDecision": "reject",
-        "overallConfidence": 0.776,
-        "timestamp": 1778849286409
+        "overallConfidence": 0.85,
+        "timestamp": 1778850878462
       },
-      "corrections": [],
-      "status": "pending"
+      "corrections": [
+        {
+          "id": "0c6fb8ae-21fc-4133-9658-57932198f548",
+          "resultId": "sample-003",
+          "handler": "zhangsan",
+          "originalDecision": "reject",
+          "newDecision": "pass",
+          "remark": "经人工核验，内容正常，误判",
+          "timestamp": 1778850898302
+        }
+      ],
+      "status": "corrected",
+      "handler": "text-auditor-01",
+      "auditTimestamp": 1778850878462,
+      "finalDecision": "pass"
     },
     "hash_62dc558e": {
       "result": {
@@ -343,7 +916,7 @@
             "modelName": "SafetyModel-A",
             "score": 0,
             "label": "normal",
-            "confidence": 0.867,
+            "confidence": 0.821,
             "details": {
               "provider": "Vendor-A",
               "version": "v2.1",
@@ -358,35 +931,35 @@
           },
           {
             "modelName": "ContentShield-B",
-            "score": 0.002,
+            "score": 0,
             "label": "normal",
-            "confidence": 0.753,
+            "confidence": 0.791,
             "details": {
               "provider": "Vendor-B",
               "version": "v1.5",
               "categories": {
-                "violence": 0.0004905696021401257,
-                "adult": 0.00040880800178343807,
-                "political": 0.00032704640142675045,
-                "fraud": 0.00024528480107006284,
-                "other": 0.00016352320071337523
+                "violence": 0,
+                "adult": 0,
+                "political": 0,
+                "fraud": 0,
+                "other": 0
               }
             }
           },
           {
             "modelName": "HarmDetector-C",
-            "score": 0.038,
+            "score": 0.092,
             "label": "normal",
-            "confidence": 0.953,
+            "confidence": 0.944,
             "details": {
               "provider": "Vendor-C",
               "version": "v3.0",
               "categories": {
-                "violence": 0.011506756151091346,
-                "adult": 0.009588963459242789,
-                "political": 0.007671170767394231,
-                "fraud": 0.005753378075545673,
-                "other": 0.0038355853836971156
+                "violence": 0.027691769140395343,
+                "adult": 0.023076474283662787,
+                "political": 0.018461179426930232,
+                "fraud": 0.013845884570197671,
+                "other": 0.009230589713465116
               }
             }
           }
@@ -424,11 +997,13 @@
           }
         ],
         "overallDecision": "pass",
-        "overallConfidence": 0.858,
-        "timestamp": 1778849286421
+        "overallConfidence": 0.852,
+        "timestamp": 1778850878473
       },
       "corrections": [],
-      "status": "pending"
+      "status": "pending",
+      "handler": "text-auditor-01",
+      "auditTimestamp": 1778850878473
     },
     "hash_24dd618d": {
       "result": {
@@ -445,52 +1020,52 @@
         "modelResults": [
           {
             "modelName": "SafetyModel-A",
-            "score": 0.541,
+            "score": 0.509,
             "label": "medium_risk",
-            "confidence": 0.809,
+            "confidence": 0.92,
             "details": {
               "provider": "Vendor-A",
               "version": "v2.1",
               "categories": {
-                "violence": 0.16224477629854656,
-                "adult": 0.1352039802487888,
-                "political": 0.10816318419903104,
-                "fraud": 0.08112238814927328,
-                "other": 0.05408159209951552
+                "violence": 0.15275819484079187,
+                "adult": 0.1272984957006599,
+                "political": 0.10183879656052792,
+                "fraud": 0.07637909742039593,
+                "other": 0.05091939828026396
               }
             }
           },
           {
             "modelName": "ContentShield-B",
-            "score": 0.564,
+            "score": 0.58,
             "label": "medium_risk",
-            "confidence": 0.702,
+            "confidence": 0.86,
             "details": {
               "provider": "Vendor-B",
               "version": "v1.5",
               "categories": {
-                "violence": 0.16920580884468758,
-                "adult": 0.14100484070390631,
-                "political": 0.11280387256312506,
-                "fraud": 0.08460290442234379,
-                "other": 0.05640193628156253
+                "violence": 0.17398068479522008,
+                "adult": 0.14498390399601674,
+                "political": 0.1159871231968134,
+                "fraud": 0.08699034239761004,
+                "other": 0.0579935615984067
               }
             }
           },
           {
             "modelName": "HarmDetector-C",
-            "score": 0.5,
+            "score": 0.608,
             "label": "medium_risk",
-            "confidence": 0.753,
+            "confidence": 0.735,
             "details": {
               "provider": "Vendor-C",
               "version": "v3.0",
               "categories": {
-                "violence": 0.15005426930134322,
-                "adult": 0.125045224417786,
-                "political": 0.10003617953422882,
-                "fraud": 0.07502713465067161,
-                "other": 0.05001808976711441
+                "violence": 0.18230987471461074,
+                "adult": 0.15192489559550895,
+                "political": 0.12153991647640716,
+                "fraud": 0.09115493735730537,
+                "other": 0.06076995823820358
               }
             }
           }
@@ -530,14 +1105,21 @@
           }
         ],
         "overallDecision": "reject",
-        "overallConfidence": 0.604,
-        "timestamp": 1778849286432
+        "overallConfidence": 0.671,
+        "timestamp": 1778850878485
       },
       "corrections": [],
-      "status": "pending"
+      "status": "pending",
+      "handler": "text-auditor-01",
+      "auditTimestamp": 1778850878485
     }
   },
   "idToHash": {
+    "img-001": "hash_172bdd72",
+    "img-002": "hash_6ee9404d",
+    "img-003": "hash_33bb963d",
+    "img-004": "hash_47421953",
+    "img-005": "hash_6f6116e1",
     "sample-001": "hash_4aca0207",
     "sample-002": "hash_2e886716",
     "sample-003": "hash_34351baa",
@@ -545,8 +1127,29 @@
     "sample-005": "hash_24dd618d"
   },
   "handlerIndex": {
+    "image-auditor-01": [
+      "img-001",
+      "img-002",
+      "img-003",
+      "img-004",
+      "img-005"
+    ],
+    "image-auditor-02": [
+      "img-001",
+      "img-002",
+      "img-003",
+      "img-004",
+      "img-005"
+    ],
+    "text-auditor-01": [
+      "sample-001",
+      "sample-002",
+      "sample-003",
+      "sample-004",
+      "sample-005"
+    ],
     "zhangsan": [
-      "sample-002"
+      "sample-003"
     ]
   }
 }

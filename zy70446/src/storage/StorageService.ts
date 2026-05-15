@@ -60,22 +60,24 @@ export class StorageService {
     return 'hash_' + Math.abs(hash).toString(16);
   }
 
-  saveAuditResult(result: AuditResult): { isDuplicate: boolean; existingRecord?: AuditRecord } {
+  saveAuditResult(
+    result: AuditResult,
+    handler?: string
+  ): { 
+    isDuplicate: boolean; 
+    isConflicting: boolean;
+    existingRecord?: AuditRecord; 
+    newRecord?: AuditRecord;
+  } {
     const contentHash = this.hashContent(result.item.content);
 
     if (this.data.records[contentHash]) {
       const existingRecord = this.data.records[contentHash];
       const isConflicting = existingRecord.result.overallDecision !== result.overallDecision;
       
-      if (isConflicting) {
-        return {
-          isDuplicate: true,
-          existingRecord
-        };
-      }
-      
       return {
         isDuplicate: true,
+        isConflicting,
         existingRecord
       };
     }
@@ -83,14 +85,68 @@ export class StorageService {
     const record: AuditRecord = {
       result,
       corrections: [],
-      status: 'pending'
+      status: 'pending',
+      handler,
+      auditTimestamp: Date.now()
     };
 
     this.data.records[contentHash] = record;
     this.data.idToHash[result.itemId] = contentHash;
+
+    if (handler) {
+      if (!this.data.handlerIndex[handler]) {
+        this.data.handlerIndex[handler] = [];
+      }
+      if (!this.data.handlerIndex[handler].includes(result.itemId)) {
+        this.data.handlerIndex[handler].push(result.itemId);
+      }
+    }
+
     this.saveData();
 
-    return { isDuplicate: false };
+    return { isDuplicate: false, isConflicting: false, newRecord: record };
+  }
+
+  forceUpdateAuditResult(
+    result: AuditResult,
+    handler?: string
+  ): {
+    isConflicting: boolean;
+    previousRecord?: AuditRecord;
+    newRecord: AuditRecord;
+  } {
+    const contentHash = this.hashContent(result.item.content);
+    const previousRecord = this.data.records[contentHash];
+
+    const newRecord: AuditRecord = {
+      result,
+      corrections: [],
+      status: 'pending',
+      handler,
+      auditTimestamp: Date.now()
+    };
+
+    this.data.records[contentHash] = newRecord;
+    this.data.idToHash[result.itemId] = contentHash;
+
+    if (handler) {
+      if (!this.data.handlerIndex[handler]) {
+        this.data.handlerIndex[handler] = [];
+      }
+      if (!this.data.handlerIndex[handler].includes(result.itemId)) {
+        this.data.handlerIndex[handler].push(result.itemId);
+      }
+    }
+
+    this.saveData();
+
+    const isConflicting = previousRecord ? previousRecord.result.overallDecision !== result.overallDecision : false;
+
+    return {
+      isConflicting,
+      previousRecord,
+      newRecord
+    };
   }
 
   getRecordByItemId(itemId: string): AuditRecord | undefined {
@@ -144,7 +200,10 @@ export class StorageService {
     return { success: true, record };
   }
 
-  confirmRecord(itemId: string): { success: boolean; record?: AuditRecord; error?: string } {
+  confirmRecord(
+    itemId: string,
+    handler?: string
+  ): { success: boolean; record?: AuditRecord; error?: string } {
     const record = this.getRecordByItemId(itemId);
     
     if (!record) {
@@ -153,6 +212,16 @@ export class StorageService {
 
     record.status = 'confirmed';
     record.finalDecision = record.result.overallDecision;
+    
+    if (handler) {
+      record.handler = handler;
+      if (!this.data.handlerIndex[handler]) {
+        this.data.handlerIndex[handler] = [];
+      }
+      if (!this.data.handlerIndex[handler].includes(itemId)) {
+        this.data.handlerIndex[handler].push(itemId);
+      }
+    }
 
     const contentHash = this.data.idToHash[itemId];
     this.data.records[contentHash] = record;
@@ -162,10 +231,23 @@ export class StorageService {
   }
 
   queryByHandler(handler: string): AuditRecord[] {
-    const itemIds = this.data.handlerIndex[handler] || [];
-    return itemIds
+    const indexedItemIds = this.data.handlerIndex[handler] || [];
+    const indexedRecords = indexedItemIds
       .map(id => this.getRecordByItemId(id))
       .filter((r): r is AuditRecord => r !== undefined);
+    
+    const allRecords = this.getAllRecords();
+    const handlerFieldMatches = allRecords.filter(r => r.handler === handler);
+    
+    const mergedMap = new Map<string, AuditRecord>();
+    for (const record of indexedRecords) {
+      mergedMap.set(record.result.itemId, record);
+    }
+    for (const record of handlerFieldMatches) {
+      mergedMap.set(record.result.itemId, record);
+    }
+    
+    return Array.from(mergedMap.values());
   }
 
   queryByStatus(status: 'pending' | 'confirmed' | 'corrected'): AuditRecord[] {

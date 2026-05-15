@@ -1,0 +1,76 @@
+[
+  {
+    "id": "img-001",
+    "content": "https://example.com/images/normal-product.jpg",
+    "contentType": "image",
+    "metadata": {
+      "filename": "normal-product.jpg",
+      "fileSize": 2048576,
+      "imageWidth": 800,
+      "imageHeight": 600,
+      "source": "product-upload",
+      "uploaderId": "user-1001",
+      "description": "正常商品展示图片"
+    }
+  },
+  {
+    "id": "img-002",
+    "content": "https://example.com/images/sensitive-logo.png",
+    "contentType": "image",
+    "metadata": {
+      "filename": "sensitive-logo.png",
+      "fileSize": 512000,
+      "imageWidth": 400,
+      "imageHeight": 400,
+      "source": "user-avatar",
+      "uploaderId": "user-1002",
+      "description": "包含敏感标识的头像图片",
+      "detectionTags": ["logo-sensitive", "brand-unauthorized"]
+    }
+  },
+  {
+    "id": "img-003",
+    "content": "https://example.com/images/violence-scene.jpg",
+    "contentType": "image",
+    "metadata": {
+      "filename": "violence-scene.jpg",
+      "fileSize": 3145728,
+      "imageWidth": 1024,
+      "imageHeight": 768,
+      "source": "comment-image",
+      "uploaderId": "user-1003",
+      "description": "包含暴力内容的图片",
+      "detectionTags": ["violence", "bloody", "weapon"]
+    }
+  },
+  {
+    "id": "img-004",
+    "content": "https://example.com/images/ad-banner.jpg",
+    "contentType": "image",
+    "metadata": {
+      "filename": "ad-banner.jpg",
+      "fileSize": 1048576,
+      "imageWidth": 1200,
+      "imageHeight": 300,
+      "source": "banner-upload",
+      "uploaderId": "user-1004",
+      "description": "可能包含广告联系方式的图片",
+      "hasText": true,
+      "extractedText": "微信: contact123 电话:13800138000"
+    }
+  },
+  {
+    "id": "img-005",
+    "content": "https://example.com/images/user-photo.png",
+    "contentType": "image",
+    "metadata": {
+      "filename": "user-photo.png",
+      "fileSize": 768000,
+      "imageWidth": 500,
+      "imageHeight": 500,
+      "source": "profile-photo",
+      "uploaderId": "user-1005",
+      "description": "正常用户头像照片"
+    }
+  }
+]

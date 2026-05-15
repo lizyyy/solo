@@ -20,15 +20,20 @@ export class OutputService {
   private toMarkdown(record: AuditRecord): string {
     const finalDecision = record.finalDecision || record.result.overallDecision;
     const result = record.result;
+    const handler = this.getHandler(record);
     
     let md = `# 审核报告 - ${result.itemId}\n\n`;
     md += `## 基本信息\n\n`;
     md += `- **内容类型**: ${result.item.contentType}\n`;
-    md += `- **审核时间**: ${new Date(result.timestamp).toLocaleString('zh-CN')}\n`;
+    md += `- **审核时间**: ${new Date(record.auditTimestamp || result.timestamp).toLocaleString('zh-CN')}\n`;
     md += `- **系统判定**: ${this.decisionEmoji(result.overallDecision)} ${result.overallDecision.toUpperCase()}\n`;
     md += `- **置信度**: ${(result.overallConfidence * 100).toFixed(1)}%\n`;
     md += `- **处理状态**: ${record.status.toUpperCase()}\n`;
-    md += `- **最终判定**: ${this.decisionEmoji(finalDecision)} ${finalDecision.toUpperCase()}\n\n`;
+    md += `- **最终判定**: ${this.decisionEmoji(finalDecision)} ${finalDecision.toUpperCase()}\n`;
+    if (handler) {
+      md += `- **审核处理人**: ${handler}\n`;
+    }
+    md += '\n';
 
     md += `## 待审核内容\n\n`;
     md += `\`\`\`\n${result.item.content}\n\`\`\`\n\n`;
@@ -87,8 +92,8 @@ export class OutputService {
     for (const record of records) {
       const result = record.result;
       const contentPreview = result.item.content.slice(0, 30) + (result.item.content.length > 30 ? '...' : '');
-      const handler = record.corrections.length > 0 ? record.corrections[record.corrections.length - 1].handler : '-';
-      md += `| ${result.itemId.slice(0, 12)} | ${contentPreview} | ${this.decisionEmoji(result.overallDecision)} ${result.overallDecision} | ${record.status} | ${handler} |\n`;
+      const handler = this.getHandler(record);
+      md += `| ${result.itemId.slice(0, 12)} | ${contentPreview} | ${this.decisionEmoji(result.overallDecision)} ${result.overallDecision} | ${record.status} | ${handler || '-'} |\n`;
     }
     md += '\n';
 
@@ -98,6 +103,16 @@ export class OutputService {
     }
 
     return md;
+  }
+
+  private getHandler(record: AuditRecord): string | undefined {
+    if (record.handler) {
+      return record.handler;
+    }
+    if (record.corrections.length > 0) {
+      return record.corrections[record.corrections.length - 1].handler;
+    }
+    return undefined;
   }
 
   private decisionEmoji(decision: string): string {

@@ -91,17 +91,46 @@ program
   .description('执行批量审核')
   .argument('<inputFile>', '输入文件路径(JSON格式)')
   .option('--force', '强制重新审核重复内容')
-  .action(async (inputFile: string, options: { force?: boolean }) => {
+  .option('--handler <name>', '审核处理人')
+  .action(async (inputFile: string, options: { force?: boolean; handler?: string }) => {
     try {
       const items = loadItemsFromFile(inputFile);
       
       console.log(chalk.blue(`\n🚀 开始审核...\n`));
+      if (options.handler) {
+        console.log(chalk.blue(`👤 处理人: ${options.handler}\n`));
+      }
       
       const { duplicates, newItems } = storageService.checkDuplicates(items);
       
-      if (duplicates.length > 0 && !options.force) {
-        console.log(chalk.yellow(`⚠️  发现 ${duplicates.length} 条重复内容，跳过审核`));
-        console.log(chalk.yellow(`   使用 --force 参数可强制重新审核\n`));
+      if (duplicates.length > 0) {
+        if (!options.force) {
+          console.log(chalk.yellow(`⚠️  发现 ${duplicates.length} 条重复内容，跳过审核`));
+          console.log(chalk.yellow(`   使用 --force 参数可强制重新审核\n`));
+        } else {
+          console.log(chalk.yellow(`⚠️  发现 ${duplicates.length} 条重复内容，强制重新审核`));
+          const conflictTable = new Table({
+            head: ['ID', '内容预览', '旧结论', '新结论', '是否冲突'],
+            colWidths: [12, 35, 12, 12, 12]
+          });
+          
+          for (const dup of duplicates) {
+            const newResult = await auditService.auditItem(dup.item);
+            const oldDecision = dup.existingRecord.finalDecision || dup.existingRecord.result.overallDecision;
+            const isConflict = oldDecision !== newResult.overallDecision;
+            const conflictStatus = isConflict ? chalk.red('是') : chalk.green('否');
+            
+            conflictTable.push([
+              dup.item.id.slice(0, 10),
+              dup.item.content.slice(0, 32) + '...',
+              oldDecision.toUpperCase(),
+              newResult.overallDecision.toUpperCase(),
+              conflictStatus
+            ]);
+          }
+          console.log(conflictTable.toString());
+          console.log();
+        }
       }
       
       const itemsToAudit = options.force ? items : newItems;
@@ -114,9 +143,24 @@ program
       console.log(chalk.blue(`📊 正在审核 ${itemsToAudit.length} 条内容...\n`));
       
       const results = [];
+      const conflicts: any[] = [];
       for (const item of itemsToAudit) {
         const result = await auditService.auditItem(item);
-        storageService.saveAuditResult(result);
+        
+        let saveResult;
+        if (options.force) {
+          saveResult = storageService.forceUpdateAuditResult(result, options.handler);
+          if (saveResult.isConflicting) {
+            conflicts.push({
+              item,
+              oldDecision: saveResult.previousRecord?.finalDecision || saveResult.previousRecord?.result.overallDecision,
+              newDecision: result.overallDecision
+            });
+          }
+        } else {
+          saveResult = storageService.saveAuditResult(result, options.handler);
+        }
+        
         results.push(result);
         
         const statusColor = result.overallDecision === 'pass' ? chalk.green : 
@@ -125,6 +169,16 @@ program
       }
       
       console.log();
+      
+      if (conflicts.length > 0) {
+        console.log(chalk.yellow(`⚠️  审核完成，发现 ${conflicts.length} 条结论冲突：`));
+        for (const conflict of conflicts) {
+          console.log(chalk.yellow(`   - ${conflict.item.content.slice(0, 30)}...`));
+          console.log(chalk.yellow(`     原结论: ${conflict.oldDecision?.toUpperCase()} → 新结论: ${conflict.newDecision.toUpperCase()}`));
+        }
+        console.log();
+      }
+      
       console.log(chalk.green(`✅ 审核完成！共处理 ${results.length} 条内容\n`));
       
     } catch (error: any) {
@@ -173,9 +227,10 @@ program
   .command('confirm')
   .description('确认审核结果（无需修改时使用）')
   .argument('<itemId>', '内容ID')
-  .action((itemId: string) => {
+  .option('--handler <name>', '确认处理人')
+  .action((itemId: string, options: { handler?: string }) => {
     try {
-      const result = storageService.confirmRecord(itemId);
+      const result = storageService.confirmRecord(itemId, options.handler);
       
       if (!result.success) {
         throw new Error(result.error);
@@ -183,6 +238,9 @@ program
       
       console.log(chalk.green(`\n✅ 已确认审核结果！\n`));
       console.log(`   内容ID: ${itemId}`);
+      if (options.handler) {
+        console.log(`   处理人: ${options.handler}`);
+      }
       console.log(`   最终判定: ${result.record?.finalDecision?.toUpperCase()}\n`);
       
     } catch (error: any) {

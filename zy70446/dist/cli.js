@@ -106,14 +106,42 @@ program
     .description('执行批量审核')
     .argument('<inputFile>', '输入文件路径(JSON格式)')
     .option('--force', '强制重新审核重复内容')
+    .option('--handler <name>', '审核处理人')
     .action(async (inputFile, options) => {
     try {
         const items = loadItemsFromFile(inputFile);
         console.log(chalk_1.default.blue(`\n🚀 开始审核...\n`));
+        if (options.handler) {
+            console.log(chalk_1.default.blue(`👤 处理人: ${options.handler}\n`));
+        }
         const { duplicates, newItems } = storageService.checkDuplicates(items);
-        if (duplicates.length > 0 && !options.force) {
-            console.log(chalk_1.default.yellow(`⚠️  发现 ${duplicates.length} 条重复内容，跳过审核`));
-            console.log(chalk_1.default.yellow(`   使用 --force 参数可强制重新审核\n`));
+        if (duplicates.length > 0) {
+            if (!options.force) {
+                console.log(chalk_1.default.yellow(`⚠️  发现 ${duplicates.length} 条重复内容，跳过审核`));
+                console.log(chalk_1.default.yellow(`   使用 --force 参数可强制重新审核\n`));
+            }
+            else {
+                console.log(chalk_1.default.yellow(`⚠️  发现 ${duplicates.length} 条重复内容，强制重新审核`));
+                const conflictTable = new cli_table3_1.default({
+                    head: ['ID', '内容预览', '旧结论', '新结论', '是否冲突'],
+                    colWidths: [12, 35, 12, 12, 12]
+                });
+                for (const dup of duplicates) {
+                    const newResult = await auditService.auditItem(dup.item);
+                    const oldDecision = dup.existingRecord.finalDecision || dup.existingRecord.result.overallDecision;
+                    const isConflict = oldDecision !== newResult.overallDecision;
+                    const conflictStatus = isConflict ? chalk_1.default.red('是') : chalk_1.default.green('否');
+                    conflictTable.push([
+                        dup.item.id.slice(0, 10),
+                        dup.item.content.slice(0, 32) + '...',
+                        oldDecision.toUpperCase(),
+                        newResult.overallDecision.toUpperCase(),
+                        conflictStatus
+                    ]);
+                }
+                console.log(conflictTable.toString());
+                console.log();
+            }
         }
         const itemsToAudit = options.force ? items : newItems;
         if (itemsToAudit.length === 0) {
@@ -122,15 +150,37 @@ program
         }
         console.log(chalk_1.default.blue(`📊 正在审核 ${itemsToAudit.length} 条内容...\n`));
         const results = [];
+        const conflicts = [];
         for (const item of itemsToAudit) {
             const result = await auditService.auditItem(item);
-            storageService.saveAuditResult(result);
+            let saveResult;
+            if (options.force) {
+                saveResult = storageService.forceUpdateAuditResult(result, options.handler);
+                if (saveResult.isConflicting) {
+                    conflicts.push({
+                        item,
+                        oldDecision: saveResult.previousRecord?.finalDecision || saveResult.previousRecord?.result.overallDecision,
+                        newDecision: result.overallDecision
+                    });
+                }
+            }
+            else {
+                saveResult = storageService.saveAuditResult(result, options.handler);
+            }
             results.push(result);
             const statusColor = result.overallDecision === 'pass' ? chalk_1.default.green :
                 result.overallDecision === 'reject' ? chalk_1.default.red : chalk_1.default.yellow;
             console.log(`   ${statusColor(result.overallDecision.toUpperCase())} ${item.content.slice(0, 40)}...`);
         }
         console.log();
+        if (conflicts.length > 0) {
+            console.log(chalk_1.default.yellow(`⚠️  审核完成，发现 ${conflicts.length} 条结论冲突：`));
+            for (const conflict of conflicts) {
+                console.log(chalk_1.default.yellow(`   - ${conflict.item.content.slice(0, 30)}...`));
+                console.log(chalk_1.default.yellow(`     原结论: ${conflict.oldDecision?.toUpperCase()} → 新结论: ${conflict.newDecision.toUpperCase()}`));
+            }
+            console.log();
+        }
         console.log(chalk_1.default.green(`✅ 审核完成！共处理 ${results.length} 条内容\n`));
     }
     catch (error) {
@@ -169,14 +219,18 @@ program
     .command('confirm')
     .description('确认审核结果（无需修改时使用）')
     .argument('<itemId>', '内容ID')
-    .action((itemId) => {
+    .option('--handler <name>', '确认处理人')
+    .action((itemId, options) => {
     try {
-        const result = storageService.confirmRecord(itemId);
+        const result = storageService.confirmRecord(itemId, options.handler);
         if (!result.success) {
             throw new Error(result.error);
         }
         console.log(chalk_1.default.green(`\n✅ 已确认审核结果！\n`));
         console.log(`   内容ID: ${itemId}`);
+        if (options.handler) {
+            console.log(`   处理人: ${options.handler}`);
+        }
         console.log(`   最终判定: ${result.record?.finalDecision?.toUpperCase()}\n`);
     }
     catch (error) {
