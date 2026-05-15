@@ -1,0 +1,29 @@
+{
+  "record_id": "BATCH_20260515_203421_008",
+  "batch_id": "BATCH_20260515_203421",
+  "file_hash": "b377b37b4d892b3b1fb3ff9cd8f9b47a1a970cd4ae87d5410ec9b8efa7e2564c",
+  "merged_path": [
+    "/customer/profile/basic",
+    "/complaint/review",
+    "/complaint/close"
+  ],
+  "status": "success",
+  "processed_time": "2026-05-15 20:34:21.809787",
+  "issues": [
+    {
+      "type": "permission_over_grant",
+      "message": "Permission was over-granted for paths: ['/complaint/close']",
+      "severity": "high",
+      "over_granted_paths": [
+        "/complaint/close"
+      ],
+      "permission_count": 2,
+      "actual_count": 3
+    },
+    {
+      "type": "path_mismatch",
+      "message": "Path length mismatch: permission(2) vs actual(3)",
+      "severity": "low"
+    }
+  ]
+}

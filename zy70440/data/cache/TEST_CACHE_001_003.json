@@ -1,0 +1,36 @@
+{
+  "record_id": "TEST_CACHE_001_003",
+  "batch_id": "TEST_CACHE_001",
+  "file_hash": "f454babca1be67e66db9d095414da285221cbb5bacec5564415fa4647af544fb",
+  "merged_path": [
+    "/customer/profile/basic",
+    "/technical/support/basic",
+    "/technical/support/advanced"
+  ],
+  "status": "success",
+  "processed_time": "2026-05-15 20:34:34.683636",
+  "issues": [
+    {
+      "type": "cross_day_boundary",
+      "message": "Recording crosses day boundary: 2024-05-15 -> 2024-05-16",
+      "severity": "medium",
+      "start_date": "2024-05-15",
+      "end_date": "2024-05-16"
+    },
+    {
+      "type": "permission_over_grant",
+      "message": "Permission was over-granted for paths: ['/technical/support/advanced']",
+      "severity": "high",
+      "over_granted_paths": [
+        "/technical/support/advanced"
+      ],
+      "permission_count": 2,
+      "actual_count": 3
+    },
+    {
+      "type": "path_mismatch",
+      "message": "Path length mismatch: permission(2) vs actual(3)",
+      "severity": "low"
+    }
+  ]
+}

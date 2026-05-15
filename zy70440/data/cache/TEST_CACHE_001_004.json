@@ -1,0 +1,33 @@
+{
+  "record_id": "TEST_CACHE_001_004",
+  "batch_id": "TEST_CACHE_001",
+  "file_hash": "7c72476d2862ad8c8e40cfc81001067339c60fb1fa864446740670daf39a9972",
+  "merged_path": [
+    "/customer/profile/basic",
+    "/customer/profile/sensitive",
+    "/warranty/check",
+    "/warranty/claim",
+    "/admin/system/access"
+  ],
+  "status": "success",
+  "processed_time": "2026-05-15 20:34:34.683923",
+  "issues": [
+    {
+      "type": "permission_over_grant",
+      "message": "Permission was over-granted for paths: ['/admin/system/access', '/customer/profile/sensitive', '/warranty/claim']",
+      "severity": "high",
+      "over_granted_paths": [
+        "/admin/system/access",
+        "/customer/profile/sensitive",
+        "/warranty/claim"
+      ],
+      "permission_count": 2,
+      "actual_count": 5
+    },
+    {
+      "type": "path_mismatch",
+      "message": "Path length mismatch: permission(2) vs actual(5)",
+      "severity": "low"
+    }
+  ]
+}

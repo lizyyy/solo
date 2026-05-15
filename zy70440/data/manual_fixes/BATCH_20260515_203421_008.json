@@ -1,0 +1,48 @@
+{
+  "record_id": "BATCH_20260515_203421_008",
+  "batch_id": "BATCH_20260515_203421",
+  "source": "manual_fix",
+  "recording_id": "REC_20240514_1600_A001",
+  "agent_id": "AGENT_001",
+  "customer_id": "CUST_10008",
+  "start_time": "2024-05-14 16:00:00",
+  "end_time": "2024-05-14 16:30:00",
+  "permission_path": [
+    "/customer/profile/basic",
+    "/complaint/review"
+  ],
+  "actual_path": [
+    "/customer/profile/basic",
+    "/complaint/review",
+    "/complaint/close"
+  ],
+  "merged_path": [
+    "/customer/profile/basic",
+    "/complaint/review",
+    "/complaint/close"
+  ],
+  "status": "success",
+  "issues": [
+    {
+      "type": "permission_over_grant",
+      "message": "Permission was over-granted for paths: ['/complaint/close']",
+      "severity": "high",
+      "over_granted_paths": [
+        "/complaint/close"
+      ],
+      "permission_count": 2,
+      "actual_count": 3
+    },
+    {
+      "type": "path_mismatch",
+      "message": "Path length mismatch: permission(2) vs actual(3)",
+      "severity": "low"
+    }
+  ],
+  "is_manual_fix": true,
+  "fix_reason": "人工审核确认：高级客服主管有权限处理客诉关闭，此前误判为权限放大",
+  "fix_time": "2024-05-15 07:00:00",
+  "processed_time": "2026-05-15 20:34:21.809787",
+  "execution_time_ms": 0.010251998901367188,
+  "metadata": {}
+}

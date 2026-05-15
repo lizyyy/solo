@@ -1,0 +1,32 @@
+{
+  "record_id": "BATCH_20260515_203421_002",
+  "batch_id": "BATCH_20260515_203421",
+  "file_hash": "3f15ab1733294c71b61ba8829521743831f3447a8686bb469b091085d7111b0f",
+  "merged_path": [
+    "/customer/profile/basic",
+    "/customer/profile/contact",
+    "/refund/apply",
+    "/refund/approve",
+    "/complaint/create"
+  ],
+  "status": "success",
+  "processed_time": "2026-05-15 20:34:21.808074",
+  "issues": [
+    {
+      "type": "permission_over_grant",
+      "message": "Permission was over-granted for paths: ['/customer/profile/contact', '/refund/approve']",
+      "severity": "high",
+      "over_granted_paths": [
+        "/customer/profile/contact",
+        "/refund/approve"
+      ],
+      "permission_count": 3,
+      "actual_count": 5
+    },
+    {
+      "type": "path_mismatch",
+      "message": "Path length mismatch: permission(3) vs actual(5)",
+      "severity": "low"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "record_id": "BATCH_20260515_203421_001",
+  "batch_id": "BATCH_20260515_203421",
+  "file_hash": "e2c6710b977df827d887ad958b0f2253f977b346e500d537f0bdaac53c56eb9c",
+  "merged_path": [
+    "/customer/profile/basic",
+    "/customer/service/history",
+    "/order/query/basic",
+    "/order/query/detail"
+  ],
+  "status": "success",
+  "processed_time": "2026-05-15 20:34:21.807170",
+  "issues": [
+    {
+      "type": "permission_over_grant",
+      "message": "Permission was over-granted for paths: ['/order/query/detail']",
+      "severity": "high",
+      "over_granted_paths": [
+        "/order/query/detail"
+      ],
+      "permission_count": 3,
+      "actual_count": 4
+    },
+    {
+      "type": "path_mismatch",
+      "message": "Path length mismatch: permission(3) vs actual(4)",
+      "severity": "low"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "record_id": "BATCH_20260515_203421_007",
+  "batch_id": "BATCH_20260515_203421",
+  "file_hash": "da2fa940aebce7ee57279ede7456ca26599c59ad4998a7eff294bcca3823ef1f",
+  "merged_path": [
+    "/customer/profile/basic",
+    "/feedback/submit",
+    "/feedback/escalate",
+    "/manager/special/approval"
+  ],
+  "status": "success",
+  "processed_time": "2026-05-15 20:34:21.809539",
+  "issues": [
+    {
+      "type": "permission_over_grant",
+      "message": "Permission was over-granted for paths: ['/feedback/escalate', '/manager/special/approval']",
+      "severity": "high",
+      "over_granted_paths": [
+        "/feedback/escalate",
+        "/manager/special/approval"
+      ],
+      "permission_count": 2,
+      "actual_count": 4
+    },
+    {
+      "type": "path_mismatch",
+      "message": "Path length mismatch: permission(2) vs actual(4)",
+      "severity": "low"
+    }
+  ]
+}

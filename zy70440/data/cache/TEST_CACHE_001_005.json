@@ -1,0 +1,23 @@
+{
+  "record_id": "TEST_CACHE_001_005",
+  "batch_id": "TEST_CACHE_001",
+  "file_hash": "fc9bfdceffdbc31a1cb0cf61a96001736d38843a3ddda9dee8c12129198b9be2",
+  "merged_path": [
+    "/customer/profile/basic"
+  ],
+  "status": "success",
+  "processed_time": "2026-05-15 20:34:34.684220",
+  "issues": [
+    {
+      "type": "missing_data",
+      "message": "actual_path is empty",
+      "severity": "high",
+      "field": "actual_path"
+    },
+    {
+      "type": "path_mismatch",
+      "message": "Path length mismatch: permission(1) vs actual(0)",
+      "severity": "low"
+    }
+  ]
+}
