@@ -15,8 +15,16 @@ import json
 
 class IdempotencyService:
     @staticmethod
+    def _json_serializer(obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif hasattr(obj, 'value'):
+            return obj.value
+        raise TypeError(f"Type {type(obj)} not serializable")
+    
+    @staticmethod
     def generate_request_hash(data: dict) -> str:
-        sorted_data = json.dumps(data, sort_keys=True)
+        sorted_data = json.dumps(data, sort_keys=True, default=IdempotencyService._json_serializer)
         return hashlib.sha256(sorted_data.encode()).hexdigest()
     
     @staticmethod
@@ -38,7 +46,7 @@ class IdempotencyService:
         record = IdempotencyKey(
             key=key,
             request_hash=request_hash,
-            response_data=json.dumps(response_data),
+            response_data=json.dumps(response_data, default=IdempotencyService._json_serializer),
             expires_at=datetime.now() + timedelta(hours=hours)
         )
         db.add(record)

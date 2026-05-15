@@ -22,7 +22,7 @@ async def create_event(
 ):
     try:
         if x_idempotency_key:
-            request_hash = IdempotencyService.generate_request_hash(event_data.model_dump())
+            request_hash = IdempotencyService.generate_request_hash(event_data.model_dump(mode='json'))
             cached = IdempotencyService.check_idempotency(db, x_idempotency_key, request_hash)
             if cached:
                 return cached
@@ -30,8 +30,9 @@ async def create_event(
         event = FaultEventService.create_event(db, event_data)
         
         if x_idempotency_key:
-            request_hash = IdempotencyService.generate_request_hash(event_data.model_dump())
-            IdempotencyService.store_idempotency(db, x_idempotency_key, request_hash, event.__dict__)
+            request_hash = IdempotencyService.generate_request_hash(event_data.model_dump(mode='json'))
+            response_data = FaultEvent.model_validate(event).model_dump(mode='json')
+            IdempotencyService.store_idempotency(db, x_idempotency_key, request_hash, response_data)
         
         return event
     except ValueError as e:
