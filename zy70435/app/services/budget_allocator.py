@@ -311,12 +311,17 @@ class BudgetAllocatorService:
             ).order_by(ProcessLog.created_at.desc()).all()
 
             if query_filter:
-                if query_filter.status and latest_allocation and latest_allocation.status != query_filter.status:
-                    continue
-                if query_filter.has_error is True and not (latest_allocation and latest_allocation.status in ['failed', 'error']):
-                    continue
-                if query_filter.has_error is False and latest_allocation and latest_allocation.status in ['failed', 'error']:
-                    continue
+                if query_filter.status:
+                    if not latest_allocation:
+                        continue
+                    if latest_allocation.status != query_filter.status:
+                        continue
+                if query_filter.has_error is True:
+                    if not latest_allocation or latest_allocation.status not in ['failed', 'error']:
+                        continue
+                if query_filter.has_error is False:
+                    if latest_allocation and latest_allocation.status in ['failed', 'error']:
+                        continue
                 if query_filter.has_correction is True and not corrections:
                     continue
                 if query_filter.has_correction is False and corrections:

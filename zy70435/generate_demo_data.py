@@ -166,6 +166,7 @@ def create_dirty_data_scenario(db: Session, orders):
         created_at=datetime.now() - timedelta(days=10)
     )
     db.add(alloc1_v1)
+    db.flush()
 
     alloc1_v2 = BudgetAllocation(
         order_id=order1.id,
@@ -179,6 +180,7 @@ def create_dirty_data_scenario(db: Session, orders):
         created_at=datetime.now() - timedelta(days=8)
     )
     db.add(alloc1_v2)
+    db.flush()
 
     alloc1_v3 = BudgetAllocation(
         order_id=order1.id,
@@ -192,6 +194,7 @@ def create_dirty_data_scenario(db: Session, orders):
         created_at=datetime.now() - timedelta(days=5)
     )
     db.add(alloc1_v3)
+    db.flush()
 
     correction = ManualCorrection(
         order_id=order1.id,
@@ -210,6 +213,7 @@ def create_dirty_data_scenario(db: Session, orders):
         created_at=datetime.now() - timedelta(days=5)
     )
     db.add(correction)
+    db.flush()
 
     freeze = VersionFreeze(
         allocation_id=alloc1_v3.id,
@@ -219,6 +223,7 @@ def create_dirty_data_scenario(db: Session, orders):
         frozen_at=datetime.now() - timedelta(days=3)
     )
     db.add(freeze)
+    db.flush()
 
     alloc2_fail = BudgetAllocation(
         order_id=order2.id,
@@ -233,6 +238,7 @@ def create_dirty_data_scenario(db: Session, orders):
         created_at=datetime.now() - timedelta(days=2)
     )
     db.add(alloc2_fail)
+    db.flush()
 
     log_error = ProcessLog(
         order_id=order2.id,
