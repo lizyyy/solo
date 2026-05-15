@@ -67,7 +67,7 @@ export class AuditService {
   private async runModelAnalysis(item: AuditItem): Promise<ModelResult[]> {
     return Promise.all(
       this.models.map(async (model) => {
-        const baseScore = this.calculateModelScore(item.content);
+        const baseScore = this.calculateModelScore(item);
         const variance = Math.random() * 0.2 - 0.1;
         const score = Math.min(1, Math.max(0, baseScore + variance));
 
@@ -92,16 +92,18 @@ export class AuditService {
               political: score * 0.2,
               fraud: score * 0.15,
               other: score * 0.1
-            }
+            },
+            contentAnalyzed: item.contentType,
+            metadataUsed: item.metadata ? Object.keys(item.metadata) : []
           }
         };
       })
     );
   }
 
-  private calculateModelScore(content: string): number {
+  private calculateModelScore(item: AuditItem): number {
     let score = 0;
-    const lowerContent = content.toLowerCase();
+    const lowerContent = item.content.toLowerCase();
 
     for (const word of this.sensitiveWords) {
       if (lowerContent.includes(word)) {
@@ -121,23 +123,90 @@ export class AuditService {
       }
     }
 
-    if (content.length > 500) {
+    if (item.contentType === 'image' && item.metadata) {
+      score += this.calculateImageMetadataScore(item.metadata);
+    }
+
+    if (item.content.length > 500) {
       score += 0.05;
     }
 
-    if (content.includes('http') || content.includes('www')) {
-      score += 0.1;
+    if (item.content.includes('http') || item.content.includes('www')) {
+      score += 0.05;
     }
 
     return Math.min(1, score);
+  }
+
+  private calculateImageMetadataScore(metadata: Record<string, any>): number {
+    let score = 0;
+
+    if (metadata.detectionTags && Array.isArray(metadata.detectionTags)) {
+      for (const tag of metadata.detectionTags) {
+        const lowerTag = tag.toLowerCase();
+        if (lowerTag.includes('violence') || lowerTag.includes('暴力') || lowerTag.includes('bloody') || lowerTag.includes('weapon') || lowerTag.includes('weapon')) {
+          score += 0.4;
+        }
+        if (lowerTag.includes('sensitive') || lowerTag.includes('敏感')) {
+          score += 0.3;
+        }
+        if (lowerTag.includes('adult') || lowerTag.includes('色情')) {
+          score += 0.35;
+        }
+        if (lowerTag.includes('brand-unauthorized') || lowerTag.includes('侵权')) {
+          score += 0.25;
+        }
+      }
+    }
+
+    if (metadata.description && typeof metadata.description === 'string') {
+      const lowerDesc = metadata.description.toLowerCase();
+      for (const word of this.sensitiveWords) {
+        if (lowerDesc.includes(word)) {
+          score += 0.3;
+        }
+      }
+      if (lowerDesc.includes('暴力') || lowerDesc.includes('违法') || lowerDesc.includes('违规')) {
+        score += 0.35;
+      }
+    }
+
+    if (metadata.extractedText && typeof metadata.extractedText === 'string') {
+      const lowerText = metadata.extractedText.toLowerCase();
+      for (const word of this.adWords) {
+        if (lowerText.includes(word)) {
+          score += 0.15;
+        }
+      }
+      const phoneMatch = metadata.extractedText.match(/1[3-9]\d{9}/);
+      if (phoneMatch) {
+        score += 0.1;
+      }
+    }
+
+    return score;
   }
 
   private runRuleDetection(item: AuditItem): RuleResult[] {
     const results: RuleResult[] = [];
     const content = item.content.toLowerCase();
 
+    const allTextToCheck = [content];
+    if (item.contentType === 'image' && item.metadata) {
+      if (item.metadata.description && typeof item.metadata.description === 'string') {
+        allTextToCheck.push(item.metadata.description.toLowerCase());
+      }
+      if (item.metadata.extractedText && typeof item.metadata.extractedText === 'string') {
+        allTextToCheck.push(item.metadata.extractedText.toLowerCase());
+      }
+    }
+
+    const textContains = (word: string): boolean => {
+      return allTextToCheck.some(text => text.includes(word));
+    };
+
     for (const word of this.sensitiveWords) {
-      if (content.includes(word)) {
+      if (textContains(word)) {
         results.push({
           ruleId: 'R001',
           ruleName: '敏感词检测',
@@ -149,19 +218,45 @@ export class AuditService {
       }
     }
 
-    if (content.includes('暴力') || content.includes('打') || content.includes('杀')) {
+    if (textContains('暴力') || textContains('打') || textContains('杀')) {
       results.push({
         ruleId: 'R002',
         ruleName: '暴力内容规则',
         matched: true,
-        matchContent: content.match(/(.{0,10}[打杀暴力].{0,10})/gi)?.[0] || '暴力相关内容',
+        matchContent: '图片包含暴力相关标识',
         severity: 'high'
       });
     }
 
+    if (item.contentType === 'image' && item.metadata?.detectionTags && Array.isArray(item.metadata.detectionTags)) {
+      const tags = item.metadata.detectionTags.map((t: string) => t.toLowerCase());
+      if (tags.some((tag: string) => tag.includes('violence') || tag.includes('暴力') || tag.includes('bloody') || tag.includes('weapon'))) {
+        if (!results.find(r => r.ruleId === 'R002')) {
+          results.push({
+            ruleId: 'R002',
+            ruleName: '暴力内容规则',
+            matched: true,
+            matchContent: '图片检测标签：暴力相关',
+            severity: 'high'
+          });
+        }
+      }
+      if (tags.some((tag: string) => tag.includes('sensitive') || tag.includes('敏感'))) {
+        if (!results.find(r => r.ruleId === 'R001')) {
+          results.push({
+            ruleId: 'R001',
+            ruleName: '敏感词检测',
+            matched: true,
+            matchContent: '图片检测标签：敏感标识',
+            severity: 'high'
+          });
+        }
+      }
+    }
+
     let adMatched = false;
     for (const word of this.adWords) {
-      if (content.includes(word)) {
+      if (textContains(word)) {
         adMatched = true;
         results.push({
           ruleId: 'R003',
@@ -174,19 +269,24 @@ export class AuditService {
       }
     }
 
-    const phoneMatch = content.match(/1[3-9]\d{9}/);
-    if (phoneMatch) {
-      results.push({
-        ruleId: 'R004',
-        ruleName: '联系方式提取',
-        matched: true,
-        matchContent: phoneMatch[0],
-        severity: 'low'
-      });
+    let phoneFound = false;
+    for (const text of allTextToCheck) {
+      const phoneMatch = text.match(/1[3-9]\d{9}/);
+      if (phoneMatch && !phoneFound) {
+        phoneFound = true;
+        results.push({
+          ruleId: 'R004',
+          ruleName: '联系方式提取',
+          matched: true,
+          matchContent: phoneMatch[0],
+          severity: 'low'
+        });
+        break;
+      }
     }
 
     for (const word of this.politicalWords) {
-      if (content.includes(word)) {
+      if (textContains(word)) {
         results.push({
           ruleId: 'R005',
           ruleName: '政治敏感词',
