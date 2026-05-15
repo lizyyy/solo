@@ -1,0 +1,40 @@
+============================================================
+   业务事件重算 API 服务器启动中...
+============================================================
+
+📡 服务地址: http://localhost:8080
+🔍 健康检查: http://localhost:8080/health
+📚 API 文档:
+   POST   /api/recalculate/batches          - 创建批次
+   GET    /api/recalculate/batches          - 批次列表
+   GET    /api/recalculate/batches/{no}     - 批次详情
+   POST   /api/recalculate/batches/{no}/validate  - 执行校验
+   POST   /api/recalculate/batches/{no}/recalculate - 沙箱重算
+   POST   /api/recalculate/batches/{no}/compare   - 结果对比
+   POST   /api/recalculate/batches/{no}/publish   - 发布结果
+   POST   /api/recalculate/batches/{no}/revoke    - 撤销发布
+   GET    /api/recalculate/batches/{no}/history   - 状态历史
+   GET    /api/recalculate/batches/{no}/export    - 导出结果
+
+🧪 运行测试: bash test-recalculate-api.sh
+============================================================
+
+ * Serving Flask app 'recalculate_api_server'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://10.16.14.196:8080
+Press CTRL+C to quit
+127.0.0.1 - - [16/May/2026 00:54:10] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:10] "POST /api/recalculate/batches HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:10] "POST /api/recalculate/batches HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:10] "GET /api/recalculate/batches/REC-20260516005410-8E7BAD HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:11] "POST /api/recalculate/batches/REC-20260516005410-8E7BAD/validate?operator=test_user HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:11] "POST /api/recalculate/batches/REC-20260516005410-8E7BAD/recalculate?operator=test_user HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:12] "POST /api/recalculate/batches/REC-20260516005410-8E7BAD/compare?operator=test_user HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:12] "POST /api/recalculate/batches/REC-20260516005410-8E7BAD/publish?approved=true&reason=å¯¹æ¯\x94ç»\x93æ\x9e\x9cç¬¦å\x90\x88é¢\x84æ\x9c\x9f&operator=test_user HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:12] "GET /api/recalculate/batches/REC-20260516005410-8E7BAD/history HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:12] "GET /api/recalculate/batches/REC-20260516005410-8E7BAD/export HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:13] "POST /api/recalculate/batches/REC-20260516005410-8E7BAD/revoke?reason=å\x8f\x91ç\x8e°æ\x95°æ\x8d®å¼\x82å¸¸&operator=admin HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2026 00:54:13] "GET /api/recalculate/batches/REC-20260516005410-8E7BAD HTTP/1.1" 200 -
