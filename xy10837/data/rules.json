@@ -1,0 +1,20 @@
+{
+  "cf3d0c95-cb4a-4296-b837-b8c8e94a0b05": {
+    "name": "跳过手机号格式错误",
+    "topic": "notification.sent",
+    "deadReason": "validation_error",
+    "payloadPattern": "invalid-phone",
+    "enabled": true,
+    "id": "cf3d0c95-cb4a-4296-b837-b8c8e94a0b05",
+    "createdAt": 1778841901592
+  },
+  "22917fde-ea62-4b66-a46d-416172cc936a": {
+    "name": "跳过订单金额负数",
+    "topic": "order.created",
+    "deadReason": "validation_error",
+    "payloadPattern": "amount.*-",
+    "enabled": true,
+    "id": "22917fde-ea62-4b66-a46d-416172cc936a",
+    "createdAt": 1778841901593
+  }
+}

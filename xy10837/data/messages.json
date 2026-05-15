@@ -1,0 +1,210 @@
+{
+  "f024ec2d-40d4-4076-b442-d27fad7ec5e9": {
+    "topic": "order.created",
+    "deadReason": "timeout",
+    "deadReasonDesc": "调用库存服务超时",
+    "payloadSummary": "订单ID: ORD-2024-001, 金额: 999.00",
+    "payload": {
+      "orderId": "ORD-2024-001",
+      "amount": 999,
+      "userId": "U10001"
+    },
+    "originalQueue": "order-service-queue",
+    "status": "dead",
+    "responsibleNode": "order-service-01",
+    "retryCount": 3,
+    "id": "f024ec2d-40d4-4076-b442-d27fad7ec5e9",
+    "createdAt": 1778841901583,
+    "updatedAt": 1778841901583,
+    "history": [
+      {
+        "timestamp": 1778841901583,
+        "action": "created",
+        "status": "dead",
+        "operator": "system"
+      }
+    ]
+  },
+  "5787af22-5a2a-4a52-acb5-0b01ceb2f3a9": {
+    "topic": "order.created",
+    "deadReason": "exception",
+    "deadReasonDesc": "NullPointerException: 用户不存在",
+    "payloadSummary": "订单ID: ORD-2024-002, 金额: 199.00",
+    "payload": {
+      "orderId": "ORD-2024-002",
+      "amount": 199,
+      "userId": "U99999"
+    },
+    "originalQueue": "order-service-queue",
+    "status": "dead",
+    "responsibleNode": "order-service-02",
+    "retryCount": 2,
+    "id": "5787af22-5a2a-4a52-acb5-0b01ceb2f3a9",
+    "createdAt": 1778841901585,
+    "updatedAt": 1778841901585,
+    "history": [
+      {
+        "timestamp": 1778841901585,
+        "action": "created",
+        "status": "dead",
+        "operator": "system"
+      }
+    ]
+  },
+  "8b30b186-6531-4d0c-abab-b7b8298e8ae2": {
+    "topic": "order.created",
+    "deadReason": "validation_error",
+    "deadReasonDesc": "订单金额不能为负数",
+    "payloadSummary": "订单ID: ORD-2024-003, 金额: -50.00",
+    "payload": {
+      "orderId": "ORD-2024-003",
+      "amount": -50,
+      "userId": "U10003"
+    },
+    "originalQueue": "order-service-queue",
+    "status": "dead",
+    "responsibleNode": "order-service-01",
+    "retryCount": 1,
+    "id": "8b30b186-6531-4d0c-abab-b7b8298e8ae2",
+    "createdAt": 1778841901586,
+    "updatedAt": 1778841901586,
+    "history": [
+      {
+        "timestamp": 1778841901586,
+        "action": "created",
+        "status": "dead",
+        "operator": "system"
+      }
+    ]
+  },
+  "36c870c7-56b2-48ef-8dad-eb25f8a1b921": {
+    "topic": "payment.completed",
+    "deadReason": "business_error",
+    "deadReasonDesc": "订单已取消，无法完成支付",
+    "payloadSummary": "支付ID: PAY-2024-001, 订单: ORD-2024-004",
+    "payload": {
+      "paymentId": "PAY-2024-001",
+      "orderId": "ORD-2024-004",
+      "status": "cancelled"
+    },
+    "originalQueue": "payment-service-queue",
+    "status": "dead",
+    "responsibleNode": "payment-service-01",
+    "retryCount": 2,
+    "id": "36c870c7-56b2-48ef-8dad-eb25f8a1b921",
+    "createdAt": 1778841901588,
+    "updatedAt": 1778841901588,
+    "history": [
+      {
+        "timestamp": 1778841901588,
+        "action": "created",
+        "status": "dead",
+        "operator": "system"
+      }
+    ]
+  },
+  "f3abf802-ba76-4f6f-9170-3b20d446e644": {
+    "topic": "payment.completed",
+    "deadReason": "timeout",
+    "deadReasonDesc": "调用账务系统超时",
+    "payloadSummary": "支付ID: PAY-2024-002, 金额: 500.00",
+    "payload": {
+      "paymentId": "PAY-2024-002",
+      "amount": 500,
+      "userId": "U10005"
+    },
+    "originalQueue": "payment-service-queue",
+    "status": "pending",
+    "responsibleNode": "payment-service-02",
+    "retryCount": 1,
+    "id": "f3abf802-ba76-4f6f-9170-3b20d446e644",
+    "createdAt": 1778841901589,
+    "updatedAt": 1778841901589,
+    "history": [
+      {
+        "timestamp": 1778841901589,
+        "action": "created",
+        "status": "pending",
+        "operator": "system"
+      }
+    ]
+  },
+  "1b71097b-f04a-4238-acc4-4883fb89aefc": {
+    "topic": "user.registered",
+    "deadReason": "exception",
+    "deadReasonDesc": "数据库连接异常",
+    "payloadSummary": "用户ID: U10006, 邮箱: test@example.com",
+    "payload": {
+      "userId": "U10006",
+      "email": "test@example.com",
+      "phone": "13800138000"
+    },
+    "originalQueue": "user-service-queue",
+    "status": "success",
+    "responsibleNode": "user-service-01",
+    "retryCount": 5,
+    "id": "1b71097b-f04a-4238-acc4-4883fb89aefc",
+    "createdAt": 1778841901590,
+    "updatedAt": 1778841901590,
+    "history": [
+      {
+        "timestamp": 1778841901590,
+        "action": "created",
+        "status": "success",
+        "operator": "system"
+      }
+    ]
+  },
+  "6627a510-3bcc-4f0b-9f52-f1b42a2916ee": {
+    "topic": "user.registered",
+    "deadReason": "unknown",
+    "deadReasonDesc": "未知错误",
+    "payloadSummary": "用户ID: U10007, 邮箱: user7@example.com",
+    "payload": {
+      "userId": "U10007",
+      "email": "user7@example.com"
+    },
+    "originalQueue": "user-service-queue",
+    "status": "failed",
+    "responsibleNode": "user-service-02",
+    "retryCount": 3,
+    "lastError": "Consumer failed with unknown error",
+    "id": "6627a510-3bcc-4f0b-9f52-f1b42a2916ee",
+    "createdAt": 1778841901590,
+    "updatedAt": 1778841901590,
+    "history": [
+      {
+        "timestamp": 1778841901590,
+        "action": "created",
+        "status": "failed",
+        "operator": "system"
+      }
+    ]
+  },
+  "81782219-f3bd-466b-8741-e86f98fe306b": {
+    "topic": "notification.sent",
+    "deadReason": "validation_error",
+    "deadReasonDesc": "手机号格式错误",
+    "payloadSummary": "通知类型: SMS, 接收人: invalid-phone",
+    "payload": {
+      "type": "SMS",
+      "to": "invalid-phone",
+      "content": "验证码：123456"
+    },
+    "originalQueue": "notification-service-queue",
+    "status": "skipped",
+    "responsibleNode": "notification-service-01",
+    "retryCount": 1,
+    "id": "81782219-f3bd-466b-8741-e86f98fe306b",
+    "createdAt": 1778841901591,
+    "updatedAt": 1778841901591,
+    "history": [
+      {
+        "timestamp": 1778841901591,
+        "action": "created",
+        "status": "skipped",
+        "operator": "system"
+      }
+    ]
+  }
+}
