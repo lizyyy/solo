@@ -1,0 +1,94 @@
+[
+  {
+    "order_id": "CS-2024-001",
+    "title": "客服升级工单 - 服务版本不一致问题",
+    "created_at": "2026-05-16T07:40:55.831215",
+    "status": "open",
+    "records": [
+      {
+        "record_id": "REC-2024-001",
+        "timestamp": "2026-05-16T07:40:55.831392",
+        "source_system": "customer_service",
+        "record_type": "normal",
+        "content": "用户提交升级申请，要求从标准版升级到企业版",
+        "operator": "customer_001",
+        "version_before": "v1.0-std",
+        "version_after": null,
+        "manual_remark": null,
+        "change_reason": null
+      },
+      {
+        "record_id": "REC-2024-002",
+        "timestamp": "2026-05-16T07:40:55.831550",
+        "source_system": "customer_service",
+        "record_type": "normal",
+        "content": "客服人员审核用户资质通过",
+        "operator": "agent_zhang",
+        "version_before": null,
+        "version_after": null,
+        "manual_remark": null,
+        "change_reason": null
+      },
+      {
+        "record_id": "REC-2024-003",
+        "timestamp": "2026-05-16T07:40:55.831639",
+        "source_system": "version_control",
+        "record_type": "abnormal",
+        "content": "检测到服务版本不一致 - 生产环境版本与预发布版本不匹配",
+        "operator": "system",
+        "version_before": "v2.1.0-prod",
+        "version_after": "v2.2.0-pre",
+        "manual_remark": null,
+        "change_reason": null
+      },
+      {
+        "record_id": "REC-2024-004",
+        "timestamp": "2026-05-16T07:40:55.831722",
+        "source_system": "approval_flow",
+        "record_type": "manual_correction",
+        "content": "人工修正：确认版本差异为预期的灰度发布，允许继续升级流程",
+        "operator": "admin_li",
+        "version_before": null,
+        "version_after": null,
+        "manual_remark": "版本差异是因为灰度发布策略，生产环境正在逐步升级，不属于异常",
+        "change_reason": null
+      },
+      {
+        "record_id": "REC-2024-005",
+        "timestamp": "2026-05-16T07:40:55.831804",
+        "source_system": "cloud_resource",
+        "record_type": "normal",
+        "content": "云资源申请单已批准",
+        "operator": "cloud_admin",
+        "version_before": null,
+        "version_after": null,
+        "manual_remark": null,
+        "change_reason": null
+      },
+      {
+        "record_id": "REC-2024-006",
+        "timestamp": "2026-05-16T07:40:55.831899",
+        "source_system": "cloud_resource",
+        "record_type": "manual_correction",
+        "content": "补充修改云资源申请单 - 增加CPU配额",
+        "operator": "admin_wang",
+        "version_before": "4CPU-16G",
+        "version_after": "8CPU-32G",
+        "manual_remark": null,
+        "change_reason": "用户业务量超出预期，原申请的4核CPU不足以支撑峰值流量，申请增加到8核"
+      },
+      {
+        "record_id": "REC-2024-007",
+        "timestamp": "2026-05-16T07:40:55.832002",
+        "source_system": "customer_service",
+        "record_type": "normal",
+        "content": "升级完成，通知用户",
+        "operator": "agent_zhang",
+        "version_before": null,
+        "version_after": "v2.2.0-enterprise",
+        "manual_remark": null,
+        "change_reason": null
+      }
+    ]
+  }
+]
