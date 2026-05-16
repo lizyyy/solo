@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+      - "443:443"
+    environment:
+      - NGINX_HOST=localhost
+      - NODE_ENV=production
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
