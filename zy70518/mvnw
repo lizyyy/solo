@@ -1,25 +1,37 @@
-#!/bin/sh
-# Maven Wrapper Simplified
+#!/bin/bash
+# Maven Wrapper with Docker fallback
+# Uses Docker if local Maven not available
+
 set -e
 
-BASE_DIR=$(dirname "$0")
-WRAPPER_JAR="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Download wrapper jar if needed
-if [ ! -f "$WRAPPER_JAR" ] || [ ! -s "$WRAPPER_JAR" ]; then
-    echo "[INFO] Downloading Maven Wrapper..."
-    mkdir -p "$(dirname "$WRAPPER_JAR")"
-    WRAPPER_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
-    
-    if command -v curl >/dev/null 2>&1; then
-        curl -f -L -o "$WRAPPER_JAR" "$WRAPPER_URL"
-    elif command -v wget >/dev/null 2>&1; then
-        wget -O "$WRAPPER_JAR" "$WRAPPER_URL"
-    else
-        echo "[ERROR] Neither curl nor wget found. Cannot download Maven Wrapper."
-        exit 1
-    fi
-    echo "[INFO] Maven Wrapper downloaded successfully"
+# Method 1: Try local Maven first
+if command -v mvn >/dev/null 2>&1; then
+    cd "$SCRIPT_DIR" && mvn "$@"
+    exit $?
 fi
 
-exec java -jar "$WRAPPER_JAR" "$@"
+# Method 2: Use Docker to run Maven
+if command -v docker >/dev/null 2>&1; then
+    if ! docker info >/dev/null 2>&1; then
+        echo "[ERROR] Docker daemon is not running!"
+        echo "Please start Docker Desktop first"
+        exit 1
+    fi
+    
+    echo "[INFO] Using Docker Maven..."
+    docker run -it --rm \
+        -v "$SCRIPT_DIR:/app" \
+        -v "$HOME/.m2:/root/.m2" \
+        -w /app \
+        maven:3.8.6-openjdk-11 \
+        mvn "$@"
+    exit $?
+fi
+
+echo "[ERROR] Neither Maven nor Docker found!"
+echo "Please install one of:"
+echo "  - Maven: brew install maven or https://maven.apache.org/download.cgi"
+echo "  - Docker: https://docs.docker.com/get-docker/"
+exit 1

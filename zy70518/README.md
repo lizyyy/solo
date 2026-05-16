@@ -107,53 +107,14 @@ diagnostic:
 
 ## 启动方式
 
-### 方式1: 使用启动脚本 (推荐，自动检测环境)
-脚本会自动检测Maven或Docker，优先使用本地Maven
-```bash
-./start.sh
-```
-
-### 方式2: Maven Wrapper (无需预装Maven)
-自动下载并使用指定版本的Maven
-```bash
-./mvnw spring-boot:run
-```
-
-### 方式3: Docker Compose (无需Maven，一键启动)
-```bash
-docker-compose up --build
-```
-
-### 方式4: 纯Docker命令 (分步执行)
-```bash
-# 构建镜像
-docker build -t diagnostic-api .
-
-# 运行容器
-docker run -p 8080:8080 diagnostic-api
-```
-
-### 方式5: 本地Maven (已安装Maven时使用)
 ```bash
 mvn spring-boot:run
 ```
 
-## 服务验证
+默认端口: 8080
+ContextPath: /diagnostic
 
-服务启动成功后，执行以下命令验证核心API：
-```bash
-# 方式1: 使用验证脚本（推荐）
-./verify_api.sh
-
-# 方式2: 手动curl测试
-curl http://localhost:8080/diagnostic/api/diagnostic/statuses
-```
-
-## 访问信息
-
-- **- **- **- **- **- **- **- **- **- **- **- **- **- **- **- **- **- **- **- **- **- *t:8080/diagnostic/h2-console
-- **ContextPath**: /diagnostic
-- **默认端口**: 8080
+H2控制台: http://localhost:8080/diagnostic/h2-console
 
 ## 接口调用示例
 
