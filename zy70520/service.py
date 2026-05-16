@@ -325,15 +325,15 @@ class MigrationGuardrailService:
         summary = self.get_migration_summary(migration_id)
 
         report = {
-            "summary": summary.dict(),
+            "summary": summary.model_dump(mode='json'),
             "phase_details": [],
-            "rollback_points": [rb.dict() for rb in migration.rollback_points],
+            "rollback_points": [rb.model_dump(mode='json') for rb in migration.rollback_points],
             "manual_corrections": migration.metadata.get("manual_corrections", []),
             "all_exceptions": []
         }
 
         for phase in migration.phase_history:
-            phase_dict = phase.dict()
+            phase_dict = phase.model_dump(mode='json')
             phase_dict["duration_seconds"] = None
             if phase.started_at and phase.completed_at:
                 duration = (phase.completed_at - phase.started_at).total_seconds()
@@ -341,7 +341,7 @@ class MigrationGuardrailService:
             report["phase_details"].append(phase_dict)
 
             for exc in phase.exceptions:
-                exc_dict = exc.dict()
+                exc_dict = exc.model_dump(mode='json')
                 exc_dict["phase"] = phase.phase.value
                 report["all_exceptions"].append(exc_dict)
 
