@@ -1,0 +1,25 @@
+{
+  "name": "account-risk-api",
+  "version": "1.0.0",
+  "description": "账号冒用风险API - 客服账号安全风控系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node scripts/init-db.js",
+    "seed": "node/scripts/seed-data.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "joi": "^17.11.0",
+    "moment": "^2.29.4",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
