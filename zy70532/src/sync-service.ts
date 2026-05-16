@@ -190,19 +190,22 @@ export async function validateSyncBatch(batchId: string): Promise<{ valid: boole
   await calculateDepartmentLevels(batchId, rootNodes, deptMap);
   await buildDepartmentRelations(batchId, deptMap);
 
-  const existingExceptions = await all<any>(
+  const allExceptions = await all<any>(
     'SELECT * FROM exception_nodes WHERE batch_id = ?',
     [batchId]
   );
-  const invalidCount = nodes.length - validCount + existingExceptions.length;
+  const unresolvedExceptions = allExceptions.filter((e: any) => e.is_resolved === 0);
+  const invalidCount = nodes.length - validCount + unresolvedExceptions.length;
 
   const report = {
     valid: invalidCount === 0,
     rootCount: rootNodes.length,
     validCount,
     invalidCount,
-    exceptionCount: existingExceptions.length
+    exceptionCount: unresolvedExceptions.length,
+    resolvedExceptionCount: allExceptions.length - unresolvedExceptions.length
   };
+
 
   const finalStatus = invalidCount > 0 ? BatchStatus.VALIDATION_FAILED : BatchStatus.READY;
   await run(
