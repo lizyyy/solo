@@ -121,7 +121,7 @@ router.post('/batches/:batchId/interceptions', async (req, res) => {
 router.post('/batches/:batchId/exceptions', async (req, res) => {
   try {
     const { batchId } = req.params;
-    const { spaceId, namespace, payloadId, exceptionType, errorMessage, errorStack, originalInput, processingEvidence, operatedBy } = req.body;
+    const { spaceId, namespace, payloadId, exceptionType, errorMessage, errorStack, originalInput, processingEvidence, finalConclusion, operatedBy } = req.body;
     
     if (!spaceId || !namespace || !exceptionType || !errorMessage || !originalInput) {
       return res.status(400).json({ error: '必填字段缺失' });
@@ -129,9 +129,47 @@ router.post('/batches/:batchId/exceptions', async (req, res) => {
     
     const result = await replayService.recordException(
       batchId, spaceId, namespace, payloadId, exceptionType, errorMessage, 
-      errorStack, originalInput, processingEvidence, operatedBy
+      errorStack, originalInput, processingEvidence, finalConclusion, operatedBy
     );
     res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.patch('/batches/:batchId/exceptions/:exceptionId', async (req, res) => {
+  try {
+    const { batchId, exceptionId } = req.params;
+    const { namespace, status, finalConclusion, resolvedBy } = req.body;
+    
+    if (!namespace || !status || !resolvedBy) {
+      return res.status(400).json({ error: 'namespace, status, resolvedBy 为必填字段' });
+    }
+    
+    const { db } = require('../database/schema');
+    const { EXCEPTION_STATES } = require('../utils/constants');
+    
+    if (![EXCEPTION_STATES.OPEN, EXCEPTION_STATES.INVESTIGATING, EXCEPTION_STATES.RESOLVED, EXCEPTION_STATES.DISMISSED].includes(status)) {
+      return res.status(400).json({ error: '无效的状态值' });
+    }
+    
+    const now = Date.now();
+    
+    db.run(
+      `UPDATE exception_records 
+       SET status = ?, final_conclusion = ?, resolved_at = ?, resolved_by = ?
+       WHERE id = ? AND batch_id = ? AND namespace = ?`,
+      [status, finalConclusion ? JSON.stringify(finalConclusion) : null, now, resolvedBy, exceptionId, batchId, namespace],
+      function(err) {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
+        if (this.changes === 0) {
+          return res.status(404).json({ error: '异常记录不存在或不属于当前批次' });
+        }
+        res.json({ id: exceptionId, status, finalConclusion: !!finalConclusion, resolvedAt: now, resolvedBy });
+      }
+    );
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
