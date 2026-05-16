@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nginx 路由冲突检测报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        .container { background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; }
+        h2 { color: #34495e; margin-top: 30px; margin-bottom: 15px; border-left: 4px solid #3498db; padding-left: 10px; }
+        h3 { color: #555; margin-top: 20px; margin-bottom: 10px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .summary-card { background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center; }
+        .summary-card .number { font-size: 2em; font-weight: bold; color: #3498db; }
+        .summary-card .label { color: #666; font-size: 0.9em; }
+        .error { color: #e74c3c; }
+        .warning { color: #f39c12; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #3498db; color: white; font-weight: 600; }
+        tr:hover { background: #f8f9fa; }
+        .conflict-card { background: #fef5f5; border: 1px solid #fecaca; border-radius: 6px; padding: 20px; margin: 15px 0; }
+        .conflict-card.warning { background: #fffbeb; border-color: #fcd34d; }
+        .conflict-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .conflict-title { font-size: 1.1em; font-weight: 600; }
+        .severity-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+        .severity-badge.error { background: #fee2e2; color: #dc2626; }
+        .severity-badge.warning { background: #fef3c7; color: #d97706; }
+        .location-item { background: white; padding: 10px; border-radius: 4px; margin: 8px 0; border-left: 3px solid #3498db; }
+        .location-path { font-family: 'Monaco', 'Consolas', monospace; color: #2c3e50; font-weight: 600; }
+        .location-meta { color: #666; font-size: 0.9em; margin-top: 5px; }
+        .suggestion-box { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; padding: 15px; margin: 15px 0; }
+        .suggestion-title { font-weight: 600; color: #065f46; margin-bottom: 8px; }
+        code { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: 'Monaco', 'Consolas', monospace; font-size: 0.9em; }
+        .generated-at { color: #999; text-align: right; font-size: 0.9em; margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Nginx 路由冲突检测报告</h1>
+
+        <h2>📊 统计摘要</h2>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="number">1</div>
+                <div class="label">Server 块数</div>
+            </div>
+            <div class="summary-card">
+                <div class="number">8</div>
+                <div class="label">Location 规则数</div>
+            </div>
+            <div class="summary-card">
+                <div class="number error">2</div>
+                <div class="label">检测到冲突</div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="number error">0</div>
+                <div class="label">错误级冲突</div>
+            </div>
+            <div class="summary-card">
+                <div class="number warning">2</div>
+                <div class="label">警告级冲突</div>
+            </div>
+            
+        </div>
+
+        <h2>📋 Server 配置详情</h2>
+
+        <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+            <h3>🖥️ example.com</h3>
+            <div style="margin: 10px 0; color: #666;">
+                <div>📁 文件: <code>/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf</code></div>
+                <div>🔌 监听: 80</div>
+                <div>🌐 域名: example.com</div>
+                <div>📍 Location 规则数: 8</div>
+            </div>
+
+            <h4>Location 规则列表 (按优先级排序)</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>优先级</th>
+                        <th>匹配类型</th>
+                        <th>规则</th>
+                        <th>文件位置</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>4</td>
+                        <td>exact</td>
+                        <td><code>= /health</code></td>
+                        <td><code>example.conf:13</code></td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>regex_case_insensitive</td>
+                        <td><code>~* \.(jpg|jpeg|png|gif)$</code></td>
+                        <td><code>example.conf:25</code></td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td>regex_case_sensitive</td>
+                        <td><code>~ \.php$</code></td>
+                        <td><code>example.conf:21</code></td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>prefix_no_regex</td>
+                        <td><code>^~ /static/</code></td>
+                        <td><code>example.conf:17</code></td>
+                    </tr>
+
+                    <tr>
+                        <td>1</td>
+                        <td>prefix</td>
+                        <td><code>/admin/api</code></td>
+                        <td><code>example.conf:33</code></td>
+                    </tr>
+
+                    <tr>
+                        <td>1</td>
+                        <td>prefix</td>
+                        <td><code>/api/v2</code></td>
+                        <td><code>example.conf:9</code></td>
+                    </tr>
+
+                    <tr>
+                        <td>1</td>
+                        <td>prefix</td>
+                        <td><code>/admin</code></td>
+                        <td><code>example.conf:29</code></td>
+                    </tr>
+
+                    <tr>
+                        <td>1</td>
+                        <td>prefix</td>
+                        <td><code>/api</code></td>
+                        <td><code>example.conf:5</code></td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <h2>⚠️ 冲突详情</h2>
+
+        <div class="conflict-card warning">
+            <div class="conflict-header">
+                <div class="conflict-title">🟡 冲突 #1: subset</div>
+                <span class="severity-badge warning">WARNING</span>
+            </div>
+
+            <div style="margin: 10px 0;">
+                <div><strong>Server:</strong> <code>example.com</code></div>
+                <div><strong>影响:</strong> 中 - 可能导致意外的路由行为</div>
+                <div><strong>说明:</strong> /api/v2 是 /api 的子集，请求时按配置顺序匹配</div>
+            </div>
+
+            <h4>涉及的 Location 规则</h4>
+            <div class="location-item">
+                <div class="location-path">#1 /api</div>
+                <div class="location-meta">
+                    类型: prefix |
+                    优先级: 1 |
+                    文件: <code>/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf:5</code>
+                </div>
+            </div>
+            <div class="location-item">
+                <div class="location-path">#2 /api/v2</div>
+                <div class="location-meta">
+                    类型: prefix |
+                    优先级: 1 |
+                    文件: <code>/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf:9</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="conflict-card warning">
+            <div class="conflict-header">
+                <div class="conflict-title">🟡 冲突 #2: subset</div>
+                <span class="severity-badge warning">WARNING</span>
+            </div>
+
+            <div style="margin: 10px 0;">
+                <div><strong>Server:</strong> <code>example.com</code></div>
+                <div><strong>影响:</strong> 中 - 可能导致意外的路由行为</div>
+                <div><strong>说明:</strong> /admin/api 是 /admin 的子集，请求时按配置顺序匹配</div>
+            </div>
+
+            <h4>涉及的 Location 规则</h4>
+            <div class="location-item">
+                <div class="location-path">#1 /admin</div>
+                <div class="location-meta">
+                    类型: prefix |
+                    优先级: 1 |
+                    文件: <code>/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf:29</code>
+                </div>
+            </div>
+            <div class="location-item">
+                <div class="location-path">#2 /admin/api</div>
+                <div class="location-meta">
+                    类型: prefix |
+                    优先级: 1 |
+                    文件: <code>/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf:33</code>
+                </div>
+            </div>
+        </div>
+
+        <h2>💡 修复建议</h2>
+
+        <div class="suggestion-box">
+            <div class="suggestion-title">对于被覆盖的规则 (shadowed)</div>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+                <li>检查是否确实需要该规则，如不需要可删除</li>
+                <li>如需保留，调整修饰符提高优先级 (如使用 <code>^~</code> 或 <code>=</code>)</li>
+            </ul>
+        </div>
+
+        <div class="suggestion-box">
+            <div class="suggestion-title">对于相同路径的规则 (identical)</div>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+                <li>删除重复配置</li>
+                <li>合并配置内容</li>
+            </ul>
+        </div>
+
+        <div class="suggestion-box">
+            <div class="suggestion-title">对于路径子集冲突 (subset)</div>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+                <li>将更具体的路径放在更一般的路径之前</li>
+                <li>使用 <code>=</code> 精确匹配修饰符提高优先级</li>
+            </ul>
+        </div>
+
+        <div class="suggestion-box">
+            <div class="suggestion-title">对于正则表达式重叠 (regex_overlap)</div>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+                <li>简化正则表达式</li>
+                <li>使用 <code>^~</code> 前缀匹配阻止正则匹配</li>
+            </ul>
+        </div>
+
+        <h2>📖 Nginx Location 优先级参考</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>修饰符</th>
+                    <th>类型</th>
+                    <th>优先级</th>
+                    <th>说明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>=</code></td>
+                    <td>精确匹配</td>
+                    <td>4 (最高)</td>
+                    <td>完全匹配后停止搜索</td>
+                </tr>
+                <tr>
+                    <td><code>^~</code></td>
+                    <td>前缀匹配(禁用正则)</td>
+                    <td>3</td>
+                    <td>匹配成功后不再检查正则</td>
+                </tr>
+                <tr>
+                    <td><code>~</code> / <code>~*</code></td>
+                    <td>正则匹配</td>
+                    <td>2</td>
+                    <td>按配置顺序匹配</td>
+                </tr>
+                <tr>
+                    <td>(无)</td>
+                    <td>前缀匹配</td>
+                    <td>1 (最低)</td>
+                    <td>最长前缀优先</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="generated-at">
+            生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+        </div>
+    </div>
+</body>
+</html>

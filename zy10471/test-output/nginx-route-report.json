@@ -1,0 +1,143 @@
+{
+  "generated_at": "2026-05-17T03:56:05.591579",
+  "summary": {
+    "total_servers": 1,
+    "total_locations": 8,
+    "total_conflicts": 2,
+    "error_conflicts": 0,
+    "warning_conflicts": 2
+  },
+  "servers": [
+    {
+      "name": "example.com",
+      "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+      "listen": [
+        "80"
+      ],
+      "server_name": [
+        "example.com"
+      ],
+      "location_count": 8,
+      "locations": [
+        {
+          "raw": "/api",
+          "pattern": "/api",
+          "modifier": null,
+          "match_type": "prefix",
+          "priority": 1,
+          "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+          "line": 5
+        },
+        {
+          "raw": "/api/v2",
+          "pattern": "/api/v2",
+          "modifier": null,
+          "match_type": "prefix",
+          "priority": 1,
+          "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+          "line": 9
+        },
+        {
+          "raw": "= /health",
+          "pattern": "/health",
+          "modifier": "=",
+          "match_type": "exact",
+          "priority": 4,
+          "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+          "line": 13
+        },
+        {
+          "raw": "^~ /static/",
+          "pattern": "/static/",
+          "modifier": "^~",
+          "match_type": "prefix_no_regex",
+          "priority": 2,
+          "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+          "line": 17
+        },
+        {
+          "raw": "~ \\.php$",
+          "pattern": "\\.php$",
+          "modifier": "~",
+          "match_type": "regex_case_sensitive",
+          "priority": 3,
+          "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+          "line": 21
+        },
+        {
+          "raw": "~* \\.(jpg|jpeg|png|gif)$",
+          "pattern": "\\.(jpg|jpeg|png|gif)$",
+          "modifier": "~*",
+          "match_type": "regex_case_insensitive",
+          "priority": 3,
+          "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+          "line": 25
+        },
+        {
+          "raw": "/admin",
+          "pattern": "/admin",
+          "modifier": null,
+          "match_type": "prefix",
+          "priority": 1,
+          "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+          "line": 29
+        },
+        {
+          "raw": "/admin/api",
+          "pattern": "/admin/api",
+          "modifier": null,
+          "match_type": "prefix",
+          "priority": 1,
+          "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+          "line": 33
+        }
+      ]
+    }
+  ],
+  "conflicts": [
+    {
+      "server_name": "example.com",
+      "server_file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+      "location1": {
+        "raw": "/api",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+        "line": 5,
+        "match_type": "prefix",
+        "priority": 1
+      },
+      "location2": {
+        "raw": "/api/v2",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+        "line": 9,
+        "match_type": "prefix",
+        "priority": 1
+      },
+      "overlap_type": "subset",
+      "severity": "warning",
+      "description": "/api/v2 是 /api 的子集，请求时按配置顺序匹配",
+      "impact": "中 - 可能导致意外的路由行为"
+    },
+    {
+      "server_name": "example.com",
+      "server_file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+      "location1": {
+        "raw": "/admin",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+        "line": 29,
+        "match_type": "prefix",
+        "priority": 1
+      },
+      "location2": {
+        "raw": "/admin/api",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10471/test-conf/example.conf",
+        "line": 33,
+        "match_type": "prefix",
+        "priority": 1
+      },
+      "overlap_type": "subset",
+      "severity": "warning",
+      "description": "/admin/api 是 /admin 的子集，请求时按配置顺序匹配",
+      "impact": "中 - 可能导致意外的路由行为"
+    }
+  ]
+}
