@@ -341,6 +341,7 @@ class OutputService:
 
         lines.append("# 审计取证报告")
         lines.append("")
+        lines.append(f"**批次UUID**: {batch.id}")
         lines.append(f"**批次号**: {batch.batch_no}")
         lines.append(f"**环境名称**: {batch.environment_name}")
         lines.append(f"**操作人**: {batch.operator}")
@@ -371,8 +372,8 @@ class OutputService:
 
         lines.append("## 取证记录明细")
         lines.append("")
-        lines.append("| 证据ID | 来源 | 设备名称 | 设备IP | 风险等级 | 证据路径 | 证据哈希 | 采集时间 | 状态 | 错误信息 |")
-        lines.append("|--------|------|----------|--------|----------|----------|----------|----------|------|----------|")
+        lines.append("| 记录UUID | 证据ID | 来源 | 设备名称 | 设备IP | 风险等级 | 证据路径 | 证据哈希 | 采集时间 | 记录创建时间 | 状态 | 错误信息 |")
+        lines.append("|----------|--------|------|----------|--------|----------|----------|----------|----------|--------------|------|----------|")
 
         for r in records:
             device_name = r.device_name or "-"
@@ -381,16 +382,17 @@ class OutputService:
             evidence_path = r.evidence_path or "-"
             evidence_hash = r.evidence_hash or "-"
             collected_at = r.collected_at.strftime("%Y-%m-%d %H:%M:%S") if r.collected_at else "-"
+            record_created_at = r.created_at.strftime("%Y-%m-%d %H:%M:%S")
             error_msg = r.error_message or "-"
             lines.append(
-                f"| {r.evidence_id} | {r.source} | {device_name} | {device_ip} | {risk_level} | {evidence_path} | {evidence_hash} | {collected_at} | {r.status} | {error_msg} |"
+                f"| {r.id} | {r.evidence_id} | {r.source} | {device_name} | {device_ip} | {risk_level} | {evidence_path} | {evidence_hash} | {collected_at} | {record_created_at} | {r.status} | {error_msg} |"
             )
         lines.append("")
 
         lines.append("## 下载授权记录")
         lines.append("")
-        lines.append("| 授权人 | 被授权人 | 授权时间 | 过期时间 | 是否使用 | 使用人 | 使用时间 | 原因 |")
-        lines.append("|--------|----------|----------|----------|----------|--------|----------|------|")
+        lines.append("| 授权UUID | 授权人 | 被授权人 | 授权时间 | 过期时间 | 是否使用 | 使用人 | 使用时间 | 原因 |")
+        lines.append("|----------|--------|----------|----------|----------|----------|--------|----------|------|")
 
         for a in authorizations:
             expires_at = a.expires_at.strftime("%Y-%m-%d %H:%M:%S") if a.expires_at else "-"
@@ -398,7 +400,7 @@ class OutputService:
             used_by = a.used_by or "-"
             reason = a.reason or "-"
             lines.append(
-                f"| {a.authorized_by} | {a.authorized_to} | {a.authorized_at.strftime('%Y-%m-%d %H:%M:%S')} | {expires_at} | {a.is_used} | {used_by} | {used_at} | {reason} |"
+                f"| {a.id} | {a.authorized_by} | {a.authorized_to} | {a.authorized_at.strftime('%Y-%m-%d %H:%M:%S')} | {expires_at} | {a.is_used} | {used_by} | {used_at} | {reason} |"
             )
         lines.append("")
 
