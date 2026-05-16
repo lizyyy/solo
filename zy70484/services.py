@@ -126,47 +126,85 @@ class TenantSuspenderService:
         )
         
         cached_tenant = CacheService.get_cache(db, tenant_cache_key)
+        tenant = None
         if not cached_tenant:
             tenant = TenantSuspenderService.get_tenant_by_code(db, request.tenant_code)
             if tenant:
+                errors.append(f"租户 {request.tenant_code} 存在，但缓存未刷新，已触发异常处理流程")
+            else:
+                errors.append(f"租户 {request.tenant_code} 不存在，且缓存未刷新")
+            
+            processing_log = models.ProcessingLog(
+                batch_no=request.batch_no,
+                tenant_code=request.tenant_code,
+                action="SMS_BACKFILL",
+                status=schemas.ProcessingStatus.CACHE_STALE.value,
+                input_summary=input_summary,
+                action_details=f"租户信息缓存失效，租户状态：{'存在' if tenant else '不存在'}",
+                conclusion=f"补录异常：缓存未刷新，租户{'可从数据库恢复' if tenant else '不存在'}",
+                error_message="; ".join(errors),
+                logistics_screenshot_ref=f"LOGISTICS-{request.batch_no}-SAMPLE-001",
+                executed_by=request.submitted_by,
+                duration_ms=int((time.time() - start_time) * 1000)
+            )
+            db.add(processing_log)
+            
+            if tenant:
+                for idx, record in enumerate(request.records):
+                    try:
+                        db_record = models.SmsSendRecord(
+                            batch_no=request.batch_no,
+                            tenant_code=request.tenant_code,
+                            phone_number=record.phone_number,
+                            content=record.content,
+                            send_time=record.send_time or datetime.utcnow(),
+                            operator=record.operator,
+                            department=request.department,
+                            remark=record.remark,
+                            is_backfill=True
+                        )
+                        db.add(db_record)
+                        success_count += 1
+                    except Exception as e:
+                        failed_count += 1
+                        errors.append(f"记录{idx+1}: {str(e)}")
+                
                 CacheService.set_cache(db, tenant_cache_key, {
                     "tenant_code": tenant.tenant_code,
                     "status": tenant.status,
                     "department": tenant.department
                 })
-                cache_stale = False
-            else:
-                errors.append(f"租户 {request.tenant_code} 不存在，且缓存未刷新")
+            
+            summary_content = TenantSuspenderService._generate_material_summary(
+                request, success_count, failed_count, 
+                f"【缓存未刷新异常】批次{request.batch_no} | 提交部门：{request.department} | 提交人：{request.submitted_by} | 处理结果：成功{success_count}条，失败{failed_count}条 | ⚠️ 警告：租户状态缓存未及时刷新，已触发异常处理流程"
+            )
+            material_summary = models.MaterialSummary(
+                batch_no=request.batch_no,
+                tenant_code=request.tenant_code,
+                summary_content=summary_content,
+                material_count=success_count,
+                export_token=__import__('hashlib').md5(request.batch_no.encode()).hexdigest()
+            )
+            db.add(material_summary)
+            db.commit()
+            db.refresh(processing_log)
+            
+            if not tenant:
                 failed_count = len(request.records)
-                
-                processing_log = models.ProcessingLog(
-                    batch_no=request.batch_no,
-                    tenant_code=request.tenant_code,
-                    action="SMS_BACKFILL",
-                    status=schemas.ProcessingStatus.CACHE_STALE.value,
-                    input_summary=input_summary,
-                    action_details="租户信息缓存失效，无法验证租户状态",
-                    conclusion="补录失败：缓存未刷新",
-                    error_message="; ".join(errors),
-                    executed_by=request.submitted_by,
-                    duration_ms=int((time.time() - start_time) * 1000)
-                )
-                db.add(processing_log)
-                db.commit()
-                db.refresh(processing_log)
-                
-                return schemas.ProcessingResult(
-                    batch_no=request.batch_no,
-                    tenant_code=request.tenant_code,
-                    status=schemas.ProcessingStatus.CACHE_STALE.value,
-                    total_records=len(request.records),
-                    success_count=0,
-                    failed_count=failed_count,
-                    log_id=processing_log.id,
-                    summary="租户缓存未刷新，补录中断",
-                    cache_status="STALE",
-                    error_details=errors
-                ), errors
+            
+            return schemas.ProcessingResult(
+                batch_no=request.batch_no,
+                tenant_code=request.tenant_code,
+                status=schemas.ProcessingStatus.CACHE_STALE.value,
+                total_records=len(request.records),
+                success_count=success_count,
+                failed_count=failed_count,
+                log_id=processing_log.id,
+                summary="租户缓存未刷新，触发异常处理流程",
+                cache_status="STALE",
+                error_details=errors
+            ), errors
         
         for idx, record in enumerate(request.records):
             try:

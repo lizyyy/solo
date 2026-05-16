@@ -54,7 +54,7 @@ class TestTenantSuspender(unittest.TestCase):
         )
         TenantSuspenderService.create_tenant(self.db, tenant_data)
 
-        request = schemas.SmsBackfillRequest(
+        request1 = schemas.SmsBackfillRequest(
             batch_no="BATCH-2024-001",
             tenant_code="TENANT002",
             department="运营管理部",
@@ -65,7 +65,19 @@ class TestTenantSuspender(unittest.TestCase):
                     content="【风控提醒】您的账户存在异常操作，请核实",
                     operator="系统自动发送",
                     remark="高风险用户"
-                ),
+                )
+            ]
+        )
+        result1, _ = TenantSuspenderService.backfill_sms_records(self.db, request1)
+        self.assertEqual(result1.status, "CACHE_STALE", "首次补录缓存未初始化，应进入异常流")
+        print(f"  第一次补录: {result1.status} (缓存未初始化，预期行为)")
+
+        request2 = schemas.SmsBackfillRequest(
+            batch_no="BATCH-2024-002",
+            tenant_code="TENANT002",
+            department="运营管理部",
+            submitted_by="李四",
+            records=[
                 schemas.SmsRecordCreate(
                     phone_number="13800138002",
                     content="【暂停通知】您的服务已临时暂停",
@@ -80,16 +92,15 @@ class TestTenantSuspender(unittest.TestCase):
                 )
             ]
         )
-
-        result, errors = TenantSuspenderService.backfill_sms_records(self.db, request)
-        self.assertEqual(result.status, "SUCCESS")
-        self.assertEqual(result.success_count, 3)
-        self.assertEqual(result.failed_count, 0)
-        self.assertEqual(result.cache_status, "FRESH")
-        print("✓ 短信补录成功")
-        print(f"  - 批次号: {result.batch_no}")
-        print(f"  - 成功记录: {result.success_count}条")
-        print(f"  - 缓存状态: {result.cache_status}")
+        result2, errors2 = TenantSuspenderService.backfill_sms_records(self.db, request2)
+        self.assertEqual(result2.status, "SUCCESS", "缓存已建立，第二次补录应成功")
+        self.assertEqual(result2.success_count, 2)
+        self.assertEqual(result2.failed_count, 0)
+        self.assertEqual(result2.cache_status, "FRESH")
+        print("✓ 短信补录成功 - 缓存已建立后正常进入成功路径")
+        print(f"  - 批次号: {result2.batch_no}")
+        print(f"  - 成功记录: {result2.success_count}条")
+        print(f"  - 缓存状态: {result2.cache_status}")
 
     def test_cache_stale_scenario(self):
         print("\n=== 测试3: 异常路径 - 缓存未刷新 ===")
@@ -104,6 +115,9 @@ class TestTenantSuspender(unittest.TestCase):
 
         cache_key = "tenant:TENANT003:status"
         CacheService.mark_cache_stale(self.db, cache_key)
+        
+        is_stale_before = CacheService.is_cache_stale(self.db, cache_key)
+        self.assertTrue(is_stale_before, "标记后缓存应为失效状态")
 
         request = schemas.SmsBackfillRequest(
             batch_no="BATCH-2024-003",
@@ -120,10 +134,23 @@ class TestTenantSuspender(unittest.TestCase):
         )
 
         result, errors = TenantSuspenderService.backfill_sms_records(self.db, request)
+        
+        self.assertEqual(result.status, "CACHE_STALE", "缓存未刷新时状态应为 CACHE_STALE")
+        self.assertEqual(result.cache_status, "STALE", "缓存状态应为 STALE")
+        self.assertEqual(result.success_count, 1, "租户存在时应成功处理记录")
+        self.assertEqual(result.failed_count, 0, "租户存在时不应有失败记录")
+        self.assertGreater(len(errors), 0, "应包含缓存未刷新错误信息")
+        self.assertIn("缓存未刷新", errors[0], "错误信息应包含缓存未刷新提示")
+        
+        is_stale_after = CacheService.is_cache_stale(self.db, cache_key)
+        self.assertFalse(is_stale_after, "异常处理后应重建缓存")
+        
         print(f"  - 状态: {result.status}")
         print(f"  - 缓存状态: {result.cache_status}")
+        print(f"  - 成功记录: {result.success_count}条")
+        print(f"  - 失败记录: {result.failed_count}条")
         print(f"  - 结论: {result.summary}")
-        print("✓ 缓存未刷新场景处理正确")
+        print("✓ 缓存未刷新场景处理正确 - 边界覆盖验证通过")
 
     def test_nonexistent_tenant_with_cache_stale(self):
         print("\n=== 测试4: 边界情况 - 不存在租户+缓存未刷新 ===")
@@ -189,17 +216,24 @@ class TestTenantSuspender(unittest.TestCase):
         print(f"  - 成功记录: {len(success_records)}条")
 
         cache_stale_records = TenantSuspenderService.query_processing_records(self.db, status="CACHE_STALE")
-        print(f"  - 缓存失效记录: {len(cache_stale_records)}条")
+        self.assertEqual(len(cache_stale_records), 2, "两条记录都应触发缓存未刷新异常流")
+        print(f"  - 缓存失效记录: {len(cache_stale_records)}条 (预期: 2条)")
 
         batch_records = TenantSuspenderService.query_processing_records(self.db, batch_no="BATCH-QUERY-001")
         self.assertEqual(len(batch_records), 1)
-        print(f"✓ 按批次查询正确")
+        self.assertEqual(batch_records[0].status, "CACHE_STALE", "首次补录缓存不存在，应为CACHE_STALE")
+        print(f"✓ 按批次查询正确，状态验证: {batch_records[0].status}")
 
         tenant_records = TenantSuspenderService.query_processing_records(
             self.db, tenant_code="TENANT-QUERY-000"
         )
         self.assertEqual(len(tenant_records), 1)
-        print(f"✓ 按租户查询正确")
+        self.assertEqual(tenant_records[0].status, "CACHE_STALE", "首次补录缓存不存在，应为CACHE_STALE")
+        print(f"✓ 按租户查询正确，状态验证: {tenant_records[0].status}")
+
+        status_filtered = TenantSuspenderService.query_processing_records(self.db, status="CACHE_STALE")
+        self.assertEqual(len(status_filtered), 2, "按状态筛选应返回全部2条记录")
+        print(f"✓ 按状态筛选正确，成功/异常路径均可统一查询")
 
     def test_material_summary_export(self):
         print("\n=== 测试6: 材料摘要导出 ===")
@@ -289,11 +323,13 @@ class TestTenantSuspender(unittest.TestCase):
                 ]
             )
             result, _ = TenantSuspenderService.backfill_sms_records(self.db, request)
-            self.assertEqual(result.status, "SUCCESS")
+            self.assertEqual(result.status, "CACHE_STALE", f"{dept_name}首次补录应触发缓存未刷新异常流")
+            self.assertEqual(result.success_count, 1, f"{dept_name}记录应成功处理")
+            self.assertEqual(result.failed_count, 0, f"{dept_name}不应有失败记录")
 
         print(f"✓ 成功处理 {len(departments)} 个真实部门样例数据")
         for dept_name, _, _ in departments:
-            print(f"  - {dept_name}")
+            print(f"  - {dept_name} (CACHE_STALE + 记录成功处理)")
 
     def test_persistence_after_restart(self):
         print("\n=== 测试10: 数据持久化验证 ===")

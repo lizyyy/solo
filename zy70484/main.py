@@ -88,6 +88,85 @@ def query_records(
     }
 
 
+def _generate_complete_export_content(
+    batch_no: str,
+    summary: models.MaterialSummary,
+    sms_records: list,
+    processing_logs: list
+) -> str:
+    content_parts = []
+    content_parts.append(summary.summary_content)
+    content_parts.append("")
+    content_parts.append("=" * 60)
+    content_parts.append("【短信发送明细】")
+    content_parts.append("-" * 60)
+    for idx, r in enumerate(sms_records, 1):
+        content_parts.append(f"{idx}. 手机号: {r.phone_number}")
+        content_parts.append(f"   内容: {r.content}")
+        content_parts.append(f"   操作人: {r.operator}")
+        content_parts.append(f"   部门: {r.department}")
+        content_parts.append("")
+    content_parts.append("=" * 60)
+    content_parts.append("【处理日志明细】")
+    content_parts.append("-" * 60)
+    for idx, r in enumerate(processing_logs, 1):
+        content_parts.append(f"{idx}. 动作: {r.action}")
+        content_parts.append(f"   状态: {r.status}")
+        content_parts.append(f"   结论: {r.conclusion}")
+        content_parts.append(f"   物流截图: {r.logistics_screenshot_ref or '无'}")
+        content_parts.append("")
+    content_parts.append("=" * 60)
+    content_parts.append(f"导出凭证: {summary.export_token}")
+    content_parts.append(f"导出时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    return "\n".join(content_parts)
+
+
+def _generate_complete_markdown_export(
+    batch_no: str,
+    summary: models.MaterialSummary,
+    sms_records: list,
+    processing_logs: list
+) -> str:
+    md_parts = []
+    md_parts.append("# 租户暂停器 - 完整复核材料")
+    md_parts.append("")
+    md_parts.append("## 基本信息")
+    md_parts.append(f"- **批次号**: {batch_no}")
+    md_parts.append(f"- **租户编码**: {summary.tenant_code}")
+    md_parts.append(f"- **记录总数**: {len(sms_records)}条")
+    md_parts.append("")
+    md_parts.append("## 材料摘要")
+    md_parts.append("```")
+    md_parts.append(summary.summary_content)
+    md_parts.append("```")
+    md_parts.append("")
+    md_parts.append("## 短信发送明细")
+    md_parts.append("| 序号 | 手机号 | 内容 | 操作人 | 部门 |")
+    md_parts.append("|------|--------|------|--------|------|")
+    for idx, r in enumerate(sms_records, 1):
+        content_short = r.content[:30] + "..." if len(r.content) > 30 else r.content
+        md_parts.append(f"| {idx} | {r.phone_number} | {content_short} | {r.operator} | {r.department} |")
+    md_parts.append("")
+    md_parts.append("## 处理日志明细")
+    md_parts.append("| 序号 | 动作 | 状态 | 结论 | 物流截图 |")
+    md_parts.append("|------|------|------|------|----------|")
+    for idx, r in enumerate(processing_logs, 1):
+        conclusion_short = r.conclusion[:40] + "..." if len(r.conclusion) > 40 else r.conclusion
+        logistics_ref = r.logistics_screenshot_ref or "无"
+        md_parts.append(f"| {idx} | {r.action} | {r.status} | {conclusion_short} | {logistics_ref} |")
+    md_parts.append("")
+    md_parts.append("## 物流拦截复核样例")
+    if processing_logs and processing_logs[0].logistics_screenshot_ref:
+        md_parts.append(f"- **截图编号**: `{processing_logs[0].logistics_screenshot_ref}`")
+        md_parts.append("- **复核说明**: 请核对物流拦截记录中的收件人电话是否与短信发送清单中的号码一致")
+        md_parts.append("- **复核状态**: ☐ 一致 ☐ 不一致 ☐ 需进一步核实")
+    md_parts.append("")
+    md_parts.append("---")
+    md_parts.append(f"**导出凭证**: `{summary.export_token}`  ")
+    md_parts.append(f"**导出时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    return "\n".join(md_parts)
+
+
 @app.get("/api/summary/{batch_no}/export", tags=["导出"])
 def export_summary(
     batch_no: str,
@@ -124,32 +203,47 @@ def export_summary(
             }
             for r in processing_logs
         ],
+        "logistics_review_sample": processing_logs[0].logistics_screenshot_ref if processing_logs else None,
         "export_token": summary.export_token,
         "export_time": datetime.now().isoformat()
     }
     
     if format == "markdown":
-        md_content = summary.summary_content
+        md_content = _generate_complete_markdown_export(batch_no, summary, sms_records, processing_logs)
         return PlainTextResponse(content=md_content, media_type="text/markdown")
     
     if format == "text":
-        return PlainTextResponse(content=summary.summary_content, media_type="text/plain")
+        text_content = _generate_complete_export_content(batch_no, summary, sms_records, processing_logs)
+        return PlainTextResponse(content=text_content, media_type="text/plain")
     
     return export_data
 
 
 @app.get("/api/summary/{batch_no}/download", tags=["导出"])
-def download_summary(batch_no: str, db: Session = Depends(get_db)):
+def download_summary(
+    batch_no: str,
+    format: str = Query("txt", description="下载格式: txt/md"),
+    db: Session = Depends(get_db)
+):
     summary = TenantSuspenderService.get_material_summary(db, batch_no)
     if not summary:
         raise HTTPException(status_code=404, detail="批次摘要不存在")
     
-    content = summary.summary_content
-    filename = f"tenant_suspender_summary_{batch_no}_{datetime.now().strftime('%Y%m%d')}.txt"
+    sms_records = TenantSuspenderService.get_all_sms_records(db, batch_no)
+    processing_logs = TenantSuspenderService.query_processing_records(db, batch_no=batch_no)
+    
+    if format == "md":
+        content = _generate_complete_markdown_export(batch_no, summary, sms_records, processing_logs)
+        filename = f"tenant_suspender_summary_{batch_no}_{datetime.now().strftime('%Y%m%d')}.md"
+        media_type = "text/markdown"
+    else:
+        content = _generate_complete_export_content(batch_no, summary, sms_records, processing_logs)
+        filename = f"tenant_suspender_summary_{batch_no}_{datetime.now().strftime('%Y%m%d')}.txt"
+        media_type = "text/plain"
     
     return Response(
         content=content,
-        media_type="text/plain",
+        media_type=media_type,
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
