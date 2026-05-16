@@ -53,6 +53,28 @@ class RevocationRequest {
           }
         );
 
+        db.run(
+          `INSERT INTO status_history (id, deletion_request_id, old_status, new_status, changed_at, changed_by, reason, evidence)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            uuidv4(), 
+            deletionRequestId, 
+            deletionRequest.status, 
+            DELETION_STATUS.REVOCATION_REQUESTED, 
+            now.toISOString(), 
+            data.requested_by, 
+            data.reason,
+            JSON.stringify({ revocation_request_id: id })
+          ],
+          function(err) {
+            if (err) {
+              db.run('ROLLBACK');
+              reject(err);
+              return;
+            }
+          }
+        );
+
         db.run('COMMIT', (err) => {
           if (err) reject(err);
           else resolve({
@@ -100,6 +122,7 @@ class RevocationRequest {
       throw new Error('REVOCATION_ALREADY_REVIEWED');
     }
 
+    const deletionRequest = await DeletionRequest.findById(revocation.deletion_request_id);
     const now = new Date().toISOString();
     const newStatus = decision === 'APPROVE' ? REVOCATION_STATUS.APPROVED : REVOCATION_STATUS.REJECTED;
     const deletionStatus = decision === 'APPROVE' ? DELETION_STATUS.REVOKED : DELETION_STATUS.IN_GRACE_PERIOD;
@@ -125,6 +148,32 @@ class RevocationRequest {
         db.run(
           'UPDATE deletion_requests SET status = ?, version = version + 1 WHERE id = ?',
           [deletionStatus, revocation.deletion_request_id],
+          function(err) {
+            if (err) {
+              db.run('ROLLBACK');
+              reject(err);
+              return;
+            }
+          }
+        );
+
+        db.run(
+          `INSERT INTO status_history (id, deletion_request_id, old_status, new_status, changed_at, changed_by, reason, evidence)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            uuidv4(), 
+            revocation.deletion_request_id, 
+            deletionRequest.status, 
+            deletionStatus, 
+            now, 
+            reviewedBy, 
+            `撤销审核${decision === 'APPROVE' ? '通过' : '拒绝'}`,
+            JSON.stringify({ 
+              revocation_request_id: id, 
+              decision, 
+              review_notes: reviewNotes 
+            })
+          ],
           function(err) {
             if (err) {
               db.run('ROLLBACK');

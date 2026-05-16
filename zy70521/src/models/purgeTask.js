@@ -62,6 +62,28 @@ class PurgeTask {
           }
         );
 
+        db.run(
+          `INSERT INTO status_history (id, deletion_request_id, old_status, new_status, changed_at, changed_by, reason, evidence)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            uuidv4(), 
+            deletionRequestId, 
+            deletionRequest.status, 
+            DELETION_STATUS.PURGE_SCHEDULED, 
+            now, 
+            'SYSTEM', 
+            '创建清除任务',
+            JSON.stringify({ purge_task_id: id, purge_scope: purgeScope })
+          ],
+          function(err) {
+            if (err) {
+              db.run('ROLLBACK');
+              reject(err);
+              return;
+            }
+          }
+        );
+
         db.run('COMMIT', (err) => {
           if (err) reject(err);
           else resolve({
@@ -108,6 +130,7 @@ class PurgeTask {
       throw new Error('TASK_NOT_SCHEDULED');
     }
 
+    const deletionRequest = await DeletionRequest.findById(task.deletion_request_id);
     const now = new Date().toISOString();
 
     return new Promise((resolve, reject) => {
@@ -138,6 +161,28 @@ class PurgeTask {
           }
         );
 
+        db.run(
+          `INSERT INTO status_history (id, deletion_request_id, old_status, new_status, changed_at, changed_by, reason, evidence)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            uuidv4(), 
+            task.deletion_request_id, 
+            deletionRequest.status, 
+            DELETION_STATUS.PURGE_IN_PROGRESS, 
+            now, 
+            'SYSTEM', 
+            '开始执行清除任务',
+            JSON.stringify({ purge_task_id: id, started_at: now })
+          ],
+          function(err) {
+            if (err) {
+              db.run('ROLLBACK');
+              reject(err);
+              return;
+            }
+          }
+        );
+
         db.run('COMMIT', (err) => {
           if (err) reject(err);
           else resolve({ id, status: PURGE_TASK_STATUS.IN_PROGRESS, started_at: now });
@@ -156,6 +201,7 @@ class PurgeTask {
       throw new Error('TASK_NOT_IN_PROGRESS');
     }
 
+    const deletionRequest = await DeletionRequest.findById(task.deletion_request_id);
     const now = new Date().toISOString();
     const evidenceHash = DeletionRequest.generateHash({
       records_purged: recordsPurged,
@@ -201,6 +247,33 @@ class PurgeTask {
           }
         );
 
+        db.run(
+          `INSERT INTO status_history (id, deletion_request_id, old_status, new_status, changed_at, changed_by, reason, evidence)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            uuidv4(), 
+            task.deletion_request_id, 
+            deletionRequest.status, 
+            DELETION_STATUS.PURGED, 
+            now, 
+            'SYSTEM', 
+            '清除任务完成',
+            JSON.stringify({ 
+              purge_task_id: id, 
+              records_purged: recordsPurged,
+              bytes_purged: bytesPurged,
+              evidence_hash: evidenceHash 
+            })
+          ],
+          function(err) {
+            if (err) {
+              db.run('ROLLBACK');
+              reject(err);
+              return;
+            }
+          }
+        );
+
         db.run('COMMIT', (err) => {
           if (err) reject(err);
           else resolve({
@@ -222,6 +295,7 @@ class PurgeTask {
       throw new Error('PURGE_TASK_NOT_FOUND');
     }
 
+    const deletionRequest = await DeletionRequest.findById(task.deletion_request_id);
     const now = new Date().toISOString();
 
     return new Promise((resolve, reject) => {
@@ -243,8 +317,48 @@ class PurgeTask {
         );
 
         db.run(
-          'UPDATE deletion_requests SET status = ?, version = version + 1 WHERE id = ?',
-          [DELETION_STATUS.ERROR, task.deletion_request_id],
+          `UPDATE deletion_requests 
+           SET status = ?, processing_evidence = ?, final_conclusion = ?, version = version + 1 
+           WHERE id = ?`,
+          [
+            DELETION_STATUS.ERROR,
+            JSON.stringify({ 
+              purge_failed: now, 
+              error_details: errorDetails 
+            }),
+            JSON.stringify({ 
+              conclusion: 'PURGE_FAILED', 
+              error_code: errorDetails.code || 'UNKNOWN',
+              error_message: errorDetails.message || '未知错误'
+            }),
+            task.deletion_request_id
+          ],
+          function(err) {
+            if (err) {
+              db.run('ROLLBACK');
+              reject(err);
+              return;
+            }
+          }
+        );
+
+        db.run(
+          `INSERT INTO status_history (id, deletion_request_id, old_status, new_status, changed_at, changed_by, reason, evidence)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            uuidv4(), 
+            task.deletion_request_id, 
+            deletionRequest.status, 
+            DELETION_STATUS.ERROR, 
+            now, 
+            'SYSTEM', 
+            '清除任务失败',
+            JSON.stringify({ 
+              purge_task_id: id, 
+              failed_at: now,
+              error_details: errorDetails 
+            })
+          ],
           function(err) {
             if (err) {
               db.run('ROLLBACK');
