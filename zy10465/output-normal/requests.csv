@@ -1,0 +1,11 @@
+index,url,domain,resourceType,status,latency_ms,bucket,bucketLabel,method,source
+9,https://slow.example.com/heavy-resource,slow.example.com,other,200,7500,5,>=5000ms,GET,test-normal.har:entries[9]
+4,https://cdn.example.com/photo.jpg,cdn.example.com,image,200,2500,4,2000ms-5000ms,GET,test-normal.har:entries[4]
+8,https://fonts.example.com/font.woff2,fonts.example.com,font,200,1800,3,1000ms-2000ms,GET,test-normal.har:entries[8]
+3,https://cdn.example.com/image.png,cdn.example.com,image,200,1200,3,1000ms-2000ms,GET,test-normal.har:entries[3]
+5,https://api.example.com/data,api.example.com,json,200,800,2,500ms-1000ms,GET,test-normal.har:entries[5]
+6,https://api.example.com/submit,api.example.com,json,400,600,2,500ms-1000ms,POST,test-normal.har:entries[6]
+2,https://example.com/app.js,example.com,js,200,350,1,100ms-500ms,GET,test-normal.har:entries[2]
+0,https://example.com/,example.com,html,200,150,1,100ms-500ms,GET,test-normal.har:entries[0]
+7,https://api.example.com/notfound,api.example.com,html,404,150,1,100ms-500ms,GET,test-normal.har:entries[7]
+1,https://example.com/styles.css,example.com,css,200,80,0,<100ms,GET,test-normal.har:entries[1]

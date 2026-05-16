@@ -1,0 +1,23 @@
+{
+  "name": "har-latency-bucket",
+  "version": "1.0.0",
+  "description": "HAR 文件延迟分桶分析 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "har-latency": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": ["har", "performance", "latency", "analysis"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

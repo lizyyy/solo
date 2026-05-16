@@ -1,0 +1,4 @@
+index,url,domain,resourceType,status,latency_ms,bucket,bucketLabel,method,source
+9,https://example.com/valid5,example.com,html,500,1200,3,1000ms-2000ms,GET,test-dirty.har:entries[9]
+6,https://example.com/valid4,example.com,js,200,800,2,500ms-1000ms,GET,test-dirty.har:entries[6]
+0,https://example.com/valid1,example.com,html,200,200,1,100ms-500ms,GET,test-dirty.har:entries[0]

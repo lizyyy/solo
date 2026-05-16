@@ -1,0 +1,6 @@
+domain,count,avgLatency_ms,totalLatency_ms,<100ms,100ms-500ms,500ms-1000ms,1000ms-2000ms,2000ms-5000ms,>=5000ms
+example.com,3,193,580,1,2,0,0,0,0
+api.example.com,3,517,1550,0,1,2,0,0,0
+cdn.example.com,2,1850,3700,0,0,0,1,1,0
+fonts.example.com,1,1800,1800,0,0,0,1,0,0
+slow.example.com,1,7500,7500,0,0,0,0,0,1

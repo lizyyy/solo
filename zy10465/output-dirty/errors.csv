@@ -1,0 +1,8 @@
+index,source,errors,entry_snippet
+1,test-dirty.har:entries[1],条目为空,null...
+2,test-dirty.har:entries[2],缺少 request.url,"{""request"":{""method"":""GET""},""response"":{""status"":200},""time"":300}..."
+3,test-dirty.har:entries[3],缺少或无效的 time 字段; 缺少 response,"{""request"":{""method"":""GET"",""url"":""https://example.com/valid2""},""time"":""not-a-number""}..."
+4,test-dirty.har:entries[4],缺少 response,"{""request"":{""method"":""GET"",""url"":""https://example.com/missing-response""},""time"":150}..."
+5,test-dirty.har:entries[5],缺少 response.status,"{""request"":{""method"":""GET"",""url"":""https://example.com/valid3""},""response"":{},""time"":500}..."
+7,test-dirty.har:entries[7],缺少 request.url; 缺少或无效的 time 字段; 缺少 response,{}...
+8,test-dirty.har:entries[8],缺少 request.url; 缺少或无效的 time 字段; 缺少 response,"{""invalid"":""structure"",""no"":""request or response""}..."
