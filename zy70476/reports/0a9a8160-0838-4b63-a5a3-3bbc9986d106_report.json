@@ -1,0 +1,70 @@
+{
+  "batch_id": "0a9a8160-0838-4b63-a5a3-3bbc9986d106",
+  "rule_version": "1.0.0",
+  "rule_type": "normal",
+  "execution_time_seconds": 0.003761,
+  "before_summary": {
+    "total_partitions": 5,
+    "total_records": 76700,
+    "total_size_mb": 942.9,
+    "environments_count": 3,
+    "environments": [
+      "test",
+      "uat",
+      "prod"
+    ]
+  },
+  "after_summary": {
+    "total_processed": 5,
+    "pass_count": 0,
+    "fail_count": 1,
+    "warning_count": 4,
+    "pass_rate": "0.0%",
+    "status": "completed"
+  },
+  "comparisons": [
+    {
+      "field_name": "总分区数",
+      "before": 5,
+      "after": 5,
+      "changed": false
+    },
+    {
+      "field_name": "通过检测数",
+      "before": "-",
+      "after": 0,
+      "changed": true
+    },
+    {
+      "field_name": "失败检测数",
+      "before": "-",
+      "after": 1,
+      "changed": true
+    },
+    {
+      "field_name": "警告数",
+      "before": "-",
+      "after": 4,
+      "changed": true
+    },
+    {
+      "field_name": "使用规则版本",
+      "before": "-",
+      "after": "1.0.0",
+      "changed": true
+    }
+  ],
+  "suggestions": [
+    "共有1个分区检测失败，请优先处理失败项",
+    "分区记录数为0，请检查数据同步是否正常",
+    "文件大小(0.1MB)低于最小值阈值(1.0MB)",
+    "数据日期(2024-01-15)距今852天，超过容忍阈值(7天)",
+    "共有4个分区存在警告，请关注相关异常",
+    "存在1个处理失败的项目，请查看failed_items目录下的失败记录",
+    "本次检测使用规则版本1.0.0，规则类型为normal",
+    "建议定期执行检测，关注数据质量变化",
+    "对于连续失败的分区，建议检查数据源同步情况"
+  ],
+  "failed_items_count": 1,
+  "generated_at": "2026-05-16 08:49:19.901283"
+}

@@ -145,6 +145,16 @@ class PartitionDetector:
                 if status == DetectionStatus.PASS:
                     pass_count += 1
                 elif status == DetectionStatus.FAIL:
+                    failed_item = FailedItem(
+                        batch_id=batch_id,
+                        item_id=partition.id,
+                        item_type="partition",
+                        error_message="; ".join(suggestions) if suggestions else "检测不通过",
+                        error_type="business_check_failed",
+                        original_data=partition.model_dump(),
+                        rule_version=rule.version
+                    )
+                    store.save_failed_item(failed_item)
                     fail_count += 1
                 else:
                     warning_count += 1
@@ -155,7 +165,7 @@ class PartitionDetector:
                     item_id=partition.id,
                     item_type="partition",
                     error_message=str(e),
-                    error_type="detection_error",
+                    error_type="detection_exception",
                     original_data=partition.model_dump(),
                     rule_version=rule.version
                 )

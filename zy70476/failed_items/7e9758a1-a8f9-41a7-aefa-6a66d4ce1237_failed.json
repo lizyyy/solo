@@ -1,0 +1,32 @@
+[
+  {
+    "batch_id": "7e9758a1-a8f9-41a7-aefa-6a66d4ce1237",
+    "item_id": "ce76ee4f-2027-4c6d-b24c-51a9987533cd",
+    "item_type": "partition",
+    "error_message": "分区记录数为0，请检查数据同步是否正常; 数据日期(2024-01-15)距今852天，超过容忍阈值(90天)",
+    "error_type": "business_check_failed",
+    "original_data": {
+      "id": "ce76ee4f-2027-4c6d-b24c-51a9987533cd",
+      "source_system": "HRS",
+      "environment": "test",
+      "database_name": "employee",
+      "table_name": "attendance",
+      "partition_column": "dt",
+      "partition_value": "2024-01-15",
+      "data_date": "2024-01-15",
+      "record_count": 0,
+      "file_size": 0.1,
+      "creation_time": "2026-05-14 08:48:28.797702",
+      "update_time": "2026-05-15 08:48:28.797703",
+      "original_input": {
+        "source": "HRS_employee_attendance",
+        "load_time": "2024-01-16 05:00:00",
+        "etl_job": "job_003",
+        "source_count": 0,
+        "note": "测试环境数据"
+      }
+    },
+    "failed_at": "2026-05-16 08:48:28.806328",
+    "rule_version": "1.0.0-wide"
+  }
+]
