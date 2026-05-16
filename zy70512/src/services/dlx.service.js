@@ -1,4 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
+const http = require('http');
+const https = require('https');
 const { getDatabase, promisifyDb } = require('../../config/database');
 
 const PROCESSING_STATUSES = {
@@ -10,11 +12,79 @@ const PROCESSING_STATUSES = {
   CANCELLED: 'cancelled'
 };
 
+const CALLBACK_TIMEOUT = 10000;
+
+function httpRequest(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const client = urlObj.protocol === 'https:' ? https : http;
+    
+    const requestOptions = {
+      hostname: urlObj.hostname,
+      port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
+      path: urlObj.pathname + urlObj.search,
+      method: options.method || 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      },
+      timeout: options.timeout || CALLBACK_TIMEOUT
+    };
+
+    const req = client.request(requestOptions, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve({
+            success: true,
+            statusCode: res.statusCode,
+            data: data
+          });
+        } else {
+          const error = new Error(`回调返回 ${res.statusCode}`);
+          error.statusCode = res.statusCode;
+          error.responseData = data;
+          reject(error);
+        }
+      });
+    });
+
+    req.on('error', (err) => {
+      reject(err);
+    });
+
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('回调请求超时'));
+    });
+
+    if (options.body) {
+      req.write(JSON.stringify(options.body));
+    }
+    req.end();
+  });
+}
+
 class DlxService {
   constructor() {
     this.db = getDatabase();
     this.pDb = promisifyDb(this.db);
     this.rateLimitStore = new Map();
+    this.mockMode = true;
+    this.mockResponses = new Map();
+  }
+
+  setMockMode(enabled) {
+    this.mockMode = enabled;
+  }
+
+  setMockResponse(url, response) {
+    this.mockResponses.set(url, response);
+  }
+
+  clearMockResponses() {
+    this.mockResponses.clear();
   }
 
   async createDlxMessage(eventId, errorTypeId, originalInput, processingEvidence = null) {
@@ -33,7 +103,8 @@ class DlxService {
 
   async getDlxMessage(messageId) {
     const message = await this.pDb.get(`
-      SELECT dm.*, ce.event_type, ce.payload, ce.callback_url, et.error_code, et.error_name
+      SELECT dm.*, ce.event_type, ce.payload, ce.callback_url, ce.headers as event_headers,
+             et.error_code, et.error_name
       FROM dlx_messages dm
       JOIN callback_events ce ON dm.event_id = ce.id
       JOIN error_types et ON dm.error_type_id = et.id
@@ -103,7 +174,8 @@ class DlxService {
              SUM(CASE WHEN dm.status = 'pending' THEN 1 ELSE 0 END) as pending_count,
              SUM(CASE WHEN dm.status = 'processing' THEN 1 ELSE 0 END) as processing_count,
              SUM(CASE WHEN dm.status = 'success' THEN 1 ELSE 0 END) as success_count,
-             SUM(CASE WHEN dm.status = 'failed' THEN 1 ELSE 0 END) as failed_count
+             SUM(CASE WHEN dm.status = 'failed' THEN 1 ELSE 0 END) as failed_count,
+             SUM(CASE WHEN dm.status = 'manual_required' THEN 1 ELSE 0 END) as manual_required_count
       FROM dlx_messages dm
       JOIN error_types et ON dm.error_type_id = et.id
       GROUP BY et.id, et.error_code, et.error_name
@@ -127,30 +199,24 @@ class DlxService {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `, [batchId, batchName, errorTypeId, strategyId, PROCESSING_STATUSES.PENDING, totalCount, createdBy]);
     
-    const updateStmt = this.db.prepare(`
-      UPDATE dlx_messages SET batch_id = ? WHERE id = ?
-    `);
-    
     for (const msg of pendingMessages) {
-      await new Promise((resolve, reject) => {
-        updateStmt.run(batchId, msg.id, (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
+      await this.pDb.run(`
+        UPDATE dlx_messages SET batch_id = ? WHERE id = ?
+      `, [batchId, msg.id]);
     }
     
     return this.getBatch(batchId);
   }
 
   async getBatch(batchId) {
-    return await this.pDb.get(`
+    const batch = await this.pDb.get(`
       SELECT db.*, et.error_code, et.error_name, rs.strategy_code, rs.strategy_name
       FROM dlx_batches db
       JOIN error_types et ON db.error_type_id = et.id
       JOIN retry_strategies rs ON db.strategy_id = rs.id
       WHERE db.id = ?
     `, [batchId]);
+    return batch || null;
   }
 
   async listBatches(filters = {}, pagination = { page: 1, limit: 20 }) {
@@ -237,6 +303,10 @@ class DlxService {
   async processMessage(messageId) {
     const message = await this.getDlxMessage(messageId);
     if (!message) throw new Error('消息不存在');
+
+    if (message.status === PROCESSING_STATUSES.SUCCESS) {
+      return message;
+    }
     
     const batch = await this.getBatch(message.batchId);
     const strategy = await this.getStrategyById(batch.strategy_id);
@@ -246,40 +316,71 @@ class DlxService {
     }
     
     if (message.retryCount >= strategy.max_retries) {
-      await this._updateMessageStatus(messageId, PROCESSING_STATUSES.MANUAL_REQUIRED, {
-        finalConclusion: '已达到最大重试次数，需要人工介入'
-      });
+      if (message.status !== PROCESSING_STATUSES.MANUAL_REQUIRED) {
+        await this._updateMessageStatus(messageId, PROCESSING_STATUSES.MANUAL_REQUIRED, {
+          finalConclusion: '已达到最大重试次数，需要人工介入'
+        });
+      }
       return this.getDlxMessage(messageId);
     }
     
+    const originalRetryCount = message.retryCount;
+    let callbackResult;
+    
     try {
-      await this._executeCallback(message, strategy);
+      callbackResult = await this._executeCallback(message, strategy);
       
       await this._updateMessageStatus(messageId, PROCESSING_STATUSES.SUCCESS, {
-        retryCount: message.retryCount + 1,
+        retryCount: originalRetryCount + 1,
         lastRetryAt: new Date().toISOString(),
-        finalConclusion: '重试成功'
+        finalConclusion: `重试成功，HTTP ${callbackResult.statusCode || 200}`,
+        processingEvidence: JSON.stringify({
+          attempt: originalRetryCount + 1,
+          success: true,
+          statusCode: callbackResult.statusCode,
+          responseData: callbackResult.data,
+          timestamp: new Date().toISOString()
+        })
       });
       
       await this._incrementBatchSuccessCount(message.batchId);
       
     } catch (error) {
-      const newRetryCount = message.retryCount + 1;
+      const newRetryCount = originalRetryCount + 1;
       
-      await this._updateMessageStatus(messageId, PROCESSING_STATUSES.FAILED, {
-        retryCount: newRetryCount,
-        lastRetryAt: new Date().toISOString(),
-        lastError: error.message,
-        processingEvidence: JSON.stringify({ error: error.message, timestamp: new Date().toISOString() })
-      });
+      const errorType = this._classifyError(error);
+      const errorEvidence = {
+        attempt: newRetryCount,
+        success: false,
+        errorType: errorType,
+        errorMessage: error.message,
+        statusCode: error.statusCode,
+        timestamp: new Date().toISOString()
+      };
       
       if (newRetryCount >= strategy.max_retries) {
+        errorEvidence.final = true;
+        errorEvidence.action = 'require_manual';
+        
         await this._updateMessageStatus(messageId, PROCESSING_STATUSES.MANUAL_REQUIRED, {
-          finalConclusion: '已达到最大重试次数，需要人工介入'
+          retryCount: newRetryCount,
+          lastRetryAt: new Date().toISOString(),
+          lastError: error.message,
+          finalConclusion: `重试${newRetryCount}次全部失败，需要人工介入`,
+          processingEvidence: JSON.stringify(errorEvidence)
         });
+        
+        await this._incrementBatchFailCount(message.batchId);
+      } else {
+        await this._updateMessageStatus(messageId, PROCESSING_STATUSES.FAILED, {
+          retryCount: newRetryCount,
+          lastRetryAt: new Date().toISOString(),
+          lastError: error.message,
+          processingEvidence: JSON.stringify(errorEvidence)
+        });
+        
+        await this._incrementBatchFailCount(message.batchId);
       }
-      
-      await this._incrementBatchFailCount(message.batchId);
     }
     
     await this._checkBatchCompletion(message.batchId);
@@ -288,12 +389,63 @@ class DlxService {
   }
 
   async _executeCallback(message, strategy) {
-    return { success: true };
+    const input = message.manuallyCorrectedInput || message.originalInput;
+    const callbackUrl = input.url || message.callbackUrl;
+    const payload = input.payload || {};
+    const headers = input.headers || {};
+    
+    if (this.mockMode) {
+      const mockResponse = this.mockResponses.get(callbackUrl);
+      if (mockResponse) {
+        if (mockResponse.success) {
+          return { success: true, statusCode: 200, data: JSON.stringify(mockResponse.data || {}) };
+        } else {
+          const error = new Error(mockResponse.message || 'Mock callback failed');
+          error.statusCode = mockResponse.statusCode || 500;
+          throw error;
+        }
+      }
+      return { success: true, statusCode: 200, data: '{}' };
+    }
+    
+    return httpRequest(callbackUrl, {
+      method: 'POST',
+      headers,
+      body: payload,
+      timeout: strategy.retry_interval > 0 ? Math.min(strategy.retry_interval, CALLBACK_TIMEOUT) : CALLBACK_TIMEOUT
+    });
+  }
+
+  _classifyError(error) {
+    if (error.message.includes('timeout') || error.message.includes('超时')) {
+      return 'timeout';
+    }
+    if (error.message.includes('ECONNREFUSED') || error.message.includes('ECONNRESET')) {
+      return 'network_error';
+    }
+    if (error.message.includes('ENOTFOUND') || error.message.includes('DNS')) {
+      return 'dns_error';
+    }
+    if (error.statusCode >= 500) {
+      return 'server_error';
+    }
+    if (error.statusCode >= 400) {
+      return 'client_error';
+    }
+    return 'unknown_error';
   }
 
   async manualCorrect(messageId, correctedInput, operator = null) {
     const message = await this.getDlxMessage(messageId);
     if (!message) throw new Error('消息不存在');
+    
+    const currentEvidence = message.processingEvidence || {};
+    const correctionEvidence = {
+      ...currentEvidence,
+      correctedBy: operator,
+      correctedAt: new Date().toISOString(),
+      corrections: Object.keys(correctedInput)
+    };
     
     await this.pDb.run(`
       UPDATE dlx_messages 
@@ -302,7 +454,7 @@ class DlxService {
     `, [
       JSON.stringify(correctedInput), 
       PROCESSING_STATUSES.PENDING,
-      JSON.stringify({ correctedBy: operator, correctedAt: new Date().toISOString() }),
+      JSON.stringify(correctionEvidence),
       messageId
     ]);
     
@@ -320,6 +472,13 @@ class DlxService {
   }
 
   async _updateMessageStatus(messageId, status, updates = {}) {
+    const currentMessage = await this.getDlxMessage(messageId);
+    if (!currentMessage) throw new Error('消息不存在');
+    
+    if (currentMessage.status === PROCESSING_STATUSES.SUCCESS && status === PROCESSING_STATUSES.SUCCESS) {
+      return;
+    }
+    
     const fields = ['status = ?'];
     const params = [status];
     
@@ -365,7 +524,7 @@ class DlxService {
 
   async _checkBatchCompletion(batchId) {
     const batch = await this.getBatch(batchId);
-    if (batch.success_count + batch.fail_count >= batch.total_count) {
+    if (batch.success_count + batch.fail_count >= batch.total_count && batch.status !== PROCESSING_STATUSES.SUCCESS) {
       await this.pDb.run(`
         UPDATE dlx_batches SET status = ?, completed_at = CURRENT_TIMESTAMP WHERE id = ?
       `, [PROCESSING_STATUSES.SUCCESS, batchId]);
@@ -398,6 +557,17 @@ class DlxService {
     
     const formattedMessages = messages.map(m => this._formatMessage(m));
     
+    const successRate = batch.total_count > 0 ? (batch.success_count / batch.total_count * 100).toFixed(2) : 0;
+    const failRate = batch.total_count > 0 ? (batch.fail_count / batch.total_count * 100).toFixed(2) : 0;
+    
+    const errorBreakdown = {};
+    formattedMessages.forEach(m => {
+      if (m.lastError) {
+        const errorType = m.processingEvidence?.errorType || 'unknown';
+        errorBreakdown[errorType] = (errorBreakdown[errorType] || 0) + 1;
+      }
+    });
+    
     const reportContent = {
       batch,
       generatedAt: new Date().toISOString(),
@@ -405,8 +575,10 @@ class DlxService {
         total: batch.total_count,
         success: batch.success_count,
         failed: batch.fail_count,
-        successRate: batch.total_count > 0 ? (batch.success_count / batch.total_count * 100).toFixed(2) : 0
+        successRate,
+        failRate
       },
+      errorBreakdown,
       messages: formattedMessages
     };
     
@@ -421,10 +593,10 @@ class DlxService {
 
   async exportMessages(batchId) {
     return await this.pDb.all(`
-      SELECT dm.id, dm.status, dm.retry_count, dm.last_error, dm.created_at,
-             ce.event_type, ce.payload, ce.callback_url,
+      SELECT dm.id, dm.status, dm.retry_count, dm.last_error, dm.final_conclusion, dm.created_at, dm.last_retry_at,
+             ce.event_type, ce.callback_url,
              et.error_code, et.error_name,
-             dm.original_input, dm.manually_corrected_input, dm.processing_evidence, dm.final_conclusion
+             dm.original_input, dm.manually_corrected_input, dm.processing_evidence
       FROM dlx_messages dm
       JOIN callback_events ce ON dm.event_id = ce.id
       JOIN error_types et ON dm.error_type_id = et.id
