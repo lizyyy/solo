@@ -1,0 +1,167 @@
+{
+  "summary_id": "72787baa-512f-4560-b01d-7a23139f39d5",
+  "generated_at": "2026-05-17T03:16:02.058771",
+  "input_file": "examples/sample_plan.json",
+  "total_resources": 5,
+  "total_changes": 5,
+  "changes_by_action": {
+    "update": 2,
+    "create": 2,
+    "delete": 1
+  },
+  "changes_by_team": {
+    "平台团队": 2,
+    "数据团队": 2,
+    "存储团队": 1
+  },
+  "changes_by_severity": {
+    "high": 3,
+    "critical": 1,
+    "medium": 1
+  },
+  "changes_requiring_attention": 2,
+  "changes": [
+    {
+      "resource_address": "aws_instance.web_server",
+      "resource_type": "aws_instance",
+      "resource_name": "web_server",
+      "module_path": null,
+      "action": "update",
+      "previous_attributes": {
+        "instance_type": "t2.micro",
+        "ami": "ami-12345678",
+        "tags": {
+          "Name": "Web Server"
+        }
+      },
+      "planned_attributes": {
+        "instance_type": "t2.large",
+        "ami": "ami-87654321",
+        "tags": {
+          "Name": "Web Server"
+        }
+      },
+      "changed_fields": [
+        "instance_type",
+        "ami"
+      ],
+      "sensitive_fields": [],
+      "line_number": 0,
+      "source_file": "examples/sample_plan.json",
+      "responsible_team": "平台团队",
+      "severity": "high",
+      "requires_attention": true,
+      "notes": null
+    },
+    {
+      "resource_address": "aws_security_group.web_sg",
+      "resource_type": "aws_security_group",
+      "resource_name": "web_sg",
+      "module_path": null,
+      "action": "create",
+      "previous_attributes": {},
+      "planned_attributes": {
+        "name": "web-sg",
+        "description": "Web server security group",
+        "ingress": [
+          {
+            "from_port": 80,
+            "to_port": 80,
+            "protocol": "tcp",
+            "cidr_blocks": [
+              "0.0.0.0/0"
+            ]
+          }
+        ]
+      },
+      "changed_fields": [
+        "description",
+        "ingress",
+        "name"
+      ],
+      "sensitive_fields": [],
+      "line_number": 1,
+      "source_file": "examples/sample_plan.json",
+      "responsible_team": "平台团队",
+      "severity": "high",
+      "requires_attention": false,
+      "notes": null
+    },
+    {
+      "resource_address": "module.database.aws_db_instance.mysql",
+      "resource_type": "aws_db_instance",
+      "resource_name": "mysql",
+      "module_path": "module.database",
+      "action": "delete",
+      "previous_attributes": {
+        "identifier": "prod-mysql",
+        "engine": "mysql",
+        "instance_class": "db.t3.medium"
+      },
+      "planned_attributes": {},
+      "changed_fields": [
+        "instance_class",
+        "identifier",
+        "engine"
+      ],
+      "sensitive_fields": [],
+      "line_number": 2,
+      "source_file": "examples/sample_plan.json",
+      "responsible_team": "数据团队",
+      "severity": "critical",
+      "requires_attention": true,
+      "notes": null
+    },
+    {
+      "resource_address": "module.redis.aws_elasticache_cluster.cache",
+      "resource_type": "aws_elasticache_cluster",
+      "resource_name": "cache",
+      "module_path": "module.redis",
+      "action": "update",
+      "previous_attributes": {
+        "node_type": "cache.t2.micro",
+        "num_cache_nodes": 2
+      },
+      "planned_attributes": {
+        "node_type": "cache.t2.small",
+        "num_cache_nodes": 3
+      },
+      "changed_fields": [
+        "num_cache_nodes",
+        "node_type"
+      ],
+      "sensitive_fields": [],
+      "line_number": 3,
+      "source_file": "examples/sample_plan.json",
+      "responsible_team": "数据团队",
+      "severity": "medium",
+      "requires_attention": false,
+      "notes": null
+    },
+    {
+      "resource_address": "aws_s3_bucket.assets",
+      "resource_type": "aws_s3_bucket",
+      "resource_name": "assets",
+      "module_path": null,
+      "action": "create",
+      "previous_attributes": {},
+      "planned_attributes": {
+        "bucket": "my-app-assets-2024",
+        "acl": "private"
+      },
+      "changed_fields": [
+        "acl",
+        "bucket"
+      ],
+      "sensitive_fields": [],
+      "line_number": 4,
+      "source_file": "examples/sample_plan.json",
+      "responsible_team": "存储团队",
+      "severity": "high",
+      "requires_attention": false,
+      "notes": null
+    }
+  ],
+  "errors": [],
+  "masked_fields_count": 0
+}

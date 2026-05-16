@@ -1,0 +1,121 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_instance.web_server",
+      "module_address": "",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "web_server",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["update"],
+        "before": {
+          "instance_type": "t2.micro",
+          "ami": "ami-12345678",
+          "tags": {
+            "Name": "Web Server"
+          }
+        },
+        "after": {
+          "instance_type": "t2.large",
+          "ami": "ami-87654321",
+          "tags": {
+            "Name": "Web Server"
+          }
+        },
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.web_sg",
+      "module_address": "",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "web_sg",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "name": "web-sg",
+          "description": "Web server security group",
+          "ingress": [
+            {
+              "from_port": 80,
+              "to_port": 80,
+              "protocol": "tcp",
+              "cidr_blocks": ["0.0.0.0/0"]
+            }
+          ]
+        },
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.database.aws_db_instance.mysql",
+      "module_address": "module.database",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "mysql",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["delete"],
+        "before": {
+          "identifier": "prod-mysql",
+          "engine": "mysql",
+          "instance_class": "db.t3.medium"
+        },
+        "after": null,
+        "before_sensitive": {
+          "password": "secret123"
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.redis.aws_elasticache_cluster.cache",
+      "module_address": "module.redis",
+      "mode": "managed",
+      "type": "aws_elasticache_cluster",
+      "name": "cache",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["update"],
+        "before": {
+          "node_type": "cache.t2.micro",
+          "num_cache_nodes": 2
+        },
+        "after": {
+          "node_type": "cache.t2.small",
+          "num_cache_nodes": 3
+        },
+        "before_sensitive": {
+          "auth_token": "redis-secret-token"
+        },
+        "after_sensitive": {
+          "auth_token": "redis-secret-token"
+        }
+      }
+    },
+    {
+      "address": "aws_s3_bucket.assets",
+      "module_address": "",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "assets",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "bucket": "my-app-assets-2024",
+          "acl": "private"
+        },
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    }
+  ]
+}

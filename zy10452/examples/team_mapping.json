@@ -1,0 +1,22 @@
+[
+  {
+    "team_name": "平台团队",
+    "patterns": ["aws_instance", "aws_security_group", "module.vpc"],
+    "priority": 10
+  },
+  {
+    "team_name": "数据团队",
+    "patterns": ["aws_db_instance", "aws_elasticache_cluster", "module.database", "module.redis"],
+    "priority": 10
+  },
+  {
+    "team_name": "存储团队",
+    "patterns": ["aws_s3_bucket", "aws_ebs_volume"],
+    "priority": 5
+  },
+  {
+    "team_name": "网络团队",
+    "patterns": ["aws_route53", "aws_cloudfront", "aws_lb"],
+    "priority": 5
+  }
+]
