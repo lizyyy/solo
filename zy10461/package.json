@@ -1,0 +1,33 @@
+{
+  "name": "env-shadow-cli",
+  "version": "1.0.0",
+  "description": "环境变量影子CLI - 多源环境变量优先级分析与覆盖追踪工具",
+  "main": "src/cli.js",
+  "bin": {
+    "env-shadow": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js",
+    "demo": "node src/cli.js --input ./examples --output ./output"
+  },
+  "keywords": [
+    "env",
+    "environment-variables",
+    "dotenv",
+    "docker-compose",
+    "shell",
+    "cli",
+    "configuration"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "js-yaml": "^4.1.0",
+    "table": "^6.8.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

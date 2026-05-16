@@ -1,0 +1,1323 @@
+{
+  "generatedAt": "2026-05-16T20:40:19.687Z",
+  "inputDirectory": "/Users/lzy/pro/solo/workspaces/zy10461/examples",
+  "statistics": {
+    "totalVariables": 20,
+    "totalDefinitions": 36,
+    "overriddenCount": 11,
+    "uniqueSources": 3,
+    "errorCount": 3,
+    "noOverrides": 9
+  },
+  "sources": [
+    {
+      "path": "examples/.env",
+      "type": "dotenv",
+      "variableCount": 13
+    },
+    {
+      "path": "examples/docker-compose.yml",
+      "type": "compose",
+      "variableCount": 13
+    },
+    {
+      "path": "examples/start.sh",
+      "type": "shell",
+      "variableCount": 10
+    }
+  ],
+  "variables": [
+    {
+      "name": "API_KEY",
+      "finalValue": "compose-api-key-xyz",
+      "winner": {
+        "name": "API_KEY",
+        "value": "compose-api-key-xyz",
+        "rawValue": "compose-api-key-xyz",
+        "serviceName": "web",
+        "arrayIndex": 2,
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "API_KEY",
+          "value": "compose-api-key-xyz",
+          "rawValue": "compose-api-key-xyz",
+          "serviceName": "web",
+          "arrayIndex": 2,
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        },
+        {
+          "name": "API_KEY",
+          "value": "shell-api-key-67890",
+          "rawValue": "shell-api-key-67890",
+          "lineNumber": 14,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": true,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        },
+        {
+          "name": "API_KEY",
+          "value": "env-file-key-12345",
+          "rawValue": "env-file-key-12345",
+          "lineNumber": 19,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "API_KEY",
+            "value": "compose-api-key-xyz",
+            "rawValue": "compose-api-key-xyz",
+            "serviceName": "web",
+            "arrayIndex": 2,
+            "source": "examples/docker-compose.yml",
+            "sourceType": "compose",
+            "priority": 30,
+            "basePriority": 30,
+            "effectivePriority": 30013
+          },
+          "definition": {
+            "name": "API_KEY",
+            "value": "shell-api-key-67890",
+            "rawValue": "shell-api-key-67890",
+            "lineNumber": 14,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": true,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          }
+        },
+        {
+          "order": 2,
+          "overriddenBy": {
+            "name": "API_KEY",
+            "value": "shell-api-key-67890",
+            "rawValue": "shell-api-key-67890",
+            "lineNumber": 14,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": true,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          },
+          "definition": {
+            "name": "API_KEY",
+            "value": "env-file-key-12345",
+            "rawValue": "env-file-key-12345",
+            "lineNumber": 19,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 2
+    },
+    {
+      "name": "APP_DEBUG",
+      "finalValue": "false",
+      "winner": {
+        "name": "APP_DEBUG",
+        "value": "false",
+        "rawValue": "false",
+        "lineNumber": 6,
+        "source": "examples/start.sh",
+        "sourceType": "shell",
+        "hasExport": true,
+        "priority": 20,
+        "basePriority": 20,
+        "effectivePriority": 20026,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "APP_DEBUG",
+          "value": "false",
+          "rawValue": "false",
+          "lineNumber": 6,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": true,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        },
+        {
+          "name": "APP_DEBUG",
+          "value": "true",
+          "rawValue": "true",
+          "lineNumber": 4,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "APP_DEBUG",
+            "value": "false",
+            "rawValue": "false",
+            "lineNumber": 6,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": true,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          },
+          "definition": {
+            "name": "APP_DEBUG",
+            "value": "true",
+            "rawValue": "true",
+            "lineNumber": 4,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 1
+    },
+    {
+      "name": "APP_ENV",
+      "finalValue": "staging",
+      "winner": {
+        "name": "APP_ENV",
+        "value": "staging",
+        "rawValue": "staging",
+        "serviceName": "web",
+        "arrayIndex": 1,
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "APP_ENV",
+          "value": "staging",
+          "rawValue": "staging",
+          "serviceName": "web",
+          "arrayIndex": 1,
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        },
+        {
+          "name": "APP_ENV",
+          "value": "production",
+          "rawValue": "production",
+          "lineNumber": 5,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": true,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        },
+        {
+          "name": "APP_ENV",
+          "value": "development",
+          "rawValue": "development",
+          "lineNumber": 3,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "APP_ENV",
+            "value": "staging",
+            "rawValue": "staging",
+            "serviceName": "web",
+            "arrayIndex": 1,
+            "source": "examples/docker-compose.yml",
+            "sourceType": "compose",
+            "priority": 30,
+            "basePriority": 30,
+            "effectivePriority": 30013
+          },
+          "definition": {
+            "name": "APP_ENV",
+            "value": "production",
+            "rawValue": "production",
+            "lineNumber": 5,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": true,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          }
+        },
+        {
+          "order": 2,
+          "overriddenBy": {
+            "name": "APP_ENV",
+            "value": "production",
+            "rawValue": "production",
+            "lineNumber": 5,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": true,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          },
+          "definition": {
+            "name": "APP_ENV",
+            "value": "development",
+            "rawValue": "development",
+            "lineNumber": 3,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 2
+    },
+    {
+      "name": "APP_NAME",
+      "finalValue": "compose-web-app",
+      "winner": {
+        "name": "APP_NAME",
+        "value": "compose-web-app",
+        "rawValue": "compose-web-app",
+        "serviceName": "web",
+        "arrayIndex": 0,
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "APP_NAME",
+          "value": "compose-web-app",
+          "rawValue": "compose-web-app",
+          "serviceName": "web",
+          "arrayIndex": 0,
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        },
+        {
+          "name": "APP_NAME",
+          "value": "my-shell-app",
+          "rawValue": "my-shell-app",
+          "lineNumber": 4,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": true,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        },
+        {
+          "name": "APP_NAME",
+          "value": "my-app",
+          "rawValue": "my-app",
+          "lineNumber": 2,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "APP_NAME",
+            "value": "compose-web-app",
+            "rawValue": "compose-web-app",
+            "serviceName": "web",
+            "arrayIndex": 0,
+            "source": "examples/docker-compose.yml",
+            "sourceType": "compose",
+            "priority": 30,
+            "basePriority": 30,
+            "effectivePriority": 30013
+          },
+          "definition": {
+            "name": "APP_NAME",
+            "value": "my-shell-app",
+            "rawValue": "my-shell-app",
+            "lineNumber": 4,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": true,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          }
+        },
+        {
+          "order": 2,
+          "overriddenBy": {
+            "name": "APP_NAME",
+            "value": "my-shell-app",
+            "rawValue": "my-shell-app",
+            "lineNumber": 4,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": true,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          },
+          "definition": {
+            "name": "APP_NAME",
+            "value": "my-app",
+            "rawValue": "my-app",
+            "lineNumber": 2,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 2
+    },
+    {
+      "name": "APP_URL",
+      "finalValue": "http://localhost:3000",
+      "winner": {
+        "name": "APP_URL",
+        "value": "http://localhost:3000",
+        "rawValue": "http://localhost:3000",
+        "lineNumber": 5,
+        "source": "examples/.env",
+        "sourceType": "dotenv",
+        "priority": 10,
+        "basePriority": 10,
+        "effectivePriority": 10001,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "APP_URL",
+          "value": "http://localhost:3000",
+          "rawValue": "http://localhost:3000",
+          "lineNumber": 5,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [],
+      "isOverridden": false,
+      "overrideCount": 0
+    },
+    {
+      "name": "DB_HOST",
+      "finalValue": "db",
+      "winner": {
+        "name": "DB_HOST",
+        "value": "db",
+        "rawValue": "db",
+        "serviceName": "db",
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "DB_HOST",
+          "value": "db",
+          "rawValue": "db",
+          "serviceName": "db",
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        },
+        {
+          "name": "DB_HOST",
+          "value": "shell-db-host",
+          "rawValue": "shell-db-host",
+          "lineNumber": 9,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": false,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        },
+        {
+          "name": "DB_HOST",
+          "value": "localhost",
+          "rawValue": "localhost",
+          "lineNumber": 8,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "DB_HOST",
+            "value": "db",
+            "rawValue": "db",
+            "serviceName": "db",
+            "source": "examples/docker-compose.yml",
+            "sourceType": "compose",
+            "priority": 30,
+            "basePriority": 30,
+            "effectivePriority": 30013
+          },
+          "definition": {
+            "name": "DB_HOST",
+            "value": "shell-db-host",
+            "rawValue": "shell-db-host",
+            "lineNumber": 9,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": false,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          }
+        },
+        {
+          "order": 2,
+          "overriddenBy": {
+            "name": "DB_HOST",
+            "value": "shell-db-host",
+            "rawValue": "shell-db-host",
+            "lineNumber": 9,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": false,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          },
+          "definition": {
+            "name": "DB_HOST",
+            "value": "localhost",
+            "rawValue": "localhost",
+            "lineNumber": 8,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 2
+    },
+    {
+      "name": "DB_NAME",
+      "finalValue": "shell_db",
+      "winner": {
+        "name": "DB_NAME",
+        "value": "shell_db",
+        "rawValue": "shell_db",
+        "lineNumber": 11,
+        "source": "examples/start.sh",
+        "sourceType": "shell",
+        "hasExport": false,
+        "priority": 20,
+        "basePriority": 20,
+        "effectivePriority": 20026,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "DB_NAME",
+          "value": "shell_db",
+          "rawValue": "shell_db",
+          "lineNumber": 11,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": false,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        },
+        {
+          "name": "DB_NAME",
+          "value": "app_db",
+          "rawValue": "app_db",
+          "lineNumber": 10,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "DB_NAME",
+            "value": "shell_db",
+            "rawValue": "shell_db",
+            "lineNumber": 11,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": false,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          },
+          "definition": {
+            "name": "DB_NAME",
+            "value": "app_db",
+            "rawValue": "app_db",
+            "lineNumber": 10,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 1
+    },
+    {
+      "name": "DB_PASS",
+      "finalValue": "password123",
+      "winner": {
+        "name": "DB_PASS",
+        "value": "password123",
+        "rawValue": "password123",
+        "lineNumber": 12,
+        "source": "examples/.env",
+        "sourceType": "dotenv",
+        "priority": 10,
+        "basePriority": 10,
+        "effectivePriority": 10001,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "DB_PASS",
+          "value": "password123",
+          "rawValue": "password123",
+          "lineNumber": 12,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [],
+      "isOverridden": false,
+      "overrideCount": 0
+    },
+    {
+      "name": "DB_PORT",
+      "finalValue": "5432",
+      "winner": {
+        "name": "DB_PORT",
+        "value": "5432",
+        "rawValue": "5432",
+        "serviceName": "db",
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "DB_PORT",
+          "value": "5432",
+          "rawValue": "5432",
+          "serviceName": "db",
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        },
+        {
+          "name": "DB_PORT",
+          "value": "5432",
+          "rawValue": "5432",
+          "lineNumber": 10,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": false,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        },
+        {
+          "name": "DB_PORT",
+          "value": "3306",
+          "rawValue": "3306",
+          "lineNumber": 9,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "DB_PORT",
+            "value": "5432",
+            "rawValue": "5432",
+            "serviceName": "db",
+            "source": "examples/docker-compose.yml",
+            "sourceType": "compose",
+            "priority": 30,
+            "basePriority": 30,
+            "effectivePriority": 30013
+          },
+          "definition": {
+            "name": "DB_PORT",
+            "value": "5432",
+            "rawValue": "5432",
+            "lineNumber": 10,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": false,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          }
+        },
+        {
+          "order": 2,
+          "overriddenBy": {
+            "name": "DB_PORT",
+            "value": "5432",
+            "rawValue": "5432",
+            "lineNumber": 10,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": false,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          },
+          "definition": {
+            "name": "DB_PORT",
+            "value": "3306",
+            "rawValue": "3306",
+            "lineNumber": 9,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 2
+    },
+    {
+      "name": "DB_USER",
+      "finalValue": "root",
+      "winner": {
+        "name": "DB_USER",
+        "value": "root",
+        "rawValue": "root",
+        "lineNumber": 11,
+        "source": "examples/.env",
+        "sourceType": "dotenv",
+        "priority": 10,
+        "basePriority": 10,
+        "effectivePriority": 10001,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "DB_USER",
+          "value": "root",
+          "rawValue": "root",
+          "lineNumber": 11,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [],
+      "isOverridden": false,
+      "overrideCount": 0
+    },
+    {
+      "name": "LOG_LEVEL",
+      "finalValue": "info",
+      "winner": {
+        "name": "LOG_LEVEL",
+        "value": "info",
+        "rawValue": "info",
+        "lineNumber": 19,
+        "source": "examples/start.sh",
+        "sourceType": "shell",
+        "hasExport": false,
+        "priority": 20,
+        "basePriority": 20,
+        "effectivePriority": 20026,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "LOG_LEVEL",
+          "value": "info",
+          "rawValue": "info",
+          "lineNumber": 19,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": false,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        }
+      ],
+      "overrideChain": [],
+      "isOverridden": false,
+      "overrideCount": 0
+    },
+    {
+      "name": "NGINX_HOST",
+      "finalValue": "localhost",
+      "winner": {
+        "name": "NGINX_HOST",
+        "value": "localhost",
+        "rawValue": "localhost",
+        "serviceName": "web",
+        "arrayIndex": 4,
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "NGINX_HOST",
+          "value": "localhost",
+          "rawValue": "localhost",
+          "serviceName": "web",
+          "arrayIndex": 4,
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        }
+      ],
+      "overrideChain": [],
+      "isOverridden": false,
+      "overrideCount": 0
+    },
+    {
+      "name": "POSTGRES_DB",
+      "finalValue": "compose_db",
+      "winner": {
+        "name": "POSTGRES_DB",
+        "value": "compose_db",
+        "rawValue": "compose_db",
+        "serviceName": "db",
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "POSTGRES_DB",
+          "value": "compose_db",
+          "rawValue": "compose_db",
+          "serviceName": "db",
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        }
+      ],
+      "overrideChain": [],
+      "isOverridden": false,
+      "overrideCount": 0
+    },
+    {
+      "name": "POSTGRES_PASSWORD",
+      "finalValue": "compose_pass",
+      "winner": {
+        "name": "POSTGRES_PASSWORD",
+        "value": "compose_pass",
+        "rawValue": "compose_pass",
+        "serviceName": "db",
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "POSTGRES_PASSWORD",
+          "value": "compose_pass",
+          "rawValue": "compose_pass",
+          "serviceName": "db",
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        }
+      ],
+      "overrideChain": [],
+      "isOverridden": false,
+      "overrideCount": 0
+    },
+    {
+      "name": "POSTGRES_USER",
+      "finalValue": "compose_user",
+      "winner": {
+        "name": "POSTGRES_USER",
+        "value": "compose_user",
+        "rawValue": "compose_user",
+        "serviceName": "db",
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "POSTGRES_USER",
+          "value": "compose_user",
+          "rawValue": "compose_user",
+          "serviceName": "db",
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        }
+      ],
+      "overrideChain": [],
+      "isOverridden": false,
+      "overrideCount": 0
+    },
+    {
+      "name": "REDIS_HOST",
+      "finalValue": "redis",
+      "winner": {
+        "name": "REDIS_HOST",
+        "value": "redis",
+        "rawValue": "redis",
+        "serviceName": "redis",
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "REDIS_HOST",
+          "value": "redis",
+          "rawValue": "redis",
+          "serviceName": "redis",
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        },
+        {
+          "name": "REDIS_HOST",
+          "value": "localhost",
+          "rawValue": "localhost",
+          "lineNumber": 15,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "REDIS_HOST",
+            "value": "redis",
+            "rawValue": "redis",
+            "serviceName": "redis",
+            "source": "examples/docker-compose.yml",
+            "sourceType": "compose",
+            "priority": 30,
+            "basePriority": 30,
+            "effectivePriority": 30013
+          },
+          "definition": {
+            "name": "REDIS_HOST",
+            "value": "localhost",
+            "rawValue": "localhost",
+            "lineNumber": 15,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 1
+    },
+    {
+      "name": "REDIS_PASSWORD",
+      "finalValue": "redis_compose_pass",
+      "winner": {
+        "name": "REDIS_PASSWORD",
+        "value": "redis_compose_pass",
+        "rawValue": "redis_compose_pass",
+        "serviceName": "redis",
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "REDIS_PASSWORD",
+          "value": "redis_compose_pass",
+          "rawValue": "redis_compose_pass",
+          "serviceName": "redis",
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        }
+      ],
+      "overrideChain": [],
+      "isOverridden": false,
+      "overrideCount": 0
+    },
+    {
+      "name": "REDIS_PORT",
+      "finalValue": "6379",
+      "winner": {
+        "name": "REDIS_PORT",
+        "value": "6379",
+        "rawValue": "6379",
+        "serviceName": "redis",
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "REDIS_PORT",
+          "value": "6379",
+          "rawValue": "6379",
+          "serviceName": "redis",
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        },
+        {
+          "name": "REDIS_PORT",
+          "value": "6379",
+          "rawValue": "6379",
+          "lineNumber": 16,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "REDIS_PORT",
+            "value": "6379",
+            "rawValue": "6379",
+            "serviceName": "redis",
+            "source": "examples/docker-compose.yml",
+            "sourceType": "compose",
+            "priority": 30,
+            "basePriority": 30,
+            "effectivePriority": 30013
+          },
+          "definition": {
+            "name": "REDIS_PORT",
+            "value": "6379",
+            "rawValue": "6379",
+            "lineNumber": 16,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 1
+    },
+    {
+      "name": "SECRET_KEY",
+      "finalValue": "shell-secret-fghij",
+      "winner": {
+        "name": "SECRET_KEY",
+        "value": "shell-secret-fghij",
+        "rawValue": "shell-secret-fghij",
+        "lineNumber": 15,
+        "source": "examples/start.sh",
+        "sourceType": "shell",
+        "hasExport": true,
+        "priority": 20,
+        "basePriority": 20,
+        "effectivePriority": 20026,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "SECRET_KEY",
+          "value": "shell-secret-fghij",
+          "rawValue": "shell-secret-fghij",
+          "lineNumber": 15,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": true,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        },
+        {
+          "name": "SECRET_KEY",
+          "value": "env-secret-abcde",
+          "rawValue": "env-secret-abcde",
+          "lineNumber": 20,
+          "source": "examples/.env",
+          "sourceType": "dotenv",
+          "priority": 10,
+          "basePriority": 10,
+          "effectivePriority": 10001
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "SECRET_KEY",
+            "value": "shell-secret-fghij",
+            "rawValue": "shell-secret-fghij",
+            "lineNumber": 15,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": true,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          },
+          "definition": {
+            "name": "SECRET_KEY",
+            "value": "env-secret-abcde",
+            "rawValue": "env-secret-abcde",
+            "lineNumber": 20,
+            "source": "examples/.env",
+            "sourceType": "dotenv",
+            "priority": 10,
+            "basePriority": 10,
+            "effectivePriority": 10001
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 1
+    },
+    {
+      "name": "SERVICE_PORT",
+      "finalValue": "80",
+      "winner": {
+        "name": "SERVICE_PORT",
+        "value": "80",
+        "rawValue": "80",
+        "serviceName": "web",
+        "arrayIndex": 3,
+        "source": "examples/docker-compose.yml",
+        "sourceType": "compose",
+        "priority": 30,
+        "basePriority": 30,
+        "effectivePriority": 30013,
+        "isWinner": true
+      },
+      "definitions": [
+        {
+          "name": "SERVICE_PORT",
+          "value": "80",
+          "rawValue": "80",
+          "serviceName": "web",
+          "arrayIndex": 3,
+          "source": "examples/docker-compose.yml",
+          "sourceType": "compose",
+          "priority": 30,
+          "basePriority": 30,
+          "effectivePriority": 30013
+        },
+        {
+          "name": "SERVICE_PORT",
+          "value": "8080",
+          "rawValue": "8080",
+          "lineNumber": 18,
+          "source": "examples/start.sh",
+          "sourceType": "shell",
+          "hasExport": false,
+          "priority": 20,
+          "basePriority": 20,
+          "effectivePriority": 20026
+        }
+      ],
+      "overrideChain": [
+        {
+          "order": 1,
+          "overriddenBy": {
+            "name": "SERVICE_PORT",
+            "value": "80",
+            "rawValue": "80",
+            "serviceName": "web",
+            "arrayIndex": 3,
+            "source": "examples/docker-compose.yml",
+            "sourceType": "compose",
+            "priority": 30,
+            "basePriority": 30,
+            "effectivePriority": 30013
+          },
+          "definition": {
+            "name": "SERVICE_PORT",
+            "value": "8080",
+            "rawValue": "8080",
+            "lineNumber": 18,
+            "source": "examples/start.sh",
+            "sourceType": "shell",
+            "hasExport": false,
+            "priority": 20,
+            "basePriority": 20,
+            "effectivePriority": 20026
+          }
+        }
+      ],
+      "isOverridden": true,
+      "overrideCount": 1
+    }
+  ],
+  "errors": [
+    {
+      "type": "BAD_LINE",
+      "message": "无法解析的变量格式",
+      "line": "INVALID LINE WITHOUT EQUALS",
+      "lineNumber": 23,
+      "source": "examples/.env"
+    },
+    {
+      "type": "BAD_LINE",
+      "message": "无法解析的变量格式",
+      "line": "ANOTHER_BAD_LINE@#$%",
+      "lineNumber": 24,
+      "source": "examples/.env"
+    },
+    {
+      "type": "BAD_LINE",
+      "message": "无法解析的Shell变量格式",
+      "line": "EXPORT WRONG_CASE=test",
+      "lineNumber": 22,
+      "source": "examples/start.sh"
+    }
+  ]
+}

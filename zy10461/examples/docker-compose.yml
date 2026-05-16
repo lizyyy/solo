@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    image: nginx:alpine
+    environment:
+      - APP_NAME=compose-web-app
+      - APP_ENV=staging
+      - API_KEY=compose-api-key-xyz
+      - SERVICE_PORT=80
+      - NGINX_HOST=localhost
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: compose_user
+      POSTGRES_PASSWORD: compose_pass
+      POSTGRES_DB: compose_db
+      DB_HOST: db
+      DB_PORT: 5432
+
+  redis:
+    image: redis:alpine
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis_compose_pass

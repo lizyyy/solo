@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>环境变量影子分析报告</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; text-align: center; }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .card h2 { font-size: 20px; margin-bottom: 20px; color: #1a202c; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+    .stat-item { text-align: center; padding: 20px; background: #f7fafc; border-radius: 8px; }
+    .stat-item .number { font-size: 32px; font-weight: bold; color: #4a5568; }
+    .stat-item .label { font-size: 14px; color: #718096; margin-top: 4px; }
+    .stat-item.warning .number { color: #d69e2e; }
+    .stat-item.danger .number { color: #c53030; }
+    .stat-item.success .number { color: #38a169; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f7fafc; font-weight: 600; color: #4a5568; }
+    tr:hover { background: #f7fafc; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .badge-dotenv { background: #ebf8ff; color: #2b6cb0; }
+    .badge-shell { background: #f0fff4; color: #2f855a; }
+    .badge-compose { background: #faf5ff; color: #6b46c1; }
+    .variable-row { cursor: pointer; }
+    .override-detail { display: none; background: #fff5f5; }
+    .override-detail.show { display: table-row; }
+    .override-item { padding: 12px 24px; border-left: 3px solid #fc8181; margin-bottom: 8px; background: white; border-radius: 0 6px 6px 0; }
+    .winner-badge { background: #c6f6d5; color: #276749; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+    .overridden-badge { background: #fed7d7; color: #c53030; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+    .error-item { background: #fff5f5; border-left: 4px solid #fc8181; padding: 16px; margin-bottom: 12px; border-radius: 0 6px 6px 0; }
+    .error-type { font-weight: 600; color: #c53030; margin-bottom: 8px; }
+    .error-location { color: #718096; font-size: 14px; font-family: monospace; }
+    .error-content { color: #4a5568; font-family: monospace; background: #f7fafc; padding: 8px; border-radius: 4px; margin-top: 8px; }
+    .footer { text-align: center; padding: 24px; color: #718096; font-size: 14px; }
+    .chain-indicator { color: #a0aec0; margin: 0 8px; }
+    .truncated { color: #a0aec0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔍 环境变量影子分析报告</h1>
+      <p>ENV Shadow CLI Analysis Report</p>
+      <p style="margin-top: 12px;">生成时间: 2026-05-16T20:40:33.845Z</p>
+      <p>分析目录: /Users/lzy/pro/solo/workspaces/zy10461/examples</p>
+    </div>
+
+    <div class="card">
+      <h2>📊 统计摘要</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="number">20</div>
+          <div class="label">唯一变量总数</div>
+        </div>
+        <div class="stat-item">
+          <div class="number">36</div>
+          <div class="label">总定义次数</div>
+        </div>
+        <div class="stat-item warning">
+          <div class="number">11</div>
+          <div class="label">被覆盖变量数</div>
+        </div>
+        <div class="stat-item success">
+          <div class="number">9</div>
+          <div class="label">无覆盖变量数</div>
+        </div>
+        <div class="stat-item">
+          <div class="number">3</div>
+          <div class="label">源文件数量</div>
+        </div>
+        
+        <div class="stat-item danger">
+          <div class="number">3</div>
+          <div class="label">错误数量</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📁 源文件列表</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>文件路径</th>
+            <th>类型</th>
+            <th>变量数量</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><code>examples/.env</code></td>
+            <td><span class="badge badge-dotenv">dotenv</span></td>
+            <td>13</td>
+          </tr>
+          
+          <tr>
+            <td><code>examples/docker-compose.yml</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td>13</td>
+          </tr>
+          
+          <tr>
+            <td><code>examples/start.sh</code></td>
+            <td><span class="badge badge-shell">shell</span></td>
+            <td>10</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>🔄 变量覆盖链追踪</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>变量名</th>
+            <th>最终值</th>
+            <th>来源类型</th>
+            <th>状态</th>
+            <th>覆盖次数</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr class="variable-row" onclick="toggleDetail('API_KEY')">
+            <td><strong>API_KEY</strong></td>
+            <td><code>compose-api-key-xyz</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>2</td>
+          </tr>
+          <tr class="override-detail" id="detail-API_KEY">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">API_KEY=compose-api-key-xyz</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>API_KEY=shell-api-key-67890</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:14
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>API_KEY=env-file-key-12345</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:19
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('APP_DEBUG')">
+            <td><strong>APP_DEBUG</strong></td>
+            <td><code>false</code></td>
+            <td><span class="badge badge-shell">shell</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>1</td>
+          </tr>
+          <tr class="override-detail" id="detail-APP_DEBUG">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">APP_DEBUG=false</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:6
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>APP_DEBUG=true</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:4
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('APP_ENV')">
+            <td><strong>APP_ENV</strong></td>
+            <td><code>staging</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>2</td>
+          </tr>
+          <tr class="override-detail" id="detail-APP_ENV">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">APP_ENV=staging</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>APP_ENV=production</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:5
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>APP_ENV=development</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:3
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('APP_NAME')">
+            <td><strong>APP_NAME</strong></td>
+            <td><code>compose-web-app</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>2</td>
+          </tr>
+          <tr class="override-detail" id="detail-APP_NAME">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">APP_NAME=compose-web-app</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>APP_NAME=my-shell-app</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:4
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>APP_NAME=my-app</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:2
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('APP_URL')">
+            <td><strong>APP_URL</strong></td>
+            <td><code>http://localhost:3000</code></td>
+            <td><span class="badge badge-dotenv">dotenv</span></td>
+            <td><span class="winner-badge">唯一值</span></td>
+            <td>0</td>
+          </tr>
+          <tr class="override-detail" id="detail-APP_URL">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">APP_URL=http://localhost:3000</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:5
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('DB_HOST')">
+            <td><strong>DB_HOST</strong></td>
+            <td><code>db</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>2</td>
+          </tr>
+          <tr class="override-detail" id="detail-DB_HOST">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">DB_HOST=db</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>DB_HOST=shell-db-host</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:9
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>DB_HOST=localhost</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:8
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('DB_NAME')">
+            <td><strong>DB_NAME</strong></td>
+            <td><code>shell_db</code></td>
+            <td><span class="badge badge-shell">shell</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>1</td>
+          </tr>
+          <tr class="override-detail" id="detail-DB_NAME">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">DB_NAME=shell_db</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:11
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>DB_NAME=app_db</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:10
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('DB_PASS')">
+            <td><strong>DB_PASS</strong></td>
+            <td><code>password123</code></td>
+            <td><span class="badge badge-dotenv">dotenv</span></td>
+            <td><span class="winner-badge">唯一值</span></td>
+            <td>0</td>
+          </tr>
+          <tr class="override-detail" id="detail-DB_PASS">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">DB_PASS=password123</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:12
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('DB_PORT')">
+            <td><strong>DB_PORT</strong></td>
+            <td><code>5432</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>2</td>
+          </tr>
+          <tr class="override-detail" id="detail-DB_PORT">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">DB_PORT=5432</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>DB_PORT=5432</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:10
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>DB_PORT=3306</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:9
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('DB_USER')">
+            <td><strong>DB_USER</strong></td>
+            <td><code>root</code></td>
+            <td><span class="badge badge-dotenv">dotenv</span></td>
+            <td><span class="winner-badge">唯一值</span></td>
+            <td>0</td>
+          </tr>
+          <tr class="override-detail" id="detail-DB_USER">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">DB_USER=root</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:11
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('LOG_LEVEL')">
+            <td><strong>LOG_LEVEL</strong></td>
+            <td><code>info</code></td>
+            <td><span class="badge badge-shell">shell</span></td>
+            <td><span class="winner-badge">唯一值</span></td>
+            <td>0</td>
+          </tr>
+          <tr class="override-detail" id="detail-LOG_LEVEL">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">LOG_LEVEL=info</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:19
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('NGINX_HOST')">
+            <td><strong>NGINX_HOST</strong></td>
+            <td><code>localhost</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="winner-badge">唯一值</span></td>
+            <td>0</td>
+          </tr>
+          <tr class="override-detail" id="detail-NGINX_HOST">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">NGINX_HOST=localhost</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('POSTGRES_DB')">
+            <td><strong>POSTGRES_DB</strong></td>
+            <td><code>compose_db</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="winner-badge">唯一值</span></td>
+            <td>0</td>
+          </tr>
+          <tr class="override-detail" id="detail-POSTGRES_DB">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">POSTGRES_DB=compose_db</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('POSTGRES_PASSWORD')">
+            <td><strong>POSTGRES_PASSWORD</strong></td>
+            <td><code>compose_pass</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="winner-badge">唯一值</span></td>
+            <td>0</td>
+          </tr>
+          <tr class="override-detail" id="detail-POSTGRES_PASSWORD">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">POSTGRES_PASSWORD=compose_pass</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('POSTGRES_USER')">
+            <td><strong>POSTGRES_USER</strong></td>
+            <td><code>compose_user</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="winner-badge">唯一值</span></td>
+            <td>0</td>
+          </tr>
+          <tr class="override-detail" id="detail-POSTGRES_USER">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">POSTGRES_USER=compose_user</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('REDIS_HOST')">
+            <td><strong>REDIS_HOST</strong></td>
+            <td><code>redis</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>1</td>
+          </tr>
+          <tr class="override-detail" id="detail-REDIS_HOST">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">REDIS_HOST=redis</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>REDIS_HOST=localhost</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:15
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('REDIS_PASSWORD')">
+            <td><strong>REDIS_PASSWORD</strong></td>
+            <td><code>redis_compose_pass</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="winner-badge">唯一值</span></td>
+            <td>0</td>
+          </tr>
+          <tr class="override-detail" id="detail-REDIS_PASSWORD">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">REDIS_PASSWORD=redis_compose_pass</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('REDIS_PORT')">
+            <td><strong>REDIS_PORT</strong></td>
+            <td><code>6379</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>1</td>
+          </tr>
+          <tr class="override-detail" id="detail-REDIS_PORT">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">REDIS_PORT=6379</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>REDIS_PORT=6379</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:16
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('SECRET_KEY')">
+            <td><strong>SECRET_KEY</strong></td>
+            <td><code>shell-secret-fghij</code></td>
+            <td><span class="badge badge-shell">shell</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>1</td>
+          </tr>
+          <tr class="override-detail" id="detail-SECRET_KEY">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">SECRET_KEY=shell-secret-fghij</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:15
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>SECRET_KEY=env-secret-abcde</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/.env:20
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr class="variable-row" onclick="toggleDetail('SERVICE_PORT')">
+            <td><strong>SERVICE_PORT</strong></td>
+            <td><code>80</code></td>
+            <td><span class="badge badge-compose">compose</span></td>
+            <td><span class="overridden-badge">被覆盖</span></td>
+            <td>1</td>
+          </tr>
+          <tr class="override-detail" id="detail-SERVICE_PORT">
+            <td colspan="5">
+              <div style="padding: 16px;">
+                <div style="margin-bottom: 12px;">
+                  <span class="winner-badge">🏆 最终生效</span>
+                  <code style="margin-left: 12px;">SERVICE_PORT=80</code>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/docker-compose.yml
+                  </div>
+                </div>
+                
+                <div class="override-item">
+                  <div>
+                    <span class="chain-indicator">↳</span>
+                    <span style="color: #c53030;">被覆盖</span>:
+                    <code>SERVICE_PORT=8080</code>
+                  </div>
+                  <div style="color: #718096; font-size: 14px; margin-top: 4px;">
+                    📍 examples/start.sh:18
+                  </div>
+                </div>
+                
+              </div>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+      <p style="margin-top: 16px; color: #718096; font-size: 14px;">💡 点击变量行可展开查看完整覆盖链</p>
+    </div>
+
+    
+    <div class="card">
+      <h2>❌ 解析错误</h2>
+      
+      <div class="error-item">
+        <div class="error-type">BAD_LINE</div>
+        <div>无法解析的变量格式</div>
+        <div class="error-location">
+          📍 文件: examples/.env
+           | 行号: 23
+          
+        </div>
+        <div class="error-content">INVALID LINE WITHOUT EQUALS</div>
+      </div>
+      
+      <div class="error-item">
+        <div class="error-type">BAD_LINE</div>
+        <div>无法解析的变量格式</div>
+        <div class="error-location">
+          📍 文件: examples/.env
+           | 行号: 24
+          
+        </div>
+        <div class="error-content">ANOTHER_BAD_LINE@#$%</div>
+      </div>
+      
+      <div class="error-item">
+        <div class="error-type">BAD_LINE</div>
+        <div>无法解析的Shell变量格式</div>
+        <div class="error-location">
+          📍 文件: examples/start.sh
+           | 行号: 22
+          
+        </div>
+        <div class="error-content">EXPORT WRONG_CASE=test</div>
+      </div>
+      
+    </div>
+    
+
+    <div class="footer">
+      <p>由 env-shadow-cli 生成</p>
+    </div>
+  </div>
+
+  <script>
+    function toggleDetail(name) {
+      const detail = document.getElementById('detail-' + name);
+      if (detail) {
+        detail.classList.toggle('show');
+      }
+    }
+  </script>
+</body>
+</html>
