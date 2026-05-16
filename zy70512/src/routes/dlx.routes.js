@@ -21,4 +21,8 @@ router.post('/batches/:id/start', dlxController.startBatch);
 router.get('/batches/:id/report', dlxController.generateReport);
 router.get('/batches/:id/export', dlxController.exportMessages);
 
+router.get('/config', dlxController.getConfig);
+router.post('/config/mock-mode', dlxController.setMockMode);
+router.post('/config/mock-response', dlxController.setMockResponse);
+
 module.exports = router;

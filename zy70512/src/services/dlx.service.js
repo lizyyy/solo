@@ -71,12 +71,20 @@ class DlxService {
     this.db = getDatabase();
     this.pDb = promisifyDb(this.db);
     this.rateLimitStore = new Map();
-    this.mockMode = true;
+    
+    this.mockMode = process.env.DLX_MOCK_MODE === 'true' || 
+                    process.env.NODE_ENV === 'test' ||
+                    false;
+    
     this.mockResponses = new Map();
   }
 
   setMockMode(enabled) {
     this.mockMode = enabled;
+  }
+
+  getMockMode() {
+    return this.mockMode;
   }
 
   setMockResponse(url, response) {
@@ -324,29 +332,36 @@ class DlxService {
       return this.getDlxMessage(messageId);
     }
     
-    const originalRetryCount = message.retryCount;
+    const wasFailed = message.status === PROCESSING_STATUSES.FAILED || 
+                      message.status === PROCESSING_STATUSES.MANUAL_REQUIRED;
+    
     let callbackResult;
     
     try {
       callbackResult = await this._executeCallback(message, strategy);
       
       await this._updateMessageStatus(messageId, PROCESSING_STATUSES.SUCCESS, {
-        retryCount: originalRetryCount + 1,
+        retryCount: message.retryCount + 1,
         lastRetryAt: new Date().toISOString(),
         finalConclusion: `重试成功，HTTP ${callbackResult.statusCode || 200}`,
         processingEvidence: JSON.stringify({
-          attempt: originalRetryCount + 1,
+          attempt: message.retryCount + 1,
           success: true,
           statusCode: callbackResult.statusCode,
           responseData: callbackResult.data,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          wasManualCorrected: !!message.manuallyCorrectedInput
         })
       });
       
       await this._incrementBatchSuccessCount(message.batchId);
       
+      if (wasFailed) {
+        await this._decrementBatchFailCount(message.batchId);
+      }
+      
     } catch (error) {
-      const newRetryCount = originalRetryCount + 1;
+      const newRetryCount = message.retryCount + 1;
       
       const errorType = this._classifyError(error);
       const errorEvidence = {
@@ -370,7 +385,9 @@ class DlxService {
           processingEvidence: JSON.stringify(errorEvidence)
         });
         
-        await this._incrementBatchFailCount(message.batchId);
+        if (!wasFailed) {
+          await this._incrementBatchFailCount(message.batchId);
+        }
       } else {
         await this._updateMessageStatus(messageId, PROCESSING_STATUSES.FAILED, {
           retryCount: newRetryCount,
@@ -379,7 +396,9 @@ class DlxService {
           processingEvidence: JSON.stringify(errorEvidence)
         });
         
-        await this._incrementBatchFailCount(message.batchId);
+        if (!wasFailed) {
+          await this._incrementBatchFailCount(message.batchId);
+        }
       }
     }
     
@@ -439,24 +458,36 @@ class DlxService {
     const message = await this.getDlxMessage(messageId);
     if (!message) throw new Error('消息不存在');
     
+    const wasFailed = message.status === PROCESSING_STATUSES.FAILED || 
+                      message.status === PROCESSING_STATUSES.MANUAL_REQUIRED;
+    
     const currentEvidence = message.processingEvidence || {};
     const correctionEvidence = {
       ...currentEvidence,
       correctedBy: operator,
       correctedAt: new Date().toISOString(),
-      corrections: Object.keys(correctedInput)
+      corrections: Object.keys(correctedInput),
+      previousStatus: message.status,
+      previousRetryCount: message.retryCount
     };
     
     await this.pDb.run(`
       UPDATE dlx_messages 
-      SET manually_corrected_input = ?, status = ?, retry_count = 0, processing_evidence = ?
+      SET manually_corrected_input = ?, status = ?, retry_count = 0, 
+          processing_evidence = ?, final_conclusion = ?, last_error = ?
       WHERE id = ?
     `, [
       JSON.stringify(correctedInput), 
       PROCESSING_STATUSES.PENDING,
       JSON.stringify(correctionEvidence),
+      `已人工修正，等待重试 - 由 ${operator || 'system'} 操作`,
+      null,
       messageId
     ]);
+    
+    if (wasFailed && message.batchId) {
+      await this._decrementBatchFailCount(message.batchId);
+    }
     
     return this.getDlxMessage(messageId);
   }
@@ -522,9 +553,31 @@ class DlxService {
     `, [batchId]);
   }
 
+  async _decrementBatchFailCount(batchId) {
+    await this.pDb.run(`
+      UPDATE dlx_batches SET fail_count = MAX(fail_count - 1, 0) WHERE id = ?
+    `, [batchId]);
+  }
+
+  async _recalculateBatchCounts(batchId) {
+    const messages = await this.pDb.all(`
+      SELECT status FROM dlx_messages WHERE batch_id = ?
+    `, [batchId]);
+    
+    const successCount = messages.filter(m => m.status === PROCESSING_STATUSES.SUCCESS).length;
+    const failCount = messages.filter(m => 
+      m.status === PROCESSING_STATUSES.FAILED || m.status === PROCESSING_STATUSES.MANUAL_REQUIRED
+    ).length;
+    
+    await this.pDb.run(`
+      UPDATE dlx_batches SET success_count = ?, fail_count = ? WHERE id = ?
+    `, [successCount, failCount, batchId]);
+  }
+
   async _checkBatchCompletion(batchId) {
     const batch = await this.getBatch(batchId);
-    if (batch.success_count + batch.fail_count >= batch.total_count && batch.status !== PROCESSING_STATUSES.SUCCESS) {
+    if (batch.success_count + batch.fail_count >= batch.total_count && 
+        batch.status !== PROCESSING_STATUSES.SUCCESS) {
       await this.pDb.run(`
         UPDATE dlx_batches SET status = ?, completed_at = CURRENT_TIMESTAMP WHERE id = ?
       `, [PROCESSING_STATUSES.SUCCESS, batchId]);
@@ -562,21 +615,25 @@ class DlxService {
     
     const errorBreakdown = {};
     formattedMessages.forEach(m => {
-      if (m.lastError) {
-        const errorType = m.processingEvidence?.errorType || 'unknown';
-        errorBreakdown[errorType] = (errorBreakdown[errorType] || 0) + 1;
+      if (m.lastError && m.processingEvidence?.errorType) {
+        const type = m.processingEvidence.errorType;
+        errorBreakdown[type] = (errorBreakdown[type] || 0) + 1;
       }
     });
+    
+    const manualCorrectedCount = formattedMessages.filter(m => m.manuallyCorrectedInput).length;
     
     const reportContent = {
       batch,
       generatedAt: new Date().toISOString(),
+      mockMode: this.mockMode,
       summary: {
         total: batch.total_count,
         success: batch.success_count,
         failed: batch.fail_count,
         successRate,
-        failRate
+        failRate,
+        manualCorrectedCount
       },
       errorBreakdown,
       messages: formattedMessages

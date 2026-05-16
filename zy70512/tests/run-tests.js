@@ -1,7 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+process.env.NODE_ENV = 'test';
+
 const { getDatabase, initDatabase } = require('../config/database');
 const dlxService = require('../src/services/dlx.service');
+
+dlxService.setMockMode(true);
 
 const colors = {
   reset: '\x1b[0m',

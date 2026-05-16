@@ -2,6 +2,8 @@ const Joi = require('joi');
 const dlxService = require('../services/dlx.service');
 const createCsvWriter = require('csv-writer').createObjectCsvStringifier;
 
+const CALLBACK_TIMEOUT = 10000;
+
 const dlxMessageSchema = Joi.object({
   eventId: Joi.string().required(),
   errorTypeId: Joi.number().integer().required(),
@@ -257,6 +259,50 @@ class DlxController {
     try {
       const strategies = await dlxService.listStrategies();
       res.json(strategies);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  async getConfig(req, res) {
+    try {
+      res.json({
+        mockMode: dlxService.getMockMode(),
+        env: process.env.NODE_ENV || 'development',
+        callbackTimeout: CALLBACK_TIMEOUT
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  async setMockMode(req, res) {
+    try {
+      const { enabled } = req.body;
+      if (typeof enabled !== 'boolean') {
+        return res.status(400).json({ error: 'enabled 必须是布尔值' });
+      }
+      dlxService.setMockMode(enabled);
+      res.json({
+        mockMode: dlxService.getMockMode(),
+        message: enabled ? 'Mock 模式已启用' : '真实回调模式已启用'
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  async setMockResponse(req, res) {
+    try {
+      const { url, response } = req.body;
+      if (!url || !response) {
+        return res.status(400).json({ error: 'url 和 response 是必填项' });
+      }
+      dlxService.setMockResponse(url, response);
+      res.json({
+        success: true,
+        message: `已为 ${url} 设置 Mock 响应`
+      });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
