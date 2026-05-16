@@ -1,0 +1,47 @@
+[
+  {
+    "phone": "13800138006",
+    "idCard": "310101199006066789",
+    "userName": "周八",
+    "content": "用户咨询理财产品收益，已提供产品说明",
+    "riskType": "LOW",
+    "riskScore": 12,
+    "riskReason": "常规产品咨询"
+  },
+  {
+    "phone": "13800138007",
+    "idCard": "310101199007077890",
+    "userName": "吴九",
+    "content": "用户反馈账单有误，已核实并调整",
+    "riskType": "LOW",
+    "riskScore": 18,
+    "riskReason": "常规账单处理"
+  },
+  {
+    "phone": "13800138000",
+    "idCard": "310101199008088901",
+    "userName": "郑十",
+    "content": "用户账户解冻申请，已提交风控审核",
+    "riskType": "HIGH",
+    "riskScore": 88,
+    "riskReason": "高风险账户操作，历史异常记录"
+  },
+  {
+    "phone": "13800138008",
+    "idCard": "310101199009099012",
+    "userName": "冯十一",
+    "content": "用户投诉服务态度问题，已道歉并补偿",
+    "riskType": "MEDIUM",
+    "riskScore": 35,
+    "riskReason": "用户投诉处理"
+  },
+  {
+    "phone": "13800138009",
+    "idCard": "31010119910101234",
+    "userName": "陈十二",
+    "content": "用户咨询退款流程，已指导操作",
+    "riskType": "LOW",
+    "riskScore": 8,
+    "riskReason": "常规流程咨询"
+  }
+]
