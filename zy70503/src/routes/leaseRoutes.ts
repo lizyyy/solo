@@ -266,6 +266,25 @@ router.get('/leases/export', validateQuery(exportSchema), async (req: Request, r
       }
       const csvData = csvRecords;
 
+      const csvStringifier = createObjectCsvStringifier({
+        header: [
+          { id: 'leaseId', title: '租约ID' },
+          { id: 'accountName', title: '账号名称' },
+          { id: 'permissionItem', title: '权限项' },
+          { id: 'leaseStartTime', title: '租约开始时间' },
+          { id: 'leaseEndTime', title: '租约结束时间' },
+          { id: 'leaseStatus', title: '租约状态' },
+          { id: 'operationType', title: '操作类型' },
+          { id: 'operator', title: '操作人' },
+          { id: 'processingBasis', title: '处理依据' },
+          { id: 'finalConclusion', title: '最终结论' },
+          { id: 'statusBefore', title: '状态变更前' },
+          { id: 'statusAfter', title: '状态变更后' },
+          { id: 'logCreatedAt', title: '日志创建时间' },
+          { id: 'originalInput', title: '原始输入' }
+        ]
+      });
+
       const csvContent = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(csvData);
       
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');

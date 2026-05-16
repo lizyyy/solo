@@ -214,27 +214,67 @@ router.get('/leases/export', validateQuery(exportSchema), async (req, res) => {
             });
         }
         if (format === 'csv') {
+            const csvRecords = [];
+            for (const item of result.data) {
+                const lease = item.lease;
+                if (item.auditLogs && item.auditLogs.length > 0) {
+                    for (const log of item.auditLogs) {
+                        csvRecords.push({
+                            leaseId: lease.id,
+                            accountName: lease.accountName,
+                            permissionItem: lease.permissionItem,
+                            leaseStartTime: new Date(lease.leaseStartTime).toISOString(),
+                            leaseEndTime: new Date(lease.leaseEndTime).toISOString(),
+                            leaseStatus: lease.status,
+                            operationType: log.operationType,
+                            operator: log.operator,
+                            processingBasis: log.processingBasis,
+                            finalConclusion: log.finalConclusion,
+                            statusBefore: log.statusBefore,
+                            statusAfter: log.statusAfter,
+                            logCreatedAt: new Date(log.createdAt).toISOString(),
+                            originalInput: JSON.stringify(log.originalInput)
+                        });
+                    }
+                }
+                else {
+                    csvRecords.push({
+                        leaseId: lease.id,
+                        accountName: lease.accountName,
+                        permissionItem: lease.permissionItem,
+                        leaseStartTime: new Date(lease.leaseStartTime).toISOString(),
+                        leaseEndTime: new Date(lease.leaseEndTime).toISOString(),
+                        leaseStatus: lease.status,
+                        operationType: '',
+                        operator: '',
+                        processingBasis: '',
+                        finalConclusion: '',
+                        statusBefore: '',
+                        statusAfter: '',
+                        logCreatedAt: '',
+                        originalInput: ''
+                    });
+                }
+            }
+            const csvData = csvRecords;
             const csvStringifier = (0, csv_writer_1.createObjectCsvStringifier)({
                 header: [
-                    { id: 'id', title: 'ID' },
+                    { id: 'leaseId', title: '租约ID' },
                     { id: 'accountName', title: '账号名称' },
                     { id: 'permissionItem', title: '权限项' },
                     { id: 'leaseStartTime', title: '租约开始时间' },
                     { id: 'leaseEndTime', title: '租约结束时间' },
-                    { id: 'applicationReason', title: '申请理由' },
-                    { id: 'applicant', title: '申请人' },
-                    { id: 'status', title: '状态' },
-                    { id: 'createdAt', title: '创建时间' },
-                    { id: 'recyclingConclusion', title: '回收结论' },
-                    { id: 'blockedReason', title: '拦截原因' }
+                    { id: 'leaseStatus', title: '租约状态' },
+                    { id: 'operationType', title: '操作类型' },
+                    { id: 'operator', title: '操作人' },
+                    { id: 'processingBasis', title: '处理依据' },
+                    { id: 'finalConclusion', title: '最终结论' },
+                    { id: 'statusBefore', title: '状态变更前' },
+                    { id: 'statusAfter', title: '状态变更后' },
+                    { id: 'logCreatedAt', title: '日志创建时间' },
+                    { id: 'originalInput', title: '原始输入' }
                 ]
             });
-            const csvData = result.data.map(lease => ({
-                ...lease.lease,
-                leaseStartTime: new Date(lease.lease.leaseStartTime).toISOString(),
-                leaseEndTime: new Date(lease.lease.leaseEndTime).toISOString(),
-                createdAt: new Date(lease.lease.createdAt).toISOString()
-            }));
             const csvContent = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(csvData);
             res.setHeader('Content-Type', 'text/csv; charset=utf-8');
             res.setHeader('Content-Disposition', `attachment; filename="leases-export-${Date.now()}.csv"`);
