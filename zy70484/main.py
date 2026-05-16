@@ -141,20 +141,27 @@ def _generate_complete_markdown_export(
     md_parts.append("```")
     md_parts.append("")
     md_parts.append("## 短信发送明细")
-    md_parts.append("| 序号 | 手机号 | 内容 | 操作人 | 部门 |")
-    md_parts.append("|------|--------|------|--------|------|")
     for idx, r in enumerate(sms_records, 1):
-        content_short = r.content[:30] + "..." if len(r.content) > 30 else r.content
-        md_parts.append(f"| {idx} | {r.phone_number} | {content_short} | {r.operator} | {r.department} |")
-    md_parts.append("")
+        md_parts.append(f"### 记录 #{idx}")
+        md_parts.append(f"- **手机号**: {r.phone_number}")
+        md_parts.append(f"- **操作人**: {r.operator}")
+        md_parts.append(f"- **部门**: {r.department}")
+        md_parts.append("- **短信内容**:")
+        md_parts.append("  ```")
+        md_parts.append(f"  {r.content}")
+        md_parts.append("  ```")
+        md_parts.append("")
     md_parts.append("## 处理日志明细")
-    md_parts.append("| 序号 | 动作 | 状态 | 结论 | 物流截图 |")
-    md_parts.append("|------|------|------|------|----------|")
     for idx, r in enumerate(processing_logs, 1):
-        conclusion_short = r.conclusion[:40] + "..." if len(r.conclusion) > 40 else r.conclusion
-        logistics_ref = r.logistics_screenshot_ref or "无"
-        md_parts.append(f"| {idx} | {r.action} | {r.status} | {conclusion_short} | {logistics_ref} |")
-    md_parts.append("")
+        md_parts.append(f"### 处理日志 #{idx}")
+        md_parts.append(f"- **动作**: {r.action}")
+        md_parts.append(f"- **状态**: {r.status}")
+        md_parts.append(f"- **物流截图**: `{r.logistics_screenshot_ref or '无'}`")
+        md_parts.append("- **处理结论**:")
+        md_parts.append("  ```")
+        md_parts.append(f"  {r.conclusion}")
+        md_parts.append("  ```")
+        md_parts.append("")
     md_parts.append("## 物流拦截复核样例")
     if processing_logs and processing_logs[0].logistics_screenshot_ref:
         md_parts.append(f"- **截图编号**: `{processing_logs[0].logistics_screenshot_ref}`")

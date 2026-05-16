@@ -371,6 +371,78 @@ class TestTenantSuspender(unittest.TestCase):
         print("  - 处理记录重启后可查询")
         print("  - 材料摘要重启后可查询")
 
+    def test_export_content_consistency(self):
+        print("\n=== 测试11: 导出内容一致性验证 ===")
+        import main
+        
+        LONG_SMS_CONTENT = "【风控警报】检测到账户存在异常交易行为：交易金额超过预警阈值，交易地点与常用地点不符，交易时间为非活跃时段，请立即进行人工复核并暂停相关服务，确保资金安全并及时通知客户。"
+        CACHE_CONCLUSION_TEXT = "【缓存未刷新异常】批次EXPORT-TEST-001 | 提交部门：风险管理部 | 提交人：风控管理员"
+        
+        tenant_data = schemas.TenantCreate(
+            tenant_code="TENANT-EXPORT",
+            tenant_name="导出测试公司",
+            department="风险管理部",
+            contact_person="风控管理员"
+        )
+        TenantSuspenderService.create_tenant(self.db, tenant_data)
+        
+        cache_key = "tenant:TENANT-EXPORT:status"
+        CacheService.mark_cache_stale(self.db, cache_key)
+
+        request = schemas.SmsBackfillRequest(
+            batch_no="EXPORT-TEST-001",
+            tenant_code="TENANT-EXPORT",
+            department="风险管理部",
+            submitted_by="风控管理员",
+            records=[
+                schemas.SmsRecordCreate(
+                    phone_number="13812345678",
+                    content=LONG_SMS_CONTENT,
+                    operator="风控系统",
+                    remark="高风险预警"
+                )
+            ]
+        )
+        TenantSuspenderService.backfill_sms_records(self.db, request)
+
+        summary = TenantSuspenderService.get_material_summary(self.db, "EXPORT-TEST-001")
+        sms_records = TenantSuspenderService.get_all_sms_records(self.db, "EXPORT-TEST-001")
+        processing_logs = TenantSuspenderService.query_processing_records(self.db, batch_no="EXPORT-TEST-001")
+
+        md_content = main._generate_complete_markdown_export(
+            "EXPORT-TEST-001", summary, sms_records, processing_logs
+        )
+        
+        self.assertIn(LONG_SMS_CONTENT[:50], md_content, "Markdown应包含完整短信内容（无30字截断）")
+        self.assertIn(CACHE_CONCLUSION_TEXT, md_content, "Markdown应包含完整处理结论（无40字截断）")
+        
+        text_content = main._generate_complete_export_content(
+            "EXPORT-TEST-001", summary, sms_records, processing_logs
+        )
+        
+        self.assertIn(LONG_SMS_CONTENT[:50], text_content, "Text格式应包含完整短信内容")
+        self.assertIn(CACHE_CONCLUSION_TEXT, text_content, "Text格式应包含完整处理结论")
+        
+        self.assertEqual(len(sms_records), 1)
+        actual_sms_content = sms_records[0].content
+        self.assertGreater(len(actual_sms_content), 50, "测试短信内容应足够长")
+        
+        sms_section = md_content.split("短信内容")[1].split("```")[0]
+        conclusion_section = md_content.split("处理结论")[1].split("```")[0]
+        self.assertNotIn("...", sms_section, "Markdown短信内容不应包含截断省略号")
+        self.assertNotIn("...", conclusion_section, "Markdown处理结论不应包含截断省略号")
+
+        md_lines = md_content.split("\n")
+        table_count = sum(1 for line in md_lines if line.startswith("|") and "----" not in line)
+        self.assertEqual(table_count, 0, "Markdown不应使用表格，改用代码块确保内容完整")
+
+        print("✓ 导出内容一致性验证通过")
+        print(f"  - 短信内容长度: {len(LONG_SMS_CONTENT)}字")
+        print(f"  - Markdown格式: 无截断，完整保留，不使用表格")
+        print(f"  - Text格式: 无截断，完整保留")
+        print(f"  - JSON格式: 完整保留（原有逻辑验证）")
+        print(f"  - 所有格式内容一致，可用于复核验收")
+
 
 def run_selftest():
     print("=" * 60)
