@@ -260,10 +260,19 @@ func (s *RollbackService) ObserveMetrics(id string, currentMetrics []model.Metri
 	}
 
 	var currentValue float64
+	found := false
 	for _, m := range currentMetrics {
 		if m.Metric == threshold.MetricName {
 			currentValue = m.Value
+			found = true
 			break
+		}
+	}
+
+	if !found {
+		return nil, &model.APIError{
+			Code:    "MISSING_METRIC",
+			Message: fmt.Sprintf("Target metric '%s' not found in observation data", threshold.MetricName),
 		}
 	}
 
@@ -305,12 +314,12 @@ func (s *RollbackService) triggerRollback(id, reason string, result *model.Obser
 	anomalyData, _ := json.Marshal(result)
 
 	rollback := &model.RollbackAction{
-		ID:           generateID(),
-		ReleaseID:    id,
-		Reason:       reason,
-		AnomalyData:  string(anomalyData),
-		ExecutedAt:   time.Now(),
-		Success:      true,
+		ID:          generateID(),
+		ReleaseID:   id,
+		Reason:      reason,
+		AnomalyData: string(anomalyData),
+		ExecutedAt:  time.Now(),
+		Success:     true,
 	}
 
 	s.store.CreateRollback(rollback)
@@ -362,11 +371,11 @@ func (s *RollbackService) ManualRollback(id, reason string) (*model.RollbackActi
 	}
 
 	rollback := &model.RollbackAction{
-		ID:          generateID(),
-		ReleaseID:   id,
-		Reason:      reason,
-		ExecutedAt:  time.Now(),
-		Success:     true,
+		ID:         generateID(),
+		ReleaseID:  id,
+		Reason:     reason,
+		ExecutedAt: time.Now(),
+		Success:    true,
 	}
 
 	s.store.CreateRollback(rollback)

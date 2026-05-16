@@ -12,6 +12,13 @@ import (
 )
 
 func main() {
+	for _, arg := range os.Args {
+		if arg == "--test" || arg == "-test" {
+			RunSelfTests()
+			return
+		}
+	}
+
 	memStore := store.NewMemoryStore()
 	rollbackService := service.NewRollbackService(memStore)
 	handler := api.NewHandler(rollbackService)
@@ -43,6 +50,8 @@ func main() {
 	fmt.Println("  POST /api/releases/{id}/rollback - 手动回滚")
 	fmt.Println("  GET  /api/releases/{id}/decisions - 获取判定历史")
 	fmt.Println("  GET  /api/decisions        - 获取所有判定记录")
+	fmt.Println("")
+	fmt.Println("运行自测: ./test.sh 或 go run . --test")
 
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }

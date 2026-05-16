@@ -16,7 +16,7 @@ type TestResult struct {
 	Message string
 }
 
-func main() {
+func RunSelfTests() {
 	fmt.Println("=== 异常配置回滚判定 API 自检测试 ===")
 	fmt.Println()
 
@@ -32,8 +32,9 @@ func main() {
 		{"6. 状态不允许跳转测试", testInvalidStateTransition},
 		{"7. 基线和阈值配置测试", testBaselineAndThreshold},
 		{"8. 指标观察和自动回滚测试", testObservationAndRollback},
-		{"9. 手动回滚测试", testManualRollback},
-		{"10. 判定历史审计测试", testDecisionHistory},
+		{"9. 缺失目标指标错误测试", testMissingMetric},
+		{"10. 手动回滚测试", testManualRollback},
+		{"11. 判定历史审计测试", testDecisionHistory},
 	}
 
 	var results []TestResult
@@ -314,6 +315,68 @@ func testObservationAndRollback() TestResult {
 
 	if release["status"] != "ROLLBACK" {
 		return TestResult{Passed: false, Message: fmt.Sprintf("应该自动回滚，状态: %s", release["status"])}
+	}
+
+	return TestResult{Passed: true}
+}
+
+func testMissingMetric() TestResult {
+	idempotentKey := "test-missing-metric-" + time.Now().String()
+	reqBody := map[string]string{
+		"config_name":    "test-config-metric",
+		"version":        "v1.0.0",
+		"content":        "key=value",
+		"idempotent_key": idempotentKey,
+	}
+	jsonData, _ := json.Marshal(reqBody)
+	resp, _ := http.Post(baseURL+"/releases", "application/json", bytes.NewBuffer(jsonData))
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+	releaseID := result["id"].(string)
+	resp.Body.Close()
+
+	http.Post(fmt.Sprintf("%s/releases/%s/start", baseURL, releaseID), "application/json", nil)
+
+	now := time.Now()
+	baselineReq := map[string]interface{}{
+		"metrics": []map[string]interface{}{
+			{"timestamp": now, "value": 100.0, "metric": "error_rate"},
+		},
+		"window_start": now.Add(-10 * time.Minute),
+		"window_end":   now,
+	}
+	baselineData, _ := json.Marshal(baselineReq)
+	http.Post(fmt.Sprintf("%s/releases/%s/baseline", baseURL, releaseID), "application/json", bytes.NewBuffer(baselineData))
+
+	thresholdReq := map[string]interface{}{
+		"metric_name":       "error_rate",
+		"max_deviation":     20.0,
+		"min_threshold":     0.0,
+		"max_threshold":     200.0,
+		"consecutive_count": 3,
+	}
+	thresholdData, _ := json.Marshal(thresholdReq)
+	http.Post(fmt.Sprintf("%s/releases/%s/threshold", baseURL, releaseID), "application/json", bytes.NewBuffer(thresholdData))
+
+	http.Post(fmt.Sprintf("%s/releases/%s/observe/start", baseURL, releaseID), "application/json", nil)
+
+	observeReq := map[string]interface{}{
+		"metrics": []map[string]interface{}{
+			{"timestamp": time.Now(), "value": 150.0, "metric": "wrong_metric_name"},
+		},
+	}
+	observeData, _ := json.Marshal(observeReq)
+	observeResp, _ := http.Post(fmt.Sprintf("%s/releases/%s/observe", baseURL, releaseID), "application/json", bytes.NewBuffer(observeData))
+	defer observeResp.Body.Close()
+
+	if observeResp.StatusCode != http.StatusBadRequest {
+		return TestResult{Passed: false, Message: fmt.Sprintf("缺失目标指标应该返回400错误，实际状态码: %d", observeResp.StatusCode)}
+	}
+
+	var errorResp map[string]interface{}
+	json.NewDecoder(observeResp.Body).Decode(&errorResp)
+	if errorResp["code"] != "MISSING_METRIC" {
+		return TestResult{Passed: false, Message: fmt.Sprintf("应该返回 MISSING_METRIC 错误码")}
 	}
 
 	return TestResult{Passed: true}
