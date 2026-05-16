@@ -28,26 +28,30 @@ class SQLAuditEngine:
             parsed = sqlglot.parse_one(sql_content)
             sql_type = self._get_sql_type(parsed)
             tables = self._extract_tables(parsed)
-            warnings.extend(self._check_syntax_warnings(parsed))
+            warnings.extend(self._check_syntax_warnings(parsed, sql_type))
         except Exception as e:
             errors.append(f"SQL解析失败: {str(e)}")
 
         return sql_type, tables, errors, warnings
 
     def _get_sql_type(self, parsed) -> SQLType:
-        type_map = {
-            sqlglot.exp.Select: SQLType.SELECT,
-            sqlglot.exp.Insert: SQLType.INSERT,
-            sqlglot.exp.Update: SQLType.UPDATE,
-            sqlglot.exp.Delete: SQLType.DELETE,
-            sqlglot.exp.Alter: SQLType.ALTER,
-            sqlglot.exp.Create: SQLType.CREATE,
-            sqlglot.exp.Drop: SQLType.DROP,
-            sqlglot.exp.Truncate: SQLType.TRUNCATE,
+        node_type = type(parsed).__name__.upper()
+        
+        type_mapping = {
+            'SELECT': SQLType.SELECT,
+            'INSERT': SQLType.INSERT,
+            'UPDATE': SQLType.UPDATE,
+            'DELETE': SQLType.DELETE,
+            'ALTER': SQLType.ALTER,
+            'CREATE': SQLType.CREATE,
+            'DROP': SQLType.DROP,
+            'TRUNCATE': SQLType.TRUNCATE,
         }
-        for exp_type, sql_type in type_map.items():
-            if isinstance(parsed, exp_type):
+        
+        for key, sql_type in type_mapping.items():
+            if key in node_type:
                 return sql_type
+        
         return SQLType.UNKNOWN
 
     def _extract_tables(self, parsed) -> List[TargetTable]:
@@ -67,10 +71,10 @@ class SQLAuditEngine:
 
         return tables
 
-    def _check_syntax_warnings(self, parsed) -> List[str]:
+    def _check_syntax_warnings(self, parsed, sql_type: SQLType) -> List[str]:
         warnings = []
 
-        if isinstance(parsed, sqlglot.exp.Update) or isinstance(parsed, sqlglot.exp.Delete):
+        if sql_type in [SQLType.UPDATE, SQLType.DELETE]:
             where_clause = parsed.find(sqlglot.exp.Where)
             if not where_clause:
                 warnings.append("缺少WHERE子句，可能导致全表操作")
@@ -78,21 +82,22 @@ class SQLAuditEngine:
                 if "1=1" in str(where_clause).replace(" ", ""):
                     warnings.append("WHERE子句包含恒真条件(1=1)，存在全表操作风险")
 
-        if isinstance(parsed, sqlglot.exp.Select):
+        if sql_type == SQLType.SELECT:
             limit = parsed.find(sqlglot.exp.Limit)
             if not limit:
                 warnings.append("SELECT语句缺少LIMIT限制")
 
-        if isinstance(parsed, sqlglot.exp.Alter):
+        if sql_type == SQLType.ALTER:
             alter_kind = ""
-            if parsed.find(sqlglot.exp.AddColumn):
-                alter_kind = "添加列"
-            elif parsed.find(sqlglot.exp.DropColumn):
-                alter_kind = "删除列"
-            elif parsed.find(sqlglot.exp.ModifyColumn):
-                alter_kind = "修改列"
-
-            if alter_kind:
+            node_type_str = type(parsed).__name__.upper()
+            if 'ALTER' in node_type_str:
+                alter_kind = "DDL"
+                if hasattr(parsed, 'args'):
+                    for key in parsed.args:
+                        if 'COLUMN' in str(key).upper():
+                            alter_kind = "修改列"
+                            break
+                
                 warnings.append(f"ALTER TABLE操作({alter_kind})可能导致表锁")
 
         return warnings
