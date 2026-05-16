@@ -223,22 +223,6 @@ router.get('/leases/export', validateQuery(exportSchema), async (req: Request, r
     }
 
     if (format === 'csv') {
-      const csvStringifier = createObjectCsvStringifier({
-        header: [
-          { id: 'id', title: 'ID' },
-          { id: 'accountName', title: '账号名称' },
-          { id: 'permissionItem', title: '权限项' },
-          { id: 'leaseStartTime', title: '租约开始时间' },
-          { id: 'leaseEndTime', title: '租约结束时间' },
-          { id: 'applicationReason', title: '申请理由' },
-          { id: 'applicant', title: '申请人' },
-          { id: 'status', title: '状态' },
-          { id: 'createdAt', title: '创建时间' },
-          { id: 'recyclingConclusion', title: '回收结论' },
-          { id: 'blockedReason', title: '拦截原因' }
-        ]
-      });
-
       const csvRecords: any[] = [];
       for (const item of result.data) {
         const lease = item.lease;
@@ -342,52 +326,6 @@ router.post('/leases/renewal/approve', validateRequest(approveRenewalSchema), as
       error: 'INTERNAL_SERVER_ERROR',
       message: error.message
     });
-  }
-});
-
-router.post('/leases/handle-expired', async (req: Request, res: Response) => {
-  try {
-    const result = await leaseService.handleExpiredLeases();
-    const statusCode = result.success ? 200 : 500;
-    res.status(statusCode).json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_SERVER_ERROR',
-      message: error.message
-    });
-  }
-});
-
-router.post('/leases/manual-correction', validateRequest(manualCorrectionSchema), async (req: Request, res: Response) => {
-  try {
-    const result = await leaseService.manualCorrection(req.body);
-    const statusCode = result.success ? 200 : (result.error === 'LEASE_NOT_FOUND' ? 404 : 500);
-    res.status(statusCode).json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_SERVER_ERROR',
-      message: error.message
-    });
-  }
-});
-
-router.get('/leases/:id', async (req: Request, res: Response) => {
-  try {
-    const result = await leaseService.getLeaseDetail(req.params.id);
-    const statusCode = result.success ? 200 : (result.error === 'LEASE_NOT_FOUND' ? 404 : 500);
-    res.status(statusCode).json(result);
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_SERVER_ERROR',
-      message: error.message
-    });
-  }
-});
-
-export default router;
   }
 });
 
