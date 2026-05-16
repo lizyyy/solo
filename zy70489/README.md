@@ -170,6 +170,34 @@ node dist/cli.js summary --id <inquiryId>
 
 ### 7. 统一查询入口
 
+#### ✨ 询价单处理状态概览（统一入口）
+```bash
+# 查看所有询价单的处理状态概览
+node dist/cli.js list-overview
+```
+**功能说明：**
+- 显示所有询价单基本信息
+- 显示处理记录数
+- 标记是否有过人工修正
+- 标记是否已生成摘要
+- 高亮显示并发测试状态的权限票
+
+#### ✨ 查看完整处理历史（成功/异常路径统一展示）
+```bash
+# 查看单个询价单的完整处理链路
+node dist/cli.js query-history --id <inquiryId>
+```
+**功能说明：**
+- 统一展示询价单基本信息
+- 列出所有处理记录（系统处理 + 人工修正）
+- 自动识别并标记路径类型：
+  - ✅ 成功路径 - 正常流程处理
+  - ⚠️ 异常路径 - 并发写入
+  - 🛠️ 人工修正路径 - 审计追踪
+- 展示权限票变更历史
+- 展示完整材料摘要
+- 底部统计系统处理次数和人工修正次数
+
 #### 查询探活结果
 ```bash
 # 查询所有结果
@@ -182,9 +210,37 @@ node dist/cli.js query-probes --status failure
 node dist/cli.js query-probes --status success
 ```
 
+#### 列出所有询价单
+```bash
+node dist/cli.js list-inquiries
+```
+
 #### 列出所有摘要
 ```bash
 node dist/cli.js list-summaries
+```
+
+## 可复跑处理链路
+
+### 幂等初始化
+```bash
+# init-data 命令支持重复执行，不会因为唯一约束报错
+node dist/cli.js init-data
+```
+**实现方式：**
+- 执行前先清除所有旧数据（采购询价单、处理结论、材料摘要）
+- 重新生成5条测试数据
+- 保证每次运行后状态一致，便于重复测试
+
+### 完整复跑链路示例
+```bash
+# 第1次运行 - 初始化
+node dist/cli.js init-data
+# 执行测试...
+
+# 第2次运行 - 重新初始化（不会报错）
+node dist/cli.js init-data
+# 再次执行测试...
 ```
 
 ## 主流程

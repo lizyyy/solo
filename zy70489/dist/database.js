@@ -194,6 +194,17 @@ class Database {
             });
         });
     }
+    async resetAllInquiryData() {
+        return new Promise((resolve, reject) => {
+            this.db.serialize(() => {
+                this.db.run(`DELETE FROM material_summaries`);
+                this.db.run(`DELETE FROM processing_conclusions`);
+                this.db.run(`DELETE FROM purchase_inquiries`, (err) => {
+                    err ? reject(err) : resolve();
+                });
+            });
+        });
+    }
     async queryProbeResults(filter) {
         return new Promise((resolve, reject) => {
             let query = `SELECT * FROM probe_results WHERE 1=1`;

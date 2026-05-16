@@ -19,6 +19,7 @@ class InquiryProcessor {
         return inquiry.permissionTicket || '未知';
     }
     async generateMockData() {
+        const now = Date.now();
         const inquiries = [
             {
                 id: this.generateId(),
@@ -30,8 +31,8 @@ class InquiryProcessor {
                 totalPrice: 625000,
                 status: 'pending',
                 permissionTicket: 'PERM-2024-0515-001',
-                createdAt: Date.now(),
-                updatedAt: Date.now()
+                createdAt: now,
+                updatedAt: now
             },
             {
                 id: this.generateId(),
@@ -43,8 +44,8 @@ class InquiryProcessor {
                 totalPrice: 360000,
                 status: 'approved',
                 permissionTicket: 'PERM-2024-0515-002',
-                createdAt: Date.now() - 3600000,
-                updatedAt: Date.now() - 3600000
+                createdAt: now - 3600000,
+                updatedAt: now - 3600000
             },
             {
                 id: this.generateId(),
@@ -56,8 +57,8 @@ class InquiryProcessor {
                 totalPrice: 320000,
                 status: 'pending',
                 permissionTicket: 'PERM-2024-0515-003',
-                createdAt: Date.now() - 7200000,
-                updatedAt: Date.now() - 7200000
+                createdAt: now - 7200000,
+                updatedAt: now - 7200000
             },
             {
                 id: this.generateId(),
@@ -69,8 +70,8 @@ class InquiryProcessor {
                 totalPrice: 170000,
                 status: 'rejected',
                 permissionTicket: 'PERM-2024-0515-004',
-                createdAt: Date.now() - 10800000,
-                updatedAt: Date.now() - 10800000
+                createdAt: now - 10800000,
+                updatedAt: now - 10800000
             },
             {
                 id: this.generateId(),
@@ -82,10 +83,11 @@ class InquiryProcessor {
                 totalPrice: 250000,
                 status: 'pending',
                 permissionTicket: 'PERM-2024-0515-005',
-                createdAt: Date.now() - 14400000,
-                updatedAt: Date.now() - 14400000
+                createdAt: now - 14400000,
+                updatedAt: now - 14400000
             }
         ];
+        await this.db.resetAllInquiryData();
         for (const inquiry of inquiries) {
             await this.db.insertPurchaseInquiry(inquiry);
         }
@@ -255,6 +257,28 @@ class InquiryProcessor {
     }
     async getAllSummaries() {
         return this.db.getAllMaterialSummaries();
+    }
+    async getInquiryFullHistory(inquiryId) {
+        const inquiry = await this.db.getPurchaseInquiry(inquiryId);
+        const conclusions = await this.db.getProcessingConclusions(inquiryId);
+        const summary = await this.db.getMaterialSummary(inquiryId);
+        return { inquiry, conclusions, summary };
+    }
+    async getAllInquiriesWithStatus() {
+        const inquiries = await this.db.getAllPurchaseInquiries();
+        const results = [];
+        for (const inquiry of inquiries) {
+            const conclusions = await this.db.getProcessingConclusions(inquiry.id);
+            const summary = await this.db.getMaterialSummary(inquiry.id);
+            const hasManualCorrection = conclusions.some(c => c.isManualCorrection);
+            results.push({
+                inquiry,
+                conclusionsCount: conclusions.length,
+                hasManualCorrection,
+                hasSummary: !!summary
+            });
+        }
+        return results;
     }
 }
 exports.InquiryProcessor = InquiryProcessor;

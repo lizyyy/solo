@@ -276,6 +276,106 @@ program
         process.exit(2);
     }
 });
+program
+    .command('list-overview')
+    .description('统一查看所有询价单的处理状态概览')
+    .action(async () => {
+    try {
+        const overview = await processor.getAllInquiriesWithStatus();
+        console.log(chalk_1.default.cyan(`采购询价单处理状态概览 (共${overview.length}条):\n`));
+        overview.forEach((item, index) => {
+            const { inquiry, conclusionsCount, hasManualCorrection, hasSummary } = item;
+            console.log(`${index + 1}. ${chalk_1.default.cyan(inquiry.inquiryNo)} - ${inquiry.supplier}`);
+            console.log(`   ID: ${chalk_1.default.yellow(inquiry.id)}`);
+            console.log(`   状态: ${formatStatus(inquiry.status)}`);
+            console.log(`   处理记录数: ${conclusionsCount}`);
+            console.log(`   人工修正: ${hasManualCorrection ? chalk_1.default.magenta('是') : '否'}`);
+            console.log(`   摘要: ${hasSummary ? chalk_1.default.green('已生成') : '未生成'}`);
+            if (inquiry.permissionTicket) {
+                const isConcurrent = inquiry.permissionTicket.includes('CONCURRENT');
+                console.log(`   权限票: ${isConcurrent ? chalk_1.default.yellow(inquiry.permissionTicket) : inquiry.permissionTicket}`);
+            }
+            console.log();
+        });
+        db.close();
+        process.exit(0);
+    }
+    catch (error) {
+        console.error(chalk_1.default.red(`错误: ${error.message}`));
+        db.close();
+        process.exit(2);
+    }
+});
+program
+    .command('query-history')
+    .description('查看询价单完整处理历史（包含成功/异常路径）')
+    .requiredOption('--id <inquiryId>', '询价单ID')
+    .action(async (options) => {
+    try {
+        const { inquiry, conclusions, summary } = await processor.getInquiryFullHistory(options.id);
+        if (!inquiry) {
+            console.error(chalk_1.default.red(`错误: 询价单 ${options.id} 不存在`));
+            db.close();
+            process.exit(1);
+        }
+        console.log(chalk_1.default.cyan('='.repeat(60)));
+        console.log(chalk_1.default.bold(`询价单完整处理历史 - ${inquiry.inquiryNo}`));
+        console.log(chalk_1.default.cyan('='.repeat(60)));
+        console.log();
+        console.log(chalk_1.default.bold('【基本信息】'));
+        console.log(`供应商: ${inquiry.supplier}`);
+        console.log(`材料: ${inquiry.materialName}`);
+        console.log(`数量: ${inquiry.quantity}, 总价: ¥${inquiry.totalPrice.toFixed(2)}`);
+        console.log(`当前状态: ${formatStatus(inquiry.status)}`);
+        if (inquiry.permissionTicket) {
+            const isConcurrent = inquiry.permissionTicket.includes('CONCURRENT');
+            console.log(`权限票: ${isConcurrent ? chalk_1.default.yellow(inquiry.permissionTicket) : inquiry.permissionTicket}`);
+        }
+        console.log();
+        console.log(chalk_1.default.bold(`【处理记录】 (共${conclusions.length}条)`));
+        conclusions.forEach((conclusion, index) => {
+            const isManual = conclusion.isManualCorrection;
+            const prefix = isManual ? chalk_1.default.magenta('[人工修正]') : '[系统处理]';
+            console.log(`${index + 1}. ${prefix} ${formatConclusion(conclusion.conclusion)}`);
+            console.log(`   原因: ${conclusion.reason}`);
+            console.log(`   时间: ${new Date(conclusion.createdAt).toLocaleString()}`);
+            if (isManual && conclusion.operator) {
+                console.log(`   操作人: ${conclusion.operator}`);
+                console.log(`   备注: ${conclusion.correctionRemark}`);
+            }
+            if (conclusion.previousPermissionTicket !== undefined || conclusion.newPermissionTicket !== undefined) {
+                console.log(`   权限票变更: ${conclusion.previousPermissionTicket || '无'} → ${conclusion.newPermissionTicket || '无'}`);
+            }
+            const manualCount = conclusions.filter(c => c.isManualCorrection).length;
+            const systemCount = conclusions.filter(c => !c.isManualCorrection).length;
+            if (!isManual && systemCount === 1 && manualCount === 0) {
+                console.log(chalk_1.default.green(`   ✅ 成功路径 - 正常流程处理`));
+            }
+            else if (!isManual && systemCount > 1) {
+                console.log(chalk_1.default.yellow(`   ⚠️ 异常路径 - 并发写入`));
+            }
+            else if (isManual) {
+                console.log(chalk_1.default.magenta(`   🛠️ 人工修正路径 - 审计追踪`));
+            }
+            console.log();
+        });
+        if (summary) {
+            console.log(chalk_1.default.bold('【材料摘要】'));
+            console.log(summary.summary);
+            console.log();
+        }
+        console.log(chalk_1.default.cyan('='.repeat(60)));
+        console.log(chalk_1.default.cyan(`路径统计: ${conclusions.filter(c => !c.isManualCorrection).length}次系统处理, ${conclusions.filter(c => c.isManualCorrection).length}次人工修正`));
+        console.log(chalk_1.default.cyan('='.repeat(60)));
+        db.close();
+        process.exit(0);
+    }
+    catch (error) {
+        console.error(chalk_1.default.red(`错误: ${error.message}`));
+        db.close();
+        process.exit(2);
+    }
+});
 function printProbeResult(result, index) {
     const prefix = index ? `${index}. ` : '';
     if (result.status === 'success') {
