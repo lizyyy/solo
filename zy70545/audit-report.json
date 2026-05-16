@@ -1,0 +1,113 @@
+{
+  "batchId": "cd8bf7ef-5f5b-413b-b031-435256c8fa70",
+  "fileName": "users_20240520.csv",
+  "operator": "admin",
+  "status": "COMPLETED",
+  "createdAt": "2026-05-16T05:01:12.264Z",
+  "updatedAt": "2026-05-16T05:01:12.500Z",
+  "summary": {
+    "totalRows": 3,
+    "processed": 3,
+    "success": 3,
+    "failed": 0,
+    "totalConflicts": 1,
+    "pendingConflicts": 0,
+    "totalCorrections": 1
+  },
+  "statusHistory": [
+    {
+      "status": "CREATED",
+      "timestamp": "2026-05-16T05:01:12.264Z",
+      "operator": "admin",
+      "note": "批次创建"
+    },
+    {
+      "status": "PROCESSING",
+      "timestamp": "2026-05-16T05:01:12.362Z",
+      "operator": "system",
+      "note": "开始处理数据"
+    },
+    {
+      "status": "COMPLETED",
+      "timestamp": "2026-05-16T05:01:12.500Z",
+      "operator": "system",
+      "note": "处理完成: 成功3条, 失败0条"
+    }
+  ],
+  "rowDetails": [
+    {
+      "rowNumber": 1,
+      "rowId": "4274479e-5eff-40a6-9ccb-99aa561744f7",
+      "status": "SUCCESS",
+      "originalData": {
+        "name": "张三",
+        "email": "zhang@example.com",
+        "phone": "13800138001"
+      },
+      "finalData": {
+        "name": "张三",
+        "email": "zhang@example.com",
+        "phone": "13800138001"
+      },
+      "success": true,
+      "errors": [],
+      "conflicts": [],
+      "corrections": []
+    },
+    {
+      "rowNumber": 2,
+      "rowId": "f8921a2f-3db5-4237-828c-e33bc43c6edf",
+      "status": "SUCCESS",
+      "originalData": {
+        "name": "李四",
+        "email": "li@example.com",
+        "phone": "13800138002"
+      },
+      "finalData": {
+        "name": "李四",
+        "email": "li@example.com",
+        "phone": "13800138002"
+      },
+      "success": true,
+      "errors": [],
+      "conflicts": [
+        {
+          "type": "DUPLICATE_PHONE",
+          "field": "phone",
+          "message": "手机号与现有用户冲突",
+          "resolution": "USE_NEW",
+          "resolvedBy": "manager"
+        }
+      ],
+      "corrections": []
+    },
+    {
+      "rowNumber": 3,
+      "rowId": "17030bc9-e56f-42fc-b88a-8201714b7d30",
+      "status": "SUCCESS",
+      "originalData": {
+        "name": "王五",
+        "email": "wang@example",
+        "phone": "invalid-phone"
+      },
+      "finalData": {
+        "name": "王五",
+        "email": "wang@example.com",
+        "phone": "invalid-phone"
+      },
+      "success": true,
+      "errors": [],
+      "conflicts": [],
+      "corrections": [
+        {
+          "field": "email",
+          "oldValue": "wang@example",
+          "newValue": "wang@example.com",
+          "operator": "editor",
+          "reason": "邮箱格式错误，修正域名",
+          "timestamp": "2026-05-16T05:01:12.421Z"
+        }
+      ]
+    }
+  ]
+}
