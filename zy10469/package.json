@@ -1,0 +1,27 @@
+{
+  "name": "proto-compat-checker",
+  "version": "1.0.0",
+  "description": "gRPC Proto 文件兼容性检查 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "proto-compat": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/",
+    "lint": "eslint src/",
+    "start": "node src/cli.js"
+  },
+  "keywords": ["grpc", "proto", "compatibility", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

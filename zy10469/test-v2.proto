@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package example.v1;
+
+message User {
+  int64 id = 1;
+  string full_name = 2;
+  string email = 3;
+  string phone = 4;
+  UserStatus status = 5;
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  int32 age = 3;
+}
+
+message CreateUserResponse {
+  User user = 1;
+}
+
+enum UserStatus {
+  UNKNOWN = 0;
+  ACTIVE = 1;
+  INACTIVE = 2;
+  SUSPENDED = 3;
+}
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+}

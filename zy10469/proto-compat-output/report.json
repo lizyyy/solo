@@ -1,0 +1,144 @@
+{
+  "generatedAt": "2026-05-16T20:56:54.064Z",
+  "isCompatible": false,
+  "summary": {
+    "errors": 3,
+    "warnings": 1,
+    "infos": 2,
+    "total": 6
+  },
+  "issues": [
+    {
+      "id": "FIELD_NUMBER_REUSED-1778965014064-0ec0",
+      "type": "error",
+      "code": "FIELD_NUMBER_REUSED",
+      "message": "字段编号 2 被复用: 原字段 \"name\" -> 新字段 \"full_name\"",
+      "details": {
+        "messageName": "example.v1.User",
+        "fieldNumber": 2,
+        "oldFieldName": "name",
+        "newFieldName": "full_name",
+        "oldFileName": "test-v1.proto",
+        "oldLine": 7,
+        "newFileName": "test-v2.proto",
+        "newLine": 7
+      }
+    },
+    {
+      "id": "FIELD_NUMBER_REUSED-1778965014064-duc2",
+      "type": "error",
+      "code": "FIELD_NUMBER_REUSED",
+      "message": "字段编号 4 被复用: 原字段 \"age\" -> 新字段 \"phone\"",
+      "details": {
+        "messageName": "example.v1.User",
+        "fieldNumber": 4,
+        "oldFieldName": "age",
+        "newFieldName": "phone",
+        "oldFileName": "test-v1.proto",
+        "oldLine": 9,
+        "newFileName": "test-v2.proto",
+        "newLine": 9
+      }
+    },
+    {
+      "id": "FIELD_TYPE_CHANGED-1778965014064-9p0w",
+      "type": "error",
+      "code": "FIELD_TYPE_CHANGED",
+      "message": "字段 example.v1.User.age (编号 4) 的类型改变: int32 -> string",
+      "details": {
+        "messageName": "example.v1.User",
+        "fieldName": "age",
+        "fieldNumber": 4,
+        "oldType": "int32",
+        "newType": "string",
+        "fileName": "test-v2.proto",
+        "line": 9
+      }
+    },
+    {
+      "id": "FIELD_ADDED-1778965014064-d688",
+      "type": "info",
+      "code": "FIELD_ADDED",
+      "message": "新增字段 example.v1.User.status (编号 5)",
+      "details": {
+        "messageName": "example.v1.User",
+        "fieldName": "status",
+        "fieldNumber": 5,
+        "fieldType": "UserStatus",
+        "fileName": "test-v2.proto",
+        "line": 10
+      }
+    },
+    {
+      "id": "ENUM_VALUE_ADDED-1778965014064-cu1k",
+      "type": "info",
+      "code": "ENUM_VALUE_ADDED",
+      "message": "新增枚举值 example.v1.User.CreateUserRequest.CreateUserResponse.UserStatus.SUSPENDED (编号 3)",
+      "details": {
+        "enumName": "example.v1.User.CreateUserRequest.CreateUserResponse.UserStatus",
+        "valueName": "SUSPENDED",
+        "valueNumber": 3,
+        "line": 27
+      }
+    },
+    {
+      "id": "METHOD_REMOVED-1778965014064-o7as",
+      "type": "warning",
+      "code": "METHOD_REMOVED",
+      "message": "方法 example.v1.UserService.GetUser 被删除",
+      "details": {
+        "serviceName": "example.v1.UserService",
+        "methodName": "GetUser",
+        "line": 30
+      }
+    }
+  ],
+  "protoData": {
+    "messages": [
+      {
+        "name": "User",
+        "fullName": "example.v1.User",
+        "fileName": "test-v2.proto",
+        "fieldCount": 5
+      },
+      {
+        "name": "CreateUserRequest",
+        "fullName": "example.v1.User.CreateUserRequest",
+        "fileName": "test-v2.proto",
+        "fieldCount": 3
+      },
+      {
+        "name": "CreateUserResponse",
+        "fullName": "example.v1.User.CreateUserRequest.CreateUserResponse",
+        "fileName": "test-v2.proto",
+        "fieldCount": 1
+      },
+      {
+        "name": "GetUserRequest",
+        "fullName": "example.v1.User.CreateUserRequest.CreateUserResponse.GetUserRequest",
+        "fileName": "test-v1.proto",
+        "fieldCount": 1
+      }
+    ],
+    "enums": [
+      {
+        "name": "UserStatus",
+        "fullName": "example.v1.User.CreateUserRequest.CreateUserResponse.UserStatus",
+        "fileName": "test-v2.proto",
+        "valueCount": 4
+      }
+    ],
+    "services": [
+      {
+        "name": "UserService",
+        "fullName": "example.v1.UserService",
+        "fileName": "test-v2.proto",
+        "methodCount": 1
+      }
+    ]
+  },
+  "snapshot": {
+    "version": "v1",
+    "createdAt": "2026-05-16T20:56:54.061Z"
+  }
+}

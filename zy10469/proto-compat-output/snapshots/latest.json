@@ -1,0 +1,229 @@
+{
+  "version": "v1",
+  "createdAt": "2026-05-16T20:56:54.061Z",
+  "checksum": "db74b239b496988bba428f549bd478b340dd57437cbd8710c9d399c7509e02c6",
+  "messages": [
+    {
+      "name": "User",
+      "fullName": "example.v1.User",
+      "package": "example.v1",
+      "fileName": "test-v1.proto",
+      "startLine": 5,
+      "fields": [
+        {
+          "name": "id",
+          "number": 1,
+          "type": "int64",
+          "repeated": false,
+          "line": 6,
+          "fileName": "test-v1.proto"
+        },
+        {
+          "name": "name",
+          "number": 2,
+          "type": "string",
+          "repeated": false,
+          "line": 7,
+          "fileName": "test-v1.proto"
+        },
+        {
+          "name": "email",
+          "number": 3,
+          "type": "string",
+          "repeated": false,
+          "line": 8,
+          "fileName": "test-v1.proto"
+        },
+        {
+          "name": "age",
+          "number": 4,
+          "type": "int32",
+          "repeated": false,
+          "line": 9,
+          "fileName": "test-v1.proto"
+        }
+      ]
+    },
+    {
+      "name": "CreateUserRequest",
+      "fullName": "example.v1.User.CreateUserRequest",
+      "package": "example.v1",
+      "fileName": "test-v1.proto",
+      "startLine": 12,
+      "fields": [
+        {
+          "name": "name",
+          "number": 1,
+          "type": "string",
+          "repeated": false,
+          "line": 13,
+          "fileName": "test-v1.proto"
+        },
+        {
+          "name": "email",
+          "number": 2,
+          "type": "string",
+          "repeated": false,
+          "line": 14,
+          "fileName": "test-v1.proto"
+        },
+        {
+          "name": "age",
+          "number": 3,
+          "type": "int32",
+          "repeated": false,
+          "line": 15,
+          "fileName": "test-v1.proto"
+        }
+      ]
+    },
+    {
+      "name": "CreateUserResponse",
+      "fullName": "example.v1.User.CreateUserRequest.CreateUserResponse",
+      "package": "example.v1",
+      "fileName": "test-v1.proto",
+      "startLine": 18,
+      "fields": [
+        {
+          "name": "user",
+          "number": 1,
+          "type": "User",
+          "repeated": false,
+          "line": 19,
+          "fileName": "test-v1.proto"
+        }
+      ]
+    },
+    {
+      "name": "GetUserRequest",
+      "fullName": "example.v1.User.CreateUserRequest.CreateUserResponse.GetUserRequest",
+      "package": "example.v1",
+      "fileName": "test-v1.proto",
+      "startLine": 33,
+      "fields": [
+        {
+          "name": "id",
+          "number": 1,
+          "type": "int64",
+          "repeated": false,
+          "line": 34,
+          "fileName": "test-v1.proto"
+        }
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "UserStatus",
+      "fullName": "example.v1.User.CreateUserRequest.CreateUserResponse.UserStatus",
+      "fileName": "test-v1.proto",
+      "startLine": 22,
+      "values": [
+        {
+          "name": "UNKNOWN",
+          "number": 0,
+          "line": 23
+        },
+        {
+          "name": "ACTIVE",
+          "number": 1,
+          "line": 24
+        },
+        {
+          "name": "INACTIVE",
+          "number": 2,
+          "line": 25
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "name": "UserService",
+      "fullName": "example.v1.UserService",
+      "fileName": "test-v1.proto",
+      "startLine": 28,
+      "methods": [
+        {
+          "name": "CreateUser",
+          "input": "CreateUserRequest",
+          "output": "CreateUserResponse",
+          "line": 29
+        },
+        {
+          "name": "GetUser",
+          "input": "GetUserRequest",
+          "output": "User",
+          "line": 30
+        }
+      ]
+    }
+  ],
+  "sourceLocations": {
+    "example.v1.User": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 5
+    },
+    "example.v1.User.id": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 6
+    },
+    "example.v1.User.name": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 7
+    },
+    "example.v1.User.email": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 8
+    },
+    "example.v1.User.age": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 9
+    },
+    "example.v1.User.CreateUserRequest": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 12
+    },
+    "example.v1.User.CreateUserRequest.name": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 13
+    },
+    "example.v1.User.CreateUserRequest.email": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 14
+    },
+    "example.v1.User.CreateUserRequest.age": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 15
+    },
+    "example.v1.User.CreateUserRequest.CreateUserResponse": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 18
+    },
+    "example.v1.User.CreateUserRequest.CreateUserResponse.user": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 19
+    },
+    "example.v1.User.CreateUserRequest.CreateUserResponse.GetUserRequest": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 33
+    },
+    "example.v1.User.CreateUserRequest.CreateUserResponse.GetUserRequest.id": {
+      "filePath": "test-v1.proto",
+      "fileName": "test-v1.proto",
+      "line": 34
+    }
+  }
+}
