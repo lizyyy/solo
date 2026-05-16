@@ -157,6 +157,13 @@ class MessageProcessor {
             results
         };
     }
+    getEffectiveStatus(record) {
+        if (record.reviewRecords.length > 0) {
+            const latestReview = record.reviewRecords[record.reviewRecords.length - 1];
+            return latestReview.newConclusion;
+        }
+        return record.status;
+    }
     async reviewMessage(params) {
         const record = await database_1.db.findMessageRecordById(params.messageId);
         if (!record) {
@@ -174,7 +181,6 @@ class MessageProcessor {
         };
         await database_1.db.saveReviewRecord(reviewRecord);
         await database_1.db.updateMessageRecord(params.messageId, {
-            status: params.newConclusion,
             reviewRecords: [...record.reviewRecords, reviewRecord]
         });
         return reviewRecord;
@@ -192,7 +198,7 @@ class MessageProcessor {
                 records = records.filter(r => r.riskType === filters.riskType);
             }
             if (filters.status) {
-                records = records.filter(r => r.status === filters.status);
+                records = records.filter(r => this.getEffectiveStatus(r) === filters.status);
             }
         }
         return records;

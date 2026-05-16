@@ -216,8 +216,8 @@ program
       console.log()
 
       const table = new Table({
-        head: ['用户姓名', '手机号', '风险类型', '风险分', '状态', '操作人'],
-        colWidths: [15, 15, 12, 10, 25, 15]
+        head: ['用户姓名', '手机号', '风险类型', '风险分', '状态', '复核', '操作人'],
+        colWidths: [15, 15, 12, 10, 25, 8, 15]
       })
 
       records.forEach(r => {
@@ -225,24 +225,32 @@ program
         if (r.riskType === RiskType.HIGH) riskColor = chalk.red
         else if (r.riskType === RiskType.MEDIUM) riskColor = chalk.yellow
 
+        const effectiveStatus = processor.getEffectiveStatus(r)
         let statusColor = chalk.green
-        if (r.status === ProcessingStatus.EARLY_TERMINATION_BLOCKED || r.status === ProcessingStatus.BLOCKED) {
+        if (effectiveStatus === ProcessingStatus.EARLY_TERMINATION_BLOCKED || effectiveStatus === ProcessingStatus.BLOCKED) {
           statusColor = chalk.yellow
-        } else if (r.status === ProcessingStatus.FAILED) {
+        } else if (effectiveStatus === ProcessingStatus.FAILED) {
           statusColor = chalk.red
         }
+
+        const hasReview = r.reviewRecords.length > 0
+        const reviewMarker = hasReview ? chalk.magenta('✓') : '-'
+        const statusDisplay = hasReview ? `${effectiveStatus}*` : effectiveStatus
 
         table.push([
           r.userName,
           r.phone,
           riskColor(r.riskType),
           r.riskScore.toString(),
-          statusColor(r.status),
+          statusColor(statusDisplay),
+          reviewMarker,
           r.operator
         ])
       })
 
       console.log(table.toString())
+      console.log()
+      console.log(chalk.gray('* 表示已复核状态，可通过 record:detail 查看完整复核轨迹及关联客服工单'))
     } catch (error: any) {
       console.error(chalk.red('✗ 查询失败:'), error.message)
     }
@@ -262,6 +270,7 @@ program
       }
 
       const { record, reviews } = detail
+      const effectiveStatus = processor.getEffectiveStatus(record)
 
       console.log(chalk.blue('=== 记录详情 ==='))
       console.log(`记录ID: ${record.id}`)
@@ -273,26 +282,32 @@ program
       console.log(`风险类型: ${record.riskType}`)
       console.log(`风险评分: ${record.riskScore}`)
       console.log(`风险原因: ${record.riskReason}`)
-      console.log(`当前状态: ${record.status}`)
+      console.log(chalk.cyan(`原始处理结论: ${record.status}`))
+      if (reviews.length > 0) {
+        console.log(chalk.magenta(`当前有效状态: ${effectiveStatus} (已复核)`))
+      } else {
+        console.log(`当前有效状态: ${effectiveStatus}`)
+      }
       if (record.blockReason) {
-        console.log(chalk.yellow(`拦截原因: ${record.blockReason}`))
+        console.log(chalk.yellow(`原始拦截原因: ${record.blockReason}`))
       }
       console.log(`操作人: ${record.operator}`)
       console.log(`创建时间: ${record.createdAt.toLocaleString()}`)
       console.log()
 
       if (reviews.length > 0) {
-        console.log(chalk.magenta('=== 复核记录 ==='))
+        console.log(chalk.magenta('=== 复核记录 (原始结论永不覆盖) ==='))
         reviews.forEach((review, index) => {
           console.log(chalk.gray(`--- 复核 ${index + 1} ---`))
           console.log(`复核人: ${review.reviewer}`)
           console.log(`复核意见: ${review.reviewOpinion}`)
-          console.log(`客服工单: ${review.serviceTicketNo}`)
-          console.log(`原结论: ${review.originalConclusion}`)
-          console.log(`新结论: ${review.newConclusion}`)
+          console.log(chalk.yellow(`关联客服工单: ${review.serviceTicketNo}`))
+          console.log(chalk.red(`原始处理结论: ${review.originalConclusion}`))
+          console.log(chalk.green(`复核后结论: ${review.newConclusion}`))
           console.log(`复核时间: ${review.reviewedAt.toLocaleString()}`)
           console.log()
         })
+        console.log(chalk.gray('说明: 原始处理结论永久保留，通过复核记录可追溯到客服升级工单的原始记录'))
       }
     } catch (error: any) {
       console.error(chalk.red('✗ 查询失败:'), error.message)

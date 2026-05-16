@@ -208,6 +208,14 @@ export class MessageProcessor {
     }
   }
 
+  getEffectiveStatus(record: MessageRecord): ProcessingStatus {
+    if (record.reviewRecords.length > 0) {
+      const latestReview = record.reviewRecords[record.reviewRecords.length - 1]
+      return latestReview.newConclusion
+    }
+    return record.status
+  }
+
   async reviewMessage(params: {
     messageId: string
     reviewer: string
@@ -233,7 +241,6 @@ export class MessageProcessor {
 
     await db.saveReviewRecord(reviewRecord)
     await db.updateMessageRecord(params.messageId, {
-      status: params.newConclusion,
       reviewRecords: [...record.reviewRecords, reviewRecord]
     })
 
@@ -259,7 +266,7 @@ export class MessageProcessor {
         records = records.filter(r => r.riskType === filters.riskType)
       }
       if (filters.status) {
-        records = records.filter(r => r.status === filters.status)
+        records = records.filter(r => this.getEffectiveStatus(r) === filters.status)
       }
     }
 

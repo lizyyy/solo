@@ -27,6 +27,7 @@ export declare class MessageProcessor {
     }): Promise<BatchInfo>;
     previewBatch(batchId: string): Promise<ProcessResult>;
     processBatch(batchId: string): Promise<ProcessResult>;
+    getEffectiveStatus(record: MessageRecord): ProcessingStatus;
     reviewMessage(params: {
         messageId: string;
         reviewer: string;
