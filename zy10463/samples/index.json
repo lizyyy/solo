@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-05-16T20:41:04.436Z",
+  "schema": "/Users/lzy/pro/solo/workspaces/zy10463/example-schema.json",
+  "options": {
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/example-schema.json",
+    "outputDir": "/Users/lzy/pro/solo/workspaces/zy10463/samples",
+    "sampleTypes": [
+      "valid",
+      "boundary",
+      "invalid"
+    ],
+    "countPerType": 2,
+    "seed": 1778964064403
+  },
+  "total": 6,
+  "samples": [
+    {
+      "id": "MTc3ODk2NDA2",
+      "type": "valid",
+      "file": "valid/valid_MTc3ODk2NDA2.json",
+      "isValid": true,
+      "reason": "正常样本 #1 - 通过Schema验证"
+    },
+    {
+      "id": "MTc3ODk2NDA2",
+      "type": "valid",
+      "file": "valid/valid_MTc3ODk2NDA2.json",
+      "isValid": true,
+      "reason": "正常样本 #2 - 通过Schema验证"
+    },
+    {
+      "id": "MTc3ODk2NDA2",
+      "type": "boundary",
+      "file": "boundary/boundary_MTc3ODk2NDA2.json",
+      "isValid": false,
+      "reason": "空字符串 - 字段: orderId"
+    },
+    {
+      "id": "MTc3ODk2NDA2",
+      "type": "boundary",
+      "file": "boundary/boundary_MTc3ODk2NDA2.json",
+      "isValid": false,
+      "reason": "空字符串 - 字段: userId"
+    },
+    {
+      "id": "MTc3ODk2NDA2",
+      "type": "invalid",
+      "file": "invalid/invalid_MTc3ODk2NDA2.json",
+      "isValid": false,
+      "reason": "类型错误: 用数值代替字符串 - 字段: orderId"
+    },
+    {
+      "id": "MTc3ODk2NDA2",
+      "type": "invalid",
+      "file": "invalid/invalid_MTc3ODk2NDA2.json",
+      "isValid": false,
+      "reason": "类型错误: 用数值代替字符串 - 字段: userId"
+    }
+  ]
+}

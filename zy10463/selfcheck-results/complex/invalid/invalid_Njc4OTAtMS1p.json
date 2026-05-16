@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "id": "Njc4OTAtMS1p",
+    "type": "invalid",
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-complex-schema.json",
+    "fieldPath": "",
+    "reason": "类型错误: 用数值代替字符串 - 字段: items",
+    "index": 1,
+    "seed": 67891
+  },
+  "data": {
+    "id": "71LHF5SB",
+    "items": [
+      {
+        "sku": "sit Excepteur non laborum reprehenderit",
+        "quantity": 37501715,
+        "price": 24580332.64746228
+      },
+      {
+        "sku": "culpa in nisi non",
+        "quantity": 8717422,
+        "price": 1865997.9423868312
+      },
+      {
+        "sku": "in cillum Lorem Excepteur do",
+        "quantity": 96805556,
+        "price": 9604338.134430727
+      },
+      {
+        "sku": "in officia sit",
+        "quantity": 531551,
+        "price": 65079303.84087791
+      },
+      {
+        "sku": "ex dolor enim",
+        "quantity": 26068245,
+        "price": 81871141.97530864
+      },
+      {
+        "sku": "exercitation voluptate Lorem do magna",
+        "quantity": 42551441,
+        "price": 92078617.96982168
+      },
+      {
+        "sku": "nisi",
+        "quantity": 4302127,
+        "price": 35207904.66392318
+      },
+      {
+        "sku": "dolor",
+        "quantity": 39715364,
+        "price": 13728137.860082304
+      },
+      {
+        "sku": "in minim dolor",
+        "quantity": 6815844,
+        "price": 15293638.545953361
+      },
+      {
+        "sku": "sunt",
+        "quantity": 15480110,
+        "price": 1632801.7832647462
+      }
+    ],
+    "status": "pending"
+  },
+  "validation": {
+    "isValid": true,
+    "errors": []
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "id": "MTIzNDUtMS1p",
+    "type": "invalid",
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-basic-schema.json",
+    "fieldPath": "",
+    "reason": "类型错误: 用数值代替字符串 - 字段: age",
+    "index": 1,
+    "seed": 12346
+  },
+  "data": {
+    "name": "qui",
+    "age": 35,
+    "email": "Hk-YToOvP@wKNuORJojIHjPoozG.dbje"
+  },
+  "validation": {
+    "isValid": true,
+    "errors": []
+  }
+}

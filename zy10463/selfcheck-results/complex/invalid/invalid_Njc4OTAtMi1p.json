@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "id": "Njc4OTAtMi1p",
+    "type": "invalid",
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-complex-schema.json",
+    "fieldPath": "",
+    "reason": "类型错误: 用数值代替字符串 - 字段: items[].sku",
+    "index": 2,
+    "seed": 67892
+  },
+  "data": {
+    "id": "CV1S9EQL",
+    "items": [
+      {
+        "sku": "deserunt ipsum ex nisi",
+        "quantity": 43064987,
+        "price": 68569530.17832647
+      },
+      {
+        "sku": "anim veniam laborum magna eu",
+        "quantity": 34651064,
+        "price": 10670010.288065843
+      },
+      {
+        "sku": "in aute tempor reprehenderit incididunt",
+        "quantity": 20887346,
+        "price": 94334276.40603566
+      },
+      {
+        "sku": "proident ad",
+        "quantity": 33872600,
+        "price": 70179612.48285323
+      },
+      {
+        "sku": "deserunt sit nulla dolore ipsum",
+        "quantity": 13112998,
+        "price": 85119598.7654321
+      },
+      {
+        "sku": "reprehenderit aliqua Ut laborum",
+        "quantity": 61077675,
+        "price": 4586334.019204389
+      },
+      {
+        "sku": "reprehenderit proident nulla mollit",
+        "quantity": 65420954,
+        "price": 1419324.417009602
+      },
+      {
+        "sku": "ut et tempor amet culpa",
+        "quantity": 87871228,
+        "price": 11421039.094650205
+      },
+      {
+        "sku": "veniam fugiat eiusmod velit",
+        "quantity": 19786523,
+        "price": 55579132.37311386
+      },
+      {
+        "sku": "pariatur dolor ut velit",
+        "quantity": 4376715,
+        "price": 28955332.64746228
+      }
+    ],
+    "status": "paid"
+  },
+  "validation": {
+    "isValid": true,
+    "errors": []
+  }
+}

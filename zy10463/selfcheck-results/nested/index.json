@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-05-16T20:40:55.888Z",
+  "schema": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-nested-schema.json",
+  "options": {
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-nested-schema.json",
+    "outputDir": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/nested",
+    "sampleTypes": [
+      "valid"
+    ],
+    "countPerType": 1,
+    "seed": 22222
+  },
+  "total": 1,
+  "samples": [
+    {
+      "id": "MjIyMjItMC12",
+      "type": "valid",
+      "file": "valid/valid_MjIyMjItMC12.json",
+      "isValid": true,
+      "reason": "正常样本 #1 - 通过Schema验证"
+    }
+  ]
+}

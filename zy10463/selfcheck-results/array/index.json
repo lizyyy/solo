@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-16T20:40:55.886Z",
+  "schema": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-array-schema.json",
+  "options": {
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-array-schema.json",
+    "outputDir": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/array",
+    "sampleTypes": [
+      "valid"
+    ],
+    "countPerType": 2,
+    "seed": 11111
+  },
+  "total": 2,
+  "samples": [
+    {
+      "id": "MTExMTEtMC12",
+      "type": "valid",
+      "file": "valid/valid_MTExMTEtMC12.json",
+      "isValid": true,
+      "reason": "正常样本 #1 - 通过Schema验证"
+    },
+    {
+      "id": "MTExMTEtMS12",
+      "type": "valid",
+      "file": "valid/valid_MTExMTEtMS12.json",
+      "isValid": true,
+      "reason": "正常样本 #2 - 通过Schema验证"
+    }
+  ]
+}

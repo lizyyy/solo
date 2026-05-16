@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "id": "MTc3ODk2NDA2",
+    "type": "boundary",
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/example-schema.json",
+    "fieldPath": "",
+    "reason": "空字符串 - 字段: userId",
+    "index": 1,
+    "seed": 1778964064404
+  },
+  "data": {
+    "orderId": "ORD-46283751",
+    "userId": "",
+    "items": [
+      {
+        "sku": "proiden",
+        "quantity": 14,
+        "price": 28521.09483076132,
+        "name": "labore"
+      },
+      {
+        "sku": "cupidat",
+        "quantity": 237,
+        "price": 90574.83756404322,
+        "name": "consequat do et"
+      },
+      {
+        "sku": "ut irure quis Exce",
+        "quantity": 235,
+        "price": 10730.460528806585,
+        "name": "ex"
+      },
+      {
+        "sku": "nulla cons",
+        "quantity": 426,
+        "price": 30654.582058384778,
+        "name": "dolore labore sit"
+      },
+      {
+        "sku": "ipsum",
+        "quantity": 226,
+        "price": 92013.88048611111,
+        "name": "fugiat labore amet laboris"
+      },
+      {
+        "sku": "adipisi",
+        "quantity": 51,
+        "price": 36475.054145318936,
+        "name": "in irure esse"
+      },
+      {
+        "sku": "cillum oc",
+        "quantity": 318,
+        "price": 5704.741369341565,
+        "name": "in nulla eu proident cillum"
+      },
+      {
+        "sku": "ipsu",
+        "quantity": 444,
+        "price": 41369.60049151235,
+        "name": "sunt dolor ea ut culpa"
+      },
+      {
+        "sku": "ex ullamco pariatur",
+        "quantity": 845,
+        "price": 85136.30984516462,
+        "name": "consequat eu"
+      },
+      {
+        "sku": "reprehe",
+        "quantity": 938,
+        "price": 78671.54776363168,
+        "name": "eu"
+      },
+      {
+        "sku": "anim fugiat",
+        "quantity": 141,
+        "price": 63641.97258024692,
+        "name": "deserunt"
+      },
+      {
+        "sku": "null",
+        "quantity": 868,
+        "price": 81714.24262834362,
+        "name": "ut aliqua"
+      },
+      {
+        "sku": "sint ut a",
+        "quantity": 539,
+        "price": 74555.03624125515,
+        "name": "nostrud elit adipisicing incididunt"
+      },
+      {
+        "sku": "adipisicing id con",
+        "quantity": 567,
+        "price": 83831.01175231482,
+        "name": "dolor"
+      },
+      {
+        "sku": "non adipisicing",
+        "quantity": 372,
+        "price": 51208.84749485598,
+        "name": "consectetur nulla occaecat"
+      },
+      {
+        "sku": "deserunt nostrud min",
+        "quantity": 368,
+        "price": 18355.201802211934,
+        "name": "nostrud qui nulla"
+      },
+      {
+        "sku": "Ut enim ame",
+        "quantity": 972,
+        "price": 26936.733007716048,
+        "name": "commodo dolore do"
+      },
+      {
+        "sku": "quis cupidatat e",
+        "quantity": 603,
+        "price": 18620.119444701646,
+        "name": "cillum"
+      },
+      {
+        "sku": "laboris ",
+        "quantity": 676,
+        "price": 35072.01944650206,
+        "name": "nostrud laborum adipisicing"
+      },
+      {
+        "sku": "dolor",
+        "quantity": 608,
+        "price": 17959.11134645062,
+        "name": "enim"
+      }
+    ],
+    "status": "shipped",
+    "totalAmount": 77501714.67989042,
+    "createdAt": "1941-08-31T08:57:25.0Z",
+    "shippingAddress": {
+      "country": "minim",
+      "province": "dolor amet eiusmod",
+      "city": "ullamco non",
+      "street": "esse deserunt",
+      "zipCode": "cillum enim ex nisi id"
+    }
+  },
+  "validation": {
+    "isValid": false,
+    "errors": [
+      {
+        "keyword": "minLength",
+        "instancePath": "/userId",
+        "schemaPath": "#/properties/userId/minLength",
+        "message": "must NOT have fewer than 5 characters",
+        "params": {
+          "limit": 5
+        }
+      }
+    ]
+  }
+}

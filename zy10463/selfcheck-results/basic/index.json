@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-05-16T20:40:55.873Z",
+  "schema": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-basic-schema.json",
+  "options": {
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-basic-schema.json",
+    "outputDir": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/basic",
+    "sampleTypes": [
+      "valid",
+      "boundary",
+      "invalid"
+    ],
+    "countPerType": 2,
+    "seed": 12345
+  },
+  "total": 6,
+  "samples": [
+    {
+      "id": "MTIzNDUtMC12",
+      "type": "valid",
+      "file": "valid/valid_MTIzNDUtMC12.json",
+      "isValid": true,
+      "reason": "正常样本 #1 - 通过Schema验证"
+    },
+    {
+      "id": "MTIzNDUtMS12",
+      "type": "valid",
+      "file": "valid/valid_MTIzNDUtMS12.json",
+      "isValid": true,
+      "reason": "正常样本 #2 - 通过Schema验证"
+    },
+    {
+      "id": "MTIzNDUtMC1i",
+      "type": "boundary",
+      "file": "boundary/boundary_MTIzNDUtMC1i.json",
+      "isValid": false,
+      "reason": "空字符串 - 字段: name"
+    },
+    {
+      "id": "MTIzNDUtMS1i",
+      "type": "boundary",
+      "file": "boundary/boundary_MTIzNDUtMS1i.json",
+      "isValid": false,
+      "reason": "空字符串 - 字段: age"
+    },
+    {
+      "id": "MTIzNDUtMC1p",
+      "type": "invalid",
+      "file": "invalid/invalid_MTIzNDUtMC1p.json",
+      "isValid": false,
+      "reason": "类型错误: 用数值代替字符串 - 字段: name"
+    },
+    {
+      "id": "MTIzNDUtMS1p",
+      "type": "invalid",
+      "file": "invalid/invalid_MTIzNDUtMS1p.json",
+      "isValid": true,
+      "reason": "类型错误: 用数值代替字符串 - 字段: age"
+    }
+  ]
+}

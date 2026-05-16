@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "id": "MjIyMjItMC12",
+    "type": "valid",
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-nested-schema.json",
+    "fieldPath": "",
+    "reason": "正常样本 #1 - 通过Schema验证",
+    "index": 0,
+    "seed": 22222
+  },
+  "data": {
+    "level1": {
+      "level2": {
+        "voluptatec8": "ut dolore sed nostrud",
+        "esse_03": 46370027,
+        "level3": "est dolore"
+      }
+    }
+  },
+  "validation": {
+    "isValid": true,
+    "errors": []
+  }
+}

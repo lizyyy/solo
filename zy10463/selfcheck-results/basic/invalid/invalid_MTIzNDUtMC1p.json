@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "id": "MTIzNDUtMC1p",
+    "type": "invalid",
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-basic-schema.json",
+    "fieldPath": "",
+    "reason": "类型错误: 用数值代替字符串 - 字段: name",
+    "index": 0,
+    "seed": 12345
+  },
+  "data": {
+    "name": 12345,
+    "age": 126,
+    "email": "J8RNe5oIOk1v2wx@zkhKlDtRvWzeOEasBFeNnsIw.snf"
+  },
+  "validation": {
+    "isValid": false,
+    "errors": [
+      {
+        "keyword": "type",
+        "instancePath": "/name",
+        "schemaPath": "#/properties/name/type",
+        "message": "must be string",
+        "params": {
+          "type": "string"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-05-16T20:40:55.883Z",
+  "schema": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-complex-schema.json",
+  "options": {
+    "schemaPath": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/test-complex-schema.json",
+    "outputDir": "/Users/lzy/pro/solo/workspaces/zy10463/selfcheck-results/complex",
+    "sampleTypes": [
+      "valid",
+      "invalid"
+    ],
+    "countPerType": 3,
+    "seed": 67890
+  },
+  "total": 6,
+  "samples": [
+    {
+      "id": "Njc4OTAtMC12",
+      "type": "valid",
+      "file": "valid/valid_Njc4OTAtMC12.json",
+      "isValid": true,
+      "reason": "正常样本 #1 - 通过Schema验证"
+    },
+    {
+      "id": "Njc4OTAtMS12",
+      "type": "valid",
+      "file": "valid/valid_Njc4OTAtMS12.json",
+      "isValid": true,
+      "reason": "正常样本 #2 - 通过Schema验证"
+    },
+    {
+      "id": "Njc4OTAtMi12",
+      "type": "valid",
+      "file": "valid/valid_Njc4OTAtMi12.json",
+      "isValid": true,
+      "reason": "正常样本 #3 - 通过Schema验证"
+    },
+    {
+      "id": "Njc4OTAtMC1p",
+      "type": "invalid",
+      "file": "invalid/invalid_Njc4OTAtMC1p.json",
+      "isValid": false,
+      "reason": "类型错误: 用数值代替字符串 - 字段: id"
+    },
+    {
+      "id": "Njc4OTAtMS1p",
+      "type": "invalid",
+      "file": "invalid/invalid_Njc4OTAtMS1p.json",
+      "isValid": true,
+      "reason": "类型错误: 用数值代替字符串 - 字段: items"
+    },
+    {
+      "id": "Njc4OTAtMi1p",
+      "type": "invalid",
+      "file": "invalid/invalid_Njc4OTAtMi1p.json",
+      "isValid": true,
+      "reason": "类型错误: 用数值代替字符串 - 字段: items[].sku"
+    }
+  ]
+}
