@@ -1,0 +1,24 @@
+{
+  "name": "event-sourcing-correction-api",
+  "version": "1.0.0",
+  "description": "Event Sourcing Correction API Service",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node tests/run-tests.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0",
+    "joi": "^17.11.0",
+    "cors": "^2.8.5",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["event-sourcing", "correction", "api"],
+  "author": "",
+  "license": "MIT"
+}
