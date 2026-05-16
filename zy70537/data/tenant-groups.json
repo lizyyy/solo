@@ -1,0 +1,378 @@
+[
+  {
+    "tenantId": "tenant-001",
+    "groupId": "b4814aab-1a70-4e76-89a8-efc9f5e1579c",
+    "requestId": "req-001",
+    "sourceSystems": [
+      {
+        "systemId": "product-a",
+        "systemName": "产品线A",
+        "rules": [
+          {
+            "ruleId": "rule-1",
+            "ruleType": "WHITELIST",
+            "ruleValue": "tenant-001",
+            "description": "白名单"
+          }
+        ]
+      }
+    ],
+    "mergedRules": [
+      {
+        "ruleId": "rule-1",
+        "ruleType": "WHITELIST",
+        "ruleValue": "tenant-001",
+        "description": "白名单"
+      }
+    ],
+    "hitResults": [
+      {
+        "sourceSystemId": "product-a",
+        "hitDetails": [
+          {
+            "ruleId": "rule-1",
+            "hit": true,
+            "explanation": "租户在白名单中: tenant-001"
+          }
+        ],
+        "overallHit": true,
+        "confidence": 1
+      }
+    ],
+    "finalResult": true,
+    "status": "SUCCESS",
+    "adjustmentRecords": [],
+    "rawInput": {
+      "requestId": "req-001",
+      "tenantId": "tenant-001",
+      "sourceSystems": [
+        {
+          "systemId": "product-a",
+          "systemName": "产品线A",
+          "rules": [
+            {
+              "ruleId": "rule-1",
+              "ruleType": "WHITELIST",
+              "ruleValue": "tenant-001",
+              "description": "白名单"
+            }
+          ]
+        }
+      ]
+    },
+    "processingBasis": [
+      "初始创建",
+      "开始规则合并，1个来源系统",
+      "合并来源系统 产品线A 的 1 条规则",
+      "开始命中计算",
+      "来源系统 产品线A: 1/1 条规则命中"
+    ],
+    "createdAt": 1778907080030,
+    "updatedAt": 1778907080033
+  },
+  {
+    "tenantId": "tenant-002",
+    "groupId": "b3ee75ad-83ed-4efd-9a0a-0723ca81824c",
+    "requestId": "req-duplicate",
+    "sourceSystems": [
+      {
+        "systemId": "product-b",
+        "systemName": "产品线B",
+        "rules": [
+          {
+            "ruleId": "rule-2",
+            "ruleType": "PERCENTAGE",
+            "ruleValue": 50,
+            "description": "50%流量"
+          }
+        ]
+      }
+    ],
+    "mergedRules": [],
+    "hitResults": [],
+    "finalResult": null,
+    "status": "PENDING",
+    "adjustmentRecords": [],
+    "rawInput": {
+      "requestId": "req-duplicate",
+      "tenantId": "tenant-002",
+      "sourceSystems": [
+        {
+          "systemId": "product-b",
+          "systemName": "产品线B",
+          "rules": [
+            {
+              "ruleId": "rule-2",
+              "ruleType": "PERCENTAGE",
+              "ruleValue": 50,
+              "description": "50%流量"
+            }
+          ]
+        }
+      ]
+    },
+    "processingBasis": [
+      "初始创建"
+    ],
+    "createdAt": 1778907080036,
+    "updatedAt": 1778907080036
+  },
+  {
+    "tenantId": "tenant-003",
+    "groupId": "b68f55d5-08f2-4f1b-8275-9a0e1aeb2897",
+    "requestId": "req-003",
+    "sourceSystems": [
+      {
+        "systemId": "product-c",
+        "systemName": "产品线C",
+        "rules": [
+          {
+            "ruleId": "rule-3",
+            "ruleType": "BLACKLIST",
+            "ruleValue": "tenant-003",
+            "description": "黑名单"
+          }
+        ]
+      }
+    ],
+    "mergedRules": [],
+    "hitResults": [
+      {
+        "sourceSystemId": "product-c",
+        "hitDetails": [
+          {
+            "ruleId": "rule-3",
+            "hit": true,
+            "explanation": "租户在黑名单中: tenant-003"
+          }
+        ],
+        "overallHit": true,
+        "confidence": 1
+      }
+    ],
+    "finalResult": true,
+    "status": "SUCCESS",
+    "adjustmentRecords": [
+      {
+        "adjustmentId": "c42f5725-08cc-4041-91cc-99468f37b8cc",
+        "operator": "operator-admin",
+        "operationType": "OVERRIDE",
+        "beforeValue": true,
+        "afterValue": false,
+        "reason": "特殊客户豁免",
+        "timestamp": 1778907080037
+      }
+    ],
+    "rawInput": {
+      "requestId": "req-003",
+      "tenantId": "tenant-003",
+      "sourceSystems": [
+        {
+          "systemId": "product-c",
+          "systemName": "产品线C",
+          "rules": [
+            {
+              "ruleId": "rule-3",
+              "ruleType": "BLACKLIST",
+              "ruleValue": "tenant-003",
+              "description": "黑名单"
+            }
+          ]
+        }
+      ]
+    },
+    "processingBasis": [
+      "初始创建",
+      "开始命中计算",
+      "来源系统 产品线C: 1/1 条规则命中",
+      "人工修正: operator-admin 将结果从 true 改为 false，原因: 特殊客户豁免",
+      "人工修正后重新计算",
+      "开始命中计算",
+      "来源系统 产品线C: 1/1 条规则命中"
+    ],
+    "createdAt": 1778907080037,
+    "updatedAt": 1778907080038
+  },
+  {
+    "tenantId": "tenant-004",
+    "groupId": "893f317c-6694-4f53-87f9-28abf83511b8",
+    "requestId": "req-004",
+    "sourceSystems": [
+      {
+        "systemId": "product-d",
+        "systemName": "产品线D",
+        "rules": [
+          {
+            "ruleId": "rule-4",
+            "ruleType": "ATTRIBUTE",
+            "ruleValue": {
+              "key": "region",
+              "value": "cn"
+            },
+            "description": "区域属性"
+          }
+        ]
+      }
+    ],
+    "mergedRules": [],
+    "hitResults": [],
+    "finalResult": null,
+    "status": "PROCESSING",
+    "adjustmentRecords": [],
+    "rawInput": {
+      "requestId": "req-004",
+      "tenantId": "tenant-004",
+      "sourceSystems": [
+        {
+          "systemId": "product-d",
+          "systemName": "产品线D",
+          "rules": [
+            {
+              "ruleId": "rule-4",
+              "ruleType": "ATTRIBUTE",
+              "ruleValue": {
+                "key": "region",
+                "value": "cn"
+              },
+              "description": "区域属性"
+            }
+          ]
+        }
+      ]
+    },
+    "processingBasis": [
+      "初始创建",
+      "异常处理: 规则冲突，无法自动判定，转入人工审核",
+      "状态变更为: PROCESSING"
+    ],
+    "createdAt": 1778907080038,
+    "updatedAt": 1778907080039,
+    "errorMessage": "规则冲突，无法自动判定"
+  },
+  {
+    "tenantId": "tenant-005",
+    "groupId": "e51baa25-abf8-4677-8e25-8571502fa724",
+    "requestId": "req-005",
+    "sourceSystems": [
+      {
+        "systemId": "product-x",
+        "systemName": "产品线X",
+        "rules": [
+          {
+            "ruleId": "rule-x1",
+            "ruleType": "WHITELIST",
+            "ruleValue": "tenant-005",
+            "description": "白名单X"
+          },
+          {
+            "ruleId": "rule-x2",
+            "ruleType": "PERCENTAGE",
+            "ruleValue": 30,
+            "description": "30%流量"
+          }
+        ]
+      },
+      {
+        "systemId": "product-y",
+        "systemName": "产品线Y",
+        "rules": [
+          {
+            "ruleId": "rule-y1",
+            "ruleType": "WHITELIST",
+            "ruleValue": "tenant-005",
+            "description": "白名单Y"
+          },
+          {
+            "ruleId": "rule-y2",
+            "ruleType": "ATTRIBUTE",
+            "ruleValue": {
+              "key": "vip",
+              "value": "true"
+            },
+            "description": "VIP用户"
+          }
+        ]
+      }
+    ],
+    "mergedRules": [
+      {
+        "ruleId": "rule-x1",
+        "ruleType": "WHITELIST",
+        "ruleValue": "tenant-005",
+        "description": "白名单X"
+      },
+      {
+        "ruleId": "rule-x2",
+        "ruleType": "PERCENTAGE",
+        "ruleValue": 30,
+        "description": "30%流量"
+      },
+      {
+        "ruleId": "rule-y2",
+        "ruleType": "ATTRIBUTE",
+        "ruleValue": {
+          "key": "vip",
+          "value": "true"
+        },
+        "description": "VIP用户"
+      }
+    ],
+    "hitResults": [],
+    "finalResult": null,
+    "status": "PENDING",
+    "adjustmentRecords": [],
+    "rawInput": {
+      "requestId": "req-005",
+      "tenantId": "tenant-005",
+      "sourceSystems": [
+        {
+          "systemId": "product-x",
+          "systemName": "产品线X",
+          "rules": [
+            {
+              "ruleId": "rule-x1",
+              "ruleType": "WHITELIST",
+              "ruleValue": "tenant-005",
+              "description": "白名单X"
+            },
+            {
+              "ruleId": "rule-x2",
+              "ruleType": "PERCENTAGE",
+              "ruleValue": 30,
+              "description": "30%流量"
+            }
+          ]
+        },
+        {
+          "systemId": "product-y",
+          "systemName": "产品线Y",
+          "rules": [
+            {
+              "ruleId": "rule-y1",
+              "ruleType": "WHITELIST",
+              "ruleValue": "tenant-005",
+              "description": "白名单Y"
+            },
+            {
+              "ruleId": "rule-y2",
+              "ruleType": "ATTRIBUTE",
+              "ruleValue": {
+                "key": "vip",
+                "value": "true"
+              },
+              "description": "VIP用户"
+            }
+          ]
+        }
+      ]
+    },
+    "processingBasis": [
+      "初始创建",
+      "开始规则合并，2个来源系统",
+      "合并来源系统 产品线X 的 2 条规则",
+      "合并来源系统 产品线Y 的 2 条规则"
+    ],
+    "createdAt": 1778907080039,
+    "updatedAt": 1778907080039
+  }
+]

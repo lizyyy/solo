@@ -1,0 +1,37 @@
+[
+  {
+    "reportId": "fdd3dd72-6711-45f2-b59d-eb03cf4ff6d5",
+    "groupId": "b4814aab-1a70-4e76-89a8-efc9f5e1579c",
+    "tenantId": "tenant-001",
+    "finalResult": true,
+    "status": "SUCCESS",
+    "sourceSummary": [
+      {
+        "systemId": "product-a",
+        "systemName": "产品线A",
+        "hitCount": 1,
+        "totalRules": 1
+      }
+    ],
+    "adjustmentCount": 0,
+    "generatedAt": 1778907080034
+  },
+  {
+    "reportId": "874a774d-c084-46df-8d65-439aebc3f03a",
+    "groupId": "b4814aab-1a70-4e76-89a8-efc9f5e1579c",
+    "tenantId": "tenant-001",
+    "finalResult": true,
+    "status": "SUCCESS",
+    "sourceSummary": [
+      {
+        "systemId": "product-a",
+        "systemName": "产品线A",
+        "hitCount": 1,
+        "totalRules": 1
+      }
+    ],
+    "adjustmentCount": 0,
+    "generatedAt": 1778907080035,
+    "exportContent": "报告ID,分组ID,租户ID,最终结果,状态,调整次数,生成时间,来源系统详情\n874a774d-c084-46df-8d65-439aebc3f03a,b4814aab-1a70-4e76-89a8-efc9f5e1579c,tenant-001,true,SUCCESS,0,2026-05-16T04:51:20.035Z,产品线A(命中1/1)"
+  }
+]
