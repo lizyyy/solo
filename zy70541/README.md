@@ -157,7 +157,7 @@ curl -X POST http://localhost:17735/api/secrets/DB_PASSWORD/replacements \
 #### 审批通过
 
 ```bash
-curl -X PUT http://localhost:17735/api/secrets/replacements/{id}/approve \
+curl -X PUT http://localhost:17735/api/replacements/{id}/approve \
   -H "Content-Type: application/json" \
   -d '{
     "approver": "security-team",

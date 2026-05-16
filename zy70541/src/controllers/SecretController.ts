@@ -136,6 +136,15 @@ export class SecretController {
     }
   }
 
+  async executeReplacement(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await replacementService.executeReplacement(req.params.id);
+      res.json(successResponse(result));
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async createCorrection(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await correctionService.createCorrection(

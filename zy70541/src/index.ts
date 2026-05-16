@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import secretsRoutes from './routes/secrets';
+import replacementsRoutes from './routes/replacements';
 import errorsRoutes from './routes/errors';
 import { errorHandler } from './middleware/errorHandler';
 
@@ -16,6 +17,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/secrets', secretsRoutes);
+app.use('/api/replacements', replacementsRoutes);
 app.use('/api/errors', errorsRoutes);
 
 app.use(errorHandler);
