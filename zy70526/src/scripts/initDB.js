@@ -101,6 +101,24 @@ db.serialize(() => {
     )
   `);
 
+  db.run(`
+    CREATE TABLE IF NOT EXISTS manual_corrections (
+      id TEXT PRIMARY KEY,
+      risk_sample_id TEXT NOT NULL,
+      operator TEXT NOT NULL,
+      correction_reason TEXT NOT NULL,
+      old_risk_level TEXT,
+      new_risk_level TEXT,
+      old_status TEXT,
+      new_status TEXT,
+      old_identified_fields TEXT,
+      new_identified_fields TEXT,
+      remarks TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (risk_sample_id) REFERENCES risk_samples(id)
+    )
+  `);
+
   console.log('数据库表初始化完成');
   db.close();
 });

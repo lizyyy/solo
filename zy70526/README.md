@@ -33,7 +33,7 @@ npm start
 npm run dev
 ```
 
-服务启动后访问：http://localhost:3001
+服务启动后访问：http://localhost:3000
 
 ## 核心功能
 
@@ -60,25 +60,25 @@ npm run dev
 ### 健康检查
 
 ```bash
-curl http://localhost:3001/api/health
+curl http://localhost:3000/api/health
 ```
 
 ### 数据集管理
 
 ```bash
 # 创建数据集
-curl -X POST http://localhost:3001/api/datasets \
+curl -X POST http://localhost:3000/api/datasets \
   -H "Content-Type: application/json" \
   -d '{"name":"测试数据集","description":"测试用途","data_source":"测试系统","record_count":100}'
 
 # 查询所有数据集
-curl http://localhost:3001/api/datasets
+curl http://localhost:3000/api/datasets
 
 # 查询单个数据集
-curl http://localhost:3001/api/datasets/{datasetId}
+curl http://localhost:3000/api/datasets/{datasetId}
 
 # 更新数据集状态
-curl -X PATCH http://localhost:3001/api/datasets/{datasetId}/status \
+curl -X PATCH http://localhost:3000/api/datasets/{datasetId}/status \
   -H "Content-Type: application/json" \
   -d '{"status":"completed"}'
 ```
@@ -87,33 +87,33 @@ curl -X PATCH http://localhost:3001/api/datasets/{datasetId}/status \
 
 ```bash
 # 创建规则
-curl -X POST http://localhost:3001/api/rules \
+curl -X POST http://localhost:3000/api/rules \
   -H "Content-Type: application/json" \
   -d '{"name":"身份证脱敏规则","rule_type":"masking","config":{"pattern":"****"}}'
 
 # 查询所有活跃规则
-curl http://localhost:3001/api/rules
+curl http://localhost:3000/api/rules
 
 # 按名称查询所有版本
-curl http://localhost:3001/api/rules/name/{ruleName}
+curl http://localhost:3000/api/rules/name/{ruleName}
 
 # 停用规则
-curl -X PATCH http://localhost:3001/api/rules/{ruleId}/deactivate
+curl -X PATCH http://localhost:3000/api/rules/{ruleId}/deactivate
 ```
 
 ### 风险样本管理
 
 ```bash
 # 创建风险样本
-curl -X POST http://localhost:3001/api/risk-samples \
+curl -X POST http://localhost:3000/api/risk-samples \
   -H "Content-Type: application/json" \
   -d '{"dataset_id":"{datasetId}","sample_data":"样本数据内容","risk_level":"high","identified_fields":["phone","id_card"],"confidence_score":0.95}'
 
 # 查询风险样本（支持过滤）
-curl "http://localhost:3001/api/risk-samples?dataset_id={datasetId}&risk_level=high&status=pending"
+curl "http://localhost:3000/api/risk-samples?dataset_id={datasetId}&risk_level=high&status=pending"
 
 # 更新样本状态
-curl -X PATCH http://localhost:3001/api/risk-samples/{sampleId}/status \
+curl -X PATCH http://localhost:3000/api/risk-samples/{sampleId}/status \
   -H "Content-Type: application/json" \
   -d '{"status":"approved"}'
 ```
@@ -122,30 +122,30 @@ curl -X PATCH http://localhost:3001/api/risk-samples/{sampleId}/status \
 
 ```bash
 # 创建仲裁意见
-curl -X POST http://localhost:3001/api/arbitration/opinions \
+curl -X POST http://localhost:3000/api/arbitration/opinions \
   -H "Content-Type: application/json" \
   -d '{"risk_sample_id":"{sampleId}","arbitrator":"仲裁员A","decision":"need_reprocess","reason":"存在个人敏感信息","evidence":{"type":"PII"}}'
 
 # 生成仲裁摘要
-curl -X POST http://localhost:3001/api/arbitration/summaries/generate/{datasetId}
+curl -X POST http://localhost:3000/api/arbitration/summaries/generate/{datasetId}
 
 # 查询仲裁摘要
-curl http://localhost:3001/api/arbitration/summaries
+curl http://localhost:3000/api/arbitration/summaries
 ```
 
 ### 重处理任务
 
 ```bash
 # 创建重处理任务
-curl -X POST http://localhost:3001/api/reprocess-tasks \
+curl -X POST http://localhost:3000/api/reprocess-tasks \
   -H "Content-Type: application/json" \
   -d '{"dataset_id":"{datasetId}","priority":"high","original_input":{"records":[]},"processing_basis":{"rule_version":"1.0"}}'
 
 # 查询任务列表
-curl "http://localhost:3001/api/reprocess-tasks?status=pending"
+curl "http://localhost:3000/api/reprocess-tasks?status=pending"
 
 # 更新任务状态（含结论留痕）
-curl -X PATCH http://localhost:3001/api/reprocess-tasks/{taskId}/status \
+curl -X PATCH http://localhost:3000/api/reprocess-tasks/{taskId}/status \
   -H "Content-Type: application/json" \
   -d '{"status":"completed","final_conclusion":{"result":"success","processed_count":100}}'
 ```
@@ -154,16 +154,16 @@ curl -X PATCH http://localhost:3001/api/reprocess-tasks/{taskId}/status \
 
 ```bash
 # 导出仲裁摘要（默认CSV格式）
-curl -O http://localhost:3001/api/export/summary/{summaryId}
+curl -O http://localhost:3000/api/export/summary/{summaryId}
 
 # 导出仲裁摘要（JSON格式）
-curl -O http://localhost:3001/api/export/summary/{summaryId}?format=json
+curl -O http://localhost:3000/api/export/summary/{summaryId}?format=json
 
 # 导出风险样本CSV
-curl -O http://localhost:3001/api/export/risk-samples/{datasetId}
+curl -O http://localhost:3000/api/export/risk-samples/{datasetId}
 
 # 导出重处理任务CSV
-curl -O http://localhost:3001/api/export/reprocess-tasks/{datasetId}
+curl -O http://localhost:3000/api/export/reprocess-tasks/{datasetId}
 ```
 
 ## 被规则拦截的场景示例
@@ -172,12 +172,12 @@ curl -O http://localhost:3001/api/export/reprocess-tasks/{datasetId}
 
 ```bash
 # 第一次创建会成功
-curl -X POST http://localhost:3001/api/reprocess-tasks \
+curl -X POST http://localhost:3000/api/reprocess-tasks \
   -H "Content-Type: application/json" \
   -d '{"dataset_id":"{datasetId}","original_input":{}}'
 
 # 同一数据集重复创建会被拦截（返回409）
-curl -X POST http://localhost:3001/api/reprocess-tasks \
+curl -X POST http://localhost:3000/api/reprocess-tasks \
   -H "Content-Type: application/json" \
   -d '{"dataset_id":"{datasetId}","original_input":{}}'
 ```
@@ -195,7 +195,7 @@ curl -X POST http://localhost:3001/api/reprocess-tasks \
 
 ```bash
 # 使用非法状态值会被拦截
-curl -X PATCH http://localhost:3001/api/risk-samples/{sampleId}/status \
+curl -X PATCH http://localhost:3000/api/risk-samples/{sampleId}/status \
   -H "Content-Type: application/json" \
   -d '{"status":"invalid_status"}'
 ```

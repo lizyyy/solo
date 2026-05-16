@@ -32,6 +32,19 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/name/:name', async (req, res) => {
+  try {
+    const rules = await AnonymizationRule.findByName(req.params.name);
+    res.json({ data: rules });
+  } catch (err) {
+    res.status(500).json({
+      error: '获取规则版本失败',
+      code: 'RULE_VERSION_ERROR',
+      message: err.message
+    });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const rule = await AnonymizationRule.findById(req.params.id);
@@ -46,19 +59,6 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({
       error: '获取规则失败',
       code: 'RULE_GET_ERROR',
-      message: err.message
-    });
-  }
-});
-
-router.get('/name/:name', async (req, res) => {
-  try {
-    const rules = await AnonymizationRule.findByName(req.params.name);
-    res.json({ data: rules });
-  } catch (err) {
-    res.status(500).json({
-      error: '获取规则版本失败',
-      code: 'RULE_VERSION_ERROR',
       message: err.message
     });
   }
