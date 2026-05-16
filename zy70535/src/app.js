@@ -340,6 +340,19 @@ app.post('/api/publish-requests', (req, res) => {
       return res.status(400).json({ error: '只有已完成的解析任务才能申请发布' });
     }
 
+    const failedRows = store.getFailedRowsByTaskId(taskId);
+    const unfixedCount = failedRows.filter(r => !r.isManuallyFixed).length;
+    if (unfixedCount > 0) {
+      return res.status(400).json({ 
+        error: '存在未修复的失败行，无法申请发布',
+        details: {
+          totalFailedRows: task.failedRows,
+          unfixedFailedRows: unfixedCount,
+          message: '请先修复所有失败行后再申请发布'
+        }
+      });
+    }
+
     const publishRequest = new PublishRequest({
       fileId,
       taskId,
@@ -391,6 +404,21 @@ app.post('/api/publish-requests/:id/approve', (req, res) => {
 
     if (publishRequest.status !== APPROVAL_STATUS.PENDING) {
       return res.status(400).json({ error: '该申请已被处理' });
+    }
+
+    const task = store.getTask(publishRequest.taskId);
+    if (task) {
+      const failedRows = store.getFailedRowsByTaskId(task.id);
+      const unfixedCount = failedRows.filter(r => !r.isManuallyFixed).length;
+      if (unfixedCount > 0) {
+        return res.status(400).json({ 
+          error: '审批失败：仍存在未修复的失败行',
+          details: {
+            unfixedFailedRows: unfixedCount,
+            message: '请确认所有失败行已被人工修复后再审批'
+          }
+        });
+      }
     }
 
     publishRequest.approve(reviewedBy || 'anonymous', comment);
