@@ -18,10 +18,11 @@ echo -e "${YELLOW}检查服务是否启动...${NC}"
 if ! curl -s --connect-timeout 2 "$BASE_URL/list" > /dev/null 2>&1; then
     echo -e "${RED}✗ 服务未启动或无法访问${NC}"
     echo ""
-    echo "请先启动服务："
-    echo "  方式一: ./quick-start.sh"
-    echo "  方式二: ./mvnw spring-boot:run"
-    echo "  方式三: java -jar target/api-tag-validation-1.0.0.jar"
+    echo "请先启动服务（按优先级选择）："
+    echo "  📦 方式一: mvn spring-boot:run  (系统 Maven，最可靠)"
+    echo "  🚀 方式二: ./quick-start.sh    (一键启动)"
+    echo "  📥 方式三: ./mvnw spring-boot:run (使用 Maven Wrapper)"
+    echo "  🎯 方式四: java -jar target/api-tag-validation-1.0.0.jar (预编译版本)"
     echo ""
     exit 1
 fi

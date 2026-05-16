@@ -2,9 +2,26 @@
 
 基于 Spring Boot 的 API 可观测性标签校验服务，提供标签白名单管理、样本校验、违规聚合、修复建议等核心功能。
 
-## 🚀 快速开始（推荐：一键启动）
+## 🚀 快速开始（优先级从高到低）
 
-### 方式一：自动启动脚本（最简单）
+---
+
+### ✅ 方式一：使用系统 Maven（最可靠，优先推荐）
+如已安装 Maven，直接使用：
+```bash
+# 编译
+mvn clean package -DskipTests
+
+# 启动
+mvn spring-boot:run
+
+# 新开终端，运行完整测试
+./test_demo.sh
+```
+
+---
+
+### ✅ 方式二：自动启动脚本（推荐）
 ```bash
 # 一键检测环境 + 自动选择最佳方式启动
 ./quick-start.sh
@@ -13,19 +30,23 @@
 ./test_demo.sh
 ```
 
-### 方式二：分步手动启动
+---
+
+### ✅ 方式三：使用 Maven Wrapper
 ```bash
-# 1. 检查环境
+# 检查环境
 ./check-env.sh
 
-# 2. 编译项目
+# 编译项目（首次运行会自动下载 Maven Wrapper）
 ./mvnw clean package -DskipTests
 
-# 3. 启动服务
+# 启动服务
 ./mvnw spring-boot:run
 ```
 
-### 方式三：直接运行预编译版本（如有）
+---
+
+### ✅ 方式四：直接运行预编译版本（如有）
 ```bash
 # 如 target 目录已有 jar 包，可直接运行
 java -jar target/api-tag-validation-1.0.0.jar
