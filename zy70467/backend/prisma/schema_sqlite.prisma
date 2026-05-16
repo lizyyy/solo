@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum BatchStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  PARTIAL_SUCCESS
+  FAILED
+  REVIEWED
+}
+
+enum ItemStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum ErrorSeverity {
+  ERROR
+  WARNING
+  BLOCKER
+}
+
+enum RuleStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum CandidateListType {
+  CLEANUP
+  ROLLBACK
+}
+
+enum CandidateListStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXECUTED
+}
+
+model Batch {
+  id              String          @id @default(cuid())
+  name            String
+  description     String?
+  status          BatchStatus     @default(PENDING)
+  ruleVersionId   String
+  totalCount      Int             @default(0)
+  successCount    Int             @default(0)
+  failedCount     Int             @default(0)
+  partialSuccess  Boolean         @default(false)
+  executionTimeMs Int?
+  createdAt       DateTime        @default(now())
+  executedAt      DateTime?
+  createdBy       String
+  
+  items           BatchItem[]
+  failedItems     FailedItem[]
+  auditLogs       AuditLog[]
+  ruleVersion     RuleVersion     @relation(fields: [ruleVersionId], references: [id])
+  
+  @@index([status])
+  @@index([createdAt])
+}
+
+model BatchItem {
+  id               String            @id @default(cuid())
+  batchId          String
+  originalData     String
+  processedData    String?
+  status           ItemStatus        @default(PENDING)
+  validationErrors String?
+  isFailed         Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  processedAt      DateTime?
+  
+  batch            Batch             @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  failedItem       FailedItem?
+  auditLogs        AuditLog[]
+  
+  @@index([batchId])
+  @@index([status])
+}
+
+model RuleVersion {
+  id          String       @id @default(cuid())
+  name        String
+  description String
+  version     Int
+  logic       String
+  status      RuleStatus   @default(ACTIVE)
+  createdAt   DateTime     @default(now())
+  createdBy   String
+  
+  batches     Batch[]
+  
+  @@index([status])
+  @@index([version])
+}
+
+model FailedItem {
+  id             String       @id @default(cuid())
+  batchId        String
+  batchItemId    String       @unique
+  originalData   String
+  failureReason  String
+  errorDetails   String
+  reviewStatus   ReviewStatus @default(PENDING)
+  reviewComment  String?
+  reviewedBy     String?
+  reviewedAt     DateTime?
+  
+  batch          Batch        @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  batchItem      BatchItem    @relation(fields: [batchItemId], references: [id], onDelete: Cascade)
+  
+  @@index([batchId])
+  @@index([reviewStatus])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  batchId     String?
+  batchItemId String?
+  action      String
+  operator    String
+  beforeData  String?
+  afterData   String?
+  comment     String?
+  createdAt   DateTime @default(now())
+  
+  @@index([batchId])
+  @@index([batchItemId])
+  @@index([createdAt])
+}
+
+model CandidateList {
+  id          String              @id @default(cuid())
+  type        CandidateListType
+  itemIds     String
+  reason      String
+  status      CandidateListStatus @default(PENDING)
+  requestedBy String
+  approvedBy  String?
+  comment     String?
+  createdAt   DateTime            @default(now())
+  approvedAt  DateTime?
+  executedAt  DateTime?
+  
+  @@index([status])
+  @@index([type])
+}

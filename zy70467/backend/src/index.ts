@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -12,6 +15,7 @@ import batchRoutes from './routes/batch.routes';
 import ruleRoutes from './routes/rule.routes';
 import auditRoutes from './routes/audit.routes';
 import securityRoutes from './routes/security.routes';
+import demoRoutes from './routes/demo.routes';
 
 const app = express();
 
@@ -42,9 +46,14 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    mode: process.env.USE_IN_MEMORY === 'true' ? '演示模式（内存存储）' : '完整模式（PostgreSQL）',
+  });
 });
 
+app.use('/api/demo', demoRoutes);
 app.use('/api/batches', batchRoutes);
 app.use('/api/rules', ruleRoutes);
 app.use('/api/audit', auditRoutes);
@@ -53,6 +62,9 @@ app.use('/api/security', securityRoutes);
 app.use(errorHandler);
 
 app.listen(config.port, () => {
-  logger.info(`🚀 服务运行在 http://localhost:${config.port}`);
+  logger.info(`🚀 SLA 日志服务启动成功！`);
+  logger.info(`📍 服务地址: http://localhost:${config.port}`);
   logger.info(`📚 API 文档: http://localhost:${config.port}/api-docs`);
+  logger.info(`💾 运行模式: ${process.env.USE_IN_MEMORY === 'true' ? '演示模式（内存存储）' : '完整模式（PostgreSQL）'}`);
+  logger.info(`🧪 快速体验: POST http://localhost:${config.port}/api/demo/sample-batch 创建示例批次`);
 });

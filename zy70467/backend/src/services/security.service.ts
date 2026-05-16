@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import prisma from '../utils/db';
 import logger from '../utils/logger';
 
@@ -135,8 +136,8 @@ export class SecurityService {
             data: {
               status: 'PENDING',
               isFailed: false,
-              validationErrors: null,
-              processedData: null,
+              validationErrors: Prisma.JsonNull,
+              processedData: Prisma.JsonNull,
               processedAt: null,
             },
           });

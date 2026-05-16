@@ -83,13 +83,40 @@ backend/
 
 ## 快速开始
 
-### 前置要求
+### 🚀 30秒快速体验（无需数据库 - 演示模式）
+
+```bash
+cd backend
+npm install
+npm run dev:demo
+```
+
+服务启动后访问 `http://localhost:3000`，然后：
+
+1. **创建示例批次**（包含 3 条审批数据，其中 2 条审批意见为空将被拦截）
+```bash
+curl -X POST http://localhost:3000/api/demo/sample-batch
+```
+
+2. **获取批次 ID**，然后执行批次处理：
+```bash
+curl -X POST http://localhost:3000/api/demo/batches/{批次ID}/execute
+```
+
+3. **查看处理报告**：
+```bash
+curl http://localhost:3000/api/demo/batches/{批次ID}/report
+```
+
+### 完整模式（需要 PostgreSQL）
+
+#### 前置要求
 
 - Node.js 18+
 - PostgreSQL 14+
 - npm 或 yarn
 
-### 安装步骤
+#### 安装步骤
 
 1. **进入后端目录**
 ```bash
@@ -108,6 +135,7 @@ npm install
 DATABASE_URL="postgresql://username:password@localhost:5432/sla_log_db?schema=public"
 PORT=3000
 NODE_ENV="development"
+USE_IN_MEMORY=false
 ```
 
 4. **初始化数据库**
@@ -134,6 +162,22 @@ npm run dev
 启动服务后访问：`http://localhost:3000/api-docs`
 
 ### 主要 API 端点
+
+#### 🧪 演示模式端点（无需数据库，内存存储）
+
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| POST | `/api/demo/sample-batch` | 一键创建示例批次（包含 3 条测试数据） |
+| POST | `/api/demo/batches` | 创建批次 |
+| GET | `/api/demo/batches` | 获取批次列表 |
+| GET | `/api/demo/batches/:id` | 获取批次详情 |
+| POST | `/api/demo/batches/:id/execute` | 执行批次处理 |
+| GET | `/api/demo/batches/:id/report` | 生成处理报告 |
+| POST | `/api/demo/review` | 提交复核意见 |
+| GET | `/api/demo/rules` | 获取规则列表 |
+| GET | `/api/demo/audit-logs` | 获取审计日志 |
+
+#### 📦 完整模式端点（需要 PostgreSQL）
 
 | 方法 | 路径 | 描述 |
 |------|------|------|
