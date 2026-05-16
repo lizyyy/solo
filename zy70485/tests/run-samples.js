@@ -14,12 +14,23 @@ async function loadJSON(filename) {
   return JSON.parse(content)
 }
 
+async function clearOldData(db) {
+  db.data.reconciliations = []
+  db.data.statusChanges = []
+  db.data.reminders = []
+  db.data.manualNotes = []
+  await db.write()
+}
+
 async function main() {
   console.log('╔══════════════════════════════════════════════════════╗')
   console.log('║      灰度配置对账 - 真实业务样例演示                  ║')
   console.log('╚══════════════════════════════════════════════════════╝\n')
 
-  await initDB()
+  const db = await initDB()
+  console.log('ℹ 清理历史数据...')
+  await clearOldData(db)
+  console.log('✓ 历史数据已清理\n')
 
   printInfo('步骤1: 创建对账任务 - 过期版本冻结通知')
   const sourceData = await loadJSON('sample-source.json')

@@ -1,14 +1,14 @@
 {
   "reconciliations": [
     {
-      "id": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "id": "1df88fb2-0c6a-4037-af39-7151e4e11c71",
       "batchNo": "FREEZE-20240515-001",
       "configType": "版本冻结通知",
       "source": "灰度发布系统",
       "status": "partial_success",
       "items": [
         {
-          "id": "9d30c04b-8930-4a3d-a477-767fe829cb59",
+          "id": "9eb6ccad-f60e-43ba-ab72-029af2bacbfa",
           "itemRef": "V2.4.1-FR-001",
           "department": "风控合规部",
           "owner": "张明",
@@ -24,7 +24,7 @@
             "status": "approved",
             "comments": "风控规则已验证，同意冻结"
           },
-          "receiptTime": "2026-05-15T23:55:11.668Z",
+          "receiptTime": "2024-05-10T09:30:00.000Z",
           "validationResult": {
             "itemRef": "V2.4.1-FR-001",
             "success": true,
@@ -45,10 +45,10 @@
               }
             ]
           },
-          "validatedAt": "2026-05-15T23:55:11.670Z"
+          "validatedAt": "2026-05-16T00:56:20.046Z"
         },
         {
-          "id": "035300e9-1725-4bd7-b741-0a2c60eb7120",
+          "id": "8725c223-178f-4651-b3f3-46b1985dfdfe",
           "itemRef": "V2.4.1-OPS-002",
           "department": "运维保障部",
           "owner": "李强",
@@ -64,7 +64,7 @@
             "status": "approved",
             "comments": "运维窗口已协调，回执晚到一天"
           },
-          "receiptTime": "2026-05-15T23:55:11.668Z",
+          "receiptTime": "2024-05-11T01:15:00.000Z",
           "validationResult": {
             "itemRef": "V2.4.1-OPS-002",
             "success": true,
@@ -85,10 +85,10 @@
               }
             ]
           },
-          "validatedAt": "2026-05-15T23:55:11.670Z"
+          "validatedAt": "2026-05-16T00:56:20.046Z"
         },
         {
-          "id": "d60e4479-e959-41fd-a043-504d8adec41e",
+          "id": "d693d28c-3773-4697-ba9c-607b3e5cf8eb",
           "itemRef": "V2.4.1-PRD-003",
           "department": "产品研发部",
           "owner": "王芳",
@@ -104,7 +104,7 @@
             "status": "approved",
             "comments": "代码评审通过"
           },
-          "receiptTime": "2026-05-15T23:55:11.668Z",
+          "receiptTime": "2024-05-11T03:45:00.000Z",
           "validationResult": {
             "itemRef": "V2.4.1-PRD-003",
             "success": false,
@@ -126,10 +126,10 @@
               }
             ]
           },
-          "validatedAt": "2026-05-15T23:55:11.670Z"
+          "validatedAt": "2026-05-16T00:56:20.046Z"
         },
         {
-          "id": "d7607dde-7bae-49d9-9f43-29de6d4db2e0",
+          "id": "0857d03d-8c6d-47cc-9eda-92178fca04fa",
           "itemRef": "V2.4.1-FIN-004",
           "department": "财务结算部",
           "owner": "赵静",
@@ -141,7 +141,7 @@
           "receiptTime": null
         },
         {
-          "id": "2bb961ca-9d71-40cf-b619-cdb8ebf28983",
+          "id": "14ca9b66-557d-460e-a85f-360a92725b2c",
           "itemRef": "V2.4.1-SEC-005",
           "department": "安全应急部",
           "owner": "陈伟",
@@ -157,7 +157,7 @@
             "status": "approved",
             "comments": "安全扫描已通过，提前完成"
           },
-          "receiptTime": "2026-05-15T23:55:11.668Z",
+          "receiptTime": "2024-05-10T00:30:00.000Z",
           "validationResult": {
             "itemRef": "V2.4.1-SEC-005",
             "success": true,
@@ -178,7 +178,7 @@
               }
             ]
           },
-          "validatedAt": "2026-05-15T23:55:11.670Z"
+          "validatedAt": "2026-05-16T00:56:20.046Z"
         }
       ],
       "summary": {
@@ -187,7 +187,7 @@
         "success": 3,
         "failed": 1,
         "waiting": 0,
-        "overdue": 5
+        "overdue": 3
       },
       "materialSummary": {
         "source": "灰度发布系统",
@@ -203,90 +203,72 @@
         "latestDeadline": "2024-05-12 23:59:59",
         "totalAmount": 600000
       },
-      "createdAt": "2026-05-15T23:55:11.667Z",
-      "updatedAt": "2026-05-15T23:55:11.670Z"
+      "createdAt": "2026-05-16T00:56:20.044Z",
+      "updatedAt": "2026-05-16T00:56:20.046Z"
     }
   ],
   "statusChanges": [
     {
-      "id": "b1a44764-5ce6-43a5-83cc-5de96a249206",
-      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "id": "4d109e67-7f06-4458-842e-c8b9511efd46",
+      "reconId": "1df88fb2-0c6a-4037-af39-7151e4e11c71",
       "fromStatus": null,
       "toStatus": "pending",
       "reason": "系统创建对账任务",
-      "changedAt": "2026-05-15T23:55:11.667Z"
+      "changedAt": "2026-05-16T00:56:20.045Z"
     },
     {
-      "id": "98f89552-e08d-40d9-94ee-9d20ac89ddbe",
-      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "id": "bad9b776-2c53-4c66-b238-810938768699",
+      "reconId": "1df88fb2-0c6a-4037-af39-7151e4e11c71",
       "fromStatus": "pending",
       "toStatus": "receipt_late",
       "reason": "完成匹配，匹配成功4项",
-      "changedAt": "2026-05-15T23:55:11.668Z"
+      "changedAt": "2026-05-16T00:56:20.045Z"
     },
     {
-      "id": "982e9597-d7c8-4887-a6ea-88d5d34d6e22",
-      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
+      "id": "61756c31-bd78-4dd9-9e94-75da710f627d",
+      "reconId": "1df88fb2-0c6a-4037-af39-7151e4e11c71",
       "fromStatus": "receipt_late",
       "toStatus": "partial_success",
       "reason": "完成校验，成功3项，失败1项",
-      "changedAt": "2026-05-15T23:55:11.670Z"
+      "changedAt": "2026-05-16T00:56:20.046Z"
     }
   ],
   "reminders": [
     {
-      "id": "bad2ab8a-2199-47fb-a4b0-a1153a471035",
-      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
-      "itemId": "9d30c04b-8930-4a3d-a477-767fe829cb59",
+      "id": "8e4afd05-9f58-46a0-827f-8cc4ad84effa",
+      "reconId": "1df88fb2-0c6a-4037-af39-7151e4e11c71",
+      "itemId": "8725c223-178f-4651-b3f3-46b1985dfdfe",
       "type": "回执晚到",
-      "content": "项目V2.4.1-FR-001回执时间晚于截止时间2024-05-10 18:00:00",
+      "content": "项目V2.4.1-OPS-002回执时间(2024-05-11T01:15:00.000Z)晚于截止时间2024-05-10 18:00:00",
       "isResolved": false,
-      "createdAt": "2026-05-15T23:55:11.668Z"
+      "createdAt": "2026-05-16T00:56:20.045Z"
     },
     {
-      "id": "305cd065-95ae-4dce-80e4-bc2cfc1f4798",
-      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
-      "itemId": "035300e9-1725-4bd7-b741-0a2c60eb7120",
-      "type": "回执晚到",
-      "content": "项目V2.4.1-OPS-002回执时间晚于截止时间2024-05-10 18:00:00",
-      "isResolved": false,
-      "createdAt": "2026-05-15T23:55:11.668Z"
-    },
-    {
-      "id": "da1822a9-ac38-429a-af79-bfa6b20fa8b4",
-      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
-      "itemId": "d60e4479-e959-41fd-a043-504d8adec41e",
-      "type": "回执晚到",
-      "content": "项目V2.4.1-PRD-003回执时间晚于截止时间2024-05-11 12:00:00",
-      "isResolved": false,
-      "createdAt": "2026-05-15T23:55:11.668Z"
-    },
-    {
-      "id": "19d7a05c-e991-47d8-be52-a91cba110c17",
-      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
-      "itemId": "d7607dde-7bae-49d9-9f43-29de6d4db2e0",
+      "id": "bb9283fe-74d2-48d2-8aae-1054c52fcc1e",
+      "reconId": "1df88fb2-0c6a-4037-af39-7151e4e11c71",
+      "itemId": "0857d03d-8c6d-47cc-9eda-92178fca04fa",
       "type": "回执逾期",
       "content": "项目V2.4.1-FIN-004已超过截止时间2024-05-12 23:59:59，尚未收到回执",
       "isResolved": false,
-      "createdAt": "2026-05-15T23:55:11.668Z"
+      "createdAt": "2026-05-16T00:56:20.045Z"
     },
     {
-      "id": "0e830f58-d283-4e4f-8d8a-3245dfd2ad88",
-      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
-      "itemId": "2bb961ca-9d71-40cf-b619-cdb8ebf28983",
+      "id": "bd3ceef3-3a47-4de8-a676-b6c1cdb1ec8f",
+      "reconId": "1df88fb2-0c6a-4037-af39-7151e4e11c71",
+      "itemId": "14ca9b66-557d-460e-a85f-360a92725b2c",
       "type": "回执晚到",
-      "content": "项目V2.4.1-SEC-005回执时间晚于截止时间2024-05-09 20:00:00",
+      "content": "项目V2.4.1-SEC-005回执时间(2024-05-10T00:30:00.000Z)晚于截止时间2024-05-09 20:00:00",
       "isResolved": false,
-      "createdAt": "2026-05-15T23:55:11.668Z"
+      "createdAt": "2026-05-16T00:56:20.045Z"
     },
     {
-      "id": "13bf5d54-8f70-4d67-8374-ce0c79910046",
-      "reconId": "e03cf247-596b-4717-9836-86fd33a3b4f6",
-      "itemId": "d60e4479-e959-41fd-a043-504d8adec41e",
+      "id": "27dd31a7-a8a7-4738-adb4-cb5ac4834b53",
+      "reconId": "1df88fb2-0c6a-4037-af39-7151e4e11c71",
+      "itemId": "d693d28c-3773-4697-ba9c-607b3e5cf8eb",
       "type": "校验失败",
       "content": "项目V2.4.1-PRD-003校验失败：回执单缺少版本号字段，审批附件不全",
       "isResolved": false,
-      "createdAt": "2026-05-15T23:55:11.670Z"
+      "createdAt": "2026-05-16T00:56:20.046Z"
     }
   ],
   "manualNotes": []

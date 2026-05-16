@@ -50,13 +50,13 @@ export async function performMatching(reconId, receiptData) {
     const receipt = receiptData.find(r => r.itemRef === item.itemRef)
     if (receipt) {
       item.receipt = receipt
-      item.receiptTime = new Date().toISOString()
+      item.receiptTime = parseReceiptTime(receipt)
       item.status = ITEM_STATUS.MATCHED
       matchedCount++
 
       if (isReceiptLate(item.deadline, item.receiptTime)) {
         item.status = ITEM_STATUS.OVERDUE
-        await addReminder(reconId, item.id, '回执晚到', `项目${item.itemRef}回执时间晚于截止时间${item.deadline}`)
+        await addReminder(reconId, item.id, '回执晚到', `项目${item.itemRef}回执时间(${item.receiptTime})晚于截止时间${item.deadline}`)
       }
     } else {
       if (isOverdue(item.deadline)) {
@@ -203,6 +203,13 @@ function generateMaterialSummary(source, items) {
     latestDeadline: items.reduce((max, i) => i.deadline > max ? i.deadline : max, items[0]?.deadline),
     totalAmount: items.reduce((sum, i) => sum + (i.amount || 0), 0)
   }
+}
+
+function parseReceiptTime(receipt) {
+  if (receipt.approvedAt) {
+    return new Date(receipt.approvedAt).toISOString()
+  }
+  return new Date().toISOString()
 }
 
 function isReceiptLate(deadline, receiptTime) {
