@@ -1,0 +1,22 @@
+{
+  "name": "webhook-dlx-retry-api",
+  "version": "1.0.0",
+  "description": "Webhook Dead Letter Queue Retry API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node tests/run-tests.js",
+    "init-db": "node scripts/init-db.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.1",
+    "joi": "^17.11.0",
+    "csv-writer": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
