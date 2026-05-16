@@ -22,12 +22,16 @@ uvicorn main:app --reload --host 0.0.0.0
 - API文档: http://localhost:8000/docs
 - 健康检查: http://localhost:8000/api/health
 
-### 3. 运行测试脚本
+### 3. 运行验收测试脚本
 
 ```bash
 chmod +x test_api.sh
 ./test_api.sh
 ```
+
+**脚本特性:**
+- 使用时间戳生成唯一设备ID，避免历史数据污染
+- 完整覆盖三个验收场景：序号排序、幂等性、异常解释
 
 ## API接口说明
 

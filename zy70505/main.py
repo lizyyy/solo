@@ -278,7 +278,7 @@ async def list_events(
             query += " AND status = ?"
             params.append(status)
         
-        query += " ORDER BY id DESC LIMIT ?"
+        query += " ORDER BY event_sequence LIMIT ?"
         params.append(limit)
         
         events = db.fetch_all(query, params)
