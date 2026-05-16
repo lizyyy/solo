@@ -1,0 +1,58 @@
+======================================================================
+CSV File Encoding and Format Report
+Generated: 2026-05-17 07:53:52
+======================================================================
+
+1. File Information
+----------------------------------------
+File path: test_samples/mixed_bad_rows.csv
+File size: 65 bytes
+
+2. Encoding Detection
+----------------------------------------
+Recommended encoding: ascii
+Has BOM: No
+Decode errors: 0
+
+Encoding candidates (sorted by confidence):
+  1. ascii - confidence: 100.0%
+  2. utf-8 - confidence: 30.0%
+  3. gb18030 - confidence: 30.0%
+  4. gbk - confidence: 30.0%
+  5. latin-1 - confidence: 30.0%
+
+3. Header Information
+----------------------------------------
+Header fields (3):
+  1. name
+  2. age
+  3. city
+
+Header validation:
+  OK - Validation passed
+
+4. Row Statistics
+----------------------------------------
+Total rows: 4
+Good rows: 1
+Bad rows: 2
+
+5. Bad Rows Details
+----------------------------------------
+
+[Row 2] [field_count_mismatch]
+  Reason: field count mismatch: expected 3, got 2
+  Content: Alice,25
+
+[Row 3] [field_count_mismatch]
+  Reason: field count mismatch: expected 3, got 4
+  Content: Bob,30,Shanghai,extra
+
+6. Processing Suggestions
+----------------------------------------
+  1. Found 2 bad rows, check data format and delimiters
+  2. Recommend converting to UTF-8 encoding for better compatibility
+
+======================================================================
+End of Report
+======================================================================

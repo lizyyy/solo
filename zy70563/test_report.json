@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-05-17T07:53:02.608619",
+  "all_passed": true,
+  "total_tests": 8,
+  "passed_count": 8,
+  "failed_count": 0,
+  "results": [
+    {
+      "filename": "utf8_normal.csv",
+      "test_name": "Detect UTF-8 encoding",
+      "passed": true,
+      "encoding": "ascii",
+      "bad_rows": 0
+    },
+    {
+      "filename": "utf8_bom.csv",
+      "test_name": "Detect UTF-8 BOM",
+      "passed": true,
+      "encoding": "utf-8-sig",
+      "bad_rows": 0
+    },
+    {
+      "filename": "gbk_normal.csv",
+      "test_name": "Detect GBK encoding",
+      "passed": true,
+      "encoding": "ascii",
+      "bad_rows": 0
+    },
+    {
+      "filename": "gb18030_chinese.csv",
+      "test_name": "Detect GB18030 Chinese content",
+      "passed": true,
+      "encoding": "ascii",
+      "bad_rows": 0
+    },
+    {
+      "filename": "gbk_chinese.csv",
+      "test_name": "Detect GBK Chinese content",
+      "passed": true,
+      "encoding": "ascii",
+      "bad_rows": 0
+    },
+    {
+      "filename": "empty_file.csv",
+      "test_name": "Handle empty file",
+      "passed": true,
+      "encoding": "utf-8",
+      "bad_rows": 0
+    },
+    {
+      "filename": "quoted_fields.csv",
+      "test_name": "Handle quoted fields",
+      "passed": true,
+      "encoding": "ascii",
+      "bad_rows": 0
+    },
+    {
+      "filename": "mixed_bad_rows.csv",
+      "test_name": "Detect bad rows",
+      "passed": true,
+      "encoding": "ascii",
+      "bad_rows": 2
+    }
+  ]
+}
