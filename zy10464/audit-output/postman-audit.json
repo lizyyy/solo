@@ -1,0 +1,285 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-05-16T20:41:38.526Z",
+  "metadata": {
+    "toolVersion": "1.0.0",
+    "auditTime": "2026-05-16T20:41:38.524Z",
+    "collectionName": "示例 API Collection",
+    "collectionFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+    "environmentFile": null,
+    "totalRequests": 5
+  },
+  "summary": {
+    "assertions": {
+      "total": 5,
+      "withAssertions": 2,
+      "withoutAssertions": 3,
+      "coverageRate": 40
+    },
+    "examples": {
+      "total": 5,
+      "withExamples": 2,
+      "withoutExamples": 3,
+      "coverageRate": 40
+    }
+  },
+  "assertions": {
+    "coverage": {
+      "rate": 40,
+      "withAssertions": 2,
+      "withoutAssertions": 3,
+      "total": 5
+    },
+    "statistics": {
+      "totalAssertions": 3,
+      "types": {
+        "pm.expect.to": 1,
+        "tests[]": 1
+      }
+    },
+    "requests": {
+      "withCoverage": [
+        {
+          "id": "req_fkulg1p07",
+          "name": "获取用户列表",
+          "path": "用户管理 > 获取用户列表",
+          "method": "GET",
+          "url": "{{base_url}}/api/users?page=1&limit=10",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "用户管理",
+              "获取用户列表"
+            ],
+            "itemIndices": [
+              0,
+              0
+            ]
+          },
+          "assertionCount": 2,
+          "assertionTypes": [
+            "pm.expect.to"
+          ]
+        },
+        {
+          "id": "req_ren8vmz7a",
+          "name": "创建订单",
+          "path": "订单管理 > 创建订单",
+          "method": "POST",
+          "url": "{{base_url}}/api/orders",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "订单管理",
+              "创建订单"
+            ],
+            "itemIndices": [
+              1,
+              1
+            ]
+          },
+          "assertionCount": 1,
+          "assertionTypes": [
+            "tests[]"
+          ]
+        }
+      ],
+      "withoutCoverage": [
+        {
+          "id": "req_tw0wgu2pq",
+          "name": "创建用户",
+          "path": "用户管理 > 创建用户",
+          "method": "POST",
+          "url": "{{base_url}}/api/users",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "用户管理",
+              "创建用户"
+            ],
+            "itemIndices": [
+              0,
+              1
+            ]
+          },
+          "assertionCount": 0,
+          "assertionTypes": []
+        },
+        {
+          "id": "req_atbe2fj3j",
+          "name": "获取订单详情",
+          "path": "订单管理 > 获取订单详情",
+          "method": "GET",
+          "url": "{{base_url}}/api/orders/{{order_id}}",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "订单管理",
+              "获取订单详情"
+            ],
+            "itemIndices": [
+              1,
+              0
+            ]
+          },
+          "assertionCount": 0,
+          "assertionTypes": []
+        },
+        {
+          "id": "req_r6nplf8kh",
+          "name": "健康检查",
+          "path": "健康检查",
+          "method": "GET",
+          "url": "{{base_url}}/health",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "健康检查"
+            ],
+            "itemIndices": [
+              2
+            ]
+          },
+          "assertionCount": 0,
+          "assertionTypes": []
+        }
+      ]
+    },
+    "issues": []
+  },
+  "examples": {
+    "coverage": {
+      "rate": 40,
+      "withExamples": 2,
+      "withoutExamples": 3,
+      "total": 5
+    },
+    "statistics": {
+      "totalExamples": 2,
+      "statusCodeDistribution": {
+        "200": 1,
+        "404": 1
+      },
+      "contentTypeDistribution": {
+        "application/json; charset=utf-8": 2
+      }
+    },
+    "requests": {
+      "withCoverage": [
+        {
+          "id": "req_fkulg1p07",
+          "name": "获取用户列表",
+          "path": "用户管理 > 获取用户列表",
+          "method": "GET",
+          "url": "{{base_url}}/api/users?page=1&limit=10",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "用户管理",
+              "获取用户列表"
+            ],
+            "itemIndices": [
+              0,
+              0
+            ]
+          },
+          "exampleCount": 1,
+          "statusCodes": {
+            "200": 1
+          }
+        },
+        {
+          "id": "req_atbe2fj3j",
+          "name": "获取订单详情",
+          "path": "订单管理 > 获取订单详情",
+          "method": "GET",
+          "url": "{{base_url}}/api/orders/{{order_id}}",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "订单管理",
+              "获取订单详情"
+            ],
+            "itemIndices": [
+              1,
+              0
+            ]
+          },
+          "exampleCount": 1,
+          "statusCodes": {
+            "404": 1
+          }
+        }
+      ],
+      "withoutCoverage": [
+        {
+          "id": "req_tw0wgu2pq",
+          "name": "创建用户",
+          "path": "用户管理 > 创建用户",
+          "method": "POST",
+          "url": "{{base_url}}/api/users",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "用户管理",
+              "创建用户"
+            ],
+            "itemIndices": [
+              0,
+              1
+            ]
+          },
+          "exampleCount": 0,
+          "statusCodes": {}
+        },
+        {
+          "id": "req_ren8vmz7a",
+          "name": "创建订单",
+          "path": "订单管理 > 创建订单",
+          "method": "POST",
+          "url": "{{base_url}}/api/orders",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "订单管理",
+              "创建订单"
+            ],
+            "itemIndices": [
+              1,
+              1
+            ]
+          },
+          "exampleCount": 0,
+          "statusCodes": {}
+        },
+        {
+          "id": "req_r6nplf8kh",
+          "name": "健康检查",
+          "path": "健康检查",
+          "method": "GET",
+          "url": "{{base_url}}/health",
+          "sourceFile": "/Users/lzy/pro/solo/workspaces/zy10464/examples/sample-collection.json",
+          "sourceLocation": {
+            "itemPath": [
+              "健康检查"
+            ],
+            "itemIndices": [
+              2
+            ]
+          },
+          "exampleCount": 0,
+          "statusCodes": {}
+        }
+      ]
+    },
+    "issues": [
+      {
+        "type": "ONLY_SUCCESS_EXAMPLE",
+        "severity": "info",
+        "message": "只有成功响应示例 (200)",
+        "suggestion": "考虑添加错误场景的示例 (400, 404, 500 等)"
+      }
+    ]
+  },
+  "variables": null
+}

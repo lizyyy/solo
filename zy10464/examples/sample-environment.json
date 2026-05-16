@@ -1,0 +1,15 @@
+{
+  "name": "开发环境",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "https://api.example.com",
+      "enabled": true
+    },
+    {
+      "key": "api_key",
+      "value": "your-api-key-here",
+      "enabled": true
+    }
+  ]
+}
