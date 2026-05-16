@@ -5,7 +5,7 @@ PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
 
 echo "========================================"
-echo "  边缘节点配置签收 API - 启动脚本"
+echo "  边缘节点配置签收 API - 直接启动"
 echo "========================================"
 echo ""
 
@@ -17,23 +17,18 @@ fi
 
 JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1-2)
 echo "✅ Java version: $JAVA_VERSION"
+echo ""
 
-# Check if target/classes exist
-if [ ! -d "target/classes" ]; then
-    echo ""
-    echo "❌ Error: target/classes not found!"
-    echo "   Please run: ./mvnw compile"
-    exit 1
-fi
-echo "✅ Found compiled classes"
+# Maven repository path
+M2_REPO="$HOME/.m2/repository"
 
-# Check dependencies
-if [ ! -d "target/dependency" ] || [ -z "$(ls target/dependency/*.jar 2>/dev/null)" ]; then
+# Check if dependencies exist, if not download
+if [ ! -d "$M2_REPO/org/springframework/boot/spring-boot-starter-web" ]; then
+    echo "📦 First run: downloading dependencies..."
+    echo "   This may take 3-5 minutes..."
     echo ""
-    echo "📦 Downloading dependencies..."
-    "$PROJECT_DIR"/mvnw dependency:copy-dependencies -DoutputDirectory=target/dependency -q
+    "$PROJECT_DIR"/mvnw dependency:copy-dependencies -DoutputDirectory=target/dependency -q 2>&1 || true
 fi
-echo "✅ Dependencies ready"
 
 # Build classpath
 CLASSPATH="target/classes"
@@ -43,8 +38,7 @@ for jar in target/dependency/*.jar; do
     fi
 done
 
-echo ""
-echo "🚀 Starting Spring Boot application..."
+echo "🚀 Starting application..."
 echo "   Service URL: http://localhost:8080"
 echo "   H2 Console:  http://localhost:8080/h2-console"
 echo ""
