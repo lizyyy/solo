@@ -7,6 +7,8 @@ const db = new sqlite3.Database(dbPath);
 const initDatabase = () => {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
+      db.run(`PRAGMA foreign_keys = ON`);
+      
       db.run(`CREATE TABLE IF NOT EXISTS isolation_spaces (
         id TEXT PRIMARY KEY,
         namespace TEXT UNIQUE NOT NULL,
