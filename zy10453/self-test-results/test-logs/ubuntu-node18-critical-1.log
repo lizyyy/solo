@@ -1,0 +1,10 @@
+2026-05-16T19:14:25.075Z Starting job: {"os":"ubuntu-latest","node-version":"18"}
+2026-05-16T19:14:25.075Z matrix.os = ubuntu-latest
+2026-05-16T19:14:25.075Z matrix.node-version = 18
+2026-05-16T19:14:25.075Z Running tests...
+2026-05-16T19:14:25.075Z Re-run attempt #1
+2026-05-16T19:14:25.075Z Re-run attempt #2
+2026-05-16T19:14:25.075Z Re-run attempt #3
+2026-05-16T19:14:25.075Z Error: Connection timeout
+2026-05-16T19:14:25.075Z AssertionError: expected 200 to equal 500
+2026-05-16T19:14:25.075Z Process completed with exit code 1

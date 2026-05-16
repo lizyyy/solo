@@ -1,0 +1,10 @@
+2026-05-16T20:14:25.077Z Starting job: {"os":"ubuntu-latest","node-version":"20"}
+2026-05-16T20:14:25.077Z matrix.os = ubuntu-latest
+2026-05-16T20:14:25.077Z matrix.node-version = 20
+2026-05-16T20:14:25.077Z Running tests...
+2026-05-16T20:14:25.077Z Re-run attempt #1
+2026-05-16T20:14:25.077Z Traceback (most recent call last):
+2026-05-16T20:14:25.077Z   File "/app/test.py", line 42, in <module>
+2026-05-16T20:14:25.077Z     raise ValueError("Invalid response")
+2026-05-16T20:14:25.077Z ValueError: Invalid response
+2026-05-16T20:14:25.077Z Process completed with exit code 1

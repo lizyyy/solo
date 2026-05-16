@@ -1,0 +1,6 @@
+矩阵组合,总运行次数,失败次数,失败率(%),平均重跑次数,抖动分数,抖动级别,样本错误
+"{""os"":""ubuntu-latest"",""node-version"":""18""}",5,5,100.00,6.00,100.00,CRITICAL,2026-05-16T20:14:25.073Z Re-run attempt #1
+"{""os"":""windows-latest"",""node-version"":""16""}",4,4,100.00,4.00,100.00,CRITICAL,2026-05-16T20:14:25.075Z Running tests...
+"{""os"":""macos-latest"",""node-version"":""20""}",3,2,66.67,2.00,83.33,CRITICAL,2026-05-16T20:14:25.076Z matrix.node-version = 20
+"{""os"":""ubuntu-latest"",""node-version"":""20""}",1,1,100.00,2.00,80.00,CRITICAL,2026-05-16T20:14:25.077Z matrix.node-version = 20
+"{""os"":""ubuntu-latest"",""node-version"":""14""}",2,0,0.00,0.00,0.00,LOW,

@@ -1,0 +1,481 @@
+{
+  "generatedAt": "2026-05-16T20:14:30.788Z",
+  "summary": {
+    "totalLogs": 15,
+    "totalFailed": 12,
+    "totalSuccess": 3,
+    "totalReruns": 54,
+    "totalMatrixGroups": 5,
+    "criticalGroups": 4,
+    "highGroups": 0,
+    "overallFailureRate": 0.8,
+    "mostUnstable": {
+      "matrix": {
+        "os": "ubuntu-latest",
+        "node-version": "18"
+      },
+      "flakeScore": 100,
+      "flakeLevel": "CRITICAL"
+    }
+  },
+  "groups": [
+    {
+      "key": "ubuntu-latest|18",
+      "matrix": {
+        "os": "ubuntu-latest",
+        "node-version": "18"
+      },
+      "totalRuns": 5,
+      "failedRuns": 5,
+      "successRuns": 0,
+      "failureRate": 1,
+      "totalReruns": 30,
+      "avgReruns": 6,
+      "flakeScore": 100,
+      "flakeLevel": "CRITICAL",
+      "failureSnippets": [
+        {
+          "lineNumber": 8,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-0.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T20:14:25.073Z Re-run attempt #1\n2026-05-16T20:14:25.073Z Re-run attempt #2\n2026-05-16T20:14:25.073Z Re-run attempt #3\n2026-05-16T20:14:25.073Z Error: Connection timeout\n2026-05-16T20:14:25.073Z AssertionError: expected 200 to equal 500\n2026-05-16T20:14:25.073Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-0.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-0.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T20:14:25.073Z Re-run attempt #2\n2026-05-16T20:14:25.073Z Re-run attempt #3\n2026-05-16T20:14:25.073Z Error: Connection timeout\n2026-05-16T20:14:25.073Z AssertionError: expected 200 to equal 500\n2026-05-16T20:14:25.073Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-0.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 10,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-0.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T20:14:25.073Z Re-run attempt #3\n2026-05-16T20:14:25.073Z Error: Connection timeout\n2026-05-16T20:14:25.073Z AssertionError: expected 200 to equal 500\n2026-05-16T20:14:25.073Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-0.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 8,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-1.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T19:14:25.075Z Re-run attempt #1\n2026-05-16T19:14:25.075Z Re-run attempt #2\n2026-05-16T19:14:25.075Z Re-run attempt #3\n2026-05-16T19:14:25.075Z Error: Connection timeout\n2026-05-16T19:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T19:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-1.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-1.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T19:14:25.075Z Re-run attempt #2\n2026-05-16T19:14:25.075Z Re-run attempt #3\n2026-05-16T19:14:25.075Z Error: Connection timeout\n2026-05-16T19:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T19:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-1.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 10,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-1.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T19:14:25.075Z Re-run attempt #3\n2026-05-16T19:14:25.075Z Error: Connection timeout\n2026-05-16T19:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T19:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-1.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 8,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-2.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T18:14:25.075Z Re-run attempt #1\n2026-05-16T18:14:25.075Z Re-run attempt #2\n2026-05-16T18:14:25.075Z Re-run attempt #3\n2026-05-16T18:14:25.075Z Error: Connection timeout\n2026-05-16T18:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T18:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-2.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-2.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T18:14:25.075Z Re-run attempt #2\n2026-05-16T18:14:25.075Z Re-run attempt #3\n2026-05-16T18:14:25.075Z Error: Connection timeout\n2026-05-16T18:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T18:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-2.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 10,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-2.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T18:14:25.075Z Re-run attempt #3\n2026-05-16T18:14:25.075Z Error: Connection timeout\n2026-05-16T18:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T18:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-2.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 8,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-3.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T17:14:25.075Z Re-run attempt #1\n2026-05-16T17:14:25.075Z Re-run attempt #2\n2026-05-16T17:14:25.075Z Re-run attempt #3\n2026-05-16T17:14:25.075Z Error: Connection timeout\n2026-05-16T17:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T17:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-3.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-3.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T17:14:25.075Z Re-run attempt #2\n2026-05-16T17:14:25.075Z Re-run attempt #3\n2026-05-16T17:14:25.075Z Error: Connection timeout\n2026-05-16T17:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T17:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-3.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 10,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-3.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T17:14:25.075Z Re-run attempt #3\n2026-05-16T17:14:25.075Z Error: Connection timeout\n2026-05-16T17:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T17:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-3.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 8,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-4.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T16:14:25.075Z Re-run attempt #1\n2026-05-16T16:14:25.075Z Re-run attempt #2\n2026-05-16T16:14:25.075Z Re-run attempt #3\n2026-05-16T16:14:25.075Z Error: Connection timeout\n2026-05-16T16:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T16:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-4.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-4.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T16:14:25.075Z Re-run attempt #2\n2026-05-16T16:14:25.075Z Re-run attempt #3\n2026-05-16T16:14:25.075Z Error: Connection timeout\n2026-05-16T16:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T16:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-4.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        },
+        {
+          "lineNumber": 10,
+          "filePath": "self-test-results/test-logs/ubuntu-node18-critical-4.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T16:14:25.075Z Re-run attempt #3\n2026-05-16T16:14:25.075Z Error: Connection timeout\n2026-05-16T16:14:25.075Z AssertionError: expected 200 to equal 500\n2026-05-16T16:14:25.075Z Process completed with exit code 1",
+          "logFile": "ubuntu-node18-critical-4.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "18"
+          }
+        }
+      ]
+    },
+    {
+      "key": "windows-latest|16",
+      "matrix": {
+        "os": "windows-latest",
+        "node-version": "16"
+      },
+      "totalRuns": 4,
+      "failedRuns": 4,
+      "successRuns": 0,
+      "failureRate": 1,
+      "totalReruns": 16,
+      "avgReruns": 4,
+      "flakeScore": 100,
+      "flakeLevel": "CRITICAL",
+      "failureSnippets": [
+        {
+          "lineNumber": 7,
+          "filePath": "self-test-results/test-logs/windows-node16-high-0.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T20:14:25.075Z Running tests...\n2026-05-16T20:14:25.075Z Re-run attempt #1\n2026-05-16T20:14:25.075Z Re-run attempt #2\n2026-05-16T20:14:25.075Z Error: EPERM: operation not permitted\n2026-05-16T20:14:25.075Z npm ERR! code EINTEGRITY\n2026-05-16T20:14:25.075Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-0.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 8,
+          "filePath": "self-test-results/test-logs/windows-node16-high-0.log",
+          "pattern": "/npm err!.*$/i",
+          "snippet": "2026-05-16T20:14:25.075Z Re-run attempt #1\n2026-05-16T20:14:25.075Z Re-run attempt #2\n2026-05-16T20:14:25.075Z Error: EPERM: operation not permitted\n2026-05-16T20:14:25.075Z npm ERR! code EINTEGRITY\n2026-05-16T20:14:25.075Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-0.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/windows-node16-high-0.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T20:14:25.075Z Re-run attempt #2\n2026-05-16T20:14:25.075Z Error: EPERM: operation not permitted\n2026-05-16T20:14:25.075Z npm ERR! code EINTEGRITY\n2026-05-16T20:14:25.075Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-0.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 7,
+          "filePath": "self-test-results/test-logs/windows-node16-high-1.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T19:14:25.076Z Running tests...\n2026-05-16T19:14:25.076Z Re-run attempt #1\n2026-05-16T19:14:25.076Z Re-run attempt #2\n2026-05-16T19:14:25.076Z Error: EPERM: operation not permitted\n2026-05-16T19:14:25.076Z npm ERR! code EINTEGRITY\n2026-05-16T19:14:25.076Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-1.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 8,
+          "filePath": "self-test-results/test-logs/windows-node16-high-1.log",
+          "pattern": "/npm err!.*$/i",
+          "snippet": "2026-05-16T19:14:25.076Z Re-run attempt #1\n2026-05-16T19:14:25.076Z Re-run attempt #2\n2026-05-16T19:14:25.076Z Error: EPERM: operation not permitted\n2026-05-16T19:14:25.076Z npm ERR! code EINTEGRITY\n2026-05-16T19:14:25.076Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-1.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/windows-node16-high-1.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T19:14:25.076Z Re-run attempt #2\n2026-05-16T19:14:25.076Z Error: EPERM: operation not permitted\n2026-05-16T19:14:25.076Z npm ERR! code EINTEGRITY\n2026-05-16T19:14:25.076Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-1.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 7,
+          "filePath": "self-test-results/test-logs/windows-node16-high-2.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T18:14:25.076Z Running tests...\n2026-05-16T18:14:25.076Z Re-run attempt #1\n2026-05-16T18:14:25.076Z Re-run attempt #2\n2026-05-16T18:14:25.076Z Error: EPERM: operation not permitted\n2026-05-16T18:14:25.076Z npm ERR! code EINTEGRITY\n2026-05-16T18:14:25.076Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-2.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 8,
+          "filePath": "self-test-results/test-logs/windows-node16-high-2.log",
+          "pattern": "/npm err!.*$/i",
+          "snippet": "2026-05-16T18:14:25.076Z Re-run attempt #1\n2026-05-16T18:14:25.076Z Re-run attempt #2\n2026-05-16T18:14:25.076Z Error: EPERM: operation not permitted\n2026-05-16T18:14:25.076Z npm ERR! code EINTEGRITY\n2026-05-16T18:14:25.076Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-2.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/windows-node16-high-2.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T18:14:25.076Z Re-run attempt #2\n2026-05-16T18:14:25.076Z Error: EPERM: operation not permitted\n2026-05-16T18:14:25.076Z npm ERR! code EINTEGRITY\n2026-05-16T18:14:25.076Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-2.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 7,
+          "filePath": "self-test-results/test-logs/windows-node16-high-3.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T17:14:25.076Z Running tests...\n2026-05-16T17:14:25.076Z Re-run attempt #1\n2026-05-16T17:14:25.076Z Re-run attempt #2\n2026-05-16T17:14:25.076Z Error: EPERM: operation not permitted\n2026-05-16T17:14:25.076Z npm ERR! code EINTEGRITY\n2026-05-16T17:14:25.076Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-3.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 8,
+          "filePath": "self-test-results/test-logs/windows-node16-high-3.log",
+          "pattern": "/npm err!.*$/i",
+          "snippet": "2026-05-16T17:14:25.076Z Re-run attempt #1\n2026-05-16T17:14:25.076Z Re-run attempt #2\n2026-05-16T17:14:25.076Z Error: EPERM: operation not permitted\n2026-05-16T17:14:25.076Z npm ERR! code EINTEGRITY\n2026-05-16T17:14:25.076Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-3.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/windows-node16-high-3.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T17:14:25.076Z Re-run attempt #2\n2026-05-16T17:14:25.076Z Error: EPERM: operation not permitted\n2026-05-16T17:14:25.076Z npm ERR! code EINTEGRITY\n2026-05-16T17:14:25.076Z Process completed with exit code 1",
+          "logFile": "windows-node16-high-3.log",
+          "matrix": {
+            "os": "windows-latest",
+            "node-version": "16"
+          }
+        }
+      ]
+    },
+    {
+      "key": "macos-latest|20",
+      "matrix": {
+        "os": "macos-latest",
+        "node-version": "20"
+      },
+      "totalRuns": 3,
+      "failedRuns": 2,
+      "successRuns": 1,
+      "failureRate": 0.6666666666666666,
+      "totalReruns": 6,
+      "avgReruns": 2,
+      "flakeScore": 83.33333333333333,
+      "flakeLevel": "CRITICAL",
+      "failureSnippets": [
+        {
+          "lineNumber": 6,
+          "filePath": "self-test-results/test-logs/macos-node20-medium-0.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T20:14:25.076Z matrix.node-version = 20\n2026-05-16T20:14:25.076Z Running tests...\n2026-05-16T20:14:25.076Z Re-run attempt #1\n2026-05-16T20:14:25.076Z Error: Socket hang up\n2026-05-16T20:14:25.076Z Process completed with exit code 1",
+          "logFile": "macos-node20-medium-0.log",
+          "matrix": {
+            "os": "macos-latest",
+            "node-version": "20"
+          }
+        },
+        {
+          "lineNumber": 7,
+          "filePath": "self-test-results/test-logs/macos-node20-medium-0.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T20:14:25.076Z Running tests...\n2026-05-16T20:14:25.076Z Re-run attempt #1\n2026-05-16T20:14:25.076Z Error: Socket hang up\n2026-05-16T20:14:25.076Z Process completed with exit code 1",
+          "logFile": "macos-node20-medium-0.log",
+          "matrix": {
+            "os": "macos-latest",
+            "node-version": "20"
+          }
+        },
+        {
+          "lineNumber": 6,
+          "filePath": "self-test-results/test-logs/macos-node20-medium-2.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T18:14:25.077Z matrix.node-version = 20\n2026-05-16T18:14:25.077Z Running tests...\n2026-05-16T18:14:25.077Z Re-run attempt #1\n2026-05-16T18:14:25.077Z Error: Socket hang up\n2026-05-16T18:14:25.077Z Process completed with exit code 1",
+          "logFile": "macos-node20-medium-2.log",
+          "matrix": {
+            "os": "macos-latest",
+            "node-version": "20"
+          }
+        },
+        {
+          "lineNumber": 7,
+          "filePath": "self-test-results/test-logs/macos-node20-medium-2.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T18:14:25.077Z Running tests...\n2026-05-16T18:14:25.077Z Re-run attempt #1\n2026-05-16T18:14:25.077Z Error: Socket hang up\n2026-05-16T18:14:25.077Z Process completed with exit code 1",
+          "logFile": "macos-node20-medium-2.log",
+          "matrix": {
+            "os": "macos-latest",
+            "node-version": "20"
+          }
+        }
+      ]
+    },
+    {
+      "key": "ubuntu-latest|20",
+      "matrix": {
+        "os": "ubuntu-latest",
+        "node-version": "20"
+      },
+      "totalRuns": 1,
+      "failedRuns": 1,
+      "successRuns": 0,
+      "failureRate": 1,
+      "totalReruns": 2,
+      "avgReruns": 2,
+      "flakeScore": 80,
+      "flakeLevel": "CRITICAL",
+      "failureSnippets": [
+        {
+          "lineNumber": 6,
+          "filePath": "self-test-results/test-logs/ubuntu-node20-1-0.log",
+          "pattern": "/traceback[\\s\\S]*?(?=\\n\\n|\\n\\s*\\n|$)/i",
+          "snippet": "2026-05-16T20:14:25.077Z matrix.node-version = 20\n2026-05-16T20:14:25.077Z Running tests...\n2026-05-16T20:14:25.077Z Re-run attempt #1\n2026-05-16T20:14:25.077Z Traceback (most recent call last):\n2026-05-16T20:14:25.077Z   File \"/app/test.py\", line 42, in <module>\n2026-05-16T20:14:25.077Z     raise ValueError(\"Invalid response\")\n2026-05-16T20:14:25.077Z ValueError: Invalid response\n2026-05-16T20:14:25.077Z Process completed with exit code 1",
+          "logFile": "ubuntu-node20-1-0.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "20"
+          }
+        },
+        {
+          "lineNumber": 9,
+          "filePath": "self-test-results/test-logs/ubuntu-node20-1-0.log",
+          "pattern": "/error:.*/i",
+          "snippet": "2026-05-16T20:14:25.077Z Traceback (most recent call last):\n2026-05-16T20:14:25.077Z   File \"/app/test.py\", line 42, in <module>\n2026-05-16T20:14:25.077Z     raise ValueError(\"Invalid response\")\n2026-05-16T20:14:25.077Z ValueError: Invalid response\n2026-05-16T20:14:25.077Z Process completed with exit code 1",
+          "logFile": "ubuntu-node20-1-0.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "20"
+          }
+        },
+        {
+          "lineNumber": 10,
+          "filePath": "self-test-results/test-logs/ubuntu-node20-1-0.log",
+          "pattern": "/exit code 1.*/i",
+          "snippet": "2026-05-16T20:14:25.077Z   File \"/app/test.py\", line 42, in <module>\n2026-05-16T20:14:25.077Z     raise ValueError(\"Invalid response\")\n2026-05-16T20:14:25.077Z ValueError: Invalid response\n2026-05-16T20:14:25.077Z Process completed with exit code 1",
+          "logFile": "ubuntu-node20-1-0.log",
+          "matrix": {
+            "os": "ubuntu-latest",
+            "node-version": "20"
+          }
+        }
+      ]
+    },
+    {
+      "key": "ubuntu-latest|14",
+      "matrix": {
+        "os": "ubuntu-latest",
+        "node-version": "14"
+      },
+      "totalRuns": 2,
+      "failedRuns": 0,
+      "successRuns": 2,
+      "failureRate": 0,
+      "totalReruns": 0,
+      "avgReruns": 0,
+      "flakeScore": 0,
+      "flakeLevel": "LOW",
+      "failureSnippets": []
+    }
+  ]
+}

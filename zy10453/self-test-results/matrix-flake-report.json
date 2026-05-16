@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-05-16T20:14:25.085Z",
+  "summary": {
+    "totalLogs": 10,
+    "totalFailed": 5,
+    "totalSuccess": 5,
+    "totalReruns": 8,
+    "totalMatrixGroups": 2,
+    "criticalGroups": 1,
+    "highGroups": 1,
+    "overallFailureRate": 0.5,
+    "mostUnstable": {
+      "matrix": {
+        "os": "ubuntu",
+        "node-version": "18"
+      },
+      "flakeScore": 85,
+      "flakeLevel": "CRITICAL"
+    }
+  },
+  "groups": [
+    {
+      "key": "ubuntu|18",
+      "matrix": {
+        "os": "ubuntu",
+        "node-version": "18"
+      },
+      "totalRuns": 5,
+      "failedRuns": 4,
+      "successRuns": 1,
+      "failureRate": 0.8,
+      "totalReruns": 6,
+      "avgReruns": 1.2,
+      "flakeScore": 85,
+      "flakeLevel": "CRITICAL",
+      "failureSnippets": [
+        {
+          "lineNumber": 42,
+          "filePath": "test.log",
+          "logFile": "test.log",
+          "pattern": "error",
+          "snippet": "Error: Connection timeout",
+          "matrix": {
+            "os": "ubuntu",
+            "node-version": "18"
+          }
+        }
+      ]
+    }
+  ]
+}

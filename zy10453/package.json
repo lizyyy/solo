@@ -1,0 +1,32 @@
+{
+  "name": "actions-matrix-flake-cli",
+  "version": "1.0.0",
+  "description": "GitHub Actions矩阵抖动分析CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "matrix-flake": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node src/self-test.js",
+    "self-test": "node src/self-test.js"
+  },
+  "keywords": [
+    "github-actions",
+    "matrix",
+    "flaky",
+    "ci",
+    "analytics"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "csv-writer": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
