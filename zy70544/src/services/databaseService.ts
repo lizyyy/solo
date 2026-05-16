@@ -185,7 +185,9 @@ export class DatabaseService {
     request: ManualCorrectionRequest
   ): Promise<void> {
     const now = new Date().toISOString();
-    const totalDifference = request.totalNewAmount - request.totalNewAmount;
+    const appRow = await this.getAsync<any>('SELECT total_original_amount FROM recalculation_applications WHERE id = ?', [applicationId]);
+    const totalOriginalAmount = appRow?.total_original_amount ?? 0;
+    const totalDifference = request.totalNewAmount - totalOriginalAmount;
 
     await this.runAsync(
       `UPDATE recalculation_applications 
