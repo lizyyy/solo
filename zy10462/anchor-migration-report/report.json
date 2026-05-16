@@ -1,0 +1,281 @@
+{
+  "meta": {
+    "generatedAt": "2026-05-16T20:42:21.846Z",
+    "version": "1.0.0",
+    "inputPath": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs",
+    "pattern": "**/*.md",
+    "exclude": [
+      "node_modules",
+      ".git"
+    ]
+  },
+  "summary": {
+    "totalFiles": 2,
+    "totalAnchors": 15,
+    "validLinks": 3,
+    "brokenLinks": 3,
+    "unhandledLinks": 0
+  },
+  "brokenLinks": [
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+      "line": 37,
+      "column": 26,
+      "linkText": "文档2的高级功能",
+      "linkUrl": "test2.md#高级功能",
+      "targetFile": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test2.md",
+      "targetAnchor": "高级功能",
+      "suggestedFix": {
+        "newAnchor": "高级用法",
+        "newTitle": "高级用法",
+        "confidence": 60
+      },
+      "availableAnchors": [
+        {
+          "anchor": "测试文档-2",
+          "title": "测试文档 2"
+        },
+        {
+          "anchor": "简介",
+          "title": "简介"
+        },
+        {
+          "anchor": "基础功能",
+          "title": "基础功能"
+        },
+        {
+          "anchor": "高级用法",
+          "title": "高级用法"
+        },
+        {
+          "anchor": "api-参考",
+          "title": "API 参考"
+        }
+      ]
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+      "line": 41,
+      "column": 14,
+      "linkText": "不存在的锚点",
+      "linkUrl": "#不存在的标题",
+      "targetFile": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+      "targetAnchor": "不存在的标题",
+      "suggestedFix": {
+        "newAnchor": "已更改的标题",
+        "newTitle": "已更改的标题",
+        "confidence": 55
+      },
+      "availableAnchors": [
+        {
+          "anchor": "测试文档-1",
+          "title": "测试文档 1"
+        },
+        {
+          "anchor": "简介",
+          "title": "简介"
+        },
+        {
+          "anchor": "安装指南",
+          "title": "安装指南"
+        },
+        {
+          "anchor": "使用方法",
+          "title": "使用方法"
+        },
+        {
+          "anchor": "常见问题",
+          "title": "常见问题"
+        },
+        {
+          "anchor": "q1-如何使用",
+          "title": "Q1: 如何使用？"
+        },
+        {
+          "anchor": "q2-安装失败怎么办",
+          "title": "Q2: 安装失败怎么办？"
+        },
+        {
+          "anchor": "已更改的标题",
+          "title": "已更改的标题"
+        },
+        {
+          "anchor": "跨文件链接",
+          "title": "跨文件链接"
+        },
+        {
+          "anchor": "断链示例",
+          "title": "断链示例"
+        }
+      ]
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+      "line": 43,
+      "column": 14,
+      "linkText": "旧标题已改名",
+      "linkUrl": "#旧标题",
+      "targetFile": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+      "targetAnchor": "旧标题",
+      "suggestedFix": null,
+      "availableAnchors": [
+        {
+          "anchor": "测试文档-1",
+          "title": "测试文档 1"
+        },
+        {
+          "anchor": "简介",
+          "title": "简介"
+        },
+        {
+          "anchor": "安装指南",
+          "title": "安装指南"
+        },
+        {
+          "anchor": "使用方法",
+          "title": "使用方法"
+        },
+        {
+          "anchor": "常见问题",
+          "title": "常见问题"
+        },
+        {
+          "anchor": "q1-如何使用",
+          "title": "Q1: 如何使用？"
+        },
+        {
+          "anchor": "q2-安装失败怎么办",
+          "title": "Q2: 安装失败怎么办？"
+        },
+        {
+          "anchor": "已更改的标题",
+          "title": "已更改的标题"
+        },
+        {
+          "anchor": "跨文件链接",
+          "title": "跨文件链接"
+        },
+        {
+          "anchor": "断链示例",
+          "title": "断链示例"
+        }
+      ]
+    }
+  ],
+  "unhandledLinks": [],
+  "files": [
+    "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test2.md",
+    "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md"
+  ],
+  "allAnchors": {
+    "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test2.md": [
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test2.md",
+        "line": 1,
+        "level": 1,
+        "title": "测试文档 2",
+        "anchor": "测试文档-2"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test2.md",
+        "line": 3,
+        "level": 2,
+        "title": "简介",
+        "anchor": "简介"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test2.md",
+        "line": 7,
+        "level": 2,
+        "title": "基础功能",
+        "anchor": "基础功能"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test2.md",
+        "line": 11,
+        "level": 2,
+        "title": "高级用法",
+        "anchor": "高级用法"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test2.md",
+        "line": 15,
+        "level": 2,
+        "title": "API 参考",
+        "anchor": "api-参考"
+      }
+    ],
+    "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md": [
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 1,
+        "level": 1,
+        "title": "测试文档 1",
+        "anchor": "测试文档-1"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 5,
+        "level": 2,
+        "title": "简介",
+        "anchor": "简介"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 9,
+        "level": 2,
+        "title": "安装指南",
+        "anchor": "安装指南"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 17,
+        "level": 2,
+        "title": "使用方法",
+        "anchor": "使用方法"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 21,
+        "level": 2,
+        "title": "常见问题",
+        "anchor": "常见问题"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 23,
+        "level": 3,
+        "title": "Q1: 如何使用？",
+        "anchor": "q1-如何使用"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 27,
+        "level": 3,
+        "title": "Q2: 安装失败怎么办？",
+        "anchor": "q2-安装失败怎么办"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 31,
+        "level": 2,
+        "title": "已更改的标题",
+        "anchor": "已更改的标题"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 35,
+        "level": 2,
+        "title": "跨文件链接",
+        "anchor": "跨文件链接"
+      },
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10462/test/docs/test1.md",
+        "line": 39,
+        "level": 2,
+        "title": "断链示例",
+        "anchor": "断链示例"
+      }
+    ]
+  }
+}
