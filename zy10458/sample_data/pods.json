@@ -1,0 +1,74 @@
+{
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "web-app-7f98d7c6b4-abcde",
+        "namespace": "default",
+        "labels": {
+          "app": "web",
+          "pod-template-hash": "7f98d7c6b4"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "nginx",
+            "image": "nginx:1.21"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "podIP": "10.244.1.10",
+        "hostIP": "192.168.1.100",
+        "startTime": "2026-05-16T20:14:49.304319Z",
+        "containerStatuses": [
+          {
+            "name": "nginx",
+            "ready": true,
+            "restartCount": 0
+          }
+        ],
+        "qosClass": "BestEffort"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "web-app-7f98d7c6b4-fghij",
+        "namespace": "default",
+        "labels": {
+          "app": "web",
+          "pod-template-hash": "7f98d7c6b4"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "nginx",
+            "image": "nginx:1.21"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "podIP": "10.244.1.11",
+        "hostIP": "192.168.1.100",
+        "startTime": "2026-05-16T20:15:49.304319Z",
+        "containerStatuses": [
+          {
+            "name": "nginx",
+            "ready": true,
+            "restartCount": 0
+          }
+        ],
+        "qosClass": "BestEffort"
+      }
+    }
+  ],
+  "kind": "List"
+}

@@ -1,0 +1,40 @@
+{
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "count": 5,
+      "eventTime": "2026-05-16T20:17:49.304316Z",
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "web-app-bad-image-xyz",
+        "namespace": "default"
+      },
+      "kind": "Event",
+      "message": "Failed to pull image \"nginx:invalid-tag\": rpc error: code = Unknown desc = Error response from daemon: manifest for nginx:invalid-tag not found",
+      "reason": "Failed",
+      "source": {
+        "component": "kubelet"
+      },
+      "type": "Warning"
+    },
+    {
+      "apiVersion": "v1",
+      "count": 3,
+      "eventTime": "2026-05-16T20:19:49.304316Z",
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "web-app-crash-abc",
+        "namespace": "default"
+      },
+      "kind": "Event",
+      "message": "Back-off restarting failed container",
+      "reason": "BackOff",
+      "source": {
+        "component": "kubelet"
+      },
+      "type": "Warning"
+    }
+  ],
+  "kind": "List"
+}

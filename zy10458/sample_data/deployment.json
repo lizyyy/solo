@@ -1,0 +1,22 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "web-app",
+    "namespace": "default",
+    "creationTimestamp": "2026-05-16T19:22:49.304324Z"
+  },
+  "spec": {
+    "replicas": 2,
+    "strategy": {
+      "type": "RollingUpdate"
+    }
+  },
+  "status": {
+    "replicas": 2,
+    "updatedReplicas": 2,
+    "readyReplicas": 2,
+    "availableReplicas": 2,
+    "observedGeneration": 1
+  }
+}

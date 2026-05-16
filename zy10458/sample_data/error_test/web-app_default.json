@@ -1,0 +1,193 @@
+{
+  "namespace": "default",
+  "deployment_name": "web-app",
+  "start_time": "2026-05-16T20:14:49.304319+00:00",
+  "end_time": "2026-05-16T20:19:49.304316+00:00",
+  "events": [
+    {
+      "timestamp": "2026-05-16T20:14:49.304319+00:00",
+      "event_type": "pod_start",
+      "severity": "info",
+      "title": "Pod web-app-7f98d7c6b4-abcde started",
+      "description": "Phase: Running, IP: 10.244.1.10, Restarts: 0",
+      "object_ref": "Pod/web-app-7f98d7c6b4-abcde",
+      "attributes": {
+        "phase": "Running",
+        "restarts": 0,
+        "ready": true
+      }
+    },
+    {
+      "timestamp": "2026-05-16T20:15:49.304319+00:00",
+      "event_type": "pod_start",
+      "severity": "info",
+      "title": "Pod web-app-7f98d7c6b4-fghij started",
+      "description": "Phase: Running, IP: 10.244.1.11, Restarts: 0",
+      "object_ref": "Pod/web-app-7f98d7c6b4-fghij",
+      "attributes": {
+        "phase": "Running",
+        "restarts": 0,
+        "ready": true
+      }
+    },
+    {
+      "timestamp": "2026-05-16T20:17:49.304316+00:00",
+      "event_type": "error",
+      "severity": "error",
+      "title": "Failed",
+      "description": "Failed to pull image \"nginx:invalid-tag\": rpc error: code = Unknown desc = Error response from daemon: manifest for nginx:invalid-tag not found",
+      "object_ref": "Pod/web-app-bad-image-xyz",
+      "attributes": {
+        "source": "kubelet",
+        "count": 5,
+        "raw_type": "Warning"
+      }
+    },
+    {
+      "timestamp": "2026-05-16T20:19:49.304316+00:00",
+      "event_type": "general",
+      "severity": "error",
+      "title": "BackOff",
+      "description": "Back-off restarting failed container",
+      "object_ref": "Pod/web-app-crash-abc",
+      "attributes": {
+        "source": "kubelet",
+        "count": 3,
+        "raw_type": "Warning"
+      }
+    }
+  ],
+  "pods": [
+    {
+      "name": "web-app-7f98d7c6b4-abcde",
+      "namespace": "default",
+      "phase": "Running",
+      "pod_ip": "10.244.1.10",
+      "host_ip": "192.168.1.100",
+      "start_time": "2026-05-16T20:14:49.304319+00:00",
+      "containers_ready": true,
+      "ready": true,
+      "restarts": 0,
+      "qos_class": "BestEffort",
+      "labels": {
+        "app": "web",
+        "pod-template-hash": "7f98d7c6b4"
+      },
+      "annotations": {},
+      "container_statuses": [
+        {
+          "name": "nginx",
+          "ready": true,
+          "restartCount": 0
+        }
+      ],
+      "raw_source": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "web-app-7f98d7c6b4-abcde",
+          "namespace": "default",
+          "labels": {
+            "app": "web",
+            "pod-template-hash": "7f98d7c6b4"
+          }
+        },
+        "spec": {
+          "containers": [
+            {
+              "name": "nginx",
+              "image": "nginx:1.21"
+            }
+          ]
+        },
+        "status": {
+          "phase": "Running",
+          "podIP": "10.244.1.10",
+          "hostIP": "192.168.1.100",
+          "startTime": "2026-05-16T20:14:49.304319Z",
+          "containerStatuses": [
+            {
+              "name": "nginx",
+              "ready": true,
+              "restartCount": 0
+            }
+          ],
+          "qosClass": "BestEffort"
+        }
+      }
+    },
+    {
+      "name": "web-app-7f98d7c6b4-fghij",
+      "namespace": "default",
+      "phase": "Running",
+      "pod_ip": "10.244.1.11",
+      "host_ip": "192.168.1.100",
+      "start_time": "2026-05-16T20:15:49.304319+00:00",
+      "containers_ready": true,
+      "ready": true,
+      "restarts": 0,
+      "qos_class": "BestEffort",
+      "labels": {
+        "app": "web",
+        "pod-template-hash": "7f98d7c6b4"
+      },
+      "annotations": {},
+      "container_statuses": [
+        {
+          "name": "nginx",
+          "ready": true,
+          "restartCount": 0
+        }
+      ],
+      "raw_source": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "web-app-7f98d7c6b4-fghij",
+          "namespace": "default",
+          "labels": {
+            "app": "web",
+            "pod-template-hash": "7f98d7c6b4"
+          }
+        },
+        "spec": {
+          "containers": [
+            {
+              "name": "nginx",
+              "image": "nginx:1.21"
+            }
+          ]
+        },
+        "status": {
+          "phase": "Running",
+          "podIP": "10.244.1.11",
+          "hostIP": "192.168.1.100",
+          "startTime": "2026-05-16T20:15:49.304319Z",
+          "containerStatuses": [
+            {
+              "name": "nginx",
+              "ready": true,
+              "restartCount": 0
+            }
+          ],
+          "qosClass": "BestEffort"
+        }
+      }
+    }
+  ],
+  "replicasets": [],
+  "deployment": null,
+  "image_changes": [],
+  "errors": [],
+  "parse_errors": [],
+  "summary": {
+    "total_events": 4,
+    "error_events": 2,
+    "warning_events": 0,
+    "info_events": 2,
+    "pods_count": 2,
+    "pods_ready": 2,
+    "total_restarts": 0,
+    "replicasets_count": 0
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "apps/v1",
+      "kind": "ReplicaSet",
+      "metadata": {
+        "name": "web-app-7f98d7c6b4",
+        "namespace": "default",
+        "labels": {
+          "app": "web",
+          "pod-template-hash": "7f98d7c6b4"
+        },
+        "creationTimestamp": "2026-05-16T20:07:49.304323Z"
+      },
+      "spec": {
+        "replicas": 2
+      },
+      "status": {
+        "replicas": 2,
+        "readyReplicas": 2,
+        "availableReplicas": 2
+      }
+    }
+  ],
+  "kind": "List"
+}
