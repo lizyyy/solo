@@ -212,15 +212,18 @@ def calculate_monthly_results(
                 db,
                 key=calculate_req.idempotency_key,
                 request_type="monthly_calculation",
-                response_data=json.dumps({"created_count": 0, "month": calculate_req.month})
+                response_data=json.dumps({"created_count": 0, "failed_count": 0, "month": calculate_req.month})
             )
             return schemas.SuccessResponse(
                 success=True,
                 message="No call records found for the specified month",
-                data={"processed_count": 0}
+                data={"processed_count": 0, "failed_count": 0}
             )
         
         created_count = 0
+        failed_count = 0
+        failures = []
+        
         for caller_id, api_group_id, total_calls in aggregated_records:
             result_idempotency_key = f"{calculate_req.idempotency_key}_{caller_id}_{api_group_id}"
             
@@ -240,19 +243,55 @@ def calculate_monthly_results(
                 )
                 created_count += 1
             except ValueError as e:
-                continue
+                failure_reason = str(e)
+                crud.create_failed_monthly_result(
+                    db,
+                    month=calculate_req.month,
+                    caller_id=caller_id,
+                    api_group_id=api_group_id,
+                    rule_id=rule.id,
+                    rule_version=rule.version,
+                    total_calls=total_calls,
+                    failure_reason=failure_reason,
+                    idempotency_key=result_idempotency_key
+                )
+                failed_count += 1
+                failures.append({
+                    "caller_id": caller_id,
+                    "api_group_id": api_group_id,
+                    "total_calls": total_calls,
+                    "reason": failure_reason
+                })
         
         crud.create_idempotent_record(
             db,
             key=calculate_req.idempotency_key,
             request_type="monthly_calculation",
-            response_data=json.dumps({"created_count": created_count, "month": calculate_req.month})
+            response_data=json.dumps({
+                "created_count": created_count,
+                "failed_count": failed_count,
+                "month": calculate_req.month,
+                "failures": failures
+            })
         )
+        
+        if failed_count > 0:
+            return schemas.SuccessResponse(
+                success=True,
+                message=f"Calculated {created_count} monthly results, {failed_count} failed. Check failures in response data.",
+                data={
+                    "created_count": created_count,
+                    "failed_count": failed_count,
+                    "month": calculate_req.month,
+                    "failures": failures,
+                    "has_failures": True
+                }
+            )
         
         return schemas.SuccessResponse(
             success=True,
             message=f"Successfully calculated {created_count} monthly results",
-            data={"created_count": created_count, "month": calculate_req.month}
+            data={"created_count": created_count, "failed_count": 0, "month": calculate_req.month}
         )
     
     except Exception as e:

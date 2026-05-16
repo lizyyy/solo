@@ -216,6 +216,31 @@ def create_monthly_result(
     return db_result
 
 
+def create_failed_monthly_result(
+    db: Session, month: str, caller_id: int, api_group_id: int,
+    rule_id: int, rule_version: int, total_calls: int, failure_reason: str,
+    idempotency_key: str
+) -> MonthlyResult:
+    db_result = MonthlyResult(
+        month=month,
+        caller_id=caller_id,
+        api_group_id=api_group_id,
+        rule_id=rule_id,
+        rule_version=rule_version,
+        total_calls=total_calls,
+        unit_price=0.0,
+        raw_cost=0.0,
+        allocated_cost=0.0,
+        status=AllocationStatus.FAILED,
+        failure_reason=failure_reason,
+        idempotency_key=idempotency_key
+    )
+    db.add(db_result)
+    db.commit()
+    db.refresh(db_result)
+    return db_result
+
+
 def validate_monthly_result(db: Session, result_id: int) -> Optional[MonthlyResult]:
     db_result = db.query(MonthlyResult).filter(MonthlyResult.id == result_id).first()
     if db_result and db_result.status == AllocationStatus.DRAFT:
