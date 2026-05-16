@@ -1,4 +1,5 @@
 ## 1. 架构设计
+
 ```mermaid
 flowchart LR
     Client["客户端/API调用方"] --> Router["API路由层"]
@@ -12,31 +13,39 @@ flowchart LR
 ```
 
 ## 2. 技术选型
-- 后端框架: Express@4 + TypeScript
-- 数据库: SQLite (内置，无需额外服务)
-- ORM: Prisma
-- 数据校验: Zod
-- 日志: Winston
-- 初始化工具: npm init
+
+* 后端框架: Express\@4 + TypeScript
+
+* 数据库: SQLite (内置，无需额外服务)
+
+* ORM: Prisma
+
+* 数据校验: Zod
+
+* 日志: Winston
+
+* 初始化工具: npm init
 
 ## 3. 路由定义
-| HTTP方法 | 路由 | 用途 |
-|----------|------|------|
-| POST | /api/secrets | 创建Secret |
-| GET | /api/secrets | 查询Secret列表 |
-| GET | /api/secrets/:name | 查询单个Secret详情 |
-| POST | /api/secrets/:name/references | 登记引用 |
-| GET | /api/secrets/:name/references | 查询引用列表 |
-| POST | /api/secrets/:name/access | 记录访问 |
-| PUT | /api/secrets/:name/status | 状态推进 |
-| POST | /api/secrets/:name/replacements | 创建替换计划 |
-| PUT | /api/replacements/:id/approve | 审批替换计划 |
-| POST | /api/secrets/:name/corrections | 人工修正 |
-| DELETE | /api/secrets/:name | 删除Secret（受保护） |
-| GET | /api/secrets/:name/report | 导出血缘报告 |
-| GET | /api/errors | 查询异常记录 |
+
+| HTTP方法 | 路由                              | 用途            |
+| ------ | ------------------------------- | ------------- |
+| POST   | /api/secrets                    | 创建Secret      |
+| GET    | /api/secrets                    | 查询Secret列表    |
+| GET    | /api/secrets/:name              | 查询单个Secret详情  |
+| POST   | /api/secrets/:name/references   | 登记引用          |
+| GET    | /api/secrets/:name/references   | 查询引用列表        |
+| POST   | /api/secrets/:name/access       | 记录访问          |
+| PUT    | /api/secrets/:name/status       | 状态推进          |
+| POST   | /api/secrets/:name/replacements | 创建替换计划        |
+| PUT    | /api/replacements/:id/approve   | 审批替换计划        |
+| POST   | /api/secrets/:name/corrections  | 人工修正          |
+| DELETE | /api/secrets/:name              | 删除Secret（受保护） |
+| GET    | /api/secrets/:name/report       | 导出血缘报告        |
+| GET    | /api/errors                     | 查询异常记录        |
 
 ## 4. API响应定义
+
 ```typescript
 // 通用响应
 interface ApiResponse<T> {
@@ -123,6 +132,7 @@ interface LineageReport {
 ```
 
 ## 5. 服务层架构
+
 ```mermaid
 flowchart TD
     Controller["API Controller"] --> SecretService["SecretService"]
@@ -142,6 +152,7 @@ flowchart TD
 ## 6. 数据模型
 
 ### 6.1 ER图
+
 ```mermaid
 erDiagram
     SECRET ||--o{ REFERENCE : has
@@ -219,6 +230,7 @@ erDiagram
 ```
 
 ### 6.2 Prisma Schema
+
 ```prisma
 model Secret {
   id           String        @id @default(uuid())
@@ -299,8 +311,10 @@ model ErrorRecord {
 ```
 
 ## 7. 核心业务规则实现
+
 1. **删除保护规则**: 删除前校验是否有活跃引用，有则拦截并记录ErrorRecord
-2. **状态机规则**: ACTIVE -> DEPRECATED -> PENDING_DELETION，不可逆
-3. **引用自动更新**: 登记引用时自动更新Secret的last_access时间
+2. **状态机规则**: ACTIVE -> DEPRECATED -> PENDING\_DELETION，不可逆
+3. **引用自动更新**: 登记引用时自动更新Secret的last\_access时间
 4. **审批规则**: 替换计划必须审批通过才能执行
 5. **审计规则**: 所有修改操作记录操作人和时间
+
