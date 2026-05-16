@@ -1,0 +1,39 @@
+replicaCount: 3
+
+image:
+  tag: v1.0.0
+  pullPolicy: Always
+
+service:
+  type: LoadBalancer
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+database:
+  host: prod-db.example.com
+  password: prod-secure-password-123
+
+ingress:
+  enabled: true
+  hosts:
+    - host: myapp.example.com
+      paths: [/]
+  tls:
+    - hosts:
+        - myapp.example.com
+      secretName: myapp-tls
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+logging:
+  level: warn

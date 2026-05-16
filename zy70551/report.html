@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Helm Values Audit Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .file-list { margin: 20px 0; }
+        .overrides { margin: 20px 0; }
+        .key { font-weight: bold; color: #2c3e50; }
+        .source { margin-left: 20px; color: #7f8c8d; }
+        .current { color: #27ae60; font-weight: bold; }
+        .sensitive { color: #e74c3c; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Helm Values Audit Report</h1>
+    <h2>Files Loaded</h2>
+    <div class="file-list">
+        <ul>
+        
+            <li>examples/values/base.yaml</li>
+        
+            <li>examples/values/prod.yaml</li>
+        
+        </ul>
+    </div>
+    <h2>Overridden Keys (16)</h2>
+    <div class="overrides">
+        <table>
+            <tr>
+                <th>Key</th>
+                <th>Value History</th>
+            </tr>
+        
+            <tr>
+                <td class="key">replicaCount</td>
+                <td>
+                
+                    <div class="source">
+                        1 @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        3 @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">image.tag</td>
+                <td>
+                
+                    <div class="source">
+                        latest @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        v1.0.0 @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">image.pullPolicy</td>
+                <td>
+                
+                    <div class="source">
+                        IfNotPresent @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        Always @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">service.type</td>
+                <td>
+                
+                    <div class="source">
+                        ClusterIP @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        LoadBalancer @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">resources.limits.cpu</td>
+                <td>
+                
+                    <div class="source">
+                        100m @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        500m @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">resources.limits.memory</td>
+                <td>
+                
+                    <div class="source">
+                        128Mi @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        512Mi @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">resources.requests.cpu</td>
+                <td>
+                
+                    <div class="source">
+                        50m @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        200m @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">resources.requests.memory</td>
+                <td>
+                
+                    <div class="source">
+                        64Mi @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        256Mi @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">database.host</td>
+                <td>
+                
+                    <div class="source">
+                        localhost @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        prod-db.example.com @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">database.password</td>
+                <td>
+                
+                    <div class="source">
+                        changeme @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        prod-secure-password-123 @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">ingress.enabled</td>
+                <td>
+                
+                    <div class="source">
+                        False @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        True @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">ingress.hosts</td>
+                <td>
+                
+                    <div class="source">
+                        [{'host': 'myapp.local', 'paths': ['/']}] @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        [{'host': 'myapp.example.com', 'paths': ['/']}] @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">autoscaling.enabled</td>
+                <td>
+                
+                    <div class="source">
+                        False @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        True @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">autoscaling.minReplicas</td>
+                <td>
+                
+                    <div class="source">
+                        1 @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        2 @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">autoscaling.maxReplicas</td>
+                <td>
+                
+                    <div class="source">
+                        5 @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        10 @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="key">logging.level</td>
+                <td>
+                
+                    <div class="source">
+                        info @ examples/values/base.yaml
+                    </div>
+                
+                    <div class="current">
+                        warn @ examples/values/prod.yaml
+                    </div>
+                
+                </td>
+            </tr>
+        
+        </table>
+    </div>
+    <h2>Sensitive Keys (1)</h2>
+    <ul>
+    
+        <li class="sensitive">database.password</li>
+    
+    </ul>
+</body>
+</html>
+        

@@ -1,0 +1,307 @@
+{
+  "files_loaded": [
+    "examples/values/base.yaml",
+    "examples/values/prod.yaml"
+  ],
+  "merged_values": {
+    "replicaCount": 3,
+    "image": {
+      "repository": "myapp",
+      "tag": "v1.0.0",
+      "pullPolicy": "Always"
+    },
+    "service": {
+      "type": "LoadBalancer",
+      "port": 80
+    },
+    "resources": {
+      "limits": {
+        "cpu": "500m",
+        "memory": "512Mi"
+      },
+      "requests": {
+        "cpu": "200m",
+        "memory": "256Mi"
+      }
+    },
+    "database": {
+      "host": "prod-db.example.com",
+      "port": 5432,
+      "name": "myapp",
+      "username": "admin",
+      "password": "********"
+    },
+    "ingress": {
+      "enabled": true,
+      "hosts": [
+        {
+          "host": "myapp.example.com",
+          "paths": [
+            "/"
+          ]
+        }
+      ],
+      "tls": [
+        {
+          "hosts": [
+            "myapp.example.com"
+          ],
+          "secretName": "myapp-tls"
+        }
+      ]
+    },
+    "autoscaling": {
+      "enabled": true,
+      "minReplicas": 2,
+      "maxReplicas": 10,
+      "targetCPUUtilizationPercentage": 70
+    },
+    "logging": {
+      "level": "warn",
+      "format": "json"
+    }
+  },
+  "overridden_keys": {
+    "replicaCount": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": 1,
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": 3,
+        "is_overridden": false
+      }
+    ],
+    "image.tag": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "latest",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "v1.0.0",
+        "is_overridden": false
+      }
+    ],
+    "image.pullPolicy": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "IfNotPresent",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "Always",
+        "is_overridden": false
+      }
+    ],
+    "service.type": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "ClusterIP",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "LoadBalancer",
+        "is_overridden": false
+      }
+    ],
+    "resources.limits.cpu": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "100m",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "500m",
+        "is_overridden": false
+      }
+    ],
+    "resources.limits.memory": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "128Mi",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "512Mi",
+        "is_overridden": false
+      }
+    ],
+    "resources.requests.cpu": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "50m",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "200m",
+        "is_overridden": false
+      }
+    ],
+    "resources.requests.memory": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "64Mi",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "256Mi",
+        "is_overridden": false
+      }
+    ],
+    "database.host": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "localhost",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "prod-db.example.com",
+        "is_overridden": false
+      }
+    ],
+    "database.password": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "********",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "********",
+        "is_overridden": false
+      }
+    ],
+    "ingress.enabled": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": false,
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": true,
+        "is_overridden": false
+      }
+    ],
+    "ingress.hosts": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": [
+          {
+            "host": "myapp.local",
+            "paths": [
+              "/"
+            ]
+          }
+        ],
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": [
+          {
+            "host": "myapp.example.com",
+            "paths": [
+              "/"
+            ]
+          }
+        ],
+        "is_overridden": false
+      }
+    ],
+    "autoscaling.enabled": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": false,
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": true,
+        "is_overridden": false
+      }
+    ],
+    "autoscaling.minReplicas": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": 1,
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": 2,
+        "is_overridden": false
+      }
+    ],
+    "autoscaling.maxReplicas": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": 5,
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": 10,
+        "is_overridden": false
+      }
+    ],
+    "logging.level": [
+      {
+        "file_path": "examples/values/base.yaml",
+        "line_number": null,
+        "value": "info",
+        "is_overridden": true
+      },
+      {
+        "file_path": "examples/values/prod.yaml",
+        "line_number": null,
+        "value": "warn",
+        "is_overridden": false
+      }
+    ]
+  },
+  "sensitive_keys": [
+    "database.password"
+  ]
+}
