@@ -59,6 +59,21 @@ class ContractProcessor:
         
         return len(differences) == 0, differences
     
+    def _compare_payment_receipts(self, r1: List[Dict], r2: List[Dict]) -> Tuple[bool, List[str]]:
+        differences = []
+        if len(r1) != len(r2):
+            differences.append(f"支付回执数量不一致: {len(r1)} vs {len(r2)}")
+            return False, differences
+        
+        receipt_keys = {'receipt_id', 'payment_channel', 'amount', 'manual_remark', 'caller'}
+        
+        for i, (rec1, rec2) in enumerate(zip(r1, r2)):
+            same, diff = self._compare_dicts(rec1, rec2, receipt_keys)
+            if not same:
+                differences.append(f"回执[{i}]差异: {', '.join(diff)}")
+        
+        return len(differences) == 0, differences
+    
     def compare_submission_content(self, new_submission: Dict[str, Any], 
                                   old_submission: Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
         differences = {}
@@ -85,6 +100,12 @@ class ContractProcessor:
         
         if new_submission.get('batch_id') != old_submission.get('batch_id'):
             differences['batch_id'] = [f"{old_submission.get('batch_id')} -> {new_submission.get('batch_id')}"]
+        
+        new_receipts = new_submission.get('payment_receipts', [])
+        old_receipts = old_submission.get('payment_receipts', [])
+        _, receipt_diff = self._compare_payment_receipts(new_receipts, old_receipts)
+        if receipt_diff:
+            differences['payment_receipts'] = receipt_diff
         
         is_same = len(differences) == 0
         return is_same, differences
@@ -163,6 +184,7 @@ class ContractProcessor:
             
             if existing_result.get('status') == ContractStatus.VERIFIED:
                 if is_content_same:
+                    self.save_payment_receipts(submission_data)
                     return ProcessingResult(
                         batch_id=batch_id,
                         contract_id=contract_id,
@@ -171,10 +193,12 @@ class ContractProcessor:
                         original_batch_id=existing_result.get('batch_id'),
                         details={
                             "message": "复用之前的校验通过结果，提交内容完全一致",
-                            "original_batch_id": existing_result.get('batch_id')
+                            "original_batch_id": existing_result.get('batch_id'),
+                            "note": "支付回执已按新提交更新保存，支持按调用方查询"
                         }
                     )
                 else:
+                    self.save_payment_receipts(submission_data)
                     return ProcessingResult(
                         batch_id=batch_id,
                         contract_id=contract_id,
@@ -187,10 +211,12 @@ class ContractProcessor:
                             "message": "合同ID相同但提交内容不一致，请核实是否为重传",
                             "content_differences": differences,
                             "original_batch_id": existing_result.get('batch_id'),
-                            "original_status": existing_result.get('status')
+                            "original_status": existing_result.get('status'),
+                            "note": "支付回执已按新提交更新保存，支持按调用方查询"
                         }
                     )
             else:
+                self.save_payment_receipts(submission_data)
                 return ProcessingResult(
                     batch_id=batch_id,
                     contract_id=contract_id,
@@ -200,7 +226,8 @@ class ContractProcessor:
                     original_batch_id=existing_result.get('batch_id'),
                     details={
                         "original_status": existing_result.get('status'),
-                        "content_differences": differences if not is_content_same else {}
+                        "content_differences": differences if not is_content_same else {},
+                        "note": "支付回执已按新提交更新保存，支持按调用方查询"
                     }
                 )
         

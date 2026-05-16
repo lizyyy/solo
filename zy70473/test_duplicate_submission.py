@@ -151,6 +151,72 @@ def test_scenario_5_batch_id_change():
     print("✓ 场景5通过: 批次ID变更时正确返回冲突")
 
 
+def test_scenario_6_payment_receipt_change():
+    print("\n=== 场景6: 同一合同ID仅支付回执有变更（修改人工备注和调用方） ===")
+    cleanup_data()
+    
+    generator = DemoDataGenerator()
+    batch = generator.get_demo_batch(include_error=False)
+    contract_original = batch[0].copy()
+    
+    processor = ContractProcessor()
+    result1 = processor.process_submission(contract_original)
+    
+    contract_modified = contract_original.copy()
+    receipts = contract_modified['payment_receipts'].copy()
+    receipts[0]['manual_remark'] = "更新后的人工备注"
+    receipts[0]['caller'] = "new_caller_service_001"
+    contract_modified['payment_receipts'] = receipts
+    
+    result2 = processor.process_submission(contract_modified)
+    
+    print(f"合同ID: {contract_original['contract_id']}")
+    print(f"首次提交状态: {result1.status}")
+    print(f"回执变更后提交状态: {result2.status}")
+    print(f"是否复用: {result2.is_reused}")
+    if result2.details:
+        print(f"内容差异: {result2.details.get('content_differences', {})}")
+    
+    receipts = processor.storage.get_receipts_by_caller("new_caller_service_001")
+    print(f"按新调用方查询到的回执数量: {len(receipts)}")
+    
+    assert result1.status == 'verified'
+    assert result2.status == 'conflict', f"支付回执变更应返回冲突"
+    assert result2.is_reused == False
+    assert len(receipts) > 0, "新调用方应能查询到支付回执"
+    assert receipts[0]['manual_remark'] == "更新后的人工备注", "人工备注应已更新"
+    print("✓ 场景6通过: 支付回执变更时正确返回冲突，且能按新调用方查询")
+
+
+def test_scenario_7_same_receipts_also_save():
+    print("\n=== 场景7: 内容完全相同复用时，回执仍能按原调用方也能查询 ===")
+    cleanup_data()
+    
+    generator = DemoDataGenerator()
+    batch = generator.get_demo_batch(include_error=False)
+    contract = batch[1].copy()
+    original_caller = contract['payment_receipts'][0]['caller']
+    
+    processor = ContractProcessor()
+    result1 = processor.process_submission(contract)
+    
+    result2 = processor.process_submission(contract)
+    
+    print(f"合同ID: {contract['contract_id']}")
+    print(f"首次提交状态: {result1.status}")
+    print(f"再次提交状态: {result2.status}")
+    print(f"是否复用: {result2.is_reused}")
+    
+    receipts = processor.storage.get_receipts_by_caller(original_caller)
+    print(f"按原调用方查询到的回执数量: {len(receipts)}")
+    
+    assert result1.status == 'verified'
+    assert result2.status == 'verified'
+    assert result2.is_reused == True
+    assert len(receipts) >= 1, "即使复用时也能按原调用方查询到回执"
+    print("✓ 场景7通过: 内容复用时也正确保存回执，可按调用方查询")
+
+
 if __name__ == '__main__':
     print("=" * 60)
     print("重复提交处理逻辑测试")
@@ -162,6 +228,8 @@ if __name__ == '__main__':
         test_scenario_3_modified_contract()
         test_scenario_4_modified_supplements()
         test_scenario_5_batch_id_change()
+        test_scenario_6_payment_receipt_change()
+        test_scenario_7_same_receipts_also_save()
         
         print("\n" + "=" * 60)
         print("✓ 所有测试场景通过！")
