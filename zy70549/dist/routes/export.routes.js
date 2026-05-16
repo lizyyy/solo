@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const export_controller_1 = require("../controllers/export.controller");
+const router = (0, express_1.Router)();
+router.post("/", export_controller_1.ExportController.createRequest);
+router.get("/", export_controller_1.ExportController.getRequests);
+router.get("/:id", export_controller_1.ExportController.getRequestById);
+router.post("/:id/approve", export_controller_1.ExportController.approveRequest);
+router.post("/:id/reject", export_controller_1.ExportController.rejectRequest);
+router.post("/:id/verify", export_controller_1.ExportController.verifyHashChain);
+router.post("/:id/report", export_controller_1.ExportController.generateReport);
+router.get("/:id/export", export_controller_1.ExportController.exportEvents);
+router.get("/:id/history", export_controller_1.ExportController.getProcessingHistory);
+exports.default = router;
