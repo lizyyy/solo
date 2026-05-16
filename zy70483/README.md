@@ -263,7 +263,7 @@ node src/index.js bus-query --line 1
 |------|------|------|
 | `start-order` | 计算依赖启动顺序 | `--services` 指定服务列表 |
 | `cert-issue` | 签发离线证书 | `--demo` 加载演示数据 |
-| `rollback` | 执行回滚操作 | `--batch` 指定批次 |
+| `rollback` | 执行回滚操作 | `--batch` 指定批次, `--preview` 仅生成清单, `--yes` 跳过确认 |
 | `history` | 查询历史记录 | `--batch` `--operator` `--risk` |
 | `bus-import` | 导入班车预约 | `--file` CSV文件路径 |
 | `bus-query` | 查询班车预约 | `--line` 原始行号 |

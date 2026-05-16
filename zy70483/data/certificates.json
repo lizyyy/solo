@@ -1,38 +1,38 @@
 [
   {
-    "id": "908450fb-7ca7-478a-9df2-a9fcbb85bb54",
-    "batchId": "7b65050e",
+    "id": "7dfba2ed-370e-4268-ad51-c61f1c058f1f",
+    "batchId": "70de1478",
     "name": "服务器证书-001",
     "operator": "admin",
-    "issueDate": "2026-05-15T23:49:16.977Z",
+    "issueDate": "2026-05-16T00:50:43.807Z",
     "status": "rolled_back",
     "riskType": "low",
     "hasEvidence": true,
     "evidence": "审批流#2024001",
     "ruleVersion": "v1.0",
     "remark": "生产环境服务器证书",
-    "rollbackDate": "2026-05-15T23:49:35.144Z"
+    "rollbackDate": "2026-05-16T00:50:43.877Z"
   },
   {
-    "id": "4424eb1c-179e-4ae1-a25a-993bd5c1916d",
-    "batchId": "7b65050e",
+    "id": "5801436b-50ad-4cb8-9157-0915245c4c18",
+    "batchId": "70de1478",
     "name": "API网关证书-002",
     "operator": "operator1",
-    "issueDate": "2026-05-15T23:49:16.977Z",
+    "issueDate": "2026-05-16T00:50:43.807Z",
     "status": "rolled_back",
     "riskType": "medium",
     "hasEvidence": true,
     "evidence": "审批流#2024002",
     "ruleVersion": "v1.0",
     "remark": "API网关HTTPS证书",
-    "rollbackDate": "2026-05-15T23:49:35.144Z"
+    "rollbackDate": "2026-05-16T00:50:43.878Z"
   },
   {
-    "id": "d7197c6a-31ad-42d4-a795-a8d70cf963a7",
-    "batchId": "7b65050e",
+    "id": "6d02622a-2452-427c-847d-397b9a9c1117",
+    "batchId": "70de1478",
     "name": "回滚测试证书-NOEVIDENCE",
     "operator": "operator2",
-    "issueDate": "2026-05-15T23:49:16.977Z",
+    "issueDate": "2026-05-16T00:50:43.807Z",
     "status": "issued",
     "riskType": "high",
     "hasEvidence": false,
@@ -41,17 +41,17 @@
     "remark": "专门用于回滚复核测试，无审批证据"
   },
   {
-    "id": "dc7d01cc-0df6-4413-b4e2-42bc8ebf7ef7",
-    "batchId": "3ff9204f",
+    "id": "828bc3c1-d9ea-4a0d-abf6-ffbeb19fe5a2",
+    "batchId": "db823477",
     "name": "数据库证书-003",
     "operator": "dba",
-    "issueDate": "2026-05-15T23:49:16.977Z",
+    "issueDate": "2026-05-16T00:50:43.807Z",
     "status": "rolled_back",
     "riskType": "high",
     "hasEvidence": true,
     "evidence": "审批流#2024003",
     "ruleVersion": "v1.0",
     "remark": "数据库连接加密证书",
-    "rollbackDate": "2026-05-15T23:49:35.144Z"
+    "rollbackDate": "2026-05-16T00:50:43.878Z"
   }
 ]

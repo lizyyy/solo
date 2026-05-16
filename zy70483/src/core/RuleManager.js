@@ -147,7 +147,7 @@ class RuleManager {
 
   getChangesFromPrevious(version) {
     const index = this.rules.findIndex(r => r.version === version);
-    if (index <= 0) return '无历史版本，为初始规则';
+    if (index <= 0) return ['初始规则，无前序版本'];
 
     const current = this.rules[index];
     const previous = this.rules[index - 1];

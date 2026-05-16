@@ -8,5 +8,15 @@
     "operator": "operator2",
     "hasEvidence": false,
     "riskType": "high"
+  },
+  {
+    "id": "6d02622a-2452-427c-847d-397b9a9c1117",
+    "name": "回滚测试证书-NOEVIDENCE",
+    "batchId": "70de1478",
+    "error": "无审批证据，无法回滚",
+    "failedAt": "2026-05-16T00:50:43.878Z",
+    "operator": "operator2",
+    "hasEvidence": false,
+    "riskType": "high"
   }
 ]

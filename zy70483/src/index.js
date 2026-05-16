@@ -2,6 +2,7 @@
 
 const { program } = require('commander');
 const chalk = require('chalk');
+const readline = require('readline');
 const DependencyManager = require('./core/DependencyManager');
 const CertificateManager = require('./core/CertificateManager');
 const HistoryManager = require('./core/HistoryManager');
@@ -48,10 +49,42 @@ program
   .description('回滚操作')
   .option('-b, --batch <batchId>', '批次ID')
   .option('-t, --type <type>', '操作类型')
-  .action((options) => {
+  .option('-p, --preview', '仅生成候选清单，不执行回滚')
+  .option('-y, --yes', '跳过确认，直接执行回滚')
+  .action(async (options) => {
     console.log(chalk.blue('\n=== 回滚操作 ===\n'));
     const candidates = certManager.generateRollbackCandidates(options);
     certManager.printCandidates(candidates);
+
+    if (candidates.total === 0) {
+      console.log(chalk.yellow('⚠️  没有可回滚的候选记录'));
+      return;
+    }
+
+    if (options.preview) {
+      console.log(chalk.green('✅ 预览模式，仅生成候选清单，不执行回滚'));
+      console.log(chalk.gray('如需执行回滚，请移除 --preview 参数并确认操作'));
+      return;
+    }
+
+    if (!options.yes) {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+
+      const answer = await new Promise((resolve) => {
+        rl.question(chalk.yellow('⚠️  请确认是否执行回滚？此操作不可撤销 (yes/no): '), resolve);
+      });
+      rl.close();
+
+      if (answer.toLowerCase() !== 'yes' && answer.toLowerCase() !== 'y') {
+        console.log(chalk.yellow('⚠️  用户取消操作，未执行回滚'));
+        return;
+      }
+    }
+
+    console.log(chalk.green('\n✅ 开始执行回滚...\n'));
     const result = certManager.executeRollback(candidates);
     certManager.printRollbackResult(result);
     historyManager.record('rollback', 'system', result);
