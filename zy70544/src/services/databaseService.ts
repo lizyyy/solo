@@ -170,13 +170,18 @@ export class DatabaseService {
     );
   }
 
-  async markAsFailed(applicationId: string, failureReason: string, processingBasis: string): Promise<void> {
+  async markAsFailed(applicationId: string, failureReason: string, processingBasis: string, finalConclusion: string): Promise<void> {
     const now = new Date().toISOString();
     await this.runAsync(
       `UPDATE recalculation_applications 
-       SET status = ?, failure_reason = ?, processing_basis = ?, updated_at = ? 
+       SET status = ?, failure_reason = ?, processing_basis = ?, final_conclusion = ?, updated_at = ? 
        WHERE id = ?`,
-      [RecalculationStatus.FAILED, failureReason, processingBasis, now, applicationId]
+      [RecalculationStatus.FAILED, failureReason, processingBasis, finalConclusion, now, applicationId]
+    );
+    await this.createSnapshot(
+      applicationId, 
+      'FAILED_PROCESSING', 
+      JSON.stringify({ failureReason, processingBasis, finalConclusion, failedAt: now })
     );
   }
 

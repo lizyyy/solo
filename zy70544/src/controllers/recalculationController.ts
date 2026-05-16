@@ -163,7 +163,7 @@ export class RecalculationController {
       const { failureReason, processingBasis } = req.body;
 
       if (!failureReason || !processingBasis) {
-        res.status(400).json({ error: '失败原因和处理依据是必填项' });
+        res.status(400).json({ error: '失败原因、处理依据和最终结论是必填项' });
         return;
       }
 
@@ -173,7 +173,7 @@ export class RecalculationController {
         return;
       }
 
-      await this.dbService.markAsFailed(id, failureReason, processingBasis);
+      await this.dbService.markAsFailed(id, failureReason, processingBasis, finalConclusion);
 
       const updatedApplication = await this.dbService.getApplicationById(id);
       res.status(200).json({
