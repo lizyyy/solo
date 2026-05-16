@@ -1,0 +1,22 @@
+{
+  "name": "data-deletion-grace-api",
+  "version": "1.0.0",
+  "description": "数据删除宽限API - 支持删除申请、宽限期管理、撤销、清除及证明留存",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "init-db": "node src/scripts/initDB.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "joi": "^17.11.0",
+    "cors": "^2.8.5"
+  },
+  "keywords": ["deletion", "grace-period", "compliance", "api"],
+  "author": "",
+  "license": "MIT"
+}
