@@ -1,8 +1,31 @@
 #!/usr/bin/env python3
 import requests
 import json
+import subprocess
+import time
+import atexit
 
-BASE_URL = 'http://localhost:5000/api'
+BASE_URL = 'http://localhost:5001/api'
+
+server_process = None
+
+def start_server():
+    global server_process
+    print("正在启动后端服务...")
+    server_process = subprocess.Popen(
+        ['python3', 'app.py'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    time.sleep(3)
+    print("服务启动完成\n")
+    
+    def cleanup():
+        if server_process:
+            server_process.terminate()
+            server_process.wait()
+    
+    atexit.register(cleanup)
 
 def print_step(title, data=None):
     print(f"\n{'='*60}")
@@ -183,6 +206,8 @@ def test_strategy_explanation(batch_id):
 def main():
     print("响应压缩策略后端服务 - 完整流程测试")
     print("=" * 60)
+    
+    start_server()
     
     try:
         import_batch_id = test_supplier_import()
