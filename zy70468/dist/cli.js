@@ -167,12 +167,12 @@ program
     console.log(`  风险类型: ${record.riskType}`);
     console.log(`  状态: ${record.status}`);
     console.log(`  当前审批节点: ${record.currentApprovalNode}`);
+    console.log(`  创建时间: ${new Date(record.createdAt).toLocaleString()}`);
+    console.log(`  更新时间: ${new Date(record.updatedAt).toLocaleString()}`);
     console.log();
-    console.log('【金额信息】');
+    console.log('【系统原始判断】');
     console.log(`  原金额: ¥${record.originalAmount.toFixed(2)}`);
     console.log(`  红冲金额: ¥${record.redFlushAmount.toFixed(2)}`);
-    console.log();
-    console.log('【文件信息】');
     console.log(`  归档路径: ${record.archivePath}`);
     console.log(`  材料摘要: ${record.materialSummary}`);
     if (record.failureReason) {
@@ -185,20 +185,24 @@ program
     }
     else {
         record.smsRecords.forEach((sms, i) => {
-            console.log(`  [${i + 1}] ${sms.phone} | ${sms.status} | ${new Date(sms.sendTime).toLocaleString()}`);
+            console.log(`  [${i + 1}] 短信ID: ${sms.id}`);
+            console.log(`      手机号: ${sms.phone}`);
+            console.log(`      状态: ${sms.status}`);
+            console.log(`      发送时间: ${new Date(sms.sendTime).toLocaleString()}`);
             console.log(`      内容: ${sms.content}`);
         });
     }
     console.log();
-    console.log('【人工修正历史】');
+    console.log('【人工修正历史（不覆盖系统原始判断）】');
     if (corrections.length === 0) {
         console.log('  暂无修正记录');
     }
     else {
         corrections.forEach((c, i) => {
-            console.log(`  [${i + 1}] 字段: ${c.fieldName}`);
-            console.log(`      原值: ${c.oldValue}`);
-            console.log(`      新值: ${c.newValue}`);
+            console.log(`  [${i + 1}] 修正ID: ${c.id}`);
+            console.log(`      字段: ${c.fieldName}`);
+            console.log(`      系统原值: ${c.oldValue}`);
+            console.log(`      人工修正值: ${c.newValue}`);
             console.log(`      操作人: ${c.operator}`);
             console.log(`      备注: ${c.remark}`);
             console.log(`      审批节点: ${c.approvalNode}`);
@@ -215,20 +219,25 @@ program
     .action(async (options) => {
     await (0, changeIndexService_1.initDB)();
     if (options.node) {
-        const records = (0, changeIndexService_1.queryRecords)({}).filter(r => r.currentApprovalNode === options.node);
-        console.log(`\n审批节点 "${options.node}" 的记录:\n`);
-        records.forEach((record, i) => {
-            const corrections = (0, changeIndexService_1.getApprovalNodeHistory)(record.id);
-            console.log(`[${i + 1}] ${record.invoiceNumber} - ${record.operator}`);
-            console.log(`    修正次数: ${corrections.length}`);
-            if (corrections.length > 0) {
-                corrections.forEach((c, j) => {
+        const recordsWithCorrections = (0, changeIndexService_1.getRecordsByApprovalNode)(options.node);
+        console.log(`\n审批节点 "${options.node}" 的修正记录:\n`);
+        if (recordsWithCorrections.length === 0) {
+            console.log('  该审批节点暂无修正记录');
+        }
+        else {
+            recordsWithCorrections.forEach((item, i) => {
+                console.log(`[${i + 1}] ${item.record.invoiceNumber} - ${item.record.operator}`);
+                console.log(`    该节点修正次数: ${item.corrections.length}`);
+                item.corrections.forEach((c, j) => {
                     console.log(`      [${j + 1}] ${c.fieldName}: ${c.oldValue} → ${c.newValue}`);
+                    console.log(`          修正ID: ${c.id}`);
+                    console.log(`          操作人: ${c.operator}`);
                     console.log(`          备注: ${c.remark}`);
+                    console.log(`          修正时间: ${new Date(c.correctedAt).toLocaleString()}`);
                 });
-            }
-            console.log();
-        });
+                console.log();
+            });
+        }
     }
     else {
         console.log('\n可用审批节点:');

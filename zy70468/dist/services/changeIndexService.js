@@ -97,7 +97,6 @@ async function manualCorrect(recordId, fieldName, oldValue, newValue, operator, 
         correctedAt: new Date().toISOString()
     };
     await db.insertCorrection(correction);
-    record[fieldName] = newValue;
     record.status = types_1.ProcessingStatus.MANUAL_CORRECTED;
     record.updatedAt = new Date().toISOString();
     await db.updateRecord(record);
@@ -121,6 +120,7 @@ function exportToMarkdown(filter = {}) {
     records.forEach((record, index) => {
         const corrections = db.getCorrectionsByRecordId(record.id);
         md += `## 记录 ${index + 1}: ${record.invoiceNumber}\n\n`;
+        md += `- **记录ID**: ${record.id}\n`;
         md += `- **批次ID**: ${record.batchId}\n`;
         md += `- **操作人**: ${record.operator}\n`;
         md += `- **风险类型**: ${record.riskType}\n`;
@@ -131,23 +131,24 @@ function exportToMarkdown(filter = {}) {
         md += `- **归档路径**: ${record.archivePath}\n`;
         md += `- **材料摘要**: ${record.materialSummary}\n`;
         md += `- **创建时间**: ${new Date(record.createdAt).toLocaleString()}\n`;
+        md += `- **更新时间**: ${new Date(record.updatedAt).toLocaleString()}\n`;
         if (record.failureReason) {
             md += `- **失败原因**: ${record.failureReason}\n`;
         }
         if (record.smsRecords.length > 0) {
             md += `\n### 短信发送清单\n\n`;
-            md += '| 手机号 | 内容 | 发送时间 | 状态 |\n';
-            md += '|--------|------|----------|------|\n';
+            md += '| 短信ID | 手机号 | 内容 | 发送时间 | 状态 |\n';
+            md += '|--------|--------|------|----------|------|\n';
             record.smsRecords.forEach(sms => {
-                md += `| ${sms.phone} | ${sms.content} | ${new Date(sms.sendTime).toLocaleString()} | ${sms.status} |\n`;
+                md += `| ${sms.id} | ${sms.phone} | ${sms.content} | ${new Date(sms.sendTime).toLocaleString()} | ${sms.status} |\n`;
             });
         }
         if (corrections.length > 0) {
             md += `\n### 人工修正记录\n\n`;
-            md += '| 字段 | 原值 | 新值 | 操作人 | 备注 | 审批节点 | 修正时间 |\n';
-            md += '|------|------|------|--------|------|----------|----------|\n';
+            md += '| 修正ID | 字段 | 原值 | 新值 | 操作人 | 备注 | 审批节点 | 修正时间 |\n';
+            md += '|--------|------|------|------|--------|------|----------|----------|\n';
             corrections.forEach(c => {
-                md += `| ${c.fieldName} | ${c.oldValue} | ${c.newValue} | ${c.operator} | ${c.remark} | ${c.approvalNode} | ${new Date(c.correctedAt).toLocaleString()} |\n`;
+                md += `| ${c.id} | ${c.fieldName} | ${c.oldValue} | ${c.newValue} | ${c.operator} | ${c.remark} | ${c.approvalNode} | ${new Date(c.correctedAt).toLocaleString()} |\n`;
             });
         }
         md += '\n---\n\n';
@@ -166,7 +167,14 @@ function getBatches() {
     return getDB().getBatches();
 }
 function getRecordsByApprovalNode(approvalNode) {
-    return getDB().getRecords({}).filter(r => r.currentApprovalNode === approvalNode);
+    const db = getDB();
+    const corrections = db.getCorrectionsByApprovalNode(approvalNode);
+    const recordIds = [...new Set(corrections.map(c => c.recordId))];
+    const records = recordIds.map(id => db.getRecordById(id)).filter(Boolean);
+    return records.map(record => ({
+        record,
+        corrections: db.getCorrectionsByRecordId(record.id).filter(c => c.approvalNode === approvalNode)
+    }));
 }
 function getApprovalNodeHistory(recordId) {
     return getDB().getCorrectionsByRecordId(recordId);

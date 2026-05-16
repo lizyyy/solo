@@ -1,0 +1,299 @@
+[
+  {
+    "id": "31c8274f-3d5c-4aab-90cc-c551f54380f4",
+    "batchId": "21d702f8-f462-4d33-b86c-f69fef5cae24",
+    "invoiceNumber": "FP20260516489829",
+    "originalAmount": 41000,
+    "redFlushAmount": 41000,
+    "archivePath": "/data/archives/202401/batch2_success_002.zip",
+    "operator": "李四",
+    "riskType": "data_inconsistency",
+    "status": "success",
+    "currentApprovalNode": "completed",
+    "materialSummary": "数据不一致已人工核实修正",
+    "smsRecords": [
+      {
+        "id": "fa28e231-002f-462c-b1c3-3e5159abfd87",
+        "phone": "13800138001",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516573136",
+        "sendTime": "2026-05-15T08:42:52.596Z",
+        "status": "failed"
+      },
+      {
+        "id": "9180e8db-3442-44e4-b4db-142f183ef320",
+        "phone": "13900139002",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516385795",
+        "sendTime": "2026-05-15T01:18:17.994Z",
+        "status": "pending"
+      }
+    ],
+    "createdAt": "2026-05-14T07:57:41.974Z",
+    "updatedAt": "2026-05-14T07:57:41.974Z",
+    "corrections": []
+  },
+  {
+    "id": "b04059ef-35bc-4cca-8478-31fac6ef1de5",
+    "batchId": "21d702f8-f462-4d33-b86c-f69fef5cae24",
+    "invoiceNumber": "FP20260516511895",
+    "originalAmount": 7800,
+    "redFlushAmount": 7800,
+    "archivePath": "/data/archives/202401/batch2_success_001.zip",
+    "operator": "李四",
+    "riskType": "manual_review_required",
+    "status": "success",
+    "currentApprovalNode": "completed",
+    "materialSummary": "红冲金额较小，自动审核通过",
+    "smsRecords": [
+      {
+        "id": "6254f4da-6656-4ea1-a8ef-34f4067711aa",
+        "phone": "13800138001",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516050545",
+        "sendTime": "2026-05-15T10:04:12.000Z",
+        "status": "failed"
+      }
+    ],
+    "createdAt": "2026-05-14T05:33:41.974Z",
+    "updatedAt": "2026-05-14T05:33:41.974Z",
+    "corrections": []
+  },
+  {
+    "id": "a63c5d21-77c8-4d8b-968b-5151d362cbd8",
+    "batchId": "21d702f8-f462-4d33-b86c-f69fef5cae24",
+    "invoiceNumber": "FP20260516033850",
+    "originalAmount": 22000,
+    "redFlushAmount": 22000,
+    "archivePath": "/data/archives/202401/missing_file.zip",
+    "operator": "李四",
+    "riskType": "compression_path_error",
+    "status": "manual_corrected",
+    "currentApprovalNode": "risk_assessment",
+    "failureReason": "压缩包路径异常：文件不存在或已被移动 /data/archives/202401/missing_file.zip",
+    "materialSummary": "红字专用发票开具材料",
+    "smsRecords": [
+      {
+        "id": "3db40950-6a5f-4a06-aa84-23ce928bb8d3",
+        "phone": "13800138001",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516689217",
+        "sendTime": "2026-05-15T09:38:22.331Z",
+        "status": "failed"
+      },
+      {
+        "id": "14736570-9c35-40dd-a60f-ca15551c6d8e",
+        "phone": "13900139002",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516165499",
+        "sendTime": "2026-05-15T04:59:02.715Z",
+        "status": "pending"
+      }
+    ],
+    "createdAt": "2026-05-14T03:09:41.974Z",
+    "updatedAt": "2026-05-16T00:45:49.068Z",
+    "corrections": [
+      {
+        "id": "c9b3c9aa-0ccd-4477-9baf-b5821f569375",
+        "recordId": "a63c5d21-77c8-4d8b-968b-5151d362cbd8",
+        "fieldName": "archivePath",
+        "oldValue": "/data/archives/202401/missing_file.zip",
+        "newValue": "/data/archives/202401/corrected_file.zip",
+        "operator": "管理员",
+        "remark": "修正文件路径错误，移至正确目录",
+        "approvalNode": "risk_assessment",
+        "correctedAt": "2026-05-16T00:45:49.066Z"
+      }
+    ]
+  },
+  {
+    "id": "f4802b8a-a7a4-4197-934f-aa7863fdbceb",
+    "batchId": "21d702f8-f462-4d33-b86c-f69fef5cae24",
+    "invoiceNumber": "FP20260516726690",
+    "originalAmount": 35000,
+    "redFlushAmount": 35000,
+    "archivePath": "/data/temp/未命名文件夹 1.zip",
+    "operator": "李四",
+    "riskType": "compression_path_error",
+    "status": "failed",
+    "currentApprovalNode": "upload",
+    "failureReason": "压缩包路径异常：路径包含中文空格和特殊字符，系统无法正确解析 \"/data/temp/未命名文件夹 1.zip\"",
+    "materialSummary": "跨年发票红冲申请，需主管税务机关审批",
+    "smsRecords": [
+      {
+        "id": "f25a6d2d-a55f-4b56-813a-58d2efafded0",
+        "phone": "13800138001",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516710660",
+        "sendTime": "2026-05-15T12:51:07.717Z",
+        "status": "failed"
+      },
+      {
+        "id": "21c97ada-db96-466b-8a8b-77ccded29312",
+        "phone": "13900139002",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516393027",
+        "sendTime": "2026-05-15T20:55:12.608Z",
+        "status": "pending"
+      },
+      {
+        "id": "682acb86-f902-4717-bd28-6c3e252eeb2d",
+        "phone": "13700137003",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516870678",
+        "sendTime": "2026-05-15T10:46:05.264Z",
+        "status": "sent"
+      }
+    ],
+    "createdAt": "2026-05-14T00:45:41.974Z",
+    "updatedAt": "2026-05-14T00:45:41.974Z",
+    "corrections": []
+  },
+  {
+    "id": "1ee24de7-9e3e-475f-a712-49146be55739",
+    "batchId": "f9f285f9-5f97-4c79-b8c9-7e28a67ef371",
+    "invoiceNumber": "FP20260516455942",
+    "originalAmount": 9500,
+    "redFlushAmount": 9500,
+    "archivePath": "/data/archives/202401/success_003.zip",
+    "operator": "张三",
+    "riskType": "manual_review_required",
+    "status": "success",
+    "currentApprovalNode": "completed",
+    "materialSummary": "纸质发票红冲，已回收原票",
+    "smsRecords": [
+      {
+        "id": "b3606285-4e18-4eec-af34-6276c08cb2b6",
+        "phone": "13800138001",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516847374",
+        "sendTime": "2026-05-15T13:03:44.822Z",
+        "status": "failed"
+      }
+    ],
+    "createdAt": "2026-05-13T10:21:41.974Z",
+    "updatedAt": "2026-05-13T10:21:41.974Z",
+    "corrections": []
+  },
+  {
+    "id": "5322070e-17ba-43cd-841e-ad1d183b14b2",
+    "batchId": "f9f285f9-5f97-4c79-b8c9-7e28a67ef371",
+    "invoiceNumber": "FP20260516891504",
+    "originalAmount": 18000,
+    "redFlushAmount": 18000,
+    "archivePath": "/data/archives/202401/success_002.zip",
+    "operator": "张三",
+    "riskType": "manual_review_required",
+    "status": "success",
+    "currentApprovalNode": "completed",
+    "materialSummary": "电子发票红冲申请，核验通过",
+    "smsRecords": [
+      {
+        "id": "90c65bb0-fccd-4d51-82e5-3115c3093118",
+        "phone": "13800138001",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516479060",
+        "sendTime": "2026-05-15T19:26:59.648Z",
+        "status": "failed"
+      },
+      {
+        "id": "85ae3119-7645-4988-a28c-48b3a64a4a7c",
+        "phone": "13900139002",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516233257",
+        "sendTime": "2026-05-15T16:38:14.909Z",
+        "status": "pending"
+      }
+    ],
+    "createdAt": "2026-05-13T07:57:41.974Z",
+    "updatedAt": "2026-05-13T07:57:41.974Z",
+    "corrections": []
+  },
+  {
+    "id": "cedc829c-b3d1-4a64-8e8b-a16620210df6",
+    "batchId": "f9f285f9-5f97-4c79-b8c9-7e28a67ef371",
+    "invoiceNumber": "FP20260516867208",
+    "originalAmount": 5200,
+    "redFlushAmount": 5200,
+    "archivePath": "/data/archives/202401/success_001.zip",
+    "operator": "张三",
+    "riskType": "manual_review_required",
+    "status": "success",
+    "currentApprovalNode": "completed",
+    "materialSummary": "普通发票红冲，材料完整合规",
+    "smsRecords": [
+      {
+        "id": "faf63140-da68-4ae8-9912-30a6ff5f0c72",
+        "phone": "13800138001",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516435682",
+        "sendTime": "2026-05-15T09:21:42.551Z",
+        "status": "failed"
+      }
+    ],
+    "createdAt": "2026-05-13T05:33:41.974Z",
+    "updatedAt": "2026-05-13T05:33:41.974Z",
+    "corrections": []
+  },
+  {
+    "id": "8f425b1c-681c-4ba3-9895-ad44935a7e2c",
+    "batchId": "f9f285f9-5f97-4c79-b8c9-7e28a67ef371",
+    "invoiceNumber": "FP20260516896794",
+    "originalAmount": 28600.5,
+    "redFlushAmount": 28600.5,
+    "archivePath": "/data/archives/202401/../invalid_path.zip",
+    "operator": "张三",
+    "riskType": "compression_path_error",
+    "status": "failed",
+    "currentApprovalNode": "pre_check",
+    "failureReason": "压缩包路径异常：检测到路径遍历攻击风险 /data/archives/202401/../invalid_path.zip，已自动拦截",
+    "materialSummary": "大额发票红冲材料，附购销合同复印件、红字信息表",
+    "smsRecords": [
+      {
+        "id": "93528788-ccd0-42ff-8f5c-65be7f1c4336",
+        "phone": "13800138001",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516338073",
+        "sendTime": "2026-05-15T18:51:53.095Z",
+        "status": "failed"
+      },
+      {
+        "id": "75c3a83f-306c-4d62-9f39-17c558e4f2ce",
+        "phone": "13900139002",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516083874",
+        "sendTime": "2026-05-15T01:48:51.855Z",
+        "status": "pending"
+      },
+      {
+        "id": "4f8fd404-5926-4bcd-ac81-1ffd5db99e48",
+        "phone": "13700137003",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516741708",
+        "sendTime": "2026-05-15T11:59:38.642Z",
+        "status": "sent"
+      }
+    ],
+    "createdAt": "2026-05-13T03:09:41.974Z",
+    "updatedAt": "2026-05-13T03:09:41.974Z",
+    "corrections": []
+  },
+  {
+    "id": "ec0b82c4-a6d1-4ff4-a496-63f844aa6c83",
+    "batchId": "f9f285f9-5f97-4c79-b8c9-7e28a67ef371",
+    "invoiceNumber": "FP20260516037924",
+    "originalAmount": 10500,
+    "redFlushAmount": 10500,
+    "archivePath": "/data/archives/202401/normal_file_001.zip",
+    "operator": "张三",
+    "riskType": "compression_path_error",
+    "status": "failed",
+    "currentApprovalNode": "data_extraction",
+    "failureReason": "压缩包路径异常：文件路径包含非法字符，系统无法定位归档文件 /data/archives/202401/normal_file_001.zip",
+    "materialSummary": "增值税专用发票红冲申请材料，包含原始发票扫描件、红冲说明、审批表",
+    "smsRecords": [
+      {
+        "id": "0ccd2524-c533-417c-b125-c39bd11e8651",
+        "phone": "13800138001",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516965668",
+        "sendTime": "2026-05-15T21:47:57.651Z",
+        "status": "failed"
+      },
+      {
+        "id": "32a9f5b0-ab63-4f63-bbf0-b4190072ba3a",
+        "phone": "13900139002",
+        "content": "【税务系统】您的发票红冲申请已提交，发票号：FP20260516116889",
+        "sendTime": "2026-05-15T20:41:06.066Z",
+        "status": "pending"
+      }
+    ],
+    "createdAt": "2026-05-13T00:45:41.973Z",
+    "updatedAt": "2026-05-13T00:45:41.973Z",
+    "corrections": []
+  }
+]
