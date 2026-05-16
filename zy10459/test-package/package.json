@@ -1,0 +1,24 @@
+{
+  "name": "test-package",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils.esm.js",
+      "require": "./dist/utils.js"
+    },
+    "./missing": "./dist/not-exist.js",
+    "./null-export": null
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ]
+}

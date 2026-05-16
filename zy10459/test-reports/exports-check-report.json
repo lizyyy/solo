@@ -1,0 +1,201 @@
+{
+  "packageName": "test-package",
+  "packageVersion": "1.0.0",
+  "checkedAt": "2026-05-16T20:23:14.155Z",
+  "packageDir": "/Users/lzy/pro/solo/workspaces/zy10459/test-package",
+  "exports": [
+    {
+      "path": ".",
+      "exportPath": ".",
+      "resolvedPath": "dist/index.js",
+      "conditions": [],
+      "fileExists": true,
+      "source": "main"
+    },
+    {
+      "path": ".",
+      "exportPath": ".",
+      "resolvedPath": "dist/index.esm.js",
+      "conditions": [
+        "import",
+        "module"
+      ],
+      "fileExists": true,
+      "source": "module"
+    },
+    {
+      "path": ".",
+      "exportPath": ".",
+      "resolvedPath": "dist/index.d.ts",
+      "conditions": [
+        "types"
+      ],
+      "fileExists": true,
+      "source": "types"
+    },
+    {
+      "path": ".",
+      "exportPath": ".",
+      "resolvedPath": "dist/index.esm.js",
+      "conditions": [
+        "import"
+      ],
+      "fileExists": true,
+      "source": "exports"
+    },
+    {
+      "path": ".",
+      "exportPath": ".",
+      "resolvedPath": "dist/index.js",
+      "conditions": [
+        "require"
+      ],
+      "fileExists": true,
+      "source": "exports"
+    },
+    {
+      "path": ".",
+      "exportPath": ".",
+      "resolvedPath": "dist/index.d.ts",
+      "conditions": [
+        "types"
+      ],
+      "fileExists": true,
+      "source": "exports"
+    },
+    {
+      "path": "./utils",
+      "exportPath": "./utils",
+      "resolvedPath": "dist/utils.esm.js",
+      "conditions": [
+        "import"
+      ],
+      "fileExists": true,
+      "source": "exports"
+    },
+    {
+      "path": "./utils",
+      "exportPath": "./utils",
+      "resolvedPath": "dist/utils.js",
+      "conditions": [
+        "require"
+      ],
+      "fileExists": true,
+      "source": "exports"
+    },
+    {
+      "path": "./missing",
+      "exportPath": "./missing",
+      "resolvedPath": "dist/not-exist.js",
+      "conditions": [],
+      "fileExists": false,
+      "source": "exports"
+    }
+  ],
+  "files": [
+    {
+      "path": "package.json",
+      "exists": true,
+      "isDirectory": false,
+      "isFile": true,
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10459/test-package/package.json"
+    },
+    {
+      "path": "src",
+      "exists": true,
+      "isDirectory": true,
+      "isFile": false,
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10459/test-package/src"
+    },
+    {
+      "path": "src/another.js",
+      "exists": true,
+      "isDirectory": false,
+      "isFile": true,
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10459/test-package/src/another.js"
+    },
+    {
+      "path": "src/secret.js",
+      "exists": true,
+      "isDirectory": false,
+      "isFile": true,
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10459/test-package/src/secret.js"
+    }
+  ],
+  "importExamples": [
+    {
+      "importPath": "import 'test-package'",
+      "shouldWork": true,
+      "actualPath": "dist/index.js",
+      "sourceLocation": "dist/index.js"
+    },
+    {
+      "importPath": "require('test-package')",
+      "shouldWork": true,
+      "actualPath": "dist/index.js",
+      "sourceLocation": "dist/index.js"
+    },
+    {
+      "importPath": "import 'test-package/utils'",
+      "shouldWork": true,
+      "actualPath": "dist/utils.esm.js",
+      "sourceLocation": "dist/utils.esm.js"
+    },
+    {
+      "importPath": "require('test-package/utils')",
+      "shouldWork": true,
+      "actualPath": "dist/utils.esm.js",
+      "sourceLocation": "dist/utils.esm.js"
+    },
+    {
+      "importPath": "import 'test-package/missing'",
+      "shouldWork": false,
+      "actualPath": "dist/not-exist.js",
+      "error": "Target file does not exist",
+      "sourceLocation": "dist/not-exist.js"
+    },
+    {
+      "importPath": "require('test-package/missing')",
+      "shouldWork": false,
+      "actualPath": "dist/not-exist.js",
+      "error": "Target file does not exist",
+      "sourceLocation": "dist/not-exist.js"
+    }
+  ],
+  "missingPaths": [
+    {
+      "path": "src/another.js",
+      "expectedInExports": true,
+      "expectedInFiles": true,
+      "reason": "File exists but not exported via exports field",
+      "actualLocation": "/Users/lzy/pro/solo/workspaces/zy10459/test-package/src/another.js"
+    },
+    {
+      "path": "src/secret.js",
+      "expectedInExports": true,
+      "expectedInFiles": true,
+      "reason": "File exists but not exported via exports field",
+      "actualLocation": "/Users/lzy/pro/solo/workspaces/zy10459/test-package/src/secret.js"
+    },
+    {
+      "path": "dist/not-exist.js",
+      "expectedInExports": true,
+      "expectedInFiles": true,
+      "reason": "Export path \"./missing\" points to non-existent file",
+      "actualLocation": "test-package/dist/not-exist.js"
+    }
+  ],
+  "summary": {
+    "totalExports": 9,
+    "validExports": 8,
+    "invalidExports": 1,
+    "missingFiles": 3,
+    "totalFiles": 4
+  },
+  "errors": [
+    "1 export(s) point to non-existent files"
+  ],
+  "warnings": [
+    "3 file(s) exist but are not exported"
+  ]
+}
