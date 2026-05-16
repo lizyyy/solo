@@ -1,0 +1,44 @@
+{
+  "name": "openapi-example-regression",
+  "version": "1.0.0",
+  "description": "OpenAPI示例回归CLI工具 - 验证API文档示例请求和响应的有效性",
+  "main": "dist/cli.js",
+  "bin": {
+    "oer": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "openapi",
+    "regression",
+    "api",
+    "testing",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^10.1.0",
+    "axios": "^1.6.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1",
+    "js-yaml": "^4.1.0",
+    "jsonpath-plus": "^7.2.0",
+    "openapi-types": "^12.1.3"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.9.0",
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,38 @@
+openapi: 3.0.0
+info:
+  title: Normal API
+  version: 1.0.0
+servers:
+  - url: https://jsonplaceholder.typicode.com
+paths:
+  /users:
+    get:
+      summary: Get users
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              example:
+                - id: 1
+                  name: John Doe
+  /posts:
+    post:
+      summary: Create a post
+      requestBody:
+        content:
+          application/json:
+            example:
+              title: foo
+              body: bar
+              userId: 1
+      responses:
+        '400':
+          description: Post created
+          content:
+            application/json:
+              example:
+                id: 101
+                title: foo
+                body: bar
+                userId: 1
