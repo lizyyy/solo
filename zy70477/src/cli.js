@@ -89,6 +89,13 @@ program
       force: options.force
     });
 
+    console.log(chalk.yellow('\n📋 生成候选清单...'));
+    const candidateResult = cleaner.generateCandidateList(options.patterns);
+    const candidates = cleaner.getCandidateList();
+    
+    console.log(chalk.green(`✓ 找到 ${candidates.length} 个候选文件`));
+    reporter.saveCandidateList(candidates);
+
     if (options.rollback) {
       console.log(chalk.yellow('\n🔄 执行回滚操作...'));
       const auditLog = cleaner.rollback();
@@ -96,13 +103,6 @@ program
       console.log(chalk.green('✓ 回滚操作记录已保存'));
       return;
     }
-
-    console.log(chalk.yellow('\n📋 生成候选清单...'));
-    const candidateResult = cleaner.generateCandidateList(options.patterns);
-    const candidates = cleaner.getCandidateList();
-    
-    console.log(chalk.green(`✓ 找到 ${candidates.length} 个候选文件`));
-    reporter.saveCandidateList(candidates);
 
     console.log(chalk.yellow('\n🧹 执行清理...'));
     const cleanResult = cleaner.executeClean();

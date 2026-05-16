@@ -43,15 +43,9 @@ class ParamValidator {
   checkParamCombinations(options) {
     const combinations = [
       {
-        name: '安全执行组合',
-        required: ['dryRun'],
-        when: () => !options.force,
-        explanation: '未使用 --force 时，建议始终使用 --dry-run 预览操作'
-      },
-      {
         name: '生产环境保护',
         required: ['output'],
-        when: () => !options.dryRun,
+        when: () => options.dryRun === false,
         explanation: '真实执行清理前必须指定 --output 保存报告'
       },
       {

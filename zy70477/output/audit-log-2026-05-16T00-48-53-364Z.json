@@ -1,0 +1,16 @@
+[
+  {
+    "action": "delete",
+    "path": "test_cache/file1.tmp",
+    "size": 0,
+    "timestamp": "2026-05-16T00:48:53.347Z",
+    "operator": "lzy"
+  },
+  {
+    "action": "delete",
+    "path": "test_cache/file2.cache",
+    "size": 0,
+    "timestamp": "2026-05-16T00:48:53.347Z",
+    "operator": "lzy"
+  }
+]

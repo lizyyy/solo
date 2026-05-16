@@ -278,6 +278,8 @@ class SelfCheck {
     console.log(chalk.cyan('缓存清理工具 - 自检程序'));
     console.log(chalk.cyan('='.repeat(60)));
 
+    let hasException = false;
+
     try {
       this.setupTestEnvironment();
 
@@ -287,10 +289,16 @@ class SelfCheck {
       this.testBoundaryConditions();
 
     } catch (error) {
+      hasException = true;
+      this.failed++;
       console.log(chalk.red(`\n❌ 测试执行异常: ${error.message}`));
       console.log(error.stack);
     } finally {
-      this.cleanupTestEnvironment();
+      try {
+        this.cleanupTestEnvironment();
+      } catch (cleanupError) {
+        console.log(chalk.yellow(`\n⚠️  清理测试环境失败: ${cleanupError.message}`));
+      }
     }
 
     console.log(chalk.cyan('\n' + '='.repeat(60)));
@@ -300,8 +308,8 @@ class SelfCheck {
     }
     console.log(chalk.cyan('='.repeat(60)));
 
-    if (this.failed > 0) {
-      console.log(chalk.yellow('\n⚠️  部分测试未通过，请检查相关模块'));
+    if (this.failed > 0 || hasException) {
+      console.log(chalk.yellow('\n⚠️  部分测试未通过或发生异常，请检查相关模块'));
       process.exit(1);
     } else {
       console.log(chalk.green('\n✅ 所有测试通过！系统功能正常'));
