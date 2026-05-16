@@ -30,33 +30,55 @@ class BatchService:
         new_count = 0
         conflict_count = 0
         conflict_details = []
+        will_reuse_existing = False
 
         if existing_batch:
-            conflict_count = 1
-            conflict_details.append(
-                {
-                    "type": "batch_no_conflict",
-                    "batch_no": batch_data.batch_no,
-                    "existing_batch_id": existing_batch.id,
-                    "existing_operator": existing_batch.operator,
-                    "existing_created_at": existing_batch.created_at.isoformat(),
-                    "existing_status": existing_batch.status,
-                    "message": f"批次号 {batch_data.batch_no} 已存在，将复用旧结论",
-                }
-            )
-
             existing_record_ids = {
                 rec.evidence_id
                 for rec in db.query(EvidenceRecord)
                 .filter(EvidenceRecord.batch_id == existing_batch.id)
                 .all()
             }
+            new_record_ids = {rec.evidence_id for rec in batch_data.evidence_records}
 
             for record in batch_data.evidence_records:
                 if record.evidence_id in existing_record_ids:
                     existing_count += 1
                 else:
                     new_count += 1
+
+            if existing_record_ids == new_record_ids:
+                conflict_count = 1
+                will_reuse_existing = True
+                conflict_details.append(
+                    {
+                        "type": "batch_no_conflict_reuse",
+                        "batch_no": batch_data.batch_no,
+                        "existing_batch_id": existing_batch.id,
+                        "existing_operator": existing_batch.operator,
+                        "existing_created_at": existing_batch.created_at.isoformat(),
+                        "existing_status": existing_batch.status,
+                        "message": f"批次号 {batch_data.batch_no} 已存在且内容完全相同，将复用旧结论",
+                    }
+                )
+            else:
+                conflict_count = 1
+                will_reuse_existing = False
+                new_records = new_record_ids - existing_record_ids
+                missing_records = existing_record_ids - new_record_ids
+                conflict_details.append(
+                    {
+                        "type": "batch_no_conflict_variant",
+                        "batch_no": batch_data.batch_no,
+                        "existing_batch_id": existing_batch.id,
+                        "existing_operator": existing_batch.operator,
+                        "existing_created_at": existing_batch.created_at.isoformat(),
+                        "existing_status": existing_batch.status,
+                        "new_records": list(new_records),
+                        "missing_records": list(missing_records),
+                        "message": f"批次号 {batch_data.batch_no} 已存在但内容不一致（变体），将作为冲突拦截",
+                    }
+                )
         else:
             new_count = total_count
 
@@ -66,7 +88,7 @@ class BatchService:
             new_count=new_count,
             conflict_count=conflict_count,
             conflict_details=conflict_details,
-            will_reuse_existing=existing_batch is not None,
+            will_reuse_existing=will_reuse_existing,
         )
 
     @staticmethod
@@ -74,28 +96,21 @@ class BatchService:
         existing_batch = db.query(Batch).filter(Batch.batch_no == batch_data.batch_no).first()
 
         if existing_batch:
-            existing_record_ids = {
-                rec.evidence_id: rec
-                for rec in db.query(EvidenceRecord)
-                .filter(EvidenceRecord.batch_id == existing_batch.id)
-                .all()
-            }
+            existing_records = db.query(EvidenceRecord).filter(
+                EvidenceRecord.batch_id == existing_batch.id
+            ).all()
+            existing_record_ids = {rec.evidence_id for rec in existing_records}
+            new_record_ids = {rec.evidence_id for rec in batch_data.evidence_records}
 
-            for record in batch_data.evidence_records:
-                if record.evidence_id not in existing_record_ids:
-                    new_record = EvidenceRecord(
-                        id=generate_uuid(),
-                        batch_id=existing_batch.id,
-                        **record.model_dump(),
-                        status=ProcessingStatus.PENDING,
-                    )
-                    db.add(new_record)
+            if existing_record_ids == new_record_ids:
+                return existing_batch, True
 
-            existing_batch.status = ProcessingStatus.PARTIAL_SUCCESS
-            existing_batch.updated_at = datetime.utcnow()
-            db.commit()
-            db.refresh(existing_batch)
-            return existing_batch, True
+            raise ValueError(
+                f"批次号 {batch_data.batch_no} 已存在，但证据记录内容不一致。"
+                f"原有 {len(existing_record_ids)} 条记录，新提交 {len(new_record_ids)} 条记录。"
+                f"差异：新增记录 {new_record_ids - existing_record_ids}，"
+                f"缺失记录 {existing_record_ids - new_record_ids}"
+            )
 
         batch_id = generate_uuid()
         batch = Batch(
@@ -332,6 +347,7 @@ class OutputService:
         lines.append(f"**风险类型**: {batch.risk_type}")
         lines.append(f"**状态**: {batch.status}")
         lines.append(f"**创建时间**: {batch.created_at.strftime('%Y-%m-%d %H:%M:%S')}")
+        lines.append(f"**更新时间**: {batch.updated_at.strftime('%Y-%m-%d %H:%M:%S')}")
         lines.append("")
 
         if batch.description:
@@ -355,29 +371,34 @@ class OutputService:
 
         lines.append("## 取证记录明细")
         lines.append("")
-        lines.append("| 证据ID | 来源 | 设备名称 | 风险等级 | 状态 | 错误信息 |")
-        lines.append("|--------|------|----------|----------|------|----------|")
+        lines.append("| 证据ID | 来源 | 设备名称 | 设备IP | 风险等级 | 证据路径 | 证据哈希 | 采集时间 | 状态 | 错误信息 |")
+        lines.append("|--------|------|----------|--------|----------|----------|----------|----------|------|----------|")
 
         for r in records:
             device_name = r.device_name or "-"
+            device_ip = r.device_ip or "-"
             risk_level = r.risk_level or "-"
+            evidence_path = r.evidence_path or "-"
+            evidence_hash = r.evidence_hash or "-"
+            collected_at = r.collected_at.strftime("%Y-%m-%d %H:%M:%S") if r.collected_at else "-"
             error_msg = r.error_message or "-"
             lines.append(
-                f"| {r.evidence_id} | {r.source} | {device_name} | {risk_level} | {r.status} | {error_msg} |"
+                f"| {r.evidence_id} | {r.source} | {device_name} | {device_ip} | {risk_level} | {evidence_path} | {evidence_hash} | {collected_at} | {r.status} | {error_msg} |"
             )
         lines.append("")
 
         lines.append("## 下载授权记录")
         lines.append("")
-        lines.append("| 授权人 | 被授权人 | 授权时间 | 是否使用 | 使用人 | 使用时间 | 原因 |")
-        lines.append("|--------|----------|----------|----------|--------|----------|------|")
+        lines.append("| 授权人 | 被授权人 | 授权时间 | 过期时间 | 是否使用 | 使用人 | 使用时间 | 原因 |")
+        lines.append("|--------|----------|----------|----------|----------|--------|----------|------|")
 
         for a in authorizations:
+            expires_at = a.expires_at.strftime("%Y-%m-%d %H:%M:%S") if a.expires_at else "-"
             used_at = a.used_at.strftime("%Y-%m-%d %H:%M:%S") if a.used_at else "-"
             used_by = a.used_by or "-"
             reason = a.reason or "-"
             lines.append(
-                f"| {a.authorized_by} | {a.authorized_to} | {a.authorized_at.strftime('%Y-%m-%d %H:%M:%S')} | {a.is_used} | {used_by} | {used_at} | {reason} |"
+                f"| {a.authorized_by} | {a.authorized_to} | {a.authorized_at.strftime('%Y-%m-%d %H:%M:%S')} | {expires_at} | {a.is_used} | {used_by} | {used_at} | {reason} |"
             )
         lines.append("")
 

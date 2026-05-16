@@ -23,8 +23,11 @@ def preview_batch(batch_data: BatchCreate, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=BatchSchema)
 def create_batch(batch_data: BatchCreate, db: Session = Depends(get_db)):
-    batch, reused = BatchService.create_batch(db, batch_data)
-    return batch
+    try:
+        batch, reused = BatchService.create_batch(db, batch_data)
+        return batch
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
 
 
 @router.get("/", response_model=List[BatchSchema])
