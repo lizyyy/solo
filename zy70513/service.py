@@ -114,6 +114,9 @@ class ConfigReceiptService:
     def _generate_report(self, diffs: List[DiffSegment]) -> ReceiptReport:
         total_checks = len(diffs)
         failed_checks = len(diffs)
+        diff_types = {}
+        for d in diffs:
+            diff_types[d.diff_type] = diff_types.get(d.diff_type, 0) + 1
         return ReceiptReport(
             total_checks=total_checks,
             passed_checks=0,
@@ -121,7 +124,7 @@ class ConfigReceiptService:
             diff_count=len(diffs),
             has_critical_diff=len(diffs) > 0,
             summary=f"Detected {len(diffs)} configuration differences" if diffs else "Configuration matches exactly",
-            details={"diff_types": {d.diff_type: sum(1 for d in diffs if d.diff_type == d.diff_type) for d in diffs}}
+            details={"diff_types": diff_types}
         )
 
     def create_receipt(self, data: ConfigReceiptCreate) -> ConfigReceipt:

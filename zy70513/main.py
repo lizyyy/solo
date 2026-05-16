@@ -18,14 +18,6 @@ async def create_receipt(data: ConfigReceiptCreate):
     return service.create_receipt(data)
 
 
-@app.get("/api/receipts/{receipt_id}", response_model=ConfigReceipt, summary="查询单个签收记录")
-async def get_receipt(receipt_id: str):
-    receipt = service.get_receipt(receipt_id)
-    if not receipt:
-        raise HTTPException(status_code=404, detail="Receipt not found")
-    return receipt
-
-
 @app.get("/api/receipts", response_model=List[ConfigReceipt], summary="查询签收记录列表")
 async def query_receipts(
     service_name: Optional[str] = None,
@@ -44,6 +36,19 @@ async def query_receipts(
         has_diff=has_diff
     )
     return service.query_receipts(query)
+
+
+@app.get("/api/receipts/timeout", response_model=List[ConfigReceipt], summary="获取超时记录")
+async def get_timeout_receipts():
+    return service.get_timeout_receipts()
+
+
+@app.get("/api/receipts/{receipt_id}", response_model=ConfigReceipt, summary="查询单个签收记录")
+async def get_receipt(receipt_id: str):
+    receipt = service.get_receipt(receipt_id)
+    if not receipt:
+        raise HTTPException(status_code=404, detail="Receipt not found")
+    return receipt
 
 
 @app.put("/api/receipts/{receipt_id}/status", response_model=ConfigReceipt, summary="状态推进")
@@ -87,11 +92,6 @@ async def revoke_receipt(receipt_id: str, operator: str, reason: str):
     if not receipt:
         raise HTTPException(status_code=404, detail="Receipt not found")
     return receipt
-
-
-@app.get("/api/receipts/timeout", response_model=List[ConfigReceipt], summary="获取超时记录")
-async def get_timeout_receipts():
-    return service.get_timeout_receipts()
 
 
 @app.get("/api/summary", response_model=List[ReceiptSummary], summary="获取签收汇总")
