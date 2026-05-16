@@ -1,0 +1,150 @@
+{
+  "scan_info": {
+    "timestamp": "2026-05-17T03:13:05.719184",
+    "lockfile": "package-lock.json",
+    "exceptions_file": "bad_exceptions.json",
+    "total_dependencies": 9,
+    "total_exceptions": 0,
+    "expired_exceptions": 0
+  },
+  "license_summary": {
+    "MIT": 9
+  },
+  "results": [
+    {
+      "dependency": {
+        "name": "lodash",
+        "version": "4.17.21",
+        "license": "MIT",
+        "path": "node_modules/lodash",
+        "lockfile_source": "package-lock.json",
+        "line_number": 0
+      },
+      "is_exception": false,
+      "exception_rule": null,
+      "is_expired": false,
+      "warning": ""
+    },
+    {
+      "dependency": {
+        "name": "axios",
+        "version": "1.6.0",
+        "license": "MIT",
+        "path": "node_modules/axios",
+        "lockfile_source": "package-lock.json",
+        "line_number": 0
+      },
+      "is_exception": false,
+      "exception_rule": null,
+      "is_expired": false,
+      "warning": ""
+    },
+    {
+      "dependency": {
+        "name": "react",
+        "version": "18.2.0",
+        "license": "MIT",
+        "path": "node_modules/react",
+        "lockfile_source": "package-lock.json",
+        "line_number": 0
+      },
+      "is_exception": false,
+      "exception_rule": null,
+      "is_expired": false,
+      "warning": ""
+    },
+    {
+      "dependency": {
+        "name": "@types/node",
+        "version": "20.0.0",
+        "license": "MIT",
+        "path": "node_modules/@types/node",
+        "lockfile_source": "package-lock.json",
+        "line_number": 0
+      },
+      "is_exception": false,
+      "exception_rule": null,
+      "is_expired": false,
+      "warning": ""
+    },
+    {
+      "dependency": {
+        "name": "@types/react",
+        "version": "18.2.0",
+        "license": "MIT",
+        "path": "node_modules/@types/react",
+        "lockfile_source": "package-lock.json",
+        "line_number": 0
+      },
+      "is_exception": false,
+      "exception_rule": null,
+      "is_expired": false,
+      "warning": ""
+    },
+    {
+      "dependency": {
+        "name": "express",
+        "version": "4.18.2",
+        "license": "MIT",
+        "path": "node_modules/express",
+        "lockfile_source": "package-lock.json",
+        "line_number": 0
+      },
+      "is_exception": false,
+      "exception_rule": null,
+      "is_expired": false,
+      "warning": ""
+    },
+    {
+      "dependency": {
+        "name": "underscore",
+        "version": "1.13.6",
+        "license": "MIT",
+        "path": "node_modules/underscore",
+        "lockfile_source": "package-lock.json",
+        "line_number": 0
+      },
+      "is_exception": false,
+      "exception_rule": null,
+      "is_expired": false,
+      "warning": ""
+    },
+    {
+      "dependency": {
+        "name": "moment",
+        "version": "2.29.4",
+        "license": "MIT",
+        "path": "node_modules/moment",
+        "lockfile_source": "package-lock.json",
+        "line_number": 0
+      },
+      "is_exception": false,
+      "exception_rule": null,
+      "is_expired": false,
+      "warning": ""
+    },
+    {
+      "dependency": {
+        "name": "jquery",
+        "version": "3.7.1",
+        "license": "MIT",
+        "path": "node_modules/jquery",
+        "lockfile_source": "package-lock.json",
+        "line_number": 0
+      },
+      "is_exception": false,
+      "exception_rule": null,
+      "is_expired": false,
+      "warning": ""
+    }
+  ],
+  "errors": [
+    {
+      "file_path": "bad_exceptions.json",
+      "line_number": 9,
+      "error_type": "JSONParseError",
+      "message": "例外规则JSON解析错误: Expecting value",
+      "raw_content": "Expecting value: line 9 column 3 (char 141)"
+    }
+  ]
+}

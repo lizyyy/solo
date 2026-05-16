@@ -1,0 +1,79 @@
+{
+  "scan_info": {
+    "timestamp": "2026-05-17T03:13:36.490961",
+    "lockfile": "yarn.lock",
+    "exceptions_file": "exceptions.json",
+    "total_dependencies": 3,
+    "total_exceptions": 3,
+    "expired_exceptions": 1
+  },
+  "license_summary": {
+    "Unknown": 3
+  },
+  "results": [
+    {
+      "dependency": {
+        "name": "lodash",
+        "version": "4.17.21",
+        "license": "",
+        "path": "",
+        "lockfile_source": "yarn.lock",
+        "line_number": 5
+      },
+      "is_exception": true,
+      "exception_rule": {
+        "package_name": "lodash",
+        "license": "MIT",
+        "reason": "广泛使用的工具库，已通过法务审批",
+        "approved_by": "法务部-张三",
+        "expires_at": "2026-12-31",
+        "notes": "年度复核通过"
+      },
+      "is_expired": false,
+      "warning": ""
+    },
+    {
+      "dependency": {
+        "name": "axios",
+        "version": "1.6.0",
+        "license": "",
+        "path": "",
+        "lockfile_source": "yarn.lock",
+        "line_number": 10
+      },
+      "is_exception": true,
+      "exception_rule": {
+        "package_name": "axios",
+        "license": "MIT",
+        "reason": "HTTP请求库，业务关键依赖",
+        "approved_by": "法务部-李四",
+        "expires_at": "2025-06-30",
+        "notes": "即将到期，需重新审批"
+      },
+      "is_expired": true,
+      "warning": "例外已过期: 2025-06-30"
+    },
+    {
+      "dependency": {
+        "name": "react",
+        "version": "18.2.0",
+        "license": "",
+        "path": "",
+        "lockfile_source": "yarn.lock",
+        "line_number": 16
+      },
+      "is_exception": true,
+      "exception_rule": {
+        "package_name": "react",
+        "license": "MIT",
+        "reason": "前端框架核心依赖",
+        "approved_by": "法务部-王五",
+        "expires_at": null,
+        "notes": "永久有效"
+      },
+      "is_expired": false,
+      "warning": ""
+    }
+  ],
+  "errors": []
+}

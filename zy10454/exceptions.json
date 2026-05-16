@@ -1,0 +1,42 @@
+[
+  {
+    "package_name": "lodash",
+    "license": "MIT",
+    "reason": "广泛使用的工具库，已通过法务审批",
+    "approved_by": "法务部-张三",
+    "expires_at": "2026-12-31",
+    "notes": "年度复核通过"
+  },
+  {
+    "package_name": "axios",
+    "license": "MIT",
+    "reason": "HTTP请求库，业务关键依赖",
+    "approved_by": "法务部-李四",
+    "expires_at": "2025-06-30",
+    "notes": "即将到期，需重新审批"
+  },
+  {
+    "package_name": "react",
+    "license": "MIT",
+    "reason": "前端框架核心依赖",
+    "approved_by": "法务部-王五",
+    "expires_at": null,
+    "notes": "永久有效"
+  },
+  {
+    "package_name": "@types/*",
+    "license": "MIT",
+    "reason": "TypeScript类型定义文件，无业务风险",
+    "approved_by": "法务部-张三",
+    "expires_at": "2027-01-01",
+    "notes": "通配符匹配所有@types包"
+  },
+  {
+    "package_name": "express",
+    "license": "MIT",
+    "reason": "后端框架，已完成合规评估",
+    "approved_by": "法务部-李四",
+    "expires_at": "2025-05-20",
+    "notes": "已过期"
+  }
+]
