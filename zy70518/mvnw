@@ -1,0 +1,25 @@
+#!/bin/sh
+# Maven Wrapper Simplified
+set -e
+
+BASE_DIR=$(dirname "$0")
+WRAPPER_JAR="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
+
+# Download wrapper jar if needed
+if [ ! -f "$WRAPPER_JAR" ] || [ ! -s "$WRAPPER_JAR" ]; then
+    echo "[INFO] Downloading Maven Wrapper..."
+    mkdir -p "$(dirname "$WRAPPER_JAR")"
+    WRAPPER_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+    
+    if command -v curl >/dev/null 2>&1; then
+        curl -f -L -o "$WRAPPER_JAR" "$WRAPPER_URL"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "$WRAPPER_JAR" "$WRAPPER_URL"
+    else
+        echo "[ERROR] Neither curl nor wget found. Cannot download Maven Wrapper."
+        exit 1
+    fi
+    echo "[INFO] Maven Wrapper downloaded successfully"
+fi
+
+exec java -jar "$WRAPPER_JAR" "$@"
