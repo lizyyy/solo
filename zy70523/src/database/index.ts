@@ -420,6 +420,25 @@ export class Database {
     });
   }
 
+  updateFilingField(
+    filingId: string,
+    field: string,
+    value: any
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const now = dayjs().toISOString();
+      
+      this.db.run(
+        `UPDATE filing_records SET ${field} = ?, updatedAt = ? WHERE id = ?`,
+        [value, now, filingId],
+        function(err) {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+  }
+
   close(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.close(err => {

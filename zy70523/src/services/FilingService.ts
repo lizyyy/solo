@@ -7,7 +7,8 @@ import {
   CreateFilingRequest,
   HandleExceptionRequest,
   ManualCorrectionRequest,
-  FilingStatus
+  FilingStatus,
+  AccessLog
 } from '../types';
 import { db } from '../database';
 import { stateMachineService } from './StateMachineService';
@@ -59,7 +60,7 @@ export class FilingService {
   async manualCorrection(
     filingId: string,
     request: ManualCorrectionRequest
-  ): Promise<void> {
+  ): Promise<FilingRecord> {
     const filing = await db.getFiling(filingId);
     if (!filing) {
       throw new Error('备案记录不存在');
@@ -78,6 +79,15 @@ export class FilingService {
       request.operator,
       request.reason
     );
+
+    await db.updateFilingField(filingId, request.field, request.newValue);
+
+    const updatedFiling = await db.getFiling(filingId);
+    if (!updatedFiling) {
+      throw new Error('更新后备案记录不存在');
+    }
+
+    return updatedFiling;
   }
 
   async closeFiling(id: string, closer: string, reason: string): Promise<void> {
@@ -90,8 +100,12 @@ export class FilingService {
     destination: string,
     action: string,
     result: string
-  ): Promise<void> {
-    await db.recordAccessLog(filingId, sourceIp, destination, action, result);
+  ): Promise<AccessLog> {
+    return db.recordAccessLog(filingId, sourceIp, destination, action, result);
+  }
+
+  async getAccessLogs(filingId: string): Promise<AccessLog[]> {
+    return db.getAccessLogs(filingId);
   }
 
   async generateReport(filingId: string): Promise<FilingReport> {

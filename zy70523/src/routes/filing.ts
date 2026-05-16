@@ -56,6 +56,13 @@ const closeSchema = Joi.object({
   reason: Joi.string().required()
 });
 
+const accessLogSchema = Joi.object({
+  sourceIp: Joi.string().required(),
+  destination: Joi.string().required(),
+  action: Joi.string().required(),
+  result: Joi.string().required()
+});
+
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { error, value } = createFilingSchema.validate(req.body);
@@ -173,10 +180,39 @@ router.post('/:id/manual-correction', async (req: Request, res: Response) => {
       return res.status(400).json({ error: error.details[0].message });
     }
 
-    await filingService.manualCorrection(req.params.id, value as ManualCorrectionRequest);
-    res.status(200).json({ message: '人工修正已记录' });
+    const result = await filingService.manualCorrection(req.params.id, value as ManualCorrectionRequest);
+    res.status(200).json({ message: '人工修正已记录', filing: result });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
+  }
+});
+
+router.post('/:id/access-logs', async (req: Request, res: Response) => {
+  try {
+    const { error, value } = accessLogSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const result = await filingService.recordAccess(
+      req.params.id,
+      value.sourceIp,
+      value.destination,
+      value.action,
+      value.result
+    );
+    res.status(201).json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.get('/:id/access-logs', async (req: Request, res: Response) => {
+  try {
+    const result = await filingService.getAccessLogs(req.params.id);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -207,7 +243,7 @@ router.get('/:id/export', async (req: Request, res: Response) => {
   try {
     const csv = await filingService.exportToCSV(req.params.id);
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="filing-${req.params.id}.csv`);
+    res.setHeader('Content-Disposition', `attachment; filename="filing-${req.params.id}.csv"`);
     res.send(csv);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
