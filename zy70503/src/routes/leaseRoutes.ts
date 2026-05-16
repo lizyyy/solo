@@ -200,11 +200,60 @@ router.get('/leases', validateQuery(queryLeasesSchema), async (req: Request, res
   }
 });
 
-router.get('/leases/:id', async (req: Request, res: Response) => {
+router.get('/leases/export', validateQuery(exportSchema), async (req: Request, res: Response) => {
   try {
-    const result = await leaseService.getLeaseDetail(req.params.id);
-    const statusCode = result.success ? 200 : (result.error === 'LEASE_NOT_FOUND' ? 404 : 500);
-    res.status(statusCode).json(result);
+    const format = req.query.format as string || 'json';
+    const result = await leaseService.exportLeases({
+      accountName: req.query.accountName as string,
+      status: req.query.status as LeaseStatus,
+      startTime: req.query.startTime ? parseInt(req.query.startTime as string) : undefined,
+      endTime: req.query.endTime ? parseInt(req.query.endTime as string) : undefined
+    });
+
+    if (!result.success) {
+      return res.status(500).json(result);
+    }
+
+    if (!result.data) {
+      return res.status(500).json({
+        success: false,
+        error: 'EXPORT_ERROR',
+        message: '导出数据为空'
+      });
+    }
+
+    if (format === 'csv') {
+      const csvStringifier = createObjectCsvStringifier({
+        header: [
+          { id: 'id', title: 'ID' },
+          { id: 'accountName', title: '账号名称' },
+          { id: 'permissionItem', title: '权限项' },
+          { id: 'leaseStartTime', title: '租约开始时间' },
+          { id: 'leaseEndTime', title: '租约结束时间' },
+          { id: 'applicationReason', title: '申请理由' },
+          { id: 'applicant', title: '申请人' },
+          { id: 'status', title: '状态' },
+          { id: 'createdAt', title: '创建时间' },
+          { id: 'recyclingConclusion', title: '回收结论' },
+          { id: 'blockedReason', title: '拦截原因' }
+        ]
+      });
+
+      const csvData = result.data.map(lease => ({
+        ...lease,
+        leaseStartTime: new Date(lease.leaseStartTime).toISOString(),
+        leaseEndTime: new Date(lease.leaseEndTime).toISOString(),
+        createdAt: new Date(lease.createdAt).toISOString()
+      }));
+
+      const csvContent = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(csvData);
+      
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="leases-export-${Date.now()}.csv"`);
+      res.send('\uFEFF' + csvContent);
+    } else {
+      res.json(result);
+    }
   } catch (error: any) {
     res.status(500).json({
       success: false,
@@ -288,60 +337,11 @@ router.post('/leases/manual-correction', validateRequest(manualCorrectionSchema)
   }
 });
 
-router.get('/leases/export', validateQuery(exportSchema), async (req: Request, res: Response) => {
+router.get('/leases/:id', async (req: Request, res: Response) => {
   try {
-    const format = req.query.format as string || 'json';
-    const result = await leaseService.exportLeases({
-      accountName: req.query.accountName as string,
-      status: req.query.status as LeaseStatus,
-      startTime: req.query.startTime ? parseInt(req.query.startTime as string) : undefined,
-      endTime: req.query.endTime ? parseInt(req.query.endTime as string) : undefined
-    });
-
-    if (!result.success) {
-      return res.status(500).json(result);
-    }
-
-    if (!result.data) {
-      return res.status(500).json({
-        success: false,
-        error: 'EXPORT_ERROR',
-        message: '导出数据为空'
-      });
-    }
-
-    if (format === 'csv') {
-      const csvStringifier = createObjectCsvStringifier({
-        header: [
-          { id: 'id', title: 'ID' },
-          { id: 'accountName', title: '账号名称' },
-          { id: 'permissionItem', title: '权限项' },
-          { id: 'leaseStartTime', title: '租约开始时间' },
-          { id: 'leaseEndTime', title: '租约结束时间' },
-          { id: 'applicationReason', title: '申请理由' },
-          { id: 'applicant', title: '申请人' },
-          { id: 'status', title: '状态' },
-          { id: 'createdAt', title: '创建时间' },
-          { id: 'recyclingConclusion', title: '回收结论' },
-          { id: 'blockedReason', title: '拦截原因' }
-        ]
-      });
-
-      const csvData = result.data.map(lease => ({
-        ...lease,
-        leaseStartTime: new Date(lease.leaseStartTime).toISOString(),
-        leaseEndTime: new Date(lease.leaseEndTime).toISOString(),
-        createdAt: new Date(lease.createdAt).toISOString()
-      }));
-
-      const csvContent = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(csvData);
-      
-      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="leases-export-${Date.now()}.csv"`);
-      res.send('\uFEFF' + csvContent);
-    } else {
-      res.json(result);
-    }
+    const result = await leaseService.getLeaseDetail(req.params.id);
+    const statusCode = result.success ? 200 : (result.error === 'LEASE_NOT_FOUND' ? 404 : 500);
+    res.status(statusCode).json(result);
   } catch (error: any) {
     res.status(500).json({
       success: false,

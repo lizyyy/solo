@@ -242,8 +242,7 @@ class LeaseService {
     }
     async approveRenewal(renewalId, approver, approved) {
         try {
-            const records = await database_1.db.getRenewalRecordsByLeaseId('');
-            const renewalRecord = records.find(r => r.id === renewalId);
+            const renewalRecord = await database_1.db.findRenewalRecordById(renewalId);
             if (!renewalRecord) {
                 return {
                     success: false,

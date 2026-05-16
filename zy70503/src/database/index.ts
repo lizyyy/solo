@@ -282,6 +282,19 @@ export class Database {
     });
   }
 
+  async findRenewalRecordById(id: string): Promise<RenewalRecord | null> {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        `SELECT * FROM renewal_records WHERE id = ?`,
+        [id],
+        (err, row: any) => {
+          if (err) reject(err);
+          else resolve(row || null);
+        }
+      );
+    });
+  }
+
   async updateRenewalStatus(
     id: string,
     status: RenewalStatus,

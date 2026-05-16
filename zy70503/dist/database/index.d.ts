@@ -24,6 +24,7 @@ export declare class Database {
     manualUpdateLease(id: string, updates: Partial<PermissionLease>): Promise<void>;
     createRenewalRecord(record: Omit<RenewalRecord, 'id' | 'createdAt'>): Promise<RenewalRecord>;
     getRenewalRecordsByLeaseId(leaseId: string): Promise<RenewalRecord[]>;
+    findRenewalRecordById(id: string): Promise<RenewalRecord | null>;
     updateRenewalStatus(id: string, status: RenewalStatus, approver: string): Promise<void>;
     createAuditLog(log: Omit<AuditLog, 'id' | 'createdAt'>): Promise<AuditLog>;
     getAuditLogsByLeaseId(leaseId: string): Promise<AuditLog[]>;
