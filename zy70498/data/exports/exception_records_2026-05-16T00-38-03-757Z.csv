@@ -1,0 +1,2 @@
+批次ID,供应商名称,供应商目录(修正前),供应商目录(修正后),压缩包路径,异常类型,错误信息,输入数据,创建时间
+BATCH_B7CA0585,测试供应商B,供应商B/2024Q2,供应商B/2024Q2,/invalid/path/with..traversal/../../data.zip,zip_path_validation,压缩包路径包含目录遍历字符(..),"{""zip_path"":""/invalid/path/with..traversal/../../data.zip"",""supplier_dir"":""供应商B/2024Q2""}",2026-05-16 00:38:03
