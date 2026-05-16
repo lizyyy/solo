@@ -146,7 +146,7 @@ def cancel(ctx, batch_id, operator):
 @cli.command("history")
 @click.option("--batch-id", "-b", help="按批次ID过滤")
 @click.option("--operator", "-o", help="按操作者过滤")
-@click.option("--risk-type", "-r", type=click.Choice(['OLD_VERSION_OVERWRITES_NEW', 'EXPIRED_RECORD']), help="按风险类型过滤")
+@click.option("--risk-type", "-r", type=click.Choice(['OLD_VERSION_OVERWRITES_NEW', 'EXPIRED_RECORD', 'NORMAL_RECORD']), help="按风险类型过滤")
 @click.pass_context
 def show_history(ctx, batch_id, operator, risk_type):
     """查询历史记录"""

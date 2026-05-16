@@ -1,66 +1,431 @@
 [
   {
-    "history_id": "3e47fe77",
-    "batch_id": "c96212f6",
-    "record_id": "7ea59672",
-    "operator": "张三",
-    "risk_type": "旧版本覆盖新版本",
+    "history_id": "88fa6d05",
+    "batch_id": "31c48d8c",
+    "record_id": "9badca29",
+    "operator": "管理员",
+    "risk_type": "正常记录",
     "operation_type": "回滚",
-    "executed_at": "2026-05-16T08:28:15.249399",
+    "executed_at": "2026-05-16T10:10:10.897003",
     "before_state": {
-      "record_id": "7ea59672",
-      "date": "2026-05-06",
-      "engineer": "工程师6",
-      "content": "有问题的记录：旧版本覆盖了新版本",
-      "version": 2,
-      "last_updated": "2026-05-08T08:28:03.669356",
-      "created_at": "2026-05-06T08:28:03.669356",
-      "is_expired": true,
+      "record_id": "9badca29",
+      "date": "2026-05-15",
+      "engineer": "工程师1",
+      "content": "正常值班记录1：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-16T10:10:10.504535",
+      "created_at": "2026-05-15T10:10:10.504535",
+      "is_expired": false,
       "metadata": {
         "version_history": [
           {
             "version": 1,
-            "content": "草稿记录6",
-            "updated_at": "2026-05-04T08:28:03.669356"
+            "content": "草稿记录1",
+            "updated_at": "2026-05-14T10:10:10.504535"
           },
           {
             "version": 2,
-            "content": "有问题的记录：旧版本覆盖了新版本",
-            "updated_at": "2026-05-08T08:28:03.669356"
+            "content": "更新记录1",
+            "updated_at": "2026-05-14T22:10:10.504535"
           },
           {
             "version": 3,
-            "content": "正确的完整记录：完成部署上线、值班日志完整、交接清晰",
-            "updated_at": "2026-05-07T08:28:03.669356"
+            "content": "正常值班记录1：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-16T10:10:10.504535"
           }
         ]
       }
     },
     "after_state": {
-      "record_id": "7ea59672",
+      "record_id": "9badca29",
+      "date": "2026-05-15",
+      "engineer": "工程师1",
+      "content": "正常值班记录1：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-16T10:10:10.504535",
+      "created_at": "2026-05-15T10:10:10.504535",
+      "is_expired": false,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录1",
+            "updated_at": "2026-05-14T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "更新记录1",
+            "updated_at": "2026-05-14T22:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正常值班记录1：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-16T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "result": "记录正常，无需处理",
+    "is_anomaly": false,
+    "details": {
+      "candidate_description": "记录正常，无版本冲突问题",
+      "suggestion": "无需处理，保持原样"
+    }
+  },
+  {
+    "history_id": "54517c8f",
+    "batch_id": "31c48d8c",
+    "record_id": "28981896",
+    "operator": "管理员",
+    "risk_type": "正常记录",
+    "operation_type": "回滚",
+    "executed_at": "2026-05-16T10:10:10.897003",
+    "before_state": {
+      "record_id": "28981896",
+      "date": "2026-05-14",
+      "engineer": "工程师2",
+      "content": "正常值班记录2：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-15T10:10:10.504535",
+      "created_at": "2026-05-14T10:10:10.504535",
+      "is_expired": false,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录2",
+            "updated_at": "2026-05-13T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "更新记录2",
+            "updated_at": "2026-05-13T22:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正常值班记录2：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-15T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "after_state": {
+      "record_id": "28981896",
+      "date": "2026-05-14",
+      "engineer": "工程师2",
+      "content": "正常值班记录2：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-15T10:10:10.504535",
+      "created_at": "2026-05-14T10:10:10.504535",
+      "is_expired": false,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录2",
+            "updated_at": "2026-05-13T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "更新记录2",
+            "updated_at": "2026-05-13T22:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正常值班记录2：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-15T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "result": "记录正常，无需处理",
+    "is_anomaly": false,
+    "details": {
+      "candidate_description": "记录正常，无版本冲突问题",
+      "suggestion": "无需处理，保持原样"
+    }
+  },
+  {
+    "history_id": "bffb4141",
+    "batch_id": "31c48d8c",
+    "record_id": "493f6616",
+    "operator": "管理员",
+    "risk_type": "正常记录",
+    "operation_type": "回滚",
+    "executed_at": "2026-05-16T10:10:10.897003",
+    "before_state": {
+      "record_id": "493f6616",
+      "date": "2026-05-13",
+      "engineer": "工程师3",
+      "content": "正常值班记录3：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-14T10:10:10.504535",
+      "created_at": "2026-05-13T10:10:10.504535",
+      "is_expired": false,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录3",
+            "updated_at": "2026-05-12T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "更新记录3",
+            "updated_at": "2026-05-12T22:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正常值班记录3：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-14T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "after_state": {
+      "record_id": "493f6616",
+      "date": "2026-05-13",
+      "engineer": "工程师3",
+      "content": "正常值班记录3：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-14T10:10:10.504535",
+      "created_at": "2026-05-13T10:10:10.504535",
+      "is_expired": false,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录3",
+            "updated_at": "2026-05-12T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "更新记录3",
+            "updated_at": "2026-05-12T22:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正常值班记录3：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-14T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "result": "记录正常，无需处理",
+    "is_anomaly": false,
+    "details": {
+      "candidate_description": "记录正常，无版本冲突问题",
+      "suggestion": "无需处理，保持原样"
+    }
+  },
+  {
+    "history_id": "82b1679e",
+    "batch_id": "31c48d8c",
+    "record_id": "29db2558",
+    "operator": "管理员",
+    "risk_type": "正常记录",
+    "operation_type": "回滚",
+    "executed_at": "2026-05-16T10:10:10.897003",
+    "before_state": {
+      "record_id": "29db2558",
+      "date": "2026-05-12",
+      "engineer": "工程师4",
+      "content": "正常值班记录4：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-13T10:10:10.504535",
+      "created_at": "2026-05-12T10:10:10.504535",
+      "is_expired": false,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录4",
+            "updated_at": "2026-05-11T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "更新记录4",
+            "updated_at": "2026-05-11T22:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正常值班记录4：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-13T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "after_state": {
+      "record_id": "29db2558",
+      "date": "2026-05-12",
+      "engineer": "工程师4",
+      "content": "正常值班记录4：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-13T10:10:10.504535",
+      "created_at": "2026-05-12T10:10:10.504535",
+      "is_expired": false,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录4",
+            "updated_at": "2026-05-11T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "更新记录4",
+            "updated_at": "2026-05-11T22:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正常值班记录4：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-13T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "result": "记录正常，无需处理",
+    "is_anomaly": false,
+    "details": {
+      "candidate_description": "记录正常，无版本冲突问题",
+      "suggestion": "无需处理，保持原样"
+    }
+  },
+  {
+    "history_id": "554b3938",
+    "batch_id": "31c48d8c",
+    "record_id": "929f167a",
+    "operator": "管理员",
+    "risk_type": "正常记录",
+    "operation_type": "回滚",
+    "executed_at": "2026-05-16T10:10:10.897003",
+    "before_state": {
+      "record_id": "929f167a",
+      "date": "2026-05-11",
+      "engineer": "工程师5",
+      "content": "正常值班记录5：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-12T10:10:10.504535",
+      "created_at": "2026-05-11T10:10:10.504535",
+      "is_expired": false,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录5",
+            "updated_at": "2026-05-10T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "更新记录5",
+            "updated_at": "2026-05-10T22:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正常值班记录5：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-12T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "after_state": {
+      "record_id": "929f167a",
+      "date": "2026-05-11",
+      "engineer": "工程师5",
+      "content": "正常值班记录5：完成代码评审、处理线上告警3个、同步进度",
+      "version": 3,
+      "last_updated": "2026-05-12T10:10:10.504535",
+      "created_at": "2026-05-11T10:10:10.504535",
+      "is_expired": false,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录5",
+            "updated_at": "2026-05-10T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "更新记录5",
+            "updated_at": "2026-05-10T22:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正常值班记录5：完成代码评审、处理线上告警3个、同步进度",
+            "updated_at": "2026-05-12T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "result": "记录正常，无需处理",
+    "is_anomaly": false,
+    "details": {
+      "candidate_description": "记录正常，无版本冲突问题",
+      "suggestion": "无需处理，保持原样"
+    }
+  },
+  {
+    "history_id": "d6568109",
+    "batch_id": "31c48d8c",
+    "record_id": "73913180",
+    "operator": "管理员",
+    "risk_type": "旧版本覆盖新版本",
+    "operation_type": "回滚",
+    "executed_at": "2026-05-16T10:10:10.897003",
+    "before_state": {
+      "record_id": "73913180",
       "date": "2026-05-06",
       "engineer": "工程师6",
-      "content": "正确的完整记录：完成部署上线、值班日志完整、交接清晰",
-      "version": 3,
-      "last_updated": "2026-05-07T08:28:03.669356",
-      "created_at": "2026-05-06T08:28:03.669356",
+      "content": "有问题的记录：旧版本覆盖了新版本",
+      "version": 2,
+      "last_updated": "2026-05-08T10:10:10.504535",
+      "created_at": "2026-05-06T10:10:10.504535",
       "is_expired": true,
       "metadata": {
         "version_history": [
           {
             "version": 1,
             "content": "草稿记录6",
-            "updated_at": "2026-05-04T08:28:03.669356"
+            "updated_at": "2026-05-04T10:10:10.504535"
           },
           {
             "version": 2,
             "content": "有问题的记录：旧版本覆盖了新版本",
-            "updated_at": "2026-05-08T08:28:03.669356"
+            "updated_at": "2026-05-08T10:10:10.504535"
           },
           {
             "version": 3,
             "content": "正确的完整记录：完成部署上线、值班日志完整、交接清晰",
-            "updated_at": "2026-05-07T08:28:03.669356"
+            "updated_at": "2026-05-07T10:10:10.504535"
+          }
+        ]
+      }
+    },
+    "after_state": {
+      "record_id": "73913180",
+      "date": "2026-05-06",
+      "engineer": "工程师6",
+      "content": "正确的完整记录：完成部署上线、值班日志完整、交接清晰",
+      "version": 3,
+      "last_updated": "2026-05-07T10:10:10.504535",
+      "created_at": "2026-05-06T10:10:10.504535",
+      "is_expired": true,
+      "metadata": {
+        "version_history": [
+          {
+            "version": 1,
+            "content": "草稿记录6",
+            "updated_at": "2026-05-04T10:10:10.504535"
+          },
+          {
+            "version": 2,
+            "content": "有问题的记录：旧版本覆盖了新版本",
+            "updated_at": "2026-05-08T10:10:10.504535"
+          },
+          {
+            "version": 3,
+            "content": "正确的完整记录：完成部署上线、值班日志完整、交接清晰",
+            "updated_at": "2026-05-07T10:10:10.504535"
           }
         ]
       }
@@ -73,37 +438,37 @@
     }
   },
   {
-    "history_id": "fe6a3c91",
-    "batch_id": "c96212f6",
-    "record_id": "99a8c681",
-    "operator": "张三",
+    "history_id": "303c2212",
+    "batch_id": "31c48d8c",
+    "record_id": "30d5bb2d",
+    "operator": "管理员",
     "risk_type": "过期记录",
     "operation_type": "回滚",
-    "executed_at": "2026-05-16T08:28:15.249399",
+    "executed_at": "2026-05-16T10:10:10.897003",
     "before_state": {
-      "record_id": "99a8c681",
+      "record_id": "30d5bb2d",
       "date": "2026-04-16",
       "engineer": "工程师7",
       "content": "过期不完整记录",
       "version": 1,
-      "last_updated": "2026-04-16T08:28:03.669356",
-      "created_at": "2026-04-16T08:28:03.669356",
+      "last_updated": "2026-04-16T10:10:10.504535",
+      "created_at": "2026-04-16T10:10:10.504535",
       "is_expired": true,
       "metadata": {
-        "cleaned_at": "2026-05-16T08:28:15.249399"
+        "cleaned_at": "2026-05-16T10:10:10.897003"
       }
     },
     "after_state": {
-      "record_id": "99a8c681",
+      "record_id": "30d5bb2d",
       "date": "2026-04-16",
       "engineer": "工程师7",
       "content": "过期不完整记录",
       "version": 1,
-      "last_updated": "2026-04-16T08:28:03.669356",
-      "created_at": "2026-04-16T08:28:03.669356",
+      "last_updated": "2026-04-16T10:10:10.504535",
+      "created_at": "2026-04-16T10:10:10.504535",
       "is_expired": true,
       "metadata": {
-        "cleaned_at": "2026-05-16T08:28:15.249399"
+        "cleaned_at": "2026-05-16T10:10:10.897003"
       }
     },
     "result": "已标记为已清理的过期记录",

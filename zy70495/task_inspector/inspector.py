@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Optional, Tuple, Dict
 import hashlib
+import json
 
 from .models import (
     DutyRecord,
@@ -20,7 +21,19 @@ class TaskInspector:
         self.storage = storage
 
     def _generate_content_hash(self, records: List[DutyRecord]) -> str:
-        content = ",".join([f"{r.record_id}:v{r.version}:{r.last_updated.isoformat()}" for r in sorted(records, key=lambda x: x.record_id)])
+        sorted_records = sorted(records, key=lambda x: (x.date, x.engineer, x.content))
+        hash_parts = []
+        for r in sorted_records:
+            record_dict = {
+                "date": r.date,
+                "engineer": r.engineer,
+                "content": r.content,
+                "version": r.version,
+                "is_expired": r.is_expired,
+                "has_version_history": "version_history" in r.metadata
+            }
+            hash_parts.append(json.dumps(record_dict, sort_keys=True, ensure_ascii=False))
+        content = "|".join(hash_parts)
         return hashlib.md5(content.encode()).hexdigest()
 
     def _check_duplicate_batch(self, content_hash: str) -> Optional[InspectionBatch]:
@@ -36,12 +49,15 @@ class TaskInspector:
 
         for record in records:
             metadata = record.metadata
+            found_issue = False
+
             if "version_history" in metadata:
                 version_history = metadata["version_history"]
                 history_versions = [v["version"] for v in version_history]
                 max_version = max(history_versions) if history_versions else 0
 
                 if record.version < max_version:
+                    found_issue = True
                     last_newer_update = None
                     for v_entry in version_history:
                         if v_entry["version"] == max_version:
@@ -64,6 +80,7 @@ class TaskInspector:
                     ))
             else:
                 if record.is_expired and record.version < 3:
+                    found_issue = True
                     candidates.append(CandidateItem(
                         record_id=record.record_id,
                         risk_type=RiskType.EXPIRED_RECORD,
@@ -75,6 +92,20 @@ class TaskInspector:
                             "engineer": record.engineer
                         }
                     ))
+
+            if not found_issue:
+                candidates.append(CandidateItem(
+                    record_id=record.record_id,
+                    risk_type=RiskType.NORMAL_RECORD,
+                    description="记录正常，无版本冲突问题",
+                    suggestion="无需处理，保持原样",
+                    current_version=record.version,
+                    detected_version=None,
+                    details={
+                        "date": record.date,
+                        "engineer": record.engineer
+                    }
+                ))
 
         return candidates
 
@@ -148,6 +179,9 @@ class TaskInspector:
                 record.is_expired = True
                 record.metadata["cleaned_at"] = executed_at.isoformat()
                 result = "已标记为已清理的过期记录"
+
+            elif candidate.risk_type == RiskType.NORMAL_RECORD:
+                result = "记录正常，无需处理"
 
             after_state = record.to_dict()
             self.storage.save_duty_record(record)

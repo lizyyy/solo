@@ -9,6 +9,7 @@ class RiskType(Enum):
     OLD_VERSION_OVERWRITES_NEW = "旧版本覆盖新版本"
     EXPIRED_RECORD = "过期记录"
     DATA_INCONSISTENCY = "数据不一致"
+    NORMAL_RECORD = "正常记录"
     UNKNOWN = "未知风险"
 
 
