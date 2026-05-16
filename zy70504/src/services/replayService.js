@@ -334,7 +334,7 @@ const recordWriteInterception = (batchId, spaceId, namespace, payloadId, origina
   });
 };
 
-const recordException = (batchId, spaceId, namespace, payloadId, exceptionType, errorMessage, errorStack, originalInput, processingEvidence, operatedBy) => {
+const recordException = (batchId, spaceId, namespace, payloadId, exceptionType, errorMessage, errorStack, originalInput, processingEvidence, finalConclusion, operatedBy) => {
   return new Promise((resolve, reject) => {
     const validations = [
       validateBatchBelongsToNamespace(batchId, namespace),
@@ -355,9 +355,9 @@ const recordException = (batchId, spaceId, namespace, payloadId, exceptionType, 
         const now = Date.now();
         
         db.run(
-          `INSERT INTO exception_records (id, batch_id, space_id, namespace, payload_id, exception_type, error_message, error_stack, original_input, processing_evidence, occurred_at, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [id, batchId, spaceId, namespace, payloadId, exceptionType, errorMessage, errorStack, JSON.stringify(originalInput), JSON.stringify(processingEvidence), now, EXCEPTION_STATES.OPEN],
+          `INSERT INTO exception_records (id, batch_id, space_id, namespace, payload_id, exception_type, error_message, error_stack, original_input, processing_evidence, final_conclusion, occurred_at, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [id, batchId, spaceId, namespace, payloadId, exceptionType, errorMessage, errorStack, JSON.stringify(originalInput), JSON.stringify(processingEvidence), finalConclusion ? JSON.stringify(finalConclusion) : null, now, finalConclusion ? EXCEPTION_STATES.RESOLVED : EXCEPTION_STATES.OPEN],
           (err) => {
             if (err) {
               reject(err);
