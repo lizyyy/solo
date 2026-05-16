@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const baseURL = "http://localhost:8080/api/v1"
+const baseURL = "http://localhost:8081/api/v1"
 
 type File struct {
 	ID   string `json:"id"`
@@ -24,14 +24,16 @@ type Issuer struct {
 }
 
 type Link struct {
-	ID          string    `json:"id"`
-	Token       string    `json:"token"`
-	FileID      string    `json:"file_id"`
-	IssuerID    string    `json:"issuer_id"`
-	ExpiresAt   time.Time `json:"expires_at"`
-	MaxAccess   int       `json:"max_access"`
-	AccessCount int       `json:"access_count"`
-	Status      string    `json:"status"`
+	ID           string    `json:"id"`
+	Token        string    `json:"token"`
+	FileID       string    `json:"file_id"`
+	IssuerID     string    `json:"issuer_id"`
+	ExpiresAt    time.Time `json:"expires_at"`
+	MaxAccess    int       `json:"max_access"`
+	AccessCount  int       `json:"access_count"`
+	Status       string    `json:"status"`
+	RevokeReason string    `json:"revoke_reason"`
+	RevokedBy    string    `json:"revoked_by"`
 }
 
 func postRequest(url string, data interface{}, result interface{}) error {

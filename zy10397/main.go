@@ -10,11 +10,11 @@ import (
 func main() {
 	config.InitDB()
 	service.StartCleanupJob()
-	
+
 	r := api.SetupRouter()
-	
-	log.Println("Server starting on :8080")
-	if err := r.Run(":8080"); err != nil {
+
+	log.Println("Server starting on :8081")
+	if err := r.Run(":8081"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }

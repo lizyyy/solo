@@ -9,20 +9,20 @@ import (
 )
 
 var (
-	ErrLinkNotFound    = errors.New("link not found")
-	ErrLinkExpired     = errors.New("link expired")
-	ErrLinkRevoked     = errors.New("link revoked")
-	ErrLinkExhausted   = errors.New("link access exhausted")
-	ErrFileNotFound    = errors.New("file not found")
-	ErrIssuerNotFound  = errors.New("issuer not found")
+	ErrLinkNotFound     = errors.New("link not found")
+	ErrLinkExpired      = errors.New("link expired")
+	ErrLinkRevoked      = errors.New("link revoked")
+	ErrLinkExhausted    = errors.New("link access exhausted")
+	ErrFileNotFound     = errors.New("file not found")
+	ErrIssuerNotFound   = errors.New("issuer not found")
 	ErrInvalidMaxAccess = errors.New("max access must be greater than 0")
 )
 
 type LinkService struct {
-	linkRepo    *repository.LinkRepository
-	fileRepo    *repository.FileRepository
-	issuerRepo  *repository.IssuerRepository
-	logRepo     *repository.AccessLogRepository
+	linkRepo   *repository.LinkRepository
+	fileRepo   *repository.FileRepository
+	issuerRepo *repository.IssuerRepository
+	logRepo    *repository.AccessLogRepository
 }
 
 func NewLinkService() *LinkService {
@@ -158,8 +158,8 @@ func (s *LinkService) logAccess(linkID, token, clientIP, userAgent string, succe
 }
 
 type RevokeRequest struct {
-	LinkID string `json:"link_id" binding:"required"`
-	Reason string `json:"reason" binding:"required"`
+	LinkID    string `json:"link_id"`
+	Reason    string `json:"reason" binding:"required"`
 	RevokedBy string `json:"revoked_by"`
 }
 

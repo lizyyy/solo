@@ -37,7 +37,7 @@ go mod download
 go run main.go
 ```
 
-服务将在 `http://localhost:8080` 启动。
+服务将在 `http://localhost:8081` 启动。
 
 ### 3. 运行示例
 
@@ -86,7 +86,7 @@ go run cmd/example.go
 
 **请求：**
 ```bash
-curl -X POST http://localhost:8080/api/v1/files \
+curl -X POST http://localhost:8081/api/v1/files \
   -H "Content-Type: application/json" \
   -d '{"name": "report.pdf", "path": "/documents/report.pdf", "size": 1024000}'
 ```
@@ -106,7 +106,7 @@ curl -X POST http://localhost:8080/api/v1/files \
 
 **请求：**
 ```bash
-curl -X POST http://localhost:8080/api/v1/issuers \
+curl -X POST http://localhost:8081/api/v1/issuers \
   -H "Content-Type: application/json" \
   -d '{"name": "李四", "email": "lisi@example.com", "department": "技术部"}'
 ```
@@ -126,7 +126,7 @@ curl -X POST http://localhost:8080/api/v1/issuers \
 
 **请求（基本）：**
 ```bash
-curl -X POST http://localhost:8080/api/v1/links \
+curl -X POST http://localhost:8081/api/v1/links \
   -H "Content-Type: application/json" \
   -d '{
     "file_id": "文件ID",
@@ -138,7 +138,7 @@ curl -X POST http://localhost:8080/api/v1/links \
 
 **请求（带幂等性）：**
 ```bash
-curl -X POST http://localhost:8080/api/v1/links \
+curl -X POST http://localhost:8081/api/v1/links \
   -H "Content-Type: application/json" \
   -d '{
     "idempotency_key": "order-12345-file-access",
@@ -171,7 +171,7 @@ curl -X POST http://localhost:8080/api/v1/links \
 
 **请求：**
 ```bash
-curl -X POST http://localhost:8080/api/v1/links \
+curl -X POST http://localhost:8081/api/v1/links \
   -H "Content-Type: application/json" \
   -d '{
     "file_id": "non-existent-id",
@@ -199,13 +199,13 @@ curl -X POST http://localhost:8080/api/v1/links \
 
 ```bash
 # 第1次 - 成功
-curl http://localhost:8080/api/v1/access/validate/你的token
+curl http://localhost:8081/api/v1/access/validate/你的token
 
 # 第2次 - 成功
-curl http://localhost:8080/api/v1/access/validate/你的token
+curl http://localhost:8081/api/v1/access/validate/你的token
 
 # 第3次 - 失败
-curl http://localhost:8080/api/v1/access/validate/你的token
+curl http://localhost:8081/api/v1/access/validate/你的token
 ```
 
 **第3次响应（403）：**
@@ -222,13 +222,13 @@ curl http://localhost:8080/api/v1/access/validate/你的token
 1. 创建链接
 2. 撤销链接：
 ```bash
-curl -X POST http://localhost:8080/api/v1/links/链接ID/revoke \
+curl -X POST http://localhost:8081/api/v1/links/链接ID/revoke \
   -H "Content-Type: application/json" \
   -d '{"reason": "文件内容变更", "revoked_by": "admin"}'
 ```
 3. 验证链接：
 ```bash
-curl http://localhost:8080/api/v1/access/validate/你的token
+curl http://localhost:8081/api/v1/access/validate/你的token
 ```
 
 **响应（403）：**
@@ -244,7 +244,7 @@ curl http://localhost:8080/api/v1/access/validate/你的token
 
 **请求：**
 ```bash
-curl http://localhost:8080/api/v1/access/validate/invalid-token
+curl http://localhost:8081/api/v1/access/validate/invalid-token
 ```
 
 **响应（403）：**
@@ -262,12 +262,12 @@ curl http://localhost:8080/api/v1/access/validate/invalid-token
 
 ```bash
 # 第一次
-curl -X POST http://localhost:8080/api/v1/links \
+curl -X POST http://localhost:8081/api/v1/links \
   -H "Content-Type: application/json" \
   -d '{"idempotency_key": "test-key-001", "file_id": "文件ID", "issuer_id": "签发人ID", "expire_hours": 1, "max_access": 3}'
 
 # 第二次（返回相同的链接，不创建新记录）
-curl -X POST http://localhost:8080/api/v1/links \
+curl -X POST http://localhost:8081/api/v1/links \
   -H "Content-Type: application/json" \
   -d '{"idempotency_key": "test-key-001", "file_id": "文件ID", "issuer_id": "签发人ID", "expire_hours": 1, "max_access": 3}'
 ```
@@ -281,7 +281,7 @@ curl -X POST http://localhost:8080/api/v1/links \
 ### 1. 查看单个链接的访问日志
 
 ```bash
-curl http://localhost:8080/api/v1/links/链接ID/logs?limit=10
+curl http://localhost:8081/api/v1/links/链接ID/logs?limit=10
 ```
 
 **响应：**
@@ -308,7 +308,7 @@ curl http://localhost:8080/api/v1/links/链接ID/logs?limit=10
 ### 2. 查看所有访问日志（分页）
 
 ```bash
-curl http://localhost:8080/api/v1/access/logs?limit=50&offset=0
+curl http://localhost:8081/api/v1/access/logs?limit=50&offset=0
 ```
 
 **响应：**
@@ -324,7 +324,7 @@ curl http://localhost:8080/api/v1/access/logs?limit=50&offset=0
 ### 3. 查看链接状态
 
 ```bash
-curl http://localhost:8080/api/v1/links/链接ID
+curl http://localhost:8081/api/v1/links/链接ID
 ```
 
 可以查看链接的：
@@ -337,7 +337,7 @@ curl http://localhost:8080/api/v1/links/链接ID
 ### 4. 查看所有链接列表
 
 ```bash
-curl http://localhost:8080/api/v1/links
+curl http://localhost:8081/api/v1/links
 ```
 
 ---
