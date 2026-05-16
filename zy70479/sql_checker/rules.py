@@ -65,10 +65,10 @@ class RuleEngine:
                 {
                     "id": "R005",
                     "name": "硬编码检测",
-                    "description": "检测WHERE条件中的硬编码值，强制使用参数化查询",
+                    "description": "检测WHERE条件中的硬编码值和字符串格式化占位符，强制使用参数化查询",
                     "check_func": "check_param_markers",
                     "severity": "high",
-                    "suggestion": "使用?或%s作为参数标记，避免硬编码SQL"
+                    "suggestion": "使用?作为参数标记，避免硬编码SQL或字符串格式化"
                 },
                 {
                     "id": "R006",
@@ -146,12 +146,19 @@ class RuleEngine:
         )
 
     def check_param_markers(self, sql: str, rule_content: Dict) -> Dict:
-        allowed = rule_content.get("allowed_param_markers", ["?", "%s", ":name", ":1"])
+        has_percent_s_in_quotes = re.search(r"['\"]%[sdf]['\"]", sql)
+        if has_percent_s_in_quotes:
+            return {
+                "passed": False,
+                "message": "检测到字符串中的格式化占位符('%s')，使用.format()而非参数化查询"
+            }
+
+        allowed = rule_content.get("allowed_param_markers", ["?"])
         has_param = any(marker in sql for marker in allowed)
 
         has_hardcoded_where = False
+        matches = []
         if "where" in sql.lower() and not has_param:
-            import re
             matches = re.findall(r"=\s*['\"]?[\w\d]+['\"]?", sql, re.IGNORECASE)
             if matches:
                 has_hardcoded_where = True

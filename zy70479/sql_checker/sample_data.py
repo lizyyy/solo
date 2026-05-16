@@ -32,7 +32,8 @@ def generate_channel_receipts() -> List[Dict]:
         "channel_code": "CH011",
         "amount": 5000.00,
         "status": "success",
-        "sql": 'SELECT * FROM payment_records WHERE business_no = \'' + business_no + '\'',
+        "sql": "SELECT * FROM payment_records WHERE business_no = 'PAY202605160011'",
+        "raw_sql_pattern": "字符串拼接: '...' + var",
         "description": "字符串拼接SQL - 注入风险",
         "expected_result": "fail",
         "source": "微信支付渠道回执"
@@ -44,7 +45,8 @@ def generate_channel_receipts() -> List[Dict]:
         "channel_code": "CH012",
         "amount": 3000.00,
         "status": "success",
-        "sql": f"SELECT * FROM payment_records WHERE amount > {1000} AND status = 'success'",
+        "sql": "SELECT * FROM payment_records WHERE amount > 1000 AND status = 'success'",
+        "raw_sql_pattern": "f-string: f'...{var}...'",
         "description": "f-string格式化SQL - 注入风险",
         "expected_result": "fail",
         "source": "银联渠道回执"
@@ -56,7 +58,8 @@ def generate_channel_receipts() -> List[Dict]:
         "channel_code": "CH013",
         "amount": 2500.00,
         "status": "success",
-        "sql": "SELECT * FROM payment_records WHERE channel_code = '%s'".format("CH013"),
+        "sql": "SELECT * FROM payment_records WHERE channel_code = '%s'",
+        "raw_sql_pattern": ".format(): '...%s...'.format(var)",
         "description": "format方法格式化SQL - 注入风险",
         "expected_result": "fail",
         "source": "京东支付渠道回执"
@@ -68,7 +71,8 @@ def generate_channel_receipts() -> List[Dict]:
         "channel_code": "CH014",
         "amount": 8000.00,
         "status": "success",
-        "sql": "SELECT * FROM payment_records WHERE id = %d" % 12345,
+        "sql": "SELECT * FROM payment_records WHERE id = 12345",
+        "raw_sql_pattern": "%格式化: '...%d...' % var",
         "description": "百分号格式化SQL - 注入风险",
         "expected_result": "fail",
         "source": "美团支付渠道回执"

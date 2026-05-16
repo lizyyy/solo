@@ -105,6 +105,7 @@
     "amount": 5000.0,
     "status": "success",
     "sql": "SELECT * FROM payment_records WHERE business_no = 'PAY202605160011'",
+    "raw_sql_pattern": "字符串拼接: '...' + var",
     "description": "字符串拼接SQL - 注入风险",
     "expected_result": "fail",
     "source": "微信支付渠道回执"
@@ -115,6 +116,7 @@
     "amount": 3000.0,
     "status": "success",
     "sql": "SELECT * FROM payment_records WHERE amount > 1000 AND status = 'success'",
+    "raw_sql_pattern": "f-string: f'...{var}...'",
     "description": "f-string格式化SQL - 注入风险",
     "expected_result": "fail",
     "source": "银联渠道回执"
@@ -125,6 +127,7 @@
     "amount": 2500.0,
     "status": "success",
     "sql": "SELECT * FROM payment_records WHERE channel_code = '%s'",
+    "raw_sql_pattern": ".format(): '...%s...'.format(var)",
     "description": "format方法格式化SQL - 注入风险",
     "expected_result": "fail",
     "source": "京东支付渠道回执"
@@ -135,6 +138,7 @@
     "amount": 8000.0,
     "status": "success",
     "sql": "SELECT * FROM payment_records WHERE id = 12345",
+    "raw_sql_pattern": "%格式化: '...%d...' % var",
     "description": "百分号格式化SQL - 注入风险",
     "expected_result": "fail",
     "source": "美团支付渠道回执"
