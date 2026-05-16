@@ -1,0 +1,76 @@
+{
+  "metadata": {
+    "total_samples": 20,
+    "valid_samples": 18,
+    "bad_samples": 2
+  },
+  "summary": {
+    "total_lag": 25420,
+    "max_lag": 4600,
+    "avg_lag": 1412.22
+  },
+  "partition_stats": [
+    {
+      "consumer_group": "order-service",
+      "topic": "order-topic",
+      "partition": 0,
+      "min_lag": 1250,
+      "max_lag": 1520,
+      "avg_lag": 1383.33,
+      "latest_lag": 1520,
+      "trend": "increasing"
+    },
+    {
+      "consumer_group": "order-service",
+      "topic": "order-topic",
+      "partition": 1,
+      "min_lag": 890,
+      "max_lag": 1300,
+      "avg_lag": 1022.5,
+      "latest_lag": 1300,
+      "trend": "increasing"
+    },
+    {
+      "consumer_group": "order-service",
+      "topic": "order-topic",
+      "partition": 2,
+      "min_lag": 2100,
+      "max_lag": 4600,
+      "avg_lag": 2987.5,
+      "latest_lag": 4600,
+      "trend": "increasing"
+    },
+    {
+      "consumer_group": "payment-service",
+      "topic": "payment-topic",
+      "partition": 0,
+      "min_lag": 450,
+      "max_lag": 850,
+      "avg_lag": 600.0,
+      "latest_lag": 850,
+      "trend": "increasing"
+    },
+    {
+      "consumer_group": "payment-service",
+      "topic": "payment-topic",
+      "partition": 1,
+      "min_lag": 780,
+      "max_lag": 1200,
+      "avg_lag": 943.33,
+      "latest_lag": 1200,
+      "trend": "increasing"
+    }
+  ],
+  "bad_samples": [
+    {
+      "line": 16,
+      "data": "2024-01-15 10timestamp,consumer_group,tme2024-01-15 10:00:00,order-service,order-topic,0,1250,10000,11250",
+      "error": "Cannot parse timestamp: 2024-01-15 10timestamp"
+    },
+    {
+      "line": 17,
+      "data": "2024c,2024-01-15 10:00:00,order-service,order-topic,1,890,15000,15890c,2024-01-15 10:00:00,order-service,order-topic,2,2100,20000,221ic2024-01-15 10:00:00,payment-service,payment-topic,0,450,5000,54-t2024-01-15 10:00:00,payment-service,payment-topic,1,780,8000,878-t2024-01-15 10:05:00,order-service,order-topic,0,1380,10500,11880pi2024-01-15 10:05:00,order-service,order-topic,1,920,15500,16420pi2024-01-15 10:05:00,order-service,order-topic,2,2450,20500,229op2024-01-15 10:05:00,payment-service,payment-topic,0,520,5500,60nt2024-01-15 10:05:00,payment-service,payment-topic,1,850,8500,935nt2024-01-15 10:10:00,order-service,order-topic,0,1520,11000,12520:02024-01-15 10:10:00,order-service,order-topic,1,980,16000,16980:02024-01-15 10:10:00,order-service,order-topic,2,2800,21000,2385:2024-01-15 10:10:00,payment-service,payment-topic,0,580,6000,65th2024-01-15 10timestamp,consumer_group,tme2024-01-15 10:00:00,ord0,2024c,2024-01-15 10:00:00,order-service,order-topic,1,890,15000,15890c,2024-01-15 10:00:00,order-servicerder-service,order-topic,0,2280,13000,15280",
+      "error": "Cannot parse timestamp: 2024c"
+    }
+  ]
+}

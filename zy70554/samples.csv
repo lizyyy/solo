@@ -1,0 +1,21 @@
+timestamp,consumer_group,topic,partition,lag,current_offset,end_offset
+2024-01-15 10:00:00,order-service,order-topic,0,1250,10000,11250
+2024-01-15 10:00:00,order-service,order-topic,1,890,15000,15890
+2024-01-15 10:00:00,order-service,order-topic,2,2100,20000,22100
+2024-01-15 10:00:00,payment-service,payment-topic,0,450,5000,5450
+2024-01-15 10:00:00,payment-service,payment-topic,1,780,8000,8780
+2024-01-15 10:05:00,order-service,order-topic,0,1380,10500,11880
+2024-01-15 10:05:00,order-service,order-topic,1,920,15500,16420
+2024-01-15 10:05:00,order-service,order-topic,2,2450,20500,22950
+2024-01-15 10:05:00,payment-service,payment-topic,0,520,5500,6020
+2024-01-15 10:05:00,payment-service,payment-topic,1,850,8500,9350
+2024-01-15 10:10:00,order-service,order-topic,0,1520,11000,12520
+2024-01-15 10:10:00,order-service,order-topic,1,980,16000,16980
+2024-01-15 10:10:00,order-service,order-topic,2,2800,21000,23800
+2024-01-15 10:10:00,payment-service,payment-topic,0,580,6000,6580
+2024-01-15 10timestamp,consumer_group,tme2024-01-15 10:00:00,order-service,order-topic,0,1250,10000,11250
+2024c,2024-01-15 10:00:00,order-service,order-topic,1,890,15000,15890c,2024-01-15 10:00:00,order-service,order-topic,2,2100,20000,221ic2024-01-15 10:00:00,payment-service,payment-topic,0,450,5000,54-t2024-01-15 10:00:00,payment-service,payment-topic,1,780,8000,878-t2024-01-15 10:05:00,order-service,order-topic,0,1380,10500,11880pi2024-01-15 10:05:00,order-service,order-topic,1,920,15500,16420pi2024-01-15 10:05:00,order-service,order-topic,2,2450,20500,229op2024-01-15 10:05:00,payment-service,payment-topic,0,520,5500,60nt2024-01-15 10:05:00,payment-service,payment-topic,1,850,8500,935nt2024-01-15 10:10:00,order-service,order-topic,0,1520,11000,12520:02024-01-15 10:10:00,order-service,order-topic,1,980,16000,16980:02024-01-15 10:10:00,order-service,order-topic,2,2800,21000,2385:2024-01-15 10:10:00,payment-service,payment-topic,0,580,6000,65th2024-01-15 10timestamp,consumer_group,tme2024-01-15 10:00:00,ord0,2024c,2024-01-15 10:00:00,order-service,order-topic,1,890,15000,15890c,2024-01-15 10:00:00,order-servicerder-service,order-topic,0,2280,13000,15280
+2024-01-15 10:30:00,order-service,order-topic,1,1300,18000,19300
+2024-01-15 10:30:00,order-service,order-topic,2,4600,23000,27600
+2024-01-15 10:30:00,payment-service,payment-topic,0,850,8000,8850
+2024-01-15 10:30:00,payment-service,payment-topic,1,1200,11000,12200
