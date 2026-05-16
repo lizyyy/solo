@@ -1,0 +1,23 @@
+{
+  "name": "replay-isolation-api",
+  "version": "1.0.0",
+  "description": "数据回放隔离API - 生产事件沙箱回放系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "node tests/run-tests.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "joi": "^17.11.0",
+    "crypto-js": "^4.2.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
