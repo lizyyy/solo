@@ -5,6 +5,7 @@ async function runTests() {
  let vendorId;
  let interfaceId;
  let disposalId;
+ let disposalId2;
  try {
  console.log('1. 创建供应商...');
  const vendorRes = await axios.post(`${BASE_URL}/vendors`, {
@@ -127,7 +128,7 @@ async function runTests() {
  }
  }
  try {
- console.log('\n9. 推进处置状态...');
+ console.log('\n9. 推进处置状态 pending -> in_progress...');
  const advanceRes = await axios.post(`${BASE_URL}/disposal/${disposalId}/status`, {
  status: 'in_progress',
  result: '运维已确认，正在排查'
@@ -138,7 +139,86 @@ async function runTests() {
  console.log(` ✗ 推进失败: ${err.response?.data?.error || err.message}`);
  }
  try {
- console.log('\n10. 人工修正...');
+ console.log('\n10. 重复推进到相同状态 in_progress -> in_progress (验证防重复推进)...');
+ await axios.post(`${BASE_URL}/disposal/${disposalId}/status`, {
+ status: 'in_progress',
+ result: '重复推进'
+ });
+ console.log(' ✗ 应该失败但成功了');
+ }
+ catch (err) {
+ if (err.response?.data?.error?.includes('状态未变更')) {
+ console.log(' ✓ 正确拦截重复推进');
+ }
+ else {
+ console.log(` ✗ 错误类型不符: ${err.response?.data?.error}`);
+ }
+ }
+ try {
+ console.log('\n11. 非法状态回退 in_progress -> pending (验证非法流转)...');
+ await axios.post(`${BASE_URL}/disposal/${disposalId}/status`, {
+ status: 'pending',
+ result: '状态回退'
+ });
+ console.log(' ✗ 应该失败但成功了');
+ }
+ catch (err) {
+ if (err.response?.data?.error?.includes('非法的状态流转')) {
+ console.log(' ✓ 正确拦截状态回退');
+ }
+ else {
+ console.log(` ✗ 错误类型不符: ${err.response?.data?.error}`);
+ }
+ }
+ try {
+ console.log('\n12. 正常推进到结束状态 in_progress -> resolved...');
+ const advanceRes = await axios.post(`${BASE_URL}/disposal/${disposalId}/status`, {
+ status: 'resolved',
+ result: '问题已修复，服务恢复正常'
+ });
+ console.log(` ✓ 状态推进成功，当前状态: ${advanceRes.data.data.status}`);
+ }
+ catch (err) {
+ console.log(` ✗ 推进失败: ${err.response?.data?.error || err.message}`);
+ }
+ try {
+ console.log('\n13. 已结束状态再次推进 resolved -> cancelled (验证已结束不可推进)...');
+ await axios.post(`${BASE_URL}/disposal/${disposalId}/status`, {
+ status: 'cancelled',
+ result: '再次推进'
+ });
+ console.log(' ✗ 应该失败但成功了');
+ }
+ catch (err) {
+ if (err.response?.data?.error?.includes('无法推进已结束的状态')) {
+ console.log(' ✓ 正确拦截已结束状态的推进');
+ }
+ else {
+ console.log(` ✗ 错误类型不符: ${err.response?.data?.error}`);
+ }
+ }
+ try {
+ console.log('\n14. 创建第二个处置动作，完整验证流转 pending -> cancelled...');
+ const disposalRes2 = await axios.post(`${BASE_URL}/disposal`, {
+ interface_id: interfaceId,
+ vendor_id: vendorId,
+ action_type: 'fuse',
+ action_reason: '熔断测试',
+ triggered_by: 'manual'
+ });
+ disposalId2 = disposalRes2.data.data.id;
+ console.log(` ✓ 第二个处置动作创建成功，ID: ${disposalId2}`);
+ const cancelRes = await axios.post(`${BASE_URL}/disposal/${disposalId2}/status`, {
+ status: 'cancelled',
+ result: '取消熔断，改为降级'
+ });
+ console.log(` ✓ 状态推进成功 pending -> cancelled，当前状态: ${cancelRes.data.data.status}`);
+ }
+ catch (err) {
+ console.log(` ✗ 测试失败: ${err.response?.data?.error || err.message}`);
+ }
+ try {
+ console.log('\n15. 人工修正...');
  await axios.post(`${BASE_URL}/export/manual-correction`, {
  interface_id: interfaceId,
  vendor_id: vendorId,
@@ -154,7 +234,7 @@ async function runTests() {
  console.log(` ✗ 修正失败: ${err.response?.data?.error || err.message}`);
  }
  try {
- console.log('\n11. 导出健康摘要...');
+ console.log('\n16. 导出健康摘要...');
  const exportRes = await axios.get(`${BASE_URL}/export/health-summary?vendor_id=${vendorId}`);
  const summary = exportRes.data.data;
  console.log(` ✓ 导出成功，共 ${summary.total_interfaces} 个接口`);
@@ -173,7 +253,7 @@ async function runTests() {
  console.log(` ✗ 导出失败: ${err.response?.data?.error || err.message}`);
  }
  try {
- console.log('\n12. 查询失败聚合...');
+ console.log('\n17. 查询失败聚合...');
  const aggRes = await axios.get(`${BASE_URL}/failures/interface/${interfaceId}/aggregate`);
  console.log(` ✓ 聚合成功，共 ${aggRes.data.data.length} 种错误类型`);
  aggRes.data.data.forEach(item => {
@@ -190,6 +270,11 @@ async function runTests() {
  console.log(' ✓ 健康评分自动计算');
  console.log(' ✓ 处置动作防重复提交');
  console.log(' ✓ 处置状态推进');
+ console.log(' ✓ 状态机严格校验 - 重复推进被拦截');
+ console.log(' ✓ 状态机严格校验 - 状态回退被拦截');
+ console.log(' ✓ 状态机严格校验 - 已结束状态不可推进');
+ console.log(' ✓ 合法流转路径: pending -> in_progress -> resolved');
+ console.log(' ✓ 合法流转路径: pending -> cancelled');
  console.log(' ✓ 人工修正记录');
  console.log(' ✓ 健康摘要导出，每条异常都有解释');
  console.log(' ✓ 失败路径保留原始输入、处理依据和最终结论');

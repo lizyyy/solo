@@ -14,6 +14,16 @@ const ACTION_TYPES = {
  RETRY: 'retry',
  MANUAL: 'manual'
 };
+const VALID_TRANSITIONS = {
+ [DISPOSAL_STATUS.PENDING]: [DISPOSAL_STATUS.IN_PROGRESS, DISPOSAL_STATUS.RESOLVED, DISPOSAL_STATUS.CANCELLED],
+ [DISPOSAL_STATUS.IN_PROGRESS]: [DISPOSAL_STATUS.RESOLVED, DISPOSAL_STATUS.CANCELLED],
+ [DISPOSAL_STATUS.RESOLVED]: [],
+ [DISPOSAL_STATUS.CANCELLED]: []
+};
+function isValidTransition(currentStatus, newStatus) {
+ const validNextStates = VALID_TRANSITIONS[currentStatus];
+ return validNextStates && validNextStates.includes(newStatus);
+}
 class DisposalService {
  static async checkDuplicateAction(interfaceId, actionType, statusList = [DISPOSAL_STATUS.PENDING, DISPOSAL_STATUS.IN_PROGRESS]) {
  return new Promise((resolve, reject) => {
@@ -67,8 +77,15 @@ class DisposalService {
  if (!action) {
  return reject(new Error('处置动作不存在'));
  }
- if (action.status === DISPOSAL_STATUS.RESOLVED || action.status === DISPOSAL_STATUS.CANCELLED) {
- return reject(new Error(`无法推进已结束的状态: ${action.status}`));
+ const currentStatus = action.status;
+ if (currentStatus === newStatus) {
+ return reject(new Error(`状态未变更，当前已是: ${currentStatus}`));
+ }
+ if (currentStatus === DISPOSAL_STATUS.RESOLVED || currentStatus === DISPOSAL_STATUS.CANCELLED) {
+ return reject(new Error(`无法推进已结束的状态: ${currentStatus}`));
+ }
+ if (!isValidTransition(currentStatus, newStatus)) {
+ return reject(new Error(`非法的状态流转: ${currentStatus} -> ${newStatus}`));
  }
  const now = Date.now();
  db.run(`UPDATE disposal_actions SET status = ?, action_result = ?, updated_at = ?
@@ -130,4 +147,4 @@ class DisposalService {
  return null;
  }
 }
-module.exports = { DisposalService, DISPOSAL_STATUS, ACTION_TYPES };
+module.exports = { DisposalService, DISPOSAL_STATUS, ACTION_TYPES, VALID_TRANSITIONS };
