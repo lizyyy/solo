@@ -1,0 +1,16 @@
+key,size,lastModified,isLatest,versionId,storageClass,tags
+logs/2024/01/app.log,1048576,2024-01-15T10:30:00Z,true,ver-001,STANDARD,
+logs/2024/05/server.log,2097152,2024-05-20T14:45:00Z,true,ver-002,STANDARD,
+logs/2024/12/access.log,524288,2024-12-01T08:00:00Z,true,ver-003,STANDARD,
+tmp/upload-12345.tmp,102400,2024-12-25T16:20:00Z,true,ver-004,STANDARD,
+tmp/cache-data.dat,512000,2024-12-20T09:10:00Z,true,ver-005,STANDARD,
+tmp/old-file.tmp,256000,2024-11-01T12:00:00Z,true,ver-006,STANDARD,
+data/archive/2023/records.json,10485760,2023-06-15T10:00:00Z,true,ver-007,GLACIER,"archive=true"
+data/archive/2024/backup.tar,52428800,2024-06-01T15:30:00Z,true,ver-008,GLACIER,"archive=true"
+data/active/users.csv,1048576,2024-12-28T11:00:00Z,true,ver-009,STANDARD,
+documents/report.pdf,2097152,2024-10-15T09:00:00Z,false,ver-010,STANDARD,
+documents/report.pdf,3145728,2024-12-01T14:30:00Z,true,ver-011,STANDARD,
+backup/database.sql,104857600,2024-01-01T00:00:00Z,true,ver-012,STANDARD,
+this,is,a,bad,row
+invalid-data,,,,,
+another-bad-line,with,some,data

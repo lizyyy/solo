@@ -1,0 +1,44 @@
+{
+  "name": "lifecycle-simulator",
+  "version": "1.0.0",
+  "description": "对象存储生命周期规则预演CLI工具",
+  "main": "dist/index.js",
+  "bin": {
+    "lifecycle-sim": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "lint": "eslint src/**/*.ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "object-storage",
+    "lifecycle",
+    "simulator",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "dayjs": "^1.11.10",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/js-yaml": "^4.0.9",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

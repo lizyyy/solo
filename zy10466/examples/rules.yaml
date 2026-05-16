@@ -1,0 +1,41 @@
+Rules:
+  - id: delete-old-logs
+    status: Enabled
+    filter:
+      prefix: logs/
+    expiration:
+      days: 30
+
+  - id: delete-temp-files
+    status: Enabled
+    filter:
+      prefix: tmp/
+    expiration:
+      days: 7
+
+  - id: archive-old-data
+    status: Enabled
+    filter:
+      prefix: data/archive/
+      tags:
+        - key: archive
+          value: "true"
+    expiration:
+      days: 365
+
+  - id: noncurrent-version-cleanup
+    status: Enabled
+    noncurrentVersionExpiration:
+      noncurrentDays: 90
+
+  - id: abort-incomplete-uploads
+    status: Enabled
+    abortIncompleteMultipartUpload:
+      daysAfterInitiation: 7
+
+  - id: disabled-rule-example
+    status: Disabled
+    filter:
+      prefix: backup/
+    expiration:
+      days: 180
