@@ -105,7 +105,7 @@ class BudgetFreezeService {
     }
 
     if (!canTransition(freeze.status, toStatus)) {
-      throw new Error(`不允许从 ${freeze.status} 转换到 ${toStatus}`);
+      throw new Error('不允许从 ' + freeze.status + ' 转换到 ' + toStatus);
     }
 
     const operationId = uuidv4();
@@ -152,6 +152,19 @@ class BudgetFreezeService {
   }
 
   async createThawApproval(freezeId, applicantId, applicantName, thawReason, proposedAmount) {
+    const freeze = await this.getFreezeRecord(freezeId);
+    if (!freeze) {
+      throw new Error('冻结记录不存在');
+    }
+
+    if (isTerminalStatus(freeze.status)) {
+      throw new Error('当前状态为终态，不可申请解冻');
+    }
+
+    if (freeze.status === FREEZE_STATUS.PENDING_THAW_APPROVAL) {
+      throw new Error('已有解冻审批正在处理中');
+    }
+
     const approvalId = uuidv4();
 
     await db.run(`
@@ -162,6 +175,11 @@ class BudgetFreezeService {
     `, [
       approvalId, freezeId, applicantId, applicantName, thawReason, proposedAmount
     ]);
+
+    await this.transitionStatus(
+      freezeId, FREEZE_STATUS.PENDING_THAW_APPROVAL, applicantId, applicantName,
+      '提交解冻申请，申请金额: ' + proposedAmount + '，原因: ' + thawReason
+    );
 
     return this.getFreezeRecord(freezeId);
   }
@@ -175,6 +193,19 @@ class BudgetFreezeService {
       throw new Error('审批记录不存在');
     }
 
+    if (approval.status !== 'pending') {
+      throw new Error('该审批已处理，不可重复审批');
+    }
+
+    const freeze = await this.getFreezeRecord(approval.freeze_id);
+    if (!freeze) {
+      throw new Error('关联的冻结记录不存在');
+    }
+
+    if (freeze.status !== FREEZE_STATUS.PENDING_THAW_APPROVAL) {
+      throw new Error('当前状态 ' + freeze.status + ' 不可审批解冻，需先提交解冻申请');
+    }
+
     const toStatus = isPartial ? FREEZE_STATUS.PARTIALLY_THAWED : FREEZE_STATUS.THAWED;
 
     await db.run(`
@@ -186,16 +217,23 @@ class BudgetFreezeService {
 
     await this.transitionStatus(
       approval.freeze_id, toStatus, approverId, approverName,
-      isPartial ? '部分解冻审批通过' : '全额解冻审批通过'
+      isPartial ? ('部分解冻审批通过，解冻金额: ' + approval.proposed_amount) : ('全额解冻审批通过，解冻金额: ' + approval.proposed_amount)
     );
 
-    if (!isPartial) {
-      await db.run(`
-        UPDATE budget_freezes
-        SET final_conclusion = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE freeze_id = ?
-      `, [JSON.stringify({ conclusion: '全额解冻', amount: approval.proposed_amount }), approval.freeze_id]);
-    }
+    const finalConclusion = {
+      conclusion: isPartial ? '部分解冻' : '全额解冻',
+      thawAmount: approval.proposed_amount,
+      approver: approverName,
+      approvalTime: new Date().toISOString(),
+      remarks: approvalRemarks || '',
+      approvalId: approvalId
+    };
+
+    await db.run(`
+      UPDATE budget_freezes
+      SET final_conclusion = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE freeze_id = ?
+    `, [JSON.stringify(finalConclusion), approval.freeze_id]);
 
     return this.getFreezeRecord(approval.freeze_id);
   }
@@ -209,12 +247,30 @@ class BudgetFreezeService {
       throw new Error('审批记录不存在');
     }
 
+    if (approval.status !== 'pending') {
+      throw new Error('该审批已处理，不可重复驳回');
+    }
+
+    const freeze = await this.getFreezeRecord(approval.freeze_id);
+    if (!freeze) {
+      throw new Error('关联的冻结记录不存在');
+    }
+
+    if (freeze.status !== FREEZE_STATUS.PENDING_THAW_APPROVAL) {
+      throw new Error('当前状态 ' + freeze.status + ' 不可处理解冻审批');
+    }
+
     await db.run(`
       UPDATE thaw_approvals
       SET status = 'rejected', approver_id = ?, approver_name = ?,
           approval_remarks = ?, approved_at = CURRENT_TIMESTAMP
       WHERE approval_id = ?
     `, [approverId, approverName, rejectionReason, approvalId]);
+
+    await this.transitionStatus(
+      approval.freeze_id, FREEZE_STATUS.IN_INVESTIGATION, approverId, approverName,
+      '解冻申请被驳回，原因: ' + rejectionReason + '，转回继续调查状态'
+    );
 
     return this.getFreezeRecord(approval.freeze_id);
   }
@@ -255,7 +311,7 @@ class BudgetFreezeService {
     if (correction.freeze_id) {
       await this.transitionStatus(
         correction.freeze_id, FREEZE_STATUS.CORRECTED, approverId, approverName,
-        `人工修正已应用: ${remarks}`
+        '人工修正已应用: ' + remarks
       );
 
       await db.run(`
@@ -292,7 +348,7 @@ class BudgetFreezeService {
     `, [
       operationId, freezeId, 'exception', freeze.status, freeze.status,
       operatorId, operatorName,
-      `异常处理: ${JSON.stringify(exceptionData)}`
+      '异常处理: ' + JSON.stringify(exceptionData)
     ]);
 
     await db.run(`
