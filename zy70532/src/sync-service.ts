@@ -102,6 +102,7 @@ export async function validateSyncBatch(batchId: string): Promise<{ valid: boole
   }
 
   const rootNodes: string[] = [];
+  const validated = new Set<string>();
 
   for (const node of nodes) {
     if (node.parent_dept_id && !deptMap.has(node.parent_dept_id)) {
@@ -120,8 +121,54 @@ export async function validateSyncBatch(batchId: string): Promise<{ valid: boole
 
     if (!node.parent_dept_id) {
       rootNodes.push(node.dept_id);
+      validated.add(node.dept_id);
+      validCount++;
+      await updateNodeStatus(node.id, NodeStatus.VALID);
+      continue;
     }
 
+    const path: string[] = [];
+    let hasCycle = false;
+    let current: any = node;
+    const maxDepth = 1000;
+    let depth = 0;
+
+    while (current && current.parent_dept_id) {
+      if (depth++ > maxDepth) {
+        hasCycle = true;
+        break;
+      }
+
+      path.push(current.dept_id);
+
+      if (path.includes(current.parent_dept_id)) {
+        hasCycle = true;
+        break;
+      }
+
+      if (validated.has(current.parent_dept_id)) {
+        break;
+      }
+
+      current = deptMap.get(current.parent_dept_id);
+    }
+
+    if (hasCycle) {
+      const cyclePath = path.join(' -> ') + ' -> ' + current.parent_dept_id;
+      await createExceptionNode(
+        batchId,
+        node.id,
+        node.dept_id,
+        'CYCLE_DETECTED',
+        `检测到环形上级关系: ${cyclePath}`,
+        node.raw_data,
+        '部门树中不能存在环形引用关系'
+      );
+      await updateNodeStatus(node.id, NodeStatus.INVALID);
+      continue;
+    }
+
+    validated.add(node.dept_id);
     validCount++;
     await updateNodeStatus(node.id, NodeStatus.VALID);
   }
@@ -203,18 +250,26 @@ async function buildDepartmentRelations(
   batchId: string,
   deptMap: Map<string, any>
 ): Promise<void> {
+  const maxDepth = 1000;
   for (const [deptId, node] of deptMap) {
     const ancestors: string[] = [];
+    const visited = new Set<string>();
     let current: any = node;
     let distance = 0;
 
-    while (current) {
+    while (current && distance < maxDepth) {
+      if (visited.has(current.dept_id)) {
+        break;
+      }
+      visited.add(current.dept_id);
+
       if (distance > 0) {
         ancestors.push(current.dept_id);
       }
       current = current.parent_dept_id ? deptMap.get(current.parent_dept_id) : undefined;
       distance++;
     }
+
 
     for (let i = 0; i < ancestors.length; i++) {
       await run(
