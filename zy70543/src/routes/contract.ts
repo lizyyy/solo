@@ -58,6 +58,34 @@ router.get('/contracts/:contractId', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/suppliers/:supplierId/contracts', async (req: Request, res: Response) => {
+  try {
+    const contracts = await contractService.getSupplierContracts(req.params.supplierId);
+    res.json({ success: true, data: contracts, count: contracts.length });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error instanceof Error ? error.message : '查询供应商契约列表失败' });
+  }
+});
+
+router.get('/contracts/compare/:versionId1/:versionId2', async (req: Request, res: Response) => {
+  try {
+    const { versionId1, versionId2 } = req.params;
+    const result = await contractService.compareTwoVersions(versionId1, versionId2);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error instanceof Error ? error.message : '对比契约版本失败' });
+  }
+});
+
+router.get('/suppliers/:supplierId/contracts/compare', async (req: Request, res: Response) => {
+  try {
+    const result = await contractService.compareSupplierVersions(req.params.supplierId);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error instanceof Error ? error.message : '对比供应商所有契约版本失败' });
+  }
+});
+
 router.post('/samples', async (req: Request, res: Response) => {
   try {
     const { supplierId, contractVersionId, headers, body } = req.body;
