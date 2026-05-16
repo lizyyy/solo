@@ -1,0 +1,570 @@
+{
+  "meta": {
+    "generatedAt": "2026-05-16T21:09:22.632Z",
+    "inputOptions": {
+      "flags": "examples/flags.csv",
+      "code": "test-code",
+      "output": "./test-output",
+      "defaultValue": "false",
+      "extensions": "js,ts,jsx,tsx,vue",
+      "exclude": "node_modules,.git,dist,build",
+      "force": false,
+      "jsonOnly": false
+    },
+    "scanStats": {
+      "filesScanned": 4,
+      "linesScanned": 109,
+      "matchesFound": 40
+    },
+    "totalFlags": 8,
+    "totalReferences": 40
+  },
+  "flags": [
+    {
+      "name": "enable_new_checkout",
+      "defaultValue": "true",
+      "status": "deprecated",
+      "owner": "team-a",
+      "description": "新结算流程开关",
+      "source": {
+        "file": "examples/flags.csv",
+        "line": 2
+      },
+      "references": [
+        {
+          "flagName": "enable_new_checkout",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/checkout.js",
+          "line": 2,
+          "column": 22,
+          "context": "if (getFeatureFlag('enable_new_checkout')) {",
+          "matchType": "string_literal",
+          "relativePath": "src/checkout.js"
+        },
+        {
+          "flagName": "enable_new_checkout",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/checkout.js",
+          "line": 2,
+          "column": 23,
+          "context": "if (getFeatureFlag('enable_new_checkout')) {",
+          "matchType": "identifier",
+          "relativePath": "src/checkout.js"
+        },
+        {
+          "flagName": "enable_new_checkout",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/checkout.js",
+          "line": 2,
+          "column": 7,
+          "context": "if (getFeatureFlag('enable_new_checkout')) {",
+          "matchType": "getter_call",
+          "relativePath": "src/checkout.js"
+        },
+        {
+          "flagName": "enable_new_checkout",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/checkout.js",
+          "line": 13,
+          "column": 23,
+          "context": "if (!getFeatureFlag('enable_new_checkout')) {",
+          "matchType": "string_literal",
+          "relativePath": "src/checkout.js"
+        },
+        {
+          "flagName": "enable_new_checkout",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/checkout.js",
+          "line": 13,
+          "column": 24,
+          "context": "if (!getFeatureFlag('enable_new_checkout')) {",
+          "matchType": "identifier",
+          "relativePath": "src/checkout.js"
+        },
+        {
+          "flagName": "enable_new_checkout",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/checkout.js",
+          "line": 13,
+          "column": 8,
+          "context": "if (!getFeatureFlag('enable_new_checkout')) {",
+          "matchType": "getter_call",
+          "relativePath": "src/checkout.js"
+        }
+      ],
+      "referenceCount": 6,
+      "fileCount": 1,
+      "riskLevel": "caution",
+      "riskScore": 45,
+      "riskFactors": [
+        "开关默认值 (true) 与全局默认值 (false) 不一致",
+        "开关已标记为下线状态",
+        "引用次数中等 (6 处)",
+        "包含条件分支逻辑，删除可能影响代码流"
+      ],
+      "recommendation": "建议谨慎处理，建议人工复核后删除"
+    },
+    {
+      "name": "enable_v2_api",
+      "defaultValue": "false",
+      "status": "active",
+      "owner": "team-b",
+      "description": "V2版本API开关",
+      "source": {
+        "file": "examples/flags.csv",
+        "line": 3
+      },
+      "references": [
+        {
+          "flagName": "enable_v2_api",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/api.js",
+          "line": 5,
+          "column": 25,
+          "context": "return getFeatureFlag('enable_v2_api') ? API_V2 : API_V1;",
+          "matchType": "string_literal",
+          "relativePath": "src/api.js"
+        },
+        {
+          "flagName": "enable_v2_api",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/api.js",
+          "line": 5,
+          "column": 26,
+          "context": "return getFeatureFlag('enable_v2_api') ? API_V2 : API_V1;",
+          "matchType": "identifier",
+          "relativePath": "src/api.js"
+        },
+        {
+          "flagName": "enable_v2_api",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/api.js",
+          "line": 5,
+          "column": 10,
+          "context": "return getFeatureFlag('enable_v2_api') ? API_V2 : A...",
+          "matchType": "getter_call",
+          "relativePath": "src/api.js"
+        },
+        {
+          "flagName": "enable_v2_api",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/api.js",
+          "line": 15,
+          "column": 5,
+          "context": "enable_v2_api: false,",
+          "matchType": "identifier",
+          "relativePath": "src/api.js"
+        }
+      ],
+      "referenceCount": 4,
+      "fileCount": 1,
+      "riskLevel": "caution",
+      "riskScore": 35,
+      "riskFactors": [
+        "开关仍标记为活跃状态",
+        "包含条件分支逻辑，删除可能影响代码流"
+      ],
+      "recommendation": "建议谨慎处理，建议人工复核后删除"
+    },
+    {
+      "name": "old_login_flow",
+      "defaultValue": "true",
+      "status": "deprecated",
+      "owner": "team-a",
+      "description": "旧版登录流程",
+      "source": {
+        "file": "examples/flags.csv",
+        "line": 4
+      },
+      "references": [
+        {
+          "flagName": "old_login_flow",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/auth.js",
+          "line": 2,
+          "column": 22,
+          "context": "if (getFeatureFlag('old_login_flow')) {",
+          "matchType": "string_literal",
+          "relativePath": "src/auth.js"
+        },
+        {
+          "flagName": "old_login_flow",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/auth.js",
+          "line": 2,
+          "column": 23,
+          "context": "if (getFeatureFlag('old_login_flow')) {",
+          "matchType": "identifier",
+          "relativePath": "src/auth.js"
+        },
+        {
+          "flagName": "old_login_flow",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/auth.js",
+          "line": 2,
+          "column": 7,
+          "context": "if (getFeatureFlag('old_login_flow')) {",
+          "matchType": "getter_call",
+          "relativePath": "src/auth.js"
+        },
+        {
+          "flagName": "old_login_flow",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/auth.js",
+          "line": 9,
+          "column": 22,
+          "context": "if (getFeatureFlag('old_login_flow')) {",
+          "matchType": "string_literal",
+          "relativePath": "src/auth.js"
+        },
+        {
+          "flagName": "old_login_flow",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/auth.js",
+          "line": 9,
+          "column": 23,
+          "context": "if (getFeatureFlag('old_login_flow')) {",
+          "matchType": "identifier",
+          "relativePath": "src/auth.js"
+        },
+        {
+          "flagName": "old_login_flow",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/auth.js",
+          "line": 9,
+          "column": 7,
+          "context": "if (getFeatureFlag('old_login_flow')) {",
+          "matchType": "getter_call",
+          "relativePath": "src/auth.js"
+        }
+      ],
+      "referenceCount": 6,
+      "fileCount": 1,
+      "riskLevel": "caution",
+      "riskScore": 45,
+      "riskFactors": [
+        "开关默认值 (true) 与全局默认值 (false) 不一致",
+        "开关已标记为下线状态",
+        "引用次数中等 (6 处)",
+        "包含条件分支逻辑，删除可能影响代码流"
+      ],
+      "recommendation": "建议谨慎处理，建议人工复核后删除"
+    },
+    {
+      "name": "enable_dark_mode",
+      "defaultValue": "false",
+      "status": "active",
+      "owner": "team-c",
+      "description": "暗黑模式功能",
+      "source": {
+        "file": "examples/flags.csv",
+        "line": 5
+      },
+      "references": [
+        {
+          "flagName": "enable_dark_mode",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 2,
+          "column": 22,
+          "context": "if (getFeatureFlag('enable_dark_mode')) {",
+          "matchType": "string_literal",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "enable_dark_mode",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 2,
+          "column": 23,
+          "context": "if (getFeatureFlag('enable_dark_mode')) {",
+          "matchType": "identifier",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "enable_dark_mode",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 2,
+          "column": 7,
+          "context": "if (getFeatureFlag('enable_dark_mode')) {",
+          "matchType": "getter_call",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "enable_dark_mode",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 8,
+          "column": 23,
+          "context": "if (!getFeatureFlag('enable_dark_mode')) {",
+          "matchType": "string_literal",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "enable_dark_mode",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 8,
+          "column": 24,
+          "context": "if (!getFeatureFlag('enable_dark_mode')) {",
+          "matchType": "identifier",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "enable_dark_mode",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 8,
+          "column": 8,
+          "context": "if (!getFeatureFlag('enable_dark_mode')) {",
+          "matchType": "getter_call",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "enable_dark_mode",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 16,
+          "column": 19,
+          "context": "return name === 'enable_dark_mode';",
+          "matchType": "string_literal",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "enable_dark_mode",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 16,
+          "column": 20,
+          "context": "return name === 'enable_dark_mode';",
+          "matchType": "identifier",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "enable_dark_mode",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/api.js",
+          "line": 16,
+          "column": 5,
+          "context": "enable_dark_mode: true",
+          "matchType": "identifier",
+          "relativePath": "src/api.js"
+        }
+      ],
+      "referenceCount": 9,
+      "fileCount": 2,
+      "riskLevel": "caution",
+      "riskScore": 45,
+      "riskFactors": [
+        "开关仍标记为活跃状态",
+        "引用次数中等 (9 处)",
+        "包含条件分支逻辑，删除可能影响代码流"
+      ],
+      "recommendation": "建议谨慎处理，建议人工复核后删除"
+    },
+    {
+      "name": "enable_experiment_x",
+      "defaultValue": "true",
+      "status": "deprecated",
+      "owner": "team-b",
+      "description": "实验功能X",
+      "source": {
+        "file": "examples/flags.csv",
+        "line": 6
+      },
+      "references": [
+        {
+          "flagName": "enable_experiment_x",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/auth.js",
+          "line": 20,
+          "column": 25,
+          "context": "return getFeatureFlag('enable_experiment_x');",
+          "matchType": "string_literal",
+          "relativePath": "src/auth.js"
+        },
+        {
+          "flagName": "enable_experiment_x",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/auth.js",
+          "line": 20,
+          "column": 26,
+          "context": "return getFeatureFlag('enable_experiment_x');",
+          "matchType": "identifier",
+          "relativePath": "src/auth.js"
+        },
+        {
+          "flagName": "enable_experiment_x",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/auth.js",
+          "line": 20,
+          "column": 10,
+          "context": "return getFeatureFlag('enable_experiment_x');",
+          "matchType": "getter_call",
+          "relativePath": "src/auth.js"
+        }
+      ],
+      "referenceCount": 3,
+      "fileCount": 1,
+      "riskLevel": "safe",
+      "riskScore": 10,
+      "riskFactors": [
+        "开关默认值 (true) 与全局默认值 (false) 不一致",
+        "开关已标记为下线状态"
+      ],
+      "recommendation": "可以安全删除，风险较低"
+    },
+    {
+      "name": "unused_flag",
+      "defaultValue": "true",
+      "status": "deprecated",
+      "owner": "team-a",
+      "description": "这个开关在代码中没有被引用",
+      "source": {
+        "file": "examples/flags.csv",
+        "line": 7
+      },
+      "references": [],
+      "referenceCount": 0,
+      "fileCount": 0,
+      "riskLevel": "safe",
+      "riskScore": 0,
+      "riskFactors": [
+        "代码中无引用，可以安全删除"
+      ],
+      "recommendation": "可以直接删除，代码中无引用"
+    },
+    {
+      "name": "another_old_flag",
+      "defaultValue": "false",
+      "status": "deprecated",
+      "owner": "team-c",
+      "description": "另一个旧开关",
+      "source": {
+        "file": "examples/flags.csv",
+        "line": 8
+      },
+      "references": [
+        {
+          "flagName": "another_old_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 28,
+          "column": 58,
+          "context": "...isk_flag') && getFeatureFlag('another_old_flag')) {",
+          "matchType": "string_literal",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "another_old_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 28,
+          "column": 59,
+          "context": "...sk_flag') && getFeatureFlag('another_old_flag')) {",
+          "matchType": "identifier",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "another_old_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 28,
+          "column": 43,
+          "context": "...ureFlag('high_risk_flag') && getFeatureFlag('another_old_flag')) {",
+          "matchType": "getter_call",
+          "relativePath": "src/theme.js"
+        }
+      ],
+      "referenceCount": 3,
+      "fileCount": 1,
+      "riskLevel": "safe",
+      "riskScore": 0,
+      "riskFactors": [
+        "开关已标记为下线状态"
+      ],
+      "recommendation": "可以安全删除，风险较低"
+    },
+    {
+      "name": "high_risk_flag",
+      "defaultValue": "true",
+      "status": "active",
+      "owner": "team-b",
+      "description": "高风险开关",
+      "source": {
+        "file": "examples/flags.csv",
+        "line": 9
+      },
+      "references": [
+        {
+          "flagName": "high_risk_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 20,
+          "column": 22,
+          "context": "if (getFeatureFlag('high_risk_flag')) {",
+          "matchType": "string_literal",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "high_risk_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 20,
+          "column": 23,
+          "context": "if (getFeatureFlag('high_risk_flag')) {",
+          "matchType": "identifier",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "high_risk_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 20,
+          "column": 7,
+          "context": "if (getFeatureFlag('high_risk_flag')) {",
+          "matchType": "getter_call",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "high_risk_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 22,
+          "column": 27,
+          "context": "if (!getFeatureFlag('high_risk_flag')) {",
+          "matchType": "string_literal",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "high_risk_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 22,
+          "column": 28,
+          "context": "if (!getFeatureFlag('high_risk_flag')) {",
+          "matchType": "identifier",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "high_risk_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 22,
+          "column": 12,
+          "context": "if (!getFeatureFlag('high_risk_flag')) {",
+          "matchType": "getter_call",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "high_risk_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 28,
+          "column": 22,
+          "context": "if (getFeatureFlag('high_risk_flag') && getFeatureFlag('another_...",
+          "matchType": "string_literal",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "high_risk_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 28,
+          "column": 23,
+          "context": "if (getFeatureFlag('high_risk_flag') && getFeatureFlag('another_o...",
+          "matchType": "identifier",
+          "relativePath": "src/theme.js"
+        },
+        {
+          "flagName": "high_risk_flag",
+          "file": "/Users/lzy/pro/solo/workspaces/zy10472/test-code/src/theme.js",
+          "line": 28,
+          "column": 7,
+          "context": "if (getFeatureFlag('high_risk_flag') && getFeatur...",
+          "matchType": "getter_call",
+          "relativePath": "src/theme.js"
+        }
+      ],
+      "referenceCount": 9,
+      "fileCount": 1,
+      "riskLevel": "high",
+      "riskScore": 75,
+      "riskFactors": [
+        "开关默认值 (true) 与全局默认值 (false) 不一致",
+        "开关仍标记为活跃状态",
+        "引用次数中等 (9 处)",
+        "包含条件分支逻辑，删除可能影响代码流"
+      ],
+      "recommendation": "极高风险，必须详细审查后再决定是否删除"
+    }
+  ],
+  "riskSummary": {
+    "safe": 3,
+    "caution": 4,
+    "high": 1,
+    "unknown": 0
+  }
+}

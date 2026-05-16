@@ -1,0 +1,9 @@
+name,defaultValue,status,owner,description
+enable_new_checkout,true,deprecated,team-a,新结算流程开关
+enable_v2_api,false,active,team-b,V2版本API开关
+old_login_flow,true,deprecated,team-a,旧版登录流程
+enable_dark_mode,false,active,team-c,暗黑模式功能
+enable_experiment_x,true,deprecated,team-b,实验功能X
+unused_flag,true,deprecated,team-a,这个开关在代码中没有被引用
+another_old_flag,false,deprecated,team-c,另一个旧开关
+high_risk_flag,true,active,team-b,高风险开关

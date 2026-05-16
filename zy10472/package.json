@@ -1,0 +1,25 @@
+{
+  "name": "featureflag-cleaner",
+  "version": "1.0.0",
+  "description": "Feature Flag 清理CLI工具 - 安全排查和清理下线后的开关代码",
+  "main": "src/index.js",
+  "bin": {
+    "ff-clean": "./bin/ff-clean.js"
+  },
+  "scripts": {
+    "start": "node bin/ff-clean.js",
+    "test": "node --test tests/"
+  },
+  "keywords": ["feature-flag", "cleanup", "cli", "technical-debt"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "glob": "^10.3.10"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

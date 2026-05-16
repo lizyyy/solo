@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feature Flag 清理报告</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+    h1 { font-size: 28px; margin-bottom: 10px; }
+    .subtitle { opacity: 0.9; font-size: 14px; }
+    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .stat-item { padding: 16px; border-radius: 8px; text-align: center; }
+    .stat-item.blue { background: #e3f2fd; }
+    .stat-item.green { background: #e8f5e9; }
+    .stat-item.yellow { background: #fff8e1; }
+    .stat-item.red { background: #ffebee; }
+    .stat-value { font-size: 32px; font-weight: 700; }
+    .stat-label { font-size: 14px; color: #666; margin-top: 4px; }
+    .risk-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .risk-safe { background: #e8f5e9; color: #2e7d32; }
+    .risk-caution { background: #fff8e1; color: #f57f17; }
+    .risk-high { background: #ffebee; color: #c62828; }
+    .risk-unknown { background: #f5f5f5; color: #616161; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 600; color: #555; }
+    tr:hover { background: #f8f9fa; }
+    .code-context { font-family: 'SF Mono', Monaco, monospace; font-size: 12px; background: #f6f8fa; padding: 8px 12px; border-radius: 6px; color: #24292e; white-space: nowrap; overflow-x: auto; }
+    .source-link { color: #667eea; text-decoration: none; font-size: 12px; }
+    .source-link:hover { text-decoration: underline; }
+    .error-item { background: #fff5f5; border-left: 4px solid #fc8181; padding: 12px 16px; margin-bottom: 8px; border-radius: 0 6px 6px 0; }
+    .warning-item { background: #fffaf0; border-left: 4px solid #ed8936; padding: 12px 16px; margin-bottom: 8px; border-radius: 0 6px 6px 0; }
+    .collapsible { cursor: pointer; user-select: none; }
+    .collapsible::before { content: '▶'; display: inline-block; margin-right: 8px; transition: transform 0.2s; }
+    .collapsible.open::before { transform: rotate(90deg); }
+    .collapsible-content { display: none; margin-top: 10px; }
+    .collapsible-content.show { display: block; }
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-btn { padding: 8px 16px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .filter-btn:hover { background: #f5f5f5; }
+    .filter-btn.active { background: #667eea; color: white; border-color: #667eea; }
+    .search-box { padding: 8px 16px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 250px; }
+    .flag-details { background: #f8f9fa; padding: 16px; border-radius: 8px; margin-top: 10px; }
+    .factor-list { list-style: none; margin-top: 8px; }
+    .factor-list li { padding: 4px 0; padding-left: 20px; position: relative; font-size: 13px; color: #666; }
+    .factor-list li::before { content: '•'; position: absolute; left: 0; color: #667eea; font-weight: bold; }
+    @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr 1fr; } table { font-size: 12px; } th, td { padding: 8px 10px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🚩 Feature Flag 清理报告</h1>
+      <p class="subtitle">生成时间: 2026/5/17 04:09:22</p>
+    </header>
+
+    <div class="card">
+      <div class="card-title">📊 扫描统计</div>
+      <div class="stats-grid">
+        <div class="stat-item blue">
+          <div class="stat-value">4</div>
+          <div class="stat-label">扫描文件数</div>
+        </div>
+        <div class="stat-item blue">
+          <div class="stat-value">109</div>
+          <div class="stat-label">扫描行数</div>
+        </div>
+        <div class="stat-item blue">
+          <div class="stat-value">40</div>
+          <div class="stat-label">发现引用数</div>
+        </div>
+        <div class="stat-item blue">
+          <div class="stat-value">8</div>
+          <div class="stat-label">分析开关数</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎯 风险分级汇总</div>
+      <div class="stats-grid">
+        <div class="stat-item green">
+          <div class="stat-value">3</div>
+          <div class="stat-label">✅ 可以安全删除</div>
+        </div>
+        <div class="stat-item yellow">
+          <div class="stat-value">4</div>
+          <div class="stat-label">⚠️ 需要注意</div>
+        </div>
+        <div class="stat-item red">
+          <div class="stat-value">1</div>
+          <div class="stat-label">❌ 高风险</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">0</div>
+          <div class="stat-label">❓ 未知</div>
+        </div>
+      </div>
+    </div>
+
+    
+
+    
+
+    <div class="card">
+      <div class="card-title">📋 Feature Flag 详情</div>
+      <div class="filter-bar">
+        <input type="text" class="search-box" placeholder="搜索开关名称..." id="searchInput">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="safe">安全</button>
+        <button class="filter-btn" data-filter="caution">注意</button>
+        <button class="filter-btn" data-filter="high">高风险</button>
+        <button class="filter-btn" data-filter="unused">未使用</button>
+      </div>
+      <table id="flagsTable">
+        <thead>
+          <tr>
+            <th>开关名称</th>
+            <th>风险等级</th>
+            <th>风险分</th>
+            <th>引用数</th>
+            <th>文件数</th>
+            <th>状态</th>
+            <th>负责人</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr data-risk="caution" data-name="enable_new_checkout" data-unused="false">
+            <td><strong>enable_new_checkout</strong></td>
+            <td><span class="risk-badge risk-caution">注意</span></td>
+            <td>45</td>
+            <td>6</td>
+            <td>1</td>
+            <td>deprecated</td>
+            <td>team-a</td>
+            <td><button class="filter-btn collapsible" onclick="toggleDetails(0)">详情</button></td>
+          </tr>
+          <tr style="display:none;" id="details-0">
+            <td colspan="8">
+              <div class="flag-details">
+                <p><strong>💡 建议:</strong> 建议谨慎处理，建议人工复核后删除</p>
+                <p><strong>📝 描述:</strong> 新结算流程开关</p>
+                <p><strong>📁 来源:</strong> <span class="source-link">examples/flags.csv:2</span></p>
+                <div><strong>🔍 风险因素:</strong><ul class="factor-list"><li>开关默认值 (true) 与全局默认值 (false) 不一致</li><li>开关已标记为下线状态</li><li>引用次数中等 (6 处)</li><li>包含条件分支逻辑，删除可能影响代码流</li></ul></div>
+                
+                <div style="margin-top:12px;">
+                  <strong>📎 代码引用:</strong>
+                  <div style="margin-top:8px;">
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/checkout.js:2:22</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;enable_new_checkout&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/checkout.js:2:23</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;enable_new_checkout&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/checkout.js:2:7</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;enable_new_checkout&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/checkout.js:13:23</span>
+                        <div class="code-context">if (!getFeatureFlag(&#039;enable_new_checkout&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/checkout.js:13:24</span>
+                        <div class="code-context">if (!getFeatureFlag(&#039;enable_new_checkout&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/checkout.js:13:8</span>
+                        <div class="code-context">if (!getFeatureFlag(&#039;enable_new_checkout&#039;)) {</div>
+                      </div>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr data-risk="caution" data-name="enable_v2_api" data-unused="false">
+            <td><strong>enable_v2_api</strong></td>
+            <td><span class="risk-badge risk-caution">注意</span></td>
+            <td>35</td>
+            <td>4</td>
+            <td>1</td>
+            <td>active</td>
+            <td>team-b</td>
+            <td><button class="filter-btn collapsible" onclick="toggleDetails(1)">详情</button></td>
+          </tr>
+          <tr style="display:none;" id="details-1">
+            <td colspan="8">
+              <div class="flag-details">
+                <p><strong>💡 建议:</strong> 建议谨慎处理，建议人工复核后删除</p>
+                <p><strong>📝 描述:</strong> V2版本API开关</p>
+                <p><strong>📁 来源:</strong> <span class="source-link">examples/flags.csv:3</span></p>
+                <div><strong>🔍 风险因素:</strong><ul class="factor-list"><li>开关仍标记为活跃状态</li><li>包含条件分支逻辑，删除可能影响代码流</li></ul></div>
+                
+                <div style="margin-top:12px;">
+                  <strong>📎 代码引用:</strong>
+                  <div style="margin-top:8px;">
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/api.js:5:25</span>
+                        <div class="code-context">return getFeatureFlag(&#039;enable_v2_api&#039;) ? API_V2 : API_V1;</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/api.js:5:26</span>
+                        <div class="code-context">return getFeatureFlag(&#039;enable_v2_api&#039;) ? API_V2 : API_V1;</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/api.js:5:10</span>
+                        <div class="code-context">return getFeatureFlag(&#039;enable_v2_api&#039;) ? API_V2 : A...</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/api.js:15:5</span>
+                        <div class="code-context">enable_v2_api: false,</div>
+                      </div>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr data-risk="caution" data-name="old_login_flow" data-unused="false">
+            <td><strong>old_login_flow</strong></td>
+            <td><span class="risk-badge risk-caution">注意</span></td>
+            <td>45</td>
+            <td>6</td>
+            <td>1</td>
+            <td>deprecated</td>
+            <td>team-a</td>
+            <td><button class="filter-btn collapsible" onclick="toggleDetails(2)">详情</button></td>
+          </tr>
+          <tr style="display:none;" id="details-2">
+            <td colspan="8">
+              <div class="flag-details">
+                <p><strong>💡 建议:</strong> 建议谨慎处理，建议人工复核后删除</p>
+                <p><strong>📝 描述:</strong> 旧版登录流程</p>
+                <p><strong>📁 来源:</strong> <span class="source-link">examples/flags.csv:4</span></p>
+                <div><strong>🔍 风险因素:</strong><ul class="factor-list"><li>开关默认值 (true) 与全局默认值 (false) 不一致</li><li>开关已标记为下线状态</li><li>引用次数中等 (6 处)</li><li>包含条件分支逻辑，删除可能影响代码流</li></ul></div>
+                
+                <div style="margin-top:12px;">
+                  <strong>📎 代码引用:</strong>
+                  <div style="margin-top:8px;">
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/auth.js:2:22</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;old_login_flow&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/auth.js:2:23</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;old_login_flow&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/auth.js:2:7</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;old_login_flow&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/auth.js:9:22</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;old_login_flow&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/auth.js:9:23</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;old_login_flow&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/auth.js:9:7</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;old_login_flow&#039;)) {</div>
+                      </div>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr data-risk="caution" data-name="enable_dark_mode" data-unused="false">
+            <td><strong>enable_dark_mode</strong></td>
+            <td><span class="risk-badge risk-caution">注意</span></td>
+            <td>45</td>
+            <td>9</td>
+            <td>2</td>
+            <td>active</td>
+            <td>team-c</td>
+            <td><button class="filter-btn collapsible" onclick="toggleDetails(3)">详情</button></td>
+          </tr>
+          <tr style="display:none;" id="details-3">
+            <td colspan="8">
+              <div class="flag-details">
+                <p><strong>💡 建议:</strong> 建议谨慎处理，建议人工复核后删除</p>
+                <p><strong>📝 描述:</strong> 暗黑模式功能</p>
+                <p><strong>📁 来源:</strong> <span class="source-link">examples/flags.csv:5</span></p>
+                <div><strong>🔍 风险因素:</strong><ul class="factor-list"><li>开关仍标记为活跃状态</li><li>引用次数中等 (9 处)</li><li>包含条件分支逻辑，删除可能影响代码流</li></ul></div>
+                
+                <div style="margin-top:12px;">
+                  <strong>📎 代码引用:</strong>
+                  <div style="margin-top:8px;">
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:2:22</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;enable_dark_mode&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:2:23</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;enable_dark_mode&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:2:7</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;enable_dark_mode&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:8:23</span>
+                        <div class="code-context">if (!getFeatureFlag(&#039;enable_dark_mode&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:8:24</span>
+                        <div class="code-context">if (!getFeatureFlag(&#039;enable_dark_mode&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:8:8</span>
+                        <div class="code-context">if (!getFeatureFlag(&#039;enable_dark_mode&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:16:19</span>
+                        <div class="code-context">return name === &#039;enable_dark_mode&#039;;</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:16:20</span>
+                        <div class="code-context">return name === &#039;enable_dark_mode&#039;;</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/api.js:16:5</span>
+                        <div class="code-context">enable_dark_mode: true</div>
+                      </div>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr data-risk="safe" data-name="enable_experiment_x" data-unused="false">
+            <td><strong>enable_experiment_x</strong></td>
+            <td><span class="risk-badge risk-safe">安全</span></td>
+            <td>10</td>
+            <td>3</td>
+            <td>1</td>
+            <td>deprecated</td>
+            <td>team-b</td>
+            <td><button class="filter-btn collapsible" onclick="toggleDetails(4)">详情</button></td>
+          </tr>
+          <tr style="display:none;" id="details-4">
+            <td colspan="8">
+              <div class="flag-details">
+                <p><strong>💡 建议:</strong> 可以安全删除，风险较低</p>
+                <p><strong>📝 描述:</strong> 实验功能X</p>
+                <p><strong>📁 来源:</strong> <span class="source-link">examples/flags.csv:6</span></p>
+                <div><strong>🔍 风险因素:</strong><ul class="factor-list"><li>开关默认值 (true) 与全局默认值 (false) 不一致</li><li>开关已标记为下线状态</li></ul></div>
+                
+                <div style="margin-top:12px;">
+                  <strong>📎 代码引用:</strong>
+                  <div style="margin-top:8px;">
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/auth.js:20:25</span>
+                        <div class="code-context">return getFeatureFlag(&#039;enable_experiment_x&#039;);</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/auth.js:20:26</span>
+                        <div class="code-context">return getFeatureFlag(&#039;enable_experiment_x&#039;);</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/auth.js:20:10</span>
+                        <div class="code-context">return getFeatureFlag(&#039;enable_experiment_x&#039;);</div>
+                      </div>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr data-risk="safe" data-name="unused_flag" data-unused="true">
+            <td><strong>unused_flag</strong></td>
+            <td><span class="risk-badge risk-safe">安全</span></td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>deprecated</td>
+            <td>team-a</td>
+            <td><button class="filter-btn collapsible" onclick="toggleDetails(5)">详情</button></td>
+          </tr>
+          <tr style="display:none;" id="details-5">
+            <td colspan="8">
+              <div class="flag-details">
+                <p><strong>💡 建议:</strong> 可以直接删除，代码中无引用</p>
+                <p><strong>📝 描述:</strong> 这个开关在代码中没有被引用</p>
+                <p><strong>📁 来源:</strong> <span class="source-link">examples/flags.csv:7</span></p>
+                <div><strong>🔍 风险因素:</strong><ul class="factor-list"><li>代码中无引用，可以安全删除</li></ul></div>
+                
+              </div>
+            </td>
+          </tr>
+          
+          <tr data-risk="safe" data-name="another_old_flag" data-unused="false">
+            <td><strong>another_old_flag</strong></td>
+            <td><span class="risk-badge risk-safe">安全</span></td>
+            <td>0</td>
+            <td>3</td>
+            <td>1</td>
+            <td>deprecated</td>
+            <td>team-c</td>
+            <td><button class="filter-btn collapsible" onclick="toggleDetails(6)">详情</button></td>
+          </tr>
+          <tr style="display:none;" id="details-6">
+            <td colspan="8">
+              <div class="flag-details">
+                <p><strong>💡 建议:</strong> 可以安全删除，风险较低</p>
+                <p><strong>📝 描述:</strong> 另一个旧开关</p>
+                <p><strong>📁 来源:</strong> <span class="source-link">examples/flags.csv:8</span></p>
+                <div><strong>🔍 风险因素:</strong><ul class="factor-list"><li>开关已标记为下线状态</li></ul></div>
+                
+                <div style="margin-top:12px;">
+                  <strong>📎 代码引用:</strong>
+                  <div style="margin-top:8px;">
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:28:58</span>
+                        <div class="code-context">...isk_flag&#039;) &amp;&amp; getFeatureFlag(&#039;another_old_flag&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:28:59</span>
+                        <div class="code-context">...sk_flag&#039;) &amp;&amp; getFeatureFlag(&#039;another_old_flag&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:28:43</span>
+                        <div class="code-context">...ureFlag(&#039;high_risk_flag&#039;) &amp;&amp; getFeatureFlag(&#039;another_old_flag&#039;)) {</div>
+                      </div>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          <tr data-risk="high" data-name="high_risk_flag" data-unused="false">
+            <td><strong>high_risk_flag</strong></td>
+            <td><span class="risk-badge risk-high">高风险</span></td>
+            <td>75</td>
+            <td>9</td>
+            <td>1</td>
+            <td>active</td>
+            <td>team-b</td>
+            <td><button class="filter-btn collapsible" onclick="toggleDetails(7)">详情</button></td>
+          </tr>
+          <tr style="display:none;" id="details-7">
+            <td colspan="8">
+              <div class="flag-details">
+                <p><strong>💡 建议:</strong> 极高风险，必须详细审查后再决定是否删除</p>
+                <p><strong>📝 描述:</strong> 高风险开关</p>
+                <p><strong>📁 来源:</strong> <span class="source-link">examples/flags.csv:9</span></p>
+                <div><strong>🔍 风险因素:</strong><ul class="factor-list"><li>开关默认值 (true) 与全局默认值 (false) 不一致</li><li>开关仍标记为活跃状态</li><li>引用次数中等 (9 处)</li><li>包含条件分支逻辑，删除可能影响代码流</li></ul></div>
+                
+                <div style="margin-top:12px;">
+                  <strong>📎 代码引用:</strong>
+                  <div style="margin-top:8px;">
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:20:22</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;high_risk_flag&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:20:23</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;high_risk_flag&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:20:7</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;high_risk_flag&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:22:27</span>
+                        <div class="code-context">if (!getFeatureFlag(&#039;high_risk_flag&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:22:28</span>
+                        <div class="code-context">if (!getFeatureFlag(&#039;high_risk_flag&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:22:12</span>
+                        <div class="code-context">if (!getFeatureFlag(&#039;high_risk_flag&#039;)) {</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:28:22</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;high_risk_flag&#039;) &amp;&amp; getFeatureFlag(&#039;another_...</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:28:23</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;high_risk_flag&#039;) &amp;&amp; getFeatureFlag(&#039;another_o...</div>
+                      </div>
+                    
+                      <div style="margin-bottom:8px;">
+                        <span class="source-link">src/theme.js:28:7</span>
+                        <div class="code-context">if (getFeatureFlag(&#039;high_risk_flag&#039;) &amp;&amp; getFeatur...</div>
+                      </div>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function toggleDetails(idx) {
+      const row = document.getElementById('details-' + idx);
+      row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+    }
+
+    const filterBtns = document.querySelectorAll('.filter-btn[data-filter]');
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('#flagsTable tbody tr[data-risk]');
+
+    function applyFilters() {
+      const activeFilter = document.querySelector('.filter-btn[data-filter].active')?.dataset.filter || 'all';
+      const searchTerm = searchInput.value.toLowerCase();
+
+      tableRows.forEach(row => {
+        const risk = row.dataset.risk;
+        const name = row.dataset.name;
+        const unused = row.dataset.unused === 'true';
+
+        let matchesFilter = activeFilter === 'all';
+        if (activeFilter === 'safe') matchesFilter = risk === 'safe';
+        if (activeFilter === 'caution') matchesFilter = risk === 'caution';
+        if (activeFilter === 'high') matchesFilter = risk === 'high';
+        if (activeFilter === 'unused') matchesFilter = unused;
+
+        const matchesSearch = name.includes(searchTerm);
+
+        row.style.display = matchesFilter && matchesSearch ? '' : 'none';
+      });
+    }
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilters();
+      });
+    });
+
+    searchInput.addEventListener('input', applyFilters);
+  </script>
+</body>
+</html>
