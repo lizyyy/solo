@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "node tests/run-tests.js"
+    "test": "node tests/runDemo.js"
   },
   "dependencies": {
     "express": "^4.18.2",

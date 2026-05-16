@@ -6,7 +6,7 @@ const { logOperation } = require('./auditService');
 
 const validateBatchBelongsToNamespace = (batchId, namespace) => {
   return new Promise((resolve, reject) => {
-    db.get(`SELECT id, space_id, namespace FROM event_batches WHERE id = ?`, [batchId], (err, batch) => {
+    db.get(`SELECT * FROM event_batches WHERE id = ?`, [batchId], (err, batch) => {
       if (err) {
         reject(err);
         return;
