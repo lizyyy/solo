@@ -1,0 +1,151 @@
+{
+  "anomalies": [
+    {
+      "action": "FAIL",
+      "conclusion": "补跑失败: 仍有锁冲突",
+      "operator": "operator",
+      "original_input": "{\"step\":\"FAIL\",\"error_detail\":\"DB_LOCK_CONFLICT\"}",
+      "time": "2026-05-16T20:40:39.967066+07:00"
+    }
+  ],
+  "anomaly_count": 1,
+  "impact_summary": {
+    "impact_by_date": {
+      "2024-05-31": 50002
+    },
+    "impact_by_type": {
+      "LEDGER": 50000,
+      "REPORT": 2
+    },
+    "impact_count": 2,
+    "status": "COMPLETED",
+    "task_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+    "task_name": "FINANCE_MONTHEND_CLOSE",
+    "total_affected": 50002
+  },
+  "impacts": [
+    {
+      "id": "f6ef5b02-5b21-457f-9393-fe62c3372c60",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "impact_type": "LEDGER",
+      "impact_scope": "GL_LEDGER",
+      "impact_desc": "总账关账失败，无法生成财务报表",
+      "affected_count": 50000,
+      "business_date": "2024-05-31",
+      "created_at": "2026-05-16T20:40:39.919954+07:00"
+    },
+    {
+      "id": "70eede1d-bc35-40ed-9a7f-81ad19993fb6",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "impact_type": "REPORT",
+      "impact_scope": "FINANCIAL_STATEMENT",
+      "impact_desc": "资产负债表、利润表无法生成",
+      "affected_count": 2,
+      "business_date": "2024-05-31",
+      "created_at": "2026-05-16T20:40:39.920019+07:00"
+    }
+  ],
+  "status_history": [
+    {
+      "id": "fde369c5-3586-4c1c-b3bd-dd895202aaa7",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "from_status": "",
+      "to_status": "PENDING",
+      "action": "CREATE",
+      "operator": "finance_manager",
+      "original_input": "{\"batch_id\":\"ME20240531\",\"timeout\":3600,\"error\":\"DB_LOCK\"}",
+      "processing_note": "创建漏跑恢复任务",
+      "created_at": "2026-05-16T20:40:39.920034+07:00"
+    },
+    {
+      "id": "e66ef31e-5d50-4412-981a-55ad6306c895",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "from_status": "DETECTED",
+      "to_status": "DETECTED",
+      "action": "DETECT",
+      "operator": "admin",
+      "original_input": "{\"step\":\"DETECT\",\"error_detail\":\"DB_LOCK_CONFLICT\"}",
+      "processing_note": "检测到漏跑",
+      "created_at": "2026-05-16T20:40:39.938138+07:00"
+    },
+    {
+      "id": "d1271e89-f276-4b38-bfad-7ac892051f2a",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "from_status": "ANALYZING",
+      "to_status": "ANALYZING",
+      "action": "ANALYZE",
+      "operator": "developer",
+      "original_input": "{\"step\":\"ANALYZE\",\"error_detail\":\"DB_LOCK_CONFLICT\"}",
+      "processing_note": "分析问题: 数据库锁超时",
+      "created_at": "2026-05-16T20:40:39.946256+07:00"
+    },
+    {
+      "id": "52a86094-5090-40da-a3e7-0ddbc0408d28",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "from_status": "RECOVERING",
+      "to_status": "RECOVERING",
+      "action": "START_RECOVERY",
+      "operator": "operator",
+      "original_input": "{\"step\":\"START_RECOVERY\",\"error_detail\":\"DB_LOCK_CONFLICT\"}",
+      "processing_note": "开始第一次补跑",
+      "created_at": "2026-05-16T20:40:39.954064+07:00"
+    },
+    {
+      "id": "d6b35d67-eee2-4d4f-b2ec-0f40a0617309",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "from_status": "FAILED",
+      "to_status": "FAILED",
+      "action": "FAIL",
+      "operator": "operator",
+      "original_input": "{\"step\":\"FAIL\",\"error_detail\":\"DB_LOCK_CONFLICT\"}",
+      "processing_note": "补跑失败: 仍有锁冲突",
+      "created_at": "2026-05-16T20:40:39.967066+07:00"
+    },
+    {
+      "id": "76495f55-8107-4096-beff-0465771fbd76",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "from_status": "MANUAL_FIX",
+      "to_status": "MANUAL_FIX",
+      "action": "MANUAL_FIX",
+      "operator": "dba_admin",
+      "original_input": "{\"session_id\":\"SESS_12345\",\"action\":\"KILL\",\"operator\":\"dba_admin\"}",
+      "processing_note": "杀掉阻塞会话，回滚未完成事务",
+      "created_at": "2026-05-16T20:40:39.982816+07:00"
+    },
+    {
+      "id": "1c5ca20a-3e9f-47e3-a1a6-427776ec15be",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "from_status": "RECOVERING",
+      "to_status": "RECOVERING",
+      "action": "RETRY_AFTER_FIX",
+      "operator": "dba_admin",
+      "original_input": "",
+      "processing_note": "开始第二次补跑",
+      "created_at": "2026-05-16T20:40:40.003827+07:00"
+    },
+    {
+      "id": "c0988e86-7c09-449d-b30c-80d84527d525",
+      "task_recovery_id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+      "from_status": "COMPLETED",
+      "to_status": "COMPLETED",
+      "action": "FINISH",
+      "operator": "dba_admin",
+      "original_input": "",
+      "processing_note": "补跑成功，共处理50000条记录",
+      "created_at": "2026-05-16T20:40:40.035863+07:00"
+    }
+  ],
+  "task_info": {
+    "created_at": "2026-05-16T20:40:39.919371+07:00",
+    "created_by": "finance_manager",
+    "current_status": "COMPLETED",
+    "detected_at": "2026-05-16T20:40:39.937851+07:00",
+    "id": "96ecf8fa-f43d-43e5-9084-9445fdf6ddd7",
+    "miss_reason": "TIMEOUT",
+    "recovered_at": "2026-05-16T20:40:40.030395+07:00",
+    "recovery_action": "MANUAL",
+    "remarks": "DBA已清理数据库锁，会话ID: SESS_12345",
+    "scheduled_time": "2024-05-31T20:00:00+07:00",
+    "task_name": "FINANCE_MONTHEND_CLOSE"
+  }
+}
