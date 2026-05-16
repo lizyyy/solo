@@ -31,9 +31,9 @@ public class RepairScriptController {
         return Result.success(script);
     }
 
-    @PostMapping("/{id}/submit")
-    public Result<Void> submit(@PathVariable Long id, @RequestParam(required = false) String operator) {
-        repairScriptService.submit(id, operator);
+    @PostMapping("/submit")
+    public Result<Void> submit(@Valid @RequestBody SubmitDTO dto) {
+        repairScriptService.submit(dto);
         return Result.success();
     }
 

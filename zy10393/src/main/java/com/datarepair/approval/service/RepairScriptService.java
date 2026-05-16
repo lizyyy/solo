@@ -95,11 +95,17 @@ public class RepairScriptService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void submit(Long scriptId, String operator) {
-        RepairScript script = getById(scriptId);
+    public void submit(SubmitDTO dto) {
+        String requestId = dto.getRequestId();
+        if (idempotencyService.isProcessed(requestId)) {
+            log.info("幂等校验：重复提交，直接返回: requestId={}", requestId);
+            return;
+        }
+
+        RepairScript script = getById(dto.getScriptId());
         validateStatus(script, ScriptStatus.DRAFT, ScriptStatus.REJECTED);
 
-        List<TargetScope> scopes = targetScopeMapper.selectByScriptId(scriptId);
+        List<TargetScope> scopes = targetScopeMapper.selectByScriptId(dto.getScriptId());
         if (CollectionUtils.isEmpty(scopes)) {
             throw new BusinessException(ErrorCode.TARGET_SCOPE_EMPTY);
         }
@@ -107,12 +113,14 @@ public class RepairScriptService {
         ScriptStatus fromStatus = script.getStatus();
         script.setStatus(ScriptStatus.SUBMITTED);
         script.setSubmitTime(LocalDateTime.now());
-        script.setCurrentHandler(operator);
+        script.setCurrentHandler(dto.getOperator());
         repairScriptMapper.updateById(script);
 
-        timelineService.record(scriptId, null, ApprovalAction.SUBMIT,
-                fromStatus, ScriptStatus.SUBMITTED, operator, null,
+        timelineService.record(dto.getScriptId(), null, ApprovalAction.SUBMIT,
+                fromStatus, ScriptStatus.SUBMITTED, dto.getOperator(), null,
                 "提交审批", "脚本已提交等待校验");
+
+        idempotencyService.markAsProcessed(requestId, null);
     }
 
     @Transactional(rollbackFor = Exception.class)

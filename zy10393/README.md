@@ -4,7 +4,7 @@
 
 ## 技术栈
 
-- Java 11
+- Java 8+
 - Spring Boot 2.7.x
 - MyBatis Plus 3.5.3
 - H2 Database (开发验证) / MySQL 8.0 (生产)
@@ -16,45 +16,38 @@
 ### 前置要求
 
 - JDK 8+
-- Maven 3.6+（可通过 `./mvnw` 使用内置Maven Wrapper）
+- Maven 3.6+（项目已内置 Maven Wrapper，无需系统安装）
 
 ### 启动方式
 
 #### 方式一：使用启动脚本（推荐）
 
 ```bash
-# 编译并启动（使用H2内存数据库，无需MySQL）
+# 终端1：编译并启动服务（使用H2内存数据库，无需外部依赖）
 ./start.sh
 
-# 或 Windows
-start.bat
+# 终端2：服务启动后，运行健康检查（自动验证所有核心API）
+./health-check.sh
 ```
 
-#### 方式二：Maven命令启动
-
-```bash
-# 使用H2内存数据库（默认）
-mvn clean spring-boot:run -Dspring.profiles.active=h2
-
-# 使用MySQL数据库
-mvn clean spring-boot:run -Dspring.profiles.active=mysql
-```
+**说明：**
+- `./start.sh` 会自动使用 Maven Wrapper (`./mvnw`)，无需系统安装 Maven
+- 首次启动需要下载依赖，可能需要 1-3 分钟
+- 使用 H2 内存数据库，数据仅在内存中，重启后清空
+- 服务启动后会在控制台显示 `Started DataRepairApprovalApplication`
 
 ### 访问地址
 
-- API 基础地址: http://localhost:8080/api
-- H2 控制台: http://localhost:8080/api/h2-console
+- **API 基础地址**: http://localhost:8080/api
+- **健康检查**: http://localhost:8080/api/health
+- **H2 控制台**: http://localhost:8080/api/h2-console (仅H2模式)
   - JDBC URL: `jdbc:h2:mem:data_repair`
   - Username: `sa`
   - Password: (空)
 
-### 健康检查
-
-```bash
-curl http://localhost:8080/api/health
-```
-
 ## API 接口
+
+所有写操作均支持**幂等性**，通过 `requestId` 参数控制。相同的 `requestId` 重复提交不会产生脏数据。
 
 ### 1. 创建修复脚本
 
@@ -71,7 +64,7 @@ curl -X POST http://localhost:8080/api/repair-scripts \
     "databaseName": "user_db",
     "applicant": "张三",
     "applicantDept": "技术部",
-    "requestId": "REQ_" + $(date +%s),
+    "requestId": "REQ_20240516_001",
     "targetScopes": [
       {
         "scopeType": "TABLE",
@@ -88,7 +81,13 @@ curl -X POST http://localhost:8080/api/repair-scripts \
 ### 2. 提交审批
 
 ```bash
-curl -X POST http://localhost:8080/api/repair-scripts/{scriptId}/submit?operator=张三
+curl -X POST http://localhost:8080/api/repair-scripts/submit \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scriptId": 1,
+    "operator": "张三",
+    "requestId": "SUBMIT_20240516_001"
+  }'
 ```
 
 ### 3. 执行试跑
@@ -99,7 +98,7 @@ curl -X POST http://localhost:8080/api/repair-scripts/dry-run \
   -d '{
     "scriptId": 1,
     "operator": "张三",
-    "requestId": "DRY_RUN_" + $(date +%s)
+    "requestId": "DRYRUN_20240516_001"
   }'
 ```
 
@@ -116,7 +115,7 @@ curl -X POST http://localhost:8080/api/repair-scripts/approve \
     "opinion": "同意执行",
     "approvalLevel": 1,
     "passed": true,
-    "requestId": "APV_" + $(date +%s)
+    "requestId": "APV_20240516_001"
   }'
 ```
 
@@ -128,7 +127,7 @@ curl -X POST http://localhost:8080/api/repair-scripts/execute \
   -d '{
     "scriptId": 1,
     "operator": "张三",
-    "requestId": "EXEC_" + $(date +%s)
+    "requestId": "EXEC_20240516_001"
   }'
 ```
 
@@ -142,52 +141,24 @@ curl -X POST http://localhost:8080/api/repair-scripts/rollback \
     "executionBatchId": 123,
     "rollbackProof": "已验证数据一致性",
     "operator": "张三",
-    "requestId": "RBK_" + $(date +%s)
+    "requestId": "RBK_20240516_001"
   }'
 ```
 
-### 7. 查询详情
+### 7. 查询接口
 
 ```bash
 # 查询脚本基本信息
-curl http://localhost:8080/api/repair-scripts/{scriptId}
+curl http://localhost:8080/api/repair-scripts/{id}
 
 # 查询脚本完整详情（含关联数据）
-curl http://localhost:8080/api/repair-scripts/{scriptId}/detail
+curl http://localhost:8080/api/repair-scripts/{id}/detail
 
 # 查询问题排查报告
-curl http://localhost:8080/api/repair-scripts/{scriptId}/troubleshoot-report
-```
+curl http://localhost:8080/api/repair-scripts/{id}/troubleshoot-report
 
-### 8. 分页查询
-
-```bash
-curl "http://localhost:8080/api/repair-scripts/page?pageNum=1&pageSize=10&status=0"
-```
-
-## 自检验证
-
-### 运行完整自检
-
-```bash
-# 启动服务后运行自检脚本
-./health-check.sh
-```
-
-### 手动验证核心流程
-
-```bash
-# 1. 健康检查
-curl http://localhost:8080/api/health
-
-# 2. 创建脚本
-export REQ_ID="TEST_$(date +%s)"
-curl -X POST http://localhost:8080/api/repair-scripts \
-  -H "Content-Type: application/json" \
-  -d "{\"scriptName\":\"测试脚本\",\"scriptType\":\"UPDATE\",\"scriptContent\":\"SELECT 1\",\"description\":\"测试\",\"businessSystem\":\"测试系统\",\"databaseName\":\"test_db\",\"applicant\":\"test\",\"requestId\":\"${REQ_ID}\",\"targetScopes\":[{\"scopeType\":\"TABLE\",\"tableName\":\"test\",\"whereCondition\":\"1=1\",\"estimatedRows\":1}]}"
-
-# 3. 查看脚本列表
-curl http://localhost:8080/api/repair-scripts/page
+# 分页查询
+curl "http://localhost:8080/api/repair-scripts/page?pageNum=1&pageSize=10"
 ```
 
 ## 脚本状态流转
@@ -206,22 +177,34 @@ curl http://localhost:8080/api/repair-scripts/page
 
 ### 1. 幂等性保证
 
-- 所有写操作通过 `requestId` 参数实现幂等
-- 重复提交不会产生脏数据
+所有写操作通过 `requestId` 参数实现幂等：
+- 内存缓存最近 60 分钟内的请求
+- 相同 `requestId` 重复提交直接返回已有结果
+- 不会产生脏数据
+
+**支持幂等的接口：**
+- 创建脚本
+- 提交审批
+- 执行试跑
+- 审批操作
+- 正式执行
+- 回滚操作
 
 ### 2. 枚举持久化
 
-- 通过 `CodeEnumTypeHandler` 实现枚举与数据库 INT 字段的双向转换
-- 使用 `@EnumValue` 注解标记枚举值字段
+通过自定义 `CodeEnumTypeHandler` 实现枚举与数据库 INT 字段的双向转换：
+- 枚举值存储为数字，查询时自动转为枚举对象
+- 支持 `@EnumValue` 注解标记枚举值字段
 
 ### 3. 时间线追踪
 
-- 每个关键操作自动记录时间线
-- 记录操作人、操作时间、状态变更、详细信息
+每个关键操作自动记录时间线：
+- 记录操作人、操作时间、状态变更
 - 支持完整的操作审计回溯
 
 ### 4. 问题排查汇总
 
+生成完整的问题排查报告，包含：
 - 脚本基本信息汇总
 - 目标范围分析（影响表、预估行数）
 - 试跑历史统计
@@ -263,8 +246,16 @@ src/main/java/com/datarepair/approval/
 │   ├── MybatisPlusConfig.java             # MyBatis Plus配置
 │   └── MyMetaObjectHandler.java           # 自动填充处理器
 ├── controller/                            # 控制层
-│   └── RepairScriptController.java        # 脚本API
+│   ├── HealthController.java              # 健康检查接口
+│   └── RepairScriptController.java        # 脚本API接口
 ├── dto/                                   # 数据传输对象
+│   ├── RepairScriptCreateDTO.java
+│   ├── SubmitDTO.java
+│   ├── DryRunDTO.java
+│   ├── ApprovalDTO.java
+│   ├── ExecuteDTO.java
+│   ├── RollbackDTO.java
+│   └── ...
 ├── entity/                                # 实体类
 ├── enums/                                 # 枚举类
 ├── exception/                             # 异常处理
@@ -276,23 +267,32 @@ src/main/java/com/datarepair/approval/
 └── service/                               # 业务逻辑层
     ├── RepairScriptService.java           # 核心业务服务
     ├── TimelineService.java               # 时间线服务
+    ├── IdempotencyService.java            # 幂等性服务
     └── TroubleshootService.java           # 问题排查服务
 ```
 
 ## 常见问题
 
-### 1. 枚举值读写失败
+### 1. Maven Wrapper 无法下载依赖
 
-确保实体类枚举字段添加了 `@TableField(typeHandler = CodeEnumTypeHandler.class)` 注解，
-并且 `@TableName` 添加了 `autoResultMap = true` 属性。
+如果网络问题导致依赖下载失败：
+- 配置 Maven 镜像源（阿里云）
+- 或者手动将依赖包放入 `~/.m2/repository` 目录
 
-### 2. H2控制台访问404
+### 2. 启动失败提示端口被占用
 
-确保访问路径包含 context-path：`http://localhost:8080/api/h2-console`
+检查并关闭占用 8080 端口的进程：
+```bash
+lsof -i :8080
+kill -9 <PID>
+```
 
-### 3. 启动失败提示缺少表
+### 3. H2控制台无法访问
 
-H2模式会自动初始化表结构，MySQL模式需要先执行 schema.sql。
+确保：
+- 服务已正常启动（检查健康检查接口）
+- 访问路径包含 context-path: `/api/h2-console`
+- JDBC URL 正确：`jdbc:h2:mem:data_repair`
 
 ## 许可证
 

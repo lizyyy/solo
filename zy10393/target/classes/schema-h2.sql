@@ -1,0 +1,141 @@
+CREATE TABLE IF NOT EXISTS repair_script (
+    id BIGINT PRIMARY KEY,
+    script_no VARCHAR(64) NOT NULL UNIQUE,
+    script_name VARCHAR(200) NOT NULL,
+    script_type VARCHAR(32) NOT NULL,
+    script_content CLOB NOT NULL,
+    rollback_script CLOB,
+    description VARCHAR(500),
+    business_system VARCHAR(100) NOT NULL,
+    database_name VARCHAR(100) NOT NULL,
+    estimated_impact VARCHAR(500),
+    status INT NOT NULL DEFAULT 0,
+    current_handler VARCHAR(64),
+    submit_time TIMESTAMP,
+    approval_time TIMESTAMP,
+    execute_time TIMESTAMP,
+    complete_time TIMESTAMP,
+    applicant VARCHAR(64),
+    applicant_dept VARCHAR(100),
+    remark VARCHAR(500),
+    request_id VARCHAR(128),
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_by VARCHAR(64),
+    update_by VARCHAR(64),
+    deleted TINYINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS target_scope (
+    id BIGINT PRIMARY KEY,
+    script_id BIGINT NOT NULL,
+    scope_type VARCHAR(32) NOT NULL,
+    table_name VARCHAR(100) NOT NULL,
+    primary_key VARCHAR(64),
+    where_condition VARCHAR(1000),
+    estimated_rows BIGINT,
+    columns_affected VARCHAR(500),
+    remark VARCHAR(500),
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_by VARCHAR(64),
+    update_by VARCHAR(64),
+    deleted TINYINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS dry_run_result (
+    id BIGINT PRIMARY KEY,
+    script_id BIGINT NOT NULL,
+    batch_no VARCHAR(64) NOT NULL,
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
+    affected_rows BIGINT,
+    preview_data CLOB,
+    execution_log CLOB,
+    success BOOLEAN,
+    error_message CLOB,
+    operator VARCHAR(64),
+    remark VARCHAR(500),
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_by VARCHAR(64),
+    update_by VARCHAR(64),
+    deleted TINYINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS approval_opinion (
+    id BIGINT PRIMARY KEY,
+    script_id BIGINT NOT NULL,
+    action INT,
+    approver VARCHAR(64),
+    approver_dept VARCHAR(100),
+    opinion CLOB,
+    approval_level INT,
+    passed BOOLEAN,
+    remark VARCHAR(500),
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_by VARCHAR(64),
+    update_by VARCHAR(64),
+    deleted TINYINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS execution_batch (
+    id BIGINT PRIMARY KEY,
+    script_id BIGINT NOT NULL,
+    batch_no VARCHAR(64) NOT NULL,
+    batch_type INT,
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
+    affected_rows BIGINT,
+    execution_log CLOB,
+    status INT,
+    operator VARCHAR(64),
+    success BOOLEAN,
+    error_message CLOB,
+    remark VARCHAR(500),
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_by VARCHAR(64),
+    update_by VARCHAR(64),
+    deleted TINYINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS rollback_record (
+    id BIGINT PRIMARY KEY,
+    script_id BIGINT NOT NULL,
+    execution_batch_id BIGINT NOT NULL,
+    batch_no VARCHAR(64) NOT NULL,
+    rollback_proof CLOB,
+    rollback_script CLOB,
+    rollback_time TIMESTAMP,
+    rollback_rows BIGINT,
+    rollback_log CLOB,
+    success BOOLEAN,
+    operator VARCHAR(64),
+    remark VARCHAR(500),
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_by VARCHAR(64),
+    update_by VARCHAR(64),
+    deleted TINYINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS timeline_record (
+    id BIGINT PRIMARY KEY,
+    script_id BIGINT NOT NULL,
+    batch_id BIGINT,
+    action INT,
+    from_status INT,
+    to_status INT,
+    operator VARCHAR(64),
+    operator_dept VARCHAR(100),
+    action_time TIMESTAMP,
+    remark VARCHAR(500),
+    detail CLOB,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_by VARCHAR(64),
+    update_by VARCHAR(64),
+    deleted TINYINT DEFAULT 0
+);
