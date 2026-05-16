@@ -1,0 +1,33 @@
+{
+  "quotaConfigs": [],
+  "usageRecords": [],
+  "rejectEvents": [
+    {
+      "id": "571c504e-2073-4615-b1de-9ea0596fc9d8",
+      "quotaId": "",
+      "teamName": "测试团队",
+      "modelName": "GPT-4",
+      "usageTag": "unknown-tag",
+      "reason": "invalid_usage_tag",
+      "rawInput": {
+        "teamName": "测试团队",
+        "modelName": "GPT-4",
+        "usageTag": "unknown-tag",
+        "tokens": 1000,
+        "requestId": "req-test",
+        "timestamp": "2026-05-16T10:51:36.334Z"
+      },
+      "processingBasis": {
+        "currentLimit": 0,
+        "currentUsed": 0,
+        "windowStart": "",
+        "windowEnd": "",
+        "quotaStatus": "expired"
+      },
+      "conclusion": "Invalid usage tag: unknown-tag. Valid tags are: research, production, testing, internal, customer-demo, fine-tuning",
+      "timestamp": "2026-05-16T10:51:36.334Z",
+      "requestId": "req-test"
+    }
+  ],
+  "auditLogs": []
+}

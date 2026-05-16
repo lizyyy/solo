@@ -55,6 +55,9 @@ class QuotaService {
         return config;
     }
     createQuota(teamName, modelName, usageTag, limit, window, createdBy) {
+        if (!this.validUsageTags.includes(usageTag)) {
+            throw new Error('Invalid usage tag: ' + usageTag + '. Valid tags are: ' + this.validUsageTags.join(', '));
+        }
         const existing = this.storage.findQuotaConfig(teamName, modelName, usageTag);
         if (existing) {
             throw new Error('Quota already exists for team: ' + teamName + ', model: ' + modelName + ', usage: ' + usageTag);
@@ -92,8 +95,18 @@ class QuotaService {
         return this.storage.getQuotaConfigs().map(c => this.checkWindowReset(c));
     }
     validateUsage(teamName, modelName, usageTag, tokens, requestId) {
-        let config = this.storage.findQuotaConfig(teamName, modelName, usageTag);
         const timestamp = new Date().toISOString();
+        if (!this.validUsageTags.includes(usageTag)) {
+            const rejectEvent = this.createRejectEvent('', teamName, modelName, usageTag, types_1.RejectReason.INVALID_USAGE_TAG, { teamName, modelName, usageTag, tokens, requestId, timestamp }, {
+                currentLimit: 0,
+                currentUsed: 0,
+                windowStart: '',
+                windowEnd: '',
+                quotaStatus: types_1.QuotaStatus.EXPIRED
+            }, 'Invalid usage tag: ' + usageTag + '. Valid tags are: ' + this.validUsageTags.join(', '));
+            return { success: false, rejectEvent };
+        }
+        let config = this.storage.findQuotaConfig(teamName, modelName, usageTag);
         if (!config) {
             const rejectEvent = this.createRejectEvent('', teamName, modelName, usageTag, types_1.RejectReason.MODEL_NOT_AUTHORIZED, { teamName, modelName, usageTag, tokens, requestId, timestamp }, {
                 currentLimit: 0,
@@ -113,16 +126,6 @@ class QuotaService {
                 windowEnd: config.windowEnd,
                 quotaStatus: config.status
             }, 'Quota is currently ' + config.status);
-            return { success: false, rejectEvent, config };
-        }
-        if (!this.validUsageTags.includes(usageTag)) {
-            const rejectEvent = this.createRejectEvent(config.id, teamName, modelName, usageTag, types_1.RejectReason.INVALID_USAGE_TAG, { teamName, modelName, usageTag, tokens, requestId, timestamp }, {
-                currentLimit: config.limit,
-                currentUsed: config.used,
-                windowStart: config.windowStart,
-                windowEnd: config.windowEnd,
-                quotaStatus: config.status
-            }, 'Invalid usage tag: ' + usageTag + '. Valid tags: ' + this.validUsageTags.join(', '));
             return { success: false, rejectEvent, config };
         }
         const effectiveLimit = config.limit + config.tempBonus;
