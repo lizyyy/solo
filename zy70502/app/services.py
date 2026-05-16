@@ -39,10 +39,7 @@ class ContractDiffAnalyzer:
             if is_doc:
                 summary["documentation_changes"].append(change_info)
             else:
-                if cls._is_required_field_deletion(path, key, root_old):
-                    summary["breaking_changes"].append(change_info)
-                else:
-                    summary["compatible_changes"].append(change_info)
+                summary["breaking_changes"].append(change_info)
             summary["modified"].append(change_info)
         
         for key in old_keys & new_keys:
