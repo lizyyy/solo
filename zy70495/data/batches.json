@@ -1,0 +1,62 @@
+[
+  {
+    "batch_id": "c96212f6",
+    "operator": "张三",
+    "operation_type": "回滚",
+    "created_at": "2026-05-16T08:28:09.012988",
+    "status": "已执行",
+    "candidates": [
+      {
+        "record_id": "7ea59672",
+        "risk_type": "旧版本覆盖新版本",
+        "description": "记录版本(v2)低于历史最高版本(v3)，存在旧版本覆盖风险",
+        "suggestion": "建议回滚到历史最高版本，或确认当前版本是否为预期更新",
+        "current_version": 2,
+        "detected_version": 3,
+        "details": {
+          "date": "2026-05-06",
+          "engineer": "工程师6",
+          "last_newer_update": "2026-05-07T08:28:03.669356",
+          "current_update": "2026-05-08T08:28:03.669356"
+        }
+      },
+      {
+        "record_id": "99a8c681",
+        "risk_type": "过期记录",
+        "description": "过期记录版本过低(v1)，数据可能不完整",
+        "suggestion": "建议清理该过期记录，或补充完整信息后保留",
+        "current_version": 1,
+        "detected_version": null,
+        "details": {
+          "date": "2026-04-16",
+          "engineer": "工程师7"
+        }
+      }
+    ],
+    "executed_at": "2026-05-16T08:28:15.249399",
+    "notes": "hash:04c2eed27323d861ba4da72ce78c112e | 确认人:张三 | 确认时间:2026-05-16T08:28:15.188396"
+  },
+  {
+    "batch_id": "3f5010bf",
+    "operator": "李四",
+    "operation_type": "回滚",
+    "created_at": "2026-05-16T08:28:20.425502",
+    "status": "待确认",
+    "candidates": [
+      {
+        "record_id": "99a8c681",
+        "risk_type": "过期记录",
+        "description": "过期记录版本过低(v1)，数据可能不完整",
+        "suggestion": "建议清理该过期记录，或补充完整信息后保留",
+        "current_version": 1,
+        "detected_version": null,
+        "details": {
+          "date": "2026-04-16",
+          "engineer": "工程师7"
+        }
+      }
+    ],
+    "executed_at": null,
+    "notes": "hash:e1554570a8e9108d82252d5b8bf7174e"
+  }
+]
