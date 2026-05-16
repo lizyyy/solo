@@ -10,8 +10,17 @@ router.post('/create', (req: Request, res: Response) => {
 
     const validation = groupingService.validateInput(req.body);
     if (!validation.valid) {
+      const failedGroup = groupingService.createFailedTenantGroup(
+        (tenantId as string) || 'unknown',
+        (sourceSystems as SourceSystem[]) || [],
+        req.body,
+        validation.errors
+      );
+
       return res.status(400).json({
         success: false,
+        groupId: failedGroup.groupId,
+        requestId: failedGroup.requestId,
         errors: validation.errors
       });
     }

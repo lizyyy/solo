@@ -308,6 +308,106 @@ test('多个来源系统规则去重合并', () => {
   assertEqual(mergedRules.length, 3);
 });
 
+console.log('\n--- 场景7: 校验失败时保留失败记录 ---\n');
+
+test('校验失败时应创建失败分组记录', () => {
+  const invalidInput = {
+    requestId: 'req-failed-001',
+    sourceSystems: []
+  };
+
+  const validation = groupingService.validateInput(invalidInput);
+  assertFalse(validation.valid);
+
+  const failedGroup = groupingService.createFailedTenantGroup(
+    'unknown',
+    [],
+    invalidInput,
+    validation.errors
+  );
+
+  assertEqual(failedGroup.status, GroupStatus.FAILED);
+  assertEqual(failedGroup.finalResult, false);
+  assertTrue(failedGroup.processingBasis.includes('输入校验失败'));
+  assertTrue(failedGroup.processingBasis.includes('最终结论: 拒绝处理'));
+  assertTrue(failedGroup.errorMessage !== undefined);
+  assertEqual(failedGroup.rawInput.requestId, 'req-failed-001');
+});
+
+test('失败分组记录应持久化到存储，重启后可查询', () => {
+  const invalidInput = {
+    requestId: 'req-failed-002',
+    tenantId: ''
+  };
+
+  const validation = groupingService.validateInput(invalidInput);
+  const failedGroup = groupingService.createFailedTenantGroup(
+    '',
+    [],
+    invalidInput,
+    validation.errors
+  );
+
+  const fetchedGroup = groupingService.getTenantGroup(failedGroup.groupId);
+  assertTrue(fetchedGroup !== undefined);
+  assertEqual(fetchedGroup?.status, GroupStatus.FAILED);
+  assertEqual(fetchedGroup?.requestId, 'req-failed-002');
+});
+
+console.log('\n--- 场景8: 对象型规则正确去重 ---\n');
+
+test('不同属性对象规则不应被误判为重复', () => {
+  const sourceSystems = [
+    {
+      systemId: 'product-a',
+      systemName: '产品线A',
+      rules: [
+        { ruleId: 'rule-1', ruleType: RuleType.ATTRIBUTE, ruleValue: { key: 'region', value: 'cn' }, description: '中国区' },
+        { ruleId: 'rule-2', ruleType: RuleType.ATTRIBUTE, ruleValue: { key: 'region', value: 'us' }, description: '美国区' }
+      ]
+    }
+  ];
+
+  const group = groupingService.createTenantGroup('tenant-obj-test', sourceSystems, {
+    requestId: 'req-obj-test',
+    tenantId: 'tenant-obj-test',
+    sourceSystems
+  });
+
+  const mergedRules = groupingService.mergeRules(group.groupId);
+
+  assertEqual(mergedRules.length, 2);
+});
+
+test('相同属性对象规则应正确去重', () => {
+  const sourceSystems = [
+    {
+      systemId: 'product-a',
+      systemName: '产品线A',
+      rules: [
+        { ruleId: 'rule-a', ruleType: RuleType.ATTRIBUTE, ruleValue: { key: 'vip', value: 'true' }, description: 'VIP用户A' }
+      ]
+    },
+    {
+      systemId: 'product-b',
+      systemName: '产品线B',
+      rules: [
+        { ruleId: 'rule-b', ruleType: RuleType.ATTRIBUTE, ruleValue: { key: 'vip', value: 'true' }, description: 'VIP用户B' }
+      ]
+    }
+  ];
+
+  const group = groupingService.createTenantGroup('tenant-obj-test2', sourceSystems, {
+    requestId: 'req-obj-test2',
+    tenantId: 'tenant-obj-test2',
+    sourceSystems
+  });
+
+  const mergedRules = groupingService.mergeRules(group.groupId);
+
+  assertEqual(mergedRules.length, 1);
+});
+
 console.log('\n========================================');
 console.log('测试结果汇总');
 console.log('========================================');

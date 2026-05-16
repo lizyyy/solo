@@ -46,6 +46,45 @@ export class GroupingService {
     return group;
   }
 
+  createFailedTenantGroup(
+    tenantId: string,
+    sourceSystems: SourceSystem[],
+    rawInput: Record<string, unknown>,
+    errors: string[]
+  ): TenantGroup {
+    const now = Date.now();
+    const group: TenantGroup = {
+      tenantId,
+      groupId: uuidv4(),
+      requestId: rawInput.requestId as string || uuidv4(),
+      sourceSystems,
+      mergedRules: [],
+      hitResults: [],
+      finalResult: false,
+      status: GroupStatus.FAILED,
+      adjustmentRecords: [],
+      rawInput,
+      processingBasis: [
+        '输入校验失败',
+        `错误详情: ${JSON.stringify(errors)}`,
+        '最终结论: 拒绝处理'
+      ],
+      errorMessage: errors.join('; '),
+      createdAt: now,
+      updatedAt: now
+    };
+
+    dataStore.saveTenantGroup(group);
+    return group;
+  }
+
+  private getRuleKey(rule: GroupRule): string {
+    const valueStr = typeof rule.ruleValue === 'object'
+      ? JSON.stringify(rule.ruleValue)
+      : String(rule.ruleValue);
+    return `${rule.ruleType}-${valueStr}`;
+  }
+
   mergeRules(groupId: string): GroupRule[] {
     const group = this.getGroupOrThrow(groupId);
     const mergedRules: GroupRule[] = [];
@@ -55,7 +94,7 @@ export class GroupingService {
 
     for (const sourceSystem of group.sourceSystems) {
       for (const rule of sourceSystem.rules) {
-        const ruleKey = `${rule.ruleType}-${rule.ruleValue}`;
+        const ruleKey = this.getRuleKey(rule);
         if (!ruleMap.has(ruleKey)) {
           ruleMap.set(ruleKey, rule);
           mergedRules.push(rule);

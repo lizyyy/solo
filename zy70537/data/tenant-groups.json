@@ -1,7 +1,7 @@
 [
   {
     "tenantId": "tenant-001",
-    "groupId": "b4814aab-1a70-4e76-89a8-efc9f5e1579c",
+    "groupId": "1cfa0777-a882-4356-9cd0-e0b92479da21",
     "requestId": "req-001",
     "sourceSystems": [
       {
@@ -67,12 +67,12 @@
       "开始命中计算",
       "来源系统 产品线A: 1/1 条规则命中"
     ],
-    "createdAt": 1778907080030,
-    "updatedAt": 1778907080033
+    "createdAt": 1778918695207,
+    "updatedAt": 1778918695208
   },
   {
     "tenantId": "tenant-002",
-    "groupId": "b3ee75ad-83ed-4efd-9a0a-0723ca81824c",
+    "groupId": "c8572ada-9c87-4253-8744-b91da1712926",
     "requestId": "req-duplicate",
     "sourceSystems": [
       {
@@ -114,12 +114,12 @@
     "processingBasis": [
       "初始创建"
     ],
-    "createdAt": 1778907080036,
-    "updatedAt": 1778907080036
+    "createdAt": 1778918695210,
+    "updatedAt": 1778918695210
   },
   {
     "tenantId": "tenant-003",
-    "groupId": "b68f55d5-08f2-4f1b-8275-9a0e1aeb2897",
+    "groupId": "ec7fe963-4026-4004-83a7-45eab926e32d",
     "requestId": "req-003",
     "sourceSystems": [
       {
@@ -154,13 +154,13 @@
     "status": "SUCCESS",
     "adjustmentRecords": [
       {
-        "adjustmentId": "c42f5725-08cc-4041-91cc-99468f37b8cc",
+        "adjustmentId": "836f6978-f0be-4304-9da4-42e6dfbd291b",
         "operator": "operator-admin",
         "operationType": "OVERRIDE",
         "beforeValue": true,
         "afterValue": false,
         "reason": "特殊客户豁免",
-        "timestamp": 1778907080037
+        "timestamp": 1778918695210
       }
     ],
     "rawInput": {
@@ -190,12 +190,12 @@
       "开始命中计算",
       "来源系统 产品线C: 1/1 条规则命中"
     ],
-    "createdAt": 1778907080037,
-    "updatedAt": 1778907080038
+    "createdAt": 1778918695210,
+    "updatedAt": 1778918695211
   },
   {
     "tenantId": "tenant-004",
-    "groupId": "893f317c-6694-4f53-87f9-28abf83511b8",
+    "groupId": "68f459b5-3776-4ee2-ac45-92f7c3347d09",
     "requestId": "req-004",
     "sourceSystems": [
       {
@@ -245,13 +245,13 @@
       "异常处理: 规则冲突，无法自动判定，转入人工审核",
       "状态变更为: PROCESSING"
     ],
-    "createdAt": 1778907080038,
-    "updatedAt": 1778907080039,
+    "createdAt": 1778918695211,
+    "updatedAt": 1778918695211,
     "errorMessage": "规则冲突，无法自动判定"
   },
   {
     "tenantId": "tenant-005",
-    "groupId": "e51baa25-abf8-4677-8e25-8571502fa724",
+    "groupId": "0f7effb9-3efb-4f08-b737-ea09e2662069",
     "requestId": "req-005",
     "sourceSystems": [
       {
@@ -372,7 +372,7 @@
       "合并来源系统 产品线X 的 2 条规则",
       "合并来源系统 产品线Y 的 2 条规则"
     ],
-    "createdAt": 1778907080039,
-    "updatedAt": 1778907080039
+    "createdAt": 1778918695212,
+    "updatedAt": 1778918695212
   }
 ]
