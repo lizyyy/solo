@@ -102,17 +102,38 @@ class CorrectionService {
 
   detectAnomalies(originalEvent, correction, stateBefore, stateAfter) {
     const anomalies = [];
-
     const originalKeys = Object.keys(correction.originalPayload);
     const correctedKeys = Object.keys(correction.correctedPayload);
+    const criticalFields = ['id', 'Id', 'ID', '_id', 'uuid', 'orderId', 'customerId', 'transactionId', 'total', 'amount'];
 
     const missingKeys = originalKeys.filter(k => !correctedKeys.includes(k));
     if (missingKeys.length > 0) {
+      const missingCritical = missingKeys.filter(k => 
+        criticalFields.some(cf => k.toLowerCase().includes(cf.toLowerCase()))
+      );
+      if (missingCritical.length > 0) {
+        anomalies.push({
+          type: 'critical_field_removed',
+          severity: 'error',
+          message: `Critical identifier fields removed in correction: ${missingCritical.join(', ')} - this may break event replay`,
+          affectedFields: missingCritical
+        });
+      }
+      if (missingKeys.filter(k => !missingCritical.includes(k)).length > 0) {
+        anomalies.push({
+          type: 'missing_fields',
+          severity: 'warning',
+          message: `Some fields from original payload are missing in correction: ${missingKeys.join(', ')}`,
+          affectedFields: missingKeys
+        });
+      }
+    }
+
+    if (correctedKeys.length === 0 || Object.keys(correction.correctedPayload).length === 0) {
       anomalies.push({
-        type: 'missing_fields',
-        severity: 'warning',
-        message: `Some fields from original payload are missing in correction: ${missingKeys.join(', ')}`,
-        affectedFields: missingKeys
+        type: 'empty_payload',
+        severity: 'error',
+        message: 'Correction payload is empty'
       });
     }
 
@@ -142,6 +163,21 @@ class CorrectionService {
         message: 'Correction does not result in any state change - may be redundant'
       });
     }
+
+    originalKeys.forEach(key => {
+      if (correctedKeys.includes(key)) {
+        const origVal = correction.originalPayload[key];
+        const corrVal = correction.correctedPayload[key];
+        if (typeof origVal !== typeof corrVal && origVal !== undefined && corrVal !== undefined) {
+          anomalies.push({
+            type: 'type_mismatch',
+            severity: 'error',
+            message: `Type mismatch for field "${key}": original is ${typeof origVal}, corrected is ${typeof corrVal}`,
+            affectedField: key
+          });
+        }
+      }
+    });
 
     return anomalies;
   }
