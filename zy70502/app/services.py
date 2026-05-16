@@ -222,5 +222,3 @@ class VerdictReportGenerator:
                 for c in changes
             ]
         }
-            ]
-        }
