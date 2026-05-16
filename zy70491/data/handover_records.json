@@ -1,0 +1,245 @@
+[
+  {
+    "id": "d4e5c041-bba6-43af-8b63-7d3f4e1b8e8d",
+    "title": "2024年Q1仓库交接单",
+    "description": "第一季度代码仓库及相关资产交接",
+    "operator": "张三",
+    "status": "normal",
+    "materials": [
+      {
+        "id": "412b1d4c-2828-48a6-b326-7b1567310179",
+        "name": "会员续费流水表",
+        "type": "财务报表",
+        "content": {
+          "period": "2024-Q1",
+          "total_amount": 150000,
+          "member_count": 1250
+        },
+        "attachments": [
+          {
+            "id": "56ad7417-852c-4de9-8603-b95e403eda79",
+            "name": "2024-Q1_续费流水.xlsx",
+            "file_path": "/data/attachments/2024-Q1_renewal.xlsx",
+            "upload_time": "2026-05-16T08:22:31.027794",
+            "expire_time": "2027-12-31T00:00:00",
+            "status": "valid"
+          }
+        ],
+        "created_at": "2026-05-16T08:22:31.027806",
+        "updated_at": "2026-05-16T08:22:31.027806"
+      },
+      {
+        "id": "3b6deb86-2f56-4d75-bd53-015de4d42ac3",
+        "name": "代码仓库权限清单",
+        "type": "权限文档",
+        "content": {
+          "repo_count": 15,
+          "admin_users": [
+            "admin1",
+            "admin2"
+          ],
+          "developer_users": [
+            "dev1",
+            "dev2",
+            "dev3"
+          ]
+        },
+        "attachments": [
+          {
+            "id": "20334f20-54c0-491f-b118-729630b529fb",
+            "name": "仓库权限清单_2024.pdf",
+            "file_path": "/data/attachments/repo_permissions_2024.pdf",
+            "upload_time": "2026-05-16T08:22:31.027815",
+            "expire_time": "2027-06-30T00:00:00",
+            "status": "valid"
+          }
+        ],
+        "created_at": "2026-05-16T08:22:31.027816",
+        "updated_at": "2026-05-16T08:22:31.027817"
+      },
+      {
+        "id": "6fba6aa9-ccf2-4df9-b882-785962017d68",
+        "name": "服务器资产清单",
+        "type": "资产管理",
+        "content": {
+          "server_count": 8,
+          "total_cpu": 64,
+          "total_memory": "256GB",
+          "total_storage": "4TB"
+        },
+        "attachments": [
+          {
+            "id": "212a4145-7e74-4ba3-a886-6cda0e8a6cfa",
+            "name": "服务器资产清单_2024.xlsx",
+            "file_path": "/data/attachments/server_assets_2024.xlsx",
+            "upload_time": "2026-05-16T08:22:31.027824",
+            "expire_time": null,
+            "status": "valid"
+          }
+        ],
+        "created_at": "2026-05-16T08:22:31.027825",
+        "updated_at": "2026-05-16T08:22:31.027825"
+      }
+    ],
+    "system_judgment": {
+      "is_abnormal": false,
+      "reason": "所有附件状态正常",
+      "detected_at": "2026-05-16T08:22:31.028390",
+      "details": {
+        "total_attachments": 3,
+        "expired_count": 0,
+        "expiring_soon_count": 0,
+        "expired_attachments": [],
+        "expiring_soon_attachments": [],
+        "all_attachments": [
+          {
+            "attachment_id": "56ad7417-852c-4de9-8603-b95e403eda79",
+            "attachment_name": "2024-Q1_续费流水.xlsx",
+            "material_id": "412b1d4c-2828-48a6-b326-7b1567310179",
+            "material_name": "会员续费流水表",
+            "expire_time": "2027-12-31T00:00:00"
+          },
+          {
+            "attachment_id": "20334f20-54c0-491f-b118-729630b529fb",
+            "attachment_name": "仓库权限清单_2024.pdf",
+            "material_id": "3b6deb86-2f56-4d75-bd53-015de4d42ac3",
+            "material_name": "代码仓库权限清单",
+            "expire_time": "2027-06-30T00:00:00"
+          },
+          {
+            "attachment_id": "212a4145-7e74-4ba3-a886-6cda0e8a6cfa",
+            "attachment_name": "服务器资产清单_2024.xlsx",
+            "material_id": "6fba6aa9-ccf2-4df9-b882-785962017d68",
+            "material_name": "服务器资产清单",
+            "expire_time": null
+          }
+        ]
+      }
+    },
+    "remarks": [],
+    "manual_corrections": [],
+    "created_at": "2026-05-16T08:22:31.027827",
+    "updated_at": "2026-05-16T08:22:31.028392"
+  },
+  {
+    "id": "22d032bd-db8a-4987-a273-b6f9a5a83610",
+    "title": "2023年Q4仓库交接单",
+    "description": "第四季度代码仓库及相关资产交接（包含过期附件）",
+    "operator": "李四",
+    "status": "abnormal",
+    "materials": [
+      {
+        "id": "a166eeda-5769-415c-8b93-bfbc9d679ae1",
+        "name": "会员续费流水表",
+        "type": "财务报表",
+        "content": {
+          "period": "2023-Q4",
+          "total_amount": 120000,
+          "member_count": 1000
+        },
+        "attachments": [
+          {
+            "id": "81e4fccd-0016-43af-9f96-2ee45c578907",
+            "name": "2023-Q4_续费流水.xlsx",
+            "file_path": "/data/attachments/2023-Q4_renewal.xlsx",
+            "upload_time": "2023-12-01T00:00:00",
+            "expire_time": "2024-03-31T00:00:00",
+            "status": "expired"
+          }
+        ],
+        "created_at": "2026-05-16T08:22:31.028051",
+        "updated_at": "2026-05-16T08:22:31.028051"
+      },
+      {
+        "id": "f13444d1-7604-48e9-bd55-fe17f8c66494",
+        "name": "SSL证书清单",
+        "type": "安全文档",
+        "content": {
+          "cert_count": 5,
+          "domains": [
+            "example.com",
+            "api.example.com"
+          ]
+        },
+        "attachments": [
+          {
+            "id": "ff879415-960e-4b5e-b9a9-e9b9c0697c2e",
+            "name": "SSL证书_2023.pdf",
+            "file_path": "/data/attachments/ssl_certs_2023.pdf",
+            "upload_time": "2023-01-01T00:00:00",
+            "expire_time": "2024-01-01T00:00:00",
+            "status": "expired"
+          }
+        ],
+        "created_at": "2026-05-16T08:22:31.028059",
+        "updated_at": "2026-05-16T08:22:31.028059"
+      }
+    ],
+    "system_judgment": {
+      "is_abnormal": true,
+      "reason": "发现 2 个已过期附件",
+      "detected_at": "2026-05-16T08:22:31.029540",
+      "details": {
+        "total_attachments": 2,
+        "expired_count": 2,
+        "expiring_soon_count": 0,
+        "expired_attachments": [
+          {
+            "attachment_id": "81e4fccd-0016-43af-9f96-2ee45c578907",
+            "attachment_name": "2023-Q4_续费流水.xlsx",
+            "material_id": "a166eeda-5769-415c-8b93-bfbc9d679ae1",
+            "material_name": "会员续费流水表",
+            "expire_time": "2024-03-31T00:00:00"
+          },
+          {
+            "attachment_id": "ff879415-960e-4b5e-b9a9-e9b9c0697c2e",
+            "attachment_name": "SSL证书_2023.pdf",
+            "material_id": "f13444d1-7604-48e9-bd55-fe17f8c66494",
+            "material_name": "SSL证书清单",
+            "expire_time": "2024-01-01T00:00:00"
+          }
+        ],
+        "expiring_soon_attachments": [],
+        "all_attachments": [
+          {
+            "attachment_id": "81e4fccd-0016-43af-9f96-2ee45c578907",
+            "attachment_name": "2023-Q4_续费流水.xlsx",
+            "material_id": "a166eeda-5769-415c-8b93-bfbc9d679ae1",
+            "material_name": "会员续费流水表",
+            "expire_time": "2024-03-31T00:00:00"
+          },
+          {
+            "attachment_id": "ff879415-960e-4b5e-b9a9-e9b9c0697c2e",
+            "attachment_name": "SSL证书_2023.pdf",
+            "material_id": "f13444d1-7604-48e9-bd55-fe17f8c66494",
+            "material_name": "SSL证书清单",
+            "expire_time": "2024-01-01T00:00:00"
+          }
+        ]
+      }
+    },
+    "remarks": [
+      {
+        "id": "ae67f907-edcd-4e7b-bfc4-4fdb58b0690b",
+        "content": "已确认附件过期，正在联系相关部门更新",
+        "operator": "王五",
+        "created_at": "2026-05-16T08:22:38.040895",
+        "reason": "附件过期确认"
+      }
+    ],
+    "manual_corrections": [
+      {
+        "id": "8c175966-ed21-4c2d-b70e-273812825516",
+        "operator": "赵六",
+        "correction_type": "续费流水补录",
+        "old_value": "120000",
+        "new_value": "125000",
+        "reason": "发现漏记的5笔续费记录，已补充录入",
+        "created_at": "2026-05-16T08:22:44.410752",
+        "resource_scope": "会员续费流水"
+      }
+    ],
+    "created_at": "2026-05-16T08:22:31.028060",
+    "updated_at": "2026-05-16T08:22:44.410758"
+  }
+]
