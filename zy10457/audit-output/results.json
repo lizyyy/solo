@@ -1,0 +1,1179 @@
+{
+  "silences": [
+    {
+      "id": "abc123def456-critical-expired",
+      "status": {
+        "state": "expired"
+      },
+      "createdBy": "admin@example.com",
+      "comment": "临时维护，已过期忘记删除",
+      "startsAt": "2024-01-01T00:00:00.000Z",
+      "endsAt": "2024-01-07T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "HighCpuUsage",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": true,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "alertname"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "HighCpuUsage",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "CRITICAL",
+      "riskLevelInfo": {
+        "level": 0,
+        "name": "严重",
+        "color": "red",
+        "description": "高风险，需立即处理"
+      },
+      "issues": [
+        {
+          "type": "EXPIRED",
+          "message": "规则已过期"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 0,
+        "line": 2
+      }
+    },
+    {
+      "id": "abc123def456-expiring-soon",
+      "status": {
+        "state": "active"
+      },
+      "createdBy": "devops@example.com",
+      "comment": "新版本上线临时静默",
+      "startsAt": "2024-01-10T00:00:00.000Z",
+      "endsAt": "2025-01-13T00:00:00.000Z",
+      "createdAt": "2024-01-10T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "ServiceDown",
+          "isRegex": false,
+          "isEqual": true
+        },
+        {
+          "name": "service",
+          "value": "api-gateway",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 2,
+        "labelNames": [
+          "alertname",
+          "service"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "ServiceDown",
+            "isRegex": false,
+            "isEqual": true
+          },
+          {
+            "name": "service",
+            "value": "api-gateway",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "MEDIUM",
+      "riskLevelInfo": {
+        "level": 2,
+        "name": "中",
+        "color": "yellow",
+        "description": "存在潜在问题"
+      },
+      "issues": [
+        {
+          "type": "NO_HITS",
+          "message": "未命中任何告警"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 1,
+        "line": 3
+      }
+    },
+    {
+      "id": "abc123def456-broad-match",
+      "status": {
+        "state": "active"
+      },
+      "createdBy": "lazy.admin@example.com",
+      "comment": "test",
+      "startsAt": "2024-01-01T00:00:00.000Z",
+      "endsAt": "2025-12-31T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "env",
+          "value": ".*",
+          "isRegex": true,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "env"
+        ],
+        "hasAlertName": false,
+        "hasSeverity": false,
+        "regexMatcherCount": 1,
+        "negativeMatcherCount": 0,
+        "isBroad": true,
+        "broadMatchReason": "缺少关键标签(alertname/severity)，匹配范围过宽",
+        "allMatchers": [
+          {
+            "name": "env",
+            "value": ".*",
+            "isRegex": true,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "CRITICAL",
+      "riskLevelInfo": {
+        "level": 0,
+        "name": "严重",
+        "color": "red",
+        "description": "高风险，需立即处理"
+      },
+      "issues": [
+        {
+          "type": "BROAD_MATCH",
+          "message": "缺少关键标签(alertname/severity)，匹配范围过宽"
+        },
+        {
+          "type": "NO_HITS",
+          "message": "未命中任何告警"
+        },
+        {
+          "type": "NO_COMMENT",
+          "message": "缺少说明或说明过短"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 2,
+        "line": 4
+      }
+    },
+    {
+      "id": "abc123def456-normal",
+      "status": {
+        "state": "active"
+      },
+      "createdBy": "sre@example.com",
+      "comment": "数据库维护窗口，每周六凌晨2-4点",
+      "startsAt": "2024-01-01T00:00:00.000Z",
+      "endsAt": "2025-06-01T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "DatabaseHighLatency",
+          "isRegex": false,
+          "isEqual": true
+        },
+        {
+          "name": "severity",
+          "value": "warning",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 2,
+        "labelNames": [
+          "alertname",
+          "severity"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": true,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "DatabaseHighLatency",
+            "isRegex": false,
+            "isEqual": true
+          },
+          {
+            "name": "severity",
+            "value": "warning",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "MEDIUM",
+      "riskLevelInfo": {
+        "level": 2,
+        "name": "中",
+        "color": "yellow",
+        "description": "存在潜在问题"
+      },
+      "issues": [
+        {
+          "type": "NO_HITS",
+          "message": "未命中任何告警"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 3,
+        "line": 5
+      }
+    },
+    {
+      "id": "abc123def456-pending",
+      "status": {
+        "state": "pending"
+      },
+      "createdBy": "release@example.com",
+      "comment": "春节前大版本发布",
+      "startsAt": "2025-02-01T00:00:00.000Z",
+      "endsAt": "2025-02-02T00:00:00.000Z",
+      "createdAt": "2024-12-15T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "DeploymentFailed",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "alertname"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "DeploymentFailed",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "LOW",
+      "riskLevelInfo": {
+        "level": 3,
+        "name": "低",
+        "color": "green",
+        "description": "正常状态"
+      },
+      "issues": [],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 4,
+        "line": 6
+      }
+    },
+    {
+      "id": "abc123def456-no-comment",
+      "status": {
+        "state": "active"
+      },
+      "createdBy": "unknown",
+      "comment": "",
+      "startsAt": "2024-06-01T00:00:00.000Z",
+      "endsAt": "2025-06-01T00:00:00.000Z",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "DiskFull",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "alertname"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "DiskFull",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "MEDIUM",
+      "riskLevelInfo": {
+        "level": 2,
+        "name": "中",
+        "color": "yellow",
+        "description": "存在潜在问题"
+      },
+      "issues": [
+        {
+          "type": "NO_HITS",
+          "message": "未命中任何告警"
+        },
+        {
+          "type": "NO_COMMENT",
+          "message": "缺少说明或说明过短"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 5,
+        "line": 7
+      }
+    }
+  ],
+  "statistics": {
+    "total": 6,
+    "active": 4,
+    "expired": 1,
+    "pending": 1,
+    "byRiskLevel": {
+      "CRITICAL": 2,
+      "HIGH": 0,
+      "MEDIUM": 3,
+      "LOW": 1
+    },
+    "byCreator": {
+      "admin@example.com": 1,
+      "devops@example.com": 1,
+      "lazy.admin@example.com": 1,
+      "sre@example.com": 1,
+      "release@example.com": 1,
+      "unknown": 1
+    },
+    "hitCount": 0,
+    "noHitCount": 6,
+    "topCreators": [
+      {
+        "name": "admin@example.com",
+        "count": 1
+      },
+      {
+        "name": "devops@example.com",
+        "count": 1
+      },
+      {
+        "name": "lazy.admin@example.com",
+        "count": 1
+      },
+      {
+        "name": "sre@example.com",
+        "count": 1
+      },
+      {
+        "name": "release@example.com",
+        "count": 1
+      },
+      {
+        "name": "unknown",
+        "count": 1
+      }
+    ]
+  },
+  "summary": {
+    "totalSilences": 6,
+    "highRiskCount": 2,
+    "activeCount": 4,
+    "expiredCount": 1,
+    "noHitCount": 6,
+    "auditTime": "2026-05-17T03:22:09.578+07:00",
+    "riskThreshold": 7,
+    "matchThreshold": 80
+  },
+  "highRiskSilences": [
+    {
+      "id": "abc123def456-critical-expired",
+      "status": {
+        "state": "expired"
+      },
+      "createdBy": "admin@example.com",
+      "comment": "临时维护，已过期忘记删除",
+      "startsAt": "2024-01-01T00:00:00.000Z",
+      "endsAt": "2024-01-07T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "HighCpuUsage",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": true,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "alertname"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "HighCpuUsage",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "CRITICAL",
+      "riskLevelInfo": {
+        "level": 0,
+        "name": "严重",
+        "color": "red",
+        "description": "高风险，需立即处理"
+      },
+      "issues": [
+        {
+          "type": "EXPIRED",
+          "message": "规则已过期"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 0,
+        "line": 2
+      }
+    },
+    {
+      "id": "abc123def456-broad-match",
+      "status": {
+        "state": "active"
+      },
+      "createdBy": "lazy.admin@example.com",
+      "comment": "test",
+      "startsAt": "2024-01-01T00:00:00.000Z",
+      "endsAt": "2025-12-31T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "env",
+          "value": ".*",
+          "isRegex": true,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "env"
+        ],
+        "hasAlertName": false,
+        "hasSeverity": false,
+        "regexMatcherCount": 1,
+        "negativeMatcherCount": 0,
+        "isBroad": true,
+        "broadMatchReason": "缺少关键标签(alertname/severity)，匹配范围过宽",
+        "allMatchers": [
+          {
+            "name": "env",
+            "value": ".*",
+            "isRegex": true,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "CRITICAL",
+      "riskLevelInfo": {
+        "level": 0,
+        "name": "严重",
+        "color": "red",
+        "description": "高风险，需立即处理"
+      },
+      "issues": [
+        {
+          "type": "BROAD_MATCH",
+          "message": "缺少关键标签(alertname/severity)，匹配范围过宽"
+        },
+        {
+          "type": "NO_HITS",
+          "message": "未命中任何告警"
+        },
+        {
+          "type": "NO_COMMENT",
+          "message": "缺少说明或说明过短"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 2,
+        "line": 4
+      }
+    }
+  ],
+  "noHitSilences": [
+    {
+      "id": "abc123def456-critical-expired",
+      "status": {
+        "state": "expired"
+      },
+      "createdBy": "admin@example.com",
+      "comment": "临时维护，已过期忘记删除",
+      "startsAt": "2024-01-01T00:00:00.000Z",
+      "endsAt": "2024-01-07T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "HighCpuUsage",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": true,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "alertname"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "HighCpuUsage",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "CRITICAL",
+      "riskLevelInfo": {
+        "level": 0,
+        "name": "严重",
+        "color": "red",
+        "description": "高风险，需立即处理"
+      },
+      "issues": [
+        {
+          "type": "EXPIRED",
+          "message": "规则已过期"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 0,
+        "line": 2
+      }
+    },
+    {
+      "id": "abc123def456-expiring-soon",
+      "status": {
+        "state": "active"
+      },
+      "createdBy": "devops@example.com",
+      "comment": "新版本上线临时静默",
+      "startsAt": "2024-01-10T00:00:00.000Z",
+      "endsAt": "2025-01-13T00:00:00.000Z",
+      "createdAt": "2024-01-10T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "ServiceDown",
+          "isRegex": false,
+          "isEqual": true
+        },
+        {
+          "name": "service",
+          "value": "api-gateway",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 2,
+        "labelNames": [
+          "alertname",
+          "service"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "ServiceDown",
+            "isRegex": false,
+            "isEqual": true
+          },
+          {
+            "name": "service",
+            "value": "api-gateway",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "MEDIUM",
+      "riskLevelInfo": {
+        "level": 2,
+        "name": "中",
+        "color": "yellow",
+        "description": "存在潜在问题"
+      },
+      "issues": [
+        {
+          "type": "NO_HITS",
+          "message": "未命中任何告警"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 1,
+        "line": 3
+      }
+    },
+    {
+      "id": "abc123def456-broad-match",
+      "status": {
+        "state": "active"
+      },
+      "createdBy": "lazy.admin@example.com",
+      "comment": "test",
+      "startsAt": "2024-01-01T00:00:00.000Z",
+      "endsAt": "2025-12-31T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "env",
+          "value": ".*",
+          "isRegex": true,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "env"
+        ],
+        "hasAlertName": false,
+        "hasSeverity": false,
+        "regexMatcherCount": 1,
+        "negativeMatcherCount": 0,
+        "isBroad": true,
+        "broadMatchReason": "缺少关键标签(alertname/severity)，匹配范围过宽",
+        "allMatchers": [
+          {
+            "name": "env",
+            "value": ".*",
+            "isRegex": true,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "CRITICAL",
+      "riskLevelInfo": {
+        "level": 0,
+        "name": "严重",
+        "color": "red",
+        "description": "高风险，需立即处理"
+      },
+      "issues": [
+        {
+          "type": "BROAD_MATCH",
+          "message": "缺少关键标签(alertname/severity)，匹配范围过宽"
+        },
+        {
+          "type": "NO_HITS",
+          "message": "未命中任何告警"
+        },
+        {
+          "type": "NO_COMMENT",
+          "message": "缺少说明或说明过短"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 2,
+        "line": 4
+      }
+    },
+    {
+      "id": "abc123def456-normal",
+      "status": {
+        "state": "active"
+      },
+      "createdBy": "sre@example.com",
+      "comment": "数据库维护窗口，每周六凌晨2-4点",
+      "startsAt": "2024-01-01T00:00:00.000Z",
+      "endsAt": "2025-06-01T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "DatabaseHighLatency",
+          "isRegex": false,
+          "isEqual": true
+        },
+        {
+          "name": "severity",
+          "value": "warning",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 2,
+        "labelNames": [
+          "alertname",
+          "severity"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": true,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "DatabaseHighLatency",
+            "isRegex": false,
+            "isEqual": true
+          },
+          {
+            "name": "severity",
+            "value": "warning",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "MEDIUM",
+      "riskLevelInfo": {
+        "level": 2,
+        "name": "中",
+        "color": "yellow",
+        "description": "存在潜在问题"
+      },
+      "issues": [
+        {
+          "type": "NO_HITS",
+          "message": "未命中任何告警"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 3,
+        "line": 5
+      }
+    },
+    {
+      "id": "abc123def456-pending",
+      "status": {
+        "state": "pending"
+      },
+      "createdBy": "release@example.com",
+      "comment": "春节前大版本发布",
+      "startsAt": "2025-02-01T00:00:00.000Z",
+      "endsAt": "2025-02-02T00:00:00.000Z",
+      "createdAt": "2024-12-15T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "DeploymentFailed",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "alertname"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "DeploymentFailed",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "LOW",
+      "riskLevelInfo": {
+        "level": 3,
+        "name": "低",
+        "color": "green",
+        "description": "正常状态"
+      },
+      "issues": [],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 4,
+        "line": 6
+      }
+    },
+    {
+      "id": "abc123def456-no-comment",
+      "status": {
+        "state": "active"
+      },
+      "createdBy": "unknown",
+      "comment": "",
+      "startsAt": "2024-06-01T00:00:00.000Z",
+      "endsAt": "2025-06-01T00:00:00.000Z",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "DiskFull",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": false,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "alertname"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "DiskFull",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "MEDIUM",
+      "riskLevelInfo": {
+        "level": 2,
+        "name": "中",
+        "color": "yellow",
+        "description": "存在潜在问题"
+      },
+      "issues": [
+        {
+          "type": "NO_HITS",
+          "message": "未命中任何告警"
+        },
+        {
+          "type": "NO_COMMENT",
+          "message": "缺少说明或说明过短"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 5,
+        "line": 7
+      }
+    }
+  ],
+  "expiredSilences": [
+    {
+      "id": "abc123def456-critical-expired",
+      "status": {
+        "state": "expired"
+      },
+      "createdBy": "admin@example.com",
+      "comment": "临时维护，已过期忘记删除",
+      "startsAt": "2024-01-01T00:00:00.000Z",
+      "endsAt": "2024-01-07T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "matchers": [
+        {
+          "name": "alertname",
+          "value": "HighCpuUsage",
+          "isRegex": false,
+          "isEqual": true
+        }
+      ],
+      "timeAnalysis": {
+        "durationDays": null,
+        "daysRemaining": null,
+        "ageDays": null,
+        "isExpired": true,
+        "isLongRunning": false
+      },
+      "labelAnalysis": {
+        "matcherCount": 1,
+        "labelNames": [
+          "alertname"
+        ],
+        "hasAlertName": true,
+        "hasSeverity": false,
+        "regexMatcherCount": 0,
+        "negativeMatcherCount": 0,
+        "isBroad": false,
+        "broadMatchReason": "",
+        "allMatchers": [
+          {
+            "name": "alertname",
+            "value": "HighCpuUsage",
+            "isRegex": false,
+            "isEqual": true
+          }
+        ]
+      },
+      "hitStats": {
+        "count": 0,
+        "matchedAlerts": [],
+        "bySeverity": {}
+      },
+      "riskLevel": "CRITICAL",
+      "riskLevelInfo": {
+        "level": 0,
+        "name": "严重",
+        "color": "red",
+        "description": "高风险，需立即处理"
+      },
+      "issues": [
+        {
+          "type": "EXPIRED",
+          "message": "规则已过期"
+        }
+      ],
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10457/data/silences.json",
+        "index": 0,
+        "line": 2
+      }
+    }
+  ],
+  "errors": [],
+  "generatedAt": "2026-05-16T20:22:09.630Z"
+}

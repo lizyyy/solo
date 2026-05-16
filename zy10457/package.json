@@ -1,0 +1,32 @@
+{
+  "name": "prometheus-silence-audit",
+  "version": "1.0.0",
+  "description": "Prometheus告警静默规则审计CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "silence-audit": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "lint": "eslint src/**/*.js",
+    "test": "jest"
+  },
+  "keywords": ["prometheus", "alertmanager", "silence", "audit", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "joi": "^17.11.0",
+    "luxon": "^3.4.4",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

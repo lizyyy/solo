@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>告警静默审计报告</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.header h1 { font-size: 28px; margin-bottom: 10px; }
+.header .time { opacity: 0.9; }
+.card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.card h2 { font-size: 20px; margin-bottom: 20px; color: #2d3748; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+.stat-card { background: #f8fafc; padding: 20px; border-radius: 8px; text-align: center; }
+.stat-card .value { font-size: 36px; font-weight: bold; color: #4a5568; }
+.stat-card .label { color: #718096; font-size: 14px; }
+.stat-card.critical .value { color: #dc3545; }
+.stat-card.warning .value { color: #fd7e14; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+th { background: #f8fafc; font-weight: 600; color: #4a5568; }
+tr:hover { background: #f8fafc; }
+.badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.risk-critical { background: #f8d7da; color: #dc3545; }
+.risk-high { background: #ffe5d0; color: #fd7e14; }
+.risk-medium { background: #fff3cd; color: #ffc107; }
+.risk-low { background: #d4edda; color: #28a745; }
+.issue-tag { display: inline-block; padding: 2px 8px; margin: 2px; background: #fee2e2; color: #dc2626; border-radius: 4px; font-size: 12px; }
+.matchers { font-family: monospace; font-size: 12px; color: #666; }
+.tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; }
+.tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: #718096; }
+.tab.active { border-bottom-color: #667eea; color: #667eea; font-weight: 600; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.error-alert { background: #fee2e2; border-left: 4px solid #dc2626; padding: 16px; border-radius: 4px; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>🔔 告警静默规则审计报告</h1>
+<div class="time">生成时间: 2026/5/17 03:22:09</div>
+</div>
+
+
+
+<div class="card">
+<h2>📊 审计概览</h2>
+<div class="stats-grid">
+<div class="stat-card"><div class="value">6</div><div class="label">总规则数</div></div>
+<div class="stat-card"><div class="value">4</div><div class="label">活跃规则</div></div>
+<div class="stat-card critical"><div class="value">2</div><div class="label">高风险规则</div></div>
+<div class="stat-card warning"><div class="value">1</div><div class="label">已过期</div></div>
+<div class="stat-card"><div class="value">6</div><div class="label">未命中告警</div></div>
+</div>
+</div>
+
+<div class="card">
+<h2>🎯 风险等级分布</h2>
+<table>
+<thead><tr><th>风险等级</th><th>数量</th><th>说明</th></tr></thead>
+<tbody>
+
+<tr>
+<td><span class="badge risk-critical">严重</span></td>
+<td>2</td>
+<td>高风险，需立即处理</td>
+</tr>
+
+<tr>
+<td><span class="badge risk-high">高</span></td>
+<td>0</td>
+<td>即将过期，需关注</td>
+</tr>
+
+<tr>
+<td><span class="badge risk-medium">中</span></td>
+<td>3</td>
+<td>存在潜在问题</td>
+</tr>
+
+<tr>
+<td><span class="badge risk-low">低</span></td>
+<td>1</td>
+<td>正常状态</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+<div class="card">
+<h2>⚠ 高风险规则详情</h2>
+
+<table>
+<thead><tr><th>ID</th><th>风险</th><th>创建人</th><th>状态</th><th>剩余天数</th><th>匹配器</th><th>问题</th></tr></thead>
+<tbody>
+
+<tr style="background: #f8d7da30">
+<td><code>abc123def456</code></td>
+<td><span class="badge risk-critical">严重</span></td>
+<td>admin@example.com</td>
+<td>expired</td>
+<td>-</td>
+<td class="matchers">alertname=HighCpuUsage</td>
+<td><span class="issue-tag">规则已过期</span></td>
+</tr>
+
+<tr style="background: #f8d7da30">
+<td><code>abc123def456</code></td>
+<td><span class="badge risk-critical">严重</span></td>
+<td>lazy.admin@example.com</td>
+<td>active</td>
+<td>NaN</td>
+<td class="matchers">env=.*</td>
+<td><span class="issue-tag">缺少关键标签(alertname/severity)，匹配范围过宽</span><span class="issue-tag">未命中任何告警</span><span class="issue-tag">缺少说明或说明过短</span></td>
+</tr>
+
+</tbody>
+</table>
+
+</div>
+
+<div class="card">
+<h2>📋 所有规则</h2>
+<div class="tabs">
+<div class="tab active" onclick="showTab('all')">全部 (6)</div>
+<div class="tab" onclick="showTab('active')">活跃 (4)</div>
+<div class="tab" onclick="showTab('expired')">已过期 (1)</div>
+<div class="tab" onclick="showTab('nohit')">未命中 (6)</div>
+</div>
+<div id="tab-all" class="tab-content active">
+<table>
+<thead><tr><th>ID</th><th>风险</th><th>创建人</th><th>状态</th><th>剩余天数</th><th>备注</th></tr></thead>
+<tbody>
+
+<tr>
+<td><code>abc123def456</code></td>
+<td><span class="badge risk-critical">严重</span></td>
+<td>admin@example.com</td>
+<td>expired</td>
+<td>-</td>
+<td>临时维护，已过期忘记删除</td>
+</tr>
+
+<tr>
+<td><code>abc123def456</code></td>
+<td><span class="badge risk-medium">中</span></td>
+<td>devops@example.com</td>
+<td>active</td>
+<td>NaN</td>
+<td>新版本上线临时静默</td>
+</tr>
+
+<tr>
+<td><code>abc123def456</code></td>
+<td><span class="badge risk-critical">严重</span></td>
+<td>lazy.admin@example.com</td>
+<td>active</td>
+<td>NaN</td>
+<td>test</td>
+</tr>
+
+<tr>
+<td><code>abc123def456</code></td>
+<td><span class="badge risk-medium">中</span></td>
+<td>sre@example.com</td>
+<td>active</td>
+<td>NaN</td>
+<td>数据库维护窗口，每周六凌晨2-4点</td>
+</tr>
+
+<tr>
+<td><code>abc123def456</code></td>
+<td><span class="badge risk-low">低</span></td>
+<td>release@example.com</td>
+<td>pending</td>
+<td>-</td>
+<td>春节前大版本发布</td>
+</tr>
+
+<tr>
+<td><code>abc123def456</code></td>
+<td><span class="badge risk-medium">中</span></td>
+<td>unknown</td>
+<td>active</td>
+<td>NaN</td>
+<td>-</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+<div id="tab-active" class="tab-content"></div>
+<div id="tab-expired" class="tab-content"></div>
+<div id="tab-nohit" class="tab-content"></div>
+</div>
+</div>
+<script>
+function showTab(tabName) {
+document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+event.target.classList.add('active');
+document.getElementById('tab-' + tabName).classList.add('active');
+}
+</script>
+</body>
+</html>

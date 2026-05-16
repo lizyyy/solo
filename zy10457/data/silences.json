@@ -1,0 +1,76 @@
+[
+  {
+    "id": "abc123def456-critical-expired",
+    "status": { "state": "expired" },
+    "startsAt": "2024-01-01T00:00:00Z",
+    "endsAt": "2024-01-07T00:00:00Z",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "createdBy": "admin@example.com",
+    "comment": "临时维护，已过期忘记删除",
+    "matchers": [
+      { "name": "alertname", "value": "HighCpuUsage", "isRegex": false, "isEqual": true }
+    ]
+  },
+  {
+    "id": "abc123def456-expiring-soon",
+    "status": { "state": "active" },
+    "startsAt": "2024-01-10T00:00:00Z",
+    "endsAt": "2025-01-13T00:00:00Z",
+    "createdAt": "2024-01-10T00:00:00Z",
+    "createdBy": "devops@example.com",
+    "comment": "新版本上线临时静默",
+    "matchers": [
+      { "name": "alertname", "value": "ServiceDown", "isRegex": false, "isEqual": true },
+      { "name": "service", "value": "api-gateway", "isRegex": false, "isEqual": true }
+    ]
+  },
+  {
+    "id": "abc123def456-broad-match",
+    "status": { "state": "active" },
+    "startsAt": "2024-01-01T00:00:00Z",
+    "endsAt": "2025-12-31T00:00:00Z",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "createdBy": "lazy.admin@example.com",
+    "comment": "test",
+    "matchers": [
+      { "name": "env", "value": ".*", "isRegex": true, "isEqual": true }
+    ]
+  },
+  {
+    "id": "abc123def456-normal",
+    "status": { "state": "active" },
+    "startsAt": "2024-01-01T00:00:00Z",
+    "endsAt": "2025-06-01T00:00:00Z",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "createdBy": "sre@example.com",
+    "comment": "数据库维护窗口，每周六凌晨2-4点",
+    "matchers": [
+      { "name": "alertname", "value": "DatabaseHighLatency", "isRegex": false, "isEqual": true },
+      { "name": "severity", "value": "warning", "isRegex": false, "isEqual": true }
+    ]
+  },
+  {
+    "id": "abc123def456-pending",
+    "status": { "state": "pending" },
+    "startsAt": "2025-02-01T00:00:00Z",
+    "endsAt": "2025-02-02T00:00:00Z",
+    "createdAt": "2024-12-15T00:00:00Z",
+    "createdBy": "release@example.com",
+    "comment": "春节前大版本发布",
+    "matchers": [
+      { "name": "alertname", "value": "DeploymentFailed", "isRegex": false, "isEqual": true }
+    ]
+  },
+  {
+    "id": "abc123def456-no-comment",
+    "status": { "state": "active" },
+    "startsAt": "2024-06-01T00:00:00Z",
+    "endsAt": "2025-06-01T00:00:00Z",
+    "createdAt": "2024-06-01T00:00:00Z",
+    "createdBy": "unknown",
+    "comment": "",
+    "matchers": [
+      { "name": "alertname", "value": "DiskFull", "isRegex": false, "isEqual": true }
+    ]
+  }
+]
