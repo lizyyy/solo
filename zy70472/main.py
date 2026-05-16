@@ -19,27 +19,17 @@ from reporter import Reporter
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-signature_service: SignatureService = None
-audit_manager: AuditManager = None
-reporter: Reporter = None
+signature_service = SignatureService()
+audit_manager = AuditManager()
+reporter = Reporter(audit_manager)
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    global signature_service, audit_manager, reporter
-    signature_service = SignatureService()
-    audit_manager = AuditManager()
-    reporter = Reporter(audit_manager)
-    logger.info("Signature service initialized")
-    yield
-    logger.info("Signature service shutdown")
+logger.info("Signature service initialized")
 
 
 app = FastAPI(
     title="参数签名器服务",
     description="提供参数签名、验证、批量处理和审计功能",
-    version="1.0.0",
-    lifespan=lifespan
+    version="1.0.0"
 )
 
 
@@ -137,15 +127,16 @@ async def query_audit(
     
     result = audit_manager.query(filters, page, page_size)
     
+    failure_groups = None
     if status == "failed":
-        result["items"] = audit_manager.group_by_failure_reason(result["items"])
+        failure_groups = audit_manager.group_by_failure_reason(result["items"])
     
     return AuditQueryResponse(
         total=result["total"],
         page=page,
         page_size=page_size,
         items=result["items"],
-        failure_groups=result.get("failure_groups", {})
+        failure_groups=failure_groups
     )
 
 
