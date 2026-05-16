@@ -15,21 +15,38 @@
 ## 安装
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## 使用
 
 ```bash
 # 查看帮助
-python -m encoding_inspector --help
+python3 -m encoding_inspector --help
 
 # 生成演示数据
-python -m encoding_inspector generate-demo
+python3 -m encoding_inspector generate-demo
 
 # 执行巡检
-python -m encoding_inspector scan ./data
+python3 -m encoding_inspector scan ./data
 
-# 查看报告
-python -m encoding_inspector report
+# 查看报告列表
+python3 -m encoding_inspector report list
+
+# 查看指定报告
+python3 -m encoding_inspector report show <report_id>
+
+# 查看完整巡检流程
+python3 -m encoding_inspector report full <report_id>
 ```
+
+## 完整巡检流程
+
+1. **生成演示数据**：`python3 -m encoding_inspector generate-demo`
+2. **执行编码巡检**：`python3 -m encoding_inspector scan --output markdown`
+3. **查看候选清单**：`python3 -m encoding_inspector list-candidates`
+4. **添加人工备注**：`python3 -m encoding_inspector add-note <candidate_id> --note "确认清理"`
+5. **确认执行操作**：`python3 -m encoding_inspector confirm <candidate_id>`
+6. **查看失败项**：`python3 -m encoding_inspector list-failures`
+7. **查看巡检报告**：`python3 -m encoding_inspector report list`
+8. **查看版本历史**：`python3 -m encoding_inspector version-history`

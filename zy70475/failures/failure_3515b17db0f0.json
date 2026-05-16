@@ -1,0 +1,27 @@
+{
+  "failure_id": "3515b17db0f0",
+  "operation": "cleanup:approval_reminder_mixed.txt",
+  "failed_at": "2026-05-16T08:47:19.600951",
+  "item": {
+    "file_path": "/tmp/nonexistent_file_12345.txt",
+    "file_name": "approval_reminder_mixed.txt",
+    "detected_encoding": null,
+    "confidence": 0.0,
+    "reason": "编码置信度过低 (0.00)",
+    "risk_level": "high",
+    "suggested_action": "cleanup",
+    "confirmed": false,
+    "manual_note": null,
+    "status": "failed",
+    "error": "文件不存在: /tmp/nonexistent_file_12345.txt",
+    "failed_at": "2026-05-16T08:47:19.600937"
+  },
+  "error": "文件不存在: /tmp/nonexistent_file_12345.txt",
+  "context": {
+    "candidate_id": "7cfe056522e9",
+    "index": 0
+  },
+  "handled": true,
+  "handler_note": "手动检查并解决",
+  "handled_at": "2026-05-16T08:47:34.064117"
+}

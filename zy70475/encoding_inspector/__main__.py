@@ -120,7 +120,8 @@ def add_note(candidate_id, note, index):
 @cli.command()
 @click.argument('candidate_id')
 @click.option('--select', '-s', multiple=True, type=int, help='选择要确认的文件索引 (从0开始)')
-def confirm(candidate_id, select):
+@click.option('--yes', '-y', is_flag=True, help='跳过确认，直接执行')
+def confirm(candidate_id, select, yes):
     """确认候选清单并执行操作"""
     candidate_mgr = CandidateManager()
 
@@ -130,32 +131,42 @@ def confirm(candidate_id, select):
         return
 
     click.echo(f"候选清单: {candidate_id}")
+    click.echo(f"操作类型: {candidate_data['action_type']}")
     click.echo(f"待处理文件: {len(candidate_data['candidates'])} 个\n")
 
+    selected_indices = list(select) if select else None
+
     for i, c in enumerate(candidate_data['candidates']):
-        risk_color = {'high': 'red', 'medium': 'yellow', 'low': 'green'}.get(c['risk_level'], 'white')
-        click.echo(f"  [{i}] [{c['risk_level'].upper()}] {c['file_name']}")
+        status = " [选中]" if selected_indices is None or i in selected_indices else " [跳过]"
+        click.echo(f"  [{i}] [{c['risk_level'].upper()}] {c['file_name']}{status}")
         click.echo(f"      原因: {c['reason']}")
         if c.get('manual_note'):
             click.echo(f"      备注: {c['manual_note']}")
 
     click.echo()
 
-    if not select:
-        if click.confirm('是否确认处理所有候选文件？', default=False):
-            result = candidate_mgr.confirm_candidates(candidate_id)
-        else:
+    if not yes:
+        if not click.confirm('是否确认执行上述操作？', default=False):
             click.echo("操作已取消")
             return
-    else:
-        result = candidate_mgr.confirm_candidates(candidate_id, list(select))
+
+    click.echo("正在执行操作...")
+    result = candidate_mgr.execute_action(candidate_id, selected_indices)
 
     if result['success']:
-        click.echo(f"\n✅ 确认完成!")
-        click.echo(f"   已确认: {len(result['confirmed'])} 个")
-        click.echo(f"   已跳过: {len(result['skipped'])} 个")
+        click.echo(f"\n✅ 操作完成!")
     else:
-        click.echo(f"❌ {result.get('error', '操作失败')}")
+        click.echo(f"\n⚠️  操作部分完成，存在失败项")
+
+    click.echo(f"   成功处理: {len(result['processed'])} 个")
+    click.echo(f"   处理失败: {len(result['failed'])} 个")
+    click.echo(f"   已跳过: {len(result['skipped'])} 个")
+
+    if result['failed']:
+        click.echo(f"\n❌ 失败项:")
+        for f in result['failed']:
+            click.echo(f"   - {f['file_name']}: {f['error']}")
+            click.echo(f"     失败ID: {f['failure_id']}")
 
 
 @cli.command()
@@ -211,6 +222,102 @@ def version_history(limit):
         click.echo(f"📌 {h['report_id']}")
         click.echo(f"   冻结时间: {h['frozen_at']}")
         click.echo(f"   备注: {h.get('freeze_note', '无')}")
+        click.echo()
+
+
+@click.group()
+def report():
+    """巡检报告管理"""
+    pass
+
+cli.add_command(report)
+
+
+@report.command(name='list')
+@click.option('--limit', default=10, help='显示最近N条报告')
+def list_reports(limit):
+    """列出所有巡检报告"""
+    reporter = ReportGenerator()
+    reports = reporter.list_reports()[:limit]
+
+    if not reports:
+        click.echo("暂无巡检报告")
+        return
+
+    click.echo(f"巡检报告列表 (共 {len(reports)} 个):\n")
+
+    for i, r in enumerate(reports, 1):
+        summary = r.get('summary', {})
+        click.echo(f"{i}. 📊 {r['report_id']}")
+        click.echo(f"   生成时间: {r['generated_at']}")
+        click.echo(f"   总文件数: {summary.get('total_files', 0)}")
+        click.echo(f"   编码异常: {summary.get('invalid_encoding', 0)} 个")
+        click.echo()
+
+
+@report.command(name='show')
+@click.argument('report_id')
+def show_report(report_id):
+    """查看指定报告详情"""
+    reporter = ReportGenerator()
+    report = reporter.get_report(report_id)
+
+    if not report:
+        click.echo(f"❌ 报告不存在: {report_id}")
+        return
+
+    summary = report.get('summary', {})
+    results = report.get('results', [])
+
+    click.echo(f"📊 报告详情: {report_id}")
+    click.echo(f"   生成时间: {report.get('generated_at', '未知')}\n")
+
+    click.echo("【执行摘要】")
+    click.echo(f"   总文件数: {summary.get('total_files', 0)}")
+    click.echo(f"   编码有效: {summary.get('valid_encoding', 0)}")
+    click.echo(f"   编码异常: {summary.get('invalid_encoding', 0)}")
+    click.echo(f"   含BOM标记: {summary.get('has_bom', 0)}")
+    click.echo()
+
+    click.echo("【编码分布】")
+    encoding_dist = summary.get('encoding_distribution', {})
+    if encoding_dist:
+        for enc, count in encoding_dist.items():
+            click.echo(f"   - {enc or '未知'}: {count} 个")
+    else:
+        click.echo("   无编码分布数据")
+    click.echo()
+
+    click.echo("【文件检测结果】")
+    for i, r in enumerate(results, 1):
+        status = "✅" if r.get('is_valid') else "❌"
+        click.echo(f"   {status} {r.get('file_name')}")
+        click.echo(f"      编码: {r.get('encoding', '未知')}")
+        click.echo(f"      置信度: {r.get('confidence', 0):.2f}")
+        if r.get('error'):
+            click.echo(f"      错误: {r['error']}")
+    click.echo()
+
+
+@report.command(name='full')
+@click.argument('report_id')
+def full_report(report_id):
+    """查看完整报告（含版本冻结信息）"""
+    reporter = ReportGenerator()
+    full = reporter.get_full_report(report_id)
+
+    if not full:
+        click.echo(f"❌ 报告不存在: {report_id}")
+        return
+
+    show_report.callback(report_id)
+
+    version = full.get('version')
+    if version:
+        click.echo("【版本冻结信息】")
+        click.echo(f"   冻结时间: {version.get('frozen_at', '未知')}")
+        click.echo(f"   冻结备注: {version.get('freeze_note', '无')}")
+        click.echo(f"   校验和: {version.get('checksum', '无')}")
         click.echo()
 
 

@@ -1,0 +1,81 @@
+{
+  "report_id": "20260516_084608",
+  "generated_at": "2026-05-16T08:46:08.085025",
+  "summary": {
+    "total_files": 5,
+    "valid_encoding": 3,
+    "invalid_encoding": 2,
+    "has_error": 0,
+    "has_bom": 0,
+    "high_confidence": 3,
+    "low_confidence": 2,
+    "encoding_distribution": {
+      "unknown": 1,
+      "Windows-1254": 1,
+      "GB2312": 2,
+      "utf-8": 1
+    }
+  },
+  "results": [
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70475/data/approval_reminder_mixed.txt",
+      "file_name": "approval_reminder_mixed.txt",
+      "file_size": 3891,
+      "detected_at": "2026-05-16T08:46:08.047111",
+      "encoding": null,
+      "confidence": 0.0,
+      "language": null,
+      "is_valid": false,
+      "has_bom": false,
+      "error": null
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70475/data/approval_reminder_corrupted.txt",
+      "file_name": "approval_reminder_corrupted.txt",
+      "file_size": 2137,
+      "detected_at": "2026-05-16T08:46:08.058886",
+      "encoding": "Windows-1254",
+      "confidence": 0.3195563488054326,
+      "language": "Turkish",
+      "is_valid": false,
+      "has_bom": false,
+      "error": null
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70475/data/approval_reminder_gbk.txt",
+      "file_name": "approval_reminder_gbk.txt",
+      "file_size": 363,
+      "detected_at": "2026-05-16T08:46:08.064959",
+      "encoding": "GB2312",
+      "confidence": 0.99,
+      "language": "Chinese",
+      "is_valid": true,
+      "has_bom": false,
+      "error": null
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70475/data/approval_reminder_dirty.txt",
+      "file_name": "approval_reminder_dirty.txt",
+      "file_size": 2625,
+      "detected_at": "2026-05-16T08:46:08.067719",
+      "encoding": "GB2312",
+      "confidence": 0.99,
+      "language": "Chinese",
+      "is_valid": true,
+      "has_bom": false,
+      "error": null
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70475/data/approval_reminder_utf8.txt",
+      "file_name": "approval_reminder_utf8.txt",
+      "file_size": 5596,
+      "detected_at": "2026-05-16T08:46:08.080292",
+      "encoding": "utf-8",
+      "confidence": 0.99,
+      "language": "",
+      "is_valid": true,
+      "has_bom": false,
+      "error": null
+    }
+  ]
+}

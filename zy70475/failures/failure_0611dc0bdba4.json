@@ -1,0 +1,26 @@
+{
+  "failure_id": "0611dc0bdba4",
+  "operation": "cleanup:approval_reminder_corrupted.txt",
+  "failed_at": "2026-05-16T08:47:19.601173",
+  "item": {
+    "file_path": "/Users/lzy/pro/solo/workspaces/zy70475/data/approval_reminder_corrupted.txt",
+    "file_name": "approval_reminder_corrupted.txt",
+    "detected_encoding": "Windows-1254",
+    "confidence": 0.3195563488054326,
+    "reason": "编码置信度过低 (0.32)",
+    "risk_level": "medium",
+    "suggested_action": "cleanup",
+    "confirmed": false,
+    "manual_note": null,
+    "status": "failed",
+    "error": "文件不存在: /Users/lzy/pro/solo/workspaces/zy70475/data/approval_reminder_corrupted.txt",
+    "failed_at": "2026-05-16T08:47:19.601167"
+  },
+  "error": "文件不存在: /Users/lzy/pro/solo/workspaces/zy70475/data/approval_reminder_corrupted.txt",
+  "context": {
+    "candidate_id": "7cfe056522e9",
+    "index": 1
+  },
+  "handled": false,
+  "handler_note": null
+}

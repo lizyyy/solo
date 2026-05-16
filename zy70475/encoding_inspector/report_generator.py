@@ -1,7 +1,7 @@
 from pathlib import Path
 from datetime import datetime
 import json
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from .config import OUTPUT_DIR, VERSION_HISTORY_DIR
 
 
@@ -29,8 +29,12 @@ class ReportGenerator:
 
         self._freeze_version(report_id, report)
 
-        formatter = self.formatters.get(output_format.lower(), self._format_json)
-        output_path = formatter(report, report_id)
+        self._format_json(report, report_id)
+
+        if output_format.lower() == "markdown":
+            output_path = self._format_markdown(report, report_id)
+        else:
+            output_path = OUTPUT_DIR / f"report_{report_id}.json"
 
         return {
             "report_id": report_id,
@@ -166,3 +170,51 @@ class ReportGenerator:
             })
 
         return result
+
+    def list_reports(self) -> List[Dict[str, Any]]:
+        report_files = sorted(OUTPUT_DIR.glob("report_*.json"), reverse=True)
+        result = []
+
+        for file_path in report_files:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    report = json.load(f)
+                    result.append({
+                        "report_id": report.get("report_id", file_path.stem.replace("report_", "")),
+                        "generated_at": report.get("generated_at", "未知"),
+                        "summary": report.get("summary", {})
+                    })
+            except Exception as e:
+                continue
+
+        return result
+
+    def get_report(self, report_id: str) -> Optional[Dict[str, Any]]:
+        json_path = OUTPUT_DIR / f"report_{report_id}.json"
+        if not json_path.exists():
+            return None
+
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            return None
+
+    def get_full_report(self, report_id: str) -> Dict[str, Any]:
+        report = self.get_report(report_id)
+        if not report:
+            return None
+
+        version = None
+        version_path = VERSION_HISTORY_DIR / f"version_{report_id}.json"
+        if version_path.exists():
+            try:
+                with open(version_path, "r", encoding="utf-8") as f:
+                    version = json.load(f)
+            except Exception:
+                pass
+
+        return {
+            "report": report,
+            "version": version
+        }

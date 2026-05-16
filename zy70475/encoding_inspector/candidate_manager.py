@@ -2,14 +2,123 @@ from pathlib import Path
 from datetime import datetime
 import json
 import hashlib
+import shutil
 from typing import Dict, List, Any, Optional
-from .config import CANDIDATE_DIR, FAILURE_DIR
+from .config import CANDIDATE_DIR, FAILURE_DIR, DATA_DIR
 
 
 class CandidateManager:
     def __init__(self):
         self.candidates: List[Dict[str, Any]] = []
         self.manual_notes: Dict[str, str] = {}
+        self.failure_manager = FailureManager()
+
+    def execute_action(self, candidate_id: str, selected_indices: List[int] = None) -> Dict[str, Any]:
+        candidate_data = self.load_candidate_list(candidate_id)
+        if not candidate_data:
+            return {"success": False, "error": "候选清单不存在"}
+
+        action_type = candidate_data["action_type"]
+        results = {
+            "success": True,
+            "candidate_id": candidate_id,
+            "action_type": action_type,
+            "processed": [],
+            "failed": [],
+            "skipped": []
+        }
+
+        backup_dir = DATA_DIR / "backup"
+        backup_dir.mkdir(exist_ok=True)
+
+        for i, candidate in enumerate(candidate_data["candidates"]):
+            if selected_indices is not None and i not in selected_indices:
+                results["skipped"].append(candidate)
+                continue
+
+            file_path = Path(candidate["file_path"])
+            try:
+                if action_type == "cleanup":
+                    self._execute_cleanup(file_path, candidate, backup_dir)
+                elif action_type == "fix_encoding":
+                    self._execute_fix_encoding(file_path, candidate)
+                elif action_type == "rollback":
+                    self._execute_rollback(file_path, candidate, backup_dir)
+                else:
+                    raise ValueError(f"不支持的操作类型: {action_type}")
+
+                candidate["executed_at"] = datetime.now().isoformat()
+                candidate["status"] = "success"
+                results["processed"].append(candidate)
+
+            except Exception as e:
+                error_msg = str(e)
+                candidate["status"] = "failed"
+                candidate["error"] = error_msg
+                candidate["failed_at"] = datetime.now().isoformat()
+
+                failure_id = self.failure_manager.record_failure(
+                    operation=f"{action_type}:{candidate['file_name']}",
+                    item=candidate,
+                    error=error_msg,
+                    context={"candidate_id": candidate_id, "index": i}
+                )
+                candidate["failure_id"] = failure_id
+                results["failed"].append(candidate)
+
+        candidate_data["execution_results"] = results
+        candidate_data["executed_at"] = datetime.now().isoformat()
+        self._save_candidate_list(candidate_data)
+
+        results["success"] = len(results["failed"]) == 0
+        return results
+
+    def _execute_cleanup(self, file_path: Path, candidate: Dict[str, Any], backup_dir: Path):
+        if not file_path.exists():
+            raise FileNotFoundError(f"文件不存在: {file_path}")
+
+        backup_path = backup_dir / f"{file_path.name}.{datetime.now().strftime('%Y%m%d_%H%M%S')}.bak"
+        shutil.copy2(file_path, backup_path)
+        candidate["backup_path"] = str(backup_path)
+
+        file_path.unlink()
+
+    def _execute_fix_encoding(self, file_path: Path, candidate: Dict[str, Any]):
+        if not file_path.exists():
+            raise FileNotFoundError(f"文件不存在: {file_path}")
+
+        with open(file_path, "rb") as f:
+            raw_data = f.read()
+
+        encodings_to_try = ["utf-8", "gbk", "gb2312", "gb18030", "latin1"]
+        decoded_content = None
+
+        for encoding in encodings_to_try:
+            try:
+                decoded_content = raw_data.decode(encoding)
+                candidate["source_encoding"] = encoding
+                break
+            except UnicodeDecodeError:
+                continue
+
+        if decoded_content is None:
+            raise ValueError("无法用任何支持的编码解码文件")
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(decoded_content)
+
+        candidate["target_encoding"] = "utf-8"
+
+    def _execute_rollback(self, file_path: Path, candidate: Dict[str, Any], backup_dir: Path):
+        if "backup_path" not in candidate:
+            raise ValueError("没有找到备份文件，无法回滚")
+
+        backup_path = Path(candidate["backup_path"])
+        if not backup_path.exists():
+            raise FileNotFoundError(f"备份文件不存在: {backup_path}")
+
+        shutil.copy2(backup_path, file_path)
+        candidate["rolled_back_at"] = datetime.now().isoformat()
 
     def generate_candidates(self, scan_results: List[Dict[str, Any]], action: str = "cleanup") -> Dict[str, Any]:
         candidate_id = hashlib.md5(
