@@ -46,25 +46,75 @@ async function createBorrowRequest(data) {
   const { borrowerTeam, lenderTeam, resourceType, amount, dueDate, operator } = data;
 
   if (!RESOURCE_TYPES.includes(resourceType)) {
-    throw { code: 'INVALID_RESOURCE_TYPE', message: '资源类型必须是 CPU 或 STORAGE' };
+    const error = { code: 'INVALID_RESOURCE_TYPE', message: '资源类型必须是 CPU 或 STORAGE' };
+    await logOperation(
+      null,
+      'CREATE_REQUEST_FAILED',
+      operator,
+      data,
+      '验证资源类型是否为 CPU 或 STORAGE',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   if (amount <= 0) {
-    throw { code: 'INVALID_AMOUNT', message: '借用额度必须大于 0' };
+    const error = { code: 'INVALID_AMOUNT', message: '借用额度必须大于 0' };
+    await logOperation(
+      null,
+      'CREATE_REQUEST_FAILED',
+      operator,
+      data,
+      '验证借用额度大于 0',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   const borrower = await getTeamByName(borrowerTeam);
   if (!borrower) {
-    throw { code: 'BORROWER_NOT_FOUND', message: '借用方团队 ' + borrowerTeam + ' 不存在' };
+    const error = { code: 'BORROWER_NOT_FOUND', message: '借用方团队 ' + borrowerTeam + ' 不存在' };
+    await logOperation(
+      null,
+      'CREATE_REQUEST_FAILED',
+      operator,
+      data,
+      '验证借用方团队是否存在',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   const lender = await getTeamByName(lenderTeam);
   if (!lender) {
-    throw { code: 'LENDER_NOT_FOUND', message: '出借方团队 ' + lenderTeam + ' 不存在' };
+    const error = { code: 'LENDER_NOT_FOUND', message: '出借方团队 ' + lenderTeam + ' 不存在' };
+    await logOperation(
+      null,
+      'CREATE_REQUEST_FAILED',
+      operator,
+      data,
+      '验证出借方团队是否存在',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   if (borrowerTeam === lenderTeam) {
-    throw { code: 'SAME_TEAM', message: '借用方和出借方不能是同一个团队' };
+    const error = { code: 'SAME_TEAM', message: '借用方和出借方不能是同一个团队' };
+    await logOperation(
+      null,
+      'CREATE_REQUEST_FAILED',
+      operator,
+      data,
+      '验证借用方和出借方不是同一个团队',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   const availableKey = resourceType === 'CPU' ? 'cpu_quota' : 'storage_quota';
@@ -72,10 +122,20 @@ async function createBorrowRequest(data) {
   const available = lender[availableKey] - lender[usedKey];
   
   if (amount > available) {
-    throw { 
+    const error = { 
       code: 'INSUFFICIENT_QUOTA', 
       message: '出借方' + resourceType + '配额不足，可用: ' + available + ', 请求: ' + amount
     };
+    await logOperation(
+      null,
+      'CREATE_REQUEST_FAILED',
+      operator,
+      data,
+      '验证出借方配额是否充足',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   const borrowDate = new Date().toISOString();
@@ -107,11 +167,31 @@ async function createBorrowRequest(data) {
 async function approveRequest(requestId, approver, comment) {
   const record = await get('SELECT * FROM borrow_records WHERE request_id = ?', [requestId]);
   if (!record) {
-    throw { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    const error = { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    await logOperation(
+      null,
+      'APPROVE_FAILED',
+      approver,
+      { requestId, approver, comment },
+      '验证借用记录是否存在',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   if (record.status !== STATUS.PENDING_APPROVAL) {
-    throw { code: 'INVALID_STATUS', message: '当前状态 ' + record.status + ' 不允许审批' };
+    const error = { code: 'INVALID_STATUS', message: '当前状态 ' + record.status + ' 不允许审批' };
+    await logOperation(
+      record.id,
+      'APPROVE_FAILED',
+      approver,
+      { requestId, approver, comment },
+      '验证状态为 PENDING_APPROVAL',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   const lender = await getTeamByName(record.lender_team);
@@ -144,11 +224,31 @@ async function approveRequest(requestId, approver, comment) {
 async function rejectRequest(requestId, approver, comment) {
   const record = await get('SELECT * FROM borrow_records WHERE request_id = ?', [requestId]);
   if (!record) {
-    throw { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    const error = { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    await logOperation(
+      null,
+      'REJECT_FAILED',
+      approver,
+      { requestId, approver, comment },
+      '验证借用记录是否存在',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   if (record.status !== STATUS.PENDING_APPROVAL) {
-    throw { code: 'INVALID_STATUS', message: `当前状态 ${record.status} 不允许审批` };
+    const error = { code: 'INVALID_STATUS', message: '当前状态 ' + record.status + ' 不允许审批' };
+    await logOperation(
+      record.id,
+      'REJECT_FAILED',
+      approver,
+      { requestId, approver, comment },
+      '验证状态为 PENDING_APPROVAL',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   await run(
@@ -173,11 +273,31 @@ async function rejectRequest(requestId, approver, comment) {
 async function returnResource(requestId, operator) {
   const record = await get('SELECT * FROM borrow_records WHERE request_id = ?', [requestId]);
   if (!record) {
-    throw { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    const error = { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    await logOperation(
+      null,
+      'RETURN_FAILED',
+      operator,
+      { requestId },
+      '验证借用记录是否存在',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   if (record.status !== STATUS.ACTIVE && record.status !== STATUS.OVERDUE) {
-    throw { code: 'INVALID_STATUS', message: '当前状态 ' + record.status + ' 不允许归还' };
+    const error = { code: 'INVALID_STATUS', message: '当前状态 ' + record.status + ' 不允许归还' };
+    await logOperation(
+      record.id,
+      'RETURN_FAILED',
+      operator,
+      { requestId },
+      '验证状态为 ACTIVE 或 OVERDUE',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   const resourceKey = record.resource_type === 'CPU' ? 'cpu_used' : 'storage_used';
@@ -236,7 +356,17 @@ async function checkOverdue() {
 async function manualCorrect(requestId, data, operator) {
   const record = await get('SELECT * FROM borrow_records WHERE request_id = ?', [requestId]);
   if (!record) {
-    throw { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    const error = { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    await logOperation(
+      null,
+      'MANUAL_CORRECT_FAILED',
+      operator,
+      { requestId, changes: data },
+      '验证借用记录是否存在',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   const originalRecord = { ...record };
@@ -261,7 +391,17 @@ async function manualCorrect(requestId, data, operator) {
   }
 
   if (updates.length === 0) {
-    throw { code: 'NO_CHANGES', message: '没有提供需要修改的字段' };
+    const error = { code: 'NO_CHANGES', message: '没有提供需要修改的字段' };
+    await logOperation(
+      record.id,
+      'MANUAL_CORRECT_FAILED',
+      operator,
+      { requestId, changes: data },
+      '验证至少提供一个需要修改的字段',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   updates.push('updated_at = CURRENT_TIMESTAMP');
@@ -328,11 +468,31 @@ async function getOperationLogs(recordId) {
 async function settleRecord(requestId, settlementSummary, operator) {
   const record = await get('SELECT * FROM borrow_records WHERE request_id = ?', [requestId]);
   if (!record) {
-    throw { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    const error = { code: 'RECORD_NOT_FOUND', message: '借用记录不存在' };
+    await logOperation(
+      null,
+      'SETTLE_FAILED',
+      operator,
+      { requestId, settlementSummary },
+      '验证借用记录是否存在',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   if (record.status !== STATUS.RETURNED && record.status !== STATUS.OVERDUE) {
-    throw { code: 'INVALID_STATUS', message: '当前状态 ' + record.status + ' 不允许结算' };
+    const error = { code: 'INVALID_STATUS', message: '当前状态 ' + record.status + ' 不允许结算' };
+    await logOperation(
+      record.id,
+      'SETTLE_FAILED',
+      operator,
+      { requestId, settlementSummary },
+      '验证状态为 RETURNED 或 OVERDUE',
+      null,
+      error.message
+    );
+    throw error;
   }
 
   await run(
