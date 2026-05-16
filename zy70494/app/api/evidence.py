@@ -5,6 +5,22 @@ from app.api import bp
 from app.models import EvidenceChain, ErrorSample, CompressionExecution
 from app.utils import ApiResponse, ErrorCode, calculate_hash
 
+@bp.route('/evidence/chain/<execution_id>/break', methods=['POST'])
+def break_evidence_chain(execution_id):
+    evidences = EvidenceChain.query.filter_by(execution_id=execution_id).order_by(EvidenceChain.chain_order).all()
+    if not evidences:
+        return ApiResponse.error(ErrorCode.BATCH_NOT_FOUND, message='执行记录不存在')
+    
+    if len(evidences) > 0:
+        db.session.delete(evidences[-1])
+        db.session.commit()
+    
+    return ApiResponse.success({
+        'execution_id': execution_id,
+        'message': '证据链已故意断开，删除了最后一个证据节点',
+        'remaining_evidence_count': len(evidences) - 1
+    }, '证据链已断开')
+
 @bp.route('/evidence/chain/<batch_id>/validate', methods=['POST'])
 def validate_evidence_chain(batch_id):
     executions = CompressionExecution.query.filter_by(batch_id=batch_id).all()
@@ -45,7 +61,10 @@ def validate_evidence_chain(batch_id):
                 sample_data=f'expected: {expected_order}, actual: {actual_order}'
             )
             db.session.add(error_sample)
+            db.session.flush()
             error_samples.append(error_sample.to_dict())
+            
+            execution.status = 'evidence_broken'
             continue
         
         previous_hash = None
@@ -78,7 +97,10 @@ def validate_evidence_chain(batch_id):
                 sample_data=f'previous_hash: {previous_hash}'
             )
             db.session.add(error_sample)
+            db.session.flush()
             error_samples.append(error_sample.to_dict())
+            
+            execution.status = 'hash_invalid'
     
     db.session.commit()
     

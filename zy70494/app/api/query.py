@@ -85,8 +85,16 @@ def unified_query():
         errors = ErrorSample.query.filter_by(batch_id=batch.batch_id).all()
         corrections = ManualCorrection.query.filter_by(batch_id=batch.batch_id).all()
         
-        success_executions = [e for e in executions if e.status == 'success']
-        failed_executions = [e for e in executions if e.status != 'success']
+        error_execution_ids = set(e.execution_id for e in errors)
+        
+        success_executions = [
+            e for e in executions 
+            if e.status == 'success' and e.id not in error_execution_ids
+        ]
+        failed_executions = [
+            e for e in executions 
+            if e.status != 'success' or e.id in error_execution_ids
+        ]
         
         result.append({
             'batch': batch.to_dict(),

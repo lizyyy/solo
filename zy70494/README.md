@@ -121,7 +121,9 @@ python test_flow.py
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
+| POST | /api/evidence/chain/<execution_id>/break | 故意断开证据链（测试用） |
 | POST | /api/evidence/chain/<batch_id>/validate | 验证证据链 |
+| GET | /api/evidence/chain/<execution_id> | 查询证据链详情 |
 | GET | /api/evidence/errors/<batch_id> | 查询错误样本 |
 | POST | /api/evidence/errors/<id>/mark-reported | 标记已报告 |
 

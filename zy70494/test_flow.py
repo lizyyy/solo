@@ -4,8 +4,13 @@ import json
 import subprocess
 import time
 import atexit
+import uuid
 
 BASE_URL = 'http://localhost:5001/api'
+
+# 生成唯一的供应商代码，避免数据库冲突
+unique_id = str(uuid.uuid4())[:4].upper()
+SUPPLIER_CODES = [f"TEST{unique_id}01", f"TEST{unique_id}02", f"TEST{unique_id}03"]
 
 server_process = None
 
@@ -41,7 +46,7 @@ def test_supplier_import():
         "operator": "admin",
         "suppliers": [
             {
-                "supplier_code": "SUP001",
+                "supplier_code": SUPPLIER_CODES[0],
                 "supplier_name": "测试供应商一号",
                 "contact_person": "张三",
                 "contact_phone": "13800138001",
@@ -49,7 +54,7 @@ def test_supplier_import():
                 "risk_level": "high"
             },
             {
-                "supplier_code": "SUP002",
+                "supplier_code": SUPPLIER_CODES[1],
                 "supplier_name": "测试供应商二号",
                 "contact_person": "李四",
                 "contact_phone": "13800138002",
@@ -57,7 +62,7 @@ def test_supplier_import():
                 "risk_level": "medium"
             },
             {
-                "supplier_code": "SUP003",
+                "supplier_code": SUPPLIER_CODES[2],
                 "supplier_name": "测试供应商三号",
                 "contact_person": "王五",
                 "contact_phone": "13800138003",
@@ -98,7 +103,7 @@ def test_compression_execution(strategy_code):
     print_step("步骤3: 执行压缩策略")
     
     exec_data = {
-        "supplier_codes": ["SUP001", "SUP002", "SUP003"],
+        "supplier_codes": SUPPLIER_CODES,
         "strategy_code": strategy_code,
         "operator": "operator_001"
     }
@@ -111,15 +116,31 @@ def test_compression_execution(strategy_code):
         return result['data']['batch_id']
     return None
 
+def break_evidence_chain(batch_id):
+    print_step("步骤4a: 故意制造证据链断裂")
+    
+    response = requests.get(f"{BASE_URL}/history/executions?batch_id={batch_id}")
+    exec_result = response.json()
+    
+    if exec_result['success'] and exec_result['data']['executions']:
+        execution_id = exec_result['data']['executions'][0]['id']
+        response = requests.post(f"{BASE_URL}/evidence/chain/{execution_id}/break")
+        result = response.json()
+        print_step("证据链断开结果", result)
+        return execution_id
+    return None
+
 def test_evidence_validation(batch_id):
-    print_step("步骤4: 验证证据链（异常流测试）")
+    print_step("步骤4b: 验证证据链（异常流测试）")
     
     response = requests.post(f"{BASE_URL}/evidence/chain/{batch_id}/validate")
     result = response.json()
     print_step("证据链验证结果", result)
     
     if not result['success'] and 'data' in result and result['data']['error_samples']:
-        return result['data']['error_samples'][0]['id']
+        error_id = result['data']['error_samples'][0]['id']
+        print(f"✓ 检测到错误样本，ID: {error_id}")
+        return error_id
     return None
 
 def test_manual_correction(error_id):
@@ -222,10 +243,14 @@ def main():
             print("压缩执行失败，终止测试")
             return
         
+        break_evidence_chain(compression_batch_id)
+        
         error_id = test_evidence_validation(compression_batch_id)
         
         if error_id:
             test_manual_correction(error_id)
+        else:
+            print("⚠️  未检测到错误样本，跳过人工修正测试")
         
         test_report_generation(compression_batch_id)
         
