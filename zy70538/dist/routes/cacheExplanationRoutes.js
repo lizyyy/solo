@@ -1,0 +1,22 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const cacheExplanationController_1 = require("../controllers/cacheExplanationController");
+const errorHandler_1 = require("../middleware/errorHandler");
+const validation_1 = require("../middleware/validation");
+const router = (0, express_1.Router)();
+router.post('/', (0, errorHandler_1.validateRequest)(validation_1.createExplanationSchema), cacheExplanationController_1.cacheExplanationController.createExplanation.bind(cacheExplanationController_1.cacheExplanationController));
+router.get('/', (0, errorHandler_1.validateQuery)(validation_1.querySchema), cacheExplanationController_1.cacheExplanationController.queryExplanations.bind(cacheExplanationController_1.cacheExplanationController));
+router.get('/:id', cacheExplanationController_1.cacheExplanationController.getExplanationById.bind(cacheExplanationController_1.cacheExplanationController));
+router.get('/cache-key/:cacheKey', cacheExplanationController_1.cacheExplanationController.getExplanationByCacheKey.bind(cacheExplanationController_1.cacheExplanationController));
+router.get('/:id/report', cacheExplanationController_1.cacheExplanationController.getDetailedReport.bind(cacheExplanationController_1.cacheExplanationController));
+router.get('/:id/hit-history', cacheExplanationController_1.cacheExplanationController.getHitHistory.bind(cacheExplanationController_1.cacheExplanationController));
+router.patch('/:id/status', cacheExplanationController_1.cacheExplanationController.updateStatus.bind(cacheExplanationController_1.cacheExplanationController));
+router.post('/manual-correction', (0, errorHandler_1.validateRequest)(validation_1.manualCorrectionSchema), cacheExplanationController_1.cacheExplanationController.manualCorrection.bind(cacheExplanationController_1.cacheExplanationController));
+router.post('/record-hit', (0, errorHandler_1.validateRequest)(validation_1.recordHitSchema), cacheExplanationController_1.cacheExplanationController.recordHit.bind(cacheExplanationController_1.cacheExplanationController));
+router.post('/force-refresh', (0, errorHandler_1.validateRequest)(validation_1.forceRefreshSchema), cacheExplanationController_1.cacheExplanationController.forceRefresh.bind(cacheExplanationController_1.cacheExplanationController));
+router.post('/record-failure', (0, errorHandler_1.validateRequest)(validation_1.recordFailureSchema), cacheExplanationController_1.cacheExplanationController.recordFailure.bind(cacheExplanationController_1.cacheExplanationController));
+router.get('/export/csv', cacheExplanationController_1.cacheExplanationController.exportToCSV.bind(cacheExplanationController_1.cacheExplanationController));
+router.get('/export/json', cacheExplanationController_1.cacheExplanationController.exportToJSON.bind(cacheExplanationController_1.cacheExplanationController));
+exports.default = router;
+//# sourceMappingURL=cacheExplanationRoutes.js.map
