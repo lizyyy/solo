@@ -1,0 +1,26 @@
+{
+  "name": "monorepo-boundary-cli",
+  "version": "1.0.0",
+  "description": "Monorepo 边界检查 CLI 工具 - 检测包之间的违规依赖",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "monobound": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "selfcheck": "node src/cli.js selfcheck"
+  },
+  "keywords": ["monorepo", "boundary", "dependency", "lint", "architecture"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "glob": "^10.3.10",
+    "ora": "^8.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

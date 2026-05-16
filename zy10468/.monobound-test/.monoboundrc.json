@@ -1,0 +1,35 @@
+{
+  "packages": [
+    "packages/*",
+    "apps/*"
+  ],
+  "rules": {
+    "@test/web": {
+      "allow": [
+        "@test/*"
+      ]
+    },
+    "@test/*": {
+      "allow": [
+        "@test/*"
+      ],
+      "deny": [
+        "@test/web"
+      ]
+    }
+  },
+  "ignore": [
+    "**/node_modules/**"
+  ],
+  "extensions": [
+    ".js"
+  ],
+  "output": {
+    "dir": "./monobound-reports",
+    "formats": [
+      "terminal",
+      "json",
+      "html"
+    ]
+  }
+}

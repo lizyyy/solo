@@ -1,0 +1,27 @@
+{
+  "packages": [
+    "packages/*",
+    "apps/*"
+  ],
+  "rules": {
+    "@myorg/app-*": {
+      "allow": ["@myorg/*"]
+    },
+    "@myorg/*": {
+      "allow": ["@myorg/*"],
+      "deny": ["@myorg/app-*"]
+    }
+  },
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ],
+  "extensions": [".js", ".jsx", ".ts", ".tsx", ".mjs"],
+  "output": {
+    "dir": "./monobound-reports",
+    "formats": ["terminal", "json", "html"]
+  }
+}

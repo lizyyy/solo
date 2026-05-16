@@ -1,0 +1,213 @@
+{
+  "success": true,
+  "summary": {
+    "packageCount": 4,
+    "fileCount": 5,
+    "dependencyCount": 6,
+    "violationCount": 1,
+    "cycleCount": 2
+  },
+  "packages": [
+    {
+      "name": "@test/ui",
+      "path": "packages/ui"
+    },
+    {
+      "name": "@test/shared",
+      "path": "packages/shared"
+    },
+    {
+      "name": "@test/api",
+      "path": "packages/api"
+    },
+    {
+      "name": "@test/web",
+      "path": "apps/web"
+    }
+  ],
+  "graph": {
+    "fileDependencies": [
+      {
+        "from": "@test/ui",
+        "to": "@test/web",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10468/.monobound-test/packages/ui/src/index.js",
+        "relativeFile": "packages/ui/src/index.js",
+        "line": 1,
+        "column": 1,
+        "importPath": "@test/web",
+        "source": "import { config } from '@test/web';"
+      },
+      {
+        "from": "@test/shared",
+        "to": "@test/api",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10468/.monobound-test/packages/shared/src/utils.js",
+        "relativeFile": "packages/shared/src/utils.js",
+        "line": 1,
+        "column": 1,
+        "importPath": "@test/api",
+        "source": "import { fetchData } from '@test/api';"
+      },
+      {
+        "from": "@test/shared",
+        "to": "@test/ui",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10468/.monobound-test/packages/shared/src/index.js",
+        "relativeFile": "packages/shared/src/index.js",
+        "line": 1,
+        "column": 1,
+        "importPath": "@test/ui",
+        "source": "import { Button } from '@test/ui';"
+      },
+      {
+        "from": "@test/web",
+        "to": "@test/shared",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10468/.monobound-test/apps/web/src/index.js",
+        "relativeFile": "apps/web/src/index.js",
+        "line": 1,
+        "column": 1,
+        "importPath": "@test/shared",
+        "source": "import { sharedUtil } from '@test/shared';"
+      },
+      {
+        "from": "@test/web",
+        "to": "@test/ui",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10468/.monobound-test/apps/web/src/index.js",
+        "relativeFile": "apps/web/src/index.js",
+        "line": 2,
+        "column": 1,
+        "importPath": "@test/ui",
+        "source": "import { Button } from '@test/ui';"
+      },
+      {
+        "from": "@test/web",
+        "to": "@test/api",
+        "file": "/Users/lzy/pro/solo/workspaces/zy10468/.monobound-test/apps/web/src/index.js",
+        "relativeFile": "apps/web/src/index.js",
+        "line": 3,
+        "column": 1,
+        "importPath": "@test/api",
+        "source": "import { fetchData } from '@test/api';"
+      }
+    ],
+    "packageDependencies": [
+      {
+        "from": "@test/ui",
+        "to": "@test/web",
+        "count": 1,
+        "examples": [
+          {
+            "file": "packages/ui/src/index.js",
+            "line": 1,
+            "importPath": "@test/web"
+          }
+        ]
+      },
+      {
+        "from": "@test/shared",
+        "to": "@test/api",
+        "count": 1,
+        "examples": [
+          {
+            "file": "packages/shared/src/utils.js",
+            "line": 1,
+            "importPath": "@test/api"
+          }
+        ]
+      },
+      {
+        "from": "@test/shared",
+        "to": "@test/ui",
+        "count": 1,
+        "examples": [
+          {
+            "file": "packages/shared/src/index.js",
+            "line": 1,
+            "importPath": "@test/ui"
+          }
+        ]
+      },
+      {
+        "from": "@test/web",
+        "to": "@test/shared",
+        "count": 1,
+        "examples": [
+          {
+            "file": "apps/web/src/index.js",
+            "line": 1,
+            "importPath": "@test/shared"
+          }
+        ]
+      },
+      {
+        "from": "@test/web",
+        "to": "@test/ui",
+        "count": 1,
+        "examples": [
+          {
+            "file": "apps/web/src/index.js",
+            "line": 2,
+            "importPath": "@test/ui"
+          }
+        ]
+      },
+      {
+        "from": "@test/web",
+        "to": "@test/api",
+        "count": 1,
+        "examples": [
+          {
+            "file": "apps/web/src/index.js",
+            "line": 3,
+            "importPath": "@test/api"
+          }
+        ]
+      }
+    ]
+  },
+  "violations": [
+    {
+      "from": "@test/ui",
+      "to": "@test/web",
+      "file": "/Users/lzy/pro/solo/workspaces/zy10468/.monobound-test/packages/ui/src/index.js",
+      "relativeFile": "packages/ui/src/index.js",
+      "line": 1,
+      "column": 1,
+      "importPath": "@test/web",
+      "source": "import { config } from '@test/web';",
+      "rule": "@test/*",
+      "reason": "@test/ui 被禁止依赖 @test/web (匹配规则: @test/* deny @test/web)",
+      "severity": "error",
+      "suggestions": [
+        {
+          "type": "refactor",
+          "title": "重构依赖关系",
+          "description": "考虑将 @test/web 中的功能提取到双方都可以依赖的共享包中"
+        },
+        {
+          "type": "rule",
+          "title": "更新边界规则",
+          "description": "如果此依赖是有意的，可以在 .monoboundrc.json 中为 @test/ui 添加对 @test/web 的允许规则",
+          "code": "{\n  \"rules\": {\n    \"@test/ui\": {\n      \"allow\": [\"...\", \"@test/web\"]\n    }\n  }\n}"
+        },
+        {
+          "type": "invert",
+          "title": "反转依赖方向",
+          "description": "考虑使用依赖倒置原则，让 @test/web 依赖 @test/ui 而不是相反"
+        }
+      ]
+    }
+  ],
+  "cycles": [
+    [
+      "@test/ui",
+      "@test/web",
+      "@test/shared",
+      "@test/ui"
+    ],
+    [
+      "@test/ui",
+      "@test/web",
+      "@test/ui"
+    ]
+  ],
+  "timestamp": "2026-05-16T20:50:33.685Z"
+}
