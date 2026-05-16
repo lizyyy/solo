@@ -1,0 +1,42 @@
+{
+  "batch_id": "BATCH2024001",
+  "contract_id": "CTR2024000",
+  "contract_name": "采购合同-1",
+  "party_a": "甲方公司",
+  "party_b": "乙方供应商1",
+  "sign_time_a": "2024-01-15 10:00:00",
+  "sign_time_b": "2024-01-15 12:00:00",
+  "create_time": "2024-01-14 10:00:00",
+  "supplements": [
+    {
+      "contract_id": "CTR2024000",
+      "supplement_id": "SUPCTR2024000_01",
+      "supplement_type": "补充协议",
+      "content": "关于CTR2024000的补充条款1",
+      "create_time": "2024-01-15 10:30:00",
+      "operator": "张三"
+    },
+    {
+      "contract_id": "CTR2024000",
+      "supplement_id": "SUPCTR2024000_02",
+      "supplement_type": "附件",
+      "content": "CTR2024000的附件材料",
+      "create_time": "2024-01-15 11:00:00",
+      "operator": "李四"
+    }
+  ],
+  "payment_receipts": [
+    {
+      "receipt_id": "RCPCTR2024000_01",
+      "contract_id": "CTR2024000",
+      "payment_channel": "支付宝",
+      "amount": 10000.0,
+      "payment_time": "2024-01-16 12:00:00",
+      "manual_remark": "正常付款1",
+      "caller": "payment_service_001",
+      "create_time": "2026-05-16 08:44:23.312142"
+    }
+  ],
+  "submit_time": "2026-05-16 08:44:23.312186",
+  "submitter": "王五"
+}
