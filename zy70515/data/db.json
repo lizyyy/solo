@@ -1,0 +1,129 @@
+{
+  "evidencePackages": [
+    {
+      "id": "0b7f5688-f156-4f8c-adf6-957b171d96c5",
+      "caseId": "CASE-001",
+      "evidenceType": "report",
+      "fileName": "test.pdf",
+      "fileHash": "hash123",
+      "description": "",
+      "status": "downloaded",
+      "createdAt": "2026-05-16T04:04:22.592Z",
+      "updatedAt": "2026-05-16T04:05:37.868Z",
+      "metadata": {}
+    },
+    {
+      "id": "7a6dbfdd-f016-4845-84e5-b7c2a4d7a657",
+      "caseId": "CASE-999",
+      "evidenceType": "test",
+      "fileName": "no_auth.pdf",
+      "fileHash": "xxx",
+      "description": "",
+      "status": "created",
+      "createdAt": "2026-05-16T04:05:54.915Z",
+      "updatedAt": "2026-05-16T04:05:54.915Z",
+      "metadata": {}
+    }
+  ],
+  "downloaders": [
+    {
+      "id": "e9f94977-3e60-49c3-8503-3b7b4399efc6",
+      "employeeId": "EMP001",
+      "name": "测试用户",
+      "createdAt": "2026-05-16T04:05:10.827Z"
+    }
+  ],
+  "watermarks": [
+    {
+      "id": "c358af75-5b1e-43fd-b0f9-9e8cf9261efc",
+      "packageId": "0b7f5688-f156-4f8c-adf6-957b171d96c5",
+      "downloaderId": "e9f94977-3e60-49c3-8503-3b7b4399efc6",
+      "watermarkText": "机密文档 | AUDIT-D1618BE9715D2DBB",
+      "generatedAt": "2026-05-16T04:05:22.068Z",
+      "applied": false
+    }
+  ],
+  "authorizations": [
+    {
+      "id": "aadc068d-9dff-4a57-93c2-68aaf48f8c90",
+      "packageId": "0b7f5688-f156-4f8c-adf6-957b171d96c5",
+      "downloaderId": "e9f94977-3e60-49c3-8503-3b7b4399efc6",
+      "scope": "download",
+      "grantedAt": "2026-05-16T04:05:37.850Z",
+      "expiresAt": "2026-05-23T04:05:37.850Z",
+      "grantedBy": "admin",
+      "revoked": false
+    }
+  ],
+  "revocationRecords": [],
+  "trackingSummaries": [
+    {
+      "id": "bfb1bfc2-59bf-4800-ba63-62e0049729a6",
+      "packageId": "0b7f5688-f156-4f8c-adf6-957b171d96c5",
+      "downloaderId": "e9f94977-3e60-49c3-8503-3b7b4399efc6",
+      "downloadedAt": "2026-05-16T04:05:37.867Z",
+      "ipAddress": "192.168.1.100",
+      "userAgent": "",
+      "downloadCount": 1
+    }
+  ],
+  "failureRecords": [
+    {
+      "id": "bebb36c1-a178-4038-a9aa-ea2035606cf7",
+      "operation": "record_download",
+      "originalInput": {
+        "packageId": "7a6dbfdd-f016-4845-84e5-b7c2a4d7a657",
+        "downloaderId": "e9f94977-3e60-49c3-8503-3b7b4399efc6",
+        "ipAddress": "10.0.0.1"
+      },
+      "processingBasis": "No authorization found",
+      "finalConclusion": "Download recording failed",
+      "timestamp": "2026-05-16T04:05:55.121Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "6eec40b5-e389-40d5-99e0-6ce078a4c862",
+      "packageId": "0b7f5688-f156-4f8c-adf6-957b171d96c5",
+      "action": "status_changed",
+      "details": {
+        "from": "watermarked",
+        "to": "watermarked",
+        "reason": "Watermark generated"
+      },
+      "timestamp": "2026-05-16T04:05:22.070Z"
+    },
+    {
+      "id": "04fc22d7-d990-47e5-9346-c250ecb8cba1",
+      "packageId": "0b7f5688-f156-4f8c-adf6-957b171d96c5",
+      "action": "status_changed",
+      "details": {
+        "from": "authorized",
+        "to": "authorized",
+        "reason": "Authorization granted"
+      },
+      "timestamp": "2026-05-16T04:05:37.851Z"
+    },
+    {
+      "id": "876fa814-a96f-4c76-8f8e-18e5bcdf0167",
+      "packageId": "0b7f5688-f156-4f8c-adf6-957b171d96c5",
+      "action": "status_changed",
+      "details": {
+        "from": "downloaded",
+        "to": "downloaded",
+        "reason": "Package downloaded"
+      },
+      "timestamp": "2026-05-16T04:05:37.868Z"
+    },
+    {
+      "id": "3618d26f-1d98-4d07-9723-608efff0b434",
+      "packageId": "0b7f5688-f156-4f8c-adf6-957b171d96c5",
+      "action": "downloaded",
+      "details": {
+        "downloaderId": "e9f94977-3e60-49c3-8503-3b7b4399efc6",
+        "ipAddress": "192.168.1.100"
+      },
+      "timestamp": "2026-05-16T04:05:37.868Z"
+    }
+  ]
+}
