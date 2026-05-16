@@ -1,0 +1,283 @@
+{
+  "languages": {
+    "go": {
+      "name": "Go gRPC SDK",
+      "version": "1.58.0",
+      "codes": {
+        "OK": {
+          "grpcCode": 0,
+          "retry": "nonRetriable",
+          "description": "Success"
+        },
+        "CANCELLED": {
+          "grpcCode": 1,
+          "retry": "nonRetriable",
+          "description": "Operation cancelled"
+        },
+        "UNKNOWN": {
+          "grpcCode": 2,
+          "retry": "conditional",
+          "description": "Unknown error"
+        },
+        "INVALID_ARGUMENT": {
+          "grpcCode": 3,
+          "retry": "nonRetriable",
+          "description": "Invalid argument"
+        },
+        "DEADLINE_EXCEEDED": {
+          "grpcCode": 4,
+          "retry": "retriable",
+          "description": "Deadline exceeded"
+        },
+        "NOT_FOUND": {
+          "grpcCode": 5,
+          "retry": "nonRetriable",
+          "description": "Resource not found"
+        },
+        "ALREADY_EXISTS": {
+          "grpcCode": 6,
+          "retry": "nonRetriable",
+          "description": "Resource already exists"
+        },
+        "PERMISSION_DENIED": {
+          "grpcCode": 7,
+          "retry": "nonRetriable",
+          "description": "Permission denied"
+        },
+        "RESOURCE_EXHAUSTED": {
+          "grpcCode": 8,
+          "retry": "retriable",
+          "description": "Resource exhausted"
+        },
+        "FAILED_PRECONDITION": {
+          "grpcCode": 9,
+          "retry": "conditional",
+          "description": "Failed precondition"
+        },
+        "ABORTED": {
+          "grpcCode": 10,
+          "retry": "retriable",
+          "description": "Operation aborted"
+        },
+        "OUT_OF_RANGE": {
+          "grpcCode": 11,
+          "retry": "nonRetriable",
+          "description": "Out of range"
+        },
+        "UNIMPLEMENTED": {
+          "grpcCode": 12,
+          "retry": "nonRetriable",
+          "description": "Not implemented"
+        },
+        "INTERNAL": {
+          "grpcCode": 13,
+          "retry": "conditional",
+          "description": "Internal error"
+        },
+        "UNAVAILABLE": {
+          "grpcCode": 14,
+          "retry": "retriable",
+          "description": "Service unavailable"
+        },
+        "DATA_LOSS": {
+          "grpcCode": 15,
+          "retry": "nonRetriable",
+          "description": "Data loss"
+        },
+        "UNAUTHENTICATED": {
+          "grpcCode": 16,
+          "retry": "nonRetriable",
+          "description": "Unauthenticated"
+        }
+      }
+    },
+    "java": {
+      "name": "Java gRPC SDK",
+      "version": "1.59.0",
+      "codes": {
+        "OK": {
+          "grpcCode": 0,
+          "retry": "nonRetriable",
+          "description": "Success"
+        },
+        "CANCELLED": {
+          "grpcCode": 1,
+          "retry": "nonRetriable",
+          "description": "Call cancelled"
+        },
+        "UNKNOWN": {
+          "grpcCode": 2,
+          "retry": "conditional",
+          "description": "Unknown server error"
+        },
+        "INVALID_ARGUMENT": {
+          "grpcCode": 3,
+          "retry": "nonRetriable",
+          "description": "Invalid request parameter"
+        },
+        "DEADLINE_EXCEEDED": {
+          "grpcCode": 4,
+          "retry": "retriable",
+          "description": "Request timeout"
+        },
+        "NOT_FOUND": {
+          "grpcCode": 5,
+          "retry": "nonRetriable",
+          "description": "Entity not found"
+        },
+        "ALREADY_EXISTS": {
+          "grpcCode": 6,
+          "retry": "nonRetriable",
+          "description": "Entity already exists"
+        },
+        "PERMISSION_DENIED": {
+          "grpcCode": 7,
+          "retry": "nonRetriable",
+          "description": "Insufficient permission"
+        },
+        "RESOURCE_EXHAUSTED": {
+          "grpcCode": 8,
+          "retry": "retriable",
+          "description": "Quota exceeded"
+        },
+        "FAILED_PRECONDITION": {
+          "grpcCode": 9,
+          "retry": "nonRetriable",
+          "description": "Precondition failure"
+        },
+        "ABORTED": {
+          "grpcCode": 10,
+          "retry": "retriable",
+          "description": "Transaction aborted"
+        },
+        "OUT_OF_RANGE": {
+          "grpcCode": 11,
+          "retry": "nonRetriable",
+          "description": "Value out of range"
+        },
+        "UNIMPLEMENTED": {
+          "grpcCode": 12,
+          "retry": "nonRetriable",
+          "description": "Method not implemented"
+        },
+        "INTERNAL": {
+          "grpcCode": 13,
+          "retry": "conditional",
+          "description": "Internal server error"
+        },
+        "UNAVAILABLE": {
+          "grpcCode": 14,
+          "retry": "retriable",
+          "description": "Connection failed"
+        },
+        "DATA_LOSS": {
+          "grpcCode": 15,
+          "retry": "nonRetriable",
+          "description": "Data corruption"
+        },
+        "UNAUTHENTICATED": {
+          "grpcCode": 16,
+          "retry": "nonRetriable",
+          "description": "Invalid credentials"
+        }
+      }
+    },
+    "python": {
+      "name": "Python gRPC SDK",
+      "version": "1.59.0",
+      "codes": {
+        "OK": {
+          "grpcCode": 0,
+          "retry": "nonRetriable",
+          "description": "Success"
+        },
+        "CANCELLED": {
+          "grpcCode": 1,
+          "retry": "nonRetriable",
+          "description": "Request cancelled"
+        },
+        "UNKNOWN": {
+          "grpcCode": 2,
+          "retry": "retriable",
+          "description": "Unknown error"
+        },
+        "INVALID_ARGUMENT": {
+          "grpcCode": 3,
+          "retry": "nonRetriable",
+          "description": "Invalid arguments"
+        },
+        "DEADLINE_EXCEEDED": {
+          "grpcCode": 4,
+          "retry": "retriable",
+          "description": "Deadline exceeded"
+        },
+        "NOT_FOUND": {
+          "grpcCode": 5,
+          "retry": "nonRetriable",
+          "description": "Entity not found"
+        },
+        "ALREADY_EXISTS": {
+          "grpcCode": 6,
+          "retry": "nonRetriable",
+          "description": "Entity already exists"
+        },
+        "PERMISSION_DENIED": {
+          "grpcCode": 7,
+          "retry": "nonRetriable",
+          "description": "Permission denied"
+        },
+        "RESOURCE_EXHAUSTED": {
+          "grpcCode": 8,
+          "retry": "retriable",
+          "description": "Resource exhausted"
+        },
+        "FAILED_PRECONDITION": {
+          "grpcCode": 9,
+          "retry": "conditional",
+          "description": "Failed precondition"
+        },
+        "ABORTED": {
+          "grpcCode": 10,
+          "retry": "retriable",
+          "description": "Aborted"
+        },
+        "OUT_OF_RANGE": {
+          "grpcCode": 11,
+          "retry": "nonRetriable",
+          "description": "Out of range"
+        },
+        "UNIMPLEMENTED": {
+          "grpcCode": 12,
+          "retry": "nonRetriable",
+          "description": "Unimplemented"
+        },
+        "INTERNAL": {
+          "grpcCode": 13,
+          "retry": "retriable",
+          "description": "Internal error"
+        },
+        "UNAVAILABLE": {
+          "grpcCode": 14,
+          "retry": "retriable",
+          "description": "Service unavailable"
+        },
+        "DATA_LOSS": {
+          "grpcCode": 15,
+          "retry": "nonRetriable",
+          "description": "Data loss"
+        },
+        "UNAUTHENTICATED": {
+          "grpcCode": 16,
+          "retry": "nonRetriable",
+          "description": "Unauthenticated"
+        }
+      }
+    }
+  },
+  "retryStrategy": {
+    "defaultMaxRetries": 3,
+    "backoffMultiplier": 2.0,
+    "initialBackoffMs": 1000,
+    "maxBackoffMs": 30000
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "grpc-error-matrix",
+  "version": "1.0.0",
+  "description": "gRPC错误码矩阵CLI工具 - 解析、校验和报告不同语言SDK的错误码差异",
+  "main": "src/index.js",
+  "bin": {
+    "grpc-error-matrix": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node src/cli.js self-test",
+    "demo": "node src/cli.js analyze --proto examples/error_codes.proto --sdk examples/sdk-definitions.json --output reports",
+    "analyze": "node src/cli.js analyze --proto examples/error_codes.proto --sdk examples/sdk-definitions.json --output reports"
+  },
+  "keywords": ["grpc", "error", "code", "matrix", "sdk"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  }
+}

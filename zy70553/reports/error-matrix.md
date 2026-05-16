@@ -1,0 +1,1 @@
+# gRPC Error Code Matrix Report\n\nGenerated: 2026/5/17 07:50:59\n\n## Summary\n\n- Total Codes: 17\n- Languages: 3\n- Safe Retry: 4\n- Never Retry: 10\n- Controversial: 3\n- Differences: 3\n
