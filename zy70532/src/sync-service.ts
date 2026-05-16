@@ -41,8 +41,28 @@ export async function createSyncBatch(request: CreateBatchRequest): Promise<Sync
     ]
   );
 
+  const seenDeptIds = new Set<string>();
+
   for (const dept of request.departments) {
     const nodeId = uuidv4();
+
+    if (seenDeptIds.has(dept.deptId)) {
+      await run(
+        `INSERT INTO exception_nodes (
+          id, batch_id, node_id, dept_id, error_type, error_message,
+          raw_input, processing_basis, is_resolved, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)`,
+        [
+          uuidv4(), batchId, nodeId, dept.deptId, 'DUPLICATE_ID',
+          `部门ID ${dept.deptId} 重复`,
+          JSON.stringify(dept), '同一批次内部门ID必须唯一', now
+        ]
+      );
+      continue;
+    }
+
+    seenDeptIds.add(dept.deptId);
+
     await run(
       `INSERT INTO department_nodes (
         id, batch_id, dept_id, dept_name, parent_dept_id,
@@ -75,33 +95,15 @@ export async function validateSyncBatch(batchId: string): Promise<{ valid: boole
   );
 
   const deptMap = new Map<string, any>();
-  const exceptions: ExceptionNode[] = [];
   let validCount = 0;
 
   for (const node of nodes) {
     deptMap.set(node.dept_id, node);
   }
 
-  const deptIds = new Set<string>();
   const rootNodes: string[] = [];
 
   for (const node of nodes) {
-    if (deptIds.has(node.dept_id)) {
-      await createExceptionNode(
-        batchId,
-        node.id,
-        node.dept_id,
-        'DUPLICATE_ID',
-        `部门ID ${node.dept_id} 重复`,
-        node.raw_data,
-        '部门ID必须唯一'
-      );
-      exceptions.push({} as ExceptionNode);
-      await updateNodeStatus(node.id, NodeStatus.INVALID);
-      continue;
-    }
-    deptIds.add(node.dept_id);
-
     if (node.parent_dept_id && !deptMap.has(node.parent_dept_id)) {
       await createExceptionNode(
         batchId,
@@ -112,7 +114,6 @@ export async function validateSyncBatch(batchId: string): Promise<{ valid: boole
         node.raw_data,
         '上级部门ID必须在当前批次中存在或为null'
       );
-      exceptions.push({} as ExceptionNode);
       await updateNodeStatus(node.id, NodeStatus.INVALID);
       continue;
     }
@@ -130,8 +131,7 @@ export async function validateSyncBatch(batchId: string): Promise<{ valid: boole
       valid: false,
       error: '没有根节点（parentDeptId为null的部门）',
       validCount: 0,
-      invalidCount: nodes.length,
-      exceptions: exceptions.length
+      invalidCount: nodes.length
     };
     await run(
       'UPDATE sync_batches SET status = ?, validation_report = ?, updated_at = ? WHERE id = ?',
@@ -143,13 +143,18 @@ export async function validateSyncBatch(batchId: string): Promise<{ valid: boole
   await calculateDepartmentLevels(batchId, rootNodes, deptMap);
   await buildDepartmentRelations(batchId, deptMap);
 
-  const invalidCount = nodes.length - validCount;
+  const existingExceptions = await all<any>(
+    'SELECT * FROM exception_nodes WHERE batch_id = ?',
+    [batchId]
+  );
+  const invalidCount = nodes.length - validCount + existingExceptions.length;
+
   const report = {
     valid: invalidCount === 0,
     rootCount: rootNodes.length,
     validCount,
     invalidCount,
-    exceptionCount: exceptions.length
+    exceptionCount: existingExceptions.length
   };
 
   const finalStatus = invalidCount > 0 ? BatchStatus.VALIDATION_FAILED : BatchStatus.READY;
@@ -166,15 +171,15 @@ export async function validateSyncBatch(batchId: string): Promise<{ valid: boole
 async function calculateDepartmentLevels(
   batchId: string,
   rootNodes: string[],
-  deptMap: Map<string, DepartmentNode>
+  deptMap: Map<string, any>
 ): Promise<void> {
   const childrenMap = new Map<string, string[]>();
   for (const [deptId, node] of deptMap) {
-    if (node.parentDeptId) {
-      if (!childrenMap.has(node.parentDeptId)) {
-        childrenMap.set(node.parentDeptId, []);
+    if (node.parent_dept_id) {
+      if (!childrenMap.has(node.parent_dept_id)) {
+        childrenMap.set(node.parent_dept_id, []);
       }
-      childrenMap.get(node.parentDeptId)!.push(deptId);
+      childrenMap.get(node.parent_dept_id)!.push(deptId);
     }
   }
 
@@ -196,18 +201,18 @@ async function calculateDepartmentLevels(
 
 async function buildDepartmentRelations(
   batchId: string,
-  deptMap: Map<string, DepartmentNode>
+  deptMap: Map<string, any>
 ): Promise<void> {
   for (const [deptId, node] of deptMap) {
     const ancestors: string[] = [];
-    let current: DepartmentNode | undefined = node;
+    let current: any = node;
     let distance = 0;
 
     while (current) {
       if (distance > 0) {
-        ancestors.push(current.deptId);
+        ancestors.push(current.dept_id);
       }
-      current = current.parentDeptId ? deptMap.get(current.parentDeptId) : undefined;
+      current = current.parent_dept_id ? deptMap.get(current.parent_dept_id) : undefined;
       distance++;
     }
 
@@ -442,6 +447,11 @@ export async function exportSyncReport(batchId: string, format: 'json' | 'csv' =
   const exceptions = await getExceptionNodes(batchId);
   const progress = await all<any>('SELECT * FROM consumer_progress WHERE batch_id = ?', [batchId]);
 
+  const relations = await all<any>(
+    'SELECT * FROM department_relations WHERE batch_id = ?',
+    [batchId]
+  );
+
   const report = {
     batch,
     departments: nodes.map(n => ({
@@ -450,6 +460,11 @@ export async function exportSyncReport(batchId: string, format: 'json' | 'csv' =
       parentDeptId: n.parentDeptId,
       level: n.level,
       status: n.status
+    })),
+    departmentRelations: relations.map(r => ({
+      ancestor: r.ancestor_dept_id,
+      descendant: r.descendant_dept_id,
+      distance: r.distance
     })),
     exceptions: exceptions.map(e => ({
       deptId: e.deptId,
