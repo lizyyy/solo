@@ -112,7 +112,9 @@ export class CancelRequestService {
     await this.store.addReport(requestId, report);
 
     const finalStatus =
-      report.canceledTasks > 0 ? CancelRequestStatus.CANCELED : CancelRequestStatus.COMPENSATED;
+      report.interceptedTasks > 0 || report.canceledTasks > 0
+        ? CancelRequestStatus.CANCELED
+        : CancelRequestStatus.COMPENSATED;
 
     return this.store.updateStatus(requestId, finalStatus, {
       code: 'COMPLETED',
@@ -208,20 +210,29 @@ export class CancelRequestService {
   }
 
   async generateCancelReport(request: CancelRequest): Promise<CancelReport> {
+    const originalTaskStatuses = new Map<string, TaskExecutionStatus>();
+    request.tasks.forEach(task => {
+      originalTaskStatuses.set(task.taskId, task.executionStatus);
+    });
+
     const result = await this.cancelPendingTasks(request.requestId);
 
-    const details = request.tasks.map(task => ({
-      taskId: task.taskId,
-      taskName: task.taskName,
-      originalStatus: task.executionStatus,
-      finalStatus:
-        task.executionStatus === TaskExecutionStatus.PENDING ||
-        task.executionStatus === TaskExecutionStatus.RUNNING
+    const details = request.tasks.map(task => {
+      const originalStatus = originalTaskStatuses.get(task.taskId)!;
+      const finalStatus =
+        originalStatus === TaskExecutionStatus.PENDING ||
+        originalStatus === TaskExecutionStatus.RUNNING
           ? TaskExecutionStatus.CANCELED
-          : task.executionStatus,
-      action: this.getTaskAction(task.executionStatus),
-      reason: this.getTaskActionReason(task.executionStatus)
-    }));
+          : originalStatus;
+      return {
+        taskId: task.taskId,
+        taskName: task.taskName,
+        originalStatus,
+        finalStatus,
+        action: this.getTaskAction(originalStatus),
+        reason: this.getTaskActionReason(originalStatus)
+      };
+    });
 
     const summary = this.generateSummary(request, result);
 
@@ -232,8 +243,9 @@ export class CancelRequestService {
       interceptedTasks: result.intercepted,
       canceledTasks: result.canceled,
       protectedTasks: result.protected,
-      failedTasks: request.tasks.filter(t => t.executionStatus === TaskExecutionStatus.FAILED)
-        .length,
+      failedTasks: Array.from(originalTaskStatuses.values()).filter(
+        s => s === TaskExecutionStatus.FAILED
+      ).length,
       summary,
       details,
       failurePaths: request.failurePaths
