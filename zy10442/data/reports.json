@@ -1,0 +1,26 @@
+[
+  {
+    "report_id": "report_000001",
+    "approval_id": "approval_000001",
+    "tenant_id": "tenant_001",
+    "target_region": "cn-south",
+    "generated_at": "2026-05-16T22:22:06.963620",
+    "overall_status": "success",
+    "compliance_summary": {
+      "region_check_result": "compliant",
+      "is_compliant": true,
+      "has_block_reasons": false,
+      "block_reason_count": 0,
+      "requires_manual_review": false
+    },
+    "data_types_verified": [
+      "user_data",
+      "transaction_data"
+    ],
+    "block_reasons": [],
+    "recommendations": [
+      "可正常进行区域部署"
+    ],
+    "export_format": "json"
+  }
+]

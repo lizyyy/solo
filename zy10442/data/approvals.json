@@ -1,0 +1,170 @@
+[
+  {
+    "approval_id": "approval_000001",
+    "tenant_id": "tenant_001",
+    "target_region": "cn-south",
+    "data_types": [
+      "user_data",
+      "transaction_data"
+    ],
+    "status": "success",
+    "created_at": "2026-05-16T22:22:06.897639",
+    "updated_at": "2026-05-16T22:22:06.897640",
+    "original_request": {
+      "tenant_id": "tenant_001",
+      "target_region": "cn-south",
+      "data_types": [
+        "user_data",
+        "transaction_data"
+      ],
+      "extra_info": {
+        "company_name": "示例公司A",
+        "business_type": "电商",
+        "request_source": "工单系统#12345"
+      }
+    },
+    "processing_result": {
+      "region_check": "compliant",
+      "block_count": 0,
+      "timestamp": "2026-05-16T22:22:06.897601"
+    },
+    "block_reasons": [],
+    "comments": [],
+    "region_check_result": "compliant",
+    "is_compensated": false,
+    "compensation_note": null
+  },
+  {
+    "approval_id": "approval_000002",
+    "tenant_id": "tenant_002",
+    "target_region": "eu-central",
+    "data_types": [
+      "metadata",
+      "log_data"
+    ],
+    "status": "compensated",
+    "created_at": "2026-05-16T22:22:06.903677",
+    "updated_at": "2026-05-16T22:22:06.948037",
+    "original_request": {
+      "tenant_id": "tenant_002",
+      "target_region": "eu-central",
+      "data_types": [
+        "user_data",
+        "transaction_data"
+      ],
+      "extra_info": {
+        "company_name": "示例公司B",
+        "business_type": "金融",
+        "request_source": "工单系统#12346"
+      }
+    },
+    "processing_result": {
+      "manual_correction": true,
+      "corrections": {
+        "data_types": [
+          "metadata",
+          "log_data"
+        ],
+        "status": "success"
+      },
+      "reviewer": "技术支持_李四",
+      "timestamp": "2026-05-16T22:22:06.943675"
+    },
+    "block_reasons": [
+      {
+        "reason_id": "block_reason_000001",
+        "category": "data_type_restriction",
+        "description": "数据类型 'user_data' 在区域 '欧盟中部' 被禁止驻留",
+        "severity": "high",
+        "resolution_hint": "请选择该区域允许的数据类型，或更换其他区域"
+      },
+      {
+        "reason_id": "block_reason_000002",
+        "category": "data_type_restriction",
+        "description": "数据类型 'transaction_data' 在区域 '欧盟中部' 被禁止驻留",
+        "severity": "high",
+        "resolution_hint": "请选择该区域允许的数据类型，或更换其他区域"
+      }
+    ],
+    "comments": [
+      {
+        "comment_id": "comment_000002",
+        "reviewer": "技术支持_李四",
+        "comment": "人工修正: 客户同意仅传输元数据和日志数据，不传输用户敏感数据",
+        "timestamp": "2026-05-16T22:22:06.944113",
+        "status_before": "blocked",
+        "status_after": "success"
+      },
+      {
+        "comment_id": "comment_000003",
+        "reviewer": "主管_王五",
+        "comment": "该客户为战略合作伙伴，已签署特殊合规协议，予以补偿通过",
+        "timestamp": "2026-05-16T22:22:06.948189",
+        "status_before": "success",
+        "status_after": "compensated"
+      }
+    ],
+    "region_check_result": "non_compliant",
+    "is_compensated": true,
+    "compensation_note": "该客户为战略合作伙伴，已签署特殊合规协议，予以补偿通过"
+  },
+  {
+    "approval_id": "approval_000003",
+    "tenant_id": "tenant_003",
+    "target_region": "ap-southeast",
+    "data_types": [
+      "user_data",
+      "transaction_data"
+    ],
+    "status": "success",
+    "created_at": "2026-05-16T22:22:06.908621",
+    "updated_at": "2026-05-16T22:22:06.931641",
+    "original_request": {
+      "tenant_id": "tenant_003",
+      "target_region": "ap-southeast",
+      "data_types": [
+        "user_data",
+        "transaction_data"
+      ],
+      "extra_info": {
+        "company_name": "示例公司C",
+        "business_type": "数据分析",
+        "request_source": "工单系统#12347"
+      }
+    },
+    "processing_result": {
+      "region_check": "needs_review",
+      "block_count": 2,
+      "timestamp": "2026-05-16T22:22:06.908576"
+    },
+    "block_reasons": [
+      {
+        "reason_id": "block_reason_000003",
+        "category": "data_type_needs_review",
+        "description": "数据类型 'user_data' 在区域 '未知区域(ap-southeast)' 需要人工复核",
+        "severity": "medium",
+        "resolution_hint": "请提交审批材料供合规团队审核"
+      },
+      {
+        "reason_id": "block_reason_000004",
+        "category": "data_type_needs_review",
+        "description": "数据类型 'transaction_data' 在区域 '未知区域(ap-southeast)' 需要人工复核",
+        "severity": "medium",
+        "resolution_hint": "请提交审批材料供合规团队审核"
+      }
+    ],
+    "comments": [
+      {
+        "comment_id": "comment_000001",
+        "reviewer": "合规专员_张三",
+        "comment": "经人工复核，该客户数据类型符合要求，予以通过",
+        "timestamp": "2026-05-16T22:22:06.931802",
+        "status_before": "pending_review",
+        "status_after": "success"
+      }
+    ],
+    "region_check_result": "needs_review",
+    "is_compensated": false,
+    "compensation_note": null
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "code": "cn-north",
+    "name": "中国华北",
+    "requires_data_residency": true,
+    "allowed_data_types": [
+      "user_data",
+      "transaction_data",
+      "metadata",
+      "log_data"
+    ],
+    "blocked_data_types": [
+      "analytics_data"
+    ]
+  },
+  {
+    "code": "cn-south",
+    "name": "中国华南",
+    "requires_data_residency": true,
+    "allowed_data_types": [
+      "user_data",
+      "transaction_data",
+      "metadata",
+      "log_data",
+      "analytics_data"
+    ],
+    "blocked_data_types": []
+  },
+  {
+    "code": "us-west",
+    "name": "美国西部",
+    "requires_data_residency": false,
+    "allowed_data_types": [
+      "user_data",
+      "transaction_data",
+      "metadata",
+      "log_data",
+      "analytics_data"
+    ],
+    "blocked_data_types": []
+  },
+  {
+    "code": "eu-central",
+    "name": "欧盟中部",
+    "requires_data_residency": true,
+    "allowed_data_types": [
+      "metadata",
+      "log_data"
+    ],
+    "blocked_data_types": [
+      "user_data",
+      "transaction_data",
+      "analytics_data"
+    ]
+  }
+]
