@@ -240,11 +240,24 @@ export class DatabaseService {
     return Promise.all(rows.map(row => this.mapToApplication(row)));
   }
 
+  private mapToImpactDetail(row: any): ImpactDetail {
+    return {
+      id: row.id,
+      itemCode: row.item_code,
+      itemName: row.item_name,
+      originalAmount: row.original_amount,
+      newAmount: row.new_amount,
+      difference: row.difference,
+      remarks: row.remarks
+    };
+  }
+
   private async mapToApplication(row: any): Promise<RecalculationApplication> {
-    const impactDetails = await this.allAsync<ImpactDetail>(
+    const impactDetailRows = await this.allAsync<any>(
       'SELECT * FROM impact_details WHERE application_id = ?',
       [row.id]
     );
+    const impactDetails = impactDetailRows.map(r => this.mapToImpactDetail(r));
 
     return {
       id: row.id,
