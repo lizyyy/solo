@@ -160,9 +160,9 @@ export class RecalculationController {
   markAsFailed = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const { failureReason, processingBasis } = req.body;
+      const { failureReason, processingBasis, finalConclusion } = req.body;
 
-      if (!failureReason || !processingBasis) {
+      if (!failureReason || !processingBasis || !finalConclusion) {
         res.status(400).json({ error: '失败原因、处理依据和最终结论是必填项' });
         return;
       }

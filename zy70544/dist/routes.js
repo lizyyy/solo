@@ -1,0 +1,21 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createRouter = void 0;
+const express_1 = require("express");
+const recalculationController_1 = require("./controllers/recalculationController");
+const createRouter = (dbService) => {
+    const router = (0, express_1.Router)();
+    const controller = new recalculationController_1.RecalculationController(dbService);
+    router.post('/applications', controller.createApplication);
+    router.get('/applications', controller.getApplications);
+    router.get('/applications/:id', controller.getApplicationById);
+    router.put('/applications/:id/status', controller.updateStatus);
+    router.get('/applications/:id/approval-history', controller.getApprovalHistory);
+    router.get('/applications/:id/snapshots', controller.getSnapshots);
+    router.post('/applications/:id/fail', controller.markAsFailed);
+    router.post('/applications/:id/manual-correction', controller.applyManualCorrection);
+    router.post('/applications/:id/complete', controller.completeApplication);
+    router.get('/export', controller.exportApplications);
+    return router;
+};
+exports.createRouter = createRouter;
