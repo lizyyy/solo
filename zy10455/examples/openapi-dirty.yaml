@@ -1,0 +1,125 @@
+openapi: 3.0.0
+info:
+  title: Dirty API
+  version: 1.0.0
+  description: API with intentionally problematic examples for testing
+
+paths:
+  /items:
+    get:
+      summary: List items
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - total
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                          minLength: 1
+                        tags:
+                          type: array
+                          items:
+                            type: string
+                          uniqueItems: true
+                  total:
+                    type: integer
+              example:
+                data:
+                  - id: 1
+                    name: "Item One"
+                    tags: ["tag1", "tag2"]
+                  - id: 2
+                    name: "Item Two"
+                    tags: ["tag2", "tag3"]
+                total: 2
+
+    post:
+      summary: Create item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 50
+                description:
+                  type: string
+                  minLength: 10
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  minItems: 1
+                  uniqueItems: true
+                metadata:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    source:
+                      type: string
+                    priority:
+                      type: integer
+            example:
+              name: "Test Item"
+              description: "This is a test item description"
+              tags: ["test", "sample"]
+              metadata:
+                source: "api"
+                priority: 1
+      responses:
+        '201':
+          description: Item created
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - sku
+        - price
+        - name
+      properties:
+        sku:
+          type: string
+          pattern: '^[A-Z]{3}-[0-9]{4}$'
+          example: "ABC-1234"
+        name:
+          type: string
+          minLength: 2
+          example: "Product Name"
+        price:
+          type: number
+          minimum: 0.01
+          example: 99.99
+        categories:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          example: ["electronics", "computers"]
+        inStock:
+          type: boolean
+          example: true

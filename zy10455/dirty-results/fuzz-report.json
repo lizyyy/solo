@@ -1,0 +1,1122 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-16T20:17:20.264Z",
+    "version": "1.0.0",
+    "inputFile": "examples/openapi-dirty.yaml",
+    "command": "/Users/lzy/pro/solo/workspaces/zy10455/node_modules/.bin/ts-node /Users/lzy/pro/solo/workspaces/zy10455/src/cli.ts -i examples/openapi-dirty.yaml -o ./dirty-results"
+  },
+  "summary": {
+    "totalTests": 16,
+    "passed": 5,
+    "failed": 11,
+    "passRate": 0.3125,
+    "durationMs": 8
+  },
+  "coverage": {
+    "totalRules": 7,
+    "appliedRules": 7,
+    "totalSamples": 7,
+    "perturbedSamples": 16,
+    "schemaPathsCovered": [
+      "$.components.schemas.Product.properties.sku",
+      "$.components.schemas.Product.properties.name",
+      "$.components.schemas.Product.properties.price",
+      "$.components.schemas.Product.properties.categories",
+      "$.components.schemas.Product.properties.inStock",
+      "$.paths./items.get.responses.200.content.application/json",
+      "$.paths./items.post.requestBody.content.application/json"
+    ],
+    "ruleCoverage": {
+      "null-value": 7,
+      "empty-string": 2,
+      "array-shuffle": 1,
+      "array-reverse": 1,
+      "array-sort": 1,
+      "missing-field": 2,
+      "extra-field": 2
+    }
+  },
+  "failures": [
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-1",
+        "original": {
+          "value": "ABC-1234",
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.sku"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.sku"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 3
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/pattern",
+          "keyword": "pattern",
+          "message": "must match pattern \"^[A-Z]{3}-[0-9]{4}$\"",
+          "params": {
+            "pattern": "^[A-Z]{3}-[0-9]{4}$"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-2",
+        "original": {
+          "value": "ABC-1234",
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.sku"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.sku"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-3",
+        "original": {
+          "value": "Product Name",
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.name"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/minLength",
+          "keyword": "minLength",
+          "message": "must NOT have fewer than 2 characters",
+          "params": {
+            "limit": 2
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-4",
+        "original": {
+          "value": "Product Name",
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.name"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be number",
+          "params": {
+            "type": "number"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-5",
+        "original": {
+          "value": 99.99,
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.price"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.price"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be array",
+          "params": {
+            "type": "array"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-6",
+        "original": {
+          "value": [
+            "electronics",
+            "computers"
+          ],
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.categories"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.categories"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be boolean",
+          "params": {
+            "type": "boolean"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-10",
+        "original": {
+          "value": true,
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.inStock"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.inStock"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-11",
+        "original": {
+          "value": {
+            "data": [
+              {
+                "id": 1,
+                "name": "Item One",
+                "tags": [
+                  "tag1",
+                  "tag2"
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Item Two",
+                "tags": [
+                  "tag2",
+                  "tag3"
+                ]
+              }
+            ],
+            "total": 2
+          },
+          "location": {
+            "path": "/items",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./items.get.responses.200.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 2
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "message": "must have required property 'data'",
+          "params": {
+            "missingProperty": "data"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-12",
+        "original": {
+          "value": {
+            "data": [
+              {
+                "id": 1,
+                "name": "Item One",
+                "tags": [
+                  "tag1",
+                  "tag2"
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Item Two",
+                "tags": [
+                  "tag2",
+                  "tag3"
+                ]
+              }
+            ],
+            "total": 2
+          },
+          "location": {
+            "path": "/items",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./items.get.responses.200.content.application/json"
+        },
+        "perturbedValue": {
+          "total": 2
+        },
+        "ruleId": "missing-field",
+        "ruleName": "Remove required field",
+        "perturbationDescription": "Removed field: data"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-14",
+        "original": {
+          "value": {
+            "name": "Test Item",
+            "description": "This is a test item description",
+            "tags": [
+              "test",
+              "sample"
+            ],
+            "metadata": {
+              "source": "api",
+              "priority": 1
+            }
+          },
+          "location": {
+            "path": "/items",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./items.post.requestBody.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 2
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "message": "must have required property 'name'",
+          "params": {
+            "missingProperty": "name"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-15",
+        "original": {
+          "value": {
+            "name": "Test Item",
+            "description": "This is a test item description",
+            "tags": [
+              "test",
+              "sample"
+            ],
+            "metadata": {
+              "source": "api",
+              "priority": 1
+            }
+          },
+          "location": {
+            "path": "/items",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./items.post.requestBody.content.application/json"
+        },
+        "perturbedValue": {
+          "description": "This is a test item description",
+          "tags": [
+            "test",
+            "sample"
+          ],
+          "metadata": {
+            "source": "api",
+            "priority": 1
+          }
+        },
+        "ruleId": "missing-field",
+        "ruleName": "Remove required field",
+        "perturbationDescription": "Removed field: name"
+      },
+      "durationMs": 0
+    }
+  ],
+  "allResults": [
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-1",
+        "original": {
+          "value": "ABC-1234",
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.sku"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.sku"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 3
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/pattern",
+          "keyword": "pattern",
+          "message": "must match pattern \"^[A-Z]{3}-[0-9]{4}$\"",
+          "params": {
+            "pattern": "^[A-Z]{3}-[0-9]{4}$"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-2",
+        "original": {
+          "value": "ABC-1234",
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.sku"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.sku"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-3",
+        "original": {
+          "value": "Product Name",
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.name"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/minLength",
+          "keyword": "minLength",
+          "message": "must NOT have fewer than 2 characters",
+          "params": {
+            "limit": 2
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-4",
+        "original": {
+          "value": "Product Name",
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.name"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be number",
+          "params": {
+            "type": "number"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-5",
+        "original": {
+          "value": 99.99,
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.price"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.price"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be array",
+          "params": {
+            "type": "array"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-6",
+        "original": {
+          "value": [
+            "electronics",
+            "computers"
+          ],
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.categories"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.categories"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-7",
+        "original": {
+          "value": [
+            "electronics",
+            "computers"
+          ],
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.categories"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.categories"
+        },
+        "perturbedValue": [
+          "electronics",
+          "computers"
+        ],
+        "ruleId": "array-shuffle",
+        "ruleName": "Shuffle array items",
+        "perturbationDescription": "Shuffled array items"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-8",
+        "original": {
+          "value": [
+            "electronics",
+            "computers"
+          ],
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.categories"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.categories"
+        },
+        "perturbedValue": [
+          "computers",
+          "electronics"
+        ],
+        "ruleId": "array-reverse",
+        "ruleName": "Reverse array",
+        "perturbationDescription": "Reversed array order"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-9",
+        "original": {
+          "value": [
+            "electronics",
+            "computers"
+          ],
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.categories"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.categories"
+        },
+        "perturbedValue": [
+          "computers",
+          "electronics"
+        ],
+        "ruleId": "array-sort",
+        "ruleName": "Sort array",
+        "perturbationDescription": "Sorted array items alphabetically"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be boolean",
+          "params": {
+            "type": "boolean"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-10",
+        "original": {
+          "value": true,
+          "location": {
+            "path": "#/components/schemas/Product",
+            "jsonPath": "$.components.schemas.Product.properties.inStock"
+          },
+          "schemaPath": "$.components.schemas.Product.properties.inStock"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-11",
+        "original": {
+          "value": {
+            "data": [
+              {
+                "id": 1,
+                "name": "Item One",
+                "tags": [
+                  "tag1",
+                  "tag2"
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Item Two",
+                "tags": [
+                  "tag2",
+                  "tag3"
+                ]
+              }
+            ],
+            "total": 2
+          },
+          "location": {
+            "path": "/items",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./items.get.responses.200.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 2
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "message": "must have required property 'data'",
+          "params": {
+            "missingProperty": "data"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-12",
+        "original": {
+          "value": {
+            "data": [
+              {
+                "id": 1,
+                "name": "Item One",
+                "tags": [
+                  "tag1",
+                  "tag2"
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Item Two",
+                "tags": [
+                  "tag2",
+                  "tag3"
+                ]
+              }
+            ],
+            "total": 2
+          },
+          "location": {
+            "path": "/items",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./items.get.responses.200.content.application/json"
+        },
+        "perturbedValue": {
+          "total": 2
+        },
+        "ruleId": "missing-field",
+        "ruleName": "Remove required field",
+        "perturbationDescription": "Removed field: data"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-13",
+        "original": {
+          "value": {
+            "data": [
+              {
+                "id": 1,
+                "name": "Item One",
+                "tags": [
+                  "tag1",
+                  "tag2"
+                ]
+              },
+              {
+                "id": 2,
+                "name": "Item Two",
+                "tags": [
+                  "tag2",
+                  "tag3"
+                ]
+              }
+            ],
+            "total": 2
+          },
+          "location": {
+            "path": "/items",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./items.get.responses.200.content.application/json"
+        },
+        "perturbedValue": {
+          "data": [
+            {
+              "id": 1,
+              "name": "Item One",
+              "tags": [
+                "tag1",
+                "tag2"
+              ]
+            },
+            {
+              "id": 2,
+              "name": "Item Two",
+              "tags": [
+                "tag2",
+                "tag3"
+              ]
+            }
+          ],
+          "total": 2,
+          "__extra_fuzz_field__": "unexpected_value"
+        },
+        "ruleId": "extra-field",
+        "ruleName": "Add extra field",
+        "perturbationDescription": "Added unexpected field"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-14",
+        "original": {
+          "value": {
+            "name": "Test Item",
+            "description": "This is a test item description",
+            "tags": [
+              "test",
+              "sample"
+            ],
+            "metadata": {
+              "source": "api",
+              "priority": 1
+            }
+          },
+          "location": {
+            "path": "/items",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./items.post.requestBody.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 2
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "message": "must have required property 'name'",
+          "params": {
+            "missingProperty": "name"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-15",
+        "original": {
+          "value": {
+            "name": "Test Item",
+            "description": "This is a test item description",
+            "tags": [
+              "test",
+              "sample"
+            ],
+            "metadata": {
+              "source": "api",
+              "priority": 1
+            }
+          },
+          "location": {
+            "path": "/items",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./items.post.requestBody.content.application/json"
+        },
+        "perturbedValue": {
+          "description": "This is a test item description",
+          "tags": [
+            "test",
+            "sample"
+          ],
+          "metadata": {
+            "source": "api",
+            "priority": 1
+          }
+        },
+        "ruleId": "missing-field",
+        "ruleName": "Remove required field",
+        "perturbationDescription": "Removed field: name"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-16",
+        "original": {
+          "value": {
+            "name": "Test Item",
+            "description": "This is a test item description",
+            "tags": [
+              "test",
+              "sample"
+            ],
+            "metadata": {
+              "source": "api",
+              "priority": 1
+            }
+          },
+          "location": {
+            "path": "/items",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./items.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./items.post.requestBody.content.application/json"
+        },
+        "perturbedValue": {
+          "name": "Test Item",
+          "description": "This is a test item description",
+          "tags": [
+            "test",
+            "sample"
+          ],
+          "metadata": {
+            "source": "api",
+            "priority": 1
+          },
+          "__extra_fuzz_field__": "unexpected_value"
+        },
+        "ruleId": "extra-field",
+        "ruleName": "Add extra field",
+        "perturbationDescription": "Added unexpected field"
+      },
+      "durationMs": 0
+    }
+  ],
+  "rules": [
+    {
+      "id": "null-value",
+      "name": "Replace with null",
+      "description": "Replace non-null values with null to test nullability",
+      "enabled": true,
+      "type": "null",
+      "priority": 100
+    },
+    {
+      "id": "empty-string",
+      "name": "Replace with empty string",
+      "description": "Replace string values with empty strings",
+      "enabled": true,
+      "type": "empty-string",
+      "priority": 90
+    },
+    {
+      "id": "array-shuffle",
+      "name": "Shuffle array items",
+      "description": "Randomly shuffle array items to test order sensitivity",
+      "enabled": true,
+      "type": "array-shuffle",
+      "priority": 80
+    },
+    {
+      "id": "array-reverse",
+      "name": "Reverse array",
+      "description": "Reverse the order of array items",
+      "enabled": true,
+      "type": "array-reverse",
+      "priority": 75
+    },
+    {
+      "id": "array-sort",
+      "name": "Sort array",
+      "description": "Sort array items alphabetically",
+      "enabled": true,
+      "type": "array-sort",
+      "priority": 70
+    },
+    {
+      "id": "missing-field",
+      "name": "Remove required field",
+      "description": "Remove required fields from objects",
+      "enabled": true,
+      "type": "missing-field",
+      "priority": 60
+    },
+    {
+      "id": "extra-field",
+      "name": "Add extra field",
+      "description": "Add unexpected fields to objects",
+      "enabled": true,
+      "type": "extra-field",
+      "priority": 50
+    }
+  ]
+}

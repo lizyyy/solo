@@ -1,0 +1,3977 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-16T20:17:06.815Z",
+    "version": "1.0.0",
+    "inputFile": "examples/openapi-normal.yaml",
+    "command": "/Users/lzy/pro/solo/workspaces/zy10455/node_modules/.bin/ts-node /Users/lzy/pro/solo/workspaces/zy10455/src/cli.ts -i examples/openapi-normal.yaml -o ./test-results -f both"
+  },
+  "summary": {
+    "totalTests": 60,
+    "passed": 9,
+    "failed": 51,
+    "passRate": 0.15,
+    "durationMs": 11
+  },
+  "coverage": {
+    "totalRules": 7,
+    "appliedRules": 7,
+    "totalSamples": 29,
+    "perturbedSamples": 60,
+    "schemaPathsCovered": [
+      "$.components.schemas.User.properties.id",
+      "$.components.schemas.User.properties.name",
+      "$.components.schemas.User.properties.email",
+      "$.components.schemas.User.properties.roles",
+      "$.components.schemas.User.properties.active",
+      "$.components.schemas.User.properties.createdAt",
+      "$.components.schemas.UserInput.properties.name",
+      "$.components.schemas.UserInput.properties.email",
+      "$.components.schemas.UserInput.properties.password",
+      "$.components.schemas.UserInput.properties.roles",
+      "$.paths./users.get.responses.200.content.application/json",
+      "$.paths./users.post.requestBody.content.application/json",
+      "$.paths./users.post.requestBody.content.application/json.properties.name",
+      "$.paths./users.post.requestBody.content.application/json.properties.email",
+      "$.paths./users.post.requestBody.content.application/json.properties.password",
+      "$.paths./users.post.requestBody.content.application/json.properties.roles",
+      "$.paths./users.post.responses.201.content.application/json.properties.id",
+      "$.paths./users.post.responses.201.content.application/json.properties.name",
+      "$.paths./users.post.responses.201.content.application/json.properties.email",
+      "$.paths./users.post.responses.201.content.application/json.properties.roles",
+      "$.paths./users.post.responses.201.content.application/json.properties.active",
+      "$.paths./users.post.responses.201.content.application/json.properties.createdAt",
+      "$.paths./users/{id}.get.responses.200.content.application/json",
+      "$.paths./users/{id}.get.responses.200.content.application/json.properties.id",
+      "$.paths./users/{id}.get.responses.200.content.application/json.properties.name",
+      "$.paths./users/{id}.get.responses.200.content.application/json.properties.email",
+      "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles",
+      "$.paths./users/{id}.get.responses.200.content.application/json.properties.active",
+      "$.paths./users/{id}.get.responses.200.content.application/json.properties.createdAt"
+    ],
+    "ruleCoverage": {
+      "null-value": 29,
+      "empty-string": 15,
+      "array-shuffle": 4,
+      "array-reverse": 4,
+      "array-sort": 4,
+      "missing-field": 2,
+      "extra-field": 2
+    }
+  },
+  "failures": [
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be integer",
+          "params": {
+            "type": "integer"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-1",
+        "original": {
+          "value": 1,
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.id"
+          },
+          "schemaPath": "$.components.schemas.User.properties.id"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-2",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.name"
+          },
+          "schemaPath": "$.components.schemas.User.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-4",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.email"
+          },
+          "schemaPath": "$.components.schemas.User.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/format",
+          "keyword": "format",
+          "message": "must match format \"email\"",
+          "params": {
+            "format": "email"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-5",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.email"
+          },
+          "schemaPath": "$.components.schemas.User.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be array",
+          "params": {
+            "type": "array"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-6",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.roles"
+          },
+          "schemaPath": "$.components.schemas.User.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be boolean",
+          "params": {
+            "type": "boolean"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-10",
+        "original": {
+          "value": true,
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.active"
+          },
+          "schemaPath": "$.components.schemas.User.properties.active"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-11",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.createdAt"
+          },
+          "schemaPath": "$.components.schemas.User.properties.createdAt"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/format",
+          "keyword": "format",
+          "message": "must match format \"date-time\"",
+          "params": {
+            "format": "date-time"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-12",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.createdAt"
+          },
+          "schemaPath": "$.components.schemas.User.properties.createdAt"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-13",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.name"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/minLength",
+          "keyword": "minLength",
+          "message": "must NOT have fewer than 2 characters",
+          "params": {
+            "limit": 2
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-14",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.name"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-15",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.email"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/format",
+          "keyword": "format",
+          "message": "must match format \"email\"",
+          "params": {
+            "format": "email"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-16",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.email"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-17",
+        "original": {
+          "value": "secret123",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.password"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.password"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/minLength",
+          "keyword": "minLength",
+          "message": "must NOT have fewer than 8 characters",
+          "params": {
+            "limit": 8
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-18",
+        "original": {
+          "value": "secret123",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.password"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.password"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be array",
+          "params": {
+            "type": "array"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-19",
+        "original": {
+          "value": [
+            "user"
+          ],
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.roles"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be array",
+          "params": {
+            "type": "array"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-20",
+        "original": {
+          "value": [
+            {
+              "id": 1,
+              "name": "John Doe",
+              "email": "john@example.com",
+              "roles": [
+                "user",
+                "admin"
+              ],
+              "active": true
+            },
+            {
+              "id": 2,
+              "name": "Jane Smith",
+              "email": "jane@example.com",
+              "roles": [
+                "user"
+              ],
+              "active": true
+            }
+          ],
+          "location": {
+            "path": "/users",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users.get.responses.200.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 3
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-24",
+        "original": {
+          "value": {
+            "name": "New User",
+            "email": "new@example.com",
+            "password": "secret123",
+            "roles": [
+              "user"
+            ]
+          },
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/required",
+          "keyword": "required",
+          "message": "must have required property 'name'",
+          "params": {
+            "missingProperty": "name"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-25",
+        "original": {
+          "value": {
+            "name": "New User",
+            "email": "new@example.com",
+            "password": "secret123",
+            "roles": [
+              "user"
+            ]
+          },
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json"
+        },
+        "perturbedValue": {
+          "email": "new@example.com",
+          "password": "secret123",
+          "roles": [
+            "user"
+          ]
+        },
+        "ruleId": "missing-field",
+        "ruleName": "Remove required field",
+        "perturbationDescription": "Removed field: name"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-27",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-28",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-29",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-30",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-31",
+        "original": {
+          "value": "secret123",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.password"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.password"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-32",
+        "original": {
+          "value": "secret123",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.password"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.password"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-33",
+        "original": {
+          "value": [
+            "user"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-34",
+        "original": {
+          "value": 1,
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.id"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.id"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-35",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-36",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-37",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-38",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-39",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-40",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "user",
+          "admin"
+        ],
+        "ruleId": "array-shuffle",
+        "ruleName": "Shuffle array items",
+        "perturbationDescription": "Shuffled array items"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-41",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-reverse",
+        "ruleName": "Reverse array",
+        "perturbationDescription": "Reversed array order"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-42",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-sort",
+        "ruleName": "Sort array",
+        "perturbationDescription": "Sorted array items alphabetically"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-43",
+        "original": {
+          "value": true,
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.active"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.active"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-44",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.createdAt"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.createdAt"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-45",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.createdAt"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.createdAt"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-46",
+        "original": {
+          "value": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "roles": [
+              "user",
+              "admin"
+            ],
+            "active": true
+          },
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/required",
+          "keyword": "required",
+          "message": "must have required property 'id'",
+          "params": {
+            "missingProperty": "id"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-47",
+        "original": {
+          "value": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "roles": [
+              "user",
+              "admin"
+            ],
+            "active": true
+          },
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+        },
+        "perturbedValue": {
+          "name": "John Doe",
+          "email": "john@example.com",
+          "roles": [
+            "user",
+            "admin"
+          ],
+          "active": true
+        },
+        "ruleId": "missing-field",
+        "ruleName": "Remove required field",
+        "perturbationDescription": "Removed field: id"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-49",
+        "original": {
+          "value": 1,
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.id"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.id"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-50",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-51",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-52",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-53",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-54",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-55",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "user",
+          "admin"
+        ],
+        "ruleId": "array-shuffle",
+        "ruleName": "Shuffle array items",
+        "perturbationDescription": "Shuffled array items"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-56",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-reverse",
+        "ruleName": "Reverse array",
+        "perturbationDescription": "Reversed array order"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-57",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-sort",
+        "ruleName": "Sort array",
+        "perturbationDescription": "Sorted array items alphabetically"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-58",
+        "original": {
+          "value": true,
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.active"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.active"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-59",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.createdAt"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.createdAt"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-60",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.createdAt"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.createdAt"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    }
+  ],
+  "allResults": [
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be integer",
+          "params": {
+            "type": "integer"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-1",
+        "original": {
+          "value": 1,
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.id"
+          },
+          "schemaPath": "$.components.schemas.User.properties.id"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-2",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.name"
+          },
+          "schemaPath": "$.components.schemas.User.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-3",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.name"
+          },
+          "schemaPath": "$.components.schemas.User.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-4",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.email"
+          },
+          "schemaPath": "$.components.schemas.User.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/format",
+          "keyword": "format",
+          "message": "must match format \"email\"",
+          "params": {
+            "format": "email"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-5",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.email"
+          },
+          "schemaPath": "$.components.schemas.User.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be array",
+          "params": {
+            "type": "array"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-6",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.roles"
+          },
+          "schemaPath": "$.components.schemas.User.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-7",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.roles"
+          },
+          "schemaPath": "$.components.schemas.User.properties.roles"
+        },
+        "perturbedValue": [
+          "user",
+          "admin"
+        ],
+        "ruleId": "array-shuffle",
+        "ruleName": "Shuffle array items",
+        "perturbationDescription": "Shuffled array items"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-8",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.roles"
+          },
+          "schemaPath": "$.components.schemas.User.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-reverse",
+        "ruleName": "Reverse array",
+        "perturbationDescription": "Reversed array order"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-9",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.roles"
+          },
+          "schemaPath": "$.components.schemas.User.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-sort",
+        "ruleName": "Sort array",
+        "perturbationDescription": "Sorted array items alphabetically"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be boolean",
+          "params": {
+            "type": "boolean"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-10",
+        "original": {
+          "value": true,
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.active"
+          },
+          "schemaPath": "$.components.schemas.User.properties.active"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-11",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.createdAt"
+          },
+          "schemaPath": "$.components.schemas.User.properties.createdAt"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/format",
+          "keyword": "format",
+          "message": "must match format \"date-time\"",
+          "params": {
+            "format": "date-time"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-12",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "#/components/schemas/User",
+            "jsonPath": "$.components.schemas.User.properties.createdAt"
+          },
+          "schemaPath": "$.components.schemas.User.properties.createdAt"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-13",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.name"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/minLength",
+          "keyword": "minLength",
+          "message": "must NOT have fewer than 2 characters",
+          "params": {
+            "limit": 2
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-14",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.name"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-15",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.email"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/format",
+          "keyword": "format",
+          "message": "must match format \"email\"",
+          "params": {
+            "format": "email"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-16",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.email"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be string",
+          "params": {
+            "type": "string"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-17",
+        "original": {
+          "value": "secret123",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.password"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.password"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/minLength",
+          "keyword": "minLength",
+          "message": "must NOT have fewer than 8 characters",
+          "params": {
+            "limit": 8
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-18",
+        "original": {
+          "value": "secret123",
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.password"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.password"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be array",
+          "params": {
+            "type": "array"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-19",
+        "original": {
+          "value": [
+            "user"
+          ],
+          "location": {
+            "path": "#/components/schemas/UserInput",
+            "jsonPath": "$.components.schemas.UserInput.properties.roles"
+          },
+          "schemaPath": "$.components.schemas.UserInput.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/type",
+          "keyword": "type",
+          "message": "must be array",
+          "params": {
+            "type": "array"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-20",
+        "original": {
+          "value": [
+            {
+              "id": 1,
+              "name": "John Doe",
+              "email": "john@example.com",
+              "roles": [
+                "user",
+                "admin"
+              ],
+              "active": true
+            },
+            {
+              "id": 2,
+              "name": "Jane Smith",
+              "email": "jane@example.com",
+              "roles": [
+                "user"
+              ],
+              "active": true
+            }
+          ],
+          "location": {
+            "path": "/users",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users.get.responses.200.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 3
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-21",
+        "original": {
+          "value": [
+            {
+              "id": 1,
+              "name": "John Doe",
+              "email": "john@example.com",
+              "roles": [
+                "user",
+                "admin"
+              ],
+              "active": true
+            },
+            {
+              "id": 2,
+              "name": "Jane Smith",
+              "email": "jane@example.com",
+              "roles": [
+                "user"
+              ],
+              "active": true
+            }
+          ],
+          "location": {
+            "path": "/users",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users.get.responses.200.content.application/json"
+        },
+        "perturbedValue": [
+          {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "roles": [
+              "user",
+              "admin"
+            ],
+            "active": true
+          },
+          {
+            "id": 2,
+            "name": "Jane Smith",
+            "email": "jane@example.com",
+            "roles": [
+              "user"
+            ],
+            "active": true
+          }
+        ],
+        "ruleId": "array-shuffle",
+        "ruleName": "Shuffle array items",
+        "perturbationDescription": "Shuffled array items"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-22",
+        "original": {
+          "value": [
+            {
+              "id": 1,
+              "name": "John Doe",
+              "email": "john@example.com",
+              "roles": [
+                "user",
+                "admin"
+              ],
+              "active": true
+            },
+            {
+              "id": 2,
+              "name": "Jane Smith",
+              "email": "jane@example.com",
+              "roles": [
+                "user"
+              ],
+              "active": true
+            }
+          ],
+          "location": {
+            "path": "/users",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users.get.responses.200.content.application/json"
+        },
+        "perturbedValue": [
+          {
+            "id": 2,
+            "name": "Jane Smith",
+            "email": "jane@example.com",
+            "roles": [
+              "user"
+            ],
+            "active": true
+          },
+          {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "roles": [
+              "user",
+              "admin"
+            ],
+            "active": true
+          }
+        ],
+        "ruleId": "array-reverse",
+        "ruleName": "Reverse array",
+        "perturbationDescription": "Reversed array order"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-23",
+        "original": {
+          "value": [
+            {
+              "id": 1,
+              "name": "John Doe",
+              "email": "john@example.com",
+              "roles": [
+                "user",
+                "admin"
+              ],
+              "active": true
+            },
+            {
+              "id": 2,
+              "name": "Jane Smith",
+              "email": "jane@example.com",
+              "roles": [
+                "user"
+              ],
+              "active": true
+            }
+          ],
+          "location": {
+            "path": "/users",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users.get.responses.200.content.application/json"
+        },
+        "perturbedValue": [
+          {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "roles": [
+              "user",
+              "admin"
+            ],
+            "active": true
+          },
+          {
+            "id": 2,
+            "name": "Jane Smith",
+            "email": "jane@example.com",
+            "roles": [
+              "user"
+            ],
+            "active": true
+          }
+        ],
+        "ruleId": "array-sort",
+        "ruleName": "Sort array",
+        "perturbationDescription": "Sorted array items alphabetically"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-24",
+        "original": {
+          "value": {
+            "name": "New User",
+            "email": "new@example.com",
+            "password": "secret123",
+            "roles": [
+              "user"
+            ]
+          },
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/required",
+          "keyword": "required",
+          "message": "must have required property 'name'",
+          "params": {
+            "missingProperty": "name"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-25",
+        "original": {
+          "value": {
+            "name": "New User",
+            "email": "new@example.com",
+            "password": "secret123",
+            "roles": [
+              "user"
+            ]
+          },
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json"
+        },
+        "perturbedValue": {
+          "email": "new@example.com",
+          "password": "secret123",
+          "roles": [
+            "user"
+          ]
+        },
+        "ruleId": "missing-field",
+        "ruleName": "Remove required field",
+        "perturbationDescription": "Removed field: name"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-26",
+        "original": {
+          "value": {
+            "name": "New User",
+            "email": "new@example.com",
+            "password": "secret123",
+            "roles": [
+              "user"
+            ]
+          },
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json"
+        },
+        "perturbedValue": {
+          "name": "New User",
+          "email": "new@example.com",
+          "password": "secret123",
+          "roles": [
+            "user"
+          ],
+          "__extra_fuzz_field__": "unexpected_value"
+        },
+        "ruleId": "extra-field",
+        "ruleName": "Add extra field",
+        "perturbationDescription": "Added unexpected field"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-27",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-28",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-29",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-30",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-31",
+        "original": {
+          "value": "secret123",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.password"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.password"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-32",
+        "original": {
+          "value": "secret123",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.password"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.password"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/UserInput/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-33",
+        "original": {
+          "value": [
+            "user"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.requestBody.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.requestBody.content.application/json.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-34",
+        "original": {
+          "value": 1,
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.id"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.id"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-35",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-36",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-37",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-38",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-39",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-40",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "user",
+          "admin"
+        ],
+        "ruleId": "array-shuffle",
+        "ruleName": "Shuffle array items",
+        "perturbationDescription": "Shuffled array items"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-41",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-reverse",
+        "ruleName": "Reverse array",
+        "perturbationDescription": "Reversed array order"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-42",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-sort",
+        "ruleName": "Sort array",
+        "perturbationDescription": "Sorted array items alphabetically"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-43",
+        "original": {
+          "value": true,
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.active"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.active"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-44",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.createdAt"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.createdAt"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-45",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "/users",
+            "method": "post",
+            "statusCode": "201",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users.post.responses.201.content.application/json.properties.createdAt"
+          },
+          "schemaPath": "$.paths./users.post.responses.201.content.application/json.properties.createdAt"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-46",
+        "original": {
+          "value": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "roles": [
+              "user",
+              "admin"
+            ],
+            "active": true
+          },
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/required",
+          "keyword": "required",
+          "message": "must have required property 'id'",
+          "params": {
+            "missingProperty": "id"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-47",
+        "original": {
+          "value": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "roles": [
+              "user",
+              "admin"
+            ],
+            "active": true
+          },
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+        },
+        "perturbedValue": {
+          "name": "John Doe",
+          "email": "john@example.com",
+          "roles": [
+            "user",
+            "admin"
+          ],
+          "active": true
+        },
+        "ruleId": "missing-field",
+        "ruleName": "Remove required field",
+        "perturbationDescription": "Removed field: id"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": true,
+      "errors": [],
+      "sample": {
+        "id": "fuzz-48",
+        "original": {
+          "value": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "roles": [
+              "user",
+              "admin"
+            ],
+            "active": true
+          },
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json"
+        },
+        "perturbedValue": {
+          "id": 1,
+          "name": "John Doe",
+          "email": "john@example.com",
+          "roles": [
+            "user",
+            "admin"
+          ],
+          "active": true,
+          "__extra_fuzz_field__": "unexpected_value"
+        },
+        "ruleId": "extra-field",
+        "ruleName": "Add extra field",
+        "perturbationDescription": "Added unexpected field"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-49",
+        "original": {
+          "value": 1,
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.id"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.id"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-50",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.name"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-51",
+        "original": {
+          "value": "John Doe",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.name"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.name"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-52",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.email"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-53",
+        "original": {
+          "value": "john@example.com",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.email"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.email"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 1
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-54",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-55",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "user",
+          "admin"
+        ],
+        "ruleId": "array-shuffle",
+        "ruleName": "Shuffle array items",
+        "perturbationDescription": "Shuffled array items"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-56",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-reverse",
+        "ruleName": "Reverse array",
+        "perturbationDescription": "Reversed array order"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-57",
+        "original": {
+          "value": [
+            "user",
+            "admin"
+          ],
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.roles"
+        },
+        "perturbedValue": [
+          "admin",
+          "user"
+        ],
+        "ruleId": "array-sort",
+        "ruleName": "Sort array",
+        "perturbationDescription": "Sorted array items alphabetically"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-58",
+        "original": {
+          "value": true,
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.active"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.active"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-59",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.createdAt"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.createdAt"
+        },
+        "perturbedValue": null,
+        "ruleId": "null-value",
+        "ruleName": "Replace with null",
+        "perturbationDescription": "Replaced value with null"
+      },
+      "durationMs": 0
+    },
+    {
+      "valid": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/components/schemas/User/type",
+          "keyword": "type",
+          "message": "must be object",
+          "params": {
+            "type": "object"
+          }
+        }
+      ],
+      "sample": {
+        "id": "fuzz-60",
+        "original": {
+          "value": "2024-01-01T00:00:00Z",
+          "location": {
+            "path": "/users/{id}",
+            "method": "get",
+            "statusCode": "200",
+            "mediaType": "application/json",
+            "jsonPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.createdAt"
+          },
+          "schemaPath": "$.paths./users/{id}.get.responses.200.content.application/json.properties.createdAt"
+        },
+        "perturbedValue": "",
+        "ruleId": "empty-string",
+        "ruleName": "Replace with empty string",
+        "perturbationDescription": "Replaced string with empty string"
+      },
+      "durationMs": 0
+    }
+  ],
+  "rules": [
+    {
+      "id": "null-value",
+      "name": "Replace with null",
+      "description": "Replace non-null values with null to test nullability",
+      "enabled": true,
+      "type": "null",
+      "priority": 100
+    },
+    {
+      "id": "empty-string",
+      "name": "Replace with empty string",
+      "description": "Replace string values with empty strings",
+      "enabled": true,
+      "type": "empty-string",
+      "priority": 90
+    },
+    {
+      "id": "array-shuffle",
+      "name": "Shuffle array items",
+      "description": "Randomly shuffle array items to test order sensitivity",
+      "enabled": true,
+      "type": "array-shuffle",
+      "priority": 80
+    },
+    {
+      "id": "array-reverse",
+      "name": "Reverse array",
+      "description": "Reverse the order of array items",
+      "enabled": true,
+      "type": "array-reverse",
+      "priority": 75
+    },
+    {
+      "id": "array-sort",
+      "name": "Sort array",
+      "description": "Sort array items alphabetically",
+      "enabled": true,
+      "type": "array-sort",
+      "priority": 70
+    },
+    {
+      "id": "missing-field",
+      "name": "Remove required field",
+      "description": "Remove required fields from objects",
+      "enabled": true,
+      "type": "missing-field",
+      "priority": 60
+    },
+    {
+      "id": "extra-field",
+      "name": "Add extra field",
+      "description": "Add unexpected fields to objects",
+      "enabled": true,
+      "type": "extra-field",
+      "priority": 50
+    }
+  ]
+}
