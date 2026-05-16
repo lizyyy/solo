@@ -1,0 +1,22 @@
+[
+  {
+    "op": "replace",
+    "path": "/version",
+    "value": "2.0.0"
+  },
+  {
+    "op": "replace",
+    "path": "/database",
+    "value": "sqlite://file.db"
+  },
+  {
+    "op": "add",
+    "path": "/features/-",
+    "value": "analytics"
+  },
+  {
+    "op": "test",
+    "path": "/settings/debug",
+    "value": true
+  }
+]
