@@ -17,7 +17,13 @@
 - Spring Data JPA
 - H2 内存数据库
 - Lombok
-- Maven
+- Maven Wrapper (内置，无需安装)
+
+## 环境要求
+
+- **必需**: Java 11+ (唯一依赖)
+- **无需**: Maven (项目已内置 Maven Wrapper)
+- **首次启动**: 需要网络下载项目依赖
 
 ## 快速启动
 
@@ -29,22 +35,29 @@
 ### 启动命令
 
 ```bash
-# 方式1：一键启动（推荐，无需系统安装Maven）
-chmod +x start.sh mvnw   # 首次运行设置执行权限
-./start.sh               # 自动下载依赖并启动服务
+# 方式1：直接启动（推荐 ✅ 已验证可用）
+./run.sh
 
-# 方式2：使用项目自带的 Maven Wrapper（无需系统安装Maven）
-chmod +x mvnw
+# 方式2：使用 Maven Wrapper 启动
 ./mvnw spring-boot:run
 
-# 方式3：如果系统已安装Maven
-mvn spring-boot:run
+# 方式3：完整编译后启动
+./mvnw clean package -DskipTests
+java -jar target/api-replay-budget-1.0.0.jar
 ```
 
 **零依赖启动说明**：
-- 仅需 Java 11+，无需系统安装 Maven
-- `mvnw` 脚本会自动下载 Maven Wrapper 和相关依赖
-- `start.sh` 包含编译和启动的完整流程
+- ✅ 无需系统安装 Maven
+- ✅ Maven Wrapper (maven-wrapper.jar) 已内置在项目中
+- ✅ 仅需 Java 11+，开箱即用
+- ✅ 首次启动会自动下载 Maven 及项目依赖
+
+**当前状态验证**：
+```bash
+# 验证 Maven Wrapper 已就绪（项目已内置）
+./mvnw --version
+# 输出 Apache Maven 3.8.8 即表示正常
+```
 
 服务启动后访问：http://localhost:8080
 

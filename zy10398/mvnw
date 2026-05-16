@@ -24,5 +24,10 @@ if [ ! -f "$WRAPPER_JAR" ]; then
     echo "[mvnw] Maven Wrapper 下载完成"
 fi
 
+# 获取项目目录
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # 执行 Maven
-java -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"
+java -Dmaven.multiModuleProjectDirectory="$PROJECT_DIR" \
+     -classpath "$WRAPPER_JAR" \
+     org.apache.maven.wrapper.MavenWrapperMain "$@"
