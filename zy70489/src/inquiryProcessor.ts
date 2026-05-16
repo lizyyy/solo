@@ -12,6 +12,22 @@ export class InquiryProcessor {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
+  private findOriginalPermissionTicket(
+    conclusions: ProcessingConclusion[],
+    inquiry: PurchaseInquiry
+  ): string {
+    const sortedConclusions = [...conclusions].sort((a, b) => a.createdAt - b.createdAt);
+
+    for (const conclusion of sortedConclusions) {
+      if (conclusion.previousPermissionTicket &&
+          !conclusion.previousPermissionTicket.includes('CONCURRENT')) {
+        return conclusion.previousPermissionTicket;
+      }
+    }
+
+    return inquiry.permissionTicket || '未知';
+  }
+
   async generateMockData(): Promise<PurchaseInquiry[]> {
     const inquiries: PurchaseInquiry[] = [
       {
@@ -104,8 +120,11 @@ export class InquiryProcessor {
             await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
 
             const updatedInquiry = { ...currentInquiry };
+            const previousPermissionTicket = currentInquiry.permissionTicket;
+            const newPermissionTicket = `PERM-CONCURRENT-${i}`;
+
             updatedInquiry.status = i === 0 ? 'approved' : i === 1 ? 'rejected' : 'pending';
-            updatedInquiry.permissionTicket = `PERM-CONCURRENT-${i}`;
+            updatedInquiry.permissionTicket = newPermissionTicket;
             updatedInquiry.updatedAt = Date.now();
 
             await this.db.updatePurchaseInquiry(updatedInquiry);
@@ -116,6 +135,8 @@ export class InquiryProcessor {
               conclusion: i === 0 ? 'pass' : i === 1 ? 'fail' : 'review',
               reason: `并发写入测试 - 实例${i + 1}`,
               isManualCorrection: false,
+              previousPermissionTicket,
+              newPermissionTicket,
               createdAt: Date.now()
             };
             await this.db.insertProcessingConclusion(conclusion);
@@ -143,6 +164,7 @@ export class InquiryProcessor {
       conclusion,
       reason,
       isManualCorrection: false,
+      previousPermissionTicket: inquiry.permissionTicket,
       createdAt: Date.now()
     };
 
@@ -160,7 +182,8 @@ export class InquiryProcessor {
     newConclusion: 'pass' | 'fail' | 'review',
     newReason: string,
     operator: string,
-    remark: string
+    remark: string,
+    newPermissionTicket?: string
   ): Promise<ProcessingConclusion> {
     const inquiry = await this.db.getPurchaseInquiry(inquiryId);
     if (!inquiry) {
@@ -169,6 +192,7 @@ export class InquiryProcessor {
 
     const conclusions = await this.db.getProcessingConclusions(inquiryId);
     const lastConclusion = conclusions[0];
+    const previousPermissionTicket = inquiry.permissionTicket;
 
     const correctionConclusion: ProcessingConclusion = {
       id: this.generateId(),
@@ -180,12 +204,17 @@ export class InquiryProcessor {
       correctionRemark: remark,
       previousConclusion: lastConclusion?.conclusion,
       previousReason: lastConclusion?.reason,
+      previousPermissionTicket,
+      newPermissionTicket,
       createdAt: Date.now()
     };
 
     await this.db.insertProcessingConclusion(correctionConclusion);
 
     inquiry.status = newConclusion === 'pass' ? 'approved' : newConclusion === 'fail' ? 'rejected' : 'pending';
+    if (newPermissionTicket !== undefined) {
+      inquiry.permissionTicket = newPermissionTicket;
+    }
     inquiry.updatedAt = Date.now();
     await this.db.updatePurchaseInquiry(inquiry);
 
@@ -222,13 +251,31 @@ export class InquiryProcessor {
     if (inquiry.permissionTicket) {
       const manualCorrections = conclusions.filter(c => c.isManualCorrection);
 
-      if (manualCorrections.length > 0 && inquiry.permissionTicket.includes('CONCURRENT')) {
+      const hasPermissionTicketCorrection = manualCorrections.some(
+        c => c.previousPermissionTicket !== undefined || c.newPermissionTicket !== undefined
+      );
+
+      if (hasConcurrentIssue || hasPermissionTicketCorrection) {
+        const ticketBefore = this.findOriginalPermissionTicket(conclusions, inquiry);
+        const ticketAfter = inquiry.permissionTicket;
+        const wasTicketCorrected = manualCorrections.some(c => c.newPermissionTicket !== undefined);
+        const isTicketStillConcurrent = ticketAfter.includes('CONCURRENT');
+
+        let correctionConclusion = '';
+        if (wasTicketCorrected && !isTicketStillConcurrent) {
+          correctionConclusion = '已修正，权限票已恢复正常';
+        } else if (wasTicketCorrected && isTicketStillConcurrent) {
+          correctionConclusion = '已修正，但权限票仍为并发测试值';
+        } else {
+          correctionConclusion = '未修正，权限票仍为并发覆盖状态';
+        }
+
         permissionTicketChanges = {
-          before: 'PERM-2024-0515-XXX',
-          after: inquiry.permissionTicket,
-          exception: '权限临时票在并发写入时被覆盖,导致权限验证失败',
-          correction: '人工修正权限票状态，恢复正确的权限票编号',
-          conclusion: '已修正，权限票已恢复正常'
+          before: ticketBefore,
+          after: ticketAfter,
+          exception: '权限临时票在并发写入时被覆盖，导致权限验证失败',
+          correction: wasTicketCorrected ? '已执行人工修正权限票状态' : '尚未执行人工修正',
+          conclusion: correctionConclusion
         };
 
         summary += `\n【权限临时票变更记录:\n`;

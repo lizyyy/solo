@@ -44,6 +44,8 @@ export interface ProcessingConclusion {
   correctionRemark?: string;
   previousConclusion?: string;
   previousReason?: string;
+  previousPermissionTicket?: string;
+  newPermissionTicket?: string;
   createdAt: number;
 }
 

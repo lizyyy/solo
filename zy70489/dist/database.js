@@ -51,6 +51,8 @@ class Database {
           correctionRemark TEXT,
           previousConclusion TEXT,
           previousReason TEXT,
+          previousPermissionTicket TEXT,
+          newPermissionTicket TEXT,
           createdAt INTEGER NOT NULL,
           FOREIGN KEY (inquiryId) REFERENCES purchase_inquiries(id)
         )
@@ -129,8 +131,8 @@ class Database {
     }
     async insertProcessingConclusion(conclusion) {
         return new Promise((resolve, reject) => {
-            this.db.run(`INSERT INTO processing_conclusions (id, inquiryId, conclusion, reason, operator, isManualCorrection, correctionRemark, previousConclusion, previousReason, createdAt)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+            this.db.run(`INSERT INTO processing_conclusions (id, inquiryId, conclusion, reason, operator, isManualCorrection, correctionRemark, previousConclusion, previousReason, previousPermissionTicket, newPermissionTicket, createdAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
                 conclusion.id,
                 conclusion.inquiryId,
                 conclusion.conclusion,
@@ -140,6 +142,8 @@ class Database {
                 conclusion.correctionRemark,
                 conclusion.previousConclusion,
                 conclusion.previousReason,
+                conclusion.previousPermissionTicket,
+                conclusion.newPermissionTicket,
                 conclusion.createdAt
             ], (err) => err ? reject(err) : resolve());
         });

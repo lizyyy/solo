@@ -154,9 +154,10 @@ program
     .requiredOption('--reason <reason>', '新原因')
     .requiredOption('--operator <operator>', '操作人')
     .requiredOption('--remark <remark>', '修正备注')
+    .option('--permission-ticket <ticket>', '新的权限临时票(可选)')
     .action(async (options) => {
     try {
-        const conclusion = await processor.manualCorrect(options.id, options.conclusion, options.reason, options.operator, options.remark);
+        const conclusion = await processor.manualCorrect(options.id, options.conclusion, options.reason, options.operator, options.remark, options.permissionTicket);
         console.log(chalk_1.default.green('✓ 人工修正成功'));
         console.log(chalk_1.default.magenta('⚠️ 这是人工修正记录，保留了历史变更痕迹'));
         console.log(`新结论: ${formatConclusion(conclusion.conclusion)}`);
@@ -167,6 +168,11 @@ program
             console.log(`\n历史记录:`);
             console.log(`  之前结论: ${formatConclusion(conclusion.previousConclusion)}`);
             console.log(`  之前原因: ${conclusion.previousReason}`);
+        }
+        if (conclusion.newPermissionTicket !== undefined) {
+            console.log(`\n权限临时票变更:`);
+            console.log(`  变更前: ${conclusion.previousPermissionTicket || '无'}`);
+            console.log(`  变更后: ${conclusion.newPermissionTicket || '无'}`);
         }
         console.log();
         db.close();
