@@ -8,7 +8,7 @@ from models import (
     KeyStatus, KeyPurpose
 )
 from service import KeyEscrowService
-from database import init_db, get_db_session
+from database import init_db, get_db
 
 app = FastAPI(title="多租户密钥托管API", version="1.0.0")
 
@@ -18,7 +18,7 @@ async def startup_event():
     init_db()
 
 
-def get_service(db: Session = Depends(get_db_session)):
+def get_service(db: Session = Depends(get_db)):
     return KeyEscrowService(db)
 
 

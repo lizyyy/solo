@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from contextlib import contextmanager
 import os
+from typing import Generator
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./key_escrow.db")
 
@@ -17,8 +18,22 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 
 
+# FastAPI 依赖注入用的函数
+def get_db() -> Generator[Session, None, None]:
+    db = SessionLocal()
+    try:
+        yield db
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
+
+# 兼容直接调用的上下文管理器
 @contextmanager
-def get_db_session() -> Session:
+def get_db_session() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
