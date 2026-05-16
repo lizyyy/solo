@@ -303,7 +303,6 @@ def test_detail_duplicate_count():
     response = requests.post(f"{BASE_URL}/receipts", json=create_payload)
     result = response.json()
     batch_id = result["data"]["batch_id"]
-    receipt_no = result["data"]["receipt_no"]
 
     print(f"创建批次成功，批次ID: {batch_id}，初始 success_count: {result['data']['success_count']}")
 
@@ -400,6 +399,88 @@ def test_status_machine_validation():
         return False
 
 
+def test_detail_final_state_switch():
+    print_section("14. 测试终态之间切换计数（success↔failed）")
+
+    idempotent_key = f"test_state_switch_{int(time.time())}"
+
+    create_payload = {
+        "batch_name": "终态切换测试",
+        "trigger_source": "api",
+        "idempotent_key": idempotent_key,
+        "original_input": {"test": "state_switch"},
+        "items": [
+            {"item_key": "item_001", "name": "测试项1"}
+        ]
+    }
+
+    response = requests.post(f"{BASE_URL}/receipts", json=create_payload)
+    result = response.json()
+    batch_id = result["data"]["batch_id"]
+
+    print(f"创建批次成功，初始状态 success_count=0, failed_count=0")
+
+    update_success_payload = [
+        {
+            "item_key": "item_001",
+            "status": "success",
+            "result_data": {"id": 1}
+        }
+    ]
+
+    print("\n第一步：更新明细状态为 success...")
+    response = requests.patch(f"{BASE_URL}/receipts/{batch_id}/details", json=update_success_payload)
+    result = response.json()
+    success_count_1 = result["data"]["success_count"]
+    failed_count_1 = result["data"]["failed_count"]
+    print(f"更新后: success_count={success_count_1}, failed_count={failed_count_1}")
+
+    if success_count_1 != 1 or failed_count_1 != 0:
+        print("❌ 第一步失败: 期望 success_count=1, failed_count=0")
+        return False
+
+    print("\n第二步：更新同一明细状态从 success 切换为 failed...")
+    update_failed_payload = [
+        {
+            "item_key": "item_001",
+            "status": "failed",
+            "error_message": "发现异常，需要重试"
+        }
+    ]
+
+    response = requests.patch(f"{BASE_URL}/receipts/{batch_id}/details", json=update_failed_payload)
+    result = response.json()
+    success_count_2 = result["data"]["success_count"]
+    failed_count_2 = result["data"]["failed_count"]
+    print(f"更新后: success_count={success_count_2}, failed_count={failed_count_2}")
+
+    if success_count_2 != 0 or failed_count_2 != 1:
+        print("❌ 第二步失败: 期望 success_count=0, failed_count=1")
+        return False
+
+    print("\n第三步：更新同一明细状态从 failed 切换回 success...")
+    update_back_payload = [
+        {
+            "item_key": "item_001",
+            "status": "success",
+            "result_data": {"id": 1, "fixed": True}
+        }
+    ]
+
+    response = requests.patch(f"{BASE_URL}/receipts/{batch_id}/details", json=update_back_payload)
+    result = response.json()
+    success_count_3 = result["data"]["success_count"]
+    failed_count_3 = result["data"]["failed_count"]
+    print(f"更新后: success_count={success_count_3}, failed_count={failed_count_3}")
+
+    if success_count_3 != 1 or failed_count_3 != 0:
+        print("❌ 第三步失败: 期望 success_count=1, failed_count=0")
+        return False
+
+    print("\n✅ 终态之间切换计数验证通过!")
+    return True
+
+
 def main():
     print("\n" + "="*60)
     print("  任务幂等收据API 集成测试")
@@ -424,6 +505,7 @@ def main():
     results.append(("统计数据", test_stats()))
     results.append(("明细重复计数修复", test_detail_duplicate_count()))
     results.append(("状态机校验", test_status_machine_validation()))
+    results.append(("终态之间切换计数", test_detail_final_state_switch()))
 
     print_section("测试结果汇总")
     passed = sum(1 for _, r in results if r)

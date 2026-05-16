@@ -112,8 +112,10 @@ def update_process_detail(db: Session, batch_id: int, updates: List[ProcessDetai
     if not batch:
         raise ValueError(f"批次不存在: {batch_id}")
 
-    success_count = 0
-    failed_count = 0
+    success_inc = 0
+    failed_inc = 0
+    success_dec = 0
+    failed_dec = 0
 
     for update in updates:
         detail = db.query(ProcessDetail).filter(
@@ -134,12 +136,19 @@ def update_process_detail(db: Session, batch_id: int, updates: List[ProcessDetai
 
             if old_status not in [TaskStatus.SUCCESS, TaskStatus.FAILED]:
                 if update.status == TaskStatus.SUCCESS:
-                    success_count += 1
+                    success_inc += 1
                 elif update.status == TaskStatus.FAILED:
-                    failed_count += 1
+                    failed_inc += 1
+            elif old_status != update.status:
+                if old_status == TaskStatus.SUCCESS and update.status == TaskStatus.FAILED:
+                    success_dec += 1
+                    failed_inc += 1
+                elif old_status == TaskStatus.FAILED and update.status == TaskStatus.SUCCESS:
+                    failed_dec += 1
+                    success_inc += 1
 
-    batch.success_count += success_count
-    batch.failed_count += failed_count
+    batch.success_count = batch.success_count - success_dec + success_inc
+    batch.failed_count = batch.failed_count - failed_dec + failed_inc
     batch.updated_at = datetime.utcnow()
 
     db.commit()
