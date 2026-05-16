@@ -1,0 +1,43 @@
+{
+  "jobId": "JOB-2024-001",
+  "jobName": "月度数据同步作业",
+  "tasks": [
+    {
+      "taskId": "T001",
+      "taskName": "数据抽取",
+      "executionStatus": "PENDING"
+    },
+    {
+      "taskId": "T002",
+      "taskName": "数据转换",
+      "executionStatus": "RUNNING"
+    },
+    {
+      "taskId": "T003",
+      "taskName": "数据加载",
+      "executionStatus": "COMPLETED"
+    },
+    {
+      "taskId": "T004",
+      "taskName": "索引重建",
+      "executionStatus": "FAILED"
+    },
+    {
+      "taskId": "T005",
+      "taskName": "数据校验",
+      "executionStatus": "PENDING"
+    },
+    {
+      "taskId": "T006",
+      "taskName": "报表生成",
+      "executionStatus": "PENDING"
+    }
+  ],
+  "reason": {
+    "code": "WRONG_CONDITION",
+    "message": "用户提交大批量作业后发现条件选错",
+    "operator": "admin",
+    "evidence": "ticket-12345"
+  },
+  "retainResultPolicy": "ALL"
+}
