@@ -1,0 +1,63 @@
+{
+  "total": 6,
+  "excepted_active": 4,
+  "excepted_expired": 0,
+  "unexcepted": 2,
+  "errors": [],
+  "vulnerabilities": [
+    {
+      "id": "CVE-2023-1234",
+      "component_name": "log4j",
+      "component_version": "2.14.1",
+      "severity": "critical",
+      "description": "Remote code execution vulnerability in Log4j",
+      "cvss_score": 9.8,
+      "source": "cyclonedx"
+    },
+    {
+      "id": "CVE-2023-5678",
+      "component_name": "spring-core",
+      "component_version": "5.3.18",
+      "severity": "high",
+      "description": "Spring Framework RCE vulnerability",
+      "cvss_score": 7.5,
+      "source": "cyclonedx"
+    },
+    {
+      "id": "CVE-2023-9012",
+      "component_name": "jackson-databind",
+      "component_version": "2.13.0",
+      "severity": "medium",
+      "description": "Deserialization vulnerability",
+      "cvss_score": 5.3,
+      "source": "cyclonedx"
+    },
+    {
+      "id": "CVE-2023-1234",
+      "component_name": "log4j",
+      "component_version": "2.14.1",
+      "severity": "critical",
+      "description": "Remote code execution vulnerability in Log4j",
+      "cvss_score": 9.8,
+      "source": "cyclonedx"
+    },
+    {
+      "id": "CVE-2023-5678",
+      "component_name": "spring-core",
+      "component_version": "5.3.18",
+      "severity": "high",
+      "description": "Spring Framework RCE vulnerability",
+      "cvss_score": 7.5,
+      "source": "cyclonedx"
+    },
+    {
+      "id": "CVE-2023-9012",
+      "component_name": "jackson-databind",
+      "component_version": "2.13.0",
+      "severity": "medium",
+      "description": "Deserialization vulnerability",
+      "cvss_score": 5.3,
+      "source": "cyclonedx"
+    }
+  ]
+}

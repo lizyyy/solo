@@ -1,0 +1,22 @@
+[
+  {
+    "vulnerability_id": "CVE-2023-1234",
+    "component_name": "log4j",
+    "component_version": "2.14.1",
+    "reason": "Accepted risk",
+    "expires_at": "2027-12-31",
+    "reviewer": "Security Team",
+    "created_at": "2026-05-16T20:28:16.513625",
+    "status": "active"
+  },
+  {
+    "vulnerability_id": "*",
+    "component_name": "spring-*",
+    "component_version": "*",
+    "reason": "All spring vulnerabilities accepted",
+    "expires_at": "2027-06-30",
+    "reviewer": "AppSec",
+    "created_at": "2026-05-16T20:28:16.553907",
+    "status": "active"
+  }
+]

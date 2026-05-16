@@ -1,0 +1,20 @@
+{
+  "bomFormat": "CycloneDX",
+  "vulnerabilities": [
+    {
+      "id": "CVE-2023-1234",
+      "component": {
+        "name": "log4j",
+        "version": "2.14.1"
+      }
+    },
+    invalid json here!
+    {
+      "id": "CVE-2023-9012",
+      "component": {
+        "name": "jackson-databind",
+        "version": "2.13.0"
+      }
+    }
+  ]
+}
