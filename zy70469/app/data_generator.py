@@ -29,10 +29,12 @@ TIME_SLOTS = [
     "17:30-18:00", "18:00-18:30", "18:30-19:00"
 ]
 
-RISK_TYPES = [
-    "重复提交", "日期异常", "时段冲突", "身份验证失败",
+ABNORMAL_RISK_TYPES = [
+    "日期异常", "时段冲突", "身份验证失败",
     "权限不足", "系统超时", "数据不一致"
 ]
+DUPLICATE_RISK_TYPE = "重复提交"
+NORMAL_RISK_TYPE = "正常"
 
 
 def generate_bus_reservations(
@@ -136,11 +138,17 @@ def generate_comparison_results(
     
     for reservation in reservations:
         is_abnormal = reservation.is_duplicate
-        risk_type = "重复提交" if is_abnormal else random.choice(RISK_TYPES) if random.random() < 0.2 else "正常"
+        if is_abnormal:
+            risk_type = DUPLICATE_RISK_TYPE
+        elif random.random() < 0.1:
+            risk_type = random.choice(ABNORMAL_RISK_TYPES)
+            is_abnormal = True
+        else:
+            risk_type = NORMAL_RISK_TYPE
         
         original_response = {
             "code": "0000" if not is_abnormal else "9999",
-            "message": "预约成功" if not is_abnormal else "重复提交",
+            "message": "预约成功" if not is_abnormal else risk_type,
             "data": {
                 "reservation_id": reservation.reservation_id,
                 "status": "成功",
@@ -150,7 +158,7 @@ def generate_comparison_results(
         
         replay_response = {
             "code": "0000" if not is_abnormal else "9999",
-            "message": "预约成功" if not is_abnormal else "重复提交检测",
+            "message": "预约成功" if not is_abnormal else f"{risk_type}检测",
             "data": {
                 "reservation_id": reservation.reservation_id,
                 "status": "成功" if not is_abnormal else "异常",
@@ -167,10 +175,14 @@ def generate_comparison_results(
         
         if is_abnormal:
             diff_fields = ["message", "data.status"]
-            before_value = "message: 预约成功, status: 成功"
-            after_value = "message: 重复提交检测, status: 异常"
-            correction = "已标记为重复提交，需人工复核"
-            conclusion = f"培训环境清单异常检测：变更前【{before_value}】，变更后【{after_value}】，修正措施：{correction}，结论：确认为同一员工同一时段重复预约"
+            before_value = f"message: 预约成功, status: 成功"
+            after_value = f"message: {risk_type}检测, status: 异常"
+            if risk_type == DUPLICATE_RISK_TYPE:
+                correction = "已标记为重复提交，需人工复核"
+                conclusion = f"培训环境清单异常检测：变更前【{before_value}】，变更后【{after_value}】，修正措施：{correction}，结论：确认为同一员工同一时段重复预约"
+            else:
+                correction = f"已标记为{risk_type}，需人工复核"
+                conclusion = f"培训环境清单异常检测：变更前【{before_value}】，变更后【{after_value}】，修正措施：{correction}，结论：确认为{risk_type}异常"
         
         result = ComparisonResult(
             batch_no=batch_no,
