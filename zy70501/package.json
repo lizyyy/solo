@@ -1,0 +1,25 @@
+{
+  "name": "idempotent-mediation-api",
+  "version": "1.0.0",
+  "description": "幂等窗口调停API - 处理重复请求的幂等性问题",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node src/scripts/init-db.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "crypto": "^1.0.1",
+    "joi": "^17.11.0",
+    "csv-writer": "^1.6.0",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["idempotent", "mediation", "api"],
+  "author": "",
+  "license": "MIT"
+}
