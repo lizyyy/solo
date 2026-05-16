@@ -69,7 +69,7 @@ const checkDependencies = async (dependentServices, windowStart, windowEnd) => {
 const checkRiskLevel = (riskLevel, windowStart, windowEnd) => {
   const start = moment(windowStart);
   const end = moment(windowEnd);
-  const duration = end.diff(start, 'hours');
+  const duration = end.diff(start, 'hours', true);
   
   if (riskLevel === 'critical' && duration > 2) {
     return {
