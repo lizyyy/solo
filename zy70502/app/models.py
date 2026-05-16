@@ -6,6 +6,7 @@ from app.database import Base
 
 
 class RiskLevel(str, enum.Enum):
+    UNKNOWN = "unknown"
     SAFE = "safe"
     LOW = "low"
     MEDIUM = "medium"

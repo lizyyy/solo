@@ -1,17 +1,14 @@
-import json
-import jsondiff
 from typing import Dict, Any, Tuple, List
 from datetime import datetime, timedelta
-from app.models import RiskLevel, ChangeCategory, ContractChange, VerdictStatus, ChangeHistory
+from app.models import RiskLevel, ChangeCategory, ContractChange, VerdictStatus, ChangeHistory, VerdictReport
 from sqlalchemy.orm import Session
 
 
 class ContractDiffAnalyzer:
-    DOCUMENTATION_FIELDS = {"description", "summary", "title", "externalDocs"}
+    DOCUMENTATION_FIELDS = {"description", "summary", "title", "externaldocs"}
 
     @classmethod
     def analyze_diff(cls, old_contract: Dict[str, Any], new_contract: Dict[str, Any]) -> Dict[str, Any]:
-        diff = jsondiff.diff(old_contract, new_contract, syntax='symmetric')
         diff_summary = {
             "added": [],
             "removed": [],
@@ -20,79 +17,78 @@ class ContractDiffAnalyzer:
             "breaking_changes": [],
             "compatible_changes": []
         }
-        cls._traverse_diff(diff, [], diff_summary, old_contract, new_contract)
+        cls._compare_dicts(old_contract, new_contract, [], diff_summary)
         return diff_summary
 
     @classmethod
-    def _traverse_diff(cls, diff: Any, path: List[str], summary: Dict[str, Any],
-                        old: Dict[str, Any], new: Dict[str, Any]):
-        if isinstance(diff, dict):
-            for key, value in diff.items():
-                if key == jsondiff.symbols.insert:
-                    for item in value:
-                        summary["added"].append(".".join(path + [str(item)]))
-                elif key == jsondiff.symbols.delete:
-                    for item in value:
-                        summary["removed"].append(".".join(path + [str(item)]))
-                else:
-                    new_path = path + [str(key)]
-                    path_str = ".".join(new_path)
+    def _compare_dicts(cls, old: Dict, new: Dict, path: List[str], summary: Dict[str, Any]):
+        old_keys = set(old.keys()) if isinstance(old, dict) else set()
+        new_keys = set(new.keys()) if isinstance(new, dict) else set()
+        
+        for key in new_keys - old_keys:
+            full_path = ".".join(path + [str(key)])
+            summary["added"].append(full_path)
+        
+        for key in old_keys - new_keys:
+            full_path = ".".join(path + [str(key)])
+            summary["removed"].append(full_path)
+        
+        for key in old_keys & new_keys:
+            old_val = old[key]
+            new_val = new[key]
+            new_path = path + [str(key)]
+            path_str = ".".join(new_path)
+            
+            if isinstance(old_val, dict) and isinstance(new_val, dict):
+                cls._compare_dicts(old_val, new_val, new_path, summary)
+            elif isinstance(old_val, list) and isinstance(new_val, list):
+                if sorted(old_val) != sorted(new_val):
                     is_doc = any(f in path_str.lower() for f in cls.DOCUMENTATION_FIELDS)
-                    if isinstance(value, dict) and jsondiff.symbols.old in value and jsondiff.symbols.new in value:
-                        old_val = value[jsondiff.symbols.old]
-                        new_val = value[jsondiff.symbols.new]
-                        if is_doc:
-                            summary["documentation_changes"].append({
-                                "path": path_str,
-                                "old": old_val,
-                                "new": new_val
-                            })
-                        else:
-                            breaking = cls._is_breaking_change(new_path, old_val, new_val, old, new)
-                            change_info = {"path": path_str, "old": old_val, "new": new_val}
-                            if breaking:
-                                summary["breaking_changes"].append(change_info)
-                                summary["modified"].append(change_info)
-                            else:
-                                summary["compatible_changes"].append(change_info)
-                                summary["modified"].append(change_info)
+                    change_info = {"path": path_str, "old": old_val, "new": new_val}
+                    if is_doc:
+                        summary["documentation_changes"].append(change_info)
                     else:
-                        cls._traverse_diff(value, new_path, summary, old, new)
+                        breaking = cls._is_breaking_list_change(new_path, old_val, new_val)
+                        if breaking:
+                            summary["breaking_changes"].append(change_info)
+                        else:
+                            summary["compatible_changes"].append(change_info)
+                        summary["modified"].append(change_info)
+            elif old_val != new_val:
+                is_doc = any(f in path_str.lower() for f in cls.DOCUMENTATION_FIELDS)
+                change_info = {"path": path_str, "old": old_val, "new": new_val}
+                if is_doc:
+                    summary["documentation_changes"].append(change_info)
+                else:
+                    breaking = cls._is_breaking_change(new_path, old_val, new_val)
+                    if breaking:
+                        summary["breaking_changes"].append(change_info)
+                    else:
+                        summary["compatible_changes"].append(change_info)
+                summary["modified"].append(change_info)
 
     @classmethod
-    def _is_breaking_change(cls, path: List[str], old_val: Any, new_val: Any,
-                            old_contract: Dict, new_contract: Dict) -> bool:
-        path_str = ".".join(path)
+    def _is_breaking_list_change(cls, path: List[str], old_val: List, new_val: List) -> bool:
+        path_str = ".".join(path).lower()
         if "required" in path_str:
-            if isinstance(new_val, list) and isinstance(old_val, list):
-                if len(set(new_val) - set(old_val)) > 0:
-                    return True
+            if len(set(new_val) - set(old_val)) > 0:
+                return True
+        if "enum" in path_str:
+            if len(set(old_val) - set(new_val)) > 0:
+                return True
+        return False
+
+    @classmethod
+    def _is_breaking_change(cls, path: List[str], old_val: Any, new_val: Any) -> bool:
+        path_str = ".".join(path).lower()
         if "type" in path_str:
             if old_val != new_val:
                 return True
+        if "required" in path_str:
+            return True
         if "enum" in path_str:
-            if isinstance(new_val, list) and isinstance(old_val, list):
-                if len(set(old_val) - set(new_val)) > 0:
-                    return True
-        if "properties" in path and len(path) >= 2:
-            prop_name = path[-2]
-            old_props = cls._get_nested_value(old_contract, path[:-1]) or {}
-            new_props = cls._get_nested_value(new_contract, path[:-1]) or {}
-            if old_props and isinstance(old_props, dict):
-                if "nullable" not in old_props.get(prop_name, {}) and "nullable" not in new_props.get(prop_name, {}):
-                    if path[-1] != "nullable":
-                        return True
+            return True
         return False
-
-    @staticmethod
-    def _get_nested_value(obj: Dict, path: List[str]) -> Any:
-        current = obj
-        for key in path:
-            if isinstance(current, dict) and key in current:
-                current = current[key]
-            else:
-                return None
-        return current
 
 
 class RiskEngine:
@@ -130,7 +126,7 @@ class RiskEngine:
             opinion = f"仅文档变更，共{doc_count}处"
         else:
             category = ChangeCategory.UNKNOWN
-            risk_level = RiskLevel.SAFE
+            risk_level = RiskLevel.UNKNOWN
             opinion = "未检测到有效变更"
 
         return risk_level, opinion, category

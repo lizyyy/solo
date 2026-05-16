@@ -35,7 +35,7 @@ class ContractChangeResponse(BaseModel):
     manual_override: Optional[Dict[str, Any]]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ContractChangeQuery(BaseModel):
@@ -78,7 +78,7 @@ class VerdictReportResponse(BaseModel):
     generated_by: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ErrorResponse(BaseModel):
