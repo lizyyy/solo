@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Secret {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  status       String        @default("ACTIVE")
+  description  String?
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  last_access  DateTime?
+  references   Reference[]
+  replacements ReplacementPlan[]
+  access_logs  AccessLog[]
+  corrections  CorrectionLog[]
+}
+
+model Reference {
+  id           String     @id @default(uuid())
+  secret_id    String
+  secret_name  String
+  service_name String
+  environment  String
+  file_path    String?
+  line_number  Int?
+  last_access  DateTime?
+  created_at   DateTime   @default(now())
+  is_active    Boolean    @default(true)
+  secret       Secret     @relation(fields: [secret_id], references: [id], onDelete: Cascade)
+  access_logs  AccessLog[]
+}
+
+model ReplacementPlan {
+  id               String   @id @default(uuid())
+  secret_id        String
+  new_secret_name  String
+  status           String   @default("PENDING_APPROVAL")
+  planned_date     DateTime
+  approver         String?
+  approval_comment String?
+  approval_date    DateTime?
+  created_by       String
+  created_at       DateTime @default(now())
+  secret           Secret   @relation(fields: [secret_id], references: [id], onDelete: Cascade)
+}
+
+model AccessLog {
+  id            String    @id @default(uuid())
+  secret_id     String
+  reference_id  String?
+  accessed_by   String?
+  access_source String?
+  accessed_at   DateTime  @default(now())
+  secret        Secret    @relation(fields: [secret_id], references: [id], onDelete: Cascade)
+  reference     Reference? @relation(fields: [reference_id], references: [id], onDelete: SetNull)
+}
+
+model CorrectionLog {
+  id            String   @id @default(uuid())
+  secret_id     String
+  field_name    String
+  old_value     String?
+  new_value     String?
+  reason        String
+  corrected_by  String
+  corrected_at  DateTime @default(now())
+  secret        Secret   @relation(fields: [secret_id], references: [id], onDelete: Cascade)
+}
+
+model ErrorRecord {
+  id               String   @id @default(uuid())
+  operation        String
+  raw_input        String
+  processing_basis String
+  conclusion       String
+  error_message    String
+  operator         String?
+  occurred_at      DateTime @default(now())
+}
