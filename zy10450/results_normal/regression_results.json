@@ -1,0 +1,132 @@
+{
+  "summary": {
+    "scan_time": "2026-05-17T02:35:17.019096",
+    "log_directory": "/Users/lzy/pro/solo/workspaces/zy10450/test_logs/normal",
+    "rules_file": "/Users/lzy/pro/solo/workspaces/zy10450/rules.json",
+    "total_files": 2,
+    "total_lines": 15,
+    "masked_lines": 11,
+    "failed_lines": 0,
+    "risk_lines": 5,
+    "rules_applied": 6
+  },
+  "files": [
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10450/test_logs/normal/access.log",
+      "total_lines": 5,
+      "masked_lines": 5,
+      "failed_lines": 0,
+      "risk_lines": 0
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10450/test_logs/normal/app.log",
+      "total_lines": 10,
+      "masked_lines": 6,
+      "failed_lines": 0,
+      "risk_lines": 5
+    }
+  ],
+  "failed_samples": [],
+  "risk_samples": [
+    {
+      "line_number": 1,
+      "original": "2024-01-15 10:00:01 INFO 用户登录成功，用户：张三，手机号：13812345678，IP：192.168.1.100",
+      "masked": "2024-01-15 10:00:01 INFO 用户登录成功，用户：***，手机号：138****0000，IP：***.***.***.***",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10450/test_logs/normal/app.log",
+      "differences": [
+        [
+          "13812345678",
+          "138****0000"
+        ],
+        [
+          "用户",
+          "\\g<1>：***"
+        ],
+        [
+          "192.168.1.100",
+          "***.***.***.***"
+        ]
+      ],
+      "risk_words_found": [
+        "手机号"
+      ],
+      "has_error": false,
+      "error_message": ""
+    },
+    {
+      "line_number": 2,
+      "original": "2024-01-15 10:00:02 INFO 会员注册成功，姓名：李四，邮箱：lisi@example.com，身份证号：110101199001011234",
+      "masked": "2024-01-15 10:00:02 INFO 会员注册成功，姓名：***，邮箱：u***@example.com，身份证号：110101138****00004",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10450/test_logs/normal/app.log",
+      "differences": [
+        [
+          "19900101123",
+          "138****0000"
+        ],
+        [
+          "lisi@example.com",
+          "u***@example.com"
+        ],
+        [
+          "姓名",
+          "\\g<1>：***"
+        ]
+      ],
+      "risk_words_found": [
+        "身份证"
+      ],
+      "has_error": false,
+      "error_message": ""
+    },
+    {
+      "line_number": 3,
+      "original": "2024-01-15 10:00:03 INFO 订单支付完成，客户：王五，银行卡号：6222021234567890123",
+      "masked": "2024-01-15 10:00:03 INFO 订单支付完成，客户：***，银行卡号：110***********00003",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10450/test_logs/normal/app.log",
+      "differences": [
+        [
+          "622202123456789012",
+          "110***********0000"
+        ],
+        [
+          "客户",
+          "\\g<1>：***"
+        ]
+      ],
+      "risk_words_found": [
+        "银行卡"
+      ],
+      "has_error": false,
+      "error_message": ""
+    },
+    {
+      "line_number": 4,
+      "original": "2024-01-15 10:00:04 DEBUG 系统正常运行，无敏感信息",
+      "masked": "2024-01-15 10:00:04 DEBUG 系统正常运行，无敏感信息",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10450/test_logs/normal/app.log",
+      "differences": [],
+      "risk_words_found": [
+        "敏感"
+      ],
+      "has_error": false,
+      "error_message": ""
+    },
+    {
+      "line_number": 6,
+      "original": "2024-01-15 10:00:06 WARNING 操作超时，手机号：13987654321，重试中",
+      "masked": "2024-01-15 10:00:06 WARNING 操作超时，手机号：138****0000，重试中",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10450/test_logs/normal/app.log",
+      "differences": [
+        [
+          "13987654321",
+          "138****0000"
+        ]
+      ],
+      "risk_words_found": [
+        "手机号"
+      ],
+      "has_error": false,
+      "error_message": ""
+    }
+  ]
+}
