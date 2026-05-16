@@ -41,6 +41,75 @@ export class ContractService {
     return row;
   }
 
+  async getSupplierContracts(supplierId: string) {
+    const rows = await getAll(
+      'SELECT * FROM contract_versions WHERE supplier_id = ? ORDER BY created_at DESC',
+      [supplierId]
+    );
+    return rows.map((row: any) => ({
+      ...row,
+      expected_fields: JSON.parse(row.expected_fields)
+    }));
+  }
+
+  async compareTwoVersions(versionId1: string, versionId2: string) {
+    const v1 = await this.getContractVersion(versionId1);
+    const v2 = await this.getContractVersion(versionId2);
+    
+    if (!v1 || !v2) {
+      throw new Error('一个或多个契约版本不存在');
+    }
+
+    const fields1 = v1.expected_fields;
+    const fields2 = v2.expected_fields;
+
+    const added = fields2.filter((f: string) => !fields1.includes(f));
+    const removed = fields1.filter((f: string) => !fields2.includes(f));
+    const common = fields1.filter((f: string) => fields2.includes(f));
+
+    return {
+      version1: { id: v1.id, version: v1.version, callback_url: v1.callback_url, sign_header_name: v1.sign_header_name },
+      version2: { id: v2.id, version: v2.version, callback_url: v2.callback_url, sign_header_name: v2.sign_header_name },
+      fieldChanges: {
+        added,
+        removed,
+        common,
+        totalInV1: fields1.length,
+        totalInV2: fields2.length
+      },
+      signHeaderChanged: v1.sign_header_name !== v2.sign_header_name,
+      callbackUrlChanged: v1.callback_url !== v2.callback_url
+    };
+  }
+
+  async compareSupplierVersions(supplierId: string) {
+    const contracts = await this.getSupplierContracts(supplierId);
+    
+    if (contracts.length < 2) {
+      return {
+        supplierId,
+        totalVersions: contracts.length,
+        message: '供应商契约版本少于2个，无法对比',
+        versions: contracts
+      };
+    }
+
+    const comparisons = [];
+    for (let i = 0; i < contracts.length - 1; i++) {
+      for (let j = i + 1; j < contracts.length; j++) {
+        const comparison = await this.compareTwoVersions(contracts[i].id, contracts[j].id);
+        comparisons.push(comparison);
+      }
+    }
+
+    return {
+      supplierId,
+      totalVersions: contracts.length,
+      versions: contracts,
+      comparisons
+    };
+  }
+
   async createCallbackSample(
     supplierId: string,
     contractVersionId: string,
@@ -85,6 +154,10 @@ export class ContractService {
 
     const signHeaderName = contract.sign_header_name || 'X-Signature';
     const signature = sample.headers[signHeaderName] || sample.headers[signHeaderName.toLowerCase()];
+    
+    if (signature) {
+      await verifyService.saveSignHeader(sampleId, signHeaderName, signature, 'RSA-SHA256');
+    }
     
     if (!signature) {
       const conclusionId = await verifyService.createConclusion(
@@ -291,12 +364,14 @@ export class ContractService {
     const sample = await this.getCallbackSample(conclusion.callback_sample_id);
     const fieldDiffs = await verifyService.getFieldDiffs(conclusion.callback_sample_id);
     const auditLogs = await verifyService.getAuditLogs(conclusionId);
+    const signHeaders = await verifyService.getSignHeadersBySample(conclusion.callback_sample_id);
 
     return {
       conclusion,
       rawInput: conclusion.raw_input,
       processingBasis: conclusion.processing_basis,
       fieldDiffs,
+      signHeaders,
       auditLogs
     };
   }

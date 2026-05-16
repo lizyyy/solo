@@ -140,6 +140,22 @@ export class VerifyService {
     }
   }
 
+  async saveSignHeader(
+    sampleId: string,
+    headerName: string,
+    headerValue: string,
+    algorithm: string = 'RSA-SHA256'
+  ): Promise<void> {
+    await runQuery(`
+      INSERT INTO sign_headers (id, callback_sample_id, header_name, header_value, algorithm, extracted_at)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `, [uuidv4(), sampleId, headerName, headerValue, algorithm]);
+  }
+
+  async getSignHeadersBySample(sampleId: string) {
+    return getAll('SELECT * FROM sign_headers WHERE callback_sample_id = ?', [sampleId]);
+  }
+
   async getConclusion(conclusionId: string) {
     return getOne(`
       SELECT vc.*, s.name as supplier_name, cv.version as contract_version
