@@ -12,8 +12,26 @@ const STATUS = {
 };
 
 class IdempotentRequest {
+  static _deepSortKeys(obj) {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(item => this._deepSortKeys(item));
+    }
+
+    const sortedKeys = Object.keys(obj).sort();
+    const sortedObj = {};
+    for (const key of sortedKeys) {
+      sortedObj[key] = this._deepSortKeys(obj[key]);
+    }
+    return sortedObj;
+  }
+
   static generateFingerprint(payload) {
-    const sortedPayload = JSON.stringify(payload, Object.keys(payload).sort());
+    const deeplySorted = this._deepSortKeys(payload);
+    const sortedPayload = JSON.stringify(deeplySorted);
     return crypto.createHash('sha256').update(sortedPayload).digest('hex');
   }
 
