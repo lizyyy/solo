@@ -17,11 +17,11 @@ class ContractDiffAnalyzer:
             "breaking_changes": [],
             "compatible_changes": []
         }
-        cls._compare_dicts(old_contract, new_contract, [], diff_summary)
+        cls._compare_dicts(old_contract, new_contract, [], diff_summary, old_contract)
         return diff_summary
 
     @classmethod
-    def _compare_dicts(cls, old: Dict, new: Dict, path: List[str], summary: Dict[str, Any]):
+    def _compare_dicts(cls, old: Dict, new: Dict, path: List[str], summary: Dict[str, Any], root_old: Dict):
         old_keys = set(old.keys()) if isinstance(old, dict) else set()
         new_keys = set(new.keys()) if isinstance(new, dict) else set()
         
@@ -32,6 +32,18 @@ class ContractDiffAnalyzer:
         for key in old_keys - new_keys:
             full_path = ".".join(path + [str(key)])
             summary["removed"].append(full_path)
+            
+            is_doc = any(f in full_path.lower() for f in cls.DOCUMENTATION_FIELDS)
+            change_info = {"path": full_path, "old": "存在", "new": "删除"}
+            
+            if is_doc:
+                summary["documentation_changes"].append(change_info)
+            else:
+                if cls._is_required_field_deletion(path, key, root_old):
+                    summary["breaking_changes"].append(change_info)
+                else:
+                    summary["compatible_changes"].append(change_info)
+            summary["modified"].append(change_info)
         
         for key in old_keys & new_keys:
             old_val = old[key]
@@ -40,7 +52,7 @@ class ContractDiffAnalyzer:
             path_str = ".".join(new_path)
             
             if isinstance(old_val, dict) and isinstance(new_val, dict):
-                cls._compare_dicts(old_val, new_val, new_path, summary)
+                cls._compare_dicts(old_val, new_val, new_path, summary, root_old)
             elif isinstance(old_val, list) and isinstance(new_val, list):
                 if sorted(old_val) != sorted(new_val):
                     is_doc = any(f in path_str.lower() for f in cls.DOCUMENTATION_FIELDS)
@@ -53,7 +65,7 @@ class ContractDiffAnalyzer:
                             summary["breaking_changes"].append(change_info)
                         else:
                             summary["compatible_changes"].append(change_info)
-                        summary["modified"].append(change_info)
+                    summary["modified"].append(change_info)
             elif old_val != new_val:
                 is_doc = any(f in path_str.lower() for f in cls.DOCUMENTATION_FIELDS)
                 change_info = {"path": path_str, "old": old_val, "new": new_val}
@@ -66,6 +78,26 @@ class ContractDiffAnalyzer:
                     else:
                         summary["compatible_changes"].append(change_info)
                 summary["modified"].append(change_info)
+
+    @classmethod
+    def _is_required_field_deletion(cls, path: List[str], field_name: str, root_old: Dict) -> bool:
+        parent_path = path.copy()
+        while parent_path:
+            current = root_old
+            valid = True
+            for p in parent_path:
+                if isinstance(current, dict) and p in current:
+                    current = current[p]
+                else:
+                    valid = False
+                    break
+            if valid and isinstance(current, dict):
+                if "required" in current:
+                    required = current["required"]
+                    if isinstance(required, list) and field_name in required:
+                        return True
+            parent_path.pop()
+        return False
 
     @classmethod
     def _is_breaking_list_change(cls, path: List[str], old_val: List, new_val: List) -> bool:
@@ -84,8 +116,6 @@ class ContractDiffAnalyzer:
         if "type" in path_str:
             if old_val != new_val:
                 return True
-        if "required" in path_str:
-            return True
         if "enum" in path_str:
             return True
         return False
@@ -101,10 +131,10 @@ class RiskEngine:
         removed_count = len(diff_summary.get("removed", []))
 
         if breaking_count > 0:
-            if breaking_count >= 5 or removed_count > 0:
+            if breaking_count >= 5:
                 risk_level = RiskLevel.CRITICAL
                 category = ChangeCategory.BREAKING
-                opinion = f"检测到{breaking_count}项破坏性变更，{removed_count}项字段删除"
+                opinion = f"检测到{breaking_count}项破坏性变更"
             elif breaking_count >= 2:
                 risk_level = RiskLevel.HIGH
                 category = ChangeCategory.BREAKING
@@ -112,7 +142,7 @@ class RiskEngine:
             else:
                 risk_level = RiskLevel.MEDIUM
                 category = ChangeCategory.BREAKING
-                opinion = "检测到破坏性变更"
+                opinion = "检测到1项破坏性变更"
         elif compatible_count > 0 or added_count > 0:
             category = ChangeCategory.COMPATIBLE
             if compatible_count + added_count >= 5:
@@ -190,5 +220,7 @@ class VerdictReportGenerator:
                     "created_at": c.created_at.isoformat() if c.created_at else None
                 }
                 for c in changes
+            ]
+        }
             ]
         }
