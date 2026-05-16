@@ -134,6 +134,25 @@ def renew_lock(db: Session, audit_id: int, renew_in: RenewRequest) -> Tuple[Lock
     )
     db.add(renew_history)
     
+    if db_audit.execution_phase:
+        old_phase = db.query(PhaseHistory).filter(
+            and_(
+                PhaseHistory.lock_audit_id == audit_id,
+                PhaseHistory.phase == db_audit.execution_phase,
+                PhaseHistory.exited_at.is_(None)
+            )
+        ).first()
+        if old_phase:
+            old_phase.exited_at = now
+            old_phase.duration_seconds = int((now - old_phase.entered_at).total_seconds())
+    
+    phase_history = PhaseHistory(
+        lock_audit_id=audit_id,
+        phase=ExecutionPhase.LOCK_RENEW,
+        phase_data={"client_info": renew_in.client_info}
+    )
+    db.add(phase_history)
+    
     db_audit.execution_phase = ExecutionPhase.LOCK_RENEW
     
     db.commit()
