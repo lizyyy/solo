@@ -1,0 +1,64 @@
+{
+  "batchId": "BATCH-1778891517291-F5A19121",
+  "ruleVersion": "v1.1.0",
+  "ruleDescription": "实验室样本单审计规则 - 新增实验室字段校验",
+  "executionTime": "2026/5/16 08:31:57",
+  "executionTimeMs": 0,
+  "statistics": {
+    "total": 9,
+    "success": 6,
+    "warning": 0,
+    "failed": 3
+  },
+  "beforeAfterComparison": [
+    {
+      "sampleNo": "LAB-20260516-1001",
+      "before": {
+        "sampleNo": "LAB-20260516-1001",
+        "status": "failed",
+        "gatewayError": "504 Gateway Timeout - 上游服务响应超时，请检查网络连接"
+      },
+      "after": {
+        "sampleNo": "LAB-20260516-1001",
+        "status": "pending"
+      }
+    },
+    {
+      "sampleNo": "INVALID-bcggoz4iu",
+      "before": {
+        "sampleNo": "INVALID-bcggoz4iu",
+        "status": "pending"
+      },
+      "after": {
+        "sampleNo": "LAB-20260516-4648",
+        "status": "pending"
+      }
+    },
+    {
+      "sampleNo": "LAB-20260516-1001",
+      "before": {
+        "sampleNo": "LAB-20260516-1001",
+        "status": "pending"
+      },
+      "after": {
+        "sampleNo": "LAB-20260516-1001",
+        "status": "pending"
+      }
+    }
+  ],
+  "summaries": [
+    {
+      "sampleNo": "LAB-20260516-1001",
+      "exception": "504 Gateway Timeout - 上游服务响应超时，请检查网络连接",
+      "correction": "已清除网关错误标记，样本状态重置为待检测，建议重新提交或人工复核",
+      "conclusion": "样本数据本身有效，仅为传输层问题，修正后可继续正常处理流程"
+    }
+  ],
+  "nextSteps": [
+    "优先处理 3 个失败样本，详见失败项目清单",
+    "重点核查 2 例重复提交情况，确认是否为系统自动重试导致",
+    "排查 1 例网关错误原因，检查上游服务健康状态",
+    "所有修正后的样本需重新执行审计流程确认问题已解决",
+    "定期统计失败类型，优化系统设计以降低同类问题复发"
+  ]
+}

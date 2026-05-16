@@ -1,0 +1,31 @@
+{
+  "name": "batch-script-audit",
+  "version": "1.0.0",
+  "description": "批量脚本执行审计命令行工具",
+  "main": "dist/index.js",
+  "bin": {
+    "bsa": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "jest"
+  },
+  "keywords": ["audit", "batch", "script", "laboratory"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "@types/jest": "^29.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  }
+}

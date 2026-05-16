@@ -1,0 +1,110 @@
+[
+  {
+    "sampleId": "b99f0c44-4709-4901-ae2e-3d21d95d2deb",
+    "sampleNo": "LAB-20260516-1001",
+    "errors": [
+      {
+        "ruleId": "R002",
+        "ruleName": "重复提交检测",
+        "message": "样本编号 LAB-20260516-1001 在批次内重复提交 2 次"
+      },
+      {
+        "ruleId": "R005",
+        "ruleName": "网关错误摘录",
+        "message": "网关错误: 504 Gateway Timeout - 上游服务响应超时，请检查网络连接"
+      },
+      {
+        "ruleId": "R006",
+        "ruleName": "实验室字段校验",
+        "message": "实验室 外部合作实验室 不在允许列表内"
+      }
+    ],
+    "rawData": {
+      "id": "b99f0c44-4709-4901-ae2e-3d21d95d2deb",
+      "sampleNo": "LAB-20260516-1001",
+      "sampleName": "痰液样本",
+      "sampleType": "常规",
+      "collectionTime": "2026-05-08T00:31:57.289Z",
+      "submitter": "王五",
+      "laboratory": "外部合作实验室",
+      "testItems": [
+        "凝血功能",
+        "D-二聚体",
+        "血小板聚集"
+      ],
+      "status": "failed",
+      "submitTime": "2026-05-16T00:31:57.290Z",
+      "batchId": "DEMO-1778891517289",
+      "gatewayError": "504 Gateway Timeout - 上游服务响应超时，请检查网络连接"
+    },
+    "suggestion": "请删除重复提交记录，保留最新一条并确认数据一致性；建议检查网络连接稳定性，重试提交并监控网关状态"
+  },
+  {
+    "sampleId": "e07ef510-0aa8-465f-9a0b-fc1aeaf02355",
+    "sampleNo": "INVALID-bcggoz4iu",
+    "errors": [
+      {
+        "ruleId": "R001",
+        "ruleName": "样本编号格式校验",
+        "message": "样本编号 INVALID-bcggoz4iu 不符合 LAB-YYYYMMDD-XXXX 格式"
+      },
+      {
+        "ruleId": "R006",
+        "ruleName": "实验室字段校验",
+        "message": "实验室 外部合作实验室 不在允许列表内"
+      }
+    ],
+    "rawData": {
+      "id": "e07ef510-0aa8-465f-9a0b-fc1aeaf02355",
+      "sampleNo": "INVALID-bcggoz4iu",
+      "sampleName": "尿液样本",
+      "sampleType": "加急",
+      "collectionTime": "2026-03-31T00:31:57.289Z",
+      "submitter": "张三",
+      "laboratory": "外部合作实验室",
+      "testItems": [
+        "凝血功能",
+        "D-二聚体",
+        "血小板聚集"
+      ],
+      "status": "pending",
+      "submitTime": "2026-05-16T00:31:57.290Z",
+      "batchId": "DEMO-1778891517289"
+    },
+    "suggestion": "请修正样本编号格式为 LAB-YYYYMMDD-XXXX"
+  },
+  {
+    "sampleId": "7908001c-39df-464e-ba8b-c086aee02f53",
+    "sampleNo": "LAB-20260516-1001",
+    "errors": [
+      {
+        "ruleId": "R002",
+        "ruleName": "重复提交检测",
+        "message": "样本编号 LAB-20260516-1001 在批次内重复提交 2 次"
+      },
+      {
+        "ruleId": "R006",
+        "ruleName": "实验室字段校验",
+        "message": "实验室 外部合作实验室 不在允许列表内"
+      }
+    ],
+    "rawData": {
+      "id": "7908001c-39df-464e-ba8b-c086aee02f53",
+      "sampleNo": "LAB-20260516-1001",
+      "sampleName": "痰液样本",
+      "sampleType": "常规",
+      "collectionTime": "2026-05-08T00:31:57.289Z",
+      "submitter": "王五",
+      "laboratory": "外部合作实验室",
+      "testItems": [
+        "凝血功能",
+        "D-二聚体",
+        "血小板聚集"
+      ],
+      "status": "pending",
+      "submitTime": "2026-05-16T00:32:02.291Z",
+      "batchId": "DEMO-1778891517289"
+    },
+    "suggestion": "请删除重复提交记录，保留最新一条并确认数据一致性"
+  }
+]
