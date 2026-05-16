@@ -1,0 +1,25 @@
+{
+  "name": "s3-policy-compactor",
+  "version": "1.0.0",
+  "description": "S3权限策略压缩CLI工具 - 合并重复授权、识别过宽通配符、生成审计报告",
+  "main": "lib/index.js",
+  "bin": {
+    "s3-policy-compactor": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js"
+  },
+  "keywords": [
+    "s3",
+    "iam",
+    "policy",
+    "security",
+    "audit",
+    "compactor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
