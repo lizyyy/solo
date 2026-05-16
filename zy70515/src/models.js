@@ -51,6 +51,10 @@ const updatePackageStatus = (packageId, newStatus, reason = '') => {
   const pkg = getEvidencePackage(packageId);
   if (!pkg) return null;
   
+  if (pkg.status === newStatus) {
+    return pkg;
+  }
+  
   const validTransitions = {
     [PACKAGE_STATUSES.CREATED]: [PACKAGE_STATUSES.WATERMARKED],
     [PACKAGE_STATUSES.WATERMARKED]: [PACKAGE_STATUSES.AUTHORIZED],
@@ -206,6 +210,24 @@ const recordDownload = (packageId, downloaderId, ipAddress) => {
   const check = checkAuthorization(packageId, downloaderId);
   if (!check.authorized) throw new Error(check.reason);
   
+  const existingRecord = db.get('trackingSummaries')
+    .find({ packageId, downloaderId })
+    .value();
+  
+  if (existingRecord) {
+    return existingRecord;
+  }
+  
+  const pkg = getEvidencePackage(packageId);
+  if (pkg && pkg.status === PACKAGE_STATUSES.DOWNLOADED) {
+    const existingDownload = db.get('trackingSummaries')
+      .filter({ packageId })
+      .value();
+    if (existingDownload.length > 0) {
+      throw new Error('Package already downloaded, duplicate download not allowed');
+    }
+  }
+  
   const now = new Date().toISOString();
   const summaryId = uuidv4();
   
@@ -220,7 +242,14 @@ const recordDownload = (packageId, downloaderId, ipAddress) => {
   };
   
   db.get('trackingSummaries').push(summary).write();
-  updatePackageStatus(packageId, PACKAGE_STATUSES.DOWNLOADED, 'Package downloaded');
+  
+  try {
+    updatePackageStatus(packageId, PACKAGE_STATUSES.DOWNLOADED, 'Package downloaded');
+  } catch (statusError) {
+    db.get('trackingSummaries').remove({ id: summaryId }).write();
+    throw statusError;
+  }
+  
   addAuditLog(packageId, 'downloaded', { downloaderId, ipAddress });
   
   return summary;
@@ -291,12 +320,21 @@ const exportTrackingData = (packageId = null) => {
     ? [getEvidencePackage(packageId)].filter(Boolean)
     : listEvidencePackages();
   
+  const allFailures = listFailures();
+  
   return packages.map(pkg => {
     const watermarks = listWatermarks(pkg.id);
     const authorizations = db.get('authorizations').filter({ packageId: pkg.id }).value();
     const tracking = getTrackingSummary(pkg.id);
     const revocations = db.get('revocationRecords').filter({ packageId: pkg.id }).value();
     const logs = db.get('auditLogs').filter({ packageId: pkg.id }).value();
+    
+    const packageFailures = allFailures.filter(f => {
+      if (f.originalInput && typeof f.originalInput === 'object') {
+        return f.originalInput.packageId === pkg.id;
+      }
+      return false;
+    });
     
     return {
       package: {
@@ -327,6 +365,14 @@ const exportTrackingData = (packageId = null) => {
       auditLog: logs.map(l => ({
         action: l.action,
         timestamp: l.timestamp
+      })),
+      failureRecords: packageFailures.map(f => ({
+        id: f.id,
+        operation: f.operation,
+        originalInput: f.originalInput,
+        processingBasis: f.processingBasis,
+        finalConclusion: f.finalConclusion,
+        timestamp: f.timestamp
       }))
     };
   });
