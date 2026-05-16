@@ -102,13 +102,13 @@ const createRiskEvent = async (eventData) => {
     role: eventData.role
   });
 
-  const device = await recordDeviceFingerprint(account.id, eventData.device_fingerprint);
-  const location = await recordLoginLocation(account.id, eventData.ip_address, eventData.location || {});
-
   const riskResult = await calculateRiskScore(account.id, {
     ...eventData,
     location: eventData.location || {}
   });
+
+  const device = await recordDeviceFingerprint(account.id, eventData.device_fingerprint);
+  const location = await recordLoginLocation(account.id, eventData.ip_address, eventData.location || {});
 
   await run(
     `INSERT INTO risk_events 
