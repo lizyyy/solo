@@ -172,7 +172,7 @@ class CompensationService:
             final_conclusion=final_conclusion
         )
 
-    def handle_failure(self, record_id: int, error_message: str, process_basis: Optional[str] = None) -> CompensationRecord:
+    def handle_failure(self, record_id: int, error_message: str, process_basis: Optional[str] = None, final_conclusion: Optional[str] = None) -> CompensationRecord:
         record = self.get_record(record_id)
         if not record:
             raise ValueError("补偿记录不存在")
@@ -190,6 +190,7 @@ class CompensationService:
             operator="system",
             remark=remark,
             process_basis=process_basis,
+            final_conclusion=final_conclusion,
             error_message=error_message
         )
 

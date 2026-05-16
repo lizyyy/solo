@@ -93,10 +93,10 @@ def handle_success(record_id: int, process_basis: str, final_conclusion: str, db
 
 
 @router.post("/records/{record_id}/failure", response_model=CompensationRecordResponse, summary="标记处理失败")
-def handle_failure(record_id: int, error_message: str, process_basis: str = None, db: Session = Depends(get_db)):
+def handle_failure(record_id: int, error_message: str, process_basis: str = None, final_conclusion: str = None, db: Session = Depends(get_db)):
     try:
         service = CompensationService(db)
-        return service.handle_failure(record_id, error_message, process_basis)
+        return service.handle_failure(record_id, error_message, process_basis, final_conclusion)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
