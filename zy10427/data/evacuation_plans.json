@@ -1,0 +1,409 @@
+{
+  "85cee435-046f-4aaf-9302-d5e057feca5f": {
+    "plan_id": "85cee435-046f-4aaf-9302-d5e057feca5f",
+    "region_name": "验证-机房",
+    "created_at": "2026-05-16T14:27:07.199561",
+    "created_by": "tester",
+    "status": "COMPLETED",
+    "tenant_bindings": [
+      {
+        "tenant_id": "V001",
+        "tenant_name": "验证租户",
+        "bind_time": "2026-05-16T14:27:07.199304",
+        "local_resources": [
+          "MySQL-01"
+        ],
+        "traffic_percentage": 100.0,
+        "dependency_check_passed": null,
+        "block_reason": null
+      }
+    ],
+    "local_dependencies": [
+      {
+        "resource_type": "DB",
+        "resource_name": "MySQL-Main",
+        "is_critical": true,
+        "check_status": "PASS",
+        "detail": null
+      }
+    ],
+    "evacuation_steps": [
+      {
+        "step_id": "1079a02d-f05e-4ba2-8212-9361b277b5c5",
+        "step_order": 1,
+        "target_percentage": 75,
+        "status": "COMPLETED",
+        "executed_at": "2026-05-16T14:27:07.202279",
+        "result": "SUCCESS",
+        "detail": "流量已调整至75%"
+      },
+      {
+        "step_id": "8bd0e386-4745-477f-811f-1f56fab9fa33",
+        "step_order": 2,
+        "target_percentage": 50,
+        "status": "COMPLETED",
+        "executed_at": "2026-05-16T14:27:07.203614",
+        "result": "SUCCESS",
+        "detail": "流量已调整至50%"
+      },
+      {
+        "step_id": "d3dad331-a7a4-4fc1-bb97-582b0f89a49b",
+        "step_order": 3,
+        "target_percentage": 25,
+        "status": "COMPLETED",
+        "executed_at": "2026-05-16T14:27:07.205185",
+        "result": "SUCCESS",
+        "detail": "流量已调整至25%"
+      },
+      {
+        "step_id": "a207fe22-2858-41ca-bf0d-ee9ad88ba6db",
+        "step_order": 4,
+        "target_percentage": 0,
+        "status": "COMPLETED",
+        "executed_at": "2026-05-16T14:27:07.206215",
+        "result": "SUCCESS",
+        "detail": "流量已调整至0%"
+      }
+    ],
+    "execution_logs": [
+      {
+        "log_id": "915ea0bf-d5b7-4b8c-bfab-72e599856f16",
+        "timestamp": "2026-05-16T14:27:07.200156",
+        "action": "CREATE_PLAN",
+        "operator": "tester",
+        "original_input": {
+          "region_name": "验证-机房",
+          "created_by": "tester",
+          "tenant_count": 1,
+          "dependency_count": 1,
+          "target_percentage": 0.0
+        },
+        "processing_result": {
+          "plan_id": "85cee435-046f-4aaf-9302-d5e057feca5f"
+        },
+        "conclusion": "撤离计划创建成功"
+      },
+      {
+        "log_id": "d5bf7448-6c12-40b7-92b4-94c18c8021bb",
+        "timestamp": "2026-05-16T14:27:07.201115",
+        "action": "REVIEW_PLAN",
+        "operator": "reviewer",
+        "original_input": {
+          "approved": true,
+          "reason": ""
+        },
+        "processing_result": {
+          "new_status": "IN_PROGRESS"
+        },
+        "conclusion": "计划复核通过，进入执行中状态"
+      },
+      {
+        "log_id": "2578ca0c-4bf7-46e6-9a63-a44194372bda",
+        "timestamp": "2026-05-16T14:27:07.203003",
+        "action": "ADVANCE_STEP",
+        "operator": "operator",
+        "original_input": {
+          "force": false
+        },
+        "processing_result": {
+          "step_index": 0,
+          "target_percentage": 75
+        },
+        "conclusion": "步骤1执行完成，当前流量: 75%"
+      },
+      {
+        "log_id": "bee34bda-58eb-480b-8f9f-23ea8644b450",
+        "timestamp": "2026-05-16T14:27:07.204445",
+        "action": "ADVANCE_STEP",
+        "operator": "operator",
+        "original_input": {
+          "force": false
+        },
+        "processing_result": {
+          "step_index": 1,
+          "target_percentage": 50
+        },
+        "conclusion": "步骤2执行完成，当前流量: 50%"
+      },
+      {
+        "log_id": "3e694689-a64c-4771-afb0-85d876200eb4",
+        "timestamp": "2026-05-16T14:27:07.205704",
+        "action": "ADVANCE_STEP",
+        "operator": "operator",
+        "original_input": {
+          "force": false
+        },
+        "processing_result": {
+          "step_index": 2,
+          "target_percentage": 25
+        },
+        "conclusion": "步骤3执行完成，当前流量: 25%"
+      },
+      {
+        "log_id": "34c751aa-25c2-48bb-b2f1-d189be609ca5",
+        "timestamp": "2026-05-16T14:27:07.206704",
+        "action": "ADVANCE_STEP",
+        "operator": "operator",
+        "original_input": {
+          "force": false
+        },
+        "processing_result": {
+          "step_index": 3,
+          "target_percentage": 0
+        },
+        "conclusion": "流量已成功撤离至目标值，最终流量: 0%"
+      }
+    ],
+    "current_step_index": 4,
+    "overall_traffic_percentage": 0,
+    "block_reason": null,
+    "updated_at": "2026-05-16T14:27:07.206706",
+    "completed_at": "2026-05-16T14:27:07.206218"
+  },
+  "f5a80aa2-b66b-41c7-b6fb-9c4250328acf": {
+    "plan_id": "f5a80aa2-b66b-41c7-b6fb-9c4250328acf",
+    "region_name": "异常-机房",
+    "created_at": "2026-05-16T14:27:07.207447",
+    "created_by": "tester2",
+    "status": "COMPENSATED",
+    "tenant_bindings": [
+      {
+        "tenant_id": "E001",
+        "tenant_name": "异常租户",
+        "bind_time": "2026-05-16T14:27:07.207433",
+        "local_resources": [],
+        "traffic_percentage": 100.0,
+        "dependency_check_passed": null,
+        "block_reason": null
+      }
+    ],
+    "local_dependencies": [
+      {
+        "resource_type": "Net",
+        "resource_name": "Switch",
+        "is_critical": true,
+        "check_status": "PASS",
+        "detail": null
+      }
+    ],
+    "evacuation_steps": [
+      {
+        "step_id": "72ab8038-c60e-44f5-b612-d033fb018ef6",
+        "step_order": 1,
+        "target_percentage": 75,
+        "status": "PENDING",
+        "executed_at": null,
+        "result": null,
+        "detail": null
+      },
+      {
+        "step_id": "ddf678eb-a7b1-4d77-bd6e-fe5d534fa3fd",
+        "step_order": 2,
+        "target_percentage": 50,
+        "status": "PENDING",
+        "executed_at": null,
+        "result": null,
+        "detail": null
+      }
+    ],
+    "execution_logs": [
+      {
+        "log_id": "08eab83a-26e8-4011-b897-b6e3d4b936fc",
+        "timestamp": "2026-05-16T14:27:07.208208",
+        "action": "CREATE_PLAN",
+        "operator": "tester2",
+        "original_input": {
+          "region_name": "异常-机房",
+          "created_by": "tester2",
+          "tenant_count": 1,
+          "dependency_count": 1,
+          "target_percentage": 50.0
+        },
+        "processing_result": {
+          "plan_id": "f5a80aa2-b66b-41c7-b6fb-9c4250328acf"
+        },
+        "conclusion": "撤离计划创建成功"
+      },
+      {
+        "log_id": "68089d86-86ec-4c86-8496-59d6964750ba",
+        "timestamp": "2026-05-16T14:27:07.209606",
+        "action": "REVIEW_PLAN",
+        "operator": "admin",
+        "original_input": {
+          "approved": true,
+          "reason": ""
+        },
+        "processing_result": {
+          "block_reasons": [
+            "关键依赖[Net:Switch]检查失败: 未知原因"
+          ]
+        },
+        "conclusion": "依赖检查失败，计划被拦截"
+      },
+      {
+        "log_id": "bccd89e9-ca34-4c3a-8fe7-e6d4de47d478",
+        "timestamp": "2026-05-16T14:27:07.213136",
+        "action": "MANUAL_CORRECT",
+        "operator": "senior",
+        "original_input": {
+          "local_dependencies": [
+            {
+              "resource_type": "Net",
+              "resource_name": "Switch",
+              "check_status": "PASS"
+            }
+          ],
+          "status": "IN_PROGRESS"
+        },
+        "processing_result": {
+          "changes": [
+            "状态从[BLOCKED]调整为[IN_PROGRESS]",
+            "依赖[Net:Switch]状态已更新"
+          ]
+        },
+        "conclusion": "状态从[BLOCKED]调整为[IN_PROGRESS]; 依赖[Net:Switch]状态已更新"
+      },
+      {
+        "log_id": "5da839a5-69c2-4d83-aa98-ea76a70190ff",
+        "timestamp": "2026-05-16T14:27:07.214878",
+        "action": "HANDLE_EXCEPTION",
+        "operator": "sre",
+        "original_input": {
+          "exception_type": "TEST_ERR",
+          "exception_detail": "测试异常",
+          "compensate": true
+        },
+        "processing_result": {
+          "original_status": "IN_PROGRESS",
+          "new_status": "COMPENSATED"
+        },
+        "conclusion": "已执行异常补偿，原状态[IN_PROGRESS]，现状态[COMPENSATED]"
+      }
+    ],
+    "current_step_index": 0,
+    "overall_traffic_percentage": 100.0,
+    "block_reason": "异常补偿: TEST_ERR - 测试异常",
+    "updated_at": "2026-05-16T14:27:07.214884",
+    "completed_at": null
+  },
+  "506d17ce-100e-4c26-a658-cb26234734d3": {
+    "plan_id": "506d17ce-100e-4c26-a658-cb26234734d3",
+    "region_name": "API-测试机房",
+    "created_at": "2026-05-16T14:38:39.134780",
+    "created_by": "api_tester",
+    "status": "PARTIAL",
+    "tenant_bindings": [
+      {
+        "tenant_id": "A001",
+        "tenant_name": "API测试租户",
+        "bind_time": "2026-05-16T14:38:39.134746",
+        "local_resources": [
+          "MySQL",
+          "Redis"
+        ],
+        "traffic_percentage": 100.0,
+        "dependency_check_passed": null,
+        "block_reason": null
+      }
+    ],
+    "local_dependencies": [
+      {
+        "resource_type": "DB",
+        "resource_name": "MySQL",
+        "is_critical": true,
+        "check_status": "PASS",
+        "detail": null
+      }
+    ],
+    "evacuation_steps": [
+      {
+        "step_id": "b7d8ae52-7f35-4873-9be9-54a7cd7a7cdc",
+        "step_order": 1,
+        "target_percentage": 75,
+        "status": "COMPLETED",
+        "executed_at": "2026-05-16T14:38:49.684346",
+        "result": "SUCCESS",
+        "detail": "流量已调整至75%"
+      },
+      {
+        "step_id": "f88ab361-624f-420e-81d4-29f0b3ad2c01",
+        "step_order": 2,
+        "target_percentage": 50,
+        "status": "PENDING",
+        "executed_at": null,
+        "result": null,
+        "detail": null
+      },
+      {
+        "step_id": "5320b19b-9b4b-4119-b541-9aae3a85813f",
+        "step_order": 3,
+        "target_percentage": 25,
+        "status": "PENDING",
+        "executed_at": null,
+        "result": null,
+        "detail": null
+      },
+      {
+        "step_id": "079671f8-e44c-4011-ba8e-f6476618fb3a",
+        "step_order": 4,
+        "target_percentage": 0,
+        "status": "PENDING",
+        "executed_at": null,
+        "result": null,
+        "detail": null
+      }
+    ],
+    "execution_logs": [
+      {
+        "log_id": "ecedcd72-10fe-470a-8dbf-ba22baa057a0",
+        "timestamp": "2026-05-16T14:38:39.141410",
+        "action": "CREATE_PLAN",
+        "operator": "api_tester",
+        "original_input": {
+          "region_name": "API-测试机房",
+          "created_by": "api_tester",
+          "tenant_count": 1,
+          "dependency_count": 1,
+          "target_percentage": 0.0
+        },
+        "processing_result": {
+          "plan_id": "506d17ce-100e-4c26-a658-cb26234734d3"
+        },
+        "conclusion": "撤离计划创建成功"
+      },
+      {
+        "log_id": "a1184770-849b-4181-bc88-6ceec3c7cc46",
+        "timestamp": "2026-05-16T14:38:49.595861",
+        "action": "REVIEW_PLAN",
+        "operator": "reviewer_admin",
+        "original_input": {
+          "approved": true,
+          "reason": ""
+        },
+        "processing_result": {
+          "new_status": "IN_PROGRESS"
+        },
+        "conclusion": "计划复核通过，进入执行中状态"
+      },
+      {
+        "log_id": "8cc9956d-e851-4e52-9b9f-91f77558506a",
+        "timestamp": "2026-05-16T14:38:49.688943",
+        "action": "ADVANCE_STEP",
+        "operator": "operator_001",
+        "original_input": {
+          "force": false
+        },
+        "processing_result": {
+          "step_index": 0,
+          "target_percentage": 75
+        },
+        "conclusion": "步骤1执行完成，当前流量: 75%"
+      }
+    ],
+    "current_step_index": 1,
+    "overall_traffic_percentage": 75,
+    "block_reason": null,
+    "updated_at": "2026-05-16T14:38:49.688951",
+    "completed_at": null
+  }
+}
