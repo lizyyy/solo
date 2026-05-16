@@ -196,7 +196,26 @@ async function approveRequest(requestId, approver, comment) {
 
   const lender = await getTeamByName(record.lender_team);
   const resourceKey = record.resource_type === 'CPU' ? 'cpu_used' : 'storage_used';
-  
+  const quotaKey = record.resource_type === 'CPU' ? 'cpu_quota' : 'storage_quota';
+  const available = lender[quotaKey] - lender[resourceKey];
+
+  if (record.amount > available) {
+    const error = {
+      code: 'INSUFFICIENT_QUOTA',
+      message: '出借方' + record.resource_type + '配额不足，可用: ' + available + ', 请求: ' + record.amount
+    };
+    await logOperation(
+      record.id,
+      'APPROVE_FAILED',
+      approver,
+      { requestId, approver, comment },
+      '审批时重新校验出借方配额是否充足',
+      null,
+      error.message
+    );
+    throw error;
+  }
+
   await run(
     `UPDATE teams SET ${resourceKey} = ${resourceKey} + ?, updated_at = CURRENT_TIMESTAMP WHERE name = ?`,
     [record.amount, record.lender_team]
