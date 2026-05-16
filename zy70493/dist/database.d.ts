@@ -1,0 +1,15 @@
+import type { Database } from 'sqlite';
+import { OfflineMemberRenewal, BuildArtifact, WhitelistRecord, LabSample, AbnormalSample, QueryFilter } from './types';
+export declare function initDatabase(dbPath?: string): Promise<Database>;
+export declare function insertOfflineMemberRenewal(item: Omit<OfflineMemberRenewal, 'id' | 'createdAt' | 'updatedAt'>): Promise<string>;
+export declare function queryOfflineMemberRenewals(filter?: QueryFilter): Promise<OfflineMemberRenewal[]>;
+export declare function insertWhitelistRecord(item: Omit<WhitelistRecord, 'id'>): Promise<string>;
+export declare function queryWhitelistRecords(filter?: QueryFilter): Promise<WhitelistRecord[]>;
+export declare function insertLabSample(item: Omit<LabSample, 'id'>): Promise<string>;
+export declare function queryLabSamples(filter?: QueryFilter): Promise<LabSample[]>;
+export declare function insertAbnormalSample(item: Omit<AbnormalSample, 'id'>): Promise<string>;
+export declare function queryAbnormalSamples(filter?: QueryFilter): Promise<AbnormalSample[]>;
+export declare function markSampleAsExported(id: string): Promise<void>;
+export declare function insertBuildArtifact(item: Omit<BuildArtifact, 'id'>): Promise<string>;
+export declare function getDatabase(): Promise<Database>;
+export declare function closeDatabase(): Promise<void>;
