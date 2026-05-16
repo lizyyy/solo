@@ -1,0 +1,51 @@
+{
+  "batch_id": "488db66f-b74b-4a44-b6b5-809139941184",
+  "started_at": "2026-05-16T08:41:46.707763",
+  "completed_at": "2026-05-16T08:41:46.707763",
+  "total_count": 2,
+  "success_count": 2,
+  "fail_count": 0,
+  "confirmed": false,
+  "confirmed_by": null,
+  "confirmed_at": null,
+  "records": [
+    {
+      "id": "a16f6504-b6fb-4938-84e2-01b6695f5c08",
+      "batch_id": "488db66f-b74b-4a44-b6b5-809139941184",
+      "item_id": "1",
+      "client_id": "c1",
+      "status": "success",
+      "signature": "1778892106.8678738f4c8a26d4ceb018cbedde279add5a0adda367bfabd6f6095db1604f88",
+      "error_code": null,
+      "error_message": null,
+      "original_params": {
+        "keyword": "商品A"
+      },
+      "compensated": false,
+      "execution_time_ms": 0.008821487426757812,
+      "created_at": "2026-05-16T08:41:46.707770",
+      "confirmed": false,
+      "confirmed_by": null,
+      "confirmed_at": null
+    },
+    {
+      "id": "e94a1099-9901-4eec-938e-6d682e99832e",
+      "batch_id": "488db66f-b74b-4a44-b6b5-809139941184",
+      "item_id": "2",
+      "client_id": "c1",
+      "status": "success",
+      "signature": "1778892106.7d049814cd1d1a32bdcf0eb2babca1114cfc4fa28bb8657ffb3c5360e4492503",
+      "error_code": null,
+      "error_message": null,
+      "original_params": {
+        "keyword": "测试违禁"
+      },
+      "compensated": false,
+      "execution_time_ms": 0.006198883056640625,
+      "created_at": "2026-05-16T08:41:46.707775",
+      "confirmed": false,
+      "confirmed_by": null,
+      "confirmed_at": null
+    }
+  ]
+}

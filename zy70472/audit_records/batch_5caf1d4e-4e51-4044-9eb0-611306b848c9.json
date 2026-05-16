@@ -1,0 +1,51 @@
+{
+  "batch_id": "5caf1d4e-4e51-4044-9eb0-611306b848c9",
+  "started_at": "2026-05-16T08:42:47.576044",
+  "completed_at": "2026-05-16T08:42:47.576045",
+  "total_count": 2,
+  "success_count": 1,
+  "fail_count": 1,
+  "confirmed": false,
+  "confirmed_by": null,
+  "confirmed_at": null,
+  "records": [
+    {
+      "id": "b580eea8-e271-407d-9c6c-844814cbdec7",
+      "batch_id": "5caf1d4e-4e51-4044-9eb0-611306b848c9",
+      "item_id": "1",
+      "client_id": "c1",
+      "status": "success",
+      "signature": "1778892167.d2241f946b600df7455b767583ed44b6ee8a38ad74723f8c78ed2c665d1ba858",
+      "error_code": null,
+      "error_message": null,
+      "original_params": {
+        "keyword": "商品A"
+      },
+      "compensated": false,
+      "execution_time_ms": 0.025987625122070312,
+      "created_at": "2026-05-16T08:42:47.576054",
+      "confirmed": false,
+      "confirmed_by": null,
+      "confirmed_at": null
+    },
+    {
+      "id": "d82d985a-0759-460e-8316-40cba5cb1f61",
+      "batch_id": "5caf1d4e-4e51-4044-9eb0-611306b848c9",
+      "item_id": "2",
+      "client_id": "c1",
+      "status": "failed",
+      "signature": null,
+      "error_code": "GRAY_SEARCH_WORD_DETECTED",
+      "error_message": "灰度搜索词检测失败: GRAY_SEARCH_WORD: score=0.800, 补偿机制未启用",
+      "original_params": {
+        "keyword": "测试违禁"
+      },
+      "compensated": false,
+      "execution_time_ms": 0.009059906005859375,
+      "created_at": "2026-05-16T08:42:47.576138",
+      "confirmed": false,
+      "confirmed_by": null,
+      "confirmed_at": null
+    }
+  ]
+}

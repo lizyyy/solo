@@ -1,0 +1,70 @@
+{
+  "batch_id": "22abae66-45ca-4b69-99b1-d7141af8dbbb",
+  "started_at": "2026-05-16T08:42:19.128130",
+  "completed_at": "2026-05-16T08:42:19.128131",
+  "total_count": 3,
+  "success_count": 3,
+  "fail_count": 0,
+  "confirmed": false,
+  "confirmed_by": null,
+  "confirmed_at": null,
+  "records": [
+    {
+      "id": "2728a85a-2a3a-4093-9dfc-96580102dae0",
+      "batch_id": "22abae66-45ca-4b69-99b1-d7141af8dbbb",
+      "item_id": "1",
+      "client_id": "c1",
+      "status": "success",
+      "signature": "1778892139.d5177867e327497652c5fe0fd11e52e5502099b367bb8d8477a63a063b3e4df3",
+      "error_code": null,
+      "error_message": null,
+      "original_params": {
+        "keyword": "商品A"
+      },
+      "compensated": false,
+      "execution_time_ms": 0.009059906005859375,
+      "created_at": "2026-05-16T08:42:19.128137",
+      "confirmed": false,
+      "confirmed_by": null,
+      "confirmed_at": null
+    },
+    {
+      "id": "dec82491-e6f8-48a8-8a76-12bde8bd4c6a",
+      "batch_id": "22abae66-45ca-4b69-99b1-d7141af8dbbb",
+      "item_id": "2",
+      "client_id": "c1",
+      "status": "success",
+      "signature": "1778892139.a1065e55318aac4a48b1a9be7dea59c0da740737916502b1a36dd04e586b2e33",
+      "error_code": null,
+      "error_message": null,
+      "original_params": {
+        "keyword": "测试违禁"
+      },
+      "compensated": true,
+      "execution_time_ms": 0.008821487426757812,
+      "created_at": "2026-05-16T08:42:19.128142",
+      "confirmed": false,
+      "confirmed_by": null,
+      "confirmed_at": null
+    },
+    {
+      "id": "3374b5bb-0573-4f2f-bd49-854be8b78da2",
+      "batch_id": "22abae66-45ca-4b69-99b1-d7141af8dbbb",
+      "item_id": "3",
+      "client_id": "c2",
+      "status": "success",
+      "signature": "1778892139.304a6b762320820239918ddb9284779ec74e5cb18b1d3beae04fddb024f64ea8",
+      "error_code": null,
+      "error_message": null,
+      "original_params": {
+        "keyword": "灰色搜索词"
+      },
+      "compensated": false,
+      "execution_time_ms": 0.00476837158203125,
+      "created_at": "2026-05-16T08:42:19.128146",
+      "confirmed": false,
+      "confirmed_by": null,
+      "confirmed_at": null
+    }
+  ]
+}
