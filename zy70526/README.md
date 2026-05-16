@@ -116,6 +116,21 @@ curl "http://localhost:3000/api/risk-samples?dataset_id={datasetId}&risk_level=h
 curl -X PATCH http://localhost:3000/api/risk-samples/{sampleId}/status \
   -H "Content-Type: application/json" \
   -d '{"status":"approved"}'
+
+# 人工修正风险样本（包含操作者、修正原因和变更记录）
+curl -X POST http://localhost:3000/api/risk-samples/{sampleId}/correction \
+  -H "Content-Type: application/json" \
+  -d '{
+    "operator": "张三",
+    "correction_reason": "人工审核后降低风险等级",
+    "new_risk_level": "low",
+    "new_status": "approved",
+    "new_identified_fields": ["phone"],
+    "remarks": "经审核，仅手机号需要脱敏"
+  }'
+
+# 查询修正记录
+curl http://localhost:3000/api/risk-samples/{sampleId}/corrections
 ```
 
 ### 仲裁流程
