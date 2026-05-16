@@ -12,7 +12,7 @@ from models import (
 from services import DeduplicationService, ExportService
 from data import generate_all_samples
 
-router = APIRouter(prefix="/receipt", tags=["收据管理"])
+router = APIRouter(tags=["收据管理"])
 
 deduplication_service = DeduplicationService()
 export_service = ExportService()
@@ -38,14 +38,6 @@ async def run_deduplication(fields: List[str] = None):
     
     result = deduplication_service.run_full_deduplication(fields)
     return result
-
-
-@router.get("/{receipt_id}", response_model=DeviceLedger)
-async def get_receipt(receipt_id: str):
-    receipt = deduplication_service.get_original_receipt(receipt_id)
-    if not receipt:
-        raise HTTPException(status_code=404, detail="收据不存在")
-    return receipt
 
 
 @router.get("/original/{original_id}", response_model=DeviceLedger)
@@ -118,3 +110,11 @@ async def get_statistics():
         "duplicate_count": len(deduplication_service.duplicates),
         "abnormal_count": len(deduplication_service.abnormal_records),
     }
+
+
+@router.get("/{receipt_id}", response_model=DeviceLedger)
+async def get_receipt(receipt_id: str):
+    receipt = deduplication_service.get_original_receipt(receipt_id)
+    if not receipt:
+        raise HTTPException(status_code=404, detail="收据不存在")
+    return receipt

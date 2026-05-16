@@ -5,7 +5,7 @@ from models import ExportRequest, ExportResult, ApprovalNode
 from services import DeduplicationService, ExportService
 from data import generate_all_samples
 
-router = APIRouter(prefix="/export", tags=["导出管理"])
+router = APIRouter(tags=["导出管理"])
 
 deduplication_service = DeduplicationService()
 export_service = ExportService()

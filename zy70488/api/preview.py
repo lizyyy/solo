@@ -6,7 +6,7 @@ from models import BatchPreviewRequest, BatchPreviewResult, ApprovalNode
 from services import DeduplicationService
 from data import generate_all_samples
 
-router = APIRouter(prefix="/preview", tags=["批量预览"])
+router = APIRouter(tags=["批量预览"])
 
 deduplication_service = DeduplicationService()
 
