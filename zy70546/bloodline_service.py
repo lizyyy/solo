@@ -69,8 +69,9 @@ def process_single_bloodline(
     db: Session,
     bloodline: BloodlineRelation,
     batch_id: str
-) -> List[Notification]:
+) -> Tuple[List[Notification], List[FailureRecord]]:
     notifications = []
+    failure_records = []
     subscriptions = db.query(BloodlineSubscription).filter(
         BloodlineSubscription.status == SubscriptionStatus.ACTIVE
     ).all()
@@ -90,6 +91,7 @@ def process_single_bloodline(
                 notification.status = NotificationStatus.FILTERED
                 notification.filter_reason = match_reason
                 db.add(notification)
+                notifications.append(notification)
                 continue
             
             notification.status = NotificationStatus.MATCHED
@@ -102,6 +104,7 @@ def process_single_bloodline(
                 notification.status = NotificationStatus.FILTERED
                 notification.filter_reason = f"去重拦截: 同一团队同一血缘已通知过 (key: {dedup_key[:8]}...)"
                 db.add(notification)
+                notifications.append(notification)
                 continue
             
             notification.status = NotificationStatus.DEDUPLICATED
@@ -139,8 +142,10 @@ def process_single_bloodline(
                 final_conclusion="处理异常，已记录失败信息"
             )
             db.add(failure_record)
+            notifications.append(notification)
+            failure_records.append(failure_record)
     
-    return notifications
+    return notifications, failure_records
 
 def batch_process_bloodline_changes(
     db: Session,
@@ -176,7 +181,7 @@ def batch_process_bloodline_changes(
             db.add(bloodline)
             db.flush()
             
-            notifications = process_single_bloodline(db, bloodline, batch_id)
+            notifications, failure_records = process_single_bloodline(db, bloodline, batch_id)
             all_notifications.extend(notifications)
             
             for n in notifications:
@@ -189,6 +194,28 @@ def batch_process_bloodline_changes(
                     
         except Exception as e:
             failed_count += 1
+            failure_record = FailureRecord(
+                notification_id=None,
+                original_input={
+                    "bloodline_change": {
+                        "field_name": change.field_name,
+                        "upstream_table": change.upstream_table,
+                        "downstream_report": change.downstream_report,
+                        "change_type": change.change_type,
+                        "change_description": change.change_description
+                    }
+                },
+                processing_rules={
+                    "match_logic": "pattern_match使用fnmatch通配符匹配",
+                    "dedup_logic": "基于字段+表+报表+团队+变更类型的MD5去重",
+                    "filter_logic": "订阅状态必须为ACTIVE",
+                    "bloodline_creation": "创建BloodlineRelation并flush"
+                },
+                error_message=str(e),
+                error_stack=traceback.format_exc(),
+                final_conclusion="批次处理外部异常，血缘关系创建或后续处理失败"
+            )
+            db.add(failure_record)
     
     batch.matched_count = matched_count
     batch.filtered_count = filtered_count
