@@ -26,6 +26,25 @@ public class VerificationService {
     private final ConflictFieldRepository conflictRepository;
     private final MergeSuggestionRepository suggestionRepository;
     private final ConfirmationRecordRepository confirmationRepository;
+    private final VerificationHistoryRepository historyRepository;
+
+    private void recordHistory(Long taskId, VerificationStatus previousStatus, VerificationStatus newStatus,
+                               String actionType, String operatorId, String operatorName, String description,
+                               String fieldName, String finalValue, Integer conflictCount, Integer trustScore) {
+        VerificationHistory history = new VerificationHistory();
+        history.setTaskId(taskId);
+        history.setPreviousStatus(previousStatus);
+        history.setNewStatus(newStatus);
+        history.setActionType(actionType);
+        history.setOperatorId(operatorId);
+        history.setOperatorName(operatorName);
+        history.setDescription(description);
+        history.setFieldName(fieldName);
+        history.setFinalValue(finalValue);
+        history.setConflictCount(conflictCount);
+        history.setTrustScore(trustScore);
+        historyRepository.save(history);
+    }
 
     @Transactional
     public ResponseEntity<ApiResponse<VerificationResult>> createVerification(CreateVerificationRequest request) {
@@ -40,8 +59,13 @@ public class VerificationService {
         task.setBusinessType(request.getBusinessType());
         task.setDescription(request.getDescription());
         task.setCreatedBy(request.getCreatedBy());
-        task.setStatus(VerificationStatus.VERIFYING);
+        task.setStatus(VerificationStatus.CREATED);
         task = taskRepository.save(task);
+
+        recordHistory(task.getId(), null, VerificationStatus.CREATED,
+                "创建任务", request.getCreatedBy(), null,
+                "创建校验任务，请求ID: " + request.getRequestId(),
+                null, null, null, null);
 
         List<PersonIdentifier> identifiers = new ArrayList<>();
         for (CreateVerificationRequest.IdentityData identityData : request.getIdentityDataList()) {
@@ -105,11 +129,25 @@ public class VerificationService {
         task.setTrustLevel(TrustLevel.fromScore(trustScore));
         task.setConflictCount(conflicts.size());
 
+        VerificationStatus previousStatus = task.getStatus();
+        recordHistory(task.getId(), previousStatus, VerificationStatus.VERIFYING,
+                "开始校验", task.getCreatedBy(), null,
+                "多源校验开始，数据源数量: " + identifiers.size(),
+                null, null, conflicts.size(), trustScore);
+
         if (conflicts.isEmpty()) {
             task.setStatus(VerificationStatus.CONFIRMED);
             task.setCompletedAt(LocalDateTime.now());
+            recordHistory(task.getId(), VerificationStatus.VERIFYING, VerificationStatus.CONFIRMED,
+                    "校验完成", task.getCreatedBy(), null,
+                    "校验完成，无冲突，信任评分: " + trustScore,
+                    null, null, 0, trustScore);
         } else {
             task.setStatus(VerificationStatus.PENDING_CONFIRM);
+            recordHistory(task.getId(), VerificationStatus.VERIFYING, VerificationStatus.PENDING_CONFIRM,
+                    "发现冲突", task.getCreatedBy(), null,
+                    "校验完成，发现 " + conflicts.size() + " 个字段冲突，待人工确认，信任评分: " + trustScore,
+                    null, null, conflicts.size(), trustScore);
         }
 
         taskRepository.save(task);
@@ -252,14 +290,25 @@ public class VerificationService {
                 record.setFieldName(conflict.getFieldName());
                 record.setFinalValue(resolution.getFinalValue());
                 confirmationRepository.save(record);
+
+                recordHistory(taskId, task.getStatus(), task.getStatus(),
+                        "解决冲突", request.getOperatorId(), request.getOperatorName(),
+                        "解决字段冲突: " + conflict.getFieldName(),
+                        conflict.getFieldName(), resolution.getFinalValue(), null, null);
             }
         }
 
         List<ConflictField> remainingConflicts = conflictRepository.findByTaskIdAndResolved(taskId, false);
         if (remainingConflicts.isEmpty()) {
+            VerificationStatus previousStatus = task.getStatus();
             task.setStatus(VerificationStatus.MERGED);
             task.setCompletedAt(LocalDateTime.now());
             task.setFinalIdentity("已完成人工确认的最终身份数据");
+
+            recordHistory(taskId, previousStatus, VerificationStatus.MERGED,
+                    "完成合并", request.getOperatorId(), request.getOperatorName(),
+                    "所有冲突已解决，校验完成合并",
+                    null, null, 0, task.getTrustScore());
         }
 
         taskRepository.save(task);
@@ -271,8 +320,15 @@ public class VerificationService {
         VerificationTask task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("校验任务不存在"));
 
+        VerificationStatus previousStatus = task.getStatus();
         task.setStatus(VerificationStatus.REVOKED);
         task.setDescription(task.getDescription() + " [撤销原因: " + reason + "]");
+
+        recordHistory(taskId, previousStatus, VerificationStatus.REVOKED,
+                "撤销任务", task.getCreatedBy(), null,
+                "任务被撤销，原因: " + reason,
+                null, null, task.getConflictCount(), task.getTrustScore());
+
         taskRepository.save(task);
 
         return ApiResponse.successEntity("校验任务已撤销", buildResult(task));
@@ -289,19 +345,10 @@ public class VerificationService {
     }
 
     public ResponseEntity<ApiResponse<List<VerificationHistory>>> getHistory(Long taskId) {
-        List<ConfirmationRecord> records = confirmationRepository.findByTaskId(taskId);
-        List<VerificationHistory> history = records.stream()
-                .map(r -> {
-                    VerificationHistory h = new VerificationHistory();
-                    h.setTimestamp(r.getCreatedAt());
-                    h.setOperator(r.getOperatorName());
-                    h.setAction("人工确认");
-                    h.setFieldName(r.getFieldName());
-                    h.setFinalValue(r.getFinalValue());
-                    h.setComments(r.getComments());
-                    return h;
-                })
-                .collect(Collectors.toList());
+        if (!taskRepository.existsById(taskId)) {
+            throw new RuntimeException("校验任务不存在");
+        }
+        List<VerificationHistory> history = historyRepository.findByTaskIdOrderByCreatedAtAsc(taskId);
         return ApiResponse.successEntity(history);
     }
 

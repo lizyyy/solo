@@ -34,11 +34,38 @@
 - 重复请求直接返回已有结果，不产生脏数据
 - 重复请求返回 HTTP 409 Conflict 状态码
 
-### 5. 导出功能
+### 5. 完整历史追踪
+- 记录所有状态变更轨迹
+- 支持回答"哪一步改了结果"
+- 可追踪操作包括：
+  - 任务创建
+  - 校验开始
+  - 校验完成(无冲突)
+  - 发现冲突(待确认)
+  - 解决单个冲突
+  - 完成全部合并
+  - 撤销任务
+- 每次记录包含：操作类型、前后状态、操作人、时间戳、变更详情
+
+### 6. 导出功能
 - 支持校验结果 JSON 导出
 - 支持 Excel 多工作表导出
 
 ## 启动方式
+
+### 快速启动脚本 (推荐)
+项目自带环境检测和启动脚本，自动检测环境并提供运行方案：
+
+```bash
+./quick-start.sh
+```
+
+脚本会：
+1. 自动检测 Java 版本和类型 (JDK/JRE)
+2. 检测 Maven 环境
+3. 检查是否有已编译好的 JAR
+4. 提供合适的启动方案
+5. 显示完整 API 信息和状态流转图
 
 ### 环境要求
 - **JDK 8+** (需要完整 JDK，仅 JRE 无法编译。推荐 JDK 1.8 或更高)
@@ -155,10 +182,80 @@ POST /api/verification/{taskId}/revoke?reason=撤销原因
 GET /api/verification/list?status=PENDING_CONFIRM
 ```
 
-### 7. 查询历史记录
+### 7. 查询历史记录 (追踪哪一步改了结果)
 ```
 GET /api/verification/{taskId}/history
 ```
+
+**返回示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": [
+    {
+      "id": 1,
+      "taskId": 123,
+      "previousStatus": null,
+      "newStatus": "CREATED",
+      "actionType": "创建任务",
+      "operatorId": "system",
+      "description": "创建校验任务，请求ID: REQ-001",
+      "createdAt": "2024-01-15T10:30:00"
+    },
+    {
+      "id": 2,
+      "taskId": 123,
+      "previousStatus": "CREATED",
+      "newStatus": "VERIFYING",
+      "actionType": "开始校验",
+      "description": "多源校验开始，数据源数量: 3",
+      "conflictCount": 2,
+      "trustScore": 65,
+      "createdAt": "2024-01-15T10:30:01"
+    },
+    {
+      "id": 3,
+      "taskId": 123,
+      "previousStatus": "VERIFYING",
+      "newStatus": "PENDING_CONFIRM",
+      "actionType": "发现冲突",
+      "description": "校验完成，发现 2 个字段冲突，待人工确认",
+      "conflictCount": 2,
+      "trustScore": 65,
+      "createdAt": "2024-01-15T10:30:02"
+    },
+    {
+      "id": 4,
+      "taskId": 123,
+      "previousStatus": "PENDING_CONFIRM",
+      "newStatus": "PENDING_CONFIRM",
+      "actionType": "解决冲突",
+      "operatorId": "OPERATOR-001",
+      "operatorName": "审核员",
+      "fieldName": "gender",
+      "finalValue": "男",
+      "description": "解决字段冲突: gender",
+      "createdAt": "2024-01-15T11:00:00"
+    },
+    {
+      "id": 5,
+      "taskId": 123,
+      "previousStatus": "PENDING_CONFIRM",
+      "newStatus": "MERGED",
+      "actionType": "完成合并",
+      "operatorId": "OPERATOR-001",
+      "operatorName": "审核员",
+      "description": "所有冲突已解决，校验完成合并",
+      "conflictCount": 0,
+      "trustScore": 65,
+      "createdAt": "2024-01-15T11:00:01"
+    }
+  ]
+}
+```
+
+**历史追踪能力**: 可以清晰看到任务从创建→校验→发现冲突→解决冲突→完成合并的全流程，回答"到底哪一步改了结果"
 
 ### 8. 导出Excel
 ```

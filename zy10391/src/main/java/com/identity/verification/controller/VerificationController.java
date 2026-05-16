@@ -1,6 +1,7 @@
 package com.identity.verification.controller;
 
 import com.identity.verification.dto.*;
+import com.identity.verification.model.VerificationHistory;
 import com.identity.verification.model.VerificationTask;
 import com.identity.verification.service.VerificationService;
 import javax.validation.Valid;
