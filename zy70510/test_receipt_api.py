@@ -285,6 +285,121 @@ def test_stats():
     return False
 
 
+def test_detail_duplicate_count():
+    print_section("12. 测试明细重复计数修复")
+
+    idempotent_key = f"test_count_{int(time.time())}"
+
+    create_payload = {
+        "batch_name": "重复计数测试",
+        "trigger_source": "api",
+        "idempotent_key": idempotent_key,
+        "original_input": {"test": "count_test"},
+        "items": [
+            {"item_key": "item_001", "name": "测试项1"}
+        ]
+    }
+
+    response = requests.post(f"{BASE_URL}/receipts", json=create_payload)
+    result = response.json()
+    batch_id = result["data"]["batch_id"]
+    receipt_no = result["data"]["receipt_no"]
+
+    print(f"创建批次成功，批次ID: {batch_id}，初始 success_count: {result['data']['success_count']}")
+
+    update_payload = [
+        {
+            "item_key": "item_001",
+            "status": "success",
+            "result_data": {"id": 1}
+        }
+    ]
+
+    print("第一次更新明细...")
+    response = requests.patch(f"{BASE_URL}/receipts/{batch_id}/details", json=update_payload)
+    result = response.json()
+    success_count_1 = result["data"]["success_count"]
+    print(f"第一次更新后 success_count: {success_count_1}")
+
+    print("第二次更新同一明细（幂等性测试）...")
+    response = requests.patch(f"{BASE_URL}/receipts/{batch_id}/details", json=update_payload)
+    result = response.json()
+    success_count_2 = result["data"]["success_count"]
+    print(f"第二次更新后 success_count: {success_count_2}")
+
+    if success_count_1 == 1 and success_count_2 == 1:
+        print("\n✅ 明细重复计数修复验证通过! 重复更新不会重复计数")
+        return True
+    else:
+        print(f"\n❌ 明细重复计数修复验证失败! 期望 success_count 始终为 1，实际为 {success_count_2}")
+        return False
+
+
+def test_status_machine_validation():
+    print_section("13. 测试状态机校验")
+
+    idempotent_key = f"test_state_{int(time.time())}"
+
+    create_payload = {
+        "batch_name": "状态机测试",
+        "trigger_source": "api",
+        "idempotent_key": idempotent_key,
+        "original_input": {"test": "state_test"},
+        "items": [
+            {"item_key": "item_001", "name": "测试项1"}
+        ]
+    }
+
+    response = requests.post(f"{BASE_URL}/receipts", json=create_payload)
+    result = response.json()
+    batch_id = result["data"]["batch_id"]
+    receipt_no = result["data"]["receipt_no"]
+    print(f"创建批次成功，当前状态: {result['data']['status']}")
+
+    print("测试 PENDING -> MANUAL_FIXED（不允许的转换）...")
+    status_payload = {
+        "status": "manual_fixed",
+        "operator": "test"
+    }
+    response = requests.patch(f"{BASE_URL}/receipts/{batch_id}/status", json=status_payload)
+    print(f"状态码: {response.status_code}")
+    if response.status_code == 400:
+        result = response.json()
+        print(f"错误信息: {result['detail']}")
+        print("✅ 状态机校验生效，拒绝了不允许的状态转换")
+    else:
+        print("❌ 状态机校验未生效，本应拒绝该转换")
+        return False
+
+    print("\n测试 PENDING -> SUCCESS（合法的转换）...")
+    status_payload = {
+        "status": "success",
+        "operator": "system"
+    }
+    response = requests.patch(f"{BASE_URL}/receipts/{batch_id}/status", json=status_payload)
+    result = response.json()
+    if result["code"] == 200:
+        print(f"✅ 状态转换成功，当前状态: {result['data']['status']}")
+    else:
+        print("❌ 状态转换失败")
+        return False
+
+    print("\n测试 SUCCESS -> MANUAL_FIXED（合法的转换）...")
+    fix_payload = {
+        "receipt_no": receipt_no,
+        "final_conclusion": "人工修正测试",
+        "operator": "manager"
+    }
+    response = requests.post(f"{BASE_URL}/receipts/manual-fix", json=fix_payload)
+    result = response.json()
+    if result["code"] == 200:
+        print(f"✅ 人工修正成功，当前状态: {result['data']['status']}")
+        return True
+    else:
+        print("❌ 人工修正失败")
+        return False
+
+
 def main():
     print("\n" + "="*60)
     print("  任务幂等收据API 集成测试")
@@ -307,6 +422,8 @@ def main():
     results.append(("列表查询", test_query_list()))
     results.append(("导出功能", test_export()))
     results.append(("统计数据", test_stats()))
+    results.append(("明细重复计数修复", test_detail_duplicate_count()))
+    results.append(("状态机校验", test_status_machine_validation()))
 
     print_section("测试结果汇总")
     passed = sum(1 for _, r in results if r)

@@ -120,7 +120,11 @@ def update_status(batch_id: int, request: TaskBatchStatusUpdate, db: Session = D
             "data": response_data
         }
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        error_msg = str(e)
+        if "不存在" in error_msg:
+            raise HTTPException(status_code=404, detail=error_msg)
+        else:
+            raise HTTPException(status_code=400, detail=error_msg)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"更新失败: {str(e)}")
 
@@ -141,7 +145,11 @@ def manual_fix(request: ManualFixRequest, db: Session = Depends(get_db)):
             }
         }
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        error_msg = str(e)
+        if "不存在" in error_msg:
+            raise HTTPException(status_code=404, detail=error_msg)
+        else:
+            raise HTTPException(status_code=400, detail=error_msg)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"修正失败: {str(e)}")
 

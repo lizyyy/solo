@@ -7,6 +7,21 @@ from sqlalchemy import and_, or_
 from models import TaskBatch, ProcessDetail, MergeRecord, Receipt, TaskStatus, TriggerSource
 from schemas import TaskBatchCreate, ProcessDetailUpdate, TaskBatchStatusUpdate, ManualFixRequest
 
+VALID_STATUS_TRANSITIONS = {
+    TaskStatus.PENDING: {TaskStatus.PROCESSING, TaskStatus.SUCCESS, TaskStatus.FAILED},
+    TaskStatus.PROCESSING: {TaskStatus.SUCCESS, TaskStatus.FAILED, TaskStatus.MANUAL_FIXED},
+    TaskStatus.SUCCESS: {TaskStatus.MANUAL_FIXED},
+    TaskStatus.FAILED: {TaskStatus.MANUAL_FIXED},
+    TaskStatus.MANUAL_FIXED: set(),
+    TaskStatus.MERGED: set(),
+}
+
+
+def validate_status_transition(current_status: TaskStatus, new_status: TaskStatus) -> Tuple[bool, str]:
+    if new_status not in VALID_STATUS_TRANSITIONS.get(current_status, set()):
+        return False, f"不允许从 {current_status.value} 转换为 {new_status.value}"
+    return True, ""
+
 
 def generate_receipt_no() -> str:
     timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
@@ -109,6 +124,7 @@ def update_process_detail(db: Session, batch_id: int, updates: List[ProcessDetai
         ).first()
 
         if detail:
+            old_status = detail.status
             detail.status = update.status
             detail.result_data = update.result_data
             detail.error_message = update.error_message
@@ -116,10 +132,11 @@ def update_process_detail(db: Session, batch_id: int, updates: List[ProcessDetai
             detail.processed_at = datetime.utcnow()
             detail.retry_count += 1
 
-            if update.status == TaskStatus.SUCCESS:
-                success_count += 1
-            elif update.status == TaskStatus.FAILED:
-                failed_count += 1
+            if old_status not in [TaskStatus.SUCCESS, TaskStatus.FAILED]:
+                if update.status == TaskStatus.SUCCESS:
+                    success_count += 1
+                elif update.status == TaskStatus.FAILED:
+                    failed_count += 1
 
     batch.success_count += success_count
     batch.failed_count += failed_count
@@ -134,6 +151,10 @@ def update_batch_status(db: Session, batch_id: int, request: TaskBatchStatusUpda
     batch = db.query(TaskBatch).filter(TaskBatch.id == batch_id).first()
     if not batch:
         raise ValueError(f"批次不存在: {batch_id}")
+
+    is_valid, error_msg = validate_status_transition(batch.status, request.status)
+    if not is_valid:
+        raise ValueError(error_msg)
 
     batch.status = request.status
     if request.result_snapshot:
@@ -176,6 +197,10 @@ def manual_fix_receipt(db: Session, request: ManualFixRequest) -> Receipt:
     ).first()
     if not receipt:
         raise ValueError(f"收据不存在: {request.receipt_no}")
+
+    is_valid, error_msg = validate_status_transition(receipt.status, TaskStatus.MANUAL_FIXED)
+    if not is_valid:
+        raise ValueError(error_msg)
 
     batch = db.query(TaskBatch).filter(TaskBatch.id == receipt.batch_id).first()
     if batch:
