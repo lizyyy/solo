@@ -177,7 +177,29 @@ class SLOBudgetTests:
             total_budget=100.0
         )
 
-        print("\n2.5 审批非待审批状态的批次")
+        print("\n2.5 发布评估 - 负数预算消耗测试")
+        self.assert_raises(
+            ValueError,
+            self.service.evaluate_release,
+            service_name="payment-service",
+            batch_name="v2.0.1-neg",
+            slo_name="latency",
+            budget_consumption=-10.0,
+            requester="engineer_x"
+        )
+
+        print("\n2.6 发布评估 - 零值预算消耗测试")
+        self.assert_raises(
+            ValueError,
+            self.service.evaluate_release,
+            service_name="payment-service",
+            batch_name="v2.0.1-zero",
+            slo_name="latency",
+            budget_consumption=0.0,
+            requester="engineer_x"
+        )
+
+        print("\n2.7 审批非待审批状态的批次")
         batch = self.service.evaluate_release(
             service_name="payment-service",
             batch_name="v2.0.0",

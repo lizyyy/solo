@@ -50,6 +50,9 @@ class SLOBudgetService:
                          metrics_snapshot: Optional[Dict[str, Any]] = None,
                          raw_input: Optional[Dict[str, Any]] = None,
                          exemption_reason: Optional[str] = None) -> ReleaseBatch:
+        if budget_consumption <= 0:
+            raise ValueError("Budget consumption must be a positive number")
+
         budget = self.storage.get_budget(service_name, slo_name)
         if not budget:
             raise ValueError(f"Budget not found for {service_name}/{slo_name}")
@@ -169,6 +172,9 @@ class SLOBudgetService:
         batch = self.storage.get_batch(batch_id)
         if not batch:
             raise ValueError(f"Batch {batch_id} not found")
+
+        if new_budget_consumption is not None and new_budget_consumption <= 0:
+            raise ValueError("New budget consumption must be a positive number")
 
         batch.is_manual_correction = True
         batch.correction_note = f"Corrected by {corrector}: {correction_note}"
