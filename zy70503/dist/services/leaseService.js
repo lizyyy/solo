@@ -116,6 +116,16 @@ class LeaseService {
         try {
             const lease = await database_1.db.findLeaseById(request.leaseId);
             if (!lease) {
+                await database_1.db.createAuditLog({
+                    leaseId: request.leaseId,
+                    operationType: 'STATUS_ADVANCE_FAILED',
+                    operator: request.operator,
+                    originalInput: request,
+                    processingBasis: '检查租约是否存在',
+                    finalConclusion: '租约不存在，状态推进失败',
+                    statusBefore: '',
+                    statusAfter: ''
+                });
                 return {
                     success: false,
                     error: 'LEASE_NOT_FOUND',
@@ -196,6 +206,16 @@ class LeaseService {
         try {
             const lease = await database_1.db.findLeaseById(request.leaseId);
             if (!lease) {
+                await database_1.db.createAuditLog({
+                    leaseId: request.leaseId,
+                    operationType: 'RENEWAL_REQUEST_FAILED',
+                    operator: request.applicant,
+                    originalInput: request,
+                    processingBasis: '检查租约是否存在',
+                    finalConclusion: '租约不存在，续租申请失败',
+                    statusBefore: '',
+                    statusAfter: ''
+                });
                 return {
                     success: false,
                     error: 'LEASE_NOT_FOUND',
@@ -203,6 +223,16 @@ class LeaseService {
                 };
             }
             if (lease.status !== types_1.LeaseStatus.CONFIRMED) {
+                await database_1.db.createAuditLog({
+                    leaseId: request.leaseId,
+                    operationType: 'RENEWAL_REQUEST_FAILED',
+                    operator: request.applicant,
+                    originalInput: request,
+                    processingBasis: `检查租约状态，当前状态: ${lease.status}`,
+                    finalConclusion: '租约状态不合法，只有已确认的租约才能申请续租',
+                    statusBefore: lease.status,
+                    statusAfter: lease.status
+                });
                 return {
                     success: false,
                     error: 'INVALID_STATUS',
@@ -233,6 +263,16 @@ class LeaseService {
             };
         }
         catch (error) {
+            await database_1.db.createAuditLog({
+                leaseId: request.leaseId,
+                operationType: 'RENEWAL_REQUEST_FAILED',
+                operator: request.applicant,
+                originalInput: request,
+                processingBasis: '系统异常',
+                finalConclusion: `续租申请失败: ${error.message}`,
+                statusBefore: '',
+                statusAfter: ''
+            });
             return {
                 success: false,
                 error: error.message,
@@ -244,6 +284,16 @@ class LeaseService {
         try {
             const renewalRecord = await database_1.db.findRenewalRecordById(renewalId);
             if (!renewalRecord) {
+                await database_1.db.createAuditLog({
+                    leaseId: 'unknown-' + renewalId,
+                    operationType: 'RENEWAL_APPROVAL_FAILED',
+                    operator: approver,
+                    originalInput: { renewalId, approved },
+                    processingBasis: '检查续租记录是否存在',
+                    finalConclusion: '续租记录不存在，审批失败',
+                    statusBefore: '',
+                    statusAfter: ''
+                });
                 return {
                     success: false,
                     error: 'RENEWAL_NOT_FOUND',
@@ -251,6 +301,16 @@ class LeaseService {
                 };
             }
             if (renewalRecord.status !== types_1.RenewalStatus.PENDING) {
+                await database_1.db.createAuditLog({
+                    leaseId: renewalRecord.leaseId,
+                    operationType: 'RENEWAL_APPROVAL_FAILED',
+                    operator: approver,
+                    originalInput: { renewalId, approved },
+                    processingBasis: `检查续租记录状态，当前状态: ${renewalRecord.status}`,
+                    finalConclusion: '续租申请已处理，不允许重复审批',
+                    statusBefore: '',
+                    statusAfter: ''
+                });
                 return {
                     success: false,
                     error: 'INVALID_STATUS',
@@ -259,6 +319,16 @@ class LeaseService {
             }
             const lease = await database_1.db.findLeaseById(renewalRecord.leaseId);
             if (!lease) {
+                await database_1.db.createAuditLog({
+                    leaseId: renewalRecord.leaseId,
+                    operationType: 'RENEWAL_APPROVAL_FAILED',
+                    operator: approver,
+                    originalInput: { renewalId, approved },
+                    processingBasis: '检查关联租约是否存在',
+                    finalConclusion: '关联租约不存在，审批失败',
+                    statusBefore: '',
+                    statusAfter: ''
+                });
                 return {
                     success: false,
                     error: 'LEASE_NOT_FOUND',
@@ -300,6 +370,16 @@ class LeaseService {
             };
         }
         catch (error) {
+            await database_1.db.createAuditLog({
+                leaseId: 'error-' + renewalId,
+                operationType: 'RENEWAL_APPROVAL_FAILED',
+                operator: approver,
+                originalInput: { renewalId, approved },
+                processingBasis: '系统异常',
+                finalConclusion: `续租审批失败: ${error.message}`,
+                statusBefore: '',
+                statusAfter: ''
+            });
             return {
                 success: false,
                 error: error.message,
@@ -339,6 +419,16 @@ class LeaseService {
         try {
             const lease = await database_1.db.findLeaseById(request.leaseId);
             if (!lease) {
+                await database_1.db.createAuditLog({
+                    leaseId: request.leaseId,
+                    operationType: 'MANUAL_CORRECTION_FAILED',
+                    operator: request.operator,
+                    originalInput: request,
+                    processingBasis: '检查租约是否存在',
+                    finalConclusion: '租约不存在，人工修正失败',
+                    statusBefore: '',
+                    statusAfter: ''
+                });
                 return {
                     success: false,
                     error: 'LEASE_NOT_FOUND',
@@ -383,10 +473,28 @@ class LeaseService {
     async exportLeases(params) {
         try {
             const leases = await database_1.db.getAllLeasesForExport(params);
+            const leasesWithAudit = [];
+            for (const lease of leases) {
+                const auditLogs = await database_1.db.getAuditLogsByLeaseId(lease.id);
+                leasesWithAudit.push({
+                    lease,
+                    auditLogs: auditLogs.map(log => ({
+                        id: log.id,
+                        operationType: log.operationType,
+                        operator: log.operator,
+                        originalInput: log.originalInput,
+                        processingBasis: log.processingBasis,
+                        finalConclusion: log.finalConclusion,
+                        statusBefore: log.statusBefore,
+                        statusAfter: log.statusAfter,
+                        createdAt: log.createdAt
+                    }))
+                });
+            }
             return {
                 success: true,
-                data: leases,
-                count: leases.length,
+                data: leasesWithAudit,
+                count: leasesWithAudit.length,
                 message: '导出成功'
             };
         }

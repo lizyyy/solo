@@ -124,7 +124,20 @@ export declare class LeaseService {
         endTime?: number;
     }): Promise<{
         success: boolean;
-        data: import("../types").PermissionLease[];
+        data: {
+            lease: import("../types").PermissionLease;
+            auditLogs: {
+                id: string;
+                operationType: string;
+                operator: string;
+                originalInput: any;
+                processingBasis: string;
+                finalConclusion: string;
+                statusBefore: LeaseStatus;
+                statusAfter: LeaseStatus;
+                createdAt: number;
+            }[];
+        }[];
         count: number;
         message: string;
         error?: undefined;

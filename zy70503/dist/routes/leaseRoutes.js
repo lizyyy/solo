@@ -230,10 +230,10 @@ router.get('/leases/export', validateQuery(exportSchema), async (req, res) => {
                 ]
             });
             const csvData = result.data.map(lease => ({
-                ...lease,
-                leaseStartTime: new Date(lease.leaseStartTime).toISOString(),
-                leaseEndTime: new Date(lease.leaseEndTime).toISOString(),
-                createdAt: new Date(lease.createdAt).toISOString()
+                ...lease.lease,
+                leaseStartTime: new Date(lease.lease.leaseStartTime).toISOString(),
+                leaseEndTime: new Date(lease.lease.leaseEndTime).toISOString(),
+                createdAt: new Date(lease.lease.createdAt).toISOString()
             }));
             const csvContent = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(csvData);
             res.setHeader('Content-Type', 'text/csv; charset=utf-8');

@@ -239,12 +239,48 @@ router.get('/leases/export', validateQuery(exportSchema), async (req: Request, r
         ]
       });
 
-      const csvData = result.data.map(lease => ({
-        ...lease,
-        leaseStartTime: new Date(lease.leaseStartTime).toISOString(),
-        leaseEndTime: new Date(lease.leaseEndTime).toISOString(),
-        createdAt: new Date(lease.createdAt).toISOString()
-      }));
+      const csvRecords: any[] = [];
+      for (const item of result.data) {
+        const lease = item.lease;
+        if (item.auditLogs && item.auditLogs.length > 0) {
+          for (const log of item.auditLogs) {
+            csvRecords.push({
+              leaseId: lease.id,
+              accountName: lease.accountName,
+              permissionItem: lease.permissionItem,
+              leaseStartTime: new Date(lease.leaseStartTime).toISOString(),
+              leaseEndTime: new Date(lease.leaseEndTime).toISOString(),
+              leaseStatus: lease.status,
+              operationType: log.operationType,
+              operator: log.operator,
+              processingBasis: log.processingBasis,
+              finalConclusion: log.finalConclusion,
+              statusBefore: log.statusBefore,
+              statusAfter: log.statusAfter,
+              logCreatedAt: new Date(log.createdAt).toISOString(),
+              originalInput: JSON.stringify(log.originalInput)
+            });
+          }
+        } else {
+          csvRecords.push({
+            leaseId: lease.id,
+            accountName: lease.accountName,
+            permissionItem: lease.permissionItem,
+            leaseStartTime: new Date(lease.leaseStartTime).toISOString(),
+            leaseEndTime: new Date(lease.leaseEndTime).toISOString(),
+            leaseStatus: lease.status,
+            operationType: '',
+            operator: '',
+            processingBasis: '',
+            finalConclusion: '',
+            statusBefore: '',
+            statusAfter: '',
+            logCreatedAt: '',
+            originalInput: ''
+          });
+        }
+      }
+      const csvData = csvRecords;
 
       const csvContent = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(csvData);
       
@@ -306,6 +342,52 @@ router.post('/leases/renewal/approve', validateRequest(approveRenewalSchema), as
       error: 'INTERNAL_SERVER_ERROR',
       message: error.message
     });
+  }
+});
+
+router.post('/leases/handle-expired', async (req: Request, res: Response) => {
+  try {
+    const result = await leaseService.handleExpiredLeases();
+    const statusCode = result.success ? 200 : 500;
+    res.status(statusCode).json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_SERVER_ERROR',
+      message: error.message
+    });
+  }
+});
+
+router.post('/leases/manual-correction', validateRequest(manualCorrectionSchema), async (req: Request, res: Response) => {
+  try {
+    const result = await leaseService.manualCorrection(req.body);
+    const statusCode = result.success ? 200 : (result.error === 'LEASE_NOT_FOUND' ? 404 : 500);
+    res.status(statusCode).json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_SERVER_ERROR',
+      message: error.message
+    });
+  }
+});
+
+router.get('/leases/:id', async (req: Request, res: Response) => {
+  try {
+    const result = await leaseService.getLeaseDetail(req.params.id);
+    const statusCode = result.success ? 200 : (result.error === 'LEASE_NOT_FOUND' ? 404 : 500);
+    res.status(statusCode).json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_SERVER_ERROR',
+      message: error.message
+    });
+  }
+});
+
+export default router;
   }
 });
 
