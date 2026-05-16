@@ -7,6 +7,7 @@ router.post('/', ruleController.createRuleVersion);
 router.get('/', ruleController.getAllRules);
 router.get('/active', ruleController.getActiveRule);
 router.get('/:id', ruleController.getRuleById);
+router.get('/:id/explanation', ruleController.getRuleExplanation);
 router.put('/:id/status', ruleController.toggleRuleStatus);
 
 export default router;

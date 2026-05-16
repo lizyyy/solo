@@ -32,6 +32,24 @@ export const getRuleById = asyncHandler(async (req: Request, res: Response) => {
   res.json({ success: true, data: rule });
 });
 
+export const getRuleExplanation = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const rule = await ruleEngineService.getRuleVersionById(id);
+  if (!rule) {
+    return res.status(404).json({ success: false, error: '规则不存在' });
+  }
+  
+  const ruleLogic = rule.logic as any;
+  const explanation = ruleEngineService.explainRuleLogic(ruleLogic);
+  res.json({
+    success: true,
+    data: {
+      rule,
+      explanation,
+    },
+  });
+});
+
 export const toggleRuleStatus = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { status } = req.body;

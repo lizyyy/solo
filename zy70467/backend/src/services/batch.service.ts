@@ -12,9 +12,15 @@ export class BatchService {
   }) {
     logger.info(`创建批次: ${data.name}, 数据量: ${data.inputData.length}`);
 
-    const activeRule = await ruleEngineService.getActiveRuleVersion();
+    let activeRule = await ruleEngineService.getActiveRuleVersion();
     if (!activeRule) {
-      throw new Error('没有激活的规则版本，请先创建规则');
+      logger.info('未找到激活的规则版本，自动创建默认规则');
+      activeRule = await ruleEngineService.createRuleVersion({
+        name: '默认审批校验规则',
+        description: '系统自动创建的默认审批校验规则',
+        logic: ruleEngineService.getDefaultRuleLogic(1),
+        createdBy: 'system',
+      });
     }
 
     const batch = await prisma.$transaction(async (tx) => {

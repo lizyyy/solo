@@ -150,3 +150,59 @@ export const createSampleBatch = asyncHandler(async (req: Request, res: Response
     data: batch,
   });
 });
+
+export const switchDemoRuleVersion = asyncHandler(async (req: Request, res: Response) => {
+  const { version } = req.body;
+  const success = demoBatchService.switchRuleVersion(version);
+  
+  if (!success) {
+    return res.status(400).json({
+      success: false,
+      error: `规则版本 v${version} 不存在`,
+    });
+  }
+
+  const ruleLogic = demoBatchService.getCurrentRuleLogic();
+  res.json({
+    success: true,
+    message: `[演示模式] 已切换到规则版本 v${version}`,
+    data: {
+      version,
+      description: ruleLogic.description,
+      ruleCount: ruleLogic.rules.length,
+    },
+  });
+});
+
+export const getDemoRuleExplanation = asyncHandler(async (req: Request, res: Response) => {
+  const { version } = req.params;
+  const ruleLogic = demoBatchService.getRuleLogicByVersion(parseInt(version));
+  
+  if (!ruleLogic) {
+    return res.status(404).json({
+      success: false,
+      error: `规则版本 v${version} 不存在`,
+    });
+  }
+
+  const explanation = demoBatchService.explainRuleLogic(ruleLogic);
+  res.json({
+    success: true,
+    message: `[演示模式] 获取规则 v${version} 解释成功`,
+    data: {
+      version: ruleLogic.version,
+      description: ruleLogic.description,
+      rules: ruleLogic.rules,
+      explanation,
+    },
+  });
+});
+
+export const getDemoActiveRule = asyncHandler(async (req: Request, res: Response) => {
+  const activeRule = demoBatchService.getActiveRule();
+  res.json({
+    success: true,
+    message: '[演示模式] 获取当前激活规则成功',
+    data: activeRule,
+  });
+});

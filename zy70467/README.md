@@ -170,11 +170,14 @@ npm run dev
 | POST | `/api/demo/sample-batch` | 一键创建示例批次（包含 3 条测试数据） |
 | POST | `/api/demo/batches` | 创建批次 |
 | GET | `/api/demo/batches` | 获取批次列表 |
-| GET | `/api/demo/batches/:id` | 获取批次详情 |
+| GET | `/api/demo/batches/:id` | 获取批次详情（含规则版本快照） |
 | POST | `/api/demo/batches/:id/execute` | 执行批次处理 |
-| GET | `/api/demo/batches/:id/report` | 生成处理报告 |
+| GET | `/api/demo/batches/:id/report` | 生成处理报告（含规则解释） |
 | POST | `/api/demo/review` | 提交复核意见 |
-| GET | `/api/demo/rules` | 获取规则列表 |
+| GET | `/api/demo/rules` | 获取所有规则版本 |
+| GET | `/api/demo/rules/active` | 获取当前激活规则 |
+| GET | `/api/demo/rules/:version/explanation` | 获取规则版本的详细解释 |
+| PUT | `/api/demo/rules/switch` | 切换规则版本 |
 | GET | `/api/demo/audit-logs` | 获取审计日志 |
 
 #### 📦 完整模式端点（需要 PostgreSQL）
@@ -258,11 +261,69 @@ if (['APPROVED', 'REJECTED'].includes(item.approvalStatus)) {
 
 ## 设计亮点
 
-1. **规则版本快照**：每个批次关联创建时的规则版本，历史可追溯
-2. **失败项隔离**：异常数据单独存储，不影响正常流程
-3. **部分成功机制**：整批处理时部分成功部分失败，分别标记
-4. **审计全链路**：所有操作留痕，人工复核不覆盖原始记录
-5. **安全双确认**：清理/回滚等危险操作需要先创建清单再审核执行
+1. **✅ 规则版本快照与可执行逻辑**：
+   - 每个批次关联创建时的规则版本
+   - `validateItem` 真正使用传入的 `ruleLogic` 进行校验，而非硬编码
+   - 规则版本包含完整的可执行条件和动作定义
+   - 历史查询时可还原当时的判断口径并重新执行验证
+
+2. **✅ 可扩展的规则引擎**：
+   - 支持多种条件运算符（equals、contains、isEmpty、in 等）
+   - 条件组合模式（AND/OR）
+   - 错误分级（BLOCKER/ERROR/WARNING）
+   - 支持自定义规则版本管理
+
+3. **✅ 失败项隔离**：异常数据单独存储，不影响正常流程
+
+4. **✅ 部分成功机制**：整批处理时部分成功部分失败，分别标记
+
+5. **✅ 审计全链路**：所有操作留痕，人工复核不覆盖原始记录
+
+6. **✅ 安全双确认**：清理/回滚等危险操作需要先创建清单再审核执行
+
+## 规则版本追溯功能说明
+
+### 核心实现
+
+规则引擎的 `validateItem` 方法不再使用硬编码逻辑，而是根据传入的 `ruleLogic` 动态执行：
+
+```typescript
+validateItem(item: TrainingEnvironmentItem, ruleLogic: RuleLogic): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  for (const rule of ruleLogic.rules) {
+    const isTriggered = this.evaluateRuleConditions(item, rule);
+    
+    if (isTriggered) {
+      errors.push({
+        field: rule.action.field,
+        code: rule.action.errorCode,
+        message: rule.action.message,
+        severity: rule.action.severity
+      });
+    }
+  }
+
+  return errors;
+}
+```
+
+### 演示模式验证流程
+
+1. **创建 v1 规则的批次**：使用默认规则（4 条验证规则）
+2. **执行批次**：使用 v1 规则校验
+3. **切换到 v2 规则**（更严格，包含学员姓名必填检查）
+4. **创建新批次**：使用 v2 规则
+5. **对比结果**：不同版本规则产生不同的校验结果
+6. **查询历史批次**：每个批次都保留关联的规则版本快照
+
+### 规则解释功能
+
+每个批次的报告中都包含：
+- 关联的规则版本号
+- 规则逻辑完整快照
+- 规则的人类可读解释
+- 每条规则的条件和动作
 
 ## 文档位置
 

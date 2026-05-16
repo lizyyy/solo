@@ -17,21 +17,49 @@ export interface ValidationError {
   severity: 'ERROR' | 'WARNING' | 'BLOCKER';
 }
 
+export type RuleOperator = 
+  | 'equals' 
+  | 'notEquals' 
+  | 'contains' 
+  | 'notContains' 
+  | 'isEmpty' 
+  | 'isNotEmpty' 
+  | 'in' 
+  | 'notIn'
+  | 'startsWith'
+  | 'endsWith'
+  | 'greaterThan'
+  | 'lessThan';
+
 export interface RuleCondition {
   field: string;
-  operator: string;
-  value: any;
+  operator: RuleOperator;
+  value?: any;
 }
 
+export type ErrorSeverity = 'ERROR' | 'WARNING' | 'BLOCKER';
+
 export interface RuleAction {
-  type: string;
-  params: Record<string, any>;
+  type: 'ADD_ERROR';
+  severity: ErrorSeverity;
+  field: string;
+  errorCode: string;
+  message: string;
+}
+
+export interface RuleDefinition {
+  id: string;
+  name: string;
+  description: string;
+  conditions: RuleCondition[];
+  conditionMode: 'AND' | 'OR';
+  action: RuleAction;
 }
 
 export interface RuleLogic {
-  conditions: RuleCondition[];
-  actions: RuleAction[];
-  approvalRequired: boolean;
+  version: number;
+  rules: RuleDefinition[];
+  description: string;
 }
 
 export type BatchStatus = 'PENDING' | 'PROCESSING' | 'SUCCESS' | 'PARTIAL_SUCCESS' | 'FAILED' | 'REVIEWED';

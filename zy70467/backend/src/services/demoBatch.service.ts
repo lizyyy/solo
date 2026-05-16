@@ -1,30 +1,253 @@
-import { inMemoryDb, InMemoryBatch } from '../utils/inMemoryDb';
+import { v4 as uuidv4 } from 'uuid';
+import { inMemoryDb, InMemoryBatch, InMemoryRule } from '../utils/inMemoryDb';
 import logger from '../utils/logger';
+import { 
+  TrainingEnvironmentItem, 
+  RuleLogic, 
+  ValidationError,
+  RuleDefinition,
+  RuleCondition,
+  RuleOperator
+} from '../models';
 
 export class DemoBatchService {
+  private currentRuleVersion: number = 1;
+  private rules: Map<number, RuleLogic> = new Map();
+
+  constructor() {
+    this.initializeDefaultRules();
+  }
+
+  private initializeDefaultRules() {
+    this.rules.set(1, this.getDefaultRuleLogic(1));
+    this.rules.set(2, this.getStrictRuleLogic(2));
+  }
+
+  getDefaultRuleLogic(version: number): RuleLogic {
+    return {
+      version,
+      description: '默认审批校验规则 v' + version,
+      rules: [
+        {
+          id: 'RULE_001',
+          name: '审批通过时意见不能为空',
+          description: '当审批状态为已通过时，审批意见不能为空',
+          conditionMode: 'AND' as const,
+          conditions: [
+            { field: 'approvalStatus', operator: 'equals' as RuleOperator, value: 'APPROVED' },
+            { field: 'approvalComment', operator: 'isEmpty' as RuleOperator }
+          ],
+          action: {
+            type: 'ADD_ERROR' as const,
+            severity: 'BLOCKER',
+            field: 'approvalComment',
+            errorCode: 'APPROVAL_COMMENT_MISSING_ON_APPROVE',
+            message: '审批通过时必须填写审批意见'
+          }
+        },
+        {
+          id: 'RULE_002',
+          name: '审批拒绝时意见不能为空',
+          description: '当审批状态为已拒绝时，审批意见不能为空',
+          conditionMode: 'AND' as const,
+          conditions: [
+            { field: 'approvalStatus', operator: 'equals' as RuleOperator, value: 'REJECTED' },
+            { field: 'approvalComment', operator: 'isEmpty' as RuleOperator }
+          ],
+          action: {
+            type: 'ADD_ERROR' as const,
+            severity: 'BLOCKER',
+            field: 'approvalComment',
+            errorCode: 'APPROVAL_COMMENT_MISSING_ON_REJECT',
+            message: '审批拒绝时必须填写审批意见'
+          }
+        },
+        {
+          id: 'RULE_003',
+          name: '提交ID不能为空',
+          description: '提交记录ID是必填字段',
+          conditionMode: 'AND' as const,
+          conditions: [
+            { field: 'submissionId', operator: 'isEmpty' as RuleOperator }
+          ],
+          action: {
+            type: 'ADD_ERROR' as const,
+            severity: 'ERROR',
+            field: 'submissionId',
+            errorCode: 'SUBMISSION_ID_MISSING',
+            message: '提交记录ID是必填项'
+          }
+        },
+        {
+          id: 'RULE_004',
+          name: '提交日期缺失警告',
+          description: '建议填写提交日期',
+          conditionMode: 'AND' as const,
+          conditions: [
+            { field: 'submittedAt', operator: 'isEmpty' as RuleOperator }
+          ],
+          action: {
+            type: 'ADD_ERROR' as const,
+            severity: 'WARNING',
+            field: 'submittedAt',
+            errorCode: 'SUBMISSION_DATE_MISSING',
+            message: '建议填写提交日期'
+          }
+        }
+      ]
+    };
+  }
+
+  getStrictRuleLogic(version: number): RuleLogic {
+    const baseRules = this.getDefaultRuleLogic(version).rules;
+    return {
+      version,
+      description: '严格审批校验规则 v' + version,
+      rules: [
+        ...baseRules,
+        {
+          id: 'RULE_005',
+          name: '学员姓名不能为空',
+          description: '学员姓名是必填字段',
+          conditionMode: 'AND' as const,
+          conditions: [
+            { field: 'traineeName', operator: 'isEmpty' as RuleOperator }
+          ],
+          action: {
+            type: 'ADD_ERROR' as const,
+            severity: 'ERROR',
+            field: 'traineeName',
+            errorCode: 'TRAINEE_NAME_MISSING',
+            message: '学员姓名不能为空'
+          }
+        }
+      ]
+    };
+  }
+
+  private evaluateCondition(item: TrainingEnvironmentItem, condition: RuleCondition): boolean {
+    const fieldValue = (item as any)[condition.field];
+    const { operator, value } = condition;
+
+    switch (operator) {
+      case 'equals':
+        return fieldValue === value;
+      case 'notEquals':
+        return fieldValue !== value;
+      case 'contains':
+        return typeof fieldValue === 'string' && fieldValue.includes(value);
+      case 'notContains':
+        return typeof fieldValue === 'string' && !fieldValue.includes(value);
+      case 'isEmpty':
+        return fieldValue === null 
+          || fieldValue === undefined 
+          || (typeof fieldValue === 'string' && fieldValue.trim() === '')
+          || (Array.isArray(fieldValue) && fieldValue.length === 0);
+      case 'isNotEmpty':
+        return fieldValue !== null 
+          && fieldValue !== undefined 
+          && !(typeof fieldValue === 'string' && fieldValue.trim() === '')
+          && !(Array.isArray(fieldValue) && fieldValue.length === 0);
+      case 'in':
+        return Array.isArray(value) && value.includes(fieldValue);
+      case 'notIn':
+        return Array.isArray(value) && !value.includes(fieldValue);
+      case 'startsWith':
+        return typeof fieldValue === 'string' && fieldValue.startsWith(value);
+      case 'endsWith':
+        return typeof fieldValue === 'string' && fieldValue.endsWith(value);
+      default:
+        return false;
+    }
+  }
+
+  private evaluateRuleConditions(
+    item: TrainingEnvironmentItem, 
+    rule: RuleDefinition
+  ): boolean {
+    const results = rule.conditions.map(condition => 
+      this.evaluateCondition(item, condition)
+    );
+
+    if (rule.conditionMode === 'AND') {
+      return results.every(r => r);
+    } else {
+      return results.some(r => r);
+    }
+  }
+
+  validateItem(item: TrainingEnvironmentItem, ruleLogic: RuleLogic): ValidationError[] {
+    const errors: ValidationError[] = [];
+
+    if (!ruleLogic || !ruleLogic.rules || ruleLogic.rules.length === 0) {
+      logger.warn('规则逻辑为空，使用默认校验规则');
+      ruleLogic = this.getDefaultRuleLogic(ruleLogic?.version || 1);
+    }
+
+    for (const rule of ruleLogic.rules) {
+      const isTriggered = this.evaluateRuleConditions(item, rule);
+      
+      if (isTriggered) {
+        logger.debug(`规则触发: ${rule.id} - ${rule.name}`);
+        errors.push({
+          field: rule.action.field,
+          code: rule.action.errorCode,
+          message: rule.action.message,
+          severity: rule.action.severity
+        });
+      }
+    }
+
+    return errors;
+  }
+
+  hasBlockerErrors(errors: ValidationError[]): boolean {
+    return errors.some(e => e.severity === 'BLOCKER');
+  }
+
+  switchRuleVersion(version: number): boolean {
+    if (this.rules.has(version)) {
+      this.currentRuleVersion = version;
+      logger.info(`[演示模式] 已切换到规则版本 v${version}`);
+      return true;
+    }
+    return false;
+  }
+
+  getCurrentRuleLogic(): RuleLogic {
+    return this.rules.get(this.currentRuleVersion) || this.getDefaultRuleLogic(1);
+  }
+
+  getRuleLogicByVersion(version: number): RuleLogic | undefined {
+    return this.rules.get(version);
+  }
+
+  getAllRuleVersions(): Array<{ version: number; description: string; ruleCount: number }> {
+    return Array.from(this.rules.entries()).map(([version, logic]) => ({
+      version,
+      description: logic.description,
+      ruleCount: logic.rules.length
+    }));
+  }
+
   async createBatch(data: {
     name: string;
     description?: string;
     inputData: any[];
     createdBy: string;
   }) {
-    logger.info(`[演示模式] 创建批次: ${data.name}, 数据量: ${data.inputData.length}`);
-
-    const activeRule = inMemoryDb.getActiveRule();
-    if (!activeRule) {
-      throw new Error('没有激活的规则版本');
-    }
+    logger.info(`[演示模式] 创建批次: ${data.name}, 数据量: ${data.inputData.length}, 使用规则版本 v${this.currentRuleVersion}`);
 
     const batch = inMemoryDb.createBatch({
       ...data,
-      ruleVersionId: activeRule.id,
+      ruleVersionId: `demo-rule-v${this.currentRuleVersion}`,
     });
 
     return batch;
   }
 
   async executeBatch(batchId: string) {
-    logger.info(`[演示模式] 执行批次: ${batchId}`);
+    logger.info(`[演示模式] 执行批次: ${batchId}, 使用规则版本 v${this.currentRuleVersion}`);
     const startTime = Date.now();
 
     const batch = inMemoryDb.getBatchById(batchId);
@@ -38,14 +261,15 @@ export class DemoBatchService {
 
     inMemoryDb.updateBatch(batchId, { status: 'PROCESSING' });
 
+    const ruleLogic = this.getCurrentRuleLogic();
     let successCount = 0;
     let failedCount = 0;
     const failedItems: any[] = [];
 
     for (const item of batch.items) {
       const originalData = item.originalData;
-      const errors = this.validateItem(originalData);
-      const hasBlocker = errors.some((e: any) => e.severity === 'BLOCKER');
+      const errors = this.validateItem(originalData, ruleLogic);
+      const hasBlocker = this.hasBlockerErrors(errors);
 
       if (hasBlocker || errors.length > 0) {
         failedCount++;
@@ -114,8 +338,9 @@ export class DemoBatchService {
         successCount,
         failedCount,
         executionTimeMs,
+        ruleVersion: this.currentRuleVersion,
       },
-      comment: `批次执行完成，成功: ${successCount}, 失败: ${failedCount}`,
+      comment: `批次执行完成，成功: ${successCount}, 失败: ${failedCount}, 使用规则 v${this.currentRuleVersion}`,
     });
 
     logger.info(`[演示模式] 批次执行完成: ${batchId}, 状态: ${finalStatus}, 耗时: ${executionTimeMs}ms`);
@@ -129,33 +354,9 @@ export class DemoBatchService {
       partialSuccess,
       executionTimeMs,
       failedItems,
+      ruleVersion: this.currentRuleVersion,
+      ruleDescription: ruleLogic.description,
     };
-  }
-
-  private validateItem(item: any): any[] {
-    const errors: any[] = [];
-
-    if (['APPROVED', 'REJECTED'].includes(item.approvalStatus)) {
-      if (!item.approvalComment || item.approvalComment.trim() === '') {
-        errors.push({
-          field: 'approvalComment',
-          code: 'APPROVAL_COMMENT_MISSING',
-          message: '审批意见为空，流程被拦截',
-          severity: 'BLOCKER',
-        });
-      }
-    }
-
-    if (!item.submissionId || item.submissionId.trim() === '') {
-      errors.push({
-        field: 'submissionId',
-        code: 'SUBMISSION_ID_MISSING',
-        message: '提交记录ID缺失',
-        severity: 'ERROR',
-      });
-    }
-
-    return errors;
   }
 
   async getBatchList(params: { page?: number; pageSize?: number; status?: string }) {
@@ -168,13 +369,17 @@ export class DemoBatchService {
     
     const failedItems = inMemoryDb.getFailedItemsByBatch(batchId);
     const auditLogs = inMemoryDb.getAuditLogs({ batchId }).data;
-    const ruleVersion = inMemoryDb.getRuleById(batch.ruleVersionId);
+    const ruleVersionMatch = batch.ruleVersionId.match(/v(\d+)/);
+    const ruleVersion = ruleVersionMatch ? parseInt(ruleVersionMatch[1]) : 1;
+    const ruleLogic = this.getRuleLogicByVersion(ruleVersion);
 
     return {
       ...batch,
       failedItems,
       auditLogs,
       ruleVersion,
+      ruleLogic: ruleLogic,
+      ruleExplanation: ruleLogic ? this.explainRuleLogic(ruleLogic) : '无法获取规则解释',
     };
   }
 
@@ -197,7 +402,7 @@ export class DemoBatchService {
     if (batch.status === 'SUCCESS') {
       nextSteps.push('所有数据验证通过，可以进入下一流程');
     }
-    nextSteps.push(`[演示模式] 当前使用规则版本: v${batch.ruleVersion?.version} - ${batch.ruleVersion?.name}`);
+    nextSteps.push(`本次处理使用规则版本: v${batch.ruleVersion} - ${batch.ruleLogic?.description}`);
 
     return {
       batchId,
@@ -209,7 +414,33 @@ export class DemoBatchService {
       partialSuccess: batch.partialSuccess,
       nextSteps,
       failedItems: batch.failedItems,
+      ruleVersion: batch.ruleVersion,
+      ruleLogicSnapshot: batch.ruleLogic,
+      ruleExplanation: batch.ruleExplanation,
     };
+  }
+
+  explainRuleLogic(ruleLogic: RuleLogic): string {
+    const explanations: string[] = [];
+    explanations.push(`规则版本: v${ruleLogic.version}`);
+    explanations.push(`规则描述: ${ruleLogic.description}`);
+    explanations.push(`包含规则数: ${ruleLogic.rules.length}`);
+    explanations.push('');
+    
+    for (const rule of ruleLogic.rules) {
+      explanations.push(`【${rule.id}】${rule.name}`);
+      explanations.push(`   描述: ${rule.description}`);
+      explanations.push(`   条件模式: ${rule.conditionMode}`);
+      
+      for (const cond of rule.conditions) {
+        explanations.push(`     - ${cond.field} ${cond.operator} ${cond.value !== undefined ? cond.value : ''}`);
+      }
+      
+      explanations.push(`   动作: ${rule.action.type} [${rule.action.severity}] ${rule.action.message}`);
+      explanations.push('');
+    }
+
+    return explanations.join('\n');
   }
 
   async submitReview(data: {
@@ -252,11 +483,14 @@ export class DemoBatchService {
   }
 
   getActiveRule() {
-    return inMemoryDb.getActiveRule();
+    return {
+      version: this.currentRuleVersion,
+      logic: this.getCurrentRuleLogic(),
+    };
   }
 
   getAllRules() {
-    return inMemoryDb.getAllRules();
+    return this.getAllRuleVersions();
   }
 
   getAuditLogs(params: { batchId?: string; page?: number; pageSize?: number }) {

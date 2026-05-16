@@ -11,6 +11,9 @@ router.post('/batches/:id/execute', demoController.executeDemoBatch);
 router.get('/batches/:id/report', demoController.getDemoBatchReport);
 router.post('/review', demoController.submitDemoReview);
 router.get('/rules', demoController.getDemoRules);
+router.get('/rules/active', demoController.getDemoActiveRule);
+router.get('/rules/:version/explanation', demoController.getDemoRuleExplanation);
+router.put('/rules/switch', demoController.switchDemoRuleVersion);
 router.get('/audit-logs', demoController.getDemoAuditLogs);
 
 export default router;
