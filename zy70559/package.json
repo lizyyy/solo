@@ -1,0 +1,16 @@
+{
+  "name": "npm-license-diff",
+  "version": "1.0.0",
+  "description": "NPM许可证差异CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "license-diff": "./bin/license-diff.js"
+  },
+  "dependencies": {
+    "@yarnpkg/lockfile": "^1.1.0",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "semver": "^7.5.4",
+    "spdx-expression-parse": "^3.0.1"
+  }
+}
