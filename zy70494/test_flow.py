@@ -146,6 +146,10 @@ def test_evidence_validation(batch_id):
 def test_manual_correction(error_id):
     print_step("步骤5: 人工修正备注")
     
+    # 先获取错误样本，得到对应的execution_id
+    response = requests.get(f"{BASE_URL}/history/executions")
+    pre_executions = response.json()
+    
     correction_data = {
         "error_sample_id": error_id,
         "corrected_status": "reviewed_and_accepted",
@@ -157,6 +161,35 @@ def test_manual_correction(error_id):
     response = requests.post(f"{BASE_URL}/corrections", json=correction_data)
     result = response.json()
     print_step("人工修正结果", result)
+    
+    # 验证系统原始判断未被覆盖
+    if result['success']:
+        execution_id = result['data'].get('execution_id')
+        original_status = result['data'].get('original_status')
+        
+        response = requests.get(f"{BASE_URL}/history/executions")
+        post_executions = response.json()
+        post_execution = next((e for e in post_executions['data']['executions'] if e['id'] == execution_id), None)
+        post_status = post_execution['status'] if post_execution else 'unknown'
+        
+        print(f"\n✅ 系统原始状态验证:")
+        print(f"   Execution ID: {execution_id}")
+        print(f"   记录的原始状态: {original_status}")
+        print(f"   当前执行状态: {post_status}")
+        if original_status == post_status:
+            print(f"   ✓ 验证通过: 系统原始状态未被覆盖")
+        else:
+            print(f"   ✗ 验证失败: 系统原始状态被修改！")
+        
+        # 验证人工修正表中保留了原始状态
+        print(f"\n✅ 人工修正记录验证:")
+        print(f"   original_status: {result['data'].get('original_status')}")
+        print(f"   corrected_status: {result['data'].get('corrected_status')}")
+        print(f"   original_risk_level: {result['data'].get('original_risk_level')}")
+        print(f"   corrected_risk_level: {result['data'].get('corrected_risk_level')}")
+        print(f"   original_system_judgment: {result['data'].get('original_system_judgment')}")
+        print(f"   system_judgment_preserved: {result['data'].get('system_judgment_preserved')}")
+        print(f"   保留说明: {result['data'].get('system_judgment_preserved_note')}")
 
 def test_report_generation(batch_id):
     print_step("步骤6: 生成报告（含法务证据页）")

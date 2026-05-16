@@ -34,7 +34,7 @@ def create_correction():
         execution_id=error_sample.execution_id,
         error_sample_id=data['error_sample_id'],
         original_status=original_status,
-        corrected_status=data.get('corrected_status', 'manually_corrected'),
+        corrected_status=data.get('corrected_status'),
         original_risk_level=original_risk_level,
         corrected_risk_level=data.get('corrected_risk_level'),
         correction_note=data['correction_note'],
@@ -43,16 +43,12 @@ def create_correction():
         original_system_judgment=system_judgment
     )
     db.session.add(correction)
-    
-    if execution and 'corrected_status' in data:
-        execution.status = data['corrected_status']
-    
-    if supplier and 'corrected_risk_level' in data:
-        supplier.risk_level = data['corrected_risk_level']
-    
     db.session.commit()
     
-    return ApiResponse.success(correction.to_dict(), '人工修正备注已记录，系统判断已保留')
+    result = correction.to_dict()
+    result['system_judgment_preserved_note'] = '系统原始状态已完整保留，未被覆盖。修正记录仅存储在人工修正表中，用于审计追溯。'
+    
+    return ApiResponse.success(result, '人工修正备注已记录，系统原始判断已完整保留未被覆盖')
 
 @bp.route('/corrections/<correction_id>', methods=['GET'])
 def get_correction(correction_id):

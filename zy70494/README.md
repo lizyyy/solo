@@ -131,9 +131,17 @@ python test_flow.py
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| POST | /api/corrections | 创建人工修正 |
-| GET | /api/corrections/batch/<batch_id> | 按批次查询 |
-| GET | /api/corrections/supplier/<code> | 按供应商查询 |
+| POST | /api/corrections | 创建人工修正（**不覆盖系统原始判断**） |
+| GET | /api/corrections/batch/<batch_id> | 按批次查询修正记录 |
+| GET | /api/corrections/supplier/<code> | 按供应商查询修正记录 |
+
+**重要说明**: 创建人工修正时，系统原始状态（执行状态、供应商风险等级）会被完整保留，不会被覆盖。修正记录仅存储在人工修正表中，用于审计追溯。返回数据包含：
+- `original_status`: 系统原始执行状态
+- `corrected_status`: 人工修正的状态意见
+- `original_risk_level`: 系统原始风险等级
+- `corrected_risk_level`: 人工修正的风险等级意见
+- `original_system_judgment`: 系统原始判断摘要
+- `system_judgment_preserved`: 系统判断已保留标记（恒为true）
 
 ### 历史查询
 
