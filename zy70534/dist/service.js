@@ -57,7 +57,7 @@ class QuotaService {
     createQuota(teamName, modelName, usageTag, limit, window, createdBy) {
         const existing = this.storage.findQuotaConfig(teamName, modelName, usageTag);
         if (existing) {
-            throw new Error(`Quota already exists for team: ${teamName}, model: ${modelName}, usage: ${usageTag}`);
+            throw new Error('Quota already exists for team: ' + teamName + ', model: ' + modelName + ', usage: ' + usageTag);
         }
         const { start, end } = this.getWindowDates(window);
         const now = new Date().toISOString();
@@ -112,7 +112,7 @@ class QuotaService {
                 windowStart: config.windowStart,
                 windowEnd: config.windowEnd,
                 quotaStatus: config.status
-            }, `Quota is currently ${config.status}`);
+            }, 'Quota is currently ' + config.status);
             return { success: false, rejectEvent, config };
         }
         if (!this.validUsageTags.includes(usageTag)) {
@@ -122,7 +122,7 @@ class QuotaService {
                 windowStart: config.windowStart,
                 windowEnd: config.windowEnd,
                 quotaStatus: config.status
-            }, `Invalid usage tag: ${usageTag}. Valid tags: ${this.validUsageTags.join(', ')}`);
+            }, 'Invalid usage tag: ' + usageTag + '. Valid tags: ' + this.validUsageTags.join(', '));
             return { success: false, rejectEvent, config };
         }
         const effectiveLimit = config.limit + config.tempBonus;
@@ -133,7 +133,7 @@ class QuotaService {
                 windowStart: config.windowStart,
                 windowEnd: config.windowEnd,
                 quotaStatus: config.status
-            }, `Quota exhausted. Used: ${config.used}, Requested: ${tokens}, Limit: ${config.limit}, Bonus: ${config.tempBonus}`);
+            }, 'Quota exhausted. Used: ' + config.used + ', Requested: ' + tokens + ', Limit: ' + config.limit + ', Bonus: ' + config.tempBonus);
             return { success: false, rejectEvent, config };
         }
         config = this.storage.updateQuotaConfig(config.id, {
@@ -173,22 +173,19 @@ class QuotaService {
     addTempBonus(quotaId, bonusAmount, operator, reason) {
         const config = this.storage.getQuotaConfig(quotaId);
         if (!config) {
-            throw new Error(`Quota not found: ${quotaId}');
+            throw new Error('Quota not found: ' + quotaId);
+        }
+        const before = { ...config };
+        const updated = this.storage.updateQuotaConfig(quotaId, {
+            tempBonus: config.tempBonus + bonusAmount
+        });
+        this.addAuditLog(quotaId, 'TEMP_BONUS', operator, before, updated, reason);
+        return updated;
     }
-
-    const before = { ...config };
-    const updated = this.storage.updateQuotaConfig(quotaId, {
-      tempBonus: config.tempBonus + bonusAmount
-    })!;
-
-    this.addAuditLog(quotaId, 'TEMP_BONUS', operator, before, updated, reason);
-    return updated;
-  }
-
-  public updateQuotaStatus(quotaId: string, status: QuotaStatus, operator: string, reason: string): QuotaConfig {
-    const config = this.storage.getQuotaConfig(quotaId);
-    if (!config) {
-      throw new Error(`, Quota, not, found, $, { quotaId }, '););
+    updateQuotaStatus(quotaId, status, operator, reason) {
+        const config = this.storage.getQuotaConfig(quotaId);
+        if (!config) {
+            throw new Error('Quota not found: ' + quotaId);
         }
         const before = { ...config };
         const updated = this.storage.updateQuotaConfig(quotaId, { status });
@@ -198,91 +195,75 @@ class QuotaService {
     manualAdjust(quotaId, adjustments, operator, reason) {
         const config = this.storage.getQuotaConfig(quotaId);
         if (!config) {
-            throw new Error(`Quota not found: ${quotaId}');
-    }
-
-    const before = { ...config };
-    const updated = this.storage.updateQuotaConfig(quotaId, adjustments)!;
-
-    this.addAuditLog(quotaId, 'MANUAL_ADJUST', operator, before, updated, reason);
-    return updated;
-  }
-
-  private addAuditLog(quotaId: string, action: string, operator: string, before: any, after: any, reason: string): void {
-    const log: AuditLog = {
-      id: uuidv4(),
-      quotaId,
-      action,
-      operator,
-      before,
-      after,
-      reason,
-      timestamp: new Date().toISOString()
-    };
-    this.storage.addAuditLog(log);
-  }
-
-  public getSummary(quotaId: string): UsageSummary {
-    const config = this.getQuota(quotaId);
-    if (!config) {
-      throw new Error(`, Quota, not, found, $, { quotaId } `);
-    }
-
-    const rejectEvents = this.storage.getRejectEvents(quotaId);
-    const effectiveLimit = config.limit + config.tempBonus;
-
-    return {
-      teamName: config.teamName,
-      modelName: config.modelName,
-      usageTag: config.usageTag,
-      window: config.window,
-      totalLimit: config.limit,
-      totalUsed: config.used,
-      tempBonus: config.tempBonus,
-      remaining: effectiveLimit - config.used,
-      utilizationRate: (config.used / effectiveLimit) * 100,
-      rejectCount: rejectEvents.length,
-      windowStart: config.windowStart,
-      windowEnd: config.windowEnd,
-      lastUpdated: config.updatedAt
-    };
-  }
-
-  public getRejectEvents(quotaId?: string): RejectEvent[] {
-    return this.storage.getRejectEvents(quotaId);
-  }
-
-  public getAuditLogs(quotaId?: string): AuditLog[] {
-    return this.storage.getAuditLogs(quotaId);
-  }
-
-  public exportQuota(quotaId: string, exportBy: string): ExportRecord {
-    const config = this.getQuota(quotaId);
-    if (!config) {
-      throw new Error(`, Quota, not, found, $, { quotaId } `);
-    }
-
-    return {
-      quotaConfig: config,
-      usageRecords: this.storage.getUsageRecords(quotaId),
-      rejectEvents: this.storage.getRejectEvents(quotaId),
-      summary: this.getSummary(quotaId),
-      exportTime: new Date().toISOString(),
-      exportBy
-    };
-  }
-
-  public exportAll(exportBy: string): ExportRecord[] {
-    const configs = this.getAllQuotas();
-    return configs.map(config => this.exportQuota(config.id, exportBy));
-  }
-
-  public getValidUsageTags(): string[] {
-    return [...this.validUsageTags];
-  }
-}
-            );
+            throw new Error('Quota not found: ' + quotaId);
         }
+        const before = { ...config };
+        const updated = this.storage.updateQuotaConfig(quotaId, adjustments);
+        this.addAuditLog(quotaId, 'MANUAL_ADJUST', operator, before, updated, reason);
+        return updated;
+    }
+    addAuditLog(quotaId, action, operator, before, after, reason) {
+        const log = {
+            id: (0, uuid_1.v4)(),
+            quotaId,
+            action,
+            operator,
+            before,
+            after,
+            reason,
+            timestamp: new Date().toISOString()
+        };
+        this.storage.addAuditLog(log);
+    }
+    getSummary(quotaId) {
+        const config = this.getQuota(quotaId);
+        if (!config) {
+            throw new Error('Quota not found: ' + quotaId);
+        }
+        const rejectEvents = this.storage.getRejectEvents(quotaId);
+        const effectiveLimit = config.limit + config.tempBonus;
+        return {
+            teamName: config.teamName,
+            modelName: config.modelName,
+            usageTag: config.usageTag,
+            window: config.window,
+            totalLimit: config.limit,
+            totalUsed: config.used,
+            tempBonus: config.tempBonus,
+            remaining: effectiveLimit - config.used,
+            utilizationRate: (config.used / effectiveLimit) * 100,
+            rejectCount: rejectEvents.length,
+            windowStart: config.windowStart,
+            windowEnd: config.windowEnd,
+            lastUpdated: config.updatedAt
+        };
+    }
+    getRejectEvents(quotaId) {
+        return this.storage.getRejectEvents(quotaId);
+    }
+    getAuditLogs(quotaId) {
+        return this.storage.getAuditLogs(quotaId);
+    }
+    exportQuota(quotaId, exportBy) {
+        const config = this.getQuota(quotaId);
+        if (!config) {
+            throw new Error('Quota not found: ' + quotaId);
+        }
+        return {
+            quotaConfig: config,
+            usageRecords: this.storage.getUsageRecords(quotaId),
+            rejectEvents: this.storage.getRejectEvents(quotaId),
+            summary: this.getSummary(quotaId),
+            exportTime: new Date().toISOString(),
+            exportBy
+        };
+    }
+    exportAll(exportBy) {
+        const configs = this.getAllQuotas();
+        return configs.map(config => this.exportQuota(config.id, exportBy));
+    }
+    getValidUsageTags() {
+        return [...this.validUsageTags];
     }
 }
 exports.QuotaService = QuotaService;
