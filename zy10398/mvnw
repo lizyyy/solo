@@ -1,0 +1,28 @@
+#!/bin/sh
+# Maven Wrapper bootstrap script
+# 该脚本会自动下载并使用指定版本的 Maven，无需全局安装
+
+set -e
+
+MAVEN_VERSION="3.8.8"
+WRAPPER_VERSION="3.2.0"
+WRAPPER_DIR=".mvn/wrapper"
+WRAPPER_JAR="$WRAPPER_DIR/maven-wrapper.jar"
+MAVEN_BASE="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper"
+
+if [ ! -d "$WRAPPER_DIR" ]; then
+    mkdir -p "$WRAPPER_DIR"
+fi
+
+# 下载 wrapper jar 如果不存在
+if [ ! -f "$WRAPPER_JAR" ]; then
+    echo "[mvnw] 正在下载 Maven Wrapper..."
+    if ! curl -sL "$MAVEN_BASE/$WRAPPER_VERSION/maven-wrapper-$WRAPPER_VERSION.jar" -o "$WRAPPER_JAR"; then
+        echo "[mvnw] 下载失败，请检查网络连接"
+        exit 1
+    fi
+    echo "[mvnw] Maven Wrapper 下载完成"
+fi
+
+# 执行 Maven
+java -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"

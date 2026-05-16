@@ -29,18 +29,23 @@
 ### 启动命令
 
 ```bash
-# 1. 编译项目（首次运行必须执行）
-mvn clean package -DskipTests
+# 方式1：一键启动（推荐，无需系统安装Maven）
+chmod +x start.sh mvnw   # 首次运行设置执行权限
+./start.sh               # 自动下载依赖并启动服务
 
-# 2. 启动服务（两种方式二选一）
-# 方式A：使用jar包启动
-java -jar target/api-replay-budget-1.0.0.jar
+# 方式2：使用项目自带的 Maven Wrapper（无需系统安装Maven）
+chmod +x mvnw
+./mvnw spring-boot:run
 
-# 方式B：使用Maven直接启动（推荐开发时）
+# 方式3：如果系统已安装Maven
 mvn spring-boot:run
 ```
 
-**注意**：首次运行必须先执行 `mvn clean package` 生成 jar 包。
+**零依赖启动说明**：
+- 仅需 Java 11+，无需系统安装 Maven
+- `mvnw` 脚本会自动下载 Maven Wrapper 和相关依赖
+- `start.sh` 包含编译和启动的完整流程
+
 服务启动后访问：http://localhost:8080
 
 ### H2 数据库控制台
@@ -321,27 +326,50 @@ user002 预算 = 500
 600 > 500 → 拦截 ✅
 ```
 
+## 快速验证（启动后执行）
+
+```bash
+# 另开终端，一键验证拦截功能
+chmod +x quick-test.sh
+./quick-test.sh
+```
+
+预期输出：
+```
+✅ 服务运行正常
+✅ 获取样本ID: SMPxxxxxxxxxx
+✅ 拦截验证成功！预算不足拦截正常工作
+   错误码: 2002 (隐私预算不足)
+```
+
 ## 项目结构
 
 ```
 api-replay-budget/
-├── src/main/java/com/privacy/replay/
-│   ├── ReplayBudgetApplication.java    # 启动类
-│   ├── config/                          # 配置类
-│   │   ├── DataInitializer.java
-│   │   └── JacksonConfig.java
-│   ├── controller/                      # 控制器
-│   │   ├── BudgetController.java
-│   │   ├── ReplayController.java
-│   │   └── SampleController.java
-│   ├── dto/                             # 数据传输对象
-│   │   ├── ApiResponse.java
-│   │   ├── ApproveReplayRequest.java
-│   │   ├── CreateReplayRequest.java
-│   │   └── ExecuteReplayRequest.java
-│   ├── exception/                       # 异常处理
-│   │   ├── BusinessException.java
-│   │   ├── ErrorCode.java
+├── mvnw                                  # Maven Wrapper (Linux/macOS)
+├── mvnw.cmd                              # Maven Wrapper (Windows)
+├── start.sh                              # 一键启动脚本
+├── quick-test.sh                         # 快速验证脚本
+├── pom.xml                               # Maven 配置
+├── .mvn/wrapper/
+│   └── maven-wrapper.properties          # Wrapper 配置
+└── src/main/java/com/privacy/replay/
+    ├── ReplayBudgetApplication.java      # 启动类
+    ├── config/                            # 配置类
+    │   ├── DataInitializer.java
+    │   └── JacksonConfig.java
+    ├── controller/                        # 控制器
+    │   ├── BudgetController.java
+    │   ├── ReplayController.java
+    │   └── SampleController.java
+    ├── dto/                               # 数据传输对象
+    │   ├── ApiResponse.java
+    │   ├── ApproveReplayRequest.java
+    │   ├── CreateReplayRequest.java
+    │   └── ExecuteReplayRequest.java
+    ├── exception/                         # 异常处理
+    │   ├── BusinessException.java
+    │   ├── ErrorCode.java
 │   │   └── GlobalExceptionHandler.java
 │   ├── model/                           # 数据模型
 │   │   ├── IdempotentRecord.java
