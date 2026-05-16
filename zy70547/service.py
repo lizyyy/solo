@@ -87,8 +87,8 @@ class QuotaCircuitBreakerService:
         status_info = self.get_circuit_breaker_status(window.supplier_id)
         
         if status_info["status"] == CircuitBreakerStatus.OPEN.value:
-            if business_tag.priority > 5:
-                return {"allowed": False, "reason": "Circuit breaker is OPEN, low priority request rejected"}
+            if business_tag.priority > 3:
+                return {"allowed": False, "reason": "Circuit breaker is OPEN, medium and low priority request rejected"}
         
         if usage_ratio >= window.circuit_breaker_threshold:
             if business_tag.priority > 3:

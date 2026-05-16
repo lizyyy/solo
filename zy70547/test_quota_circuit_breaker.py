@@ -274,6 +274,51 @@ class TestQuotaCircuitBreaker(unittest.TestCase):
         self.assertEqual(failed_usage.status, "REJECTED")
         print("✓ 失败路径数据保留测试通过")
 
+    def test_open_state_persists_medium_priority_rejection(self):
+        print("\n=== 测试熔断状态机 - OPEN状态下中优先级应持续被拒绝")
+        self.window.used_quota = 96
+        self.db.commit()
+        
+        result = self.service.consume_quota(
+            supplier_code="SMS_PROVIDER",
+            business_tag_code="MARKETING",
+            amount=1,
+            request_id="req_state_001"
+        )
+        print(f"触发熔断时中优先级结果: {result}")
+        self.assertFalse(result["success"])
+        self.assertTrue(result["rejected"])
+        
+        events = self.service.get_circuit_breaker_events(self.supplier.id)
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0].status, "OPEN")
+        
+        self.service.manual_correct_quota(
+            quota_window_id=self.window.id,
+            new_used_quota=90,
+            reason="测试人工修正",
+            operator="admin"
+        )
+        
+        window = self.service.get_current_quota_window(self.supplier.id)
+        print(f"人工修正后已用额度: {window.used_quota}%")
+        self.assertEqual(window.used_quota, 90)
+        
+        status_info = self.service.get_circuit_breaker_status(self.supplier.id)
+        print(f"当前熔断状态: {status_info}")
+        self.assertEqual(status_info["status"], "OPEN")
+        
+        result = self.service.consume_quota(
+            supplier_code="SMS_PROVIDER",
+            business_tag_code="MARKETING",
+            amount=1,
+            request_id="req_state_002"
+        )
+        print(f"OPEN状态下中优先级(priority=4)结果: {result}")
+        self.assertFalse(result["success"], "OPEN状态下中优先级请求应该被拒绝，但实际通过了！")
+        self.assertTrue(result["rejected"])
+        print("✓ OPEN状态下中优先级持续被拒绝测试通过")
+
 
 def run_tests():
     print("=" * 60)
