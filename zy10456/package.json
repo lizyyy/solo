@@ -1,0 +1,24 @@
+{
+  "name": "csv-to-ndjson-cli",
+  "version": "1.0.0",
+  "description": "CSV转NDJSON规整CLI工具 - 处理编码探测、列名归一、坏行留存",
+  "main": "src/index.js",
+  "bin": {
+    "csv2ndjson": "./bin/csv2ndjson.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": ["csv", "ndjson", "etl", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chardet": "^2.0.0",
+    "csv-parser": "^3.0.0",
+    "iconv-lite": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

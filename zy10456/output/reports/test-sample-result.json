@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "generatedAt": "2026-05-16T20:15:21.259Z",
+    "inputFile": "/Users/lzy/pro/solo/workspaces/zy10456/test-sample.csv",
+    "outputFile": "/Users/lzy/pro/solo/workspaces/zy10456/output/test-sample.ndjson",
+    "badRowsFile": "/Users/lzy/pro/solo/workspaces/zy10456/output/test-sample-bad-rows.csv"
+  },
+  "summary": {
+    "success": true,
+    "detectedEncoding": "UTF-8",
+    "totalRows": 5,
+    "successRows": 4,
+    "badRows": 0,
+    "duplicateRows": 1,
+    "successRate": "80.00%",
+    "durationMs": 20
+  },
+  "columns": {
+    "original": [
+      "订单号",
+      "用户姓名",
+      "下单时间",
+      "支付金额",
+      "备注"
+    ],
+    "normalized": [
+      "order_id",
+      "user_name",
+      "created_at",
+      "amount",
+      "remark"
+    ],
+    "mapping": {
+      "订单号": "order_id",
+      "用户姓名": "user_name",
+      "下单时间": "created_at",
+      "支付金额": "amount",
+      "备注": "remark"
+    }
+  },
+  "badRows": [],
+  "duplicateRows": [
+    {
+      "lineNumber": 4,
+      "data": {
+        "order_id": "1001",
+        "user_name": "张三",
+        "created_at": "2024-01-01",
+        "amount": "99.00",
+        "remark": "重复订单"
+      }
+    }
+  ],
+  "error": null
+}
