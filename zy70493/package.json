@@ -2,7 +2,7 @@
   "name": "audit-sign-tool",
   "version": "1.0.0",
   "description": "构建产物签名与审计流水管理工具",
-  "main": "dist/index.js",
+  "main": "dist/cli.js",
   "bin": {
     "audit-sign": "dist/cli.js"
   },

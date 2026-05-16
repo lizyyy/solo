@@ -94,6 +94,7 @@ async function enrichExportData(samples: AbnormalSample[], includeRawData: boole
         sourceInfo = {
           样本编号: labSample.sampleCode,
           样本类型: labSample.sampleType,
+          调用方: labSample.requester,
           采集日期: labSample.collectionDate,
           采集地点: labSample.collectionSite,
           采集人: labSample.collector,

@@ -137,12 +137,14 @@ program
   .description('查询实验室样本记录')
   .option('--batch-id <batchId>', '按批次号过滤')
   .option('--status <status>', '按状态过滤')
+  .option('--requester <requester>', '按调用方过滤（支持模糊匹配）')
   .option('--format <format>', '输出格式 (table|json)', 'table')
   .action(async (options) => {
     try {
       const filter: any = {};
       if (options.batchId) filter.batchId = options.batchId;
       if (options.status) filter.status = options.status;
+      if (options.requester) filter.requester = options.requester;
       
       const records = await queryLabSamples(filter);
       
@@ -150,20 +152,23 @@ program
         console.log(JSON.stringify(records, null, 2));
       } else {
         console.log('\n📋 实验室样本记录');
-        console.log('='.repeat(100));
+        console.log('='.repeat(120));
         console.log(`共 ${records.length} 条记录`);
+        if (options.requester) {
+          console.log(`过滤条件：调用方 = "${options.requester}"`);
+        }
         console.log('');
         
         console.table(records.map((r: any) => ({
           '样本编号': r.sampleCode,
           '样本类型': r.sampleType,
+          '调用方': r.requester,
           '采集日期': r.collectionDate,
           '采集地点': r.collectionSite,
-          '采集人': r.collector,
           '检测人': r.tester,
           '检测结果': r.testResult,
           '状态': r.status,
-          '人工备注': r.manualNotes.substring(0, 20)
+          '人工备注': r.manualNotes.substring(0, 18)
         })));
       }
     } catch (error) {

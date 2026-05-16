@@ -108,6 +108,7 @@ async function initDatabase(dbPath) {
       manual_notes TEXT NOT NULL,
       reviewer TEXT,
       review_date TEXT,
+      requester TEXT NOT NULL,
       status TEXT NOT NULL,
       created_at TEXT NOT NULL
     );
@@ -278,13 +279,13 @@ async function insertLabSample(item) {
     INSERT INTO lab_samples (
       id, sample_code, batch_id, member_id, sample_type, collection_date,
       collection_site, collector, tester, test_result, test_date,
-      manual_notes, reviewer, review_date, status, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      manual_notes, reviewer, review_date, requester, status, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
         id, item.sampleCode, item.batchId, item.memberId, item.sampleType,
         item.collectionDate, item.collectionSite, item.collector, item.tester,
         item.testResult, item.testDate, item.manualNotes, item.reviewer,
-        item.reviewDate, item.status, item.createdAt
+        item.reviewDate, item.requester, item.status, item.createdAt
     ]);
     return id;
 }
@@ -299,6 +300,10 @@ async function queryLabSamples(filter = {}) {
     if (filter.status) {
         query += ' AND status = ?';
         params.push(filter.status);
+    }
+    if (filter.requester) {
+        query += ' AND requester LIKE ?';
+        params.push(`%${filter.requester}%`);
     }
     const rows = await database.all(query, params);
     return rows.map((row) => ({
@@ -316,6 +321,7 @@ async function queryLabSamples(filter = {}) {
         manualNotes: row.manual_notes,
         reviewer: row.reviewer,
         reviewDate: row.review_date,
+        requester: row.requester,
         status: row.status,
         createdAt: row.created_at
     }));

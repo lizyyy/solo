@@ -52,6 +52,16 @@ const OPERATORS = [
     { id: 'OP004', name: '赵审核' },
     { id: 'OP005', name: '刘风控' }
 ];
+const REQUESTERS = [
+    '会员运营部',
+    '风控合规部',
+    '客户服务中心',
+    '门店管理部',
+    '财务审计组',
+    '反欺诈调查组',
+    '质量管理部',
+    '数据合规组'
+];
 const MEMBER_PLANS = [
     '月卡会员',
     '季卡会员',
@@ -246,6 +256,7 @@ async function generateDemoData(batchId) {
             manualNotes: manualNotesList[Math.floor(Math.random() * manualNotesList.length)],
             reviewer: status === 'completed' ? OPERATORS[4].name : undefined,
             reviewDate: status === 'completed' ? (0, date_fns_1.format)((0, date_fns_1.addDays)(collectionDate, 3), 'yyyy-MM-dd') : undefined,
+            requester: REQUESTERS[Math.floor(Math.random() * REQUESTERS.length)],
             status,
             createdAt: collectionDate.toISOString()
         });

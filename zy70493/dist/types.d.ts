@@ -73,6 +73,7 @@ export interface LabSample {
     manualNotes: string;
     reviewer?: string;
     reviewDate?: string;
+    requester: string;
     status: string;
     createdAt: string;
 }
@@ -100,4 +101,5 @@ export interface QueryFilter {
     startDate?: string;
     endDate?: string;
     status?: string;
+    requester?: string;
 }
