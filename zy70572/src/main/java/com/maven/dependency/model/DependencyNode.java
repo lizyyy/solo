@@ -2,7 +2,9 @@ package com.maven.dependency.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class DependencyNode {
     private String groupId;
@@ -15,13 +17,14 @@ public class DependencyNode {
     private int depth;
     private String rawLine;
     private int lineNumber;
-    
+
     private List<DependencyNode> children = new ArrayList<>();
-    
+
     @JsonIgnore
     private DependencyNode parent;
 
-    public DependencyNode() {}
+    public DependencyNode() {
+    }
 
     public DependencyNode(String groupId, String artifactId, String version, String scope) {
         this.groupId = groupId;
@@ -30,41 +33,101 @@ public class DependencyNode {
         this.scope = scope;
     }
 
-    public String getGroupId() { return groupId; }
-    public void setGroupId(String groupId) { this.groupId = groupId; }
+    public String getGroupId() {
+        return groupId;
+    }
 
-    public String getArtifactId() { return artifactId; }
-    public void setArtifactId(String artifactId) { this.artifactId = artifactId; }
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
 
-    public String getVersion() { return version; }
-    public void setVersion(String version) { this.version = version; }
+    public String getArtifactId() {
+        return artifactId;
+    }
 
-    public String getScope() { return scope; }
-    public void setScope(String scope) { this.scope = scope; }
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
 
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
+    public String getVersion() {
+        return version;
+    }
 
-    public String getClassifier() { return classifier; }
-    public void setClassifier(String classifier) { this.classifier = classifier; }
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
-    public boolean isOptional() { return optional; }
-    public void setOptional(boolean optional) { this.optional = optional; }
+    public String getScope() {
+        return scope;
+    }
 
-    public int getDepth() { return depth; }
-    public void setDepth(int depth) { this.depth = depth; }
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
 
-    public String getRawLine() { return rawLine; }
-    public void setRawLine(String rawLine) { this.rawLine = rawLine; }
+    public String getType() {
+        return type;
+    }
 
-    public int getLineNumber() { return lineNumber; }
-    public void setLineNumber(int lineNumber) { this.lineNumber = lineNumber; }
+    public void setType(String type) {
+        this.type = type;
+    }
 
-    public List<DependencyNode> getChildren() { return children; }
-    public void setChildren(List<DependencyNode> children) { this.children = children; }
+    public String getClassifier() {
+        return classifier;
+    }
 
-    public DependencyNode getParent() { return parent; }
-    public void setParent(DependencyNode parent) { this.parent = parent; }
+    public void setClassifier(String classifier) {
+        this.classifier = classifier;
+    }
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    public String getRawLine() {
+        return rawLine;
+    }
+
+    public void setRawLine(String rawLine) {
+        this.rawLine = rawLine;
+    }
+
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
+    public List<DependencyNode> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<DependencyNode> children) {
+        this.children = children;
+    }
+
+    public DependencyNode getParent() {
+        return parent;
+    }
+
+    public void setParent(DependencyNode parent) {
+        this.parent = parent;
+    }
 
     @JsonProperty("fullName")
     public String getFullName() {

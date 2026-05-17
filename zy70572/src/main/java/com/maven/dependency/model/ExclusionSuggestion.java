@@ -9,10 +9,11 @@ public class ExclusionSuggestion {
     private int priority;
     private String dependencyPath;
 
-    public ExclusionSuggestion() {}
+    public ExclusionSuggestion() {
+    }
 
-    public ExclusionSuggestion(String fromGroupId, String fromArtifactId, 
-                               String excludeGroupId, String excludeArtifactId, 
+    public ExclusionSuggestion(String fromGroupId, String fromArtifactId,
+                               String excludeGroupId, String excludeArtifactId,
                                String reason, int priority) {
         this.fromGroupId = fromGroupId;
         this.fromArtifactId = fromArtifactId;
@@ -22,26 +23,61 @@ public class ExclusionSuggestion {
         this.priority = priority;
     }
 
-    public String getFromGroupId() { return fromGroupId; }
-    public void setFromGroupId(String fromGroupId) { this.fromGroupId = fromGroupId; }
+    public String getFromGroupId() {
+        return fromGroupId;
+    }
 
-    public String getFromArtifactId() { return fromArtifactId; }
-    public void setFromArtifactId(String fromArtifactId) { this.fromArtifactId = fromArtifactId; }
+    public void setFromGroupId(String fromGroupId) {
+        this.fromGroupId = fromGroupId;
+    }
 
-    public String getExcludeGroupId() { return excludeGroupId; }
-    public void setExcludeGroupId(String excludeGroupId) { this.excludeGroupId = excludeGroupId; }
+    public String getFromArtifactId() {
+        return fromArtifactId;
+    }
 
-    public String getExcludeArtifactId() { return excludeArtifactId; }
-    public void setExcludeArtifactId(String excludeArtifactId) { this.excludeArtifactId = excludeArtifactId; }
+    public void setFromArtifactId(String fromArtifactId) {
+        this.fromArtifactId = fromArtifactId;
+    }
 
-    public String getReason() { return reason; }
-    public void setReason(String reason) { this.reason = reason; }
+    public String getExcludeGroupId() {
+        return excludeGroupId;
+    }
 
-    public int getPriority() { return priority; }
-    public void setPriority(int priority) { this.priority = priority; }
+    public void setExcludeGroupId(String excludeGroupId) {
+        this.excludeGroupId = excludeGroupId;
+    }
 
-    public String getDependencyPath() { return dependencyPath; }
-    public void setDependencyPath(String dependencyPath) { this.dependencyPath = dependencyPath; }
+    public String getExcludeArtifactId() {
+        return excludeArtifactId;
+    }
+
+    public void setExcludeArtifactId(String excludeArtifactId) {
+        this.excludeArtifactId = excludeArtifactId;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public String getDependencyPath() {
+        return dependencyPath;
+    }
+
+    public void setDependencyPath(String dependencyPath) {
+        this.dependencyPath = dependencyPath;
+    }
 
     public String toMavenXml() {
         return String.format(
@@ -54,7 +90,7 @@ public class ExclusionSuggestion {
     }
 
     public String getLocationComment() {
-        return String.format("<!-- Add this exclusion to %s:%s dependency -->", 
+        return String.format("<!-- Add this exclusion to %s:%s dependency -->",
                            fromGroupId, fromArtifactId);
     }
 }

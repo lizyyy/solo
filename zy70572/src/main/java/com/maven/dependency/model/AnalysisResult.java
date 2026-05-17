@@ -1,6 +1,9 @@
 package com.maven.dependency.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AnalysisResult {
     private String projectName;
@@ -19,35 +22,93 @@ public class AnalysisResult {
         this.analysisTimestamp = System.currentTimeMillis();
     }
 
-    public String getProjectName() { return projectName; }
-    public     public     public     public     public     public     public     public     public     public     public     public     public     public     public     public     public     public     public inputFile; }
+    public String getProjectName() {
+        return projectName;
+    }
 
-    public long getAnalysisTimestamp() { return analysisTimestamp; }
-    public void setAnalysisTimestamp(long analysisTimestamp) { this.analysisTimestamp = analysisTimestamp; }
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
 
-    public int getTotalDependencies() { return totalDependencies; }
-    public void setTotalDependencies(int totalDependencies) { this.totalDependencies = totalDependencies; }
+    public String getInputFile() {
+        return inputFile;
+    }
 
-    public int getUniqueArtifacts() { return uniqueArtifacts; }
-    public void setUniqueArtifacts(int uniqueArtifacts) { this.uniqueArtifacts = uniqueArtifacts; }
+    public void setInputFile(String inputFile) {
+        this.inputFile = inputFile;
+    }
 
-    public int getConflictCount() { return conflictCount; }
-    public void setConflictCount(int conflictCount) { this.conflictCount = conflictCount; }
+    public long getAnalysisTimestamp() {
+        return analysisTimestamp;
+    }
 
-    public List<ConflictInfo> getConflicts() { return conflicts; }
-    public void setConflicts(List<ConflictInfo> conflicts) { this.conflicts = conflicts; }
+    public void setAnalysisTimestamp(long analysisTimestamp) {
+        this.analysisTimestamp = analysisTimestamp;
+    }
 
-    public List<BadLine> getBadLines() { return badLines; }
-    public void setBadLines(List<BadLine> badLines) { this.badLines = badLines; }
+    public int getTotalDependencies() {
+        return totalDependencies;
+    }
 
-    public List<String> getWarnings() { return warnings; }
-    public void setWarnings(List<String> warnings) { this.warnings = warnings; }
+    public void setTotalDependencies(int totalDependencies) {
+        this.totalDependencies = totalDependencies;
+    }
 
-    public DependencyNode getRootNode() { return rootNode; }
-    public void setRootNode(DependencyNode rootNode) { this.rootNode = rootNode; }
+    public int getUniqueArtifacts() {
+        return uniqueArtifacts;
+    }
 
-    public Map<String, List<DependencyNode>> getArtifactMap() { return artifactMap; }
-    public void setArtifactMap(Map<String, List<DependencyNode>> artifactMap) { this.artifactMap = artifactMap; }
+    public void setUniqueArtifacts(int uniqueArtifacts) {
+        this.uniqueArtifacts = uniqueArtifacts;
+    }
+
+    public int getConflictCount() {
+        return conflictCount;
+    }
+
+    public void setConflictCount(int conflictCount) {
+        this.conflictCount = conflictCount;
+    }
+
+    public List<ConflictInfo> getConflicts() {
+        return conflicts;
+    }
+
+    public void setConflicts(List<ConflictInfo> conflicts) {
+        this.conflicts = conflicts;
+    }
+
+    public List<BadLine> getBadLines() {
+        return badLines;
+    }
+
+    public void setBadLines(List<BadLine> badLines) {
+        this.badLines = badLines;
+    }
+
+    public List<String> getWarnings() {
+        return warnings;
+    }
+
+    public void setWarnings(List<String> warnings) {
+        this.warnings = warnings;
+    }
+
+    public DependencyNode getRootNode() {
+        return rootNode;
+    }
+
+    public void setRootNode(DependencyNode rootNode) {
+        this.rootNode = rootNode;
+    }
+
+    public Map<String, List<DependencyNode>> getArtifactMap() {
+        return artifactMap;
+    }
+
+    public void setArtifactMap(Map<String, List<DependencyNode>> artifactMap) {
+        this.artifactMap = artifactMap;
+    }
 
     public void addBadLine(BadLine badLine) {
         badLines.add(badLine);

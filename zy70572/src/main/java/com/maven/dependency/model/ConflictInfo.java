@@ -1,6 +1,7 @@
 package com.maven.dependency.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConflictInfo {
     private String groupId;
@@ -14,29 +15,92 @@ public class ConflictInfo {
     private int conflictDepth;
     private Severity severity;
 
-    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    public    pusion() { return resolvedVersion; }
-    public void setResolvedVersion(String resolvedVersion) { this.resolvedVersion = resolvedVersion; }
+    public enum Severity {
+        CRITICAL, HIGH, MEDIUM, LOW
+    }
 
-    public List<String> getConflictingVersions() { return conflictingVersions; }
-    public void setConflictingVersions(List<String> conflictingVersions) { this.conflictingVersions = conflictingVersions; }
+    public ConflictInfo() {
+    }
 
-    public List<DependencyNode> getOccurrences() { return occurrences; }
-    public void setOccurrences(List<DependencyNode> occurrences) { this.occurrences = occurrences; }
+    public String getGroupId() {
+        return groupId;
+    }
 
-    public List<String> getScopes() { return scopes; }
-    public void setScopes(List<String> scopes) { this.scopes = scopes; }
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
 
-    public String getMediationReason() { return mediationReason; }
-    public void setMediationReason(String mediationReason) { this.mediationReason = mediationReason; }
+    public String getArtifactId() {
+        return artifactId;
+    }
 
-    public List<ExclusionSuggestion> getExclusionSuggestions() { return exclusionSuggestions; }
-    public void setExclusionSuggestions(List<ExclusionSuggestion> exclusionSuggestions) { this.exclusionSuggestions = exclusionSuggestions; }
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
 
-    public int getConflictDepth() { return conflictDepth; }
-    public void setConflictDepth(int conflictDepth) { this.conflictDepth = conflictDepth; }
+    public String getResolvedVersion() {
+        return resolvedVersion;
+    }
 
-    public Severity getSeverity() { return severity; }
-    public void setSeverity(Severity severity) { this.severity = severity; }
+    public void setResolvedVersion(String resolvedVersion) {
+        this.resolvedVersion = resolvedVersion;
+    }
+
+    public List<String> getConflictingVersions() {
+        return conflictingVersions;
+    }
+
+    public void setConflictingVersions(List<String> conflictingVersions) {
+        this.conflictingVersions = conflictingVersions;
+    }
+
+    public List<DependencyNode> getOccurrences() {
+        return occurrences;
+    }
+
+    public void setOccurrences(List<DependencyNode> occurrences) {
+        this.occurrences = occurrences;
+    }
+
+    public List<String> getScopes() {
+        return scopes;
+    }
+
+    public void setScopes(List<String> scopes) {
+        this.scopes = scopes;
+    }
+
+    public String getMediationReason() {
+        return mediationReason;
+    }
+
+    public void setMediationReason(String mediationReason) {
+        this.mediationReason = mediationReason;
+    }
+
+    public List<ExclusionSuggestion> getExclusionSuggestions() {
+        return exclusionSuggestions;
+    }
+
+    public void setExclusionSuggestions(List<ExclusionSuggestion> exclusionSuggestions) {
+        this.exclusionSuggestions = exclusionSuggestions;
+    }
+
+    public int getConflictDepth() {
+        return conflictDepth;
+    }
+
+    public void setConflictDepth(int conflictDepth) {
+        this.conflictDepth = conflictDepth;
+    }
+
+    public Severity getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(Severity severity) {
+        this.severity = severity;
+    }
 
     public String getArtifactKey() {
         return groupId + ":" + artifactId;
