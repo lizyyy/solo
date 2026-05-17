@@ -1,5 +1,7 @@
+import hashlib
+import json
 from datetime import datetime, date
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Any
 from collections import defaultdict
 
 from ..models import (
@@ -45,6 +47,28 @@ class ValidationEngine:
         self.substitutes = sorted(substitutes, key=lambda s: (s.target_group_id, s.priority))
         self.checkins = checkins
         self._group_player_count: Dict[str, int] = defaultdict(int)
+        self._input_hash = self._calculate_input_hash()
+
+    def _calculate_input_hash(self) -> str:
+        def to_dict(obj: Any) -> Any:
+            if hasattr(obj, 'model_dump'):
+                return obj.model_dump(exclude={'source'})
+            if isinstance(obj, (list, tuple)):
+                return [to_dict(i) for i in obj]
+            if isinstance(obj, dict):
+                return {k: to_dict(v) for k, v in sorted(obj.items())}
+            return obj
+
+        input_data = {
+            'players': to_dict(sorted(self.players, key=lambda p: p.player_id)),
+            'groups': to_dict(sorted(self.groups.values(), key=lambda g: g.group_id)),
+            'materials': to_dict(sorted([m for ml in self.materials.values() for m in ml], key=lambda x: (x.player_id, x.material_type))),
+            'substitutes': to_dict(self.substitutes),
+            'checkins': to_dict(sorted(self.checkins, key=lambda c: (c.player_id, c.checkin_time.isoformat() if hasattr(c.checkin_time, 'isoformat') else str(c.checkin_time)))),
+        }
+
+        json_str = json.dumps(input_data, sort_keys=True, default=str)
+        return hashlib.md5(json_str.encode('utf-8')).hexdigest()[:12]
 
     def calculate_age(self, birth_date: date) -> int:
         today = date.today()
@@ -154,7 +178,7 @@ class ValidationEngine:
 
         return result
 
-    def process_substitute_promotion(self, player_qualifications: Dict[str, PlayerQualification]):
+    def process_substitute_promotion(self, player_qualifications: Dict[str, PlayerQualification], all_issues: List[ValidationIssue]):
         group_players: Dict[str, List[str]] = defaultdict(list)
 
         for pq in player_qualifications.values():
@@ -177,21 +201,47 @@ class ValidationEngine:
                             break
 
                         pq = player_qualifications.get(sub.player_id)
-                        if pq and pq.is_qualified:
-                            old_group = pq.player.group_id
-                            if old_group in group_players:
-                                group_players[old_group] = [
-                                    pid for pid in group_players[old_group]
-                                    if pid != sub.player_id
-                                ]
+                        if not pq:
+                            continue
 
-                            pq.player.group_id = group_id
-                            pq.is_substitute = True
-                            pq.substitute_priority = sub.priority
+                        eligibility_result = self.validate_substitute_eligibility(pq.player, group_id)
+                        if eligibility_result.has_errors():
+                            continue
+
+                        old_group = pq.player.group_id
+                        if old_group in group_players:
+                            group_players[old_group] = [
+                                pid for pid in group_players[old_group]
+                                if pid != sub.player_id
+                            ]
+
+                        pq.player.group_id = group_id
+                        pq.is_substitute = True
+                        pq.substitute_priority = sub.priority
+
+                        pq.issues = [i for i in pq.issues if i.rule_type not in [RuleType.MATERIAL_CHECK, RuleType.GROUP_RESTRICTION]]
+                        pq.issues.extend(eligibility_result.issues)
+
+                        has_errors = any(i.severity == IssueSeverity.ERROR for i in pq.issues)
+                        has_warnings = any(i.severity == IssueSeverity.WARNING for i in pq.issues)
+                        if has_errors:
+                            pq.overall_status = ValidationStatus.FAIL
+                            pq.is_qualified = False
+                        elif has_warnings:
+                            pq.overall_status = ValidationStatus.WARNING
+                            pq.is_qualified = True
+                        else:
+                            pq.overall_status = ValidationStatus.PASS
+                            pq.is_qualified = True
+
+                        if pq.is_qualified:
                             group_players[group_id].append(sub.player_id)
                             promoted += 1
 
-    def run_validation(self) -> QualificationReport:
+        for pq in sorted(player_qualifications.values(), key=lambda x: x.player.player_id):
+            all_issues.extend(pq.issues)
+
+    def run_validation(self, generated_at: datetime = None) -> QualificationReport:
         player_qualifications: Dict[str, PlayerQualification] = {}
         all_issues: List[ValidationIssue] = []
 
@@ -235,25 +285,36 @@ class ValidationEngine:
                 is_qualified=not has_errors,
                 checkin_count=checkin_count,
             )
-            all_issues.extend(issues)
 
-        self.process_substitute_promotion(player_qualifications)
+        all_issues.clear()
+        self.process_substitute_promotion(player_qualifications, all_issues)
 
         qualified_count = sum(1 for pq in player_qualifications.values() if pq.is_qualified)
         disqualified_count = sum(1 for pq in player_qualifications.values() if not pq.is_qualified)
         warning_count = sum(1 for pq in player_qualifications.values() if pq.overall_status == ValidationStatus.WARNING)
         pending_count = sum(1 for pq in player_qualifications.values() if pq.overall_status == ValidationStatus.PENDING)
 
+        if generated_at is None:
+            generated_at = datetime.fromtimestamp(0)
+
+        seen_issues = set()
+        unique_issues = []
+        for issue in all_issues:
+            issue_key = (issue.rule_type, issue.severity, issue.message)
+            if issue_key not in seen_issues:
+                seen_issues.add(issue_key)
+                unique_issues.append(issue)
+
         return QualificationReport(
-            report_id=f"RPT-{datetime.now().strftime('%Y%m%d%H%M%S')}",
-            generated_at=datetime.now(),
+            report_id=f"RPT-{self._input_hash}",
+            generated_at=generated_at,
             total_players=len(self.players),
             qualified_count=qualified_count,
             disqualified_count=disqualified_count,
             warning_count=warning_count,
             pending_count=pending_count,
-            player_qualifications=list(player_qualifications.values()),
-            all_issues=sorted(all_issues, key=lambda x: (x.severity, x.rule_type)),
+            player_qualifications=sorted(player_qualifications.values(), key=lambda x: x.player.player_id),
+            all_issues=sorted(unique_issues, key=lambda x: (x.severity, x.rule_type)),
         )
 
 
@@ -263,6 +324,7 @@ def run_full_validation(
     materials: List[Material],
     substitutes: List[Substitute],
     checkins: List[CheckinEvent],
+    generated_at: datetime = None,
 ) -> QualificationReport:
     engine = ValidationEngine(players, groups, materials, substitutes, checkins)
-    return engine.run_validation()
+    return engine.run_validation(generated_at=generated_at)

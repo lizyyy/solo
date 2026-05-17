@@ -1,0 +1,156 @@
+{
+  "report_id": "RPT-31f23e0443e7",
+  "generated_at": "1970-01-01T08:00:00",
+  "summary": {
+    "total_players": 3,
+    "qualified_count": 0,
+    "disqualified_count": 3,
+    "warning_count": 0
+  },
+  "player_qualifications": [
+    {
+      "player_id": "P001",
+      "name": "张三",
+      "group_id": "G001",
+      "overall_status": "FAIL",
+      "is_qualified": false,
+      "checkin_count": 2,
+      "is_substitute": false,
+      "substitute_priority": null,
+      "issues_count": 2
+    },
+    {
+      "player_id": "P002",
+      "name": "李四",
+      "group_id": "G001",
+      "overall_status": "FAIL",
+      "is_qualified": false,
+      "checkin_count": 1,
+      "is_substitute": false,
+      "substitute_priority": null,
+      "issues_count": 1
+    },
+    {
+      "player_id": "P003",
+      "name": "王五",
+      "group_id": "G002",
+      "overall_status": "FAIL",
+      "is_qualified": false,
+      "checkin_count": 0,
+      "is_substitute": false,
+      "substitute_priority": null,
+      "issues_count": 5
+    }
+  ],
+  "all_issues": [
+    {
+      "rule_type": "材料校验",
+      "severity": "ERROR",
+      "message": "材料状态无效: 健康证明 (未上传)",
+      "source": {
+        "file_path": "players.csv",
+        "row_number": 2
+      },
+      "details": {
+        "player_id": "P001",
+        "material": "健康证明",
+        "status": "未上传"
+      }
+    },
+    {
+      "rule_type": "材料校验",
+      "severity": "ERROR",
+      "message": "缺少必需材料: 身份证",
+      "source": {
+        "file_path": "players.csv",
+        "row_number": 4
+      },
+      "details": {
+        "player_id": "P003",
+        "material": "身份证"
+      }
+    },
+    {
+      "rule_type": "材料校验",
+      "severity": "ERROR",
+      "message": "缺少必需材料: 照片",
+      "source": {
+        "file_path": "players.csv",
+        "row_number": 4
+      },
+      "details": {
+        "player_id": "P003",
+        "material": "照片"
+      }
+    },
+    {
+      "rule_type": "材料校验",
+      "severity": "ERROR",
+      "message": "缺少必需材料: 健康证明",
+      "source": {
+        "file_path": "players.csv",
+        "row_number": 4
+      },
+      "details": {
+        "player_id": "P003",
+        "material": "健康证明"
+      }
+    },
+    {
+      "rule_type": "组别限制",
+      "severity": "ERROR",
+      "message": "性别不符合组别要求: 需要男",
+      "source": {
+        "file_path": "players.csv",
+        "row_number": 3
+      },
+      "details": {
+        "player_id": "P002",
+        "gender": "女",
+        "required": "男"
+      }
+    },
+    {
+      "rule_type": "组别限制",
+      "severity": "ERROR",
+      "message": "性别不符合组别要求: 需要女",
+      "source": {
+        "file_path": "players.csv",
+        "row_number": 4
+      },
+      "details": {
+        "player_id": "P003",
+        "gender": "男",
+        "required": "女"
+      }
+    },
+    {
+      "rule_type": "组别限制",
+      "severity": "ERROR",
+      "message": "年龄超过组别上限: 41 > 40",
+      "source": {
+        "file_path": "players.csv",
+        "row_number": 4
+      },
+      "details": {
+        "player_id": "P003",
+        "age": 41,
+        "max_age": 40
+      }
+    },
+    {
+      "rule_type": "重复检录",
+      "severity": "WARNING",
+      "message": "重复检录: 已检录 2 次",
+      "source": {
+        "file_path": "players.csv",
+        "row_number": 2
+      },
+      "details": {
+        "player_id": "P001",
+        "checkin_count": 2
+      }
+    }
+  ],
+  "parse_errors": []
+}
