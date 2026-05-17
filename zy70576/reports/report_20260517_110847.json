@@ -1,0 +1,40 @@
+{
+  "total": 3,
+  "matched": 0,
+  "unmatched": 3,
+  "invalid": 0,
+  "timestamp": "20260517_110847",
+  "clusters": [],
+  "results": [
+    {
+      "line_num": 1,
+      "path": "/api/v1/users/profile",
+      "matched": false,
+      "cluster": "",
+      "route_name": "",
+      "vhost": "",
+      "reason": [],
+      "error": ""
+    },
+    {
+      "line_num": 2,
+      "path": "/health",
+      "matched": false,
+      "cluster": "",
+      "route_name": "",
+      "vhost": "",
+      "reason": [],
+      "error": ""
+    },
+    {
+      "line_num": 3,
+      "path": "/index.html",
+      "matched": false,
+      "cluster": "",
+      "route_name": "",
+      "vhost": "",
+      "reason": [],
+      "error": ""
+    }
+  ]
+}
