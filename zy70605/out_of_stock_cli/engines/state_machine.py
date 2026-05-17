@@ -61,6 +61,28 @@ class CompensationStateMachine:
                     and plan.user_id == conf.user_id
                 ):
                     if conf.confirmed:
+                        old_type = plan.compensation_type.value
+                        plan.compensation_type = conf.compensation_type
+
+                        if conf.compensation_type.value != old_type:
+                            if plan.compensation_type.value == "refund":
+                                refund_amount = round(plan.quantity * (plan.refund_amount / plan.quantity) if plan.refund_amount else 0, 2)
+                                plan.refund_amount = refund_amount
+                                plan.points_amount = None
+                                plan.exchange_sku_id = None
+                                plan.exchange_sku_name = None
+                            elif plan.compensation_type.value == "points":
+                                points_amount = plan.quantity * 100 * (plan.refund_amount / plan.quantity if plan.refund_amount and plan.quantity > 0 else 0.599)
+                                plan.points_amount = int(points_amount)
+                                plan.refund_amount = None
+                                plan.exchange_sku_id = None
+                                plan.exchange_sku_name = None
+                            elif plan.compensation_type.value == "exchange":
+                                plan.exchange_sku_id = plan.exchange_sku_id or ""
+                                plan.exchange_sku_name = plan.exchange_sku_name or ""
+                                plan.refund_amount = None
+                                plan.points_amount = None
+
                         success, msg = self.transition(plan.plan_id, CompensationStatus.CONFIRMED)
                         if not success:
                             errors.append(f"方案 {plan.plan_id}: {msg}")

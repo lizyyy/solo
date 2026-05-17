@@ -36,45 +36,75 @@ class AllocationEngine:
     ) -> AllocationResult:
         plans: List[CompensationPlan] = []
 
-        for order in self.orders:
-            key = (order.batch_id, order.sku_id)
-            oos_item = self.oos_map.get(key)
+        grouped_orders = self._group_orders_by_batch_sku()
 
+        for (batch_id, sku_id), orders in grouped_orders.items():
+            oos_item = self.oos_map.get((batch_id, sku_id))
             if not oos_item or oos_item.shortage_quantity <= 0:
                 continue
 
-            shortage_per_order = self._calculate_shortage(order, oos_item)
-            if shortage_per_order <= 0:
-                continue
+            shortage_allocations = self._calculate_allocation(orders, oos_item)
 
-            plan = self._create_compensation_plan(
-                order=order,
-                oos_item=oos_item,
-                quantity=shortage_per_order,
-                compensation_type=default_compensation_type,
-            )
-            plans.append(plan)
+            for order in orders:
+                shortage_qty = shortage_allocations.get(order.order_id, 0)
+                if shortage_qty <= 0:
+                    continue
+
+                plan = self._create_compensation_plan(
+                    order=order,
+                    oos_item=oos_item,
+                    quantity=shortage_qty,
+                    compensation_type=default_compensation_type,
+                )
+                plans.append(plan)
 
         summary = self._generate_summary(plans)
         return AllocationResult(plans=plans, summary=summary)
 
-    def _calculate_shortage(self, order: OrderItem, oos_item: OutOfStockItem) -> int:
-        batch_orders = [
-            o for o in self.orders
-            if o.batch_id == order.batch_id and o.sku_id == order.sku_id
-        ]
-        total_ordered = sum(o.quantity for o in batch_orders)
+    def _group_orders_by_batch_sku(self) -> Dict[Tuple[str, str], List[OrderItem]]:
+        grouped: Dict[Tuple[str, str], List[OrderItem]] = {}
+        for order in self.orders:
+            key = (order.batch_id, order.sku_id)
+            if key not in grouped:
+                grouped[key] = []
+            grouped[key].append(order)
+        return grouped
 
+    def _calculate_allocation(
+        self, orders: List[OrderItem], oos_item: OutOfStockItem
+    ) -> Dict[str, int]:
+        result: Dict[str, int] = {order.order_id: 0 for order in orders}
+
+        total_ordered = sum(o.quantity for o in orders)
         if total_ordered <= oos_item.available_quantity:
-            return 0
+            return result
 
-        shortage_ratio = oos_item.shortage_quantity / total_ordered
-        order_shortage = int(order.quantity * shortage_ratio)
+        shortage_remaining = oos_item.shortage_quantity
+        shortage_ratio = shortage_remaining / total_ordered
 
-        if order_shortage < 1 and oos_item.shortage_quantity > 0:
-            order_shortage = 1
+        order_with_share = []
+        for order in orders:
+            exact_share = order.quantity * shortage_ratio
+            base_allocation = int(exact_share)
+            fractional_part = exact_share - base_allocation
 
-        return min(order_shortage, order.quantity, oos_item.shortage_quantity)
+            result[order.order_id] = min(base_allocation, order.quantity)
+            shortage_remaining -= result[order.order_id]
+
+            if result[order.order_id] < order.quantity:
+                order_with_share.append((order.order_id, fractional_part))
+
+        order_with_share.sort(key=lambda x: -x[1])
+
+        for order_id, _ in order_with_share:
+            if shortage_remaining <= 0:
+                break
+            order = next(o for o in orders if o.order_id == order_id)
+            if result[order_id] < order.quantity:
+                result[order_id] += 1
+                shortage_remaining -= 1
+
+        return result
 
     def _create_compensation_plan(
         self,
