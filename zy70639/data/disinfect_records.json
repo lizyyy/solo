@@ -1,0 +1,38 @@
+[
+  {
+    "record_id": "DISINF7c8466",
+    "item_id": "ITEM00000001",
+    "batch_id": "BATCH20240115_001",
+    "method": "紫外线消毒",
+    "operator": "消毒员A",
+    "disinfect_time": "2026-05-17T18:36:48.973580",
+    "duration_minutes": 30,
+    "temperature": null,
+    "notes": "紫外线消毒完成",
+    "created_at": "2026-05-17T18:36:48.973584"
+  },
+  {
+    "record_id": "DISINFdb0e75",
+    "item_id": "ITEM00000002",
+    "batch_id": "BATCH20240115_001",
+    "method": "高温消毒",
+    "operator": "消毒员A",
+    "disinfect_time": "2026-05-17T18:36:48.974787",
+    "duration_minutes": 45,
+    "temperature": 85.0,
+    "notes": "",
+    "created_at": "2026-05-17T18:36:48.974790"
+  },
+  {
+    "record_id": "DISINF4cfa83",
+    "item_id": "ITEM00000003",
+    "batch_id": "BATCH20240115_001",
+    "method": "洗涤烘干",
+    "operator": "消毒员B",
+    "disinfect_time": "2026-05-17T18:36:48.979509",
+    "duration_minutes": 60,
+    "temperature": null,
+    "notes": "",
+    "created_at": "2026-05-17T18:36:48.979512"
+  }
+]

@@ -1,0 +1,51 @@
+{
+  "report_type": "item_trace_report",
+  "version": "1.0",
+  "generated_at": "2026-05-17T18:37:17.651084",
+  "item_id": "ITEM00000001",
+  "history": {
+    "item": {
+      "item_id": "ITEM00000001",
+      "batch_id": "BATCH20240115_001",
+      "category": "外套",
+      "description": "藏青色羊毛大衣",
+      "brand": "优衣库",
+      "size": "L",
+      "color": "藏青",
+      "status": "已转赠",
+      "sort_time": "2026-05-17T18:36:48.973484",
+      "sort_operator": "分拣员A",
+      "sort_notes": "成色较新，无污渍",
+      "created_at": "2026-05-17T18:36:48.973114"
+    },
+    "disinfect_records": [
+      {
+        "record_id": "DISINF7c8466",
+        "item_id": "ITEM00000001",
+        "batch_id": "BATCH20240115_001",
+        "method": "紫外线消毒",
+        "operator": "消毒员A",
+        "disinfect_time": "2026-05-17T18:36:48.973580",
+        "duration_minutes": 30,
+        "temperature": null,
+        "notes": "紫外线消毒完成",
+        "created_at": "2026-05-17T18:36:48.973584"
+      }
+    ],
+    "donate_records": [
+      {
+        "record_id": "DONATEd2deb9",
+        "item_id": "ITEM00000001",
+        "batch_id": "BATCH20240115_001",
+        "organization_id": "ORG001",
+        "organization_name": "阳光社区服务中心",
+        "operator": "管理员A",
+        "donate_time": "2026-05-17T18:36:48.973859",
+        "receiver": "困难家庭刘先生",
+        "notes": "已签收",
+        "created_at": "2026-05-17T18:36:48.973863"
+      }
+    ],
+    "eliminate_records": []
+  }
+}
