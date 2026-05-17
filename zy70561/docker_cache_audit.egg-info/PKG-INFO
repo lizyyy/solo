@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: docker-cache-audit
+Version: 0.1.0
+Summary: Dockerfile层缓存审计CLI工具 - 分析缓存失效原因并生成审计报告
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0.0
+Requires-Dist: rich>=12.0.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jinja2>=3.0.0

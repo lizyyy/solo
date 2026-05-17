@@ -1,0 +1,21 @@
+Step 1/7 : FROM python:3.9-slim
+ ---> 1234567890ab
+Step 2/7 : WORKDIR /app
+ ---> Using cache
+ ---> 0987654321ba
+Step 3/7 : COPY requirements.txt .
+ ---> abcdef123456
+Step 4/7 : RUN pip install --no-cache-dir -r requirements.txt
+ ---> Running in abc123def456
+ ---> fedcba654321
+Removing intermediate container abc123def456
+Step 5/7 : COPY . .
+ ---> 112233445566
+Step 6/7 : RUN python setup.py install
+ ---> Running in 77889900aabb
+ ---> ccddeeff1122
+Removing intermediate container 77889900aabb
+Step 7/7 : CMD ["python", "app.py"]
+ ---> Using cache
+ ---> 334455667788
+Successfully built 334455667788
