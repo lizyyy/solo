@@ -51,21 +51,27 @@ class InventoryManager:
             return False, f"物料未出库: 订单{return_record.order_id}-物料{return_record.material_id}"
 
         inventory = self.inventories[key]
-        if inventory.returned_quantity + return_record.quantity > inventory.outbound_quantity:
-            return False, (f"归还数量超出: 订单{return_record.order_id}-物料{return_record.material_id} "
-                          f"已归还{inventory.returned_quantity}, 本次{return_record.quantity}, "
-                          f"出库总数{inventory.outbound_quantity}")
+        if inventory.returned_quantity + inventory.lost_quantity + return_record.quantity > inventory.outbound_quantity:
+            return False, (f"归还/丢失数量超出: 订单{return_record.order_id}-物料{return_record.material_id} "
+                          f"已归还{inventory.returned_quantity}, 已丢失{inventory.lost_quantity}, "
+                          f"本次{return_record.quantity}, 出库总数{inventory.outbound_quantity}")
 
-        inventory.returned_quantity += return_record.quantity
+        if return_record.damage_level == DamageLevel.LOST:
+            inventory.lost_quantity += return_record.quantity
+        else:
+            inventory.returned_quantity += return_record.quantity
 
         if return_record.damage_level in [DamageLevel.MINOR, DamageLevel.MAJOR]:
             inventory.damaged_quantity += return_record.quantity
 
         return True, ""
 
-    def calculate_loss(self):
+    def calculate_unreturned(self):
         for inventory in self.inventories.values():
-            inventory.lost_quantity = inventory.outbound_quantity - inventory.returned_quantity
+            unreturned = inventory.outbound_quantity - inventory.returned_quantity - inventory.lost_quantity
+            if not hasattr(inventory, 'unreturned_quantity'):
+                inventory.unreturned_quantity = 0
+            inventory.unreturned_quantity = max(0, unreturned)
 
     def get_inventory(self, order_id: str, material_id: str) -> MaterialInventory:
         key = self._get_key(order_id, material_id)
@@ -123,6 +129,7 @@ class RuleEngine:
         self.damage_validator = DamageValidator()
         self.warnings: List[str] = []
         self.errors: List[str] = []
+        self._return_quantity_map: Dict[Tuple[str, str], int] = {}
 
     def process_outbounds(self, outbounds: List[OutboundRecord]):
         sorted_outbounds = sorted(outbounds, key=lambda x: (x.order_id, x.material_id, x.outbound_id))
@@ -151,6 +158,11 @@ class RuleEngine:
                 self.errors.append(f"归还失败: {msg} (来源: {return_record.source.file_path} 第{return_record.source.row_number}行)")
                 continue
 
+            key = (return_record.order_id, return_record.material_id)
+            if key not in self._return_quantity_map:
+                self._return_quantity_map[key] = 0
+            self._return_quantity_map[key] += return_record.quantity
+
             valid_returns.append(return_record)
 
         return valid_returns
@@ -160,23 +172,46 @@ class RuleEngine:
         valid_compensations = []
         sorted_compensations = sorted(compensations, key=lambda x: (x.order_id, x.material_id, x.compensation_id))
 
+        compensation_tracker: Dict[Tuple[str, str], float] = {}
+
         for comp in sorted_compensations:
             if comp.material_id in materials:
                 material = materials[comp.material_id]
-                expected_amount = self.compensation_sm.calculate_compensation(
+                inventory = self.inventory_manager.get_inventory(comp.order_id, comp.material_id)
+                
+                unit_amount = self.compensation_sm.calculate_compensation(
                     comp.damage_level, material.unit_price, 1
                 )
-                if abs(comp.compensation_amount - expected_amount) > 0.01:
-                    self.warnings.append(
-                        f"赔付{comp.compensation_id}: 金额异常, 预期{expected_amount:.2f}, 实际{comp.compensation_amount:.2f}"
-                    )
+                
+                actual_quantity = round(comp.compensation_amount / unit_amount, 2) if unit_amount > 0 else 0
+                
+                key = (comp.order_id, comp.material_id)
+                if key not in compensation_tracker:
+                    compensation_tracker[key] = 0
+                
+                if comp.damage_level == DamageLevel.LOST and inventory.lost_quantity > 0:
+                    remaining = inventory.lost_quantity - compensation_tracker[key]
+                    if actual_quantity > remaining and remaining > 0:
+                        self.warnings.append(
+                            f"赔付{comp.compensation_id}: 赔付数量({actual_quantity}件)超出该物料标记丢失数量"
+                            f"({inventory.lost_quantity}件), 剩余可赔付{remaining}件"
+                        )
+                elif comp.damage_level in [DamageLevel.MINOR, DamageLevel.MAJOR] and inventory.damaged_quantity > 0:
+                    remaining = inventory.damaged_quantity - compensation_tracker[key]
+                    if actual_quantity > remaining and remaining > 0:
+                        self.warnings.append(
+                            f"赔付{comp.compensation_id}: 赔付数量({actual_quantity}件)超出该物料标记损坏数量"
+                            f"({inventory.damaged_quantity}件), 剩余可赔付{remaining}件"
+                        )
+                
+                compensation_tracker[key] += actual_quantity
 
             valid_compensations.append(comp)
 
         return valid_compensations
 
     def finalize(self):
-        self.inventory_manager.calculate_loss()
+        self.inventory_manager.calculate_unreturned()
 
     def get_pending_returns(self) -> List[MaterialInventory]:
         pending = []

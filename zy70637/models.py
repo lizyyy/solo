@@ -115,16 +115,17 @@ class BadRecord:
 
 @dataclass
 class MaterialInventory:
-    material_id: str
-    order_id: str
+    material_id: str = ""
+    order_id: str = ""
     outbound_quantity: int = 0
     returned_quantity: int = 0
     lost_quantity: int = 0
     damaged_quantity: int = 0
+    unreturned_quantity: int = 0
 
     @property
     def pending_quantity(self) -> int:
-        return self.outbound_quantity - self.returned_quantity
+        return self.unreturned_quantity
 
 
 def stable_hash(obj: Any) -> str:
