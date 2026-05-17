@@ -1,8 +1,9 @@
-from database import SessionLocal
-from models import Employee, CertificateType, EmployeeCertificate, CourseScore
+from database import SessionLocal, engine
+from models import Base, Employee, CertificateType, EmployeeCertificate, CourseScore
 from datetime import date, timedelta
 import json
 
+Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
 try:
@@ -60,6 +61,9 @@ try:
     db.commit()
     print(f"已创建 {len(certs_data)} 条员工证书记录")
     
+    from services import CourseService, QualificationService, RetakeService
+    import schemas
+    
     courses_data = [
         (employees[0], "CS001", "Python高级编程", 85.5, today - timedelta(days=30)),
         (employees[0], "CS002", "项目管理实战", 78.0, today - timedelta(days=20)),
@@ -71,19 +75,18 @@ try:
     ]
     
     for emp, course_code, course_name, score, exam_date in courses_data:
-        cs = CourseScore(
+        course_create = schemas.CourseScoreCreate(
             employee_id=emp.id,
             course_code=course_code,
             course_name=course_name,
             score=score,
             exam_date=exam_date
         )
-        db.add(cs)
-    db.commit()
-    print(f"已创建 {len(courses_data)} 条课程成绩记录 (不及格自动生成补考记录)")
+        CourseService.create_course_score(db, course_create)
     
-    from services import QualificationService
-    import schemas
+    from models import RetakeRecord
+    retake_count = db.query(RetakeRecord).count()
+    print(f"已创建 {len(courses_data)} 条课程成绩记录, 自动生成 {retake_count} 条补考记录")
     
     position_reqs = [
         (employees[0], "高级工程师", ["CERT001", "CERT002"], ["CS001", "CS002"]),

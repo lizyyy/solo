@@ -207,15 +207,33 @@ class QualificationService:
                     cert_matched_count += 1
         
         course_matched_count = 0
+        employee_retakes = RetakeService.get_employee_retakes(db, req.employee_id)
+        
         for course_code in required_courses:
-            has_passed = any(
-                ec.course_code == course_code and 
-                ec.status == ExamStatus.PASSED
-                for ec in employee_courses
-            )
+            course_scores = [ec for ec in employee_courses if ec.course_code == course_code]
+            has_passed = False
+            pass_type = None
+            
+            for course_score in course_scores:
+                if course_score.status == ExamStatus.PASSED:
+                    has_passed = True
+                    pass_type = "original"
+                    break
+                
+                retake_passed = any(
+                    rt.course_score_id == course_score.id and 
+                    rt.status == RetakeStatus.COMPLETED_PASSED
+                    for rt in employee_retakes
+                )
+                if retake_passed:
+                    has_passed = True
+                    pass_type = "retake"
+                    break
+            
             match_details["courses"].append({
                 "code": course_code,
-                "matched": has_passed
+                "matched": has_passed,
+                "pass_type": pass_type
             })
             if has_passed:
                 course_matched_count += 1

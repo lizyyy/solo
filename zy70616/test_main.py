@@ -318,6 +318,74 @@ class TestQualification:
         assert response.status_code == 200
         assert response.json()["qualification_match"] == "fully_matched"
 
+    def test_qualification_recover_after_retake_passed(self, test_db):
+        client.post(
+            "/employees/",
+            json={
+                "employee_id": "TEST001",
+                "name": "测试员工",
+                "status": "active"
+            }
+        )
+        client.post(
+            "/certificate-types/",
+            json={
+                "code": "CERT001",
+                "name": "测试证书",
+                "status": "active"
+            }
+        )
+        expiry = (date.today() + timedelta(days=365)).isoformat()
+        client.post(
+            "/employee-certificates/",
+            json={
+                "employee_id": 1,
+                "certificate_type_id": 1,
+                "certificate_number": "TESTCERT001",
+                "issue_date": date.today().isoformat(),
+                "expiry_date": expiry
+            }
+        )
+        client.post(
+            "/course-scores/",
+            json={
+                "employee_id": 1,
+                "course_code": "CS001",
+                "course_name": "测试课程",
+                "score": 55.0,
+                "exam_date": date.today().isoformat()
+            }
+        )
+        client.post(
+            "/position-requirements/",
+            json={
+                "employee_id": 1,
+                "position_name": "测试岗位",
+                "required_certificate_types": json.dumps(["CERT001"]),
+                "required_courses": json.dumps(["CS001"])
+            }
+        )
+        
+        initial_response = client.put("/position-requirements/1/evaluate/")
+        assert initial_response.status_code == 200
+        assert initial_response.json()["qualification_match"] == "partially_matched"
+        
+        client.put(
+            "/retake-records/1",
+            json={
+                "score": 75.0,
+                "actual_date": date.today().isoformat(),
+                "status": "completed_passed"
+            }
+        )
+        
+        final_response = client.put("/position-requirements/1/evaluate/")
+        assert final_response.status_code == 200
+        assert final_response.json()["qualification_match"] == "fully_matched"
+        
+        match_details = json.loads(final_response.json()["match_details"])
+        assert match_details["courses"][0]["pass_type"] == "retake"
+
 
 class TestRenewal:
     def test_create_renewal_item(self, test_db):
