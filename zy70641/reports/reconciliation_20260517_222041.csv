@@ -1,0 +1,17 @@
+﻿=== 对账汇总 ===
+收银机流水总数,1
+支付平台流水总数,2
+匹配成功,0
+未匹配,2
+重复流水,0
+坏行数,0
+处理时间(秒),0.00
+
+=== 差异原因统计 ===
+store_mismatch,1
+missing_in_cash_register,1
+
+=== 对账详情 ===
+状态,差异原因,匹配置信度,收银机-交易号,收银机-门店,收银机-金额,收银机-时间,收银机-类型,收银机-文件,收银机-行号,支付平台-交易号,支付平台-门店,支付平台-金额,支付平台-时间,支付平台-类型,支付平台-文件,支付平台-行号,备注
+unmatched,store_mismatch,,TXN_M01,STORE_A,100.00,2024-01-15 10:00:00,payment,cash_multi_candidate.csv,2,PAY_M01,STORE_B,100.00,2024-01-15 10:00:02,payment,payment_multi_candidate.csv,2,同订单号但不匹配：订单号 ORD_MULTI_01
+unmatched,missing_in_cash_register,,,,,,,,,PAY_M02,STORE_A,100.00,2024-01-15 10:00:03,payment,payment_multi_candidate.csv,3,
