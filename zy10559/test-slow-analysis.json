@@ -1,0 +1,511 @@
+{
+  "generatedAt": "2026-05-17T15:37:20.167Z",
+  "summary": {
+    "totalQueries": 12,
+    "uniqueFingerprints": 10,
+    "tablesCount": 7,
+    "totalTime": 58.7917,
+    "avgTime": 4.8993,
+    "p50": 3.4567,
+    "p95": 15.6789,
+    "p99": 15.6789
+  },
+  "timeBuckets": [
+    {
+      "bucket": "< 0.1s",
+      "threshold": 0.1,
+      "count": 0,
+      "totalTime": 0
+    },
+    {
+      "bucket": "0.1s - 0.5s",
+      "threshold": 0.5,
+      "count": 1,
+      "totalTime": 0.1234
+    },
+    {
+      "bucket": "0.5s - 1s",
+      "threshold": 1,
+      "count": 2,
+      "totalTime": 1.4579
+    },
+    {
+      "bucket": "1s - 2s",
+      "threshold": 2,
+      "count": 1,
+      "totalTime": 1.2345
+    },
+    {
+      "bucket": "2s - 5s",
+      "threshold": 5,
+      "count": 3,
+      "totalTime": 10.3701
+    },
+    {
+      "bucket": "5s - 10s",
+      "threshold": 10,
+      "count": 3,
+      "totalTime": 19.6924
+    },
+    {
+      "bucket": "> 10s",
+      "threshold": null,
+      "count": 2,
+      "totalTime": 25.9134
+    }
+  ],
+  "queryTypes": [
+    {
+      "type": "SELECT",
+      "count": 10,
+      "totalTime": 43.9894,
+      "avgTime": 4.3989
+    },
+    {
+      "type": "UPDATE",
+      "count": 1,
+      "totalTime": 10.2345,
+      "avgTime": 10.2345
+    },
+    {
+      "type": "DELETE",
+      "count": 1,
+      "totalTime": 4.5678,
+      "avgTime": 4.5678
+    }
+  ],
+  "topFingerprints": [
+    {
+      "fingerprint": "a5c758072d82e4ebd809c95ad0616785",
+      "queryType": "SELECT",
+      "tables": [
+        "logs"
+      ],
+      "count": 1,
+      "totalTime": 15.6789,
+      "avgTime": 15.6789,
+      "timeStats": {
+        "count": 1,
+        "sum": 15.6789,
+        "avg": 15.6789,
+        "min": 15.6789,
+        "max": 15.6789,
+        "p50": 15.6789,
+        "p95": 15.6789,
+        "p99": 15.6789
+      },
+      "normalizedSQL": "SELECT * FROM logs WHERE level = ? AND created_at > ? ORDER BY id DESC;",
+      "topSamples": [
+        {
+          "queryTime": 15.6789,
+          "startLine": 81,
+          "endLine": 86,
+          "sql": "SELECT * FROM logs WHERE level = 'error' AND created_at > '2024-01-01' ORDER BY id DESC;"
+        }
+      ]
+    },
+    {
+      "fingerprint": "eb6eb0634396ca6591abd0d753d05cc1",
+      "queryType": "UPDATE",
+      "tables": [
+        "orders"
+      ],
+      "count": 1,
+      "totalTime": 10.2345,
+      "avgTime": 10.2345,
+      "timeStats": {
+        "count": 1,
+        "sum": 10.2345,
+        "avg": 10.2345,
+        "min": 10.2345,
+        "max": 10.2345,
+        "p50": 10.2345,
+        "p95": 10.2345,
+        "p99": 10.2345
+      },
+      "normalizedSQL": "UPDATE orders SET status = ?, updated_at = NOW() WHERE created_at < ? AND status = ?;",
+      "topSamples": [
+        {
+          "queryTime": 10.2345,
+          "startLine": 24,
+          "endLine": 29,
+          "sql": "UPDATE orders SET status = 'completed', updated_at = NOW() WHERE created_at < '2024-01-01' AND status = 'pending';"
+        }
+      ]
+    },
+    {
+      "fingerprint": "331d86c528d2db78237e26fdc120c813",
+      "queryType": "SELECT",
+      "tables": [
+        "orders",
+        "users"
+      ],
+      "count": 1,
+      "totalTime": 7.8901,
+      "avgTime": 7.8901,
+      "timeStats": {
+        "count": 1,
+        "sum": 7.8901,
+        "avg": 7.8901,
+        "min": 7.8901,
+        "max": 7.8901,
+        "p50": 7.8901,
+        "p95": 7.8901,
+        "p99": 7.8901
+      },
+      "normalizedSQL": "SELECT o.*, u.name FROM orders o LEFT JOIN users u ON o.user_id = u.id WHERE o.created_at BETWEEN ? AND ? LIMIT ?;",
+      "topSamples": [
+        {
+          "queryTime": 7.8901,
+          "startLine": 39,
+          "endLine": 44,
+          "sql": "SELECT o.*, u.name FROM orders o LEFT JOIN users u ON o.user_id = u.id WHERE o.created_at BETWEEN '2024-01-01' AND '2024-01-15' LIMIT 1000;"
+        }
+      ]
+    },
+    {
+      "fingerprint": "6526ff85c5a5b0cd4cc600c679ba063a",
+      "queryType": "SELECT",
+      "tables": [
+        "products",
+        "categories"
+      ],
+      "count": 1,
+      "totalTime": 6.1234,
+      "avgTime": 6.1234,
+      "timeStats": {
+        "count": 1,
+        "sum": 6.1234,
+        "avg": 6.1234,
+        "min": 6.1234,
+        "max": 6.1234,
+        "p50": 6.1234,
+        "p95": 6.1234,
+        "p99": 6.1234
+      },
+      "normalizedSQL": "SELECT p.*, c.name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.price BETWEEN ? AND ? ORDER BY p.created_at DESC;",
+      "topSamples": [
+        {
+          "queryTime": 6.1234,
+          "startLine": 72,
+          "endLine": 77,
+          "sql": "SELECT p.*, c.name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.price BETWEEN 50 AND 500 ORDER BY p.created_at DESC;"
+        }
+      ]
+    },
+    {
+      "fingerprint": "4316f5ffcf065dd6f1b2bca23727eb05",
+      "queryType": "SELECT",
+      "tables": [
+        "users",
+        "profiles"
+      ],
+      "count": 1,
+      "totalTime": 5.6789,
+      "avgTime": 5.6789,
+      "timeStats": {
+        "count": 1,
+        "sum": 5.6789,
+        "avg": 5.6789,
+        "min": 5.6789,
+        "max": 5.6789,
+        "p50": 5.6789,
+        "p95": 5.6789,
+        "p99": 5.6789
+      },
+      "normalizedSQL": "SELECT u.*, p.* FROM users u JOIN profiles p ON u.id = p.user_id WHERE u.id IN (...) ORDER BY u.created_at DESC;",
+      "topSamples": [
+        {
+          "queryTime": 5.6789,
+          "startLine": 9,
+          "endLine": 14,
+          "sql": "SELECT u.*, p.* FROM users u JOIN profiles p ON u.id = p.user_id WHERE u.id IN (1, 2, 3, 4, 5) ORDER BY u.created_at DESC;"
+        }
+      ]
+    },
+    {
+      "fingerprint": "8035d3134e7528a3eb07dc28447cf065",
+      "queryType": "DELETE",
+      "tables": [
+        "session_tokens"
+      ],
+      "count": 1,
+      "totalTime": 4.5678,
+      "avgTime": 4.5678,
+      "timeStats": {
+        "count": 1,
+        "sum": 4.5678,
+        "avg": 4.5678,
+        "min": 4.5678,
+        "max": 4.5678,
+        "p50": 4.5678,
+        "p95": 4.5678,
+        "p99": 4.5678
+      },
+      "normalizedSQL": "DELETE FROM session_tokens WHERE expired_at < NOW();",
+      "topSamples": [
+        {
+          "queryTime": 4.5678,
+          "startLine": 60,
+          "endLine": 62,
+          "sql": "DELETE FROM session_tokens WHERE expired_at < NOW();"
+        }
+      ]
+    },
+    {
+      "fingerprint": "0b28afb40dc10f0ac4c6261e7d6ac295",
+      "queryType": "SELECT",
+      "tables": [
+        "orders"
+      ],
+      "count": 2,
+      "totalTime": 4.0245,
+      "avgTime": 2.0122,
+      "timeStats": {
+        "count": 2,
+        "sum": 4.0245,
+        "avg": 2.0122,
+        "min": 0.5678,
+        "max": 3.4567,
+        "p50": 0.5678,
+        "p95": 3.4567,
+        "p99": 3.4567
+      },
+      "normalizedSQL": "SELECT * FROM orders WHERE user_id = ? AND status = ?;",
+      "topSamples": [
+        {
+          "queryTime": 3.4567,
+          "startLine": 33,
+          "endLine": 35,
+          "sql": "SELECT * FROM orders WHERE user_id = 123 AND status = 'pending';"
+        },
+        {
+          "queryTime": 0.5678,
+          "startLine": 48,
+          "endLine": 50,
+          "sql": "SELECT * FROM orders WHERE user_id = 456 AND status = 'completed';"
+        }
+      ]
+    },
+    {
+      "fingerprint": "7fa18baff83d33db015b47f0e8d03b00",
+      "queryType": "SELECT",
+      "tables": [
+        "users"
+      ],
+      "count": 2,
+      "totalTime": 2.469,
+      "avgTime": 1.2345,
+      "timeStats": {
+        "count": 2,
+        "sum": 2.469,
+        "avg": 1.2345,
+        "min": 0.1234,
+        "max": 2.3456,
+        "p50": 0.1234,
+        "p95": 2.3456,
+        "p99": 2.3456
+      },
+      "normalizedSQL": "SELECT * FROM users WHERE status = ? AND created_at > ?;",
+      "topSamples": [
+        {
+          "queryTime": 2.3456,
+          "startLine": 3,
+          "endLine": 5,
+          "sql": "SELECT * FROM users WHERE status = 'active' AND created_at > '2024-01-01';"
+        },
+        {
+          "queryTime": 0.1234,
+          "startLine": 18,
+          "endLine": 20,
+          "sql": "SELECT * FROM users WHERE status = 'inactive' AND created_at > '2023-12-01';"
+        }
+      ]
+    },
+    {
+      "fingerprint": "60fab5496c02e6e8bc05e1a0bfb35c92",
+      "queryType": "SELECT",
+      "tables": [
+        "products"
+      ],
+      "count": 1,
+      "totalTime": 1.2345,
+      "avgTime": 1.2345,
+      "timeStats": {
+        "count": 1,
+        "sum": 1.2345,
+        "avg": 1.2345,
+        "min": 1.2345,
+        "max": 1.2345,
+        "p50": 1.2345,
+        "p95": 1.2345,
+        "p99": 1.2345
+      },
+      "normalizedSQL": "SELECT * FROM products WHERE category = ? AND price > ?;",
+      "topSamples": [
+        {
+          "queryTime": 1.2345,
+          "startLine": 54,
+          "endLine": 56,
+          "sql": "SELECT * FROM products WHERE category = 'electronics' AND price > 100;"
+        }
+      ]
+    },
+    {
+      "fingerprint": "e6f4d0151e40edbbef66b05d1561708d",
+      "queryType": "SELECT",
+      "tables": [
+        "products"
+      ],
+      "count": 1,
+      "totalTime": 0.8901,
+      "avgTime": 0.8901,
+      "timeStats": {
+        "count": 1,
+        "sum": 0.8901,
+        "avg": 0.8901,
+        "min": 0.8901,
+        "max": 0.8901,
+        "p50": 0.8901,
+        "p95": 0.8901,
+        "p99": 0.8901
+      },
+      "normalizedSQL": "SELECT * FROM products WHERE id = ? AND status = ?;",
+      "topSamples": [
+        {
+          "queryTime": 0.8901,
+          "startLine": 66,
+          "endLine": 68,
+          "sql": "SELECT * FROM products WHERE id = 999 AND status = 'active';"
+        }
+      ]
+    }
+  ],
+  "tableStats": [
+    {
+      "table": "orders",
+      "count": 4,
+      "totalTime": 22.1491,
+      "avgTime": 5.5373,
+      "fingerprintCount": 3,
+      "timeStats": {
+        "count": 4,
+        "sum": 22.1491,
+        "avg": 5.5373,
+        "min": 0.5678,
+        "max": 10.2345,
+        "p50": 3.4567,
+        "p95": 10.2345,
+        "p99": 10.2345
+      }
+    },
+    {
+      "table": "users",
+      "count": 4,
+      "totalTime": 16.038,
+      "avgTime": 4.0095,
+      "fingerprintCount": 3,
+      "timeStats": {
+        "count": 4,
+        "sum": 16.038,
+        "avg": 4.0095,
+        "min": 0.1234,
+        "max": 7.8901,
+        "p50": 2.3456,
+        "p95": 7.8901,
+        "p99": 7.8901
+      }
+    },
+    {
+      "table": "logs",
+      "count": 1,
+      "totalTime": 15.6789,
+      "avgTime": 15.6789,
+      "fingerprintCount": 1,
+      "timeStats": {
+        "count": 1,
+        "sum": 15.6789,
+        "avg": 15.6789,
+        "min": 15.6789,
+        "max": 15.6789,
+        "p50": 15.6789,
+        "p95": 15.6789,
+        "p99": 15.6789
+      }
+    },
+    {
+      "table": "products",
+      "count": 3,
+      "totalTime": 8.248,
+      "avgTime": 2.7493,
+      "fingerprintCount": 3,
+      "timeStats": {
+        "count": 3,
+        "sum": 8.248,
+        "avg": 2.7493,
+        "min": 0.8901,
+        "max": 6.1234,
+        "p50": 1.2345,
+        "p95": 6.1234,
+        "p99": 6.1234
+      }
+    },
+    {
+      "table": "categories",
+      "count": 1,
+      "totalTime": 6.1234,
+      "avgTime": 6.1234,
+      "fingerprintCount": 1,
+      "timeStats": {
+        "count": 1,
+        "sum": 6.1234,
+        "avg": 6.1234,
+        "min": 6.1234,
+        "max": 6.1234,
+        "p50": 6.1234,
+        "p95": 6.1234,
+        "p99": 6.1234
+      }
+    },
+    {
+      "table": "profiles",
+      "count": 1,
+      "totalTime": 5.6789,
+      "avgTime": 5.6789,
+      "fingerprintCount": 1,
+      "timeStats": {
+        "count": 1,
+        "sum": 5.6789,
+        "avg": 5.6789,
+        "min": 5.6789,
+        "max": 5.6789,
+        "p50": 5.6789,
+        "p95": 5.6789,
+        "p99": 5.6789
+      }
+    },
+    {
+      "table": "session_tokens",
+      "count": 1,
+      "totalTime": 4.5678,
+      "avgTime": 4.5678,
+      "fingerprintCount": 1,
+      "timeStats": {
+        "count": 1,
+        "sum": 4.5678,
+        "avg": 4.5678,
+        "min": 4.5678,
+        "max": 4.5678,
+        "p50": 4.5678,
+        "p95": 4.5678,
+        "p99": 4.5678
+      }
+    }
+  ],
+  "errors": [],
+  "parseInfo": {
+    "totalLines": 86,
+    "parsedEntries": 12,
+    "errorCount": 0
+  }
+}

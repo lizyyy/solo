@@ -1,0 +1,22 @@
+{
+  "name": "sql-slow-query-fingerprint",
+  "version": "1.0.0",
+  "description": "SQL慢查询指纹分析工具",
+  "main": "src/cli.js",
+  "bin": {
+    "sql-fingerprint": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/",
+    "lint": "eslint src/"
+  },
+  "keywords": ["sql", "slow-query", "fingerprint", "mysql", "performance"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^5.3.0",
+    "sql-formatter": "^15.0.0",
+    "cli-table3": "^0.6.3"
+  }
+}

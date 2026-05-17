@@ -1,0 +1,86 @@
+# Time: 2024-01-15T10:00:00.000000Z
+# User@Host: root[root] @ localhost []
+# Query_time: 2.3456  Lock_time: 0.0001  Rows_sent: 100  Rows_examined: 10000
+SET timestamp=1705312800;
+SELECT * FROM users WHERE status = 'active' AND created_at > '2024-01-01';
+
+# Time: 2024-01-15T10:00:02.000000Z
+# User@Host: app[app] @ localhost []
+# Query_time: 5.6789  Lock_time: 0.0002  Rows_sent: 10  Rows_examined: 50000
+SET timestamp=1705312802;
+SELECT u.*, p.* FROM users u 
+JOIN profiles p ON u.id = p.user_id 
+WHERE u.id IN (1, 2, 3, 4, 5) 
+ORDER BY u.created_at DESC;
+
+# Time: 2024-01-15T10:00:05.000000Z
+# User@Host: root[root] @ localhost []
+# Query_time: 0.1234  Lock_time: 0.0000  Rows_sent: 1  Rows_examined: 100
+SET timestamp=1705312805;
+SELECT * FROM users WHERE status = 'inactive' AND created_at > '2023-12-01';
+
+# Time: 2024-01-15T10:00:06.000000Z
+# User@Host: app[app] @ localhost []
+# Query_time: 10.2345  Lock_time: 0.0005  Rows_sent: 0  Rows_examined: 200000
+SET timestamp=1705312806;
+UPDATE orders 
+SET status = 'completed', updated_at = NOW() 
+WHERE created_at < '2024-01-01' 
+AND status = 'pending';
+
+# Time: 2024-01-15T10:00:10.000000Z
+# User@Host: app[app] @ localhost []
+# Query_time: 3.4567  Lock_time: 0.0001  Rows_sent: 50  Rows_examined: 20000
+SET timestamp=1705312810;
+SELECT * FROM orders WHERE user_id = 123 AND status = 'pending';
+
+# Time: 2024-01-15T10:00:15.000000Z
+# User@Host: root[root] @ localhost []
+# Query_time: 7.8901  Lock_time: 0.0010  Rows_sent: 1000  Rows_examined: 150000
+SET timestamp=1705312815;
+SELECT o.*, u.name FROM orders o 
+LEFT JOIN users u ON o.user_id = u.id 
+WHERE o.created_at BETWEEN '2024-01-01' AND '2024-01-15' 
+LIMIT 1000;
+
+# Time: 2024-01-15T10:00:20.000000Z
+# User@Host: app[app] @ localhost []
+# Query_time: 0.5678  Lock_time: 0.0000  Rows_sent: 20  Rows_examined: 500
+SET timestamp=1705312820;
+SELECT * FROM orders WHERE user_id = 456 AND status = 'completed';
+
+# Time: 2024-01-15T10:00:22.000000Z
+# User@Host: app[app] @ localhost []
+# Query_time: 1.2345  Lock_time: 0.0001  Rows_sent: 5  Rows_examined: 1000
+SET timestamp=1705312822;
+SELECT * FROM products WHERE category = 'electronics' AND price > 100;
+
+# Time: 2024-01-15T10:00:25.000000Z
+# User@Host: root[root] @ localhost []
+# Query_time: 4.5678  Lock_time: 0.0003  Rows_sent: 0  Rows_examined: 10000
+SET timestamp=1705312825;
+DELETE FROM session_tokens WHERE expired_at < NOW();
+
+# Time: 2024-01-15T10:00:30.000000Z
+# User@Host: app[app] @ localhost []
+# Query_time: 0.8901  Lock_time: 0.0000  Rows_sent: 1  Rows_examined: 100
+SET timestamp=1705312830;
+SELECT * FROM products WHERE id = 999 AND status = 'active';
+
+# Time: 2024-01-15T10:00:32.000000Z
+# User@Host: app[app] @ localhost []
+# Query_time: 6.1234  Lock_time: 0.0005  Rows_sent: 100  Rows_examined: 80000
+SET timestamp=1705312832;
+SELECT p.*, c.name FROM products p 
+JOIN categories c ON p.category_id = c.id 
+WHERE p.price BETWEEN 50 AND 500 
+ORDER BY p.created_at DESC;
+
+# Time: 2024-01-15T10:00:40.000000Z
+# User@Host: root[root] @ localhost []
+# Query_time: 15.6789  Lock_time: 0.0020  Rows_sent: 5000  Rows_examined: 500000
+SET timestamp=1705312840;
+SELECT * FROM logs 
+WHERE level = 'error' 
+AND created_at > '2024-01-01' 
+ORDER BY id DESC;
