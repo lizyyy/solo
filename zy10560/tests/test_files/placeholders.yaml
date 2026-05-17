@@ -1,0 +1,12 @@
+database:
+  url: ${DATABASE_URL}
+  password: {{ DB_PASSWORD }}
+
+api:
+  token: "<API_TOKEN>"
+  key: "%{API_KEY}"
+
+config:
+  secret: REPLACE_ME
+  password: CHANGEME
+  token: your_token_here

@@ -1,0 +1,92 @@
+[
+  {
+    "file_path": "tests/test_files/broken.yaml",
+    "findings": [],
+    "errors": [
+      {
+        "line": 3,
+        "column": 13,
+        "message": "YAML解析错误: mapping values are not allowed here\n  in \"<unicode string>\", line 3, column 13:\n        password: invalid_indentation  # 这里缩进错误\n                ^",
+        "raw_line": "    password: invalid_indentation  # 这里缩进错误"
+      }
+    ]
+  },
+  {
+    "file_path": "tests/test_files/placeholders.yaml",
+    "findings": [],
+    "errors": [
+      {
+        "line": 3,
+        "column": 14,
+        "message": "YAML解析错误: while constructing a mapping\n  in \"<unicode string>\", line 3, column 13:\n      password: {{ DB_PASSWORD }}\n                ^\nfound unhashable key\n  in \"<unicode string>\", line 3, column 14:\n      password: {{ DB_PASSWORD }}\n                 ^",
+        "raw_line": "  password: {{ DB_PASSWORD }}"
+      }
+    ]
+  },
+  {
+    "file_path": "tests/test_files/valid_secrets.yaml",
+    "findings": [
+      {
+        "field_path": "database.url",
+        "line": 2,
+        "column": 3,
+        "value": "mysecretpassword123",
+        "pattern_name": "database-url",
+        "risk_level": "high",
+        "description": "数据库连接字符串",
+        "raw_line": "url: postgres://user:mysecretpassword123@localhost:5432/mydb"
+      },
+      {
+        "field_path": "aws.access_key_id",
+        "line": 6,
+        "column": 3,
+        "value": "AKIAIOSFODNN7EXAMPLE",
+        "pattern_name": "aws-access-key",
+        "risk_level": "critical",
+        "description": "AWS 访问密钥 ID",
+        "raw_line": "access_key_id: AKIAIOSFODNN7EXAMPLE"
+      },
+      {
+        "field_path": "api.token",
+        "line": 10,
+        "column": 3,
+        "value": "github_token_example_abcdefghijklmnopqrstuvwxyz1234567890",
+        "pattern_name": "github-token",
+        "risk_level": "critical",
+        "description": "GitHub 个人访问令牌",
+        "raw_line": "token: github_token_example_abcdefghijklmnopqrstuvwxyz1234567890"
+      },
+      {
+        "field_path": "jwt.token",
+        "line": 14,
+        "column": 3,
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+        "pattern_name": "jwt-token",
+        "risk_level": "high",
+        "description": "JWT 令牌",
+        "raw_line": "token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+      },
+      {
+        "field_path": "slack.webhook_url",
+        "line": 17,
+        "column": 3,
+        "value": "slack-webhook-example-token",
+        "pattern_name": "slack-token",
+        "risk_level": "critical",
+        "description": "Slack API 令牌",
+        "raw_line": "webhook_url: https://example.invalid/slack-webhook/example-token"
+      },
+      {
+        "field_path": "private_key",
+        "line": 1,
+        "column": 1,
+        "value": "-----BEGIN RSA PRIVATE KEY-----",
+        "pattern_name": "private-key",
+        "risk_level": "critical",
+        "description": "私钥",
+        "raw_line": "database:"
+      }
+    ],
+    "errors": []
+  }
+]

@@ -1,0 +1,51 @@
+YAML 密钥泄漏扫描报告
+==================================================
+
+文件: tests/test_files/broken.yaml
+--------------------------------------------------
+解析错误:
+  行 3, 列 13: YAML解析错误: mapping values are not allowed here
+  in "<unicode string>", line 3, column 13:
+        password: invalid_indentation  # 这里缩进错误
+                ^
+    内容:     password: invalid_indentation  # 这里缩进错误
+
+文件: tests/test_files/placeholders.yaml
+--------------------------------------------------
+解析错误:
+  行 3, 列 14: YAML解析错误: while constructing a mapping
+  in "<unicode string>", line 3, column 13:
+      password: {{ DB_PASSWORD }}
+                ^
+found unhashable key
+  in "<unicode string>", line 3, column 14:
+      password: {{ DB_PASSWORD }}
+                 ^
+    内容:   password: {{ DB_PASSWORD }}
+
+文件: tests/test_files/valid_secrets.yaml
+--------------------------------------------------
+发现的问题:
+  [HIGH] 行 2: database.url
+    描述: 数据库连接字符串
+    内容: url: postgres://user:mysecretpassword123@localhost:5432/mydb
+
+  [CRITICAL] 行 6: aws.access_key_id
+    描述: AWS 访问密钥 ID
+    内容: access_key_id: AKIAIOSFODNN7EXAMPLE
+
+  [CRITICAL] 行 10: api.token
+    描述: GitHub 个人访问令牌
+    内容: token: github_token_example_abcdefghijklmnopqrstuvwxyz1234567890
+
+  [HIGH] 行 14: jwt.token
+    描述: JWT 令牌
+    内容: token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+  [CRITICAL] 行 17: slack.webhook_url
+    描述: Slack API 令牌
+    内容: webhook_url: https://example.invalid/slack-webhook/example-token
+
+  [CRITICAL] 行 1: private_key
+    描述: 私钥
+    内容: database:

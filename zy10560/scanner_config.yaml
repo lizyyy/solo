@@ -1,0 +1,20 @@
+whitelist:
+  - "database.url"
+  - "aws.access_key_id"
+  - "config.placeholder"
+
+whitelist_values:
+  - "default_password"
+
+min_risk_level: "low"
+
+custom_patterns:
+  company-api-key:
+    regex: "(?i)company[_-]?api[_-]?key\\s*[:=]\\s*['\"]?([A-Z0-9]{20,})['\"]?"
+    risk_level: "high"
+    description: "公司内部API密钥"
+    min_entropy: 3.5
+
+exclude_patterns:
+  - "tests/"
+  - "node_modules/"

@@ -1,0 +1,9 @@
+database:
+  url: postgres://localhost:5432/mydb
+    password: invalid_indentation  # 这里缩进错误
+api:
+  token: github_token_example_abcdefghijklmnopqrstuvwxyz1234567890
+  another_key:
+    - item1
+    - item2
+      - nested_error  # 这里缩进错误
