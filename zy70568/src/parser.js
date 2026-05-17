@@ -11,7 +11,7 @@ class SSHConfigParser {
 
   parse(filePath) {
     const content = fs.readFileSync(filePath, 'utf-8');
-    const lines = content.split(String.fromCharCode(10));
+    const lines = content.split('\n');
     let currentHost = null;
     let lineNumber = 0;
 

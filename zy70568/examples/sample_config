@@ -1,0 +1,46 @@
+# 多人共用跳板机配置示例
+# 注意: 规则顺序很重要!
+
+# === 全局配置 (最先加载, 可被后续覆盖) ===
+User default-user
+IdentityFile ~/.ssh/id_rsa
+Port 22
+
+# === 跳板机入口 ===
+Host bastion-public
+  HostName 203.0.113.10
+  User ops-team
+  Port 2222
+  IdentityFile ~/.ssh/bastion_key
+
+# === 内部网络跳板 (通过 bastion-public) ===
+Host bastion-internal
+  HostName 192.168.1.1
+  User admin
+  ProxyJump bastion-public
+  IdentityFile ~/.ssh/internal_key
+
+# === 所有 .internal 主机的默认配置 ===
+Host *.internal
+  User developer
+  ProxyJump bastion-internal
+  IdentityFile ~/.ssh/dev_key
+  ForwardAgent yes
+
+# === 特定服务器 - 会覆盖上面的通配符规则 ===
+Host db-server.internal
+  HostName 192.168.2.100
+  User dba
+  Port 2222
+  IdentityFile ~/.ssh/dba_key
+
+# === 有问题的配置 - 循环跳板 ===
+Host loop-host-a
+  ProxyJump loop-host-b
+
+Host loop-host-b
+  ProxyJump loop-host-a
+
+# === 无效行测试 ===
+This is an invalid SSH config line
+Another bad line
