@@ -1,0 +1,41 @@
+
+
+def process_curl_line(curl_cmd, line_num, file_path, result):
+    curl_cmd = curl_cmd.strip()
+    if not curl_cmd.lower().startswith("curl"):
+        return
+    
+    method = "GET"
+    url = ""
+    headers = {}
+    
+    # Simple URL extraction
+    import shlex
+    try:
+        parts = shlex.split(curl_cmd)
+        for i, part in enumerate(parts):
+            if part.startswith("http"):
+                url = part
+                break
+    except:
+        pass
+    
+    request = {
+        "method": method.upper(),
+        "url": url,
+        "headers": headers,
+        "body": None,
+        "source_type": "curl",
+        "source_location": f"{file_path}:line {line_num}",
+    }
+    
+    entry = {
+        "id": f"curl_{line_num}",
+        "request": request,
+        "response": None,
+        "curl_command": curl_cmd,
+        "is_sensitive": False,
+        "sensitive_fields": [],
+        "status": "success",
+    }
+    result["entries"].append(entry)
