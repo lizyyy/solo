@@ -1,0 +1,16 @@
+﻿城市,缺失配件,缺失类型,严重程度,需要数量,实际数量,源行号,所在箱号,依赖物料,备注
+上海,支架,DEPENDENCY,CRITICAL,8,0,5,SH-001,海报,每海报需要1个支架
+上海,支架,DEPENDENCY,CRITICAL,4,0,6,SH-001,展架,每展架需要1个支架
+上海,电源线,DEPENDENCY,CRITICAL,8,3,5,SH-001,海报,每海报需要1个电源线
+北京,支架,DEPENDENCY,CRITICAL,5,3,2,BJ-001,海报,每海报需要1个支架
+北京,电源线,DEPENDENCY,CRITICAL,5,2,2,BJ-001,海报,每海报需要1个电源线
+南京,支架,DEPENDENCY,CRITICAL,5,3,19,,展架,每展架需要1个支架
+成都,支架,DEPENDENCY,CRITICAL,10,5,15,,海报,每海报需要1个支架
+成都,电源线,DEPENDENCY,CRITICAL,10,0,15,,海报,每海报需要1个电源线
+武汉,支架,DEPENDENCY,CRITICAL,7,0,17,WH-001,海报,每海报需要1个支架
+武汉,电源线,DEPENDENCY,CRITICAL,7,3,17,WH-001,海报,每海报需要1个电源线
+深圳,电源线,DEPENDENCY,CRITICAL,3,0,11,SZ-001,投影仪,每投影仪需要1个电源线
+西安,支架,DEPENDENCY,CRITICAL,6,0,24,XA-001,海报,每海报需要1个支架
+西安,电源线,DEPENDENCY,CRITICAL,6,0,24,XA-001,海报,每海报需要1个电源线
+杭州,电源线,DEPENDENCY,HIGH,6,4,13,HZ-001,灯箱,每灯箱需要1个电源线
+重庆,电源线,DEPENDENCY,HIGH,4,0,22,CQ-001,灯箱,每灯箱需要1个电源线

@@ -1,0 +1,299 @@
+{
+  "timestamp": "2026-05-18T06:39:35.965974",
+  "summary": {
+    "total_materials": 21,
+    "invalid_rows": 3,
+    "total_boxes": 14,
+    "total_missing": 15,
+    "missing_by_severity": {
+      "CRITICAL": 13,
+      "HIGH": 2
+    }
+  },
+  "cities": [
+    "上海",
+    "北京",
+    "南京",
+    "广州",
+    "成都",
+    "杭州",
+    "武汉",
+    "深圳",
+    "西安",
+    "重庆"
+  ],
+  "missing_items": [
+    {
+      "city": "上海",
+      "material_name": "支架",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 8,
+      "actual_quantity": 0,
+      "source_line": 5,
+      "source_box": "SH-001",
+      "depends_on": "海报",
+      "notes": "每海报需要1个支架"
+    },
+    {
+      "city": "上海",
+      "material_name": "支架",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 4,
+      "actual_quantity": 0,
+      "source_line": 6,
+      "source_box": "SH-001",
+      "depends_on": "展架",
+      "notes": "每展架需要1个支架"
+    },
+    {
+      "city": "上海",
+      "material_name": "电源线",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 8,
+      "actual_quantity": 3,
+      "source_line": 5,
+      "source_box": "SH-001",
+      "depends_on": "海报",
+      "notes": "每海报需要1个电源线"
+    },
+    {
+      "city": "北京",
+      "material_name": "支架",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 5,
+      "actual_quantity": 3,
+      "source_line": 2,
+      "source_box": "BJ-001",
+      "depends_on": "海报",
+      "notes": "每海报需要1个支架"
+    },
+    {
+      "city": "北京",
+      "material_name": "电源线",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 5,
+      "actual_quantity": 2,
+      "source_line": 2,
+      "source_box": "BJ-001",
+      "depends_on": "海报",
+      "notes": "每海报需要1个电源线"
+    },
+    {
+      "city": "南京",
+      "material_name": "支架",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 5,
+      "actual_quantity": 3,
+      "source_line": 19,
+      "source_box": "",
+      "depends_on": "展架",
+      "notes": "每展架需要1个支架"
+    },
+    {
+      "city": "成都",
+      "material_name": "支架",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 10,
+      "actual_quantity": 5,
+      "source_line": 15,
+      "source_box": "",
+      "depends_on": "海报",
+      "notes": "每海报需要1个支架"
+    },
+    {
+      "city": "成都",
+      "material_name": "电源线",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 10,
+      "actual_quantity": 0,
+      "source_line": 15,
+      "source_box": "",
+      "depends_on": "海报",
+      "notes": "每海报需要1个电源线"
+    },
+    {
+      "city": "武汉",
+      "material_name": "支架",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 7,
+      "actual_quantity": 0,
+      "source_line": 17,
+      "source_box": "WH-001",
+      "depends_on": "海报",
+      "notes": "每海报需要1个支架"
+    },
+    {
+      "city": "武汉",
+      "material_name": "电源线",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 7,
+      "actual_quantity": 3,
+      "source_line": 17,
+      "source_box": "WH-001",
+      "depends_on": "海报",
+      "notes": "每海报需要1个电源线"
+    },
+    {
+      "city": "深圳",
+      "material_name": "电源线",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 3,
+      "actual_quantity": 0,
+      "source_line": 11,
+      "source_box": "SZ-001",
+      "depends_on": "投影仪",
+      "notes": "每投影仪需要1个电源线"
+    },
+    {
+      "city": "西安",
+      "material_name": "支架",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 6,
+      "actual_quantity": 0,
+      "source_line": 24,
+      "source_box": "XA-001",
+      "depends_on": "海报",
+      "notes": "每海报需要1个支架"
+    },
+    {
+      "city": "西安",
+      "material_name": "电源线",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 6,
+      "actual_quantity": 0,
+      "source_line": 24,
+      "source_box": "XA-001",
+      "depends_on": "海报",
+      "notes": "每海报需要1个电源线"
+    },
+    {
+      "city": "杭州",
+      "material_name": "电源线",
+      "missing_type": "DEPENDENCY",
+      "severity": "HIGH",
+      "required_quantity": 6,
+      "actual_quantity": 4,
+      "source_line": 13,
+      "source_box": "HZ-001",
+      "depends_on": "灯箱",
+      "notes": "每灯箱需要1个电源线"
+    },
+    {
+      "city": "重庆",
+      "material_name": "电源线",
+      "missing_type": "DEPENDENCY",
+      "severity": "HIGH",
+      "required_quantity": 4,
+      "actual_quantity": 0,
+      "source_line": 22,
+      "source_box": "CQ-001",
+      "depends_on": "灯箱",
+      "notes": "每灯箱需要1个电源线"
+    }
+  ],
+  "city_summary": {
+    "上海": {
+      "material_count": 3,
+      "total_quantity": 15,
+      "missing_total": 3,
+      "missing_critical": 3,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "北京": {
+      "material_count": 3,
+      "total_quantity": 10,
+      "missing_total": 2,
+      "missing_critical": 2,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "南京": {
+      "material_count": 2,
+      "total_quantity": 8,
+      "missing_total": 1,
+      "missing_critical": 1,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "广州": {
+      "material_count": 3,
+      "total_quantity": 9,
+      "missing_total": 0,
+      "missing_critical": 0,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "成都": {
+      "material_count": 2,
+      "total_quantity": 15,
+      "missing_total": 2,
+      "missing_critical": 2,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "杭州": {
+      "material_count": 2,
+      "total_quantity": 10,
+      "missing_total": 1,
+      "missing_critical": 0,
+      "missing_high": 1,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "武汉": {
+      "material_count": 2,
+      "total_quantity": 10,
+      "missing_total": 2,
+      "missing_critical": 2,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "深圳": {
+      "material_count": 2,
+      "total_quantity": 5,
+      "missing_total": 1,
+      "missing_critical": 1,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "西安": {
+      "material_count": 1,
+      "total_quantity": 6,
+      "missing_total": 2,
+      "missing_critical": 2,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "重庆": {
+      "material_count": 1,
+      "total_quantity": 4,
+      "missing_total": 1,
+      "missing_critical": 0,
+      "missing_high": 1,
+      "missing_medium": 0,
+      "missing_low": 0
+    }
+  }
+}
