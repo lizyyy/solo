@@ -1,0 +1,40 @@
+openapi: 3.0.0
+info:
+  title: 脏数据测试 API
+  version: 1.0.0
+
+components:
+  schemas:
+    OrderStatus:
+      type: string
+      enum:
+        - PENDING
+        - PAID
+        - SHIPPED
+        - DELIVERED
+        - CANCELLED
+    
+    InvalidEnum:
+      type: string
+      enum:
+        - VALUE_1
+        - VALUE_2
+      this_is_an_error: true
+
+    PaymentMethod:
+      type: string
+      enum:
+        - CREDIT_CARD
+        - DEBIT_CARD
+
+    BadSyntaxHere
+      type: string
+      enum:
+        - TEST
+
+    UserRole:
+      type: string
+      enum:
+        - ADMIN
+        - USER
+        - GUEST

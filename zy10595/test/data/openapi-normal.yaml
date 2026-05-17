@@ -1,0 +1,55 @@
+openapi: 3.0.0
+info:
+  title: 测试 API
+  version: 1.0.0
+
+components:
+  schemas:
+    OrderStatus:
+      type: string
+      enum:
+        - PENDING
+        - PAID
+        - SHIPPED
+        - DELIVERED
+        - CANCELLED
+    
+    PaymentMethod:
+      type: string
+      enum:
+        - CREDIT_CARD
+        - DEBIT_CARD
+        - PAYPAL
+        - BANK_TRANSFER
+    
+    User:
+      type: object
+      properties:
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+            - GUEST
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - SUSPENDED
+
+paths:
+  /orders:
+    get:
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - PENDING
+              - PAID
+              - SHIPPED
+      responses:
+        '200':
+          description: 成功
