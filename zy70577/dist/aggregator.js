@@ -8,6 +8,12 @@ class StageAggregator {
     aggregate(entries) {
         const stageMap = new Map();
         for (const entry of entries) {
+            // 只聚合有实际数据意义的行（有缓存信息或耗时）
+            // 过滤掉纯结构标记行（如 endgroup）
+            const hasMeaningfulData = entry.hitStatus || entry.cacheKey || entry.durationMs;
+            if (!hasMeaningfulData) {
+                continue;
+            }
             const stage = entry.stage || 'unknown';
             if (!stageMap.has(stage)) {
                 stageMap.set(stage, []);

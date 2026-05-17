@@ -89,7 +89,6 @@ export class LogParser {
     const entry: LogEntry = {
       lineNumber,
       raw: line,
-      stage: currentStage,
     };
 
     const timestampMatch = line.match(this.patterns.timestamp);
@@ -98,6 +97,9 @@ export class LogParser {
     }
 
     const stageMatch = line.match(this.patterns.stage);
+    const isStageEndLine = /##\[endgroup\]/.test(line);
+    const isStageRelatedLine = !!stageMatch || isStageEndLine;
+    
     if (stageMatch) {
       entry.stage = stageMatch[1].trim();
     }
@@ -133,6 +135,12 @@ export class LogParser {
       entry.hitStatus = CACHE_HIT_STATUS.UNKNOWN;
     }
 
+    // 只有当行有实际的缓存或耗时信息时，才附加阶段上下文
+    // 阶段相关行本身已有stage属性或不需要附加
+    if (!isStageRelatedLine && this.hasCacheOrDurationInfo(entry)) {
+      entry.stage = currentStage;
+    }
+
     if (!entry.message && line.length > 0) {
       entry.message = line.substring(0, 200);
     }
@@ -140,13 +148,17 @@ export class LogParser {
     return entry;
   }
 
+  private hasCacheOrDurationInfo(entry: LogEntry): boolean {
+    return !!(entry.hitStatus || entry.cacheKey || entry.durationMs);
+  }
+
   private isValidEntry(entry: LogEntry): boolean {
-    return !!(
-      entry.hitStatus ||
-      entry.cacheKey ||
-      entry.durationMs ||
-      (entry.stage && entry.stage !== 'unknown')
-    );
+    // 有效行条件：
+    // 1. 有缓存或耗时信息（命中/未命中状态、缓存键、耗时）
+    // 2. 或者是阶段相关行（阶段开始、阶段结束）
+    return !!this.hasCacheOrDurationInfo(entry) || 
+           !!(entry.stage && entry.stage !== 'unknown') ||
+           /##\[endgroup\]/.test(entry.raw);
   }
 
   detectFormatFromContent(content: string): keyof typeof LOG_PATTERNS | null {

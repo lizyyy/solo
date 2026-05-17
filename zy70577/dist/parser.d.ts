@@ -12,6 +12,7 @@ export declare class LogParser {
     private autoDetectPatterns;
     parse(): Promise<ParseResult>;
     private parseLine;
+    private hasCacheOrDurationInfo;
     private isValidEntry;
     detectFormatFromContent(content: string): keyof typeof LOG_PATTERNS | null;
 }
