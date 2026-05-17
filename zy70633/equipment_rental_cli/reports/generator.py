@@ -46,7 +46,7 @@ class TextReportGenerator:
 
         if result.accessory_discrepancies:
             lines.append("")
-            lines.append("  配件差异:")
+            lines.append("  配件差异(待确认，不计入当前扣款):")
             for disc in result.accessory_discrepancies:
                 status = "缺少" if disc.difference < 0 else "多余"
                 lines.append(
@@ -54,7 +54,7 @@ class TextReportGenerator:
                     f"应有{disc.expected_quantity}, "
                     f"实有{disc.returned_quantity}, "
                     f"{status}{abs(disc.difference)}件 "
-                    f"(损失¥{disc.total_loss:.2f})"
+                    f"(待确认损失¥{disc.total_loss:.2f})"
                 )
 
         if result.overdue_record:

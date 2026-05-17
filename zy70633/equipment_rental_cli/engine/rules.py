@@ -180,9 +180,6 @@ class VerificationEngine:
         total_deductions = DeductionProcessor.calculate_total_deductions(approved)
         if result.overdue_record:
             total_deductions += result.overdue_record.overdue_fee
-        for disc in result.accessory_discrepancies:
-            if disc.difference < 0:
-                total_deductions += disc.total_loss
 
         result.total_deductions = total_deductions
         result.refund_amount = max(0.0, order.deposit_paid - total_deductions)
