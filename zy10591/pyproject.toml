@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "image-tag-linter"
+version = "0.1.0"
+description = "Docker镜像标签命名规范检查CLI工具"
+requires-python = ">=3.8"
+authors = [
+  { name="Team DevOps", email="devops@example.com" }
+]
+dependencies = [
+  "click>=8.0",
+  "pydantic>=2.0",
+  "rich>=13.0",
+  "jinja2>=3.0",
+]
+
+[project.scripts]
+image-tag-linter = "image_tag_linter.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,26 @@
+# 镜像列表示例
+# 格式: 镜像名:标签 [提交哈希] [环境阶段]
+# 支持空格、逗号、分号分隔
+
+# 符合规范的标签
+registry.example.com/myapp:v1.2.3-dev a1b2c3d dev
+registry.example.com/myapp:2.0.1-test abc123def test
+registry.example.com/service:v3.1.0-staging def456ghi staging
+registry.example.com/service:3.0.0-prod jkl789mno prod
+
+# 有警告的标签（不包含提交哈希）
+registry.example.com/web:v1.0.0-dev
+registry.example.com/api:2.1.0-prod
+
+# 不符合规范的标签
+registry.example.com/myapp:latest
+registry.example.com/myapp:V1.2.3-Prod
+registry.example.com/service:build-123
+registry.example.com/service:v1-dev
+registry.example.com/web:dev-v1.0.0
+registry.example.com/api:release
+
+# 无法解析的坏数据
+这是一行坏数据
+@#$%^&*()
+invalid image line without colon
