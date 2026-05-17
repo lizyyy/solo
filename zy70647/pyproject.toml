@@ -21,5 +21,8 @@ dependencies = [
 [project.scripts]
 waste-analyzer = "waste_analyzer.cli:cli"
 
+[tool.setuptools]
+packages = ["waste_analyzer"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

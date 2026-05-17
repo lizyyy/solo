@@ -1,15 +1,20 @@
 {
-  "export_time": "2026-05-17T18:58:40.213135",
+  "export_time": "2026-05-17T22:14:17.158655",
   "summary": {
-    "total_records": 2,
-    "abnormal_records": 1,
+    "total_records": 1,
+    "abnormal_records": 0,
     "normal_records": 1
   },
   "validation": {
-    "warnings": [],
+    "warnings": [
+      "原料行 4 解析失败: 未知的单位: invalid_unit",
+      "采购单行 3 解析失败: 无法解析日期: not_a_date",
+      "采购单行 4 验证失败: 1 validation error for PurchaseOrder\nquantity\n  Input should be greater than 0 [type=greater_than, input_value=-5.0, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.5/v/greater_than",
+      "报损单行 3 解析失败: 未知的单位: 公斤"
+    ],
     "errors": [],
     "has_errors": false,
-    "has_warnings": false
+    "has_warnings": true
   },
   "waste_records": [
     {
@@ -17,51 +22,32 @@
       "material_name": "五花肉",
       "category": "肉类",
       "store_id": "S001",
-      "store_name": "门店1",
-      "purchase_quantity": 150.0,
-      "usage_quantity": 140.0,
-      "damage_quantity": 5.0,
-      "waste_rate": 0.0333,
+      "store_name": "朝阳门店",
+      "purchase_quantity": 100.0,
+      "usage_quantity": 90.0,
+      "damage_quantity": 3.0,
+      "waste_rate": 0.03,
       "is_abnormal": false,
-      "unit": "千克"
-    },
-    {
-      "material_id": "M002",
-      "material_name": "生菜",
-      "category": "蔬菜",
-      "store_id": "S001",
-      "store_name": "门店1",
-      "purchase_quantity": 50.0,
-      "usage_quantity": 45.0,
-      "damage_quantity": 5.0,
-      "waste_rate": 0.1,
-      "is_abnormal": true,
       "unit": "千克"
     }
   ],
   "store_ranking": [
     {
       "store_id": "S001",
-      "store_name": "门店1",
-      "region": "区域1",
-      "total_purchase": 200.0,
-      "total_damage": 10.0,
-      "waste_rate": 0.05,
-      "record_count": 2
+      "store_name": "朝阳门店",
+      "region": "北京",
+      "total_purchase": 100.0,
+      "total_damage": 3.0,
+      "waste_rate": 0.03,
+      "record_count": 1
     }
   ],
   "category_summary": [
     {
-      "category": "蔬菜",
-      "total_purchase": 50.0,
-      "total_damage": 5.0,
-      "waste_rate": 0.1
-    },
-    {
       "category": "肉类",
-      "total_purchase": 150.0,
-      "total_damage": 5.0,
-      "waste_rate": 0.0333
+      "total_purchase": 100.0,
+      "total_damage": 3.0,
+      "waste_rate": 0.03
     }
   ]
 }

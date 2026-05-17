@@ -56,11 +56,17 @@ class DataLoader:
         if not path.exists():
             raise FileNotFoundError(f"文件不存在: {path}")
 
+        if path.stat().st_size == 0:
+            return pd.DataFrame()
+
         suffix = path.suffix.lower()
         if suffix in [".xlsx", ".xls"]:
             return pd.read_excel(path)
         elif suffix == ".csv":
-            return pd.read_csv(path)
+            try:
+                return pd.read_csv(path)
+            except pd.errors.EmptyDataError:
+                return pd.DataFrame()
         else:
             raise ValueError(f"不支持的文件格式: {suffix}")
 

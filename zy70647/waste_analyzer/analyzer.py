@@ -40,6 +40,17 @@ class WasteAnalyzer:
             self.usages = [u for u in self.usages if u.usage_date <= self.end_date]
             self.damages = [d for d in self.damages if d.damage_date <= self.end_date]
 
+    def _get_aggregate_unit(self, material_id: str) -> Unit:
+        material = self.materials.get(material_id)
+        if not material:
+            return Unit.G
+        material_unit = material.unit
+        if material_unit in UnitConverter.WEIGHT_UNITS:
+            return Unit.G
+        if material_unit in UnitConverter.COUNT_UNITS:
+            return Unit.PIECE
+        return material_unit
+
     def _aggregate_quantity(
         self,
         records: List[Any],
@@ -47,7 +58,6 @@ class WasteAnalyzer:
         store_id_key: str,
         quantity_key: str,
         unit_key: str,
-        target_unit: Unit,
     ) -> Dict[tuple, float]:
         aggregated = defaultdict(float)
         for record in records:
@@ -61,6 +71,7 @@ class WasteAnalyzer:
             if store_id not in self.stores:
                 continue
 
+            target_unit = self._get_aggregate_unit(material_id)
             if UnitConverter.is_compatible(unit, target_unit):
                 normalized_quantity = UnitConverter.convert(quantity, unit, target_unit)
                 aggregated[(material_id, store_id)] += normalized_quantity
@@ -76,13 +87,13 @@ class WasteAnalyzer:
                 all_keys.add((material.material_id, store.store_id))
 
         purchases_agg = self._aggregate_quantity(
-            self.purchases, "material_id", "store_id", "quantity", "unit", Unit.G
+            self.purchases, "material_id", "store_id", "quantity", "unit"
         )
         usages_agg = self._aggregate_quantity(
-            self.usages, "material_id", "store_id", "quantity", "unit", Unit.G
+            self.usages, "material_id", "store_id", "quantity", "unit"
         )
         damages_agg = self._aggregate_quantity(
-            self.damages, "material_id", "store_id", "quantity", "unit", Unit.G
+            self.damages, "material_id", "store_id", "quantity", "unit"
         )
 
         for material_id, store_id in all_keys:
@@ -98,14 +109,15 @@ class WasteAnalyzer:
 
             material = self.materials[material_id]
             store = self.stores[store_id]
+            aggregate_unit = self._get_aggregate_unit(material_id)
 
             try:
                 display_unit = material.unit
-                purchase_qty_display = UnitConverter.convert(purchase_qty, Unit.G, display_unit)
-                usage_qty_display = UnitConverter.convert(usage_qty, Unit.G, display_unit)
-                damage_qty_display = UnitConverter.convert(damage_qty, Unit.G, display_unit)
+                purchase_qty_display = UnitConverter.convert(purchase_qty, aggregate_unit, display_unit)
+                usage_qty_display = UnitConverter.convert(usage_qty, aggregate_unit, display_unit)
+                damage_qty_display = UnitConverter.convert(damage_qty, aggregate_unit, display_unit)
             except ValueError:
-                display_unit = Unit.G
+                display_unit = aggregate_unit
                 purchase_qty_display = purchase_qty
                 usage_qty_display = usage_qty
                 damage_qty_display = damage_qty
