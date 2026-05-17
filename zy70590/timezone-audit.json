@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "inputPath": "test-data/normal.csv",
+    "inputType": "file",
+    "targetTimezone": "UTC",
+    "timeField": "timestamp",
+    "timezoneField": "timezone",
+    "auditTime": "2026-05-17T04:03:28.988Z"
+  },
+  "summary": {
+    "totalRows": 8,
+    "successRows": 4,
+    "errorRows": 0,
+    "warningRows": 4,
+    "dstTransitionRows": 4,
+    "files": [
+      {
+        "file": "test-data/normal.csv",
+        "totalRows": 8,
+        "successRows": 4,
+        "errorRows": 0,
+        "warningRows": 4,
+        "dstTransitionRows": 4
+      }
+    ]
+  },
+  "exitCode": 0,
+  "failedRows": [],
+  "warningRows": [
+    {
+      "file": "test-data/normal.csv",
+      "filePath": "test-data/normal.csv",
+      "rowIndex": 2,
+      "rowNumber": 4,
+      "originalRow": {
+        "id": "3",
+        "timestamp": "2024-03-10 01:59:00",
+        "timezone": "America/New_York",
+        "amount": "890.00",
+        "description": "订单 #A1003 - 夏令时前"
+      },
+      "status": "warning",
+      "issues": [
+        {
+          "type": "DST_TRANSITION",
+          "message": "该时间点位于夏令时转换边界 (时钟拨快)",
+          "dstInfo": {
+            "offsetBefore": -300,
+            "currentOffset": -300,
+            "offsetAfter": -240,
+            "offsetChange": 60
+          }
+        }
+      ],
+      "dstTransition": true,
+      "normalized": {
+        "isoString": "2024-03-10T06:59:00.000Z",
+        "timezone": "UTC",
+        "offset": 0,
+        "offsetName": "UTC",
+        "utcTimestamp": 1710053940000
+      },
+      "original": {
+        "value": "2024-03-10 01:59:00",
+        "timezone": "America/New_York",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    },
+    {
+      "file": "test-data/normal.csv",
+      "filePath": "test-data/normal.csv",
+      "rowIndex": 3,
+      "rowNumber": 5,
+      "originalRow": {
+        "id": "4",
+        "timestamp": "2024-03-10 03:00:00",
+        "timezone": "America/New_York",
+        "amount": "1200.00",
+        "description": "订单 #A1004 - 夏令时后"
+      },
+      "status": "warning",
+      "issues": [
+        {
+          "type": "DST_TRANSITION",
+          "message": "该时间点位于夏令时转换边界 (时钟拨快)",
+          "dstInfo": {
+            "offsetBefore": -300,
+            "currentOffset": -240,
+            "offsetAfter": -240,
+            "offsetChange": 60
+          }
+        }
+      ],
+      "dstTransition": true,
+      "normalized": {
+        "isoString": "2024-03-10T07:00:00.000Z",
+        "timezone": "UTC",
+        "offset": 0,
+        "offsetName": "UTC",
+        "utcTimestamp": 1710054000000
+      },
+      "original": {
+        "value": "2024-03-10 03:00:00",
+        "timezone": "America/New_York",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    },
+    {
+      "file": "test-data/normal.csv",
+      "filePath": "test-data/normal.csv",
+      "rowIndex": 5,
+      "rowNumber": 7,
+      "originalRow": {
+        "id": "6",
+        "timestamp": "2024-10-27 01:59:00",
+        "timezone": "Europe/London",
+        "amount": "1800.00",
+        "description": "订单 #A1006 - 冬令时前"
+      },
+      "status": "warning",
+      "issues": [
+        {
+          "type": "DST_TRANSITION",
+          "message": "该时间点位于夏令时转换边界 (时钟拨回)",
+          "dstInfo": {
+            "offsetBefore": 60,
+            "currentOffset": 60,
+            "offsetAfter": 0,
+            "offsetChange": -60
+          }
+        }
+      ],
+      "dstTransition": true,
+      "normalized": {
+        "isoString": "2024-10-27T00:59:00.000Z",
+        "timezone": "UTC",
+        "offset": 0,
+        "offsetName": "UTC",
+        "utcTimestamp": 1729990740000
+      },
+      "original": {
+        "value": "2024-10-27 01:59:00",
+        "timezone": "Europe/London",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    },
+    {
+      "file": "test-data/normal.csv",
+      "filePath": "test-data/normal.csv",
+      "rowIndex": 6,
+      "rowNumber": 8,
+      "originalRow": {
+        "id": "7",
+        "timestamp": "2024-10-27 01:00:00",
+        "timezone": "Europe/London",
+        "amount": "2100.00",
+        "description": "订单 #A1007 - 冬令时后"
+      },
+      "status": "warning",
+      "issues": [
+        {
+          "type": "DST_TRANSITION",
+          "message": "该时间点位于夏令时转换边界 (时钟拨回)",
+          "dstInfo": {
+            "offsetBefore": 60,
+            "currentOffset": 60,
+            "offsetAfter": 0,
+            "offsetChange": -60
+          }
+        }
+      ],
+      "dstTransition": true,
+      "normalized": {
+        "isoString": "2024-10-27T00:00:00.000Z",
+        "timezone": "UTC",
+        "offset": 0,
+        "offsetName": "UTC",
+        "utcTimestamp": 1729987200000
+      },
+      "original": {
+        "value": "2024-10-27 01:00:00",
+        "timezone": "Europe/London",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+file,row_number,original_value,error_type,error_message
+"/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",3,"invalid-date",PARSE_FAILED,"无法解析时间值: invalid-date"
+"/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",4,"",MISSING_TIME_FIELD,"时间字段 ""timestamp"" 为空或不存在"
+"/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",6,"not-a-number",PARSE_FAILED,"无法解析时间值: not-a-number"
+"/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",8,"",MISSING_TIME_FIELD,"时间字段 ""timestamp"" 为空或不存在"
+"/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",11,"2024-13-01 12:00:00",PARSE_FAILED,"无法解析时间值: 2024-13-01 12:00:00"

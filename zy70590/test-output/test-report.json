@@ -1,0 +1,257 @@
+{
+  "meta": {
+    "inputPath": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+    "inputType": "file",
+    "targetTimezone": "UTC",
+    "timeField": "timestamp",
+    "timezoneField": "timezone",
+    "auditTime": "2026-05-17T04:02:19.503Z"
+  },
+  "summary": {
+    "totalRows": 10,
+    "successRows": 2,
+    "errorRows": 5,
+    "warningRows": 3,
+    "dstTransitionRows": 2,
+    "files": [
+      {
+        "file": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+        "totalRows": 10,
+        "successRows": 2,
+        "errorRows": 5,
+        "warningRows": 3,
+        "dstTransitionRows": 2
+      }
+    ]
+  },
+  "exitCode": 1,
+  "failedRows": [
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "rowIndex": 1,
+      "rowNumber": 3,
+      "originalRow": {
+        "id": "2",
+        "timestamp": "invalid-date",
+        "timezone": "Europe/London",
+        "amount": "2300.50",
+        "description": "无效日期格式"
+      },
+      "status": "error",
+      "issues": [
+        {
+          "type": "PARSE_FAILED",
+          "message": "无法解析时间值: invalid-date",
+          "value": "invalid-date",
+          "sourceTimezone": "Europe/London"
+        }
+      ],
+      "dstTransition": false
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "rowIndex": 2,
+      "rowNumber": 4,
+      "originalRow": {
+        "id": "3",
+        "timestamp": "",
+        "timezone": "America/New_York",
+        "amount": "890.00",
+        "description": "空时间字段"
+      },
+      "status": "error",
+      "issues": [
+        {
+          "type": "MISSING_TIME_FIELD",
+          "message": "时间字段 \"timestamp\" 为空或不存在",
+          "field": "timestamp"
+        }
+      ],
+      "dstTransition": false
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "rowIndex": 4,
+      "rowNumber": 6,
+      "originalRow": {
+        "id": "5",
+        "timestamp": "not-a-number",
+        "timezone": "Asia/Tokyo",
+        "amount": "35000.00",
+        "description": "无效时间戳"
+      },
+      "status": "error",
+      "issues": [
+        {
+          "type": "PARSE_FAILED",
+          "message": "无法解析时间值: not-a-number",
+          "value": "not-a-number",
+          "sourceTimezone": "Asia/Tokyo"
+        }
+      ],
+      "dstTransition": false
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "rowIndex": 6,
+      "rowNumber": 8,
+      "originalRow": {
+        "id": "7",
+        "timestamp": "",
+        "timezone": "Invalid/Timezone",
+        "amount": "2100.00",
+        "description": "空时区字段"
+      },
+      "status": "error",
+      "issues": [
+        {
+          "type": "MISSING_TIME_FIELD",
+          "message": "时间字段 \"timestamp\" 为空或不存在",
+          "field": "timestamp"
+        }
+      ],
+      "dstTransition": false
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "rowIndex": 9,
+      "rowNumber": 11,
+      "originalRow": {
+        "id": "10",
+        "timestamp": "2024-13-01 12:00:00",
+        "timezone": "Europe/London",
+        "amount": "4000.00",
+        "description": "无效月份"
+      },
+      "status": "error",
+      "issues": [
+        {
+          "type": "PARSE_FAILED",
+          "message": "无法解析时间值: 2024-13-01 12:00:00",
+          "value": "2024-13-01 12:00:00",
+          "sourceTimezone": "Europe/London"
+        }
+      ],
+      "dstTransition": false
+    }
+  ],
+  "warningRows": [
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "rowIndex": 3,
+      "rowNumber": 5,
+      "originalRow": {
+        "id": "4",
+        "timestamp": "2024-03-10 02:30:00",
+        "timezone": "America/New_York",
+        "amount": "1200.00",
+        "description": "夏令时不存在的时间"
+      },
+      "status": "warning",
+      "issues": [
+        {
+          "type": "DST_TRANSITION",
+          "message": "该时间点位于夏令时转换边界 (时钟拨快)",
+          "dstInfo": {
+            "offsetBefore": -300,
+            "currentOffset": -240,
+            "offsetAfter": -240,
+            "offsetChange": 60
+          }
+        }
+      ],
+      "dstTransition": true,
+      "normalized": {
+        "isoString": "2024-03-10T07:30:00.000Z",
+        "timezone": "UTC",
+        "offset": 0,
+        "offsetName": "UTC",
+        "utcTimestamp": 1710055800000
+      },
+      "original": {
+        "value": "2024-03-10 02:30:00",
+        "timezone": "America/New_York",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "rowIndex": 5,
+      "rowNumber": 7,
+      "originalRow": {
+        "id": "6",
+        "timestamp": "2024-10-27 01:30:00",
+        "timezone": "Europe/London",
+        "amount": "1800.00",
+        "description": "模糊时间（时钟回拨）"
+      },
+      "status": "warning",
+      "issues": [
+        {
+          "type": "DST_TRANSITION",
+          "message": "该时间点位于夏令时转换边界 (时钟拨回)",
+          "dstInfo": {
+            "offsetBefore": 60,
+            "currentOffset": 60,
+            "offsetAfter": 0,
+            "offsetChange": -60
+          }
+        }
+      ],
+      "dstTransition": true,
+      "normalized": {
+        "isoString": "2024-10-27T00:30:00.000Z",
+        "timezone": "UTC",
+        "offset": 0,
+        "offsetName": "UTC",
+        "utcTimestamp": 1729989000000
+      },
+      "original": {
+        "value": "2024-10-27 01:30:00",
+        "timezone": "Europe/London",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      }
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70590/test-data/dirty.csv",
+      "rowIndex": 7,
+      "rowNumber": 9,
+      "originalRow": {
+        "id": "8",
+        "timestamp": "1735128000000",
+        "timezone": "",
+        "amount": "5000.00",
+        "description": "毫秒级时间戳"
+      },
+      "status": "warning",
+      "issues": [
+        {
+          "type": "MISSING_TIMEZONE_FIELD",
+          "message": "时区字段 \"timezone\" 为空，使用默认时区",
+          "usedTimezone": "UTC"
+        }
+      ],
+      "dstTransition": false,
+      "normalized": {
+        "isoString": "2024-12-25T12:00:00.000Z",
+        "timezone": "UTC",
+        "offset": 0,
+        "offsetName": "UTC",
+        "utcTimestamp": 1735128000000
+      },
+      "original": {
+        "value": "1735128000000",
+        "timezone": "UTC",
+        "format": "TIMESTAMP"
+      }
+    }
+  ]
+}
