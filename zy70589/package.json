@@ -1,0 +1,28 @@
+{
+  "name": "gitleaks-baseline-cli",
+  "version": "1.0.0",
+  "description": "Gitleaks基线整理CLI工具 - 解决历史基线问题，精准识别新增泄漏",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "gitleaks-baseline": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "keywords": ["gitleaks", "security", "baseline", "leak-detection", "cli"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3"
+  }
+}

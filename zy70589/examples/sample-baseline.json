@@ -1,0 +1,18 @@
+[
+  {
+    "fingerprint": "fingerprint_aws_001",
+    "file": "src/config/aws.js",
+    "line": 42,
+    "status": "accepted",
+    "notes": "已确认的测试环境密钥",
+    "addedAt": "2024-01-20T00:00:00Z"
+  },
+  {
+    "fingerprint": "fingerprint_db_001",
+    "file": "src/config/database.js",
+    "line": 8,
+    "status": "false_positive",
+    "notes": "示例密码，非真实密钥",
+    "addedAt": "2024-03-15T00:00:00Z"
+  }
+]
