@@ -1,0 +1,17 @@
+openapi: 3.0.0
+info:
+  title: Request Only API
+  version: 1.0.0
+servers:
+  - url: https://jsonplaceholder.typicode.com
+paths:
+  /posts:
+    post:
+      summary: Create a post (only request example)
+      requestBody:
+        content:
+          application/json:
+            example:
+              title: test
+              body: test content
+              userId: 1

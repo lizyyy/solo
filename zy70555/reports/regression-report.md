@@ -1,13 +1,13 @@
 # OpenAPI Example Regression Report
 
-> Generated at: 2026/5/17 12:41:10
+> Generated at: 2026/5/17 12:50:05
 > OpenAPI File: examples/dirty-api.yaml
 
 ## Summary
 
 | Total | Passed | Failed | Duration |
 |-------|--------|--------|----------|
-| 3 | 1 | 2 | 2371ms |
+| 2 | 0 | 2 | 1282ms |
 
 ## Failed Examples
 
@@ -21,7 +21,7 @@
 **Response Body Mismatches:**
 
 - **Field**: `[0].name`
-  - Expected: `"John Doe"`
+  - Expected: `"John Doe (Outdated)"`
   - Actual: `"Leanne Graham"`
 
 **Expected Response Body**:
@@ -30,7 +30,7 @@
 [
   {
     "id": 1,
-    "name": "John Doe"
+    "name": "John Doe (Outdated)"
   }
 ]
 ```
@@ -283,24 +283,15 @@
 
 **Response Body Mismatches:**
 
-- **Field**: `title`
-  - Expected: `"foo"`
-  - Actual: `"missing"`
-- **Field**: `body`
-  - Expected: `"bar"`
-  - Actual: `"missing"`
-- **Field**: `userId`
-  - Expected: `1`
+- **Field**: `error`
+  - Expected: `"Bad Request"`
   - Actual: `"missing"`
 
 **Expected Response Body**:
 
 ```json
 {
-  "id": 101,
-  "title": "foo",
-  "body": "bar",
-  "userId": 1
+  "error": "Bad Request"
 }
 ```
 
@@ -308,6 +299,9 @@
 
 ```json
 {
+  "title": "foo",
+  "body": "bar",
+  "userId": 1,
   "id": 101
 }
 ```

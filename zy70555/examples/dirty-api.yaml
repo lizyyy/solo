@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
-  title: Normal API
+  title: Dirty API (with outdated examples)
   version: 1.0.0
 servers:
   - url: https://jsonplaceholder.typicode.com
 paths:
   /users:
     get:
-      summary: Get users
+      summary: Get users (example name is outdated)
       responses:
         '200':
           description: A list of users
@@ -15,10 +15,10 @@ paths:
             application/json:
               example:
                 - id: 1
-                  name: John Doe
+                  name: John Doe (Outdated)
   /posts:
     post:
-      summary: Create a post
+      summary: Create a post (expected status code is wrong)
       requestBody:
         content:
           application/json:
@@ -28,11 +28,8 @@ paths:
               userId: 1
       responses:
         '400':
-          description: Post created
+          description: Expected bad request but actual is 201
           content:
             application/json:
               example:
-                id: 101
-                title: foo
-                body: bar
-                userId: 1
+                error: "Bad Request"

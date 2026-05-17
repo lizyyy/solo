@@ -1,10 +1,10 @@
 {
   "summary": {
-    "total": 3,
-    "passed": 1,
+    "total": 2,
+    "passed": 0,
     "failed": 2,
-    "duration": 2371,
-    "startTime": "2026-05-17T04:41:10.952Z"
+    "duration": 1282,
+    "startTime": "2026-05-17T04:50:05.590Z"
   },
   "results": [
     {
@@ -23,7 +23,7 @@
           "body": [
             {
               "id": 1,
-              "name": "John Doe"
+              "name": "John Doe (Outdated)"
             }
           ]
         }
@@ -273,43 +273,13 @@
         {
           "type": "body",
           "field": "[0].name",
-          "expected": "John Doe",
+          "expected": "John Doe (Outdated)",
           "actual": "Leanne Graham",
           "passed": false,
-          "message": "Expected \"John Doe\" but got \"Leanne Graham\""
+          "message": "Expected \"John Doe (Outdated)\" but got \"Leanne Graham\""
         }
       ],
-      "duration": 946
-    },
-    {
-      "example": {
-        "source": {
-          "file": "examples/dirty-api.yaml",
-          "path": "/posts",
-          "method": "POST"
-        },
-        "method": "POST",
-        "url": "https://jsonplaceholder.typicode.com/posts",
-        "path": "/posts",
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "body": {
-          "title": "foo",
-          "body": "bar",
-          "userId": 1
-        }
-      },
-      "success": true,
-      "status": 201,
-      "responseBody": {
-        "title": "foo",
-        "body": "bar",
-        "userId": 1,
-        "id": 101
-      },
-      "assertions": [],
-      "duration": 626
+      "duration": 435
     },
     {
       "example": {
@@ -322,19 +292,27 @@
         "method": "POST",
         "url": "https://jsonplaceholder.typicode.com/posts",
         "path": "/posts",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "title": "foo",
+          "body": "bar",
+          "userId": 1
+        },
         "expectedResponse": {
           "statusCode": "400",
           "body": {
-            "id": 101,
-            "title": "foo",
-            "body": "bar",
-            "userId": 1
+            "error": "Bad Request"
           }
         }
       },
       "success": false,
       "status": 201,
       "responseBody": {
+        "title": "foo",
+        "body": "bar",
+        "userId": 1,
         "id": 101
       },
       "assertions": [
@@ -347,30 +325,14 @@
         },
         {
           "type": "body",
-          "field": "title",
-          "expected": "foo",
+          "field": "error",
+          "expected": "Bad Request",
           "actual": "missing",
           "passed": false,
-          "message": "Missing expected field 'title'"
-        },
-        {
-          "type": "body",
-          "field": "body",
-          "expected": "bar",
-          "actual": "missing",
-          "passed": false,
-          "message": "Missing expected field 'body'"
-        },
-        {
-          "type": "body",
-          "field": "userId",
-          "expected": 1,
-          "actual": "missing",
-          "passed": false,
-          "message": "Missing expected field 'userId'"
+          "message": "Missing expected field 'error'"
         }
       ],
-      "duration": 793
+      "duration": 839
     }
   ],
   "failedExamples": [
@@ -390,7 +352,7 @@
           "body": [
             {
               "id": 1,
-              "name": "John Doe"
+              "name": "John Doe (Outdated)"
             }
           ]
         }
@@ -640,13 +602,13 @@
         {
           "type": "body",
           "field": "[0].name",
-          "expected": "John Doe",
+          "expected": "John Doe (Outdated)",
           "actual": "Leanne Graham",
           "passed": false,
-          "message": "Expected \"John Doe\" but got \"Leanne Graham\""
+          "message": "Expected \"John Doe (Outdated)\" but got \"Leanne Graham\""
         }
       ],
-      "duration": 946
+      "duration": 435
     },
     {
       "example": {
@@ -659,19 +621,27 @@
         "method": "POST",
         "url": "https://jsonplaceholder.typicode.com/posts",
         "path": "/posts",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "title": "foo",
+          "body": "bar",
+          "userId": 1
+        },
         "expectedResponse": {
           "statusCode": "400",
           "body": {
-            "id": 101,
-            "title": "foo",
-            "body": "bar",
-            "userId": 1
+            "error": "Bad Request"
           }
         }
       },
       "success": false,
       "status": 201,
       "responseBody": {
+        "title": "foo",
+        "body": "bar",
+        "userId": 1,
         "id": 101
       },
       "assertions": [
@@ -684,30 +654,14 @@
         },
         {
           "type": "body",
-          "field": "title",
-          "expected": "foo",
+          "field": "error",
+          "expected": "Bad Request",
           "actual": "missing",
           "passed": false,
-          "message": "Missing expected field 'title'"
-        },
-        {
-          "type": "body",
-          "field": "body",
-          "expected": "bar",
-          "actual": "missing",
-          "passed": false,
-          "message": "Missing expected field 'body'"
-        },
-        {
-          "type": "body",
-          "field": "userId",
-          "expected": 1,
-          "actual": "missing",
-          "passed": false,
-          "message": "Missing expected field 'userId'"
+          "message": "Missing expected field 'error'"
         }
       ],
-      "duration": 793
+      "duration": 839
     }
   ]
 }

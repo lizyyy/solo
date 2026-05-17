@@ -122,34 +122,62 @@ function extractExamples(openapi, filePath) {
       const requestBody = operation.requestBody;
       const responses = operation.responses;
 
+      let requestBodyExamples = [];
       if (requestBody && requestBody.content) {
         for (const [contentType, content] of Object.entries(requestBody.content)) {
           if (content.example) {
-            examples.push({
-              source: { file: filePath, path: pathKey, method: method.toUpperCase() },
-              method: method.toUpperCase(),
-              url: baseUrl + pathKey,
-              path: pathKey,
-              headers: { 'Content-Type': contentType },
+            requestBodyExamples.push({
+              contentType,
               body: content.example,
             });
           }
         }
       }
 
+      let hasResponseExamples = false;
       for (const [statusCode, response] of Object.entries(responses || {})) {
         if (response.content) {
           for (const [contentType, content] of Object.entries(response.content)) {
             if (content.example) {
-              examples.push({
-                source: { file: filePath, path: pathKey, method: method.toUpperCase(), statusCode },
-                method: method.toUpperCase(),
-                url: baseUrl + pathKey,
-                path: pathKey,
-                expectedResponse: { statusCode, body: content.example },
-              });
+              hasResponseExamples = true;
+              
+              if (requestBodyExamples.length > 0) {
+                for (const rbExample of requestBodyExamples) {
+                  examples.push({
+                    source: { file: filePath, path: pathKey, method: method.toUpperCase(), statusCode },
+                    method: method.toUpperCase(),
+                    url: baseUrl + pathKey,
+                    path: pathKey,
+                    headers: { 'Content-Type': rbExample.contentType },
+                    body: rbExample.body,
+                    expectedResponse: { statusCode, body: content.example },
+                  });
+                }
+              } else {
+                examples.push({
+                  source: { file: filePath, path: pathKey, method: method.toUpperCase(), statusCode },
+                  method: method.toUpperCase(),
+                  url: baseUrl + pathKey,
+                  path: pathKey,
+                  expectedResponse: { statusCode, body: content.example },
+                });
+              }
             }
           }
+        }
+      }
+
+      if (!hasResponseExamples && requestBodyExamples.length > 0) {
+        for (const rbExample of requestBodyExamples) {
+          examples.push({
+            source: { file: filePath, path: pathKey, method: method.toUpperCase() },
+            method: method.toUpperCase(),
+            url: baseUrl + pathKey,
+            path: pathKey,
+            headers: { 'Content-Type': rbExample.contentType },
+            body: rbExample.body,
+            hasNoAssertions: true,
+          });
         }
       }
     }
@@ -235,6 +263,12 @@ async function executeExample(example, env) {
           message: 'Response body matches expected example',
         });
       }
+    } else if (example.hasNoAssertions) {
+      assertions.push({
+        type: 'info',
+        passed: true,
+        message: 'Request executed successfully (no response example to assert)',
+      });
     }
 
     const allPassed = assertions.every(a => a.passed);
