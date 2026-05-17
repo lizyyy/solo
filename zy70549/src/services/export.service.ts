@@ -317,20 +317,21 @@ export class ExportService {
     if (!request) {
       throw new Error("Export request not found");
     }
-    if (request.status !== ExportRequestStatus.APPROVED && request.status !== ExportRequestStatus.PROCESSING) {
+    const allowedStatuses = [
+      ExportRequestStatus.APPROVED, 
+      ExportRequestStatus.PROCESSING, 
+      ExportRequestStatus.COMPLETED
+    ];
+    if (!allowedStatuses.includes(request.status as ExportRequestStatus)) {
       throw new Error("Request not approved or already processed");
     }
     const range = await getOne("SELECT * FROM event_ranges WHERE id = ?", [request.range_id]);
     const events = await getAll(
-      `SELECT e.*, hc.current_hash, hc.chain_sequence` 
-+
-      `FROM audit_log_events e` 
-+
-      `LEFT JOIN hash_chains hc ON e.id = hc.event_id` 
-+
-      `WHERE e.topic_id = ? AND e.timestamp >= ? AND e.timestamp <= ?` 
-+
-      `ORDER BY e.timestamp`,
+      `SELECT e.*, hc.current_hash, hc.chain_sequence
+       FROM audit_log_events e
+       LEFT JOIN hash_chains hc ON e.id = hc.event_id
+       WHERE e.topic_id = ? AND e.timestamp >= ? AND e.timestamp <= ?
+       ORDER BY e.timestamp`,
       [range!.topic_id, range!.start_time, range!.end_time]
     );
     return events.map(e => ({
