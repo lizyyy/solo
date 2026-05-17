@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "waste-analyzer"
+version = "0.1.0"
+authors = [
+  { name="Your Name", email="your@email.com" }
+]
+description = "原料损耗单位换算门店排行排查CLI"
+requires-python = ">=3.9"
+dependencies = [
+  "click>=8.0",
+  "pandas>=2.0",
+  "openpyxl>=3.1",
+  "rich>=13.0",
+  "pydantic>=2.0",
+]
+
+[project.scripts]
+waste-analyzer = "waste_analyzer.cli:cli"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

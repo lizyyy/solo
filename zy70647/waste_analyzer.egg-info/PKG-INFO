@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: waste-analyzer
+Version: 0.1.0
+Summary: 原料损耗单位换算门店排行排查CLI
+Author-email: Your Name <your@email.com>
+Requires-Python: >=3.9
+Requires-Dist: click>=8.0
+Requires-Dist: pandas>=2.0
+Requires-Dist: openpyxl>=3.1
+Requires-Dist: rich>=13.0
+Requires-Dist: pydantic>=2.0

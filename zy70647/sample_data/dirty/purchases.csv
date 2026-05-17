@@ -1,0 +1,4 @@
+﻿order_id,material_id,store_id,purchase_date,quantity,unit
+P001,M001,S001,2024-01-01,100,千克
+P002,INVALID,S001,not_a_date,abc,千克
+P003,M001,NONEXIST,2024/01/01,-5,千克
