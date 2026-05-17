@@ -76,7 +76,15 @@ async function runBaselineCheck(config: CLIConfig): Promise<void> {
       console.log(`✅ 基线文件已导出: ${config.outputBaseline}`);
     }
 
-    if (config.strict && (reportData.summary.newLeaks > 0 || reportData.summary.anomalies > 0)) {
+    const hasErrors = reportData.parseErrors.length > 0;
+    const hasNewLeaks = reportData.summary.newLeaks > 0;
+    const hasAnomalies = reportData.summary.anomalies > 0;
+    
+    if (hasErrors) {
+      process.exit(1);
+    }
+    
+    if (config.strict && (hasNewLeaks || hasAnomalies)) {
       process.exit(1);
     }
 

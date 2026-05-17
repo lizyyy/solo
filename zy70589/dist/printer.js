@@ -64,7 +64,7 @@ export function printTerminalSummary(reportData, verbose = false) {
     if (verbose) {
         printVerboseDetails(leaks);
     }
-    printConclusion(summary);
+    printConclusion(summary, parseErrors);
 }
 function printLeakSummary(leak, color) {
     const colorFn = chalk[color];
@@ -110,10 +110,14 @@ function printVerboseDetails(leaks) {
         console.log('');
     }
 }
-function printConclusion(summary) {
+function printConclusion(summary, parseErrors) {
     console.log(chalk.bold('【结论】'));
     console.log(chalk.gray('──────────────────────────────────────────────────────────────'));
-    if (summary.newLeaks === 0 && summary.anomalies === 0) {
+    if (parseErrors.length > 0) {
+        console.log(chalk.red.bold('  ❌ 扫描报告解析失败，存在数据格式错误！'));
+        console.log(chalk.red(`     共 ${parseErrors.length} 条解析错误，请检查扫描报告格式。`));
+    }
+    else if (summary.newLeaks === 0 && summary.anomalies === 0) {
         console.log(chalk.green.bold('  ✅ 检查通过！没有新增泄漏和异常。'));
     }
     else {
