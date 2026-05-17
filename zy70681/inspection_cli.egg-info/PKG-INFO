@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: inspection-cli
+Version: 1.0.0
+Summary: 门店巡检整改复查管理命令行工具
+Author: Inspection Team
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0.0
+Requires-Dist: pandas>=1.5.0
+Requires-Dist: openpyxl>=3.0.0
+Requires-Dist: Pillow>=9.0.0
+Requires-Dist: python-dateutil>=2.8.0
+Dynamic: author
+Dynamic: classifier
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
