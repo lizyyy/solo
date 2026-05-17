@@ -1,6 +1,30 @@
 const fs = require('fs');
 const path = require('path');
 
+const VALID_SSH_KEYWORDS = new Set([
+  'host', 'hostname', 'user', 'port', 'identityfile', 'proxyjump',
+  'forwardagent', 'forwardx11', 'forwardx11trusted', 'compression',
+  'serveraliveinterval', 'serveralivecountmax', 'tcpkeepalive',
+  'strict hostkey checking', 'stricthostkeychecking', 'userknownhostsfile',
+  'globalknownhostsfile', 'loglevel', 'ciphers', 'macs', 'kexalgorithms',
+  'preferredauthentications', 'gssapiauthentication', 'gssapidelegatecredentials',
+  'hashknownhosts', 'visualhostkey', 'controlmaster', 'controlpath',
+  'controlpersist', 'batchmode', 'checkhostip', 'addressfamily',
+  'connecttimeout', 'connectionattempts', 'escapechar', 'tunnel',
+  'tunneldevice', 'permitlocalcommand', 'localcommand', 'proxycommand',
+  'proxyusefdpass', 'sendenv', 'setenv', 'term', 'rekeylimit',
+  'rekeymaxlimit', 'pubkeyauthentication', 'passwordauthentication',
+  'challengeresponseauthentication', 'kbdinteractiveauthentication',
+  'gssapikeyexchange', 'hostbasedauthentication', 'hostkeyalgorithms',
+  'pubkeyacceptedkeytypes', 'certificatefile', 'identityagent',
+  'addkeystoagent', 'updatehostkeys', 'verifymatchlocaliponly',
+  'canonicalizefallback', 'canonicalizehostname', 'canonicalizedomainname',
+  'canonicalizemaxdots', 'canonicalizepermittedcnames', 'match',
+  'include', 'ignoreunknown', 'revokedhostkeys', 'knownhostscommand',
+  'systemhostfile', 'syslogfacility', 'xonxoff', 'enablesshkeysign',
+  'ipqos', 'identitiesonly', 'exitonforwardfailure', 'numberofpasswordprompts'
+]);
+
 class SSHConfigParser {
   constructor() {
     this.hosts = [];
@@ -25,6 +49,7 @@ class SSHConfigParser {
         return;
       }
 
+      const isIndented = line.startsWith(' ') || line.startsWith('\t');
       const match = trimmed.match(/^(\S+)\s+(.*)$/);
       if (!match) {
         this.errors.push({
@@ -37,6 +62,23 @@ class SSHConfigParser {
 
       const [, keyword, value] = match;
       const keywordLower = keyword.toLowerCase();
+
+      if (!VALID_SSH_KEYWORDS.has(keywordLower)) {
+        this.errors.push({
+          line: lineNumber,
+          content: line,
+          error: `Unknown SSH config keyword: ${keyword}`
+        });
+        if (currentHost) {
+          this.hosts.push(currentHost);
+          currentHost = null;
+        }
+        return;
+      }
+
+      if (currentHost && !isIndented && keywordLower !== 'host' && keywordLower !== 'match') {
+        currentHost = null;
+      }
 
       if (keywordLower === 'host') {
         if (currentHost) {
@@ -84,8 +126,8 @@ class SSHConfigParser {
     });
 
     matches.sort((a, b) => {
-      if (b.specificity !== a.specificity) {
-        return b.specificity - a.specificity;
+      if (a.specificity !== b.specificity) {
+        return a.specificity - b.specificity;
       }
       return a.order - b.order;
     });
