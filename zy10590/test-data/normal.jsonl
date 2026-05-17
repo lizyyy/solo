@@ -1,0 +1,6 @@
+{"sessionId": "sess-001", "timestamp": 1715000001000, "shardId": 0, "event": "start"}
+{"sessionId": "sess-002", "timestamp": 1715000002000, "shardId": 1, "event": "click"}
+{"sessionId": "sess-001", "timestamp": 1715000003000, "shardId": 0, "event": "click"}
+{"sessionId": "sess-001", "timestamp": 1715000004000, "shardId": 0, "event": "click"}
+{"sessionId": "sess-002", "timestamp": 1715000005000, "shardId": 1, "event": "end"}
+{"sessionId": "sess-001", "timestamp": 1715000006000, "shardId": 0, "event": "end"}

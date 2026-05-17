@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-17T16:46:35.447Z",
+    "options": {
+      "input": "test-data/normal.jsonl",
+      "sessionKeyField": "sessionId",
+      "eventTimeField": "timestamp",
+      "shardIdField": "shardId",
+      "gapThresholdMs": 5000,
+      "outputDir": "test-output/normal",
+      "outputPrefix": ""
+    }
+  },
+  "summary": {
+    "totalSessions": 2,
+    "totalEvents": 6,
+    "totalBadRows": 0,
+    "totalGaps": 0,
+    "uniqueShardIds": [
+      0,
+      1
+    ]
+  },
+  "gaps": [],
+  "badRows": [],
+  "sessions": [
+    {
+      "sessionKey": "sess-001",
+      "eventCount": 4,
+      "gapCount": 0,
+      "shardIds": [
+        0
+      ],
+      "eventTimeRange": {
+        "min": 1715000001000,
+        "max": 1715000006000
+      }
+    },
+    {
+      "sessionKey": "sess-002",
+      "eventCount": 2,
+      "gapCount": 0,
+      "shardIds": [
+        1
+      ],
+      "eventTimeRange": {
+        "min": 1715000002000,
+        "max": 1715000005000
+      }
+    }
+  ]
+}

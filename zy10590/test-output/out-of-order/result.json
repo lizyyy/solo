@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-17T16:46:41.185Z",
+    "options": {
+      "input": "test-data/out-of-order.jsonl",
+      "sessionKeyField": "sessionId",
+      "eventTimeField": "timestamp",
+      "shardIdField": "shardId",
+      "gapThresholdMs": 5000,
+      "outputDir": "test-output/out-of-order",
+      "outputPrefix": ""
+    }
+  },
+  "summary": {
+    "totalSessions": 2,
+    "totalEvents": 7,
+    "totalBadRows": 0,
+    "totalGaps": 1,
+    "uniqueShardIds": [
+      0,
+      1
+    ]
+  },
+  "gaps": [
+    {
+      "sessionKey": "sess-001",
+      "gapStart": 1715000006000,
+      "gapEnd": 1715000020000,
+      "gapDuration": 14000,
+      "previousEventTime": 1715000006000,
+      "nextEventTime": 1715000020000,
+      "previousShard": 0,
+      "nextShard": 0
+    }
+  ],
+  "badRows": [],
+  "sessions": [
+    {
+      "sessionKey": "sess-001",
+      "eventCount": 5,
+      "gapCount": 1,
+      "shardIds": [
+        0
+      ],
+      "eventTimeRange": {
+        "min": 1715000001000,
+        "max": 1715000020000
+      }
+    },
+    {
+      "sessionKey": "sess-002",
+      "eventCount": 2,
+      "gapCount": 0,
+      "shardIds": [
+        1
+      ],
+      "eventTimeRange": {
+        "min": 1715000002000,
+        "max": 1715000005000
+      }
+    }
+  ]
+}

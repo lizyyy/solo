@@ -1,0 +1,27 @@
+{
+  "name": "jsonl-sort-fix-cli",
+  "version": "1.0.0",
+  "description": "JSONL 乱序修复 CLI - 修复分片导出后的会话顺序问题并保留缺口",
+  "main": "dist/cli.js",
+  "bin": {
+    "jsonl-fix": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "keywords": ["jsonl", "sort", "fix", "cli", "session"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/yargs": "^17.0.32",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "yargs": "^17.7.2"
+  }
+}

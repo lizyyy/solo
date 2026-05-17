@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-17T16:46:53.596Z",
+    "options": {
+      "input": "test-data/shards/",
+      "sessionKeyField": "sessionId",
+      "eventTimeField": "timestamp",
+      "shardIdField": "shardId",
+      "gapThresholdMs": 5000,
+      "outputDir": "test-output/shards",
+      "outputPrefix": ""
+    }
+  },
+  "summary": {
+    "totalSessions": 3,
+    "totalEvents": 7,
+    "totalBadRows": 0,
+    "totalGaps": 0,
+    "uniqueShardIds": [
+      0,
+      1
+    ]
+  },
+  "gaps": [],
+  "badRows": [],
+  "sessions": [
+    {
+      "sessionKey": "sess-001",
+      "eventCount": 4,
+      "gapCount": 0,
+      "shardIds": [
+        0,
+        1
+      ],
+      "eventTimeRange": {
+        "min": 1715000001000,
+        "max": 1715000006000
+      }
+    },
+    {
+      "sessionKey": "sess-003",
+      "eventCount": 1,
+      "gapCount": 0,
+      "shardIds": [
+        0
+      ],
+      "eventTimeRange": {
+        "min": 1715000007000,
+        "max": 1715000007000
+      }
+    },
+    {
+      "sessionKey": "sess-002",
+      "eventCount": 2,
+      "gapCount": 0,
+      "shardIds": [
+        1
+      ],
+      "eventTimeRange": {
+        "min": 1715000002000,
+        "max": 1715000005000
+      }
+    }
+  ]
+}

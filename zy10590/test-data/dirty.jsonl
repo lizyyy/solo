@@ -1,0 +1,7 @@
+{"sessionId": "sess-001", "timestamp": 1715000001000, "shardId": 0, "event": "start"}
+{"sessionId": "sess-002", "timestamp": 1715000002000, "shardId": 1, "event": "click"}
+这不是 JSON
+{"sessionId": "sess-001", "timestamp": "invalid-time", "shardId": 0, "event": "click"}
+{"missingSession": true, "timestamp": 1715000004000}
+{"sessionId": "sess-002"}
+{"sessionId": "sess-001", "timestamp": 1715000006000, "shardId": 0, "event": "end"}

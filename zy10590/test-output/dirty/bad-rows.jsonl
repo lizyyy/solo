@@ -1,0 +1,4 @@
+{"sourceFile":"test-data/dirty.jsonl","lineNumber":3,"rawContent":"这不是 JSON","error":"Unexpected token '这', \"这不是 JSON\" is not valid JSON"}
+{"sourceFile":"test-data/dirty.jsonl","lineNumber":4,"rawContent":"{\"sessionId\": \"sess-001\", \"timestamp\": \"invalid-time\", \"shardId\": 0, \"event\": \"click\"}","error":"事件时间格式无效: invalid-time"}
+{"sourceFile":"test-data/dirty.jsonl","lineNumber":5,"rawContent":"{\"missingSession\": true, \"timestamp\": 1715000004000}","error":"缺少会话键字段: sessionId"}
+{"sourceFile":"test-data/dirty.jsonl","lineNumber":6,"rawContent":"{\"sessionId\": \"sess-002\"}","error":"缺少事件时间字段: timestamp"}
