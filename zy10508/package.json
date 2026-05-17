@@ -1,0 +1,23 @@
+{
+  "name": "dataset-acknowledgment-api",
+  "version": "1.0.0",
+  "description": "数据集发布签收API服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node examples/sample.js",
+    "self-check": "node examples/self-check.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "joi": "^17.11.0",
+    "moment": "^2.29.4",
+    "csv-writer": "^1.6.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
