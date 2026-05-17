@@ -1,0 +1,63 @@
+[
+  {
+    "id": 1,
+    "type": "review_comment",
+    "thread_id": "t1",
+    "author": "alice_dev",
+    "author_association": "CONTRIBUTOR",
+    "body": "这段代码逻辑看起来不错！但是这里需要添加错误处理，必须修复",
+    "created_at": "2024-01-15T10:30:00Z",
+    "file_path": "src/auth.js",
+    "line": 42,
+    "original_line": 42,
+    "diff_hunk": "@@ -40,5 +40,7 @@ function verify()",
+    "html_url": "https://github.com/example/pull/123#discussion_r1"
+  },
+  {
+    "id": 2,
+    "type": "review_comment",
+    "thread_id": "t1",
+    "author": "bob_reviewer",
+    "author_association": "REVIEWER",
+    "body": "这是阻塞意见，必须修复这个安全漏洞才能合并。这个问题可能导致内存泄漏",
+    "created_at": "2024-01-15T11:00:00Z",
+    "file_path": "src/auth.js",
+    "line": 45,
+    "original_line": 45,
+    "html_url": "https://github.com/example/pull/123#discussion_r2"
+  },
+  {
+    "id": 3,
+    "type": "review_comment",
+    "thread_id": "t2",
+    "author": "charlie_maintainer",
+    "author_association": "MEMBER",
+    "body": "请添加错误处理逻辑",
+    "created_at": "2024-01-15T12:00:00Z",
+    "file_path": "src/auth.js",
+    "line": 100,
+    "original_line": 100,
+    "is_resolved": true,
+    "state": "RESOLVED",
+    "html_url": "https://github.com/example/pull/123#discussion_r3"
+  },
+  {
+    "id": 4,
+    "type": "review_comment",
+    "thread_id": "t3",
+    "author": "dave",
+    "body": "需要在这里添加错误处理",
+    "created_at": "2024-01-15T12:30:00Z",
+    "file_path": "src/utils.js",
+    "line": 25,
+    "html_url": "https://github.com/example/pull/123#discussion_r4"
+  },
+  {
+    "id": 5,
+    "type": "issue_comment",
+    "author": "eve",
+    "body": "整体实现很好，代码质量不错。建议后续可以继续优化性能。",
+    "created_at": "2024-01-15T13:00:00Z",
+    "html_url": "https://github.com/example/pull/123#issuecomment-1"
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "name": "github-comment-sampler",
+  "version": "1.0.0",
+  "description": "GitHub PR评论采样与分析CLI工具",
+  "main": "src/cli.js",
+  "type": "module",
+  "bin": {
+    "ghcs": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js self-test",
+    "self-check": "node src/cli.js self-test"
+  },
+  "keywords": [
+    "github",
+    "pull-request",
+    "review",
+    "comments",
+    "sampler"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "lodash": "^4.17.21",
+    "chalk": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
