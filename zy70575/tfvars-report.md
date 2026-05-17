@@ -1,6 +1,6 @@
 # Terraform Variable Usage Report
 
-Generated: 2026-05-17 11:33:02
+Generated: 2026-05-17 13:27:56
 
 ## Summary
 
@@ -9,19 +9,21 @@ Generated: 2026-05-17 11:33:02
 | Total variables | 8 |
 | Used variables | 5 |
 | Unused variables | 3 |
-| With default value | 8 |
-| Without default | 0 |
+| With default value | 6 |
+| Without default | 2 |
 | Undefined but used | 0 |
-| Total issues | 3 |
+| Total issues | 5 |
 | Parse errors | 0 |
 
 ## Variable issues
 
 | Variable | Issue | Location |
 |----------|-------|----------|
-| no_default_unused | defined but never used | test-normal/variables.tf:42 |
 | unused_var | defined but never used | test-normal/variables.tf:31 |
 | no_default_used | defined but never used | test-normal/variables.tf:37 |
+| no_default_used | missing default value | test-normal/variables.tf:37 |
+| no_default_unused | defined but never used | test-normal/variables.tf:42 |
+| no_default_unused | missing default value | test-normal/variables.tf:42 |
 
 ## Unused variables
 
@@ -38,8 +40,8 @@ Generated: 2026-05-17 11:33:02
 | aws_region | YES | YES | YES | 0 |
 | environment | YES | YES | YES | 0 |
 | instance_type | YES | YES | YES | 0 |
-| no_default_unused | YES | NO | YES | 1 |
-| no_default_used | YES | NO | YES | 1 |
+| no_default_unused | YES | NO | NO | 2 |
+| no_default_used | YES | NO | NO | 2 |
 | subnet_cidrs | YES | YES | YES | 0 |
 | unused_var | YES | NO | YES | 1 |
 | vpc_cidr | YES | YES | YES | 0 |

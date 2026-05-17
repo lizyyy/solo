@@ -17,12 +17,19 @@ def parse_tf_file(file_path):
     except Exception as e:
         errors.append({'file': file_path, 'line': 0, 'col': 0, 'raw': '', 'msg': 'Read error: ' + str(e), 'type': 'file_access'})
         return variables, references, errors
+    
     var_pattern = re.compile(r'^\s*variable\s+"([^"]+)"\s*\{')
     ref_pattern = re.compile(r'var\.([a-zA-Z_][a-zA-Z0-9_\-]*)')
+    default_pattern = re.compile(r'^\s*default\s*=')
+    
+    valid_hcl_keywords = ['resource', 'module', 'output', 'provider', 'terraform', 'locals', 'data']
+    
     in_var_block = False
     current_var = None
     brace_depth = 0
+    
     for line_num, line in enumerate(lines, 1):
+        stripped = line.strip()
         try:
             var_match = var_pattern.match(line)
             if var_match:
@@ -31,21 +38,42 @@ def parse_tf_file(file_path):
                 in_var_block = True
                 brace_depth = 1
                 continue
+            
             if in_var_block:
                 brace_depth += line.count('{')
                 brace_depth -= line.count('}')
-                if 'default' in line and '=' in line:
+                if default_pattern.match(line):
                     current_var['has_default'] = True
                 if brace_depth <= 0:
                     variables[current_var['name']] = current_var
                     in_var_block = False
                     current_var = None
                 continue
-            for match in ref_pattern.finditer(line):
-                var_name = match.group(1)
-                references.append({'name': var_name, 'file': file_path, 'line': line_num, 'col': match.start() + 1})
+            
+            has_var_ref = bool(ref_pattern.search(line))
+            if has_var_ref:
+                for match in ref_pattern.finditer(line):
+                    var_name = match.group(1)
+                    references.append({'name': var_name, 'file': file_path, 'line': line_num, 'col': match.start() + 1})
+                continue
+            
+            if stripped and not stripped.startswith('#') and not stripped.startswith('//'):
+                is_valid_hcl = False
+                for kw in valid_hcl_keywords:
+                    if re.match(r'^\s*' + kw + r'\s', line) or re.match(r'^\s*' + kw + r'\s*"', line):
+                        is_valid_hcl = True
+                        break
+                if re.match(r'^\s*[a-zA-Z_][a-zA-Z0-9_]*\s*=', line):
+                    is_valid_hcl = True
+                if stripped.startswith('}') or stripped.startswith('{'):
+                    is_valid_hcl = True
+                
+                if not is_valid_hcl:
+                    errors.append({'file': file_path, 'line': line_num, 'col': 1, 'raw': stripped, 'msg': 'Invalid HCL syntax - unrecognized line outside any block', 'type': 'syntax_error'})
+        
         except Exception as e:
-            errors.append({'file': file_path, 'line': line_num, 'col': 1, 'raw': line.strip(), 'msg': 'Parse failed: ' + str(e), 'type': 'parse_error'})
+            errors.append({'file': file_path, 'line': line_num, 'col': 1, 'raw': stripped, 'msg': 'Parse failed: ' + str(e), 'type': 'parse_error'})
+    
     return variables, references, errors
 
 def analyze_path(path):
