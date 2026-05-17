@@ -23,7 +23,7 @@ export class PreviewEngine {
 
     if (!hasErrors) {
       try {
-        const result = applyPatch(deepClone(originalJson), patches, true, true);
+        const result = applyPatch(deepClone(originalJson), patches as any[], true, true);
         patchedJson = result.newDocument;
       } catch (error: any) {
         success = false;
@@ -56,7 +56,7 @@ export class PreviewEngine {
     patches.forEach((patch, index) => {
       try {
         const originalValue = this.getValueAtPath(currentJson, patch.path);
-        const result = applyPatch(currentJson, [patch], true, true);
+        const result = applyPatch(currentJson, [patch as any], true, true);
         const newValue = this.getValueAtPath(result.newDocument, patch.path);
 
         previews.push({

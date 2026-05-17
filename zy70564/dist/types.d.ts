@@ -31,7 +31,7 @@ export interface Conflict {
     existingValue?: any;
     newValue?: any;
 }
-export type ConflictType = 'path_not_exists' | 'would_overwrite_nested' | 'array_index_out_of_bounds' | 'test_failure' | 'move_source_not_exists' | 'copy_source_not_exists' | 'duplicate_path';
+export type ConflictType = 'path_not_exists' | 'would_overwrite_nested' | 'array_index_out_of_bounds' | 'test_failure' | 'move_source_not_exists' | 'copy_source_not_exists' | 'duplicate_path' | 'patch_application_error';
 export interface PatchPreview {
     originalValue: any;
     newValue: any;

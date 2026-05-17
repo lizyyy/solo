@@ -44,7 +44,8 @@ export type ConflictType =
   | 'test_failure'
   | 'move_source_not_exists'
   | 'copy_source_not_exists'
-  | 'duplicate_path';
+  | 'duplicate_path'
+  | 'patch_application_error';
 
 export interface PatchPreview {
   originalValue: any;
