@@ -4,7 +4,9 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 
-LOGFMT_PATTERN = re.compile(r'([a-zA-Z_][a-zA-Z0-9_]*)=([^\\s]+)')
+LOGFMT_PATTERN = re.compile(
+    r'([a-zA-Z_][a-zA-Z0-9_]*)=("[^"]*"|\'[^\']*\'|[^\s]+)'
+)
 
 @dataclass
 class ParsedLine:
@@ -28,7 +30,7 @@ class ParsedLine:
         }
 
 def parse_logfmt_line(line, line_number):
-    result = ParsedLine(line_number=line_number, raw=line.rstrip('\\n'))
+    result = ParsedLine(line_number=line_number, raw=line.rstrip('\n'))
     if not line.strip():
         result.is_bad = True
         result.error_reason = 'empty_line'
@@ -143,8 +145,8 @@ class LogFileParser:
         lines = self.sort_by_timestamp() if sort_by_time else self.good_lines
         with open(output_path, 'w', encoding='utf-8') as f:
             for line in lines:
-                f.write(json.dumps(line.to_dict(), ensure_ascii=False) + '\\n')
+                f.write(json.dumps(line.to_dict(), ensure_ascii=False) + '\n')
         bad_path = output_path.replace('.ndjson', '_bad.ndjson')
         with open(bad_path, 'w', encoding='utf-8') as f:
             for line in self.bad_lines:
-                f.write(json.dumps(line.to_dict(), ensure_ascii=False) + '\\n')
+                f.write(json.dumps(line.to_dict(), ensure_ascii=False) + '\n')
