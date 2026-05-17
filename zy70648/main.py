@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from datetime import datetime
 import json
@@ -104,7 +104,10 @@ def list_attendance(
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.AttendanceRecord)
+    query = db.query(models.AttendanceRecord).options(
+        joinedload(models.AttendanceRecord.session),
+        joinedload(models.AttendanceRecord.student)
+    )
     if session_code:
         session = db.query(models.CourseSession).filter(models.CourseSession.session_code == session_code).first()
         if session:
@@ -140,7 +143,10 @@ def list_makeup(
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.MakeUpSign)
+    query = db.query(models.MakeUpSign).options(
+        joinedload(models.MakeUpSign.session),
+        joinedload(models.MakeUpSign.student)
+    )
     if session_code:
         session = db.query(models.CourseSession).filter(models.CourseSession.session_code == session_code).first()
         if session:
@@ -243,7 +249,10 @@ def list_graduation_reports(
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.GraduationReport)
+    query = db.query(models.GraduationReport).options(
+        joinedload(models.GraduationReport.session),
+        joinedload(models.GraduationReport.student)
+    )
     if session_code:
         session = db.query(models.CourseSession).filter(models.CourseSession.session_code == session_code).first()
         if session:

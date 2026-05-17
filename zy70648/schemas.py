@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, field_validator, model_validator
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, Any
 
 
 class StudentBase(BaseModel):
@@ -20,7 +20,7 @@ class Student(StudentBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CourseSessionBase(BaseModel):
@@ -41,12 +41,10 @@ class CourseSession(CourseSessionBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AttendanceRecordBase(BaseModel):
-    session_code: str
-    student_id: str
     sign_in_time: datetime
     sign_out_time: Optional[datetime] = None
     status: str = "present"
@@ -54,21 +52,33 @@ class AttendanceRecordBase(BaseModel):
 
 
 class AttendanceRecordCreate(AttendanceRecordBase):
-    pass
+    session_code: str
+    student_id: str
 
 
 class AttendanceRecord(AttendanceRecordBase):
     id: int
+    session_id: int
+    student_id: int
+    session_code: str
+    student_id_str: str
     created_at: datetime
     updated_at: datetime
 
+    @model_validator(mode='before')
+    @classmethod
+    def extract_related_fields(cls, data: Any) -> Any:
+        if hasattr(data, 'session') and hasattr(data.session, 'session_code'):
+            data.session_code = data.session.session_code
+        if hasattr(data, 'student') and hasattr(data.student, 'student_id'):
+            data.student_id_str = data.student.student_id
+        return data
+
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MakeUpSignBase(BaseModel):
-    session_code: str
-    student_id: str
     teacher_id: str
     teacher_name: str
     reason: str
@@ -77,16 +87,30 @@ class MakeUpSignBase(BaseModel):
 
 
 class MakeUpSignCreate(MakeUpSignBase):
-    pass
+    session_code: str
+    student_id: str
 
 
 class MakeUpSign(MakeUpSignBase):
     id: int
+    session_id: int
+    student_id: int
+    session_code: str
+    student_id_str: str
     created_at: datetime
     updated_at: datetime
 
+    @model_validator(mode='before')
+    @classmethod
+    def extract_related_fields(cls, data: Any) -> Any:
+        if hasattr(data, 'session') and hasattr(data.session, 'session_code'):
+            data.session_code = data.session.session_code
+        if hasattr(data, 'student') and hasattr(data.student, 'student_id'):
+            data.student_id_str = data.student.student_id
+        return data
+
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ConflictRecordBase(BaseModel):
@@ -115,12 +139,11 @@ class ConflictRecord(ConflictRecordBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class GraduationReportBase(BaseModel):
-    session_code: str
-    student_id: str
+    pass
 
 
 class GraduationReportGenerate(BaseModel):
@@ -131,6 +154,10 @@ class GraduationReportGenerate(BaseModel):
 
 class GraduationReport(GraduationReportBase):
     id: int
+    session_id: Optional[int] = None
+    student_id: int
+    session_code: Optional[str] = None
+    student_id_str: str
     total_sessions: int
     attended_sessions: int
     attendance_rate: float
@@ -141,8 +168,17 @@ class GraduationReport(GraduationReportBase):
     generated_at: datetime
     generated_by: Optional[str] = None
 
+    @model_validator(mode='before')
+    @classmethod
+    def extract_related_fields(cls, data: Any) -> Any:
+        if hasattr(data, 'session') and data.session and hasattr(data.session, 'session_code'):
+            data.session_code = data.session.session_code
+        if hasattr(data, 'student') and data.student and hasattr(data.student, 'student_id'):
+            data.student_id_str = data.student.student_id
+        return data
+
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ExceptionLogBase(BaseModel):

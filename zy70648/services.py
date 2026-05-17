@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_, or_
 import models, schemas
 from datetime import datetime
@@ -47,6 +47,11 @@ def create_attendance_record(db: Session, attendance: schemas.AttendanceRecordCr
     
     check_and_create_conflict(db, course_session.id, student.id)
     
+    db_attendance = db.query(models.AttendanceRecord).options(
+        joinedload(models.AttendanceRecord.session),
+        joinedload(models.AttendanceRecord.student)
+    ).filter(models.AttendanceRecord.id == db_attendance.id).first()
+    
     return db_attendance
 
 
@@ -68,6 +73,11 @@ def create_makeup_sign(db: Session, makeup: schemas.MakeUpSignCreate):
     db.refresh(db_makeup)
     
     check_and_create_conflict(db, course_session.id, student.id)
+    
+    db_makeup = db.query(models.MakeUpSign).options(
+        joinedload(models.MakeUpSign.session),
+        joinedload(models.MakeUpSign.student)
+    ).filter(models.MakeUpSign.id == db_makeup.id).first()
     
     return db_makeup
 
@@ -357,8 +367,12 @@ def generate_graduation_report(db: Session, generate_data: schemas.GraduationRep
         reports.append(report)
     
     db.commit()
-    for report in reports:
-        db.refresh(report)
+    
+    report_ids = [report.id for report in reports]
+    reports = db.query(models.GraduationReport).options(
+        joinedload(models.GraduationReport.session),
+        joinedload(models.GraduationReport.student)
+    ).filter(models.GraduationReport.id.in_(report_ids)).all()
     
     return reports
 
@@ -402,7 +416,12 @@ def withdraw_makeup(db: Session, makeup_id: int):
         conflict.resolution = "补签已撤回"
     
     db.commit()
-    db.refresh(makeup)
+    
+    makeup = db.query(models.MakeUpSign).options(
+        joinedload(models.MakeUpSign.session),
+        joinedload(models.MakeUpSign.student)
+    ).filter(models.MakeUpSign.id == makeup_id).first()
+    
     return makeup
 
 
