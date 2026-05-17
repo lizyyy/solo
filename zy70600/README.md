@@ -168,12 +168,12 @@ curl -X POST "http://localhost:8000/api/reviews/" \
     "box_code": "BOX-DEMO-001",
     "signoff_id": 1,
     "reviewer": "质量主管-王五",
-    "original_input": "签收时箱内温度 -5℃",
-    "review_result": "确认异常",
-    "review_comment": "温度超标"
-  }",
-  "temperature_violation": true,
-  "compensation_eligible": true
+    "original_input": "现场照片：箱体外有水珠，温度计显示-5℃，产品部分解冻",
+    "review_result": "确认冷链中断",
+    "review_comment": "运输过程中制冷异常，温度超标4小时以上",
+    "temperature_violation": true,
+    "compensation_eligible": true
+  }'
 ```
 
 ### 7. 赔付结论
@@ -219,7 +219,7 @@ curl -X POST "http://localhost:8000/api/boxes/BOX-DEMO-001/close?operator=经理
 
 ### 11. 数据导出
 
-JSON 格式：
+JSON 格式（完整字段）：
 ```bash
 curl -X POST "http://localhost:8000/api/export/" \
   -H "Content-Type: application/json" \
@@ -229,12 +229,22 @@ curl -X POST "http://localhost:8000/api/export/" \
   }'
 ```
 
-Excel 格式：
+Excel 格式（包含3个Sheet）：
+- 冷链箱信息：基本信息、温度范围
+- 异常报告：签收信息、复核信息（含原始输入）、赔付信息
+- 审计日志：全链路操作留痕
+
 ```bash
 curl -X POST "http://localhost:8000/api/export/" \
   -H "Content-Type: application/json" \
   -d '{ "export_format": "xlsx" }' \
   -o "cold_chain_export.xlsx"
+```
+
+### 12. 审计日志查询
+
+```bash
+curl -X GET "http://localhost:8000/api/boxes/BOX-DEMO-001/audit-logs"
 ```
 
 ## 冲突路径 (异常场景)
