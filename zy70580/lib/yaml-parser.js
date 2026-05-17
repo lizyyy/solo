@@ -13,43 +13,96 @@ class YamlParser {
       fileName: path.basename(filePath),
       documents: [],
       success: false,
-      error: null
+      partialSuccess: false,
+      errors: []
     };
 
     try {
       const content = fs.readFileSync(filePath, 'utf8');
       const lines = content.split('\n');
       
-      const documents = yaml.loadAll(content, null, { filename: filePath });
+      const documentChunks = this.splitYamlDocuments(content, lines);
       
-      let docIndex = 0;
-      for (const doc of documents) {
-        if (doc === null || doc === undefined) {
-          docIndex++;
-          continue;
+      for (const chunk of documentChunks) {
+        try {
+          const doc = yaml.load(chunk.content, { filename: filePath });
+          
+          if (doc === null || doc === undefined) {
+            continue;
+          }
+          
+          const parsedDoc = this.parseDocument(doc, filePath, lines, chunk.startLine);
+          result.documents.push(parsedDoc);
+        } catch (docError) {
+          const errorInfo = {
+            message: docError.message,
+            type: docError.name,
+            line: docError.mark?.line !== undefined ? chunk.startLine + docError.mark.line : chunk.startLine,
+            column: docError.mark?.column,
+            docStartLine: chunk.startLine,
+            contentPreview: chunk.content.substring(0, 200)
+          };
+          result.errors.push(errorInfo);
+          this.errors.push({
+            filePath,
+            type: 'DOCUMENT_PARSE_ERROR',
+            ...errorInfo
+          });
         }
-        
-        const parsedDoc = this.parseDocument(doc, filePath, lines, docIndex);
-        result.documents.push(parsedDoc);
-        docIndex++;
       }
       
-      result.success = result.documents.length > 0;
+      result.success = result.documents.length > 0 && result.errors.length === 0;
+      result.partialSuccess = result.documents.length > 0;
     } catch (error) {
-      result.error = {
+      const errorInfo = {
         message: error.message,
         type: error.name,
         line: error.mark?.line,
         column: error.mark?.column
       };
+      result.errors.push(errorInfo);
       this.errors.push({
         filePath,
-        type: 'PARSE_ERROR',
-        ...result.error
+        type: 'FILE_PARSE_ERROR',
+        ...errorInfo
       });
     }
 
     return result;
+  }
+
+  splitYamlDocuments(content, lines) {
+    const chunks = [];
+    let currentLines = [];
+    let startLine = 0;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      if (line.trim() === '---') {
+        if (currentLines.length > 0) {
+          chunks.push({
+            content: currentLines.join('\n'),
+            startLine,
+            endLine: i - 1
+          });
+        }
+        currentLines = [];
+        startLine = i + 1;
+      } else {
+        currentLines.push(line);
+      }
+    }
+    
+    if (currentLines.length > 0) {
+      chunks.push({
+        content: currentLines.join('\n'),
+        startLine,
+        endLine: lines.length - 1
+      });
+    }
+    
+    return chunks;
   }
 
   parseDocument(doc, filePath, lines, docIndex) {
@@ -135,7 +188,7 @@ class YamlParser {
     return {
       files: results,
       totalFiles: files.length,
-      successfulFiles: results.filter(r => r.success).length,
+      successfulFiles: results.filter(r => r.success || r.partialSuccess).length,
       errors: this.errors
     };
   }
@@ -171,7 +224,7 @@ class YamlParser {
       return {
         files: [result],
         totalFiles: 1,
-        successfulFiles: result.success ? 1 : 0,
+        successfulFiles: (result.success || result.partialSuccess) ? 1 : 0,
         errors: this.errors
       };
     }

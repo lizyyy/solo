@@ -1,0 +1,185 @@
+{
+  "generatedAt": "2026-05-17T05:35:45.246Z",
+  "summary": {
+    "totalFiles": 1,
+    "successfulFiles": 1,
+    "totalDocuments": 3,
+    "totalContainers": 1,
+    "containersWithLiveness": 1,
+    "containersWithReadiness": 0,
+    "containersWithStartup": 0,
+    "issuesCount": 4,
+    "warningsCount": 1
+  },
+  "containers": [
+    {
+      "name": "broken-app",
+      "namespace": "default",
+      "workloadName": "broken-deployment",
+      "workloadKind": "Deployment",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+      "probes": {
+        "liveness": {
+          "initialDelaySeconds": 999,
+          "periodSeconds": 600,
+          "timeoutSeconds": 120,
+          "successThreshold": 1,
+          "failureThreshold": 50,
+          "type": "HTTP",
+          "raw": {
+            "httpGet": {
+              "path": "/health",
+              "port": 80
+            },
+            "initialDelaySeconds": 999,
+            "periodSeconds": 600,
+            "timeoutSeconds": 120,
+            "failureThreshold": 50
+          }
+        },
+        "readiness": null,
+        "startup": null
+      },
+      "probeIssues": [
+        {
+          "severity": "error",
+          "type": "THRESHOLD_VIOLATION",
+          "message": "livenessProbe 的 initialDelaySeconds (999s) 超过建议最大值 300s",
+          "container": "broken-app",
+          "probeType": "liveness",
+          "field": "initialDelaySeconds",
+          "value": 999,
+          "threshold": 300,
+          "thresholdType": "max",
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+          "workloadName": "broken-deployment",
+          "workloadKind": "Deployment"
+        },
+        {
+          "severity": "error",
+          "type": "THRESHOLD_VIOLATION",
+          "message": "livenessProbe 的 periodSeconds (600s) 超过建议最大值 300s",
+          "container": "broken-app",
+          "probeType": "liveness",
+          "field": "periodSeconds",
+          "value": 600,
+          "threshold": 300,
+          "thresholdType": "max",
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+          "workloadName": "broken-deployment",
+          "workloadKind": "Deployment"
+        },
+        {
+          "severity": "error",
+          "type": "THRESHOLD_VIOLATION",
+          "message": "livenessProbe 的 timeoutSeconds (120s) 超过建议最大值 60s",
+          "container": "broken-app",
+          "probeType": "liveness",
+          "field": "timeoutSeconds",
+          "value": 120,
+          "threshold": 60,
+          "thresholdType": "max",
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+          "workloadName": "broken-deployment",
+          "workloadKind": "Deployment"
+        },
+        {
+          "severity": "error",
+          "type": "THRESHOLD_VIOLATION",
+          "message": "livenessProbe 的 failureThreshold (50s) 超过建议最大值 20s",
+          "container": "broken-app",
+          "probeType": "liveness",
+          "field": "failureThreshold",
+          "value": 50,
+          "threshold": 20,
+          "thresholdType": "max",
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+          "workloadName": "broken-deployment",
+          "workloadKind": "Deployment"
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "severity": "error",
+      "type": "THRESHOLD_VIOLATION",
+      "message": "livenessProbe 的 initialDelaySeconds (999s) 超过建议最大值 300s",
+      "container": "broken-app",
+      "probeType": "liveness",
+      "field": "initialDelaySeconds",
+      "value": 999,
+      "threshold": 300,
+      "thresholdType": "max",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+      "workloadName": "broken-deployment",
+      "workloadKind": "Deployment"
+    },
+    {
+      "severity": "error",
+      "type": "THRESHOLD_VIOLATION",
+      "message": "livenessProbe 的 periodSeconds (600s) 超过建议最大值 300s",
+      "container": "broken-app",
+      "probeType": "liveness",
+      "field": "periodSeconds",
+      "value": 600,
+      "threshold": 300,
+      "thresholdType": "max",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+      "workloadName": "broken-deployment",
+      "workloadKind": "Deployment"
+    },
+    {
+      "severity": "error",
+      "type": "THRESHOLD_VIOLATION",
+      "message": "livenessProbe 的 timeoutSeconds (120s) 超过建议最大值 60s",
+      "container": "broken-app",
+      "probeType": "liveness",
+      "field": "timeoutSeconds",
+      "value": 120,
+      "threshold": 60,
+      "thresholdType": "max",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+      "workloadName": "broken-deployment",
+      "workloadKind": "Deployment"
+    },
+    {
+      "severity": "error",
+      "type": "THRESHOLD_VIOLATION",
+      "message": "livenessProbe 的 failureThreshold (50s) 超过建议最大值 20s",
+      "container": "broken-app",
+      "probeType": "liveness",
+      "field": "failureThreshold",
+      "value": 50,
+      "threshold": 20,
+      "thresholdType": "max",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+      "workloadName": "broken-deployment",
+      "workloadKind": "Deployment"
+    },
+    {
+      "severity": "warning",
+      "type": "MISSING_PROBE",
+      "message": "容器 broken-app 缺少 readinessProbe",
+      "container": "broken-app",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+      "workloadName": "broken-deployment",
+      "workloadKind": "Deployment"
+    }
+  ],
+  "comparisons": [],
+  "environmentGroups": {
+    "未知环境": 1
+  },
+  "parseErrors": [
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+      "type": "YAMLException",
+      "message": "end of the stream or a document separator is expected in \"/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml\" (2:1)\n\n 1 | another bad line with invalid syntax\n 2 | : invalid: : yaml :\n-----^",
+      "line": 40,
+      "column": 0,
+      "docStartLine": 39,
+      "contentPreview": "another bad line with invalid syntax\n: invalid: : yaml :\n"
+    }
+  ]
+}
