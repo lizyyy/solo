@@ -1,0 +1,44 @@
+{
+  "name": "My Config Schema",
+  "version": "1.0",
+  "fields": [
+    {
+      "path": "project.name",
+      "type": "string",
+      "required": true,
+      "description": "项目名称"
+    },
+    {
+      "path": "project.version",
+      "type": "string",
+      "required": true,
+      "default": "0.1.0",
+      "description": "项目版本"
+    },
+    {
+      "path": "server.port",
+      "type": "integer",
+      "required": true,
+      "min_value": 1024,
+      "max_value": 65535,
+      "default": 8000
+    },
+    {
+      "path": "server.host",
+      "type": "string",
+      "required": true,
+      "default": "localhost"
+    },
+    {
+      "path": "env",
+      "type": "string",
+      "required": false,
+      "enum": [
+        "dev",
+        "test",
+        "prod"
+      ],
+      "default": "dev"
+    }
+  ]
+}

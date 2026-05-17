@@ -1,0 +1,27 @@
+{
+  "is_valid": false,
+  "errors": [
+    {
+      "error_type": "out_of_range",
+      "field_path": "server.port",
+      "message": "值 99999 大于最大值 65535",
+      "line": null,
+      "column": null,
+      "value": 99999
+    },
+    {
+      "error_type": "invalid_type",
+      "field_path": "server.host",
+      "message": "类型不匹配: 期望 string, 实际 Integer",
+      "line": null,
+      "column": null,
+      "value": 12345
+    }
+  ],
+  "warnings": [],
+  "defaults_applied": {
+    "env": "dev"
+  },
+  "file_path": "test_config.toml",
+  "schema_path": null
+}
