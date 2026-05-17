@@ -330,6 +330,12 @@ def create_reservation(reservation_id, instrument_id, group_id, start_time, end_
         if not Validator.validate_group_id(group_id):
             errors.append(f"课题组不存在: {group_id}")
         
+        if not errors and Validator.validate_time_format(start_time) and Validator.validate_time_format(end_time):
+            start = datetime.strptime(start_time, "%Y-%m-%d %H:%M")
+            end = datetime.strptime(end_time, "%Y-%m-%d %H:%M")
+            if end <= start:
+                errors.append(f"结束时间必须晚于开始时间: 开始={start_time}, 结束={end_time}")
+        
         if errors:
             click.echo("✗ 验证失败:")
             for e in errors:
@@ -629,13 +635,53 @@ def troubleshoot(output):
     reservations = db.get("reservations")
     penalties = db.get("penalties")
     risk_reports = db.get("risk_reports")
+    instruments = db.get("instruments")
+    groups = db.get("groups")
     
     issues = {
         "time_conflicts": [],
         "overtime_issues": [],
         "high_risk_cases": [],
-        "frequent_penalty_groups": []
+        "frequent_penalty_groups": [],
+        "dirty_data_issues": []
     }
+    for rid, res in reservations.items():
+        if res["instrument_id"] not in instruments:
+            issues["dirty_data_issues"].append({
+                "reservation_id": rid,
+                "issue_type": "invalid_instrument",
+                "message": f"仪器不存在: {res['instrument_id']}"
+            })
+        
+        if res["group_id"] not in groups:
+            issues["dirty_data_issues"].append({
+                "reservation_id": rid,
+                "issue_type": "invalid_group",
+                "message": f"课题组不存在: {res['group_id']}"
+            })
+        
+        if Validator.validate_time_format(res["start_time"]) and Validator.validate_time_format(res["end_time"]):
+            start = datetime.strptime(res["start_time"], "%Y-%m-%d %H:%M")
+            end = datetime.strptime(res["end_time"], "%Y-%m-%d %H:%M")
+            if end <= start:
+                issues["dirty_data_issues"].append({
+                    "reservation_id": rid,
+                    "issue_type": "invalid_time_order",
+                    "message": f"时段倒置: 开始={res['start_time']}, 结束={res['end_time']}"
+                })
+        else:
+            if not Validator.validate_time_format(res["start_time"]):
+                issues["dirty_data_issues"].append({
+                    "reservation_id": rid,
+                    "issue_type": "invalid_time_format",
+                    "message": f"开始时间格式错误: {res['start_time']}"
+                })
+            if not Validator.validate_time_format(res["end_time"]):
+                issues["dirty_data_issues"].append({
+                    "reservation_id": rid,
+                    "issue_type": "invalid_time_format",
+                    "message": f"结束时间格式错误: {res['end_time']}"
+                })
     
     res_list = list(reservations.items())
     for i, (rid1, res1) in enumerate(res_list):
@@ -648,17 +694,19 @@ def troubleshoot(output):
             if res1["instrument_id"] != res2["instrument_id"]:
                 continue
             
-            start1 = datetime.strptime(res1["start_time"], "%Y-%m-%d %H:%M")
-            end1 = datetime.strptime(res1["end_time"], "%Y-%m-%d %H:%M")
-            start2 = datetime.strptime(res2["start_time"], "%Y-%m-%d %H:%M")
-            end2 = datetime.strptime(res2["end_time"], "%Y-%m-%d %H:%M")
-            
-            if start1 < end2 and end1 > start2:
-                issues["time_conflicts"].append({
-                    "reservation1": rid1,
-                    "reservation2": rid2,
-                    "instrument": res1["instrument_id"]
-                })
+            if Validator.validate_time_format(res1["start_time"]) and Validator.validate_time_format(res1["end_time"]) and \
+               Validator.validate_time_format(res2["start_time"]) and Validator.validate_time_format(res2["end_time"]):
+                start1 = datetime.strptime(res1["start_time"], "%Y-%m-%d %H:%M")
+                end1 = datetime.strptime(res1["end_time"], "%Y-%m-%d %H:%M")
+                start2 = datetime.strptime(res2["start_time"], "%Y-%m-%d %H:%M")
+                end2 = datetime.strptime(res2["end_time"], "%Y-%m-%d %H:%M")
+                
+                if start1 < end2 and end1 > start2:
+                    issues["time_conflicts"].append({
+                        "reservation1": rid1,
+                        "reservation2": rid2,
+                        "instrument": res1["instrument_id"]
+                    })
     
     for pid, p in penalties.items():
         if p["type"] == "overtime" and p.get("overtime_hours", 0) > 2:
@@ -697,28 +745,35 @@ def troubleshoot(output):
     click.echo("问题排查报告")
     click.echo("="*60)
     
-    click.echo(f"\n1. 时段冲突 ({len(issues['time_conflicts'])}个):")
+    click.echo(f"\n1. 脏数据问题 ({len(issues['dirty_data_issues'])}个):")
+    if issues["dirty_data_issues"]:
+        for d in issues["dirty_data_issues"]:
+            click.echo(f"  - 预约 {d['reservation_id']}: {d['message']}")
+    else:
+        click.echo("  ✓ 无脏数据")
+    
+    click.echo(f"\n2. 时段冲突 ({len(issues['time_conflicts'])}个):")
     if issues["time_conflicts"]:
         for c in issues["time_conflicts"]:
             click.echo(f"  - 预约 {c['reservation1']} 与 {c['reservation2']} 在仪器 {c['instrument']} 上冲突")
     else:
         click.echo("  ✓ 无冲突")
     
-    click.echo(f"\n2. 严重超时 ({len(issues['overtime_issues'])}个):")
+    click.echo(f"\n3. 严重超时 ({len(issues['overtime_issues'])}个):")
     if issues["overtime_issues"]:
         for o in issues["overtime_issues"]:
             click.echo(f"  - 预约 {o['reservation_id']} 超时 {o['overtime_hours']}小时, 处罚 ¥{o['amount']}")
     else:
         click.echo("  ✓ 无严重超时")
     
-    click.echo(f"\n3. 高风险样本 ({len(issues['high_risk_cases'])}个):")
+    click.echo(f"\n4. 高风险样本 ({len(issues['high_risk_cases'])}个):")
     if issues["high_risk_cases"]:
         for r in issues["high_risk_cases"]:
             click.echo(f"  - 报告 {r['report_id']}: {r['risk_level']} - {r['assessment']}")
     else:
         click.echo("  ✓ 无高风险")
     
-    click.echo(f"\n4. 高频处罚课题组 ({len(issues['frequent_penalty_groups'])}个):")
+    click.echo(f"\n5. 高频处罚课题组 ({len(issues['frequent_penalty_groups'])}个):")
     if issues["frequent_penalty_groups"]:
         for g in issues["frequent_penalty_groups"]:
             click.echo(f"  - {g['group_id']}: {g['penalty_count']}次处罚")
