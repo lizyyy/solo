@@ -1,0 +1,29 @@
+{
+  "name": "openapi-error-consistency",
+  "version": "1.0.0",
+  "description": "REST API错误体一致性检查CLI工具",
+  "main": "dist/cli.js",
+  "bin": {
+    "openapi-error-check": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "start": "node dist/cli.js"
+  },
+  "keywords": ["openapi", "swagger", "api", "error", "consistency", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/js-yaml": "^4.0.9",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1"
+  }
+}
