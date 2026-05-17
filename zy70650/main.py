@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
-from fastapi.responses import Response
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Request
+from fastapi.responses import JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime, date
@@ -28,10 +29,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-def startup_event():
-    init_db()
-
 class ErrorCode:
     MISSING_FIELD = "MISSING_FIELD"
     INVALID_VALUE = "INVALID_VALUE"
@@ -40,11 +37,51 @@ class ErrorCode:
     NEEDS_MANUAL_REVIEW = "NEEDS_MANUAL_REVIEW"
     ALREADY_PROCESSED = "ALREADY_PROCESSED"
     DUPLICATE_ENTRY = "DUPLICATE_ENTRY"
+    VALIDATION_ERROR = "VALIDATION_ERROR"
 
 class ErrorResponse(BaseModel):
     error_code: str
     message: str
     details: Optional[dict] = None
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    missing_fields = []
+    invalid_fields = []
+    
+    for error in errors:
+        loc = error.get("loc", [])
+        field_name = ".".join(str(item) for item in loc if item != "body")
+        msg = error.get("msg", "")
+        
+        if "missing" in msg.lower() or "required" in msg.lower():
+            missing_fields.append(field_name)
+        else:
+            invalid_fields.append({"field": field_name, "message": msg})
+    
+    if missing_fields:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=ErrorResponse(
+                error_code=ErrorCode.MISSING_FIELD,
+                message=f"缺少必填字段: {', '.join(missing_fields)}",
+                details={"missing_fields": missing_fields}
+            ).model_dump()
+        )
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=ErrorResponse(
+                error_code=ErrorCode.INVALID_VALUE,
+                message="字段验证失败",
+                details={"invalid_fields": invalid_fields}
+            ).model_dump()
+        )
+
+@app.on_event("startup")
+def startup_event():
+    init_db()
 
 class DriverCreate(BaseModel):
     name: str
@@ -76,6 +113,30 @@ class VehicleResponse(BaseModel):
     tank_capacity: Optional[float] = None
     standard_fuel_consumption: Optional[float] = None
     driver_id: Optional[int] = None
+    
+    class Config:
+        from_attributes = True
+
+class RouteCreate(BaseModel):
+    vehicle_id: int
+    route_name: str
+    start_date: datetime
+    end_date: datetime
+    start_location: Optional[str] = None
+    end_location: Optional[str] = None
+    total_distance: Optional[float] = None
+    total_fuel: Optional[float] = None
+
+class RouteResponse(BaseModel):
+    id: int
+    vehicle_id: int
+    route_name: str
+    start_date: datetime
+    end_date: datetime
+    start_location: Optional[str] = None
+    end_location: Optional[str] = None
+    total_distance: Optional[float] = None
+    total_fuel: Optional[float] = None
     
     class Config:
         from_attributes = True
@@ -136,6 +197,7 @@ class AbnormalReportUpdate(BaseModel):
 class AbnormalReportResponse(BaseModel):
     id: int
     vehicle_id: int
+    route_id: Optional[int] = None
     abnormal_type: str
     abnormal_level: str
     status: str
@@ -150,6 +212,17 @@ class AbnormalReportResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+class RouteAnalysisResult(BaseModel):
+    route_id: int
+    route_name: str
+    vehicle_id: int
+    total_fuel: float
+    total_mileage: float
+    fuel_consumption_100km: float
+    is_abnormal: bool
+    abnormal_type: Optional[str] = None
+    abnormal_level: Optional[str] = None
 
 @app.post("/api/drivers", response_model=DriverResponse, status_code=status.HTTP_201_CREATED)
 def create_driver(driver: DriverCreate, db: Session = Depends(get_db)):
@@ -190,6 +263,88 @@ def create_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db)):
 @app.get("/api/vehicles", response_model=List[VehicleResponse])
 def list_vehicles(db: Session = Depends(get_db)):
     return crud.get_all_vehicles(db)
+
+@app.post("/api/routes", response_model=RouteResponse, status_code=status.HTTP_201_CREATED)
+def create_route(route: RouteCreate, db: Session = Depends(get_db)):
+    vehicle = db.query(crud.Vehicle).filter(crud.Vehicle.id == route.vehicle_id).first()
+    if not vehicle:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ErrorResponse(
+                error_code=ErrorCode.NOT_FOUND,
+                message=f"车辆ID {route.vehicle_id} 不存在"
+            ).model_dump()
+        )
+    if route.start_date >= route.end_date:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ErrorResponse(
+                error_code=ErrorCode.INVALID_VALUE,
+                message="开始日期必须早于结束日期"
+            ).model_dump()
+        )
+    try:
+        return crud.create_route(db, route.model_dump())
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ErrorResponse(
+                error_code=ErrorCode.INVALID_VALUE,
+                message=f"创建路线失败: {str(e)}"
+            ).model_dump()
+        )
+
+@app.get("/api/routes", response_model=List[RouteResponse])
+def list_routes(vehicle_id: Optional[int] = None, 
+                start_date: Optional[datetime] = None,
+                end_date: Optional[datetime] = None,
+                db: Session = Depends(get_db)):
+    query = db.query(crud.Route)
+    if vehicle_id:
+        query = query.filter(crud.Route.vehicle_id == vehicle_id)
+    if start_date:
+        query = query.filter(crud.Route.start_date >= start_date)
+    if end_date:
+        query = query.filter(crud.Route.end_date <= end_date)
+    return query.order_by(crud.Route.start_date.desc()).all()
+
+@app.get("/api/routes/{route_id}", response_model=RouteResponse)
+def get_route(route_id: int, db: Session = Depends(get_db)):
+    route = db.query(crud.Route).filter(crud.Route.id == route_id).first()
+    if not route:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ErrorResponse(
+                error_code=ErrorCode.NOT_FOUND,
+                message="路线不存在"
+            ).model_dump()
+        )
+    return route
+
+@app.post("/api/analyze/route/{route_id}")
+def analyze_route(route_id: int, db: Session = Depends(get_db)):
+    result = analytics.analyze_single_route(db, route_id)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ErrorResponse(
+                error_code=ErrorCode.NOT_FOUND,
+                message="路线不存在或无法分析"
+            ).model_dump()
+        )
+    return result
+
+@app.post("/api/analyze/routes/batch")
+def batch_analyze_routes(vehicle_id: Optional[int] = None, 
+                          start_date: Optional[datetime] = None,
+                          end_date: Optional[datetime] = None,
+                          db: Session = Depends(get_db)):
+    results = analytics.analyze_routes_by_vehicle(db, vehicle_id, start_date, end_date)
+    return {
+        "message": f"路线分析完成，共分析 {len(results)} 条路线",
+        "analysis_count": len(results),
+        "results": results
+    }
 
 @app.post("/api/fuel-records", response_model=FuelRecordResponse, status_code=status.HTTP_201_CREATED)
 def create_fuel_record(record: FuelRecordCreate, db: Session = Depends(get_db)):
@@ -437,12 +592,13 @@ async def import_fuel_records(file: UploadFile = File(...), db: Session = Depend
 @app.get("/api/statistics/summary")
 def get_statistics_summary(db: Session = Depends(get_db)):
     from sqlalchemy import func
-    from models import FuelRecord, MileageRecord, AbnormalReport
+    from models import FuelRecord, MileageRecord, AbnormalReport, Route
     
     total_fuel = db.query(func.sum(FuelRecord.fuel_amount)).scalar() or 0
     total_mileage = db.query(func.sum(MileageRecord.distance)).scalar() or 0
     avg_consumption = analytics.calculate_fuel_consumption_per_100km(total_fuel, total_mileage)
     
+    total_routes = db.query(Route).count()
     abnormal_pending = db.query(AbnormalReport).filter(AbnormalReport.status == "待处理").count()
     abnormal_reviewing = db.query(AbnormalReport).filter(AbnormalReport.status == "复核中").count()
     abnormal_resolved = db.query(AbnormalReport).filter(AbnormalReport.status == "已处理").count()
@@ -451,6 +607,7 @@ def get_statistics_summary(db: Session = Depends(get_db)):
         "total_fuel_consumed": total_fuel,
         "total_mileage": total_mileage,
         "average_fuel_consumption": avg_consumption,
+        "total_routes": total_routes,
         "abnormal_statistics": {
             "pending": abnormal_pending,
             "reviewing": abnormal_reviewing,

@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import between
 from typing import List, Dict, Any
 from datetime import datetime, timedelta
-from models import Vehicle, FuelRecord, MileageRecord, AbnormalReport
+from models import Vehicle, FuelRecord, MileageRecord, AbnormalReport, Route
 import crud
 
 def calculate_fuel_consumption_per_100km(total_fuel: float, total_mileage: float) -> float:
@@ -199,9 +200,138 @@ def batch_analyze_all_vehicles(db: Session,
     
     return all_abnormal
 
+def analyze_single_route(db: Session, route_id: int) -> Dict[str, Any]:
+    route = db.query(Route).filter(Route.id == route_id).first()
+    if not route:
+        return None
+    
+    vehicle = db.query(Vehicle).filter(Vehicle.id == route.vehicle_id).first()
+    if not vehicle:
+        return None
+    
+    fuel_records = db.query(FuelRecord).filter(
+        FuelRecord.vehicle_id == route.vehicle_id,
+        between(FuelRecord.fuel_date, route.start_date, route.end_date)
+    ).all()
+    
+    mileage_records = db.query(MileageRecord).filter(
+        MileageRecord.vehicle_id == route.vehicle_id,
+        between(MileageRecord.record_date, route.start_date, route.end_date)
+    ).all()
+    
+    total_fuel = sum(fr.fuel_amount for fr in fuel_records)
+    total_mileage = sum(mr.distance for mr in mileage_records)
+    
+    if route.total_fuel is None:
+        route.total_fuel = total_fuel
+    if route.total_distance is None:
+        route.total_distance = total_mileage
+    db.commit()
+    
+    actual_consumption = calculate_fuel_consumption_per_100km(total_fuel, total_mileage)
+    standard_consumption = vehicle.standard_fuel_consumption or 25.0
+    deviation_rate = ((actual_consumption - standard_consumption) / standard_consumption) * 100 if standard_consumption else 0
+    
+    is_abnormal = False
+    abnormal_type = None
+    abnormal_level = None
+    
+    if deviation_rate > 20 or (total_fuel > 0 and total_mileage == 0):
+        is_abnormal = True
+        abnormal_type = "疑似偷油"
+        abnormal_level = get_abnormal_level(deviation_rate)
+    
+    mileage_error_result = detect_mileage_error(mileage_records)
+    if mileage_error_result["is_suspicious"]:
+        is_abnormal = True
+        abnormal_type = abnormal_type or "里程录错"
+        abnormal_level = "中等"
+    
+    result = {
+        "route_id": route.id,
+        "route_name": route.route_name,
+        "vehicle_id": route.vehicle_id,
+        "plate_number": vehicle.plate_number,
+        "start_date": route.start_date,
+        "end_date": route.end_date,
+        "start_location": route.start_location,
+        "end_location": route.end_location,
+        "total_fuel": total_fuel,
+        "total_mileage": total_mileage,
+        "fuel_consumption_100km": actual_consumption,
+        "standard_consumption": standard_consumption,
+        "deviation_rate": deviation_rate,
+        "is_abnormal": is_abnormal,
+        "abnormal_type": abnormal_type,
+        "abnormal_level": abnormal_level
+    }
+    
+    return result
+
+def analyze_routes_by_vehicle(db: Session, 
+                               vehicle_id: int = None,
+                               start_date: datetime = None,
+                               end_date: datetime = None) -> List[Dict[str, Any]]:
+    query = db.query(Route)
+    if vehicle_id:
+        query = query.filter(Route.vehicle_id == vehicle_id)
+    if start_date:
+        query = query.filter(Route.start_date >= start_date)
+    if end_date:
+        query = query.filter(Route.end_date <= end_date)
+    
+    routes = query.order_by(Route.start_date).all()
+    
+    results = []
+    for route in routes:
+        route_analysis = analyze_single_route(db, route.id)
+        if route_analysis:
+            results.append(route_analysis)
+    
+    return results
+
+def generate_abnormal_reports_by_routes(db: Session,
+                                          start_date: datetime = None,
+                                          end_date: datetime = None) -> List[AbnormalReport]:
+    route_analyses = analyze_routes_by_vehicle(db, None, start_date, end_date)
+    reports = []
+    
+    for analysis in route_analyses:
+        if analysis["is_abnormal"]:
+            report_data = {
+                "vehicle_id": analysis["vehicle_id"],
+                "route_id": analysis["route_id"],
+                "abnormal_type": analysis["abnormal_type"],
+                "abnormal_level": analysis["abnormal_level"],
+                "status": "待处理",
+                "start_date": analysis["start_date"],
+                "end_date": analysis["end_date"],
+                "actual_fuel_consumption": analysis["fuel_consumption_100km"],
+                "expected_fuel_consumption": analysis["standard_consumption"],
+                "deviation_rate": analysis["deviation_rate"],
+                "description": f"路线'{analysis['route_name']}'异常: 百公里油耗{analysis['fuel_consumption_100km']:.2f}L, 偏差{analysis['deviation_rate']:.1f}%"
+            }
+            
+            existing = db.query(AbnormalReport).filter(
+                AbnormalReport.vehicle_id == report_data["vehicle_id"],
+                AbnormalReport.route_id == report_data["route_id"],
+                AbnormalReport.abnormal_type == report_data["abnormal_type"]
+            ).first()
+            
+            if not existing:
+                report = crud.create_abnormal_report(db, report_data)
+                reports.append(report)
+    
+    return reports
+
 def generate_abnormal_reports(db: Session, 
                                 start_date: datetime = None,
                                 end_date: datetime = None) -> List[AbnormalReport]:
+    route_reports = generate_abnormal_reports_by_routes(db, start_date, end_date)
+    
+    if route_reports:
+        return route_reports
+    
     abnormal_results = batch_analyze_all_vehicles(db, start_date, end_date)
     reports = []
     
