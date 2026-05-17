@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cash-reconciliation-cli"
+version = "0.1.0"
+description = "现金长短款备用金备注归因排查CLI工具"
+requires-python = ">=3.9"
+dependencies = [
+  "pandas>=2.0.0",
+  "openpyxl>=3.1.0",
+  "click>=8.0.0",
+  "rich>=13.0.0",
+  "pydantic>=2.0.0",
+]
+
+[project.scripts]
+cash-recon = "cash_recon.cli:main"
+
+[tool.hatch.envs.default]
+dependencies = ["pytest>=7.0.0"]
