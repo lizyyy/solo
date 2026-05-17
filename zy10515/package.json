@@ -1,0 +1,22 @@
+{
+  "name": "customer-config-handover-api",
+  "version": "1.0.0",
+  "description": "客户配置交接API服务",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "node test/acceptance.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
