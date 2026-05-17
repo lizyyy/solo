@@ -1,0 +1,102 @@
+{
+  "case_id": "CASE-20260517164610-a9bc7f8b",
+  "machine_id": "WASH-001",
+  "payment_id": "PAY-20240515-001",
+  "refund_id": null,
+  "payment_verification": "pass",
+  "payment_verification_details": {
+    "payment_id": "PAY-20240515-001",
+    "amount": 25.0,
+    "status": "success",
+    "pay_time": "2026-05-17T14:45:50.751786",
+    "result": "支付核验通过，订单有效"
+  },
+  "event_matching": "pass",
+  "event_matching_details": {
+    "machine_id": "WASH-001",
+    "total_events_found": 3,
+    "machine_events_count": 2,
+    "matched_events_count": 2,
+    "failed_events_count": 2,
+    "failed_events": [
+      {
+        "event_id": "EVT-001",
+        "status": "failed",
+        "fault_code": "E001",
+        "start_time": "2026-05-17T14:40:50.751786",
+        "error_message": "电机无法启动，电流异常"
+      },
+      {
+        "event_id": "EVT-002",
+        "status": "failed",
+        "fault_code": "E001",
+        "start_time": "2026-05-17T14:42:50.751786",
+        "error_message": "重试仍然失败"
+      }
+    ],
+    "result": "所有匹配的启动事件均失败，确认存在启动问题"
+  },
+  "refund_state_check": "pending",
+  "refund_state_details": {
+    "info": "暂无退款申请记录",
+    "current_state": "none",
+    "next_possible_state": "pending"
+  },
+  "idempotency_check": "fail",
+  "idempotency_details": {
+    "total_refunds_for_payment": 2,
+    "completed_refunds_count": 1,
+    "total_completed_amount": 25.0,
+    "original_payment_amount": 25.0,
+    "issue": "该支付已完成全额退款，重复申请",
+    "duplicate_refund_ids": [
+      "REF-002"
+    ],
+    "severity": "critical"
+  },
+  "fault_analysis": {
+    "faults_found": [
+      {
+        "event_id": "EVT-001",
+        "fault_code": "E001",
+        "description": "电机故障 - 电机无法启动或转速异常",
+        "error_message": "电机无法启动，电流异常"
+      },
+      {
+        "event_id": "EVT-002",
+        "fault_code": "E001",
+        "description": "电机故障 - 电机无法启动或转速异常",
+        "error_message": "重试仍然失败"
+      }
+    ],
+    "refundable": true,
+    "suggested_action": "检测到明确的机器故障，建议退款",
+    "fault_descriptions": [
+      "E001: 电机故障 - 电机无法启动或转速异常"
+    ]
+  },
+  "conclusion": "reject_refund",
+  "conclusion_reason": "重复退款申请，该订单已完成退款",
+  "suggested_refund_amount": null,
+  "generated_at": "2026-05-17T16:46:10.816144",
+  "related_records": {
+    "machine": {
+      "machine_id": "WASH-001",
+      "location": "1号楼1层",
+      "status": "fault",
+      "last_fault_code": "E001",
+      "last_maintenance": null
+    },
+    "payment": {
+      "payment_id": "PAY-20240515-001",
+      "machine_id": "WASH-001",
+      "user_id": "USER-1001",
+      "amount": 25.0,
+      "status": "success",
+      "pay_time": "2026-05-17T14:45:50.751786",
+      "transaction_id": "TXN-abc123"
+    },
+    "refund": null,
+    "matched_events_count": 2
+  }
+}

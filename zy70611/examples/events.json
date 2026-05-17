@@ -1,0 +1,29 @@
+[
+  {
+    "event_id": "EVT-001",
+    "machine_id": "WASH-001",
+    "payment_id": "PAY-20240515-001",
+    "user_id": "USER-1001",
+    "status": "failed",
+    "fault_code": "E001",
+    "start_time": "2026-05-17T14:40:50.751786",
+    "error_message": "电机无法启动，电流异常"
+  },
+  {
+    "event_id": "EVT-002",
+    "machine_id": "WASH-001",
+    "payment_id": "PAY-20240515-001",
+    "user_id": "USER-1001",
+    "status": "failed",
+    "fault_code": "E001",
+    "start_time": "2026-05-17T14:42:50.751786",
+    "error_message": "重试仍然失败"
+  },
+  {
+    "event_id": "EVT-003",
+    "machine_id": "WASH-002",
+    "status": "success",
+    "start_time": "2026-05-17T15:45:50.751786",
+    "end_time": "2026-05-17T16:45:50.751786"
+  }
+]

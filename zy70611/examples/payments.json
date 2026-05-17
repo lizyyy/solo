@@ -1,0 +1,26 @@
+[
+  {
+    "payment_id": "PAY-20240515-001",
+    "machine_id": "WASH-001",
+    "user_id": "USER-1001",
+    "amount": 25.0,
+    "status": "success",
+    "pay_time": "2026-05-17T14:45:50.751786",
+    "transaction_id": "TXN-abc123"
+  },
+  {
+    "payment_id": "PAY-20240515-002",
+    "machine_id": "WASH-001",
+    "user_id": "USER-1002",
+    "amount": 25.0,
+    "status": "success",
+    "pay_time": "2026-05-17T15:45:50.751786"
+  },
+  {
+    "payment_id": "PAY-DIRTY-001",
+    "machine_id": "WASH-999",
+    "user_id": "USER-999",
+    "amount": -10.0,
+    "status": "failed"
+  }
+]
