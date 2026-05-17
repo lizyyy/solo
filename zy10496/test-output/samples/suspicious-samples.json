@@ -1,0 +1,38 @@
+[
+  {
+    "ip": "1.2.3.4",
+    "path": "/phpMyAdmin/scripts/setup.php",
+    "userAgent": "Mozilla/5.0 zgrab/0.x",
+    "status": 404,
+    "timestamp": "15/May/2024:10:00:07 +0800",
+    "source": "test-access.log:7",
+    "score": 20,
+    "matchedRules": [
+      "suspicious_path"
+    ]
+  },
+  {
+    "ip": "5.6.7.8",
+    "path": "/.env",
+    "userAgent": "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)",
+    "status": 404,
+    "timestamp": "15/May/2024:10:00:08 +0800",
+    "source": "test-access.log:8",
+    "score": 20,
+    "matchedRules": [
+      "suspicious_path"
+    ]
+  },
+  {
+    "ip": "49.50.51.52",
+    "path": "/search?q=product",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0",
+    "status": 200,
+    "timestamp": "15/May/2024:10:00:19 +0800",
+    "source": "test-access.log:21",
+    "score": 30,
+    "matchedRules": [
+      "suspicious_ua_pattern"
+    ]
+  }
+]

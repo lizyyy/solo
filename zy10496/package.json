@@ -1,0 +1,32 @@
+{
+  "name": "bot-filter-cli",
+  "version": "1.0.0",
+  "description": "访问日志爬虫过滤CLI工具 - 过滤并分析爬虫流量",
+  "main": "src/index.js",
+  "bin": {
+    "bot-filter": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": [
+    "log",
+    "bot",
+    "crawler",
+    "filter",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "ua-parser-js": "^1.0.37",
+    "ip-anonymize": "^0.1.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

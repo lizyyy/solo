@@ -1,0 +1,516 @@
+{
+  "generatedAt": "2026-05-17T04:16:32.472Z",
+  "inputPath": "/Users/lzy/pro/solo/workspaces/zy10496/test-access.log",
+  "summary": {
+    "totalRecords": 18,
+    "botCount": 8,
+    "suspiciousCount": 3,
+    "cleanCount": 7,
+    "badLineCount": 3,
+    "botPercentage": "44.44"
+  },
+  "topBotIPs": [
+    {
+      "ip": "66.249.66.1",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "66.249.66.1",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:01 +0800",
+          "method": "GET",
+          "path": "/robots.txt",
+          "protocol": "HTTP/1.1",
+          "status": 200,
+          "size": 25,
+          "referer": "-",
+          "userAgent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+          "sourceFile": "test-access.log",
+          "lineNumber": 1,
+          "rawLine": "66.249.66.1 - - [15/May/2024:10:00:01 +0800] \"GET /robots.txt HTTP/1.1\" 200 25 \"-\" \"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)\"",
+          "analysis": {
+            "score": 100,
+            "classification": "bot",
+            "matchedRules": [
+              "known_bot_ua"
+            ],
+            "details": {
+              "knownBot": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "157.55.39.1",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "157.55.39.1",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:02 +0800",
+          "method": "GET",
+          "path": "/sitemap.xml",
+          "protocol": "HTTP/1.1",
+          "status": 200,
+          "size": 1234,
+          "referer": "-",
+          "userAgent": "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)",
+          "sourceFile": "test-access.log",
+          "lineNumber": 2,
+          "rawLine": "157.55.39.1 - - [15/May/2024:10:00:02 +0800] \"GET /sitemap.xml HTTP/1.1\" 200 1234 \"-\" \"Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)\"",
+          "analysis": {
+            "score": 100,
+            "classification": "bot",
+            "matchedRules": [
+              "known_bot_ua"
+            ],
+            "details": {
+              "knownBot": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "192.168.1.100",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "192.168.1.100",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:03 +0800",
+          "method": "GET",
+          "path": "/admin",
+          "protocol": "HTTP/1.1",
+          "status": 403,
+          "size": 123,
+          "referer": "-",
+          "userAgent": "curl/7.68.0",
+          "sourceFile": "test-access.log",
+          "lineNumber": 3,
+          "rawLine": "192.168.1.100 - - [15/May/2024:10:00:03 +0800] \"GET /admin HTTP/1.1\" 403 123 \"-\" \"curl/7.68.0\"",
+          "analysis": {
+            "score": 130,
+            "classification": "bot",
+            "matchedRules": [
+              "known_bot_ua",
+              "private_ip_range",
+              "suspicious_path"
+            ],
+            "details": {
+              "knownBot": true,
+              "privateIP": true,
+              "suspiciousPath": true,
+              "errorStatusCode": 403
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "10.0.0.50",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "10.0.0.50",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:04 +0800",
+          "method": "GET",
+          "path": "/wp-login.php",
+          "protocol": "HTTP/1.1",
+          "status": 200,
+          "size": 456,
+          "referer": "-",
+          "userAgent": "python-requests/2.25.1",
+          "sourceFile": "test-access.log",
+          "lineNumber": 4,
+          "rawLine": "10.0.0.50 - - [15/May/2024:10:00:04 +0800] \"GET /wp-login.php HTTP/1.1\" 200 456 \"-\" \"python-requests/2.25.1\"",
+          "analysis": {
+            "score": 130,
+            "classification": "bot",
+            "matchedRules": [
+              "known_bot_ua",
+              "private_ip_range",
+              "suspicious_path"
+            ],
+            "details": {
+              "knownBot": true,
+              "privateIP": true,
+              "suspiciousPath": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "1.2.3.4",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "1.2.3.4",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:07 +0800",
+          "method": "GET",
+          "path": "/phpMyAdmin/scripts/setup.php",
+          "protocol": "HTTP/1.1",
+          "status": 404,
+          "size": 123,
+          "referer": "-",
+          "userAgent": "Mozilla/5.0 zgrab/0.x",
+          "sourceFile": "test-access.log",
+          "lineNumber": 7,
+          "rawLine": "1.2.3.4 - - [15/May/2024:10:00:07 +0800] \"GET /phpMyAdmin/scripts/setup.php HTTP/1.1\" 404 123 \"-\" \"Mozilla/5.0 zgrab/0.x\"",
+          "analysis": {
+            "score": 20,
+            "classification": "suspicious",
+            "matchedRules": [
+              "suspicious_path"
+            ],
+            "details": {
+              "suspiciousPath": true,
+              "errorStatusCode": 404
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "5.6.7.8",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "5.6.7.8",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:08 +0800",
+          "method": "GET",
+          "path": "/.env",
+          "protocol": "HTTP/1.1",
+          "status": 404,
+          "size": 123,
+          "referer": "-",
+          "userAgent": "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)",
+          "sourceFile": "test-access.log",
+          "lineNumber": 8,
+          "rawLine": "5.6.7.8 - - [15/May/2024:10:00:08 +0800] \"GET /.env HTTP/1.1\" 404 123 \"-\" \"Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)\"",
+          "analysis": {
+            "score": 20,
+            "classification": "suspicious",
+            "matchedRules": [
+              "suspicious_path"
+            ],
+            "details": {
+              "suspiciousPath": true,
+              "errorStatusCode": 404
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "21.22.23.24",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "21.22.23.24",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:12 +0800",
+          "method": "GET",
+          "path": "/backup.sql",
+          "protocol": "HTTP/1.1",
+          "status": 404,
+          "size": 123,
+          "referer": "-",
+          "userAgent": "masscan/1.0",
+          "sourceFile": "test-access.log",
+          "lineNumber": 12,
+          "rawLine": "21.22.23.24 - - [15/May/2024:10:00:12 +0800] \"GET /backup.sql HTTP/1.1\" 404 123 \"-\" \"masscan/1.0\"",
+          "analysis": {
+            "score": 50,
+            "classification": "bot",
+            "matchedRules": [
+              "suspicious_ua_pattern",
+              "suspicious_path"
+            ],
+            "details": {
+              "suspiciousUA": true,
+              "suspiciousPath": true,
+              "errorStatusCode": 404
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "29.30.31.32",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "29.30.31.32",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:14 +0800",
+          "method": "GET",
+          "path": "/owa/auth/logon.aspx",
+          "protocol": "HTTP/1.1",
+          "status": 404,
+          "size": 123,
+          "referer": "-",
+          "userAgent": "-",
+          "sourceFile": "test-access.log",
+          "lineNumber": 14,
+          "rawLine": "29.30.31.32 - - [15/May/2024:10:00:14 +0800] \"GET /owa/auth/logon.aspx HTTP/1.1\" 404 123 \"-\" \"-\"",
+          "analysis": {
+            "score": 90,
+            "classification": "bot",
+            "matchedRules": [
+              "empty_ua",
+              "scanner_path_pattern"
+            ],
+            "details": {
+              "emptyUA": true,
+              "scannerPath": true,
+              "errorStatusCode": 404
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "37.38.39.40",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "37.38.39.40",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:16 +0800",
+          "method": "GET",
+          "path": "/blog/post-1",
+          "protocol": "HTTP/1.1",
+          "status": 200,
+          "size": 2500,
+          "referer": "https://google.com/search?q=test",
+          "userAgent": "Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)",
+          "sourceFile": "test-access.log",
+          "lineNumber": 17,
+          "rawLine": "37.38.39.40 - - [15/May/2024:10:00:16 +0800] \"GET /blog/post-1 HTTP/1.1\" 200 2500 \"https://google.com/search?q=test\" \"Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)\"",
+          "analysis": {
+            "score": 100,
+            "classification": "bot",
+            "matchedRules": [
+              "known_bot_ua"
+            ],
+            "details": {
+              "knownBot": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "45.46.47.48",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "45.46.47.48",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:18 +0800",
+          "method": "GET",
+          "path": "/.git/config",
+          "protocol": "HTTP/1.1",
+          "status": 404,
+          "size": 123,
+          "referer": "-",
+          "userAgent": "Mozilla/5.0 (compatible; DotBot/1.1; http://www.opensiteexplorer.org/dotbot)",
+          "sourceFile": "test-access.log",
+          "lineNumber": 20,
+          "rawLine": "45.46.47.48 - - [15/May/2024:10:00:18 +0800] \"GET /.git/config HTTP/1.1\" 404 123 \"-\" \"Mozilla/5.0 (compatible; DotBot/1.1; http://www.opensiteexplorer.org/dotbot)\"",
+          "analysis": {
+            "score": 120,
+            "classification": "bot",
+            "matchedRules": [
+              "known_bot_ua",
+              "suspicious_path"
+            ],
+            "details": {
+              "knownBot": true,
+              "suspiciousPath": true,
+              "errorStatusCode": 404
+            }
+          }
+        }
+      ]
+    },
+    {
+      "ip": "49.50.51.52",
+      "count": 1,
+      "botCount": 1,
+      "records": [
+        {
+          "ip": "49.50.51.52",
+          "remoteUser": "-",
+          "timestamp": "15/May/2024:10:00:19 +0800",
+          "method": "GET",
+          "path": "/search?q=product",
+          "protocol": "HTTP/1.1",
+          "status": 200,
+          "size": 1800,
+          "referer": "https://example.com",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0",
+          "sourceFile": "test-access.log",
+          "lineNumber": 21,
+          "rawLine": "49.50.51.52 - - [15/May/2024:10:00:19 +0800] \"GET /search?q=product HTTP/1.1\" 200 1800 \"https://example.com\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0\"",
+          "analysis": {
+            "score": 30,
+            "classification": "suspicious",
+            "matchedRules": [
+              "suspicious_ua_pattern"
+            ],
+            "details": {
+              "suspiciousUA": true
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "topBotUAs": [
+    {
+      "userAgent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "curl/7.68.0",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "python-requests/2.25.1",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "Mozilla/5.0 zgrab/0.x",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "masscan/1.0",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "-",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "Mozilla/5.0 (compatible; DotBot/1.1; http://www.opensiteexplorer.org/dotbot)",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0",
+      "count": 1,
+      "botCount": 1
+    }
+  ],
+  "topSuspiciousPaths": [
+    {
+      "path": "/robots.txt",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/sitemap.xml",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/admin",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/wp-login.php",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/phpMyAdmin/scripts/setup.php",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/.env",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/backup.sql",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/owa/auth/logon.aspx",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/blog/post-1",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/.git/config",
+      "count": 1,
+      "botCount": 1
+    },
+    {
+      "path": "/search?q=product",
+      "count": 1,
+      "botCount": 1
+    }
+  ],
+  "matchedRules": {
+    "known_bot_ua": 6,
+    "private_ip_range": 2,
+    "suspicious_path": 6,
+    "suspicious_ua_pattern": 2,
+    "empty_ua": 1,
+    "scanner_path_pattern": 1
+  },
+  "scoring": {
+    "0-19": 7,
+    "20-39": 3,
+    "40-59": 1,
+    "60-79": 0,
+    "80-100": 4,
+    "100+": 3
+  }
+}

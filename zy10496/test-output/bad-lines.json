@@ -1,0 +1,20 @@
+[
+  {
+    "file": "/Users/lzy/pro/solo/workspaces/zy10496/test-access.log",
+    "lineNumber": 10,
+    "content": "13.14.15.16 - - [15/May/2024:10:00:10 +0800] \"GET /cgi-bin/php-cgi?<?php phpinfo()?> HTTP/1.1\" 404 123 \"-\" \"WebCrawler/3.0\"",
+    "reason": "格式不匹配"
+  },
+  {
+    "file": "/Users/lzy/pro/solo/workspaces/zy10496/test-access.log",
+    "lineNumber": 16,
+    "content": "this is a bad line that cannot be parsed",
+    "reason": "格式不匹配"
+  },
+  {
+    "file": "/Users/lzy/pro/solo/workspaces/zy10496/test-access.log",
+    "lineNumber": 18,
+    "content": "another invalid line here",
+    "reason": "格式不匹配"
+  }
+]
