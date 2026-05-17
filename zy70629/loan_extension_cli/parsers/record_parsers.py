@@ -22,7 +22,8 @@ class LoanParser(BaseParser[LoanRecord]):
 
     def _build_record(self, row: dict[str, Any], source: SourceLocation) -> LoanRecord:
         loan_no = self._get_value(row, "loan_no")
-        record_id = hashlib.md5(f"{loan_no}:{source.file_path}:{source.row_number}".encode()).hexdigest()[:12]
+        employee_id = self._get_value(row, "employee_id")
+        record_id = hashlib.md5(f"loan:{loan_no}:{employee_id}".encode()).hexdigest()[:12]
 
         record = LoanRecord(
             source=source,
@@ -56,7 +57,8 @@ class RepaymentPlanParser(BaseParser[RepaymentPlanRecord]):
     def _build_record(self, row: dict[str, Any], source: SourceLocation) -> RepaymentPlanRecord:
         plan_id = self._get_value(row, "plan_id")
         loan_no = self._get_value(row, "loan_no")
-        record_id = hashlib.md5(f"{plan_id}:{loan_no}:{source.file_path}:{source.row_number}".encode()).hexdigest()[:12]
+        period_no = self._get_value(row, "period_no")
+        record_id = hashlib.md5(f"plan:{loan_no}:{plan_id}:{period_no}".encode()).hexdigest()[:12]
 
         record = RepaymentPlanRecord(
             source=source,
@@ -91,7 +93,7 @@ class ExtensionApplicationParser(BaseParser[ExtensionApplicationRecord]):
     def _build_record(self, row: dict[str, Any], source: SourceLocation) -> ExtensionApplicationRecord:
         application_id = self._get_value(row, "application_id")
         loan_no = self._get_value(row, "loan_no")
-        record_id = hashlib.md5(f"{application_id}:{loan_no}:{source.file_path}:{source.row_number}".encode()).hexdigest()[:12]
+        record_id = hashlib.md5(f"ext:{loan_no}:{application_id}".encode()).hexdigest()[:12]
 
         record = ExtensionApplicationRecord(
             source=source,
@@ -128,7 +130,7 @@ class ApprovalParser(BaseParser[ApprovalRecord]):
         approval_id = self._get_value(row, "approval_id")
         application_id = self._get_value(row, "application_id")
         loan_no = self._get_value(row, "loan_no")
-        record_id = hashlib.md5(f"{approval_id}:{application_id}:{source.file_path}:{source.row_number}".encode()).hexdigest()[:12]
+        record_id = hashlib.md5(f"appr:{loan_no}:{application_id}:{approval_id}".encode()).hexdigest()[:12]
 
         record = ApprovalRecord(
             source=source,
@@ -162,7 +164,8 @@ class DeductionParser(BaseParser[DeductionRecord]):
     def _build_record(self, row: dict[str, Any], source: SourceLocation) -> DeductionRecord:
         deduction_id = self._get_value(row, "deduction_id")
         loan_no = self._get_value(row, "loan_no")
-        record_id = hashlib.md5(f"{deduction_id}:{loan_no}:{source.file_path}:{source.row_number}".encode()).hexdigest()[:12]
+        transaction_no = self._get_value(row, "transaction_no")
+        record_id = hashlib.md5(f"ded:{loan_no}:{deduction_id}:{transaction_no}".encode()).hexdigest()[:12]
 
         record = DeductionRecord(
             source=source,
@@ -204,7 +207,7 @@ class RepaymentReportParser(BaseParser[RepaymentReportRecord]):
     def _build_record(self, row: dict[str, Any], source: SourceLocation) -> RepaymentReportRecord:
         report_id = self._get_value(row, "report_id")
         loan_no = self._get_value(row, "loan_no")
-        record_id = hashlib.md5(f"{report_id}:{loan_no}:{source.file_path}:{source.row_number}".encode()).hexdigest()[:12]
+        record_id = hashlib.md5(f"rpt:{loan_no}:{report_id}".encode()).hexdigest()[:12]
 
         record = RepaymentReportRecord(
             source=source,

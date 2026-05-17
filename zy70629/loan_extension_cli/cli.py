@@ -200,12 +200,12 @@ def generate_sample(output_dir: str):
         writer = csv.writer(f)
         writer.writerow(["plan_id", "loan_no", "period_no", "due_date", "principal_amount", "interest_amount", "total_amount", "status", "is_extended"])
         for i in range(1, 13):
-            month = str(1 + i).zfill(2)
+            month = str(i).zfill(2)
             principal = 4166.67 if i < 12 else 4166.63
             total = principal + 250
             writer.writerow([f"PLAN001_{str(i).zfill(2)}", "LOAN001", i, f"2024-{month}-15", principal, 250, total, "paid" if i <= 2 else "pending", "false"])
         for i in range(1, 7):
-            month = str(2 + i).zfill(2)
+            month = str(i).zfill(2)
             writer.writerow([f"PLAN002_{str(i).zfill(2)}", "LOAN002", i, f"2024-{month}-20", 5000.00, 150, 5150.00, "paid" if i <= 1 else "pending", "false"])
 
     with open(path / "extension_sample.csv", "w", encoding="utf-8-sig", newline="") as f:
@@ -222,12 +222,15 @@ def generate_sample(output_dir: str):
     with open(path / "deduction_sample.csv", "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["deduction_id", "loan_no", "deduction_date", "deduction_amount", "deduction_type", "related_plan_id", "transaction_no"])
-        writer.writerow(["DED001", "LOAN001", "2024-02-15", 4416.67, "正常扣款", "PLAN001_01", "TXN20240215001"])
+        writer.writerow(["DED001", "LOAN001", "2024-01-15", 4416.67, "正常扣款", "PLAN001_01", "TXN20240115001"])
+        writer.writerow(["DED002", "LOAN001", "2024-02-15", 4416.67, "正常扣款", "PLAN001_02", "TXN20240215001"])
+        writer.writerow(["DED003", "LOAN002", "2024-01-20", 5150.00, "正常扣款", "PLAN002_01", "TXN20240120001"])
 
     with open(path / "report_sample.csv", "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["report_id", "loan_no", "report_date", "total_principal_due", "total_interest_due", "total_paid", "remaining_principal", "remaining_interest", "is_overdue"])
-        writer.writerow(["REP001", "LOAN001", "2024-03-01", 50000, 3000, 4416.67, 45833.33, 2750, "false"])
+        writer.writerow(["REP001", "LOAN001", "2024-02-20", 50000, 3000, 8833.34, 41666.66, 2500, "false"])
+        writer.writerow(["REP002", "LOAN002", "2024-02-20", 30000, 900, 5150.00, 25000, 750, "false"])
 
     click.echo(f"\n示例文件已生成到: {path.absolute()}")
     click.echo("\n文件列表:")

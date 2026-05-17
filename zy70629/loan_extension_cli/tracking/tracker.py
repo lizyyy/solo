@@ -43,9 +43,9 @@ class TrackingResult:
                 "records": [
                     {
                         "record_id": r.record_id,
-                        "source_file": r.source_file,
-                        "source_location": r.source_location,
-                        "raw_content": r.raw_content,
+                        "parsed_data": r.parsed_data,
+                        "is_valid": r.is_valid,
+                        "validation_errors": r.validation_errors,
                     }
                     for r in sorted(self.tracked_records, key=lambda x: x.record_id)
                 ],
