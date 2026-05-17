@@ -375,7 +375,7 @@ def test_24_invalid_status_transition(client):
     print(f"✓ 无效状态转换拦截成功: {error_data['error_code']}")
 
 
-def test_25_manual_review_trigger(client):
+def test_25_rework_success_approval_with_max_reworks(client):
     scheduled_date = (datetime.utcnow() + timedelta(days=2)).isoformat()
     
     task_response = client.post("/tasks/", json={
@@ -383,7 +383,93 @@ def test_25_manual_review_trigger(client):
         "cleaner_id": 2001,
         "inspector_id": 3001,
         "scheduled_date": scheduled_date,
-        "max_reworks": 0
+        "max_reworks": 1
+    })
+    task_id = task_response.json()["id"]
+    assert task_response.json()["rework_count"] == 0
+    
+    client.post("/tasks/update-status", json={
+        "task_id": task_id,
+        "new_status": "in_progress",
+        "updated_by": 2001,
+        "notes": "保洁员开始工作"
+    })
+    
+    all_results = []
+    for item_id in test_data["checklist_item_ids"]:
+        all_results.append({
+            "checklist_item_id": item_id,
+            "checked": True,
+            "passed": True
+        })
+    
+    client.post("/tasks/submit-cleaning", json={
+        "task_id": task_id,
+        "submitted_by": 2001,
+        "check_results": all_results
+    })
+    
+    fail_results = []
+    for idx, item_id in enumerate(test_data["checklist_item_ids"]):
+        fail_results.append({
+            "checklist_item_id": item_id,
+            "checked": True,
+            "passed": idx < 5
+        })
+    
+    response = client.post("/tasks/inspect", json={
+        "task_id": task_id,
+        "inspector_id": 3001,
+        "check_results": fail_results
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert data["new_status"] == "needs_rework"
+    assert data["rework_count"] == 1
+    print(f"✓ 第一次验收不通过，进入返工，返工次数: {data['rework_count']}")
+    
+    client.post("/tasks/start-rework", json={
+        "task_id": task_id,
+        "assigned_to": 2001,
+        "reason": "有项目不合格",
+        "checklist_item_ids": test_data["checklist_item_ids"]
+    })
+    
+    client.post("/tasks/update-status", json={
+        "task_id": task_id,
+        "new_status": "rework_submitted",
+        "updated_by": 2001,
+        "notes": "返工完成提交"
+    })
+    
+    pass_all_results = []
+    for item_id in test_data["checklist_item_ids"]:
+        pass_all_results.append({
+            "checklist_item_id": item_id,
+            "checked": True,
+            "passed": True
+        })
+    
+    response = client.post("/tasks/inspect", json={
+        "task_id": task_id,
+        "inspector_id": 3001,
+        "check_results": pass_all_results
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert data["new_status"] == "approved"
+    print(f"✓ max_reworks=1 时返工后全部通过，成功验收: {data['new_status']}")
+
+
+def test_26_manual_review_trigger_after_max_reworks(client):
+    scheduled_date = (datetime.utcnow() + timedelta(days=2)).isoformat()
+    
+    task_response = client.post("/tasks/", json={
+        "property_id": test_data["property_id"],
+        "cleaner_id": 2001,
+        "inspector_id": 3001,
+        "scheduled_date": scheduled_date,
+        "max_reworks": 1
     })
     task_id = task_response.json()["id"]
     
@@ -409,11 +495,11 @@ def test_25_manual_review_trigger(client):
     })
     
     fail_results = []
-    for item_id in test_data["checklist_item_ids"]:
+    for idx, item_id in enumerate(test_data["checklist_item_ids"]):
         fail_results.append({
             "checklist_item_id": item_id,
             "checked": True,
-            "passed": False
+            "passed": idx < 5
         })
     
     response = client.post("/tasks/inspect", json={
@@ -421,11 +507,40 @@ def test_25_manual_review_trigger(client):
         "inspector_id": 3001,
         "check_results": fail_results
     })
+    assert response.status_code == 200
+    
+    client.post("/tasks/start-rework", json={
+        "task_id": task_id,
+        "assigned_to": 2001,
+        "reason": "有项目不合格",
+        "checklist_item_ids": test_data["checklist_item_ids"]
+    })
+    
+    client.post("/tasks/update-status", json={
+        "task_id": task_id,
+        "new_status": "rework_submitted",
+        "updated_by": 2001,
+        "notes": "返工完成提交"
+    })
+    
+    still_fail_results = []
+    for idx, item_id in enumerate(test_data["checklist_item_ids"]):
+        still_fail_results.append({
+            "checklist_item_id": item_id,
+            "checked": True,
+            "passed": idx < 3
+        })
+    
+    response = client.post("/tasks/inspect", json={
+        "task_id": task_id,
+        "inspector_id": 3001,
+        "check_results": still_fail_results
+    })
     
     assert response.status_code == 400
     error_data = response.json()["detail"]
     assert error_data["error_code"] == "needs_manual_review"
-    print(f"✓ 人工复核触发成功: {error_data['error_code']}")
+    print(f"✓ 返工后仍不通过，达到max_reworks，触发人工复核: {error_data['error_code']}")
 
 
 def test_99_summary():

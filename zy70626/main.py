@@ -511,13 +511,6 @@ def inspect_task(request: InspectionRequest, db: Session = Depends(get_db)):
             {"current_status": task.status, "allowed_statuses": ["submitted", "rework_submitted"]}
         )
     
-    if task.rework_count >= task.max_reworks:
-        raise create_http_exception(
-            ErrorCode.NEEDS_MANUAL_REVIEW,
-            "已达到最大返工次数，需要人工复核",
-            {"rework_count": task.rework_count, "max_reworks": task.max_reworks}
-        )
-    
     all_passed = all(result.passed for result in request.check_results if result.checked)
     
     for result in request.check_results:
@@ -561,6 +554,12 @@ def inspect_task(request: InspectionRequest, db: Session = Depends(get_db)):
         task.status = TaskStatus.APPROVED
         task.completed_at = datetime.utcnow()
     else:
+        if task.rework_count >= task.max_reworks:
+            raise create_http_exception(
+                ErrorCode.NEEDS_MANUAL_REVIEW,
+                "已达到最大返工次数，需要人工复核",
+                {"rework_count": task.rework_count, "max_reworks": task.max_reworks}
+            )
         task.status = TaskStatus.NEEDS_REWORK
         task.rework_count += 1
     
