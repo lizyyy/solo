@@ -1,0 +1,42 @@
+PROJECT_NAME = makefile-indexer
+VERSION = 1.0.0
+
+.PHONY: all help clean test build install
+
+# 显示帮助信息
+help:
+	@echo "可用目标:"
+	@echo "  help    - 显示此帮助"
+	@echo "  test    - 运行测试"
+	@echo "  build   - 构建项目"
+	@echo "  clean   - 清理构建文件"
+	@echo "  install - 安装到系统"
+
+# 默认目标
+all: help
+
+# 运行单元测试
+test:
+	python -m pytest tests/ -v
+
+# 构建项目
+build: test
+	python -m build
+
+# 清理临时文件
+clean:
+	rm -rf build/ dist/ *.egg-info
+	find . -name "*.pyc" -delete
+	find . -name "__pycache__" -type d -delete
+
+# 安装包
+install: build
+	pip install dist/*.whl
+
+# 检查代码风格
+lint:
+	flake8 makefile_indexer/
+
+# 类型检查
+type-check:
+	mypy makefile_indexer/

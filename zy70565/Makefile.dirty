@@ -1,0 +1,36 @@
+PROJECT_NAME = makefile-indexer
+
+.PHONY: all help
+
+# 显示帮助
+help:
+	@echo "帮助信息"
+
+这是一行脏数据，没有缩进也不是目标
+
+all: help
+
+# 清理文件
+clean:
+	rm -rf build/
+
+another-dirty-line-here
+
+# 安装依赖
+deps:
+	pip install -r requirements.txt
+
+  这行开头有空格但不是配方
+
+# 构建项目
+build: test
+	python -m build
+
+invalid-line-without-colon
+
+# 运行测试
+test:
+	pytest -v
+
+行续接的例子 \
+	继续下一行
