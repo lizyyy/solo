@@ -24,11 +24,18 @@ class ProxyJumpResolver {
 
     const proxyJump = resolved.resolvedOptions.proxyjump;
     if (proxyJump && proxyJump !== 'none') {
-      let nextHost = proxyJump;
-      if (nextHost.includes('@')) {
-        nextHost = nextHost.split('@')[1];
+      const jumpHosts = proxyJump.split(',').map(j => j.trim()).filter(j => j.length > 0);
+      
+      for (let i = 0; i < jumpHosts.length; i++) {
+        let jumpHost = jumpHosts[i];
+        if (jumpHost.includes('@')) {
+          jumpHost = jumpHost.split('@')[1];
+        }
+        const result = this.resolveProxyChain(jumpHost, visited, chain);
+        if (result.error) {
+          return result;
+        }
       }
-      return this.resolveProxyChain(nextHost, visited, chain);
     }
 
     return { chain, finalTarget: resolved.effectiveHostname };

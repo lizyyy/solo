@@ -41,6 +41,20 @@ Host loop-host-a
 Host loop-host-b
   ProxyJump loop-host-a
 
+# === 逗号分隔的多跳板测试 ===
+Host jumpA
+  HostName 10.0.0.1
+  User jumperA
+
+Host jumpB
+  HostName 10.0.0.2
+  User jumperB
+
+Host multi-hop-target
+  HostName 192.168.100.100
+  User target-user
+  ProxyJump jumpA,jumpB
+
 # === 无效行测试 ===
 This is an invalid SSH config line
 Another bad line
