@@ -176,7 +176,12 @@ class ReplayExecutor {
             if (this.engine) {
                 try {
                     if (!this.options.preserveFailedState) {
-                        await this.engine.rollbackTransaction();
+                        console.log("Cleaning up shadow data...");
+                        await this.cleanupShadowData();
+                        console.log("  ✓ Shadow data cleaned");
+                    }
+                    else {
+                        console.log("Preserving database state for inspection...");
                     }
                     await this.engine.disconnect();
                 }
@@ -270,11 +275,12 @@ class ReplayExecutor {
             let rollbackResult = undefined;
             let rollbackVerified = false;
             const verificationErrors = [];
+            let scriptSuccess = true;
+            let scriptError = undefined;
             if (this.options.verifyRollback && script.rollbackSql) {
                 const rbStart = Date.now();
                 try {
                     const rbResult = await this.engine.executeQuery(script.rollbackSql);
-                    const rbDuration = Date.now() - rbStart;
                     rollbackResult = {
                         success: true,
                         verified: false,
@@ -284,6 +290,10 @@ class ReplayExecutor {
                     rollbackVerified = await this.verifyRollback(script, verificationErrors);
                     rollbackResult.verified = rollbackVerified;
                     rollbackResult.verificationErrors = verificationErrors;
+                    if (!rollbackVerified) {
+                        scriptSuccess = false;
+                        scriptError = { message: `Rollback verification failed: ${verificationErrors.join(', ')}` };
+                    }
                 }
                 catch (rollbackError) {
                     rollbackResult = {
@@ -292,6 +302,8 @@ class ReplayExecutor {
                         affectedRows: 0,
                         error: { message: rollbackError.message }
                     };
+                    scriptSuccess = false;
+                    scriptError = { message: `Rollback execution failed: ${rollbackError.message}` };
                 }
             }
             await this.engine.commitTransaction();
@@ -299,11 +311,12 @@ class ReplayExecutor {
             return {
                 scriptId: script.id,
                 scriptName: script.name,
-                success: true,
+                success: scriptSuccess,
                 startTime,
                 endTime,
                 durationMs: endTime.getTime() - startTime.getTime(),
                 affectedRows,
+                error: scriptError,
                 rollbackResult
             };
         }

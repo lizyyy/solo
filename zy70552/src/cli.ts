@@ -21,6 +21,10 @@ program
   .requiredOption("-s, --schemas <path>", "表结构JSON路径")
   .requiredOption("-c, --db-config <path>", "数据库配置JSON路径")
   .requiredOption("-o, --output <dir>", "输出目录")
+  .option("--no-verify-rollback", "跳过回滚校验")
+  .option("--preserve-failed-state", "失败时保留数据库现场，不清理")
+  .option("--run-id <string>", "指定运行ID，用于覆盖旧结果")
+  .option("--fail-fast", "遇到第一个失败时立即停止")
   .action(async (options) => {
     try {
       const configPath = path.resolve(options.dbConfig);
@@ -35,7 +39,11 @@ program
         shadowDataPath: options.shadowData, 
         tableSchemasPath: options.schemas, 
         outputDir: options.output, 
-        databaseConfig: dbConfig 
+        databaseConfig: dbConfig,
+        verifyRollback: options.verifyRollback,
+        preserveFailedState: options.preserveFailedState,
+        failFast: options.failFast,
+        runId: options.runId
       });
       
       const report = await executor.execute();

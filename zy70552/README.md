@@ -178,3 +178,13 @@ node test-config.js
 - ✅ 运行前自动清理旧表，确保可反复执行
 - ✅ 完整示例数据：5个用户 + 3个订单
 - ✅ README命令可直接体验
+
+### 第三轮 ✓
+- ✅ 修复回滚校验逻辑：回滚失败 → 标记脚本失败
+- ✅ 修复退出码：回滚失败 → exit code 1
+- ✅ 新增CLI参数：--preserve-failed-state 保留现场
+- ✅ 新增CLI参数：--no-verify-rollback 跳过校验
+- ✅ 新增CLI参数：--fail-fast 快速失败
+- ✅ 新增CLI参数：--run-id 指定运行ID
+- ✅ 修复FATAL ERROR清理逻辑：根据配置决定是否清理
+- ✅ 报告可信：rollbackSuccess:false = success:false = 失败退出码
