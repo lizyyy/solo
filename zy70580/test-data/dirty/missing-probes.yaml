@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-probe-app
+  namespace: staging
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: no-probe
+  template:
+    metadata:
+      labels:
+        app: no-probe
+    spec:
+      containers:
+      - name: app-without-probes
+        image: busybox
+        command: ['sleep', '3600']
+      - name: sidecar
+        image: nginx
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nightly-job
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: job-container
+            image: busybox
+            command: ['echo', 'hello']
+            livenessProbe:
+              exec:
+                command: ['echo', 'ok']
+              initialDelaySeconds: 10
+              periodSeconds: 30

@@ -1,0 +1,323 @@
+{
+  "generatedAt": "2026-05-17T03:42:38.749Z",
+  "summary": {
+    "totalFiles": 2,
+    "successfulFiles": 2,
+    "totalDocuments": 4,
+    "totalContainers": 3,
+    "containersWithLiveness": 3,
+    "containersWithReadiness": 3,
+    "containersWithStartup": 1,
+    "issuesCount": 1,
+    "warningsCount": 0
+  },
+  "containers": [
+    {
+      "name": "web-service",
+      "namespace": "development",
+      "workloadName": "web-service-dev",
+      "workloadKind": "Deployment",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/normal/deployment-dev.yaml",
+      "probes": {
+        "liveness": {
+          "initialDelaySeconds": 5,
+          "periodSeconds": 5,
+          "timeoutSeconds": 1,
+          "successThreshold": 1,
+          "failureThreshold": 3,
+          "type": "HTTP",
+          "raw": {
+            "httpGet": {
+              "path": "/health",
+              "port": 80
+            },
+            "initialDelaySeconds": 5,
+            "periodSeconds": 5,
+            "timeoutSeconds": 1,
+            "failureThreshold": 3
+          }
+        },
+        "readiness": {
+          "initialDelaySeconds": 2,
+          "periodSeconds": 3,
+          "timeoutSeconds": 1,
+          "successThreshold": 1,
+          "failureThreshold": 1,
+          "type": "HTTP",
+          "raw": {
+            "httpGet": {
+              "path": "/ready",
+              "port": 80
+            },
+            "initialDelaySeconds": 2,
+            "periodSeconds": 3,
+            "timeoutSeconds": 1,
+            "failureThreshold": 1
+          }
+        },
+        "startup": null
+      },
+      "probeIssues": []
+    },
+    {
+      "name": "api-gateway",
+      "namespace": "development",
+      "workloadName": "api-gateway-dev",
+      "workloadKind": "Deployment",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/normal/deployment-dev.yaml",
+      "probes": {
+        "liveness": {
+          "initialDelaySeconds": 10,
+          "periodSeconds": 5,
+          "timeoutSeconds": 1,
+          "successThreshold": 1,
+          "failureThreshold": 3,
+          "type": "EXEC",
+          "raw": {
+            "exec": {
+              "command": [
+                "cat",
+                "/tmp/healthy"
+              ]
+            },
+            "initialDelaySeconds": 10,
+            "periodSeconds": 5
+          }
+        },
+        "readiness": {
+          "initialDelaySeconds": 5,
+          "periodSeconds": 5,
+          "timeoutSeconds": 1,
+          "successThreshold": 1,
+          "failureThreshold": 3,
+          "type": "TCP",
+          "raw": {
+            "tcpSocket": {
+              "port": 8080
+            },
+            "initialDelaySeconds": 5,
+            "periodSeconds": 5
+          }
+        },
+        "startup": null
+      },
+      "probeIssues": []
+    },
+    {
+      "name": "web-service",
+      "namespace": "production",
+      "workloadName": "web-service-prod",
+      "workloadKind": "Deployment",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/normal/deployment-prod.yaml",
+      "probes": {
+        "liveness": {
+          "initialDelaySeconds": 30,
+          "periodSeconds": 10,
+          "timeoutSeconds": 5,
+          "successThreshold": 1,
+          "failureThreshold": 3,
+          "type": "HTTP",
+          "raw": {
+            "httpGet": {
+              "path": "/health",
+              "port": 80
+            },
+            "initialDelaySeconds": 30,
+            "periodSeconds": 10,
+            "timeoutSeconds": 5,
+            "failureThreshold": 3
+          }
+        },
+        "readiness": {
+          "initialDelaySeconds": 10,
+          "periodSeconds": 5,
+          "timeoutSeconds": 3,
+          "successThreshold": 1,
+          "failureThreshold": 2,
+          "type": "HTTP",
+          "raw": {
+            "httpGet": {
+              "path": "/ready",
+              "port": 80
+            },
+            "initialDelaySeconds": 10,
+            "periodSeconds": 5,
+            "timeoutSeconds": 3,
+            "failureThreshold": 2
+          }
+        },
+        "startup": {
+          "initialDelaySeconds": 60,
+          "periodSeconds": 10,
+          "timeoutSeconds": 1,
+          "successThreshold": 1,
+          "failureThreshold": 30,
+          "type": "HTTP",
+          "raw": {
+            "httpGet": {
+              "path": "/health",
+              "port": 80
+            },
+            "initialDelaySeconds": 60,
+            "periodSeconds": 10,
+            "failureThreshold": 30
+          }
+        }
+      },
+      "probeIssues": [
+        {
+          "severity": "error",
+          "type": "THRESHOLD_VIOLATION",
+          "message": "startupProbe 的 failureThreshold (30s) 超过建议最大值 20s",
+          "container": "web-service",
+          "probeType": "startup",
+          "field": "failureThreshold",
+          "value": 30,
+          "threshold": 20,
+          "thresholdType": "max",
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/normal/deployment-prod.yaml",
+          "workloadName": "web-service-prod",
+          "workloadKind": "Deployment"
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "severity": "error",
+      "type": "THRESHOLD_VIOLATION",
+      "message": "startupProbe 的 failureThreshold (30s) 超过建议最大值 20s",
+      "container": "web-service",
+      "probeType": "startup",
+      "field": "failureThreshold",
+      "value": 30,
+      "threshold": 20,
+      "thresholdType": "max",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/normal/deployment-prod.yaml",
+      "workloadName": "web-service-prod",
+      "workloadKind": "Deployment"
+    }
+  ],
+  "comparisons": [
+    {
+      "type": "ENV_DIFFERENCE",
+      "severity": "error",
+      "probeType": "liveness",
+      "field": "initialDelaySeconds",
+      "maxDiff": 22.5,
+      "maxDiffPercent": 75,
+      "envValues": {
+        "开发环境": {
+          "avg": 7.5,
+          "min": 5,
+          "max": 10,
+          "count": 2
+        },
+        "生产环境": {
+          "avg": 30,
+          "min": 30,
+          "max": 30,
+          "count": 1
+        }
+      },
+      "message": "livenessProbe 的 initialDelaySeconds 在各环境间差异显著 (75%)"
+    },
+    {
+      "type": "ENV_DIFFERENCE",
+      "severity": "warning",
+      "probeType": "liveness",
+      "field": "periodSeconds",
+      "maxDiff": 5,
+      "maxDiffPercent": 50,
+      "envValues": {
+        "开发环境": {
+          "avg": 5,
+          "min": 5,
+          "max": 5,
+          "count": 2
+        },
+        "生产环境": {
+          "avg": 10,
+          "min": 10,
+          "max": 10,
+          "count": 1
+        }
+      },
+      "message": "livenessProbe 的 periodSeconds 在各环境间差异显著 (50%)"
+    },
+    {
+      "type": "ENV_DIFFERENCE",
+      "severity": "error",
+      "probeType": "liveness",
+      "field": "timeoutSeconds",
+      "maxDiff": 4,
+      "maxDiffPercent": 80,
+      "envValues": {
+        "开发环境": {
+          "avg": 1,
+          "min": 1,
+          "max": 1,
+          "count": 2
+        },
+        "生产环境": {
+          "avg": 5,
+          "min": 5,
+          "max": 5,
+          "count": 1
+        }
+      },
+      "message": "livenessProbe 的 timeoutSeconds 在各环境间差异显著 (80%)"
+    },
+    {
+      "type": "ENV_DIFFERENCE",
+      "severity": "error",
+      "probeType": "readiness",
+      "field": "initialDelaySeconds",
+      "maxDiff": 6.5,
+      "maxDiffPercent": 65,
+      "envValues": {
+        "开发环境": {
+          "avg": 3.5,
+          "min": 2,
+          "max": 5,
+          "count": 2
+        },
+        "生产环境": {
+          "avg": 10,
+          "min": 10,
+          "max": 10,
+          "count": 1
+        }
+      },
+      "message": "readinessProbe 的 initialDelaySeconds 在各环境间差异显著 (65%)"
+    },
+    {
+      "type": "ENV_DIFFERENCE",
+      "severity": "error",
+      "probeType": "readiness",
+      "field": "timeoutSeconds",
+      "maxDiff": 2,
+      "maxDiffPercent": 67,
+      "envValues": {
+        "开发环境": {
+          "avg": 1,
+          "min": 1,
+          "max": 1,
+          "count": 2
+        },
+        "生产环境": {
+          "avg": 3,
+          "min": 3,
+          "max": 3,
+          "count": 1
+        }
+      },
+      "message": "readinessProbe 的 timeoutSeconds 在各环境间差异显著 (67%)"
+    }
+  ],
+  "environmentGroups": {
+    "开发环境": 2,
+    "生产环境": 1
+  },
+  "parseErrors": []
+}

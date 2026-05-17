@@ -1,0 +1,115 @@
+{
+  "generatedAt": "2026-05-17T03:43:01.885Z",
+  "summary": {
+    "totalFiles": 1,
+    "successfulFiles": 1,
+    "totalDocuments": 2,
+    "totalContainers": 1,
+    "containersWithLiveness": 1,
+    "containersWithReadiness": 1,
+    "containersWithStartup": 1,
+    "issuesCount": 1,
+    "warningsCount": 0
+  },
+  "containers": [
+    {
+      "name": "web-service",
+      "namespace": "production",
+      "workloadName": "web-service-prod",
+      "workloadKind": "Deployment",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/normal/deployment-prod.yaml",
+      "probes": {
+        "liveness": {
+          "initialDelaySeconds": 30,
+          "periodSeconds": 10,
+          "timeoutSeconds": 5,
+          "successThreshold": 1,
+          "failureThreshold": 3,
+          "type": "HTTP",
+          "raw": {
+            "httpGet": {
+              "path": "/health",
+              "port": 80
+            },
+            "initialDelaySeconds": 30,
+            "periodSeconds": 10,
+            "timeoutSeconds": 5,
+            "failureThreshold": 3
+          }
+        },
+        "readiness": {
+          "initialDelaySeconds": 10,
+          "periodSeconds": 5,
+          "timeoutSeconds": 3,
+          "successThreshold": 1,
+          "failureThreshold": 2,
+          "type": "HTTP",
+          "raw": {
+            "httpGet": {
+              "path": "/ready",
+              "port": 80
+            },
+            "initialDelaySeconds": 10,
+            "periodSeconds": 5,
+            "timeoutSeconds": 3,
+            "failureThreshold": 2
+          }
+        },
+        "startup": {
+          "initialDelaySeconds": 60,
+          "periodSeconds": 10,
+          "timeoutSeconds": 1,
+          "successThreshold": 1,
+          "failureThreshold": 30,
+          "type": "HTTP",
+          "raw": {
+            "httpGet": {
+              "path": "/health",
+              "port": 80
+            },
+            "initialDelaySeconds": 60,
+            "periodSeconds": 10,
+            "failureThreshold": 30
+          }
+        }
+      },
+      "probeIssues": [
+        {
+          "severity": "error",
+          "type": "THRESHOLD_VIOLATION",
+          "message": "startupProbe 的 failureThreshold (30s) 超过建议最大值 20s",
+          "container": "web-service",
+          "probeType": "startup",
+          "field": "failureThreshold",
+          "value": 30,
+          "threshold": 20,
+          "thresholdType": "max",
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/normal/deployment-prod.yaml",
+          "workloadName": "web-service-prod",
+          "workloadKind": "Deployment"
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "severity": "error",
+      "type": "THRESHOLD_VIOLATION",
+      "message": "startupProbe 的 failureThreshold (30s) 超过建议最大值 20s",
+      "container": "web-service",
+      "probeType": "startup",
+      "field": "failureThreshold",
+      "value": 30,
+      "threshold": 20,
+      "thresholdType": "max",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/normal/deployment-prod.yaml",
+      "workloadName": "web-service-prod",
+      "workloadKind": "Deployment"
+    }
+  ],
+  "comparisons": [],
+  "environmentGroups": {
+    "生产环境": 1
+  },
+  "parseErrors": []
+}

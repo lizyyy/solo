@@ -1,0 +1,133 @@
+{
+  "generatedAt": "2026-05-17T03:42:44.352Z",
+  "summary": {
+    "totalFiles": 2,
+    "successfulFiles": 1,
+    "totalDocuments": 2,
+    "totalContainers": 3,
+    "containersWithLiveness": 1,
+    "containersWithReadiness": 0,
+    "containersWithStartup": 0,
+    "issuesCount": 0,
+    "warningsCount": 5
+  },
+  "containers": [
+    {
+      "name": "app-without-probes",
+      "namespace": "staging",
+      "workloadName": "no-probe-app",
+      "workloadKind": "Deployment",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/missing-probes.yaml",
+      "probes": {
+        "liveness": null,
+        "readiness": null,
+        "startup": null
+      },
+      "probeIssues": []
+    },
+    {
+      "name": "sidecar",
+      "namespace": "staging",
+      "workloadName": "no-probe-app",
+      "workloadKind": "Deployment",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/missing-probes.yaml",
+      "probes": {
+        "liveness": null,
+        "readiness": null,
+        "startup": null
+      },
+      "probeIssues": []
+    },
+    {
+      "name": "job-container",
+      "namespace": "default",
+      "workloadName": "nightly-job",
+      "workloadKind": "CronJob",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/missing-probes.yaml",
+      "probes": {
+        "liveness": {
+          "initialDelaySeconds": 10,
+          "periodSeconds": 30,
+          "timeoutSeconds": 1,
+          "successThreshold": 1,
+          "failureThreshold": 3,
+          "type": "EXEC",
+          "raw": {
+            "exec": {
+              "command": [
+                "echo",
+                "ok"
+              ]
+            },
+            "initialDelaySeconds": 10,
+            "periodSeconds": 30
+          }
+        },
+        "readiness": null,
+        "startup": null
+      },
+      "probeIssues": []
+    }
+  ],
+  "issues": [
+    {
+      "severity": "warning",
+      "type": "MISSING_PROBE",
+      "message": "容器 app-without-probes 缺少 livenessProbe",
+      "container": "app-without-probes",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/missing-probes.yaml",
+      "workloadName": "no-probe-app",
+      "workloadKind": "Deployment"
+    },
+    {
+      "severity": "warning",
+      "type": "MISSING_PROBE",
+      "message": "容器 app-without-probes 缺少 readinessProbe",
+      "container": "app-without-probes",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/missing-probes.yaml",
+      "workloadName": "no-probe-app",
+      "workloadKind": "Deployment"
+    },
+    {
+      "severity": "warning",
+      "type": "MISSING_PROBE",
+      "message": "容器 sidecar 缺少 livenessProbe",
+      "container": "sidecar",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/missing-probes.yaml",
+      "workloadName": "no-probe-app",
+      "workloadKind": "Deployment"
+    },
+    {
+      "severity": "warning",
+      "type": "MISSING_PROBE",
+      "message": "容器 sidecar 缺少 readinessProbe",
+      "container": "sidecar",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/missing-probes.yaml",
+      "workloadName": "no-probe-app",
+      "workloadKind": "Deployment"
+    },
+    {
+      "severity": "warning",
+      "type": "MISSING_PROBE",
+      "message": "容器 job-container 缺少 readinessProbe",
+      "container": "job-container",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/missing-probes.yaml",
+      "workloadName": "nightly-job",
+      "workloadKind": "CronJob"
+    }
+  ],
+  "comparisons": [],
+  "environmentGroups": {
+    "预发布环境": 2,
+    "未知环境": 1
+  },
+  "parseErrors": [
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml",
+      "type": "YAMLException",
+      "message": "end of the stream or a document separator is expected in \"/Users/lzy/pro/solo/workspaces/zy70580/test-data/dirty/broken-syntax.yaml\" (41:1)\n\n 38 |     targetPort: 80\n 39 | ---\n 40 | another bad line with invalid s ...\n 41 | : invalid: : yaml :\n------^",
+      "line": 40,
+      "column": 0
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "k8s-probe-cli",
+  "version": "1.0.0",
+  "description": "K8s探针策略CLI工具 - 分析和比较Kubernetes环境中的探针配置",
+  "main": "src/index.js",
+  "bin": {
+    "k8s-probe": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["kubernetes", "k8s", "probe", "liveness", "readiness", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  }
+}

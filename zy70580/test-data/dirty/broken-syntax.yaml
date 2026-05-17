@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken
+  template:
+    metadata:
+      labels:
+        app: broken
+    spec:
+      containers:
+      - name: broken-app
+        image: nginx:1.21
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 999
+          periodSeconds: 600
+          timeoutSeconds: 120
+          failureThreshold: 50
+---
+THIS IS A BAD LINE THAT WILL CAUSE PARSING ERROR
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: broken-service
+spec:
+  selector:
+    app: broken
+  ports:
+  - port: 80
+    targetPort: 80
+---
+another bad line with invalid syntax
+: invalid: : yaml :
