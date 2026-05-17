@@ -1,0 +1,41 @@
+{
+  "name": "scaffold-drift-cli",
+  "version": "1.0.0",
+  "description": "仓库脚手架漂移检测CLI工具 - 检测项目配置与标准模板的差异",
+  "main": "dist/index.js",
+  "bin": {
+    "scaffold-drift": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "test": "jest"
+  },
+  "keywords": ["scaffold", "drift", "cli", "template", "comparison"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "diff": "^5.2.0",
+    "chalk": "^4.1.2",
+    "fs-extra": "^11.2.0",
+    "glob": "^10.3.10",
+    "lodash": "^4.17.21",
+    "js-yaml": "^4.1.0",
+    "json5": "^2.2.3",
+    "minimatch": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/diff": "^5.2.0",
+    "@types/fs-extra": "^11.0.0",
+    "@types/lodash": "^4.17.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/minimatch": "^5.1.2",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0"
+  }
+}

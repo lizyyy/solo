@@ -1,0 +1,39 @@
+{
+  "name": "test-scaffold",
+  "version": "1.0.0",
+  "files": [
+    {
+      "path": "package.json",
+      "required": true,
+      "checkContent": false
+    },
+    {
+      "path": ".gitignore",
+      "required": true,
+      "checkContent": true
+    },
+    {
+      "path": "README.md",
+      "required": false,
+      "checkContent": false
+    }
+  ],
+  "configs": [
+    {
+      "path": "tsconfig.json",
+      "type": "json",
+      "required": true,
+      "keys": [
+        "compilerOptions.target",
+        "compilerOptions.module",
+        "compilerOptions.strict"
+      ]
+    },
+    {
+      "path": ".env.example",
+      "type": "env",
+      "required": true,
+      "keys": ["NODE_ENV", "API_URL"]
+    }
+  ]
+}

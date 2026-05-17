@@ -1,0 +1,336 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-17T17:10:56.191Z",
+    "repoPath": "/Users/lzy/pro/solo/workspaces/zy10598/scaffold-drift-cli/test/repo",
+    "templatePath": "/Users/lzy/pro/solo/workspaces/zy10598/scaffold-drift-cli/test/template",
+    "templateName": "test-scaffold",
+    "templateVersion": "1.0.0",
+    "runId": "run_1779037856192_4iutuj1l2"
+  },
+  "summary": {
+    "totalFiles": 3,
+    "totalConfigs": 2,
+    "normalItems": 0,
+    "riskItems": 5,
+    "unknownItems": 0,
+    "totalDrifts": 5,
+    "criticalDrifts": 1,
+    "highDrifts": 0,
+    "mediumDrifts": 4,
+    "lowDrifts": 0
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "exists": true,
+      "required": true,
+      "drifts": []
+    },
+    {
+      "path": ".gitignore",
+      "exists": true,
+      "required": true,
+      "drifts": [
+        {
+          "id": "drift_1779037856194_a7o9neelu",
+          "type": "content_diff",
+          "path": ".gitignore",
+          "status": "risk",
+          "description": "文件内容与模板存在差异: .gitignore",
+          "severity": "medium",
+          "reason": "文件内容已偏离模板",
+          "diff": [
+            {
+              "type": "unchanged",
+              "content": "node_modules\ndist\n.env\n",
+              "lineStart": 1,
+              "lineEnd": 3
+            },
+            {
+              "type": "removed",
+              "content": "*.log\n.DS_Store\n",
+              "lineStart": 4,
+              "lineEnd": 5
+            },
+            {
+              "type": "added",
+              "content": "coverage\n",
+              "lineStart": 6,
+              "lineEnd": 6
+            }
+          ],
+          "expected": "node_modules\ndist\n.env\n*.log\n.DS_Store\n",
+          "actual": "node_modules\ndist\n.env\ncoverage\n"
+        }
+      ],
+      "contentMatch": false
+    },
+    {
+      "path": "README.md",
+      "exists": false,
+      "required": false,
+      "drifts": []
+    }
+  ],
+  "configs": [
+    {
+      "path": "tsconfig.json",
+      "exists": true,
+      "required": true,
+      "parsed": true,
+      "drifts": [
+        {
+          "id": "drift_1779037856195_ymag4rdh6",
+          "type": "config_value_diff",
+          "path": "tsconfig.json",
+          "status": "risk",
+          "description": "配置值不同: tsconfig.json > compilerOptions.target",
+          "severity": "medium",
+          "reason": "配置值已偏离模板",
+          "diff": [
+            {
+              "type": "removed",
+              "content": "\"ES2020\"",
+              "lineStart": 1,
+              "lineEnd": 0
+            },
+            {
+              "type": "added",
+              "content": "\"ESNext\"",
+              "lineStart": 1,
+              "lineEnd": 0
+            }
+          ],
+          "expected": "\"ES2020\"",
+          "actual": "\"ESNext\""
+        },
+        {
+          "id": "drift_1779037856195_hmcs7qvee",
+          "type": "config_value_diff",
+          "path": "tsconfig.json",
+          "status": "risk",
+          "description": "配置值不同: tsconfig.json > compilerOptions.module",
+          "severity": "medium",
+          "reason": "配置值已偏离模板",
+          "diff": [
+            {
+              "type": "removed",
+              "content": "\"commonjs\"",
+              "lineStart": 1,
+              "lineEnd": 0
+            },
+            {
+              "type": "added",
+              "content": "\"ESNext\"",
+              "lineStart": 1,
+              "lineEnd": 0
+            }
+          ],
+          "expected": "\"commonjs\"",
+          "actual": "\"ESNext\""
+        },
+        {
+          "id": "drift_1779037856195_kxf5x6vur",
+          "type": "config_value_diff",
+          "path": "tsconfig.json",
+          "status": "risk",
+          "description": "配置值不同: tsconfig.json > compilerOptions.strict",
+          "severity": "medium",
+          "reason": "配置值已偏离模板",
+          "diff": [
+            {
+              "type": "removed",
+              "content": "true",
+              "lineStart": 1,
+              "lineEnd": 0
+            },
+            {
+              "type": "added",
+              "content": "false",
+              "lineStart": 1,
+              "lineEnd": 0
+            }
+          ],
+          "expected": "true",
+          "actual": "false"
+        }
+      ]
+    },
+    {
+      "path": ".env.example",
+      "exists": false,
+      "required": true,
+      "parsed": false,
+      "drifts": [
+        {
+          "id": "drift_1779037856194_9w08tl4oz",
+          "type": "file_missing",
+          "path": ".env.example",
+          "status": "risk",
+          "description": "必需配置文件缺失: .env.example",
+          "severity": "critical",
+          "reason": "模板要求此配置文件必须存在"
+        }
+      ]
+    }
+  ],
+  "drifts": [
+    {
+      "id": "drift_1779037856194_a7o9neelu",
+      "type": "content_diff",
+      "path": ".gitignore",
+      "status": "risk",
+      "description": "文件内容与模板存在差异: .gitignore",
+      "severity": "medium",
+      "reason": "文件内容已偏离模板",
+      "diff": [
+        {
+          "type": "unchanged",
+          "content": "node_modules\ndist\n.env\n",
+          "lineStart": 1,
+          "lineEnd": 3
+        },
+        {
+          "type": "removed",
+          "content": "*.log\n.DS_Store\n",
+          "lineStart": 4,
+          "lineEnd": 5
+        },
+        {
+          "type": "added",
+          "content": "coverage\n",
+          "lineStart": 6,
+          "lineEnd": 6
+        }
+      ],
+      "expected": "node_modules\ndist\n.env\n*.log\n.DS_Store\n",
+      "actual": "node_modules\ndist\n.env\ncoverage\n"
+    },
+    {
+      "id": "drift_1779037856195_ymag4rdh6",
+      "type": "config_value_diff",
+      "path": "tsconfig.json",
+      "status": "risk",
+      "description": "配置值不同: tsconfig.json > compilerOptions.target",
+      "severity": "medium",
+      "reason": "配置值已偏离模板",
+      "diff": [
+        {
+          "type": "removed",
+          "content": "\"ES2020\"",
+          "lineStart": 1,
+          "lineEnd": 0
+        },
+        {
+          "type": "added",
+          "content": "\"ESNext\"",
+          "lineStart": 1,
+          "lineEnd": 0
+        }
+      ],
+      "expected": "\"ES2020\"",
+      "actual": "\"ESNext\""
+    },
+    {
+      "id": "drift_1779037856195_hmcs7qvee",
+      "type": "config_value_diff",
+      "path": "tsconfig.json",
+      "status": "risk",
+      "description": "配置值不同: tsconfig.json > compilerOptions.module",
+      "severity": "medium",
+      "reason": "配置值已偏离模板",
+      "diff": [
+        {
+          "type": "removed",
+          "content": "\"commonjs\"",
+          "lineStart": 1,
+          "lineEnd": 0
+        },
+        {
+          "type": "added",
+          "content": "\"ESNext\"",
+          "lineStart": 1,
+          "lineEnd": 0
+        }
+      ],
+      "expected": "\"commonjs\"",
+      "actual": "\"ESNext\""
+    },
+    {
+      "id": "drift_1779037856195_kxf5x6vur",
+      "type": "config_value_diff",
+      "path": "tsconfig.json",
+      "status": "risk",
+      "description": "配置值不同: tsconfig.json > compilerOptions.strict",
+      "severity": "medium",
+      "reason": "配置值已偏离模板",
+      "diff": [
+        {
+          "type": "removed",
+          "content": "true",
+          "lineStart": 1,
+          "lineEnd": 0
+        },
+        {
+          "type": "added",
+          "content": "false",
+          "lineStart": 1,
+          "lineEnd": 0
+        }
+      ],
+      "expected": "true",
+      "actual": "false"
+    },
+    {
+      "id": "drift_1779037856194_9w08tl4oz",
+      "type": "file_missing",
+      "path": ".env.example",
+      "status": "risk",
+      "description": "必需配置文件缺失: .env.example",
+      "severity": "critical",
+      "reason": "模板要求此配置文件必须存在"
+    }
+  ],
+  "repairPreview": [
+    {
+      "driftId": "drift_1779037856194_a7o9neelu",
+      "path": ".gitignore",
+      "action": "modify",
+      "description": "修复文件内容: .gitignore",
+      "preview": "## 修改文件: .gitignore\n\n### 内容差异:\n\n  node_modules\n  dist\n  .env\n  - *.log\n- .DS_Store\n- + coverage\n+ \n\n操作影响:\n- 文件内容将更新以匹配模板\n- 现有内容将被覆盖\n\n注意事项:\n- 请仔细审查上述差异\n- 确保修改不会覆盖重要的自定义配置",
+      "autoFixable": true
+    },
+    {
+      "driftId": "drift_1779037856195_ymag4rdh6",
+      "path": "tsconfig.json",
+      "action": "modify",
+      "description": "修正配置值: tsconfig.json",
+      "preview": "## 修正配置值: tsconfig.json\n\n预期值: \"ES2020\"\n当前值: \"ESNext\"\n\n操作影响:\n- 配置值将更新为模板中的值\n- 这可能影响应用程序行为\n\n注意事项:\n- 请确认修改不会破坏现有功能\n- 备份当前配置以防需要回滚",
+      "autoFixable": true
+    },
+    {
+      "driftId": "drift_1779037856195_hmcs7qvee",
+      "path": "tsconfig.json",
+      "action": "modify",
+      "description": "修正配置值: tsconfig.json",
+      "preview": "## 修正配置值: tsconfig.json\n\n预期值: \"commonjs\"\n当前值: \"ESNext\"\n\n操作影响:\n- 配置值将更新为模板中的值\n- 这可能影响应用程序行为\n\n注意事项:\n- 请确认修改不会破坏现有功能\n- 备份当前配置以防需要回滚",
+      "autoFixable": true
+    },
+    {
+      "driftId": "drift_1779037856195_kxf5x6vur",
+      "path": "tsconfig.json",
+      "action": "modify",
+      "description": "修正配置值: tsconfig.json",
+      "preview": "## 修正配置值: tsconfig.json\n\n预期值: true\n当前值: false\n\n操作影响:\n- 配置值将更新为模板中的值\n- 这可能影响应用程序行为\n\n注意事项:\n- 请确认修改不会破坏现有功能\n- 备份当前配置以防需要回滚",
+      "autoFixable": true
+    },
+    {
+      "driftId": "drift_1779037856194_9w08tl4oz",
+      "path": ".env.example",
+      "action": "create",
+      "description": "创建缺失文件: .env.example",
+      "preview": "## 创建文件: .env.example\n\n将从模板复制以下文件:\n- 源: .env.example (模板)\n- 目标: .env.example (仓库)\n\n操作影响:\n- 这将添加一个新文件到仓库\n- 文件内容将与模板完全一致\n\n推荐操作:\n- 检查模板文件内容是否适用于当前项目\n- 确认没有同名的重要文件被覆盖",
+      "autoFixable": true
+    }
+  ]
+}
