@@ -1,0 +1,90 @@
+{
+  "capacity_violations": [
+    {
+      "type": "capacity_violation",
+      "shift_id": "S001",
+      "activity_name": "社区敬老活动",
+      "capacity": 2,
+      "actual": 4,
+      "excess": 2,
+      "severity": "error"
+    }
+  ],
+  "location_violations": [
+    {
+      "type": "location_violation",
+      "checkin_id": "C002",
+      "volunteer_id": "V002",
+      "shift_id": "S001",
+      "distance_meters": 1611.56,
+      "allowed_radius": 100,
+      "severity": "warning"
+    },
+    {
+      "type": "missing_location",
+      "checkin_id": "C003",
+      "volunteer_id": "V003",
+      "shift_id": "S001",
+      "severity": "warning"
+    }
+  ],
+  "substitute_violations": [
+    {
+      "type": "missing_approver",
+      "request_id": "SUB001",
+      "shift_id": "S001",
+      "severity": "error"
+    },
+    {
+      "type": "invalid_original_volunteer",
+      "request_id": "SUB002",
+      "volunteer_id": "V999",
+      "severity": "error"
+    },
+    {
+      "type": "invalid_shift",
+      "request_id": "SUB002",
+      "shift_id": "S999",
+      "severity": "error"
+    }
+  ],
+  "duration_recalculations": [
+    {
+      "type": "duration_mismatch",
+      "certification_id": "CERT001",
+      "volunteer_id": "V001",
+      "shift_id": "S001",
+      "claimed": 200,
+      "actual": 180,
+      "difference": -20,
+      "severity": "warning"
+    },
+    {
+      "type": "duration_mismatch",
+      "certification_id": "CERT002",
+      "volunteer_id": "V002",
+      "shift_id": "S001",
+      "claimed": 200,
+      "actual": 155,
+      "difference": -45,
+      "severity": "warning"
+    },
+    {
+      "type": "missing_checkin",
+      "certification_id": "CERT003",
+      "checkin_id": "C999",
+      "severity": "error"
+    }
+  ],
+  "summary": {
+    "total_volunteers": 4,
+    "total_shifts": 2,
+    "total_checkins": 5,
+    "total_substitutes": 2,
+    "total_certifications": 3,
+    "total_errors": 5,
+    "total_warnings": 4,
+    "has_issues": true
+  },
+  "parse_errors": []
+}

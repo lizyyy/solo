@@ -1,0 +1,26 @@
+[
+  {
+    "shift_id": "S001",
+    "activity_name": "社区敬老活动",
+    "location_id": "L001",
+    "date": "2024-05-10",
+    "start_time": "09:00",
+    "end_time": "12:00",
+    "capacity": 2,
+    "status": "completed",
+    "required_skills": ["引导"],
+    "volunteer_ids": ["V001", "V002", "V003"]
+  },
+  {
+    "shift_id": "S002",
+    "activity_name": "图书馆志愿服务",
+    "location_id": "L002",
+    "date": "2024-05-11",
+    "start_time": "14:00",
+    "end_time": "17:00",
+    "capacity": 2,
+    "status": "completed",
+    "required_skills": [],
+    "volunteer_ids": ["V001", "V004"]
+  }
+]

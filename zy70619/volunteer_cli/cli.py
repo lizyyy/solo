@@ -55,6 +55,11 @@ def validate(data_dir, output_dir, verbose):
     results = engine.run_all_validations()
     service_records = engine.generate_service_records()
     
+    parse_error_count = len(data["parse_errors"])
+    results["parse_errors"] = data["parse_errors"]
+    results["summary"]["total_errors"] += parse_error_count
+    results["summary"]["has_issues"] = results["summary"]["total_errors"] > 0 or results["summary"]["total_warnings"] > 0
+    
     summary = results["summary"]
     click.echo("")
     click.echo(click.style("验证结果摘要:", fg="cyan", bold=True))
@@ -78,7 +83,7 @@ def validate(data_dir, output_dir, verbose):
     
     click.echo("生成报告中...")
     exporter = ReportExporter(output_dir)
-    files = exporter.export_all(results, service_records, data["parse_errors"])
+    files = exporter.export_all(results, service_records)
     
     click.echo("")
     click.echo(click.style("导出文件:", fg="cyan", bold=True))

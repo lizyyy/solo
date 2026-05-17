@@ -1,0 +1,64 @@
+{
+  "service_records": [
+    {
+      "record_id": "REC_C001_0",
+      "volunteer_id": "V001",
+      "shift_id": "S001",
+      "date": "2024-05-10",
+      "activity_name": "社区敬老活动",
+      "actual_duration_minutes": 180,
+      "is_substitute": false,
+      "original_volunteer_id": null,
+      "certification_status": "rejected",
+      "location_valid": true
+    },
+    {
+      "record_id": "REC_C002_1",
+      "volunteer_id": "V002",
+      "shift_id": "S001",
+      "date": "2024-05-10",
+      "activity_name": "社区敬老活动",
+      "actual_duration_minutes": 155,
+      "is_substitute": false,
+      "original_volunteer_id": null,
+      "certification_status": "rejected",
+      "location_valid": false
+    },
+    {
+      "record_id": "REC_C003_2",
+      "volunteer_id": "V003",
+      "shift_id": "S001",
+      "date": "2024-05-10",
+      "activity_name": "社区敬老活动",
+      "actual_duration_minutes": 180,
+      "is_substitute": false,
+      "original_volunteer_id": null,
+      "certification_status": "pending",
+      "location_valid": false
+    },
+    {
+      "record_id": "REC_C004_3",
+      "volunteer_id": "V001",
+      "shift_id": "S002",
+      "date": "2024-05-11",
+      "activity_name": "图书馆志愿服务",
+      "actual_duration_minutes": 180,
+      "is_substitute": false,
+      "original_volunteer_id": null,
+      "certification_status": "pending",
+      "location_valid": true
+    },
+    {
+      "record_id": "REC_C005_4",
+      "volunteer_id": "V004",
+      "shift_id": "S002",
+      "date": "2024-05-11",
+      "activity_name": "图书馆志愿服务",
+      "actual_duration_minutes": 180,
+      "is_substitute": false,
+      "original_volunteer_id": null,
+      "certification_status": "pending",
+      "location_valid": true
+    }
+  ]
+}

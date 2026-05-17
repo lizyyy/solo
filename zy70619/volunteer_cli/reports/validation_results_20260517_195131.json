@@ -1,0 +1,33 @@
+{
+  "capacity_violations": [],
+  "location_violations": [],
+  "substitute_violations": [],
+  "duration_recalculations": [],
+  "summary": {
+    "total_volunteers": 0,
+    "total_shifts": 0,
+    "total_checkins": 0,
+    "total_substitutes": 0,
+    "total_certifications": 0,
+    "total_errors": 3,
+    "total_warnings": 0,
+    "has_issues": true
+  },
+  "parse_errors": [
+    {
+      "type": "volunteer_parse_error",
+      "row": 0,
+      "error": "无法解析日期: invalid-date"
+    },
+    {
+      "type": "volunteer_parse_error",
+      "row": 1,
+      "error": "'unknown_status' is not a valid VolunteerStatus"
+    },
+    {
+      "type": "shift_parse_error",
+      "row": 0,
+      "error": "2 validation errors for Shift\nend_time\n  Value error, 结束时间必须晚于开始时间 [type=value_error, input_value=datetime.time(10, 0), input_type=time]\n    For further information visit https://errors.pydantic.dev/2.5/v/value_error\ncapacity\n  Value error, 班次容量必须大于0 [type=value_error, input_value=-5, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.5/v/value_error"
+    }
+  ]
+}

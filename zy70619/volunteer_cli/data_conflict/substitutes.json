@@ -1,0 +1,24 @@
+[
+  {
+    "request_id": "SUB001",
+    "original_volunteer_id": "V003",
+    "substitute_volunteer_id": "V004",
+    "shift_id": "S001",
+    "request_time": "2024-05-09 10:00:00",
+    "approver_id": null,
+    "approval_time": "2024-05-09 11:00:00",
+    "status": "approved",
+    "reason": "缺少审批人"
+  },
+  {
+    "request_id": "SUB002",
+    "original_volunteer_id": "V999",
+    "substitute_volunteer_id": "V002",
+    "shift_id": "S999",
+    "request_time": "2024-05-10 09:00:00",
+    "approver_id": "ADMIN001",
+    "approval_time": "2024-05-10 09:30:00",
+    "status": "approved",
+    "reason": "引用不存在的志愿者和班次"
+  }
+]

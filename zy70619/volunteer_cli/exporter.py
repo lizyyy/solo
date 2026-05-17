@@ -37,7 +37,6 @@ class ReportExporter:
 
     def export_text_report(self, validation_results: Dict, 
                           service_records: List[ServiceRecord],
-                          parse_errors: List[Dict],
                           filename: str) -> str:
         """导出文本格式报告（人可读）"""
         file_path = self.output_dir / filename
@@ -48,6 +47,8 @@ class ReportExporter:
         lines.append(f"生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         lines.append("=" * 80)
         lines.append("")
+        
+        parse_errors = validation_results.get("parse_errors", [])
         
         lines.append("【数据概览】")
         summary = validation_results["summary"]
@@ -165,8 +166,7 @@ class ReportExporter:
         return self.export_csv(rows, filename)
 
     def export_all(self, validation_results: Dict, 
-                   service_records: List[ServiceRecord],
-                   parse_errors: List[Dict]) -> Dict[str, str]:
+                   service_records: List[ServiceRecord]) -> Dict[str, str]:
         """导出所有报告"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
@@ -191,7 +191,6 @@ class ReportExporter:
         files["text_report"] = self.export_text_report(
             validation_results,
             service_records,
-            parse_errors,
             f"report_{timestamp}.txt"
         )
         

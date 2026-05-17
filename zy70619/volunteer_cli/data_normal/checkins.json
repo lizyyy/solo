@@ -1,0 +1,42 @@
+[
+  {
+    "checkin_id": "C001",
+    "volunteer_id": "V001",
+    "shift_id": "S001",
+    "checkin_time": "2024-05-10 08:55:00",
+    "checkout_time": "2024-05-10 12:00:00",
+    "latitude": 39.9042,
+    "longitude": 116.4074,
+    "notes": "正常签到签退"
+  },
+  {
+    "checkin_id": "C002",
+    "volunteer_id": "V002",
+    "shift_id": "S001",
+    "checkin_time": "2024-05-10 09:00:00",
+    "checkout_time": "2024-05-10 12:00:00",
+    "latitude": 39.9043,
+    "longitude": 116.4075,
+    "notes": ""
+  },
+  {
+    "checkin_id": "C003",
+    "volunteer_id": "V001",
+    "shift_id": "S002",
+    "checkin_time": "2024-05-11 13:55:00",
+    "checkout_time": "2024-05-11 17:00:00",
+    "latitude": 39.9572,
+    "longitude": 116.3343,
+    "notes": ""
+  },
+  {
+    "checkin_id": "C004",
+    "volunteer_id": "V003",
+    "shift_id": "S002",
+    "checkin_time": "2024-05-11 14:00:00",
+    "checkout_time": "2024-05-11 17:00:00",
+    "latitude": 39.9573,
+    "longitude": 116.3342,
+    "notes": ""
+  }
+]
