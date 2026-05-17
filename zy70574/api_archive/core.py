@@ -287,19 +287,36 @@ def get_reader_for_file(file_path: str):
 
 
 def mask_sensitive_data(entry: ArchiveEntry, sensitive_fields: List[str]):
-    """对单个条目进行敏感数据脱敏"""
+    """对单个条目进行敏感数据脱敏：Headers、URL参数、Body，并重新生成curl命令"""
     fields_lower = [f.lower() for f in sensitive_fields]
     sensitive_found = []
     
+    # 1. Headers脱敏
     for key, value in list(entry.headers.items()):
         if any(s in key.lower() for s in fields_lower):
             entry.headers[key] = mask_value(value)
             sensitive_found.append(f"header:{key}")
     
-    # 检查URL中的敏感参数
-    for param in ['token=', 'access_token=', 'key=', 'secret=']:
-        if param in entry.url:
-            sensitive_found.append(f"url:{param[:-1]}")
+    # 2. URL中的敏感参数脱敏
+    original_url = entry.url
+    for param in ['token', 'access_token', 'key', 'secret', 'password', 'apikey', 'session']:
+        pattern = re.compile(rf'({param}=)([^&\s]+)', re.IGNORECASE)
+        match = pattern.search(entry.url)
+        if match:
+            entry.url = pattern.sub(lambda m: m.group(1) + mask_value(m.group(2)), entry.url)
+            sensitive_found.append(f"url:{param}")
+    
+    # 3. Body中的敏感字段脱敏（简单JSON处理）
+    if entry.body and isinstance(entry.body, str):
+        for field in sensitive_fields:
+            # 匹配 "field": "value" 或 'field': 'value' 格式
+            pattern = re.compile(rf'([\"\']{field}[\"\']\s*:\s*[\"\'])([^\"\']+)([\"\'])', re.IGNORECASE)
+            if pattern.search(entry.body):
+                entry.body = pattern.sub(lambda m: m.group(1) + mask_value(m.group(2)) + m.group(3), entry.body)
+                sensitive_found.append(f"body:{field}")
+    
+    # 4. 🔴 关键修复：脱敏后重新生成curl命令（闭环）
+    entry.curl_command = generate_curl(entry.method, entry.url, entry.headers, entry.body)
     
     if sensitive_found:
         entry.is_sensitive = True
