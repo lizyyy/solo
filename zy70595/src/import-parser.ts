@@ -24,7 +24,7 @@ export class ImportParser {
 
       inMultilineComment = this.updateMultilineCommentState(rawLine, inMultilineComment);
 
-      const parseResult = this.parseImportLine(rawLine, lineNumber);
+      const parseResult = this.parseImportLine(rawLine, lineNumber, sourceFile);
       
       if (parseResult.isDirty) {
         dirtyLines.push({
@@ -68,7 +68,8 @@ export class ImportParser {
 
   private parseImportLine(
     rawLine: string,
-    lineNumber: number
+    lineNumber: number,
+    sourceFile?: string
   ): { isDirty: true; reason: string; category: DirtyLine['category'] } | { isDirty: false; import: ImportStatement } | { isDirty: false } {
     const trimmed = rawLine.trim();
 
@@ -95,6 +96,7 @@ export class ImportParser {
           rawLine,
           importPath,
           isTypeImport,
+          sourceFile,
         },
       };
     } catch (error) {

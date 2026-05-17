@@ -53,7 +53,7 @@ class ImportParser {
                 continue;
             }
             inMultilineComment = this.updateMultilineCommentState(rawLine, inMultilineComment);
-            const parseResult = this.parseImportLine(rawLine, lineNumber);
+            const parseResult = this.parseImportLine(rawLine, lineNumber, sourceFile);
             if (parseResult.isDirty) {
                 dirtyLines.push({
                     lineNumber,
@@ -94,7 +94,7 @@ class ImportParser {
             return false;
         return currentState;
     }
-    parseImportLine(rawLine, lineNumber) {
+    parseImportLine(rawLine, lineNumber, sourceFile) {
         const trimmed = rawLine.trim();
         if (!trimmed.toLowerCase().startsWith('import')) {
             return { isDirty: false };
@@ -116,6 +116,7 @@ class ImportParser {
                     rawLine,
                     importPath,
                     isTypeImport,
+                    sourceFile,
                 },
             };
         }

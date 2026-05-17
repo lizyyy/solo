@@ -12,11 +12,27 @@ export class ReportGenerator {
     lines.push(chalk.bold.blue('║           TypeScript Path Alias Diagnostic Report          ║'));
     lines.push(chalk.bold.blue('╚════════════════════════════════════════════════════════════╝\n'));
 
+    lines.push(this.generateEnvironmentSummary(report));
     lines.push(this.generateSummary(report));
     lines.push(this.generateDirtyLinesTable(report.dirtyLines));
     lines.push(this.generateConflictsTable(report.conflicts));
     lines.push(this.generateResolutionsSummary(report));
 
+    return lines.join('\n');
+  }
+
+  private generateEnvironmentSummary(report: DiagnosticReport): string {
+    const lines: string[] = [];
+    lines.push(chalk.bold('🌍 Environment Configurations'));
+    lines.push(chalk.gray('─'.repeat(60)));
+    
+    for (const envConfig of report.environmentConfigs) {
+      lines.push(`${chalk.cyan.bold(envConfig.name)}: ${chalk.gray(envConfig.tsconfigPath)}`);
+      const aliasCount = Object.keys(envConfig.paths).length;
+      lines.push(`   ${chalk.gray(`${aliasCount} path alias(es) configured`)}`);
+    }
+    lines.push('');
+    
     return lines.join('\n');
   }
 
@@ -187,15 +203,21 @@ export class ReportGenerator {
       }
     }
 
-    lines.push('## Path Alias Configuration');
+    lines.push('## Environment Configurations');
     lines.push('');
-    lines.push('| Alias | Target Paths |');
-    lines.push('|-------|--------------|');
     
-    for (const [alias, targets] of Object.entries(report.paths)) {
-      lines.push(`| \`${alias}\` | ${targets.map(t => `\`${t}\``).join(', ')} |`);
+    for (const envConfig of report.environmentConfigs) {
+      lines.push(`### ${envConfig.name}`);
+      lines.push(`- **tsconfig path**: \`${envConfig.tsconfigPath}\``);
+      lines.push('');
+      lines.push('| Alias | Target Paths |');
+      lines.push('|-------|--------------|');
+      
+      for (const [alias, targets] of Object.entries(envConfig.paths)) {
+        lines.push(`| \`${alias}\` | ${targets.map(t => `\`${t}\``).join(', ')} |`);
+      }
+      lines.push('');
     }
-    lines.push('');
 
     lines.push('## Resolution Details');
     lines.push('');

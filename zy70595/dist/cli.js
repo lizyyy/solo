@@ -48,10 +48,10 @@ program
 program
     .command('check')
     .description('Check path alias resolutions')
-    .option('-p, --project <path>', 'Path to tsconfig.json', './tsconfig.json')
+    .option('-p, --project <path>', 'Path to tsconfig.json (default env)', './tsconfig.json')
     .option('-s, --source <path>', 'Source file or directory to scan')
     .option('-i, --imports <path>', 'File with import paths to check')
-    .option('-e, --env <name...>', 'Environment names for multi-env comparison')
+    .option('-e, --env <name:path...>', 'Environment configs: name:tsconfig-path (e.g., "build:./tsconfig.build.json")')
     .option('-o, --output <dir>', 'Output directory for reports', './reports')
     .option('--json-only', 'Only output machine-readable JSON')
     .action(async (options) => {
@@ -75,11 +75,9 @@ program
     }
 });
 async function runCheck(options) {
-    const tsconfigPath = path.resolve(options.project);
-    const resolver = new resolver_1.PathResolver(tsconfigPath);
     const importParser = new import_parser_1.ImportParser();
     const conflictDetector = new conflict_detector_1.ConflictDetector();
-    let imports = [];
+    let importStatements = [];
     let dirtyLines = [];
     if (options.source) {
         const sourcePath = path.resolve(options.source);
@@ -88,13 +86,13 @@ async function runCheck(options) {
                 const files = findSourceFiles(sourcePath);
                 for (const file of files) {
                     const result = importParser.parseFile(file);
-                    imports.push(...result.imports.map(i => i.importPath));
+                    importStatements.push(...result.imports);
                     dirtyLines.push(...result.dirtyLines);
                 }
             }
             else {
                 const result = importParser.parseFile(sourcePath);
-                imports.push(...result.imports.map(i => i.importPath));
+                importStatements.push(...result.imports);
                 dirtyLines.push(...result.dirtyLines);
             }
         }
@@ -107,27 +105,40 @@ async function runCheck(options) {
         if (fs.existsSync(importsPath)) {
             const content = fs.readFileSync(importsPath, 'utf-8');
             const result = importParser.parseImportList(content);
-            imports.push(...result.imports);
+            importStatements.push(...result.imports.map(importPath => ({
+                lineNumber: 0,
+                rawLine: importPath,
+                importPath,
+                isTypeImport: false,
+                sourceFile: undefined,
+            })));
             dirtyLines.push(...result.dirtyLines);
         }
         else {
             throw new Error(`Imports file not found: ${importsPath}`);
         }
     }
-    if (imports.length === 0) {
+    if (importStatements.length === 0) {
         throw new Error('No import paths found. Please provide --source or --imports option.');
     }
-    const environments = options.env || ['default'];
+    const environmentInputs = parseEnvironmentConfigs(options.env, options.project);
     const resolutions = [];
-    for (const env of environments) {
-        const envResults = imports.map(importPath => resolver.resolve(importPath));
+    const envConfigsWithPaths = [];
+    for (const envInput of environmentInputs) {
+        const resolver = new resolver_1.PathResolver(envInput.tsconfigPath);
+        const envResults = importStatements.map(stmt => resolver.resolve(stmt.importPath, stmt.sourceFile));
         resolutions.push({
-            environment: env,
+            environment: envInput.name,
             results: envResults,
+        });
+        envConfigsWithPaths.push({
+            name: envInput.name,
+            tsconfigPath: envInput.tsconfigPath,
+            paths: resolver.getPaths(),
         });
     }
     const conflicts = conflictDetector.detectConflicts(resolutions);
-    const validImports = imports.length;
+    const validImports = importStatements.length;
     const totalImports = validImports + dirtyLines.length;
     return {
         summary: {
@@ -136,12 +147,27 @@ async function runCheck(options) {
             dirtyLines: dirtyLines.length,
             conflicts: conflicts.length,
         },
-        paths: resolver.getPaths(),
+        paths: envConfigsWithPaths[0].paths,
+        environmentConfigs: envConfigsWithPaths,
         resolutions,
         conflicts,
         dirtyLines,
         timestamp: new Date().toISOString(),
     };
+}
+function parseEnvironmentConfigs(envOptions, defaultTsconfig) {
+    if (!envOptions || envOptions.length === 0) {
+        return [{ name: 'default', tsconfigPath: path.resolve(defaultTsconfig) }];
+    }
+    return envOptions.map(envOpt => {
+        const parts = envOpt.split(':');
+        if (parts.length === 1) {
+            return { name: parts[0], tsconfigPath: path.resolve(defaultTsconfig) };
+        }
+        const name = parts[0];
+        const tsconfigPath = parts.slice(1).join(':');
+        return { name, tsconfigPath: path.resolve(tsconfigPath) };
+    });
 }
 function findSourceFiles(dir) {
     const files = [];

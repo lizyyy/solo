@@ -14,6 +14,7 @@ export interface ImportStatement {
   rawLine: string;
   importPath: string;
   isTypeImport: boolean;
+  sourceFile?: string;
 }
 
 export interface ResolutionResult {
@@ -48,6 +49,12 @@ export interface DirtyLine {
   category: 'parse_error' | 'invalid_format' | 'unsupported_syntax';
 }
 
+export interface EnvironmentConfig {
+  name: string;
+  tsconfigPath: string;
+  paths: TsConfigPaths;
+}
+
 export interface DiagnosticReport {
   summary: {
     totalImports: number;
@@ -56,6 +63,7 @@ export interface DiagnosticReport {
     conflicts: number;
   };
   paths: TsConfigPaths;
+  environmentConfigs: EnvironmentConfig[];
   resolutions: EnvironmentResolution[];
   conflicts: Conflict[];
   dirtyLines: DirtyLine[];

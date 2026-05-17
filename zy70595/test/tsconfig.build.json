@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "..",
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
-      "@utils/*": ["src/shared/utils/*"],
-      "@test/*": ["test/fixtures/*"]
+      "@utils/*": ["src/utils/*"],
+      "@test/*": ["test/*"]
     }
   }
 }

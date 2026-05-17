@@ -1,22 +1,38 @@
 # TypeScript Path Alias Diagnostic Report
-Generated: 2026-05-17T04:09:36.152Z
+Generated: 2026-05-17T05:56:10.079Z
 
 ## Summary
 | Metric | Count | Status |
 |--------|-------|--------|
-| Total Imports | 11 | |
-| Valid Imports | 9 | ✅ |
-| Dirty Lines | 2 | ⚠️ |
-| Conflicts | 0 | ✅ |
+| Total Imports | 5 | |
+| Valid Imports | 5 | ✅ |
+| Dirty Lines | 0 | ✅ |
+| Conflicts | 2 | ❌ |
 
-## ⚠️ Dirty Lines (Parse Errors)
+## ❌ Conflicts Detected
 
-| Line | Category | Reason | Raw Line |
-|------|----------|--------|----------|
-| 8 | invalid_format | Invalid import path format | `''` |
-| 10 | invalid_format | Invalid import path format | `invalid path with spaces` |
+### `@components/Bar`
+- **Type**: resolution_mismatch
+- **Description**: Resolved path differs across environments
 
-## Path Alias Configuration
+| Environment | Resolved Path | File Exists |
+|-------------|---------------|-------------|
+| build | `/Users/lzy/pro/solo/workspaces/zy70595/src/components/Bar` | ✅ Yes |
+| editor | `/Users/lzy/pro/solo/workspaces/zy70595/src/ui/Bar` | ✅ Yes |
+
+### `@test/config`
+- **Type**: resolution_mismatch
+- **Description**: Resolved path differs across environments
+
+| Environment | Resolved Path | File Exists |
+|-------------|---------------|-------------|
+| build | `/Users/lzy/pro/solo/workspaces/zy70595/test/config` | ❌ No |
+| editor | `@test/config` | ❌ No |
+
+## Environment Configurations
+
+### build
+- **tsconfig path**: `/Users/lzy/pro/solo/workspaces/zy70595/test/tsconfig.build.json`
 
 | Alias | Target Paths |
 |-------|--------------|
@@ -25,9 +41,19 @@ Generated: 2026-05-17T04:09:36.152Z
 | `@utils/*` | `src/utils/*` |
 | `@test/*` | `test/*` |
 
+### editor
+- **tsconfig path**: `/Users/lzy/pro/solo/workspaces/zy70595/test/tsconfig.editor.json`
+
+| Alias | Target Paths |
+|-------|--------------|
+| `@/*` | `src/*` |
+| `@components/*` | `src/ui/*` |
+| `@utils/*` | `src/utils/*` |
+| `@lib/*` | `lib/*` |
+
 ## Resolution Details
 
-### default
+### build
 
 | Import Path | Resolved Path | File Exists | Matched Alias |
 |-------------|---------------|-------------|---------------|
@@ -36,7 +62,13 @@ Generated: 2026-05-17T04:09:36.152Z
 | `@utils/index` | `/Users/lzy/pro/solo/workspaces/zy70595/src/utils/index` | ✅ | `@utils/*` |
 | `@test/config` | `/Users/lzy/pro/solo/workspaces/zy70595/test/config` | ❌ | `@test/*` |
 | `./relative` | `/Users/lzy/pro/solo/workspaces/zy70595/relative` | ❌ | - |
-| `@/missing-quotes` | `/Users/lzy/pro/solo/workspaces/zy70595/src/missing-quotes` | ❌ | `@/*` |
-| ``@/backticks`` | ``@/backticks`` | ❌ | - |
-| `another-bad-line@` | `another-bad-line@` | ❌ | - |
-| `@/double//slashes` | `/Users/lzy/pro/solo/workspaces/zy70595/src/double/slashes` | ❌ | `@/*` |
+
+### editor
+
+| Import Path | Resolved Path | File Exists | Matched Alias |
+|-------------|---------------|-------------|---------------|
+| `@/foo` | `/Users/lzy/pro/solo/workspaces/zy70595/src/foo` | ✅ | `@/*` |
+| `@components/Bar` | `/Users/lzy/pro/solo/workspaces/zy70595/src/ui/Bar` | ✅ | `@components/*` |
+| `@utils/index` | `/Users/lzy/pro/solo/workspaces/zy70595/src/utils/index` | ✅ | `@utils/*` |
+| `@test/config` | `@test/config` | ❌ | - |
+| `./relative` | `/Users/lzy/pro/solo/workspaces/zy70595/relative` | ❌ | - |
