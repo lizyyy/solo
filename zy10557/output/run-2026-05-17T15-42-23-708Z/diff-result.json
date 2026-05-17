@@ -1,0 +1,215 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-17T15:42:23.712Z",
+    "version": "1.0.0"
+  },
+  "errors": [],
+  "comparisons": [
+    {
+      "key": "dev..staging",
+      "baseEnv": "dev",
+      "targetEnv": "staging",
+      "summary": {
+        "total": 10,
+        "byType": {
+          "changed": 7,
+          "added": 2,
+          "array_item_added": 1
+        },
+        "sensitive": 0,
+        "defaultValue": 0,
+        "changed": 7,
+        "added": 2,
+        "removed": 0,
+        "arrayChanges": 1
+      },
+      "diffs": [
+        {
+          "type": "changed",
+          "path": "debug",
+          "oldValue": true,
+          "newValue": false,
+          "defaultValue": false,
+          "isDefaultValue": true
+        },
+        {
+          "type": "changed",
+          "path": "database.host",
+          "oldValue": "localhost",
+          "newValue": "staging-db.example.com"
+        },
+        {
+          "type": "changed",
+          "path": "database.username",
+          "oldValue": "dev_user",
+          "newValue": "staging_user"
+        },
+        {
+          "type": "changed",
+          "path": "database.password",
+          "oldValue": "dev_secret_123",
+          "newValue": "stg_secret_456",
+          "isSensitive": true,
+          "oldValueMasked": "dev********23",
+          "oldValueRaw": "dev_secret_123",
+          "newValueMasked": "stg********56",
+          "newValueRaw": "stg_secret_456"
+        },
+        {
+          "type": "changed",
+          "path": "database.database",
+          "oldValue": "dev_db",
+          "newValue": "staging_db"
+        },
+        {
+          "type": "added",
+          "path": "database.ssl",
+          "value": true,
+          "defaultValue": false,
+          "isDefaultValue": false
+        },
+        {
+          "type": "array_item_added",
+          "path": "features[3]",
+          "index": 3,
+          "value": "cache"
+        },
+        {
+          "type": "changed",
+          "path": "rateLimit.max",
+          "oldValue": 1000,
+          "newValue": 500
+        },
+        {
+          "type": "changed",
+          "path": "redis.host",
+          "oldValue": "localhost",
+          "newValue": "staging-redis.example.com"
+        },
+        {
+          "type": "added",
+          "path": "redis.password",
+          "value": "redis_stg_secret",
+          "isSensitive": true,
+          "valueMasked": "redi********ret",
+          "valueRaw": "redis_stg_secret"
+        }
+      ]
+    },
+    {
+      "key": "dev..prod",
+      "baseEnv": "dev",
+      "targetEnv": "prod",
+      "summary": {
+        "total": 14,
+        "byType": {
+          "changed": 8,
+          "added": 4,
+          "array_item_added": 2
+        },
+        "sensitive": 0,
+        "defaultValue": 0,
+        "changed": 8,
+        "added": 4,
+        "removed": 0,
+        "arrayChanges": 2
+      },
+      "diffs": [
+        {
+          "type": "changed",
+          "path": "debug",
+          "oldValue": true,
+          "newValue": false,
+          "defaultValue": false,
+          "isDefaultValue": true
+        },
+        {
+          "type": "changed",
+          "path": "port",
+          "oldValue": 3000,
+          "newValue": 8080,
+          "defaultValue": 3000,
+          "isDefaultValue": false
+        },
+        {
+          "type": "changed",
+          "path": "database.host",
+          "oldValue": "localhost",
+          "newValue": "prod-db.example.com"
+        },
+        {
+          "type": "changed",
+          "path": "database.username",
+          "oldValue": "dev_user",
+          "newValue": "prod_user"
+        },
+        {
+          "type": "changed",
+          "path": "database.password",
+          "oldValue": "dev_secret_123",
+          "newValue": "prod_secret_789",
+          "isSensitive": true,
+          "oldValueMasked": "dev********23",
+          "oldValueRaw": "dev_secret_123",
+          "newValueMasked": "pro********789",
+          "newValueRaw": "prod_secret_789"
+        },
+        {
+          "type": "changed",
+          "path": "database.database",
+          "oldValue": "dev_db",
+          "newValue": "prod_db"
+        },
+        {
+          "type": "added",
+          "path": "database.ssl",
+          "value": true,
+          "defaultValue": false,
+          "isDefaultValue": false
+        },
+        {
+          "type": "added",
+          "path": "database.poolSize",
+          "value": 20
+        },
+        {
+          "type": "array_item_added",
+          "path": "features[3]",
+          "index": 3,
+          "value": "cache"
+        },
+        {
+          "type": "array_item_added",
+          "path": "features[4]",
+          "index": 4,
+          "value": "cdn"
+        },
+        {
+          "type": "changed",
+          "path": "rateLimit.max",
+          "oldValue": 1000,
+          "newValue": 100
+        },
+        {
+          "type": "changed",
+          "path": "redis.host",
+          "oldValue": "localhost",
+          "newValue": "prod-redis.example.com"
+        },
+        {
+          "type": "added",
+          "path": "redis.password",
+          "value": "redis_prod_secret",
+          "isSensitive": true,
+          "valueMasked": "redi********ret",
+          "valueRaw": "redis_prod_secret"
+        },
+        {
+          "type": "added",
+          "path": "redis.cluster",
+          "value": true
+        }
+      ]
+    }
+  ]
+}

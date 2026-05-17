@@ -1,0 +1,23 @@
+{
+  "appName": "my-app",
+  "debug": false,
+  "port": 3000,
+  "database": {
+    "host": "staging-db.example.com",
+    "port": 5432,
+    "username": "staging_user",
+    "password": "stg_secret_456",
+    "database": "staging_db",
+    "ssl": true
+  },
+  "features": ["auth", "logging", "metrics", "cache"],
+  "rateLimit": {
+    "max": 500,
+    "windowMs": 60000
+  },
+  "redis": {
+    "host": "staging-redis.example.com",
+    "port": 6379,
+    "password": "redis_stg_secret"
+  }
+}

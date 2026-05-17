@@ -1,0 +1,25 @@
+{
+  "appName": "my-app",
+  "debug": false,
+  "port": 8080,
+  "database": {
+    "host": "prod-db.example.com",
+    "port": 5432,
+    "username": "prod_user",
+    "password": "prod_secret_789",
+    "database": "prod_db",
+    "ssl": true,
+    "poolSize": 20
+  },
+  "features": ["auth", "logging", "metrics", "cache", "cdn"],
+  "rateLimit": {
+    "max": 100,
+    "windowMs": 60000
+  },
+  "redis": {
+    "host": "prod-redis.example.com",
+    "port": 6379,
+    "password": "redis_prod_secret",
+    "cluster": true
+  }
+}

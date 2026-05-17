@@ -1,0 +1,27 @@
+{
+  "name": "json-config-diff",
+  "version": "1.0.0",
+  "description": "JSON 配置差异 CLI 工具 - 结构化比较多环境配置，支持数组归一、敏感遮蔽、默认值标注",
+  "main": "src/index.js",
+  "bin": {
+    "json-config-diff": "bin/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": ["json", "diff", "config", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

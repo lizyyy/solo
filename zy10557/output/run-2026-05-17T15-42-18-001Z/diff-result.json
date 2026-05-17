@@ -1,0 +1,303 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-17T15:42:18.003Z",
+    "version": "1.0.0"
+  },
+  "errors": [],
+  "comparisons": [
+    {
+      "key": "defaults..development",
+      "baseEnv": "defaults",
+      "targetEnv": "development",
+      "summary": {
+        "total": 10,
+        "byType": {
+          "changed": 1,
+          "removed": 4,
+          "added": 5
+        },
+        "sensitive": 0,
+        "defaultValue": 0,
+        "changed": 1,
+        "added": 5,
+        "removed": 4,
+        "arrayChanges": 0
+      },
+      "diffs": [
+        {
+          "type": "changed",
+          "path": "debug",
+          "oldValue": false,
+          "newValue": true,
+          "defaultValue": false,
+          "isDefaultValue": false
+        },
+        {
+          "type": "removed",
+          "path": "database.port",
+          "value": 5432,
+          "defaultValue": 5432,
+          "isDefaultValue": true
+        },
+        {
+          "type": "removed",
+          "path": "database.ssl",
+          "value": false,
+          "defaultValue": false,
+          "isDefaultValue": true
+        },
+        {
+          "type": "removed",
+          "path": "redis.port",
+          "value": 6379,
+          "defaultValue": 6379,
+          "isDefaultValue": true
+        },
+        {
+          "type": "removed",
+          "path": "rateLimit.windowMs",
+          "value": 60000,
+          "defaultValue": 60000,
+          "isDefaultValue": true
+        },
+        {
+          "type": "added",
+          "path": "appName",
+          "value": "my-app"
+        },
+        {
+          "type": "added",
+          "path": "database",
+          "value": {
+            "host": "localhost",
+            "port": 5432,
+            "username": "dev_user",
+            "password": "dev_secret_123",
+            "database": "dev_db"
+          }
+        },
+        {
+          "type": "added",
+          "path": "features",
+          "value": [
+            "auth",
+            "logging",
+            "metrics"
+          ]
+        },
+        {
+          "type": "added",
+          "path": "rateLimit",
+          "value": {
+            "max": 1000,
+            "windowMs": 60000
+          }
+        },
+        {
+          "type": "added",
+          "path": "redis",
+          "value": {
+            "host": "localhost",
+            "port": 6379
+          }
+        }
+      ]
+    },
+    {
+      "key": "defaults..production",
+      "baseEnv": "defaults",
+      "targetEnv": "production",
+      "summary": {
+        "total": 10,
+        "byType": {
+          "changed": 1,
+          "removed": 4,
+          "added": 5
+        },
+        "sensitive": 0,
+        "defaultValue": 0,
+        "changed": 1,
+        "added": 5,
+        "removed": 4,
+        "arrayChanges": 0
+      },
+      "diffs": [
+        {
+          "type": "changed",
+          "path": "port",
+          "oldValue": 3000,
+          "newValue": 8080,
+          "defaultValue": 3000,
+          "isDefaultValue": false
+        },
+        {
+          "type": "removed",
+          "path": "database.port",
+          "value": 5432,
+          "defaultValue": 5432,
+          "isDefaultValue": true
+        },
+        {
+          "type": "removed",
+          "path": "database.ssl",
+          "value": false,
+          "defaultValue": false,
+          "isDefaultValue": true
+        },
+        {
+          "type": "removed",
+          "path": "redis.port",
+          "value": 6379,
+          "defaultValue": 6379,
+          "isDefaultValue": true
+        },
+        {
+          "type": "removed",
+          "path": "rateLimit.windowMs",
+          "value": 60000,
+          "defaultValue": 60000,
+          "isDefaultValue": true
+        },
+        {
+          "type": "added",
+          "path": "appName",
+          "value": "my-app"
+        },
+        {
+          "type": "added",
+          "path": "database",
+          "value": {
+            "host": "prod-db.example.com",
+            "port": 5432,
+            "username": "prod_user",
+            "password": "prod_secret_789",
+            "database": "prod_db",
+            "ssl": true,
+            "poolSize": 20
+          }
+        },
+        {
+          "type": "added",
+          "path": "features",
+          "value": [
+            "auth",
+            "logging",
+            "metrics",
+            "cache",
+            "cdn"
+          ]
+        },
+        {
+          "type": "added",
+          "path": "rateLimit",
+          "value": {
+            "max": 100,
+            "windowMs": 60000
+          }
+        },
+        {
+          "type": "added",
+          "path": "redis",
+          "value": {
+            "host": "prod-redis.example.com",
+            "port": 6379,
+            "password": "redis_prod_secret",
+            "cluster": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "defaults..staging",
+      "baseEnv": "defaults",
+      "targetEnv": "staging",
+      "summary": {
+        "total": 9,
+        "byType": {
+          "removed": 4,
+          "added": 5
+        },
+        "sensitive": 0,
+        "defaultValue": 0,
+        "changed": 0,
+        "added": 5,
+        "removed": 4,
+        "arrayChanges": 0
+      },
+      "diffs": [
+        {
+          "type": "removed",
+          "path": "database.port",
+          "value": 5432,
+          "defaultValue": 5432,
+          "isDefaultValue": true
+        },
+        {
+          "type": "removed",
+          "path": "database.ssl",
+          "value": false,
+          "defaultValue": false,
+          "isDefaultValue": true
+        },
+        {
+          "type": "removed",
+          "path": "redis.port",
+          "value": 6379,
+          "defaultValue": 6379,
+          "isDefaultValue": true
+        },
+        {
+          "type": "removed",
+          "path": "rateLimit.windowMs",
+          "value": 60000,
+          "defaultValue": 60000,
+          "isDefaultValue": true
+        },
+        {
+          "type": "added",
+          "path": "appName",
+          "value": "my-app"
+        },
+        {
+          "type": "added",
+          "path": "database",
+          "value": {
+            "host": "staging-db.example.com",
+            "port": 5432,
+            "username": "staging_user",
+            "password": "stg_secret_456",
+            "database": "staging_db",
+            "ssl": true
+          }
+        },
+        {
+          "type": "added",
+          "path": "features",
+          "value": [
+            "auth",
+            "logging",
+            "metrics",
+            "cache"
+          ]
+        },
+        {
+          "type": "added",
+          "path": "rateLimit",
+          "value": {
+            "max": 500,
+            "windowMs": 60000
+          }
+        },
+        {
+          "type": "added",
+          "path": "redis",
+          "value": {
+            "host": "staging-redis.example.com",
+            "port": 6379,
+            "password": "redis_stg_secret"
+          }
+        }
+      ]
+    }
+  ]
+}
