@@ -1,0 +1,12 @@
+@/foo
+@components/Bar
+@utils/index
+@test/config
+./relative
+
+@/missing-quotes
+''
+`@/backticks`
+invalid path with spaces
+another-bad-line@
+@/double//slashes

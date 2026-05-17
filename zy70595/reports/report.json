@@ -1,0 +1,98 @@
+{
+  "summary": {
+    "totalImports": 11,
+    "validImports": 9,
+    "dirtyLines": 2,
+    "conflicts": 0
+  },
+  "paths": {
+    "@/*": [
+      "src/*"
+    ],
+    "@components/*": [
+      "src/components/*"
+    ],
+    "@utils/*": [
+      "src/utils/*"
+    ],
+    "@test/*": [
+      "test/*"
+    ]
+  },
+  "resolutions": [
+    {
+      "environment": "default",
+      "results": [
+        {
+          "originalPath": "@/foo",
+          "resolvedPath": "/Users/lzy/pro/solo/workspaces/zy70595/src/foo",
+          "fileExists": true,
+          "matchedAlias": "@/*"
+        },
+        {
+          "originalPath": "@components/Bar",
+          "resolvedPath": "/Users/lzy/pro/solo/workspaces/zy70595/src/components/Bar",
+          "fileExists": true,
+          "matchedAlias": "@components/*"
+        },
+        {
+          "originalPath": "@utils/index",
+          "resolvedPath": "/Users/lzy/pro/solo/workspaces/zy70595/src/utils/index",
+          "fileExists": true,
+          "matchedAlias": "@utils/*"
+        },
+        {
+          "originalPath": "@test/config",
+          "resolvedPath": "/Users/lzy/pro/solo/workspaces/zy70595/test/config",
+          "fileExists": false,
+          "matchedAlias": "@test/*"
+        },
+        {
+          "originalPath": "./relative",
+          "resolvedPath": "/Users/lzy/pro/solo/workspaces/zy70595/relative",
+          "fileExists": false
+        },
+        {
+          "originalPath": "@/missing-quotes",
+          "resolvedPath": "/Users/lzy/pro/solo/workspaces/zy70595/src/missing-quotes",
+          "fileExists": false,
+          "matchedAlias": "@/*"
+        },
+        {
+          "originalPath": "`@/backticks`",
+          "resolvedPath": "`@/backticks`",
+          "fileExists": false,
+          "error": "No matching alias found for: `@/backticks`"
+        },
+        {
+          "originalPath": "another-bad-line@",
+          "resolvedPath": "another-bad-line@",
+          "fileExists": false,
+          "error": "No matching alias found for: another-bad-line@"
+        },
+        {
+          "originalPath": "@/double//slashes",
+          "resolvedPath": "/Users/lzy/pro/solo/workspaces/zy70595/src/double/slashes",
+          "fileExists": false,
+          "matchedAlias": "@/*"
+        }
+      ]
+    }
+  ],
+  "conflicts": [],
+  "dirtyLines": [
+    {
+      "lineNumber": 8,
+      "rawLine": "''",
+      "reason": "Invalid import path format",
+      "category": "invalid_format"
+    },
+    {
+      "lineNumber": 10,
+      "rawLine": "invalid path with spaces",
+      "reason": "Invalid import path format",
+      "category": "invalid_format"
+    }
+  ],
+  "timestamp": "2026-05-17T04:09:36.152Z"
+}
