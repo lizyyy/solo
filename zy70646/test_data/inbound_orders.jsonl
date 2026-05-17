@@ -1,0 +1,3 @@
+{"id": "INB001", "batch_number": "BATCH-2024-001", "product_code": "PROD001", "product_name": "产品A", "quantity": 1000, "unit": "pcs", "supplier": "供应商1", "warehouse": "WH001", "inbound_date": "2024-01-15T08:00:00", "status": "received", "remarks": "首批入库"}
+{"id": "INB002", "batch_number": "BATCH-2024-002", "product_code": "PROD001", "product_name": "产品A", "quantity": 500, "unit": "pcs", "supplier": "供应商1", "warehouse": "WH002", "inbound_date": "2024-01-20T10:30:00", "status": "received", "remarks": "第二批入库"}
+{"id": "INB003", "batch_number": "BATCH-2024-003", "product_code": "PROD002", "product_name": "产品B", "quantity": 800, "unit": "pcs", "supplier": "供应商2", "warehouse": "WH001", "inbound_date": "2024-02-01T09:15:00", "status": "received", "remarks": "新产品线"}

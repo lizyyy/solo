@@ -1,0 +1,207 @@
+{
+  "recall_task_id": "01e63fcb-7ace-4460-be41-740c5a529a83",
+  "batch_number": "BATCH-2024-001",
+  "reason": "质量问题召回",
+  "status": "completed",
+  "created_at": "2026-05-17T10:56:56.767032",
+  "completed_at": "2026-05-17T10:56:56.770187",
+  "operator": "质检员A",
+  "total_affected_quantity": 900.0,
+  "total_customers_affected": 3,
+  "requires_manual_review": false,
+  "review_notes": null,
+  "batch_chain": [
+    {
+      "batch_number": "BATCH-2024-001",
+      "level": 0,
+      "quantity": 1000.0,
+      "path_type": "inbound"
+    },
+    {
+      "batch_number": "BATCH-2024-001-A",
+      "level": 1,
+      "quantity": 500.0,
+      "path_type": "unpack"
+    },
+    {
+      "batch_number": "BATCH-2024-001-A1",
+      "level": 2,
+      "quantity": 200.0,
+      "path_type": "unpack"
+    },
+    {
+      "batch_number": "BATCH-2024-001-A2",
+      "level": 2,
+      "quantity": 300.0,
+      "path_type": "unpack"
+    },
+    {
+      "batch_number": "BATCH-2024-001-B",
+      "level": 1,
+      "quantity": 500.0,
+      "path_type": "unpack"
+    }
+  ],
+  "customer_destinations": [
+    {
+      "customer_id": "CUST001",
+      "customer_name": "客户甲",
+      "quantity": 200.0,
+      "outbound_order_ids": [
+        "OUT001",
+        "OUT002"
+      ],
+      "latest_outbound_date": "2024-01-19T14:00:00",
+      "destination_addresses": [
+        "北京市朝阳区某某街道1号"
+      ]
+    },
+    {
+      "customer_id": "CUST002",
+      "customer_name": "客户乙",
+      "quantity": 400.0,
+      "outbound_order_ids": [
+        "OUT003",
+        "OUT005"
+      ],
+      "latest_outbound_date": "2024-01-22T15:00:00",
+      "destination_addresses": [
+        "上海市浦东新区某某路2号"
+      ]
+    },
+    {
+      "customer_id": "CUST003",
+      "customer_name": "客户丙",
+      "quantity": 300.0,
+      "outbound_order_ids": [
+        "OUT004"
+      ],
+      "latest_outbound_date": "2024-01-21T11:00:00",
+      "destination_addresses": [
+        "广州市天河区某某大道3号"
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "id": "81e79bb4-a296-43db-92f8-6cb136e1be9e",
+      "level": 0,
+      "path_type": "inbound",
+      "related_batch_number": "BATCH-2024-001",
+      "quantity": 1000.0,
+      "customer_id": null,
+      "customer_name": null,
+      "outbound_order_id": null,
+      "outbound_date": null,
+      "warehouse": null
+    },
+    {
+      "id": "8a035032-920f-49ae-a38c-1068b899b145",
+      "level": 1,
+      "path_type": "unpack",
+      "related_batch_number": "BATCH-2024-001-A",
+      "quantity": 500.0,
+      "customer_id": null,
+      "customer_name": null,
+      "outbound_order_id": null,
+      "outbound_date": null,
+      "warehouse": null
+    },
+    {
+      "id": "72e3dc5a-3da7-42f5-9ec7-fe9d05fe8fa8",
+      "level": 2,
+      "path_type": "unpack",
+      "related_batch_number": "BATCH-2024-001-A1",
+      "quantity": 200.0,
+      "customer_id": null,
+      "customer_name": null,
+      "outbound_order_id": null,
+      "outbound_date": null,
+      "warehouse": null
+    },
+    {
+      "id": "61bf0aa5-0cf9-44cb-8f45-29d59b3d6f0d",
+      "level": 3,
+      "path_type": "unpack",
+      "related_batch_number": "BATCH-2024-001-A2",
+      "quantity": 300.0,
+      "customer_id": null,
+      "customer_name": null,
+      "outbound_order_id": null,
+      "outbound_date": null,
+      "warehouse": null
+    },
+    {
+      "id": "0e46eae7-75e2-43b2-aecd-c03ab0afd9db",
+      "level": 4,
+      "path_type": "unpack",
+      "related_batch_number": "BATCH-2024-001-B",
+      "quantity": 500.0,
+      "customer_id": null,
+      "customer_name": null,
+      "outbound_order_id": null,
+      "outbound_date": null,
+      "warehouse": null
+    },
+    {
+      "id": "4b590887-880a-4174-9cc4-ee1673ea741c",
+      "level": 5,
+      "path_type": "customer",
+      "related_batch_number": "BATCH-2024-001-A1",
+      "quantity": 100.0,
+      "customer_id": "CUST001",
+      "customer_name": "客户甲",
+      "outbound_order_id": "OUT001",
+      "outbound_date": "2024-01-18T10:00:00",
+      "warehouse": "WH001"
+    },
+    {
+      "id": "b52851cf-6588-47a5-9f21-64ada681fcbe",
+      "level": 5,
+      "path_type": "customer",
+      "related_batch_number": "BATCH-2024-001-A1",
+      "quantity": 100.0,
+      "customer_id": "CUST001",
+      "customer_name": "客户甲",
+      "outbound_order_id": "OUT002",
+      "outbound_date": "2024-01-19T14:00:00",
+      "warehouse": "WH001"
+    },
+    {
+      "id": "5eeab3e8-e60c-4951-a2cd-2fc4209b2135",
+      "level": 5,
+      "path_type": "customer",
+      "related_batch_number": "BATCH-2024-001-A2",
+      "quantity": 200.0,
+      "customer_id": "CUST002",
+      "customer_name": "客户乙",
+      "outbound_order_id": "OUT003",
+      "outbound_date": "2024-01-20T09:00:00",
+      "warehouse": "WH001"
+    },
+    {
+      "id": "eab1d7db-bf90-48b5-b067-1ce21905ce91",
+      "level": 5,
+      "path_type": "customer",
+      "related_batch_number": "BATCH-2024-001-B",
+      "quantity": 200.0,
+      "customer_id": "CUST002",
+      "customer_name": "客户乙",
+      "outbound_order_id": "OUT005",
+      "outbound_date": "2024-01-22T15:00:00",
+      "warehouse": "WH001"
+    },
+    {
+      "id": "381ce2ba-3aaf-4713-9218-c16c4b969935",
+      "level": 5,
+      "path_type": "customer",
+      "related_batch_number": "BATCH-2024-001-B",
+      "quantity": 300.0,
+      "customer_id": "CUST003",
+      "customer_name": "客户丙",
+      "outbound_order_id": "OUT004",
+      "outbound_date": "2024-01-21T11:00:00",
+      "warehouse": "WH001"
+    }
+  ]
+}
