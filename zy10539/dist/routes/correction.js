@@ -1,0 +1,21 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const CorrectionController_1 = require("../controllers/CorrectionController");
+const router = (0, express_1.Router)();
+router.post('/', CorrectionController_1.correctionController.createCorrection.bind(CorrectionController_1.correctionController));
+router.get('/', CorrectionController_1.correctionController.listCorrections.bind(CorrectionController_1.correctionController));
+router.get('/:id', CorrectionController_1.correctionController.getCorrection.bind(CorrectionController_1.correctionController));
+router.post('/:id/preview', CorrectionController_1.correctionController.generatePreview.bind(CorrectionController_1.correctionController));
+router.post('/:id/submit', CorrectionController_1.correctionController.submitForApproval.bind(CorrectionController_1.correctionController));
+router.post('/:id/approve', CorrectionController_1.correctionController.approveCorrection.bind(CorrectionController_1.correctionController));
+router.post('/:id/reject', CorrectionController_1.correctionController.rejectCorrection.bind(CorrectionController_1.correctionController));
+router.post('/:id/execute', CorrectionController_1.correctionController.executeCorrection.bind(CorrectionController_1.correctionController));
+router.post('/:id/rollback', CorrectionController_1.correctionController.rollbackCorrection.bind(CorrectionController_1.correctionController));
+router.post('/:id/assets/:assetId/manual-fix', CorrectionController_1.correctionController.manualFix.bind(CorrectionController_1.correctionController));
+router.post('/exceptions/:exceptionId/resolve', CorrectionController_1.correctionController.resolveException.bind(CorrectionController_1.correctionController));
+router.post('/:id/report', CorrectionController_1.correctionController.generateReport.bind(CorrectionController_1.correctionController));
+router.get('/reports/:reportId', CorrectionController_1.correctionController.getReport.bind(CorrectionController_1.correctionController));
+router.get('/reports/:reportId/export', CorrectionController_1.correctionController.exportReport.bind(CorrectionController_1.correctionController));
+exports.default = router;
+//# sourceMappingURL=correction.js.map
