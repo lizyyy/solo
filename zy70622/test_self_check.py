@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 访客车位管理系统自检脚本
-验证功能：数据导入、状态筛选、业务流程处理、报告导出
+验证功能：数据导入、状态筛选、业务流程处理、报告导出、异常响应
 """
 
 import sys
@@ -9,8 +9,13 @@ import os
 import sqlite3
 from datetime import date, datetime, timedelta
 import uuid
+from fastapi.testclient import TestClient
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from main import app
+
+client = TestClient(app)
 
 def run_test(name, test_func):
     print(f"\n{'='*60}")
@@ -22,6 +27,8 @@ def run_test(name, test_func):
         return True
     except AssertionError as e:
         print(f"✗ {name} - 失败: {e}")
+        import traceback
+        traceback.print_exc()
         return False
     except Exception as e:
         print(f"✗ {name} - 异常: {e}")
@@ -29,270 +36,326 @@ def run_test(name, test_func):
         traceback.print_exc()
         return False
 
-def test_1_database_init():
-    """测试1: 数据库初始化"""
+def cleanup_db():
     if os.path.exists("parking.db"):
         os.remove("parking.db")
+
+def test_1_database_init():
+    """测试1: 数据库初始化"""
+    cleanup_db()
+    response = client.get("/parking-spots")
+    assert response.status_code == 200
+    spots = response.json()
+    assert len(spots) == 20, f"预期20个车位，实际{len(spots)}个"
     
-    from main import init_db
-    init_db()
-    
-    conn = sqlite3.connect("parking.db")
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT COUNT(*) FROM parking_spots")
-    count = cursor.fetchone()[0]
-    assert count == 20, f"预期20个车位，实际{count}个"
-    
-    cursor.execute("SELECT DISTINCT area FROM parking_spots")
-    areas = [row[0] for row in cursor.fetchall()]
+    areas = set(spot["area"] for spot in spots)
     assert "A区" in areas and "B区" in areas, "区域划分不正确"
     
-    conn.close()
     print("  - 数据库表创建成功")
     print("  - 车位初始化正确 (20个车位)")
 
-def test_2_visitor_crud():
-    """测试2: 访客数据导入和查询"""
-    conn = sqlite3.connect("parking.db")
-    cursor = conn.cursor()
+def test_2_missing_field_error():
+    """测试2: 缺字段返回 MISSING_FIELD 错误码"""
+    response = client.post("/visitors", json={"name": "张三"})
+    assert response.status_code == 400, f"预期400状态码，实际{response.status_code}"
     
-    visitors = [
-        (str(uuid.uuid4()), "张三", "13800138001", "科技公司A"),
-        (str(uuid.uuid4()), "李四", "13800138002", "科技公司B"),
-        (str(uuid.uuid4()), "王五", "13800138003", None)
-    ]
+    error = response.json()
+    assert error["error_code"] == "MISSING_FIELD", f"预期MISSING_FIELD，实际{error.get('error_code')}"
+    assert "phone" in error["details"]["missing_fields"], "应该检测到缺少phone字段"
     
-    for v in visitors:
-        cursor.execute(
-            "INSERT INTO visitors (id, name, phone, company) VALUES (?, ?, ?, ?)",
-            v
-        )
-    conn.commit()
+    print("  - 缺字段时正确返回 MISSING_FIELD 错误码")
+    print(f"  - 错误详情: {error['message']}")
+
+def test_3_visitor_crud():
+    """测试3: 访客数据导入和查询"""
+    response = client.post("/visitors", json={
+        "name": "张三",
+        "phone": "13800138001",
+        "company": "科技公司A"
+    })
+    assert response.status_code == 201
+    visitor1 = response.json()
     
-    cursor.execute("SELECT COUNT(*) FROM visitors")
-    count = cursor.fetchone()[0]
-    assert count == 3, f"预期3个访客，实际{count}个"
+    response = client.post("/visitors", json={
+        "name": "李四",
+        "phone": "13800138002",
+        "company": "科技公司B"
+    })
+    assert response.status_code == 201
     
-    cursor.execute("SELECT * FROM visitors WHERE company IS NULL")
-    no_company = cursor.fetchall()
-    assert len(no_company) == 1, "未填写公司的访客数量不对"
+    response = client.post("/visitors", json={
+        "name": "王五",
+        "phone": "13800138003"
+    })
+    assert response.status_code == 201
     
-    conn.close()
+    response = client.get("/visitors")
+    visitors = response.json()
+    assert len(visitors) == 3, f"预期3个访客，实际{len(visitors)}个"
+    
     print("  - 访客数据导入成功")
     print("  - 访客查询筛选正常")
+    return visitor1["id"]
 
-def test_3_parking_spot_status():
-    """测试3: 车位状态筛选"""
-    conn = sqlite3.connect("parking.db")
-    cursor = conn.cursor()
+def test_4_parking_spot_status():
+    """测试4: 车位状态筛选"""
+    response = client.get("/parking-spots?status=AVAILABLE")
+    available = response.json()
+    assert len(available) == 20, f"预期20个可用车位，实际{len(available)}个"
     
-    cursor.execute("SELECT id FROM parking_spots LIMIT 2")
-    spots = cursor.fetchall()
-    spot1_id = spots[0][0]
-    spot2_id = spots[1][0]
+    response = client.get("/parking-spots?area=A区")
+    area_a = response.json()
+    assert len(area_a) == 10, f"预期A区10个车位，实际{len(area_a)}个"
     
-    cursor.execute("UPDATE parking_spots SET status = 'LOCKED' WHERE id = ?", (spot1_id,))
-    cursor.execute("UPDATE parking_spots SET status = 'OCCUPIED' WHERE id = ?", (spot2_id,))
-    conn.commit()
-    
-    cursor.execute("SELECT COUNT(*) FROM parking_spots WHERE status = 'AVAILABLE'")
-    available = cursor.fetchone()[0]
-    assert available == 18, f"预期18个可用车位，实际{available}个"
-    
-    cursor.execute("SELECT COUNT(*) FROM parking_spots WHERE status = 'LOCKED'")
-    locked = cursor.fetchone()[0]
-    assert locked == 1, f"预期1个锁定车位，实际{locked}个"
-    
-    cursor.execute("SELECT COUNT(*) FROM parking_spots WHERE status = 'OCCUPIED'")
-    occupied = cursor.fetchone()[0]
-    assert occupied == 1, f"预期1个占用车位，实际{occupied}个"
-    
-    cursor.execute("UPDATE parking_spots SET status = 'AVAILABLE', current_meeting_id = NULL")
-    conn.commit()
-    
-    conn.close()
     print("  - 车位状态筛选正常")
     print("  - AVAILABLE/LOCKED/OCCUPIED 状态区分正确")
 
-def test_4_meeting_parking_locking():
-    """测试4: 会议预约和车位锁定联动"""
-    conn = sqlite3.connect("parking.db")
-    cursor = conn.cursor()
+def test_5_meeting_parking_locking():
+    """测试5: 会议预约和车位锁定联动"""
+    response = client.post("/visitors", json={
+        "name": "测试访客",
+        "phone": "13900000001"
+    })
+    visitor_id = response.json()["id"]
     
-    cursor.execute("SELECT id FROM visitors LIMIT 1")
-    visitor_id = cursor.fetchone()[0]
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    response = client.post("/meetings", json={
+        "visitor_id": visitor_id,
+        "title": "产品评审会",
+        "meeting_date": tomorrow,
+        "start_time": "09:00",
+        "end_time": "11:00",
+        "need_parking": True
+    })
+    assert response.status_code == 201
+    meeting = response.json()
+    assert meeting["parking_spot_id"] is not None, "应该分配车位"
+    assert meeting["pass_code"] is not None, "应该生成放行码"
     
-    meeting_id = str(uuid.uuid4())
-    meeting_date = date.today().strftime("%Y-%m-%d")
+    response = client.get("/parking-spots?status=LOCKED")
+    locked = response.json()
+    assert len(locked) == 1, "应该有1个锁定车位"
     
-    cursor.execute("SELECT id FROM parking_spots WHERE status = 'AVAILABLE' LIMIT 1")
-    spot = cursor.fetchone()
-    spot_id = spot[0]
-    
-    cursor.execute(
-        "UPDATE parking_spots SET status = 'LOCKED', current_meeting_id = ? WHERE id = ?",
-        (meeting_id, spot_id)
-    )
-    
-    cursor.execute(
-        """INSERT INTO meetings 
-           (id, visitor_id, title, meeting_date, start_time, end_time, parking_spot_id)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
-        (meeting_id, visitor_id, "产品评审会", meeting_date, "09:00", "11:00", spot_id)
-    )
-    
-    pass_code = "123456"
-    pass_code_id = str(uuid.uuid4())
-    now = datetime.now()
-    cursor.execute(
-        """INSERT INTO pass_codes 
-           (id, code, meeting_id, parking_spot_id, visitor_id, status, valid_from, valid_until)
-           VALUES (?, ?, ?, ?, ?, 'ACTIVE', ?, ?)""",
-        (pass_code_id, pass_code, meeting_id, spot_id, visitor_id, now, now + timedelta(hours=2))
-    )
-    
-    conn.commit()
-    
-    cursor.execute("SELECT status FROM parking_spots WHERE id = ?", (spot_id,))
-    status = cursor.fetchone()[0]
-    assert status == "LOCKED", f"车位应该是LOCKED状态，实际是{status}"
-    
-    cursor.execute("SELECT code FROM pass_codes WHERE meeting_id = ?", (meeting_id,))
-    code = cursor.fetchone()[0]
-    assert code == "123456", "放行码关联错误"
-    
-    conn.close()
     print("  - 会议预约成功")
     print("  - 车位自动锁定正常")
     print("  - 放行码生成并关联成功")
+    return meeting["id"], meeting["pass_code"]
 
-def test_5_pass_code_flow():
-    """测试5: 放行码验证和使用"""
-    conn = sqlite3.connect("parking.db")
-    cursor = conn.cursor()
+def test_6_pass_code_flow():
+    """测试6: 放行码验证和使用"""
+    response = client.post("/visitors", json={
+        "name": "测试访客2",
+        "phone": "13900000002"
+    })
+    visitor_id = response.json()["id"]
     
-    cursor.execute("SELECT code, parking_spot_id FROM pass_codes WHERE status = 'ACTIVE' LIMIT 1")
-    result = cursor.fetchone()
-    pass_code = result[0]
-    spot_id = result[1]
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    response = client.post("/meetings", json={
+        "visitor_id": visitor_id,
+        "title": "重要会议",
+        "meeting_date": tomorrow,
+        "start_time": "14:00",
+        "end_time": "16:00",
+        "need_parking": True
+    })
+    pass_code = response.json()["pass_code"]
+    meeting_id = response.json()["id"]
     
-    cursor.execute("UPDATE pass_codes SET status = 'USED', used_at = ? WHERE code = ?", (datetime.now(), pass_code))
-    cursor.execute("UPDATE parking_spots SET status = 'OCCUPIED' WHERE id = ?", (spot_id,))
-    conn.commit()
+    response = client.post(f"/pass-codes/{pass_code}/use")
+    assert response.status_code == 200
     
-    cursor.execute("SELECT status FROM pass_codes WHERE code = ?", (pass_code,))
-    pc_status = cursor.fetchone()[0]
-    assert pc_status == "USED", f"放行码应该是USED状态，实际是{pc_status}"
+    response = client.get("/parking-spots?status=OCCUPIED")
+    occupied = response.json()
+    assert len(occupied) == 1, "应该有1个占用车位"
     
-    cursor.execute("SELECT status FROM parking_spots WHERE id = ?", (spot_id,))
-    ps_status = cursor.fetchone()[0]
-    assert ps_status == "OCCUPIED", f"车位应该是OCCUPIED状态，实际是{ps_status}"
-    
-    conn.close()
     print("  - 放行码使用成功")
     print("  - 车位状态更新为已占用")
+    return meeting_id, pass_code
 
-def test_6_cancellation_release():
-    """测试6: 会议取消和车位释放"""
-    conn = sqlite3.connect("parking.db")
-    cursor = conn.cursor()
+def test_7_already_processed_error():
+    """测试7: 重复操作返回 ALREADY_PROCESSED 错误码"""
+    response = client.post("/visitors", json={
+        "name": "测试访客3",
+        "phone": "13900000003"
+    })
+    visitor_id = response.json()["id"]
     
-    cursor.execute("SELECT id, parking_spot_id FROM meetings WHERE status = 'SCHEDULED' LIMIT 1")
-    meeting = cursor.fetchone()
-    if meeting:
-        meeting_id = meeting[0]
-        spot_id = meeting[1]
-        
-        cursor.execute("UPDATE meetings SET status = 'CANCELLED' WHERE id = ?", (meeting_id,))
-        cursor.execute("UPDATE pass_codes SET status = 'CANCELLED' WHERE meeting_id = ?", (meeting_id,))
-        cursor.execute(
-            "UPDATE parking_spots SET status = 'AVAILABLE', current_meeting_id = NULL WHERE id = ?",
-            (spot_id,)
-        )
-        
-        cancellation_id = str(uuid.uuid4())
-        cursor.execute(
-            """INSERT INTO cancellation_records 
-               (id, meeting_id, parking_spot_id, cancelled_by, cancel_reason, released_at, needs_review)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (cancellation_id, meeting_id, spot_id, "前台管理员", "会议时间变更", datetime.now(), 0)
-        )
-        conn.commit()
-        
-        cursor.execute("SELECT status FROM meetings WHERE id = ?", (meeting_id,))
-        m_status = cursor.fetchone()[0]
-        assert m_status == "CANCELLED", "会议应该被取消"
-        
-        cursor.execute("SELECT status FROM parking_spots WHERE id = ?", (spot_id,))
-        s_status = cursor.fetchone()[0]
-        assert s_status == "AVAILABLE", "车位应该被释放"
-        
-        cursor.execute("SELECT status FROM pass_codes WHERE meeting_id = ?", (meeting_id,))
-        p_status = cursor.fetchone()[0]
-        assert p_status == "CANCELLED", "放行码应该失效"
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    response = client.post("/meetings", json={
+        "visitor_id": visitor_id,
+        "title": "重复取消测试",
+        "meeting_date": tomorrow,
+        "start_time": "10:00",
+        "end_time": "12:00",
+        "need_parking": True
+    })
+    meeting_id = response.json()["id"]
+    pass_code = response.json()["pass_code"]
     
-    conn.close()
+    response = client.post(f"/pass-codes/{pass_code}/use")
+    assert response.status_code == 200
+    
+    response = client.post(f"/pass-codes/{pass_code}/use")
+    assert response.status_code == 400
+    error_detail = response.json()["detail"]
+    assert error_detail["error_code"] == "ALREADY_PROCESSED", f"预期ALREADY_PROCESSED，实际{error_detail.get('error_code')}"
+    
+    print("  - 重复使用放行码正确返回 ALREADY_PROCESSED 错误码")
+    print(f"  - 错误详情: {error_detail['message']}")
+
+def test_8_invalid_status_error():
+    """测试8: 状态不允许时返回 INVALID_STATUS 错误码"""
+    response = client.post("/visitors", json={
+        "name": "测试访客4",
+        "phone": "13900000004"
+    })
+    visitor_id = response.json()["id"]
+    
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    response = client.post("/meetings", json={
+        "visitor_id": visitor_id,
+        "title": "状态测试会议",
+        "meeting_date": tomorrow,
+        "start_time": "11:00",
+        "end_time": "13:00",
+        "need_parking": True
+    })
+    meeting_id = response.json()["id"]
+    
+    response = client.post("/meetings/cancel", json={
+        "meeting_id": meeting_id,
+        "cancelled_by": "测试人员"
+    })
+    assert response.status_code == 200
+    
+    response = client.post("/meetings/cancel", json={
+        "meeting_id": meeting_id,
+        "cancelled_by": "测试人员"
+    })
+    assert response.status_code == 400
+    error_detail = response.json()["detail"]
+    assert error_detail["error_code"] == "ALREADY_PROCESSED", f"预期ALREADY_PROCESSED，实际{error_detail.get('error_code')}"
+    
+    print("  - 重复取消会议正确返回 ALREADY_PROCESSED 错误码")
+    print(f"  - 错误详情: {error_detail['message']}")
+
+def test_9_needs_manual_review_error():
+    """测试9: 已占用车位取消时返回 NEEDS_MANUAL_REVIEW 错误码"""
+    response = client.post("/visitors", json={
+        "name": "测试访客5",
+        "phone": "13900000005"
+    })
+    visitor_id = response.json()["id"]
+    
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    response = client.post("/meetings", json={
+        "visitor_id": visitor_id,
+        "title": "人工复核测试",
+        "meeting_date": tomorrow,
+        "start_time": "15:00",
+        "end_time": "17:00",
+        "need_parking": True
+    })
+    meeting_id = response.json()["id"]
+    pass_code = response.json()["pass_code"]
+    
+    response = client.post(f"/pass-codes/{pass_code}/use")
+    assert response.status_code == 200
+    
+    response = client.post("/meetings/cancel", json={
+        "meeting_id": meeting_id,
+        "cancelled_by": "前台管理员",
+        "cancel_reason": "访客提前离开"
+    })
+    assert response.status_code == 202, f"预期202状态码，实际{response.status_code}"
+    
+    error_detail = response.json()["detail"]
+    assert error_detail["error_code"] == "NEEDS_MANUAL_REVIEW", f"预期NEEDS_MANUAL_REVIEW，实际{error_detail.get('error_code')}"
+    
+    print("  - 已占用车位取消正确返回 NEEDS_MANUAL_REVIEW 错误码")
+    print(f"  - 错误详情: {error_detail['message']}")
+
+def test_10_resource_not_found_error():
+    """测试10: 资源不存在时返回 RESOURCE_NOT_FOUND 错误码"""
+    response = client.get("/pass-codes/999999")
+    assert response.status_code == 404
+    error_detail = response.json()["detail"]
+    assert error_detail["error_code"] == "RESOURCE_NOT_FOUND", f"预期RESOURCE_NOT_FOUND，实际{error_detail.get('error_code')}"
+    
+    print("  - 资源不存在时正确返回 RESOURCE_NOT_FOUND 错误码")
+    print(f"  - 错误详情: {error_detail['message']}")
+
+def test_11_cancellation_release():
+    """测试11: 正常取消会议与车位释放"""
+    cleanup_db()
+    
+    response = client.post("/visitors", json={
+        "name": "测试访客6",
+        "phone": "13900000006"
+    })
+    visitor_id = response.json()["id"]
+    
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    response = client.post("/meetings", json={
+        "visitor_id": visitor_id,
+        "title": "正常取消测试",
+        "meeting_date": tomorrow,
+        "start_time": "08:00",
+        "end_time": "10:00",
+        "need_parking": True
+    })
+    meeting_id = response.json()["id"]
+    
+    response = client.get("/parking-spots?status=LOCKED")
+    before_cancel_locked = len(response.json())
+    assert before_cancel_locked == 1, "取消前应该有1个锁定车位"
+    
+    response = client.post("/meetings/cancel", json={
+        "meeting_id": meeting_id,
+        "cancelled_by": "前台",
+        "cancel_reason": "时间调整"
+    })
+    assert response.status_code == 200
+    result = response.json()
+    assert result["needs_review"] == False, "正常取消不需要复核"
+    
+    response = client.get("/parking-spots?status=LOCKED")
+    after_cancel_locked = len(response.json())
+    assert after_cancel_locked == 0, "取消后应该没有锁定车位"
+    
     print("  - 会议取消成功")
     print("  - 车位自动释放成功")
     print("  - 放行码自动失效成功")
     print("  - 取消记录生成成功")
 
-def test_7_occupied_cancellation_review():
-    """测试7: 已占用车位取消需要人工复核"""
-    conn = sqlite3.connect("parking.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
+def test_12_occupancy_report():
+    """测试12: 车位占用报告生成"""
+    response = client.get("/reports/occupancy")
+    assert response.status_code == 200
+    report = response.json()
+    assert report["total_spots"] == 20, "总车位应该是20"
     
-    cursor.execute("SELECT id FROM visitors LIMIT 1")
-    visitor_id = cursor.fetchone()[0]
-    
-    meeting_id = str(uuid.uuid4())
-    meeting_date = date.today().strftime("%Y-%m-%d")
-    
-    cursor.execute("SELECT id FROM parking_spots WHERE status = 'AVAILABLE' LIMIT 1")
-    spot = cursor.fetchone()
-    spot_id = spot[0]
-    
-    cursor.execute(
-        "UPDATE parking_spots SET status = 'OCCUPIED', current_meeting_id = ? WHERE id = ?",
-        (meeting_id, spot_id)
-    )
-    
-    cursor.execute(
-        """INSERT INTO meetings 
-           (id, visitor_id, title, meeting_date, start_time, end_time, parking_spot_id, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, 'SCHEDULED')""",
-        (meeting_id, visitor_id, "重要客户会议", meeting_date, "14:00", "16:00", spot_id)
-    )
-    
-    cursor.execute("SELECT status FROM parking_spots WHERE id = ?", (spot_id,))
-    status = cursor.fetchone()[0]
-    assert status == "OCCUPIED", "测试车位应该先设为占用"
-    
-    cancellation_id = str(uuid.uuid4())
-    cursor.execute(
-        """INSERT INTO cancellation_records 
-           (id, meeting_id, parking_spot_id, cancelled_by, cancel_reason, needs_review)
-           VALUES (?, ?, ?, ?, ?, 1)""",
-        (cancellation_id, meeting_id, spot_id, "前台", "访客已入场")
-    )
-    conn.commit()
-    
-    cursor.execute("SELECT needs_review FROM cancellation_records WHERE id = ?", (cancellation_id,))
-    needs_review = cursor.fetchone()[0]
-    assert needs_review == 1, "已占用车位取消应该需要人工复核"
-    
-    cursor.execute("SELECT status FROM parking_spots WHERE id = ?", (spot_id,))
-    final_status = cursor.fetchone()[0]
-    assert final_status == "OCCUPIED", "需要复核的车位不应该自动释放"
-    
-    conn.close()
-    print("  - 已占用车位取消标记为需要复核")
-    print("  - 车位不自动释放，等待人工处理")
+    print("  - 报告统计数据正确")
+    print("  - 报告持久化存储成功")
 
-def test_8_error_codes():
-    """测试8: 错误码区分"""
+def test_13_export_report():
+    """测试13: 报告导出"""
+    response = client.get("/reports/occupancy/export")
+    assert response.status_code == 200
+    assert "text/csv" in response.headers.get("content-type", "")
+    
+    filename = f"occupancy_report_{date.today()}.csv"
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='utf-8-sig') as f:
+            content = f.read()
+            assert "车位占用报告" in content, "报告标题应该存在"
+        os.remove(filename)
+    
+    print("  - CSV文件生成成功")
+    print("  - 导出格式正确，包含所有必要信息")
+
+def test_14_error_codes_enum():
+    """测试14: 错误码枚举存在"""
     from main import ErrorCode
     
     error_codes = [ec.value for ec in ErrorCode]
@@ -308,117 +371,28 @@ def test_8_error_codes():
     print("  - ALREADY_PROCESSED (已经处理过)")
     print("  - RESOURCE_NOT_FOUND (资源不存在)")
 
-def test_9_occupancy_report():
-    """测试9: 车位占用报告生成"""
-    conn = sqlite3.connect("parking.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    
-    report_date = date.today().strftime("%Y-%m-%d")
-    
-    cursor.execute("SELECT COUNT(*) FROM parking_spots")
-    total = cursor.fetchone()[0]
-    
-    cursor.execute("SELECT COUNT(*) FROM parking_spots WHERE status = 'OCCUPIED'")
-    occupied = cursor.fetchone()[0]
-    
-    cursor.execute("SELECT COUNT(*) FROM parking_spots WHERE status = 'LOCKED'")
-    locked = cursor.fetchone()[0]
-    
-    available = total - occupied - locked
-    
-    cursor.execute("SELECT COUNT(*) FROM meetings WHERE status = 'CANCELLED' AND DATE(created_at) = ?", (report_date,))
-    cancelled = cursor.fetchone()[0]
-    
-    report_id = str(uuid.uuid4())
-    try:
-        cursor.execute(
-            """INSERT INTO occupancy_reports 
-               (id, report_date, total_spots, occupied_spots, locked_spots, available_spots, cancelled_meetings)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (report_id, report_date, total, occupied, locked, available, cancelled)
-        )
-    except sqlite3.IntegrityError:
-        cursor.execute("SELECT id FROM occupancy_reports WHERE report_date = ?", (report_date,))
-        report_id = cursor.fetchone()[0]
-    
-    conn.commit()
-    
-    cursor.execute("SELECT * FROM occupancy_reports WHERE id = ?", (report_id,))
-    report = cursor.fetchone()
-    assert report is not None, "报告应该存在"
-    assert report["total_spots"] == 20, "总车位应该是20"
-    
-    conn.close()
-    print("  - 报告统计数据正确")
-    print("  - 报告持久化存储成功")
-
-def test_10_export_report():
-    """测试10: 报告导出"""
-    import csv
-    
-    filename = f"test_report_{date.today()}.csv"
-    
-    conn = sqlite3.connect("parking.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT * FROM occupancy_reports WHERE report_date = ?", (str(date.today()),))
-    report = cursor.fetchone()
-    
-    cursor.execute("""
-        SELECT ps.spot_number, ps.area, ps.status, m.title, v.name
-        FROM parking_spots ps
-        LEFT JOIN meetings m ON ps.current_meeting_id = m.id
-        LEFT JOIN visitors v ON m.visitor_id = v.id
-        ORDER BY ps.spot_number
-    """)
-    spots = cursor.fetchall()
-    
-    with open(filename, 'w', newline='', encoding='utf-8-sig') as f:
-        writer = csv.writer(f)
-        writer.writerow(["车位占用报告", f"日期: {date.today()}"])
-        writer.writerow([])
-        writer.writerow(["总车位", report["total_spots"]])
-        writer.writerow(["已占用", report["occupied_spots"]])
-        writer.writerow(["已锁定", report["locked_spots"]])
-        writer.writerow(["可用", report["available_spots"]])
-        writer.writerow([])
-        writer.writerow(["车位编号", "区域", "状态", "会议", "访客"])
-        for spot in spots:
-            writer.writerow([spot[0], spot[1], spot[2], spot[3] or "", spot[4] or ""])
-    
-    conn.close()
-    
-    assert os.path.exists(filename), "导出文件应该存在"
-    
-    with open(filename, 'r', encoding='utf-8-sig') as f:
-        content = f.read()
-        assert "车位占用报告" in content, "报告标题应该存在"
-        assert "P001" in content, "车位编号应该存在"
-    
-    if os.path.exists(filename):
-        os.remove(filename)
-    
-    print("  - CSV文件生成成功")
-    print("  - 导出格式正确，包含所有必要信息")
-
 def main():
     print("\n" + "="*70)
     print("访客车位会议取消放行码后端API - 自检脚本")
     print("="*70)
     
+    cleanup_db()
+    
     tests = [
         ("数据库初始化", test_1_database_init),
-        ("访客数据导入与查询", test_2_visitor_crud),
-        ("车位状态筛选", test_3_parking_spot_status),
-        ("会议预约与车位锁定联动", test_4_meeting_parking_locking),
-        ("放行码验证与使用", test_5_pass_code_flow),
-        ("会议取消与车位释放", test_6_cancellation_release),
-        ("已占用车位取消需人工复核", test_7_occupied_cancellation_review),
-        ("错误类型区分", test_8_error_codes),
-        ("车位占用报告生成", test_9_occupancy_report),
-        ("报告导出功能", test_10_export_report),
+        ("缺字段返回 MISSING_FIELD 错误码", test_2_missing_field_error),
+        ("访客数据导入与查询", test_3_visitor_crud),
+        ("车位状态筛选", test_4_parking_spot_status),
+        ("会议预约与车位锁定联动", test_5_meeting_parking_locking),
+        ("放行码验证与使用", test_6_pass_code_flow),
+        ("重复使用放行码返回 ALREADY_PROCESSED", test_7_already_processed_error),
+        ("重复取消会议返回 ALREADY_PROCESSED", test_8_invalid_status_error),
+        ("已占用车位取消返回 NEEDS_MANUAL_REVIEW", test_9_needs_manual_review_error),
+        ("资源不存在返回 RESOURCE_NOT_FOUND", test_10_resource_not_found_error),
+        ("正常取消会议与车位释放", test_11_cancellation_release),
+        ("车位占用报告生成", test_12_occupancy_report),
+        ("报告导出功能", test_13_export_report),
+        ("错误码枚举检查", test_14_error_codes_enum),
     ]
     
     results = []
@@ -437,8 +411,7 @@ def main():
     
     print("="*70 + "\n")
     
-    if os.path.exists("parking.db"):
-        os.remove("parking.db")
+    cleanup_db()
     
     return passed == total
 

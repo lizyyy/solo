@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Depends, Request, status
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
 from datetime import datetime, date
 from typing import Optional, List
@@ -10,6 +11,42 @@ import os
 import uuid
 
 app = FastAPI(title="访客车位管理API", version="1.0.0")
+
+
+class ErrorResponse(BaseModel):
+    error_code: str
+    message: str
+    details: Optional[dict] = None
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    missing_fields = []
+    for error in errors:
+        if error.get("type") == "missing":
+            loc = error.get("loc", [])
+            field_name = ".".join([str(x) for x in loc if x != "body"])
+            missing_fields.append(field_name)
+    
+    if missing_fields:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error_code": "MISSING_FIELD",
+                "message": f"缺少必填字段: {', '.join(missing_fields)}",
+                "details": {"missing_fields": missing_fields}
+            }
+        )
+    
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={
+            "error_code": "INVALID_STATUS",
+            "message": "请求参数验证失败",
+            "details": {"errors": str(errors)}
+        }
+    )
 
 DATABASE = "parking.db"
 
@@ -37,6 +74,7 @@ class PassCodeStatus(str, Enum):
     CANCELLED = "CANCELLED"
 
 def get_db():
+    init_db()
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     try:
@@ -227,11 +265,6 @@ class CancellationResponse(BaseModel):
     released_at: Optional[datetime]
     needs_review: bool
 
-class ErrorResponse(BaseModel):
-    error_code: ErrorCode
-    message: str
-    details: Optional[dict] = None
-
 class ParkingSpotResponse(BaseModel):
     id: str
     spot_number: str
@@ -401,7 +434,7 @@ def list_meetings(status: Optional[MeetingStatus] = None, visitor_id: Optional[s
     cursor.execute(query, params)
     return [dict(row) for row in cursor.fetchall()]
 
-@app.post("/meetings/cancel", response_model=CancellationResponse)
+@app.post("/meetings/cancel")
 def cancel_meeting(cancel_req: CancellationRequest, db: sqlite3.Connection = Depends(get_db)):
     cursor = db.cursor()
     
@@ -464,6 +497,22 @@ def cancel_meeting(cancel_req: CancellationRequest, db: sqlite3.Connection = Dep
     row = cursor.fetchone()
     result = dict(row)
     result["needs_review"] = bool(result["needs_review"])
+    
+    if needs_review:
+        raise HTTPException(
+            status_code=202,
+            detail={
+                "error_code": "NEEDS_MANUAL_REVIEW",
+                "message": "会议已取消，但车位已被占用，需要人工复核后释放",
+                "details": {
+                    "cancellation_id": cancellation_id,
+                    "meeting_id": cancel_req.meeting_id,
+                    "parking_spot_id": parking_spot_id,
+                    "parking_spot_number": spot["spot_number"] if spot else None
+                }
+            }
+        )
+    
     return result
 
 @app.get("/pass-codes/{code}", response_model=PassCodeResponse)
