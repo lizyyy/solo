@@ -1,0 +1,32 @@
+{
+  "R001": {
+    "id": "R001",
+    "created_at": "2026-05-17T17:33:32.269370",
+    "updated_at": "2026-05-17T17:33:32.269374",
+    "room_number": "101",
+    "capacity": 2,
+    "current_visitors": 0,
+    "floor": "1楼",
+    "area": "A区"
+  },
+  "R002": {
+    "id": "R002",
+    "created_at": "2026-05-17T17:33:32.269386",
+    "updated_at": "2026-05-17T17:33:32.269386",
+    "room_number": "102",
+    "capacity": 3,
+    "current_visitors": 0,
+    "floor": "1楼",
+    "area": "A区"
+  },
+  "R003": {
+    "id": "R003",
+    "created_at": "2026-05-17T17:33:32.269391",
+    "updated_at": "2026-05-17T17:33:32.269391",
+    "room_number": "201",
+    "capacity": 2,
+    "current_visitors": 0,
+    "floor": "2楼",
+    "area": "B区"
+  }
+}
