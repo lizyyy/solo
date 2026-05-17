@@ -1,0 +1,16 @@
+{
+  "expectedParams": {
+    "page": ["page", "pageNum", "page_number", "current"],
+    "pageSize": ["pageSize", "size", "per_page", "limit", "count"]
+  },
+  "expectedResponseFields": {
+    "data": ["data", "items", "list", "records", "rows"],
+    "total": ["total", "totalCount", "total_count", "totalElements"],
+    "page": ["page", "pageNum", "current", "page_number"],
+    "pageSize": ["pageSize", "size", "per_page", "limit"],
+    "totalPages": ["totalPages", "pages", "page_count", "total_pages"]
+  },
+  "includePaths": [],
+  "excludePaths": ["/health", "/metrics"],
+  "httpMethods": ["get"]
+}

@@ -1,0 +1,312 @@
+{
+  "summary": {
+    "totalEndpoints": 4,
+    "paginationEndpoints": 3,
+    "inconsistentEndpoints": 1,
+    "totalInconsistencies": 2,
+    "bySeverity": {
+      "error": 2,
+      "warning": 3,
+      "info": 0
+    }
+  },
+  "endpoints": [
+    {
+      "path": "/api/users",
+      "method": "GET",
+      "summary": "获取用户列表 (规范)",
+      "paginationParams": {
+        "page": "page",
+        "pageSize": "pageSize",
+        "allParams": [
+          "page",
+          "pageSize"
+        ]
+      },
+      "responseFields": {
+        "data": "data",
+        "total": "total",
+        "page": "page",
+        "pageSize": "pageSize",
+        "allFields": [
+          "data",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "inconsistencies": [],
+      "isPaginationEndpoint": true
+    },
+    {
+      "path": "/api/orders",
+      "method": "GET",
+      "summary": "获取订单列表 (参数命名不一致)",
+      "paginationParams": {
+        "page": "pageNum",
+        "pageSize": "limit",
+        "allParams": [
+          "pageNum",
+          "limit"
+        ]
+      },
+      "responseFields": {
+        "data": "data",
+        "total": "total",
+        "allFields": [
+          "data",
+          "total"
+        ]
+      },
+      "inconsistencies": [
+        {
+          "type": "param_name",
+          "severity": "warning",
+          "message": "分页参数命名不一致: \"pageNum\" (期望 \"page\")",
+          "location": {
+            "path": "/api/orders",
+            "method": "get",
+            "paramName": "pageNum"
+          },
+          "expected": [
+            "page"
+          ],
+          "actual": "pageNum",
+          "suggestion": "建议重命名为 page"
+        },
+        {
+          "type": "param_name",
+          "severity": "warning",
+          "message": "分页参数命名不一致: \"limit\" (期望 \"pageSize\")",
+          "location": {
+            "path": "/api/orders",
+            "method": "get",
+            "paramName": "limit"
+          },
+          "expected": [
+            "pageSize"
+          ],
+          "actual": "limit",
+          "suggestion": "建议重命名为 pageSize"
+        }
+      ],
+      "isPaginationEndpoint": true
+    },
+    {
+      "path": "/api/products",
+      "method": "GET",
+      "summary": "获取产品列表 (缺少字段)",
+      "paginationParams": {
+        "page": "page",
+        "allParams": [
+          "page"
+        ]
+      },
+      "responseFields": {
+        "data": "items",
+        "allFields": [
+          "items"
+        ]
+      },
+      "inconsistencies": [
+        {
+          "type": "param_missing",
+          "severity": "error",
+          "message": "缺少分页参数: pageSize",
+          "location": {
+            "path": "/api/products",
+            "method": "get"
+          },
+          "expected": [
+            "pageSize",
+            "size",
+            "per_page",
+            "limit",
+            "count"
+          ],
+          "suggestion": "建议添加 pageSize 参数"
+        },
+        {
+          "type": "response_name",
+          "severity": "warning",
+          "message": "数据列表字段命名不一致: \"items\" (期望 \"data\")",
+          "location": {
+            "path": "/api/products",
+            "method": "get",
+            "fieldName": "items"
+          },
+          "expected": [
+            "data"
+          ],
+          "actual": "items",
+          "suggestion": "建议重命名为 data"
+        },
+        {
+          "type": "response_missing",
+          "severity": "error",
+          "message": "缺少总数字段: total",
+          "location": {
+            "path": "/api/products",
+            "method": "get"
+          },
+          "expected": [
+            "total",
+            "totalCount",
+            "total_count",
+            "totalElements"
+          ],
+          "suggestion": "建议添加 total 字段"
+        }
+      ],
+      "isPaginationEndpoint": true
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "summary": "健康检查",
+      "paginationParams": {
+        "allParams": []
+      },
+      "responseFields": {
+        "allFields": []
+      },
+      "inconsistencies": [],
+      "isPaginationEndpoint": false
+    }
+  ],
+  "inconsistencies": [
+    {
+      "type": "param_name",
+      "severity": "warning",
+      "message": "分页参数命名不一致: \"pageNum\" (期望 \"page\")",
+      "location": {
+        "path": "/api/orders",
+        "method": "get",
+        "paramName": "pageNum"
+      },
+      "expected": [
+        "page"
+      ],
+      "actual": "pageNum",
+      "suggestion": "建议重命名为 page"
+    },
+    {
+      "type": "param_name",
+      "severity": "warning",
+      "message": "分页参数命名不一致: \"limit\" (期望 \"pageSize\")",
+      "location": {
+        "path": "/api/orders",
+        "method": "get",
+        "paramName": "limit"
+      },
+      "expected": [
+        "pageSize"
+      ],
+      "actual": "limit",
+      "suggestion": "建议重命名为 pageSize"
+    },
+    {
+      "type": "param_missing",
+      "severity": "error",
+      "message": "缺少分页参数: pageSize",
+      "location": {
+        "path": "/api/products",
+        "method": "get"
+      },
+      "expected": [
+        "pageSize",
+        "size",
+        "per_page",
+        "limit",
+        "count"
+      ],
+      "suggestion": "建议添加 pageSize 参数"
+    },
+    {
+      "type": "response_name",
+      "severity": "warning",
+      "message": "数据列表字段命名不一致: \"items\" (期望 \"data\")",
+      "location": {
+        "path": "/api/products",
+        "method": "get",
+        "fieldName": "items"
+      },
+      "expected": [
+        "data"
+      ],
+      "actual": "items",
+      "suggestion": "建议重命名为 data"
+    },
+    {
+      "type": "response_missing",
+      "severity": "error",
+      "message": "缺少总数字段: total",
+      "location": {
+        "path": "/api/products",
+        "method": "get"
+      },
+      "expected": [
+        "total",
+        "totalCount",
+        "total_count",
+        "totalElements"
+      ],
+      "suggestion": "建议添加 total 字段"
+    }
+  ],
+  "config": {
+    "expectedParams": {
+      "page": [
+        "page",
+        "pageNum",
+        "page_number",
+        "current"
+      ],
+      "pageSize": [
+        "pageSize",
+        "size",
+        "per_page",
+        "limit",
+        "count"
+      ]
+    },
+    "expectedResponseFields": {
+      "data": [
+        "data",
+        "items",
+        "list",
+        "records",
+        "rows"
+      ],
+      "total": [
+        "total",
+        "totalCount",
+        "total_count",
+        "totalElements"
+      ],
+      "page": [
+        "page",
+        "pageNum",
+        "current",
+        "page_number"
+      ],
+      "pageSize": [
+        "pageSize",
+        "size",
+        "per_page",
+        "limit"
+      ],
+      "totalPages": [
+        "totalPages",
+        "pages",
+        "page_count",
+        "total_pages"
+      ]
+    },
+    "httpMethods": [
+      "get"
+    ]
+  },
+  "timestamp": "2026-05-17T16:44:22.199Z",
+  "openapiFile": "/Users/lzy/pro/solo/workspaces/zy10584/example-openapi.yaml"
+}

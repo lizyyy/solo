@@ -1,0 +1,92 @@
+openapi: 3.0.0
+info:
+  title: 示例 API
+  version: 1.0.0
+  description: 用于测试分页一致性检查的示例 API
+
+paths:
+  /api/users:
+    get:
+      summary: 获取用户列表 (规范)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  pageSize:
+                    type: integer
+
+  /api/orders:
+    get:
+      summary: 获取订单列表 (参数命名不一致)
+      parameters:
+        - name: pageNum
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+
+  /api/products:
+    get:
+      summary: 获取产品列表 (缺少字段)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+
+  /api/health:
+    get:
+      summary: 健康检查
+      responses:
+        '200':
+          description: 成功
