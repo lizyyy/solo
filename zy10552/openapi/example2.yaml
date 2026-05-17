@@ -1,0 +1,44 @@
+openapi: 3.0.0
+info:
+  title: 订单管理API
+  version: 1.0.0
+paths:
+  /api/orders:
+    get:
+      summary: 获取订单列表
+      description: 需要 user 或 manager 角色
+      tags:
+        - orders
+      security:
+        - bearerAuth:
+            - user
+            - manager
+      responses:
+        '200':
+          description: 成功
+    post:
+      summary: 创建订单
+      tags:
+        - orders
+      security:
+        - bearerAuth:
+            - user
+      responses:
+        '201':
+          description: 成功
+  /api/users:
+    get:
+      summary: 获取用户列表（重复接口）
+      tags:
+        - users
+      security:
+        - bearerAuth:
+            - admin
+      responses:
+        '200':
+          description: 成功
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

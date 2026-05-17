@@ -1,0 +1,76 @@
+openapi: 3.0.0
+info:
+  title: 用户管理API
+  version: 1.0.0
+  description: 用户管理系统的REST API
+paths:
+  /api/users:
+    get:
+      summary: 获取用户列表
+      description: 需要 admin 或 manager 角色
+      tags:
+        - users
+      security:
+        - bearerAuth:
+            - admin
+            - manager
+      responses:
+        '200':
+          description: 成功
+    post:
+      summary: 创建用户
+      description: 需要 admin 角色
+      tags:
+        - users
+      security:
+        - bearerAuth:
+            - admin
+      responses:
+        '201':
+          description: 成功
+  /api/users/{id}:
+    get:
+      summary: 获取用户详情
+      description: 需要 user, manager, admin 任一角色
+      tags:
+        - users
+      security:
+        - bearerAuth:
+            - user
+            - manager
+            - admin
+      responses:
+        '200':
+          description: 成功
+    put:
+      summary: 更新用户
+      tags:
+        - users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 成功
+    delete:
+      summary: 删除用户
+      tags:
+        - users
+      responses:
+        '204':
+          description: 成功
+  /api/public/health:
+    get:
+      summary: 健康检查
+      tags:
+        - public
+      responses:
+        '200':
+          description: 健康
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      x-roles:
+        - guest

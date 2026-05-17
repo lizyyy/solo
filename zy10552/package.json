@@ -1,0 +1,29 @@
+{
+  "name": "openapi-permission-matrix",
+  "version": "1.0.0",
+  "description": "OpenAPI权限矩阵CLI工具 - 生成角色到接口的权限矩阵",
+  "main": "src/index.js",
+  "bin": {
+    "openapi-permission-matrix": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": ["openapi", "swagger", "permission", "security", "matrix"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "json2md": "^2.0.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

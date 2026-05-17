@@ -1,0 +1,506 @@
+{
+  "generatedAt": "2026-05-17T15:22:27.249Z",
+  "inputDir": "/Users/lzy/pro/solo/workspaces/zy10552/openapi",
+  "summary": {
+    "totalEndpoints": 8,
+    "totalRoles": 4,
+    "missingCount": 4,
+    "errorCount": 0,
+    "duplicateCount": 1
+  },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/users",
+      "rawPath": "/api/users",
+      "operationId": "",
+      "summary": "获取用户列表",
+      "description": "需要 admin 或 manager 角色",
+      "tags": [
+        "users"
+      ],
+      "roles": [
+        "admin",
+        "manager",
+        "guest"
+      ],
+      "auth": {
+        "required": true,
+        "description": "角色",
+        "securitySchemes": [
+          "bearerAuth"
+        ]
+      },
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "GET",
+        "path": "/api/users"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/users",
+      "rawPath": "/api/users",
+      "operationId": "",
+      "summary": "创建用户",
+      "description": "需要 admin 角色",
+      "tags": [
+        "users"
+      ],
+      "roles": [
+        "admin",
+        "guest"
+      ],
+      "auth": {
+        "required": true,
+        "description": "角色",
+        "securitySchemes": [
+          "bearerAuth"
+        ]
+      },
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "POST",
+        "path": "/api/users"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/{id}",
+      "rawPath": "/api/users/{id}",
+      "operationId": "",
+      "summary": "获取用户详情",
+      "description": "需要 user, manager, admin 任一角色",
+      "tags": [
+        "users"
+      ],
+      "roles": [
+        "user",
+        "manager",
+        "admin",
+        "guest"
+      ],
+      "auth": {
+        "required": true,
+        "description": "角色",
+        "securitySchemes": [
+          "bearerAuth"
+        ]
+      },
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "GET",
+        "path": "/api/users/{id}"
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/api/users/{id}",
+      "rawPath": "/api/users/{id}",
+      "operationId": "",
+      "summary": "更新用户",
+      "description": "",
+      "tags": [
+        "users"
+      ],
+      "roles": [
+        "guest"
+      ],
+      "auth": {
+        "required": true,
+        "description": "",
+        "securitySchemes": [
+          "bearerAuth"
+        ]
+      },
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "PUT",
+        "path": "/api/users/{id}"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/users/{id}",
+      "rawPath": "/api/users/{id}",
+      "operationId": "",
+      "summary": "删除用户",
+      "description": "",
+      "tags": [
+        "users"
+      ],
+      "roles": [],
+      "auth": {
+        "required": false,
+        "description": "",
+        "securitySchemes": []
+      },
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "DELETE",
+        "path": "/api/users/{id}"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/public/health",
+      "rawPath": "/api/public/health",
+      "operationId": "",
+      "summary": "健康检查",
+      "description": "",
+      "tags": [
+        "public"
+      ],
+      "roles": [],
+      "auth": {
+        "required": false,
+        "description": "",
+        "securitySchemes": []
+      },
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "GET",
+        "path": "/api/public/health"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/orders",
+      "rawPath": "/api/orders",
+      "operationId": "",
+      "summary": "获取订单列表",
+      "description": "需要 user 或 manager 角色",
+      "tags": [
+        "orders"
+      ],
+      "roles": [
+        "user",
+        "manager"
+      ],
+      "auth": {
+        "required": true,
+        "description": "角色",
+        "securitySchemes": [
+          "bearerAuth"
+        ]
+      },
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example2.yaml",
+        "method": "GET",
+        "path": "/api/orders"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/orders",
+      "rawPath": "/api/orders",
+      "operationId": "",
+      "summary": "创建订单",
+      "description": "",
+      "tags": [
+        "orders"
+      ],
+      "roles": [
+        "user"
+      ],
+      "auth": {
+        "required": true,
+        "description": "",
+        "securitySchemes": [
+          "bearerAuth"
+        ]
+      },
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example2.yaml",
+        "method": "POST",
+        "path": "/api/orders"
+      }
+    }
+  ],
+  "roles": [
+    {
+      "name": "admin",
+      "endpointsCount": 3
+    },
+    {
+      "name": "guest",
+      "endpointsCount": 4
+    },
+    {
+      "name": "manager",
+      "endpointsCount": 3
+    },
+    {
+      "name": "user",
+      "endpointsCount": 3
+    }
+  ],
+  "matrix": {
+    "headers": [
+      "method",
+      "path",
+      "admin",
+      "guest",
+      "manager",
+      "user"
+    ],
+    "rows": [
+      {
+        "method": "GET",
+        "path": "/api/users",
+        "operationId": "",
+        "summary": "获取用户列表",
+        "authRequired": true,
+        "authDescription": "角色",
+        "source": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+          "method": "GET",
+          "path": "/api/users"
+        },
+        "roles": {
+          "admin": true,
+          "guest": true,
+          "manager": true,
+          "user": false
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/users",
+        "operationId": "",
+        "summary": "创建用户",
+        "authRequired": true,
+        "authDescription": "角色",
+        "source": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+          "method": "POST",
+          "path": "/api/users"
+        },
+        "roles": {
+          "admin": true,
+          "guest": true,
+          "manager": false,
+          "user": false
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/users/{id}",
+        "operationId": "",
+        "summary": "获取用户详情",
+        "authRequired": true,
+        "authDescription": "角色",
+        "source": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+          "method": "GET",
+          "path": "/api/users/{id}"
+        },
+        "roles": {
+          "admin": true,
+          "guest": true,
+          "manager": true,
+          "user": true
+        }
+      },
+      {
+        "method": "PUT",
+        "path": "/api/users/{id}",
+        "operationId": "",
+        "summary": "更新用户",
+        "authRequired": true,
+        "authDescription": "",
+        "source": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+          "method": "PUT",
+          "path": "/api/users/{id}"
+        },
+        "roles": {
+          "admin": false,
+          "guest": true,
+          "manager": false,
+          "user": false
+        }
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/users/{id}",
+        "operationId": "",
+        "summary": "删除用户",
+        "authRequired": false,
+        "authDescription": "",
+        "source": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+          "method": "DELETE",
+          "path": "/api/users/{id}"
+        },
+        "roles": {
+          "admin": false,
+          "guest": false,
+          "manager": false,
+          "user": false
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/public/health",
+        "operationId": "",
+        "summary": "健康检查",
+        "authRequired": false,
+        "authDescription": "",
+        "source": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+          "method": "GET",
+          "path": "/api/public/health"
+        },
+        "roles": {
+          "admin": false,
+          "guest": false,
+          "manager": false,
+          "user": false
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/orders",
+        "operationId": "",
+        "summary": "获取订单列表",
+        "authRequired": true,
+        "authDescription": "角色",
+        "source": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example2.yaml",
+          "method": "GET",
+          "path": "/api/orders"
+        },
+        "roles": {
+          "admin": false,
+          "guest": false,
+          "manager": true,
+          "user": true
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/orders",
+        "operationId": "",
+        "summary": "创建订单",
+        "authRequired": true,
+        "authDescription": "",
+        "source": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example2.yaml",
+          "method": "POST",
+          "path": "/api/orders"
+        },
+        "roles": {
+          "admin": false,
+          "guest": false,
+          "manager": false,
+          "user": true
+        }
+      }
+    ],
+    "roleNames": [
+      "admin",
+      "guest",
+      "manager",
+      "user"
+    ],
+    "stats": {
+      "totalEndpoints": 8,
+      "endpointsWithAuth": 6,
+      "endpointsWithoutAuth": 2,
+      "authCoverage": "75.0",
+      "roleStats": {
+        "admin": {
+          "total": 3,
+          "percentage": "37.5"
+        },
+        "guest": {
+          "total": 4,
+          "percentage": "50.0"
+        },
+        "manager": {
+          "total": 3,
+          "percentage": "37.5"
+        },
+        "user": {
+          "total": 3,
+          "percentage": "37.5"
+        }
+      }
+    }
+  },
+  "missing": [
+    {
+      "type": "no_auth_description",
+      "endpoint": {
+        "method": "PUT",
+        "path": "/api/users/{id}"
+      },
+      "message": "接口缺少鉴权说明",
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "PUT",
+        "path": "/api/users/{id}"
+      }
+    },
+    {
+      "type": "no_auth_required",
+      "endpoint": {
+        "method": "DELETE",
+        "path": "/api/users/{id}"
+      },
+      "message": "接口未配置鉴权要求",
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "DELETE",
+        "path": "/api/users/{id}"
+      }
+    },
+    {
+      "type": "no_auth_required",
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/public/health"
+      },
+      "message": "接口未配置鉴权要求",
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "GET",
+        "path": "/api/public/health"
+      }
+    },
+    {
+      "type": "no_auth_description",
+      "endpoint": {
+        "method": "POST",
+        "path": "/api/orders"
+      },
+      "message": "接口缺少鉴权说明",
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example2.yaml",
+        "method": "POST",
+        "path": "/api/orders"
+      }
+    }
+  ],
+  "duplicates": [
+    {
+      "endpoint": {
+        "method": "GET",
+        "path": "/api/users"
+      },
+      "firstSource": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example1.yaml",
+        "method": "GET",
+        "path": "/api/users"
+      },
+      "duplicateSource": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10552/openapi/example2.yaml",
+        "method": "GET",
+        "path": "/api/users"
+      }
+    }
+  ],
+  "errors": [],
+  "deduplicationNote": "去重口径: 按[method + path]组合去重，保留首次出现的定义"
+}
