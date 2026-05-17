@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Envoy路由模拟报告</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:20px}
+.summary{display:flex;gap:20px;margin-bottom:30px}
+.card{padding:20px;border-radius:8px;min-width:120px;text-align:center}
+.matched{background:#d4edda;color:#155724}
+.unmatched{background:#f8d7da;color:#721c24}
+.invalid{background:#fff3cd;color:#856404}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #ddd}
+th{background:#f8f9fa}
+tr:hover{background:#f5f5f5}
+.badge{padding:4px 8px;border-radius:4px;font-size:12px}
+.badge-success{background:#d4edda;color:#155724}
+.badge-danger{background:#f8d7da;color:#721c24}
+.badge-warning{background:#fff3cd;color:#856404}
+</style>
+</head>
+<body>
+<h1>Envoy路由模拟报告</h1>
+<p>生成时间: 20260517_132514</p>
+<div class="summary">
+<div class="card">总请求数<br><strong>8</strong></div>
+<div class="card matched">匹配成功<br><strong>8</strong></div>
+<div class="card unmatched">未匹配<br><strong>0</strong></div>
+<div class="card invalid">无效样本<br><strong>0</strong></div>
+</div>
+<h2>匹配结果详情</h2>
+<table>
+<thead>
+<tr>
+<th>行号</th><th>路径</th><th>状态</th><th>Cluster</th><th>路由名称</th><th>匹配原因</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+<td>1</td>
+<td>/api/v1/users/profile</td>
+<td>
+<span class="badge badge-success">匹配</span>
+
+</td>
+<td>service_a</td>
+<td>a_users</td>
+<td>domain精确匹配: api.internal.example.com, 前缀匹配: /api/v1/users, Header匹配: x-service-version</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>/api/v1/users/profile</td>
+<td>
+<span class="badge badge-success">匹配</span>
+
+</td>
+<td>default_service</td>
+<td>catch_all</td>
+<td>domain匹配: * (通配符), 前缀匹配: /</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>/api/v1/orders</td>
+<td>
+<span class="badge badge-success">匹配</span>
+
+</td>
+<td>service_b</td>
+<td>b_orders</td>
+<td>domain精确匹配: api.internal.example.com, 精确匹配: /api/v1/orders, Header匹配: x-env</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>/api/v1/orders</td>
+<td>
+<span class="badge badge-success">匹配</span>
+
+</td>
+<td>default_service</td>
+<td>catch_all</td>
+<td>domain匹配: * (通配符), 前缀匹配: /</td>
+</tr>
+
+<tr>
+<td>5</td>
+<td>/health</td>
+<td>
+<span class="badge badge-success">匹配</span>
+
+</td>
+<td>default_service</td>
+<td>health</td>
+<td>domain匹配: * (通配符), 精确匹配: /health</td>
+</tr>
+
+<tr>
+<td>6</td>
+<td>/index.html</td>
+<td>
+<span class="badge badge-success">匹配</span>
+
+</td>
+<td>default_service</td>
+<td>catch_all</td>
+<td>domain匹配: * (通配符), 前缀匹配: /</td>
+</tr>
+
+<tr>
+<td>7</td>
+<td>/api/v2/payments/123</td>
+<td>
+<span class="badge badge-success">匹配</span>
+
+</td>
+<td>service_c</td>
+<td>c_payments_regex</td>
+<td>domain精确匹配: api.internal.example.com, 正则匹配: /api/v[23]/payments.*, Header匹配: x-feature-flag</td>
+</tr>
+
+<tr>
+<td>8</td>
+<td>/api/v2/payments/123</td>
+<td>
+<span class="badge badge-success">匹配</span>
+
+</td>
+<td>default_service</td>
+<td>catch_all</td>
+<td>domain匹配: * (通配符), 前缀匹配: /</td>
+</tr>
+
+</tbody>
+</table>
+</body>
+</html>
+    

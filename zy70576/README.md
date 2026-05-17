@@ -25,15 +25,32 @@ pip install pyyaml jinja2 rich
 
 ### CLI 用法
 ```bash
-python -m envoy_route_simulator.cli -c config.yaml -r requests.jsonl -o python -m envoy_route_simulator.cli -cconfig`: Envoy 配置文件路径 (YAML/JSON)
+python -m envoy_route_simulator.cli -c examples/config/envoy.yaml -r examples/requests/test.jsonl
+```
+
+参数说明:
+- `-c, --config`: Envoy 配置文件路径 (YAML/JSON)
 - `-r, --requests`: 请求样本文件 (JSONL格式)
 - `-o, --output`: 报告输出目录 (默认: ./reports)
+
+### 完整运行示例
+```bash
+# 1. 安装依赖
+pip install pyyaml jinja2 rich
+
+# 2. 使用示例配置运行
+python -m envoy_route_simulator.cli \
+  -c examples/config/envoy.yaml \
+  -r examples/requests/test.jsonl \
+  -o ./reports
+```
 
 ### 请求样本格式
 每行一个JSON对象:
 ```json
-{"path": "/api/v1/users", "headers": {"host": "api.example.com", "x-version": "v1"}}
-{"path": "/health", "headers": {}}
+{"path": "/api/v1/users/profile", "headers": {"host": "api.internal.example.com", "x-service-version": "v1"}}
+{"path": "/health", "headers": {"host": "any.example.com"}}
+{"path": "/index.html", "headers": {"host": "www.example.com"}}
 ```
 
 ## 目录结构

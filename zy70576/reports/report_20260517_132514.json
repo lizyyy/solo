@@ -1,0 +1,122 @@
+{
+  "total": 8,
+  "matched": 8,
+  "unmatched": 0,
+  "invalid": 0,
+  "timestamp": "20260517_132514",
+  "clusters": [
+    "service_a",
+    "service_b",
+    "service_c",
+    "default_service"
+  ],
+  "results": [
+    {
+      "line_num": 1,
+      "path": "/api/v1/users/profile",
+      "matched": true,
+      "cluster": "service_a",
+      "route_name": "a_users",
+      "vhost": "internal_api",
+      "reason": [
+        "domain精确匹配: api.internal.example.com",
+        "前缀匹配: /api/v1/users",
+        "Header匹配: x-service-version"
+      ],
+      "error": ""
+    },
+    {
+      "line_num": 2,
+      "path": "/api/v1/users/profile",
+      "matched": true,
+      "cluster": "default_service",
+      "route_name": "catch_all",
+      "vhost": "default_host",
+      "reason": [
+        "domain匹配: * (通配符)",
+        "前缀匹配: /"
+      ],
+      "error": ""
+    },
+    {
+      "line_num": 3,
+      "path": "/api/v1/orders",
+      "matched": true,
+      "cluster": "service_b",
+      "route_name": "b_orders",
+      "vhost": "internal_api",
+      "reason": [
+        "domain精确匹配: api.internal.example.com",
+        "精确匹配: /api/v1/orders",
+        "Header匹配: x-env"
+      ],
+      "error": ""
+    },
+    {
+      "line_num": 4,
+      "path": "/api/v1/orders",
+      "matched": true,
+      "cluster": "default_service",
+      "route_name": "catch_all",
+      "vhost": "default_host",
+      "reason": [
+        "domain匹配: * (通配符)",
+        "前缀匹配: /"
+      ],
+      "error": ""
+    },
+    {
+      "line_num": 5,
+      "path": "/health",
+      "matched": true,
+      "cluster": "default_service",
+      "route_name": "health",
+      "vhost": "default_host",
+      "reason": [
+        "domain匹配: * (通配符)",
+        "精确匹配: /health"
+      ],
+      "error": ""
+    },
+    {
+      "line_num": 6,
+      "path": "/index.html",
+      "matched": true,
+      "cluster": "default_service",
+      "route_name": "catch_all",
+      "vhost": "default_host",
+      "reason": [
+        "domain匹配: * (通配符)",
+        "前缀匹配: /"
+      ],
+      "error": ""
+    },
+    {
+      "line_num": 7,
+      "path": "/api/v2/payments/123",
+      "matched": true,
+      "cluster": "service_c",
+      "route_name": "c_payments_regex",
+      "vhost": "internal_api",
+      "reason": [
+        "domain精确匹配: api.internal.example.com",
+        "正则匹配: /api/v[23]/payments.*",
+        "Header匹配: x-feature-flag"
+      ],
+      "error": ""
+    },
+    {
+      "line_num": 8,
+      "path": "/api/v2/payments/123",
+      "matched": true,
+      "cluster": "default_service",
+      "route_name": "catch_all",
+      "vhost": "default_host",
+      "reason": [
+        "domain匹配: * (通配符)",
+        "前缀匹配: /"
+      ],
+      "error": ""
+    }
+  ]
+}

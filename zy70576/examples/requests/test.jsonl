@@ -1,3 +1,8 @@
 {"path": "/api/v1/users/profile", "headers": {"host": "api.internal.example.com", "x-service-version": "v1"}}
-{"path": "/health", "headers": {"host": "test.example.com"}}
-{"path": "/index.html", "headers": {}}
+{"path": "/api/v1/users/profile", "headers": {"host": "wrong.example.com", "x-service-version": "v1"}}
+{"path": "/api/v1/orders", "headers": {"host": "api.internal.example.com", "x-env": "prod"}}
+{"path": "/api/v1/orders", "headers": {"host": "wrong.example.com", "x-env": "prod"}}
+{"path": "/health", "headers": {"host": "any.example.com"}}
+{"path": "/index.html", "headers": {"host": "www.example.com"}}
+{"path": "/api/v2/payments/123", "headers": {"host": "api.internal.example.com", "x-feature-flag": "true"}}
+{"path": "/api/v2/payments/123", "headers": {"host": "external.example.com", "x-feature-flag": "true"}}

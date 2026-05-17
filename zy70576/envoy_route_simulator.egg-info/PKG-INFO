@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: envoy-route-simulator
+Version: 1.0.0
+Summary: Envoy路由模拟工具 - 上线前验证路由规则
+Author: Engineering Team
+Requires-Python: >=3.8
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jinja2>=3.0
+Requires-Dist: rich>=13.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

@@ -1,0 +1,60 @@
+static_resources:
+  clusters:
+  - name: service_a
+    connect_timeout: 1s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+  - name: service_b
+    connect_timeout: 1s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+  - name: service_c
+    connect_timeout: 1s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+  - name: default_service
+    connect_timeout: 1s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+  listeners:
+  - name: listener_0
+    address:
+      socket_address: { address: 0.0.0.0, port_value: 10000 }
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+          stat_prefix: ingress_http
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: internal_api
+              domains: [api.internal.example.com]
+              routes:
+              - name: a_users
+                match:
+                  prefix: "/api/v1/users"
+                  headers: [{ name: x-service-version, exact_match: v1 }]
+                route: { cluster: service_a }
+              - name: b_orders
+                match:
+                  path: "/api/v1/orders"
+                  headers: [{ name: x-env, exact_match: prod }]
+                route: { cluster: service_b }
+              - name: c_payments_regex
+                match:
+                  regex: "/api/v[23]/payments.*"
+                  headers: [{ name: x-feature-flag, present_match: true }]
+                route: { cluster: service_c }
+            - name: default_host
+              domains: ["*"]
+              routes:
+              - name: health
+                match: { path: "/health" }
+                route: { cluster: default_service }
+              - name: catch_all
+                match: { prefix: "/" }
+                route: { cluster: default_service }
+          http_filters:
+          - name: envoy.filters.http.router

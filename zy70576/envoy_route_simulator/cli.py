@@ -137,6 +137,34 @@ def load_requests(file_path: str) -> List[RequestSample]:
         sys.exit(1)
     return samples
 
+def match_vhost_domain(request_host: str, vhost_domains: List[str]) -> Tuple[bool, str]:
+    request_host = (request_host or "").lower().strip()
+    if not request_host:
+        request_host = "*"
+    
+    request_host = request_host.split(":")[0]
+    
+    for domain in vhost_domains:
+        domain = domain.lower().strip()
+        
+        if domain == "*":
+            return True, "domain匹配: * (通配符)"
+        
+        if domain == request_host:
+            return True, f"domain精确匹配: {domain}"
+        
+        if domain.startswith("*") and domain.endswith(request_host[-(len(domain)-1):] if len(domain) > 1 else ""):
+            suffix = domain[1:]
+            if request_host.endswith(suffix):
+                return True, f"domain后缀匹配: {domain}"
+        
+        if domain.endswith("*") and request_host.startswith(domain[:-1]):
+            prefix = domain[:-1]
+            if request_host.startswith(prefix):
+                return True, f"domain前缀匹配: {domain}"
+    
+    return False, ""
+
 def match_header(header_rule: Dict, headers: Dict[str, str]) -> bool:
     name = header_rule.get("name", "").lower()
     actual_value = headers.get(name, "") or headers.get(name.title(), "") or ""
@@ -172,9 +200,16 @@ def match_request(request: RequestSample, config: EnvoyConfig) -> MatchResult:
     result = MatchResult(request=request, matched=False)
     if not request.is_valid:
         return result
+    
+    request_host = request.headers.get("host") or request.headers.get("Host") or ""
+    
     for vhost in config.virtual_hosts:
+        vhost_ok, vhost_reason = match_vhost_domain(request_host, vhost.domains)
+        if not vhost_ok:
+            continue
+            
         for route in vhost.routes:
-            reasons = []
+            reasons = [vhost_reason]
             path_ok, path_reason = match_path(route.match, request.path)
             if path_ok:
                 reasons.append(path_reason)
