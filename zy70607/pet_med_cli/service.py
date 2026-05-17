@@ -189,44 +189,56 @@ class MedicationService:
         if plan_ids is not None:
             plans_to_check = [p for p in plans_to_check if p["plan_id"] in plan_ids]
         
-        seen_alerts = set()
-        
+        pet_plans = {}
         for plan_data in plans_to_check:
             plan = MedicationPlan(**plan_data)
-            if not plan.is_active:
-                continue
-            
-            if plan.start_date > check_date:
-                continue
-            
-            executions = self.store.get_executions_by_plan(plan.plan_id)
-            executed_shifts = set(
-                (e["shift_date"], e["shift_type"]) 
-                for e in executions 
-                if e["status"] in [MedicationStatus.ADMINISTERED, MedicationStatus.SKIPPED]
-            )
-            
-            shifts_per_day = self._get_shifts_for_frequency(
-                plan.get_current_dosage().frequency if plan.get_current_dosage() else "daily"
-            )
-            
-            current_date = plan.start_date
-            while current_date <= check_date:
-                for shift in shifts_per_day:
-                    alert_key = (plan.pet_id, str(current_date), shift)
-                    if (str(current_date), shift) not in executed_shifts and alert_key not in seen_alerts:
-                        seen_alerts.add(alert_key)
-                        pet_data = self.store.get_pet(plan.pet_id)
-                        pet_name = pet_data["name"] if pet_data else "Unknown"
-                        missed.append({
-                            "plan_id": plan.plan_id,
-                            "pet_id": plan.pet_id,
-                            "pet_name": pet_name,
-                            "date": str(current_date),
-                            "shift": shift,
-                            "alert": f"漏喂告警: {pet_name} {current_date} {shift} 班次未喂药"
-                        })
-                current_date += timedelta(days=1)
+            if plan.pet_id not in pet_plans:
+                pet_plans[plan.pet_id] = []
+            pet_plans[plan.pet_id].append(plan)
+        
+        all_executions = self.store.get_all_executions()
+        if plan_ids is not None:
+            all_executions = [e for e in all_executions if e["plan_id"] in plan_ids]
+        
+        pet_executed_shifts = set()
+        for e in all_executions:
+            if e["status"] in [MedicationStatus.ADMINISTERED, MedicationStatus.SKIPPED]:
+                pet_plan = next((p for p in plans_to_check if p["plan_id"] == e["plan_id"]), None)
+                if pet_plan:
+                    pet_executed_shifts.add((pet_plan["pet_id"], e["shift_date"], e["shift_type"]))
+        
+        seen_alerts = set()
+        
+        for pet_id, plans in pet_plans.items():
+            for plan in plans:
+                if not plan.is_active:
+                    continue
+                
+                if plan.start_date > check_date:
+                    continue
+                
+                shifts_per_day = self._get_shifts_for_frequency(
+                    plan.get_current_dosage().frequency if plan.get_current_dosage() else "daily"
+                )
+                
+                current_date = plan.start_date
+                while current_date <= check_date:
+                    str_date = str(current_date)
+                    for shift in shifts_per_day:
+                        alert_key = (pet_id, str_date, shift)
+                        if alert_key not in pet_executed_shifts and alert_key not in seen_alerts:
+                            seen_alerts.add(alert_key)
+                            pet_data = self.store.get_pet(pet_id)
+                            pet_name = pet_data["name"] if pet_data else "Unknown"
+                            missed.append({
+                                "plan_id": plan.plan_id,
+                                "pet_id": pet_id,
+                                "pet_name": pet_name,
+                                "date": str_date,
+                                "shift": shift,
+                                "alert": f"漏喂告警: {pet_name} {current_date} {shift} 班次未喂药"
+                            })
+                    current_date += timedelta(days=1)
         
         return missed
 
