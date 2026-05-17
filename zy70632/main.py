@@ -16,6 +16,17 @@ from services import (
 )
 from database import get_db, init_db
 
+
+def safe_json_dumps(obj) -> str:
+    def default_converter(o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        return str(o)
+    try:
+        return json.dumps(obj, default=default_converter, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps({"raw_str": str(obj), "serialize_error": str(e)}, ensure_ascii=False)
+
 app = FastAPI(title="预制菜留样抽检销毁系统", version="1.0.0")
 
 app.add_middleware(
@@ -110,14 +121,17 @@ def create_sample_box(sample: schemas.SampleBoxCreate, db: Session = Depends(get
         db_sample = SampleBoxService.create_sample_box(db, sample)
         return {"code": 200, "message": "success", "data": {"id": db_sample.id}}
     except ValueError as e:
-        ExceptionService.create_exception(db, schemas.ExceptionRecordCreate(
-            related_type="sample_box",
-            related_id=0,
-            original_input=json.dumps(sample.model_dump()),
-            operator=sample.operator,
-            exception_type="create_error",
-            description=str(e)
-        ))
+        try:
+            ExceptionService.create_exception(db, schemas.ExceptionRecordCreate(
+                related_type="sample_box",
+                related_id=0,
+                original_input=safe_json_dumps(sample.model_dump()),
+                operator=sample.operator,
+                exception_type="create_error",
+                description=str(e)
+            ))
+        except Exception:
+            pass
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -162,14 +176,17 @@ def create_inspection(inspection: schemas.InspectionCreate, db: Session = Depend
         db_inspection = InspectionService.create_inspection(db, inspection)
         return {"code": 200, "message": "success", "data": {"id": db_inspection.id}}
     except ValueError as e:
-        ExceptionService.create_exception(db, schemas.ExceptionRecordCreate(
-            related_type="inspection",
-            related_id=0,
-            original_input=json.dumps(inspection.model_dump()),
-            operator=inspection.inspector,
-            exception_type="create_error",
-            description=str(e)
-        ))
+        try:
+            ExceptionService.create_exception(db, schemas.ExceptionRecordCreate(
+                related_type="inspection",
+                related_id=0,
+                original_input=safe_json_dumps(inspection.model_dump()),
+                operator=inspection.inspector,
+                exception_type="create_error",
+                description=str(e)
+            ))
+        except Exception:
+            pass
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -195,14 +212,17 @@ def apply_destruction(destruction: schemas.DestructionCreate, db: Session = Depe
         db_destruction = DestructionService.apply_destruction(db, destruction)
         return {"code": 200, "message": "success", "data": {"id": db_destruction.id}}
     except ValueError as e:
-        ExceptionService.create_exception(db, schemas.ExceptionRecordCreate(
-            related_type="destruction",
-            related_id=0,
-            original_input=json.dumps(destruction.model_dump()),
-            operator=destruction.applicant,
-            exception_type="create_error",
-            description=str(e)
-        ))
+        try:
+            ExceptionService.create_exception(db, schemas.ExceptionRecordCreate(
+                related_type="destruction",
+                related_id=0,
+                original_input=safe_json_dumps(destruction.model_dump()),
+                operator=destruction.applicant,
+                exception_type="create_error",
+                description=str(e)
+            ))
+        except Exception:
+            pass
         raise HTTPException(status_code=400, detail=str(e))
 
 
