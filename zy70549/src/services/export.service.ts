@@ -138,6 +138,14 @@ export class ExportService {
       [ExportRequestStatus.PROCESSING, new Date().toISOString(), requestId]
     );
 
+    // 同时获取事件和哈希链，按时间/序列排序
+    const events = await getAll(
+      `SELECT * FROM audit_log_events 
+       WHERE topic_id = ? AND timestamp >= ? AND timestamp <= ?
+       ORDER BY timestamp`,
+      [range.topic_id, range.start_time, range.end_time]
+    );
+
     const hashChains = await getAll(
       `SELECT * FROM hash_chains 
        WHERE topic_id = ? AND event_timestamp >= ? AND event_timestamp <= ?
@@ -145,23 +153,64 @@ export class ExportService {
       [range.topic_id, range.start_time, range.end_time]
     );
 
-    // 没有哈希链数据时直接标记为失败
-    let isValid = hashChains.length > 0;
     const mismatches: any[] = [];
 
-    if (hashChains.length === 0) {
+    // 校验1：哈希链数量必须与事件数量匹配
+    if (hashChains.length !== events.length) {
+      mismatches.push({
+        event_id: "N/A",
+        expected: events.length,
+        actual: hashChains.length,
+        sequence: -1,
+        issue: "hash_chain_count_mismatch"
+      });
+    }
+
+    // 校验2：没有数据时直接标记为失败
+    if (hashChains.length === 0 || events.length === 0) {
       mismatches.push({
         event_id: "N/A",
         expected_hash: "N/A",
         actual_hash: "N/A",
         sequence: 0,
-        issue: "no_hash_chain_data_found"
+        issue: "no_hash_chain_or_event_data_found"
       });
     }
 
+    // 校验3：每个事件的内容哈希验证
+    for (const event of events) {
+      const chain = hashChains.find((hc: any) => hc.event_id === event.id);
+      if (!chain) {
+        mismatches.push({
+          event_id: event.id,
+          expected_hash: "N/A",
+          actual_hash: "N/A",
+          sequence: -1,
+          issue: "hash_chain_not_found_for_event"
+        });
+        continue;
+      }
+
+      // 重新计算事件内容哈希并与存储值对比
+      const detailsObj = typeof event.details === "string" 
+        ? JSON.parse(event.details) 
+        : event.details;
+      const computedContentHash = HashService.generateHash(JSON.stringify(detailsObj));
+      
+      if (computedContentHash !== chain.event_content_hash) {
+        mismatches.push({
+          event_id: event.id,
+          expected_hash: chain.event_content_hash,
+          actual_hash: computedContentHash,
+          sequence: chain.chain_sequence,
+          issue: "event_content_hash_mismatch"
+        });
+      }
+    }
+
+    // 校验4：相邻哈希链的previous_hash/current_hash必须匹配
     for (let i = 1; i < hashChains.length; i++) {
       if (hashChains[i].previous_hash !== hashChains[i - 1].current_hash) {
-        isValid = false;
         mismatches.push({
           event_id: hashChains[i].event_id,
           expected_hash: hashChains[i - 1].current_hash,
@@ -171,6 +220,9 @@ export class ExportService {
         });
       }
     }
+
+    // 所有校验都通过才标记为有效
+    const isValid = mismatches.length === 0;
 
     const verificationId = uuidv4();
     const now = new Date().toISOString();
@@ -281,11 +333,14 @@ export class ExportService {
     const reportId = uuidv4();
     const now = new Date().toISOString();
 
-    const hasValidData = verification.hash_chain_valid === 1 && verification.verified_count > 0;
+    const countMatch = verification.verified_count === verification.total_count;
+    const hasValidData = verification.hash_chain_valid === 1 && verification.verified_count > 0 && countMatch;
     
     let conclusion = "该审计日志范围哈希链存在不匹配，数据可能被篡改，导出被阻止。";
     if (verification.verified_count === 0) {
       conclusion = "该审计日志范围未找到任何哈希链数据，无法证明数据完整性，导出被阻止。";
+    } else if (!countMatch) {
+      conclusion = "该审计日志范围哈希链数量与事件数量不匹配，数据完整性无法保证，导出被阻止。";
     } else if (hasValidData) {
       conclusion = "该审计日志范围哈希链完整，数据未被篡改，可以安全导出。";
     }
@@ -293,10 +348,11 @@ export class ExportService {
     const reportContent = {
       summary: `审计日志导出证明报告 - 主题: ${range!.topic_id}`,
       verification_details: {
-        hash_chain_integrity: hasValidData,
-        event_count_match: verification.verified_count === verification.total_count,
+        hash_chain_integrity: verification.hash_chain_valid === 1,
+        event_count_match: countMatch,
         has_hash_data: verification.verified_count > 0,
-        time_range_match: true
+        time_range_match: true,
+        all_checks_passed: hasValidData
       },
       hash_chain_summary: {
         start_hash: verification.first_hash,
