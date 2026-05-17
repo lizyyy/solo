@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List
 import json
 
-from database import get_db, init_db, Station, SupplyCategory, RaceConfig, SupplyRecord, GapRecord, TransferLog
+from database import get_db, init_db, Station, SupplyCategory, RaceConfig, SupplyRecord, GapRecord, TransferLog, ExceptionLog
 import schemas
 import services
 
