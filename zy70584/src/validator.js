@@ -1,5 +1,11 @@
 const { normalizeUrl, compareUrls, checkUrlParams, extractRedirectUriFromAuthUrl } = require('./urlNormalizer');
 
+function getUriValue(uri) {
+  if (typeof uri === 'string') return uri;
+  if (typeof uri === 'object' && uri !== null && uri.value) return uri.value;
+  return String(uri);
+}
+
 function validateConfig(config, targetEnv = null) {
   const results = {
     applications: [],
@@ -129,7 +135,8 @@ function validateConfig(config, targetEnv = null) {
         if (authUrlCheck.redirectUri) {
           const decodedRedirectUri = decodeURIComponent(authUrlCheck.redirectUri);
           const redirectMatch = env.authorizedRedirectUris.some(uri => {
-            const comparison = compareUrls(decodedRedirectUri, uri);
+            const uriValue = getUriValue(uri);
+            const comparison = compareUrls(decodedRedirectUri, uriValue);
             return comparison.exactMatch;
           });
           
@@ -193,24 +200,26 @@ function compareEnvironments(config) {
         const uris2 = env2.authorizedRedirectUris || [];
 
         uris1.forEach(uri => {
-          const found = uris2.some(u => compareUrls(uri, u).exactMatch);
+          const uriValue = getUriValue(uri);
+          const found = uris2.some(u => compareUrls(uriValue, getUriValue(u)).exactMatch);
           if (!found) {
             pairComparison.differences.push({
               type: 'URI_ONLY_IN_ENV1',
-              message: `仅在 ${env1.name} 存在: ${uri}`,
-              uri: uri,
+              message: `仅在 ${env1.name} 存在: ${uriValue}`,
+              uri: uriValue,
               environment: env1.name
             });
           }
         });
 
         uris2.forEach(uri => {
-          const found = uris1.some(u => compareUrls(uri, u).exactMatch);
+          const uriValue = getUriValue(uri);
+          const found = uris1.some(u => compareUrls(uriValue, getUriValue(u)).exactMatch);
           if (!found) {
             pairComparison.differences.push({
               type: 'URI_ONLY_IN_ENV2',
-              message: `仅在 ${env2.name} 存在: ${uri}`,
-              uri: uri,
+              message: `仅在 ${env2.name} 存在: ${uriValue}`,
+              uri: uriValue,
               environment: env2.name
             });
           }
@@ -419,5 +428,6 @@ module.exports = {
   attributeErrors,
   categorizeError,
   getSuggestion,
-  matchErrorSample
+  matchErrorSample,
+  getUriValue
 };

@@ -35,10 +35,10 @@ function runTest(test) {
   results.total++;
 }
 
-const { normalizeUrl, compareUrls, validateConfig, parseJsonWithSource } = require('../src/index');
+const { normalizeUrl, compareUrls, validateConfig, parseJsonWithSource, attributeErrors } = require('../src/index');
 
 test('模块导入正常', () => {
-  if (!normalizeUrl || !compareUrls || !validateConfig) {
+  if (!normalizeUrl || !compareUrls || !validateConfig || !attributeErrors) {
     throw new Error('核心模块导入失败');
   }
 });
@@ -106,6 +106,69 @@ test('配置溯源信息正确传递', () => {
   const uri = env.authorizedUris[0];
   if (!uri.source || uri.source.file === 'unknown') {
     throw new Error('URI溯源信息未传递');
+  }
+});
+
+test('完全匹配的回调地址不应产生REDIRECT_URI_MISMATCH错误', () => {
+  const configPath = path.join(__dirname, '../examples/valid-config.json');
+  const config = parseJsonWithSource(configPath);
+  const validationResult = validateConfig(config);
+  const result = attributeErrors(validationResult);
+  
+  if (result.summary.hasErrors !== false) {
+    throw new Error(`正确配置不应产生错误，但有 ${result.summary.totalErrors} 个错误`);
+  }
+  
+  if (result.summary.totalErrors !== 0) {
+    const mismatches = result.applications.flatMap(a => 
+      a.environments.flatMap(e => 
+        e.issues.filter(i => i.type === 'REDIRECT_URI_MISMATCH')
+      )
+    );
+    throw new Error(`不应产生REDIRECT_URI_MISMATCH，但发现 ${mismatches.length} 个: ${JSON.stringify(mismatches)}`);
+  }
+});
+
+test('完全不匹配的回调地址应正确检测到REDIRECT_URI_MISMATCH', () => {
+  const config = {
+    applications: [{
+      name: "测试错误应用",
+      environments: [{
+        name: "production",
+        authorizedRedirectUris: ["https://correct.example.com/callback"],
+        authUrl: "https://auth.example.com/authorize?client_id=test&redirect_uri=https%3A%2F%2Fwrong.example.com%2Fcb&response_type=code"
+      }]
+    }]
+  };
+  
+  const configWithSource = {
+    ...config,
+    _file: "test.json",
+    _fileName: "test.json",
+    applications: config.applications.map(app => ({
+      ...app,
+      _source: { file: "test.json", fileName: "test.json", line: 2, index: 0 },
+      environments: app.environments.map(env => ({
+        ...env,
+        _source: { file: "test.json", fileName: "test.json", line: 4, index: 0 },
+        authorizedRedirectUris: env.authorizedRedirectUris.map((uri, idx) => ({
+          value: uri,
+          _source: { file: "test.json", fileName: "test.json", line: 6 + idx * 2, index: idx, rawContent: uri }
+        }))
+      }))
+    }))
+  };
+  
+  const validationResult = validateConfig(configWithSource);
+  const result = attributeErrors(validationResult);
+  
+  if (result.summary.totalErrors !== 1) {
+    throw new Error(`应该检测到1个错误，但发现 ${result.summary.totalErrors} 个`);
+  }
+  
+  const mismatchIssue = result.applications[0].environments[0].issues.find(i => i.type === 'REDIRECT_URI_MISMATCH');
+  if (!mismatchIssue) {
+    throw new Error('应该检测到REDIRECT_URI_MISMATCH错误，但未发现');
   }
 });
 

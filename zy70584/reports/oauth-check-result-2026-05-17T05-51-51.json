@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-05-17T05:51:51.173Z",
+  "summary": {
+    "hasErrors": false,
+    "hasWarnings": false,
+    "totalApplications": 1,
+    "passedApplications": 1,
+    "failedApplications": 0,
+    "totalErrors": 0,
+    "totalWarnings": 0,
+    "errorCategories": {}
+  },
+  "applications": [
+    {
+      "appId": "test-app-001",
+      "appName": "测试正确配置的应用",
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/valid-config.json",
+        "fileName": "valid-config.json",
+        "line": 5,
+        "index": 0
+      },
+      "status": "PASSED",
+      "environments": [
+        {
+          "name": "production",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/valid-config.json",
+            "fileName": "valid-config.json",
+            "line": 8,
+            "index": 0
+          },
+          "status": "PASSED",
+          "authorizedUris": [
+            {
+              "original": "https://app.example.com/oauth/callback",
+              "normalized": "https://app.example.com/oauth/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/valid-config.json",
+                "fileName": "valid-config.json",
+                "line": 12,
+                "index": 0,
+                "rawContent": "https://app.example.com/oauth/callback"
+              },
+              "errors": [],
+              "warnings": []
+            },
+            {
+              "original": "https://app.example.com/auth",
+              "normalized": "https://app.example.com/auth",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/valid-config.json",
+                "fileName": "valid-config.json",
+                "line": 14,
+                "index": 1,
+                "rawContent": "https://app.example.com/auth"
+              },
+              "errors": [],
+              "warnings": []
+            }
+          ],
+          "issues": [],
+          "redirectUriFromAuthUrl": "https://app.example.com/oauth/callback"
+        }
+      ]
+    }
+  ],
+  "environmentComparison": {
+    "applications": []
+  },
+  "matchedErrorSamples": []
+}
