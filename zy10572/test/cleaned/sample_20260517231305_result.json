@@ -1,0 +1,774 @@
+{
+  "fileName": "sample.txt",
+  "filePath": "/Users/lzy/pro/solo/workspaces/zy10572/test/sample.txt",
+  "timestamp": "2026-05-17T16:13:05.961Z",
+  "encoding": {
+    "encoding": "UTF-8",
+    "confidence": 0.85,
+    "candidates": [
+      "UTF-8",
+      "GBK",
+      "GB2312",
+      "GB18030",
+      "BIG5"
+    ]
+  },
+  "stats": {
+    "invisibleCount": 0,
+    "mojibakeCount": 3,
+    "fullwidthCount": 65
+  },
+  "lineAnalysis": {
+    "totalLines": 30,
+    "badLineCount": 0,
+    "issueLineCount": 12,
+    "badLines": [],
+    "lineIssues": [
+      {
+        "lineNumber": 4,
+        "original": "用户12345: 您好，我想查询一下我的订单状态？",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 11,
+            "original": "，",
+            "replacement": ","
+          },
+          {
+            "position": 24,
+            "original": "？",
+            "replacement": "?"
+          }
+        ],
+        "issueCount": 2
+      },
+      {
+        "lineNumber": 6,
+        "original": "客服小Ａ: 您好，请问您的订单号是多少？",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 3,
+            "original": "Ａ",
+            "replacement": "A"
+          },
+          {
+            "position": 8,
+            "original": "，",
+            "replacement": ","
+          },
+          {
+            "position": 19,
+            "original": "？",
+            "replacement": "?"
+          }
+        ],
+        "issueCount": 3
+      },
+      {
+        "lineNumber": 8,
+        "original": "用户12345: 订单号是：ＯＲＤ２０２４００１�",
+        "invisibleChars": [],
+        "mojibake": [
+          {
+            "position": 24,
+            "charCode": "FFFD",
+            "char": "�",
+            "context": {
+              "before": "ＯＲＤ２０２４００１",
+              "after": ""
+            }
+          }
+        ],
+        "fullwidth": [
+          {
+            "position": 18,
+            "original": "０",
+            "replacement": "0"
+          },
+          {
+            "position": 21,
+            "original": "０",
+            "replacement": "0"
+          },
+          {
+            "position": 22,
+            "original": "０",
+            "replacement": "0"
+          },
+          {
+            "position": 23,
+            "original": "１",
+            "replacement": "1"
+          },
+          {
+            "position": 17,
+            "original": "２",
+            "replacement": "2"
+          },
+          {
+            "position": 19,
+            "original": "２",
+            "replacement": "2"
+          },
+          {
+            "position": 20,
+            "original": "４",
+            "replacement": "4"
+          },
+          {
+            "position": 16,
+            "original": "Ｄ",
+            "replacement": "D"
+          },
+          {
+            "position": 14,
+            "original": "Ｏ",
+            "replacement": "O"
+          },
+          {
+            "position": 15,
+            "original": "Ｒ",
+            "replacement": "R"
+          },
+          {
+            "position": 13,
+            "original": "：",
+            "replacement": ":"
+          }
+        ],
+        "issueCount": 12
+      },
+      {
+        "lineNumber": 10,
+        "original": "客服小Ａ: 好的，我帮您查询一下...",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 3,
+            "original": "Ａ",
+            "replacement": "A"
+          },
+          {
+            "position": 8,
+            "original": "，",
+            "replacement": ","
+          }
+        ],
+        "issueCount": 2
+      },
+      {
+        "lineNumber": 12,
+        "original": "用户12345: 还有一个问题，我在支付时遇到了问题，提示＂支付失败＂",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 15,
+            "original": "，",
+            "replacement": ","
+          },
+          {
+            "position": 26,
+            "original": "，",
+            "replacement": ","
+          },
+          {
+            "position": 29,
+            "original": "＂",
+            "replacement": "\""
+          },
+          {
+            "position": 34,
+            "original": "＂",
+            "replacement": "\""
+          }
+        ],
+        "issueCount": 4
+      },
+      {
+        "lineNumber": 14,
+        "original": "客服小Ａ: 请您尝试重新支付，或者换一张银行卡试试。",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 3,
+            "original": "Ａ",
+            "replacement": "A"
+          },
+          {
+            "position": 14,
+            "original": "，",
+            "replacement": ","
+          },
+          {
+            "position": 25,
+            "original": "。",
+            "replacement": "."
+          }
+        ],
+        "issueCount": 3
+      },
+      {
+        "lineNumber": 16,
+        "original": "��题记录:",
+        "invisibleChars": [],
+        "mojibake": [
+          {
+            "position": 0,
+            "charCode": "FFFD",
+            "char": "�",
+            "context": {
+              "before": "",
+              "after": "�题记录:"
+            }
+          },
+          {
+            "position": 1,
+            "charCode": "FFFD",
+            "char": "�",
+            "context": {
+              "before": "�",
+              "after": "题记录:"
+            }
+          }
+        ],
+        "fullwidth": [],
+        "issueCount": 2
+      },
+      {
+        "lineNumber": 20,
+        "original": "联系电话：１３８００１３８０００",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 8,
+            "original": "０",
+            "replacement": "0"
+          },
+          {
+            "position": 9,
+            "original": "０",
+            "replacement": "0"
+          },
+          {
+            "position": 13,
+            "original": "０",
+            "replacement": "0"
+          },
+          {
+            "position": 14,
+            "original": "０",
+            "replacement": "0"
+          },
+          {
+            "position": 15,
+            "original": "０",
+            "replacement": "0"
+          },
+          {
+            "position": 5,
+            "original": "１",
+            "replacement": "1"
+          },
+          {
+            "position": 10,
+            "original": "１",
+            "replacement": "1"
+          },
+          {
+            "position": 6,
+            "original": "３",
+            "replacement": "3"
+          },
+          {
+            "position": 11,
+            "original": "３",
+            "replacement": "3"
+          },
+          {
+            "position": 7,
+            "original": "８",
+            "replacement": "8"
+          },
+          {
+            "position": 12,
+            "original": "８",
+            "replacement": "8"
+          },
+          {
+            "position": 4,
+            "original": "：",
+            "replacement": ":"
+          }
+        ],
+        "issueCount": 12
+      },
+      {
+        "lineNumber": 21,
+        "original": "邮箱地址：ｔｅｓｔ＠ｅｘａｍｐｌｅ．ｃｏｍ",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 12,
+            "original": "ａ",
+            "replacement": "a"
+          },
+          {
+            "position": 18,
+            "original": "ｃ",
+            "replacement": "c"
+          },
+          {
+            "position": 6,
+            "original": "ｅ",
+            "replacement": "e"
+          },
+          {
+            "position": 10,
+            "original": "ｅ",
+            "replacement": "e"
+          },
+          {
+            "position": 16,
+            "original": "ｅ",
+            "replacement": "e"
+          },
+          {
+            "position": 15,
+            "original": "ｌ",
+            "replacement": "l"
+          },
+          {
+            "position": 13,
+            "original": "ｍ",
+            "replacement": "m"
+          },
+          {
+            "position": 20,
+            "original": "ｍ",
+            "replacement": "m"
+          },
+          {
+            "position": 19,
+            "original": "ｏ",
+            "replacement": "o"
+          },
+          {
+            "position": 14,
+            "original": "ｐ",
+            "replacement": "p"
+          },
+          {
+            "position": 7,
+            "original": "ｓ",
+            "replacement": "s"
+          },
+          {
+            "position": 5,
+            "original": "ｔ",
+            "replacement": "t"
+          },
+          {
+            "position": 8,
+            "original": "ｔ",
+            "replacement": "t"
+          },
+          {
+            "position": 11,
+            "original": "ｘ",
+            "replacement": "x"
+          },
+          {
+            "position": 17,
+            "original": "．",
+            "replacement": "."
+          },
+          {
+            "position": 4,
+            "original": "：",
+            "replacement": ":"
+          },
+          {
+            "position": 9,
+            "original": "＠",
+            "replacement": "@"
+          }
+        ],
+        "issueCount": 17
+      },
+      {
+        "lineNumber": 23,
+        "original": "地址：北京市朝阳区某某路１２３号",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 12,
+            "original": "１",
+            "replacement": "1"
+          },
+          {
+            "position": 13,
+            "original": "２",
+            "replacement": "2"
+          },
+          {
+            "position": 14,
+            "original": "３",
+            "replacement": "3"
+          },
+          {
+            "position": 2,
+            "original": "：",
+            "replacement": ":"
+          }
+        ],
+        "issueCount": 4
+      },
+      {
+        "lineNumber": 25,
+        "original": "备注：用户提到＂发货慢＂的问题，需要跟进",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 15,
+            "original": "，",
+            "replacement": ","
+          },
+          {
+            "position": 2,
+            "original": "：",
+            "replacement": ":"
+          },
+          {
+            "position": 7,
+            "original": "＂",
+            "replacement": "\""
+          },
+          {
+            "position": 11,
+            "original": "＂",
+            "replacement": "\""
+          }
+        ],
+        "issueCount": 4
+      },
+      {
+        "lineNumber": 27,
+        "original": "特殊字符测试：\\x00\\x01\\x02\\x03\\x04（这里包含不可见字符）",
+        "invisibleChars": [],
+        "mojibake": [],
+        "fullwidth": [
+          {
+            "position": 6,
+            "original": "：",
+            "replacement": ":"
+          },
+          {
+            "position": 27,
+            "original": "（",
+            "replacement": "("
+          },
+          {
+            "position": 37,
+            "original": "）",
+            "replacement": ")"
+          }
+        ],
+        "issueCount": 3
+      }
+    ]
+  },
+  "issues": {
+    "invisibleChars": [],
+    "mojibake": [
+      {
+        "position": 114,
+        "charCode": "FFFD",
+        "char": "�",
+        "context": {
+          "before": "ＯＲＤ２０２４００１",
+          "after": "\n\n客服小Ａ: 好的"
+        }
+      },
+      {
+        "position": 203,
+        "charCode": "FFFD",
+        "char": "�",
+        "context": {
+          "before": "一张银行卡试试。\n\n",
+          "after": "�题记录:\n- 20"
+        }
+      },
+      {
+        "position": 204,
+        "charCode": "FFFD",
+        "char": "�",
+        "context": {
+          "before": "张银行卡试试。\n\n�",
+          "after": "题记录:\n- 202"
+        }
+      }
+    ],
+    "fullwidthChars": [
+      {
+        "position": 108,
+        "original": "０",
+        "replacement": "0"
+      },
+      {
+        "position": 111,
+        "original": "０",
+        "replacement": "0"
+      },
+      {
+        "position": 112,
+        "original": "０",
+        "replacement": "0"
+      },
+      {
+        "position": 278,
+        "original": "０",
+        "replacement": "0"
+      },
+      {
+        "position": 279,
+        "original": "０",
+        "replacement": "0"
+      },
+      {
+        "position": 283,
+        "original": "０",
+        "replacement": "0"
+      },
+      {
+        "position": 284,
+        "original": "０",
+        "replacement": "0"
+      },
+      {
+        "position": 285,
+        "original": "０",
+        "replacement": "0"
+      },
+      {
+        "position": 113,
+        "original": "１",
+        "replacement": "1"
+      },
+      {
+        "position": 275,
+        "original": "１",
+        "replacement": "1"
+      },
+      {
+        "position": 280,
+        "original": "１",
+        "replacement": "1"
+      },
+      {
+        "position": 322,
+        "original": "１",
+        "replacement": "1"
+      },
+      {
+        "position": 107,
+        "original": "２",
+        "replacement": "2"
+      },
+      {
+        "position": 109,
+        "original": "２",
+        "replacement": "2"
+      },
+      {
+        "position": 323,
+        "original": "２",
+        "replacement": "2"
+      },
+      {
+        "position": 276,
+        "original": "３",
+        "replacement": "3"
+      },
+      {
+        "position": 281,
+        "original": "３",
+        "replacement": "3"
+      },
+      {
+        "position": 324,
+        "original": "３",
+        "replacement": "3"
+      },
+      {
+        "position": 110,
+        "original": "４",
+        "replacement": "4"
+      },
+      {
+        "position": 277,
+        "original": "８",
+        "replacement": "8"
+      },
+      {
+        "position": 282,
+        "original": "８",
+        "replacement": "8"
+      },
+      {
+        "position": 299,
+        "original": "ａ",
+        "replacement": "a"
+      },
+      {
+        "position": 305,
+        "original": "ｃ",
+        "replacement": "c"
+      },
+      {
+        "position": 293,
+        "original": "ｅ",
+        "replacement": "e"
+      },
+      {
+        "position": 297,
+        "original": "ｅ",
+        "replacement": "e"
+      },
+      {
+        "position": 303,
+        "original": "ｅ",
+        "replacement": "e"
+      },
+      {
+        "position": 302,
+        "original": "ｌ",
+        "replacement": "l"
+      },
+      {
+        "position": 300,
+        "original": "ｍ",
+        "replacement": "m"
+      },
+      {
+        "position": 307,
+        "original": "ｍ",
+        "replacement": "m"
+      },
+      {
+        "position": 306,
+        "original": "ｏ",
+        "replacement": "o"
+      },
+      {
+        "position": 301,
+        "original": "ｐ",
+        "replacement": "p"
+      },
+      {
+        "position": 294,
+        "original": "ｓ",
+        "replacement": "s"
+      },
+      {
+        "position": 292,
+        "original": "ｔ",
+        "replacement": "t"
+      },
+      {
+        "position": 295,
+        "original": "ｔ",
+        "replacement": "t"
+      },
+      {
+        "position": 298,
+        "original": "ｘ",
+        "replacement": "x"
+      },
+      {
+        "position": 71,
+        "original": "Ａ",
+        "replacement": "A"
+      },
+      {
+        "position": 120,
+        "original": "Ａ",
+        "replacement": "A"
+      },
+      {
+        "position": 178,
+        "original": "Ａ",
+        "replacement": "A"
+      },
+      {
+        "position": 106,
+        "original": "Ｄ",
+        "replacement": "D"
+      },
+      {
+        "position": 104,
+        "original": "Ｏ",
+        "replacement": "O"
+      },
+      {
+        "position": 105,
+        "original": "Ｒ",
+        "replacement": "R"
+      },
+      {
+        "position": 52,
+        "original": "，",
+        "replacement": ","
+      },
+      {
+        "position": 76,
+        "original": "，",
+        "replacement": ","
+      },
+      {
+        "position": 125,
+        "original": "，",
+        "replacement": ","
+      },
+      {
+        "position": 153,
+        "original": "，",
+        "replacement": ","
+      },
+      {
+        "position": 164,
+        "original": "，",
+        "replacement": ","
+      },
+      {
+        "position": 189,
+        "original": "，",
+        "replacement": ","
+      },
+      {
+        "position": 343,
+        "original": "，",
+        "replacement": ","
+      },
+      {
+        "position": 304,
+        "original": "．",
+        "replacement": "."
+      },
+      {
+        "position": 200,
+        "original": "。",
+        "replacement": "."
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "total": 4,
+  "success": 4,
+  "failed": 0,
+  "files": [
+    {
+      "file": "file2.txt",
+      "status": "success",
+      "stats": {
+        "invisibleCount": 5,
+        "mojibakeCount": 4,
+        "fullwidthCount": 64
+      }
+    },
+    {
+      "file": "file3.csv",
+      "status": "success",
+      "stats": {
+        "invisibleCount": 5,
+        "mojibakeCount": 4,
+        "fullwidthCount": 64
+      }
+    },
+    {
+      "file": "sample.txt",
+      "status": "success",
+      "stats": {
+        "invisibleCount": 0,
+        "mojibakeCount": 3,
+        "fullwidthCount": 65
+      }
+    },
+    {
+      "file": "test_sample.txt",
+      "status": "success",
+      "stats": {
+        "invisibleCount": 5,
+        "mojibakeCount": 4,
+        "fullwidthCount": 64
+      }
+    }
+  ]
+}
