@@ -5,7 +5,8 @@ import json
 
 from app.models import (
     ColdChainBox, TemperatureSample, StoreSignoff,
-    PhotoEvidence, ExceptionReview, CompensationConclusion
+    PhotoEvidence, ExceptionReview, CompensationConclusion,
+    AuditLog
 )
 from app.schemas import (
     ColdChainBoxCreate, TemperatureSampleCreate,
@@ -13,6 +14,30 @@ from app.schemas import (
     ExceptionReviewCreate, CompensationConclusionCreate,
     StatusTransitionRequest, ManualCorrectionRequest
 )
+
+
+def create_audit_log(
+    db: Session,
+    box_id: Optional[int],
+    action_type: str,
+    operator: str,
+    old_status: Optional[str] = None,
+    new_status: Optional[str] = None,
+    comment: Optional[str] = None,
+    change_details: Optional[dict] = None
+) -> AuditLog:
+    audit_log = AuditLog(
+        box_id=box_id,
+        action_type=action_type,
+        operator=operator,
+        old_status=old_status,
+        new_status=new_status,
+        comment=comment,
+        change_details=change_details
+    )
+    db.add(audit_log)
+    db.flush()
+    return audit_log
 
 
 BOX_STATUS_TRANSITIONS = {
@@ -89,14 +114,27 @@ def transition_box_status(
     if not db_box:
         raise ValueError(f"冷链箱 {box_code} 不存在")
     
-    if not can_transition_status(db_box.status, request.target_status, BOX_STATUS_TRANSITIONS):
+    old_status = db_box.status
+    
+    if not can_transition_status(old_status, request.target_status, BOX_STATUS_TRANSITIONS):
         raise StatusTransitionError(
-            f"状态转换不允许: {db_box.status} -> {request.target_status}. "
-            f"允许的状态: {BOX_STATUS_TRANSITIONS.get(db_box.status, [])}"
+            f"状态转换不允许: {old_status} -> {request.target_status}. "
+            f"允许的状态: {BOX_STATUS_TRANSITIONS.get(old_status, [])}"
         )
     
     db_box.status = request.target_status
     db_box.updated_at = datetime.now()
+    
+    create_audit_log(
+        db=db,
+        box_id=db_box.id,
+        action_type="STATUS_TRANSITION",
+        operator=request.operator,
+        old_status=old_status,
+        new_status=request.target_status,
+        comment=request.comment
+    )
+    
     db.commit()
     db.refresh(db_box)
     return db_box
@@ -206,17 +244,22 @@ def create_exception_review(db: Session, review: ExceptionReviewCreate) -> Excep
         raise ValueError(f"签收记录 {review.signoff_id} 不存在")
     
     original_input = json.dumps({
-        "signoff_data": {
-            "store_code": db_signoff.store_code,
-            "signoff_person": db_signoff.signoff_person,
-            "signoff_time": db_signoff.signoff_time.isoformat(),
-            "temperature_arrival": db_signoff.temperature_arrival,
-            "has_exception": db_signoff.has_exception,
-            "exception_desc": db_signoff.exception_desc
-        },
-        "reviewer": review.reviewer,
-        "review_time": datetime.now().isoformat()
+        "caller_input": review.original_input,
+        "system_snapshot": {
+            "signoff_data": {
+                "store_code": db_signoff.store_code,
+                "signoff_person": db_signoff.signoff_person,
+                "signoff_time": db_signoff.signoff_time.isoformat(),
+                "temperature_arrival": db_signoff.temperature_arrival,
+                "has_exception": db_signoff.has_exception,
+                "exception_desc": db_signoff.exception_desc
+            },
+            "reviewer": review.reviewer,
+            "review_time": datetime.now().isoformat()
+        }
     })
+    
+    old_status = db_box.status
     
     db_review = ExceptionReview(
         box_id=db_box.id,
@@ -230,13 +273,28 @@ def create_exception_review(db: Session, review: ExceptionReviewCreate) -> Excep
         status="PENDING"
     )
     db.add(db_review)
-    db.commit()
-    db.refresh(db_review)
     
-    if db_box.status == "SIGNED_OFF" or db_box.status == "EXCEPTION":
+    if old_status == "SIGNED_OFF" or old_status == "EXCEPTION":
         db_box.status = "UNDER_REVIEW"
         db_box.updated_at = datetime.now()
-        db.commit()
+        
+        create_audit_log(
+            db=db,
+            box_id=db_box.id,
+            action_type="EXCEPTION_REVIEW",
+            operator=review.reviewer,
+            old_status=old_status,
+            new_status="UNDER_REVIEW",
+            comment=review.review_comment,
+            change_details={
+                "review_result": review.review_result,
+                "temperature_violation": review.temperature_violation,
+                "compensation_eligible": review.compensation_eligible
+            }
+        )
+    
+    db.commit()
+    db.refresh(db_review)
     
     return db_review
 
@@ -291,6 +349,20 @@ def manual_correction(
     
     setattr(db_box, request.field_name, request.new_value)
     db_box.updated_at = datetime.now()
+    
+    create_audit_log(
+        db=db,
+        box_id=db_box.id,
+        action_type="MANUAL_CORRECTION",
+        operator=request.operator,
+        comment=request.reason,
+        change_details={
+            "field_name": request.field_name,
+            "old_value": request.old_value,
+            "new_value": request.new_value
+        }
+    )
+    
     db.commit()
     db.refresh(db_box)
     
@@ -321,16 +393,36 @@ def close_box(db: Session, box_code: str, operator: str) -> ColdChainBox:
     if not db_box:
         raise ValueError(f"冷链箱 {box_code} 不存在")
     
-    if db_box.status == "CLOSED":
+    old_status = db_box.status
+    
+    if old_status == "CLOSED":
         raise StatusTransitionError("冷链箱已处于关闭状态")
     
-    if db_box.status not in ["COMPENSATED", "REJECTED", "RESOLVED"]:
+    if old_status not in ["COMPENSATED", "REJECTED", "RESOLVED"]:
         raise StatusTransitionError(
-            f"当前状态 {db_box.status} 不允许关闭，需先完成赔付或问题解决"
+            f"当前状态 {old_status} 不允许关闭，需先完成赔付或问题解决"
         )
     
     db_box.status = "CLOSED"
     db_box.updated_at = datetime.now()
+    
+    create_audit_log(
+        db=db,
+        box_id=db_box.id,
+        action_type="BOX_CLOSED",
+        operator=operator,
+        old_status=old_status,
+        new_status="CLOSED",
+        comment="案件正式关闭"
+    )
+    
     db.commit()
     db.refresh(db_box)
     return db_box
+
+
+def get_audit_logs_by_box_code(db: Session, box_code: str) -> List[AuditLog]:
+    db_box = get_box_by_code(db, box_code)
+    if not db_box:
+        return []
+    return db.query(AuditLog).filter(AuditLog.box_id == db_box.id).order_by(AuditLog.created_at.desc()).all()

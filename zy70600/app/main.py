@@ -74,6 +74,11 @@ def get_box_detail(box_code: str, db: Session = Depends(get_db)):
     return db_box
 
 
+@app.get("/api/boxes/{box_code}/audit-logs", response_model=List[schemas.AuditLog])
+def get_box_audit_logs(box_code: str, db: Session = Depends(get_db)):
+    return services.get_audit_logs_by_box_code(db, box_code)
+
+
 @app.post("/api/boxes/{box_code}/status", response_model=schemas.ColdChainBox)
 def transition_box_status(
     box_code: str,

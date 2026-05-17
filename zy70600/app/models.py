@@ -1,7 +1,21 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text, Boolean
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text, Boolean, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    box_id = Column(Integer, ForeignKey("cold_chain_boxes.id"), nullable=True, index=True)
+    action_type = Column(String, index=True, nullable=False)
+    operator = Column(String, nullable=False)
+    old_status = Column(String)
+    new_status = Column(String)
+    comment = Column(Text)
+    change_details = Column(JSON)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
 class ColdChainBox(Base):
@@ -23,6 +37,7 @@ class ColdChainBox(Base):
     photos = relationship("PhotoEvidence", back_populates="box")
     reviews = relationship("ExceptionReview", back_populates="box")
     compensations = relationship("CompensationConclusion", back_populates="box")
+    audit_logs = relationship("AuditLog", backref="box")
 
 
 class TemperatureSample(Base):

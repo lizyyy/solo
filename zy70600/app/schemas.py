@@ -171,12 +171,28 @@ class CompensationConclusion(CompensationConclusionBase):
         from_attributes = True
 
 
+class AuditLog(BaseModel):
+    id: int
+    box_id: Optional[int] = None
+    action_type: str
+    operator: str
+    old_status: Optional[str] = None
+    new_status: Optional[str] = None
+    comment: Optional[str] = None
+    change_details: Optional[dict] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 class BoxDetailResponse(ColdChainBox):
     temperature_samples: List[TemperatureSample] = []
     signoffs: List[StoreSignoff] = []
     photos: List[PhotoEvidence] = []
     reviews: List[ExceptionReview] = []
     compensations: List[CompensationConclusion] = []
+    audit_logs: List[AuditLog] = []
 
 
 class ApiResponse(BaseModel):

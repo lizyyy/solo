@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from datetime import datetime
 import sys
 import os
+import json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -297,3 +298,130 @@ class TestHealthCheck:
         response = client.get("/api/health")
         assert response.status_code == 200
         assert response.json()["success"] == True
+
+
+class TestAuditTrail:
+    
+    def test_status_transition_audit_log(self, client):
+        client.post(
+            "/api/boxes/",
+            json={"box_code": "BOX-AUDIT-001", "product_name": "测试产品"}
+        )
+        response = client.post(
+            "/api/boxes/BOX-AUDIT-001/status",
+            json={
+                "target_status": "IN_TRANSIT",
+                "operator": "测试员",
+                "comment": "开始运输测试"
+            }
+        )
+        assert response.status_code == 200
+        
+        audit_response = client.get("/api/boxes/BOX-AUDIT-001/audit-logs")
+        assert audit_response.status_code == 200
+        audit_logs = audit_response.json()
+        assert len(audit_logs) >= 1
+        
+        status_log = next((log for log in audit_logs if log["action_type"] == "STATUS_TRANSITION"), None)
+        assert status_log is not None
+        assert status_log["operator"] == "测试员"
+        assert status_log["old_status"] == "CREATED"
+        assert status_log["new_status"] == "IN_TRANSIT"
+        assert status_log["comment"] == "开始运输测试"
+    
+    def test_manual_correction_audit_log(self, client):
+        client.post(
+            "/api/boxes/",
+            json={"box_code": "BOX-AUDIT-002", "product_name": "旧产品名"}
+        )
+        
+        correction_response = client.post(
+            "/api/boxes/BOX-AUDIT-002/correction",
+            json={
+                "field_name": "product_name",
+                "old_value": "旧产品名",
+                "new_value": "新产品名",
+                "operator": "管理员",
+                "reason": "录入错误修正"
+            }
+        )
+        assert correction_response.status_code == 200
+        
+        audit_response = client.get("/api/boxes/BOX-AUDIT-002/audit-logs")
+        assert audit_response.status_code == 200
+        audit_logs = audit_response.json()
+        
+        correction_log = next((log for log in audit_logs if log["action_type"] == "MANUAL_CORRECTION"), None)
+        assert correction_log is not None
+        assert correction_log["operator"] == "管理员"
+        assert correction_log["comment"] == "录入错误修正"
+        assert correction_log["change_details"]["field_name"] == "product_name"
+        assert correction_log["change_details"]["old_value"] == "旧产品名"
+        assert correction_log["change_details"]["new_value"] == "新产品名"
+    
+    def test_exception_review_preserves_caller_input(self, client):
+        # 先创建冷链箱
+        client.post(
+            "/api/boxes/",
+            json={"box_code": "BOX-AUDIT-003", "product_name": "测试产品", "temperature_min": -25.0, "temperature_max": -15.0}
+        )
+        
+        # 先推进状态到到货
+        client.post(
+            "/api/boxes/BOX-AUDIT-003/status",
+            json={"target_status": "IN_TRANSIT", "operator": "测试员"}
+        )
+        client.post(
+            "/api/boxes/BOX-AUDIT-003/status",
+            json={"target_status": "ARRIVED", "operator": "测试员"}
+        )
+        
+        # 创建签收
+        signoff_response = client.post(
+            "/api/signoffs/",
+            json={
+                "box_code": "BOX-AUDIT-003",
+                "store_code": "STORE-001",
+                "signoff_person": "张三",
+                "signoff_time": datetime.now().isoformat(),
+                "temperature_arrival": -5.0,
+                "has_exception": True,
+                "exception_desc": "温度超标异常"
+            }
+        )
+        signoff_id = signoff_response.json()["id"]
+        
+        # 确认签收状态（这样才会自动推进到 SIGNED_OFF）
+        client.post(
+            f"/api/signoffs/{signoff_id}/status?target_status=SUBMITTED&operator=张三"
+        )
+        client.post(
+            f"/api/signoffs/{signoff_id}/status?target_status=CONFIRMED&operator=店长"
+        )
+        
+        review_response = client.post(
+            "/api/reviews/",
+            json={
+                "box_code": "BOX-AUDIT-003",
+                "signoff_id": signoff_id,
+                "reviewer": "质量主管",
+                "original_input": "这是调用方传入的原始输入：现场拍照显示箱体外有大量水珠，温度异常",
+                "review_result": "确认异常",
+                "temperature_violation": True,
+                "compensation_eligible": True
+            }
+        )
+        assert review_response.status_code == 200
+        
+        original_input_json = json.loads(review_response.json()["original_input"])
+        assert "caller_input" in original_input_json
+        assert "这是调用方传入的原始输入" in original_input_json["caller_input"]
+        assert "system_snapshot" in original_input_json
+        assert "signoff_data" in original_input_json["system_snapshot"]
+        
+        audit_response = client.get("/api/boxes/BOX-AUDIT-003/audit-logs")
+        audit_logs = audit_response.json()
+        review_log = next((log for log in audit_logs if log["action_type"] == "EXCEPTION_REVIEW"), None)
+        assert review_log is not None
+        assert review_log["operator"] == "质量主管"
+        assert review_log["new_status"] == "UNDER_REVIEW"
