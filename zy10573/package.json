@@ -1,0 +1,19 @@
+{
+  "name": "otel-attr-cli",
+  "version": "1.0.0",
+  "description": "OpenTelemetry属性规范化检查CLI - 解析、校验和报告trace属性命名一致性",
+  "main": "src/index.js",
+  "bin": {
+    "otel-attr": "./bin/otel-attr.js"
+  },
+  "scripts": {
+    "test": "node bin/otel-attr.js self-test",
+    "lint": "node --check src/**/*.js"
+  },
+  "keywords": ["opentelemetry", "trace", "attributes", "cli", "monitoring"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

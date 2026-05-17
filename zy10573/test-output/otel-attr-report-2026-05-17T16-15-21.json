@@ -1,0 +1,1042 @@
+{
+  "generatedAt": "2026-05-17T16:15:21.224Z",
+  "summary": {
+    "totalServices": 6,
+    "totalAttributes": 22,
+    "namingConflicts": 2,
+    "namingViolations": 1,
+    "attributesPerService": {
+      "min": 6,
+      "max": 7,
+      "avg": 6.5
+    }
+  },
+  "stats": {
+    "totalLines": 8,
+    "validSpans": 6,
+    "parseErrors": 1,
+    "services": 6,
+    "uniqueAttributes": 22
+  },
+  "conflicts": [
+    {
+      "type": "naming_conflict",
+      "normalizedName": "tenant.id",
+      "variants": [
+        "tenant_id",
+        "tenantId",
+        "tenant.no",
+        "TenantID",
+        "tenant.id"
+      ],
+      "services": [
+        "api-gateway",
+        "user-service",
+        "auth-service",
+        "order-service",
+        "payment-service",
+        "notification-service"
+      ],
+      "severity": "critical"
+    },
+    {
+      "type": "naming_conflict",
+      "normalizedName": "user.id",
+      "variants": [
+        "user-id",
+        "user.id",
+        "user_id",
+        "UserID"
+      ],
+      "services": [
+        "api-gateway",
+        "user-service",
+        "auth-service",
+        "order-service",
+        "payment-service"
+      ],
+      "severity": "critical"
+    },
+    {
+      "type": "naming_violation",
+      "details": [
+        {
+          "attribute": "user-id",
+          "violations": [
+            "should use lowercase with dots, no special characters"
+          ]
+        },
+        {
+          "attribute": "traceId",
+          "violations": [
+            "should use lowercase with dots, no special characters"
+          ]
+        },
+        {
+          "attribute": "spanId",
+          "violations": [
+            "should use lowercase with dots, no special characters"
+          ]
+        },
+        {
+          "attribute": "tenantId",
+          "violations": [
+            "should use lowercase with dots, no special characters"
+          ]
+        },
+        {
+          "attribute": "TenantID",
+          "violations": [
+            "should use lowercase with dots, no special characters"
+          ]
+        },
+        {
+          "attribute": "UserID",
+          "violations": [
+            "should use lowercase with dots, no special characters"
+          ]
+        },
+        {
+          "attribute": "BadAttributeName__WithDoubleUnderscore",
+          "violations": [
+            "should use lowercase with dots, no special characters",
+            "should not use consecutive separators"
+          ]
+        }
+      ],
+      "severity": "info"
+    }
+  ],
+  "errors": [
+    {
+      "line": 5,
+      "error": "JSON parse error: Expected property name or '}' in JSON at position 2 (line 1 column 3)",
+      "raw": "{ invalid json line - this should be recorded as error }"
+    }
+  ],
+  "serviceBreakdown": {
+    "api-gateway": {
+      "spanCount": 1,
+      "attributeCount": 7,
+      "attributes": {
+        "tenant_id": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "T001"
+          ]
+        },
+        "user-id": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "U001"
+          ]
+        },
+        "http.method": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "GET"
+          ]
+        },
+        "http.status_code": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "number"
+          ],
+          "sampleValues": [
+            "200"
+          ]
+        },
+        "name": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "GET /api/users"
+          ]
+        },
+        "traceId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "trace-001"
+          ]
+        },
+        "spanId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "span-001"
+          ]
+        }
+      }
+    },
+    "user-service": {
+      "spanCount": 1,
+      "attributeCount": 7,
+      "attributes": {
+        "tenantId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "T001"
+          ]
+        },
+        "user.id": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "U001"
+          ]
+        },
+        "db.system": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "mysql"
+          ]
+        },
+        "db.statement": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "SELECT * FROM users"
+          ]
+        },
+        "name": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "getUser"
+          ]
+        },
+        "traceId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "trace-001"
+          ]
+        },
+        "spanId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "span-002"
+          ]
+        }
+      }
+    },
+    "auth-service": {
+      "spanCount": 1,
+      "attributeCount": 6,
+      "attributes": {
+        "tenant.no": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "T001"
+          ]
+        },
+        "user_id": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "U001"
+          ]
+        },
+        "auth.method": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "jwt"
+          ]
+        },
+        "name": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "validate"
+          ]
+        },
+        "traceId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "trace-001"
+          ]
+        },
+        "spanId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "span-003"
+          ]
+        }
+      }
+    },
+    "order-service": {
+      "spanCount": 1,
+      "attributeCount": 7,
+      "attributes": {
+        "TenantID": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "T002"
+          ]
+        },
+        "UserID": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "U002"
+          ]
+        },
+        "order.amount": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "number"
+          ],
+          "sampleValues": [
+            "99.99"
+          ]
+        },
+        "BadAttributeName__WithDoubleUnderscore": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "bad"
+          ]
+        },
+        "name": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "order/create"
+          ]
+        },
+        "traceId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "trace-002"
+          ]
+        },
+        "spanId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "span-004"
+          ]
+        }
+      }
+    },
+    "payment-service": {
+      "spanCount": 1,
+      "attributeCount": 6,
+      "attributes": {
+        "tenant.id": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "T002"
+          ]
+        },
+        "user.id": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "U002"
+          ]
+        },
+        "payment.method": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "credit_card"
+          ]
+        },
+        "name": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "payment"
+          ]
+        },
+        "traceId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "trace-002"
+          ]
+        },
+        "spanId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "span-005"
+          ]
+        }
+      }
+    },
+    "notification-service": {
+      "spanCount": 1,
+      "attributeCount": 6,
+      "attributes": {
+        "tenant_id": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "T003"
+          ]
+        },
+        "notification.channel": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "email"
+          ]
+        },
+        "notification.type": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "order_confirm"
+          ]
+        },
+        "name": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "notify"
+          ]
+        },
+        "traceId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "trace-003"
+          ]
+        },
+        "spanId": {
+          "count": 1,
+          "valueCount": 1,
+          "types": [
+            "string"
+          ],
+          "sampleValues": [
+            "span-006"
+          ]
+        }
+      }
+    }
+  },
+  "semanticGroups": [
+    {
+      "attribute": "tenant.id",
+      "variants": [
+        "tenant_id",
+        "tenantId",
+        "tenant.no",
+        "TenantID",
+        "tenant.id"
+      ],
+      "services": [
+        "api-gateway",
+        "user-service",
+        "auth-service",
+        "order-service",
+        "payment-service",
+        "notification-service"
+      ],
+      "totalCount": 6
+    },
+    {
+      "attribute": "user.id",
+      "variants": [
+        "user-id",
+        "user.id",
+        "user_id",
+        "UserID"
+      ],
+      "services": [
+        "api-gateway",
+        "user-service",
+        "auth-service",
+        "order-service",
+        "payment-service"
+      ],
+      "totalCount": 5
+    },
+    {
+      "attribute": "http.method",
+      "variants": [
+        "http.method"
+      ],
+      "services": [
+        "api-gateway"
+      ],
+      "totalCount": 1
+    },
+    {
+      "attribute": "http.status.code",
+      "variants": [
+        "http.status_code"
+      ],
+      "services": [
+        "api-gateway"
+      ],
+      "totalCount": 1
+    },
+    {
+      "attribute": "name",
+      "variants": [
+        "name"
+      ],
+      "services": [
+        "api-gateway",
+        "user-service",
+        "auth-service",
+        "order-service",
+        "payment-service",
+        "notification-service"
+      ],
+      "totalCount": 6
+    },
+    {
+      "attribute": "trace.id",
+      "variants": [
+        "traceId"
+      ],
+      "services": [
+        "api-gateway",
+        "user-service",
+        "auth-service",
+        "order-service",
+        "payment-service",
+        "notification-service"
+      ],
+      "totalCount": 6
+    },
+    {
+      "attribute": "span.id",
+      "variants": [
+        "spanId"
+      ],
+      "services": [
+        "api-gateway",
+        "user-service",
+        "auth-service",
+        "order-service",
+        "payment-service",
+        "notification-service"
+      ],
+      "totalCount": 6
+    },
+    {
+      "attribute": "db.system",
+      "variants": [
+        "db.system"
+      ],
+      "services": [
+        "user-service"
+      ],
+      "totalCount": 1
+    },
+    {
+      "attribute": "db.statement",
+      "variants": [
+        "db.statement"
+      ],
+      "services": [
+        "user-service"
+      ],
+      "totalCount": 1
+    },
+    {
+      "attribute": "auth.method",
+      "variants": [
+        "auth.method"
+      ],
+      "services": [
+        "auth-service"
+      ],
+      "totalCount": 1
+    },
+    {
+      "attribute": "order.amount",
+      "variants": [
+        "order.amount"
+      ],
+      "services": [
+        "order-service"
+      ],
+      "totalCount": 1
+    },
+    {
+      "attribute": "badattributename.withdoubleunderscore",
+      "variants": [
+        "BadAttributeName__WithDoubleUnderscore"
+      ],
+      "services": [
+        "order-service"
+      ],
+      "totalCount": 1
+    },
+    {
+      "attribute": "payment.method",
+      "variants": [
+        "payment.method"
+      ],
+      "services": [
+        "payment-service"
+      ],
+      "totalCount": 1
+    },
+    {
+      "attribute": "notification.channel",
+      "variants": [
+        "notification.channel"
+      ],
+      "services": [
+        "notification-service"
+      ],
+      "totalCount": 1
+    },
+    {
+      "attribute": "notification.type",
+      "variants": [
+        "notification.type"
+      ],
+      "services": [
+        "notification-service"
+      ],
+      "totalCount": 1
+    }
+  ],
+  "samples": {
+    "tenant_id:api-gateway": [
+      {
+        "value": "T001",
+        "valueType": "string",
+        "service": "api-gateway",
+        "lineNum": 1
+      }
+    ],
+    "user-id:api-gateway": [
+      {
+        "value": "U001",
+        "valueType": "string",
+        "service": "api-gateway",
+        "lineNum": 1
+      }
+    ],
+    "http.method:api-gateway": [
+      {
+        "value": "GET",
+        "valueType": "string",
+        "service": "api-gateway",
+        "lineNum": 1
+      }
+    ],
+    "http.status_code:api-gateway": [
+      {
+        "value": "200",
+        "valueType": "number",
+        "service": "api-gateway",
+        "lineNum": 1
+      }
+    ],
+    "name:api-gateway": [
+      {
+        "value": "GET /api/users",
+        "valueType": "string",
+        "service": "api-gateway",
+        "lineNum": 1
+      }
+    ],
+    "traceId:api-gateway": [
+      {
+        "value": "trace-001",
+        "valueType": "string",
+        "service": "api-gateway",
+        "lineNum": 1
+      }
+    ],
+    "spanId:api-gateway": [
+      {
+        "value": "span-001",
+        "valueType": "string",
+        "service": "api-gateway",
+        "lineNum": 1
+      }
+    ],
+    "tenantId:user-service": [
+      {
+        "value": "T001",
+        "valueType": "string",
+        "service": "user-service",
+        "lineNum": 2
+      }
+    ],
+    "user.id:user-service": [
+      {
+        "value": "U001",
+        "valueType": "string",
+        "service": "user-service",
+        "lineNum": 2
+      }
+    ],
+    "db.system:user-service": [
+      {
+        "value": "mysql",
+        "valueType": "string",
+        "service": "user-service",
+        "lineNum": 2
+      }
+    ],
+    "db.statement:user-service": [
+      {
+        "value": "SELECT * FROM users",
+        "valueType": "string",
+        "service": "user-service",
+        "lineNum": 2
+      }
+    ],
+    "name:user-service": [
+      {
+        "value": "getUser",
+        "valueType": "string",
+        "service": "user-service",
+        "lineNum": 2
+      }
+    ],
+    "traceId:user-service": [
+      {
+        "value": "trace-001",
+        "valueType": "string",
+        "service": "user-service",
+        "lineNum": 2
+      }
+    ],
+    "spanId:user-service": [
+      {
+        "value": "span-002",
+        "valueType": "string",
+        "service": "user-service",
+        "lineNum": 2
+      }
+    ],
+    "tenant.no:auth-service": [
+      {
+        "value": "T001",
+        "valueType": "string",
+        "service": "auth-service",
+        "lineNum": 3
+      }
+    ],
+    "user_id:auth-service": [
+      {
+        "value": "U001",
+        "valueType": "string",
+        "service": "auth-service",
+        "lineNum": 3
+      }
+    ],
+    "auth.method:auth-service": [
+      {
+        "value": "jwt",
+        "valueType": "string",
+        "service": "auth-service",
+        "lineNum": 3
+      }
+    ],
+    "name:auth-service": [
+      {
+        "value": "validate",
+        "valueType": "string",
+        "service": "auth-service",
+        "lineNum": 3
+      }
+    ],
+    "traceId:auth-service": [
+      {
+        "value": "trace-001",
+        "valueType": "string",
+        "service": "auth-service",
+        "lineNum": 3
+      }
+    ],
+    "spanId:auth-service": [
+      {
+        "value": "span-003",
+        "valueType": "string",
+        "service": "auth-service",
+        "lineNum": 3
+      }
+    ],
+    "TenantID:order-service": [
+      {
+        "value": "T002",
+        "valueType": "string",
+        "service": "order-service",
+        "lineNum": 4
+      }
+    ],
+    "UserID:order-service": [
+      {
+        "value": "U002",
+        "valueType": "string",
+        "service": "order-service",
+        "lineNum": 4
+      }
+    ],
+    "order.amount:order-service": [
+      {
+        "value": "99.99",
+        "valueType": "number",
+        "service": "order-service",
+        "lineNum": 4
+      }
+    ],
+    "BadAttributeName__WithDoubleUnderscore:order-service": [
+      {
+        "value": "bad",
+        "valueType": "string",
+        "service": "order-service",
+        "lineNum": 4
+      }
+    ],
+    "name:order-service": [
+      {
+        "value": "order/create",
+        "valueType": "string",
+        "service": "order-service",
+        "lineNum": 4
+      }
+    ],
+    "traceId:order-service": [
+      {
+        "value": "trace-002",
+        "valueType": "string",
+        "service": "order-service",
+        "lineNum": 4
+      }
+    ],
+    "spanId:order-service": [
+      {
+        "value": "span-004",
+        "valueType": "string",
+        "service": "order-service",
+        "lineNum": 4
+      }
+    ],
+    "tenant.id:payment-service": [
+      {
+        "value": "T002",
+        "valueType": "string",
+        "service": "payment-service",
+        "lineNum": 6
+      }
+    ],
+    "user.id:payment-service": [
+      {
+        "value": "U002",
+        "valueType": "string",
+        "service": "payment-service",
+        "lineNum": 6
+      }
+    ],
+    "payment.method:payment-service": [
+      {
+        "value": "credit_card",
+        "valueType": "string",
+        "service": "payment-service",
+        "lineNum": 6
+      }
+    ],
+    "name:payment-service": [
+      {
+        "value": "payment",
+        "valueType": "string",
+        "service": "payment-service",
+        "lineNum": 6
+      }
+    ],
+    "traceId:payment-service": [
+      {
+        "value": "trace-002",
+        "valueType": "string",
+        "service": "payment-service",
+        "lineNum": 6
+      }
+    ],
+    "spanId:payment-service": [
+      {
+        "value": "span-005",
+        "valueType": "string",
+        "service": "payment-service",
+        "lineNum": 6
+      }
+    ],
+    "tenant_id:notification-service": [
+      {
+        "value": "T003",
+        "valueType": "string",
+        "service": "notification-service",
+        "lineNum": 8
+      }
+    ],
+    "notification.channel:notification-service": [
+      {
+        "value": "email",
+        "valueType": "string",
+        "service": "notification-service",
+        "lineNum": 8
+      }
+    ],
+    "notification.type:notification-service": [
+      {
+        "value": "order_confirm",
+        "valueType": "string",
+        "service": "notification-service",
+        "lineNum": 8
+      }
+    ],
+    "name:notification-service": [
+      {
+        "value": "notify",
+        "valueType": "string",
+        "service": "notification-service",
+        "lineNum": 8
+      }
+    ],
+    "traceId:notification-service": [
+      {
+        "value": "trace-003",
+        "valueType": "string",
+        "service": "notification-service",
+        "lineNum": 8
+      }
+    ],
+    "spanId:notification-service": [
+      {
+        "value": "span-006",
+        "valueType": "string",
+        "service": "notification-service",
+        "lineNum": 8
+      }
+    ]
+  }
+}

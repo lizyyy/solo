@@ -1,0 +1,8 @@
+{"name":"GET /api/users","serviceName":"api-gateway","traceId":"trace-001","spanId":"span-001","attributes":{"tenant_id":"T001","user-id":"U001","http.method":"GET","http.status_code":200}}
+{"name":"getUser","serviceName":"user-service","traceId":"trace-001","spanId":"span-002","attributes":{"tenantId":"T001","user.id":"U001","db.system":"mysql","db.statement":"SELECT * FROM users"}}
+{"name":"validate","serviceName":"auth-service","traceId":"trace-001","spanId":"span-003","attributes":{"tenant.no":"T001","user_id":"U001","auth.method":"jwt"}}
+{"name":"order/create","serviceName":"order-service","traceId":"trace-002","spanId":"span-004","attributes":{"TenantID":"T002","UserID":"U002","order.amount":99.99,"BadAttributeName__WithDoubleUnderscore":"bad"}}
+{ invalid json line - this should be recorded as error }
+{"name":"payment","serviceName":"payment-service","traceId":"trace-002","spanId":"span-005","attributes":{"tenant.id":"T002","user.id":"U002","payment.method":"credit_card"}}
+  
+{"name":"notify","serviceName":"notification-service","traceId":"trace-003","spanId":"span-006","attributes":{"tenant_id":"T003","notification.channel":"email","notification.type":"order_confirm"}}
