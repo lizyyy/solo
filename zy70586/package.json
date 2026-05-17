@@ -1,0 +1,42 @@
+{
+  "name": "featureflag-deadbranch-cli",
+  "version": "1.0.0",
+  "description": "Feature Flag死分支扫描工具 - 检测并清理功能开关下线后残留的死代码",
+  "main": "dist/index.js",
+  "bin": {
+    "ff-scan": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "start": "node dist/cli.js",
+    "test": "node --test dist/**/*.test.js",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "feature-flag",
+    "dead-code",
+    "code-cleanup",
+    "cli",
+    "refactoring"
+  ],
+  "author": "Engineering Team",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "glob": "^10.3.10",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

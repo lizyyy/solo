@@ -1,0 +1,182 @@
+{
+  "flags": {
+    "total": 5,
+    "analyzed": 5,
+    "withDeadBranches": 4,
+    "list": [
+      {
+        "name": "FEATURE_NEW_CHECKOUT",
+        "defaultValue": true,
+        "description": "新结账流程开关 - 已全量发布，可清理死代码",
+        "source": "./examples/feature-flags.json"
+      },
+      {
+        "name": "FEATURE_DARK_MODE",
+        "defaultValue": false,
+        "description": "深色模式开关 - 默认关闭，else分支为死代码",
+        "source": "./examples/feature-flags.json"
+      },
+      {
+        "name": "FEATURE_VIP_DISCOUNT",
+        "defaultValue": true,
+        "description": "VIP折扣功能开关 - 已全量",
+        "source": "./examples/feature-flags.json"
+      },
+      {
+        "name": "FEATURE_OLD_LOGIN",
+        "defaultValue": false,
+        "description": "旧登录流程 - 已废弃，true分支为死代码",
+        "source": "./examples/feature-flags.json"
+      },
+      {
+        "name": "FEATURE_BETA_FEED",
+        "defaultValue": false,
+        "description": "Beta测试信息流 - 测试中",
+        "source": "./examples/feature-flags.json"
+      }
+    ]
+  },
+  "references": {
+    "total": 5,
+    "byFile": {
+      "examples/test-src/checkout.ts": 2,
+      "examples/test-src/auth.ts": 3
+    },
+    "byFlag": {
+      "FEATURE_NEW_CHECKOUT": 1,
+      "FEATURE_VIP_DISCOUNT": 1,
+      "FEATURE_OLD_LOGIN": 2,
+      "FEATURE_DARK_MODE": 1
+    },
+    "list": [
+      {
+        "flagName": "FEATURE_NEW_CHECKOUT",
+        "filePath": "examples/test-src/checkout.ts",
+        "lineNumber": 5,
+        "column": 7,
+        "context": "  let total = cart.items.reduce((sum: number, item: any) => sum + item.price, 0);\n\n  if (FEATURE_NEW_CHECKOUT) {\n    total = applyNewCheckoutLogic(total, user);\n    console.log('使用新结账流程');",
+        "contextType": "function-call",
+        "rawCode": "if (FEATURE_NEW_CHECKOUT) {"
+      },
+      {
+        "flagName": "FEATURE_VIP_DISCOUNT",
+        "filePath": "examples/test-src/checkout.ts",
+        "lineNumber": 13,
+        "column": 7,
+        "context": "  }\n\n  if (FEATURE_VIP_DISCOUNT && user.isVip) {\n    total = applyVipDiscount(total);\n    console.log('应用VIP折扣');",
+        "contextType": "function-call",
+        "rawCode": "if (FEATURE_VIP_DISCOUNT && user.isVip) {"
+      },
+      {
+        "flagName": "FEATURE_OLD_LOGIN",
+        "filePath": "examples/test-src/auth.ts",
+        "lineNumber": 3,
+        "column": 7,
+        "context": "// 认证流程示例代码\nexport function login(username: string, password: string) {\n  if (FEATURE_OLD_LOGIN) {\n    return legacyLogin(username, password);\n  } else {",
+        "contextType": "function-call",
+        "rawCode": "if (FEATURE_OLD_LOGIN) {"
+      },
+      {
+        "flagName": "FEATURE_DARK_MODE",
+        "filePath": "examples/test-src/auth.ts",
+        "lineNumber": 11,
+        "column": 10,
+        "context": "\nexport function getTheme() {\n  return FEATURE_DARK_MODE ? 'dark' : 'light';\n}\n",
+        "contextType": "ternary",
+        "rawCode": "return FEATURE_DARK_MODE ? 'dark' : 'light';"
+      },
+      {
+        "flagName": "FEATURE_OLD_LOGIN",
+        "filePath": "examples/test-src/auth.ts",
+        "lineNumber": 15,
+        "column": 17,
+        "context": "\nexport function renderLoginButton() {\n  const label = FEATURE_OLD_LOGIN ? '旧版登录' : '新版登录';\n  return `<button>${label}</button>`;\n}",
+        "contextType": "ternary",
+        "rawCode": "const label = FEATURE_OLD_LOGIN ? '旧版登录' : '新版登录';"
+      }
+    ]
+  },
+  "deadBranches": {
+    "total": 5,
+    "byFile": {
+      "examples/test-src/checkout.ts": 2,
+      "examples/test-src/auth.ts": 3
+    },
+    "byFlag": {
+      "FEATURE_NEW_CHECKOUT": 1,
+      "FEATURE_VIP_DISCOUNT": 1,
+      "FEATURE_OLD_LOGIN": 2,
+      "FEATURE_DARK_MODE": 1
+    },
+    "list": [
+      {
+        "flagName": "FEATURE_NEW_CHECKOUT",
+        "filePath": "examples/test-src/checkout.ts",
+        "lineNumber": 5,
+        "column": 7,
+        "branchType": "entire-condition",
+        "defaultValue": true,
+        "context": "  let total = cart.items.reduce((sum: number, item: any) => sum + item.price, 0);\n\n  if (FEATURE_NEW_CHECKOUT) {\n    total = applyNewCheckoutLogic(total, user);\n    console.log('使用新结账流程');",
+        "suggestion": "该开关默认为 true，可以考虑移除该条件判断",
+        "rawCode": "if (FEATURE_NEW_CHECKOUT) {",
+        "confidence": "low"
+      },
+      {
+        "flagName": "FEATURE_VIP_DISCOUNT",
+        "filePath": "examples/test-src/checkout.ts",
+        "lineNumber": 13,
+        "column": 7,
+        "branchType": "entire-condition",
+        "defaultValue": true,
+        "context": "  }\n\n  if (FEATURE_VIP_DISCOUNT && user.isVip) {\n    total = applyVipDiscount(total);\n    console.log('应用VIP折扣');",
+        "suggestion": "该开关默认为 true，可以考虑移除该条件判断",
+        "rawCode": "if (FEATURE_VIP_DISCOUNT && user.isVip) {",
+        "confidence": "low"
+      },
+      {
+        "flagName": "FEATURE_OLD_LOGIN",
+        "filePath": "examples/test-src/auth.ts",
+        "lineNumber": 3,
+        "column": 7,
+        "branchType": "entire-condition",
+        "defaultValue": false,
+        "context": "// 认证流程示例代码\nexport function login(username: string, password: string) {\n  if (FEATURE_OLD_LOGIN) {\n    return legacyLogin(username, password);\n  } else {",
+        "suggestion": "该开关默认为 false，可以考虑移除该条件判断",
+        "rawCode": "if (FEATURE_OLD_LOGIN) {",
+        "confidence": "low"
+      },
+      {
+        "flagName": "FEATURE_DARK_MODE",
+        "filePath": "examples/test-src/auth.ts",
+        "lineNumber": 11,
+        "column": 10,
+        "branchType": "true-branch",
+        "defaultValue": false,
+        "context": "\nexport function getTheme() {\n  return FEATURE_DARK_MODE ? 'dark' : 'light';\n}\n",
+        "suggestion": "可以简化三元表达式，直接使用冒号后的表达式结果",
+        "rawCode": "return FEATURE_DARK_MODE ? 'dark' : 'light';",
+        "confidence": "high"
+      },
+      {
+        "flagName": "FEATURE_OLD_LOGIN",
+        "filePath": "examples/test-src/auth.ts",
+        "lineNumber": 15,
+        "column": 17,
+        "branchType": "true-branch",
+        "defaultValue": false,
+        "context": "\nexport function renderLoginButton() {\n  const label = FEATURE_OLD_LOGIN ? '旧版登录' : '新版登录';\n  return `<button>${label}</button>`;\n}",
+        "suggestion": "可以简化三元表达式，直接使用冒号后的表达式结果",
+        "rawCode": "const label = FEATURE_OLD_LOGIN ? '旧版登录' : '新版登录';",
+        "confidence": "high"
+      }
+    ]
+  },
+  "badSamples": [],
+  "scanInfo": {
+    "startTime": "2026-05-17T04:04:09.767Z",
+    "endTime": "2026-05-17T04:04:09.777Z",
+    "sourceDir": "./examples/test-src",
+    "filesScanned": 2,
+    "flagsSource": "./examples/feature-flags.json"
+  }
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "name": "FEATURE_NEW_CHECKOUT",
+    "defaultValue": true,
+    "description": "新结账流程开关 - 已全量发布，可清理死代码"
+  },
+  {
+    "name": "FEATURE_DARK_MODE",
+    "defaultValue": false,
+    "description": "深色模式开关 - 默认关闭，else分支为死代码"
+  },
+  {
+    "name": "FEATURE_VIP_DISCOUNT",
+    "defaultValue": true,
+    "description": "VIP折扣功能开关 - 已全量"
+  },
+  {
+    "name": "FEATURE_OLD_LOGIN",
+    "defaultValue": false,
+    "description": "旧登录流程 - 已废弃，true分支为死代码"
+  },
+  {
+    "name": "FEATURE_BETA_FEED",
+    "defaultValue": false,
+    "description": "Beta测试信息流 - 测试中"
+  }
+]
