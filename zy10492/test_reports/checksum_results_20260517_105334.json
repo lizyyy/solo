@@ -1,0 +1,185 @@
+{
+  "timestamp": "2026-05-17T10:53:34.880803",
+  "input_directory": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts",
+  "output_directory": "/Users/lzy/pro/solo/workspaces/zy10492/test_reports",
+  "regions": [
+    "beijing",
+    "guangzhou",
+    "shanghai"
+  ],
+  "summary": {
+    "total_artifacts": 4,
+    "consistent": 0,
+    "size_mismatch": 1,
+    "hash_mismatch": 1,
+    "missing_regions": 2,
+    "skipped": 0,
+    "errors": 0
+  },
+  "results": {
+    "consistent": [],
+    "size_mismatch": [
+      {
+        "artifact_key": "release-v1.0.tar.gz",
+        "regions_present": [
+          "beijing",
+          "guangzhou",
+          "shanghai"
+        ],
+        "regions_missing": [],
+        "files": [
+          {
+            "filename": "release-v1.0.tar.gz",
+            "relative_path": "release-v1.0.tar.gz",
+            "full_path": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts/beijing/release-v1.0.tar.gz",
+            "size": 28,
+            "size_human": "28.00 B",
+            "mtime": 1778989980.4698558,
+            "mtime_human": "2026-05-17T10:53:00.469856",
+            "region": "beijing",
+            "hash": "6fd85a04d2d910965f750f24edcf1b4e4f5a5722f4815456317b195d7d81db96",
+            "hash_alg": "sha256"
+          },
+          {
+            "filename": "release-v1.0.tar.gz",
+            "relative_path": "release-v1.0.tar.gz",
+            "full_path": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts/guangzhou/release-v1.0.tar.gz",
+            "size": 38,
+            "size_human": "38.00 B",
+            "mtime": 1778989980.4704077,
+            "mtime_human": "2026-05-17T10:53:00.470408",
+            "region": "guangzhou",
+            "hash": "a7750e3a1ca4ef9647bfd2e6f42d25655d056906adf1740bed48f16fadd4d673",
+            "hash_alg": "sha256"
+          },
+          {
+            "filename": "release-v1.0.tar.gz",
+            "relative_path": "release-v1.0.tar.gz",
+            "full_path": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts/shanghai/release-v1.0.tar.gz",
+            "size": 28,
+            "size_human": "28.00 B",
+            "mtime": 1778989980.4702082,
+            "mtime_human": "2026-05-17T10:53:00.470208",
+            "region": "shanghai",
+            "hash": "6fd85a04d2d910965f750f24edcf1b4e4f5a5722f4815456317b195d7d81db96",
+            "hash_alg": "sha256"
+          }
+        ]
+      }
+    ],
+    "hash_mismatch": [
+      {
+        "artifact_key": "same_size_hash.bin",
+        "regions_present": [
+          "beijing",
+          "guangzhou",
+          "shanghai"
+        ],
+        "regions_missing": [],
+        "files": [
+          {
+            "filename": "same_size_hash.bin",
+            "relative_path": "same_size_hash.bin",
+            "full_path": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts/beijing/same_size_hash.bin",
+            "size": 4,
+            "size_human": "4.00 B",
+            "mtime": 1778990014.8387978,
+            "mtime_human": "2026-05-17T10:53:34.838798",
+            "region": "beijing",
+            "hash": "36a4aba0dcec23e926f0692065524808479c33f4501bae79348f8f005f10b21c",
+            "hash_alg": "sha256"
+          },
+          {
+            "filename": "same_size_hash.bin",
+            "relative_path": "same_size_hash.bin",
+            "full_path": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts/guangzhou/same_size_hash.bin",
+            "size": 4,
+            "size_human": "4.00 B",
+            "mtime": 1778990014.8390434,
+            "mtime_human": "2026-05-17T10:53:34.839043",
+            "region": "guangzhou",
+            "hash": "afbcdd3961c1f459626e090809decca2353cb3e24e67544c54070c2cbc9d566e",
+            "hash_alg": "sha256"
+          },
+          {
+            "filename": "same_size_hash.bin",
+            "relative_path": "same_size_hash.bin",
+            "full_path": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts/shanghai/same_size_hash.bin",
+            "size": 4,
+            "size_human": "4.00 B",
+            "mtime": 1778990014.8389535,
+            "mtime_human": "2026-05-17T10:53:34.838953",
+            "region": "shanghai",
+            "hash": "4350a48331b201b39ad3effbad0293bfa37b4b06a39a51538d50cd373b714bb0",
+            "hash_alg": "sha256"
+          }
+        ]
+      }
+    ],
+    "missing_regions": [
+      {
+        "artifact_key": "checksum.txt",
+        "regions_present": [
+          "beijing",
+          "shanghai"
+        ],
+        "regions_missing": [
+          "guangzhou"
+        ],
+        "files": [
+          {
+            "filename": "checksum.txt",
+            "relative_path": "checksum.txt",
+            "full_path": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts/beijing/checksum.txt",
+            "size": 13,
+            "size_human": "13.00 B",
+            "mtime": 1778989980.4705806,
+            "mtime_human": "2026-05-17T10:53:00.470581",
+            "region": "beijing",
+            "hash": "c2882350404a46d0935dc8ef92a4ade43ade7ca4db247e3bbd6cb97dc87c2fe5",
+            "hash_alg": "sha256"
+          },
+          {
+            "filename": "checksum.txt",
+            "relative_path": "checksum.txt",
+            "full_path": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts/shanghai/checksum.txt",
+            "size": 13,
+            "size_human": "13.00 B",
+            "mtime": 1778989980.4713247,
+            "mtime_human": "2026-05-17T10:53:00.471325",
+            "region": "shanghai",
+            "hash": "c2882350404a46d0935dc8ef92a4ade43ade7ca4db247e3bbd6cb97dc87c2fe5",
+            "hash_alg": "sha256"
+          }
+        ]
+      },
+      {
+        "artifact_key": "only_beijing.txt",
+        "regions_present": [
+          "beijing"
+        ],
+        "regions_missing": [
+          "guangzhou",
+          "shanghai"
+        ],
+        "files": [
+          {
+            "filename": "only_beijing.txt",
+            "relative_path": "only_beijing.txt",
+            "full_path": "/Users/lzy/pro/solo/workspaces/zy10492/test_artifacts/beijing/only_beijing.txt",
+            "size": 17,
+            "size_human": "17.00 B",
+            "mtime": 1778989980.4720027,
+            "mtime_human": "2026-05-17T10:53:00.472003",
+            "region": "beijing",
+            "hash": "df0ced27c999315da42cb3510c2268fd3980956e4a6bda32e9c0c9de77361eef",
+            "hash_alg": "sha256"
+          }
+        ]
+      }
+    ],
+    "partial": []
+  },
+  "skipped_records": [],
+  "errors": []
+}
