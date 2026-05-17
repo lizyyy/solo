@@ -1,0 +1,24 @@
+{
+  "name": "image-promotion-checklist",
+  "version": "1.0.0",
+  "description": "镜像晋级清单CLI - 核对签名、扫描和部署记录",
+  "main": "src/index.js",
+  "bin": {
+    "image-promotion": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-test.js"
+  },
+  "keywords": ["docker", "image", "promotion", "security", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1",
+    "joi": "^17.11.0",
+    "js-yaml": "^4.1.0",
+    "csv-parser": "^3.0.0"
+  }
+}

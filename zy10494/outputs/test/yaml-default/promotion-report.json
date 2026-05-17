@@ -1,0 +1,853 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-17T04:11:32.309Z",
+    "fromEnv": "dev",
+    "toEnv": "prod",
+    "scanGate": "critical",
+    "strictMode": false
+  },
+  "summary": {
+    "total": 5,
+    "passed": 2,
+    "failures": 3,
+    "passRate": "40.00",
+    "totalIssues": 5,
+    "totalMissing": 1,
+    "criticalIssues": 1,
+    "highIssues": 0
+  },
+  "results": [
+    {
+      "imageTag": "myapp:v1.0.0",
+      "status": "pass",
+      "fromEnv": "dev",
+      "toEnv": "prod",
+      "stageComparison": {
+        "consistent": true,
+        "message": "环境阶段 dev → prod 比对完成",
+        "details": {
+          "fromEnv": "dev",
+          "toEnv": "prod",
+          "fromTime": "2024-01-15T10:00:00.000Z",
+          "toTime": "2024-01-16T14:00:00.000Z"
+        }
+      },
+      "signatureCheck": {
+        "passed": true,
+        "issues": [],
+        "details": {
+          "fromSigned": true,
+          "fromSigner": "ci-bot",
+          "fromFingerprint": "abc123def456",
+          "toSigned": true,
+          "toSigner": "ci-bot",
+          "toFingerprint": "abc123def456"
+        }
+      },
+      "scanCheck": {
+        "passed": true,
+        "issues": [],
+        "details": {
+          "scanned": true,
+          "criticalCount": 0,
+          "highCount": 2,
+          "mediumCount": 5,
+          "lowCount": 12,
+          "scanGate": "critical"
+        }
+      },
+      "deploymentCheck": {
+        "passed": true,
+        "issues": [],
+        "details": {
+          "fromDeployed": true,
+          "fromDeployedAt": "2024-01-15T10:00:00.000Z",
+          "fromCluster": "dev-cluster",
+          "toDeployed": true,
+          "toDeployedAt": "2024-01-16T14:00:00.000Z",
+          "toCluster": "prod-cluster"
+        }
+      },
+      "issues": [],
+      "missingItems": [],
+      "sourceRecords": {
+        "from": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+          "line": 1,
+          "rawContent": "{\"imageTag\":\"myapp:v1.0.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"ci-bot\",\"signatureFingerprint\":\"abc123def456\",\"scanned\":true,\"critical\":0,\"high\":2,\"medium\":5,\"low\":12,\"deployed\":true,\"deployedAt\":\"2024-01-15T10:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+        },
+        "to": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+          "line": 2,
+          "rawContent": "{\"imageTag\":\"myapp:v1.0.0\",\"environment\":\"prod\",\"signed\":true,\"signer\":\"ci-bot\",\"signatureFingerprint\":\"abc123def456\",\"scanned\":true,\"critical\":0,\"high\":2,\"medium\":5,\"low\":12,\"deployed\":true,\"deployedAt\":\"2024-01-16T14:00:00.000Z\",\"cluster\":\"prod-cluster\"}"
+        },
+        "all": [
+          {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 1,
+            "rawContent": "{\"imageTag\":\"myapp:v1.0.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"ci-bot\",\"signatureFingerprint\":\"abc123def456\",\"scanned\":true,\"critical\":0,\"high\":2,\"medium\":5,\"low\":12,\"deployed\":true,\"deployedAt\":\"2024-01-15T10:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+          },
+          {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 2,
+            "rawContent": "{\"imageTag\":\"myapp:v1.0.0\",\"environment\":\"prod\",\"signed\":true,\"signer\":\"ci-bot\",\"signatureFingerprint\":\"abc123def456\",\"scanned\":true,\"critical\":0,\"high\":2,\"medium\":5,\"low\":12,\"deployed\":true,\"deployedAt\":\"2024-01-16T14:00:00.000Z\",\"cluster\":\"prod-cluster\"}"
+          }
+        ]
+      },
+      "rawData": {
+        "from": {
+          "imageTag": "myapp:v1.0.0",
+          "environment": "dev",
+          "signature": {
+            "signed": true,
+            "signer": "ci-bot",
+            "signedAt": "",
+            "fingerprint": "abc123def456"
+          },
+          "scan": {
+            "scanned": true,
+            "scanTime": "",
+            "criticalCount": 0,
+            "highCount": 2,
+            "mediumCount": 5,
+            "lowCount": 12,
+            "scanId": "",
+            "scanner": ""
+          },
+          "deployment": {
+            "deployed": true,
+            "environment": "dev",
+            "deployedAt": "2024-01-15T10:00:00.000Z",
+            "deployedBy": "",
+            "cluster": "dev-cluster",
+            "namespace": ""
+          },
+          "promotion": {
+            "previousEnv": "",
+            "promotionTime": "",
+            "promotedBy": "",
+            "approvalId": ""
+          }
+        },
+        "to": {
+          "imageTag": "myapp:v1.0.0",
+          "environment": "prod",
+          "signature": {
+            "signed": true,
+            "signer": "ci-bot",
+            "signedAt": "",
+            "fingerprint": "abc123def456"
+          },
+          "scan": {
+            "scanned": true,
+            "scanTime": "",
+            "criticalCount": 0,
+            "highCount": 2,
+            "mediumCount": 5,
+            "lowCount": 12,
+            "scanId": "",
+            "scanner": ""
+          },
+          "deployment": {
+            "deployed": true,
+            "environment": "prod",
+            "deployedAt": "2024-01-16T14:00:00.000Z",
+            "deployedBy": "",
+            "cluster": "prod-cluster",
+            "namespace": ""
+          },
+          "promotion": {
+            "previousEnv": "",
+            "promotionTime": "",
+            "promotedBy": "",
+            "approvalId": ""
+          }
+        }
+      }
+    },
+    {
+      "imageTag": "myapp:v1.1.0",
+      "status": "fail",
+      "fromEnv": "dev",
+      "toEnv": "prod",
+      "stageComparison": {
+        "consistent": true,
+        "message": "环境阶段 dev → prod 比对完成",
+        "details": {
+          "fromEnv": "dev",
+          "toEnv": "prod",
+          "fromTime": "2024-01-20T09:00:00.000Z",
+          "toTime": ""
+        }
+      },
+      "signatureCheck": {
+        "passed": false,
+        "issues": [
+          {
+            "type": "signature_missing",
+            "message": "目标环境 prod 镜像未签名 - 必须签名才能晋级",
+            "source": {
+              "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+              "line": 4,
+              "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"prod\",\"signed\":false,\"scanned\":true,\"critical\":1,\"high\":3,\"medium\":5,\"low\":8,\"deployed\":false,\"cluster\":\"prod-cluster\"}"
+            }
+          }
+        ],
+        "details": {
+          "fromSigned": true,
+          "fromSigner": "ci-bot",
+          "fromFingerprint": "xyz789ghi012",
+          "toSigned": false,
+          "toSigner": "",
+          "toFingerprint": ""
+        }
+      },
+      "scanCheck": {
+        "passed": false,
+        "issues": [
+          {
+            "type": "scan_violation",
+            "message": "发现 1 个 Critical 级漏洞，超过门禁阈值",
+            "severity": "critical",
+            "source": {
+              "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+              "line": 4,
+              "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"prod\",\"signed\":false,\"scanned\":true,\"critical\":1,\"high\":3,\"medium\":5,\"low\":8,\"deployed\":false,\"cluster\":\"prod-cluster\"}"
+            }
+          }
+        ],
+        "details": {
+          "scanned": true,
+          "criticalCount": 1,
+          "highCount": 3,
+          "mediumCount": 5,
+          "lowCount": 8,
+          "scanGate": "critical"
+        }
+      },
+      "deploymentCheck": {
+        "passed": false,
+        "issues": [
+          {
+            "type": "deployment_mismatch",
+            "message": "源环境 dev 已部署，但目标环境 prod 无部署记录",
+            "source": {
+              "from": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+                "line": 3,
+                "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"ci-bot\",\"signatureFingerprint\":\"xyz789ghi012\",\"scanned\":true,\"critical\":0,\"high\":0,\"medium\":3,\"low\":8,\"deployed\":true,\"deployedAt\":\"2024-01-20T09:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+              },
+              "to": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+                "line": 4,
+                "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"prod\",\"signed\":false,\"scanned\":true,\"critical\":1,\"high\":3,\"medium\":5,\"low\":8,\"deployed\":false,\"cluster\":\"prod-cluster\"}"
+              }
+            }
+          }
+        ],
+        "details": {
+          "fromDeployed": true,
+          "fromDeployedAt": "2024-01-20T09:00:00.000Z",
+          "fromCluster": "dev-cluster",
+          "toDeployed": false,
+          "toDeployedAt": "",
+          "toCluster": "prod-cluster"
+        }
+      },
+      "issues": [
+        {
+          "type": "signature_missing",
+          "message": "目标环境 prod 镜像未签名 - 必须签名才能晋级",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 4,
+            "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"prod\",\"signed\":false,\"scanned\":true,\"critical\":1,\"high\":3,\"medium\":5,\"low\":8,\"deployed\":false,\"cluster\":\"prod-cluster\"}"
+          }
+        },
+        {
+          "type": "scan_violation",
+          "message": "发现 1 个 Critical 级漏洞，超过门禁阈值",
+          "severity": "critical",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 4,
+            "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"prod\",\"signed\":false,\"scanned\":true,\"critical\":1,\"high\":3,\"medium\":5,\"low\":8,\"deployed\":false,\"cluster\":\"prod-cluster\"}"
+          }
+        },
+        {
+          "type": "deployment_mismatch",
+          "message": "源环境 dev 已部署，但目标环境 prod 无部署记录",
+          "source": {
+            "from": {
+              "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+              "line": 3,
+              "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"ci-bot\",\"signatureFingerprint\":\"xyz789ghi012\",\"scanned\":true,\"critical\":0,\"high\":0,\"medium\":3,\"low\":8,\"deployed\":true,\"deployedAt\":\"2024-01-20T09:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+            },
+            "to": {
+              "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+              "line": 4,
+              "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"prod\",\"signed\":false,\"scanned\":true,\"critical\":1,\"high\":3,\"medium\":5,\"low\":8,\"deployed\":false,\"cluster\":\"prod-cluster\"}"
+            }
+          }
+        }
+      ],
+      "missingItems": [],
+      "sourceRecords": {
+        "from": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+          "line": 3,
+          "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"ci-bot\",\"signatureFingerprint\":\"xyz789ghi012\",\"scanned\":true,\"critical\":0,\"high\":0,\"medium\":3,\"low\":8,\"deployed\":true,\"deployedAt\":\"2024-01-20T09:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+        },
+        "to": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+          "line": 4,
+          "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"prod\",\"signed\":false,\"scanned\":true,\"critical\":1,\"high\":3,\"medium\":5,\"low\":8,\"deployed\":false,\"cluster\":\"prod-cluster\"}"
+        },
+        "all": [
+          {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 3,
+            "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"ci-bot\",\"signatureFingerprint\":\"xyz789ghi012\",\"scanned\":true,\"critical\":0,\"high\":0,\"medium\":3,\"low\":8,\"deployed\":true,\"deployedAt\":\"2024-01-20T09:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+          },
+          {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 4,
+            "rawContent": "{\"imageTag\":\"myapp:v1.1.0\",\"environment\":\"prod\",\"signed\":false,\"scanned\":true,\"critical\":1,\"high\":3,\"medium\":5,\"low\":8,\"deployed\":false,\"cluster\":\"prod-cluster\"}"
+          }
+        ]
+      },
+      "rawData": {
+        "from": {
+          "imageTag": "myapp:v1.1.0",
+          "environment": "dev",
+          "signature": {
+            "signed": true,
+            "signer": "ci-bot",
+            "signedAt": "",
+            "fingerprint": "xyz789ghi012"
+          },
+          "scan": {
+            "scanned": true,
+            "scanTime": "",
+            "criticalCount": 0,
+            "highCount": 0,
+            "mediumCount": 3,
+            "lowCount": 8,
+            "scanId": "",
+            "scanner": ""
+          },
+          "deployment": {
+            "deployed": true,
+            "environment": "dev",
+            "deployedAt": "2024-01-20T09:00:00.000Z",
+            "deployedBy": "",
+            "cluster": "dev-cluster",
+            "namespace": ""
+          },
+          "promotion": {
+            "previousEnv": "",
+            "promotionTime": "",
+            "promotedBy": "",
+            "approvalId": ""
+          }
+        },
+        "to": {
+          "imageTag": "myapp:v1.1.0",
+          "environment": "prod",
+          "signature": {
+            "signed": false,
+            "signer": "",
+            "signedAt": "",
+            "fingerprint": ""
+          },
+          "scan": {
+            "scanned": true,
+            "scanTime": "",
+            "criticalCount": 1,
+            "highCount": 3,
+            "mediumCount": 5,
+            "lowCount": 8,
+            "scanId": "",
+            "scanner": ""
+          },
+          "deployment": {
+            "deployed": false,
+            "environment": "prod",
+            "deployedAt": "",
+            "deployedBy": "",
+            "cluster": "prod-cluster",
+            "namespace": ""
+          },
+          "promotion": {
+            "previousEnv": "",
+            "promotionTime": "",
+            "promotedBy": "",
+            "approvalId": ""
+          }
+        }
+      }
+    },
+    {
+      "imageTag": "auth-service:v2.0.0",
+      "status": "fail",
+      "fromEnv": "dev",
+      "toEnv": "prod",
+      "stageComparison": {
+        "consistent": true,
+        "message": "环境阶段 dev → prod 比对完成",
+        "details": {
+          "fromEnv": "dev",
+          "toEnv": "prod",
+          "fromTime": "2024-01-18T11:00:00.000Z",
+          "toTime": "2024-01-19T16:00:00.000Z"
+        }
+      },
+      "signatureCheck": {
+        "passed": false,
+        "issues": [
+          {
+            "type": "signature_mismatch",
+            "message": "签名指纹不匹配: 源环境=sec999aaa, 目标环境=sec999bbb",
+            "source": {
+              "from": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+                "line": 5,
+                "rawContent": "{\"imageTag\":\"auth-service:v2.0.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"security-team\",\"signatureFingerprint\":\"sec999aaa\",\"scanned\":true,\"critical\":2,\"high\":5,\"medium\":10,\"low\":20,\"deployed\":true,\"deployedAt\":\"2024-01-18T11:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+              },
+              "to": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+                "line": 6,
+                "rawContent": "{\"imageTag\":\"auth-service:v2.0.0\",\"environment\":\"prod\",\"signed\":true,\"signer\":\"security-team\",\"signatureFingerprint\":\"sec999bbb\",\"scanned\":true,\"critical\":0,\"high\":1,\"medium\":4,\"low\":15,\"deployed\":true,\"deployedAt\":\"2024-01-19T16:00:00.000Z\",\"cluster\":\"prod-cluster\"}"
+              }
+            }
+          }
+        ],
+        "details": {
+          "fromSigned": true,
+          "fromSigner": "security-team",
+          "fromFingerprint": "sec999aaa",
+          "toSigned": true,
+          "toSigner": "security-team",
+          "toFingerprint": "sec999bbb"
+        }
+      },
+      "scanCheck": {
+        "passed": true,
+        "issues": [],
+        "details": {
+          "scanned": true,
+          "criticalCount": 0,
+          "highCount": 1,
+          "mediumCount": 4,
+          "lowCount": 15,
+          "scanGate": "critical"
+        }
+      },
+      "deploymentCheck": {
+        "passed": true,
+        "issues": [],
+        "details": {
+          "fromDeployed": true,
+          "fromDeployedAt": "2024-01-18T11:00:00.000Z",
+          "fromCluster": "dev-cluster",
+          "toDeployed": true,
+          "toDeployedAt": "2024-01-19T16:00:00.000Z",
+          "toCluster": "prod-cluster"
+        }
+      },
+      "issues": [
+        {
+          "type": "signature_mismatch",
+          "message": "签名指纹不匹配: 源环境=sec999aaa, 目标环境=sec999bbb",
+          "source": {
+            "from": {
+              "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+              "line": 5,
+              "rawContent": "{\"imageTag\":\"auth-service:v2.0.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"security-team\",\"signatureFingerprint\":\"sec999aaa\",\"scanned\":true,\"critical\":2,\"high\":5,\"medium\":10,\"low\":20,\"deployed\":true,\"deployedAt\":\"2024-01-18T11:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+            },
+            "to": {
+              "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+              "line": 6,
+              "rawContent": "{\"imageTag\":\"auth-service:v2.0.0\",\"environment\":\"prod\",\"signed\":true,\"signer\":\"security-team\",\"signatureFingerprint\":\"sec999bbb\",\"scanned\":true,\"critical\":0,\"high\":1,\"medium\":4,\"low\":15,\"deployed\":true,\"deployedAt\":\"2024-01-19T16:00:00.000Z\",\"cluster\":\"prod-cluster\"}"
+            }
+          }
+        }
+      ],
+      "missingItems": [],
+      "sourceRecords": {
+        "from": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+          "line": 5,
+          "rawContent": "{\"imageTag\":\"auth-service:v2.0.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"security-team\",\"signatureFingerprint\":\"sec999aaa\",\"scanned\":true,\"critical\":2,\"high\":5,\"medium\":10,\"low\":20,\"deployed\":true,\"deployedAt\":\"2024-01-18T11:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+        },
+        "to": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+          "line": 6,
+          "rawContent": "{\"imageTag\":\"auth-service:v2.0.0\",\"environment\":\"prod\",\"signed\":true,\"signer\":\"security-team\",\"signatureFingerprint\":\"sec999bbb\",\"scanned\":true,\"critical\":0,\"high\":1,\"medium\":4,\"low\":15,\"deployed\":true,\"deployedAt\":\"2024-01-19T16:00:00.000Z\",\"cluster\":\"prod-cluster\"}"
+        },
+        "all": [
+          {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 5,
+            "rawContent": "{\"imageTag\":\"auth-service:v2.0.0\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"security-team\",\"signatureFingerprint\":\"sec999aaa\",\"scanned\":true,\"critical\":2,\"high\":5,\"medium\":10,\"low\":20,\"deployed\":true,\"deployedAt\":\"2024-01-18T11:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+          },
+          {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 6,
+            "rawContent": "{\"imageTag\":\"auth-service:v2.0.0\",\"environment\":\"prod\",\"signed\":true,\"signer\":\"security-team\",\"signatureFingerprint\":\"sec999bbb\",\"scanned\":true,\"critical\":0,\"high\":1,\"medium\":4,\"low\":15,\"deployed\":true,\"deployedAt\":\"2024-01-19T16:00:00.000Z\",\"cluster\":\"prod-cluster\"}"
+          }
+        ]
+      },
+      "rawData": {
+        "from": {
+          "imageTag": "auth-service:v2.0.0",
+          "environment": "dev",
+          "signature": {
+            "signed": true,
+            "signer": "security-team",
+            "signedAt": "",
+            "fingerprint": "sec999aaa"
+          },
+          "scan": {
+            "scanned": true,
+            "scanTime": "",
+            "criticalCount": 2,
+            "highCount": 5,
+            "mediumCount": 10,
+            "lowCount": 20,
+            "scanId": "",
+            "scanner": ""
+          },
+          "deployment": {
+            "deployed": true,
+            "environment": "dev",
+            "deployedAt": "2024-01-18T11:00:00.000Z",
+            "deployedBy": "",
+            "cluster": "dev-cluster",
+            "namespace": ""
+          },
+          "promotion": {
+            "previousEnv": "",
+            "promotionTime": "",
+            "promotedBy": "",
+            "approvalId": ""
+          }
+        },
+        "to": {
+          "imageTag": "auth-service:v2.0.0",
+          "environment": "prod",
+          "signature": {
+            "signed": true,
+            "signer": "security-team",
+            "signedAt": "",
+            "fingerprint": "sec999bbb"
+          },
+          "scan": {
+            "scanned": true,
+            "scanTime": "",
+            "criticalCount": 0,
+            "highCount": 1,
+            "mediumCount": 4,
+            "lowCount": 15,
+            "scanId": "",
+            "scanner": ""
+          },
+          "deployment": {
+            "deployed": true,
+            "environment": "prod",
+            "deployedAt": "2024-01-19T16:00:00.000Z",
+            "deployedBy": "",
+            "cluster": "prod-cluster",
+            "namespace": ""
+          },
+          "promotion": {
+            "previousEnv": "",
+            "promotionTime": "",
+            "promotedBy": "",
+            "approvalId": ""
+          }
+        }
+      }
+    },
+    {
+      "imageTag": "api-gateway:v3.2.1",
+      "status": "pass",
+      "fromEnv": "dev",
+      "toEnv": "prod",
+      "stageComparison": {
+        "consistent": true,
+        "message": "环境阶段 dev → prod 比对完成",
+        "details": {
+          "fromEnv": "dev",
+          "toEnv": "prod",
+          "fromTime": "2024-01-10T08:00:00.000Z",
+          "toTime": "2024-01-11T12:00:00.000Z"
+        }
+      },
+      "signatureCheck": {
+        "passed": true,
+        "issues": [],
+        "details": {
+          "fromSigned": true,
+          "fromSigner": "ops-team",
+          "fromFingerprint": "api777ccc",
+          "toSigned": true,
+          "toSigner": "ops-team",
+          "toFingerprint": "api777ccc"
+        }
+      },
+      "scanCheck": {
+        "passed": true,
+        "issues": [],
+        "details": {
+          "scanned": true,
+          "criticalCount": 0,
+          "highCount": 0,
+          "mediumCount": 0,
+          "lowCount": 5,
+          "scanGate": "critical"
+        }
+      },
+      "deploymentCheck": {
+        "passed": true,
+        "issues": [],
+        "details": {
+          "fromDeployed": true,
+          "fromDeployedAt": "2024-01-10T08:00:00.000Z",
+          "fromCluster": "dev-cluster",
+          "toDeployed": true,
+          "toDeployedAt": "2024-01-11T12:00:00.000Z",
+          "toCluster": "prod-cluster"
+        }
+      },
+      "issues": [],
+      "missingItems": [],
+      "sourceRecords": {
+        "from": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+          "line": 7,
+          "rawContent": "{\"imageTag\":\"api-gateway:v3.2.1\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"ops-team\",\"signatureFingerprint\":\"api777ccc\",\"scanned\":true,\"critical\":0,\"high\":0,\"medium\":0,\"low\":5,\"deployed\":true,\"deployedAt\":\"2024-01-10T08:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+        },
+        "to": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+          "line": 8,
+          "rawContent": "{\"imageTag\":\"api-gateway:v3.2.1\",\"environment\":\"prod\",\"signed\":true,\"signer\":\"ops-team\",\"signatureFingerprint\":\"api777ccc\",\"scanned\":true,\"critical\":0,\"high\":0,\"medium\":0,\"low\":5,\"deployed\":true,\"deployedAt\":\"2024-01-11T12:00:00.000Z\",\"cluster\":\"prod-cluster\"}"
+        },
+        "all": [
+          {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 7,
+            "rawContent": "{\"imageTag\":\"api-gateway:v3.2.1\",\"environment\":\"dev\",\"signed\":true,\"signer\":\"ops-team\",\"signatureFingerprint\":\"api777ccc\",\"scanned\":true,\"critical\":0,\"high\":0,\"medium\":0,\"low\":5,\"deployed\":true,\"deployedAt\":\"2024-01-10T08:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+          },
+          {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 8,
+            "rawContent": "{\"imageTag\":\"api-gateway:v3.2.1\",\"environment\":\"prod\",\"signed\":true,\"signer\":\"ops-team\",\"signatureFingerprint\":\"api777ccc\",\"scanned\":true,\"critical\":0,\"high\":0,\"medium\":0,\"low\":5,\"deployed\":true,\"deployedAt\":\"2024-01-11T12:00:00.000Z\",\"cluster\":\"prod-cluster\"}"
+          }
+        ]
+      },
+      "rawData": {
+        "from": {
+          "imageTag": "api-gateway:v3.2.1",
+          "environment": "dev",
+          "signature": {
+            "signed": true,
+            "signer": "ops-team",
+            "signedAt": "",
+            "fingerprint": "api777ccc"
+          },
+          "scan": {
+            "scanned": true,
+            "scanTime": "",
+            "criticalCount": 0,
+            "highCount": 0,
+            "mediumCount": 0,
+            "lowCount": 5,
+            "scanId": "",
+            "scanner": ""
+          },
+          "deployment": {
+            "deployed": true,
+            "environment": "dev",
+            "deployedAt": "2024-01-10T08:00:00.000Z",
+            "deployedBy": "",
+            "cluster": "dev-cluster",
+            "namespace": ""
+          },
+          "promotion": {
+            "previousEnv": "",
+            "promotionTime": "",
+            "promotedBy": "",
+            "approvalId": ""
+          }
+        },
+        "to": {
+          "imageTag": "api-gateway:v3.2.1",
+          "environment": "prod",
+          "signature": {
+            "signed": true,
+            "signer": "ops-team",
+            "signedAt": "",
+            "fingerprint": "api777ccc"
+          },
+          "scan": {
+            "scanned": true,
+            "scanTime": "",
+            "criticalCount": 0,
+            "highCount": 0,
+            "mediumCount": 0,
+            "lowCount": 5,
+            "scanId": "",
+            "scanner": ""
+          },
+          "deployment": {
+            "deployed": true,
+            "environment": "prod",
+            "deployedAt": "2024-01-11T12:00:00.000Z",
+            "deployedBy": "",
+            "cluster": "prod-cluster",
+            "namespace": ""
+          },
+          "promotion": {
+            "previousEnv": "",
+            "promotionTime": "",
+            "promotedBy": "",
+            "approvalId": ""
+          }
+        }
+      }
+    },
+    {
+      "imageTag": "database:v5.0.0",
+      "status": "fail",
+      "fromEnv": "dev",
+      "toEnv": "prod",
+      "stageComparison": {
+        "consistent": false,
+        "message": "缺少目标环境 prod 记录",
+        "details": null
+      },
+      "signatureCheck": {
+        "passed": true,
+        "issues": [
+          {
+            "type": "signature_warning",
+            "message": "警告: 源环境 dev 镜像未签名",
+            "severity": "warning",
+            "source": {
+              "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+              "line": 9,
+              "rawContent": "{\"imageTag\":\"database:v5.0.0\",\"environment\":\"dev\",\"signed\":false,\"signatureFingerprint\":\"db111ddd\",\"scanned\":false,\"critical\":0,\"high\":0,\"medium\":0,\"low\":0,\"deployed\":true,\"deployedAt\":\"2024-01-05T15:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+            }
+          }
+        ],
+        "details": {
+          "fromSigned": false,
+          "fromSigner": "",
+          "fromFingerprint": "db111ddd"
+        }
+      },
+      "scanCheck": {
+        "passed": false,
+        "issues": [
+          {
+            "type": "scan_missing",
+            "message": "镜像未进行安全扫描",
+            "source": {
+              "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+              "line": 9,
+              "rawContent": "{\"imageTag\":\"database:v5.0.0\",\"environment\":\"dev\",\"signed\":false,\"signatureFingerprint\":\"db111ddd\",\"scanned\":false,\"critical\":0,\"high\":0,\"medium\":0,\"low\":0,\"deployed\":true,\"deployedAt\":\"2024-01-05T15:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+            }
+          }
+        ],
+        "details": {
+          "scanned": false,
+          "criticalCount": 0,
+          "highCount": 0,
+          "mediumCount": 0,
+          "lowCount": 0,
+          "scanGate": "critical"
+        }
+      },
+      "deploymentCheck": {
+        "passed": true,
+        "issues": [],
+        "details": {
+          "fromDeployed": true,
+          "fromDeployedAt": "2024-01-05T15:00:00.000Z",
+          "fromCluster": "dev-cluster"
+        }
+      },
+      "issues": [
+        {
+          "type": "scan_missing",
+          "message": "镜像未进行安全扫描",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 9,
+            "rawContent": "{\"imageTag\":\"database:v5.0.0\",\"environment\":\"dev\",\"signed\":false,\"signatureFingerprint\":\"db111ddd\",\"scanned\":false,\"critical\":0,\"high\":0,\"medium\":0,\"low\":0,\"deployed\":true,\"deployedAt\":\"2024-01-05T15:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+          }
+        }
+      ],
+      "missingItems": [
+        {
+          "field": "targetEnvRecord",
+          "message": "目标环境 prod 无记录",
+          "source": null
+        }
+      ],
+      "sourceRecords": {
+        "from": {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+          "line": 9,
+          "rawContent": "{\"imageTag\":\"database:v5.0.0\",\"environment\":\"dev\",\"signed\":false,\"signatureFingerprint\":\"db111ddd\",\"scanned\":false,\"critical\":0,\"high\":0,\"medium\":0,\"low\":0,\"deployed\":true,\"deployedAt\":\"2024-01-05T15:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+        },
+        "to": null,
+        "all": [
+          {
+            "file": "/Users/lzy/pro/solo/workspaces/zy10494/examples/sample-images.yaml",
+            "line": 9,
+            "rawContent": "{\"imageTag\":\"database:v5.0.0\",\"environment\":\"dev\",\"signed\":false,\"signatureFingerprint\":\"db111ddd\",\"scanned\":false,\"critical\":0,\"high\":0,\"medium\":0,\"low\":0,\"deployed\":true,\"deployedAt\":\"2024-01-05T15:00:00.000Z\",\"cluster\":\"dev-cluster\"}"
+          }
+        ]
+      },
+      "rawData": {
+        "from": {
+          "imageTag": "database:v5.0.0",
+          "environment": "dev",
+          "signature": {
+            "signed": false,
+            "signer": "",
+            "signedAt": "",
+            "fingerprint": "db111ddd"
+          },
+          "scan": {
+            "scanned": false,
+            "scanTime": "",
+            "criticalCount": 0,
+            "highCount": 0,
+            "mediumCount": 0,
+            "lowCount": 0,
+            "scanId": "",
+            "scanner": ""
+          },
+          "deployment": {
+            "deployed": true,
+            "environment": "dev",
+            "deployedAt": "2024-01-05T15:00:00.000Z",
+            "deployedBy": "",
+            "cluster": "dev-cluster",
+            "namespace": ""
+          },
+          "promotion": {
+            "previousEnv": "",
+            "promotionTime": "",
+            "promotedBy": "",
+            "approvalId": ""
+          }
+        },
+        "to": null
+      }
+    }
+  ]
+}
