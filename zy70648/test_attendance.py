@@ -95,7 +95,8 @@ def test_create_attendance(client):
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["student_id"] == "S001"
+    assert data["student_id_str"] == "S001"
+    assert data["session_code"] == "CLASS001"
 
 
 def test_create_makeup(client):
@@ -127,7 +128,8 @@ def test_create_makeup(client):
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["student_id"] == "S001"
+    assert data["student_id_str"] == "S001"
+    assert data["session_code"] == "CLASS001"
 
 
 def test_conflict_detection(client, db):
