@@ -1,0 +1,525 @@
+{
+  "metadata": {
+    "checkedAt": "2026-05-17T05:48:42.174Z",
+    "inputFile": "examples/test-api.yaml",
+    "totalEndpoints": 5,
+    "totalErrorResponses": 12
+  },
+  "summary": {
+    "totalIssues": 9,
+    "errors": 0,
+    "warnings": 9,
+    "infos": 0
+  },
+  "statusCodeGroups": [
+    {
+      "statusCode": "400",
+      "category": "4xx Client Error",
+      "responses": [
+        {
+          "path": "/users",
+          "method": "GET",
+          "statusCode": "400",
+          "contentType": "application/json",
+          "schemaFields": [
+            "error",
+            "code"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "code": {
+                "type": "string"
+              }
+            }
+          },
+          "location": {
+            "path": "/users",
+            "method": "GET",
+            "statusCode": "400"
+          }
+        },
+        {
+          "path": "/users",
+          "method": "POST",
+          "statusCode": "400",
+          "contentType": "application/json",
+          "schemaFields": [
+            "message",
+            "details"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "location": {
+            "path": "/users",
+            "method": "POST",
+            "statusCode": "400"
+          }
+        },
+        {
+          "path": "/orders",
+          "method": "POST",
+          "statusCode": "400",
+          "contentType": "application/json",
+          "schemaFields": [
+            "error",
+            "code",
+            "field"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "field": {
+                "type": "string"
+              }
+            }
+          },
+          "location": {
+            "path": "/orders",
+            "method": "POST",
+            "statusCode": "400"
+          }
+        }
+      ],
+      "commonFields": [],
+      "fieldVariations": {
+        "error": 2,
+        "code": 2,
+        "message": 1,
+        "details": 1,
+        "field": 1
+      }
+    },
+    {
+      "statusCode": "401",
+      "category": "4xx Client Error",
+      "responses": [
+        {
+          "path": "/users",
+          "method": "GET",
+          "statusCode": "401",
+          "contentType": "application/json",
+          "schemaFields": [
+            "message"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "错误信息"
+              }
+            }
+          },
+          "location": {
+            "path": "/users",
+            "method": "GET",
+            "statusCode": "401"
+          }
+        }
+      ],
+      "commonFields": [
+        "message"
+      ],
+      "fieldVariations": {
+        "message": 1
+      }
+    },
+    {
+      "statusCode": "402",
+      "category": "4xx Client Error",
+      "responses": [
+        {
+          "path": "/orders",
+          "method": "POST",
+          "statusCode": "402",
+          "contentType": "none",
+          "schemaFields": [],
+          "rawSchema": {},
+          "location": {
+            "path": "/orders",
+            "method": "POST",
+            "statusCode": "402"
+          }
+        }
+      ],
+      "commonFields": [],
+      "fieldVariations": {}
+    },
+    {
+      "statusCode": "404",
+      "category": "4xx Client Error",
+      "responses": [
+        {
+          "path": "/users/{id}",
+          "method": "GET",
+          "statusCode": "404",
+          "contentType": "application/json",
+          "schemaFields": [
+            "error"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "string"
+              }
+            }
+          },
+          "location": {
+            "path": "/users/{id}",
+            "method": "GET",
+            "statusCode": "404"
+          }
+        },
+        {
+          "path": "/users/{id}",
+          "method": "DELETE",
+          "statusCode": "404",
+          "contentType": "application/json",
+          "schemaFields": [
+            "msg"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "msg": {
+                "type": "string"
+              }
+            }
+          },
+          "location": {
+            "path": "/users/{id}",
+            "method": "DELETE",
+            "statusCode": "404"
+          }
+        }
+      ],
+      "commonFields": [],
+      "fieldVariations": {
+        "error": 1,
+        "msg": 1
+      }
+    },
+    {
+      "statusCode": "409",
+      "category": "4xx Client Error",
+      "responses": [
+        {
+          "path": "/users",
+          "method": "POST",
+          "statusCode": "409",
+          "contentType": "application/json",
+          "schemaFields": [
+            "errorMessage"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "errorMessage": {
+                "type": "string"
+              }
+            }
+          },
+          "location": {
+            "path": "/users",
+            "method": "POST",
+            "statusCode": "409"
+          }
+        }
+      ],
+      "commonFields": [
+        "errorMessage"
+      ],
+      "fieldVariations": {
+        "errorMessage": 1
+      }
+    },
+    {
+      "statusCode": "500",
+      "category": "5xx Server Error",
+      "responses": [
+        {
+          "path": "/users",
+          "method": "GET",
+          "statusCode": "500",
+          "contentType": "application/json",
+          "schemaFields": [
+            "error"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "string"
+              }
+            }
+          },
+          "location": {
+            "path": "/users",
+            "method": "GET",
+            "statusCode": "500"
+          }
+        },
+        {
+          "path": "/users",
+          "method": "POST",
+          "statusCode": "500",
+          "contentType": "none",
+          "schemaFields": [],
+          "rawSchema": {},
+          "location": {
+            "path": "/users",
+            "method": "POST",
+            "statusCode": "500"
+          }
+        },
+        {
+          "path": "/users/{id}",
+          "method": "GET",
+          "statusCode": "500",
+          "contentType": "application/json",
+          "schemaFields": [
+            "message",
+            "timestamp"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string"
+              }
+            }
+          },
+          "location": {
+            "path": "/users/{id}",
+            "method": "GET",
+            "statusCode": "500"
+          }
+        },
+        {
+          "path": "/orders",
+          "method": "POST",
+          "statusCode": "500",
+          "contentType": "application/json",
+          "schemaFields": [
+            "detail"
+          ],
+          "rawSchema": {
+            "type": "object",
+            "properties": {
+              "detail": {
+                "type": "string"
+              }
+            }
+          },
+          "location": {
+            "path": "/orders",
+            "method": "POST",
+            "statusCode": "500"
+          }
+        }
+      ],
+      "commonFields": [],
+      "fieldVariations": {
+        "error": 1,
+        "message": 1,
+        "timestamp": 1,
+        "detail": 1
+      }
+    }
+  ],
+  "issues": [
+    {
+      "type": "missing_error_schema",
+      "severity": "warning",
+      "message": "错误响应缺少schema定义",
+      "location": {
+        "path": "/users",
+        "method": "POST",
+        "statusCode": "500"
+      },
+      "details": {
+        "suggestion": "为错误响应添加明确的schema定义，包含错误信息字段"
+      }
+    },
+    {
+      "type": "missing_error_schema",
+      "severity": "warning",
+      "message": "错误响应缺少schema定义",
+      "location": {
+        "path": "/orders",
+        "method": "POST",
+        "statusCode": "402"
+      },
+      "details": {
+        "suggestion": "为错误响应添加明确的schema定义，包含错误信息字段"
+      }
+    },
+    {
+      "type": "status_code_inconsistent",
+      "severity": "warning",
+      "message": "跨状态码通用字段 'error' 缺失",
+      "location": {
+        "path": "/users",
+        "method": "GET",
+        "statusCode": "401"
+      },
+      "details": {
+        "expected": [
+          "error",
+          "message"
+        ],
+        "actual": [
+          "message"
+        ],
+        "suggestion": "考虑在所有错误响应中统一使用 error, message 等字段"
+      }
+    },
+    {
+      "type": "status_code_inconsistent",
+      "severity": "warning",
+      "message": "跨状态码通用字段 'error' 缺失",
+      "location": {
+        "path": "/orders",
+        "method": "POST",
+        "statusCode": "402"
+      },
+      "details": {
+        "expected": [
+          "error",
+          "message"
+        ],
+        "actual": [],
+        "suggestion": "考虑在所有错误响应中统一使用 error, message 等字段"
+      }
+    },
+    {
+      "type": "status_code_inconsistent",
+      "severity": "warning",
+      "message": "跨状态码通用字段 'message' 缺失",
+      "location": {
+        "path": "/orders",
+        "method": "POST",
+        "statusCode": "402"
+      },
+      "details": {
+        "expected": [
+          "error",
+          "message"
+        ],
+        "actual": [],
+        "suggestion": "考虑在所有错误响应中统一使用 error, message 等字段"
+      }
+    },
+    {
+      "type": "status_code_inconsistent",
+      "severity": "warning",
+      "message": "跨状态码通用字段 'message' 缺失",
+      "location": {
+        "path": "/users/{id}",
+        "method": "GET",
+        "statusCode": "404"
+      },
+      "details": {
+        "expected": [
+          "error",
+          "message"
+        ],
+        "actual": [
+          "error"
+        ],
+        "suggestion": "考虑在所有错误响应中统一使用 error, message 等字段"
+      }
+    },
+    {
+      "type": "status_code_inconsistent",
+      "severity": "warning",
+      "message": "跨状态码通用字段 'message' 缺失",
+      "location": {
+        "path": "/users/{id}",
+        "method": "DELETE",
+        "statusCode": "404"
+      },
+      "details": {
+        "expected": [
+          "error",
+          "message"
+        ],
+        "actual": [
+          "msg"
+        ],
+        "suggestion": "考虑在所有错误响应中统一使用 error, message 等字段"
+      }
+    },
+    {
+      "type": "status_code_inconsistent",
+      "severity": "warning",
+      "message": "跨状态码通用字段 'error' 缺失",
+      "location": {
+        "path": "/users",
+        "method": "POST",
+        "statusCode": "409"
+      },
+      "details": {
+        "expected": [
+          "error",
+          "message"
+        ],
+        "actual": [
+          "errorMessage"
+        ],
+        "suggestion": "考虑在所有错误响应中统一使用 error, message 等字段"
+      }
+    },
+    {
+      "type": "status_code_inconsistent",
+      "severity": "warning",
+      "message": "跨状态码通用字段 'message' 缺失",
+      "location": {
+        "path": "/users",
+        "method": "POST",
+        "statusCode": "409"
+      },
+      "details": {
+        "expected": [
+          "error",
+          "message"
+        ],
+        "actual": [
+          "errorMessage"
+        ],
+        "suggestion": "考虑在所有错误响应中统一使用 error, message 等字段"
+      }
+    }
+  ],
+  "recommendations": [
+    "错误消息字段存在多种命名: error, message, msg, errorMessage, detail。建议统一使用 'message' 或 'error' 其中一个。",
+    "以下状态码部分响应缺少schema: 402, 500。建议为所有错误响应添加明确的schema定义。"
+  ]
+}

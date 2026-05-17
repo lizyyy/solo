@@ -110,9 +110,16 @@ export class Reporter {
     console.log('\n');
   }
 
+  private ensureParentDir(filePath: string): void {
+    const parentDir = path.dirname(filePath);
+    if (!fs.existsSync(parentDir)) {
+      fs.mkdirSync(parentDir, { recursive: true });
+    }
+  }
+
   public writeJsonOutput(outputPath?: string): string {
-    this.ensureOutputDir();
     const filePath = outputPath || path.join(this.outputDir, 'error-consistency-report.json');
+    this.ensureParentDir(filePath);
     
     const jsonContent = JSON.stringify(this.result, null, 2);
     fs.writeFileSync(filePath, jsonContent, 'utf-8');
@@ -122,8 +129,8 @@ export class Reporter {
   }
 
   public writeMarkdownOutput(outputPath?: string): string {
-    this.ensureOutputDir();
     const filePath = outputPath || path.join(this.outputDir, 'error-consistency-report.md');
+    this.ensureParentDir(filePath);
     
     const markdown = this.generateMarkdown();
     fs.writeFileSync(filePath, markdown, 'utf-8');

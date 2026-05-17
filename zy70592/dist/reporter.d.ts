@@ -5,6 +5,7 @@ export declare class Reporter {
     constructor(result: CheckResult, outputDir?: string);
     private ensureOutputDir;
     printConsoleSummary(): void;
+    private ensureParentDir;
     writeJsonOutput(outputPath?: string): string;
     writeMarkdownOutput(outputPath?: string): string;
     private generateMarkdown;

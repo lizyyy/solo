@@ -134,17 +134,23 @@ class Reporter {
         }
         console.log('\n');
     }
+    ensureParentDir(filePath) {
+        const parentDir = path.dirname(filePath);
+        if (!fs.existsSync(parentDir)) {
+            fs.mkdirSync(parentDir, { recursive: true });
+        }
+    }
     writeJsonOutput(outputPath) {
-        this.ensureOutputDir();
         const filePath = outputPath || path.join(this.outputDir, 'error-consistency-report.json');
+        this.ensureParentDir(filePath);
         const jsonContent = JSON.stringify(this.result, null, 2);
         fs.writeFileSync(filePath, jsonContent, 'utf-8');
         console.log(chalk_1.default.green(`✅ 机器可读报告已写入: ${filePath}`));
         return filePath;
     }
     writeMarkdownOutput(outputPath) {
-        this.ensureOutputDir();
         const filePath = outputPath || path.join(this.outputDir, 'error-consistency-report.md');
+        this.ensureParentDir(filePath);
         const markdown = this.generateMarkdown();
         fs.writeFileSync(filePath, markdown, 'utf-8');
         console.log(chalk_1.default.green(`✅ Markdown 报告已写入: ${filePath}`));
