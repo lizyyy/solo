@@ -1,0 +1,84 @@
+{
+  "metadata": {
+    "scan_time": "2026-05-17T11:45:11.294888",
+    "source_dirs": [
+      "/Users/lzy/pro/solo/workspaces/zy10499/test-artifacts"
+    ],
+    "expected_commits": [
+      "abc1234",
+      "def5678",
+      "abc0000"
+    ],
+    "build_number": ""
+  },
+  "summary": {
+    "total_artifacts": 4,
+    "total_size": 61,
+    "with_commit": 2,
+    "with_build": 3,
+    "errors_count": 0,
+    "warnings_count": 2,
+    "missing_commits_count": 1,
+    "missing_artifacts_count": 1,
+    "source_dirs_count": 1
+  },
+  "artifacts": [
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10499/test-artifacts/README.md",
+      "file_name": "README.md",
+      "file_size": 7,
+      "sha256": "00d75b5176b48ccc71d91bcc1d7b90fc2820429b1629b77fd1d5f4c5dcee4f6d",
+      "commit": null,
+      "build_number": null,
+      "source_dir": "/Users/lzy/pro/solo/workspaces/zy10499/test-artifacts",
+      "error": null,
+      "warning": []
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10499/test-artifacts/dist-abc1234/app-v1.0.0-def5678-win64.exe",
+      "file_name": "app-v1.0.0-def5678-win64.exe",
+      "file_size": 15,
+      "sha256": "2b4d34d4d13a21c291e24f019fe3a0b458b24268ba5483c943a94cd13dd33e98",
+      "commit": "def5678",
+      "build_number": "1.0.0",
+      "source_dir": "/Users/lzy/pro/solo/workspaces/zy10499/test-artifacts",
+      "error": null,
+      "warning": []
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10499/test-artifacts/build-12345/libabc1234.so",
+      "file_name": "libabc1234.so",
+      "file_size": 16,
+      "sha256": "05e7572a49f039c66d2cb946d67ae1e78e2247c4701bd05fbda1b37d24a67162",
+      "commit": null,
+      "build_number": "12345",
+      "source_dir": "/Users/lzy/pro/solo/workspaces/zy10499/test-artifacts",
+      "error": null,
+      "warning": []
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy10499/test-artifacts/build-12345/app-v1.0.0-abc1234-linux-x64.bin",
+      "file_name": "app-v1.0.0-abc1234-linux-x64.bin",
+      "file_size": 23,
+      "sha256": "7d09f7e2d4763b075c08404469a4603533448cd616a8f0f59779ae4bc303066c",
+      "commit": "abc1234",
+      "build_number": "1.0.0",
+      "source_dir": "/Users/lzy/pro/solo/workspaces/zy10499/test-artifacts",
+      "error": null,
+      "warning": []
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    {
+      "type": "missing_commit",
+      "message": "未找到包含提交号 abc0000 的制品",
+      "commit": "abc0000"
+    },
+    {
+      "type": "missing_artifact",
+      "message": "未找到预期制品: missing-file.bin",
+      "artifact": "missing-file.bin"
+    }
+  ]
+}
