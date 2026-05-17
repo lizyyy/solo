@@ -60,27 +60,32 @@ class MarkdownParser:
                 continue
             
             is_action_item = False
-            if re.match(r'^[-*+]\s*\[?[ x]?\]?\s*', line, re.IGNORECASE):
+            has_checkbox = False
+            checkbox_checked = False
+            
+            checkbox_match = re.match(r'^[-*+]\s*\[([ xX])\]\s*', line)
+            if checkbox_match:
                 is_action_item = True
-            elif any(keyword in line for keyword in ["待办", "行动项", "任务", "需要", "应", "要完成", "负责人", "截止"]):
+                has_checkbox = True
+                checkbox_checked = checkbox_match.group(1).lower() == 'x'
+            elif re.match(r'^[-*+]\s*', line):
+                is_action_item = True
+            
+            if not is_action_item and any(keyword in line for keyword in ["待办", "行动项", "任务", "负责人", "截止日期"]):
                 is_action_item = True
             
             if not is_action_item:
                 continue
             
-            content = re.sub(r'^[-*+]\s*\[?[ x]?\]?\s*', '', line).strip()
+            content = re.sub(r'^[-*+]\s*\[?[ xX]?\]?\s*', '', line).strip()
             
             assignee, raw_assignee = self.extract_assignee(content)
             due_date, raw_due_date = self.extract_date(content)
-            status = self.extract_status(content)
+            status = self.extract_status(content, has_checkbox, checkbox_checked)
             delay_reason = self.extract_delay_reason(content)
             
             needs_review = False
             review_notes = []
-            
-            if assignee is None and raw_assignee:
-                needs_review = True
-                review_notes.append("无法识别负责人")
             
             if due_date is None and raw_due_date:
                 needs_review = True
@@ -96,6 +101,7 @@ class MarkdownParser:
                 content=content,
                 raw_assignee=raw_assignee,
                 raw_due_date=raw_due_date,
+                due_date=due_date,
                 status=status,
                 delay_reason=delay_reason,
                 needs_review=needs_review,
@@ -162,16 +168,38 @@ class MarkdownParser:
         
         return parsed_date, raw_due_date
 
-    def extract_status(self, content: str) -> ActionStatus:
+    def extract_status(self, content: str, has_checkbox: bool = False, checkbox_checked: bool = False) -> ActionStatus:
         status = ActionStatus.PENDING
         
-        for keyword, status_value in self.status_keywords.items():
-            if keyword in content:
-                status = status_value
-                break
+        if has_checkbox and checkbox_checked:
+            return ActionStatus.COMPLETED
         
-        if re.search(r'^[-*+]\s*\[x\]', content, re.IGNORECASE):
-            status = ActionStatus.COMPLETED
+        if has_checkbox and not checkbox_checked:
+            return ActionStatus.PENDING
+        
+        status_keywords_ordered = [
+            ("已延期", ActionStatus.DELAYED),
+            ("延期", ActionStatus.DELAYED),
+            ("延后", ActionStatus.DELAYED),
+            ("已完成", ActionStatus.COMPLETED),
+            ("待处理", ActionStatus.PENDING),
+            ("待办", ActionStatus.PENDING),
+            ("未开始", ActionStatus.PENDING),
+            ("进行中", ActionStatus.IN_PROGRESS),
+            ("处理中", ActionStatus.IN_PROGRESS),
+            ("已取消", ActionStatus.CANCELLED),
+            ("取消", ActionStatus.CANCELLED),
+        ]
+        
+        for keyword, status_value in status_keywords_ordered:
+            if keyword in content:
+                if keyword == "完成":
+                    if re.search(r'(?<![要去未已待需])完成(?!接口|文档|功能|任务|工作)', content):
+                        status = status_value
+                        break
+                else:
+                    status = status_value
+                    break
         
         return status
 
