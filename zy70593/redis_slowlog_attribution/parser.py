@@ -325,6 +325,8 @@ class SlowlogParser:
 
     def _parse_redis_cli_format(self, lines: List[str], result: ParseResult) -> ParseResult:
         i = 0
+        entry_pattern = re.compile(r'^ ?(\d+)\) 1\) \(integer\)')
+        
         while i < len(lines):
             line = lines[i].rstrip()
             
@@ -332,7 +334,7 @@ class SlowlogParser:
                 i += 1
                 continue
             
-            if re.match(r'^ \d+\)', line):
+            if entry_pattern.search(line):
                 try:
                     entry_start = i
                     entry, i = self._read_cli_entry(lines, i)
@@ -345,13 +347,6 @@ class SlowlogParser:
                         error_reason=f"CLI format parse error: {str(e)}"
                     ))
                     i += 1
-            elif re.match(r'^\s*\d+\)', line):
-                result.errors.append(ParseError(
-                    line_number=i + 1,
-                    raw_content=lines[i],
-                    error_reason="Nested entry detected, might be in wrong format"
-                ))
-                i += 1
             else:
                 result.errors.append(ParseError(
                     line_number=i + 1,
@@ -373,16 +368,16 @@ class SlowlogParser:
         
         first_line = lines[idx].rstrip()
         
-        m = re.match(r'^ (\d+)\)', first_line)
+        m = re.match(r'^ ?(\d+)\)', first_line)
         if m:
             entry_id = int(m.group(1))
         
-        field_idx = 1
+        entry_pattern = re.compile(r'^ ?\d+\) 1\) \(integer\)')
         
         while idx < len(lines):
             line = lines[idx].rstrip()
             
-            if re.match(r'^ \d+\)', line) and line != first_line:
+            if entry_pattern.search(line) and line != first_line:
                 break
             
             stripped = line.strip()
@@ -415,7 +410,7 @@ class SlowlogParser:
                     idx += 1
                     while idx < len(lines):
                         next_line = lines[idx].rstrip()
-                        if re.match(r'^ \d+\)', next_line):
+                        if entry_pattern.search(next_line):
                             break
                         
                         next_stripped = next_line.strip()
