@@ -79,6 +79,10 @@ class ReplayExecutor {
             await this.engine.connect();
             console.log("  ✓ Database connected");
             console.log("");
+            console.log("Cleaning existing tables...");
+            await this.cleanupShadowData();
+            console.log("  ✓ Existing tables cleaned");
+            console.log("");
             console.log("Loading shadow data...");
             await this.loadShadowDataIntoDatabase();
             console.log("  ✓ Shadow data loaded");

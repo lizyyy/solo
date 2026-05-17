@@ -1,11 +1,46 @@
 #!/usr/bin/env node
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const chalk_1 = __importDefault(require("chalk"));
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 const replay_executor_1 = require("./replay-executor");
 const program = new commander_1.Command();
 program
@@ -22,12 +57,20 @@ program
     .requiredOption("-o, --output <dir>", "输出目录")
     .action(async (options) => {
     try {
-        const dbConfig = require(options.dbConfig);
-        const executor = new replay_executor_1.ReplayExecutor({ migrationScriptsPath: options.migrations, shadowDataPath: options.shadowData, tableSchemasPath: options.schemas, outputDir: options.output, databaseConfig: dbConfig });
-        console.log(chalk_1.default.blue("\n=== SQL迁移影子回放开始 ===\n"));
+        const configPath = path.resolve(options.dbConfig);
+        if (!fs.existsSync(configPath)) {
+            throw new Error(`Database config file not found: ${configPath}`);
+        }
+        const configContent = fs.readFileSync(configPath, "utf-8");
+        const dbConfig = JSON.parse(configContent);
+        const executor = new replay_executor_1.ReplayExecutor({
+            migrationScriptsPath: options.migrations,
+            shadowDataPath: options.shadowData,
+            tableSchemasPath: options.schemas,
+            outputDir: options.output,
+            databaseConfig: dbConfig
+        });
         const report = await executor.execute();
-        console.log(chalk_1.default.green("\n=== 回放完成 ===\n"));
-        console.log(chalk_1.default.cyan("运行ID: " + report.runId));
         process.exit(report.summary.failedScripts > 0 ? 1 : 0);
     }
     catch (error) {

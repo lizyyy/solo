@@ -12,7 +12,9 @@ const exampleDir = path.join(__dirname, 'example');
 
 const requiredPaths = [
   'db-config.json',
-  'migrations/001_create_users.sql',
+  'migrations/001_add_user_phone.sql',
+  'migrations/002_add_user_status.sql',
+  'migrations/003_add_order_discount.sql',
   'shadow-data/users.json',
   'shadow-data/orders.json',
   'schemas/users.json',

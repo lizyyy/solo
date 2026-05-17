@@ -1,0 +1,6 @@
+-- UP
+ALTER TABLE users ADD COLUMN phone VARCHAR(20);
+UPDATE users SET phone = CONCAT('+86-1380000', LPAD(id, 4, '0'));
+
+-- ROLLBACK
+ALTER TABLE users DROP COLUMN phone;
