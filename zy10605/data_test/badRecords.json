@@ -1,0 +1,33 @@
+[
+  {
+    "id": "96df9de6-9309-49fb-b734-59a5dd8bdf18",
+    "createdAt": "2026-05-17T19:12:43.278Z",
+    "updatedAt": "2026-05-17T19:12:43.278Z",
+    "rowNumber": 2,
+    "data": {
+      "orderId": "INVALID_ORDER_ID",
+      "sessionId": "38350c6c-035d-4d3f-ad5e-74ec357279a0",
+      "studentId": "STU004",
+      "studentName": "赵六",
+      "reason": "其他"
+    },
+    "error": "订单不存在",
+    "importedAt": "2026-05-17T19:12:43.278Z",
+    "importedBy": "批量导入员"
+  },
+  {
+    "id": "227882d5-462b-4e7e-b88d-649844f4ea3c",
+    "createdAt": "2026-05-17T19:12:43.278Z",
+    "updatedAt": "2026-05-17T19:12:43.279Z",
+    "rowNumber": 3,
+    "data": {
+      "orderId": "a33139a6-5a4d-48cc-ae77-9fdd252fdc4e",
+      "sessionId": "38350c6c-035d-4d3f-ad5e-74ec357279a0",
+      "studentId": "",
+      "studentName": "钱七"
+    },
+    "error": "必填字段缺失",
+    "importedAt": "2026-05-17T19:12:43.278Z",
+    "importedBy": "批量导入员"
+  }
+]

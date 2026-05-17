@@ -1,0 +1,35 @@
+const STATUS = {
+  PENDING_VERIFICATION: '待核验',
+  UNLOCKED: '已解锁',
+  EXPIRED: '已过期',
+  REVOKED: '已撤销'
+};
+
+const STATUS_FLOW = {
+  [STATUS.PENDING_VERIFICATION]: [STATUS.UNLOCKED, STATUS.REVOKED],
+  [STATUS.UNLOCKED]: [STATUS.EXPIRED, STATUS.REVOKED],
+  [STATUS.EXPIRED]: [],
+  [STATUS.REVOKED]: []
+};
+
+const OPERATION_SOURCE = {
+  API: 'API',
+  MANUAL: '人工操作',
+  IMPORT: '批量导入',
+  SYSTEM: '系统自动'
+};
+
+const UNLOCK_REASON = {
+  TECHNICAL_ISSUE: '技术故障补偿',
+  REFUND_KEEP_ACCESS: '退款保留观看',
+  SPECIAL_ARRANGEMENT: '特殊安排',
+  TEACHER_PERMISSION: '讲师授权',
+  OTHER: '其他'
+};
+
+module.exports = {
+  STATUS,
+  STATUS_FLOW,
+  OPERATION_SOURCE,
+  UNLOCK_REASON
+};

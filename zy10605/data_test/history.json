@@ -1,0 +1,116 @@
+[
+  {
+    "id": "9b0648ee-2597-4c9c-94dc-ada0230a73ea",
+    "createdAt": "2026-05-17T19:12:43.272Z",
+    "updatedAt": "2026-05-17T19:12:43.272Z",
+    "replayId": "58695a4e-0219-46f4-99a1-6abd9f1d591c",
+    "source": "API",
+    "operator": "运营小明",
+    "action": "创建回放解锁申请",
+    "previousStatus": null,
+    "newStatus": "待核验",
+    "reason": "技术故障补偿",
+    "timestamp": "2026-05-17T19:12:43.272Z",
+    "details": {
+      "orderNumber": "ORD20250518001",
+      "sessionTitle": "第5课 - 异步编程与事件循环"
+    }
+  },
+  {
+    "id": "3c986708-29c9-483d-916e-cc9c58b61683",
+    "createdAt": "2026-05-17T19:12:43.273Z",
+    "updatedAt": "2026-05-17T19:12:43.273Z",
+    "replayId": "58695a4e-0219-46f4-99a1-6abd9f1d591c",
+    "source": "人工操作",
+    "operator": "审核小红",
+    "action": "核验通过并解锁回放",
+    "previousStatus": "待核验",
+    "newStatus": "已解锁",
+    "timestamp": "2026-05-17T19:12:43.273Z",
+    "details": {
+      "unlockedAt": "2026-05-17T19:12:43.273Z"
+    }
+  },
+  {
+    "id": "9c2f5e6f-815b-4a5c-af31-53af4de73ff5",
+    "createdAt": "2026-05-17T19:12:43.274Z",
+    "updatedAt": "2026-05-17T19:12:43.274Z",
+    "replayId": "58695a4e-0219-46f4-99a1-6abd9f1d591c",
+    "source": "人工操作",
+    "operator": "主管老王",
+    "action": "撤销回放权限",
+    "previousStatus": "已解锁",
+    "newStatus": "已撤销",
+    "reason": "学员主动申请取消",
+    "timestamp": "2026-05-17T19:12:43.274Z",
+    "details": {
+      "revokedAt": "2026-05-17T19:12:43.274Z"
+    }
+  },
+  {
+    "id": "625efd7b-2ac8-4457-b4aa-0ead75fe5737",
+    "createdAt": "2026-05-17T19:12:43.275Z",
+    "updatedAt": "2026-05-17T19:12:43.275Z",
+    "replayId": "c03a0ee1-fd6f-475c-8414-360634c2cf87",
+    "source": "API",
+    "operator": "系统自动",
+    "action": "创建回放解锁申请",
+    "previousStatus": null,
+    "newStatus": "待核验",
+    "reason": "退款保留观看",
+    "timestamp": "2026-05-17T19:12:43.275Z",
+    "details": {
+      "orderNumber": "ORD20250518002",
+      "sessionTitle": "第5课 - 异步编程与事件循环"
+    }
+  },
+  {
+    "id": "ed3e3335-cfca-4978-9ade-9b4665b04ee1",
+    "createdAt": "2026-05-17T19:12:43.276Z",
+    "updatedAt": "2026-05-17T19:12:43.276Z",
+    "replayId": "c03a0ee1-fd6f-475c-8414-360634c2cf87",
+    "source": "API",
+    "operator": "审核小红",
+    "action": "核验通过并解锁回放",
+    "previousStatus": "待核验",
+    "newStatus": "已解锁",
+    "timestamp": "2026-05-17T19:12:43.276Z",
+    "details": {
+      "unlockedAt": "2026-05-17T19:12:43.276Z"
+    }
+  },
+  {
+    "id": "5856cb34-357e-46de-ae22-9180ba869ddf",
+    "createdAt": "2026-05-17T19:12:43.277Z",
+    "updatedAt": "2026-05-17T19:12:43.277Z",
+    "replayId": "844b9c34-1004-4fff-a44c-289c65f38a64",
+    "source": "API",
+    "operator": "测试用户",
+    "action": "创建回放解锁申请",
+    "previousStatus": null,
+    "newStatus": "待核验",
+    "reason": "其他",
+    "timestamp": "2026-05-17T19:12:43.277Z",
+    "details": {
+      "orderNumber": "ORD20250518001",
+      "sessionTitle": "第5课 - 异步编程与事件循环"
+    }
+  },
+  {
+    "id": "ea659195-5781-4657-8b79-2bbacc2438cb",
+    "createdAt": "2026-05-17T19:12:43.278Z",
+    "updatedAt": "2026-05-17T19:12:43.278Z",
+    "replayId": "d084e5d5-6c46-4a90-8055-42345c3bb1a4",
+    "source": "批量导入",
+    "operator": "批量导入员",
+    "action": "创建回放解锁申请",
+    "previousStatus": null,
+    "newStatus": "待核验",
+    "reason": "特殊安排",
+    "timestamp": "2026-05-17T19:12:43.278Z",
+    "details": {
+      "orderNumber": "ORD20250518003",
+      "sessionTitle": "第5课 - 异步编程与事件循环"
+    }
+  }
+]

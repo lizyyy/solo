@@ -1,0 +1,45 @@
+[
+  {
+    "id": "9955106c-0fa9-4132-a318-f227590d036b",
+    "createdAt": "2026-05-17T19:12:43.271Z",
+    "updatedAt": "2026-05-17T19:12:43.271Z",
+    "orderNumber": "ORD20250518001",
+    "studentId": "STU001",
+    "studentName": "张三",
+    "courseId": "COURSE001",
+    "courseName": "Node.js 高级编程实战",
+    "amount": 2999,
+    "purchaseDate": "2026-05-17T19:12:43.270Z",
+    "isRefunded": false,
+    "status": "有效"
+  },
+  {
+    "id": "4c71e8cb-2c4f-4542-ba82-8ddea2c02fe8",
+    "createdAt": "2026-05-17T19:12:43.271Z",
+    "updatedAt": "2026-05-17T19:12:43.271Z",
+    "orderNumber": "ORD20250518002",
+    "studentId": "STU002",
+    "studentName": "李四（已退款）",
+    "courseId": "COURSE001",
+    "courseName": "Node.js 高级编程实战",
+    "amount": 2999,
+    "purchaseDate": "2026-05-17T19:12:43.271Z",
+    "isRefunded": true,
+    "refundDate": "2026-05-17T19:12:43.271Z",
+    "status": "已退款"
+  },
+  {
+    "id": "a33139a6-5a4d-48cc-ae77-9fdd252fdc4e",
+    "createdAt": "2026-05-17T19:12:43.278Z",
+    "updatedAt": "2026-05-17T19:12:43.278Z",
+    "orderNumber": "ORD20250518003",
+    "studentId": "STU006",
+    "studentName": "孙八",
+    "courseId": "COURSE001",
+    "courseName": "Node.js 高级编程实战",
+    "amount": 2999,
+    "purchaseDate": "2026-05-17T19:12:43.277Z",
+    "isRefunded": false,
+    "status": "有效"
+  }
+]

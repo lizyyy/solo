@@ -1,0 +1,22 @@
+{
+  "name": "live-replay-unlock-api",
+  "version": "1.0.0",
+  "description": "在线教育后端直播课回放解锁API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "node src/test.js"
+  },
+  "keywords": ["live", "replay", "education", "api"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0",
+    "csv-writer": "^1.6.0",
+    "csv-parser": "^3.0.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {}
+}
