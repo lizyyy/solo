@@ -1,0 +1,14 @@
+{
+  "name": "asset-management-overdue-reminder",
+  "version": "1.0.0",
+  "description": "资产管理系统资产借用逾期催还服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node tests/acceptance.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
