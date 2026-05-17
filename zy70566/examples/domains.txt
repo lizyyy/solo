@@ -1,0 +1,21 @@
+# 生产环境域名
+example.com
+www.example.com
+api.example.com
+cdn.example.com
+
+# 灰度环境域名（容易漏掉！）
+gray.example.com
+www.gray.example.com
+api.gray.example.com
+
+# 测试环境通配符
+*.test.example.com
+
+# 管理后台
+admin.example.com
+dashboard.example.com
+
+# 下面是坏行，用来测试异常处理
+this is not a domain
+invalid-domain
