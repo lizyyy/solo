@@ -1,39 +1,39 @@
 {
   "summary": {
-    "report_generated_at": "2026-05-17T16:49:01.421991",
+    "report_generated_at": "2024-01-25T00:00:00",
     "total_orders": 4,
     "total_transactions": 7,
     "total_damages": 1,
     "total_renewals": 1,
     "total_bad_rows": 0,
     "audit_results": {
-      "passed": 3,
-      "failed": 1,
-      "pass_rate": "75.00%"
+      "passed": 4,
+      "failed": 0,
+      "pass_rate": "100.00%"
     },
     "risk_distribution": {
-      "LOW": 3,
-      "MEDIUM": 1,
+      "LOW": 4,
+      "MEDIUM": 0,
       "HIGH": 0,
       "CRITICAL": 0
     },
     "issues_by_category": {
       "deposit_issues": 0,
-      "overdue_issues": 1,
+      "overdue_issues": 0,
       "damage_issues": 0,
       "renewal_issues": 0
     },
     "financial_summary": {
       "total_deposit": "12300",
-      "total_overdue_charge": "506220.00",
+      "total_overdue_charge": "420.00",
       "total_damage_cost": "150",
-      "total_expected_deductions": "506370.00"
+      "total_expected_deductions": "570.00"
     }
   },
   "audit_results": [
     {
       "order_id": "ORD001",
-      "check_timestamp": "2026-05-17T16:49:01.421600",
+      "check_timestamp": "2024-01-25T00:00:00",
       "deposit_check_passed": true,
       "deposit_issues": [],
       "overdue_check_passed": true,
@@ -48,7 +48,7 @@
     },
     {
       "order_id": "ORD002",
-      "check_timestamp": "2026-05-17T16:49:01.421621",
+      "check_timestamp": "2024-01-25T00:00:00",
       "deposit_check_passed": true,
       "deposit_issues": [],
       "overdue_check_passed": true,
@@ -65,27 +65,24 @@
     },
     {
       "order_id": "ORD003",
-      "check_timestamp": "2026-05-17T16:49:01.421726",
+      "check_timestamp": "2024-01-25T00:00:00",
       "deposit_check_passed": true,
       "deposit_issues": [],
-      "overdue_check_passed": false,
-      "overdue_issues": [
-        "订单状态异常: 逾期 843 天, 但状态为 active"
-      ],
+      "overdue_check_passed": true,
+      "overdue_issues": [],
       "damage_check_passed": true,
       "damage_issues": [],
       "renewal_check_passed": true,
       "renewal_issues": [],
-      "overall_passed": false,
-      "risk_level": "MEDIUM",
+      "overall_passed": true,
+      "risk_level": "LOW",
       "recommended_actions": [
-        "联系客户确认逾期情况，计算逾期费用",
-        "更新订单状态为逾期"
+        "正常跟进订单状态"
       ]
     },
     {
       "order_id": "ORD004",
-      "check_timestamp": "2026-05-17T16:49:01.421743",
+      "check_timestamp": "2024-01-25T00:00:00",
       "deposit_check_passed": true,
       "deposit_issues": [],
       "overdue_check_passed": true,
@@ -119,13 +116,13 @@
       "customer_name": "李四",
       "equipment_name": "索尼 A7S III",
       "original_deposit": "4500",
-      "overdue_days": 844,
-      "overdue_charge": "354480.00",
+      "overdue_days": 1,
+      "overdue_charge": "420.00",
       "damage_count": 0,
       "damage_charge": 0,
       "other_charges": "0",
-      "total_deductions": "354480.00",
-      "net_refund": "0",
+      "total_deductions": "420.00",
+      "net_refund": "4080.00",
       "renewal_count": 1
     },
     {
@@ -133,13 +130,13 @@
       "customer_name": "王五",
       "equipment_name": "索尼 24-70mm f/2.8 GM",
       "original_deposit": "2000",
-      "overdue_days": 843,
-      "overdue_charge": "151740.00",
+      "overdue_days": 0,
+      "overdue_charge": "0",
       "damage_count": 0,
       "damage_charge": 0,
       "other_charges": "0",
-      "total_deductions": "151740.00",
-      "net_refund": "0",
+      "total_deductions": "0",
+      "net_refund": "2000",
       "renewal_count": 0
     },
     {

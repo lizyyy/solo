@@ -107,7 +107,8 @@ class DepositRuleEngine:
 class OverdueRuleEngine:
     @staticmethod
     def calculate_overdue_days(order: RentalOrder, 
-                               renewals: List[RenewalApplication]) -> int:
+                               renewals: List[RenewalApplication],
+                               audit_date: Optional[date] = None) -> int:
         effective_end_date = order.rental_end_date
         
         approved_renewals = [r for r in renewals if r.approved is True]
@@ -118,7 +119,8 @@ class OverdueRuleEngine:
                 if renewal.new_end_date > effective_end_date:
                     effective_end_date = renewal.new_end_date
         
-        return_date = order.actual_return_date or date.today()
+        reference_date = audit_date or date.today()
+        return_date = order.actual_return_date or reference_date
         
         if return_date <= effective_end_date:
             return 0
@@ -141,10 +143,11 @@ class OverdueRuleEngine:
 
     @staticmethod
     def check_overdue_status(order: RentalOrder,
-                            renewals: List[RenewalApplication]) -> Tuple[bool, List[str]]:
+                            renewals: List[RenewalApplication],
+                            audit_date: Optional[date] = None) -> Tuple[bool, List[str]]:
         issues = []
         
-        overdue_days = OverdueRuleEngine.calculate_overdue_days(order, renewals)
+        overdue_days = OverdueRuleEngine.calculate_overdue_days(order, renewals, audit_date)
         
         if overdue_days > 0:
             if order.status not in [RentalStatus.OVERDUE, RentalStatus.SETTLED]:
@@ -343,11 +346,13 @@ class AuditEngine:
                    order: RentalOrder,
                    transactions: List[DepositTransaction],
                    damages: List[DamageItem],
-                   renewals: List[RenewalApplication]) -> AuditResult:
+                   renewals: List[RenewalApplication],
+                   audit_date: Optional[date] = None,
+                   audit_timestamp: Optional[datetime] = None) -> AuditResult:
         
         deposit_passed, deposit_issues = self.deposit_engine.check_deposit_freeze(order, transactions)
         
-        overdue_passed, overdue_issues = self.overdue_engine.check_overdue_status(order, renewals)
+        overdue_passed, overdue_issues = self.overdue_engine.check_overdue_status(order, renewals, audit_date)
         
         damage_issues_all = []
         for damage in damages:
@@ -377,7 +382,7 @@ class AuditEngine:
 
         return AuditResult(
             order_id=order.order_id,
-            check_timestamp=datetime.now(),
+            check_timestamp=audit_timestamp or datetime.now(),
             deposit_check_passed=deposit_passed,
             deposit_issues=deposit_issues,
             overdue_check_passed=overdue_passed,
@@ -441,8 +446,9 @@ class AuditEngine:
                             transactions: List[DepositTransaction],
                             damages: List[DamageItem],
                             renewals: List[RenewalApplication],
-                            penalty_rate: Optional[Decimal] = None) -> Dict:
-        overdue_days = self.overdue_engine.calculate_overdue_days(order, renewals)
+                            penalty_rate: Optional[Decimal] = None,
+                            audit_date: Optional[date] = None) -> Dict:
+        overdue_days = self.overdue_engine.calculate_overdue_days(order, renewals, audit_date)
         overdue_charge = self.overdue_engine.calculate_overdue_charge(order, overdue_days, penalty_rate)
         
         verified_damages = [d for d in damages if d.is_verified]

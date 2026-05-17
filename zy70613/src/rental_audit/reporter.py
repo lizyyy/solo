@@ -1,6 +1,6 @@
 import csv
 import json
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -27,9 +27,16 @@ class ReportGenerator:
                              damages: List[DamageItem],
                              renewals: List[RenewalApplication],
                              bad_rows: List[BadRow],
-                             report_name: Optional[str] = None) -> str:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        report_name = report_name or f"audit_report_{timestamp}"
+                             report_name: Optional[str] = None,
+                             audit_date: Optional[date] = None,
+                             audit_timestamp: Optional[datetime] = None) -> str:
+        if report_name:
+            final_report_name = report_name
+        elif audit_date:
+            final_report_name = f"audit_report_{audit_date.strftime('%Y%m%d')}"
+        else:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            final_report_name = f"audit_report_{timestamp}"
         
         transactions_by_order: Dict[str, List[DepositTransaction]] = {}
         for t in transactions:
@@ -52,32 +59,35 @@ class ReportGenerator:
             order_renewals = renewals_by_order.get(order.order_id, [])
             
             audit_result = self.audit_engine.audit_order(
-                order, order_transactions, order_damages, order_renewals
+                order, order_transactions, order_damages, order_renewals,
+                audit_date, audit_timestamp
             )
             audit_results.append(audit_result)
             
             settlement = self.audit_engine.calculate_settlement(
-                order, order_transactions, order_damages, order_renewals
+                order, order_transactions, order_damages, order_renewals,
+                audit_date=audit_date
             )
             settlement_details.append(settlement)
         
         summary = self._generate_summary(
-            orders, transactions, damages, renewals, audit_results, bad_rows
+            orders, transactions, damages, renewals, audit_results, bad_rows,
+            audit_timestamp, audit_date
         )
         
         json_path = self._write_json_report(
-            report_name, summary, audit_results, settlement_details, bad_rows
+            final_report_name, summary, audit_results, settlement_details, bad_rows
         )
         
         csv_path = self._write_csv_report(
-            report_name, audit_results, settlement_details
+            final_report_name, audit_results, settlement_details
         )
         
-        self._write_bad_rows_report(report_name, bad_rows)
+        self._write_bad_rows_report(final_report_name, bad_rows)
         
         logger.info(f"审计报告已生成: {json_path}, {csv_path}")
         
-        return str(self.output_dir / report_name)
+        return str(self.output_dir / final_report_name)
 
     def _generate_summary(self,
                          orders: List[RentalOrder],
@@ -85,7 +95,9 @@ class ReportGenerator:
                          damages: List[DamageItem],
                          renewals: List[RenewalApplication],
                          audit_results: List[AuditResult],
-                         bad_rows: List[BadRow]) -> Dict[str, Any]:
+                         bad_rows: List[BadRow],
+                         audit_timestamp: Optional[datetime] = None,
+                         audit_date: Optional[date] = None) -> Dict[str, Any]:
         total_orders = len(orders)
         total_transactions = len(transactions)
         total_damages = len(damages)
@@ -111,15 +123,16 @@ class ReportGenerator:
         total_overdue_charge = sum(
             self.audit_engine.overdue_engine.calculate_overdue_charge(
                 o, self.audit_engine.overdue_engine.calculate_overdue_days(
-                    o, [r for r in renewals if r.order_id == o.order_id]
+                    o, [r for r in renewals if r.order_id == o.order_id], audit_date
                 )
             )
             for o in orders
         )
         total_damage_cost = sum(d.repair_cost for d in damages if d.is_verified)
         
+        summary_timestamp = audit_timestamp or datetime.now()
         summary = {
-            'report_generated_at': datetime.now().isoformat(),
+            'report_generated_at': summary_timestamp.isoformat(),
             'total_orders': total_orders,
             'total_transactions': total_transactions,
             'total_damages': total_damages,
@@ -283,15 +296,18 @@ class ReportGenerator:
                             order: RentalOrder,
                             transactions: List[DepositTransaction],
                             damages: List[DamageItem],
-                            renewals: List[RenewalApplication]) -> str:
+                            renewals: List[RenewalApplication],
+                            audit_date: Optional[date] = None,
+                            audit_timestamp: Optional[datetime] = None) -> str:
         audit_result = self.audit_engine.audit_order(
-            order, transactions, damages, renewals
+            order, transactions, damages, renewals, audit_date, audit_timestamp
         )
         
         settlement = self.audit_engine.calculate_settlement(
-            order, transactions, damages, renewals
+            order, transactions, damages, renewals, audit_date=audit_date
         )
         
+        report_timestamp = audit_timestamp or datetime.now()
         report_content = [
             "=" * 80,
             f"订单详细审计报告",
@@ -345,7 +361,7 @@ class ReportGenerator:
             *[f"- {action}" for action in audit_result.recommended_actions],
             "",
             "=" * 80,
-            f"报告生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            f"报告生成时间: {report_timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
             "=" * 80,
         ]
         
