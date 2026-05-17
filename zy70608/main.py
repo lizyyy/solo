@@ -40,6 +40,14 @@ def log_operation(db: Session, operation_type: str, ref_no: str, original_input:
     db.commit()
 
 
+def raise_with_log(db: Session, operation_type: str, ref_no: str, original_input: dict,
+                   operator_id: str, operator_name: str, error_detail: str, status_code: int = 400):
+    """异常时记录操作日志后抛出异常"""
+    log_operation(db, operation_type, ref_no, original_input,
+                  operator_id, operator_name, error_detail, "failed", error_detail)
+    raise HTTPException(status_code=status_code, detail=error_detail)
+
+
 @app.get("/")
 def root():
     return {"message": "无人货柜库存快照货损补货结算系统"}
@@ -47,15 +55,19 @@ def root():
 
 @app.post("/cabinets/", response_model=schemas.CabinetResponse)
 def create_cabinet(cabinet: schemas.CabinetCreate, db: Session = Depends(get_db)):
+    original_input = cabinet.dict()
     db_cabinet = db.query(models.Cabinet).filter(
         models.Cabinet.cabinet_no == cabinet.cabinet_no
     ).first()
     if db_cabinet:
-        raise HTTPException(status_code=400, detail="货柜编号已存在")
+        raise_with_log(db, "create_cabinet", cabinet.cabinet_no, original_input,
+                       "", "", "货柜编号已存在", 400)
     db_cabinet = models.Cabinet(**cabinet.dict())
     db.add(db_cabinet)
     db.commit()
     db.refresh(db_cabinet)
+    log_operation(db, "create_cabinet", cabinet.cabinet_no, original_input,
+                  "", "", "货柜创建成功", "success")
     return db_cabinet
 
 
@@ -67,13 +79,17 @@ def list_cabinets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 
 @app.post("/skus/", response_model=schemas.SKUResponse)
 def create_sku(sku: schemas.SKUCreate, db: Session = Depends(get_db)):
+    original_input = sku.dict()
     db_sku = db.query(models.SKU).filter(models.SKU.sku_code == sku.sku_code).first()
     if db_sku:
-        raise HTTPException(status_code=400, detail="SKU已存在")
+        raise_with_log(db, "create_sku", sku.sku_code, original_input,
+                       "", "", "SKU已存在", 400)
     db_sku = models.SKU(**sku.dict())
     db.add(db_sku)
     db.commit()
     db.refresh(db_sku)
+    log_operation(db, "create_sku", sku.sku_code, original_input,
+                  "", "", "SKU创建成功", "success")
     return db_sku
 
 
@@ -89,11 +105,13 @@ def create_inventory_snapshot(snapshot: schemas.InventorySnapshotCreate, db: Ses
     try:
         cabinet = db.query(models.Cabinet).filter(models.Cabinet.cabinet_no == snapshot.cabinet_no).first()
         if not cabinet:
-            raise HTTPException(status_code=404, detail="货柜不存在")
+            raise_with_log(db, "create_inventory_snapshot", f"{snapshot.cabinet_no}-{snapshot.sku_code}",
+                           original_input, snapshot.created_by or "", "", "货柜不存在", 404)
 
         sku = db.query(models.SKU).filter(models.SKU.sku_code == snapshot.sku_code).first()
         if not sku:
-            raise HTTPException(status_code=404, detail="SKU不存在")
+            raise_with_log(db, "create_inventory_snapshot", f"{snapshot.cabinet_no}-{snapshot.sku_code}",
+                           original_input, snapshot.created_by or "", "", "SKU不存在", 404)
 
         db_snapshot = models.InventorySnapshot(
             cabinet_id=cabinet.id,
@@ -126,7 +144,7 @@ def create_inventory_snapshot(snapshot: schemas.InventorySnapshotCreate, db: Ses
         raise
     except Exception as e:
         log_operation(db, "create_inventory_snapshot", f"{snapshot.cabinet_no}-{snapshot.sku_code}",
-                       original_input, snapshot.created_by or "", "", "failed", str(e))
+                       original_input, snapshot.created_by or "", "", str(e), "failed", str(e))
         raise
 
 
@@ -171,13 +189,17 @@ def create_replenishment(replenishment: schemas.ReplenishmentCreate, db: Session
             models.Replenishment.replenishment_no == replenishment.replenishment_no
         ).first()
         if existing:
-            raise HTTPException(status_code=400, detail="补货单号已存在，幂等校验通过")
+            raise_with_log(db, "create_replenishment", replenishment.replenishment_no,
+                           original_input, replenishment.operator_id or "", replenishment.operator_name or "",
+                           "补货单号已存在，幂等校验通过", 400)
 
         cabinet = db.query(models.Cabinet).filter(
             models.Cabinet.cabinet_no == replenishment.cabinet_no
         ).first()
         if not cabinet:
-            raise HTTPException(status_code=404, detail="货柜不存在")
+            raise_with_log(db, "create_replenishment", replenishment.replenishment_no,
+                           original_input, replenishment.operator_id or "", replenishment.operator_name or "",
+                           "货柜不存在", 404)
 
         db_replenishment = models.Replenishment(
             cabinet_id=cabinet.id,
@@ -192,7 +214,9 @@ def create_replenishment(replenishment: schemas.ReplenishmentCreate, db: Session
         for item in replenishment.items:
             sku = db.query(models.SKU).filter(models.SKU.sku_code == item.sku_code).first()
             if not sku:
-                raise HTTPException(status_code=404, detail=f"SKU {item.sku_code} 不存在")
+                raise_with_log(db, "create_replenishment", replenishment.replenishment_no,
+                               original_input, replenishment.operator_id or "", replenishment.operator_name or "",
+                               f"SKU {item.sku_code} 不存在", 404)
             db_item = models.ReplenishmentItem(
                 replenishment_id=db_replenishment.id,
                 sku_id=sku.id,
@@ -215,7 +239,7 @@ def create_replenishment(replenishment: schemas.ReplenishmentCreate, db: Session
     except Exception as e:
         log_operation(db, "create_replenishment", replenishment.replenishment_no,
                        original_input, replenishment.operator_id or "", replenishment.operator_name or "",
-                       "", "failed", str(e))
+                       str(e), "failed", str(e))
         raise
 
 
@@ -231,10 +255,14 @@ def confirm_replenishment(
             models.Replenishment.replenishment_no == replenishment_no
         ).first()
         if not replenishment:
-            raise HTTPException(status_code=404, detail="补货单不存在")
+            raise_with_log(db, "confirm_replenishment", replenishment_no,
+                           original_input, confirm.operator_id, confirm.operator_name,
+                           "补货单不存在", 404)
 
         if replenishment.status != "pending":
-            raise HTTPException(status_code=400, detail="补货单状态不允许确认")
+            raise_with_log(db, "confirm_replenishment", replenishment_no,
+                           original_input, confirm.operator_id, confirm.operator_name,
+                           "补货单状态不允许确认", 400)
 
         replenishment.status = "confirmed"
         replenishment.operator_id = confirm.operator_id
@@ -262,7 +290,7 @@ def confirm_replenishment(
     except Exception as e:
         log_operation(db, "confirm_replenishment", replenishment_no,
                        original_input, confirm.operator_id, confirm.operator_name,
-                       "", "failed", str(e))
+                       str(e), "failed", str(e))
         raise
 
 
@@ -320,11 +348,15 @@ def create_damage_record(damage: schemas.DamageRecordCreate, db: Session = Depen
     try:
         cabinet = db.query(models.Cabinet).filter(models.Cabinet.cabinet_no == damage.cabinet_no).first()
         if not cabinet:
-            raise HTTPException(status_code=404, detail="货柜不存在")
+            raise_with_log(db, "create_damage_record", "",
+                           original_input, damage.reporter_id or "", damage.reporter_name or "",
+                           "货柜不存在", 404)
 
         sku = db.query(models.SKU).filter(models.SKU.sku_code == damage.sku_code).first()
         if not sku:
-            raise HTTPException(status_code=404, detail="SKU不存在")
+            raise_with_log(db, "create_damage_record", "",
+                           original_input, damage.reporter_id or "", damage.reporter_name or "",
+                           "SKU不存在", 404)
 
         import time
         damage_no = f"DM{int(time.time() * 1000000)}"
@@ -365,7 +397,7 @@ def create_damage_record(damage: schemas.DamageRecordCreate, db: Session = Depen
     except Exception as e:
         log_operation(db, "create_damage_record", "",
                        original_input, damage.reporter_id or "", damage.reporter_name or "",
-                       "", "failed", str(e))
+                       str(e), "failed", str(e))
         raise
 
 
@@ -381,10 +413,14 @@ def confirm_damage_record(
             models.DamageRecord.damage_no == damage_no
         ).first()
         if not damage:
-            raise HTTPException(status_code=404, detail="货损记录不存在")
+            raise_with_log(db, "confirm_damage_record", damage_no,
+                           original_input, confirm.confirmer_id, confirm.confirmer_name,
+                           "货损记录不存在", 404)
 
         if damage.status != "pending":
-            raise HTTPException(status_code=400, detail="货损记录已处理")
+            raise_with_log(db, "confirm_damage_record", damage_no,
+                           original_input, confirm.confirmer_id, confirm.confirmer_name,
+                           "货损记录已处理", 400)
 
         damage.status = "confirmed"
         damage.confirmer_id = confirm.confirmer_id
@@ -420,7 +456,7 @@ def confirm_damage_record(
     except Exception as e:
         log_operation(db, "confirm_damage_record", damage_no,
                        original_input, confirm.confirmer_id, confirm.confirmer_name,
-                       "", "failed", str(e))
+                       str(e), "failed", str(e))
         raise
 
 
@@ -470,11 +506,15 @@ def create_expired_product(expired: schemas.ExpiredProductCreate, db: Session = 
     try:
         cabinet = db.query(models.Cabinet).filter(models.Cabinet.cabinet_no == expired.cabinet_no).first()
         if not cabinet:
-            raise HTTPException(status_code=404, detail="货柜不存在")
+            raise_with_log(db, "create_expired_product", "",
+                           original_input, expired.operator_id or "", expired.operator_name or "",
+                           "货柜不存在", 404)
 
         sku = db.query(models.SKU).filter(models.SKU.sku_code == expired.sku_code).first()
         if not sku:
-            raise HTTPException(status_code=404, detail="SKU不存在")
+            raise_with_log(db, "create_expired_product", "",
+                           original_input, expired.operator_id or "", expired.operator_name or "",
+                           "SKU不存在", 404)
 
         import time
         record_no = f"EX{int(time.time() * 1000000)}"
@@ -515,7 +555,7 @@ def create_expired_product(expired: schemas.ExpiredProductCreate, db: Session = 
     except Exception as e:
         log_operation(db, "create_expired_product", "",
                        original_input, expired.operator_id or "", expired.operator_name or "",
-                       "", "failed", str(e))
+                       str(e), "failed", str(e))
         raise
 
 
@@ -526,10 +566,12 @@ def confirm_expired_product(record_no: str, db: Session = Depends(get_db)):
             models.ExpiredProduct.record_no == record_no
         ).first()
         if not expired:
-            raise HTTPException(status_code=404, detail="临期下架记录不存在")
+            raise_with_log(db, "confirm_expired_product", record_no,
+                           {}, "", "", "临期下架记录不存在", 404)
 
         if expired.status != "pending":
-            raise HTTPException(status_code=400, detail="记录已处理")
+            raise_with_log(db, "confirm_expired_product", record_no,
+                           {}, "", "", "记录已处理", 400)
 
         expired.status = "confirmed"
         expired.confirmed_at = datetime.utcnow()
@@ -537,14 +579,14 @@ def confirm_expired_product(record_no: str, db: Session = Depends(get_db)):
         db.commit()
 
         log_operation(db, "confirm_expired_product", record_no,
-                       "", "", "", "临期下架确认成功", "success")
+                       {}, "", "", "临期下架确认成功", "success")
 
         return {"message": "确认成功", "record_no": record_no}
     except HTTPException:
         raise
     except Exception as e:
         log_operation(db, "confirm_expired_product", record_no,
-                       "", "", "", "", "failed", str(e))
+                       {}, "", "", str(e), "failed", str(e))
         raise
 
 
@@ -596,19 +638,24 @@ def create_settlement(settlement: schemas.SettlementCreate, db: Session = Depend
             models.Settlement.settlement_no == settlement.settlement_no
         ).first()
         if existing:
-            raise HTTPException(status_code=400, detail="结算单号已存在")
+            raise_with_log(db, "create_settlement", settlement.settlement_no,
+                           original_input, settlement.created_by or "", "",
+                           "结算单号已存在", 400)
 
         cabinet = db.query(models.Cabinet).filter(
             models.Cabinet.cabinet_no == settlement.cabinet_no
         ).first()
         if not cabinet:
-            raise HTTPException(status_code=404, detail="货柜不存在")
+            raise_with_log(db, "create_settlement", settlement.settlement_no,
+                           original_input, settlement.created_by or "", "",
+                           "货柜不存在", 404)
 
         db_settlement = models.Settlement(
             cabinet_id=cabinet.id,
             settlement_no=settlement.settlement_no,
             period_start=settlement.period_start,
             period_end=settlement.period_end,
+            status="draft",
             created_by=settlement.created_by
         )
         db.add(db_settlement)
@@ -635,17 +682,20 @@ def create_settlement(settlement: schemas.SettlementCreate, db: Session = Depend
     except Exception as e:
         log_operation(db, "create_settlement", settlement.settlement_no,
                        original_input, settlement.created_by or "", "",
-                       "", "failed", str(e))
+                       str(e), "failed", str(e))
         raise
 
 
 def calculate_settlement_details(settlement, db):
+    from sqlalchemy import func
+
     cabinet = db.query(models.Cabinet).filter(models.Cabinet.id == settlement.cabinet_id).first()
 
     details = db.query(models.SettlementDetail, models.SKU).join(
         models.SKU, models.SettlementDetail.sku_id == models.SKU.id
     ).filter(models.SettlementDetail.settlement_id == settlement.id).all()
 
+    # 周期内已确认的补货单
     replenishments = db.query(models.Replenishment).filter(
         models.Replenishment.cabinet_id == settlement.cabinet_id,
         models.Replenishment.status == "confirmed",
@@ -653,6 +703,7 @@ def calculate_settlement_details(settlement, db):
         models.Replenishment.created_at <= settlement.period_end
     ).all()
 
+    # 周期内已确认的货损记录
     damages = db.query(models.DamageRecord).filter(
         models.DamageRecord.cabinet_id == settlement.cabinet_id,
         models.DamageRecord.status == "confirmed",
@@ -660,6 +711,7 @@ def calculate_settlement_details(settlement, db):
         models.DamageRecord.created_at <= settlement.period_end
     ).all()
 
+    # 周期内已确认的临期下架记录
     expired = db.query(models.ExpiredProduct).filter(
         models.ExpiredProduct.cabinet_id == settlement.cabinet_id,
         models.ExpiredProduct.status == "confirmed",
@@ -667,10 +719,45 @@ def calculate_settlement_details(settlement, db):
         models.ExpiredProduct.created_at <= settlement.period_end
     ).all()
 
-    opening_snapshots = db.query(models.InventorySnapshot).filter(
+    # 期初库存快照（取周期开始前的最新快照，按SKU分组取最新）
+    opening_snapshot_subq = db.query(
+        models.InventorySnapshot.sku_id,
+        func.max(models.InventorySnapshot.snapshot_time).label("max_time")
+    ).filter(
         models.InventorySnapshot.cabinet_id == settlement.cabinet_id,
         models.InventorySnapshot.snapshot_time < settlement.period_start
-    ).order_by(models.InventorySnapshot.snapshot_time.desc()).first()
+    ).group_by(models.InventorySnapshot.sku_id).subquery()
+
+    opening_inventory_map = {}
+    for sku_id, quantity in db.query(
+        models.InventorySnapshot.sku_id,
+        models.InventorySnapshot.quantity
+    ).join(
+        opening_snapshot_subq,
+        (models.InventorySnapshot.sku_id == opening_snapshot_subq.c.sku_id) &
+        (models.InventorySnapshot.snapshot_time == opening_snapshot_subq.c.max_time)
+    ).filter(models.InventorySnapshot.cabinet_id == settlement.cabinet_id).all():
+        opening_inventory_map[sku_id] = quantity
+
+    # 期末库存快照（取周期结束前的最新快照）
+    closing_snapshot_subq = db.query(
+        models.InventorySnapshot.sku_id,
+        func.max(models.InventorySnapshot.snapshot_time).label("max_time")
+    ).filter(
+        models.InventorySnapshot.cabinet_id == settlement.cabinet_id,
+        models.InventorySnapshot.snapshot_time <= settlement.period_end
+    ).group_by(models.InventorySnapshot.sku_id).subquery()
+
+    closing_inventory_map = {}
+    for sku_id, quantity in db.query(
+        models.InventorySnapshot.sku_id,
+        models.InventorySnapshot.quantity
+    ).join(
+        closing_snapshot_subq,
+        (models.InventorySnapshot.sku_id == closing_snapshot_subq.c.sku_id) &
+        (models.InventorySnapshot.snapshot_time == closing_snapshot_subq.c.max_time)
+    ).filter(models.InventorySnapshot.cabinet_id == settlement.cabinet_id).all():
+        closing_inventory_map[sku_id] = quantity
 
     detail_responses = []
     total_sales = 0
@@ -679,21 +766,41 @@ def calculate_settlement_details(settlement, db):
     total_replenishment = 0
 
     for detail, sku in details:
+        # 期初库存（从期初快照映射中获取，默认0）
+        opening_qty = opening_inventory_map.get(sku.id, 0)
+        detail.opening_inventory = opening_qty
+
+        # 期末库存（从期末快照映射中获取，默认0）
+        closing_qty = closing_inventory_map.get(sku.id, 0)
+        detail.closing_inventory = closing_qty
+
+        # 周期内补货数量
         replenishment_qty = sum(
             item.quantity for r in replenishments
             for item in r.items if item.sku_id == sku.id
         )
-        damage_qty = sum(d.quantity for d in damages if d.sku_id == sku.id)
-        expired_qty = sum(e.quantity for e in expired if e.sku_id == sku.id)
-
         detail.replenishment_quantity = replenishment_qty
+
+        # 周期内货损数量
+        damage_qty = sum(d.quantity for d in damages if d.sku_id == sku.id)
         detail.damage_quantity = damage_qty
+
+        # 周期内临期下架数量
+        expired_qty = sum(e.quantity for e in expired if e.sku_id == sku.id)
         detail.expired_quantity = expired_qty
 
-        detail.sales_amount = detail.sales_quantity * sku.price
+        # 核心公式：期初 + 补货 - 销售 - 货损 - 临期 = 期末
+        # 推导出：销售 = 期初 + 补货 - 货损 - 临期 - 期末
+        # 保证销售数量不小于0
+        sales_qty = max(0, opening_qty + replenishment_qty - damage_qty - expired_qty - closing_qty)
+        detail.sales_quantity = sales_qty
+
+        # 计算各项金额
+        detail.sales_amount = sales_qty * sku.price
         detail.damage_loss = damage_qty * sku.price
         detail.expired_loss = expired_qty * sku.price
 
+        # 累加总计
         total_sales += detail.sales_amount
         total_damage_loss += detail.damage_loss
         total_expired_loss += detail.expired_loss
@@ -750,10 +857,14 @@ def confirm_settlement(
             models.Settlement.settlement_no == settlement_no
         ).first()
         if not settlement:
-            raise HTTPException(status_code=404, detail="结算单不存在")
+            raise_with_log(db, "confirm_settlement", settlement_no,
+                           original_input, confirm.confirmed_by, "",
+                           "结算单不存在", 404)
 
         if settlement.status != "draft":
-            raise HTTPException(status_code=400, detail="结算单状态不允许确认")
+            raise_with_log(db, "confirm_settlement", settlement_no,
+                           original_input, confirm.confirmed_by, "",
+                           "结算单状态不允许确认", 400)
 
         settlement.status = "confirmed"
         settlement.confirmed_by = confirm.confirmed_by
@@ -771,7 +882,7 @@ def confirm_settlement(
     except Exception as e:
         log_operation(db, "confirm_settlement", settlement_no,
                        original_input, confirm.confirmed_by, "",
-                       "", "failed", str(e))
+                       str(e), "failed", str(e))
         raise
 
 
@@ -787,7 +898,9 @@ def close_settlement(
             models.Settlement.settlement_no == settlement_no
         ).first()
         if not settlement:
-            raise HTTPException(status_code=404, detail="结算单不存在")
+            raise_with_log(db, "close_settlement", settlement_no,
+                           original_input, close_data.operator_id, close_data.operator_name,
+                           "结算单不存在", 404)
 
         settlement.status = "closed"
         db.commit()
@@ -802,7 +915,7 @@ def close_settlement(
     except Exception as e:
         log_operation(db, "close_settlement", settlement_no,
                        original_input, close_data.operator_id, close_data.operator_name,
-                       "", "failed", str(e))
+                       str(e), "failed", str(e))
         raise
 
 
@@ -827,11 +940,15 @@ def create_correction(correction: schemas.CorrectionCreate, db: Session = Depend
     try:
         cabinet = db.query(models.Cabinet).filter(models.Cabinet.cabinet_no == correction.cabinet_no).first()
         if not cabinet:
-            raise HTTPException(status_code=404, detail="货柜不存在")
+            raise_with_log(db, "manual_correction", correction.cabinet_no,
+                           original_input, correction.operator_id, correction.operator_name,
+                           "货柜不存在", 404)
 
         sku = db.query(models.SKU).filter(models.SKU.sku_code == correction.sku_code).first()
         if not sku:
-            raise HTTPException(status_code=404, detail="SKU不存在")
+            raise_with_log(db, "manual_correction", correction.cabinet_no,
+                           original_input, correction.operator_id, correction.operator_name,
+                           "SKU不存在", 404)
 
         snapshot = models.InventorySnapshot(
             cabinet_id=cabinet.id,
@@ -852,7 +969,7 @@ def create_correction(correction: schemas.CorrectionCreate, db: Session = Depend
     except Exception as e:
         log_operation(db, "manual_correction", correction.cabinet_no,
                        original_input, correction.operator_id, correction.operator_name,
-                       "", "failed", str(e))
+                       str(e), "failed", str(e))
         raise
 
 
@@ -878,11 +995,21 @@ def list_operation_logs(
 
 @app.get("/settlements/{settlement_no}/export")
 def export_settlement(settlement_no: str, format: str = "csv", db: Session = Depends(get_db)):
-    settlement = db.query(models.Settlement).filter(
-        models.Settlement.settlement_no == settlement_no
-    ).first()
-    if not settlement:
-        raise HTTPException(status_code=404, detail="结算单不存在")
+    try:
+        settlement = db.query(models.Settlement).filter(
+            models.Settlement.settlement_no == settlement_no
+        ).first()
+        if not settlement:
+            raise_with_log(db, "export_settlement", settlement_no,
+                           {"settlement_no": settlement_no, "format": format}, "", "",
+                           "结算单不存在", 404)
+    except HTTPException:
+        raise
+    except Exception as e:
+        log_operation(db, "export_settlement", settlement_no,
+                       {"settlement_no": settlement_no, "format": format}, "", "",
+                       str(e), "failed", str(e))
+        raise
 
     cabinet = db.query(models.Cabinet).filter(models.Cabinet.id == settlement.cabinet_id).first()
     details = db.query(models.SettlementDetail, models.SKU).join(
