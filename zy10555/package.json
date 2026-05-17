@@ -1,0 +1,30 @@
+{
+  "name": "license-snapshot-cli",
+  "version": "1.0.0",
+  "description": "Dependency license snapshot CLI for legal compliance tracking",
+  "main": "src/index.js",
+  "bin": {
+    "license-snapshot": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": ["license", "dependency", "compliance", "snapshot", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@yarnpkg/lockfile": "^1.1.0",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "semver": "^7.5.4",
+    "spdx-license-list": "^6.7.0",
+    "spdx-satisfies": "^5.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
