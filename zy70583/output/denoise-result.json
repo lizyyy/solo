@@ -1,0 +1,209 @@
+{
+  "metadata": {
+    "generatedAt": 1778989598118,
+    "inputFiles": {
+      "alerts": "sample-data/alerts.json",
+      "rules": "sample-data/rules.json",
+      "silences": "sample-data/silences.json"
+    },
+    "totalAlerts": 5,
+    "totalRules": 3,
+    "totalSilences": 2
+  },
+  "aggregations": [
+    {
+      "ruleId": "cpu-high",
+      "ruleName": "CPU使用率过高",
+      "totalCount": 3,
+      "severity": "warning",
+      "uniqueFingerprints": 3,
+      "firstSeen": 1717200000000,
+      "lastSeen": 1717200120000,
+      "labels": {
+        "env": [
+          "prod"
+        ],
+        "service": [
+          "api",
+          "web"
+        ],
+        "instance": [
+          "10.0.0.1",
+          "10.0.0.2",
+          "10.0.0.3"
+        ]
+      }
+    },
+    {
+      "ruleId": "memory-low",
+      "ruleName": "内存不足",
+      "totalCount": 1,
+      "severity": "critical",
+      "uniqueFingerprints": 1,
+      "firstSeen": 1717200180000,
+      "lastSeen": 1717200180000,
+      "labels": {
+        "env": [
+          "prod"
+        ],
+        "service": [
+          "db"
+        ]
+      }
+    },
+    {
+      "ruleId": "disk-full",
+      "ruleName": "磁盘空间不足",
+      "totalCount": 1,
+      "severity": "info",
+      "uniqueFingerprints": 1,
+      "firstSeen": 1717200240000,
+      "lastSeen": 1717200240000,
+      "labels": {
+        "env": [
+          "dev"
+        ],
+        "service": [
+          "dev-server"
+        ]
+      }
+    }
+  ],
+  "noiseScores": [
+    {
+      "ruleId": "cpu-high",
+      "ruleName": "CPU使用率过高",
+      "totalScore": 18,
+      "factors": [
+        {
+          "name": "触发频率",
+          "score": 15,
+          "description": "共触发 3 次",
+          "weight": 0.35
+        },
+        {
+          "name": "标签多样性",
+          "score": 20,
+          "description": "3 个标签, 6 个不同值",
+          "weight": 0.25
+        },
+        {
+          "name": "持续时长",
+          "score": 0,
+          "description": "持续 0 小时",
+          "weight": 0.25
+        },
+        {
+          "name": "告警级别",
+          "score": 50,
+          "description": "级别: warning",
+          "weight": 0.15
+        }
+      ],
+      "recommendation": "keep",
+      "confidence": 0.8
+    },
+    {
+      "ruleId": "memory-low",
+      "ruleName": "内存不足",
+      "totalScore": 10,
+      "factors": [
+        {
+          "name": "触发频率",
+          "score": 5,
+          "description": "共触发 1 次",
+          "weight": 0.35
+        },
+        {
+          "name": "标签多样性",
+          "score": 20,
+          "description": "2 个标签, 2 个不同值",
+          "weight": 0.25
+        },
+        {
+          "name": "持续时长",
+          "score": 0,
+          "description": "持续 0 小时",
+          "weight": 0.25
+        },
+        {
+          "name": "告警级别",
+          "score": 20,
+          "description": "级别: critical",
+          "weight": 0.15
+        }
+      ],
+      "recommendation": "keep",
+      "confidence": 0.8
+    },
+    {
+      "ruleId": "disk-full",
+      "ruleName": "磁盘空间不足",
+      "totalScore": 19,
+      "factors": [
+        {
+          "name": "触发频率",
+          "score": 5,
+          "description": "共触发 1 次",
+          "weight": 0.35
+        },
+        {
+          "name": "标签多样性",
+          "score": 20,
+          "description": "2 个标签, 2 个不同值",
+          "weight": 0.25
+        },
+        {
+          "name": "持续时长",
+          "score": 0,
+          "description": "持续 0 小时",
+          "weight": 0.25
+        },
+        {
+          "name": "告警级别",
+          "score": 80,
+          "description": "级别: info",
+          "weight": 0.15
+        }
+      ],
+      "recommendation": "keep",
+      "confidence": 0.8
+    }
+  ],
+  "matchedSilences": [
+    {
+      "ruleId": "cpu-high",
+      "ruleName": "CPU使用率过高",
+      "matches": [
+        {
+          "silenceId": "sil-002",
+          "silenceComment": "API服务CPU告警已知问题",
+          "matchedBy": [
+            "service"
+          ]
+        }
+      ]
+    },
+    {
+      "ruleId": "memory-low",
+      "ruleName": "内存不足",
+      "matches": []
+    },
+    {
+      "ruleId": "disk-full",
+      "ruleName": "磁盘空间不足",
+      "matches": [
+        {
+          "silenceId": "sil-001",
+          "silenceComment": "开发环境磁盘告警临时静默",
+          "matchedBy": [
+            "env",
+            "service"
+          ]
+        }
+      ]
+    }
+  ],
+  "candidates": [],
+  "parseErrors": []
+}

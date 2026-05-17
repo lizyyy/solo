@@ -1,0 +1,27 @@
+{
+  "name": "alert-denoiser-cli",
+  "version": "1.0.0",
+  "description": "Alert规则消噪CLI - 解析、校验和报告告警噪声",
+  "main": "dist/index.js",
+  "bin": {
+    "alert-denoiser": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "test": "node dist/cli.js self-test",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["alert", "monitoring", "noise", "cli"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parse": "^5.5.0"
+  }
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "cpu-high",
+    "name": "CPU使用率过高",
+    "expr": "100 - (avg by(instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100) > 80",
+    "severity": "warning",
+    "labels": {
+      "team": "sre"
+    },
+    "annotations": {
+      "description": "CPU使用率超过80%"
+    }
+  },
+  {
+    "id": "memory-low",
+    "name": "内存不足",
+    "expr": "node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10",
+    "severity": "critical",
+    "labels": {
+      "team": "sre"
+    },
+    "annotations": {
+      "description": "可用内存低于10%"
+    }
+  },
+  {
+    "id": "disk-full",
+    "name": "磁盘空间不足",
+    "expr": "100 - (node_filesystem_free_bytes{fstype=~\"ext4|xfs\"} / node_filesystem_size_bytes{fstype=~\"ext4|xfs\"} * 100) > 90",
+    "severity": "info",
+    "labels": {
+      "team": "devops"
+    },
+    "annotations": {
+      "description": "磁盘使用率超过90%"
+    }
+  }
+]

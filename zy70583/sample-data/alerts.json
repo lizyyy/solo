@@ -1,0 +1,80 @@
+[
+  {
+    "id": "a1",
+    "ruleId": "cpu-high",
+    "ruleName": "CPU使用率过高",
+    "severity": "warning",
+    "timestamp": 1717200000000,
+    "labels": {
+      "env": "prod",
+      "service": "api",
+      "instance": "10.0.0.1"
+    },
+    "annotations": {
+      "summary": "CPU使用率超过80%"
+    },
+    "fingerprint": "fp-cpu-1"
+  },
+  {
+    "id": "a2",
+    "ruleId": "cpu-high",
+    "ruleName": "CPU使用率过高",
+    "severity": "warning",
+    "timestamp": 1717200060000,
+    "labels": {
+      "env": "prod",
+      "service": "api",
+      "instance": "10.0.0.2"
+    },
+    "annotations": {
+      "summary": "CPU使用率超过80%"
+    },
+    "fingerprint": "fp-cpu-2"
+  },
+  {
+    "id": "a3",
+    "ruleId": "cpu-high",
+    "ruleName": "CPU使用率过高",
+    "severity": "warning",
+    "timestamp": 1717200120000,
+    "labels": {
+      "env": "prod",
+      "service": "web",
+      "instance": "10.0.0.3"
+    },
+    "annotations": {
+      "summary": "CPU使用率超过80%"
+    },
+    "fingerprint": "fp-cpu-3"
+  },
+  {
+    "id": "a4",
+    "ruleId": "memory-low",
+    "ruleName": "内存不足",
+    "severity": "critical",
+    "timestamp": 1717200180000,
+    "labels": {
+      "env": "prod",
+      "service": "db"
+    },
+    "annotations": {
+      "summary": "可用内存低于10%"
+    },
+    "fingerprint": "fp-mem-1"
+  },
+  {
+    "id": "a5",
+    "ruleId": "disk-full",
+    "ruleName": "磁盘空间不足",
+    "severity": "info",
+    "timestamp": 1717200240000,
+    "labels": {
+      "env": "dev",
+      "service": "dev-server"
+    },
+    "annotations": {
+      "summary": "磁盘使用率超过90%"
+    },
+    "fingerprint": "fp-disk-1"
+  }
+]

@@ -1,0 +1,40 @@
+[
+  {
+    "id": "sil-001",
+    "comment": "开发环境磁盘告警临时静默",
+    "createdBy": "admin",
+    "startsAt": 1717200000000,
+    "endsAt": 1717804800000,
+    "status": "active",
+    "matchers": [
+      {
+        "name": "env",
+        "value": "dev",
+        "isRegex": false,
+        "isEqual": true
+      },
+      {
+        "name": "service",
+        "value": "dev-server",
+        "isRegex": false,
+        "isEqual": true
+      }
+    ]
+  },
+  {
+    "id": "sil-002",
+    "comment": "API服务CPU告警已知问题",
+    "createdBy": "dev-team",
+    "startsAt": 1717200000000,
+    "endsAt": 1717500000000,
+    "status": "active",
+    "matchers": [
+      {
+        "name": "service",
+        "value": "api",
+        "isRegex": false,
+        "isEqual": true
+      }
+    ]
+  }
+]
