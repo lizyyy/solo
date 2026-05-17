@@ -264,28 +264,60 @@ def test_person_management():
         return passed_tests + 1, total_tests + 1
     
     total_tests += 1
-    item_response = client.post(
-        "/api/action-items/",
+    meeting_response = client.post(
+        "/api/meetings/",
         json={
-            "content": "完成API文档编写",
-            "raw_assignee": "张三",
-            "assignee_id": person1_id,
-            "due_date": str(date.today() + timedelta(days=7)),
-            "status": "待处理"
+            "title": "测试负责人归并",
+            "content": "- [ ] 完成接口开发，负责人: 张三，截止日期: 2024-06-01\n- [ ] 编写测试用例，负责人: 李四，截止日期: 2024-06-15"
         }
     )
-    if item_response.status_code == 200:
-        item_id = item_response.json()["id"]
-        passed_tests += print_result(
-            "创建带负责人的行动项",
-            True,
-            f"行动项ID: {item_id}"
-        )
+    meeting_id = meeting_response.json()["id"]
+    
+    parse_response = client.post(f"/api/meetings/{meeting_id}/parse")
+    if parse_response.status_code == 200:
+        parse_data = parse_response.json()
+        matched_count = parse_data.get("matched_assignees_count", 0)
+        if matched_count >= 2:
+            passed_tests += print_result(
+                "负责人自动归并匹配",
+                True,
+                f"成功匹配 {matched_count} 位负责人"
+            )
+        else:
+            passed_tests += print_result(
+                "负责人自动归并匹配",
+                False,
+                f"期望匹配至少 2 位，实际匹配 {matched_count} 位"
+            )
     else:
         passed_tests += print_result(
-            "创建带负责人的行动项",
+            "负责人自动归并匹配",
             False,
-            f"状态码: {item_response.status_code}"
+            f"状态码: {parse_response.status_code}"
+        )
+    
+    total_tests += 1
+    report_response = client.get("/api/reports/by-assignee")
+    if report_response.status_code == 200:
+        report_data = report_response.json()
+        zhangsan_items = [r for r in report_data if r["person_name"] == "张三"]
+        if zhangsan_items and zhangsan_items[0]["total_items"] >= 1:
+            passed_tests += print_result(
+                "按负责人统计报告",
+                True,
+                f"张三有 {zhangsan_items[0]['total_items']} 个行动项"
+            )
+        else:
+            passed_tests += print_result(
+                "按负责人统计报告",
+                False,
+                "张三的行动项未进入统计"
+            )
+    else:
+        passed_tests += print_result(
+            "按负责人统计报告",
+            False,
+            f"状态码: {report_response.status_code}"
         )
     
     return passed_tests, total_tests
