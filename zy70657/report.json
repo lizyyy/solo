@@ -1,0 +1,181 @@
+{
+  "account_stats": {
+    "数码专营店": {
+      "anchors": [
+        "大强"
+      ],
+      "dates": [
+        "2025-05-20",
+        "2025-05-21"
+      ],
+      "missing_field_control": 1,
+      "missing_product_script": 0,
+      "total": 2
+    },
+    "服饰旗舰店": {
+      "anchors": [
+        "小美"
+      ],
+      "dates": [
+        "2025-05-20"
+      ],
+      "missing_field_control": 0,
+      "missing_product_script": 1,
+      "total": 1
+    },
+    "美妆旗舰店": {
+      "anchors": [
+        "小美"
+      ],
+      "dates": [
+        "2025-05-20",
+        "2025-05-21"
+      ],
+      "missing_field_control": 0,
+      "missing_product_script": 0,
+      "total": 2
+    }
+  },
+  "generated_at": "2026-05-17T22:39:46.120926",
+  "issues": [
+    {
+      "details": {
+        "errors": [
+          "缺少日期",
+          "缺少主播"
+        ],
+        "original": "|10:00|12:00||食品旗舰店|场控D|脚本6"
+      },
+      "issue_type": "bad_row",
+      "message": "数据行错误: 缺少日期, 缺少主播",
+      "severity": "low",
+      "sources": [
+        {
+          "file_path": "sample_schedule.csv",
+          "original_content": "|10:00|12:00||食品旗舰店|场控D|脚本6",
+          "row_number": 7,
+          "sheet_name": null
+        }
+      ]
+    },
+    {
+      "details": {
+        "conflict_rows": [
+          {
+            "account": "美妆旗舰店",
+            "row": 2,
+            "time": "19:00-21:00"
+          },
+          {
+            "account": "服饰旗舰店",
+            "row": 3,
+            "time": "20:00-22:00"
+          }
+        ],
+        "date": "2025-05-20",
+        "person": "小美"
+      },
+      "issue_type": "person_conflict",
+      "message": "主播 [小美] 在 2025-05-20 存在时间冲突",
+      "severity": "high",
+      "sources": [
+        {
+          "file_path": "sample_schedule.csv",
+          "original_content": "2025-05-20|19:00|21:00|小美|美妆旗舰店|场控A|脚本1",
+          "row_number": 2,
+          "sheet_name": null
+        },
+        {
+          "file_path": "sample_schedule.csv",
+          "original_content": "2025-05-20|20:00|22:00|小美|服饰旗舰店|场控B|",
+          "row_number": 3,
+          "sheet_name": null
+        }
+      ]
+    },
+    {
+      "details": {
+        "account": "服饰旗舰店",
+        "anchor": "小美",
+        "date": "2025-05-20",
+        "missing": [
+          "商品脚本"
+        ],
+        "time": "20:00-22:00"
+      },
+      "issue_type": "script_missing",
+      "message": "账号 [服饰旗舰店] 缺少: 商品脚本",
+      "severity": "medium",
+      "sources": [
+        {
+          "file_path": "sample_schedule.csv",
+          "original_content": "2025-05-20|20:00|22:00|小美|服饰旗舰店|场控B|",
+          "row_number": 3,
+          "sheet_name": null
+        }
+      ]
+    },
+    {
+      "details": {
+        "account": "数码专营店",
+        "anchor": "大强",
+        "date": "2025-05-20",
+        "missing": [
+          "场控"
+        ],
+        "time": "18:00-20:00"
+      },
+      "issue_type": "script_missing",
+      "message": "账号 [数码专营店] 缺少: 场控",
+      "severity": "medium",
+      "sources": [
+        {
+          "file_path": "sample_schedule.csv",
+          "original_content": "2025-05-20|18:00|20:00|大强|数码专营店||脚本3",
+          "row_number": 4,
+          "sheet_name": null
+        }
+      ]
+    }
+  ],
+  "person_stats": {
+    "大强": {
+      "accounts": [
+        "数码专营店"
+      ],
+      "conflicts": 0,
+      "dates": [
+        "2025-05-20",
+        "2025-05-21"
+      ],
+      "total": 2
+    },
+    "小美": {
+      "accounts": [
+        "服饰旗舰店",
+        "美妆旗舰店"
+      ],
+      "conflicts": 0,
+      "dates": [
+        "2025-05-20",
+        "2025-05-21"
+      ],
+      "total": 3
+    }
+  },
+  "summary": {
+    "issues_by_severity": {
+      "high": 1,
+      "low": 1,
+      "medium": 2
+    },
+    "issues_by_type": {
+      "bad_row": 1,
+      "person_conflict": 1,
+      "script_missing": 2
+    },
+    "total_issues": 4,
+    "total_rows": 6,
+    "valid_rows": 5
+  }
+}
