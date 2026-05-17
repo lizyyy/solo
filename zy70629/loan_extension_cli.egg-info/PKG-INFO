@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: loan-extension-cli
+Version: 1.0.0
+Summary: 借款展期还款计划扣款流水排查CLI工具
+Author: Finance Department
+Requires-Python: >=3.9
+Requires-Dist: click>=8.0.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: python-dateutil>=2.8.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: rich>=13.0.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

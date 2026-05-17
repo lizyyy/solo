@@ -1,0 +1,11 @@
+﻿record_id,record_type,source_file,source_location,is_valid,validation_errors,raw_content
+063d2e01da49,借款单,./sample_data/loan_sample.csv,loan_sample.csv:2,是,,"LOAN001,E001,张三,50000,2024-01-15,12,active"
+f9364e629c7c,借款单,./sample_data/loan_sample.csv,loan_sample.csv:3,是,,"LOAN002,E002,李四,30000,2024-02-20,6,active"
+2cfee5d88455,审批意见,./sample_data/approval_sample.csv,approval_sample.csv:2,是,,"APPR001,EXT001,LOAN001,王经理,2024-03-12,通过,情况属实，同意展期,1"
+bf682a7362a6,审批意见,./sample_data/approval_sample.csv,approval_sample.csv:3,是,,"APPR002,EXT001,LOAN001,刘总监,2024-03-13,通过,同意,2"
+c1c822938697,展期申请,./sample_data/extension_sample.csv,extension_sample.csv:2,是,,"EXT001,LOAN001,2024-03-10,3,2024-07-15,资金周转困难,张三"
+53c064470106,扣款流水,./sample_data/deduction_sample.csv,deduction_sample.csv:2,是,,"DED001,LOAN001,2024-02-15,4416.67,正常扣款,PLAN001_01,TXN20240215001"
+c7ca135650ec,还款报告,./sample_data/report_sample.csv,report_sample.csv:2,是,,"REP001,LOAN001,2024-03-01,50000,3000,4416.67,45833.33,2750,false"
+970614fdec20,还款计划,./sample_data/plan_sample.csv,plan_sample.csv:2,是,,"PLAN001_01,LOAN001,1,2024-02-15,4166.67,250,4416.67,pending,false"
+c5feb0b91820,还款计划,./sample_data/plan_sample.csv,plan_sample.csv:4,是,,"PLAN001_03,LOAN001,3,2024-04-15,4166.67,250,4416.67,pending,false"
+cf9d503586f6,还款计划,./sample_data/plan_sample.csv,plan_sample.csv:3,是,,"PLAN001_02,LOAN001,2,2024-03-15,4166.67,250,4416.67,pending,false"

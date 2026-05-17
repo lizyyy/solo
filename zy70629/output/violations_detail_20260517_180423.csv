@@ -1,0 +1,5 @@
+﻿rule_code,rule_name,severity,message,related_sources,suggestion
+PLAN-002,还款计划本金不符,error,借款单 LOAN001 还款计划本金总额 12500.01 与借款金额 50000.00 不符,loan_sample.csv:2; plan_sample.csv:2; plan_sample.csv:3; plan_sample.csv:4,请重新计算并调整还款计划各期本金
+PLAN-001,还款计划缺失,error,借款单 LOAN002 没有还款计划记录,loan_sample.csv:3,请补充该借款单的还款计划
+OVERDUE-001,逾期未标记,warning,借款单 LOAN001 第 2 期已逾期但最新报告未标记逾期,plan_sample.csv:3; report_sample.csv:2,请更新还款报告的逾期标记
+OVERDUE-001,逾期未标记,warning,借款单 LOAN001 第 3 期已逾期但最新报告未标记逾期,plan_sample.csv:4; report_sample.csv:2,请更新还款报告的逾期标记

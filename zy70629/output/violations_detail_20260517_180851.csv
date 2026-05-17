@@ -1,0 +1,8 @@
+﻿rule_code,rule_name,severity,message,related_sources,suggestion
+PLAN-002,还款计划本金不符,error,借款单 LOAN001 还款计划本金总额 45833.37 与借款金额 50000.00 不符,loan_sample.csv:2; plan_sample.csv:2; plan_sample.csv:3; plan_sample.csv:4; plan_sample.csv:5; plan_sample.csv:6; plan_sample.csv:7; plan_sample.csv:8; plan_sample.csv:9; plan_sample.csv:10; plan_sample.csv:11; plan_sample.csv:12,请重新计算并调整还款计划各期本金
+PLAN-003,展期计划未标记,warning,借款单 LOAN001 第 7 期已展期但计划未标记为展期,extension_sample.csv:2; plan_sample.csv:8,请更新还款计划的展期标记
+PLAN-003,展期计划未标记,warning,借款单 LOAN001 第 8 期已展期但计划未标记为展期,extension_sample.csv:2; plan_sample.csv:9,请更新还款计划的展期标记
+PLAN-003,展期计划未标记,warning,借款单 LOAN001 第 9 期已展期但计划未标记为展期,extension_sample.csv:2; plan_sample.csv:10,请更新还款计划的展期标记
+PLAN-003,展期计划未标记,warning,借款单 LOAN001 第 10 期已展期但计划未标记为展期,extension_sample.csv:2; plan_sample.csv:11,请更新还款计划的展期标记
+PLAN-003,展期计划未标记,warning,借款单 LOAN001 第 11 期已展期但计划未标记为展期,extension_sample.csv:2; plan_sample.csv:12,请更新还款计划的展期标记
+OVERDUE-001,逾期未标记,warning,借款单 LOAN001 第 3 期已逾期但最新报告未标记逾期,plan_sample.csv:4; report_sample.csv:2,请更新还款报告的逾期标记
