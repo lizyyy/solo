@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from app.models import (
@@ -149,7 +150,7 @@ def can_transition_conversion_status(current_status: ConversionStatus, target_st
     return target_status in transitions.get(current_status, [])
 
 
-def create_audit_log(db: Session, operation_type: str, entity_type: str, entity_id: int, original_input: dict, handler: str, conclusion: str):
+def create_audit_log(db: Session, operation_type: str, entity_type: str, entity_id: Optional[int], original_input: dict, handler: str, conclusion: str):
     audit_log = AuditLog(
         operation_type=operation_type,
         entity_type=entity_type,

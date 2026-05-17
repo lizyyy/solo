@@ -169,18 +169,23 @@ def update_aunt_profile(aunt_id: int, aunt_update: AuntProfileUpdate, db: Sessio
 def create_trial_schedule(schedule: TrialScheduleCreate, db: Session = Depends(get_db)):
     demand = db.query(CustomerDemand).filter(CustomerDemand.id == schedule.demand_id).first()
     if not demand:
+        create_audit_log(db, "create_failed", "trial_schedule", None, schedule.model_dump(), schedule.created_by, "创建试工排期失败: 客户需求不存在")
         raise HTTPException(status_code=404, detail="客户需求不存在")
     
     aunt = db.query(AuntProfile).filter(AuntProfile.id == schedule.aunt_id).first()
     if not aunt:
+        create_audit_log(db, "create_failed", "trial_schedule", None, schedule.model_dump(), schedule.created_by, "创建试工排期失败: 阿姨档案不存在")
         raise HTTPException(status_code=404, detail="阿姨档案不存在")
     
     conflicts = check_schedule_conflict(db, schedule.aunt_id, schedule.trial_start_time, schedule.trial_end_time)
     if conflicts:
         conflict_info = [f"ID:{c.id} {c.trial_start_time}~{c.trial_end_time}" for c in conflicts]
+        conclusion = f"创建试工排期失败: 阿姨排期冲突 {', '.join(conflict_info)}"
+        create_audit_log(db, "create_failed", "trial_schedule", None, schedule.model_dump(), schedule.created_by, conclusion)
         raise HTTPException(status_code=400, detail=f"阿姨排期冲突: {', '.join(conflict_info)}")
     
     if schedule.trial_end_time <= schedule.trial_start_time:
+        create_audit_log(db, "create_failed", "trial_schedule", None, schedule.model_dump(), schedule.created_by, "创建试工排期失败: 试工结束时间必须晚于开始时间")
         raise HTTPException(status_code=400, detail="试工结束时间必须晚于开始时间")
     
     db_schedule = TrialSchedule(**schedule.model_dump())
@@ -225,6 +230,7 @@ def get_trial_schedule(schedule_id: int, db: Session = Depends(get_db)):
 def update_trial_schedule(schedule_id: int, schedule_update: TrialScheduleUpdate, db: Session = Depends(get_db)):
     schedule = db.query(TrialSchedule).filter(TrialSchedule.id == schedule_id).first()
     if not schedule:
+        create_audit_log(db, "update_failed", "trial_schedule", schedule_id, schedule_update.model_dump(exclude_unset=True), "system", "更新试工排期失败: 试工排期不存在")
         raise HTTPException(status_code=404, detail="试工排期不存在")
     
     update_data = schedule_update.model_dump(exclude_unset=True)
@@ -234,11 +240,14 @@ def update_trial_schedule(schedule_id: int, schedule_update: TrialScheduleUpdate
         end_time = update_data.get('trial_end_time', schedule.trial_end_time)
         
         if end_time <= start_time:
+            create_audit_log(db, "update_failed", "trial_schedule", schedule_id, update_data, "system", "更新试工排期失败: 试工结束时间必须晚于开始时间")
             raise HTTPException(status_code=400, detail="试工结束时间必须晚于开始时间")
         
         conflicts = check_schedule_conflict(db, schedule.aunt_id, start_time, end_time, schedule_id)
         if conflicts:
             conflict_info = [f"ID:{c.id} {c.trial_start_time}~{c.trial_end_time}" for c in conflicts]
+            conclusion = f"更新试工排期失败: 阿姨排期冲突 {', '.join(conflict_info)}"
+            create_audit_log(db, "update_failed", "trial_schedule", schedule_id, update_data, "system", conclusion)
             raise HTTPException(status_code=400, detail=f"阿姨排期冲突: {', '.join(conflict_info)}")
     
     for key, value in update_data.items():
@@ -274,9 +283,11 @@ def cancel_trial_schedule(schedule_id: int, request: CancelScheduleRequest, db: 
 def complete_trial_schedule(schedule_id: int, db: Session = Depends(get_db)):
     schedule = db.query(TrialSchedule).filter(TrialSchedule.id == schedule_id).first()
     if not schedule:
+        create_audit_log(db, "complete_failed", "trial_schedule", schedule_id, {}, "system", "完成试工失败: 试工排期不存在")
         raise HTTPException(status_code=404, detail="试工排期不存在")
     
     if schedule.status == TrialScheduleStatus.CANCELLED or schedule.is_cancelled:
+        create_audit_log(db, "complete_failed", "trial_schedule", schedule_id, {}, "system", "完成试工失败: 试工排期已取消")
         raise HTTPException(status_code=400, detail="试工排期已取消")
     
     schedule.status = TrialScheduleStatus.COMPLETED
@@ -291,6 +302,7 @@ def complete_trial_schedule(schedule_id: int, db: Session = Depends(get_db)):
 def create_deposit(deposit: DepositCreate, db: Session = Depends(get_db)):
     can_pay, message = can_pay_deposit(db, deposit.trial_schedule_id)
     if not can_pay:
+        create_audit_log(db, "create_failed", "deposit", None, deposit.model_dump(), deposit.created_by, f"创建押金记录失败: {message}")
         raise HTTPException(status_code=400, detail=message)
     
     db_deposit = Deposit(**deposit.model_dump())
@@ -328,9 +340,11 @@ def get_deposit(deposit_id: int, db: Session = Depends(get_db)):
 def pay_deposit(deposit_id: int, db: Session = Depends(get_db)):
     deposit = db.query(Deposit).filter(Deposit.id == deposit_id).first()
     if not deposit:
+        create_audit_log(db, "pay_failed", "deposit", deposit_id, {}, "system", "押金支付失败: 押金记录不存在")
         raise HTTPException(status_code=404, detail="押金记录不存在")
     
     if deposit.status != DepositStatus.PENDING:
+        create_audit_log(db, "pay_failed", "deposit", deposit_id, {}, "system", "押金支付失败: 押金状态不是待支付")
         raise HTTPException(status_code=400, detail="押金状态不是待支付")
     
     deposit.status = DepositStatus.PAID
@@ -346,6 +360,7 @@ def pay_deposit(deposit_id: int, db: Session = Depends(get_db)):
 def refund_deposit(deposit_id: int, reason: str = Query(...), operator: str = Query(...), db: Session = Depends(get_db)):
     can_refund, message = can_refund_deposit(db, deposit_id)
     if not can_refund:
+        create_audit_log(db, "refund_failed", "deposit", deposit_id, {"reason": reason}, operator, f"押金退款失败: {message}")
         raise HTTPException(status_code=400, detail=message)
     
     deposit = db.query(Deposit).filter(Deposit.id == deposit_id).first()
@@ -363,6 +378,7 @@ def refund_deposit(deposit_id: int, reason: str = Query(...), operator: str = Qu
 def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
     can_submit, message = can_submit_review(db, review.trial_schedule_id)
     if not can_submit:
+        create_audit_log(db, "create_failed", "review", None, review.model_dump(), review.reviewer, f"创建评价失败: {message}")
         raise HTTPException(status_code=400, detail=message)
     
     db_review = Review(**review.model_dump())
@@ -401,6 +417,7 @@ def get_review(review_id: int, db: Session = Depends(get_db)):
 def review_decision(review_id: int, request: ReviewDecisionRequest, db: Session = Depends(get_db)):
     can_decide, message = can_review_approval(db, review_id)
     if not can_decide:
+        create_audit_log(db, "decision_failed", "review", review_id, request.model_dump(), request.reviewed_by, f"评价复核失败: {message}")
         raise HTTPException(status_code=400, detail=message)
     
     review = db.query(Review).filter(Review.id == review_id).first()
@@ -425,10 +442,12 @@ def check_eligibility(trial_schedule_id: int, db: Session = Depends(get_db)):
 def create_conversion(conversion: ConversionCreate, db: Session = Depends(get_db)):
     existing = db.query(Conversion).filter(Conversion.trial_schedule_id == conversion.trial_schedule_id).first()
     if existing:
+        create_audit_log(db, "create_failed", "conversion", None, conversion.model_dump(), conversion.decided_by or "system", "创建转正记录失败: 该试工排期已有转正记录")
         raise HTTPException(status_code=400, detail="该试工排期已有转正记录")
     
     eligible, message = check_conversion_eligibility(db, conversion.trial_schedule_id)
     if not eligible:
+        create_audit_log(db, "create_failed", "conversion", None, conversion.model_dump(), conversion.decided_by or "system", f"创建转正记录失败: {message}")
         raise HTTPException(status_code=400, detail=message)
     
     db_conversion = Conversion(**conversion.model_dump())
@@ -467,9 +486,12 @@ def get_conversion(conversion_id: int, db: Session = Depends(get_db)):
 def conversion_decision(conversion_id: int, request: ConversionDecisionRequest, db: Session = Depends(get_db)):
     conversion = db.query(Conversion).filter(Conversion.id == conversion_id).first()
     if not conversion:
+        create_audit_log(db, "decision_failed", "conversion", conversion_id, request.model_dump(), request.decided_by, "转正决策失败: 转正记录不存在")
         raise HTTPException(status_code=404, detail="转正记录不存在")
     
     if not can_transition_conversion_status(conversion.status, request.status):
+        conclusion = f"转正决策失败: 无法从 {conversion.status} 转换到 {request.status}"
+        create_audit_log(db, "decision_failed", "conversion", conversion_id, request.model_dump(), request.decided_by, conclusion)
         raise HTTPException(status_code=400, detail=f"无法从 {conversion.status} 转换到 {request.status}")
     
     conversion.status = request.status
@@ -509,9 +531,11 @@ def conversion_decision(conversion_id: int, request: ConversionDecisionRequest, 
 def withdraw_conversion(conversion_id: int, request: WithdrawConversionRequest, db: Session = Depends(get_db)):
     conversion = db.query(Conversion).filter(Conversion.id == conversion_id).first()
     if not conversion:
+        create_audit_log(db, "withdraw_failed", "conversion", conversion_id, request.model_dump(), request.withdrawn_by, "撤回转正失败: 转正记录不存在")
         raise HTTPException(status_code=404, detail="转正记录不存在")
     
     if conversion.is_withdrawn:
+        create_audit_log(db, "withdraw_failed", "conversion", conversion_id, request.model_dump(), request.withdrawn_by, "撤回转正失败: 转正记录已撤回")
         raise HTTPException(status_code=400, detail="转正记录已撤回")
     
     conversion.is_withdrawn = True
