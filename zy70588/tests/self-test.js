@@ -60,6 +60,17 @@ test('无效采样率抛出错误 (1.5)', () => {
   assert(threw, '应该抛出错误');
 });
 
+test('无效采样率抛出错误 (150%)', () => {
+  let threw = false;
+  try { parseSampleRate('150%'); } catch (e) { threw = true; }
+  assert(threw, '应该抛出错误');
+});
+
+test('100%采样率应该有效', () => {
+  const rate = parseSampleRate('100%');
+  assert(rate === 1, `期望 1，实际 ${rate}`);
+});
+
 console.log('\n' + '='.repeat(60));
 console.log('📦 模块 2: 错误类型检测 (parser.js)');
 console.log('='.repeat(60));
@@ -130,6 +141,24 @@ test('置信区间 - 不同置信水平', () => {
   const ci95 = calculateConfidenceInterval(100, 0.1, 0.95);
   const ci99 = calculateConfidenceInterval(100, 0.1, 0.99);
   assert(ci99.marginOfError >= ci95.marginOfError, '99%置信区间应该更宽');
+});
+
+test('0样本置信区间不应该有NaN', () => {
+  const ci = calculateConfidenceInterval(0, 0.1);
+  assert(ci.estimated === 0, `期望估算值 0，实际 ${ci.estimated}`);
+  assert(!isNaN(ci.lowerBound), 'lowerBound 不应该是 NaN');
+  assert(!isNaN(ci.upperBound), 'upperBound 不应该是 NaN');
+  assert(ci.lowerBound === 0, `期望下限 0，实际 ${ci.lowerBound}`);
+  assert(ci.upperBound === 0, `期望上限 0，实际 ${ci.upperBound}`);
+});
+
+test('1样本置信区间应该有合理边界', () => {
+  const ci = calculateConfidenceInterval(1, 0.1);
+  assert(ci.estimated === 10, `期望估算值 10，实际 ${ci.estimated}`);
+  assert(!isNaN(ci.lowerBound), 'lowerBound 不应该是 NaN');
+  assert(!isNaN(ci.upperBound), 'upperBound 不应该是 NaN');
+  assert(ci.lowerBound === 0, `期望下限 0，实际 ${ci.lowerBound}`);
+  assert(ci.upperBound === 30, `期望上限 30，实际 ${ci.upperBound}`);
 });
 
 console.log('\n' + '='.repeat(60));

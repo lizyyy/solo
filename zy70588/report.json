@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-17T03:57:04.854Z",
+  "generatedAt": "2026-05-17T05:37:01.069Z",
   "summary": {
     "totalLines": 41,
     "validLines": 30,
@@ -10,6 +10,14 @@
     "totalEstimatedCount": 300,
     "totalEstimatedErrors": 180,
     "overallErrorRate": 0.6,
+    "countConfidenceInterval": {
+      "estimated": 300,
+      "lowerBound": 281,
+      "upperBound": 319,
+      "marginOfError": 19,
+      "confidenceLevel": 0.95,
+      "standardError": 9.486832980505138
+    },
     "overallConfidenceInterval": {
       "estimated": 180,
       "lowerBound": 161,
@@ -151,18 +159,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -180,18 +188,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -209,18 +217,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -238,18 +246,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -274,11 +282,11 @@
       },
       "errorConfidenceInterval": {
         "estimated": 0,
-        "lowerBound": null,
-        "upperBound": null,
-        "marginOfError": null,
+        "lowerBound": 0,
+        "upperBound": 0,
+        "marginOfError": 0,
         "confidenceLevel": 0.95,
-        "standardError": null
+        "standardError": 0
       }
     },
     {
@@ -296,18 +304,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 0,
-        "lowerBound": null,
-        "upperBound": null,
-        "marginOfError": null,
+        "lowerBound": 0,
+        "upperBound": 0,
+        "marginOfError": 0,
         "confidenceLevel": 0.95,
-        "standardError": null
+        "standardError": 0
       }
     },
     {
@@ -332,11 +340,11 @@
       },
       "errorConfidenceInterval": {
         "estimated": 0,
-        "lowerBound": null,
-        "upperBound": null,
-        "marginOfError": null,
+        "lowerBound": 0,
+        "upperBound": 0,
+        "marginOfError": 0,
         "confidenceLevel": 0.95,
-        "standardError": null
+        "standardError": 0
       }
     },
     {
@@ -354,18 +362,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 0,
-        "lowerBound": null,
-        "upperBound": null,
-        "marginOfError": null,
+        "lowerBound": 0,
+        "upperBound": 0,
+        "marginOfError": 0,
         "confidenceLevel": 0.95,
-        "standardError": null
+        "standardError": 0
       }
     },
     {
@@ -383,18 +391,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 0,
-        "lowerBound": null,
-        "upperBound": null,
-        "marginOfError": null,
+        "lowerBound": 0,
+        "upperBound": 0,
+        "marginOfError": 0,
         "confidenceLevel": 0.95,
-        "standardError": null
+        "standardError": 0
       }
     },
     {
@@ -412,18 +420,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 0,
-        "lowerBound": null,
-        "upperBound": null,
-        "marginOfError": null,
+        "lowerBound": 0,
+        "upperBound": 0,
+        "marginOfError": 0,
         "confidenceLevel": 0.95,
-        "standardError": null
+        "standardError": 0
       }
     },
     {
@@ -441,18 +449,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 0,
-        "lowerBound": null,
-        "upperBound": null,
-        "marginOfError": null,
+        "lowerBound": 0,
+        "upperBound": 0,
+        "marginOfError": 0,
         "confidenceLevel": 0.95,
-        "standardError": null
+        "standardError": 0
       }
     },
     {
@@ -470,18 +478,18 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       },
       "errorConfidenceInterval": {
         "estimated": 0,
-        "lowerBound": null,
-        "upperBound": null,
-        "marginOfError": null,
+        "lowerBound": 0,
+        "upperBound": 0,
+        "marginOfError": 0,
         "confidenceLevel": 0.95,
-        "standardError": null
+        "standardError": 0
       }
     }
   ],
@@ -534,10 +542,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -588,10 +596,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -606,10 +614,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -642,10 +650,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -660,10 +668,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -678,10 +686,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -696,10 +704,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -714,10 +722,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -750,10 +758,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     },
     {
@@ -768,10 +776,10 @@
       "confidenceInterval": {
         "estimated": 10,
         "lowerBound": 0,
-        "upperBound": 29,
-        "marginOfError": 19,
+        "upperBound": 30,
+        "marginOfError": 20,
         "confidenceLevel": 0.95,
-        "standardError": 9.486832980505138
+        "standardError": 10
       }
     }
   ],

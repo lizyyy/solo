@@ -8,6 +8,28 @@ function calculateConfidenceInterval(sampleCount, sampleRate, confidenceLevel = 
   const z = zScores[confidenceLevel] || 1.96;
   const estimatedTotal = sampleCount / sampleRate;
   
+  if (sampleCount === 0) {
+    return {
+      estimated: 0,
+      lowerBound: 0,
+      upperBound: 0,
+      marginOfError: 0,
+      confidenceLevel,
+      standardError: 0
+    };
+  }
+  
+  if (sampleCount === 1) {
+    return {
+      estimated: Math.round(estimatedTotal),
+      lowerBound: 0,
+      upperBound: Math.round(estimatedTotal * 3),
+      marginOfError: Math.round(estimatedTotal * 2),
+      confidenceLevel,
+      standardError: estimatedTotal
+    };
+  }
+  
   const se = Math.sqrt((estimatedTotal * sampleRate * (1 - sampleRate)) / sampleCount) * (1 / sampleRate);
   const marginOfError = z * se;
   
@@ -105,6 +127,7 @@ function aggregateGroups(parseResults, confidenceLevel = 0.95) {
       totalEstimatedCount: totalCi.estimated,
       totalEstimatedErrors: totalErrorCi.estimated,
       overallErrorRate: Math.round(calculateErrorRate(totalSampleErrors, totalSampleCount) * 10000) / 10000,
+      countConfidenceInterval: totalCi,
       overallConfidenceInterval: totalErrorCi
     },
     groups: aggregated,

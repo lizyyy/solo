@@ -22,7 +22,7 @@ function printTerminalSummary(aggregatedResults, options = {}) {
   summaryTable.push(
     ['总行数', summary.totalLines, '-', '-'],
     ['有效行数', summary.validLines, summary.totalEstimatedCount, 
-     `[${summary.overallConfidenceInterval.lowerBound}, ${summary.overallConfidenceInterval.upperBound}]`],
+     `[${summary.countConfidenceInterval.lowerBound}, ${summary.countConfidenceInterval.upperBound}]`],
     ['错误行数', summary.totalSampleErrors, summary.totalEstimatedErrors,
      `[${summary.overallConfidenceInterval.lowerBound}, ${summary.overallConfidenceInterval.upperBound}]`],
     ['错误率', `${(summary.overallErrorRate * 100).toFixed(2)}%`, '-', '-'],
@@ -212,7 +212,8 @@ function generateHtmlReport(aggregatedResults, outputPath) {
                 </div>
             </div>
             <div class="mt-4 text-gray-600">
-                <p><strong>置信区间 (95%):</strong> [${summary.overallConfidenceInterval.lowerBound}, ${summary.overallConfidenceInterval.upperBound}]</p>
+                <p><strong>总行数置信区间 (95%):</strong> [${summary.countConfidenceInterval.lowerBound}, ${summary.countConfidenceInterval.upperBound}]</p>
+                <p><strong>错误行数置信区间 (95%):</strong> [${summary.overallConfidenceInterval.lowerBound}, ${summary.overallConfidenceInterval.upperBound}]</p>
                 <p><strong>总体错误率:</strong> ${(summary.overallErrorRate * 100).toFixed(2)}%</p>
             </div>
         </div>

@@ -22,8 +22,8 @@ function parseSampleRate(value) {
   
   if (str.endsWith('%')) {
     const num = parseFloat(str) / 100;
-    if (isNaN(num) || num <= 0 || num > 100) {
-      throw new Error('采样率百分比格式无效');
+    if (isNaN(num) || num <= 0 || num > 1) {
+      throw new Error('采样率百分比格式无效，必须在 (0%, 100%] 范围内');
     }
     return num;
   }
