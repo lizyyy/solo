@@ -1,0 +1,22 @@
+{
+  "name": "vendor-validation-api",
+  "version": "1.0.0",
+  "description": "供应商资料校验API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init": "node scripts/init-db.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1",
+    "joi": "^17.11.0",
+    "xlsx": "^0.18.5",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
