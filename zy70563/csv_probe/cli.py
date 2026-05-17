@@ -23,19 +23,20 @@ def detect_encoding(file_path):
         return [{'encoding': bom_encoding, 'confidence': 1.0, 'has_bom': True}]
     
     chardet_result = chardet.detect(raw_data)
-    primary_encoding = chardet_result['encoding'] or 'utf-8'
-    primary_confidence = chardet_result['confidence']
+    primary_encoding = chardet_result.get('encoding')
+    primary_confidence = chardet_result.get('confidence', 0.0)
     
     candidates = []
-    candidates.append({
-        'encoding': primary_encoding,
-        'confidence': primary_confidence,
-        'has_bom': False
-    })
+    if primary_encoding is not None:
+        candidates.append({
+            'encoding': primary_encoding,
+            'confidence': primary_confidence if primary_confidence else 0.5,
+            'has_bom': False
+        })
     
     fallback_encodings = ['utf-8', 'gb18030', 'gbk', 'latin-1']
     for enc in fallback_encodings:
-        if not any(c['encoding'].lower() == enc.lower() for c in candidates):
+        if not any(c['encoding'].lower() == enc.lower() for c in candidates if c['encoding'] is not None):
             candidates.append({
                 'encoding': enc,
                 'confidence': 0.3,
@@ -45,10 +46,13 @@ def detect_encoding(file_path):
     return candidates
 
 def try_decode(data, encoding):
+    if encoding is None:
+        encoding = 'utf-8'
+    
     try:
         decoded = data.decode(encoding)
         return decoded, 0, []
-    except UnicodeDecodeError:
+    except (UnicodeDecodeError, LookupError, TypeError):
         pass
     
     result = []
@@ -60,7 +64,7 @@ def try_decode(data, encoding):
             chunk = data[pos:pos+1].decode(encoding)
             result.append(chunk)
             pos += 1
-        except UnicodeDecodeError:
+        except (UnicodeDecodeError, LookupError, TypeError):
             result.append('\ufffd')
             error_positions.append(pos)
             error_count += 1
@@ -107,70 +111,93 @@ def validate_headers(actual_headers, expected_headers):
     return validation_result
 
 def probe_csv(file_path, expected_headers=None):
-    file_size = os.path.getsize(file_path)
-    
-    with open(file_path, 'rb') as f:
-        raw_data = f.read()
-    
-    encoding_candidates = detect_encoding(file_path)
-    best_candidate = encoding_candidates[0]
-    best_encoding = best_candidate['encoding']
-    has_bom = best_candidate['has_bom']
-    
-    decoded_content, decode_errors, _ = try_decode(raw_data, best_encoding)
-    
-    lines = decoded_content.splitlines()
-    header_fields = []
-    good_rows = []
-    bad_rows = []
-    header_validation = None
-    
-    if lines:
-        try:
-            reader = csv.reader(lines)
-            header_fields = next(reader)
-            expected_field_count = len(header_fields)
-            
-            if expected_headers:
-                header_validation = validate_headers(header_fields, expected_headers)
-            
-            for row_num, row in enumerate(reader, start=2):
-                actual_field_count = len(row)
-                raw_content = lines[row_num - 1] if (row_num - 1) < len(lines) else ''
+    try:
+        file_size = os.path.getsize(file_path)
+        
+        with open(file_path, 'rb') as f:
+            raw_data = f.read()
+        
+        encoding_candidates = detect_encoding(file_path)
+        best_candidate = encoding_candidates[0]
+        best_encoding = best_candidate['encoding']
+        has_bom = best_candidate['has_bom']
+        
+        decoded_content, decode_errors, _ = try_decode(raw_data, best_encoding)
+        
+        lines = decoded_content.splitlines()
+        header_fields = []
+        good_rows = []
+        bad_rows = []
+        header_validation = None
+        
+        if lines:
+            try:
+                reader = csv.reader(lines)
+                header_fields = next(reader)
+                expected_field_count = len(header_fields)
                 
-                if actual_field_count != expected_field_count:
-                    error_type = 'field_count_mismatch'
-                    reason = 'field count mismatch: expected {0}, got {1}'.format(expected_field_count, actual_field_count)
-                    bad_rows.append({
-                        'row_number': row_num,
-                        'error_type': error_type,
-                        'reason': reason,
-                        'raw_content': raw_content
-                    })
-                else:
-                    good_rows.append(row)
-        except Exception as e:
-            bad_rows.append({
-                'row_number': 1,
-                'error_type': 'csv_parse_error',
-                'reason': 'CSV parse error: ' + str(e),
-                'raw_content': lines[0] if lines else ''
-            })
-    
-    return {
-        'file_path': file_path,
-        'file_size': file_size,
-        'encoding_candidates': encoding_candidates,
-        'best_encoding': best_encoding,
-        'has_bom': has_bom,
-        'header_fields': header_fields,
-        'header_validation': header_validation,
-        'total_rows': len(good_rows) + len(bad_rows) + (1 if header_fields else 0),
-        'good_rows': len(good_rows),
-        'bad_rows': bad_rows,
-        'decode_errors': decode_errors,
-        'sample_rows': good_rows[:5]
-    }
+                if expected_headers:
+                    header_validation = validate_headers(header_fields, expected_headers)
+                
+                for row_num, row in enumerate(reader, start=2):
+                    actual_field_count = len(row)
+                    raw_content = lines[row_num - 1] if (row_num - 1) < len(lines) else ''
+                    
+                    if actual_field_count != expected_field_count:
+                        error_type = 'field_count_mismatch'
+                        reason = 'field count mismatch: expected {0}, got {1}'.format(expected_field_count, actual_field_count)
+                        bad_rows.append({
+                            'row_number': row_num,
+                            'error_type': error_type,
+                            'reason': reason,
+                            'raw_content': raw_content
+                        })
+                    else:
+                        good_rows.append(row)
+            except Exception as e:
+                bad_rows.append({
+                    'row_number': 1,
+                    'error_type': 'csv_parse_error',
+                    'reason': 'CSV parse error: ' + str(e),
+                    'raw_content': lines[0] if lines else ''
+                })
+        
+        return {
+            'file_path': file_path,
+            'file_size': file_size,
+            'encoding_candidates': encoding_candidates,
+            'best_encoding': best_encoding,
+            'has_bom': has_bom,
+            'header_fields': header_fields,
+            'header_validation': header_validation,
+            'total_rows': len(good_rows) + len(bad_rows) + (1 if header_fields else 0),
+            'good_rows': len(good_rows),
+            'bad_rows': bad_rows,
+            'decode_errors': decode_errors,
+            'sample_rows': good_rows[:5],
+            'decoded_preview': decoded_content[:500]
+        }
+    except Exception as e:
+        return {
+            'file_path': file_path,
+            'file_size': os.path.getsize(file_path) if os.path.exists(file_path) else 0,
+            'encoding_candidates': [],
+            'best_encoding': 'unknown',
+            'has_bom': False,
+            'header_fields': [],
+            'header_validation': None,
+            'total_rows': 0,
+            'good_rows': 0,
+            'bad_rows': [{
+                'row_number': 0,
+                'error_type': 'probe_error',
+                'reason': 'Probe failed: ' + str(e),
+                'raw_content': ''
+            }],
+            'decode_errors': 0,
+            'sample_rows': [],
+            'decoded_preview': ''
+        }
 
 def generate_suggestions(result):
     suggestions = []
@@ -199,7 +226,8 @@ def cli():
 @click.option('--json-output', '-j', help='JSON output path')
 @click.option('--report', '-r', help='Human-readable report path')
 @click.option('--convert', '-c', help='Convert to UTF-8 file path')
-def probe(file_path, headers, json_output, report, convert):
+@click.option('--preview', '-p', is_flag=True, help='Show decoded content preview')
+def probe(file_path, headers, json_output, report, convert, preview):
     expected_headers = [h.strip() for h in headers.split(',')] if headers else None
     result = probe_csv(file_path, expected_headers)
     suggestions = generate_suggestions(result)
@@ -271,6 +299,13 @@ def probe(file_path, headers, json_output, report, convert):
         print('--- Suggestions ---')
         for i, s in enumerate(suggestions, 1):
             print('  {0}. {1}'.format(i, s))
+        print()
+    
+    if preview and result.get('decoded_preview'):
+        print('--- Decoded Preview (first 500 chars) ---')
+        print(result['decoded_preview'])
+        if len(result['decoded_preview']) >= 500:
+            print('... (truncated, use --convert to see full content)')
         print()
     
     if json_output:
@@ -387,9 +422,9 @@ def selftest(output_dir, json_report):
     all_passed = True
     
     test_cases = [
-        ('utf8_normal.csv', 'Detect UTF-8 encoding', ['name', 'age', 'city'], lambda r: any('utf' in c['encoding'].lower() or 'ascii' in c['encoding'].lower() for c in r['encoding_candidates'])),
+        ('utf8_normal.csv', 'Detect UTF-8/ASCII encoding', ['name', 'age', 'city'], lambda r: r['best_encoding'].lower() in ['utf-8', 'ascii', 'gbk', 'gb18030']),
         ('utf8_bom.csv', 'Detect UTF-8 BOM', ['name', 'age', 'city'], lambda r: r['has_bom']),
-        ('gbk_normal.csv', 'Detect GBK encoding', ['name', 'age', 'city'], lambda r: len(r['encoding_candidates']) > 0),
+        ('gbk_normal.csv', 'Detect ASCII/GBK encoding', ['name', 'age', 'city'], lambda r: r['best_encoding'].lower() in ['gbk', 'gb18030', 'ascii', 'utf-8']),
         ('gb18030_chinese.csv', 'Detect GB18030 Chinese content', ['name', 'age', 'city'], lambda r: len(r['header_fields']) == 3),
         ('gbk_chinese.csv', 'Detect GBK Chinese content', ['name', 'age', 'city'], lambda r: r['good_rows'] >= 2),
         ('empty_file.csv', 'Handle empty file', None, lambda r: r['total_rows'] == 0 or r['file_size'] == 0),

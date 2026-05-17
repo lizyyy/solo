@@ -1,0 +1,70 @@
+{
+  "file_path": "test_samples/mixed_bad_rows.csv",
+  "file_size": 65,
+  "encoding_candidates": [
+    {
+      "encoding": "ascii",
+      "confidence": 1.0,
+      "has_bom": false
+    },
+    {
+      "encoding": "utf-8",
+      "confidence": 0.3,
+      "has_bom": false
+    },
+    {
+      "encoding": "gb18030",
+      "confidence": 0.3,
+      "has_bom": false
+    },
+    {
+      "encoding": "gbk",
+      "confidence": 0.3,
+      "has_bom": false
+    },
+    {
+      "encoding": "latin-1",
+      "confidence": 0.3,
+      "has_bom": false
+    }
+  ],
+  "best_encoding": "ascii",
+  "has_bom": false,
+  "header_fields": [
+    "name",
+    "age",
+    "city"
+  ],
+  "header_validation": {
+    "is_valid": true,
+    "missing_fields": [],
+    "extra_fields": [],
+    "order_mismatch": false,
+    "issues": []
+  },
+  "total_rows": 4,
+  "good_rows": 1,
+  "bad_rows": [
+    {
+      "row_number": 2,
+      "error_type": "field_count_mismatch",
+      "reason": "field count mismatch: expected 3, got 2",
+      "raw_content": "Alice,25"
+    },
+    {
+      "row_number": 3,
+      "error_type": "field_count_mismatch",
+      "reason": "field count mismatch: expected 3, got 4",
+      "raw_content": "Bob,30,Shanghai,extra"
+    }
+  ],
+  "decode_errors": 0,
+  "sample_rows": [
+    [
+      "Charlie",
+      "28",
+      "Guangzhou"
+    ]
+  ],
+  "decoded_preview": "name,age,city\nAlice,25\nBob,30,Shanghai,extra\nCharlie,28,Guangzhou"
+}
