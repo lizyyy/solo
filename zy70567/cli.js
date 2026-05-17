@@ -52,6 +52,9 @@ function parseLine(line, lineNumber) {
     const range = parseCidr(cidr);
     return { lineNumber, cidr, team, purpose, environment, startIp: range.start, endIp: range.end };
   } catch (e) {
+    if (lineNumber === 1 && (cidr.toLowerCase().includes("cidr") || cidr.toLowerCase().includes("ip"))) {
+      return null;
+    }
     return { lineNumber, rawContent: line, reason: "CIDR parse failed" };
   }
 }

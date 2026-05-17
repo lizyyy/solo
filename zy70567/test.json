@@ -1,0 +1,123 @@
+{
+  "totalEntries": 9,
+  "validEntries": 6,
+  "badEntries": [
+    {
+      "lineNumber": 7,
+      "rawContent": "192.168.0.256/24,团队E,无效IP,测试环境",
+      "reason": "CIDR parse failed"
+    },
+    {
+      "lineNumber": 9,
+      "rawContent": "invalid-cidr,团队F,错误测试,测试环境",
+      "reason": "CIDR parse failed"
+    },
+    {
+      "lineNumber": 10,
+      "rawContent": "缺少字段",
+      "reason": "Not enough fields"
+    }
+  ],
+  "overlappingPairs": [
+    {
+      "overlapCidr": "10.1.0.0/16",
+      "entry1": {
+        "lineNumber": 4,
+        "cidr": "10.0.0.0/8",
+        "team": "团队C",
+        "purpose": "办公网络",
+        "environment": "办公环境"
+      },
+      "entry2": {
+        "lineNumber": 8,
+        "cidr": "10.1.0.0/16",
+        "team": "团队C",
+        "purpose": "服务器",
+        "environment": "生产环境"
+      }
+    },
+    {
+      "overlapCidr": "172.16.1.0/24",
+      "entry1": {
+        "lineNumber": 5,
+        "cidr": "172.16.0.0/12",
+        "team": "团队D",
+        "purpose": "容器网络",
+        "environment": "生产环境"
+      },
+      "entry2": {
+        "lineNumber": 6,
+        "cidr": "172.16.1.0/24",
+        "team": "团队A",
+        "purpose": "监控系统",
+        "environment": "测试环境"
+      }
+    },
+    {
+      "overlapCidr": "192.168.1.128/25",
+      "entry1": {
+        "lineNumber": 2,
+        "cidr": "192.168.1.0/24",
+        "team": "团队A",
+        "purpose": "内部服务",
+        "environment": "测试环境"
+      },
+      "entry2": {
+        "lineNumber": 3,
+        "cidr": "192.168.1.128/25",
+        "team": "团队B",
+        "purpose": "数据库",
+        "environment": "生产环境"
+      }
+    }
+  ],
+  "teamSummaries": [
+    {
+      "team": "团队A",
+      "totalRanges": 2,
+      "environments": [
+        "测试环境"
+      ],
+      "purposes": [
+        "内部服务",
+        "监控系统"
+      ],
+      "overlappingCount": 2
+    },
+    {
+      "team": "团队B",
+      "totalRanges": 1,
+      "environments": [
+        "生产环境"
+      ],
+      "purposes": [
+        "数据库"
+      ],
+      "overlappingCount": 1
+    },
+    {
+      "team": "团队C",
+      "totalRanges": 2,
+      "environments": [
+        "办公环境",
+        "生产环境"
+      ],
+      "purposes": [
+        "办公网络",
+        "服务器"
+      ],
+      "overlappingCount": 1
+    },
+    {
+      "team": "团队D",
+      "totalRanges": 1,
+      "environments": [
+        "生产环境"
+      ],
+      "purposes": [
+        "容器网络"
+      ],
+      "overlappingCount": 1
+    }
+  ]
+}
