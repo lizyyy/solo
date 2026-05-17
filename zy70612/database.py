@@ -46,28 +46,6 @@ class Store(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
-class PriceTagVersion(Base):
-    __tablename__ = "price_tag_versions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    version_code = Column(String, unique=True, index=True, nullable=False)
-    name = Column(String, nullable=False)
-    description = Column(Text)
-    status = Column(Enum(VersionStatus), default=VersionStatus.DRAFT)
-    promotion_start = Column(DateTime, nullable=False)
-    promotion_end = Column(DateTime, nullable=False)
-    created_by = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    closed_at = Column(DateTime)
-    closed_by = Column(String)
-
-    items = relationship("PriceTagItem", back_populates="version")
-    confirmations = relationship("Confirmation", back_populates="version")
-    discrepancies = relationship("Discrepancy", back_populates="version")
-    store_assignments = relationship("VersionStoreAssignment", back_populates="version")
-
-
 class PriceTagItem(Base):
     __tablename__ = "price_tag_items"
 
@@ -131,6 +109,45 @@ class Discrepancy(Base):
 
     version = relationship("PriceTagVersion", back_populates="discrepancies")
     store = relationship("Store")
+
+
+class VersionStatusHistory(Base):
+    __tablename__ = "version_status_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    version_id = Column(Integer, ForeignKey("price_tag_versions.id"), nullable=False)
+    previous_status = Column(Enum(VersionStatus), nullable=True)
+    new_status = Column(Enum(VersionStatus), nullable=False)
+    changed_by = Column(String, nullable=False)
+    change_reason = Column(Text)
+    changed_at = Column(DateTime, default=datetime.utcnow)
+
+    version = relationship("PriceTagVersion", back_populates="status_history")
+
+
+class PriceTagVersion(Base):
+    __tablename__ = "price_tag_versions"
+    __mapper_args__ = {"confirm_deleted_rows": False}
+
+    id = Column(Integer, primary_key=True, index=True)
+    version_code = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String, nullable=False)
+    description = Column(Text)
+    status = Column(Enum(VersionStatus), default=VersionStatus.DRAFT)
+    promotion_start = Column(DateTime, nullable=False)
+    promotion_end = Column(DateTime, nullable=False)
+    created_by = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    closed_at = Column(DateTime)
+    closed_by = Column(String)
+    last_expiry_check = Column(DateTime)
+
+    items = relationship("PriceTagItem", back_populates="version", cascade="all, delete-orphan")
+    confirmations = relationship("Confirmation", back_populates="version", cascade="all, delete-orphan")
+    discrepancies = relationship("Discrepancy", back_populates="version", cascade="all, delete-orphan")
+    store_assignments = relationship("VersionStoreAssignment", back_populates="version", cascade="all, delete-orphan")
+    status_history = relationship("VersionStatusHistory", back_populates="version", cascade="all, delete-orphan", order_by="VersionStatusHistory.changed_at")
 
 
 def get_db():

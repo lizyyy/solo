@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import sys
 import os
@@ -38,11 +38,13 @@ def setup_database():
     yield
     Base.metadata.drop_all(bind=engine)
 
+
 def test_root():
     response = client.get("/")
     assert response.status_code == 200
     data = response.json()
     assert data["message"] == "价签版本促销到期门店确认API"
+
 
 def test_main_flow():
     store_response = client.post(
@@ -116,7 +118,6 @@ def test_main_flow():
         }
     )
     assert confirm_start_response.status_code == 200
-    confirmation_id = confirm_start_response.json()["id"]
 
     status_response = client.get(f"/api/v1/price-tag-versions/{version_id}/status")
     assert status_response.status_code == 200
@@ -126,6 +127,87 @@ def test_main_flow():
 
     export_response = client.get(f"/api/v1/price-tag-versions/{version_id}/export")
     assert export_response.status_code == 200
+
+
+def test_status_history_tracking():
+    version_response = client.post(
+        "/api/v1/price-tag-versions/",
+        json={
+            "version_code": "TEST-HISTORY-001",
+            "name": "测试历史记录",
+            "promotion_start": "2024-06-01T00:00:00",
+            "promotion_end": "2024-06-07T23:59:59",
+            "created_by": "admin@company.com"
+        }
+    )
+    assert version_response.status_code == 200
+    version_id = version_response.json()["id"]
+
+    status_update_response = client.patch(
+        f"/api/v1/price-tag-versions/{version_id}/status",
+        json={
+            "status": "published",
+            "changed_by": "admin@company.com",
+            "change_reason": "促销活动正式发布"
+        }
+    )
+    assert status_update_response.status_code == 200
+
+    history_response = client.get(f"/api/v1/price-tag-versions/{version_id}/status-history")
+    assert history_response.status_code == 200
+    history_data = history_response.json()
+    assert len(history_data) >= 1
+    assert history_data[0]["changed_by"] == "admin@company.com"
+    assert history_data[0]["new_status"] == "published"
+
+
+def test_promotion_expiry_check():
+    store_response = client.post(
+        "/api/v1/stores/",
+        json={
+            "store_code": "TEST-EXPIRY-001",
+            "name": "测试到期检查门店",
+            "region": "测试区域",
+            "manager_email": "test@company.com"
+        }
+    )
+    store_id = store_response.json()["id"]
+
+    past_date = (datetime.utcnow() - timedelta(days=1)).isoformat()
+    version_response = client.post(
+        "/api/v1/price-tag-versions/",
+        json={
+            "version_code": "TEST-EXPIRY-PROMO",
+            "name": "已过期促销活动",
+            "promotion_start": "2024-01-01T00:00:00",
+            "promotion_end": past_date,
+            "created_by": "admin@company.com"
+        }
+    )
+    version_id = version_response.json()["id"]
+
+    client.post(
+        f"/api/v1/price-tag-versions/{version_id}/stores",
+        json={
+            "store_ids": [store_id],
+            "assigned_by": "admin@company.com"
+        }
+    )
+
+    expiry_check_response = client.post(
+        f"/api/v1/price-tag-versions/{version_id}/check-expiry?checked_by=system_checker"
+    )
+    assert expiry_check_response.status_code == 200
+    expiry_data = expiry_check_response.json()
+    assert expiry_data["created_discrepancies"] == 1
+    assert expiry_data["status_updated"] == True
+
+    discrepancies_response = client.get(f"/api/v1/discrepancies/?version_id={version_id}")
+    assert discrepancies_response.status_code == 200
+    discrepancies = discrepancies_response.json()
+    assert len(discrepancies) == 1
+    assert discrepancies[0]["discrepancy_type"] == "price_not_restored"
+
 
 def test_duplicate_confirmation_conflict():
     store_response = client.post(
@@ -185,6 +267,7 @@ def test_duplicate_confirmation_conflict():
     assert len(discrepancy_list) >= 1
     assert discrepancy_list[0]["discrepancy_type"] == "duplicate_confirmation"
 
+
 def test_discrepancy_resolution():
     store_response = client.post(
         "/api/v1/stores/",
@@ -223,6 +306,7 @@ def test_discrepancy_resolution():
     resolved_data = resolve_response.json()
     assert resolved_data["status"] == "resolved"
     assert resolved_data["resolved_by"] == "admin@company.com"
+
 
 def test_confirmation_revocation():
     store_response = client.post(
@@ -273,7 +357,8 @@ def test_confirmation_revocation():
     discrepancy_list = discrepancies.json()
     assert any(d["discrepancy_type"] == "confirmation_revoked" for d in discrepancy_list)
 
-def test_version_close():
+
+def test_version_close_with_history():
     version_response = client.post(
         "/api/v1/price-tag-versions/",
         json={
@@ -297,6 +382,13 @@ def test_version_close():
     closed_data = close_response.json()
     assert closed_data["status"] == "closed"
     assert closed_data["closed_by"] == "admin@company.com"
+
+    history_response = client.get(f"/api/v1/price-tag-versions/{version_id}/status-history")
+    assert history_response.status_code == 200
+    history_data = history_response.json()
+    assert len(history_data) >= 1
+    assert any(h["new_status"] == "closed" for h in history_data)
+
 
 def test_duplicate_version_code():
     client.post(
@@ -322,6 +414,7 @@ def test_duplicate_version_code():
     )
     assert duplicate_response.status_code == 400
 
+
 def test_invalid_store_assignment():
     version_response = client.post(
         "/api/v1/price-tag-versions/",
@@ -343,3 +436,60 @@ def test_invalid_store_assignment():
         }
     )
     assert invalid_assign.status_code == 404
+
+
+def test_export_report_contains_status_history():
+    version_response = client.post(
+        "/api/v1/price-tag-versions/",
+        json={
+            "version_code": "TEST-EXPORT-HISTORY",
+            "name": "测试导出历史",
+            "promotion_start": "2024-06-01T00:00:00",
+            "promotion_end": "2024-06-07T23:59:59",
+            "created_by": "admin@company.com"
+        }
+    )
+    version_id = version_response.json()["id"]
+
+    client.patch(
+        f"/api/v1/price-tag-versions/{version_id}/status",
+        json={
+            "status": "published",
+            "changed_by": "admin@company.com",
+            "change_reason": "测试状态变更"
+        }
+    )
+
+    export_response = client.get(f"/api/v1/price-tag-versions/{version_id}/export")
+    assert export_response.status_code == 200
+    export_data = export_response.json()
+    assert "status_history" in export_data
+    assert len(export_data["status_history"]) >= 1
+
+
+def test_bulk_expiry_check():
+    store1_response = client.post(
+        "/api/v1/stores/",
+        json={
+            "store_code": "BULK-TEST-001",
+            "name": "批量测试门店1",
+            "manager_email": "test1@company.com"
+        }
+    )
+    store1_id = store1_response.json()["id"]
+
+    past_date = (datetime.utcnow() - timedelta(days=1)).isoformat()
+    client.post(
+        "/api/v1/price-tag-versions/",
+        json={
+            "version_code": "BULK-EXPIRY-001",
+            "name": "批量测试促销1",
+            "promotion_start": "2024-01-01T00:00:00",
+            "promotion_end": past_date,
+            "created_by": "admin@company.com"
+        }
+    )
+
+    bulk_check_response = client.post("/api/v1/check-expired-promotions?checked_by=system_checker")
+    assert bulk_check_response.status_code == 200
+    assert isinstance(bulk_check_response.json(), list)

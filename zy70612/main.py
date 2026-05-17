@@ -63,10 +63,62 @@ def update_version_status(
     status_update: schemas.PriceTagVersionUpdateStatus,
     db: Session = Depends(get_db)
 ):
-    db_version = crud.update_version_status(db, version_id=version_id, status=status_update.status)
+    db_version = crud.update_version_status(
+        db,
+        version_id=version_id,
+        status=status_update.status,
+        changed_by=status_update.changed_by,
+        change_reason=status_update.change_reason
+    )
     if db_version is None:
         raise HTTPException(status_code=404, detail="Version not found")
     return db_version
+
+
+@app.get("/api/v1/price-tag-versions/{version_id}/status-history", response_model=List[schemas.VersionStatusHistory], tags=["价签版本"])
+def get_version_status_history(version_id: int, db: Session = Depends(get_db)):
+    db_version = crud.get_price_tag_version(db, version_id=version_id)
+    if db_version is None:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return crud.get_version_status_history(db, version_id=version_id)
+
+
+@app.post("/api/v1/price-tag-versions/{version_id}/check-expiry", tags=["促销到期检查"])
+def check_single_version_expiry(
+    version_id: int,
+    checked_by: str,
+    db: Session = Depends(get_db)
+):
+    db_version = crud.get_price_tag_version(db, version_id=version_id)
+    if db_version is None:
+        raise HTTPException(status_code=404, detail="Version not found")
+    
+    created_discrepancies, status_updated = crud.check_promotion_expiry(
+        db,
+        version_id=version_id,
+        checked_by=checked_by
+    )
+    
+    summary = crud.get_version_status_summary(db, version_id=version_id)
+    return {
+        "version_id": version_id,
+        "version_code": db_version.version_code,
+        "name": db_version.name,
+        "promotion_end": db_version.promotion_end,
+        "total_stores": summary.total_stores if summary else 0,
+        "pending_stores": summary.pending_stores if summary else 0,
+        "created_discrepancies": created_discrepancies,
+        "status_updated": status_updated,
+        "checked_at": datetime.utcnow()
+    }
+
+
+@app.post("/api/v1/check-expired-promotions", response_model=List[schemas.ExpiryCheckResult], tags=["促销到期检查"])
+def check_all_expired_promotions(
+    checked_by: str,
+    db: Session = Depends(get_db)
+):
+    return crud.check_all_expired_promotions(db, checked_by=checked_by)
 
 
 @app.post("/api/v1/price-tag-versions/{version_id}/close", response_model=schemas.PriceTagVersion, tags=["价签版本"])
@@ -75,7 +127,12 @@ def close_version(
     close_request: schemas.VersionCloseRequest,
     db: Session = Depends(get_db)
 ):
-    db_version = crud.close_version(db, version_id=version_id, closed_by=close_request.closed_by)
+    db_version = crud.close_version(
+        db,
+        version_id=version_id,
+        closed_by=close_request.closed_by,
+        notes=close_request.notes
+    )
     if db_version is None:
         raise HTTPException(status_code=404, detail="Version not found")
     return db_version

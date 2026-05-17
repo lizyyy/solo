@@ -61,6 +61,32 @@ class PriceTagVersionCreate(PriceTagVersionBase):
 
 class PriceTagVersionUpdateStatus(BaseModel):
     status: VersionStatus
+    changed_by: str
+    change_reason: Optional[str] = None
+
+
+class VersionStatusHistory(BaseModel):
+    id: int
+    version_id: int
+    previous_status: Optional[VersionStatus] = None
+    new_status: VersionStatus
+    changed_by: str
+    change_reason: Optional[str] = None
+    changed_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class ExpiryCheckResult(BaseModel):
+    version_id: int
+    version_code: str
+    name: str
+    promotion_end: datetime
+    total_stores: int
+    pending_stores: int
+    created_discrepancies: int
+    status_updated: bool
 
 
 class PriceTagVersion(PriceTagVersionBase):

@@ -1,11 +1,13 @@
 from sqlalchemy.orm import Session
 from datetime import datetime
+from typing import Optional, List, Tuple
 import json
 
 import schemas
 from database import (
     Store, PriceTagVersion, PriceTagItem, Confirmation, Discrepancy,
-    VersionStoreAssignment, ConfirmationType, DiscrepancyStatus, VersionStatus
+    VersionStoreAssignment, ConfirmationType, DiscrepancyStatus, VersionStatus,
+    VersionStatusHistory
 )
 
 
@@ -45,21 +47,76 @@ def get_price_tag_versions(db: Session, skip: int = 0, limit: int = 100):
     return db.query(PriceTagVersion).offset(skip).limit(limit).all()
 
 
-def update_version_status(db: Session, version_id: int, status: VersionStatus):
+def create_version_status_history(
+    db: Session,
+    version_id: int,
+    previous_status: Optional[VersionStatus],
+    new_status: VersionStatus,
+    changed_by: str,
+    change_reason: Optional[str] = None
+):
+    history = VersionStatusHistory(
+        version_id=version_id,
+        previous_status=previous_status,
+        new_status=new_status,
+        changed_by=changed_by,
+        change_reason=change_reason
+    )
+    db.add(history)
+    db.commit()
+    db.refresh(history)
+    return history
+
+
+def get_version_status_history(db: Session, version_id: int):
+    return db.query(VersionStatusHistory).filter(
+        VersionStatusHistory.version_id == version_id
+    ).order_by(VersionStatusHistory.changed_at.desc()).all()
+
+
+def update_version_status(
+    db: Session,
+    version_id: int,
+    status: VersionStatus,
+    changed_by: str,
+    change_reason: Optional[str] = None
+):
     version = db.query(PriceTagVersion).filter(PriceTagVersion.id == version_id).first()
     if version:
+        previous_status = version.status
         version.status = status
+        
+        create_version_status_history(
+            db=db,
+            version_id=version_id,
+            previous_status=previous_status,
+            new_status=status,
+            changed_by=changed_by,
+            change_reason=change_reason
+        )
+        
         db.commit()
         db.refresh(version)
     return version
 
 
-def close_version(db: Session, version_id: int, closed_by: str):
+def close_version(db: Session, version_id: int, closed_by: str, notes: Optional[str] = None):
     version = db.query(PriceTagVersion).filter(PriceTagVersion.id == version_id).first()
     if version:
+        previous_status = version.status
         version.status = VersionStatus.CLOSED
         version.closed_at = datetime.utcnow()
         version.closed_by = closed_by
+        
+        create_version_status_history(
+            db=db,
+            version_id=version_id,
+            previous_status=previous_status,
+            new_status=VersionStatus.CLOSED,
+            changed_by=closed_by,
+            change_reason=f"关闭版本: {notes}" if notes else "关闭版本"
+        )
+        
         db.commit()
         db.refresh(version)
     return version
@@ -253,6 +310,7 @@ def generate_export_report(db: Session, version_id: int):
     summary = get_version_status_summary(db, version_id)
     items = get_version_items(db, version_id)
     discrepancies = get_discrepancies(db, version_id=version_id)
+    status_history = get_version_status_history(db, version_id=version_id)
     
     return {
         "version": {
@@ -262,7 +320,8 @@ def generate_export_report(db: Session, version_id: int):
             "status": version.status,
             "promotion_start": datetime_to_str(version.promotion_start),
             "promotion_end": datetime_to_str(version.promotion_end),
-            "created_by": version.created_by
+            "created_by": version.created_by,
+            "last_expiry_check": datetime_to_str(version.last_expiry_check)
         },
         "summary": json.loads(summary.model_dump_json()) if summary else None,
         "items": [
@@ -295,6 +354,17 @@ def generate_export_report(db: Session, version_id: int):
             }
             for d in discrepancies
         ],
+        "status_history": [
+            {
+                "id": h.id,
+                "previous_status": h.previous_status.value if h.previous_status else None,
+                "new_status": h.new_status.value,
+                "changed_by": h.changed_by,
+                "change_reason": h.change_reason,
+                "changed_at": datetime_to_str(h.changed_at)
+            }
+            for h in status_history
+        ],
         "exported_at": datetime_to_str(datetime.utcnow())
     }
 
@@ -325,3 +395,95 @@ def revoke_confirmation(db: Session, confirmation_id: int, revoked_by: str, reas
     db.delete(confirmation)
     db.commit()
     return discrepancy
+
+
+def check_promotion_expiry(db: Session, version_id: int, checked_by: str) -> Tuple[int, bool]:
+    version = get_price_tag_version(db, version_id)
+    if not version:
+        return 0, False
+    
+    now = datetime.utcnow()
+    if version.promotion_end > now:
+        return 0, False
+    
+    assigned_stores = get_version_assigned_stores(db, version_id)
+    confirmations = get_confirmations(db, version_id=version_id)
+    
+    pending_stores = []
+    for store in assigned_stores:
+        store_end_confirmation = next(
+            (c for c in confirmations if c.store_id == store.id and c.confirmation_type == ConfirmationType.END),
+            None
+        )
+        if not store_end_confirmation:
+            pending_stores.append(store)
+    
+    created_discrepancies = 0
+    for store in pending_stores:
+        existing_discrepancy = db.query(Discrepancy).filter(
+            Discrepancy.version_id == version_id,
+            Discrepancy.store_id == store.id,
+            Discrepancy.discrepancy_type == "price_not_restored"
+        ).first()
+        
+        if not existing_discrepancy:
+            discrepancy = Discrepancy(
+                version_id=version_id,
+                store_id=store.id,
+                discrepancy_type="price_not_restored",
+                description=f"促销已结束，但门店未确认恢复原价",
+                original_input=json.dumps({
+                    "promotion_end": version.promotion_end.isoformat(),
+                    "check_time": now.isoformat(),
+                    "store_name": store.name,
+                    "store_code": store.store_code
+                }, default=str),
+                detected_by=checked_by
+            )
+            db.add(discrepancy)
+            created_discrepancies += 1
+    
+    status_updated = False
+    if version.status != VersionStatus.EXPIRED:
+        previous_status = version.status
+        version.status = VersionStatus.EXPIRED
+        
+        create_version_status_history(
+            db=db,
+            version_id=version_id,
+            previous_status=previous_status,
+            new_status=VersionStatus.EXPIRED,
+            changed_by=checked_by,
+            change_reason="促销到期自动检查，系统标记为已过期"
+        )
+        status_updated = True
+    
+    version.last_expiry_check = now
+    db.commit()
+    
+    return created_discrepancies, status_updated
+
+
+def check_all_expired_promotions(db: Session, checked_by: str) -> List[schemas.ExpiryCheckResult]:
+    now = datetime.utcnow()
+    expired_versions = db.query(PriceTagVersion).filter(
+        PriceTagVersion.promotion_end <= now,
+        PriceTagVersion.status != VersionStatus.CLOSED
+    ).all()
+    
+    results = []
+    for version in expired_versions:
+        created_discrepancies, status_updated = check_promotion_expiry(db, version.id, checked_by)
+        summary = get_version_status_summary(db, version.id)
+        results.append(schemas.ExpiryCheckResult(
+            version_id=version.id,
+            version_code=version.version_code,
+            name=version.name,
+            promotion_end=version.promotion_end,
+            total_stores=summary.total_stores if summary else 0,
+            pending_stores=summary.pending_stores if summary else 0,
+            created_discrepancies=created_discrepancies,
+            status_updated=status_updated
+        ))
+    
+    return results
