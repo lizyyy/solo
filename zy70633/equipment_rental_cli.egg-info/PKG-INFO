@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: equipment-rental-cli
+Version: 1.0.0
+Summary: 器材配件归还复核押金扣款排查CLI
+Author: Studio Equipment Management
+Requires-Dist: click>=8.0.0
+Requires-Dist: pandas>=1.5.0
+Requires-Dist: python-dateutil>=2.8.0
+Requires-Dist: openpyxl>=3.0.0
+Requires-Dist: xlsxwriter>=3.0.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: summary
