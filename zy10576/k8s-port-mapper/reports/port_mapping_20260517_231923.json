@@ -1,0 +1,98 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-17T23:19:23.810703",
+    "version": "0.1.0"
+  },
+  "summary": {
+    "services_count": 1,
+    "ingresses_count": 1,
+    "workloads_count": 1,
+    "errors_count": 1,
+    "warnings_count": 1,
+    "bad_lines_count": 0
+  },
+  "services": [
+    {
+      "name": "bad-app-service",
+      "namespace": null,
+      "ports": [
+        {
+          "port": 80,
+          "name": null,
+          "protocol": "TCP",
+          "target_port": 8080
+        }
+      ],
+      "selector": {
+        "app": "wrong-label"
+      },
+      "file": "examples/bad_sample.yaml",
+      "line_start": 34
+    }
+  ],
+  "ingresses": [
+    {
+      "name": "bad-app-ingress",
+      "namespace": null,
+      "paths": [
+        {
+          "path": "/",
+          "host": "bad-app.example.com",
+          "service_name": "non-existent-service",
+          "service_port": 9999
+        }
+      ],
+      "file": "examples/bad_sample.yaml",
+      "line_start": 35
+    }
+  ],
+  "workloads": [
+    {
+      "name": "bad-app",
+      "namespace": null,
+      "ports": [
+        {
+          "port": 3000,
+          "name": null,
+          "protocol": "TCP"
+        }
+      ],
+      "labels": {
+        "app": "bad-app"
+      },
+      "file": "examples/bad_sample.yaml",
+      "line_start": 1
+    }
+  ],
+  "gaps": [
+    {
+      "type": "INGRESS_SERVICE_NOT_FOUND",
+      "severity": "ERROR",
+      "message": "Ingress bad-app-ingress 引用的服务 non-existent-service 不存在",
+      "details": {
+        "ingress": "bad-app-ingress",
+        "service": "non-existent-service",
+        "path": "/"
+      },
+      "file": "examples/bad_sample.yaml",
+      "line_start": 35
+    },
+    {
+      "type": "SERVICE_NO_MATCHING_PODS",
+      "severity": "WARNING",
+      "message": "Service bad-app-service 的 selector 没有匹配到任何 Pod",
+      "details": {
+        "service": "bad-app-service",
+        "selector": {
+          "app": "wrong-label"
+        }
+      },
+      "file": "examples/bad_sample.yaml",
+      "line_start": 34
+    }
+  ],
+  "bad_lines": [],
+  "errors": [
+    "处理文档 4 失败: 'str' object has no attribute 'get'"
+  ]
+}

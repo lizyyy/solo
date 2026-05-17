@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-17T23:19:16.759261",
+    "version": "0.1.0"
+  },
+  "summary": {
+    "services_count": 1,
+    "ingresses_count": 1,
+    "workloads_count": 1,
+    "errors_count": 0,
+    "warnings_count": 0,
+    "bad_lines_count": 0
+  },
+  "services": [
+    {
+      "name": "my-app-service",
+      "namespace": null,
+      "ports": [
+        {
+          "port": 80,
+          "name": null,
+          "protocol": "TCP",
+          "target_port": 8080
+        }
+      ],
+      "selector": {
+        "app": "my-app"
+      },
+      "file": "examples/sample.yaml",
+      "line_start": 34
+    }
+  ],
+  "ingresses": [
+    {
+      "name": "my-app-ingress",
+      "namespace": null,
+      "paths": [
+        {
+          "path": "/",
+          "host": "my-app.example.com",
+          "service_name": "my-app-service",
+          "service_port": 80
+        }
+      ],
+      "file": "examples/sample.yaml",
+      "line_start": 35
+    }
+  ],
+  "workloads": [
+    {
+      "name": "my-app",
+      "namespace": null,
+      "ports": [
+        {
+          "port": 8080,
+          "name": null,
+          "protocol": "TCP"
+        }
+      ],
+      "labels": {
+        "app": "my-app"
+      },
+      "file": "examples/sample.yaml",
+      "line_start": 1
+    }
+  ],
+  "gaps": [],
+  "bad_lines": [],
+  "errors": []
+}
