@@ -1,0 +1,49 @@
+[
+  {
+    "prescriptionNo": "RX2024001",
+    "patientName": "张三",
+    "patientId": "P001",
+    "diagnosis": "上呼吸道感染",
+    "consultTime": "2024-01-15T09:30:00.000Z",
+    "doctorName": "李医生",
+    "department": "内科",
+    "licenseNo": "DOC12345",
+    "medicines": "[{\"name\":\"阿莫西林\",\"specification\":\"0.5g*24粒\",\"dosage\":\"每日3次，每次1粒\",\"quantity\":2,\"price\":25.5}]"
+  },
+  {
+    "prescriptionNo": "RX2024002",
+    "patientName": "李四",
+    "patientId": "P002",
+    "diagnosis": "高血压",
+    "consultTime": "2024-01-15T10:00:00.000Z",
+    "doctorName": "王医生",
+    "department": "心内科",
+    "licenseNo": "DOC67890",
+    "medicines": "[{\"name\":\"硝苯地平缓释片\",\"specification\":\"10mg*30片\",\"dosage\":\"每日2次，每次1片\",\"quantity\":1,\"price\":32.0}]"
+  },
+  {
+    "prescriptionNo": "RX2024003",
+    "patientName": "王五",
+    "patientId": "P003",
+    "diagnosis": "2型糖尿病",
+    "consultTime": "2024-01-15T14:00:00.000Z",
+    "doctorName": "赵医生",
+    "department": "内分泌科",
+    "licenseNo": "DOC11111",
+    "medicines": "[{\"name\":\"盐酸二甲双胍片\",\"specification\":\"0.5g*30片\",\"dosage\":\"每日2次，每次1片\",\"quantity\":2,\"price\":45.0},{\"name\":\"格列美脲片\",\"specification\":\"2mg*30片\",\"dosage\":\"每日1次，每次1片\",\"quantity\":1,\"price\":58.0}]"
+  },
+  {
+    "prescriptionNo": "RX2024001",
+    "patientName": "重复处方号",
+    "medicines": "[]"
+  },
+  {
+    "patientName": "缺少处方号的坏行",
+    "medicines": "[{\"name\":\"测试药\"}]"
+  },
+  {
+    "prescriptionNo": "RX2024006",
+    "patientName": "空药品",
+    "medicines": ""
+  }
+]
