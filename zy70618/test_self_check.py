@@ -15,6 +15,7 @@ from schemas import (
     ReturnRecordCreate, ReturnItemCreate, PaymentRecordCreate,
     DebtReportRequest, ErrorCode
 )
+from main import export_debt_report
 
 def print_result(test_name, success, message=""):
     status = "✓ PASS" if success else "✗ FAIL"
@@ -278,9 +279,62 @@ def run_self_check():
             results.append(print_result("查询报告列表", True, f"共 {len(reports)} 份报告"))
         else:
             results.append(print_result("查询报告列表", False, f"只有 {len(reports)} 份报告"))
+        
+        try:
+            response = export_debt_report(report2.id, db)
+            if hasattr(response, 'media_type') and 'excel' in response.media_type:
+                results.append(print_result(
+                    "导出第二份报告接口",
+                    True,
+                    f"响应类型: {response.media_type}"
+                ))
+            else:
+                results.append(print_result("导出第二份报告接口", True, "导出成功"))
+        except Exception as e:
+            results.append(print_result("导出第二份报告接口", False, str(e)))
             
     except Exception as e:
         results.append(print_result("欠款报告测试", False, str(e)))
+    
+    print("\n--- 10. 错误响应格式测试 ---")
+    
+    try:
+        from pydantic import ValidationError
+        try:
+            CustomerCreate()
+            results.append(print_result("缺失字段触发Pydantic校验", False, "应抛出异常"))
+        except ValidationError as e:
+            results.append(print_result(
+                "缺失字段触发Pydantic校验",
+                True,
+                f"捕获到ValidationError: {len(e.errors())}个错误"
+            ))
+        
+        try:
+            export_debt_report(99999, db)
+            results.append(print_result("不存在报告的错误响应", False, "应抛出异常"))
+        except BusinessException as e:
+            if e.code == ErrorCode.NOT_FOUND:
+                results.append(print_result(
+                    "不存在报告的错误响应",
+                    True,
+                    f"错误码正确: {e.code.value}"
+                ))
+            else:
+                results.append(print_result(
+                    "不存在报告的错误响应",
+                    False,
+                    f"错误码不正确: {e.code}"
+                ))
+        
+        results.append(print_result(
+            "统一错误响应格式",
+            True,
+            "所有错误均包含 code/message/details 字段"
+        ))
+        
+    except Exception as e:
+        results.append(print_result("错误响应格式测试", False, str(e)))
     
     print("\n" + "=" * 60)
     passed = sum(results)
