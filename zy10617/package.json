@@ -1,0 +1,21 @@
+{
+  "name": "annotation-platform-rework",
+  "version": "1.0.0",
+  "description": "数据标注平台任务包拆分返工 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "node tests/run.js",
+    "seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.1",
+    "csv-writer": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
