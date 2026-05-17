@@ -1,0 +1,201 @@
+{
+  "report_info": {
+    "generated_at": "2026-05-17T18:44:04.586781",
+    "version": "1.0"
+  },
+  "summary": {
+    "total_photos": 6,
+    "valid_photos": 6,
+    "invalid_photos": 0,
+    "total_duplicate_groups": 1,
+    "total_duplicate_files": 3,
+    "total_orders": 4,
+    "orders_with_missing": 4
+  },
+  "missing_photos": [
+    {
+      "order_id": "WO000005",
+      "customer_id": "C000005",
+      "missing_types": [
+        "after"
+      ],
+      "existing_types": [
+        "before"
+      ],
+      "photos": [
+        {
+          "original": "C000005_WO000005_before.jpg",
+          "ext": ".jpg",
+          "customer_id": "C000005",
+          "order_id": "WO000005",
+          "photo_type": "before",
+          "timestamp": null,
+          "is_valid": true,
+          "full_path": "test_samples/boundary_conflict/重复文件组/C000005_WO000005_before.jpg",
+          "relative_path": "重复文件组/C000005_WO000005_before.jpg",
+          "directory": "重复文件组",
+          "size": 17,
+          "hash": "2b78523f10109bfaad036977f4e95d07"
+        },
+        {
+          "original": "C000005_WO000005_before_copy.jpg",
+          "ext": ".jpg",
+          "customer_id": "C000005",
+          "order_id": "WO000005",
+          "photo_type": "before",
+          "timestamp": null,
+          "is_valid": true,
+          "full_path": "test_samples/boundary_conflict/重复文件组/C000005_WO000005_before_copy.jpg",
+          "relative_path": "重复文件组/C000005_WO000005_before_copy.jpg",
+          "directory": "重复文件组",
+          "size": 17,
+          "hash": "2b78523f10109bfaad036977f4e95d07"
+        },
+        {
+          "original": "C000005_WO000005_before_备份.jpg",
+          "ext": ".jpg",
+          "customer_id": "C000005",
+          "order_id": "WO000005",
+          "photo_type": "before",
+          "timestamp": null,
+          "is_valid": true,
+          "full_path": "test_samples/boundary_conflict/重复文件组/备份目录/C000005_WO000005_before_备份.jpg",
+          "relative_path": "重复文件组/备份目录/C000005_WO000005_before_备份.jpg",
+          "directory": "重复文件组/备份目录",
+          "size": 17,
+          "hash": "2b78523f10109bfaad036977f4e95d07"
+        }
+      ]
+    },
+    {
+      "order_id": "WO000007",
+      "customer_id": "C000007",
+      "missing_types": [
+        "before"
+      ],
+      "existing_types": [
+        "after"
+      ],
+      "photos": [
+        {
+          "original": "C000007_WO000007_after.jpg",
+          "ext": ".jpg",
+          "customer_id": "C000007",
+          "order_id": "WO000007",
+          "photo_type": "after",
+          "timestamp": null,
+          "is_valid": true,
+          "full_path": "test_samples/boundary_conflict/缺图工单/C000007_WO000007_after.jpg",
+          "relative_path": "缺图工单/C000007_WO000007_after.jpg",
+          "directory": "缺图工单",
+          "size": 15,
+          "hash": "4cf7ed7740949ad0d98a349866f5091f"
+        }
+      ]
+    },
+    {
+      "order_id": "WO000008",
+      "customer_id": "C000008",
+      "missing_types": [
+        "before",
+        "after"
+      ],
+      "existing_types": [
+        "during"
+      ],
+      "photos": [
+        {
+          "original": "C000008_WO000008_during.jpg",
+          "ext": ".jpg",
+          "customer_id": "C000008",
+          "order_id": "WO000008",
+          "photo_type": "during",
+          "timestamp": null,
+          "is_valid": true,
+          "full_path": "test_samples/boundary_conflict/缺图工单/C000008_WO000008_during.jpg",
+          "relative_path": "缺图工单/C000008_WO000008_during.jpg",
+          "directory": "缺图工单",
+          "size": 12,
+          "hash": "0a3daf5b0f4b2e3a288d20e8c8b8b175"
+        }
+      ]
+    },
+    {
+      "order_id": "WO000006",
+      "customer_id": "C000006",
+      "missing_types": [
+        "after"
+      ],
+      "existing_types": [
+        "before"
+      ],
+      "photos": [
+        {
+          "original": "C000006_WO000006_before.jpg",
+          "ext": ".jpg",
+          "customer_id": "C000006",
+          "order_id": "WO000006",
+          "photo_type": "before",
+          "timestamp": null,
+          "is_valid": true,
+          "full_path": "test_samples/boundary_conflict/缺图工单/C000006_WO000006_before.jpg",
+          "relative_path": "缺图工单/C000006_WO000006_before.jpg",
+          "directory": "缺图工单",
+          "size": 14,
+          "hash": "480539873698ac193559c7dda21814dd"
+        }
+      ]
+    }
+  ],
+  "duplicates": [
+    {
+      "hash": "2b78523f10109bfaad036977f4e95d07",
+      "count": 3,
+      "files": [
+        {
+          "original": "C000005_WO000005_before.jpg",
+          "ext": ".jpg",
+          "customer_id": "C000005",
+          "order_id": "WO000005",
+          "photo_type": "before",
+          "timestamp": null,
+          "is_valid": true,
+          "full_path": "test_samples/boundary_conflict/重复文件组/C000005_WO000005_before.jpg",
+          "relative_path": "重复文件组/C000005_WO000005_before.jpg",
+          "directory": "重复文件组",
+          "size": 17,
+          "hash": "2b78523f10109bfaad036977f4e95d07"
+        },
+        {
+          "original": "C000005_WO000005_before_copy.jpg",
+          "ext": ".jpg",
+          "customer_id": "C000005",
+          "order_id": "WO000005",
+          "photo_type": "before",
+          "timestamp": null,
+          "is_valid": true,
+          "full_path": "test_samples/boundary_conflict/重复文件组/C000005_WO000005_before_copy.jpg",
+          "relative_path": "重复文件组/C000005_WO000005_before_copy.jpg",
+          "directory": "重复文件组",
+          "size": 17,
+          "hash": "2b78523f10109bfaad036977f4e95d07"
+        },
+        {
+          "original": "C000005_WO000005_before_备份.jpg",
+          "ext": ".jpg",
+          "customer_id": "C000005",
+          "order_id": "WO000005",
+          "photo_type": "before",
+          "timestamp": null,
+          "is_valid": true,
+          "full_path": "test_samples/boundary_conflict/重复文件组/备份目录/C000005_WO000005_before_备份.jpg",
+          "relative_path": "重复文件组/备份目录/C000005_WO000005_before_备份.jpg",
+          "directory": "重复文件组/备份目录",
+          "size": 17,
+          "hash": "2b78523f10109bfaad036977f4e95d07"
+        }
+      ]
+    }
+  ],
+  "invalid_files": []
+}

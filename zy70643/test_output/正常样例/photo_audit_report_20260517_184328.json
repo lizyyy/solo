@@ -1,0 +1,49 @@
+{
+  "report_info": {
+    "generated_at": "2026-05-17T18:43:28.881285",
+    "version": "1.0"
+  },
+  "summary": {
+    "total_photos": 6,
+    "valid_photos": 4,
+    "invalid_photos": 2,
+    "total_duplicate_groups": 0,
+    "total_duplicate_files": 0,
+    "total_orders": 2,
+    "orders_with_missing": 0
+  },
+  "missing_photos": [],
+  "duplicates": [],
+  "invalid_files": [
+    {
+      "original": "WO000003_C000002_维修前.png",
+      "ext": ".png",
+      "customer_id": null,
+      "order_id": null,
+      "photo_type": null,
+      "timestamp": null,
+      "is_valid": false,
+      "parse_error": "无法解析文件名格式",
+      "full_path": "test_samples/normal_case/客户B/WO000003_C000002_维修前.png",
+      "relative_path": "客户B/WO000003_C000002_维修前.png",
+      "directory": "客户B",
+      "size": 13,
+      "hash": "8a4411be744df89411b2c4be26fcf1a7"
+    },
+    {
+      "original": "WO000003_C000002_维修后.png",
+      "ext": ".png",
+      "customer_id": null,
+      "order_id": null,
+      "photo_type": null,
+      "timestamp": null,
+      "is_valid": false,
+      "parse_error": "无法解析文件名格式",
+      "full_path": "test_samples/normal_case/客户B/WO000003_C000002_维修后.png",
+      "relative_path": "客户B/WO000003_C000002_维修后.png",
+      "directory": "客户B",
+      "size": 13,
+      "hash": "d125185cc6d02a1721b391f607721721"
+    }
+  ]
+}
