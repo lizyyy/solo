@@ -81,10 +81,11 @@ class RulesEngine:
         return True, fee, delay_minutes
 
     def generate_daily_report(self, report_date: date,
-                              pickup_records: List[Tuple[str, str, time]]) -> List[PickupReport]:
+                              pickup_records: List[Tuple[str, str, time]],
+                              auto_record_late: bool = True) -> List[PickupReport]:
         reports = []
 
-        for student_id, pickup_person_id, pickup_time in pickup_records:
+        for idx, (student_id, pickup_person_id, pickup_time) in enumerate(pickup_records):
             report_id = f"RPT_{report_date.strftime('%Y%m%d')}_{student_id}"
             check_datetime = datetime.combine(report_date, pickup_time)
 
@@ -121,7 +122,32 @@ class RulesEngine:
             reports.append(report)
             self.reports[report_id] = report
 
+            if is_late and auto_record_late:
+                event_id = f"LATE_{report_date.strftime('%Y%m%d')}_{student_id}_{idx}"
+                late_event = LatePickupEvent(
+                    event_id=event_id,
+                    student_id=student_id,
+                    pickup_person_id=pickup_person_id,
+                    pickup_date=report_date,
+                    actual_pickup_time=pickup_time,
+                    scheduled_end_time=scheduled_end_time,
+                    fee_amount=late_fee
+                )
+                self.add_late_event(late_event)
+
         return reports
+
+    def get_late_events_by_student(self, student_id: str) -> List[LatePickupEvent]:
+        return [e for e in self.late_events.values() if e.student_id == student_id]
+
+    def get_late_events_by_date(self, pickup_date: date) -> List[LatePickupEvent]:
+        return [e for e in self.late_events.values() if e.pickup_date == pickup_date]
+
+    def get_late_events_by_date_range(self, start_date: date, end_date: date) -> List[LatePickupEvent]:
+        return [e for e in self.late_events.values() if start_date <= e.pickup_date <= end_date]
+
+    def get_all_late_events(self) -> List[LatePickupEvent]:
+        return list(self.late_events.values())
 
     def validate_data(self) -> List[str]:
         errors = []

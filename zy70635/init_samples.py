@@ -44,7 +44,7 @@ def init_normal_sample():
     print(f"   已添加 {len(authorizations)} 条授权")
 
     leave_records = [
-        LeaveRecord("L001", "S003", date(2026, 5, 17), "生病请假"),
+        LeaveRecord("L001", "S003", date(2026, 5, 19), "生病请假"),
     ]
     storage.save_leave_records(leave_records)
     print(f"   已添加 {len(leave_records)} 条请假记录")
@@ -88,7 +88,7 @@ def init_dirty_data_sample():
     storage.save_authorizations(authorizations)
 
     leave_records = [
-        LeaveRecord("L001", "S999", date(2026, 5, 17), "不存在的学生"),
+        LeaveRecord("L001", "S999", date(2026, 5, 19), "不存在的学生"),
     ]
     storage.save_leave_records(leave_records)
 
@@ -128,7 +128,7 @@ def init_boundary_conflict_sample():
     storage.save_authorizations(authorizations)
 
     leave_records = [
-        LeaveRecord("L001", "S001", date(2026, 5, 17), "与授权日期重叠"),
+        LeaveRecord("L001", "S001", date(2026, 5, 19), "与授权日期重叠"),
     ]
     storage.save_leave_records(leave_records)
 
@@ -192,7 +192,7 @@ def init_acceptance_sample():
     storage.save_authorizations(authorizations)
 
     leave_records = [
-        LeaveRecord("L001", "S003", date(2026, 5, 17), "生病请假"),
+        LeaveRecord("L001", "S003", date(2026, 5, 19), "生病请假"),
     ]
     storage.save_leave_records(leave_records)
 

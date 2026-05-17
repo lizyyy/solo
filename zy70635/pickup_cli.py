@@ -5,7 +5,7 @@ import os
 from datetime import date, time, datetime
 from typing import List
 
-from models import Student, PickupPerson, Authorization, LeaveRecord, PickupReport
+from models import Student, PickupPerson, Authorization, LeaveRecord, PickupReport, LatePickupEvent
 from rules_engine import RulesEngine
 from storage import Storage
 from report_exporter import ReportExporter
@@ -177,6 +177,16 @@ def cmd_generate_report(args):
         storage.save_reports(reports, json_path)
         exporter.export_text_report(reports, engine, txt_path)
 
+        late_events = engine.get_all_late_events()
+        if late_events:
+            existing_events = storage.load_late_events()
+            existing_event_ids = {e.event_id for e in existing_events}
+            for event in late_events:
+                if event.event_id not in existing_event_ids:
+                    existing_events.append(event)
+            storage.save_late_events(existing_events)
+            print(f"   已自动记录 {len(late_events)} 条迟接事件")
+
         print(f"\n✅ 报告生成成功!")
         print(f"   机器可读: {json_path}")
         print(f"   人读报告: {txt_path}")
@@ -267,6 +277,99 @@ def cmd_check_auth(args):
         sys.exit(1)
 
 
+def cmd_add_late_event(args):
+    engine = RulesEngine()
+    storage = Storage()
+
+    try:
+        from datetime import time
+        actual_time = time(*map(int, args.actual_time.split(':')))
+        scheduled_time = time(*map(int, args.scheduled_time.split(':')))
+
+        event = LatePickupEvent(
+            event_id=args.id,
+            student_id=args.student_id,
+            pickup_person_id=args.person_id,
+            pickup_date=date.fromisoformat(args.pickup_date),
+            actual_pickup_time=actual_time,
+            scheduled_end_time=scheduled_time,
+            fee_amount=float(args.fee)
+        )
+
+        existing = storage.load_late_events()
+        existing.append(event)
+        storage.save_late_events(existing)
+
+        print(f"✅ 成功添加迟接事件: {event.event_id}")
+        print(f"   学生: {event.student_id}")
+        print(f"   迟接时间: {event.actual_pickup_time} (应接: {event.scheduled_end_time})")
+        print(f"   费用: ¥{event.fee_amount:.2f}")
+    except Exception as e:
+        print(f"❌ 添加迟接事件失败: {str(e)}")
+        sys.exit(1)
+
+
+def cmd_list_late_events(args):
+    engine = RulesEngine()
+    storage = Storage()
+
+    try:
+        if os.path.exists("data/students.json"):
+            for s in storage.load_students():
+                engine.add_student(s)
+        if os.path.exists("data/pickup_persons.json"):
+            for p in storage.load_pickup_persons():
+                engine.add_pickup_person(p)
+
+        events = storage.load_late_events()
+
+        if not events:
+            print("📭 没有迟接事件记录")
+            return
+
+        if args.student_id:
+            events = [e for e in events if e.student_id == args.student_id]
+
+        if args.date:
+            filter_date = date.fromisoformat(args.date)
+            events = [e for e in events if e.pickup_date == filter_date]
+
+        if not events:
+            print("📭 没有符合条件的迟接事件记录")
+            return
+
+        print(f"\n📋 迟接事件记录 (共 {len(events)} 条):")
+        print("-" * 60)
+
+        total_fee = 0.0
+        for event in events:
+            student = engine.students.get(event.student_id)
+            student_name = student.name if student else event.student_id
+            person = engine.pickup_persons.get(event.pickup_person_id)
+            person_name = person.name if person else event.pickup_person_id
+
+            delay = (datetime.combine(date.today(), event.actual_pickup_time) -
+                     datetime.combine(date.today(), event.scheduled_end_time))
+            delay_minutes = int(delay.total_seconds() // 60)
+
+            print(f"ID: {event.event_id}")
+            print(f"  日期: {event.pickup_date}")
+            print(f"  学生: {student_name}")
+            print(f"  接送人: {person_name}")
+            print(f"  应接时间: {event.scheduled_end_time}")
+            print(f"  实际接送: {event.actual_pickup_time} (迟接 {delay_minutes} 分钟)")
+            print(f"  费用: ¥{event.fee_amount:.2f}")
+            print()
+            total_fee += event.fee_amount
+
+        print("-" * 60)
+        print(f"总费用: ¥{total_fee:.2f}")
+
+    except Exception as e:
+        print(f"❌ 查询迟接事件失败: {str(e)}")
+        sys.exit(1)
+
+
 def main():
     create_data_directory()
 
@@ -294,7 +397,15 @@ def main():
   python pickup_cli.py validate
 
   # 检查授权
-  python pickup_cli.py check-auth --student-id S001 --person-id P001 --datetime 2026-05-17T17:30:00
+  python pickup_cli.py check-auth --student-id S001 --person-id P001 --datetime 2026-05-19T17:30:00
+
+  # 手动添加迟接事件
+  python pickup_cli.py add-late-event --id LATE001 --student-id S001 --person-id P001 --pickup-date 2026-05-19 --actual-time 18:20:00 --scheduled-time 18:00:00 --fee 10.0
+
+  # 查询迟接历史
+  python pickup_cli.py list-late-events
+  python pickup_cli.py list-late-events --student-id S001
+  python pickup_cli.py list-late-events --date 2026-05-19
         """
     )
 
@@ -349,6 +460,21 @@ def main():
     parser_check.add_argument("--person-id", required=True, help="接送人ID")
     parser_check.add_argument("--datetime", required=True, help="检查时间 (YYYY-MM-DDTHH:MM:SS)")
     parser_check.set_defaults(func=cmd_check_auth)
+
+    parser_add_late = subparsers.add_parser("add-late-event", help="手动添加迟接事件")
+    parser_add_late.add_argument("--id", required=True, help="事件ID")
+    parser_add_late.add_argument("--student-id", required=True, help="学生ID")
+    parser_add_late.add_argument("--person-id", required=True, help="接送人ID")
+    parser_add_late.add_argument("--pickup-date", required=True, help="接送日期 (YYYY-MM-DD)")
+    parser_add_late.add_argument("--actual-time", required=True, help="实际接送时间 (HH:MM:SS)")
+    parser_add_late.add_argument("--scheduled-time", required=True, help="应接时间 (HH:MM:SS)")
+    parser_add_late.add_argument("--fee", required=True, help="迟接费用")
+    parser_add_late.set_defaults(func=cmd_add_late_event)
+
+    parser_list_late = subparsers.add_parser("list-late-events", help="查询迟接事件历史")
+    parser_list_late.add_argument("--student-id", help="按学生ID筛选")
+    parser_list_late.add_argument("--date", help="按日期筛选 (YYYY-MM-DD)")
+    parser_list_late.set_defaults(func=cmd_list_late_events)
 
     args = parser.parse_args()
 

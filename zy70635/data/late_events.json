@@ -1,0 +1,20 @@
+[
+  {
+    "event_id": "MANUAL001",
+    "student_id": "S001",
+    "pickup_person_id": "P001",
+    "pickup_date": "2026-05-20",
+    "actual_pickup_time": "18:25:00",
+    "scheduled_end_time": "18:00:00",
+    "fee_amount": 15.0
+  },
+  {
+    "event_id": "LATE_20260519_S002_0",
+    "student_id": "S002",
+    "pickup_person_id": "P002",
+    "pickup_date": "2026-05-19",
+    "actual_pickup_time": "18:30:00",
+    "scheduled_end_time": "18:00:00",
+    "fee_amount": 25.0
+  }
+]

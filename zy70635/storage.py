@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import date, time
 from typing import List
 from models import (
@@ -74,6 +75,29 @@ class Storage:
         for d in data:
             d['leave_date'] = self._parse_date(d['leave_date'])
         return [LeaveRecord(**l) for l in data]
+
+    def save_late_events(self, events: List[LatePickupEvent], filename: str = "late_events.json"):
+        data = []
+        for e in events:
+            d = e.__dict__.copy()
+            d['pickup_date'] = d['pickup_date'].isoformat()
+            d['actual_pickup_time'] = d['actual_pickup_time'].strftime("%H:%M:%S")
+            d['scheduled_end_time'] = d['scheduled_end_time'].strftime("%H:%M:%S")
+            data.append(d)
+        with open(f"{self.data_dir}/{filename}", 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+    def load_late_events(self, filename: str = "late_events.json") -> List[LatePickupEvent]:
+        file_path = f"{self.data_dir}/{filename}"
+        if not os.path.exists(file_path):
+            return []
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        for d in data:
+            d['pickup_date'] = self._parse_date(d['pickup_date'])
+            d['actual_pickup_time'] = self._parse_time(d['actual_pickup_time'])
+            d['scheduled_end_time'] = self._parse_time(d['scheduled_end_time'])
+        return [LatePickupEvent(**e) for e in data]
 
     def save_reports(self, reports: List[PickupReport], filename: str):
         data = []
