@@ -11,11 +11,22 @@ from .models import (
 class RuleEngine:
     def __init__(self):
         self.rules = [
+            self.rule_duplicate_check,
             self.rule_blacklist_check,
             self.rule_visitor_time_check,
             self.rule_training_status_check,
             self.rule_person_profile_check
         ]
+
+    def rule_duplicate_check(self, event: GateEvent, **kwargs) -> Optional[RuleResult]:
+        if event.is_duplicate:
+            return RuleResult(
+                rule_name="重复事件标记",
+                result_type=RuleResultType.WARN,
+                message=f"该事件为重复事件，重复自事件[{event.duplicate_of}]",
+                details={"is_duplicate": True, "duplicate_of": event.duplicate_of}
+            )
+        return None
 
     def rule_blacklist_check(self, event: GateEvent, blacklist_records: List[BlacklistRecord], **kwargs) -> Optional[RuleResult]:
         active_blacklist = [r for r in blacklist_records if r.is_active]
@@ -31,7 +42,10 @@ class RuleEngine:
 
     def rule_visitor_time_check(self, event: GateEvent, person: Optional[PersonProfile], 
                                 visitor_apps: List[VisitorApplication], **kwargs) -> Optional[RuleResult]:
-        if person and person.person_type != PersonType.VISITOR:
+        if not person:
+            return None
+        
+        if person.person_type != PersonType.VISITOR:
             return None
         
         valid_apps = [app for app in visitor_apps if app.approved and app.start_time <= event.event_time <= app.end_time]
@@ -216,8 +230,6 @@ class RuleEngine:
         
         results = []
         for event in dedup_events:
-            if event.is_duplicate:
-                continue
             result = self.process_event(
                 event, persons_map, visitor_apps_map, training_map, blacklist_map
             )

@@ -72,19 +72,22 @@ def template(output_file):
     }
     df_persons = pd.DataFrame(person_data)
     
+    event_time = datetime.now()
     event_data = {
-        '事件ID': ['E001', 'E002', 'E003', 'E004', 'E005'],
-        '人员ID': ['P001', 'P002', 'P003', 'V001', 'V001'],
-        '姓名': ['张三', '李四', '王五', '访客甲', '访客甲'],
+        '事件ID': ['E001', 'E002', 'E003', 'E004', 'E005', 'E006', 'E007'],
+        '人员ID': ['P001', 'P002', 'P003', 'V001', 'V001', 'P001', 'UNKNOWN'],
+        '姓名': ['张三', '李四', '王五', '访客甲', '访客甲', '张三', '未知人员'],
         '事件时间': [
-            datetime.now().strftime('%Y-%m-%d 08:00:00'),
-            datetime.now().strftime('%Y-%m-%d 08:05:00'),
-            datetime.now().strftime('%Y-%m-%d 08:10:00'),
-            datetime.now().strftime('%Y-%m-%d 09:00:00'),
-            datetime.now().strftime('%Y-%m-%d 18:00:00')
+            event_time.strftime('%Y-%m-%d 08:00:00'),
+            event_time.strftime('%Y-%m-%d 08:05:00'),
+            event_time.strftime('%Y-%m-%d 08:10:00'),
+            event_time.strftime('%Y-%m-%d 09:00:00'),
+            event_time.strftime('%Y-%m-%d 18:00:00'),
+            event_time.strftime('%Y-%m-%d 08:00:00'),
+            event_time.strftime('%Y-%m-%d 10:00:00')
         ],
-        '闸机名称': ['东门闸机1', '东门闸机1', '西门闸机1', '东门闸机2', '东门闸机2'],
-        '事件类型': ['entry', 'entry', 'entry', 'entry', 'exit']
+        '闸机名称': ['东门闸机1', '东门闸机1', '西门闸机1', '东门闸机2', '东门闸机2', '东门闸机1', '北门闸机'],
+        '事件类型': ['entry', 'entry', 'entry', 'entry', 'exit', 'entry', 'entry']
     }
     df_events = pd.DataFrame(event_data)
     

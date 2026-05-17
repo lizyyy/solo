@@ -68,6 +68,7 @@ class ReportGenerator:
         detail_rows = []
         headers = [
             "事件ID", "人员ID", "姓名", "事件时间", "闸机名称", "事件类型",
+            "是否重复", "重复自事件ID",
             "最终状态", "最终消息",
             "人员档案来源", "闸机记录来源", "访客申请来源", "培训记录来源", "黑名单来源"
         ]
@@ -88,6 +89,8 @@ class ReportGenerator:
                 event.event_time.strftime("%Y-%m-%d %H:%M:%S"),
                 event.gate_name,
                 event.event_type.value,
+                "是" if event.is_duplicate else "否",
+                event.duplicate_of or "",
                 result.final_status.value,
                 result.final_message,
                 person_source,
