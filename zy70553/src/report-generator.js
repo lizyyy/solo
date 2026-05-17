@@ -11,12 +11,18 @@ class ReportGenerator {
 
   generateConsoleReport(matrix) {
     let output = '';
-    output += this.chalk.bold.blue('\n╔══════════════════════════════════════════════════════════════╗\n');
-    output += this.chalk.bold.blue('║') + '                    gRPC 错误码矩阵报告                         ' + this.chalk.bold.blue('║\n');
-    output += this.chalk.bold.blue('╚══════════════════════════════════════════════════════════════╝\n\n');
+    output += this.generateHeader();
     output += this.generateSummarySection(matrix);
     output += this.generateCategorySection(matrix);
-    output += this.generateErrorCodesTable(matrix);
+    output += this.generateSdkComparisonTable(matrix);
+    return output;
+  }
+
+  generateHeader() {
+    let output = '';
+    output += this.chalk.bold.cyan('╔══════════════════════════════════════════════════════════════╗\n');
+    output += this.chalk.bold.cyan('║') + '                    gRPC 错误码矩阵报告                         ' + this.chalk.bold.cyan('║\n');
+    output += this.chalk.bold.cyan('╚══════════════════════════════════════════════════════════════╝\n\n');
     return output;
   }
 
@@ -24,17 +30,20 @@ class ReportGenerator {
     let output = '';
     output += this.chalk.bold.yellow('📊 摘要信息\n');
     output += this.chalk.gray('─────────────────────────────────────────────────────────────\n');
+    
     const summary = matrix.summary;
     const summaryData = [
+      [this.chalk.white('指标'), this.chalk.white('数值')],
       ['总错误码数量', summary.totalCodes.toString()],
-      ['含重试策略', summary.withRetryStrategy.toString()],
-      ['不含重试策略', summary.withoutRetryStrategy.toString()]
+      ['SDK语言数量', summary.languages.toString()],
+      [this.chalk.green('✅ 可重试(Safe)'), summary.safeRetryCount.toString()],
+      [this.chalk.red('❌ 不可重试(Never)'), summary.neverRetryCount.toString()],
+      [this.chalk.yellow('⚠️ 有争议(Controversial)'), summary.controversialCount.toString()],
+      [this.chalk.magenta('🔀 差异数量'), (summary.differencesCount || 0).toString()]
     ];
-    for (const [category, count] of Object.entries(summary.categories)) {
-      summaryData.push([this.getCategoryDisplayName(category), count.toString()]);
-    }
+    
     output += table(summaryData, {
-      columns: [{ width: 20 }, { width: 10 }],
+      columns: [{ width: 25 }, { width: 10 }],
       border: {
         topBody: '─', topJoin: '┬', topLeft: '┌', topRight: '┐',
         bottomBody: '─', bottomJoin: '┴', bottomLeft: '└', bottomRight: '┘',
@@ -48,49 +57,98 @@ class ReportGenerator {
 
   generateCategorySection(matrix) {
     let output = '';
-    output += this.chalk.bold.yellow('📂 错误分类\n');
+    output += this.chalk.bold.yellow('📂 重试分类\n');
     output += this.chalk.gray('─────────────────────────────────────────────────────────────\n\n');
-    for (const [key, category] of Object.entries(matrix.categories)) {
-      const color = category.retryable ? this.chalk.green : this.chalk.red;
-      output += color.bold('◆ ' + category.name + ' (' + category.count + ')\n');
-      output += this.chalk.gray('  ' + category.description + '\n');
-      output += this.chalk.gray('  可重试: ' + (category.retryable ? '是 ✓' : '否 ✗') + '\n\n');
+
+    output += this.chalk.bold.green('✅ 可重试 (Safe Retry) - 所有SDK一致同意可重试\n');
+    if (matrix.categories.safeRetry.length === 0) {
+      output += this.chalk.gray('  无\n');
+    } else {
+      for (const code of matrix.categories.safeRetry) {
+        output += this.chalk.green(`  ${code.name} (${code.code})\n`);
+      }
     }
+    output += '\n';
+
+    output += this.chalk.bold.red('❌ 不可重试 (Never Retry) - 所有SDK一致同意不可重试\n');
+    if (matrix.categories.neverRetry.length === 0) {
+      output += this.chalk.gray('  无\n');
+    } else {
+      for (const code of matrix.categories.neverRetry) {
+        output += this.chalk.red(`  ${code.name} (${code.code})\n`);
+      }
+    }
+    output += '\n';
+
+    output += this.chalk.bold.yellow('⚠️ 有争议 (Controversial) - SDK之间有不同意见\n');
+    if (matrix.categories.controversial.length === 0) {
+      output += this.chalk.gray('  无\n');
+    } else {
+      for (const code of matrix.categories.controversial) {
+        output += this.chalk.yellow(`  ${code.name} (${code.code}): `);
+        const retryStr = code.retryValues.map(r => 
+          `${r.lang}=${this.formatRetry(r.retry)}`
+        ).join(', ');
+        output += this.chalk.gray(retryStr) + '\n';
+      }
+    }
+    output += '\n';
     return output;
   }
 
-  generateErrorCodesTable(matrix) {
+  generateSdkComparisonTable(matrix) {
     let output = '';
-    output += this.chalk.bold.yellow('📋 错误码详情\n');
+    const languages = Object.keys(matrix.sdkMappings);
+    
+    if (languages.length === 0) return output;
+    
+    output += this.chalk.bold.yellow('📋 SDK对比表\n');
     output += this.chalk.gray('─────────────────────────────────────────────────────────────\n\n');
-    const tableData = [
-      ['错误码', '名称', '分类', '可重试', '最大重试次数']
-    ];
-    for (const ec of matrix.errorCodes) {
-      tableData.push([
-        ec.code.toString(),
-        ec.name,
-        this.getCategoryDisplayName(ec.category),
-        ec.retryable ? '✓' : '✗',
-        ec.retryStrategy.maxRetries.toString()
-      ]);
+
+    const headers = ['错误码', '名称', ...languages.map(l => this.chalk.white(l.toUpperCase()))];
+    
+    const tableData = [headers];
+
+    for (const protoCode of matrix.protoCodes) {
+      const row = [
+        protoCode.code.toString(),
+        protoCode.name
+      ];
+
+      for (const lang of languages) {
+        const codeData = matrix.sdkMappings[lang].codes[protoCode.name];
+        if (codeData && codeData.exists) {
+          row.push(this.formatRetryColor(codeData.retry));
+        } else {
+          row.push(this.chalk.gray('N/A'));
+        }
+      }
+
+      tableData.push(row);
     }
-    output += table(tableData, {
-      columns: [
-        { width: 10 }, { width: 30 }, { width: 15 }, { width: 8 }, { width: 12 }
-      ]
-    });
+
+    output += table(tableData);
     return output;
   }
 
-  getCategoryDisplayName(category) {
-    const names = {
-      TRANSIENT: '临时错误',
-      PERMANENT: '永久错误',
-      CLIENT_ERROR: '客户端错误',
-      SERVER_ERROR: '服务端错误'
-    };
-    return names[category] || category;
+  formatRetry(retry) {
+    switch (retry) {
+      case 'retriable': return 'RETRY';
+      case 'nonRetriable': return 'NO_RETRY';
+      case 'conditional': return 'COND';
+      case 'unknown': return 'UNK';
+      default: return retry ? retry.toUpperCase() : 'N/A';
+    }
+  }
+
+  formatRetryColor(retry) {
+    switch (retry) {
+      case 'retriable': return this.chalk.green('RETRY');
+      case 'nonRetriable': return this.chalk.red('NO_RETRY');
+      case 'conditional': return this.chalk.yellow('COND');
+      case 'unknown': return this.chalk.gray('UNK');
+      default: return this.chalk.gray('N/A');
+    }
   }
 
   generateJsonReport(matrix, outputPath) {
@@ -105,27 +163,80 @@ class ReportGenerator {
 
   generateMarkdownReport(matrix, outputPath) {
     let md = '# gRPC 错误码矩阵报告\n\n';
-    md += '*生成时间: ' + new Date(matrix.timestamp).toLocaleString() + '*\n\n';
+    md += `*生成时间: ${new Date(matrix.timestamp).toLocaleString()}*\n\n`;
+
     md += '## 摘要\n\n';
     md += '| 指标 | 数值 |\n';
     md += '|------|------|\n';
-    md += '| 总错误码数量 | ' + matrix.summary.totalCodes + ' |\n';
-    md += '| 含重试策略 | ' + matrix.summary.withRetryStrategy + ' |\n';
-    md += '| 不含重试策略 | ' + matrix.summary.withoutRetryStrategy + ' |\n\n';
-    md += '## 错误分类统计\n\n';
-    md += '| 分类 | 数量 | 可重试 | 描述 |\n';
-    md += '|------|------|--------|------|\n';
-    for (const [key, category] of Object.entries(matrix.categories)) {
-      md += '| ' + category.name + ' | ' + category.count + ' | ' + (category.retryable ? '是' : '否') + ' | ' + category.description + ' |\n';
+    md += `| 总错误码数量 | ${matrix.summary.totalCodes} |\n`;
+    md += `| SDK语言数量 | ${matrix.summary.languages} |\n`;
+    md += `| 可重试(Safe) | ${matrix.summary.safeRetryCount} |\n`;
+    md += `| 不可重试(Never) | ${matrix.summary.neverRetryCount} |\n`;
+    md += `| 有争议(Controversial) | ${matrix.summary.controversialCount} |\n`;
+    md += `| 差异数量 | ${matrix.summary.differencesCount || 0} |\n\n`;
+
+    md += '## 重试分类\n\n';
+
+    md += '### ✅ 可重试 (Safe Retry)\n\n';
+    if (matrix.categories.safeRetry.length === 0) {
+      md += '无\n\n';
+    } else {
+      for (const code of matrix.categories.safeRetry) {
+        md += `- ${code.name} (${code.code})\n`;
+      }
+      md += '\n';
     }
-    md += '\n';
-    md += '## 错误码详情\n\n';
-    md += '| 错误码 | 名称 | 分类 | 可重试 | 最大重试次数 | 退避策略 |\n';
-    md += '|--------|------|------|--------|--------------|----------|\n';
-    for (const ec of matrix.errorCodes) {
-      md += '| ' + ec.code + ' | ' + ec.name + ' | ' + this.getCategoryDisplayName(ec.category) + ' | ' + (ec.retryable ? '是' : '否') + ' | ' + ec.retryStrategy.maxRetries + ' | ' + ec.retryStrategy.backoff + ' |\n';
+
+    md += '### ❌ 不可重试 (Never Retry)\n\n';
+    if (matrix.categories.neverRetry.length === 0) {
+      md += '无\n\n';
+    } else {
+      for (const code of matrix.categories.neverRetry) {
+        md += `- ${code.name} (${code.code})\n`;
+      }
+      md += '\n';
     }
-    md += '\n';
+
+    md += '### ⚠️ 有争议 (Controversial)\n\n';
+    if (matrix.categories.controversial.length === 0) {
+      md += '无\n\n';
+    } else {
+      for (const code of matrix.categories.controversial) {
+        const retryStr = code.retryValues.map(r => 
+          `${r.lang}=${this.formatRetry(r.retry)}`
+        ).join(', ');
+        md += `- ${code.name} (${code.code}): ${retryStr}\n`;
+      }
+      md += '\n';
+    }
+
+    if (matrix.differences && matrix.differences.length > 0) {
+      md += '## 🔀 SDK差异\n\n';
+      for (const diff of matrix.differences) {
+        md += `### ${diff.name} (${diff.code}) - ${diff.type === 'code_mismatch' ? '错误码不匹配' : '重试策略不匹配'}\n\n`;
+        for (const mapping of diff.mappings) {
+          md += `- ${mapping.lang}: code=${mapping.grpcCode}, retry=${this.formatRetry(mapping.retry)}\n`;
+        }
+        md += '\n';
+      }
+    }
+
+    md += '## SDK对比\n\n';
+    const languages = Object.keys(matrix.sdkMappings);
+    md += '| 错误码 | 名称 | ' + languages.map(l => l.toUpperCase()).join(' | ') + ' |\n';
+    md += '|--------|------|' + languages.map(() => '------').join('|') + '|\n';
+
+    for (const protoCode of matrix.protoCodes) {
+      const values = languages.map(lang => {
+        const codeData = matrix.sdkMappings[lang].codes[protoCode.name];
+        if (codeData && codeData.exists) {
+          return this.formatRetry(codeData.retry);
+        }
+        return 'N/A';
+      });
+      md += `| ${protoCode.code} | ${protoCode.name} | ${values.join(' | ')} |\n`;
+    }
+
     if (outputPath) {
       const dir = path.dirname(outputPath);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
