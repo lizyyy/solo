@@ -1,10 +1,9 @@
 import pytest
 import httpx
-from datetime import datetime, timedelta
-import os
 import sys
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import subprocess
+import time
+from datetime import datetime, timedelta
 
 BASE_URL = "http://localhost:8000"
 
@@ -116,14 +115,15 @@ def test_07_list_tasks_with_filters(client):
 
 
 def test_08_update_task_status_to_in_progress(client):
-    from sqlalchemy.orm import Session
-    from main import SessionLocal, CleaningTask, TaskStatus
-    
-    db = SessionLocal()
-    task = db.query(CleaningTask).filter(CleaningTask.id == test_data["task_id"]).first()
-    task.status = TaskStatus.IN_PROGRESS
-    db.commit()
-    db.close()
+    response = client.post("/tasks/update-status", json={
+        "task_id": test_data["task_id"],
+        "new_status": "in_progress",
+        "updated_by": 2001,
+        "notes": "保洁员开始工作"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert data["new_status"] == "in_progress"
     
     response = client.get(f"/tasks/{test_data['task_id']}")
     assert response.status_code == 200
@@ -376,9 +376,6 @@ def test_24_invalid_status_transition(client):
 
 
 def test_25_manual_review_trigger(client):
-    from sqlalchemy.orm import Session
-    from main import SessionLocal, CleaningTask, TaskStatus
-    
     scheduled_date = (datetime.utcnow() + timedelta(days=2)).isoformat()
     
     task_response = client.post("/tasks/", json={
@@ -390,10 +387,12 @@ def test_25_manual_review_trigger(client):
     })
     task_id = task_response.json()["id"]
     
-    db = SessionLocal()
-    task = db.query(CleaningTask).filter(CleaningTask.id == task_id).first()
-    task.status = TaskStatus.IN_PROGRESS
-    db.commit()
+    client.post("/tasks/update-status", json={
+        "task_id": task_id,
+        "new_status": "in_progress",
+        "updated_by": 2001,
+        "notes": "保洁员开始工作"
+    })
     
     all_results = []
     for item_id in test_data["checklist_item_ids"]:
@@ -447,10 +446,6 @@ if __name__ == "__main__":
     print("开始运行自检脚本...")
     print("请确保API服务已启动: python main.py")
     print()
-    
-    import subprocess
-    import time
-    import signal
     
     server_process = None
     try:

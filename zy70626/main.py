@@ -409,6 +409,35 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
     return task
 
 
+class TaskStatusUpdateRequest(BaseModel):
+    task_id: int
+    new_status: TaskStatus
+    updated_by: int
+    notes: Optional[str] = None
+
+
+@app.post("/tasks/update-status")
+def update_task_status(request: TaskStatusUpdateRequest, db: Session = Depends(get_db)):
+    task = db.query(CleaningTask).filter(CleaningTask.id == request.task_id).first()
+    if not task:
+        raise create_http_exception(ErrorCode.NOT_FOUND, "任务不存在", {"task_id": request.task_id}, 404)
+    
+    if not validate_status_transition(task.status, request.new_status):
+        raise create_http_exception(
+            ErrorCode.INVALID_STATUS,
+            f"不允许从 {task.status} 转换到 {request.new_status}",
+            {"current_status": task.status, "requested_status": request.new_status}
+        )
+    
+    task.status = request.new_status
+    if request.notes:
+        task.notes = (task.notes or "") + f"\n[{datetime.utcnow().isoformat()}] {request.notes}"
+    task.updated_at = datetime.utcnow()
+    db.commit()
+    
+    return {"message": "状态更新成功", "task_id": task.id, "new_status": task.status}
+
+
 @app.post("/tasks/submit-cleaning")
 def submit_cleaning(request: CleaningSubmitRequest, db: Session = Depends(get_db)):
     task = db.query(CleaningTask).filter(CleaningTask.id == request.task_id).first()

@@ -88,6 +88,8 @@ python test_self_check.py
 ### 保洁任务
 - `POST /tasks/` - 创建保洁任务
 - `GET /tasks/` - 任务列表（支持状态/房源/保洁员筛选）
+- `GET /tasks/{task_id}` - 获取任务详情
+- `POST /tasks/update-status` - 推进任务状态（支持状态机验证）
 - `POST /tasks/submit-cleaning` - 提交保洁成果
 - `POST /tasks/inspect` - 验收检查
 - `POST /tasks/start-rework` - 开始返工
