@@ -1,0 +1,20 @@
+{
+  "name": "code-freeze-exception-api",
+  "version": "1.0.0",
+  "description": "代码冻结例外管理API - 用于管理代码冻结期间的紧急修复申请",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "body-parser": "^1.20.2",
+    "csv-writer": "^1.6.0"
+  },
+  "keywords": ["code-freeze", "exception", "audit"],
+  "author": "",
+  "license": "ISC"
+}
