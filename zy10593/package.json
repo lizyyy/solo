@@ -1,0 +1,19 @@
+{
+  "name": "binary-dep-scanner",
+  "version": "1.0.0",
+  "description": "二进制依赖清单CLI - 扫描并分析交付包中的二进制文件及其系统依赖",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "bdep": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node bin/cli.js self-test"
+  },
+  "keywords": ["binary", "dependency", "scanner", "audit", "security"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
