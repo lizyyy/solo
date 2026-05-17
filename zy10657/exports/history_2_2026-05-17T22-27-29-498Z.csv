@@ -1,0 +1,4 @@
+历史记录ID,呼叫记录ID,操作类型,操作人,操作详情,之前状态,新状态,操作时间
+2,2,create,system,号码 13800138002 导入成功，状态为待呼叫,,pending,2026-05-17T22:27:29.486Z
+6,2,mark_called,system,呼叫完成，结果：客户接听，意向良好,pending,called,2026-05-17T22:27:29.490Z
+7,2,withdraw,manager,撤回：客户要求停止呼叫,called,archived,2026-05-17T22:27:29.490Z
