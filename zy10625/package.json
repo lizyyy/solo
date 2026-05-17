@@ -1,0 +1,19 @@
+{
+  "name": "contract-archive-signature-api",
+  "version": "1.0.0",
+  "description": "合同归档服务电子签章重签登记API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "node scripts/test-flow.js",
+    "init-data": "node scripts/init-sample-data.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "body-parser": "^1.20.2"
+  }
+}
