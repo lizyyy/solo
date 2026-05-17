@@ -134,32 +134,6 @@ def list_quotes(
     return results
 
 
-@router.get("/{quote_id}", response_model=QuoteResponse)
-def get_quote(quote_id: int, db: Session = Depends(get_db)):
-    db_quote = db.query(Quote).filter(Quote.id == quote_id).first()
-    if not db_quote:
-        raise NotFoundException("报价", quote_id)
-
-    device = db.query(Device).filter(Device.id == db_quote.device_id).first()
-
-    response = QuoteResponse(
-        id=db_quote.id,
-        device_id=db_quote.device_id,
-        serial_number=device.serial_number,
-        version=db_quote.version,
-        base_price=db_quote.base_price,
-        final_price=db_quote.final_price,
-        is_frozen=db_quote.is_frozen,
-        frozen_at=db_quote.frozen_at,
-        frozen_by=db_quote.frozen_by,
-        status=db_quote.status,
-        notes=db_quote.notes,
-        created_at=db_quote.created_at,
-        updated_at=db_quote.updated_at
-    )
-    return response
-
-
 @router.post("/reasons", response_model=DeductionReasonResponse)
 def create_deduction_reason(
     reason: DeductionReasonCreate,
@@ -217,6 +191,32 @@ def create_deduction(
         description=db_deduction.description,
         recorded_by=db_deduction.recorded_by,
         created_at=db_deduction.created_at
+    )
+    return response
+
+
+@router.get("/{quote_id}", response_model=QuoteResponse)
+def get_quote(quote_id: int, db: Session = Depends(get_db)):
+    db_quote = db.query(Quote).filter(Quote.id == quote_id).first()
+    if not db_quote:
+        raise NotFoundException("报价", quote_id)
+
+    device = db.query(Device).filter(Device.id == db_quote.device_id).first()
+
+    response = QuoteResponse(
+        id=db_quote.id,
+        device_id=db_quote.device_id,
+        serial_number=device.serial_number,
+        version=db_quote.version,
+        base_price=db_quote.base_price,
+        final_price=db_quote.final_price,
+        is_frozen=db_quote.is_frozen,
+        frozen_at=db_quote.frozen_at,
+        frozen_by=db_quote.frozen_by,
+        status=db_quote.status,
+        notes=db_quote.notes,
+        created_at=db_quote.created_at,
+        updated_at=db_quote.updated_at
     )
     return response
 

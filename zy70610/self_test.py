@@ -179,11 +179,12 @@ def test_quote_and_deduction(device_id):
     results = []
     quote_id = None
     reason_id = None
+    unique_code = f"SCREEN_DAMAGE_{int(time.time())}"
 
     with Client(base_url=BASE_URL) as client:
         try:
             response = client.post("/api/quote/reasons", json={
-                "code": "SCREEN_DAMAGE",
+                "code": unique_code,
                 "name": "屏幕破损",
                 "category": "外观损坏",
                 "default_amount": 200.0
