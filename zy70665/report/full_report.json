@@ -1,0 +1,245 @@
+{
+  "timestamp": "2026-05-18T06:23:34.991215",
+  "summary": {
+    "car_models_count": 4,
+    "maintenance_items_count": 4,
+    "inventory_count": 10,
+    "alternatives_count": 3,
+    "bad_lines_count": 0,
+    "plan_results_count": 7
+  },
+  "plan_results": [
+    {
+      "car_model": "AUDI-A4L-2023",
+      "maintenance_id": "BRAKE-002",
+      "maintenance_name": "前刹车片更换",
+      "total_gap_count": 1,
+      "critical_gap_count": 1,
+      "parts_summary": [
+        {
+          "part_number": "BRAKE-F-002",
+          "part_name": "奔驰前刹车片",
+          "required_qty": 1,
+          "available_qty": 0,
+          "gap_qty": 1,
+          "gap_level": "CRITICAL",
+          "alternative_parts": [],
+          "source_trace": [
+            "保养项目: BRAKE-F-002:1",
+            "缺口: 1 件 (CRITICAL)"
+          ]
+        }
+      ]
+    },
+    {
+      "car_model": "BENZ-C200-2022",
+      "maintenance_id": "BRAKE-002",
+      "maintenance_name": "前刹车片更换",
+      "total_gap_count": 1,
+      "critical_gap_count": 1,
+      "parts_summary": [
+        {
+          "part_number": "BRAKE-F-002",
+          "part_name": "奔驰前刹车片",
+          "required_qty": 1,
+          "available_qty": 0,
+          "gap_qty": 1,
+          "gap_level": "CRITICAL",
+          "alternative_parts": [],
+          "source_trace": [
+            "保养项目: BRAKE-F-002:1",
+            "缺口: 1 件 (CRITICAL)"
+          ]
+        }
+      ]
+    },
+    {
+      "car_model": "BENZ-C200-2022",
+      "maintenance_id": "OIL-002",
+      "maintenance_name": "常规机油保养",
+      "total_gap_count": 0,
+      "critical_gap_count": 0,
+      "parts_summary": [
+        {
+          "part_number": "FIL-OIL-002",
+          "part_name": "奔驰机油滤清器",
+          "required_qty": 1,
+          "available_qty": 1,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [],
+          "source_trace": [
+            "保养项目: FIL-OIL-002:1",
+            "使用原配: FIL-OIL-002 x1"
+          ]
+        },
+        {
+          "part_number": "OIL-002",
+          "part_name": "奔驰原厂机油5W-40",
+          "required_qty": 1,
+          "available_qty": 1,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [],
+          "source_trace": [
+            "保养项目: OIL-002:1",
+            "使用原配: OIL-002 x1"
+          ]
+        }
+      ]
+    },
+    {
+      "car_model": "BMW-320-2022",
+      "maintenance_id": "BRAKE-001",
+      "maintenance_name": "前刹车片更换",
+      "total_gap_count": 0,
+      "critical_gap_count": 0,
+      "parts_summary": [
+        {
+          "part_number": "BOLT-F-001",
+          "part_name": "刹车片固定螺栓",
+          "required_qty": 4,
+          "available_qty": 4,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [],
+          "source_trace": [
+            "保养项目: BOLT-F-001:4",
+            "使用原配: BOLT-F-001 x4"
+          ]
+        },
+        {
+          "part_number": "BRAKE-F-001",
+          "part_name": "宝马前刹车片",
+          "required_qty": 1,
+          "available_qty": 1,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [
+            "BRAKE-F-001-ALT"
+          ],
+          "source_trace": [
+            "保养项目: BRAKE-F-001:1",
+            "使用原配: BRAKE-F-001 x1"
+          ]
+        }
+      ]
+    },
+    {
+      "car_model": "BMW-320-2022",
+      "maintenance_id": "OIL-001",
+      "maintenance_name": "常规机油保养",
+      "total_gap_count": 0,
+      "critical_gap_count": 0,
+      "parts_summary": [
+        {
+          "part_number": "FIL-OIL-001",
+          "part_name": "宝马机油滤清器",
+          "required_qty": 1,
+          "available_qty": 1,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [
+            "FIL-OIL-001-ALT"
+          ],
+          "source_trace": [
+            "保养项目: FIL-OIL-001:1",
+            "使用原配: FIL-OIL-001 x1"
+          ]
+        },
+        {
+          "part_number": "OIL-001",
+          "part_name": "宝马原厂机油5W-30",
+          "required_qty": 1,
+          "available_qty": 1,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [
+            "OIL-001-ALT"
+          ],
+          "source_trace": [
+            "保养项目: OIL-001:1",
+            "使用原配: OIL-001 x1"
+          ]
+        }
+      ]
+    },
+    {
+      "car_model": "BMW-530-2023",
+      "maintenance_id": "BRAKE-001",
+      "maintenance_name": "前刹车片更换",
+      "total_gap_count": 0,
+      "critical_gap_count": 0,
+      "parts_summary": [
+        {
+          "part_number": "BOLT-F-001",
+          "part_name": "刹车片固定螺栓",
+          "required_qty": 4,
+          "available_qty": 4,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [],
+          "source_trace": [
+            "保养项目: BOLT-F-001:4",
+            "使用原配: BOLT-F-001 x4"
+          ]
+        },
+        {
+          "part_number": "BRAKE-F-001",
+          "part_name": "宝马前刹车片",
+          "required_qty": 1,
+          "available_qty": 1,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [
+            "BRAKE-F-001-ALT"
+          ],
+          "source_trace": [
+            "保养项目: BRAKE-F-001:1",
+            "使用原配: BRAKE-F-001 x1"
+          ]
+        }
+      ]
+    },
+    {
+      "car_model": "BMW-530-2023",
+      "maintenance_id": "OIL-001",
+      "maintenance_name": "常规机油保养",
+      "total_gap_count": 0,
+      "critical_gap_count": 0,
+      "parts_summary": [
+        {
+          "part_number": "FIL-OIL-001",
+          "part_name": "宝马机油滤清器",
+          "required_qty": 1,
+          "available_qty": 1,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [
+            "FIL-OIL-001-ALT"
+          ],
+          "source_trace": [
+            "保养项目: FIL-OIL-001:1",
+            "使用原配: FIL-OIL-001 x1"
+          ]
+        },
+        {
+          "part_number": "OIL-001",
+          "part_name": "宝马原厂机油5W-30",
+          "required_qty": 1,
+          "available_qty": 1,
+          "gap_qty": 0,
+          "gap_level": "LOW",
+          "alternative_parts": [
+            "OIL-001-ALT"
+          ],
+          "source_trace": [
+            "保养项目: OIL-001:1",
+            "使用原配: OIL-001 x1"
+          ]
+        }
+      ]
+    }
+  ],
+  "bad_lines": []
+}

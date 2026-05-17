@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "mparts"
+version = "0.1.0"
+description = "保养配件替代件库存预演排查CLI"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+
+packages = [{include = "mparts"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1.0"
+pydantic = "^2.0.0"
+rich = "^13.0.0"
+pandas = "^2.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+mparts = "mparts.cli:cli"
