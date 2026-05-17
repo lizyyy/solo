@@ -63,23 +63,26 @@ class ConsistencyChecker {
     checkFieldConsistency(groups) {
         const issues = [];
         for (const group of groups) {
-            if (group.responses.length < 2)
+            const responsesWithSchema = group.responses.filter(r => r.schemaFields.length > 0);
+            if (responsesWithSchema.length < 2)
                 continue;
             const allFields = Object.keys(group.fieldVariations);
-            const majorityThreshold = Math.ceil(group.responses.length * 0.7);
-            for (const [field, count] of Object.entries(group.fieldVariations)) {
-                if (count < group.responses.length && count >= majorityThreshold) {
-                    const missingIn = group.responses.filter(r => !r.schemaFields.includes(field));
-                    for (const resp of missingIn) {
+            const commonFields = group.commonFields;
+            const differentFields = allFields.filter(f => !commonFields.includes(f));
+            if (differentFields.length === 0)
+                continue;
+            for (const resp of responsesWithSchema) {
+                for (const field of differentFields) {
+                    if (!resp.schemaFields.includes(field)) {
                         issues.push({
                             type: 'field_mismatch',
                             severity: 'error',
-                            message: `字段 '${field}' 在同一状态码的响应中缺失`,
+                            message: `同状态码字段不一致: 缺少 '${field}'`,
                             location: resp.location,
                             details: {
-                                expected: [field],
+                                expected: allFields,
                                 actual: resp.schemaFields,
-                                suggestion: `为 ${resp.method} ${resp.path} 的 ${resp.statusCode} 响应添加 '${field}' 字段`,
+                                suggestion: `为 ${resp.method} ${resp.path} 的 ${resp.statusCode} 响应统一使用 ${allFields.join(', ')} 字段`,
                             },
                         });
                     }
