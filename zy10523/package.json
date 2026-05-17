@@ -1,0 +1,25 @@
+{
+  "name": "risk-order-freeze-api",
+  "version": "1.0.0",
+  "description": "异常订单冻结API - 风控订单冻结与履约拦截系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "node tests/api.test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "joi": "^17.11.0",
+    "uuid": "^9.0.1",
+    "csv-writer": "^1.6.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": ["risk-control", "order-freeze", "fulfillment-intercept"],
+  "author": "",
+  "license": "MIT"
+}
