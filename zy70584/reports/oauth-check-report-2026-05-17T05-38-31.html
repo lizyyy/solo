@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OAuth回调地址校验报告</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 24px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .summary-card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 8px 24px;
+      border-radius: 6px;
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 16px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .stat-item {
+      text-align: center;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 6px;
+    }
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      display: block;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .error-categories {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .category-item {
+      display: inline-block;
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+      color: #6b7280;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="color: #1f2937; margin-bottom: 8px;">📋 OAuth回调地址校验报告</h1>
+      <p style="color: #6b7280;">检查时间: 2026/5/17 13:38:31</p>
+    </div>
+    
+    <div class="summary-card">
+      <div style="text-align: center;">
+        <span class="status-badge" style="background: #dc2626;">校验失败</span>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-number" style="color: #374151;">3</span>
+          <span class="stat-label">应用总数</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" style="color: #16a34a;">1</span>
+          <span class="stat-label">通过</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" style="color: #dc2626;">2</span>
+          <span class="stat-label">失败</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" style="color: #dc2626;">2</span>
+          <span class="stat-label">错误数</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" style="color: #f59e0b;">2</span>
+          <span class="stat-label">警告数</span>
+        </div>
+      </div>
+      
+      
+        <div class="error-categories">
+          <strong style="color: #4b5563;">错误分类:</strong><br>
+          
+            <span class="category-item">REDIRECT_URI_MISMATCH (1)</span>
+          
+            <span class="category-item">INVALID_URL_FORMAT (1)</span>
+          
+        </div>
+      
+    </div>
+    
+    <h2 style="color: #1f2937; margin-bottom: 16px;">📦 应用校验详情</h2>
+    
+      <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="margin: 0; font-size: 18px;">用户中心Web应用</h3>
+          <span style="background: #16a34a; color: white; padding: 4px 12px; border-radius: 4px; font-weight: 600;">
+            通过
+          </span>
+        </div>
+        <div style="color: #6b7280; font-size: 12px; margin-bottom: 12px;">
+          来源文件: /Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json | 位置: 第 1 个应用
+        </div>
+        
+        <div style="background: #f9fafb; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">development</span>
+            <span style="background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+              通过
+            </span>
+          </div>
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">授权回调地址列表:</h4>
+            <ul style="margin: 0; padding-left: 20px;">
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  http://localhost:3000/auth/callback
+                  
+                </li>
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  http://127.0.0.1:3000/auth/callback
+                  
+                </li>
+              
+            </ul>
+          </div>
+        
+          
+        </div>
+      
+        <div style="background: #f9fafb; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">staging</span>
+            <span style="background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+              通过
+            </span>
+          </div>
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">授权回调地址列表:</h4>
+            <ul style="margin: 0; padding-left: 20px;">
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  https://staging.example.com/auth/callback
+                  
+                </li>
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  https://staging.example.com/callback
+                  
+                </li>
+              
+            </ul>
+          </div>
+        
+          
+        </div>
+      
+        <div style="background: #f9fafb; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">production</span>
+            <span style="background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+              通过
+            </span>
+          </div>
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">授权回调地址列表:</h4>
+            <ul style="margin: 0; padding-left: 20px;">
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  https://example.com/auth/callback
+                  
+                </li>
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  http://example.com/callback
+                  
+                </li>
+              
+            </ul>
+          </div>
+        
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">发现问题:</h4>
+            
+            
+              <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 8px 12px;">
+                <strong style="color: #f59e0b;">警告 (1):</strong>
+                <ul style="margin: 4px 0 0 0; padding-left: 20px;">
+                  
+                    <li style="color: #92400e; margin-bottom: 4px;">
+                      生产环境应使用HTTPS协议
+                      
+                        <br><span style="color: #6b7280; font-size: 11px;">💡 建议: 生产环境强烈建议使用HTTPS协议</span>
+                      
+                    </li>
+                  
+                </ul>
+              </div>
+            
+          </div>
+        
+        </div>
+      
+      </div>
+    
+      <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="margin: 0; font-size: 18px;">移动APP应用</h3>
+          <span style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 4px; font-weight: 600;">
+            失败
+          </span>
+        </div>
+        <div style="color: #6b7280; font-size: 12px; margin-bottom: 12px;">
+          来源文件: /Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json | 位置: 第 2 个应用
+        </div>
+        
+        <div style="background: #f9fafb; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">development</span>
+            <span style="background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+              通过
+            </span>
+          </div>
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">授权回调地址列表:</h4>
+            <ul style="margin: 0; padding-left: 20px;">
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  myapp://oauth/callback
+                  
+                </li>
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  exp://192.168.1.100:19000/--/oauth/callback
+                  
+                </li>
+              
+            </ul>
+          </div>
+        
+          
+        </div>
+      
+        <div style="background: #f9fafb; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">production</span>
+            <span style="background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+              失败
+            </span>
+          </div>
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">授权回调地址列表:</h4>
+            <ul style="margin: 0; padding-left: 20px;">
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  myapp://oauth/callback
+                  
+                </li>
+              
+            </ul>
+          </div>
+        
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">发现问题:</h4>
+            
+              <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 8px 12px; margin-bottom: 8px;">
+                <strong style="color: #dc2626;">错误 (1):</strong>
+                <ul style="margin: 4px 0 0 0; padding-left: 20px;">
+                  
+                    <li style="color: #991b1b; margin-bottom: 4px;">
+                      授权链接中的redirect_uri不在授权列表中: https://wrong.example.com/callback
+                      
+                        <br><span style="color: #6b7280; font-size: 11px;">💡 建议: 检查OAuth应用后台配置的回调地址</span>
+                      
+                    </li>
+                  
+                </ul>
+              </div>
+            
+            
+              <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 8px 12px;">
+                <strong style="color: #f59e0b;">警告 (1):</strong>
+                <ul style="margin: 4px 0 0 0; padding-left: 20px;">
+                  
+                    <li style="color: #92400e; margin-bottom: 4px;">
+                      生产环境应使用HTTPS协议
+                      
+                        <br><span style="color: #6b7280; font-size: 11px;">💡 建议: 生产环境强烈建议使用HTTPS协议</span>
+                      
+                    </li>
+                  
+                </ul>
+              </div>
+            
+          </div>
+        
+        </div>
+      
+      </div>
+    
+      <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="margin: 0; font-size: 18px;">管理后台应用</h3>
+          <span style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 4px; font-weight: 600;">
+            失败
+          </span>
+        </div>
+        <div style="color: #6b7280; font-size: 12px; margin-bottom: 12px;">
+          来源文件: /Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json | 位置: 第 3 个应用
+        </div>
+        
+        <div style="background: #f9fafb; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">development</span>
+            <span style="background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+              通过
+            </span>
+          </div>
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">授权回调地址列表:</h4>
+            <ul style="margin: 0; padding-left: 20px;">
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  http://localhost:8080/admin/callback
+                  
+                </li>
+              
+            </ul>
+          </div>
+        
+          
+        </div>
+      
+        <div style="background: #f9fafb; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">production</span>
+            <span style="background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+              失败
+            </span>
+          </div>
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">授权回调地址列表:</h4>
+            <ul style="margin: 0; padding-left: 20px;">
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #16a34a">✓</span>
+                  https://admin.example.com/callback
+                  
+                </li>
+              
+                <li style="margin-bottom: 4px; font-family: monospace; font-size: 12px;">
+                  <span style="color: #dc2626">✗</span>
+                  invalid-url-without-protocol
+                  <span style="color: #dc2626; font-size: 11px;">(无效: URL格式无效: Invalid URL)</span>
+                </li>
+              
+            </ul>
+          </div>
+        
+          
+          <div style="margin-top: 12px;">
+            <h4 style="margin: 0 0 8px 0; color: #4b5563;">发现问题:</h4>
+            
+              <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 8px 12px; margin-bottom: 8px;">
+                <strong style="color: #dc2626;">错误 (1):</strong>
+                <ul style="margin: 4px 0 0 0; padding-left: 20px;">
+                  
+                    <li style="color: #991b1b; margin-bottom: 4px;">
+                      URL格式无效: Invalid URL
+                      
+                        <br><span style="color: #6b7280; font-size: 11px;">💡 建议: 检查配置是否正确</span>
+                      
+                    </li>
+                  
+                </ul>
+              </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      </div>
+    
+    
+    
+      <h2 style="color: #1f2937; margin-top: 32px; margin-bottom: 16px;">🔍 错误样本匹配</h2>
+      
+        <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div style="margin-bottom: 8px;">
+            <strong>样本 URL:</strong> <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px;">https://wrong.example.com/callback</code>
+          </div>
+          <div style="margin-bottom: 8px;">
+            <strong>匹配应用:</strong> 用户中心Web应用 (staging)
+          </div>
+          <div style="margin-bottom: 8px;">
+            <strong>匹配置信度:</strong> 80%
+          </div>
+          <div>
+            <strong>差异:</strong>
+            <ul style="margin: 4px 0 0 0; padding-left: 20px; color: #dc2626;">
+              <li>主机不匹配: wrong.example.com vs staging.example.com</li>
+            </ul>
+          </div>
+        </div>
+      
+        <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div style="margin-bottom: 8px;">
+            <strong>样本 URL:</strong> <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px;">http://example.com/wrong-path</code>
+          </div>
+          <div style="margin-bottom: 8px;">
+            <strong>匹配应用:</strong> 用户中心Web应用 (production)
+          </div>
+          <div style="margin-bottom: 8px;">
+            <strong>匹配置信度:</strong> 80%
+          </div>
+          <div>
+            <strong>差异:</strong>
+            <ul style="margin: 4px 0 0 0; padding-left: 20px; color: #dc2626;">
+              <li>路径不匹配: /wrong-path vs /callback</li>
+            </ul>
+          </div>
+        </div>
+      
+    
+    
+    
+      <h2 style="color: #1f2937; margin-top: 32px; margin-bottom: 16px;">🔄 环境差异对比</h2>
+      
+        <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h3 style="margin: 0 0 12px 0; font-size: 16px;">用户中心Web应用</h3>
+          
+            <div style="background: #fef3c7; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+              <strong>环境对比: development ↔ staging</strong>
+              <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                <li style="color: #92400e; margin-bottom: 4px;">仅在 development 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 development 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 staging 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 staging 存在: [object Object]</li>
+              </ul>
+            </div>
+          
+            <div style="background: #fef3c7; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+              <strong>环境对比: development ↔ production</strong>
+              <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                <li style="color: #92400e; margin-bottom: 4px;">仅在 development 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 development 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 production 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 production 存在: [object Object]</li>
+              </ul>
+            </div>
+          
+            <div style="background: #fef3c7; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+              <strong>环境对比: staging ↔ production</strong>
+              <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                <li style="color: #92400e; margin-bottom: 4px;">仅在 staging 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 staging 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 production 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 production 存在: [object Object]</li>
+              </ul>
+            </div>
+          
+        </div>
+      
+        <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h3 style="margin: 0 0 12px 0; font-size: 16px;">移动APP应用</h3>
+          
+            <div style="background: #fef3c7; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+              <strong>环境对比: development ↔ production</strong>
+              <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                <li style="color: #92400e; margin-bottom: 4px;">仅在 development 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 development 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 production 存在: [object Object]</li>
+              </ul>
+            </div>
+          
+        </div>
+      
+        <div style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h3 style="margin: 0 0 12px 0; font-size: 16px;">管理后台应用</h3>
+          
+            <div style="background: #fef3c7; border-radius: 6px; padding: 12px; margin-bottom: 8px;">
+              <strong>环境对比: development ↔ production</strong>
+              <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                <li style="color: #92400e; margin-bottom: 4px;">仅在 development 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 production 存在: [object Object]</li><li style="color: #92400e; margin-bottom: 4px;">仅在 production 存在: [object Object]</li>
+              </ul>
+            </div>
+          
+        </div>
+      
+    
+    
+    <div class="footer">
+      <p>OAuth回调地址校验工具 | 此报告由系统自动生成</p>
+      <p>💡 提示: 点击终端摘要中的链接查看完整JSON数据</p>
+    </div>
+  </div>
+</body>
+</html>
+  

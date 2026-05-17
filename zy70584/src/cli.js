@@ -8,6 +8,7 @@ const fs = require('fs');
 const { normalizeUrl, compareUrls, checkUrlParams } = require('./urlNormalizer');
 const { validateConfig, compareEnvironments, attributeErrors } = require('./validator');
 const { generateTerminalSummary, generateJsonReport, generateReadableReport } = require('./reporter');
+const { parseJsonWithSource, parseErrorSamplesWithSource } = require('./jsonLineParser');
 
 const program = new Command();
 
@@ -28,7 +29,9 @@ program
   .option('--report', '生成可读的HTML报告')
   .action(async (options) => {
     try {
-      console.log(chalk.blue('\n🔍 OAuth回调地址校验工具启动...\n'));
+      if (!options.json) {
+        console.log(chalk.blue('\n🔍 OAuth回调地址校验工具启动...\n'));
+      }
 
       const configPath = path.resolve(options.config);
       if (!fs.existsSync(configPath)) {
@@ -36,25 +39,19 @@ program
         process.exit(1);
       }
 
-      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      const config = parseJsonWithSource(configPath);
       
       let errorSamples = [];
       if (options.errorSamples) {
         const samplesPath = path.resolve(options.errorSamples);
         if (fs.existsSync(samplesPath)) {
-          errorSamples = JSON.parse(fs.readFileSync(samplesPath, 'utf8'));
+          errorSamples = parseErrorSamplesWithSource(samplesPath);
         }
       }
 
       const validationResult = validateConfig(config, options.env);
       const envComparison = compareEnvironments(config);
       const attributedErrors = attributeErrors(validationResult, errorSamples, envComparison);
-
-      if (options.json) {
-        console.log(JSON.stringify(attributedErrors, null, 2));
-      } else {
-        generateTerminalSummary(attributedErrors);
-      }
 
       if (!fs.existsSync(options.outputDir)) {
         fs.mkdirSync(options.outputDir, { recursive: true });
@@ -63,12 +60,27 @@ program
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
       const jsonPath = path.join(options.outputDir, `oauth-check-result-${timestamp}.json`);
       generateJsonReport(attributedErrors, jsonPath);
-      console.log(chalk.gray(`📄 机器可读结果已保存: ${jsonPath}`));
 
+      let reportPath = null;
       if (options.report) {
-        const reportPath = path.join(options.outputDir, `oauth-check-report-${timestamp}.html`);
+        reportPath = path.join(options.outputDir, `oauth-check-report-${timestamp}.html`);
         generateReadableReport(attributedErrors, reportPath);
-        console.log(chalk.gray(`📊 详细报告已生成: ${reportPath}`));
+      }
+
+      if (options.json) {
+        console.log(JSON.stringify({
+          result: attributedErrors,
+          outputFiles: {
+            json: jsonPath,
+            html: reportPath
+          }
+        }, null, 2));
+      } else {
+        generateTerminalSummary(attributedErrors);
+        console.log(chalk.gray(`📄 机器可读结果已保存: ${jsonPath}`));
+        if (options.report) {
+          console.log(chalk.gray(`📊 详细报告已生成: ${reportPath}`));
+        }
       }
 
       if (attributedErrors.summary.hasErrors) {

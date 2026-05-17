@@ -1,0 +1,724 @@
+{
+  "timestamp": "2026-05-17T05:37:16.957Z",
+  "summary": {
+    "hasErrors": true,
+    "hasWarnings": true,
+    "totalApplications": 3,
+    "passedApplications": 1,
+    "failedApplications": 2,
+    "totalErrors": 2,
+    "totalWarnings": 2,
+    "errorCategories": {
+      "REDIRECT_URI_MISMATCH": 1,
+      "INVALID_URL_FORMAT": 1
+    }
+  },
+  "applications": [
+    {
+      "appId": "web-app-001",
+      "appName": "用户中心Web应用",
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+        "fileName": "oauth-config.json",
+        "line": 5,
+        "index": 0
+      },
+      "status": "PASSED",
+      "environments": [
+        {
+          "name": "development",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+            "fileName": "oauth-config.json",
+            "line": 8,
+            "index": 0
+          },
+          "status": "PASSED",
+          "authorizedUris": [
+            {
+              "original": "http://localhost:3000/auth/callback",
+              "normalized": "http://localhost:3000/auth/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 12,
+                "index": 0,
+                "rawContent": "http://localhost:3000/auth/callback"
+              },
+              "errors": [],
+              "warnings": []
+            },
+            {
+              "original": "http://127.0.0.1:3000/auth/callback",
+              "normalized": "http://127.0.0.1:3000/auth/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 14,
+                "index": 1,
+                "rawContent": "http://127.0.0.1:3000/auth/callback"
+              },
+              "errors": [],
+              "warnings": []
+            }
+          ],
+          "issues": []
+        },
+        {
+          "name": "staging",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+            "fileName": "oauth-config.json",
+            "line": 15,
+            "index": 1
+          },
+          "status": "PASSED",
+          "authorizedUris": [
+            {
+              "original": "https://staging.example.com/auth/callback",
+              "normalized": "https://staging.example.com/auth/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 19,
+                "index": 0,
+                "rawContent": "https://staging.example.com/auth/callback"
+              },
+              "errors": [],
+              "warnings": []
+            },
+            {
+              "original": "https://staging.example.com/callback",
+              "normalized": "https://staging.example.com/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 21,
+                "index": 1,
+                "rawContent": "https://staging.example.com/callback"
+              },
+              "errors": [],
+              "warnings": []
+            }
+          ],
+          "issues": []
+        },
+        {
+          "name": "production",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+            "fileName": "oauth-config.json",
+            "line": 22,
+            "index": 2
+          },
+          "status": "PASSED",
+          "authorizedUris": [
+            {
+              "original": "https://example.com/auth/callback",
+              "normalized": "https://example.com/auth/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 26,
+                "index": 0,
+                "rawContent": "https://example.com/auth/callback"
+              },
+              "errors": [],
+              "warnings": []
+            },
+            {
+              "original": "http://example.com/callback",
+              "normalized": "http://example.com/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 28,
+                "index": 1,
+                "rawContent": "http://example.com/callback"
+              },
+              "errors": [],
+              "warnings": [
+                {
+                  "type": "INSECURE_PROTOCOL",
+                  "message": "生产环境应使用HTTPS协议"
+                }
+              ]
+            }
+          ],
+          "issues": [
+            {
+              "severity": "WARNING",
+              "category": "SECURITY_WARNING",
+              "type": "INSECURE_PROTOCOL",
+              "message": "生产环境应使用HTTPS协议",
+              "suggestion": [
+                "生产环境强烈建议使用HTTPS协议",
+                "更新配置使用https://开头的回调地址"
+              ],
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 22,
+                "index": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "appId": "mobile-app-002",
+      "appName": "移动APP应用",
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+        "fileName": "oauth-config.json",
+        "line": 32,
+        "index": 1
+      },
+      "status": "FAILED",
+      "environments": [
+        {
+          "name": "development",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+            "fileName": "oauth-config.json",
+            "line": 35,
+            "index": 0
+          },
+          "status": "PASSED",
+          "authorizedUris": [
+            {
+              "original": "myapp://oauth/callback",
+              "normalized": "myapp://oauth/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 39,
+                "index": 0,
+                "rawContent": "myapp://oauth/callback"
+              },
+              "errors": [],
+              "warnings": []
+            },
+            {
+              "original": "exp://192.168.1.100:19000/--/oauth/callback",
+              "normalized": "exp://192.168.1.100/--/oauth/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 41,
+                "index": 1,
+                "rawContent": "exp://192.168.1.100:19000/--/oauth/callback"
+              },
+              "errors": [],
+              "warnings": []
+            }
+          ],
+          "issues": []
+        },
+        {
+          "name": "production",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+            "fileName": "oauth-config.json",
+            "line": 42,
+            "index": 1
+          },
+          "status": "FAILED",
+          "authorizedUris": [
+            {
+              "original": "myapp://oauth/callback",
+              "normalized": "myapp://oauth/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 46,
+                "index": 0,
+                "rawContent": "myapp://oauth/callback"
+              },
+              "errors": [],
+              "warnings": [
+                {
+                  "type": "INSECURE_PROTOCOL",
+                  "message": "生产环境应使用HTTPS协议"
+                }
+              ]
+            }
+          ],
+          "issues": [
+            {
+              "severity": "ERROR",
+              "category": "REDIRECT_URI_MISMATCH",
+              "type": "REDIRECT_URI_MISMATCH",
+              "message": "授权链接中的redirect_uri不在授权列表中: https://wrong.example.com/callback",
+              "suggestion": [
+                "检查OAuth应用后台配置的回调地址",
+                "确认代码中使用的redirect_uri参数与配置一致",
+                "注意URL编码问题，特别是特殊字符",
+                "检查是否遗漏了端口号或路径后缀"
+              ],
+              "redirectUri": "https://wrong.example.com/callback",
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 42,
+                "index": 1
+              }
+            },
+            {
+              "severity": "WARNING",
+              "category": "SECURITY_WARNING",
+              "type": "INSECURE_PROTOCOL",
+              "message": "生产环境应使用HTTPS协议",
+              "suggestion": [
+                "生产环境强烈建议使用HTTPS协议",
+                "更新配置使用https://开头的回调地址"
+              ],
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 42,
+                "index": 1
+              }
+            }
+          ],
+          "redirectUriFromAuthUrl": "https://wrong.example.com/callback"
+        }
+      ]
+    },
+    {
+      "appId": "admin-app-003",
+      "appName": "管理后台应用",
+      "source": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+        "fileName": "oauth-config.json",
+        "line": 52,
+        "index": 2
+      },
+      "status": "FAILED",
+      "environments": [
+        {
+          "name": "development",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+            "fileName": "oauth-config.json",
+            "line": 55,
+            "index": 0
+          },
+          "status": "PASSED",
+          "authorizedUris": [
+            {
+              "original": "http://localhost:8080/admin/callback",
+              "normalized": "http://localhost:8080/admin/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 59,
+                "index": 0,
+                "rawContent": "http://localhost:8080/admin/callback"
+              },
+              "errors": [],
+              "warnings": []
+            }
+          ],
+          "issues": []
+        },
+        {
+          "name": "production",
+          "source": {
+            "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+            "fileName": "oauth-config.json",
+            "line": 61,
+            "index": 1
+          },
+          "status": "FAILED",
+          "authorizedUris": [
+            {
+              "original": "https://admin.example.com/callback",
+              "normalized": "https://admin.example.com/callback",
+              "isValid": true,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 65,
+                "index": 0,
+                "rawContent": "https://admin.example.com/callback"
+              },
+              "errors": [],
+              "warnings": []
+            },
+            {
+              "original": "invalid-url-without-protocol",
+              "normalized": null,
+              "isValid": false,
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 67,
+                "index": 1,
+                "rawContent": "invalid-url-without-protocol"
+              },
+              "errors": [
+                {
+                  "type": "INVALID_URL",
+                  "message": "URL格式无效: Invalid URL"
+                }
+              ],
+              "warnings": []
+            }
+          ],
+          "issues": [
+            {
+              "severity": "ERROR",
+              "category": "INVALID_URL_FORMAT",
+              "type": "INVALID_URL",
+              "message": "URL格式无效: Invalid URL",
+              "suggestion": [
+                "检查配置是否正确"
+              ],
+              "source": {
+                "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                "fileName": "oauth-config.json",
+                "line": 61,
+                "index": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environmentComparison": {
+    "applications": [
+      {
+        "appId": "web-app-001",
+        "appName": "用户中心Web应用",
+        "environmentPairs": [
+          {
+            "env1": "development",
+            "env2": "staging",
+            "differences": [
+              {
+                "type": "URI_ONLY_IN_ENV1",
+                "message": "仅在 development 存在: [object Object]",
+                "uri": {
+                  "value": "http://localhost:3000/auth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 12,
+                    "index": 0,
+                    "rawContent": "http://localhost:3000/auth/callback"
+                  }
+                },
+                "environment": "development"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV1",
+                "message": "仅在 development 存在: [object Object]",
+                "uri": {
+                  "value": "http://127.0.0.1:3000/auth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 14,
+                    "index": 1,
+                    "rawContent": "http://127.0.0.1:3000/auth/callback"
+                  }
+                },
+                "environment": "development"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV2",
+                "message": "仅在 staging 存在: [object Object]",
+                "uri": {
+                  "value": "https://staging.example.com/auth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 19,
+                    "index": 0,
+                    "rawContent": "https://staging.example.com/auth/callback"
+                  }
+                },
+                "environment": "staging"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV2",
+                "message": "仅在 staging 存在: [object Object]",
+                "uri": {
+                  "value": "https://staging.example.com/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 21,
+                    "index": 1,
+                    "rawContent": "https://staging.example.com/callback"
+                  }
+                },
+                "environment": "staging"
+              }
+            ]
+          },
+          {
+            "env1": "development",
+            "env2": "production",
+            "differences": [
+              {
+                "type": "URI_ONLY_IN_ENV1",
+                "message": "仅在 development 存在: [object Object]",
+                "uri": {
+                  "value": "http://localhost:3000/auth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 12,
+                    "index": 0,
+                    "rawContent": "http://localhost:3000/auth/callback"
+                  }
+                },
+                "environment": "development"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV1",
+                "message": "仅在 development 存在: [object Object]",
+                "uri": {
+                  "value": "http://127.0.0.1:3000/auth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 14,
+                    "index": 1,
+                    "rawContent": "http://127.0.0.1:3000/auth/callback"
+                  }
+                },
+                "environment": "development"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV2",
+                "message": "仅在 production 存在: [object Object]",
+                "uri": {
+                  "value": "https://example.com/auth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 26,
+                    "index": 0,
+                    "rawContent": "https://example.com/auth/callback"
+                  }
+                },
+                "environment": "production"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV2",
+                "message": "仅在 production 存在: [object Object]",
+                "uri": {
+                  "value": "http://example.com/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 28,
+                    "index": 1,
+                    "rawContent": "http://example.com/callback"
+                  }
+                },
+                "environment": "production"
+              }
+            ]
+          },
+          {
+            "env1": "staging",
+            "env2": "production",
+            "differences": [
+              {
+                "type": "URI_ONLY_IN_ENV1",
+                "message": "仅在 staging 存在: [object Object]",
+                "uri": {
+                  "value": "https://staging.example.com/auth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 19,
+                    "index": 0,
+                    "rawContent": "https://staging.example.com/auth/callback"
+                  }
+                },
+                "environment": "staging"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV1",
+                "message": "仅在 staging 存在: [object Object]",
+                "uri": {
+                  "value": "https://staging.example.com/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 21,
+                    "index": 1,
+                    "rawContent": "https://staging.example.com/callback"
+                  }
+                },
+                "environment": "staging"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV2",
+                "message": "仅在 production 存在: [object Object]",
+                "uri": {
+                  "value": "https://example.com/auth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 26,
+                    "index": 0,
+                    "rawContent": "https://example.com/auth/callback"
+                  }
+                },
+                "environment": "production"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV2",
+                "message": "仅在 production 存在: [object Object]",
+                "uri": {
+                  "value": "http://example.com/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 28,
+                    "index": 1,
+                    "rawContent": "http://example.com/callback"
+                  }
+                },
+                "environment": "production"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "appId": "mobile-app-002",
+        "appName": "移动APP应用",
+        "environmentPairs": [
+          {
+            "env1": "development",
+            "env2": "production",
+            "differences": [
+              {
+                "type": "URI_ONLY_IN_ENV1",
+                "message": "仅在 development 存在: [object Object]",
+                "uri": {
+                  "value": "myapp://oauth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 39,
+                    "index": 0,
+                    "rawContent": "myapp://oauth/callback"
+                  }
+                },
+                "environment": "development"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV1",
+                "message": "仅在 development 存在: [object Object]",
+                "uri": {
+                  "value": "exp://192.168.1.100:19000/--/oauth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 41,
+                    "index": 1,
+                    "rawContent": "exp://192.168.1.100:19000/--/oauth/callback"
+                  }
+                },
+                "environment": "development"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV2",
+                "message": "仅在 production 存在: [object Object]",
+                "uri": {
+                  "value": "myapp://oauth/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 46,
+                    "index": 0,
+                    "rawContent": "myapp://oauth/callback"
+                  }
+                },
+                "environment": "production"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "appId": "admin-app-003",
+        "appName": "管理后台应用",
+        "environmentPairs": [
+          {
+            "env1": "development",
+            "env2": "production",
+            "differences": [
+              {
+                "type": "URI_ONLY_IN_ENV1",
+                "message": "仅在 development 存在: [object Object]",
+                "uri": {
+                  "value": "http://localhost:8080/admin/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 59,
+                    "index": 0,
+                    "rawContent": "http://localhost:8080/admin/callback"
+                  }
+                },
+                "environment": "development"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV2",
+                "message": "仅在 production 存在: [object Object]",
+                "uri": {
+                  "value": "https://admin.example.com/callback",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 65,
+                    "index": 0,
+                    "rawContent": "https://admin.example.com/callback"
+                  }
+                },
+                "environment": "production"
+              },
+              {
+                "type": "URI_ONLY_IN_ENV2",
+                "message": "仅在 production 存在: [object Object]",
+                "uri": {
+                  "value": "invalid-url-without-protocol",
+                  "_source": {
+                    "file": "/Users/lzy/pro/solo/workspaces/zy70584/examples/oauth-config.json",
+                    "fileName": "oauth-config.json",
+                    "line": 67,
+                    "index": 1,
+                    "rawContent": "invalid-url-without-protocol"
+                  }
+                },
+                "environment": "production"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "matchedErrorSamples": []
+}

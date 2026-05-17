@@ -16,13 +16,15 @@ function validateConfig(config, targetEnv = null) {
   }
 
   config.applications.forEach((app, appIndex) => {
+    const appSource = app._source || {};
     const appResult = {
       appId: app.appId || app.name,
       appName: app.name,
       source: {
-        file: config._file || 'unknown',
-        line: app._line || 'unknown',
-        index: appIndex
+        file: appSource.file || config._file || 'unknown',
+        fileName: appSource.fileName || config._fileName || 'unknown',
+        line: appSource.line || 'unknown',
+        index: appSource.index !== undefined ? appSource.index : appIndex
       },
       environments: [],
       errors: [],
@@ -43,12 +45,14 @@ function validateConfig(config, targetEnv = null) {
         return;
       }
 
+      const envSource = env._source || {};
       const envResult = {
         name: env.name,
         source: {
-          file: config._file || 'unknown',
-          line: env._line || 'unknown',
-          index: envIndex
+          file: envSource.file || config._file || 'unknown',
+          fileName: envSource.fileName || config._fileName || 'unknown',
+          line: envSource.line || 'unknown',
+          index: envSource.index !== undefined ? envSource.index : envIndex
         },
         authorizedUris: [],
         authUrlCheck: null,
@@ -63,15 +67,19 @@ function validateConfig(config, targetEnv = null) {
         });
       } else {
         env.authorizedRedirectUris.forEach((uri, uriIndex) => {
-          const normalized = normalizeUrl(uri);
+          const uriValue = typeof uri === 'object' && uri.value ? uri.value : uri;
+          const uriSource = typeof uri === 'object' && uri._source ? uri._source : {};
+          const normalized = normalizeUrl(uriValue);
           const uriResult = {
-            original: uri,
+            original: uriValue,
             normalized: normalized.normalized,
             isValid: !!normalized.normalized,
             source: {
-              file: config._file || 'unknown',
-              line: uri._line || 'unknown',
-              index: uriIndex
+              file: uriSource.file || config._file || 'unknown',
+              fileName: uriSource.fileName || config._fileName || 'unknown',
+              line: uriSource.line || 'unknown',
+              index: uriSource.index !== undefined ? uriSource.index : uriIndex,
+              rawContent: uriSource.rawContent || uriValue
             },
             errors: [],
             warnings: []
@@ -362,6 +370,7 @@ function getSuggestion(errorType, error) {
 function matchErrorSample(sample, validationResult) {
   const sampleUrl = sample.redirectUri || sample.url || '';
   const sampleError = sample.error || sample.message || '';
+  const sampleSource = sample._source || {};
   
   let bestMatch = null;
   let matchScore = 0;
@@ -377,10 +386,20 @@ function matchErrorSample(sample, validationResult) {
               matchScore = score;
               bestMatch = {
                 app: app.appName,
+                appSource: app.source,
                 environment: env.name,
+                environmentSource: env.source,
                 configuredUri: uri.original,
+                configuredUriSource: uri.source,
                 normalizedConfiguredUri: uri.normalized,
                 sampleUri: sampleUrl,
+                sampleSource: {
+                  file: sampleSource.file || 'unknown',
+                  fileName: sampleSource.fileName || 'unknown',
+                  line: sampleSource.line || 'unknown',
+                  index: sampleSource.index,
+                  rawContent: sampleSource.rawContent || JSON.stringify(sample).substring(0, 100)
+                },
                 differences: comparison.differences,
                 matchConfidence: score / 5
               };

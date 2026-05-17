@@ -8,7 +8,9 @@
   },
   "scripts": {
     "start": "node src/cli.js",
-    "test": "node tests/run.js"
+    "test": "node tests/run.js",
+    "validate": "node src/cli.js validate -c examples/oauth-config.json",
+    "validate:full": "node src/cli.js validate -c examples/oauth-config.json -s examples/error-samples.json --report"
   },
   "keywords": ["oauth", "security", "cli", "validation"],
   "author": "",
