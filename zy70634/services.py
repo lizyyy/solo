@@ -132,54 +132,55 @@ class WaveService:
         task.status = "completed"
 
         split_orders = []
-        if is_shortage:
-            wave = db.query(Wave).filter(Wave.id == task.wave_id).first()
-            orders = db.query(Order).filter(Order.wave_id == task.wave_id).all()
+        wave = db.query(Wave).filter(Wave.id == task.wave_id).first()
+        orders = db.query(Order).filter(Order.wave_id == task.wave_id).all()
+        remaining_quantity = actual_quantity
 
-            remaining_quantity = actual_quantity
+        for order in orders:
+            for item in order.items:
+                if item.sku_code == task.sku_code:
+                    if remaining_quantity > 0:
+                        available_for_order = min(item.ordered_quantity, remaining_quantity)
+                        item.picked_quantity = available_for_order
+                        remaining_quantity -= available_for_order
+                    else:
+                        item.picked_quantity = 0
 
-            for order in orders:
-                for item in order.items:
-                    if item.sku_code == task.sku_code:
-                        if remaining_quantity > 0:
-                            available_for_order = min(item.ordered_quantity, remaining_quantity)
-                            item.picked_quantity = available_for_order
-                            remaining_quantity -= available_for_order
-                        else:
-                            item.picked_quantity = 0
+                    if is_shortage and item.picked_quantity < item.ordered_quantity:
+                        item.is_shortage = True
+                        item.shortage_quantity = item.ordered_quantity - item.picked_quantity
 
-                        if item.picked_quantity < item.ordered_quantity:
-                            item.is_shortage = True
-                            item.shortage_quantity = item.ordered_quantity - item.picked_quantity
+                        split_order = None
+                        for so in split_orders:
+                            if so.parent_order_id == order.id:
+                                split_order = so
+                                break
 
-                            split_order = None
-                            for so in split_orders:
-                                if so.parent_order_id == order.id:
-                                    split_order = so
-                                    break
-
-                            if split_order is None:
-                                split_order = Order(
-                                    order_code=f"{order.order_code}-SPLIT-{uuid.uuid4().hex[:4].upper()}",
-                                    status="pending",
-                                    is_split=True,
-                                    parent_order_id=order.id,
-                                    customer_name=order.customer_name,
-                                    customer_phone=order.customer_phone,
-                                    shipping_address=order.shipping_address
-                                )
-                                db.add(split_order)
-                                db.flush()
-                                split_orders.append(split_order)
-                                order.is_split = True
-
-                            split_item = OrderItem(
-                                order_id=split_order.id,
-                                sku_code=item.sku_code,
-                                sku_name=item.sku_name,
-                                ordered_quantity=item.shortage_quantity
+                        if split_order is None:
+                            split_order = Order(
+                                order_code=f"{order.order_code}-SPLIT-{uuid.uuid4().hex[:4].upper()}",
+                                status="pending",
+                                is_split=True,
+                                parent_order_id=order.id,
+                                customer_name=order.customer_name,
+                                customer_phone=order.customer_phone,
+                                shipping_address=order.shipping_address
                             )
-                            db.add(split_item)
+                            db.add(split_order)
+                            db.flush()
+                            split_orders.append(split_order)
+                            order.is_split = True
+
+                        split_item = OrderItem(
+                            order_id=split_order.id,
+                            sku_code=item.sku_code,
+                            sku_name=item.sku_name,
+                            ordered_quantity=item.shortage_quantity
+                        )
+                        db.add(split_item)
+                    else:
+                        item.is_shortage = False
+                        item.shortage_quantity = 0
 
         db.commit()
         db.refresh(task)
