@@ -345,6 +345,201 @@ class TestAuditLog:
         audit_logs = response.json()
         assert len(audit_logs) >= 1
         assert audit_logs[0]["operation_type"] == "create"
+        assert audit_logs[0]["is_success"] == 1
+
+    def test_failed_weight_validation_audit_logged(self):
+        customer = client.post("/api/customers/", json={"name": "测试客户", "phone": "13800000000"}).json()
+        category = client.post("/api/categories/", json={"name": "玉米", "code": "CORN001"}).json()
+        
+        customer_id = customer["data"]["customer"]["id"]
+        category_id = category["data"]["category"]["id"]
+        
+        client.post(
+            "/api/weighings/",
+            json={
+                "record_no": "W20240101001",
+                "customer_id": customer_id,
+                "category_id": category_id,
+                "gross_weight": 300,
+                "tare_weight": 1000,
+                "weigher": "测试员",
+                "created_by": "管理员"
+            }
+        )
+        
+        response = client.get(f"/api/audits/")
+        audit_logs = response.json()
+        
+        failed_audit = [log for log in audit_logs if log["is_success"] == 0]
+        assert len(failed_audit) >= 1
+        assert "毛重必须大于皮重" in failed_audit[0]["error_message"]
+        assert failed_audit[0]["operator"] == "管理员"
+        assert failed_audit[0]["original_data"] is not None
+
+    def test_duplicate_settlement_block_audit_logged(self):
+        customer = client.post("/api/customers/", json={"name": "测试客户", "phone": "13800000000"}).json()
+        category = client.post("/api/categories/", json={"name": "玉米", "code": "CORN001"}).json()
+        
+        customer_id = customer["data"]["customer"]["id"]
+        category_id = category["data"]["category"]["id"]
+        
+        price = client.post(
+            "/api/prices/",
+            json={"category_id": category_id, "price": 2.5, "effective_date": "2024-01-01T00:00:00", "created_by": "测试"}
+        ).json()
+        price_id = price["data"]["price"]["id"]
+        
+        deduction = client.post(
+            "/api/deductions/",
+            json={"category_id": category_id, "name": "扣杂", "ratio": 0.02, "effective_date": "2024-01-01T00:00:00", "created_by": "测试"}
+        ).json()
+        deduction_id = deduction["data"]["deduction"]["id"]
+        
+        weighing = client.post(
+            "/api/weighings/",
+            json={
+                "record_no": "W20240101001",
+                "customer_id": customer_id,
+                "category_id": category_id,
+                "gross_weight": 1000,
+                "tare_weight": 300,
+                "weigher": "测试员",
+                "created_by": "管理员"
+            }
+        ).json()
+        weighing_id = weighing["data"]["weighing"]["id"]
+        
+        client.post(f"/api/weighings/{weighing_id}/set-price", json={"price_id": price_id, "operator": "测试员"})
+        client.post(f"/api/weighings/{weighing_id}/set-deduction", json={"deduction_id": deduction_id, "operator": "测试员"})
+        
+        client.post(
+            "/api/settlements/",
+            json={
+                "settlement_no": "S20240101001",
+                "customer_id": customer_id,
+                "weighing_ids": [weighing_id],
+                "settled_by": "结算员"
+            }
+        )
+        
+        client.post(
+            "/api/settlements/",
+            json={
+                "settlement_no": "S20240101002",
+                "customer_id": customer_id,
+                "weighing_ids": [weighing_id],
+                "settled_by": "结算员"
+            }
+        )
+        
+        response = client.get(f"/api/audits/", params={"weighing_id": weighing_id})
+        audit_logs = response.json()
+        
+        failed_audit = [log for log in audit_logs if log["is_success"] == 0 and "已结算，重复结算拦截" in log["error_message"]]
+        assert len(failed_audit) >= 1
+        assert failed_audit[0]["weighing_id"] == weighing_id
+        assert failed_audit[0]["operator"] == "结算员"
+
+    def test_set_price_before_deduction_failure_audited(self):
+        customer = client.post("/api/customers/", json={"name": "测试客户", "phone": "13800000000"}).json()
+        category = client.post("/api/categories/", json={"name": "玉米", "code": "CORN001"}).json()
+        
+        customer_id = customer["data"]["customer"]["id"]
+        category_id = category["data"]["category"]["id"]
+        
+        deduction = client.post(
+            "/api/deductions/",
+            json={"category_id": category_id, "name": "扣杂", "ratio": 0.02, "effective_date": "2024-01-01T00:00:00", "created_by": "测试"}
+        ).json()
+        deduction_id = deduction["data"]["deduction"]["id"]
+        
+        weighing = client.post(
+            "/api/weighings/",
+            json={
+                "record_no": "W20240101001",
+                "customer_id": customer_id,
+                "category_id": category_id,
+                "gross_weight": 1000,
+                "tare_weight": 300,
+                "weigher": "测试员",
+                "created_by": "管理员"
+            }
+        ).json()
+        weighing_id = weighing["data"]["weighing"]["id"]
+        
+        client.post(
+            f"/api/weighings/{weighing_id}/set-deduction",
+            json={"deduction_id": deduction_id, "operator": "测试员"}
+        )
+        
+        response = client.get(f"/api/audits/", params={"weighing_id": weighing_id})
+        audit_logs = response.json()
+        
+        failed_audit = [log for log in audit_logs if log["is_success"] == 0 and "请先设置价格" in log["error_message"]]
+        assert len(failed_audit) >= 1
+        assert failed_audit[0]["operator"] == "测试员"
+
+    def test_manual_correction_after_settlement_blocked(self):
+        customer = client.post("/api/customers/", json={"name": "测试客户", "phone": "13800000000"}).json()
+        category = client.post("/api/categories/", json={"name": "玉米", "code": "CORN001"}).json()
+        
+        customer_id = customer["data"]["customer"]["id"]
+        category_id = category["data"]["category"]["id"]
+        
+        price = client.post(
+            "/api/prices/",
+            json={"category_id": category_id, "price": 2.5, "effective_date": "2024-01-01T00:00:00", "created_by": "测试"}
+        ).json()
+        price_id = price["data"]["price"]["id"]
+        
+        deduction = client.post(
+            "/api/deductions/",
+            json={"category_id": category_id, "name": "扣杂", "ratio": 0.02, "effective_date": "2024-01-01T00:00:00", "created_by": "测试"}
+        ).json()
+        deduction_id = deduction["data"]["deduction"]["id"]
+        
+        weighing = client.post(
+            "/api/weighings/",
+            json={
+                "record_no": "W20240101001",
+                "customer_id": customer_id,
+                "category_id": category_id,
+                "gross_weight": 1000,
+                "tare_weight": 300,
+                "weigher": "测试员",
+                "created_by": "管理员"
+            }
+        ).json()
+        weighing_id = weighing["data"]["weighing"]["id"]
+        
+        client.post(f"/api/weighings/{weighing_id}/set-price", json={"price_id": price_id, "operator": "测试员"})
+        client.post(f"/api/weighings/{weighing_id}/set-deduction", json={"deduction_id": deduction_id, "operator": "测试员"})
+        
+        client.post(
+            "/api/settlements/",
+            json={
+                "settlement_no": "S20240101001",
+                "customer_id": customer_id,
+                "weighing_ids": [weighing_id],
+                "settled_by": "结算员"
+            }
+        )
+        
+        client.post(
+            f"/api/weighings/{weighing_id}/manual-correction",
+            json={
+                "gross_weight": 1200,
+                "operator": "主管",
+                "reason": "修正重量"
+            }
+        )
+        
+        response = client.get(f"/api/audits/", params={"weighing_id": weighing_id})
+        audit_logs = response.json()
+        
+        failed_audit = [log for log in audit_logs if log["is_success"] == 0 and "已结算，无法修改" in log["error_message"]]
+        assert len(failed_audit) >= 1
+        assert failed_audit[0]["operator"] == "主管"
 
 
 class TestExport:

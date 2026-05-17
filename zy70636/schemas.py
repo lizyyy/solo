@@ -186,12 +186,14 @@ class Settlement(BaseModel):
 
 class AuditLog(BaseModel):
     id: int
-    weighing_id: int
+    weighing_id: Optional[int]
     operation_type: str
     original_data: Optional[str]
     new_data: Optional[str]
     operator: Optional[str]
     conclusion: Optional[str]
+    is_success: Optional[int]
+    error_message: Optional[str]
     created_at: datetime
 
     class Config:

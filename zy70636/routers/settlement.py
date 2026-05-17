@@ -8,34 +8,37 @@ from models import Settlement as SettlementModel, WeighingRecord as WeighingMode
 from models import Customer as CustomerModel, Price as PriceModel, AuditLog as AuditModel
 from models import AuditType, OperationType
 from schemas import Settlement, SettlementCreate, SettlementReview, APIResponse, Weighing
+from audit_utils import create_audit_log, log_failed_operation
 
 router = APIRouter()
 
 
-def create_audit_log(db: Session, weighing_id: int, operation_type: str, 
-                     original_data: dict, new_data: dict, operator: str, conclusion: str):
-    audit = AuditModel(
-        weighing_id=weighing_id,
-        operation_type=operation_type,
-        original_data=json.dumps(original_data) if original_data else None,
-        new_data=json.dumps(new_data) if new_data else None,
-        operator=operator,
-        conclusion=conclusion,
-        created_at=datetime.utcnow()
-    )
-    db.add(audit)
-
-
 @router.post("/", response_model=APIResponse)
 def create_settlement(settlement: SettlementCreate, db: Session = Depends(get_db)):
+    input_data = settlement.model_dump()
+    
     existing = db.query(SettlementModel).filter(
         SettlementModel.settlement_no == settlement.settlement_no
     ).first()
     if existing:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.SETTLE,
+            input_data=input_data,
+            operator=settlement.settled_by,
+            error_message="结算单号已存在"
+        )
         raise HTTPException(status_code=400, detail="结算单号已存在")
     
     customer = db.query(CustomerModel).filter(CustomerModel.id == settlement.customer_id).first()
     if not customer:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.SETTLE,
+            input_data=input_data,
+            operator=settlement.settled_by,
+            error_message="客户不存在"
+        )
         raise HTTPException(status_code=404, detail="客户不存在")
     
     weighings = db.query(WeighingModel).filter(
@@ -44,29 +47,85 @@ def create_settlement(settlement: SettlementCreate, db: Session = Depends(get_db
     
     if len(weighings) != len(settlement.weighing_ids):
         missing_ids = set(settlement.weighing_ids) - {w.id for w in weighings}
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.SETTLE,
+            input_data=input_data,
+            operator=settlement.settled_by,
+            error_message=f"称重记录不存在: {missing_ids}"
+        )
         raise HTTPException(status_code=404, detail=f"称重记录不存在: {missing_ids}")
     
     for w in weighings:
         if w.customer_id != settlement.customer_id:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.SETTLE,
+                input_data=input_data,
+                operator=settlement.settled_by,
+                error_message=f"称重记录 {w.id} 不属于当前客户",
+                weighing_id=w.id
+            )
             raise HTTPException(status_code=400, detail=f"称重记录 {w.id} 不属于当前客户")
         if w.settlement_id:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.SETTLE,
+                input_data=input_data,
+                operator=settlement.settled_by,
+                error_message=f"称重记录 {w.id} 已结算，重复结算拦截",
+                weighing_id=w.id
+            )
             raise HTTPException(status_code=400, detail=f"称重记录 {w.id} 已结算，重复结算拦截")
         if w.status == AuditType.CLOSED or w.status == AuditType.CANCELLED:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.SETTLE,
+                input_data=input_data,
+                operator=settlement.settled_by,
+                error_message=f"称重记录 {w.id} 已关闭或取消",
+                weighing_id=w.id
+            )
             raise HTTPException(status_code=400, detail=f"称重记录 {w.id} 已关闭或取消")
         if w.status != AuditType.DEDUCTED:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.SETTLE,
+                input_data=input_data,
+                operator=settlement.settled_by,
+                error_message=f"称重记录 {w.id} 未完成扣杂，无法结算",
+                weighing_id=w.id
+            )
             raise HTTPException(status_code=400, detail=f"称重记录 {w.id} 未完成扣杂，无法结算")
-    
-    total_weight = 0
-    total_amount = 0
     
     for w in weighings:
         if not w.price_id:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.SETTLE,
+                input_data=input_data,
+                operator=settlement.settled_by,
+                error_message=f"称重记录 {w.id} 未设置价格",
+                weighing_id=w.id
+            )
             raise HTTPException(status_code=400, detail=f"称重记录 {w.id} 未设置价格")
         
         price = db.query(PriceModel).filter(PriceModel.id == w.price_id).first()
         if not price:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.SETTLE,
+                input_data=input_data,
+                operator=settlement.settled_by,
+                error_message=f"价格不存在: {w.price_id}",
+                weighing_id=w.id
+            )
             raise HTTPException(status_code=404, detail=f"价格不存在: {w.price_id}")
-        
+    
+    total_weight = 0
+    total_amount = 0
+    for w in weighings:
+        price = db.query(PriceModel).filter(PriceModel.id == w.price_id).first()
         total_weight += w.final_weight
         total_amount += w.final_weight * price.price
     
@@ -102,7 +161,8 @@ def create_settlement(settlement: SettlementCreate, db: Session = Depends(get_db
                 "settlement_no": settlement.settlement_no
             },
             operator=settlement.settled_by,
-            conclusion=f"结算成功，结算单号: {settlement.settlement_no}"
+            conclusion=f"结算成功，结算单号: {settlement.settlement_no}",
+            is_success=True
         )
     
     db.commit()
@@ -152,14 +212,38 @@ def get_settlement_weighings(settlement_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{settlement_id}/review", response_model=APIResponse)
 def review_settlement(settlement_id: int, data: SettlementReview, db: Session = Depends(get_db)):
+    input_data = data.model_dump()
+    input_data["settlement_id"] = settlement_id
+    
     settlement = db.query(SettlementModel).filter(SettlementModel.id == settlement_id).first()
     if not settlement:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.STATUS_CHANGE,
+            input_data=input_data,
+            operator=data.reviewed_by,
+            error_message="结算记录不存在"
+        )
         raise HTTPException(status_code=404, detail="结算记录不存在")
     
     if settlement.status == AuditType.REVIEWED:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.STATUS_CHANGE,
+            input_data=input_data,
+            operator=data.reviewed_by,
+            error_message="结算已复核，不能重复复核"
+        )
         raise HTTPException(status_code=400, detail="结算已复核，不能重复复核")
     
     if settlement.status == AuditType.CLOSED or settlement.status == AuditType.CANCELLED:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.STATUS_CHANGE,
+            input_data=input_data,
+            operator=data.reviewed_by,
+            error_message="结算已关闭或取消"
+        )
         raise HTTPException(status_code=400, detail="结算已关闭或取消")
     
     original_data = {
@@ -188,7 +272,8 @@ def review_settlement(settlement_id: int, data: SettlementReview, db: Session = 
             original_data=w_original,
             new_data={"status": w.status},
             operator=data.reviewed_by,
-            conclusion=conclusion
+            conclusion=conclusion,
+            is_success=True
         )
     
     db.commit()

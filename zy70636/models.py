@@ -140,12 +140,14 @@ class AuditLog(Base):
     __tablename__ = "audit_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    weighing_id = Column(Integer, ForeignKey("weighing_records.id"))
+    weighing_id = Column(Integer, ForeignKey("weighing_records.id"), nullable=True)
     operation_type = Column(String(50), nullable=False)
     original_data = Column(Text)
     new_data = Column(Text)
     operator = Column(String(50))
     conclusion = Column(String(200))
+    is_success = Column(Integer, default=1)
+    error_message = Column(String(500))
     created_at = Column(DateTime, default=datetime.utcnow)
 
     weighing = relationship("WeighingRecord", back_populates="audit_logs")

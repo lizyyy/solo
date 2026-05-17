@@ -11,11 +11,29 @@
 - **重复结算拦截**: 已结算的称重记录不能再次结算
 - **状态流转**: weighed → priced → deducted → settled → reviewed/closed
 
-### 异常处理
-- 所有操作保留原始数据快照
-- 记录操作人信息
-- 记录处理结论
-- 完整审计日志可追溯
+### 异常审计（核心新增）
+- **失败操作全部可追溯**: 非法重量、重复结算、状态错误、权限校验等所有异常分支全部记录审计日志
+- **原始输入保留**: 异常请求的原始输入数据完整保存，用于客户质疑时举证
+- **操作人追踪**: 每个失败操作都记录操作员信息
+- **错误原因留存**: 记录详细的错误信息和处理结论
+- **审计字段**:
+  - `is_success`: 操作是否成功 (0=失败, 1=成功)
+  - `error_message`: 失败原因
+  - `original_data`: 原始请求数据
+  - `operator`: 操作人
+  - `weighing_id`: 关联称重记录（可选）
+
+### 审计日志查询 API
+```bash
+# 查询全部审计日志（含失败操作）
+curl -X GET "http://localhost:8000/api/audits/"
+
+# 查询指定称重记录的所有审计日志
+curl -X GET "http://localhost:8000/api/audits/?weighing_id=1"
+
+# 查询失败操作记录
+curl -X GET "http://localhost:8000/api/audits/" | jq '.[] | select(.is_success == 0)'
+```
 
 ## 快速开始
 

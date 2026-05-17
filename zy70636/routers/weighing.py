@@ -9,43 +9,74 @@ from models import Price as PriceModel, DeductionRatio as DeductionModel, AuditL
 from models import AuditType, OperationType
 from schemas import Weighing, WeighingCreate, WeighingPrice, WeighingDeduction
 from schemas import WeighingManualCorrection, WeighingClose, APIResponse
+from audit_utils import create_audit_log, log_failed_operation
 
 router = APIRouter()
 
 
-def create_audit_log(db: Session, weighing_id: int, operation_type: str, 
-                     original_data: dict, new_data: dict, operator: str, conclusion: str):
-    audit = AuditModel(
-        weighing_id=weighing_id,
-        operation_type=operation_type,
-        original_data=json.dumps(original_data) if original_data else None,
-        new_data=json.dumps(new_data) if new_data else None,
-        operator=operator,
-        conclusion=conclusion,
-        created_at=datetime.utcnow()
-    )
-    db.add(audit)
-
-
 @router.post("/", response_model=APIResponse)
 def create_weighing(weighing: WeighingCreate, db: Session = Depends(get_db)):
+    input_data = weighing.model_dump()
+    
     existing = db.query(WeighingModel).filter(WeighingModel.record_no == weighing.record_no).first()
     if existing:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CREATE,
+            input_data=input_data,
+            operator=weighing.created_by,
+            error_message="称重单号已存在"
+        )
         raise HTTPException(status_code=400, detail="称重单号已存在")
     
     customer = db.query(CustomerModel).filter(CustomerModel.id == weighing.customer_id).first()
     if not customer:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CREATE,
+            input_data=input_data,
+            operator=weighing.created_by,
+            error_message="客户不存在"
+        )
         raise HTTPException(status_code=404, detail="客户不存在")
     
     category = db.query(CategoryModel).filter(CategoryModel.id == weighing.category_id).first()
     if not category:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CREATE,
+            input_data=input_data,
+            operator=weighing.created_by,
+            error_message="品类不存在"
+        )
         raise HTTPException(status_code=404, detail="品类不存在")
     
     if weighing.gross_weight <= 0:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CREATE,
+            input_data=input_data,
+            operator=weighing.created_by,
+            error_message="毛重必须大于0"
+        )
         raise HTTPException(status_code=400, detail="毛重必须大于0")
     if weighing.tare_weight < 0:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CREATE,
+            input_data=input_data,
+            operator=weighing.created_by,
+            error_message="皮重不能为负数"
+        )
         raise HTTPException(status_code=400, detail="皮重不能为负数")
     if weighing.gross_weight <= weighing.tare_weight:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CREATE,
+            input_data=input_data,
+            operator=weighing.created_by,
+            error_message="毛重必须大于皮重"
+        )
         raise HTTPException(status_code=400, detail="毛重必须大于皮重")
     
     net_weight = weighing.gross_weight - weighing.tare_weight
@@ -71,7 +102,8 @@ def create_weighing(weighing: WeighingCreate, db: Session = Depends(get_db)):
             "net_weight": net_weight
         },
         operator=weighing.created_by,
-        conclusion="称重记录创建成功"
+        conclusion="称重记录创建成功",
+        is_success=True
     )
     
     db.commit()
@@ -104,15 +136,41 @@ def get_weighing(weighing_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{weighing_id}/set-price", response_model=APIResponse)
 def set_price(weighing_id: int, data: WeighingPrice, db: Session = Depends(get_db)):
+    input_data = data.model_dump()
+    input_data["weighing_id"] = weighing_id
+    
     weighing = db.query(WeighingModel).filter(WeighingModel.id == weighing_id).first()
     if not weighing:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.UPDATE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录不存在"
+        )
         raise HTTPException(status_code=404, detail="称重记录不存在")
     
     if weighing.status == AuditType.CLOSED or weighing.status == AuditType.CANCELLED:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.UPDATE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录已关闭或取消，无法修改",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=400, detail="称重记录已关闭或取消，无法修改")
     
     price = db.query(PriceModel).filter(PriceModel.id == data.price_id).first()
     if not price:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.UPDATE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="价格不存在",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=404, detail="价格不存在")
     
     original_data = {
@@ -130,7 +188,8 @@ def set_price(weighing_id: int, data: WeighingPrice, db: Session = Depends(get_d
         original_data=original_data,
         new_data={"price_id": data.price_id, "status": AuditType.PRICED},
         operator=data.operator,
-        conclusion="价格设置成功"
+        conclusion="价格设置成功",
+        is_success=True
     )
     
     db.commit()
@@ -140,18 +199,52 @@ def set_price(weighing_id: int, data: WeighingPrice, db: Session = Depends(get_d
 
 @router.post("/{weighing_id}/set-deduction", response_model=APIResponse)
 def set_deduction(weighing_id: int, data: WeighingDeduction, db: Session = Depends(get_db)):
+    input_data = data.model_dump()
+    input_data["weighing_id"] = weighing_id
+    
     weighing = db.query(WeighingModel).filter(WeighingModel.id == weighing_id).first()
     if not weighing:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.UPDATE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录不存在"
+        )
         raise HTTPException(status_code=404, detail="称重记录不存在")
     
     if weighing.status == AuditType.CLOSED or weighing.status == AuditType.CANCELLED:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.UPDATE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录已关闭或取消，无法修改",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=400, detail="称重记录已关闭或取消，无法修改")
     
     if not weighing.price_id:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.UPDATE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="请先设置价格",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=400, detail="请先设置价格")
     
     deduction = db.query(DeductionModel).filter(DeductionModel.id == data.deduction_id).first()
     if not deduction:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.UPDATE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="扣杂比例不存在",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=404, detail="扣杂比例不存在")
     
     deducted_weight = weighing.net_weight * deduction.ratio
@@ -181,7 +274,8 @@ def set_deduction(weighing_id: int, data: WeighingDeduction, db: Session = Depen
             "status": AuditType.DEDUCTED
         },
         operator=data.operator,
-        conclusion="扣杂设置成功"
+        conclusion="扣杂设置成功",
+        is_success=True
     )
     
     db.commit()
@@ -191,14 +285,40 @@ def set_deduction(weighing_id: int, data: WeighingDeduction, db: Session = Depen
 
 @router.post("/{weighing_id}/manual-correction", response_model=APIResponse)
 def manual_correction(weighing_id: int, data: WeighingManualCorrection, db: Session = Depends(get_db)):
+    input_data = data.model_dump()
+    input_data["weighing_id"] = weighing_id
+    
     weighing = db.query(WeighingModel).filter(WeighingModel.id == weighing_id).first()
     if not weighing:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.MANUAL_CORRECTION,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录不存在"
+        )
         raise HTTPException(status_code=404, detail="称重记录不存在")
     
     if weighing.status == AuditType.CLOSED or weighing.status == AuditType.CANCELLED:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.MANUAL_CORRECTION,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录已关闭或取消，无法修改",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=400, detail="称重记录已关闭或取消，无法修改")
     
     if weighing.settlement_id:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.MANUAL_CORRECTION,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录已结算，无法修改",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=400, detail="称重记录已结算，无法修改")
     
     original_data = {
@@ -217,10 +337,34 @@ def manual_correction(weighing_id: int, data: WeighingManualCorrection, db: Sess
         new_tare = data.tare_weight if data.tare_weight is not None else weighing.tare_weight
         
         if new_gross <= 0:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.MANUAL_CORRECTION,
+                input_data=input_data,
+                operator=data.operator,
+                error_message="毛重必须大于0",
+                weighing_id=weighing_id
+            )
             raise HTTPException(status_code=400, detail="毛重必须大于0")
         if new_tare < 0:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.MANUAL_CORRECTION,
+                input_data=input_data,
+                operator=data.operator,
+                error_message="皮重不能为负数",
+                weighing_id=weighing_id
+            )
             raise HTTPException(status_code=400, detail="皮重不能为负数")
         if new_gross <= new_tare:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.MANUAL_CORRECTION,
+                input_data=input_data,
+                operator=data.operator,
+                error_message="毛重必须大于皮重",
+                weighing_id=weighing_id
+            )
             raise HTTPException(status_code=400, detail="毛重必须大于皮重")
         
         weighing.gross_weight = new_gross
@@ -231,6 +375,14 @@ def manual_correction(weighing_id: int, data: WeighingManualCorrection, db: Sess
     if data.price_id is not None:
         price = db.query(PriceModel).filter(PriceModel.id == data.price_id).first()
         if not price:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.MANUAL_CORRECTION,
+                input_data=input_data,
+                operator=data.operator,
+                error_message="价格不存在",
+                weighing_id=weighing_id
+            )
             raise HTTPException(status_code=404, detail="价格不存在")
         weighing.price_id = data.price_id
         new_data["price_id"] = data.price_id
@@ -238,6 +390,14 @@ def manual_correction(weighing_id: int, data: WeighingManualCorrection, db: Sess
     if data.deduction_id is not None:
         deduction = db.query(DeductionModel).filter(DeductionModel.id == data.deduction_id).first()
         if not deduction:
+            log_failed_operation(
+                db=db,
+                operation_type=OperationType.MANUAL_CORRECTION,
+                input_data=input_data,
+                operator=data.operator,
+                error_message="扣杂比例不存在",
+                weighing_id=weighing_id
+            )
             raise HTTPException(status_code=404, detail="扣杂比例不存在")
         weighing.deduction_id = data.deduction_id
         
@@ -258,7 +418,8 @@ def manual_correction(weighing_id: int, data: WeighingManualCorrection, db: Sess
         original_data=original_data,
         new_data=new_data,
         operator=data.operator,
-        conclusion=f"人工修正: {data.reason}"
+        conclusion=f"人工修正: {data.reason}",
+        is_success=True
     )
     
     db.commit()
@@ -268,14 +429,40 @@ def manual_correction(weighing_id: int, data: WeighingManualCorrection, db: Sess
 
 @router.post("/{weighing_id}/cancel", response_model=APIResponse)
 def cancel_weighing(weighing_id: int, data: WeighingClose, db: Session = Depends(get_db)):
+    input_data = data.model_dump()
+    input_data["weighing_id"] = weighing_id
+    
     weighing = db.query(WeighingModel).filter(WeighingModel.id == weighing_id).first()
     if not weighing:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CANCEL,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录不存在"
+        )
         raise HTTPException(status_code=404, detail="称重记录不存在")
     
     if weighing.status == AuditType.CLOSED or weighing.status == AuditType.CANCELLED:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CANCEL,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录已关闭或取消",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=400, detail="称重记录已关闭或取消")
     
     if weighing.settlement_id:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CANCEL,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录已结算，无法取消",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=400, detail="称重记录已结算，无法取消")
     
     original_data = {"status": weighing.status}
@@ -289,7 +476,8 @@ def cancel_weighing(weighing_id: int, data: WeighingClose, db: Session = Depends
         original_data=original_data,
         new_data={"status": AuditType.CANCELLED},
         operator=data.operator,
-        conclusion=f"撤回称重记录: {data.reason}"
+        conclusion=f"撤回称重记录: {data.reason}",
+        is_success=True
     )
     
     db.commit()
@@ -299,14 +487,40 @@ def cancel_weighing(weighing_id: int, data: WeighingClose, db: Session = Depends
 
 @router.post("/{weighing_id}/close", response_model=APIResponse)
 def close_weighing(weighing_id: int, data: WeighingClose, db: Session = Depends(get_db)):
+    input_data = data.model_dump()
+    input_data["weighing_id"] = weighing_id
+    
     weighing = db.query(WeighingModel).filter(WeighingModel.id == weighing_id).first()
     if not weighing:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CLOSE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录不存在"
+        )
         raise HTTPException(status_code=404, detail="称重记录不存在")
     
     if weighing.status == AuditType.CLOSED or weighing.status == AuditType.CANCELLED:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CLOSE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="称重记录已关闭或取消",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=400, detail="称重记录已关闭或取消")
     
     if not weighing.settlement_id:
+        log_failed_operation(
+            db=db,
+            operation_type=OperationType.CLOSE,
+            input_data=input_data,
+            operator=data.operator,
+            error_message="未结算记录不能关闭，请先结算",
+            weighing_id=weighing_id
+        )
         raise HTTPException(status_code=400, detail="未结算记录不能关闭，请先结算")
     
     original_data = {"status": weighing.status}
@@ -320,7 +534,8 @@ def close_weighing(weighing_id: int, data: WeighingClose, db: Session = Depends(
         original_data=original_data,
         new_data={"status": AuditType.CLOSED},
         operator=data.operator,
-        conclusion=f"关闭称重记录: {data.reason}"
+        conclusion=f"关闭称重记录: {data.reason}",
+        is_success=True
     )
     
     db.commit()
