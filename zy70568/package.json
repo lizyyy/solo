@@ -1,0 +1,17 @@
+{
+  "name": "ssh-config-analyzer",
+  "version": "1.0.0",
+  "description": "SSH配置解析CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "ssh-analyze": "./bin/ssh-analyze.js"
+  },
+  "scripts": {
+    "test": "node tests/self-test.js",
+    "self-test": "node tests/self-test.js"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  }
+}
