@@ -316,4 +316,105 @@ public class ConfigDeliveryService {
         }
         return ip;
     }
+
+    public Result<IPage<RetryTask>> queryRetryTasks(String nodeCode, Integer status, Integer pageNum, Integer pageSize) {
+        LambdaQueryWrapper<RetryTask> wrapper = new LambdaQueryWrapper<>();
+        if (nodeCode != null) {
+            wrapper.eq(RetryTask::getNodeCode, nodeCode);
+        }
+        if (status != null) {
+            wrapper.eq(RetryTask::getStatus, status);
+        }
+        wrapper.orderByDesc(RetryTask::getCreatedTime);
+
+        Page<RetryTask> page = new Page<>(pageNum != null ? pageNum : 1, pageSize != null ? pageSize : 20);
+        IPage<RetryTask> result = retryTaskMapper.selectPage(page, wrapper);
+        return Result.success(result);
+    }
+
+    public Result<RetryTask> getRetryTaskDetail(String taskNo) {
+        RetryTask task = retryTaskMapper.selectOne(
+                new LambdaQueryWrapper<RetryTask>().eq(RetryTask::getTaskNo, taskNo)
+        );
+        if (task == null) {
+            return Result.fail(ErrorCode.DELIVERY_NOT_EXIST.getCode(), "重试任务不存在");
+        }
+        return Result.success(task);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Result<RetryTask> executeRetryTask(String taskNo, String operator) {
+        RetryTask task = retryTaskMapper.selectOne(
+                new LambdaQueryWrapper<RetryTask>().eq(RetryTask::getTaskNo, taskNo)
+        );
+        if (task == null) {
+            return Result.fail(ErrorCode.DELIVERY_NOT_EXIST.getCode(), "重试任务不存在");
+        }
+
+        if (!task.getStatus().equals(RetryStatusEnum.PENDING.getCode())) {
+            return Result.fail(ErrorCode.INVALID_STATUS_TRANSITION.getCode(), "当前状态不允许执行");
+        }
+
+        if (task.getRetryCount() >= task.getMaxRetry()) {
+            return Result.fail(ErrorCode.RETRY_EXHAUSTED);
+        }
+
+        task.setStatus(RetryStatusEnum.RUNNING.getCode());
+        task.setLastRetryTime(LocalDateTime.now());
+        task.setRetryCount(task.getRetryCount() + 1);
+        retryTaskMapper.updateById(task);
+
+        ConfigDelivery delivery = deliveryMapper.selectById(task.getDeliveryId());
+
+        try {
+            if (task.getRetryType().equals(RetryTypeEnum.REDO_DELIVERY.getCode())) {
+                delivery.setStatus(DeliveryStatusEnum.PENDING_ACK.getCode());
+                delivery.setRetryCount(delivery.getRetryCount() + 1);
+            } else if (task.getRetryType().equals(RetryTypeEnum.REDO_CHECK.getCode())) {
+                delivery.setStatus(DeliveryStatusEnum.ACKED.getCode());
+            }
+            deliveryMapper.updateById(delivery);
+
+            task.setStatus(RetryStatusEnum.SUCCESS.getCode());
+            retryTaskMapper.updateById(task);
+
+            return Result.success(task);
+        } catch (Exception e) {
+            task.setStatus(RetryStatusEnum.FAILED.getCode());
+            if (task.getRetryCount() >= task.getMaxRetry()) {
+                task.setNextRetryTime(null);
+            } else {
+                task.setNextRetryTime(LocalDateTime.now().plusMinutes(5));
+            }
+            retryTaskMapper.updateById(task);
+            throw e;
+        }
+    }
+
+    public Result<List<RetryTask>> getDeliveryRetryTasks(String deliveryNo) {
+        List<RetryTask> list = retryTaskMapper.selectList(
+                new LambdaQueryWrapper<RetryTask>()
+                        .eq(RetryTask::getDeliveryNo, deliveryNo)
+                        .orderByDesc(RetryTask::getCreatedTime)
+        );
+        return Result.success(list);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Result<RetryTask> cancelRetryTask(String taskNo, String operator) {
+        RetryTask task = retryTaskMapper.selectOne(
+                new LambdaQueryWrapper<RetryTask>().eq(RetryTask::getTaskNo, taskNo)
+        );
+        if (task == null) {
+            return Result.fail(ErrorCode.DELIVERY_NOT_EXIST.getCode(), "重试任务不存在");
+        }
+
+        if (task.getStatus().equals(RetryStatusEnum.RUNNING.getCode())) {
+            return Result.fail(ErrorCode.INVALID_STATUS_TRANSITION.getCode(), "执行中的任务无法取消");
+        }
+
+        task.setStatus(RetryStatusEnum.CANCELLED.getCode());
+        retryTaskMapper.updateById(task);
+        return Result.success(task);
+    }
 }

@@ -61,7 +61,11 @@ public class ExportController {
     private ResponseEntity<byte[]> buildResponse(byte[] data, String fileName) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+        try {
+            headers.setContentDispositionFormData("attachment", URLEncoder.encode(fileName, "UTF-8"));
+        } catch (java.io.UnsupportedEncodingException e) {
+            headers.setContentDispositionFormData("attachment", fileName);
+        }
         headers.setContentLength(data.length);
         return ResponseEntity.ok().headers(headers).body(data);
     }

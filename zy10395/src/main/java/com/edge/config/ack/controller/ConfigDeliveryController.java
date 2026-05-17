@@ -67,4 +67,38 @@ public class ConfigDeliveryController {
         log.info("reconciliation request, versionNo:{}", versionNo);
         return deliveryService.reconciliation(versionNo);
     }
+
+    @GetMapping("/retry/list")
+    public Result<IPage<RetryTask>> queryRetryTasks(
+            @RequestParam(required = false) String nodeCode,
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+            @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
+        log.info("query retry tasks request, nodeCode:{}, status:{}", nodeCode, status);
+        return deliveryService.queryRetryTasks(nodeCode, status, pageNum, pageSize);
+    }
+
+    @GetMapping("/retry/{taskNo}")
+    public Result<RetryTask> getRetryTaskDetail(@PathVariable String taskNo) {
+        log.info("get retry task detail request, taskNo:{}", taskNo);
+        return deliveryService.getRetryTaskDetail(taskNo);
+    }
+
+    @GetMapping("/{deliveryNo}/retry")
+    public Result<List<RetryTask>> getDeliveryRetryTasks(@PathVariable String deliveryNo) {
+        log.info("get delivery retry tasks request, deliveryNo:{}", deliveryNo);
+        return deliveryService.getDeliveryRetryTasks(deliveryNo);
+    }
+
+    @PostMapping("/retry/execute")
+    public Result<RetryTask> executeRetryTask(@Valid @RequestBody RetryTaskReq req) {
+        log.info("execute retry task request, taskNo:{}, operator:{}", req.getTaskNo(), req.getOperator());
+        return deliveryService.executeRetryTask(req.getTaskNo(), req.getOperator());
+    }
+
+    @PostMapping("/retry/cancel")
+    public Result<RetryTask> cancelRetryTask(@Valid @RequestBody RetryTaskReq req) {
+        log.info("cancel retry task request, taskNo:{}, operator:{}", req.getTaskNo(), req.getOperator());
+        return deliveryService.cancelRetryTask(req.getTaskNo(), req.getOperator());
+    }
 }

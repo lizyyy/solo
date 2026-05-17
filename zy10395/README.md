@@ -64,6 +64,15 @@
 | GET | /api/v1/delivery/{deliveryNo}/failures | 查询失败历史 |
 | GET | /api/v1/delivery/reconciliation/{versionNo} | 版本对账 |
 
+### 重试补发接口
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/v1/delivery/retry/list | 查询重试任务列表 |
+| GET | /api/v1/delivery/retry/{taskNo} | 查询重试任务详情 |
+| GET | /api/v1/delivery/{deliveryNo}/retry | 查询下发记录的所有重试任务 |
+| POST | /api/v1/delivery/retry/execute | 执行重试任务 |
+| POST | /api/v1/delivery/retry/cancel | 取消重试任务 |
+
 ### 导出接口
 - GET `/api/v1/export/delivery` - 导出下发记录
 - GET `/api/v1/export/receipt/{deliveryNo}` - 导出签收记录

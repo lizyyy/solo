@@ -310,6 +310,67 @@ H2控制台: http://localhost:8080/h2-console
 
 ---
 
+### 9. 重试补发接口
+
+#### 9.1 查询重试任务列表
+**GET** `/api/v1/delivery/retry/list`
+
+查询参数:
+- nodeCode: 节点编码(可选)
+- status: 任务状态(可选)
+- pageNum: 页码，默认 1
+- pageSize: 每页条数，默认 20
+
+任务状态(status):
+- 1: 待执行
+- 2: 执行中
+- 3: 成功
+- 4: 失败
+- 5: 已取消
+
+#### 9.2 查询重试任务详情
+**GET** `/api/v1/delivery/retry/{taskNo}`
+
+#### 9.3 查询下发记录的所有重试任务
+**GET** `/api/v1/delivery/{deliveryNo}/retry`
+
+#### 9.4 执行重试任务
+**POST** `/api/v1/delivery/retry/execute`
+
+请求体:
+```json
+{
+  "taskNo": "TSKxxx",
+  "operator": "admin"
+}
+```
+
+重试类型(retryType):
+- 1: 补发配置
+- 2: 重新校验
+
+错误码:
+- 10004: 重试任务不存在
+- 10006: 状态流转不合法(非待执行状态)
+- 10010: 重试次数已耗尽
+
+#### 9.5 取消重试任务
+**POST** `/api/v1/delivery/retry/cancel`
+
+请求体:
+```json
+{
+  "taskNo": "TSKxxx",
+  "operator": "admin"
+}
+```
+
+错误码:
+- 10004: 重试任务不存在
+- 10006: 状态流转不合法(执行中的任务无法取消)
+
+---
+
 ## 导出接口
 
 ### 导出下发记录
