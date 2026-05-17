@@ -1,0 +1,7 @@
+fieldName,type,enum,description
+order_id,string,,订单ID
+status,string,"PENDING,PAID,CANCELLED",订单状态：PENDING待支付，PAID已支付，CANCELLED已取消
+user_id,int,,用户编号
+amount,number,,订单总金额
+update_time,string,,更新时间
+pay_channel,int,"0,1",支付渠道：0-支付宝，1-微信

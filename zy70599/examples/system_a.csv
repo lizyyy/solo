@@ -1,0 +1,8 @@
+字段名,类型,枚举值,业务说明
+order_id,string,,订单唯一标识
+status,int,"0,1,2",订单状态：0-待支付，1-已支付，2-已取消
+user_id,string,,用户ID
+amount,number,,订单金额
+create_time,string,,创建时间
+,string,,这是一个坏行，缺少字段名
+pay_channel,int,"0,1,2",支付渠道

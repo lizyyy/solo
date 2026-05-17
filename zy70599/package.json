@@ -1,0 +1,30 @@
+{
+  "name": "dict-diff-cli",
+  "version": "1.0.0",
+  "description": "数据字典差异比较CLI工具",
+  "main": "dist/cli.js",
+  "bin": {
+    "dict-diff": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node --test dist/**/*.test.js",
+    "start": "node dist/cli.js"
+  },
+  "keywords": ["data-dictionary", "diff", "cli"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parse": "^5.5.0",
+    "chalk": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

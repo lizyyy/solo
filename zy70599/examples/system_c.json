@@ -1,0 +1,32 @@
+[
+  {
+    "fieldName": "order_id",
+    "type": "string",
+    "enumValues": [],
+    "description": "订单唯一标识"
+  },
+  {
+    "fieldName": "status",
+    "type": "int",
+    "enumValues": [0, 1, 2, 3],
+    "description": "订单状态：0待支付，1已支付，2已取消，3已退款"
+  },
+  {
+    "fieldName": "user_id",
+    "type": "string",
+    "enumValues": [],
+    "description": "用户ID"
+  },
+  {
+    "fieldName": "amount",
+    "type": "decimal",
+    "enumValues": [],
+    "description": "订单金额"
+  },
+  {
+    "name": "",
+    "type": "string",
+    "enumValues": [],
+    "description": "这是一个坏行"
+  }
+]

@@ -1,0 +1,448 @@
+{
+  "timestamp": "2026-05-17T04:09:11.394Z",
+  "sources": [
+    {
+      "systemName": "系统A",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70599/examples/system_a.csv",
+      "fieldCount": 6,
+      "errorCount": 1
+    },
+    {
+      "systemName": "系统B",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70599/examples/system_b.csv",
+      "fieldCount": 6,
+      "errorCount": 0
+    },
+    {
+      "systemName": "系统C",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70599/examples/system_c.json",
+      "fieldCount": 4,
+      "errorCount": 1
+    }
+  ],
+  "conflicts": [
+    {
+      "fieldName": "order_id",
+      "level": "info",
+      "type": "description_mismatch",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "order_id",
+            "type": "string",
+            "enumValues": [],
+            "description": "订单唯一标识"
+          }
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "order_id",
+            "type": "string",
+            "enumValues": [],
+            "description": "订单ID"
+          }
+        },
+        {
+          "systemName": "系统C",
+          "field": {
+            "fieldName": "order_id",
+            "type": "string",
+            "enumValues": [],
+            "description": "订单唯一标识"
+          }
+        }
+      ],
+      "details": "业务说明不一致: 系统A: \"订单唯一标识\"; 系统B: \"订单ID\"; 系统C: \"订单唯一标识\""
+    },
+    {
+      "fieldName": "status",
+      "level": "critical",
+      "type": "type_mismatch",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "status",
+            "type": "int",
+            "enumValues": [
+              "0",
+              "1",
+              "2"
+            ],
+            "description": "订单状态：0-待支付，1-已支付，2-已取消"
+          }
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "status",
+            "type": "string",
+            "enumValues": [
+              "PENDING",
+              "PAID",
+              "CANCELLED"
+            ],
+            "description": "订单状态：PENDING待支付，PAID已支付，CANCELLED已取消"
+          }
+        },
+        {
+          "systemName": "系统C",
+          "field": {
+            "fieldName": "status",
+            "type": "int",
+            "enumValues": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "description": "订单状态：0待支付，1已支付，2已取消，3已退款"
+          }
+        }
+      ],
+      "details": "类型不匹配: 系统A: int; 系统B: string; 系统C: int"
+    },
+    {
+      "fieldName": "status",
+      "level": "warning",
+      "type": "enum_mismatch",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "status",
+            "type": "int",
+            "enumValues": [
+              "0",
+              "1",
+              "2"
+            ],
+            "description": "订单状态：0-待支付，1-已支付，2-已取消"
+          }
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "status",
+            "type": "string",
+            "enumValues": [
+              "PENDING",
+              "PAID",
+              "CANCELLED"
+            ],
+            "description": "订单状态：PENDING待支付，PAID已支付，CANCELLED已取消"
+          }
+        },
+        {
+          "systemName": "系统C",
+          "field": {
+            "fieldName": "status",
+            "type": "int",
+            "enumValues": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "description": "订单状态：0待支付，1已支付，2已取消，3已退款"
+          }
+        }
+      ],
+      "details": "枚举值不匹配: 系统A: [0, 1, 2]; 系统B: [PENDING, PAID, CANCELLED]; 系统C: [0, 1, 2, 3]"
+    },
+    {
+      "fieldName": "status",
+      "level": "info",
+      "type": "description_mismatch",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "status",
+            "type": "int",
+            "enumValues": [
+              "0",
+              "1",
+              "2"
+            ],
+            "description": "订单状态：0-待支付，1-已支付，2-已取消"
+          }
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "status",
+            "type": "string",
+            "enumValues": [
+              "PENDING",
+              "PAID",
+              "CANCELLED"
+            ],
+            "description": "订单状态：PENDING待支付，PAID已支付，CANCELLED已取消"
+          }
+        },
+        {
+          "systemName": "系统C",
+          "field": {
+            "fieldName": "status",
+            "type": "int",
+            "enumValues": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "description": "订单状态：0待支付，1已支付，2已取消，3已退款"
+          }
+        }
+      ],
+      "details": "业务说明不一致: 系统A: \"订单状态：0-待支付，1-已支付，2-已取消\"; 系统B: \"订单状态：PENDING待支付，PAID已支付，CANCELLED已取消\"; 系统C: \"订单状态：0待支付，1已支付，2已取消，3已退款\""
+    },
+    {
+      "fieldName": "user_id",
+      "level": "critical",
+      "type": "type_mismatch",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "user_id",
+            "type": "string",
+            "enumValues": [],
+            "description": "用户ID"
+          }
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "user_id",
+            "type": "int",
+            "enumValues": [],
+            "description": "用户编号"
+          }
+        },
+        {
+          "systemName": "系统C",
+          "field": {
+            "fieldName": "user_id",
+            "type": "string",
+            "enumValues": [],
+            "description": "用户ID"
+          }
+        }
+      ],
+      "details": "类型不匹配: 系统A: string; 系统B: int; 系统C: string"
+    },
+    {
+      "fieldName": "user_id",
+      "level": "info",
+      "type": "description_mismatch",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "user_id",
+            "type": "string",
+            "enumValues": [],
+            "description": "用户ID"
+          }
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "user_id",
+            "type": "int",
+            "enumValues": [],
+            "description": "用户编号"
+          }
+        },
+        {
+          "systemName": "系统C",
+          "field": {
+            "fieldName": "user_id",
+            "type": "string",
+            "enumValues": [],
+            "description": "用户ID"
+          }
+        }
+      ],
+      "details": "业务说明不一致: 系统A: \"用户ID\"; 系统B: \"用户编号\"; 系统C: \"用户ID\""
+    },
+    {
+      "fieldName": "amount",
+      "level": "critical",
+      "type": "type_mismatch",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "amount",
+            "type": "number",
+            "enumValues": [],
+            "description": "订单金额"
+          }
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "amount",
+            "type": "number",
+            "enumValues": [],
+            "description": "订单总金额"
+          }
+        },
+        {
+          "systemName": "系统C",
+          "field": {
+            "fieldName": "amount",
+            "type": "decimal",
+            "enumValues": [],
+            "description": "订单金额"
+          }
+        }
+      ],
+      "details": "类型不匹配: 系统A: number; 系统B: number; 系统C: decimal"
+    },
+    {
+      "fieldName": "amount",
+      "level": "info",
+      "type": "description_mismatch",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "amount",
+            "type": "number",
+            "enumValues": [],
+            "description": "订单金额"
+          }
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "amount",
+            "type": "number",
+            "enumValues": [],
+            "description": "订单总金额"
+          }
+        },
+        {
+          "systemName": "系统C",
+          "field": {
+            "fieldName": "amount",
+            "type": "decimal",
+            "enumValues": [],
+            "description": "订单金额"
+          }
+        }
+      ],
+      "details": "业务说明不一致: 系统A: \"订单金额\"; 系统B: \"订单总金额\"; 系统C: \"订单金额\""
+    },
+    {
+      "fieldName": "create_time",
+      "level": "critical",
+      "type": "missing_field",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "create_time",
+            "type": "string",
+            "enumValues": [],
+            "description": "创建时间"
+          }
+        },
+        {
+          "systemName": "系统B"
+        },
+        {
+          "systemName": "系统C"
+        }
+      ],
+      "details": "以下系统缺少该字段: 系统B, 系统C"
+    },
+    {
+      "fieldName": "pay_channel",
+      "level": "warning",
+      "type": "missing_field",
+      "sources": [
+        {
+          "systemName": "系统A",
+          "field": {
+            "fieldName": "pay_channel",
+            "type": "int",
+            "enumValues": [
+              "0",
+              "1",
+              "2"
+            ],
+            "description": "支付渠道"
+          }
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "pay_channel",
+            "type": "int",
+            "enumValues": [
+              "0",
+              "1"
+            ],
+            "description": "支付渠道：0-支付宝，1-微信"
+          }
+        },
+        {
+          "systemName": "系统C"
+        }
+      ],
+      "details": "以下系统缺少该字段: 系统C"
+    },
+    {
+      "fieldName": "update_time",
+      "level": "critical",
+      "type": "missing_field",
+      "sources": [
+        {
+          "systemName": "系统A"
+        },
+        {
+          "systemName": "系统B",
+          "field": {
+            "fieldName": "update_time",
+            "type": "string",
+            "enumValues": [],
+            "description": "更新时间"
+          }
+        },
+        {
+          "systemName": "系统C"
+        }
+      ],
+      "details": "以下系统缺少该字段: 系统A, 系统C"
+    }
+  ],
+  "summary": {
+    "totalFields": 7,
+    "commonFields": 4,
+    "criticalConflicts": 5,
+    "warningConflicts": 2,
+    "infoConflicts": 4,
+    "parseErrors": 2
+  },
+  "parseErrors": [
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70599/examples/system_a.csv",
+      "lineNumber": 7,
+      "rawContent": "{\"字段名\":\"\",\"类型\":\"string\",\"枚举值\":\"\",\"业务说明\":\"这是一个坏行，缺少字段名\"}",
+      "reason": "字段名为空"
+    },
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70599/examples/system_c.json",
+      "lineNumber": 5,
+      "rawContent": "{\"name\":\"\",\"type\":\"string\",\"enumValues\":[],\"description\":\"这是一个坏行\"}",
+      "reason": "字段名为空"
+    }
+  ]
+}
