@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付清结算服务分账失败补偿登记系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-value { font-size: 28px; font-weight: bold; color: #667eea; }
+        .stat-label { font-size: 14px; color: #666; margin-top: 4px; }
+        .toolbar { background: white; padding: 16px; border-radius: 8px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .toolbar input, .toolbar select { padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 150px; }
+        .toolbar button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; }
+        .toolbar button:hover { background: #5a6fd6; }
+        .toolbar button.secondary { background: #6c757d; }
+        .toolbar button.secondary:hover { background: #5a6268; }
+        .toolbar button.success { background: #28a745; }
+        .toolbar button.success:hover { background: #218838; }
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; font-size: 13px; color: #666; }
+        tr:hover { background: #f8f9fa; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-PENDING { background: #fff3cd; color: #856404; }
+        .status-COMPENSATING { background: #cce5ff; color: #004085; }
+        .status-COMPENSATED { background: #d4edda; color: #155724; }
+        .status-MANUAL_REQUIRED { background: #f8d7da; color: #721c24; }
+        .status-CONFLICT { background: #f5c6cb; color: #721c24; }
+        .status-IMPORT_ERROR { background: #e2e3e5; color: #383d41; }
+        .amount { font-weight: 600; color: #e63946; }
+        .action-link { color: #667eea; cursor: pointer; text-decoration: none; margin-right: 12px; font-size: 13px; }
+        .action-link:hover { text-decoration: underline; }
+        .pagination { display: flex; justify-content: center; gap: 8px; padding: 20px; }
+        .pagination button { padding: 8px 14px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
+        .pagination button.active { background: #667eea; color: white; border-color: #667eea; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 12px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 18px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-body { padding: 24px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .detail-item { display: flex; flex-direction: column; }
+        .detail-label { font-size: 12px; color: #999; margin-bottom: 4px; }
+        .detail-value { font-size: 14px; font-weight: 500; }
+        .evidence-box { background: #f8f9fa; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+        .history-item { padding: 16px; border-left: 3px solid #667eea; margin-bottom: 12px; background: #f8f9fa; border-radius: 0 8px 8px 0; }
+        .history-time { font-size: 12px; color: #999; margin-bottom: 8px; }
+        .history-operation { font-weight: 600; margin-bottom: 4px; }
+        .history-remark { font-size: 13px; color: #666; }
+        .history-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; }
+        .tabs { display: flex; border-bottom: 1px solid #eee; margin-bottom: 20px; }
+        .tab { padding: 12px 24px; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; }
+        .tab.active { border-bottom-color: #667eea; color: #667eea; }
+        .loading { text-align: center; padding: 40px; color: #999; }
+        .error { background: #f8d7da; color: #721c24; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+        .empty { text-align: center; padding: 40px; color: #999; }
+        .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 13px; color: #666; margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 12px; }
+        .btn { padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; border: none; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .conflict-timeline { background: #fff5f5; padding: 16px; border-radius: 8px; border-left: 4px solid #e53e3e; }
+        .conflict-step { display: flex; gap: 12px; margin-bottom: 12px; }
+        .conflict-step:last-child { margin-bottom: 0; }
+        .conflict-dot { width: 12px; height: 12px; border-radius: 50%; background: #e53e3e; margin-top: 4px; flex-shrink: 0; }
+        .conflict-content h4 { font-size: 14px; margin-bottom: 4px; }
+        .conflict-content p { font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>支付清结算服务分账失败补偿登记系统</h1>
+            <p>防止重复点击、异步回调、人工补录导致旧证据被覆盖</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card"><div class="stat-value">-</div><div class="stat-label">待分账</div></div>
+            <div class="stat-card"><div class="stat-value">-</div><div class="stat-label">补偿中</div></div>
+            <div class="stat-card"><div class="stat-value">-</div><div class="stat-label">已补偿</div></div>
+            <div class="stat-card"><div class="stat-value">-</div><div class="stat-label">需人工</div></div>
+            <div class="stat-card"><div class="stat-value">-</div><div class="stat-label">冲突记录</div></div>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" id="searchTransaction" placeholder="搜索交易号...">
+            <input type="text" id="searchBatch" placeholder="搜索批次号...">
+            <select id="filterStatus">
+                <option value="">全部状态</option>
+                <option value="PENDING">待分账</option>
+                <option value="COMPENSATING">补偿中</option>
+                <option value="COMPENSATED">已补偿</option>
+                <option value="MANUAL_REQUIRED">需人工</option>
+                <option value="CONFLICT">冲突</option>
+                <option value="IMPORT_ERROR">导入失败</option>
+            </select>
+            <button onclick="searchRecords()">搜索</button>
+            <button class="success" onclick="showCreateModal()">新建登记</button>
+            <button class="secondary" onclick="exportRecords()">导出 CSV</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>交易号</th>
+                        <th>补偿批次</th>
+                        <th>分账方</th>
+                        <th>金额</th>
+                        <th>失败原因</th>
+                        <th>状态</th>
+                        <th>证据版本</th>
+                        <th>操作人</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsBody">
+                    <tr><td colspan="11" class="loading">加载中...</td></tr>
+                </tbody>
+            </table>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>记录详情</h2>
+                <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('detail')">基本信息</div>
+                    <div class="tab" onclick="switchTab('history')">历史记录</div>
+                </div>
+                <div id="tabDetail">
+                    <div class="detail-grid" id="detailGrid"></div>
+                    <div class="detail-item">
+                        <div class="detail-label">证据详情</div>
+                        <div class="evidence-box" id="evidenceBox"></div>
+                    </div>
+                </div>
+                <div id="tabHistory" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="showStatusModal()">变更状态</button>
+                <button class="btn btn-secondary" onclick="closeModal('detailModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>新建补偿登记</h2>
+                <button class="modal-close" onclick="closeModal('createModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>交易号 *</label>
+                        <input type="text" id="createTransactionNo" placeholder="TXN2026051800001">
+                    </div>
+                    <div class="form-group">
+                        <label>补偿批次 *</label>
+                        <input type="text" id="createBatchNo" placeholder="BATCH20260518001">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>分账方ID *</label>
+                        <input type="text" id="createRecipientId" placeholder="MERCH001">
+                    </div>
+                    <div class="form-group">
+                        <label>分账方名称</label>
+                        <input type="text" id="createRecipientName" placeholder="商户A">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>分账金额 *</label>
+                        <input type="number" step="0.01" id="createAmount" placeholder="1000.00">
+                    </div>
+                    <div class="form-group">
+                        <label>操作人</label>
+                        <input type="text" id="createOperator" placeholder="admin">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>失败原因</label>
+                    <textarea id="createFailReason" placeholder="描述分账失败的原因"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="createRemark" placeholder="备注信息"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitCreate()">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="statusModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>变更状态</h2>
+                <button class="modal-close" onclick="closeModal('statusModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>新状态 *</label>
+                    <select id="statusSelect">
+                        <option value="PENDING">待分账</option>
+                        <option value="COMPENSATING">补偿中</option>
+                        <option value="COMPENSATED">已补偿</option>
+                        <option value="MANUAL_REQUIRED">需人工</option>
+                        <option value="CONFLICT">冲突</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="statusOperator" placeholder="admin">
+                </div>
+                <div class="form-group">
+                    <label>变更原因/备注</label>
+                    <textarea id="statusRemark" placeholder="描述状态变更的原因"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('statusModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitStatusChange()">确认变更</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let pageSize = 10;
+        let currentRecordId = null;
+
+        const STATUS_MAP = {
+            'PENDING': '待分账',
+            'COMPENSATING': '补偿中',
+            'COMPENSATED': '已补偿',
+            'MANUAL_REQUIRED': '需人工',
+            'CONFLICT': '冲突',
+            'IMPORT_ERROR': '导入失败'
+        };
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                const stats = data.data || {};
+                const cards = document.querySelectorAll('.stat-card');
+                const statuses = ['PENDING', 'COMPENSATING', 'COMPENSATED', 'MANUAL_REQUIRED', 'CONFLICT'];
+                cards.forEach((card, i) => {
+                    const status = statuses[i];
+                    card.querySelector('.stat-value').textContent = (stats[status]?.count || 0);
+                });
+            } catch (e) {
+                console.error('获取统计失败:', e);
+            }
+        }
+
+        async function fetchRecords() {
+            const transactionNo = document.getElementById('searchTransaction').value;
+            const batchNo = document.getElementById('searchBatch').value;
+            const status = document.getElementById('filterStatus').value;
+
+            let url = `/api/records?page=${currentPage}&pageSize=${pageSize}`;
+            if (transactionNo) url += `&transactionNo=${encodeURIComponent(transactionNo)}`;
+            if (batchNo) url += `&batchNo=${encodeURIComponent(batchNo)}`;
+            if (status) url += `&status=${status}`;
+
+            try {
+                const res = await fetch(url);
+                if (res.status === 500) {
+                    const err = await res.json();
+                    document.getElementById('recordsBody').innerHTML = 
+                        `<tr><td colspan="11" class="error">${err.error || '错误'}: ${err.message || ''}<br>${err.hint || ''}</td></tr>`;
+                    return;
+                }
+                const data = await res.json();
+                renderRecords(data.data || []);
+                renderPagination(data.total || 0);
+            } catch (e) {
+                document.getElementById('recordsBody').innerHTML = 
+                    `<tr><td colspan="11" class="error">加载失败: ${e.message}</td></tr>`;
+            }
+        }
+
+        function renderRecords(records) {
+            const tbody = document.getElementById('recordsBody');
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="empty">暂无数据</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = records.map(r => `
+                <tr>
+                    <td>${r.id}</td>
+                    <td>${r.transaction_no}</td>
+                    <td>${r.batch_no}</td>
+                    <td>${r.recipient_name || r.recipient_id}</td>
+                    <td class="amount">¥${parseFloat(r.amount).toFixed(2)}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${r.fail_reason || '-'}</td>
+                    <td><span class="status-badge status-${r.status}">${STATUS_MAP[r.status] || r.status}</span></td>
+                    <td>v${r.evidence_version}</td>
+                    <td>${r.operator || '-'}</td>
+                    <td>${new Date(r.created_at).toLocaleString()}</td>
+                    <td>
+                        <span class="action-link" onclick="viewDetail(${r.id})">详情</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination(total) {
+            const totalPages = Math.ceil(total / pageSize);
+            const pagination = document.getElementById('pagination');
+            
+            let html = `<button onclick="goToPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>上一页</button>`;
+            
+            for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+                html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            
+            html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>下一页</button>`;
+            html += `<span style="margin-left: 12px; color: #999; font-size: 13px;">共 ${total} 条</span>`;
+            
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            if (page < 1) return;
+            currentPage = page;
+            fetchRecords();
+        }
+
+        function searchRecords() {
+            currentPage = 1;
+            fetchRecords();
+        }
+
+        async function viewDetail(id) {
+            currentRecordId = id;
+            try {
+                const [detailRes, historyRes] = await Promise.all([
+                    fetch(`/api/records/${id}`),
+                    fetch(`/api/records/${id}/history`)
+                ]);
+                const detail = await detailRes.json();
+                const history = await historyRes.json();
+                
+                renderDetail(detail.data);
+                renderHistory(history.data);
+                
+                document.getElementById('detailModal').classList.add('show');
+            } catch (e) {
+                alert('加载详情失败: ' + e.message);
+            }
+        }
+
+        function renderDetail(data) {
+            const grid = document.getElementById('detailGrid');
+            grid.innerHTML = `
+                <div class="detail-item"><div class="detail-label">ID</div><div class="detail-value">${data.id}</div></div>
+                <div class="detail-item"><div class="detail-label">状态</div><div class="detail-value"><span class="status-badge status-${data.status}">${data.status_name || data.status}</span></div></div>
+                <div class="detail-item"><div class="detail-label">交易号</div><div class="detail-value">${data.transaction_no}</div></div>
+                <div class="detail-item"><div class="detail-label">补偿批次</div><div class="detail-value">${data.batch_no}</div></div>
+                <div class="detail-item"><div class="detail-label">分账方</div><div class="detail-value">${data.recipient_name || data.recipient_id}</div></div>
+                <div class="detail-item"><div class="detail-label">分账金额</div><div class="detail-value amount">¥${parseFloat(data.amount).toFixed(2)}</div></div>
+                <div class="detail-item"><div class="detail-label">失败原因</div><div class="detail-value">${data.fail_reason || '-'}</div></div>
+                <div class="detail-item"><div class="detail-label">证据版本</div><div class="detail-value">v${data.evidence_version}</div></div>
+                <div class="detail-item"><div class="detail-label">操作人</div><div class="detail-value">${data.operator || '-'}</div></div>
+                <div class="detail-item"><div class="detail-label">创建时间</div><div class="detail-value">${new Date(data.created_at).toLocaleString()}</div></div>
+            `;
+            
+            const evidenceBox = document.getElementById('evidenceBox');
+            if (data.evidence) {
+                evidenceBox.textContent = typeof data.evidence === 'string' ? data.evidence : JSON.stringify(data.evidence, null, 2);
+            } else {
+                evidenceBox.textContent = '无证据数据';
+            }
+
+            if (data.status === 'CONFLICT' && data.evidence) {
+                const ev = typeof data.evidence === 'string' ? JSON.parse(data.evidence) : data.evidence;
+                if (ev.timeoutTime) {
+                    const conflictHtml = `
+                        <div style="margin-top: 16px;" class="conflict-timeline">
+                            <h4 style="margin-bottom: 12px; color: #c53030;">冲突处理全过程</h4>
+                            <div class="conflict-step">
+                                <div class="conflict-dot"></div>
+                                <div class="conflict-content">
+                                    <h4>上游超时</h4>
+                                    <p>${ev.timeoutTime} - 触发补偿登记</p>
+                                </div>
+                            </div>
+                            ${ev.callbackSuccessTime ? `
+                            <div class="conflict-step">
+                                <div class="conflict-dot"></div>
+                                <div class="conflict-content">
+                                    <h4>异步成功回调</h4>
+                                    <p>${ev.callbackSuccessTime} - 上游实际已成功</p>
+                                </div>
+                            </div>` : ''}
+                            ${ev.duplicateCompensationTime ? `
+                            <div class="conflict-step">
+                                <div class="conflict-dot"></div>
+                                <div class="conflict-content">
+                                    <h4>重复补偿</h4>
+                                    <p>${ev.duplicateCompensationTime} - 系统重复执行补偿</p>
+                                </div>
+                            </div>` : ''}
+                            ${ev.detectedTime ? `
+                            <div class="conflict-step">
+                                <div class="conflict-dot"></div>
+                                <div class="conflict-content">
+                                    <h4>对账发现冲突</h4>
+                                    <p>${ev.detectedTime} - 发现重复补偿问题</p>
+                                </div>
+                            </div>` : ''}
+                            ${ev.handledTime ? `
+                            <div class="conflict-step">
+                                <div class="conflict-dot" style="background: #38a169;"></div>
+                                <div class="conflict-content">
+                                    <h4>处理完成</h4>
+                                    <p>${ev.handledTime} - ${ev.handler || '操作员'} - ${ev.handlingResult || '已处理'}</p>
+                                </div>
+                            </div>` : ''}
+                        </div>
+                    `;
+                    grid.innerHTML += conflictHtml;
+                }
+            }
+        }
+
+        function renderHistory(history) {
+            const container = document.getElementById('tabHistory');
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty">暂无历史记录</div>';
+                return;
+            }
+            container.innerHTML = history.map(h => `
+                <div class="history-item">
+                    <div class="history-time">${new Date(h.created_at).toLocaleString()}</div>
+                    <div class="history-operation">
+                        ${h.operation_type === 'INIT' ? '初始化' : 
+                          h.operation_type === 'CREATE' ? '新建' : 
+                          h.operation_type === 'STATUS_CHANGE' ? '状态变更' : 
+                          h.operation_type === 'CONFLICT_DETECT' ? '冲突检测' : 
+                          h.operation_type === 'IMPORT' ? '导入' : h.operation_type}
+                        ${h.old_status ? `<span class="history-status status-${h.old_status}">${h.old_status_name}</span> →` : ''}
+                        <span class="history-status status-${h.new_status}">${h.new_status_name}</span>
+                        <span style="color: #999; font-size: 12px; margin-left: 8px;">v${h.evidence_version || 1}</span>
+                        <span style="color: #999; font-size: 12px; margin-left: 8px;">来源: ${h.source || '-'}</span>
+                    </div>
+                    <div class="history-remark">${h.operation_remark || '-'}</div>
+                    ${h.operator ? `<div style="font-size: 12px; color: #999; margin-top: 4px;">操作人: ${h.operator}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tabDetail').style.display = tab === 'detail' ? 'block' : 'none';
+            document.getElementById('tabHistory').style.display = tab === 'history' ? 'block' : 'none';
+        }
+
+        function showCreateModal() {
+            document.getElementById('createModal').classList.add('show');
+        }
+
+        async function submitCreate() {
+            const data = {
+                transaction_no: document.getElementById('createTransactionNo').value,
+                batch_no: document.getElementById('createBatchNo').value,
+                recipient_id: document.getElementById('createRecipientId').value,
+                recipient_name: document.getElementById('createRecipientName').value,
+                amount: parseFloat(document.getElementById('createAmount').value),
+                fail_reason: document.getElementById('createFailReason').value,
+                operator: document.getElementById('createOperator').value,
+                remark: document.getElementById('createRemark').value
+            };
+
+            try {
+                const res = await fetch('/api/records', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (res.status === 409) {
+                    alert('创建失败: ' + (result.message || '该记录已存在，防止重复登记'));
+                    return;
+                }
+                if (!res.ok) throw new Error(result.error || '创建失败');
+                
+                alert('创建成功！');
+                closeModal('createModal');
+                fetchRecords();
+                fetchStats();
+            } catch (e) {
+                alert('创建失败: ' + e.message);
+            }
+        }
+
+        function showStatusModal() {
+            document.getElementById('statusModal').classList.add('show');
+        }
+
+        async function submitStatusChange() {
+            const status = document.getElementById('statusSelect').value;
+            const operator = document.getElementById('statusOperator').value;
+            const remark = document.getElementById('statusRemark').value;
+
+            try {
+                const res = await fetch(`/api/records/${currentRecordId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, operator, remark })
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || '更新失败');
+                }
+                
+                alert('状态更新成功！');
+                closeModal('statusModal');
+                closeModal('detailModal');
+                fetchRecords();
+                fetchStats();
+            } catch (e) {
+                alert('更新失败: ' + e.message);
+            }
+        }
+
+        function exportRecords() {
+            window.location.href = '/api/export?format=csv';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStats();
+            fetchRecords();
+        });
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
