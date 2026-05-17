@@ -1,0 +1,7 @@
+{"service": "user-service", "timestamp": "2024-01-15T10:30:00", "user_id": 12345, "level": "info", "message": "login success"}
+{"service": "user-service", "timestamp": "2024-01-15T10:30:01", "user_id": "67890", "level": "warn", "message": "invalid token"}
+{"service": "order-service", "timestamp": "2024-01-15T10:30:02", "order_id": 99999, "user_id": 12345, "amount": 99.99}
+{"service": "order-service", "timestamp": "2024-01-15T10:30:03", "order_id": "ORD-10000", "user_id": 67890, "amount": "199.99"}
+{"service": "payment-service", "timestamp": "2024-01-15T10:30:04", "payment_id": "PAY-abc", "success": true, "user_id": 12345}
+service=payment-service timestamp=2024-01-15T10:30:05 payment_id=PAY-def success=false user_id=67890
+这是一条坏日志，无法解析

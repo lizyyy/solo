@@ -1,0 +1,238 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-17T22:16:18.696977",
+    "total_records": 7,
+    "total_fields": 9,
+    "services": [
+      "user-service",
+      "order-service",
+      "payment-service"
+    ],
+    "conflicting_fields_count": 4,
+    "bad_records_count": 1
+  },
+  "conflicting_fields": [
+    "user_id",
+    "order_id",
+    "amount",
+    "success"
+  ],
+  "fields": {
+    "service": {
+      "has_conflict": false,
+      "services": [
+        "user-service",
+        "order-service",
+        "payment-service"
+      ],
+      "type_summary": {
+        "string": [
+          "user-service",
+          "order-service",
+          "payment-service"
+        ]
+      },
+      "samples": {
+        "user-service": {
+          "type": "string",
+          "sample_value": "user-service",
+          "first_seen_line": 1
+        },
+        "order-service": {
+          "type": "string",
+          "sample_value": "order-service",
+          "first_seen_line": 3
+        },
+        "payment-service": {
+          "type": "string",
+          "sample_value": "payment-service",
+          "first_seen_line": 5
+        }
+      }
+    },
+    "timestamp": {
+      "has_conflict": false,
+      "services": [
+        "user-service",
+        "order-service",
+        "payment-service"
+      ],
+      "type_summary": {
+        "timestamp": [
+          "user-service",
+          "order-service",
+          "payment-service"
+        ]
+      },
+      "samples": {
+        "user-service": {
+          "type": "timestamp",
+          "sample_value": "2024-01-15T10:30:00",
+          "first_seen_line": 1
+        },
+        "order-service": {
+          "type": "timestamp",
+          "sample_value": "2024-01-15T10:30:02",
+          "first_seen_line": 3
+        },
+        "payment-service": {
+          "type": "timestamp",
+          "sample_value": "2024-01-15T10:30:04",
+          "first_seen_line": 5
+        }
+      }
+    },
+    "user_id": {
+      "has_conflict": true,
+      "services": [
+        "user-service",
+        "order-service",
+        "payment-service"
+      ],
+      "type_summary": {
+        "integer": [
+          "user-service",
+          "order-service",
+          "payment-service"
+        ],
+        "string": [
+          "user-service"
+        ]
+      },
+      "samples": {
+        "user-service": {
+          "type": "integer",
+          "sample_value": "12345",
+          "first_seen_line": 1
+        },
+        "order-service": {
+          "type": "integer",
+          "sample_value": "12345",
+          "first_seen_line": 3
+        },
+        "payment-service": {
+          "type": "integer",
+          "sample_value": "12345",
+          "first_seen_line": 5
+        }
+      }
+    },
+    "level": {
+      "has_conflict": false,
+      "services": [
+        "user-service"
+      ],
+      "type_summary": {
+        "string": [
+          "user-service"
+        ]
+      },
+      "samples": {
+        "user-service": {
+          "type": "string",
+          "sample_value": "info",
+          "first_seen_line": 1
+        }
+      }
+    },
+    "message": {
+      "has_conflict": false,
+      "services": [
+        "user-service"
+      ],
+      "type_summary": {
+        "string": [
+          "user-service"
+        ]
+      },
+      "samples": {
+        "user-service": {
+          "type": "string",
+          "sample_value": "login success",
+          "first_seen_line": 1
+        }
+      }
+    },
+    "order_id": {
+      "has_conflict": true,
+      "services": [
+        "order-service"
+      ],
+      "type_summary": {
+        "integer": [
+          "order-service"
+        ],
+        "string": [
+          "order-service"
+        ]
+      },
+      "samples": {
+        "order-service": {
+          "type": "integer",
+          "sample_value": "99999",
+          "first_seen_line": 3
+        }
+      }
+    },
+    "amount": {
+      "has_conflict": true,
+      "services": [
+        "order-service"
+      ],
+      "type_summary": {
+        "float": [
+          "order-service"
+        ],
+        "string": [
+          "order-service"
+        ]
+      },
+      "samples": {
+        "order-service": {
+          "type": "float",
+          "sample_value": "99.99",
+          "first_seen_line": 3
+        }
+      }
+    },
+    "payment_id": {
+      "has_conflict": false,
+      "services": [
+        "payment-service"
+      ],
+      "type_summary": {
+        "string": [
+          "payment-service"
+        ]
+      },
+      "samples": {
+        "payment-service": {
+          "type": "string",
+          "sample_value": "PAY-abc",
+          "first_seen_line": 5
+        }
+      }
+    },
+    "success": {
+      "has_conflict": true,
+      "services": [
+        "payment-service"
+      ],
+      "type_summary": {
+        "boolean": [
+          "payment-service"
+        ],
+        "string": [
+          "payment-service"
+        ]
+      },
+      "samples": {
+        "payment-service": {
+          "type": "boolean",
+          "sample_value": "True",
+          "first_seen_line": 5
+        }
+      }
+    }
+  }
+}
