@@ -209,6 +209,7 @@ class ManualCorrectionRequest(BaseModel):
     new_value: str
     reason: str
     handler: str
+    notes: Optional[str] = None
 
 
 class RollbackRequest(BaseModel):

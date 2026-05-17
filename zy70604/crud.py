@@ -6,6 +6,12 @@ import schemas
 import json
 
 
+def json_serializer(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
+
 def log_operation(db: Session, operation_type: str, target_type: str = None,
                   target_id: int = None, original_input: dict = None,
                   handler: str = None, conclusion: str = None,
@@ -14,7 +20,7 @@ def log_operation(db: Session, operation_type: str, target_type: str = None,
         operation_type=operation_type,
         target_type=target_type,
         target_id=target_id,
-        original_input=json.dumps(original_input, ensure_ascii=False) if original_input else None,
+        original_input=json.dumps(original_input, ensure_ascii=False, default=json_serializer) if original_input else None,
         handler=handler,
         conclusion=conclusion,
         notes=notes,
@@ -441,10 +447,30 @@ def schedule_makeup(db: Session, original_booking_id: int, new_booking: schemas.
     if original_booking.status != models.BookingStatus.LEAVE_APPROVED:
         raise ValueError("只有已批准的请假可以安排补课")
     
-    new_booking.is_makeup = True
-    new_booking.makeup_for_booking_id = original_booking_id
+    booking_data = new_booking.dict()
+    booking_data["is_makeup"] = True
+    booking_data["makeup_for_booking_id"] = original_booking_id
     
-    db_new_booking = create_booking(db, new_booking)
+    member_card = get_member_card(db, new_booking.member_card_id)
+    course_package = get_course_package(db, new_booking.course_package_id)
+    
+    if course_package.member_card_id != new_booking.member_card_id:
+        raise ValueError("课程包不属于该会员")
+    
+    if course_package.remaining_hours < new_booking.hours:
+        raise ValueError("课程包剩余课时不足")
+    
+    if check_time_conflict(db, new_booking.main_coach_id, new_booking.booking_date,
+                          new_booking.start_time, new_booking.end_time):
+        raise ValueError("该教练此时间段已有预约")
+    
+    db_new_booking = models.Booking(
+        **booking_data,
+        status=models.BookingStatus.PENDING
+    )
+    db.add(db_new_booking)
+    db.commit()
+    db.refresh(db_new_booking)
     
     course_package = original_booking.course_package
     member_card = original_booking.member_card

@@ -78,8 +78,9 @@ class Coach(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    bookings_as_main = relationship("Booking", back_populates="main_coach")
-    substitute_requests = relationship("SubstituteRecord", back_populates="substitute_coach")
+    bookings_as_main = relationship("Booking", back_populates="main_coach", foreign_keys="Booking.main_coach_id")
+    substitute_requests_as_substitute = relationship("SubstituteRecord", back_populates="substitute_coach", foreign_keys="SubstituteRecord.substitute_coach_id")
+    substitute_requests_as_original = relationship("SubstituteRecord", back_populates="original_coach", foreign_keys="SubstituteRecord.original_coach_id")
 
 
 class Booking(Base):
@@ -142,7 +143,8 @@ class SubstituteRecord(Base):
     rejection_reason = Column(Text)
 
     booking = relationship("Booking", back_populates="substitute_records")
-    substitute_coach = relationship("Coach", back_populates="substitute_requests", foreign_keys=[substitute_coach_id])
+    substitute_coach = relationship("Coach", back_populates="substitute_requests_as_substitute", foreign_keys=[substitute_coach_id])
+    original_coach = relationship("Coach", back_populates="substitute_requests_as_original", foreign_keys=[original_coach_id])
 
 
 class ConsumptionRecord(Base):
