@@ -1,0 +1,279 @@
+{
+  "scanTime": "2026-05-17T15:28:23.075Z",
+  "scannedDir": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs",
+  "totalFiles": 2,
+  "totalHeadings": 14,
+  "totalLinks": 6,
+  "duplicateTitles": [
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+      "title": "简介",
+      "anchor": "简介",
+      "occurrences": [
+        {
+          "line": 3,
+          "raw": "## 简介"
+        },
+        {
+          "line": 15,
+          "raw": "## 简介"
+        }
+      ]
+    }
+  ],
+  "brokenLinks": [
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+      "line": 31,
+      "text": "查看第二章",
+      "target": "#第二章-进阶教程",
+      "reason": "锚点不存在: #第二章-进阶教程",
+      "raw": "- [查看第二章](#第二章-进阶教程) - 这个锚点不存在"
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+      "line": 32,
+      "text": "常见问题",
+      "target": "faq.md",
+      "reason": "目标文件不存在: faq.md",
+      "raw": "- [常见问题](faq.md) - 这个文件不存在"
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+      "line": 23,
+      "text": "不存在的章节",
+      "target": "chapter1.md#不存在",
+      "reason": "文件存在但锚点不存在: #不存在",
+      "raw": "- [不存在的章节](chapter1.md#不存在) - 跨文件无效锚点"
+    }
+  ],
+  "invalidHeadings": [
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+      "line": 1,
+      "level": 2,
+      "expectedLevel": 1,
+      "text": "第二章 进阶教程",
+      "raw": "## 第二章 进阶教程",
+      "reason": "文档第一个标题应为 H1，但实际是 H2"
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+      "line": 11,
+      "level": 5,
+      "expectedLevel": 4,
+      "text": "深度配置",
+      "raw": "##### 深度配置",
+      "reason": "标题层级跳跃: 从 H3 跳到 H5"
+    }
+  ],
+  "fileAnalyses": [
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+      "headings": [
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 1,
+          "level": 1,
+          "text": "第一章 入门指南",
+          "anchor": "第一章-入门指南",
+          "raw": "# 第一章 入门指南"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 3,
+          "level": 2,
+          "text": "简介",
+          "anchor": "简介",
+          "raw": "## 简介"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 7,
+          "level": 2,
+          "text": "安装步骤",
+          "anchor": "安装步骤",
+          "raw": "## 安装步骤"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 15,
+          "level": 2,
+          "text": "简介",
+          "anchor": "简介",
+          "raw": "## 简介"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 19,
+          "level": 2,
+          "text": "使用方法",
+          "anchor": "使用方法",
+          "raw": "## 使用方法"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 21,
+          "level": 3,
+          "text": "基本操作",
+          "anchor": "基本操作",
+          "raw": "### 基本操作"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 25,
+          "level": 3,
+          "text": "高级功能",
+          "anchor": "高级功能",
+          "raw": "### 高级功能"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 29,
+          "level": 2,
+          "text": "相关链接",
+          "anchor": "相关链接",
+          "raw": "## 相关链接"
+        }
+      ],
+      "links": [
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 31,
+          "text": "查看第二章",
+          "target": "#第二章-进阶教程",
+          "raw": "- [查看第二章](#第二章-进阶教程) - 这个锚点不存在",
+          "isExternal": false,
+          "isAnchor": true,
+          "isInternalFile": false
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 32,
+          "text": "常见问题",
+          "target": "faq.md",
+          "raw": "- [常见问题](faq.md) - 这个文件不存在",
+          "isExternal": false,
+          "isAnchor": false,
+          "isInternalFile": true
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter1.md",
+          "line": 33,
+          "text": "安装步骤",
+          "target": "#安装步骤",
+          "raw": "- [安装步骤](#安装步骤) - 这个锚点是有效的",
+          "isExternal": false,
+          "isAnchor": true,
+          "isInternalFile": false
+        }
+      ],
+      "hierarchyIssues": []
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+      "headings": [
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 1,
+          "level": 2,
+          "text": "第二章 进阶教程",
+          "anchor": "第二章-进阶教程",
+          "raw": "## 第二章 进阶教程"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 3,
+          "level": 3,
+          "text": "快速开始",
+          "anchor": "快速开始",
+          "raw": "### 快速开始"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 7,
+          "level": 3,
+          "text": "详细配置",
+          "anchor": "详细配置",
+          "raw": "### 详细配置"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 11,
+          "level": 5,
+          "text": "深度配置",
+          "anchor": "深度配置",
+          "raw": "##### 深度配置"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 15,
+          "level": 4,
+          "text": "中级配置",
+          "anchor": "中级配置",
+          "raw": "#### 中级配置"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 19,
+          "level": 2,
+          "text": "参考资料",
+          "anchor": "参考资料",
+          "raw": "## 参考资料"
+        }
+      ],
+      "links": [
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 21,
+          "text": "返回第一章",
+          "target": "chapter1.md",
+          "raw": "- [返回第一章](chapter1.md) - 有效链接",
+          "isExternal": false,
+          "isAnchor": false,
+          "isInternalFile": true
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 22,
+          "text": "安装步骤",
+          "target": "chapter1.md#安装步骤",
+          "raw": "- [安装步骤](chapter1.md#安装步骤) - 跨文件有效锚点",
+          "isExternal": false,
+          "isAnchor": false,
+          "isInternalFile": true
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 23,
+          "text": "不存在的章节",
+          "target": "chapter1.md#不存在",
+          "raw": "- [不存在的章节](chapter1.md#不存在) - 跨文件无效锚点",
+          "isExternal": false,
+          "isAnchor": false,
+          "isInternalFile": true
+        }
+      ],
+      "hierarchyIssues": [
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 1,
+          "level": 2,
+          "expectedLevel": 1,
+          "text": "第二章 进阶教程",
+          "raw": "## 第二章 进阶教程",
+          "reason": "文档第一个标题应为 H1，但实际是 H2"
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10556/test/docs/chapter2.md",
+          "line": 11,
+          "level": 5,
+          "expectedLevel": 4,
+          "text": "深度配置",
+          "raw": "##### 深度配置",
+          "reason": "标题层级跳跃: 从 H3 跳到 H5"
+        }
+      ]
+    }
+  ]
+}
