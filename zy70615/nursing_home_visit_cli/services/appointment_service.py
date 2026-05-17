@@ -164,7 +164,8 @@ class AppointmentService:
         if room:
             capacity_result = self.validation.validate_room_capacity(
                 room, len(appointment.visitor_ids),
-                current_appointments, new_start, new_end
+                current_appointments, new_start, new_end,
+                exclude_appointment_id=appointment_id
             )
             results.append(capacity_result)
             if not capacity_result.is_valid:

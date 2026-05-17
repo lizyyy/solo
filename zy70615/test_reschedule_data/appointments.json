@@ -1,0 +1,47 @@
+{
+  "APT2BA30644": {
+    "id": "APT2BA30644",
+    "created_at": "2026-05-17T19:43:39.743590",
+    "updated_at": "2026-05-17T19:43:39.744254",
+    "elder_id": "E001",
+    "visitor_ids": [
+      "V001"
+    ],
+    "room_number": "101",
+    "scheduled_start": "2026-05-18T09:30:00",
+    "scheduled_end": "2026-05-18T10:30:00",
+    "status": "rescheduled",
+    "health_declaration_ids": [],
+    "change_history": [
+      {
+        "changed_at": "2026-05-17T19:43:39.743606",
+        "changed_by": "护士A",
+        "old_status": null,
+        "new_status": "pending",
+        "old_time": null,
+        "new_time": null,
+        "reason": "创建预约"
+      },
+      {
+        "changed_at": "2026-05-17T19:43:39.743907",
+        "changed_by": "护士A",
+        "old_status": "pending",
+        "new_status": "confirmed",
+        "old_time": null,
+        "new_time": null,
+        "reason": null
+      },
+      {
+        "changed_at": "2026-05-17T19:43:39.744248",
+        "changed_by": "护士A",
+        "old_status": "confirmed",
+        "new_status": "rescheduled",
+        "old_time": "2026-05-18T09:00:00",
+        "new_time": "2026-05-18T09:30:00",
+        "reason": "家属临时改时间"
+      }
+    ],
+    "notes": null,
+    "operator": "护士A"
+  }
+}

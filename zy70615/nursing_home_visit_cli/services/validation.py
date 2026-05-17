@@ -19,10 +19,13 @@ class ValidationService:
         new_visitor_count: int,
         current_appointments: List[Appointment],
         scheduled_start: datetime,
-        scheduled_end: datetime
+        scheduled_end: datetime,
+        exclude_appointment_id: Optional[str] = None
     ) -> ValidationResult:
         overlapping_visitors = 0
         for apt in current_appointments:
+            if exclude_appointment_id and apt.id == exclude_appointment_id:
+                continue
             if apt.room_number != room.room_number:
                 continue
             if apt.status in [AppointmentStatus.CANCELLED, AppointmentStatus.REJECTED, AppointmentStatus.COMPLETED]:

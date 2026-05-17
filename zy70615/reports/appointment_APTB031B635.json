@@ -1,0 +1,65 @@
+{
+  "report_type": "appointment_detail",
+  "generated_at": "2026-05-17T19:44:07.134151",
+  "appointment": {
+    "id": "APTB031B635",
+    "elder_id": "E001",
+    "visitor_ids": [
+      "V001"
+    ],
+    "room_number": "101",
+    "scheduled_start": "2026-05-19T09:30:00",
+    "scheduled_end": "2026-05-19T10:30:00",
+    "status": "rescheduled",
+    "operator": "system",
+    "notes": "",
+    "created_at": "2026-05-17T19:43:55.862681"
+  },
+  "elder": {
+    "id": "E001",
+    "name": "张三",
+    "id_card": "110101194001011234",
+    "room_number": "101",
+    "bed_number": "A",
+    "health_status": "良好"
+  },
+  "visitors": [
+    {
+      "id": "V001",
+      "name": "张明",
+      "id_card": "110101196501013456",
+      "phone": "13800138001",
+      "relation": "儿子"
+    }
+  ],
+  "health_declarations": [],
+  "change_history": [
+    {
+      "changed_at": "2026-05-17T19:43:55.862694",
+      "changed_by": "system",
+      "old_status": null,
+      "new_status": "pending",
+      "old_time": null,
+      "new_time": null,
+      "reason": "创建预约"
+    },
+    {
+      "changed_at": "2026-05-17T19:44:06.534517",
+      "changed_by": "system",
+      "old_status": "pending",
+      "new_status": "confirmed",
+      "old_time": null,
+      "new_time": null,
+      "reason": "确认预约"
+    },
+    {
+      "changed_at": "2026-05-17T19:44:06.863037",
+      "changed_by": "system",
+      "old_status": "confirmed",
+      "new_status": "rescheduled",
+      "old_time": "2026-05-19T09:00:00",
+      "new_time": "2026-05-19T09:30:00",
+      "reason": "家属临时改时间"
+    }
+  ]
+}
