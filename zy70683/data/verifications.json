@@ -1,0 +1,26 @@
+{
+  "08d0e39c-b8f0-4a68-8730-7145e38b648f": {
+    "record_id": "08d0e39c-b8f0-4a68-8730-7145e38b648f",
+    "voucher_code": "VC20260518000004",
+    "verification_time": "2026-05-18T06:57:01.307900",
+    "status": "冲突",
+    "operator": "行政测试员",
+    "notes": "冲突：会议已取消但餐券已被使用"
+  },
+  "4a2adfd1-7f4c-4848-92fd-565fca2d7902": {
+    "record_id": "4a2adfd1-7f4c-4848-92fd-565fca2d7902",
+    "voucher_code": "VC20260518000005",
+    "verification_time": "2026-05-18T06:57:01.308963",
+    "status": "无需核销",
+    "operator": "验收员",
+    "notes": "状态正常，无需核销"
+  },
+  "ff1abee4-44d3-4a6e-8043-79a8017e65a5": {
+    "record_id": "ff1abee4-44d3-4a6e-8043-79a8017e65a5",
+    "voucher_code": "VC20260518000006",
+    "verification_time": "2026-05-18T06:57:01.310611",
+    "status": "待核销",
+    "operator": "验收员",
+    "notes": "会议已取消：验收测试：会议临时取消"
+  }
+}
