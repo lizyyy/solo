@@ -1,0 +1,17 @@
+{
+  "name": "sms-unsubscribe-api",
+  "version": "1.0.0",
+  "description": "批量短信退订API系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "csv-writer": "^1.6.0",
+    "moment": "^2.29.4"
+  }
+}
