@@ -1,0 +1,138 @@
+{
+  "summary": {
+    "pass": false,
+    "timestamp": "2026-05-17T16:20:46.911Z",
+    "rulesFile": "./demo/rules.json",
+    "samplesDir": "./demo/samples"
+  },
+  "matches": [
+    {
+      "sample": {
+        "id": "test_samples.txt:1",
+        "file": "test_samples.txt",
+        "line": 1,
+        "content": "用户邮箱: test@example.com 请查收",
+        "raw": "用户邮箱: test@example.com 请查收"
+      },
+      "matchedRules": [
+        {
+          "ruleId": "email_rule",
+          "ruleName": "邮箱地址匹配",
+          "category": "contact",
+          "matches": [
+            {
+              "text": "test@example.com",
+              "index": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample": {
+        "id": "test_samples.txt:2",
+        "file": "test_samples.txt",
+        "line": 2,
+        "content": "联系电话: 13812345678 随时拨打",
+        "raw": "联系电话: 13812345678 随时拨打"
+      },
+      "matchedRules": [
+        {
+          "ruleId": "phone_rule",
+          "ruleName": "手机号码匹配",
+          "category": "contact",
+          "matches": [
+            {
+              "text": "13812345678",
+              "index": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample": {
+        "id": "test_samples.txt:3",
+        "file": "test_samples.txt",
+        "line": 3,
+        "content": "访问官网: https://www.example.com 获取更多",
+        "raw": "访问官网: https://www.example.com 获取更多"
+      },
+      "matchedRules": [
+        {
+          "ruleId": "url_rule",
+          "ruleName": "URL链接匹配",
+          "category": "web",
+          "matches": [
+            {
+              "text": "https://www.example.com",
+              "index": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample": {
+        "id": "test_samples.txt:5",
+        "file": "test_samples.txt",
+        "line": 5,
+        "content": "混合内容: 请发送到 admin@test.org 或拨打15987654321",
+        "raw": "混合内容: 请发送到 admin@test.org 或拨打15987654321"
+      },
+      "matchedRules": [
+        {
+          "ruleId": "email_rule",
+          "ruleName": "邮箱地址匹配",
+          "category": "contact",
+          "matches": [
+            {
+              "text": "admin@test.org",
+              "index": 11
+            }
+          ]
+        },
+        {
+          "ruleId": "phone_rule",
+          "ruleName": "手机号码匹配",
+          "category": "contact",
+          "matches": [
+            {
+              "text": "15987654321",
+              "index": 29
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "differences": [],
+  "falsePositives": [],
+  "falseNegatives": [
+    {
+      "sampleId": "test_samples.txt:8",
+      "expectedRules": [
+        "email_rule"
+      ],
+      "reason": "预期命中但未命中任何规则",
+      "sampleContent": "边界测试: x@y.z 最短邮箱格式"
+    }
+  ],
+  "errors": [],
+  "statistics": {
+    "totalSamples": 9,
+    "totalRules": 3,
+    "matchedSamples": 4,
+    "matchRate": "44.44%",
+    "falsePositives": 0,
+    "falseNegatives": 1,
+    "differences": 0,
+    "errors": 0,
+    "accuracy": "88.89%",
+    "ruleHitCount": {
+      "email_rule": 2,
+      "phone_rule": 2,
+      "url_rule": 1
+    }
+  }
+}

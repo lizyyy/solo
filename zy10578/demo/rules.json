@@ -1,0 +1,23 @@
+[
+  {
+    "id": "email_rule",
+    "name": "邮箱地址匹配",
+    "pattern": "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}",
+    "flags": "g",
+    "category": "contact"
+  },
+  {
+    "id": "phone_rule",
+    "name": "手机号码匹配",
+    "pattern": "1[3-9]\\d{9}",
+    "flags": "g",
+    "category": "contact"
+  },
+  {
+    "id": "url_rule",
+    "name": "URL链接匹配",
+    "pattern": "https?://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}[^\\s]*",
+    "flags": "g",
+    "category": "web"
+  }
+]

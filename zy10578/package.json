@@ -1,0 +1,24 @@
+{
+  "name": "regex-regression-cli",
+  "version": "1.0.0",
+  "description": "正则规则回归测试CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "regex-regress": "./bin/regex-regress.js"
+  },
+  "scripts": {
+    "test": "node bin/regex-regress.js self-test",
+    "lint": "node --check src/**/*.js"
+  },
+  "keywords": ["regex", "regression", "testing", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "cli-table3": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

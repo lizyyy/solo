@@ -1,0 +1,45 @@
+{
+  "test_samples.txt:1": {
+    "shouldMatch": true,
+    "rules": [
+      "email_rule"
+    ]
+  },
+  "test_samples.txt:2": {
+    "shouldMatch": true,
+    "rules": [
+      "phone_rule"
+    ]
+  },
+  "test_samples.txt:3": {
+    "shouldMatch": true,
+    "rules": [
+      "url_rule"
+    ]
+  },
+  "test_samples.txt:4": {
+    "shouldMatch": false
+  },
+  "test_samples.txt:5": {
+    "shouldMatch": true,
+    "rules": [
+      "email_rule",
+      "phone_rule"
+    ]
+  },
+  "test_samples.txt:6": {
+    "shouldMatch": false
+  },
+  "test_samples.txt:7": {
+    "shouldMatch": false
+  },
+  "test_samples.txt:8": {
+    "shouldMatch": true,
+    "rules": [
+      "email_rule"
+    ]
+  },
+  "test_samples.txt:10": {
+    "shouldMatch": false
+  }
+}
