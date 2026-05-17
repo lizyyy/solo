@@ -7,6 +7,11 @@ const hash_service_1 = require("./hash.service");
 const types_1 = require("../models/types");
 class ExportService {
     static async createExportRequest(topicId, startTime, endTime, requester, reason, idempotencyKey) {
+        // 前置校验：topicId必须存在
+        const topic = await (0, database_1.getOne)("SELECT * FROM log_topics WHERE id = ?", [topicId]);
+        if (!topic) {
+            throw new Error(`Topic not found: ${topicId}`);
+        }
         const rangeIdentifier = `${startTime}-${endTime}`;
         const finalIdempotencyKey = idempotencyKey || hash_service_1.HashService.generateIdempotencyKey(requester, topicId, rangeIdentifier);
         const existingRequest = await (0, database_1.getOne)("SELECT * FROM export_requests WHERE idempotency_key = ?", [finalIdempotencyKey]);
@@ -77,18 +82,30 @@ class ExportService {
         if (!request) {
             throw new Error("Export request not found");
         }
+        // 前置校验：申请必须已审批
+        if (request.status !== types_1.ExportRequestStatus.APPROVED) {
+            throw new Error(`Request must be approved before verification. Current status: ${request.status}`);
+        }
         const range = await (0, database_1.getOne)("SELECT * FROM event_ranges WHERE id = ?", [request.range_id]);
         if (!range) {
             throw new Error("Event range not found");
         }
         await (0, database_1.runQuery)(`UPDATE export_requests SET status = ?, updated_at = ? WHERE id = ?`, [types_1.ExportRequestStatus.PROCESSING, new Date().toISOString(), requestId]);
-        const hashChains = await (0, database_1.getAll)(`SELECT * FROM hash_chains `
-            +
-                `WHERE topic_id = ? AND event_timestamp >= ? AND event_timestamp <= ?`
-            +
-                `ORDER BY chain_sequence`, [range.topic_id, range.start_time, range.end_time]);
-        let isValid = true;
+        const hashChains = await (0, database_1.getAll)(`SELECT * FROM hash_chains 
+       WHERE topic_id = ? AND event_timestamp >= ? AND event_timestamp <= ?
+       ORDER BY chain_sequence`, [range.topic_id, range.start_time, range.end_time]);
+        // 没有哈希链数据时直接标记为失败
+        let isValid = hashChains.length > 0;
         const mismatches = [];
+        if (hashChains.length === 0) {
+            mismatches.push({
+                event_id: "N/A",
+                expected_hash: "N/A",
+                actual_hash: "N/A",
+                sequence: 0,
+                issue: "no_hash_chain_data_found"
+            });
+        }
         for (let i = 1; i < hashChains.length; i++) {
             if (hashChains[i].previous_hash !== hashChains[i - 1].current_hash) {
                 isValid = false;
@@ -192,11 +209,20 @@ class ExportService {
         const range = await (0, database_1.getOne)("SELECT * FROM event_ranges WHERE id = ?", [request.range_id]);
         const reportId = (0, uuid_1.v4)();
         const now = new Date().toISOString();
+        const hasValidData = verification.hash_chain_valid === 1 && verification.verified_count > 0;
+        let conclusion = "该审计日志范围哈希链存在不匹配，数据可能被篡改，导出被阻止。";
+        if (verification.verified_count === 0) {
+            conclusion = "该审计日志范围未找到任何哈希链数据，无法证明数据完整性，导出被阻止。";
+        }
+        else if (hasValidData) {
+            conclusion = "该审计日志范围哈希链完整，数据未被篡改，可以安全导出。";
+        }
         const reportContent = {
             summary: `审计日志导出证明报告 - 主题: ${range.topic_id}`,
             verification_details: {
-                hash_chain_integrity: verification.hash_chain_valid === 1,
+                hash_chain_integrity: hasValidData,
                 event_count_match: verification.verified_count === verification.total_count,
+                has_hash_data: verification.verified_count > 0,
                 time_range_match: true
             },
             hash_chain_summary: {
@@ -209,14 +235,12 @@ class ExportService {
                 exported_by: generator,
                 record_count: verification.verified_count
             },
-            conclusion: verification.hash_chain_valid === 1
-                ? "该审计日志范围哈希链完整，数据未被篡改，可以安全导出。"
-                : "该审计日志范围哈希链存在不匹配，数据可能被篡改，导出被阻止。"
+            conclusion
         };
         await (0, database_1.runQuery)(`INSERT INTO proof_reports (id, request_id, verification_id, report_content, file_format, generated_at)`
             +
                 `VALUES (?, ?, ?, ?, ?, ?)`, [reportId, requestId, verification.id, JSON.stringify(reportContent), format, now]);
-        const finalStatus = verification.hash_chain_valid === 1
+        const finalStatus = hasValidData
             ? types_1.ExportRequestStatus.COMPLETED
             : types_1.ExportRequestStatus.FAILED;
         await (0, database_1.runQuery)(`UPDATE export_requests `
@@ -236,23 +260,69 @@ class ExportService {
         if (!request) {
             throw new Error("Export request not found");
         }
-        if (request.status !== types_1.ExportRequestStatus.APPROVED && request.status !== types_1.ExportRequestStatus.PROCESSING) {
+        const allowedStatuses = [
+            types_1.ExportRequestStatus.APPROVED,
+            types_1.ExportRequestStatus.PROCESSING,
+            types_1.ExportRequestStatus.COMPLETED
+        ];
+        if (!allowedStatuses.includes(request.status)) {
             throw new Error("Request not approved or already processed");
         }
         const range = await (0, database_1.getOne)("SELECT * FROM event_ranges WHERE id = ?", [request.range_id]);
-        const events = await (0, database_1.getAll)(`SELECT e.*, hc.current_hash, hc.chain_sequence`
-            +
-                `FROM audit_log_events e`
-            +
-                `LEFT JOIN hash_chains hc ON e.id = hc.event_id`
-            +
-                `WHERE e.topic_id = ? AND e.timestamp >= ? AND e.timestamp <= ?`
-            +
-                `ORDER BY e.timestamp`, [range.topic_id, range.start_time, range.end_time]);
+        const events = await (0, database_1.getAll)(`SELECT e.*, hc.current_hash, hc.chain_sequence
+       FROM audit_log_events e
+       LEFT JOIN hash_chains hc ON e.id = hc.event_id
+       WHERE e.topic_id = ? AND e.timestamp >= ? AND e.timestamp <= ?
+       ORDER BY e.timestamp`, [range.topic_id, range.start_time, range.end_time]);
         return events.map(e => ({
             ...e,
             details: typeof e.details === "string" ? JSON.parse(e.details) : e.details
         }));
+    }
+    static async addManualCorrection(requestId, corrector, correctionType, originalValue, correctedValue, reason) {
+        const request = await this.getRequestById(requestId);
+        if (!request) {
+            throw new Error("Export request not found");
+        }
+        const correctionId = (0, uuid_1.v4)();
+        const now = new Date().toISOString();
+        await (0, database_1.runQuery)(`INSERT INTO manual_corrections 
+       (id, request_id, corrector, correction_type, original_value, corrected_value, reason, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [
+            correctionId,
+            requestId,
+            corrector,
+            correctionType,
+            JSON.stringify(originalValue),
+            JSON.stringify(correctedValue),
+            reason,
+            now
+        ]);
+        await this.addProcessingHistory(requestId, "manual_correction", corrector, {
+            correctionId,
+            correctionType,
+            reason
+        });
+        return { correctionId, requestId, corrector, correctionType, reason, createdAt: now };
+    }
+    static async handleFailure(requestId, handler, error, processingEvidence) {
+        const now = new Date().toISOString();
+        const finalConclusion = `处理失败: ${error.message} - 请联系管理员进行人工核查`;
+        await (0, database_1.runQuery)(`UPDATE export_requests 
+       SET status = ?, processing_evidence = ?, failure_reason = ?, final_conclusion = ?, updated_at = ?
+       WHERE id = ?`, [
+            types_1.ExportRequestStatus.FAILED,
+            JSON.stringify(processingEvidence),
+            error.message,
+            finalConclusion,
+            now,
+            requestId
+        ]);
+        await this.addProcessingHistory(requestId, "handle_failure", handler, {
+            error: error.message,
+            processingEvidence
+        });
+        return this.getRequestById(requestId);
     }
 }
 exports.ExportService = ExportService;

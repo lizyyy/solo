@@ -12,4 +12,6 @@ router.post("/:id/verify", export_controller_1.ExportController.verifyHashChain)
 router.post("/:id/report", export_controller_1.ExportController.generateReport);
 router.get("/:id/export", export_controller_1.ExportController.exportEvents);
 router.get("/:id/history", export_controller_1.ExportController.getProcessingHistory);
+router.post("/:id/correction", export_controller_1.ExportController.addManualCorrection);
+router.post("/:id/failure", export_controller_1.ExportController.handleFailure);
 exports.default = router;

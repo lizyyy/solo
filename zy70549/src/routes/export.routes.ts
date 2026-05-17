@@ -12,5 +12,7 @@ router.post("/:id/verify", ExportController.verifyHashChain);
 router.post("/:id/report", ExportController.generateReport);
 router.get("/:id/export", ExportController.exportEvents);
 router.get("/:id/history", ExportController.getProcessingHistory);
+router.post("/:id/correction", ExportController.addManualCorrection);
+router.post("/:id/failure", ExportController.handleFailure);
 
 export default router;

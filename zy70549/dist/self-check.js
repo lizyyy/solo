@@ -139,8 +139,11 @@ async function runSelfCheck() {
             console.log('\n=== 附加验证：数据持久化 ===');
             const savedRequest = await export_service_1.ExportService.getRequestById(requestId);
             if (savedRequest && savedRequest.original_input && savedRequest.final_conclusion) {
+                const originalInput = typeof savedRequest.original_input === 'string'
+                    ? JSON.parse(savedRequest.original_input)
+                    : savedRequest.original_input;
                 console.log('✓ 原始输入和最终结论已持久化保存');
-                console.log('  - 原始输入申请人: ' + JSON.parse(savedRequest.original_input).requester);
+                console.log('  - 原始输入申请人: ' + originalInput.requester);
                 console.log('  - 最终结论: ' + savedRequest.final_conclusion);
             }
             const events = await export_service_1.ExportService.exportEvents(requestId);

@@ -29,6 +29,18 @@ const reportSchema = joi_1.default.object({
     generator: joi_1.default.string().required(),
     format: joi_1.default.string().valid("json", "csv").default("json")
 });
+const correctionSchema = joi_1.default.object({
+    corrector: joi_1.default.string().required(),
+    correctionType: joi_1.default.string().required(),
+    originalValue: joi_1.default.object().required(),
+    correctedValue: joi_1.default.object().required(),
+    reason: joi_1.default.string().required()
+});
+const handleFailureSchema = joi_1.default.object({
+    handler: joi_1.default.string().required(),
+    errorMessage: joi_1.default.string().required(),
+    processingEvidence: joi_1.default.object().required()
+});
 class ExportController {
     static async createRequest(req, res) {
         try {
@@ -169,6 +181,34 @@ class ExportController {
             const { id } = req.params;
             const history = await export_service_1.ExportService.getProcessingHistory(id);
             res.json({ success: true, data: history });
+        }
+        catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    }
+    static async addManualCorrection(req, res) {
+        try {
+            const { id } = req.params;
+            const { error, value } = correctionSchema.validate(req.body);
+            if (error) {
+                return res.status(400).json({ error: error.details[0].message });
+            }
+            const result = await export_service_1.ExportService.addManualCorrection(id, value.corrector, value.correctionType, value.originalValue, value.correctedValue, value.reason);
+            res.json({ success: true, data: result });
+        }
+        catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    }
+    static async handleFailure(req, res) {
+        try {
+            const { id } = req.params;
+            const { error, value } = handleFailureSchema.validate(req.body);
+            if (error) {
+                return res.status(400).json({ error: error.details[0].message });
+            }
+            const result = await export_service_1.ExportService.handleFailure(id, value.handler, new Error(value.errorMessage), value.processingEvidence);
+            res.json({ success: true, data: result });
         }
         catch (err) {
             res.status(500).json({ error: err.message });

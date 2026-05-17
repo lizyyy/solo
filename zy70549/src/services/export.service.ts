@@ -12,6 +12,12 @@ export class ExportService {
     reason: string,
     idempotencyKey?: string
   ) {
+    // 前置校验：topicId必须存在
+    const topic = await getOne("SELECT * FROM log_topics WHERE id = ?", [topicId]);
+    if (!topic) {
+      throw new Error(`Topic not found: ${topicId}`);
+    }
+
     const rangeIdentifier = `${startTime}-${endTime}`;
     const finalIdempotencyKey = idempotencyKey || HashService.generateIdempotencyKey(requester, topicId, rangeIdentifier);
 
@@ -117,6 +123,11 @@ export class ExportService {
       throw new Error("Export request not found");
     }
 
+    // 前置校验：申请必须已审批
+    if (request.status !== ExportRequestStatus.APPROVED) {
+      throw new Error(`Request must be approved before verification. Current status: ${request.status}`);
+    }
+
     const range = await getOne("SELECT * FROM event_ranges WHERE id = ?", [request.range_id]);
     if (!range) {
       throw new Error("Event range not found");
@@ -128,16 +139,25 @@ export class ExportService {
     );
 
     const hashChains = await getAll(
-      `SELECT * FROM hash_chains ` 
-+
-      `WHERE topic_id = ? AND event_timestamp >= ? AND event_timestamp <= ?` 
-+
-      `ORDER BY chain_sequence`,
+      `SELECT * FROM hash_chains 
+       WHERE topic_id = ? AND event_timestamp >= ? AND event_timestamp <= ?
+       ORDER BY chain_sequence`,
       [range.topic_id, range.start_time, range.end_time]
     );
 
-    let isValid = true;
+    // 没有哈希链数据时直接标记为失败
+    let isValid = hashChains.length > 0;
     const mismatches: any[] = [];
+
+    if (hashChains.length === 0) {
+      mismatches.push({
+        event_id: "N/A",
+        expected_hash: "N/A",
+        actual_hash: "N/A",
+        sequence: 0,
+        issue: "no_hash_chain_data_found"
+      });
+    }
 
     for (let i = 1; i < hashChains.length; i++) {
       if (hashChains[i].previous_hash !== hashChains[i - 1].current_hash) {
@@ -261,11 +281,21 @@ export class ExportService {
     const reportId = uuidv4();
     const now = new Date().toISOString();
 
+    const hasValidData = verification.hash_chain_valid === 1 && verification.verified_count > 0;
+    
+    let conclusion = "该审计日志范围哈希链存在不匹配，数据可能被篡改，导出被阻止。";
+    if (verification.verified_count === 0) {
+      conclusion = "该审计日志范围未找到任何哈希链数据，无法证明数据完整性，导出被阻止。";
+    } else if (hasValidData) {
+      conclusion = "该审计日志范围哈希链完整，数据未被篡改，可以安全导出。";
+    }
+
     const reportContent = {
       summary: `审计日志导出证明报告 - 主题: ${range!.topic_id}`,
       verification_details: {
-        hash_chain_integrity: verification.hash_chain_valid === 1,
+        hash_chain_integrity: hasValidData,
         event_count_match: verification.verified_count === verification.total_count,
+        has_hash_data: verification.verified_count > 0,
         time_range_match: true
       },
       hash_chain_summary: {
@@ -278,9 +308,7 @@ export class ExportService {
         exported_by: generator,
         record_count: verification.verified_count
       },
-      conclusion: verification.hash_chain_valid === 1
-        ? "该审计日志范围哈希链完整，数据未被篡改，可以安全导出。"
-        : "该审计日志范围哈希链存在不匹配，数据可能被篡改，导出被阻止。"
+      conclusion
     };
 
     await runQuery(
@@ -290,7 +318,7 @@ export class ExportService {
       [reportId, requestId, verification.id, JSON.stringify(reportContent), format, now]
     );
 
-    const finalStatus = verification.hash_chain_valid === 1
+    const finalStatus = hasValidData
       ? ExportRequestStatus.COMPLETED
       : ExportRequestStatus.FAILED;
 
@@ -338,5 +366,77 @@ export class ExportService {
       ...e,
       details: typeof e.details === "string" ? JSON.parse(e.details) : e.details
     }));
+  }
+
+  static async addManualCorrection(
+    requestId: string,
+    corrector: string,
+    correctionType: string,
+    originalValue: Record<string, any>,
+    correctedValue: Record<string, any>,
+    reason: string
+  ) {
+    const request = await this.getRequestById(requestId);
+    if (!request) {
+      throw new Error("Export request not found");
+    }
+
+    const correctionId = uuidv4();
+    const now = new Date().toISOString();
+
+    await runQuery(
+      `INSERT INTO manual_corrections 
+       (id, request_id, corrector, correction_type, original_value, corrected_value, reason, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        correctionId,
+        requestId,
+        corrector,
+        correctionType,
+        JSON.stringify(originalValue),
+        JSON.stringify(correctedValue),
+        reason,
+        now
+      ]
+    );
+
+    await this.addProcessingHistory(requestId, "manual_correction", corrector, {
+      correctionId,
+      correctionType,
+      reason
+    });
+
+    return { correctionId, requestId, corrector, correctionType, reason, createdAt: now };
+  }
+
+  static async handleFailure(
+    requestId: string,
+    handler: string,
+    error: Error,
+    processingEvidence: Record<string, any>
+  ) {
+    const now = new Date().toISOString();
+    const finalConclusion = `处理失败: ${error.message} - 请联系管理员进行人工核查`;
+
+    await runQuery(
+      `UPDATE export_requests 
+       SET status = ?, processing_evidence = ?, failure_reason = ?, final_conclusion = ?, updated_at = ?
+       WHERE id = ?`,
+      [
+        ExportRequestStatus.FAILED,
+        JSON.stringify(processingEvidence),
+        error.message,
+        finalConclusion,
+        now,
+        requestId
+      ]
+    );
+
+    await this.addProcessingHistory(requestId, "handle_failure", handler, {
+      error: error.message,
+      processingEvidence
+    });
+
+    return this.getRequestById(requestId);
   }
 }

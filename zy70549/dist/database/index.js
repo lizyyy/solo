@@ -126,7 +126,18 @@ async function initializeSchema(db) {
       details TEXT NOT NULL,
       timestamp TEXT NOT NULL DEFAULT (datetime('now'))
     )`,
-        `CREATE INDEX IF NOT EXISTS idx_processing_history_request ON processing_history(request_id)`
+        `CREATE INDEX IF NOT EXISTS idx_processing_history_request ON processing_history(request_id)`,
+        `CREATE TABLE IF NOT EXISTS manual_corrections (
+      id TEXT PRIMARY KEY,
+      request_id TEXT NOT NULL,
+      corrector TEXT NOT NULL,
+      correction_type TEXT NOT NULL,
+      original_value TEXT NOT NULL,
+      corrected_value TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )`,
+        `CREATE INDEX IF NOT EXISTS idx_manual_corrections_request ON manual_corrections(request_id)`
     ];
     for (const sql of tables) {
         await new Promise((resolve, reject) => {

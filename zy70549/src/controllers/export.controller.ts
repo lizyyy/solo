@@ -30,6 +30,20 @@ const reportSchema = Joi.object({
   format: Joi.string().valid("json", "csv").default("json")
 });
 
+const correctionSchema = Joi.object({
+  corrector: Joi.string().required(),
+  correctionType: Joi.string().required(),
+  originalValue: Joi.object().required(),
+  correctedValue: Joi.object().required(),
+  reason: Joi.string().required()
+});
+
+const handleFailureSchema = Joi.object({
+  handler: Joi.string().required(),
+  errorMessage: Joi.string().required(),
+  processingEvidence: Joi.object().required()
+});
+
 export class ExportController {
   static async createRequest(req: Request, res: Response) {
     try {
@@ -174,6 +188,46 @@ export class ExportController {
       const { id } = req.params;
       const history = await ExportService.getProcessingHistory(id);
       res.json({ success: true, data: history });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  static async addManualCorrection(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { error, value } = correctionSchema.validate(req.body);
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+      const result = await ExportService.addManualCorrection(
+        id,
+        value.corrector,
+        value.correctionType,
+        value.originalValue,
+        value.correctedValue,
+        value.reason
+      );
+      res.json({ success: true, data: result });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  static async handleFailure(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { error, value } = handleFailureSchema.validate(req.body);
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+      const result = await ExportService.handleFailure(
+        id,
+        value.handler,
+        new Error(value.errorMessage),
+        value.processingEvidence
+      );
+      res.json({ success: true, data: result });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
