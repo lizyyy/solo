@@ -119,6 +119,8 @@ class WaveService:
             raise ValueError(f"拣货任务 {task_id} 不存在")
         if task.status != "pending":
             raise ValueError(f"拣货任务状态不允许处理，当前状态: {task.status}")
+        if actual_quantity < 0:
+            raise ValueError("实际拣货数量不能为负数")
 
         task.picked_quantity = actual_quantity
         task.picker = picker
@@ -134,17 +136,29 @@ class WaveService:
             wave = db.query(Wave).filter(Wave.id == task.wave_id).first()
             orders = db.query(Order).filter(Order.wave_id == task.wave_id).all()
 
+            remaining_quantity = actual_quantity
+
             for order in orders:
                 for item in order.items:
                     if item.sku_code == task.sku_code:
-                        available_for_order = min(item.ordered_quantity, actual_quantity)
-                        item.picked_quantity = available_for_order
+                        if remaining_quantity > 0:
+                            available_for_order = min(item.ordered_quantity, remaining_quantity)
+                            item.picked_quantity = available_for_order
+                            remaining_quantity -= available_for_order
+                        else:
+                            item.picked_quantity = 0
 
-                        if available_for_order < item.ordered_quantity:
+                        if item.picked_quantity < item.ordered_quantity:
                             item.is_shortage = True
-                            item.shortage_quantity = item.ordered_quantity - available_for_order
+                            item.shortage_quantity = item.ordered_quantity - item.picked_quantity
 
-                            if not order.is_split:
+                            split_order = None
+                            for so in split_orders:
+                                if so.parent_order_id == order.id:
+                                    split_order = so
+                                    break
+
+                            if split_order is None:
                                 split_order = Order(
                                     order_code=f"{order.order_code}-SPLIT-{uuid.uuid4().hex[:4].upper()}",
                                     status="pending",
@@ -156,17 +170,16 @@ class WaveService:
                                 )
                                 db.add(split_order)
                                 db.flush()
-
-                                split_item = OrderItem(
-                                    order_id=split_order.id,
-                                    sku_code=item.sku_code,
-                                    sku_name=item.sku_name,
-                                    ordered_quantity=item.shortage_quantity
-                                )
-                                db.add(split_item)
-
-                                order.is_split = True
                                 split_orders.append(split_order)
+                                order.is_split = True
+
+                            split_item = OrderItem(
+                                order_id=split_order.id,
+                                sku_code=item.sku_code,
+                                sku_name=item.sku_name,
+                                ordered_quantity=item.shortage_quantity
+                            )
+                            db.add(split_item)
 
         db.commit()
         db.refresh(task)

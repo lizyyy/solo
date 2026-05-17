@@ -395,6 +395,106 @@ class SelfTest:
             print_error(f"筛选波次列表失败: {response.text}")
             return False
 
+    def test_17_multi_order_same_sku_shortage(self) -> bool:
+        """多订单同一SKU缺货拆单场景（关键场景）"""
+        print_info("17. 关键场景：多订单同一SKU缺货拆单...")
+
+        order_codes = ["SHORTAGE-TEST-001", "SHORTAGE-TEST-002"]
+
+        orders = [
+            {
+                "order_code": order_codes[0],
+                "customer_name": "缺货测试客户A",
+                "items": [{"sku_code": "SKU001", "sku_name": "商品A", "ordered_quantity": 10}]
+            },
+            {
+                "order_code": order_codes[1],
+                "customer_name": "缺货测试客户B",
+                "items": [{"sku_code": "SKU001", "sku_name": "商品A", "ordered_quantity": 20}]
+            }
+        ]
+
+        for order in orders:
+            response = self.session.post(f"{BASE_URL}/api/orders/", json=order)
+            if response.status_code not in [200, 400]:
+                print_error(f"创建订单失败: {response.text}")
+                return False
+
+        print_success("创建测试订单: 订单1(10件) + 订单2(20件) = 合计30件")
+
+        wave_data = {"order_codes": order_codes, "priority": 1}
+        response = self.session.post(f"{BASE_URL}/api/waves/", json=wave_data)
+        if response.status_code != 200:
+            print_error(f"创建波次失败: {response.text}")
+            return False
+        wave_id = response.json()["wave_id"]
+        print_success("创建波次成功")
+
+        response = self.session.post(f"{BASE_URL}/api/waves/{wave_id}/generate-tasks/")
+        if response.status_code != 200:
+            print_error(f"生成拣货任务失败: {response.text}")
+            return False
+        task_id = response.json()["tasks"][0]["task_id"]
+        print_success("生成拣货任务: 应拣 30 件")
+
+        process_data = {"actual_quantity": 20, "picker": "测试拣货员"}
+        response = self.session.post(
+            f"{BASE_URL}/api/pick-tasks/{task_id}/process/",
+            json=process_data
+        )
+        if response.status_code != 200:
+            print_error(f"处理拣货任务失败: {response.text}")
+            return False
+
+        result = response.json()
+        actual_picked = result["actual_quantity"]
+        split_count = result["split_orders_count"]
+        is_shortage = result["is_shortage"]
+
+        print(f"  实际拣货: {actual_picked} 件")
+        print(f"  是否缺货: {is_shortage}")
+        print(f"  拆单数量: {split_count}")
+
+        errors = []
+
+        if actual_picked != 20:
+            errors.append(f"实际拣货量记录错误: {actual_picked} (应为20)")
+
+        if not is_shortage:
+            errors.append("缺货标记错误: 应标记为缺货")
+
+        if split_count == 0:
+            errors.append("拆单错误: 缺货时应生成拆单")
+
+        response = self.session.post(f"{BASE_URL}/api/waves/{wave_id}/complete/")
+        if response.status_code != 200:
+            print_error(f"完成波次失败: {response.text}")
+            return False
+
+        report = response.json()
+        print_success("波次完成，报告已生成")
+        print(f"  报告拆单数: {report['split_orders']}")
+        print(f"  报告缺货商品数: {report['shortage_items']}")
+        print(f"  报告已拣商品数: {report['picked_items']}")
+
+        if report['split_orders'] != split_count:
+            errors.append(f"报告拆单数错误: {report['split_orders']} (应为{split_count})")
+
+        if report['shortage_items'] == 0:
+            errors.append("报告缺货商品数错误: 应大于0")
+
+        if report['picked_items'] != 20:
+            errors.append(f"报告已拣商品数错误: {report['picked_items']} (应为20)")
+
+        if errors:
+            print_error("关键场景验证失败:")
+            for err in errors:
+                print(f"  - {err}")
+            return False
+        else:
+            print_success("关键场景验证通过: 多订单同一SKU缺货拆单功能正常!")
+            return True
+
     def run_all_tests(self):
         """运行所有测试"""
         print("=" * 60)
@@ -418,6 +518,7 @@ class SelfTest:
             self.test_14_get_wave_report,
             self.test_15_export_report,
             self.test_16_wave_list_filter,
+            self.test_17_multi_order_same_sku_shortage,
         ]
 
         passed = 0
