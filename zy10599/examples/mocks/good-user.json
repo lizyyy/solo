@@ -1,0 +1,13 @@
+{
+  "method": "GET",
+  "path": "/users/123",
+  "statusCode": 200,
+  "response": {
+    "id": "123",
+    "name": "张三",
+    "email": "zhangsan@example.com",
+    "age": 25,
+    "status": "active",
+    "createdAt": "2024-01-01T12:00:00Z"
+  }
+}

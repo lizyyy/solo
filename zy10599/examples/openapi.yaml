@@ -1,0 +1,112 @@
+openapi: 3.0.0
+info:
+  title: 用户管理 API
+  version: 1.0.0
+  description: 用于演示 Mock 一致性检查的示例 API
+
+paths:
+  /users/{id}:
+    get:
+      summary: 获取单个用户
+      description: 根据用户ID获取用户详细信息
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - name
+                  - status
+                properties:
+                  id:
+                    type: string
+                    description: 用户唯一标识
+                  name:
+                    type: string
+                    description: 用户姓名
+                  email:
+                    type: string
+                    description: 用户邮箱
+                  age:
+                    type: integer
+                    description: 用户年龄
+                  status:
+                    type: string
+                    enum: [active, inactive, pending]
+                    description: 用户状态
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: 创建时间
+
+  /users:
+    get:
+      summary: 获取用户列表
+      description: 获取所有用户的列表
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - name
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    email:
+                      type: string
+
+  /users/{id}/profile:
+    get:
+      summary: 获取用户配置
+      description: 获取用户的详细配置信息
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - theme
+                  - notifications
+                properties:
+                  theme:
+                    type: string
+                    enum: [light, dark, system]
+                  notifications:
+                    type: object
+                    required:
+                      - email
+                      - push
+                    properties:
+                      email:
+                        type: boolean
+                      push:
+                        type: boolean
+                      sms:
+                        type: boolean
+                  language:
+                    type: string

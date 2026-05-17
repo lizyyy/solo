@@ -1,0 +1,12 @@
+{
+  "method": "GET",
+  "path": "/users/123/profile",
+  "statusCode": 200,
+  "response": {
+    "theme": "dark",
+    "notifications": {
+      "email": true,
+      "sms": false
+    }
+  }
+}

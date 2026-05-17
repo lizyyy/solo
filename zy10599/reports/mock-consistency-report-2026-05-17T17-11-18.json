@@ -1,0 +1,540 @@
+{
+  "meta": {
+    "generatedAt": "2026-05-17T17:11:18.646Z",
+    "timestamp": "2026-05-17T17-11-18",
+    "openapiPath": "examples/openapi.yaml",
+    "mockPath": "examples/mocks/",
+    "options": {
+      "strictType": true
+    }
+  },
+  "summary": {
+    "total": 6,
+    "passed": 2,
+    "failed": 3,
+    "warned": 0,
+    "unmatched": 1,
+    "errors": 0,
+    "noSchema": 0,
+    "totalIssues": 5,
+    "totalErrors": 3,
+    "totalWarnings": 2,
+    "passRate": "33.3"
+  },
+  "breakdown": {
+    "normal": [
+      {
+        "file": "examples/mocks/good-user.json",
+        "fileName": "good-user.json",
+        "method": "GET",
+        "path": "/users/123",
+        "statusCode": 200,
+        "contractFields": 6,
+        "mockFields": 6,
+        "endpointSummary": "获取单个用户"
+      },
+      {
+        "file": "examples/mocks/users-list.json",
+        "fileName": "users-list.json",
+        "method": "GET",
+        "path": "/users",
+        "statusCode": 200,
+        "contractFields": 4,
+        "mockFields": 3,
+        "endpointSummary": "获取用户列表"
+      }
+    ],
+    "risks": [
+      {
+        "file": "examples/mocks/missing-fields-user.json",
+        "fileName": "missing-fields-user.json",
+        "method": "GET",
+        "path": "/users/456",
+        "statusCode": 200,
+        "status": "fail",
+        "issues": [
+          {
+            "type": "missing_field",
+            "path": "status",
+            "severity": "error",
+            "message": "Missing required field",
+            "expected": {
+              "type": "string",
+              "required": true,
+              "description": "用户状态"
+            }
+          }
+        ],
+        "summary": {
+          "errors": 1,
+          "warnings": 0,
+          "passed": 5
+        },
+        "endpointSummary": "获取单个用户"
+      },
+      {
+        "file": "examples/mocks/type-mismatch-user.json",
+        "fileName": "type-mismatch-user.json",
+        "method": "GET",
+        "path": "/users/789",
+        "statusCode": 200,
+        "status": "fail",
+        "issues": [
+          {
+            "type": "type_mismatch",
+            "path": "age",
+            "severity": "warning",
+            "message": "Type mismatch",
+            "expected": "integer",
+            "actual": "string",
+            "sampleValue": "28"
+          },
+          {
+            "type": "invalid_enum",
+            "path": "status",
+            "severity": "error",
+            "message": "Value not in allowed enum",
+            "expected": [
+              "active",
+              "inactive",
+              "pending"
+            ],
+            "actual": "unknown"
+          },
+          {
+            "type": "extra_field",
+            "path": "extraField",
+            "severity": "warning",
+            "message": "Extra field not in contract",
+            "actual": {
+              "type": "string",
+              "value": "这是一个额外字段"
+            }
+          }
+        ],
+        "summary": {
+          "errors": 1,
+          "warnings": 2,
+          "passed": 3
+        },
+        "endpointSummary": "获取单个用户"
+      },
+      {
+        "file": "examples/mocks/user-profile.json",
+        "fileName": "user-profile.json",
+        "method": "GET",
+        "path": "/users/123/profile",
+        "statusCode": 200,
+        "status": "fail",
+        "issues": [
+          {
+            "type": "missing_field",
+            "path": "notifications.push",
+            "severity": "error",
+            "message": "Missing required field",
+            "expected": {
+              "type": "boolean",
+              "required": true
+            }
+          }
+        ],
+        "summary": {
+          "errors": 1,
+          "warnings": 0,
+          "passed": 5
+        },
+        "endpointSummary": "获取用户配置"
+      }
+    ],
+    "unprocessable": [
+      {
+        "file": "examples/mocks/unmatched-endpoint.json",
+        "fileName": "unmatched-endpoint.json",
+        "method": "POST",
+        "path": "/unknown/endpoint",
+        "status": "unmatched",
+        "message": "No matching OpenAPI endpoint found for POST /unknown/endpoint"
+      }
+    ]
+  },
+  "details": [
+    {
+      "file": "examples/mocks/good-user.json",
+      "fileName": "good-user.json",
+      "method": "GET",
+      "path": "/users/123",
+      "matchedEndpoint": {
+        "path": "/users/{id}",
+        "method": "GET",
+        "summary": "获取单个用户",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "schema": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "status"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "用户唯一标识"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "用户姓名"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "用户邮箱"
+                },
+                "age": {
+                  "type": "integer",
+                  "description": "用户年龄"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "inactive",
+                    "pending"
+                  ],
+                  "description": "用户状态"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "创建时间"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": null
+      },
+      "statusCode": 200,
+      "status": "pass",
+      "contractFields": 6,
+      "mockFields": 6,
+      "issues": [],
+      "summary": {
+        "errors": 0,
+        "warnings": 0,
+        "passed": 6
+      }
+    },
+    {
+      "file": "examples/mocks/missing-fields-user.json",
+      "fileName": "missing-fields-user.json",
+      "method": "GET",
+      "path": "/users/456",
+      "matchedEndpoint": {
+        "path": "/users/{id}",
+        "method": "GET",
+        "summary": "获取单个用户",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "schema": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "status"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "用户唯一标识"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "用户姓名"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "用户邮箱"
+                },
+                "age": {
+                  "type": "integer",
+                  "description": "用户年龄"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "inactive",
+                    "pending"
+                  ],
+                  "description": "用户状态"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "创建时间"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": null
+      },
+      "statusCode": 200,
+      "status": "fail",
+      "contractFields": 6,
+      "mockFields": 2,
+      "issues": [
+        {
+          "type": "missing_field",
+          "path": "status",
+          "severity": "error",
+          "message": "Missing required field",
+          "expected": {
+            "type": "string",
+            "required": true,
+            "description": "用户状态"
+          }
+        }
+      ],
+      "summary": {
+        "errors": 1,
+        "warnings": 0,
+        "passed": 5
+      }
+    },
+    {
+      "file": "examples/mocks/type-mismatch-user.json",
+      "fileName": "type-mismatch-user.json",
+      "method": "GET",
+      "path": "/users/789",
+      "matchedEndpoint": {
+        "path": "/users/{id}",
+        "method": "GET",
+        "summary": "获取单个用户",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "schema": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "status"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "用户唯一标识"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "用户姓名"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "用户邮箱"
+                },
+                "age": {
+                  "type": "integer",
+                  "description": "用户年龄"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "inactive",
+                    "pending"
+                  ],
+                  "description": "用户状态"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "创建时间"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": null
+      },
+      "statusCode": 200,
+      "status": "fail",
+      "contractFields": 6,
+      "mockFields": 5,
+      "issues": [
+        {
+          "type": "type_mismatch",
+          "path": "age",
+          "severity": "warning",
+          "message": "Type mismatch",
+          "expected": "integer",
+          "actual": "string",
+          "sampleValue": "28"
+        },
+        {
+          "type": "invalid_enum",
+          "path": "status",
+          "severity": "error",
+          "message": "Value not in allowed enum",
+          "expected": [
+            "active",
+            "inactive",
+            "pending"
+          ],
+          "actual": "unknown"
+        },
+        {
+          "type": "extra_field",
+          "path": "extraField",
+          "severity": "warning",
+          "message": "Extra field not in contract",
+          "actual": {
+            "type": "string",
+            "value": "这是一个额外字段"
+          }
+        }
+      ],
+      "summary": {
+        "errors": 1,
+        "warnings": 2,
+        "passed": 3
+      }
+    },
+    {
+      "file": "examples/mocks/unmatched-endpoint.json",
+      "fileName": "unmatched-endpoint.json",
+      "method": "POST",
+      "path": "/unknown/endpoint",
+      "status": "unmatched",
+      "message": "No matching OpenAPI endpoint found for POST /unknown/endpoint",
+      "issues": []
+    },
+    {
+      "file": "examples/mocks/user-profile.json",
+      "fileName": "user-profile.json",
+      "method": "GET",
+      "path": "/users/123/profile",
+      "matchedEndpoint": {
+        "path": "/users/{id}/profile",
+        "method": "GET",
+        "summary": "获取用户配置",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "schema": {
+              "type": "object",
+              "required": [
+                "theme",
+                "notifications"
+              ],
+              "properties": {
+                "theme": {
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "dark",
+                    "system"
+                  ]
+                },
+                "notifications": {
+                  "type": "object",
+                  "required": [
+                    "email",
+                    "push"
+                  ],
+                  "properties": {
+                    "email": {
+                      "type": "boolean"
+                    },
+                    "push": {
+                      "type": "boolean"
+                    },
+                    "sms": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "language": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": null
+      },
+      "statusCode": 200,
+      "status": "fail",
+      "contractFields": 6,
+      "mockFields": 4,
+      "issues": [
+        {
+          "type": "missing_field",
+          "path": "notifications.push",
+          "severity": "error",
+          "message": "Missing required field",
+          "expected": {
+            "type": "boolean",
+            "required": true
+          }
+        }
+      ],
+      "summary": {
+        "errors": 1,
+        "warnings": 0,
+        "passed": 5
+      }
+    },
+    {
+      "file": "examples/mocks/users-list.json",
+      "fileName": "users-list.json",
+      "method": "GET",
+      "path": "/users",
+      "matchedEndpoint": {
+        "path": "/users",
+        "method": "GET",
+        "summary": "获取用户列表",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": null
+      },
+      "statusCode": 200,
+      "status": "pass",
+      "contractFields": 4,
+      "mockFields": 3,
+      "issues": [],
+      "summary": {
+        "errors": 0,
+        "warnings": 0,
+        "passed": 4
+      }
+    }
+  ]
+}

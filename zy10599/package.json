@@ -1,0 +1,37 @@
+{
+  "name": "mock-contract-checker",
+  "version": "1.0.0",
+  "description": "接口Mock一致性检查CLI - 检查Mock数据与OpenAPI契约的一致性",
+  "main": "src/cli.js",
+  "type": "module",
+  "bin": {
+    "mock-check": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "eslint src/**/*.js",
+    "example": "node src/cli.js examples/openapi.yaml examples/mocks/"
+  },
+  "keywords": [
+    "mock",
+    "openapi",
+    "swagger",
+    "contract-testing",
+    "api",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

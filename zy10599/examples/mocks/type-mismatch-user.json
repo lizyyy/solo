@@ -1,0 +1,12 @@
+{
+  "method": "GET",
+  "path": "/users/789",
+  "statusCode": 200,
+  "response": {
+    "id": "789",
+    "name": "王五",
+    "age": "28",
+    "status": "unknown",
+    "extraField": "这是一个额外字段"
+  }
+}

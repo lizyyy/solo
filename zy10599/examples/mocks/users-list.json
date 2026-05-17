@@ -1,0 +1,16 @@
+{
+  "method": "GET",
+  "path": "/users",
+  "statusCode": 200,
+  "response": [
+    {
+      "id": "1",
+      "name": "用户一",
+      "email": "user1@example.com"
+    },
+    {
+      "id": "2",
+      "name": "用户二"
+    }
+  ]
+}
