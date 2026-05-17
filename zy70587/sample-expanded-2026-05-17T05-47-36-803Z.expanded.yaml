@@ -1,0 +1,45 @@
+base_db:
+  host: localhost
+  port: 5432
+  username: admin
+  max_connections: 100
+dev_config:
+  debug: true
+  log_level: debug
+  cache_ttl: 60
+prod_base:
+  debug: false
+  log_level: warn
+  max_retries: 5
+development:
+  host: localhost
+  port: 5432
+  username: admin
+  max_connections: 50
+  database: app_dev
+  debug: true
+  log_level: debug
+  cache_ttl: 60
+test:
+  host: localhost
+  port: 5432
+  username: admin
+  max_connections: 100
+  database: app_test
+  debug: true
+production:
+  host: localhost
+  port: 5432
+  username: prod_user
+  max_connections: 200
+  debug: false
+  log_level: warn
+  max_retries: 5
+  database: app_prod
+services:
+  api:
+    port: 3000
+    workers: 4
+  web:
+    port: 8080
+    workers: 2

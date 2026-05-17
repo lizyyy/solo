@@ -1,0 +1,175 @@
+{
+  "success": true,
+  "exitCode": 0,
+  "inputFile": "/Users/lzy/pro/solo/workspaces/zy70587/examples/sample.yaml",
+  "timestamp": "2026-05-17T05:48:20.684Z",
+  "statistics": {
+    "totalAnchors": 3,
+    "totalMerges": 3,
+    "totalOverrides": 3,
+    "totalErrors": 0,
+    "totalWarnings": 0
+  },
+  "anchors": [
+    {
+      "name": "base_db",
+      "location": {
+        "line": 2,
+        "column": 10
+      },
+      "valuePreview": "[Object]"
+    },
+    {
+      "name": "dev_config",
+      "location": {
+        "line": 9,
+        "column": 13
+      },
+      "valuePreview": "[Object]"
+    },
+    {
+      "name": "prod_base",
+      "location": {
+        "line": 15,
+        "column": 12
+      },
+      "valuePreview": "[Object]"
+    }
+  ],
+  "mergeNodes": [
+    {
+      "path": "development",
+      "location": {
+        "line": 22,
+        "column": 3
+      },
+      "sources": [
+        {
+          "anchorName": "base_db",
+          "location": {
+            "line": 2,
+            "column": 10
+          },
+          "keys": [
+            "host",
+            "port",
+            "username",
+            "max_connections"
+          ]
+        },
+        {
+          "anchorName": "dev_config",
+          "location": {
+            "line": 9,
+            "column": 13
+          },
+          "keys": [
+            "debug",
+            "log_level",
+            "cache_ttl"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "test",
+      "location": {
+        "line": 29,
+        "column": 3
+      },
+      "sources": [
+        {
+          "anchorName": "base_db",
+          "location": {
+            "line": 2,
+            "column": 10
+          },
+          "keys": [
+            "host",
+            "port",
+            "username",
+            "max_connections"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "production",
+      "location": {
+        "line": 35,
+        "column": 3
+      },
+      "sources": [
+        {
+          "anchorName": "base_db",
+          "location": {
+            "line": 2,
+            "column": 10
+          },
+          "keys": [
+            "host",
+            "port",
+            "username",
+            "max_connections"
+          ]
+        },
+        {
+          "anchorName": "prod_base",
+          "location": {
+            "line": 15,
+            "column": 12
+          },
+          "keys": [
+            "debug",
+            "log_level",
+            "max_retries"
+          ]
+        }
+      ]
+    }
+  ],
+  "overrides": [
+    {
+      "path": "development",
+      "key": "max_connections",
+      "oldValue": 100,
+      "newValue": 50,
+      "sourceAnchor": "base_db",
+      "overrideLocation": {
+        "line": 25,
+        "column": 3
+      },
+      "oldValuePreview": "100",
+      "newValuePreview": "50"
+    },
+    {
+      "path": "production",
+      "key": "username",
+      "oldValue": "admin",
+      "newValue": "prod_user",
+      "sourceAnchor": "base_db",
+      "overrideLocation": {
+        "line": 37,
+        "column": 3
+      },
+      "oldValuePreview": "admin",
+      "newValuePreview": "prod_user"
+    },
+    {
+      "path": "production",
+      "key": "max_connections",
+      "oldValue": 100,
+      "newValue": 200,
+      "sourceAnchor": "base_db",
+      "overrideLocation": {
+        "line": 38,
+        "column": 3
+      },
+      "oldValuePreview": "100",
+      "newValuePreview": "200"
+    }
+  ],
+  "errors": [],
+  "warnings": [],
+  "expandedYaml": "base_db:\n  host: localhost\n  port: 5432\n  username: admin\n  max_connections: 100\ndev_config:\n  debug: true\n  log_level: debug\n  cache_ttl: 60\nprod_base:\n  debug: false\n  log_level: warn\n  max_retries: 5\ndevelopment:\n  host: localhost\n  port: 5432\n  username: admin\n  max_connections: 50\n  database: app_dev\n  debug: true\n  log_level: debug\n  cache_ttl: 60\ntest:\n  host: localhost\n  port: 5432\n  username: admin\n  max_connections: 100\n  database: app_test\n  debug: true\nproduction:\n  host: localhost\n  port: 5432\n  username: prod_user\n  max_connections: 200\n  debug: false\n  log_level: warn\n  max_retries: 5\n  database: app_prod\nservices:\n  api:\n    port: 3000\n    workers: 4\n  web:\n    port: 8080\n    workers: 2\n"
+}

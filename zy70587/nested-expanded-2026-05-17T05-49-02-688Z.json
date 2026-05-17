@@ -1,0 +1,213 @@
+{
+  "success": true,
+  "exitCode": 0,
+  "inputFile": "/Users/lzy/pro/solo/workspaces/zy70587/examples/nested.yaml",
+  "timestamp": "2026-05-17T05:49:02.688Z",
+  "statistics": {
+    "totalAnchors": 1,
+    "totalMerges": 5,
+    "totalOverrides": 6,
+    "totalErrors": 0,
+    "totalWarnings": 0
+  },
+  "anchors": [
+    {
+      "name": "defaults",
+      "location": {
+        "line": 2,
+        "column": 11
+      },
+      "valuePreview": "[Object]"
+    }
+  ],
+  "mergeNodes": [
+    {
+      "path": "services.api",
+      "location": {
+        "line": 9,
+        "column": 5
+      },
+      "sources": [
+        {
+          "anchorName": "defaults",
+          "location": {
+            "line": 2,
+            "column": 11
+          },
+          "keys": [
+            "timeout",
+            "retries",
+            "debug"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "services.web",
+      "location": {
+        "line": 15,
+        "column": 5
+      },
+      "sources": [
+        {
+          "anchorName": "defaults",
+          "location": {
+            "line": 2,
+            "column": 11
+          },
+          "keys": [
+            "timeout",
+            "retries",
+            "debug"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "services.worker",
+      "location": {
+        "line": 21,
+        "column": 5
+      },
+      "sources": [
+        {
+          "anchorName": "defaults",
+          "location": {
+            "line": 2,
+            "column": 11
+          },
+          "keys": [
+            "timeout",
+            "retries",
+            "debug"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "database.primary",
+      "location": {
+        "line": 28,
+        "column": 5
+      },
+      "sources": [
+        {
+          "anchorName": "defaults",
+          "location": {
+            "line": 2,
+            "column": 11
+          },
+          "keys": [
+            "timeout",
+            "retries",
+            "debug"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "database.replica",
+      "location": {
+        "line": 32,
+        "column": 5
+      },
+      "sources": [
+        {
+          "anchorName": "defaults",
+          "location": {
+            "line": 2,
+            "column": 11
+          },
+          "keys": [
+            "timeout",
+            "retries",
+            "debug"
+          ]
+        }
+      ]
+    }
+  ],
+  "overrides": [
+    {
+      "path": "services.api",
+      "key": "timeout",
+      "oldValue": 30,
+      "newValue": 60,
+      "sourceAnchor": "defaults",
+      "overrideLocation": {
+        "line": 11,
+        "column": 5
+      },
+      "oldValuePreview": "30",
+      "newValuePreview": "60"
+    },
+    {
+      "path": "services.web",
+      "key": "debug",
+      "oldValue": false,
+      "newValue": true,
+      "sourceAnchor": "defaults",
+      "overrideLocation": {
+        "line": 17,
+        "column": 5
+      },
+      "oldValuePreview": "false",
+      "newValuePreview": "true"
+    },
+    {
+      "path": "services.worker",
+      "key": "timeout",
+      "oldValue": 30,
+      "newValue": 120,
+      "sourceAnchor": "defaults",
+      "overrideLocation": {
+        "line": 24,
+        "column": 5
+      },
+      "oldValuePreview": "30",
+      "newValuePreview": "120"
+    },
+    {
+      "path": "services.worker",
+      "key": "retries",
+      "oldValue": 3,
+      "newValue": 5,
+      "sourceAnchor": "defaults",
+      "overrideLocation": {
+        "line": 23,
+        "column": 5
+      },
+      "oldValuePreview": "3",
+      "newValuePreview": "5"
+    },
+    {
+      "path": "database.primary",
+      "key": "timeout",
+      "oldValue": 30,
+      "newValue": 10,
+      "sourceAnchor": "defaults",
+      "overrideLocation": {
+        "line": 30,
+        "column": 5
+      },
+      "oldValuePreview": "30",
+      "newValuePreview": "10"
+    },
+    {
+      "path": "database.replica",
+      "key": "debug",
+      "oldValue": false,
+      "newValue": true,
+      "sourceAnchor": "defaults",
+      "overrideLocation": {
+        "line": 34,
+        "column": 5
+      },
+      "oldValuePreview": "false",
+      "newValuePreview": "true"
+    }
+  ],
+  "errors": [],
+  "warnings": [],
+  "expandedYaml": "defaults:\n  timeout: 30\n  retries: 3\n  debug: false\nservices:\n  api:\n    timeout: 60\n    retries: 3\n    debug: false\n    name: api-service\n    port: 3000\n  web:\n    timeout: 30\n    retries: 3\n    debug: true\n    name: web-service\n    port: 8080\n  worker:\n    timeout: 120\n    retries: 5\n    debug: false\n    name: worker-service\ndatabase:\n  primary:\n    timeout: 10\n    retries: 3\n    debug: false\n    host: db-primary\n  replica:\n    timeout: 30\n    retries: 3\n    debug: true\n    host: db-replica\n"
+}

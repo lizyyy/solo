@@ -112,13 +112,14 @@ class YamlExpander {
 
   private findMergeLines(): { line: number; column: number; aliases: string[] }[] {
     const results: { line: number; column: number; aliases: string[] }[] = [];
-    const singleMergeRegex = /<<:\s*\*\s*(\w+)/g;
+    const singleMergeRegex = /<<:\s*\*(\w+)/g;
     const multiMergeRegex = /<<:\s*\[\s*([^\]]+)\s*\]/g;
 
     for (let lineNum = 0; lineNum < this.lines.length; lineNum++) {
       const line = this.lines[lineNum];
       let match;
 
+      singleMergeRegex.lastIndex = 0;
       while ((match = singleMergeRegex.exec(line)) !== null) {
         results.push({
           line: lineNum + 1,
@@ -127,6 +128,7 @@ class YamlExpander {
         });
       }
 
+      multiMergeRegex.lastIndex = 0;
       while ((match = multiMergeRegex.exec(line)) !== null) {
         const aliases = match[1].split(',').map(a => a.trim().replace(/^\*/, ''));
         results.push({
@@ -140,25 +142,16 @@ class YamlExpander {
   }
 
   private findPathForLine(targetLine: number): string {
-    const fallbackPath = this.findFallbackPath(targetLine);
-
-    let bestMatch = '';
-    let bestMatchLine = 0;
-    for (const [line, path] of this.lineToPath) {
-      if (line < targetLine && line > bestMatchLine) {
-        bestMatchLine = line;
-        bestMatch = path;
-      }
-    }
-
-    return fallbackPath.length >= bestMatch.length ? fallbackPath : bestMatch;
+    return this.findFallbackPath(targetLine);
   }
 
   private findFallbackPath(targetLine: number): string {
     const pathStack: string[] = [];
     const indentStack: number[] = [];
+    const targetLineContent = this.lines[targetLine - 1] || '';
+    const targetIndent = targetLineContent.search(/\S/);
 
-    for (let lineNum = 0; lineNum < targetLine; lineNum++) {
+    for (let lineNum = 0; lineNum < targetLine - 1; lineNum++) {
       const line = this.lines[lineNum];
       const indent = line.search(/\S/);
       if (indent === -1) continue;
@@ -172,6 +165,11 @@ class YamlExpander {
         pathStack.push(keyMatch[1]);
         indentStack.push(indent);
       }
+    }
+
+    while (indentStack.length > 0 && indentStack[indentStack.length - 1] >= targetIndent) {
+      pathStack.pop();
+      indentStack.pop();
     }
     return pathStack.join('.');
   }

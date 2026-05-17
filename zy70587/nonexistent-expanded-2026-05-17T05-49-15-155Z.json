@@ -1,0 +1,28 @@
+{
+  "success": false,
+  "exitCode": 1,
+  "inputFile": "/Users/lzy/pro/solo/workspaces/zy70587/nonexistent.yaml",
+  "timestamp": "2026-05-17T05:49:15.155Z",
+  "statistics": {
+    "totalAnchors": 0,
+    "totalMerges": 0,
+    "totalOverrides": 0,
+    "totalErrors": 1,
+    "totalWarnings": 0
+  },
+  "anchors": [],
+  "mergeNodes": [],
+  "overrides": [],
+  "errors": [
+    {
+      "message": "无法读取输入文件: ENOENT: no such file or directory, open '/Users/lzy/pro/solo/workspaces/zy70587/nonexistent.yaml'",
+      "location": {
+        "line": 0,
+        "column": 0
+      },
+      "severity": "error"
+    }
+  ],
+  "warnings": [],
+  "expandedYaml": ""
+}
