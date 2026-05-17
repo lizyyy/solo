@@ -157,7 +157,8 @@ class ReportGenerator {
       md += `|------|----------|----------|----------|\n`;
       for (const record of invalidRecords.slice(0, 50)) {
         const raw = (record.raw || '').replace(/\|/g, '\\|').substring(0, 100);
-        md += `| ${record.lineNumber} | ${record.error} | ${record.errorMessage || '-'} | ${raw} |\n`;
+        const errorMsg = (record.errorMessage || '-').replace(/\|/g, '\\|');
+        md += `| ${record.lineNumber} | ${record.error} | ${errorMsg} | ${raw} |\n`;
       }
       if (invalidRecords.length > 50) {
         md += `\n> 仅显示前 50 条异常记录，完整记录请查看 JSON 报告\n`;
@@ -168,8 +169,9 @@ class ReportGenerator {
     md += `| 行号 | 分层 | 状态码 | 地区 | 资源类型 | URL |\n`;
     md += `|------|------|--------|------|----------|-----|\n`;
     for (const s of samples.slice(0, 30)) {
-      const url = (s.data?.url || '').substring(0, 60);
-      md += `| ${s.lineNumber} | ${s.stratum} | ${s.data?.status || '-'} | ${s.data?.region || '-'} | ${s.data?.resourceType || '-'} | ${url} |\n`;
+      const stratumEscaped = (s.stratum || '').replace(/\|/g, '\\|');
+      const url = (s.data?.url || '').replace(/\|/g, '\\|').substring(0, 60);
+      md += `| ${s.lineNumber} | ${stratumEscaped} | ${s.data?.status || '-'} | ${s.data?.region || '-'} | ${s.data?.resourceType || '-'} | ${url} |\n`;
     }
     if (samples.length > 30) {
       md += `\n> 仅显示前 30 条样本，完整样本请查看 JSON 报告\n`;

@@ -88,6 +88,7 @@ class CDNSampler {
   buildResult(sourceFile) {
     const summary = this.sampler.getSummary();
     const samples = this.sampler.getSamples();
+    const totalProcessed = summary.totalProcessed + this.invalidRecords.length;
 
     return {
       metadata: {
@@ -102,6 +103,7 @@ class CDNSampler {
       },
       summary: {
         ...summary,
+        totalProcessed,
         filtered: this.filtered,
         invalid: this.invalidRecords.length,
         duplicates: this.duplicates.length

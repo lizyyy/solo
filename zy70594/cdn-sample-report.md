@@ -1,13 +1,13 @@
 # CDN 访问日志抽样报告
 
-**生成时间**: 2026/5/17 12:09:29
+**生成时间**: 2026/5/17 13:48:44
 **源文件**: /Users/lzy/pro/solo/workspaces/zy70594/data/sample-nginx.log
 
 ## 📊 处理统计
 
 | 指标 | 数值 |
 |------|------|
-| 总行数 | 14 |
+| 总行数 | 15 |
 | 有效行数 | 14 |
 | 抽样数量 | 13 |
 | 抽样比例 | 92.86% |
@@ -68,16 +68,16 @@
 
 | 行号 | 分层 | 状态码 | 地区 | 资源类型 | URL |
 |------|------|--------|------|----------|-----|
-| 1 | 200|CN|html | 200 | CN | html | /index.html |
-| 2 | 200|US|css | 200 | US | css | /style.css |
-| 3 | 200|EU|javascript | 200 | EU | javascript | /app.js |
-| 4 | 200|JP|image | 200 | JP | image | /image.jpg |
-| 5 | 404|KR|html | 404 | KR | html | /notfound.html |
-| 7 | 500|US|other | 500 | US | other | /api/login |
-| 8 | 206|GB|video | 206 | GB | video | /video.mp4 |
-| 9 | 403|DE|other | 403 | DE | other | /admin |
-| 10 | 200|FR|document | 200 | FR | document | /doc.pdf |
-| 12 | 200|CN|font | 200 | CN | font | /font.woff2 |
-| 13 | 304|US|css | 304 | US | css | /style.css |
-| 14 | 429|IN|other | 429 | IN | other | /api/data |
-| 15 | 301|AU|other | 301 | AU | other | /redirect |
+| 1 | 200\|CN\|html | 200 | CN | html | /index.html |
+| 2 | 200\|US\|css | 200 | US | css | /style.css |
+| 3 | 200\|EU\|javascript | 200 | EU | javascript | /app.js |
+| 4 | 200\|JP\|image | 200 | JP | image | /image.jpg |
+| 5 | 404\|KR\|html | 404 | KR | html | /notfound.html |
+| 7 | 500\|US\|other | 500 | US | other | /api/login |
+| 8 | 206\|GB\|video | 206 | GB | video | /video.mp4 |
+| 9 | 403\|DE\|other | 403 | DE | other | /admin |
+| 10 | 200\|FR\|document | 200 | FR | document | /doc.pdf |
+| 12 | 200\|CN\|font | 200 | CN | font | /font.woff2 |
+| 13 | 304\|US\|css | 304 | US | css | /style.css |
+| 14 | 429\|IN\|other | 429 | IN | other | /api/data |
+| 15 | 301\|AU\|other | 301 | AU | other | /redirect |
