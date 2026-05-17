@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package testdata;
+
+enum BadEnum {
+  VALUE1 = 0;
+  this line is bad enum value;
+  VALUE2 = 1;
+}
+
+message TestMessage {
+  string good_field = 1;
+  this is a bad field line;
+  int32 another_good = 2;
+  invalid field syntax here;
+}

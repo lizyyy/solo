@@ -1,15 +1,92 @@
 {
   "summary": {
-    "total_files": 3,
-    "total_messages": 4,
-    "total_fields": 18,
-    "high_risk_fields": 13,
+    "total_files": 4,
+    "total_messages": 5,
+    "total_fields": 20,
+    "high_risk_fields": 15,
     "medium_risk_fields": 3,
     "low_risk_fields": 2,
-    "parse_errors": 1,
-    "scan_time": "2026-05-17T11:43:15+08:00"
+    "parse_errors": 4,
+    "scan_time": "2026-05-17T13:35:17+08:00"
   },
   "proto_files": [
+    {
+      "file_path": "testdata/bad_fields.proto",
+      "messages": [
+        {
+          "name": "TestMessage",
+          "line": 11,
+          "fields": [
+            {
+              "name": "good_field",
+              "line": 12,
+              "type": "string",
+              "number": 1,
+              "label": "",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+            },
+            {
+              "name": "another_good",
+              "line": 14,
+              "type": "int32",
+              "number": 2,
+              "label": "",
+              "default_value": 0,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+            }
+          ]
+        }
+      ],
+      "enums": [
+        {
+          "name": "BadEnum",
+          "line": 5,
+          "values": [
+            {
+              "name": "VALUE1",
+              "line": 6,
+              "number": 0
+            },
+            {
+              "name": "VALUE2",
+              "line": 8,
+              "number": 1
+            }
+          ]
+        }
+      ],
+      "services": null,
+      "imports": null,
+      "package_name": "testdata",
+      "syntax": "proto3",
+      "errors": [
+        {
+          "file_path": "testdata/bad_fields.proto",
+          "line": 7,
+          "message": "invalid enum value syntax",
+          "raw_line": "  this line is bad enum value;"
+        },
+        {
+          "file_path": "testdata/bad_fields.proto",
+          "line": 13,
+          "message": "invalid message field syntax",
+          "raw_line": "  this is a bad field line;"
+        },
+        {
+          "file_path": "testdata/bad_fields.proto",
+          "line": 15,
+          "message": "invalid message field syntax",
+          "raw_line": "  invalid field syntax here;"
+        }
+      ]
+    },
     {
       "file_path": "testdata/legacy.proto",
       "messages": [
@@ -100,7 +177,7 @@
               "type": "OrderStatus",
               "number": 5,
               "label": "",
-              "default_value": null,
+              "default_value": "PENDING",
               "is_explicit": false,
               "options": null,
               "risk_level": "HIGH",
@@ -242,7 +319,7 @@
               "type": "UserStatus",
               "number": 7,
               "label": "",
-              "default_value": null,
+              "default_value": "UNKNOWN",
               "is_explicit": false,
               "options": null,
               "risk_level": "HIGH",
@@ -337,14 +414,44 @@
   ],
   "risk_fields": [
     {
+      "file_path": "testdata/bad_fields.proto",
+      "message_name": "TestMessage",
+      "field_name": "another_good",
+      "line": 14,
+      "field_type": "int32",
+      "default_value": 0,
+      "risk_level": "HIGH",
+      "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+    },
+    {
+      "file_path": "testdata/bad_fields.proto",
+      "message_name": "TestMessage",
+      "field_name": "good_field",
+      "line": 12,
+      "field_type": "string",
+      "default_value": "",
+      "risk_level": "HIGH",
+      "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+    },
+    {
       "file_path": "testdata/order.proto",
       "message_name": "Order",
       "field_name": "status",
       "line": 16,
       "field_type": "OrderStatus",
-      "default_value": null,
+      "default_value": "PENDING",
       "risk_level": "HIGH",
       "risk_reason": "Enum default is first value 'PENDING' - could be ambiguous"
+    },
+    {
+      "file_path": "testdata/order.proto",
+      "message_name": "Order",
+      "field_name": "order_id",
+      "line": 12,
+      "field_type": "string",
+      "default_value": "",
+      "risk_level": "HIGH",
+      "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
     },
     {
       "file_path": "testdata/order.proto",
@@ -367,40 +474,20 @@
       "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
     },
     {
-      "file_path": "testdata/order.proto",
-      "message_name": "Order",
-      "field_name": "order_id",
-      "line": 12,
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
+      "field_name": "name",
+      "line": 13,
       "field_type": "string",
       "default_value": "",
       "risk_level": "HIGH",
       "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
-    },
-    {
-      "file_path": "testdata/user.proto",
-      "message_name": "User",
-      "field_name": "age",
-      "line": 15,
-      "field_type": "int32",
-      "default_value": 0,
-      "risk_level": "HIGH",
-      "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
     },
     {
       "file_path": "testdata/user.proto",
       "message_name": "User",
       "field_name": "id",
       "line": 12,
-      "field_type": "string",
-      "default_value": "",
-      "risk_level": "HIGH",
-      "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
-    },
-    {
-      "file_path": "testdata/user.proto",
-      "message_name": "User",
-      "field_name": "name",
-      "line": 13,
       "field_type": "string",
       "default_value": "",
       "risk_level": "HIGH",
@@ -419,6 +506,16 @@
     {
       "file_path": "testdata/user.proto",
       "message_name": "User",
+      "field_name": "age",
+      "line": 15,
+      "field_type": "int32",
+      "default_value": 0,
+      "risk_level": "HIGH",
+      "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
       "field_name": "balance",
       "line": 17,
       "field_type": "float",
@@ -432,7 +529,7 @@
       "field_name": "status",
       "line": 18,
       "field_type": "UserStatus",
-      "default_value": null,
+      "default_value": "UNKNOWN",
       "risk_level": "HIGH",
       "risk_reason": "Enum default is first value 'UNKNOWN' - could be ambiguous"
     },

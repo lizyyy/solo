@@ -1,7 +1,7 @@
 # Proto 默认值风险扫描报告
 
-**扫描时间**: 2026-05-17T11:43:15+08:00  
-**扫描文件**: 3 个  
+**扫描时间**: 2026-05-17T13:35:17+08:00  
+**扫描文件**: 4 个  
 
 ---
 
@@ -9,39 +9,39 @@
 
 | 风险等级 | 字段数量 | 说明 |
 |---------|---------|------|
-| 🔴 HIGH | 13 | 高度歧义，极易造成误解 |
+| 🔴 HIGH | 15 | 高度歧义，极易造成误解 |
 | 🟡 MEDIUM | 3 | 中度歧义，可能造成误解 |
 | 🟢 LOW | 2 | 低风险或无歧义 |
-| ⚠️ 解析错误 | 1 | 语法问题无法解析 |
+| ⚠️ 解析错误 | 4 | 语法问题无法解析 |
 
 ---
 
 ## 高风险字段详情
 
-### 1. `Order.status`
+### 1. `TestMessage.another_good`
+
+- **位置**: [bad_fields.proto:14](testdata/bad_fields.proto#L14)
+- **类型**: `int32`
+- **隐式默认值**: `0`
+- **风险说明**: Zero value is ambiguous - could mean unset or intentionally zero
+
+**建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
+
+### 2. `TestMessage.good_field`
+
+- **位置**: [bad_fields.proto:12](testdata/bad_fields.proto#L12)
+- **类型**: `string`
+- **隐式默认值**: ``
+- **风险说明**: Empty string '' is ambiguous - could be unset or intentionally empty
+
+**建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
+
+### 3. `Order.status`
 
 - **位置**: [order.proto:16](testdata/order.proto#L16)
 - **类型**: `OrderStatus`
-- **隐式默认值**: `<nil>`
+- **隐式默认值**: `PENDING`
 - **风险说明**: Enum default is first value 'PENDING' - could be ambiguous
-
-**建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
-
-### 2. `Order.user_id`
-
-- **位置**: [order.proto:13](testdata/order.proto#L13)
-- **类型**: `int64`
-- **隐式默认值**: `0`
-- **风险说明**: Zero value is ambiguous - could mean unset or intentionally zero
-
-**建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
-
-### 3. `Order.total_amount`
-
-- **位置**: [order.proto:14](testdata/order.proto#L14)
-- **类型**: `double`
-- **隐式默认值**: `0`
-- **风险说明**: Zero value is ambiguous - could mean unset or intentionally zero
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
@@ -54,21 +54,21 @@
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
-### 5. `User.age`
+### 5. `Order.user_id`
 
-- **位置**: [user.proto:15](testdata/user.proto#L15)
-- **类型**: `int32`
+- **位置**: [order.proto:13](testdata/order.proto#L13)
+- **类型**: `int64`
 - **隐式默认值**: `0`
 - **风险说明**: Zero value is ambiguous - could mean unset or intentionally zero
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
-### 6. `User.id`
+### 6. `Order.total_amount`
 
-- **位置**: [user.proto:12](testdata/user.proto#L12)
-- **类型**: `string`
-- **隐式默认值**: ``
-- **风险说明**: Empty string '' is ambiguous - could be unset or intentionally empty
+- **位置**: [order.proto:14](testdata/order.proto#L14)
+- **类型**: `double`
+- **隐式默认值**: `0`
+- **风险说明**: Zero value is ambiguous - could mean unset or intentionally zero
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
@@ -81,7 +81,16 @@
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
-### 8. `User.email`
+### 8. `User.id`
+
+- **位置**: [user.proto:12](testdata/user.proto#L12)
+- **类型**: `string`
+- **隐式默认值**: ``
+- **风险说明**: Empty string '' is ambiguous - could be unset or intentionally empty
+
+**建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
+
+### 9. `User.email`
 
 - **位置**: [user.proto:14](testdata/user.proto#L14)
 - **类型**: `string`
@@ -90,7 +99,16 @@
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
-### 9. `User.balance`
+### 10. `User.age`
+
+- **位置**: [user.proto:15](testdata/user.proto#L15)
+- **类型**: `int32`
+- **隐式默认值**: `0`
+- **风险说明**: Zero value is ambiguous - could mean unset or intentionally zero
+
+**建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
+
+### 11. `User.balance`
 
 - **位置**: [user.proto:17](testdata/user.proto#L17)
 - **类型**: `float`
@@ -99,16 +117,16 @@
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
-### 10. `User.status`
+### 12. `User.status`
 
 - **位置**: [user.proto:18](testdata/user.proto#L18)
 - **类型**: `UserStatus`
-- **隐式默认值**: `<nil>`
+- **隐式默认值**: `UNKNOWN`
 - **风险说明**: Enum default is first value 'UNKNOWN' - could be ambiguous
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
-### 11. `CreateUserRequest.phone`
+### 13. `CreateUserRequest.phone`
 
 - **位置**: [user.proto:23](testdata/user.proto#L23)
 - **类型**: `string`
@@ -117,7 +135,7 @@
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
-### 12. `CreateUserRequest.password`
+### 14. `CreateUserRequest.password`
 
 - **位置**: [user.proto:24](testdata/user.proto#L24)
 - **类型**: `string`
@@ -126,7 +144,7 @@
 
 **建议**: 考虑使用 wrapper 类型 (如 `google.protobuf.Int32Value`) 或自定义 optional 语义
 
-### 13. `CreateUserRequest.timestamp`
+### 15. `CreateUserRequest.timestamp`
 
 - **位置**: [user.proto:25](testdata/user.proto#L25)
 - **类型**: `int64`
@@ -165,6 +183,30 @@
 ## 解析错误
 
 以下行解析失败，已保留原始内容供排查：
+
+### [bad_fields.proto:7](testdata/bad_fields.proto#L7)
+
+**错误**: invalid enum value syntax
+
+```
+  this line is bad enum value;
+```
+
+### [bad_fields.proto:13](testdata/bad_fields.proto#L13)
+
+**错误**: invalid message field syntax
+
+```
+  this is a bad field line;
+```
+
+### [bad_fields.proto:15](testdata/bad_fields.proto#L15)
+
+**错误**: invalid message field syntax
+
+```
+  invalid field syntax here;
+```
 
 ### [order.proto:20](testdata/order.proto#L20)
 

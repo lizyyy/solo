@@ -225,7 +225,7 @@ func (p *Parser) parseEnumValue(enum *Enum, trimmedLine string, lineNum int) err
 		})
 		return nil
 	}
-	return nil
+	return fmt.Errorf("invalid enum value syntax")
 }
 
 func (p *Parser) parseMessageField(message *Message, trimmedLine string, lineNum int) error {
@@ -276,7 +276,7 @@ func (p *Parser) parseMessageField(message *Message, trimmedLine string, lineNum
 		return nil
 	}
 
-	return nil
+	return fmt.Errorf("invalid message field syntax")
 }
 
 func (p *Parser) parseServiceMethod(service *Service, trimmedLine string, lineNum int) error {
@@ -290,13 +290,19 @@ func (p *Parser) parseServiceMethod(service *Service, trimmedLine string, lineNu
 			ClientStream: match[2] == "stream",
 			ServerStream: match[4] == "stream",
 		})
+		return nil
 	}
-	return nil
+	return fmt.Errorf("invalid service method syntax")
 }
 
 func (p *Parser) analyzeRisks(protoFile *ProtoFile) {
 	for mi, msg := range protoFile.Messages {
 		for fi, field := range msg.Fields {
+			for _, enum := range protoFile.Enums {
+				if enum.Name == field.Type && len(enum.Values) > 0 {
+					protoFile.Messages[mi].Fields[fi].DefaultValue = enum.Values[0].Name
+				}
+			}
 			riskLevel, riskReason := p.analyzeFieldRisk(field, protoFile)
 			protoFile.Messages[mi].Fields[fi].RiskLevel = string(riskLevel)
 			protoFile.Messages[mi].Fields[fi].RiskReason = riskReason
