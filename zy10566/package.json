@@ -1,0 +1,28 @@
+{
+  "name": "cron-timezone-audit",
+  "version": "1.0.0",
+  "description": "Cron表达式时区巡检工具 - 检测夏令时切换时的任务时间异常",
+  "main": "src/cli.js",
+  "bin": {
+    "cron-audit": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "example": "node src/cli.js --input examples/tasks.csv",
+    "lint": "node -c src/**/*.js"
+  },
+  "keywords": ["cron", "timezone", "dst", "audit", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cron-parser": "^4.9.0",
+    "luxon": "^3.4.4",
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,9 @@
+taskName,cronExpression,timezone,service,owner,description
+每日数据备份,0 2 * * *,America/New_York,infra,team-a,每日凌晨2点备份数据库
+用户统计报表,0 3 * * ?,Europe/London,billing,team-b,每日生成用户消费报表
+订单同步任务,*/30 * * * *,Asia/Tokyo,order,team-c,每30分钟同步订单
+库存检查,0 9 * * 1-5,America/Los_Angeles,inventory,team-d,工作日早9点检查库存
+邮件发送队列,*/15 8-18 * * *,Australia/Sydney,notifications,team-e,工作时间每15分钟发送邮件
+,,InvalidTimezone,,,这是一条坏数据
+UTC时间任务,0 12 * * *,UTC,global,team-f,UTC中午12点执行
+北京时区任务,0 9 * * *,Asia/Shanghai,china,team-g,北京时间早9点
