@@ -1,0 +1,35 @@
+{
+  "exchanges": [
+    {
+      "vhost": "/",
+      "type": "topic",
+      "durable": true
+    },
+    {
+      "name": "good.exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true
+    }
+  ],
+  "queues": [
+    {
+      "name": "test.queue",
+      "vhost": "/",
+      "durable": true
+    }
+  ],
+  "bindings": [
+    {
+      "source": "nonexistent.exchange",
+      "destination": "test.queue",
+      "destination_type": "queue",
+      "routing_key": "test"
+    },
+    {
+      "source": "good.exchange",
+      "destination": "nonexistent.queue",
+      "destination_type": "queue"
+    }
+  ]
+}

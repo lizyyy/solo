@@ -1,0 +1,22 @@
+%%{init: {'theme': 'neutral', 'themeVariables': {'fontSize': '14px'}} }%%
+graph TD
+    %% 样式定义
+    classDef exchange fill:#e3f2fd,stroke:#2196f3,stroke-width:2px,rounded;
+    classDef queue fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,rounded;
+    classDef binding fill:#fff,stroke:#ccc,stroke-width:1px;
+    classDef orphan fill:#ffebee,stroke:#f44336,stroke-width:2px,rounded,stroke-dasharray: 5 5;
+
+    subgraph _ ["Vhost: /"]
+        direction TB
+
+        __order_exchange["<b>order.exchange</b><br/><i>topic</i>"]:::exchange
+        __notification_exchange["<b>notification.exchange</b><br/><i>fanout</i>"]:::exchange
+
+        __order_create_queue["<b>order.create.queue</b><br/><i>queue</i>"]:::queue
+        __order_cancel_queue["<b>order.cancel.queue</b><br/><i>queue</i>"]:::queue
+        __notification_queue["<b>notification.queue</b><br/><i>queue</i>"]:::queue
+    end
+
+    __order_exchange --> |order.create| __order_create_queue
+    __order_exchange --> |order.cancel| __order_cancel_queue
+    __notification_exchange --> |fanout| __notification_queue

@@ -1,0 +1,69 @@
+{
+  "exchanges": [
+    {
+      "name": "order.exchange",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true
+    },
+    {
+      "name": "notification.exchange",
+      "vhost": "/",
+      "type": "fanout",
+      "durable": true
+    }
+  ],
+  "queues": [
+    {
+      "name": "order.create.queue",
+      "vhost": "/",
+      "durable": true
+    },
+    {
+      "name": "order.cancel.queue",
+      "vhost": "/",
+      "durable": true
+    },
+    {
+      "name": "notification.queue",
+      "vhost": "/",
+      "durable": true
+    }
+  ],
+  "bindings": [
+    {
+      "source": "order.exchange",
+      "destination": "order.create.queue",
+      "destination_type": "queue",
+      "routing_key": "order.create",
+      "vhost": "/"
+    },
+    {
+      "source": "order.exchange",
+      "destination": "order.cancel.queue",
+      "destination_type": "queue",
+      "routing_key": "order.cancel",
+      "vhost": "/"
+    },
+    {
+      "source": "notification.exchange",
+      "destination": "notification.queue",
+      "destination_type": "queue",
+      "routing_key": "",
+      "vhost": "/"
+    }
+  ],
+  "policies": [
+    {
+      "name": "ha-all",
+      "vhost": "/",
+      "pattern": ".*",
+      "definition": {
+        "ha-mode": "all",
+        "ha-sync-mode": "automatic"
+      },
+      "priority": 0,
+      "apply_to": "all"
+    }
+  ]
+}
