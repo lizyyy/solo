@@ -1,0 +1,31 @@
+{
+  "name": "nginx-cert-refer",
+  "version": "1.0.0",
+  "description": "Nginx 证书引用检查工具",
+  "main": "dist/index.js",
+  "bin": {
+    "nginx-cert-refer": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "nginx",
+    "ssl",
+    "certificate",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "dayjs": "^1.11.10",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "typescript": "^5.2.2"
+  }
+}

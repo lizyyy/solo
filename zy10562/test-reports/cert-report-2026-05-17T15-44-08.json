@@ -1,0 +1,148 @@
+{
+  "scanTime": "2026-05-17T15:44:08.124Z",
+  "inputDir": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx",
+  "outputDir": "/Users/lzy/pro/solo/workspaces/zy10562/test-reports",
+  "summary": {
+    "totalServers": 4,
+    "totalDomains": 4,
+    "totalCerts": 1,
+    "expiringIn30Days": 0,
+    "expiringIn7Days": 0,
+    "expired": 0,
+    "missingCerts": 1,
+    "parseErrors": 0
+  },
+  "serverBlocks": [
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+      "line": 1,
+      "serverNames": [
+        "example.com",
+        "www.example.com"
+      ],
+      "listen": [
+        "80"
+      ]
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+      "line": 7,
+      "serverNames": [
+        "example.com",
+        "www.example.com"
+      ],
+      "sslCertificate": "/etc/ssl/certs/example.com.pem",
+      "sslCertificateKey": "/etc/ssl/private/example.com.key",
+      "listen": [
+        "443 ssl"
+      ]
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+      "line": 18,
+      "serverNames": [
+        "api.example.com"
+      ],
+      "sslCertificate": "/etc/ssl/certs/example.com.pem",
+      "sslCertificateKey": "/etc/ssl/private/example.com.key",
+      "listen": [
+        "443 ssl"
+      ]
+    },
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+      "line": 28,
+      "serverNames": [
+        "missing-cert.example.com"
+      ],
+      "listen": [
+        "443 ssl"
+      ]
+    }
+  ],
+  "domainCertMaps": [
+    {
+      "domain": "example.com",
+      "certPath": "/etc/ssl/certs/example.com.pem",
+      "keyPath": "/etc/ssl/private/example.com.key",
+      "certInfo": {
+        "path": "/etc/ssl/certs/example.com.pem",
+        "exists": false,
+        "isValid": false,
+        "domains": [],
+        "error": "证书文件不存在"
+      },
+      "serverBlocks": [
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+          "line": 1
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "domain": "www.example.com",
+      "certPath": "/etc/ssl/certs/example.com.pem",
+      "keyPath": "/etc/ssl/private/example.com.key",
+      "certInfo": {
+        "path": "/etc/ssl/certs/example.com.pem",
+        "exists": false,
+        "isValid": false,
+        "domains": [],
+        "error": "证书文件不存在"
+      },
+      "serverBlocks": [
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+          "line": 1
+        },
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "domain": "api.example.com",
+      "certPath": "/etc/ssl/certs/example.com.pem",
+      "keyPath": "/etc/ssl/private/example.com.key",
+      "certInfo": {
+        "path": "/etc/ssl/certs/example.com.pem",
+        "exists": false,
+        "isValid": false,
+        "domains": [],
+        "error": "证书文件不存在"
+      },
+      "serverBlocks": [
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "domain": "missing-cert.example.com",
+      "certInfo": null,
+      "serverBlocks": [
+        {
+          "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+          "line": 28
+        }
+      ]
+    }
+  ],
+  "missingReferences": [
+    {
+      "type": "both",
+      "domain": "missing-cert.example.com",
+      "serverBlock": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy10562/test-nginx/conf.d/example.conf",
+        "line": 28
+      }
+    }
+  ],
+  "parseErrors": []
+}
