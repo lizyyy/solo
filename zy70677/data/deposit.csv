@@ -1,0 +1,5 @@
+deposit_id,contract_id,amount,transaction_type,transaction_date,is_refunded,refund_date
+D001,C001,45000.00,DEPOSIT,2024-01-01,False,
+D002,C002,36000.00,DEPOSIT,2024-02-01,False,
+D003,C003,60000.00,DEPOSIT,2024-01-15,False,
+D004,C001,5000.00,DEDUCTION,2024-02-15,False,
