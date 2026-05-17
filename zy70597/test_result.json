@@ -1,0 +1,161 @@
+{
+  "archive_info": {
+    "path": "/Users/lzy/pro/solo/workspaces/zy70597/test_archive.zip",
+    "size_bytes": 1125,
+    "file_count": 9,
+    "format": "zip",
+    "created_at": "2026-05-17T12:06:56.406914",
+    "modified_at": "2026-05-17T12:06:56.406914"
+  },
+  "total_files": 9,
+  "issues_count": {
+    "absolute_path": 1,
+    "normal_space": 1,
+    "chinese_space": 1,
+    "special_character": 1
+  },
+  "duplicate_groups": 0,
+  "files_with_issues": 4,
+  "files_cleaned": 4,
+  "files_skipped": 0,
+  "entries": [
+    {
+      "index": 0,
+      "original_path": "absolute/root/path.txt",
+      "normalized_path": "absolute/root/path.txt",
+      "file_size": 8,
+      "is_directory": false,
+      "issues": [],
+      "encoding_detected": null,
+      "encoding_confidence": 0.0,
+      "duplicate_group": null,
+      "duplicate_index": null,
+      "error_message": null
+    },
+    {
+      "index": 1,
+      "original_path": "C:/Windows/path.txt",
+      "normalized_path": "Windows/path.txt",
+      "file_size": 8,
+      "is_directory": false,
+      "issues": [
+        "absolute_path"
+      ],
+      "encoding_detected": null,
+      "encoding_confidence": 0.0,
+      "duplicate_group": null,
+      "duplicate_index": null,
+      "error_message": null
+    },
+    {
+      "index": 2,
+      "original_path": "file with spaces.txt",
+      "normalized_path": "file_with_spaces.txt",
+      "file_size": 8,
+      "is_directory": false,
+      "issues": [
+        "normal_space"
+      ],
+      "encoding_detected": null,
+      "encoding_confidence": 0.0,
+      "duplicate_group": null,
+      "duplicate_index": null,
+      "error_message": null
+    },
+    {
+      "index": 3,
+      "original_path": "file　with　chinese.txt",
+      "normalized_path": "file_with_chinese.txt",
+      "file_size": 8,
+      "is_directory": false,
+      "issues": [
+        "chinese_space"
+      ],
+      "encoding_detected": "utf-8",
+      "encoding_confidence": 0.0,
+      "duplicate_group": null,
+      "duplicate_index": null,
+      "error_message": null
+    },
+    {
+      "index": 4,
+      "original_path": "duplicate.txt",
+      "normalized_path": "duplicate.txt",
+      "file_size": 4,
+      "is_directory": false,
+      "issues": [],
+      "encoding_detected": null,
+      "encoding_confidence": 0.0,
+      "duplicate_group": null,
+      "duplicate_index": null,
+      "error_message": null
+    },
+    {
+      "index": 5,
+      "original_path": "subdir/duplicate.txt",
+      "normalized_path": "subdir/duplicate.txt",
+      "file_size": 4,
+      "is_directory": false,
+      "issues": [],
+      "encoding_detected": null,
+      "encoding_confidence": 0.0,
+      "duplicate_group": null,
+      "duplicate_index": null,
+      "error_message": null
+    },
+    {
+      "index": 6,
+      "original_path": "normal_file.txt",
+      "normalized_path": "normal_file.txt",
+      "file_size": 6,
+      "is_directory": false,
+      "issues": [],
+      "encoding_detected": null,
+      "encoding_confidence": 0.0,
+      "duplicate_group": null,
+      "duplicate_index": null,
+      "error_message": null
+    },
+    {
+      "index": 7,
+      "original_path": "file<special>:chars?.txt",
+      "normalized_path": "file_special__chars_.txt",
+      "file_size": 7,
+      "is_directory": false,
+      "issues": [
+        "special_character"
+      ],
+      "encoding_detected": null,
+      "encoding_confidence": 0.0,
+      "duplicate_group": null,
+      "duplicate_index": null,
+      "error_message": null
+    },
+    {
+      "index": 8,
+      "original_path": "subdir/nested/file.txt",
+      "normalized_path": "subdir/nested/file.txt",
+      "file_size": 6,
+      "is_directory": false,
+      "issues": [],
+      "encoding_detected": null,
+      "encoding_confidence": 0.0,
+      "duplicate_group": null,
+      "duplicate_index": null,
+      "error_message": null
+    }
+  ],
+  "rules": {
+    "remove_absolute": true,
+    "replace_spaces": true,
+    "replace_chinese_spaces": true,
+    "deduplicate": true,
+    "deduplicate_strategy": "index_suffix",
+    "normalize_separators": true,
+    "max_filename_length": 255
+  },
+  "output_directory": null,
+  "timestamp": "2026-05-17T12:07:30.725704",
+  "exit_code": 1,
+  "success": true
+}

@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "archive-path-cleaner"
+version = "1.0.0"
+description = "归档包路径净化CLI - 处理压缩包中的绝对路径、中文空格和重复文件名问题"
+authors = ["Your Name"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1.7"
+rich = "^13.7.0"
+pydantic = "^2.5.2"
+python-magic = "^0.4.27"
+charset-normalizer = "^3.3.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+black = "^23.11.0"
+mypy = "^1.7.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
