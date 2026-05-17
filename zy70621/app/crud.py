@@ -83,7 +83,7 @@ def check_duplicate_order(db: Session, new_order: schemas.RepairOrderCreate) -> 
         and_(
             models.RepairOrder.building_id == new_order.building_id,
             models.RepairOrder.reported_at >= window_start,
-            models.RepairOrder.status.notin([
+            models.RepairOrder.status.not_in([
                 RepairStatus.COMPLETED, RepairStatus.VERIFIED, 
                 RepairStatus.CLOSED, RepairStatus.CANCELLED
             ]),
@@ -366,6 +366,22 @@ def verify_completion_proof(db: Session, proof_id: int, verified_by: str):
     db.commit()
     db.refresh(db_proof)
     
+    db_order = get_repair_order(db, db_proof.repair_order_id)
+    if db_order and db_order.status == RepairStatus.COMPLETED:
+        old_status = db_order.status
+        db_order.status = RepairStatus.VERIFIED
+        db.commit()
+        db.refresh(db_order)
+        
+        create_audit_log(
+            db, db_proof.repair_order_id, "verify_completion",
+            operator=verified_by,
+            old_status=old_status,
+            new_status=RepairStatus.VERIFIED,
+            original_input={"proof_id": proof_id},
+            conclusion="完工证明已复核，工单状态更新为已复核"
+        )
+    
     return db_proof
 
 
@@ -467,7 +483,26 @@ def get_audit_logs(db: Session, order_id: int = None, skip: int = 0, limit: int 
 
 
 def get_overdue_orders(db: Session, skip: int = 0, limit: int = 100):
-    orders = get_repair_orders(db, skip, limit, is_overdue=True)
+    active_statuses = [
+        RepairStatus.PENDING,
+        RepairStatus.ASSIGNED,
+        RepairStatus.OUTSOURCED,
+        RepairStatus.IN_PROGRESS
+    ]
+    query = db.query(models.RepairOrder).filter(
+        models.RepairOrder.status.in_(active_statuses)
+    )
+    
+    all_active_orders = query.all()
+    for order in all_active_orders:
+        check_overdue(db, order)
+    
+    query = db.query(models.RepairOrder).filter(
+        models.RepairOrder.status.in_(active_statuses),
+        models.RepairOrder.is_overdue == True
+    )
+    orders = query.offset(skip).limit(limit).all()
+    
     return orders
 
 
