@@ -1,0 +1,13 @@
+GET https://api.example.com/search?q=test
+Authorization: Bearer secret-jwt-token
+Accept: application/json
+
+POST https://api.example.com/submit
+Content-Type: application/json
+Cookie: session=abc123; user=test
+
+{"data": "test payload"}
+
+PUT https://api.example.com/update/1
+Content-Type: application/json
+{"name": "updated"}

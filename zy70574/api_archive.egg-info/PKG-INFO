@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: api-archive
+Version: 0.1.0
+Summary: API抓包归档CLI工具 - 统一归档HTTP抓包数据
+Author: API Archive Team
+Keywords: api har curl archive
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0.0
+Requires-Dist: haralyzer>=2.0.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jinja2>=3.0
+Requires-Dist: rich>=12.0
+Dynamic: author
+Dynamic: keywords
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

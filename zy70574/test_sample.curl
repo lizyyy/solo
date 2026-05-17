@@ -1,0 +1,4 @@
+# 测试curl命令文件
+curl -X GET https://api.example.com/users -H "Authorization: Bearer test-token-12345"
+curl -X POST https://api.example.com/data -H "Content-Type: application/json" -d '{"key": "value"}'
+curl -X DELETE https://api.example.com/resource/123

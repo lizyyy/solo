@@ -12,9 +12,13 @@
 
 ## 快速开始
 
-### 安装依赖
+### 安装
 
 ```bash
+# 方式1: 开发模式安装（推荐）
+pip install -e .
+
+# 方式2: 仅安装依赖
 pip install -r requirements.txt
 ```
 
@@ -22,22 +26,25 @@ pip install -r requirements.txt
 
 ```bash
 # 查看帮助
-python3 api_archive.py --help
+python3 -m api_archive.cli --help
 
 # 查看默认配置（敏感字段、支持格式）
-python3 api_archive.py config
+python3 -m api_archive.cli config
 
 # 归档抓包文件（终端输出摘要）
-python3 api_archive.py archive example.har
+python3 -m api_archive.cli archive example.har
 
 # 归档多个文件并输出报告
-python3 api_archive.py archive example.har requests.curl -o ./output
+python3 -m api_archive.cli archive example.har requests.curl -o ./output
 
 # 仅输出JSON格式结果
-python3 api_archive.py archive example.har -f json
+python3 -m api_archive.cli archive example.har -f json
 
 # 验证抓包文件格式
-python3 api_archive.py validate example.har
+python3 -m api_archive.cli validate example.har
+
+# （已安装到PATH后）直接使用命令名
+api-archive config
 ```
 
 ### 命令选项说明
