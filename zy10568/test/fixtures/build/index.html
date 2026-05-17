@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面 - 资源404扫描</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/missing.css">
+    <link rel="icon" href="favicon.ico">
+</head>
+<body>
+    <h1>资源404扫描测试页面</h1>
+    
+    <div class="content">
+        <img src="images/logo.png" alt="Logo">
+        <img src="images/missing-image.png" alt="缺失的图片">
+        <img src="/absent.png" alt="根目录缺失图片">
+        
+        <picture>
+            <source srcset="images/photo.webp" type="image/webp">
+            <source srcset="images/photo-missing.jpg" type="image/jpeg">
+            <img src="images/photo.jpg" alt="照片">
+        </picture>
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script src="js/missing-script.js"></script>
+    
+    <style>
+        .bg-test {
+            background-image: url('images/bg.jpg');
+        }
+        .bg-missing {
+            background-image: url('images/bg-missing.png');
+        }
+    </style>
+</body>
+</html>

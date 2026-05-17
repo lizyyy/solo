@@ -1,0 +1,428 @@
+{
+  "summary": {
+    "totalFilesScanned": 1,
+    "totalAssetsFound": 16,
+    "missingAssetsCount": 13,
+    "missingByType": {
+      "image": 8,
+      "font": 2,
+      "css": 1,
+      "script": 1,
+      "media": 0,
+      "other": 1
+    },
+    "scanDuration": 6,
+    "baseDir": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build"
+  },
+  "files": [
+    "index.html"
+  ],
+  "missingAssets": [
+    {
+      "url": "images/missing-image.png",
+      "normalizedUrl": "images/missing-image.png",
+      "resolvedPath": "images/missing-image.png",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/images/missing-image.png",
+      "type": "image",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 16,
+          "column": 9,
+          "pattern": "imgSrc",
+          "rawValue": "images/missing-image.png",
+          "context": "   <img src=\"images/logo.png\" alt=\"Logo\">\n        <img src=\"images/missing-image.png\" alt=\"缺失的图片\">\n      "
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "/absent.png",
+      "normalizedUrl": "/absent.png",
+      "resolvedPath": "absent.png",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/absent.png",
+      "type": "image",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 17,
+          "column": 9,
+          "pattern": "imgSrc",
+          "rawValue": "/absent.png",
+          "context": "c=\"images/missing-image.png\" alt=\"缺失的图片\">\n        <img src=\"/absent.png\" alt=\"根目录缺失图片\">\n    "
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "images/photo.jpg",
+      "normalizedUrl": "images/photo.jpg",
+      "resolvedPath": "images/photo.jpg",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/images/photo.jpg",
+      "type": "image",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 22,
+          "column": 13,
+          "pattern": "imgSrc",
+          "rawValue": "images/photo.jpg",
+          "context": "photo-missing.jpg\" type=\"image/jpeg\">\n            <img src=\"images/photo.jpg\" alt=\"照片\">\n        <"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "css/missing.css",
+      "normalizedUrl": "css/missing.css",
+      "resolvedPath": "css/missing.css",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/css/missing.css",
+      "type": "css",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 8,
+          "column": 5,
+          "pattern": "linkHref",
+          "rawValue": "css/missing.css",
+          "context": " <link rel=\"stylesheet\" href=\"css/style.css\">\n    <link rel=\"stylesheet\" href=\"css/missing.css\">\n    <link rel=\"ico"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "favicon.ico",
+      "normalizedUrl": "favicon.ico",
+      "resolvedPath": "favicon.ico",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/favicon.ico",
+      "type": "other",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 9,
+          "column": 5,
+          "pattern": "linkHref",
+          "rawValue": "favicon.ico",
+          "context": "link rel=\"stylesheet\" href=\"css/missing.css\">\n    <link rel=\"icon\" href=\"favicon.ico\">\n</head>\n<body>\n   "
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "js/missing-script.js",
+      "normalizedUrl": "js/missing-script.js",
+      "resolvedPath": "js/missing-script.js",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/js/missing-script.js",
+      "type": "script",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 27,
+          "column": 5,
+          "pattern": "scriptSrc",
+          "rawValue": "js/missing-script.js",
+          "context": ">\n    \n    <script src=\"js/main.js\"></script>\n    <script src=\"js/missing-script.js\"></script>\n    \n    "
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "images/photo.webp",
+      "normalizedUrl": "images/photo.webp",
+      "resolvedPath": "images/photo.webp",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/images/photo.webp",
+      "type": "image",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 20,
+          "column": 13,
+          "pattern": "sourceSrcset",
+          "rawValue": "images/photo.webp",
+          "context": "\"根目录缺失图片\">\n        \n        <picture>\n            <source srcset=\"images/photo.webp\" type=\"image/webp\">\n"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "images/photo-missing.jpg",
+      "normalizedUrl": "images/photo-missing.jpg",
+      "resolvedPath": "images/photo-missing.jpg",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/images/photo-missing.jpg",
+      "type": "image",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 21,
+          "column": 13,
+          "pattern": "sourceSrcset",
+          "rawValue": "images/photo-missing.jpg",
+          "context": "images/photo.webp\" type=\"image/webp\">\n            <source srcset=\"images/photo-missing.jpg\" type=\"image/jpeg\">\n"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "../fonts/test.woff2",
+      "normalizedUrl": "../fonts/test.woff2",
+      "resolvedPath": "fonts/test.woff2",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/fonts/test.woff2",
+      "type": "font",
+      "occurrences": [
+        {
+          "source": "css",
+          "filePath": "css/style.css",
+          "line": 3,
+          "column": 10,
+          "pattern": "url",
+          "rawValue": "../fonts/test.woff2",
+          "context": "-family: 'TestFont';\n    src: url('../fonts/test.woff2') format('w"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "../fonts/missing.woff",
+      "normalizedUrl": "../fonts/missing.woff",
+      "resolvedPath": "fonts/missing.woff",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/fonts/missing.woff",
+      "type": "font",
+      "occurrences": [
+        {
+          "source": "css",
+          "filePath": "css/style.css",
+          "line": 4,
+          "column": 10,
+          "pattern": "url",
+          "rawValue": "../fonts/missing.woff",
+          "context": "2') format('woff2'),\n         url('../fonts/missing.woff') format('w"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "../images/bg-pattern.png",
+      "normalizedUrl": "../images/bg-pattern.png",
+      "resolvedPath": "images/bg-pattern.png",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/images/bg-pattern.png",
+      "type": "image",
+      "occurrences": [
+        {
+          "source": "css",
+          "filePath": "css/style.css",
+          "line": 13,
+          "column": 23,
+          "pattern": "url",
+          "rawValue": "../images/bg-pattern.png",
+          "context": "f5f5f5;\n    background-image: url('../images/bg-pattern.png');\n}\n\nh1 {\n"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "../images/icon.png",
+      "normalizedUrl": "../images/icon.png",
+      "resolvedPath": "images/icon.png",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/images/icon.png",
+      "type": "image",
+      "occurrences": [
+        {
+          "source": "css",
+          "filePath": "css/style.css",
+          "line": 23,
+          "column": 17,
+          "pattern": "url",
+          "rawValue": "../images/icon.png",
+          "context": "eight: 100px;\n    background: url('../images/icon.png') no-repeat"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    },
+    {
+      "url": "../images/not-exist.png",
+      "normalizedUrl": "../images/not-exist.png",
+      "resolvedPath": "images/not-exist.png",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/images/not-exist.png",
+      "type": "image",
+      "occurrences": [
+        {
+          "source": "css",
+          "filePath": "css/style.css",
+          "line": 27,
+          "column": 17,
+          "pattern": "url",
+          "rawValue": "../images/not-exist.png",
+          "context": ".missing-bg {\n    background: url('../images/not-exist.png');\n}\n"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": false,
+      "fileInfo": {
+        "exists": false,
+        "isDirectory": false,
+        "error": "ENOENT"
+      }
+    }
+  ],
+  "validAssets": [
+    {
+      "url": "images/logo.png",
+      "normalizedUrl": "images/logo.png",
+      "resolvedPath": "images/logo.png",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/images/logo.png",
+      "type": "image",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 15,
+          "column": 9,
+          "pattern": "imgSrc",
+          "rawValue": "images/logo.png",
+          "context": "描测试页面</h1>\n    \n    <div class=\"content\">\n        <img src=\"images/logo.png\" alt=\"Logo\">\n       "
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": true,
+      "fileInfo": {
+        "exists": true,
+        "isDirectory": false,
+        "size": 97,
+        "mtime": "2026-05-17T16:02:45.141Z"
+      }
+    },
+    {
+      "url": "css/style.css",
+      "normalizedUrl": "css/style.css",
+      "resolvedPath": "css/style.css",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/css/style.css",
+      "type": "css",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 7,
+          "column": 5,
+          "pattern": "linkHref",
+          "rawValue": "css/style.css",
+          "context": "scale=1.0\">\n    <title>测试页面 - 资源404扫描</title>\n    <link rel=\"stylesheet\" href=\"css/style.css\">\n    <link rel=\"sty"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": true,
+      "fileInfo": {
+        "exists": true,
+        "isDirectory": false,
+        "size": 522,
+        "mtime": "2026-05-17T16:01:48.638Z"
+      }
+    },
+    {
+      "url": "js/main.js",
+      "normalizedUrl": "js/main.js",
+      "resolvedPath": "js/main.js",
+      "absolutePath": "/Users/lzy/pro/solo/workspaces/zy10568/test/fixtures/build/js/main.js",
+      "type": "script",
+      "occurrences": [
+        {
+          "source": "html",
+          "filePath": "index.html",
+          "line": 26,
+          "column": 5,
+          "pattern": "scriptSrc",
+          "rawValue": "js/main.js",
+          "context": " alt=\"照片\">\n        </picture>\n    </div>\n    \n    <script src=\"js/main.js\"></script>\n    <scri"
+        }
+      ],
+      "occurrenceCount": 1,
+      "exists": true,
+      "fileInfo": {
+        "exists": true,
+        "isDirectory": false,
+        "size": 38,
+        "mtime": "2026-05-17T16:02:43.885Z"
+      }
+    }
+  ],
+  "errors": []
+}

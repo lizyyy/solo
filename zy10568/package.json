@@ -1,0 +1,26 @@
+{
+  "name": "asset-404-scanner",
+  "version": "1.0.0",
+  "description": "前端静态资源404扫描CLI工具，扫描构建目录中的HTML、CSS文件，检测缺失的图片、字体等资源",
+  "main": "src/index.js",
+  "bin": {
+    "asset-scan": "./bin/asset-scan.js"
+  },
+  "scripts": {
+    "test": "node src/self-test.js",
+    "self-test": "node src/self-test.js",
+    "demo": "node bin/asset-scan.js --dir test/fixtures/build --report test/reports"
+  },
+  "keywords": [
+    "404",
+    "asset-scanner",
+    "static-site",
+    "frontend",
+    "build-tool"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

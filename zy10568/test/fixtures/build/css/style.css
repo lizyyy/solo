@@ -1,0 +1,28 @@
+@font-face {
+    font-family: 'TestFont';
+    src: url('../fonts/test.woff2') format('woff2'),
+         url('../fonts/missing.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: #f5f5f5;
+    background-image: url('../images/bg-pattern.png');
+}
+
+h1 {
+    color: #333;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    background: url('../images/icon.png') no-repeat center;
+}
+
+.missing-bg {
+    background: url('../images/not-exist.png');
+}
