@@ -560,12 +560,22 @@ def manual_correction(request: ManualCorrectionRequest, db: Session = Depends(ge
     }
     
     if request.entity_type not in entity_map:
+        create_audit_log(
+            db, "manual_correction_failed", request.entity_type, request.entity_id,
+            {"corrected_data": request.corrected_data, "reason": request.correction_reason},
+            request.corrected_by, f"人工修正失败: 不支持的实体类型 {request.entity_type}"
+        )
         raise HTTPException(status_code=400, detail=f"不支持的实体类型: {request.entity_type}")
     
     model = entity_map[request.entity_type]
     entity = db.query(model).filter(model.id == request.entity_id).first()
     
     if not entity:
+        create_audit_log(
+            db, "manual_correction_failed", request.entity_type, request.entity_id,
+            {"corrected_data": request.corrected_data, "reason": request.correction_reason},
+            request.corrected_by, f"人工修正失败: 实体不存在"
+        )
         raise HTTPException(status_code=404, detail="实体不存在")
     
     original_data = {col.name: getattr(entity, col.name) for col in entity.__table__.columns}
