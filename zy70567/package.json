@@ -1,0 +1,26 @@
+{
+  "name": "ip-overlap-cli",
+  "version": "1.0.0",
+  "description": "IP段重叠检测CLI工具",
+  "main": "dist/index.js",
+  "bin": {
+    "ip-overlap": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": ["cidr", "ip", "overlap"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0"
+  }
+}
+}

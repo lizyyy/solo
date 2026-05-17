@@ -1,0 +1,9 @@
+# CIDR,Team,Purpose,Environment
+192.168.1.0/24,TeamA,WebService,Prod
+192.168.1.128/25,TeamB,Database,Prod
+10.0.0.0/8,TeamC,Internal,Dev
+172.16.0.0/12,TeamD,Container,Staging
+172.16.1.0/24,TeamA,Monitoring,Prod
+invalid-cidr,TeamE,Test,Dev
+bad-format
+192.168.2.0/24,TeamF,API,Prod
