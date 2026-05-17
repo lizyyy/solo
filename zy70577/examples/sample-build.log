@@ -1,0 +1,22 @@
+2024-01-15T10:00:00Z ##[group]Install Dependencies
+2024-01-15T10:00:01Z Cache restored from key: node-modules-v1-linux-x64-abc123
+2024-01-15T10:00:05Z npm install completed in 4000ms
+2024-01-15T10:00:05Z ##[endgroup]
+
+2024-01-15T10:00:05Z ##[group]Build
+2024-01-15T10:00:06Z Cache not found for input keys: build-cache-v2
+2024-01-15T10:02:30Z npm run build completed in 144000ms
+2024-01-15T10:02:30Z ##[endgroup]
+
+2024-01-15T10:02:30Z ##[group]Test
+2024-01-15T10:02:31Z Cache restored from key: test-cache-v1
+2024-01-15T10:03:15Z npm test completed in 44000ms
+2024-01-15T10:03:15Z ##[endgroup]
+
+2024-01-15T10:03:15Z ##[group]Deploy
+2024-01-15T10:03:16Z Cache not found for input keys: deploy-cache-v1
+2024-01-15T10:04:00Z Deploy completed in 44000ms
+2024-01-15T10:04:00Z ##[endgroup]
+
+This is an invalid line that should be marked as bad
+Another malformed line without any cache or stage info
