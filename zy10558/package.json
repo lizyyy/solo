@@ -1,0 +1,26 @@
+{
+  "name": "test-failure-cluster",
+  "version": "1.0.0",
+  "description": "测试失败聚类CLI - 自动聚类相似的测试失败，帮助维护者快速识别新增错误",
+  "main": "dist/cli.js",
+  "bin": {
+    "tfc": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node dist/cli.js self-test",
+    "self-test": "node dist/cli.js self-test"
+  },
+  "keywords": ["test", "failure", "cluster", "ci", "log"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.0.0"
+  }
+}
