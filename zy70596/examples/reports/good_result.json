@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "generated_at": "2026-05-17T12:10:11.585027",
+    "check_type": "sqlite_backup_consistency"
+  },
+  "summary": {
+    "is_valid": true,
+    "page_count": 6,
+    "valid_pages": 6,
+    "error_count": 0,
+    "warning_count": 0
+  },
+  "files": {
+    "database": {
+      "path": "examples/good.db",
+      "exists": true,
+      "size_bytes": 24576,
+      "size_human": "24.00 KB",
+      "sha256": "bb94e9d966b5305bf4ff2480caa26c9c81496e9072343a18bf481fcb38be1a95",
+      "modified_at": "2026-05-17T12:08:01.917220"
+    },
+    "wal": null
+  },
+  "errors": [],
+  "warnings": [],
+  "pages": []
+}

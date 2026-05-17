@@ -1,0 +1,22 @@
+errors: []
+files:
+  database:
+    exists: true
+    modified_at: '2026-05-17T12:08:01.917220'
+    path: examples/good.db
+    sha256: bb94e9d966b5305bf4ff2480caa26c9c81496e9072343a18bf481fcb38be1a95
+    size_bytes: 24576
+    size_human: 24.00 KB
+  wal: null
+metadata:
+  check_type: sqlite_backup_consistency
+  generated_at: '2026-05-17T12:10:11.585027'
+  version: 1.0.0
+pages: []
+summary:
+  error_count: 0
+  is_valid: true
+  page_count: 6
+  valid_pages: 6
+  warning_count: 0
+warnings: []
