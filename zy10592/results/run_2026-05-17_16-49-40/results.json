@@ -1,0 +1,3252 @@
+{
+  "meta": {
+    "generatedAt": "2026-05-17T16:49:40.741Z",
+    "timestamp": "2026-05-17_16-49-40",
+    "options": {
+      "input": "./logs",
+      "output": "./results",
+      "percentiles": "50,90,95,99",
+      "slowThreshold": "3000",
+      "errorSamples": "10",
+      "logFormat": "json"
+    },
+    "slowThreshold": 3000
+  },
+  "deduplication": {
+    "policy": "去重口径说明：\n1. 优先使用 request_id 作为唯一标识\n2. 无 request_id 时，使用【路径 + 租户 + 秒级时间戳 + 耗时】作为近似标识\n3. 仍无法匹配时，按原始行号保留，不进行去重\n4. 重复请求保留首次出现的记录，其他记录计入 duplicateSources",
+    "originalCount": 502,
+    "dedupedCount": 500,
+    "duplicateCount": 2
+  },
+  "badLines": {
+    "count": 3,
+    "samples": [
+      {
+        "filename": "access.log",
+        "lineNumber": 503,
+        "error": "JSON解析失败: Unexpected token '这', \"这是一行坏数据\" is not valid JSON",
+        "raw": "这是一行坏数据"
+      },
+      {
+        "filename": "access.log",
+        "lineNumber": 504,
+        "error": "JSON解析失败: Expected property name or '}' in JSON at position 2 (line 1 column 3)",
+        "raw": "{ invalid json: true "
+      },
+      {
+        "filename": "access.log",
+        "lineNumber": 505,
+        "error": "耗时尚无效 (not_a_number)",
+        "raw": "{\"path\": \"/api/test\", \"latency\": \"not_a_number\"}"
+      }
+    ]
+  },
+  "results": [
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "",
+      "statusCode": 200,
+      "stats": {
+        "count": 14,
+        "min": 61,
+        "max": 1266,
+        "avg": 251.14285714285714,
+        "sum": 3516,
+        "variance": 85269.1224489796,
+        "stdDev": 292.0087711850101,
+        "p50": 170.5,
+        "p90": 316.6000000000001,
+        "p95": 662.1499999999996,
+        "p99": 1145.229999999999
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "",
+      "statusCode": 200,
+      "stats": {
+        "count": 12,
+        "min": 109,
+        "max": 1238,
+        "avg": 319.5833333333333,
+        "sum": 3835,
+        "variance": 86718.90972222223,
+        "stdDev": 294.4807459278488,
+        "p50": 241,
+        "p90": 478.1000000000001,
+        "p95": 829.8999999999994,
+        "p99": 1156.3800000000003
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "",
+      "statusCode": 200,
+      "stats": {
+        "count": 12,
+        "min": 515,
+        "max": 1463,
+        "avg": 1107.25,
+        "sum": 13287,
+        "variance": 79261.52083333333,
+        "stdDev": 281.5342267528645,
+        "p50": 1229,
+        "p90": 1319.9,
+        "p95": 1386,
+        "p99": 1447.6000000000001
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_002",
+      "statusCode": 200,
+      "stats": {
+        "count": 10,
+        "min": 62,
+        "max": 993,
+        "avg": 242.1,
+        "sum": 2421,
+        "variance": 65639.09,
+        "stdDev": 256.20126853706245,
+        "p50": 166,
+        "p90": 331.4999999999998,
+        "p95": 662.2499999999992,
+        "p99": 926.85
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_002",
+      "statusCode": 200,
+      "stats": {
+        "count": 10,
+        "min": 512,
+        "max": 1485,
+        "avg": 951.7,
+        "sum": 9517,
+        "variance": 113902.20999999999,
+        "stdDev": 337.4940147617436,
+        "p50": 973,
+        "p90": 1380.6000000000001,
+        "p95": 1432.7999999999997,
+        "p99": 1474.56
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_003",
+      "statusCode": 200,
+      "stats": {
+        "count": 10,
+        "min": 1433,
+        "max": 14295,
+        "avg": 4277,
+        "sum": 42770,
+        "variance": 14520256.6,
+        "stdDev": 3810.545446520747,
+        "p50": 2653.5,
+        "p90": 8695.199999999997,
+        "p95": 11495.099999999993,
+        "p99": 13735.02
+      },
+      "slowSamples": [
+        {
+          "latency": 14295,
+          "requestId": "req_45fab11xxdz",
+          "sourceFile": "access.log",
+          "lineNumber": 368,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 8073,
+          "requestId": "req_fo6l4962tuu",
+          "sourceFile": "access.log",
+          "lineNumber": 259,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3953,
+          "requestId": "req_ttxhfnt6xxo",
+          "sourceFile": "access.log",
+          "lineNumber": 186,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3823,
+          "requestId": "req_czl4uje8ocd",
+          "sourceFile": "access.log",
+          "lineNumber": 269,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3228,
+          "requestId": "req_zp154bi19xc",
+          "sourceFile": "access.log",
+          "lineNumber": 346,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_003",
+      "statusCode": 200,
+      "stats": {
+        "count": 9,
+        "min": 801,
+        "max": 1483,
+        "avg": 1200,
+        "sum": 10800,
+        "variance": 48083.77777777778,
+        "stdDev": 219.28013539255622,
+        "p50": 1234,
+        "p90": 1438.1999999999998,
+        "p95": 1460.6,
+        "p99": 1478.52
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_003",
+      "statusCode": 200,
+      "stats": {
+        "count": 9,
+        "min": 69,
+        "max": 334,
+        "avg": 178.88888888888889,
+        "sum": 1610,
+        "variance": 10314.765432098766,
+        "stdDev": 101.56163366202203,
+        "p50": 135,
+        "p90": 319.6,
+        "p95": 326.8,
+        "p99": 332.56
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "",
+      "statusCode": 200,
+      "stats": {
+        "count": 7,
+        "min": 156,
+        "max": 1046,
+        "avg": 376.42857142857144,
+        "sum": 2635,
+        "variance": 78086.5306122449,
+        "stdDev": 279.4396725811224,
+        "p50": 290,
+        "p90": 620.6000000000003,
+        "p95": 833.2999999999995,
+        "p99": 1003.4599999999996
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_003",
+      "statusCode": 200,
+      "stats": {
+        "count": 7,
+        "min": 71,
+        "max": 347,
+        "avg": 159.85714285714286,
+        "sum": 1119,
+        "variance": 8361.26530612245,
+        "stdDev": 91.43995464851484,
+        "p50": 138,
+        "p90": 272.6,
+        "p95": 309.7999999999999,
+        "p99": 339.55999999999995
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_001",
+      "statusCode": 200,
+      "stats": {
+        "count": 7,
+        "min": 72,
+        "max": 1189,
+        "avg": 375.57142857142856,
+        "sum": 2629,
+        "variance": 123436.8163265306,
+        "stdDev": 351.3357601021146,
+        "p50": 269,
+        "p90": 743.2000000000003,
+        "p95": 966.0999999999995,
+        "p99": 1144.4199999999996
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "",
+      "statusCode": 200,
+      "stats": {
+        "count": 7,
+        "min": 1167,
+        "max": 4577,
+        "avg": 2564.1428571428573,
+        "sum": 17949,
+        "variance": 1111235.5510204083,
+        "stdDev": 1054.1515787686362,
+        "p50": 2615,
+        "p90": 3698.6000000000004,
+        "p95": 4137.799999999999,
+        "p99": 4489.159999999999
+      },
+      "slowSamples": [
+        {
+          "latency": 4577,
+          "requestId": "req_lngrpa6tzzh",
+          "sourceFile": "access.log",
+          "lineNumber": 48,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3113,
+          "requestId": "req_tt5wcvcfv4o",
+          "sourceFile": "access.log",
+          "lineNumber": 192,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_003",
+      "statusCode": 200,
+      "stats": {
+        "count": 7,
+        "min": 54,
+        "max": 281,
+        "avg": 137.85714285714286,
+        "sum": 965,
+        "variance": 5125.836734693878,
+        "stdDev": 71.59494908646752,
+        "p50": 144,
+        "p90": 216.20000000000005,
+        "p95": 248.5999999999999,
+        "p99": 274.52
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "",
+      "statusCode": 201,
+      "stats": {
+        "count": 6,
+        "min": 1510,
+        "max": 3141,
+        "avg": 2393.6666666666665,
+        "sum": 14362,
+        "variance": 448425.22222222225,
+        "stdDev": 669.6455944917597,
+        "p50": 2397,
+        "p90": 3132.5,
+        "p95": 3136.75,
+        "p99": 3140.15
+      },
+      "slowSamples": [
+        {
+          "latency": 3141,
+          "requestId": "req_ywdhrojic7",
+          "sourceFile": "access.log",
+          "lineNumber": 212,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3124,
+          "requestId": "req_ggnf5wncyeb",
+          "sourceFile": "access.log",
+          "lineNumber": 281,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/products",
+      "tenant": "",
+      "statusCode": 201,
+      "stats": {
+        "count": 6,
+        "min": 53,
+        "max": 341,
+        "avg": 185,
+        "sum": 1110,
+        "variance": 11310.666666666666,
+        "stdDev": 106.3516180726305,
+        "p50": 188,
+        "p90": 312,
+        "p95": 326.5,
+        "p99": 338.1
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "",
+      "statusCode": 200,
+      "stats": {
+        "count": 6,
+        "min": 1569,
+        "max": 3613,
+        "avg": 2440.8333333333335,
+        "sum": 14645,
+        "variance": 629360.8055555556,
+        "stdDev": 793.3226364825068,
+        "p50": 2210,
+        "p90": 3499,
+        "p95": 3556,
+        "p99": 3601.6000000000004
+      },
+      "slowSamples": [
+        {
+          "latency": 3613,
+          "requestId": "req_e44obuiead8",
+          "sourceFile": "access.log",
+          "lineNumber": 478,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3385,
+          "requestId": "req_lcwxmber6ei",
+          "sourceFile": "access.log",
+          "lineNumber": 430,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_003",
+      "statusCode": 200,
+      "stats": {
+        "count": 6,
+        "min": 70,
+        "max": 1168,
+        "avg": 299,
+        "sum": 1794,
+        "variance": 153723.33333333334,
+        "stdDev": 392.07567296802966,
+        "p50": 126.5,
+        "p90": 697.5,
+        "p95": 932.75,
+        "p99": 1120.95
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_002",
+      "statusCode": 200,
+      "stats": {
+        "count": 6,
+        "min": 66,
+        "max": 330,
+        "avg": 194.16666666666666,
+        "sum": 1165,
+        "variance": 11121.13888888889,
+        "stdDev": 105.45681053819564,
+        "p50": 184,
+        "p90": 327,
+        "p95": 328.5,
+        "p99": 329.7
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "",
+      "statusCode": 200,
+      "stats": {
+        "count": 6,
+        "min": 82,
+        "max": 2446,
+        "avg": 566,
+        "sum": 3396,
+        "variance": 714496.3333333334,
+        "stdDev": 845.2788494534412,
+        "p50": 205.5,
+        "p90": 1393,
+        "p95": 1919.5,
+        "p99": 2340.7000000000003
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_001",
+      "statusCode": 200,
+      "stats": {
+        "count": 6,
+        "min": 1243,
+        "max": 2890,
+        "avg": 1910.6666666666667,
+        "sum": 11464,
+        "variance": 336112.22222222225,
+        "stdDev": 579.7518626293686,
+        "p50": 1797.5,
+        "p90": 2644.5,
+        "p95": 2767.25,
+        "p99": 2865.45
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_002",
+      "statusCode": 200,
+      "stats": {
+        "count": 6,
+        "min": 1242,
+        "max": 3437,
+        "avg": 2587.8333333333335,
+        "sum": 15527,
+        "variance": 661859.1388888889,
+        "stdDev": 813.5472567029459,
+        "p50": 2991,
+        "p90": 3298.5,
+        "p95": 3367.75,
+        "p99": 3423.15
+      },
+      "slowSamples": [
+        {
+          "latency": 3437,
+          "requestId": "req_apdhsc9rv8",
+          "sourceFile": "access.log",
+          "lineNumber": 481,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3160,
+          "requestId": "req_kg9mgs2gbi",
+          "sourceFile": "access.log",
+          "lineNumber": 365,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3057,
+          "requestId": "req_830jno440ua",
+          "sourceFile": "access.log",
+          "lineNumber": 489,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_003",
+      "statusCode": 200,
+      "stats": {
+        "count": 5,
+        "min": 2600,
+        "max": 3986,
+        "avg": 3381.8,
+        "sum": 16909,
+        "variance": 326222.16,
+        "stdDev": 571.1586119459287,
+        "p50": 3561,
+        "p90": 3967.2,
+        "p95": 3976.6,
+        "p99": 3984.12
+      },
+      "slowSamples": [
+        {
+          "latency": 3986,
+          "requestId": "req_rvp99bk0qt",
+          "sourceFile": "access.log",
+          "lineNumber": 403,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3939,
+          "requestId": "req_i2kwq6cxw6f",
+          "sourceFile": "access.log",
+          "lineNumber": 21,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3561,
+          "requestId": "req_dtr5ppbml",
+          "sourceFile": "access.log",
+          "lineNumber": 232,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "",
+      "statusCode": 201,
+      "stats": {
+        "count": 5,
+        "min": 1668,
+        "max": 3536,
+        "avg": 2792.2,
+        "sum": 13961,
+        "variance": 446284.16,
+        "stdDev": 668.0450284224859,
+        "p50": 2819,
+        "p90": 3476.8,
+        "p95": 3506.3999999999996,
+        "p99": 3530.08
+      },
+      "slowSamples": [
+        {
+          "latency": 3536,
+          "requestId": "req_hyebehb0a",
+          "sourceFile": "access.log",
+          "lineNumber": 185,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3388,
+          "requestId": "req_mi2xftop1tg",
+          "sourceFile": "access.log",
+          "lineNumber": 378,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_001",
+      "statusCode": 200,
+      "stats": {
+        "count": 5,
+        "min": 78,
+        "max": 322,
+        "avg": 182.6,
+        "sum": 913,
+        "variance": 7846.639999999999,
+        "stdDev": 88.58126212693065,
+        "p50": 173,
+        "p90": 287.2,
+        "p95": 304.6,
+        "p99": 318.52000000000004
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_001",
+      "statusCode": 201,
+      "stats": {
+        "count": 5,
+        "min": 97,
+        "max": 323,
+        "avg": 200.6,
+        "sum": 1003,
+        "variance": 7114.639999999999,
+        "stdDev": 84.3483254131343,
+        "p50": 165,
+        "p90": 303.40000000000003,
+        "p95": 313.2,
+        "p99": 321.04
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "",
+      "statusCode": 401,
+      "stats": {
+        "count": 5,
+        "min": 55,
+        "max": 174,
+        "avg": 110.4,
+        "sum": 552,
+        "variance": 2856.2400000000002,
+        "stdDev": 53.44380225994404,
+        "p50": 91,
+        "p90": 174,
+        "p95": 174,
+        "p99": 174
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "",
+      "statusCode": 404,
+      "stats": {
+        "count": 5,
+        "min": 364,
+        "max": 557,
+        "avg": 447,
+        "sum": 2235,
+        "variance": 4266.8,
+        "stdDev": 65.32074708697077,
+        "p50": 444,
+        "p90": 521,
+        "p95": 539,
+        "p99": 553.4000000000001
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_002",
+      "statusCode": 404,
+      "stats": {
+        "count": 5,
+        "min": 629,
+        "max": 4171,
+        "avg": 1637,
+        "sum": 8185,
+        "variance": 1654234.8,
+        "stdDev": 1286.1705952166687,
+        "p50": 1064,
+        "p90": 3031,
+        "p95": 3600.9999999999995,
+        "p99": 4057
+      },
+      "slowSamples": [
+        {
+          "latency": 4171,
+          "requestId": "req_m11w6njpry",
+          "sourceFile": "access.log",
+          "lineNumber": 258,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_002",
+      "statusCode": 401,
+      "stats": {
+        "count": 5,
+        "min": 557,
+        "max": 3854,
+        "avg": 1961.6,
+        "sum": 9808,
+        "variance": 1950299.44,
+        "stdDev": 1396.5312169801289,
+        "p50": 1190,
+        "p90": 3687.6000000000004,
+        "p95": 3770.8,
+        "p99": 3837.3599999999997
+      },
+      "slowSamples": [
+        {
+          "latency": 3854,
+          "requestId": "req_xaeq6ye4dfp",
+          "sourceFile": "access.log",
+          "lineNumber": 394,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3438,
+          "requestId": "req_oazgx8wxr4q",
+          "sourceFile": "access.log",
+          "lineNumber": 388,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_002",
+      "statusCode": 200,
+      "stats": {
+        "count": 5,
+        "min": 2442,
+        "max": 3736,
+        "avg": 3237.8,
+        "sum": 16189,
+        "variance": 216685.75999999995,
+        "stdDev": 465.495177203803,
+        "p50": 3328,
+        "p90": 3695.6000000000004,
+        "p95": 3715.8,
+        "p99": 3731.96
+      },
+      "slowSamples": [
+        {
+          "latency": 3736,
+          "requestId": "req_uxvsbbtn9oe",
+          "sourceFile": "access.log",
+          "lineNumber": 321,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3635,
+          "requestId": "req_b9vpbev81wn",
+          "sourceFile": "access.log",
+          "lineNumber": 182,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3328,
+          "requestId": "req_0tszb4xccfuo",
+          "sourceFile": "access.log",
+          "lineNumber": 304,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3048,
+          "requestId": "req_pacy3ue7wka",
+          "sourceFile": "access.log",
+          "lineNumber": 183,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_002",
+      "statusCode": 401,
+      "stats": {
+        "count": 5,
+        "min": 551,
+        "max": 7374,
+        "avg": 2399,
+        "sum": 11995,
+        "variance": 6399511.2,
+        "stdDev": 2529.725518707514,
+        "p50": 1532,
+        "p90": 5137.200000000001,
+        "p95": 6255.599999999999,
+        "p99": 7150.32
+      },
+      "slowSamples": [
+        {
+          "latency": 7374,
+          "requestId": "req_c2cl2wshb3",
+          "sourceFile": "access.log",
+          "lineNumber": 337,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_002",
+      "statusCode": 200,
+      "stats": {
+        "count": 4,
+        "min": 75,
+        "max": 1372,
+        "avg": 460,
+        "sum": 1840,
+        "variance": 280449.5,
+        "stdDev": 529.5748294622772,
+        "p50": 196.5,
+        "p90": 1030.9,
+        "p95": 1201.4499999999996,
+        "p99": 1337.8899999999996
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_001",
+      "statusCode": 400,
+      "stats": {
+        "count": 4,
+        "min": 314,
+        "max": 537,
+        "avg": 431,
+        "sum": 1724,
+        "variance": 10432.5,
+        "stdDev": 102.13961033800746,
+        "p50": 436.5,
+        "p90": 534.3,
+        "p95": 535.65,
+        "p99": 536.73
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_001",
+      "statusCode": 401,
+      "stats": {
+        "count": 4,
+        "min": 49,
+        "max": 156,
+        "avg": 99.25,
+        "sum": 397,
+        "variance": 1513.6875,
+        "stdDev": 38.90613704802881,
+        "p50": 96,
+        "p90": 141.60000000000002,
+        "p95": 148.79999999999998,
+        "p99": 154.56
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_001",
+      "statusCode": 404,
+      "stats": {
+        "count": 4,
+        "min": 389,
+        "max": 745,
+        "avg": 587.75,
+        "sum": 2351,
+        "variance": 24147.6875,
+        "stdDev": 155.39526215428833,
+        "p50": 608.5,
+        "p90": 741.7,
+        "p95": 743.35,
+        "p99": 744.6700000000001
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_001",
+      "statusCode": 500,
+      "stats": {
+        "count": 4,
+        "min": 500,
+        "max": 1446,
+        "avg": 932,
+        "sum": 3728,
+        "variance": 157650,
+        "stdDev": 397.0516339218364,
+        "p50": 891,
+        "p90": 1368.6000000000001,
+        "p95": 1407.3,
+        "p99": 1438.26
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_001",
+      "statusCode": 500,
+      "stats": {
+        "count": 4,
+        "min": 71,
+        "max": 171,
+        "avg": 121.25,
+        "sum": 485,
+        "variance": 1355.1875,
+        "stdDev": 36.81287139031673,
+        "p50": 121.5,
+        "p90": 160.5,
+        "p95": 165.75,
+        "p99": 169.95
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_001",
+      "statusCode": 201,
+      "stats": {
+        "count": 4,
+        "min": 142,
+        "max": 316,
+        "avg": 235.25,
+        "sum": 941,
+        "variance": 4769.6875,
+        "stdDev": 69.06292420684198,
+        "p50": 241.5,
+        "p90": 306.7,
+        "p95": 311.35,
+        "p99": 315.07
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_001",
+      "statusCode": 200,
+      "stats": {
+        "count": 4,
+        "min": 63,
+        "max": 331,
+        "avg": 176.5,
+        "sum": 706,
+        "variance": 9402.75,
+        "stdDev": 96.96777815336391,
+        "p50": 156,
+        "p90": 279.40000000000003,
+        "p95": 305.2,
+        "p99": 325.84
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_003",
+      "statusCode": 404,
+      "stats": {
+        "count": 4,
+        "min": 546,
+        "max": 1376,
+        "avg": 1115,
+        "sum": 4460,
+        "variance": 112793,
+        "stdDev": 335.8466912149054,
+        "p50": 1269,
+        "p90": 1367,
+        "p95": 1371.5,
+        "p99": 1375.1
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_001",
+      "statusCode": 201,
+      "stats": {
+        "count": 4,
+        "min": 183,
+        "max": 305,
+        "avg": 235.25,
+        "sum": 941,
+        "variance": 2532.1875,
+        "stdDev": 50.32084558113069,
+        "p50": 226.5,
+        "p90": 291.8,
+        "p95": 298.4,
+        "p99": 303.67999999999995
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_001",
+      "statusCode": 401,
+      "stats": {
+        "count": 4,
+        "min": 409,
+        "max": 581,
+        "avg": 509,
+        "sum": 2036,
+        "variance": 4258.5,
+        "stdDev": 65.25718351262181,
+        "p50": 523,
+        "p90": 571.7,
+        "p95": 576.35,
+        "p99": 580.0699999999999
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_002",
+      "statusCode": 401,
+      "stats": {
+        "count": 4,
+        "min": 80,
+        "max": 675,
+        "avg": 256,
+        "sum": 1024,
+        "variance": 59718.5,
+        "stdDev": 244.37368925479683,
+        "p50": 134.5,
+        "p90": 524.1000000000001,
+        "p95": 599.5499999999998,
+        "p99": 659.91
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_003",
+      "statusCode": 401,
+      "stats": {
+        "count": 4,
+        "min": 39,
+        "max": 58,
+        "avg": 49,
+        "sum": 196,
+        "variance": 48.5,
+        "stdDev": 6.96419413859206,
+        "p50": 49.5,
+        "p90": 56.2,
+        "p95": 57.1,
+        "p99": 57.81999999999999
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_001",
+      "statusCode": 404,
+      "stats": {
+        "count": 4,
+        "min": 61,
+        "max": 85,
+        "avg": 69.25,
+        "sum": 277,
+        "variance": 92.1875,
+        "stdDev": 9.60143218483576,
+        "p50": 65.5,
+        "p90": 80.2,
+        "p95": 82.6,
+        "p99": 84.52
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "",
+      "statusCode": 500,
+      "stats": {
+        "count": 4,
+        "min": 703,
+        "max": 1451,
+        "avg": 902,
+        "sum": 3608,
+        "variance": 100743.5,
+        "stdDev": 317.4011657193464,
+        "p50": 727,
+        "p90": 1239.5000000000002,
+        "p95": 1345.2499999999998,
+        "p99": 1429.8499999999997
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_003",
+      "statusCode": 401,
+      "stats": {
+        "count": 4,
+        "min": 878,
+        "max": 1835,
+        "avg": 1471.25,
+        "sum": 5885,
+        "variance": 153869.1875,
+        "stdDev": 392.2616314400377,
+        "p50": 1586,
+        "p90": 1829,
+        "p95": 1832,
+        "p99": 1834.4
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_003",
+      "statusCode": 201,
+      "stats": {
+        "count": 4,
+        "min": 1443,
+        "max": 3025,
+        "avg": 2023,
+        "sum": 8092,
+        "variance": 378579.5,
+        "stdDev": 615.2881438805724,
+        "p50": 1812,
+        "p90": 2722.9,
+        "p95": 2873.95,
+        "p99": 2994.7899999999995
+      },
+      "slowSamples": [
+        {
+          "latency": 3025,
+          "requestId": "req_dkwwc81qqjv",
+          "sourceFile": "access.log",
+          "lineNumber": 250,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_002",
+      "statusCode": 500,
+      "stats": {
+        "count": 4,
+        "min": 92,
+        "max": 164,
+        "avg": 133.25,
+        "sum": 533,
+        "variance": 975.6875,
+        "stdDev": 31.235996862594284,
+        "p50": 138.5,
+        "p90": 163.7,
+        "p95": 163.85000000000002,
+        "p99": 163.97
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_003",
+      "statusCode": 400,
+      "stats": {
+        "count": 4,
+        "min": 27,
+        "max": 173,
+        "avg": 103.25,
+        "sum": 413,
+        "variance": 4106.1875,
+        "stdDev": 64.07954041657915,
+        "p50": 106.5,
+        "p90": 169.10000000000002,
+        "p95": 171.04999999999998,
+        "p99": 172.60999999999999
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "",
+      "statusCode": 401,
+      "stats": {
+        "count": 3,
+        "min": 35,
+        "max": 135,
+        "avg": 96.33333333333333,
+        "sum": 289,
+        "variance": 1923.5555555555557,
+        "stdDev": 43.8583578757294,
+        "p50": 119,
+        "p90": 131.79999999999998,
+        "p95": 133.4,
+        "p99": 134.68
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_001",
+      "statusCode": 400,
+      "stats": {
+        "count": 3,
+        "min": 43,
+        "max": 83,
+        "avg": 59.333333333333336,
+        "sum": 178,
+        "variance": 293.55555555555554,
+        "stdDev": 17.13346303452853,
+        "p50": 52,
+        "p90": 76.80000000000001,
+        "p95": 79.89999999999999,
+        "p99": 82.38000000000001
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_001",
+      "statusCode": 404,
+      "stats": {
+        "count": 3,
+        "min": 38,
+        "max": 132,
+        "avg": 94.33333333333333,
+        "sum": 283,
+        "variance": 1646.888888888889,
+        "stdDev": 40.581878824037815,
+        "p50": 113,
+        "p90": 128.2,
+        "p95": 130.1,
+        "p99": 131.61999999999998
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "",
+      "statusCode": 404,
+      "stats": {
+        "count": 3,
+        "min": 60,
+        "max": 134,
+        "avg": 89,
+        "sum": 267,
+        "variance": 1040.6666666666667,
+        "stdDev": 32.25936556516056,
+        "p50": 73,
+        "p90": 121.8,
+        "p95": 127.9,
+        "p99": 132.78
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_002",
+      "statusCode": 500,
+      "stats": {
+        "count": 3,
+        "min": 102,
+        "max": 152,
+        "avg": 119,
+        "sum": 357,
+        "variance": 544.6666666666666,
+        "stdDev": 23.338094752285727,
+        "p50": 103,
+        "p90": 142.2,
+        "p95": 147.1,
+        "p99": 151.02
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_003",
+      "statusCode": 500,
+      "stats": {
+        "count": 3,
+        "min": 667,
+        "max": 681,
+        "avg": 675.6666666666666,
+        "sum": 2027,
+        "variance": 38.22222222222223,
+        "stdDev": 6.18241233033047,
+        "p50": 679,
+        "p90": 680.6,
+        "p95": 680.8000000000001,
+        "p99": 680.96
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_003",
+      "statusCode": 201,
+      "stats": {
+        "count": 3,
+        "min": 2096,
+        "max": 3701,
+        "avg": 3008.6666666666665,
+        "sum": 9026,
+        "variance": 453610.88888888893,
+        "stdDev": 673.5064133984835,
+        "p50": 3229,
+        "p90": 3606.6,
+        "p95": 3653.7999999999997,
+        "p99": 3691.56
+      },
+      "slowSamples": [
+        {
+          "latency": 3701,
+          "requestId": "req_prhsuowmawn",
+          "sourceFile": "access.log",
+          "lineNumber": 498,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        },
+        {
+          "latency": 3229,
+          "requestId": "req_v4lx1gfpks",
+          "sourceFile": "access.log",
+          "lineNumber": 30,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_001",
+      "statusCode": 201,
+      "stats": {
+        "count": 3,
+        "min": 694,
+        "max": 9312,
+        "avg": 3822,
+        "sum": 11466,
+        "variance": 15167842.666666666,
+        "stdDev": 3894.591463384403,
+        "p50": 1460,
+        "p90": 7741.6,
+        "p95": 8526.8,
+        "p99": 9154.960000000001
+      },
+      "slowSamples": [
+        {
+          "latency": 9312,
+          "requestId": "req_83bl81rvszb",
+          "sourceFile": "access.log",
+          "lineNumber": 196,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_001",
+      "statusCode": 400,
+      "stats": {
+        "count": 3,
+        "min": 837,
+        "max": 1642,
+        "avg": 1134.6666666666667,
+        "sum": 3404,
+        "variance": 129984.22222222223,
+        "stdDev": 360.5332470414098,
+        "p50": 925,
+        "p90": 1498.6000000000001,
+        "p95": 1570.3,
+        "p99": 1627.66
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_003",
+      "statusCode": 400,
+      "stats": {
+        "count": 3,
+        "min": 448,
+        "max": 2313,
+        "avg": 1129.6666666666667,
+        "sum": 3389,
+        "variance": 705538.8888888889,
+        "stdDev": 839.9636235509779,
+        "p50": 628,
+        "p90": 1976,
+        "p95": 2144.5,
+        "p99": 2279.2999999999997
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_003",
+      "statusCode": 201,
+      "stats": {
+        "count": 3,
+        "min": 67,
+        "max": 216,
+        "avg": 136.33333333333334,
+        "sum": 409,
+        "variance": 3753.555555555556,
+        "stdDev": 61.266267680964184,
+        "p50": 126,
+        "p90": 198,
+        "p95": 207,
+        "p99": 214.20000000000002
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_002",
+      "statusCode": 404,
+      "stats": {
+        "count": 3,
+        "min": 712,
+        "max": 1193,
+        "avg": 879.3333333333334,
+        "sum": 2638,
+        "variance": 49266.88888888888,
+        "stdDev": 221.9614581157929,
+        "p50": 733,
+        "p90": 1101,
+        "p95": 1147,
+        "p99": 1183.8
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_003",
+      "statusCode": 201,
+      "stats": {
+        "count": 3,
+        "min": 92,
+        "max": 332,
+        "avg": 211.66666666666666,
+        "sum": 635,
+        "variance": 9600.222222222223,
+        "stdDev": 97.98072372779363,
+        "p50": 211,
+        "p90": 307.8,
+        "p95": 319.9,
+        "p99": 329.58000000000004
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_001",
+      "statusCode": 500,
+      "stats": {
+        "count": 3,
+        "min": 39,
+        "max": 170,
+        "avg": 114,
+        "sum": 342,
+        "variance": 3040.6666666666665,
+        "stdDev": 55.142240312365495,
+        "p50": 133,
+        "p90": 162.6,
+        "p95": 166.29999999999998,
+        "p99": 169.26
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "",
+      "statusCode": 500,
+      "stats": {
+        "count": 3,
+        "min": 28,
+        "max": 122,
+        "avg": 82,
+        "sum": 246,
+        "variance": 1570.6666666666667,
+        "stdDev": 39.6316371938716,
+        "p50": 96,
+        "p90": 116.80000000000001,
+        "p95": 119.39999999999999,
+        "p99": 121.48
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_001",
+      "statusCode": 401,
+      "stats": {
+        "count": 3,
+        "min": 805,
+        "max": 1710,
+        "avg": 1264,
+        "sum": 3792,
+        "variance": 136588.66666666666,
+        "stdDev": 369.57903980970923,
+        "p50": 1277,
+        "p90": 1623.3999999999999,
+        "p95": 1666.6999999999998,
+        "p99": 1701.34
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_002",
+      "statusCode": 400,
+      "stats": {
+        "count": 3,
+        "min": 1258,
+        "max": 1877,
+        "avg": 1657.3333333333333,
+        "sum": 4972,
+        "variance": 80000.22222222222,
+        "stdDev": 282.84310531144683,
+        "p50": 1837,
+        "p90": 1869,
+        "p95": 1873,
+        "p99": 1876.2
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_002",
+      "statusCode": 400,
+      "stats": {
+        "count": 3,
+        "min": 590,
+        "max": 1994,
+        "avg": 1472.3333333333333,
+        "sum": 4417,
+        "variance": 393576.22222222225,
+        "stdDev": 627.3565351713667,
+        "p50": 1833,
+        "p90": 1961.8,
+        "p95": 1977.9,
+        "p99": 1990.78
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_002",
+      "statusCode": 201,
+      "stats": {
+        "count": 3,
+        "min": 1779,
+        "max": 2787,
+        "avg": 2402,
+        "sum": 7206,
+        "variance": 197666,
+        "stdDev": 444.5964462296117,
+        "p50": 2640,
+        "p90": 2757.6,
+        "p95": 2772.3,
+        "p99": 2784.06
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_002",
+      "statusCode": 400,
+      "stats": {
+        "count": 3,
+        "min": 268,
+        "max": 463,
+        "avg": 340.6666666666667,
+        "sum": 1022,
+        "variance": 7570.888888888888,
+        "stdDev": 87.01085500607891,
+        "p50": 291,
+        "p90": 428.6,
+        "p95": 445.79999999999995,
+        "p99": 459.56
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_002",
+      "statusCode": 500,
+      "stats": {
+        "count": 3,
+        "min": 833,
+        "max": 1789,
+        "avg": 1292.3333333333333,
+        "sum": 3877,
+        "variance": 153019.55555555553,
+        "stdDev": 391.17714089086996,
+        "p50": 1255,
+        "p90": 1682.2,
+        "p95": 1735.6,
+        "p99": 1778.3200000000002
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_002",
+      "statusCode": 201,
+      "stats": {
+        "count": 3,
+        "min": 1512,
+        "max": 3714,
+        "avg": 2486,
+        "sum": 7458,
+        "variance": 840392,
+        "stdDev": 916.7289675798404,
+        "p50": 2232,
+        "p90": 3417.6000000000004,
+        "p95": 3565.7999999999997,
+        "p99": 3684.3599999999997
+      },
+      "slowSamples": [
+        {
+          "latency": 3714,
+          "requestId": "req_22ob6avyc27h",
+          "sourceFile": "access.log",
+          "lineNumber": 252,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "",
+      "statusCode": 401,
+      "stats": {
+        "count": 3,
+        "min": 306,
+        "max": 663,
+        "avg": 530.3333333333334,
+        "sum": 1591,
+        "variance": 25442.88888888889,
+        "stdDev": 159.508272164452,
+        "p50": 622,
+        "p90": 654.8,
+        "p95": 658.9,
+        "p99": 662.1800000000001
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_003",
+      "statusCode": 400,
+      "stats": {
+        "count": 3,
+        "min": 73,
+        "max": 143,
+        "avg": 109.66666666666667,
+        "sum": 329,
+        "variance": 822.2222222222223,
+        "stdDev": 28.674417556808756,
+        "p50": 113,
+        "p90": 137,
+        "p95": 140,
+        "p99": 142.39999999999998
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "",
+      "statusCode": 404,
+      "stats": {
+        "count": 3,
+        "min": 1038,
+        "max": 1910,
+        "avg": 1475.3333333333333,
+        "sum": 4426,
+        "variance": 126734.22222222223,
+        "stdDev": 355.9975031123424,
+        "p50": 1478,
+        "p90": 1823.6,
+        "p95": 1866.8,
+        "p99": 1901.36
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_002",
+      "statusCode": 201,
+      "stats": {
+        "count": 3,
+        "min": 521,
+        "max": 863,
+        "avg": 637.6666666666666,
+        "sum": 1913,
+        "variance": 25398.222222222223,
+        "stdDev": 159.36819702256227,
+        "p50": 529,
+        "p90": 796.2,
+        "p95": 829.6,
+        "p99": 856.32
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 90,
+        "max": 494,
+        "avg": 292,
+        "sum": 584,
+        "variance": 40804,
+        "stdDev": 202,
+        "p50": 292,
+        "p90": 453.6,
+        "p95": 473.79999999999995,
+        "p99": 489.96
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_002",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 42,
+        "max": 93,
+        "avg": 67.5,
+        "sum": 135,
+        "variance": 650.25,
+        "stdDev": 25.5,
+        "p50": 67.5,
+        "p90": 87.9,
+        "p95": 90.45,
+        "p99": 92.49
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_001",
+      "statusCode": 200,
+      "stats": {
+        "count": 2,
+        "min": 1320,
+        "max": 1353,
+        "avg": 1336.5,
+        "sum": 2673,
+        "variance": 272.25,
+        "stdDev": 16.5,
+        "p50": 1336.5,
+        "p90": 1349.7,
+        "p95": 1351.35,
+        "p99": 1352.67
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "",
+      "statusCode": 201,
+      "stats": {
+        "count": 2,
+        "min": 172,
+        "max": 266,
+        "avg": 219,
+        "sum": 438,
+        "variance": 2209,
+        "stdDev": 47,
+        "p50": 219,
+        "p90": 256.6,
+        "p95": 261.3,
+        "p99": 265.06
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_003",
+      "statusCode": 500,
+      "stats": {
+        "count": 2,
+        "min": 794,
+        "max": 1689,
+        "avg": 1241.5,
+        "sum": 2483,
+        "variance": 200256.25,
+        "stdDev": 447.5,
+        "p50": 1241.5,
+        "p90": 1599.5,
+        "p95": 1644.25,
+        "p99": 1680.05
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_001",
+      "statusCode": 500,
+      "stats": {
+        "count": 2,
+        "min": 68,
+        "max": 173,
+        "avg": 120.5,
+        "sum": 241,
+        "variance": 2756.25,
+        "stdDev": 52.5,
+        "p50": 120.5,
+        "p90": 162.50000000000003,
+        "p95": 167.75,
+        "p99": 171.95000000000002
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_003",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 104,
+        "max": 174,
+        "avg": 139,
+        "sum": 278,
+        "variance": 1225,
+        "stdDev": 35,
+        "p50": 139,
+        "p90": 167,
+        "p95": 170.5,
+        "p99": 173.29999999999998
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_003",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 111,
+        "max": 779,
+        "avg": 445,
+        "sum": 890,
+        "variance": 111556,
+        "stdDev": 334,
+        "p50": 445,
+        "p90": 712.2,
+        "p95": 745.5999999999999,
+        "p99": 772.32
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_003",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 96,
+        "max": 157,
+        "avg": 126.5,
+        "sum": 253,
+        "variance": 930.25,
+        "stdDev": 30.5,
+        "p50": 126.5,
+        "p90": 150.9,
+        "p95": 153.95000000000002,
+        "p99": 156.39000000000001
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_002",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 25,
+        "max": 141,
+        "avg": 83,
+        "sum": 166,
+        "variance": 3364,
+        "stdDev": 58,
+        "p50": 83,
+        "p90": 129.4,
+        "p95": 135.2,
+        "p99": 139.84
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_002",
+      "statusCode": 201,
+      "stats": {
+        "count": 2,
+        "min": 249,
+        "max": 282,
+        "avg": 265.5,
+        "sum": 531,
+        "variance": 272.25,
+        "stdDev": 16.5,
+        "p50": 265.5,
+        "p90": 278.7,
+        "p95": 280.34999999999997,
+        "p99": 281.67
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_002",
+      "statusCode": 500,
+      "stats": {
+        "count": 2,
+        "min": 93,
+        "max": 141,
+        "avg": 117,
+        "sum": 234,
+        "variance": 576,
+        "stdDev": 24,
+        "p50": 117,
+        "p90": 136.2,
+        "p95": 138.6,
+        "p99": 140.52
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 820,
+        "max": 1484,
+        "avg": 1152,
+        "sum": 2304,
+        "variance": 110224,
+        "stdDev": 332,
+        "p50": 1152,
+        "p90": 1417.6000000000001,
+        "p95": 1450.8,
+        "p99": 1477.3600000000001
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_003",
+      "statusCode": 201,
+      "stats": {
+        "count": 2,
+        "min": 844,
+        "max": 1105,
+        "avg": 974.5,
+        "sum": 1949,
+        "variance": 17030.25,
+        "stdDev": 130.5,
+        "p50": 974.5,
+        "p90": 1078.9,
+        "p95": 1091.95,
+        "p99": 1102.39
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_002",
+      "statusCode": 500,
+      "stats": {
+        "count": 2,
+        "min": 375,
+        "max": 633,
+        "avg": 504,
+        "sum": 1008,
+        "variance": 16641,
+        "stdDev": 129,
+        "p50": 504,
+        "p90": 607.2,
+        "p95": 620.1,
+        "p99": 630.42
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_002",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 154,
+        "max": 526,
+        "avg": 340,
+        "sum": 680,
+        "variance": 34596,
+        "stdDev": 186,
+        "p50": 340,
+        "p90": 488.8,
+        "p95": 507.4,
+        "p99": 522.28
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 29,
+        "max": 51,
+        "avg": 40,
+        "sum": 80,
+        "variance": 121,
+        "stdDev": 11,
+        "p50": 40,
+        "p90": 48.8,
+        "p95": 49.9,
+        "p99": 50.78
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 449,
+        "max": 541,
+        "avg": 495,
+        "sum": 990,
+        "variance": 2116,
+        "stdDev": 46,
+        "p50": 495,
+        "p90": 531.8000000000001,
+        "p95": 536.4,
+        "p99": 540.08
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 37,
+        "max": 420,
+        "avg": 228.5,
+        "sum": 457,
+        "variance": 36672.25,
+        "stdDev": 191.5,
+        "p50": 228.5,
+        "p90": 381.7,
+        "p95": 400.85,
+        "p99": 416.17
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 668,
+        "max": 1746,
+        "avg": 1207,
+        "sum": 2414,
+        "variance": 290521,
+        "stdDev": 539,
+        "p50": 1207,
+        "p90": 1638.2,
+        "p95": 1692.1,
+        "p99": 1735.22
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 616,
+        "max": 1338,
+        "avg": 977,
+        "sum": 1954,
+        "variance": 130321,
+        "stdDev": 361,
+        "p50": 977,
+        "p90": 1265.8,
+        "p95": 1301.8999999999999,
+        "p99": 1330.78
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 635,
+        "max": 1373,
+        "avg": 1004,
+        "sum": 2008,
+        "variance": 136161,
+        "stdDev": 369,
+        "p50": 1004,
+        "p90": 1299.2,
+        "p95": 1336.1,
+        "p99": 1365.62
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_003",
+      "statusCode": 500,
+      "stats": {
+        "count": 2,
+        "min": 89,
+        "max": 93,
+        "avg": 91,
+        "sum": 182,
+        "variance": 4,
+        "stdDev": 2,
+        "p50": 91,
+        "p90": 92.6,
+        "p95": 92.8,
+        "p99": 92.96
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_002",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 122,
+        "max": 125,
+        "avg": 123.5,
+        "sum": 247,
+        "variance": 2.25,
+        "stdDev": 1.5,
+        "p50": 123.5,
+        "p90": 124.7,
+        "p95": 124.85000000000001,
+        "p99": 124.97
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_002",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 326,
+        "max": 702,
+        "avg": 514,
+        "sum": 1028,
+        "variance": 35344,
+        "stdDev": 188,
+        "p50": 514,
+        "p90": 664.4000000000001,
+        "p95": 683.2,
+        "p99": 698.24
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_003",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 90,
+        "max": 162,
+        "avg": 126,
+        "sum": 252,
+        "variance": 1296,
+        "stdDev": 36,
+        "p50": 126,
+        "p90": 154.8,
+        "p95": 158.4,
+        "p99": 161.28
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "",
+      "statusCode": 500,
+      "stats": {
+        "count": 2,
+        "min": 75,
+        "max": 89,
+        "avg": 82,
+        "sum": 164,
+        "variance": 49,
+        "stdDev": 7,
+        "p50": 82,
+        "p90": 87.60000000000001,
+        "p95": 88.3,
+        "p99": 88.86
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "",
+      "statusCode": 201,
+      "stats": {
+        "count": 2,
+        "min": 238,
+        "max": 308,
+        "avg": 273,
+        "sum": 546,
+        "variance": 1225,
+        "stdDev": 35,
+        "p50": 273,
+        "p90": 301,
+        "p95": 304.5,
+        "p99": 307.3
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_001",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 1817,
+        "max": 5354,
+        "avg": 3585.5,
+        "sum": 7171,
+        "variance": 3127592.25,
+        "stdDev": 1768.5,
+        "p50": 3585.5,
+        "p90": 5000.3,
+        "p95": 5177.150000000001,
+        "p99": 5318.63
+      },
+      "slowSamples": [
+        {
+          "latency": 5354,
+          "requestId": "req_qy8wgrol48",
+          "sourceFile": "access.log",
+          "lineNumber": 176,
+          "hasDuplicates": false,
+          "duplicateSources": []
+        }
+      ]
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_002",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 64,
+        "max": 115,
+        "avg": 89.5,
+        "sum": 179,
+        "variance": 650.25,
+        "stdDev": 25.5,
+        "p50": 89.5,
+        "p90": 109.9,
+        "p95": 112.45,
+        "p99": 114.49
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_001",
+      "statusCode": 201,
+      "stats": {
+        "count": 2,
+        "min": 1369,
+        "max": 2542,
+        "avg": 1955.5,
+        "sum": 3911,
+        "variance": 343982.25,
+        "stdDev": 586.5,
+        "p50": 1955.5,
+        "p90": 2424.7000000000003,
+        "p95": 2483.3500000000004,
+        "p99": 2530.27
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_003",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 1400,
+        "max": 1433,
+        "avg": 1416.5,
+        "sum": 2833,
+        "variance": 272.25,
+        "stdDev": 16.5,
+        "p50": 1416.5,
+        "p90": 1429.7,
+        "p95": 1431.35,
+        "p99": 1432.67
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_001",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 49,
+        "max": 76,
+        "avg": 62.5,
+        "sum": 125,
+        "variance": 182.25,
+        "stdDev": 13.5,
+        "p50": 62.5,
+        "p90": 73.30000000000001,
+        "p95": 74.65,
+        "p99": 75.72999999999999
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 105,
+        "max": 138,
+        "avg": 121.5,
+        "sum": 243,
+        "variance": 272.25,
+        "stdDev": 16.5,
+        "p50": 121.5,
+        "p90": 134.7,
+        "p95": 136.35,
+        "p99": 137.67000000000002
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_003",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 87,
+        "max": 159,
+        "avg": 123,
+        "sum": 246,
+        "variance": 1296,
+        "stdDev": 36,
+        "p50": 123,
+        "p90": 151.79999999999998,
+        "p95": 155.39999999999998,
+        "p99": 158.28
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_003",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 81,
+        "max": 469,
+        "avg": 275,
+        "sum": 550,
+        "variance": 37636,
+        "stdDev": 194,
+        "p50": 275,
+        "p90": 430.20000000000005,
+        "p95": 449.59999999999997,
+        "p99": 465.12
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_002",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 26,
+        "max": 86,
+        "avg": 56,
+        "sum": 112,
+        "variance": 900,
+        "stdDev": 30,
+        "p50": 56,
+        "p90": 80,
+        "p95": 83,
+        "p99": 85.4
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_002",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 400,
+        "max": 572,
+        "avg": 486,
+        "sum": 972,
+        "variance": 7396,
+        "stdDev": 86,
+        "p50": 486,
+        "p90": 554.8000000000001,
+        "p95": 563.4,
+        "p99": 570.28
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_003",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 125,
+        "max": 127,
+        "avg": 126,
+        "sum": 252,
+        "variance": 1,
+        "stdDev": 1,
+        "p50": 126,
+        "p90": 126.8,
+        "p95": 126.89999999999999,
+        "p99": 126.98
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "",
+      "statusCode": 201,
+      "stats": {
+        "count": 2,
+        "min": 202,
+        "max": 206,
+        "avg": 204,
+        "sum": 408,
+        "variance": 4,
+        "stdDev": 2,
+        "p50": 204,
+        "p90": 205.6,
+        "p95": 205.8,
+        "p99": 205.96
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "",
+      "statusCode": 400,
+      "stats": {
+        "count": 2,
+        "min": 47,
+        "max": 143,
+        "avg": 95,
+        "sum": 190,
+        "variance": 2304,
+        "stdDev": 48,
+        "p50": 95,
+        "p90": 133.4,
+        "p95": 138.2,
+        "p99": 142.04
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "",
+      "statusCode": 500,
+      "stats": {
+        "count": 2,
+        "min": 33,
+        "max": 79,
+        "avg": 56,
+        "sum": 112,
+        "variance": 529,
+        "stdDev": 23,
+        "p50": 56,
+        "p90": 74.4,
+        "p95": 76.7,
+        "p99": 78.53999999999999
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_001",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 25,
+        "max": 170,
+        "avg": 97.5,
+        "sum": 195,
+        "variance": 5256.25,
+        "stdDev": 72.5,
+        "p50": 97.5,
+        "p90": 155.5,
+        "p95": 162.75,
+        "p99": 168.55
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_002",
+      "statusCode": 200,
+      "stats": {
+        "count": 2,
+        "min": 326,
+        "max": 524,
+        "avg": 425,
+        "sum": 850,
+        "variance": 9801,
+        "stdDev": 99,
+        "p50": 425,
+        "p90": 504.20000000000005,
+        "p95": 514.1,
+        "p99": 522.02
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_001",
+      "statusCode": 500,
+      "stats": {
+        "count": 2,
+        "min": 50,
+        "max": 85,
+        "avg": 67.5,
+        "sum": 135,
+        "variance": 306.25,
+        "stdDev": 17.5,
+        "p50": 67.5,
+        "p90": 81.5,
+        "p95": 83.25,
+        "p99": 84.65
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_003",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 552,
+        "max": 778,
+        "avg": 665,
+        "sum": 1330,
+        "variance": 12769,
+        "stdDev": 113,
+        "p50": 665,
+        "p90": 755.4000000000001,
+        "p95": 766.6999999999999,
+        "p99": 775.74
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "",
+      "statusCode": 500,
+      "stats": {
+        "count": 2,
+        "min": 253,
+        "max": 735,
+        "avg": 494,
+        "sum": 988,
+        "variance": 58081,
+        "stdDev": 241,
+        "p50": 494,
+        "p90": 686.8,
+        "p95": 710.9,
+        "p99": 730.18
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_002",
+      "statusCode": 404,
+      "stats": {
+        "count": 2,
+        "min": 68,
+        "max": 137,
+        "avg": 102.5,
+        "sum": 205,
+        "variance": 1190.25,
+        "stdDev": 34.5,
+        "p50": 102.5,
+        "p90": 130.1,
+        "p95": 133.55,
+        "p99": 136.31
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_001",
+      "statusCode": 401,
+      "stats": {
+        "count": 2,
+        "min": 61,
+        "max": 173,
+        "avg": 117,
+        "sum": 234,
+        "variance": 3136,
+        "stdDev": 56,
+        "p50": 117,
+        "p90": 161.8,
+        "p95": 167.4,
+        "p99": 171.88000000000002
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_003",
+      "statusCode": 400,
+      "stats": {
+        "count": 1,
+        "min": 1379,
+        "max": 1379,
+        "avg": 1379,
+        "sum": 1379,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 1379,
+        "p90": 1379,
+        "p95": 1379,
+        "p99": 1379
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_003",
+      "statusCode": 404,
+      "stats": {
+        "count": 1,
+        "min": 609,
+        "max": 609,
+        "avg": 609,
+        "sum": 609,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 609,
+        "p90": 609,
+        "p95": 609,
+        "p99": 609
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_001",
+      "statusCode": 500,
+      "stats": {
+        "count": 1,
+        "min": 926,
+        "max": 926,
+        "avg": 926,
+        "sum": 926,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 926,
+        "p90": 926,
+        "p95": 926,
+        "p99": 926
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_001",
+      "statusCode": 201,
+      "stats": {
+        "count": 1,
+        "min": 1806,
+        "max": 1806,
+        "avg": 1806,
+        "sum": 1806,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 1806,
+        "p90": 1806,
+        "p95": 1806,
+        "p99": 1806
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_002",
+      "statusCode": 500,
+      "stats": {
+        "count": 1,
+        "min": 133,
+        "max": 133,
+        "avg": 133,
+        "sum": 133,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 133,
+        "p90": 133,
+        "p95": 133,
+        "p99": 133
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_002",
+      "statusCode": 201,
+      "stats": {
+        "count": 1,
+        "min": 217,
+        "max": 217,
+        "avg": 217,
+        "sum": 217,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 217,
+        "p90": 217,
+        "p95": 217,
+        "p99": 217
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_002",
+      "statusCode": 404,
+      "stats": {
+        "count": 1,
+        "min": 94,
+        "max": 94,
+        "avg": 94,
+        "sum": 94,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 94,
+        "p90": 94,
+        "p95": 94,
+        "p99": 94
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "",
+      "statusCode": 500,
+      "stats": {
+        "count": 1,
+        "min": 1115,
+        "max": 1115,
+        "avg": 1115,
+        "sum": 1115,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 1115,
+        "p90": 1115,
+        "p95": 1115,
+        "p99": 1115
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_001",
+      "statusCode": 404,
+      "stats": {
+        "count": 1,
+        "min": 1940,
+        "max": 1940,
+        "avg": 1940,
+        "sum": 1940,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 1940,
+        "p90": 1940,
+        "p95": 1940,
+        "p99": 1940
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_002",
+      "statusCode": 404,
+      "stats": {
+        "count": 1,
+        "min": 88,
+        "max": 88,
+        "avg": 88,
+        "sum": 88,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 88,
+        "p90": 88,
+        "p95": 88,
+        "p99": 88
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "",
+      "statusCode": 401,
+      "stats": {
+        "count": 1,
+        "min": 1041,
+        "max": 1041,
+        "avg": 1041,
+        "sum": 1041,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 1041,
+        "p90": 1041,
+        "p95": 1041,
+        "p99": 1041
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_001",
+      "statusCode": 500,
+      "stats": {
+        "count": 1,
+        "min": 588,
+        "max": 588,
+        "avg": 588,
+        "sum": 588,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 588,
+        "p90": 588,
+        "p95": 588,
+        "p99": 588
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_002",
+      "statusCode": 400,
+      "stats": {
+        "count": 1,
+        "min": 161,
+        "max": 161,
+        "avg": 161,
+        "sum": 161,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 161,
+        "p90": 161,
+        "p95": 161,
+        "p99": 161
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "",
+      "statusCode": 400,
+      "stats": {
+        "count": 1,
+        "min": 129,
+        "max": 129,
+        "avg": 129,
+        "sum": 129,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 129,
+        "p90": 129,
+        "p95": 129,
+        "p99": 129
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_002",
+      "statusCode": 201,
+      "stats": {
+        "count": 1,
+        "min": 70,
+        "max": 70,
+        "avg": 70,
+        "sum": 70,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 70,
+        "p90": 70,
+        "p95": 70,
+        "p99": 70
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/reports/generate",
+      "tenant": "tenant_001",
+      "statusCode": 200,
+      "stats": {
+        "count": 1,
+        "min": 1423,
+        "max": 1423,
+        "avg": 1423,
+        "sum": 1423,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 1423,
+        "p90": 1423,
+        "p95": 1423,
+        "p99": 1423
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_001",
+      "statusCode": 200,
+      "stats": {
+        "count": 1,
+        "min": 303,
+        "max": 303,
+        "avg": 303,
+        "sum": 303,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 303,
+        "p90": 303,
+        "p95": 303,
+        "p99": 303
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_003",
+      "statusCode": 201,
+      "stats": {
+        "count": 1,
+        "min": 105,
+        "max": 105,
+        "avg": 105,
+        "sum": 105,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 105,
+        "p90": 105,
+        "p95": 105,
+        "p99": 105
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "",
+      "statusCode": 404,
+      "stats": {
+        "count": 1,
+        "min": 82,
+        "max": 82,
+        "avg": 82,
+        "sum": 82,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 82,
+        "p90": 82,
+        "p95": 82,
+        "p99": 82
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "tenant_002",
+      "statusCode": 401,
+      "stats": {
+        "count": 1,
+        "min": 101,
+        "max": 101,
+        "avg": 101,
+        "sum": 101,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 101,
+        "p90": 101,
+        "p95": 101,
+        "p99": 101
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_003",
+      "statusCode": 500,
+      "stats": {
+        "count": 1,
+        "min": 109,
+        "max": 109,
+        "avg": 109,
+        "sum": 109,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 109,
+        "p90": 109,
+        "p95": 109,
+        "p99": 109
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_001",
+      "statusCode": 400,
+      "stats": {
+        "count": 1,
+        "min": 129,
+        "max": 129,
+        "avg": 129,
+        "sum": 129,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 129,
+        "p90": 129,
+        "p95": 129,
+        "p99": 129
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/login",
+      "tenant": "tenant_003",
+      "statusCode": 401,
+      "stats": {
+        "count": 1,
+        "min": 510,
+        "max": 510,
+        "avg": 510,
+        "sum": 510,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 510,
+        "p90": 510,
+        "p95": 510,
+        "p99": 510
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_001",
+      "statusCode": 404,
+      "stats": {
+        "count": 1,
+        "min": 146,
+        "max": 146,
+        "avg": 146,
+        "sum": 146,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 146,
+        "p90": 146,
+        "p95": 146,
+        "p99": 146
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/users",
+      "tenant": "tenant_001",
+      "statusCode": 401,
+      "stats": {
+        "count": 1,
+        "min": 70,
+        "max": 70,
+        "avg": 70,
+        "sum": 70,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 70,
+        "p90": 70,
+        "p95": 70,
+        "p99": 70
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/products",
+      "tenant": "tenant_003",
+      "statusCode": 500,
+      "stats": {
+        "count": 1,
+        "min": 125,
+        "max": 125,
+        "avg": 125,
+        "sum": 125,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 125,
+        "p90": 125,
+        "p95": 125,
+        "p99": 125
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/orders",
+      "tenant": "",
+      "statusCode": 401,
+      "stats": {
+        "count": 1,
+        "min": 172,
+        "max": 172,
+        "avg": 172,
+        "sum": 172,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 172,
+        "p90": 172,
+        "p95": 172,
+        "p99": 172
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/dashboard/stats",
+      "tenant": "tenant_001",
+      "statusCode": 400,
+      "stats": {
+        "count": 1,
+        "min": 1810,
+        "max": 1810,
+        "avg": 1810,
+        "sum": 1810,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 1810,
+        "p90": 1810,
+        "p95": 1810,
+        "p99": 1810
+      },
+      "slowSamples": []
+    },
+    {
+      "path": "/api/auth/refresh",
+      "tenant": "tenant_001",
+      "statusCode": 400,
+      "stats": {
+        "count": 1,
+        "min": 127,
+        "max": 127,
+        "avg": 127,
+        "sum": 127,
+        "variance": 0,
+        "stdDev": 0,
+        "p50": 127,
+        "p90": 127,
+        "p95": 127,
+        "p99": 127
+      },
+      "slowSamples": []
+    }
+  ]
+}

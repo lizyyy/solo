@@ -1,0 +1,4 @@
+文件名,行号,错误原因,原始内容
+access.log,503,"JSON解析失败: Unexpected token '这', ""这是一行坏数据"" is not valid JSON",这是一行坏数据
+access.log,504,JSON解析失败: Expected property name or '}' in JSON at position 2 (line 1 column 3),{ invalid json: true 
+access.log,505,耗时尚无效 (not_a_number),"{""path"": ""/api/test"", ""latency"": ""not_a_number""}"

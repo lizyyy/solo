@@ -1,0 +1,21 @@
+{
+  "name": "latency-percentile-cli",
+  "version": "1.0.0",
+  "description": "接口耗时分位分析CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "latency-percentile": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "keywords": ["latency", "percentile", "log-analysis", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-writer": "^1.6.0",
+    "simple-statistics": "^7.8.3"
+  }
+}
