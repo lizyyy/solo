@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 from routers import customer, category, weighing, price, deduction, settlement, audit, export
+import migrate
+
+migrate.migrate_all("weighing.db")
 
 Base.metadata.create_all(bind=engine)
 

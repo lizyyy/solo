@@ -42,7 +42,19 @@ curl -X GET "http://localhost:8000/api/audits/" | jq '.[] | select(.is_success =
 pip install -r requirements.txt
 ```
 
-### 2. 启动服务
+### 2. 数据库迁移（自动）
+- **启动时会自动检测并迁移，无需手动操作
+```bash
+# 或手动执行迁移：
+python migrate.py
+```
+
+迁移脚本会自动检测表结构，添加缺失的字段：
+- `audit_logs.is_success: 操作是否成功 (0=失败, 1=成功)
+- `audit_logs.error_message: 错误原因
+- （表不存在时跳过，由 create_all() 自动创建）
+
+### 3. 启动服务
 ```bash
 python main.py
 ```
