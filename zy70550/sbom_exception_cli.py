@@ -81,14 +81,49 @@ class SBOMParser:
     """SBOM解析器"""
     
     @staticmethod
+    def _extract_bad_line(file_path: str, lineno: int) -> str:
+        """提取出错行附近的原始内容"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            # 提取出错行附近的内容（前后各2行）
+            start = max(0, lineno - 3)
+            end = min(len(lines), lineno + 2)
+            bad_lines = []
+            for i in range(start, end):
+                marker = ">> " if i == lineno - 1 else "   "
+                bad_lines.append(f"{marker}{i+1}: {lines[i].rstrip()}")
+            return "\n".join(bad_lines)
+        except:
+            return ""
+    
+    @staticmethod
     def parse_cyclonedx(file_path: str) -> Tuple[List[Vulnerability], List[ProcessingError]]:
         """解析CycloneDX格式的SBOM文件"""
         vulnerabilities = []
         errors = []
+        file_lines = []
         
         try:
+            # 先读取文件内容用于错误定位
             with open(file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+                file_lines = f.readlines()
+                content = "".join(file_lines)
+            
+            try:
+                data = json.loads(content)
+            except json.JSONDecodeError as e:
+                # 提取JSON解析错误的行号和坏行内容
+                lineno = e.lineno if hasattr(e, 'lineno') else 0
+                bad_line_content = SBOMParser._extract_bad_line(file_path, lineno)
+                errors.append(ProcessingError(
+                    row_number=lineno,
+                    raw_data=bad_line_content,
+                    error_message=f"JSON解析失败: {str(e)}",
+                    source_file=file_path
+                ))
+                return vulnerabilities, errors
             
             # 解析漏洞信息
             if "vulnerabilities" in data:
@@ -120,13 +155,6 @@ class SBOMParser:
                             source_file=file_path
                         ))
             
-        except json.JSONDecodeError as e:
-            errors.append(ProcessingError(
-                row_number=0,
-                raw_data="",
-                error_message=f"JSON解析失败: {str(e)}",
-                source_file=file_path
-            ))
         except Exception as e:
             errors.append(ProcessingError(
                 row_number=0,
@@ -560,9 +588,9 @@ def check_expiry(days: int, exceptions: str):
         sys.exit(1)
     sys.exit(0)
 
-@cli.command()
+@cli.command(name='list')
 @click.option('--exceptions', '-e', default='exceptions.json', help='例外文件路径')
-def list(exceptions: str):
+def list_exceptions(exceptions: str):
     """列出所有例外"""
     exception_manager = ExceptionManager(exceptions)
     

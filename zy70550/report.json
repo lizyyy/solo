@@ -1,63 +1,42 @@
 {
-  "total": 6,
-  "excepted_active": 4,
-  "excepted_expired": 0,
-  "unexcepted": 2,
-  "errors": [],
-  "vulnerabilities": [
+  "generated_at": "2026-05-17T12:27:47.974072",
+  "summary": {
+    "total_vulnerabilities": 0,
+    "excepted_active": 0,
+    "excepted_expired": 0,
+    "unexcepted": 0,
+    "errors": 1
+  },
+  "vulnerabilities": [],
+  "exceptions": [
     {
-      "id": "CVE-2023-1234",
+      "vulnerability_id": "CVE-2023-1234",
       "component_name": "log4j",
       "component_version": "2.14.1",
-      "severity": "critical",
-      "description": "Remote code execution vulnerability in Log4j",
-      "cvss_score": 9.8,
-      "source": "cyclonedx"
+      "reason": "Accepted risk",
+      "expires_at": "2027-12-31",
+      "reviewer": "Security Team",
+      "created_at": "2026-05-16T20:28:16.513625",
+      "status": "active"
     },
     {
-      "id": "CVE-2023-5678",
-      "component_name": "spring-core",
-      "component_version": "5.3.18",
-      "severity": "high",
-      "description": "Spring Framework RCE vulnerability",
-      "cvss_score": 7.5,
-      "source": "cyclonedx"
-    },
+      "vulnerability_id": "*",
+      "component_name": "spring-*",
+      "component_version": "*",
+      "reason": "All spring vulnerabilities accepted",
+      "expires_at": "2027-06-30",
+      "reviewer": "AppSec",
+      "created_at": "2026-05-16T20:28:16.553907",
+      "status": "active"
+    }
+  ],
+  "expiring_exceptions": [],
+  "errors": [
     {
-      "id": "CVE-2023-9012",
-      "component_name": "jackson-databind",
-      "component_version": "2.13.0",
-      "severity": "medium",
-      "description": "Deserialization vulnerability",
-      "cvss_score": 5.3,
-      "source": "cyclonedx"
-    },
-    {
-      "id": "CVE-2023-1234",
-      "component_name": "log4j",
-      "component_version": "2.14.1",
-      "severity": "critical",
-      "description": "Remote code execution vulnerability in Log4j",
-      "cvss_score": 9.8,
-      "source": "cyclonedx"
-    },
-    {
-      "id": "CVE-2023-5678",
-      "component_name": "spring-core",
-      "component_version": "5.3.18",
-      "severity": "high",
-      "description": "Spring Framework RCE vulnerability",
-      "cvss_score": 7.5,
-      "source": "cyclonedx"
-    },
-    {
-      "id": "CVE-2023-9012",
-      "component_name": "jackson-databind",
-      "component_version": "2.13.0",
-      "severity": "medium",
-      "description": "Deserialization vulnerability",
-      "cvss_score": 5.3,
-      "source": "cyclonedx"
+      "row_number": 11,
+      "raw_data": "   9:       }\n   10:     },\n>> 11:     invalid json here!\n   12:     {\n   13:       \"id\": \"CVE-2023-9012\",",
+      "error_message": "JSON解析失败: Expecting value: line 11 column 5 (char 181)",
+      "source_file": "dirty_sbom.json"
     }
   ]
 }
