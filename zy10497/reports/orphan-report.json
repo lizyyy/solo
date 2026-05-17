@@ -1,0 +1,95 @@
+{
+  "generatedAt": "2026-05-17T04:25:53.544Z",
+  "totalServices": 5,
+  "orphanServices": [
+    {
+      "serviceId": "order-service",
+      "serviceName": "订单服务",
+      "reasons": [
+        "服务标记为已废弃"
+      ],
+      "alertReferences": []
+    },
+    {
+      "serviceId": "notification-service",
+      "serviceName": "通知服务",
+      "reasons": [
+        "服务标记为已废弃"
+      ],
+      "alertReferences": []
+    }
+  ],
+  "activeServices": 3,
+  "owners": [
+    {
+      "name": "王五",
+      "services": [
+        "订单服务"
+      ],
+      "orphanServices": [
+        "订单服务"
+      ]
+    },
+    {
+      "name": "周九",
+      "services": [
+        "通知服务"
+      ],
+      "orphanServices": [
+        "通知服务"
+      ]
+    },
+    {
+      "name": "吴十",
+      "services": [
+        "通知服务"
+      ],
+      "orphanServices": [
+        "通知服务"
+      ]
+    },
+    {
+      "name": "张三",
+      "services": [
+        "用户服务"
+      ],
+      "orphanServices": []
+    },
+    {
+      "name": "李四",
+      "services": [
+        "用户服务"
+      ],
+      "orphanServices": []
+    },
+    {
+      "name": "赵六",
+      "services": [
+        "支付服务"
+      ],
+      "orphanServices": []
+    },
+    {
+      "name": "钱七",
+      "services": [
+        "支付服务"
+      ],
+      "orphanServices": []
+    },
+    {
+      "name": "孙八",
+      "services": [
+        "库存服务"
+      ],
+      "orphanServices": []
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "total": 5,
+    "orphanCount": 2,
+    "activeCount": 3,
+    "errorCount": 0,
+    "orphanRate": 40
+  }
+}

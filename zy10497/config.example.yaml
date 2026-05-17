@@ -1,0 +1,45 @@
+# 服务孤儿检测配置文件示例
+
+# 服务目录文件匹配模式
+serviceDirectories:
+  - "services.yaml"
+  - "services.json"
+  - "**/*.yaml"
+  - "**/*.json"
+  - "**/*.csv"
+
+# 告警规则文件匹配模式
+alertRulePaths:
+  - "alerts/**/*.yaml"
+  - "alerts/**/*.yml"
+  - "alerts/**/*.json"
+
+# 仓库探测配置
+repoProbe:
+  # 是否启用仓库探测
+  enabled: true
+  # 请求超时时间（毫秒）
+  timeout: 10000
+  # GitHub API 基础地址
+  githubApiBase: "https://api.github.com"
+
+# 孤儿服务判定标准
+orphanCriteria:
+  # 仓库已归档判定为孤儿
+  repoArchived: true
+  # 超过多少天无提交判定为孤儿（默认180天）
+  noCommitSinceDays: 180
+  # 无告警规则引用判定为孤儿
+  noAlertReferences: true
+  # 状态为 deprecated/inactive 判定为孤儿
+  inactiveStatus: true
+
+# 输出配置
+output:
+  # 输出格式
+  formats:
+    - json
+    - markdown
+    - csv
+  # 是否在文件名前添加时间戳前缀
+  timestampPrefix: false

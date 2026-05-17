@@ -1,0 +1,38 @@
+groups:
+  - name: service_alerts
+    rules:
+      - alert: high_cpu_usage
+        expr: cpu_usage > 80
+        for: 5m
+        labels:
+          service: user-service
+          severity: critical
+        annotations:
+          description: "用户服务 CPU 使用率过高"
+
+      - alert: service_down
+        expr: up == 0
+        for: 1m
+        labels:
+          service: user-service
+          severity: critical
+        annotations:
+          description: "用户服务已下线"
+
+      - alert: order_processing_error
+        expr: order_error_rate > 0.1
+        for: 2m
+        labels:
+          service: order-service
+          severity: warning
+        annotations:
+          description: "订单服务处理错误率过高"
+
+      - alert: low_stock_alert
+        expr: inventory_level < 100
+        for: 10m
+        labels:
+          service: inventory-service
+          severity: warning
+        annotations:
+          description: "库存服务库存不足"

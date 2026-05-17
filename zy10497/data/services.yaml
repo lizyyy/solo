@@ -1,0 +1,52 @@
+services:
+  - id: user-service
+    name: 用户服务
+    repoUrl: https://github.com/example/user-service
+    owners:
+      - 张三
+      - 李四
+    alertRules:
+      - high_cpu_usage
+      - service_down
+    status: active
+    lastUpdated: 2024-01-15
+
+  - id: order-service
+    name: 订单服务
+    repoUrl: https://github.com/example/order-service
+    owners:
+      - 王五
+    alertRules:
+      - order_processing_error
+    status: deprecated
+    lastUpdated: 2023-06-20
+
+  - id: payment-service
+    name: 支付服务
+    repoUrl: https://github.com/example/non-existent-repo
+    owners:
+      - 赵六
+      - 钱七
+    alertRules: []
+    status: unknown
+    lastUpdated: 2022-12-01
+
+  - id: inventory-service
+    name: 库存服务
+    repoUrl: https://github.com/example/inventory-service
+    owners:
+      - 孙八
+    alertRules:
+      - low_stock_alert
+    status: active
+    lastUpdated: 2024-01-10
+
+  - id: notification-service
+    name: 通知服务
+    repoUrl: https://github.com/octocat/Hello-World
+    owners:
+      - 周九
+      - 吴十
+    alertRules: []
+    status: deprecated
+    lastUpdated: 2023-03-15
