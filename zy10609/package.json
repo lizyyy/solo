@@ -1,0 +1,18 @@
+{
+  "name": "sms-unsubscribe-blacklist-restore",
+  "version": "1.0.0",
+  "description": "短信通知平台退订黑名单恢复 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/seed.js",
+    "test": "bash test/acceptance.sh"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}
