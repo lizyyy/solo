@@ -1,0 +1,95 @@
+{
+  "fullFlowRecords": [
+    {
+      "orderNo": "ACCP-FULL-001",
+      "title": "跨部门协作项目启动审批",
+      "applicantId": "EMP-001",
+      "applicantName": "张明",
+      "applicantDept": "产品部",
+      "content": "申请启动跨部门协作项目，涉及产品、技术、运营三个部门，预算200万元",
+      "applyTime": "2024-05-01T09:00:00Z",
+      "status": "signing",
+      "timeoutTime": "2024-05-04T09:00:00Z",
+      "signerId": "EMP-002",
+      "signerName": "李强",
+      "signerDept": "技术部",
+      "signOrder": 1,
+      "signStartTime": "2024-05-01T10:00:00Z",
+      "signStatus": "pending",
+      "remark": "需要技术架构评估"
+    }
+  ],
+  "conflictRecords": [
+    {
+      "orderNo": "ACCP-FULL-001",
+      "title": "重复提交的审批单",
+      "applicantId": "EMP-001",
+      "applicantName": "张明",
+      "applicantDept": "产品部",
+      "applyTime": "2024-05-01T09:00:00Z",
+      "status": "signing",
+      "signerId": "EMP-003",
+      "signerName": "王芳",
+      "signerDept": "财务部",
+      "signOrder": 1,
+      "signStartTime": "2024-05-01T11:00:00Z",
+      "signStatus": "pending"
+    }
+  ],
+  "badRecords": [
+    {
+      "title": "缺少审批单号的坏记录",
+      "applicantId": "EMP-004",
+      "applicantName": "赵六",
+      "applicantDept": "市场部"
+    },
+    {
+      "orderNo": "ACCP-BAD-002",
+      "title": "缺少申请人信息的坏记录",
+      "applyTime": "2024-05-02T09:00:00Z",
+      "status": "pending",
+      "signerId": "EMP-005",
+      "signerName": "孙七",
+      "signerDept": "人事部",
+      "signOrder": 1,
+      "signStartTime": "2024-05-02T10:00:00Z",
+      "signStatus": "pending"
+    }
+  ],
+  "resignedRecords": [
+    {
+      "orderNo": "ACCP-RESIGN-001",
+      "title": "离职员工待处理审批单",
+      "applicantId": "EMP-006",
+      "applicantName": "周八",
+      "applicantDept": "运营部",
+      "applyTime": "2024-04-15T09:00:00Z",
+      "status": "timeout",
+      "timeoutTime": "2024-04-18T09:00:00Z",
+      "signerId": "EMP-RESIGNED-001",
+      "signerName": "离职员工A",
+      "signerDept": "管理层",
+      "isResigned": true,
+      "signOrder": 1,
+      "signStartTime": "2024-04-15T10:00:00Z",
+      "signStatus": "timeout"
+    }
+  ],
+  "withdrawRecords": [
+    {
+      "orderNo": "ACCP-WITHDRAW-001",
+      "title": "待撤回测试审批单",
+      "applicantId": "EMP-007",
+      "applicantName": "吴九",
+      "applicantDept": "财务部",
+      "applyTime": "2024-05-03T09:00:00Z",
+      "status": "signing",
+      "signerId": "EMP-008",
+      "signerName": "郑十",
+      "signerDept": "财务部",
+      "signOrder": 1,
+      "signStartTime": "2024-05-03T10:00:00Z",
+      "signStatus": "pending"
+    }
+  ]
+}
