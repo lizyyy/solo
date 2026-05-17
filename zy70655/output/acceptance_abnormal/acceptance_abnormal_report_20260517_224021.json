@@ -1,0 +1,184 @@
+{
+  "report_info": {
+    "report_date": "2026-05-17",
+    "generated_at": "2026-05-17 22:40:21"
+  },
+  "statistics": {
+    "total": 6,
+    "completed": 4,
+    "defects": 2,
+    "completion_rate": 66.67,
+    "safety_defects": 1,
+    "maintenance_defects": 1,
+    "environment_defects": 0,
+    "operation_defects": 0,
+    "high_risk": 0,
+    "medium_risk": 1,
+    "low_risk": 1
+  },
+  "team_summaries": [
+    {
+      "team": "A班",
+      "total_items": 2,
+      "completed_items": 1,
+      "completion_rate": 50.0,
+      "safety_defects": 0,
+      "maintenance_defects": 1,
+      "high_risk": 0,
+      "medium_risk": 0,
+      "low_risk": 1
+    },
+    {
+      "team": "B班",
+      "total_items": 2,
+      "completed_items": 2,
+      "completion_rate": 100.0,
+      "safety_defects": 0,
+      "maintenance_defects": 0,
+      "high_risk": 0,
+      "medium_risk": 0,
+      "low_risk": 0
+    },
+    {
+      "team": "C班",
+      "total_items": 1,
+      "completed_items": 0,
+      "completion_rate": 0.0,
+      "safety_defects": 1,
+      "maintenance_defects": 0,
+      "high_risk": 0,
+      "medium_risk": 1,
+      "low_risk": 0
+    },
+    {
+      "team": "nan",
+      "total_items": 1,
+      "completed_items": 1,
+      "completion_rate": 100.0,
+      "safety_defects": 0,
+      "maintenance_defects": 0,
+      "high_risk": 0,
+      "medium_risk": 0,
+      "low_risk": 0
+    }
+  ],
+  "defect_records": [
+    {
+      "date": "2025-05-16",
+      "device_id": "nan",
+      "check_item": "nan",
+      "team": "A班",
+      "defect_type": "保养项",
+      "is_completed": false,
+      "inspector": "李工",
+      "remark": "数据验证测试",
+      "risk_level": "低风险",
+      "rectification_deadline": "2025-05-23",
+      "rectification_person": "李工",
+      "is_rectified": false
+    },
+    {
+      "date": "invalid",
+      "device_id": "EQ-3006",
+      "check_item": "安全门检查",
+      "team": "C班",
+      "defect_type": "安全项",
+      "is_completed": false,
+      "inspector": "刘工",
+      "remark": "验收样例",
+      "risk_level": "中风险",
+      "rectification_deadline": "",
+      "rectification_person": "刘工",
+      "is_rectified": false
+    }
+  ],
+  "all_records": [
+    {
+      "date": "2025-05-15",
+      "device_id": "EQ-3001",
+      "check_item": "高压电路检测",
+      "team": "A班",
+      "defect_type": "安全项",
+      "is_completed": true,
+      "inspector": "张工",
+      "remark": "nan",
+      "risk_level": "高风险",
+      "rectification_deadline": "2025-05-16",
+      "rectification_person": "nan",
+      "is_rectified": false
+    },
+    {
+      "date": "2025-05-16",
+      "device_id": "nan",
+      "check_item": "nan",
+      "team": "A班",
+      "defect_type": "保养项",
+      "is_completed": false,
+      "inspector": "李工",
+      "remark": "数据验证测试",
+      "risk_level": "低风险",
+      "rectification_deadline": "2025-05-23",
+      "rectification_person": "李工",
+      "is_rectified": false
+    },
+    {
+      "date": "2025-05-18",
+      "device_id": "EQ-3004",
+      "check_item": "机械保养",
+      "team": "B班",
+      "defect_type": "安全项",
+      "is_completed": true,
+      "inspector": "nan",
+      "remark": "nan",
+      "risk_level": "中风险",
+      "rectification_deadline": "2025-05-21",
+      "rectification_person": "nan",
+      "is_rectified": false
+    },
+    {
+      "date": "2025-05-19",
+      "device_id": "nan",
+      "check_item": "润滑油更换",
+      "team": "B班",
+      "defect_type": "保养项",
+      "is_completed": true,
+      "inspector": "赵工",
+      "remark": "nan",
+      "risk_level": "低风险",
+      "rectification_deadline": "2025-05-26",
+      "rectification_person": "nan",
+      "is_rectified": false
+    },
+    {
+      "date": "invalid",
+      "device_id": "EQ-3006",
+      "check_item": "安全门检查",
+      "team": "C班",
+      "defect_type": "安全项",
+      "is_completed": false,
+      "inspector": "刘工",
+      "remark": "验收样例",
+      "risk_level": "中风险",
+      "rectification_deadline": "",
+      "rectification_person": "刘工",
+      "is_rectified": false
+    },
+    {
+      "date": "2025-05-21",
+      "device_id": "EQ-3007",
+      "check_item": "电气接地检测",
+      "team": "nan",
+      "defect_type": "保养项",
+      "is_completed": true,
+      "inspector": "陈工",
+      "remark": "nan",
+      "risk_level": "低风险",
+      "rectification_deadline": "2025-05-28",
+      "rectification_person": "nan",
+      "is_rectified": false
+    }
+  ],
+  "errors": [
+    "第4行: 日期不能为空"
+  ]
+}
