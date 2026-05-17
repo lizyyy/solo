@@ -326,13 +326,13 @@ class SlowlogParser:
     def _parse_redis_cli_format(self, lines: List[str], result: ParseResult) -> ParseResult:
         i = 0
         while i < len(lines):
-            line = lines[i].strip()
+            line = lines[i].rstrip()
             
-            if not line:
+            if not line.strip():
                 i += 1
                 continue
             
-            if re.match(r'^\d+\)', line):
+            if re.match(r'^ \d+\)', line):
                 try:
                     entry_start = i
                     entry, i = self._read_cli_entry(lines, i)
@@ -345,6 +345,13 @@ class SlowlogParser:
                         error_reason=f"CLI format parse error: {str(e)}"
                     ))
                     i += 1
+            elif re.match(r'^\s*\d+\)', line):
+                result.errors.append(ParseError(
+                    line_number=i + 1,
+                    raw_content=lines[i],
+                    error_reason="Nested entry detected, might be in wrong format"
+                ))
+                i += 1
             else:
                 result.errors.append(ParseError(
                     line_number=i + 1,
@@ -361,35 +368,62 @@ class SlowlogParser:
         duration = 0
         command = ''
         args: List[str] = []
+        client_ip = None
+        client_name = None
         
-        m = re.match(r'^\s*(\d+)\)', lines[idx])
+        first_line = lines[idx].rstrip()
+        
+        m = re.match(r'^ (\d+)\)', first_line)
         if m:
             entry_id = int(m.group(1))
-        idx += 1
         
-        while idx < len(lines) and re.match(r'^\s*(\d+)\)', lines[idx].strip()):
-            part_line = lines[idx].strip()
+        field_idx = 1
+        
+        while idx < len(lines):
+            line = lines[idx].rstrip()
             
-            if '1) (integer)' in part_line:
-                pass
-            elif '2) (integer)' in part_line:
-                m = re.search(r'\(integer\)\s+(\d+)', part_line)
-                if m:
-                    timestamp = int(m.group(1))
-            elif '3) (integer)' in part_line:
-                m = re.search(r'\(integer\)\s+(\d+)', part_line)
-                if m:
-                    duration = int(m.group(1))
-            elif '4)' in part_line or '5)' in part_line:
-                if '1)' in part_line:
+            if re.match(r'^ \d+\)', line) and line != first_line:
+                break
+            
+            stripped = line.strip()
+            
+            m_field = re.match(r'(\d+)\) ', stripped)
+            if m_field:
+                current_field = int(m_field.group(1))
+                content = stripped[len(m_field.group(0)):]
+                
+                if current_field == 1 and '(integer)' in content:
+                    pass
+                
+                elif current_field == 2 and '(integer)' in content:
+                    m_val = re.search(r'\(integer\)\s+(\d+)', content)
+                    if m_val:
+                        timestamp = int(m_val.group(1))
+                
+                elif current_field == 3 and '(integer)' in content:
+                    m_val = re.search(r'\(integer\)\s+(\d+)', content)
+                    if m_val:
+                        duration = int(m_val.group(1))
+                
+                elif current_field == 4:
                     cmd_parts = []
-                    quote_parts = re.findall(r'"([^"]*)"', part_line)
-                    if quote_parts:
-                        cmd_parts.extend(quote_parts)
+                    if '"' in content:
+                        quote_parts = re.findall(r'"([^"]*)"', content)
+                        if quote_parts:
+                            cmd_parts.extend(quote_parts)
                     
                     idx += 1
-                    while idx < len(lines) and re.match(r'^\s*\d+\)', lines[idx]) is None:
-                        quote_parts = re.findall(r'"([^"]*)"', lines[idx])
+                    while idx < len(lines):
+                        next_line = lines[idx].rstrip()
+                        if re.match(r'^ \d+\)', next_line):
+                            break
+                        
+                        next_stripped = next_line.strip()
+                        m_next = re.match(r'(\d+)\) ', next_stripped)
+                        if m_next and int(m_next.group(1)) >= 5:
+                            break
+                        
+                        quote_parts = re.findall(r'"([^"]*)"', next_stripped)
                         if quote_parts:
                             cmd_parts.extend(quote_parts)
                         idx += 1
@@ -398,6 +432,18 @@ class SlowlogParser:
                         command = cmd_parts[0]
                         args = cmd_parts[1:]
                     idx -= 1
+                
+                elif current_field == 5:
+                    ip_match = re.search(r'"([^"]+)"', content)
+                    if ip_match:
+                        client_ip = ip_match.group(1)
+                        if ':' in client_ip:
+                            client_ip = client_ip.split(':')[0]
+                
+                elif current_field == 6:
+                    name_match = re.search(r'"([^"]+)"', content)
+                    if name_match:
+                        client_name = name_match.group(1)
             
             idx += 1
         
@@ -406,5 +452,7 @@ class SlowlogParser:
             timestamp=timestamp,
             duration_us=duration,
             command=command,
-            args=args
+            args=args,
+            client_ip=client_ip,
+            client_name=client_name
         ), idx
