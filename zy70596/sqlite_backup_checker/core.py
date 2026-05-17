@@ -300,17 +300,20 @@ class SQLiteBackupChecker:
                 
                 cursor.execute("PRAGMA integrity_check")
                 result = cursor.fetchone()
-                if result[0] != "ok":
-                    messages.append(f"完整性检查失败: {result[0]}")
+                integrity_result = result[0]
+                
+                if integrity_result != "ok":
+                    messages.append(f"完整性检查失败: {integrity_result}")
+                    success = False
                 else:
                     messages.append("SQLite完整性检查通过")
-                
-                cursor.execute("PRAGMA wal_checkpoint(TRUNCATE)")
-                conn.commit()
-                
-                shutil.copy2(temp_db, output_path)
-                messages.append(f"恢复的数据库已保存到: {output_path}")
-                success = True
+                    
+                    cursor.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+                    conn.commit()
+                    
+                    shutil.copy2(temp_db, output_path)
+                    messages.append(f"恢复的数据库已保存到: {output_path}")
+                    success = True
                 
                 conn.close()
                 

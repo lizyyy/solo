@@ -144,6 +144,7 @@ def scandir(backup_dir, output):
     
     click.echo("")
     valid_count = sum(1 for r in results if r["result"].is_valid)
+    all_valid = valid_count == len(results)
     click.echo(f"总计: {valid_count}/{len(results)} 个文件通过检查")
     
     if output:
@@ -151,10 +152,12 @@ def scandir(backup_dir, output):
         out_dir.mkdir(parents=True, exist_ok=True)
         
         import json
+        from datetime import datetime
         summary = {
-            "scanned_at": reporter.timestamp.isoformat() if 'reporter' in locals() else None,
+            "scanned_at": datetime.now().isoformat(),
             "total_files": len(results),
             "valid_files": valid_count,
+            "all_valid": all_valid,
             "files": []
         }
         
@@ -174,6 +177,8 @@ def scandir(backup_dir, output):
             json.dump(summary, f, ensure_ascii=False, indent=2)
         
         click.echo(f"扫描报告已保存到: {summary_path}")
+    
+    sys.exit(0 if all_valid else 2)
 
 
 @main.command()
