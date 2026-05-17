@@ -1,0 +1,62 @@
+{
+  "report_info": {
+    "generated_at": "2026-05-18",
+    "input_file": "sample_data/01_正常输入.xlsx",
+    "generated_by": "药品效期排查CLI"
+  },
+  "summary": {
+    "total_batches": 6,
+    "valid_batches": 6,
+    "invalid_batches": 0
+  },
+  "expiry_distribution": {
+    "normal": 2,
+    "near_expiry": 2,
+    "critical": 2,
+    "expired": 0
+  },
+  "freeze_distribution": {
+    "frozen": 1,
+    "pending": 0,
+    "not_frozen": 5
+  },
+  "problem_batches": [
+    {
+      "batch_no": "B2024005",
+      "medicine_name": "布洛芬片",
+      "store_name": "分店A",
+      "quantity": 60,
+      "expiry_date": "2026-07-01",
+      "expiry_days": 44,
+      "expiry_level": "近效期",
+      "freeze_status": "已冻结",
+      "issues": null
+    },
+    {
+      "batch_no": "B2024001",
+      "medicine_name": "阿莫西林胶囊",
+      "store_name": "中心店",
+      "quantity": 100,
+      "expiry_date": "2026-06-01",
+      "expiry_days": 14,
+      "expiry_level": "危急",
+      "freeze_status": "未冻结",
+      "issues": null
+    },
+    {
+      "batch_no": "B2024003",
+      "medicine_name": "阿莫西林胶囊",
+      "store_name": "分店A",
+      "quantity": 80,
+      "expiry_date": "2026-06-01",
+      "expiry_days": 14,
+      "expiry_level": "危急",
+      "freeze_status": "未冻结",
+      "issues": null
+    }
+  ],
+  "transfer_suggestions": [],
+  "validation": {
+    "expiry_count_match": true
+  }
+}
