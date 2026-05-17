@@ -21,7 +21,13 @@ class ReportGenerator:
 
     def _classify_targets(self):
         for name, target in self.parse_result.targets.items():
-            if target.has_side_effect:
+            has_risky_dep = False
+            for dep_name in target.expanded_deps:
+                dep = self.parse_result.targets.get(dep_name)
+                if dep and dep.has_side_effect:
+                    has_risky_dep = True
+                    break
+            if target.has_side_effect or has_risky_dep:
                 self.report.risky_targets.append(name)
             else:
                 self.report.safe_targets.append(name)
@@ -48,7 +54,12 @@ class ReportGenerator:
         for name in sorted(self.report.risky_targets):
             target = self.parse_result.targets[name]
             comment = " | ".join(target.comments) if target.comments else "无描述"
-            reason = target.side_effect_reason or "未知原因"
+            if target.has_side_effect:
+                reason = target.side_effect_reason or "未知原因"
+            else:
+                risky_deps = [d for d in target.expanded_deps 
+                              if self.parse_result.targets.get(d) and self.parse_result.targets[d].has_side_effect]
+                reason = f"依赖风险: {', '.join(risky_deps)}"
             print(f"  ⚠ {name:<20} [{reason}] {comment}", file=output)
         print("", file=output)
 
@@ -75,6 +86,10 @@ class ReportGenerator:
         }
 
         for name, target in self.parse_result.targets.items():
+            risky_deps = [d for d in target.expanded_deps 
+                          if self.parse_result.targets.get(d) and self.parse_result.targets[d].has_side_effect]
+            has_risky_dep = len(risky_deps) > 0
+            is_safe = not (target.has_side_effect or has_risky_dep)
             data["targets"][name] = {
                 "name": target.name,
                 "line_number": target.line_number,
@@ -83,7 +98,9 @@ class ReportGenerator:
                 "comments": target.comments,
                 "has_side_effect": target.has_side_effect,
                 "side_effect_reason": target.side_effect_reason,
-                "is_safe": not target.has_side_effect
+                "has_risky_deps": has_risky_dep,
+                "risky_deps": risky_deps,
+                "is_safe": is_safe
             }
 
         for bad_line in self.parse_result.bad_lines:
@@ -119,12 +136,17 @@ class ReportGenerator:
             f.write("\n")
 
             f.write("## 风险目标 (有副作用！)\n\n")
-            f.write("| 目标名 | 副作用说明 | 目标说明 |\n")
-            f.write("|--------|------------|----------|\n")
+            f.write("| 目标名 | 风险来源 | 目标说明 |\n")
+            f.write("|--------|----------|----------|\n")
             for name in sorted(self.report.risky_targets):
                 target = self.parse_result.targets[name]
                 comment = "<br>".join(target.comments) if target.comments else "-"
-                reason = target.side_effect_reason or "未知"
+                if target.has_side_effect:
+                    reason = target.side_effect_reason or "未知"
+                else:
+                    risky_deps = [d for d in target.expanded_deps 
+                                  if self.parse_result.targets.get(d) and self.parse_result.targets[d].has_side_effect]
+                    reason = f"依赖风险: {', '.join(risky_deps)}"
                 f.write(f"| {name} | {reason} | {comment} |\n")
             f.write("\n")
 
