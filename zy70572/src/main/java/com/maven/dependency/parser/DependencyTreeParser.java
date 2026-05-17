@@ -8,10 +8,8 @@ import java.util.regex.*;
 
 public class DependencyTreeParser {
     private static final Pattern DEP_PATTERN = Pattern.compile(
-        "^([\\\\| +-]*)([\\w.-]+):([\\w.-]+):([\\w.-]+)(?::([\\w.-]+))?(?::([\\w.-]+))?(?: *(\\(optional\\)))?$"
+        "^[\\\\| +-]*([\\w.-]+:[\\w.-]+:[\\w.-]+(?::[\\w.-]+){0,2})(?: *\\(optional\\))?$"
     );
-
-    private static final Pattern TREE_PREFIX = Pattern.compile("^([\\\\| +-]+)");
 
     public AnalysisResult parse(File inputFile) throws IOException {
         AnalysisResult result = new AnalysisResult();
@@ -37,7 +35,7 @@ public class DependencyTreeParser {
         for (String rawLine : lines) {
             lineNum++;
             String line = rawLine.trim();
-            
+
             if (line.isEmpty()) {
                 continue;
             }
@@ -46,27 +44,40 @@ public class DependencyTreeParser {
                 line = line.substring(6).trim();
             }
 
-            if (line.contains("--- maven-dependency-plugin") || line.contains("BUILD") || 
-                line.contains("Total time") || line.contains("Finished at")) {
+            if (line.contains("--- maven-dependency-plugin") || line.contains("BUILD") ||
+                line.contains("Total time") || line.contains("Finished at") ||
+                line.contains("Scanning for projects") || line.contains("--------") ||
+                line.contains("Building ") || line.contains("maven-dependency-plugin")) {
                 continue;
             }
 
             try {
-                Matcher prefixMatcher = TREE_PREFIX.matcher(rawLine);
-                int depth = 0;
-                if (prefixMatcher.find()) {
-                    depth = calculateDepth(prefixMatcher.group(1));
-                }
+                int depth = calculateDepth(rawLine);
 
                 Matcher depMatcher = DEP_PATTERN.matcher(line);
                 if (depMatcher.find()) {
+                    String gavString = depMatcher.group(1);
+                    String[] parts = gavString.split(":");
+
                     DependencyNode node = new DependencyNode();
-                    node.setGroupId(depMatcher.group(2));
-                    node.setArtifactId(depMatcher.group(3));
-                    node.setVersion(depMatcher.group(4));
-                    node.setScope(depMatcher.group(5));
-                    node.setClassifier(depMatcher.group(6));
-                    node.setOptional(depMatcher.group(7) != null);
+                    node.setGroupId(parts[0]);
+                    node.setArtifactId(parts[1]);
+
+                    if (parts.length == 4) {
+                        node.setType(parts[2]);
+                        node.setVersion(parts[3]);
+                    } else if (parts.length == 5) {
+                        node.setType(parts[2]);
+                        node.setVersion(parts[3]);
+                        node.setScope(parts[4]);
+                    } else if (parts.length == 6) {
+                        node.setType(parts[2]);
+                        node.setClassifier(parts[3]);
+                        node.setVersion(parts[4]);
+                        node.setScope(parts[5]);
+                    }
+
+                    node.setOptional(line.contains("(optional)"));
                     node.setDepth(depth);
                     node.setRawLine(rawLine);
                     node.setLineNumber(lineNum);
@@ -104,9 +115,10 @@ public class DependencyTreeParser {
         return result;
     }
 
-    private int calculateDepth(String prefix) {
+    private int calculateDepth(String rawLine) {
         int depth = 0;
-        for (char c : prefix.toCharArray()) {
+        for (int i = 0; i < rawLine.length(); i++) {
+            char c = rawLine.charAt(i);
             if (c == '|' || c == '+' || c == '\\') {
                 depth++;
             }

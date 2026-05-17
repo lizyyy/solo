@@ -1,0 +1,67 @@
+{
+  "projectName": "assertj-core",
+  "analysisTime": "2026-05-17 13:54:22",
+  "inputFile": "/Users/lzy/pro/solo/workspaces/zy70572/sample-dependency-tree.txt",
+  "totalDependencies": 39,
+  "uniqueArtifacts": 35,
+  "conflictCount": 3,
+  "warnings": [],
+  "conflicts": [
+    {
+      "severity": "MEDIUM",
+      "groupId": "org.apache.httpcomponents",
+      "artifactId": "httpcore",
+      "resolvedVersion": "4.4.15",
+      "conflictingVersions": ["4.4.10"],
+      "scopes": ["compile"],
+      "mediationReason": "First declaration wins (depth: 1)",
+      "exclusionSuggestions": [
+        {
+          "fromArtifact": "org.apache.httpcomponents:httpasyncclient",
+          "excludeArtifact": "org.apache.httpcomponents:httpcore",
+          "reason": "Conflicts with resolved version 4.4.15",
+          "priority": 2100,
+          "mavenXml": "<exclusion>\n  <groupId>org.apache.httpcomponents</groupId>\n  <artifactId>httpcore</artifactId>\n</exclusion>"
+        }
+      ]
+    },
+    {
+      "severity": "MEDIUM",
+      "groupId": "commons-logging",
+      "artifactId": "commons-logging",
+      "resolvedVersion": "1.2",
+      "conflictingVersions": ["1.1.1"],
+      "scopes": ["compile"],
+      "mediationReason": "First declaration wins (depth: 1)",
+      "exclusionSuggestions": [
+        {
+          "fromArtifact": "org.apache.httpcomponents:httpasyncclient",
+          "excludeArtifact": "commons-logging:commons-logging",
+          "reason": "Conflicts with resolved version 1.2",
+          "priority": 2100,
+          "mavenXml": "<exclusion>\n  <groupId>commons-logging</groupId>\n  <artifactId>commons-logging</artifactId>\n</exclusion>"
+        }
+      ]
+    },
+    {
+      "severity": "MEDIUM",
+      "groupId": "org.springframework",
+      "artifactId": "spring-core",
+      "resolvedVersion": "5.3.29",
+      "conflictingVersions": ["5.2.0.RELEASE"],
+      "scopes": ["compile"],
+      "mediationReason": "Direct dependency declaration",
+      "exclusionSuggestions": [
+        {
+          "fromArtifact": "org.springframework:spring-context",
+          "excludeArtifact": "org.springframework:spring-core",
+          "reason": "Conflicts with resolved version 5.3.29",
+          "priority": 2100,
+          "mavenXml": "<exclusion>\n  <groupId>org.springframework</groupId>\n  <artifactId>spring-core</artifactId>\n</exclusion>"
+        }
+      ]
+    }
+  ],
+  "parseErrors": [
+  ]
+}

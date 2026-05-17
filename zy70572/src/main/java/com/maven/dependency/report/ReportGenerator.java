@@ -1,7 +1,5 @@
 package com.maven.dependency.report;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.maven.dependency.model.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -9,12 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ReportGenerator {
-    private final ObjectMapper objectMapper;
     private final SimpleDateFormat dateFormat;
 
     public ReportGenerator() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 
@@ -45,12 +40,12 @@ public class ReportGenerator {
                     conflict.getSeverity(),
                     conflict.getGroupId(),
                     conflict.getArtifactId()));
-                sb.append(String.format("  Resolved: %s\n", conflict.getResolvedVersion()));
-                sb.append(String.format("  Conflicting: %s\n", 
+                sb.append(String.format("  Resolved Version: %s\n", conflict.getResolvedVersion()));
+                sb.append(String.format("  Conflicting Versions: %s\n",
                     String.join(", ", conflict.getConflictingVersions())));
-                sb.append(String.format("  Scopes: %s\n", 
+                sb.append(String.format("  Scopes: %s\n",
                     String.join(", ", conflict.getScopes())));
-                sb.append(String.format("  Mediation: %s\n", conflict.getMediationReason()));
+                sb.append(String.format("  Mediation Reason: %s\n", conflict.getMediationReason()));
             }
         }
 
@@ -69,54 +64,61 @@ public class ReportGenerator {
     }
 
     public void writeJsonReport(AnalysisResult result, File outputFile) throws IOException {
-        Map<String, Object> report = new LinkedHashMap<>();
-        report.put("projectName", result.getProjectName());
-        report.put("analysisTime", dateFormat.format(new Date(result.getAnalysisTimestamp())));
-        report.put("inputFile", result.getInputFile());
-        report.put("totalDependencies", result.getTotalDependencies());
-        report.put("uniqueArtifacts", result.getUniqueArtifacts());
-        report.put("conflictCount", result.getConflictCount());
-        report.put("warnings", result.getWarnings());
+        StringBuilder json = new StringBuilder();
+        json.append("{\n");
+        json.append(String.format("  \"projectName\": %s,\n", jsonEscape(result.getProjectName())));
+        json.append(String.format("  \"analysisTime\": %s,\n", jsonEscape(dateFormat.format(new Date(result.getAnalysisTimestamp())))));
+        json.append(String.format("  \"inputFile\": %s,\n", jsonEscape(result.getInputFile())));
+        json.append(String.format("  \"totalDependencies\": %d,\n", result.getTotalDependencies()));
+        json.append(String.format("  \"uniqueArtifacts\": %d,\n", result.getUniqueArtifacts()));
+        json.append(String.format("  \"conflictCount\": %d,\n", result.getConflictCount()));
+        json.append(String.format("  \"warnings\": %s,\n", toJsonArray(result.getWarnings())));
 
-        List<Map<String, Object>> conflicts = new ArrayList<>();
-        for (ConflictInfo c : result.getConflicts()) {
-            Map<String, Object> cm = new LinkedHashMap<>();
-            cm.put("severity", c.getSeverity().toString());
-            cm.put("groupId", c.getGroupId());
-            cm.put("artifactId", c.getArtifactId());
-            cm.put("resolvedVersion", c.getResolvedVersion());
-            cm.put("conflictingVersions", c.getConflictingVersions());
-            cm.put("scopes", c.getScopes());
-            cm.put("mediationReason", c.getMediationReason());
+        json.append("  \"conflicts\": [\n");
+        for (int i = 0; i < result.getConflicts().size(); i++) {
+            ConflictInfo c = result.getConflicts().get(i);
+            json.append("    {\n");
+            json.append(String.format("      \"severity\": %s,\n", jsonEscape(c.getSeverity().toString())));
+            json.append(String.format("      \"groupId\": %s,\n", jsonEscape(c.getGroupId())));
+            json.append(String.format("      \"artifactId\": %s,\n", jsonEscape(c.getArtifactId())));
+            json.append(String.format("      \"resolvedVersion\": %s,\n", jsonEscape(c.getResolvedVersion())));
+            json.append(String.format("      \"conflictingVersions\": %s,\n", toJsonArray(c.getConflictingVersions())));
+            json.append(String.format("      \"scopes\": %s,\n", toJsonArray(c.getScopes())));
+            json.append(String.format("      \"mediationReason\": %s,\n", jsonEscape(c.getMediationReason())));
 
-            List<Map<String, Object>> suggestions = new ArrayList<>();
-            for (ExclusionSuggestion s : c.getExclusionSuggestions()) {
-                Map<String, Object> sm = new LinkedHashMap<>();
-                sm.put("fromArtifact", s.getFromGroupId() + ":" + s.getFromArtifactId());
-                sm.put("excludeArtifact", s.getExcludeGroupId() + ":" + s.getExcludeArtifactId());
-                sm.put("reason", s.getReason());
-                sm.put("priority", s.getPriority());
-                sm.put("mavenXml", s.toMavenXml());
-                suggestions.add(sm);
+            json.append("      \"exclusionSuggestions\": [\n");
+            for (int j = 0; j < c.getExclusionSuggestions().size(); j++) {
+                ExclusionSuggestion s = c.getExclusionSuggestions().get(j);
+                json.append("        {\n");
+                json.append(String.format("          \"fromArtifact\": %s,\n",
+                    jsonEscape(s.getFromGroupId() + ":" + s.getFromArtifactId())));
+                json.append(String.format("          \"excludeArtifact\": %s,\n",
+                    jsonEscape(s.getExcludeGroupId() + ":" + s.getExcludeArtifactId())));
+                json.append(String.format("          \"reason\": %s,\n", jsonEscape(s.getReason())));
+                json.append(String.format("          \"priority\": %d,\n", s.getPriority()));
+                json.append(String.format("          \"mavenXml\": %s\n", jsonEscape(s.toMavenXml())));
+                json.append("        }").append(j < c.getExclusionSuggestions().size() - 1 ? ",\n" : "\n");
             }
-            cm.put("exclusionSuggestions", suggestions);
-            conflicts.add(cm);
+            json.append("      ]\n");
+            json.append("    }").append(i < result.getConflicts().size() - 1 ? ",\n" : "\n");
         }
-        report.put("conflicts", conflicts);
+        json.append("  ],\n");
 
-        List<Map<String, Object>> badLines = new ArrayList<>();
-        for (BadLine b : result.getBadLines()) {
-            Map<String, Object> bm = new LinkedHashMap<>();
-            bm.put("lineNumber", b.getLineNumber());
-            bm.put("content", b.getLineContent());
-            bm.put("reason", b.getErrorReason());
-            badLines.add(bm);
+        json.append("  \"parseErrors\": [\n");
+        for (int i = 0; i < result.getBadLines().size(); i++) {
+            BadLine b = result.getBadLines().get(i);
+            json.append("    {\n");
+            json.append(String.format("      \"lineNumber\": %d,\n", b.getLineNumber()));
+            json.append(String.format("      \"content\": %s,\n", jsonEscape(b.getLineContent())));
+            json.append(String.format("      \"reason\": %s\n", jsonEscape(b.getErrorReason())));
+            json.append("    }").append(i < result.getBadLines().size() - 1 ? ",\n" : "\n");
         }
-        report.put("parseErrors", badLines);
+        json.append("  ]\n");
+        json.append("}\n");
 
         try (OutputStreamWriter writer = new OutputStreamWriter(
                 new FileOutputStream(outputFile), StandardCharsets.UTF_8)) {
-            objectMapper.writeValue(writer, report);
+            writer.write(json.toString());
         }
     }
 
@@ -125,9 +127,9 @@ public class ReportGenerator {
                 new FileOutputStream(outputFile), StandardCharsets.UTF_8)) {
 
             writer.write("# Maven Dependency Conflict Report\n\n");
-            writer.write(String.format("**Project**: %s  \n", 
+            writer.write(String.format("**Project**: %s  \n",
                 result.getProjectName() != null ? result.getProjectName() : "N/A"));
-            writer.write(String.format("**Generated**: %s  \n", 
+            writer.write(String.format("**Generated**: %s  \n",
                 dateFormat.format(new Date(result.getAnalysisTimestamp()))));
             writer.write(String.format("**Input**: `%s`\n\n", result.getInputFile()));
 
@@ -149,7 +151,7 @@ public class ReportGenerator {
                         conflict.getArtifactId()));
 
                     writer.write("- **Resolved Version**: `" + conflict.getResolvedVersion() + "`\n");
-                    writer.write("- **Conflicting Versions**: `" + 
+                    writer.write("- **Conflicting Versions**: `" +
                         String.join("`, `", conflict.getConflictingVersions()) + "`\n");
                     writer.write("- **Scopes**: `" + String.join("`, `", conflict.getScopes()) + "`\n");
                     writer.write("- **Mediation Reason**: " + conflict.getMediationReason() + "\n\n");
@@ -170,7 +172,7 @@ public class ReportGenerator {
                         writer.write("#### Maven XML Exclusions\n\n");
                         writer.write("```xml\n");
                         for (ExclusionSuggestion s : conflict.getExclusionSuggestions()) {
-                            writer.write("<!-- " + s.getLocationComment().replace("<!-- ", "").replace(" -->", "") + " -->\n");
+                            writer.write("<!-- Add this exclusion to " + s.getFromGroupId() + ":" + s.getFromArtifactId() + " -->\n");
                             writer.write(s.toMavenXml() + "\n\n");
                         }
                         writer.write("```\n\n");
@@ -191,5 +193,21 @@ public class ReportGenerator {
                 }
             }
         }
+    }
+
+    private String jsonEscape(String s) {
+        if (s == null) return "null";
+        return "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n") + "\"";
+    }
+
+    private String toJsonArray(List<String> list) {
+        if (list == null || list.isEmpty()) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(jsonEscape(list.get(i)));
+            if (i < list.size() - 1) sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

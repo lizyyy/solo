@@ -1,7 +1,5 @@
 package com.maven.dependency.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,8 +17,6 @@ public class DependencyNode {
     private int lineNumber;
 
     private List<DependencyNode> children = new ArrayList<>();
-
-    @JsonIgnore
     private DependencyNode parent;
 
     public DependencyNode() {
@@ -129,12 +125,10 @@ public class DependencyNode {
         this.parent = parent;
     }
 
-    @JsonProperty("fullName")
     public String getFullName() {
         return groupId + ":" + artifactId;
     }
 
-    @JsonProperty("gav")
     public String getGAV() {
         return groupId + ":" + artifactId + ":" + version;
     }
