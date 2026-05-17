@@ -1,0 +1,6 @@
+﻿文件路径,工作表,行号,原始内容,错误类型,错误信息
+/Users/lzy/pro/solo/workspaces/zy70637/test_data/compensations.csv,,6,"赔付ID=,订单ID=ORD003,物料ID=MAT001,损坏程度=轻微损坏,赔付金额=45.00,赔付状态=已赔付,记录时间=2024-07-12,备注=",MissingField,赔付ID不能为空
+/Users/lzy/pro/solo/workspaces/zy70637/test_data/materials.csv,,6,"物料ID=,物料名称=无效物料,物料类型=花架,单价=100.00,数量=5",MissingField,物料ID不能为空
+/Users/lzy/pro/solo/workspaces/zy70637/test_data/orders.csv,,5,"订单ID=,活动名称=无效订单,活动日期=2024-08-01,客户姓名=无名氏,客户电话=",MissingField,订单ID不能为空
+/Users/lzy/pro/solo/workspaces/zy70637/test_data/outbounds.csv,,10,"出库ID=,订单ID=ORD003,物料ID=MAT004,出库数量=20,出库日期=2024-07-09,经办人=王主管",MissingField,出库ID不能为空
+/Users/lzy/pro/solo/workspaces/zy70637/test_data/returns.csv,,11,"归还ID=,订单ID=ORD003,物料ID=MAT004,归还数量=15,归还日期=2024-07-11,检查人=王检查,损坏程度=无损坏,损坏描述=",MissingField,归还ID不能为空
