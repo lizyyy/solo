@@ -1,5 +1,5 @@
 import json
-import os
+import re
 from typing import List, Dict, Any, Optional, Tuple
 from pathlib import Path
 from .models import (
@@ -8,9 +8,41 @@ from .models import (
 )
 
 
+class LineNumberedJSONParser:
+    def __init__(self, content: str, lines: List[str]):
+        self.content = content
+        self.lines = lines
+        self.line_offsets = self._calculate_line_offsets()
+    
+    def _calculate_line_offsets(self) -> List[int]:
+        offsets = [0]
+        current = 0
+        for line in self.lines:
+            current += len(line)
+            offsets.append(current)
+        return offsets
+    
+    def _get_line_number(self, char_pos: int) -> int:
+        for i, offset in enumerate(self.line_offsets):
+            if char_pos < offset:
+                return i
+        return len(self.lines)
+    
+    def find_object_line_numbers(self, obj_str: str) -> Tuple[int, int]:
+        pattern = re.escape(obj_str)
+        match = re.search(pattern, self.content)
+        if match:
+            start_line = self._get_line_number(match.start())
+            end_line = self._get_line_number(match.end())
+            return (start_line, end_line)
+        return (None, None)
+
+
 class TopologyParser:
     def __init__(self):
         self.topology = TopologyData()
+        self._json_parser = None
+        self._raw_content = None
 
     def parse_file(self, file_path: str) -> TopologyData:
         file_path = Path(file_path)
@@ -42,6 +74,9 @@ class TopologyParser:
             ))
             return self.topology
 
+        self._raw_content = content
+        self._json_parser = LineNumberedJSONParser(content, lines)
+
         try:
             data = json.loads(content)
         except json.JSONDecodeError as e:
@@ -71,8 +106,42 @@ class TopologyParser:
         self._parse_bindings(data.get('bindings', []))
         self._parse_policies(data.get('policies', []))
 
+    def _find_item_line_number(self, item: Any, field_name: str, idx: int) -> Optional[int]:
+        if not self._json_parser or not self._raw_content:
+            return None
+        
+        item_str = json.dumps(item, ensure_ascii=False, separators=(',', ':'))
+        item_pretty = json.dumps(item, ensure_ascii=False, indent=2)
+        
+        for variant in [item_str, item_pretty]:
+            variant_clean = variant.strip()
+            if variant_clean:
+                pattern = re.escape(variant_clean).replace(r'\ ', r'\s*')
+                matches = list(re.finditer(pattern, self._raw_content))
+                if len(matches) == 1:
+                    start_line = self._json_parser._get_line_number(matches[0].start())
+                    return start_line
+        
+        pattern = rf'"{field_name}"\s*:\s*\[([^\]]*?)\]'
+        match = re.search(pattern, self._raw_content, re.DOTALL)
+        if match:
+            array_content = match.group(1)
+            items = re.findall(r'\{[^{}]*\}', array_content)
+            if idx < len(items):
+                item_pos = match.start(1) + array_content.find(items[idx])
+                return self._json_parser._get_line_number(item_pos)
+        
+        pattern = rf'"{field_name}"\s*:\s*\['
+        match = re.search(pattern, self._raw_content)
+        if match:
+            array_start = self._json_parser._get_line_number(match.end())
+            return array_start + idx
+        
+        return None
+
     def _parse_exchanges(self, exchanges: List[Any]):
         for idx, item in enumerate(exchanges):
+            line_no = self._find_item_line_number(item, 'exchanges', idx)
             try:
                 if not isinstance(item, dict):
                     raise ValueError("exchange必须是对象")
@@ -84,7 +153,7 @@ class TopologyParser:
                 self.topology.exchanges.append(exchange)
             except Exception as e:
                 self.topology.errors.append(ValidationError(
-                    line_number=idx + 1,
+                    line_number=line_no,
                     field="exchanges",
                     error_type="ExchangeParseError",
                     message=f"Exchange解析失败: {str(e)}",
@@ -93,6 +162,7 @@ class TopologyParser:
 
     def _parse_queues(self, queues: List[Any]):
         for idx, item in enumerate(queues):
+            line_no = self._find_item_line_number(item, 'queues', idx)
             try:
                 if not isinstance(item, dict):
                     raise ValueError("queue必须是对象")
@@ -104,7 +174,7 @@ class TopologyParser:
                 self.topology.queues.append(queue)
             except Exception as e:
                 self.topology.errors.append(ValidationError(
-                    line_number=idx + 1,
+                    line_number=line_no,
                     field="queues",
                     error_type="QueueParseError",
                     message=f"Queue解析失败: {str(e)}",
@@ -113,6 +183,7 @@ class TopologyParser:
 
     def _parse_bindings(self, bindings: List[Any]):
         for idx, item in enumerate(bindings):
+            line_no = self._find_item_line_number(item, 'bindings', idx)
             try:
                 if not isinstance(item, dict):
                     raise ValueError("binding必须是对象")
@@ -126,7 +197,7 @@ class TopologyParser:
                 self.topology.bindings.append(binding)
             except Exception as e:
                 self.topology.errors.append(ValidationError(
-                    line_number=idx + 1,
+                    line_number=line_no,
                     field="bindings",
                     error_type="BindingParseError",
                     message=f"Binding解析失败: {str(e)}",
@@ -135,6 +206,7 @@ class TopologyParser:
 
     def _parse_policies(self, policies: List[Any]):
         for idx, item in enumerate(policies):
+            line_no = self._find_item_line_number(item, 'policies', idx)
             try:
                 if not isinstance(item, dict):
                     raise ValueError("policy必须是对象")
@@ -148,7 +220,7 @@ class TopologyParser:
                 self.topology.policies.append(policy)
             except Exception as e:
                 self.topology.errors.append(ValidationError(
-                    line_number=idx + 1,
+                    line_number=line_no,
                     field="policies",
                     error_type="PolicyParseError",
                     message=f"Policy解析失败: {str(e)}",
@@ -178,6 +250,9 @@ class TopologyParser:
         for json_file in json_files:
             sub_parser = TopologyParser()
             sub_topology = sub_parser.parse_file(str(json_file))
+            for err in sub_topology.errors:
+                if err.raw_data:
+                    err.raw_data = f"{json_file}: {err.raw_data}"
             self.topology.exchanges.extend(sub_topology.exchanges)
             self.topology.queues.extend(sub_topology.queues)
             self.topology.bindings.extend(sub_topology.bindings)

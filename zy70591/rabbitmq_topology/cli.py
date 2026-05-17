@@ -22,7 +22,8 @@ def main():
               help='报告名称前缀 (默认: 根据时间生成)')
 @click.option('--no-summary', is_flag=True, help='不显示终端摘要')
 @click.option('--machine-readable', is_flag=True, help='仅输出机器可读格式')
-def analyze(input_path, output_dir, name, no_summary, machine_readable):
+@click.option('--strict', is_flag=True, help='严格模式：发现问题时返回非0退出码')
+def analyze(input_path, output_dir, name, no_summary, machine_readable, strict):
     input_path = Path(input_path)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -43,23 +44,34 @@ def analyze(input_path, output_dir, name, no_summary, machine_readable):
     
     if machine_readable:
         print(reporter.generate_machine_readable())
-        return
+    else:
+        if not no_summary:
+            reporter.print_console_summary()
+        
+        report_paths = reporter.generate_all_reports()
+        
+        if not no_summary:
+            click.echo(f"\n📄 报告已生成:")
+            for report_type, path in report_paths.items():
+                click.echo(f"   - {report_type}: {path}")
     
-    if not no_summary:
-        reporter.print_console_summary()
-    
-    report_paths = reporter.generate_all_reports()
-    
-    if not no_summary:
-        click.echo(f"\n📄 报告已生成:")
-        for report_type, path in report_paths.items():
-            click.echo(f"   - {report_type}: {path}")
+    if strict:
+        has_errors = len(topology.errors) > 0
+        has_validation_issues = (
+            len(validation_result.invalid_bindings) > 0 or
+            len(validation_result.orphan_queues) > 0 or
+            len(validation_result.orphan_exchanges) > 0 or
+            len(validation_result.duplicate_bindings) > 0
+        )
+        if has_errors or has_validation_issues:
+            sys.exit(1)
 
 
 @main.command()
 @click.argument('input_path', type=click.Path(exists=True))
 @click.option('--json', 'output_json', is_flag=True, help='以JSON格式输出')
-def validate(input_path, output_json):
+@click.option('--no-exit-code', is_flag=True, help='不设置非0退出码，即使发现问题')
+def validate(input_path, output_json, no_exit_code):
     input_path = Path(input_path)
     
     parser = TopologyParser()
@@ -78,6 +90,17 @@ def validate(input_path, output_json):
     else:
         reporter = Reporter(topology, validation_result, Path('/tmp'), 'validate')
         reporter.print_validation_only()
+    
+    if not no_exit_code:
+        has_errors = len(topology.errors) > 0
+        has_validation_issues = (
+            len(validation_result.invalid_bindings) > 0 or
+            len(validation_result.orphan_queues) > 0 or
+            len(validation_result.orphan_exchanges) > 0 or
+            len(validation_result.duplicate_bindings) > 0
+        )
+        if has_errors or has_validation_issues:
+            sys.exit(1)
 
 
 @main.command(name="list")

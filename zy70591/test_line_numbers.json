@@ -1,0 +1,41 @@
+{
+  "exchanges": [
+    {
+      "name": "good.exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true
+    },
+    {
+      "vhost": "/",
+      "type": "topic",
+      "durable": true
+    },
+    {
+      "name": "another.good",
+      "vhost": "/",
+      "type": "fanout"
+    }
+  ],
+  "queues": [
+    {
+      "name": "good.queue",
+      "durable": true
+    },
+    {
+      "durable": true,
+      "exclusive": false
+    }
+  ],
+  "bindings": [
+    {
+      "source": "good.exchange",
+      "destination": "good.queue",
+      "destination_type": "queue"
+    },
+    {
+      "source": "missing.exchange",
+      "destination": "nowhere.queue"
+    }
+  ]
+}

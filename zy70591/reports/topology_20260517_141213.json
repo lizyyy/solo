@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-17T14:12:13.057654",
+    "report_name": "topology_20260517_141213"
+  },
+  "topology": {
+    "exchanges_count": 1,
+    "queues_count": 1,
+    "bindings_count": 2,
+    "policies_count": 0,
+    "exchanges": [
+      {
+        "name": "good.exchange",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+      }
+    ],
+    "queues": [
+      {
+        "name": "test.queue",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "exclusive": false,
+        "arguments": {}
+      }
+    ],
+    "bindings": [
+      {
+        "source": "nonexistent.exchange",
+        "destination": "test.queue",
+        "destination_type": "queue",
+        "routing_key": "test",
+        "vhost": "/",
+        "arguments": {}
+      },
+      {
+        "source": "good.exchange",
+        "destination": "nonexistent.queue",
+        "destination_type": "queue",
+        "routing_key": "",
+        "vhost": "/",
+        "arguments": {}
+      }
+    ],
+    "policies": []
+  },
+  "validation": {
+    "orphan_queues": [],
+    "orphan_exchanges": [],
+    "invalid_bindings": [
+      {
+        "type": "source_not_found",
+        "source": "nonexistent.exchange",
+        "destination": "test.queue",
+        "routing_key": "test",
+        "vhost": "/",
+        "message": "源Exchange不存在: nonexistent.exchange"
+      },
+      {
+        "type": "destination_not_found",
+        "source": "good.exchange",
+        "destination": "nonexistent.queue",
+        "routing_key": "",
+        "vhost": "/",
+        "message": "目标Queue不存在: nonexistent.queue"
+      }
+    ],
+    "duplicate_bindings": [],
+    "warnings": []
+  },
+  "parse_errors": [
+    {
+      "line_number": 3,
+      "field": "exchanges",
+      "value": null,
+      "error_type": "ExchangeParseError",
+      "message": "Exchange解析失败: 缺少必填字段: name",
+      "raw_data": "{\"vhost\": \"/\", \"type\": \"topic\", \"durable\": true}"
+    }
+  ]
+}

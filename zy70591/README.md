@@ -74,7 +74,12 @@ rabbitmq-topology analyze <输入路径> [选项]
   -n, --name            报告名称前缀 (默认: 按时间自动生成)
   --no-summary          不显示终端摘要
   --machine-readable    仅输出机器可读的JSON格式
+  --strict              严格模式，发现任何问题时返回非0退出码
 ```
+
+**退出码说明:**
+- `0`: 拓扑验证通过
+- `1`: 发现解析错误或拓扑问题（需配合`--strict`）
 
 **示例:**
 
@@ -84,6 +89,9 @@ rabbitmq-topology analyze topology.json -o ./my-reports -n production
 
 # 仅输出机器可读格式，便于CI/CD集成
 rabbitmq-topology analyze topology.json --machine-readable
+
+# 严格模式，失败时退出
+rabbitmq-topology analyze topology.json --strict || echo "拓扑检查失败"
 ```
 
 ### validate - 验证拓扑
@@ -93,6 +101,21 @@ rabbitmq-topology validate <输入路径> [选项]
 
 选项:
   --json               以JSON格式输出验证结果
+  --no-exit-code       即使发现问题也不设置非0退出码
+```
+
+**退出码说明:**
+- `0`: 拓扑验证通过
+- `1`: 发现解析错误或拓扑问题
+
+**示例:**
+
+```bash
+# 验证拓扑，如果有问题则中断脚本
+rabbitmq-topology validate topology.json || exit 1
+
+# JSON格式输出，便于程序处理
+rabbitmq-topology validate topology.json --json | jq .
 ```
 
 ### list - 列出拓扑元素
