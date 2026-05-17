@@ -45,8 +45,9 @@ class YamlExpander {
         this.overrides = [];
         this.errors = [];
         this.warnings = [];
-        this.detectedMerges = [];
         this.mergeNodes = [];
+        this.lineToAnchor = new Map();
+        this.lineToPath = new Map();
         this.options = options;
     }
     expand() {
@@ -67,19 +68,19 @@ class YamlExpander {
         let expandedYaml = '';
         let doc = null;
         try {
-            this.scanAnchors();
+            this.scanAnchorsByLine();
             doc = yaml.load(this.originalContent, {
                 filename: this.options.inputFile,
             });
-            this.extractAnchorValues(doc);
-            this.detectOverrides(doc);
-            const { expanded } = this.expandNode(doc, '');
+            this.buildPathMapping(doc, '');
+            this.collectAnchorsFirst(doc, '');
+            this.processMergesFromScan(doc);
+            const expanded = this.expandNode(doc, '');
             expandedYaml = yaml.dump(expanded, {
                 indent: 2,
                 lineWidth: -1,
                 noRefs: true,
             });
-            this.buildMergeNodes(doc);
         }
         catch (error) {
             const yamlError = error;
@@ -97,10 +98,8 @@ class YamlExpander {
         const exitCode = this.errors.length > 0 ? 3 : 0;
         return this.buildResult(exitCode === 0, exitCode, outputBase, timestamp, expandedYaml);
     }
-    scanAnchors() {
-        const anchorRegex = /&(\w+)/g;
-        const singleMergeRegex = /<<:\s*\*(\w+)/g;
-        const multiMergeRegex = /<<:\s*\[\s*([^\]]+)\s*\]/g;
+    scanAnchorsByLine() {
+        const anchorRegex = /&\s*(\w+)/g;
         for (let lineNum = 0; lineNum < this.lines.length; lineNum++) {
             const line = this.lines[lineNum];
             let match;
@@ -111,74 +110,243 @@ class YamlExpander {
                     location: { line: lineNum + 1, column: match.index + 1 },
                     value: null,
                 });
+                this.lineToAnchor.set(lineNum + 1, anchorName);
             }
+        }
+    }
+    findMergeLines() {
+        const results = [];
+        const singleMergeRegex = /<<:\s*\*\s*(\w+)/g;
+        const multiMergeRegex = /<<:\s*\[\s*([^\]]+)\s*\]/g;
+        for (let lineNum = 0; lineNum < this.lines.length; lineNum++) {
+            const line = this.lines[lineNum];
+            let match;
             while ((match = singleMergeRegex.exec(line)) !== null) {
-                const parentKey = this.findParentKey(lineNum);
-                this.detectedMerges.push({
+                results.push({
                     line: lineNum + 1,
                     column: match.index + 1,
-                    anchorNames: [match[1]],
-                    parentKey: parentKey,
+                    aliases: [match[1]],
                 });
             }
             while ((match = multiMergeRegex.exec(line)) !== null) {
-                const parentKey = this.findParentKey(lineNum);
-                const anchorNames = match[1].split(',').map((a) => a.trim().replace(/^\*/, ''));
-                this.detectedMerges.push({
+                const aliases = match[1].split(',').map(a => a.trim().replace(/^\*/, ''));
+                results.push({
                     line: lineNum + 1,
                     column: match.index + 1,
-                    anchorNames: anchorNames,
-                    parentKey: parentKey,
+                    aliases,
+                });
+            }
+        }
+        return results;
+    }
+    findPathForLine(targetLine) {
+        const fallbackPath = this.findFallbackPath(targetLine);
+        let bestMatch = '';
+        let bestMatchLine = 0;
+        for (const [line, path] of this.lineToPath) {
+            if (line < targetLine && line > bestMatchLine) {
+                bestMatchLine = line;
+                bestMatch = path;
+            }
+        }
+        return fallbackPath.length >= bestMatch.length ? fallbackPath : bestMatch;
+    }
+    findFallbackPath(targetLine) {
+        const pathStack = [];
+        const indentStack = [];
+        for (let lineNum = 0; lineNum < targetLine; lineNum++) {
+            const line = this.lines[lineNum];
+            const indent = line.search(/\S/);
+            if (indent === -1)
+                continue;
+            const keyMatch = line.match(/^\s*(\w+):/);
+            if (keyMatch) {
+                while (indentStack.length > 0 && indentStack[indentStack.length - 1] >= indent) {
+                    pathStack.pop();
+                    indentStack.pop();
+                }
+                pathStack.push(keyMatch[1]);
+                indentStack.push(indent);
+            }
+        }
+        return pathStack.join('.');
+    }
+    getValueAtPath(doc, path) {
+        if (!path)
+            return doc;
+        const parts = path.split('.');
+        let current = doc;
+        for (const part of parts) {
+            if (current && typeof current === 'object' && part in current) {
+                current = current[part];
+            }
+            else {
+                return null;
+            }
+        }
+        return current;
+    }
+    processMergesFromScan(doc) {
+        const mergeLines = this.findMergeLines();
+        const mergeByPath = new Map();
+        for (const mergeInfo of mergeLines) {
+            const path = this.findPathForLine(mergeInfo.line);
+            const node = this.getValueAtPath(doc, path);
+            if (!node || typeof node !== 'object')
+                continue;
+            if (!mergeByPath.has(path)) {
+                mergeByPath.set(path, { mergeInfos: [], node });
+            }
+            mergeByPath.get(path).mergeInfos.push(mergeInfo);
+        }
+        for (const [path, data] of mergeByPath) {
+            const { mergeInfos, node } = data;
+            let allSources = [];
+            let firstLocation = { line: 0, column: 0 };
+            for (let i = 0; i < mergeInfos.length; i++) {
+                const mergeInfo = mergeInfos[i];
+                if (i === 0) {
+                    firstLocation = { line: mergeInfo.line, column: mergeInfo.column };
+                }
+                for (const alias of mergeInfo.aliases) {
+                    const anchorInfo = this.anchors.get(alias);
+                    if (anchorInfo) {
+                        const keys = anchorInfo.value && typeof anchorInfo.value === 'object'
+                            ? Object.keys(anchorInfo.value)
+                            : [];
+                        allSources.push({
+                            anchorName: alias,
+                            location: anchorInfo.location,
+                            keys,
+                        });
+                        if (anchorInfo.value && typeof anchorInfo.value === 'object') {
+                            const explicitKeys = Object.keys(node).filter(k => k !== '<<');
+                            for (const [key, oldValue] of Object.entries(anchorInfo.value)) {
+                                if (explicitKeys.includes(key)) {
+                                    const newValue = node[key];
+                                    if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+                                        const existingOverride = this.overrides.find(o => o.path === path && o.key === key);
+                                        if (!existingOverride) {
+                                            this.overrides.push({
+                                                path,
+                                                key,
+                                                oldValue,
+                                                newValue,
+                                                sourceAnchor: alias,
+                                                overrideLocation: this.findOverrideLocation(path, key),
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (allSources.length > 0) {
+                this.mergeNodes.push({
+                    fullPath: path,
+                    location: firstLocation,
+                    sources: allSources,
                 });
             }
         }
     }
-    findParentKey(mergeLine) {
-        for (let i = mergeLine - 1; i >= 0; i--) {
-            const line = this.lines[i];
-            const keyMatch = line.match(/^(\s*)(\w+):\s*$/);
-            if (keyMatch) {
-                return keyMatch[2];
-            }
-        }
-        return '';
-    }
-    extractAnchorValues(node, path = '') {
-        if (!node || typeof node !== 'object')
-            return;
-        if (Array.isArray(node)) {
-            for (let i = 0; i < node.length; i++) {
-                this.extractAnchorValues(node[i], `${path}[${i}]`);
-            }
+    buildPathMapping(node, currentPath) {
+        if (!node || typeof node !== 'object' || Array.isArray(node)) {
             return;
         }
         for (const [key, value] of Object.entries(node)) {
-            for (const [anchorName, anchorInfo] of this.anchors) {
-                if (anchorInfo.value === null) {
-                    const anchorLine = anchorInfo.location.line - 1;
-                    if (this.isKeyAtLine(key, anchorLine)) {
-                        anchorInfo.value = value;
+            const newPath = currentPath ? `${currentPath}.${key}` : key;
+            const keyLine = this.findKeyLine(currentPath, key);
+            if (keyLine > 0) {
+                this.lineToPath.set(keyLine, newPath);
+            }
+            this.buildPathMapping(value, newPath);
+        }
+    }
+    collectAnchorsFirst(node, currentPath) {
+        if (!node || typeof node !== 'object' || Array.isArray(node)) {
+            return;
+        }
+        for (const anchorName of this.anchors.keys()) {
+            const anchorInfo = this.anchors.get(anchorName);
+            if (anchorInfo.value === null) {
+                const anchorLine = anchorInfo.location.line - 1;
+                const pathParts = currentPath.split('.');
+                const lastKey = pathParts[pathParts.length - 1];
+                for (let i = Math.max(0, anchorLine - 1); i <= anchorLine; i++) {
+                    const line = this.lines[i].trim();
+                    if (line.startsWith(`${lastKey}:`)) {
+                        anchorInfo.value = node;
+                        break;
                     }
                 }
             }
-            this.extractAnchorValues(value, `${path}.${key}`);
+        }
+        for (const [key, value] of Object.entries(node)) {
+            if (key !== '<<') {
+                const newPath = currentPath ? `${currentPath}.${key}` : key;
+                this.collectAnchorsFirst(value, newPath);
+            }
         }
     }
-    isKeyAtLine(key, anchorLine) {
-        const keyRegex = new RegExp(`^\\s*${key}\\s*:`);
-        return keyRegex.test(this.lines[anchorLine]);
+    findOverrideLocation(currentPath, key) {
+        const pathParts = currentPath.split('.');
+        let searchStart = 0;
+        const parentLine = this.findPathLine(currentPath);
+        if (parentLine > 0) {
+            searchStart = parentLine;
+        }
+        const indentLevel = pathParts.length;
+        const keyRegex = new RegExp(`^\\s{${indentLevel * 2}}${key}:\\s*`);
+        const looseRegex = new RegExp(`^\\s+${key}:\\s*`);
+        for (let lineNum = searchStart; lineNum < Math.min(searchStart + 20, this.lines.length); lineNum++) {
+            const line = this.lines[lineNum];
+            if (keyRegex.test(line) || looseRegex.test(line)) {
+                return { line: lineNum + 1, column: line.indexOf(key) + 1 };
+            }
+        }
+        return { line: 0, column: 0 };
+    }
+    findPathLine(path) {
+        for (const [line, p] of this.lineToPath) {
+            if (p === path) {
+                return line;
+            }
+        }
+        const parts = path.split('.');
+        let currentLine = 0;
+        let currentSearch = 0;
+        for (const part of parts) {
+            for (let lineNum = currentSearch; lineNum < this.lines.length; lineNum++) {
+                const trimmed = this.lines[lineNum].trim();
+                if (trimmed.startsWith(`${part}:`)) {
+                    currentLine = lineNum + 1;
+                    currentSearch = lineNum + 1;
+                    break;
+                }
+            }
+        }
+        return currentLine;
+    }
+    findKeyLine(parentPath, key) {
+        const parentLine = this.findPathLine(parentPath);
+        const indentLevel = parentPath ? parentPath.split('.').length : 0;
+        const keyRegex = new RegExp(`^\\s{${indentLevel * 2}}${key}:\\s*`);
+        for (let lineNum = parentLine; lineNum < Math.min(parentLine + 30, this.lines.length); lineNum++) {
+            if (keyRegex.test(this.lines[lineNum])) {
+                return lineNum + 1;
+            }
+        }
+        return 0;
     }
     expandNode(node, path) {
         if (!node || typeof node !== 'object') {
-            return { expanded: node };
+            return node;
         }
         if (Array.isArray(node)) {
-            const result = [];
-            for (let i = 0; i < node.length; i++) {
-                const { expanded } = this.expandNode(node[i], `${path}[${i}]`);
-                result.push(expanded);
-            }
-            return { expanded: result };
+            return node.map((item, index) => this.expandNode(item, `${path}[${index}]`));
         }
         const result = {};
         const mergeSources = [];
@@ -192,8 +360,7 @@ class YamlExpander {
                 }
             }
             else {
-                const { expanded } = this.expandNode(value, `${path}.${key}`);
-                result[key] = expanded;
+                result[key] = this.expandNode(value, `${path}.${key}`);
             }
         }
         for (let i = mergeSources.length - 1; i >= 0; i--) {
@@ -201,98 +368,12 @@ class YamlExpander {
             if (mergeSource && typeof mergeSource === 'object') {
                 for (const [key, value] of Object.entries(mergeSource)) {
                     if (!(key in result)) {
-                        result[key] = value;
+                        result[key] = this.expandNode(value, `${path}.${key}`);
                     }
                 }
             }
         }
-        return { expanded: result };
-    }
-    buildMergeNodes(doc) {
-        for (const detected of this.detectedMerges) {
-            const sources = detected.anchorNames.map((anchorName) => {
-                const anchorInfo = this.anchors.get(anchorName);
-                const keys = anchorInfo?.value
-                    ? Object.keys(anchorInfo.value)
-                    : [];
-                return {
-                    anchorName: anchorName,
-                    location: anchorInfo?.location || { line: 0, column: 0 },
-                    keys: keys,
-                };
-            });
-            this.mergeNodes.push({
-                path: detected.parentKey,
-                location: { line: detected.line, column: detected.column },
-                sources: sources,
-            });
-        }
-    }
-    detectOverrides(doc) {
-        for (const detected of this.detectedMerges) {
-            const node = doc[detected.parentKey];
-            if (!node || typeof node !== 'object')
-                continue;
-            const explicitKeys = Object.keys(node).filter((k) => k !== '<<');
-            for (const anchorName of detected.anchorNames) {
-                const anchorInfo = this.anchors.get(anchorName);
-                if (!anchorInfo || !anchorInfo.value || typeof anchorInfo.value !== 'object')
-                    continue;
-                for (const [key, value] of Object.entries(anchorInfo.value)) {
-                    if (explicitKeys.includes(key)) {
-                        const newValue = node[key];
-                        if (JSON.stringify(value) !== JSON.stringify(newValue)) {
-                            this.overrides.push({
-                                path: detected.parentKey,
-                                key: key,
-                                oldValue: value,
-                                newValue: newValue,
-                                sourceAnchor: anchorName,
-                                overrideLocation: this.findLocationForKey(detected.parentKey, key),
-                            });
-                        }
-                    }
-                }
-            }
-        }
-    }
-    findLocationForKey(parentKey, key) {
-        let parentFound = false;
-        for (let lineNum = 0; lineNum < this.lines.length; lineNum++) {
-            const line = this.lines[lineNum];
-            if (!parentFound) {
-                const keyMatch = line.match(new RegExp(`^${parentKey}:\\s*$`));
-                if (keyMatch) {
-                    parentFound = true;
-                }
-            }
-            else {
-                const keyMatch = line.match(new RegExp(`^\\s+${key}:\\s*`));
-                if (keyMatch) {
-                    return { line: lineNum + 1, column: line.indexOf(key) + 1 };
-                }
-                const nextTopLevel = line.match(/^\w+:\s*$/);
-                if (nextTopLevel) {
-                    break;
-                }
-            }
-        }
-        return { line: 0, column: 0 };
-    }
-    findAnchorNameForValue(value) {
-        for (const [name, info] of this.anchors) {
-            if (info.value === value) {
-                return name;
-            }
-        }
-        for (const [name, info] of this.anchors) {
-            if (info.value &&
-                typeof info.value === 'object' &&
-                JSON.stringify(info.value) === JSON.stringify(value)) {
-                return name;
-            }
-        }
-        return undefined;
+        return result;
     }
     getOutputBase(timestamp) {
         const baseName = path
@@ -319,7 +400,11 @@ class YamlExpander {
             originalYaml: this.originalContent,
             expandedYaml,
             anchors: Array.from(this.anchors.values()),
-            mergeNodes: this.mergeNodes,
+            mergeNodes: this.mergeNodes.map(m => ({
+                path: m.fullPath,
+                location: m.location,
+                sources: m.sources,
+            })),
             overrides: this.overrides,
             errors: this.errors,
             warnings: this.warnings,

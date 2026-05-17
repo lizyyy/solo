@@ -1,0 +1,38 @@
+{
+  "success": false,
+  "exitCode": 2,
+  "inputFile": "/Users/lzy/pro/solo/workspaces/zy70587/examples/invalid.yaml",
+  "timestamp": "2026-05-17T05:38:10.575Z",
+  "statistics": {
+    "totalAnchors": 1,
+    "totalMerges": 0,
+    "totalOverrides": 0,
+    "totalErrors": 1,
+    "totalWarnings": 0
+  },
+  "anchors": [
+    {
+      "name": "defaults",
+      "location": {
+        "line": 2,
+        "column": 11
+      },
+      "valuePreview": "null"
+    }
+  ],
+  "mergeNodes": [],
+  "overrides": [],
+  "errors": [
+    {
+      "message": "bad indentation of a mapping entry in \"/Users/lzy/pro/solo/workspaces/zy70587/examples/invalid.yaml\" (9:10)\n\n  6 | development:\n  7 |   <<: *defaults\n  8 |   port: 3001\n  9 |     debug: true  # 这里缩进错误\n---------------^\n 10 | \n 11 | production:",
+      "location": {
+        "line": 9,
+        "column": 10
+      },
+      "severity": "error",
+      "context": "  7:   <<: *defaults\n  8:   port: 3001\n> 9:     debug: true  # 这里缩进错误\n  10: \n  11: production:"
+    }
+  ],
+  "warnings": [],
+  "expandedYaml": ""
+}

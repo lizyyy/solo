@@ -1,0 +1,34 @@
+# 嵌套配置示例 - 测试复杂YAML场景
+defaults: &defaults
+  timeout: 30
+  retries: 3
+  debug: false
+
+services:
+  api:
+    <<: *defaults
+    name: "api-service"
+    timeout: 60      # 覆盖默认值
+    port: 3000
+  
+  web:
+    <<: *defaults
+    name: "web-service"
+    debug: true      # 覆盖默认值
+    port: 8080
+
+  worker:
+    <<: *defaults
+    name: "worker-service"
+    retries: 5       # 覆盖默认值
+    timeout: 120     # 覆盖默认值
+
+database:
+  primary:
+    <<: *defaults
+    host: "db-primary"
+    timeout: 10
+  replica:
+    <<: *defaults
+    host: "db-replica"
+    debug: true

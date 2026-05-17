@@ -1,0 +1,33 @@
+defaults:
+  timeout: 30
+  retries: 3
+  debug: false
+services:
+  api:
+    timeout: 60
+    retries: 3
+    debug: false
+    name: api-service
+    port: 3000
+  web:
+    timeout: 30
+    retries: 3
+    debug: true
+    name: web-service
+    port: 8080
+  worker:
+    timeout: 120
+    retries: 5
+    debug: false
+    name: worker-service
+database:
+  primary:
+    timeout: 10
+    retries: 3
+    debug: false
+    host: db-primary
+  replica:
+    timeout: 30
+    retries: 3
+    debug: true
+    host: db-replica
