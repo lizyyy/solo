@@ -1,0 +1,19 @@
+{
+  "name": "snapshot-dedup",
+  "version": "1.0.0",
+  "description": "快照文件去重CLI工具 - 扫描、哈希计算、同名分组、保留建议、报告导出",
+  "main": "src/index.js",
+  "bin": {
+    "snapshot-dedup": "./bin/snapshot-dedup.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "node --check src/**/*.js"
+  },
+  "keywords": ["snapshot", "deduplication", "cli", "backup"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
