@@ -1,5 +1,6 @@
 import click
 import os
+import sys
 import yaml
 from .auditor import HelmValuesAuditor
 
@@ -15,10 +16,12 @@ def main():
 def audit(values_files, output_json, output_html):
     if not values_files:
         click.echo("Error: Please provide at least one values file")
-        return
+        sys.exit(1)
+    
     auditor = HelmValuesAuditor()
     auditor.load_values_files(values_files)
     click.echo(auditor.generate_terminal_summary())
+    
     if output_json:
         with open(output_json, "w") as f:
             f.write(auditor.generate_json_report())
@@ -27,6 +30,11 @@ def audit(values_files, output_json, output_html):
         with open(output_html, "w") as f:
             f.write(auditor.generate_html_report())
         click.echo("HTML report written to " + output_html)
+    
+    has_errors = len(auditor.get_errors()) > 0
+    if has_errors:
+        sys.exit(1)
+    sys.exit(0)
 
 def flatten_dict(d, parent_key=""):
     items = {}

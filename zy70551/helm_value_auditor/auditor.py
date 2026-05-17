@@ -177,7 +177,9 @@ class HelmValuesAuditor:
             for i, src in enumerate(chain.sources):
                 prefix = '->' if i == len(chain.sources) - 1 else '  '
                 val = mask_sensitive_value(chain.key, src.value)
-                lines.append(f'       {prefix} {val} @ {os.path.basename(src.file_path)}')
+                file_name = os.path.basename(src.file_path)
+                line_info = f':{src.line_number}' if src.line_number else ''
+                lines.append(f'       {prefix} {val} @ {file_name}{line_info}')
         lines.append('')
         
         sensitive = self.get_sensitive_keys()
