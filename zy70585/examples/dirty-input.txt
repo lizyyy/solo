@@ -1,0 +1,6 @@
+{"headers":{"X-Forwarded-For":"203.0.113.195, 10.0.0.1, 127.0.0.1","X-Forwarded-Proto":"https, http, http"},"expectedIp":"203.0.113.195","expectedProtocol":"https"}
+这不是一个有效的JSON
+{"headers":{"X-Forwarded-For":"invalid-ip, 127.0.0.1","X-Forwarded-Proto":"invalid-proto"}}
+{"headers":{"X-Forwarded-For":"198.51.100.23, 127.0.0.1","X-Forwarded-Proto":"https"},"expectedIp":"1.2.3.4"}
+{"headers":{"X-Forwarded-For":"2001:db8::1, 127.0.0.1","X-Forwarded-Proto":"http"}}
+{"headers":{"X-Forwarded-For":"<script>alert('xss')</script>, 127.0.0.1"}}

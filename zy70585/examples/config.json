@@ -1,0 +1,5 @@
+{
+  "trustedProxies": ["127.0.0.1", "::1", "192.168.1.1", "10.0.0.1"],
+  "trustDepth": 2,
+  "trustedHeaders": ["X-Forwarded-For", "X-Forwarded-Proto", "X-Forwarded-Host", "X-Forwarded-Port", "X-Real-IP"]
+}

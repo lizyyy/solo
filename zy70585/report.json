@@ -1,0 +1,211 @@
+{
+  "summary": {
+    "total": 6,
+    "normal": 2,
+    "abnormal": 4,
+    "anomalyCount": 6
+  },
+  "results": [
+    {
+      "sample": {
+        "id": "sample-1",
+        "lineNumber": 1,
+        "raw": "{\"headers\":{\"X-Forwarded-For\":\"203.0.113.195, 10.0.0.1, 127.0.0.1\",\"X-Forwarded-Proto\":\"https, http, http\"},\"expectedIp\":\"203.0.113.195\",\"expectedProtocol\":\"https\"}",
+        "headers": {
+          "X-Forwarded-For": "203.0.113.195, 10.0.0.1, 127.0.0.1",
+          "X-Forwarded-Proto": "https, http, http"
+        },
+        "expectedProtocol": "https",
+        "expectedIp": "203.0.113.195"
+      },
+      "headerChain": {
+        "xForwardedFor": [
+          "203.0.113.195",
+          "10.0.0.1",
+          "127.0.0.1"
+        ],
+        "xForwardedProto": [
+          "https",
+          "http",
+          "http"
+        ],
+        "xForwardedHost": [],
+        "xForwardedPort": []
+      },
+      "realIp": "203.0.113.195",
+      "realProtocol": "https",
+      "anomalies": [],
+      "isNormal": true,
+      "trustedProxyCount": 2
+    },
+    {
+      "sample": {
+        "id": "sample-3",
+        "lineNumber": 3,
+        "raw": "{\"headers\":{\"X-Forwarded-For\":\"invalid-ip, 127.0.0.1\",\"X-Forwarded-Proto\":\"invalid-proto\"}}",
+        "headers": {
+          "X-Forwarded-For": "invalid-ip, 127.0.0.1",
+          "X-Forwarded-Proto": "invalid-proto"
+        }
+      },
+      "headerChain": {
+        "xForwardedFor": [
+          "invalid-ip",
+          "127.0.0.1"
+        ],
+        "xForwardedProto": [
+          "invalid-proto"
+        ],
+        "xForwardedHost": [],
+        "xForwardedPort": []
+      },
+      "realIp": "invalid-ip",
+      "realProtocol": "invalid-proto",
+      "anomalies": [
+        {
+          "type": "invalid_format",
+          "header": "X-Forwarded-For",
+          "message": "第 1 个IP格式无效: invalid-ip",
+          "severity": "high"
+        },
+        {
+          "type": "invalid_format",
+          "header": "X-Forwarded-Proto",
+          "message": "第 1 个协议无效: invalid-proto",
+          "severity": "medium"
+        }
+      ],
+      "isNormal": false,
+      "trustedProxyCount": 1
+    },
+    {
+      "sample": {
+        "id": "sample-4",
+        "lineNumber": 4,
+        "raw": "{\"headers\":{\"X-Forwarded-For\":\"198.51.100.23, 127.0.0.1\",\"X-Forwarded-Proto\":\"https\"},\"expectedIp\":\"1.2.3.4\"}",
+        "headers": {
+          "X-Forwarded-For": "198.51.100.23, 127.0.0.1",
+          "X-Forwarded-Proto": "https"
+        },
+        "expectedIp": "1.2.3.4"
+      },
+      "headerChain": {
+        "xForwardedFor": [
+          "198.51.100.23",
+          "127.0.0.1"
+        ],
+        "xForwardedProto": [
+          "https"
+        ],
+        "xForwardedHost": [],
+        "xForwardedPort": []
+      },
+      "realIp": "198.51.100.23",
+      "realProtocol": "https",
+      "anomalies": [
+        {
+          "type": "ip_mismatch",
+          "header": "X-Forwarded-For",
+          "message": "IP不匹配: 期望 1.2.3.4, 实际 198.51.100.23",
+          "severity": "high"
+        }
+      ],
+      "isNormal": false,
+      "trustedProxyCount": 1
+    },
+    {
+      "sample": {
+        "id": "sample-5",
+        "lineNumber": 5,
+        "raw": "{\"headers\":{\"X-Forwarded-For\":\"2001:db8::1, 127.0.0.1\",\"X-Forwarded-Proto\":\"http\"}}",
+        "headers": {
+          "X-Forwarded-For": "2001:db8::1, 127.0.0.1",
+          "X-Forwarded-Proto": "http"
+        }
+      },
+      "headerChain": {
+        "xForwardedFor": [
+          "2001:db8::1",
+          "127.0.0.1"
+        ],
+        "xForwardedProto": [
+          "http"
+        ],
+        "xForwardedHost": [],
+        "xForwardedPort": []
+      },
+      "realIp": "2001:db8::1",
+      "realProtocol": "http",
+      "anomalies": [],
+      "isNormal": true,
+      "trustedProxyCount": 1
+    },
+    {
+      "sample": {
+        "id": "sample-6",
+        "lineNumber": 6,
+        "raw": "{\"headers\":{\"X-Forwarded-For\":\"<script>alert('xss')</script>, 127.0.0.1\"}}",
+        "headers": {
+          "X-Forwarded-For": "<script>alert('xss')</script>, 127.0.0.1"
+        }
+      },
+      "headerChain": {
+        "xForwardedFor": [
+          "<script>alert('xss')</script>",
+          "127.0.0.1"
+        ],
+        "xForwardedProto": [],
+        "xForwardedHost": [],
+        "xForwardedPort": []
+      },
+      "realIp": "<script>alert('xss')</script>",
+      "realProtocol": "http",
+      "anomalies": [
+        {
+          "type": "invalid_format",
+          "header": "X-Forwarded-For",
+          "message": "第 1 个IP格式无效: <script>alert('xss')</script>",
+          "severity": "high"
+        },
+        {
+          "type": "suspicious_header",
+          "header": "X-Forwarded-For",
+          "message": "包含可疑字符: <script>alert('xss')</script>, 127.0.0.1",
+          "severity": "medium"
+        },
+        {
+          "type": "suspicious_header",
+          "header": "X-Forwarded-For",
+          "message": "包含潜在的XSS攻击代码",
+          "severity": "high"
+        }
+      ],
+      "isNormal": false,
+      "trustedProxyCount": 1
+    }
+  ],
+  "config": {
+    "trustedProxies": [
+      "127.0.0.1",
+      "::1",
+      "192.168.1.1",
+      "10.0.0.1"
+    ],
+    "trustDepth": 2,
+    "trustedHeaders": [
+      "X-Forwarded-For",
+      "X-Forwarded-Proto",
+      "X-Forwarded-Host",
+      "X-Forwarded-Port",
+      "X-Real-IP"
+    ]
+  },
+  "generatedAt": "2026-05-17T03:55:32.552Z",
+  "badLines": [
+    {
+      "line": "这不是一个有效的JSON",
+      "lineNumber": 2,
+      "reason": "JSON 解析失败"
+    }
+  ]
+}
