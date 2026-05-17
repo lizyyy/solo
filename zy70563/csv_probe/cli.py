@@ -118,11 +118,28 @@ def probe_csv(file_path, expected_headers=None):
             raw_data = f.read()
         
         encoding_candidates = detect_encoding(file_path)
-        best_candidate = encoding_candidates[0]
-        best_encoding = best_candidate['encoding']
-        has_bom = best_candidate['has_bom']
         
-        decoded_content, decode_errors, _ = try_decode(raw_data, best_encoding)
+        best_result = None
+        min_errors = float('inf')
+        
+        for candidate in encoding_candidates:
+            encoding = candidate['encoding']
+            decoded, errors, _ = try_decode(raw_data, encoding)
+            
+            if errors < min_errors:
+                min_errors = errors
+                best_result = {
+                    'encoding': encoding,
+                    'has_bom': candidate['has_bom'],
+                    'confidence': candidate['confidence'],
+                    'decoded_content': decoded,
+                    'decode_errors': errors
+                }
+        
+        best_encoding = best_result['encoding']
+        has_bom = best_result['has_bom']
+        decoded_content = best_result['decoded_content']
+        decode_errors = best_result['decode_errors']
         
         lines = decoded_content.splitlines()
         header_fields = []
@@ -400,8 +417,8 @@ def selftest(output_dir, json_report):
         ('utf8_normal.csv', 'utf-8', 'name,age,city\nAlice,25,Beijing\nBob,30,Shanghai\nCharlie,28,Guangzhou'),
         ('utf8_bom.csv', 'utf-8-sig', 'name,age,city\nAlice,25,Beijing\nBob,30,Shanghai'),
         ('gbk_normal.csv', 'gbk', 'name,age,city\nAlice,25,Beijing\nBob,30,Shanghai'),
-        ('gb18030_chinese.csv', 'gb18030', 'name,age,city\nZhang San,25,Beijing\nLi Si,30,Shanghai\nWang Wu,28,Guangzhou'),
-        ('gbk_chinese.csv', 'gbk', 'name,age,city\nZhang San,25,Beijing\nLi Si,30,Shanghai'),
+        ('gb18030_chinese.csv', 'gb18030', '姓名,年龄,城市\n张三,25,北京\n李四,30,上海\n王五,28,广州'),
+        ('gbk_chinese.csv', 'gbk', '姓名,年龄,城市\n张三,25,北京\n李四,30,上海'),
         ('empty_file.csv', 'utf-8', ''),
         ('quoted_fields.csv', 'utf-8', '"name","age","city"\n"Alice Smith","25","Beijing, China"\n"Bob, Jr.","30","Shanghai"'),
         ('mixed_bad_rows.csv', 'utf-8', 'name,age,city\nAlice,25\nBob,30,Shanghai,extra\nCharlie,28,Guangzhou'),
@@ -425,8 +442,8 @@ def selftest(output_dir, json_report):
         ('utf8_normal.csv', 'Detect UTF-8/ASCII encoding', ['name', 'age', 'city'], lambda r: r['best_encoding'].lower() in ['utf-8', 'ascii', 'gbk', 'gb18030']),
         ('utf8_bom.csv', 'Detect UTF-8 BOM', ['name', 'age', 'city'], lambda r: r['has_bom']),
         ('gbk_normal.csv', 'Detect ASCII/GBK encoding', ['name', 'age', 'city'], lambda r: r['best_encoding'].lower() in ['gbk', 'gb18030', 'ascii', 'utf-8']),
-        ('gb18030_chinese.csv', 'Detect GB18030 Chinese content', ['name', 'age', 'city'], lambda r: len(r['header_fields']) == 3),
-        ('gbk_chinese.csv', 'Detect GBK Chinese content', ['name', 'age', 'city'], lambda r: r['good_rows'] >= 2),
+        ('gb18030_chinese.csv', 'Detect GB18030 Chinese content', ['姓名', '年龄', '城市'], lambda r: r['decode_errors'] == 0 and len(r['header_fields']) == 3),
+        ('gbk_chinese.csv', 'Detect GBK Chinese content', ['姓名', '年龄', '城市'], lambda r: r['decode_errors'] == 0 and r['good_rows'] >= 2),
         ('empty_file.csv', 'Handle empty file', None, lambda r: r['total_rows'] == 0 or r['file_size'] == 0),
         ('quoted_fields.csv', 'Handle quoted fields', ['name', 'age', 'city'], lambda r: r['good_rows'] >= 2),
         ('mixed_bad_rows.csv', 'Detect bad rows', ['name', 'age', 'city'], lambda r: len(r['bad_rows']) >= 2),
