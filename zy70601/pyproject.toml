@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "sample-handover-cli"
+version = "0.1.0"
+description = "检验样本交接拒收原因补录审批排查CLI工具"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1.0"
+pandas = "^2.0.0"
+openpyxl = "^3.1.0"
+python-dateutil = "^2.8.0"
+pydantic = "^2.0.0"
+rich = "^13.0.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+sample-cli = "sample_cli.main:cli"
