@@ -11,6 +11,7 @@ import {
 export class ReplayEngine {
   private options: ReplayOptions;
   private currentState: Record<string, any>;
+  private previousState: Record<string, any> = {};
   private stateSnapshots: StateSnapshot[] = [];
   private anomalies: Anomaly[] = [];
   private stateDiffs: StateDiff[] = [];
@@ -18,6 +19,7 @@ export class ReplayEngine {
   constructor(options: ReplayOptions = {}) {
     this.options = {
       initialState: {},
+      enableBuiltinRules: true,
       ...options,
     };
     this.currentState = { ...this.options.initialState };
@@ -82,8 +84,14 @@ export class ReplayEngine {
 
   private processFrame(frame: WebSocketFrame, index: number): void {
     const previousState = { ...this.currentState };
+    this.previousState = previousState;
 
     this.extractState(frame);
+    
+    if (this.options.enableBuiltinRules) {
+      this.detectBuiltinAnomalies(frame, index, previousState);
+    }
+    
     this.checkAnomalyRules(frame, index);
     this.detectStateChanges(frame, index, previousState);
 
@@ -93,6 +101,164 @@ export class ReplayEngine {
       state: { ...this.currentState },
       frame,
     });
+  }
+
+  private detectBuiltinAnomalies(frame: WebSocketFrame, index: number, previousState: Record<string, any>): void {
+    this.detectErrorMessage(frame, index);
+    this.detectDisconnectMessage(frame, index);
+    this.detectStateSpikes(frame, index, previousState);
+    this.detectUnexpectedValues(frame, index);
+  }
+
+  private detectErrorMessage(frame: WebSocketFrame, index: number): void {
+    try {
+      const payload = JSON.parse(frame.payload);
+      if (payload.error || payload.type === 'error' || 
+          (payload.data && payload.data.error) ||
+          payload.status === 'error') {
+        this.anomalies.push({
+          type: 'error_message',
+          severity: 'high',
+          frameIndex: index,
+          frame,
+          message: `检测到错误消息: ${payload.error || payload.message || '未知错误'}`,
+          details: { payload },
+        });
+      }
+    } catch {}
+  }
+
+  private detectDisconnectMessage(frame: WebSocketFrame, index: number): void {
+    try {
+      const payload = JSON.parse(frame.payload);
+      if (payload.type === 'disconnect' || payload.reason) {
+        const isCorrupted = payload.reason?.includes('corrupted') || 
+                           payload.reason?.includes('invalid') ||
+                           payload.reason?.includes('error');
+        this.anomalies.push({
+          type: 'disconnect',
+          severity: isCorrupted ? 'critical' : 'medium',
+          frameIndex: index,
+          frame,
+          message: `连接断开: ${payload.reason || '未知原因'}`,
+          details: { payload, reason: payload.reason },
+        });
+      }
+    } catch {}
+  }
+
+  private detectStateSpikes(frame: WebSocketFrame, index: number, previousState: Record<string, any>): void {
+    const numericPaths = this.findNumericPaths(this.currentState);
+    
+    for (const path of numericPaths) {
+      const oldVal = this.getNestedValue(previousState, path);
+      const newVal = this.getNestedValue(this.currentState, path);
+      
+      if (oldVal === undefined || typeof oldVal !== 'number' || 
+          newVal === undefined || typeof newVal !== 'number') {
+        continue;
+      }
+
+      if (oldVal === 0) continue;
+      
+      const changePercent = Math.abs((newVal - oldVal) / oldVal) * 100;
+      const changeAmount = Math.abs(newVal - oldVal);
+      
+      let severity: 'low' | 'medium' | 'high' | 'critical' | null = null;
+      let message = '';
+      
+      if (changePercent >= 500 || changeAmount >= 500) {
+        severity = 'critical';
+        message = `${path} 发生极度异常跳变: ${oldVal} → ${newVal} (变化${changePercent.toFixed(0)}%)`;
+      } else if (changePercent >= 200 || changeAmount >= 200) {
+        severity = 'high';
+        message = `${path} 发生大幅跳变: ${oldVal} → ${newVal} (变化${changePercent.toFixed(0)}%)`;
+      } else if (changePercent >= 50 || changeAmount >= 50) {
+        severity = 'medium';
+        message = `${path} 发生明显跳变: ${oldVal} → ${newVal} (变化${changePercent.toFixed(0)}%)`;
+      }
+      
+      if (severity && oldVal !== newVal) {
+        this.anomalies.push({
+          type: 'state_spike',
+          severity,
+          frameIndex: index,
+          frame,
+          message,
+          details: { path, oldValue: oldVal, newValue: newVal, changePercent },
+        });
+      }
+    }
+  }
+
+  private detectUnexpectedValues(frame: WebSocketFrame, index: number): void {
+    const suspiciousPatterns = [
+      { value: 999, name: '可疑的最大值(999)' },
+      { value: 0, name: '零值', minCount: 3 },
+      { value: -1, name: '异常负值' },
+    ];
+    
+    for (const pattern of suspiciousPatterns) {
+      const paths = this.findPathsWithValue(this.currentState, pattern.value);
+      if (paths.length > 0) {
+        const isExtreme = pattern.value === 999 || pattern.value === -1;
+        if (isExtreme || (pattern.minCount && paths.length >= pattern.minCount)) {
+          this.anomalies.push({
+            type: 'unexpected_value',
+            severity: isExtreme ? 'high' : 'medium',
+            frameIndex: index,
+            frame,
+            message: `检测到${pattern.name}: ${paths.join(', ')}`,
+            details: { paths, value: pattern.value },
+          });
+        }
+      }
+    }
+
+    if (this.currentState.bugs || this.currentState.corrupted) {
+      this.anomalies.push({
+        type: 'state_corruption',
+        severity: 'critical',
+        frameIndex: index,
+        frame,
+        message: '检测到状态损坏标记',
+        details: { flags: { bugs: this.currentState.bugs, corrupted: this.currentState.corrupted } },
+      });
+    }
+  }
+
+  private findNumericPaths(obj: Record<string, any>, prefix: string = ''): string[] {
+    const paths: string[] = [];
+    
+    for (const key of Object.keys(obj)) {
+      const value = obj[key];
+      const path = prefix ? `${prefix}.${key}` : key;
+      
+      if (typeof value === 'number') {
+        paths.push(path);
+      } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+        paths.push(...this.findNumericPaths(value, path));
+      }
+    }
+    
+    return paths;
+  }
+
+  private findPathsWithValue(obj: Record<string, any>, targetValue: number, prefix: string = ''): string[] {
+    const paths: string[] = [];
+    
+    for (const key of Object.keys(obj)) {
+      const value = obj[key];
+      const path = prefix ? `${prefix}.${key}` : key;
+      
+      if (value === targetValue) {
+        paths.push(path);
+      } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+        paths.push(...this.findPathsWithValue(value, targetValue, path));
+      }
+    }
+    
+    return paths;
   }
 
   private extractState(frame: WebSocketFrame): void {

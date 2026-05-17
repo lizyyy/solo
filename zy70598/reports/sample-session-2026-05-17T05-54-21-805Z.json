@@ -1,0 +1,4480 @@
+{
+  "meta": {
+    "inputFile": "examples/sample-session.log",
+    "totalLines": 23,
+    "validFrames": 20,
+    "invalidFrames": 3,
+    "startTime": 1715763600000,
+    "endTime": 1715763601900,
+    "durationMs": 1900
+  },
+  "frames": [
+    {
+      "raw": "2024-05-15T09:00:00.000Z [conn-user-123] IN text {\"type\":\"connect\",\"user\":\"bob\",\"state\":\"init\"}",
+      "lineNumber": 1,
+      "timestamp": 1715763600000,
+      "timestampStr": "2024-05-15T09:00:00.000Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"connect\",\"user\":\"bob\",\"state\":\"init\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:00.100Z [conn-user-123] OUT text {\"type\":\"welcome\",\"version\":\"1.0.0\"}",
+      "lineNumber": 2,
+      "timestamp": 1715763600100,
+      "timestampStr": "2024-05-15T09:00:00.100Z",
+      "connectionId": "conn-user-123",
+      "direction": "out",
+      "opcode": "text",
+      "payload": "{\"type\":\"welcome\",\"version\":\"1.0.0\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:00.200Z [conn-user-123] IN text {\"type\":\"auth\",\"token\":\"abc123\"}",
+      "lineNumber": 3,
+      "timestamp": 1715763600200,
+      "timestampStr": "2024-05-15T09:00:00.200Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"auth\",\"token\":\"abc123\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:00.300Z [conn-user-123] OUT text {\"type\":\"auth_ok\",\"user_id\":42,\"state\":\"authenticated\"}",
+      "lineNumber": 4,
+      "timestamp": 1715763600300,
+      "timestampStr": "2024-05-15T09:00:00.300Z",
+      "connectionId": "conn-user-123",
+      "direction": "out",
+      "opcode": "text",
+      "payload": "{\"type\":\"auth_ok\",\"user_id\":42,\"state\":\"authenticated\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:00.400Z [conn-user-123] IN text {\"type\":\"join\",\"room\":\"lobby\"}",
+      "lineNumber": 5,
+      "timestamp": 1715763600400,
+      "timestampStr": "2024-05-15T09:00:00.400Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"join\",\"room\":\"lobby\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:00.500Z [conn-user-123] OUT text {\"type\":\"joined\",\"room\":\"lobby\",\"users\":15}",
+      "lineNumber": 6,
+      "timestamp": 1715763600500,
+      "timestampStr": "2024-05-15T09:00:00.500Z",
+      "connectionId": "conn-user-123",
+      "direction": "out",
+      "opcode": "text",
+      "payload": "{\"type\":\"joined\",\"room\":\"lobby\",\"users\":15}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:00.600Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":100,\"level\":1,\"coins\":50}",
+      "lineNumber": 7,
+      "timestamp": 1715763600600,
+      "timestampStr": "2024-05-15T09:00:00.600Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"sync\",\"score\":100,\"level\":1,\"coins\":50}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:00.700Z [conn-user-123] IN text {\"type\":\"action\",\"target\":\"chest\",\"item\":\"sword\"}",
+      "lineNumber": 10,
+      "timestamp": 1715763600700,
+      "timestampStr": "2024-05-15T09:00:00.700Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"action\",\"target\":\"chest\",\"item\":\"sword\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:00.800Z [conn-user-123] OUT text {\"type\":\"item_add\",\"item\":\"sword\",\"rarity\":\"rare\"}",
+      "lineNumber": 11,
+      "timestamp": 1715763600800,
+      "timestampStr": "2024-05-15T09:00:00.800Z",
+      "connectionId": "conn-user-123",
+      "direction": "out",
+      "opcode": "text",
+      "payload": "{\"type\":\"item_add\",\"item\":\"sword\",\"rarity\":\"rare\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:00.900Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":150}",
+      "lineNumber": 12,
+      "timestamp": 1715763600900,
+      "timestampStr": "2024-05-15T09:00:00.900Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"sync\",\"score\":150}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.000Z [conn-user-123] IN text {\"type\":\"action\",\"target\":\"enemy\"}",
+      "lineNumber": 13,
+      "timestamp": 1715763601000,
+      "timestampStr": "2024-05-15T09:00:01.000Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"action\",\"target\":\"enemy\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.100Z [conn-user-123] OUT text {\"type\":\"combat\",\"damage\":25}",
+      "lineNumber": 14,
+      "timestamp": 1715763601100,
+      "timestampStr": "2024-05-15T09:00:01.100Z",
+      "connectionId": "conn-user-123",
+      "direction": "out",
+      "opcode": "text",
+      "payload": "{\"type\":\"combat\",\"damage\":25}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.200Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":125,\"hp\":75}",
+      "lineNumber": 16,
+      "timestamp": 1715763601200,
+      "timestampStr": "2024-05-15T09:00:01.200Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"sync\",\"score\":125,\"hp\":75}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.300Z [conn-user-123] IN text {\"type\":\"chat\",\"message\":\"hello world\"}",
+      "lineNumber": 17,
+      "timestamp": 1715763601300,
+      "timestampStr": "2024-05-15T09:00:01.300Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"chat\",\"message\":\"hello world\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.400Z [conn-user-123] OUT text {\"type\":\"chat_broadcast\",\"from\":\"bob\",\"msg\":\"hello world\"}",
+      "lineNumber": 18,
+      "timestamp": 1715763601400,
+      "timestampStr": "2024-05-15T09:00:01.400Z",
+      "connectionId": "conn-user-123",
+      "direction": "out",
+      "opcode": "text",
+      "payload": "{\"type\":\"chat_broadcast\",\"from\":\"bob\",\"msg\":\"hello world\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.500Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":999,\"hp\":999}",
+      "lineNumber": 19,
+      "timestamp": 1715763601500,
+      "timestampStr": "2024-05-15T09:00:01.500Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"sync\",\"score\":999,\"hp\":999}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.600Z [conn-user-123] IN text {\"type\":\"action\",\"target\":\"boss\"}",
+      "lineNumber": 20,
+      "timestamp": 1715763601600,
+      "timestampStr": "2024-05-15T09:00:01.600Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"action\",\"target\":\"boss\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.700Z [conn-user-123] OUT text {\"type\":\"combat\",\"damage\":0,\"error\":\"invalid_target\"}",
+      "lineNumber": 21,
+      "timestamp": 1715763601700,
+      "timestampStr": "2024-05-15T09:00:01.700Z",
+      "connectionId": "conn-user-123",
+      "direction": "out",
+      "opcode": "text",
+      "payload": "{\"type\":\"combat\",\"damage\":0,\"error\":\"invalid_target\"}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.800Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":999,\"hp\":999,\"bugs\":true}",
+      "lineNumber": 22,
+      "timestamp": 1715763601800,
+      "timestampStr": "2024-05-15T09:00:01.800Z",
+      "connectionId": "conn-user-123",
+      "direction": "in",
+      "opcode": "text",
+      "payload": "{\"type\":\"sync\",\"score\":999,\"hp\":999,\"bugs\":true}",
+      "isValid": true
+    },
+    {
+      "raw": "2024-05-15T09:00:01.900Z [conn-user-123] OUT text {\"type\":\"disconnect\",\"reason\":\"state_corrupted\"}",
+      "lineNumber": 23,
+      "timestamp": 1715763601900,
+      "timestampStr": "2024-05-15T09:00:01.900Z",
+      "connectionId": "conn-user-123",
+      "direction": "out",
+      "opcode": "text",
+      "payload": "{\"type\":\"disconnect\",\"reason\":\"state_corrupted\"}",
+      "isValid": true
+    }
+  ],
+  "stateSnapshots": [
+    {
+      "frameIndex": 0,
+      "timestamp": 1715763600000,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ]
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.000Z [conn-user-123] IN text {\"type\":\"connect\",\"user\":\"bob\",\"state\":\"init\"}",
+        "lineNumber": 1,
+        "timestamp": 1715763600000,
+        "timestampStr": "2024-05-15T09:00:00.000Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"connect\",\"user\":\"bob\",\"state\":\"init\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 1,
+      "timestamp": 1715763600100,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ]
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.100Z [conn-user-123] OUT text {\"type\":\"welcome\",\"version\":\"1.0.0\"}",
+        "lineNumber": 2,
+        "timestamp": 1715763600100,
+        "timestampStr": "2024-05-15T09:00:00.100Z",
+        "connectionId": "conn-user-123",
+        "direction": "out",
+        "opcode": "text",
+        "payload": "{\"type\":\"welcome\",\"version\":\"1.0.0\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 2,
+      "timestamp": 1715763600200,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ]
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.200Z [conn-user-123] IN text {\"type\":\"auth\",\"token\":\"abc123\"}",
+        "lineNumber": 3,
+        "timestamp": 1715763600200,
+        "timestampStr": "2024-05-15T09:00:00.200Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"auth\",\"token\":\"abc123\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 3,
+      "timestamp": 1715763600300,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ]
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.300Z [conn-user-123] OUT text {\"type\":\"auth_ok\",\"user_id\":42,\"state\":\"authenticated\"}",
+        "lineNumber": 4,
+        "timestamp": 1715763600300,
+        "timestampStr": "2024-05-15T09:00:00.300Z",
+        "connectionId": "conn-user-123",
+        "direction": "out",
+        "opcode": "text",
+        "payload": "{\"type\":\"auth_ok\",\"user_id\":42,\"state\":\"authenticated\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 4,
+      "timestamp": 1715763600400,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ]
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.400Z [conn-user-123] IN text {\"type\":\"join\",\"room\":\"lobby\"}",
+        "lineNumber": 5,
+        "timestamp": 1715763600400,
+        "timestampStr": "2024-05-15T09:00:00.400Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"join\",\"room\":\"lobby\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 5,
+      "timestamp": 1715763600500,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ]
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.500Z [conn-user-123] OUT text {\"type\":\"joined\",\"room\":\"lobby\",\"users\":15}",
+        "lineNumber": 6,
+        "timestamp": 1715763600500,
+        "timestampStr": "2024-05-15T09:00:00.500Z",
+        "connectionId": "conn-user-123",
+        "direction": "out",
+        "opcode": "text",
+        "payload": "{\"type\":\"joined\",\"room\":\"lobby\",\"users\":15}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 6,
+      "timestamp": 1715763600600,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 100,
+        "level": 1,
+        "coins": 50
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.600Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":100,\"level\":1,\"coins\":50}",
+        "lineNumber": 7,
+        "timestamp": 1715763600600,
+        "timestampStr": "2024-05-15T09:00:00.600Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"sync\",\"score\":100,\"level\":1,\"coins\":50}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 7,
+      "timestamp": 1715763600700,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 100,
+        "level": 1,
+        "coins": 50
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.700Z [conn-user-123] IN text {\"type\":\"action\",\"target\":\"chest\",\"item\":\"sword\"}",
+        "lineNumber": 10,
+        "timestamp": 1715763600700,
+        "timestampStr": "2024-05-15T09:00:00.700Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"action\",\"target\":\"chest\",\"item\":\"sword\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 8,
+      "timestamp": 1715763600800,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 100,
+        "level": 1,
+        "coins": 50
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.800Z [conn-user-123] OUT text {\"type\":\"item_add\",\"item\":\"sword\",\"rarity\":\"rare\"}",
+        "lineNumber": 11,
+        "timestamp": 1715763600800,
+        "timestampStr": "2024-05-15T09:00:00.800Z",
+        "connectionId": "conn-user-123",
+        "direction": "out",
+        "opcode": "text",
+        "payload": "{\"type\":\"item_add\",\"item\":\"sword\",\"rarity\":\"rare\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 9,
+      "timestamp": 1715763600900,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 150,
+        "level": 1,
+        "coins": 50
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:00.900Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":150}",
+        "lineNumber": 12,
+        "timestamp": 1715763600900,
+        "timestampStr": "2024-05-15T09:00:00.900Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"sync\",\"score\":150}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 10,
+      "timestamp": 1715763601000,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 150,
+        "level": 1,
+        "coins": 50
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.000Z [conn-user-123] IN text {\"type\":\"action\",\"target\":\"enemy\"}",
+        "lineNumber": 13,
+        "timestamp": 1715763601000,
+        "timestampStr": "2024-05-15T09:00:01.000Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"action\",\"target\":\"enemy\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 11,
+      "timestamp": 1715763601100,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 150,
+        "level": 1,
+        "coins": 50
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.100Z [conn-user-123] OUT text {\"type\":\"combat\",\"damage\":25}",
+        "lineNumber": 14,
+        "timestamp": 1715763601100,
+        "timestampStr": "2024-05-15T09:00:01.100Z",
+        "connectionId": "conn-user-123",
+        "direction": "out",
+        "opcode": "text",
+        "payload": "{\"type\":\"combat\",\"damage\":25}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 12,
+      "timestamp": 1715763601200,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 125,
+        "level": 1,
+        "coins": 50,
+        "hp": 75
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.200Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":125,\"hp\":75}",
+        "lineNumber": 16,
+        "timestamp": 1715763601200,
+        "timestampStr": "2024-05-15T09:00:01.200Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"sync\",\"score\":125,\"hp\":75}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 13,
+      "timestamp": 1715763601300,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 125,
+        "level": 1,
+        "coins": 50,
+        "hp": 75
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.300Z [conn-user-123] IN text {\"type\":\"chat\",\"message\":\"hello world\"}",
+        "lineNumber": 17,
+        "timestamp": 1715763601300,
+        "timestampStr": "2024-05-15T09:00:01.300Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"chat\",\"message\":\"hello world\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 14,
+      "timestamp": 1715763601400,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 125,
+        "level": 1,
+        "coins": 50,
+        "hp": 75
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.400Z [conn-user-123] OUT text {\"type\":\"chat_broadcast\",\"from\":\"bob\",\"msg\":\"hello world\"}",
+        "lineNumber": 18,
+        "timestamp": 1715763601400,
+        "timestampStr": "2024-05-15T09:00:01.400Z",
+        "connectionId": "conn-user-123",
+        "direction": "out",
+        "opcode": "text",
+        "payload": "{\"type\":\"chat_broadcast\",\"from\":\"bob\",\"msg\":\"hello world\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 15,
+      "timestamp": 1715763601500,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 999,
+        "level": 1,
+        "coins": 50,
+        "hp": 999
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.500Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":999,\"hp\":999}",
+        "lineNumber": 19,
+        "timestamp": 1715763601500,
+        "timestampStr": "2024-05-15T09:00:01.500Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"sync\",\"score\":999,\"hp\":999}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 16,
+      "timestamp": 1715763601600,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 999,
+        "level": 1,
+        "coins": 50,
+        "hp": 999
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.600Z [conn-user-123] IN text {\"type\":\"action\",\"target\":\"boss\"}",
+        "lineNumber": 20,
+        "timestamp": 1715763601600,
+        "timestampStr": "2024-05-15T09:00:01.600Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"action\",\"target\":\"boss\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 17,
+      "timestamp": 1715763601700,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 999,
+        "level": 1,
+        "coins": 50,
+        "hp": 999
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.700Z [conn-user-123] OUT text {\"type\":\"combat\",\"damage\":0,\"error\":\"invalid_target\"}",
+        "lineNumber": 21,
+        "timestamp": 1715763601700,
+        "timestampStr": "2024-05-15T09:00:01.700Z",
+        "connectionId": "conn-user-123",
+        "direction": "out",
+        "opcode": "text",
+        "payload": "{\"type\":\"combat\",\"damage\":0,\"error\":\"invalid_target\"}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 18,
+      "timestamp": 1715763601800,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 999,
+        "level": 1,
+        "coins": 50,
+        "hp": 999,
+        "bugs": true
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.800Z [conn-user-123] IN text {\"type\":\"sync\",\"score\":999,\"hp\":999,\"bugs\":true}",
+        "lineNumber": 22,
+        "timestamp": 1715763601800,
+        "timestampStr": "2024-05-15T09:00:01.800Z",
+        "connectionId": "conn-user-123",
+        "direction": "in",
+        "opcode": "text",
+        "payload": "{\"type\":\"sync\",\"score\":999,\"hp\":999,\"bugs\":true}",
+        "isValid": true
+      }
+    },
+    {
+      "frameIndex": 19,
+      "timestamp": 1715763601900,
+      "state": {
+        "received": [
+          {
+            "time": 1715763600000,
+            "opcode": "text",
+            "data": {
+              "type": "connect",
+              "user": "bob",
+              "state": "init"
+            }
+          },
+          {
+            "time": 1715763600200,
+            "opcode": "text",
+            "data": {
+              "type": "auth",
+              "token": "abc123"
+            }
+          },
+          {
+            "time": 1715763600400,
+            "opcode": "text",
+            "data": {
+              "type": "join",
+              "room": "lobby"
+            }
+          },
+          {
+            "time": 1715763600600,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 100,
+              "level": 1,
+              "coins": 50
+            }
+          },
+          {
+            "time": 1715763600700,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "chest",
+              "item": "sword"
+            }
+          },
+          {
+            "time": 1715763600900,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 150
+            }
+          },
+          {
+            "time": 1715763601000,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "enemy"
+            }
+          },
+          {
+            "time": 1715763601200,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 125,
+              "hp": 75
+            }
+          },
+          {
+            "time": 1715763601300,
+            "opcode": "text",
+            "data": {
+              "type": "chat",
+              "message": "hello world"
+            }
+          },
+          {
+            "time": 1715763601500,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999
+            }
+          },
+          {
+            "time": 1715763601600,
+            "opcode": "text",
+            "data": {
+              "type": "action",
+              "target": "boss"
+            }
+          },
+          {
+            "time": 1715763601800,
+            "opcode": "text",
+            "data": {
+              "type": "sync",
+              "score": 999,
+              "hp": 999,
+              "bugs": true
+            }
+          }
+        ],
+        "sent": [
+          {
+            "time": 1715763600100,
+            "opcode": "text",
+            "data": {
+              "type": "welcome",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "time": 1715763600300,
+            "opcode": "text",
+            "data": {
+              "type": "auth_ok",
+              "user_id": 42,
+              "state": "authenticated"
+            }
+          },
+          {
+            "time": 1715763600500,
+            "opcode": "text",
+            "data": {
+              "type": "joined",
+              "room": "lobby",
+              "users": 15
+            }
+          },
+          {
+            "time": 1715763600800,
+            "opcode": "text",
+            "data": {
+              "type": "item_add",
+              "item": "sword",
+              "rarity": "rare"
+            }
+          },
+          {
+            "time": 1715763601100,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 25
+            }
+          },
+          {
+            "time": 1715763601400,
+            "opcode": "text",
+            "data": {
+              "type": "chat_broadcast",
+              "from": "bob",
+              "msg": "hello world"
+            }
+          },
+          {
+            "time": 1715763601700,
+            "opcode": "text",
+            "data": {
+              "type": "combat",
+              "damage": 0,
+              "error": "invalid_target"
+            }
+          },
+          {
+            "time": 1715763601900,
+            "opcode": "text",
+            "data": {
+              "type": "disconnect",
+              "reason": "state_corrupted"
+            }
+          }
+        ],
+        "type": "sync",
+        "score": 999,
+        "level": 1,
+        "coins": 50,
+        "hp": 999,
+        "bugs": true
+      },
+      "frame": {
+        "raw": "2024-05-15T09:00:01.900Z [conn-user-123] OUT text {\"type\":\"disconnect\",\"reason\":\"state_corrupted\"}",
+        "lineNumber": 23,
+        "timestamp": 1715763601900,
+        "timestampStr": "2024-05-15T09:00:01.900Z",
+        "connectionId": "conn-user-123",
+        "direction": "out",
+        "opcode": "text",
+        "payload": "{\"type\":\"disconnect\",\"reason\":\"state_corrupted\"}",
+        "isValid": true
+      }
+    }
+  ],
+  "anomalies": [
+    {
+      "type": "parse_error",
+      "severity": "low",
+      "frameIndex": 0,
+      "frame": {
+        "raw": " ",
+        "lineNumber": 8,
+        "timestamp": 0,
+        "timestampStr": "",
+        "connectionId": "",
+        "direction": "unknown",
+        "opcode": "unknown",
+        "payload": "",
+        "isValid": false,
+        "parseError": "空行"
+      },
+      "message": "空行",
+      "details": {
+        "lineNumber": 8
+      }
+    },
+    {
+      "type": "parse_error",
+      "severity": "low",
+      "frameIndex": 1,
+      "frame": {
+        "raw": "这里有一条乱入的坏日志行",
+        "lineNumber": 9,
+        "timestamp": 0,
+        "timestampStr": "",
+        "connectionId": "",
+        "direction": "unknown",
+        "opcode": "unknown",
+        "payload": "",
+        "isValid": false,
+        "parseError": "无法识别的日志格式"
+      },
+      "message": "无法识别的日志格式",
+      "details": {
+        "lineNumber": 9
+      }
+    },
+    {
+      "type": "parse_error",
+      "severity": "low",
+      "frameIndex": 2,
+      "frame": {
+        "raw": "--- 这是另一行垃圾数据 ---",
+        "lineNumber": 15,
+        "timestamp": 0,
+        "timestampStr": "",
+        "connectionId": "",
+        "direction": "unknown",
+        "opcode": "unknown",
+        "payload": "",
+        "isValid": false,
+        "parseError": "无法识别的日志格式"
+      },
+      "message": "无法识别的日志格式",
+      "details": {
+        "lineNumber": 15
+      }
+    }
+  ],
+  "stateDiffs": [
+    {
+      "frameIndex": 0,
+      "path": "received.0.time",
+      "newValue": 1715763600000,
+      "operation": "add"
+    },
+    {
+      "frameIndex": 0,
+      "path": "received.0.opcode",
+      "newValue": "text",
+      "operation": "add"
+    },
+    {
+      "frameIndex": 0,
+      "path": "received.0.data.type",
+      "newValue": "connect",
+      "operation": "add"
+    },
+    {
+      "frameIndex": 0,
+      "path": "received.0.data.user",
+      "newValue": "bob",
+      "operation": "add"
+    },
+    {
+      "frameIndex": 0,
+      "path": "received.0.data.state",
+      "newValue": "init",
+      "operation": "add"
+    },
+    {
+      "frameIndex": 1,
+      "path": "sent.0.time",
+      "newValue": 1715763600100,
+      "operation": "add"
+    },
+    {
+      "frameIndex": 1,
+      "path": "sent.0.opcode",
+      "newValue": "text",
+      "operation": "add"
+    },
+    {
+      "frameIndex": 1,
+      "path": "sent.0.data.type",
+      "newValue": "welcome",
+      "operation": "add"
+    },
+    {
+      "frameIndex": 1,
+      "path": "sent.0.data.version",
+      "newValue": "1.0.0",
+      "operation": "add"
+    },
+    {
+      "frameIndex": 6,
+      "path": "type",
+      "newValue": "sync",
+      "operation": "add"
+    },
+    {
+      "frameIndex": 6,
+      "path": "score",
+      "newValue": 100,
+      "operation": "add"
+    },
+    {
+      "frameIndex": 6,
+      "path": "level",
+      "newValue": 1,
+      "operation": "add"
+    },
+    {
+      "frameIndex": 6,
+      "path": "coins",
+      "newValue": 50,
+      "operation": "add"
+    },
+    {
+      "frameIndex": 9,
+      "path": "score",
+      "oldValue": 100,
+      "newValue": 150,
+      "operation": "update"
+    },
+    {
+      "frameIndex": 12,
+      "path": "score",
+      "oldValue": 150,
+      "newValue": 125,
+      "operation": "update"
+    },
+    {
+      "frameIndex": 12,
+      "path": "hp",
+      "newValue": 75,
+      "operation": "add"
+    },
+    {
+      "frameIndex": 15,
+      "path": "score",
+      "oldValue": 125,
+      "newValue": 999,
+      "operation": "update"
+    },
+    {
+      "frameIndex": 15,
+      "path": "hp",
+      "oldValue": 75,
+      "newValue": 999,
+      "operation": "update"
+    },
+    {
+      "frameIndex": 18,
+      "path": "bugs",
+      "newValue": true,
+      "operation": "add"
+    }
+  ],
+  "finalState": {
+    "received": [
+      {
+        "time": 1715763600000,
+        "opcode": "text",
+        "data": {
+          "type": "connect",
+          "user": "bob",
+          "state": "init"
+        }
+      },
+      {
+        "time": 1715763600200,
+        "opcode": "text",
+        "data": {
+          "type": "auth",
+          "token": "abc123"
+        }
+      },
+      {
+        "time": 1715763600400,
+        "opcode": "text",
+        "data": {
+          "type": "join",
+          "room": "lobby"
+        }
+      },
+      {
+        "time": 1715763600600,
+        "opcode": "text",
+        "data": {
+          "type": "sync",
+          "score": 100,
+          "level": 1,
+          "coins": 50
+        }
+      },
+      {
+        "time": 1715763600700,
+        "opcode": "text",
+        "data": {
+          "type": "action",
+          "target": "chest",
+          "item": "sword"
+        }
+      },
+      {
+        "time": 1715763600900,
+        "opcode": "text",
+        "data": {
+          "type": "sync",
+          "score": 150
+        }
+      },
+      {
+        "time": 1715763601000,
+        "opcode": "text",
+        "data": {
+          "type": "action",
+          "target": "enemy"
+        }
+      },
+      {
+        "time": 1715763601200,
+        "opcode": "text",
+        "data": {
+          "type": "sync",
+          "score": 125,
+          "hp": 75
+        }
+      },
+      {
+        "time": 1715763601300,
+        "opcode": "text",
+        "data": {
+          "type": "chat",
+          "message": "hello world"
+        }
+      },
+      {
+        "time": 1715763601500,
+        "opcode": "text",
+        "data": {
+          "type": "sync",
+          "score": 999,
+          "hp": 999
+        }
+      },
+      {
+        "time": 1715763601600,
+        "opcode": "text",
+        "data": {
+          "type": "action",
+          "target": "boss"
+        }
+      },
+      {
+        "time": 1715763601800,
+        "opcode": "text",
+        "data": {
+          "type": "sync",
+          "score": 999,
+          "hp": 999,
+          "bugs": true
+        }
+      }
+    ],
+    "sent": [
+      {
+        "time": 1715763600100,
+        "opcode": "text",
+        "data": {
+          "type": "welcome",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "time": 1715763600300,
+        "opcode": "text",
+        "data": {
+          "type": "auth_ok",
+          "user_id": 42,
+          "state": "authenticated"
+        }
+      },
+      {
+        "time": 1715763600500,
+        "opcode": "text",
+        "data": {
+          "type": "joined",
+          "room": "lobby",
+          "users": 15
+        }
+      },
+      {
+        "time": 1715763600800,
+        "opcode": "text",
+        "data": {
+          "type": "item_add",
+          "item": "sword",
+          "rarity": "rare"
+        }
+      },
+      {
+        "time": 1715763601100,
+        "opcode": "text",
+        "data": {
+          "type": "combat",
+          "damage": 25
+        }
+      },
+      {
+        "time": 1715763601400,
+        "opcode": "text",
+        "data": {
+          "type": "chat_broadcast",
+          "from": "bob",
+          "msg": "hello world"
+        }
+      },
+      {
+        "time": 1715763601700,
+        "opcode": "text",
+        "data": {
+          "type": "combat",
+          "damage": 0,
+          "error": "invalid_target"
+        }
+      },
+      {
+        "time": 1715763601900,
+        "opcode": "text",
+        "data": {
+          "type": "disconnect",
+          "reason": "state_corrupted"
+        }
+      }
+    ],
+    "type": "sync",
+    "score": 999,
+    "level": 1,
+    "coins": 50,
+    "hp": 999,
+    "bugs": true
+  }
+}

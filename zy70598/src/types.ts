@@ -19,7 +19,7 @@ export interface StateSnapshot {
 }
 
 export interface Anomaly {
-  type: 'parse_error' | 'state_change' | 'timeout' | 'unexpected_frame' | 'custom';
+  type: 'parse_error' | 'state_spike' | 'state_corruption' | 'error_message' | 'disconnect' | 'unexpected_value' | 'custom';
   severity: 'low' | 'medium' | 'high' | 'critical';
   frameIndex: number;
   frame: WebSocketFrame;
@@ -68,6 +68,7 @@ export interface ReplayOptions extends ParseOptions {
   initialState?: Record<string, any>;
   stateExtractor?: (frame: WebSocketFrame, currentState: Record<string, any>) => Record<string, any>;
   anomalyRules?: AnomalyRule[];
+  enableBuiltinRules?: boolean;
 }
 
 export interface AnomalyRule {

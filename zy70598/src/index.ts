@@ -23,6 +23,8 @@ program
   .option('--html', '生成 HTML 报告')
   .option('--json', '生成 JSON 报告')
   .option('--no-terminal', '不输出终端报告')
+  .option('--no-builtin-rules', '禁用内置异常检测规则')
+  .option('--min-severity <level>', '最小异常严重程度: low|medium|high|critical', 'low')
   .action(async (logFile: string, options) => {
     try {
       if (!fs.existsSync(logFile)) {
@@ -42,8 +44,19 @@ program
 
       console.log(`解析完成，共 ${frames.length} 帧，有效 ${frames.filter(f => f.isValid).length} 帧`);
 
-      const engine = new ReplayEngine();
-      const result = engine.replay(filteredFrames, logFile);
+      const engine = new ReplayEngine({
+        enableBuiltinRules: options.builtinRules !== false,
+      });
+      
+      let result = engine.replay(filteredFrames, logFile);
+      
+      if (options.minSeverity && options.minSeverity !== 'low') {
+        const severityOrder = ['low', 'medium', 'high', 'critical'];
+        const minIndex = severityOrder.indexOf(options.minSeverity);
+        result.anomalies = result.anomalies.filter(a => 
+          severityOrder.indexOf(a.severity) >= minIndex
+        );
+      }
 
       const generator = new ReportGenerator();
       const reports = generator.generate(result);

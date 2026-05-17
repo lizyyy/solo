@@ -239,6 +239,16 @@ export class ReportGenerator {
       low: 'text-gray-500',
     };
 
+    const anomalyTypeLabels: Record<string, string> = {
+      parse_error: '解析错误',
+      state_spike: '状态跳变',
+      state_corruption: '状态损坏',
+      error_message: '错误消息',
+      disconnect: '连接断开',
+      unexpected_value: '异常值',
+      custom: '自定义规则',
+    };
+
     const operationClasses: Record<string, string> = {
       add: 'text-green-600',
       remove: 'text-red-600',
@@ -330,10 +340,10 @@ export class ReportGenerator {
                             <tr>
                                 <td>${i + 1}</td>
                                 <td><span class="${severityClasses[a.severity]}">${a.severity.toUpperCase()}</span></td>
-                                <td>${a.type}</td>
+                                <td>${anomalyTypeLabels[a.type] || a.type}</td>
                                 <td>${a.frameIndex}</td>
                                 <td>${a.frame.lineNumber}</td>
-                                <td>${a.message}</td>
+                                <td>${this.escapeHtml(a.message)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
