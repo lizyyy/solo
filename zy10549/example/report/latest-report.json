@@ -1,0 +1,222 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "rawLine": 6,
+      "rawColumn": 2,
+      "rawSource": "router/index.ts",
+      "name": "Home",
+      "component": "Home"
+    },
+    {
+      "path": "/about",
+      "rawLine": 11,
+      "rawColumn": 2,
+      "rawSource": "router/index.ts",
+      "name": "About",
+      "importPath": "../views/About.vue",
+      "lazy": true
+    },
+    {
+      "path": "/user/:id",
+      "rawLine": 16,
+      "rawColumn": 2,
+      "rawSource": "router/index.ts",
+      "name": "User",
+      "importPath": "../views/User.vue",
+      "lazy": true
+    },
+    {
+      "path": "/deleted-page",
+      "rawLine": 21,
+      "rawColumn": 2,
+      "rawSource": "router/index.ts",
+      "name": "DeletedPage",
+      "importPath": "../views/DeletedPage.vue",
+      "lazy": true
+    },
+    {
+      "path": "/nested",
+      "rawLine": 26,
+      "rawColumn": 2,
+      "rawSource": "router/index.ts",
+      "name": "Nested",
+      "children": [
+        {
+          "path": "child",
+          "rawLine": 30,
+          "rawColumn": 6,
+          "rawSource": "{",
+          "name": "NestedChild",
+          "importPath": "../views/NestedChild.vue",
+          "lazy": true
+        }
+      ]
+    },
+    {
+      "path": "/nested/child",
+      "rawLine": 30,
+      "rawColumn": 6,
+      "rawSource": "{",
+      "name": "NestedChild",
+      "importPath": "../views/NestedChild.vue",
+      "lazy": true
+    },
+    {
+      "path": "child",
+      "rawLine": 30,
+      "rawColumn": 6,
+      "rawSource": "router/index.ts",
+      "name": "NestedChild",
+      "importPath": "../views/NestedChild.vue",
+      "lazy": true
+    },
+    {
+      "path": "/no-component",
+      "rawLine": 37,
+      "rawColumn": 2,
+      "rawSource": "router/index.ts",
+      "name": "NoComponent"
+    },
+    {
+      "path": "/:pathMatch(.*)*",
+      "rawLine": 41,
+      "rawColumn": 2,
+      "rawSource": "router/index.ts",
+      "name": "NotFound",
+      "component": "NotFound"
+    }
+  ],
+  "pageFiles": [
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10549/example/src/views/User.vue",
+      "fileName": "User.vue",
+      "relativePath": "views/User.vue",
+      "exportNames": [],
+      "isComponent": true,
+      "isPage": true,
+      "imports": []
+    },
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10549/example/src/views/OrphanPage.vue",
+      "fileName": "OrphanPage.vue",
+      "relativePath": "views/OrphanPage.vue",
+      "exportNames": [],
+      "isComponent": true,
+      "isPage": true,
+      "imports": []
+    },
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10549/example/src/views/NotFound.vue",
+      "fileName": "NotFound.vue",
+      "relativePath": "views/NotFound.vue",
+      "exportNames": [],
+      "isComponent": true,
+      "isPage": true,
+      "imports": []
+    },
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10549/example/src/views/Home.vue",
+      "fileName": "Home.vue",
+      "relativePath": "views/Home.vue",
+      "exportNames": [],
+      "isComponent": true,
+      "isPage": true,
+      "imports": []
+    },
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10549/example/src/views/AnotherOrphan.vue",
+      "fileName": "AnotherOrphan.vue",
+      "relativePath": "views/AnotherOrphan.vue",
+      "exportNames": [],
+      "isComponent": true,
+      "isPage": true,
+      "imports": []
+    },
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10549/example/src/views/About.vue",
+      "fileName": "About.vue",
+      "relativePath": "views/About.vue",
+      "exportNames": [],
+      "isComponent": true,
+      "isPage": true,
+      "imports": []
+    }
+  ],
+  "orphans": [
+    {
+      "type": "route-without-page",
+      "routePath": "/deleted-page",
+      "routeName": "DeletedPage",
+      "componentPath": "../views/DeletedPage.vue",
+      "reason": "路由对应的页面文件不存在",
+      "location": {
+        "file": "router/index.ts",
+        "line": 21,
+        "column": 2,
+        "snippet": "router/index.ts"
+      },
+      "severity": "error"
+    },
+    {
+      "type": "route-without-page",
+      "routePath": "/nested/child",
+      "routeName": "NestedChild",
+      "componentPath": "../views/NestedChild.vue",
+      "reason": "路由对应的页面文件不存在",
+      "location": {
+        "file": "{",
+        "line": 30,
+        "column": 6,
+        "snippet": "{"
+      },
+      "severity": "error"
+    },
+    {
+      "type": "invalid-route",
+      "routePath": "/no-component",
+      "routeName": "NoComponent",
+      "reason": "路由缺少组件配置",
+      "location": {
+        "file": "router/index.ts",
+        "line": 37,
+        "column": 2,
+        "snippet": "router/index.ts"
+      },
+      "severity": "warning"
+    },
+    {
+      "type": "page-without-route",
+      "filePath": "views/OrphanPage.vue",
+      "reason": "页面文件没有对应路由入口",
+      "location": {
+        "file": "views/OrphanPage.vue"
+      },
+      "severity": "warning"
+    },
+    {
+      "type": "page-without-route",
+      "filePath": "views/AnotherOrphan.vue",
+      "reason": "页面文件没有对应路由入口",
+      "location": {
+        "file": "views/AnotherOrphan.vue"
+      },
+      "severity": "warning"
+    }
+  ],
+  "summary": {
+    "totalRoutes": 9,
+    "totalPages": 6,
+    "orphanCount": 5,
+    "routeWithoutPage": 2,
+    "pageWithoutRoute": 2,
+    "invalidRoute": 1,
+    "deadImport": 0
+  },
+  "metadata": {
+    "scanTime": "2026-05-17T17:00:21.686Z",
+    "sourceDir": "/Users/lzy/pro/solo/workspaces/zy10549/example/src",
+    "outputDir": "/Users/lzy/pro/solo/workspaces/zy10549/example/report",
+    "durationMs": 2
+  }
+}

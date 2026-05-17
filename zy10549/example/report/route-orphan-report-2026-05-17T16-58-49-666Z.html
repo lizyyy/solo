@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>前端路由孤儿检测报告</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .header p {
+      opacity: 0.9;
+    }
+    .summary-section {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+    .summary-section h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .stat-card {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      border-left: 4px solid #667eea;
+    }
+    .stat-card.error {
+      border-left-color: #e74c3c;
+    }
+    .stat-card.warning {
+      border-left-color: #f39c12;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+    }
+    .stat-card.error .stat-value { color: #e74c3c; }
+    .stat-card.warning .stat-value { color: #f39c12; }
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .issues-section {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+    .issues-section h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      border-bottom: 2px solid #e74c3c;
+      padding-bottom: 10px;
+    }
+    .no-issues {
+      text-align: center;
+      padding: 40px;
+      color: #27ae60;
+      font-size: 18px;
+    }
+    .no-issues .icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    .orphan-item {
+      border-radius: 8px;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+    .orphan-item.error { border: 1px solid #fecdd3; }
+    .orphan-item.warning { border: 1px solid #fef3c7; }
+    .orphan-item.info { border: 1px solid #dbeafe; }
+    .orphan-header {
+      padding: 12px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .orphan-item.error .orphan-header { background: #fecdd3; }
+    .orphan-item.warning .orphan-header { background: #fef3c7; }
+    .orphan-item.info .orphan-header { background: #dbeafe; }
+    .orphan-number {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .orphan-type {
+      font-weight: 600;
+      flex: 1;
+    }
+    .orphan-severity {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.1);
+    }
+    .orphan-body {
+      padding: 16px;
+      background: white;
+    }
+    .orphan-body p {
+      margin-bottom: 8px;
+    }
+    .orphan-body code {
+      background: #f4f4f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+    }
+    .orphan-body code.snippet {
+      display: block;
+      padding: 10px;
+      margin-top: 5px;
+      overflow-x: auto;
+    }
+    .reason {
+      font-size: 15px;
+      color: #374151;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+    .metadata {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+    .metadata h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+    .metadata-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      font-size: 14px;
+    }
+    .metadata-item {
+      display: flex;
+      justify-content: space-between;
+    }
+    .metadata-label {
+      color: #666;
+    }
+    .metadata-value {
+      font-family: 'Monaco', monospace;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔍 前端路由孤儿检测报告</h1>
+      <p>检测时间：2026/5/17 23:58:49</p>
+    </div>
+
+    <div class="summary-section">
+      <h2>📊 扫描概要</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">9</div>
+          <div class="stat-label">总路由数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">6</div>
+          <div class="stat-label">总页面数</div>
+        </div>
+        <div class="stat-card error">
+          <div class="stat-value">6</div>
+          <div class="stat-label">问题总数</div>
+        </div>
+      </div>
+      
+      <div class="stats-grid" style="margin-top: 20px;">
+        <div class="stat-card error">
+          <div class="stat-value">3</div>
+          <div class="stat-label">路由无对应页面</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-value">2</div>
+          <div class="stat-label">页面无对应路由</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-value">1</div>
+          <div class="stat-label">无效路由配置</div>
+        </div>
+      </div>
+      
+    </div>
+
+    <div class="issues-section">
+      <h2>⚠️ 问题详情</h2>
+      
+        <div class="orphan-item error">
+          <div class="orphan-header">
+            <span class="orphan-number">#1</span>
+            <span class="orphan-type">route-without-page</span>
+            <span class="orphan-severity">ERROR</span>
+          </div>
+          <div class="orphan-body">
+            <p class="reason"><strong>原因：</strong>路由对应的页面文件不存在</p>
+            <p><strong>路由路径：</strong><code>/deleted-page</code></p>
+            <p><strong>路由名称：</strong>DeletedPage</p>
+            <p><strong>组件路径：</strong><code>../views/DeletedPage.vue</code></p>
+            
+            
+              <p><strong>位置：</strong><code>router/index.ts</code></p>
+              <p><strong>行号：</strong>21</p>
+              <p><strong>代码片段：</strong><code class="snippet">router/index.ts</code></p>
+            
+          </div>
+        </div>
+      
+        <div class="orphan-item error">
+          <div class="orphan-header">
+            <span class="orphan-number">#2</span>
+            <span class="orphan-type">route-without-page</span>
+            <span class="orphan-severity">ERROR</span>
+          </div>
+          <div class="orphan-body">
+            <p class="reason"><strong>原因：</strong>路由对应的页面文件不存在</p>
+            <p><strong>路由路径：</strong><code>/nested/child</code></p>
+            <p><strong>路由名称：</strong>NestedChild</p>
+            <p><strong>组件路径：</strong><code>../views/NestedChild.vue</code></p>
+            
+            
+              <p><strong>位置：</strong><code>{</code></p>
+              <p><strong>行号：</strong>30</p>
+              <p><strong>代码片段：</strong><code class="snippet">{</code></p>
+            
+          </div>
+        </div>
+      
+        <div class="orphan-item error">
+          <div class="orphan-header">
+            <span class="orphan-number">#3</span>
+            <span class="orphan-type">route-without-page</span>
+            <span class="orphan-severity">ERROR</span>
+          </div>
+          <div class="orphan-body">
+            <p class="reason"><strong>原因：</strong>路由对应的页面文件不存在</p>
+            <p><strong>路由路径：</strong><code>child</code></p>
+            <p><strong>路由名称：</strong>NestedChild</p>
+            <p><strong>组件路径：</strong><code>../views/NestedChild.vue</code></p>
+            
+            
+              <p><strong>位置：</strong><code>router/index.ts</code></p>
+              <p><strong>行号：</strong>30</p>
+              <p><strong>代码片段：</strong><code class="snippet">router/index.ts</code></p>
+            
+          </div>
+        </div>
+      
+        <div class="orphan-item warning">
+          <div class="orphan-header">
+            <span class="orphan-number">#4</span>
+            <span class="orphan-type">invalid-route</span>
+            <span class="orphan-severity">WARNING</span>
+          </div>
+          <div class="orphan-body">
+            <p class="reason"><strong>原因：</strong>路由缺少组件配置</p>
+            <p><strong>路由路径：</strong><code>/no-component</code></p>
+            <p><strong>路由名称：</strong>NoComponent</p>
+            
+            
+            
+              <p><strong>位置：</strong><code>router/index.ts</code></p>
+              <p><strong>行号：</strong>37</p>
+              <p><strong>代码片段：</strong><code class="snippet">router/index.ts</code></p>
+            
+          </div>
+        </div>
+      
+        <div class="orphan-item warning">
+          <div class="orphan-header">
+            <span class="orphan-number">#5</span>
+            <span class="orphan-type">page-without-route</span>
+            <span class="orphan-severity">WARNING</span>
+          </div>
+          <div class="orphan-body">
+            <p class="reason"><strong>原因：</strong>页面文件没有对应路由入口</p>
+            
+            
+            
+            <p><strong>文件路径：</strong><code>views/OrphanPage.vue</code></p>
+            
+              <p><strong>位置：</strong><code>views/OrphanPage.vue</code></p>
+              
+              
+            
+          </div>
+        </div>
+      
+        <div class="orphan-item warning">
+          <div class="orphan-header">
+            <span class="orphan-number">#6</span>
+            <span class="orphan-type">page-without-route</span>
+            <span class="orphan-severity">WARNING</span>
+          </div>
+          <div class="orphan-body">
+            <p class="reason"><strong>原因：</strong>页面文件没有对应路由入口</p>
+            
+            
+            
+            <p><strong>文件路径：</strong><code>views/AnotherOrphan.vue</code></p>
+            
+              <p><strong>位置：</strong><code>views/AnotherOrphan.vue</code></p>
+              
+              
+            
+          </div>
+        </div>
+      
+    </div>
+
+    <div class="metadata">
+      <h3>📁 扫描元数据</h3>
+      <div class="metadata-grid">
+        <div class="metadata-item">
+          <span class="metadata-label">源码目录</span>
+          <span class="metadata-value">/Users/lzy/pro/solo/workspaces/zy10549/example/src</span>
+        </div>
+        <div class="metadata-item">
+          <span class="metadata-label">输出目录</span>
+          <span class="metadata-value">/Users/lzy/pro/solo/workspaces/zy10549/example/report</span>
+        </div>
+        <div class="metadata-item">
+          <span class="metadata-label">扫描耗时</span>
+          <span class="metadata-value">2ms</span>
+        </div>
+        <div class="metadata-item">
+          <span class="metadata-label">扫描时间</span>
+          <span class="metadata-value">2026/5/17 23:58:49</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>路由孤儿检测工具 v1.0.0</p>
+    </div>
+  </div>
+</body>
+</html>
