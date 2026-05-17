@@ -1,0 +1,28 @@
+﻿=== 对账汇总 ===
+收银机流水总数,7
+支付平台流水总数,5
+匹配成功,4
+未匹配,3
+重复流水,1
+坏行数,1
+处理时间(秒),0.01
+
+=== 差异原因统计 ===
+duplicate_transaction,1
+missing_in_payment_gateway,2
+missing_in_cash_register,1
+
+=== 对账详情 ===
+状态,差异原因,匹配置信度,收银机-交易号,收银机-门店,收银机-金额,收银机-时间,收银机-类型,收银机-文件,收银机-行号,支付平台-交易号,支付平台-门店,支付平台-金额,支付平台-时间,支付平台-类型,支付平台-文件,支付平台-行号,备注
+matched,,1.00,TXN001,STORE001,100.50,2024-01-15 10:30:00,payment,cash_register_001.csv,2,PAY001,STORE001,100.50,2024-01-15 10:30:02,payment,payment_gateway_001.csv,2,
+duplicate,duplicate_transaction,,TXN001,STORE001,100.50,2024-01-15 10:30:00,payment,cash_register_001.csv,8,,,,,,,,重复流水，来源：cash_register
+matched,,1.00,TXN002,STORE001,200.00,2024-01-15 10:35:00,payment,cash_register_001.csv,3,PAY002,STORE001,200.00,2024-01-15 10:35:05,payment,payment_gateway_001.csv,3,
+matched,,1.00,TXN003,STORE002,150.75,2024-01-15 11:00:00,payment,cash_register_001.csv,4,PAY003,STORE002,150.75,2024-01-15 11:00:10,payment,payment_gateway_001.csv,4,
+matched,,1.00,TXN004,STORE001,-50.00,2024-01-15 14:00:00,refund,cash_register_001.csv,5,PAY004,STORE001,-50.00,2024-01-16 09:00:00,refund,payment_gateway_001.csv,5,退款匹配：原交易号 TXN002
+unmatched,missing_in_payment_gateway,,TXN005,STORE003,300.00,2024-01-15 15:00:00,payment,cash_register_001.csv,6,,,,,,,,
+unmatched,missing_in_payment_gateway,,TXN006,STORE001,99.99,2024-01-15 16:00:00,payment,cash_register_001.csv,7,,,,,,,,
+unmatched,missing_in_cash_register,,,,,,,,,PAY005,STORE004,500.00,2024-01-15 17:00:00,payment,payment_gateway_001.csv,6,
+
+=== 坏行记录 ===
+文件,行号,原始内容
+cash_register_001.csv,9,"BAD_ROW_WITHOUT_ID,STORE001,100.00,,payment,微信,ORD007,,"

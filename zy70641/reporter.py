@@ -137,17 +137,28 @@ class ReportGenerator:
 
             f.write("## 未匹配详情\n\n")
             if unmatched:
-                f.write("| 类型 | 交易号 | 门店 | 金额 | 时间 | 文件 | 行号 | 差异原因 |\n")
-                f.write("|------|--------|------|------|------|------|------|----------|\n")
+                f.write("| 差异原因 | 收银机-交易号 | 收银机-门店 | 收银机-金额 | 收银机-时间 | 支付平台-交易号 | 支付平台-门店 | 支付平台-金额 | 支付平台-时间 | 备注 |\n")
+                f.write("|----------|--------------|------------|------------|------------|----------------|------------|------------|------------|------|\n")
                 for m in unmatched:
-                    tx = m.cash_register_tx or m.payment_gateway_tx
-                    source = "收银机" if m.cash_register_tx else "支付平台"
-                    if tx:
+                    cash = m.cash_register_tx
+                    payment = m.payment_gateway_tx
+                    reason = m.discrepancy_reason.value if m.discrepancy_reason else ""
+                    notes = m.notes or ""
+                    
+                    if cash and payment:
                         f.write((
-                            f"| {source} | {tx.transaction_id} | {tx.store_id} | "
-                            f"{tx.amount:.2f} | {tx.transaction_time.strftime('%Y-%m-%d %H:%M:%S')} | "
-                            f"{os.path.basename(tx.source.file_path)} | {tx.source.line_number} | "
-                            f"{m.discrepancy_reason.value if m.discrepancy_reason else ''} |\n"
+                            f"| {reason} | {cash.transaction_id} | {cash.store_id} | {cash.amount:.2f} | {cash.transaction_time.strftime('%Y-%m-%d %H:%M:%S')} | "
+                            f"{payment.transaction_id} | {payment.store_id} | {payment.amount:.2f} | {payment.transaction_time.strftime('%Y-%m-%d %H:%M:%S')} | {notes} |\n"
+                        ))
+                    elif cash:
+                        f.write((
+                            f"| {reason} | {cash.transaction_id} | {cash.store_id} | {cash.amount:.2f} | {cash.transaction_time.strftime('%Y-%m-%d %H:%M:%S')} | "
+                            f"- | - | - | - | {notes} |\n"
+                        ))
+                    elif payment:
+                        f.write((
+                            f"| {reason} | - | - | - | - | "
+                            f"{payment.transaction_id} | {payment.store_id} | {payment.amount:.2f} | {payment.transaction_time.strftime('%Y-%m-%d %H:%M:%S')} | {notes} |\n"
                         ))
             else:
                 f.write("无未匹配记录\n")

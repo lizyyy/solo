@@ -75,20 +75,46 @@ class TransactionMatcher:
                         if (cash_tx.transaction_id in cash_matched or
                             payment_tx.transaction_id in payment_matched):
                             continue
-                        if self._is_amount_match(cash_tx.amount, payment_tx.amount):
-                            if self._is_time_match(
-                                cash_tx.transaction_time,
-                                payment_tx.transaction_time,
-                                self.config.matching.time_window_minutes
-                            ):
-                                results.append(MatchResult(
-                                    cash_register_tx=cash_tx,
-                                    payment_gateway_tx=payment_tx,
-                                    status=MatchStatus.MATCHED,
-                                    match_confidence=1.0
-                                ))
-                                cash_matched.add(cash_tx.transaction_id)
-                                payment_matched.add(payment_tx.transaction_id)
+                        
+                        is_amount_ok = self._is_amount_match(cash_tx.amount, payment_tx.amount)
+                        is_time_ok = self._is_time_match(
+                            cash_tx.transaction_time,
+                            payment_tx.transaction_time,
+                            self.config.matching.time_window_minutes
+                        )
+                        is_store_ok = (
+                            not self.config.matching.store_id_required
+                            or cash_tx.store_id == payment_tx.store_id
+                        )
+                        
+                        if is_amount_ok and is_time_ok and is_store_ok:
+                            results.append(MatchResult(
+                                cash_register_tx=cash_tx,
+                                payment_gateway_tx=payment_tx,
+                                status=MatchStatus.MATCHED,
+                                match_confidence=1.0
+                            ))
+                            cash_matched.add(cash_tx.transaction_id)
+                            payment_matched.add(payment_tx.transaction_id)
+                        else:
+                            discrepancy_reason = None
+                            if not is_store_ok:
+                                discrepancy_reason = DiscrepancyReason.STORE_MISMATCH
+                            elif not is_amount_ok:
+                                discrepancy_reason = DiscrepancyReason.AMOUNT_MISMATCH
+                            elif not is_time_ok:
+                                discrepancy_reason = DiscrepancyReason.TIME_WINDOW_MISMATCH
+                            
+                            results.append(MatchResult(
+                                cash_register_tx=cash_tx,
+                                payment_gateway_tx=payment_tx,
+                                status=MatchStatus.UNMATCHED,
+                                discrepancy_reason=discrepancy_reason,
+                                match_confidence=0.0,
+                                notes=f"同订单号但不匹配：订单号 {order_no}"
+                            ))
+                            cash_matched.add(cash_tx.transaction_id)
+                            payment_matched.add(payment_tx.transaction_id)
 
         cash_unmatched = [tx for tx in cash_txs if tx.transaction_id not in cash_matched]
         payment_unmatched = [tx for tx in payment_txs if tx.transaction_id not in payment_matched]
