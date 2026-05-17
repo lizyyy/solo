@@ -8,7 +8,7 @@ import pandas as pd
 
 from main import app
 from database import Base, get_db
-from cleaning_service import validate_passport, validate_phone, normalize_phone, normalize_passport
+from cleaning_service import validate_passport, validate_phone, normalize_phone, normalize_passport, find_duplicates
 
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -85,6 +85,26 @@ class TestValidationFunctions:
         for input_passport, expected in test_cases:
             result = normalize_passport(input_passport)
             assert result == expected
+
+    def test_find_duplicates_uses_record_ids_not_indices(self):
+        records = [
+            {'id': 101, 'passport_number': 'E12345678', 'guardian_phone': '13800138000'},
+            {'id': 102, 'passport_number': 'E12345678', 'guardian_phone': '13800138000'},
+            {'id': 103, 'passport_number': 'E87654321', 'guardian_phone': '13912345678'},
+        ]
+        
+        duplicates = find_duplicates(records)
+        
+        for key, dup_ids in duplicates.items():
+            for dup_id in dup_ids:
+                assert dup_id >= 100, f"Expected actual record ID (>=100), got index-like ID: {dup_id}"
+                assert dup_id in [101, 102, 103], f"Unexpected record ID: {dup_id}"
+        
+        assert len(duplicates) >= 1
+        for key, dup_ids in duplicates.items():
+            if key.startswith('passport_') or key.startswith('phone_'):
+                assert 101 in dup_ids
+                assert 102 in dup_ids
 
 
 class TestTaskAPI:

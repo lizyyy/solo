@@ -194,31 +194,35 @@ def find_duplicates(records: List[Dict[str, Any]]) -> Dict[str, List[int]]:
     passport_groups = {}
     phone_groups = {}
     
-    for idx, record in enumerate(records):
+    for record in records:
+        record_id = record.get('id')
+        if record_id is None:
+            continue
+            
         passport = normalize_passport(record.get('passport_number', ''))
         phone = normalize_phone(record.get('guardian_phone', ''))
         
         if passport:
             if passport not in passport_groups:
                 passport_groups[passport] = []
-            passport_groups[passport].append(idx)
+            passport_groups[passport].append(record_id)
         
         if phone:
             if phone not in phone_groups:
                 phone_groups[phone] = []
-            phone_groups[phone].append(idx)
+            phone_groups[phone].append(record_id)
     
     duplicates = {}
     
-    for passport, indices in passport_groups.items():
-        if len(indices) > 1:
+    for passport, record_ids in passport_groups.items():
+        if len(record_ids) > 1:
             key = f"passport_{passport}"
-            duplicates[key] = indices
+            duplicates[key] = record_ids
     
-    for phone, indices in phone_groups.items():
-        if len(indices) > 1:
+    for phone, record_ids in phone_groups.items():
+        if len(record_ids) > 1:
             key = f"phone_{phone}"
-            duplicates[key] = indices
+            duplicates[key] = record_ids
     
     return duplicates
 
