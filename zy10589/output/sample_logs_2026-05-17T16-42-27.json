@@ -1,0 +1,757 @@
+{
+  "summary": {
+    "totalTopics": 25,
+    "validTopics": 19,
+    "invalidTopics": 6,
+    "totalDailySizeGB": 1763.7999999999997,
+    "totalCompressedDailySizeGB": 754.531,
+    "totalRetentionGB": 13906.053000000002,
+    "totalRetentionTB": 13.580129882812502,
+    "totalEstimatedCost": 2037.019482421875
+  },
+  "validTopics": [
+    {
+      "topic": "api-gateway-access",
+      "dailySizeGB": 50.5,
+      "retentionDays": 30,
+      "compressionRatio": 0.3,
+      "costTag": "核心业务",
+      "originalLineNumber": 2,
+      "compressedDailySizeGB": 15.149999999999999,
+      "totalSizeGB": 454.49999999999994,
+      "totalSizeTB": 0.44384765624999994,
+      "estimatedCost": 66.57714843749999
+    },
+    {
+      "topic": "user-service-error",
+      "dailySizeGB": 25.2,
+      "retentionDays": 90,
+      "compressionRatio": 0.25,
+      "costTag": "核心业务",
+      "originalLineNumber": 3,
+      "compressedDailySizeGB": 6.3,
+      "totalSizeGB": 567,
+      "totalSizeTB": 0.5537109375,
+      "estimatedCost": 83.056640625
+    },
+    {
+      "topic": "order-service-debug",
+      "dailySizeGB": 120.8,
+      "retentionDays": 15,
+      "compressionRatio": 0.4,
+      "costTag": "核心业务",
+      "originalLineNumber": 4,
+      "compressedDailySizeGB": 48.32,
+      "totalSizeGB": 724.8,
+      "totalSizeTB": 0.7078125,
+      "estimatedCost": 106.171875
+    },
+    {
+      "topic": "payment-webhook",
+      "dailySizeGB": 35.6,
+      "retentionDays": 60,
+      "compressionRatio": 0.2,
+      "costTag": "支付系统",
+      "originalLineNumber": 5,
+      "compressedDailySizeGB": 7.120000000000001,
+      "totalSizeGB": 427.20000000000005,
+      "totalSizeTB": 0.41718750000000004,
+      "estimatedCost": 62.57812500000001
+    },
+    {
+      "topic": "database-slow-query",
+      "dailySizeGB": 80.3,
+      "retentionDays": 30,
+      "compressionRatio": 0.35,
+      "costTag": "数据库",
+      "originalLineNumber": 6,
+      "compressedDailySizeGB": 28.104999999999997,
+      "totalSizeGB": 843.1499999999999,
+      "totalSizeTB": 0.8233886718749999,
+      "estimatedCost": 123.50830078124999
+    },
+    {
+      "topic": "kafka-message-trace",
+      "dailySizeGB": 200.5,
+      "retentionDays": 7,
+      "compressionRatio": 0.5,
+      "costTag": "消息队列",
+      "originalLineNumber": 7,
+      "compressedDailySizeGB": 100.25,
+      "totalSizeGB": 701.75,
+      "totalSizeTB": 0.685302734375,
+      "estimatedCost": 102.79541015625
+    },
+    {
+      "topic": "redis-aof-log",
+      "dailySizeGB": 150.2,
+      "retentionDays": 3,
+      "compressionRatio": 0.6,
+      "costTag": "缓存",
+      "originalLineNumber": 8,
+      "compressedDailySizeGB": 90.11999999999999,
+      "totalSizeGB": 270.35999999999996,
+      "totalSizeTB": 0.26402343749999996,
+      "estimatedCost": 39.60351562499999
+    },
+    {
+      "topic": "frontend-nginx-access",
+      "dailySizeGB": 95.8,
+      "retentionDays": 30,
+      "compressionRatio": 0.3,
+      "costTag": "前端",
+      "originalLineNumber": 9,
+      "compressedDailySizeGB": 28.74,
+      "totalSizeGB": 862.1999999999999,
+      "totalSizeTB": 0.8419921874999999,
+      "estimatedCost": 126.29882812499999
+    },
+    {
+      "topic": "mobile-crash-report",
+      "dailySizeGB": 45.3,
+      "retentionDays": 60,
+      "compressionRatio": 0.22,
+      "costTag": "移动端",
+      "originalLineNumber": 10,
+      "compressedDailySizeGB": 9.966,
+      "totalSizeGB": 597.9599999999999,
+      "totalSizeTB": 0.5839453124999999,
+      "estimatedCost": 87.59179687499999
+    },
+    {
+      "topic": "third-party-callback",
+      "dailySizeGB": 30.1,
+      "retentionDays": 15,
+      "compressionRatio": 0.28,
+      "costTag": "第三方",
+      "originalLineNumber": 11,
+      "compressedDailySizeGB": 8.428,
+      "totalSizeGB": 126.42000000000002,
+      "totalSizeTB": 0.12345703125000002,
+      "estimatedCost": 18.518554687500004
+    },
+    {
+      "topic": "monitoring-metrics",
+      "dailySizeGB": 60.7,
+      "retentionDays": 7,
+      "compressionRatio": 0.45,
+      "costTag": "监控系统",
+      "originalLineNumber": 12,
+      "compressedDailySizeGB": 27.315,
+      "totalSizeGB": 191.205,
+      "totalSizeTB": 0.1867236328125,
+      "estimatedCost": 28.008544921875004
+    },
+    {
+      "topic": "audit-log",
+      "dailySizeGB": 25.9,
+      "retentionDays": 365,
+      "compressionRatio": 0.18,
+      "costTag": "审计",
+      "originalLineNumber": 13,
+      "compressedDailySizeGB": 4.662,
+      "totalSizeGB": 1701.6299999999999,
+      "totalSizeTB": 1.6617480468749999,
+      "estimatedCost": 249.26220703124997
+    },
+    {
+      "topic": "backup-job-log",
+      "dailySizeGB": 180.4,
+      "retentionDays": 14,
+      "compressionRatio": 0.55,
+      "costTag": "运维",
+      "originalLineNumber": 14,
+      "compressedDailySizeGB": 99.22000000000001,
+      "totalSizeGB": 1389.0800000000002,
+      "totalSizeTB": 1.3565234375000002,
+      "estimatedCost": 203.47851562500003
+    },
+    {
+      "topic": "batch-processing",
+      "dailySizeGB": 90.6,
+      "retentionDays": 30,
+      "compressionRatio": 0.32,
+      "costTag": "数据平台",
+      "originalLineNumber": 15,
+      "compressedDailySizeGB": 28.991999999999997,
+      "totalSizeGB": 869.7599999999999,
+      "totalSizeTB": 0.8493749999999999,
+      "estimatedCost": 127.40624999999999
+    },
+    {
+      "topic": "search-engine-query",
+      "dailySizeGB": 55.2,
+      "retentionDays": 45,
+      "compressionRatio": 0.27,
+      "costTag": "搜索服务",
+      "originalLineNumber": 16,
+      "compressedDailySizeGB": 14.904000000000002,
+      "totalSizeGB": 670.6800000000001,
+      "totalSizeTB": 0.6549609375000001,
+      "estimatedCost": 98.24414062500001
+    },
+    {
+      "topic": "cdn-access",
+      "dailySizeGB": 300.1,
+      "retentionDays": 3,
+      "compressionRatio": 0.6,
+      "costTag": "CDN",
+      "originalLineNumber": 17,
+      "compressedDailySizeGB": 180.06,
+      "totalSizeGB": 540.1800000000001,
+      "totalSizeTB": 0.5275195312500001,
+      "estimatedCost": 79.12792968750001
+    },
+    {
+      "topic": "security-attack",
+      "dailySizeGB": 120.3,
+      "retentionDays": 90,
+      "compressionRatio": 0.2,
+      "costTag": "安全",
+      "originalLineNumber": 18,
+      "compressedDailySizeGB": 24.060000000000002,
+      "totalSizeGB": 2165.4,
+      "totalSizeTB": 2.1146484375,
+      "estimatedCost": 317.197265625
+    },
+    {
+      "topic": "email-notification",
+      "dailySizeGB": 20.8,
+      "retentionDays": 7,
+      "compressionRatio": 0.38,
+      "costTag": "通知服务",
+      "originalLineNumber": 19,
+      "compressedDailySizeGB": 7.904000000000001,
+      "totalSizeGB": 55.328,
+      "totalSizeTB": 0.05403125,
+      "estimatedCost": 8.1046875
+    },
+    {
+      "topic": "file-upload-access",
+      "dailySizeGB": 75.5,
+      "retentionDays": 30,
+      "compressionRatio": 0.33,
+      "costTag": "存储服务",
+      "originalLineNumber": 20,
+      "compressedDailySizeGB": 24.915000000000003,
+      "totalSizeGB": 747.45,
+      "totalSizeTB": 0.729931640625,
+      "estimatedCost": 109.48974609375
+    }
+  ],
+  "invalidTopics": [
+    {
+      "topic": "invalid-line-1",
+      "dailySizeGB": "",
+      "retentionDays": "30",
+      "compressionRatio": "0.3",
+      "costTag": "测试",
+      "originalLineNumber": 21,
+      "errorReason": "日均大小无效: \"\""
+    },
+    {
+      "topic": "invalid-line-2",
+      "dailySizeGB": "test",
+      "retentionDays": "30",
+      "compressionRatio": "0.3",
+      "costTag": "测试",
+      "originalLineNumber": 22,
+      "errorReason": "日均大小无效: \"test\""
+    },
+    {
+      "topic": "invalid-line-3",
+      "dailySizeGB": "50.5",
+      "retentionDays": "-5",
+      "compressionRatio": "0.3",
+      "costTag": "测试",
+      "originalLineNumber": 23,
+      "errorReason": "保留天数无效: \"-5\""
+    },
+    {
+      "topic": "invalid-line-4",
+      "dailySizeGB": "50.5",
+      "retentionDays": "30",
+      "compressionRatio": "1.5",
+      "costTag": "测试",
+      "originalLineNumber": 24,
+      "errorReason": "压缩率无效: \"1.5\" (应为0-1之间的小数)"
+    },
+    {
+      "topic": "invalid-line-5",
+      "dailySizeGB": "50.5",
+      "retentionDays": "30",
+      "compressionRatio": "-0.1",
+      "costTag": "测试",
+      "originalLineNumber": 25,
+      "errorReason": "压缩率无效: \"-0.1\" (应为0-1之间的小数)"
+    },
+    {
+      "topic": "",
+      "dailySizeGB": "50.5",
+      "retentionDays": "30",
+      "compressionRatio": "0.3",
+      "costTag": "空主题",
+      "originalLineNumber": 26,
+      "errorReason": "日志主题为空"
+    }
+  ],
+  "groupedByCostTag": {
+    "核心业务": {
+      "topics": [
+        {
+          "topic": "order-service-debug",
+          "dailySizeGB": 120.8,
+          "retentionDays": 15,
+          "compressionRatio": 0.4,
+          "costTag": "核心业务",
+          "originalLineNumber": 4,
+          "compressedDailySizeGB": 48.32,
+          "totalSizeGB": 724.8,
+          "totalSizeTB": 0.7078125,
+          "estimatedCost": 106.171875
+        },
+        {
+          "topic": "user-service-error",
+          "dailySizeGB": 25.2,
+          "retentionDays": 90,
+          "compressionRatio": 0.25,
+          "costTag": "核心业务",
+          "originalLineNumber": 3,
+          "compressedDailySizeGB": 6.3,
+          "totalSizeGB": 567,
+          "totalSizeTB": 0.5537109375,
+          "estimatedCost": 83.056640625
+        },
+        {
+          "topic": "api-gateway-access",
+          "dailySizeGB": 50.5,
+          "retentionDays": 30,
+          "compressionRatio": 0.3,
+          "costTag": "核心业务",
+          "originalLineNumber": 2,
+          "compressedDailySizeGB": 15.149999999999999,
+          "totalSizeGB": 454.49999999999994,
+          "totalSizeTB": 0.44384765624999994,
+          "estimatedCost": 66.57714843749999
+        }
+      ],
+      "totalRetentionTB": 1.70537109375,
+      "totalEstimatedCost": 255.8056640625
+    },
+    "支付系统": {
+      "topics": [
+        {
+          "topic": "payment-webhook",
+          "dailySizeGB": 35.6,
+          "retentionDays": 60,
+          "compressionRatio": 0.2,
+          "costTag": "支付系统",
+          "originalLineNumber": 5,
+          "compressedDailySizeGB": 7.120000000000001,
+          "totalSizeGB": 427.20000000000005,
+          "totalSizeTB": 0.41718750000000004,
+          "estimatedCost": 62.57812500000001
+        }
+      ],
+      "totalRetentionTB": 0.41718750000000004,
+      "totalEstimatedCost": 62.57812500000001
+    },
+    "数据库": {
+      "topics": [
+        {
+          "topic": "database-slow-query",
+          "dailySizeGB": 80.3,
+          "retentionDays": 30,
+          "compressionRatio": 0.35,
+          "costTag": "数据库",
+          "originalLineNumber": 6,
+          "compressedDailySizeGB": 28.104999999999997,
+          "totalSizeGB": 843.1499999999999,
+          "totalSizeTB": 0.8233886718749999,
+          "estimatedCost": 123.50830078124999
+        }
+      ],
+      "totalRetentionTB": 0.8233886718749999,
+      "totalEstimatedCost": 123.50830078124999
+    },
+    "消息队列": {
+      "topics": [
+        {
+          "topic": "kafka-message-trace",
+          "dailySizeGB": 200.5,
+          "retentionDays": 7,
+          "compressionRatio": 0.5,
+          "costTag": "消息队列",
+          "originalLineNumber": 7,
+          "compressedDailySizeGB": 100.25,
+          "totalSizeGB": 701.75,
+          "totalSizeTB": 0.685302734375,
+          "estimatedCost": 102.79541015625
+        }
+      ],
+      "totalRetentionTB": 0.685302734375,
+      "totalEstimatedCost": 102.79541015625
+    },
+    "缓存": {
+      "topics": [
+        {
+          "topic": "redis-aof-log",
+          "dailySizeGB": 150.2,
+          "retentionDays": 3,
+          "compressionRatio": 0.6,
+          "costTag": "缓存",
+          "originalLineNumber": 8,
+          "compressedDailySizeGB": 90.11999999999999,
+          "totalSizeGB": 270.35999999999996,
+          "totalSizeTB": 0.26402343749999996,
+          "estimatedCost": 39.60351562499999
+        }
+      ],
+      "totalRetentionTB": 0.26402343749999996,
+      "totalEstimatedCost": 39.60351562499999
+    },
+    "前端": {
+      "topics": [
+        {
+          "topic": "frontend-nginx-access",
+          "dailySizeGB": 95.8,
+          "retentionDays": 30,
+          "compressionRatio": 0.3,
+          "costTag": "前端",
+          "originalLineNumber": 9,
+          "compressedDailySizeGB": 28.74,
+          "totalSizeGB": 862.1999999999999,
+          "totalSizeTB": 0.8419921874999999,
+          "estimatedCost": 126.29882812499999
+        }
+      ],
+      "totalRetentionTB": 0.8419921874999999,
+      "totalEstimatedCost": 126.29882812499999
+    },
+    "移动端": {
+      "topics": [
+        {
+          "topic": "mobile-crash-report",
+          "dailySizeGB": 45.3,
+          "retentionDays": 60,
+          "compressionRatio": 0.22,
+          "costTag": "移动端",
+          "originalLineNumber": 10,
+          "compressedDailySizeGB": 9.966,
+          "totalSizeGB": 597.9599999999999,
+          "totalSizeTB": 0.5839453124999999,
+          "estimatedCost": 87.59179687499999
+        }
+      ],
+      "totalRetentionTB": 0.5839453124999999,
+      "totalEstimatedCost": 87.59179687499999
+    },
+    "第三方": {
+      "topics": [
+        {
+          "topic": "third-party-callback",
+          "dailySizeGB": 30.1,
+          "retentionDays": 15,
+          "compressionRatio": 0.28,
+          "costTag": "第三方",
+          "originalLineNumber": 11,
+          "compressedDailySizeGB": 8.428,
+          "totalSizeGB": 126.42000000000002,
+          "totalSizeTB": 0.12345703125000002,
+          "estimatedCost": 18.518554687500004
+        }
+      ],
+      "totalRetentionTB": 0.12345703125000002,
+      "totalEstimatedCost": 18.518554687500004
+    },
+    "监控系统": {
+      "topics": [
+        {
+          "topic": "monitoring-metrics",
+          "dailySizeGB": 60.7,
+          "retentionDays": 7,
+          "compressionRatio": 0.45,
+          "costTag": "监控系统",
+          "originalLineNumber": 12,
+          "compressedDailySizeGB": 27.315,
+          "totalSizeGB": 191.205,
+          "totalSizeTB": 0.1867236328125,
+          "estimatedCost": 28.008544921875004
+        }
+      ],
+      "totalRetentionTB": 0.1867236328125,
+      "totalEstimatedCost": 28.008544921875004
+    },
+    "审计": {
+      "topics": [
+        {
+          "topic": "audit-log",
+          "dailySizeGB": 25.9,
+          "retentionDays": 365,
+          "compressionRatio": 0.18,
+          "costTag": "审计",
+          "originalLineNumber": 13,
+          "compressedDailySizeGB": 4.662,
+          "totalSizeGB": 1701.6299999999999,
+          "totalSizeTB": 1.6617480468749999,
+          "estimatedCost": 249.26220703124997
+        }
+      ],
+      "totalRetentionTB": 1.6617480468749999,
+      "totalEstimatedCost": 249.26220703124997
+    },
+    "运维": {
+      "topics": [
+        {
+          "topic": "backup-job-log",
+          "dailySizeGB": 180.4,
+          "retentionDays": 14,
+          "compressionRatio": 0.55,
+          "costTag": "运维",
+          "originalLineNumber": 14,
+          "compressedDailySizeGB": 99.22000000000001,
+          "totalSizeGB": 1389.0800000000002,
+          "totalSizeTB": 1.3565234375000002,
+          "estimatedCost": 203.47851562500003
+        }
+      ],
+      "totalRetentionTB": 1.3565234375000002,
+      "totalEstimatedCost": 203.47851562500003
+    },
+    "数据平台": {
+      "topics": [
+        {
+          "topic": "batch-processing",
+          "dailySizeGB": 90.6,
+          "retentionDays": 30,
+          "compressionRatio": 0.32,
+          "costTag": "数据平台",
+          "originalLineNumber": 15,
+          "compressedDailySizeGB": 28.991999999999997,
+          "totalSizeGB": 869.7599999999999,
+          "totalSizeTB": 0.8493749999999999,
+          "estimatedCost": 127.40624999999999
+        }
+      ],
+      "totalRetentionTB": 0.8493749999999999,
+      "totalEstimatedCost": 127.40624999999999
+    },
+    "搜索服务": {
+      "topics": [
+        {
+          "topic": "search-engine-query",
+          "dailySizeGB": 55.2,
+          "retentionDays": 45,
+          "compressionRatio": 0.27,
+          "costTag": "搜索服务",
+          "originalLineNumber": 16,
+          "compressedDailySizeGB": 14.904000000000002,
+          "totalSizeGB": 670.6800000000001,
+          "totalSizeTB": 0.6549609375000001,
+          "estimatedCost": 98.24414062500001
+        }
+      ],
+      "totalRetentionTB": 0.6549609375000001,
+      "totalEstimatedCost": 98.24414062500001
+    },
+    "CDN": {
+      "topics": [
+        {
+          "topic": "cdn-access",
+          "dailySizeGB": 300.1,
+          "retentionDays": 3,
+          "compressionRatio": 0.6,
+          "costTag": "CDN",
+          "originalLineNumber": 17,
+          "compressedDailySizeGB": 180.06,
+          "totalSizeGB": 540.1800000000001,
+          "totalSizeTB": 0.5275195312500001,
+          "estimatedCost": 79.12792968750001
+        }
+      ],
+      "totalRetentionTB": 0.5275195312500001,
+      "totalEstimatedCost": 79.12792968750001
+    },
+    "安全": {
+      "topics": [
+        {
+          "topic": "security-attack",
+          "dailySizeGB": 120.3,
+          "retentionDays": 90,
+          "compressionRatio": 0.2,
+          "costTag": "安全",
+          "originalLineNumber": 18,
+          "compressedDailySizeGB": 24.060000000000002,
+          "totalSizeGB": 2165.4,
+          "totalSizeTB": 2.1146484375,
+          "estimatedCost": 317.197265625
+        }
+      ],
+      "totalRetentionTB": 2.1146484375,
+      "totalEstimatedCost": 317.197265625
+    },
+    "通知服务": {
+      "topics": [
+        {
+          "topic": "email-notification",
+          "dailySizeGB": 20.8,
+          "retentionDays": 7,
+          "compressionRatio": 0.38,
+          "costTag": "通知服务",
+          "originalLineNumber": 19,
+          "compressedDailySizeGB": 7.904000000000001,
+          "totalSizeGB": 55.328,
+          "totalSizeTB": 0.05403125,
+          "estimatedCost": 8.1046875
+        }
+      ],
+      "totalRetentionTB": 0.05403125,
+      "totalEstimatedCost": 8.1046875
+    },
+    "存储服务": {
+      "topics": [
+        {
+          "topic": "file-upload-access",
+          "dailySizeGB": 75.5,
+          "retentionDays": 30,
+          "compressionRatio": 0.33,
+          "costTag": "存储服务",
+          "originalLineNumber": 20,
+          "compressedDailySizeGB": 24.915000000000003,
+          "totalSizeGB": 747.45,
+          "totalSizeTB": 0.729931640625,
+          "estimatedCost": 109.48974609375
+        }
+      ],
+      "totalRetentionTB": 0.729931640625,
+      "totalEstimatedCost": 109.48974609375
+    }
+  },
+  "topLargestTopics": [
+    {
+      "topic": "security-attack",
+      "dailySizeGB": 120.3,
+      "retentionDays": 90,
+      "compressionRatio": 0.2,
+      "costTag": "安全",
+      "originalLineNumber": 18,
+      "compressedDailySizeGB": 24.060000000000002,
+      "totalSizeGB": 2165.4,
+      "totalSizeTB": 2.1146484375,
+      "estimatedCost": 317.197265625
+    },
+    {
+      "topic": "audit-log",
+      "dailySizeGB": 25.9,
+      "retentionDays": 365,
+      "compressionRatio": 0.18,
+      "costTag": "审计",
+      "originalLineNumber": 13,
+      "compressedDailySizeGB": 4.662,
+      "totalSizeGB": 1701.6299999999999,
+      "totalSizeTB": 1.6617480468749999,
+      "estimatedCost": 249.26220703124997
+    },
+    {
+      "topic": "backup-job-log",
+      "dailySizeGB": 180.4,
+      "retentionDays": 14,
+      "compressionRatio": 0.55,
+      "costTag": "运维",
+      "originalLineNumber": 14,
+      "compressedDailySizeGB": 99.22000000000001,
+      "totalSizeGB": 1389.0800000000002,
+      "totalSizeTB": 1.3565234375000002,
+      "estimatedCost": 203.47851562500003
+    },
+    {
+      "topic": "batch-processing",
+      "dailySizeGB": 90.6,
+      "retentionDays": 30,
+      "compressionRatio": 0.32,
+      "costTag": "数据平台",
+      "originalLineNumber": 15,
+      "compressedDailySizeGB": 28.991999999999997,
+      "totalSizeGB": 869.7599999999999,
+      "totalSizeTB": 0.8493749999999999,
+      "estimatedCost": 127.40624999999999
+    },
+    {
+      "topic": "frontend-nginx-access",
+      "dailySizeGB": 95.8,
+      "retentionDays": 30,
+      "compressionRatio": 0.3,
+      "costTag": "前端",
+      "originalLineNumber": 9,
+      "compressedDailySizeGB": 28.74,
+      "totalSizeGB": 862.1999999999999,
+      "totalSizeTB": 0.8419921874999999,
+      "estimatedCost": 126.29882812499999
+    },
+    {
+      "topic": "database-slow-query",
+      "dailySizeGB": 80.3,
+      "retentionDays": 30,
+      "compressionRatio": 0.35,
+      "costTag": "数据库",
+      "originalLineNumber": 6,
+      "compressedDailySizeGB": 28.104999999999997,
+      "totalSizeGB": 843.1499999999999,
+      "totalSizeTB": 0.8233886718749999,
+      "estimatedCost": 123.50830078124999
+    },
+    {
+      "topic": "file-upload-access",
+      "dailySizeGB": 75.5,
+      "retentionDays": 30,
+      "compressionRatio": 0.33,
+      "costTag": "存储服务",
+      "originalLineNumber": 20,
+      "compressedDailySizeGB": 24.915000000000003,
+      "totalSizeGB": 747.45,
+      "totalSizeTB": 0.729931640625,
+      "estimatedCost": 109.48974609375
+    },
+    {
+      "topic": "order-service-debug",
+      "dailySizeGB": 120.8,
+      "retentionDays": 15,
+      "compressionRatio": 0.4,
+      "costTag": "核心业务",
+      "originalLineNumber": 4,
+      "compressedDailySizeGB": 48.32,
+      "totalSizeGB": 724.8,
+      "totalSizeTB": 0.7078125,
+      "estimatedCost": 106.171875
+    },
+    {
+      "topic": "kafka-message-trace",
+      "dailySizeGB": 200.5,
+      "retentionDays": 7,
+      "compressionRatio": 0.5,
+      "costTag": "消息队列",
+      "originalLineNumber": 7,
+      "compressedDailySizeGB": 100.25,
+      "totalSizeGB": 701.75,
+      "totalSizeTB": 0.685302734375,
+      "estimatedCost": 102.79541015625
+    },
+    {
+      "topic": "search-engine-query",
+      "dailySizeGB": 55.2,
+      "retentionDays": 45,
+      "compressionRatio": 0.27,
+      "costTag": "搜索服务",
+      "originalLineNumber": 16,
+      "compressedDailySizeGB": 14.904000000000002,
+      "totalSizeGB": 670.6800000000001,
+      "totalSizeTB": 0.6549609375000001,
+      "estimatedCost": 98.24414062500001
+    }
+  ],
+  "generatedAt": "2026-05-17T16:42:27.260Z",
+  "parameters": {
+    "inputFile": "sample_logs.csv",
+    "costPerTBMonth": 150
+  }
+}
