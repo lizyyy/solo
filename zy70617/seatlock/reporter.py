@@ -10,21 +10,27 @@ from .rules import SeatLockRuleEngine
 
 
 class ReportGenerator:
-    def __init__(self, engine: SeatLockRuleEngine):
+    def __init__(self, engine: SeatLockRuleEngine, run_id: str = None, check_time: datetime = None):
         self.engine = engine
         self.stats = engine.get_lock_statistics()
+        self.run_id = run_id or "unknown"
+        self.check_time = check_time or datetime.now()
+        self.report_id = self.run_id
     
     def _get_severity_order(self, severity: str) -> int:
         order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
         return order.get(severity, 99)
     
+    def _sort_issues(self, issues: List[Issue]) -> List[Issue]:
+        return sorted(issues, key=lambda x: (self._get_severity_order(x.severity), x.issue_id))
+    
     def generate_text_report(self, show_details: bool = True) -> str:
         output = StringIO()
-        now = datetime.now()
         
         output.write("=" * 80 + "\n")
         output.write(f"团体锁座换座超时释放排查报告\n")
-        output.write(f"生成时间: {now.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        output.write(f"运行ID: {self.run_id}\n")
+        output.write(f"生成时间: {self.check_time.strftime('%Y-%m-%d %H:%M:%S')}\n")
         output.write("=" * 80 + "\n\n")
         
         output.write("【统计概览】\n")
@@ -47,7 +53,8 @@ class ReportGenerator:
                 output.write(f"    - {severity}: {count}\n")
         
         output.write(f"\n  按问题类型:\n")
-        for issue_type, count in self.stats['issues_by_type'].items():
+        for issue_type in sorted(self.stats['issues_by_type'].keys()):
+            count = self.stats['issues_by_type'][issue_type]
             output.write(f"    - {issue_type}: {count}\n")
         output.write("\n")
         
@@ -56,16 +63,18 @@ class ReportGenerator:
             output.write("【问题详情】\n")
             output.write("=" * 80 + "\n\n")
             
-            sorted_issues = sorted(self.engine.issues, key=lambda x: self._get_severity_order(x.severity))
+            sorted_issues = self._sort_issues(self.engine.issues)
             
             for i, issue in enumerate(sorted_issues, 1):
                 output.write(f"#{i} [{issue.severity}] {issue.issue_type.value}\n")
+                output.write(f"    问题ID: {issue.issue_id}\n")
                 output.write(f"    演出ID: {issue.show_id}\n")
                 output.write(f"    描述: {issue.description}\n")
                 if issue.related_ids:
-                    for key, ids in issue.related_ids.items():
+                    for key in sorted(issue.related_ids.keys()):
+                        ids = issue.related_ids[key]
                         if ids:
-                            output.write(f"    关联{key}: {', '.join(ids)}\n")
+                            output.write(f"    关联{key}: {', '.join(sorted(ids))}\n")
                 output.write(f"    发现时间: {issue.discovered_at.strftime('%Y-%m-%d %H:%M:%S')}\n")
                 if issue.source_trace:
                     output.write(f"    来源: {issue.source_trace.source_file}:{issue.source_trace.line_number}\n")
@@ -74,7 +83,7 @@ class ReportGenerator:
             output.write("=" * 80 + "\n")
             output.write("【超时锁座明细】\n")
             output.write("=" * 80 + "\n\n")
-            expired = self.engine.get_expired_locks_detail()
+            expired = sorted(self.engine.get_expired_locks_detail(), key=lambda x: x['lock_id'])
             if expired:
                 for i, detail in enumerate(expired, 1):
                     output.write(f"#{i} 锁ID: {detail['lock_id']}\n")
@@ -90,13 +99,13 @@ class ReportGenerator:
             output.write("=" * 80 + "\n")
             output.write("【座位冲突明细】\n")
             output.write("=" * 80 + "\n\n")
-            conflicts = self.engine.get_conflict_seats_detail()
+            conflicts = sorted(self.engine.get_conflict_seats_detail(), key=lambda x: x['seat_id'])
             if conflicts:
                 for i, detail in enumerate(conflicts, 1):
                     output.write(f"#{i} 座位ID: {detail['seat_id']}\n")
                     output.write(f"    活跃锁数量: {detail['active_lock_count']}\n")
-                    output.write(f"    涉及锁ID: {', '.join(detail['lock_ids'])}\n")
-                    output.write(f"    涉及订单: {', '.join(detail['order_ids'])}\n")
+                    output.write(f"    涉及锁ID: {', '.join(sorted(detail['lock_ids']))}\n")
+                    output.write(f"    涉及订单: {', '.join(sorted(detail['order_ids']))}\n")
                     output.write("\n")
             else:
                 output.write("无座位冲突\n\n")
@@ -104,31 +113,37 @@ class ReportGenerator:
         return output.getvalue()
     
     def generate_json_report(self) -> str:
+        sorted_issues = self._sort_issues(self.engine.issues)
+        expired_detail = sorted(self.engine.get_expired_locks_detail(), key=lambda x: x['lock_id'])
+        conflict_detail = sorted(self.engine.get_conflict_seats_detail(), key=lambda x: x['seat_id'])
+        
         report = {
             "report_metadata": {
-                "generated_at": datetime.now().isoformat(),
+                "run_id": self.run_id,
+                "report_id": self.report_id,
+                "generated_at": self.check_time.isoformat(),
                 "version": "1.0.0"
             },
             "statistics": self.stats,
-            "issues": [issue.to_dict() for issue in self.engine.issues],
-            "expired_locks_detail": self.engine.get_expired_locks_detail(),
-            "conflict_seats_detail": self.engine.get_conflict_seats_detail()
+            "issues": [issue.to_dict() for issue in sorted_issues],
+            "expired_locks_detail": expired_detail,
+            "conflict_seats_detail": conflict_detail
         }
-        return json.dumps(report, ensure_ascii=False, indent=2)
+        return json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True)
     
     def generate_csv_report(self, output_dir: str) -> Dict[str, str]:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         files_generated = {}
         
-        issues_file = output_path / f"seatlock_issues_{timestamp}.csv"
+        sorted_issues = self._sort_issues(self.engine.issues)
+        issues_file = output_path / f"seatlock_issues_{self.run_id}.csv"
         with open(issues_file, 'w', encoding='utf-8-sig', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(["序号", "问题ID", "问题类型", "演出ID", "严重程度", "描述", "关联ID", "发现时间", "来源文件", "行号"])
-            for i, issue in enumerate(self.engine.issues, 1):
-                related_str = json.dumps(issue.related_ids, ensure_ascii=False) if issue.related_ids else ""
+            for i, issue in enumerate(sorted_issues, 1):
+                related_str = json.dumps(issue.related_ids, ensure_ascii=False, sort_keys=True) if issue.related_ids else ""
                 source_file = issue.source_trace.source_file if issue.source_trace else ""
                 line_number = issue.source_trace.line_number if issue.source_trace else ""
                 writer.writerow([
@@ -138,29 +153,31 @@ class ReportGenerator:
                 ])
         files_generated["issues"] = str(issues_file)
         
-        expired_file = output_path / f"expired_locks_{timestamp}.csv"
+        expired = sorted(self.engine.get_expired_locks_detail(), key=lambda x: x['lock_id'])
+        expired_file = output_path / f"expired_locks_{self.run_id}.csv"
         with open(expired_file, 'w', encoding='utf-8-sig', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(["序号", "锁ID", "座位ID", "订单ID", "超时时长(分钟)", "锁创建时间", "超时时间"])
-            for i, detail in enumerate(self.engine.get_expired_locks_detail(), 1):
+            for i, detail in enumerate(expired, 1):
                 writer.writerow([
                     i, detail["lock_id"], detail["seat_id"], detail["order_id"],
                     detail["timeout_minutes"], detail["locked_at"], detail["lock_timeout"]
                 ])
         files_generated["expired_locks"] = str(expired_file)
         
-        conflicts_file = output_path / f"conflict_seats_{timestamp}.csv"
+        conflicts = sorted(self.engine.get_conflict_seats_detail(), key=lambda x: x['seat_id'])
+        conflicts_file = output_path / f"conflict_seats_{self.run_id}.csv"
         with open(conflicts_file, 'w', encoding='utf-8-sig', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(["序号", "座位ID", "活跃锁数量", "涉及锁ID", "涉及订单ID"])
-            for i, detail in enumerate(self.engine.get_conflict_seats_detail(), 1):
+            for i, detail in enumerate(conflicts, 1):
                 writer.writerow([
                     i, detail["seat_id"], detail["active_lock_count"],
-                    ", ".join(detail["lock_ids"]), ", ".join(detail["order_ids"])
+                    ", ".join(sorted(detail["lock_ids"])), ", ".join(sorted(detail["order_ids"]))
                 ])
         files_generated["conflict_seats"] = str(conflicts_file)
         
-        stats_file = output_path / f"statistics_{timestamp}.csv"
+        stats_file = output_path / f"statistics_{self.run_id}.csv"
         with open(stats_file, 'w', encoding='utf-8-sig', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(["统计项", "数值"])

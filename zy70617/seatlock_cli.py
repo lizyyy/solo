@@ -60,9 +60,13 @@ def cmd_check(args):
             print(f"⏭️  发现幂等运行记录 (RunID: {existing_run.run_id})")
             print(f"   执行时间: {existing_run.started_at.strftime('%Y-%m-%d %H:%M:%S')}")
             print(f"   处理记录: {existing_run.records_processed}, 跳过: {existing_run.records_skipped}, 发现问题: {existing_run.issues_found}")
+            print(f"   使用 --force 强制重新运行")
             print()
+            sys.exit(0)
     
-    state_mgr.start_new_run(input_files)
+    run_state = state_mgr.start_new_run(input_files)
+    run_id = run_state.run_id
+    check_time = run_state.started_at
     
     print(f"[{datetime.now().strftime('%H:%M:%S')}] 正在解析数据文件...")
     parser = DataParser()
@@ -122,7 +126,7 @@ def cmd_check(args):
     for change in parser.changes:
         engine.add_change(change)
     
-    issues = engine.run_all_checks()
+    issues = engine.run_all_checks(check_time=check_time)
     state_mgr.update_progress(issues_found=len(issues))
     
     print(f"   ✓ 超时未释放检查: 发现 {len([i for i in issues if i.issue_type.value == 'TIMEOUT_UNRELEASED'])} 个")
@@ -132,7 +136,7 @@ def cmd_check(args):
     print(f"   ✓ 团体票数量不匹配检查: 发现 {len([i for i in issues if i.issue_type.value == 'GROUP_MISMATCH'])} 个")
     print()
     
-    reporter = ReportGenerator(engine)
+    reporter = ReportGenerator(engine, run_id=run_id, check_time=check_time)
     
     output_formats = args.format.split(",") if args.format else ["text"]
     
@@ -152,7 +156,7 @@ def cmd_check(args):
         print(reporter.generate_text_report())
     
     state_mgr.complete_run(success=True)
-    print(f"\n✅ 检查完成! RunID: {state_mgr.current_run.run_id}")
+    print(f"\n✅ 检查完成! RunID: {run_id}")
 
 
 def cmd_history(args):

@@ -48,46 +48,67 @@ class SeatLockRuleEngine:
     
     def _create_issue(self, issue_type: IssueType, show_id: str, severity: str,
                       description: str, related_ids: Dict[str, List[str]] = None,
-                      source_trace: SourceTrace = None) -> Issue:
+                      source_trace: SourceTrace = None, base_time: datetime = None,
+                      stable_id: str = None) -> Issue:
+        import hashlib
+        
+        if stable_id:
+            issue_id = stable_id
+        else:
+            hash_input = f"{issue_type.value}:{show_id}:{severity}"
+            if related_ids:
+                for key, values in sorted(related_ids.items()):
+                    hash_input += f":{key}:{','.join(sorted(values))}"
+            if source_trace:
+                hash_input += f":{source_trace.source_file}:{source_trace.line_number}"
+            
+            issue_id = hashlib.md5(hash_input.encode()).hexdigest()[:12]
+        
         issue = Issue(
-            issue_id=str(uuid.uuid4()),
+            issue_id=issue_id,
             issue_type=issue_type,
             show_id=show_id,
             severity=severity,
             description=description,
             related_ids=related_ids or {},
-            discovered_at=datetime.now(),
+            discovered_at=base_time or datetime.now(),
             source_trace=source_trace
         )
         self.issues.append(issue)
         return issue
     
-    def check_timeout_unreleased(self) -> List[Issue]:
+    def check_timeout_unreleased(self, check_time: datetime = None) -> List[Issue]:
         issues = []
-        now = datetime.now()
+        now = check_time or datetime.now()
         
-        for lock in self.locks.values():
+        for lock in sorted(self.locks.values(), key=lambda l: l.lock_id):
             if lock.status == LockStatus.ACTIVE and now > lock.lock_timeout:
+                timeout_minutes = int((now - lock.lock_timeout).total_seconds() / 60)
+                import hashlib
+                stable_id = hashlib.md5(f"TIMEOUT:{lock.lock_id}:{lock.lock_timeout.isoformat()}".encode()).hexdigest()[:12]
                 issue = self._create_issue(
                     issue_type=IssueType.TIMEOUT_UNRELEASED,
                     show_id=lock.show_id,
                     severity="CRITICAL",
-                    description=f"锁座超时未释放: 座位{lock.seat_id}已超时{(now - lock.lock_timeout).total_seconds() / 60:.1f}分钟",
+                    description=f"锁座超时未释放: 座位{lock.seat_id}已超时{timeout_minutes}分钟",
                     related_ids={
                         "lock_ids": [lock.lock_id],
                         "seat_ids": [lock.seat_id],
                         "order_ids": [lock.order_id]
                     },
-                    source_trace=lock.source_trace
+                    source_trace=lock.source_trace,
+                    base_time=now,
+                    stable_id=stable_id
                 )
                 issues.append(issue)
         return issues
     
-    def check_seat_conflicts(self) -> List[Issue]:
+    def check_seat_conflicts(self, base_time: datetime = None) -> List[Issue]:
         issues = []
         
-        for seat_id, locks in self._seat_locks_by_seat.items():
-            active_locks = [l for l in locks if l.status == LockStatus.ACTIVE]
+        for seat_id in sorted(self._seat_locks_by_seat.keys()):
+            locks = self._seat_locks_by_seat[seat_id]
+            active_locks = sorted([l for l in locks if l.status == LockStatus.ACTIVE], key=lambda l: l.lock_id)
             if len(active_locks) > 1:
                 seat = self.seats.get(seat_id)
                 show_id = seat.show_id if seat else "UNKNOWN"
@@ -98,25 +119,27 @@ class SeatLockRuleEngine:
                     severity="HIGH",
                     description=f"座位冲突: 座位{seat_id}被{len(active_locks)}个订单同时锁定",
                     related_ids={
-                        "lock_ids": [l.lock_id for l in active_locks],
+                        "lock_ids": sorted([l.lock_id for l in active_locks]),
                         "seat_ids": [seat_id],
-                        "order_ids": [l.order_id for l in active_locks]
+                        "order_ids": sorted([l.order_id for l in active_locks])
                     },
-                    source_trace=active_locks[0].source_trace
+                    source_trace=active_locks[0].source_trace,
+                    base_time=base_time
                 )
                 issues.append(issue)
         return issues
     
-    def check_overlapping_windows(self) -> List[Issue]:
+    def check_overlapping_windows(self, base_time: datetime = None) -> List[Issue]:
         issues = []
         
         windows_by_show_seat = defaultdict(list)
-        for window in self.windows.values():
-            for seat_id in window.seat_ids:
+        for window in sorted(self.windows.values(), key=lambda w: w.window_id):
+            for seat_id in sorted(window.seat_ids):
                 key = f"{window.show_id}_{seat_id}"
                 windows_by_show_seat[key].append(window)
         
-        for key, windows in windows_by_show_seat.items():
+        for key in sorted(windows_by_show_seat.keys()):
+            windows = windows_by_show_seat[key]
             if len(windows) < 2:
                 continue
             
@@ -124,25 +147,27 @@ class SeatLockRuleEngine:
             for i in range(len(windows_sorted) - 1):
                 w1, w2 = windows_sorted[i], windows_sorted[i + 1]
                 if w1.hold_end > w2.hold_start:
-                    overlap_minutes = (w1.hold_end - w2.hold_start).total_seconds() / 60
+                    overlap_minutes = int((w1.hold_end - w2.hold_start).total_seconds() / 60)
+                    seat_ids_str = ",".join(sorted(set(w1.seat_ids) & set(w2.seat_ids)))
                     issue = self._create_issue(
                         issue_type=IssueType.OVERLAPPING_WINDOW,
                         show_id=w1.show_id,
                         severity="MEDIUM",
-                        description=f"保留窗口重叠: 座位{w1.seat_ids}重叠{overlap_minutes:.1f}分钟",
+                        description=f"保留窗口重叠: 座位{seat_ids_str}重叠{overlap_minutes}分钟",
                         related_ids={
-                            "window_ids": [w1.window_id, w2.window_id],
-                            "order_ids": [w1.order_id, w2.order_id]
+                            "window_ids": sorted([w1.window_id, w2.window_id]),
+                            "order_ids": sorted([w1.order_id, w2.order_id])
                         },
-                        source_trace=w1.source_trace
+                        source_trace=w1.source_trace,
+                        base_time=base_time
                     )
                     issues.append(issue)
         return issues
     
-    def check_invalid_change_requests(self) -> List[Issue]:
+    def check_invalid_change_requests(self, base_time: datetime = None) -> List[Issue]:
         issues = []
         
-        for change in self.changes.values():
+        for change in sorted(self.changes.values(), key=lambda c: c.change_id):
             if change.status not in [ChangeStatus.PENDING, ChangeStatus.APPROVED]:
                 continue
             
@@ -151,13 +176,13 @@ class SeatLockRuleEngine:
             if not change.seat_count_match:
                 reasons.append(f"换座数量不匹配: 原{len(change.from_seat_ids)}个座位，新{len(change.to_seat_ids)}个座位")
             
-            for seat_id in change.from_seat_ids:
+            for seat_id in sorted(change.from_seat_ids):
                 locks = self._seat_locks_by_seat.get(seat_id, [])
                 order_locks = [l for l in locks if l.order_id == change.order_id and l.status == LockStatus.ACTIVE]
                 if not order_locks:
                     reasons.append(f"原座位{seat_id}无有效锁")
             
-            for seat_id in change.to_seat_ids:
+            for seat_id in sorted(change.to_seat_ids):
                 seat = self.seats.get(seat_id)
                 if not seat:
                     reasons.append(f"目标座位{seat_id}不存在")
@@ -174,26 +199,28 @@ class SeatLockRuleEngine:
                     issue_type=IssueType.INVALID_CHANGE,
                     show_id=change.show_id,
                     severity="HIGH",
-                    description=f"无效换座申请{change.change_id}: " + "; ".join(reasons),
+                    description=f"无效换座申请{change.change_id}: " + "; ".join(sorted(reasons)),
                     related_ids={
                         "change_ids": [change.change_id],
                         "order_ids": [change.order_id],
-                        "seat_ids": change.from_seat_ids + change.to_seat_ids
+                        "seat_ids": sorted(change.from_seat_ids + change.to_seat_ids)
                     },
-                    source_trace=change.source_trace
+                    source_trace=change.source_trace,
+                    base_time=base_time
                 )
                 issues.append(issue)
         return issues
     
-    def check_group_mismatch(self) -> List[Issue]:
+    def check_group_mismatch(self, base_time: datetime = None) -> List[Issue]:
         issues = []
         
-        for order_id, locks in self._locks_by_order.items():
+        for order_id in sorted(self._locks_by_order.keys()):
+            locks = self._locks_by_order[order_id]
             order = self.orders.get(order_id)
             if not order:
                 continue
             
-            active_locks = [l for l in locks if l.status == LockStatus.ACTIVE]
+            active_locks = sorted([l for l in locks if l.status == LockStatus.ACTIVE], key=lambda l: l.lock_id)
             if len(active_locks) != order.total_tickets:
                 issue = self._create_issue(
                     issue_type=IssueType.GROUP_MISMATCH,
@@ -204,20 +231,20 @@ class SeatLockRuleEngine:
                         "order_ids": [order_id],
                         "lock_ids": [l.lock_id for l in active_locks]
                     },
-                    source_trace=order.source_trace
+                    source_trace=order.source_trace,
+                    base_time=base_time
                 )
                 issues.append(issue)
         return issues
     
-    def run_all_checks(self) -> List[Issue]:
+    def run_all_checks(self, check_time: datetime = None) -> List[Issue]:
+        base_time = check_time or datetime.now()
         self.issues = []
-        
-        self.check_timeout_unreleased()
-        self.check_seat_conflicts()
-        self.check_overlapping_windows()
-        self.check_invalid_change_requests()
-        self.check_group_mismatch()
-        
+        self.check_timeout_unreleased(base_time)
+        self.check_seat_conflicts(base_time)
+        self.check_overlapping_windows(base_time)
+        self.check_invalid_change_requests(base_time)
+        self.check_group_mismatch(base_time)
         return self.issues
     
     def get_lock_statistics(self) -> Dict[str, any]:

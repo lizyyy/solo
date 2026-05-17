@@ -1,7 +1,8 @@
 {
-  "run_id": "1ce83654",
-  "started_at": "2026-05-17T19:53:23.036735",
-  "completed_at": "2026-05-17T19:53:23.040206",
+  "run_id": "3ab8acb7",
+  "input_hash": "3ab8acb7ea7952d8caec511e85c41ff6",
+  "started_at": "2026-05-17T20:32:48.785392",
+  "completed_at": "2026-05-17T20:32:48.788299",
   "status": "COMPLETED",
   "input_files": [
     "sample_data/changes.csv",
@@ -13,6 +14,6 @@
   ],
   "records_processed": 56,
   "records_skipped": 0,
-  "issues_found": 28,
+  "issues_found": 32,
   "error_message": null
 }
