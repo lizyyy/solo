@@ -1,0 +1,19 @@
+{
+  "name": "git-history-large-files",
+  "version": "1.0.0",
+  "description": "Git历史大文件分析CLI工具",
+  "main": "src/cli.js",
+  "bin": {
+    "git-large-files": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node src/self-test.js",
+    "lint": "node --check src/**/*.js"
+  },
+  "keywords": ["git", "history", "large-files", "analysis", "cli"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
