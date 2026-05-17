@@ -36,7 +36,7 @@ class MySqlEngine extends database_1.DatabaseEngine {
             return { rows: [], affectedRows: 0 };
         }
         try {
-            const [result] = await this.connection.execute(sql);
+            const [result] = await this.connection.query(sql);
             if (Array.isArray(result)) {
                 return { rows: result, affectedRows: result.length };
             }

@@ -188,3 +188,9 @@ node test-config.js
 - ✅ 新增CLI参数：--run-id 指定运行ID
 - ✅ 修复FATAL ERROR清理逻辑：根据配置决定是否清理
 - ✅ 报告可信：rollbackSuccess:false = success:false = 失败退出码
+
+### 第四轮 ✓
+- ✅ 修复多语句SQL执行：使用query()替代execute()
+- ✅ 支持ALTER TABLE + UPDATE组合迁移脚本
+- ✅ 支持多语句迁移脚本可靠执行
+- ✅ mysql2 prepared statement路径问题已解决
