@@ -188,8 +188,8 @@ class SQLiteBackupChecker:
         if wal_info:
             wal_valid, wal_err = self._check_wal_file()
             if not wal_valid:
-                warnings.append({
-                    "type": "wal_issue",
+                errors.append({
+                    "type": "wal_error",
                     "message": wal_err,
                     "location": str(self.wal_path)
                 })
@@ -236,7 +236,11 @@ class SQLiteBackupChecker:
                 "location": str(self.db_path)
             })
         except Exception as e:
-            pass
+            errors.append({
+                "type": "recovery_check_error",
+                "message": f"恢复预检失败: {str(e)}",
+                "location": str(self.db_path)
+            })
 
         is_valid = len(errors) == 0 and all(p.checksum_valid for p in pages)
         

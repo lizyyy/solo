@@ -1,0 +1,41 @@
+errors:
+- location: examples/with_wal.db-wal
+  message: '无效的WAL头: 期望 b''7\x7f\x06\x82'', 实际 b'''''
+  type: wal_error
+files:
+  database:
+    exists: true
+    modified_at: '2026-05-17T13:54:34.929859'
+    path: examples/with_wal.db
+    sha256: 3a2a15c198c0c456bcaaa01ea62c3c90ba3e19e0000545fd58c2f8ee49ec6608
+    size_bytes: 8192
+    size_human: 8.00 KB
+  wal:
+    exists: true
+    modified_at: '2026-05-17T13:54:34.930483'
+    path: examples/with_wal.db-wal
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    size_bytes: 0
+    size_human: 0.00 B
+metadata:
+  check_type: sqlite_backup_consistency
+  generated_at: '2026-05-17T14:08:01.098876'
+  version: 1.0.0
+pages:
+- checksum_valid: true
+  error: null
+  offset: 0
+  page_number: 1
+  size: 4096
+- checksum_valid: true
+  error: null
+  offset: 4096
+  page_number: 2
+  size: 4096
+summary:
+  error_count: 1
+  is_valid: false
+  page_count: 2
+  valid_pages: 2
+  warning_count: 0
+warnings: []
