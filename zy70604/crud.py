@@ -31,6 +31,14 @@ def log_operation(db: Session, operation_type: str, target_type: str = None,
     return log
 
 
+def log_and_raise(db: Session, operation_type: str, error_msg: str,
+                  target_type: str = None, target_id: int = None,
+                  original_input: dict = None, handler: str = None):
+    log_operation(db, operation_type, target_type, target_id,
+                  original_input, handler, "failed", error_msg, False)
+    raise ValueError(error_msg)
+
+
 def create_coach(db: Session, coach: schemas.CoachCreate):
     db_coach = models.Coach(**coach.dict())
     db.add(db_coach)
@@ -119,21 +127,27 @@ def can_cancel_booking(booking: models.Booking):
 def create_booking(db: Session, booking: schemas.BookingCreate):
     member_card = get_member_card(db, booking.member_card_id)
     if not member_card:
-        raise ValueError("会员卡不存在")
+        log_and_raise(db, "create_booking", "会员卡不存在",
+                      "booking", None, booking.dict(), booking.created_by)
     
     course_package = get_course_package(db, booking.course_package_id)
     if not course_package:
-        raise ValueError("课程包不存在")
+        log_and_raise(db, "create_booking", "课程包不存在",
+                      "booking", None, booking.dict(), booking.created_by)
     
     if course_package.member_card_id != booking.member_card_id:
-        raise ValueError("课程包不属于该会员")
+        log_and_raise(db, "create_booking", "课程包不属于该会员",
+                      "booking", None, booking.dict(), booking.created_by)
     
-    if course_package.remaining_hours < booking.hours:
-        raise ValueError("课程包剩余课时不足")
+    available_hours = course_package.remaining_hours - course_package.frozen_hours
+    if available_hours < booking.hours:
+        log_and_raise(db, "create_booking", "课程包可用课时不足（已扣除冻结课时）",
+                      "booking", None, booking.dict(), booking.created_by)
     
     if check_time_conflict(db, booking.main_coach_id, booking.booking_date,
                           booking.start_time, booking.end_time):
-        raise ValueError("该教练此时间段已有预约")
+        log_and_raise(db, "create_booking", "该教练此时间段已有预约",
+                      "booking", None, booking.dict(), booking.created_by)
     
     db_booking = models.Booking(
         **booking.dict(),
@@ -168,10 +182,12 @@ def get_bookings(db: Session, member_card_id: int = None, coach_id: int = None,
 def confirm_booking(db: Session, booking_id: int, handler: str):
     booking = get_booking(db, booking_id)
     if not booking:
-        raise ValueError("预约不存在")
+        log_and_raise(db, "confirm_booking", "预约不存在",
+                      "booking", booking_id, {"booking_id": booking_id}, handler)
     
     if booking.status != models.BookingStatus.PENDING:
-        raise ValueError("当前状态不能确认")
+        log_and_raise(db, "confirm_booking", "当前状态不能确认",
+                      "booking", booking_id, {"booking_id": booking_id}, handler)
     
     booking.status = models.BookingStatus.CONFIRMED
     db.commit()
@@ -186,10 +202,12 @@ def confirm_booking(db: Session, booking_id: int, handler: str):
 def consume_booking(db: Session, booking_id: int, consumed_by: str, notes: str = None):
     booking = get_booking(db, booking_id)
     if not booking:
-        raise ValueError("预约不存在")
+        log_and_raise(db, "consume_booking", "预约不存在",
+                      "booking", booking_id, {"booking_id": booking_id}, consumed_by)
     
     if booking.status not in [models.BookingStatus.CONFIRMED, models.BookingStatus.SUBSTITUTE_CONFIRMED]:
-        raise ValueError("当前状态不能消课")
+        log_and_raise(db, "consume_booking", "当前状态不能消课",
+                      "booking", booking_id, {"booking_id": booking_id}, consumed_by)
     
     existing_consumption = db.query(models.ConsumptionRecord).filter(
         models.ConsumptionRecord.booking_id == booking_id,
@@ -197,13 +215,15 @@ def consume_booking(db: Session, booking_id: int, consumed_by: str, notes: str =
     ).first()
     
     if existing_consumption:
-        raise ValueError("该预约已消课，不可重复消课")
+        log_and_raise(db, "consume_booking", "该预约已消课，不可重复消课",
+                      "booking", booking_id, {"booking_id": booking_id}, consumed_by)
     
     course_package = booking.course_package
     member_card = booking.member_card
     
     if course_package.remaining_hours < booking.hours:
-        raise ValueError("课程包剩余课时不足")
+        log_and_raise(db, "consume_booking", "课程包剩余课时不足",
+                      "booking", booking_id, {"booking_id": booking_id}, consumed_by)
     
     coach_id = booking.main_coach_id
     substitute = db.query(models.SubstituteRecord).filter(
@@ -247,13 +267,16 @@ def consume_booking(db: Session, booking_id: int, consumed_by: str, notes: str =
 def cancel_booking(db: Session, booking_id: int, handler: str, reason: str = None):
     booking = get_booking(db, booking_id)
     if not booking:
-        raise ValueError("预约不存在")
+        log_and_raise(db, "cancel_booking", "预约不存在",
+                      "booking", booking_id, {"booking_id": booking_id}, handler)
     
     if booking.status in [models.BookingStatus.CONSUMED, models.BookingStatus.CANCELLED]:
-        raise ValueError("当前状态不能取消")
+        log_and_raise(db, "cancel_booking", "当前状态不能取消",
+                      "booking", booking_id, {"booking_id": booking_id}, handler)
     
     if not can_cancel_booking(booking):
-        raise ValueError("距离上课不足24小时，不能取消")
+        log_and_raise(db, "cancel_booking", "距离上课不足24小时，不能取消",
+                      "booking", booking_id, {"booking_id": booking_id}, handler)
     
     booking.status = models.BookingStatus.CANCELLED
     db.commit()
@@ -269,11 +292,13 @@ def cancel_booking(db: Session, booking_id: int, handler: str, reason: str = Non
 def apply_leave(db: Session, leave: schemas.LeaveApplicationCreate, handler: str):
     booking = get_booking(db, leave.booking_id)
     if not booking:
-        raise ValueError("预约不存在")
+        log_and_raise(db, "apply_leave", "预约不存在",
+                      "leave", None, leave.dict(), handler)
     
     if booking.status in [models.BookingStatus.CONSUMED, models.BookingStatus.CANCELLED,
                            models.BookingStatus.LEAVE_APPLIED, models.BookingStatus.LEAVE_APPROVED]:
-        raise ValueError("当前状态不能申请请假")
+        log_and_raise(db, "apply_leave", "当前状态不能申请请假",
+                      "leave", None, leave.dict(), handler)
     
     db_leave = models.LeaveApplication(**leave.dict())
     db.add(db_leave)
@@ -296,10 +321,12 @@ def get_leave_application(db: Session, leave_id: int):
 def approve_leave(db: Session, leave_id: int, handler: str):
     leave = get_leave_application(db, leave_id)
     if not leave:
-        raise ValueError("请假申请不存在")
+        log_and_raise(db, "approve_leave", "请假申请不存在",
+                      "leave", leave_id, {"leave_id": leave_id}, handler)
     
     if leave.status != models.LeaveStatus.PENDING:
-        raise ValueError("当前状态不能审批")
+        log_and_raise(db, "approve_leave", "当前状态不能审批",
+                      "leave", leave_id, {"leave_id": leave_id}, handler)
     
     leave.status = models.LeaveStatus.APPROVED
     leave.approved_at = datetime.now()
@@ -327,10 +354,12 @@ def approve_leave(db: Session, leave_id: int, handler: str):
 def reject_leave(db: Session, leave_id: int, handler: str, rejection_reason: str):
     leave = get_leave_application(db, leave_id)
     if not leave:
-        raise ValueError("请假申请不存在")
+        log_and_raise(db, "reject_leave", "请假申请不存在",
+                      "leave", leave_id, {"leave_id": leave_id}, handler)
     
     if leave.status != models.LeaveStatus.PENDING:
-        raise ValueError("当前状态不能审批")
+        log_and_raise(db, "reject_leave", "当前状态不能审批",
+                      "leave", leave_id, {"leave_id": leave_id}, handler)
     
     leave.status = models.LeaveStatus.REJECTED
     leave.approved_by = handler
@@ -352,21 +381,26 @@ def reject_leave(db: Session, leave_id: int, handler: str, rejection_reason: str
 def request_substitute(db: Session, substitute: schemas.SubstituteRecordCreate, handler: str):
     booking = get_booking(db, substitute.booking_id)
     if not booking:
-        raise ValueError("预约不存在")
+        log_and_raise(db, "request_substitute", "预约不存在",
+                      "substitute", None, substitute.dict(), handler)
     
     if booking.status in [models.BookingStatus.CONSUMED, models.BookingStatus.CANCELLED]:
-        raise ValueError("当前状态不能申请代课")
+        log_and_raise(db, "request_substitute", "当前状态不能申请代课",
+                      "substitute", None, substitute.dict(), handler)
     
     substitute_coach = get_coach(db, substitute.substitute_coach_id)
     if not substitute_coach:
-        raise ValueError("代课教练不存在")
+        log_and_raise(db, "request_substitute", "代课教练不存在",
+                      "substitute", None, substitute.dict(), handler)
     
     if substitute.substitute_coach_id == booking.main_coach_id:
-        raise ValueError("代课教练不能与原教练相同")
+        log_and_raise(db, "request_substitute", "代课教练不能与原教练相同",
+                      "substitute", None, substitute.dict(), handler)
     
     if check_time_conflict(db, substitute.substitute_coach_id, booking.booking_date,
                           booking.start_time, booking.end_time):
-        raise ValueError("代课教练此时间段已有预约")
+        log_and_raise(db, "request_substitute", "代课教练此时间段已有预约",
+                      "substitute", None, substitute.dict(), handler)
     
     db_substitute = models.SubstituteRecord(
         **substitute.dict(),
@@ -393,10 +427,12 @@ def get_substitute_record(db: Session, substitute_id: int):
 def confirm_substitute(db: Session, substitute_id: int, handler: str):
     substitute = get_substitute_record(db, substitute_id)
     if not substitute:
-        raise ValueError("代课记录不存在")
+        log_and_raise(db, "confirm_substitute", "代课记录不存在",
+                      "substitute", substitute_id, {"substitute_id": substitute_id}, handler)
     
     if substitute.status != models.SubstituteStatus.PENDING:
-        raise ValueError("当前状态不能确认")
+        log_and_raise(db, "confirm_substitute", "当前状态不能确认",
+                      "substitute", substitute_id, {"substitute_id": substitute_id}, handler)
     
     substitute.status = models.SubstituteStatus.CONFIRMED
     substitute.confirmed_at = datetime.now()
@@ -417,10 +453,12 @@ def confirm_substitute(db: Session, substitute_id: int, handler: str):
 def reject_substitute(db: Session, substitute_id: int, handler: str, rejection_reason: str):
     substitute = get_substitute_record(db, substitute_id)
     if not substitute:
-        raise ValueError("代课记录不存在")
+        log_and_raise(db, "reject_substitute", "代课记录不存在",
+                      "substitute", substitute_id, {"substitute_id": substitute_id}, handler)
     
     if substitute.status != models.SubstituteStatus.PENDING:
-        raise ValueError("当前状态不能拒绝")
+        log_and_raise(db, "reject_substitute", "当前状态不能拒绝",
+                      "substitute", substitute_id, {"substitute_id": substitute_id}, handler)
     
     substitute.status = models.SubstituteStatus.REJECTED
     substitute.confirmed_by = handler
@@ -442,10 +480,12 @@ def reject_substitute(db: Session, substitute_id: int, handler: str, rejection_r
 def schedule_makeup(db: Session, original_booking_id: int, new_booking: schemas.BookingCreate):
     original_booking = get_booking(db, original_booking_id)
     if not original_booking:
-        raise ValueError("原预约不存在")
+        log_and_raise(db, "schedule_makeup", "原预约不存在",
+                      "booking", None, {"original_booking_id": original_booking_id}, new_booking.created_by)
     
     if original_booking.status != models.BookingStatus.LEAVE_APPROVED:
-        raise ValueError("只有已批准的请假可以安排补课")
+        log_and_raise(db, "schedule_makeup", "只有已批准的请假可以安排补课",
+                      "booking", None, {"original_booking_id": original_booking_id}, new_booking.created_by)
     
     booking_data = new_booking.dict()
     booking_data["is_makeup"] = True
@@ -455,14 +495,17 @@ def schedule_makeup(db: Session, original_booking_id: int, new_booking: schemas.
     course_package = get_course_package(db, new_booking.course_package_id)
     
     if course_package.member_card_id != new_booking.member_card_id:
-        raise ValueError("课程包不属于该会员")
+        log_and_raise(db, "schedule_makeup", "课程包不属于该会员",
+                      "booking", None, {"original_booking_id": original_booking_id}, new_booking.created_by)
     
     if course_package.remaining_hours < new_booking.hours:
-        raise ValueError("课程包剩余课时不足")
+        log_and_raise(db, "schedule_makeup", "课程包剩余课时不足",
+                      "booking", None, {"original_booking_id": original_booking_id}, new_booking.created_by)
     
     if check_time_conflict(db, new_booking.main_coach_id, new_booking.booking_date,
                           new_booking.start_time, new_booking.end_time):
-        raise ValueError("该教练此时间段已有预约")
+        log_and_raise(db, "schedule_makeup", "该教练此时间段已有预约",
+                      "booking", None, {"original_booking_id": original_booking_id}, new_booking.created_by)
     
     db_new_booking = models.Booking(
         **booking_data,
@@ -496,10 +539,12 @@ def rollback_consumption(db: Session, consumption_id: int, reason: str, handler:
     ).first()
     
     if not consumption:
-        raise ValueError("消课记录不存在")
+        log_and_raise(db, "rollback_consumption", "消课记录不存在",
+                      "consumption", consumption_id, {"consumption_id": consumption_id}, handler)
     
     if consumption.is_rollback:
-        raise ValueError("该消课记录已撤回")
+        log_and_raise(db, "rollback_consumption", "该消课记录已撤回",
+                      "consumption", consumption_id, {"consumption_id": consumption_id}, handler)
     
     consumption.is_rollback = True
     consumption.rollback_reason = reason
@@ -540,7 +585,8 @@ def manual_correction(db: Session, request: schemas.ManualCorrectionRequest):
     if request.target_type == "member_card":
         target = get_member_card(db, request.target_id)
         if not target:
-            raise ValueError("会员卡不存在")
+            log_and_raise(db, "manual_correction", "会员卡不存在",
+                          request.target_type, request.target_id, request.dict(), request.handler)
         
         if request.correction_type == "adjust_hours":
             delta = int(request.new_value)
@@ -548,27 +594,39 @@ def manual_correction(db: Session, request: schemas.ManualCorrectionRequest):
             target.remaining_hours += delta
         elif request.correction_type == "set_active":
             target.is_active = request.new_value.lower() == "true"
+        else:
+            log_and_raise(db, "manual_correction", "不支持的修正类型",
+                          request.target_type, request.target_id, request.dict(), request.handler)
     
     elif request.target_type == "course_package":
         target = get_course_package(db, request.target_id)
         if not target:
-            raise ValueError("课程包不存在")
+            log_and_raise(db, "manual_correction", "课程包不存在",
+                          request.target_type, request.target_id, request.dict(), request.handler)
         
         if request.correction_type == "adjust_hours":
             delta = int(request.new_value)
             target.total_hours += delta
             target.remaining_hours += delta
+        else:
+            log_and_raise(db, "manual_correction", "不支持的修正类型",
+                          request.target_type, request.target_id, request.dict(), request.handler)
     
     elif request.target_type == "booking":
         target = get_booking(db, request.target_id)
         if not target:
-            raise ValueError("预约不存在")
+            log_and_raise(db, "manual_correction", "预约不存在",
+                          request.target_type, request.target_id, request.dict(), request.handler)
         
         if request.correction_type == "set_status":
             target.status = request.new_value
+        else:
+            log_and_raise(db, "manual_correction", "不支持的修正类型",
+                          request.target_type, request.target_id, request.dict(), request.handler)
     
     else:
-        raise ValueError("不支持的目标类型")
+        log_and_raise(db, "manual_correction", "不支持的目标类型",
+                      request.target_type, request.target_id, request.dict(), request.handler)
     
     db.commit()
     
@@ -624,10 +682,20 @@ def generate_report(db: Session, query: schemas.ReportQuery):
     
     report_data = []
     for record in consumption_records:
+        coach = db.query(models.Coach).filter(models.Coach.id == record.coach_id).first()
+        coach_name = coach.name if coach else record.booking.main_coach.name
+        
+        substitute = db.query(models.SubstituteRecord).filter(
+            models.SubstituteRecord.booking_id == record.booking_id,
+            models.SubstituteRecord.status == models.SubstituteStatus.CONFIRMED
+        ).first()
+        
         report_data.append({
             "id": record.id,
             "member_name": record.booking.member_card.member_name,
-            "coach_name": record.booking.main_coach.name,
+            "coach_name": coach_name,
+            "original_coach_name": record.booking.main_coach.name,
+            "has_substitute": substitute is not None,
             "package_name": record.booking.course_package.package_name,
             "booking_date": record.booking.booking_date,
             "consumed_at": record.consumed_at,
