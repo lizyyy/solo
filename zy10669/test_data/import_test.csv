@@ -1,0 +1,8 @@
+member_no,disease_code,package_code,materials
+M001,HTN,PKG_A,diagnosis_proof,medical_record
+M003,DM,PKG_B,diagnosis_proof,medical_record
+M999,HTN,PKG_A,diagnosis_proof
+M001,INVALID,PKG_A,diagnosis_proof
+M002,HTN,INVALID,
+,HTN,PKG_A,diagnosis_proof
+M001,DM,PKG_C,diagnosis_proof,medical_record
