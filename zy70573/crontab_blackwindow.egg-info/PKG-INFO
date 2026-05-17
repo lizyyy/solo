@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: crontab-blackwindow
+Version: 0.1.1
+Summary: Crontab黑窗检查CLI工具
+Author: DevOps Team
+Requires-Python: >=3.8
+Requires-Dist: croniter>=1.4.0
+Requires-Dist: python-dateutil>=2.8.2
+Requires-Dist: pytz>=2023.3
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

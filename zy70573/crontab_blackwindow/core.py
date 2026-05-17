@@ -1,7 +1,6 @@
 import sys
 import re
 import json
-import argparse
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 import croniter
@@ -11,6 +10,7 @@ CRON_PATTERN = re.compile(r'^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.*)$')
 ENV_LINE_PATTERN = re.compile(r'^(\w+)\s*=\s*(.*)$')
 COMMENT_PATTERN = re.compile(r'^#\s*(.*)$')
 DEFAULT_TZ = 'Asia/Shanghai'
+
 
 class CronLine:
     def __init__(
@@ -55,10 +55,10 @@ class CronLine:
         cmd = self.command.strip()
         return cmd[:47] + "..." if len(cmd) > 50 else cmd
 
-    def calculate_next_runs(
+    def calculate_next_runs_within_hours(
         self,
         start_time: Optional[datetime] = None,
-        count: int = 24,
+        hours_to_check: int = 24,
         tz: str = DEFAULT_TZ
     ) -> List[datetime]:
         if not self.is_valid or not self.cron_expression:
@@ -67,14 +67,25 @@ class CronLine:
             start_time = datetime.now(pytz.timezone(tz))
         elif start_time.tzinfo is None:
             start_time = pytz.timezone(tz).localize(start_time)
+        
+        end_time = start_time + timedelta(hours=hours_to_check)
+        runs = []
+        
         try:
             cron = croniter.croniter(self.cron_expression, start_time)
-            self._next_runs = [cron.get_next(datetime) for _ in range(count)]
-            return self._next_runs
+            while True:
+                next_run = cron.get_next(datetime)
+                if next_run >= end_time:
+                    break
+                runs.append(next_run)
         except Exception as e:
             self.is_valid = False
             self.error = f"cron expression error: {str(e)}"
             return []
+        
+        self._next_runs = runs
+        return runs
+
 
 def parse_crontab_file(file_path: str, owner: Optional[str] = None) -> Tuple[List[CronLine], Dict[str, str]]:
     lines = []
@@ -143,6 +154,7 @@ def parse_crontab_file(file_path: str, owner: Optional[str] = None) -> Tuple[Lis
 
     return lines, env_vars
 
+
 class BlackWindow:
     def __init__(self, start_hour: int, end_hour: int, start_minute: int = 0, end_minute: int = 0):
         self.start_hour = start_hour
@@ -163,6 +175,7 @@ class BlackWindow:
     def __str__(self) -> str:
         return f"{self.start_hour:02d}:{self.start_minute:02d} - {self.end_hour:02d}:{self.end_minute:02d}"
 
+
 class Conflict:
     def __init__(self, cron_line: CronLine, run_time: datetime, black_window: BlackWindow):
         self.cron_line = cron_line
@@ -182,6 +195,7 @@ class Conflict:
             "risk_level": self.risk_level
         }
 
+
 def check_conflicts(
     cron_lines: List[CronLine],
     black_windows: List[BlackWindow],
@@ -196,7 +210,7 @@ def check_conflicts(
             invalid_lines.append(line)
             continue
 
-        next_runs = line.calculate_next_runs(start_time, count=hours_to_check * 2)
+        next_runs = line.calculate_next_runs_within_hours(start_time, hours_to_check=hours_to_check)
         for run_time in next_runs:
             for bw in black_windows:
                 if bw.contains(run_time):
@@ -206,11 +220,13 @@ def check_conflicts(
 
     return conflicts, invalid_lines
 
+
 def generate_terminal_summary(
     cron_lines: List[CronLine],
     conflicts: List[Conflict],
     invalid_lines: List[CronLine],
-    black_windows: List[BlackWindow]
+    black_windows: List[BlackWindow],
+    hours_to_check: int = 24
 ) -> str:
     lines = []
     lines.append("=" * 70)
@@ -219,6 +235,7 @@ def generate_terminal_summary(
     lines.append("")
 
     lines.append(f"检查时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append(f"检查范围: 未来 {hours_to_check} 小时")
     lines.append(f"黑窗配置: {', '.join(str(bw) for bw in black_windows)}")
     lines.append("")
 
@@ -269,14 +286,17 @@ def generate_terminal_summary(
     lines.append("=" * 70)
     return "\n".join(lines)
 
+
 def generate_json_report(
     cron_lines: List[CronLine],
     conflicts: List[Conflict],
     invalid_lines: List[CronLine],
-    black_windows: List[BlackWindow]
+    black_windows: List[BlackWindow],
+    hours_to_check: int = 24
 ) -> str:
     report = {
         "generated_at": datetime.now().isoformat(),
+        "check_hours": hours_to_check,
         "black_windows": [str(bw) for bw in black_windows],
         "summary": {
             "total_tasks": len(cron_lines),
@@ -296,16 +316,19 @@ def generate_json_report(
     }
     return json.dumps(report, ensure_ascii=False, indent=2)
 
+
 def generate_markdown_report(
     cron_lines: List[CronLine],
     conflicts: List[Conflict],
     invalid_lines: List[CronLine],
-    black_windows: List[BlackWindow]
+    black_windows: List[BlackWindow],
+    hours_to_check: int = 24
 ) -> str:
     lines = []
     lines.append("# Crontab 黑窗时间检查报告")
     lines.append("")
     lines.append(f"生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append(f"检查范围: 未来 {hours_to_check} 小时")
     lines.append("")
 
     lines.append("## 概览")
@@ -356,6 +379,7 @@ def generate_markdown_report(
     lines.append("*此报告由 Crontab Black Window CLI 工具自动生成*")
     return "\n".join(lines)
 
+
 def create_sample_crontab(output_path: str) -> None:
     sample = """# 示例 Crontab - 用于测试黑窗检查工具
 SHELL=/bin/bash
@@ -382,6 +406,7 @@ invalid cron line here
         f.write(sample)
     print(f"创建示例文件: {output_path}")
 
+
 def run_self_test() -> int:
     print("=" * 60)
     print("Crontab 黑窗检查工具 - 自检模式")
@@ -398,30 +423,32 @@ def run_self_test() -> int:
     print(f"   环境变量: {len(env_vars)} 个")
     print()
 
-    print("2. 测试 cron 表达式展开...")
+    print("2. 测试 cron 表达式展开（未来 24 小时）...")
     valid_lines = [l for l in cron_lines if l.is_valid]
     if valid_lines:
         first = valid_lines[0]
-        next_runs = first.calculate_next_runs(count=5)
+        next_runs = first.calculate_next_runs_within_hours(hours_to_check=24)
         print(f"   示例任务: {first.task_name}")
         print(f"   Cron表达式: {first.cron_expression}")
-        print(f"   接下来5次执行:")
-        for dt in next_runs:
-            print(f"     - {dt.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"   未来 24 小时内执行次数: {len(next_runs)} 次")
+        if next_runs:
+            print(f"   接下来 5 次执行:")
+            for dt in next_runs[:5]:
+                print(f"     - {dt.strftime('%Y-%m-%d %H:%M:%S')}")
     print()
 
-    print("3. 测试黑窗冲突检测...")
+    print("3. 测试黑窗冲突检测（检查未来 1 小时）...")
     black_windows = [BlackWindow(2, 5)]
     print(f"   黑窗配置: {black_windows[0]}")
-    conflicts, invalid_lines = check_conflicts(cron_lines, black_windows)
+    conflicts, invalid_lines = check_conflicts(cron_lines, black_windows, hours_to_check=1)
     print(f"   发现冲突: {len(conflicts)} 次")
     print(f"   无效行数: {len(invalid_lines)}")
     print()
 
     print("4. 测试报告生成...")
-    terminal_report = generate_terminal_summary(cron_lines, conflicts, invalid_lines, black_windows)
-    json_report = generate_json_report(cron_lines, conflicts, invalid_lines, black_windows)
-    md_report = generate_markdown_report(cron_lines, conflicts, invalid_lines, black_windows)
+    terminal_report = generate_terminal_summary(cron_lines, conflicts, invalid_lines, black_windows, hours_to_check=1)
+    json_report = generate_json_report(cron_lines, conflicts, invalid_lines, black_windows, hours_to_check=1)
+    md_report = generate_markdown_report(cron_lines, conflicts, invalid_lines, black_windows, hours_to_check=1)
     print(f"   终端报告: {len(terminal_report)} 字符")
     print(f"   JSON报告: {len(json_report)} 字符")
     print(f"   Markdown报告: {len(md_report)} 字符")
@@ -435,136 +462,3 @@ def run_self_test() -> int:
     print(terminal_report)
 
     return 0
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Crontab 黑窗时间检查工具 - 检查定时任务是否在维护窗口内执行",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-示例:
-  python cbw.py --crontab /etc/crontab --black-window 2:00-5:00
-  python cbw.py --file crontab1 --black-window 23:00-7:00
-  python cbw.py --self-test
-  python cbw.py --create-sample ./test_crontab
-  python cbw.py --file ./test_crontab --output json --black-window 2:00-5:00
-        """
-    )
-
-    parser.add_argument(
-        "--file", "--crontab", "-f",
-        action="append",
-        dest="files",
-        metavar="PATH",
-        help="crontab文件路径 (可指定多个)"
-    )
-
-    parser.add_argument(
-        "--black-window", "-b",
-        action="append",
-        dest="black_windows",
-        metavar="HH:MM-HH:MM",
-        help="黑窗时间范围 (可指定多个，例如 2:00-5:00)"
-    )
-
-    parser.add_argument(
-        "--output", "-o",
-        choices=["terminal", "json", "markdown", "all"],
-        default="terminal",
-        help="输出格式 (默认: terminal)"
-    )
-
-    parser.add_argument(
-        "--output-file", "-O",
-        metavar="PATH",
-        help="输出文件路径 (仅用于json和markdown格式)"
-    )
-
-    parser.add_argument(
-        "--hours",
-        type=int,
-        default=24,
-        help="检查未来多少小时 (默认: 24小时)"
-    )
-
-    parser.add_argument(
-        "--self-test", "--test",
-        action="store_true",
-        help="运行自检功能"
-    )
-
-    parser.add_argument(
-        "--create-sample",
-        metavar="PATH",
-        help="创建示例crontab文件用于测试"
-    )
-
-    args = parser.parse_args()
-
-    if args.self_test:
-        sys.exit(run_self_test())
-
-    if args.create_sample:
-        create_sample_crontab(args.create_sample)
-        sys.exit(0)
-
-    if not args.files:
-        parser.error("需要至少指定一个 --file 参数")
-
-    if not args.black_windows:
-        parser.error("需要至少指定一个 --black-window 参数")
-
-    black_windows = []
-    for bw_str in args.black_windows:
-        try:
-            start_str, end_str = bw_str.split("-")
-            start_h, start_m = map(int, start_str.split(":"))
-            end_h, end_m = map(int, end_str.split(":"))
-            black_windows.append(BlackWindow(start_h, end_h, start_m, end_m))
-        except Exception as e:
-            parser.error(f"无效的黑窗格式 '{bw_str}': {str(e)}")
-
-    all_cron_lines = []
-    for file_path in args.files:
-        cron_lines, _ = parse_crontab_file(file_path)
-        all_cron_lines.extend(cron_lines)
-
-    conflicts, invalid_lines = check_conflicts(
-        all_cron_lines,
-        black_windows,
-        args.hours
-    )
-
-    if args.output in ["terminal", "all"]:
-        print(generate_terminal_summary(all_cron_lines, conflicts, invalid_lines, black_windows))
-
-    json_report = generate_json_report(all_cron_lines, conflicts, invalid_lines, black_windows)
-    if args.output in ["json", "all"]:
-        if args.output_file and args.output != "all":
-            with open(f"{args.output_file}.json", 'w', encoding='utf-8') as f:
-                f.write(json_report)
-            print(f"JSON报告已写入: {args.output_file}.json")
-        else:
-            print(json_report)
-
-    md_report = generate_markdown_report(all_cron_lines, conflicts, invalid_lines, black_windows)
-    if args.output in ["markdown", "all"]:
-        if args.output_file and args.output != "all":
-            with open(f"{args.output_file}.md", 'w', encoding='utf-8') as f:
-                f.write(md_report)
-            print(f"Markdown报告已写入: {args.output_file}.md")
-        else:
-            print(md_report)
-
-    if args.output == "all" and args.output_file:
-        with open(f"{args.output_file}.json", 'w', encoding='utf-8') as f:
-            f.write(json_report)
-        with open(f"{args.output_file}.md", 'w', encoding='utf-8') as f:
-            f.write(md_report)
-        print(f"所有报告已写入: {args.output_file}.json 和 {args.output_file}.md")
-
-    sys.exit(1 if conflicts else 0)
-
-if __name__ == "__main__":
-    main()
-if __name__ == "__main__":
-    main()
