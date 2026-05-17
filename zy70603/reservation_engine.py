@@ -47,13 +47,18 @@ class ReservationEngine:
                 return True
         return False
 
-    def create_reservation(self, reader_id: str, copy_id: str) -> Optional[Reservation]:
+    def create_reservation(self, reader_id: str, copy_id: str, 
+                           status: ReservationStatus = ReservationStatus.PENDING,
+                           created_at: datetime = None,
+                           locked_until: datetime = None,
+                           picked_up_at: datetime = None,
+                           expired_at: datetime = None) -> Optional[Reservation]:
         if reader_id not in self.readers:
             return None
         if copy_id not in self.copies:
             return None
         
-        if self.has_active_reservation(reader_id, copy_id):
+        if self.has_active_reservation(reader_id, copy_id) and status == ReservationStatus.PENDING:
             for res_id in self.reader_reservation_map[reader_id]:
                 res = self.reservations[res_id]
                 if res.copy_id == copy_id and res.status in [
@@ -62,20 +67,43 @@ class ReservationEngine:
                     return res
 
         reservation_id = f"RES-{uuid.uuid4().hex[:8].upper()}"
+        actual_created = created_at if created_at else datetime.now()
         reservation = Reservation(
             reservation_id=reservation_id,
             reader_id=reader_id,
             copy_id=copy_id,
-            status=ReservationStatus.PENDING,
-            created_at=datetime.now()
+            status=status,
+            created_at=actual_created,
+            locked_until=locked_until,
+            picked_up_at=picked_up_at,
+            expired_at=expired_at
         )
 
         self.reservations[reservation_id] = reservation
         self.copy_reservation_map[copy_id].append(reservation_id)
         self.reader_reservation_map[reader_id].append(reservation_id)
         
+        if status == ReservationStatus.LOCKED and locked_until:
+            copy = self.copies[copy_id]
+            copy.status = CopyStatus.RESERVED
+            copy.current_reservation_id = reservation_id
+        
         self._rebuild_queue(copy_id)
         return reservation
+
+    def simulate_expire_locked(self, hours_ago: int = 25) -> int:
+        expired_time = datetime.now() - timedelta(hours=hours_ago)
+        count = 0
+        for res in self.reservations.values():
+            if res.status == ReservationStatus.PENDING:
+                res.status = ReservationStatus.LOCKED
+                res.locked_until = expired_time
+                copy = self.copies.get(res.copy_id)
+                if copy:
+                    copy.status = CopyStatus.RESERVED
+                    copy.current_reservation_id = res.reservation_id
+                count += 1
+        return count
 
     def _rebuild_queue(self, copy_id: str) -> None:
         reservation_ids = self.copy_reservation_map.get(copy_id, [])

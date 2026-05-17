@@ -80,14 +80,59 @@ class CLIManager:
                 if not line or line.startswith('#'):
                     continue
                 parts = line.split(',')
-                if len(parts) >= 3:
+                if len(parts) >= 2:
                     try:
+                        reader_id = parts[0].strip()
+                        copy_id = parts[1].strip()
+                        status = ReservationStatus.PENDING
+                        created_at = None
+                        locked_until = None
+                        picked_up_at = None
+                        expired_at = None
+                        
+                        if len(parts) >= 3 and parts[2].strip() and parts[2].strip() in [s.value for s in ReservationStatus]:
+                            status = ReservationStatus(parts[2].strip())
+                        if len(parts) >= 4 and parts[3].strip():
+                            created_at = datetime.fromisoformat(parts[3].strip())
+                        if len(parts) >= 5 and parts[4].strip():
+                            locked_until = datetime.fromisoformat(parts[4].strip())
+                        if len(parts) >= 6 and parts[5].strip():
+                            picked_up_at = datetime.fromisoformat(parts[5].strip())
+                        if len(parts) >= 7 and parts[6].strip():
+                            expired_at = datetime.fromisoformat(parts[6].strip())
+                        
                         self.engine.create_reservation(
-                            reader_id=parts[0].strip(),
-                            copy_id=parts[1].strip()
+                            reader_id=reader_id,
+                            copy_id=copy_id,
+                            status=status,
+                            created_at=created_at,
+                            locked_until=locked_until,
+                            picked_up_at=picked_up_at,
+                            expired_at=expired_at
                         )
-                    except (ValueError, KeyError):
+                    except (ValueError, KeyError) as e:
                         continue
+
+    def list_reservations(self):
+        print("\n📋 当前所有预约记录:")
+        print("-" * 80)
+        for res_id, res in self.engine.reservations.items():
+            reader = self.engine.readers.get(res.reader_id)
+            copy = self.engine.copies.get(res.copy_id)
+            reader_name = reader.name if reader else "未知"
+            copy_title = copy.title if copy else "未知"
+            status_str = res.status.value
+            locked_info = ""
+            if res.locked_until:
+                if res.is_expired():
+                    locked_info = " [已逾期]"
+                else:
+                    remaining = res.locked_until - datetime.now()
+                    hours = int(remaining.total_seconds() / 3600)
+                    locked_info = f" [锁定剩余{hours}小时]"
+            print(f"  {res_id}: {reader_name}({res.reader_id}) -> "
+                  f"{copy_title}({res.copy_id}) [{status_str}]{locked_info}")
+        print()
 
     def _load_windows(self, filepath: str):
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -186,22 +231,26 @@ def main():
         description="图书馆预约队列逾期释放副本流转排查CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+【预约数据完整格式】: reader_id,copy_id,status,created_at,locked_until,picked_up_at,expired_at
+
 示例:
-  # 加载数据并生成报告
-  python library_cli.py --readers data/readers.txt --copies data/copies.txt 
-                        --reservations data/reservations.txt --windows data/windows.txt
-                        
-  # 只处理逾期并生成报告
-  python library_cli.py --process-expired --report
+  # 查看所有预约及锁定状态
+  python library_cli.py --list
   
-  # 导出机器可读报告
-  python library_cli.py --json-out report.json --csv-out report.csv
+  # 模拟预约锁定过期（演示模式，立即将PENDING转已过期LOCKED）
+  python library_cli.py --simulate-expired
   
-  # 查看队列状态
+  # 处理逾期释放（逾期释放后副本流转）
+  python library_cli.py --process-expired --report --json-out report.json
+  
+  # 查看逾期释放报告（expired_reservations和released_copies不为空）
+  cat report.json | grep -E 'expired_reservations|released_copies'
+  
+  # 查看指定书籍的预约队列
   python library_cli.py --queue COPY-001
   
-  # 数据校验模式
-  python library_cli.py --validate
+  # 演示完整闭环：模拟过期 -> 处理释放 -> 生成报告
+  python library_cli.py --simulate-expired --process-expired --report --json-out result.json
         """
     )
 
@@ -210,8 +259,14 @@ def main():
     parser.add_argument("--copies", help="书籍副本数据文件路径")
     parser.add_argument("--reservations", help="预约数据文件路径")
     parser.add_argument("--windows", help="取书窗口数据文件路径")
+    parser.add_argument("--sample", help="使用指定样例数据: normal/boundary/dirty/empty")
     
-    parser.add_argument("--process-expired", action="store_true", help="处理逾期预约")
+    parser.add_argument("--list", action="store_true", help="列出所有预约及状态")
+    parser.add_argument("--simulate-expired", action="store_true", help="演示模式：模拟预约锁定已过期")
+    parser.add_argument("--process-expired", action="store_true", help="处理逾期预约（释放副本流转）")
+    parser.add_argument("--lock", nargs=2, metavar=("RES_ID", "WIN_ID"), help="锁定指定预约")
+    parser.add_argument("--pickup", metavar="RES_ID", help="取书完成预约")
+    
     parser.add_argument("--report", action="store_true", help="生成流转报告")
     parser.add_argument("--queue", metavar="COPY_ID", help="查看指定书籍的预约队列")
     parser.add_argument("--validate", action="store_true", help="数据校验模式")
@@ -224,16 +279,61 @@ def main():
 
     cli = CLIManager(data_dir=args.data_dir)
     
-    base_path = os.path.join(os.path.dirname(__file__), "samples", "normal")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    sample_map = {
+        "normal": "samples/normal",
+        "boundary": "samples/boundary",
+        "dirty": "samples/dirty",
+        "empty": "samples/empty",
+        "expired": "samples/expired"
+    }
+    if args.sample and args.sample in sample_map:
+        base_path = os.path.join(script_dir, sample_map[args.sample])
+    else:
+        base_path = os.path.join(script_dir, "samples", "normal")
+    
+    def resolve_path(path):
+        if path is None:
+            return None
+        if os.path.isabs(path):
+            return path
+        return os.path.join(script_dir, path)
+    
     cli.load_data(
-        readers_file=args.readers or os.path.join(base_path, "readers.txt"),
-        copies_file=args.copies or os.path.join(base_path, "copies.txt"),
-        reservations_file=args.reservations or os.path.join(base_path, "reservations.txt"),
-        windows_file=args.windows or os.path.join(base_path, "windows.txt")
+        readers_file=resolve_path(args.readers) if args.readers else os.path.join(base_path, "readers.txt"),
+        copies_file=resolve_path(args.copies) if args.copies else os.path.join(base_path, "copies.txt"),
+        reservations_file=resolve_path(args.reservations) if args.reservations else os.path.join(base_path, "reservations.txt"),
+        windows_file=resolve_path(args.windows) if args.windows else os.path.join(base_path, "windows.txt")
     )
 
     if args.validate:
         cli.validate_and_report()
+        return
+
+    if args.list:
+        cli.list_reservations()
+        return
+
+    if args.simulate_expired:
+        count = cli.engine.simulate_expire_locked(25)
+        print(f"\n⏳ 演示模式：模拟 {count} 个预约锁定已过期（锁定时间设为25小时前）")
+        cli.list_reservations()
+
+    if args.lock:
+        res_id, win_id = args.lock
+        success = cli.engine.lock_reservation(res_id, win_id, 24)
+        if success:
+            print(f"\n✅ 预约 {res_id} 已锁定，取书窗口 {win_id}，锁定24小时")
+        else:
+            print(f"\n❌ 预约 {res_id} 锁定失败")
+        return
+
+    if args.pickup:
+        success = cli.engine.pickup_book(args.pickup)
+        if success:
+            print(f"\n✅ 预约 {args.pickup} 已取书完成")
+        else:
+            print(f"\n❌ 预约 {args.pickup} 取书失败")
         return
 
     if args.queue:

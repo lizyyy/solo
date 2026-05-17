@@ -92,6 +92,28 @@ run_test "同读者同书籍重复预约幂等" \
     "python3 verify_idempotent.py" \
     "SUCCESS.*幂等性验证通过"
 
+echo "【逾期释放闭环验证】"
+echo "--------------------------------------------"
+run_test "过期样例包含已逾期锁定预约" \
+    "python3 library_cli.py --sample expired --list | grep '已逾期'" \
+    '已逾期'
+
+run_test "逾期释放处理成功计数1" \
+    "python3 library_cli.py --sample expired --process-expired 2>&1" \
+    '处理了 1 个逾期预约'
+
+run_test "逾期释放报告包含expired_reservations=1" \
+    "python3 library_cli.py --sample expired --process-expired --no-human --json-out /tmp/expired_test.json && cat /tmp/expired_test.json" \
+    '"expired_reservations": 1'
+
+run_test "逾期释放报告包含released_copies非空" \
+    "python3 library_cli.py --sample expired --process-expired --no-human --json-out /tmp/expired_test2.json && python3 -c \"import json; d=json.load(open('/tmp/expired_test2.json')); print('released_copies:', d['released_copies'])\"" \
+    'BOOK-A'
+
+run_test "演示模式可模拟过期" \
+    "python3 library_cli.py --sample normal --simulate-expired 2>&1 | head -3" \
+    '模拟.*个预约锁定已过期'
+
 echo "============================================"
 echo "  测试汇总"
 echo "  ✅ 通过: $PASS"
@@ -101,6 +123,17 @@ echo "============================================"
 if [ $FAIL -eq 0 ]; then
     echo ""
     echo "🎉 所有验收测试通过！"
+    echo ""
+    echo "📋 快速体验逾期释放完整闭环:"
+    echo "  1. 查看已锁定且逾期的预约:"
+    echo "     python3 library_cli.py --sample expired --list"
+    echo ""
+    echo "  2. 处理逾期释放并生成完整报告:"
+    echo "     python3 library_cli.py --sample expired --process-expired --report --json-out report.json"
+    echo ""
+    echo "  3. 验证报告关键数据:"
+    echo "     cat report.json | grep -E '(expired_reservations|released_copies)'"
+    echo ""
     exit 0
 else
     echo ""

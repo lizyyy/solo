@@ -1,0 +1,5 @@
+# 预约逾期释放样例 - 预约数据(动态生成，加载时BOOK-A已逾期)
+# 格式: reader_id,copy_id,status,created_at,locked_until,picked_up_at,expired_at
+R-001,BOOK-A,locked,2026-05-15T19:18:18.646096,2026-05-16T18:18:18.646089,,
+R-002,BOOK-B,pending,2026-05-15T19:18:18.646096,,,
+R-003,BOOK-C,pending,2026-05-15T19:18:18.646096,,,
