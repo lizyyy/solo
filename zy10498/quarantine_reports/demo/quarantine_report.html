@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试隔离名单报告</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+        h2 { color: #555; margin-top: 30px; }
+        .summary { display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap; }
+        .card { flex: 1; min-width: 120px; padding: 15px; border-radius: 6px; text-align: center; }
+        .card-total { background: #e3f2fd; }
+        .card-overdue { background: #ffebee; }
+        .card-soon { background: #fff3e0; }
+        .card-valid { background: #e8f5e9; }
+        .number { font-size: 2em; font-weight: bold; }
+        .label { font-size: 0.9em; color: #666; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; font-weight: 600; }
+        tr:hover { background: #f5f5f5; }
+        .danger { color: #dc3545; font-weight: bold; }
+        .warning { color: #ff9800; font-weight: bold; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 测试隔离名单报告</h1>
+        <p>生成时间: 2026-05-17 11:29:54</p>
+        
+        <div class="summary">
+            <div class="card card-total">
+                <div class="number">10</div>
+                <div class="label">总测试数</div>
+            </div>
+            <div class="card card-valid">
+                <div class="number">7</div>
+                <div class="label">有效测试</div>
+            </div>
+            <div class="card card-overdue">
+                <div class="number">2</div>
+                <div class="label">🔴 已超期</div>
+            </div>
+            <div class="card card-soon">
+                <div class="number">3</div>
+                <div class="label">🟡 7天内到期</div>
+            </div>
+        </div>
+
+        <h2>🔴 已超期的测试 (需要立即处理)</h2>
+        <table>
+            <tr>
+                <th>测试名称</th>
+                <th>隔离原因</th>
+                <th>负责人</th>
+                <th>到期日期</th>
+                <th>最近结果</th>
+                <th>来源</th>
+            </tr>
+            
+                        <tr>
+                            <td>test_login_success</td>
+                            <td>依赖外部服务不稳定</td>
+                            <td><strong>张三</strong></td>
+                            <td class="danger">2026-05-10</td>
+                            <td>失败</td>
+                            <td><code>quarantine_reports/selftest/test_data/sample_tests.csv:2</code></td>
+                        </tr>
+                    
+                        <tr>
+                            <td>api_v2_check</td>
+                            <td>v2接口下线</td>
+                            <td><strong>李四</strong></td>
+                            <td class="danger">2026-05-15</td>
+                            <td>失败</td>
+                            <td><code>quarantine_reports/selftest/test_data/sample_tests.json:1</code></td>
+                        </tr>
+                    
+        </table>
+
+        <h2>🟡 7天内即将到期的测试</h2>
+        <table>
+            <tr>
+                <th>测试名称</th>
+                <th>隔离原因</th>
+                <th>负责人</th>
+                <th>到期日期</th>
+                <th>最近结果</th>
+                <th>来源</th>
+            </tr>
+            
+                        <tr>
+                            <td>test_payment_flow</td>
+                            <td>第三方API变更未同步</td>
+                            <td><strong>李四</strong></td>
+                            <td class="warning">2026-05-20 (3天后)</td>
+                            <td>失败</td>
+                            <td><code>quarantine_reports/selftest/test_data/sample_tests.csv:3</code></td>
+                        </tr>
+                    
+                        <tr>
+                            <td>mobile_auth</td>
+                            <td>短信服务降级</td>
+                            <td><strong>王五</strong></td>
+                            <td class="warning">2026-05-22 (5天后)</td>
+                            <td>跳过</td>
+                            <td><code>quarantine_reports/selftest/test_data/sample_tests.json:2</code></td>
+                        </tr>
+                    
+                        <tr>
+                            <td>test_email_notification</td>
+                            <td>邮件服务限流</td>
+                            <td><strong>赵六</strong></td>
+                            <td class="warning">2026-05-18 (1天后)</td>
+                            <td>失败</td>
+                            <td><code>quarantine_reports/selftest/test_data/sample_tests.csv:6</code></td>
+                        </tr>
+                    
+        </table>
+
+        
+        <h2>⚠️ 解析错误</h2>
+        <table>
+            <tr>
+                <th>文件</th>
+                <th>行号</th>
+                <th>错误信息</th>
+                <th>原始内容</th>
+            </tr>
+            
+                <tr>
+                    <td><code>quarantine_reports/selftest/test_data/sample_tests.csv</code></td>
+                    <td>7</td>
+                    <td>日期格式无效: invalid-date (应为 YYYY-MM-DD)</td>
+                    <td><code>{"test_name": "test_invalid_date", "quarantine_reason": "日期格式错误测试", "owner": "李四", "due_date": "inva</code></td>
+                </tr>
+            
+                <tr>
+                    <td><code>quarantine_reports/selftest/test_data/sample_tests.csv</code></td>
+                    <td>8</td>
+                    <td>缺少 test_name 或为空</td>
+                    <td><code>{"test_name": "", "quarantine_reason": "缺少test_name", "owner": "王五", "due_date": "2026-05-20", "last</code></td>
+                </tr>
+            
+                <tr>
+                    <td><code>quarantine_reports/selftest/test_data/sample_tests.json</code></td>
+                    <td>3</td>
+                    <td>缺少 quarantine_reason 或为空; 缺少 owner 或为空; 缺少 due_date 或为空; 缺少 last_result 或为空</td>
+                    <td><code>{"test_name": "invalid_row"}</code></td>
+                </tr>
+            
+        </table>
+        
+
+        <div class="footer">
+            此报告由 quarantine-tests CLI 工具自动生成 | 请及时清理过期的隔离测试
+        </div>
+    </div>
+</body>
+</html>

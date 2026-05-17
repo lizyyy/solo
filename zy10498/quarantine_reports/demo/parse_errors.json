@@ -1,0 +1,20 @@
+[
+  {
+    "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+    "line_number": 7,
+    "raw_content": "{\"test_name\": \"test_invalid_date\", \"quarantine_reason\": \"日期格式错误测试\", \"owner\": \"李四\", \"due_date\": \"invalid-date\", \"last_result\": \"失败\"}",
+    "error_message": "日期格式无效: invalid-date (应为 YYYY-MM-DD)"
+  },
+  {
+    "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+    "line_number": 8,
+    "raw_content": "{\"test_name\": \"\", \"quarantine_reason\": \"缺少test_name\", \"owner\": \"王五\", \"due_date\": \"2026-05-20\", \"last_result\": \"失败\"}",
+    "error_message": "缺少 test_name 或为空"
+  },
+  {
+    "source_file": "quarantine_reports/selftest/test_data/sample_tests.json",
+    "line_number": 3,
+    "raw_content": "{\"test_name\": \"invalid_row\"}",
+    "error_message": "缺少 quarantine_reason 或为空; 缺少 owner 或为空; 缺少 due_date 或为空; 缺少 last_result 或为空"
+  }
+]

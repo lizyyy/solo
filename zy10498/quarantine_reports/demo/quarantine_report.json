@@ -1,0 +1,210 @@
+{
+  "summary": {
+    "total_tests": 10,
+    "valid_tests": 7,
+    "invalid_tests": 3,
+    "overdue_tests": 2,
+    "due_soon_tests": 3,
+    "generated_at": "2026-05-17T11:29:54.340633"
+  },
+  "tests_by_owner": {
+    "张三": [
+      {
+        "test_name": "test_login_success",
+        "quarantine_reason": "依赖外部服务不稳定",
+        "owner": "张三",
+        "due_date": "2026-05-10",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 2,
+        "is_valid": true,
+        "parse_errors": []
+      },
+      {
+        "test_name": "test_user_profile",
+        "quarantine_reason": "数据库连接偶尔超时",
+        "owner": "张三",
+        "due_date": "2026-05-25",
+        "last_result": "跳过",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 4,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ],
+    "李四": [
+      {
+        "test_name": "test_payment_flow",
+        "quarantine_reason": "第三方API变更未同步",
+        "owner": "李四",
+        "due_date": "2026-05-20",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 3,
+        "is_valid": true,
+        "parse_errors": []
+      },
+      {
+        "test_name": "api_v2_check",
+        "quarantine_reason": "v2接口下线",
+        "owner": "李四",
+        "due_date": "2026-05-15",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.json",
+        "line_number": 1,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ],
+    "王五": [
+      {
+        "test_name": "test_search_function",
+        "quarantine_reason": "ES索引重建中",
+        "owner": "王五",
+        "due_date": "2026-06-01",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 5,
+        "is_valid": true,
+        "parse_errors": []
+      },
+      {
+        "test_name": "mobile_auth",
+        "quarantine_reason": "短信服务降级",
+        "owner": "王五",
+        "due_date": "2026-05-22",
+        "last_result": "跳过",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.json",
+        "line_number": 2,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ],
+    "赵六": [
+      {
+        "test_name": "test_email_notification",
+        "quarantine_reason": "邮件服务限流",
+        "owner": "赵六",
+        "due_date": "2026-05-18",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 6,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ]
+  },
+  "tests_by_reason": {
+    "依赖外部服务不稳定": [
+      {
+        "test_name": "test_login_success",
+        "quarantine_reason": "依赖外部服务不稳定",
+        "owner": "张三",
+        "due_date": "2026-05-10",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 2,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ],
+    "第三方API变更未同步": [
+      {
+        "test_name": "test_payment_flow",
+        "quarantine_reason": "第三方API变更未同步",
+        "owner": "李四",
+        "due_date": "2026-05-20",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 3,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ],
+    "数据库连接偶尔超时": [
+      {
+        "test_name": "test_user_profile",
+        "quarantine_reason": "数据库连接偶尔超时",
+        "owner": "张三",
+        "due_date": "2026-05-25",
+        "last_result": "跳过",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 4,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ],
+    "ES索引重建中": [
+      {
+        "test_name": "test_search_function",
+        "quarantine_reason": "ES索引重建中",
+        "owner": "王五",
+        "due_date": "2026-06-01",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 5,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ],
+    "邮件服务限流": [
+      {
+        "test_name": "test_email_notification",
+        "quarantine_reason": "邮件服务限流",
+        "owner": "赵六",
+        "due_date": "2026-05-18",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+        "line_number": 6,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ],
+    "v2接口下线": [
+      {
+        "test_name": "api_v2_check",
+        "quarantine_reason": "v2接口下线",
+        "owner": "李四",
+        "due_date": "2026-05-15",
+        "last_result": "失败",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.json",
+        "line_number": 1,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ],
+    "短信服务降级": [
+      {
+        "test_name": "mobile_auth",
+        "quarantine_reason": "短信服务降级",
+        "owner": "王五",
+        "due_date": "2026-05-22",
+        "last_result": "跳过",
+        "source_file": "quarantine_reports/selftest/test_data/sample_tests.json",
+        "line_number": 2,
+        "is_valid": true,
+        "parse_errors": []
+      }
+    ]
+  },
+  "parse_errors": [
+    {
+      "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+      "line_number": 7,
+      "raw_content": "{\"test_name\": \"test_invalid_date\", \"quarantine_reason\": \"日期格式错误测试\", \"owner\": \"李四\", \"due_date\": \"invalid-date\", \"last_result\": \"失败\"}",
+      "error_message": "日期格式无效: invalid-date (应为 YYYY-MM-DD)"
+    },
+    {
+      "source_file": "quarantine_reports/selftest/test_data/sample_tests.csv",
+      "line_number": 8,
+      "raw_content": "{\"test_name\": \"\", \"quarantine_reason\": \"缺少test_name\", \"owner\": \"王五\", \"due_date\": \"2026-05-20\", \"last_result\": \"失败\"}",
+      "error_message": "缺少 test_name 或为空"
+    },
+    {
+      "source_file": "quarantine_reports/selftest/test_data/sample_tests.json",
+      "line_number": 3,
+      "raw_content": "{\"test_name\": \"invalid_row\"}",
+      "error_message": "缺少 quarantine_reason 或为空; 缺少 owner 或为空; 缺少 due_date 或为空; 缺少 last_result 或为空"
+    }
+  ]
+}

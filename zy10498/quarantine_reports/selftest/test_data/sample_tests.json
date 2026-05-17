@@ -1,0 +1,21 @@
+{
+  "tests": [
+    {
+      "test_name": "api_v2_check",
+      "quarantine_reason": "v2接口下线",
+      "owner": "李四",
+      "due_date": "2026-05-15",
+      "last_result": "失败"
+    },
+    {
+      "test_name": "mobile_auth",
+      "quarantine_reason": "短信服务降级",
+      "owner": "王五",
+      "due_date": "2026-05-22",
+      "last_result": "跳过"
+    },
+    {
+      "test_name": "invalid_row"
+    }
+  ]
+}

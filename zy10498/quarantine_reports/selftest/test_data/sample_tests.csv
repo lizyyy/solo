@@ -1,0 +1,8 @@
+test_name,quarantine_reason,owner,due_date,last_result
+test_login_success,依赖外部服务不稳定,张三,2026-05-10,失败
+test_payment_flow,第三方API变更未同步,李四,2026-05-20,失败
+test_user_profile,数据库连接偶尔超时,张三,2026-05-25,跳过
+test_search_function,ES索引重建中,王五,2026-06-01,失败
+test_email_notification,邮件服务限流,赵六,2026-05-18,失败
+test_invalid_date,日期格式错误测试,李四,invalid-date,失败
+,缺少test_name,王五,2026-05-20,失败
