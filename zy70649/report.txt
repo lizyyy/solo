@@ -39,7 +39,7 @@
      日期: 2025-06-04
      描述: 日期 2025-06-04 存在重叠预订: 张三(airbnb,airbnb) 和 赵六(airbnb)
      涉及预订:
-       - 2025-06-01 ~ 2025-06-05 | 张三 | airbnb,airbnb | None
+       - 2025-06-01 ~ 2025-06-05 | 张三 | airbnb,airbnb | examples/airbnb.csv:2
        - 2025-06-04 ~ 2025-06-06 | 赵六 | airbnb | examples/tujia.csv:2
 
   4. [booking_gap]

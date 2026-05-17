@@ -1,5 +1,5 @@
 from typing import List, Dict, Set
-from datetime import date
+from datetime import date, timedelta
 from collections import defaultdict
 from models import BookingInterval, Conflict
 from interval_merger import IntervalMerger
@@ -130,7 +130,7 @@ class ConflictDetector:
         d = overlap_start
         while d < overlap_end:
             dates.append(d)
-            d = d.replace(day=d.day + 1)
+            d = d + timedelta(days=1)
 
         return dates
 

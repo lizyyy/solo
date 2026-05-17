@@ -1,7 +1,7 @@
 import json
 from typing import List
 from pathlib import Path
-from datetime import date
+from datetime import date, timedelta
 from models import BookingInterval, Conflict, ParseError
 from interval_merger import IntervalMerger
 
@@ -163,6 +163,6 @@ class ReportGenerator:
                     lines.append(f"  {current.isoformat()}: ■ 已预订")
                 else:
                     lines.append(f"  {current.isoformat()}: □ 空房")
-                current = current.replace(day=current.day + 1)
+                current = current + timedelta(days=1)
 
         return "\n".join(lines)

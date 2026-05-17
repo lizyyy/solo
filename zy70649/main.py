@@ -46,7 +46,7 @@ class BookingConflictChecker:
 
         if not all_intervals:
             print("错误: 未找到任何有效预订记录", file=sys.stderr)
-            return None, None, None
+            return [], [], [], all_errors
 
         all_intervals_sorted = sorted(
             all_intervals, key=lambda x: (x.room_id, x.checkin_date, x.checkout_date)
@@ -69,11 +69,10 @@ class BookingConflictChecker:
         output_json: str = None,
         show_calendar: bool = False,
     ):
-        result = self.process_files(input_files)
-        if result is None:
-            return 1
+        intervals, merged_intervals, conflicts, parse_errors = self.process_files(input_files)
 
-        intervals, merged_intervals, conflicts, parse_errors = result
+        if not intervals:
+            return 1
 
         if output_text:
             text_report = self.reporter.generate_text_report(

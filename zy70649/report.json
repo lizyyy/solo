@@ -67,7 +67,7 @@
           "date_range": "2025-06-01 ~ 2025-06-05",
           "guest": "张三",
           "platform": "airbnb,airbnb",
-          "source": "None",
+          "source": "examples/airbnb.csv:2",
           "booking_id": "AB12345,AB12346"
         },
         {
@@ -160,7 +160,7 @@
       "platform": "airbnb,airbnb",
       "booking_id": "AB12345,AB12346",
       "is_merged": true,
-      "source": "None"
+      "source": "examples/airbnb.csv:2"
     },
     {
       "room_id": "海景房A",

@@ -1,5 +1,5 @@
 from typing import List, Dict, Tuple
-from datetime import date
+from datetime import date, timedelta
 from collections import defaultdict
 from models import BookingInterval
 
@@ -88,7 +88,7 @@ class IntervalMerger:
             for interval in intervals:
                 if interval.contains_date(current_date):
                     occupancy[current_date][interval.room_id].append(interval)
-            current_date = current_date.replace(day=current_date.day + 1)
+            current_date = current_date + timedelta(days=1)
 
         return dict(occupancy)
 
@@ -111,6 +111,6 @@ class IntervalMerger:
             d = interval.checkin_date
             while d < interval.checkout_date:
                 all_dates.add(d)
-                d = d.replace(day=d.day + 1)
+                d = d + timedelta(days=1)
 
         return sorted(all_dates)
