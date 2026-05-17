@@ -1,0 +1,8 @@
+record_id,volunteer_id,shift_id,date,activity_name,actual_duration_minutes,is_substitute,original_volunteer_id,certification_status,location_valid
+REC_C001_0,V001,S001,2024-05-10,社区敬老活动,180,否,,verified,是
+REC_C002_1,V002,S001,2024-05-10,社区敬老活动,155,否,,rejected,是
+REC_C003_2,V003,S001,2024-05-10,社区敬老活动,180,否,,rejected,否
+REC_C004_3,V001,S002,2024-05-11,图书馆志愿服务,180,否,,rejected,是
+REC_C005_4,V004,S002,2024-05-11,图书馆志愿服务,180,否,,pending,否
+REC_C006_5,V002,S003,2024-05-12,敬老院探访,0,否,,pending,是
+REC_C007_6,V003,S003,2024-05-12,敬老院探访,0,否,,pending,是

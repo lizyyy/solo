@@ -1,0 +1,18 @@
+[
+  {
+    "volunteer_id": "V001",
+    "name": "张三",
+    "phone": "123",
+    "email": "zhangsan@example.com",
+    "status": "active",
+    "join_date": "invalid-date",
+    "skills": ["急救"]
+  },
+  {
+    "volunteer_id": "V002",
+    "name": "李四",
+    "phone": "",
+    "status": "unknown_status",
+    "join_date": "2024-01-01"
+  }
+]

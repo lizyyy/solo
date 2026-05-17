@@ -1,0 +1,34 @@
+================================================================================
+志愿者替班签到校验时长认证排查报告
+生成时间: 2026-05-17 17:36:51
+================================================================================
+
+【数据概览】
+  志愿者总数: 0
+  班次总数: 0
+  签到记录: 0
+  替班申请: 0
+  时长认证: 0
+
+【数据解析错误】
+  ✗ [volunteer_parse_error] 无法解析日期: invalid-date
+  ✗ [volunteer_parse_error] 'unknown_status' is not a valid VolunteerStatus
+  ✗ [shift_parse_error] 2 validation errors for Shift
+end_time
+  Value error, 结束时间必须晚于开始时间 [type=value_error, input_value=datetime.time(10, 0), input_type=time]
+    For further information visit https://errors.pydantic.dev/2.5/v/value_error
+capacity
+  Value error, 班次容量必须大于0 [type=value_error, input_value=-5, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.5/v/value_error
+
+【验证结果概要】
+  错误总数: 0
+  警告总数: 0
+  ✓ 所有验证通过
+
+【服务记录统计】
+  (无服务记录)
+
+================================================================================
+报告结束
+================================================================================

@@ -1,0 +1,50 @@
+[
+  {
+    "shift_id": "S001",
+    "activity_name": "社区敬老活动",
+    "location_id": "L001",
+    "date": "2024-05-10",
+    "start_time": "09:00",
+    "end_time": "12:00",
+    "capacity": 3,
+    "status": "completed",
+    "required_skills": ["引导"],
+    "volunteer_ids": ["V001", "V002", "V003"]
+  },
+  {
+    "shift_id": "S002",
+    "activity_name": "图书馆志愿服务",
+    "location_id": "L002",
+    "date": "2024-05-11",
+    "start_time": "14:00",
+    "end_time": "17:00",
+    "capacity": 2,
+    "status": "completed",
+    "required_skills": [],
+    "volunteer_ids": ["V001", "V004"]
+  },
+  {
+    "shift_id": "S003",
+    "activity_name": "敬老院探访",
+    "location_id": "L003",
+    "date": "2024-05-12",
+    "start_time": "09:00",
+    "end_time": "11:00",
+    "capacity": 2,
+    "status": "in_progress",
+    "required_skills": ["急救"],
+    "volunteer_ids": ["V002", "V003", "V004", "V001"]
+  },
+  {
+    "shift_id": "S004",
+    "activity_name": "环保宣传活动",
+    "location_id": "L001",
+    "date": "2024-05-13",
+    "start_time": "08:00",
+    "end_time": "18:00",
+    "capacity": 5,
+    "status": "planned",
+    "required_skills": [],
+    "volunteer_ids": []
+  }
+]

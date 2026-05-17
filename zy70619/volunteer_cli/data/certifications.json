@@ -1,0 +1,62 @@
+[
+  {
+    "certification_id": "CERT001",
+    "volunteer_id": "V001",
+    "shift_id": "S001",
+    "checkin_id": "C001",
+    "claimed_duration_minutes": 180,
+    "verified_duration_minutes": null,
+    "status": "pending",
+    "verifier_id": null,
+    "verify_time": null,
+    "notes": ""
+  },
+  {
+    "certification_id": "CERT002",
+    "volunteer_id": "V002",
+    "shift_id": "S001",
+    "checkin_id": "C002",
+    "claimed_duration_minutes": 200,
+    "verified_duration_minutes": null,
+    "status": "pending",
+    "verifier_id": null,
+    "verify_time": null,
+    "notes": "多报了时长"
+  },
+  {
+    "certification_id": "CERT003",
+    "volunteer_id": "V003",
+    "shift_id": "S001",
+    "checkin_id": "C003",
+    "claimed_duration_minutes": 190,
+    "verified_duration_minutes": null,
+    "status": "pending",
+    "verifier_id": null,
+    "verify_time": null,
+    "notes": ""
+  },
+  {
+    "certification_id": "CERT004",
+    "volunteer_id": "V001",
+    "shift_id": "S002",
+    "checkin_id": "C004",
+    "claimed_duration_minutes": 200,
+    "verified_duration_minutes": null,
+    "status": "pending",
+    "verifier_id": null,
+    "verify_time": null,
+    "notes": ""
+  },
+  {
+    "certification_id": "CERT005",
+    "volunteer_id": "V004",
+    "shift_id": "S002",
+    "checkin_id": "C999",
+    "claimed_duration_minutes": 180,
+    "verified_duration_minutes": null,
+    "status": "pending",
+    "verifier_id": null,
+    "verify_time": null,
+    "notes": "签到记录不存在"
+  }
+]

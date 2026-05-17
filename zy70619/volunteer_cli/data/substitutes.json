@@ -1,0 +1,46 @@
+[
+  {
+    "request_id": "SUB001",
+    "original_volunteer_id": "V001",
+    "substitute_volunteer_id": "V004",
+    "shift_id": "S001",
+    "request_time": "2024-05-09 10:00:00",
+    "approver_id": "ADMIN001",
+    "approval_time": "2024-05-09 11:30:00",
+    "status": "approved",
+    "reason": "个人事务请假"
+  },
+  {
+    "request_id": "SUB002",
+    "original_volunteer_id": "V002",
+    "substitute_volunteer_id": "V005",
+    "shift_id": "S002",
+    "request_time": "2024-05-10 15:00:00",
+    "approver_id": null,
+    "approval_time": null,
+    "status": "pending",
+    "reason": "身体不适"
+  },
+  {
+    "request_id": "SUB003",
+    "original_volunteer_id": "V999",
+    "substitute_volunteer_id": "V003",
+    "shift_id": "S999",
+    "request_time": "2024-05-11 09:00:00",
+    "approver_id": "ADMIN002",
+    "approval_time": "2024-05-11 09:30:00",
+    "status": "approved",
+    "reason": "紧急替班"
+  },
+  {
+    "request_id": "SUB004",
+    "original_volunteer_id": "V003",
+    "substitute_volunteer_id": "V001",
+    "shift_id": "S003",
+    "request_time": "2024-05-12 08:00:00",
+    "approver_id": null,
+    "approval_time": "2024-05-12 08:30:00",
+    "status": "approved",
+    "reason": "临时替班"
+  }
+]

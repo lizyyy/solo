@@ -1,0 +1,108 @@
+{
+  "capacity_violations": [
+    {
+      "type": "capacity_violation",
+      "shift_id": "S001",
+      "activity_name": "社区敬老活动",
+      "capacity": 3,
+      "actual": 4,
+      "excess": 1,
+      "severity": "error"
+    },
+    {
+      "type": "capacity_violation",
+      "shift_id": "S003",
+      "activity_name": "敬老院探访",
+      "capacity": 2,
+      "actual": 5,
+      "excess": 3,
+      "severity": "error"
+    }
+  ],
+  "location_violations": [
+    {
+      "type": "location_violation",
+      "checkin_id": "C003",
+      "volunteer_id": "V003",
+      "shift_id": "S001",
+      "distance_meters": 1611.56,
+      "allowed_radius": 100,
+      "severity": "warning"
+    },
+    {
+      "type": "missing_location",
+      "checkin_id": "C005",
+      "volunteer_id": "V004",
+      "shift_id": "S002",
+      "severity": "warning"
+    }
+  ],
+  "substitute_violations": [
+    {
+      "type": "invalid_original_volunteer",
+      "request_id": "SUB003",
+      "volunteer_id": "V999",
+      "severity": "error"
+    },
+    {
+      "type": "invalid_shift",
+      "request_id": "SUB003",
+      "shift_id": "S999",
+      "severity": "error"
+    },
+    {
+      "type": "missing_approver",
+      "request_id": "SUB004",
+      "shift_id": "S003",
+      "severity": "error"
+    }
+  ],
+  "duration_recalculations": [
+    {
+      "type": "duration_mismatch",
+      "certification_id": "CERT002",
+      "volunteer_id": "V002",
+      "shift_id": "S001",
+      "claimed": 200,
+      "actual": 155,
+      "difference": -45,
+      "severity": "warning"
+    },
+    {
+      "type": "duration_mismatch",
+      "certification_id": "CERT003",
+      "volunteer_id": "V003",
+      "shift_id": "S001",
+      "claimed": 190,
+      "actual": 180,
+      "difference": -10,
+      "severity": "warning"
+    },
+    {
+      "type": "duration_mismatch",
+      "certification_id": "CERT004",
+      "volunteer_id": "V001",
+      "shift_id": "S002",
+      "claimed": 200,
+      "actual": 180,
+      "difference": -20,
+      "severity": "warning"
+    },
+    {
+      "type": "missing_checkin",
+      "certification_id": "CERT005",
+      "checkin_id": "C999",
+      "severity": "error"
+    }
+  ],
+  "summary": {
+    "total_volunteers": 5,
+    "total_shifts": 4,
+    "total_checkins": 7,
+    "total_substitutes": 4,
+    "total_certifications": 5,
+    "total_errors": 6,
+    "total_warnings": 5,
+    "has_issues": true
+  }
+}
