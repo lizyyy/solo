@@ -279,7 +279,7 @@ class TestManualCorrection:
 
 class TestExport:
     
-    def test_export_json(self, client):
+    def test_export_json_basic(self, client):
         client.post(
             "/api/boxes/",
             json={"box_code": "BOX-PYTEST-001", "product_name": "测试产品"}
@@ -290,6 +290,134 @@ class TestExport:
         )
         assert response.status_code == 200
         assert response.json()["success"] == True
+    
+    def test_export_json_full_chain_fields(self, client):
+        # 创建完整的异常处理链路
+        client.post(
+            "/api/boxes/",
+            json={
+                "box_code": "BOX-EXPORT-001",
+                "batch_no": "BATCH-EXPORT-001",
+                "product_name": "进口冷冻海鲜",
+                "temperature_min": -25.0,
+                "temperature_max": -15.0
+            }
+        )
+        
+        # 推进状态
+        client.post(
+            "/api/boxes/BOX-EXPORT-001/status",
+            json={"target_status": "IN_TRANSIT", "operator": "物流员", "comment": "开始运输"}
+        )
+        client.post(
+            "/api/boxes/BOX-EXPORT-001/status",
+            json={"target_status": "ARRIVED", "operator": "门店"}
+        )
+        
+        # 创建异常签收
+        signoff_response = client.post(
+            "/api/signoffs/",
+            json={
+                "box_code": "BOX-EXPORT-001",
+                "store_code": "STORE-EXPORT-001",
+                "store_name": "北京朝阳门店",
+                "signoff_person": "李四",
+                "signoff_time": datetime.now().isoformat(),
+                "temperature_arrival": -5.0,
+                "has_exception": True,
+                "exception_desc": "箱体外有大量水珠，内部温度超标严重"
+            }
+        )
+        signoff_id = signoff_response.json()["id"]
+        
+        # 确认签收
+        client.post(f"/api/signoffs/{signoff_id}/status?target_status=SUBMITTED&operator=李四")
+        client.post(f"/api/signoffs/{signoff_id}/status?target_status=CONFIRMED&operator=店长")
+        
+        # 异常复核
+        review_response = client.post(
+            "/api/reviews/",
+            json={
+                "box_code": "BOX-EXPORT-001",
+                "signoff_id": signoff_id,
+                "reviewer": "质量主管-王五",
+                "original_input": "这是原始输入：现场拍摄照片显示冷链箱密封失效，温度计显示-2度",
+                "review_result": "确认冷链中断",
+                "review_comment": "运输过程中制冷机故障，建议全额赔付",
+                "temperature_violation": True,
+                "compensation_eligible": True
+            }
+        )
+        review_id = review_response.json()["id"]
+        
+        # 赔付结论
+        client.post(
+            "/api/compensations/",
+            json={
+                "box_code": "BOX-EXPORT-001",
+                "review_id": review_id,
+                "compensation_amount": 8000.0,
+                "compensation_reason": "冷链中断导致全部产品变质",
+                "processor": "财务-赵六",
+                "approved_by": "经理-钱七"
+            }
+        )
+        
+        # 导出并验证字段
+        response = client.post(
+            "/api/export/",
+            json={"export_format": "json"}
+        )
+        assert response.status_code == 200
+        assert response.json()["success"] == True
+        
+        data = response.json()["data"]
+        assert len(data) == 1
+        
+        box_data = data[0]
+        assert box_data["box_code"] == "BOX-EXPORT-001"
+        assert box_data["batch_no"] == "BATCH-EXPORT-001"
+        # 创建赔付时状态自动推进到 COMPENSATED
+        assert box_data["status"] == "COMPENSATED"
+        
+        # 验证签收字段完整
+        assert len(box_data["signoffs"]) == 1
+        signoff_data = box_data["signoffs"][0]
+        assert signoff_data["store_code"] == "STORE-EXPORT-001"
+        assert signoff_data["store_name"] == "北京朝阳门店"
+        assert signoff_data["signoff_person"] == "李四"
+        assert signoff_data["temperature_arrival"] == -5.0
+        assert signoff_data["has_exception"] == True
+        assert "箱体外有大量水珠" in signoff_data["exception_desc"]
+        
+        # 验证复核字段完整（核心修复点）
+        assert len(box_data["reviews"]) == 1
+        review_data = box_data["reviews"][0]
+        assert review_data["reviewer"] == "质量主管-王五"
+        assert review_data["original_input"] is not None
+        assert review_data["review_result"] == "确认冷链中断"
+        assert review_data["review_comment"] == "运输过程中制冷机故障，建议全额赔付"
+        assert review_data["temperature_violation"] == True
+        assert review_data["compensation_eligible"] == True
+        
+        # 验证原始输入确实保留了调用方内容
+        original_input_json = json.loads(review_data["original_input"])
+        assert "原始输入" in original_input_json["caller_input"]
+        
+        # 验证赔付字段完整（核心修复点）
+        assert len(box_data["compensations"]) == 1
+        compensation_data = box_data["compensations"][0]
+        assert compensation_data["amount"] == 8000.0
+        assert "冷链中断导致全部产品变质" in compensation_data["reason"]
+        assert compensation_data["processor"] == "财务-赵六"
+        assert compensation_data["approved_by"] == "经理-钱七"
+        
+        # 验证审计日志导出
+        assert len(box_data["audit_logs"]) > 0
+        status_transitions = [a for a in box_data["audit_logs"] if a["action_type"] == "STATUS_TRANSITION"]
+        assert len(status_transitions) >= 2
+        review_logs = [a for a in box_data["audit_logs"] if a["action_type"] == "EXCEPTION_REVIEW"]
+        assert len(review_logs) >= 1
 
 
 class TestHealthCheck:

@@ -197,21 +197,66 @@ def export_data(export_request: schemas.ExportRequest, db: Session = Depends(get
                 "batch_no": box.batch_no,
                 "product_name": box.product_name,
                 "status": box.status,
+                "temperature_min": box.temperature_min,
+                "temperature_max": box.temperature_max,
+                "created_at": box.created_at.isoformat(),
                 "temperature_samples": [
-                    {"time": s.sample_time.isoformat(), "temperature": s.temperature, "is_anomaly": s.is_anomaly}
+                    {
+                        "time": s.sample_time.isoformat(),
+                        "temperature": s.temperature,
+                        "is_anomaly": s.is_anomaly,
+                        "probe_id": s.probe_id
+                    }
                     for s in box.temperature_samples
                 ],
                 "signoffs": [
-                    {"store_code": s.store_code, "signoff_person": s.signoff_person, "has_exception": s.has_exception}
+                    {
+                        "store_code": s.store_code,
+                        "store_name": s.store_name,
+                        "signoff_person": s.signoff_person,
+                        "signoff_time": s.signoff_time.isoformat() if s.signoff_time else None,
+                        "temperature_arrival": s.temperature_arrival,
+                        "has_exception": s.has_exception,
+                        "exception_desc": s.exception_desc,
+                        "status": s.status
+                    }
                     for s in box.signoffs
                 ],
                 "reviews": [
-                    {"reviewer": r.reviewer, "compensation_eligible": r.compensation_eligible}
+                    {
+                        "reviewer": r.reviewer,
+                        "review_time": r.review_time.isoformat() if r.review_time else None,
+                        "original_input": r.original_input,
+                        "review_result": r.review_result,
+                        "review_comment": r.review_comment,
+                        "temperature_violation": r.temperature_violation,
+                        "compensation_eligible": r.compensation_eligible,
+                        "status": r.status
+                    }
                     for r in box.reviews
                 ],
                 "compensations": [
-                    {"amount": c.compensation_amount, "reason": c.compensation_reason}
+                    {
+                        "amount": c.compensation_amount,
+                        "reason": c.compensation_reason,
+                        "processor": c.processor,
+                        "approved_by": c.approved_by,
+                        "conclusion_time": c.conclusion_time.isoformat() if c.conclusion_time else None,
+                        "status": c.status
+                    }
                     for c in box.compensations
+                ],
+                "audit_logs": [
+                    {
+                        "action_type": a.action_type,
+                        "operator": a.operator,
+                        "old_status": a.old_status,
+                        "new_status": a.new_status,
+                        "comment": a.comment,
+                        "change_details": a.change_details,
+                        "created_at": a.created_at.isoformat()
+                    }
+                    for a in box.audit_logs
                 ]
             })
         return {"success": True, "message": "导出成功", "data": result}
@@ -234,7 +279,14 @@ def export_data(export_request: schemas.ExportRequest, db: Session = Depends(get
         ])
     
     ws2 = wb.create_sheet("异常报告")
-    headers2 = ["箱号", "门店编码", "签收人", "异常描述", "复核人", "温度违规", "赔付金额", "状态"]
+    headers2 = [
+        "箱号", "批次号", "门店编码", "门店名称", "签收人", "签收时间",
+        "到货温度", "是否异常", "异常描述",
+        "复核人", "复核时间", "复核原始输入", "复核结论", "复核意见",
+        "温度违规", "符合赔付",
+        "赔付金额", "赔付原因", "赔付处理人", "审批人",
+        "状态"
+    ]
     ws2.append(headers2)
     
     for box in boxes:
@@ -243,18 +295,66 @@ def export_data(export_request: schemas.ExportRequest, db: Session = Depends(get
             compensation = db.query(models.CompensationConclusion).filter(
                 models.CompensationConclusion.review_id == review.id
             ).first()
+            
+            original_input_display = ""
+            if review.original_input:
+                try:
+                    import json
+                    original_data = json.loads(review.original_input)
+                    original_input_display = original_data.get("caller_input", review.original_input)
+                except:
+                    original_input_display = review.original_input
+            
             ws2.append([
                 box.box_code,
+                box.batch_no,
                 signoff.store_code if signoff else "",
+                signoff.store_name if signoff else "",
                 signoff.signoff_person if signoff else "",
+                signoff.signoff_time.strftime("%Y-%m-%d %H:%M:%S") if signoff and signoff.signoff_time else "",
+                signoff.temperature_arrival if signoff else "",
+                "是" if (signoff and signoff.has_exception) else "否",
                 signoff.exception_desc if signoff else "",
                 review.reviewer,
+                review.review_time.strftime("%Y-%m-%d %H:%M:%S") if review.review_time else "",
+                original_input_display,
+                review.review_result,
+                review.review_comment,
                 "是" if review.temperature_violation else "否",
+                "是" if review.compensation_eligible else "否",
                 compensation.compensation_amount if compensation else 0,
+                compensation.compensation_reason if compensation else "",
+                compensation.processor if compensation else "",
+                compensation.approved_by if compensation else "",
                 review.status
             ])
     
-    for ws in [ws1, ws2]:
+    ws3 = wb.create_sheet("审计日志")
+    headers3 = ["箱号", "操作类型", "操作人", "旧状态", "新状态", "备注", "变更详情", "操作时间"]
+    ws3.append(headers3)
+    
+    for box in boxes:
+        for audit in box.audit_logs:
+            change_details_display = ""
+            if audit.change_details:
+                import json
+                if isinstance(audit.change_details, dict):
+                    change_details_display = json.dumps(audit.change_details, ensure_ascii=False)
+                else:
+                    change_details_display = str(audit.change_details)
+            
+            ws3.append([
+                box.box_code,
+                audit.action_type,
+                audit.operator,
+                audit.old_status,
+                audit.new_status,
+                audit.comment,
+                change_details_display,
+                audit.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            ])
+    
+    for ws in [ws1, ws2, ws3]:
         for cell in ws[1]:
             cell.font = Font(bold=True)
             cell.fill = PatternFill(start_color="DDDDDD", fill_type="solid")
