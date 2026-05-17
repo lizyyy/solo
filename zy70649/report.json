@@ -1,0 +1,194 @@
+{
+  "generated_at": "2026-05-17",
+  "summary": {
+    "total_original": 7,
+    "total_merged": 6,
+    "total_conflicts": 4,
+    "total_parse_errors": 0
+  },
+  "conflicts": [
+    {
+      "conflict_type": "same_day_transition",
+      "room_id": "山景房B",
+      "room_name": "山景房B",
+      "date": "2025-06-12",
+      "description": "日期 2025-06-12 存在同日退房和入住: 1个退房, 1个入住，需确认打扫时间",
+      "intervals_count": 2,
+      "intervals": [
+        {
+          "date_range": "2025-06-10 ~ 2025-06-12",
+          "guest": "李四",
+          "platform": "airbnb",
+          "source": "examples/airbnb.csv:4",
+          "booking_id": "AB12347"
+        },
+        {
+          "date_range": "2025-06-12 ~ 2025-06-15",
+          "guest": "钱七",
+          "platform": "airbnb",
+          "source": "examples/tujia.csv:3",
+          "booking_id": ""
+        }
+      ]
+    },
+    {
+      "conflict_type": "overlapping_booking",
+      "room_id": "山景房B",
+      "room_name": "山景房B",
+      "date": "2025-06-14",
+      "description": "日期 2025-06-14 存在重叠预订: 钱七(airbnb) 和 孙八(airbnb)",
+      "intervals_count": 2,
+      "intervals": [
+        {
+          "date_range": "2025-06-12 ~ 2025-06-15",
+          "guest": "钱七",
+          "platform": "airbnb",
+          "source": "examples/tujia.csv:3",
+          "booking_id": ""
+        },
+        {
+          "date_range": "2025-06-14 ~ 2025-06-16",
+          "guest": "孙八",
+          "platform": "airbnb",
+          "source": "examples/tujia.csv:4",
+          "booking_id": ""
+        }
+      ]
+    },
+    {
+      "conflict_type": "overlapping_booking",
+      "room_id": "海景房A",
+      "room_name": "海景房A",
+      "date": "2025-06-04",
+      "description": "日期 2025-06-04 存在重叠预订: 张三(airbnb,airbnb) 和 赵六(airbnb)",
+      "intervals_count": 2,
+      "intervals": [
+        {
+          "date_range": "2025-06-01 ~ 2025-06-05",
+          "guest": "张三",
+          "platform": "airbnb,airbnb",
+          "source": "None",
+          "booking_id": "AB12345,AB12346"
+        },
+        {
+          "date_range": "2025-06-04 ~ 2025-06-06",
+          "guest": "赵六",
+          "platform": "airbnb",
+          "source": "examples/tujia.csv:2",
+          "booking_id": ""
+        }
+      ]
+    },
+    {
+      "conflict_type": "booking_gap",
+      "room_id": "海景房A",
+      "room_name": "海景房A",
+      "date": "2025-06-06",
+      "description": "日期 2025-06-06 至 2025-06-07 存在 1 天空房缺口",
+      "intervals_count": 2,
+      "intervals": [
+        {
+          "date_range": "2025-06-04 ~ 2025-06-06",
+          "guest": "赵六",
+          "platform": "airbnb",
+          "source": "examples/tujia.csv:2",
+          "booking_id": ""
+        },
+        {
+          "date_range": "2025-06-07 ~ 2025-06-09",
+          "guest": "王五",
+          "platform": "airbnb",
+          "source": "examples/airbnb.csv:5",
+          "booking_id": "AB12348"
+        }
+      ]
+    }
+  ],
+  "parse_errors": [],
+  "merged_bookings": [
+    {
+      "room_id": "山景房B",
+      "room_name": "山景房B",
+      "checkin": "2025-06-10",
+      "checkout": "2025-06-12",
+      "nights": 2,
+      "guest_name": "李四",
+      "status": "confirmed",
+      "lock_reason": "booking",
+      "platform": "airbnb",
+      "booking_id": "AB12347",
+      "is_merged": false,
+      "source": "examples/airbnb.csv:4"
+    },
+    {
+      "room_id": "山景房B",
+      "room_name": "山景房B",
+      "checkin": "2025-06-12",
+      "checkout": "2025-06-15",
+      "nights": 3,
+      "guest_name": "钱七",
+      "status": "confirmed",
+      "lock_reason": "booking",
+      "platform": "airbnb",
+      "booking_id": "",
+      "is_merged": false,
+      "source": "examples/tujia.csv:3"
+    },
+    {
+      "room_id": "山景房B",
+      "room_name": "山景房B",
+      "checkin": "2025-06-14",
+      "checkout": "2025-06-16",
+      "nights": 2,
+      "guest_name": "孙八",
+      "status": "confirmed",
+      "lock_reason": "booking",
+      "platform": "airbnb",
+      "booking_id": "",
+      "is_merged": false,
+      "source": "examples/tujia.csv:4"
+    },
+    {
+      "room_id": "海景房A",
+      "room_name": "海景房A",
+      "checkin": "2025-06-01",
+      "checkout": "2025-06-05",
+      "nights": 4,
+      "guest_name": "张三",
+      "status": "confirmed",
+      "lock_reason": "booking",
+      "platform": "airbnb,airbnb",
+      "booking_id": "AB12345,AB12346",
+      "is_merged": true,
+      "source": "None"
+    },
+    {
+      "room_id": "海景房A",
+      "room_name": "海景房A",
+      "checkin": "2025-06-04",
+      "checkout": "2025-06-06",
+      "nights": 2,
+      "guest_name": "赵六",
+      "status": "confirmed",
+      "lock_reason": "booking",
+      "platform": "airbnb",
+      "booking_id": "",
+      "is_merged": false,
+      "source": "examples/tujia.csv:2"
+    },
+    {
+      "room_id": "海景房A",
+      "room_name": "海景房A",
+      "checkin": "2025-06-07",
+      "checkout": "2025-06-09",
+      "nights": 2,
+      "guest_name": "王五",
+      "status": "confirmed",
+      "lock_reason": "booking",
+      "platform": "airbnb",
+      "booking_id": "AB12348",
+      "is_merged": false,
+      "source": "examples/airbnb.csv:5"
+    }
+  ]
+}
