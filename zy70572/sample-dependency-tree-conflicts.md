@@ -1,7 +1,7 @@
 # Maven Dependency Conflict Report
 
 **Project**: assertj-core  
-**Generated**: 2026-05-17 13:54:22  
+**Generated**: 2026-05-17 14:10:01  
 **Input**: `/Users/lzy/pro/solo/workspaces/zy70572/sample-dependency-tree.txt`
 
 ## Summary
