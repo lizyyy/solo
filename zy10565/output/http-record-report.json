@@ -1,0 +1,303 @@
+{
+  "summary": {
+    "totalRequests": 7,
+    "validRequests": 5,
+    "badRequests": 2,
+    "variablesExtracted": 8,
+    "sensitiveValuesMasked": 2
+  },
+  "variables": {
+    "TARGET_HOST": {
+      "name": "TARGET_HOST",
+      "value": "api.example.com",
+      "type": "host",
+      "location": "url",
+      "occurrences": 5
+    },
+    "AUTH_TOKEN": {
+      "name": "AUTH_TOKEN",
+      "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
+      "type": "token",
+      "location": "header",
+      "occurrences": 2
+    },
+    "BEARER_TOKEN": {
+      "name": "BEARER_TOKEN",
+      "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
+      "type": "token",
+      "location": "header",
+      "occurrences": 2
+    },
+    "API_KEY": {
+      "name": "API_KEY",
+      "value": "secret-key-123",
+      "type": "token",
+      "location": "header",
+      "occurrences": 1
+    },
+    "TIMESTAMP_SEC": {
+      "name": "TIMESTAMP_SEC",
+      "value": "1715000000",
+      "type": "timestamp",
+      "location": "url",
+      "occurrences": 2
+    },
+    "SENSITIVE_PASSWORD_1": {
+      "name": "SENSITIVE_PASSWORD_1",
+      "value": "***MASKED***",
+      "type": "sensitive",
+      "location": "url",
+      "occurrences": 1
+    },
+    "TIMESTAMP_MS": {
+      "name": "TIMESTAMP_MS",
+      "value": "1715001234567",
+      "type": "timestamp",
+      "location": "url",
+      "occurrences": 1
+    },
+    "SENSITIVE_CREDIT_CARD_1": {
+      "name": "SENSITIVE_CREDIT_CARD_1",
+      "value": "***MASKED***",
+      "type": "sensitive",
+      "location": "url",
+      "occurrences": 1
+    }
+  },
+  "records": [
+    {
+      "id": "req-1",
+      "lineNumber": 1,
+      "original": "{\"method\": \"GET\", \"url\": \"https://api.example.com/users/12345?timestamp=1715000000\", \"headers\": {\"Authorization\": \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U\", \"X-API-Key\": \"secret-key-123\", \"Content-Type\": \"application/json\"}}",
+      "headers": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
+        "X-API-Key": "secret-key-123",
+        "Content-Type": "application/json"
+      },
+      "queryParams": {
+        "timestamp": "1715000000"
+      },
+      "isBadLine": false,
+      "variables": {
+        "TARGET_HOST": {
+          "name": "TARGET_HOST",
+          "value": "api.example.com",
+          "type": "host",
+          "location": "url",
+          "occurrences": 1
+        },
+        "AUTH_TOKEN": {
+          "name": "AUTH_TOKEN",
+          "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
+          "type": "token",
+          "location": "header",
+          "occurrences": 1
+        },
+        "BEARER_TOKEN": {
+          "name": "BEARER_TOKEN",
+          "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
+          "type": "token",
+          "location": "header",
+          "occurrences": 1
+        },
+        "API_KEY": {
+          "name": "API_KEY",
+          "value": "secret-key-123",
+          "type": "token",
+          "location": "header",
+          "occurrences": 1
+        },
+        "TIMESTAMP_SEC": {
+          "name": "TIMESTAMP_SEC",
+          "value": "1715000000",
+          "type": "timestamp",
+          "location": "url",
+          "occurrences": 1
+        }
+      },
+      "method": "GET",
+      "url": "https://api.example.com/users/12345?timestamp=1715000000",
+      "protocol": "https",
+      "host": "api.example.com",
+      "path": "/users/12345"
+    },
+    {
+      "id": "req-3",
+      "lineNumber": 3,
+      "original": "这是一行坏数据，应该被识别为异常请求",
+      "headers": {},
+      "queryParams": {},
+      "isBadLine": true,
+      "variables": {},
+      "badLineReason": "Unrecognized format"
+    },
+    {
+      "id": "req-5",
+      "lineNumber": 5,
+      "original": "{\"method\": \"POST\", \"url\": \"https://api.example.com/auth/login\", \"headers\": {\"Content-Type\": \"application/json\"}, \"body\": \"{\\\"username\\\":\\\"test\\\",\\\"password\\\":\\\"mySecretPassword123\\\"}\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": {},
+      "isBadLine": false,
+      "variables": {
+        "TARGET_HOST": {
+          "name": "TARGET_HOST",
+          "value": "api.example.com",
+          "type": "host",
+          "location": "url",
+          "occurrences": 1
+        },
+        "SENSITIVE_PASSWORD_1": {
+          "name": "SENSITIVE_PASSWORD_1",
+          "value": "***MASKED***",
+          "type": "sensitive",
+          "location": "url",
+          "occurrences": 1
+        }
+      },
+      "method": "POST",
+      "url": "https://api.example.com/auth/login",
+      "body": "{\"username\":\"test\",\"password\":\"mySecretPassword123\"}",
+      "protocol": "https",
+      "host": "api.example.com",
+      "path": "/auth/login"
+    },
+    {
+      "id": "req-7",
+      "lineNumber": 7,
+      "original": "curl -X PUT 'https://api.example.com/items/999' -H 'Authorization: Bearer another-token-here' -H 'Content-Type: application/json' -d '{\"name\":\"test\",\"timestamp\":1715001234567}'",
+      "headers": {
+        "Authorization": "Bearer another-token-here",
+        "Content-Type": "application/json"
+      },
+      "queryParams": {},
+      "isBadLine": false,
+      "variables": {
+        "TARGET_HOST": {
+          "name": "TARGET_HOST",
+          "value": "api.example.com",
+          "type": "host",
+          "location": "url",
+          "occurrences": 1
+        },
+        "AUTH_TOKEN": {
+          "name": "AUTH_TOKEN",
+          "value": "Bearer another-token-here",
+          "type": "token",
+          "location": "header",
+          "occurrences": 1
+        },
+        "BEARER_TOKEN": {
+          "name": "BEARER_TOKEN",
+          "value": "Bearer another-token-here",
+          "type": "token",
+          "location": "header",
+          "occurrences": 1
+        },
+        "TIMESTAMP_MS": {
+          "name": "TIMESTAMP_MS",
+          "value": "1715001234567",
+          "type": "timestamp",
+          "location": "url",
+          "occurrences": 1
+        },
+        "SENSITIVE_CREDIT_CARD_1": {
+          "name": "SENSITIVE_CREDIT_CARD_1",
+          "value": "***MASKED***",
+          "type": "sensitive",
+          "location": "url",
+          "occurrences": 1
+        }
+      },
+      "method": "PUT",
+      "url": "https://api.example.com/items/999",
+      "protocol": "https",
+      "host": "api.example.com",
+      "path": "/items/999",
+      "body": "{\"name\":\"test\",\"timestamp\":1715001234567}"
+    },
+    {
+      "id": "req-9",
+      "lineNumber": 9,
+      "original": "GET https://api.example.com/healthcheck",
+      "headers": {},
+      "queryParams": {},
+      "isBadLine": false,
+      "variables": {
+        "TARGET_HOST": {
+          "name": "TARGET_HOST",
+          "value": "api.example.com",
+          "type": "host",
+          "location": "url",
+          "occurrences": 1
+        }
+      },
+      "method": "GET",
+      "url": "https://api.example.com/healthcheck",
+      "protocol": "https",
+      "host": "api.example.com",
+      "path": "/healthcheck"
+    },
+    {
+      "id": "req-11",
+      "lineNumber": 11,
+      "original": "invalid data that cannot be parsed as a valid request",
+      "headers": {},
+      "queryParams": {},
+      "isBadLine": true,
+      "variables": {},
+      "badLineReason": "Unrecognized format"
+    },
+    {
+      "id": "req-13",
+      "lineNumber": 13,
+      "original": "{\"method\": \"DELETE\", \"url\": \"https://api.example.com/orders/555?ts=1715009999\"}",
+      "headers": {},
+      "queryParams": {
+        "ts": "1715009999"
+      },
+      "isBadLine": false,
+      "variables": {
+        "TARGET_HOST": {
+          "name": "TARGET_HOST",
+          "value": "api.example.com",
+          "type": "host",
+          "location": "url",
+          "occurrences": 1
+        },
+        "TIMESTAMP_SEC": {
+          "name": "TIMESTAMP_SEC",
+          "value": "1715009999",
+          "type": "timestamp",
+          "location": "url",
+          "occurrences": 1
+        }
+      },
+      "method": "DELETE",
+      "url": "https://api.example.com/orders/555?ts=1715009999",
+      "protocol": "https",
+      "host": "api.example.com",
+      "path": "/orders/555"
+    }
+  ],
+  "replayCommands": [
+    "curl 'https://${TARGET_HOST}/users/12345?timestamp=${TIMESTAMP_SEC}' -H 'Authorization: ${AUTH_TOKEN}' -H 'X-API-Key: ${API_KEY}' -H 'Content-Type: application/json'",
+    "curl -X POST 'https://${TARGET_HOST}/auth/login' -H 'Content-Type: application/json' -d '{\"username\":\"test\",\"password\":\"mySecretPassword123\"}'",
+    "curl -X PUT 'https://${TARGET_HOST}/items/999' -H 'Authorization: ${AUTH_TOKEN}' -H 'Content-Type: application/json' -d '{\"name\":\"test\",\"timestamp\":${TIMESTAMP_MS}}'",
+    "curl 'https://${TARGET_HOST}/healthcheck'",
+    "curl -X DELETE 'https://${TARGET_HOST}/orders/555?ts=${TIMESTAMP_SEC}'"
+  ],
+  "badLinesDetails": [
+    {
+      "lineNumber": 3,
+      "original": "这是一行坏数据，应该被识别为异常请求",
+      "reason": "Unrecognized format"
+    },
+    {
+      "lineNumber": 11,
+      "original": "invalid data that cannot be parsed as a valid request",
+      "reason": "Unrecognized format"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{"method": "GET", "url": "https://api.example.com/users/12345?timestamp=1715000000", "headers": {"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U", "X-API-Key": "secret-key-123", "Content-Type": "application/json"}}
+
+这是一行坏数据，应该被识别为异常请求
+
+{"method": "POST", "url": "https://api.example.com/auth/login", "headers": {"Content-Type": "application/json"}, "body": "{\"username\":\"test\",\"password\":\"mySecretPassword123\"}"}
+
+curl -X PUT 'https://api.example.com/items/999' -H 'Authorization: Bearer another-token-here' -H 'Content-Type: application/json' -d '{"name":"test","timestamp":1715001234567}'
+
+GET https://api.example.com/healthcheck
+
+invalid data that cannot be parsed as a valid request
+
+{"method": "DELETE", "url": "https://api.example.com/orders/555?ts=1715009999"}

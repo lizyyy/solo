@@ -1,0 +1,35 @@
+{
+  "name": "http-record-variable-cli",
+  "version": "1.0.0",
+  "description": "HTTP录制变量化CLI工具",
+  "main": "dist/cli.js",
+  "bin": {
+    "httpv": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node --test dist/**/*.test.js",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "http",
+    "record",
+    "replay",
+    "variable",
+    "cli",
+    "testing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
