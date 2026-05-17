@@ -1,0 +1,84 @@
+{
+  "filePath": "test/data_dirty.csv",
+  "keyColumns": [
+    "id"
+  ],
+  "summary": {
+    "totalRows": 8,
+    "validRows": 7,
+    "nullKeyCount": 1,
+    "duplicateCount": 2,
+    "duplicateRowsCount": 4,
+    "hasIssues": true
+  },
+  "duplicateGroups": [
+    {
+      "normalizedKey": "1",
+      "originalKeys": [
+        "1",
+        " 1 "
+      ],
+      "rows": [
+        {
+          "lineNumber": 1,
+          "originalKey": "1"
+        },
+        {
+          "lineNumber": 2,
+          "originalKey": " 1 "
+        }
+      ],
+      "count": 2
+    },
+    {
+      "normalizedKey": "2",
+      "originalKeys": [
+        "2",
+        "2 "
+      ],
+      "rows": [
+        {
+          "lineNumber": 3,
+          "originalKey": "2"
+        },
+        {
+          "lineNumber": 4,
+          "originalKey": "2 "
+        }
+      ],
+      "count": 2
+    }
+  ],
+  "badRows": [
+    {
+      "lineNumber": 1,
+      "reason": "主键重复 (归一化后: 1)",
+      "normalizedKey": "1",
+      "originalKey": "1"
+    },
+    {
+      "lineNumber": 2,
+      "reason": "主键重复 (归一化后: 1)",
+      "normalizedKey": "1",
+      "originalKey": " 1 "
+    },
+    {
+      "lineNumber": 3,
+      "reason": "主键重复 (归一化后: 2)",
+      "normalizedKey": "2",
+      "originalKey": "2"
+    },
+    {
+      "lineNumber": 4,
+      "reason": "主键重复 (归一化后: 2)",
+      "normalizedKey": "2",
+      "originalKey": "2 "
+    },
+    {
+      "lineNumber": 7,
+      "reason": "主键列为空",
+      "normalizedKey": null,
+      "originalKey": null
+    }
+  ]
+}

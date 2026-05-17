@@ -1,0 +1,19 @@
+{
+  "name": "csv-duplicate-checker",
+  "version": "1.0.0",
+  "description": "CSV主键重复检测CLI工具",
+  "main": "src/cli.js",
+  "bin": {
+    "csv-dup-check": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "keywords": ["csv", "duplicate", "cli", "data-quality"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "yargs": "^17.7.2"
+  }
+}
