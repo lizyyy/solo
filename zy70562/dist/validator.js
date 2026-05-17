@@ -156,21 +156,18 @@ class Validator {
         if (rule.annotations) {
             for (const [annoKey, annoValue] of Object.entries(rule.annotations)) {
                 const annotationParser = new annotation_parser_1.AnnotationParser(annoValue);
-                const placeholders = annotationParser.extractPlaceholders();
-                for (const placeholder of placeholders) {
-                    const placeholderParts = placeholder.name.split(".");
-                    const labelName = placeholderParts[placeholderParts.length - 1];
-                    if (!availableLabels.includes(labelName) &&
-                        !["labels", "value", "externalURL", "expr"].includes(labelName)) {
+                const referencedLabels = annotationParser.extractLabelNames();
+                for (const labelName of referencedLabels) {
+                    if (!availableLabels.includes(labelName)) {
                         issues.push({
                             type: "warning",
                             category: "annotation",
-                            message: `Annotation placeholder '${placeholder.name}' references label '${labelName}' not available in expression`,
+                            message: `Annotation references label '${labelName}' which is not available in the expression labels. Available labels: [${availableLabels.join(", ")}]`,
                             ruleName: rule.alert,
                             groupName,
                             filePath,
                             line: lineNumber,
-                            rawContent: placeholder.fullMatch,
+                            rawContent: annoValue,
                         });
                     }
                 }
@@ -254,8 +251,10 @@ class Validator {
                         let rendered = String(annoValue);
                         for (const [labelKey, labelValue] of Object.entries(sample.metric)) {
                             rendered = rendered.replace(new RegExp(`{{\\s*\\.labels\\.${labelKey}\\s*}}`, "g"), labelValue);
+                            rendered = rendered.replace(new RegExp(`{{\\s*\\$labels\\.${labelKey}\\s*}}`, "g"), labelValue);
                         }
                         rendered = rendered.replace(new RegExp(`{{\\s*\\.value\\s*}}`, "g"), value.toString());
+                        rendered = rendered.replace(new RegExp(`{{\\s*\\$value\\s*}}`, "g"), value.toString());
                         annotationRendered[key] = rendered;
                     }
                 }

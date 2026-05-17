@@ -1,0 +1,147 @@
+{
+  "summary": {
+    "totalRules": 3,
+    "totalGroups": 1,
+    "totalIssues": 1,
+    "errors": 0,
+    "warnings": 1,
+    "infos": 0,
+    "rulesWithIssues": 1
+  },
+  "results": [
+    {
+      "ruleName": "HighCPUUsage",
+      "groupName": "test-rules",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+      "expr": "node_cpu_seconds_total{mode=\"idle\", instance=\"server-01\"} < 0.2",
+      "parsedLabels": {
+        "metricName": "node_cpu_seconds_total",
+        "labels": [
+          "mode",
+          "instance"
+        ],
+        "aggregationLabels": [],
+        "byLabels": [],
+        "withoutLabels": []
+      },
+      "issues": [],
+      "sampleEvaluations": [
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.15,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "High CPU on server-01",
+            "description": "CPU value is 0.15 on idle"
+          }
+        }
+      ]
+    },
+    {
+      "ruleName": "MissingLabelInExpression",
+      "groupName": "test-rules",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+      "expr": "up == 0",
+      "parsedLabels": {
+        "metricName": "up",
+        "labels": [],
+        "aggregationLabels": [],
+        "byLabels": [],
+        "withoutLabels": []
+      },
+      "issues": [
+        {
+          "type": "warning",
+          "category": "annotation",
+          "message": "Annotation references label 'nonexistent' which is not available in the expression labels. Available labels: []",
+          "ruleName": "MissingLabelInExpression",
+          "groupName": "test-rules",
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+          "line": 10,
+          "rawContent": "Instance down: {{ $labels.nonexistent }}"
+        }
+      ],
+      "sampleEvaluations": [
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.15,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "summary": "Instance down: {{ $labels.nonexistent }}",
+            "description": "Value: 0.15"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "up",
+            "instance": "server-01"
+          },
+          "value": 0,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Instance down: {{ $labels.nonexistent }}",
+            "description": "Value: 0"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_memory_MemAvailable_bytes",
+            "instance": "server-01",
+            "job": "node"
+          },
+          "value": 500000000,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "summary": "Instance down: {{ $labels.nonexistent }}",
+            "description": "Value: 500000000"
+          }
+        }
+      ]
+    },
+    {
+      "ruleName": "MixedSyntaxTest",
+      "groupName": "test-rules",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+      "expr": "node_memory_MemAvailable_bytes{instance=\"server-01\", job=\"node\"} < 1000000000",
+      "parsedLabels": {
+        "metricName": "node_memory_MemAvailable_bytes",
+        "labels": [
+          "instance",
+          "job"
+        ],
+        "aggregationLabels": [],
+        "byLabels": [],
+        "withoutLabels": []
+      },
+      "issues": [],
+      "sampleEvaluations": [
+        {
+          "labels": {
+            "__name__": "node_memory_MemAvailable_bytes",
+            "instance": "server-01",
+            "job": "node"
+          },
+          "value": 500000000,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Low memory on server-01 (node)",
+            "description": "Current value: 500000000"
+          }
+        }
+      ]
+    }
+  ],
+  "files": [
+    "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml"
+  ],
+  "timestamp": "2026-05-17T05:06:29.860Z",
+  "version": "1.0.0"
+}
