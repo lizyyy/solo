@@ -1,12 +1,16 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field, validator
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, ForeignKey, Boolean, Text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, relationship
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 import enum
+import uuid
+import time
 from sqlalchemy import Enum as SQLEnum
 
 DATABASE_URL = "sqlite:///./spare_parts.db"
@@ -132,6 +136,49 @@ class FulfillmentSummary(Base):
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="备件预占改派释放履约摘要API", version="1.0.0")
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    missing_fields = []
+    for error in exc.errors():
+        if error.get("type") in ["missing", "value_error.missing"]:
+            loc = error.get("loc", [])
+            if len(loc) > 1:
+                missing_fields.append(str(loc[-1]))
+            elif len(loc) == 1:
+                missing_fields.append(str(loc[0]))
+    
+    if missing_fields:
+        return create_error_response(
+            ErrorCode.MISSING_FIELD,
+            f"缺少必填字段: {', '.join(missing_fields)}",
+            {"missing_fields": missing_fields},
+            400
+        )
+    return create_error_response(
+        ErrorCode.MISSING_FIELD,
+        "请求参数验证失败",
+        {"errors": exc.errors()},
+        400
+    )
+
+@app.exception_handler(IntegrityError)
+async def integrity_error_handler(request: Request, exc: IntegrityError):
+    error_msg = str(exc.orig)
+    if "UNIQUE constraint failed" in error_msg:
+        if "spare_part_preemptions.preemption_no" in error_msg:
+            return create_error_response(
+                ErrorCode.ALREADY_PROCESSED,
+                "预占编号冲突，请重试",
+                {"error": "preemption_no_unique_conflict"},
+                409
+            )
+    return create_error_response(
+        ErrorCode.NEEDS_REVIEW,
+        "数据完整性错误，请人工复核",
+        {"error": error_msg},
+        400
+    )
 
 def get_db():
     db = SessionLocal()
@@ -340,7 +387,9 @@ def create_preemption(preemption: PreemptionCreate, db: Session = Depends(get_db
     spare_part.available_stock -= preemption.quantity
     spare_part.reserved_stock += preemption.quantity
     
-    preemption_no = f"PRE-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}-{preemption.work_order_id}"
+    timestamp_ms = int(time.time() * 1000)
+    random_suffix = uuid.uuid4().hex[:8]
+    preemption_no = f"PRE-{timestamp_ms}-{preemption.work_order_id}-{random_suffix}"
     expires_at = datetime.utcnow() + timedelta(hours=preemption.expiration_hours)
     
     db_preemption = SparePartPreemption(

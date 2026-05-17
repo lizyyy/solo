@@ -324,14 +324,24 @@ def test_core_processing(engineer_ids, spare_part_ids, work_order_ids):
     print_step(8, "预占扣减")
     if preemption_ids:
         try:
-            latest_preemption = preemption_ids[-1]
-            response = requests.post(f"{BASE_URL}/preemptions/consume/", params={"preemption_id": latest_preemption})
+            response = requests.get(f"{BASE_URL}/preemptions/", params={"status": "active"})
             if response.status_code == 200:
-                data = response.json()
-                print_result(True, "预占扣减成功", data)
-                results.append(True)
+                active_preemptions = response.json()
+                if active_preemptions:
+                    latest_preemption = active_preemptions[-1]['id']
+                    response = requests.post(f"{BASE_URL}/preemptions/consume/", params={"preemption_id": latest_preemption})
+                    if response.status_code == 200:
+                        data = response.json()
+                        print_result(True, "预占扣减成功", data)
+                        results.append(True)
+                    else:
+                        print_result(False, "预占扣减失败", response.json())
+                        results.append(False)
+                else:
+                    print_result(False, "没有找到活跃的预占记录")
+                    results.append(False)
             else:
-                print_result(False, "预占扣减失败", response.json())
+                print_result(False, "查询活跃预占失败")
                 results.append(False)
         except Exception as e:
             print_result(False, f"请求失败: {str(e)}")
@@ -494,11 +504,16 @@ def test_error_responses():
             "name": "测试",
         }
         response = requests.post(f"{BASE_URL}/engineers/", json=incomplete_engineer)
-        if response.status_code in [400, 422]:
-            print_result(True, "正确返回字段验证错误", {"status_code": response.status_code})
-            results.append(True)
+        if response.status_code == 400:
+            data = response.json()
+            if data.get('error_code') == 'missing_field':
+                print_result(True, "正确返回 MISSING_FIELD 错误", data)
+                results.append(True)
+            else:
+                print_result(False, f"错误码不正确: {data.get('error_code')}", data)
+                results.append(False)
         else:
-            print_result(False, f"状态码不正确: {response.status_code}")
+            print_result(False, f"状态码不正确: {response.status_code}", response.json())
             results.append(False)
     except Exception as e:
         print_result(False, f"请求失败: {str(e)}")

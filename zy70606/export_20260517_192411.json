@@ -28,8 +28,8 @@
       "sku": "SP-001",
       "name": "空调压缩机",
       "category": "制冷配件",
-      "total_stock": 50,
-      "available_stock": 50,
+      "total_stock": 49,
+      "available_stock": 49,
       "reserved_stock": 0,
       "unit": "台",
       "location": "A-01"
@@ -106,33 +106,44 @@
   "preemptions": [
     {
       "id": 1,
-      "preemption_no": "PRE-20260517084417-1",
+      "preemption_no": "PRE-1779017051560-1-439d0aca",
       "work_order_id": 1,
       "spare_part_id": 1,
       "engineer_id": 1,
       "quantity": 2,
       "status": "released",
-      "expires_at": "2026-05-18T08:44:17.623377",
-      "created_at": "2026-05-17T08:44:17.624794"
+      "expires_at": "2026-05-18T11:24:11.560190",
+      "created_at": "2026-05-17T11:24:11.562136"
     },
     {
       "id": 2,
-      "preemption_no": "PRE-20260517084417-2",
+      "preemption_no": "PRE-1779017051614-2-db00ae03",
       "work_order_id": 2,
       "spare_part_id": 2,
       "engineer_id": 2,
       "quantity": 1,
       "status": "released",
-      "expires_at": "2026-05-18T08:44:17.641724",
-      "created_at": "2026-05-17T08:44:17.642282"
+      "expires_at": "2026-05-18T11:24:11.614597",
+      "created_at": "2026-05-17T11:24:11.617100"
+    },
+    {
+      "id": 3,
+      "preemption_no": "PRE-1779017051642-1-64fdc57e",
+      "work_order_id": 1,
+      "spare_part_id": 1,
+      "engineer_id": 3,
+      "quantity": 1,
+      "status": "consumed",
+      "expires_at": "2026-05-18T11:24:11.642285",
+      "created_at": "2026-05-17T11:24:11.642728"
     }
   ],
   "fulfillment_summary": {
     "id": 0,
-    "summary_date": "2026-05-17T08:44:17.899597",
+    "summary_date": "2026-05-17T11:24:11.704488",
     "total_work_orders": 3,
-    "total_preemptions": 2,
-    "successful_fulfillments": 0,
+    "total_preemptions": 3,
+    "successful_fulfillments": 1,
     "timeout_releases": 0,
     "reassigned_releases": 1,
     "manual_releases": 1,
