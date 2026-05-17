@@ -1,0 +1,34 @@
+{
+  "description": "边界冲突样例 - 税额尾差问题",
+  "invoices": [
+    {
+      "invoice_no": "INV-BOUNDARY-001",
+      "invoice_date": "2024-05-01",
+      "total_amount": 100.0,
+      "total_tax": 5.66,
+      "invoice_type": "hotel",
+      "vendor_name": "边界测试酒店",
+      "tax_rate": 0.06
+    }
+  ],
+  "travelers": [
+    {
+      "name": "测试人A",
+      "employee_id": "TEST-A",
+      "project_code": "TEST-PRJ",
+      "weight": 1
+    },
+    {
+      "name": "测试人B",
+      "employee_id": "TEST-B",
+      "project_code": "TEST-PRJ",
+      "weight": 1
+    },
+    {
+      "name": "测试人C",
+      "employee_id": "TEST-C",
+      "project_code": "TEST-PRJ",
+      "weight": 1
+    }
+  ]
+}

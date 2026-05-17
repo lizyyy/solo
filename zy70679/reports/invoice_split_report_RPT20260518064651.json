@@ -1,0 +1,63 @@
+{
+  "report_id": "RPT20260518064651",
+  "report_date": "2026-05-18 06:46:51",
+  "summary": {
+    "total_invoices": 1,
+    "total_invoices_valid": 1,
+    "total_invoices_invalid": 0,
+    "total_original_amount": 100.0,
+    "total_original_tax": 5.66,
+    "total_split_amount": 100.0,
+    "total_split_tax": 5.66,
+    "tax_diff_amount": 0.0
+  },
+  "split_results": [
+    {
+      "invoice_no": "INV-BOUNDARY-001",
+      "traveler_name": "测试人A",
+      "employee_id": "TEST-A",
+      "project_code": "TEST-PRJ",
+      "split_amount": 33.34,
+      "split_tax": 1.89,
+      "split_amount_excl_tax": 31.45,
+      "tax_rate": 0.06,
+      "original_amount": 100.0,
+      "original_tax": 5.66,
+      "split_ratio": 0.3333,
+      "is_valid": true,
+      "error_message": ""
+    },
+    {
+      "invoice_no": "INV-BOUNDARY-001",
+      "traveler_name": "测试人B",
+      "employee_id": "TEST-B",
+      "project_code": "TEST-PRJ",
+      "split_amount": 33.34,
+      "split_tax": 1.89,
+      "split_amount_excl_tax": 31.45,
+      "tax_rate": 0.06,
+      "original_amount": 100.0,
+      "original_tax": 5.66,
+      "split_ratio": 0.3333,
+      "is_valid": true,
+      "error_message": ""
+    },
+    {
+      "invoice_no": "INV-BOUNDARY-001",
+      "traveler_name": "测试人C",
+      "employee_id": "TEST-C",
+      "project_code": "TEST-PRJ",
+      "split_amount": 33.32,
+      "split_tax": 1.88,
+      "split_amount_excl_tax": 31.44,
+      "tax_rate": 0.06,
+      "original_amount": 100.0,
+      "original_tax": 5.66,
+      "split_ratio": 0.3333,
+      "is_valid": true,
+      "error_message": ""
+    }
+  ],
+  "warnings": [],
+  "errors": []
+}

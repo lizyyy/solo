@@ -1,0 +1,34 @@
+{
+  "description": "正常输入样例 - 3人酒店发票按项目拆分",
+  "invoices": [
+    {
+      "invoice_no": "HTL20240501001",
+      "invoice_date": "2024-05-01",
+      "total_amount": 3180.0,
+      "total_tax": 180.0,
+      "invoice_type": "hotel",
+      "vendor_name": "XX大酒店",
+      "tax_rate": 0.06
+    }
+  ],
+  "travelers": [
+    {
+      "name": "张三",
+      "employee_id": "E001",
+      "project_code": "PRJ-A-2024",
+      "weight": 1
+    },
+    {
+      "name": "李四",
+      "employee_id": "E002",
+      "project_code": "PRJ-B-2024",
+      "weight": 1
+    },
+    {
+      "name": "王五",
+      "employee_id": "E003",
+      "project_code": "PRJ-A-2024",
+      "weight": 1
+    }
+  ]
+}

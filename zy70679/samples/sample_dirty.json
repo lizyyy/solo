@@ -1,0 +1,22 @@
+{
+  "description": "脏数据样例 - 包含格式错误",
+  "invoices": [
+    {
+      "invoice_no": "INV-DIRTY-001",
+      "invoice_date": "2024/05/01",
+      "total_amount": -100.0,
+      "total_tax": -6.0,
+      "invoice_type": "hotel",
+      "vendor_name": "测试酒店",
+      "tax_rate": 0.06
+    }
+  ],
+  "travelers": [
+    {
+      "name": "",
+      "employee_id": "",
+      "project_code": "",
+      "weight": 0
+    }
+  ]
+}

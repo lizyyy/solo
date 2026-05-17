@@ -1,0 +1,31 @@
+{
+  "description": "重复发票样例",
+  "invoices": [
+    {
+      "invoice_no": "INV-DUP-001",
+      "invoice_date": "2024-05-01",
+      "total_amount": 1060.0,
+      "total_tax": 60.0,
+      "invoice_type": "hotel",
+      "vendor_name": "重复测试酒店",
+      "tax_rate": 0.06
+    },
+    {
+      "invoice_no": "INV-DUP-001",
+      "invoice_date": "2024-05-01",
+      "total_amount": 1060.0,
+      "total_tax": 60.0,
+      "invoice_type": "hotel",
+      "vendor_name": "重复测试酒店",
+      "tax_rate": 0.06
+    }
+  ],
+  "travelers": [
+    {
+      "name": "测试人",
+      "employee_id": "TEST-001",
+      "project_code": "TEST-PRJ",
+      "weight": 1
+    }
+  ]
+}

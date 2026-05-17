@@ -1,0 +1,35 @@
+{
+  "report_id": "RPT20260518064640",
+  "report_date": "2026-05-18 06:46:40",
+  "summary": {
+    "total_invoices": 1,
+    "total_invoices_valid": 1,
+    "total_invoices_invalid": 0,
+    "total_original_amount": 1060.0,
+    "total_original_tax": 60.0,
+    "total_split_amount": 1060.0,
+    "total_split_tax": 60.0,
+    "tax_diff_amount": 0.0
+  },
+  "split_results": [
+    {
+      "invoice_no": "INV-DUP-001",
+      "traveler_name": "测试人",
+      "employee_id": "TEST-001",
+      "project_code": "TEST-PRJ",
+      "split_amount": 1060.0,
+      "split_tax": 60.0,
+      "split_amount_excl_tax": 1000.0,
+      "tax_rate": 0.06,
+      "original_amount": 1060.0,
+      "original_tax": 60.0,
+      "split_ratio": 1.0,
+      "is_valid": true,
+      "error_message": ""
+    }
+  ],
+  "warnings": [],
+  "errors": [
+    "重复发票: INV-DUP-001"
+  ]
+}

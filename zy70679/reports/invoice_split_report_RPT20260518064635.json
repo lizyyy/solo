@@ -1,0 +1,63 @@
+{
+  "report_id": "RPT20260518064635",
+  "report_date": "2026-05-18 06:46:35",
+  "summary": {
+    "total_invoices": 1,
+    "total_invoices_valid": 1,
+    "total_invoices_invalid": 0,
+    "total_original_amount": 3180.0,
+    "total_original_tax": 180.0,
+    "total_split_amount": 3180.0,
+    "total_split_tax": 180.0,
+    "tax_diff_amount": 0.0
+  },
+  "split_results": [
+    {
+      "invoice_no": "HTL20240501001",
+      "traveler_name": "张三",
+      "employee_id": "E001",
+      "project_code": "PRJ-A-2024",
+      "split_amount": 1060.0,
+      "split_tax": 60.0,
+      "split_amount_excl_tax": 1000.0,
+      "tax_rate": 0.06,
+      "original_amount": 3180.0,
+      "original_tax": 180.0,
+      "split_ratio": 0.3333,
+      "is_valid": true,
+      "error_message": ""
+    },
+    {
+      "invoice_no": "HTL20240501001",
+      "traveler_name": "李四",
+      "employee_id": "E002",
+      "project_code": "PRJ-B-2024",
+      "split_amount": 1060.0,
+      "split_tax": 60.0,
+      "split_amount_excl_tax": 1000.0,
+      "tax_rate": 0.06,
+      "original_amount": 3180.0,
+      "original_tax": 180.0,
+      "split_ratio": 0.3333,
+      "is_valid": true,
+      "error_message": ""
+    },
+    {
+      "invoice_no": "HTL20240501001",
+      "traveler_name": "王五",
+      "employee_id": "E003",
+      "project_code": "PRJ-A-2024",
+      "split_amount": 1060.0,
+      "split_tax": 60.0,
+      "split_amount_excl_tax": 1000.0,
+      "tax_rate": 0.06,
+      "original_amount": 3180.0,
+      "original_tax": 180.0,
+      "split_ratio": 0.3333,
+      "is_valid": true,
+      "error_message": ""
+    }
+  ],
+  "warnings": [],
+  "errors": []
+}
