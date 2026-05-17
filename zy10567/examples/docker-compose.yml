@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  web:
+    image: nginx:alpine
+    environment:
+      - NODE_ENV=production
+      - DEBUG=false
+      - API_URL=https://api.example.com
+      - DB_HOST=db
+      - DB_PORT=5432
+    env_file:
+      - .env
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=appdb
+    env_file:
+      - path: ./db.env
+        required: false

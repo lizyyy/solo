@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-17T15:53:00.204Z",
+    "inputDir": "/Users/lzy/pro/solo/workspaces/zy10567/examples",
+    "outputDir": "./reports",
+    "composeFile": null,
+    "envFiles": [],
+    "cliEnv": []
+  },
+  "composeFiles": [
+    {
+      "file": "/Users/lzy/pro/solo/workspaces/zy10567/examples/docker-compose.yml",
+      "services": {},
+      "errors": [
+        {
+          "type": "file_read_error",
+          "message": "Cannot read properties of undefined (reading 'line')"
+        }
+      ],
+      "warnings": []
+    }
+  ],
+  "envFiles": [],
+  "services": {},
+  "finalVariables": {},
+  "conflicts": [],
+  "errors": [
+    {
+      "type": "file_read_error",
+      "message": "Cannot read properties of undefined (reading 'line')",
+      "file": "/Users/lzy/pro/solo/workspaces/zy10567/examples/docker-compose.yml"
+    }
+  ],
+  "warnings": [],
+  "reports": null
+}
