@@ -1,0 +1,131 @@
+{
+  "run_id": "1cc9faef",
+  "run_time": "2026-05-17T11:43:16.065051",
+  "input_files": [
+    "test_data/v2.parquet",
+    "test_data/v3_incompatible.parquet"
+  ],
+  "reference_schema": {
+    "file_path": "test_data/v1.parquet",
+    "snapshot_time": "2026-05-17T11:43:15.429289",
+    "fields": [
+      {
+        "name": "id",
+        "type": "int64",
+        "nullable": true,
+        "logical_type": null
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "nullable": true,
+        "logical_type": null
+      },
+      {
+        "name": "value",
+        "type": "double",
+        "nullable": true,
+        "logical_type": null
+      }
+    ],
+    "row_count": 5
+  },
+  "target_schemas": [
+    {
+      "file_path": "test_data/v2.parquet",
+      "snapshot_time": "2026-05-17T11:43:15.429988",
+      "fields": [
+        {
+          "name": "id",
+          "type": "int64",
+          "nullable": true,
+          "logical_type": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": true,
+          "logical_type": null
+        },
+        {
+          "name": "value",
+          "type": "double",
+          "nullable": true,
+          "logical_type": null
+        },
+        {
+          "name": "new_col",
+          "type": "string",
+          "nullable": true,
+          "logical_type": null
+        }
+      ],
+      "row_count": 5
+    },
+    {
+      "file_path": "test_data/v3_incompatible.parquet",
+      "snapshot_time": "2026-05-17T11:43:16.063855",
+      "fields": [
+        {
+          "name": "id",
+          "type": "int64",
+          "nullable": true,
+          "logical_type": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": true,
+          "logical_type": null
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "nullable": true,
+          "logical_type": null
+        }
+      ],
+      "row_count": 5
+    }
+  ],
+  "compatibility": {
+    "overall_level": "fully_compatible",
+    "changes": [
+      {
+        "field_name": "new_col",
+        "change_type": "field_added",
+        "old_value": null,
+        "new_value": "string",
+        "compatibility_impact": "low",
+        "description": "Nullable field 'new_col' was added to target schema"
+      },
+      {
+        "field_name": "value",
+        "change_type": "type_changed",
+        "old_value": "double",
+        "new_value": "string",
+        "compatibility_impact": "high",
+        "description": "Type change from double to string is incompatible"
+      }
+    ],
+    "bad_rows": [],
+    "summary": {
+      "total_changes": 2,
+      "changes_by_type": {
+        "field_added": 1,
+        "type_changed": 1
+      },
+      "changes_by_impact": {
+        "low": 1,
+        "high": 1
+      },
+      "reference_field_count": 3,
+      "target_field_count": 4
+    }
+  },
+  "output_paths": {
+    "machine_readable_json": "test_output/run_1cc9faef_20260517_114315/results.json",
+    "markdown_report": "test_output/run_1cc9faef_20260517_114315/report.md",
+    "bad_rows_csv": "test_output/run_1cc9faef_20260517_114315/bad_rows.csv"
+  }
+}

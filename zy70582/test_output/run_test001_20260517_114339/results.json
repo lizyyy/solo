@@ -1,0 +1,89 @@
+{
+  "run_id": "test001",
+  "run_time": "2026-05-17T11:43:39.472218",
+  "input_files": [
+    "test_data/v3_incompatible.parquet"
+  ],
+  "reference_schema": {
+    "file_path": "test_data/v1.parquet",
+    "snapshot_time": "2026-05-17T11:43:39.282967",
+    "fields": [
+      {
+        "name": "id",
+        "type": "int64",
+        "nullable": true,
+        "logical_type": null
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "nullable": true,
+        "logical_type": null
+      },
+      {
+        "name": "value",
+        "type": "double",
+        "nullable": true,
+        "logical_type": null
+      }
+    ],
+    "row_count": 5
+  },
+  "target_schemas": [
+    {
+      "file_path": "test_data/v3_incompatible.parquet",
+      "snapshot_time": "2026-05-17T11:43:39.283137",
+      "fields": [
+        {
+          "name": "id",
+          "type": "int64",
+          "nullable": true,
+          "logical_type": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": true,
+          "logical_type": null
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "nullable": true,
+          "logical_type": null
+        }
+      ],
+      "row_count": 5
+    }
+  ],
+  "compatibility": {
+    "overall_level": "incompatible",
+    "changes": [
+      {
+        "field_name": "value",
+        "change_type": "type_changed",
+        "old_value": "double",
+        "new_value": "string",
+        "compatibility_impact": "high",
+        "description": "Type change from double to string is incompatible"
+      }
+    ],
+    "bad_rows": [],
+    "summary": {
+      "total_changes": 1,
+      "changes_by_type": {
+        "type_changed": 1
+      },
+      "changes_by_impact": {
+        "high": 1
+      },
+      "reference_field_count": 3,
+      "target_field_count": 3
+    }
+  },
+  "output_paths": {
+    "machine_readable_json": "test_output/run_test001_20260517_114339/results.json",
+    "markdown_report": "test_output/run_test001_20260517_114339/report.md",
+    "bad_rows_csv": "test_output/run_test001_20260517_114339/bad_rows.csv"
+  }
+}

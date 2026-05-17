@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "parquet-evolve-cli"
+version = "0.1.0"
+description = "Parquet Schema Evolution Compatibility Checker CLI"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "parquet_evolve_cli", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyarrow = "^15.0.0"
+click = "^8.1.0"
+pandas = "^2.0.0"
+rich = "^13.0.0"
+pydantic = "^2.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+parquet-evolve = "parquet_evolve_cli.cli:main"
