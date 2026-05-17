@@ -1,0 +1,500 @@
+{
+  "summary": {
+    "total_files": 3,
+    "total_messages": 4,
+    "total_fields": 18,
+    "high_risk_fields": 13,
+    "medium_risk_fields": 3,
+    "low_risk_fields": 2,
+    "parse_errors": 1,
+    "scan_time": "2026-05-17T11:43:15+08:00"
+  },
+  "proto_files": [
+    {
+      "file_path": "testdata/legacy.proto",
+      "messages": [
+        {
+          "name": "LegacyMessage",
+          "line": 5,
+          "fields": [
+            {
+              "name": "name",
+              "line": 6,
+              "type": "string",
+              "number": 1,
+              "label": "required",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "LOW",
+              "risk_reason": "Proto2 has explicit default value semantics"
+            }
+          ]
+        }
+      ],
+      "enums": null,
+      "services": null,
+      "imports": null,
+      "package_name": "testdata",
+      "syntax": "proto2",
+      "errors": []
+    },
+    {
+      "file_path": "testdata/order.proto",
+      "messages": [
+        {
+          "name": "Order",
+          "line": 11,
+          "fields": [
+            {
+              "name": "order_id",
+              "line": 12,
+              "type": "string",
+              "number": 1,
+              "label": "",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+            },
+            {
+              "name": "user_id",
+              "line": 13,
+              "type": "int64",
+              "number": 2,
+              "label": "",
+              "default_value": 0,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+            },
+            {
+              "name": "total_amount",
+              "line": 14,
+              "type": "double",
+              "number": 3,
+              "label": "",
+              "default_value": 0,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+            },
+            {
+              "name": "is_paid",
+              "line": 15,
+              "type": "bool",
+              "number": 4,
+              "label": "",
+              "default_value": false,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "MEDIUM",
+              "risk_reason": "False could mean unset or intentionally false"
+            },
+            {
+              "name": "status",
+              "line": 16,
+              "type": "OrderStatus",
+              "number": 5,
+              "label": "",
+              "default_value": null,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Enum default is first value 'PENDING' - could be ambiguous"
+            },
+            {
+              "name": "items",
+              "line": 17,
+              "type": "string",
+              "number": 6,
+              "label": "repeated",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "LOW",
+              "risk_reason": "Repeated fields default to empty list"
+            }
+          ]
+        }
+      ],
+      "enums": [
+        {
+          "name": "OrderStatus",
+          "line": 5,
+          "values": [
+            {
+              "name": "PENDING",
+              "line": 6,
+              "number": 0
+            },
+            {
+              "name": "PAID",
+              "line": 7,
+              "number": 1
+            },
+            {
+              "name": "SHIPPED",
+              "line": 8,
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "services": null,
+      "imports": null,
+      "package_name": "testdata",
+      "syntax": "proto3",
+      "errors": [
+        {
+          "file_path": "testdata/order.proto",
+          "line": 20,
+          "message": "unrecognized syntax",
+          "raw_line": "这行是非法的，会导致解析错误"
+        }
+      ]
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "messages": [
+        {
+          "name": "User",
+          "line": 11,
+          "fields": [
+            {
+              "name": "id",
+              "line": 12,
+              "type": "string",
+              "number": 1,
+              "label": "",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+            },
+            {
+              "name": "name",
+              "line": 13,
+              "type": "string",
+              "number": 2,
+              "label": "",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+            },
+            {
+              "name": "email",
+              "line": 14,
+              "type": "string",
+              "number": 3,
+              "label": "",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+            },
+            {
+              "name": "age",
+              "line": 15,
+              "type": "int32",
+              "number": 4,
+              "label": "",
+              "default_value": 0,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+            },
+            {
+              "name": "is_verified",
+              "line": 16,
+              "type": "bool",
+              "number": 5,
+              "label": "",
+              "default_value": false,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "MEDIUM",
+              "risk_reason": "False could mean unset or intentionally false"
+            },
+            {
+              "name": "balance",
+              "line": 17,
+              "type": "float",
+              "number": 6,
+              "label": "",
+              "default_value": 0,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+            },
+            {
+              "name": "status",
+              "line": 18,
+              "type": "UserStatus",
+              "number": 7,
+              "label": "",
+              "default_value": null,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Enum default is first value 'UNKNOWN' - could be ambiguous"
+            },
+            {
+              "name": "avatar",
+              "line": 19,
+              "type": "bytes",
+              "number": 8,
+              "label": "",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "MEDIUM",
+              "risk_reason": "Empty bytes could mean unset or intentionally empty"
+            }
+          ]
+        },
+        {
+          "name": "CreateUserRequest",
+          "line": 22,
+          "fields": [
+            {
+              "name": "phone",
+              "line": 23,
+              "type": "string",
+              "number": 1,
+              "label": "",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+            },
+            {
+              "name": "password",
+              "line": 24,
+              "type": "string",
+              "number": 2,
+              "label": "",
+              "default_value": "",
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+            },
+            {
+              "name": "timestamp",
+              "line": 25,
+              "type": "int64",
+              "number": 3,
+              "label": "",
+              "default_value": 0,
+              "is_explicit": false,
+              "options": null,
+              "risk_level": "HIGH",
+              "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+            }
+          ]
+        }
+      ],
+      "enums": [
+        {
+          "name": "UserStatus",
+          "line": 5,
+          "values": [
+            {
+              "name": "UNKNOWN",
+              "line": 6,
+              "number": 0
+            },
+            {
+              "name": "ACTIVE",
+              "line": 7,
+              "number": 1
+            },
+            {
+              "name": "INACTIVE",
+              "line": 8,
+              "number": 2
+            }
+          ]
+        }
+      ],
+      "services": null,
+      "imports": null,
+      "package_name": "testdata",
+      "syntax": "proto3",
+      "errors": []
+    }
+  ],
+  "risk_fields": [
+    {
+      "file_path": "testdata/order.proto",
+      "message_name": "Order",
+      "field_name": "status",
+      "line": 16,
+      "field_type": "OrderStatus",
+      "default_value": null,
+      "risk_level": "HIGH",
+      "risk_reason": "Enum default is first value 'PENDING' - could be ambiguous"
+    },
+    {
+      "file_path": "testdata/order.proto",
+      "message_name": "Order",
+      "field_name": "user_id",
+      "line": 13,
+      "field_type": "int64",
+      "default_value": 0,
+      "risk_level": "HIGH",
+      "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+    },
+    {
+      "file_path": "testdata/order.proto",
+      "message_name": "Order",
+      "field_name": "total_amount",
+      "line": 14,
+      "field_type": "double",
+      "default_value": 0,
+      "risk_level": "HIGH",
+      "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+    },
+    {
+      "file_path": "testdata/order.proto",
+      "message_name": "Order",
+      "field_name": "order_id",
+      "line": 12,
+      "field_type": "string",
+      "default_value": "",
+      "risk_level": "HIGH",
+      "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
+      "field_name": "age",
+      "line": 15,
+      "field_type": "int32",
+      "default_value": 0,
+      "risk_level": "HIGH",
+      "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
+      "field_name": "id",
+      "line": 12,
+      "field_type": "string",
+      "default_value": "",
+      "risk_level": "HIGH",
+      "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
+      "field_name": "name",
+      "line": 13,
+      "field_type": "string",
+      "default_value": "",
+      "risk_level": "HIGH",
+      "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
+      "field_name": "email",
+      "line": 14,
+      "field_type": "string",
+      "default_value": "",
+      "risk_level": "HIGH",
+      "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
+      "field_name": "balance",
+      "line": 17,
+      "field_type": "float",
+      "default_value": 0,
+      "risk_level": "HIGH",
+      "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
+      "field_name": "status",
+      "line": 18,
+      "field_type": "UserStatus",
+      "default_value": null,
+      "risk_level": "HIGH",
+      "risk_reason": "Enum default is first value 'UNKNOWN' - could be ambiguous"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "CreateUserRequest",
+      "field_name": "phone",
+      "line": 23,
+      "field_type": "string",
+      "default_value": "",
+      "risk_level": "HIGH",
+      "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "CreateUserRequest",
+      "field_name": "password",
+      "line": 24,
+      "field_type": "string",
+      "default_value": "",
+      "risk_level": "HIGH",
+      "risk_reason": "Empty string '' is ambiguous - could be unset or intentionally empty"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "CreateUserRequest",
+      "field_name": "timestamp",
+      "line": 25,
+      "field_type": "int64",
+      "default_value": 0,
+      "risk_level": "HIGH",
+      "risk_reason": "Zero value is ambiguous - could mean unset or intentionally zero"
+    },
+    {
+      "file_path": "testdata/order.proto",
+      "message_name": "Order",
+      "field_name": "is_paid",
+      "line": 15,
+      "field_type": "bool",
+      "default_value": false,
+      "risk_level": "MEDIUM",
+      "risk_reason": "False could mean unset or intentionally false"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
+      "field_name": "is_verified",
+      "line": 16,
+      "field_type": "bool",
+      "default_value": false,
+      "risk_level": "MEDIUM",
+      "risk_reason": "False could mean unset or intentionally false"
+    },
+    {
+      "file_path": "testdata/user.proto",
+      "message_name": "User",
+      "field_name": "avatar",
+      "line": 19,
+      "field_type": "bytes",
+      "default_value": "",
+      "risk_level": "MEDIUM",
+      "risk_reason": "Empty bytes could mean unset or intentionally empty"
+    }
+  ]
+}

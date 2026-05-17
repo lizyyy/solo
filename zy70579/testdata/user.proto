@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package testdata;
+
+enum UserStatus {
+  UNKNOWN = 0;
+  ACTIVE = 1;
+  INACTIVE = 2;
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  int32 age = 4;
+  bool is_verified = 5;
+  float balance = 6;
+  UserStatus status = 7;
+  bytes avatar = 8;
+}
+
+message CreateUserRequest {
+  string phone = 1;
+  string password = 2;
+  int64 timestamp = 3;
+}

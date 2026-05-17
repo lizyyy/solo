@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package testdata;
+
+message LegacyMessage {
+  required string name = 1;
+  optional int32 age = 2 [default = 18];
+  optional bool active = 3 [default = true];
+}
