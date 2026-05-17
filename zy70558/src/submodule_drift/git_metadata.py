@@ -30,7 +30,7 @@ class SubmoduleInfo:
 
 @dataclass
 class ParseResult:
-    submodules: List[SubmoduleInfo]
+    submodules: List[SubmoduleInfo] = field(default_factory=list)
     errors: List[Dict[str, Any]] = field(default_factory=list)
     raw_content: Optional[str] = None
 
