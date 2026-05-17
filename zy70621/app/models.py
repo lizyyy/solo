@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Enum, Boolean
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 import enum
+from datetime import datetime
 from app.database import Base
 
 
@@ -32,8 +32,8 @@ class Building(Base):
     room_number = Column(String(50), nullable=False)
     owner_name = Column(String(100))
     owner_phone = Column(String(20))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), default=datetime.now)
+    updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)
 
     repairs = relationship("RepairOrder", back_populates="building")
 
@@ -48,7 +48,7 @@ class Handler(Base):
     is_outsourcer = Column(Boolean, default=False)
     company_name = Column(String(200))
     skills = Column(String(500))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=datetime.now)
     is_active = Column(Boolean, default=True)
 
     assigned_repairs = relationship("RepairOrder", back_populates="handler")
@@ -68,14 +68,14 @@ class RepairOrder(Base):
     urgency = Column(Enum(UrgencyLevel), default=UrgencyLevel.MEDIUM)
     status = Column(Enum(RepairStatus), default=RepairStatus.PENDING)
     handler_id = Column(Integer, ForeignKey("handlers.id"))
-    reported_at = Column(DateTime(timezone=True), server_default=func.now())
+    reported_at = Column(DateTime(timezone=True), default=datetime.now)
     expected_completion_time = Column(DateTime(timezone=True))
     actual_completion_time = Column(DateTime(timezone=True))
     is_overdue = Column(Boolean, default=False)
     is_duplicate = Column(Boolean, default=False)
     merged_into_order_id = Column(Integer, ForeignKey("repair_orders.id"))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), default=datetime.now)
+    updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)
 
     building = relationship("Building", back_populates="repairs")
     handler = relationship("Handler", back_populates="assigned_repairs")
@@ -90,12 +90,12 @@ class ReminderRecord(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     repair_order_id = Column(Integer, ForeignKey("repair_orders.id"))
-    reminder_time = Column(DateTime(timezone=True), server_default=func.now())
+    reminder_time = Column(DateTime(timezone=True), default=datetime.now)
     reminder_method = Column(String(50))
     reminder_content = Column(Text)
     reminder_by = Column(String(100))
     is_duplicate = Column(Boolean, default=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=datetime.now)
 
     repair_order = relationship("RepairOrder", back_populates="reminders")
 
@@ -106,13 +106,13 @@ class OutsourcingRecord(Base):
     id = Column(Integer, primary_key=True, index=True)
     repair_order_id = Column(Integer, ForeignKey("repair_orders.id"))
     outsourcer_id = Column(Integer, ForeignKey("handlers.id"))
-    outsourcing_time = Column(DateTime(timezone=True), server_default=func.now())
+    outsourcing_time = Column(DateTime(timezone=True), default=datetime.now)
     expected_completion = Column(DateTime(timezone=True))
     cost_estimate = Column(Integer)
     actual_cost = Column(Integer)
     status = Column(String(50), default="pending")
     notes = Column(Text)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=datetime.now)
 
     repair_order = relationship("RepairOrder", back_populates="outsourcing_records")
     outsourcer = relationship("Handler", back_populates="outsourcing_records")
@@ -127,7 +127,7 @@ class CompletionProof(Base):
     proof_url = Column(String(500))
     description = Column(Text)
     uploaded_by = Column(String(100))
-    uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
+    uploaded_at = Column(DateTime(timezone=True), default=datetime.now)
     is_verified = Column(Boolean, default=False)
     verified_by = Column(String(100))
     verified_at = Column(DateTime(timezone=True))
@@ -147,6 +147,6 @@ class AuditLog(Base):
     original_input = Column(Text)
     conclusion = Column(Text)
     reason = Column(Text)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=datetime.now)
 
     repair_order = relationship("RepairOrder", back_populates="audit_logs")
