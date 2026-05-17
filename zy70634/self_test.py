@@ -495,6 +495,72 @@ class SelfTest:
             print_success("关键场景验证通过: 多订单同一SKU缺货拆单功能正常!")
             return True
 
+    def test_18_error_response_format(self) -> bool:
+        """错误响应格式统一验证"""
+        print_info("18. 错误响应格式统一验证...")
+
+        test_cases = [
+            {
+                "name": "订单缺少 items 字段",
+                "method": "POST",
+                "url": "/api/orders/",
+                "data": {"order_code": "ERROR-TEST-001", "customer_name": "测试"},
+                "expected_code": "MISSING_FIELDS"
+            },
+            {
+                "name": "订单缺少 order_code 字段",
+                "method": "POST",
+                "url": "/api/orders/",
+                "data": {"customer_name": "测试", "items": []},
+                "expected_code": "MISSING_FIELDS"
+            },
+            {
+                "name": "波次缺少 order_codes 字段",
+                "method": "POST",
+                "url": "/api/waves/",
+                "data": {"priority": 1},
+                "expected_code": "MISSING_FIELDS"
+            },
+            {
+                "name": "拣货任务缺少 actual_quantity 字段",
+                "method": "POST",
+                "url": "/api/pick-tasks/1/process/",
+                "data": {"picker": "测试"},
+                "expected_code": "MISSING_FIELDS"
+            },
+        ]
+
+        errors = []
+        for case in test_cases:
+            if case["method"] == "POST":
+                response = self.session.post(f"{BASE_URL}{case['url']}", json=case["data"])
+            else:
+                response = self.session.get(f"{BASE_URL}{case['url']}")
+
+            if response.status_code != 400:
+                errors.append(f"{case['name']}: 期望状态码 400，实际 {response.status_code}")
+                continue
+
+            data = response.json()
+            required_fields = ["error_code", "message", "details"]
+            for field in required_fields:
+                if field not in data:
+                    errors.append(f"{case['name']}: 响应缺少 {field} 字段")
+
+            if data.get("error_code") != case["expected_code"]:
+                errors.append(f"{case['name']}: 期望 error_code={case['expected_code']}，实际 {data.get('error_code')}")
+
+            print(f"  ✅ {case['name']}: error_code={data.get('error_code')}")
+
+        if errors:
+            print_error("错误响应格式验证失败:")
+            for err in errors:
+                print(f"  - {err}")
+            return False
+        else:
+            print_success("错误响应格式验证通过: 所有接口缺字段统一返回 400/MISSING_FIELDS")
+            return True
+
     def run_all_tests(self):
         """运行所有测试"""
         print("=" * 60)
@@ -519,6 +585,7 @@ class SelfTest:
             self.test_15_export_report,
             self.test_16_wave_list_filter,
             self.test_17_multi_order_same_sku_shortage,
+            self.test_18_error_response_format,
         ]
 
         passed = 0

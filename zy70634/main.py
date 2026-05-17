@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -42,6 +43,38 @@ async def custom_http_exception_handler(request, exc):
             "error_code": exc.error_code,
             "message": exc.detail,
             "details": exc.details
+        }
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    missing_fields = []
+    invalid_fields = []
+    for error in exc.errors():
+        field = " -> ".join(str(loc) for loc in error["loc"])
+        if error["type"] == "missing":
+            missing_fields.append(field)
+        else:
+            invalid_fields.append(f"{field}: {error['msg']}")
+    
+    if missing_fields:
+        error_code = "MISSING_FIELDS"
+        message = f"缺少必填字段: {', '.join(missing_fields)}"
+    else:
+        error_code = "INVALID_FIELDS"
+        message = f"字段验证失败: {', '.join(invalid_fields)}"
+    
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error_code": error_code,
+            "message": message,
+            "details": {
+                "missing_fields": missing_fields,
+                "invalid_fields": invalid_fields,
+                "raw_errors": exc.errors()
+            }
         }
     )
 
