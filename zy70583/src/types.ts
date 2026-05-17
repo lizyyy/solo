@@ -66,6 +66,7 @@ export interface MatchResult {
   silenceId: string;
   silenceComment: string;
   matchedBy: string[];
+  matchedAlertCount: number;
 }
 
 export interface DenoiseResult {

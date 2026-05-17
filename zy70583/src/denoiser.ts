@@ -75,43 +75,38 @@ export class Denoiser {
     ruleName: string;
     matches: MatchResult[];
   }[] {
-    const results = aggregations.map((agg) => {
+    const ruleGroups = new Map<string, Alert[]>();
+    this.alerts.forEach((alert) => {
+      const key = alert.ruleId || alert.ruleName;
+      if (!ruleGroups.has(key)) {
+        ruleGroups.set(key, []);
+      }
+      ruleGroups.get(key)!.push(alert);
+    });
+
+    return aggregations.map((agg) => {
+      const alerts = ruleGroups.get(agg.ruleId) || [];
       const matches: MatchResult[] = [];
 
       this.silences.forEach((silence) => {
         if (silence.status !== 'active') return;
 
-        const matchedBy: string[] = [];
-        const alertLabels = agg.labels;
+        let matchedAlertCount = 0;
+        const matchedLabels = new Set<string>();
 
-        silence.matchers.forEach((matcher) => {
-          const labelValues = alertLabels[matcher.name] || [];
-
-          if (matcher.isRegex) {
-            try {
-              const regex = new RegExp(matcher.value);
-              const hasMatch = labelValues.some((v) => regex.test(v));
-              if ((matcher.isEqual && hasMatch) || (!matcher.isEqual && !hasMatch)) {
-                matchedBy.push(matcher.name);
-              }
-            } catch {
-              if (labelValues.includes(matcher.value) === matcher.isEqual) {
-                matchedBy.push(matcher.name);
-              }
-            }
-          } else {
-            const hasValue = labelValues.includes(matcher.value);
-            if ((matcher.isEqual && hasValue) || (!matcher.isEqual && !hasValue)) {
-              matchedBy.push(matcher.name);
-            }
+        alerts.forEach((alert) => {
+          if (this.doesAlertMatchSilence(alert, silence)) {
+            matchedAlertCount++;
+            silence.matchers.forEach((m) => matchedLabels.add(m.name));
           }
         });
 
-        if (matchedBy.length > 0) {
+        if (matchedAlertCount > 0) {
           matches.push({
             silenceId: silence.id,
             silenceComment: silence.comment,
-            matchedBy,
+            matchedBy: Array.from(matchedLabels),
+            matchedAlertCount,
           });
         }
       });
@@ -122,8 +117,28 @@ export class Denoiser {
         matches,
       };
     });
+  }
 
-    return results;
+  private doesAlertMatchSilence(alert: Alert, silence: Silence): boolean {
+    for (const matcher of silence.matchers) {
+      const alertValue = alert.labels[matcher.name];
+
+      if (matcher.isRegex) {
+        try {
+          const regex = new RegExp(matcher.value);
+          const isMatch = alertValue !== undefined && regex.test(alertValue);
+          if (matcher.isEqual && !isMatch) return false;
+          if (!matcher.isEqual && isMatch) return false;
+        } catch {
+          if (matcher.isEqual && alertValue !== matcher.value) return false;
+          if (!matcher.isEqual && alertValue === matcher.value) return false;
+        }
+      } else {
+        if (matcher.isEqual && alertValue !== matcher.value) return false;
+        if (!matcher.isEqual && alertValue === matcher.value) return false;
+      }
+    }
+    return true;
   }
 
   calculateNoiseScores(aggregations: AlertAggregation[]): NoiseScore[] {

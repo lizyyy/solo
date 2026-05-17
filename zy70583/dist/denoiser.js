@@ -53,41 +53,34 @@ class Denoiser {
         return aggregations.sort((a, b) => b.totalCount - a.totalCount);
     }
     matchSilences(aggregations) {
-        const results = aggregations.map((agg) => {
+        const ruleGroups = new Map();
+        this.alerts.forEach((alert) => {
+            const key = alert.ruleId || alert.ruleName;
+            if (!ruleGroups.has(key)) {
+                ruleGroups.set(key, []);
+            }
+            ruleGroups.get(key).push(alert);
+        });
+        return aggregations.map((agg) => {
+            const alerts = ruleGroups.get(agg.ruleId) || [];
             const matches = [];
             this.silences.forEach((silence) => {
                 if (silence.status !== 'active')
                     return;
-                const matchedBy = [];
-                const alertLabels = agg.labels;
-                silence.matchers.forEach((matcher) => {
-                    const labelValues = alertLabels[matcher.name] || [];
-                    if (matcher.isRegex) {
-                        try {
-                            const regex = new RegExp(matcher.value);
-                            const hasMatch = labelValues.some((v) => regex.test(v));
-                            if ((matcher.isEqual && hasMatch) || (!matcher.isEqual && !hasMatch)) {
-                                matchedBy.push(matcher.name);
-                            }
-                        }
-                        catch {
-                            if (labelValues.includes(matcher.value) === matcher.isEqual) {
-                                matchedBy.push(matcher.name);
-                            }
-                        }
-                    }
-                    else {
-                        const hasValue = labelValues.includes(matcher.value);
-                        if ((matcher.isEqual && hasValue) || (!matcher.isEqual && !hasValue)) {
-                            matchedBy.push(matcher.name);
-                        }
+                let matchedAlertCount = 0;
+                const matchedLabels = new Set();
+                alerts.forEach((alert) => {
+                    if (this.doesAlertMatchSilence(alert, silence)) {
+                        matchedAlertCount++;
+                        silence.matchers.forEach((m) => matchedLabels.add(m.name));
                     }
                 });
-                if (matchedBy.length > 0) {
+                if (matchedAlertCount > 0) {
                     matches.push({
                         silenceId: silence.id,
                         silenceComment: silence.comment,
-                        matchedBy,
+                        matchedBy: Array.from(matchedLabels),
+                        matchedAlertCount,
                     });
                 }
             });
@@ -97,7 +90,34 @@ class Denoiser {
                 matches,
             };
         });
-        return results;
+    }
+    doesAlertMatchSilence(alert, silence) {
+        for (const matcher of silence.matchers) {
+            const alertValue = alert.labels[matcher.name];
+            if (matcher.isRegex) {
+                try {
+                    const regex = new RegExp(matcher.value);
+                    const isMatch = alertValue !== undefined && regex.test(alertValue);
+                    if (matcher.isEqual && !isMatch)
+                        return false;
+                    if (!matcher.isEqual && isMatch)
+                        return false;
+                }
+                catch {
+                    if (matcher.isEqual && alertValue !== matcher.value)
+                        return false;
+                    if (!matcher.isEqual && alertValue === matcher.value)
+                        return false;
+                }
+            }
+            else {
+                if (matcher.isEqual && alertValue !== matcher.value)
+                    return false;
+                if (!matcher.isEqual && alertValue === matcher.value)
+                    return false;
+            }
+        }
+        return true;
     }
     calculateNoiseScores(aggregations) {
         return aggregations.map((agg) => {

@@ -169,11 +169,12 @@ export class Reporter {
     lines.push('');
     const matched = matchedSilences.filter((m) => m.matches.length > 0);
     if (matched.length > 0) {
-      lines.push('| 规则名称 | 匹配静默数 | 匹配标签 |');
-      lines.push('|----------|------------|----------|');
+      lines.push('| 规则名称 | 匹配静默数 | 匹配告警数 | 匹配标签 |');
+      lines.push('|----------|------------|------------|----------|');
       matched.forEach((m) => {
-        const matchLabels = m.matches.map((ma) => ma.matchedBy.join(',')).join('; ');
-        lines.push(`| ${m.ruleName} | ${m.matches.length} | ${matchLabels} |`);
+        const totalMatchedAlerts = m.matches.reduce((sum, ma) => sum + ma.matchedAlertCount, 0);
+        const matchDetails = m.matches.map((ma) => `${ma.silenceComment}(${ma.matchedAlertCount}条:${ma.matchedBy.join(',')})`).join('; ');
+        lines.push(`| ${m.ruleName} | ${m.matches.length} | ${totalMatchedAlerts} | ${matchDetails} |`);
       });
     } else {
       lines.push('暂无匹配的静默规则');

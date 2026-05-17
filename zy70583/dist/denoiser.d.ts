@@ -11,6 +11,7 @@ export declare class Denoiser {
         ruleName: string;
         matches: MatchResult[];
     }[];
+    private doesAlertMatchSilence;
     calculateNoiseScores(aggregations: AlertAggregation[]): NoiseScore[];
     private calculateFrequencyFactor;
     private calculateDiversityFactor;

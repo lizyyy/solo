@@ -147,6 +147,7 @@ export class SelfTester {
 
   private async testSilenceMatching(): Promise<void> {
     console.log('🧪 测试5: 静默规则匹配...');
+    let allPassed = true;
 
     const alerts: Alert[] = [
       {
@@ -177,9 +178,100 @@ export class SelfTester {
     const matches = denoiser.matchSilences(aggregations);
 
     if (matches[0]?.matches.length === 1) {
-      this.pass(`静默匹配正常 - 匹配数:${matches[0].matches.length}`);
+      this.pass('  - 单标签匹配正常');
     } else {
-      this.fail(`静默匹配异常 - 匹配数:${matches[0]?.matches.length || 0}`);
+      this.fail('  - 单标签匹配异常');
+      allPassed = false;
+    }
+
+    const crossAlerts: Alert[] = [
+      {
+        id: 'a1', ruleId: 'r1', ruleName: 'CrossAlert', severity: 'warning',
+        timestamp: Date.now(), labels: { env: 'prod', service: 'api' }, annotations: {},
+      },
+      {
+        id: 'a2', ruleId: 'r1', ruleName: 'CrossAlert', severity: 'warning',
+        timestamp: Date.now(), labels: { env: 'dev', service: 'web' }, annotations: {},
+      },
+    ];
+
+    const crossSilences: Silence[] = [
+      {
+        id: 's1', comment: 'prod+web组合', createdBy: 'test',
+        startsAt: Date.now(), endsAt: Date.now() + 86400000, status: 'active',
+        matchers: [
+          { name: 'env', value: 'prod', isRegex: false, isEqual: true },
+          { name: 'service', value: 'web', isRegex: false, isEqual: true },
+        ],
+      },
+    ];
+
+    const crossDenoiser = new Denoiser(crossAlerts, [], crossSilences, 50);
+    const crossAggregations = crossDenoiser.aggregateAlerts();
+    const crossMatches = crossDenoiser.matchSilences(crossAggregations);
+
+    if (crossMatches[0]?.matches.length === 0) {
+      this.pass('  - 跨告警组合误判已修复');
+    } else {
+      this.fail('  - 跨告警组合误判 - 不应该匹配任何告警');
+      allPassed = false;
+    }
+
+    const missingAlerts: Alert[] = [
+      {
+        id: 'a1', ruleId: 'r1', ruleName: 'MissingAlert', severity: 'warning',
+        timestamp: Date.now(), labels: { env: 'prod' }, annotations: {},
+      },
+    ];
+
+    const missingSilences: Silence[] = [
+      {
+        id: 's1', comment: 'prod+cluster组合', createdBy: 'test',
+        startsAt: Date.now(), endsAt: Date.now() + 86400000, status: 'active',
+        matchers: [
+          { name: 'env', value: 'prod', isRegex: false, isEqual: true },
+          { name: 'cluster', value: 'c1', isRegex: false, isEqual: true },
+        ],
+      },
+    ];
+
+    const missingDenoiser = new Denoiser(missingAlerts, [], missingSilences, 50);
+    const missingAggregations = missingDenoiser.aggregateAlerts();
+    const missingMatches = missingDenoiser.matchSilences(missingAggregations);
+
+    if (missingMatches[0]?.matches.length === 0) {
+      this.pass('  - 缺失标签部分匹配已修复');
+    } else {
+      this.fail('  - 缺失标签部分匹配 - 不应该被匹配');
+      allPassed = false;
+    }
+
+    const correctAlerts: Alert[] = [
+      {
+        id: 'a1', ruleId: 'r1', ruleName: 'CorrectAlert', severity: 'warning',
+        timestamp: Date.now(), labels: { env: 'prod', service: 'web' }, annotations: {},
+      },
+      {
+        id: 'a2', ruleId: 'r1', ruleName: 'CorrectAlert', severity: 'warning',
+        timestamp: Date.now(), labels: { env: 'prod', service: 'api' }, annotations: {},
+      },
+    ];
+
+    const correctDenoiser = new Denoiser(correctAlerts, [], [crossSilences[0]], 50);
+    const correctAggregations = correctDenoiser.aggregateAlerts();
+    const correctMatches = correctDenoiser.matchSilences(correctAggregations);
+
+    if (correctMatches[0]?.matches[0]?.matchedAlertCount === 1) {
+      this.pass('  - 精确匹配数量正确');
+    } else {
+      this.fail(`  - 精确匹配数量错误: ${correctMatches[0]?.matches[0]?.matchedAlertCount}`);
+      allPassed = false;
+    }
+
+    if (allPassed) {
+      this.pass('静默规则匹配逻辑验证通过');
+    } else {
+      this.fail('静默规则匹配逻辑存在问题');
     }
   }
 
