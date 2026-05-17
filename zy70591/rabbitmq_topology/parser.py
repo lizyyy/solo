@@ -110,34 +110,37 @@ class TopologyParser:
         if not self._json_parser or not self._raw_content:
             return None
         
-        item_str = json.dumps(item, ensure_ascii=False, separators=(',', ':'))
-        item_pretty = json.dumps(item, ensure_ascii=False, indent=2)
-        
-        for variant in [item_str, item_pretty]:
-            variant_clean = variant.strip()
-            if variant_clean:
-                pattern = re.escape(variant_clean).replace(r'\ ', r'\s*')
-                matches = list(re.finditer(pattern, self._raw_content))
-                if len(matches) == 1:
-                    start_line = self._json_parser._get_line_number(matches[0].start())
-                    return start_line
-        
-        pattern = rf'"{field_name}"\s*:\s*\[([^\]]*?)\]'
-        match = re.search(pattern, self._raw_content, re.DOTALL)
-        if match:
-            array_content = match.group(1)
-            items = re.findall(r'\{[^{}]*\}', array_content)
-            if idx < len(items):
-                item_pos = match.start(1) + array_content.find(items[idx])
-                return self._json_parser._get_line_number(item_pos)
-        
         pattern = rf'"{field_name}"\s*:\s*\['
         match = re.search(pattern, self._raw_content)
-        if match:
-            array_start = self._json_parser._get_line_number(match.end())
-            return array_start + idx
+        if not match:
+            return None
         
-        return None
+        array_start_pos = match.end()
+        content_after_array_start = self._raw_content[array_start_pos:]
+        
+        brace_count = 0
+        in_object = False
+        object_start_pos = None
+        current_object_idx = 0
+        
+        for i, char in enumerate(content_after_array_start):
+            if char == '{':
+                if brace_count == 0:
+                    in_object = True
+                    object_start_pos = array_start_pos + i
+                brace_count += 1
+            elif char == '}':
+                brace_count -= 1
+                if brace_count == 0 and in_object:
+                    if current_object_idx == idx:
+                        return self._json_parser._get_line_number(object_start_pos)
+                    current_object_idx += 1
+                    in_object = False
+                    if current_object_idx > idx:
+                        break
+        
+        array_start_line = self._json_parser._get_line_number(array_start_pos)
+        return array_start_line + idx
 
     def _parse_exchanges(self, exchanges: List[Any]):
         for idx, item in enumerate(exchanges):

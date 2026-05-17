@@ -1,0 +1,48 @@
+# RabbitMQ 拓扑分析报告 - test_run
+
+**生成时间**: 2026-05-17 14:36:04
+
+## 📊 拓扑统计
+
+| 项目 | 数量 |
+|------|------|
+| Exchanges | 2 |
+| Queues | 3 |
+| Bindings | 3 |
+| Policies | 1 |
+
+## 🔍 验证结果
+
+### ⚠️  警告 (1个)
+- Policy 'ha-all' (vhost: /, pattern: '.*') 未匹配到任何Queue或Exchange
+
+## 📋 详细列表
+
+### Exchanges
+
+| Vhost | Name | Type | Durable |
+|-------|------|------|---------|
+| / | order.exchange | topic | ✓ |
+| / | notification.exchange | fanout | ✓ |
+
+### Queues
+
+| Vhost | Name | Durable | Exclusive |
+|-------|------|---------|-----------|
+| / | order.create.queue | ✓ | ✗ |
+| / | order.cancel.queue | ✓ | ✗ |
+| / | notification.queue | ✓ | ✗ |
+
+### Bindings
+
+| Vhost | Source | Destination | Routing Key |
+|-------|--------|-------------|-------------|
+| / | order.exchange | order.create.queue | order.create |
+| / | order.exchange | order.cancel.queue | order.cancel |
+| / | notification.exchange | notification.queue | (fanout) |
+
+### Policies
+
+| Vhost | Name | Pattern | Apply To |
+|-------|------|---------|----------|
+| / | ha-all | .* | all |

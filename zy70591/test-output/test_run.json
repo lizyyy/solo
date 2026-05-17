@@ -1,0 +1,107 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-17T14:36:04.782704",
+    "report_name": "test_run"
+  },
+  "topology": {
+    "exchanges_count": 2,
+    "queues_count": 3,
+    "bindings_count": 3,
+    "policies_count": 1,
+    "exchanges": [
+      {
+        "name": "order.exchange",
+        "vhost": "/",
+        "type": "topic",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+      },
+      {
+        "name": "notification.exchange",
+        "vhost": "/",
+        "type": "fanout",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+      }
+    ],
+    "queues": [
+      {
+        "name": "order.create.queue",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "exclusive": false,
+        "arguments": {}
+      },
+      {
+        "name": "order.cancel.queue",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "exclusive": false,
+        "arguments": {}
+      },
+      {
+        "name": "notification.queue",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "exclusive": false,
+        "arguments": {}
+      }
+    ],
+    "bindings": [
+      {
+        "source": "order.exchange",
+        "destination": "order.create.queue",
+        "destination_type": "queue",
+        "routing_key": "order.create",
+        "vhost": "/",
+        "arguments": {}
+      },
+      {
+        "source": "order.exchange",
+        "destination": "order.cancel.queue",
+        "destination_type": "queue",
+        "routing_key": "order.cancel",
+        "vhost": "/",
+        "arguments": {}
+      },
+      {
+        "source": "notification.exchange",
+        "destination": "notification.queue",
+        "destination_type": "queue",
+        "routing_key": "",
+        "vhost": "/",
+        "arguments": {}
+      }
+    ],
+    "policies": [
+      {
+        "name": "ha-all",
+        "vhost": "/",
+        "pattern": ".*",
+        "definition": {
+          "ha-mode": "all",
+          "ha-sync-mode": "automatic"
+        },
+        "priority": 0,
+        "apply_to": "all"
+      }
+    ]
+  },
+  "validation": {
+    "orphan_queues": [],
+    "orphan_exchanges": [],
+    "invalid_bindings": [],
+    "duplicate_bindings": [],
+    "warnings": [
+      "Policy 'ha-all' (vhost: /, pattern: '.*') 未匹配到任何Queue或Exchange"
+    ]
+  },
+  "parse_errors": []
+}

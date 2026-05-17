@@ -313,19 +313,39 @@ rabbitmq-topology analyze ./topologies/ -o ./reports
 当遇到坏数据或解析错误时，工具会：
 
 1. **不抛出异常**，继续处理剩余数据
-2. **保留错误位置**：记录行号、字段名
-3. **保存原始数据**：保留错误样本的原始内容
-4. **汇总报告**：在最终报告中列出所有错误
+2. **精确行号定位**：记录JSON文件中的真实行号（不是数组索引）
+3. **保留错误上下文**：记录字段名、错误类型
+4. **保存原始数据**：保留错误样本的原始内容
+5. **非0退出码**：发现问题时返回非0退出码（可配置）
 
 **示例错误输出:**
 
 ```
 ❌ 解析错误 (2个):
-  - [JSONDecodeError] [第15行]: 无效的JSON语法
-    原始数据: "queues": [ missing bracket...
+  - [ExchangeParseError] [第9行]: Exchange解析失败: 缺少必填字段: name
+    原始数据: {"vhost": "/", "type": "topic", "durable": true}
 
-  - [ExchangeParseError] [第3行]: 缺少必填字段: name
-    原始数据: {"vhost": "/", "type": "topic"}
+  - [QueueParseError] [第25行]: Queue解析失败: 缺少必填字段: name
+    原始数据: {"durable": true, "exclusive": false}
+
+🔍 验证结果
+  ❌ 无效Binding (2个):
+      - 源Exchange不存在: nonexistent.exchange (第23行)
+      - 目标Queue不存在: nonexistent.queue (第29行)
+```
+
+**CI/CD 集成示例:**
+
+```bash
+# 验证拓扑，失败时中断流水线
+rabbitmq-topology validate topology.json || {
+  echo "拓扑验证失败，请检查上述错误"
+  exit 1
+}
+
+# 在GitHub Actions中使用
+- name: 验证RabbitMQ拓扑
+  run: rabbitmq-topology validate deploy/topology.json
 ```
 
 ## 🔧 开发
