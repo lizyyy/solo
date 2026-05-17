@@ -1,0 +1,396 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-17_16-58-07",
+    "inputInfo": {
+      "source": "examples/cookies.json",
+      "type": "file",
+      "files": [
+        "examples/cookies.json"
+      ]
+    },
+    "version": "1.0.0"
+  },
+  "summary": {
+    "total": 5,
+    "valid": 1,
+    "invalid": 0,
+    "risks": {
+      "critical": 2,
+      "high": 2,
+      "medium": 6,
+      "low": 0,
+      "info": 0
+    }
+  },
+  "normal": [
+    {
+      "cookie": {
+        "name": "session_id",
+        "value": "abc123xyz",
+        "domain": ".example.com",
+        "path": "/",
+        "secure": true,
+        "httpOnly": true,
+        "sameSite": "Lax",
+        "expires": 1893456000000,
+        "source": "examples/cookies.json",
+        "index": 0
+      },
+      "checks": {
+        "expired": {
+          "isExpired": false,
+          "daysAgo": -1324,
+          "expiresAt": "2030-01-01T00:00:00.000Z"
+        },
+        "sameSite": {
+          "valid": true,
+          "message": "SameSite 设置合理",
+          "value": "Lax"
+        },
+        "domain": {
+          "valid": true,
+          "riskLevel": "info",
+          "message": "Domain 带前导点，适用于所有子域",
+          "value": ".example.com",
+          "scope": "all-subdomains"
+        },
+        "path": {
+          "valid": true,
+          "message": "Path=/ 适用于全站",
+          "value": "/",
+          "scope": "entire-site"
+        },
+        "secure": {
+          "valid": true,
+          "message": "Secure 属性已设置",
+          "value": true
+        },
+        "httpOnly": {
+          "valid": true,
+          "message": "HttpOnly 属性已设置",
+          "value": true
+        }
+      }
+    }
+  ],
+  "risks": [
+    {
+      "cookie": {
+        "name": "session_id",
+        "value": "def456uvw",
+        "domain": "app.example.com",
+        "path": "/",
+        "secure": false,
+        "httpOnly": false,
+        "sameSite": "None",
+        "expires": 1893456000000,
+        "source": "examples/cookies.json",
+        "index": 1
+      },
+      "risks": [
+        {
+          "type": "samesite",
+          "level": "medium",
+          "message": "SameSite=None 必须配合 Secure 属性使用",
+          "detail": {
+            "valid": false,
+            "message": "SameSite=None 必须配合 Secure 属性使用",
+            "value": "None"
+          }
+        },
+        {
+          "type": "domain",
+          "level": "critical",
+          "message": "Domain 设置可能导致跨域冲突: 匹配 2 个目标域",
+          "detail": {
+            "valid": false,
+            "riskLevel": "critical",
+            "message": "Domain 设置可能导致跨域冲突: 匹配 2 个目标域",
+            "value": "app.example.com",
+            "matches": [
+              "example.com",
+              "app.example.com"
+            ]
+          }
+        },
+        {
+          "type": "secure",
+          "level": "critical",
+          "message": "SameSite=None 必须设置 Secure 属性",
+          "detail": {
+            "valid": false,
+            "message": "SameSite=None 必须设置 Secure 属性",
+            "value": false
+          }
+        },
+        {
+          "type": "httponly",
+          "level": "medium",
+          "message": "建议设置 HttpOnly 属性 (防止 XSS 窃取)",
+          "detail": {
+            "valid": false,
+            "message": "建议设置 HttpOnly 属性 (防止 XSS 窃取)",
+            "value": false
+          }
+        }
+      ],
+      "checks": {
+        "expired": {
+          "isExpired": false,
+          "daysAgo": -1324,
+          "expiresAt": "2030-01-01T00:00:00.000Z"
+        },
+        "sameSite": {
+          "valid": false,
+          "message": "SameSite=None 必须配合 Secure 属性使用",
+          "value": "None"
+        },
+        "domain": {
+          "valid": false,
+          "riskLevel": "critical",
+          "message": "Domain 设置可能导致跨域冲突: 匹配 2 个目标域",
+          "value": "app.example.com",
+          "matches": [
+            "example.com",
+            "app.example.com"
+          ]
+        },
+        "path": {
+          "valid": true,
+          "message": "Path=/ 适用于全站",
+          "value": "/",
+          "scope": "entire-site"
+        },
+        "secure": {
+          "valid": false,
+          "message": "SameSite=None 必须设置 Secure 属性",
+          "value": false
+        },
+        "httpOnly": {
+          "valid": false,
+          "message": "建议设置 HttpOnly 属性 (防止 XSS 窃取)",
+          "value": false
+        }
+      }
+    },
+    {
+      "cookie": {
+        "name": "user_token",
+        "value": "ghi789rst",
+        "domain": ".example.com",
+        "path": "/api",
+        "secure": true,
+        "httpOnly": true,
+        "sameSite": "Strict",
+        "expires": 1735689600000,
+        "source": "examples/cookies.json",
+        "index": 2
+      },
+      "risks": [
+        {
+          "type": "expired",
+          "level": "high",
+          "message": "Cookie已过期: 501天",
+          "detail": {
+            "isExpired": true,
+            "daysAgo": 501,
+            "expiresAt": "2025-01-01T00:00:00.000Z"
+          }
+        }
+      ],
+      "checks": {
+        "expired": {
+          "isExpired": true,
+          "daysAgo": 501,
+          "expiresAt": "2025-01-01T00:00:00.000Z"
+        },
+        "sameSite": {
+          "valid": true,
+          "message": "SameSite=Strict",
+          "value": "Strict"
+        },
+        "domain": {
+          "valid": true,
+          "riskLevel": "info",
+          "message": "Domain 带前导点，适用于所有子域",
+          "value": ".example.com",
+          "scope": "all-subdomains"
+        },
+        "path": {
+          "valid": true,
+          "message": "Path 限制为 /api",
+          "value": "/api"
+        },
+        "secure": {
+          "valid": true,
+          "message": "Secure 属性已设置",
+          "value": true
+        },
+        "httpOnly": {
+          "valid": true,
+          "message": "HttpOnly 属性已设置",
+          "value": true
+        }
+      }
+    },
+    {
+      "cookie": {
+        "name": "remember_me",
+        "value": "jkl012opq",
+        "domain": "auth.example.com",
+        "path": "/",
+        "secure": false,
+        "httpOnly": false,
+        "sameSite": "Lax",
+        "expires": 1609459200000,
+        "source": "examples/cookies.json",
+        "index": 3
+      },
+      "risks": [
+        {
+          "type": "expired",
+          "level": "high",
+          "message": "Cookie已过期: 1962天",
+          "detail": {
+            "isExpired": true,
+            "daysAgo": 1962,
+            "expiresAt": "2021-01-01T00:00:00.000Z"
+          }
+        },
+        {
+          "type": "secure",
+          "level": "medium",
+          "message": "建议设置 Secure 属性 (仅 HTTPS 传输)",
+          "detail": {
+            "valid": false,
+            "message": "建议设置 Secure 属性 (仅 HTTPS 传输)",
+            "value": false
+          }
+        },
+        {
+          "type": "httponly",
+          "level": "medium",
+          "message": "建议设置 HttpOnly 属性 (防止 XSS 窃取)",
+          "detail": {
+            "valid": false,
+            "message": "建议设置 HttpOnly 属性 (防止 XSS 窃取)",
+            "value": false
+          }
+        }
+      ],
+      "checks": {
+        "expired": {
+          "isExpired": true,
+          "daysAgo": 1962,
+          "expiresAt": "2021-01-01T00:00:00.000Z"
+        },
+        "sameSite": {
+          "valid": true,
+          "message": "SameSite 设置合理",
+          "value": "Lax"
+        },
+        "domain": {
+          "valid": true,
+          "message": "Domain 设置合理",
+          "value": "auth.example.com"
+        },
+        "path": {
+          "valid": true,
+          "message": "Path=/ 适用于全站",
+          "value": "/",
+          "scope": "entire-site"
+        },
+        "secure": {
+          "valid": false,
+          "message": "建议设置 Secure 属性 (仅 HTTPS 传输)",
+          "value": false
+        },
+        "httpOnly": {
+          "valid": false,
+          "message": "建议设置 HttpOnly 属性 (防止 XSS 窃取)",
+          "value": false
+        }
+      }
+    },
+    {
+      "cookie": {
+        "name": "analytics_id",
+        "value": "mno345stu",
+        "domain": ".example.com",
+        "path": "/",
+        "secure": false,
+        "httpOnly": false,
+        "sameSite": "Lax",
+        "expires": null,
+        "source": "examples/cookies.json",
+        "index": 4
+      },
+      "risks": [
+        {
+          "type": "secure",
+          "level": "medium",
+          "message": "建议设置 Secure 属性 (仅 HTTPS 传输)",
+          "detail": {
+            "valid": false,
+            "message": "建议设置 Secure 属性 (仅 HTTPS 传输)",
+            "value": false
+          }
+        },
+        {
+          "type": "httponly",
+          "level": "medium",
+          "message": "建议设置 HttpOnly 属性 (防止 XSS 窃取)",
+          "detail": {
+            "valid": false,
+            "message": "建议设置 HttpOnly 属性 (防止 XSS 窃取)",
+            "value": false
+          }
+        }
+      ],
+      "checks": {
+        "expired": {
+          "isExpired": false,
+          "isSession": true
+        },
+        "sameSite": {
+          "valid": true,
+          "message": "SameSite 设置合理",
+          "value": "Lax"
+        },
+        "domain": {
+          "valid": true,
+          "riskLevel": "info",
+          "message": "Domain 带前导点，适用于所有子域",
+          "value": ".example.com",
+          "scope": "all-subdomains"
+        },
+        "path": {
+          "valid": true,
+          "message": "Path=/ 适用于全站",
+          "value": "/",
+          "scope": "entire-site"
+        },
+        "secure": {
+          "valid": false,
+          "message": "建议设置 Secure 属性 (仅 HTTPS 传输)",
+          "value": false
+        },
+        "httpOnly": {
+          "valid": false,
+          "message": "建议设置 HttpOnly 属性 (防止 XSS 窃取)",
+          "value": false
+        }
+      }
+    }
+  ],
+  "unparseable": [],
+  "domainAnalysis": {
+    "totalConflicts": 0,
+    "conflicts": [],
+    "domainGroups": [
+      ".example.com",
+      "app.example.com",
+      "auth.example.com"
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+[
+  {
+    "name": "session_id",
+    "value": "abc123xyz",
+    "domain": ".example.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "Lax",
+    "expires": 1893456000000
+  },
+  {
+    "name": "session_id",
+    "value": "def456uvw",
+    "domain": "app.example.com",
+    "path": "/",
+    "secure": false,
+    "httpOnly": false,
+    "sameSite": "None",
+    "expires": 1893456000000
+  },
+  {
+    "name": "user_token",
+    "value": "ghi789rst",
+    "domain": ".example.com",
+    "path": "/api",
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "Strict",
+    "expires": 1735689600000
+  },
+  {
+    "name": "remember_me",
+    "value": "jkl012opq",
+    "domain": "auth.example.com",
+    "path": "/",
+    "secure": false,
+    "httpOnly": false,
+    "sameSite": "Lax",
+    "expires": 1609459200000
+  },
+  {
+    "name": "analytics_id",
+    "value": "mno345stu",
+    "domain": ".example.com",
+    "path": "/",
+    "secure": false,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  }
+]
