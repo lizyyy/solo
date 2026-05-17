@@ -1,0 +1,948 @@
+{
+  "summary": {
+    "total_entries": 100,
+    "total_errors": 5,
+    "total_duration_us": 8753281,
+    "avg_duration_ms": 87.53281,
+    "max_duration_ms": 471.352,
+    "min_duration_ms": 0.739
+  },
+  "duration_distribution": [
+    {
+      "name": "0-1ms",
+      "min_us": 0,
+      "max_us": 1000,
+      "count": 2,
+      "total_duration_us": 1592,
+      "avg_duration_ms": 0.796
+    },
+    {
+      "name": "1-5ms",
+      "min_us": 1000,
+      "max_us": 5000,
+      "count": 4,
+      "total_duration_us": 15089,
+      "avg_duration_ms": 3.77225
+    },
+    {
+      "name": "5-10ms",
+      "min_us": 5000,
+      "max_us": 10000,
+      "count": 6,
+      "total_duration_us": 46968,
+      "avg_duration_ms": 7.828
+    },
+    {
+      "name": "10-50ms",
+      "min_us": 10000,
+      "max_us": 50000,
+      "count": 36,
+      "total_duration_us": 1129392,
+      "avg_duration_ms": 31.372
+    },
+    {
+      "name": "50-100ms",
+      "min_us": 50000,
+      "max_us": 100000,
+      "count": 30,
+      "total_duration_us": 2222090,
+      "avg_duration_ms": 74.06966666666668
+    },
+    {
+      "name": "100ms-1s",
+      "min_us": 100000,
+      "max_us": 1000000,
+      "count": 22,
+      "total_duration_us": 5338150,
+      "avg_duration_ms": 242.64318181818183
+    },
+    {
+      "name": ">1s",
+      "min_us": 1000000,
+      "max_us": null,
+      "count": 0,
+      "total_duration_us": 0,
+      "avg_duration_ms": 0.0
+    }
+  ],
+  "command_stats": [
+    {
+      "command": "HGET",
+      "count": 14,
+      "total_duration_us": 503604,
+      "avg_duration_ms": 35.971714285714285,
+      "max_duration_ms": 72.449
+    },
+    {
+      "command": "KEYS",
+      "count": 12,
+      "total_duration_us": 3851696,
+      "avg_duration_ms": 320.9746666666667,
+      "max_duration_ms": 471.352
+    },
+    {
+      "command": "ZRANGE",
+      "count": 12,
+      "total_duration_us": 758409,
+      "avg_duration_ms": 63.20075,
+      "max_duration_ms": 96.438
+    },
+    {
+      "command": "SMEMBERS",
+      "count": 11,
+      "total_duration_us": 530155,
+      "avg_duration_ms": 48.19590909090909,
+      "max_duration_ms": 89.147
+    },
+    {
+      "command": "LRANGE",
+      "count": 10,
+      "total_duration_us": 1152721,
+      "avg_duration_ms": 115.27210000000001,
+      "max_duration_ms": 189.095
+    },
+    {
+      "command": "SET",
+      "count": 9,
+      "total_duration_us": 541145,
+      "avg_duration_ms": 60.127222222222215,
+      "max_duration_ms": 78.156
+    },
+    {
+      "command": "DEL",
+      "count": 9,
+      "total_duration_us": 58299,
+      "avg_duration_ms": 6.477666666666667,
+      "max_duration_ms": 16.305
+    },
+    {
+      "command": "ZADD",
+      "count": 8,
+      "total_duration_us": 693481,
+      "avg_duration_ms": 86.685125,
+      "max_duration_ms": 144.025
+    },
+    {
+      "command": "GET",
+      "count": 8,
+      "total_duration_us": 152421,
+      "avg_duration_ms": 19.052625,
+      "max_duration_ms": 43.527
+    },
+    {
+      "command": "HSET",
+      "count": 7,
+      "total_duration_us": 511350,
+      "avg_duration_ms": 73.05,
+      "max_duration_ms": 129.388
+    }
+  ],
+  "key_patterns": [
+    {
+      "pattern": "order:*:items",
+      "count": 17,
+      "total_duration_us": 2689381,
+      "avg_duration_ms": 158.19888235294118,
+      "sample_keys": [
+        "order:5262:items",
+        "order:8218:items",
+        "order:1989:items",
+        "order:4088:items",
+        "order:545:items"
+      ],
+      "commands": [
+        "GET",
+        "SMEMBERS",
+        "KEYS",
+        "HSET",
+        "ZADD",
+        "LRANGE",
+        "HGET"
+      ]
+    },
+    {
+      "pattern": "session:*-abc",
+      "count": 16,
+      "total_duration_us": 801580,
+      "avg_duration_ms": 50.09875,
+      "sample_keys": [
+        "session:8110-abc",
+        "session:4839-abc",
+        "session:8706-abc",
+        "session:5891-abc",
+        "session:9454-abc"
+      ],
+      "commands": [
+        "GET",
+        "SMEMBERS",
+        "DEL",
+        "SET",
+        "HSET",
+        "ZADD",
+        "ZRANGE",
+        "KEYS",
+        "HGET"
+      ]
+    },
+    {
+      "pattern": "user:*",
+      "count": 15,
+      "total_duration_us": 1899403,
+      "avg_duration_ms": 126.62686666666667,
+      "sample_keys": [
+        "user:7385",
+        "user:3606",
+        "user:302",
+        "user:7945",
+        "user:2524"
+      ],
+      "commands": [
+        "SMEMBERS",
+        "DEL",
+        "SET",
+        "KEYS",
+        "HGET",
+        "ZRANGE"
+      ]
+    },
+    {
+      "pattern": "product:*:info",
+      "count": 15,
+      "total_duration_us": 855548,
+      "avg_duration_ms": 57.03653333333333,
+      "sample_keys": [
+        "product:2724:info",
+        "product:9814:info",
+        "product:9085:info",
+        "product:1050:info",
+        "product:4268:info"
+      ],
+      "commands": [
+        "GET",
+        "SMEMBERS",
+        "DEL",
+        "KEYS",
+        "SET",
+        "ZADD",
+        "ZRANGE",
+        "HGET"
+      ]
+    },
+    {
+      "pattern": "rate_limit:*.*.*.*",
+      "count": 10,
+      "total_duration_us": 834511,
+      "avg_duration_ms": 83.45110000000001,
+      "sample_keys": [
+        "rate_limit:10.0.10.78",
+        "rate_limit:10.0.0.217",
+        "rate_limit:10.0.5.172",
+        "rate_limit:10.0.3.94",
+        "rate_limit:10.0.10.178"
+      ],
+      "commands": [
+        "DEL",
+        "KEYS",
+        "ZRANGE",
+        "LRANGE",
+        "HGET"
+      ]
+    },
+    {
+      "pattern": "cache:perm:*",
+      "count": 4,
+      "total_duration_us": 252563,
+      "avg_duration_ms": 63.14075,
+      "sample_keys": [
+        "cache:perm:9820",
+        "cache:perm:2527",
+        "cache:perm:37",
+        "cache:perm:1790"
+      ],
+      "commands": [
+        "DEL",
+        "HSET",
+        "ZADD"
+      ]
+    },
+    {
+      "pattern": "cache:temp:*",
+      "count": 3,
+      "total_duration_us": 221856,
+      "avg_duration_ms": 73.952,
+      "sample_keys": [
+        "cache:temp:9397",
+        "cache:temp:7347",
+        "cache:temp:6861"
+      ],
+      "commands": [
+        "GET",
+        "LRANGE",
+        "SMEMBERS"
+      ]
+    },
+    {
+      "pattern": "cache:data:*",
+      "count": 3,
+      "total_duration_us": 84460,
+      "avg_duration_ms": 28.153333333333332,
+      "sample_keys": [
+        "cache:data:8439",
+        "cache:data:5571",
+        "cache:data:5650"
+      ],
+      "commands": [
+        "ZADD",
+        "HGET"
+      ]
+    },
+    {
+      "pattern": "config:setting_76",
+      "count": 2,
+      "total_duration_us": 511151,
+      "avg_duration_ms": 255.5755,
+      "sample_keys": [
+        "config:setting_76"
+      ],
+      "commands": [
+        "KEYS",
+        "SET"
+      ]
+    },
+    {
+      "pattern": "config:setting_24",
+      "count": 1,
+      "total_duration_us": 129388,
+      "avg_duration_ms": 129.388,
+      "sample_keys": [
+        "config:setting_24"
+      ],
+      "commands": [
+        "HSET"
+      ]
+    },
+    {
+      "pattern": "config:setting_21",
+      "count": 1,
+      "total_duration_us": 71209,
+      "avg_duration_ms": 71.209,
+      "sample_keys": [
+        "config:setting_21"
+      ],
+      "commands": [
+        "ZADD"
+      ]
+    },
+    {
+      "pattern": "config:setting_59",
+      "count": 1,
+      "total_duration_us": 51620,
+      "avg_duration_ms": 51.62,
+      "sample_keys": [
+        "config:setting_59"
+      ],
+      "commands": [
+        "HGET"
+      ]
+    },
+    {
+      "pattern": "config:setting_47",
+      "count": 1,
+      "total_duration_us": 48338,
+      "avg_duration_ms": 48.338,
+      "sample_keys": [
+        "config:setting_47"
+      ],
+      "commands": [
+        "ZRANGE"
+      ]
+    },
+    {
+      "pattern": "config:setting_50",
+      "count": 1,
+      "total_duration_us": 46796,
+      "avg_duration_ms": 46.796,
+      "sample_keys": [
+        "config:setting_50"
+      ],
+      "commands": [
+        "LRANGE"
+      ]
+    },
+    {
+      "pattern": "config:setting_48",
+      "count": 1,
+      "total_duration_us": 41799,
+      "avg_duration_ms": 41.799,
+      "sample_keys": [
+        "config:setting_48"
+      ],
+      "commands": [
+        "SET"
+      ]
+    },
+    {
+      "pattern": "config:setting_44",
+      "count": 1,
+      "total_duration_us": 38995,
+      "avg_duration_ms": 38.995,
+      "sample_keys": [
+        "config:setting_44"
+      ],
+      "commands": [
+        "SMEMBERS"
+      ]
+    },
+    {
+      "pattern": "config:setting_41",
+      "count": 1,
+      "total_duration_us": 36918,
+      "avg_duration_ms": 36.918,
+      "sample_keys": [
+        "config:setting_41"
+      ],
+      "commands": [
+        "SMEMBERS"
+      ]
+    },
+    {
+      "pattern": "config:setting_27",
+      "count": 1,
+      "total_duration_us": 34771,
+      "avg_duration_ms": 34.771,
+      "sample_keys": [
+        "config:setting_27"
+      ],
+      "commands": [
+        "HGET"
+      ]
+    },
+    {
+      "pattern": "config:setting_79",
+      "count": 1,
+      "total_duration_us": 22898,
+      "avg_duration_ms": 22.898,
+      "sample_keys": [
+        "config:setting_79"
+      ],
+      "commands": [
+        "LRANGE"
+      ]
+    },
+    {
+      "pattern": "config:setting_54",
+      "count": 1,
+      "total_duration_us": 22543,
+      "avg_duration_ms": 22.543,
+      "sample_keys": [
+        "config:setting_54"
+      ],
+      "commands": [
+        "HGET"
+      ]
+    },
+    {
+      "pattern": "config:setting_15",
+      "count": 1,
+      "total_duration_us": 20292,
+      "avg_duration_ms": 20.292,
+      "sample_keys": [
+        "config:setting_15"
+      ],
+      "commands": [
+        "GET"
+      ]
+    },
+    {
+      "pattern": "config:setting_2",
+      "count": 1,
+      "total_duration_us": 16305,
+      "avg_duration_ms": 16.305,
+      "sample_keys": [
+        "config:setting_2"
+      ],
+      "commands": [
+        "DEL"
+      ]
+    },
+    {
+      "pattern": "config:setting_18",
+      "count": 1,
+      "total_duration_us": 14460,
+      "avg_duration_ms": 14.46,
+      "sample_keys": [
+        "config:setting_18"
+      ],
+      "commands": [
+        "HGET"
+      ]
+    },
+    {
+      "pattern": "config:setting_51",
+      "count": 1,
+      "total_duration_us": 6496,
+      "avg_duration_ms": 6.496,
+      "sample_keys": [
+        "config:setting_51"
+      ],
+      "commands": [
+        "DEL"
+      ]
+    }
+  ],
+  "caller_stats": [
+    {
+      "label": "unknown",
+      "count": 63,
+      "total_duration_us": 5915059,
+      "avg_duration_ms": 93.8898253968254,
+      "commands": {
+        "GET": 4,
+        "SMEMBERS": 7,
+        "HSET": 6,
+        "HGET": 12,
+        "ZRANGE": 7,
+        "DEL": 2,
+        "LRANGE": 7,
+        "ZADD": 4,
+        "SET": 6,
+        "KEYS": 8
+      },
+      "top_key_patterns": [
+        [
+          "product:2724:info",
+          1
+        ],
+        [
+          "cache:temp:9397",
+          1
+        ],
+        [
+          "order:8218:items",
+          1
+        ],
+        [
+          "config:setting_59",
+          1
+        ],
+        [
+          "config:setting_47",
+          1
+        ],
+        [
+          "user:3606",
+          1
+        ],
+        [
+          "config:setting_2",
+          1
+        ],
+        [
+          "order:1989:items",
+          1
+        ],
+        [
+          "rate_limit:10.0.10.78",
+          1
+        ],
+        [
+          "config:setting_27",
+          1
+        ]
+      ]
+    },
+    {
+      "label": "ip:192.168.1.100",
+      "count": 12,
+      "total_duration_us": 439112,
+      "avg_duration_ms": 36.592666666666666,
+      "commands": {
+        "ZRANGE": 2,
+        "LRANGE": 1,
+        "SET": 2,
+        "DEL": 6,
+        "GET": 1
+      },
+      "top_key_patterns": [
+        [
+          "user:7385",
+          1
+        ],
+        [
+          "cache:temp:7347",
+          1
+        ],
+        [
+          "user:8869",
+          1
+        ],
+        [
+          "cache:perm:37",
+          1
+        ],
+        [
+          "session:1844-abc",
+          1
+        ],
+        [
+          "config:setting_51",
+          1
+        ],
+        [
+          "session:0972-abc",
+          1
+        ],
+        [
+          "product:4552:info",
+          1
+        ],
+        [
+          "rate_limit:10.0.3.94",
+          1
+        ],
+        [
+          "user:4093",
+          1
+        ]
+      ]
+    },
+    {
+      "label": "ip:192.168.1.101",
+      "count": 10,
+      "total_duration_us": 1343521,
+      "avg_duration_ms": 134.3521,
+      "commands": {
+        "HSET": 1,
+        "ZADD": 1,
+        "SMEMBERS": 1,
+        "DEL": 1,
+        "ZRANGE": 1,
+        "KEYS": 2,
+        "HGET": 2,
+        "GET": 1
+      },
+      "top_key_patterns": [
+        [
+          "cache:perm:9820",
+          1
+        ],
+        [
+          "session:8110-abc",
+          1
+        ],
+        [
+          "order:4088:items",
+          1
+        ],
+        [
+          "user:7945",
+          1
+        ],
+        [
+          "user:2524",
+          1
+        ],
+        [
+          "order:545:items",
+          1
+        ],
+        [
+          "config:setting_76",
+          1
+        ],
+        [
+          "product:8053:info",
+          1
+        ],
+        [
+          "user:183",
+          1
+        ],
+        [
+          "config:setting_15",
+          1
+        ]
+      ]
+    },
+    {
+      "label": "ip:192.168.2.50",
+      "count": 9,
+      "total_duration_us": 680342,
+      "avg_duration_ms": 75.59355555555557,
+      "commands": {
+        "ZADD": 2,
+        "SMEMBERS": 2,
+        "SET": 1,
+        "KEYS": 1,
+        "GET": 2,
+        "ZRANGE": 1
+      },
+      "top_key_patterns": [
+        [
+          "order:5262:items",
+          1
+        ],
+        [
+          "product:9814:info",
+          1
+        ],
+        [
+          "config:setting_76",
+          1
+        ],
+        [
+          "user:4506",
+          1
+        ],
+        [
+          "config:setting_21",
+          1
+        ],
+        [
+          "session:5891-abc",
+          1
+        ],
+        [
+          "order:5766:items",
+          1
+        ],
+        [
+          "config:setting_41",
+          1
+        ],
+        [
+          "rate_limit:10.0.1.172",
+          1
+        ]
+      ]
+    },
+    {
+      "label": "ip:10.0.0.25",
+      "count": 6,
+      "total_duration_us": 375247,
+      "avg_duration_ms": 62.54116666666666,
+      "commands": {
+        "KEYS": 1,
+        "ZADD": 1,
+        "ZRANGE": 1,
+        "LRANGE": 2,
+        "SMEMBERS": 1
+      },
+      "top_key_patterns": [
+        [
+          "session:9415-abc",
+          1
+        ],
+        [
+          "product:6559:info",
+          1
+        ],
+        [
+          "rate_limit:10.0.1.239",
+          1
+        ],
+        [
+          "config:setting_79",
+          1
+        ],
+        [
+          "product:6699:info",
+          1
+        ],
+        [
+          "config:setting_50",
+          1
+        ]
+      ]
+    }
+  ],
+  "slowest_entries": [
+    {
+      "id": 34,
+      "timestamp": 1778990933,
+      "duration_us": 471352,
+      "duration_ms": 471.352,
+      "command": "KEYS",
+      "args": [
+        "config:setting_76"
+      ],
+      "keys": [
+        "config:setting_76"
+      ],
+      "client_ip": "192.168.1.101",
+      "client_name": null,
+      "line_number": 336
+    },
+    {
+      "id": 63,
+      "timestamp": 1778990962,
+      "duration_us": 448963,
+      "duration_ms": 448.963,
+      "command": "KEYS",
+      "args": [
+        "user:4115"
+      ],
+      "keys": [
+        "user:4115"
+      ],
+      "client_ip": null,
+      "client_name": null,
+      "line_number": 635
+    },
+    {
+      "id": 57,
+      "timestamp": 1778990956,
+      "duration_us": 441691,
+      "duration_ms": 441.691,
+      "command": "KEYS",
+      "args": [
+        "order:7287:items"
+      ],
+      "keys": [
+        "order:7287:items"
+      ],
+      "client_ip": null,
+      "client_name": null,
+      "line_number": 561
+    },
+    {
+      "id": 45,
+      "timestamp": 1778990944,
+      "duration_us": 381815,
+      "duration_ms": 381.815,
+      "command": "KEYS",
+      "args": [
+        "user:8291"
+      ],
+      "keys": [
+        "user:8291"
+      ],
+      "client_ip": null,
+      "client_name": null,
+      "line_number": 443
+    },
+    {
+      "id": 27,
+      "timestamp": 1778990926,
+      "duration_us": 357607,
+      "duration_ms": 357.607,
+      "command": "KEYS",
+      "args": [
+        "order:545:items"
+      ],
+      "keys": [
+        "order:545:items"
+      ],
+      "client_ip": "192.168.1.101",
+      "client_name": "web-server",
+      "line_number": 263
+    },
+    {
+      "id": 80,
+      "timestamp": 1778990979,
+      "duration_us": 350675,
+      "duration_ms": 350.675,
+      "command": "KEYS",
+      "args": [
+        "rate_limit:10.0.6.104"
+      ],
+      "keys": [
+        "rate_limit:10.0.6.104"
+      ],
+      "client_ip": null,
+      "client_name": null,
+      "line_number": 812
+    },
+    {
+      "id": 87,
+      "timestamp": 1778990986,
+      "duration_us": 339317,
+      "duration_ms": 339.317,
+      "command": "KEYS",
+      "args": [
+        "order:6978:items"
+      ],
+      "keys": [
+        "order:6978:items"
+      ],
+      "client_ip": null,
+      "client_name": null,
+      "line_number": 879
+    },
+    {
+      "id": 41,
+      "timestamp": 1778990940,
+      "duration_us": 265273,
+      "duration_ms": 265.273,
+      "command": "KEYS",
+      "args": [
+        "order:3886:items"
+      ],
+      "keys": [
+        "order:3886:items"
+      ],
+      "client_ip": null,
+      "client_name": null,
+      "line_number": 407
+    },
+    {
+      "id": 26,
+      "timestamp": 1778990925,
+      "duration_us": 255577,
+      "duration_ms": 255.577,
+      "command": "KEYS",
+      "args": [
+        "user:4506"
+      ],
+      "keys": [
+        "user:4506"
+      ],
+      "client_ip": "192.168.2.50",
+      "client_name": null,
+      "line_number": 252
+    },
+    {
+      "id": 44,
+      "timestamp": 1778990943,
+      "duration_us": 205477,
+      "duration_ms": 205.477,
+      "command": "KEYS",
+      "args": [
+        "product:4268:info"
+      ],
+      "keys": [
+        "product:4268:info"
+      ],
+      "client_ip": null,
+      "client_name": null,
+      "line_number": 434
+    }
+  ],
+  "errors": [
+    {
+      "line_number": 1017,
+      "raw_content": "INVALID LINE FORMAT",
+      "error_reason": "Expected RESP array"
+    },
+    {
+      "line_number": 1018,
+      "raw_content": "*2",
+      "error_reason": "Protocol parse error: invalid literal for int() with base 10: 'not-a-number'"
+    },
+    {
+      "line_number": 1019,
+      "raw_content": ":not-a-number",
+      "error_reason": "Expected RESP array"
+    },
+    {
+      "line_number": 1020,
+      "raw_content": "$5",
+      "error_reason": "Expected RESP array"
+    },
+    {
+      "line_number": 1021,
+      "raw_content": "hello",
+      "error_reason": "Expected RESP array"
+    }
+  ]
+}

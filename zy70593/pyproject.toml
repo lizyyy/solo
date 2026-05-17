@@ -1,0 +1,14 @@
+[project]
+name = "redis-slowlog-attribution"
+version = "0.1.0"
+description = "Redis慢日志归因分析CLI工具"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+]
+
+[project.scripts]
+redis-slowlog = "redis_slowlog_attribution.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
