@@ -1,0 +1,18 @@
+# 这是一个混合了正常和错误数据的测试文件
+GET /api/v1/users
+POST /api/v1/login
+/api/v1/orders
+
+# 这行格式有问题
+这个是坏行
+/another/good/path
+
+# 路由定义
+/api/v1 -> main-service
+/api/v2 -> new-service
+
+# 更多错误
+    缩进有问题的行
+这也不对
+
+DELETE /api/v1/users/123

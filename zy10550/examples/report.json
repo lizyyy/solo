@@ -1,0 +1,327 @@
+{
+  "generated_at": "2026-05-17T22:16:08.676503",
+  "summary": {
+    "total_routes": 6,
+    "total_requests": 14,
+    "matched_requests": 12,
+    "unmatched_requests": 2,
+    "bad_lines": 0,
+    "upstream_stats": {
+      "auth-service": 2,
+      "user-service": 2,
+      "order-service": 2,
+      "product-service": 2,
+      "static-service": 2,
+      "health-service": 2
+    }
+  },
+  "routes": [
+    {
+      "path": "/api/v1/users/login",
+      "upstream": "auth-service",
+      "match_type": "exact",
+      "priority": 20,
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "source_file": "examples/test_routes.yaml",
+      "line_number": 2
+    },
+    {
+      "path": "/health",
+      "upstream": "health-service",
+      "match_type": "exact",
+      "priority": 0,
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "source_file": "examples/test_routes.yaml",
+      "line_number": 6
+    },
+    {
+      "path": "^/public/.*",
+      "upstream": "static-service",
+      "match_type": "regex",
+      "priority": 0,
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "source_file": "examples/test_routes.yaml",
+      "line_number": 5
+    },
+    {
+      "path": "/api/v1/users",
+      "upstream": "user-service",
+      "match_type": "prefix",
+      "priority": 10,
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "source_file": "examples/test_routes.yaml",
+      "line_number": 1
+    },
+    {
+      "path": "/api/v1/orders",
+      "upstream": "order-service",
+      "match_type": "prefix",
+      "priority": 5,
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "source_file": "examples/test_routes.yaml",
+      "line_number": 3
+    },
+    {
+      "path": "/api/v1/products",
+      "upstream": "product-service",
+      "match_type": "prefix",
+      "priority": 0,
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "source_file": "examples/test_routes.yaml",
+      "line_number": 4
+    }
+  ],
+  "match_results": [
+    {
+      "request": {
+        "path": "/api/v1/users/login",
+        "method": "POST",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 1
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/api/v1/users/login",
+        "upstream": "auth-service"
+      },
+      "match_reason": "匹配类型: exact, 路由优先级: 20, 请求方法: POST 匹配, 共找到 2 个候选路由，按优先级排序后选择此路由"
+    },
+    {
+      "request": {
+        "path": "/api/v1/users/123",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 2
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/api/v1/users",
+        "upstream": "user-service"
+      },
+      "match_reason": "匹配类型: prefix, 路由优先级: 10, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/api/v1/orders/456",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 3
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/api/v1/orders",
+        "upstream": "order-service"
+      },
+      "match_reason": "匹配类型: prefix, 路由优先级: 5, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/api/v1/products",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 4
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/api/v1/products",
+        "upstream": "product-service"
+      },
+      "match_reason": "匹配类型: prefix, 路由优先级: 0, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/public/index.html",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 5
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "^/public/.*",
+        "upstream": "static-service"
+      },
+      "match_reason": "匹配类型: regex, 路由优先级: 0, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/health",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 6
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/health",
+        "upstream": "health-service"
+      },
+      "match_reason": "匹配类型: exact, 路由优先级: 0, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/api/v2/notfound",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 7
+      },
+      "is_matched": false,
+      "matched_route": null,
+      "match_reason": "未找到匹配的路由规则"
+    },
+    {
+      "request": {
+        "path": "/api/v1/users/login",
+        "method": "POST",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 8
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/api/v1/users/login",
+        "upstream": "auth-service"
+      },
+      "match_reason": "匹配类型: exact, 路由优先级: 20, 请求方法: POST 匹配, 共找到 2 个候选路由，按优先级排序后选择此路由"
+    },
+    {
+      "request": {
+        "path": "/api/v1/users/123",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 9
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/api/v1/users",
+        "upstream": "user-service"
+      },
+      "match_reason": "匹配类型: prefix, 路由优先级: 10, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/api/v1/orders/456",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 10
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/api/v1/orders",
+        "upstream": "order-service"
+      },
+      "match_reason": "匹配类型: prefix, 路由优先级: 5, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/api/v1/products",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 11
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/api/v1/products",
+        "upstream": "product-service"
+      },
+      "match_reason": "匹配类型: prefix, 路由优先级: 0, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/public/index.html",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 12
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "^/public/.*",
+        "upstream": "static-service"
+      },
+      "match_reason": "匹配类型: regex, 路由优先级: 0, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/health",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 13
+      },
+      "is_matched": true,
+      "matched_route": {
+        "path": "/health",
+        "upstream": "health-service"
+      },
+      "match_reason": "匹配类型: exact, 路由优先级: 0, 请求方法: GET 匹配"
+    },
+    {
+      "request": {
+        "path": "/api/v2/notfound",
+        "method": "GET",
+        "headers": {},
+        "source_file": "examples/test_routes.yaml",
+        "line_number": 14
+      },
+      "is_matched": false,
+      "matched_route": null,
+      "match_reason": "未找到匹配的路由规则"
+    }
+  ],
+  "unmatched_requests": [
+    {
+      "path": "/api/v2/notfound",
+      "method": "GET",
+      "source_file": "examples/test_routes.yaml",
+      "line_number": 7,
+      "raw_content": "method: GET\npath: /api/v2/notfound\n"
+    },
+    {
+      "path": "/api/v2/notfound",
+      "method": "GET",
+      "source_file": "examples/test_routes.yaml",
+      "line_number": 14,
+      "raw_content": "method: GET\npath: /api/v2/notfound\n"
+    }
+  ],
+  "bad_lines": []
+}

@@ -1,0 +1,53 @@
+routes:
+  - path: /api/v1/users
+    upstream: user-service
+    match_type: prefix
+    priority: 10
+  - path: /api/v1/users/login
+    upstream: auth-service
+    match_type: exact
+    priority: 20
+  - path: /api/v1/orders
+    upstream: order-service
+    match_type: prefix
+    priority: 5
+  - path: /api/v1/products
+    upstream: product-service
+    match_type: prefix
+  - path: ^/public/.*
+    upstream: static-service
+    match_type: regex
+  - path: /health
+    upstream: health-service
+    match_type: exact
+
+requests:
+  - path: /api/v1/users/login
+    method: POST
+  - path: /api/v1/users/123
+    method: GET
+  - path: /api/v1/orders/456
+    method: GET
+  - path: /api/v1/products
+    method: GET
+  - path: /public/index.html
+    method: GET
+  - path: /health
+    method: GET
+  - path: /api/v2/notfound
+    method: GET
+
+  - path: /api/v1/users/login
+    method: POST
+  - path: /api/v1/users/123
+    method: GET
+  - path: /api/v1/orders/456
+    method: GET
+  - path: /api/v1/products
+    method: GET
+  - path: /public/index.html
+    method: GET
+  - path: /health
+    method: GET
+  - path: /api/v2/notfound
+    method: GET
