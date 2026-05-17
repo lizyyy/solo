@@ -1,0 +1,221 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum EnvironmentStage {
+  DEV
+  TEST
+  STAGING
+  PRODUCTION
+}
+
+enum PromotionStatus {
+  DRAFT
+  PENDING_TEST
+  TEST_COMPLETED
+  PENDING_SIGNATURE
+  SIGNED
+  PENDING_APPROVAL
+  APPROVED
+  PROMOTED
+  REJECTED
+  FAILED
+  CANCELLED
+}
+
+enum SignatureStatus {
+  NOT_SIGNED
+  PENDING
+  VERIFIED
+  INVALID
+}
+
+enum ApprovalDecision {
+  APPROVE
+  REJECT
+  DEFER
+}
+
+enum TestResult {
+  PASS
+  FAIL
+  PARTIAL
+  NOT_RUN
+}
+
+model ArtifactVersion {
+  id              String   @id @default(uuid())
+  artifactName    String
+  version         String
+  buildNumber     String?
+  commitHash      String?
+  buildBranch     String?
+  buildTime       DateTime?
+  artifactUrl     String?
+  checksum        String?
+  checksumAlgorithm String?
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  promotions      PromotionRecord[]
+}
+
+model PromotionRecord {
+  id              String   @id @default(uuid())
+  artifactVersionId String
+  fromEnvironment  EnvironmentStage
+  toEnvironment    EnvironmentStage
+  status          PromotionStatus @default(DRAFT)
+  title           String
+  description     String?
+  initiator       String
+  currentStep       Int      @default(0)
+  totalSteps      Int      @default(4)
+
+  testSummaryId   String?
+  signatureId       String?
+  promotionReportId String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  completedAt     DateTime?
+
+  artifactVersion ArtifactVersion @relation(fields: [artifactVersionId], references: [id])
+  testSummary     TestSummary?   @relation(fields: [testSummaryId], references: [id])
+  signature       SignatureRecord? @relation(fields: [signatureId], references: [id])
+  promotionReport PromotionReport? @relation(fields: [promotionReportId], references: [id])
+  approvals       ApprovalRecord[]
+  auditLogs       AuditLog[]
+  exceptions      ExceptionRecord[]
+  corrections     CorrectionRecord[]
+}
+
+model TestSummary {
+  id              String   @id @default(uuid())
+  promotionRecordId  String
+  testSuite       String
+  totalTests      Int      @default(0)
+  passedTests     Int      @default(0)
+  failedTests     Int      @default(0)
+  skippedTests    Int      @default(0)
+  testResult      TestResult @default(NOT_RUN)
+  testDuration    Int?
+  testStartTime    DateTime?
+  testEndTime      DateTime?
+  testReportUrl    String?
+  coveragePercent  Float?
+  criticalIssues    Json?
+  gatePassed      Boolean  @default(false)
+  remarks         String?
+  verifiedBy      String?
+  verifiedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  promotionRecord PromotionRecord @relation(fields: [promotionRecordId], references: [id])
+}
+
+model SignatureRecord {
+  id              String   @id @default(uuid())
+  promotionRecordId String
+  signatory       String
+  signatureStatus SignatureStatus @default(NOT_SIGNED)
+  signatureData   String?
+  signatureAlgorithm String?
+  signedAt        DateTime?
+  certificateInfo       String?
+  verificationLog         Json?
+  remarks         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  promotionRecord PromotionRecord @relation(fields: [promotionRecordId], references: [id])
+}
+
+model ApprovalRecord {
+  id              String   @id @default(uuid())
+  promotionRecordId String
+  approver        String
+  approverRole    String?
+  decision        ApprovalDecision
+  comments        String?
+  approvedAt      DateTime?
+  sequenceOrder     Int      @default(1)
+  isRequired      Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  promotionRecord PromotionRecord @relation(fields: [promotionRecordId], references: [id])
+}
+
+model PromotionReport {
+  id              String   @id @default(uuid())
+  promotionRecordId String
+  reportContent   Json
+  reportFormat    String   @default("JSON")
+  generatedBy     String?
+  generatedAt     DateTime?
+  reportUrl       String?
+  createdAt       DateTime @default(now())
+
+  promotionRecord PromotionRecord @relation(fields: [promotionRecordId], references: [id])
+}
+
+model AuditLog {
+  id              String   @id @default(uuid())
+  promotionRecordId String?
+  action          String
+  actionType      String
+  performedBy     String
+  oldValue        Json?
+  newValue        Json?
+  details         String?
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime @default(now())
+
+  promotionRecord PromotionRecord? @relation(fields: [promotionRecordId], references: [id])
+}
+
+model ExceptionRecord {
+  id              String   @id @default(uuid())
+  promotionRecordId String
+  exceptionType   String
+  errorCode       String
+  errorMessage    String
+  stackTrace      String?
+  rawInput        Json?
+  processingContext Json?
+  resolutionStatus    String   @default("OPEN")
+  resolvedBy      String?
+  resolutionNotes  String?
+  resolvedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  promotionRecord PromotionRecord @relation(fields: [promotionRecordId], references: [id])
+}
+
+model CorrectionRecord {
+  id              String   @id @default(uuid())
+  promotionRecordId String
+  correctionType  String
+  fieldName       String
+  oldValue        Json?
+  newValue        Json?
+  reason          String
+  correctedBy     String
+  correctionTime      DateTime @default(now())
+  approvalRequired    Boolean  @default(false)
+  approvedBy      String?
+  approvedAt      DateTime?
+  createdAt       DateTime @default(now())
+
+  promotionRecord PromotionRecord @relation(fields: [promotionRecordId], references: [id])
+}
