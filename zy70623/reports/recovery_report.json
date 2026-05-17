@@ -1,0 +1,134 @@
+{
+  "generated_at": "2026-05-17T17:42:21.755004",
+  "reroute_info": {
+    "reroute_id": "RR001",
+    "route_id": "R001",
+    "reason": "道路施工",
+    "reason_detail": "阳光路修路，预计工期3天",
+    "effective_date": "2026-05-17",
+    "expiry_date": null,
+    "original_stop_replacements": {
+      "S001": {
+        "stop_id": "TEMP001",
+        "name": "临时停靠站",
+        "address": "辅路临时站点",
+        "is_temporary": true,
+        "latitude": null,
+        "longitude": null
+      }
+    },
+    "created_at": "2026-05-17T17:42:21.454914",
+    "created_by": ""
+  },
+  "summary": {
+    "total_confirmations": 5,
+    "unique_confirmations": 5,
+    "duplicate_confirmations": 0,
+    "confirmed_count": 4,
+    "pending_count": 1,
+    "rejected_count": 0,
+    "late_confirmations": 0,
+    "stop_mismatches": 0
+  },
+  "confirmations": [
+    {
+      "confirmation_id": "CONF005",
+      "student_id": "STU005",
+      "reroute_id": "RR001",
+      "status": "ConfirmationStatus.PENDING",
+      "channel": "ConfirmationChannel.WECHAT_GROUP",
+      "confirmed_at": null,
+      "parent_name": "家长5",
+      "notes": "",
+      "is_late": false,
+      "original_stop_id": "S001",
+      "new_stop_id": "TEMP001"
+    },
+    {
+      "confirmation_id": "CONF001",
+      "student_id": "STU001",
+      "reroute_id": "RR001",
+      "status": "ConfirmationStatus.CONFIRMED",
+      "channel": "ConfirmationChannel.WECHAT_GROUP",
+      "confirmed_at": "2026-05-17 12:42:21.455041",
+      "parent_name": "家长1",
+      "notes": "已知晓改线安排，准时接送",
+      "is_late": false,
+      "original_stop_id": "S001",
+      "new_stop_id": "TEMP001"
+    },
+    {
+      "confirmation_id": "CONF002",
+      "student_id": "STU002",
+      "reroute_id": "RR001",
+      "status": "ConfirmationStatus.CONFIRMED",
+      "channel": "ConfirmationChannel.WECHAT_GROUP",
+      "confirmed_at": "2026-05-17 12:52:21.455041",
+      "parent_name": "家长2",
+      "notes": "已知晓改线安排，准时接送",
+      "is_late": false,
+      "original_stop_id": "S001",
+      "new_stop_id": "TEMP001"
+    },
+    {
+      "confirmation_id": "CONF003",
+      "student_id": "STU003",
+      "reroute_id": "RR001",
+      "status": "ConfirmationStatus.CONFIRMED",
+      "channel": "ConfirmationChannel.WECHAT_GROUP",
+      "confirmed_at": "2026-05-17 13:02:21.455041",
+      "parent_name": "家长3",
+      "notes": "已知晓改线安排，准时接送",
+      "is_late": false,
+      "original_stop_id": "S001",
+      "new_stop_id": "TEMP001"
+    },
+    {
+      "confirmation_id": "CONF004",
+      "student_id": "STU004",
+      "reroute_id": "RR001",
+      "status": "ConfirmationStatus.CONFIRMED",
+      "channel": "ConfirmationChannel.WECHAT_GROUP",
+      "confirmed_at": "2026-05-17 13:12:21.455041",
+      "parent_name": "家长4",
+      "notes": "已知晓改线安排，准时接送",
+      "is_late": false,
+      "original_stop_id": "S001",
+      "new_stop_id": "TEMP001"
+    }
+  ],
+  "duplicates": [],
+  "recovery_checks": [
+    {
+      "check_id": "CHECK001",
+      "reroute_id": "RR001",
+      "status": "排查中",
+      "checked_at": "2026-05-17T17:42:21.455635",
+      "checked_by": "张老师",
+      "issues_found": [],
+      "resolution_notes": ""
+    },
+    {
+      "check_id": "24eb4d92",
+      "reroute_id": "RR001",
+      "status": "已验证恢复",
+      "checked_at": "2026-05-17T17:42:21.705723",
+      "checked_by": "李老师",
+      "issues_found": [],
+      "resolution_notes": "开始排查\n所有家长已确认，站点替换正常"
+    }
+  ],
+  "recovery_assessment": {
+    "readiness_score": 95,
+    "total_expected": 5,
+    "confirmed": 4,
+    "pending": 1,
+    "rejected": 0,
+    "duplicates": 0,
+    "stop_mismatches": 0,
+    "issues": [
+      "还有 1 名学生待确认"
+    ],
+    "can_recover": true
+  }
+}

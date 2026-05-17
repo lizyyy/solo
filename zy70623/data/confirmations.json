@@ -1,0 +1,80 @@
+[
+  {
+    "confirmation_id": "CONF006",
+    "student_id": "STU003",
+    "reroute_id": "RR001",
+    "status": "已确认",
+    "channel": "家长群",
+    "confirmed_at": "2026-05-17T10:42:21.808843",
+    "parent_name": "家长3-迟到",
+    "notes": "",
+    "is_late": true,
+    "original_stop_id": "S001",
+    "new_stop_id": "TEMP001"
+  },
+  {
+    "confirmation_id": "CONF001",
+    "student_id": "STU001",
+    "reroute_id": "RR001",
+    "status": "已确认",
+    "channel": "家长群",
+    "confirmed_at": "2026-05-17T12:42:21.808843",
+    "parent_name": "家长1-重复1",
+    "notes": "第1次回复",
+    "is_late": false,
+    "original_stop_id": "S001",
+    "new_stop_id": "TEMP001"
+  },
+  {
+    "confirmation_id": "CONF004",
+    "student_id": "STU002",
+    "reroute_id": "RR001",
+    "status": "已确认",
+    "channel": "家长群",
+    "confirmed_at": "2026-05-17T12:42:21.808843",
+    "parent_name": "家长2-已确认",
+    "notes": "",
+    "is_late": false,
+    "original_stop_id": "S001",
+    "new_stop_id": "TEMP001"
+  },
+  {
+    "confirmation_id": "CONF002",
+    "student_id": "STU001",
+    "reroute_id": "RR001",
+    "status": "重复回执",
+    "channel": "家长群",
+    "confirmed_at": "2026-05-17T12:47:21.808843",
+    "parent_name": "家长1-重复2",
+    "notes": "第2次回复",
+    "is_late": false,
+    "original_stop_id": "S001",
+    "new_stop_id": "TEMP001"
+  },
+  {
+    "confirmation_id": "CONF003",
+    "student_id": "STU001",
+    "reroute_id": "RR001",
+    "status": "重复回执",
+    "channel": "家长群",
+    "confirmed_at": "2026-05-17T12:52:21.808843",
+    "parent_name": "家长1-重复3",
+    "notes": "第3次回复",
+    "is_late": false,
+    "original_stop_id": "S001",
+    "new_stop_id": "TEMP001"
+  },
+  {
+    "confirmation_id": "CONF005",
+    "student_id": "STU002",
+    "reroute_id": "RR001",
+    "status": "重复回执",
+    "channel": "电话",
+    "confirmed_at": "2026-05-17T13:12:21.808843",
+    "parent_name": "家长2-已拒绝",
+    "notes": "不同意改线，自行接送",
+    "is_late": false,
+    "original_stop_id": "S001",
+    "new_stop_id": "TEMP001"
+  }
+]

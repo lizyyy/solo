@@ -1,0 +1,22 @@
+[
+  {
+    "reroute_id": "RR001",
+    "route_id": "R001",
+    "reason": "道路施工",
+    "reason_detail": "阳光路修路，预计工期3天",
+    "effective_date": "2026-05-17",
+    "expiry_date": null,
+    "original_stop_replacements": {
+      "S001": {
+        "stop_id": "TEMP001",
+        "name": "临时停靠站",
+        "address": "辅路临时站点",
+        "is_temporary": true,
+        "latitude": null,
+        "longitude": null
+      }
+    },
+    "created_at": "2026-05-17T17:42:21.808710",
+    "created_by": ""
+  }
+]
