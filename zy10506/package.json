@@ -1,0 +1,28 @@
+{
+  "name": "featureflag-explainer-api",
+  "version": "1.0.0",
+  "description": "FeatureFlag命中解释API - 追踪功能开关的命中逻辑、覆盖链和规则匹配过程",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.4.2",
+    "@types/uuid": "^9.0.2",
+    "@types/json2csv": "^5.0.3",
+    "typescript": "^5.1.6",
+    "ts-node-dev": "^2.0.0",
+    "jest": "^29.6.1",
+    "@types/jest": "^29.5.3",
+    "ts-jest": "^29.1.1"
+  }
+}
