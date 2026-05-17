@@ -1,0 +1,5 @@
+change_id,show_id,order_id,from_seat_ids,to_seat_ids,requested_at,requested_by,status,approved_at,approved_by,executed_at,reject_reason
+CHG001,SHOW001,GRP001,"S007,S008","S009,S010",2026-05-17 19:00:00,张经理,PENDING,,,,
+CHG002,SHOW001,GRP002,"S009","S005",2026-05-17 19:10:00,李总,APPROVED,2026-05-17 19:15:00,admin,,
+CHG003,SHOW002,GRP003,"S016","S999",2026-05-17 19:20:00,王小姐,PENDING,,,,
+CHG004,SHOW001,GRP004,"S002,S003","S013,S014,S015",2026-05-17 19:30:00,赵主任,PENDING,,,,

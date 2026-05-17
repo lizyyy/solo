@@ -1,0 +1,18 @@
+{
+  "run_id": "1ce83654",
+  "started_at": "2026-05-17T19:53:23.036735",
+  "completed_at": "2026-05-17T19:53:23.040206",
+  "status": "COMPLETED",
+  "input_files": [
+    "sample_data/changes.csv",
+    "sample_data/locks.csv",
+    "sample_data/orders.csv",
+    "sample_data/seats.csv",
+    "sample_data/shows.csv",
+    "sample_data/windows.csv"
+  ],
+  "records_processed": 56,
+  "records_skipped": 0,
+  "issues_found": 28,
+  "error_message": null
+}
