@@ -1,2 +1,27 @@
 [build-system]
-requires =
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "helm-value-auditor"
+version = "0.1.0"
+authors = [
+  { name="DevOps Team", email="devops@example.com" }
+]
+description = "Helm Values 覆盖审计 CLI 工具"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "click>=8.0",
+    "jinja2>=3.0",
+    "tabulate>=0.9.0",
+]
+
+[project.scripts]
+helm-value-auditor = "helm_value_auditor.cli:main"
