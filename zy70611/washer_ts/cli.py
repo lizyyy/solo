@@ -155,7 +155,7 @@ def troubleshoot(
         json_report = ResultReporter.generate_machine_report(result)
         if output_format == 'json':
             click.echo(json_report)
-        elif output == 'both':
+        elif output_format == 'both':
             click.echo("\nJSON 输出:")
             click.echo(json_report)
 
