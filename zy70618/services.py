@@ -390,6 +390,10 @@ def generate_debt_report(
     return db_report
 
 
+def get_debt_report_by_id(db: Session, report_id: int) -> Optional[DebtReport]:
+    return db.query(DebtReport).filter(DebtReport.id == report_id).first()
+
+
 def get_debt_reports(
     db: Session, skip: int = 0, limit: int = 100, customer_id: int = None
 ) -> List[DebtReport]:

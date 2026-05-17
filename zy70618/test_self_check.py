@@ -7,7 +7,8 @@ from services import (
     BusinessException,
     create_customer, create_sales_order, create_return_record,
     create_payment_record, recalculate_debt, generate_debt_report,
-    get_customer_by_id, get_sales_order_by_id, get_debt_reports
+    get_customer_by_id, get_sales_order_by_id, get_debt_reports,
+    get_debt_report_by_id
 )
 from schemas import (
     CustomerCreate, SalesOrderCreate, SalesOrderItemCreate,
@@ -254,19 +255,29 @@ def run_self_check():
     print("\n--- 9. 欠款报告测试 ---")
     
     try:
-        report_request = DebtReportRequest()
-        report = generate_debt_report(db, report_request)
+        report1 = generate_debt_report(db, DebtReportRequest())
+        report2 = generate_debt_report(db, DebtReportRequest())
         results.append(print_result(
-            "生成欠款报告",
+            "连续生成多份欠款报告",
             True,
-            f"报告编号: {report.report_no}, 总欠款: {report.total_debt}, 已回款: {report.total_paid}"
+            f"报告1 ID: {report1.id}, 报告2 ID: {report2.id}"
         ))
         
-        reports = get_debt_reports(db)
-        if len(reports) > 0:
-            results.append(print_result("查询报告列表", True))
+        queried_report2 = get_debt_report_by_id(db, report2.id)
+        if queried_report2 and queried_report2.id == report2.id:
+            results.append(print_result(
+                "按ID查询报告",
+                True,
+                f"成功查询报告ID: {report2.id}"
+            ))
         else:
-            results.append(print_result("查询报告列表", False))
+            results.append(print_result("按ID查询报告", False, "无法查询第二条报告"))
+        
+        reports = get_debt_reports(db)
+        if len(reports) >= 2:
+            results.append(print_result("查询报告列表", True, f"共 {len(reports)} 份报告"))
+        else:
+            results.append(print_result("查询报告列表", False, f"只有 {len(reports)} 份报告"))
             
     except Exception as e:
         results.append(print_result("欠款报告测试", False, str(e)))

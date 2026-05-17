@@ -23,7 +23,8 @@ from services import (
     create_sales_order, get_sales_orders, get_sales_order_by_id,
     create_return_record, get_return_records,
     create_payment_record, get_payment_records,
-    recalculate_debt, generate_debt_report, get_debt_reports
+    recalculate_debt, generate_debt_report, get_debt_reports,
+    get_debt_report_by_id
 )
 
 app = FastAPI(
@@ -209,8 +210,7 @@ def list_debt_reports(
 
 @app.get("/api/debt-reports/{report_id}/export", tags=["欠款报告"])
 def export_debt_report(report_id: int, db: Session = Depends(get_db)):
-    reports = get_debt_reports(db, 0, 1, None)
-    report = next((r for r in reports if r.id == report_id), None)
+    report = get_debt_report_by_id(db, report_id)
     if not report:
         raise BusinessException(
             code=ErrorCode.NOT_FOUND,
