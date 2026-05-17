@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-05-17T23:32:53.758268",
+  "summary": {
+    "total_lines": 17,
+    "valid_messages": 16,
+    "parse_errors": 1,
+    "error_types_count": 6,
+    "total_sampled": 16
+  },
+  "error_distribution": [
+    {
+      "reason": "数据库连接超时",
+      "count": 8,
+      "percentage": 47.05882352941176,
+      "sampled": 8
+    },
+    {
+      "reason": "参数校验失败",
+      "count": 3,
+      "percentage": 17.647058823529413,
+      "sampled": 3
+    },
+    {
+      "reason": "库存不足",
+      "count": 2,
+      "percentage": 11.76470588235294,
+      "sampled": 2
+    },
+    {
+      "reason": "支付超时",
+      "count": 1,
+      "percentage": 5.88235294117647,
+      "sampled": 1
+    },
+    {
+      "reason": "未知错误",
+      "count": 1,
+      "percentage": 5.88235294117647,
+      "sampled": 1
+    },
+    {
+      "reason": "网络异常",
+      "count": 1,
+      "percentage": 5.88235294117647,
+      "sampled": 1
+    }
+  ],
+  "parse_errors_summary": [
+    {
+      "line_number": 16,
+      "error": "JSON decode error: Expecting value: line 1 column 1 (char 0)"
+    }
+  ]
+}
