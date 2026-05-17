@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "generated_at": "2026-05-17T13:55:15.447582",
+    "check_type": "sqlite_backup_consistency"
+  },
+  "summary": {
+    "is_valid": false,
+    "page_count": 6,
+    "valid_pages": 3,
+    "error_count": 1,
+    "warning_count": 0
+  },
+  "files": {
+    "database": {
+      "path": "examples/partial_corrupted.db",
+      "exists": true,
+      "size_bytes": 24576,
+      "size_human": "24.00 KB",
+      "sha256": "9bd160c5b21b4666a22f4dd737a8b9f7ba0eb16d4258f5de368ec081f2cd4715",
+      "modified_at": "2026-05-17T13:54:34.958587"
+    },
+    "wal": null
+  },
+  "errors": [
+    {
+      "type": "integrity_error",
+      "message": "SQLite完整性检查失败: *** in database main ***\nTree 2 page 2: btreeInitPage() returns error code 11\nPage 4: never used\nPage 5: never used",
+      "location": "examples/partial_corrupted.db"
+    }
+  ],
+  "warnings": [],
+  "pages": [
+    {
+      "page_number": 1,
+      "offset": 0,
+      "size": 4096,
+      "checksum_valid": true,
+      "error": null
+    },
+    {
+      "page_number": 2,
+      "offset": 4096,
+      "size": 4096,
+      "checksum_valid": false,
+      "error": "无效的页面类型标记: 0xff"
+    },
+    {
+      "page_number": 3,
+      "offset": 8192,
+      "size": 4096,
+      "checksum_valid": true,
+      "error": null
+    },
+    {
+      "page_number": 4,
+      "offset": 12288,
+      "size": 4096,
+      "checksum_valid": false,
+      "error": "无效的页面类型标记: 0xff"
+    },
+    {
+      "page_number": 5,
+      "offset": 16384,
+      "size": 4096,
+      "checksum_valid": false,
+      "error": "无效的页面类型标记: 0xff"
+    },
+    {
+      "page_number": 6,
+      "offset": 20480,
+      "size": 4096,
+      "checksum_valid": true,
+      "error": null
+    }
+  ]
+}

@@ -43,6 +43,10 @@ class ReportGenerator:
             lines.append(f"    大小: {self._human_size(self.result.db_file.size)}")
             lines.append(f"    页面大小: 4096 字节")
             lines.append(f"    总页数: {self.result.page_count}")
+            lines.append(f"    有效页: {self.result.valid_pages}")
+            if self.result.page_count > 0:
+                validity_rate = (self.result.valid_pages / self.result.page_count) * 100
+                lines.append(f"    合格率: {validity_rate:.1f}%")
             lines.append(f"    SHA256: {self.result.db_file.sha256[:16]}...")
         
         if self.result.wal_file:
@@ -74,7 +78,19 @@ class ReportGenerator:
                 lines.append(f"     位置: {warn['location']}")
             lines.append("")
 
-        if not self.result.wal_file:
+        invalid_pages = [p for p in self.result.pages if not p.checksum_valid]
+        if invalid_pages:
+            lines.append("【损坏页面详情】")
+            lines.append(f"  共发现 {len(invalid_pages)} 个损坏页面:")
+            for p in invalid_pages[:10]:
+                lines.append(f"    页面 #{p.page_number} (偏移量: 0x{p.offset:x}, 位置: {self.result.db_file.path}:0x{p.offset:x})")
+                if p.error:
+                    lines.append(f"      原因: {p.error}")
+            if len(invalid_pages) > 10:
+                lines.append(f"    ... 还有 {len(invalid_pages) - 10} 个损坏页面")
+            lines.append("")
+
+        if not self.result.wal_file and self.result.db_file.exists:
             lines.append("【WAL文件提示】")
             lines.append("  ⚠️  未检测到WAL文件。如果数据库处于活跃状态，")
             lines.append("     最新事务可能只在WAL文件中。请确保同时备份！")
@@ -190,17 +206,40 @@ class ReportGenerator:
                 lines.append(f"- **位置**: `{warn['location']}`")
                 lines.append("")
 
-        lines.append("## 五、检查说明")
+        if self.result.db_file.exists:
+            lines.append("## 五、页面校验详情")
+            lines.append("")
+            lines.append(f"- **页面大小**: 4096 字节")
+            lines.append(f"- **总页数**: {self.result.page_count} 页")
+            lines.append(f"- **有效页数**: {self.result.valid_pages} 页")
+            if self.result.page_count > 0:
+                validity_rate = (self.result.valid_pages / self.result.page_count) * 100
+                lines.append(f"- **校验合格率**: {validity_rate:.1f}%")
+            lines.append("")
+
+            invalid_pages = [p for p in self.result.pages if not p.checksum_valid]
+            if invalid_pages:
+                lines.append(f"### 损坏页面列表 (共 {len(invalid_pages)} 页)")
+                lines.append("")
+                lines.append("| 页面编号 | 文件偏移 | 位置 | 状态 | 原因 |")
+                lines.append("|---------|---------|------|------|------|")
+                for p in invalid_pages:
+                    location = f"`{self.result.db_file.path}:0x{p.offset:x}`"
+                    reason = p.error if p.error else "校验和不匹配"
+                    lines.append(f"| {p.page_number} | 0x{p.offset:x} | {location} | ❌ 损坏 | {reason} |")
+                lines.append("")
+
+        lines.append("## 六、检查说明")
         lines.append("")
         lines.append("本工具执行以下检查:")
         lines.append("")
         lines.append("1. **文件头验证** - 确认文件是有效的SQLite格式")
-        lines.append("2. **文件完整性** - 验证文件大小与页面计数匹配")
+        lines.append("2. **页级哈希校验** - 逐页验证校验和，记录损坏页面的位置和原因")
         lines.append("3. **SQLite完整性检查** - 使用 `PRAGMA integrity_check` 执行深度检查")
         lines.append("4. **WAL文件配对** - 检测并验证WAL文件是否存在")
         lines.append("")
 
-        lines.append("## 六、建议")
+        lines.append("## 七、建议")
         lines.append("")
         if self.result.is_valid:
             lines.append("- ✅ 备份文件完整可用，可以正常恢复")

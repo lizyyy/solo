@@ -1,0 +1,40 @@
+======================================================================
+  SQLite备份一致性检查报告
+======================================================================
+检查时间: 2026-05-17 13:55:15
+
+【文件信息】
+  数据库文件: examples/partial_corrupted.db
+    存在: 是
+    大小: 24.00 KB
+    页面大小: 4096 字节
+    总页数: 6
+    有效页: 3
+    合格率: 50.0%
+    SHA256: 9bd160c5b21b4666...
+  WAL文件: 未提供
+
+【检查结果】
+  整体状态: ❌ 未通过
+
+【错误详情】
+  1. [integrity_error] SQLite完整性检查失败: *** in database main ***
+Tree 2 page 2: btreeInitPage() returns error code 11
+Page 4: never used
+Page 5: never used
+     位置: examples/partial_corrupted.db
+
+【损坏页面详情】
+  共发现 3 个损坏页面:
+    页面 #2 (偏移量: 0x1000, 位置: examples/partial_corrupted.db:0x1000)
+      原因: 无效的页面类型标记: 0xff
+    页面 #4 (偏移量: 0x3000, 位置: examples/partial_corrupted.db:0x3000)
+      原因: 无效的页面类型标记: 0xff
+    页面 #5 (偏移量: 0x4000, 位置: examples/partial_corrupted.db:0x4000)
+      原因: 无效的页面类型标记: 0xff
+
+【WAL文件提示】
+  ⚠️  未检测到WAL文件。如果数据库处于活跃状态，
+     最新事务可能只在WAL文件中。请确保同时备份！
+
+======================================================================

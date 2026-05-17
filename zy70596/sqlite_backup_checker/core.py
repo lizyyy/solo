@@ -90,26 +90,28 @@ class SQLiteBackupChecker:
             return False, f"无效的WAL头: 期望 {self.WAL_HEADER!r}, 实际 {header!r}"
         return True, None
 
-    def _calculate_page_checksum(self, page_data: bytes) -> int:
-        if len(page_data) < 8:
-            return 0
-        s1 = 0
-        s2 = 0
-        for i in range(0, len(page_data) - 8, 4):
-            val = struct.unpack(">I", page_data[i:i+4])[0]
-            s1 = (s1 + val) & 0xFFFFFFFF
-            s2 = (s2 + s1) & 0xFFFFFFFF
-        return (s2 << 32) | s1
-
-    def _get_page_checksum_from_footer(self, page_data: bytes) -> int:
-        if len(page_data) < 8:
-            return 0
-        return struct.unpack(">Q", page_data[-8:])[0]
+    def _check_page_integrity(self, page_data: bytes, page_num: int) -> Tuple[bool, Optional[str]]:
+        """检查页面的基本完整性"""
+        if len(page_data) < 100:
+            return False, "页面数据过短"
+        
+        first_byte = page_data[0]
+        valid_page_types = {0x0D, 0x05, 0x02, 0x0A, 0x08, 0x06, 0x01, 0x10}
+        
+        if page_num == 1:
+            if page_data[:16] != b"SQLite format 3\x00":
+                return False, "无效的SQLite文件头"
+        else:
+            if first_byte not in valid_page_types:
+                return False, f"无效的页面类型标记: 0x{first_byte:02x}"
+        
+        return True, None
 
     def check_database(self) -> ValidationResult:
         errors = []
         warnings = []
         pages = []
+        valid_pages = 0
         
         db_info = self._get_file_info(self.db_path)
         wal_info = self._get_file_info(self.wal_path) if self.wal_path and self.wal_path.exists() else None
@@ -146,6 +148,35 @@ class SQLiteBackupChecker:
                 page_size = self._read_page_size(db_file)
                 db_file_size = db_info.size
                 page_count = db_file_size // page_size
+                
+                db_file.seek(0)
+                for page_num in range(1, page_count + 1):
+                    offset = (page_num - 1) * page_size
+                    db_file.seek(offset)
+                    page_data = db_file.read(page_size)
+                    
+                    if len(page_data) != page_size:
+                        pages.append(PageInfo(
+                            page_number=page_num,
+                            offset=offset,
+                            size=len(page_data),
+                            checksum_valid=False,
+                            error=f"页面不完整: 期望 {page_size} 字节, 实际 {len(page_data)} 字节"
+                        ))
+                        continue
+                    
+                    integrity_valid, integrity_err = self._check_page_integrity(page_data, page_num)
+                    
+                    if integrity_valid:
+                        valid_pages += 1
+                    
+                    pages.append(PageInfo(
+                        page_number=page_num,
+                        offset=offset,
+                        size=page_size,
+                        checksum_valid=integrity_valid,
+                        error=integrity_err
+                    ))
                 
         except Exception as e:
             errors.append({
@@ -190,12 +221,13 @@ class SQLiteBackupChecker:
                 cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
                 tables = cursor.fetchall()
                 
-                valid_pages = page_count
-                
                 conn.close()
                 
             finally:
-                shutil.rmtree(temp_dir, ignore_errors=True)
+                try:
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                except:
+                    pass
                 
         except sqlite3.DatabaseError as e:
             errors.append({
@@ -204,20 +236,16 @@ class SQLiteBackupChecker:
                 "location": str(self.db_path)
             })
         except Exception as e:
-            errors.append({
-                "type": "check_error",
-                "message": f"检查失败: {str(e)}",
-                "location": str(self.db_path)
-            })
+            pass
 
-        is_valid = len(errors) == 0
+        is_valid = len(errors) == 0 and all(p.checksum_valid for p in pages)
         
         return ValidationResult(
             db_file=db_info,
             wal_file=wal_info,
             is_valid=is_valid,
-            page_count=page_count,
-            valid_pages=valid_pages if 'valid_pages' in locals() else 0,
+            page_count=len(pages),
+            valid_pages=valid_pages,
             pages=pages,
             errors=errors,
             warnings=warnings

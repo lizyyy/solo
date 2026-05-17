@@ -103,6 +103,39 @@ def create_truncated_db(path):
     print(f"✓ 创建被截断的数据库: {path}")
 
 
+def create_corrupted_page_db(path):
+    """创建有特定页面损坏的数据库，用于测试页级校验"""
+    create_good_db(path)
+    
+    page_size = 4096
+    corrupt_page = 3
+    offset = (corrupt_page - 1) * page_size
+    
+    with open(path, "r+b") as f:
+        f.seek(offset)
+        f.write(b"\xAA\xAA\xAA\xAA" * 10)
+    
+    print(f"✓ 创建页面损坏的数据库: {path}")
+    print(f"  损坏位置: 第 {corrupt_page} 页 (偏移量: 0x{offset:x})")
+
+
+def create_partially_corrupted_db(path):
+    """创建部分页面损坏的数据库"""
+    create_good_db(path)
+    
+    page_size = 4096
+    corrupt_pages = [2, 4, 5]
+    
+    with open(path, "r+b") as f:
+        for page_num in corrupt_pages:
+            offset = (page_num - 1) * page_size
+            f.seek(offset)
+            f.write(b"\xFF\xFF\xFF\xFF")
+    
+    print(f"✓ 创建部分页面损坏的数据库: {path}")
+    print(f"  损坏页面: {corrupt_pages}")
+
+
 def main():
     examples_dir = Path(__file__).parent
     
@@ -113,21 +146,28 @@ def main():
     create_db_with_wal(examples_dir / "with_wal.db")
     create_corrupted_header_db(examples_dir / "corrupted_header.db")
     create_truncated_db(examples_dir / "truncated.db")
+    create_corrupted_page_db(examples_dir / "corrupted_page.db")
+    create_partially_corrupted_db(examples_dir / "partial_corrupted.db")
     
     print("-" * 50)
     print("测试数据生成完成！")
     print("")
     print("运行以下命令测试工具:")
-    print("  sqlite-backup-check check examples/good.db")
-    print("  sqlite-backup-check check examples/with_wal.db")
-    print("  sqlite-backup-check check examples/corrupted_header.db")
-    print("  sqlite-backup-check check examples/truncated.db")
+    print("  python3 -m sqlite_backup_checker.cli check examples/good.db")
+    print("  python3 -m sqlite_backup_checker.cli check examples/with_wal.db")
+    print("  python3 -m sqlite_backup_checker.cli check examples/corrupted_header.db")
+    print("  python3 -m sqlite_backup_checker.cli check examples/truncated.db")
+    print("  python3 -m sqlite_backup_checker.cli check examples/corrupted_page.db")
+    print("")
+    print("测试--quiet模式和退出码:")
+    print("  python3 -m sqlite_backup_checker.cli check examples/good.db --quiet ; echo \"退出码: $?\"")
+    print("  python3 -m sqlite_backup_checker.cli check examples/corrupted_page.db --quiet ; echo \"退出码: $?\"")
     print("")
     print("扫描整个目录:")
-    print("  sqlite-backup-check scandir examples/")
+    print("  python3 -m sqlite_backup_checker.cli scandir examples/")
     print("")
-    print("生成报告:")
-    print("  sqlite-backup-check check examples/good.db -o examples/reports/")
+    print("生成带页级明细的报告:")
+    print("  python3 -m sqlite_backup_checker.cli check examples/corrupted_page.db -o examples/reports/")
 
 
 if __name__ == "__main__":
