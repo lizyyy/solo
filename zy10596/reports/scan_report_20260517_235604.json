@@ -1,0 +1,214 @@
+{
+  "total": 18,
+  "successful": 2,
+  "failed": 7,
+  "bad_entries": [
+    {
+      "line_number": 3,
+      "raw_line": "",
+      "error_reason": "空行"
+    },
+    {
+      "line_number": 7,
+      "raw_line": "",
+      "error_reason": "空行"
+    },
+    {
+      "line_number": 10,
+      "raw_line": "",
+      "error_reason": "空行"
+    },
+    {
+      "line_number": 13,
+      "raw_line": "",
+      "error_reason": "空行"
+    },
+    {
+      "line_number": 16,
+      "raw_line": "",
+      "error_reason": "空行"
+    },
+    {
+      "line_number": 19,
+      "raw_line": "",
+      "error_reason": "空行"
+    },
+    {
+      "line_number": 21,
+      "raw_line": "",
+      "error_reason": "空行"
+    },
+    {
+      "line_number": 26,
+      "raw_line": "",
+      "error_reason": "空行"
+    },
+    {
+      "line_number": 28,
+      "raw_line": "test.example.com 99999 test",
+      "error_reason": "无效端口: 99999"
+    }
+  ],
+  "avg_latency_ms": 180.31,
+  "scan_duration_seconds": 1.0,
+  "results": [
+    {
+      "line_number": 5,
+      "hostname": "baidu.com",
+      "port": 80,
+      "tags": [
+        "web",
+        "public"
+      ],
+      "raw_line": "baidu.com 80 web,public",
+      "success": true,
+      "latency_ms": 229.11,
+      "error_message": null,
+      "scan_time": "2026-05-17T23:56:03.521066"
+    },
+    {
+      "line_number": 6,
+      "hostname": "qq.com",
+      "port": 443,
+      "tags": [
+        "web",
+        "public"
+      ],
+      "raw_line": "qq.com 443 web,public",
+      "success": false,
+      "latency_ms": 1001.31,
+      "error_message": "其他错误: ",
+      "scan_time": "2026-05-17T23:56:04.293072"
+    },
+    {
+      "line_number": 9,
+      "hostname": "127.0.0.1",
+      "port": 22,
+      "tags": [
+        "local",
+        "ssh"
+      ],
+      "raw_line": "127.0.0.1 22 local,ssh",
+      "success": false,
+      "latency_ms": 5.66,
+      "error_message": "其他错误: [Errno 61] Connect call failed ('127.0.0.1', 22)",
+      "scan_time": "2026-05-17T23:56:03.297425"
+    },
+    {
+      "line_number": 12,
+      "hostname": "this-host-does-not-exist.example.com",
+      "port": 80,
+      "tags": [
+        "test",
+        "invalid"
+      ],
+      "raw_line": "this-host-does-not-exist.example.com 80 test,invalid",
+      "success": false,
+      "latency_ms": 77.35,
+      "error_message": "DNS解析失败 (主机名不存在)",
+      "scan_time": "2026-05-17T23:56:03.369112"
+    },
+    {
+      "line_number": 15,
+      "hostname": "127.0.0.1",
+      "port": 59999,
+      "tags": [
+        "test",
+        "closed-port"
+      ],
+      "raw_line": "127.0.0.1 59999 test,closed-port",
+      "success": false,
+      "latency_ms": 5.67,
+      "error_message": "其他错误: [Errno 61] Connect call failed ('127.0.0.1', 59999)",
+      "scan_time": "2026-05-17T23:56:03.297441"
+    },
+    {
+      "line_number": 18,
+      "hostname": "github.com",
+      "port": 22,
+      "tags": [],
+      "raw_line": "github.com",
+      "success": true,
+      "latency_ms": 131.5,
+      "error_message": null,
+      "scan_time": "2026-05-17T23:56:03.423463"
+    },
+    {
+      "line_number": 23,
+      "hostname": "@#$%^&*()",
+      "port": 22,
+      "tags": [],
+      "raw_line": "@#$%^&*()",
+      "success": false,
+      "latency_ms": 63.65,
+      "error_message": "DNS解析失败 (主机名不存在)",
+      "scan_time": "2026-05-17T23:56:03.355452"
+    },
+    {
+      "line_number": 24,
+      "hostname": "这是一行中文测试",
+      "port": 22,
+      "tags": [],
+      "raw_line": "这是一行中文测试",
+      "success": false,
+      "latency_ms": 77.31,
+      "error_message": "DNS解析失败 (主机名不存在)",
+      "scan_time": "2026-05-17T23:56:03.369103"
+    },
+    {
+      "line_number": 25,
+      "hostname": "invalid",
+      "port": 22,
+      "tags": [
+        "port:99999:toomany"
+      ],
+      "raw_line": "invalid:port:99999:toomany",
+      "success": false,
+      "latency_ms": 77.21,
+      "error_message": "DNS解析失败 (主机名不存在)",
+      "scan_time": "2026-05-17T23:56:03.369022"
+    }
+  ],
+  "tags_summary": {
+    "web": {
+      "total": 2,
+      "successful": 1,
+      "failed": 1
+    },
+    "public": {
+      "total": 2,
+      "successful": 1,
+      "failed": 1
+    },
+    "local": {
+      "total": 1,
+      "successful": 0,
+      "failed": 1
+    },
+    "ssh": {
+      "total": 1,
+      "successful": 0,
+      "failed": 1
+    },
+    "test": {
+      "total": 2,
+      "successful": 0,
+      "failed": 2
+    },
+    "invalid": {
+      "total": 1,
+      "successful": 0,
+      "failed": 1
+    },
+    "closed-port": {
+      "total": 1,
+      "successful": 0,
+      "failed": 1
+    },
+    "port:99999:toomany": {
+      "total": 1,
+      "successful": 0,
+      "failed": 1
+    }
+  }
+}

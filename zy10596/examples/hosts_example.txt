@@ -1,0 +1,28 @@
+# 示例主机清单
+# 运维交接测试用例
+
+# 公共Web服务（应该能连通）
+baidu.com 80 web,public
+qq.com 443 web,public
+
+# 本地服务测试
+127.0.0.1 22 local,ssh
+
+# 不存在的主机（测试DNS失败）
+this-host-does-not-exist.example.com 80 test,invalid
+
+# 无法连接的端口（测试连接拒绝）
+127.0.0.1 59999 test,closed-port
+
+# 仅主机名（使用默认端口22）
+github.com
+
+# 空行（会被标记为坏数据）
+
+# 格式错误的行（保留原始信息）
+@#$%^&*()
+这是一行中文测试
+invalid:port:99999:toomany
+
+# 无效端口号
+test.example.com 99999 test
