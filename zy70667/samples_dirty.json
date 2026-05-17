@@ -1,0 +1,30 @@
+[
+  {
+    "hotel_name": "",
+    "linen_type": "床单",
+    "inbound_quantity": 100,
+    "damage": 5,
+    "rewash": 3
+  },
+  {
+    "hotel_name": "  ",
+    "linen_type": "毛巾",
+    "inbound_quantity": -50,
+    "damage": 10,
+    "rewash": 5
+  },
+  {
+    "hotel_name": "测试酒店",
+    "linen_type": "",
+    "inbound_quantity": 200,
+    "damage": -5,
+    "rewash": 10
+  },
+  {
+    "hotel_name": "脏数据酒店",
+    "linen_type": "台布",
+    "inbound_quantity": 50,
+    "damage": 60,
+    "rewash": 5
+  }
+]
