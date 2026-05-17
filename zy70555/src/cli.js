@@ -11,6 +11,86 @@ const dotenv = require('dotenv');
 
 const program = new Command();
 
+function deepCompare(expected, actual, path = '') {
+  const differences = [];
+
+  if (expected === null || expected === undefined) {
+    return differences;
+  }
+
+  if (actual === null || actual === undefined) {
+    differences.push({
+      path: path || 'root',
+      expected: expected,
+      actual: 'undefined or null',
+      message: `Expected ${JSON.stringify(expected)} but got null/undefined`
+    });
+    return differences;
+  }
+
+  if (Array.isArray(expected)) {
+    if (!Array.isArray(actual)) {
+      differences.push({
+        path: path || 'root',
+        expected: 'array',
+        actual: typeof actual,
+        message: `Expected array but got ${typeof actual}`
+      });
+      return differences;
+    }
+
+    for (let i = 0; i < expected.length; i++) {
+      if (i < actual.length) {
+        const nestedDiffs = deepCompare(expected[i], actual[i], `${path}[${i}]`);
+        differences.push(...nestedDiffs);
+      } else {
+        differences.push({
+          path: `${path}[${i}]`,
+          expected: expected[i],
+          actual: 'missing',
+          message: `Missing expected array element at index ${i}`
+        });
+      }
+    }
+  } else if (typeof expected === 'object') {
+    if (typeof actual !== 'object') {
+      differences.push({
+        path: path || 'root',
+        expected: 'object',
+        actual: typeof actual,
+        message: `Expected object but got ${typeof actual}`
+      });
+      return differences;
+    }
+
+    for (const key of Object.keys(expected)) {
+      const currentPath = path ? `${path}.${key}` : key;
+      if (actual.hasOwnProperty(key)) {
+        const nestedDiffs = deepCompare(expected[key], actual[key], currentPath);
+        differences.push(...nestedDiffs);
+      } else {
+        differences.push({
+          path: currentPath,
+          expected: expected[key],
+          actual: 'missing',
+          message: `Missing expected field '${key}'`
+        });
+      }
+    }
+  } else {
+    if (expected !== actual) {
+      differences.push({
+        path: path || 'root',
+        expected: expected,
+        actual: actual,
+        message: `Expected ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`
+      });
+    }
+  }
+
+  return differences;
+}
+
 function resolveVariables(value, env) {
   const errors = [];
   if (typeof value === 'string') {
@@ -135,6 +215,28 @@ async function executeExample(example, env) {
       });
     }
 
+    if (example.expectedResponse && example.expectedResponse.body) {
+      const differences = deepCompare(example.expectedResponse.body, response.data);
+      if (differences.length > 0) {
+        for (const diff of differences) {
+          assertions.push({
+            type: 'body',
+            field: diff.path,
+            expected: diff.expected,
+            actual: diff.actual,
+            passed: false,
+            message: diff.message,
+          });
+        }
+      } else {
+        assertions.push({
+          type: 'body',
+          passed: true,
+          message: 'Response body matches expected example',
+        });
+      }
+    }
+
     const allPassed = assertions.every(a => a.passed);
 
     return {
@@ -188,7 +290,13 @@ function printTerminalSummary(report) {
         console.log(chalk.red('  Error: ') + failed.error);
       }
       for (const assertion of failed.assertions.filter(a => !a.passed)) {
-        console.log(chalk.red('  Assertion Failed: ' + assertion.message));
+        if (assertion.type === 'body') {
+          console.log(chalk.red(`  Body Assertion Failed (${assertion.field}): ${assertion.message}`));
+          console.log(chalk.yellow(`    Expected: ${JSON.stringify(assertion.expected)}`));
+          console.log(chalk.yellow(`    Actual: ${JSON.stringify(assertion.actual)}`));
+        } else {
+          console.log(chalk.red('  Assertion Failed: ' + assertion.message));
+        }
       }
     }
     console.log('');
@@ -239,6 +347,26 @@ function generateMarkdownReport(report, outputDir, openapiFile) {
       if (failed.error) {
         md += '- **Error Reason**: ' + failed.error + '\n';
       }
+      
+      const bodyAssertions = failed.assertions.filter(a => a.type === 'body' && !a.passed);
+      if (bodyAssertions.length > 0) {
+        md += '\n**Response Body Mismatches:**\n\n';
+        for (const assertion of bodyAssertions) {
+          md += `- **Field**: \`${assertion.field}\`\n`;
+          md += `  - Expected: \`${JSON.stringify(assertion.expected)}\`\n`;
+          md += `  - Actual: \`${JSON.stringify(assertion.actual)}\`\n`;
+        }
+      }
+      
+      if (failed.example.expectedResponse && failed.example.expectedResponse.body) {
+        md += '\n**Expected Response Body**:\n\n';
+        md += '```json\n' + JSON.stringify(failed.example.expectedResponse.body, null, 2) + '\n```\n';
+      }
+      if (failed.responseBody) {
+        md += '\n**Actual Response Body**:\n\n';
+        md += '```json\n' + JSON.stringify(failed.responseBody, null, 2) + '\n```\n';
+      }
+      
       md += '\n---\n\n';
     }
   }
