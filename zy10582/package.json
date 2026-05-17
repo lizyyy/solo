@@ -1,0 +1,26 @@
+{
+  "name": "bundle-analyzer-cli",
+  "version": "1.0.0",
+  "description": "前端包体来源分析CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "bundle-analyze": "./bin/bundle-analyze.js"
+  },
+  "scripts": {
+    "test": "node bin/bundle-analyze.js --help"
+  },
+  "keywords": ["bundle", "analyzer", "webpack", "size", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "filesize": "^10.1.0",
+    "glob": "^10.3.10",
+    "gzip-size": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

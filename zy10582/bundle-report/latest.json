@@ -1,0 +1,95 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-17T16:33:41.008Z",
+  "summary": {
+    "totalChunks": 1,
+    "totalModules": 1,
+    "totalSize": 148,
+    "totalGzippedSize": 136,
+    "dependenciesCount": 1,
+    "anomaliesCount": 0,
+    "largestChunk": {
+      "path": "/Users/lzy/pro/solo/workspaces/zy10582/dist/test-app.js",
+      "name": "test-app.js",
+      "relativePath": "test-app.js",
+      "size": 148,
+      "gzippedSize": 136,
+      "extension": ".js",
+      "isSourceMap": false
+    },
+    "largestDependency": {
+      "name": "(application)",
+      "size": 148,
+      "modulesCount": 1,
+      "chunksCount": 1,
+      "chunks": [
+        "test-app.js"
+      ],
+      "modules": [
+        {
+          "path": "/Users/lzy/pro/solo/workspaces/zy10582/dist/test-app.js",
+          "name": "test-app.js",
+          "package": "(application)",
+          "chunk": "test-app.js",
+          "chunkPath": "/Users/lzy/pro/solo/workspaces/zy10582/dist/test-app.js",
+          "size": 148,
+          "method": "direct",
+          "type": "javascript"
+        }
+      ],
+      "isExternal": false
+    }
+  },
+  "comparison": {
+    "previousTimestamp": "2026-05-17T16:33:33.847Z",
+    "totals": {
+      "previous": 0,
+      "current": 148,
+      "diff": 148,
+      "diffPercent": 0
+    },
+    "topChanges": [
+      {
+        "name": "(application)",
+        "previousSize": 0,
+        "currentSize": 148,
+        "diff": 148,
+        "diffPercent": 0,
+        "type": "increased",
+        "isNew": true,
+        "isRemoved": false
+      }
+    ]
+  },
+  "chunks": [
+    {
+      "name": "test-app.js",
+      "relativePath": "test-app.js",
+      "size": 148,
+      "gzippedSize": 136
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "(application)",
+      "size": 148,
+      "modulesCount": 1,
+      "chunksCount": 1,
+      "isExternal": false
+    }
+  ],
+  "topModules": [
+    {
+      "path": "/Users/lzy/pro/solo/workspaces/zy10582/dist/test-app.js",
+      "name": "test-app.js",
+      "package": "(application)",
+      "chunk": "test-app.js",
+      "size": 148
+    }
+  ],
+  "anomalies": [],
+  "config": {
+    "inputDir": "/Users/lzy/pro/solo/workspaces/zy10582/dist",
+    "outputDir": "/Users/lzy/pro/solo/workspaces/zy10582/bundle-report"
+  }
+}
