@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rental-audit-cli"
+version = "0.1.0"
+authors = [
+  { name="Rental Audit Team", email="audit@rental.com" }
+]
+description = "摄影器材租赁押金审计CLI工具"
+requires-python = ">=3.9"
+dependencies = [
+  "click>=8.0",
+  "pydantic>=2.0",
+  "pandas>=2.0",
+  "python-dateutil>=2.8",
+  "jinja2>=3.0",
+]
+
+[project.scripts]
+rental-audit = "rental_audit.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]

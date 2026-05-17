@@ -1,0 +1,8 @@
+﻿transaction_id,order_id,transaction_type,amount,currency,transaction_date,status,payment_method,reference_no
+TRX001,ORD001,deposit_freeze,5000,CNY,2024-01-15T10:30:00,frozen,credit_card,REF001
+TRX002,ORD001,deposit_release,5000,CNY,2024-01-20T16:00:00,released,credit_card,REF002
+TRX003,ORD002,deposit_freeze,4500,CNY,2024-01-18T15:00:00,frozen,wechat,REF003
+TRX004,ORD003,deposit_freeze,2000,CNY,2024-01-20T09:30:00,frozen,alipay,REF004
+TRX005,ORD004,deposit_freeze,800,CNY,2024-01-21T11:30:00,frozen,credit_card,REF005
+TRX006,ORD004,damage_deduction,150,CNY,2024-01-23T17:00:00,partial_deducted,credit_card,REF006
+TRX007,ORD004,deposit_release,650,CNY,2024-01-23T17:05:00,released,credit_card,REF007

@@ -1,0 +1,5 @@
+﻿order_id,customer_id,customer_name,equipment_id,equipment_name,rental_start_date,rental_end_date,daily_rate,deposit_amount,status,actual_return_date,created_at
+ORD001,CUST001,张三,CAM001,佳能 EOS R5 套机,2024-01-15,2024-01-20,300,5000,returned,2024-01-20,2024-01-15T10:00:00
+ORD002,CUST002,李四,CAM002,索尼 A7S III,2024-01-18,2024-01-22,280,4500,overdue,,2024-01-18T14:30:00
+ORD003,CUST003,王五,LEN001,索尼 24-70mm f/2.8 GM,2024-01-20,2024-01-25,120,2000,active,,2024-01-20T09:15:00
+ORD004,CUST004,赵六,LIGHT001,神牛 SL60W 补光灯,2024-01-21,2024-01-23,50,800,settled,2024-01-23,2024-01-21T11:00:00

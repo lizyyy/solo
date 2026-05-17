@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: rental-audit-cli
+Version: 0.1.0
+Summary: 摄影器材租赁押金审计CLI工具
+Author-email: Rental Audit Team <audit@rental.com>
+Requires-Python: >=3.10
+Requires-Dist: click>=8.0
+Requires-Dist: pydantic>=2.0
+Requires-Dist: pandas>=2.0
+Requires-Dist: python-dateutil>=2.8
+Requires-Dist: jinja2>=3.0

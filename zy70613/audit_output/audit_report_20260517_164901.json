@@ -1,0 +1,161 @@
+{
+  "summary": {
+    "report_generated_at": "2026-05-17T16:49:01.421991",
+    "total_orders": 4,
+    "total_transactions": 7,
+    "total_damages": 1,
+    "total_renewals": 1,
+    "total_bad_rows": 0,
+    "audit_results": {
+      "passed": 3,
+      "failed": 1,
+      "pass_rate": "75.00%"
+    },
+    "risk_distribution": {
+      "LOW": 3,
+      "MEDIUM": 1,
+      "HIGH": 0,
+      "CRITICAL": 0
+    },
+    "issues_by_category": {
+      "deposit_issues": 0,
+      "overdue_issues": 1,
+      "damage_issues": 0,
+      "renewal_issues": 0
+    },
+    "financial_summary": {
+      "total_deposit": "12300",
+      "total_overdue_charge": "506220.00",
+      "total_damage_cost": "150",
+      "total_expected_deductions": "506370.00"
+    }
+  },
+  "audit_results": [
+    {
+      "order_id": "ORD001",
+      "check_timestamp": "2026-05-17T16:49:01.421600",
+      "deposit_check_passed": true,
+      "deposit_issues": [],
+      "overdue_check_passed": true,
+      "overdue_issues": [],
+      "damage_check_passed": true,
+      "damage_issues": [],
+      "renewal_check_passed": true,
+      "renewal_issues": [],
+      "overall_passed": true,
+      "risk_level": "LOW",
+      "recommended_actions": []
+    },
+    {
+      "order_id": "ORD002",
+      "check_timestamp": "2026-05-17T16:49:01.421621",
+      "deposit_check_passed": true,
+      "deposit_issues": [],
+      "overdue_check_passed": true,
+      "overdue_issues": [],
+      "damage_check_passed": true,
+      "damage_issues": [],
+      "renewal_check_passed": true,
+      "renewal_issues": [],
+      "overall_passed": true,
+      "risk_level": "LOW",
+      "recommended_actions": [
+        "优先处理逾期订单，安排设备回收"
+      ]
+    },
+    {
+      "order_id": "ORD003",
+      "check_timestamp": "2026-05-17T16:49:01.421726",
+      "deposit_check_passed": true,
+      "deposit_issues": [],
+      "overdue_check_passed": false,
+      "overdue_issues": [
+        "订单状态异常: 逾期 843 天, 但状态为 active"
+      ],
+      "damage_check_passed": true,
+      "damage_issues": [],
+      "renewal_check_passed": true,
+      "renewal_issues": [],
+      "overall_passed": false,
+      "risk_level": "MEDIUM",
+      "recommended_actions": [
+        "联系客户确认逾期情况，计算逾期费用",
+        "更新订单状态为逾期"
+      ]
+    },
+    {
+      "order_id": "ORD004",
+      "check_timestamp": "2026-05-17T16:49:01.421743",
+      "deposit_check_passed": true,
+      "deposit_issues": [],
+      "overdue_check_passed": true,
+      "overdue_issues": [],
+      "damage_check_passed": true,
+      "damage_issues": [],
+      "renewal_check_passed": true,
+      "renewal_issues": [],
+      "overall_passed": true,
+      "risk_level": "LOW",
+      "recommended_actions": []
+    }
+  ],
+  "settlement_details": [
+    {
+      "order_id": "ORD001",
+      "customer_name": "张三",
+      "equipment_name": "佳能 EOS R5 套机",
+      "original_deposit": "5000",
+      "overdue_days": 0,
+      "overdue_charge": "0",
+      "damage_count": 0,
+      "damage_charge": 0,
+      "other_charges": "0",
+      "total_deductions": "0",
+      "net_refund": "5000",
+      "renewal_count": 0
+    },
+    {
+      "order_id": "ORD002",
+      "customer_name": "李四",
+      "equipment_name": "索尼 A7S III",
+      "original_deposit": "4500",
+      "overdue_days": 844,
+      "overdue_charge": "354480.00",
+      "damage_count": 0,
+      "damage_charge": 0,
+      "other_charges": "0",
+      "total_deductions": "354480.00",
+      "net_refund": "0",
+      "renewal_count": 1
+    },
+    {
+      "order_id": "ORD003",
+      "customer_name": "王五",
+      "equipment_name": "索尼 24-70mm f/2.8 GM",
+      "original_deposit": "2000",
+      "overdue_days": 843,
+      "overdue_charge": "151740.00",
+      "damage_count": 0,
+      "damage_charge": 0,
+      "other_charges": "0",
+      "total_deductions": "151740.00",
+      "net_refund": "0",
+      "renewal_count": 0
+    },
+    {
+      "order_id": "ORD004",
+      "customer_name": "赵六",
+      "equipment_name": "神牛 SL60W 补光灯",
+      "original_deposit": "800",
+      "overdue_days": 0,
+      "overdue_charge": "0",
+      "damage_count": 1,
+      "damage_charge": "150",
+      "other_charges": "0",
+      "total_deductions": "150",
+      "net_refund": "650",
+      "renewal_count": 0
+    }
+  ],
+  "bad_rows": []
+}
