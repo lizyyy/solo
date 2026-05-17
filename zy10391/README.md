@@ -64,33 +64,68 @@
 1. 自动检测 Java 版本和类型 (JDK/JRE)
 2. 检测 Maven 环境
 3. 检查是否有已编译好的 JAR
-4. 提供合适的启动方案
+4. **如实反映当前环境状态，不做不实引导**
 5. 显示完整 API 信息和状态流转图
 
+---
+
+### ⚠️ 重要说明
+
+**当前项目状态**：仓库中仅包含源码，**不包含预编译的 JAR 文件**。
+
+| 需求 | 必须条件 |
+|------|----------|
+| 从源码编译 | 完整 JDK 8+ (含 javac) + Maven |
+| 运行应用 | Java 运行时 (JRE) + 已编译的 JAR |
+
+**常见问题**：
+- 很多系统预装的是 JRE（仅运行时），不是 JDK（开发工具包）
+- JRE 只有 `java` 命令，没有 `javac` 编译器，无法编译源码
+- 运行脚本时请仔细阅读环境检测结果
+
+---
+
 ### 环境要求
-- **JDK 8+** (需要完整 JDK，仅 JRE 无法编译。推荐 JDK 1.8 或更高)
+
+#### 编译环境（必需）
+- **完整 JDK 8+** (必须包含 `javac` 编译器)
 - Maven 3.6+ (项目自带 Maven Wrapper，无需系统安装)
 
 #### 验证环境
 ```bash
-# 检查是否有完整 JDK
+# 检查是否有完整 JDK（关键！）
 javac -version
 
-# 如果显示 "command not found"，需要安装 JDK
-# macOS: brew install openjdk@8 或从 Oracle 官网下载
-# Linux: apt-get install openjdk-8-jdk
+# 如果显示 "command not found"，必须先安装 JDK
+# macOS:    brew install openjdk@8
+# Ubuntu:   sudo apt-get install openjdk-8-jdk
+# Windows:  从 Oracle 官网下载 JDK 8
+
+# 检查 Java 运行时
+java -version
 ```
 
-### 编译运行
+### 编译运行步骤
 
-#### 使用 Maven Wrapper (推荐，无需系统安装 Maven)
+#### 步骤 1: 确认环境（关键）
 ```bash
-# 编译项目
+./quick-start.sh
+```
+仔细查看检测结果，确保显示 "检测到完整 JDK"。
+
+#### 步骤 2: 使用 Maven Wrapper 编译
+```bash
+# 编译项目（需要 JDK + 网络）
 ./mvnw clean package -DskipTests
 
-# 运行应用
+# 编译成功后运行
 java -jar target/multi-source-identity-verification-1.0.0.jar
 ```
+
+**重要提示**：
+- 首次运行 `./mvnw` 会自动下载 Maven（约 10MB）
+- 首次编译需要网络下载依赖（约 50MB）
+- 如遇编译问题，请先运行 `./quick-start.sh` 检查环境
 
 #### Windows 用户
 ```cmd
