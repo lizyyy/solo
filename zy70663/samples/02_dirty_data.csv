@@ -1,0 +1,8 @@
+old_label,sku,location,batch,print_status
+OLD-001,,A-01-01,BATCH-202401,pending
+,SKU-002,A-01-02,BATCH-202401,printed
+OLD-003,SKU-003,,BATCH-202402,pending
+OLD-004,sku-004,A-02-02,BATCH-202401,failed
+OLD-005,SKU005,A-02-03,BATCH-202403,pending
+OLD-006,SKU-006,AA01-01,BATCH-202401,pending
+OLD-007,SKU-007,A-99-99,BATCH-202401,unknown_status
