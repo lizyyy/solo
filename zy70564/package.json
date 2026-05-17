@@ -12,7 +12,14 @@
     "test": "jest",
     "lint": "eslint src/**/*.ts"
   },
-  "keywords": ["json", "json-patch", "cli", "preview", "diff", "validation"],
+  "keywords": [
+    "json",
+    "json-patch",
+    "cli",
+    "preview",
+    "diff",
+    "validation"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {

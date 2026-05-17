@@ -1,16 +1,108 @@
 {
   "summary": {
-    "totalFiles": 1,
-    "totalPatches": 2,
-    "successCount": 1,
+    "totalFiles": 2,
+    "totalPatches": 4,
+    "successCount": 2,
     "conflictCount": 0,
     "errorCount": 0,
     "warningCount": 0,
-    "changedFiles": 1
+    "changedFiles": 2
   },
   "results": [
     {
-      "filePath": "test-data/config.json",
+      "filePath": "test-data/configs/app1.json",
+      "originalJson": {
+        "name": "my-app",
+        "version": "1.0.0",
+        "database": {
+          "host": "localhost",
+          "port": 5432,
+          "credentials": {
+            "username": "admin",
+            "password": "secret"
+          }
+        },
+        "features": [
+          "auth",
+          "logging",
+          "monitoring"
+        ],
+        "settings": {
+          "debug": false,
+          "maxConnections": 10
+        }
+      },
+      "patches": [
+        {
+          "op": "replace",
+          "path": "/version",
+          "value": "2.0.0"
+        },
+        {
+          "op": "add",
+          "path": "/features/-",
+          "value": "analytics"
+        }
+      ],
+      "patchedJson": {
+        "name": "my-app",
+        "version": "2.0.0",
+        "database": {
+          "host": "localhost",
+          "port": 5432,
+          "credentials": {
+            "username": "admin",
+            "password": "secret"
+          }
+        },
+        "features": [
+          "auth",
+          "logging",
+          "monitoring",
+          "analytics"
+        ],
+        "settings": {
+          "debug": false,
+          "maxConnections": 10
+        }
+      },
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": []
+      },
+      "conflicts": [],
+      "previews": [
+        {
+          "originalValue": "1.0.0",
+          "newValue": "2.0.0",
+          "path": "/version",
+          "op": "replace",
+          "changed": true
+        },
+        {
+          "path": "/features/-",
+          "op": "add",
+          "changed": false
+        }
+      ],
+      "diff": [
+        {
+          "path": "/version",
+          "op": "replace",
+          "oldValue": "1.0.0",
+          "newValue": "2.0.0"
+        },
+        {
+          "path": "/features/3",
+          "op": "add",
+          "newValue": "analytics"
+        }
+      ],
+      "success": true
+    },
+    {
+      "filePath": "test-data/configs/app2.json",
       "originalJson": {
         "name": "my-app",
         "version": "1.0.0",
@@ -102,5 +194,5 @@
       "success": true
     }
   ],
-  "generatedAt": "2026-05-16T23:55:00.182Z"
+  "generatedAt": "2026-05-17T04:47:49.291Z"
 }
