@@ -1,0 +1,22 @@
+{
+  "name": "project-risk-registry",
+  "version": "1.0.0",
+  "description": "项目风险登记API - 追踪项目风险、处理动作和关闭依据",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "init-db": "node src/scripts/init-db.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "joi": "^17.11.0",
+    "csv-writer": "^1.6.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
