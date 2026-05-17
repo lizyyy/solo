@@ -240,9 +240,13 @@ def add_confirmation(cli: BusRoutingCLI, student_id: str, reroute_id: str, paren
 
 @cli.command()
 @click.argument('reroute_id')
+@click.option('--deadline', '-d', help='回执截止时间 (格式: YYYY-MM-DD HH:MM:SS)，超过此时间的回执将被标记为迟到')
 @pass_cli
-def process_confirmations(cli: BusRoutingCLI, reroute_id: str):
-    """处理回执：站点替换、去重、标记迟到"""
+def process_confirmations(cli: BusRoutingCLI, reroute_id: str, deadline: str):
+    """处理回执：站点替换、去重、标记迟到
+    
+    截止时间示例: "2026-05-17 18:00:00"
+    """
     try:
         reroute = cli.storage.get_reroute_by_id(reroute_id)
         if not reroute:
@@ -284,6 +288,21 @@ def process_confirmations(cli: BusRoutingCLI, reroute_id: str):
             )
         
         conf_objects = cli.rules_engine.batch_apply_stop_replacement(reroute_obj, conf_objects)
+        
+        if deadline:
+            try:
+                deadline_dt = datetime.fromisoformat(deadline.replace(' ', 'T'))
+                before_late = sum(1 for c in conf_objects if c.is_late)
+                conf_objects = cli.rules_engine.mark_late_confirmations(conf_objects, deadline_dt)
+                after_late = sum(1 for c in conf_objects if c.is_late)
+                new_late = after_late - before_late
+                if new_late > 0:
+                    cli.print_info(f"已标记 {new_late} 条回执为迟到")
+            except ValueError as e:
+                cli.print_error(f"截止时间格式错误: {e}")
+                cli.print_info(f"正确格式示例: \"2026-05-17 18:00:00\"")
+                sys.exit(1)
+        
         unique_confs, duplicates = cli.rules_engine.deduplicate_confirmations(conf_objects)
         
         cli.storage._save_json(cli.storage.confirmations_file, [])
@@ -293,11 +312,17 @@ def process_confirmations(cli: BusRoutingCLI, reroute_id: str):
         cli.print_info(f"有效回执: {len(unique_confs)}")
         cli.print_info(f"重复回执: {len(duplicates)}")
         
+        total_late = sum(1 for c in unique_confs if c.is_late)
+        if total_late > 0:
+            cli.print_info(f"迟到回执: {total_late}")
+        
         if duplicates:
             cli.print_warning("重复回执已标记，将在报告中过滤")
             
     except Exception as e:
         cli.print_error(str(e))
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 

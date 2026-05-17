@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T17:42:22.017506",
+  "generated_at": "2026-05-17T20:11:13.368575",
   "reroute_info": {
     "reroute_id": "RR001",
     "route_id": "R001",
@@ -17,7 +17,7 @@
         "longitude": null
       }
     },
-    "created_at": "2026-05-17T17:42:21.808710",
+    "created_at": "2026-05-17T20:11:13.132148",
     "created_by": ""
   },
   "summary": {
@@ -27,7 +27,7 @@
     "confirmed_count": 3,
     "pending_count": 0,
     "rejected_count": 0,
-    "late_confirmations": 1,
+    "late_confirmations": 0,
     "stop_mismatches": 0
   },
   "confirmations": [
@@ -37,10 +37,10 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.CONFIRMED",
       "channel": "ConfirmationChannel.WECHAT_GROUP",
-      "confirmed_at": "2026-05-17 10:42:21.808843",
-      "parent_name": "家长3-迟到",
+      "confirmed_at": "2026-05-17 13:11:13.132276",
+      "parent_name": "家长3-较早确认",
       "notes": "",
-      "is_late": true,
+      "is_late": false,
       "original_stop_id": "S001",
       "new_stop_id": "TEMP001"
     },
@@ -50,7 +50,7 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.CONFIRMED",
       "channel": "ConfirmationChannel.WECHAT_GROUP",
-      "confirmed_at": "2026-05-17 12:42:21.808843",
+      "confirmed_at": "2026-05-17 15:11:13.132276",
       "parent_name": "家长1-重复1",
       "notes": "第1次回复",
       "is_late": false,
@@ -63,7 +63,7 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.CONFIRMED",
       "channel": "ConfirmationChannel.WECHAT_GROUP",
-      "confirmed_at": "2026-05-17 12:42:21.808843",
+      "confirmed_at": "2026-05-17 15:11:13.132276",
       "parent_name": "家长2-已确认",
       "notes": "",
       "is_late": false,
@@ -78,7 +78,7 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.DUPLICATE",
       "channel": "ConfirmationChannel.WECHAT_GROUP",
-      "confirmed_at": "2026-05-17 12:47:21.808843",
+      "confirmed_at": "2026-05-17 15:16:13.132276",
       "parent_name": "家长1-重复2",
       "notes": "第2次回复",
       "is_late": false,
@@ -91,7 +91,7 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.DUPLICATE",
       "channel": "ConfirmationChannel.WECHAT_GROUP",
-      "confirmed_at": "2026-05-17 12:52:21.808843",
+      "confirmed_at": "2026-05-17 15:21:13.132276",
       "parent_name": "家长1-重复3",
       "notes": "第3次回复",
       "is_late": false,
@@ -104,7 +104,7 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.DUPLICATE",
       "channel": "ConfirmationChannel.PHONE",
-      "confirmed_at": "2026-05-17 13:12:21.808843",
+      "confirmed_at": "2026-05-17 15:41:13.132276",
       "parent_name": "家长2-已拒绝",
       "notes": "不同意改线，自行接送",
       "is_late": false,
@@ -114,10 +114,10 @@
   ],
   "recovery_checks": [
     {
-      "check_id": "04c642cf",
+      "check_id": "647230b7",
       "reroute_id": "RR001",
       "status": "恢复失败",
-      "checked_at": "2026-05-17T17:42:21.963058",
+      "checked_at": "2026-05-17T20:11:13.311003",
       "checked_by": "王老师",
       "issues_found": [
         "存在重复回执",

@@ -5,14 +5,18 @@ import subprocess
 import sys
 import json
 import os
+from datetime import datetime, timedelta
 from pathlib import Path
 
+
+import shlex
 
 def run_command(cmd, capture_output=True):
     """运行命令并返回结果"""
     print(f"\n>>> 执行命令: python main.py {cmd}")
+    args = shlex.split(cmd)
     result = subprocess.run(
-        [sys.executable, "main.py"] + cmd.split(),
+        [sys.executable, "main.py"] + args,
         capture_output=capture_output,
         text=True
     )
@@ -33,7 +37,8 @@ def test_normal_sample():
     run_command("list-routes")
     run_command("list-reroutes")
     
-    run_command("process-confirmations RR001")
+    normal_deadline = (datetime.now() + timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")
+    run_command(f"process-confirmations RR001 --deadline \"{normal_deadline}\"")
     run_command("start-recovery-check RR001 --checked-by 李老师")
     
     checks = json.load(open("data/recovery_checks.json"))
@@ -63,7 +68,8 @@ def test_abnormal_sample():
     
     run_command("generate-sample conflict --clear")
     
-    run_command("process-confirmations RR001")
+    conflict_deadline = (datetime.now() - timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")
+    run_command(f"process-confirmations RR001 --deadline \"{conflict_deadline}\"")
     
     run_command("start-recovery-check RR001 --checked-by 王老师")
     
@@ -154,6 +160,50 @@ def verify_error_messages():
     return True
 
 
+def test_late_marking():
+    """测试迟到标记核心功能"""
+    print("\n" + "="*60)
+    print("测试5: 迟到标记核心功能验证")
+    print("="*60)
+    
+    run_command("generate-sample normal --clear")
+    
+    early_deadline = (datetime.now() - timedelta(hours=10)).strftime("%Y-%m-%d %H:%M:%S")
+    result = run_command(f"process-confirmations RR001 --deadline \"{early_deadline}\"")
+    
+    assert "已标记" in result.stdout and "条回执为迟到" in result.stdout, "应该标记迟到回执"
+    print("✓ 截止时间前处理：正确标记了迟到回执")
+    
+    confirmations = json.load(open("data/confirmations.json"))
+    late_count = sum(1 for c in confirmations if c.get('is_late', False))
+    assert late_count > 0, "数据中应该有迟到回执"
+    print(f"✓ 数据持久化验证：共 {late_count} 条迟到回执已保存")
+    
+    run_command("generate-report RR001 --name late_test_report")
+    
+    report_path = Path("reports/late_test_report.json")
+    if report_path.exists():
+        with open(report_path, encoding="utf-8") as f:
+            report = json.load(f)
+        assert report["summary"]["late_confirmations"] > 0, "报告中应包含迟到回执统计"
+        print(f"✓ 报告验证：报告中统计了 {report['summary']['late_confirmations']} 条迟到回执")
+    
+    run_command("generate-sample normal --clear")
+    late_deadline = (datetime.now() + timedelta(hours=10)).strftime("%Y-%m-%d %H:%M:%S")
+    result = run_command(f"process-confirmations RR001 --deadline \"{late_deadline}\"")
+    
+    assert "已标记" not in result.stdout, "截止时间后处理不应该标记新的迟到"
+    print("✓ 截止时间后处理：正确不标记迟到")
+    
+    confirmations = json.load(open("data/confirmations.json"))
+    late_count = sum(1 for c in confirmations if c.get('is_late', False))
+    assert late_count == 0, "数据中不应该有迟到回执"
+    print("✓ 数据持久化验证：无迟到回执")
+    
+    print("\n✓ 迟到标记核心功能测试通过")
+    return True
+
+
 def main():
     print("\n" + "#"*60)
     print("# 校车改线家长回执站点恢复排查CLI - 验收测试")
@@ -165,6 +215,7 @@ def main():
     try:
         test_normal_sample()
         test_abnormal_sample()
+        test_late_marking()
         verify_report_consistency()
         verify_error_messages()
         
@@ -174,6 +225,7 @@ def main():
         print("\n验收总结:")
         print("  ✓ 正常样例: 数据处理、状态流转、报告生成")
         print("  ✓ 异常样例: 冲突检测、重复回执识别、失败标记")
+        print("  ✓ 迟到标记: 截止时间参数、核心规则计算、报告统计")
         print("  ✓ 报告一致: 机器可读与人类可读数据一致")
         print("  ✓ 错误提示: 边界情况有明确错误信息")
         print("\n历史记录请查看:")

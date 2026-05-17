@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T20:11:13.029549",
+  "generated_at": "2026-05-17T20:11:13.564239",
   "reroute_info": {
     "reroute_id": "RR001",
     "route_id": "R001",
@@ -17,7 +17,7 @@
         "longitude": null
       }
     },
-    "created_at": "2026-05-17T20:11:12.635435",
+    "created_at": "2026-05-17T20:11:13.434340",
     "created_by": ""
   },
   "summary": {
@@ -27,7 +27,7 @@
     "confirmed_count": 4,
     "pending_count": 1,
     "rejected_count": 0,
-    "late_confirmations": 0,
+    "late_confirmations": 4,
     "stop_mismatches": 0
   },
   "confirmations": [
@@ -50,10 +50,10 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.CONFIRMED",
       "channel": "ConfirmationChannel.WECHAT_GROUP",
-      "confirmed_at": "2026-05-17 15:11:12.637163",
+      "confirmed_at": "2026-05-17 15:11:13.434472",
       "parent_name": "家长1",
       "notes": "已知晓改线安排，准时接送",
-      "is_late": false,
+      "is_late": true,
       "original_stop_id": "S001",
       "new_stop_id": "TEMP001"
     },
@@ -63,10 +63,10 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.CONFIRMED",
       "channel": "ConfirmationChannel.WECHAT_GROUP",
-      "confirmed_at": "2026-05-17 15:21:12.637163",
+      "confirmed_at": "2026-05-17 15:21:13.434472",
       "parent_name": "家长2",
       "notes": "已知晓改线安排，准时接送",
-      "is_late": false,
+      "is_late": true,
       "original_stop_id": "S001",
       "new_stop_id": "TEMP001"
     },
@@ -76,10 +76,10 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.CONFIRMED",
       "channel": "ConfirmationChannel.WECHAT_GROUP",
-      "confirmed_at": "2026-05-17 15:31:12.637163",
+      "confirmed_at": "2026-05-17 15:31:13.434472",
       "parent_name": "家长3",
       "notes": "已知晓改线安排，准时接送",
-      "is_late": false,
+      "is_late": true,
       "original_stop_id": "S001",
       "new_stop_id": "TEMP001"
     },
@@ -89,10 +89,10 @@
       "reroute_id": "RR001",
       "status": "ConfirmationStatus.CONFIRMED",
       "channel": "ConfirmationChannel.WECHAT_GROUP",
-      "confirmed_at": "2026-05-17 15:41:12.637163",
+      "confirmed_at": "2026-05-17 15:41:13.434472",
       "parent_name": "家长4",
       "notes": "已知晓改线安排，准时接送",
-      "is_late": false,
+      "is_late": true,
       "original_stop_id": "S001",
       "new_stop_id": "TEMP001"
     }
@@ -103,19 +103,10 @@
       "check_id": "CHECK001",
       "reroute_id": "RR001",
       "status": "排查中",
-      "checked_at": "2026-05-17T20:11:12.639007",
+      "checked_at": "2026-05-17T20:11:13.435169",
       "checked_by": "张老师",
       "issues_found": [],
       "resolution_notes": ""
-    },
-    {
-      "check_id": "ba4daf8f",
-      "reroute_id": "RR001",
-      "status": "已验证恢复",
-      "checked_at": "2026-05-17T20:11:12.972490",
-      "checked_by": "李老师",
-      "issues_found": [],
-      "resolution_notes": "开始排查\n所有家长已确认，站点替换正常"
     }
   ],
   "recovery_assessment": {

@@ -212,8 +212,8 @@ def _generate_conflict_data(cli, reroute, students, base_time):
         status=ConfirmationStatus.CONFIRMED,
         channel=ConfirmationChannel.WECHAT_GROUP,
         confirmed_at=base_time - timedelta(hours=2),
-        parent_name="家长3-迟到",
-        is_late=True,
+        parent_name="家长3-较早确认",
+        is_late=False,
         original_stop_id="S001"
     )
     cli.storage.save_confirmation(conf6)

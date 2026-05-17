@@ -1,14 +1,11 @@
 [
   {
-    "check_id": "04c642cf",
+    "check_id": "CHECK001",
     "reroute_id": "RR001",
-    "status": "恢复失败",
-    "checked_at": "2026-05-17T17:42:21.963058",
-    "checked_by": "王老师",
-    "issues_found": [
-      "存在重复回执",
-      "存在状态冲突回执"
-    ],
-    "resolution_notes": "开始排查\n恢复失败: 存在重复回执, 存在状态冲突回执"
+    "status": "排查中",
+    "checked_at": "2026-05-17T20:11:13.627797",
+    "checked_by": "张老师",
+    "issues_found": [],
+    "resolution_notes": ""
   }
 ]
