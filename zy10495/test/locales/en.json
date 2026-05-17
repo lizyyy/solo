@@ -1,0 +1,13 @@
+{
+  "greeting": "Hello, {name}!",
+  "welcome": "Welcome to {{appName}}",
+  "message": "You have $count new messages",
+  "notification": "Your order %orderId% has been shipped",
+  "action": "Click :buttonText to continue",
+  "profile": "User: {username}, Age: {age}, Email: {email}",
+  "simple": "This is a simple text without placeholders",
+  "nested": {
+    "title": "Nested title with {value}",
+    "description": "Nested description with {{var}}"
+  }
+}

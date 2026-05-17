@@ -1,0 +1,215 @@
+{
+  "summary": {
+    "totalKeys": 9,
+    "checkedKeys": 9,
+    "errors": 5,
+    "warnings": 1,
+    "passed": 4
+  },
+  "results": [
+    {
+      "key": "greeting",
+      "sourceLanguage": "en",
+      "targetLanguage": "ja",
+      "sourceText": "Hello, {name}!",
+      "targetText": "こんにちは！",
+      "sourcePlaceholders": [
+        {
+          "name": "name",
+          "raw": "{name}",
+          "type": "curly"
+        }
+      ],
+      "targetPlaceholders": [],
+      "missingPlaceholders": [
+        {
+          "name": "name",
+          "raw": "{name}",
+          "type": "curly"
+        }
+      ],
+      "extraPlaceholders": [],
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json",
+      "lineNumber": 2,
+      "severity": "error",
+      "suggestion": "こんにちは{name}！"
+    },
+    {
+      "key": "welcome",
+      "sourceLanguage": "en",
+      "targetLanguage": "ja",
+      "sourceText": "Welcome to {{appName}}",
+      "targetText": "ようこそ",
+      "sourcePlaceholders": [
+        {
+          "name": "appName",
+          "raw": "{appName}",
+          "type": "curly"
+        }
+      ],
+      "targetPlaceholders": [],
+      "missingPlaceholders": [
+        {
+          "name": "appName",
+          "raw": "{appName}",
+          "type": "curly"
+        }
+      ],
+      "extraPlaceholders": [],
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json",
+      "lineNumber": 3,
+      "severity": "error",
+      "suggestion": "ようこそ{appName}"
+    },
+    {
+      "key": "notification",
+      "sourceLanguage": "en",
+      "targetLanguage": "ja",
+      "sourceText": "Your order %orderId% has been shipped",
+      "targetText": "注文が発送されました",
+      "sourcePlaceholders": [
+        {
+          "name": "orderId",
+          "raw": "%orderId%",
+          "type": "percent"
+        }
+      ],
+      "targetPlaceholders": [],
+      "missingPlaceholders": [
+        {
+          "name": "orderId",
+          "raw": "%orderId%",
+          "type": "percent"
+        }
+      ],
+      "extraPlaceholders": [],
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json",
+      "lineNumber": 5,
+      "severity": "error",
+      "suggestion": "注文が発送されました %orderId%"
+    },
+    {
+      "key": "profile",
+      "sourceLanguage": "en",
+      "targetLanguage": "ja",
+      "sourceText": "User: {username}, Age: {age}, Email: {email}",
+      "targetText": "ユーザー：{username}、メール：{email}",
+      "sourcePlaceholders": [
+        {
+          "name": "username",
+          "raw": "{username}",
+          "type": "curly"
+        },
+        {
+          "name": "age",
+          "raw": "{age}",
+          "type": "curly"
+        },
+        {
+          "name": "email",
+          "raw": "{email}",
+          "type": "curly"
+        }
+      ],
+      "targetPlaceholders": [
+        {
+          "name": "username",
+          "raw": "{username}",
+          "type": "curly"
+        },
+        {
+          "name": "email",
+          "raw": "{email}",
+          "type": "curly"
+        }
+      ],
+      "missingPlaceholders": [
+        {
+          "name": "age",
+          "raw": "{age}",
+          "type": "curly"
+        }
+      ],
+      "extraPlaceholders": [],
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json",
+      "lineNumber": 7,
+      "severity": "error",
+      "suggestion": "ユーザー：{username}、メール：{email}{age}"
+    },
+    {
+      "key": "nested.title",
+      "sourceLanguage": "en",
+      "targetLanguage": "ja",
+      "sourceText": "Nested title with {value}",
+      "targetText": "ネストされたタイトル",
+      "sourcePlaceholders": [
+        {
+          "name": "value",
+          "raw": "{value}",
+          "type": "curly"
+        }
+      ],
+      "targetPlaceholders": [],
+      "missingPlaceholders": [
+        {
+          "name": "value",
+          "raw": "{value}",
+          "type": "curly"
+        }
+      ],
+      "extraPlaceholders": [],
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json",
+      "lineNumber": 10,
+      "severity": "error",
+      "suggestion": "ネストされたタイトル{value}"
+    },
+    {
+      "key": "nested.description",
+      "sourceLanguage": "en",
+      "targetLanguage": "ja",
+      "sourceText": "Nested description with {{var}}",
+      "targetText": "ネストされた説明には {{var}} と {extra} が含まれます",
+      "sourcePlaceholders": [
+        {
+          "name": "var",
+          "raw": "{var}",
+          "type": "curly"
+        }
+      ],
+      "targetPlaceholders": [
+        {
+          "name": "var",
+          "raw": "{var}",
+          "type": "curly"
+        },
+        {
+          "name": "extra",
+          "raw": "{extra}",
+          "type": "curly"
+        }
+      ],
+      "missingPlaceholders": [],
+      "extraPlaceholders": [
+        {
+          "name": "extra",
+          "raw": "{extra}",
+          "type": "curly"
+        }
+      ],
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json",
+      "lineNumber": 11,
+      "severity": "warning"
+    }
+  ],
+  "metadata": {
+    "sourceLanguage": "en",
+    "targetLanguages": [
+      "ja"
+    ],
+    "checkedAt": "2026-05-17T04:08:52.252Z",
+    "filesProcessed": [
+      "/Users/lzy/pro/solo/workspaces/zy10495/test/locales/en.json",
+      "/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json"
+    ]
+  }
+}

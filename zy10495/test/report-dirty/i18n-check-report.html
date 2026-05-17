@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>i18n 占位符检查报告</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+    .container { background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { color: #333; border-bottom: 3px solid #1890ff; padding-bottom: 15px; margin-bottom: 25px; }
+    h2 { color: #555; margin: 25px 0 15px; padding-left: 10px; border-left: 4px solid #1890ff; }
+    h3 { color: #666; margin: 20px 0 10px; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+    .summary-card { padding: 20px; border-radius: 8px; text-align: center; }
+    .summary-card .number { font-size: 32px; font-weight: bold; display: block; }
+    .summary-card .label { font-size: 14px; color: #666; margin-top: 5px; }
+    .card-passed { background: #f6ffed; border: 1px solid #b7eb8f; }
+    .card-passed .number { color: #52c41a; }
+    .card-errors { background: #fff2f0; border: 1px solid #ffccc7; }
+    .card-errors .number { color: #ff4d4f; }
+    .card-warnings { background: #fffbe6; border: 1px solid #ffe58f; }
+    .card-warnings .number { color: #faad14; }
+    .card-total { background: #e6f7ff; border: 1px solid #91d5ff; }
+    .card-total .number { color: #1890ff; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #fafafa; font-weight: 600; }
+    .result-item { margin: 20px 0; padding: 20px; border-radius: 8px; border-left: 4px solid; }
+    .result-error { background: #fff1f0; border-color: #ff4d4f; }
+    .result-warning { background: #fffbe6; border-color: #faad14; }
+    .result-title { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+    .result-detail { margin: 8px 0; color: #555; }
+    .result-detail strong { color: #333; }
+    .placeholder { display: inline-block; background: #fff; padding: 2px 8px; border-radius: 4px; font-family: monospace; margin: 0 4px; }
+    .suggestion { background: #e6f7ff; padding: 15px; border-radius: 6px; margin-top: 15px; }
+    .suggestion strong { color: #1890ff; }
+    .success-box { background: #f6ffed; border: 1px solid #b7eb8f; padding: 40px; border-radius: 8px; text-align: center; margin: 30px 0; }
+    .success-box .emoji { font-size: 48px; margin-bottom: 15px; }
+    .success-box h3 { color: #52c41a; border: none; }
+    .meta-info { background: #fafafa; padding: 15px; border-radius: 6px; margin: 15px 0; }
+    .meta-info ul { margin-left: 20px; margin-top: 10px; }
+    .meta-info li { margin: 5px 0; }
+    code { background: #f5f5f5; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📋 i18n 占位符检查报告</h1>
+    
+    <div class="meta-info">
+      <p><strong>检查时间:</strong> 2026/5/17 11:08:38</p>
+      <p><strong>源语言:</strong> en</p>
+      <p><strong>目标语言:</strong> ja</p>
+      <p><strong>处理文件:</strong></p>
+      <ul>
+        <li><code>/Users/lzy/pro/solo/workspaces/zy10495/test/locales/en.json</code></li><li><code>/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json</code></li>
+      </ul>
+    </div>
+
+    <h2>📊 摘要</h2>
+    <div class="summary">
+      <div class="summary-card card-total">
+        <span class="number">9</span>
+        <span class="label">总键数</span>
+      </div>
+      <div class="summary-card card-passed">
+        <span class="number">4</span>
+        <span class="label">通过</span>
+      </div>
+      <div class="summary-card card-errors">
+        <span class="number">5</span>
+        <span class="label">错误</span>
+      </div>
+      <div class="summary-card card-warnings">
+        <span class="number">1</span>
+        <span class="label">警告</span>
+      </div>
+    </div>
+
+    
+
+    
+    <h2>❌ 错误详情 (缺失占位符)</h2>
+    
+    <div class="result-item result-error">
+      <div class="result-title">#1 greeting</div>
+      <div class="result-detail"><strong>语言:</strong> en → ja</div>
+      <div class="result-detail"><strong>文件:</strong> <code>/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json</code>:<strong>2</strong></div>
+      <div class="result-detail"><strong>源文案:</strong> Hello, {name}!</div>
+      <div class="result-detail"><strong>译文案:</strong> こんにちは！</div>
+      <div class="result-detail"><strong>缺失占位符:</strong> <span class="placeholder">{name}</span></div>
+      <div class="suggestion"><strong>💡 建议修复:</strong> こんにちは{name}！</div>
+    </div>
+    
+    <div class="result-item result-error">
+      <div class="result-title">#2 welcome</div>
+      <div class="result-detail"><strong>语言:</strong> en → ja</div>
+      <div class="result-detail"><strong>文件:</strong> <code>/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json</code>:<strong>3</strong></div>
+      <div class="result-detail"><strong>源文案:</strong> Welcome to {{appName}}</div>
+      <div class="result-detail"><strong>译文案:</strong> ようこそ</div>
+      <div class="result-detail"><strong>缺失占位符:</strong> <span class="placeholder">{appName}</span></div>
+      <div class="suggestion"><strong>💡 建议修复:</strong> ようこそ{appName}</div>
+    </div>
+    
+    <div class="result-item result-error">
+      <div class="result-title">#3 notification</div>
+      <div class="result-detail"><strong>语言:</strong> en → ja</div>
+      <div class="result-detail"><strong>文件:</strong> <code>/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json</code>:<strong>5</strong></div>
+      <div class="result-detail"><strong>源文案:</strong> Your order %orderId% has been shipped</div>
+      <div class="result-detail"><strong>译文案:</strong> 注文が発送されました</div>
+      <div class="result-detail"><strong>缺失占位符:</strong> <span class="placeholder">%orderId%</span></div>
+      <div class="suggestion"><strong>💡 建议修复:</strong> 注文が発送されました %orderId%</div>
+    </div>
+    
+    <div class="result-item result-error">
+      <div class="result-title">#4 profile</div>
+      <div class="result-detail"><strong>语言:</strong> en → ja</div>
+      <div class="result-detail"><strong>文件:</strong> <code>/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json</code>:<strong>7</strong></div>
+      <div class="result-detail"><strong>源文案:</strong> User: {username}, Age: {age}, Email: {email}</div>
+      <div class="result-detail"><strong>译文案:</strong> ユーザー：{username}、メール：{email}</div>
+      <div class="result-detail"><strong>缺失占位符:</strong> <span class="placeholder">{age}</span></div>
+      <div class="suggestion"><strong>💡 建议修复:</strong> ユーザー：{username}、メール：{email}{age}</div>
+    </div>
+    
+    <div class="result-item result-error">
+      <div class="result-title">#5 nested.title</div>
+      <div class="result-detail"><strong>语言:</strong> en → ja</div>
+      <div class="result-detail"><strong>文件:</strong> <code>/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json</code>:<strong>10</strong></div>
+      <div class="result-detail"><strong>源文案:</strong> Nested title with {value}</div>
+      <div class="result-detail"><strong>译文案:</strong> ネストされたタイトル</div>
+      <div class="result-detail"><strong>缺失占位符:</strong> <span class="placeholder">{value}</span></div>
+      <div class="suggestion"><strong>💡 建议修复:</strong> ネストされたタイトル{value}</div>
+    </div>
+    
+    
+
+    
+    <h2>⚠️ 警告详情 (额外占位符)</h2>
+    
+    <div class="result-item result-warning">
+      <div class="result-title">#1 nested.description</div>
+      <div class="result-detail"><strong>语言:</strong> en → ja</div>
+      <div class="result-detail"><strong>文件:</strong> <code>/Users/lzy/pro/solo/workspaces/zy10495/test/locales/ja.json</code>:<strong>11</strong></div>
+      <div class="result-detail"><strong>源文案:</strong> Nested description with {{var}}</div>
+      <div class="result-detail"><strong>译文案:</strong> ネストされた説明には {{var}} と {extra} が含まれます</div>
+      <div class="result-detail"><strong>额外占位符:</strong> <span class="placeholder">{extra}</span></div>
+    </div>
+    
+    
+  </div>
+</body>
+</html>

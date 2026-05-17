@@ -1,0 +1,13 @@
+{
+  "greeting": "こんにちは！",
+  "welcome": "ようこそ",
+  "message": "新着メッセージが $count 件あります",
+  "notification": "注文が発送されました",
+  "action": ":buttonText をクリックして続行",
+  "profile": "ユーザー：{username}、メール：{email}",
+  "simple": "プレースホルダーのない単純なテキスト",
+  "nested": {
+    "title": "ネストされたタイトル",
+    "description": "ネストされた説明には {{var}} と {extra} が含まれます"
+  }
+}

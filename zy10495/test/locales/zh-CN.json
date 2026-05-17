@@ -1,0 +1,13 @@
+{
+  "greeting": "你好，{name}！",
+  "welcome": "欢迎来到 {{appName}}",
+  "message": "你有 $count 条新消息",
+  "notification": "你的订单 %orderId% 已发货",
+  "action": "点击 :buttonText 继续",
+  "profile": "用户：{username}，年龄：{age}，邮箱：{email}",
+  "simple": "这是一段没有占位符的简单文本",
+  "nested": {
+    "title": "嵌套标题包含 {value}",
+    "description": "嵌套描述包含 {{var}}"
+  }
+}
