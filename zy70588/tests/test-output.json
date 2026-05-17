@@ -1,0 +1,323 @@
+{
+  "generatedAt": "2026-05-17T03:56:43.482Z",
+  "summary": {
+    "totalLines": 41,
+    "validLines": 30,
+    "badLineCount": 11,
+    "sampleRate": 0.1,
+    "totalSampleCount": 30,
+    "totalSampleErrors": 18,
+    "totalEstimatedCount": 300,
+    "totalEstimatedErrors": 180,
+    "overallErrorRate": 0.6,
+    "overallConfidenceInterval": {
+      "estimated": 180,
+      "lowerBound": 161,
+      "upperBound": 199,
+      "marginOfError": 19,
+      "confidenceLevel": 0.95,
+      "standardError": 9.486832980505138
+    }
+  },
+  "groups": [
+    {
+      "key": "order-service",
+      "groups": {
+        "service": "order-service"
+      },
+      "sampleCount": 8,
+      "sampleErrorCount": 6,
+      "sampleErrorRate": 0.75,
+      "estimatedCount": 80,
+      "estimatedErrorCount": 60,
+      "estimatedErrorRate": 0.75,
+      "confidenceInterval": {
+        "estimated": 80,
+        "lowerBound": 61,
+        "upperBound": 99,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      },
+      "errorConfidenceInterval": {
+        "estimated": 60,
+        "lowerBound": 41,
+        "upperBound": 79,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    },
+    {
+      "key": "user-api",
+      "groups": {
+        "service": "user-api"
+      },
+      "sampleCount": 10,
+      "sampleErrorCount": 5,
+      "sampleErrorRate": 0.5,
+      "estimatedCount": 100,
+      "estimatedErrorCount": 50,
+      "estimatedErrorRate": 0.5,
+      "confidenceInterval": {
+        "estimated": 100,
+        "lowerBound": 81,
+        "upperBound": 119,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      },
+      "errorConfidenceInterval": {
+        "estimated": 50,
+        "lowerBound": 31,
+        "upperBound": 69,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    },
+    {
+      "key": "payment-service",
+      "groups": {
+        "service": "payment-service"
+      },
+      "sampleCount": 4,
+      "sampleErrorCount": 3,
+      "sampleErrorRate": 0.75,
+      "estimatedCount": 40,
+      "estimatedErrorCount": 30,
+      "estimatedErrorRate": 0.75,
+      "confidenceInterval": {
+        "estimated": 40,
+        "lowerBound": 21,
+        "upperBound": 59,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      },
+      "errorConfidenceInterval": {
+        "estimated": 30,
+        "lowerBound": 11,
+        "upperBound": 49,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    },
+    {
+      "key": "notification-service",
+      "groups": {
+        "service": "notification-service"
+      },
+      "sampleCount": 3,
+      "sampleErrorCount": 2,
+      "sampleErrorRate": 0.6667,
+      "estimatedCount": 30,
+      "estimatedErrorCount": 20,
+      "estimatedErrorRate": 0.6667,
+      "confidenceInterval": {
+        "estimated": 30,
+        "lowerBound": 11,
+        "upperBound": 49,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      },
+      "errorConfidenceInterval": {
+        "estimated": 20,
+        "lowerBound": 1,
+        "upperBound": 39,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    },
+    {
+      "key": "search-service",
+      "groups": {
+        "service": "search-service"
+      },
+      "sampleCount": 3,
+      "sampleErrorCount": 1,
+      "sampleErrorRate": 0.3333,
+      "estimatedCount": 30,
+      "estimatedErrorCount": 10,
+      "estimatedErrorRate": 0.3333,
+      "confidenceInterval": {
+        "estimated": 30,
+        "lowerBound": 11,
+        "upperBound": 49,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      },
+      "errorConfidenceInterval": {
+        "estimated": 10,
+        "lowerBound": 0,
+        "upperBound": 29,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    },
+    {
+      "key": "analytics-service",
+      "groups": {
+        "service": "analytics-service"
+      },
+      "sampleCount": 2,
+      "sampleErrorCount": 1,
+      "sampleErrorRate": 0.5,
+      "estimatedCount": 20,
+      "estimatedErrorCount": 10,
+      "estimatedErrorRate": 0.5,
+      "confidenceInterval": {
+        "estimated": 20,
+        "lowerBound": 1,
+        "upperBound": 39,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      },
+      "errorConfidenceInterval": {
+        "estimated": 10,
+        "lowerBound": 0,
+        "upperBound": 29,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    }
+  ],
+  "anomalies": [
+    {
+      "groupKey": "payment-service",
+      "groups": {
+        "service": "payment-service"
+      },
+      "sampleCount": 4,
+      "zScore": -0.34,
+      "reason": "样本量过小 (n=4)，置信区间不可靠",
+      "confidenceInterval": {
+        "estimated": 40,
+        "lowerBound": 21,
+        "upperBound": 59,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    },
+    {
+      "groupKey": "search-service",
+      "groups": {
+        "service": "search-service"
+      },
+      "sampleCount": 3,
+      "zScore": -0.68,
+      "reason": "样本量过小 (n=3)，置信区间不可靠",
+      "confidenceInterval": {
+        "estimated": 30,
+        "lowerBound": 11,
+        "upperBound": 49,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    },
+    {
+      "groupKey": "notification-service",
+      "groups": {
+        "service": "notification-service"
+      },
+      "sampleCount": 3,
+      "zScore": -0.68,
+      "reason": "样本量过小 (n=3)，置信区间不可靠",
+      "confidenceInterval": {
+        "estimated": 30,
+        "lowerBound": 11,
+        "upperBound": 49,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    },
+    {
+      "groupKey": "analytics-service",
+      "groups": {
+        "service": "analytics-service"
+      },
+      "sampleCount": 2,
+      "zScore": -1.02,
+      "reason": "样本量过小 (n=2)，置信区间不可靠",
+      "confidenceInterval": {
+        "estimated": 20,
+        "lowerBound": 1,
+        "upperBound": 39,
+        "marginOfError": 19,
+        "confidenceLevel": 0.95,
+        "standardError": 9.486832980505138
+      }
+    }
+  ],
+  "badLines": [
+    {
+      "lineNumber": 1,
+      "content": "# 这是一条注释，应该被标记为注释行",
+      "reason": "注释行"
+    },
+    {
+      "lineNumber": 6,
+      "content": "",
+      "reason": "空行"
+    },
+    {
+      "lineNumber": 12,
+      "content": "",
+      "reason": "空行"
+    },
+    {
+      "lineNumber": 17,
+      "content": "",
+      "reason": "空行"
+    },
+    {
+      "lineNumber": 21,
+      "content": "",
+      "reason": "空行"
+    },
+    {
+      "lineNumber": 24,
+      "content": "",
+      "reason": "空行"
+    },
+    {
+      "lineNumber": 25,
+      "content": "// 这是另一条注释",
+      "reason": "注释行"
+    },
+    {
+      "lineNumber": 27,
+      "content": "",
+      "reason": "空行"
+    },
+    {
+      "lineNumber": 31,
+      "content": "",
+      "reason": "空行"
+    },
+    {
+      "lineNumber": 35,
+      "content": "",
+      "reason": "空行"
+    },
+    {
+      "lineNumber": 39,
+      "content": "",
+      "reason": "空行"
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "confidenceLevel": 0.95
+  }
+}

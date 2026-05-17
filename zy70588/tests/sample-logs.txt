@@ -1,0 +1,41 @@
+# 这是一条注释，应该被标记为注释行
+2024-01-15 10:00:01 [INFO] service=user-api - 正常请求处理完成
+2024-01-15 10:00:02 [ERROR] service=user-api - 数据库连接超时
+2024-01-15 10:00:03 [ERROR] service=user-api - 用户认证失败
+2024-01-15 10:00:04 [WARN] service=user-api - 请求参数不完整
+
+2024-01-15 10:00:05 [INFO] service=order-service - 订单创建成功
+2024-01-15 10:00:06 [ERROR] service=order-service - 库存不足
+2024-01-15 10:00:07 [ERROR] service=order-service - 支付网关超时
+2024-01-15 10:00:08 [FATAL] service=order-service - 数据库崩溃
+2024-01-15 10:00:09 [ERROR] service=order-service - 订单状态更新失败
+
+2024-01-15 10:00:10 [INFO] service=payment-service - 支付成功
+2024-01-15 10:00:11 [ERROR] service=payment-service - 银行卡验证失败
+2024-01-15 10:00:12 [ERROR] service=payment-service - 余额不足
+2024-01-15 10:00:13 [EXCEPTION] service=payment-service - NullReferenceException
+
+2024-01-15 10:00:14 [INFO] service=user-api - 登录成功
+2024-01-15 10:00:15 [ERROR] service=user-api - Token过期
+2024-01-15 10:00:16 [HTTP_500] service=user-api - 内部服务器错误
+
+2024-01-15 10:00:17 [INFO] service=search-service - 搜索完成
+2024-01-15 10:00:18 [ERROR] service=search-service - 索引损坏
+
+// 这是另一条注释
+2024-01-15 10:00:19 [WARN] service=search-service - 查询超时
+
+2024-01-15 10:00:20 [INFO] service=notification-service - 邮件发送成功
+2024-01-15 10:00:21 [ERROR] service=notification-service - 短信网关不可用
+2024-01-15 10:00:22 [ERROR] service=notification-service - 推送失败
+
+2024-01-15 10:00:23 [INFO] service=user-api - 用户注册成功
+2024-01-15 10:00:24 [ERROR] service=user-api - 邮箱已被注册
+2024-01-15 10:00:25 [ERROR] service=user-api - 验证码错误
+
+2024-01-15 10:00:26 [INFO] service=order-service - 订单取消成功
+2024-01-15 10:00:27 [ERROR] service=order-service - 订单不存在
+2024-01-15 10:00:28 [ERROR] service=order-service - 退款失败
+
+2024-01-15 10:00:29 [INFO] service=analytics-service - 数据统计完成
+2024-01-15 10:00:30 [ERROR] service=analytics-service - 数据仓库连接失败

@@ -1,0 +1,23 @@
+{
+  "name": "log-sampling-reducer",
+  "version": "1.0.0",
+  "description": "日志采样还原CLI - 从采样日志估算真实错误量",
+  "main": "src/cli.js",
+  "bin": {
+    "log-reduce": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node tests/self-test.js",
+    "self-check": "node tests/self-test.js",
+    "demo": "node src/cli.js --input tests/sample-logs.txt --sample-rate 0.1 --group-by service,error_type --output report"
+  },
+  "keywords": ["logging", "sampling", "statistics", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "cli-table3": "^0.6.3",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {}
+}
