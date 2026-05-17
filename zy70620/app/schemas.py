@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing import Optional, List
-from pydantic import BaseModel, Field
+from typing import Optional, List, Any
+from pydantic import BaseModel, Field, field_validator
 from app.models import RepairOrderStatus, UrgencyLevel
 
 
@@ -182,7 +182,12 @@ class RepairOrder(RepairOrderBase):
 
 
 class RepairOrderDetail(RepairOrder):
-    duplicates: List["RepairOrder"] = []
+    duplicates: List["RepairOrder"] = Field(default_factory=list)
+
+    @field_validator("duplicates", mode="before")
+    @classmethod
+    def empty_list_if_none(cls, v: Any) -> Any:
+        return v or []
 
 
 class StatusTransition(BaseModel):

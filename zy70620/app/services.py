@@ -41,7 +41,7 @@ def check_duplicate_order(db: Session, order_data: schemas.RepairOrderCreate) ->
             RepairOrder.room_number == order_data.room_number,
             RepairOrder.issue_type == order_data.issue_type,
             RepairOrder.created_at > time_threshold,
-            RepairOrder.status.notin([
+            ~RepairOrder.status.in_([
                 RepairOrderStatus.COMPLETED,
                 RepairOrderStatus.VERIFIED,
                 RepairOrderStatus.CLOSED,
