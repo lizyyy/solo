@@ -1,0 +1,36 @@
+[
+  {
+    "auth_id": "A001",
+    "student_id": "S001",
+    "pickup_person_id": "P001",
+    "start_date": "2026-05-10",
+    "end_date": "2026-05-20",
+    "weekdays": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "start_time": "16:00:00",
+    "end_time": "18:00:00",
+    "is_active": true
+  },
+  {
+    "auth_id": "A002",
+    "student_id": "S001",
+    "pickup_person_id": "P002",
+    "start_date": "2026-05-15",
+    "end_date": "2026-05-25",
+    "weekdays": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "start_time": "17:00:00",
+    "end_time": "19:00:00",
+    "is_active": true
+  }
+]
