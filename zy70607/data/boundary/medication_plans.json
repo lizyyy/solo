@@ -1,0 +1,23 @@
+{
+  "PLAN-BOUNDARY-001": {
+    "plan_id": "PLAN-BOUNDARY-001",
+    "order_id": "ORD-BOUNDARY-001",
+    "pet_id": "PET-BOUNDARY-001",
+    "start_date": "2026-05-17",
+    "dosage_versions": [
+      {
+        "version": 1,
+        "medication_name": "测试药",
+        "dosage_amount": "100",
+        "dosage_unit": "mg",
+        "frequency": "daily",
+        "route": "口服",
+        "created_by": "测试人",
+        "created_at": "2026-05-17T16:45:13.057823"
+      }
+    ],
+    "current_version": 1,
+    "is_active": true,
+    "created_at": "2026-05-17T16:45:13.057825"
+  }
+}

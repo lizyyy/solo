@@ -1,0 +1,86 @@
+{
+  "EXEC-cf174cd7": {
+    "execution_id": "EXEC-cf174cd7",
+    "plan_id": "PLAN-1d912ddf",
+    "shift_date": "2026-05-14",
+    "shift_type": "morning",
+    "status": "administered",
+    "administered_at": "2026-05-17 16:45:13.045537",
+    "administered_by": "早班护士",
+    "dosage_version_at_execution": 1,
+    "notes": "第1天早班喂药",
+    "created_at": "2026-05-17 16:45:13.045545"
+  },
+  "EXEC-f73bb6aa": {
+    "execution_id": "EXEC-f73bb6aa",
+    "plan_id": "PLAN-1d912ddf",
+    "shift_date": "2026-05-14",
+    "shift_type": "evening",
+    "status": "administered",
+    "administered_at": "2026-05-17 16:45:13.045930",
+    "administered_by": "晚班护士",
+    "dosage_version_at_execution": 1,
+    "notes": null,
+    "created_at": "2026-05-17 16:45:13.045935"
+  },
+  "EXEC-23ababd5": {
+    "execution_id": "EXEC-23ababd5",
+    "plan_id": "PLAN-1d912ddf",
+    "shift_date": "2026-05-15",
+    "shift_type": "morning",
+    "status": "administered",
+    "administered_at": "2026-05-17 16:45:13.046336",
+    "administered_by": "早班护士",
+    "dosage_version_at_execution": 1,
+    "notes": "第2天早班喂药",
+    "created_at": "2026-05-17 16:45:13.046339"
+  },
+  "EXEC-c8120caa": {
+    "execution_id": "EXEC-c8120caa",
+    "plan_id": "PLAN-1d912ddf",
+    "shift_date": "2026-05-15",
+    "shift_type": "evening",
+    "status": "administered",
+    "administered_at": "2026-05-17 16:45:13.046712",
+    "administered_by": "晚班护士",
+    "dosage_version_at_execution": 1,
+    "notes": null,
+    "created_at": "2026-05-17 16:45:13.046717"
+  },
+  "EXEC-8f085b94": {
+    "execution_id": "EXEC-8f085b94",
+    "plan_id": "PLAN-1d912ddf",
+    "shift_date": "2026-05-16",
+    "shift_type": "morning",
+    "status": "administered",
+    "administered_at": "2026-05-17 16:45:13.047893",
+    "administered_by": "早班护士",
+    "dosage_version_at_execution": 1,
+    "notes": "第3天早班喂药",
+    "created_at": "2026-05-17 16:45:13.047903"
+  },
+  "EXEC-89394888": {
+    "execution_id": "EXEC-89394888",
+    "plan_id": "PLAN-1d912ddf",
+    "shift_date": "2026-05-16",
+    "shift_type": "evening",
+    "status": "administered",
+    "administered_at": "2026-05-17 16:45:13.050886",
+    "administered_by": "晚班护士",
+    "dosage_version_at_execution": 1,
+    "notes": null,
+    "created_at": "2026-05-17 16:45:13.050903"
+  },
+  "EXEC-f5e8df5c": {
+    "execution_id": "EXEC-f5e8df5c",
+    "plan_id": "PLAN-1d912ddf",
+    "shift_date": "2026-05-17",
+    "shift_type": "morning",
+    "status": "administered",
+    "administered_at": "2026-05-17 16:45:13.054398",
+    "administered_by": "早班护士",
+    "dosage_version_at_execution": 2,
+    "notes": "按新剂量执行",
+    "created_at": "2026-05-17 16:45:13.054413"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "PLAN-1d912ddf": {
+    "plan_id": "PLAN-1d912ddf",
+    "order_id": "ORD-f57fc5fa",
+    "pet_id": "PET-2e57fb6b",
+    "start_date": "2026-05-14",
+    "end_date": null,
+    "dosage_versions": [
+      {
+        "version": 1,
+        "medication_name": "阿莫西林",
+        "dosage_amount": "500",
+        "dosage_unit": "mg",
+        "frequency": "twice_daily",
+        "route": "口服",
+        "notes": null,
+        "created_by": "李护士",
+        "created_at": "2026-05-17 16:45:13.045101"
+      },
+      {
+        "version": 2,
+        "medication_name": "阿莫西林",
+        "dosage_amount": "250",
+        "dosage_unit": "mg",
+        "frequency": "twice_daily",
+        "route": "口服",
+        "notes": null,
+        "created_by": "张店长",
+        "created_at": "2026-05-17 16:45:13.045101"
+      }
+    ],
+    "current_version": 2,
+    "is_active": true,
+    "created_at": "2026-05-17 16:45:13.045108"
+  }
+}

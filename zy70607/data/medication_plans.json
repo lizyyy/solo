@@ -1,0 +1,59 @@
+{
+  "PLAN-70be7af5": {
+    "plan_id": "PLAN-70be7af5",
+    "order_id": "ORD-451474ee",
+    "pet_id": "PET-aecc3a6d",
+    "start_date": "2026-05-17",
+    "end_date": null,
+    "dosage_versions": [
+      {
+        "version": 1,
+        "medication_name": "阿莫西林",
+        "dosage_amount": "500",
+        "dosage_unit": "mg",
+        "frequency": "twice_daily",
+        "route": "口服",
+        "notes": null,
+        "created_by": "李护士",
+        "created_at": "2026-05-17 16:47:11.617009"
+      }
+    ],
+    "current_version": 1,
+    "is_active": true,
+    "created_at": "2026-05-17 16:47:11.617031"
+  },
+  "PLAN-294acb9a": {
+    "plan_id": "PLAN-294acb9a",
+    "order_id": "ORD-451474ee",
+    "pet_id": "PET-aecc3a6d",
+    "start_date": "2026-05-17",
+    "end_date": null,
+    "dosage_versions": [
+      {
+        "version": 1,
+        "medication_name": "阿莫西林",
+        "dosage_amount": "500",
+        "dosage_unit": "mg",
+        "frequency": "twice_daily",
+        "route": "口服",
+        "notes": null,
+        "created_by": "李护士",
+        "created_at": "2026-05-17 16:47:22.195962"
+      },
+      {
+        "version": 2,
+        "medication_name": "阿莫西林",
+        "dosage_amount": "250",
+        "dosage_unit": "mg",
+        "frequency": "twice_daily",
+        "route": "口服",
+        "notes": null,
+        "created_by": "张店长",
+        "created_at": "2026-05-17 16:47:22.195962"
+      }
+    ],
+    "current_version": 2,
+    "is_active": true,
+    "created_at": "2026-05-17 16:47:22.195990"
+  }
+}

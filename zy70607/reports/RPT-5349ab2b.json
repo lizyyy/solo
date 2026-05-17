@@ -1,0 +1,102 @@
+{
+  "report_id": "RPT-5349ab2b",
+  "order_id": "ORD-f57fc5fa",
+  "pet_id": "PET-2e57fb6b",
+  "start_date": "2026-05-14",
+  "end_date": "2026-05-18",
+  "generated_at": "2026-05-17 16:45:38.814963",
+  "items": [
+    {
+      "date": "2026-05-14",
+      "shift": "morning",
+      "pet_name": "旺财",
+      "medication": "阿莫西林",
+      "dosage": "1",
+      "status": "administered",
+      "administered_by": "早班护士",
+      "notes": "第1天早班喂药",
+      "has_change": false,
+      "change_info": null
+    },
+    {
+      "date": "2026-05-14",
+      "shift": "evening",
+      "pet_name": "旺财",
+      "medication": "阿莫西林",
+      "dosage": "1",
+      "status": "administered",
+      "administered_by": "晚班护士",
+      "notes": null,
+      "has_change": false,
+      "change_info": null
+    },
+    {
+      "date": "2026-05-15",
+      "shift": "morning",
+      "pet_name": "旺财",
+      "medication": "阿莫西林",
+      "dosage": "1",
+      "status": "administered",
+      "administered_by": "早班护士",
+      "notes": "第2天早班喂药",
+      "has_change": false,
+      "change_info": null
+    },
+    {
+      "date": "2026-05-15",
+      "shift": "evening",
+      "pet_name": "旺财",
+      "medication": "阿莫西林",
+      "dosage": "1",
+      "status": "administered",
+      "administered_by": "晚班护士",
+      "notes": null,
+      "has_change": false,
+      "change_info": null
+    },
+    {
+      "date": "2026-05-16",
+      "shift": "morning",
+      "pet_name": "旺财",
+      "medication": "阿莫西林",
+      "dosage": "1",
+      "status": "administered",
+      "administered_by": "早班护士",
+      "notes": "第3天早班喂药",
+      "has_change": false,
+      "change_info": null
+    },
+    {
+      "date": "2026-05-16",
+      "shift": "evening",
+      "pet_name": "旺财",
+      "medication": "阿莫西林",
+      "dosage": "1",
+      "status": "administered",
+      "administered_by": "晚班护士",
+      "notes": null,
+      "has_change": false,
+      "change_info": null
+    },
+    {
+      "date": "2026-05-17",
+      "shift": "morning",
+      "pet_name": "旺财",
+      "medication": "阿莫西林",
+      "dosage": "2",
+      "status": "administered",
+      "administered_by": "早班护士",
+      "notes": "按新剂量执行",
+      "has_change": false,
+      "change_info": null
+    }
+  ],
+  "alerts": [
+    "漏喂告警: 旺财 2026-05-17 evening 班次未喂药",
+    "漏喂告警: 旺财 2026-05-18 morning 班次未喂药",
+    "漏喂告警: 旺财 2026-05-18 evening 班次未喂药"
+  ],
+  "summary": {
+    "administered": 7
+  }
+}
