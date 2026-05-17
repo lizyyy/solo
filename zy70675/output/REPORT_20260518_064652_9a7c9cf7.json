@@ -1,0 +1,220 @@
+{
+  "report_id": "REPORT_20260518_064652_9a7c9cf7",
+  "generated_at": "2026-05-18T06:46:52.938960",
+  "total_records": 7,
+  "valid_records": 5,
+  "invalid_records": 9,
+  "total_base_amount": 202650.0,
+  "total_discount_amount": 20265.0,
+  "total_final_amount": 182385.0,
+  "results": [
+    {
+      "customer_id": "C001",
+      "customer_name": "重复ID客户",
+      "warehouse_location": "A-01-01",
+      "volume": 100.0,
+      "raw_occupancy_days": 30,
+      "checkout_truncated_days": 0,
+      "effective_occupancy_days": 30,
+      "free_rent_days_applied": 7,
+      "billable_days": 23,
+      "volume_tier_price": 3.0,
+      "days_discount_rate": 0.9,
+      "daily_rate": 2.7,
+      "base_amount": 6900.0,
+      "discount_amount": 690.0,
+      "final_amount": 6210.0,
+      "calculation_details": {
+        "volume_tier_matching": "体积100.0m³匹配单价3.0元/m³/天",
+        "days_tier_matching": "天数30天匹配折扣率90.0%",
+        "truncation_logic": "原始天数30天，退仓截断减免0天",
+        "free_rent_logic": "有效天数30天，免租减免7天",
+        "final_billable_days": "最终计费天数23天"
+      },
+      "warnings": [
+        "正常减免免租期7天"
+      ]
+    },
+    {
+      "customer_id": "C001",
+      "customer_name": "重复ID客户2号",
+      "warehouse_location": "B-02-02",
+      "volume": 150.0,
+      "raw_occupancy_days": 45,
+      "checkout_truncated_days": 0,
+      "effective_occupancy_days": 45,
+      "free_rent_days_applied": 10,
+      "billable_days": 35,
+      "volume_tier_price": 3.0,
+      "days_discount_rate": 0.9,
+      "daily_rate": 2.7,
+      "base_amount": 15750.0,
+      "discount_amount": 1575.0,
+      "final_amount": 14175.0,
+      "calculation_details": {
+        "volume_tier_matching": "体积150.0m³匹配单价3.0元/m³/天",
+        "days_tier_matching": "天数45天匹配折扣率90.0%",
+        "truncation_logic": "原始天数45天，退仓截断减免0天",
+        "free_rent_logic": "有效天数45天，免租减免10天",
+        "final_billable_days": "最终计费天数35天"
+      },
+      "warnings": [
+        "正常减免免租期10天"
+      ]
+    },
+    {
+      "customer_id": "C002",
+      "customer_name": "免租超长客户",
+      "warehouse_location": "C-03-03",
+      "volume": 50.0,
+      "raw_occupancy_days": 30,
+      "checkout_truncated_days": 0,
+      "effective_occupancy_days": 30,
+      "free_rent_days_applied": 30,
+      "billable_days": 0,
+      "volume_tier_price": 3.0,
+      "days_discount_rate": 0.9,
+      "daily_rate": 2.7,
+      "base_amount": 0.0,
+      "discount_amount": 0.0,
+      "final_amount": 0.0,
+      "calculation_details": {
+        "volume_tier_matching": "体积50.0m³匹配单价3.0元/m³/天",
+        "days_tier_matching": "天数30天匹配折扣率90.0%",
+        "truncation_logic": "原始天数30天，退仓截断减免0天",
+        "free_rent_logic": "有效天数30天，免租减免30天",
+        "final_billable_days": "最终计费天数0天"
+      },
+      "warnings": [
+        "约定免租90天超过实际占用30天，仅减免30天",
+        "计费天数为0，全部被免租覆盖"
+      ]
+    },
+    {
+      "customer_id": "C003",
+      "customer_name": "超大体积客户",
+      "warehouse_location": "D-04-04",
+      "volume": 2000.0,
+      "raw_occupancy_days": 60,
+      "checkout_truncated_days": 0,
+      "effective_occupancy_days": 60,
+      "free_rent_days_applied": 15,
+      "billable_days": 45,
+      "volume_tier_price": 2.0,
+      "days_discount_rate": 0.9,
+      "daily_rate": 1.8,
+      "base_amount": 180000.0,
+      "discount_amount": 18000.0,
+      "final_amount": 162000.0,
+      "calculation_details": {
+        "volume_tier_matching": "体积2000.0m³匹配单价2.0元/m³/天",
+        "days_tier_matching": "天数60天匹配折扣率90.0%",
+        "truncation_logic": "原始天数60天，退仓截断减免0天",
+        "free_rent_logic": "有效天数60天，免租减免15天",
+        "final_billable_days": "最终计费天数45天"
+      },
+      "warnings": [
+        "正常减免免租期15天"
+      ]
+    },
+    {
+      "customer_id": "C004",
+      "customer_name": "免租超过天数客户",
+      "warehouse_location": "E-05-05",
+      "volume": 80.0,
+      "raw_occupancy_days": 10,
+      "checkout_truncated_days": 0,
+      "effective_occupancy_days": 10,
+      "free_rent_days_applied": 10,
+      "billable_days": 0,
+      "volume_tier_price": 3.0,
+      "days_discount_rate": 0.95,
+      "daily_rate": 2.85,
+      "base_amount": 0.0,
+      "discount_amount": 0.0,
+      "final_amount": 0.0,
+      "calculation_details": {
+        "volume_tier_matching": "体积80.0m³匹配单价3.0元/m³/天",
+        "days_tier_matching": "天数10天匹配折扣率95.0%",
+        "truncation_logic": "原始天数10天，退仓截断减免0天",
+        "free_rent_logic": "有效天数10天，免租减免10天",
+        "final_billable_days": "最终计费天数0天"
+      },
+      "warnings": [
+        "约定免租20天超过实际占用10天，仅减免10天",
+        "计费天数为0，全部被免租覆盖"
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "row_number": 6,
+      "field": "volume",
+      "error_type": "greater_than",
+      "message": "Input should be greater than 0",
+      "value": -5
+    },
+    {
+      "row_number": 6,
+      "field": "occupancy_days",
+      "error_type": "greater_than",
+      "message": "Input should be greater than 0",
+      "value": 0
+    },
+    {
+      "row_number": 7,
+      "field": "occupancy_days",
+      "error_type": "greater_than",
+      "message": "Input should be greater than 0",
+      "value": -10
+    },
+    {
+      "row_number": 7,
+      "field": "checkout_date",
+      "error_type": "value_error",
+      "message": "Value error, 退仓日期不能早于入仓日期",
+      "value": "2024-04-01T00:00:00"
+    },
+    {
+      "row_number": 2,
+      "field": "customer_id",
+      "error_type": "duplicate",
+      "message": "客户ID重复，首次出现于第1行",
+      "value": "C001"
+    },
+    {
+      "row_number": 4,
+      "field": "volume",
+      "error_type": "outlier",
+      "message": "体积2000.0m³超过预警阈值1000.0m³，请核实",
+      "value": 2000.0
+    },
+    {
+      "row_number": 3,
+      "field": "free_rent_days",
+      "error_type": "anomaly",
+      "message": "免租天数90天超过最大预警值60天，请核实",
+      "value": 90
+    },
+    {
+      "row_number": 3,
+      "field": "free_rent_days",
+      "error_type": "logic_conflict",
+      "message": "免租天数90天超过实际占用天数30天",
+      "value": 90
+    },
+    {
+      "row_number": 5,
+      "field": "free_rent_days",
+      "error_type": "logic_conflict",
+      "message": "免租天数20天超过实际占用天数10天",
+      "value": 20
+    }
+  ],
+  "summary_stats": {
+    "avg_volume": 476.0,
+    "avg_days": 35.0,
+    "truncation_count": 0,
+    "free_rent_count": 5
+  }
+}

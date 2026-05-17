@@ -1,0 +1,67 @@
+[
+  {
+    "customer_id": "C001",
+    "customer_name": "重复ID客户",
+    "warehouse_location": "A-01-01",
+    "volume": 100,
+    "occupancy_days": 30,
+    "free_rent_days": 7,
+    "is_checked_out": false
+  },
+  {
+    "customer_id": "C001",
+    "customer_name": "重复ID客户2号",
+    "warehouse_location": "B-02-02",
+    "volume": 150,
+    "occupancy_days": 45,
+    "free_rent_days": 10,
+    "is_checked_out": false
+  },
+  {
+    "customer_id": "C002",
+    "customer_name": "免租超长客户",
+    "warehouse_location": "C-03-03",
+    "volume": 50,
+    "occupancy_days": 30,
+    "free_rent_days": 90,
+    "is_checked_out": false
+  },
+  {
+    "customer_id": "C003",
+    "customer_name": "超大体积客户",
+    "warehouse_location": "D-04-04",
+    "volume": 2000,
+    "occupancy_days": 60,
+    "free_rent_days": 15,
+    "is_checked_out": false
+  },
+  {
+    "customer_id": "C004",
+    "customer_name": "免租超过天数客户",
+    "warehouse_location": "E-05-05",
+    "volume": 80,
+    "occupancy_days": 10,
+    "free_rent_days": 20,
+    "is_checked_out": false
+  },
+  {
+    "customer_id": "",
+    "customer_name": "空ID客户",
+    "warehouse_location": "F-06-06",
+    "volume": -5,
+    "occupancy_days": 0,
+    "free_rent_days": 5,
+    "is_checked_out": false
+  },
+  {
+    "customer_id": "C005",
+    "customer_name": "日期冲突客户",
+    "warehouse_location": "G-07-07",
+    "volume": 100,
+    "occupancy_days": -10,
+    "checkin_date": "2024-04-15T00:00:00",
+    "checkout_date": "2024-04-01T00:00:00",
+    "free_rent_days": 5,
+    "is_checked_out": true
+  }
+]

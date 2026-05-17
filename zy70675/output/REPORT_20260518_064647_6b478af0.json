@@ -1,0 +1,157 @@
+{
+  "report_id": "REPORT_20260518_064647_6b478af0",
+  "generated_at": "2026-05-18T06:46:47.988816",
+  "total_records": 5,
+  "valid_records": 5,
+  "invalid_records": 0,
+  "total_base_amount": 188595.0,
+  "total_discount_amount": 27290.25,
+  "total_final_amount": 161304.75,
+  "results": [
+    {
+      "customer_id": "C001",
+      "customer_name": "北京商贸有限公司",
+      "warehouse_location": "A-01-01",
+      "volume": 120.0,
+      "raw_occupancy_days": 45,
+      "checkout_truncated_days": 1,
+      "effective_occupancy_days": 44,
+      "free_rent_days_applied": 7,
+      "billable_days": 37,
+      "volume_tier_price": 3.0,
+      "days_discount_rate": 0.9,
+      "daily_rate": 2.7,
+      "base_amount": 13320.0,
+      "discount_amount": 1332.0,
+      "final_amount": 11988.0,
+      "calculation_details": {
+        "volume_tier_matching": "体积120.0m³匹配单价3.0元/m³/天",
+        "days_tier_matching": "天数44天匹配折扣率90.0%",
+        "truncation_logic": "原始天数45天，退仓截断减免1天",
+        "free_rent_logic": "有效天数44天，免租减免7天",
+        "final_billable_days": "最终计费天数37天"
+      },
+      "warnings": [
+        "退仓时间10:00早于截断时间12:00，减免1天",
+        "正常减免免租期7天"
+      ]
+    },
+    {
+      "customer_id": "C002",
+      "customer_name": "上海物流科技公司",
+      "warehouse_location": "B-02-05",
+      "volume": 350.0,
+      "raw_occupancy_days": 90,
+      "checkout_truncated_days": 0,
+      "effective_occupancy_days": 90,
+      "free_rent_days_applied": 15,
+      "billable_days": 75,
+      "volume_tier_price": 2.5,
+      "days_discount_rate": 0.85,
+      "daily_rate": 2.125,
+      "base_amount": 65625.0,
+      "discount_amount": 9843.75,
+      "final_amount": 55781.25,
+      "calculation_details": {
+        "volume_tier_matching": "体积350.0m³匹配单价2.5元/m³/天",
+        "days_tier_matching": "天数90天匹配折扣率85.0%",
+        "truncation_logic": "原始天数90天，退仓截断减免0天",
+        "free_rent_logic": "有效天数90天，免租减免15天",
+        "final_billable_days": "最终计费天数75天"
+      },
+      "warnings": [
+        "退仓时间15:00晚于截断时间12:00，正常计费",
+        "正常减免免租期15天"
+      ]
+    },
+    {
+      "customer_id": "C003",
+      "customer_name": "广州电子有限公司",
+      "warehouse_location": "C-01-10",
+      "volume": 45.0,
+      "raw_occupancy_days": 15,
+      "checkout_truncated_days": 0,
+      "effective_occupancy_days": 15,
+      "free_rent_days_applied": 3,
+      "billable_days": 12,
+      "volume_tier_price": 3.5,
+      "days_discount_rate": 0.95,
+      "daily_rate": 3.325,
+      "base_amount": 1890.0,
+      "discount_amount": 94.5,
+      "final_amount": 1795.5,
+      "calculation_details": {
+        "volume_tier_matching": "体积45.0m³匹配单价3.5元/m³/天",
+        "days_tier_matching": "天数15天匹配折扣率95.0%",
+        "truncation_logic": "原始天数15天，退仓截断减免0天",
+        "free_rent_logic": "有效天数15天，免租减免3天",
+        "final_billable_days": "最终计费天数12天"
+      },
+      "warnings": [
+        "正常减免免租期3天"
+      ]
+    },
+    {
+      "customer_id": "C004",
+      "customer_name": "深圳食品供应链",
+      "warehouse_location": "A-03-02",
+      "volume": 600.0,
+      "raw_occupancy_days": 120,
+      "checkout_truncated_days": 1,
+      "effective_occupancy_days": 119,
+      "free_rent_days_applied": 30,
+      "billable_days": 89,
+      "volume_tier_price": 2.0,
+      "days_discount_rate": 0.85,
+      "daily_rate": 1.7,
+      "base_amount": 106800.0,
+      "discount_amount": 16020.0,
+      "final_amount": 90780.0,
+      "calculation_details": {
+        "volume_tier_matching": "体积600.0m³匹配单价2.0元/m³/天",
+        "days_tier_matching": "天数119天匹配折扣率85.0%",
+        "truncation_logic": "原始天数120天，退仓截断减免1天",
+        "free_rent_logic": "有效天数119天，免租减免30天",
+        "final_billable_days": "最终计费天数89天"
+      },
+      "warnings": [
+        "退仓时间8:00早于截断时间12:00，减免1天",
+        "正常减免免租期30天"
+      ]
+    },
+    {
+      "customer_id": "C005",
+      "customer_name": "杭州服装贸易",
+      "warehouse_location": "B-01-08",
+      "volume": 80.0,
+      "raw_occupancy_days": 5,
+      "checkout_truncated_days": 1,
+      "effective_occupancy_days": 4,
+      "free_rent_days_applied": 0,
+      "billable_days": 4,
+      "volume_tier_price": 3.0,
+      "days_discount_rate": 1.0,
+      "daily_rate": 3.0,
+      "base_amount": 960.0,
+      "discount_amount": 0.0,
+      "final_amount": 960.0,
+      "calculation_details": {
+        "volume_tier_matching": "体积80.0m³匹配单价3.0元/m³/天",
+        "days_tier_matching": "天数4天匹配折扣率100.0%",
+        "truncation_logic": "原始天数5天，退仓截断减免1天",
+        "free_rent_logic": "有效天数4天，免租减免0天",
+        "final_billable_days": "最终计费天数4天"
+      },
+      "warnings": [
+        "退仓时间6:00早于截断时间12:00，减免1天"
+      ]
+    }
+  ],
+  "errors": [],
+  "summary_stats": {
+    "avg_volume": 239.0,
+    "avg_days": 54.4,
+    "truncation_count": 3,
+    "free_rent_count": 4
+  }
+}

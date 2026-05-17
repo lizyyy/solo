@@ -1,0 +1,62 @@
+[
+  {
+    "customer_id": "C001",
+    "customer_name": "北京商贸有限公司",
+    "warehouse_location": "A-01-01",
+    "volume": 120,
+    "occupancy_days": 45,
+    "checkin_date": "2024-03-01T09:00:00",
+    "checkout_date": "2024-04-15T10:30:00",
+    "free_rent_days": 7,
+    "is_checked_out": true,
+    "notes": "常规客户"
+  },
+  {
+    "customer_id": "C002",
+    "customer_name": "上海物流科技公司",
+    "warehouse_location": "B-02-05",
+    "volume": 350,
+    "occupancy_days": 90,
+    "checkin_date": "2024-01-01T08:00:00",
+    "checkout_date": "2024-04-01T15:00:00",
+    "free_rent_days": 15,
+    "is_checked_out": true,
+    "notes": "VIP客户，享超长免租"
+  },
+  {
+    "customer_id": "C003",
+    "customer_name": "广州电子有限公司",
+    "warehouse_location": "C-01-10",
+    "volume": 45,
+    "occupancy_days": 15,
+    "checkin_date": "2024-04-01T10:00:00",
+    "checkout_date": null,
+    "free_rent_days": 3,
+    "is_checked_out": false,
+    "notes": "在仓客户"
+  },
+  {
+    "customer_id": "C004",
+    "customer_name": "深圳食品供应链",
+    "warehouse_location": "A-03-02",
+    "volume": 600,
+    "occupancy_days": 120,
+    "checkin_date": "2024-01-01T00:00:00",
+    "checkout_date": "2024-05-01T08:00:00",
+    "free_rent_days": 30,
+    "is_checked_out": true,
+    "notes": "大客户协议价"
+  },
+  {
+    "customer_id": "C005",
+    "customer_name": "杭州服装贸易",
+    "warehouse_location": "B-01-08",
+    "volume": 80,
+    "occupancy_days": 5,
+    "checkin_date": "2024-04-10T09:00:00",
+    "checkout_date": "2024-04-15T06:00:00",
+    "free_rent_days": 0,
+    "is_checked_out": true,
+    "notes": "短租客户，早于12点退仓"
+  }
+]
