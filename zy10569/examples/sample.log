@@ -1,0 +1,12 @@
+{"timestamp":"2024-01-15T10:30:45.123Z","method":"POST","path":"/api/users/login","statusCode":500,"errorType":"InternalServerError","errorMessage":"Database connection timeout","requestBody":"{\"email\":\"user@example.com\",\"password\":\"secret123\"}","traceId":"abc-123-def-456","duration":5000}
+{"timestamp":"2024-01-15T10:30:46.456Z","method":"POST","path":"/api/users/login","statusCode":500,"errorType":"InternalServerError","errorMessage":"Database connection timeout","requestBody":"{\"email\":\"test@example.com\",\"password\":\"mypassword\"}","traceId":"xyz-789-uvw-012","duration":4800}
+{"timestamp":"2024-01-15T10:30:47.789Z","method":"GET","path":"/api/users/12345","statusCode":404,"errorType":"NotFoundError","errorMessage":"User not found","traceId":"aaa-bbb-ccc-ddd","duration":150}
+{"timestamp":"2024-01-15T10:30:48.012Z","method":"GET","path":"/api/users/67890","statusCode":404,"errorType":"NotFoundError","errorMessage":"User not found","traceId":"eee-fff-ggg-hhh","duration":120}
+{"timestamp":"2024-01-15T10:30:49.345Z","method":"POST","path":"/api/orders","statusCode":400,"errorType":"ValidationError","errorMessage":"Invalid order data: missing required field 'items'","requestBody":"{\"userId\":\"user-001\",\"total\":99.99}","traceId":"111-222-333-444","duration":80}
+{"timestamp":"2024-01-15T10:30:50.678Z","method":"POST","path":"/api/orders","statusCode":400,"errorType":"ValidationError","errorMessage":"Invalid order data: missing required field 'items'","requestBody":"{\"userId\":\"user-002\",\"total\":199.99}","traceId":"555-666-777-888","duration":95}
+{"timestamp":"2024-01-15T10:30:51.901Z","method":"GET","path":"/api/products/999","statusCode":200,"traceId":"success-123","duration":50}
+2024-01-15T10:30:52.000Z "GET /api/health HTTP/1.1" 200 10
+[2024-01-15T10:30:53.000Z] ERROR /api/payment: Payment gateway timeout occurred
+这是一行无法解析的日志格式
+{"invalid-json": true, missing-end
+{"timestamp":"2024-01-15T10:30:55.000Z","method":"DELETE","path":"/api/cart/items/555","statusCode":401,"errorType":"UnauthorizedError","errorMessage":"Invalid authorization token","userId":"user-007","traceId":"auth-err-001","duration":30}

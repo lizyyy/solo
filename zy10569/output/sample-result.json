@@ -1,0 +1,196 @@
+{
+  "summary": {
+    "totalLines": 13,
+    "validEntries": 10,
+    "invalidEntries": 3,
+    "totalErrors": 8,
+    "uniqueErrorGroups": 5
+  },
+  "errorGroups": [
+    {
+      "path": "/api/users/login",
+      "method": "POST",
+      "statusCode": 500,
+      "errorType": "InternalServerError",
+      "count": 2,
+      "samples": [
+        {
+          "id": "454de58532a75563",
+          "path": "/api/users/login",
+          "method": "POST",
+          "statusCode": 500,
+          "errorType": "InternalServerError",
+          "errorMessage": "Database connection timeout",
+          "timestamp": "2024-01-15T10:30:45.123Z",
+          "traceId": "abc-123-def-456",
+          "requestBody": "{\"email\":\"user@example.com\",\"password\":\"***MASKED***\"}",
+          "duration": 5000,
+          "originalLine": 1,
+          "originalRaw": "{\"timestamp\":\"2024-01-15T10:30:45.123Z\",\"method\":\"POST\",\"path\":\"/api/users/login\",\"statusCode\":500,\"errorType\":\"InternalServerError\",\"errorMessage\":\"Database connection timeout\",\"requestBody\":\"{\\\"email\\\":\\\"user@example.com\\\",\\\"password\\\":\\\"secret123\\\"}\",\"traceId\":\"abc-123-def-456\",\"duration\":5000}"
+        },
+        {
+          "id": "f7bd9262fa1cfa81",
+          "path": "/api/users/login",
+          "method": "POST",
+          "statusCode": 500,
+          "errorType": "InternalServerError",
+          "errorMessage": "Database connection timeout",
+          "timestamp": "2024-01-15T10:30:46.456Z",
+          "traceId": "xyz-789-uvw-012",
+          "requestBody": "{\"email\":\"test@example.com\",\"password\":\"***MASKED***\"}",
+          "duration": 4800,
+          "originalLine": 2,
+          "originalRaw": "{\"timestamp\":\"2024-01-15T10:30:46.456Z\",\"method\":\"POST\",\"path\":\"/api/users/login\",\"statusCode\":500,\"errorType\":\"InternalServerError\",\"errorMessage\":\"Database connection timeout\",\"requestBody\":\"{\\\"email\\\":\\\"test@example.com\\\",\\\"password\\\":\\\"mypassword\\\"}\",\"traceId\":\"xyz-789-uvw-012\",\"duration\":4800}"
+        }
+      ]
+    },
+    {
+      "path": "/api/users/{id}",
+      "method": "GET",
+      "statusCode": 404,
+      "errorType": "NotFoundError",
+      "count": 2,
+      "samples": [
+        {
+          "id": "eed386537b9853a3",
+          "path": "/api/users/12345",
+          "method": "GET",
+          "statusCode": 404,
+          "errorType": "NotFoundError",
+          "errorMessage": "User not found",
+          "timestamp": "2024-01-15T10:30:47.789Z",
+          "traceId": "aaa-bbb-ccc-ddd",
+          "duration": 150,
+          "originalLine": 3,
+          "originalRaw": "{\"timestamp\":\"2024-01-15T10:30:47.789Z\",\"method\":\"GET\",\"path\":\"/api/users/12345\",\"statusCode\":404,\"errorType\":\"NotFoundError\",\"errorMessage\":\"User not found\",\"traceId\":\"aaa-bbb-ccc-ddd\",\"duration\":150}"
+        },
+        {
+          "id": "327770ba3a3b4ae2",
+          "path": "/api/users/67890",
+          "method": "GET",
+          "statusCode": 404,
+          "errorType": "NotFoundError",
+          "errorMessage": "User not found",
+          "timestamp": "2024-01-15T10:30:48.012Z",
+          "traceId": "eee-fff-ggg-hhh",
+          "duration": 120,
+          "originalLine": 4,
+          "originalRaw": "{\"timestamp\":\"2024-01-15T10:30:48.012Z\",\"method\":\"GET\",\"path\":\"/api/users/67890\",\"statusCode\":404,\"errorType\":\"NotFoundError\",\"errorMessage\":\"User not found\",\"traceId\":\"eee-fff-ggg-hhh\",\"duration\":120}"
+        }
+      ]
+    },
+    {
+      "path": "/api/orders",
+      "method": "POST",
+      "statusCode": 400,
+      "errorType": "ValidationError",
+      "count": 2,
+      "samples": [
+        {
+          "id": "2ad2dc153091c1a6",
+          "path": "/api/orders",
+          "method": "POST",
+          "statusCode": 400,
+          "errorType": "ValidationError",
+          "errorMessage": "Invalid order data: missing required field 'items'",
+          "timestamp": "2024-01-15T10:30:49.345Z",
+          "traceId": "111-222-333-444",
+          "requestBody": "{\"userId\":\"user-001\",\"total\":99.99}",
+          "duration": 80,
+          "originalLine": 5,
+          "originalRaw": "{\"timestamp\":\"2024-01-15T10:30:49.345Z\",\"method\":\"POST\",\"path\":\"/api/orders\",\"statusCode\":400,\"errorType\":\"ValidationError\",\"errorMessage\":\"Invalid order data: missing required field 'items'\",\"requestBody\":\"{\\\"userId\\\":\\\"user-001\\\",\\\"total\\\":99.99}\",\"traceId\":\"111-222-333-444\",\"duration\":80}"
+        },
+        {
+          "id": "f4a9ea2037081595",
+          "path": "/api/orders",
+          "method": "POST",
+          "statusCode": 400,
+          "errorType": "ValidationError",
+          "errorMessage": "Invalid order data: missing required field 'items'",
+          "timestamp": "2024-01-15T10:30:50.678Z",
+          "traceId": "555-666-777-888",
+          "requestBody": "{\"userId\":\"user-002\",\"total\":199.99}",
+          "duration": 95,
+          "originalLine": 6,
+          "originalRaw": "{\"timestamp\":\"2024-01-15T10:30:50.678Z\",\"method\":\"POST\",\"path\":\"/api/orders\",\"statusCode\":400,\"errorType\":\"ValidationError\",\"errorMessage\":\"Invalid order data: missing required field 'items'\",\"requestBody\":\"{\\\"userId\\\":\\\"user-002\\\",\\\"total\\\":199.99}\",\"traceId\":\"555-666-777-888\",\"duration\":95}"
+        }
+      ]
+    },
+    {
+      "path": "/api/payment",
+      "method": "UNKNOWN",
+      "statusCode": 0,
+      "errorType": "ERROR",
+      "count": 1,
+      "samples": [
+        {
+          "id": "f9ec1f55e2a3d66a",
+          "path": "/api/payment",
+          "method": "UNKNOWN",
+          "statusCode": 0,
+          "errorType": "ERROR",
+          "errorMessage": "Payment gateway timeout occurred",
+          "timestamp": "2024-01-15T10:30:53.000Z",
+          "traceId": "unknown",
+          "originalLine": 9,
+          "originalRaw": "[2024-01-15T10:30:53.000Z] ERROR /api/payment: Payment gateway timeout occurred"
+        }
+      ]
+    },
+    {
+      "path": "/api/cart/items/{id}",
+      "method": "DELETE",
+      "statusCode": 401,
+      "errorType": "UnauthorizedError",
+      "count": 1,
+      "samples": [
+        {
+          "id": "ba700ce753eb9a7e",
+          "path": "/api/cart/items/555",
+          "method": "DELETE",
+          "statusCode": 401,
+          "errorType": "UnauthorizedError",
+          "errorMessage": "Invalid authorization token",
+          "timestamp": "2024-01-15T10:30:55.000Z",
+          "traceId": "auth-err-001",
+          "userId": "user-007",
+          "duration": 30,
+          "originalLine": 12,
+          "originalRaw": "{\"timestamp\":\"2024-01-15T10:30:55.000Z\",\"method\":\"DELETE\",\"path\":\"/api/cart/items/555\",\"statusCode\":401,\"errorType\":\"UnauthorizedError\",\"errorMessage\":\"Invalid authorization token\",\"userId\":\"user-007\",\"traceId\":\"auth-err-001\",\"duration\":30}"
+        }
+      ]
+    }
+  ],
+  "invalidEntries": [
+    {
+      "raw": "这是一行无法解析的日志格式",
+      "lineNumber": 10,
+      "isValid": false,
+      "parseError": "未匹配到任何日志格式"
+    },
+    {
+      "raw": "{\"invalid-json\": true, missing-end",
+      "lineNumber": 11,
+      "isValid": false,
+      "parseError": "未匹配到任何日志格式"
+    },
+    {
+      "raw": "",
+      "lineNumber": 13,
+      "isValid": false,
+      "parseError": "空行"
+    }
+  ],
+  "config": {
+    "maxSamplesPerGroup": 3,
+    "includeRequest": true,
+    "includeResponse": true,
+    "sensitiveFields": [
+      "password",
+      "token",
+      "secret",
+      "authorization"
+    ]
+  },
+  "generatedAt": "2026-05-17T16:07:54.428Z"
+}

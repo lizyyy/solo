@@ -1,0 +1,33 @@
+{
+  "name": "api-error-sampler",
+  "version": "1.0.0",
+  "description": "API错误样本采集CLI工具",
+  "main": "dist/cli.js",
+  "bin": {
+    "api-error-sampler": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/cli.ts",
+    "dev": "ts-node src/cli.ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "api",
+    "error",
+    "log",
+    "sampler",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
