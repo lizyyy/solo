@@ -278,12 +278,22 @@ curl -X POST "http://localhost:8000/api/boxes/BOX-TEST-001/status" \
 # 正常温度 → 状态不变
 curl -X POST "http://localhost:8000/api/temperature/" \
   -H "Content-Type: application/json" \
-  -d '{"box_code": "BOX-TEST-001", "temperature": -20.0}'
+  -d '{
+    "box_code": "BOX-TEST-001",
+    "sample_time": "2024-01-15T14:30:00",
+    "temperature": -20.0,
+    "probe_id": "PROBE-001"
+  }'
 
 # 异常温度 → 自动转为 EXCEPTION 状态
 curl -X POST "http://localhost:8000/api/temperature/" \
   -H "Content-Type: application/json" \
-  -d '{"box_code": "BOX-TEST-001", "temperature": -5.0}'
+  -d '{
+    "box_code": "BOX-TEST-001",
+    "sample_time": "2024-01-15T15:00:00",
+    "temperature": -5.0,
+    "probe_id": "PROBE-001"
+  }'
 ```
 
 ### 4. 人工修正旧值不匹配
@@ -295,7 +305,8 @@ curl -X POST "http://localhost:8000/api/boxes/BOX-TEST-001/correction" \
     "field_name": "product_name",
     "old_value": "错误的旧值",
     "new_value": "新名称",
-    "operator": "管理员"
+    "operator": "管理员",
+    "reason": "修正产品信息"
   }'
 ```
 
