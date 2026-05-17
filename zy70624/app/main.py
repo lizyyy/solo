@@ -9,7 +9,7 @@ from sqlalchemy import and_
 
 from app.database import get_db, engine, Base
 from app.models import (
-    CustomerDemand, AuntProfile, TrialSchedule, Deposit, Review, Conversion,
+    CustomerDemand, AuntProfile, TrialSchedule, Deposit, Review, Conversion, AuditLog,
     TrialScheduleStatus, DepositStatus, ReviewStatus, ConversionStatus
 )
 from app.schemas import (
