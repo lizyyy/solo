@@ -1,0 +1,257 @@
+{
+  "report_id": "c34fa16d-8e15-4ca5-8f7e-f8cf5fe1875e",
+  "generated_at": "2026-05-17T19:19:58.113606",
+  "validation_result": {
+    "total_records": 9,
+    "valid_records": 9,
+    "invalid_records": 0,
+    "rejected_records": 6,
+    "pending_approval": 7,
+    "barcode_duplicates": [
+      "S001",
+      "S003"
+    ],
+    "time_expired": [
+      "S003",
+      "S007"
+    ],
+    "error_details": {
+      "batch01.csv:2": [
+        "条码重复: 该条码在 2 条记录中出现"
+      ],
+      "batch01.csv:4": [
+        "条码重复: 该条码在 2 条记录中出现",
+        "接收超时: 采样到接收间隔 26.0 小时"
+      ],
+      "batch01.csv:5": [
+        "条码重复: 该条码在 2 条记录中出现"
+      ],
+      "batch01.csv:6": [
+        "采样时间缺失"
+      ],
+      "batch02.csv:4": [
+        "条码重复: 该条码在 2 条记录中出现"
+      ],
+      "batch02.csv:5": [
+        "接收超时: 采样到接收间隔 28.0 小时"
+      ]
+    }
+  },
+  "summary": {
+    "by_source": {
+      "batch01.csv": {
+        "total": 5,
+        "valid": 5,
+        "invalid": 0,
+        "rejected": 3,
+        "pending_approval": 4
+      },
+      "batch02.csv": {
+        "total": 4,
+        "valid": 4,
+        "invalid": 0,
+        "rejected": 3,
+        "pending_approval": 3
+      }
+    },
+    "by_rejection_reason": {
+      "条码重复": 3,
+      "超时接收": 2,
+      "样本破损": 1
+    },
+    "by_approval_status": {
+      "待审批": 7,
+      "已批准": 2
+    }
+  },
+  "records": [
+    {
+      "source_file": "batch01.csv",
+      "source_row": 2,
+      "barcode": "S001",
+      "sampling_time": "2026-05-17T14:17:28",
+      "transporter": "张三",
+      "transport_batch": "BATCH001",
+      "receive_time": "2026-05-17T15:17:28",
+      "receive_window": "上午",
+      "is_rejected": true,
+      "rejection_reason": "条码重复",
+      "rejection_note": null,
+      "approval_status": "待审批",
+      "approval_time": null,
+      "approver": null,
+      "is_valid": true,
+      "errors": [
+        "条码重复: 该条码在 2 条记录中出现"
+      ],
+      "warnings": []
+    },
+    {
+      "source_file": "batch01.csv",
+      "source_row": 3,
+      "barcode": "S002",
+      "sampling_time": "2026-05-17T11:17:28",
+      "transporter": "李四",
+      "transport_batch": "BATCH001",
+      "receive_time": "2026-05-17T12:17:28",
+      "receive_window": "上午",
+      "is_rejected": false,
+      "rejection_reason": null,
+      "rejection_note": null,
+      "approval_status": "已批准",
+      "approval_time": "2026-05-17T19:19:51.878292",
+      "approver": "李主任",
+      "is_valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "source_file": "batch01.csv",
+      "source_row": 4,
+      "barcode": "S003",
+      "sampling_time": "2026-05-16T14:17:28",
+      "transporter": "王五",
+      "transport_batch": "BATCH001",
+      "receive_time": "2026-05-17T16:17:28",
+      "receive_window": "下午",
+      "is_rejected": true,
+      "rejection_reason": "超时接收",
+      "rejection_note": null,
+      "approval_status": "待审批",
+      "approval_time": null,
+      "approver": null,
+      "is_valid": true,
+      "errors": [
+        "条码重复: 该条码在 2 条记录中出现",
+        "接收超时: 采样到接收间隔 26.0 小时"
+      ],
+      "warnings": []
+    },
+    {
+      "source_file": "batch01.csv",
+      "source_row": 5,
+      "barcode": "S001",
+      "sampling_time": "2026-05-17T13:17:28",
+      "transporter": "赵六",
+      "transport_batch": "BATCH002",
+      "receive_time": "2026-05-17T14:17:28",
+      "receive_window": "下午",
+      "is_rejected": true,
+      "rejection_reason": "条码重复",
+      "rejection_note": null,
+      "approval_status": "待审批",
+      "approval_time": null,
+      "approver": null,
+      "is_valid": true,
+      "errors": [
+        "条码重复: 该条码在 2 条记录中出现"
+      ],
+      "warnings": []
+    },
+    {
+      "source_file": "batch01.csv",
+      "source_row": 6,
+      "barcode": "S004",
+      "sampling_time": null,
+      "transporter": "钱七",
+      "transport_batch": "BATCH002",
+      "receive_time": "2026-05-17T16:17:28",
+      "receive_window": "下午",
+      "is_rejected": false,
+      "rejection_reason": null,
+      "rejection_note": null,
+      "approval_status": "待审批",
+      "approval_time": null,
+      "approver": null,
+      "is_valid": true,
+      "errors": [
+        "采样时间缺失"
+      ],
+      "warnings": [
+        "无法验证接收时限"
+      ]
+    },
+    {
+      "source_file": "batch02.csv",
+      "source_row": 2,
+      "barcode": "S005",
+      "sampling_time": "2026-05-17T06:17:28",
+      "transporter": "孙八",
+      "transport_batch": "BATCH003",
+      "receive_time": "2026-05-17T07:17:28",
+      "receive_window": null,
+      "is_rejected": false,
+      "rejection_reason": null,
+      "rejection_note": null,
+      "approval_status": "待审批",
+      "approval_time": null,
+      "approver": null,
+      "is_valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "source_file": "batch02.csv",
+      "source_row": 3,
+      "barcode": "S006",
+      "sampling_time": "2026-05-17T14:17:28",
+      "transporter": null,
+      "transport_batch": "BATCH003",
+      "receive_time": "2026-05-17T15:17:28",
+      "receive_window": null,
+      "is_rejected": true,
+      "rejection_reason": "样本破损",
+      "rejection_note": null,
+      "approval_status": "已批准",
+      "approval_time": "2026-05-17T19:19:51.878486",
+      "approver": "李主任",
+      "is_valid": true,
+      "errors": [],
+      "warnings": [
+        "运输人信息缺失"
+      ]
+    },
+    {
+      "source_file": "batch02.csv",
+      "source_row": 4,
+      "barcode": "S003",
+      "sampling_time": "2026-05-17T13:17:28",
+      "transporter": "周九",
+      "transport_batch": "BATCH003",
+      "receive_time": "2026-05-17T14:17:28",
+      "receive_window": null,
+      "is_rejected": true,
+      "rejection_reason": "条码重复",
+      "rejection_note": null,
+      "approval_status": "待审批",
+      "approval_time": null,
+      "approver": null,
+      "is_valid": true,
+      "errors": [
+        "条码重复: 该条码在 2 条记录中出现"
+      ],
+      "warnings": []
+    },
+    {
+      "source_file": "batch02.csv",
+      "source_row": 5,
+      "barcode": "S007",
+      "sampling_time": "2026-05-16T12:17:28",
+      "transporter": "吴十",
+      "transport_batch": "BATCH004",
+      "receive_time": "2026-05-17T16:17:28",
+      "receive_window": null,
+      "is_rejected": true,
+      "rejection_reason": "超时接收",
+      "rejection_note": null,
+      "approval_status": "待审批",
+      "approval_time": null,
+      "approver": null,
+      "is_valid": true,
+      "errors": [
+        "接收超时: 采样到接收间隔 28.0 小时"
+      ],
+      "warnings": []
+    }
+  ]
+}

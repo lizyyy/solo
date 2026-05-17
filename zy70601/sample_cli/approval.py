@@ -51,19 +51,25 @@ class ApprovalManager:
         record.approval_time = datetime.now()
         record.approver = approver
 
+        key = self._get_record_key(record)
+        cached = self.approval_cache.get(key, {})
+
         if override_rejection:
             record.is_rejected = False
+            cached["is_rejected"] = False
             record.warnings.append("审批通过，已解除拒收状态")
         else:
             record.warnings.append("审批通过，确认拒收")
 
-        self.approval_cache[self._get_record_key(record)] = {
-            "status": ApprovalStatus.APPROVED,
+        cached.update({
+            "status": ApprovalStatus.APPROVED.value,
             "approver": approver,
             "approval_time": record.approval_time.isoformat(),
             "approval_note": approval_note,
             "override_rejection": override_rejection
-        }
+        })
+
+        self.approval_cache[key] = cached
         self._save_approvals()
 
         return record
@@ -79,12 +85,16 @@ class ApprovalManager:
         record.approver = approver
         record.warnings.append("审批拒绝，需重新核查")
 
-        self.approval_cache[self._get_record_key(record)] = {
-            "status": ApprovalStatus.REJECTED,
+        key = self._get_record_key(record)
+        cached = self.approval_cache.get(key, {})
+        cached.update({
+            "status": ApprovalStatus.REJECTED.value,
             "approver": approver,
             "approval_time": record.approval_time.isoformat(),
             "rejection_note": rejection_note
-        }
+        })
+
+        self.approval_cache[key] = cached
         self._save_approvals()
 
         return record
@@ -98,25 +108,37 @@ class ApprovalManager:
         rejection_reason: Optional[RejectionReason] = None,
         rejection_note: Optional[str] = None
     ) -> SampleRecord:
+        key = self._get_record_key(record)
+        cached = self.approval_cache.get(key, {})
+
         if sampling_time is not None:
             record.sampling_time = sampling_time
+            cached["sampling_time"] = sampling_time.isoformat()
             record.warnings.append("已补录采样时间")
 
         if transporter is not None:
             record.transporter = transporter
+            cached["transporter"] = transporter
             record.warnings.append("已补录运输人")
 
         if transport_batch is not None:
             record.transport_batch = transport_batch
+            cached["transport_batch"] = transport_batch
             record.warnings.append("已补录运输批次")
 
         if rejection_reason is not None:
             record.rejection_reason = rejection_reason
             record.is_rejected = True
+            cached["rejection_reason"] = rejection_reason.value
+            cached["is_rejected"] = True
             record.warnings.append("已补录拒收原因")
 
         if rejection_note is not None:
             record.rejection_note = rejection_note
+            cached["rejection_note"] = rejection_note
+
+        self.approval_cache[key] = cached
+        self._save_approvals()
 
         return record
 
@@ -136,11 +158,44 @@ class ApprovalManager:
             key = self._get_record_key(record)
             if key in self.approval_cache:
                 cached = self.approval_cache[key]
-                record.approval_status = cached.get("status", ApprovalStatus.PENDING)
+                status_str = cached.get("status")
+                if status_str:
+                    for status in ApprovalStatus:
+                        if status.value == status_str:
+                            record.approval_status = status
+                            break
+                    else:
+                        record.approval_status = ApprovalStatus.PENDING
+                else:
+                    record.approval_status = ApprovalStatus.PENDING
                 record.approver = cached.get("approver")
                 approval_time = cached.get("approval_time")
                 if approval_time:
                     record.approval_time = datetime.fromisoformat(approval_time)
+
+                sampling_time = cached.get("sampling_time")
+                if sampling_time:
+                    record.sampling_time = datetime.fromisoformat(sampling_time)
+
+                transporter = cached.get("transporter")
+                if transporter:
+                    record.transporter = transporter
+
+                transport_batch = cached.get("transport_batch")
+                if transport_batch:
+                    record.transport_batch = transport_batch
+
+                rejection_reason_str = cached.get("rejection_reason")
+                if rejection_reason_str:
+                    for reason in RejectionReason:
+                        if reason.value == rejection_reason_str:
+                            record.rejection_reason = reason
+                            break
+
+                if cached.get("is_rejected"):
+                    record.is_rejected = True
+
+                record.rejection_note = cached.get("rejection_note")
 
         return records
 

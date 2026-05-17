@@ -1,8 +1,18 @@
 {
+  "batch01.csv:3:S002": {
+    "rejection_reason": "单据不全",
+    "is_rejected": true,
+    "rejection_note": "单据缺失",
+    "status": "已批准",
+    "approver": "王主任",
+    "approval_time": "2026-05-17T19:20:46.091213",
+    "approval_note": null,
+    "override_rejection": false
+  },
   "batch02.csv:3:S006": {
     "status": "已批准",
-    "approver": "张主任",
-    "approval_time": "2026-05-17T16:17:52.237499",
+    "approver": "王主任",
+    "approval_time": "2026-05-17T19:20:46.091566",
     "approval_note": null,
     "override_rejection": false
   }

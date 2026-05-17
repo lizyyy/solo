@@ -201,6 +201,80 @@ class SampleHandoverCLI:
         self.approval_manager.batch_approve(pending, approver, override_rejection)
         console.print(f"[green]已批量审批 {len(pending)} 条记录[/green]")
 
+    def _get_record_by_location(self, source_file: str, source_row: int):
+        for record in self.records:
+            if record.source_file == source_file and record.source_row == source_row:
+                return record
+        return None
+
+    def supplement_rejection_reason(self, source_file: str, source_row: int, reason_code: str, note: Optional[str] = None):
+        if not self.approval_manager:
+            console.print("[red]错误: 未指定审批存储路径，请使用 --approval-store 参数[/red]")
+            return
+
+        record = self._get_record_by_location(source_file, source_row)
+        if not record:
+            console.print(f"[red]未找到记录: {source_file}:{source_row}[/red]")
+            return
+
+        reason_map = {
+            "duplicate": RejectionReason.BARCODE_DUPLICATE,
+            "missing": RejectionReason.BARCODE_MISSING,
+            "invalid": RejectionReason.BARCODE_INVALID,
+            "timeout": RejectionReason.TIME_EXPIRED,
+            "time_invalid": RejectionReason.TIME_INVALID,
+            "transporter_missing": RejectionReason.TRANSPORTER_MISSING,
+            "damaged": RejectionReason.SAMPLE_DAMAGED,
+            "leaking": RejectionReason.SAMPLE_LEAKING,
+            "incomplete": RejectionReason.DOCUMENT_INCOMPLETE,
+            "temperature": RejectionReason.TEMPERATURE_ABNORMAL,
+            "other": RejectionReason.OTHER,
+        }
+
+        if reason_code not in reason_map:
+            console.print(f"[red]无效的原因代码，可用代码: {', '.join(reason_map.keys())}[/red]")
+            return
+
+        reason = reason_map[reason_code]
+        self.approval_manager.supplement_record(record, rejection_reason=reason, rejection_note=note)
+        record.approval_status = ApprovalStatus.PENDING
+        record.approval_time = None
+        record.approver = None
+        console.print(f"[green]已补录拒收原因: {record.barcode} -> {reason.value}[/green]")
+
+    def supplement_sampling_time(self, source_file: str, source_row: int, time_str: str):
+        if not self.approval_manager:
+            console.print("[red]错误: 未指定审批存储路径，请使用 --approval-store 参数[/red]")
+            return
+
+        record = self._get_record_by_location(source_file, source_row)
+        if not record:
+            console.print(f"[red]未找到记录: {source_file}:{source_row}[/red]")
+            return
+
+        from dateutil import parser as date_parser
+        try:
+            sampling_time = date_parser.parse(time_str)
+        except Exception as e:
+            console.print(f"[red]时间格式错误: {e}[/red]")
+            return
+
+        self.approval_manager.supplement_record(record, sampling_time=sampling_time)
+        console.print(f"[green]已补录采样时间: {record.barcode} -> {sampling_time.strftime('%Y-%m-%d %H:%M:%S')}[/green]")
+
+    def supplement_transporter(self, source_file: str, source_row: int, transporter: str):
+        if not self.approval_manager:
+            console.print("[red]错误: 未指定审批存储路径，请使用 --approval-store 参数[/red]")
+            return
+
+        record = self._get_record_by_location(source_file, source_row)
+        if not record:
+            console.print(f"[red]未找到记录: {source_file}:{source_row}[/red]")
+            return
+
+        self.approval_manager.supplement_record(record, transporter=transporter)
+        console.print(f"[green]已补录运输人: {record.barcode} -> {transporter}[/green]")
+
     def find_by_barcode(self, barcode: str):
         found = self.rule_engine.get_records_by_barcode(self.records, barcode)
         if not found:
@@ -311,6 +385,40 @@ def approve(ctx, approver, override):
     """批量审批所有待审批记录"""
     cli_instance = ctx.obj["cli"]
     cli_instance.approve_all(approver, override)
+
+
+@cli.command("supplement-reason")
+@click.option("--source", "-s", required=True, help="来源文件名")
+@click.option("--row", "-r", required=True, type=int, help="来源行号")
+@click.option("--reason", "-c", required=True, help="拒收原因代码: duplicate, missing, invalid, timeout, time_invalid, transporter_missing, damaged, leaking, incomplete, temperature, other")
+@click.option("--note", "-n", help="备注")
+@click.pass_context
+def supplement_reason(ctx, source, row, reason, note):
+    """补录拒收原因"""
+    cli_instance = ctx.obj["cli"]
+    cli_instance.supplement_rejection_reason(source, row, reason, note)
+
+
+@cli.command("supplement-time")
+@click.option("--source", "-s", required=True, help="来源文件名")
+@click.option("--row", "-r", required=True, type=int, help="来源行号")
+@click.option("--time", "-t", required=True, help="采样时间 (如: '2024-01-15 14:30:00')")
+@click.pass_context
+def supplement_time(ctx, source, row, time):
+    """补录采样时间"""
+    cli_instance = ctx.obj["cli"]
+    cli_instance.supplement_sampling_time(source, row, time)
+
+
+@cli.command("supplement-transporter")
+@click.option("--source", "-s", required=True, help="来源文件名")
+@click.option("--row", "-r", required=True, type=int, help="来源行号")
+@click.option("--name", "-n", required=True, help="运输人姓名")
+@click.pass_context
+def supplement_transporter(ctx, source, row, name):
+    """补录运输人"""
+    cli_instance = ctx.obj["cli"]
+    cli_instance.supplement_transporter(source, row, name)
 
 
 @cli.command()
