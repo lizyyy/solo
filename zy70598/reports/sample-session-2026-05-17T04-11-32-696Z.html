@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket 会话回放报告</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #1a365d; margin-bottom: 24px; border-bottom: 2px solid #3182ce; padding-bottom: 12px; }
+        h2 { color: #2d3748; margin: 24px 0 16px; font-size: 1.25rem; }
+        .section { margin-bottom: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #edf2f7; font-weight: 600; color: #2d3748; }
+        tr:hover { background: #f7fafc; }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+        .meta-card { background: #f7fafc; padding: 16px; border-radius: 6px; }
+        .meta-label { color: #718096; font-size: 0.875rem; margin-bottom: 4px; }
+        .meta-value { color: #2d3748; font-size: 1.125rem; font-weight: 600; }
+        .bad-row { background: #fff5f5; }
+        .code { background: #1a202c; color: #e2e8f0; padding: 16px; border-radius: 6px; font-family: 'Monaco', monospace; font-size: 0.875rem; overflow-x: auto; white-space: pre-wrap; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+        .tab { padding: 8px 16px; cursor: pointer; border: none; background: none; color: #718096; font-size: 0.875rem; }
+        .tab.active { color: #3182ce; border-bottom: 2px solid #3182ce; font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 WebSocket 会话回放报告</h1>
+
+        <div class="section">
+            <h2>📊 概览信息</h2>
+            <div class="meta-grid">
+                <div class="meta-card">
+                    <div class="meta-label">输入文件</div>
+                    <div class="meta-value">examples/sample-session.log</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-label">总行数</div>
+                    <div class="meta-value">23</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-label">有效帧</div>
+                    <div class="meta-value" style="color: #38a169">20</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-label">无效帧</div>
+                    <div class="meta-value" style="color: #e53e3e">3</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-label">开始时间</div>
+                    <div class="meta-value">2024/5/15 17:00:00</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-label">会话时长</div>
+                    <div class="meta-value">1.90s</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('anomalies')">异常 (3)</button>
+            <button class="tab" onclick="showTab('frames')">帧列表</button>
+            <button class="tab" onclick="showTab('diffs')">状态变更</button>
+            <button class="tab" onclick="showTab('state')">最终状态</button>
+        </div>
+
+        <div id="anomalies" class="tab-content active">
+            <div class="section">
+                <h2>⚠️ 异常检测 (3)</h2>
+                
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>严重程度</th><th>类型</th><th>帧索引</th><th>行号</th><th>消息</th></tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr>
+                                <td>1</td>
+                                <td><span class="text-gray-500">LOW</span></td>
+                                <td>parse_error</td>
+                                <td>0</td>
+                                <td>8</td>
+                                <td>空行</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>2</td>
+                                <td><span class="text-gray-500">LOW</span></td>
+                                <td>parse_error</td>
+                                <td>1</td>
+                                <td>9</td>
+                                <td>无法识别的日志格式</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>3</td>
+                                <td><span class="text-gray-500">LOW</span></td>
+                                <td>parse_error</td>
+                                <td>2</td>
+                                <td>15</td>
+                                <td>无法识别的日志格式</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+                
+            </div>
+        </div>
+
+        <div id="frames" class="tab-content">
+            <div class="section">
+                <h2>🔄 帧列表 (20)</h2>
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>时间</th><th>方向</th><th>Opcode</th><th>Payload</th></tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr class="">
+                                <td>0</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;connect&quot;,&quot;user&quot;:&quot;bob&quot;,&quot;state&quot;:&quot;init&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>1</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>out</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;welcome&quot;,&quot;version&quot;:&quot;1.0.0&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>2</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;auth&quot;,&quot;token&quot;:&quot;abc123&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>3</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>out</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;auth_ok&quot;,&quot;user_id&quot;:42,&quot;state&quot;:&quot;authenticated&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>4</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;join&quot;,&quot;room&quot;:&quot;lobby&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>5</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>out</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;joined&quot;,&quot;room&quot;:&quot;lobby&quot;,&quot;users&quot;:15}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>6</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;sync&quot;,&quot;score&quot;:100,&quot;level&quot;:1,&quot;coins&quot;:50}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>7</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;action&quot;,&quot;target&quot;:&quot;chest&quot;,&quot;item&quot;:&quot;sword&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>8</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>out</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;item_add&quot;,&quot;item&quot;:&quot;sword&quot;,&quot;rarity&quot;:&quot;rare&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>9</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:00</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;sync&quot;,&quot;score&quot;:150}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>10</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;action&quot;,&quot;target&quot;:&quot;enemy&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>11</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>out</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;combat&quot;,&quot;damage&quot;:25}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>12</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;sync&quot;,&quot;score&quot;:125,&quot;hp&quot;:75}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>13</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;chat&quot;,&quot;message&quot;:&quot;hello world&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>14</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>out</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;chat_broadcast&quot;,&quot;from&quot;:&quot;bob&quot;,&quot;msg&quot;:&quot;hello world&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>15</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;sync&quot;,&quot;score&quot;:999,&quot;hp&quot;:999}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>16</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;action&quot;,&quot;target&quot;:&quot;boss&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>17</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>out</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;combat&quot;,&quot;damage&quot;:0,&quot;error&quot;:&quot;invalid_target&quot;}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>18</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>in</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;sync&quot;,&quot;score&quot;:999,&quot;hp&quot;:999,&quot;bugs&quot;:true}</td>
+                            </tr>
+                        
+                            <tr class="">
+                                <td>19</td>
+                                <td style="font-size: 0.75rem; color: #718096;">17:00:01</td>
+                                <td>out</td>
+                                <td>text</td>
+                                <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">{&quot;type&quot;:&quot;disconnect&quot;,&quot;reason&quot;:&quot;state_corrupted&quot;}</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="diffs" class="tab-content">
+            <div class="section">
+                <h2>🔀 状态变更 (19)</h2>
+                
+                <table>
+                    <thead>
+                        <tr><th>帧索引</th><th>操作</th><th>路径</th><th>旧值</th><th>新值</th></tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr>
+                                <td>0</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>received.0.time</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">1715763600000</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>0</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>received.0.opcode</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">text</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>0</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>received.0.data.type</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">connect</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>0</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>received.0.data.user</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">bob</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>0</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>received.0.data.state</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">init</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>1</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>sent.0.time</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">1715763600100</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>1</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>sent.0.opcode</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">text</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>1</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>sent.0.data.type</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">welcome</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>1</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>sent.0.data.version</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">1.0.0</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>6</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>type</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">sync</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>6</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>score</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">100</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>6</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>level</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">1</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>6</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>coins</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">50</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>9</td>
+                                <td><span class="text-yellow-600">UPDATE</span></td>
+                                <td><code>score</code></td>
+                                <td style="font-size: 0.75rem;">100</td>
+                                <td style="font-size: 0.75rem;">150</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>12</td>
+                                <td><span class="text-yellow-600">UPDATE</span></td>
+                                <td><code>score</code></td>
+                                <td style="font-size: 0.75rem;">150</td>
+                                <td style="font-size: 0.75rem;">125</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>12</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>hp</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">75</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>15</td>
+                                <td><span class="text-yellow-600">UPDATE</span></td>
+                                <td><code>score</code></td>
+                                <td style="font-size: 0.75rem;">125</td>
+                                <td style="font-size: 0.75rem;">999</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>15</td>
+                                <td><span class="text-yellow-600">UPDATE</span></td>
+                                <td><code>hp</code></td>
+                                <td style="font-size: 0.75rem;">75</td>
+                                <td style="font-size: 0.75rem;">999</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>18</td>
+                                <td><span class="text-green-600">ADD</span></td>
+                                <td><code>bugs</code></td>
+                                <td style="font-size: 0.75rem;">undefined</td>
+                                <td style="font-size: 0.75rem;">true</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+                
+            </div>
+        </div>
+
+        <div id="state" class="tab-content">
+            <div class="section">
+                <h2>📋 最终状态</h2>
+                <div class="code">{
+  &quot;received&quot;: [
+    {
+      &quot;time&quot;: 1715763600000,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;connect&quot;,
+        &quot;user&quot;: &quot;bob&quot;,
+        &quot;state&quot;: &quot;init&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763600200,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;auth&quot;,
+        &quot;token&quot;: &quot;abc123&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763600400,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;join&quot;,
+        &quot;room&quot;: &quot;lobby&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763600600,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;sync&quot;,
+        &quot;score&quot;: 100,
+        &quot;level&quot;: 1,
+        &quot;coins&quot;: 50
+      }
+    },
+    {
+      &quot;time&quot;: 1715763600700,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;action&quot;,
+        &quot;target&quot;: &quot;chest&quot;,
+        &quot;item&quot;: &quot;sword&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763600900,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;sync&quot;,
+        &quot;score&quot;: 150
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601000,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;action&quot;,
+        &quot;target&quot;: &quot;enemy&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601200,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;sync&quot;,
+        &quot;score&quot;: 125,
+        &quot;hp&quot;: 75
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601300,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;chat&quot;,
+        &quot;message&quot;: &quot;hello world&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601500,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;sync&quot;,
+        &quot;score&quot;: 999,
+        &quot;hp&quot;: 999
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601600,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;action&quot;,
+        &quot;target&quot;: &quot;boss&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601800,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;sync&quot;,
+        &quot;score&quot;: 999,
+        &quot;hp&quot;: 999,
+        &quot;bugs&quot;: true
+      }
+    }
+  ],
+  &quot;sent&quot;: [
+    {
+      &quot;time&quot;: 1715763600100,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;welcome&quot;,
+        &quot;version&quot;: &quot;1.0.0&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763600300,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;auth_ok&quot;,
+        &quot;user_id&quot;: 42,
+        &quot;state&quot;: &quot;authenticated&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763600500,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;joined&quot;,
+        &quot;room&quot;: &quot;lobby&quot;,
+        &quot;users&quot;: 15
+      }
+    },
+    {
+      &quot;time&quot;: 1715763600800,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;item_add&quot;,
+        &quot;item&quot;: &quot;sword&quot;,
+        &quot;rarity&quot;: &quot;rare&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601100,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;combat&quot;,
+        &quot;damage&quot;: 25
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601400,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;chat_broadcast&quot;,
+        &quot;from&quot;: &quot;bob&quot;,
+        &quot;msg&quot;: &quot;hello world&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601700,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;combat&quot;,
+        &quot;damage&quot;: 0,
+        &quot;error&quot;: &quot;invalid_target&quot;
+      }
+    },
+    {
+      &quot;time&quot;: 1715763601900,
+      &quot;opcode&quot;: &quot;text&quot;,
+      &quot;data&quot;: {
+        &quot;type&quot;: &quot;disconnect&quot;,
+        &quot;reason&quot;: &quot;state_corrupted&quot;
+      }
+    }
+  ],
+  &quot;type&quot;: &quot;sync&quot;,
+  &quot;score&quot;: 999,
+  &quot;level&quot;: 1,
+  &quot;coins&quot;: 50,
+  &quot;hp&quot;: 999,
+  &quot;bugs&quot;: true
+}</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event?.target?.classList.add('active');
+            document.getElementById(tabId)?.classList.add('active');
+        }
+    </script>
+</body>
+</html>

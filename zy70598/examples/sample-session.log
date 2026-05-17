@@ -1,0 +1,23 @@
+2024-05-15T09:00:00.000Z [conn-user-123] IN text {"type":"connect","user":"bob","state":"init"}
+2024-05-15T09:00:00.100Z [conn-user-123] OUT text {"type":"welcome","version":"1.0.0"}
+2024-05-15T09:00:00.200Z [conn-user-123] IN text {"type":"auth","token":"abc123"}
+2024-05-15T09:00:00.300Z [conn-user-123] OUT text {"type":"auth_ok","user_id":42,"state":"authenticated"}
+2024-05-15T09:00:00.400Z [conn-user-123] IN text {"type":"join","room":"lobby"}
+2024-05-15T09:00:00.500Z [conn-user-123] OUT text {"type":"joined","room":"lobby","users":15}
+2024-05-15T09:00:00.600Z [conn-user-123] IN text {"type":"sync","score":100,"level":1,"coins":50}
+
+这里有一条乱入的坏日志行
+2024-05-15T09:00:00.700Z [conn-user-123] IN text {"type":"action","target":"chest","item":"sword"}
+2024-05-15T09:00:00.800Z [conn-user-123] OUT text {"type":"item_add","item":"sword","rarity":"rare"}
+2024-05-15T09:00:00.900Z [conn-user-123] IN text {"type":"sync","score":150}
+2024-05-15T09:00:01.000Z [conn-user-123] IN text {"type":"action","target":"enemy"}
+2024-05-15T09:00:01.100Z [conn-user-123] OUT text {"type":"combat","damage":25}
+--- 这是另一行垃圾数据 ---
+2024-05-15T09:00:01.200Z [conn-user-123] IN text {"type":"sync","score":125,"hp":75}
+2024-05-15T09:00:01.300Z [conn-user-123] IN text {"type":"chat","message":"hello world"}
+2024-05-15T09:00:01.400Z [conn-user-123] OUT text {"type":"chat_broadcast","from":"bob","msg":"hello world"}
+2024-05-15T09:00:01.500Z [conn-user-123] IN text {"type":"sync","score":999,"hp":999}
+2024-05-15T09:00:01.600Z [conn-user-123] IN text {"type":"action","target":"boss"}
+2024-05-15T09:00:01.700Z [conn-user-123] OUT text {"type":"combat","damage":0,"error":"invalid_target"}
+2024-05-15T09:00:01.800Z [conn-user-123] IN text {"type":"sync","score":999,"hp":999,"bugs":true}
+2024-05-15T09:00:01.900Z [conn-user-123] OUT text {"type":"disconnect","reason":"state_corrupted"}
