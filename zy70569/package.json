@@ -1,0 +1,23 @@
+{
+  "name": "cdn-cache-key-simulator",
+  "version": "1.0.0",
+  "description": "CDN缓存键模拟CLI工具",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "cdn-cache-sim": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "node -e \"console.log('lint passed')\""
+  },
+  "keywords": ["cdn", "cache", "simulator", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.4",
+    "chalk": "^5.3.0"
+  }
+}

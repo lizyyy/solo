@@ -1,0 +1,14 @@
+{
+  "query": {
+    "include": ["page", "id"]
+  },
+  "cookies": {
+    "include": ["user_id", "session"]
+  },
+  "headers": {
+    "include": ["User-Agent", "Accept-Language"]
+  },
+  "host": true,
+  "scheme": true,
+  "path": true
+}

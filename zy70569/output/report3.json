@@ -1,0 +1,414 @@
+{
+  "total": 9,
+  "valid": 8,
+  "invalid": 1,
+  "groups": {
+    "712e5b535ef884db15b5788fc8ad1987": {
+      "count": 1,
+      "samples": [
+        {
+          "lineNumber": 2,
+          "url": "https://example.com/products",
+          "description": "产品列表页"
+        }
+      ],
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/products||cookies:{\"user_id\":\"123\",\"session\":\"abc\"}",
+        "hash": "712e5b535ef884db15b5788fc8ad1987",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/products",
+          "query": {},
+          "cookies": {
+            "user_id": "123",
+            "session": "abc"
+          },
+          "headers": {}
+        }
+      }
+    },
+    "6cab2fdc5d39503a222772cee54ab185": {
+      "count": 2,
+      "samples": [
+        {
+          "lineNumber": 3,
+          "url": "https://example.com/products?page=1",
+          "description": "产品列表第1页"
+        },
+        {
+          "lineNumber": 4,
+          "url": "https://example.com/products?page=1",
+          "description": "产品列表第1页重复"
+        }
+      ],
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/products||query:{\"page\":\"1\"}||cookies:{\"user_id\":\"123\",\"session\":\"abc\"}",
+        "hash": "6cab2fdc5d39503a222772cee54ab185",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/products",
+          "query": {
+            "page": "1"
+          },
+          "cookies": {
+            "user_id": "123",
+            "session": "abc"
+          },
+          "headers": {}
+        }
+      }
+    },
+    "bcda41116c4e79bdb9611f22d3923a33": {
+      "count": 1,
+      "samples": [
+        {
+          "lineNumber": 5,
+          "url": "https://example.com/products?page=2",
+          "description": "产品列表第2页"
+        }
+      ],
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/products||query:{\"page\":\"2\"}||cookies:{\"user_id\":\"123\",\"session\":\"abc\"}",
+        "hash": "bcda41116c4e79bdb9611f22d3923a33",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/products",
+          "query": {
+            "page": "2"
+          },
+          "cookies": {
+            "user_id": "123",
+            "session": "abc"
+          },
+          "headers": {}
+        }
+      }
+    },
+    "5322316dadb933e048403ab524f8b310": {
+      "count": 1,
+      "samples": [
+        {
+          "lineNumber": 6,
+          "url": "https://example.com/products?id=100",
+          "description": "产品详情页"
+        }
+      ],
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/products||query:{\"id\":\"100\"}||cookies:{\"user_id\":\"123\",\"session\":\"abc\"}",
+        "hash": "5322316dadb933e048403ab524f8b310",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/products",
+          "query": {
+            "id": "100"
+          },
+          "cookies": {
+            "user_id": "123",
+            "session": "abc"
+          },
+          "headers": {}
+        }
+      }
+    },
+    "f3fd2126a405bc6336b83fd7efad2a8c": {
+      "count": 1,
+      "samples": [
+        {
+          "lineNumber": 7,
+          "url": "https://example.com/about",
+          "description": "关于页面-不同用户"
+        }
+      ],
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/about||cookies:{\"user_id\":\"456\",\"session\":\"xyz\"}",
+        "hash": "f3fd2126a405bc6336b83fd7efad2a8c",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/about",
+          "query": {},
+          "cookies": {
+            "user_id": "456",
+            "session": "xyz"
+          },
+          "headers": {}
+        }
+      }
+    },
+    "d9734aab83268d5f2e9d3478c1bdd419": {
+      "count": 2,
+      "samples": [
+        {
+          "lineNumber": 9,
+          "url": "https://example.com/search?q=test&foo=bar",
+          "description": "搜索页-query不参与缓存键"
+        },
+        {
+          "lineNumber": 10,
+          "url": "https://example.com/search?q=test2&foo=bar2",
+          "description": "搜索页2-query不参与缓存键"
+        }
+      ],
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/search",
+        "hash": "d9734aab83268d5f2e9d3478c1bdd419",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/search",
+          "query": {},
+          "cookies": {},
+          "headers": {}
+        }
+      }
+    }
+  },
+  "details": [
+    {
+      "lineNumber": 2,
+      "url": "https://example.com/products",
+      "description": "产品列表页",
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/products||cookies:{\"user_id\":\"123\",\"session\":\"abc\"}",
+        "hash": "712e5b535ef884db15b5788fc8ad1987",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/products",
+          "query": {},
+          "cookies": {
+            "user_id": "123",
+            "session": "abc"
+          },
+          "headers": {}
+        }
+      },
+      "input": {
+        "headers": {},
+        "cookies": {
+          "user_id": "123",
+          "session": "abc"
+        },
+        "query": {}
+      }
+    },
+    {
+      "lineNumber": 3,
+      "url": "https://example.com/products?page=1",
+      "description": "产品列表第1页",
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/products||query:{\"page\":\"1\"}||cookies:{\"user_id\":\"123\",\"session\":\"abc\"}",
+        "hash": "6cab2fdc5d39503a222772cee54ab185",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/products",
+          "query": {
+            "page": "1"
+          },
+          "cookies": {
+            "user_id": "123",
+            "session": "abc"
+          },
+          "headers": {}
+        }
+      },
+      "input": {
+        "headers": {},
+        "cookies": {
+          "user_id": "123",
+          "session": "abc"
+        },
+        "query": {
+          "page": "1"
+        }
+      }
+    },
+    {
+      "lineNumber": 4,
+      "url": "https://example.com/products?page=1",
+      "description": "产品列表第1页重复",
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/products||query:{\"page\":\"1\"}||cookies:{\"user_id\":\"123\",\"session\":\"abc\"}",
+        "hash": "6cab2fdc5d39503a222772cee54ab185",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/products",
+          "query": {
+            "page": "1"
+          },
+          "cookies": {
+            "user_id": "123",
+            "session": "abc"
+          },
+          "headers": {}
+        }
+      },
+      "input": {
+        "headers": {},
+        "cookies": {
+          "user_id": "123",
+          "session": "abc"
+        },
+        "query": {
+          "page": "1"
+        }
+      }
+    },
+    {
+      "lineNumber": 5,
+      "url": "https://example.com/products?page=2",
+      "description": "产品列表第2页",
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/products||query:{\"page\":\"2\"}||cookies:{\"user_id\":\"123\",\"session\":\"abc\"}",
+        "hash": "bcda41116c4e79bdb9611f22d3923a33",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/products",
+          "query": {
+            "page": "2"
+          },
+          "cookies": {
+            "user_id": "123",
+            "session": "abc"
+          },
+          "headers": {}
+        }
+      },
+      "input": {
+        "headers": {},
+        "cookies": {
+          "user_id": "123",
+          "session": "abc"
+        },
+        "query": {
+          "page": "2"
+        }
+      }
+    },
+    {
+      "lineNumber": 6,
+      "url": "https://example.com/products?id=100",
+      "description": "产品详情页",
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/products||query:{\"id\":\"100\"}||cookies:{\"user_id\":\"123\",\"session\":\"abc\"}",
+        "hash": "5322316dadb933e048403ab524f8b310",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/products",
+          "query": {
+            "id": "100"
+          },
+          "cookies": {
+            "user_id": "123",
+            "session": "abc"
+          },
+          "headers": {}
+        }
+      },
+      "input": {
+        "headers": {},
+        "cookies": {
+          "user_id": "123",
+          "session": "abc"
+        },
+        "query": {
+          "id": "100"
+        }
+      }
+    },
+    {
+      "lineNumber": 7,
+      "url": "https://example.com/about",
+      "description": "关于页面-不同用户",
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/about||cookies:{\"user_id\":\"456\",\"session\":\"xyz\"}",
+        "hash": "f3fd2126a405bc6336b83fd7efad2a8c",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/about",
+          "query": {},
+          "cookies": {
+            "user_id": "456",
+            "session": "xyz"
+          },
+          "headers": {}
+        }
+      },
+      "input": {
+        "headers": {},
+        "cookies": {
+          "user_id": "456",
+          "session": "xyz"
+        },
+        "query": {}
+      }
+    },
+    {
+      "lineNumber": 9,
+      "url": "https://example.com/search?q=test&foo=bar",
+      "description": "搜索页-query不参与缓存键",
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/search",
+        "hash": "d9734aab83268d5f2e9d3478c1bdd419",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/search",
+          "query": {},
+          "cookies": {},
+          "headers": {}
+        }
+      },
+      "input": {
+        "headers": {},
+        "cookies": {},
+        "query": {
+          "q": "test",
+          "foo": "bar"
+        }
+      }
+    },
+    {
+      "lineNumber": 10,
+      "url": "https://example.com/search?q=test2&foo=bar2",
+      "description": "搜索页2-query不参与缓存键",
+      "cacheKey": {
+        "rawKey": "scheme:https:||host:example.com||path:/search",
+        "hash": "d9734aab83268d5f2e9d3478c1bdd419",
+        "components": {
+          "scheme": "https:",
+          "host": "example.com",
+          "path": "/search",
+          "query": {},
+          "cookies": {},
+          "headers": {}
+        }
+      },
+      "input": {
+        "headers": {},
+        "cookies": {},
+        "query": {
+          "q": "test2",
+          "foo": "bar2"
+        }
+      }
+    }
+  ],
+  "errors": [
+    {
+      "lineNumber": 8,
+      "raw": "{\"url\":\"invalid-url\",\"headers\":\"{}\",\"cookies\":\"\",\"description\":\"无效URL样本\"}",
+      "error": "Invalid URL"
+    }
+  ],
+  "uniqueKeys": 6
+}
