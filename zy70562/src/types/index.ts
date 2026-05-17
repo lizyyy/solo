@@ -40,11 +40,20 @@ export interface ValidationIssue {
   rawContent?: string;
 }
 
+export interface SampleSeries {
+  metric: Record<string, string>;
+  values: Array<[number, string]>;
+}
+
 export interface SampleEvaluation {
   labels: Record<string, string>;
   value: number;
   triggersAlert: boolean;
   annotationRendered?: Record<string, string>;
+}
+
+export interface SamplesFile {
+  samples: SampleSeries[];
 }
 
 export interface RuleValidationResult {

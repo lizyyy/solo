@@ -14,6 +14,7 @@ program
 program
   .option("-i, --input <path>", "Input path to Prometheus rules", ".")
   .option("-o, --output <path>", "Output directory for reports")
+  .option("-s, --samples <path>", "Path to sample series YAML file for evaluation")
   .option("-v, --verbose", "Verbose output")
   .option("--fail-on-error", "Exit with non-zero code on errors")
   .action(async (options) => {

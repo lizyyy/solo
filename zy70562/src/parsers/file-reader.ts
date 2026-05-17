@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "js-yaml";
-import { RulesFile } from "../types";
+import { RulesFile, SamplesFile, SampleSeries } from "../types";
 
 export class FileReader {
   private filePath: string;
@@ -48,6 +48,17 @@ export class FileReader {
     }
     
     return undefined;
+  }
+
+  parseSamplesYaml(): SampleSeries[] {
+    const { content } = this.read();
+    const parsed = yaml.load(content) as SamplesFile;
+    
+    if (!parsed.samples || !Array.isArray(parsed.samples)) {
+      throw new Error("Invalid samples file: missing 'samples' array field");
+    }
+    
+    return parsed.samples;
   }
 }
 

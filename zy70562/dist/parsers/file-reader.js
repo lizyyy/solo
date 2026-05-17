@@ -72,6 +72,14 @@ class FileReader {
         }
         return undefined;
     }
+    parseSamplesYaml() {
+        const { content } = this.read();
+        const parsed = yaml.load(content);
+        if (!parsed.samples || !Array.isArray(parsed.samples)) {
+            throw new Error("Invalid samples file: missing 'samples' array field");
+        }
+        return parsed.samples;
+    }
 }
 exports.FileReader = FileReader;
 function resolveInputPath(inputPath) {

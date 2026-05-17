@@ -95,7 +95,8 @@ class PromQLParser {
     getAvailableLabels() {
         const parsed = this.parse();
         const allLabels = [...parsed.labels, ...(parsed.byLabels || [])];
-        const result = allLabels.filter(l => !(parsed.withoutLabels || []).includes(l));
+        const withoutSet = new Set(parsed.withoutLabels || []);
+        const result = allLabels.filter(l => !withoutSet.has(l));
         return [...new Set(result)];
     }
 }

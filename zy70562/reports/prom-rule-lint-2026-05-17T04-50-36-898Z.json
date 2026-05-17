@@ -1,0 +1,340 @@
+{
+  "summary": {
+    "totalRules": 4,
+    "totalGroups": 1,
+    "totalIssues": 2,
+    "errors": 0,
+    "warnings": 1,
+    "infos": 1,
+    "rulesWithIssues": 2
+  },
+  "results": [
+    {
+      "ruleName": "HighCPUUsage",
+      "groupName": "test-rules",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+      "expr": "node_cpu_seconds_total{mode=\"idle\"} < 0.2",
+      "parsedLabels": {
+        "metricName": "node_cpu_seconds_total",
+        "labels": [
+          "mode"
+        ],
+        "aggregationLabels": [],
+        "byLabels": [],
+        "withoutLabels": []
+      },
+      "issues": [],
+      "sampleEvaluations": [
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.15,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "High CPU usage detected on {{ $labels.instance }}",
+            "description": "CPU usage is above 80% for instance {{ $labels.instance }}"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.18,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "High CPU usage detected on {{ $labels.instance }}",
+            "description": "CPU usage is above 80% for instance {{ $labels.instance }}"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.25,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "summary": "High CPU usage detected on {{ $labels.instance }}",
+            "description": "CPU usage is above 80% for instance {{ $labels.instance }}"
+          }
+        }
+      ]
+    },
+    {
+      "ruleName": "MissingSummaryAnnotation",
+      "groupName": "test-rules",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+      "expr": "up == 0",
+      "parsedLabels": {
+        "metricName": "up",
+        "labels": [],
+        "aggregationLabels": [],
+        "byLabels": [],
+        "withoutLabels": []
+      },
+      "issues": [
+        {
+          "type": "warning",
+          "category": "annotation",
+          "message": "Missing summary annotation for alert",
+          "ruleName": "MissingSummaryAnnotation",
+          "groupName": "test-rules",
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+          "line": 13
+        }
+      ],
+      "sampleEvaluations": [
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.15,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "description": "Instance {{ $labels.instance }} is down"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.18,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "description": "Instance {{ $labels.instance }} is down"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.25,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "description": "Instance {{ $labels.instance }} is down"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_memory_MemAvailable_bytes",
+            "instance": "server-01"
+          },
+          "value": 500000000,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "description": "Instance {{ $labels.instance }} is down"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_memory_MemAvailable_bytes",
+            "instance": "server-01"
+          },
+          "value": 800000000,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "description": "Instance {{ $labels.instance }} is down"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "up",
+            "job": "prometheus",
+            "instance": "server-01"
+          },
+          "value": 0,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "description": "Instance {{ $labels.instance }} is down"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "up",
+            "job": "prometheus",
+            "instance": "server-01"
+          },
+          "value": 1,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "description": "Instance {{ $labels.instance }} is down"
+          }
+        }
+      ]
+    },
+    {
+      "ruleName": "InvalidPlaceholder",
+      "groupName": "test-rules",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+      "expr": "node_memory_MemAvailable_bytes < 1000000000",
+      "parsedLabels": {
+        "metricName": "node_memory_MemAvailable_bytes",
+        "labels": [],
+        "aggregationLabels": [],
+        "byLabels": [],
+        "withoutLabels": []
+      },
+      "issues": [],
+      "sampleEvaluations": [
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.15,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Low memory",
+            "description": "Memory low on {{ $labels.nonexistent }}"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.18,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Low memory",
+            "description": "Memory low on {{ $labels.nonexistent }}"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_cpu_seconds_total",
+            "mode": "idle",
+            "instance": "server-01"
+          },
+          "value": 0.25,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Low memory",
+            "description": "Memory low on {{ $labels.nonexistent }}"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_memory_MemAvailable_bytes",
+            "instance": "server-01"
+          },
+          "value": 500000000,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Low memory",
+            "description": "Memory low on {{ $labels.nonexistent }}"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "node_memory_MemAvailable_bytes",
+            "instance": "server-01"
+          },
+          "value": 800000000,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Low memory",
+            "description": "Memory low on {{ $labels.nonexistent }}"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "up",
+            "job": "prometheus",
+            "instance": "server-01"
+          },
+          "value": 0,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Low memory",
+            "description": "Memory low on {{ $labels.nonexistent }}"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "up",
+            "job": "prometheus",
+            "instance": "server-01"
+          },
+          "value": 1,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Low memory",
+            "description": "Memory low on {{ $labels.nonexistent }}"
+          }
+        }
+      ]
+    },
+    {
+      "ruleName": "SyntaxErrorRule",
+      "groupName": "test-rules",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+      "expr": "up{job=~\"prom.*\"} == 0",
+      "parsedLabels": {
+        "metricName": "up",
+        "labels": [
+          "job"
+        ],
+        "aggregationLabels": [],
+        "byLabels": [],
+        "withoutLabels": []
+      },
+      "issues": [
+        {
+          "type": "info",
+          "category": "annotation",
+          "message": "Missing description annotation for alert",
+          "ruleName": "SyntaxErrorRule",
+          "groupName": "test-rules",
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml",
+          "line": 26
+        }
+      ],
+      "sampleEvaluations": [
+        {
+          "labels": {
+            "__name__": "up",
+            "job": "prometheus",
+            "instance": "server-01"
+          },
+          "value": 0,
+          "triggersAlert": true,
+          "annotationRendered": {
+            "summary": "Test alert"
+          }
+        },
+        {
+          "labels": {
+            "__name__": "up",
+            "job": "prometheus",
+            "instance": "server-01"
+          },
+          "value": 1,
+          "triggersAlert": false,
+          "annotationRendered": {
+            "summary": "Test alert"
+          }
+        }
+      ]
+    }
+  ],
+  "files": [
+    "/Users/lzy/pro/solo/workspaces/zy70562/test-rules.yaml"
+  ],
+  "timestamp": "2026-05-17T04:50:36.893Z",
+  "version": "1.0.0"
+}

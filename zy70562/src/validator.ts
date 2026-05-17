@@ -7,6 +7,8 @@ import {
   LintResult,
   RuleValidationResult,
   ValidationIssue,
+  SampleSeries,
+  SampleEvaluation,
 } from "./types";
 
 export class Validator {
@@ -19,9 +21,20 @@ export class Validator {
   async run(): Promise<LintResult> {
     const files = resolveInputPath(this.options.input);
     const allResults: RuleValidationResult[] = [];
+    let samples: SampleSeries[] = [];
+
+    if (this.options.samples) {
+      try {
+        const samplesReader = new FileReader(this.options.samples);
+        samples = samplesReader.parseSamplesYaml();
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`Failed to load samples: ${errorMessage}`);
+      }
+    }
 
     for (const filePath of files) {
-      const fileResults = this.validateFile(filePath);
+      const fileResults = this.validateFile(filePath, samples);
       allResults.push(...fileResults);
     }
 
@@ -44,28 +57,105 @@ export class Validator {
     };
   }
 
-  private validateFile(filePath: string): RuleValidationResult[] {
+  private validateFile(filePath: string, samples: SampleSeries[] = []): RuleValidationResult[] {
     const results: RuleValidationResult[] = [];
     const reader = new FileReader(filePath);
 
     try {
       const rulesFile = reader.parseYaml();
 
+      if (!rulesFile || !rulesFile.groups || !Array.isArray(rulesFile.groups)) {
+        results.push({
+          ruleName: "__FILE_PARSE_ERROR__",
+          groupName: "__INVALID_STRUCTURE__",
+          filePath,
+          expr: "",
+          issues: [
+            {
+              type: "error",
+              category: "structure",
+              message: "Invalid or missing 'groups' field in rules file",
+              ruleName: "__FILE_PARSE_ERROR__",
+              groupName: "__INVALID_STRUCTURE__",
+              filePath,
+            },
+          ],
+        });
+        return results;
+      }
+
       for (const group of rulesFile.groups) {
+        if (!group.name || !group.rules || !Array.isArray(group.rules)) {
+          results.push({
+            ruleName: "__GROUP_ERROR__",
+            groupName: group.name || "__UNKNOWN_GROUP__",
+            filePath,
+            expr: "",
+            issues: [
+              {
+                type: "error",
+                category: "structure",
+                message: `Group '${group.name || "unknown"}' is missing 'name' or 'rules' array`,
+                ruleName: "__GROUP_ERROR__",
+                groupName: group.name || "__UNKNOWN_GROUP__",
+                filePath,
+              },
+            ],
+          });
+          continue;
+        }
+
         for (const rule of group.rules) {
-          const result = this.validateRule(rule, group.name, filePath, reader);
+          if (!rule.alert || !rule.expr) {
+            results.push({
+              ruleName: rule.alert || "__MISSING_RULE_NAME__",
+              groupName: group.name,
+              filePath,
+              expr: rule.expr || "",
+              issues: [
+                {
+                  type: "error",
+                  category: "structure",
+                  message: "Rule missing required 'alert' name or 'expr' field",
+                  ruleName: rule.alert || "__MISSING_RULE_NAME__",
+                  groupName: group.name,
+                  filePath,
+                },
+              ],
+            });
+            continue;
+          }
+
+          const result = this.validateRule(rule, group.name, filePath, reader, samples);
           results.push(result);
         }
       }
     } catch (error) {
-      console.error("Failed to parse ${filePath}:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      results.push({
+        ruleName: "__FILE_PARSE_ERROR__",
+        groupName: "__PARSE_FAILURE__",
+        filePath,
+        expr: "",
+        issues: [
+          {
+            type: "error",
+            category: "parse",
+            message: `Failed to parse file: ${errorMessage}`,
+            ruleName: "__FILE_PARSE_ERROR__",
+            groupName: "__PARSE_FAILURE__",
+            filePath,
+            rawContent: errorMessage,
+          },
+        ],
+      });
     }
 
     return results;
   }
 
   private validateRule(
-    rule: any, groupName: string, filePath: string, reader: FileReader): RuleValidationResult {
+    rule: any, groupName: string, filePath: string, reader: FileReader, samples: SampleSeries[] = []): RuleValidationResult {
     const issues: ValidationIssue[] = [];
     const lineNumber = reader.findRuleLineNumber(rule.alert, groupName);
 
@@ -78,7 +168,7 @@ export class Validator {
       issues.push({
         type: "error",
         category: "syntax",
-        message: "PromQL syntax error: ${syntaxCheck.error}",
+        message: `PromQL syntax error: ${syntaxCheck.error}`,
         ruleName: rule.alert,
         groupName,
         filePath,
@@ -88,30 +178,30 @@ export class Validator {
     }
 
     if (rule.annotations) {
-        for (const [annoKey, annoValue] of Object.entries(rule.annotations)) {
-          const annotationParser = new AnnotationParser(annoValue as string)
-          const placeholders = annotationParser.extractPlaceholders();
+      for (const [annoKey, annoValue] of Object.entries(rule.annotations)) {
+        const annotationParser = new AnnotationParser(annoValue as string);
+        const placeholders = annotationParser.extractPlaceholders();
+        
+        for (const placeholder of placeholders) {
+          const placeholderParts = placeholder.name.split(".");
+          const labelName = placeholderParts[placeholderParts.length - 1];
           
-          for (const placeholder of placeholders) {
-            const placeholderParts = placeholder.name.split(".");
-            const labelName = placeholderParts[placeholderParts.length - 1];
-            
-            if (!availableLabels.includes(labelName) && 
-                !["labels", "value", "externalURL", "expr"].includes(labelName)) {
-              issues.push({
-                type: "warning",
-                category: "annotation",
-                message: "Annotation placeholder references label not available in expression",
-                ruleName: rule.alert,
-                groupName,
-                filePath,
-                line: lineNumber,
-                rawContent: placeholder.fullMatch,
-              });
-            }
+          if (!availableLabels.includes(labelName) && 
+              !["labels", "value", "externalURL", "expr"].includes(labelName)) {
+            issues.push({
+              type: "warning",
+              category: "annotation",
+              message: `Annotation placeholder '${placeholder.name}' references label '${labelName}' not available in expression`,
+              ruleName: rule.alert,
+              groupName,
+              filePath,
+              line: lineNumber,
+              rawContent: placeholder.fullMatch,
+            });
           }
         }
       }
+    }
 
     if (!rule.annotations || !rule.annotations.summary) {
       issues.push({
@@ -137,6 +227,9 @@ export class Validator {
       });
     }
 
+    const sampleEvaluations = samples.length > 0 ? 
+      this.evaluateRuleWithSamples(rule, samples, parsedLabels.labels) : [];
+
     return {
       ruleName: rule.alert,
       groupName,
@@ -144,6 +237,68 @@ export class Validator {
       expr: rule.expr,
       parsedLabels,
       issues,
+      sampleEvaluations,
     };
+  }
+
+  private evaluateRuleWithSamples(
+    rule: any, samples: SampleSeries[], ruleLabels: string[]): SampleEvaluation[] {
+    const evaluations: SampleEvaluation[] = [];
+    const parsed = new PromQLParser(rule.expr).parse();
+
+    for (const sample of samples) {
+      const hasRequiredLabels = ruleLabels.every(label => 
+        Object.keys(sample.metric).includes(label)
+      );
+
+      if (!hasRequiredLabels) {
+        continue;
+      }
+
+      for (const [timestamp, valueStr] of sample.values) {
+        const value = parseFloat(valueStr);
+        if (isNaN(value)) continue;
+
+        let triggersAlert = false;
+        const comparisonMatch = rule.expr.match(/([=<>!]=?)\s*(-?\d+\.?\d*)/);
+        if (comparisonMatch) {
+          const operator = comparisonMatch[1];
+          const threshold = parseFloat(comparisonMatch[2]);
+          switch (operator) {
+            case ">": triggersAlert = value > threshold; break;
+            case ">=": triggersAlert = value >= threshold; break;
+            case "<": triggersAlert = value < threshold; break;
+            case "<=": triggersAlert = value <= threshold; break;
+            case "==": triggersAlert = value === threshold; break;
+            case "!=": triggersAlert = value !== threshold; break;
+          }
+        }
+
+        const annotationRendered: Record<string, string> = {};
+        if (rule.annotations) {
+          for (const [key, annoValue] of Object.entries(rule.annotations)) {
+            let rendered = String(annoValue);
+            for (const [labelKey, labelValue] of Object.entries(sample.metric)) {
+              rendered = rendered.replace(
+                new RegExp(`{{\\s*\\.labels\\.${labelKey}\\s*}}`, "g"), labelValue
+              );
+            }
+            rendered = rendered.replace(
+              new RegExp(`{{\\s*\\.value\\s*}}`, "g"), value.toString()
+            );
+            annotationRendered[key] = rendered;
+          }
+        }
+
+        evaluations.push({
+          labels: sample.metric,
+          value,
+          triggersAlert,
+          annotationRendered,
+        });
+      }
+    }
+
+    return evaluations;
   }
 }
