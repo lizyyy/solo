@@ -1,0 +1,23 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const multer_1 = __importDefault(require("multer"));
+const candidate_controller_1 = require("./controllers/candidate.controller");
+const router = express_1.default.Router();
+const upload = (0, multer_1.default)({ storage: multer_1.default.memoryStorage() });
+router.post('/candidates', candidate_controller_1.candidateController.create.bind(candidate_controller_1.candidateController));
+router.get('/candidates', candidate_controller_1.candidateController.list.bind(candidate_controller_1.candidateController));
+router.get('/candidates/:id', candidate_controller_1.candidateController.get.bind(candidate_controller_1.candidateController));
+router.put('/candidates/:id', candidate_controller_1.candidateController.update.bind(candidate_controller_1.candidateController));
+router.post('/candidates/review', candidate_controller_1.candidateController.review.bind(candidate_controller_1.candidateController));
+router.get('/candidates/:id/history', candidate_controller_1.candidateController.getHistory.bind(candidate_controller_1.candidateController));
+router.get('/merge-history', candidate_controller_1.candidateController.getAllHistory.bind(candidate_controller_1.candidateController));
+router.post('/import', upload.single('file'), candidate_controller_1.candidateController.importCsv.bind(candidate_controller_1.candidateController));
+router.get('/import', candidate_controller_1.candidateController.getImportRecords.bind(candidate_controller_1.candidateController));
+router.get('/import/:id', candidate_controller_1.candidateController.getImportRecord.bind(candidate_controller_1.candidateController));
+router.get('/export/csv', candidate_controller_1.candidateController.exportCsv.bind(candidate_controller_1.candidateController));
+router.get('/export/json', candidate_controller_1.candidateController.exportJson.bind(candidate_controller_1.candidateController));
+exports.default = router;
