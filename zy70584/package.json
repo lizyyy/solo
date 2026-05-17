@@ -1,0 +1,21 @@
+{
+  "name": "oauth-redirect-checker",
+  "version": "1.0.0",
+  "description": "OAuth回调地址校验CLI工具，适合CI或本地巡检",
+  "main": "src/index.js",
+  "bin": {
+    "oauth-check": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node tests/run.js"
+  },
+  "keywords": ["oauth", "security", "cli", "validation"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  }
+}

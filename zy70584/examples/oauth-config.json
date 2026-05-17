@@ -1,0 +1,70 @@
+{
+  "applications": [
+    {
+      "appId": "web-app-001",
+      "name": "用户中心Web应用",
+      "environments": [
+        {
+          "name": "development",
+          "authorizedRedirectUris": [
+            "http://localhost:3000/auth/callback",
+            "http://127.0.0.1:3000/auth/callback"
+          ]
+        },
+        {
+          "name": "staging",
+          "authorizedRedirectUris": [
+            "https://staging.example.com/auth/callback",
+            "https://staging.example.com/callback"
+          ]
+        },
+        {
+          "name": "production",
+          "authorizedRedirectUris": [
+            "https://example.com/auth/callback",
+            "http://example.com/callback"
+          ]
+        }
+      ]
+    },
+    {
+      "appId": "mobile-app-002",
+      "name": "移动APP应用",
+      "environments": [
+        {
+          "name": "development",
+          "authorizedRedirectUris": [
+            "myapp://oauth/callback",
+            "exp://192.168.1.100:19000/--/oauth/callback"
+          ]
+        },
+        {
+          "name": "production",
+          "authorizedRedirectUris": [
+            "myapp://oauth/callback"
+          ],
+          "authUrl": "https://auth.example.com/oauth/authorize?client_id=mobile002&redirect_uri=https%3A%2F%2Fwrong.example.com%2Fcallback&response_type=code"
+        }
+      ]
+    },
+    {
+      "appId": "admin-app-003",
+      "name": "管理后台应用",
+      "environments": [
+        {
+          "name": "development",
+          "authorizedRedirectUris": [
+            "http://localhost:8080/admin/callback"
+          ]
+        },
+        {
+          "name": "production",
+          "authorizedRedirectUris": [
+            "https://admin.example.com/callback",
+            "invalid-url-without-protocol"
+          ]
+        }
+      ]
+    }
+  ]
+}

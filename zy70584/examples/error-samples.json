@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2024-01-15T10:30:00Z",
+    "error": "redirect_uri_mismatch",
+    "description": "The redirect URI in the request, https://wrong.example.com/callback, does not match the ones authorized for the OAuth client.",
+    "redirectUri": "https://wrong.example.com/callback",
+    "environment": "production",
+    "clientId": "web-app-001"
+  },
+  {
+    "timestamp": "2024-01-15T11:20:00Z",
+    "error": "invalid_request",
+    "description": "Missing required parameter: redirect_uri",
+    "url": "https://auth.example.com/oauth/authorize?client_id=test&response_type=code",
+    "environment": "development"
+  },
+  {
+    "timestamp": "2024-01-15T14:45:00Z",
+    "error": "redirect_uri_mismatch",
+    "description": "Redirect URI mismatch",
+    "redirectUri": "http://example.com/wrong-path",
+    "environment": "staging"
+  }
+]
