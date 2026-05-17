@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "jenkins-param-audit"
+version = "0.1.0"
+description = "Jenkins参数审计CLI工具 - 审计job配置参数、默认值、构建步骤风险"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1.7"
+lxml = "^5.1.0"
+pyyaml = "^6.0.1"
+rich = "^13.7.0"
+jinja2 = "^3.1.3"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+jenkins-param-audit = "jenkins_param_audit.cli:main"

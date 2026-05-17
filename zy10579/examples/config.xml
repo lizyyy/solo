@@ -1,0 +1,110 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <description>示例Jenkins Job配置 - 用于参数审计测试</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>ENVIRONMENT</name>
+          <description>部署环境</description>
+          <defaultValue>production</defaultValue>
+          <trim>true</trim>
+        </hudson.model.StringParameterDefinition>
+        
+        <hudson.model.StringParameterDefinition>
+          <name>SERVICE_NAME</name>
+          <description>服务名称</description>
+          <defaultValue>api-gateway</defaultValue>
+          <trim>true</trim>
+        </hudson.model.StringParameterDefinition>
+        
+        <hudson.model.BooleanParameterDefinition>
+          <name>FORCE_DEPLOY</name>
+          <description>是否强制部署（覆盖现有实例）</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        
+        <hudson.model.BooleanParameterDefinition>
+          <name>CLEAN_OLD_DATA</name>
+          <description>部署前清理旧数据</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        
+        <hudson.model.ChoiceParameterDefinition>
+          <name>DEPLOY_STRATEGY</name>
+          <description>部署策略</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>rolling</string>
+              <string>recreate</string>
+              <string>blue-green</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        
+        <hudson.model.StringParameterDefinition>
+          <name>DELETE_TARGET</name>
+          <description>需要删除的目标资源</description>
+          <defaultValue>*</defaultValue>
+          <trim>true</trim>
+        </hudson.model.StringParameterDefinition>
+        
+        <hudson.model.PasswordParameterDefinition>
+          <name>API_TOKEN</name>
+          <description>API访问令牌</description>
+          <defaultValue/>
+        </hudson.model.PasswordParameterDefinition>
+        
+        <hudson.model.TextParameterDefinition>
+          <name>EXTRA_CONFIG</name>
+          <description>额外配置内容</description>
+          <defaultValue/>
+        </hudson.model.TextParameterDefinition>
+        
+        <hudson.model.StringParameterDefinition>
+          <name>UNUSED_PARAM</name>
+          <description>这个参数没有被任何步骤使用</description>
+          <defaultValue>test</defaultValue>
+          <trim>true</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+echo "开始部署到 ${ENVIRONMENT} 环境"
+echo "服务名称: ${SERVICE_NAME}"
+
+if [ "${FORCE_DEPLOY}" = "true" ]; then
+  echo "执行强制部署..."
+  kubectl delete deployment ${SERVICE_NAME} -n ${ENVIRONMENT}
+fi
+
+if [ "${CLEAN_OLD_DATA}" = "true" ]; then
+  echo "清理旧数据..."
+  rm -rf /data/${SERVICE_NAME}/old/*
+fi
+
+echo "部署策略: ${DEPLOY_STRATEGY}"</command>
+    </hudson.tasks.Shell>
+    
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+echo "清理目标资源: ${DELETE_TARGET}"
+curl -X DELETE "https://api.example.com/resources/${DELETE_TARGET}" -H "Authorization: Bearer ${API_TOKEN}" | bash</command>
+    </hudson.tasks.Shell>
+    
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+echo "常规构建步骤"
+make build
+make test</command>
+    </hudson.tasks.Shell>
+  </builders>
+  
+  <publishers/>
+  <buildWrappers/>
+</project>

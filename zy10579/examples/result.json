@@ -1,0 +1,183 @@
+{
+  "job_name": "examples",
+  "file_path": "/Users/lzy/pro/solo/workspaces/zy10579/examples/config.xml",
+  "parameters": [
+    {
+      "name": "ENVIRONMENT",
+      "param_type": "StringParameterDefinition",
+      "default_value": "production",
+      "description": "部署环境",
+      "raw_xml": "<hudson.model.StringParameterDefinition>\n  <name>ENVIRONMENT</name>\n  <description>部署环境</description>\n  <defaultValue>production</defaultValue>\n  <trim>true</trim>\n</hudson.model.StringParameterDefinition>\n",
+      "line_number": 0,
+      "choices": [],
+      "used_in_steps": [
+        0
+      ],
+      "risk_level": "DANGER",
+      "risk_reason": "默认指向生产环境 | 参数被危险构建步骤使用"
+    },
+    {
+      "name": "SERVICE_NAME",
+      "param_type": "StringParameterDefinition",
+      "default_value": "api-gateway",
+      "description": "服务名称",
+      "raw_xml": "<hudson.model.StringParameterDefinition>\n  <name>SERVICE_NAME</name>\n  <description>服务名称</description>\n  <defaultValue>api-gateway</defaultValue>\n  <trim>true</trim>\n</hudson.model.StringParameterDefinition>\n",
+      "line_number": 0,
+      "choices": [],
+      "used_in_steps": [
+        0
+      ],
+      "risk_level": "WARNING",
+      "risk_reason": "参数被危险构建步骤使用"
+    },
+    {
+      "name": "FORCE_DEPLOY",
+      "param_type": "BooleanParameterDefinition",
+      "default_value": "true",
+      "description": "是否强制部署（覆盖现有实例）",
+      "raw_xml": "<hudson.model.BooleanParameterDefinition>\n  <name>FORCE_DEPLOY</name>\n  <description>是否强制部署（覆盖现有实例）</description>\n  <defaultValue>true</defaultValue>\n</hudson.model.BooleanParameterDefinition>\n",
+      "line_number": 0,
+      "choices": [],
+      "used_in_steps": [
+        0
+      ],
+      "risk_level": "CRITICAL",
+      "risk_reason": "可能强制覆盖资源 | 布尔参数默认为真，可能自动执行危险操作 | 参数被危险构建步骤使用"
+    },
+    {
+      "name": "CLEAN_OLD_DATA",
+      "param_type": "BooleanParameterDefinition",
+      "default_value": "false",
+      "description": "部署前清理旧数据",
+      "raw_xml": "<hudson.model.BooleanParameterDefinition>\n  <name>CLEAN_OLD_DATA</name>\n  <description>部署前清理旧数据</description>\n  <defaultValue>false</defaultValue>\n</hudson.model.BooleanParameterDefinition>\n",
+      "line_number": 0,
+      "choices": [],
+      "used_in_steps": [
+        0
+      ],
+      "risk_level": "DANGER",
+      "risk_reason": "可能清理数据 | 参数被危险构建步骤使用"
+    },
+    {
+      "name": "DEPLOY_STRATEGY",
+      "param_type": "ChoiceParameterDefinition",
+      "default_value": null,
+      "description": "部署策略",
+      "raw_xml": "<hudson.model.ChoiceParameterDefinition>\n  <name>DEPLOY_STRATEGY</name>\n  <description>部署策略</description>\n  <choices class=\"java.util.Arrays$ArrayList\">\n    <a class=\"string-array\">\n      <string>rolling</string>\n      <string>recreate</string>\n      <string>blue-green</string>\n    </a>\n  </choices>\n</hudson.model.ChoiceParameterDefinition>\n",
+      "line_number": 0,
+      "choices": [
+        "rolling",
+        "recreate",
+        "blue-green"
+      ],
+      "used_in_steps": [
+        0
+      ],
+      "risk_level": "DANGER",
+      "risk_reason": "参数无默认值，需人工确认 | 参数被危险构建步骤使用"
+    },
+    {
+      "name": "DELETE_TARGET",
+      "param_type": "StringParameterDefinition",
+      "default_value": "*",
+      "description": "需要删除的目标资源",
+      "raw_xml": "<hudson.model.StringParameterDefinition>\n  <name>DELETE_TARGET</name>\n  <description>需要删除的目标资源</description>\n  <defaultValue>*</defaultValue>\n  <trim>true</trim>\n</hudson.model.StringParameterDefinition>\n",
+      "line_number": 0,
+      "choices": [],
+      "used_in_steps": [
+        1
+      ],
+      "risk_level": "CRITICAL",
+      "risk_reason": "可能触发删除操作 | 通配符默认值可能影响范围过大 | 参数被危险构建步骤使用"
+    },
+    {
+      "name": "API_TOKEN",
+      "param_type": "PasswordParameterDefinition",
+      "default_value": null,
+      "description": "API访问令牌",
+      "raw_xml": "<hudson.model.PasswordParameterDefinition>\n  <name>API_TOKEN</name>\n  <description>API访问令牌</description>\n  <defaultValue/>\n</hudson.model.PasswordParameterDefinition>\n",
+      "line_number": 0,
+      "choices": [],
+      "used_in_steps": [
+        1
+      ],
+      "risk_level": "CRITICAL",
+      "risk_reason": "参数无默认值，需人工确认 | 敏感参数类型: PasswordParameterDefinition | 参数被危险构建步骤使用"
+    },
+    {
+      "name": "EXTRA_CONFIG",
+      "param_type": "TextParameterDefinition",
+      "default_value": null,
+      "description": "额外配置内容",
+      "raw_xml": "<hudson.model.TextParameterDefinition>\n  <name>EXTRA_CONFIG</name>\n  <description>额外配置内容</description>\n  <defaultValue/>\n</hudson.model.TextParameterDefinition>\n",
+      "line_number": 0,
+      "choices": [],
+      "used_in_steps": [],
+      "risk_level": "DANGER",
+      "risk_reason": "参数无默认值，需人工确认 | 参数未被任何构建步骤使用，可能是冗余参数"
+    },
+    {
+      "name": "UNUSED_PARAM",
+      "param_type": "StringParameterDefinition",
+      "default_value": "test",
+      "description": "这个参数没有被任何步骤使用",
+      "raw_xml": "<hudson.model.StringParameterDefinition>\n  <name>UNUSED_PARAM</name>\n  <description>这个参数没有被任何步骤使用</description>\n  <defaultValue>test</defaultValue>\n  <trim>true</trim>\n</hudson.model.StringParameterDefinition>\n",
+      "line_number": 0,
+      "choices": [],
+      "used_in_steps": [],
+      "risk_level": "WARNING",
+      "risk_reason": "参数未被任何构建步骤使用，可能是冗余参数"
+    }
+  ],
+  "build_steps": [
+    {
+      "step_type": "hudson.tasks.Shell",
+      "raw_xml": "<hudson.tasks.Shell>\n  <command>#!/bin/bash\necho \"开始部署到 ${ENVIRONMENT} 环境\"\necho \"服务名称: ${SERVICE_NAME}\"\n\nif [ \"${FORCE_DEPLOY}\" = \"true\" ]; then\n  echo \"执行强制部署...\"\n  kubectl delete deployment ${SERVICE_NAME} -n ${ENVIRONMENT}\nfi\n\nif [ \"${CLEAN_OLD_DATA}\" = \"true\" ]; then\n  echo \"清理旧数据...\"\n  rm -rf /data/${SERVICE_NAME}/old/*\nfi\n\necho \"部署策略: ${DEPLOY_STRATEGY}\"</command>\n</hudson.tasks.Shell>\n",
+      "line_number": 0,
+      "uses_params": [
+        "ENVIRONMENT",
+        "SERVICE_NAME",
+        "FORCE_DEPLOY",
+        "CLEAN_OLD_DATA",
+        "DEPLOY_STRATEGY"
+      ],
+      "is_dangerous": true,
+      "danger_reason": "递归删除命令"
+    },
+    {
+      "step_type": "hudson.tasks.Shell",
+      "raw_xml": "<hudson.tasks.Shell>\n  <command>#!/bin/bash\necho \"清理目标资源: ${DELETE_TARGET}\"\ncurl -X DELETE \"https://api.example.com/resources/${DELETE_TARGET}\" -H \"Authorization: Bearer ${API_TOKEN}\" | bash</command>\n</hudson.tasks.Shell>\n",
+      "line_number": 0,
+      "uses_params": [
+        "DELETE_TARGET",
+        "API_TOKEN"
+      ],
+      "is_dangerous": true,
+      "danger_reason": "管道执行远程脚本"
+    },
+    {
+      "step_type": "hudson.tasks.Shell",
+      "raw_xml": "<hudson.tasks.Shell>\n  <command>#!/bin/bash\necho \"常规构建步骤\"\nmake build\nmake test</command>\n</hudson.tasks.Shell>\n",
+      "line_number": 0,
+      "uses_params": [],
+      "is_dangerous": false,
+      "danger_reason": null
+    }
+  ],
+  "parse_errors": [],
+  "summary": {
+    "total_parameters": 9,
+    "parameters_with_default": 6,
+    "parameters_without_default": 3,
+    "risk_distribution": {
+      "SAFE": 0,
+      "WARNING": 2,
+      "DANGER": 4,
+      "CRITICAL": 3
+    },
+    "total_build_steps": 3,
+    "dangerous_steps": 2,
+    "parse_errors": 0
+  },
+  "audit_time": "2026-05-17T23:24:23.764694"
+}
