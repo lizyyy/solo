@@ -1,0 +1,343 @@
+{
+  "summary": {
+    "totalTables": 6,
+    "totalColumns": 20,
+    "tablesWithMissingComment": 1,
+    "columnsWithMissingComment": 3,
+    "duplicateTableComments": 0,
+    "duplicateColumnComments": 3,
+    "conflictingTableComments": 1,
+    "conflictingColumnComments": 3,
+    "badLines": 1,
+    "hasIssues": true
+  },
+  "tables": [
+    {
+      "name": "users",
+      "filePath": "test/sample.sql",
+      "startLine": 2,
+      "columns": [
+        {
+          "name": "id",
+          "comment": "用户ID",
+          "line": 3,
+          "raw": "id INT PRIMARY KEY COMMENT '用户ID',"
+        },
+        {
+          "name": "name",
+          "comment": "用户名",
+          "line": 4,
+          "raw": "name VARCHAR(100) NOT NULL COMMENT '用户名',"
+        },
+        {
+          "name": "email",
+          "comment": "用户邮箱",
+          "line": 5,
+          "raw": "email VARCHAR(255) COMMENT '用户邮箱',"
+        },
+        {
+          "name": "created_at",
+          "comment": null,
+          "line": 6,
+          "raw": "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+        },
+        {
+          "name": "updated_at",
+          "comment": null,
+          "line": 7,
+          "raw": "updated_at TIMESTAMP"
+        }
+      ],
+      "comment": "用户表",
+      "endLine": 8
+    },
+    {
+      "name": "orders",
+      "filePath": "test/sample.sql",
+      "startLine": 11,
+      "columns": [
+        {
+          "name": "id",
+          "comment": "订单ID",
+          "line": 12,
+          "raw": "id INT PRIMARY KEY COMMENT '订单ID',"
+        },
+        {
+          "name": "user_id",
+          "comment": "用户ID",
+          "line": 13,
+          "raw": "user_id INT NOT NULL COMMENT '用户ID',"
+        },
+        {
+          "name": "total_amount",
+          "comment": "订单总金额",
+          "line": 14,
+          "raw": "total_amount DECIMAL(10, 2) NOT NULL COMMENT '订单总金额',"
+        },
+        {
+          "name": "status",
+          "comment": null,
+          "line": 15,
+          "raw": "status INT NOT NULL,"
+        },
+        {
+          "name": "created_at",
+          "comment": "创建时间",
+          "line": 16,
+          "raw": "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'"
+        }
+      ],
+      "comment": null,
+      "endLine": 17
+    },
+    {
+      "name": "products",
+      "filePath": "test/sample.sql",
+      "startLine": 20,
+      "columns": [
+        {
+          "name": "id",
+          "comment": "产品ID",
+          "line": 21,
+          "raw": "id INT PRIMARY KEY COMMENT '产品ID',"
+        },
+        {
+          "name": "name",
+          "comment": "商品名称",
+          "line": 22,
+          "raw": "name VARCHAR(100) NOT NULL COMMENT '商品名称',"
+        },
+        {
+          "name": "price",
+          "comment": "价格",
+          "line": 23,
+          "raw": "price DECIMAL(10, 2) NOT NULL COMMENT '价格'"
+        }
+      ],
+      "comment": "商品表",
+      "endLine": 24
+    },
+    {
+      "name": "products",
+      "filePath": "test/sample.sql",
+      "startLine": 26,
+      "columns": [
+        {
+          "name": "id",
+          "comment": "产品主键",
+          "line": 27,
+          "raw": "id INT PRIMARY KEY COMMENT '产品主键',"
+        },
+        {
+          "name": "name",
+          "comment": "产品名称",
+          "line": 28,
+          "raw": "name VARCHAR(100) NOT NULL COMMENT '产品名称',"
+        },
+        {
+          "name": "price",
+          "comment": "售价",
+          "line": 29,
+          "raw": "price DECIMAL(10, 2) NOT NULL COMMENT '售价'"
+        }
+      ],
+      "comment": "产品表",
+      "endLine": 30
+    },
+    {
+      "name": "category",
+      "filePath": "test/sample.sql",
+      "startLine": 36,
+      "columns": [
+        {
+          "name": "id",
+          "comment": "ID",
+          "line": 37,
+          "raw": "id INT PRIMARY KEY COMMENT 'ID',"
+        },
+        {
+          "name": "name",
+          "comment": "名称",
+          "line": 38,
+          "raw": "name VARCHAR(100) NOT NULL COMMENT '名称'"
+        }
+      ],
+      "comment": "分类表",
+      "endLine": 39
+    },
+    {
+      "name": "tag",
+      "filePath": "test/sample.sql",
+      "startLine": 41,
+      "columns": [
+        {
+          "name": "id",
+          "comment": "ID",
+          "line": 42,
+          "raw": "id INT PRIMARY KEY COMMENT 'ID',"
+        },
+        {
+          "name": "name",
+          "comment": "名称",
+          "line": 43,
+          "raw": "name VARCHAR(100) NOT NULL COMMENT '名称'"
+        }
+      ],
+      "comment": "标签表",
+      "endLine": 44
+    }
+  ],
+  "missingComments": {
+    "tables": [
+      {
+        "table": "orders",
+        "filePath": "test/sample.sql",
+        "line": 11
+      }
+    ],
+    "columns": [
+      {
+        "table": "users",
+        "column": "created_at",
+        "filePath": "test/sample.sql",
+        "line": 6
+      },
+      {
+        "table": "users",
+        "column": "updated_at",
+        "filePath": "test/sample.sql",
+        "line": 7
+      },
+      {
+        "table": "orders",
+        "column": "status",
+        "filePath": "test/sample.sql",
+        "line": 15
+      }
+    ]
+  },
+  "duplicateComments": {
+    "tables": [],
+    "columns": [
+      {
+        "comment": "用户ID",
+        "columns": [
+          {
+            "column": "users.id",
+            "filePath": "test/sample.sql",
+            "comment": "用户ID"
+          },
+          {
+            "column": "orders.user_id",
+            "filePath": "test/sample.sql",
+            "comment": "用户ID"
+          }
+        ]
+      },
+      {
+        "comment": "ID",
+        "columns": [
+          {
+            "column": "category.id",
+            "filePath": "test/sample.sql",
+            "comment": "ID"
+          },
+          {
+            "column": "tag.id",
+            "filePath": "test/sample.sql",
+            "comment": "ID"
+          }
+        ]
+      },
+      {
+        "comment": "名称",
+        "columns": [
+          {
+            "column": "category.name",
+            "filePath": "test/sample.sql",
+            "comment": "名称"
+          },
+          {
+            "column": "tag.name",
+            "filePath": "test/sample.sql",
+            "comment": "名称"
+          }
+        ]
+      }
+    ]
+  },
+  "conflictingComments": {
+    "tables": [
+      {
+        "table": "products",
+        "comments": [
+          {
+            "comment": "商品表",
+            "filePath": "test/sample.sql",
+            "line": 20
+          },
+          {
+            "comment": "产品表",
+            "filePath": "test/sample.sql",
+            "line": 26
+          }
+        ]
+      }
+    ],
+    "columns": [
+      {
+        "column": "products.id",
+        "comments": [
+          {
+            "comment": "产品ID",
+            "filePath": "test/sample.sql",
+            "line": 21
+          },
+          {
+            "comment": "产品主键",
+            "filePath": "test/sample.sql",
+            "line": 27
+          }
+        ]
+      },
+      {
+        "column": "products.name",
+        "comments": [
+          {
+            "comment": "商品名称",
+            "filePath": "test/sample.sql",
+            "line": 22
+          },
+          {
+            "comment": "产品名称",
+            "filePath": "test/sample.sql",
+            "line": 28
+          }
+        ]
+      },
+      {
+        "column": "products.price",
+        "comments": [
+          {
+            "comment": "价格",
+            "filePath": "test/sample.sql",
+            "line": 23
+          },
+          {
+            "comment": "售价",
+            "filePath": "test/sample.sql",
+            "line": 29
+          }
+        ]
+      }
+    ]
+  },
+  "badLines": [
+    {
+      "filePath": "test/sample.sql",
+      "line": 33,
+      "content": "INVALID SQL SYNTAX HERE",
+      "reason": "无法识别的SQL语法"
+    }
+  ]
+}

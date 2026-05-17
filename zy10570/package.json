@@ -1,0 +1,19 @@
+{
+  "name": "db-comment-cli",
+  "version": "1.0.0",
+  "description": "数据库表注释检查CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "db-comment": "./bin/db-comment.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": ["database", "ddl", "comment", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  }
+}
