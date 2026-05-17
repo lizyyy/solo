@@ -1,10 +1,11 @@
 import os
 import re
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Tuple, Optional, Dict, Any
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509.oid import ExtensionOID, NameOID
+from cryptography.hazmat.primitives.asymmetric import rsa, ec, dsa
 
 from .exceptions import CSRParseError, CertificateParseError, DomainListParseError
 
@@ -34,11 +35,21 @@ def parse_csr(csr_path: str) -> Dict[str, Any]:
         except x509.ExtensionNotFound:
             pass
         
+        key_type = None
+        public_key = csr.public_key()
+        if isinstance(public_key, rsa.RSAPublicKey):
+            key_type = f"RSA {public_key.key_size} bits"
+        elif isinstance(public_key, ec.EllipticCurvePublicKey):
+            key_type = f"ECDSA {public_key.curve.name}"
+        elif isinstance(public_key, dsa.DSAPublicKey):
+            key_type = f"DSA {public_key.key_size} bits"
+        
         return {
             "file_path": os.path.abspath(csr_path),
             "file_name": os.path.basename(csr_path),
             "common_name": common_name,
             "san_list": san_list,
+            "key_type": key_type,
             "parsed_at": datetime.now().isoformat()
         }
     
@@ -85,16 +96,28 @@ def parse_certificate(cert_path: str) -> Dict[str, Any]:
         days_remaining = (not_after - now).days
         is_expired = now > not_after
         
+        key_type = None
+        public_key = cert.public_key()
+        if isinstance(public_key, rsa.RSAPublicKey):
+            key_type = f"RSA {public_key.key_size} bits"
+        elif isinstance(public_key, ec.EllipticCurvePublicKey):
+            key_type = f"ECDSA {public_key.curve.name}"
+        elif isinstance(public_key, dsa.DSAPublicKey):
+            key_type = f"DSA {public_key.key_size} bits"
+        
         return {
             "file_path": os.path.abspath(cert_path),
             "file_name": os.path.basename(cert_path),
             "common_name": common_name,
             "san_list": san_list,
             "issuer": issuer_cn,
+            "serial_number": format(cert.serial_number, 'x'),
             "not_before": not_before.isoformat(),
             "not_after": not_after.isoformat(),
             "days_remaining": days_remaining,
             "is_expired": is_expired,
+            "key_type": key_type,
+            "version": str(cert.version),
             "parsed_at": datetime.now().isoformat()
         }
     
@@ -111,6 +134,7 @@ def parse_domain_list(domain_list_path: str) -> Dict[str, Any]:
     domains: List[str] = []
     bad_lines: List[Dict[str, Any]] = []
     line_count = 0
+    valid_count = 0
     
     domain_pattern = re.compile(
         r'^(?:\*\.)?(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$'
@@ -143,6 +167,7 @@ def parse_domain_list(domain_list_path: str) -> Dict[str, Any]:
                     continue
                 
                 domains.append(cleaned)
+                valid_count += 1
     
     except Exception as e:
         raise DomainListParseError(f"Failed to read domain list: {str(e)}", file_path=domain_list_path)
@@ -153,6 +178,7 @@ def parse_domain_list(domain_list_path: str) -> Dict[str, Any]:
         "domains": domains,
         "domain_count": len(domains),
         "line_count": line_count,
+        "valid_count": valid_count,
         "bad_lines": bad_lines,
         "bad_line_count": len(bad_lines),
         "parsed_at": datetime.now().isoformat()

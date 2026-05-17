@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: san-checker
+Version: 1.0.0
+Summary: Certificate SAN Checker CLI
+Author: Engineering Team
+Keywords: certificate san csr ssl tls
+Requires-Python: >=3.8
+Requires-Dist: cryptography>=41.0.0
+Requires-Dist: pyOpenSSL>=23.0.0
+Requires-Dist: jinja2>=3.1.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: tabulate>=0.9.0
+Dynamic: author
+Dynamic: keywords
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

@@ -9,36 +9,35 @@ def generate_terminal_summary(result):
     lines.append("=" * 60)
     lines.append("")
     compare = result.get("san_comparison", {})
-    lines.append("期望域名数: {}".format(compare.get("expected_count", 0)))
-    lines.append("实际 SAN 数: {}".format(compare.get("actual_count", 0)))
-    lines.append("匹配成功: {}".format(compare.get("matched_count", 0)))
-    lines.append("缺失域名: {}".format(compare.get("missing_count", 0)))
-    lines.append("额外 SAN: {}".format(compare.get("extra_count", 0)))
-    lines.append("通配符数量: {}".format(compare.get("wildcard_count", 0)))
+    lines.append(f"期望域名数: {compare.get('expected_count', 0)}")
+    lines.append(f"实际 SAN 数: {compare.get('actual_count', 0)}")
+    lines.append(f"匹配成功: {compare.get('matched_count', 0)}")
+    lines.append(f"缺失域名: {compare.get('missing_count', 0)}")
+    lines.append(f"额外 SAN: {compare.get('extra_count', 0)}")
+    lines.append(f"通配符数量: {compare.get('wildcard_count', 0)}")
     lines.append("")
     if compare.get("all_matched"):
         lines.append("✓ 所有域名均已匹配!")
     else:
         lines.append("✗ 发现缺失域名:")
         for d in compare.get("missing_domains", []):
-            lines.append("   - {}".format(d))
+            lines.append(f"   - {d}")
     if compare.get("extra_san"):
         lines.append("")
         lines.append("额外的 SAN 条目:")
         for d in compare.get("extra_san", []):
-            lines.append("   + {}".format(d))
+            lines.append(f"   + {d}")
     bad_lines = result.get("bad_lines", [])
     if bad_lines:
         lines.append("")
-        lines.append("⚠ 发现 {} 个无效行:".format(len(bad_lines)))
+        lines.append(f"⚠ 发现 {len(bad_lines)} 个无效行:")
         for bl in bad_lines[:5]:
-            lines.append("   行{}: {} [{}]".format(bl.get("line", "?"), bl.get("content", ""), bl.get("reason", "")))
+            lines.append(f"   行{bl.get('line', '?')}: {bl.get('content', '')} [{bl.get('reason', '')}]")
         if len(bad_lines) > 5:
-            lines.append("   ... 还有 {} 个".format(len(bad_lines) - 5))
+            lines.append(f"   ... 还有 {len(bad_lines) - 5} 个")
     lines.append("")
     lines.append("=" * 60)
     return "\n".join(lines)
 
 def generate_json_output(result, indent=2):
     return json.dumps(result, ensure_ascii=False, indent=indent)
-
