@@ -1,0 +1,57 @@
+{
+  "package_id": "P001",
+  "customer": {
+    "customer_id": "C001",
+    "name": "张美丽",
+    "phone": "13800138001"
+  },
+  "package_name": "美白嫩肤套餐",
+  "original_store": "STORE_A",
+  "current_store": "STORE_A",
+  "status": "active",
+  "expiry_status": "valid",
+  "expiry_message": "套餐有效，剩余 286 天过期",
+  "expiry_details": {
+    "package_id": "P001",
+    "effective_expiry": "2027-02-28T00:00:00",
+    "days_until_expiry": 286
+  },
+  "transferred": false,
+  "transfer_history": [],
+  "items": [
+    {
+      "item_id": "ITEM001",
+      "name": "美白护理",
+      "total_count": 10,
+      "used_count": 3,
+      "gifted_count": 2,
+      "remaining_count": 9
+    },
+    {
+      "item_id": "ITEM002",
+      "name": "补水护理",
+      "total_count": 10,
+      "used_count": 2,
+      "gifted_count": 1,
+      "remaining_count": 9
+    }
+  ],
+  "reconciliation": {
+    "package_id": "P001",
+    "total_verifications": 5,
+    "discrepancies": [],
+    "item_breakdown": {
+      "ITEM001": {
+        "normal": 2,
+        "gift": 1,
+        "total": 3
+      },
+      "ITEM002": {
+        "normal": 1,
+        "gift": 1,
+        "total": 2
+      }
+    }
+  },
+  "audit_timestamp": "2026-05-17T17:47:41.007972"
+}

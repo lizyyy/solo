@@ -1,0 +1,60 @@
+{
+  "package_id": "P003",
+  "customer": {
+    "customer_id": "C003",
+    "name": "王大方",
+    "phone": "13800138003"
+  },
+  "package_name": "问题套餐",
+  "original_store": "STORE_A",
+  "current_store": "STORE_C",
+  "status": "active",
+  "expiry_status": "invalid",
+  "expiry_message": "套餐已过期 48 天",
+  "expiry_details": {
+    "package_id": "P003",
+    "effective_expiry": "2026-03-31T00:00:00",
+    "check_date": "2026-05-17T17:48:21.380423",
+    "days_past_expiry": 48
+  },
+  "transferred": true,
+  "transfer_history": [
+    "STORE_A",
+    "STORE_B",
+    "STORE_C",
+    "STORE_D"
+  ],
+  "items": [
+    {
+      "item_id": "ITEM004",
+      "name": "按摩护理",
+      "total_count": 10,
+      "used_count": 15,
+      "gifted_count": 5,
+      "remaining_count": 0
+    }
+  ],
+  "reconciliation": {
+    "package_id": "P003",
+    "total_verifications": 2,
+    "discrepancies": [
+      {
+        "item_id": "ITEM004",
+        "item_name": "按摩护理",
+        "recorded_used": 15,
+        "actual_verifications": 2,
+        "gift_verifications": 0,
+        "normal_verifications": 2,
+        "difference": 13
+      }
+    ],
+    "item_breakdown": {
+      "ITEM004": {
+        "normal": 2,
+        "gift": 0,
+        "total": 2
+      }
+    }
+  },
+  "audit_timestamp": "2026-05-17T17:48:21.380436"
+}
