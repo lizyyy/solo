@@ -304,18 +304,21 @@ def clean_task_data(db: Session, task_id: int) -> CleaningResult:
     } for r in cleaned_records]
     
     duplicates = find_duplicates(records_for_dup)
-    duplicate_count = 0
+    marked_duplicates = set()
     
     for key, record_ids in duplicates.items():
         if len(record_ids) > 1:
-            duplicate_count += len(record_ids) - 1
             keep_id = record_ids[0]
             for dup_id in record_ids[1:]:
-                dup_record = db.query(CleanedRecord).filter(CleanedRecord.id == dup_id).first()
-                if dup_record:
-                    dup_record.status = "duplicate"
-                    dup_record.is_duplicate = True
-                    dup_record.duplicate_with = keep_id
+                if dup_id not in marked_duplicates:
+                    dup_record = db.query(CleanedRecord).filter(CleanedRecord.id == dup_id).first()
+                    if dup_record:
+                        dup_record.status = "duplicate"
+                        dup_record.is_duplicate = True
+                        dup_record.duplicate_with = keep_id
+                        marked_duplicates.add(dup_id)
+    
+    duplicate_count = len(marked_duplicates)
     
     task.total_records = len(records_data)
     task.valid_records = valid_count - duplicate_count

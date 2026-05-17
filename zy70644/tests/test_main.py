@@ -369,6 +369,60 @@ class TestDuplicateHandling:
         
         response = client.get(f"/api/tasks/{task_id}/duplicates")
         assert response.status_code == 200
+    
+    def test_dual_duplicate_not_counted_twice(self, db_session):
+        """测试当两条记录同时重复护照号和手机号时，只计算1条重复，而不是2条"""
+        create_response = client.post(
+            "/api/tasks",
+            json={"task_name": "双重重复测试", "source_teacher": "王老师"}
+        )
+        task_id = create_response.json()["id"]
+        
+        # 创建两条记录，护照号和手机号都相同（会产生两个重复组）
+        df = pd.DataFrame([
+            {
+                "学生姓名": "张三",
+                "护照号": "E22222222",
+                "监护人电话": "13900000002",
+                "监护人姓名": "张父"
+            },
+            {
+                "学生姓名": "张三",
+                "护照号": "E22222222",
+                "监护人电话": "13900000002",
+                "监护人姓名": "张父"
+            }
+        ])
+        
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False)
+        output.seek(0)
+        
+        client.post(
+            f"/api/tasks/{task_id}/upload",
+            files={"file": ("test.xlsx", output.getvalue(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
+        )
+        
+        clean_response = client.post(f"/api/tasks/{task_id}/clean")
+        clean_result = clean_response.json()
+        
+        # 关键验证：实际只有1条重复，不应是2条
+        assert clean_result["duplicate_count"] == 1, f"预期1条重复，实际得到 {clean_result['duplicate_count']} 条"
+        
+        # 验证：总记录2条 - 异常0条 - 重复1条 = 有效1条
+        assert clean_result["valid_count"] == 1, f"预期1条有效，实际得到 {clean_result['valid_count']} 条"
+        
+        # 验证任务统计
+        task_response = client.get(f"/api/tasks/{task_id}")
+        task_data = task_response.json()
+        assert task_data["duplicate_records"] == 1, "任务重复记录数应为1"
+        assert task_data["valid_records"] == 1, "任务有效记录数应为1"
+        
+        # 验证实际重复记录
+        dup_response = client.get(f"/api/tasks/{task_id}/duplicates")
+        dup_records = dup_response.json()
+        assert len(dup_records) == 1, f"实际重复记录数应为1，得到 {len(dup_records)} 条"
 
 
 class TestExport:
