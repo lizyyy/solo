@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package example;
+
+message BadMessage {
+    reserved 3, 5 to 7;
+    reserved "email";
+
+    int64 id = 1;
+    string name = 2;
+    int32 age = 3;
+    string phone = 4;
+    string email = 8;
+    string name = 9;
+}

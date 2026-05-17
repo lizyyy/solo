@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "proto-reserved-checker"
+version = "0.1.0"
+authors = [
+  { name="Proto Checker Team", email="checker@example.com" }
+]
+description = "Protobuf 字段保留检查 CLI 工具 - 防止字段编号复用导致的兼容性问题"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "click>=8.0",
+    "rich>=12.0",
+]
+
+[project.scripts]
+proto-reserved-checker = "proto_reserved_checker.cli:main"

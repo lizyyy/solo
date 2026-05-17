@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package example;
+
+message GoodMessage {
+    reserved 3, 5 to 7;
+    reserved "email", "phone";
+
+    int64 id = 1;
+    string name = 2;
+    string avatar_url = 4;
+    string address = 8;
+}
