@@ -282,12 +282,10 @@ class SeatLockRuleEngine:
         expired = []
         for lock in sorted(self.locks.values(), key=lambda l: l.lock_id):
             if lock.status == LockStatus.ACTIVE and check_time > lock.lock_timeout:
-                timeout_minutes = int((check_time - lock.lock_timeout).total_seconds() / 60)
                 expired.append({
                     "lock_id": lock.lock_id,
                     "seat_id": lock.seat_id,
                     "order_id": lock.order_id,
-                    "timeout_minutes": timeout_minutes,
                     "locked_at": lock.locked_at.isoformat(),
                     "lock_timeout": lock.lock_timeout.isoformat()
                 })

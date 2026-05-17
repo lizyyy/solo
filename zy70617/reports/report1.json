@@ -67,118 +67,138 @@
       "lock_timeout": "2026-05-17T19:51:57",
       "locked_at": "2026-05-17T18:51:57",
       "order_id": "GRP001",
-      "seat_id": "S002",
-      "timeout_minutes": 40
+      "seat_id": "S002"
     },
     {
       "lock_id": "LOCK002",
       "lock_timeout": "2026-05-17T19:51:57",
       "locked_at": "2026-05-17T18:51:57",
       "order_id": "GRP001",
-      "seat_id": "S003",
-      "timeout_minutes": 40
+      "seat_id": "S003"
     },
     {
       "lock_id": "LOCK003",
       "lock_timeout": "2026-05-17T19:51:57",
       "locked_at": "2026-05-17T18:51:57",
       "order_id": "GRP001",
-      "seat_id": "S004",
-      "timeout_minutes": 40
+      "seat_id": "S004"
     },
     {
       "lock_id": "LOCK004",
       "lock_timeout": "2026-05-17T19:51:57",
       "locked_at": "2026-05-17T18:51:57",
       "order_id": "GRP001",
-      "seat_id": "S007",
-      "timeout_minutes": 40
+      "seat_id": "S007"
     },
     {
       "lock_id": "LOCK005",
       "lock_timeout": "2026-05-17T19:51:57",
       "locked_at": "2026-05-17T18:51:57",
       "order_id": "GRP001",
-      "seat_id": "S008",
-      "timeout_minutes": 40
+      "seat_id": "S008"
+    },
+    {
+      "lock_id": "LOCK006",
+      "lock_timeout": "2026-05-17T20:51:57",
+      "locked_at": "2026-05-17T19:21:57",
+      "order_id": "GRP004",
+      "seat_id": "S002"
+    },
+    {
+      "lock_id": "LOCK007",
+      "lock_timeout": "2026-05-17T20:51:57",
+      "locked_at": "2026-05-17T19:21:57",
+      "order_id": "GRP004",
+      "seat_id": "S003"
+    },
+    {
+      "lock_id": "LOCK008",
+      "lock_timeout": "2026-05-17T20:51:57",
+      "locked_at": "2026-05-17T19:21:57",
+      "order_id": "GRP004",
+      "seat_id": "S004"
     },
     {
       "lock_id": "LOCK009",
       "lock_timeout": "2026-05-17T18:51:57",
       "locked_at": "2026-05-17T18:21:57",
       "order_id": "GRP002",
-      "seat_id": "S009",
-      "timeout_minutes": 100
+      "seat_id": "S009"
     },
     {
       "lock_id": "LOCK010",
       "lock_timeout": "2026-05-17T18:51:57",
       "locked_at": "2026-05-17T18:21:57",
       "order_id": "GRP002",
-      "seat_id": "S010",
-      "timeout_minutes": 100
+      "seat_id": "S010"
     },
     {
       "lock_id": "LOCK011",
       "lock_timeout": "2026-05-17T18:51:57",
       "locked_at": "2026-05-17T18:21:57",
       "order_id": "GRP002",
-      "seat_id": "S011",
-      "timeout_minutes": 100
+      "seat_id": "S011"
     },
     {
       "lock_id": "LOCK012",
       "lock_timeout": "2026-05-17T18:51:57",
       "locked_at": "2026-05-17T18:21:57",
       "order_id": "GRP002",
-      "seat_id": "S013",
-      "timeout_minutes": 100
+      "seat_id": "S013"
     },
     {
       "lock_id": "LOCK013",
       "lock_timeout": "2026-05-17T18:51:57",
       "locked_at": "2026-05-17T18:21:57",
       "order_id": "GRP002",
-      "seat_id": "S014",
-      "timeout_minutes": 100
+      "seat_id": "S014"
     },
     {
       "lock_id": "LOCK014",
       "lock_timeout": "2026-05-17T20:06:57",
       "locked_at": "2026-05-17T19:41:57",
       "order_id": "GRP003",
-      "seat_id": "S016",
-      "timeout_minutes": 25
+      "seat_id": "S016"
     },
     {
       "lock_id": "LOCK015",
       "lock_timeout": "2026-05-17T20:06:57",
       "locked_at": "2026-05-17T19:41:57",
       "order_id": "GRP003",
-      "seat_id": "S017",
-      "timeout_minutes": 25
+      "seat_id": "S017"
     },
     {
       "lock_id": "LOCK016",
       "lock_timeout": "2026-05-17T20:06:57",
       "locked_at": "2026-05-17T19:41:57",
       "order_id": "GRP003",
-      "seat_id": "S019",
-      "timeout_minutes": 25
+      "seat_id": "S019"
     },
     {
       "lock_id": "LOCK017",
       "lock_timeout": "2026-05-17T20:06:57",
       "locked_at": "2026-05-17T19:41:57",
       "order_id": "GRP003",
-      "seat_id": "S020",
-      "timeout_minutes": 25
+      "seat_id": "S020"
+    },
+    {
+      "lock_id": "LOCK018",
+      "lock_timeout": "2026-05-17T20:51:57",
+      "locked_at": "2026-05-17T19:41:57",
+      "order_id": "GRP005",
+      "seat_id": "S016"
+    },
+    {
+      "lock_id": "LOCK019",
+      "lock_timeout": "2026-05-17T20:51:57",
+      "locked_at": "2026-05-17T19:41:57",
+      "order_id": "GRP005",
+      "seat_id": "S017"
     }
   ],
   "issues": [
     {
-      "description": "锁座超时未释放: 座位S004已超时40分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S004，超时截止时间：2026-05-17 19:51",
       "issue_id": "0d6e1f50ebc4",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -199,8 +219,28 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S019已超时25分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S017，超时截止时间：2026-05-17 20:51",
+      "issue_id": "19eca0fb6bc4",
+      "issue_type": "TIMEOUT_UNRELEASED",
+      "related_ids": {
+        "lock_ids": [
+          "LOCK019"
+        ],
+        "order_ids": [
+          "GRP005"
+        ],
+        "seat_ids": [
+          "S017"
+        ]
+      },
+      "resolution_note": null,
+      "resolved": false,
+      "resolved_at": null,
+      "severity": "CRITICAL",
+      "show_id": "SHOW002"
+    },
+    {
+      "description": "锁座超时未释放: 座位S019，超时截止时间：2026-05-17 20:06",
       "issue_id": "242428a14bc3",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -221,8 +261,7 @@
       "show_id": "SHOW002"
     },
     {
-      "description": "锁座超时未释放: 座位S020已超时25分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S020，超时截止时间：2026-05-17 20:06",
       "issue_id": "2d96f2cd5377",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -243,8 +282,7 @@
       "show_id": "SHOW002"
     },
     {
-      "description": "锁座超时未释放: 座位S010已超时100分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S010，超时截止时间：2026-05-17 18:51",
       "issue_id": "317aab3419c7",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -265,8 +303,7 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S003已超时40分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S003，超时截止时间：2026-05-17 19:51",
       "issue_id": "48ae9a29c2dc",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -287,8 +324,7 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S007已超时40分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S007，超时截止时间：2026-05-17 19:51",
       "issue_id": "48efd944779f",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -309,8 +345,28 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S017已超时25分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S003，超时截止时间：2026-05-17 20:51",
+      "issue_id": "4e1128062805",
+      "issue_type": "TIMEOUT_UNRELEASED",
+      "related_ids": {
+        "lock_ids": [
+          "LOCK007"
+        ],
+        "order_ids": [
+          "GRP004"
+        ],
+        "seat_ids": [
+          "S003"
+        ]
+      },
+      "resolution_note": null,
+      "resolved": false,
+      "resolved_at": null,
+      "severity": "CRITICAL",
+      "show_id": "SHOW001"
+    },
+    {
+      "description": "锁座超时未释放: 座位S017，超时截止时间：2026-05-17 20:06",
       "issue_id": "56b92eb9b206",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -331,8 +387,28 @@
       "show_id": "SHOW002"
     },
     {
-      "description": "锁座超时未释放: 座位S009已超时100分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S004，超时截止时间：2026-05-17 20:51",
+      "issue_id": "5c1bdfc6eae1",
+      "issue_type": "TIMEOUT_UNRELEASED",
+      "related_ids": {
+        "lock_ids": [
+          "LOCK008"
+        ],
+        "order_ids": [
+          "GRP004"
+        ],
+        "seat_ids": [
+          "S004"
+        ]
+      },
+      "resolution_note": null,
+      "resolved": false,
+      "resolved_at": null,
+      "severity": "CRITICAL",
+      "show_id": "SHOW001"
+    },
+    {
+      "description": "锁座超时未释放: 座位S009，超时截止时间：2026-05-17 18:51",
       "issue_id": "68c13ae297d8",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -353,8 +429,7 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S011已超时100分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S011，超时截止时间：2026-05-17 18:51",
       "issue_id": "7facd1118b79",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -375,8 +450,28 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S014已超时100分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S002，超时截止时间：2026-05-17 20:51",
+      "issue_id": "8cd31e35ec3a",
+      "issue_type": "TIMEOUT_UNRELEASED",
+      "related_ids": {
+        "lock_ids": [
+          "LOCK006"
+        ],
+        "order_ids": [
+          "GRP004"
+        ],
+        "seat_ids": [
+          "S002"
+        ]
+      },
+      "resolution_note": null,
+      "resolved": false,
+      "resolved_at": null,
+      "severity": "CRITICAL",
+      "show_id": "SHOW001"
+    },
+    {
+      "description": "锁座超时未释放: 座位S014，超时截止时间：2026-05-17 18:51",
       "issue_id": "a18e9b0b502d",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -397,8 +492,7 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S013已超时100分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S013，超时截止时间：2026-05-17 18:51",
       "issue_id": "b16ce37e6b87",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -419,8 +513,28 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S008已超时40分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S016，超时截止时间：2026-05-17 20:51",
+      "issue_id": "bab6dea44765",
+      "issue_type": "TIMEOUT_UNRELEASED",
+      "related_ids": {
+        "lock_ids": [
+          "LOCK018"
+        ],
+        "order_ids": [
+          "GRP005"
+        ],
+        "seat_ids": [
+          "S016"
+        ]
+      },
+      "resolution_note": null,
+      "resolved": false,
+      "resolved_at": null,
+      "severity": "CRITICAL",
+      "show_id": "SHOW002"
+    },
+    {
+      "description": "锁座超时未释放: 座位S008，超时截止时间：2026-05-17 19:51",
       "issue_id": "d842d83b9b41",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -441,8 +555,7 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S002已超时40分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S002，超时截止时间：2026-05-17 19:51",
       "issue_id": "e309fc844a61",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -463,8 +576,7 @@
       "show_id": "SHOW001"
     },
     {
-      "description": "锁座超时未释放: 座位S016已超时25分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
+      "description": "锁座超时未释放: 座位S016，超时截止时间：2026-05-17 20:06",
       "issue_id": "e3d76b7ee53b",
       "issue_type": "TIMEOUT_UNRELEASED",
       "related_ids": {
@@ -486,7 +598,6 @@
     },
     {
       "description": "座位冲突: 座位S016被2个订单同时锁定",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "71010c58de5d",
       "issue_type": "SEAT_CONFLICT",
       "related_ids": {
@@ -510,7 +621,6 @@
     },
     {
       "description": "无效换座申请CHG004: 换座数量不匹配: 原2个座位，新3个座位; 目标座位S013已被其他订单锁定; 目标座位S014已被其他订单锁定",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "90128dda2a0b",
       "issue_type": "INVALID_CHANGE",
       "related_ids": {
@@ -536,7 +646,6 @@
     },
     {
       "description": "无效换座申请CHG002: 目标座位S005状态为SOLD，不可换座",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "9dbc58560681",
       "issue_type": "INVALID_CHANGE",
       "related_ids": {
@@ -559,7 +668,6 @@
     },
     {
       "description": "座位冲突: 座位S003被2个订单同时锁定",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "a9c76fd0da32",
       "issue_type": "SEAT_CONFLICT",
       "related_ids": {
@@ -583,7 +691,6 @@
     },
     {
       "description": "座位冲突: 座位S004被2个订单同时锁定",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "c6ae46df436a",
       "issue_type": "SEAT_CONFLICT",
       "related_ids": {
@@ -607,7 +714,6 @@
     },
     {
       "description": "无效换座申请CHG001: 目标座位S009已被其他订单锁定; 目标座位S010已被其他订单锁定",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "c7dccb38ae54",
       "issue_type": "INVALID_CHANGE",
       "related_ids": {
@@ -632,7 +738,6 @@
     },
     {
       "description": "座位冲突: 座位S017被2个订单同时锁定",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "dc11256b6057",
       "issue_type": "SEAT_CONFLICT",
       "related_ids": {
@@ -656,7 +761,6 @@
     },
     {
       "description": "无效换座申请CHG003: 目标座位S999不存在",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "e9d503494759",
       "issue_type": "INVALID_CHANGE",
       "related_ids": {
@@ -679,7 +783,6 @@
     },
     {
       "description": "座位冲突: 座位S002被2个订单同时锁定",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "ebd1b4980c6d",
       "issue_type": "SEAT_CONFLICT",
       "related_ids": {
@@ -703,7 +806,6 @@
     },
     {
       "description": "团体票数量不匹配: 订单GRP003应有12张票，实际锁定4个座位",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "063449608250",
       "issue_type": "GROUP_MISMATCH",
       "related_ids": {
@@ -725,7 +827,6 @@
     },
     {
       "description": "团体票数量不匹配: 订单GRP005应有6张票，实际锁定2个座位",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "349d10219b62",
       "issue_type": "GROUP_MISMATCH",
       "related_ids": {
@@ -745,7 +846,6 @@
     },
     {
       "description": "团体票数量不匹配: 订单GRP004应有20张票，实际锁定3个座位",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "3d6b7621baaa",
       "issue_type": "GROUP_MISMATCH",
       "related_ids": {
@@ -766,7 +866,6 @@
     },
     {
       "description": "保留窗口重叠: 座位S016,S017重叠4860分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "50a5bbc65385",
       "issue_type": "OVERLAPPING_WINDOW",
       "related_ids": {
@@ -787,7 +886,6 @@
     },
     {
       "description": "保留窗口重叠: 座位S016,S017重叠4860分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "50a5bbc65385",
       "issue_type": "OVERLAPPING_WINDOW",
       "related_ids": {
@@ -808,7 +906,6 @@
     },
     {
       "description": "团体票数量不匹配: 订单GRP002应有8张票，实际锁定5个座位",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "9015dcf10c83",
       "issue_type": "GROUP_MISMATCH",
       "related_ids": {
@@ -831,7 +928,6 @@
     },
     {
       "description": "保留窗口重叠: 座位S002,S003,S004重叠780分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "b5d7ffd59bff",
       "issue_type": "OVERLAPPING_WINDOW",
       "related_ids": {
@@ -852,7 +948,6 @@
     },
     {
       "description": "保留窗口重叠: 座位S002,S003,S004重叠780分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "b5d7ffd59bff",
       "issue_type": "OVERLAPPING_WINDOW",
       "related_ids": {
@@ -873,7 +968,6 @@
     },
     {
       "description": "保留窗口重叠: 座位S002,S003,S004重叠780分钟",
-      "discovered_at": "2026-05-17T20:32:46.708998",
       "issue_id": "b5d7ffd59bff",
       "issue_type": "OVERLAPPING_WINDOW",
       "related_ids": {
@@ -894,16 +988,15 @@
     }
   ],
   "report_metadata": {
-    "generated_at": "2026-05-17T20:32:46.708998",
     "report_id": "3ab8acb7",
     "run_id": "3ab8acb7",
     "version": "1.0.0"
   },
   "statistics": {
     "active_locks": 19,
-    "expired_locks": 14,
+    "expired_locks": 19,
     "issues_by_severity": {
-      "CRITICAL": 14,
+      "CRITICAL": 19,
       "HIGH": 9,
       "MEDIUM": 9
     },
@@ -912,11 +1005,11 @@
       "INVALID_CHANGE": 4,
       "OVERLAPPING_WINDOW": 5,
       "SEAT_CONFLICT": 5,
-      "TIMEOUT_UNRELEASED": 14
+      "TIMEOUT_UNRELEASED": 19
     },
     "pending_changes": 3,
     "released_locks": 0,
-    "total_issues": 32,
+    "total_issues": 37,
     "total_locks": 19,
     "total_orders": 5,
     "total_seats": 20,

@@ -312,7 +312,6 @@ class Issue:
             "severity": self.severity,
             "description": self.description,
             "related_ids": self.related_ids,
-            "discovered_at": self.discovered_at.isoformat(),
             "resolved": self.resolved,
             "resolved_at": self.resolved_at.isoformat() if self.resolved_at else None,
             "resolution_note": self.resolution_note

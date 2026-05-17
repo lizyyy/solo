@@ -75,7 +75,6 @@ class ReportGenerator:
                         ids = issue.related_ids[key]
                         if ids:
                             output.write(f"    关联{key}: {', '.join(sorted(ids))}\n")
-                output.write(f"    发现时间: {issue.discovered_at.strftime('%Y-%m-%d %H:%M:%S')}\n")
                 if issue.source_trace:
                     output.write(f"    来源: {issue.source_trace.source_file}:{issue.source_trace.line_number}\n")
                 output.write("\n")
@@ -89,9 +88,8 @@ class ReportGenerator:
                     output.write(f"#{i} 锁ID: {detail['lock_id']}\n")
                     output.write(f"    座位ID: {detail['seat_id']}\n")
                     output.write(f"    订单ID: {detail['order_id']}\n")
-                    output.write(f"    超时时长: {detail['timeout_minutes']}分钟\n")
                     output.write(f"    锁创建时间: {detail['locked_at']}\n")
-                    output.write(f"    超时时间: {detail['lock_timeout']}\n")
+                    output.write(f"    超时截止时间: {detail['lock_timeout']}\n")
                     output.write("\n")
             else:
                 output.write("无超时锁座\n\n")
@@ -121,7 +119,6 @@ class ReportGenerator:
             "report_metadata": {
                 "run_id": self.run_id,
                 "report_id": self.report_id,
-                "generated_at": self.check_time.isoformat(),
                 "version": "1.0.0"
             },
             "statistics": self.stats,
@@ -141,7 +138,7 @@ class ReportGenerator:
         issues_file = output_path / f"seatlock_issues_{self.run_id}.csv"
         with open(issues_file, 'w', encoding='utf-8-sig', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["序号", "问题ID", "问题类型", "演出ID", "严重程度", "描述", "关联ID", "发现时间", "来源文件", "行号"])
+            writer.writerow(["序号", "问题ID", "问题类型", "演出ID", "严重程度", "描述", "关联ID", "来源文件", "行号"])
             for i, issue in enumerate(sorted_issues, 1):
                 related_str = json.dumps(issue.related_ids, ensure_ascii=False, sort_keys=True) if issue.related_ids else ""
                 source_file = issue.source_trace.source_file if issue.source_trace else ""
@@ -149,7 +146,7 @@ class ReportGenerator:
                 writer.writerow([
                     i, issue.issue_id, issue.issue_type.value, issue.show_id,
                     issue.severity, issue.description, related_str,
-                    issue.discovered_at.isoformat(), source_file, line_number
+                    source_file, line_number
                 ])
         files_generated["issues"] = str(issues_file)
         
@@ -157,11 +154,11 @@ class ReportGenerator:
         expired_file = output_path / f"expired_locks_{self.run_id}.csv"
         with open(expired_file, 'w', encoding='utf-8-sig', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["序号", "锁ID", "座位ID", "订单ID", "超时时长(分钟)", "锁创建时间", "超时时间"])
+            writer.writerow(["序号", "锁ID", "座位ID", "订单ID", "锁创建时间", "超时截止时间"])
             for i, detail in enumerate(expired, 1):
                 writer.writerow([
                     i, detail["lock_id"], detail["seat_id"], detail["order_id"],
-                    detail["timeout_minutes"], detail["locked_at"], detail["lock_timeout"]
+                    detail["locked_at"], detail["lock_timeout"]
                 ])
         files_generated["expired_locks"] = str(expired_file)
         
