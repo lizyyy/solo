@@ -2,61 +2,289 @@ const ProtoParser = require("./src/proto-parser");
 const MatrixBuilder = require("./src/matrix-builder");
 const ReportGenerator = require("./src/report-generator");
 const fs = require("fs");
+const path = require("path");
+
+let passed = 0;
+let failed = 0;
+
+function test(name, fn) {
+  try {
+    fn();
+    console.log("✅ PASS:", name);
+    passed++;
+  } catch (err) {
+    console.log("❌ FAIL:", name);
+    console.log("   错误:", err.message);
+    failed++;
+  }
+}
 
 console.log("=".repeat(60));
-console.log("           gRPC 错误码矩阵 CLI");
+console.log("           gRPC 错误码矩阵 - 轻量自检");
 console.log("=".repeat(60));
 console.log();
 
-console.log("1. 测试 ProtoParser...");
-const protoPath = "./examples/error_codes.proto";
-if (!fs.existsSync("./examples")) fs.mkdirSync("./examples");
-fs.writeFileSync(protoPath, 'syntax = "proto3";\npackage demo;\nenum ErrorCode { OK = 0; NOT_FOUND = 5; INTERNAL = 13; UNAVAILABLE = 14; }');
+// ===== 1. ProtoParser 解析测试 =====
+console.log("📦 第1部分: ProtoParser 解析测试\n");
 
-const parser = new ProtoParser();
-const pr = parser.parse(protoPath);
-console.log("   找到 " + pr.errorCodes.length + " 个错误码");
-pr.errorCodes.forEach(ec => console.log("     - " + ec.name + " (" + ec.code + ")"));
+test("ProtoParser 应能正确加载", () => {
+  const parser = new ProtoParser();
+  if (!parser) throw new Error("ProtoParser 实例创建失败");
+});
 
-console.log("\n2. 测试 MatrixBuilder...");
-const sdkData = { languages: {
-  go: { codes: { 
-    OK: { grpcCode: 0, retry: "nonRetriable", description: "Success" },
-    NOT_FOUND: { grpcCode: 5, retry: "nonRetriable", description: "Not Found" },
-    UNAVAILABLE: { grpcCode: 14, retry: "retriable", description: "Unavailable" },
-    INTERNAL: { grpcCode: 13, retry: "retriable", description: "Internal Error" }
-  }},
-  java: { codes: {
-    OK: { grpcCode: 0, retry: "nonRetriable", description: "Success" },
-    NOT_FOUND: { grpcCode: 5, retry: "nonRetriable", description: "Resource Not Exist" },
-    UNAVAILABLE: { grpcCode: 14, retry: "retriable", description: "Connection Failed" },
-    INTERNAL: { grpcCode: 13, retry: "conditional", description: "Internal Exception" }
-  }},
-  python: { codes: {
-    OK: { grpcCode: 0, retry: "nonRetriable", description: "OK" },
-    NOT_FOUND: { grpcCode: 5, retry: "nonRetriable", description: "NotFound" },
-    UNAVAILABLE: { grpcCode: 14, retry: "retriable", description: "ServiceUnavailable" },
-    INTERNAL: { grpcCode: 13, retry: "retriable", description: "InternalServerError" }
-  }}
-}};
+test("ProtoParser 应能解析有效proto文件", () => {
+  const parser = new ProtoParser();
+  const result = parser.parse("./examples/error_codes.proto");
+  if (!result || !result.errorCodes || result.errorCodes.length === 0) {
+    throw new Error("未能解析出错误码");
+  }
+});
 
-const builder = new MatrixBuilder();
-builder.loadSdkDefinitions(sdkData);
-builder.loadProtoErrorCodes(pr.errorCodes);
-const matrix = builder.buildMatrix();
-const retryClass = builder.classifyRetriable(matrix);
+test("ProtoParser 应能正确获取错误码数值", () => {
+  const parser = new ProtoParser();
+  const result = parser.parse("./examples/error_codes.proto");
+  const okCode = result.errorCodes.find(ec => ec.name === "OK");
+  if (!okCode || okCode.code !== 0) {
+    throw new Error("OK 错误码解析错误，期望 0，实际 " + (okCode?.code));
+  }
+});
 
-console.log("   总计 " + matrix.summary.totalCodes + " 个错误码");
-console.log("   语言SDK: " + matrix.summary.languages.join(", "));
+// ===== 2. 边界样本测试 =====
+console.log("\n🔍 第2部分: 边界样本测试\n");
 
-console.log("\n3. 测试 ReportGenerator...");
-const reporter = new ReportGenerator("./reports");
-reporter.generateConsoleReport(matrix, retryClass);
-reporter.generateJsonReport(matrix, retryClass);
-reporter.generateMarkdownReport(matrix, retryClass);
-console.log("   JSON: reports/error-matrix.json");
-console.log("   Markdown: reports/error-matrix-report.md");
+// 创建临时测试目录
+const testDir = "./test-temp";
+if (!fs.existsSync(testDir)) fs.mkdirSync(testDir);
 
+// 边界测试1: 空proto文件
+test("边界测试: 空proto文件应优雅处理", () => {
+  const emptyProto = path.join(testDir, "empty.proto");
+  fs.writeFileSync(emptyProto, "");
+  const parser = new ProtoParser();
+  const result = parser.parse(emptyProto);
+  if (!result) throw new Error("空proto返回null");
+});
+
+// 边界测试2: 只有enum但没有值
+test("边界测试: 只有enum定义但无值", () => {
+  const protoPath = path.join(testDir, "no-values.proto");
+  fs.writeFileSync(protoPath, "syntax = \"proto3\";\nenum EmptyEnum {}");
+  const parser = new ProtoParser();
+  const result = parser.parse(protoPath);
+  if (!result) throw new Error("空enum解析崩溃");
+});
+
+// 边界测试3: 不存在的文件
+test("边界测试: 不存在的proto文件", () => {
+  const parser = new ProtoParser();
+  const result = parser.parse("./non-existent.proto");
+  if (!result) throw new Error("不存在文件处理失败");
+});
+
+// ===== 3. MatrixBuilder 验证 =====
+console.log("\n🏗️  第3部分: MatrixBuilder 验证\n");
+
+test("MatrixBuilder 应能正确构建矩阵", () => {
+  const parser = new ProtoParser();
+  const pr = parser.parse("./examples/error_codes.proto");
+  
+  const sdkData = {
+    languages: {
+      go: { codes: { 
+        OK: { grpcCode: 0, retry: "nonRetriable" },
+        NOT_FOUND: { grpcCode: 5, retry: "nonRetriable" },
+        UNAVAILABLE: { grpcCode: 14, retry: "retriable" }
+      }},
+      java: { codes: {
+        OK: { grpcCode: 0, retry: "nonRetriable" },
+        NOT_FOUND: { grpcCode: 5, retry: "nonRetriable" },
+        UNAVAILABLE: { grpcCode: 14, retry: "retriable" }
+      }}
+    }
+  };
+
+  const builder = new MatrixBuilder();
+  const matrix = builder
+    .loadProtoErrorCodes(pr.errorCodes)
+    .loadSdkDefinitions(sdkData)
+    .buildMatrix();
+
+  if (!matrix.summary) throw new Error("summary 字段缺失");
+  if (typeof matrix.summary.totalCodes !== "number") throw new Error("totalCodes 不是数字");
+});
+
+test("MatrixBuilder 应能处理空SDK数据", () => {
+  const parser = new ProtoParser();
+  const pr = parser.parse("./examples/error_codes.proto");
+  
+  const builder = new MatrixBuilder();
+  const matrix = builder
+    .loadProtoErrorCodes(pr.errorCodes)
+    .loadSdkDefinitions({ languages: {} })
+    .buildMatrix();
+  
+  if (!matrix) throw new Error("空SDK导致崩溃");
+});
+
+// ===== 4. 报告导出测试 =====
+console.log("\n📄 第4部分: 报告导出测试\n");
+
+test("ReportGenerator 应能生成终端报告", () => {
+  const parser = new ProtoParser();
+  const pr = parser.parse("./examples/error_codes.proto");
+  
+  const sdkData = {
+    languages: {
+      go: { codes: { OK: { grpcCode: 0, retry: "nonRetriable" } } },
+      java: { codes: { OK: { grpcCode: 0, retry: "nonRetriable" } } }
+    }
+  };
+
+  const builder = new MatrixBuilder();
+  const matrix = builder
+    .loadProtoErrorCodes(pr.errorCodes)
+    .loadSdkDefinitions(sdkData)
+    .buildMatrix();
+
+  const reporter = new ReportGenerator();
+  const consoleReport = reporter.generateConsoleReport(matrix);
+  if (!consoleReport || consoleReport.length === 0) {
+    throw new Error("终端报告生成失败");
+  }
+});
+
+test("ReportGenerator 应能生成JSON报告文件", () => {
+  const parser = new ProtoParser();
+  const pr = parser.parse("./examples/error_codes.proto");
+  
+  const sdkData = {
+    languages: {
+      go: { codes: { OK: { grpcCode: 0, retry: "nonRetriable" } } }
+    }
+  };
+
+  const builder = new MatrixBuilder();
+  const matrix = builder
+    .loadProtoErrorCodes(pr.errorCodes)
+    .loadSdkDefinitions(sdkData)
+    .buildMatrix();
+
+  const reporter = new ReportGenerator();
+  const outputPath = path.join(testDir, "test-report.json");
+  reporter.generateJsonReport(matrix, outputPath);
+  
+  if (!fs.existsSync(outputPath)) {
+    throw new Error("JSON报告文件未生成: " + outputPath);
+  }
+  
+  const content = JSON.parse(fs.readFileSync(outputPath, "utf8"));
+  if (!content.summary) throw new Error("生成的JSON缺少summary字段");
+});
+
+test("ReportGenerator 应能生成Markdown报告文件", () => {
+  const parser = new ProtoParser();
+  const pr = parser.parse("./examples/error_codes.proto");
+  
+  const sdkData = {
+    languages: {
+      go: { codes: { OK: { grpcCode: 0, retry: "nonRetriable" } } }
+    }
+  };
+
+  const builder = new MatrixBuilder();
+  const matrix = builder
+    .loadProtoErrorCodes(pr.errorCodes)
+    .loadSdkDefinitions(sdkData)
+    .buildMatrix();
+
+  const reporter = new ReportGenerator();
+  const outputPath = path.join(testDir, "test-report.md");
+  reporter.generateMarkdownReport(matrix, outputPath);
+  
+  if (!fs.existsSync(outputPath)) {
+    throw new Error("Markdown报告文件未生成: " + outputPath);
+  }
+  
+  const content = fs.readFileSync(outputPath, "utf8");
+  if (!content.includes("#")) throw new Error("生成的Markdown格式不正确");
+});
+
+test("ReportGenerator 应能生成所有报告", () => {
+  const parser = new ProtoParser();
+  const pr = parser.parse("./examples/error_codes.proto");
+  
+  const sdkData = JSON.parse(fs.readFileSync("./examples/sdk-definitions.json", "utf8"));
+
+  const builder = new MatrixBuilder();
+  const matrix = builder
+    .loadProtoErrorCodes(pr.errorCodes)
+    .loadSdkDefinitions(sdkData)
+    .buildMatrix();
+
+  const reporter = new ReportGenerator();
+  const reports = reporter.generateAllReports(matrix, testDir);
+  
+  if (!reports.console) throw new Error("缺少console报告");
+  if (!reports.jsonPath || !fs.existsSync(reports.jsonPath)) throw new Error("缺少JSON报告文件");
+  if (!reports.markdownPath || !fs.existsSync(reports.markdownPath)) throw new Error("缺少Markdown报告文件");
+});
+
+// ===== 5. 完整端到端测试 =====
+console.log("\n🔗 第5部分: 完整端到端测试\n");
+
+test("完整链路: proto解析 -> 矩阵构建 -> 报告生成", () => {
+  // 1. 解析
+  const parser = new ProtoParser();
+  const pr = parser.parse("./examples/error_codes.proto");
+  if (pr.errorCodes.length < 10) throw new Error("错误码数量不足，可能解析失败");
+
+  // 2. 构建矩阵
+  const sdkData = JSON.parse(fs.readFileSync("./examples/sdk-definitions.json", "utf8"));
+  const builder = new MatrixBuilder();
+  const matrix = builder
+    .loadProtoErrorCodes(pr.errorCodes)
+    .loadSdkDefinitions(sdkData)
+    .buildMatrix();
+
+  // 3. 验证分类
+  if (!matrix.categories.safeRetry || !matrix.categories.neverRetry || !matrix.categories.controversial) {
+    throw new Error("分类数据缺失");
+  }
+
+  // 4. 验证差异检测
+  if (!matrix.differences) throw new Error("差异数据缺失");
+  
+  // 5. 生成所有报告
+  const reporter = new ReportGenerator();
+  const reports = reporter.generateAllReports(matrix, testDir);
+  
+  if (!reports.console) throw new Error("终端报告缺失");
+  if (!fs.existsSync(reports.jsonPath)) throw new Error("JSON报告未生成");
+  if (!fs.existsSync(reports.markdownPath)) throw new Error("Markdown报告未生成");
+});
+
+// ===== 清理和总结 =====
 console.log("\n" + "=".repeat(60));
-console.log("所有核心功能验证通过!");
+console.log("📊 测试总结");
 console.log("=".repeat(60));
+console.log("总测试数:", passed + failed);
+console.log("✅ 通过:", passed);
+console.log("❌ 失败:", failed);
+
+// 清理临时文件
+try {
+  fs.rmSync(testDir, { recursive: true, force: true });
+} catch (e) {}
+
+if (failed > 0) {
+  console.log("\n❌ 部分测试失败，请修复后重试");
+  process.exit(1);
+} else {
+  console.log("\n🎉 所有测试通过!");
+  console.log("   ✓ Proto解析测试");
+  console.log("   ✓ 边界样本测试");
+  console.log("   ✓ 矩阵构建验证");
+  console.log("   ✓ JSON/Markdown报告导出");
+  console.log("   ✓ 完整端到端链路");
+  process.exit(0);
+}

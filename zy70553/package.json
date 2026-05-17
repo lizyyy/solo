@@ -7,8 +7,9 @@
     "grpc-error-matrix": "src/cli.js"
   },
   "scripts": {
-    "test": "node src/cli.js self-test",
-    "demo": "node src/cli.js analyze --proto examples/error_codes.proto --sdk examples/sdk-definitions.json --output reports",
+    "test": "node test-simple.js",
+    "self-test": "node src/cli.js self-test",
+    "demo": "node demo.js",
     "analyze": "node src/cli.js analyze --proto examples/error_codes.proto --sdk examples/sdk-definitions.json --output reports"
   },
   "keywords": ["grpc", "error", "code", "matrix", "sdk"],
