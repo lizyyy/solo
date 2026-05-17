@@ -610,3 +610,53 @@ class RenewalApplicationParser(BaseParser):
             idempotency_key=str(data['idempotency_key']),
             source=self._make_source(line_number=line_num)
         )
+
+
+def derive_audit_date(orders: List[RentalOrder],
+                       transactions: List[DepositTransaction] = None,
+                       damages: List[DamageItem] = None,
+                       renewals: List[RenewalApplication] = None) -> Optional[date]:
+    """从输入数据中推导审计日期（取所有记录中的最新日期）
+    
+    用于保证默认情况下同一批材料重复运行时结果稳定。
+    """
+    all_dates = []
+    
+    for order in orders:
+        all_dates.append(order.rental_end_date)
+        if order.actual_return_date:
+            all_dates.append(order.actual_return_date)
+        all_dates.append(order.created_at.date())
+    
+    if transactions:
+        for t in transactions:
+            all_dates.append(t.transaction_date.date())
+    
+    if damages:
+        for d in damages:
+            all_dates.append(d.reported_date.date())
+    
+    if renewals:
+        for r in renewals:
+            all_dates.append(r.new_end_date)
+            all_dates.append(r.application_date.date())
+            if r.approved_date:
+                all_dates.append(r.approved_date.date())
+    
+    if not all_dates:
+        return None
+    
+    return max(all_dates)
+
+
+def make_stable_report_name(audit_date: Optional[date] = None,
+                           report_name: Optional[str] = None) -> str:
+    """生成稳定的报告名称，不依赖当前运行时间
+    
+    优先使用用户指定的 report_name，其次使用审计日期。
+    """
+    if report_name:
+        return report_name
+    if audit_date:
+        return f"audit_report_{audit_date.strftime('%Y%m%d')}"
+    return "audit_report_stable"

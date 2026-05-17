@@ -10,7 +10,8 @@
 - **续租幂等检查**: 防止重复续租申请，确保续租时间线连续
 - **多格式支持**: 支持 CSV、JSON、JSONL 格式输入文件
 - **来源追踪**: 记录每条数据的原始文件位置，坏行保留原始信息
-- **稳定输出**: 重复运行同一批数据结果稳定，排序一致
+- **可复跑/稳定输出**: 默认从输入数据中推导审计日期，同一批材料重复运行结果稳定
+- **默认行为描述**: 报告文件名、时间戳、逾期天数和费用计算均保持一致
 
 ## 安装
 
@@ -37,6 +38,8 @@ rental-audit validate --file-type renewals sample_data/renewals.csv
 
 ### 3. 执行完整审计
 
+默认从输入数据中推导审计日期（取所有记录中的最新日期），确保同一批材料重复运行结果稳定：
+
 ```bash
 rental-audit audit \
   --orders sample_data/orders.csv \
@@ -44,6 +47,17 @@ rental-audit audit \
   --damages sample_data/damages.csv \
   --renewals sample_data/renewals.csv \
   --output-dir audit_output
+```
+
+也可手动指定审计日期：
+
+```bash
+rental-audit audit \
+  --orders sample_data/orders.csv \
+  --transactions sample_data/transactions.csv \
+  --damages sample_data/damages.csv \
+  --renewals sample_data/renewals.csv \
+  --audit-date 2024-01-25
 ```
 
 ### 4. 审计单个订单

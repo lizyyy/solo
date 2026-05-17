@@ -2,10 +2,12 @@ import click
 import logging
 from pathlib import Path
 from typing import List, Optional
+from datetime import datetime as dt_datetime
 
 from .parser import (
     RentalOrderParser, DepositTransactionParser,
-    DamageItemParser, RenewalApplicationParser
+    DamageItemParser, RenewalApplicationParser,
+    derive_audit_date, make_stable_report_name
 )
 from .reporter import ReportGenerator
 
@@ -33,7 +35,7 @@ def cli():
 @click.option('--renewals', '-r', default=None, help='续租申请文件路径 (CSV/JSON)')
 @click.option('--output-dir', '-O', default='audit_output', help='输出目录路径')
 @click.option('--report-name', default=None, help='报告名称 (不包含扩展名)')
-@click.option('--audit-date', default=None, help='审计日期 (YYYY-MM-DD)，用于计算逾期')
+@click.option('--audit-date', default=None, help='审计日期 (YYYY-MM-DD)，用于计算逾期。默认从输入数据中推导最新日期')
 @click.option('--verbose', '-v', is_flag=True, help='显示详细日志')
 def audit(orders: str, transactions: str, damages: Optional[str], 
           renewals: Optional[str], output_dir: str, report_name: Optional[str],
@@ -41,22 +43,11 @@ def audit(orders: str, transactions: str, damages: Optional[str],
     """执行完整的租赁押金审计
     
     解析输入文件，执行审计规则，生成审计报告。
-    使用 --audit-date 指定审计日期，可重复运行得到稳定结果。
+    默认从输入数据中推导审计日期（取所有记录中的最新日期），确保同一批材料重复运行结果稳定。
+    使用 --audit-date 可手动指定审计日期。
     """
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-    
-    from datetime import datetime as dt_datetime
-    parsed_audit_date = None
-    parsed_audit_timestamp = None
-    
-    if audit_date:
-        try:
-            parsed_audit_date = dt_datetime.strptime(audit_date, '%Y-%m-%d').date()
-            parsed_audit_timestamp = dt_datetime.strptime(audit_date, '%Y-%m-%d')
-            click.echo(f"使用审计日期: {parsed_audit_date}")
-        except ValueError:
-            click.echo(f"警告: 审计日期格式无效 '{audit_date}'，将使用当前日期")
     
     click.echo("开始租赁押金审计...")
     
@@ -104,12 +95,31 @@ def audit(orders: str, transactions: str, damages: Optional[str],
         if renewal_bad_rows:
             click.echo(f"    发现 {len(renewal_bad_rows)} 条解析错误")
     
+    parsed_audit_date = None
+    parsed_audit_timestamp = None
+    if audit_date:
+        try:
+            parsed_audit_date = dt_datetime.strptime(audit_date, '%Y-%m-%d').date()
+            parsed_audit_timestamp = dt_datetime.strptime(audit_date, '%Y-%m-%d')
+            click.echo(f"  使用指定审计日期: {parsed_audit_date}")
+        except ValueError:
+            click.echo(f"  警告: 审计日期格式无效 '{audit_date}'，将从输入数据推导")
+    
+    if parsed_audit_date is None:
+        derived_date = derive_audit_date(all_orders, all_transactions, all_damages, all_renewals)
+        if derived_date:
+            parsed_audit_date = derived_date
+            parsed_audit_timestamp = dt_datetime.combine(derived_date, dt_datetime.min.time())
+            click.echo(f"  从输入数据推导审计日期: {parsed_audit_date}")
+    
+    final_report_name = make_stable_report_name(parsed_audit_date, report_name)
+    
     click.echo("\n  执行审计规则...")
     reporter = ReportGenerator(output_dir)
     
     report_path = reporter.generate_audit_report(
         all_orders, all_transactions, all_damages, all_renewals,
-        all_bad_rows, report_name, parsed_audit_date, parsed_audit_timestamp
+        all_bad_rows, final_report_name, parsed_audit_date, parsed_audit_timestamp
     )
     
     reporter.print_console_summary(
@@ -126,27 +136,16 @@ def audit(orders: str, transactions: str, damages: Optional[str],
 @click.option('--damages', '-d', default=None, help='损坏记录文件路径 (CSV/JSON)')
 @click.option('--renewals', '-r', default=None, help='续租申请文件路径 (CSV/JSON)')
 @click.option('--output-dir', '-O', default='audit_output', help='输出目录路径')
-@click.option('--audit-date', default=None, help='审计日期 (YYYY-MM-DD)，用于计算逾期')
+@click.option('--audit-date', default=None, help='审计日期 (YYYY-MM-DD)，用于计算逾期。默认从输入数据中推导最新日期')
 def audit_order(order_id: str, orders: str, transactions: str, 
                 damages: Optional[str], renewals: Optional[str], output_dir: str,
                 audit_date: Optional[str]):
     """审计单个订单的详细信息
     
     生成指定订单的详细审计报告。
-    使用 --audit-date 指定审计日期，可重复运行得到稳定结果。
+    默认从输入数据中推导审计日期（取所有记录中的最新日期），确保同一批材料重复运行结果稳定。
+    使用 --audit-date 可手动指定审计日期。
     """
-    from datetime import datetime as dt_datetime
-    parsed_audit_date = None
-    parsed_audit_timestamp = None
-    
-    if audit_date:
-        try:
-            parsed_audit_date = dt_datetime.strptime(audit_date, '%Y-%m-%d').date()
-            parsed_audit_timestamp = dt_datetime.strptime(audit_date, '%Y-%m-%d')
-            click.echo(f"使用审计日期: {parsed_audit_date}")
-        except ValueError:
-            click.echo(f"警告: 审计日期格式无效 '{audit_date}'，将使用当前日期")
-    
     click.echo(f"开始审计订单 {order_id}...")
     
     all_orders = []
@@ -173,6 +172,7 @@ def audit_order(order_id: str, orders: str, transactions: str,
     trans_parser = DepositTransactionParser(transactions)
     parsed_trans, _ = trans_parser.parse()
     order_transactions = [t for t in parsed_trans if t.order_id == order_id]
+    all_transactions.extend(order_transactions)
     click.echo(f"  找到 {len(order_transactions)} 条相关交易记录")
     
     if damages and Path(damages).exists():
@@ -188,6 +188,23 @@ def audit_order(order_id: str, orders: str, transactions: str,
         order_renewals = [r for r in parsed_renewals if r.order_id == order_id]
         all_renewals.extend(order_renewals)
         click.echo(f"  找到 {len(order_renewals)} 条相关续租申请")
+    
+    parsed_audit_date = None
+    parsed_audit_timestamp = None
+    if audit_date:
+        try:
+            parsed_audit_date = dt_datetime.strptime(audit_date, '%Y-%m-%d').date()
+            parsed_audit_timestamp = dt_datetime.strptime(audit_date, '%Y-%m-%d')
+            click.echo(f"  使用指定审计日期: {parsed_audit_date}")
+        except ValueError:
+            click.echo(f"  警告: 审计日期格式无效 '{audit_date}'，将从输入数据推导")
+    
+    if parsed_audit_date is None:
+        derived_date = derive_audit_date(all_orders, all_transactions, all_damages, all_renewals)
+        if derived_date:
+            parsed_audit_date = derived_date
+            parsed_audit_timestamp = dt_datetime.combine(derived_date, dt_datetime.min.time())
+            click.echo(f"  从输入数据推导审计日期: {parsed_audit_date}")
     
     reporter = ReportGenerator(output_dir)
     report_path = reporter.export_detailed_audit(
