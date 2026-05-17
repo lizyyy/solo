@@ -18,6 +18,18 @@ class ConsoleColors:
     UNDERLINE = '\033[4m'
 
 
+class NoColors:
+    HEADER = ''
+    OKBLUE = ''
+    OKCYAN = ''
+    OKGREEN = ''
+    WARNING = ''
+    FAIL = ''
+    ENDC = ''
+    BOLD = ''
+    UNDERLINE = ''
+
+
 class ResultReporter:
     STATUS_COLORS = {
         VerificationResult.PASS: ConsoleColors.OKGREEN,
@@ -43,7 +55,7 @@ class ResultReporter:
     @staticmethod
     def generate_human_report(result: TroubleshootingResult, use_color: bool = True) -> str:
         lines = []
-        color = ConsoleColors if use_color else type('NoColors', (), {k: '' for k in dir(ConsoleColors)})()
+        color = ConsoleColors if use_color else NoColors
 
         lines.append(f"\n{color.HEADER}{color.BOLD}{'='*70}{color.ENDC}")
         lines.append(f"{color.HEADER}{color.BOLD}           洗衣机启动失败支付核验退款排查报告{color.ENDC}")

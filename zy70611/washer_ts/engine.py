@@ -334,8 +334,16 @@ class TroubleshootingEngine:
 
         matched_events = [e for e in events if e.machine_id == machine_id]
         if payment:
-            matched_events = [e for e in matched_events if e.payment_id == payment_id or 
-                            abs((e.start_time - payment.pay_time).total_seconds()) <= 300]
+            def is_matching_event(e):
+                if e.payment_id and payment_id:
+                    if e.payment_id == payment_id:
+                        return True
+                if payment.pay_time:
+                    time_diff = abs((e.start_time - payment.pay_time).total_seconds())
+                    if time_diff <= 300:
+                        return True
+                return False
+            matched_events = [e for e in matched_events if is_matching_event(e)]
 
         fault_analysis = self.fault_analyzer.analyze(matched_events, machine)
 
