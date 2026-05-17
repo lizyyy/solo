@@ -1,0 +1,40 @@
+{
+  "old_version": "2.25.0",
+  "new_version": "2.31.0",
+  "deprecations": [
+    {
+      "category": "deprecation",
+      "description": "Several functions in requests have been deprecated",
+      "version_introduced": "2.31.0",
+      "affected_symbols": [
+        "requests.some_function",
+        "requests.SomeClass",
+        "requests.deprecated_method"
+      ],
+      "migration_guide": "Replace deprecated calls with new recommended APIs"
+    }
+  ],
+  "removals": [],
+  "signature_changes": [
+    {
+      "category": "signature_change",
+      "description": "Function signatures have changed with new required parameters",
+      "version_introduced": "2.31.0",
+      "affected_symbols": [
+        "requests.api_call"
+      ],
+      "migration_guide": "Update calls to include new required parameters"
+    }
+  ],
+  "behavior_changes": [
+    {
+      "category": "behavior_change",
+      "description": "Default behavior of certain APIs has changed",
+      "version_introduced": "2.31.0",
+      "affected_symbols": [
+        "requests.utils.helper"
+      ],
+      "migration_guide": "Review and update any code relying on old default behaviors"
+    }
+  ]
+}

@@ -1,0 +1,675 @@
+{
+  "dependency_name": "requests",
+  "old_version": "2.25.0",
+  "new_version": "2.31.0",
+  "scan_timestamp": "2026-05-17T23:26:42.840557",
+  "total_files_scanned": 2,
+  "total_references": 17,
+  "references": [
+    {
+      "file_path": "test_sample.py",
+      "line_number": 2,
+      "column": 0,
+      "reference_type": "import",
+      "symbol": "requests",
+      "code_snippet": "import requests",
+      "context_lines": [
+        "import pytest",
+        "import requests",
+        "from .sample import fetch_data, send_data",
+        ""
+      ]
+    },
+    {
+      "file_path": "test_sample.py",
+      "line_number": 14,
+      "column": 15,
+      "reference_type": "direct_call",
+      "symbol": "requests.get",
+      "code_snippet": "response = requests.get(\"https://example.com\")",
+      "context_lines": [
+        "",
+        "def test_requests_direct():",
+        "    response = requests.get(\"https://example.com\")",
+        "    assert response.status_code == 200"
+      ]
+    },
+    {
+      "file_path": "test_sample.py",
+      "line_number": 14,
+      "column": 15,
+      "reference_type": "direct_call",
+      "symbol": "requests",
+      "code_snippet": "response = requests.get(\"https://example.com\")",
+      "context_lines": [
+        "",
+        "def test_requests_direct():",
+        "    response = requests.get(\"https://example.com\")",
+        "    assert response.status_code == 200"
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 1,
+      "column": 0,
+      "reference_type": "import",
+      "symbol": "requests",
+      "code_snippet": "import requests",
+      "context_lines": [
+        "import requests",
+        "from requests import get, post",
+        "import requests.some_function"
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 2,
+      "column": 0,
+      "reference_type": "import",
+      "symbol": "requests.get",
+      "code_snippet": "from requests import get, post",
+      "context_lines": [
+        "import requests",
+        "from requests import get, post",
+        "import requests.some_function",
+        "from requests.utils import helper"
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 2,
+      "column": 0,
+      "reference_type": "import",
+      "symbol": "requests.post",
+      "code_snippet": "from requests import get, post",
+      "context_lines": [
+        "import requests",
+        "from requests import get, post",
+        "import requests.some_function",
+        "from requests.utils import helper"
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 3,
+      "column": 0,
+      "reference_type": "import",
+      "symbol": "requests.some_function",
+      "code_snippet": "import requests.some_function",
+      "context_lines": [
+        "import requests",
+        "from requests import get, post",
+        "import requests.some_function",
+        "from requests.utils import helper",
+        ""
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 4,
+      "column": 0,
+      "reference_type": "import",
+      "symbol": "requests.utils.helper",
+      "code_snippet": "from requests.utils import helper",
+      "context_lines": [
+        "from requests import get, post",
+        "import requests.some_function",
+        "from requests.utils import helper",
+        "",
+        "def fetch_data():"
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 7,
+      "column": 15,
+      "reference_type": "direct_call",
+      "symbol": "requests.get",
+      "code_snippet": "response = requests.get(\"https://example.com\")",
+      "context_lines": [
+        "",
+        "def fetch_data():",
+        "    response = requests.get(\"https://example.com\")",
+        "    return response.json()",
+        ""
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 11,
+      "column": 13,
+      "reference_type": "direct_call",
+      "symbol": "requests.post",
+      "code_snippet": "result = requests.post(\"https://example.com/api\", json=data)",
+      "context_lines": [
+        "",
+        "def send_data(data):",
+        "    result = requests.post(\"https://example.com/api\", json=data)",
+        "    return result.status_code",
+        ""
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 15,
+      "column": 13,
+      "reference_type": "direct_call",
+      "symbol": "requests.some_function",
+      "code_snippet": "result = requests.some_function(\"old-api\")",
+      "context_lines": [
+        "",
+        "def use_deprecated():",
+        "    result = requests.some_function(\"old-api\")",
+        "    return result",
+        ""
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 19,
+      "column": 11,
+      "reference_type": "direct_call",
+      "symbol": "requests.utils.helper",
+      "code_snippet": "return requests.utils.helper()",
+      "context_lines": [
+        "",
+        "def use_utils():",
+        "    return requests.utils.helper()"
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 7,
+      "column": 15,
+      "reference_type": "direct_call",
+      "symbol": "requests",
+      "code_snippet": "response = requests.get(\"https://example.com\")",
+      "context_lines": [
+        "",
+        "def fetch_data():",
+        "    response = requests.get(\"https://example.com\")",
+        "    return response.json()",
+        ""
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 11,
+      "column": 13,
+      "reference_type": "direct_call",
+      "symbol": "requests",
+      "code_snippet": "result = requests.post(\"https://example.com/api\", json=data)",
+      "context_lines": [
+        "",
+        "def send_data(data):",
+        "    result = requests.post(\"https://example.com/api\", json=data)",
+        "    return result.status_code",
+        ""
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 15,
+      "column": 13,
+      "reference_type": "direct_call",
+      "symbol": "requests",
+      "code_snippet": "result = requests.some_function(\"old-api\")",
+      "context_lines": [
+        "",
+        "def use_deprecated():",
+        "    result = requests.some_function(\"old-api\")",
+        "    return result",
+        ""
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 19,
+      "column": 11,
+      "reference_type": "direct_call",
+      "symbol": "requests.utils",
+      "code_snippet": "return requests.utils.helper()",
+      "context_lines": [
+        "",
+        "def use_utils():",
+        "    return requests.utils.helper()"
+      ]
+    },
+    {
+      "file_path": "sample.py",
+      "line_number": 19,
+      "column": 11,
+      "reference_type": "direct_call",
+      "symbol": "requests",
+      "code_snippet": "return requests.utils.helper()",
+      "context_lines": [
+        "",
+        "def use_utils():",
+        "    return requests.utils.helper()"
+      ]
+    }
+  ],
+  "test_files": [
+    {
+      "file_path": "test_sample.py",
+      "test_count": 3,
+      "related_references": [
+        {
+          "file_path": "test_sample.py",
+          "line_number": 2,
+          "column": 0,
+          "reference_type": "import",
+          "symbol": "requests",
+          "code_snippet": "import requests",
+          "context_lines": [
+            "import pytest",
+            "import requests",
+            "from .sample import fetch_data, send_data",
+            ""
+          ]
+        },
+        {
+          "file_path": "test_sample.py",
+          "line_number": 14,
+          "column": 15,
+          "reference_type": "direct_call",
+          "symbol": "requests.get",
+          "code_snippet": "response = requests.get(\"https://example.com\")",
+          "context_lines": [
+            "",
+            "def test_requests_direct():",
+            "    response = requests.get(\"https://example.com\")",
+            "    assert response.status_code == 200"
+          ]
+        },
+        {
+          "file_path": "test_sample.py",
+          "line_number": 14,
+          "column": 15,
+          "reference_type": "direct_call",
+          "symbol": "requests",
+          "code_snippet": "response = requests.get(\"https://example.com\")",
+          "context_lines": [
+            "",
+            "def test_requests_direct():",
+            "    response = requests.get(\"https://example.com\")",
+            "    assert response.status_code == 200"
+          ]
+        }
+      ]
+    }
+  ],
+  "version_diff": {
+    "old_version": "2.25.0",
+    "new_version": "2.31.0",
+    "deprecations": [
+      {
+        "category": "deprecation",
+        "description": "Several functions in requests have been deprecated",
+        "version_introduced": "2.31.0",
+        "affected_symbols": [
+          "requests.some_function",
+          "requests.SomeClass",
+          "requests.deprecated_method"
+        ],
+        "migration_guide": "Replace deprecated calls with new recommended APIs"
+      }
+    ],
+    "removals": [],
+    "signature_changes": [
+      {
+        "category": "signature_change",
+        "description": "Function signatures have changed with new required parameters",
+        "version_introduced": "2.31.0",
+        "affected_symbols": [
+          "requests.api_call"
+        ],
+        "migration_guide": "Update calls to include new required parameters"
+      }
+    ],
+    "behavior_changes": [
+      {
+        "category": "behavior_change",
+        "description": "Default behavior of certain APIs has changed",
+        "version_introduced": "2.31.0",
+        "affected_symbols": [
+          "requests.utils.helper"
+        ],
+        "migration_guide": "Review and update any code relying on old default behaviors"
+      }
+    ]
+  },
+  "impact_groups": [
+    {
+      "impact_level": "high",
+      "category": "signature_changes",
+      "description": "函数签名变更，需要更新调用方式",
+      "references": [
+        {
+          "file_path": "test_sample.py",
+          "line_number": 2,
+          "column": 0,
+          "reference_type": "import",
+          "symbol": "requests",
+          "code_snippet": "import requests",
+          "context_lines": [
+            "import pytest",
+            "import requests",
+            "from .sample import fetch_data, send_data",
+            ""
+          ]
+        },
+        {
+          "file_path": "test_sample.py",
+          "line_number": 14,
+          "column": 15,
+          "reference_type": "direct_call",
+          "symbol": "requests.get",
+          "code_snippet": "response = requests.get(\"https://example.com\")",
+          "context_lines": [
+            "",
+            "def test_requests_direct():",
+            "    response = requests.get(\"https://example.com\")",
+            "    assert response.status_code == 200"
+          ]
+        },
+        {
+          "file_path": "test_sample.py",
+          "line_number": 14,
+          "column": 15,
+          "reference_type": "direct_call",
+          "symbol": "requests",
+          "code_snippet": "response = requests.get(\"https://example.com\")",
+          "context_lines": [
+            "",
+            "def test_requests_direct():",
+            "    response = requests.get(\"https://example.com\")",
+            "    assert response.status_code == 200"
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 1,
+          "column": 0,
+          "reference_type": "import",
+          "symbol": "requests",
+          "code_snippet": "import requests",
+          "context_lines": [
+            "import requests",
+            "from requests import get, post",
+            "import requests.some_function"
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 2,
+          "column": 0,
+          "reference_type": "import",
+          "symbol": "requests.get",
+          "code_snippet": "from requests import get, post",
+          "context_lines": [
+            "import requests",
+            "from requests import get, post",
+            "import requests.some_function",
+            "from requests.utils import helper"
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 2,
+          "column": 0,
+          "reference_type": "import",
+          "symbol": "requests.post",
+          "code_snippet": "from requests import get, post",
+          "context_lines": [
+            "import requests",
+            "from requests import get, post",
+            "import requests.some_function",
+            "from requests.utils import helper"
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 3,
+          "column": 0,
+          "reference_type": "import",
+          "symbol": "requests.some_function",
+          "code_snippet": "import requests.some_function",
+          "context_lines": [
+            "import requests",
+            "from requests import get, post",
+            "import requests.some_function",
+            "from requests.utils import helper",
+            ""
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 4,
+          "column": 0,
+          "reference_type": "import",
+          "symbol": "requests.utils.helper",
+          "code_snippet": "from requests.utils import helper",
+          "context_lines": [
+            "from requests import get, post",
+            "import requests.some_function",
+            "from requests.utils import helper",
+            "",
+            "def fetch_data():"
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 7,
+          "column": 15,
+          "reference_type": "direct_call",
+          "symbol": "requests.get",
+          "code_snippet": "response = requests.get(\"https://example.com\")",
+          "context_lines": [
+            "",
+            "def fetch_data():",
+            "    response = requests.get(\"https://example.com\")",
+            "    return response.json()",
+            ""
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 11,
+          "column": 13,
+          "reference_type": "direct_call",
+          "symbol": "requests.post",
+          "code_snippet": "result = requests.post(\"https://example.com/api\", json=data)",
+          "context_lines": [
+            "",
+            "def send_data(data):",
+            "    result = requests.post(\"https://example.com/api\", json=data)",
+            "    return result.status_code",
+            ""
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 15,
+          "column": 13,
+          "reference_type": "direct_call",
+          "symbol": "requests.some_function",
+          "code_snippet": "result = requests.some_function(\"old-api\")",
+          "context_lines": [
+            "",
+            "def use_deprecated():",
+            "    result = requests.some_function(\"old-api\")",
+            "    return result",
+            ""
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 19,
+          "column": 11,
+          "reference_type": "direct_call",
+          "symbol": "requests.utils.helper",
+          "code_snippet": "return requests.utils.helper()",
+          "context_lines": [
+            "",
+            "def use_utils():",
+            "    return requests.utils.helper()"
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 7,
+          "column": 15,
+          "reference_type": "direct_call",
+          "symbol": "requests",
+          "code_snippet": "response = requests.get(\"https://example.com\")",
+          "context_lines": [
+            "",
+            "def fetch_data():",
+            "    response = requests.get(\"https://example.com\")",
+            "    return response.json()",
+            ""
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 11,
+          "column": 13,
+          "reference_type": "direct_call",
+          "symbol": "requests",
+          "code_snippet": "result = requests.post(\"https://example.com/api\", json=data)",
+          "context_lines": [
+            "",
+            "def send_data(data):",
+            "    result = requests.post(\"https://example.com/api\", json=data)",
+            "    return result.status_code",
+            ""
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 15,
+          "column": 13,
+          "reference_type": "direct_call",
+          "symbol": "requests",
+          "code_snippet": "result = requests.some_function(\"old-api\")",
+          "context_lines": [
+            "",
+            "def use_deprecated():",
+            "    result = requests.some_function(\"old-api\")",
+            "    return result",
+            ""
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 19,
+          "column": 11,
+          "reference_type": "direct_call",
+          "symbol": "requests.utils",
+          "code_snippet": "return requests.utils.helper()",
+          "context_lines": [
+            "",
+            "def use_utils():",
+            "    return requests.utils.helper()"
+          ]
+        },
+        {
+          "file_path": "sample.py",
+          "line_number": 19,
+          "column": 11,
+          "reference_type": "direct_call",
+          "symbol": "requests",
+          "code_snippet": "return requests.utils.helper()",
+          "context_lines": [
+            "",
+            "def use_utils():",
+            "    return requests.utils.helper()"
+          ]
+        }
+      ],
+      "affected_files": [
+        "test_sample.py",
+        "sample.py"
+      ],
+      "test_files": [
+        {
+          "file_path": "test_sample.py",
+          "test_count": 3,
+          "related_references": [
+            {
+              "file_path": "test_sample.py",
+              "line_number": 2,
+              "column": 0,
+              "reference_type": "import",
+              "symbol": "requests",
+              "code_snippet": "import requests",
+              "context_lines": [
+                "import pytest",
+                "import requests",
+                "from .sample import fetch_data, send_data",
+                ""
+              ]
+            },
+            {
+              "file_path": "test_sample.py",
+              "line_number": 14,
+              "column": 15,
+              "reference_type": "direct_call",
+              "symbol": "requests.get",
+              "code_snippet": "response = requests.get(\"https://example.com\")",
+              "context_lines": [
+                "",
+                "def test_requests_direct():",
+                "    response = requests.get(\"https://example.com\")",
+                "    assert response.status_code == 200"
+              ]
+            },
+            {
+              "file_path": "test_sample.py",
+              "line_number": 14,
+              "column": 15,
+              "reference_type": "direct_call",
+              "symbol": "requests",
+              "code_snippet": "response = requests.get(\"https://example.com\")",
+              "context_lines": [
+                "",
+                "def test_requests_direct():",
+                "    response = requests.get(\"https://example.com\")",
+                "    assert response.status_code == 200"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "test_suggestions": [
+    {
+      "priority": "P1",
+      "description": "优先测试签名变更的API调用",
+      "test_files": [
+        "test_sample.py"
+      ],
+      "action_items": [
+        "检查函数参数是否匹配新签名",
+        "运行集成测试验证行为一致性",
+        "更新类型注解和文档字符串"
+      ]
+    },
+    {
+      "priority": "P3",
+      "description": "运行完整回归测试套件",
+      "test_files": [
+        "test_sample.py"
+      ],
+      "action_items": [
+        "运行完整测试套件排查潜在问题",
+        "关注边界情况和边缘用例",
+        "更新性能基准测试"
+      ]
+    }
+  ],
+  "error_samples": [],
+  "metadata": {}
+}

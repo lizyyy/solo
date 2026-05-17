@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+setup.py
+src/dep_break_scanner/__init__.py
+src/dep_break_scanner/cli.py
+src/dep_break_scanner/impact_analyzer.py
+src/dep_break_scanner/models.py
+src/dep_break_scanner/reporter.py
+src/dep_break_scanner/scanner.py
+src/dep_break_scanner/version_diff.py
+src/dep_break_scanner.egg-info/PKG-INFO
+src/dep_break_scanner.egg-info/SOURCES.txt
+src/dep_break_scanner.egg-info/dependency_links.txt
+src/dep_break_scanner.egg-info/entry_points.txt
+src/dep_break_scanner.egg-info/requires.txt
+src/dep_break_scanner.egg-info/top_level.txt
