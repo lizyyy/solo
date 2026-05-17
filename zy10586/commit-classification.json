@@ -1,0 +1,1041 @@
+{
+  "generatedAt": "2026-05-17T16:41:14.546Z",
+  "summary": {
+    "totalCommits": 4,
+    "categories": {
+      "fix": 1,
+      "feature": 1,
+      "refactor": 1,
+      "config": 0,
+      "docs": 1,
+      "test": 0,
+      "style": 0,
+      "build": 0,
+      "revert": 0,
+      "perf": 0,
+      "other": 0
+    }
+  },
+  "categories": {
+    "fix": {
+      "name": "修复",
+      "count": 1,
+      "commits": [
+        {
+          "hash": "685e954",
+          "subject": "fix: 修复转义函数的Node.js兼容性问题",
+          "author": "lzy",
+          "date": "2026-05-17 23:41:07 +0700"
+        }
+      ]
+    },
+    "feature": {
+      "name": "新功能",
+      "count": 1,
+      "commits": [
+        {
+          "hash": "2a9d56d",
+          "subject": "feat: 初始提交，添加Git提交分类工具",
+          "author": "lzy",
+          "date": "2026-05-17 23:40:39 +0700"
+        }
+      ]
+    },
+    "refactor": {
+      "name": "重构",
+      "count": 1,
+      "commits": [
+        {
+          "hash": "58b8028",
+          "subject": "style: 优化终端输出样式",
+          "author": "lzy",
+          "date": "2026-05-17 23:41:07 +0700"
+        }
+      ]
+    },
+    "config": {
+      "name": "配置改动",
+      "count": 0,
+      "commits": []
+    },
+    "docs": {
+      "name": "文档",
+      "count": 1,
+      "commits": [
+        {
+          "hash": "53069b7",
+          "subject": "docs: 更新README使用示例",
+          "author": "lzy",
+          "date": "2026-05-17 23:41:07 +0700"
+        }
+      ]
+    },
+    "test": {
+      "name": "测试",
+      "count": 0,
+      "commits": []
+    },
+    "style": {
+      "name": "样式",
+      "count": 0,
+      "commits": []
+    },
+    "build": {
+      "name": "构建/CI",
+      "count": 0,
+      "commits": []
+    },
+    "revert": {
+      "name": "回滚",
+      "count": 0,
+      "commits": []
+    },
+    "perf": {
+      "name": "性能",
+      "count": 0,
+      "commits": []
+    },
+    "other": {
+      "name": "其他",
+      "count": 0,
+      "commits": []
+    }
+  },
+  "errors": [],
+  "rawData": [
+    {
+      "hash": "53069b787dff124d29a63fb3b93f83d1c51e0379",
+      "shortHash": "53069b7",
+      "authorName": "lzy",
+      "authorEmail": "lizhiyuan01@zuoyebang.com",
+      "date": "2026-05-17 23:41:07 +0700",
+      "subject": "docs: 更新README使用示例",
+      "category": "docs",
+      "categoryName": "文档",
+      "matchedPattern": "/^docs:/i",
+      "files": [
+        {
+          "status": "M",
+          "path": "README.md"
+        }
+      ]
+    },
+    {
+      "hash": "58b8028bd4058981f1b8619911a753162a4419e6",
+      "shortHash": "58b8028",
+      "authorName": "lzy",
+      "authorEmail": "lizhiyuan01@zuoyebang.com",
+      "date": "2026-05-17 23:41:07 +0700",
+      "subject": "style: 优化终端输出样式",
+      "category": "refactor",
+      "categoryName": "重构",
+      "matchedPattern": "/优化/i",
+      "files": [
+        {
+          "status": "M",
+          "path": "src/report-generator.js"
+        }
+      ]
+    },
+    {
+      "hash": "685e954ddccae12c2a584b03e3c1603b5bbfa0e3",
+      "shortHash": "685e954",
+      "authorName": "lzy",
+      "authorEmail": "lizhiyuan01@zuoyebang.com",
+      "date": "2026-05-17 23:41:07 +0700",
+      "subject": "fix: 修复转义函数的Node.js兼容性问题",
+      "category": "fix",
+      "categoryName": "修复",
+      "matchedPattern": "/^fix:/i",
+      "files": [
+        {
+          "status": "A",
+          "path": "commit-classification.json"
+        },
+        {
+          "status": "A",
+          "path": "release-notes.html"
+        },
+        {
+          "status": "A",
+          "path": "release-notes.md"
+        },
+        {
+          "status": "M",
+          "path": "src/git-reader.js"
+        },
+        {
+          "status": "M",
+          "path": "src/report-generator.js"
+        }
+      ]
+    },
+    {
+      "hash": "2a9d56d117bb994f65a4e26f9db0cc675bd09e36",
+      "shortHash": "2a9d56d",
+      "authorName": "lzy",
+      "authorEmail": "lizhiyuan01@zuoyebang.com",
+      "date": "2026-05-17 23:40:39 +0700",
+      "subject": "feat: 初始提交，添加Git提交分类工具",
+      "category": "feature",
+      "categoryName": "新功能",
+      "matchedPattern": "/^feat:/i",
+      "files": [
+        {
+          "status": "A",
+          "path": "README.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/.package-lock.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/LICENSE"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/README.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/examples/normal-usage.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/examples/safe-string.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/colors.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/custom/trap.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/custom/zalgo.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/extendStringPrototype.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/maps/america.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/maps/rainbow.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/maps/random.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/maps/zebra.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/styles.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/system/has-flag.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/lib/system/supports-colors.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/safe.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/safe.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/@colors/colors/themes/generic-logging.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-regex/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-regex/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-regex/license"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-regex/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-regex/readme.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-styles/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-styles/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-styles/license"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-styles/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/ansi-styles/readme.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/chalk/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/chalk/license"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/chalk/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/chalk/readme.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/chalk/source/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/chalk/source/templates.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/chalk/source/util.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/LICENSE"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/README.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/src/cell.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/src/debug.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/src/layout-manager.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/src/table.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/cli-table3/src/utils.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-convert/CHANGELOG.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-convert/LICENSE"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-convert/README.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-convert/conversions.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-convert/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-convert/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-convert/route.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-name/LICENSE"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-name/README.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-name/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/color-name/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/LICENSE"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/Readme.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/esm.mjs"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/lib/argument.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/lib/command.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/lib/error.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/lib/help.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/lib/option.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/lib/suggestSimilar.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/package-support.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/typings/esm.d.mts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/commander/typings/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/emoji-regex/LICENSE-MIT.txt"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/emoji-regex/README.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/emoji-regex/es2015/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/emoji-regex/es2015/text.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/emoji-regex/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/emoji-regex/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/emoji-regex/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/emoji-regex/text.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/has-flag/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/has-flag/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/has-flag/license"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/has-flag/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/has-flag/readme.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/is-fullwidth-code-point/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/is-fullwidth-code-point/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/is-fullwidth-code-point/license"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/is-fullwidth-code-point/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/is-fullwidth-code-point/readme.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/string-width/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/string-width/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/string-width/license"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/string-width/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/string-width/readme.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/strip-ansi/index.d.ts"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/strip-ansi/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/strip-ansi/license"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/strip-ansi/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/strip-ansi/readme.md"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/supports-color/browser.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/supports-color/index.js"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/supports-color/license"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/supports-color/package.json"
+        },
+        {
+          "status": "A",
+          "path": "node_modules/supports-color/readme.md"
+        },
+        {
+          "status": "A",
+          "path": "package-lock.json"
+        },
+        {
+          "status": "A",
+          "path": "package.json"
+        },
+        {
+          "status": "A",
+          "path": "src/classifier.js"
+        },
+        {
+          "status": "A",
+          "path": "src/git-reader.js"
+        },
+        {
+          "status": "A",
+          "path": "src/index.js"
+        },
+        {
+          "status": "A",
+          "path": "src/path-analyzer.js"
+        },
+        {
+          "status": "A",
+          "path": "src/report-generator.js"
+        }
+      ]
+    }
+  ],
+  "pathAnalysis": {
+    "moduleChanges": [
+      {
+        "name": "前端",
+        "commitCount": 3,
+        "fileCount": 8,
+        "commits": [
+          {
+            "hash": "58b8028",
+            "subject": "style: 优化终端输出样式",
+            "author": "lzy"
+          },
+          {
+            "hash": "685e954",
+            "subject": "fix: 修复转义函数的Node.js兼容性问题",
+            "author": "lzy"
+          },
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy"
+          }
+        ]
+      },
+      {
+        "name": "配置",
+        "commitCount": 2,
+        "fileCount": 19,
+        "commits": [
+          {
+            "hash": "685e954",
+            "subject": "fix: 修复转义函数的Node.js兼容性问题",
+            "author": "lzy"
+          },
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy"
+          }
+        ]
+      },
+      {
+        "name": "文档",
+        "commitCount": 3,
+        "fileCount": 19,
+        "commits": [
+          {
+            "hash": "53069b7",
+            "subject": "docs: 更新README使用示例",
+            "author": "lzy"
+          },
+          {
+            "hash": "685e954",
+            "subject": "fix: 修复转义函数的Node.js兼容性问题",
+            "author": "lzy"
+          },
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy"
+          }
+        ]
+      }
+    ],
+    "topPathChanges": [
+      {
+        "path": "src/report-generator.js",
+        "commitCount": 3,
+        "commits": [
+          {
+            "hash": "58b8028",
+            "subject": "style: 优化终端输出样式",
+            "author": "lzy",
+            "date": "2026-05-17 23:41:07 +0700"
+          },
+          {
+            "hash": "685e954",
+            "subject": "fix: 修复转义函数的Node.js兼容性问题",
+            "author": "lzy",
+            "date": "2026-05-17 23:41:07 +0700"
+          },
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "M": 2,
+          "A": 1
+        }
+      },
+      {
+        "path": "README.md",
+        "commitCount": 2,
+        "commits": [
+          {
+            "hash": "53069b7",
+            "subject": "docs: 更新README使用示例",
+            "author": "lzy",
+            "date": "2026-05-17 23:41:07 +0700"
+          },
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "M": 1,
+          "A": 1
+        }
+      },
+      {
+        "path": "src/git-reader.js",
+        "commitCount": 2,
+        "commits": [
+          {
+            "hash": "685e954",
+            "subject": "fix: 修复转义函数的Node.js兼容性问题",
+            "author": "lzy",
+            "date": "2026-05-17 23:41:07 +0700"
+          },
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "M": 1,
+          "A": 1
+        }
+      },
+      {
+        "path": "commit-classification.json",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "685e954",
+            "subject": "fix: 修复转义函数的Node.js兼容性问题",
+            "author": "lzy",
+            "date": "2026-05-17 23:41:07 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "release-notes.html",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "685e954",
+            "subject": "fix: 修复转义函数的Node.js兼容性问题",
+            "author": "lzy",
+            "date": "2026-05-17 23:41:07 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "release-notes.md",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "685e954",
+            "subject": "fix: 修复转义函数的Node.js兼容性问题",
+            "author": "lzy",
+            "date": "2026-05-17 23:41:07 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/.package-lock.json",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/LICENSE",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/README.md",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/examples/normal-usage.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/examples/safe-string.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/index.d.ts",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/lib/colors.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/lib/custom/trap.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/lib/custom/zalgo.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/lib/extendStringPrototype.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/lib/index.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/lib/maps/america.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/lib/maps/rainbow.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      },
+      {
+        "path": "node_modules/@colors/colors/lib/maps/random.js",
+        "commitCount": 1,
+        "commits": [
+          {
+            "hash": "2a9d56d",
+            "subject": "feat: 初始提交，添加Git提交分类工具",
+            "author": "lzy",
+            "date": "2026-05-17 23:40:39 +0700"
+          }
+        ],
+        "statuses": {
+          "A": 1
+        }
+      }
+    ]
+  }
+}
