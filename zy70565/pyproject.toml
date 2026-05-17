@@ -1,1 +1,25 @@
 [build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "makefile-indexer"
+version = "1.0.0"
+authors = [
+  { name="Makefile Indexer Team" }
+]
+description = "Makefile 目标索引 CLI - 解析 Makefile 并识别安全/风险目标"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+[project.scripts]
+makefile-indexer = "makefile_indexer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["makefile_indexer*"]

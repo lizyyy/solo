@@ -1,0 +1,55 @@
+# 这是一个测试Makefile
+# 包含各种目标和脏数据
+
+.PHONY: all clean install test build deploy help
+
+# 默认目标 - 安全执行
+all: build test
+	@echo "All done!"
+
+# 构建目标 - 安全执行
+build:
+	@echo "Building project..."
+	mkdir -p build
+	gcc -o build/app src/main.c
+
+# 清理目标 - 有副作用
+clean:
+	rm -rf build/ dist/ *.o
+	@echo "Cleaned up!"
+
+# 安装目标 - 有副作用
+install: build
+	sudo cp build/app /usr/local/bin/
+	@echo "Installed successfully!"
+
+# 测试目标 - 安全执行
+test: build
+	./build/app --test
+	pytest tests/
+
+# 部署目标 - 有副作用
+deploy:
+	docker build -t myapp .
+	docker push myapp:latest
+	kubectl apply -f k8s/
+
+# 帮助目标 - 安全执行
+help:
+	@echo "Available targets:"
+	@echo "  all     - Build and test"
+	@echo "  build   - Build the project"
+	@echo "  clean   - Clean build artifacts"
+	@echo "  install - Install to system"
+	@echo "  test    - Run tests"
+	@echo "  deploy  - Deploy to cluster"
+
+# 这是一行无效的Makefile语法
+this is bad syntax that should be caught
+
+another invalid line here!
+
+# 变量定义
+VERSION = 1.0.0
+CC = gcc
+CFLAGS = -Wall -O2
