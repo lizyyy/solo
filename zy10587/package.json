@@ -1,0 +1,23 @@
+{
+  "name": "excel-formula-linter",
+  "version": "1.0.0",
+  "description": "Excel公式引用检查CLI工具 - 检测跨sheet引用错误",
+  "main": "src/index.js",
+  "bin": {
+    "excel-formula-linter": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node test/test.js"
+  },
+  "keywords": ["excel", "formula", "lint", "reference", "cross-sheet"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "xlsx": "^0.18.5",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "glob": "^10.3.10"
+  }
+}

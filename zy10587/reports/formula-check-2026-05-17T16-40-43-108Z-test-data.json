@@ -1,0 +1,450 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-17T16:40:43.145Z",
+    "version": "1.0.0",
+    "checkType": "excel-formula-reference"
+  },
+  "summary": {
+    "totalSheets": 3,
+    "totalFormulas": 8,
+    "totalReferences": 8,
+    "totalErrors": 8,
+    "totalWarnings": 0,
+    "errorByType": {
+      "SHEET_NOT_FOUND": 8
+    }
+  },
+  "sheets": {
+    "数据源": {
+      "sheetName": "数据源",
+      "formulaCount": 0,
+      "referenceCount": 0,
+      "errors": [],
+      "warnings": [],
+      "cells": {}
+    },
+    "汇总表": {
+      "sheetName": "汇总表",
+      "formulaCount": 5,
+      "referenceCount": 5,
+      "errors": [
+        {
+          "errorType": "SHEET_NOT_FOUND",
+          "sourceSheet": "汇总表",
+          "sourceCell": "B2",
+          "reference": "=数据源!A2",
+          "referenceType": "cell",
+          "targetSheet": "=数据源",
+          "targetCell": "A2",
+          "message": "工作表 \"=数据源\" 不存在",
+          "timestamp": "2026-05-17T16:40:43.120Z"
+        },
+        {
+          "errorType": "SHEET_NOT_FOUND",
+          "sourceSheet": "汇总表",
+          "sourceCell": "B3",
+          "reference": "=数据源!B100",
+          "referenceType": "cell",
+          "targetSheet": "=数据源",
+          "targetCell": "B100",
+          "message": "工作表 \"=数据源\" 不存在",
+          "timestamp": "2026-05-17T16:40:43.120Z"
+        },
+        {
+          "errorType": "SHEET_NOT_FOUND",
+          "sourceSheet": "汇总表",
+          "sourceCell": "B4",
+          "reference": "=不存在的表!C5",
+          "referenceType": "cell",
+          "targetSheet": "=不存在的表",
+          "targetCell": "C5",
+          "message": "工作表 \"=不存在的表\" 不存在",
+          "timestamp": "2026-05-17T16:40:43.120Z"
+        },
+        {
+          "errorType": "SHEET_NOT_FOUND",
+          "sourceSheet": "汇总表",
+          "sourceCell": "B5",
+          "reference": "=数据源!A1:C100",
+          "referenceType": "range",
+          "targetSheet": "=数据源",
+          "targetCell": "A1:C100",
+          "message": "工作表 \"=数据源\" 不存在",
+          "timestamp": "2026-05-17T16:40:43.120Z"
+        },
+        {
+          "errorType": "SHEET_NOT_FOUND",
+          "sourceSheet": "汇总表",
+          "sourceCell": "B6",
+          "reference": "=数据源!A1:Z1000",
+          "referenceType": "range",
+          "targetSheet": "=数据源",
+          "targetCell": "A1:Z1000",
+          "message": "工作表 \"=数据源\" 不存在",
+          "timestamp": "2026-05-17T16:40:43.120Z"
+        }
+      ],
+      "warnings": [],
+      "cells": {
+        "B2": {
+          "cellAddr": "B2",
+          "formula": "=数据源!A2",
+          "references": [
+            {
+              "type": "cell",
+              "raw": "=数据源!A2",
+              "sheetName": "=数据源",
+              "cell": "A2",
+              "currentSheet": "汇总表"
+            }
+          ],
+          "errors": [
+            {
+              "errorType": "SHEET_NOT_FOUND",
+              "sourceSheet": "汇总表",
+              "sourceCell": "B2",
+              "reference": "=数据源!A2",
+              "referenceType": "cell",
+              "targetSheet": "=数据源",
+              "targetCell": "A2",
+              "message": "工作表 \"=数据源\" 不存在",
+              "timestamp": "2026-05-17T16:40:43.120Z"
+            }
+          ],
+          "warnings": []
+        },
+        "B3": {
+          "cellAddr": "B3",
+          "formula": "=数据源!B100",
+          "references": [
+            {
+              "type": "cell",
+              "raw": "=数据源!B100",
+              "sheetName": "=数据源",
+              "cell": "B100",
+              "currentSheet": "汇总表"
+            }
+          ],
+          "errors": [
+            {
+              "errorType": "SHEET_NOT_FOUND",
+              "sourceSheet": "汇总表",
+              "sourceCell": "B3",
+              "reference": "=数据源!B100",
+              "referenceType": "cell",
+              "targetSheet": "=数据源",
+              "targetCell": "B100",
+              "message": "工作表 \"=数据源\" 不存在",
+              "timestamp": "2026-05-17T16:40:43.120Z"
+            }
+          ],
+          "warnings": []
+        },
+        "B4": {
+          "cellAddr": "B4",
+          "formula": "=不存在的表!C5",
+          "references": [
+            {
+              "type": "cell",
+              "raw": "=不存在的表!C5",
+              "sheetName": "=不存在的表",
+              "cell": "C5",
+              "currentSheet": "汇总表"
+            }
+          ],
+          "errors": [
+            {
+              "errorType": "SHEET_NOT_FOUND",
+              "sourceSheet": "汇总表",
+              "sourceCell": "B4",
+              "reference": "=不存在的表!C5",
+              "referenceType": "cell",
+              "targetSheet": "=不存在的表",
+              "targetCell": "C5",
+              "message": "工作表 \"=不存在的表\" 不存在",
+              "timestamp": "2026-05-17T16:40:43.120Z"
+            }
+          ],
+          "warnings": []
+        },
+        "B5": {
+          "cellAddr": "B5",
+          "formula": "=数据源!A1:C100",
+          "references": [
+            {
+              "type": "range",
+              "raw": "=数据源!A1:C100",
+              "sheetName": "=数据源",
+              "startCell": "A1",
+              "endCell": "C100",
+              "currentSheet": "汇总表"
+            }
+          ],
+          "errors": [
+            {
+              "errorType": "SHEET_NOT_FOUND",
+              "sourceSheet": "汇总表",
+              "sourceCell": "B5",
+              "reference": "=数据源!A1:C100",
+              "referenceType": "range",
+              "targetSheet": "=数据源",
+              "targetCell": "A1:C100",
+              "message": "工作表 \"=数据源\" 不存在",
+              "timestamp": "2026-05-17T16:40:43.120Z"
+            }
+          ],
+          "warnings": []
+        },
+        "B6": {
+          "cellAddr": "B6",
+          "formula": "=数据源!A1:Z1000",
+          "references": [
+            {
+              "type": "range",
+              "raw": "=数据源!A1:Z1000",
+              "sheetName": "=数据源",
+              "startCell": "A1",
+              "endCell": "Z1000",
+              "currentSheet": "汇总表"
+            }
+          ],
+          "errors": [
+            {
+              "errorType": "SHEET_NOT_FOUND",
+              "sourceSheet": "汇总表",
+              "sourceCell": "B6",
+              "reference": "=数据源!A1:Z1000",
+              "referenceType": "range",
+              "targetSheet": "=数据源",
+              "targetCell": "A1:Z1000",
+              "message": "工作表 \"=数据源\" 不存在",
+              "timestamp": "2026-05-17T16:40:43.120Z"
+            }
+          ],
+          "warnings": []
+        }
+      }
+    },
+    "计算表": {
+      "sheetName": "计算表",
+      "formulaCount": 3,
+      "referenceCount": 3,
+      "errors": [
+        {
+          "errorType": "SHEET_NOT_FOUND",
+          "sourceSheet": "计算表",
+          "sourceCell": "B2",
+          "reference": "=数据源!B2",
+          "referenceType": "cell",
+          "targetSheet": "=数据源",
+          "targetCell": "B2",
+          "message": "工作表 \"=数据源\" 不存在",
+          "timestamp": "2026-05-17T16:40:43.120Z"
+        },
+        {
+          "errorType": "SHEET_NOT_FOUND",
+          "sourceSheet": "计算表",
+          "sourceCell": "B3",
+          "reference": "=数据源!B3",
+          "referenceType": "cell",
+          "targetSheet": "=数据源",
+          "targetCell": "B3",
+          "message": "工作表 \"=数据源\" 不存在",
+          "timestamp": "2026-05-17T16:40:43.120Z"
+        },
+        {
+          "errorType": "SHEET_NOT_FOUND",
+          "sourceSheet": "计算表",
+          "sourceCell": "B4",
+          "reference": "=汇总表!B10",
+          "referenceType": "cell",
+          "targetSheet": "=汇总表",
+          "targetCell": "B10",
+          "message": "工作表 \"=汇总表\" 不存在",
+          "timestamp": "2026-05-17T16:40:43.120Z"
+        }
+      ],
+      "warnings": [],
+      "cells": {
+        "B2": {
+          "cellAddr": "B2",
+          "formula": "=数据源!B2",
+          "references": [
+            {
+              "type": "cell",
+              "raw": "=数据源!B2",
+              "sheetName": "=数据源",
+              "cell": "B2",
+              "currentSheet": "计算表"
+            }
+          ],
+          "errors": [
+            {
+              "errorType": "SHEET_NOT_FOUND",
+              "sourceSheet": "计算表",
+              "sourceCell": "B2",
+              "reference": "=数据源!B2",
+              "referenceType": "cell",
+              "targetSheet": "=数据源",
+              "targetCell": "B2",
+              "message": "工作表 \"=数据源\" 不存在",
+              "timestamp": "2026-05-17T16:40:43.120Z"
+            }
+          ],
+          "warnings": []
+        },
+        "B3": {
+          "cellAddr": "B3",
+          "formula": "=数据源!B3",
+          "references": [
+            {
+              "type": "cell",
+              "raw": "=数据源!B3",
+              "sheetName": "=数据源",
+              "cell": "B3",
+              "currentSheet": "计算表"
+            }
+          ],
+          "errors": [
+            {
+              "errorType": "SHEET_NOT_FOUND",
+              "sourceSheet": "计算表",
+              "sourceCell": "B3",
+              "reference": "=数据源!B3",
+              "referenceType": "cell",
+              "targetSheet": "=数据源",
+              "targetCell": "B3",
+              "message": "工作表 \"=数据源\" 不存在",
+              "timestamp": "2026-05-17T16:40:43.120Z"
+            }
+          ],
+          "warnings": []
+        },
+        "B4": {
+          "cellAddr": "B4",
+          "formula": "=汇总表!B10",
+          "references": [
+            {
+              "type": "cell",
+              "raw": "=汇总表!B10",
+              "sheetName": "=汇总表",
+              "cell": "B10",
+              "currentSheet": "计算表"
+            }
+          ],
+          "errors": [
+            {
+              "errorType": "SHEET_NOT_FOUND",
+              "sourceSheet": "计算表",
+              "sourceCell": "B4",
+              "reference": "=汇总表!B10",
+              "referenceType": "cell",
+              "targetSheet": "=汇总表",
+              "targetCell": "B10",
+              "message": "工作表 \"=汇总表\" 不存在",
+              "timestamp": "2026-05-17T16:40:43.120Z"
+            }
+          ],
+          "warnings": []
+        }
+      }
+    }
+  },
+  "errors": [
+    {
+      "errorType": "SHEET_NOT_FOUND",
+      "sourceSheet": "汇总表",
+      "sourceCell": "B2",
+      "reference": "=数据源!A2",
+      "referenceType": "cell",
+      "targetSheet": "=数据源",
+      "targetCell": "A2",
+      "message": "工作表 \"=数据源\" 不存在",
+      "timestamp": "2026-05-17T16:40:43.120Z"
+    },
+    {
+      "errorType": "SHEET_NOT_FOUND",
+      "sourceSheet": "汇总表",
+      "sourceCell": "B3",
+      "reference": "=数据源!B100",
+      "referenceType": "cell",
+      "targetSheet": "=数据源",
+      "targetCell": "B100",
+      "message": "工作表 \"=数据源\" 不存在",
+      "timestamp": "2026-05-17T16:40:43.120Z"
+    },
+    {
+      "errorType": "SHEET_NOT_FOUND",
+      "sourceSheet": "汇总表",
+      "sourceCell": "B4",
+      "reference": "=不存在的表!C5",
+      "referenceType": "cell",
+      "targetSheet": "=不存在的表",
+      "targetCell": "C5",
+      "message": "工作表 \"=不存在的表\" 不存在",
+      "timestamp": "2026-05-17T16:40:43.120Z"
+    },
+    {
+      "errorType": "SHEET_NOT_FOUND",
+      "sourceSheet": "汇总表",
+      "sourceCell": "B5",
+      "reference": "=数据源!A1:C100",
+      "referenceType": "range",
+      "targetSheet": "=数据源",
+      "targetCell": "A1:C100",
+      "message": "工作表 \"=数据源\" 不存在",
+      "timestamp": "2026-05-17T16:40:43.120Z"
+    },
+    {
+      "errorType": "SHEET_NOT_FOUND",
+      "sourceSheet": "汇总表",
+      "sourceCell": "B6",
+      "reference": "=数据源!A1:Z1000",
+      "referenceType": "range",
+      "targetSheet": "=数据源",
+      "targetCell": "A1:Z1000",
+      "message": "工作表 \"=数据源\" 不存在",
+      "timestamp": "2026-05-17T16:40:43.120Z"
+    },
+    {
+      "errorType": "SHEET_NOT_FOUND",
+      "sourceSheet": "计算表",
+      "sourceCell": "B2",
+      "reference": "=数据源!B2",
+      "referenceType": "cell",
+      "targetSheet": "=数据源",
+      "targetCell": "B2",
+      "message": "工作表 \"=数据源\" 不存在",
+      "timestamp": "2026-05-17T16:40:43.120Z"
+    },
+    {
+      "errorType": "SHEET_NOT_FOUND",
+      "sourceSheet": "计算表",
+      "sourceCell": "B3",
+      "reference": "=数据源!B3",
+      "referenceType": "cell",
+      "targetSheet": "=数据源",
+      "targetCell": "B3",
+      "message": "工作表 \"=数据源\" 不存在",
+      "timestamp": "2026-05-17T16:40:43.120Z"
+    },
+    {
+      "errorType": "SHEET_NOT_FOUND",
+      "sourceSheet": "计算表",
+      "sourceCell": "B4",
+      "reference": "=汇总表!B10",
+      "referenceType": "cell",
+      "targetSheet": "=汇总表",
+      "targetCell": "B10",
+      "message": "工作表 \"=汇总表\" 不存在",
+      "timestamp": "2026-05-17T16:40:43.120Z"
+    }
+  ],
+  "warnings": [],
+  "file": {
+    "path": "/Users/lzy/pro/solo/workspaces/zy10587/test/test-data.xlsx",
+    "name": "test-data.xlsx",
+    "size": 19219,
+    "checkedAt": "2026-05-17T16:40:43.120Z"
+  }
+}

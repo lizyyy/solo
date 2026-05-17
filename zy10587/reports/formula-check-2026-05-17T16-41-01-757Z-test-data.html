@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel 公式引用检查报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 24px; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card-value { font-size: 36px; font-weight: bold; color: #333; }
+        .card-label { color: #666; margin-top: 4px; }
+        .card.error .card-value { color: #e74c3c; }
+        .card.success .card-value { color: #27ae60; }
+        .section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .section-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #eee; }
+        .error-table { width: 100%; border-collapse: collapse; }
+        .error-table th { background: #f8f9fa; text-align: left; padding: 12px 16px; font-weight: 600; color: #555; border-bottom: 2px solid #eee; }
+        .error-table td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
+        .error-table tr:hover { background: #fafbfc; }
+        .error-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .error-badge.SHEET_NOT_FOUND { background: #fee; color: #c33; }
+        .error-badge.CELL_OUT_OF_RANGE { background: #fef5e7; color: #e67e22; }
+        .error-badge.RANGE_OUT_OF_BOUNDS { background: #fef5e7; color: #e67e22; }
+        .error-badge.INVALID_REFERENCE { background: #f0f0f0; color: #666; }
+        .cell-ref { font-family: 'SFMono-Regular', Consolas, monospace; background: #f6f8fa; padding: 2px 8px; border-radius: 4px; color: #0366d6; }
+        .sheet-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .sheet-item { padding: 8px 16px; background: #f6f8fa; border-radius: 20px; font-size: 14px; }
+        .no-errors { text-align: center; padding: 40px; color: #27ae60; }
+        .no-errors svg { width: 64px; height: 64px; margin-bottom: 16px; }
+        .footer { text-align: center; color: #999; padding: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Excel 公式引用检查报告</h1>
+            <p>生成时间: 2026/5/17 23:41:01</p>
+        </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-value">3</div>
+                <div class="card-label">工作表数量</div>
+            </div>
+            <div class="card">
+                <div class="card-value">8</div>
+                <div class="card-label">公式总数</div>
+            </div>
+            <div class="card">
+                <div class="card-value">8</div>
+                <div class="card-label">引用总数</div>
+            </div>
+            <div class="card error">
+                <div class="card-value">5</div>
+                <div class="card-label">错误数量</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📑 检查的工作表</h2>
+            <div class="sheet-list">
+                <span class="sheet-item">数据源 (0 个公式)</span><span class="sheet-item">汇总表 (5 个公式)</span><span class="sheet-item">计算表 (3 个公式)</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">❌ 错误详情 (5)</h2>
+            
+                <table class="error-table">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>源工作表</th>
+                            <th>单元格</th>
+                            <th>错误类型</th>
+                            <th>引用内容</th>
+                            <th>错误描述</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                            <tr>
+                                <td>1</td>
+                                <td><span class="cell-ref">汇总表</span></td>
+                                <td><span class="cell-ref">B3</span></td>
+                                <td><span class="error-badge CELL_OUT_OF_RANGE">单元格超出范围</span></td>
+                                <td><span class="cell-ref">数据源!B100</span></td>
+                                <td>单元格 B100 超出工作表 "数据源" 的范围 (A1:B4)</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>2</td>
+                                <td><span class="cell-ref">汇总表</span></td>
+                                <td><span class="cell-ref">B4</span></td>
+                                <td><span class="error-badge SHEET_NOT_FOUND">工作表不存在</span></td>
+                                <td><span class="cell-ref">不存在的表!C5</span></td>
+                                <td>工作表 "不存在的表" 不存在</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>3</td>
+                                <td><span class="cell-ref">汇总表</span></td>
+                                <td><span class="cell-ref">B5</span></td>
+                                <td><span class="error-badge RANGE_OUT_OF_BOUNDS">范围越界</span></td>
+                                <td><span class="cell-ref">数据源!A1:C100</span></td>
+                                <td>范围 A1:C100 超出工作表 "数据源" 的范围 (A1:B4)</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>4</td>
+                                <td><span class="cell-ref">汇总表</span></td>
+                                <td><span class="cell-ref">B6</span></td>
+                                <td><span class="error-badge RANGE_OUT_OF_BOUNDS">范围越界</span></td>
+                                <td><span class="cell-ref">数据源!A1:Z1000</span></td>
+                                <td>范围 A1:Z1000 超出工作表 "数据源" 的范围 (A1:B4)</td>
+                            </tr>
+                        
+                            <tr>
+                                <td>5</td>
+                                <td><span class="cell-ref">计算表</span></td>
+                                <td><span class="cell-ref">B4</span></td>
+                                <td><span class="error-badge CELL_OUT_OF_RANGE">单元格超出范围</span></td>
+                                <td><span class="cell-ref">汇总表!B10</span></td>
+                                <td>单元格 B10 超出工作表 "汇总表" 的范围 (A1:C6)</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+            
+        </div>
+
+        <div class="footer">
+            <p>Excel Formula Linter v1.0.0 | 报告生成时间: 2026/5/17 23:41:01</p>
+        </div>
+    </div>
+</body>
+</html>
