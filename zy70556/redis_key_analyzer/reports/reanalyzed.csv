@@ -1,0 +1,22 @@
+Summary
+total_keys,18
+total_memory_bytes,115973
+permanent_keys,6
+permanent_memory_bytes,17835
+scan_timestamp,2026-05-17T12:48:44.555822
+
+Prefix Analysis
+prefix,owner,total_keys,permanent_keys,total_memory_bytes,permanent_memory_bytes,avg_ttl_seconds,ttl_distribution,key_type_distribution
+temp:export,unassigned,1,0,45678,0,2592000.00,"{""TTL_1M"": 1}","{""list"": 1}"
+cache:page,unassigned,2,0,21308,0,2100.00,"{""TTL_1H"": 2}","{""string"": 2}"
+temp:import,unassigned,1,0,15678,0,3000.00,"{""TTL_1H"": 1}","{""list"": 1}"
+product:item,unassigned,3,2,15399,10297,7776000.00,"{""PERMANENT"": 2, ""TTL_LONG"": 1}","{""hash"": 3}"
+order:20240115,unassigned,2,0,6752,0,509200.00,"{""TTL_1W"": 2}","{""hash"": 2}"
+order:20240114,unassigned,1,1,3100,3100,0.00,"{""PERMANENT"": 1}","{""hash"": 1}"
+user:1002,unassigned,1,1,2156,2156,0.00,"{""PERMANENT"": 1}","{""string"": 1}"
+user:1001,unassigned,1,1,2048,2048,0.00,"{""PERMANENT"": 1}","{""string"": 1}"
+user:1003,unassigned,1,0,1987,0,72000.00,"{""TTL_1D"": 1}","{""string"": 1}"
+session:xyz789ghi012,unassigned,1,0,723,0,43200.00,"{""TTL_1D"": 1}","{""string"": 1}"
+session:abc123def456,unassigned,1,0,654,0,86400.00,"{""TTL_1D"": 1}","{""string"": 1}"
+api:rate,unassigned,2,0,256,0,2700.00,"{""TTL_1H"": 2}","{""string"": 2}"
+stats:daily,unassigned,1,1,234,234,0.00,"{""PERMANENT"": 1}","{""string"": 1}"

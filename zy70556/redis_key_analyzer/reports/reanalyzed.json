@@ -1,0 +1,221 @@
+{
+  "summary": {
+    "total_keys": 18,
+    "total_memory_bytes": 115973,
+    "permanent_keys": 6,
+    "permanent_memory_bytes": 17835,
+    "scan_timestamp": "2026-05-17T12:48:44.555822",
+    "overall_ttl_distribution": {
+      "PERMANENT": 6,
+      "TTL_1D": 3,
+      "TTL_1W": 2,
+      "TTL_LONG": 1,
+      "TTL_1H": 5,
+      "TTL_1M": 1
+    },
+    "overall_key_type_distribution": {
+      "string": 10,
+      "hash": 6,
+      "list": 2
+    }
+  },
+  "prefix_analysis": [
+    {
+      "prefix": "temp:export",
+      "total_keys": 1,
+      "permanent_keys": 0,
+      "total_memory_bytes": 45678,
+      "permanent_memory_bytes": 0,
+      "avg_ttl_seconds": 2592000.0,
+      "ttl_distribution": {
+        "TTL_1M": 1
+      },
+      "key_type_distribution": {
+        "list": 1
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "cache:page",
+      "total_keys": 2,
+      "permanent_keys": 0,
+      "total_memory_bytes": 21308,
+      "permanent_memory_bytes": 0,
+      "avg_ttl_seconds": 2100.0,
+      "ttl_distribution": {
+        "TTL_1H": 2
+      },
+      "key_type_distribution": {
+        "string": 2
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "temp:import",
+      "total_keys": 1,
+      "permanent_keys": 0,
+      "total_memory_bytes": 15678,
+      "permanent_memory_bytes": 0,
+      "avg_ttl_seconds": 3000.0,
+      "ttl_distribution": {
+        "TTL_1H": 1
+      },
+      "key_type_distribution": {
+        "list": 1
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "product:item",
+      "total_keys": 3,
+      "permanent_keys": 2,
+      "total_memory_bytes": 15399,
+      "permanent_memory_bytes": 10297,
+      "avg_ttl_seconds": 7776000.0,
+      "ttl_distribution": {
+        "PERMANENT": 2,
+        "TTL_LONG": 1
+      },
+      "key_type_distribution": {
+        "hash": 3
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "order:20240115",
+      "total_keys": 2,
+      "permanent_keys": 0,
+      "total_memory_bytes": 6752,
+      "permanent_memory_bytes": 0,
+      "avg_ttl_seconds": 509200.0,
+      "ttl_distribution": {
+        "TTL_1W": 2
+      },
+      "key_type_distribution": {
+        "hash": 2
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "order:20240114",
+      "total_keys": 1,
+      "permanent_keys": 1,
+      "total_memory_bytes": 3100,
+      "permanent_memory_bytes": 3100,
+      "avg_ttl_seconds": 0.0,
+      "ttl_distribution": {
+        "PERMANENT": 1
+      },
+      "key_type_distribution": {
+        "hash": 1
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "user:1002",
+      "total_keys": 1,
+      "permanent_keys": 1,
+      "total_memory_bytes": 2156,
+      "permanent_memory_bytes": 2156,
+      "avg_ttl_seconds": 0.0,
+      "ttl_distribution": {
+        "PERMANENT": 1
+      },
+      "key_type_distribution": {
+        "string": 1
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "user:1001",
+      "total_keys": 1,
+      "permanent_keys": 1,
+      "total_memory_bytes": 2048,
+      "permanent_memory_bytes": 2048,
+      "avg_ttl_seconds": 0.0,
+      "ttl_distribution": {
+        "PERMANENT": 1
+      },
+      "key_type_distribution": {
+        "string": 1
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "user:1003",
+      "total_keys": 1,
+      "permanent_keys": 0,
+      "total_memory_bytes": 1987,
+      "permanent_memory_bytes": 0,
+      "avg_ttl_seconds": 72000.0,
+      "ttl_distribution": {
+        "TTL_1D": 1
+      },
+      "key_type_distribution": {
+        "string": 1
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "session:xyz789ghi012",
+      "total_keys": 1,
+      "permanent_keys": 0,
+      "total_memory_bytes": 723,
+      "permanent_memory_bytes": 0,
+      "avg_ttl_seconds": 43200.0,
+      "ttl_distribution": {
+        "TTL_1D": 1
+      },
+      "key_type_distribution": {
+        "string": 1
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "session:abc123def456",
+      "total_keys": 1,
+      "permanent_keys": 0,
+      "total_memory_bytes": 654,
+      "permanent_memory_bytes": 0,
+      "avg_ttl_seconds": 86400.0,
+      "ttl_distribution": {
+        "TTL_1D": 1
+      },
+      "key_type_distribution": {
+        "string": 1
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "api:rate",
+      "total_keys": 2,
+      "permanent_keys": 0,
+      "total_memory_bytes": 256,
+      "permanent_memory_bytes": 0,
+      "avg_ttl_seconds": 2700.0,
+      "ttl_distribution": {
+        "TTL_1H": 2
+      },
+      "key_type_distribution": {
+        "string": 2
+      },
+      "owner": "unassigned"
+    },
+    {
+      "prefix": "stats:daily",
+      "total_keys": 1,
+      "permanent_keys": 1,
+      "total_memory_bytes": 234,
+      "permanent_memory_bytes": 234,
+      "avg_ttl_seconds": 0.0,
+      "ttl_distribution": {
+        "PERMANENT": 1
+      },
+      "key_type_distribution": {
+        "string": 1
+      },
+      "owner": "unassigned"
+    }
+  ],
+  "bad_records": []
+}

@@ -37,7 +37,17 @@ redis_key_analyzer/
 
 ## 快速开始
 
-### 0. 先体验离线分析（无需Redis）
+### 0. 核心流程：扫描 -> 保存原始键 -> 离线分析（闭环）
+
+工具支持完整的扫描-分析闭环：
+
+1. **`scan` 命令**：扫描 Redis 并生成以下两种文件：
+   - `*_raw_keys.json`：原始键列表（可再次用于离线分析）
+   - 分析报告（JSON/CSV/HTML）
+
+2. **`analyze` 命令**：从原始键列表重新分析，支持更换 Owner 映射
+
+### 1. 先体验离线分析（无需Redis）
 
 使用内置的样例数据，直接体验完整的分析流程：
 
@@ -53,7 +63,7 @@ python3 -m redis_key_analyzer analyze redis_key_analyzer/data/sample_keys.json \
 
 报告将生成在 `redis_key_analyzer/reports/` 目录下。
 
-### 1. 初始化Owner映射配置文件
+### 2. 初始化Owner映射配置文件
 
 ```bash
 # 生成映射模板
@@ -96,16 +106,38 @@ python3 -m redis_key_analyzer scan --max-keys 10000
 python3 -m redis_key_analyzer scan --output-dir ./my_reports
 ```
 
-### 3. 从已保存的扫描文件进行离线分析
+### 5. 从已保存的扫描文件进行离线分析
+
+使用 `scan` 命令生成的 `*_raw_keys.json` 文件进行离线分析：
 
 ```bash
-# 基本使用
-python3 -m redis_key_analyzer analyze redis_analysis.json
+# 使用 scan 生成的原始键列表文件
+python3 -m redis_key_analyzer analyze redis_key_analyzer/reports/redis_scan_xxx_raw_keys.json
 
-# 使用自定义Owner映射重新分析
-python3 -m redis_key_analyzer analyze redis_analysis.json \
+# 使用自定义Owner映射重新分析（无需重新扫描Redis）
+python3 -m redis_key_analyzer analyze redis_key_analyzer/reports/redis_scan_xxx_raw_keys.json \
     --owner-mapping new_mapping.json \
     --output new_analysis
+```
+
+### 原始键列表 JSON 格式
+
+`*_raw_keys.json` 文件格式如下，可被 `load_from_file` 正确读取：
+
+```json
+[
+    {
+        "key": "user:1001:profile",
+        "ttl": "PERMANENT",
+        "ttl_seconds": null,
+        "memory_bytes": 2048,
+        "key_type": "string",
+        "prefix": "user:1001",
+        "has_expiry": false,
+        "scan_timestamp": "2026-05-17T10:30:00.000000"
+    },
+    ...
+]
 ```
 
 ## 输出报告说明

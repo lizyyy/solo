@@ -260,9 +260,21 @@ class ReportGenerator:
         print(f"扫描时间: {result.scan_timestamp}")
         print(f"总键数量: {result.total_keys:,}")
         print(f"总内存使用: {self._format_bytes(result.total_memory_bytes)}")
-        print(f"永久键数量: {result.permanent_keys:,} ({result.permanent_keys/result.total_keys*100:.1f}%)")
+        
+        if result.total_keys > 0:
+            permanent_pct = result.permanent_keys / result.total_keys * 100
+            print(f"永久键数量: {result.permanent_keys:,} ({permanent_pct:.1f}%)")
+        else:
+            print(f"永久键数量: {result.permanent_keys:,}")
+        
         print(f"永久键内存: {self._format_bytes(result.permanent_memory_bytes)}")
         print(f"前缀分组数: {len(result.prefix_analysis)}")
+        
+        if result.total_keys == 0:
+            print("\n" + "⚠️ 未扫描到任何键，无法生成前缀分析")
+            print("="*60 + "\n")
+            return
+        
         print("\n" + "-"*60)
         print("Top 10 内存占用前缀:")
         print("-"*60)

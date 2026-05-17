@@ -3,6 +3,7 @@ import logging
 import json
 import os
 from pathlib import Path
+from dataclasses import asdict
 
 from .scanner import RedisScanner
 from .analyzer import KeyAnalyzer
@@ -62,9 +63,18 @@ def scan(host, port, db, password, pattern, batch_size, max_keys, output, owner_
     
     if output:
         output_path = Path(output_dir) / output
+        raw_keys_file = Path(output_dir) / f"{output}_raw_keys.json"
     else:
         timestamp = result.scan_timestamp.replace(":", "-").replace(".", "-")
         output_path = Path(output_dir) / f"redis_analysis_{timestamp}"
+        raw_keys_file = Path(output_dir) / f"redis_scan_{timestamp}_raw_keys.json"
+    
+    # 保存原始键列表（供离线分析使用）
+    keys_dict = [asdict(k) for k in keys_info]
+    with open(raw_keys_file, 'w', encoding='utf-8') as f:
+        json.dump(keys_dict, f, ensure_ascii=False, indent=2)
+    click.echo(click.style(f"💾 原始键列表已保存: {raw_keys_file}", fg="blue"))
+    click.echo(click.style(f"   后续可使用此文件进行离线分析: python -m redis_key_analyzer analyze {raw_keys_file}", fg="blue"))
     
     reporter = ReportGenerator(output_dir=output_dir)
     reporter.generate_all(result, base_filename=str(output_path))
