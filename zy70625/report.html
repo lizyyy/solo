@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检录资格校验报告 - RPT-20260517174212</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 20px; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; }
+        .summary-card { padding: 20px; border-radius: 6px; text-align: center; }
+        .summary-card h3 { font-size: 2em; margin-bottom: 5px; }
+        .summary-card p { color: #666; font-size: 0.9em; }
+        .total { background: #e3f2fd; color: #1976d2; }
+        .pass { background: #e8f5e9; color: #388e3c; }
+        .fail { background: #ffebee; color: #d32f2f; }
+        .warning { background: #fff3e0; color: #f57c00; }
+        h2 { color: #444; margin: 30px 0 15px; border-left: 4px solid #4CAF50; padding-left: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; font-weight: 600; color: #333; }
+        tr:hover { background: #f5f5f5; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
+        .status-PASS { background: #c8e6c9; color: #2e7d32; }
+        .status-FAIL { background: #ffcdd2; color: #c62828; }
+        .status-WARNING { background: #ffe0b2; color: #ef6c00; }
+        .severity-ERROR { color: #d32f2f; font-weight: 600; }
+        .severity-WARNING { color: #f57c00; font-weight: 600; }
+        .severity-INFO { color: #1976d2; }
+        .issues-list { list-style: none; }
+        .issues-list li { padding: 8px 12px; margin: 5px 0; background: #fafafa; border-left: 3px solid; border-radius: 0 4px 4px 0; }
+        .issues-list li.ERROR { border-color: #d32f2f; }
+        .issues-list li.WARNING { border-color: #f57c00; }
+        .issues-list li.INFO { border-color: #1976d2; }
+        .meta-info { color: #666; font-size: 0.9em; margin-bottom: 20px; }
+        .parse-errors { background: #ffebee; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .parse-errors h4 { color: #c62828; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏆 检录资格校验报告</h1>
+        <div class="meta-info">
+            <p><strong>报告编号:</strong> RPT-20260517174212</p>
+            <p><strong>生成时间:</strong> 2026-05-17 17:42:12</p>
+        </div>
+
+        <h2>📊 校验概览</h2>
+        <div class="summary">
+            <div class="summary-card total">
+                <h3>3</h3>
+                <p>总选手数</p>
+            </div>
+            <div class="summary-card pass">
+                <h3>0</h3>
+                <p>资格通过</p>
+            </div>
+            <div class="summary-card fail">
+                <h3>3</h3>
+                <p>资格不通过</p>
+            </div>
+            <div class="summary-card warning">
+                <h3>0</h3>
+                <p>存在警告</p>
+            </div>
+        </div>
+
+        
+
+        <h2>👥 选手资格明细</h2>
+        <table>
+            <tr>
+                <th>选手ID</th>
+                <th>姓名</th>
+                <th>组别</th>
+                <th>状态</th>
+                <th>检录次数</th>
+                <th>是否替补</th>
+            </tr>
+            
+            <tr>
+                <td>P001</td>
+                <td>张三</td>
+                <td>G001</td>
+                <td><span class="status-badge status-ValidationStatus.FAIL">ValidationStatus.FAIL</span></td>
+                <td>2</td>
+                <td>否</td>
+            </tr>
+            
+            <tr>
+                <td colspan="6">
+                    <ul class="issues-list">
+                        
+                        <li class="IssueSeverity.ERROR">
+                            <span class="severity-IssueSeverity.ERROR">[RuleType.MATERIAL_CHECK]</span>
+                            材料状态无效: 健康证明 (未上传)
+                            
+                            <small>(players.csv:2)</small>
+                            
+                        </li>
+                        
+                        <li class="IssueSeverity.WARNING">
+                            <span class="severity-IssueSeverity.WARNING">[RuleType.DUPLICATE_CHECKIN]</span>
+                            重复检录: 已检录 2 次
+                            
+                            <small>(players.csv:2)</small>
+                            
+                        </li>
+                        
+                    </ul>
+                </td>
+            </tr>
+            
+            
+            <tr>
+                <td>P002</td>
+                <td>李四</td>
+                <td>G001</td>
+                <td><span class="status-badge status-ValidationStatus.FAIL">ValidationStatus.FAIL</span></td>
+                <td>1</td>
+                <td>否</td>
+            </tr>
+            
+            <tr>
+                <td colspan="6">
+                    <ul class="issues-list">
+                        
+                        <li class="IssueSeverity.ERROR">
+                            <span class="severity-IssueSeverity.ERROR">[RuleType.GROUP_RESTRICTION]</span>
+                            性别不符合组别要求: 需要男
+                            
+                            <small>(players.csv:3)</small>
+                            
+                        </li>
+                        
+                    </ul>
+                </td>
+            </tr>
+            
+            
+            <tr>
+                <td>P003</td>
+                <td>王五</td>
+                <td>G002</td>
+                <td><span class="status-badge status-ValidationStatus.FAIL">ValidationStatus.FAIL</span></td>
+                <td>0</td>
+                <td>否</td>
+            </tr>
+            
+            <tr>
+                <td colspan="6">
+                    <ul class="issues-list">
+                        
+                        <li class="IssueSeverity.ERROR">
+                            <span class="severity-IssueSeverity.ERROR">[RuleType.MATERIAL_CHECK]</span>
+                            缺少必需材料: 身份证
+                            
+                            <small>(players.csv:4)</small>
+                            
+                        </li>
+                        
+                        <li class="IssueSeverity.ERROR">
+                            <span class="severity-IssueSeverity.ERROR">[RuleType.MATERIAL_CHECK]</span>
+                            缺少必需材料: 照片
+                            
+                            <small>(players.csv:4)</small>
+                            
+                        </li>
+                        
+                        <li class="IssueSeverity.ERROR">
+                            <span class="severity-IssueSeverity.ERROR">[RuleType.MATERIAL_CHECK]</span>
+                            缺少必需材料: 健康证明
+                            
+                            <small>(players.csv:4)</small>
+                            
+                        </li>
+                        
+                        <li class="IssueSeverity.ERROR">
+                            <span class="severity-IssueSeverity.ERROR">[RuleType.GROUP_RESTRICTION]</span>
+                            性别不符合组别要求: 需要女
+                            
+                            <small>(players.csv:4)</small>
+                            
+                        </li>
+                        
+                        <li class="IssueSeverity.ERROR">
+                            <span class="severity-IssueSeverity.ERROR">[RuleType.GROUP_RESTRICTION]</span>
+                            年龄超过组别上限: 41 > 40
+                            
+                            <small>(players.csv:4)</small>
+                            
+                        </li>
+                        
+                    </ul>
+                </td>
+            </tr>
+            
+            
+        </table>
+
+        <h2>❌ 所有问题汇总</h2>
+        <table>
+            <tr>
+                <th>规则类型</th>
+                <th>严重程度</th>
+                <th>消息</th>
+                <th>来源</th>
+            </tr>
+            
+            <tr>
+                <td>RuleType.MATERIAL_CHECK</td>
+                <td><span class="severity-IssueSeverity.ERROR">IssueSeverity.ERROR</span></td>
+                <td>材料状态无效: 健康证明 (未上传)</td>
+                <td>
+                    
+                    players.csv:2
+                    
+                </td>
+            </tr>
+            
+            <tr>
+                <td>RuleType.MATERIAL_CHECK</td>
+                <td><span class="severity-IssueSeverity.ERROR">IssueSeverity.ERROR</span></td>
+                <td>缺少必需材料: 身份证</td>
+                <td>
+                    
+                    players.csv:4
+                    
+                </td>
+            </tr>
+            
+            <tr>
+                <td>RuleType.MATERIAL_CHECK</td>
+                <td><span class="severity-IssueSeverity.ERROR">IssueSeverity.ERROR</span></td>
+                <td>缺少必需材料: 照片</td>
+                <td>
+                    
+                    players.csv:4
+                    
+                </td>
+            </tr>
+            
+            <tr>
+                <td>RuleType.MATERIAL_CHECK</td>
+                <td><span class="severity-IssueSeverity.ERROR">IssueSeverity.ERROR</span></td>
+                <td>缺少必需材料: 健康证明</td>
+                <td>
+                    
+                    players.csv:4
+                    
+                </td>
+            </tr>
+            
+            <tr>
+                <td>RuleType.GROUP_RESTRICTION</td>
+                <td><span class="severity-IssueSeverity.ERROR">IssueSeverity.ERROR</span></td>
+                <td>性别不符合组别要求: 需要男</td>
+                <td>
+                    
+                    players.csv:3
+                    
+                </td>
+            </tr>
+            
+            <tr>
+                <td>RuleType.GROUP_RESTRICTION</td>
+                <td><span class="severity-IssueSeverity.ERROR">IssueSeverity.ERROR</span></td>
+                <td>性别不符合组别要求: 需要女</td>
+                <td>
+                    
+                    players.csv:4
+                    
+                </td>
+            </tr>
+            
+            <tr>
+                <td>RuleType.GROUP_RESTRICTION</td>
+                <td><span class="severity-IssueSeverity.ERROR">IssueSeverity.ERROR</span></td>
+                <td>年龄超过组别上限: 41 > 40</td>
+                <td>
+                    
+                    players.csv:4
+                    
+                </td>
+            </tr>
+            
+            <tr>
+                <td>RuleType.DUPLICATE_CHECKIN</td>
+                <td><span class="severity-IssueSeverity.WARNING">IssueSeverity.WARNING</span></td>
+                <td>重复检录: 已检录 2 次</td>
+                <td>
+                    
+                    players.csv:2
+                    
+                </td>
+            </tr>
+            
+        </table>
+    </div>
+</body>
+</html>
