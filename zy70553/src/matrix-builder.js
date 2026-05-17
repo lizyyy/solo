@@ -2,6 +2,8 @@ class MatrixBuilder {
   constructor() {
     this.protoErrorCodes = [];
     this.sdkDefinitions = {};
+    this.validationIssues = [];
+    this.malformedLines = [];
   }
 
   loadSdkDefinitions(sdkData) {
@@ -11,8 +13,12 @@ class MatrixBuilder {
     return this;
   }
 
-  loadProtoErrorCodes(codes) {
+  loadProtoErrorCodes(codes, parseResult = null) {
     this.protoErrorCodes = codes || [];
+    if (parseResult) {
+      this.validationIssues = parseResult.validationIssues || [];
+      this.malformedLines = parseResult.malformedLines || [];
+    }
     return this;
   }
 
@@ -27,6 +33,8 @@ class MatrixBuilder {
         controversial: []
       },
       differences: [],
+      validationIssues: this.validationIssues,
+      malformedLines: this.malformedLines,
       summary: {}
     };
 

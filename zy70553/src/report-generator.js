@@ -12,9 +12,41 @@ class ReportGenerator {
   generateConsoleReport(matrix) {
     let output = '';
     output += this.generateHeader();
+    output += this.generateValidationSection(matrix);
     output += this.generateSummarySection(matrix);
     output += this.generateCategorySection(matrix);
     output += this.generateSdkComparisonTable(matrix);
+    return output;
+  }
+
+  generateValidationSection(matrix) {
+    let output = '';
+    
+    if ((matrix.validationIssues && matrix.validationIssues.length > 0) || 
+        (matrix.malformedLines && matrix.malformedLines.length > 0)) {
+      output += this.chalk.bold.red('⚠️ 校验问题\n');
+      output += this.chalk.gray('─────────────────────────────────────────────────────────────\n\n');
+      
+      if (matrix.malformedLines && matrix.malformedLines.length > 0) {
+        output += this.chalk.bold.yellow(`  ❌ 非法枚举值 (${matrix.malformedLines.length} 处):\n`);
+        for (const ml of matrix.malformedLines) {
+          output += this.chalk.yellow(`     行 ${ml.line}: ${ml.rawLine}\n`);
+          output += this.chalk.gray(`        原因: ${ml.reason}\n`);
+        }
+        output += '\n';
+      }
+      
+      if (matrix.validationIssues && matrix.validationIssues.length > 0) {
+        output += this.chalk.bold.yellow(`  ⚠️ 校验问题 (${matrix.validationIssues.length} 处):\n`);
+        for (const issue of matrix.validationIssues) {
+          const severityColor = issue.type === 'duplicate_code' ? this.chalk.red : this.chalk.yellow;
+          output += severityColor(`     行 ${issue.line}: [${issue.type}] ${issue.message}\n`);
+          output += this.chalk.gray(`        原始内容: ${issue.rawLine}\n`);
+        }
+        output += '\n';
+      }
+    }
+    
     return output;
   }
 
@@ -32,6 +64,9 @@ class ReportGenerator {
     output += this.chalk.gray('─────────────────────────────────────────────────────────────\n');
     
     const summary = matrix.summary;
+    const malformedCount = (matrix.malformedLines || []).length;
+    const issueCount = (matrix.validationIssues || []).length;
+    
     const summaryData = [
       [this.chalk.white('指标'), this.chalk.white('数值')],
       ['总错误码数量', summary.totalCodes.toString()],
@@ -41,6 +76,15 @@ class ReportGenerator {
       [this.chalk.yellow('⚠️ 有争议(Controversial)'), summary.controversialCount.toString()],
       [this.chalk.magenta('🔀 差异数量'), (summary.differencesCount || 0).toString()]
     ];
+    
+    if (malformedCount > 0 || issueCount > 0) {
+      if (malformedCount > 0) {
+        summaryData.push([this.chalk.red('❌ 非法行数量'), malformedCount.toString()]);
+      }
+      if (issueCount > 0) {
+        summaryData.push([this.chalk.red('⚠️ 校验问题数量'), issueCount.toString()]);
+      }
+    }
     
     output += table(summaryData, {
       columns: [{ width: 25 }, { width: 10 }],
@@ -165,6 +209,9 @@ class ReportGenerator {
     let md = '# gRPC 错误码矩阵报告\n\n';
     md += `*生成时间: ${new Date(matrix.timestamp).toLocaleString()}*\n\n`;
 
+    const malformedCount = (matrix.malformedLines || []).length;
+    const issueCount = (matrix.validationIssues || []).length;
+
     md += '## 摘要\n\n';
     md += '| 指标 | 数值 |\n';
     md += '|------|------|\n';
@@ -173,7 +220,38 @@ class ReportGenerator {
     md += `| 可重试(Safe) | ${matrix.summary.safeRetryCount} |\n`;
     md += `| 不可重试(Never) | ${matrix.summary.neverRetryCount} |\n`;
     md += `| 有争议(Controversial) | ${matrix.summary.controversialCount} |\n`;
-    md += `| 差异数量 | ${matrix.summary.differencesCount || 0} |\n\n`;
+    md += `| 差异数量 | ${matrix.summary.differencesCount || 0} |\n`;
+    if (malformedCount > 0) {
+      md += `| ⚠️ 非法行数量 | ${malformedCount} |\n`;
+    }
+    if (issueCount > 0) {
+      md += `| ❌ 校验问题数量 | ${issueCount} |\n`;
+    }
+    md += '\n';
+
+    if (malformedCount > 0 || issueCount > 0) {
+      md += '## ⚠️ 校验问题\n\n';
+      
+      if (malformedCount > 0) {
+        md += '### ❌ 非法枚举值\n\n';
+        md += '| 行号 | 原始内容 | 原因 |\n';
+        md += '|------|---------|------|\n';
+        for (const ml of matrix.malformedLines) {
+          md += `| ${ml.line} | \`${ml.rawLine}\` | ${ml.reason} |\n`;
+        }
+        md += '\n';
+      }
+      
+      if (issueCount > 0) {
+        md += '### ⚠️ 校验警告\n\n';
+        md += '| 行号 | 类型 | 消息 | 原始内容 |\n';
+        md += '|------|------|------|---------|\n';
+        for (const issue of matrix.validationIssues) {
+          md += `| ${issue.line} | ${issue.type} | ${issue.message} | \`${issue.rawLine}\` |\n`;
+        }
+        md += '\n';
+      }
+    }
 
     md += '## 重试分类\n\n';
 

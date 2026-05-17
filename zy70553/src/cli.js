@@ -56,6 +56,29 @@ program.command('analyze')
       const parser = new ProtoParser();
       const parseResult = parser.parse(protoPath);
       
+      if (parseResult.parseErrors.length > 0) {
+        for (const err of parseResult.parseErrors) {
+          console.error(chalk.red(`❌ 解析错误: ${err.message}`));
+        }
+      }
+      
+      if (parseResult.malformedLines.length > 0) {
+        console.log(chalk.yellow(`⚠️ Found ${parseResult.malformedLines.length} malformed enum values:`));
+        for (const ml of parseResult.malformedLines) {
+          console.log(chalk.yellow(`   行 ${ml.line}: ${ml.rawLine}`));
+          console.log(chalk.gray(`      原因: ${ml.reason}`));
+        }
+      }
+      
+      if (parseResult.validationIssues.length > 0) {
+        console.log(chalk.yellow(`⚠️ Found ${parseResult.validationIssues.length} validation issues:`));
+        for (const issue of parseResult.validationIssues) {
+          const severity = issue.type === 'duplicate_code' ? chalk.red : chalk.yellow;
+          console.log(severity(`   行 ${issue.line}: [${issue.type}] ${issue.message}`));
+          console.log(chalk.gray(`      原始内容: ${issue.rawLine}`));
+        }
+      }
+      
       if (parseResult.errorCodes.length === 0) {
         console.error(chalk.red('Error: No error codes found in proto file'));
         process.exit(1);
@@ -70,7 +93,7 @@ program.command('analyze')
       console.log(chalk.cyan('Building error code matrix...'));
       const builder = new MatrixBuilder();
       const matrix = builder
-        .loadProtoErrorCodes(parseResult.errorCodes)
+        .loadProtoErrorCodes(parseResult.errorCodes, parseResult)
         .loadSdkDefinitions(sdkData)
         .buildMatrix();
       console.log(chalk.green('Matrix built successfully'));

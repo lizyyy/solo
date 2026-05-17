@@ -16,7 +16,9 @@ class ProtoParser {
       messages: [],
       services: [],
       errorCodes: [],
-      parseErrors: []
+      parseErrors: [],
+      validationIssues: [],
+      malformedLines: []
     };
 
     try {
@@ -77,6 +79,17 @@ class ProtoParser {
               line: lineNum + 1,
               rawLine: rawLine.trim()
             });
+          } 
+          else if (trimmed.match(/^\w+\s*=/) && !trimmed.match(/^\w+\s*=\s*(-?\d+)\s*;/)) {
+            const nameMatch = trimmed.match(/^(\w+)\s*=/);
+            result.malformedLines.push({
+              type: 'invalid_enum_value',
+              line: lineNum + 1,
+              rawLine: rawLine.trim(),
+              context: `In enum: ${currentEnum ? currentEnum.name : 'unknown'}`,
+              reason: '枚举值格式错误，无法解析为有效整数',
+              name: nameMatch ? nameMatch[1] : 'unknown'
+            });
           }
           continue;
         }
@@ -96,6 +109,8 @@ class ProtoParser {
           }
         }
       }
+
+      result.validationIssues = this.validateErrorCodes(result.errorCodes);
 
     } catch (error) {
       result.parseErrors.push({
