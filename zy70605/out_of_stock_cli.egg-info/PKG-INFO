@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: out-of-stock-cli
+Version: 1.0.0
+Summary: 缺货补偿库存回写结算一致性排查CLI
+Author: 团长团队
+Requires-Python: >=3.9
+Requires-Dist: click>=8.0.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: python-dotenv>=1.0.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
