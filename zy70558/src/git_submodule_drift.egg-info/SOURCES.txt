@@ -1,0 +1,13 @@
+pyproject.toml
+src/git_submodule_drift.egg-info/PKG-INFO
+src/git_submodule_drift.egg-info/SOURCES.txt
+src/git_submodule_drift.egg-info/dependency_links.txt
+src/git_submodule_drift.egg-info/entry_points.txt
+src/git_submodule_drift.egg-info/requires.txt
+src/git_submodule_drift.egg-info/top_level.txt
+src/submodule_drift/__init__.py
+src/submodule_drift/cli.py
+src/submodule_drift/drift_detector.py
+src/submodule_drift/git_metadata.py
+src/submodule_drift/report_generator.py
+src/submodule_drift/test.py

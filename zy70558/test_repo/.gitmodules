@@ -1,0 +1,8 @@
+[submodule "module1"]
+    path = lib/module1
+    url = https://github.com/example/module1.git
+    branch = main
+[submodule "module2"]
+    path = lib/module2
+    url = https://github.com/example/module2.git
+    extra_field = should_be_reported
