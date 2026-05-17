@@ -1,0 +1,219 @@
+{
+  "summary": {
+    "total_variables": 8,
+    "used_variables": 5,
+    "unused_variables": 3,
+    "variables_with_default": 8,
+    "variables_without_default": 0,
+    "undefined_but_referenced": 0,
+    "total_errors": 0,
+    "total_issues": 3
+  },
+  "variables": {
+    "subnet_cidrs": {
+      "name": "subnet_cidrs",
+      "defined": true,
+      "is_used": true,
+      "has_default": true,
+      "definition": {
+        "name": "subnet_cidrs",
+        "file": "test-normal/variables.tf",
+        "line": 25,
+        "has_default": true
+      },
+      "references": [
+        {
+          "name": "subnet_cidrs",
+          "file": "test-normal/main.tf",
+          "line": 14,
+          "col": 30
+        },
+        {
+          "name": "subnet_cidrs",
+          "file": "test-normal/main.tf",
+          "line": 16,
+          "col": 23
+        }
+      ],
+      "issues": []
+    },
+    "no_default_unused": {
+      "name": "no_default_unused",
+      "defined": true,
+      "is_used": false,
+      "has_default": true,
+      "definition": {
+        "name": "no_default_unused",
+        "file": "test-normal/variables.tf",
+        "line": 42,
+        "has_default": true
+      },
+      "references": [],
+      "issues": [
+        "defined but never used"
+      ]
+    },
+    "vpc_cidr": {
+      "name": "vpc_cidr",
+      "defined": true,
+      "is_used": true,
+      "has_default": true,
+      "definition": {
+        "name": "vpc_cidr",
+        "file": "test-normal/variables.tf",
+        "line": 19,
+        "has_default": true
+      },
+      "references": [
+        {
+          "name": "vpc_cidr",
+          "file": "test-normal/main.tf",
+          "line": 6,
+          "col": 16
+        }
+      ],
+      "issues": []
+    },
+    "unused_var": {
+      "name": "unused_var",
+      "defined": true,
+      "is_used": false,
+      "has_default": true,
+      "definition": {
+        "name": "unused_var",
+        "file": "test-normal/variables.tf",
+        "line": 31,
+        "has_default": true
+      },
+      "references": [],
+      "issues": [
+        "defined but never used"
+      ]
+    },
+    "environment": {
+      "name": "environment",
+      "defined": true,
+      "is_used": true,
+      "has_default": true,
+      "definition": {
+        "name": "environment",
+        "file": "test-normal/variables.tf",
+        "line": 7,
+        "has_default": true
+      },
+      "references": [
+        {
+          "name": "environment",
+          "file": "test-normal/main.tf",
+          "line": 9,
+          "col": 15
+        },
+        {
+          "name": "environment",
+          "file": "test-normal/main.tf",
+          "line": 20,
+          "col": 15
+        },
+        {
+          "name": "environment",
+          "file": "test-normal/main.tf",
+          "line": 32,
+          "col": 19
+        }
+      ],
+      "issues": []
+    },
+    "instance_type": {
+      "name": "instance_type",
+      "defined": true,
+      "is_used": true,
+      "has_default": true,
+      "definition": {
+        "name": "instance_type",
+        "file": "test-normal/variables.tf",
+        "line": 13,
+        "has_default": true
+      },
+      "references": [
+        {
+          "name": "instance_type",
+          "file": "test-normal/main.tf",
+          "line": 31,
+          "col": 19
+        }
+      ],
+      "issues": []
+    },
+    "no_default_used": {
+      "name": "no_default_used",
+      "defined": true,
+      "is_used": false,
+      "has_default": true,
+      "definition": {
+        "name": "no_default_used",
+        "file": "test-normal/variables.tf",
+        "line": 37,
+        "has_default": true
+      },
+      "references": [],
+      "issues": [
+        "defined but never used"
+      ]
+    },
+    "aws_region": {
+      "name": "aws_region",
+      "defined": true,
+      "is_used": true,
+      "has_default": true,
+      "definition": {
+        "name": "aws_region",
+        "file": "test-normal/variables.tf",
+        "line": 1,
+        "has_default": true
+      },
+      "references": [
+        {
+          "name": "aws_region",
+          "file": "test-normal/main.tf",
+          "line": 2,
+          "col": 12
+        }
+      ],
+      "issues": []
+    }
+  },
+  "errors": [],
+  "issues": [
+    [
+      "no_default_unused",
+      "defined but never used",
+      {
+        "name": "no_default_unused",
+        "file": "test-normal/variables.tf",
+        "line": 42,
+        "has_default": true
+      }
+    ],
+    [
+      "unused_var",
+      "defined but never used",
+      {
+        "name": "unused_var",
+        "file": "test-normal/variables.tf",
+        "line": 31,
+        "has_default": true
+      }
+    ],
+    [
+      "no_default_used",
+      "defined but never used",
+      {
+        "name": "no_default_used",
+        "file": "test-normal/variables.tf",
+        "line": 37,
+        "has_default": true
+      }
+    ]
+  ],
+  "generated_at": "2026-05-17T11:33:02.156772"
+}
