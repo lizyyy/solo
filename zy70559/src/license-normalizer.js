@@ -8,15 +8,25 @@ const RISK_LEVELS = {
 };
 
 const LICENSE_RISKS = {
+  'GPL-1.0-only': RISK_LEVELS.HIGH,
+  'GPL-1.0-or-later': RISK_LEVELS.HIGH,
+  'GPL-2.0-only': RISK_LEVELS.HIGH,
+  'GPL-2.0-or-later': RISK_LEVELS.HIGH,
+  'GPL-3.0-only': RISK_LEVELS.HIGH,
+  'GPL-3.0-or-later': RISK_LEVELS.HIGH,
+  'AGPL-1.0-only': RISK_LEVELS.HIGH,
+  'AGPL-3.0-only': RISK_LEVELS.HIGH,
+  'MPL-1.0': RISK_LEVELS.MEDIUM,
+  'MPL-1.1': RISK_LEVELS.MEDIUM,
+  'MPL-2.0': RISK_LEVELS.MEDIUM,
+  'CDDL-1.0': RISK_LEVELS.MEDIUM,
+  'EPL-1.0': RISK_LEVELS.MEDIUM,
+  'EPL-2.0': RISK_LEVELS.MEDIUM,
   'MIT': RISK_LEVELS.LOW,
   'Apache-2.0': RISK_LEVELS.LOW,
   'BSD-2-Clause': RISK_LEVELS.LOW,
   'BSD-3-Clause': RISK_LEVELS.LOW,
-  'ISC': RISK_LEVELS.LOW,
-  'GPL-3.0-only': RISK_LEVELS.HIGH,
-  'GPL-2.0-only': RISK_LEVELS.HIGH,
-  'AGPL-3.0-only': RISK_LEVELS.HIGH,
-  'MPL-2.0': RISK_LEVELS.MEDIUM
+  'ISC': RISK_LEVELS.LOW
 };
 
 class LicenseNormalizer {
@@ -29,14 +39,17 @@ class LicenseNormalizer {
       this.addError(packageName, 'no license found', packagePath);
       return { original: null, normalized: null, risk: RISK_LEVELS.UNKNOWN };
     }
+
     const original = license;
     let normalized = license.trim();
+
     try {
-      const risk = this.simpleRiskCheck(normalized);
+      const parsed = spdxParse(normalized);
+      const risk = this.determineRisk(parsed);
       return { original, normalized, risk };
     } catch (e) {
       const risk = this.simpleRiskCheck(normalized);
-      this.addError(packageName, 'SPDX parse failed', packagePath);
+      this.addError(packageName, 'SPDX parse failed: ' + e.message, packagePath);
       return { original, normalized, risk };
     }
   }
@@ -47,6 +60,11 @@ class LicenseNormalizer {
     }
     if (parsed.license) {
       return LICENSE_RISKS[parsed.license] || RISK_LEVELS.UNKNOWN;
+    }
+    if (parsed.conjunction) {
+      const leftRisk = this.riskToNumber(this.determineRisk(parsed.left));
+      const rightRisk = this.riskToNumber(this.determineRisk(parsed.right));
+      return this.numberToRisk(Math.max(leftRisk, rightRisk));
     }
     return RISK_LEVELS.UNKNOWN;
   }

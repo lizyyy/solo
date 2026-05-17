@@ -4,7 +4,7 @@ const content = `#!/usr/bin/env node
 const { program } = require('commander');
 const chalk = require('chalk');
 const path = require('path');
-const LicenseDiff = require('./src/index');
+const LicenseDiff = require('../src/index');
 
 program
   .name('license-diff')

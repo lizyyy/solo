@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-05-17T04:43:06.959Z",
+  "summary": {
+    "total": 6,
+    "added": 3,
+    "removed": 1,
+    "changed": 1,
+    "unchanged": 1
+  },
+  "riskAnalysis": [
+    {
+      "name": "risky-pkg",
+      "version": "1.0.0",
+      "license": "GPL-3.0-only",
+      "normalizedLicense": {
+        "original": "GPL-3.0-only",
+        "normalized": "GPL-3.0-only",
+        "risk": "high"
+      },
+      "status": "added",
+      "path": "node_modules/risky-pkg",
+      "risk": "high",
+      "changeType": "added"
+    },
+    {
+      "name": "medium-risk",
+      "version": "2.0.0",
+      "license": "MPL-2.0",
+      "normalizedLicense": {
+        "original": "MPL-2.0",
+        "normalized": "MPL-2.0",
+        "risk": "medium"
+      },
+      "status": "added",
+      "path": "node_modules/medium-risk",
+      "risk": "medium",
+      "changeType": "added"
+    }
+  ],
+  "details": {
+    "added": [
+      {
+        "name": "semver",
+        "version": "7.5.4",
+        "license": "ISC",
+        "normalizedLicense": {
+          "original": "ISC",
+          "normalized": "ISC",
+          "risk": "low"
+        },
+        "status": "added",
+        "path": "node_modules/semver"
+      },
+      {
+        "name": "risky-pkg",
+        "version": "1.0.0",
+        "license": "GPL-3.0-only",
+        "normalizedLicense": {
+          "original": "GPL-3.0-only",
+          "normalized": "GPL-3.0-only",
+          "risk": "high"
+        },
+        "status": "added",
+        "path": "node_modules/risky-pkg"
+      },
+      {
+        "name": "medium-risk",
+        "version": "2.0.0",
+        "license": "MPL-2.0",
+        "normalizedLicense": {
+          "original": "MPL-2.0",
+          "normalized": "MPL-2.0",
+          "risk": "medium"
+        },
+        "status": "added",
+        "path": "node_modules/medium-risk"
+      }
+    ],
+    "removed": [
+      {
+        "name": "lodash",
+        "version": "4.17.21",
+        "license": "MIT",
+        "normalizedLicense": {
+          "original": "MIT",
+          "normalized": "MIT",
+          "risk": "low"
+        },
+        "status": "removed",
+        "path": "node_modules/lodash"
+      }
+    ],
+    "changed": [
+      {
+        "name": "commander",
+        "hasChanges": true,
+        "changes": [
+          {
+            "type": "version",
+            "old": "8.3.0",
+            "new": "9.5.0",
+            "changeType": "major"
+          }
+        ],
+        "versionChange": {
+          "type": "version",
+          "old": "8.3.0",
+          "new": "9.5.0",
+          "changeType": "major"
+        },
+        "licenseChange": null,
+        "old": {
+          "name": "commander",
+          "version": "8.3.0",
+          "license": "MIT",
+          "normalizedLicense": {
+            "original": "MIT",
+            "normalized": "MIT",
+            "risk": "low"
+          },
+          "status": "old",
+          "path": "node_modules/commander"
+        },
+        "new": {
+          "name": "commander",
+          "version": "9.5.0",
+          "license": "MIT",
+          "normalizedLicense": {
+            "original": "MIT",
+            "normalized": "MIT",
+            "risk": "low"
+          },
+          "status": "new",
+          "path": "node_modules/commander"
+        }
+      }
+    ],
+    "unchanged": [
+      {
+        "name": "chalk",
+        "version": "4.1.2",
+        "license": "MIT"
+      }
+    ]
+  }
+}

@@ -6,11 +6,21 @@
   "bin": {
     "license-diff": "./bin/license-diff.js"
   },
+  "keywords": [
+    "license",
+    "cli",
+    "compliance"
+  ],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
     "@yarnpkg/lockfile": "^1.1.0",
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
     "semver": "^7.5.4",
     "spdx-expression-parse": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

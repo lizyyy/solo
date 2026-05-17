@@ -1,6 +1,7 @@
 const LockfileParser = require('./lockfile-parser');
 const DependencyComparator = require('./dependency-comparator');
 const ReportGenerator = require('./report-generator');
+const LicenseNormalizer = require('./license-normalizer');
 
 class LicenseDiff {
   constructor(options = {}) {
@@ -18,7 +19,7 @@ class LicenseDiff {
     this.parserErrors = [...oldParser.getErrors(), ...newParser.getErrors()];
 
     if (!oldLock || !newLock) {
-      throw new Error('Cannot parse lockfile');
+      throw new Error('无法解析 lockfile');
     }
 
     const comparison = this.comparator.compare(oldLock, newLock);
@@ -62,3 +63,9 @@ class LicenseDiff {
 }
 
 module.exports = LicenseDiff;
+module.exports.LockfileParser = LockfileParser;
+module.exports.DependencyComparator = DependencyComparator;
+module.exports.ReportGenerator = ReportGenerator;
+module.exports.LicenseNormalizer = LicenseNormalizer;
+r = ReportGenerator;
+module.exports.LicenseNormalizer = LicenseNormalizer;

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const yarnLockfile = require('@yarnpkg/lockfile');
 
 class LockfileParser {
   constructor(filePath) {
@@ -11,13 +12,14 @@ class LockfileParser {
   parse() {
     const content = fs.readFileSync(this.filePath, 'utf8');
     if (this.filePath.includes('package-lock.json')) return this.parsePackageLock(content);
+    if (this.fileName === 'yarn.lock') return this.parseYarnLock(content);
     throw new Error('Unsupported lock file format');
   }
 
   parsePackageLock(content) {
     try {
       const data = JSON.parse(content);
-      const packages = [];
+      const packages = new Map();
       if (data.packages) {
         for (const [pkgPath, pkgInfo] of Object.entries(data.packages)) {
           if (pkgPath === '') continue;
@@ -27,7 +29,7 @@ class LockfileParser {
             this.addError(name, 'missing version', pkgPath);
             continue;
           }
-          packages.push({
+          packages.set(name + '@' + version, {
             name,
             version,
             license: this.extractLicense(pkgInfo),
@@ -38,13 +40,48 @@ class LockfileParser {
       }
       return {
         type: 'package-lock',
-        packages,
+        packages: Array.from(packages.values()),
         errors: this.errors
       };
     } catch (e) {
       this.addError('root', 'JSON parse failed', '/');
       return {
         type: 'package-lock',
+        packages: [],
+        errors: this.errors
+      };
+    }
+  }
+
+  parseYarnLock(content) {
+    try {
+      const data = yarnLockfile.parse(content);
+      const packages = new Map();
+      if (data.object) {
+        for (const [key, pkgInfo] of Object.entries(data.object)) {
+          const name = key.split('@')[0];
+          const version = pkgInfo.version;
+          if (!version) {
+            this.addError(name, 'missing version', key);
+            continue;
+          }
+          packages.set(name + '@' + version, {
+            name,
+            version,
+            license: this.extractLicense(pkgInfo),
+            path: key
+          });
+        }
+      }
+      return {
+        type: 'yarn-lock',
+        packages: Array.from(packages.values()),
+        errors: this.errors
+      };
+    } catch (e) {
+      this.addError('root', 'Yarn lock file parse failed', '/');
+      return {
+        type: 'yarn-lock',
         packages: [],
         errors: this.errors
       };
