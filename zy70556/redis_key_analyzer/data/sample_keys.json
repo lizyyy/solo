@@ -1,0 +1,182 @@
+[
+    {
+        "key": "user:1001:profile",
+        "ttl": "PERMANENT",
+        "ttl_seconds": null,
+        "memory_bytes": 2048,
+        "key_type": "string",
+        "prefix": "user:1001",
+        "has_expiry": false,
+        "scan_timestamp": "2024-01-15T10:30:00.000000"
+    },
+    {
+        "key": "user:1002:profile",
+        "ttl": "PERMANENT",
+        "ttl_seconds": null,
+        "memory_bytes": 2156,
+        "key_type": "string",
+        "prefix": "user:1002",
+        "has_expiry": false,
+        "scan_timestamp": "2024-01-15T10:30:00.000001"
+    },
+    {
+        "key": "user:1003:profile",
+        "ttl": "TTL_1D",
+        "ttl_seconds": 72000,
+        "memory_bytes": 1987,
+        "key_type": "string",
+        "prefix": "user:1003",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000002"
+    },
+    {
+        "key": "order:20240115:001",
+        "ttl": "TTL_1W",
+        "ttl_seconds": 518400,
+        "memory_bytes": 3542,
+        "key_type": "hash",
+        "prefix": "order:20240115",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000003"
+    },
+    {
+        "key": "order:20240115:002",
+        "ttl": "TTL_1W",
+        "ttl_seconds": 500000,
+        "memory_bytes": 3210,
+        "key_type": "hash",
+        "prefix": "order:20240115",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000004"
+    },
+    {
+        "key": "order:20240114:001",
+        "ttl": "PERMANENT",
+        "ttl_seconds": null,
+        "memory_bytes": 3100,
+        "key_type": "hash",
+        "prefix": "order:20240114",
+        "has_expiry": false,
+        "scan_timestamp": "2024-01-15T10:30:00.000005"
+    },
+    {
+        "key": "product:item:9987",
+        "ttl": "PERMANENT",
+        "ttl_seconds": null,
+        "memory_bytes": 5421,
+        "key_type": "hash",
+        "prefix": "product:item",
+        "has_expiry": false,
+        "scan_timestamp": "2024-01-15T10:30:00.000006"
+    },
+    {
+        "key": "product:item:9988",
+        "ttl": "PERMANENT",
+        "ttl_seconds": null,
+        "memory_bytes": 4876,
+        "key_type": "hash",
+        "prefix": "product:item",
+        "has_expiry": false,
+        "scan_timestamp": "2024-01-15T10:30:00.000007"
+    },
+    {
+        "key": "product:item:9989",
+        "ttl": "TTL_LONG",
+        "ttl_seconds": 7776000,
+        "memory_bytes": 5102,
+        "key_type": "hash",
+        "prefix": "product:item",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000008"
+    },
+    {
+        "key": "cache:page:home",
+        "ttl": "TTL_1H",
+        "ttl_seconds": 1800,
+        "memory_bytes": 12543,
+        "key_type": "string",
+        "prefix": "cache:page",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000009"
+    },
+    {
+        "key": "cache:page:about",
+        "ttl": "TTL_1H",
+        "ttl_seconds": 2400,
+        "memory_bytes": 8765,
+        "key_type": "string",
+        "prefix": "cache:page",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000010"
+    },
+    {
+        "key": "session:abc123def456",
+        "ttl": "TTL_1D",
+        "ttl_seconds": 86400,
+        "memory_bytes": 654,
+        "key_type": "string",
+        "prefix": "session:abc123def456",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000011"
+    },
+    {
+        "key": "session:xyz789ghi012",
+        "ttl": "TTL_1D",
+        "ttl_seconds": 43200,
+        "memory_bytes": 723,
+        "key_type": "string",
+        "prefix": "session:xyz789ghi012",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000012"
+    },
+    {
+        "key": "stats:daily:active_users",
+        "ttl": "PERMANENT",
+        "ttl_seconds": null,
+        "memory_bytes": 234,
+        "key_type": "string",
+        "prefix": "stats:daily",
+        "has_expiry": false,
+        "scan_timestamp": "2024-01-15T10:30:00.000013"
+    },
+    {
+        "key": "api:rate:limit:192.168.1.1",
+        "ttl": "TTL_1H",
+        "ttl_seconds": 3600,
+        "memory_bytes": 128,
+        "key_type": "string",
+        "prefix": "api:rate",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000014"
+    },
+    {
+        "key": "api:rate:limit:192.168.1.2",
+        "ttl": "TTL_1H",
+        "ttl_seconds": 1800,
+        "memory_bytes": 128,
+        "key_type": "string",
+        "prefix": "api:rate",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000015"
+    },
+    {
+        "key": "temp:import:job123",
+        "ttl": "TTL_1H",
+        "ttl_seconds": 3000,
+        "memory_bytes": 15678,
+        "key_type": "list",
+        "prefix": "temp:import",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000016"
+    },
+    {
+        "key": "temp:export:report456",
+        "ttl": "TTL_1M",
+        "ttl_seconds": 2592000,
+        "memory_bytes": 45678,
+        "key_type": "list",
+        "prefix": "temp:export",
+        "has_expiry": true,
+        "scan_timestamp": "2024-01-15T10:30:00.000017"
+    }
+]

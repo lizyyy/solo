@@ -1,0 +1,22 @@
+Summary
+total_keys,18
+total_memory_bytes,115973
+permanent_keys,6
+permanent_memory_bytes,17835
+scan_timestamp,2026-05-17T12:34:53.354290
+
+Prefix Analysis
+prefix,owner,total_keys,permanent_keys,total_memory_bytes,permanent_memory_bytes,avg_ttl_seconds,ttl_distribution,key_type_distribution
+temp:export,临时数据,1,0,45678,0,2592000.00,"{""TTL_1M"": 1}","{""list"": 1}"
+cache:page,缓存服务,2,0,21308,0,2100.00,"{""TTL_1H"": 2}","{""string"": 2}"
+temp:import,临时数据,1,0,15678,0,3000.00,"{""TTL_1H"": 1}","{""list"": 1}"
+product:item,商品服务,3,2,15399,10297,7776000.00,"{""PERMANENT"": 2, ""TTL_LONG"": 1}","{""hash"": 3}"
+order:20240115,订单服务,2,0,6752,0,509200.00,"{""TTL_1W"": 2}","{""hash"": 2}"
+order:20240114,订单服务,1,1,3100,3100,0.00,"{""PERMANENT"": 1}","{""hash"": 1}"
+user:1002,用户服务,1,1,2156,2156,0.00,"{""PERMANENT"": 1}","{""string"": 1}"
+user:1001,用户服务,1,1,2048,2048,0.00,"{""PERMANENT"": 1}","{""string"": 1}"
+user:1003,用户服务,1,0,1987,0,72000.00,"{""TTL_1D"": 1}","{""string"": 1}"
+session:xyz789ghi012,会话服务,1,0,723,0,43200.00,"{""TTL_1D"": 1}","{""string"": 1}"
+session:abc123def456,会话服务,1,0,654,0,86400.00,"{""TTL_1D"": 1}","{""string"": 1}"
+api:rate,unassigned,2,0,256,0,2700.00,"{""TTL_1H"": 2}","{""string"": 2}"
+stats:daily,统计服务,1,1,234,234,0.00,"{""PERMANENT"": 1}","{""string"": 1}"

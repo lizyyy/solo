@@ -1,4 +1,9 @@
-from typing import List, Dict, Any, Tuple, Optional
+import os
+
+base = 'redis_key_analyzer'
+
+# analyzer.py
+analyzer = '''from typing import List, Dict, Any, Tuple, Optional
 from collections import defaultdict
 from dataclasses import dataclass, asdict
 from datetime import datetime
@@ -167,3 +172,8 @@ class KeyAnalyzer:
         except Exception as e:
             logger.error(f"Failed to load owner mapping: {e}")
             return {}
+'''
+
+with open(os.path.join(base, 'analyzer.py'), 'w') as f:
+    f.write(analyzer)
+print("analyzer.py done")

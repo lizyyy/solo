@@ -2,7 +2,7 @@ import click
 import logging
 import json
 import os
-from typing import Optional
+from pathlib import Path
 
 from .scanner import RedisScanner
 from .analyzer import KeyAnalyzer
@@ -14,94 +14,131 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 @click.group()
-@click.version_option(version="1.0.0")
+@click.version_option(version="0.1.0")
 def cli():
     """Redis Key Space Analyzer - 分析Redis键空间使用情况"""
     pass
 
+
 @cli.command()
 @click.option("--host", "-h", default="localhost", help="Redis主机地址")
-@click.option("--port", "-p", default=6379, type=int, help="Redis端口")
-@click.option("--db", "-d", default=0, type=int, help="Redis数据库编号")
-@click.option("--password", "-a", help="Redis密码")
-@click.option("--output", "-o", default="data/scan_result.json", help="扫描结果输出文件")
-@click.option("--prefix-delimiter", default=":", help="键前缀分隔符")
-@click.option("--count", default=1000, type=int, help="SCAN命令每次返回的键数量")
-@click.option("--no-memory", is_flag=True, help="跳过内存使用统计（更快）")
-def scan(host: str, port: int, db: int, password: Optional[str], output: str,
-         prefix_delimiter: str, count: int, no_memory: bool):
-    """扫描Redis键空间并保存结果"""
-    try:
-        os.makedirs(os.path.dirname(output), exist_ok=True)
-        scanner = RedisScanner(prefix_delimiter=prefix_delimiter)
-        scanner.connect(host=host, port=port, db=db, password=password)
-        keys_info, bad_records = scanner.scan_keys(
-            count=count,
-            with_memory=not no_memory
-        )
-        scanner.save_to_file(keys_info, bad_records, output)
-        click.echo(f"扫描完成！共扫描 {len(keys_info)} 个键，{len(bad_records)} 个失败记录")
-        click.echo(f"结果已保存到: {output}")
-    except Exception as e:
-        click.echo(f"扫描失败: {str(e)}", err=True)
-        raise click.Abort()
+@click.option("--port", "-p", type=int, default=6379, help="Redis端口")
+@click.option("--db", "-d", type=int, default=0, help="Redis数据库编号")
+@click.option("--password", "-a", default=None, help="Redis密码")
+@click.option("--pattern", "-k", default="*", help="键匹配模式，默认为*")
+@click.option("--batch-size", type=int, default=1000, help="SCAN命令每次返回的键数量")
+@click.option("--max-keys", "-m", type=int, default=None, help="最大扫描键数，适用于大型Redis")
+@click.option("--output", "-o", default=None, help="扫描结果输出文件路径（JSON格式）")
+@click.option("--owner-mapping", default=None, help="Owner映射JSON文件路径")
+@click.option("--output-dir", default="redis_key_analyzer/reports", help="报告输出目录")
+def scan(host, port, db, password, pattern, batch_size, max_keys, output, owner_mapping, output_dir):
+    """扫描Redis键空间并生成分析报告"""
+    click.echo(click.style(f"🔍 开始扫描Redis: {host}:{port}/{db}", fg="blue"))
+    
+    scanner = RedisScanner(host=host, port=port, db=db, password=password)
+    
+    if not scanner.connect():
+        click.echo(click.style("❌ 无法连接到Redis，请检查连接参数", fg="red"))
+        return
+    
+    keys_info, bad_records = scanner.scan_keys(pattern=pattern, batch_size=batch_size, max_keys=max_keys)
+    
+    if not keys_info:
+        click.echo(click.style("⚠️ 未扫描到任何键", fg="yellow"))
+        return
+    
+    click.echo(click.style(f"✅ 扫描完成: {len(keys_info)} 个键, {len(bad_records)} 条异常记录", fg="green"))
+    
+    owner_map = {}
+    if owner_mapping:
+        owner_map = KeyAnalyzer.load_owner_mapping(owner_mapping)
+    
+    analyzer = KeyAnalyzer(owner_mapping=owner_map)
+    result = analyzer.analyze(keys_info, bad_records)
+    
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    
+    if output:
+        output_path = Path(output_dir) / output
+    else:
+        timestamp = result.scan_timestamp.replace(":", "-").replace(".", "-")
+        output_path = Path(output_dir) / f"redis_analysis_{timestamp}"
+    
+    reporter = ReportGenerator(output_dir=output_dir)
+    reporter.generate_all(result, base_filename=str(output_path))
+    
+    click.echo(click.style(f"🎉 报告已生成到目录: {output_dir}", fg="green"))
+
 
 @cli.command()
-@click.option("--input", "-i", default="data/scan_result.json", help="扫描结果输入文件")
-@click.option("--output", "-o", default="reports", help="分析报告输出目录")
-@click.option("--owner-mapping", "-m", help="所有者映射JSON文件路径")
-@click.option("--format", "-f", "formats", multiple=True, default=["terminal", "json", "csv", "html"],
-              type=click.Choice(["terminal", "json", "csv", "html"]),
-              help="输出格式（可多选）")
-def analyze(input: str, output: str, owner_mapping: Optional[str], formats):
-    """分析扫描结果并生成报告"""
-    try:
-        os.makedirs(output, exist_ok=True)
-        scanner = RedisScanner()
-        keys_info, bad_records = scanner.load_from_file(input)
-        click.echo(f"加载扫描结果: {len(keys_info)} 个键")
-        mapping = {}
-        if owner_mapping and os.path.exists(owner_mapping):
-            mapping = KeyAnalyzer.load_owner_mapping(owner_mapping)
-            click.echo(f"加载所有者映射: {len(mapping)} 个条目")
-        analyzer = KeyAnalyzer(owner_mapping=mapping)
-        result = analyzer.analyze(keys_info, bad_records)
-        report_gen = ReportGenerator(output_dir=output)
-        report_gen.generate_all(result, formats=list(formats))
-        click.echo(f"分析完成！报告已保存到: {output}/")
-    except FileNotFoundError as e:
-        click.echo(f"文件未找到: {str(e)}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"分析失败: {str(e)}", err=True)
-        raise click.Abort()
+@click.argument("input_file", type=click.Path(exists=True))
+@click.option("--owner-mapping", default=None, help="Owner映射JSON文件路径")
+@click.option("--output", "-o", default=None, help="分析结果输出文件路径（不含扩展名）")
+@click.option("--output-dir", default="redis_key_analyzer/reports", help="报告输出目录")
+def analyze(input_file, owner_mapping, output, output_dir):
+    """从已保存的扫描文件进行离线分析"""
+    click.echo(click.style(f"📂 加载扫描数据: {input_file}", fg="blue"))
+    
+    scanner = RedisScanner()
+    keys_info, bad_records = scanner.load_from_file(input_file)
+    
+    click.echo(click.style(f"✅ 加载完成: {len(keys_info)} 个键, {len(bad_records)} 条异常记录", fg="green"))
+    
+    owner_map = {}
+    if owner_mapping:
+        owner_map = KeyAnalyzer.load_owner_mapping(owner_mapping)
+    
+    analyzer = KeyAnalyzer(owner_mapping=owner_map)
+    result = analyzer.analyze(keys_info, bad_records)
+    
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    
+    if output:
+        output_path = Path(output_dir) / output
+    else:
+        timestamp = result.scan_timestamp.replace(":", "-").replace(".", "-")
+        output_path = Path(output_dir) / f"redis_analysis_{timestamp}"
+    
+    reporter = ReportGenerator(output_dir=output_dir)
+    reporter.generate_all(result, base_filename=str(output_path))
+    
+    click.echo(click.style(f"🎉 报告已生成到目录: {output_dir}", fg="green"))
 
-@cli.command("init-mapping")
+
+@cli.command()
 @click.option("--output", "-o", default="owner_mapping.json", help="输出文件路径")
 @click.option("--force", is_flag=True, help="覆盖已存在的文件")
-def init_mapping(output: str, force: bool):
-    """初始化所有者映射配置文件"""
+def init_mapping(output, force):
+    """初始化Owner映射配置文件模板"""
     if os.path.exists(output) and not force:
-        click.confirm(f"文件 {output} 已存在，是否覆盖？", abort=True)
-    default_mapping = {
-        "user": "用户服务",
-        "session": "会话服务",
-        "cache": "缓存服务",
-        "product": "商品服务",
-        "order": "订单服务",
-        "cart": "购物车服务",
-        "config": "配置中心",
-        "stats": "统计服务"
+        click.echo(click.style(f"⚠️ 文件已存在: {output}", fg="yellow"))
+        click.echo("使用 --force 参数覆盖")
+        return
+    
+    template = {
+        "user:": "用户服务",
+        "order:": "订单服务",
+        "product:": "商品服务",
+        "cache:": "缓存服务",
+        "session:": "会话服务",
+        "stats:": "统计服务",
+        "api:rate:limit:": "API限流",
+        "temp:": "临时数据"
     }
-    try:
-        with open(output, "w", encoding="utf-8") as f2:
-            json.dump(default_mapping, f2, indent=2, ensure_ascii=False)
-        click.echo(f"所有者映射文件已创建: {output}")
-        click.echo("请编辑此文件以匹配您的业务前缀")
-    except Exception as e:
-        click.echo(f"创建文件失败: {str(e)}", err=True)
-        raise click.Abort()
+    
+    with open(output, 'w', encoding='utf-8') as f:
+        json.dump(template, f, ensure_ascii=False, indent=2)
+    
+    click.echo(click.style(f"✅ Owner映射模板已生成: {output}", fg="green"))
+    click.echo("请根据实际需求修改前缀和对应的服务/负责人名称")
+
+
+def main():
+    """命令行入口函数"""
+    cli()
+
 
 if __name__ == "__main__":
-    cli()
+    main()
