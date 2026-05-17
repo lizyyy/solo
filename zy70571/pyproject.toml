@@ -3,13 +3,23 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "logfmt-cli"
+name = "logfmt-structured-cli"
 version = "0.1.0"
-authors = [{ name="Your Name", email="your@email.com" }]
-description = "Logfmt structured parser CLI for mixed log files"
-requires-python = ">=3.8"
+description = "Logfmt structured parsing CLI for mixed format logs"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+  { name="Your Team", email="team@example.com" }
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
 dependencies = [
   "click>=8.0",
+  "rich>=13.0",
+  "pygments>=2.15",
 ]
 
 [project.scripts]
