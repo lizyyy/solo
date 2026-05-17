@@ -1,0 +1,37 @@
+{
+  "report_id": "RPT-D435CB25",
+  "generated_at": "2026-05-17T16:34:29.621827",
+  "total_reservations": 9,
+  "processed_reservations": 0,
+  "expired_reservations": 0,
+  "picked_up_reservations": 0,
+  "teacher_priority_count": 3,
+  "released_copies": [],
+  "queue_changes": [
+    {
+      "copy_id": "COPY-001",
+      "queue_length": 3,
+      "next_reader": "R-001"
+    },
+    {
+      "copy_id": "COPY-002",
+      "queue_length": 2,
+      "next_reader": "R-002"
+    },
+    {
+      "copy_id": "COPY-003",
+      "queue_length": 2,
+      "next_reader": "R-007"
+    },
+    {
+      "copy_id": "COPY-004",
+      "queue_length": 1,
+      "next_reader": "R-005"
+    },
+    {
+      "copy_id": "COPY-005",
+      "queue_length": 1,
+      "next_reader": "R-008"
+    }
+  ]
+}
