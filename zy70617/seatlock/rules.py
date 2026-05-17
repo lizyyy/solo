@@ -18,6 +18,7 @@ class SeatLockRuleEngine:
         self.locks: Dict[str, SeatLock] = {}
         self.changes: Dict[str, SeatChangeRequest] = {}
         self.issues: List[Issue] = []
+        self._check_time: Optional[datetime] = None
         
         self._seat_locks_by_seat: Dict[str, List[SeatLock]] = defaultdict(list)
         self._locks_by_order: Dict[str, List[SeatLock]] = defaultdict(list)
@@ -83,14 +84,13 @@ class SeatLockRuleEngine:
         
         for lock in sorted(self.locks.values(), key=lambda l: l.lock_id):
             if lock.status == LockStatus.ACTIVE and now > lock.lock_timeout:
-                timeout_minutes = int((now - lock.lock_timeout).total_seconds() / 60)
                 import hashlib
                 stable_id = hashlib.md5(f"TIMEOUT:{lock.lock_id}:{lock.lock_timeout.isoformat()}".encode()).hexdigest()[:12]
                 issue = self._create_issue(
                     issue_type=IssueType.TIMEOUT_UNRELEASED,
                     show_id=lock.show_id,
                     severity="CRITICAL",
-                    description=f"锁座超时未释放: 座位{lock.seat_id}已超时{timeout_minutes}分钟",
+                    description=f"锁座超时未释放: 座位{lock.seat_id}，超时截止时间：{lock.lock_timeout.strftime('%Y-%m-%d %H:%M')}",
                     related_ids={
                         "lock_ids": [lock.lock_id],
                         "seat_ids": [lock.seat_id],
@@ -238,19 +238,19 @@ class SeatLockRuleEngine:
         return issues
     
     def run_all_checks(self, check_time: datetime = None) -> List[Issue]:
-        base_time = check_time or datetime.now()
+        self._check_time = check_time or datetime.now()
         self.issues = []
-        self.check_timeout_unreleased(base_time)
-        self.check_seat_conflicts(base_time)
-        self.check_overlapping_windows(base_time)
-        self.check_invalid_change_requests(base_time)
-        self.check_group_mismatch(base_time)
+        self.check_timeout_unreleased(self._check_time)
+        self.check_seat_conflicts(self._check_time)
+        self.check_overlapping_windows(self._check_time)
+        self.check_invalid_change_requests(self._check_time)
+        self.check_group_mismatch(self._check_time)
         return self.issues
     
     def get_lock_statistics(self) -> Dict[str, any]:
-        now = datetime.now()
+        check_time = self._check_time or datetime.now()
         total_active = sum(1 for l in self.locks.values() if l.status == LockStatus.ACTIVE)
-        total_expired = sum(1 for l in self.locks.values() if l.is_timeout)
+        total_expired = sum(1 for l in self.locks.values() if l.status == LockStatus.ACTIVE and check_time > l.lock_timeout)
         total_released = sum(1 for l in self.locks.values() if l.status == LockStatus.RELEASED)
         
         stats = {
@@ -278,29 +278,31 @@ class SeatLockRuleEngine:
         return stats
     
     def get_expired_locks_detail(self) -> List[Dict[str, any]]:
-        now = datetime.now()
+        check_time = self._check_time or datetime.now()
         expired = []
-        for lock in self.locks.values():
-            if lock.status == LockStatus.ACTIVE and now > lock.lock_timeout:
+        for lock in sorted(self.locks.values(), key=lambda l: l.lock_id):
+            if lock.status == LockStatus.ACTIVE and check_time > lock.lock_timeout:
+                timeout_minutes = int((check_time - lock.lock_timeout).total_seconds() / 60)
                 expired.append({
                     "lock_id": lock.lock_id,
                     "seat_id": lock.seat_id,
                     "order_id": lock.order_id,
-                    "timeout_minutes": int((now - lock.lock_timeout).total_seconds() / 60),
+                    "timeout_minutes": timeout_minutes,
                     "locked_at": lock.locked_at.isoformat(),
                     "lock_timeout": lock.lock_timeout.isoformat()
                 })
-        return sorted(expired, key=lambda x: x["timeout_minutes"], reverse=True)
+        return sorted(expired, key=lambda x: x["lock_id"])
     
     def get_conflict_seats_detail(self) -> List[Dict[str, any]]:
         conflicts = []
-        for seat_id, locks in self._seat_locks_by_seat.items():
-            active_locks = [l for l in locks if l.status == LockStatus.ACTIVE]
+        for seat_id in sorted(self._seat_locks_by_seat.keys()):
+            locks = self._seat_locks_by_seat[seat_id]
+            active_locks = sorted([l for l in locks if l.status == LockStatus.ACTIVE], key=lambda l: l.lock_id)
             if len(active_locks) > 1:
                 conflicts.append({
                     "seat_id": seat_id,
                     "active_lock_count": len(active_locks),
                     "lock_ids": [l.lock_id for l in active_locks],
-                    "order_ids": [l.order_id for l in active_locks]
+                    "order_ids": sorted([l.order_id for l in active_locks])
                 })
         return conflicts
