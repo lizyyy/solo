@@ -181,11 +181,17 @@ class MedicationService:
         self.store.save_shift_execution(execution.dict())
         return execution
 
-    def check_missed_doses(self, check_date: Optional[date] = None) -> List[Dict]:
+    def check_missed_doses(self, check_date: Optional[date] = None, plan_ids: Optional[List[str]] = None) -> List[Dict]:
         check_date = check_date or date.today()
         missed = []
         
-        for plan_data in self.store.get_all_plans():
+        plans_to_check = self.store.get_all_plans()
+        if plan_ids is not None:
+            plans_to_check = [p for p in plans_to_check if p["plan_id"] in plan_ids]
+        
+        seen_alerts = set()
+        
+        for plan_data in plans_to_check:
             plan = MedicationPlan(**plan_data)
             if not plan.is_active:
                 continue
@@ -207,7 +213,9 @@ class MedicationService:
             current_date = plan.start_date
             while current_date <= check_date:
                 for shift in shifts_per_day:
-                    if (str(current_date), shift) not in executed_shifts:
+                    alert_key = (plan.pet_id, str(current_date), shift)
+                    if (str(current_date), shift) not in executed_shifts and alert_key not in seen_alerts:
+                        seen_alerts.add(alert_key)
                         pet_data = self.store.get_pet(plan.pet_id)
                         pet_name = pet_data["name"] if pet_data else "Unknown"
                         missed.append({
@@ -251,22 +259,25 @@ class MedicationService:
 
         plans = self.store.get_plans_by_order(order_id)
         
+        plan_ids = [p["plan_id"] for p in plans]
+        
         for plan_data in plans:
             plan = MedicationPlan(**plan_data)
             changes = self.store.get_changes_by_plan(plan.plan_id)
             
             current_date = start_date
             while current_date <= end_date:
+                str_date = str(current_date)
                 executions = [
                     e for e in self.store.get_executions_by_plan(plan.plan_id)
-                    if e["shift_date"] == str(current_date)
+                    if e["shift_date"] == str_date
                 ]
                 
                 for exec_data in executions:
                     dosage = plan.get_current_dosage()
                     has_change = any(
                         c["status"] == ChangeStatus.CONFIRMED and
-                        c["requested_at"].split("T")[0] == str(current_date)
+                        c["requested_at"].split("T")[0] == str_date
                         for c in changes
                     )
                     
@@ -286,9 +297,10 @@ class MedicationService:
                 
                 current_date += timedelta(days=1)
 
-        missed = self.check_missed_doses(end_date)
+        missed = self.check_missed_doses(end_date, plan_ids=plan_ids)
         for m in missed:
-            if start_date <= date.fromisoformat(m["date"]) <= end_date:
+            m_date = date.fromisoformat(m["date"])
+            if start_date <= m_date <= end_date:
                 report.alerts.append(m["alert"])
 
         status_counts: Dict[str, int] = {}

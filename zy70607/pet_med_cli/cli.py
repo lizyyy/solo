@@ -8,8 +8,9 @@ from .reports import ReportExporter
 from .models import MedicationStatus, ChangeStatus
 
 
-def get_service():
-    return MedicationService()
+def get_service(data_dir: Optional[str] = None):
+    store = DataStore(data_dir) if data_dir else DataStore()
+    return MedicationService(store)
 
 
 @click.group()
@@ -290,9 +291,10 @@ def generate_report(order_id, start, end, export):
 
 
 @cli.command("validate")
-def validate_data():
+@click.option("--data-dir", type=str, help="数据目录路径")
+def validate_data(data_dir):
     """验证数据完整性"""
-    service = get_service()
+    service = get_service(data_dir)
     errors = service.validate_data()
     
     total_errors = sum(len(v) for v in errors.values())

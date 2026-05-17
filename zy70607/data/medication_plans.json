@@ -55,5 +55,28 @@
     "current_version": 2,
     "is_active": true,
     "created_at": "2026-05-17 16:47:22.195990"
+  },
+  "PLAN-b1d9ad76": {
+    "plan_id": "PLAN-b1d9ad76",
+    "order_id": "ORD-06b56d31",
+    "pet_id": "PET-567c5c1a",
+    "start_date": "2026-05-17",
+    "end_date": null,
+    "dosage_versions": [
+      {
+        "version": 1,
+        "medication_name": "猫用营养液",
+        "dosage_amount": "10",
+        "dosage_unit": "ml",
+        "frequency": "daily",
+        "route": "口服",
+        "notes": null,
+        "created_by": "李护士",
+        "created_at": "2026-05-17 19:24:46.861190"
+      }
+    ],
+    "current_version": 1,
+    "is_active": true,
+    "created_at": "2026-05-17 19:24:46.861207"
   }
 }
