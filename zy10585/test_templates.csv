@@ -1,0 +1,8 @@
+name,dir_mode,owner,group,file_mode,recursive
+webroot,755,www-data,www-data,644,true
+strict_dir,700,root,root,600,true
+,invalid_mode,user,group,644,true
+missing_owner,755,,staff,644,true
+bad_mode,999,user,group,644,true
+partial_fields,755
+good_shared,775,admin,users,664,false
