@@ -1,0 +1,45 @@
+{
+  "reconciliation_time": "2026-05-17T22:24:10.512206",
+  "source_files": {
+    "source1": "testdata/渠道A.csv",
+    "source2": "testdata/渠道B.csv"
+  },
+  "summary": {
+    "total_transactions": 5,
+    "matched_transactions": 4,
+    "unmatched_source1_count": 0,
+    "unmatched_source2_count": 1,
+    "differences_count": 3,
+    "bad_rows_count": 0
+  },
+  "unmatched": {
+    "source1": [],
+    "source2": [
+      "TX005"
+    ]
+  },
+  "differences": [
+    {
+      "transaction_id": "TX002",
+      "field": "tax",
+      "source1_value": "120.00",
+      "source2_value": "120.50",
+      "difference": "-0.50"
+    },
+    {
+      "transaction_id": "TX003",
+      "field": "refund_status",
+      "source1_value": "已退款",
+      "source2_value": "退款",
+      "difference": "0"
+    },
+    {
+      "transaction_id": "TX004",
+      "field": "amount",
+      "source1_value": "4000.00",
+      "source2_value": "4001.00",
+      "difference": "-1.00"
+    }
+  ],
+  "bad_rows": []
+}

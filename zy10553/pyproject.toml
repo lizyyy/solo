@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "csv-reconciler"
+version = "0.1.0"
+description = "CSV金额对账CLI工具 - 解析、校验和报告稳定"
+authors = ["Your Name <your@email.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1.7"
+pandas = "^2.2.1"
+jinja2 = "^3.1.3"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+csv-reconciler = "csv_reconciler.cli:cli"
