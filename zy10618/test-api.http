@@ -1,0 +1,93 @@
+### 广告投放预算超投止损系统 API 测试
+
+@baseUrl = http://localhost:3000/api
+
+### 1. 健康检查
+GET {{baseUrl}}/health
+
+### 2. 获取广告主列表
+GET {{baseUrl}}/advertisers
+
+### 3. 获取所有投放计划列表
+GET {{baseUrl}}/plans
+
+### 4. 按状态筛选计划 (止损中)
+GET {{baseUrl}}/plans?status=止损中
+
+### 5. 获取计划详情 (查看完整流转记录 plan6)
+GET {{baseUrl}}/plans/[替换为实际的plan6 ID]
+
+### 6. 获取计划历史记录
+GET {{baseUrl}}/plans/[替换为实际的plan6 ID]/history
+
+### 7. 检查预算超支情况
+GET {{baseUrl}}/plans/[替换为实际的plan1 ID]/check-budget
+
+### 8. 导出计划数据
+GET {{baseUrl}}/plans/[替换为实际的plan6 ID]/export
+
+### 9. 触发止损 (正常流)
+POST {{baseUrl}}/plans/[替换为实际的plan1 ID]/trigger-stop-loss
+Content-Type: application/json
+
+{
+  "operatorId": "op-003",
+  "operatorName": "测试操作员"
+}
+
+### 10. 驳回止损 (驳回流 - 冲突记录)
+POST {{baseUrl}}/plans/[替换为实际的plan3 ID]/reject
+Content-Type: application/json
+
+{
+  "operatorId": "mgr-003",
+  "operatorName": "测试经理",
+  "reason": "驳回原因：数据统计有误，需要重新核对"
+}
+
+### 11. 人工复核 (人工复核流 - 通过)
+POST {{baseUrl}}/plans/[替换为实际的plan3 ID]/manual-review
+Content-Type: application/json
+
+{
+  "operatorId": "mgr-003",
+  "operatorName": "测试经理",
+  "approved": true,
+  "reason": "人工复核通过，确认超投，启动补偿流程"
+}
+
+### 12. 关闭计划
+POST {{baseUrl}}/plans/[替换为实际的plan5 ID]/close
+Content-Type: application/json
+
+{
+  "operatorId": "op-003",
+  "operatorName": "测试操作员"
+}
+
+### 13. 批量导入消耗回传 (包含坏行测试)
+POST {{baseUrl}}/spend-callbacks/batch-import
+Content-Type: application/json
+
+{
+  "data": [
+    {
+      "planId": "不存在的计划ID",
+      "spendAmount": 5000,
+      "callbackTime": "2024-06-15T10:00:00Z",
+      "callbackSource": "测试导入"
+    },
+    {
+      "planId": "[替换为实际的plan2 ID]",
+      "spendAmount": 3000,
+      "callbackTime": "2024-06-10T08:00:00Z",
+      "callbackSource": "测试导入-延迟回传"
+    },
+    {
+      "planId": "[替换为实际的plan2 ID]",
+      "spendAmount": 1000,
+      "callbackTime": "2024-06-15T09:00:00Z",
+      "callbackSource": "测试导入-正常"
+    }
+  ]
+}
