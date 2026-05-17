@@ -44,6 +44,7 @@ class ModuleFinder:
                     path_key = str(candidate.path.resolve())
                     if path_key not in seen_paths:
                         seen_paths.add(path_key)
+                        self._check_syntax_and_errors(candidate)
                         self._check_stdlib_or_builtin(candidate)
                         candidates.append(candidate)
             except Exception as e:
@@ -106,6 +107,52 @@ class ModuleFinder:
             candidate.is_builtin = True
             return candidate
         return None
+    
+    def find_from_file(self, module_name: str, file_path: Path,
+                        search_paths: List[Path]) -> List[ModuleCandidate]:
+        candidates = []
+        seen_paths = set()
+        
+        if file_path.name == f"{module_name}.py":
+            candidate = ModuleCandidate(
+                module_name, file_path, "file", 0
+            )
+            self._check_syntax_and_errors(candidate)
+            self._check_stdlib_or_builtin(candidate)
+            candidates.append(candidate)
+            seen_paths.add(str(file_path.resolve()))
+        
+        for priority, search_path in enumerate(search_paths):
+            try:
+                found = self._find_in_path(module_name, search_path, priority)
+                for candidate in found:
+                    path_key = str(candidate.path.resolve())
+                    if path_key not in seen_paths:
+                        seen_paths.add(path_key)
+                        self._check_syntax_and_errors(candidate)
+                        self._check_stdlib_or_builtin(candidate)
+                        candidates.append(candidate)
+            except Exception as e:
+                self._add_error(str(search_path), f"搜索路径出错: {str(e)}",
+                              search_path, priority)
+        
+        builtin = self._check_builtin_module(module_name, len(candidates))
+        if builtin:
+            candidates.append(builtin)
+        
+        return sorted(candidates, key=lambda x: (x.priority, not x.is_stdlib, x.path))
+    
+    def _check_syntax_and_errors(self, candidate: ModuleCandidate) -> None:
+        if candidate.path.suffix == '.py' and candidate.path.exists():
+            try:
+                import ast
+                with open(candidate.path, 'r', encoding='utf-8') as f:
+                    source = f.read()
+                ast.parse(source, filename=str(candidate.path))
+            except SyntaxError as e:
+                candidate.errors.append(f"语法错误: 第 {e.lineno} 行, {e.msg}")
+            except Exception as e:
+                candidate.errors.append(f"解析错误: {str(e)}")
     
     def _add_error(self, raw_input: str, reason: str,
                    location: Path, position: int) -> None:
