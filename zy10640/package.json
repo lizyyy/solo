@@ -1,0 +1,21 @@
+{
+  "name": "trial-extension-api",
+  "version": "1.0.0",
+  "description": "企业订阅服务试用延期审批 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "init-db": "node scripts/init-db.js",
+    "seed": "node scripts/seed-data.js",
+    "setup": "npm run init-db && npm run seed"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-writer": "^1.6.0",
+    "body-parser": "^1.20.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
