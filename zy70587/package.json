@@ -1,0 +1,28 @@
+{
+  "name": "yaml-anchor-expander",
+  "version": "1.0.0",
+  "description": "YAML锚点展开CLI工具，支持机器可读输出和Markdown报告",
+  "main": "dist/cli.js",
+  "bin": {
+    "yaml-expand": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "test": "node dist/cli.js --input examples/sample.yaml"
+  },
+  "keywords": ["yaml", "anchor", "merge", "expand", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2"
+  }
+}

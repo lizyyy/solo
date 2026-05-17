@@ -1,0 +1,47 @@
+# 数据库基础配置
+base_db: &base_db
+  host: localhost
+  port: 5432
+  username: admin
+  max_connections: 100
+
+# 开发环境配置
+dev_config: &dev_config
+  debug: true
+  log_level: debug
+  cache_ttl: 60
+
+# 生产环境基础配置
+prod_base: &prod_base
+  debug: false
+  log_level: warn
+  max_retries: 5
+
+# 开发数据库
+development:
+  <<: *base_db
+  database: app_dev
+  <<: *dev_config
+  max_connections: 50
+
+# 测试数据库
+test:
+  <<: *base_db
+  database: app_test
+  debug: true
+
+# 生产数据库
+production:
+  <<: [*base_db, *prod_base]
+  database: app_prod
+  username: prod_user
+  max_connections: 200
+
+# 服务配置
+services:
+  api:
+    port: 3000
+    workers: 4
+  web:
+    port: 8080
+    workers: 2
