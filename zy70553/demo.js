@@ -9,10 +9,11 @@ console.log("           gRPC 错误码矩阵 CLI - Demo");
 console.log("=".repeat(60));
 console.log("");
 
-// 1. 创建示例proto
-console.log("1. 创建示例proto文件");
-if (!fs.existsSync("./examples")) fs.mkdirSync("./examples");
-const protoPath = "./examples/error_codes.proto";
+// 1. 创建示例proto (使用demo临时文件，不覆盖examples目录)
+console.log("1. 创建示例proto文件 (demo临时文件)");
+const demoDir = "./demo-temp";
+if (!fs.existsSync(demoDir)) fs.mkdirSync(demoDir);
+const protoPath = path.join(demoDir, "demo-error-codes.proto");
 fs.writeFileSync(protoPath, 
 'syntax = "proto3";\n' +
 'package demo;\n' +
@@ -79,3 +80,8 @@ console.log("   Markdown:", reports.markdownPath);
 console.log("\n" + "=".repeat(60));
 console.log("🎉 Demo完成! 所有核心功能验证通过");
 console.log("=".repeat(60));
+
+// 清理demo临时文件
+try {
+  fs.rmSync(demoDir, { recursive: true, force: true });
+} catch (e) {}

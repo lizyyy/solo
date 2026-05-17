@@ -232,35 +232,108 @@ test("ReportGenerator 应能生成所有报告", () => {
 // ===== 5. 完整端到端测试 =====
 console.log("\n🔗 第5部分: 完整端到端测试\n");
 
-test("完整链路: proto解析 -> 矩阵构建 -> 报告生成", () => {
-  // 1. 解析
-  const parser = new ProtoParser();
-  const pr = parser.parse("./examples/error_codes.proto");
-  if (pr.errorCodes.length < 10) throw new Error("错误码数量不足，可能解析失败");
+test("完整链路: 构建完整proto -> 矩阵构建 -> 报告生成", () => {
+  // 1. 创建完整的测试proto文件 (17个错误码)
+  const e2eProtoPath = path.join(testDir, "e2e-test.proto");
+  const fullProtoContent = `
+syntax = "proto3";
+package grpc.status;
+enum StatusCode {
+  OK = 0;
+  CANCELLED = 1;
+  UNKNOWN = 2;
+  INVALID_ARGUMENT = 3;
+  DEADLINE_EXCEEDED = 4;
+  NOT_FOUND = 5;
+  ALREADY_EXISTS = 6;
+  PERMISSION_DENIED = 7;
+  RESOURCE_EXHAUSTED = 8;
+  FAILED_PRECONDITION = 9;
+  ABORTED = 10;
+  OUT_OF_RANGE = 11;
+  UNIMPLEMENTED = 12;
+  INTERNAL = 13;
+  UNAVAILABLE = 14;
+  DATA_LOSS = 15;
+  UNAUTHENTICATED = 16;
+}
+`;
+  fs.writeFileSync(e2eProtoPath, fullProtoContent);
 
-  // 2. 构建矩阵
-  const sdkData = JSON.parse(fs.readFileSync("./examples/sdk-definitions.json", "utf8"));
+  // 2. 解析
+  const parser = new ProtoParser();
+  const pr = parser.parse(e2eProtoPath);
+  if (pr.errorCodes.length < 10) throw new Error("错误码数量不足，可能解析失败，实际: " + pr.errorCodes.length);
+
+  // 3. 创建完整SDK数据
+  const sdkData = {
+    languages: {
+      go: {
+        name: "Go SDK",
+        codes: {
+          OK: { grpcCode: 0, retry: "nonRetriable" },
+          CANCELLED: { grpcCode: 1, retry: "nonRetriable" },
+          UNKNOWN: { grpcCode: 2, retry: "conditional" },
+          DEADLINE_EXCEEDED: { grpcCode: 4, retry: "retriable" },
+          INTERNAL: { grpcCode: 13, retry: "conditional" },
+          UNAVAILABLE: { grpcCode: 14, retry: "retriable" }
+        }
+      },
+      java: {
+        name: "Java SDK",
+        codes: {
+          OK: { grpcCode: 0, retry: "nonRetriable" },
+          CANCELLED: { grpcCode: 1, retry: "nonRetriable" },
+          UNKNOWN: { grpcCode: 2, retry: "conditional" },
+          DEADLINE_EXCEEDED: { grpcCode: 4, retry: "retriable" },
+          INTERNAL: { grpcCode: 13, retry: "conditional" },
+          UNAVAILABLE: { grpcCode: 14, retry: "retriable" }
+        }
+      },
+      python: {
+        name: "Python SDK",
+        codes: {
+          OK: { grpcCode: 0, retry: "nonRetriable" },
+          CANCELLED: { grpcCode: 1, retry: "nonRetriable" },
+          UNKNOWN: { grpcCode: 2, retry: "retriable" },
+          DEADLINE_EXCEEDED: { grpcCode: 4, retry: "retriable" },
+          INTERNAL: { grpcCode: 13, retry: "retriable" },
+          UNAVAILABLE: { grpcCode: 14, retry: "retriable" }
+        }
+      }
+    }
+  };
+
+  // 4. 构建矩阵
   const builder = new MatrixBuilder();
   const matrix = builder
     .loadProtoErrorCodes(pr.errorCodes)
     .loadSdkDefinitions(sdkData)
     .buildMatrix();
 
-  // 3. 验证分类
+  // 5. 验证分类
   if (!matrix.categories.safeRetry || !matrix.categories.neverRetry || !matrix.categories.controversial) {
     throw new Error("分类数据缺失");
   }
 
-  // 4. 验证差异检测
+  // 6. 验证差异检测
   if (!matrix.differences) throw new Error("差异数据缺失");
   
-  // 5. 生成所有报告
+  // 7. 生成所有报告
   const reporter = new ReportGenerator();
-  const reports = reporter.generateAllReports(matrix, testDir);
+  const e2eOutputDir = path.join(testDir, "e2e-output");
+  const reports = reporter.generateAllReports(matrix, e2eOutputDir);
   
   if (!reports.console) throw new Error("终端报告缺失");
   if (!fs.existsSync(reports.jsonPath)) throw new Error("JSON报告未生成");
   if (!fs.existsSync(reports.markdownPath)) throw new Error("Markdown报告未生成");
+});
+
+test("验证示例数据独立性: examples目录文件不被覆盖", () => {
+  // 验证examples目录的原始数据仍然完整
+  const parser = new ProtoParser();
+  const pr = parser.parse("./examples/error_codes.proto");
+  if (pr.errorCodes.length < 15) throw new Error("示例文件错误码数量异常，可能被覆盖，实际: " + pr.errorCodes.length);
 });
 
 // ===== 清理和总结 =====
