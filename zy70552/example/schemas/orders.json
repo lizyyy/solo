@@ -1,0 +1,14 @@
+{
+  "tableName": "orders",
+  "primaryKey": ["id"],
+  "columns": [
+    { "name": "id", "type": "INT", "nullable": false, "isPrimaryKey": true },
+    { "name": "user_id", "type": "INT", "nullable": false, "isPrimaryKey": false },
+    { "name": "total", "type": "DECIMAL(10,2)", "nullable": false, "isPrimaryKey": false },
+    { "name": "status", "type": "VARCHAR(50)", "nullable": false, "isPrimaryKey": false },
+    { "name": "created_at", "type": "DATETIME", "nullable": true, "isPrimaryKey": false }
+  ],
+  "indexes": [
+    { "name": "idx_user_id", "columns": ["user_id"], "isUnique": false }
+  ]
+}

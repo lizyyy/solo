@@ -1,0 +1,13 @@
+{
+  "tableName": "users",
+  "primaryKey": ["id"],
+  "columns": [
+    { "name": "id", "type": "INT", "nullable": false, "isPrimaryKey": true },
+    { "name": "name", "type": "VARCHAR(255)", "nullable": false, "isPrimaryKey": false },
+    { "name": "email", "type": "VARCHAR(255)", "nullable": false, "isPrimaryKey": false },
+    { "name": "created_at", "type": "DATETIME", "nullable": true, "isPrimaryKey": false }
+  ],
+  "indexes": [
+    { "name": "idx_email", "columns": ["email"], "isUnique": true }
+  ]
+}
