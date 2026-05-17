@@ -2,14 +2,13 @@
   "name": "ip-overlap-cli",
   "version": "1.0.0",
   "description": "IP段重叠检测CLI工具",
-  "main": "dist/index.js",
+  "main": "cli.js",
   "bin": {
-    "ip-overlap": "dist/index.js"
+    "ip-overlap": "cli.js"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts"
+    "start": "node cli.js",
+    "test": "node cli.js -i test.csv"
   },
   "keywords": ["cidr", "ip", "overlap"],
   "author": "",
@@ -22,5 +21,4 @@
   "dependencies": {
     "commander": "^11.0.0"
   }
-}
 }

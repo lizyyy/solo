@@ -61,9 +61,8 @@ JSON输出已写入: result.json
 - [package.json](file:///Users/lzy/pro/solo/workspaces/zy70567/package.json) - 项目配置
 - [src/cidr.ts](file:///Users/lzy/pro/solo/workspaces/zy70567/src/cidr.ts) - TypeScript 核心库代码
 
-## 已知问题
+## 已知问题（待后续完善）
 
-1. `bigintToCidr()` 函数未在 CLI 输出中使用，重叠区间未转换回 CIDR 格式显示
-2. 团队归属汇总统计（generateTeamSummaries）未集成到 CLI 输出中
-3. Markdown 报告生成功能尚未实现
-4. `index.js` 文件存在语法错误（已提供可用的 `cli.js` 作为替代）
+1. 重叠区间未转换回 CIDR 格式显示（`bigintToCidr()` 函数已实现但未集成）
+2. 团队归属汇总统计功能尚未集成到 CLI 输出
+3. Markdown 友好报告生成功能尚未实现

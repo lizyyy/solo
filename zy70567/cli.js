@@ -5,12 +5,18 @@ const { Command } = require("commander");
 
 function ipToBigint(ip) {
   const parts = ip.split(".").map(Number);
+  if (parts.length !== 4 || parts.some(p => isNaN(p) || p < 0 || p > 255)) {
+    throw new Error(`无效IP地址: ${ip}`);
+  }
   return (BigInt(parts[0]) << 24n) | (BigInt(parts[1]) << 16n) | (BigInt(parts[2]) << 8n) | BigInt(parts[3]);
 }
 
 function parseCidr(cidr) {
   const [ip, prefixStr] = cidr.split("/");
   const prefix = parseInt(prefixStr || "32", 10);
+  if (isNaN(prefix) || prefix < 0 || prefix > 32) {
+    throw new Error(`无效CIDR前缀: ${prefixStr}`);
+  }
   const ipNum = ipToBigint(ip);
   const mask = prefix === 0 ? 0n : (0xffffffffn << BigInt(32 - prefix));
   return { start: ipNum & mask, end: (ipNum & mask) | (~mask & 0xffffffffn) };
