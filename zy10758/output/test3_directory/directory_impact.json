@@ -1,0 +1,1784 @@
+{
+  "summary": {
+    "totalFiles": 3,
+    "totalMetrics": 21,
+    "validMetrics": 20,
+    "affectedMetrics": 13,
+    "highImpactMetrics": 13
+  },
+  "byImpactLevel": {
+    "high": [
+      {
+        "metricId": "M001",
+        "metricName": "日活跃用户数",
+        "sourceFile": "bad_rows_metrics.csv",
+        "owner": "张三",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "指标本身口径发生变更",
+            "level": "高",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": [
+          {
+            "type": "WARNING",
+            "code": "METRIC_ALIAS_FOUND",
+            "message": "指标存在别名: DAU",
+            "lineNumber": 2
+          },
+          {
+            "type": "WARNING",
+            "code": "HISTORY_SNAPSHOT_FOUND",
+            "message": "配置了历史快照: 每日快照",
+            "lineNumber": 2
+          }
+        ]
+      },
+      {
+        "metricId": "M002",
+        "metricName": "月活跃用户数",
+        "sourceFile": "bad_rows_metrics.csv",
+        "owner": "李四",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "依赖指标 M001 口径变更",
+            "level": "高",
+            "dependency": "M001",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": [
+          {
+            "type": "WARNING",
+            "code": "METRIC_ALIAS_FOUND",
+            "message": "指标存在别名: MAU",
+            "lineNumber": 3
+          }
+        ]
+      },
+      {
+        "metricId": "M003",
+        "metricName": "用户转化率",
+        "sourceFile": "bad_rows_metrics.csv",
+        "owner": " M002/M001*100",
+        "department": " 0)",
+        "businessDomain": "王五",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "依赖指标 M001 口径变更",
+            "level": "高",
+            "dependency": "M001",
+            "affectedDashboards": [
+              "王五核心看板",
+              " 0)运营看板",
+              "综合数据看板"
+            ]
+          },
+          {
+            "type": "口径定义变更",
+            "description": "依赖的1个指标口径变更",
+            "level": "高",
+            "affectedMetrics": [
+              "M001"
+            ],
+            "affectedDashboards": [
+              "王五核心看板",
+              " 0)运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": [
+          {
+            "type": "WARNING",
+            "code": "METRIC_ALIAS_FOUND",
+            "message": "指标存在别名: 数据产品部",
+            "lineNumber": 4
+          },
+          {
+            "type": "WARNING",
+            "code": "HISTORY_SNAPSHOT_FOUND",
+            "message": "配置了历史快照: 用户中心",
+            "lineNumber": 4
+          }
+        ]
+      },
+      {
+        "metricId": "M008",
+        "metricName": "复杂嵌套指标",
+        "sourceFile": "bad_rows_metrics.csv",
+        "owner": " M003*M004",
+        "department": " 0)",
+        "businessDomain": "测试",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "依赖指标 M001 口径变更",
+            "level": "高",
+            "dependency": "M001",
+            "affectedDashboards": [
+              "测试核心看板",
+              " 0)运营看板",
+              "综合数据看板"
+            ]
+          },
+          {
+            "type": "口径定义变更",
+            "description": "依赖的1个指标口径变更",
+            "level": "高",
+            "affectedMetrics": [
+              "M001"
+            ],
+            "affectedDashboards": [
+              "测试核心看板",
+              " 0)运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": [
+          {
+            "type": "WARNING",
+            "code": "METRIC_ALIAS_FOUND",
+            "message": "指标存在别名: 技术部",
+            "lineNumber": 9
+          },
+          {
+            "type": "WARNING",
+            "code": "HISTORY_SNAPSHOT_FOUND",
+            "message": "配置了历史快照: 分析中心",
+            "lineNumber": 9
+          },
+          {
+            "type": "WARNING",
+            "code": "FORMULA_NESTING_TOO_DEEP",
+            "message": "公式嵌套层级过深: 3层",
+            "lineNumber": 9
+          }
+        ]
+      },
+      {
+        "metricId": "M001",
+        "metricName": "日活跃用户数",
+        "sourceFile": "duplicate_metrics.csv",
+        "owner": "张三",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "指标本身口径发生变更",
+            "level": "高",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "metricId": "M002",
+        "metricName": "月活跃用户数",
+        "sourceFile": "duplicate_metrics.csv",
+        "owner": "李四",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "依赖指标 M001 口径变更",
+            "level": "高",
+            "dependency": "M001",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "metricId": "M003",
+        "metricName": "用户转化率",
+        "sourceFile": "duplicate_metrics.csv",
+        "owner": "王五",
+        "department": "数据产品部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "依赖指标 M001 口径变更",
+            "level": "高",
+            "dependency": "M001",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "数据产品部运营看板",
+              "综合数据看板"
+            ]
+          },
+          {
+            "type": "口径定义变更",
+            "description": "依赖的1个指标口径变更",
+            "level": "高",
+            "affectedMetrics": [
+              "M001"
+            ],
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "数据产品部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "metricId": "M001",
+        "metricName": "日活跃用户数_重复",
+        "sourceFile": "duplicate_metrics.csv",
+        "owner": "张三",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "指标本身口径发生变更",
+            "level": "高",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "metricId": "M002",
+        "metricName": "月活跃用户数_重复",
+        "sourceFile": "duplicate_metrics.csv",
+        "owner": "李四",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "依赖指标 M001 口径变更",
+            "level": "高",
+            "dependency": "M001",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "metricId": "M001",
+        "metricName": "日活跃用户数",
+        "sourceFile": "normal_metrics.csv",
+        "owner": "张三",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "指标本身口径发生变更",
+            "level": "高",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "metricId": "M002",
+        "metricName": "月活跃用户数",
+        "sourceFile": "normal_metrics.csv",
+        "owner": "李四",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "依赖指标 M001 口径变更",
+            "level": "高",
+            "dependency": "M001",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "metricId": "M003",
+        "metricName": "用户转化率",
+        "sourceFile": "normal_metrics.csv",
+        "owner": "王五",
+        "department": "数据产品部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "依赖指标 M001 口径变更",
+            "level": "高",
+            "dependency": "M001",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "数据产品部运营看板",
+              "综合数据看板"
+            ]
+          },
+          {
+            "type": "口径定义变更",
+            "description": "依赖的1个指标口径变更",
+            "level": "高",
+            "affectedMetrics": [
+              "M001"
+            ],
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "数据产品部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "metricId": "M008",
+        "metricName": "用户留存率",
+        "sourceFile": "normal_metrics.csv",
+        "owner": "吴十",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [
+          {
+            "type": "口径定义变更",
+            "description": "依赖指标 M001 口径变更",
+            "level": "高",
+            "dependency": "M001",
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          },
+          {
+            "type": "口径定义变更",
+            "description": "依赖的1个指标口径变更",
+            "level": "高",
+            "affectedMetrics": [
+              "M001"
+            ],
+            "affectedDashboards": [
+              "用户中心核心看板",
+              "用户运营部运营看板",
+              "综合数据看板"
+            ]
+          }
+        ],
+        "issues": []
+      }
+    ],
+    "medium": [],
+    "low": [
+      {
+        "metricId": "M005",
+        "metricName": "",
+        "sourceFile": "bad_rows_metrics.csv",
+        "owner": "钱七",
+        "department": "电商运营部",
+        "businessDomain": "交易中心",
+        "impacts": [],
+        "issues": [
+          {
+            "type": "ERROR",
+            "code": "MISSING_METRIC_NAME",
+            "message": "指标名称为空",
+            "lineNumber": 6
+          }
+        ]
+      },
+      {
+        "metricId": "M006",
+        "metricName": "客单价",
+        "sourceFile": "bad_rows_metrics.csv",
+        "owner": "孙八",
+        "department": "电商运营部",
+        "businessDomain": "交易中心",
+        "impacts": [],
+        "issues": []
+      },
+      {
+        "metricId": "M007",
+        "metricName": "GMV",
+        "sourceFile": "bad_rows_metrics.csv",
+        "owner": "周九",
+        "department": "电商运营部",
+        "businessDomain": "交易中心",
+        "impacts": [],
+        "issues": [
+          {
+            "type": "WARNING",
+            "code": "METRIC_ALIAS_FOUND",
+            "message": "指标存在别名: 商品交易总额",
+            "lineNumber": 8
+          },
+          {
+            "type": "WARNING",
+            "code": "HISTORY_SNAPSHOT_FOUND",
+            "message": "配置了历史快照: 历史归档",
+            "lineNumber": 8
+          }
+        ]
+      },
+      {
+        "metricId": "M009",
+        "metricName": "新指标",
+        "sourceFile": "duplicate_metrics.csv",
+        "owner": "新人",
+        "department": "新部门",
+        "businessDomain": "新域",
+        "impacts": [],
+        "issues": []
+      },
+      {
+        "metricId": "M004",
+        "metricName": "订单总金额",
+        "sourceFile": "normal_metrics.csv",
+        "owner": "赵六",
+        "department": "电商运营部",
+        "businessDomain": "交易中心",
+        "impacts": [],
+        "issues": []
+      },
+      {
+        "metricId": "M005",
+        "metricName": "订单数量",
+        "sourceFile": "normal_metrics.csv",
+        "owner": "钱七",
+        "department": "电商运营部",
+        "businessDomain": "交易中心",
+        "impacts": [],
+        "issues": []
+      },
+      {
+        "metricId": "M006",
+        "metricName": "客单价",
+        "sourceFile": "normal_metrics.csv",
+        "owner": "孙八",
+        "department": "电商运营部",
+        "businessDomain": "交易中心",
+        "impacts": [],
+        "issues": []
+      },
+      {
+        "metricId": "M007",
+        "metricName": "新增用户数",
+        "sourceFile": "normal_metrics.csv",
+        "owner": "周九",
+        "department": "用户运营部",
+        "businessDomain": "用户中心",
+        "impacts": [],
+        "issues": []
+      }
+    ],
+    "summary": {
+      "highCount": 13,
+      "mediumCount": 0,
+      "lowCount": 8
+    }
+  },
+  "byDepartment": [
+    {
+      "department": "用户运营部",
+      "metrics": [
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数_重复",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数_重复",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M007",
+          "metricName": "新增用户数",
+          "impactLevel": "低",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "用户留存率",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv"
+        }
+      ],
+      "affectedCount": 9,
+      "highImpactCount": 9
+    },
+    {
+      "department": " 0)",
+      "metrics": [
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "复杂嵌套指标",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv"
+        }
+      ],
+      "affectedCount": 2,
+      "highImpactCount": 2
+    },
+    {
+      "department": "数据产品部",
+      "metrics": [
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv"
+        }
+      ],
+      "affectedCount": 2,
+      "highImpactCount": 2
+    },
+    {
+      "department": "电商运营部",
+      "metrics": [
+        {
+          "metricId": "M005",
+          "metricName": "",
+          "impactLevel": "低",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M006",
+          "metricName": "客单价",
+          "impactLevel": "低",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M007",
+          "metricName": "GMV",
+          "impactLevel": "低",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M004",
+          "metricName": "订单总金额",
+          "impactLevel": "低",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M005",
+          "metricName": "订单数量",
+          "impactLevel": "低",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M006",
+          "metricName": "客单价",
+          "impactLevel": "低",
+          "sourceFile": "normal_metrics.csv"
+        }
+      ],
+      "affectedCount": 0,
+      "highImpactCount": 0
+    },
+    {
+      "department": "新部门",
+      "metrics": [
+        {
+          "metricId": "M009",
+          "metricName": "新指标",
+          "impactLevel": "低",
+          "sourceFile": "duplicate_metrics.csv"
+        }
+      ],
+      "affectedCount": 0,
+      "highImpactCount": 0
+    }
+  ],
+  "byBusinessDomain": [
+    {
+      "businessDomain": "用户中心",
+      "metrics": [
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数_重复",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数_重复",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv"
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M007",
+          "metricName": "新增用户数",
+          "impactLevel": "低",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "用户留存率",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv"
+        }
+      ],
+      "affectedCount": 11,
+      "highImpactCount": 11,
+      "affectedDashboards": [
+        "用户中心核心看板",
+        "用户运营部运营看板",
+        "综合数据看板",
+        "数据产品部运营看板"
+      ]
+    },
+    {
+      "businessDomain": "王五",
+      "metrics": [
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv"
+        }
+      ],
+      "affectedCount": 1,
+      "highImpactCount": 1,
+      "affectedDashboards": [
+        "王五核心看板",
+        " 0)运营看板",
+        "综合数据看板"
+      ]
+    },
+    {
+      "businessDomain": "测试",
+      "metrics": [
+        {
+          "metricId": "M008",
+          "metricName": "复杂嵌套指标",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv"
+        }
+      ],
+      "affectedCount": 1,
+      "highImpactCount": 1,
+      "affectedDashboards": [
+        "测试核心看板",
+        " 0)运营看板",
+        "综合数据看板"
+      ]
+    },
+    {
+      "businessDomain": "交易中心",
+      "metrics": [
+        {
+          "metricId": "M005",
+          "metricName": "",
+          "impactLevel": "低",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M006",
+          "metricName": "客单价",
+          "impactLevel": "低",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M007",
+          "metricName": "GMV",
+          "impactLevel": "低",
+          "sourceFile": "bad_rows_metrics.csv"
+        },
+        {
+          "metricId": "M004",
+          "metricName": "订单总金额",
+          "impactLevel": "低",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M005",
+          "metricName": "订单数量",
+          "impactLevel": "低",
+          "sourceFile": "normal_metrics.csv"
+        },
+        {
+          "metricId": "M006",
+          "metricName": "客单价",
+          "impactLevel": "低",
+          "sourceFile": "normal_metrics.csv"
+        }
+      ],
+      "affectedCount": 0,
+      "highImpactCount": 0,
+      "affectedDashboards": []
+    },
+    {
+      "businessDomain": "新域",
+      "metrics": [
+        {
+          "metricId": "M009",
+          "metricName": "新指标",
+          "impactLevel": "低",
+          "sourceFile": "duplicate_metrics.csv"
+        }
+      ],
+      "affectedCount": 0,
+      "highImpactCount": 0,
+      "affectedDashboards": []
+    }
+  ],
+  "byChangeType": [
+    {
+      "changeType": "口径定义变更",
+      "metrics": [
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv",
+          "impactDescription": "指标本身口径发生变更"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv",
+          "impactDescription": "依赖指标 M001 口径变更"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv",
+          "impactDescription": "依赖指标 M001 口径变更"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv",
+          "impactDescription": "依赖的1个指标口径变更"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "复杂嵌套指标",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv",
+          "impactDescription": "依赖指标 M001 口径变更"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "复杂嵌套指标",
+          "impactLevel": "高",
+          "sourceFile": "bad_rows_metrics.csv",
+          "impactDescription": "依赖的1个指标口径变更"
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv",
+          "impactDescription": "指标本身口径发生变更"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv",
+          "impactDescription": "依赖指标 M001 口径变更"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv",
+          "impactDescription": "依赖指标 M001 口径变更"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv",
+          "impactDescription": "依赖的1个指标口径变更"
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数_重复",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv",
+          "impactDescription": "指标本身口径发生变更"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数_重复",
+          "impactLevel": "高",
+          "sourceFile": "duplicate_metrics.csv",
+          "impactDescription": "依赖指标 M001 口径变更"
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv",
+          "impactDescription": "指标本身口径发生变更"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv",
+          "impactDescription": "依赖指标 M001 口径变更"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv",
+          "impactDescription": "依赖指标 M001 口径变更"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv",
+          "impactDescription": "依赖的1个指标口径变更"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "用户留存率",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv",
+          "impactDescription": "依赖指标 M001 口径变更"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "用户留存率",
+          "impactLevel": "高",
+          "sourceFile": "normal_metrics.csv",
+          "impactDescription": "依赖的1个指标口径变更"
+        }
+      ],
+      "affectedCount": 18,
+      "affectedDashboards": [
+        "用户中心核心看板",
+        "用户运营部运营看板",
+        "综合数据看板",
+        "王五核心看板",
+        " 0)运营看板",
+        "测试核心看板",
+        "数据产品部运营看板"
+      ]
+    }
+  ],
+  "bySourceFile": [
+    {
+      "fileName": "bad_rows_metrics.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10758/samples/bad_rows_metrics.csv",
+      "totalMetrics": 7,
+      "validMetrics": 6,
+      "affectedMetrics": 4,
+      "fileErrors": [
+        "第5行: 缺少指标ID",
+        "第6行: 缺少指标名称"
+      ],
+      "fileWarnings": [
+        "第2行: 发现指标别名 \"DAU\"，继续处理",
+        "第2行: 发现历史快照配置 \"每日快照\"，继续处理",
+        "第3行: 发现指标别名 \"MAU\"，继续处理",
+        "第4行: 发现指标别名 \"数据产品部\"，继续处理",
+        "第4行: 发现历史快照配置 \"用户中心\"，继续处理",
+        "第8行: 发现指标别名 \"商品交易总额\"，继续处理",
+        "第8行: 发现历史快照配置 \"历史归档\"，继续处理",
+        "第9行: 发现指标别名 \"技术部\"，继续处理",
+        "第9行: 发现历史快照配置 \"分析中心\"，继续处理",
+        "第9行: 公式嵌套层级过深 (3层)，继续处理"
+      ],
+      "metricsWithIssues": [
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [
+            {
+              "type": "WARNING",
+              "code": "METRIC_ALIAS_FOUND",
+              "message": "指标存在别名: DAU",
+              "lineNumber": 2
+            },
+            {
+              "type": "WARNING",
+              "code": "HISTORY_SNAPSHOT_FOUND",
+              "message": "配置了历史快照: 每日快照",
+              "lineNumber": 2
+            }
+          ],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "指标本身口径发生变更",
+              "level": "高",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [
+            {
+              "type": "WARNING",
+              "code": "METRIC_ALIAS_FOUND",
+              "message": "指标存在别名: MAU",
+              "lineNumber": 3
+            }
+          ],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "依赖指标 M001 口径变更",
+              "level": "高",
+              "dependency": "M001",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [
+            {
+              "type": "WARNING",
+              "code": "METRIC_ALIAS_FOUND",
+              "message": "指标存在别名: 数据产品部",
+              "lineNumber": 4
+            },
+            {
+              "type": "WARNING",
+              "code": "HISTORY_SNAPSHOT_FOUND",
+              "message": "配置了历史快照: 用户中心",
+              "lineNumber": 4
+            }
+          ],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "依赖指标 M001 口径变更",
+              "level": "高",
+              "dependency": "M001",
+              "affectedDashboards": [
+                "王五核心看板",
+                " 0)运营看板",
+                "综合数据看板"
+              ]
+            },
+            {
+              "type": "口径定义变更",
+              "description": "依赖的1个指标口径变更",
+              "level": "高",
+              "affectedMetrics": [
+                "M001"
+              ],
+              "affectedDashboards": [
+                "王五核心看板",
+                " 0)运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M005",
+          "metricName": "",
+          "isValid": false,
+          "impactLevel": "低",
+          "issues": [
+            {
+              "type": "ERROR",
+              "code": "MISSING_METRIC_NAME",
+              "message": "指标名称为空",
+              "lineNumber": 6
+            }
+          ],
+          "impacts": []
+        },
+        {
+          "metricId": "M008",
+          "metricName": "复杂嵌套指标",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [
+            {
+              "type": "WARNING",
+              "code": "METRIC_ALIAS_FOUND",
+              "message": "指标存在别名: 技术部",
+              "lineNumber": 9
+            },
+            {
+              "type": "WARNING",
+              "code": "HISTORY_SNAPSHOT_FOUND",
+              "message": "配置了历史快照: 分析中心",
+              "lineNumber": 9
+            },
+            {
+              "type": "WARNING",
+              "code": "FORMULA_NESTING_TOO_DEEP",
+              "message": "公式嵌套层级过深: 3层",
+              "lineNumber": 9
+            }
+          ],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "依赖指标 M001 口径变更",
+              "level": "高",
+              "dependency": "M001",
+              "affectedDashboards": [
+                "测试核心看板",
+                " 0)运营看板",
+                "综合数据看板"
+              ]
+            },
+            {
+              "type": "口径定义变更",
+              "description": "依赖的1个指标口径变更",
+              "level": "高",
+              "affectedMetrics": [
+                "M001"
+              ],
+              "affectedDashboards": [
+                "测试核心看板",
+                " 0)运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fileName": "duplicate_metrics.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10758/samples/duplicate_metrics.csv",
+      "totalMetrics": 6,
+      "validMetrics": 6,
+      "affectedMetrics": 5,
+      "fileErrors": [],
+      "fileWarnings": [],
+      "metricsWithIssues": [
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "指标本身口径发生变更",
+              "level": "高",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "依赖指标 M001 口径变更",
+              "level": "高",
+              "dependency": "M001",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "依赖指标 M001 口径变更",
+              "level": "高",
+              "dependency": "M001",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "数据产品部运营看板",
+                "综合数据看板"
+              ]
+            },
+            {
+              "type": "口径定义变更",
+              "description": "依赖的1个指标口径变更",
+              "level": "高",
+              "affectedMetrics": [
+                "M001"
+              ],
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "数据产品部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数_重复",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "指标本身口径发生变更",
+              "level": "高",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数_重复",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "依赖指标 M001 口径变更",
+              "level": "高",
+              "dependency": "M001",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fileName": "normal_metrics.csv",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy10758/samples/normal_metrics.csv",
+      "totalMetrics": 8,
+      "validMetrics": 8,
+      "affectedMetrics": 4,
+      "fileErrors": [],
+      "fileWarnings": [],
+      "metricsWithIssues": [
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "指标本身口径发生变更",
+              "level": "高",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "依赖指标 M001 口径变更",
+              "level": "高",
+              "dependency": "M001",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "依赖指标 M001 口径变更",
+              "level": "高",
+              "dependency": "M001",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "数据产品部运营看板",
+                "综合数据看板"
+              ]
+            },
+            {
+              "type": "口径定义变更",
+              "description": "依赖的1个指标口径变更",
+              "level": "高",
+              "affectedMetrics": [
+                "M001"
+              ],
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "数据产品部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        },
+        {
+          "metricId": "M008",
+          "metricName": "用户留存率",
+          "isValid": true,
+          "impactLevel": "高",
+          "issues": [],
+          "impacts": [
+            {
+              "type": "口径定义变更",
+              "description": "依赖指标 M001 口径变更",
+              "level": "高",
+              "dependency": "M001",
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            },
+            {
+              "type": "口径定义变更",
+              "description": "依赖的1个指标口径变更",
+              "level": "高",
+              "affectedMetrics": [
+                "M001"
+              ],
+              "affectedDashboards": [
+                "用户中心核心看板",
+                "用户运营部运营看板",
+                "综合数据看板"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dashboardList": [
+    {
+      "dashboardName": "综合数据看板",
+      "affectedMetrics": [
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "impactDescription": "指标本身口径发生变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": "张三"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": "李四"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": " M002/M001*100"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "复杂嵌套指标",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": " M003*M004"
+        }
+      ],
+      "highImpactCount": 18,
+      "totalImpactCount": 18,
+      "departments": [
+        "用户运营部",
+        " 0)",
+        "数据产品部"
+      ],
+      "businessDomains": [
+        "用户中心",
+        "王五",
+        "测试"
+      ]
+    },
+    {
+      "dashboardName": "用户中心核心看板",
+      "affectedMetrics": [
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "impactDescription": "指标本身口径发生变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": "张三"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": "李四"
+        },
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "duplicate_metrics.csv",
+          "owner": "王五"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "用户留存率",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "normal_metrics.csv",
+          "owner": "吴十"
+        }
+      ],
+      "highImpactCount": 14,
+      "totalImpactCount": 14,
+      "departments": [
+        "用户运营部",
+        "数据产品部"
+      ],
+      "businessDomains": [
+        "用户中心"
+      ]
+    },
+    {
+      "dashboardName": "用户运营部运营看板",
+      "affectedMetrics": [
+        {
+          "metricId": "M001",
+          "metricName": "日活跃用户数",
+          "impactLevel": "高",
+          "impactDescription": "指标本身口径发生变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": "张三"
+        },
+        {
+          "metricId": "M002",
+          "metricName": "月活跃用户数",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": "李四"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "用户留存率",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "normal_metrics.csv",
+          "owner": "吴十"
+        }
+      ],
+      "highImpactCount": 10,
+      "totalImpactCount": 10,
+      "departments": [
+        "用户运营部"
+      ],
+      "businessDomains": [
+        "用户中心"
+      ]
+    },
+    {
+      "dashboardName": " 0)运营看板",
+      "affectedMetrics": [
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": " M002/M001*100"
+        },
+        {
+          "metricId": "M008",
+          "metricName": "复杂嵌套指标",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": " M003*M004"
+        }
+      ],
+      "highImpactCount": 4,
+      "totalImpactCount": 4,
+      "departments": [
+        " 0)"
+      ],
+      "businessDomains": [
+        "王五",
+        "测试"
+      ]
+    },
+    {
+      "dashboardName": "数据产品部运营看板",
+      "affectedMetrics": [
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "duplicate_metrics.csv",
+          "owner": "王五"
+        }
+      ],
+      "highImpactCount": 4,
+      "totalImpactCount": 4,
+      "departments": [
+        "数据产品部"
+      ],
+      "businessDomains": [
+        "用户中心"
+      ]
+    },
+    {
+      "dashboardName": "王五核心看板",
+      "affectedMetrics": [
+        {
+          "metricId": "M003",
+          "metricName": "用户转化率",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": " M002/M001*100"
+        }
+      ],
+      "highImpactCount": 2,
+      "totalImpactCount": 2,
+      "departments": [
+        " 0)"
+      ],
+      "businessDomains": [
+        "王五"
+      ]
+    },
+    {
+      "dashboardName": "测试核心看板",
+      "affectedMetrics": [
+        {
+          "metricId": "M008",
+          "metricName": "复杂嵌套指标",
+          "impactLevel": "高",
+          "impactDescription": "依赖指标 M001 口径变更",
+          "sourceFile": "bad_rows_metrics.csv",
+          "owner": " M003*M004"
+        }
+      ],
+      "highImpactCount": 2,
+      "totalImpactCount": 2,
+      "departments": [
+        " 0)"
+      ],
+      "businessDomains": [
+        "测试"
+      ]
+    }
+  ],
+  "exceptions": [
+    {
+      "type": "FILE_ERROR",
+      "source": "bad_rows_metrics.csv",
+      "message": "第5行: 缺少指标ID",
+      "recommendation": "检查文件格式和编码"
+    },
+    {
+      "type": "FILE_ERROR",
+      "source": "bad_rows_metrics.csv",
+      "message": "第6行: 缺少指标名称",
+      "recommendation": "检查文件格式和编码"
+    },
+    {
+      "type": "METRIC_ALIAS",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M001",
+      "metricName": "日活跃用户数",
+      "lineNumber": 2,
+      "message": "指标存在别名: DAU",
+      "recommendation": "确认别名是否需要同步口径变更"
+    },
+    {
+      "type": "HISTORY_SNAPSHOT",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M001",
+      "metricName": "日活跃用户数",
+      "lineNumber": 2,
+      "message": "配置了历史快照: 每日快照",
+      "recommendation": "评估历史快照数据是否需要重新计算"
+    },
+    {
+      "type": "METRIC_ALIAS",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M002",
+      "metricName": "月活跃用户数",
+      "lineNumber": 3,
+      "message": "指标存在别名: MAU",
+      "recommendation": "确认别名是否需要同步口径变更"
+    },
+    {
+      "type": "METRIC_ALIAS",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M003",
+      "metricName": "用户转化率",
+      "lineNumber": 4,
+      "message": "指标存在别名: 数据产品部",
+      "recommendation": "确认别名是否需要同步口径变更"
+    },
+    {
+      "type": "HISTORY_SNAPSHOT",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M003",
+      "metricName": "用户转化率",
+      "lineNumber": 4,
+      "message": "配置了历史快照: 用户中心",
+      "recommendation": "评估历史快照数据是否需要重新计算"
+    },
+    {
+      "type": "VALIDATION_ERROR",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M005",
+      "metricName": "",
+      "lineNumber": 6,
+      "message": "指标名称为空",
+      "recommendation": "修复指标配置后重新分析"
+    },
+    {
+      "type": "METRIC_ALIAS",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M007",
+      "metricName": "GMV",
+      "lineNumber": 8,
+      "message": "指标存在别名: 商品交易总额",
+      "recommendation": "确认别名是否需要同步口径变更"
+    },
+    {
+      "type": "HISTORY_SNAPSHOT",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M007",
+      "metricName": "GMV",
+      "lineNumber": 8,
+      "message": "配置了历史快照: 历史归档",
+      "recommendation": "评估历史快照数据是否需要重新计算"
+    },
+    {
+      "type": "METRIC_ALIAS",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M008",
+      "metricName": "复杂嵌套指标",
+      "lineNumber": 9,
+      "message": "指标存在别名: 技术部",
+      "recommendation": "确认别名是否需要同步口径变更"
+    },
+    {
+      "type": "HISTORY_SNAPSHOT",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M008",
+      "metricName": "复杂嵌套指标",
+      "lineNumber": 9,
+      "message": "配置了历史快照: 分析中心",
+      "recommendation": "评估历史快照数据是否需要重新计算"
+    },
+    {
+      "type": "FORMULA_NESTING",
+      "source": "bad_rows_metrics.csv",
+      "metricId": "M008",
+      "metricName": "复杂嵌套指标",
+      "lineNumber": 9,
+      "message": "公式嵌套层级过深: 3层",
+      "recommendation": "检查依赖指标口径变更的传导影响"
+    }
+  ]
+}

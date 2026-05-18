@@ -1,0 +1,22 @@
+{
+  "name": "metric-config-calendar-impact-cli",
+  "version": "1.0.0",
+  "description": "指标配置仓库口径变更影响 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "metric-impact": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run.js",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": ["metrics", "config", "impact", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "lodash": "^4.17.21"
+  }
+}
