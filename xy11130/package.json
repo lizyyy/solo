@@ -1,0 +1,26 @@
+{
+  "name": "community-groupbuy-package-splitter",
+  "version": "1.0.0",
+  "description": "社区团购仓团购包裹拆分 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "package-splitter": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/yargs": "^17.0.32",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  }
+}
