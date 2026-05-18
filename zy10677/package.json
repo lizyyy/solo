@@ -1,0 +1,18 @@
+{
+  "name": "equipment-rental-deposit-api",
+  "version": "1.0.0",
+  "description": "设备租赁平台押金分阶段退还 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

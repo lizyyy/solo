@@ -1,0 +1,20 @@
+
+=============================================
+  设备租赁平台押金分阶段退还 API
+=============================================
+  服务器运行在: http://localhost:3001
+  健康检查: GET http://localhost:3001/api/health
+  
+  主要接口:
+  - 租赁单列表: GET /api/leases
+  - 创建租赁单: POST /api/leases
+  - 租赁单详情: GET /api/leases/:id
+  - 历史记录: GET /api/leases/:id/history
+  - 开始验收: POST /api/leases/:id/start-inspection
+  - 发起退款: POST /api/leases/:id/refund
+  - 驳回退款: POST /api/leases/refund-batches/:batchId/reject
+  - 导出CSV: GET /api/leases/export/csv
+  - 导出JSON: GET /api/leases/export/json
+  - 导入数据: POST /api/leases/import
+=============================================
+  
