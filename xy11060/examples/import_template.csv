@@ -1,0 +1,3 @@
+station_code,station_name,report_date,reporter_code,reporter_name,vegetable_code,vegetable_name,vegetable_category,batch_no,delivery_order_no,purchase_order_no,loss_type,loss_quantity,loss_weight,loss_unit,loss_reason,loss_description,discovery_time,discovery_location,handler_name,related_docs
+BJ001,北京朝阳配送站,2024-05-18,R001,张三,V004,土豆,根茎类,B20240518004,D20240518004,P20240518004,transport_loss,30,15,公斤,运输途中碰撞破损,车辆急刹车导致包装箱破损,2024-05-18 09:00:00,配送站卸货区,李四,运输单T20240518004,照片IMG_004.jpg
+SH001,上海浦东配送站,2024-05-18,R003,孙七,V005,青菜,叶菜类,B20240518005,D20240518005,P20240518005,store_loss,20,10,公斤,门店存放过久变黄,门店冷藏温度设置过高导致蔬菜失水,2024-05-18 14:00:00,门店货架区,周八,门店盘点表P20240518
