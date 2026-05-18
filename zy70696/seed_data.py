@@ -7,6 +7,9 @@ from models import Customer, Prescription, LensOrder, Frame, ProcessingStatus
 
 
 def seed_database():
+    from database import Base, engine
+    Base.metadata.create_all(bind=engine)
+
     db = SessionLocal()
     try:
         print("开始创建测试数据...")
@@ -136,7 +139,11 @@ def seed_database():
             },
         ]
 
+        from models import PickupReport, ProcessingStatusHistory
+        from services import ReportNumberGenerator
+
         orders = []
+        orders_with_status = []
         for data in orders_data:
             customer_idx = data.pop("customer_idx")
             prescription_idx = data.pop("prescription_idx")
@@ -147,11 +154,41 @@ def seed_database():
             data["order_no"] = OrderNumberGenerator.generate()
             data["status_updated_at"] = datetime.now()
             data["status_updated_by"] = data["created_by"]
-            order = LensOrder(**data)
+            order_status = data.pop("status")
+            order = LensOrder(**data, status=ProcessingStatus.PENDING.value)
             db.add(order)
             orders.append(order)
+            orders_with_status.append((order, order_status))
+
+        db.flush()
+
+        pickup_reports_count = 0
+        for order, target_status in orders_with_status:
+            if target_status != ProcessingStatus.PENDING.value:
+                history = ProcessingStatusHistory(
+                    lens_order_id=order.id,
+                    from_status=ProcessingStatus.PENDING.value,
+                    to_status=target_status,
+                    changed_by=order.status_updated_by,
+                    notes="初始化状态"
+                )
+                db.add(history)
+                order.status = target_status
+
+            if target_status == ProcessingStatus.READY_FOR_PICKUP.value:
+                pickup_report = PickupReport(
+                    lens_order_id=order.id,
+                    report_no=ReportNumberGenerator.generate(),
+                    final_check_by="张质检",
+                    quality_pass=True,
+                    pickup_ready_date=datetime.now()
+                )
+                db.add(pickup_report)
+                pickup_reports_count += 1
+
         db.flush()
         print(f"已创建 {len(orders)} 个镜片加工订单")
+        print(f"已创建 {pickup_reports_count} 个取件报告")
 
         db.commit()
         print("\n测试数据创建完成！")

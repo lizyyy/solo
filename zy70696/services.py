@@ -201,10 +201,27 @@ class PickupService:
         return report
 
     @staticmethod
-    def send_reminder(db: Session, lens_order_id: int, reminder_type: str, sent_by: str, notes: str = None) -> PickupReport:
+    def get_or_create_report(db: Session, lens_order_id: int) -> PickupReport:
         report = db.query(PickupReport).filter(PickupReport.lens_order_id == lens_order_id).first()
         if not report:
-            raise ValueError(f"订单 {lens_order_id} 的取件报告不存在")
+            lens_order = db.query(LensOrder).filter(LensOrder.id == lens_order_id).first()
+            if not lens_order:
+                raise ValueError(f"订单 {lens_order_id} 不存在")
+            if lens_order.status != ProcessingStatus.READY_FOR_PICKUP.value:
+                raise ValueError(f"订单状态不是待取件，当前状态: {lens_order.status}")
+
+            report = PickupReport(
+                lens_order_id=lens_order_id,
+                report_no=ReportNumberGenerator.generate(),
+                pickup_ready_date=lens_order.status_updated_at or datetime.now()
+            )
+            db.add(report)
+            db.flush()
+        return report
+
+    @staticmethod
+    def send_reminder(db: Session, lens_order_id: int, reminder_type: str, sent_by: str, notes: str = None) -> PickupReport:
+        report = PickupService.get_or_create_report(db, lens_order_id)
 
         now = datetime.now()
 
@@ -231,9 +248,7 @@ class PickupService:
 
     @staticmethod
     def confirm_pickup(db: Session, lens_order_id: int, picked_up_by: str, pickup_notes: str = None) -> Tuple[PickupReport, LensOrder]:
-        report = db.query(PickupReport).filter(PickupReport.lens_order_id == lens_order_id).first()
-        if not report:
-            raise ValueError(f"订单 {lens_order_id} 的取件报告不存在")
+        report = PickupService.get_or_create_report(db, lens_order_id)
 
         lens_order = db.query(LensOrder).filter(LensOrder.id == lens_order_id).first()
         if not lens_order:

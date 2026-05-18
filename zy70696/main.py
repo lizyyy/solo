@@ -298,11 +298,10 @@ def confirm_pickup(
 
 @app.get("/pickup-reports/{order_id}", response_model=schemas.PickupReport, tags=["取件管理"])
 def get_pickup_report(order_id: int, db: Session = Depends(get_db)):
-    from models import PickupReport
-    report = db.query(PickupReport).filter(PickupReport.lens_order_id == order_id).first()
-    if not report:
-        raise HTTPException(status_code=404, detail="取件报告不存在")
-    return report
+    try:
+        return PickupService.get_or_create_report(db, order_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/lens-orders/{order_id}/withdraw", response_model=schemas.LensOrder, tags=["订单管理"])
