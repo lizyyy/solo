@@ -7,7 +7,7 @@ import csv
 from io import StringIO
 
 from database import engine, get_db, SessionLocal
-from models import Base, Room, Course, RoomSwap, Notification, SignInCode, AuditLog
+from models import Base, Room, Course, RoomSwap, Notification, SignInCode, AuditLog, RoomDevice
 import schemas
 import services
 

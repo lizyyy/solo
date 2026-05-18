@@ -12,6 +12,12 @@ from models import (
 import schemas
 
 
+def json_serializer(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
+
 def generate_swap_code() -> str:
     return f"SWAP-{uuid.uuid4().hex[:8].upper()}"
 
@@ -94,7 +100,7 @@ def create_audit_log(
 
 
 def create_room_swap(db: Session, swap_data: schemas.RoomSwapCreate) -> RoomSwap:
-    original_input = json.dumps(swap_data.model_dump(), ensure_ascii=False)
+    original_input = json.dumps(swap_data.model_dump(), ensure_ascii=False, default=json_serializer)
     
     swap = RoomSwap(
         swap_code=generate_swap_code(),

@@ -1,10 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Text, Enum, Float
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
 
-Base = declarative_base()
+from database import Base
 
 
 class DeviceType(str, enum.Enum):
