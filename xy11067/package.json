@@ -1,0 +1,26 @@
+{
+  "name": "nursery-health-check-isolation-api",
+  "version": "1.0.0",
+  "description": "托育园保健室托育晨检隔离 API 系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node tests/run-tests.js",
+    "init-db": "node src/scripts/init-db.js",
+    "seed-data": "node src/scripts/seed-data.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-writer": "^1.6.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["nursery", "health-check", "isolation", "api"],
+  "author": "",
+  "license": "ISC"
+}
