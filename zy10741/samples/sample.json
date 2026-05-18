@@ -1,0 +1,5 @@
+[
+  {"id": "REC-001", "error_type": "partial_success", "primary_key": "JSON-001", "content": "JSON格式半批成功记录"},
+  {"id": "REC-002", "error_type": "primary_key_conflict", "primary_key": "JSON-002", "content": "JSON主键冲突"},
+  {"id": "REC-003", "error_type": "order_dependency", "primary_key": "JSON-003", "content": "JSON顺序依赖"}
+]

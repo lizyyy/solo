@@ -1,0 +1,3 @@
+2024-01-15 10:10:01 [ERROR] 同步用户数据 - primary_key: USER-999 - 主键冲突 duplicate key
+2024-01-15 10:10:02 [ERROR] 同步用户数据 - primary_key: USER-888 - 唯一约束违反 unique constraint violation
+2024-01-15 10:10:03 [ERROR] 同步产品数据 - primary_key: PROD-123 - primary key 冲突

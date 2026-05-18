@@ -1,0 +1,3 @@
+2024-01-15 10:15:01 [ERROR] 同步订单数据 - primary_key: ORD-999 - 顺序依赖错误，前置数据未同步
+2024-01-15 10:15:02 [ERROR] 同步明细数据 - primary_key: ITEM-999 - order_dependency，需先同步主表
+2024-01-15 10:15:03 [ERROR] 同步关联数据 - primary_key: REL-001 - 外键约束违反，顺序依赖

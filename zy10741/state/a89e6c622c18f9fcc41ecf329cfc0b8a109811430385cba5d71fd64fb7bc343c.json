@@ -1,0 +1,89 @@
+{
+  "batch_id": "REPLAY-SYNC-20260518-117518",
+  "input_hash": "a89e6c622c18f9fcc41ecf329cfc0b8a109811430385cba5d71fd64fb7bc343c",
+  "created_at": "2026-05-18T22:18:38.835954+07:00",
+  "status": "generated",
+  "total_entries": 3,
+  "processed": 0,
+  "success_count": 0,
+  "failed_count": 0,
+  "entries": [
+    {
+      "id": "sample.json:1",
+      "file_name": "samples/sample.json",
+      "line_number": 1,
+      "content": "{\"content\":\"JSON格式半批成功记录\",\"error_type\":\"partial_success\",\"id\":\"REC-001\",\"primary_key\":\"JSON-001\"}",
+      "error_type": "partial_success",
+      "primary_key": "JSON-001",
+      "retry_count": 0,
+      "processed": false,
+      "success": false
+    },
+    {
+      "id": "sample.json:2",
+      "file_name": "samples/sample.json",
+      "line_number": 2,
+      "content": "{\"content\":\"JSON主键冲突\",\"error_type\":\"primary_key_conflict\",\"id\":\"REC-002\",\"primary_key\":\"JSON-002\"}",
+      "error_type": "primary_key_conflict",
+      "primary_key": "JSON-002",
+      "retry_count": 0,
+      "processed": false,
+      "success": false
+    },
+    {
+      "id": "sample.json:3",
+      "file_name": "samples/sample.json",
+      "line_number": 3,
+      "content": "{\"content\":\"JSON顺序依赖\",\"error_type\":\"order_dependency\",\"id\":\"REC-003\",\"primary_key\":\"JSON-003\"}",
+      "error_type": "order_dependency",
+      "primary_key": "JSON-003",
+      "retry_count": 0,
+      "processed": false,
+      "success": false
+    }
+  ],
+  "partial_success_entries": [
+    {
+      "id": "sample.json:1",
+      "file_name": "samples/sample.json",
+      "line_number": 1,
+      "content": "{\"content\":\"JSON格式半批成功记录\",\"error_type\":\"partial_success\",\"id\":\"REC-001\",\"primary_key\":\"JSON-001\"}",
+      "error_type": "partial_success",
+      "primary_key": "JSON-001",
+      "retry_count": 0,
+      "processed": false,
+      "success": false
+    }
+  ],
+  "primary_key_conflict_entries": [
+    {
+      "id": "sample.json:2",
+      "file_name": "samples/sample.json",
+      "line_number": 2,
+      "content": "{\"content\":\"JSON主键冲突\",\"error_type\":\"primary_key_conflict\",\"id\":\"REC-002\",\"primary_key\":\"JSON-002\"}",
+      "error_type": "primary_key_conflict",
+      "primary_key": "JSON-002",
+      "retry_count": 0,
+      "processed": false,
+      "success": false
+    }
+  ],
+  "order_dependency_entries": [
+    {
+      "id": "sample.json:3",
+      "file_name": "samples/sample.json",
+      "line_number": 3,
+      "content": "{\"content\":\"JSON顺序依赖\",\"error_type\":\"order_dependency\",\"id\":\"REC-003\",\"primary_key\":\"JSON-003\"}",
+      "error_type": "order_dependency",
+      "primary_key": "JSON-003",
+      "retry_count": 0,
+      "processed": false,
+      "success": false
+    }
+  ],
+  "replay_order": [
+    "sample.json:1",
+    "sample.json:2",
+    "sample.json:3"
+  ]
+}
