@@ -1,0 +1,22 @@
+{
+  "name": "crowd-package-revoke-checker",
+  "version": "1.0.0",
+  "description": "人群包发布记录撤销渠道核对 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "revoke-checker": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js --data-dir ./samples/normal && node src/cli.js --data-dir ./samples/bad-rows && node src/cli.js --data-dir ./samples/duplicate"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
