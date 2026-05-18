@@ -1,0 +1,22 @@
+{
+  "name": "swim-lesson-compensation-cli",
+  "version": "1.0.0",
+  "description": "亲子游泳馆泳课停课补偿 CLI",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "swim-comp": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "keywords": ["swim", "lesson", "compensation", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}

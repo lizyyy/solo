@@ -1,0 +1,62 @@
+=== 汇总信息 ===
+总记录数,17
+部分时段停课,6
+连报课程,8
+可复跑输出,12
+成功处理文件,4
+处理失败文件,0
+
+=== 部分时段停课记录 ===
+"childName","courseName","suspensionDate","suspensionType","notes","sourceFile","_recordIndex"
+"林小蛙","亲子游泳连报年卡","2024-06-01","partial","年卡用户部分时段停课待审核","chinese_columns.csv",0
+"李朵朵","亲子游泳进阶班","2024-05-12","partial","部分时段停课，仅周六上午取消","data_2024_05.csv",1
+"刘阳光","暑期连报48课时套餐","2024-05-20","partial","暑期连报套餐部分时段停课待确认","data_2024_05.csv",4
+"孙洋洋","水感培养基础班","2024-05-22","partial","临时通知部分时段停课","data_2024_05.csv",6
+"郑乐乐","亲子游泳启蒙+进阶连报","2024-05-30","partial","连报课程部分时段停课，备注需要复跑确认","data_2024_05.csv",9
+"韩小贝","连报半年卡72课时","2024-06-10","partial","半年卡连报用户，部分时段停课需复跑确认","data_2024_06.json",1
+
+=== 连报课程记录 ===
+"childName","courseName","suspensionDate","suspensionType","notes","sourceFile","_recordIndex"
+"林小蛙","亲子游泳连报年卡","2024-06-01","partial","年卡用户部分时段停课待审核","chinese_columns.csv",0
+"李朵朵","亲子游泳进阶班","2024-05-12","partial","部分时段停课，仅周六上午取消","data_2024_05.csv",1
+"王浩然","连报96课时VIP套餐","2024-05-15","full","大额连报课程，需主管审批","data_2024_05.csv",2
+"刘阳光","暑期连报48课时套餐","2024-05-20","partial","暑期连报套餐部分时段停课待确认","data_2024_05.csv",4
+"周小涵","年卡连报120课时VIP","2024-05-25","full","年卡VIP用户补偿方案待复跑","data_2024_05.csv",7
+"郑乐乐","亲子游泳启蒙+进阶连报","2024-05-30","partial","连报课程部分时段停课，备注需要复跑确认","data_2024_05.csv",9
+"钱小龙","儿童游泳提高班","2024-06-05","full","儿童节活动停课","data_2024_06.json",0
+"韩小贝","连报半年卡72课时","2024-06-10","partial","半年卡连报用户，部分时段停课需复跑确认","data_2024_06.json",1
+
+=== 可复跑输出记录 ===
+"childName","courseName","suspensionDate","suspensionType","notes","sourceFile","_recordIndex"
+"林小蛙","亲子游泳连报年卡","2024-06-01","partial","年卡用户部分时段停课待审核","chinese_columns.csv",0
+"","","","full","","corrupted_data.csv",0
+"","","","full","","corrupted_data.csv",1
+"李朵朵","亲子游泳进阶班","2024-05-12","partial","部分时段停课，仅周六上午取消","data_2024_05.csv",1
+"王浩然","连报96课时VIP套餐","2024-05-15","full","大额连报课程，需主管审批","data_2024_05.csv",2
+"刘阳光","暑期连报48课时套餐","2024-05-20","partial","暑期连报套餐部分时段停课待确认","data_2024_05.csv",4
+"赵小鱼","亲子戏水班","2024-05-18","full","会员有效期延长处理","data_2024_05.csv",5
+"孙洋洋","水感培养基础班","2024-05-22","partial","临时通知部分时段停课","data_2024_05.csv",6
+"周小涵","年卡连报120课时VIP","2024-05-25","full","年卡VIP用户补偿方案待复跑","data_2024_05.csv",7
+"郑乐乐","亲子游泳启蒙+进阶连报","2024-05-30","partial","连报课程部分时段停课，备注需要复跑确认","data_2024_05.csv",9
+"钱小龙","儿童游泳提高班","2024-06-05","full","儿童节活动停课","data_2024_06.json",0
+"韩小贝","连报半年卡72课时","2024-06-10","partial","半年卡连报用户，部分时段停课需复跑确认","data_2024_06.json",1
+
+=== 全部停课补偿记录 ===
+"childName","parentPhone","courseName","courseType","totalLessons","usedLessons","remainingLessons","suspensionDate","suspensionType","suspendedDuration","totalDuration","compensationType","compensationAmount","compensationLessons","status","compensationStatus","needsReview","notes","sourceFile"
+"林小蛙","13700137001","亲子游泳连报年卡","package",100,25,75,"2024-06-01","partial","40","60","makeup",0,2,"pending","review","true","年卡用户部分时段停课待审核","chinese_columns.csv"
+"何小泳","13700137002","婴幼儿水育课","regular",12,6,6,"2024-06-08","full","60","60","makeup",0,1,"completed","completed","false","已完成补课","chinese_columns.csv"
+"","","","regular",0,0,0,"","full","","","makeup",0,0,"pending","pending","false","","corrupted_data.csv"
+"","","","regular",0,0,0,"","full","","","makeup",0,0,"pending","pending","false","","corrupted_data.csv"
+"张小宝","13800138001","婴幼儿水育启蒙课","regular",12,5,7,"2024-05-10","full","60","60","makeup",0,2,"completed","completed","false","泳池设备维修停课","data_2024_05.csv"
+"李朵朵","13800138002","亲子游泳进阶班","regular",24,8,16,"2024-05-12","partial","30","60","makeup",0,1,"pending","pending","true","部分时段停课，仅周六上午取消","data_2024_05.csv"
+"王浩然","13800138003","连报96课时VIP套餐","package",96,20,76,"2024-05-15","full","60","60","refund",500,0,"pending","review","true","大额连报课程，需主管审批","data_2024_05.csv"
+"陈思琪","13800138004","幼儿游泳技能班","regular",12,3,9,"2024-05-08","full","60","60","makeup",0,1,"completed","completed","false","教练生病临时停课","data_2024_05.csv"
+"刘阳光","13800138005","暑期连报48课时套餐","package",48,12,36,"2024-05-20","partial","45","60","makeup",0,2,"pending","pending","true","暑期连报套餐部分时段停课待确认","data_2024_05.csv"
+"赵小鱼","13800138006","亲子戏水班","regular",8,2,6,"2024-05-18","full","60","60","extend",0,0,"pending","review","false","会员有效期延长处理","data_2024_05.csv"
+"孙洋洋","13800138007","水感培养基础班","regular",16,4,12,"2024-05-22","partial","20","60","makeup",0,1,"pending","pending","true","临时通知部分时段停课","data_2024_05.csv"
+"周小涵","13800138008","年卡连报120课时VIP","package",120,30,90,"2024-05-25","full","60","60","makeup",0,3,"pending","review","true","年卡VIP用户补偿方案待复跑","data_2024_05.csv"
+"吴小迪","13800138009","婴幼儿自救课程","regular",10,1,9,"2024-05-28","full","60","60","makeup",0,1,"completed","completed","false","已完成补课安排","data_2024_05.csv"
+"郑乐乐","13800138010","亲子游泳启蒙+进阶连报","package",60,15,45,"2024-05-30","partial","30","60","makeup",0,2,"pending","pending","true","连报课程部分时段停课，备注需要复跑确认","data_2024_05.csv"
+"钱小龙","13900139001","儿童游泳提高班","regular",20,6,14,"2024-06-05","full","60","60","makeup",0,2,"pending","pending","false","儿童节活动停课","data_2024_06.json"
+"韩小贝","13900139002","连报半年卡72课时","package",72,18,54,"2024-06-10","partial","30","60","makeup",0,1,"pending","review","true","半年卡连报用户，部分时段停课需复跑确认","data_2024_06.json"
+"杨小渔","13900139003","亲子游泳基础班","regular",16,4,12,"2024-06-15","full","60","60","makeup",0,1,"completed","completed","false","已安排补课","data_2024_06.json"
