@@ -1,0 +1,33 @@
+{
+  "total_issues": 2,
+  "critical_issues": [],
+  "combination_restrictions": [
+    {
+      "type": "combination_restriction",
+      "severity": "info",
+      "prescription_id": "RX-2024-005",
+      "message": "处方 RX-2024-005 (孙七) 要求单煎，不宜合煎"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "info",
+      "prescription_id": "RX-2024-004",
+      "message": "处方 RX-2024-005 (孙七) 要求单煎，不宜合煎"
+    }
+  ],
+  "validation_warnings": [],
+  "all_issues": [
+    {
+      "type": "combination_restriction",
+      "severity": "info",
+      "prescription_id": "RX-2024-005",
+      "message": "处方 RX-2024-005 (孙七) 要求单煎，不宜合煎"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "info",
+      "prescription_id": "RX-2024-004",
+      "message": "处方 RX-2024-005 (孙七) 要求单煎，不宜合煎"
+    }
+  ]
+}

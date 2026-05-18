@@ -1,0 +1,17 @@
+{
+  "max_prescriptions_per_pot": 3,
+  "incompatible_drugs": [
+    ["甘草", "甘遂"],
+    ["甘草", "大戟"],
+    ["甘草", "芫花"],
+    ["乌头", "半夏"],
+    ["乌头", "瓜蒌"],
+    ["乌头", "贝母"],
+    ["藜芦", "人参"],
+    ["藜芦", "丹参"],
+    ["藜芦", "玄参"]
+  ],
+  "urgent_priority": true,
+  "pot_capacity_ml": 5000,
+  "max_decoction_time_minutes": 60
+}

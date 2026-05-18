@@ -1,0 +1,151 @@
+{
+  "success": true,
+  "run_timestamp": "2026-05-19T03:42:50.704507",
+  "statistics": {
+    "total_prescriptions": 5,
+    "urgent_prescriptions": 1,
+    "total_pots_used": 3,
+    "average_prescriptions_per_pot": 1.67,
+    "issues_found": 2
+  },
+  "pot_assignments": [
+    {
+      "pot_id": "POT-001",
+      "scheduled_time": "2026-05-19T03:42:50.703947",
+      "estimated_duration_minutes": 60,
+      "notes": [],
+      "prescriptions": [
+        {
+          "id": "RX-2024-003",
+          "patient_name": "王五",
+          "drugs": [
+            "人参",
+            "白术",
+            "茯苓",
+            "甘草"
+          ],
+          "is_urgent": true,
+          "special_instruction": "急单，患者发热"
+        },
+        {
+          "id": "RX-2024-001",
+          "patient_name": "张三",
+          "drugs": [
+            "麻黄",
+            "桂枝",
+            "杏仁",
+            "甘草",
+            "生姜"
+          ],
+          "is_urgent": false,
+          "special_instruction": ""
+        }
+      ]
+    },
+    {
+      "pot_id": "POT-002",
+      "scheduled_time": "2026-05-19T03:42:50.703947",
+      "estimated_duration_minutes": 45,
+      "notes": [
+        "处方 RX-2024-005 (孙七) 要求单煎，不宜合煎"
+      ],
+      "prescriptions": [
+        {
+          "id": "RX-2024-005",
+          "patient_name": "孙七",
+          "drugs": [
+            "黄芪",
+            "党参",
+            "麦冬",
+            "五味子"
+          ],
+          "is_urgent": false,
+          "special_instruction": "单煎"
+        }
+      ]
+    },
+    {
+      "pot_id": "POT-003",
+      "scheduled_time": "2026-05-19T03:42:50.703947",
+      "estimated_duration_minutes": 45,
+      "notes": [],
+      "prescriptions": [
+        {
+          "id": "RX-2024-004",
+          "patient_name": "赵六",
+          "drugs": [
+            "当归",
+            "白芍",
+            "川芎",
+            "熟地黄"
+          ],
+          "is_urgent": false,
+          "special_instruction": ""
+        },
+        {
+          "id": "RX-2024-002",
+          "patient_name": "李四",
+          "drugs": [
+            "金银花",
+            "连翘",
+            "薄荷",
+            "桔梗"
+          ],
+          "is_urgent": false,
+          "special_instruction": ""
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "type": "combination_restriction",
+      "severity": "info",
+      "prescription_id": "RX-2024-005",
+      "message": "处方 RX-2024-005 (孙七) 要求单煎，不宜合煎"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "info",
+      "prescription_id": "RX-2024-004",
+      "message": "处方 RX-2024-005 (孙七) 要求单煎，不宜合煎"
+    }
+  ],
+  "urgent_summary": {
+    "count": 1,
+    "ids": [
+      "RX-2024-003"
+    ]
+  },
+  "rerun_checkpoint": {
+    "timestamp": "2026-05-19T03:42:50.704002",
+    "processed_prescriptions": [
+      {
+        "id": "RX-2024-003",
+        "pot_id": "POT-001",
+        "scheduled_time": "2026-05-19T03:42:50.703947"
+      },
+      {
+        "id": "RX-2024-001",
+        "pot_id": "POT-001",
+        "scheduled_time": "2026-05-19T03:42:50.703947"
+      },
+      {
+        "id": "RX-2024-005",
+        "pot_id": "POT-002",
+        "scheduled_time": "2026-05-19T03:42:50.703947"
+      },
+      {
+        "id": "RX-2024-004",
+        "pot_id": "POT-003",
+        "scheduled_time": "2026-05-19T03:42:50.703947"
+      },
+      {
+        "id": "RX-2024-002",
+        "pot_id": "POT-003",
+        "scheduled_time": "2026-05-19T03:42:50.703947"
+      }
+    ],
+    "pending_prescriptions": []
+  }
+}

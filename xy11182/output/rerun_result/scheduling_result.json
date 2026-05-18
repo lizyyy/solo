@@ -1,0 +1,85 @@
+{
+  "success": true,
+  "run_timestamp": "2026-05-19T03:43:21.911573",
+  "statistics": {
+    "total_prescriptions": 3,
+    "urgent_prescriptions": 1,
+    "total_pots_used": 1,
+    "average_prescriptions_per_pot": 3.0,
+    "issues_found": 0
+  },
+  "pot_assignments": [
+    {
+      "pot_id": "POT-001",
+      "scheduled_time": "2026-05-19T03:43:21.911253",
+      "estimated_duration_minutes": 60,
+      "notes": [],
+      "prescriptions": [
+        {
+          "id": "RX-RERUN-002",
+          "patient_name": "重跑患者B",
+          "drugs": [
+            "苍术",
+            "厚朴",
+            "陈皮",
+            "甘草"
+          ],
+          "is_urgent": true,
+          "special_instruction": "急单，腹痛"
+        },
+        {
+          "id": "RX-RERUN-001",
+          "patient_name": "重跑患者A",
+          "drugs": [
+            "陈皮",
+            "半夏",
+            "茯苓",
+            "甘草"
+          ],
+          "is_urgent": false,
+          "special_instruction": ""
+        },
+        {
+          "id": "RX-RERUN-003",
+          "patient_name": "重跑患者C",
+          "drugs": [
+            "柴胡",
+            "黄芩",
+            "半夏",
+            "党参"
+          ],
+          "is_urgent": false,
+          "special_instruction": ""
+        }
+      ]
+    }
+  ],
+  "issues": [],
+  "urgent_summary": {
+    "count": 1,
+    "ids": [
+      "RX-RERUN-002"
+    ]
+  },
+  "rerun_checkpoint": {
+    "timestamp": "2026-05-19T03:43:21.911293",
+    "processed_prescriptions": [
+      {
+        "id": "RX-RERUN-002",
+        "pot_id": "POT-001",
+        "scheduled_time": "2026-05-19T03:43:21.911253"
+      },
+      {
+        "id": "RX-RERUN-001",
+        "pot_id": "POT-001",
+        "scheduled_time": "2026-05-19T03:43:21.911253"
+      },
+      {
+        "id": "RX-RERUN-003",
+        "pot_id": "POT-001",
+        "scheduled_time": "2026-05-19T03:43:21.911253"
+      }
+    ],
+    "pending_prescriptions": []
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "success": true,
+  "run_timestamp": "2026-05-19T03:43:06.930469",
+  "statistics": {
+    "total_prescriptions": 4,
+    "urgent_prescriptions": 1,
+    "total_pots_used": 4,
+    "average_prescriptions_per_pot": 1.0,
+    "issues_found": 15
+  },
+  "pot_assignments": [
+    {
+      "pot_id": "POT-001",
+      "scheduled_time": "2026-05-19T03:43:06.930251",
+      "estimated_duration_minutes": 60,
+      "notes": [
+        "合煎禁忌: 发现不相容药品组合 乌头, 半夏",
+        "合煎禁忌: 发现不相容药品组合 乌头, 贝母"
+      ],
+      "prescriptions": [
+        {
+          "id": "RX-DIRTY-002",
+          "patient_name": "异常患者2",
+          "drugs": [
+            "乌头",
+            "半夏",
+            "贝母"
+          ],
+          "is_urgent": true,
+          "special_instruction": ""
+        }
+      ]
+    },
+    {
+      "pot_id": "POT-002",
+      "scheduled_time": "2026-05-19T03:43:06.930251",
+      "estimated_duration_minutes": 45,
+      "notes": [
+        "合煎禁忌: 发现不相容药品组合 甘草, 甘遂"
+      ],
+      "prescriptions": [
+        {
+          "id": "RX-DIRTY-001",
+          "patient_name": "异常患者1",
+          "drugs": [
+            "甘草",
+            "甘遂",
+            "其他药"
+          ],
+          "is_urgent": false,
+          "special_instruction": ""
+        }
+      ]
+    },
+    {
+      "pot_id": "POT-003",
+      "scheduled_time": "2026-05-19T03:43:06.930251",
+      "estimated_duration_minutes": 45,
+      "notes": [
+        "合煎禁忌: 发现不相容药品组合 藜芦, 人参",
+        "合煎禁忌: 发现不相容药品组合 藜芦, 丹参"
+      ],
+      "prescriptions": [
+        {
+          "id": "RX-DIRTY-005",
+          "patient_name": "异常患者5",
+          "drugs": [
+            "藜芦",
+            "人参",
+            "丹参"
+          ],
+          "is_urgent": false,
+          "special_instruction": ""
+        }
+      ]
+    },
+    {
+      "pot_id": "POT-004",
+      "scheduled_time": "2026-05-19T03:43:06.930251",
+      "estimated_duration_minutes": 45,
+      "notes": [
+        "处方 RX-DIRTY-003 (异常患者3) 包含先煎药品，需特殊处理"
+      ],
+      "prescriptions": [
+        {
+          "id": "RX-DIRTY-003",
+          "patient_name": "异常患者3",
+          "drugs": [],
+          "is_urgent": false,
+          "special_instruction": "先煎"
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "type": "format_error",
+      "severity": "error",
+      "message": "处方文件格式错误 prescription_004_bad.json: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "type": "validation_error",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-003",
+      "message": "处方 RX-DIRTY-003 (prescription_003.json) 未包含药品列表"
+    },
+    {
+      "type": "validation_error",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-002",
+      "message": "处方 RX-DIRTY-002 (prescription_002.json) 数量无效: -5"
+    },
+    {
+      "type": "validation_error",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-002",
+      "message": "处方 RX-DIRTY-002 (prescription_002.json) 煎药次数异常: 5"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-002",
+      "message": "合煎禁忌: 发现不相容药品组合 乌头, 半夏"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-002",
+      "message": "合煎禁忌: 发现不相容药品组合 乌头, 贝母"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-001",
+      "message": "合煎禁忌: 发现不相容药品组合 甘草, 甘遂"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-001",
+      "message": "合煎禁忌: 发现不相容药品组合 乌头, 半夏"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-001",
+      "message": "合煎禁忌: 发现不相容药品组合 乌头, 贝母"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-005",
+      "message": "合煎禁忌: 发现不相容药品组合 甘草, 甘遂"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-005",
+      "message": "合煎禁忌: 发现不相容药品组合 藜芦, 人参"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-005",
+      "message": "合煎禁忌: 发现不相容药品组合 藜芦, 丹参"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-003",
+      "message": "合煎禁忌: 发现不相容药品组合 藜芦, 人参"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "warning",
+      "prescription_id": "RX-DIRTY-003",
+      "message": "合煎禁忌: 发现不相容药品组合 藜芦, 丹参"
+    },
+    {
+      "type": "combination_restriction",
+      "severity": "info",
+      "prescription_id": "RX-DIRTY-003",
+      "message": "处方 RX-DIRTY-003 (异常患者3) 包含先煎药品，需特殊处理"
+    }
+  ],
+  "urgent_summary": {
+    "count": 1,
+    "ids": [
+      "RX-DIRTY-002"
+    ]
+  },
+  "rerun_checkpoint": {
+    "timestamp": "2026-05-19T03:43:06.930291",
+    "processed_prescriptions": [
+      {
+        "id": "RX-DIRTY-002",
+        "pot_id": "POT-001",
+        "scheduled_time": "2026-05-19T03:43:06.930251"
+      },
+      {
+        "id": "RX-DIRTY-001",
+        "pot_id": "POT-002",
+        "scheduled_time": "2026-05-19T03:43:06.930251"
+      },
+      {
+        "id": "RX-DIRTY-005",
+        "pot_id": "POT-003",
+        "scheduled_time": "2026-05-19T03:43:06.930251"
+      },
+      {
+        "id": "RX-DIRTY-003",
+        "pot_id": "POT-004",
+        "scheduled_time": "2026-05-19T03:43:06.930251"
+      }
+    ],
+    "pending_prescriptions": []
+  }
+}
