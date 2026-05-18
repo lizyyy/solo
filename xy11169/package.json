@@ -1,0 +1,28 @@
+{
+  "name": "used-phone-inspection-report",
+  "version": "1.0.0",
+  "description": "二手手机回收店手机检测报告数据清洗CLI工具",
+  "main": "src/cli.js",
+  "bin": {
+    "phone-report": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": ["二手手机", "检测报告", "数据清洗"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.56.0"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "iconv-lite": "^0.6.3",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  }
+}
