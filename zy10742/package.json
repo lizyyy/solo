@@ -1,0 +1,27 @@
+{
+  "name": "cs-quality-recheck-cli",
+  "version": "1.0.0",
+  "description": "客服质检导出复议改分核对CLI工具",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "cs-recheck": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.js",
+    "test:watch": "node --test --watch test/*.js",
+    "lint": "node --check src/**/*.js test/**/*.js"
+  },
+  "keywords": ["customer-service", "quality-check", "recheck", "audit"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "diff": "^5.1.0",
+    "fast-csv": "^4.3.6"
+  }
+}
