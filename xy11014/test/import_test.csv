@@ -1,0 +1,6 @@
+compensation_no,order_no,customer_name,customer_phone,tent_model,return_date,check_person,main_component_damage,main_damage_level,main_damage_description,main_compensation_amount,accessory_missing,missing_accessory_list,accessory_compensation_amount,total_compensation_amount,compensation_status,payment_method,payment_time,remarks
+COMP20240507001,ORD20240501001,赵六,13600136001,牧高笛冷山2,2024-05-07,张管理员,none,,,,yes,地钉x2,30,30,pending,,,正常导入记录
+,ORD20240502001,钱七,13500135001,凯乐石星空3,2024-05-07,李管理员,none,,,,yes,防风绳x1,20,20,pending,,,坏行：赔付单号为空
+COMP20240507003,ORD20240503001,孙八,13400134001,北面VE25,2024-05-07,王管理员,yes,,,,yes,地钉x3,45,45,pending,,,坏行：主件破损但缺少破损信息
+COMP20240507004,ORD20240501001,周九,13300133001,牧高笛冷山2,2024-05-07,赵管理员,none,,,,yes,防风绳x4,80,85,pending,,,坏行：总金额不一致
+COMP20240507005,ORD20240502001,吴十,13200132001,凯乐石星空3,2024-05-07,钱管理员,yes,轻微,帐杆轻微弯曲,100,none,,,100,pending,,,正常导入记录

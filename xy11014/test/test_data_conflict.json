@@ -1,0 +1,22 @@
+{
+  "compensationData": {
+    "compensation_no": "COMP20240504001",
+    "order_no": "ORD20240501001",
+    "customer_name": "张三",
+    "customer_phone": "13800138001",
+    "tent_model": "牧高笛冷山2",
+    "return_date": "2024-05-04",
+    "check_person": "赵管理员",
+    "main_component_damage": "none",
+    "main_damage_level": null,
+    "main_damage_description": null,
+    "main_compensation_amount": 0,
+    "accessory_missing": "yes",
+    "missing_accessory_list": "地钉x3,防风绳x2",
+    "accessory_compensation_amount": 80.00,
+    "total_compensation_amount": 80.00,
+    "compensation_status": "paid",
+    "remarks": "这是一个重复的赔付单号，应该被拒绝"
+  },
+  "items": []
+}

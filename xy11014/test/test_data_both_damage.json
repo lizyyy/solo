@@ -1,0 +1,47 @@
+{
+  "compensationData": {
+    "compensation_no": "COMP20240506002",
+    "order_no": "ORD20240502001",
+    "customer_name": "李四",
+    "customer_phone": "13900139001",
+    "tent_model": "凯乐石星空3",
+    "return_date": "2024-05-06",
+    "check_person": "王管理员",
+    "main_component_damage": "yes",
+    "main_damage_level": "严重",
+    "main_damage_description": "帐篷外帐撕裂约30cm，无法修复",
+    "main_compensation_amount": 500.00,
+    "accessory_missing": "yes",
+    "missing_accessory_list": "地钉x5, 帐杆x1",
+    "accessory_compensation_amount": 200.00,
+    "total_compensation_amount": 700.00,
+    "compensation_status": "pending",
+    "remarks": "同时存在主件破损和配件缺失"
+  },
+  "items": [
+    {
+      "item_type": "main",
+      "item_name": "帐篷外帐",
+      "quantity": 1,
+      "unit_price": 500.00,
+      "subtotal": 500.00,
+      "reason": "严重撕裂"
+    },
+    {
+      "item_type": "accessory",
+      "item_name": "地钉",
+      "quantity": 5,
+      "unit_price": 15.00,
+      "subtotal": 75.00,
+      "reason": "丢失"
+    },
+    {
+      "item_type": "accessory",
+      "item_name": "帐杆",
+      "quantity": 1,
+      "unit_price": 125.00,
+      "subtotal": 125.00,
+      "reason": "丢失"
+    }
+  ]
+}

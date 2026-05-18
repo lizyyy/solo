@@ -1,0 +1,39 @@
+{
+  "compensationData": {
+    "compensation_no": "COMP20240506001",
+    "order_no": "ORD20240503001",
+    "customer_name": "王五",
+    "customer_phone": "13700137001",
+    "tent_model": "北面VE25",
+    "return_date": "2024-05-06",
+    "check_person": "李管理员",
+    "main_component_damage": "none",
+    "main_damage_level": null,
+    "main_damage_description": null,
+    "main_compensation_amount": 0,
+    "accessory_missing": "yes",
+    "missing_accessory_list": "地钉x4, 防风绳x3",
+    "accessory_compensation_amount": 120.00,
+    "total_compensation_amount": 120.00,
+    "compensation_status": "pending",
+    "remarks": "客户承认丢失配件"
+  },
+  "items": [
+    {
+      "item_type": "accessory",
+      "item_name": "地钉",
+      "quantity": 4,
+      "unit_price": 15.00,
+      "subtotal": 60.00,
+      "reason": "丢失"
+    },
+    {
+      "item_type": "accessory",
+      "item_name": "防风绳",
+      "quantity": 3,
+      "unit_price": 20.00,
+      "subtotal": 60.00,
+      "reason": "丢失"
+    }
+  ]
+}
