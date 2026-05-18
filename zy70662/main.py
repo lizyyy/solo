@@ -80,12 +80,18 @@ def read_time_records(participant_id: int, db: Session = Depends(get_db)):
 
 @app.post("/penalties/", response_model=schemas.Penalty, tags=["处罚管理"])
 def create_penalty(penalty: schemas.PenaltyCreate, db: Session = Depends(get_db)):
-    return PenaltyService.add_penalty(db, penalty)
+    result = PenaltyService.add_penalty(db, penalty)
+    db.commit()
+    db.refresh(result)
+    return result
 
 
 @app.post("/penalties/{penalty_id}/apply", response_model=schemas.Penalty, tags=["处罚管理"])
 def apply_penalty(penalty_id: int, db: Session = Depends(get_db)):
-    return PenaltyService.apply_penalty(db, penalty_id)
+    result = PenaltyService.apply_penalty(db, penalty_id)
+    db.commit()
+    db.refresh(result)
+    return result
 
 
 @app.get("/penalties/", response_model=List[schemas.Penalty], tags=["处罚管理"])
@@ -104,7 +110,10 @@ def read_penalties(
 
 @app.post("/appeals/", response_model=schemas.Appeal, tags=["申诉管理"])
 def create_appeal(appeal: schemas.AppealCreate, db: Session = Depends(get_db)):
-    return AppealService.create_appeal(db, appeal)
+    result = AppealService.create_appeal(db, appeal)
+    db.commit()
+    db.refresh(result)
+    return result
 
 
 @app.get("/appeals/", response_model=List[schemas.Appeal], tags=["申诉管理"])
@@ -127,12 +136,17 @@ def review_appeal(
     review_data: schemas.AppealReview,
     db: Session = Depends(get_db)
 ):
-    return AppealService.review_appeal(db, appeal_id, review_data)
+    result = AppealService.review_appeal(db, appeal_id, review_data)
+    db.commit()
+    db.refresh(result)
+    return result
 
 
 @app.post("/appeals/{appeal_id}/process", tags=["申诉管理"])
 def process_appeal(appeal_id: int, db: Session = Depends(get_db)):
-    return AppealService.process_appeal_decision(db, appeal_id)
+    result = AppealService.process_appeal_decision(db, appeal_id)
+    db.commit()
+    return result
 
 
 @app.post("/scores/recalculate", response_model=List[schemas.Score], tags=["成绩管理"])
