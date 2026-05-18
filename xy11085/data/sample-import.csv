@@ -1,0 +1,5 @@
+customer_id,customer_name,store_id,store_name,product_type,paper_type,paper_size,width,height,quantity,color_mode,double_sided,locked_price,status,responsible_person,lock_date,valid_from,valid_to,review_conclusion
+C001,东方印务有限公司,S001,中心门店,宣传单,铜版纸,A4,210,297,5000,四色,1,1200.00,approved,张三,2024-01-15,2024-01-15,2024-06-30,价格合理
+C002,南方广告公司,S002,东门店,画册,哑粉纸,A3,297,420,1000,四色,1,3500.00,pending,李四,2024-01-16,2024-01-16,2024-12-31,
+C003,西城设计工作室,S001,中心门店,名片,铜版纸,A4,210,297,2000,单色,0,300.00,reviewing,王五,2024-01-17,2024-01-17,2024-03-31,
+C004,北城印刷厂,S003,西门店,海报,白卡纸,A2,420,594,500,四色,0,,approved,张三,2024-01-18,2024-01-18,2024-04-30,尺寸变更但沿用旧锁价
