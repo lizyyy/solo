@@ -1,0 +1,22 @@
+{
+  "name": "camera-rental-settlement",
+  "version": "1.0.0",
+  "description": "摄影器材租赁店相机租金结算CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "rental-settle": "./bin/rental-settle.js"
+  },
+  "scripts": {
+    "start": "node bin/rental-settle.js",
+    "test": "node examples/run-example.js"
+  },
+  "keywords": ["camera", "rental", "settlement", "摄影器材", "租金结算"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2"
+  }
+}
