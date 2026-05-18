@@ -1,0 +1,6 @@
+﻿issue_type,severity,message,file_path,sheet_name,row_number,details
+bad_row,low,"数据行错误: 缺少日期, 缺少主播",sample_schedule.csv,,7,"{""errors"": [""缺少日期"", ""缺少主播""], ""original"": ""|10:00|12:00||食品旗舰店|场控D|脚本6""}"
+person_conflict,high,主播 [小美] 在 2025-05-20 存在时间冲突,sample_schedule.csv,,2,"{""person"": ""小美"", ""date"": ""2025-05-20"", ""conflict_rows"": [{""account"": ""美妆旗舰店"", ""time"": ""19:00-21:00"", ""row"": 2}, {""account"": ""服饰旗舰店"", ""time"": ""20:00-22:00"", ""row"": 3}]}"
+person_conflict,high,主播 [小美] 在 2025-05-20 存在时间冲突,sample_schedule.csv,,3,"{""person"": ""小美"", ""date"": ""2025-05-20"", ""conflict_rows"": [{""account"": ""美妆旗舰店"", ""time"": ""19:00-21:00"", ""row"": 2}, {""account"": ""服饰旗舰店"", ""time"": ""20:00-22:00"", ""row"": 3}]}"
+script_missing,medium,账号 [服饰旗舰店] 缺少: 商品脚本,sample_schedule.csv,,3,"{""anchor"": ""小美"", ""account"": ""服饰旗舰店"", ""date"": ""2025-05-20"", ""time"": ""20:00-22:00"", ""missing"": [""商品脚本""]}"
+script_missing,medium,账号 [数码专营店] 缺少: 场控,sample_schedule.csv,,4,"{""anchor"": ""大强"", ""account"": ""数码专营店"", ""date"": ""2025-05-20"", ""time"": ""18:00-20:00"", ""missing"": [""场控""]}"

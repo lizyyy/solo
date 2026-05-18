@@ -1,6 +1,7 @@
 import json
 import csv
 import os
+import hashlib
 from typing import List, Dict, Any
 from datetime import datetime
 
@@ -11,6 +12,15 @@ class ReportGenerator:
     def __init__(self):
         pass
 
+    def _generate_content_hash(self, result: CheckResult) -> str:
+        content = json.dumps({
+            "summary": self._generate_summary(result),
+            "issues": self._issues_to_list(result.issues, ensure_stable=True),
+            "account_stats": result.account_stats,
+            "person_stats": result.person_stats
+        }, sort_keys=True, ensure_ascii=False)
+        return hashlib.sha256(content.encode("utf-8")).hexdigest()[:16]
+
     def generate_json_report(
         self,
         result: CheckResult,
@@ -18,14 +28,16 @@ class ReportGenerator:
         ensure_stable: bool = True
     ):
         report = {
-            "generated_at": datetime.now().isoformat(),
             "summary": self._generate_summary(result),
             "issues": self._issues_to_list(result.issues, ensure_stable),
             "account_stats": result.account_stats,
             "person_stats": result.person_stats
         }
         if ensure_stable:
+            report["content_hash"] = self._generate_content_hash(result)
             report = self._sort_dict_recursive(report)
+        else:
+            report["generated_at"] = datetime.now().isoformat()
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=2)
 
