@@ -1,0 +1,6 @@
+﻿customer_name,repair_order_id,backup_device_id,deposit_amount,borrow_date,expected_return_date,actual_return_date,damage_check_result,damage_description,damage_charge_amount,notes
+张三,WX2024001,BJ001,500,2024-05-01,2024-05-10,2024-05-09,正常,,0,正常归还
+李四,WX2024002,BJ002,800,2024-05-05,2024-05-12,,,,未归还
+王五,WX2024003,BJ003,600,2024-05-08,2024-05-15,2024-05-20,有损坏,屏幕划痕,100,逾期10天
+赵六,WX2024004,BJ001,500,2024-05-10,2024-05-17,,,,重复借用
+钱七,WX2024005,BJ005,,2024-05-12,2024-05-19,2024-05-18,,,,无效行测试

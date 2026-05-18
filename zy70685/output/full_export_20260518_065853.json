@@ -1,0 +1,139 @@
+{
+  "export_time": "2026-05-18T06:58:53.822252",
+  "validation_summary": {
+    "total_records": 5,
+    "valid_records": 2,
+    "invalid_records": 3,
+    "duplicate_ids": [],
+    "unique_devices": 2,
+    "unique_repair_orders": 2,
+    "total_deposit": 1100.0
+  },
+  "records": [
+    {
+      "summary": {
+        "customer_name": "张三",
+        "repair_order_id": "WX2024001",
+        "backup_device_id": "BJ001",
+        "deposit_amount": 500.0,
+        "borrow_date": "2024-05-01",
+        "expected_return_date": "2024-05-10",
+        "actual_return_date": "2024-05-09",
+        "is_returned": true,
+        "is_overdue": false,
+        "has_damage": false,
+        "damage_charge": 0.0,
+        "final_deposit_refund": 500.0,
+        "device_locked": false,
+        "deposit_frozen": false
+      },
+      "source": {
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70685/sample_backup_data.csv",
+        "line_number": 2,
+        "raw_content": "张三,WX2024001,BJ001,500,2024-05-01,2024-05-10,2024-05-09,正常,,0,正常归还"
+      },
+      "rule_results": [
+        {
+          "rule_type": "device_lock",
+          "status": "not_triggered",
+          "message": "备机 BJ001 正常可用",
+          "details": {
+            "device_id": "BJ001"
+          },
+          "severity": "info"
+        },
+        {
+          "rule_type": "deposit_freeze",
+          "status": "not_triggered",
+          "message": "维修单 WX2024001 押金可正常退还",
+          "details": {
+            "repair_order_id": "WX2024001",
+            "deposit_amount": 500.0
+          },
+          "severity": "info"
+        },
+        {
+          "rule_type": "deposit_refund",
+          "status": "triggered",
+          "message": "押金可退还 ¥500.00 (押金 ¥500.00)",
+          "details": {
+            "deposit_amount": 500.0,
+            "refund_amount": 500.0,
+            "repair_order_id": "WX2024001"
+          },
+          "severity": "success"
+        }
+      ]
+    },
+    {
+      "summary": {
+        "customer_name": "王五",
+        "repair_order_id": "WX2024003",
+        "backup_device_id": "BJ003",
+        "deposit_amount": 600.0,
+        "borrow_date": "2024-05-08",
+        "expected_return_date": "2024-05-15",
+        "actual_return_date": "2024-05-20",
+        "is_returned": true,
+        "is_overdue": true,
+        "has_damage": true,
+        "damage_charge": 100.0,
+        "final_deposit_refund": 500.0,
+        "device_locked": false,
+        "deposit_frozen": true
+      },
+      "source": {
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70685/sample_backup_data.csv",
+        "line_number": 4,
+        "raw_content": "王五,WX2024003,BJ003,600,2024-05-08,2024-05-15,2024-05-20,有损坏,屏幕划痕,100,逾期10天"
+      },
+      "rule_results": [
+        {
+          "rule_type": "device_lock",
+          "status": "not_triggered",
+          "message": "备机 BJ003 正常可用",
+          "details": {
+            "device_id": "BJ003"
+          },
+          "severity": "info"
+        },
+        {
+          "rule_type": "deposit_freeze",
+          "status": "triggered",
+          "message": "维修单 WX2024003 押金 ¥600.00 已冻结",
+          "details": {
+            "repair_order_id": "WX2024003",
+            "deposit_amount": 600.0,
+            "freeze_reason": "有损坏待处理"
+          },
+          "severity": "warning"
+        },
+        {
+          "rule_type": "overdue_reminder",
+          "status": "triggered",
+          "message": "逾期 5 天: 预计 2024-05-15，实际 2024-05-20",
+          "details": {
+            "expected_return_date": "2024-05-15",
+            "actual_return_date": "2024-05-20",
+            "check_date": "2024-05-20",
+            "days_overdue": 5,
+            "repair_order_id": "WX2024003"
+          },
+          "severity": "error"
+        },
+        {
+          "rule_type": "damage_charge",
+          "status": "triggered",
+          "message": "损坏扣款 ¥100.00: 屏幕划痕",
+          "details": {
+            "damage_description": "屏幕划痕",
+            "damage_charge_amount": 100.0,
+            "repair_order_id": "WX2024003",
+            "backup_device_id": "BJ003"
+          },
+          "severity": "error"
+        }
+      ]
+    }
+  ]
+}
