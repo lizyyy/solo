@@ -1,0 +1,25 @@
+{
+  "name": "cycling-club-trace-cleaner",
+  "version": "1.0.0",
+  "description": "骑行俱乐部骑行轨迹整理CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "trace-cleaner": "src/cli.js"
+  },
+  "scripts": {
+    "test": "jest --verbose",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": ["cycling", "gps", "trace", "cleaner"],
+  "author": "骑行俱乐部技术组",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "tmp": "^0.2.3"
+  }
+}

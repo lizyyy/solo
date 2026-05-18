@@ -1,0 +1,253 @@
+{
+  "timestamp": "2026-05-18T18:35:40.218Z",
+  "stats": {
+    "totalFiles": 7,
+    "processedFiles": 6,
+    "failedFiles": 1,
+    "totalRecords": 49,
+    "validRecords": 36,
+    "invalidRecords": 11,
+    "duplicateRecords": 2,
+    "powerLossEvents": 2,
+    "reverseRouteEvents": 1
+  },
+  "errors": [
+    {
+      "type": "DUPLICATE_RECORD",
+      "message": "重复记录行 3",
+      "record": {
+        "timestamp": "2024-05-19T10:00:00Z",
+        "latitude": "39.9200",
+        "longitude": "116.4600",
+        "altitude": "48.0",
+        "speed": "18.5",
+        "rider_id": "R005",
+        "ride_id": "RD20240519005"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/duplicate_rows.csv"
+    },
+    {
+      "type": "DUPLICATE_RECORD",
+      "message": "重复记录行 4",
+      "record": {
+        "timestamp": "2024-05-19T10:00:10Z",
+        "latitude": "39.9203",
+        "longitude": "116.4605",
+        "altitude": "49.0",
+        "speed": "19.0",
+        "rider_id": "R005",
+        "ride_id": "RD20240519005"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/duplicate_rows.csv"
+    },
+    {
+      "type": "EMPTY_FILE",
+      "message": "空文件: /Users/mac/pro/solo/workspaces/xy11129/data/samples/empty_file.csv",
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/empty_file.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 2",
+      "errors": [
+        "字段 'latitude' 为空或缺失"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T11:00:10Z",
+        "latitude": "",
+        "longitude": "116.4705",
+        "altitude": "53.0",
+        "speed": "21.0",
+        "rider_id": "R006",
+        "ride_id": "RD20240519006"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/invalid_records.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 2",
+      "errors": [
+        "字段 'longitude' 为空或缺失"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T11:00:20Z",
+        "latitude": "39.9306",
+        "longitude": "",
+        "altitude": "54.0",
+        "speed": "22.0",
+        "rider_id": "R006",
+        "ride_id": "RD20240519006"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/invalid_records.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 2",
+      "errors": [
+        "速度值无效（应为0-150 km/h）"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T11:00:30Z",
+        "latitude": "39.9309",
+        "longitude": "116.4715",
+        "altitude": "55.0",
+        "speed": "-5.0",
+        "rider_id": "R006",
+        "ride_id": "RD20240519006"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/invalid_records.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 2",
+      "errors": [
+        "速度值无效（应为0-150 km/h）"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T11:00:40Z",
+        "latitude": "39.9312",
+        "longitude": "116.4720",
+        "altitude": "56.0",
+        "speed": "200.0",
+        "rider_id": "R006",
+        "ride_id": "RD20240519006"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/invalid_records.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 2",
+      "errors": [
+        "纬度值无效"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T11:00:50Z",
+        "latitude": "95.0",
+        "longitude": "116.4725",
+        "altitude": "57.0",
+        "speed": "18.0",
+        "rider_id": "R006",
+        "ride_id": "RD20240519006"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/invalid_records.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 2",
+      "errors": [
+        "经度值无效"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T11:01:00Z",
+        "latitude": "39.9318",
+        "longitude": "200.0",
+        "altitude": "58.0",
+        "speed": "19.0",
+        "rider_id": "R006",
+        "ride_id": "RD20240519006"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/invalid_records.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 2",
+      "errors": [
+        "字段 'rider_id' 为空或缺失"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T11:01:10Z",
+        "latitude": "39.9321",
+        "longitude": "116.4740",
+        "altitude": "59.0",
+        "speed": "20.0",
+        "rider_id": "",
+        "ride_id": "RD20240519006"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/invalid_records.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 2",
+      "errors": [
+        "字段 'ride_id' 为空或缺失"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T11:01:20Z",
+        "latitude": "39.9324",
+        "longitude": "116.4745",
+        "altitude": "60.0",
+        "speed": "21.0",
+        "rider_id": "R006",
+        "ride_id": ""
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/invalid_records.csv"
+    },
+    {
+      "type": "MISSING_COLUMNS",
+      "message": "缺少必需列: ride_id",
+      "missingFields": [
+        "ride_id"
+      ],
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/missing_columns.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 1",
+      "errors": [
+        "字段 'ride_id' 为空或缺失"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T09:00:00Z",
+        "latitude": "39.9500",
+        "longitude": "116.4800",
+        "altitude": "55.0",
+        "speed": "20.0",
+        "rider_id": "R004"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/missing_columns.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 1",
+      "errors": [
+        "字段 'ride_id' 为空或缺失"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T09:00:10Z",
+        "latitude": "39.9503",
+        "longitude": "116.4805",
+        "altitude": "56.0",
+        "speed": "21.0",
+        "rider_id": "R004"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/missing_columns.csv"
+    },
+    {
+      "type": "INVALID_RECORD",
+      "message": "无效记录行 1",
+      "errors": [
+        "字段 'ride_id' 为空或缺失"
+      ],
+      "record": {
+        "timestamp": "2024-05-19T09:00:20Z",
+        "latitude": "39.9506",
+        "longitude": "116.4810",
+        "altitude": "57.0",
+        "speed": "22.0",
+        "rider_id": "R004"
+      },
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/missing_columns.csv"
+    },
+    {
+      "type": "POWER_LOSS_DETECTED",
+      "message": "检测到 2 次设备断电事件",
+      "count": 2,
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/power_loss_ride.csv"
+    },
+    {
+      "type": "REVERSE_ROUTE_DETECTED",
+      "message": "检测到 1 次路线反向异常",
+      "count": 1,
+      "file": "/Users/mac/pro/solo/workspaces/xy11129/data/samples/reverse_route.csv"
+    }
+  ]
+}
