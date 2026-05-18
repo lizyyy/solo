@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "daycare-auth-cli"
+version = "0.1.0"
+authors = [
+  { name="Daycare Admin", email="admin@daycare.com" }
+]
+description = "儿童托管班接送授权名单处理工具"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "pandas>=2.0.0",
+  "pydantic>=2.0.0",
+  "python-dateutil>=2.8.0",
+  "click>=8.0.0",
+]
+
+[project.scripts]
+daycare-auth = "src.main:cli"

@@ -1,0 +1,33 @@
+
+validation_rules:
+  id_expiry_days_warning: 30
+  id_expiry_days_error: 0
+  require_child_id: true
+  require_parent_id: true
+  require_relationship: true
+
+duplicate_handling:
+  match_columns:
+    - parent_name
+    - parent_id_number
+  conflict_resolution: latest_timestamp
+
+output_settings:
+  separate_expired: true
+  separate_duplicates: true
+  timestamp_format: "%Y%m%d_%H%M%S"
+  encoding: "utf-8-sig"
+
+columns_mapping:
+  child_name: "儿童姓名"
+  child_id: "儿童证件号"
+  child_class: "班级"
+  parent_name: "家长姓名"
+  parent_id_type: "家长证件类型"
+  parent_id_number: "家长证件号"
+  parent_phone: "联系电话"
+  relationship: "与儿童关系"
+  auth_start_date: "授权开始日期"
+  auth_end_date: "授权结束日期"
+  id_expiry_date: "证件有效期"
+  timestamp: "录入时间"
