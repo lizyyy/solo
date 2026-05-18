@@ -1,0 +1,22 @@
+{
+  "name": "camping-equipment-inventory",
+  "version": "1.0.0",
+  "description": "露营装备店租赁装备清点CLI工具",
+  "main": "src/cli.js",
+  "bin": {
+    "camping-inventory": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "preview": "node src/cli.js preview --input data/sample.csv",
+    "run": "node src/cli.js run --input data/sample.csv --output output/",
+    "report": "node src/cli.js report --output output/"
+  },
+  "keywords": ["camping", "equipment", "inventory", "rental"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parse": "^5.5.0",
+    "csv-stringify": "^6.4.0"
+  }
+}
