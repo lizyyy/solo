@@ -1,0 +1,19 @@
+{
+  "name": "laundry-label-reprint-cli",
+  "version": "1.0.0",
+  "description": "连锁洗衣店洗衣标签补打 CLI 工具",
+  "main": "index.js",
+  "bin": {
+    "laundry-reprint": "./index.js"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": ["laundry", "label", "reprint", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0"
+  }
+}
