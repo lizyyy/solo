@@ -1,0 +1,20 @@
+{
+  "name": "kids-gym-video-renamer",
+  "version": "1.0.0",
+  "description": "少儿体能馆课程录播重命名 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "gym-rename": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js --input samples/normal_input --output samples/output"
+  },
+  "keywords": ["kids-gym", "video", "rename", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  }
+}
