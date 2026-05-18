@@ -1,0 +1,7 @@
+instrument_id,instrument_type,check_date,damage_type,damage_location,damage_level,checker,photo_path,notes
+INS-401,小提琴,2026-05-25,自然磨损,指板,轻微,张老师,/photos/INS-401-001.jpg,正常使用
+这一行格式错误，字段不匹配,错误数据
+INS-402,吉他,2026-05-25,人为磕碰,琴身,中等,李老师,/photos/INS-402-001.jpg,学生练习时磕碰
+INS-403,古筝,2026-05-25,无损伤,-,无,王老师,-,状态良好
+这是另一行错误数据，缺少逗号分隔
+INS-404,架子鼓,2026-05-25,自然磨损,鼓皮,轻微,赵老师,/photos/INS-404-001.jpg,正常击打磨损

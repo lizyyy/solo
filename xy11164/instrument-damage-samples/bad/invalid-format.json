@@ -1,0 +1,25 @@
+[
+  {
+    "instrument_id": "INS-301",
+    "instrument_type": "小提琴",
+    "check_date": "2026-05-20",
+    "damage_type": "自然磨损",
+    "damage_location": "琴头",
+    "damage_level": "轻微",
+    "checker": "张老师",
+    "photo_path": "/photos/INS-301-001.jpg",
+    "notes": "正常磨损"
+  },
+  {
+    "instrument_id": "INS-302",
+    "instrument_type": "钢琴",
+    "check_date": "2026-05-20",
+    "damage_type": "人为磕碰",
+    "damage_location": "琴腿",
+    "damage_level": "中等",
+    "checker": "李老师",
+    "photo_path": "/photos/INS-302-001.jpg",
+    "notes": "搬运时碰撞"
+  }
+  这里缺少逗号，格式错误
+]
