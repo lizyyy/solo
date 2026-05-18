@@ -1,0 +1,24 @@
+{
+  "name": "housekeeping-evaluation-api",
+  "version": "1.0.0",
+  "description": "家政派单点保姆试工评价 API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node tests/run-tests.js",
+    "import-sample": "node scripts/import-sample.js"
+  },
+  "keywords": ["housekeeping", "evaluation", "api"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "csv-writer": "^1.6.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
