@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "school-uniform-sorter"
+version = "1.0.0"
+authors = [
+  { name="校服订购点运营组", email="ops@school-uniform.com" }
+]
+description = "小学校服订购点校服批次分拣CLI工具"
+requires-python = ">=3.8"
+dependencies = [
+  "click>=8.0",
+  "pandas>=1.3",
+  "openpyxl>=3.0"
+]
+
+[project.scripts]
+"校服分拣" = "uniform_sorter.cli:main"
+uniform-sorter = "uniform_sorter.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
