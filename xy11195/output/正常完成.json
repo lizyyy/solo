@@ -1,0 +1,105 @@
+{
+  "meta": {
+    "category": "normal",
+    "count": 6,
+    "generatedAt": "2026-05-18T21:21:14.262Z",
+    "rules": {
+      "name": "正常完成",
+      "description": "正常完成且无特殊情况的订单",
+      "outputFile": "正常完成.json",
+      "notes": "常规完成订单，可正常归档或通知客户取件"
+    }
+  },
+  "data": [
+    {
+      "orderNo": "LC202405001",
+      "customerName": "张先生",
+      "phone": "138****1234",
+      "itemName": "LV手提包",
+      "serviceType": "深度清洁+保养",
+      "receiveDate": "2024-05-01",
+      "expectDate": "2024-05-05",
+      "status": "已完成",
+      "priority": "普通",
+      "price": 280,
+      "notes": "客户对护理效果满意，已取件",
+      "processedAt": "2026-05-18T21:21:14.254Z",
+      "category": "normal"
+    },
+    {
+      "orderNo": "LC202405002",
+      "customerName": "李女士",
+      "phone": "139****5678",
+      "itemName": "Gucci钱包",
+      "serviceType": "日常清洁",
+      "receiveDate": "2024-05-02",
+      "expectDate": "2024-05-04",
+      "status": "已完成",
+      "priority": "普通",
+      "price": 120,
+      "notes": "正常完成",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "normal"
+    },
+    {
+      "orderNo": "LC202405003",
+      "customerName": "王先生",
+      "phone": "137****9012",
+      "itemName": "男士皮带",
+      "serviceType": "打蜡抛光",
+      "receiveDate": "2024-05-03",
+      "expectDate": "2024-05-06",
+      "status": "已完成",
+      "priority": "普通",
+      "price": 80,
+      "notes": "",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "normal"
+    },
+    {
+      "orderNo": "LC202405010",
+      "customerName": "郑女士",
+      "phone": "130****8901",
+      "itemName": "Dior戴妃包",
+      "serviceType": "五金翻新+保养",
+      "receiveDate": "2024-05-04",
+      "expectDate": "2024-05-08",
+      "status": "已完成",
+      "priority": "普通",
+      "price": 380,
+      "notes": "五金件翻新效果好，客户满意",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "normal"
+    },
+    {
+      "orderNo": "LC202405011",
+      "customerName": "冯先生",
+      "phone": "158****2345",
+      "itemName": "皮沙发局部",
+      "serviceType": "污渍清洁",
+      "receiveDate": "2024-05-03",
+      "expectDate": "2024-05-06",
+      "status": "已完成",
+      "priority": "普通",
+      "price": 200,
+      "notes": "上门服务，处理效果良好",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "normal"
+    },
+    {
+      "orderNo": "LC202405012",
+      "customerName": "何女士",
+      "phone": "159****6789",
+      "itemName": "汽车座椅",
+      "serviceType": "深度清洁+护理",
+      "receiveDate": "2024-05-05",
+      "expectDate": "2024-05-10",
+      "status": "已完成",
+      "priority": "普通",
+      "price": 450,
+      "notes": "",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "normal"
+    }
+  ]
+}

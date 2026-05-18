@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "category": "rework",
+    "count": 2,
+    "generatedAt": "2026-05-18T21:21:14.263Z",
+    "rules": {
+      "name": "返修待处理",
+      "description": "护理效果不达标，需要重新处理的订单",
+      "keywords": [
+        "返修",
+        "返工",
+        "重新处理",
+        "效果不满意",
+        "不达标",
+        "不合格",
+        "重做"
+      ],
+      "outputFile": "返修待处理.json",
+      "notes": "此类订单需要优先安排技师重新处理，处理前需与客户确认返修方案"
+    }
+  },
+  "data": [
+    {
+      "orderNo": "LC202405004",
+      "customerName": "陈女士",
+      "phone": "136****3456",
+      "itemName": "Coach单肩包",
+      "serviceType": "深度清洁+保养",
+      "receiveDate": "2024-05-03",
+      "expectDate": "2024-05-07",
+      "status": "返修-边角磨损修复不达标",
+      "priority": "普通",
+      "price": 260,
+      "notes": "需要重新处理包角，客户对修复效果不满意",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "rework"
+    },
+    {
+      "orderNo": "LC202405005",
+      "customerName": "刘先生",
+      "phone": "135****7890",
+      "itemName": "皮鞋",
+      "serviceType": "补色修复",
+      "receiveDate": "2024-05-04",
+      "expectDate": "2024-05-08",
+      "status": "返修-颜色不均",
+      "priority": "加急",
+      "price": 180,
+      "notes": "颜色修补后发现色差明显，需要重新调色",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "rework"
+    }
+  ]
+}

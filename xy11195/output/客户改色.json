@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "category": "colorChange",
+    "count": 2,
+    "generatedAt": "2026-05-18T21:21:14.263Z",
+    "rules": {
+      "name": "客户改色",
+      "description": "客户主动要求改色服务的订单",
+      "keywords": [
+        "客户改色",
+        "改色",
+        "换色",
+        "颜色更换"
+      ],
+      "outputFile": "客户改色.json",
+      "notes": "改色订单需要单独工艺流程，需记录改色前需先打样确认"
+    }
+  },
+  "data": [
+    {
+      "orderNo": "LC202405006",
+      "customerName": "赵女士",
+      "phone": "134****2345",
+      "itemName": "Prada斜挎包",
+      "serviceType": "客户改色-黑色换酒红色",
+      "receiveDate": "2024-05-02",
+      "expectDate": "2024-05-10",
+      "status": "改色进行中",
+      "priority": "普通",
+      "price": 580,
+      "notes": "客户主动要求整体改色，从黑色改为酒红色，已完成打底",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "colorChange"
+    },
+    {
+      "orderNo": "LC202405007",
+      "customerName": "孙先生",
+      "phone": "133****6789",
+      "itemName": "Hermes皮带",
+      "serviceType": "客户改色-棕色换黑色",
+      "receiveDate": "2024-05-05",
+      "expectDate": "2024-05-12",
+      "status": "待改色",
+      "priority": "普通",
+      "price": 320,
+      "notes": "客户看了样例后决定改色，需要单独处理",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "colorChange"
+    }
+  ]
+}

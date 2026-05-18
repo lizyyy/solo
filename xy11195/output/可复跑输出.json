@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "category": "reRunnable",
+    "count": 2,
+    "generatedAt": "2026-05-18T21:21:14.263Z",
+    "rules": {
+      "name": "可复跑输出",
+      "description": "因外部原因暂停，可后续继续处理的订单",
+      "conditions": [
+        {
+          "status": "待确认",
+          "reason": "需客户确认后继续"
+        },
+        {
+          "status": "待材料",
+          "reason": "材料缺货，待材料到货"
+        },
+        {
+          "status": "待客户回复",
+          "reason": "等待客户反馈"
+        },
+        {
+          "priority": "加急",
+          "reason": "加急单可优先复跑"
+        }
+      ],
+      "outputFile": "可复跑输出.json",
+      "notes": "此类订单需要定期检查状态变化，条件满足后自动或人工触发复跑"
+    }
+  },
+  "data": [
+    {
+      "orderNo": "LC202405008",
+      "customerName": "周女士",
+      "phone": "132****0123",
+      "itemName": "Chanel小羊皮手包",
+      "serviceType": "深度清洁+修复",
+      "receiveDate": "2024-05-01",
+      "expectDate": "2024-05-05",
+      "status": "待确认",
+      "priority": "加急",
+      "price": 680,
+      "notes": "清洁后发现隐藏裂纹，需要客户确认是否继续修复",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "reRunnable"
+    },
+    {
+      "orderNo": "LC202405009",
+      "customerName": "吴先生",
+      "phone": "131****4567",
+      "itemName": "旅行箱提手",
+      "serviceType": "磨损修复",
+      "receiveDate": "2024-05-06",
+      "expectDate": "2024-05-09",
+      "status": "待材料",
+      "priority": "普通",
+      "price": 150,
+      "notes": "专用补皮材料缺货，待材料到货后继续处理",
+      "processedAt": "2026-05-18T21:21:14.261Z",
+      "category": "reRunnable"
+    }
+  ]
+}
