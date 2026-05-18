@@ -1,0 +1,56 @@
+{
+  "offline_devices": [
+    {
+      "checksum": "f6a1b2c3d4e5",
+      "current_version": "v2.0.0",
+      "device_id": "LOCK-GZ-2024-0202",
+      "device_type": "bluetooth_lock_lite",
+      "error_message": null,
+      "is_offline": true,
+      "last_online": "2024-04-01T12:00:00Z",
+      "status": "pending",
+      "target_version": "v2.3.0",
+      "upgrade_mode": "bluetooth",
+      "upgrade_path": null,
+      "version_abnormal": false
+    },
+    {
+      "checksum": "a1b2c3d4e5f6",
+      "current_version": "v2.2.0",
+      "device_id": "LOCK-GZ-2024-0203",
+      "device_type": "bluetooth_lock_lite",
+      "error_message": "无效的时间格式: invalid_date_format",
+      "is_offline": true,
+      "last_online": "invalid_date_format",
+      "status": "pending",
+      "target_version": "v2.3.0",
+      "upgrade_mode": "bluetooth",
+      "upgrade_path": null,
+      "version_abnormal": false
+    }
+  ],
+  "processing_time": "2026-05-19T02:51:34.093817",
+  "ready_devices": [
+    {
+      "checksum": "e5f6a1b2c3d4",
+      "current_version": "v2.1.0",
+      "device_id": "LOCK-GZ-2024-0201",
+      "device_type": "bluetooth_lock_lite",
+      "error_message": null,
+      "is_offline": false,
+      "last_online": "2026-05-18T15:00:00Z",
+      "status": "pending",
+      "target_version": "v2.3.0",
+      "upgrade_mode": "bluetooth",
+      "upgrade_path": "firmware/bluetooth_lock_lite/v2.3.0/LOCK-GZ-2024-0201.bin",
+      "version_abnormal": false
+    }
+  ],
+  "summary": {
+    "offline_devices": 2,
+    "ready_for_upgrade": 1,
+    "total_devices": 3,
+    "version_abnormal_devices": 0
+  },
+  "version_abnormal_devices": []
+}

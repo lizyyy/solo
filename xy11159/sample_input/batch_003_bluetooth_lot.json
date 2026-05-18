@@ -1,0 +1,32 @@
+[
+  {
+    "device_id": "LOCK-GZ-2024-0201",
+    "device_type": "bluetooth_lock_lite",
+    "current_version": "v2.1.0",
+    "target_version": "v2.3.0",
+    "status": "pending",
+    "upgrade_mode": "bluetooth",
+    "last_online": "2026-05-18T15:00:00Z",
+    "checksum": "e5f6a1b2c3d4"
+  },
+  {
+    "device_id": "LOCK-GZ-2024-0202",
+    "device_type": "bluetooth_lock_lite",
+    "current_version": "v2.0.0",
+    "target_version": "v2.3.0",
+    "status": "pending",
+    "upgrade_mode": "bluetooth",
+    "last_online": "2024-04-01T12:00:00Z",
+    "checksum": "f6a1b2c3d4e5"
+  },
+  {
+    "device_id": "LOCK-GZ-2024-0203",
+    "device_type": "bluetooth_lock_lite",
+    "current_version": "v2.2.0",
+    "target_version": "v2.3.0",
+    "status": "pending",
+    "upgrade_mode": "bluetooth",
+    "last_online": "invalid_date_format",
+    "checksum": "a1b2c3d4e5f6"
+  }
+]
