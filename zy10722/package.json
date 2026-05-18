@@ -1,0 +1,29 @@
+{
+  "name": "permission-audit-scanner",
+  "version": "1.0.0",
+  "description": "权限审计日志临权到期巡检 CLI - 检测过期权限仍在访问的用户",
+  "main": "index.js",
+  "bin": {
+    "perm-scan": "./bin/perm-scan.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "test:watch": "node --test --watch test/*.test.js",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "permission",
+    "audit",
+    "security",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}
