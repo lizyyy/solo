@@ -1,0 +1,20 @@
+[project]
+name = "school-bus-audit-cli"
+version = "1.0.0"
+description = "校车运营队校车站点稽核 CLI 工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "pandas>=1.5.0",
+    "openpyxl>=3.1.0",
+]
+
+[project.scripts]
+school-bus-audit = "school_bus_audit.cli:main"
+
+[tool.setuptools]
+packages = ["school_bus_audit"]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
