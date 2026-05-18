@@ -1,0 +1,18 @@
+{
+  "name": "问诊处方撤回对账规则",
+  "version": "1.0",
+  "description": "用于核对处方撤回是否通知到位的业务规则",
+  "fields": {
+    "prescriptionId": "处方号",
+    "patientName": "患者姓名",
+    "doctorName": "开具医生",
+    "dispenseStatus": "配药状态",
+    "pickupStatus": "取药状态",
+    "modifiedFlag": "改方标记",
+    "notificationStatus": "通知状态"
+  },
+  "pharmacyDispensedValues": ["已配药", "配药完成", "已配"],
+  "patientReceivedValues": ["已取药", "取药完成", "已取"],
+  "doctorModifiedValues": ["已改方", "改方", "已修改"],
+  "notificationSuccessValues": ["已通知", "通知成功", "通知送达"]
+}
