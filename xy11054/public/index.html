@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>糕点中央厨房留样管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .warning-card {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .warning-card h3 {
+            color: #856404;
+        }
+        
+        .warning-card .value {
+            color: #dc3545;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 1000px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .panel h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .sample-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .sample-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .sample-item.duplicate {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        
+        .sample-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .sample-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-created {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-in_storage {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inspected {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .status-expired {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-destroyed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .sample-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .detail-item {
+            display: flex;
+        }
+        
+        .detail-label {
+            color: #999;
+            margin-right: 5px;
+        }
+        
+        .timeline {
+            margin-top: 20px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            padding-bottom: 20px;
+            border-left: 2px solid #667eea;
+        }
+        
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        .timeline-status {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-meta {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .duplicate-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .duplicate-warning h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .duplicate-warning ul {
+            margin-left: 20px;
+            color: #856404;
+            font-size: 13px;
+        }
+        
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: #5568d3;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍰 糕点中央厨房留样管理系统</h1>
+            <p>实时监控留样状态流转，自动检测留样盒编号重复，确保追溯链条完整</p>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+        </div>
+        
+        <div class="main-content">
+            <div class="panel">
+                <div class="section-header">
+                    <h2>📋 留样记录列表</h2>
+                    <button class="refresh-btn" onclick="loadData()">🔄 刷新</button>
+                </div>
+                <div id="samplesList">
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>🔍 留样详情与状态流转</h2>
+                <div id="sampleDetail">
+                    <p style="color: #999; text-align: center; padding: 40px;">点击左侧留样记录查看详情</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSamples = [];
+        
+        const statusLabels = {
+            'created': '已创建',
+            'in_storage': '在库',
+            'inspected': '已检验',
+            'expired': '已过期',
+            'destroyed': '已销毁'
+        };
+        
+        async function loadData() {
+            try {
+                const [samplesRes, statsRes] = await Promise.all([
+                    fetch('/api/samples'),
+                    fetch('/api/samples/statistics')
+                ]);
+                
+                const samplesData = await samplesRes.json();
+                const statsData = await statsRes.json();
+                
+                currentSamples = samplesData.data;
+                
+                renderStats(statsData.data);
+                renderSamples(samplesData.data, statsData.data);
+                
+            } catch (error) {
+                console.error('加载数据失败:', error);
+            }
+        }
+        
+        function renderStats(stats) {
+            const html = `
+                <div class="stat-card">
+                    <h3>总留样数</h3>
+                    <div class="value">${stats.total}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>已创建</h3>
+                    <div class="value">${stats.byStatus.created || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>在库</h3>
+                    <div class="value">${stats.byStatus.in_storage || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>已检验</h3>
+                    <div class="value">${stats.byStatus.inspected || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>已过期</h3>
+                    <div class="value">${stats.byStatus.expired || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>已销毁</h3>
+                    <div class="value">${stats.byStatus.destroyed || 0}</div>
+                </div>
+                <div class="stat-card warning-card">
+                    <h3>⚠️ 重复盒号</h3>
+                    <div class="value">${stats.duplicateBoxCodes.length}</div>
+                </div>
+                <div class="stat-card warning-card">
+                    <h3>⚠️ 一致性问题</h3>
+                    <div class="value">${stats.consistencyIssues.length}</div>
+                </div>
+            `;
+            document.getElementById('statsGrid').innerHTML = html;
+        }
+        
+        function renderSamples(samples, stats) {
+            const duplicateBoxCodes = stats.duplicateBoxCodes;
+            
+            let warningHtml = '';
+            if (stats.duplicateIssues.length > 0 || stats.consistencyIssues.length > 0) {
+                warningHtml = '<div class="duplicate-warning"><h4>⚠️ 系统检测到以下问题</h4><ul>';
+                
+                if (stats.duplicateIssues.length > 0) {
+                    warningHtml += `<li>留样盒编号重复: ${stats.duplicateIssues.map(d => d.sampleBoxCode).join(', ')}</li>`;
+                }
+                
+                if (stats.consistencyIssues.length > 0) {
+                    warningHtml += `<li>数据一致性问题: ${stats.consistencyIssues.length} 条记录存在问题</li>`;
+                }
+                
+                warningHtml += '</ul></div>';
+            }
+            
+            let samplesHtml = samples.map(sample => {
+                const isDuplicate = duplicateBoxCodes.includes(sample.sampleBoxCode);
+                return `
+                    <div class="sample-item ${isDuplicate ? 'duplicate' : ''}" onclick="showDetail('${sample.id}')">
+                        <div class="sample-header">
+                            <span class="sample-name">${sample.pastryName} (${sample.sampleBoxCode})</span>
+                            <span class="status-badge status-${sample.status}">${statusLabels[sample.status]}</span>
+                        </div>
+                        <div class="sample-details">
+                            <div class="detail-item"><span class="detail-label">批次:</span>${sample.productionBatch}</div>
+                            <div class="detail-item"><span class="detail-label">生产线:</span>${sample.productionLine}</div>
+                            <div class="detail-item"><span class="detail-label">取样人:</span>${sample.sampler}</div>
+                            <div class="detail-item"><span class="detail-label">留样量:</span>${sample.sampleQuantity}个</div>
+                            ${isDuplicate ? '<div class="detail-item" style="color: #dc3545; grid-column: 1/-1;"><span class="detail-label">⚠️</span>留样盒编号重复，可能导致追溯失败</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('samplesList').innerHTML = warningHtml + samplesHtml;
+        }
+        
+        async function showDetail(id) {
+            try {
+                const res = await fetch(`/api/samples/${id}`);
+                const data = await res.json();
+                const sample = data.data;
+                
+                const timelineHtml = sample.statusHistory.map((item, index) => `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-status">${statusLabels[item.status] || item.status}</div>
+                            <div class="timeline-meta">
+                                操作者: ${item.operator} | 来源: ${item.source}<br>
+                                时间: ${new Date(item.timestamp).toLocaleString('zh-CN')}<br>
+                                ${item.remark ? '备注: ' + item.remark : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                let issuesHtml = '';
+                if (sample.consistencyIssues && sample.consistencyIssues.length > 0) {
+                    issuesHtml = `
+                        <div class="duplicate-warning" style="margin-top: 20px;">
+                            <h4>⚠️ 数据一致性问题</h4>
+                            <ul>
+                                ${sample.consistencyIssues.map(issue => `<li>${issue}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                let allowedActionsHtml = '';
+                if (sample.allowedActions && sample.allowedActions.length > 0) {
+                    allowedActionsHtml = `
+                        <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px;">
+                            <h4 style="color: #004085; margin-bottom: 10px;">✅ 允许的下一步操作</h4>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                ${sample.allowedActions.map(action => `
+                                    <span class="status-badge" style="background: #cce5ff; color: #004085;">
+                                        ${action.action} → ${statusLabels[action.status]}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                const html = `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #333; margin-bottom: 15px;">${sample.pastryName}</h3>
+                        <div class="sample-details" style="grid-template-columns: 1fr;">
+                            <div class="detail-item"><span class="detail-label">留样盒编号:</span>${sample.sampleBoxCode}</div>
+                            <div class="detail-item"><span class="detail-label">糕点类型:</span>${sample.pastryType}</div>
+                            <div class="detail-item"><span class="detail-label">生产批次:</span>${sample.productionBatch}</div>
+                            <div class="detail-item"><span class="detail-label">生产线:</span>${sample.productionLine}</div>
+                            <div class="detail-item"><span class="detail-label">生产时间:</span>${new Date(sample.productionTime).toLocaleString('zh-CN')}</div>
+                            <div class="detail-item"><span class="detail-label">生产数量:</span>${sample.productionQuantity}个</div>
+                            <div class="detail-item"><span class="detail-label">取样人:</span>${sample.sampler}</div>
+                            <div class="detail-item"><span class="detail-label">留样数量:</span>${sample.sampleQuantity}个</div>
+                            <div class="detail-item"><span class="detail-label">存放位置:</span>${sample.storageLocation}</div>
+                            <div class="detail-item"><span class="detail-label">存储温度:</span>${sample.storageTemperature}°C</div>
+                            <div class="detail-item"><span class="detail-label">留样期限:</span>${sample.retentionPeriod}小时</div>
+                            <div class="detail-item"><span class="detail-label">当前状态:</span><span class="status-badge status-${sample.status}">${statusLabels[sample.status]}</span></div>
+                            ${sample.inspectionResult ? `<div class="detail-item"><span class="detail-label">检验结果:</span>${sample.inspectionResult}</div>` : ''}
+                            ${sample.inspector ? `<div class="detail-item"><span class="detail-label">检验员:</span>${sample.inspector}</div>` : ''}
+                            ${sample.destroyer ? `<div class="detail-item"><span class="detail-label">销毁人:</span>${sample.destroyer}</div>` : ''}
+                        </div>
+                    </div>
+                    
+                    ${issuesHtml}
+                    ${allowedActionsHtml}
+                    
+                    <div class="timeline">
+                        <h4 style="color: #333; margin-bottom: 15px;">📊 状态流转历史</h4>
+                        ${timelineHtml}
+                    </div>
+                `;
+                
+                document.getElementById('sampleDetail').innerHTML = html;
+                
+            } catch (error) {
+                console.error('加载详情失败:', error);
+            }
+        }
+        
+        loadData();
+    </script>
+</body>
+</html>
