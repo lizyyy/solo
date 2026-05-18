@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const quoteController_1 = require("../controllers/quoteController");
+const router = (0, express_1.Router)();
+router.get('/', quoteController_1.quoteController.getAllQuotes);
+router.get('/:id', quoteController_1.quoteController.getQuoteById);
+router.get('/number/:number', quoteController_1.quoteController.getQuoteByNumber);
+router.post('/', quoteController_1.quoteController.createQuote);
+router.post('/:id/submit', quoteController_1.quoteController.submitForApproval);
+router.post('/:id/accept', quoteController_1.quoteController.customerAcceptQuote);
+router.post('/:id/add-hidden-fault', quoteController_1.quoteController.addHiddenFault);
+router.post('/:id/review-supplement/:recordId', quoteController_1.quoteController.reviewSupplement);
+router.post('/:id/complete', quoteController_1.quoteController.completeQuote);
+router.get('/:id/change-records', quoteController_1.quoteController.getChangeRecords);
+exports.default = router;
