@@ -1,0 +1,28 @@
+{
+  "name": "trip-photo-reschedule-api",
+  "version": "1.0.0",
+  "description": "旅拍客服组旅拍路线改期 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest --verbose",
+    "init-db": "node scripts/initDB.js",
+    "seed-data": "node scripts/seedData.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
+    "supertest": "^6.3.3"
+  },
+  "keywords": ["trip-photo", "reschedule", "api"],
+  "author": "",
+  "license": "MIT"
+}
