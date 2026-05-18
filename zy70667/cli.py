@@ -15,9 +15,9 @@ def parse_args():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例用法:
-  # 单次处理
-  python3 cli.py process --hotel "希尔顿酒店" --linen "床单" --inbound 100 --damage 5 --rewash 3
-  python3 cli.py process --hotel "万豪酒店" -l "毛巾" -i 200 -d 0 -r 10
+  # 单次处理（入库100，出库90，破损5，返洗3 → 短少2）
+  python3 cli.py process --hotel "希尔顿酒店" --linen "床单" --inbound 100 --outbound 90 --damage 5 --rewash 3
+  python3 cli.py process --hotel "万豪酒店" -l "毛巾" -i 200 -o 180 -d 8 -r 10
 
   # 批量处理（JSON文件）
   python3 cli.py batch --file records.json
@@ -38,6 +38,7 @@ def parse_args():
     process_parser.add_argument("--hotel", required=True, help="酒店名称")
     process_parser.add_argument("-l", "--linen", required=True, help="布草类型")
     process_parser.add_argument("-i", "--inbound", type=int, required=True, help="入库数量")
+    process_parser.add_argument("-o", "--outbound", type=int, required=True, help="实际出库数量")
     process_parser.add_argument("-d", "--damage", type=int, default=0, help="破损数量")
     process_parser.add_argument("-r", "--rewash", type=int, default=0, help="返洗数量")
     process_parser.add_argument("--damage-reason", default="正常损耗", help="破损原因")
@@ -58,7 +59,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def load_records_from_file(filepath: str) -> List[HotelRecord]:
+def load_records_from_file(filepath: str) -> List[tuple]:
     with open(filepath, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -83,7 +84,8 @@ def load_records_from_file(filepath: str) -> List[HotelRecord]:
             damage_records=damage_records,
             rewash_records=rewash_records,
         )
-        records.append(record)
+        outbound_quantity = item.get("outbound", item.get("outbound_quantity", 0))
+        records.append((record, outbound_quantity))
 
     return records
 
@@ -114,7 +116,7 @@ def main():
                 rewash_records=rewash_records,
             )
 
-            result, errors = processor.process(record)
+            result, errors = processor.process(record, args.outbound)
             storage.save_history(processor.history)
 
             print(reporter.generate_human_readable([result], errors))

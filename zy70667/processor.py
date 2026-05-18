@@ -14,7 +14,7 @@ class LinenProcessor:
         self.history: List[ProcessingResult] = []
         self.errors: List[ValidationError] = []
 
-    def validate_input(self, record: HotelRecord) -> List[ValidationError]:
+    def validate_input(self, record: HotelRecord, outbound_quantity: int) -> List[ValidationError]:
         errors = []
 
         if not record.hotel_name or not record.hotel_name.strip():
@@ -30,6 +30,9 @@ class LinenProcessor:
             errors.append(
                 ValidationError("inbound_quantity", "入库数量不能为0", severity="warning")
             )
+
+        if outbound_quantity < 0:
+            errors.append(ValidationError("outbound_quantity", "出库数量不能为负数"))
 
         total_damage = sum(d.quantity for d in record.damage_records)
         total_rewash = sum(r.quantity for r in record.rewash_records)
@@ -87,8 +90,8 @@ class LinenProcessor:
         else:
             return round(shortage_rate, 2), ShortageLevel.SEVERE
 
-    def process(self, record: HotelRecord) -> Tuple[ProcessingResult, List[ValidationError]]:
-        self.errors = self.validate_input(record)
+    def process(self, record: HotelRecord, outbound_quantity: int) -> Tuple[ProcessingResult, List[ValidationError]]:
+        self.errors = self.validate_input(record, outbound_quantity)
 
         has_errors = any(e.severity == "error" for e in self.errors)
         if has_errors:
@@ -97,8 +100,8 @@ class LinenProcessor:
         total_damage = sum(d.quantity for d in record.damage_records)
         total_rewash = sum(r.quantity for r in record.rewash_records)
 
-        outbound_quantity = record.inbound_quantity - total_damage - total_rewash
-        shortage = max(0, record.inbound_quantity - (outbound_quantity + total_damage + total_rewash))
+        expected_outbound = record.inbound_quantity - total_damage - total_rewash
+        shortage = max(0, expected_outbound - outbound_quantity)
 
         shortage_rate, shortage_level = self.calculate_shortage_level(shortage, record.inbound_quantity)
 
@@ -117,13 +120,13 @@ class LinenProcessor:
         self.history.append(result)
         return result, self.errors
 
-    def batch_process(self, records: List[HotelRecord]) -> Tuple[List[ProcessingResult], List[ValidationError]]:
+    def batch_process(self, records_with_outbound: List[tuple]) -> Tuple[List[ProcessingResult], List[ValidationError]]:
         results = []
         all_errors = []
 
-        for record in records:
+        for record, outbound_quantity in records_with_outbound:
             try:
-                result, errors = self.process(record)
+                result, errors = self.process(record, outbound_quantity)
                 results.append(result)
                 all_errors.extend(errors)
             except ValueError as e:
