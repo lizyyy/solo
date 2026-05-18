@@ -1,0 +1,7 @@
+﻿类型,错误类型,消息,比赛ID,详细信息
+错误,duplicate_game_id,重复的比赛ID: G001,G001,"{""type"": ""duplicate_game_id"", ""message"": ""重复的比赛ID: G001"", ""game_id"": ""G001""}"
+错误,empty_game_id,比赛ID不能为空,,"{""type"": ""empty_game_id"", ""message"": ""比赛ID不能为空"", ""game_id"": null}"
+错误,same_team,主队和客队不能为同一球队: 阳光社区,G004,"{""type"": ""same_team"", ""message"": ""主队和客队不能为同一球队: 阳光社区"", ""game_id"": ""G004""}"
+错误,invalid_round,轮次必须为正整数: 0,G007,"{""type"": ""invalid_round"", ""message"": ""轮次必须为正整数: 0"", ""game_id"": ""G007""}"
+警告,abnormal_high_score,主队得分异常偏高: 250,G007,"{""type"": ""abnormal_high_score"", ""message"": ""主队得分异常偏高: 250"", ""game_id"": ""G007"", ""score"": 250}"
+警告,uneven_game_count,各球队参赛场次不一致,,"{""type"": ""uneven_game_count"", ""message"": ""各球队参赛场次不一致"", ""game_id"": null, ""details"": {""3"": [""阳光社区""], ""1"": [""幸福社区"", ""重复ID社区"", ""和谐社区"", ""友爱社区"", ""高分社区""], ""2"": [""测试社区""]}}"
