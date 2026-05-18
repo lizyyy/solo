@@ -1,0 +1,20 @@
+{
+  "name": "refund-risk-review-cli",
+  "version": "1.0.0",
+  "description": "退款风控记录异常退款复核包 CLI",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "refund-review": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test:normal": "node src/cli.js ./samples/normal.csv",
+    "test:bad": "node src/cli.js ./samples/bad-rows.csv",
+    "test:duplicate": "node src/cli.js ./samples/duplicate-run.csv"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "chalk": "^5.3.0"
+  }
+}
