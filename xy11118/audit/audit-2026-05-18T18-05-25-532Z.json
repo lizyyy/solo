@@ -1,0 +1,340 @@
+{
+  "auditId": "audit-2026-05-18T18-05-25-532Z",
+  "generatedAt": "2026-05-18T18:05:25.546Z",
+  "entries": [
+    {
+      "timestamp": "2026-05-18T18:05:25.537Z",
+      "action": "process_start",
+      "details": {
+        "configPath": "园区食堂餐补拆账默认规则",
+        "inputPath": "/Users/mac/pro/solo/workspaces/xy11118/data/sample-input.csv",
+        "outputDir": "/Users/mac/pro/solo/workspaces/xy11118/output",
+        "nodeVersion": "v24.15.0"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN001",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN002",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN003",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN004",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN005",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN006",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN007",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN008",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN009",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN010",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN011",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN012",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "special_case_detected",
+      "details": {
+        "recordId": "TXN013",
+        "caseType": "cross_month_refund",
+        "description": "跨月退款: 交易月份2024-03，原月份2024-02"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.543Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN013",
+        "originalType": "unclassified",
+        "newType": "cross_month_refund",
+        "reason": "跨月退款: 交易月份2024-03，原月份2024-02"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "special_case_detected",
+      "details": {
+        "recordId": "TXN014",
+        "caseType": "resigned_employee",
+        "description": "离职员工: 员工韩十五, 状态已离职"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN014",
+        "originalType": "unclassified",
+        "newType": "resigned_employee",
+        "reason": "离职员工: 员工韩十五, 状态已离职"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "special_case_detected",
+      "details": {
+        "recordId": "TXN015",
+        "caseType": "resigned_employee",
+        "description": "离职员工: 员工杨十六, 状态已离职"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN015",
+        "originalType": "unclassified",
+        "newType": "resigned_employee",
+        "reason": "离职员工: 员工杨十六, 状态已离职"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN016",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN017",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "special_case_detected",
+      "details": {
+        "recordId": "TXN018",
+        "caseType": "rerun_output",
+        "description": "复跑输出标记"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN018",
+        "originalType": "unclassified",
+        "newType": "rerun_output",
+        "reason": "复跑输出标记"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "special_case_detected",
+      "details": {
+        "recordId": "TXN019",
+        "caseType": "rerun_output",
+        "description": "复跑输出标记"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN019",
+        "originalType": "unclassified",
+        "newType": "rerun_output",
+        "reason": "复跑输出标记"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "record_classified",
+      "details": {
+        "recordId": "TXN020",
+        "originalType": "unclassified",
+        "newType": "normal",
+        "reason": "正常交易"
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.544Z",
+      "action": "rule_applied",
+      "details": {
+        "ruleName": "食堂餐补规则",
+        "ruleParams": {
+          "dailyLimit": {
+            "lunch": 25,
+            "dinner": 30,
+            "breakfast": 15
+          },
+          "dinnerSubsidyRate": 0.8,
+          "maxMonthlySubsidy": 800,
+          "subsidyDays": [
+            "周一",
+            "周二",
+            "周三",
+            "周四",
+            "周五"
+          ]
+        },
+        "affectedRecords": 15
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.545Z",
+      "action": "output_generated",
+      "details": {
+        "filePath": "/Users/mac/pro/solo/workspaces/xy11118/output/normal-result.csv",
+        "recordCount": 15
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.545Z",
+      "action": "output_generated",
+      "details": {
+        "filePath": "/Users/mac/pro/solo/workspaces/xy11118/output/cross-month-refund.csv",
+        "recordCount": 1
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.545Z",
+      "action": "output_generated",
+      "details": {
+        "filePath": "/Users/mac/pro/solo/workspaces/xy11118/output/resigned-employee.csv",
+        "recordCount": 2
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.546Z",
+      "action": "output_generated",
+      "details": {
+        "filePath": "/Users/mac/pro/solo/workspaces/xy11118/output/rerun-output.csv",
+        "recordCount": 2
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.546Z",
+      "action": "output_generated",
+      "details": {
+        "filePath": "/Users/mac/pro/solo/workspaces/xy11118/output/summary.json",
+        "recordCount": 1
+      }
+    },
+    {
+      "timestamp": "2026-05-18T18:05:25.546Z",
+      "action": "process_end",
+      "details": {
+        "totalRecords": 20,
+        "classifiedCounts": {
+          "total": 20,
+          "normal": 15,
+          "crossMonthRefund": 1,
+          "resignedEmployee": 2,
+          "rerunOutput": 2
+        },
+        "completedAt": "2026-05-18T18:05:25.546Z"
+      }
+    }
+  ]
+}

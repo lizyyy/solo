@@ -1,0 +1,25 @@
+{
+  "name": "canteen-meal-subsidy-splitter",
+  "version": "1.0.0",
+  "description": "园区食堂餐补流水拆账 CLI 工具",
+  "main": "src/cli.js",
+  "bin": {
+    "meal-split": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js --sample",
+    "demo": "node src/cli.js --config config/default.json --input data/sample-input.csv --output output/"
+  },
+  "keywords": ["canteen", "subsidy", "accounting", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

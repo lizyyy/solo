@@ -1,0 +1,55 @@
+{
+  "name": "园区食堂餐补拆账默认规则",
+  "version": "1.0",
+  "description": "默认业务口径，新人接手可直接使用此配置跑样例",
+  "effectiveDate": "2024-01-01",
+  
+  "subsidyRules": {
+    "dailyLimit": {
+      "lunch": 25,
+      "dinner": 30,
+      "breakfast": 15
+    },
+    "dinnerSubsidyRate": 0.8,
+    "maxMonthlySubsidy": 800,
+    "subsidyDays": ["周一", "周二", "周三", "周四", "周五"]
+  },
+  
+  "classificationRules": {
+    "crossMonthRefund": {
+      "enabled": true,
+      "description": "跨月退款：交易月份与原消费月份不一致的退款记录",
+      "fields": ["transactionDate", "originalMonth", "amount"]
+    },
+    "resignedEmployee": {
+      "enabled": true,
+      "description": "离职员工交易：员工状态为已离职或交易日期晚于离职日期",
+      "fields": ["employeeStatus", "resignationDate", "transactionDate"]
+    },
+    "rerunOutput": {
+      "enabled": true,
+      "description": "复跑输出：带有RE-RUN标记或rerunFlag=Y的记录",
+      "fields": ["processTag", "rerunFlag"]
+    }
+  },
+  
+  "outputRules": {
+    "separateSpecialCases": true,
+    "includeClassificationMetadata": true,
+    "fileNaming": {
+      "normal": "normal-result.csv",
+      "crossMonthRefund": "cross-month-refund.csv",
+      "resignedEmployee": "resigned-employee.csv",
+      "rerunOutput": "rerun-output.csv"
+    }
+  },
+  
+  "businessNotes": [
+    "1. 午餐最高补贴25元/餐，超出部分员工自付",
+    "2. 晚餐补贴比例为80%，即公司承担80%，员工承担20%",
+    "3. 每人每月最高补贴总额不超过800元",
+    "4. 周末及节假日餐补需单独走审批流程",
+    "5. 跨月退款必须人工复核确认后才能入账",
+    "6. 离职员工的最后一个月餐补需HR确认后发放"
+  ]
+}
