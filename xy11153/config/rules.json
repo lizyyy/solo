@@ -1,0 +1,176 @@
+{
+  "version": "1.0.0",
+  "description": "篮球场预约处球场天气补偿规则配置 - 默认口径",
+  
+  "recordClassification": {
+    "normalRecords": {
+      "description": "正常记录 - 无需补偿",
+      "conditions": [
+        {
+          "field": "天气状况",
+          "operator": "notContains",
+          "values": ["雨", "雷", "暴", "雪"],
+          "description": "天气状况不包含雨、雷、暴、雪等恶劣天气"
+        },
+        {
+          "field": "是否降雨",
+          "operator": "equals",
+          "values": ["否"],
+          "description": "明确标记为无降雨"
+        },
+        {
+          "field": "补偿状态",
+          "operator": "equals",
+          "values": ["正常"],
+          "description": "补偿状态标记为正常"
+        }
+      ],
+      "matchStrategy": "any",
+      "outputFile": "正常记录.csv"
+    },
+    
+    "abnormalRecords": {
+      "description": "异常记录 - 需要天气补偿",
+      "conditions": [
+        {
+          "field": "是否降雨",
+          "operator": "equals",
+          "values": ["是"],
+          "description": "明确标记为有降雨"
+        },
+        {
+          "field": "天气状况",
+          "operator": "contains",
+          "values": ["雨", "雷", "暴"],
+          "description": "天气状况包含雨、雷、暴等恶劣天气"
+        },
+        {
+          "field": "补偿状态",
+          "operator": "equals",
+          "values": ["待补偿", "待复核"],
+          "description": "补偿状态标记为待补偿或待复核"
+        }
+      ],
+      "matchStrategy": "any",
+      "outputFile": "异常记录.csv"
+    }
+  },
+  
+  "specialScenarios": {
+    "partialRain": {
+      "description": "局部降雨识别规则",
+      "keywords": ["局部", "半场", "南半场", "北半场", "时段", "突然", "后半场"],
+      "conditions": [
+        {
+          "field": "备注",
+          "operator": "containsAny",
+          "values": ["局部", "半场", "南半场", "北半场", "时段", "突然", "后半场"]
+        },
+        {
+          "field": "降雨时段",
+          "operator": "notEmpty",
+          "description": "有具体降雨时段记录"
+        },
+        {
+          "field": "球场使用情况",
+          "operator": "equals",
+          "values": ["中断"]
+        }
+      ],
+      "matchStrategy": "any",
+      "tag": "局部降雨",
+      "outputFile": "局部降雨记录.csv"
+    },
+    
+    "halfCourtUsage": {
+      "description": "半场使用识别规则",
+      "keywords": ["半场", "北半场", "南半场", "训练", "友谊赛"],
+      "conditions": [
+        {
+          "field": "球场使用情况",
+          "operator": "equals",
+          "values": ["半场使用"]
+        },
+        {
+          "field": "备注",
+          "operator": "containsAny",
+          "values": ["半场", "北半场", "南半场", "训练", "友谊赛"]
+        }
+      ],
+      "matchStrategy": "any",
+      "tag": "半场使用",
+      "outputFile": "半场使用记录.csv"
+    }
+  },
+  
+  "compensationRules": {
+    "fullCompensation": {
+      "description": "全场补偿 - 降雨覆盖整个预约时段",
+      "conditions": [
+        {
+          "field": "球场使用情况",
+          "operator": "equals",
+          "values": ["未使用"]
+        },
+        {
+          "field": "降雨时段",
+          "operator": "matchesPattern",
+          "pattern": "覆盖全场",
+          "description": "降雨覆盖全场"
+        }
+      ],
+      "compensationRate": 1.0,
+      "compensationType": "全额补偿"
+    },
+    
+    "partialCompensation": {
+      "description": "部分补偿 - 降雨覆盖部分预约时段",
+      "conditions": [
+        {
+          "field": "球场使用情况",
+          "operator": "equals",
+          "values": ["中断", "半场使用"]
+        }
+      ],
+      "compensationRate": 0.5,
+      "compensationType": "半场补偿"
+    }
+  },
+  
+  "outputConfig": {
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "includeHeader": true,
+    "timestampFormat": "YYYY-MM-DD_HH-mm-ss",
+    "stableOutput": true,
+    "sortBy": "预约编号",
+    "columns": [
+      "预约编号",
+      "球场编号",
+      "预约日期",
+      "开始时间",
+      "结束时间",
+      "预约时长",
+      "天气状况",
+      "是否降雨",
+      "降雨时段",
+      "球场使用情况",
+      "补偿状态",
+      "补偿类型",
+      "补偿比例",
+      "标签",
+      "备注",
+      "数据来源"
+    ]
+  },
+  
+  "validationRules": {
+    "requiredFields": ["预约编号", "球场编号", "预约日期", "天气状况", "是否降雨"],
+    "dataTypes": {
+      "预约时长": "number",
+      "预约人数": "number"
+    },
+    "dateFormat": "YYYY-MM-DD",
+    "timeFormat": "HH:mm"
+  }
+}
