@@ -1,0 +1,104 @@
+{
+  "deliveryId": "VEG-DEL-20260519-001",
+  "deliveryDate": "2026-05-19",
+  "supplier": "绿源蔬菜种植基地",
+  "warehouse": "城西配送站A仓",
+  "items": [
+    {
+      "vegetableName": "西红柿",
+      "vegetableCode": "VEG-001",
+      "basketType": "塑料筐",
+      "basketCount": 5,
+      "expectedWeight": 100,
+      "expectedWeightUnit": "斤",
+      "actualWeight": 48.5,
+      "actualWeightUnit": "kg",
+      "unitPrice": 3.5,
+      "remarks": "新鲜采摘，带筐称重"
+    },
+    {
+      "vegetableName": "黄瓜",
+      "vegetableCode": "VEG-002",
+      "basketType": "竹筐",
+      "basketCount": 3,
+      "expectedWeight": 60,
+      "expectedWeightUnit": "斤",
+      "actualWeight": 29.2,
+      "actualWeightUnit": "kg",
+      "unitPrice": 2.8,
+      "remarks": "带刺黄瓜"
+    },
+    {
+      "vegetableName": "大白菜",
+      "vegetableCode": "VEG-003",
+      "basketType": "纸箱",
+      "basketCount": 8,
+      "expectedWeight": 120,
+      "expectedWeightUnit": "斤",
+      "actualWeight": 57.8,
+      "actualWeightUnit": "kg",
+      "unitPrice": 1.2,
+      "remarks": "冬季储存菜"
+    },
+    {
+      "vegetableName": "土豆",
+      "vegetableCode": "VEG-004",
+      "basketType": "泡沫箱",
+      "basketCount": 6,
+      "expectedWeight": 150,
+      "expectedWeightUnit": "斤",
+      "actualWeight": 72.3,
+      "actualWeightUnit": "kg",
+      "unitPrice": 2.0,
+      "remarks": "内蒙土豆"
+    },
+    {
+      "vegetableName": "青椒",
+      "vegetableCode": "VEG-005",
+      "basketType": "塑料筐",
+      "basketCount": 4,
+      "expectedWeight": 80,
+      "expectedWeightUnit": "斤",
+      "actualWeight": 35.1,
+      "actualWeightUnit": "kg",
+      "unitPrice": 4.2,
+      "remarks": "薄皮青椒，重量偏差较大需复核"
+    },
+    {
+      "vegetableName": "茄子",
+      "vegetableCode": "VEG-006",
+      "basketType": "保温箱",
+      "basketCount": 2,
+      "expectedWeight": 40,
+      "expectedWeightUnit": "斤",
+      "actualWeight": 16.8,
+      "actualWeightUnit": "kg",
+      "unitPrice": 3.8,
+      "remarks": "长茄子，保温配送"
+    },
+    {
+      "vegetableName": "菠菜",
+      "vegetableCode": "VEG-007",
+      "basketType": "塑料筐",
+      "basketCount": 3,
+      "expectedWeight": 30,
+      "expectedWeightUnit": "斤",
+      "actualWeight": 14.5,
+      "actualWeightUnit": "kg",
+      "unitPrice": 5.5,
+      "remarks": "有机菠菜"
+    },
+    {
+      "vegetableName": "胡萝卜",
+      "vegetableCode": "VEG-008",
+      "basketType": "竹筐",
+      "basketCount": 4,
+      "expectedWeight": 80,
+      "expectedWeightUnit": "斤",
+      "actualWeight": 39.2,
+      "actualWeightUnit": "kg",
+      "unitPrice": 2.5,
+      "remarks": "水洗胡萝卜"
+    }
+  ]
+}

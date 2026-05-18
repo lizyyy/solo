@@ -1,0 +1,670 @@
+{
+  "deliveryId": "VEG-DEL-20260519-001",
+  "deliveryDate": "2026-05-19",
+  "supplier": "绿源蔬菜种植基地",
+  "warehouse": "城西配送站A仓",
+  "reconciliationTime": "2026-05-18T19:49:46.644Z",
+  "ruleVersion": "1.0.0",
+  "items": [
+    {
+      "vegetableName": "西红柿",
+      "vegetableCode": "VEG-001",
+      "basketType": "塑料筐",
+      "basketCount": 5,
+      "expected": {
+        "grossWeight": 100,
+        "grossUnit": "斤",
+        "grossWeightKg": 50,
+        "netWeightKg": 37.5,
+        "price": 131.25
+      },
+      "actual": {
+        "grossWeight": 48.5,
+        "grossUnit": "kg",
+        "grossWeightKg": 48.5,
+        "netWeightKg": 36,
+        "price": 126
+      },
+      "difference": {
+        "weightKg": -1.5,
+        "weightPercent": 4,
+        "price": -5.25,
+        "toleranceKg": 0.3
+      },
+      "status": "FAIL",
+      "isWithinTolerance": false,
+      "calculationSteps": [
+        {
+          "step": "expected_weight_calculation",
+          "description": "计算预期净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 100,
+            "unit": "斤"
+          },
+          "converted": {
+            "weight": 50,
+            "unit": "kg"
+          },
+          "rate": 0.5
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 50,
+          "basketType": "塑料筐",
+          "basketCount": 5,
+          "basketWeightKg": 2.5,
+          "totalDeductionKg": 12.5,
+          "netWeightKg": 37.5
+        },
+        {
+          "step": "actual_weight_calculation",
+          "description": "计算实际净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 48.5,
+            "unit": "kg"
+          },
+          "converted": {
+            "weight": 48.5,
+            "unit": "kg"
+          },
+          "rate": 1
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 48.5,
+          "basketType": "塑料筐",
+          "basketCount": 5,
+          "basketWeightKg": 2.5,
+          "totalDeductionKg": 12.5,
+          "netWeightKg": 36
+        }
+      ],
+      "remarks": "新鲜采摘，带筐称重"
+    },
+    {
+      "vegetableName": "黄瓜",
+      "vegetableCode": "VEG-002",
+      "basketType": "竹筐",
+      "basketCount": 3,
+      "expected": {
+        "grossWeight": 60,
+        "grossUnit": "斤",
+        "grossWeightKg": 30,
+        "netWeightKg": 24.6,
+        "price": 68.88
+      },
+      "actual": {
+        "grossWeight": 29.2,
+        "grossUnit": "kg",
+        "grossWeightKg": 29.2,
+        "netWeightKg": 23.799999999999997,
+        "price": 66.64
+      },
+      "difference": {
+        "weightKg": -0.8,
+        "weightPercent": 3.252,
+        "price": -2.24,
+        "toleranceKg": 0.3
+      },
+      "status": "FAIL",
+      "isWithinTolerance": false,
+      "calculationSteps": [
+        {
+          "step": "expected_weight_calculation",
+          "description": "计算预期净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 60,
+            "unit": "斤"
+          },
+          "converted": {
+            "weight": 30,
+            "unit": "kg"
+          },
+          "rate": 0.5
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 30,
+          "basketType": "竹筐",
+          "basketCount": 3,
+          "basketWeightKg": 1.8,
+          "totalDeductionKg": 5.4,
+          "netWeightKg": 24.6
+        },
+        {
+          "step": "actual_weight_calculation",
+          "description": "计算实际净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 29.2,
+            "unit": "kg"
+          },
+          "converted": {
+            "weight": 29.2,
+            "unit": "kg"
+          },
+          "rate": 1
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 29.2,
+          "basketType": "竹筐",
+          "basketCount": 3,
+          "basketWeightKg": 1.8,
+          "totalDeductionKg": 5.4,
+          "netWeightKg": 23.799999999999997
+        }
+      ],
+      "remarks": "带刺黄瓜"
+    },
+    {
+      "vegetableName": "大白菜",
+      "vegetableCode": "VEG-003",
+      "basketType": "纸箱",
+      "basketCount": 8,
+      "expected": {
+        "grossWeight": 120,
+        "grossUnit": "斤",
+        "grossWeightKg": 60,
+        "netWeightKg": 53.6,
+        "price": 64.32
+      },
+      "actual": {
+        "grossWeight": 57.8,
+        "grossUnit": "kg",
+        "grossWeightKg": 57.8,
+        "netWeightKg": 51.4,
+        "price": 61.68
+      },
+      "difference": {
+        "weightKg": -2.2,
+        "weightPercent": 4.1045,
+        "price": -2.64,
+        "toleranceKg": 0.3
+      },
+      "status": "FAIL",
+      "isWithinTolerance": false,
+      "calculationSteps": [
+        {
+          "step": "expected_weight_calculation",
+          "description": "计算预期净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 120,
+            "unit": "斤"
+          },
+          "converted": {
+            "weight": 60,
+            "unit": "kg"
+          },
+          "rate": 0.5
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 60,
+          "basketType": "纸箱",
+          "basketCount": 8,
+          "basketWeightKg": 0.8,
+          "totalDeductionKg": 6.4,
+          "netWeightKg": 53.6
+        },
+        {
+          "step": "actual_weight_calculation",
+          "description": "计算实际净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 57.8,
+            "unit": "kg"
+          },
+          "converted": {
+            "weight": 57.8,
+            "unit": "kg"
+          },
+          "rate": 1
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 57.8,
+          "basketType": "纸箱",
+          "basketCount": 8,
+          "basketWeightKg": 0.8,
+          "totalDeductionKg": 6.4,
+          "netWeightKg": 51.4
+        }
+      ],
+      "remarks": "冬季储存菜"
+    },
+    {
+      "vegetableName": "土豆",
+      "vegetableCode": "VEG-004",
+      "basketType": "泡沫箱",
+      "basketCount": 6,
+      "expected": {
+        "grossWeight": 150,
+        "grossUnit": "斤",
+        "grossWeightKg": 75,
+        "netWeightKg": 72,
+        "price": 144
+      },
+      "actual": {
+        "grossWeight": 72.3,
+        "grossUnit": "kg",
+        "grossWeightKg": 72.3,
+        "netWeightKg": 69.3,
+        "price": 138.6
+      },
+      "difference": {
+        "weightKg": -2.7,
+        "weightPercent": 3.75,
+        "price": -5.4,
+        "toleranceKg": 0.36
+      },
+      "status": "FAIL",
+      "isWithinTolerance": false,
+      "calculationSteps": [
+        {
+          "step": "expected_weight_calculation",
+          "description": "计算预期净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 150,
+            "unit": "斤"
+          },
+          "converted": {
+            "weight": 75,
+            "unit": "kg"
+          },
+          "rate": 0.5
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 75,
+          "basketType": "泡沫箱",
+          "basketCount": 6,
+          "basketWeightKg": 0.5,
+          "totalDeductionKg": 3,
+          "netWeightKg": 72
+        },
+        {
+          "step": "actual_weight_calculation",
+          "description": "计算实际净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 72.3,
+            "unit": "kg"
+          },
+          "converted": {
+            "weight": 72.3,
+            "unit": "kg"
+          },
+          "rate": 1
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 72.3,
+          "basketType": "泡沫箱",
+          "basketCount": 6,
+          "basketWeightKg": 0.5,
+          "totalDeductionKg": 3,
+          "netWeightKg": 69.3
+        }
+      ],
+      "remarks": "内蒙土豆"
+    },
+    {
+      "vegetableName": "青椒",
+      "vegetableCode": "VEG-005",
+      "basketType": "塑料筐",
+      "basketCount": 4,
+      "expected": {
+        "grossWeight": 80,
+        "grossUnit": "斤",
+        "grossWeightKg": 40,
+        "netWeightKg": 30,
+        "price": 126
+      },
+      "actual": {
+        "grossWeight": 35.1,
+        "grossUnit": "kg",
+        "grossWeightKg": 35.1,
+        "netWeightKg": 25.1,
+        "price": 105.42
+      },
+      "difference": {
+        "weightKg": -4.9,
+        "weightPercent": 16.3333,
+        "price": -20.58,
+        "toleranceKg": 0.3
+      },
+      "status": "FAIL",
+      "isWithinTolerance": false,
+      "calculationSteps": [
+        {
+          "step": "expected_weight_calculation",
+          "description": "计算预期净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 80,
+            "unit": "斤"
+          },
+          "converted": {
+            "weight": 40,
+            "unit": "kg"
+          },
+          "rate": 0.5
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 40,
+          "basketType": "塑料筐",
+          "basketCount": 4,
+          "basketWeightKg": 2.5,
+          "totalDeductionKg": 10,
+          "netWeightKg": 30
+        },
+        {
+          "step": "actual_weight_calculation",
+          "description": "计算实际净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 35.1,
+            "unit": "kg"
+          },
+          "converted": {
+            "weight": 35.1,
+            "unit": "kg"
+          },
+          "rate": 1
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 35.1,
+          "basketType": "塑料筐",
+          "basketCount": 4,
+          "basketWeightKg": 2.5,
+          "totalDeductionKg": 10,
+          "netWeightKg": 25.1
+        }
+      ],
+      "remarks": "薄皮青椒，重量偏差较大需复核"
+    },
+    {
+      "vegetableName": "茄子",
+      "vegetableCode": "VEG-006",
+      "basketType": "保温箱",
+      "basketCount": 2,
+      "expected": {
+        "grossWeight": 40,
+        "grossUnit": "斤",
+        "grossWeightKg": 20,
+        "netWeightKg": 13.6,
+        "price": 51.68
+      },
+      "actual": {
+        "grossWeight": 16.8,
+        "grossUnit": "kg",
+        "grossWeightKg": 16.8,
+        "netWeightKg": 10.4,
+        "price": 39.52
+      },
+      "difference": {
+        "weightKg": -3.2,
+        "weightPercent": 23.5294,
+        "price": -12.16,
+        "toleranceKg": 0.3
+      },
+      "status": "FAIL",
+      "isWithinTolerance": false,
+      "calculationSteps": [
+        {
+          "step": "expected_weight_calculation",
+          "description": "计算预期净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 40,
+            "unit": "斤"
+          },
+          "converted": {
+            "weight": 20,
+            "unit": "kg"
+          },
+          "rate": 0.5
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 20,
+          "basketType": "保温箱",
+          "basketCount": 2,
+          "basketWeightKg": 3.2,
+          "totalDeductionKg": 6.4,
+          "netWeightKg": 13.6
+        },
+        {
+          "step": "actual_weight_calculation",
+          "description": "计算实际净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 16.8,
+            "unit": "kg"
+          },
+          "converted": {
+            "weight": 16.8,
+            "unit": "kg"
+          },
+          "rate": 1
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 16.8,
+          "basketType": "保温箱",
+          "basketCount": 2,
+          "basketWeightKg": 3.2,
+          "totalDeductionKg": 6.4,
+          "netWeightKg": 10.4
+        }
+      ],
+      "remarks": "长茄子，保温配送"
+    },
+    {
+      "vegetableName": "菠菜",
+      "vegetableCode": "VEG-007",
+      "basketType": "塑料筐",
+      "basketCount": 3,
+      "expected": {
+        "grossWeight": 30,
+        "grossUnit": "斤",
+        "grossWeightKg": 15,
+        "netWeightKg": 7.5,
+        "price": 41.25
+      },
+      "actual": {
+        "grossWeight": 14.5,
+        "grossUnit": "kg",
+        "grossWeightKg": 14.5,
+        "netWeightKg": 7,
+        "price": 38.5
+      },
+      "difference": {
+        "weightKg": -0.5,
+        "weightPercent": 6.6667,
+        "price": -2.75,
+        "toleranceKg": 0.3
+      },
+      "status": "FAIL",
+      "isWithinTolerance": false,
+      "calculationSteps": [
+        {
+          "step": "expected_weight_calculation",
+          "description": "计算预期净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 30,
+            "unit": "斤"
+          },
+          "converted": {
+            "weight": 15,
+            "unit": "kg"
+          },
+          "rate": 0.5
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 15,
+          "basketType": "塑料筐",
+          "basketCount": 3,
+          "basketWeightKg": 2.5,
+          "totalDeductionKg": 7.5,
+          "netWeightKg": 7.5
+        },
+        {
+          "step": "actual_weight_calculation",
+          "description": "计算实际净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 14.5,
+            "unit": "kg"
+          },
+          "converted": {
+            "weight": 14.5,
+            "unit": "kg"
+          },
+          "rate": 1
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 14.5,
+          "basketType": "塑料筐",
+          "basketCount": 3,
+          "basketWeightKg": 2.5,
+          "totalDeductionKg": 7.5,
+          "netWeightKg": 7
+        }
+      ],
+      "remarks": "有机菠菜"
+    },
+    {
+      "vegetableName": "胡萝卜",
+      "vegetableCode": "VEG-008",
+      "basketType": "竹筐",
+      "basketCount": 4,
+      "expected": {
+        "grossWeight": 80,
+        "grossUnit": "斤",
+        "grossWeightKg": 40,
+        "netWeightKg": 32.8,
+        "price": 82
+      },
+      "actual": {
+        "grossWeight": 39.2,
+        "grossUnit": "kg",
+        "grossWeightKg": 39.2,
+        "netWeightKg": 32,
+        "price": 80
+      },
+      "difference": {
+        "weightKg": -0.8,
+        "weightPercent": 2.439,
+        "price": -2,
+        "toleranceKg": 0.3
+      },
+      "status": "FAIL",
+      "isWithinTolerance": false,
+      "calculationSteps": [
+        {
+          "step": "expected_weight_calculation",
+          "description": "计算预期净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 80,
+            "unit": "斤"
+          },
+          "converted": {
+            "weight": 40,
+            "unit": "kg"
+          },
+          "rate": 0.5
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 40,
+          "basketType": "竹筐",
+          "basketCount": 4,
+          "basketWeightKg": 1.8,
+          "totalDeductionKg": 7.2,
+          "netWeightKg": 32.8
+        },
+        {
+          "step": "actual_weight_calculation",
+          "description": "计算实际净重"
+        },
+        {
+          "type": "unit_conversion",
+          "original": {
+            "weight": 39.2,
+            "unit": "kg"
+          },
+          "converted": {
+            "weight": 39.2,
+            "unit": "kg"
+          },
+          "rate": 1
+        },
+        {
+          "type": "basket_deduction",
+          "grossWeightKg": 39.2,
+          "basketType": "竹筐",
+          "basketCount": 4,
+          "basketWeightKg": 1.8,
+          "totalDeductionKg": 7.2,
+          "netWeightKg": 32
+        }
+      ],
+      "remarks": "水洗胡萝卜"
+    }
+  ],
+  "summary": {
+    "totalItems": 8,
+    "passItems": 0,
+    "failItems": 8,
+    "totalExpectedNetWeightKg": 271.6,
+    "totalActualNetWeightKg": 255,
+    "totalDifferenceKg": -16.6,
+    "totalExpectedPrice": 709.38,
+    "totalActualPrice": 656.36,
+    "totalPriceDifference": -53.02
+  },
+  "overallStatus": "FAIL"
+}

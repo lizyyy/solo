@@ -1,0 +1,54 @@
+{
+  "ruleVersion": "1.0.0",
+  "description": "蔬菜配送站蔬菜称重对账默认规则配置",
+  
+  "unitConversion": {
+    "enabled": true,
+    "description": "单位换算规则 - 所有重量统一换算为公斤(kg)",
+    "baseUnit": "kg",
+    "rates": {
+      "g": 0.001,
+      "jin": 0.5,
+      "斤": 0.5,
+      "kg": 1,
+      "公斤": 1,
+      "lb": 0.453592
+    }
+  },
+
+  "basketDeduction": {
+    "enabled": true,
+    "description": "整筐扣重规则 - 扣除容器重量",
+    "defaultBasketWeightKg": 2.5,
+    "basketTypes": {
+      "塑料筐": 2.5,
+      "竹筐": 1.8,
+      "纸箱": 0.8,
+      "泡沫箱": 0.5,
+      "保温箱": 3.2
+    },
+    "deductionPerBasket": true
+  },
+
+  "reconciliationRules": {
+    "tolerancePercent": 0.5,
+    "toleranceKg": 0.3,
+    "description": "对账容差规则：误差在0.5%以内或0.3kg以内视为正常",
+    "useMaxTolerance": true
+  },
+
+  "outputConfig": {
+    "format": "json",
+    "includeDetails": true,
+    "includeCalculationSteps": true,
+    "timestampFormat": "YYYY-MM-DD HH:mm:ss",
+    "deterministicOutput": true,
+    "sortOutput": true
+  },
+
+  "priceCalculation": {
+    "enabled": true,
+    "rounding": 2,
+    "taxRate": 0.09
+  }
+}

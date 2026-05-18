@@ -1,0 +1,19 @@
+{
+  "name": "vegetable-delivery-reconciliation",
+  "version": "1.0.0",
+  "description": "蔬菜配送站蔬菜称重对账 CLI 工具",
+  "main": "src/cli.js",
+  "bin": {
+    "veg-reconcile": "./src/cli.js"
+  },
+  "scripts": {
+    "reconcile": "node src/cli.js",
+    "sample": "node src/cli.js --config config/default.json --input data/sample-input.json --output output/sample-result.json"
+  },
+  "keywords": ["vegetable", "delivery", "reconciliation", "weighing", "accounting"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0"
+  }
+}
