@@ -1,0 +1,21 @@
+{
+  "name": "mall-inventory-reconciliation",
+  "version": "1.0.0",
+  "description": "商城库存快照预占释放对账 CLI",
+  "main": "src/cli.js",
+  "bin": {
+    "inventory-recon": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js --pre-occupation data/sample-pre-occupation.csv --payment data/sample-payment.csv --inventory data/sample-inventory.csv --output output"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  },
+  "keywords": ["inventory", "reconciliation", "mall"],
+  "author": "",
+  "license": "ISC"
+}
