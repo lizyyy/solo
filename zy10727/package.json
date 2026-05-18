@@ -1,0 +1,27 @@
+{
+  "name": "access-control-audit-cli",
+  "version": "1.0.0",
+  "description": "门禁离线日志补开记录稽核 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "access-audit": "./bin/access-audit.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.js test/**/*.js"
+  },
+  "keywords": ["access-control", "audit", "cli", "offline-log"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^5.0.7"
+  }
+}
