@@ -161,23 +161,33 @@ class AuditService:
 class LabResultService:
     @staticmethod
     def create_lab_result(db: Session, lab_result: schemas.LabResultCreate) -> LabResult:
-        if not PointMatchingService.validate_sampling_point(
-            db, db.query(FieldRecord).filter(FieldRecord.id == lab_result.field_record_id).first().sampling_point_id
-        ):
+        field_record = db.query(FieldRecord).filter(FieldRecord.id == lab_result.field_record_id).first()
+        if not field_record:
+            raise ValueError("现场记录不存在")
+
+        if not PointMatchingService.validate_sampling_point(db, field_record.sampling_point_id):
             raise ValueError("采样点无效")
 
         parameter = db.query(Parameter).filter(Parameter.id == lab_result.parameter_id).first()
-        if parameter and parameter.default_unit_id:
+        if not parameter:
+            raise ValueError("检测参数不存在")
+
+        raw_unit = db.query(Unit).filter(Unit.id == lab_result.raw_unit_id).first()
+        if not raw_unit:
+            raise ValueError("原始数据单位不存在")
+
+        converted_value = None
+        if parameter.default_unit_id:
             converted_value = UnitConversionService.convert_value(
                 db, lab_result.raw_value, lab_result.raw_unit_id, parameter.default_unit_id
             )
-        else:
-            converted_value = None
+            if converted_value is None:
+                raise ValueError("单位换算失败，请检查单位维度是否匹配")
 
         db_lab_result = LabResult(
             **lab_result.model_dump(),
             converted_value=converted_value,
-            standard_unit_id=parameter.default_unit_id if parameter else None
+            standard_unit_id=parameter.default_unit_id
         )
         db.add(db_lab_result)
         db.commit()

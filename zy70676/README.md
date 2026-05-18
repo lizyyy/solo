@@ -60,11 +60,19 @@ curl -X POST "http://localhost:8000/sampling-points/" \
 ```bash
 curl -X POST "http://localhost:8000/units/" \
   -H "Content-Type: application/json" \
-  -d '{"unit_code": "MG_L", "unit_name": "毫克/升", "dimension": "浓度", "conversion_factor": 0.001}'
+  -d '{"unit_code": "MG_L", "unit_name": "毫克/升", "dimension": "浓度", "conversion_factor": 1000.0}'
 
 curl -X POST "http://localhost:8000/units/" \
   -H "Content-Type: application/json" \
   -d '{"unit_code": "UG_L", "unit_name": "微克/升", "dimension": "浓度", "conversion_factor": 1.0}'
+
+curl -X POST "http://localhost:8000/units/" \
+  -H "Content-Type: application/json" \
+  -d '{"unit_code": "NG_L", "unit_name": "纳克/升", "dimension": "浓度", "conversion_factor": 0.001}'
+
+curl -X POST "http://localhost:8000/units/" \
+  -H "Content-Type: application/json" \
+  -d '{"unit_code": "PH", "unit_name": "pH值", "dimension": "pH", "conversion_factor": 1.0}'
 ```
 
 ### 3. 创建参数
