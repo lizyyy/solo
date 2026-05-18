@@ -1,0 +1,27 @@
+{
+  "name": "delivery-redispatch-compensation-calculator",
+  "version": "1.0.0",
+  "description": "配送改派记录骑手补偿核算 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "redispatch-compensation": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node tests/run-tests.js"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  },
+  "keywords": [
+    "delivery",
+    "redispatch",
+    "compensation",
+    "rider",
+    "calculator"
+  ],
+  "author": "",
+  "license": "MIT"
+}
