@@ -1,0 +1,9 @@
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/*.test.ts'],
+  testTimeout: 60000,
+  setupFilesAfterEnv: [],
+  forceExit: true
+};
