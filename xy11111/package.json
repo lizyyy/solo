@@ -1,0 +1,25 @@
+{
+  "name": "photo-studio-merge",
+  "version": "1.0.0",
+  "description": "摄影工作室照片选片合并CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "photo-merge": "src/index.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "sample": "node src/index.js --config config/default.json --preview",
+    "sample:run": "node src/index.js --config config/default.json --run"
+  },
+  "keywords": ["photo", "studio", "merge", "cli"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  }
+}

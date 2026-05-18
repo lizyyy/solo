@@ -1,0 +1,30 @@
+{
+  "name": "摄影工作室选片合并默认配置",
+  "description": "新人接手请先跑样例：npm run sample，确认规则后再修改",
+  
+  "sourceDirs": {
+    "精修": "sample/photos/精修",
+    "原片": "sample/photos/原片",
+    "花絮": "sample/photos/花絮"
+  },
+  
+  "outputDir": "sample/output",
+  "logDir": "sample/logs",
+  
+  "rules": {
+    "allowedExtensions": [".jpg", ".jpeg", ".png", ".raw", ".cr2", ".nef", ".arw"],
+    "normalizeExtension": true,
+    "duplicateStrategy": "rename",
+    "skipProcessed": true,
+    "maxFilenameLength": 100
+  },
+  
+  "filenamePattern": "{拍摄日期}_{客户姓名}_{照片类型}_{序号}{扩展名}",
+  "dateFormat": "YYYYMMDD",
+  
+  "客户信息": {
+    "拍摄日期": "20240515",
+    "客户姓名": "张三_李四",
+    "套餐类型": "婚纱摄影A套系"
+  }
+}
