@@ -1,0 +1,20 @@
+{
+  "name": "母婴护理站夜班交接补全",
+  "version": "1.0.0",
+  "description": "母婴护理站夜班交接记录补全工具 - 处理跨夜时间、护理员换班等业务场景",
+  "main": "src/index.js",
+  "bin": {
+    "母婴护理站夜班交接补全": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node bin/cli.js --input sample/input.csv --output sample/output.csv",
+    "start": "node bin/cli.js"
+  },
+  "keywords": ["母婴护理", "夜班交接", "数据补全"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5"
+  }
+}
