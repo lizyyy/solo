@@ -1,0 +1,77 @@
+{
+  "fileType": "组织变更-继承规则差异",
+  "generatedAt": "2026-05-18T17:13:16.370Z",
+  "ruleVersion": "v2.1.0",
+  "recordCount": 6,
+  "handlingRules": {
+    "enabled": true,
+    "recalculateOnDepartmentChange": true,
+    "roleInheritance": true,
+    "groupInheritance": true,
+    "departmentInheritance": true
+  },
+  "data": [
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "changed",
+      "permissionId": "PERM_INH001",
+      "permissionName": "部门公共文档",
+      "originalValue": "部门: 技术研发部",
+      "changeReason": "继承权限：部门变更需重新计算 (来源: 技术研发部)",
+      "category": "inherited"
+    },
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "unchanged",
+      "permissionId": "PERM_INH002",
+      "permissionName": "开发工程师角色权限",
+      "originalValue": "角色: 开发工程师",
+      "changeReason": "继承权限：角色继承保留 (来源: 开发工程师)",
+      "category": "inherited"
+    },
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "unchanged",
+      "permissionId": "PERM_INH003",
+      "permissionName": "技术委员会权限",
+      "originalValue": "用户组: 技术委员会",
+      "changeReason": "继承权限：用户组继承保留 (来源: 技术委员会)",
+      "category": "inherited"
+    },
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "changed",
+      "permissionId": "DEPT_INHERITANCE_CHECK",
+      "permissionName": "部门继承权限检查",
+      "originalValue": "技术研发部",
+      "newValue": "产品部",
+      "changeReason": "部门变更：从 [技术研发部] 调至 [产品部]，需重新计算部门继承权限",
+      "category": "inherited"
+    },
+    {
+      "employeeId": "EMP002",
+      "employeeName": "李四",
+      "diffType": "changed",
+      "permissionId": "PERM_INH004",
+      "permissionName": "部门公共文档",
+      "originalValue": "部门: 市场部",
+      "changeReason": "继承权限：部门变更需重新计算 (来源: 市场部)",
+      "category": "inherited"
+    },
+    {
+      "employeeId": "EMP002",
+      "employeeName": "李四",
+      "diffType": "changed",
+      "permissionId": "DEPT_INHERITANCE_CHECK",
+      "permissionName": "部门继承权限检查",
+      "originalValue": "市场部",
+      "newValue": "销售部",
+      "changeReason": "部门变更：从 [市场部] 调至 [销售部]，需重新计算部门继承权限",
+      "category": "inherited"
+    }
+  ]
+}

@@ -1,0 +1,256 @@
+[
+  {
+    "employeeId": "EMP001",
+    "employeeName": "张三",
+    "originalDepartment": "技术研发部",
+    "originalDepartmentId": "DEP001",
+    "newDepartment": "产品部",
+    "newDepartmentId": "DEP002",
+    "originalPermissions": [
+      {
+        "permissionId": "PERM001",
+        "permissionName": "代码库读写权限",
+        "permissionType": "write",
+        "resource": "/repo/backend",
+        "scope": "department",
+        "grantedBy": "SYSTEM",
+        "grantedAt": "2024-01-15"
+      },
+      {
+        "permissionId": "PERM002",
+        "permissionName": "服务器SSH访问",
+        "permissionType": "execute",
+        "resource": "/servers/dev",
+        "scope": "department",
+        "grantedBy": "DEP001",
+        "grantedAt": "2024-02-20"
+      },
+      {
+        "permissionId": "PERM003",
+        "permissionName": "文档查看权限",
+        "permissionType": "read",
+        "resource": "/docs/public",
+        "scope": "company",
+        "grantedBy": "SYSTEM",
+        "grantedAt": "2024-01-01"
+      }
+    ],
+    "newPermissions": [
+      {
+        "permissionId": "PERM003",
+        "permissionName": "文档查看权限",
+        "permissionType": "read",
+        "resource": "/docs/public",
+        "scope": "company",
+        "grantedBy": "SYSTEM",
+        "grantedAt": "2024-01-01"
+      },
+      {
+        "permissionId": "PERM004",
+        "permissionName": "产品需求编辑",
+        "permissionType": "write",
+        "resource": "/prd/all",
+        "scope": "department",
+        "grantedBy": "DEP002",
+        "grantedAt": "2025-01-10"
+      },
+      {
+        "permissionId": "PERM005",
+        "permissionName": "原型工具访问",
+        "permissionType": "read",
+        "resource": "/tools/figma",
+        "scope": "department",
+        "grantedBy": "DEP002",
+        "grantedAt": "2025-01-10"
+      }
+    ],
+    "partTimeDepartments": [
+      {
+        "departmentId": "DEP003",
+        "departmentName": "运维部",
+        "permissions": [
+          {
+            "permissionId": "PERM_PART001",
+            "permissionName": "运维监控查看",
+            "permissionType": "read",
+            "resource": "/monitor/all",
+            "scope": "department",
+            "grantedBy": "DEP003",
+            "grantedAt": "2024-06-01"
+          }
+        ],
+        "effectiveDate": "2024-06-01",
+        "expiryDate": "2025-06-01"
+      }
+    ],
+    "temporaryAuthorizations": [
+      {
+        "authId": "AUTH001",
+        "authName": "项目临时权限",
+        "permissions": [
+          {
+            "permissionId": "PERM_TEMP001",
+            "permissionName": "客户数据临时访问",
+            "permissionType": "read",
+            "resource": "/data/customer",
+            "scope": "project",
+            "grantedBy": "PROJ001",
+            "grantedAt": "2024-12-01"
+          }
+        ],
+        "grantedBy": "经理A",
+        "grantedAt": "2024-12-01",
+        "expiryDate": "2025-02-28",
+        "reason": "年度审计项目需要"
+      }
+    ],
+    "inheritedPermissions": [
+      {
+        "permissionId": "PERM_INH001",
+        "permissionName": "部门公共文档",
+        "inheritedFrom": "department",
+        "sourceId": "DEP001",
+        "sourceName": "技术研发部",
+        "resource": "/docs/dept"
+      },
+      {
+        "permissionId": "PERM_INH002",
+        "permissionName": "开发工程师角色权限",
+        "inheritedFrom": "role",
+        "sourceId": "ROLE_DEV",
+        "sourceName": "开发工程师",
+        "resource": "/tools/dev"
+      },
+      {
+        "permissionId": "PERM_INH003",
+        "permissionName": "技术委员会权限",
+        "inheritedFrom": "group",
+        "sourceId": "GROUP_TECH",
+        "sourceName": "技术委员会",
+        "resource": "/committee/tech"
+      }
+    ]
+  },
+  {
+    "employeeId": "EMP002",
+    "employeeName": "李四",
+    "originalDepartment": "市场部",
+    "originalDepartmentId": "DEP004",
+    "newDepartment": "销售部",
+    "newDepartmentId": "DEP005",
+    "originalPermissions": [
+      {
+        "permissionId": "PERM006",
+        "permissionName": "市场数据分析",
+        "permissionType": "write",
+        "resource": "/market/data",
+        "scope": "department",
+        "grantedBy": "DEP004",
+        "grantedAt": "2024-03-10"
+      },
+      {
+        "permissionId": "PERM007",
+        "permissionName": "营销素材库",
+        "permissionType": "read",
+        "resource": "/marketing/assets",
+        "scope": "department",
+        "grantedBy": "DEP004",
+        "grantedAt": "2024-03-15"
+      }
+    ],
+    "newPermissions": [
+      {
+        "permissionId": "PERM008",
+        "permissionName": "客户关系管理",
+        "permissionType": "write",
+        "resource": "/crm/all",
+        "scope": "department",
+        "grantedBy": "DEP005",
+        "grantedAt": "2025-01-15"
+      },
+      {
+        "permissionId": "PERM009",
+        "permissionName": "销售报表查看",
+        "permissionType": "read",
+        "resource": "/sales/reports",
+        "scope": "department",
+        "grantedBy": "DEP005",
+        "grantedAt": "2025-01-15"
+      }
+    ],
+    "partTimeDepartments": [],
+    "temporaryAuthorizations": [],
+    "inheritedPermissions": [
+      {
+        "permissionId": "PERM_INH004",
+        "permissionName": "部门公共文档",
+        "inheritedFrom": "department",
+        "sourceId": "DEP004",
+        "sourceName": "市场部",
+        "resource": "/docs/dept"
+      }
+    ]
+  },
+  {
+    "employeeId": "EMP003",
+    "employeeName": "王五",
+    "originalDepartment": "财务部",
+    "originalDepartmentId": "DEP006",
+    "newDepartment": "财务部",
+    "newDepartmentId": "DEP006",
+    "originalPermissions": [
+      {
+        "permissionId": "PERM010",
+        "permissionName": "财务系统访问",
+        "permissionType": "read",
+        "resource": "/finance/all",
+        "scope": "department",
+        "grantedBy": "DEP006",
+        "grantedAt": "2024-04-01"
+      }
+    ],
+    "newPermissions": [
+      {
+        "permissionId": "PERM010",
+        "permissionName": "财务系统访问",
+        "permissionType": "read",
+        "resource": "/finance/all",
+        "scope": "department",
+        "grantedBy": "DEP006",
+        "grantedAt": "2024-04-01"
+      },
+      {
+        "permissionId": "PERM011",
+        "permissionName": "预算审批权限",
+        "permissionType": "admin",
+        "resource": "/budget/approve",
+        "scope": "department",
+        "grantedBy": "DEP006",
+        "grantedAt": "2025-01-20"
+      }
+    ],
+    "partTimeDepartments": [],
+    "temporaryAuthorizations": [
+      {
+        "authId": "AUTH002",
+        "authName": "年度审计授权",
+      "permissions": [
+          {
+            "permissionId": "PERM_TEMP002",
+            "permissionName": "审计数据访问",
+            "permissionType": "read",
+            "resource": "/audit/data",
+            "scope": "company",
+            "grantedBy": "AUDIT",
+            "grantedAt": "2025-01-01"
+          }
+        ],
+        "grantedBy": "审计部",
+        "grantedAt": "2025-01-01",
+        "expiryDate": "2025-03-31",
+        "reason": "年度财务审计"
+      }
+    ],
+    "inheritedPermissions": []
+  }
+]

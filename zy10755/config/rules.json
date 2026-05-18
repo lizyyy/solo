@@ -1,0 +1,33 @@
+{
+  "version": "v2.1.0",
+  "effectiveDate": "2025-01-01",
+  "rules": {
+    "partTimeHandling": {
+      "enabled": true,
+      "retainOnTransfer": false,
+      "autoExpireDays": 30
+    },
+    "temporaryAuthorization": {
+      "enabled": true,
+      "carryOverOnTransfer": false,
+      "requireReapproval": true
+    },
+    "inheritance": {
+      "enabled": true,
+      "recalculateOnDepartmentChange": true,
+      "roleInheritance": true,
+      "groupInheritance": true,
+      "departmentInheritance": true
+    },
+    "permissionMatching": {
+      "matchById": true,
+      "matchByName": false,
+      "ignoreScope": false
+    },
+    "output": {
+      "includeUnchanged": true,
+      "splitByCategory": true,
+      "generateSummary": true
+    }
+  }
+}

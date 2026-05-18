@@ -1,0 +1,35 @@
+{
+  "fileType": "组织变更-临时授权差异",
+  "generatedAt": "2026-05-18T17:13:16.370Z",
+  "ruleVersion": "v2.1.0",
+  "recordCount": 2,
+  "handlingRules": {
+    "enabled": true,
+    "carryOverOnTransfer": false,
+    "requireReapproval": true
+  },
+  "data": [
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "changed",
+      "permissionId": "PERM_TEMP001",
+      "permissionName": "客户数据临时访问",
+      "originalValue": "项目临时权限",
+      "newValue": "待重新审批",
+      "changeReason": "临时授权：调岗后需重新审批 (年度审计项目需要, 过期: 2025-02-28)",
+      "category": "temporary"
+    },
+    {
+      "employeeId": "EMP003",
+      "employeeName": "王五",
+      "diffType": "changed",
+      "permissionId": "PERM_TEMP002",
+      "permissionName": "审计数据访问",
+      "originalValue": "年度审计授权",
+      "newValue": "待重新审批",
+      "changeReason": "临时授权：调岗后需重新审批 (年度财务审计, 过期: 2025-03-31)",
+      "category": "temporary"
+    }
+  ]
+}

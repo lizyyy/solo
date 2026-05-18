@@ -1,0 +1,98 @@
+{
+  "fileType": "组织变更-标准权限差异",
+  "generatedAt": "2026-05-18T17:13:16.369Z",
+  "ruleVersion": "v2.1.0",
+  "recordCount": 9,
+  "data": [
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "removed",
+      "permissionId": "PERM001",
+      "permissionName": "代码库读写权限",
+      "originalValue": "write:/repo/backend",
+      "changeReason": "调岗后权限被移除",
+      "category": "standard"
+    },
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "removed",
+      "permissionId": "PERM002",
+      "permissionName": "服务器SSH访问",
+      "originalValue": "execute:/servers/dev",
+      "changeReason": "调岗后权限被移除",
+      "category": "standard"
+    },
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "added",
+      "permissionId": "PERM004",
+      "permissionName": "产品需求编辑",
+      "newValue": "write:/prd/all",
+      "changeReason": "调岗后获得新权限",
+      "category": "standard"
+    },
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "added",
+      "permissionId": "PERM005",
+      "permissionName": "原型工具访问",
+      "newValue": "read:/tools/figma",
+      "changeReason": "调岗后获得新权限",
+      "category": "standard"
+    },
+    {
+      "employeeId": "EMP002",
+      "employeeName": "李四",
+      "diffType": "removed",
+      "permissionId": "PERM006",
+      "permissionName": "市场数据分析",
+      "originalValue": "write:/market/data",
+      "changeReason": "调岗后权限被移除",
+      "category": "standard"
+    },
+    {
+      "employeeId": "EMP002",
+      "employeeName": "李四",
+      "diffType": "removed",
+      "permissionId": "PERM007",
+      "permissionName": "营销素材库",
+      "originalValue": "read:/marketing/assets",
+      "changeReason": "调岗后权限被移除",
+      "category": "standard"
+    },
+    {
+      "employeeId": "EMP002",
+      "employeeName": "李四",
+      "diffType": "added",
+      "permissionId": "PERM008",
+      "permissionName": "客户关系管理",
+      "newValue": "write:/crm/all",
+      "changeReason": "调岗后获得新权限",
+      "category": "standard"
+    },
+    {
+      "employeeId": "EMP002",
+      "employeeName": "李四",
+      "diffType": "added",
+      "permissionId": "PERM009",
+      "permissionName": "销售报表查看",
+      "newValue": "read:/sales/reports",
+      "changeReason": "调岗后获得新权限",
+      "category": "standard"
+    },
+    {
+      "employeeId": "EMP003",
+      "employeeName": "王五",
+      "diffType": "added",
+      "permissionId": "PERM011",
+      "permissionName": "预算审批权限",
+      "newValue": "admin:/budget/approve",
+      "changeReason": "调岗后获得新权限",
+      "category": "standard"
+    }
+  ]
+}

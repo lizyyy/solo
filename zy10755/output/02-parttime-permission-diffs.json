@@ -1,0 +1,23 @@
+{
+  "fileType": "组织变更-兼职部门权限差异",
+  "generatedAt": "2026-05-18T17:13:16.370Z",
+  "ruleVersion": "v2.1.0",
+  "recordCount": 1,
+  "handlingRules": {
+    "enabled": true,
+    "retainOnTransfer": false,
+    "autoExpireDays": 30
+  },
+  "data": [
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "removed",
+      "permissionId": "PERM_PART001",
+      "permissionName": "运维监控查看",
+      "originalValue": "运维部 (兼职)",
+      "changeReason": "兼职部门权限：调岗后需重新申请",
+      "category": "part-time"
+    }
+  ]
+}

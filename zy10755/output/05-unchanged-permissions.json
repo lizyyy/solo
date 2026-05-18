@@ -1,0 +1,30 @@
+{
+  "fileType": "组织变更-未变更权限",
+  "generatedAt": "2026-05-18T17:13:16.371Z",
+  "ruleVersion": "v2.1.0",
+  "recordCount": 2,
+  "data": [
+    {
+      "employeeId": "EMP001",
+      "employeeName": "张三",
+      "diffType": "unchanged",
+      "permissionId": "PERM003",
+      "permissionName": "文档查看权限",
+      "originalValue": "read:/docs/public",
+      "newValue": "read:/docs/public",
+      "changeReason": "权限未发生变化",
+      "category": "standard"
+    },
+    {
+      "employeeId": "EMP003",
+      "employeeName": "王五",
+      "diffType": "unchanged",
+      "permissionId": "PERM010",
+      "permissionName": "财务系统访问",
+      "originalValue": "read:/finance/all",
+      "newValue": "read:/finance/all",
+      "changeReason": "权限未发生变化",
+      "category": "standard"
+    }
+  ]
+}

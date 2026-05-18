@@ -1,0 +1,27 @@
+{
+  "name": "org-permission-diff-cli",
+  "version": "1.0.0",
+  "description": "组织变更文件权限重算差异 CLI",
+  "main": "dist/index.js",
+  "bin": {
+    "org-permission-diff": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "test": "ts-node src/cli.ts --input samples/input.json --rules config/rules.json --output output --dry-run"
+  },
+  "keywords": ["permission", "organization", "diff"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "fs-extra": "^11.1.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  }
+}
