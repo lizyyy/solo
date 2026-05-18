@@ -1,0 +1,23 @@
+{
+  "name": "nursing-home-medicine-expiry-cli",
+  "version": "1.0.0",
+  "description": "养老院药事组养老药品效期管理 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "medicine-expiry": "./src/index.js"
+  },
+  "scripts": {
+    "preview": "node src/index.js preview",
+    "run": "node src/index.js run",
+    "report": "node src/index.js report"
+  },
+  "keywords": ["nursing-home", "medicine", "expiry", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2"
+  }
+}
