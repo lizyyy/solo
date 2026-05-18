@@ -15,6 +15,17 @@ from app.schemas.schemas import (
 )
 
 
+class DateEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, date):
+            return obj.isoformat()
+        return super().default(obj)
+
+
+def safe_json_dumps(obj: Any, **kwargs) -> str:
+    return json.dumps(obj, cls=DateEncoder, **kwargs)
+
+
 def generate_batch_id() -> str:
     return f"BATCH-{datetime.now().strftime('%Y%m%d%H%M%S')}-{uuid.uuid4().hex[:6]}"
 
@@ -53,7 +64,7 @@ def batch_import_orders(
         try:
             order.batch_id = batch_id
             order.row_number = idx + 1
-            order.raw_data = json.dumps(order.model_dump(), ensure_ascii=False)
+            order.raw_data = safe_json_dumps(order.model_dump(), ensure_ascii=False)
 
             department = db.query(Department).filter(
                 Department.id == order.department_id
@@ -77,7 +88,7 @@ def batch_import_orders(
                 batch_id=batch_id,
                 exception_type="import_error",
                 description=str(e),
-                raw_data=json.dumps(order.model_dump(), ensure_ascii=False),
+                raw_data=safe_json_dumps(order.model_dump(), ensure_ascii=False),
                 status="pending"
             )
             db.add(exception)
@@ -146,7 +157,7 @@ def process_cancellation_offset(
     for idx, cancel in enumerate(cancellations):
         cancel.batch_id = batch_id
         cancel.row_number = idx + 1
-        cancel.raw_data = json.dumps(cancel.model_dump(), ensure_ascii=False)
+        cancel.raw_data = safe_json_dumps(cancel.model_dump(), ensure_ascii=False)
 
         matched_order = None
 
@@ -442,6 +453,12 @@ def get_diet_restriction_summary(
         reports = reports.filter(MealReport.meal_type_id == meal_type_id)
     reports = reports.all()
 
+    meal_type_name = "全部"
+    if meal_type_id:
+        meal_type = db.query(MealType).filter(MealType.id == meal_type_id).first()
+        if meal_type:
+            meal_type_name = meal_type.name
+
     all_restrictions = {}
     total_orders = 0
     total_cancelled = 0
@@ -476,6 +493,7 @@ def get_diet_restriction_summary(
 
     return {
         "report_date": report_date,
+        "meal_type": meal_type_name,
         "total_orders": total_orders,
         "total_cancelled": total_cancelled,
         "net_quantity": total_orders - total_cancelled,
