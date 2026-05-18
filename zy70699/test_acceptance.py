@@ -55,7 +55,9 @@ def test_dirty_data():
     
     results = engine.trace_batch('B002')
     assert len(results) == 1, f"预期1条记录，实际{len(results)}条"
-    print(f"✓ 通过: 脏数据验证 (患者: {results[0].patient_name})")
+    assert results[0].is_valid == False, "预期B002批次应为无效记录（使用过期灭菌）"
+    assert 'EXPIRED' in [a.value for a in results[0].anomalies], "预期检测到EXPIRED异常（使用已过期灭菌）"
+    print(f"✓ 通过: 脏数据验证 (患者: {results[0].patient_name}, 异常类型: {[a.value for a in results[0].anomalies]})")
     return True
 
 
@@ -131,8 +133,10 @@ def test_statistics():
     assert stats['total_sterilizations'] == 4, f"预期4条灭菌记录，实际{stats['total_sterilizations']}"
     assert stats['total_patients'] == 3, f"预期3个患者，实际{stats['total_patients']}"
     assert stats['total_traces'] == 4, f"预期4条追溯记录，实际{stats['total_traces']}"
-    assert stats['valid_count'] == 2, f"预期2条有效记录，实际{stats['valid_count']}"
-    assert stats['invalid_count'] == 2, f"预期2条无效记录，实际{stats['invalid_count']}"
+    assert stats['valid_count'] == 1, f"预期1条有效记录（仅B001正常），实际{stats['valid_count']}"
+    assert stats['invalid_count'] == 3, f"预期3条无效记录（B002过期灭菌，B003未来使用，B004无有效灭菌），实际{stats['invalid_count']}"
+    assert 'EXPIRED' in stats['anomaly_counts'], "预期异常统计中包含EXPIRED类型"
+    assert stats['anomaly_counts']['EXPIRED'] >= 1, "预期至少有1条EXPIRED异常记录"
     print("✓ 通过: 统计汇总验证")
     return True
 

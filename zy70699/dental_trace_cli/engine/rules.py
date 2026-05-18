@@ -104,6 +104,24 @@ class TraceEngine:
         
         return None
 
+    def check_any_sterilization_before(
+        self,
+        batch_id: str,
+        usage_date: datetime
+    ) -> Tuple[bool, Optional[SterilizationRecord]]:
+        sterilizations = self.batch_sterilizations.get(batch_id, [])
+        
+        expired_sterilizations = []
+        for ster in sterilizations:
+            if ster.expiration_date < usage_date:
+                expired_sterilizations.append(ster)
+        
+        if expired_sterilizations:
+            expired_sterilizations.sort(key=lambda x: x.expiration_date, reverse=True)
+            return True, expired_sterilizations[0]
+        
+        return False, None
+
     def trace_batch(self, batch_id: str) -> List[TraceResult]:
         if batch_id not in self.batches:
             return []
@@ -150,15 +168,24 @@ class TraceEngine:
             sterilization = self.find_sterilization_for_usage(batch_id, usage.usage_date)
             
             if not sterilization:
-                anomalies.append(AnomalyType.NOT_STERILIZED)
-                sterilizations = self.batch_sterilizations.get(batch_id, [])
-                if sterilizations:
+                has_expired, expired_ster = self.check_any_sterilization_before(batch_id, usage.usage_date)
+                if has_expired and expired_ster:
+                    anomalies.append(AnomalyType.EXPIRED)
                     anomaly_details.append(
-                        f"无有效灭菌记录: 共有 {len(sterilizations)} 条灭菌记录，"
-                        f"但使用时间 {usage.usage_date} 不在任何灭菌有效期内"
+                        f"使用已过期灭菌: 最近一次灭菌ID={expired_ster.sterilization_id}, "
+                        f"有效期至 {expired_ster.expiration_date.strftime('%Y-%m-%d %H:%M:%S')}, "
+                        f"使用时间 {usage.usage_date.strftime('%Y-%m-%d %H:%M:%S')}"
                     )
                 else:
-                    anomaly_details.append("该批次无任何灭菌记录")
+                    anomalies.append(AnomalyType.NOT_STERILIZED)
+                    sterilizations = self.batch_sterilizations.get(batch_id, [])
+                    if sterilizations:
+                        anomaly_details.append(
+                            f"无有效灭菌记录: 共有 {len(sterilizations)} 条灭菌记录，"
+                            f"但使用时间 {usage.usage_date} 不在任何灭菌有效期内"
+                        )
+                    else:
+                        anomaly_details.append("该批次无任何灭菌记录")
             else:
                 valid, reason = self.validate_sterilization_expiration(sterilization, usage.usage_date)
                 if not valid:

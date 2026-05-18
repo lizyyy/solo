@@ -169,8 +169,8 @@ def generate_samples(output):
     sterilizations = [
         ['灭菌记录ID', '批次号', '灭菌日期', '灭菌有效期', '灭菌方式', '操作人员', '灭菌器编号', '温度', '时长', '指示剂结果', '备注'],
         ['S001', 'B001', (now - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S'), (now + timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S'), '高压蒸汽', '张护士', 'STER-001', 134, 15, '合格', '正常灭菌'],
-        ['S002', 'B002', (now - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S'), (now - timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S'), '高压蒸汽', '李护士', 'STER-001', 134, 15, '合格', '已过期灭菌'],
-        ['S003', 'B002', (now - timedelta(days=5)).strftime('%Y-%m-%d %H:%M:%S'), (now + timedelta(days=55)).strftime('%Y-%m-%d %H:%M:%S'), '高压蒸汽', '张护士', 'STER-002', 134, 15, '合格', '重新灭菌'],
+        ['S002', 'B002', (now - timedelta(days=60)).strftime('%Y-%m-%d %H:%M:%S'), (now - timedelta(days=10)).strftime('%Y-%m-%d %H:%M:%S'), '高压蒸汽', '李护士', 'STER-001', 134, 15, '合格', '已过期灭菌'],
+        ['S003', 'B002', (now - timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S'), (now + timedelta(days=57)).strftime('%Y-%m-%d %H:%M:%S'), '高压蒸汽', '张护士', 'STER-002', 134, 15, '合格', '重新灭菌（在使用之后）'],
         ['S004', 'B004', (now + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S'), (now + timedelta(days=61)).strftime('%Y-%m-%d %H:%M:%S'), '环氧乙烷', '王护士', 'STER-003', 55, 360, '合格', '未来灭菌时间'],
     ]
     
