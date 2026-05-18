@@ -1,0 +1,20 @@
+{
+  "name": "lens-param-validator",
+  "version": "1.0.0",
+  "description": "眼镜店镜片参数校验CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "lens-validate": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["眼镜店", "镜片", "参数校验", "CLI"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}

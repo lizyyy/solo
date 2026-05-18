@@ -1,0 +1,6 @@
+"sourceFile","prescriptionId","patientName","status","warningCount","errorCount","warningTypes","errorTypes","warningMessages","errorMessages"
+"prescriptions_dirty.csv","RX20240501006","周八","WARNING",1,0,"EYE_SWAP","","检测到可能的左右眼参数颠倒",""
+"prescriptions_dirty.csv","RX20240501007","吴九","WARNING",1,0,"AXIS_RANGE","","左眼轴位超出有效范围",""
+"prescriptions_dirty.csv","RX20240501008","郑十","WARNING",2,0,"AXIS_RANGE;AXIS_RANGE","","左眼轴位超出有效范围 | 右眼轴位超出有效范围",""
+"prescriptions_dirty.csv","RX20240501009","钱十一","WARNING",1,0,"EYE_SWAP","","检测到可能的左右眼参数颠倒",""
+"prescriptions_dirty.csv","RX20240501010","孙十二","ERROR",1,1,"EYE_SWAP","MISSING_FIELD","检测到可能的左右眼参数颠倒","缺少必填字段: 左眼球镜"

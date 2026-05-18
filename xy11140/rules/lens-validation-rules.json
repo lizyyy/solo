@@ -1,0 +1,42 @@
+{
+  "name": "眼镜店镜片参数校验规则",
+  "version": "1.0",
+  "description": "用于眼镜店镜片处方参数校验的规则配置",
+  
+  "requiredFields": [
+    "处方单号",
+    "患者姓名",
+    "左眼球镜",
+    "右眼球镜"
+  ],
+  
+  "eyeSwap": {
+    "enabled": true,
+    "threshold": 2.0,
+    "description": "左右眼球镜差值超过阈值时，可能存在左右眼颠倒"
+  },
+  
+  "axisRange": {
+    "enabled": true,
+    "min": 0,
+    "max": 180,
+    "description": "轴位有效范围为0-180度"
+  },
+  
+  "reprocess": {
+    "enabled": true,
+    "description": "标记重跑数据记录"
+  },
+  
+  "sphereRange": {
+    "min": -30.0,
+    "max": 30.0,
+    "step": 0.25
+  },
+  
+  "cylinderRange": {
+    "min": -10.0,
+    "max": 10.0,
+    "step": 0.25
+  }
+}

@@ -1,0 +1,6 @@
+"sourceFile","prescriptionId","patientName","status","warningCount","errorCount","warningTypes","errorTypes","warningMessages","errorMessages"
+"prescriptions_reprocess.csv","RX20240501006-R","周八","WARNING",2,0,"EYE_SWAP;REPROCESSED","","检测到可能的左右眼参数颠倒 | 该记录为重跑数据",""
+"prescriptions_reprocess.csv","RX20240501007-R","吴九","WARNING",1,0,"REPROCESSED","","该记录为重跑数据",""
+"prescriptions_reprocess.csv","RX20240501008-R","郑十","WARNING",1,0,"REPROCESSED","","该记录为重跑数据",""
+"prescriptions_reprocess.csv","RX20240501011","王小明","PASS",0,0,"","","",""
+"prescriptions_reprocess.csv","RX20240501012","李小红","PASS",0,0,"","","",""
