@@ -1,0 +1,29 @@
+{
+  "name": "low-altitude-inspection-no-fly-api",
+  "version": "1.0.0",
+  "description": "低空巡检平台航线临时禁飞 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "seed": "node src/scripts/seed.js",
+    "test": "node src/scripts/test.js",
+    "lint": "eslint src/**/*.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "joi": "^17.11.0",
+    "moment": "^2.29.4",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "eslint": "^8.52.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
