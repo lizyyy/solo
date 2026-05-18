@@ -1,12 +1,15 @@
+#!/usr/bin/env python3
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime, timedelta
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from app.main import app
 from app.database import Base, get_db
-from app.models import RepairStatus, UrgencyLevel
-from main import app
+from app import schemas
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -17,8 +20,8 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 
 def override_get_db():
-    db = TestingSessionLocal()
     try:
+        db = TestingSessionLocal()
         yield db
     finally:
         db.close()
@@ -29,483 +32,341 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
-@pytest.fixture(autouse=True)
-def setup_database():
+@pytest.fixture(scope="function")
+def db_session():
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
 
 
-def test_read_root():
-    response = client.get("/")
+def test_health_check():
+    response = client.get("/health")
     assert response.status_code == 200
-    data = response.json()
-    assert "message" in data
-    assert "version" in data
+    assert response.json()["status"] == "healthy"
 
 
-def test_create_building():
+def test_create_handler(db_session):
     response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三",
-            "owner_phone": "13800138001"
-        }
+        "/api/handlers/",
+        json={"name": "张工", "phone": "13800138000", "department": "工程部", "role": "维修工", "is_outsource": False}
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["building_name"] == "1号楼"
-    assert data["room_number"] == "101"
-    assert "id" in data
+    assert data["name"] == "张工"
+    assert data["is_outsource"] == False
 
 
-def test_read_buildings():
-    client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "102",
-            "owner_name": "李四"
-        }
-    )
-    
-    response = client.get("/buildings/")
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data) >= 2
-
-
-def test_create_handler():
+def test_create_repair_order(db_session):
     response = client.post(
-        "/handlers/",
+        "/api/orders/",
         json={
-            "name": "张维修",
-            "phone": "13900139001",
-            "department": "工程部",
-            "is_outsourcer": False
-        }
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["name"] == "张维修"
-    assert data["is_outsourcer"] == False
-
-
-def test_read_handlers():
-    client.post(
-        "/handlers/",
-        json={
-            "name": "张维修",
-            "is_outsourcer": False
-        }
-    )
-    client.post(
-        "/handlers/",
-        json={
-            "name": "王师傅",
-            "is_outsourcer": True,
-            "company_name": "诚信维修"
-        }
-    )
-    
-    response = client.get("/handlers/")
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data) >= 2
-    
-    response = client.get("/handlers/?is_outsourcer=true")
-    assert response.status_code == 200
-    data = response.json()
-    assert all(h["is_outsourcer"] == True for h in data)
-
-
-def test_create_repair_order():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
+            "building": "1号楼",
             "room_number": "101",
-            "owner_name": "张三"
+            "repair_type": "水电维修",
+            "description": "水龙头漏水",
+            "contact_name": "业主A",
+            "contact_phone": "13900139000",
+            "priority": "normal",
+            "sla_hours": 24
         }
     )
-    building_id = building_response.json()["id"]
+    assert response.status_code == 200
+    data = response.json()
+    assert data["order_no"].startswith("WO")
+    assert data["status"] == "pending"
+    assert data["building_room"]["building"] == "1号楼"
+    assert data["building_room"]["room_number"] == "101"
+
+
+def test_query_orders(db_session):
+    for i in range(5):
+        client.post(
+            "/api/orders/",
+            json={
+                "building": f"{i+1}号楼",
+                "room_number": "101",
+                "repair_type": "水电维修",
+                "description": "测试报修",
+                "contact_name": "业主",
+                "contact_phone": "13900139000",
+                "priority": "normal",
+                "sla_hours": 24
+            }
+        )
     
     response = client.post(
-        "/repairs/",
-        json={
-            "building_id": building_id,
-            "reporter_name": "张三",
-            "reporter_phone": "13800138001",
-            "repair_type": "水管漏水",
-            "description": "厨房水管漏水",
-            "urgency": "high"
-        }
+        "/api/orders/query",
+        json={"page": 1, "page_size": 10}
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["repair_type"] == "水管漏水"
-    assert data["urgency"] == "high"
-    assert "order_no" in data
+    assert data["total"] == 5
+    assert len(data["data"]) == 5
 
 
-def test_read_repair_orders():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
-    
-    client.post(
-        "/repairs/",
-        json={
-            "building_id": building_id,
-            "repair_type": "水管漏水",
-            "urgency": "high"
-        }
-    )
-    client.post(
-        "/repairs/",
-        json={
-            "building_id": building_id,
-            "repair_type": "电路故障",
-            "urgency": "medium"
-        }
-    )
-    
-    response = client.get("/repairs/")
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data) >= 2
-
-
-def test_update_order_status():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
-    
+def test_add_reminder(db_session):
     order_response = client.post(
-        "/repairs/",
+        "/api/orders/",
         json={
-            "building_id": building_id,
-            "repair_type": "水管漏水",
-            "urgency": "high"
+            "building": "1号楼",
+            "room_number": "101",
+            "repair_type": "水电维修",
+            "description": "水龙头漏水",
+            "contact_name": "业主A",
+            "contact_phone": "13900139000",
+            "priority": "normal",
+            "sla_hours": 24
         }
     )
     order_id = order_response.json()["id"]
     
-    update_response = client.patch(
-        f"/repairs/{order_id}/status",
+    response = client.post(
+        f"/api/orders/{order_id}/reminders",
         json={
-            "new_status": "assigned",
-            "operator": "管理员",
-            "reason": "已分配给维修人员",
-            "conclusion": "任务已分配"
+            "reminder_type": "normal",
+            "content": "请尽快处理",
+            "reminded_by": "业主A"
         }
     )
-    assert update_response.status_code == 200
-    data = update_response.json()
-    assert data["status"] == "assigned"
+    assert response.status_code == 200
+    data = response.json()
+    assert data["content"] == "请尽快处理"
+    assert data["repair_order_id"] == order_id
 
 
-def test_add_reminder():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
-    
-    order_response = client.post(
-        "/repairs/",
-        json={
-            "building_id": building_id,
-            "repair_type": "水管漏水",
-            "urgency": "high"
-        }
-    )
-    order_id = order_response.json()["id"]
-    
-    reminder_response = client.post(
-        f"/repairs/{order_id}/reminders",
-        json={
-            "reminder_method": "电话",
-            "reminder_content": "请尽快处理",
-            "reminder_by": "张三"
-        }
-    )
-    assert reminder_response.status_code == 200
-    data = reminder_response.json()
-    assert data["reminder_by"] == "张三"
-
-
-def test_outsourcing():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
-    
+def test_status_flow_assignment(db_session):
     handler_response = client.post(
-        "/handlers/",
-        json={
-            "name": "王师傅",
-            "is_outsourcer": True,
-            "company_name": "诚信维修"
-        }
+        "/api/handlers/",
+        json={"name": "张工", "phone": "13800138000", "department": "工程部", "role": "维修工", "is_outsource": False}
     )
     handler_id = handler_response.json()["id"]
     
     order_response = client.post(
-        "/repairs/",
+        "/api/orders/",
         json={
-            "building_id": building_id,
-            "repair_type": "空调维修",
-            "urgency": "high"
+            "building": "1号楼",
+            "room_number": "101",
+            "repair_type": "水电维修",
+            "description": "水龙头漏水",
+            "contact_name": "业主A",
+            "contact_phone": "13900139000",
+            "priority": "normal",
+            "sla_hours": 24
         }
     )
     order_id = order_response.json()["id"]
     
-    outsourcing_response = client.post(
-        f"/repairs/{order_id}/outsourcing?operator=管理员",
+    response = client.post(
+        f"/api/orders/{order_id}/advance/assign",
         json={
-            "outsourcer_id": handler_id,
-            "cost_estimate": 200,
-            "notes": "需要加氟"
+            "operated_by": "物业管理员",
+            "handler_id": handler_id,
+            "notes": "已派单给张工"
         }
     )
-    assert outsourcing_response.status_code == 200
-    data = outsourcing_response.json()
-    assert data["cost_estimate"] == 200
-    
-    order_detail = client.get(f"/repairs/{order_id}")
-    assert order_detail.json()["status"] == "outsourced"
-
-
-def test_close_order():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
-    
-    order_response = client.post(
-        "/repairs/",
-        json={
-            "building_id": building_id,
-            "repair_type": "水管漏水",
-            "urgency": "high"
-        }
-    )
-    order_id = order_response.json()["id"]
-    
-    close_response = client.post(
-        f"/repairs/{order_id}/close?operator=管理员&reason=维修已完成"
-    )
-    assert close_response.status_code == 200
-    data = close_response.json()
-    assert data["status"] == "closed"
-
-
-def test_cancel_order():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
-    
-    order_response = client.post(
-        "/repairs/",
-        json={
-            "building_id": building_id,
-            "repair_type": "水管漏水",
-            "urgency": "high"
-        }
-    )
-    order_id = order_response.json()["id"]
-    
-    cancel_response = client.post(
-        f"/repairs/{order_id}/cancel?operator=管理员&reason=业主自行解决"
-    )
-    assert cancel_response.status_code == 200
-    data = cancel_response.json()
-    assert data["status"] == "cancelled"
-
-
-def test_audit_logs():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
-    
-    order_response = client.post(
-        "/repairs/",
-        json={
-            "building_id": building_id,
-            "repair_type": "水管漏水",
-            "urgency": "high"
-        }
-    )
-    order_id = order_response.json()["id"]
-    
-    client.patch(
-        f"/repairs/{order_id}/status",
-        json={
-            "new_status": "assigned",
-            "operator": "管理员",
-            "reason": "已分配"
-        }
-    )
-    
-    logs_response = client.get(f"/repairs/{order_id}/audit-logs")
-    assert logs_response.status_code == 200
-    data = logs_response.json()
-    assert len(data) >= 1
-    assert any(log["action"] == "status_update" for log in data)
-
-
-def test_export_repairs():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
-    
-    client.post(
-        "/repairs/",
-        json={
-            "building_id": building_id,
-            "repair_type": "水管漏水",
-            "urgency": "high"
-        }
-    )
-    
-    response = client.get("/export/repairs")
     assert response.status_code == 200
-    assert "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" in response.headers["content-type"]
-
-
-def test_export_statistics():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
+    assert response.json()["status"] == "assigned"
     
-    client.post(
-        "/repairs/",
-        json={
-            "building_id": building_id,
-            "repair_type": "水管漏水",
-            "urgency": "high"
-        }
+    response = client.post(
+        f"/api/orders/{order_id}/advance/start",
+        json={"operated_by": "张工", "notes": "开始维修"}
     )
-    
-    response = client.get("/export/statistics")
     assert response.status_code == 200
-    assert "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" in response.headers["content-type"]
-
-
-def test_manual_correction():
-    building_response = client.post(
-        "/buildings/",
-        json={
-            "building_name": "1号楼",
-            "unit_number": "1单元",
-            "room_number": "101",
-            "owner_name": "张三"
-        }
-    )
-    building_id = building_response.json()["id"]
+    assert response.json()["status"] == "processing"
     
+    response = client.post(
+        f"/api/orders/{order_id}/advance/complete",
+        json={"operated_by": "张工", "notes": "维修完成"}
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "completed"
+
+
+def test_manual_correction(db_session):
     order_response = client.post(
-        "/repairs/",
+        "/api/orders/",
         json={
-            "building_id": building_id,
-            "repair_type": "水管漏水",
-            "urgency": "high"
+            "building": "1号楼",
+            "room_number": "101",
+            "repair_type": "水电维修",
+            "description": "水龙头漏水",
+            "contact_name": "业主A",
+            "contact_phone": "13900139000",
+            "priority": "normal",
+            "sla_hours": 24
         }
     )
     order_id = order_response.json()["id"]
     
-    correction_response = client.post(
-        f"/repairs/{order_id}/manual-correction",
+    response = client.post(
+        f"/api/orders/{order_id}/correct",
         json={
-            "field_name": "repair_type",
-            "old_value": "水管漏水",
-            "new_value": "下水道堵塞",
-            "operator": "管理员",
-            "reason": "报修类型录入错误"
+            "operated_by": "管理员",
+            "new_status": "processing",
+            "notes": "特殊情况，直接开始处理",
+            "conclusion": "人工修正状态"
         }
     )
-    assert correction_response.status_code == 200
+    assert response.status_code == 200
+    assert response.json()["status"] == "processing"
 
 
-def test_order_not_found():
-    response = client.get("/repairs/99999")
+def test_close_order(db_session):
+    order_response = client.post(
+        "/api/orders/",
+        json={
+            "building": "1号楼",
+            "room_number": "101",
+            "repair_type": "水电维修",
+            "description": "水龙头漏水",
+            "contact_name": "业主A",
+            "contact_phone": "13900139000",
+            "priority": "normal",
+            "sla_hours": 24
+        }
+    )
+    order_id = order_response.json()["id"]
+    
+    response = client.post(
+        f"/api/orders/{order_id}/close",
+        json={
+            "operated_by": "管理员",
+            "reason": "业主自行解决",
+            "conclusion": "工单关闭"
+        }
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "cancelled"
+
+
+def test_outsource_flow(db_session):
+    outsource_response = client.post(
+        "/api/handlers/",
+        json={"name": "快修公司", "phone": "4008008888", "department": "外包", "role": "外包商", "is_outsource": True}
+    )
+    outsource_id = outsource_response.json()["id"]
+    
+    order_response = client.post(
+        "/api/orders/",
+        json={
+            "building": "1号楼",
+            "room_number": "101",
+            "repair_type": "水电维修",
+            "description": "电路故障",
+            "contact_name": "业主A",
+            "contact_phone": "13900139000",
+            "priority": "high",
+            "sla_hours": 8
+        }
+    )
+    order_id = order_response.json()["id"]
+    
+    response = client.post(
+        f"/api/orders/{order_id}/outsource?operated_by=管理员",
+        json={
+            "outsource_company_id": outsource_id,
+            "estimated_cost": 200.0,
+            "notes": "专业电路维修"
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["outsource_order_no"].startswith("OS")
+    assert data["status"] == "dispatched"
+    
+    order = client.get(f"/api/orders/{order_id}")
+    assert order.json()["status"] == "outsourced"
+
+
+def test_export_orders(db_session):
+    for i in range(3):
+        client.post(
+            "/api/orders/",
+            json={
+                "building": f"{i+1}号楼",
+                "room_number": "101",
+                "repair_type": "水电维修",
+                "description": "测试报修",
+                "contact_name": "业主",
+                "contact_phone": "13900139000",
+                "priority": "normal",
+                "sla_hours": 24
+            }
+        )
+    
+    response = client.post(
+        "/api/orders/export",
+        json={"export_type": "excel"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 3
+    assert len(data["data"]) == 3
+
+
+def test_invalid_status_transition(db_session):
+    order_response = client.post(
+        "/api/orders/",
+        json={
+            "building": "1号楼",
+            "room_number": "101",
+            "repair_type": "水电维修",
+            "description": "水龙头漏水",
+            "contact_name": "业主A",
+            "contact_phone": "13900139000",
+            "priority": "normal",
+            "sla_hours": 24
+        }
+    )
+    order_id = order_response.json()["id"]
+    
+    response = client.post(
+        f"/api/orders/{order_id}/advance/complete",
+        json={"operated_by": "张工"}
+    )
+    assert response.status_code == 400
+
+
+def test_get_order_not_found(db_session):
+    response = client.get("/api/orders/999999")
     assert response.status_code == 404
 
 
-def test_building_not_found():
-    response = client.get("/buildings/99999")
-    assert response.status_code == 404
+def test_merge_orders(db_session):
+    order1 = client.post(
+        "/api/orders/",
+        json={
+            "building": "1号楼",
+            "room_number": "101",
+            "repair_type": "水电维修",
+            "description": "水龙头漏水需要维修",
+            "contact_name": "业主A",
+            "contact_phone": "13900139000",
+            "priority": "normal",
+            "sla_hours": 24
+        }
+    ).json()
+    
+    order2 = client.post(
+        "/api/orders/",
+        json={
+            "building": "1号楼",
+            "room_number": "101",
+            "repair_type": "水电维修",
+            "description": "水龙头漏水报修",
+            "contact_name": "业主A",
+            "contact_phone": "13900139000",
+            "priority": "normal",
+            "sla_hours": 24
+        }
+    ).json()
+    
+    response = client.post(
+        f"/api/orders/{order2['id']}/merge",
+        json={
+            "operated_by": "管理员",
+            "merge_into_order_id": order1["id"],
+            "notes": "重复工单合并"
+        }
+    )
+    assert response.status_code == 200

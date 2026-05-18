@@ -1,58 +1,37 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Enum, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean, Float
 from sqlalchemy.orm import relationship
-import enum
-from datetime import datetime
+from sqlalchemy.sql import func
 from app.database import Base
 
 
-class RepairStatus(str, enum.Enum):
-    PENDING = "pending"
-    ASSIGNED = "assigned"
-    OUTSOURCED = "outsourced"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
-    VERIFIED = "verified"
-    CLOSED = "closed"
-    CANCELLED = "cancelled"
-
-
-class UrgencyLevel(str, enum.Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    EMERGENCY = "emergency"
-
-
-class Building(Base):
-    __tablename__ = "buildings"
+class BuildingRoom(Base):
+    __tablename__ = "building_rooms"
 
     id = Column(Integer, primary_key=True, index=True)
-    building_name = Column(String(100), nullable=False)
-    unit_number = Column(String(50), nullable=False)
-    room_number = Column(String(50), nullable=False)
+    building = Column(String(50), index=True)
+    room_number = Column(String(50), index=True)
     owner_name = Column(String(100))
     owner_phone = Column(String(20))
-    created_at = Column(DateTime(timezone=True), default=datetime.now)
-    updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    is_active = Column(Boolean, default=True)
 
-    repairs = relationship("RepairOrder", back_populates="building")
+    repair_orders = relationship("RepairOrder", back_populates="building_room")
 
 
 class Handler(Base):
     __tablename__ = "handlers"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), index=True)
     phone = Column(String(20))
     department = Column(String(100))
-    is_outsourcer = Column(Boolean, default=False)
-    company_name = Column(String(200))
-    skills = Column(String(500))
-    created_at = Column(DateTime(timezone=True), default=datetime.now)
+    role = Column(String(50))
+    is_outsource = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean, default=True)
 
-    assigned_repairs = relationship("RepairOrder", back_populates="handler")
-    outsourcing_records = relationship("OutsourcingRecord", back_populates="outsourcer")
+    repair_orders = relationship("RepairOrder", back_populates="handler")
+    outsource_orders = relationship("OutsourceOrder", back_populates="outsource_company")
 
 
 class RepairOrder(Base):
@@ -60,62 +39,64 @@ class RepairOrder(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     order_no = Column(String(50), unique=True, index=True)
-    building_id = Column(Integer, ForeignKey("buildings.id"))
-    reporter_name = Column(String(100))
-    reporter_phone = Column(String(20))
+    building_room_id = Column(Integer, ForeignKey("building_rooms.id"))
     repair_type = Column(String(100))
     description = Column(Text)
-    urgency = Column(Enum(UrgencyLevel), default=UrgencyLevel.MEDIUM)
-    status = Column(Enum(RepairStatus), default=RepairStatus.PENDING)
-    handler_id = Column(Integer, ForeignKey("handlers.id"))
-    reported_at = Column(DateTime(timezone=True), default=datetime.now)
-    expected_completion_time = Column(DateTime(timezone=True))
-    actual_completion_time = Column(DateTime(timezone=True))
+    contact_name = Column(String(100))
+    contact_phone = Column(String(20))
+    status = Column(String(50), default="pending")
+    priority = Column(String(20), default="normal")
+    handler_id = Column(Integer, ForeignKey("handlers.id"), nullable=True)
+    reported_at = Column(DateTime(timezone=True), server_default=func.now())
+    expected_completion_at = Column(DateTime(timezone=True))
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+    sla_hours = Column(Integer, default=24)
     is_overdue = Column(Boolean, default=False)
-    is_duplicate = Column(Boolean, default=False)
-    merged_into_order_id = Column(Integer, ForeignKey("repair_orders.id"))
-    created_at = Column(DateTime(timezone=True), default=datetime.now)
-    updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)
+    is_merged = Column(Boolean, default=False)
+    merged_into_order_id = Column(Integer, nullable=True)
+    reminder_count = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    building = relationship("Building", back_populates="repairs")
-    handler = relationship("Handler", back_populates="assigned_repairs")
-    reminders = relationship("ReminderRecord", back_populates="repair_order")
-    outsourcing_records = relationship("OutsourcingRecord", back_populates="repair_order")
-    completion_proofs = relationship("CompletionProof", back_populates="repair_order")
-    audit_logs = relationship("AuditLog", back_populates="repair_order")
+    building_room = relationship("BuildingRoom", back_populates="repair_orders")
+    handler = relationship("Handler", back_populates="repair_orders")
+    reminders = relationship("Reminder", back_populates="repair_order", cascade="all, delete-orphan")
+    outsource_order = relationship("OutsourceOrder", back_populates="repair_order", uselist=False)
+    completion_proof = relationship("CompletionProof", back_populates="repair_order", uselist=False)
+    status_logs = relationship("StatusLog", back_populates="repair_order", cascade="all, delete-orphan")
 
 
-class ReminderRecord(Base):
-    __tablename__ = "reminder_records"
+class Reminder(Base):
+    __tablename__ = "reminders"
 
     id = Column(Integer, primary_key=True, index=True)
     repair_order_id = Column(Integer, ForeignKey("repair_orders.id"))
-    reminder_time = Column(DateTime(timezone=True), default=datetime.now)
-    reminder_method = Column(String(50))
-    reminder_content = Column(Text)
-    reminder_by = Column(String(100))
+    reminder_type = Column(String(50), default="normal")
+    content = Column(Text)
+    reminded_by = Column(String(100))
+    reminded_at = Column(DateTime(timezone=True), server_default=func.now())
     is_duplicate = Column(Boolean, default=False)
-    created_at = Column(DateTime(timezone=True), default=datetime.now)
+    duplicate_of_reminder_id = Column(Integer, nullable=True)
 
     repair_order = relationship("RepairOrder", back_populates="reminders")
 
 
-class OutsourcingRecord(Base):
-    __tablename__ = "outsourcing_records"
+class OutsourceOrder(Base):
+    __tablename__ = "outsource_orders"
 
     id = Column(Integer, primary_key=True, index=True)
     repair_order_id = Column(Integer, ForeignKey("repair_orders.id"))
-    outsourcer_id = Column(Integer, ForeignKey("handlers.id"))
-    outsourcing_time = Column(DateTime(timezone=True), default=datetime.now)
-    expected_completion = Column(DateTime(timezone=True))
-    cost_estimate = Column(Integer)
-    actual_cost = Column(Integer)
-    status = Column(String(50), default="pending")
-    notes = Column(Text)
-    created_at = Column(DateTime(timezone=True), default=datetime.now)
+    outsource_company_id = Column(Integer, ForeignKey("handlers.id"))
+    outsource_order_no = Column(String(50), unique=True, index=True)
+    status = Column(String(50), default="dispatched")
+    dispatched_at = Column(DateTime(timezone=True), server_default=func.now())
+    accepted_at = Column(DateTime(timezone=True), nullable=True)
+    estimated_cost = Column(Float, nullable=True)
+    actual_cost = Column(Float, nullable=True)
+    notes = Column(Text, nullable=True)
 
-    repair_order = relationship("RepairOrder", back_populates="outsourcing_records")
-    outsourcer = relationship("Handler", back_populates="outsourcing_records")
+    repair_order = relationship("RepairOrder", back_populates="outsource_order")
+    outsource_company = relationship("Handler", back_populates="outsource_orders")
 
 
 class CompletionProof(Base):
@@ -124,29 +105,29 @@ class CompletionProof(Base):
     id = Column(Integer, primary_key=True, index=True)
     repair_order_id = Column(Integer, ForeignKey("repair_orders.id"))
     proof_type = Column(String(50))
-    proof_url = Column(String(500))
+    proof_url = Column(String(500), nullable=True)
     description = Column(Text)
-    uploaded_by = Column(String(100))
-    uploaded_at = Column(DateTime(timezone=True), default=datetime.now)
+    verified_by = Column(String(100), nullable=True)
+    verified_at = Column(DateTime(timezone=True), nullable=True)
     is_verified = Column(Boolean, default=False)
-    verified_by = Column(String(100))
-    verified_at = Column(DateTime(timezone=True))
+    verification_notes = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    repair_order = relationship("RepairOrder", back_populates="completion_proofs")
+    repair_order = relationship("RepairOrder", back_populates="completion_proof")
 
 
-class AuditLog(Base):
-    __tablename__ = "audit_logs"
+class StatusLog(Base):
+    __tablename__ = "status_logs"
 
     id = Column(Integer, primary_key=True, index=True)
     repair_order_id = Column(Integer, ForeignKey("repair_orders.id"))
-    action = Column(String(100))
-    old_status = Column(String(50))
-    new_status = Column(String(50))
-    operator = Column(String(100))
-    original_input = Column(Text)
-    conclusion = Column(Text)
-    reason = Column(Text)
-    created_at = Column(DateTime(timezone=True), default=datetime.now)
+    from_status = Column(String(50), nullable=True)
+    to_status = Column(String(50))
+    operated_by = Column(String(100))
+    operation_type = Column(String(50))
+    notes = Column(Text, nullable=True)
+    original_request = Column(Text, nullable=True)
+    conclusion = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    repair_order = relationship("RepairOrder", back_populates="audit_logs")
+    repair_order = relationship("RepairOrder", back_populates="status_logs")
