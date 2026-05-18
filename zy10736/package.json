@@ -1,0 +1,23 @@
+{
+  "name": "maintenance-inspection-validator",
+  "version": "1.0.0",
+  "description": "维保巡检导出漏检补录校验CLI",
+  "main": "src/index.js",
+  "bin": {
+    "inspection-validate": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-test.js",
+    "validate": "node src/cli.js"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5",
+    "csv-parser": "^3.0.0",
+    "commander": "^11.0.0",
+    "chalk": "^4.1.2",
+    "fs-extra": "^11.1.1"
+  },
+  "keywords": ["maintenance", "inspection", "validation", "cli"],
+  "author": "",
+  "license": "MIT"
+}
