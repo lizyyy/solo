@@ -1,0 +1,21 @@
+{
+  "name": "reimbursement-budget-transfer-recalc",
+  "version": "1.0.0",
+  "description": "报销预算文件科目调拨复算 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "budget-recalc": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "xlsx": "^0.18.5",
+    "commander": "^11.0.0",
+    "chalk": "^4.1.2"
+  },
+  "keywords": ["budget", "reimbursement", "recalc", "cli"],
+  "author": "",
+  "license": "MIT"
+}
