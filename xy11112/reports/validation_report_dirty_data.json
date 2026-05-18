@@ -1,0 +1,153 @@
+{
+  "run_id": "dirty_data",
+  "timestamp": "2026-05-19T00:47:32.855959",
+  "source_file": "samples/dirty_data.csv",
+  "summary": {
+    "total": 12,
+    "errors": 8,
+    "warnings": 4,
+    "infos": 0
+  },
+  "issues": [
+    {
+      "level": "错误",
+      "code": "E001",
+      "message": "座位编号重复: A01",
+      "seat_id": "A01",
+      "row": "A",
+      "details": null
+    },
+    {
+      "level": "错误",
+      "code": "E007",
+      "message": "加座 A03 缺少关联的父座位编号",
+      "seat_id": "A03",
+      "row": "A",
+      "details": null
+    },
+    {
+      "level": "错误",
+      "code": "E002",
+      "message": "座号无效，应为正整数: -1.0",
+      "seat_id": "A03",
+      "row": "A",
+      "details": null
+    },
+    {
+      "level": "错误",
+      "code": "E010",
+      "message": "座位类型无效: invalid_type，有效类型: ['normal', 'extra', 'wheelchair', 'vip', 'box']",
+      "seat_id": "A03",
+      "row": "A",
+      "details": null
+    },
+    {
+      "level": "警告",
+      "code": "W001",
+      "message": "票价为负值: -50.0",
+      "seat_id": "A03",
+      "row": "A",
+      "details": null
+    },
+    {
+      "level": "错误",
+      "code": "E009",
+      "message": "座位缺少必填字段: seat_id",
+      "seat_id": null,
+      "row": null,
+      "details": {
+        "seat_id": "",
+        "row": 2,
+        "seat_number": "normal",
+        "type": 150,
+        "price": false,
+        "is_extra": false,
+        "is_wheelchair": "",
+        "package_id": "",
+        "parent_seat": null
+      }
+    },
+    {
+      "level": "错误",
+      "code": "E007",
+      "message": "加座 W01 缺少关联的父座位编号",
+      "seat_id": "W01",
+      "row": "W",
+      "details": null
+    },
+    {
+      "level": "错误",
+      "code": "E007",
+      "message": "加座 E01 缺少关联的父座位编号",
+      "seat_id": "E01",
+      "row": "E",
+      "details": null
+    },
+    {
+      "level": "错误",
+      "code": "E007",
+      "message": "加座 E02 缺少关联的父座位编号",
+      "seat_id": "E02",
+      "row": "E",
+      "details": null
+    },
+    {
+      "level": "警告",
+      "code": "E006",
+      "message": "套票组 PACK_SINGLE 座位数不足，仅 1 个座位",
+      "seat_id": null,
+      "row": null,
+      "details": {
+        "package_id": "PACK_SINGLE",
+        "seats": [
+          "C01"
+        ]
+      }
+    },
+    {
+      "level": "警告",
+      "code": "E006",
+      "message": "套票组 NOT_EXISTS 座位数不足，仅 1 个座位",
+      "seat_id": null,
+      "row": null,
+      "details": {
+        "package_id": "NOT_EXISTS",
+        "seats": [
+          "W01"
+        ]
+      }
+    },
+    {
+      "level": "警告",
+      "code": "E006",
+      "message": "套票组 INVALID_PARENT_12345 座位数不足，仅 1 个座位",
+      "seat_id": null,
+      "row": null,
+      "details": {
+        "package_id": "INVALID_PARENT_12345",
+        "seats": [
+          "E02"
+        ]
+      }
+    }
+  ],
+  "statistics": {
+    "total_seats": 9,
+    "by_type": {
+      "normal": 3,
+      "invalid_type": 1,
+      "150": 1,
+      "vip": 1,
+      "wheelchair": 1,
+      "extra": 2
+    },
+    "by_row": {
+      "A": 3,
+      "B": 1,
+      "2": 1,
+      "C": 1,
+      "W": 1,
+      "E": 2
+    }
+  }
+}

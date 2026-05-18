@@ -1,0 +1,73 @@
+{
+  "run_id": "normal",
+  "timestamp": "2026-05-19T00:47:21.617894",
+  "source_file": "samples/normal.csv",
+  "summary": {
+    "total": 4,
+    "errors": 2,
+    "warnings": 2,
+    "infos": 0
+  },
+  "issues": [
+    {
+      "level": "错误",
+      "code": "E007",
+      "message": "加座 E01 缺少关联的父座位编号",
+      "seat_id": "E01",
+      "row": "E",
+      "details": null
+    },
+    {
+      "level": "错误",
+      "code": "E007",
+      "message": "加座 E02 缺少关联的父座位编号",
+      "seat_id": "E02",
+      "row": "E",
+      "details": null
+    },
+    {
+      "level": "警告",
+      "code": "E006",
+      "message": "套票组 A01 座位数不足，仅 1 个座位",
+      "seat_id": null,
+      "row": null,
+      "details": {
+        "package_id": "A01",
+        "seats": [
+          "E01"
+        ]
+      }
+    },
+    {
+      "level": "警告",
+      "code": "E006",
+      "message": "套票组 A02 座位数不足，仅 1 个座位",
+      "seat_id": null,
+      "row": null,
+      "details": {
+        "package_id": "A02",
+        "seats": [
+          "E02"
+        ]
+      }
+    }
+  ],
+  "statistics": {
+    "total_seats": 19,
+    "by_type": {
+      "normal": 10,
+      "vip": 3,
+      "wheelchair": 2,
+      "extra": 2,
+      "box": 2
+    },
+    "by_row": {
+      "A": 5,
+      "B": 5,
+      "C": 3,
+      "W": 2,
+      "E": 2,
+      "P": 2
+    }
+  }
+}

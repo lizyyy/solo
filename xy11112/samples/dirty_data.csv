@@ -1,0 +1,10 @@
+seat_id,row,seat_number,type,price,is_extra,is_wheelchair,package_id,parent_seat
+A01,A,1,normal,180,False,False,,
+A01,A,2,normal,180,False,False,,
+A03,A,-1,invalid_type,-50,True,False,,
+B01,B,1,normal,150,False,False,,
+,2,normal,150,False,False,,
+C01,C,1,vip,280,False,False,PACK_SINGLE
+W01,W,1,wheelchair,120,True,True,NOT_EXISTS
+E01,E,1,extra,80,True,False,
+E02,E,2,extra,80,True,False,INVALID_PARENT_12345

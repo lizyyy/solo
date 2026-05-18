@@ -1,0 +1,52 @@
+{
+  "run_id": "rerun_baseline",
+  "timestamp": "2026-05-19T00:47:32.860244",
+  "source_file": "samples/rerun_baseline.csv",
+  "summary": {
+    "total": 2,
+    "errors": 1,
+    "warnings": 1,
+    "infos": 0
+  },
+  "issues": [
+    {
+      "level": "错误",
+      "code": "E007",
+      "message": "加座 E01 缺少关联的父座位编号",
+      "seat_id": "E01",
+      "row": "E",
+      "details": null
+    },
+    {
+      "level": "警告",
+      "code": "E006",
+      "message": "套票组 A01 座位数不足，仅 1 个座位",
+      "seat_id": null,
+      "row": null,
+      "details": {
+        "package_id": "A01",
+        "seats": [
+          "E01"
+        ]
+      }
+    }
+  ],
+  "statistics": {
+    "total_seats": 10,
+    "by_type": {
+      "normal": 5,
+      "vip": 1,
+      "wheelchair": 1,
+      "extra": 1,
+      "box": 2
+    },
+    "by_row": {
+      "A": 3,
+      "B": 2,
+      "C": 1,
+      "W": 1,
+      "E": 1,
+      "P": 2
+    }
+  }
+}
