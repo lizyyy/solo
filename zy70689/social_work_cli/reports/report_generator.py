@@ -25,6 +25,10 @@ class ReportGenerator:
         
         wb = Workbook()
         
+        # 先删除默认创建的Sheet工作表
+        if 'Sheet' in wb.sheetnames:
+            wb.remove(wb['Sheet'])
+        
         self._add_summary_sheet(wb, data)
         self._add_risk_sheet(wb, data.get('risk_results', pd.DataFrame()))
         self._add_schedule_sheet(wb, data.get('schedule_results', pd.DataFrame()))
@@ -33,8 +37,6 @@ class ReportGenerator:
         self._add_source_sheet(wb, data.get('source_results', pd.DataFrame()))
         self._add_changes_sheet(wb, data.get('change_results', pd.DataFrame()))
         self._add_bad_rows_sheet(wb, data.get('bad_rows_results', pd.DataFrame()))
-        
-        wb.remove(wb.active)
         
         wb.save(filepath)
         return filepath
