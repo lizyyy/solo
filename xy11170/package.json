@@ -1,0 +1,28 @@
+{
+  "name": "dance-studio-billing-audit-cli",
+  "version": "1.0.0",
+  "description": "舞蹈排练室计费核对CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "dance-audit": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "preview": "node src/cli.js preview -i samples/input.csv",
+    "audit": "node src/cli.js audit -i samples/input.csv -o output",
+    "report": "node src/cli.js report -o output"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  },
+  "keywords": [
+    "dance",
+    "studio",
+    "billing",
+    "audit"
+  ],
+  "author": "",
+  "license": "MIT"
+}
