@@ -1,0 +1,17 @@
+{
+  "name": "greenhouse-env-summary-cli",
+  "version": "1.0.0",
+  "description": "花卉温室环境汇总 CLI 工具 - 解析、校验、生成报告",
+  "main": "cli.js",
+  "bin": {
+    "greenhouse-summary": "./cli.js"
+  },
+  "scripts": {
+    "preview": "node cli.js preview data/greenhouse-data.csv",
+    "run": "node cli.js run data/greenhouse-data.csv",
+    "report": "node cli.js report"
+  },
+  "keywords": ["greenhouse", "environment", "cli"],
+  "author": "",
+  "license": "ISC"
+}
