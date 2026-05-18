@@ -1,0 +1,73 @@
+{
+  "name": "口腔诊所耗材领用汇总校验规则",
+  "version": "1.0.0",
+  "description": "用于口腔诊所耗材领用数据的质量校验和异常检测",
+  "lastUpdated": "2024-01-01",
+  "rules": {
+    "negativeReturn": {
+      "enabled": true,
+      "severity": "medium",
+      "description": "检测负数数量记录，通常表示耗材退回操作。需确认退回原因和审批流程。",
+      "fields": ["数量"],
+      "examples": [
+        "数量: -5 表示退回5件耗材"
+      ]
+    },
+    "missingApprover": {
+      "enabled": true,
+      "severity": "high",
+      "description": "检测审批人缺失的记录。所有耗材领用必须经过审批人签字确认，缺少审批的记录需要补全流程。",
+      "fields": ["审批人", "审核人", "批准人"],
+      "examples": [
+        "审批人列为空"
+      ]
+    },
+    "zeroAmount": {
+      "enabled": true,
+      "severity": "low",
+      "description": "检测金额为0但数量不为0的记录。可能是免费领用、赠品或录入错误。",
+      "fields": ["金额", "数量"],
+      "examples": [
+        "数量: 10, 金额: 0 表示免费领用"
+      ]
+    },
+    "missingDepartment": {
+      "enabled": true,
+      "severity": "medium",
+      "description": "检测领用科室缺失的记录。科室信息用于成本核算和库存分配，必须填写。",
+      "fields": ["领用科室"],
+      "examples": [
+        "领用科室列为空"
+      ]
+    },
+    "abnormalQuantity": {
+      "enabled": true,
+      "severity": "medium",
+      "threshold": 100,
+      "description": "检测数量异常大的记录。单次领用超过阈值需要确认是否为批量采购或录入错误。默认阈值：100件",
+      "fields": ["数量"],
+      "examples": [
+        "数量: 200 超过阈值100，需确认"
+      ]
+    }
+  },
+  "columns": {
+    "required": ["领用日期", "耗材名称", "数量", "领用人"],
+    "recommended": ["规格型号", "单位", "单价", "金额", "领用科室", "审批人", "备注"],
+    "description": "必填字段缺失将导致数据不完整，建议字段建议填写以保证数据质量"
+  },
+  "workflow": {
+    "step1": "运行CLI工具处理数据",
+    "step2": "查看异常报告，按优先级处理",
+    "step3": "高优先级：补全审批人信息",
+    "step4": "中优先级：确认退回操作和异常数量",
+    "step5": "低优先级：确认零金额原因",
+    "step6": "保存证据日志作为审计记录"
+  },
+  "gettingStarted": {
+    "command": "node src/cli.js process --sample",
+    "description": "新手建议先运行样例数据，熟悉工具输出格式后再处理实际业务数据",
+    "sampleData": "samples/dental-consumables-sample.csv",
+    "outputLocation": "output/"
+  }
+}

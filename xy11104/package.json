@@ -1,0 +1,21 @@
+{
+  "name": "dental-clinic-consumables-cli",
+  "version": "1.0.0",
+  "description": "口腔诊所耗材领用汇总CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "dental-consumables": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js --sample"
+  },
+  "keywords": ["dental", "clinic", "consumables", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "chalk": "^4.1.2"
+  }
+}
