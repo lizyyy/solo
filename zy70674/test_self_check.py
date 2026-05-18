@@ -428,6 +428,85 @@ class TestBedTurnoverSystem(unittest.TestCase):
         self.assertEqual(second_reviewed_by, ["测试员"] * len(intervals_after_second))
         
         print(f"  ✓ 已复核记录正确跳过，复核人未被覆盖")
+    
+    def test_12_transfer_ward_split_correctness(self):
+        print("\n[测试12] 转科拆分后各病区统计正确性验证")
+        icu_ward = "ICU-测试"
+        internal_ward = "内科-测试"
+        
+        patient = Patient(patient_id="P901", name="转科测试患者")
+        bed_icu = Bed(bed_number="T-ICU-001", ward=icu_ward, department="重症医学科")
+        bed_internal = Bed(bed_number="T-INT-001", ward=internal_ward, department="内科")
+        self.db.add_all([patient, bed_icu, bed_internal])
+        self.db.commit()
+        
+        admission = Admission(
+            admission_number="ADM901",
+            patient_id="P901",
+            bed_id=bed_icu.id,
+            ward=icu_ward,
+            department="重症医学科",
+            admission_time=datetime(2024, 1, 1, 8, 0),
+            discharge_time=datetime(2024, 1, 10, 16, 0)
+        )
+        self.db.add(admission)
+        self.db.commit()
+        
+        transfer = TransferRecord(
+            admission_number="ADM901",
+            patient_id="P901",
+            from_ward=icu_ward,
+            to_ward=internal_ward,
+            from_bed_id=bed_icu.id,
+            to_bed_id=bed_internal.id,
+            transfer_time=datetime(2024, 1, 5, 10, 0),
+            transfer_reason="病情稳定转出ICU"
+        )
+        self.db.add(transfer)
+        self.db.commit()
+        
+        admission.ward = internal_ward
+        admission.bed_id = bed_internal.id
+        self.db.commit()
+        
+        icu_request = TurnoverCalculationRequest(
+            ward=icu_ward,
+            start_date=datetime(2024, 1, 1),
+            end_date=datetime(2024, 1, 31),
+            abnormal_threshold_hours=24.0
+        )
+        icu_report, icu_intervals = generate_turnover_report(self.db, icu_request)
+        
+        self.assertEqual(len(icu_intervals), 1, "ICU报告应该有1个区间")
+        self.assertEqual(icu_intervals[0].ward, icu_ward, "区间归属应为ICU")
+        print(f"  ✓ ICU报告区间数正确: {len(icu_intervals)}个")
+        print(f"    区间归属病区验证: {icu_intervals[0].ward}")
+        
+        internal_request = TurnoverCalculationRequest(
+            ward=internal_ward,
+            start_date=datetime(2024, 1, 1),
+            end_date=datetime(2024, 1, 31),
+            abnormal_threshold_hours=24.0
+        )
+        internal_report, internal_intervals = generate_turnover_report(self.db, internal_request)
+        
+        self.assertEqual(len(internal_intervals), 1, "内科报告应该有1个区间")
+        self.assertEqual(internal_intervals[0].ward, internal_ward, "区间归属应为内科")
+        print(f"  ✓ 内科报告区间数正确: {len(internal_intervals)}个")
+        print(f"    区间归属病区验证: {internal_intervals[0].ward}")
+        
+        icu_duration = icu_intervals[0].duration_hours
+        internal_duration = internal_intervals[0].duration_hours
+        total_duration = icu_duration + internal_duration
+        expected_total = (datetime(2024, 1, 10, 16, 0) - datetime(2024, 1, 1, 8, 0)).total_seconds() / 3600
+        
+        self.assertAlmostEqual(total_duration, expected_total, places=1, 
+                              msg="ICU+内科总时长应等于完整住院时长")
+        print(f"  ✓ 总时长验证正确: ICU {icu_duration}h + 内科 {internal_duration}h = {total_duration}h")
+        
+        self.assertEqual(icu_report.total_intervals, 1)
+        self.assertEqual(internal_report.total_intervals, 1)
+        print(f"  ✓ 各病区报告统计独立且正确")
 
 
 def run_all_tests():

@@ -123,15 +123,43 @@ def generate_turnover_report(
     
     report_name = request.report_name or f"{request.ward}周转报告_{request.start_date.strftime('%Y%m%d')}"
     
-    admissions = db.query(Admission).filter(
-        Admission.ward == request.ward,
+    ward = request.ward
+    
+    ward_admission_numbers = set()
+    
+    admissions_in_ward = db.query(Admission).filter(
+        Admission.ward == ward,
         Admission.admission_time < request.end_date,
         (Admission.discharge_time.is_(None) | (Admission.discharge_time > request.start_date))
     ).all()
+    for adm in admissions_in_ward:
+        ward_admission_numbers.add(adm.admission_number)
     
-    all_intervals = []
+    transfers_from_ward = db.query(TransferRecord).filter(
+        TransferRecord.from_ward == ward,
+        TransferRecord.transfer_time >= request.start_date,
+        TransferRecord.transfer_time <= request.end_date
+    ).all()
+    for trans in transfers_from_ward:
+        ward_admission_numbers.add(trans.admission_number)
     
-    for admission in admissions:
+    transfers_to_ward = db.query(TransferRecord).filter(
+        TransferRecord.to_ward == ward,
+        TransferRecord.transfer_time >= request.start_date,
+        TransferRecord.transfer_time <= request.end_date
+    ).all()
+    for trans in transfers_to_ward:
+        ward_admission_numbers.add(trans.admission_number)
+    
+    all_candidate_intervals = []
+    
+    for admission_number in ward_admission_numbers:
+        admission = db.query(Admission).filter(
+            Admission.admission_number == admission_number
+        ).first()
+        if not admission:
+            continue
+            
         patient = db.query(Patient).filter(Patient.patient_id == admission.patient_id).first()
         bed = db.query(Bed).filter(Bed.id == admission.bed_id).first()
         
@@ -139,7 +167,7 @@ def generate_turnover_report(
             TransferRecord.admission_number == admission.admission_number,
             TransferRecord.transfer_time >= request.start_date,
             TransferRecord.transfer_time <= request.end_date
-        ).all()
+        ).order_by(TransferRecord.transfer_time).all()
         
         if patient and bed:
             intervals = process_admission_intervals(
@@ -148,21 +176,23 @@ def generate_turnover_report(
                 request.abnormal_threshold_hours,
                 report_id
             )
-            all_intervals.extend(intervals)
+            all_candidate_intervals.extend(intervals)
     
-    total_intervals = len(all_intervals)
-    abnormal_intervals = sum(1 for i in all_intervals if i.is_abnormal)
-    transfer_count = sum(1 for i in all_intervals if i.has_transfer)
-    pre_discharge_count = sum(1 for i in all_intervals if i.is_pre_discharge)
+    ward_intervals = [i for i in all_candidate_intervals if i.ward == ward]
+    
+    total_intervals = len(ward_intervals)
+    abnormal_intervals = sum(1 for i in ward_intervals if i.is_abnormal)
+    transfer_count = sum(1 for i in ward_intervals if i.has_transfer)
+    pre_discharge_count = sum(1 for i in ward_intervals if i.is_pre_discharge)
     avg_turnover = (
-        sum(i.duration_hours for i in all_intervals) / total_intervals
+        sum(i.duration_hours for i in ward_intervals) / total_intervals
         if total_intervals > 0 else 0
     )
     
     report = TurnoverReport(
         report_id=report_id,
         report_name=report_name,
-        ward=request.ward,
+        ward=ward,
         start_date=request.start_date,
         end_date=request.end_date,
         total_intervals=total_intervals,
@@ -175,12 +205,12 @@ def generate_turnover_report(
     )
     
     db.add(report)
-    for interval in all_intervals:
+    for interval in ward_intervals:
         db.add(interval)
     db.commit()
     db.refresh(report)
     
-    return report, all_intervals
+    return report, ward_intervals
 
 
 def review_intervals(
