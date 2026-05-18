@@ -143,6 +143,7 @@ class ScanRequest(BaseModel):
     directory_path: Optional[str] = None
     article_ids: Optional[List[int]] = None
     scan_all: bool = False
+    validate_links: bool = False
 
 
 class ScanResult(BaseModel):

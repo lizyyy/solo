@@ -186,7 +186,10 @@ def scan_articles(scan_request: schemas.ScanRequest, db: Session = Depends(get_d
             }
         )
     
-    scanned_count, new_references, updated_references = article_service.scan_articles(article_ids)
+    scanned_count, new_references, updated_references = article_service.scan_articles(
+        article_ids,
+        validate_links=scan_request.validate_links
+    )
     
     return schemas.ScanResult(
         scanned_count=scanned_count,

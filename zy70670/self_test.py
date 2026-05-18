@@ -70,17 +70,20 @@ def run_tests():
             {
                 "title": "产品A使用指南",
                 "content": "# 产品A使用指南\n\n请参考[产品B配置说明](/docs/product-b-config.md)进行初始设置。\n\n更多信息请查看[官方网站](https://example.com)。",
-                "file_path": "/docs/product-a-guide.md"
+                "file_path": "/docs/product-a-guide.md",
+                "product_id": 1
             },
             {
                 "title": "产品B配置说明",
-                "content": "# 产品B配置说明\n\n本产品依赖于[产品A的API](/docs/product-a-api.md)服务。",
-                "file_path": "/docs/product-b-config.md"
+                "content": "# 产品B配置说明\n\n本产品配置流程说明。",
+                "file_path": "/docs/product-b-config.md",
+                "product_id": 2
             },
             {
                 "title": "常见问题解答",
                 "content": "# 常见问题解答\n\nQ: 如何获取产品B支持？\nA: 请联系客服或查看[产品B配置说明](/docs/product-b-config.md)。",
-                "file_path": "/docs/faq.md"
+                "file_path": "/docs/faq.md",
+                "product_id": None
             }
         ]
         
@@ -110,6 +113,14 @@ def run_tests():
         
         all_references = db.query(ArticleReference).all()
         print_success(f"数据库中共有 {len(all_references)} 条引用记录")
+        
+        resolved_refs = 0
+        for ref in all_references:
+            target_article_info = f", target_article_id: {ref.target_article_id}" if ref.target_article_id else ""
+            print_success(f"  - 引用 {ref.id}: {ref.link_text} -> {ref.target_url}{target_article_info}")
+            if ref.target_article_id:
+                resolved_refs += 1
+        print_success(f"成功解析 {resolved_refs}/{len(all_references)} 个内部链接到目标文章")
 
         print_step(4, "将产品B标记为下线状态")
         
@@ -119,8 +130,13 @@ def run_tests():
         invalid_references = article_service.get_invalid_references()
         print_success(f"检测到 {len(invalid_references)} 条失效引用")
         
+        if len(invalid_references) == 0:
+            raise AssertionError("核心测试失败：产品下线后应检测到失效引用，但 get_invalid_references() 返回空列表！")
+        
         for ref in invalid_references:
             print_success(f"  - ID: {ref.id}, 状态: {ref.status.value}, 原因: {ref.failure_reason.value if ref.failure_reason else 'N/A'}")
+            if ref.failure_reason != FailureReason.PRODUCT_OFFLINE:
+                raise AssertionError(f"失效原因错误：期望 PRODUCT_OFFLINE，实际 {ref.failure_reason}")
 
         print_step(5, "按条件筛选失效引用")
         

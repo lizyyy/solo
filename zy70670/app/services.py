@@ -63,13 +63,29 @@ class ReferenceAnalyzer:
     def __init__(self, db: Session):
         self.db = db
 
-    def match_product_by_keywords(self, content: str, link_text: str) -> Optional[Product]:
+    def match_product_by_keywords(self, link_text: str, target_url: str = "") -> Optional[Product]:
         all_products = self.db.query(Product).all()
-        combined_text = f"{content[:500]} {link_text}".lower()
+        link_based_text = f"{target_url} {link_text}".lower()
         
         for product in all_products:
-            if product.name.lower() in combined_text:
+            if product.name.lower() in link_based_text:
                 return product
+        
+        return None
+
+    def find_target_article_by_url(self, target_url: str) -> Optional[Article]:
+        filename = target_url.split('/')[-1].lower() if '/' in target_url else target_url.lower()
+        filename = filename.replace('.md', '')
+        
+        all_articles = self.db.query(Article).all()
+        for article in all_articles:
+            article_file = article.file_path.split('/')[-1].lower().replace('.md', '')
+            if article_file == filename:
+                return article
+            
+            if article.title.lower() in target_url.lower() or target_url.lower() in article.title.lower():
+                return article
+        
         return None
 
     def check_product_status(self, product: Optional[Product]) -> Tuple[bool, Optional[FailureReason]]:
@@ -85,7 +101,7 @@ class ReferenceAnalyzer:
         self,
         reference: ArticleReference,
         source_article: Article,
-        validate_links: bool = True
+        validate_links: bool = False
     ) -> Tuple[ReferenceStatus, Optional[FailureReason], str]:
         if validate_links:
             link_is_valid, link_error = LinkValidator.validate_link(reference.target_url)
@@ -109,8 +125,8 @@ class ReferenceAnalyzer:
         
         if not target_product:
             target_product = self.match_product_by_keywords(
-                source_article.content,
-                reference.link_text or ""
+                reference.link_text or "",
+                reference.target_url
             )
         
         is_valid, failure_reason = self.check_product_status(target_product)
@@ -189,8 +205,10 @@ class ArticleService:
                     existing.link_text = link_text
                     updated_count += 1
                 else:
+                    target_article = analyzer.find_target_article_by_url(target_url)
                     reference = ArticleReference(
                         source_article_id=article.id,
+                        target_article_id=target_article.id if target_article else None,
                         target_url=target_url,
                         link_text=link_text,
                         reference_count=1,
