@@ -1,0 +1,200 @@
+Metadata-Version: 2.4
+Name: jiazheng-callback
+Version: 1.0.0
+Summary: 家政派单点家政回访汇总 CLI 工具
+Author: 家政派团队
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: openpyxl>=3.1.0
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# 家政派单点家政回访汇总 CLI 工具
+
+用于汇总和清洗家政服务回访记录的命令行工具。支持手机号脱敏、重复客户检测、可复跑输出分离等功能。
+
+## 功能特性
+
+- ✅ **手机号脱敏**: 自动将 11 位手机号中间 4 位替换为 `****`
+- 🔍 **重复客户检测**: 自动识别并提取重复的客户记录
+- 🔄 **可复跑输出**: 保留每个客户最后一条记录，用于后续复核
+- 📂 **批量处理**: 支持同时处理多个 Excel 文件或整个目录
+- ❌ **错误处理**: 友好的错误提示，而非直接抛出 traceback
+- 🔧 **部分失败继续处理**: 即使部分文件处理失败，其他文件仍会继续处理
+
+## 安装
+
+### 方式一：直接安装（推荐）
+
+```bash
+pip3 install -e .
+```
+
+安装后即可直接使用 `jiazheng-callback` 命令。
+
+### 方式二：作为模块运行
+
+无需安装，直接运行：
+
+```bash
+python3 -m jiazheng_callback.cli [参数]
+```
+
+## 输入文件格式
+
+输入的 Excel 文件必须包含以下列：
+
+| 列名 | 说明 | 示例 |
+|------|------|------|
+| 客户姓名 | 客户的姓名 | 张三 |
+| 手机号码 | 客户的手机号 | 13800138001 |
+| 服务日期 | 服务发生的日期 | 2024-01-15 |
+| 服务类型 | 服务的类型 | 日常保洁 |
+| 服务人员 | 提供服务的人员 | 李阿姨 |
+| 回访状态 | 是否已回访 | 已回访 / 未回访 |
+| 回访结果 | 客户的满意度评价 | 满意 / 一般 / 不满意 |
+
+## 使用示例
+
+### 示例 1：处理单个文件
+
+```bash
+jiazheng-callback -i 回访记录.xlsx -o 输出目录
+```
+
+### 示例 2：处理多个文件
+
+```bash
+jiazheng-callback -i 第一周.xlsx 第二周.xlsx 第三周.xlsx -o ./汇总结果
+```
+
+### 示例 3：处理整个目录
+
+```bash
+jiazheng-callback --input-dir ./待处理文件 -o ./汇总结果
+```
+
+### 示例 4：查看帮助信息
+
+```bash
+jiazheng-callback --help
+```
+
+### 示例 5：查看版本号
+
+```bash
+jiazheng-callback --version
+```
+
+## 输出文件说明
+
+处理完成后，输出目录将包含以下文件：
+
+### 1. `家政回访汇总结果.xlsx`
+去重后的主结果文件，每个客户只保留第一条记录。
+
+**样例数据：**
+
+| 客户姓名 | 手机号码 | 服务日期 | 服务类型 | 服务人员 | 回访状态 | 回访结果 | 来源文件 |
+|---------|---------|---------|---------|---------|---------|---------|---------|
+| 张三 | 138****8001 | 2024-01-15 | 日常保洁 | 李阿姨 | 已回访 | 满意 | 回访记录.xlsx |
+| 李四 | 139****9002 | 2024-01-15 | 深度清洁 | 王阿姨 | 已回访 | 一般 | 回访记录.xlsx |
+
+### 2. `重复客户记录.xlsx`
+所有被识别为重复的客户记录，用于人工复核。
+
+**样例数据：**
+
+| 客户姓名 | 手机号码 | 服务日期 | 服务类型 | 服务人员 | 回访状态 | 回访结果 | 来源文件 |
+|---------|---------|---------|---------|---------|---------|---------|---------|
+| 张三 | 138****8001 | 2024-01-15 | 日常保洁 | 李阿姨 | 已回访 | 满意 | 第一周.xlsx |
+| 张三 | 138****8001 | 2024-01-20 | 日常保洁 | 李阿姨 | 已回访 | 非常满意 | 第二周.xlsx |
+
+### 3. `可复跑输出.xlsx`
+每个客户只保留最后一条记录，用于后续复核或系统重跑。
+
+### 4. `处理失败文件.txt`
+如果有文件处理失败，此文件会记录失败的文件名和错误原因。
+
+## 完整使用流程
+
+1. **准备数据文件**
+   ```
+   ./待处理/
+   ├── 家政回访记录_202401_第一周.xlsx
+   ├── 家政回访记录_202401_第二周.xlsx
+   └── 家政回访记录_202401_第三周.xlsx
+   ```
+
+2. **运行汇总命令**
+   ```bash
+   jiazheng-callback --input-dir ./待处理 -o ./2024年1月回访汇总
+   ```
+
+3. **查看输出结果**
+   ```
+   ./2024年1月回访汇总/
+   ├── 家政回访汇总结果.xlsx    # 主结果
+   ├── 重复客户记录.xlsx        # 重复记录
+   ├── 可复跑输出.xlsx          # 复核用
+   └── 处理失败文件.txt          # 错误日志（如有）
+   ```
+
+## 运行测试
+
+```bash
+python3 -m pytest tests/ -v
+```
+
+测试覆盖场景：
+- ✅ 手机号脱敏
+- ✅ 文件不存在处理
+- ✅ 空文件处理
+- ✅ 缺少必要列处理
+- ✅ 重复客户检测（单文件内）
+- ✅ 重复客户检测（跨文件）
+- ✅ 部分文件失败后的继续处理
+- ✅ 可复跑输出保留最后一条记录
+
+## 常见问题
+
+### Q: 提示"文件缺少必要列"怎么办？
+A: 请检查 Excel 文件是否包含所有必需列：客户姓名、手机号码、服务日期、服务类型、服务人员、回访状态、回访结果。
+
+### Q: 如何处理 CSV 格式文件？
+A: 当前版本仅支持 Excel (.xlsx) 格式。如需支持 CSV，请先转换为 Excel 格式。
+
+### Q: 处理失败的文件会影响其他文件吗？
+A: 不会。工具会跳过失败的文件，继续处理其他文件，并在`处理失败文件.txt`中记录错误详情。
+
+## 项目结构
+
+```
+jiazheng-callback/
+├── jiazheng_callback/
+│   ├── __init__.py      # 版本信息
+│   ├── cli.py           # 命令行入口
+│   ├── core.py          # 核心业务逻辑
+│   └── exceptions.py    # 自定义异常
+├── samples/
+│   ├── generate_samples.py  # 样例数据生成脚本
+│   └── *.xlsx           # 样例数据文件
+├── tests/
+│   └── test_callback.py # 测试用例
+├── setup.py             # 安装配置
+├── requirements.txt     # 依赖列表
+└── README.md            # 说明文档
+```
