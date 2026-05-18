@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "kb-rollback-checker"
+version = "0.1.0"
+description = "知识库发布日志文章回滚核验 CLI"
+authors = []
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.0"
+rich = "^13.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+kb-rollback-checker = "kb_rollback_checker.cli:main"
