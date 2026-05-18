@@ -1,0 +1,43 @@
+{
+  "paths": {
+    "pdfInput": "./input/pdf",
+    "imageInput": "./input/images",
+    "output": "./output"
+  },
+  "rules": {
+    "pdf": {
+      "allowedFonts": [
+        "Microsoft YaHei",
+        "SimSun",
+        "PingFang SC",
+        "Source Han Sans CN",
+        "Arial",
+        "Helvetica"
+      ],
+      "fontReplacements": {
+        "KaiTi": "Microsoft YaHei",
+        "FangSong": "SimSun",
+        "LiSu": "Microsoft YaHei",
+        "STSong": "SimSun"
+      }
+    },
+    "image": {
+      "allowedFormats": ["jpeg", "png", "webp"]
+    }
+  },
+  "thresholds": {
+    "pdf": {
+      "maxPages": 20,
+      "maxSizeMB": 5
+    },
+    "image": {
+      "maxSizeKB": 500,
+      "minDPI": 300,
+      "targetWidth": 1200
+    }
+  },
+  "defaults": {
+    "description": "企业礼品仓礼品稿件比对默认配置",
+    "note": "接手人请先运行 --sample 查看样例，再根据实际需求修改此配置"
+  }
+}

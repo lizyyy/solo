@@ -1,0 +1,224 @@
+{
+  "runId": "gift-compare-1779135827172",
+  "timestamp": "2026-05-18T20:23:47.172Z",
+  "mode": "formal",
+  "config": {
+    "rules": {
+      "pdf": {
+        "allowedFonts": [
+          "Microsoft YaHei",
+          "SimSun",
+          "PingFang SC",
+          "Source Han Sans CN",
+          "Arial",
+          "Helvetica"
+        ],
+        "fontReplacements": {
+          "KaiTi": "Microsoft YaHei",
+          "FangSong": "SimSun",
+          "LiSu": "Microsoft YaHei",
+          "STSong": "SimSun"
+        }
+      },
+      "image": {
+        "allowedFormats": [
+          "jpeg",
+          "png",
+          "webp"
+        ]
+      }
+    },
+    "thresholds": {
+      "pdf": {
+        "maxPages": 20,
+        "maxSizeMB": 5
+      },
+      "image": {
+        "maxSizeKB": 500,
+        "minDPI": 300,
+        "targetWidth": 1200
+      }
+    }
+  },
+  "results": {
+    "pdfIssues": [
+      {
+        "type": "font_replacement",
+        "severity": "error",
+        "filePath": "sample-gift-brochure.pdf",
+        "fileName": "sample-gift-brochure.pdf",
+        "fontName": "KaiTi_GB2312",
+        "suggestedFont": "Microsoft YaHei",
+        "message": "字体 \"KaiTi_GB2312\" 不在企业礼品仓许可字体列表中，请替换为标准字体",
+        "page": 3
+      },
+      {
+        "type": "font_replacement",
+        "severity": "warning",
+        "filePath": "sample-gift-brochure.pdf",
+        "fileName": "sample-gift-brochure.pdf",
+        "fontName": "Arial-BoldMT",
+        "suggestedFont": "Microsoft YaHei Bold",
+        "message": "字体 \"Arial-BoldMT\" 建议替换为更适合中文显示的粗体",
+        "page": 5
+      },
+      {
+        "type": "font_replacement",
+        "severity": "error",
+        "filePath": "sample-vip-certificate.pdf",
+        "fileName": "sample-vip-certificate.pdf",
+        "fontName": "FangSong_GB2312",
+        "suggestedFont": "SimSun",
+        "message": "字体 \"FangSong_GB2312\" 不在企业礼品仓许可字体列表中",
+        "page": 1
+      },
+      {
+        "type": "file_size",
+        "severity": "warning",
+        "filePath": "sample-product-label.pdf",
+        "fileName": "sample-product-label.pdf",
+        "message": "PDF文件大小 8.7MB 超过建议阈值 5MB",
+        "currentSize": "8.7MB",
+        "suggestedSize": "5MB"
+      }
+    ],
+    "imageIssues": [
+      {
+        "type": "compression",
+        "severity": "warning",
+        "filePath": "sample-product-main.jpg",
+        "fileName": "sample-product-main.jpg",
+        "message": "图片大小 3,240KB 超过建议阈值 500KB，建议压缩 85%",
+        "currentSize": "3,240KB",
+        "suggestedSize": "500KB",
+        "compressionRatio": 85
+      },
+      {
+        "type": "resolution",
+        "severity": "warning",
+        "filePath": "sample-product-main.jpg",
+        "fileName": "sample-product-main.jpg",
+        "message": "图片宽度 4000px 超过建议宽度 1200px，建议缩放至 30%",
+        "currentWidth": 4000,
+        "suggestedWidth": 1200
+      },
+      {
+        "type": "format",
+        "severity": "error",
+        "filePath": "sample-product-detail.png",
+        "fileName": "sample-product-detail.png",
+        "message": "图片格式 \"tiff\" 不在许可列表中",
+        "currentFormat": "tiff",
+        "suggestedFormat": "webp"
+      },
+      {
+        "type": "dpi",
+        "severity": "info",
+        "filePath": "sample-packaging-design.tiff",
+        "fileName": "sample-packaging-design.tiff",
+        "message": "图片DPI 72 低于建议值 300，打印质量可能受影响",
+        "currentDPI": 72,
+        "suggestedDPI": 300
+      },
+      {
+        "type": "compression",
+        "severity": "warning",
+        "filePath": "sample-brand-logo.png",
+        "fileName": "sample-brand-logo.png",
+        "message": "图片大小 1,200KB 超过建议阈值 200KB，建议压缩 83%",
+        "currentSize": "1,200KB",
+        "suggestedSize": "200KB",
+        "compressionRatio": 83
+      }
+    ],
+    "fixSuggestions": [
+      {
+        "category": "PDF字体替换",
+        "title": "替换非标准字体 \"KaiTi_GB2312\"",
+        "suggestion": "将字体 \"KaiTi_GB2312\" 统一替换为企业标准字体 \"Microsoft YaHei\"，确保礼品仓宣传材料的视觉一致性",
+        "files": [
+          "sample-gift-brochure.pdf"
+        ],
+        "action": "使用 PDF 编辑工具将字体批量替换为 \"Microsoft YaHei\""
+      },
+      {
+        "category": "PDF字体替换",
+        "title": "替换非标准字体 \"Arial-BoldMT\"",
+        "suggestion": "将字体 \"Arial-BoldMT\" 统一替换为企业标准字体 \"Microsoft YaHei Bold\"，确保礼品仓宣传材料的视觉一致性",
+        "files": [
+          "sample-gift-brochure.pdf"
+        ],
+        "action": "使用 PDF 编辑工具将字体批量替换为 \"Microsoft YaHei Bold\""
+      },
+      {
+        "category": "PDF字体替换",
+        "title": "替换非标准字体 \"FangSong_GB2312\"",
+        "suggestion": "将字体 \"FangSong_GB2312\" 统一替换为企业标准字体 \"SimSun\"，确保礼品仓宣传材料的视觉一致性",
+        "files": [
+          "sample-vip-certificate.pdf"
+        ],
+        "action": "使用 PDF 编辑工具将字体批量替换为 \"SimSun\""
+      },
+      {
+        "category": "PDF优化",
+        "title": "压缩PDF文件大小",
+        "suggestion": "PDF文件过大可能导致礼品仓打印和传输效率低下，建议使用PDF压缩工具优化",
+        "files": [
+          "sample-product-label.pdf"
+        ],
+        "action": "使用 Adobe Acrobat 或在线PDF压缩工具进行压缩，目标大小 5MB 以内"
+      },
+      {
+        "category": "图片格式转换",
+        "title": "转换 TIFF 格式图片",
+        "suggestion": "TIFF 格式不适合礼品仓产品展示，建议转换为 WebP 格式以获得更好的压缩率和质量",
+        "files": [
+          "sample-product-detail.png"
+        ],
+        "action": "使用 sharp 或 ImageMagick 批量转换为 WebP 格式，质量设置 85%"
+      },
+      {
+        "category": "图片压缩",
+        "title": "压缩产品图片文件大小",
+        "suggestion": "礼品仓产品图片需要兼顾加载速度和显示质量，建议统一压缩至合理大小",
+        "files": [
+          "sample-product-main.jpg",
+          "sample-brand-logo.png"
+        ],
+        "action": "使用 tinypng 或 sharp 进行批量无损压缩，建议质量 80-85%"
+      },
+      {
+        "category": "图片尺寸调整",
+        "title": "调整产品图片分辨率",
+        "suggestion": "礼品仓产品展示图不需要过高的分辨率，统一宽度可提升页面加载性能",
+        "files": [
+          "sample-product-main.jpg"
+        ],
+        "action": "批量调整图片宽度至 1200px，保持宽高比，高度自适应"
+      },
+      {
+        "category": "打印质量",
+        "title": "提高打印图片DPI",
+        "suggestion": "用于礼品仓实物打印的图片建议使用 300DPI 以确保印刷质量",
+        "files": [
+          "sample-packaging-design.tiff"
+        ],
+        "action": "重新导出或处理图片，将DPI设置为 300，保持像素尺寸不变"
+      }
+    ]
+  },
+  "statistics": {
+    "pdf": {
+      "totalFiles": 3,
+      "errors": 2,
+      "warnings": 2,
+      "infos": 0
+    },
+    "image": {
+      "totalFiles": 4,
+      "errors": 1,
+      "warnings": 3,
+      "infos": 1
+    }
+  }
+}
