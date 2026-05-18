@@ -1,0 +1,88 @@
+{
+  "operator": "验收测试员",
+  "records": [
+    {
+      "_comment": "第1行：正常有效记录",
+      "lecture_id": "LIB-2024-004",
+      "lecture_title": "图书馆服务创新与用户体验",
+      "lecture_date": "2024-02-01T14:00:00",
+      "lecture_venue": "图书馆报告厅",
+      "reader_id": "R20240100",
+      "reader_name": "郑晓",
+      "reader_phone": "13900139001",
+      "reader_department": "管理学院",
+      "waitlist_number": 1,
+      "status": "waiting",
+      "data_source": "spreadsheet",
+      "source_note": "验收测试 - 正常记录"
+    },
+    {
+      "_comment": "第2行：冲突记录 - 与已存在的张明重复",
+      "lecture_id": "LIB-2024-001",
+      "lecture_title": "人工智能在图书馆资源管理中的应用",
+      "lecture_date": "2024-01-15T14:00:00",
+      "lecture_venue": "图书馆三楼多功能厅",
+      "reader_id": "R20240001",
+      "reader_name": "张明",
+      "reader_phone": "13800138001",
+      "reader_department": "计算机学院",
+      "waitlist_number": 5,
+      "status": "waiting",
+      "data_source": "spreadsheet",
+      "source_note": "验收测试 - 冲突记录（重复读者）"
+    },
+    {
+      "_comment": "第3行：坏行 - 缺少必填字段 lecture_id",
+      "lecture_title": "数字资源检索与利用",
+      "lecture_date": "2024-02-05T09:00:00",
+      "lecture_venue": "图书馆电子阅览室",
+      "reader_id": "R20240102",
+      "reader_name": "钱伟",
+      "reader_phone": "13900139003",
+      "waitlist_number": 1,
+      "data_source": "screenshot",
+      "source_note": "验收测试 - 坏行（缺少lecture_id）"
+    },
+    {
+      "_comment": "第4行：坏行 - 候补序号无效（0不是正整数）",
+      "lecture_id": "LIB-2024-004",
+      "lecture_title": "图书馆服务创新与用户体验",
+      "lecture_date": "2024-02-01T14:00:00",
+      "lecture_venue": "图书馆报告厅",
+      "reader_id": "R20240103",
+      "reader_name": "孙丽",
+      "reader_phone": "13900139004",
+      "waitlist_number": 0,
+      "data_source": "verbal",
+      "source_note": "验收测试 - 坏行（序号无效）"
+    },
+    {
+      "_comment": "第5行：坏行 - 日期格式无效",
+      "lecture_id": "LIB-2024-004",
+      "lecture_title": "图书馆服务创新与用户体验",
+      "lecture_date": "2024/02/01",
+      "lecture_venue": "图书馆报告厅",
+      "reader_id": "R20240104",
+      "reader_name": "周健",
+      "reader_phone": "13900139005",
+      "waitlist_number": 2,
+      "data_source": "system",
+      "source_note": "验收测试 - 坏行（日期格式）"
+    },
+    {
+      "_comment": "第6行：正常有效记录",
+      "lecture_id": "LIB-2024-004",
+      "lecture_title": "图书馆服务创新与用户体验",
+      "lecture_date": "2024-02-01T14:00:00",
+      "lecture_venue": "图书馆报告厅",
+      "reader_id": "R20240105",
+      "reader_name": "吴敏",
+      "reader_phone": "139-0013-9006",
+      "reader_department": "外语学院",
+      "waitlist_number": 3,
+      "status": "confirmed",
+      "data_source": "spreadsheet",
+      "source_note": "验收测试 - 正常记录2"
+    }
+  ]
+}
