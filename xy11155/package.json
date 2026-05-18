@@ -1,0 +1,28 @@
+{
+  "name": "yuezi-meal-delivery-check",
+  "version": "1.0.0",
+  "description": "月子餐配送组月子餐配送核对 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "yuezi-check": "./bin/yuezi-check.js"
+  },
+  "scripts": {
+    "start": "node bin/yuezi-check.js",
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "月子餐",
+    "配送核对",
+    "cli"
+  ],
+  "author": "月子餐配送组",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parser": "^3.0.0",
+    "chalk": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
