@@ -1,0 +1,3 @@
+[console_scripts]
+warehouse-validator = warehouse_validator.cli:main
+仓库冻结快照库存释放校验 = warehouse_validator.cli:main

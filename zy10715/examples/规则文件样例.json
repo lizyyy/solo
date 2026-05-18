@@ -1,0 +1,6 @@
+{
+  "min_release_qty": 1,
+  "max_age_days": 180,
+  "allow_negative": false,
+  "exclude_status": ["报废", "待检", "冻结"]
+}

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "warehouse-freeze-snapshot-validator"
+version = "0.1.0"
+authors = [
+  { name="Warehouse Team", email="warehouse@example.com" }
+]
+description = "仓库冻结快照库存释放校验 CLI 工具"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "pandas>=2.0.0",
+  "openpyxl>=3.1.0",
+  "click>=8.0.0",
+]
+
+[project.scripts]
+warehouse-validator = "warehouse_validator.cli:main"
