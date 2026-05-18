@@ -36,11 +36,14 @@ python3 -m inspection_cli photos 数据文件.xlsx
 
 ### 2. 生成报告
 ```bash
-# 生成完整Excel报告
+# 生成完整Excel报告（默认使用稳定文件名，同一材料多次运行结果一致）
 python3 -m inspection_cli report 数据文件.xlsx
 
 # 生成JSON格式报告
 python3 -m inspection_cli report 数据文件.xlsx --format json
+
+# 生成带时间戳的报告（每次运行文件名不同）
+python3 -m inspection_cli report 数据文件.xlsx --with-timestamp
 
 # 生成指定门店详细报告
 python3 -m inspection_cli store-report 数据文件.xlsx --store-id S001
@@ -48,6 +51,14 @@ python3 -m inspection_cli store-report 数据文件.xlsx --store-id S001
 # 生成指定巡检项追踪报告
 python3 -m inspection_cli item-report 数据文件.xlsx --item-id I001
 ```
+
+### 3. 可复跑性保证
+报告生成默认使用**稳定文件名**，文件名基于数据内容的哈希值（`inspection_report_内容哈希.xlsx`）。相同输入材料多次运行时：
+- 报告文件名保持一致（不会因时间戳产生差异）
+- 所有数据按业务 ID 稳定排序
+- 报告内容字节级一致
+
+如需每次生成不同的报告文件，可添加 `--with-timestamp` 参数。
 
 ## 数据格式说明
 

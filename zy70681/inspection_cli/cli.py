@@ -132,7 +132,7 @@ class InspectionCLI:
             for photo_id, result in invalid_photos:
                 click.echo(f"  [{photo_id}]: {'; '.join(result.errors)}")
 
-    def generate_report(self, format: str = "excel", stable_filename: bool = False) -> None:
+    def generate_report(self, format: str = "excel", stable_filename: bool = True) -> None:
         if not self.session:
             click.echo("没有加载数据", err=True)
             return
@@ -205,10 +205,11 @@ def summary(cli_instance: InspectionCLI, files):
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
 @click.option('--format', '-f', type=click.Choice(['excel', 'json']), default='excel', help='报告格式')
 @click.option('--output-dir', '-o', type=click.Path(), help='输出目录')
-@click.option('--stable-filename', '-s', is_flag=True, default=False, help='使用稳定文件名（不包含时间戳）')
+@click.option('--with-timestamp', '-t', is_flag=True, default=False, help='文件名包含时间戳（默认不包含，确保可复跑）')
 @pass_cli
-def report(cli_instance: InspectionCLI, files, format, output_dir, stable_filename):
-    """生成完整的巡检报告"""
+def report(cli_instance: InspectionCLI, files, format, output_dir, with_timestamp):
+    """生成完整的巡检报告。默认使用稳定文件名，确保重复运行同一批材料结果一致。"""
+    stable_filename = not with_timestamp
     if not files:
         click.echo("请指定要加载的文件", err=True)
         return

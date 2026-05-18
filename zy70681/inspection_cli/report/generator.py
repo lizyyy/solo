@@ -40,15 +40,16 @@ class ReportGenerator:
         rule_result: RuleResult,
         photo_manager: PhotoManager,
         format: str = "excel",
-        stable_filename: bool = False
+        stable_filename: bool = True
     ) -> str:
         content_hash = self._calculate_content_hash(session)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        ext = "json" if format.lower() == "json" else "xlsx"
 
         if stable_filename:
-            filename = f"inspection_report_{content_hash}.{format.lower()}"
+            filename = f"inspection_report_{content_hash}.{ext}"
         else:
-            filename = f"inspection_report_{timestamp}_{content_hash}.{format.lower()}"
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"inspection_report_{timestamp}_{content_hash}.{ext}"
 
         if format.lower() == "json":
             return self._generate_json_report(session, rule_result, photo_manager, filename)
