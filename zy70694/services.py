@@ -134,6 +134,21 @@ def checkin_service(db: Session, booking_id: int) -> Tuple[Booking, Optional[Lat
         late_minutes = int((now - booking_start).total_seconds() / 60)
         
         if late_minutes >= 30:
+            late_record = LateRecord(
+                booking_id=booking.id,
+                user_id=booking.user_id,
+                late_minutes=late_minutes,
+                is_released=True,
+                released_at=now
+            )
+            db.add(late_record)
+            booking.status = BookingStatus.RELEASED
+            booking.is_late_released = True
+            
+            room = db.query(PianoRoom).filter(PianoRoom.id == booking.room_id).first()
+            room.status = RoomStatus.AVAILABLE
+            
+            db.commit()
             raise BusinessError("TOO_LATE", "迟到超过30分钟，预约已失效")
         
         late_record = LateRecord(
