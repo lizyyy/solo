@@ -22,14 +22,26 @@ class ReportGenerator:
 
     def _calculate_content_hash(self, session: InspectionSession) -> str:
         """计算会话内容的稳定哈希，确保相同内容产生相同哈希"""
+        # 只基于实际数据内容计算哈希，排除随机session_id
         content_parts = [
-            session.session_id,
+            # 门店：ID列表
             *sorted(session.stores.keys()),
-            *sorted(session.items.keys()),
-            *sorted(session.tasks.keys()),
-            *sorted(session.rechecks.keys()),
-            *sorted(session.deductions.keys()),
-            *sorted(session.photos.keys()),
+            # 巡检项：ID + 得分 + 是否通过
+            *sorted(f"{item_id}:{session.items[item_id].score}:{session.items[item_id].is_pass}"
+                     for item_id in session.items.keys()),
+            # 整改任务：ID + 状态
+            *sorted(f"{task_id}:{session.tasks[task_id].status.value}"
+                     for task_id in session.tasks.keys()),
+            # 复查记录：ID + 结果
+            *sorted(f"{recheck_id}:{session.rechecks[recheck_id].result.value}"
+                     for recheck_id in session.rechecks.keys()),
+            # 扣分记录：ID + 分数
+            *sorted(f"{ded_id}:{session.deductions[ded_id].points}"
+                     for ded_id in session.deductions.keys()),
+            # 照片：ID + 文件路径
+            *sorted(f"{photo_id}:{session.photos[photo_id].file_path}"
+                     for photo_id in session.photos.keys()),
+            # 解析错误数量
             str(len(session.parsing_errors))
         ]
         return stable_hash("|".join(content_parts))[:12]
@@ -261,31 +273,32 @@ class ReportGenerator:
         summary = dict(sorted(rule_result.summary.items()))
         store_scores = {
             store_id: {
-                "store_name": score.store_name,
-                "total_score": score.total_score,
-                "max_score": score.max_score,
-                "percentage": score.percentage,
-                "deduction_points": score.deduction_points,
-                "final_score": score.final_score,
-                "pass_count": score.pass_count,
-                "fail_count": score.fail_count
+                "store_name": rule_result.store_scores[store_id].store_name,
+                "total_score": rule_result.store_scores[store_id].total_score,
+                "max_score": rule_result.store_scores[store_id].max_score,
+                "percentage": rule_result.store_scores[store_id].percentage,
+                "deduction_points": rule_result.store_scores[store_id].deduction_points,
+                "final_score": rule_result.store_scores[store_id].final_score,
+                "pass_count": rule_result.store_scores[store_id].pass_count,
+                "fail_count": rule_result.store_scores[store_id].fail_count
             }
             for store_id in sorted(rule_result.store_scores.keys())
         }
         tasks = {
             task_id: {
-                "current_status": status.current_status.value,
-                "recheck_count": status.recheck_count,
-                "last_recheck_result": status.last_recheck_result.value if status.last_recheck_result else None,
-                "has_photo_evidence": status.has_photo_evidence,
-                "is_overdue": status.is_overdue
+                "current_status": rule_result.task_statuses[task_id].current_status.value,
+                "recheck_count": rule_result.task_statuses[task_id].recheck_count,
+                "last_recheck_result": rule_result.task_statuses[task_id].last_recheck_result.value if rule_result.task_statuses[task_id].last_recheck_result else None,
+                "has_photo_evidence": rule_result.task_statuses[task_id].has_photo_evidence,
+                "is_overdue": rule_result.task_statuses[task_id].is_overdue
             }
             for task_id in sorted(rule_result.task_statuses.keys())
         }
 
+        content_hash = self._calculate_content_hash(session)
         report_data = {
-            "session_id": session.session_id,
-            "content_hash": self._calculate_content_hash(session),
+            "session_id": content_hash,
+            "content_hash": content_hash,
             "summary": summary,
             "store_scores": store_scores,
             "tasks": tasks,

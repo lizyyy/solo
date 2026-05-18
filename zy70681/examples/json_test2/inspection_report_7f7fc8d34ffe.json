@@ -1,0 +1,86 @@
+{
+  "content_hash": "7f7fc8d34ffe",
+  "parsing_errors": [],
+  "session_id": "7f7fc8d34ffe",
+  "store_scores": {
+    "S001": {
+      "deduction_points": 5.0,
+      "fail_count": 1,
+      "final_score": 76.66666666666667,
+      "max_score": 30.0,
+      "pass_count": 2,
+      "percentage": 81.66666666666667,
+      "store_name": "北京朝阳店",
+      "total_score": 24.5
+    },
+    "S002": {
+      "deduction_points": 8.0,
+      "fail_count": 1,
+      "final_score": 59.5,
+      "max_score": 20.0,
+      "pass_count": 1,
+      "percentage": 67.5,
+      "store_name": "上海浦东店",
+      "total_score": 13.5
+    },
+    "S003": {
+      "deduction_points": 10.0,
+      "fail_count": 1,
+      "final_score": 67.5,
+      "max_score": 20.0,
+      "pass_count": 1,
+      "percentage": 77.5,
+      "store_name": "广州天河店",
+      "total_score": 15.5
+    }
+  },
+  "summary": {
+    "average_score": 67.89,
+    "failed_items": 3,
+    "overdue_tasks": 1,
+    "parsing_errors": 0,
+    "passed_items": 4,
+    "recheck_result_distribution": {
+      "需再次整改": 1
+    },
+    "task_status_distribution": {
+      "待整改": 2,
+      "整改中": 1
+    },
+    "tasks_without_photo": 1,
+    "total_deduction_points": 23.0,
+    "total_deductions": 3,
+    "total_inspection_items": 7,
+    "total_rechecks": 2,
+    "total_stores": 3,
+    "total_tasks": 3
+  },
+  "tasks": {
+    "T001": {
+      "current_status": "待整改",
+      "has_photo_evidence": true,
+      "is_overdue": false,
+      "last_recheck_result": null,
+      "recheck_count": 0
+    },
+    "T002": {
+      "current_status": "整改中",
+      "has_photo_evidence": true,
+      "is_overdue": true,
+      "last_recheck_result": "需再次整改",
+      "recheck_count": 2
+    },
+    "T003": {
+      "current_status": "待整改",
+      "has_photo_evidence": false,
+      "is_overdue": false,
+      "last_recheck_result": null,
+      "recheck_count": 0
+    }
+  },
+  "warnings": [
+    "[S002] 上海浦东店 最终得分 59.5 低于及格线 60.0%",
+    "[T002] 上海浦东店 整改任务已逾期: 彻底清洁后厨地面油污...",
+    "[T003] 广州天河店 整改任务缺少照片证据"
+  ]
+}
