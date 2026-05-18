@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hotel-conflict-checker"
+version = "0.1.0"
+authors = [
+  { name="Hotel Ops Team", email="ops@hotel.com" }
+]
+description = "酒店房态导出锁房冲突核对CLI工具"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "click>=8.0",
+  "pandas>=2.0",
+  "openpyxl>=3.1",
+  "rich>=13.0",
+]
+
+[project.scripts]
+hotel-conflict = "hotel_conflict_checker.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
