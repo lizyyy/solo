@@ -1,0 +1,14 @@
+{
+  "ruleCode": "expired_invoice",
+  "ruleDescription": "发票已超过红冲有效期（360天）",
+  "violationCount": 1,
+  "description": "触发\"发票已超过红冲有效期（360天）\"规则的发票明细",
+  "invoices": [
+    {
+      "invoiceNumber": "11002311307777777777",
+      "invoiceDate": "2025-01-01",
+      "amount": 15000,
+      "reason": "发票开具日期距今502天，超过红冲有效期360天"
+    }
+  ]
+}

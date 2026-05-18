@@ -1,0 +1,49 @@
+{
+  "listName": "可红冲发票清单",
+  "description": "通过预审、可以进行红冲操作的发票列表",
+  "count": 3,
+  "invoices": [
+    {
+      "invoiceNumber": "44032311301234567890",
+      "invoiceDate": "2026-03-01",
+      "originalInvoiceNumber": "44032311301111111111",
+      "buyerName": "深圳XX科技有限公司",
+      "sellerName": "广州YY贸易有限公司",
+      "amount": 10000,
+      "taxAmount": 1300,
+      "taxRate": 0.13,
+      "redFlushType": "full",
+      "refundType": "full",
+      "status": "approved",
+      "statusDescription": "预审通过，可红冲"
+    },
+    {
+      "invoiceNumber": "31002311309876543210",
+      "invoiceDate": "2026-02-15",
+      "originalInvoiceNumber": "31002311302222222222",
+      "buyerName": "上海ZZ实业有限公司",
+      "sellerName": "北京WW商贸有限公司",
+      "amount": 5000,
+      "taxAmount": 300,
+      "taxRate": 0.06,
+      "redFlushType": "partial",
+      "refundType": "partial",
+      "status": "approved",
+      "statusDescription": "预审通过，可红冲"
+    },
+    {
+      "invoiceNumber": "33002311305555555555",
+      "invoiceDate": "2026-01-20",
+      "originalInvoiceNumber": "33002311306666666666",
+      "buyerName": "杭州AA电子有限公司",
+      "sellerName": "宁波BB制造有限公司",
+      "amount": 20000,
+      "taxAmount": 2600,
+      "taxRate": 0.13,
+      "redFlushType": "full",
+      "refundType": "full",
+      "status": "approved",
+      "statusDescription": "预审通过，可红冲"
+    }
+  ]
+}

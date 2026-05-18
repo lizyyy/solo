@@ -1,0 +1,31 @@
+{
+  "listName": "驳回发票清单",
+  "description": "预审未通过、需要修改或补充材料的发票列表",
+  "count": 1,
+  "invoices": [
+    {
+      "invoiceNumber": "INV-12345",
+      "invoiceDate": "2026-03-01",
+      "originalInvoiceNumber": "44032311301111111111",
+      "buyerName": "深圳XX科技有限公司",
+      "sellerName": "广州YY贸易有限公司",
+      "amount": 10000,
+      "redFlushType": "full",
+      "refundType": "full",
+      "status": "rejected",
+      "statusDescription": "预审驳回，不可红冲",
+      "rejectionReasons": [
+        {
+          "rule": "missing_attachment",
+          "ruleDescription": "缺少必要的红冲证明材料",
+          "details": "缺少必要附件: proof_of_return"
+        },
+        {
+          "rule": "invalid_invoice_number",
+          "ruleDescription": "发票号码格式无效",
+          "details": "发票号码(INV-12345)格式无效，应为12-20位数字"
+        }
+      ]
+    }
+  ]
+}

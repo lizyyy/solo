@@ -1,0 +1,14 @@
+{
+  "ruleCode": "partial_refund",
+  "ruleDescription": "部分退款金额超过原发票金额的80%",
+  "violationCount": 1,
+  "description": "触发\"部分退款金额超过原发票金额的80%\"规则的发票明细",
+  "invoices": [
+    {
+      "invoiceNumber": "44032311301234567890",
+      "invoiceDate": "2026-03-01",
+      "amount": 9000,
+      "reason": "部分退款金额(9000)占原发票金额(10000)的90.00%，超过阈值80%"
+    }
+  ]
+}

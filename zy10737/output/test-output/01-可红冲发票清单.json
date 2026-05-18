@@ -1,0 +1,21 @@
+{
+  "listName": "可红冲发票清单",
+  "description": "通过预审、可以进行红冲操作的发票列表",
+  "count": 1,
+  "invoices": [
+    {
+      "invoiceNumber": "44032311301234567890",
+      "invoiceDate": "2026-03-01",
+      "originalInvoiceNumber": "44032311301111111111",
+      "buyerName": "深圳XX科技有限公司",
+      "sellerName": "广州YY贸易有限公司",
+      "amount": 10000,
+      "taxAmount": 1300,
+      "taxRate": 0.13,
+      "redFlushType": "full",
+      "refundType": "full",
+      "status": "approved",
+      "statusDescription": "预审通过，可红冲"
+    }
+  ]
+}

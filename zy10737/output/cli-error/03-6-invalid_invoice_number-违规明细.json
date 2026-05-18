@@ -1,0 +1,14 @@
+{
+  "ruleCode": "invalid_invoice_number",
+  "ruleDescription": "发票号码格式无效",
+  "violationCount": 1,
+  "description": "触发\"发票号码格式无效\"规则的发票明细",
+  "invoices": [
+    {
+      "invoiceNumber": "INV-12345",
+      "invoiceDate": "2026-04-01",
+      "amount": 8000,
+      "reason": "发票号码(INV-12345)格式无效，应为12-20位数字"
+    }
+  ]
+}

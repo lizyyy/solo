@@ -1,0 +1,121 @@
+{
+  "listName": "驳回发票清单",
+  "description": "预审未通过、需要修改或补充材料的发票列表",
+  "count": 6,
+  "invoices": [
+    {
+      "invoiceNumber": "44032311301234567890",
+      "invoiceDate": "2026-03-01",
+      "originalInvoiceNumber": "44032311301111111111",
+      "buyerName": "深圳XX科技有限公司",
+      "sellerName": "广州YY贸易有限公司",
+      "amount": 9000,
+      "redFlushType": "partial",
+      "refundType": "partial",
+      "status": "rejected",
+      "statusDescription": "预审驳回，不可红冲",
+      "rejectionReasons": [
+        {
+          "rule": "partial_refund",
+          "ruleDescription": "部分退款金额超过原发票金额的80%",
+          "details": "部分退款金额(9000)占原发票金额(10000)的90.00%，超过阈值80%"
+        }
+      ]
+    },
+    {
+      "invoiceNumber": "31002311309876543210",
+      "invoiceDate": "2026-02-15",
+      "originalInvoiceNumber": "31002311302222222222",
+      "buyerName": "上海ZZ实业有限公司",
+      "sellerName": "北京WW商贸有限公司",
+      "amount": 5000,
+      "redFlushType": "partial",
+      "refundType": "partial",
+      "status": "rejected",
+      "statusDescription": "预审驳回，不可红冲",
+      "rejectionReasons": [
+        {
+          "rule": "missing_attachment",
+          "ruleDescription": "缺少必要的红冲证明材料",
+          "details": "缺少必要附件: proof_of_return, partial_refund_agreement"
+        }
+      ]
+    },
+    {
+      "invoiceNumber": "33002311305555555555",
+      "invoiceDate": "2026-01-20",
+      "originalInvoiceNumber": "33002311306666666666",
+      "buyerName": "杭州AA电子有限公司",
+      "sellerName": "宁波BB制造有限公司",
+      "amount": 20000,
+      "redFlushType": "full",
+      "refundType": "full",
+      "status": "rejected",
+      "statusDescription": "预审驳回，不可红冲",
+      "rejectionReasons": [
+        {
+          "rule": "tax_rate_mismatch",
+          "ruleDescription": "红冲税率与原发票税率不符",
+          "details": "红冲税率(0.13)与原发票税率(0.09)不符"
+        }
+      ]
+    },
+    {
+      "invoiceNumber": "11002311307777777777",
+      "invoiceDate": "2025-01-01",
+      "originalInvoiceNumber": "11002311308888888888",
+      "buyerName": "北京CC科技有限公司",
+      "sellerName": "天津DD制造有限公司",
+      "amount": 15000,
+      "redFlushType": "full",
+      "refundType": "full",
+      "status": "rejected",
+      "statusDescription": "预审驳回，不可红冲",
+      "rejectionReasons": [
+        {
+          "rule": "expired_invoice",
+          "ruleDescription": "发票已超过红冲有效期（360天）",
+          "details": "发票开具日期距今502天，超过红冲有效期360天"
+        }
+      ]
+    },
+    {
+      "invoiceNumber": "INV-12345",
+      "invoiceDate": "2026-04-01",
+      "originalInvoiceNumber": "INV-99999",
+      "buyerName": "成都EE网络有限公司",
+      "sellerName": "重庆FF软件有限公司",
+      "amount": 8000,
+      "redFlushType": "full",
+      "refundType": "full",
+      "status": "rejected",
+      "statusDescription": "预审驳回，不可红冲",
+      "rejectionReasons": [
+        {
+          "rule": "invalid_invoice_number",
+          "ruleDescription": "发票号码格式无效",
+          "details": "发票号码(INV-12345)格式无效，应为12-20位数字"
+        }
+      ]
+    },
+    {
+      "invoiceNumber": "50002311309999999999",
+      "invoiceDate": "2026-05-01",
+      "originalInvoiceNumber": "50002311300000000000",
+      "buyerName": "武汉GG材料有限公司",
+      "sellerName": "长沙HH工程有限公司",
+      "amount": 25000,
+      "redFlushType": "full",
+      "refundType": "full",
+      "status": "rejected",
+      "statusDescription": "预审驳回，不可红冲",
+      "rejectionReasons": [
+        {
+          "rule": "invoice_amount_exceeded",
+          "ruleDescription": "红冲金额超过原发票剩余可冲金额",
+          "details": "红冲金额(25000)超过剩余可冲金额(20000)"
+        }
+      ]
+    }
+  ]
+}

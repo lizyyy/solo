@@ -1,0 +1,14 @@
+{
+  "ruleCode": "tax_rate_mismatch",
+  "ruleDescription": "红冲税率与原发票税率不符",
+  "violationCount": 1,
+  "description": "触发\"红冲税率与原发票税率不符\"规则的发票明细",
+  "invoices": [
+    {
+      "invoiceNumber": "33002311305555555555",
+      "invoiceDate": "2026-01-20",
+      "amount": 20000,
+      "reason": "红冲税率(0.13)与原发票税率(0.09)不符"
+    }
+  ]
+}

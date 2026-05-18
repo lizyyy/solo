@@ -1,0 +1,14 @@
+{
+  "ruleCode": "missing_attachment",
+  "ruleDescription": "缺少必要的红冲证明材料",
+  "violationCount": 1,
+  "description": "触发\"缺少必要的红冲证明材料\"规则的发票明细",
+  "invoices": [
+    {
+      "invoiceNumber": "INV-12345",
+      "invoiceDate": "2026-03-01",
+      "amount": 10000,
+      "reason": "缺少必要附件: proof_of_return"
+    }
+  ]
+}

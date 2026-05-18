@@ -1,0 +1,27 @@
+{
+  "name": "invoice-red-flush-preaudit-cli",
+  "version": "1.0.0",
+  "description": "发票红冲材料红票申请预审 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "invoice-preaudit": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "sample": "node src/cli.js run --input samples/normal-case/invoices.json --output output/normal-case --format human",
+    "sample-error": "node src/cli.js run --input samples/error-case/invoices.json --output output/error-case --format human"
+  },
+  "keywords": [
+    "invoice",
+    "red-flush",
+    "preaudit",
+    "cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {}
+}

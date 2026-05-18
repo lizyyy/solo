@@ -1,0 +1,50 @@
+[
+  {
+    "invoiceNumber": "44032311301234567890",
+    "invoiceDate": "2026-03-01",
+    "originalInvoiceNumber": "44032311301111111111",
+    "buyerName": "深圳XX科技有限公司",
+    "sellerName": "广州YY贸易有限公司",
+    "amount": 10000.00,
+    "taxAmount": 1300.00,
+    "taxRate": 0.13,
+    "originalTaxRate": 0.13,
+    "redFlushType": "full",
+    "refundType": "full",
+    "originalInvoiceAmount": 10000.00,
+    "remainingAmount": 10000.00,
+    "attachments": ["red_flush_agreement", "proof_of_return"]
+  },
+  {
+    "invoiceNumber": "31002311309876543210",
+    "invoiceDate": "2026-02-15",
+    "originalInvoiceNumber": "31002311302222222222",
+    "buyerName": "上海ZZ实业有限公司",
+    "sellerName": "北京WW商贸有限公司",
+    "amount": 5000.00,
+    "taxAmount": 300.00,
+    "taxRate": 0.06,
+    "originalTaxRate": 0.06,
+    "redFlushType": "partial",
+    "refundType": "partial",
+    "originalInvoiceAmount": 10000.00,
+    "remainingAmount": 10000.00,
+    "attachments": ["red_flush_agreement", "proof_of_return", "partial_refund_agreement"]
+  },
+  {
+    "invoiceNumber": "33002311305555555555",
+    "invoiceDate": "2026-01-20",
+    "originalInvoiceNumber": "33002311306666666666",
+    "buyerName": "杭州AA电子有限公司",
+    "sellerName": "宁波BB制造有限公司",
+    "amount": 20000.00,
+    "taxAmount": 2600.00,
+    "taxRate": 0.13,
+    "originalTaxRate": 0.13,
+    "redFlushType": "full",
+    "refundType": "full",
+    "originalInvoiceAmount": 20000.00,
+    "remainingAmount": 20000.00,
+    "attachments": ["red_flush_agreement", "proof_of_return"]
+  }
+]

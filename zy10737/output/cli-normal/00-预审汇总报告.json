@@ -1,0 +1,60 @@
+{
+  "toolName": "发票红冲材料红票申请预审 CLI",
+  "version": "1.0.0",
+  "auditDate": "2026-05-18T11:07:51.763Z",
+  "statistics": {
+    "totalInvoices": 3,
+    "approvedCount": 3,
+    "rejectedCount": 0,
+    "approvalRate": "100.00%"
+  },
+  "ruleStatistics": [
+    {
+      "ruleCode": "partial_refund",
+      "ruleDescription": "部分退款金额超过原发票金额的80%",
+      "violationCount": 0
+    },
+    {
+      "ruleCode": "missing_attachment",
+      "ruleDescription": "缺少必要的红冲证明材料",
+      "violationCount": 0
+    },
+    {
+      "ruleCode": "tax_rate_mismatch",
+      "ruleDescription": "红冲税率与原发票税率不符",
+      "violationCount": 0
+    },
+    {
+      "ruleCode": "invoice_amount_exceeded",
+      "ruleDescription": "红冲金额超过原发票剩余可冲金额",
+      "violationCount": 0
+    },
+    {
+      "ruleCode": "expired_invoice",
+      "ruleDescription": "发票已超过红冲有效期（360天）",
+      "violationCount": 0
+    },
+    {
+      "ruleCode": "invalid_invoice_number",
+      "ruleDescription": "发票号码格式无效",
+      "violationCount": 0
+    }
+  ],
+  "generatedFiles": [
+    {
+      "fileName": "00-预审汇总报告.json",
+      "description": "预审总体汇总报告，包含统计数据、规则违规统计和生成文件清单",
+      "path": "/Users/lzy/pro/solo/workspaces/zy10737/output/cli-normal/00-预审汇总报告.json"
+    },
+    {
+      "fileName": "01-可红冲发票清单.json",
+      "description": "通过预审的发票清单，包含详细发票信息和红冲类型",
+      "path": "/Users/lzy/pro/solo/workspaces/zy10737/output/cli-normal/01-可红冲发票清单.json"
+    },
+    {
+      "fileName": "02-驳回发票清单.json",
+      "description": "预审驳回的发票清单，包含详细的驳回原因和违规规则说明",
+      "path": "/Users/lzy/pro/solo/workspaces/zy10737/output/cli-normal/02-驳回发票清单.json"
+    }
+  ]
+}

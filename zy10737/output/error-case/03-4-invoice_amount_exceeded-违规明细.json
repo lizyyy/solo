@@ -1,0 +1,14 @@
+{
+  "ruleCode": "invoice_amount_exceeded",
+  "ruleDescription": "红冲金额超过原发票剩余可冲金额",
+  "violationCount": 1,
+  "description": "触发\"红冲金额超过原发票剩余可冲金额\"规则的发票明细",
+  "invoices": [
+    {
+      "invoiceNumber": "50002311309999999999",
+      "invoiceDate": "2026-05-01",
+      "amount": 25000,
+      "reason": "红冲金额(25000)超过剩余可冲金额(20000)"
+    }
+  ]
+}
