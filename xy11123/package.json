@@ -1,0 +1,21 @@
+{
+  "name": "nongzi-ledger-cli",
+  "version": "1.0.0",
+  "description": "农资门店农资实名台账 CLI - 处理重复记录、身份证尾号缺失、退货记录，稳定排序便于比较差异",
+  "main": "src/index.js",
+  "bin": {
+    "nongzi-ledger": "./bin/nongzi-ledger.js"
+  },
+  "scripts": {
+    "test": "node test/run-test.js"
+  },
+  "keywords": ["nongzi", "ledger", "cli", "agriculture"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "chalk": "^4.1.2"
+  }
+}
