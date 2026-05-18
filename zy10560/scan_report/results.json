@@ -70,11 +70,11 @@
         "field_path": "slack.webhook_url",
         "line": 17,
         "column": 3,
-        "value": "slack-webhook-example-token",
+        "value": "SLACK_TOKEN_REDACTED",
         "pattern_name": "slack-token",
         "risk_level": "critical",
         "description": "Slack API 令牌",
-        "raw_line": "webhook_url: https://example.invalid/slack-webhook/example-token"
+        "raw_line": "webhook_url: https://example.invalid/redacted-slack-webhook"
       },
       {
         "field_path": "private_key",

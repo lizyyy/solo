@@ -44,7 +44,7 @@ found unhashable key
 
   [CRITICAL] 行 17: slack.webhook_url
     描述: Slack API 令牌
-    内容: webhook_url: https://example.invalid/slack-webhook/example-token
+    内容: webhook_url: https://example.invalid/redacted-slack-webhook
 
   [CRITICAL] 行 1: private_key
     描述: 私钥

@@ -16,7 +16,7 @@
 | 6 | `aws.access_key_id` | **CRITICAL** | AWS 访问密钥 ID | `access_key_id: AKIAIOSFODNN7EXAMPLE` |
 | 10 | `api.token` | **CRITICAL** | GitHub 个人访问令牌 | `token: github_token_example_abcdefghijklmnopqrstuvwxyz1234567890` |
 | 14 | `jwt.token` | **HIGH** | JWT 令牌 | `token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c` |
-| 17 | `slack.webhook_url` | **CRITICAL** | Slack API 令牌 | `webhook_url: https://example.invalid/slack-webhook/example-token` |
+| 17 | `slack.webhook_url` | **CRITICAL** | Slack API 令牌 | `webhook_url: https://example.invalid/redacted-slack-webhook` |
 | 1 | `private_key` | **CRITICAL** | 私钥 | `database:` |
 
 ## 解析错误
