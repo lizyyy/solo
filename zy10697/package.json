@@ -1,0 +1,29 @@
+{
+  "name": "task-orchestration-skip-api",
+  "version": "1.0.0",
+  "description": "任务编排平台依赖任务临时跳过 API",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node test/acceptance.test.ts",
+    "test:normal": "ts-node test/normal.test.ts",
+    "test:abnormal": "ts-node test/abnormal.test.ts",
+    "test:repeat": "ts-node test/repeat.test.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-writer": "^1.6.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.5.0",
+    "@types/sqlite3": "^3.1.8",
+    "@types/uuid": "^9.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}
