@@ -1,0 +1,23 @@
+rules:
+  - type: whitelist
+    rule_id: WL-007
+    rule_name: 内存缓存访问白名单
+    tenant_name: 租户H
+    interface: /api/v1/memory/cache
+    status: active
+    expires_at: 2025-04-15 23:59:59
+    remark: 内存缓冲数据访问接口
+    tags: ["cache", "memory"]
+  - type: whitelist
+    rule_id: WL-008
+    rule_name: 租户更名过渡白名单-2
+    tenant_id: 原租户I
+    api: /api/v1/transaction/*
+    enabled: "true"
+    expire_date: 2025-02-28
+    description: 租户I更名为租户J的过渡期访问
+    tags: ["更名", "tenant"]
+  - type: rate_limit
+    rule_id: RL-001
+    rule_name: 普通限流规则
+    tenant: 通用

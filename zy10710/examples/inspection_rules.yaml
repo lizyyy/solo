@@ -1,0 +1,28 @@
+classification:
+  cache_keywords:
+    - cache
+    - 缓存
+    - redis
+    - memory
+    - 缓冲
+  rename_keywords:
+    - rename
+    - 改名
+    - 更名
+    - 迁移
+    - 租户变更
+  combo_keywords:
+    - combo
+    - 组合
+    - bundle
+    - 批量
+    - 接口组
+
+inspection:
+  check_expired: true
+  check_disabled: false
+  ignore_expire_null: true
+
+report:
+  include_all_whitelists: true
+  include_original_data: false

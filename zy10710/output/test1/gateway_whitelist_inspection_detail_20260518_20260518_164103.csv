@@ -1,0 +1,9 @@
+﻿巡检编号,规则ID,规则名称,租户,接口,状态,过期日期,是否过期仍生效,分类,来源文件,描述,标签
+GW-WL-20260518-0001,WL-001,用户查询接口白名单,租户A,/api/v1/user/query,启用,2025-01-15,是,普通,gateway_prod_01.json,普通用户查询接口访问权限,"user,query"
+GW-WL-20260518-0002,WL-002,缓存预热接口白名单,租户B,/api/v1/cache/warmup,启用,2025-02-20,是,缓存配置,gateway_prod_01.json,Redis缓存预热专用接口,"cache,redis"
+GW-WL-20260518-0003,WL-003,租户改名过渡白名单,原租户C,/api/v1/order/*,启用,2025-01-10,是,租户改名,gateway_prod_01.json,租户C更名为租户D期间的过渡访问,"rename,迁移"
+GW-WL-20260518-0004,WL-004,接口组合批量访问白名单,租户E,/api/v1/combo/*,启用,2025-03-01,是,接口组合,gateway_prod_02.yaml,批量接口组合访问权限，包含10个相关接口,"combo,组合,批量"
+GW-WL-20260518-0005,WL-005,未过期正常白名单,租户F,/api/v2/data/list,启用,2099-12-31,否,普通,gateway_prod_02.yaml,长期有效白名单,normal
+GW-WL-20260518-0006,WL-006,已禁用过期白名单,租户G,/api/v1/old/*,启用,2024-06-01,否,普通,gateway_prod_02.yaml,已禁用的白名单,deprecated
+GW-WL-20260518-0007,WL-007,内存缓存访问白名单,租户H,/api/v1/memory/cache,启用,2025-04-15 23:59:59,是,缓存配置,rules_config.yml,内存缓冲数据访问接口,"cache,memory"
+GW-WL-20260518-0008,WL-008,租户更名过渡白名单-2,原租户I,/api/v1/transaction/*,启用,2025-02-28,是,租户改名,rules_config.yml,租户I更名为租户J的过渡期访问,"更名,tenant"

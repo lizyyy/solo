@@ -1,0 +1,38 @@
+{
+  "gateway": {
+    "name": "生产环境网关-01",
+    "env": "prod",
+    "whitelist": [
+      {
+        "id": "WL-001",
+        "name": "用户查询接口白名单",
+        "tenant": "租户A",
+        "api_path": "/api/v1/user/query",
+        "status": "enabled",
+        "expire_date": "2025-01-15",
+        "description": "普通用户查询接口访问权限",
+        "tags": ["user", "query"]
+      },
+      {
+        "id": "WL-002",
+        "name": "缓存预热接口白名单",
+        "tenant": "租户B",
+        "api_path": "/api/v1/cache/warmup",
+        "status": true,
+        "expire_date": "2025-02-20",
+        "description": "Redis缓存预热专用接口",
+        "tags": ["cache", "redis"]
+      },
+      {
+        "id": "WL-003",
+        "name": "租户改名过渡白名单",
+        "tenant": "原租户C",
+        "api_path": "/api/v1/order/*",
+        "status": "启用",
+        "expire_date": "2025-01-10",
+        "description": "租户C更名为租户D期间的过渡访问",
+        "tags": ["rename", "迁移"]
+      }
+    ]
+  }
+}

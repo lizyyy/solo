@@ -1,0 +1,28 @@
+gateway:
+  name: 生产环境网关-02
+  env: prod
+whitelists:
+  - id: WL-004
+    name: 接口组合批量访问白名单
+    tenant: 租户E
+    api: /api/v1/combo/*
+    enabled: true
+    valid_until: 2025-03-01
+    description: 批量接口组合访问权限，包含10个相关接口
+    tags: ["combo", "组合", "批量"]
+  - id: WL-005
+    name: 未过期正常白名单
+    tenant: 租户F
+    api: /api/v2/data/list
+    status: enabled
+    expire_date: 2099-12-31
+    description: 长期有效白名单
+    tags: ["normal"]
+  - id: WL-006
+    name: 已禁用过期白名单
+    tenant: 租户G
+    api: /api/v1/old/*
+    status: disabled
+    expire_date: 2024-06-01
+    description: 已禁用的白名单
+    tags: ["deprecated"]
