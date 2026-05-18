@@ -344,7 +344,7 @@ def generate_refund_report(lease_id: str, db: Session = Depends(get_db)):
     needs_manual = False
     dispute_notes = []
     
-    if refund_amount < 0:
+    if total_all_deductions > total_deposit:
         needs_manual = True
         dispute_notes.append("扣款总额超过押金，需要人工复核")
     

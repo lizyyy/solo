@@ -466,6 +466,70 @@ async def test_error_cases():
             print_error(f"测试异常: {e}")
             all_passed = False
         
+        print_info("测试 4: 水电超额抵扣触发人工复核（核心bug修复验证）")
+        try:
+            lease_data4 = {
+                "id": "LEASE-TEST-OVERDRAFT",
+                "tenant_name": "测试用户4",
+                "apartment_number": "TEST-004",
+                "lease_start_date": "2023-01-01",
+                "lease_end_date": "2024-01-01",
+                "monthly_rent": 2000.0
+            }
+            await client.post(f"{BASE_URL}/leases/", json=lease_data4)
+            
+            deposit_data4 = {
+                "id": "DEPOSIT-TEST-OVERDRAFT",
+                "lease_id": "LEASE-TEST-OVERDRAFT",
+                "amount": 500.0,
+                "received_date": "2023-01-01"
+            }
+            await client.post(f"{BASE_URL}/deposits/", json=deposit_data4)
+            
+            inspection_data4 = {
+                "id": "INSPECTION-TEST-OVERDRAFT",
+                "lease_id": "LEASE-TEST-OVERDRAFT",
+                "inspection_date": "2024-01-02"
+            }
+            await client.post(f"{BASE_URL}/checkout-inspections/", json=inspection_data4)
+            
+            utility_bill4 = {
+                "id": "BILL-TEST-OVERDRAFT",
+                "lease_id": "LEASE-TEST-OVERDRAFT",
+                "bill_type": "electricity",
+                "billing_period_start": "2023-12-01",
+                "billing_period_end": "2023-12-31",
+                "usage_amount": 700,
+                "unit_price": 1.0,
+                "total_amount": 700.0,
+                "payment_status": "unpaid"
+            }
+            await client.post(f"{BASE_URL}/utility-bills/", json=utility_bill4)
+            
+            response = await client.post(f"{BASE_URL}/refund-reports/generate/LEASE-TEST-OVERDRAFT")
+            if response.status_code == 200:
+                report = response.json()
+                print_info(f"  押金: {report['total_deposit']}")
+                print_info(f"  水电扣款: {report['total_utility_deductions']}")
+                print_info(f"  应退金额: {report['refund_amount']}")
+                print_info(f"  争议状态: {report['dispute_status']}")
+                print_info(f"  备注: {report['dispute_notes']}")
+                
+                if report['refund_amount'] == 0.0 and \
+                   report['total_utility_deductions'] == 700.0 and \
+                   report['dispute_status'] == 'needs_manual_review' and \
+                   report['dispute_notes'] and '扣款总额超过押金' in report['dispute_notes']:
+                    print_success(f"核心bug修复验证通过！水电超额抵扣正确触发人工复核")
+                else:
+                    print_error(f"核心bug修复验证失败！状态或备注不正确")
+                    all_passed = False
+            else:
+                print_error(f"状态码不正确: {response.status_code}")
+                all_passed = False
+        except Exception as e:
+            print_error(f"测试异常: {e}")
+            all_passed = False
+        
         return all_passed
 
 async def main():
