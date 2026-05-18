@@ -1,0 +1,61 @@
+{
+  "name": "用户满意度调查配额规则",
+  "version": "1.0",
+  "invalidChecks": [
+    {
+      "field": "年龄",
+      "type": "empty",
+      "reason": "年龄不能为空"
+    },
+    {
+      "field": "年龄",
+      "type": "range",
+      "min": 18,
+      "max": 70,
+      "reason": "年龄应在18-70岁之间"
+    },
+    {
+      "field": "所在城市",
+      "type": "empty",
+      "reason": "所在城市不能为空"
+    },
+    {
+      "field": "性别",
+      "type": "enum",
+      "values": ["男", "女"],
+      "reason": "性别只能为男或女"
+    },
+    {
+      "field": "答题时长",
+      "type": "range",
+      "min": 30,
+      "max": 600,
+      "reason": "答题时长异常"
+    },
+    {
+      "field": "满意度",
+      "type": "empty",
+      "reason": "满意度不能为空"
+    }
+  ],
+  "duplicateKeys": ["受访者ID", "IP地址"],
+  "quotaFields": [
+    {
+      "field": "所在城市",
+      "targets": [
+        { "value": "北京", "count": 5 },
+        { "value": "上海", "count": 5 },
+        { "value": "广州", "count": 4 },
+        { "value": "深圳", "count": 4 },
+        { "value": "成都", "count": 2 }
+      ]
+    },
+    {
+      "field": "性别",
+      "targets": [
+        { "value": "男", "count": 10 },
+        { "value": "女", "count": 10 }
+      ]
+    }
+  ]
+}

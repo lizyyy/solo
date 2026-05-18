@@ -1,0 +1,21 @@
+{
+  "name": "survey-quota-sampling-cli",
+  "version": "1.0.0",
+  "description": "问卷回收数据配额补样计算 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "survey-quota": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["survey", "quota", "sampling", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0"
+  }
+}
