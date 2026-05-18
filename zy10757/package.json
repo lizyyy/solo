@@ -1,0 +1,20 @@
+{
+  "name": "outbound-call-dedupe-cli",
+  "version": "1.0.0",
+  "description": "外呼任务记录重复呼叫拦截 CLI - 识别跨任务重复号码",
+  "main": "src/index.js",
+  "bin": {
+    "outbound-dedupe": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js",
+    "test:watch": "node --watch test/run-tests.js"
+  },
+  "keywords": ["outbound", "call", "deduplication", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0"
+  }
+}
