@@ -1,0 +1,26 @@
+{
+  "name": "counseling-appointment-desensitize",
+  "version": "1.0.0",
+  "description": "心理咨询室咨询预约数据脱敏工具",
+  "main": "src/index.js",
+  "bin": {
+    "counseling-desensitize": "./bin/counseling-desensitize.js"
+  },
+  "scripts": {
+    "start": "node bin/counseling-desensitize.js",
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["心理咨询", "数据脱敏", "隐私保护", "CLI"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
