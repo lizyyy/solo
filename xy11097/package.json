@@ -1,0 +1,17 @@
+{
+  "name": "school-uniform-exchange-api",
+  "version": "1.0.0",
+  "description": "小学校服订购点校服尺码换货API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "seed": "node src/seed.js",
+    "test": "node src/test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "body-parser": "^1.20.2"
+  }
+}
