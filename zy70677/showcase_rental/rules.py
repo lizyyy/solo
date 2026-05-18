@@ -86,6 +86,10 @@ class RuleEngine:
 
         period_counter = 1
 
+        remaining_deposit = self.calculate_deposit_available(
+            contract.contract_id, deposit_records
+        )
+
         for lease in contract_leases:
             lease_periods = self.split_lease_by_billing_cycle(lease, contract)
 
@@ -116,13 +120,12 @@ class RuleEngine:
                                 }
                             )
 
-                deposit_available = self.calculate_deposit_available(
-                    contract.contract_id, deposit_records
-                )
                 total_before_deduction = base_amount + add_cabinet_amount
 
-                deposit_deduction = min(deposit_available, total_before_deduction)
+                deposit_deduction = min(remaining_deposit, total_before_deduction)
                 total_amount = total_before_deduction - deposit_deduction
+
+                remaining_deposit -= deposit_deduction
 
                 billing_period = BillingPeriod(
                     period_id=f"{contract.contract_id}-{period_counter:03d}",
@@ -212,7 +215,8 @@ class RuleEngine:
             total_deposit_deduction = sum(b.deposit_deduction for b in contract_billing)
             total_amount = sum(b.total_amount for b in contract_billing)
 
-            deposit_balance = self.calculate_deposit_available(contract.contract_id, deposit_records)
+            initial_deposit = self.calculate_deposit_available(contract.contract_id, deposit_records)
+            remaining_deposit = initial_deposit - total_deposit_deduction
 
             summary["contracts_summary"].append(
                 {
@@ -225,7 +229,8 @@ class RuleEngine:
                     "total_add_cabinet_amount": str(total_add_amount),
                     "total_deposit_deduction": str(total_deposit_deduction),
                     "total_amount": str(total_amount),
-                    "deposit_balance": str(deposit_balance),
+                    "initial_deposit": str(initial_deposit),
+                    "remaining_deposit": str(remaining_deposit),
                 }
             )
 

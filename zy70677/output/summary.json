@@ -3,38 +3,41 @@
     {
       "billing_periods": 21,
       "contract_id": "C001",
-      "deposit_balance": "40000.00",
+      "initial_deposit": "40000.00",
       "merchant_name": "优衣库",
+      "remaining_deposit": "0.00",
       "total_add_cabinet_amount": "32700.00",
       "total_add_cabinet_days": 26,
-      "total_amount": "700.00",
+      "total_amount": "402200.00",
       "total_base_amount": "409500.00",
       "total_base_days": 273,
-      "total_deposit_deduction": "441500.00"
+      "total_deposit_deduction": "40000.00"
     },
     {
       "billing_periods": 12,
       "contract_id": "C002",
-      "deposit_balance": "36000.00",
+      "initial_deposit": "36000.00",
       "merchant_name": "星巴克",
+      "remaining_deposit": "0.00",
       "total_add_cabinet_amount": "21000.00",
       "total_add_cabinet_days": 21,
-      "total_amount": "0.00",
+      "total_amount": "201000.00",
       "total_base_amount": "216000.00",
       "total_base_days": 180,
-      "total_deposit_deduction": "237000.00"
+      "total_deposit_deduction": "36000.00"
     },
     {
       "billing_periods": 11,
       "contract_id": "C003",
-      "deposit_balance": "60000.00",
+      "initial_deposit": "60000.00",
       "merchant_name": "海底捞",
+      "remaining_deposit": "0.00",
       "total_add_cabinet_amount": "0",
       "total_add_cabinet_days": 0,
-      "total_amount": "0.00",
+      "total_amount": "186000.00",
       "total_base_amount": "246000.00",
       "total_base_days": 123,
-      "total_deposit_deduction": "246000.00"
+      "total_deposit_deduction": "60000.00"
     }
   ],
   "grand_totals": {
@@ -42,8 +45,8 @@
     "add_cabinet_days": 47,
     "base_amount": "871500.00",
     "base_days": 576,
-    "deposit_deduction": "924500.00",
-    "total_amount": "700.00"
+    "deposit_deduction": "136000.00",
+    "total_amount": "789200.00"
   },
   "total_add_cabinet_records": 3,
   "total_billing_periods": 44,
