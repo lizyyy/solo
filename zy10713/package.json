@@ -1,0 +1,27 @@
+{
+  "name": "robot-message-template-graydiff-cli",
+  "version": "1.0.0",
+  "description": "机器人消息样本模板灰度差异CLI工具",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "graydiff": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "test:normal": "node src/cli.js --old test/data/normal/old --new test/data/normal/new --output test/output/normal",
+    "test:empty": "node src/cli.js --old test/data/empty --new test/data/normal/new --output test/output/empty",
+    "test:missing-col": "node src/cli.js --old test/data/missing-col/old --new test/data/normal/new --output test/output/missing-col",
+    "test:duplicate": "node src/cli.js --old test/data/duplicate/old --new test/data/normal/new --output test/output/duplicate",
+    "test:corrupted": "node src/cli.js --old test/data/corrupted/old --new test/data/normal/new --output test/output/corrupted",
+    "test:all": "npm run test:normal && npm run test:empty && npm run test:missing-col && npm run test:duplicate && npm run test:corrupted"
+  },
+  "keywords": ["robot", "message", "template", "graydiff", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parse": "^5.5.3",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {}
+}

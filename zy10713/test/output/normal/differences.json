@@ -1,0 +1,59 @@
+[
+  {
+    "type": "VARIABLE_ADDED",
+    "key": "TPL_001_CHAT_001",
+    "templateId": "TPL_001",
+    "templateName": "活动运营通知",
+    "chatId": "CHAT_001",
+    "chatName": "运营部主群",
+    "variableName": "discount",
+    "newValue": "8折",
+    "message": "新增模板变量: 活动运营通知 -> discount = 8折",
+    "timestamp": "2026-05-18T09:44:05.869Z"
+  },
+  {
+    "type": "TOUCH_STATUS_CHANGED",
+    "key": "TPL_002_CHAT_001",
+    "templateId": "TPL_002",
+    "templateName": "周报提醒",
+    "chatId": "CHAT_001",
+    "chatName": "运营部主群",
+    "oldStatus": "pending",
+    "newStatus": "success",
+    "message": "触达状态变化: 周报提醒 -> 运营部主群: pending → success",
+    "timestamp": "2026-05-18T09:44:05.871Z"
+  },
+  {
+    "type": "RECORD_MISSING_IN_NEW",
+    "key": "TPL_002_CHAT_003",
+    "templateId": "TPL_002",
+    "templateName": "周报提醒",
+    "chatId": "CHAT_003",
+    "chatName": "产品部群",
+    "oldStatus": "success",
+    "message": "记录在新版本中缺失: 周报提醒 -> 产品部群",
+    "timestamp": "2026-05-18T09:44:05.871Z"
+  },
+  {
+    "type": "NEW_RECORD_ADDED",
+    "key": "TPL_002_CHAT_004",
+    "templateId": "TPL_002",
+    "templateName": "周报提醒",
+    "chatId": "CHAT_004",
+    "chatName": "技术研发群",
+    "newStatus": "success",
+    "message": "新版本新增记录: 周报提醒 -> 技术研发群",
+    "timestamp": "2026-05-18T09:44:05.871Z"
+  },
+  {
+    "type": "NEW_RECORD_ADDED",
+    "key": "TPL_004_CHAT_005",
+    "templateId": "TPL_004",
+    "templateName": "新用户欢迎",
+    "chatId": "CHAT_005",
+    "chatName": "新人群",
+    "newStatus": "success",
+    "message": "新版本新增记录: 新用户欢迎 -> 新人群",
+    "timestamp": "2026-05-18T09:44:05.871Z"
+  }
+]

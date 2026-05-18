@@ -1,0 +1,7 @@
+template_id,template_name,chat_id,chat_name,variables,touch_status,touch_time
+TPL_001,活动运营通知,CHAT_001,运营部主群,"{""activity_name"":""618大促"",""start_date"":""2024-06-18"",""discount"":""8折""}",success,2024-06-17 09:00:00
+TPL_001,活动运营通知,CHAT_002,市场部工作群,"{""activity_name"":""618大促"",""start_date"":""2024-06-18""}",success,2024-06-17 09:01:00
+TPL_002,周报提醒,CHAT_001,运营部主群,"{""deadline"":""2024-06-21"",""template"":""v2""}",success,2024-06-17 10:00:00
+TPL_002,周报提醒,CHAT_004,技术研发群,"{""deadline"":""2024-06-21"",""template"":""v2""}",success,2024-06-17 10:05:00
+TPL_003,数据日报,CHAT_001,运营部主群,"{""report_date"":""2024-06-17""}",success,2024-06-17 08:00:00
+TPL_004,新用户欢迎,CHAT_005,新人群,"{""welcome_msg"":""欢迎加入""}",success,2024-06-17 11:00:00
