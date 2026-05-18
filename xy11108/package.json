@@ -1,0 +1,30 @@
+{
+  "name": "flower-shop-reconciliation-cli",
+  "version": "1.0.0",
+  "description": "花店配送花材采购对账 CLI 工具",
+  "main": "src/cli.js",
+  "bin": {
+    "flower-reconcile": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "flower",
+    "shop",
+    "reconciliation",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "tmp": "^0.2.3"
+  }
+}
