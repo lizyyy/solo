@@ -170,3 +170,28 @@ class SettlementCloseRequest(BaseModel):
     settlement_id: int
     processed_by: str
     close_reason: str
+
+
+class OrderCreateRequest(BaseModel):
+    order_no: str
+    leader_id: int
+    user_name: Optional[str] = None
+    user_phone: Optional[str] = None
+    total_amount: float
+    product_count: int = 1
+    processed_by: str
+
+
+class RefundCreateRequest(BaseModel):
+    refund_no: str
+    order_id: int
+    refund_amount: float
+    refund_reason: Optional[str] = None
+    processed_by: str
+
+
+class SettlementCreateRequest(BaseModel):
+    leader_id: int
+    start_date: datetime
+    end_date: datetime
+    processed_by: str

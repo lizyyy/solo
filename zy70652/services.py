@@ -11,6 +11,17 @@ from database import (
 import schemas
 
 
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
+
+
+def safe_json_dumps(obj, **kwargs):
+    return json.dumps(obj, cls=DateTimeEncoder, **kwargs)
+
+
 def generate_no(prefix: str) -> str:
     return f"{prefix}{uuid.uuid4().hex[:8].upper()}"
 
@@ -162,7 +173,7 @@ class SettlementService:
         if not settlement or settlement.status != "draft":
             return None
         
-        original_input = json.dumps({
+        original_input = safe_json_dumps({
             "settlement_id": settlement_id,
             "processed_by": processed_by,
             "before_status": settlement.status
@@ -214,12 +225,12 @@ class SettlementService:
         for refund in refunds:
             refund.settlement_id = settlement.id
         
-        audit_log = AuditLog(
-            settlement_id=settlement.id,
-            action="calculate",
+        AuditLogService.create_log(
+            db,
+            action="calculate_settlement_success",
             original_input=original_input,
             processed_by=processed_by,
-            conclusion=json.dumps({
+            conclusion=safe_json_dumps({
                 "total_order_amount": total_order_amount,
                 "total_refund_amount": total_refund_amount,
                 "net_order_amount": net_order_amount,
@@ -227,9 +238,9 @@ class SettlementService:
                 "commission_amount": commission_amount,
                 "service_fee": service_fee,
                 "final_leader_amount": final_leader_amount
-            }, ensure_ascii=False)
+            }, ensure_ascii=False),
+            settlement_id=settlement.id
         )
-        db.add(audit_log)
         
         db.commit()
         db.refresh(settlement)
@@ -243,7 +254,7 @@ class SettlementService:
         if not settlement or settlement.status != "calculated":
             return None
         
-        original_input = json.dumps({
+        original_input = safe_json_dumps({
             "settlement_id": settlement_id,
             "processed_by": processed_by,
             "before_status": settlement.status
@@ -253,14 +264,14 @@ class SettlementService:
         settlement.processed_at = datetime.utcnow()
         settlement.processed_by = processed_by
         
-        audit_log = AuditLog(
-            settlement_id=settlement.id,
-            action="process",
+        AuditLogService.create_log(
+            db,
+            action="process_settlement_success",
             original_input=original_input,
             processed_by=processed_by,
-            conclusion="Settlement processed successfully"
+            conclusion="结算处理成功",
+            settlement_id=settlement.id
         )
-        db.add(audit_log)
         
         db.commit()
         db.refresh(settlement)
@@ -291,14 +302,14 @@ class SettlementService:
         settlement.closed_by = processed_by
         settlement.close_reason = close_reason
         
-        audit_log = AuditLog(
-            settlement_id=settlement.id,
-            action="close",
+        AuditLogService.create_log(
+            db,
+            action="close_settlement_success",
             original_input=original_input,
             processed_by=processed_by,
-            conclusion=f"Settlement closed: {close_reason}"
+            conclusion=f"结算关闭成功: {close_reason}",
+            settlement_id=settlement.id
         )
-        db.add(audit_log)
         
         db.commit()
         db.refresh(settlement)
@@ -333,18 +344,18 @@ class AdjustmentService:
             if settlement.final_leader_amount < 0:
                 settlement.final_leader_amount = 0
         
-        audit_log = AuditLog(
-            settlement_id=settlement.id,
-            action="adjustment",
+        AuditLogService.create_log(
+            db,
+            action="adjustment_success",
             original_input=original_input,
             processed_by=adjustment.processed_by,
-            conclusion=json.dumps({
+            conclusion=safe_json_dumps({
                 "adjustment_type": adjustment.adjustment_type,
                 "amount": adjustment.amount,
                 "new_final_amount": settlement.final_leader_amount
-            }, ensure_ascii=False)
+            }, ensure_ascii=False),
+            settlement_id=settlement.id
         )
-        db.add(audit_log)
         
         db.commit()
         db.refresh(db_adjustment)
@@ -352,6 +363,27 @@ class AdjustmentService:
 
 
 class AuditLogService:
+    @staticmethod
+    def create_log(
+        db: Session,
+        action: str,
+        original_input: str,
+        processed_by: str,
+        conclusion: str,
+        settlement_id: Optional[int] = None
+    ) -> AuditLog:
+        db_log = AuditLog(
+            settlement_id=settlement_id,
+            action=action,
+            original_input=original_input,
+            processed_by=processed_by,
+            conclusion=conclusion
+        )
+        db.add(db_log)
+        db.commit()
+        db.refresh(db_log)
+        return db_log
+    
     @staticmethod
     def get_logs_by_settlement(db: Session, settlement_id: int) -> List[AuditLog]:
         return db.query(AuditLog).filter(AuditLog.settlement_id == settlement_id).all()

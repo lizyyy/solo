@@ -9,13 +9,26 @@ import json
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 
-from database import get_db, init_db, ServiceFee, Refund
+from database import get_db, init_db, ServiceFee, Refund, Order, Settlement
 import schemas
 from services import (
     LeaderService, CommissionRuleService, OrderService,
     RefundService, SettlementService, AdjustmentService,
     AuditLogService
 )
+import json
+from datetime import datetime as dt_datetime
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, dt_datetime):
+            return obj.isoformat()
+        return super().default(obj)
+
+
+def safe_json_dumps(obj, **kwargs):
+    return json.dumps(obj, cls=DateTimeEncoder, **kwargs)
 
 app = FastAPI(title="社群分账退款冲抵佣金阶梯API", version="1.0.0")
 
@@ -49,10 +62,54 @@ def create_commission_rule(rule: schemas.CommissionRuleCreate, db: Session = Dep
 
 
 @app.post("/orders/", response_model=schemas.OrderResponse, tags=["订单"])
-def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
-    db_order, is_duplicate = OrderService.create_order(db, order)
-    if is_duplicate:
+def create_order(order: schemas.OrderCreateRequest, db: Session = Depends(get_db)):
+    original_input = safe_json_dumps(order.model_dump(), ensure_ascii=False)
+    
+    existing = db.query(Order).filter(Order.order_no == order.order_no).first()
+    if existing:
+        AuditLogService.create_log(
+            db,
+            action="create_order_failed",
+            original_input=original_input,
+            processed_by=order.processed_by,
+            conclusion="失败：订单号已存在",
+            settlement_id=None
+        )
         raise HTTPException(status_code=400, detail="订单号已存在")
+    
+    leader = LeaderService.get_leader(db, order.leader_id)
+    if not leader:
+        AuditLogService.create_log(
+            db,
+            action="create_order_failed",
+            original_input=original_input,
+            processed_by=order.processed_by,
+            conclusion="失败：团长不存在",
+            settlement_id=None
+        )
+        raise HTTPException(status_code=400, detail="团长不存在")
+    
+    db_order, is_duplicate = OrderService.create_order(db, schemas.OrderCreate(**order.model_dump()))
+    
+    if is_duplicate or db_order.is_duplicate:
+        AuditLogService.create_log(
+            db,
+            action="create_order_duplicate",
+            original_input=original_input,
+            processed_by=order.processed_by,
+            conclusion=f"检测到重复订单，原始订单ID: {db_order.duplicate_of}",
+            settlement_id=None
+        )
+    else:
+        AuditLogService.create_log(
+            db,
+            action="create_order_success",
+            original_input=original_input,
+            processed_by=order.processed_by,
+            conclusion=f"订单创建成功，订单ID: {db_order.id}",
+            settlement_id=None
+        )
+    
     return db_order
 
 
@@ -65,32 +122,120 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/refunds/", response_model=schemas.RefundResponse, tags=["退款"])
-def create_refund(refund: schemas.RefundCreate, db: Session = Depends(get_db)):
+def create_refund(refund: schemas.RefundCreateRequest, db: Session = Depends(get_db)):
+    original_input = safe_json_dumps(refund.model_dump(), ensure_ascii=False)
+    
+    existing = db.query(Refund).filter(Refund.refund_no == refund.refund_no).first()
+    if existing:
+        AuditLogService.create_log(
+            db,
+            action="create_refund_failed",
+            original_input=original_input,
+            processed_by=refund.processed_by,
+            conclusion="失败：退款单号已存在",
+            settlement_id=None
+        )
+        raise HTTPException(status_code=400, detail="退款单号已存在")
+    
     order = OrderService.get_order(db, refund.order_id)
     if not order:
+        AuditLogService.create_log(
+            db,
+            action="create_refund_failed",
+            original_input=original_input,
+            processed_by=refund.processed_by,
+            conclusion="失败：订单不存在",
+            settlement_id=None
+        )
         raise HTTPException(status_code=404, detail="订单不存在")
-    return RefundService.create_refund(db, refund)
+    
+    db_refund = RefundService.create_refund(db, schemas.RefundCreate(**refund.model_dump()))
+    
+    AuditLogService.create_log(
+        db,
+        action="create_refund_success",
+        original_input=original_input,
+        processed_by=refund.processed_by,
+        conclusion=f"退款创建成功，退款ID: {db_refund.id}",
+        settlement_id=None
+    )
+    
+    return db_refund
 
 
 @app.put("/refunds/{refund_id}/process", response_model=schemas.RefundResponse, tags=["退款"])
 def process_refund(refund_id: int, processed_by: str, db: Session = Depends(get_db)):
+    original_input = safe_json_dumps({"refund_id": refund_id, "processed_by": processed_by}, ensure_ascii=False)
+    
     refund = db.query(Refund).filter(Refund.id == refund_id).first()
     if not refund:
+        AuditLogService.create_log(
+            db,
+            action="process_refund_failed",
+            original_input=original_input,
+            processed_by=processed_by,
+            conclusion="失败：退款记录不存在",
+            settlement_id=None
+        )
         raise HTTPException(status_code=404, detail="退款记录不存在")
+    
+    if refund.status == "processed":
+        AuditLogService.create_log(
+            db,
+            action="process_refund_failed",
+            original_input=original_input,
+            processed_by=processed_by,
+            conclusion="失败：退款已处理",
+            settlement_id=None
+        )
+        raise HTTPException(status_code=400, detail="退款已处理")
+    
     refund.status = "processed"
     refund.processed_at = datetime.utcnow()
     refund.processed_by = processed_by
     db.commit()
     db.refresh(refund)
+    
+    AuditLogService.create_log(
+        db,
+        action="process_refund_success",
+        original_input=original_input,
+        processed_by=processed_by,
+        conclusion=f"退款处理成功，退款ID: {refund_id}",
+        settlement_id=None
+    )
+    
     return refund
 
 
 @app.post("/settlements/", response_model=schemas.SettlementResponse, tags=["分账结算"])
-def create_settlement(settlement: schemas.SettlementCreate, db: Session = Depends(get_db)):
+def create_settlement(settlement: schemas.SettlementCreateRequest, db: Session = Depends(get_db)):
+    original_input = safe_json_dumps(settlement.model_dump(), ensure_ascii=False)
+    
     leader = LeaderService.get_leader(db, settlement.leader_id)
     if not leader:
+        AuditLogService.create_log(
+            db,
+            action="create_settlement_failed",
+            original_input=original_input,
+            processed_by=settlement.processed_by,
+            conclusion="失败：团长不存在",
+            settlement_id=None
+        )
         raise HTTPException(status_code=404, detail="团长不存在")
-    return SettlementService.create_settlement(db, settlement)
+    
+    db_settlement = SettlementService.create_settlement(db, schemas.SettlementCreate(**settlement.model_dump()))
+    
+    AuditLogService.create_log(
+        db,
+        action="create_settlement_success",
+        original_input=original_input,
+        processed_by=settlement.processed_by,
+        conclusion=f"结算单创建成功，结算ID: {db_settlement.id}",
+        settlement_id=db_settlement.id
+    )
+    
+    return db_settlement
 
 
 @app.get("/settlements/{settlement_id}", response_model=schemas.SettlementResponse, tags=["分账结算"])
@@ -106,11 +251,35 @@ def calculate_settlement(
     request: schemas.SettlementCalculateRequest,
     db: Session = Depends(get_db)
 ):
+    original_input = safe_json_dumps(request.model_dump(), ensure_ascii=False)
+    
+    settlement = db.query(Settlement).filter(Settlement.id == request.settlement_id).first()
+    if not settlement:
+        AuditLogService.create_log(
+            db,
+            action="calculate_settlement_failed",
+            original_input=original_input,
+            processed_by=request.processed_by,
+            conclusion="失败：结算单不存在",
+            settlement_id=request.settlement_id
+        )
+        raise HTTPException(status_code=400, detail="计算失败：结算单不存在")
+    
+    if settlement.status != "draft":
+        AuditLogService.create_log(
+            db,
+            action="calculate_settlement_failed",
+            original_input=original_input,
+            processed_by=request.processed_by,
+            conclusion=f"失败：结算单状态不正确，当前状态: {settlement.status}",
+            settlement_id=request.settlement_id
+        )
+        raise HTTPException(status_code=400, detail=f"计算失败：结算单状态不正确，当前状态: {settlement.status}")
+    
     settlement = SettlementService.calculate_settlement(
         db, request.settlement_id, request.processed_by
     )
-    if not settlement:
-        raise HTTPException(status_code=400, detail="计算失败：结算单不存在或状态不正确")
+    
     return settlement
 
 
@@ -119,11 +288,35 @@ def process_settlement(
     request: schemas.SettlementProcessRequest,
     db: Session = Depends(get_db)
 ):
+    original_input = safe_json_dumps(request.model_dump(), ensure_ascii=False)
+    
+    settlement = db.query(Settlement).filter(Settlement.id == request.settlement_id).first()
+    if not settlement:
+        AuditLogService.create_log(
+            db,
+            action="process_settlement_failed",
+            original_input=original_input,
+            processed_by=request.processed_by,
+            conclusion="失败：结算单不存在",
+            settlement_id=request.settlement_id
+        )
+        raise HTTPException(status_code=400, detail="处理失败：结算单不存在")
+    
+    if settlement.status != "calculated":
+        AuditLogService.create_log(
+            db,
+            action="process_settlement_failed",
+            original_input=original_input,
+            processed_by=request.processed_by,
+            conclusion=f"失败：结算单状态不正确，当前状态: {settlement.status}",
+            settlement_id=request.settlement_id
+        )
+        raise HTTPException(status_code=400, detail=f"处理失败：结算单状态不正确，当前状态: {settlement.status}")
+    
     settlement = SettlementService.process_settlement(
         db, request.settlement_id, request.processed_by
     )
-    if not settlement:
-        raise HTTPException(status_code=400, detail="处理失败：结算单不存在或状态不正确")
+    
     return settlement
 
 
@@ -132,11 +325,35 @@ def close_settlement(
     request: schemas.SettlementCloseRequest,
     db: Session = Depends(get_db)
 ):
+    original_input = safe_json_dumps(request.model_dump(), ensure_ascii=False)
+    
+    settlement = db.query(Settlement).filter(Settlement.id == request.settlement_id).first()
+    if not settlement:
+        AuditLogService.create_log(
+            db,
+            action="close_settlement_failed",
+            original_input=original_input,
+            processed_by=request.processed_by,
+            conclusion="失败：结算单不存在",
+            settlement_id=request.settlement_id
+        )
+        raise HTTPException(status_code=400, detail="关闭失败：结算单不存在")
+    
+    if settlement.status == "closed":
+        AuditLogService.create_log(
+            db,
+            action="close_settlement_failed",
+            original_input=original_input,
+            processed_by=request.processed_by,
+            conclusion="失败：结算单已关闭",
+            settlement_id=request.settlement_id
+        )
+        raise HTTPException(status_code=400, detail="关闭失败：结算单已关闭")
+    
     settlement = SettlementService.close_settlement(
         db, request.settlement_id, request.processed_by, request.close_reason
     )
-    if not settlement:
-        raise HTTPException(status_code=400, detail="关闭失败：结算单不存在或已关闭")
+    
     return settlement
 
 
@@ -145,9 +362,33 @@ def create_adjustment(
     adjustment: schemas.AdjustmentCreate,
     db: Session = Depends(get_db)
 ):
+    original_input = safe_json_dumps(adjustment.model_dump(), ensure_ascii=False)
+    
+    settlement = db.query(Settlement).filter(Settlement.id == adjustment.settlement_id).first()
+    if not settlement:
+        AuditLogService.create_log(
+            db,
+            action="create_adjustment_failed",
+            original_input=original_input,
+            processed_by=adjustment.processed_by,
+            conclusion="失败：结算单不存在",
+            settlement_id=adjustment.settlement_id
+        )
+        raise HTTPException(status_code=400, detail="修正失败：结算单不存在")
+    
+    if settlement.status not in ["calculated", "processed"]:
+        AuditLogService.create_log(
+            db,
+            action="create_adjustment_failed",
+            original_input=original_input,
+            processed_by=adjustment.processed_by,
+            conclusion=f"失败：结算单状态不正确，当前状态: {settlement.status}",
+            settlement_id=adjustment.settlement_id
+        )
+        raise HTTPException(status_code=400, detail=f"修正失败：结算单状态不正确，当前状态: {settlement.status}")
+    
     db_adjustment = AdjustmentService.create_adjustment(db, adjustment)
-    if not db_adjustment:
-        raise HTTPException(status_code=400, detail="修正失败：结算单不存在或状态不正确")
+    
     return db_adjustment
 
 
