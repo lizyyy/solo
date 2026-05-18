@@ -94,25 +94,34 @@ class RuleEngine:
     def manage_access_control(self, record: SubleaseRecord, 
                               check_date: datetime = None) -> Dict[str, any]:
         check_date = check_date or datetime.now()
+        effective_end = record.actual_terminate_date or record.end_date
         
-        if record.access_status == AccessStatus.NOT_GRANTED:
-            if record.access_grant_date and record.access_grant_date <= check_date:
-                effective_end = record.actual_terminate_date or record.end_date
-                if check_date <= effective_end:
-                    record.access_status = AccessStatus.GRANTED
-                else:
-                    record.access_status = AccessStatus.EXPIRED
-        elif record.access_status == AccessStatus.GRANTED:
-            effective_end = record.actual_terminate_date or record.end_date
-            if check_date > effective_end or (record.access_revoke_date and record.access_revoke_date <= check_date):
-                record.access_status = AccessStatus.REVOKED
+        has_revoke = record.access_revoke_date is not None
+        has_grant = record.access_grant_date is not None
+        
+        revoke_effective = has_revoke and record.access_revoke_date <= check_date
+        grant_effective = has_grant and record.access_grant_date <= check_date
+        lease_active = check_date <= effective_end
+        lease_expired = check_date > effective_end
+        
+        if revoke_effective:
+            record.access_status = AccessStatus.REVOKED
+        elif grant_effective:
+            if lease_active:
+                record.access_status = AccessStatus.GRANTED
+            else:
+                record.access_status = AccessStatus.EXPIRED
+        else:
+            record.access_status = AccessStatus.NOT_GRANTED
         
         access_detail = {
             "record_id": record.record_id,
             "access_status": record.access_status.value,
             "access_grant_date": record.access_grant_date.strftime("%Y-%m-%d") if record.access_grant_date else None,
             "access_revoke_date": record.access_revoke_date.strftime("%Y-%m-%d") if record.access_revoke_date else None,
-            "can_access": record.access_status == AccessStatus.GRANTED
+            "can_access": record.access_status == AccessStatus.GRANTED,
+            "check_date": check_date.strftime("%Y-%m-%d"),
+            "lease_end_date": effective_end.strftime("%Y-%m-%d")
         }
         
         self.access_summary[record.record_id] = access_detail

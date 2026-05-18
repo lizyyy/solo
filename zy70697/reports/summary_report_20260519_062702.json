@@ -1,0 +1,383 @@
+{
+  "report_title": "车位转租门禁授权费用分摊排查报告",
+  "report_time": "2026-05-19 06:27:02",
+  "summary": {
+    "total_records": 6,
+    "valid_records": 5,
+    "invalid_records": 1,
+    "total_fee": 15600.02,
+    "total_property_fee": 1560.02,
+    "total_owner_income": 14040.0,
+    "granted_access": 2,
+    "check_date": "2025-03-01",
+    "property_fee_rate": 0.1
+  },
+  "statistics": {
+    "total_records": 6,
+    "valid_records": 5,
+    "expired_records": 1,
+    "overlapping_records": 0,
+    "early_terminated_records": 0,
+    "invalid_date_records": 0,
+    "bad_records": 0,
+    "records_with_errors": 0,
+    "records_with_warnings": 1,
+    "access_granted": 2,
+    "access_revoked": 2,
+    "access_not_granted": 1
+  },
+  "records": [
+    {
+      "record_id": "CASE1",
+      "space_id": "A001",
+      "owner_id": "O001",
+      "owner_name": "张三",
+      "tenant_id": "T001",
+      "tenant_name": "李四",
+      "tenant_phone": "13800138001",
+      "start_date": "2025-01-01",
+      "end_date": "2025-06-30",
+      "actual_terminate_date": null,
+      "monthly_fee": 500.0,
+      "lease_days": 181,
+      "total_fee": 3016.67,
+      "status": "有效",
+      "access_status": "未授权",
+      "access_grant_date": null,
+      "access_revoke_date": null,
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 2,
+        "original_data": "CASE1,A001,O001,张三,T001,李四,13800138001,2025-01-01,2025-06-30,500.00,,,"
+      },
+      "fee_detail": {
+        "record_id": "CASE1",
+        "monthly_fee": 500.0,
+        "lease_days": 181,
+        "total_fee": 3016.67,
+        "property_fee": 301.67,
+        "owner_income": 2715.0,
+        "property_rate": 0.1
+      },
+      "access_detail": {
+        "record_id": "CASE1",
+        "access_status": "未授权",
+        "access_grant_date": null,
+        "access_revoke_date": null,
+        "can_access": false,
+        "check_date": "2025-03-01",
+        "lease_end_date": "2025-06-30"
+      }
+    },
+    {
+      "record_id": "CASE2",
+      "space_id": "A002",
+      "owner_id": "O002",
+      "owner_name": "王五",
+      "tenant_id": "T002",
+      "tenant_name": "赵六",
+      "tenant_phone": "13800138002",
+      "start_date": "2025-01-01",
+      "end_date": "2025-06-30",
+      "actual_terminate_date": null,
+      "monthly_fee": 500.0,
+      "lease_days": 181,
+      "total_fee": 3016.67,
+      "status": "有效",
+      "access_status": "已授权",
+      "access_grant_date": "2025-01-01",
+      "access_revoke_date": null,
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 3,
+        "original_data": "CASE2,A002,O002,王五,T002,赵六,13800138002,2025-01-01,2025-06-30,500.00,,2025-01-01,"
+      },
+      "fee_detail": {
+        "record_id": "CASE2",
+        "monthly_fee": 500.0,
+        "lease_days": 181,
+        "total_fee": 3016.67,
+        "property_fee": 301.67,
+        "owner_income": 2715.0,
+        "property_rate": 0.1
+      },
+      "access_detail": {
+        "record_id": "CASE2",
+        "access_status": "已授权",
+        "access_grant_date": "2025-01-01",
+        "access_revoke_date": null,
+        "can_access": true,
+        "check_date": "2025-03-01",
+        "lease_end_date": "2025-06-30"
+      }
+    },
+    {
+      "record_id": "CASE3",
+      "space_id": "A003",
+      "owner_id": "O003",
+      "owner_name": "钱七",
+      "tenant_id": "T003",
+      "tenant_name": "孙八",
+      "tenant_phone": "13800138003",
+      "start_date": "2025-01-01",
+      "end_date": "2025-06-30",
+      "actual_terminate_date": null,
+      "monthly_fee": 500.0,
+      "lease_days": 181,
+      "total_fee": 3016.67,
+      "status": "有效",
+      "access_status": "已撤销",
+      "access_grant_date": "2025-01-01",
+      "access_revoke_date": "2025-02-01",
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 4,
+        "original_data": "CASE3,A003,O003,钱七,T003,孙八,13800138003,2025-01-01,2025-06-30,500.00,,2025-01-01,2025-02-01"
+      },
+      "fee_detail": {
+        "record_id": "CASE3",
+        "monthly_fee": 500.0,
+        "lease_days": 181,
+        "total_fee": 3016.67,
+        "property_fee": 301.67,
+        "owner_income": 2715.0,
+        "property_rate": 0.1
+      },
+      "access_detail": {
+        "record_id": "CASE3",
+        "access_status": "已撤销",
+        "access_grant_date": "2025-01-01",
+        "access_revoke_date": "2025-02-01",
+        "can_access": false,
+        "check_date": "2025-03-01",
+        "lease_end_date": "2025-06-30"
+      }
+    },
+    {
+      "record_id": "CASE4",
+      "space_id": "A004",
+      "owner_id": "O004",
+      "owner_name": "郑九",
+      "tenant_id": "T004",
+      "tenant_name": "周十",
+      "tenant_phone": "13800138004",
+      "start_date": "2025-01-01",
+      "end_date": "2025-01-31",
+      "actual_terminate_date": null,
+      "monthly_fee": 500.0,
+      "lease_days": 31,
+      "total_fee": 516.67,
+      "status": "已过期",
+      "access_status": "授权过期",
+      "access_grant_date": "2025-01-01",
+      "access_revoke_date": null,
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 5,
+        "original_data": "CASE4,A004,O004,郑九,T004,周十,13800138004,2025-01-01,2025-01-31,500.00,,2025-01-01,"
+      },
+      "fee_detail": {
+        "record_id": "CASE4",
+        "monthly_fee": 500.0,
+        "lease_days": 31,
+        "total_fee": 516.67,
+        "property_fee": 51.67,
+        "owner_income": 465.0,
+        "property_rate": 0.1
+      },
+      "access_detail": {
+        "record_id": "CASE4",
+        "access_status": "授权过期",
+        "access_grant_date": "2025-01-01",
+        "access_revoke_date": null,
+        "can_access": false,
+        "check_date": "2025-03-01",
+        "lease_end_date": "2025-01-31"
+      }
+    },
+    {
+      "record_id": "CASE5",
+      "space_id": "A005",
+      "owner_id": "O005",
+      "owner_name": "吴十一",
+      "tenant_id": "T005",
+      "tenant_name": "郑十二",
+      "tenant_phone": "13800138005",
+      "start_date": "2025-01-01",
+      "end_date": "2025-06-30",
+      "actual_terminate_date": null,
+      "monthly_fee": 500.0,
+      "lease_days": 181,
+      "total_fee": 3016.67,
+      "status": "有效",
+      "access_status": "已授权",
+      "access_grant_date": "2025-01-01",
+      "access_revoke_date": "2025-03-15",
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 6,
+        "original_data": "CASE5,A005,O005,吴十一,T005,郑十二,13800138005,2025-01-01,2025-06-30,500.00,,2025-01-01,2025-03-15"
+      },
+      "fee_detail": {
+        "record_id": "CASE5",
+        "monthly_fee": 500.0,
+        "lease_days": 181,
+        "total_fee": 3016.67,
+        "property_fee": 301.67,
+        "owner_income": 2715.0,
+        "property_rate": 0.1
+      },
+      "access_detail": {
+        "record_id": "CASE5",
+        "access_status": "已授权",
+        "access_grant_date": "2025-01-01",
+        "access_revoke_date": "2025-03-15",
+        "can_access": true,
+        "check_date": "2025-03-01",
+        "lease_end_date": "2025-06-30"
+      }
+    },
+    {
+      "record_id": "CASE6",
+      "space_id": "A006",
+      "owner_id": "O006",
+      "owner_name": "王十三",
+      "tenant_id": "T006",
+      "tenant_name": "李十四",
+      "tenant_phone": "13800138006",
+      "start_date": "2025-01-01",
+      "end_date": "2025-06-30",
+      "actual_terminate_date": null,
+      "monthly_fee": 500.0,
+      "lease_days": 181,
+      "total_fee": 3016.67,
+      "status": "有效",
+      "access_status": "已撤销",
+      "access_grant_date": null,
+      "access_revoke_date": "2025-03-01",
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 7,
+        "original_data": "CASE6,A006,O006,王十三,T006,李十四,13800138006,2025-01-01,2025-06-30,500.00,,,2025-03-01"
+      },
+      "fee_detail": {
+        "record_id": "CASE6",
+        "monthly_fee": 500.0,
+        "lease_days": 181,
+        "total_fee": 3016.67,
+        "property_fee": 301.67,
+        "owner_income": 2715.0,
+        "property_rate": 0.1
+      },
+      "access_detail": {
+        "record_id": "CASE6",
+        "access_status": "已撤销",
+        "access_grant_date": null,
+        "access_revoke_date": "2025-03-01",
+        "can_access": false,
+        "check_date": "2025-03-01",
+        "lease_end_date": "2025-06-30"
+      }
+    }
+  ],
+  "validation_results": [
+    {
+      "record_id": "CASE1",
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 2,
+        "original_data": "CASE1,A001,O001,张三,T001,李四,13800138001,2025-01-01,2025-06-30,500.00,,,"
+      }
+    },
+    {
+      "record_id": "CASE2",
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 3,
+        "original_data": "CASE2,A002,O002,王五,T002,赵六,13800138002,2025-01-01,2025-06-30,500.00,,2025-01-01,"
+      }
+    },
+    {
+      "record_id": "CASE3",
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 4,
+        "original_data": "CASE3,A003,O003,钱七,T003,孙八,13800138003,2025-01-01,2025-06-30,500.00,,2025-01-01,2025-02-01"
+      }
+    },
+    {
+      "record_id": "CASE4",
+      "is_valid": true,
+      "errors": [],
+      "warnings": [
+        "租期已过期"
+      ],
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 5,
+        "original_data": "CASE4,A004,O004,郑九,T004,周十,13800138004,2025-01-01,2025-01-31,500.00,,2025-01-01,"
+      }
+    },
+    {
+      "record_id": "CASE5",
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 6,
+        "original_data": "CASE5,A005,O005,吴十一,T005,郑十二,13800138005,2025-01-01,2025-06-30,500.00,,2025-01-01,2025-03-15"
+      }
+    },
+    {
+      "record_id": "CASE6",
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 7,
+        "original_data": "CASE6,A006,O006,王十三,T006,李十四,13800138006,2025-01-01,2025-06-30,500.00,,,2025-03-01"
+      }
+    }
+  ],
+  "bad_records": [],
+  "error_records": [],
+  "warning_records": [
+    {
+      "record_id": "CASE4",
+      "is_valid": true,
+      "errors": [],
+      "warnings": [
+        "租期已过期"
+      ],
+      "source": {
+        "file_path": "test_access_control.csv",
+        "sheet_name": null,
+        "row_number": 5,
+        "original_data": "CASE4,A004,O004,郑九,T004,周十,13800138004,2025-01-01,2025-01-31,500.00,,2025-01-01,"
+      }
+    }
+  ]
+}

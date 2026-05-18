@@ -172,6 +172,24 @@ parking_sublease_cli/
 - 控制台输出摘要
 - 按record_id排序保证稳定性
 
+## 门禁状态判定规则
+
+门禁状态按以下优先级判定（检查日期为准）：
+
+1. **已撤销 (REVOKED)** - 最高优先级
+   - 有 `access_revoke_date` 且撤销日期 ≤ 检查日期
+   
+2. **已授权 (GRANTED)**
+   - 有 `access_grant_date` 且授权日期 ≤ 检查日期
+   - 且租期未结束（检查日期 ≤ 租期结束日期）
+   
+3. **授权过期 (EXPIRED)**
+   - 有 `access_grant_date` 且授权日期 ≤ 检查日期
+   - 但租期已结束
+   
+4. **未授权 (NOT_GRANTED)**
+   - 无有效授权日期或授权未生效
+
 ## 稳定性保证
 
 1. **排序稳定** - 所有输出按`record_id`排序
