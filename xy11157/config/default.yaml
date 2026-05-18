@@ -1,0 +1,39 @@
+valuation:
+  default_currency: "CNY"
+  supported_currencies:
+    - "CNY"
+    - "USD"
+    - "EUR"
+    - "JPY"
+  
+  exchange_rates:
+    USD_to_CNY: 7.25
+    EUR_to_CNY: 7.85
+    JPY_to_CNY: 0.048
+
+  temporary_out_adjustment:
+    discount_rate: 0.85
+    max_days: 30
+
+  valuation_rules:
+    base_value_multiplier: 1.0
+    insurance_premium_rate: 0.005
+    age_depreciation_rate: 0.02
+
+processing:
+  remove_duplicates: true
+  skip_errors: true
+  save_progress: true
+  progress_file: ".valuation_progress.json"
+
+output:
+  format: "xlsx"
+  include_summary: true
+  include_details: true
+  comparison_report: true
+  timestamp_filename: false
+
+logging:
+  level: "INFO"
+  log_to_file: true
+  log_file: "valuation.log"

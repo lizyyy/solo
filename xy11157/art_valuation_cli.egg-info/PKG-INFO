@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: art-valuation-cli
+Version: 1.0.0
+Summary: 艺术品寄存库保险估值 CLI 工具
+Author: Art Storage Insurance
+Keywords: art valuation insurance storage
+Requires-Python: >=3.8
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: pyyaml>=6.0.0
+Requires-Dist: openpyxl>=3.1.0
+Dynamic: author
+Dynamic: keywords
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
