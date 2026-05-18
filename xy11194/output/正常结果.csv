@@ -1,0 +1,4 @@
+﻿source_file,row_index,bl_no,container_no,container_type,shipping_line,arrival_date,release_date,free_days,total_calendar_days,total_work_days,exempt_days,detention_days,detention_fee,has_inspection,inspection_date,has_port_change,original_port,new_port,port_change_penalty,total_amount,category,need_rerun,remarks
+正常滞箱数据.csv,6,BL202405005,EMC4455667,40GP,EMC,2024-05-08,2024-05-22,7,15,11,0,8,2250,False,,False,nan,nan,0,2250,NORMAL,False,nan
+含错误数据.csv,2,BL202408001,MSKU1111111,20GP,MAERSK,2024-08-01,2024-08-10,10,10,7,0,0,0,False,,False,nan,正常数据,0,0,NORMAL,False,nan
+含错误数据.csv,5,BL202408004,MSKU4444444,40GP,COSCO,2024-08-08,2024-08-20,12,13,9,0,1,250,False,,False,nan,正常数据,0,250,NORMAL,False,nan

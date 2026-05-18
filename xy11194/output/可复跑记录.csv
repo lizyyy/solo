@@ -1,0 +1,4 @@
+﻿source_file,row_index,bl_no,container_no,container_type,shipping_line,arrival_date,release_date,free_days,total_calendar_days,total_work_days,exempt_days,detention_days,detention_fee,has_inspection,inspection_date,has_port_change,original_port,new_port,port_change_penalty,total_amount,category,need_rerun,remarks
+可复跑数据.csv,3,BL202407002,COSU4564567,40GP,COSCO,2024-07-05,2024-07-20,12,16,11,0,4,1000,False,,False,nan,nan,0,1000,RERUN,True,费率有疑问，需复核
+可复跑数据.csv,4,BL202407003,MSC7897890,40HQ,MSC,2024-07-10,2024-07-28,14,19,13,0,5,1500,False,,False,nan,nan,0,1500,RERUN,True,日期核对中，需复核
+可复跑数据.csv,2,BL202407001,MSKU1231234,20GP,MAERSK,2024-07-01,2024-07-15,10,15,11,0,5,750,False,,False,nan,nan,0,750,RERUN,True,待确认免箱期，需复核

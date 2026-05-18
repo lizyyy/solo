@@ -1,0 +1,4 @@
+﻿source_file,row_index,bl_no,container_no,container_type,shipping_line,arrival_date,release_date,free_days,total_calendar_days,total_work_days,exempt_days,detention_days,detention_fee,has_inspection,inspection_date,has_port_change,original_port,new_port,port_change_penalty,total_amount,category,need_rerun,remarks
+改港数据.csv,3,BL202406002,COSU7776665,40GP,COSCO,2024-06-05,2024-06-20,12,16,11,0,4,1000,False,,True,深圳,广州,500,1500,PORT_CHANGE,False,客户要求改港
+改港数据.csv,4,BL202406003,MSC5554443,40HQ,MSC,2024-06-10,2024-06-25,14,16,11,0,2,600,False,,True,青岛,天津,500,1100,PORT_CHANGE,False,船公司改港
+改港数据.csv,2,BL202406001,MSKU9998887,20GP,MAERSK,2024-06-01,2024-06-15,10,15,9,0,5,750,False,,True,上海,宁波,500,1250,PORT_CHANGE,False,中转改港
