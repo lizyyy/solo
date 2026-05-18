@@ -1,0 +1,24 @@
+{
+  "total_files": 2,
+  "processed_files": 1,
+  "failed_files": 1,
+  "total_records": 10,
+  "normal_records": 3,
+  "exception_records": 7,
+  "failed_files_list": [
+    {
+      "filename": "batch_003_corrupted.csv",
+      "error": "缺少必需列: 展区, 快充标识"
+    }
+  ],
+  "exception_types": {
+    "设备未归还（归还时间缺失）": 1,
+    "当前电量缺失": 2,
+    "归还时间早于领用时间": 1,
+    "当前电量超出正常范围(0-100)": 1,
+    "当前电量高于初始电量（可能存在快充或数据异常）": 2,
+    "领用时间格式无效或缺失": 1,
+    "初始电量缺失": 1,
+    "快充标识值无效（应为0或1）": 1
+  }
+}
