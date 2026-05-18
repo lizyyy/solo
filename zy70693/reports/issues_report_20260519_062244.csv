@@ -1,0 +1,11 @@
+﻿规则类型,严重程度,问题描述,关联租借单,关联渔具,缺少物品,来源文件,来源行号
+equipment_list_match,high,租借单 R003: 归还清单缺少渔具: E005,R003,,E005,/Users/lzy/pro/solo/workspaces/zy70693/data/rentals.csv,4
+item_missing_detection,high,"租借单 R003: 押金扣减金额不一致 (应扣:30.00, 实扣:20.00)",R003,,E001-鱼护,/Users/lzy/pro/solo/workspaces/zy70693/data/deposits.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/returns.csv,4; 6
+points_calculation_accuracy,high,"租借单 R001: 积分补偿计算不一致 (应补:525, 实补:350, 差异:+175)",R001,,,/Users/lzy/pro/solo/workspaces/zy70693/data/deposits.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/rentals.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/returns.csv,2; 2; 2; 3
+points_calculation_accuracy,high,"租借单 R003: 积分补偿计算不一致 (应补:600, 实补:200, 差异:+400)",R003,,,/Users/lzy/pro/solo/workspaces/zy70693/data/deposits.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/rentals.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/returns.csv,4; 4; 6
+points_calculation_accuracy,high,"租借单 R005: 积分补偿计算不一致 (应补:120, 实补:100, 差异:+20)",R005,,,/Users/lzy/pro/solo/workspaces/zy70693/data/deposits.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/rentals.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/returns.csv,6; 6; 8; 9; 10
+return_completeness,high,租借单 R001 渔具 E001: 缺少 鱼钩,R001,E001,鱼钩,/Users/lzy/pro/solo/workspaces/zy70693/data/equipment.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/returns.csv,2; 2
+return_completeness,high,租借单 R001 渔具 E004: 缺少 鱼护,R001,E004,鱼护,/Users/lzy/pro/solo/workspaces/zy70693/data/equipment.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/returns.csv,3; 5
+return_completeness,high,租借单 R002 渔具 E003: 缺少 鱼线,R002,E003,鱼线,/Users/lzy/pro/solo/workspaces/zy70693/data/equipment.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/returns.csv,5; 4
+return_completeness,high,租借单 R003 渔具 E001: 缺少 鱼护,R003,E001,鱼护,/Users/lzy/pro/solo/workspaces/zy70693/data/equipment.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/returns.csv,6; 2
+return_completeness,high,租借单 R005 渔具 E001: 缺少 鱼线,R005,E001,鱼线,/Users/lzy/pro/solo/workspaces/zy70693/data/equipment.csv; /Users/lzy/pro/solo/workspaces/zy70693/data/returns.csv,8; 2

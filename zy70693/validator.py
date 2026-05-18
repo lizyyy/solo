@@ -30,6 +30,13 @@ class RuleValidator:
         self.equipments: Dict[str, DataRow] = {}
         self.return_checks: Dict[str, List[DataRow]] = {}
         self.deposits: Dict[str, DataRow] = {}
+        self.points_per_yuan: float = 10.0
+        self.level_multipliers: Dict[str, float] = {
+            '普通': 1.0,
+            '银卡': 1.2,
+            '金卡': 1.5,
+            '钻石': 2.0
+        }
 
     def load_data(self, rows: List[DataRow]) -> None:
         for row in rows:
@@ -56,7 +63,68 @@ class RuleValidator:
         self._validate_return_completeness()
         self._validate_deposit_status_consistency()
         self._validate_item_missing_detection()
+        self._validate_points_calculation_accuracy()
         return sorted(self.issues, key=lambda x: (x.severity, x.rule.value))
+
+    def _calculate_expected_points(self, rental_id: str) -> int:
+        if rental_id not in self.rentals:
+            return 0
+
+        rental_row = self.rentals[rental_id]
+        rental_data = rental_row.parsed_data
+        member_id = rental_data['member_id']
+
+        member_level = '普通'
+        if member_id in self.members:
+            member_data = self.members[member_id].parsed_data
+            member_level = member_data['member_level']
+
+        deduction_amount = 0.0
+        if rental_id in self.return_checks:
+            for check_row in sorted(self.return_checks[rental_id],
+                                  key=lambda r: r.parsed_data['equipment_id']):
+                check_data = check_row.parsed_data
+                eq_id = check_data['equipment_id']
+                if eq_id not in self.equipments:
+                    continue
+                eq_data = self.equipments[eq_id].parsed_data
+
+                if eq_data['hook_included'] and not check_data['hook_returned']:
+                    deduction_amount += eq_data['hook_price']
+                if eq_data['line_included'] and not check_data['line_returned']:
+                    deduction_amount += eq_data['line_price']
+                if eq_data['net_included'] and not check_data['net_returned']:
+                    deduction_amount += eq_data['net_price']
+
+        multiplier = self.level_multipliers.get(member_level, 1.0)
+        return int(round(deduction_amount * self.points_per_yuan * multiplier))
+
+    def _validate_points_calculation_accuracy(self) -> None:
+        for rental_id in sorted(self.rentals.keys()):
+            if rental_id not in self.deposits:
+                continue
+
+            deposit_row = self.deposits[rental_id]
+            deposit_data = deposit_row.parsed_data
+
+            expected_points = self._calculate_expected_points(rental_id)
+            actual_points = deposit_data['points_compensated']
+
+            if expected_points != actual_points:
+                rental_row = self.rentals[rental_id]
+                source_rows = [deposit_row, rental_row]
+                if rental_id in self.return_checks:
+                    source_rows.extend(sorted(self.return_checks[rental_id],
+                                           key=lambda r: r.parsed_data['equipment_id']))
+
+                self.issues.append(ValidationIssue(
+                    rule=ValidationRule.POINTS_CALCULATION_ACCURACY,
+                    severity='high',
+                    message=f"租借单 {rental_id}: 积分补偿计算不一致 "
+                           f"(应补:{expected_points}, 实补:{actual_points}, 差异:{expected_points - actual_points:+d})",
+                    source_rows=source_rows,
+                    related_ids={'rental_id': rental_id}
+                ))
 
     def _validate_equipment_list_match(self) -> None:
         for rental_id, rental_row in sorted(self.rentals.items()):
