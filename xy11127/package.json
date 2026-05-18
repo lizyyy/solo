@@ -1,0 +1,24 @@
+{
+  "name": "certificate-mailing-verify",
+  "version": "1.0.0",
+  "description": "职业培训班证书邮寄核对CLI工具",
+  "main": "src/cli.js",
+  "bin": {
+    "cert-verify": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "jest --verbose",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": ["certificate", "mailing", "verify", "cli"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "iconv-lite": "^0.6.3"
+  }
+}
