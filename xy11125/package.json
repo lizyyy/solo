@@ -1,0 +1,23 @@
+{
+  "name": "water-station-bucket-tracker",
+  "version": "1.0.0",
+  "description": "水站配送队水桶流转追踪CLI工具",
+  "main": "src/cli.js",
+  "bin": {
+    "bucket-tracker": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js validate --input sample-data/sample-2026-05.csv"
+  },
+  "keywords": ["water-station", "bucket-tracking", "delivery"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  }
+}

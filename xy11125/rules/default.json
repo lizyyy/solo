@@ -1,0 +1,95 @@
+{
+  "name": "水站配送队水桶流转追踪默认规则配置",
+  "version": "1.0.0",
+  "last_updated": "2026-05-19",
+  "description": "本配置文件定义了水站配送队水桶流转追踪的所有验证规则和业务口径，新接手人员可直接使用默认配置跑通样例数据，再根据实际业务调整参数。",
+
+  "validation": {
+    "bucketNumberRules": {
+      "required": true,
+      "format": {
+        "pattern": "^BT[A-Z0-9]{6,10}$",
+        "description": "以BT开头，后跟6-10位大写字母或数字",
+        "examples": ["BT000001", "BTABCD1234"]
+      },
+      "remark": "桶号是水桶唯一标识，必须严格校验格式"
+    },
+
+    "duplicateDetection": {
+      "checkSameDay": true,
+      "checkSameStation": true,
+      "checkInTransit": true,
+      "remark": "同一水站同一天不允许桶号重复，配送中状态的桶不能重复标记"
+    },
+
+    "driverEntryRules": {
+      "requireDriverId": true,
+      "maxSupplementHours": 48,
+      "validReasons": [
+        "系统故障漏录",
+        "现场临时加单",
+        "交接时遗漏",
+        "客户要求补送",
+        "其他合理原因"
+      ],
+      "remark": "司机补录必须在配送日期后48小时内完成，且必须选择合法补录原因"
+    },
+
+    "statusTransition": {
+      "rules": {
+        "in_stock": ["out_for_delivery", "returned"],
+        "out_for_delivery": ["delivered", "returned", "lost"],
+        "delivered": ["returned", "recycled"],
+        "returned": ["in_stock", "damaged"],
+        "in_transit": ["delivered", "returned"],
+        "lost": [],
+        "damaged": [],
+        "recycled": []
+      },
+      "remark": "水桶状态必须按规定流程流转，不能随意跳转"
+    }
+  },
+
+  "businessDefinitions": {
+    "validStatus": {
+      "in_stock": "在库",
+      "out_for_delivery": "待配送",
+      "in_transit": "配送中",
+      "delivered": "已送达",
+      "returned": "已回收",
+      "recycled": "已循环",
+      "lost": "丢失",
+      "damaged": "损坏"
+    },
+
+    "entryTypes": {
+      "system_entry": "系统录入",
+      "driver_supplement": "司机补录",
+      "batch_import": "批量导入"
+    },
+
+    "bucketTypes": {
+      "18L": "18升桶装水",
+      "15L": "15升桶装水",
+      "11L": "11升桶装水",
+      "5L": "5升桶装水"
+    },
+
+    "remark": "以上为标准业务字典，实际使用时需与公司主数据保持一致"
+  },
+
+  "outputSettings": {
+    "keepOriginalLineNumber": true,
+    "keepSourceFileName": true,
+    "exceptionDetailLevel": "detailed",
+    "includeErrorContext": true,
+    "remark": "输出文件必须保留原始行号和源文件名，异常报告必须包含详细上下文"
+  },
+
+  "quickStartGuide": {
+    "step1": "运行 npm install 安装依赖",
+    "step2": "运行 npm test 验证样例数据",
+    "step3": "查看 output 目录下的异常报告和清洗结果",
+    "step4": "根据实际业务修改本配置文件中的规则参数"
+  }
+}

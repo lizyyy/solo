@@ -1,0 +1,19 @@
+date,station_code,station_name,bucket_number,bucket_type,driver_id,driver_name,status,entry_type,supplement_time,supplement_reason,customer_id,customer_address,delivery_count,return_count,remark
+2026-05-18,WS001,城东水站,BT000001,18L,D001,张三,out_for_delivery,system_entry,,,,,C001,朝阳区XX路1号,1,0,正常配送
+2026-05-18,WS001,城东水站,BT000002,18L,D001,张三,out_for_delivery,system_entry,,,,,C002,朝阳区XX路2号,1,0,正常配送
+2026-05-18,WS001,城东水站,BT000001,18L,D001,张三,in_transit,system_entry,,,,,C001,朝阳区XX路1号,1,0,桶号重复-同一天同一水站
+2026-05-18,WS002,城西水站,BT000003,18L,D002,李四,in_transit,driver_supplement,2026-05-18 14:30:00,系统故障漏录,C003,海淀区YY路1号,1,0,司机补录-正常
+2026-05-18,WS002,城西水站,BT000004,15L,D002,李四,in_transit,driver_supplement,,,系统故障漏录,C004,海淀区YY路2号,1,0,司机补录-缺少补录时间
+2026-05-18,WS002,城西水站,BT000005,18L,D002,李四,delivered,driver_supplement,2026-05-20 10:00:00,系统故障漏录,C005,海淀区YY路3号,1,0,司机补录-超过48小时
+2026-05-18,WS002,城西水站,BT000006,11L,,,in_transit,driver_supplement,2026-05-18 15:00:00,系统故障漏录,C006,海淀区YY路4号,1,0,司机补录-缺少司机ID
+2026-05-18,WS003,城南水站,INVALID,18L,D003,王五,out_for_delivery,system_entry,,,,,C007,丰台区ZZ路1号,1,0,桶号格式错误
+2026-05-18,WS003,城南水站,,18L,D003,王五,out_for_delivery,system_entry,,,,,C008,丰台区ZZ路2号,1,0,桶号为空
+2026-05-18,WS003,城南水站,BT000007,5L,D003,王五,lost,delivered,system_entry,,,,C009,丰台区ZZ路3号,1,0,状态流转错误
+2026-05-18,WS003,城南水站,BT000008,18L,D003,王五,damaged,driver_supplement,2026-05-18 16:00:00,不存在的原因,C010,丰台区ZZ路4号,1,0,补录原因不合法
+2026-05-18,WS004,城北水站,BT000009,18L,D004,赵六,delivered,system_entry,,,,,C011,西城区AA路1号,1,0,正常送达
+2026-05-18,WS004,城北水站,BT000010,18L,D004,赵六,returned,system_entry,,,,,C012,西城区AA路2号,0,1,正常回收
+2026-05-18,WS004,城北水站,BT000011,15L,D004,赵六,in_transit,system_entry,,,,,C013,西城区AA路3号,1,0,配送中
+2026-05-18,WS004,城北水站,BT000011,15L,D004,赵六,in_transit,system_entry,,,,,C014,西城区AA路4号,1,0,重复配送中状态
+2026-05-18,WS005,亦庄水站,BT000012,18L,D005,孙七,delivered,system_entry,,,,,C015,亦庄开发区BB路1号,1,0,正常送达
+2026-05-18,WS005,亦庄水站,BT000013,18L,D005,孙七,recycled,system_entry,,,,,C016,亦庄开发区BB路2号,0,1,循环使用
+2026-05-18,WS005,亦庄水站,BT000014,11L,D005,孙七,in_stock,system_entry,,,,,,,0,0,在库正常
