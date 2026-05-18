@@ -1,0 +1,134 @@
+[
+  {
+    "id": "R20240501001",
+    "dormNumber": "3101",
+    "repairType": "水电",
+    "description": "宿舍日光灯不亮，已检查过灯泡是好的，可能是线路问题",
+    "reporter": "张三",
+    "contact": "13800138001",
+    "reportTime": "2024-05-01T08:30:00",
+    "area": "东区",
+    "priority": "normal"
+  },
+  {
+    "id": "R20240501002",
+    "dormNumber": "2205",
+    "repairType": "空调",
+    "description": "空调不制冷，室外机运转但出风不凉",
+    "reporter": "李四",
+    "contact": "13800138002",
+    "reportTime": "2024-05-01T09:15:00",
+    "area": "西区",
+    "priority": "urgent"
+  },
+  {
+    "id": "R20240501003",
+    "dormNumber": "3101",
+    "repairType": "水电",
+    "description": "日光灯还是不亮，刚才报修后没人来修",
+    "reporter": "张三",
+    "contact": "13800138001",
+    "reportTime": "2024-05-01T11:20:00",
+    "area": "东区",
+    "priority": "normal"
+  },
+  {
+    "id": "R20240501004",
+    "dormNumber": "4312",
+    "repairType": "门窗",
+    "description": "阳台窗户锁扣损坏，无法锁上，存在安全隐患",
+    "reporter": "王五",
+    "contact": "13800138003",
+    "reportTime": "2024-05-01T10:00:00",
+    "area": "南区",
+    "priority": "urgent"
+  },
+  {
+    "id": "R20240501005",
+    "dormNumber": "1108",
+    "repairType": "卫浴",
+    "description": "卫生间淋浴头漏水，关不严实",
+    "reporter": "赵六",
+    "contact": "13800138004",
+    "reportTime": "2024-05-01T14:30:00",
+    "area": "北区",
+    "priority": "normal"
+  },
+  {
+    "id": "R20240501006",
+    "dormNumber": "5203",
+    "repairType": "网络",
+    "description": "宿舍WiFi信号弱，经常断网，影响上网课",
+    "reporter": "孙七",
+    "contact": "13800138005",
+    "reportTime": "2024-05-01T16:45:00",
+    "area": "东区",
+    "priority": "normal"
+  },
+  {
+    "id": "R20240501007",
+    "dormNumber": "3406",
+    "repairType": "家具",
+    "description": "书桌抽屉滑道损坏，抽拉困难",
+    "reporter": "周八",
+    "contact": "13800138006",
+    "reportTime": "2024-05-01T13:20:00",
+    "area": "西区",
+    "priority": "low"
+  },
+  {
+    "id": "R20240501008",
+    "dormNumber": "2205",
+    "repairType": "空调",
+    "description": "空调漏水严重，地面都是水",
+    "reporter": "李四",
+    "contact": "13800138002",
+    "reportTime": "2024-05-01T15:00:00",
+    "area": "西区",
+    "priority": "urgent"
+  },
+  {
+    "id": "R20240501009",
+    "dormNumber": "1502",
+    "repairType": "其他",
+    "description": "窗帘杆脱落",
+    "reporter": "吴九",
+    "contact": "13800138007",
+    "reportTime": "2024-05-01T17:30:00",
+    "area": "南区",
+    "priority": "normal"
+  },
+  {
+    "id": "R20240501010",
+    "dormNumber": "6101",
+    "repairType": "水电",
+    "description": "卫生间水龙头不出热水，只有冷水",
+    "reporter": "郑十",
+    "contact": "13800138008",
+    "reportTime": "2024-05-01T18:00:00",
+    "area": "北区",
+    "priority": "normal"
+  },
+  {
+    "id": "R20240501011",
+    "dormNumber": "1108",
+    "repairType": "卫浴",
+    "description": "刚才报修的淋浴头，漏水更严重了",
+    "reporter": "赵六",
+    "contact": "13800138004",
+    "reportTime": "2024-05-01T16:00:00",
+    "area": "北区",
+    "priority": "normal"
+  },
+  {
+    "id": "R20240501012",
+    "dormNumber": "东区宿舍3105",
+    "repairType": "未知类型",
+    "description": "坏了",
+    "reporter": "陈同学",
+    "contact": "",
+    "reportTime": "2024-05-01T19:00:00",
+    "area": "东区",
+    "priority": "unknown"
+  }
+]
