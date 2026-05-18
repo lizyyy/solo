@@ -1,0 +1,20 @@
+{
+  "name": "resume-dedup-cli",
+  "version": "1.0.0",
+  "description": "简历来源文件候选人查重整理 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "resume-dedup": "./bin/resume-dedup.js"
+  },
+  "scripts": {
+    "start": "node bin/resume-dedup.js"
+  },
+  "keywords": ["resume", "dedup", "cli"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  }
+}
