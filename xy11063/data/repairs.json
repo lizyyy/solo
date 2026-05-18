@@ -1,0 +1,382 @@
+[
+  {
+    "title": "3号楼电梯故障停运",
+    "description": "3号楼电梯突然停运，轿厢内有人员被困。电梯控制屏显示故障代码E01，主板指示灯不亮。",
+    "category": "elevator",
+    "priority": "emergency",
+    "status": "in_progress",
+    "location": {
+      "building": "3号楼",
+      "floor": "1层",
+      "room": "大厅",
+      "areaDescription": "电梯A"
+    },
+    "reporter": {
+      "name": "张三",
+      "phone": "13800138001",
+      "roomNumber": "3-101",
+      "email": "zhangsan@example.com",
+      "isResident": true
+    },
+    "assignment": {
+      "technicianId": "tech-001",
+      "technicianName": "李师傅",
+      "assignedAt": "2026-05-18T13:53:40.337Z",
+      "estimatedCompletion": "2026-05-18T16:23:40.337Z"
+    },
+    "estimatedCost": 2500,
+    "images": [
+      "elevator_fault_01.jpg",
+      "elevator_fault_02.jpg"
+    ],
+    "mergeHistory": [],
+    "isDuplicate": false,
+    "duplicateCount": 0,
+    "relatedRepairIds": [],
+    "createdBy": "system",
+    "notes": [
+      "已通知电梯维保单位紧急到场",
+      "已联系被困人员安抚情绪"
+    ],
+    "id": "ba121aa3-cd85-4d34-a07e-497724bbeb6f",
+    "repairNumber": "REP-000001",
+    "createdAt": "2026-05-18T14:23:40.338Z",
+    "updatedAt": "2026-05-18T14:23:40.338Z",
+    "submittedAt": "2026-05-18T14:23:40.338Z",
+    "version": 1
+  },
+  {
+    "title": "3号楼电梯异响",
+    "description": "3号楼电梯运行时有明显的金属摩擦声，乘坐时感觉有颠簸。",
+    "category": "elevator",
+    "priority": "urgent",
+    "status": "submitted",
+    "location": {
+      "building": "3号楼",
+      "floor": "1层",
+      "room": "大厅",
+      "areaDescription": "电梯A"
+    },
+    "reporter": {
+      "name": "李四",
+      "phone": "13800138002",
+      "roomNumber": "3-202",
+      "isResident": true
+    },
+    "images": [],
+    "mergeHistory": [],
+    "isDuplicate": false,
+    "duplicateCount": 0,
+    "relatedRepairIds": [],
+    "createdBy": "user",
+    "notes": [],
+    "id": "0d25de4b-962a-4363-bfd2-5e1de437928f",
+    "repairNumber": "REP-000002",
+    "createdAt": "2026-05-18T14:23:40.339Z",
+    "updatedAt": "2026-05-18T14:23:40.339Z",
+    "submittedAt": "2026-05-18T14:23:40.339Z",
+    "version": 1
+  },
+  {
+    "title": "1号楼水管爆裂漏水",
+    "description": "1号楼东侧外墙主水管爆裂，水流入地下车库。漏水情况严重，已形成积水。",
+    "category": "plumbing",
+    "priority": "emergency",
+    "status": "assigned",
+    "location": {
+      "building": "1号楼",
+      "floor": "1层",
+      "room": "东侧外墙",
+      "areaDescription": "水管井旁"
+    },
+    "reporter": {
+      "name": "王五",
+      "phone": "13800138003",
+      "roomNumber": "1-1503",
+      "isResident": true
+    },
+    "assignment": {
+      "technicianId": "tech-002",
+      "technicianName": "赵师傅",
+      "assignedAt": "2026-05-18T14:08:40.337Z"
+    },
+    "estimatedCost": 5000,
+    "images": [
+      "water_leak_01.jpg",
+      "water_leak_02.jpg"
+    ],
+    "mergeHistory": [],
+    "isDuplicate": false,
+    "duplicateCount": 0,
+    "relatedRepairIds": [],
+    "createdBy": "security",
+    "notes": [
+      "已关闭主水阀",
+      "正在联系抢修队伍"
+    ],
+    "id": "88bab2cf-9bf8-42ac-a068-b88218bb2284",
+    "repairNumber": "REP-000003",
+    "createdAt": "2026-05-18T14:23:40.339Z",
+    "updatedAt": "2026-05-18T14:23:40.339Z",
+    "submittedAt": "2026-05-18T14:23:40.339Z",
+    "version": 1
+  },
+  {
+    "title": "地下车库照明故障",
+    "description": "地下车库B区照明全部熄灭，只有应急灯工作。光线昏暗，影响行车安全。",
+    "category": "electrical",
+    "priority": "high",
+    "status": "pending_parts",
+    "location": {
+      "building": "地下车库",
+      "floor": "B1层",
+      "room": "B区",
+      "areaDescription": "车位B101-B150"
+    },
+    "reporter": {
+      "name": "赵六",
+      "phone": "13800138004",
+      "roomNumber": "2-802",
+      "isResident": true
+    },
+    "assignment": {
+      "technicianId": "tech-003",
+      "technicianName": "王电工",
+      "assignedAt": "2026-05-18T12:23:40.337Z"
+    },
+    "estimatedCost": 1200,
+    "images": [
+      "lighting_fault.jpg"
+    ],
+    "mergeHistory": [],
+    "isDuplicate": false,
+    "duplicateCount": 0,
+    "relatedRepairIds": [],
+    "createdBy": "security",
+    "notes": [
+      "空气开关烧毁，待采购配件更换",
+      "预计明天下午到货"
+    ],
+    "id": "a188ed67-8e60-4cad-bceb-2775054ef987",
+    "repairNumber": "REP-000004",
+    "createdAt": "2026-05-18T14:23:40.339Z",
+    "updatedAt": "2026-05-18T14:23:40.339Z",
+    "submittedAt": "2026-05-18T14:23:40.339Z",
+    "version": 1
+  },
+  {
+    "title": "2号楼卫生间下水道堵塞",
+    "description": "2号楼3层公共卫生间下水道堵塞，污水溢出到地面，气味难闻。",
+    "category": "plumbing",
+    "priority": "high",
+    "status": "completed",
+    "location": {
+      "building": "2号楼",
+      "floor": "3层",
+      "room": "公共卫生间",
+      "areaDescription": "男厕"
+    },
+    "reporter": {
+      "name": "孙七",
+      "phone": "13800138005",
+      "roomNumber": "2-301",
+      "isResident": true
+    },
+    "assignment": {
+      "technicianId": "tech-002",
+      "technicianName": "赵师傅",
+      "assignedAt": "2026-05-17T14:23:40.337Z"
+    },
+    "estimatedCost": 300,
+    "actualCost": 280,
+    "images": [],
+    "mergeHistory": [],
+    "isDuplicate": false,
+    "duplicateCount": 0,
+    "relatedRepairIds": [],
+    "createdBy": "user",
+    "notes": [
+      "疏通完成，正常使用",
+      "清理了地面污水"
+    ],
+    "completedAt": "2026-05-17T18:23:40.337Z",
+    "id": "ed1f0c4e-3ea3-4ae8-a2fa-b0cc16578d7d",
+    "repairNumber": "REP-000005",
+    "createdAt": "2026-05-18T14:23:40.339Z",
+    "updatedAt": "2026-05-18T14:23:40.339Z",
+    "submittedAt": "2026-05-18T14:23:40.339Z",
+    "version": 1
+  },
+  {
+    "title": "中央空调不制冷",
+    "description": "4号楼公共区域中央空调出风口温度偏高，不制冷。已连续三天如此。",
+    "category": "hvac",
+    "priority": "medium",
+    "status": "submitted",
+    "location": {
+      "building": "4号楼",
+      "floor": "5-12层",
+      "room": "公共走廊",
+      "areaDescription": "各楼层"
+    },
+    "reporter": {
+      "name": "周八",
+      "phone": "13800138006",
+      "roomNumber": "4-1001",
+      "isResident": true
+    },
+    "images": [],
+    "mergeHistory": [],
+    "isDuplicate": false,
+    "duplicateCount": 0,
+    "relatedRepairIds": [],
+    "createdBy": "user",
+    "notes": [],
+    "id": "33772e8f-06ce-49bd-8ebf-9a34bfd2ce02",
+    "repairNumber": "REP-000006",
+    "createdAt": "2026-05-18T14:23:40.339Z",
+    "updatedAt": "2026-05-18T14:23:40.339Z",
+    "submittedAt": "2026-05-18T14:23:40.339Z",
+    "version": 1
+  },
+  {
+    "id": "b5f6dff6-210b-4425-9e50-ab032e1ff2ba",
+    "repairNumber": "REP-000007",
+    "title": "9号楼门禁系统故障",
+    "description": "单元楼门禁无法刷卡开门，密码键盘也无响应，居民无法进出。",
+    "category": "security",
+    "priority": "high",
+    "status": "submitted",
+    "location": {
+      "building": "9号楼",
+      "floor": "1层",
+      "room": "单元门",
+      "areaDescription": "主入口"
+    },
+    "reporter": {
+      "name": "金十七",
+      "phone": "13800138015",
+      "roomNumber": "9-1102",
+      "isResident": true
+    },
+    "images": [],
+    "mergeHistory": [],
+    "isDuplicate": false,
+    "duplicateCount": 0,
+    "relatedRepairIds": [],
+    "createdAt": "2026-05-18T14:26:19.321Z",
+    "updatedAt": "2026-05-18T14:26:19.321Z",
+    "submittedAt": "2026-05-18T14:26:19.321Z",
+    "createdBy": "property_admin",
+    "notes": [],
+    "version": 1
+  },
+  {
+    "id": "8d8f0581-86df-4fa5-8309-8d0286b528ab",
+    "repairNumber": "REP-000008",
+    "title": "9号楼大门打不开",
+    "description": "门禁刷卡没反应，按门铃也没人接，无法进入大楼。",
+    "category": "security",
+    "priority": "urgent",
+    "status": "submitted",
+    "location": {
+      "building": "9号楼",
+      "floor": "1层",
+      "room": "单元门"
+    },
+    "reporter": {
+      "name": "魏十八",
+      "phone": "13800138016",
+      "roomNumber": "9-503",
+      "isResident": true
+    },
+    "images": [],
+    "mergeHistory": [],
+    "isDuplicate": false,
+    "duplicateCount": 0,
+    "relatedRepairIds": [],
+    "createdAt": "2026-05-18T14:26:20.341Z",
+    "updatedAt": "2026-05-18T14:26:20.341Z",
+    "submittedAt": "2026-05-18T14:26:20.341Z",
+    "createdBy": "resident_app",
+    "notes": [],
+    "version": 1
+  },
+  {
+    "id": "757a65cb-1ec4-40c4-9888-c20defce93bd",
+    "repairNumber": "REP-000009",
+    "title": "10号楼电梯停运",
+    "description": "电梯突然停在5楼不动，有人被困。\n\n--- 合并内容 ---\n[REP-000010] 电梯运行时有金属摩擦声，很响。",
+    "category": "elevator",
+    "priority": "high",
+    "status": "submitted",
+    "location": {
+      "building": "10号楼",
+      "floor": "5层",
+      "room": "电梯内"
+    },
+    "reporter": {
+      "name": "秦十九",
+      "phone": "13800138017",
+      "roomNumber": "10-801",
+      "isResident": true
+    },
+    "images": [],
+    "mergeHistory": [
+      {
+        "mergedRepairId": "d8b0ba30-22b8-4a28-bd83-77d3f2ef7148",
+        "mergedAt": "2026-05-18T14:26:23.536Z",
+        "mergedBy": "admin",
+        "reason": "同一电梯故障合并处理"
+      }
+    ],
+    "isDuplicate": false,
+    "duplicateCount": 1,
+    "relatedRepairIds": [
+      "d8b0ba30-22b8-4a28-bd83-77d3f2ef7148"
+    ],
+    "createdAt": "2026-05-18T14:26:22.946Z",
+    "updatedAt": "2026-05-18T14:26:23.536Z",
+    "submittedAt": "2026-05-18T14:26:22.946Z",
+    "createdBy": "emergency",
+    "notes": [
+      "[2026-05-18T14:26:23.536Z] admin: 合并了 1 条报修记录 - 同一电梯故障合并处理",
+      "[2026-05-18T14:26:23.536Z] 系统: 合并后优先级调整为 high"
+    ],
+    "version": 2
+  },
+  {
+    "id": "d8b0ba30-22b8-4a28-bd83-77d3f2ef7148",
+    "repairNumber": "REP-000010",
+    "title": "10号楼电梯异响",
+    "description": "电梯运行时有金属摩擦声，很响。",
+    "category": "elevator",
+    "priority": "emergency",
+    "status": "cancelled",
+    "location": {
+      "building": "10号楼",
+      "floor": "5层",
+      "room": "电梯"
+    },
+    "reporter": {
+      "name": "尤二十",
+      "phone": "13800138018",
+      "roomNumber": "10-901",
+      "isResident": true
+    },
+    "images": [],
+    "mergeHistory": [],
+    "isDuplicate": true,
+    "duplicateCount": 0,
+    "relatedRepairIds": [],
+    "createdAt": "2026-05-18T14:26:22.975Z",
+    "updatedAt": "2026-05-18T14:26:23.536Z",
+    "submittedAt": "2026-05-18T14:26:22.975Z",
+    "createdBy": "user",
+    "notes": [
+      "[2026-05-18T14:26:23.536Z] 系统: 已合并到报修 REP-000009"
+    ],
+    "version": 2,
+    "mergedInto": "757a65cb-1ec4-40c4-9888-c20defce93bd"
+  }
+]
