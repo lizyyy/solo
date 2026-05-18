@@ -1,0 +1,36 @@
+{
+  "installation_id": "INST-2024-0519-002",
+  "customer_name": "王五",
+  "customer_phone": "13800138002",
+  "address": "上海市浦东新区张江高科技园区",
+  "appliance_type": "滚筒洗衣机",
+  "appliance_model": "海尔EG10014B39GU1",
+  "technician": "赵六",
+  "technician_id": "TECH-012",
+  "installation_date": "2024-05-19",
+  "start_time": "14:00",
+  "end_time": "15:30",
+  "customer_signature": "王五_20240519",
+  "technician_signature": "赵六_20240519",
+  "photos": [
+    {
+      "type": "before_installation",
+      "file_path": "/photos/INST-002/before_001.jpg",
+      "blur_score": 85,
+      "size_kb": 1256
+    },
+    {
+      "type": "after_installation",
+      "file_path": "/photos/INST-002/after_001.jpg",
+      "blur_score": 92,
+      "size_kb": 1345
+    },
+    {
+      "type": "signature_photo",
+      "file_path": "/photos/INST-002/signature.jpg",
+      "blur_score": 145,
+      "size_kb": 1823
+    }
+  ],
+  "installation_notes": "安装位置调整，运行正常"
+}

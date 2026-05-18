@@ -1,0 +1,141 @@
+[
+  {
+    "file_path": "/Users/mac/pro/solo/workspaces/xy11131/receipts/receipt_004_multiple_issues.json",
+    "file_name": "receipt_004_multiple_issues.json",
+    "check_time": "2026-05-19T01:41:05.367818",
+    "rules_checked": [
+      {
+        "passed": false,
+        "rule": "photo_blur",
+        "error_message": "照片模糊度不达标",
+        "details": [
+          {
+            "photo_type": "before_installation",
+            "file_path": "/photos/INST-004/before_001.jpg",
+            "blur_score": 78,
+            "threshold": 100,
+            "issue": "照片模糊度=78 < 阈值=100"
+          },
+          {
+            "photo_type": "after_installation",
+            "file_path": "/photos/INST-004/after_001.jpg",
+            "blur_score": 85,
+            "threshold": 100,
+            "issue": "照片模糊度=85 < 阈值=100"
+          }
+        ]
+      },
+      {
+        "passed": false,
+        "rule": "signature_missing",
+        "error_message": "缺少必要签名",
+        "details": {
+          "missing_fields": [
+            "customer_signature",
+            "technician_signature"
+          ],
+          "required_fields": [
+            "customer_signature",
+            "technician_signature"
+          ]
+        }
+      },
+      {
+        "passed": false,
+        "rule": "business_rules",
+        "error_message": "业务规则校验失败",
+        "details": [
+          {
+            "rule": "min_photo_count",
+            "issue": "照片数量不足: 2张 < 要求3张"
+          },
+          {
+            "rule": "required_photo_types",
+            "issue": "缺少必要照片类型: signature_photo"
+          }
+        ]
+      }
+    ],
+    "all_passed": false,
+    "parse_error": null,
+    "installation_id": "INST-2024-0519-004",
+    "technician": "吴十"
+  },
+  {
+    "file_path": "/Users/mac/pro/solo/workspaces/xy11131/receipts/receipt_003_missing_signature.json",
+    "file_name": "receipt_003_missing_signature.json",
+    "check_time": "2026-05-19T01:41:05.369018",
+    "rules_checked": [
+      {
+        "passed": true,
+        "details": "所有3张照片清晰度达标"
+      },
+      {
+        "passed": false,
+        "rule": "signature_missing",
+        "error_message": "缺少必要签名",
+        "details": {
+          "missing_fields": [
+            "customer_signature"
+          ],
+          "required_fields": [
+            "customer_signature",
+            "technician_signature"
+          ]
+        }
+      },
+      {
+        "passed": true,
+        "details": "业务规则校验通过"
+      }
+    ],
+    "all_passed": false,
+    "parse_error": null,
+    "installation_id": "INST-2024-0519-003",
+    "technician": "孙八"
+  },
+  {
+    "file_path": "/Users/mac/pro/solo/workspaces/xy11131/receipts/receipt_002_blur.json",
+    "file_name": "receipt_002_blur.json",
+    "check_time": "2026-05-19T01:41:05.369265",
+    "rules_checked": [
+      {
+        "passed": false,
+        "rule": "photo_blur",
+        "error_message": "照片模糊度不达标",
+        "details": [
+          {
+            "photo_type": "before_installation",
+            "file_path": "/photos/INST-002/before_001.jpg",
+            "blur_score": 85,
+            "threshold": 100,
+            "issue": "照片模糊度=85 < 阈值=100"
+          },
+          {
+            "photo_type": "after_installation",
+            "file_path": "/photos/INST-002/after_001.jpg",
+            "blur_score": 92,
+            "threshold": 100,
+            "issue": "照片模糊度=92 < 阈值=100"
+          }
+        ]
+      },
+      {
+        "passed": true,
+        "details": "所有签名字段完整"
+      },
+      {
+        "passed": true,
+        "details": "业务规则校验通过"
+      }
+    ],
+    "all_passed": false,
+    "parse_error": null,
+    "installation_id": "INST-2024-0519-002",
+    "technician": "赵六"
+  },
+  {
+    "file": "receipts/receipt_005_corrupted.json",
+    "error": "JSON解析失败: Expecting ',' delimiter: line 36 column 1 (char 924)"
+  }
+]

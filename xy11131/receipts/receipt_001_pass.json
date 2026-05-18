@@ -1,0 +1,36 @@
+{
+  "installation_id": "INST-2024-0519-001",
+  "customer_name": "张三",
+  "customer_phone": "13800138001",
+  "address": "北京市朝阳区建国路88号",
+  "appliance_type": "挂式空调",
+  "appliance_model": "格力KFR-35GW",
+  "technician": "李四",
+  "technician_id": "TECH-007",
+  "installation_date": "2024-05-19",
+  "start_time": "09:30",
+  "end_time": "11:45",
+  "customer_signature": "张三_20240519",
+  "technician_signature": "李四_20240519",
+  "photos": [
+    {
+      "type": "before_installation",
+      "file_path": "/photos/INST-001/before_001.jpg",
+      "blur_score": 156,
+      "size_kb": 2145
+    },
+    {
+      "type": "after_installation",
+      "file_path": "/photos/INST-001/after_001.jpg",
+      "blur_score": 189,
+      "size_kb": 2356
+    },
+    {
+      "type": "signature_photo",
+      "file_path": "/photos/INST-001/signature.jpg",
+      "blur_score": 167,
+      "size_kb": 1823
+    }
+  ],
+  "installation_notes": "安装顺利，客户满意"
+}

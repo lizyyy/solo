@@ -1,0 +1,36 @@
+{
+  "installation_id": "INST-2024-0519-005",
+  "customer_name": "郑十一",
+  "customer_phone": "13800138005",
+  "address": "杭州市西湖区文三路",
+  "appliance_type": "燃气热水器",
+  "appliance_model": "万和JSQ30-526W16",
+  "technician": "王十二",
+  "technician_id": "TECH-021",
+  "installation_date": "2024-05-19",
+  "start_time": "08:30",
+  "end_time": "09:45",
+  "customer_signature": "郑十一_20240519",
+  "technician_signature": "王十二_20240519",
+  "photos": [
+    {
+      "type": "before_installation",
+      "file_path": "/photos/INST-005/before_001.jpg",
+      "blur_score": 145,
+      "size_kb": 1987
+    },
+    {
+      "type": "after_installation",
+      "file_path": "/photos/INST-005/after_001.jpg",
+      "blur_score": 156,
+      "size_kb": 2134
+    },
+    {
+      "type": "signature_photo",
+      "file_path": "/photos/INST-005/signature.jpg",
+      "blur_score": 167,
+      "size_kb": 1876
+    }
+  ],
+  "installation_notes": "排烟管安装完成，测试正常"
+这是损坏的JSON，缺少闭合大括号
