@@ -41,7 +41,12 @@ class SamplingEngine:
     ) -> List[AttributionResult]:
         groups: Dict[str, List[AttributionResult]] = {}
         
-        for result in results:
+        problematic_results = [r for r in results if r.missing_reason_code != 'MATCH_OK']
+        
+        if not problematic_results:
+            problematic_results = results
+        
+        for result in problematic_results:
             if strata_key == 'reason':
                 key = result.missing_reason_code
             elif strata_key == 'confidence':
@@ -61,11 +66,7 @@ class SamplingEngine:
         sampled = []
         for group_key, group_items in groups.items():
             sorted_items = sorted(group_items, key=lambda x: x.ticket_id or "")
-            count = min(per_stratum_count, len(sorted_items))
-            
-            for i in range(count):
-                item_seed = self._generate_deterministic_seed(sorted_items[i], self.base_seed)
-                random.seed(item_seed)
+            count = min(max(1, per_stratum_count), len(sorted_items))
             
             indices = list(range(len(sorted_items)))
             deterministic_indices = sorted(
@@ -145,6 +146,22 @@ class SamplingEngine:
         else:
             sorted_attributions = sorted(valid_results, key=lambda x: x.ticket_id or "")
             sampled_attributions = sorted_attributions[:sample_size]
+        
+        if len(sampled_attributions) < sample_size:
+            seen_tickets = {f"{r.ticket_id}:{r.source_file}:{r.source_row}" for r in sampled_attributions}
+            remaining_needed = sample_size - len(sampled_attributions)
+            
+            problematic_results = [r for r in valid_results if r.missing_reason_code != 'MATCH_OK']
+            sorted_problematic = sorted(problematic_results, key=lambda x: x.ticket_id or "")
+            
+            for result in sorted_problematic:
+                if remaining_needed <= 0:
+                    break
+                ticket_key = f"{result.ticket_id}:{result.source_file}:{result.source_row}"
+                if ticket_key not in seen_tickets:
+                    sampled_attributions.append(result)
+                    seen_tickets.add(ticket_key)
+                    remaining_needed -= 1
         
         self.sample_results = []
         for attribution in sampled_attributions:

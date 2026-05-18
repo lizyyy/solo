@@ -29,8 +29,8 @@ class RecordingScanner:
     ]
     
     AGENT_ID_PATTERNS = [
-        r'(?:agent|坐席|cs|op)[_-]?(\d{4,8})',
-        r'(?:^|[_-])(\d{4,8})(?:[_-]|$)',
+        r'(?:agent|坐席|cs|op)[_-]?(\d{1,8})',
+        r'(?:^|[_-])(\d{1,8})(?:[_-]|$)',
     ]
     
     DURATION_PATTERNS = [

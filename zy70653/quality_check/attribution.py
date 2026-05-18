@@ -7,16 +7,18 @@ import hashlib
 
 
 MISSING_REASON_CODES = {
+    'MATCH_OK': '匹配正常',
     'NO_TICKET_ID': '工单无工单号',
     'NO_RECORDING_FILE': '未找到录音文件',
     'RECORDING_PARSE_FAILED': '录音文件名解析失败',
-    'TICKET_ID_MISMATCH': '工单号不匹配',
+    'TICKET_ID_MISMATCH': '工单号模糊匹配',
     'AGENT_ID_MISMATCH': '坐席号不匹配',
     'DURATION_ZERO': '通话时长为0',
     'DURATION_TOO_SHORT': '通话时长过短',
     'DURATION_MISMATCH': '录音与工单时长不匹配',
     'AGENT_NOT_IN_LIST': '坐席不在坐席表',
-    'OTHER': '其他原因'
+    'INVALID_TICKET': '工单数据无效',
+    'OTHER': '综合匹配度不足'
 }
 
 
@@ -72,11 +74,15 @@ class AttributionEngine:
         match_result: MatchResult,
         duration_issues: List[str]
     ) -> tuple:
-        reason_code = 'OTHER'
-        reason_desc = '其他原因'
-        confidence = 0.5
+        reason_code = 'MATCH_OK'
+        reason_desc = '匹配正常'
+        confidence = 1.0
 
-        if not match_result.ticket.ticket_id:
+        if match_result.match_status == '工单无效':
+            reason_code = 'INVALID_TICKET'
+            reason_desc = '工单数据无效'
+            confidence = 1.0
+        elif not match_result.ticket.ticket_id:
             reason_code = 'NO_TICKET_ID'
             reason_desc = '工单无工单号'
             confidence = 1.0
@@ -104,7 +110,7 @@ class AttributionEngine:
             reason_code = 'TICKET_ID_MISMATCH'
             reason_desc = '工单号模糊匹配'
             confidence = 0.7
-        elif match_result.match_score < 60:
+        elif match_result.match_score < 90:
             reason_code = 'OTHER'
             reason_desc = '综合匹配度不足'
             confidence = 0.6

@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: quality-check-cli
+Version: 1.0.0
+Summary: 工单录音匹配缺失归因抽样清单排查CLI
+Author: Quality Check Team
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0.0
+Requires-Dist: pandas>=1.5.0
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: python-dateutil>=2.8.0
+Requires-Dist: chardet>=5.0.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

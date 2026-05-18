@@ -155,10 +155,9 @@ class MatchingEngine:
     ) -> List[MatchResult]:
         self.match_results = []
         
-        valid_tickets = [t for t in tickets if t.is_valid]
         valid_agents = [a for a in agents if a.is_valid]
         
-        for ticket in sorted(valid_tickets, key=lambda x: x.ticket_id or ""):
+        for ticket in sorted(tickets, key=lambda x: x.ticket_id or ""):
             if not ticket.is_valid:
                 self.match_results.append(MatchResult(
                     ticket=ticket,
@@ -166,7 +165,7 @@ class MatchingEngine:
                     matched_agent=None,
                     match_status=self.MATCH_STATUS['INVALID_TICKET'],
                     match_score=0,
-                    issues=["工单数据无效"]
+                    issues=[ticket.error_message or "工单数据无效"]
                 ))
                 continue
             
