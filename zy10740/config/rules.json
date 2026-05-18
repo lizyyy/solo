@@ -1,0 +1,38 @@
+{
+  "fields": {
+    "required": [
+      "租户ID",
+      "租户名称",
+      "销售姓名",
+      "状态",
+      "延期日期",
+      "到期日期"
+    ],
+    "tenantId": "租户ID",
+    "tenantName": "租户名称",
+    "salesName": "销售姓名",
+    "status": "状态",
+    "extensionDate": "延期日期",
+    "expireDate": "到期日期"
+  },
+  "businessRules": {
+    "convertedStatuses": [
+      "正式",
+      "已转正",
+      "试用转正",
+      "转为付费"
+    ],
+    "withdrawnStatuses": [
+      "撤回",
+      "已撤回",
+      "延期撤回",
+      "取消申请"
+    ],
+    "maxExtensionDays": 90
+  },
+  "outputConfig": {
+    "generateSummary": true,
+    "generateDetails": true,
+    "includeSourceFile": true
+  }
+}

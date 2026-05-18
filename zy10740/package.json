@@ -1,0 +1,23 @@
+{
+  "name": "trial-tenant-extension-audit-cli",
+  "version": "1.0.0",
+  "description": "试用租户清单延期审批巡检 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "trial-tenant-audit": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test/run-tests.js"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2",
+    "fs-extra": "^11.2.0"
+  },
+  "keywords": ["tenant", "audit", "trial", "extension"],
+  "author": "",
+  "license": "MIT"
+}
