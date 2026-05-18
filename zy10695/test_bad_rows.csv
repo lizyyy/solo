@@ -1,0 +1,6 @@
+datasetName,datasetCode,fieldName,exemptionReason,approver,expireDate,createdBy
+,TEST_BAD_001,坏字段1,这是一个测试原因,审批人A,2026-05-28,创建人
+正常数据集,,坏字段2,原因太短,审批人B,2026-05-28,创建人
+正常数据集,TEST_BAD_003,坏字段3,,审批人C,2026-05-28,创建人
+正常数据集,TEST_BAD_004,坏字段4,这是一个合法的原因,审批人D,2020-01-01,创建人
+正常数据集,TEST_GOOD_001,好字段,这是一个合法的豁免原因,审批人E,2026-05-28,创建人
