@@ -1,0 +1,19 @@
+{
+  "name": "appointment-reschedule-api",
+  "version": "1.0.0",
+  "description": "预约挂号中台医生停诊批量改约 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "csv-writer": "^1.6.0",
+    "uuid": "^9.0.0",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
