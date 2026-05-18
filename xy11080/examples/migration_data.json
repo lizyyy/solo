@@ -1,0 +1,29 @@
+{
+  "operator": "系统管理员",
+  "records": [
+    {
+      "old_system_id": "OLD001",
+      "pool_name": "阳光亲子游泳馆",
+      "record_date": "2023-12-01",
+      "water_temp": 30.5,
+      "status": "待处理",
+      "remark": "旧系统记录，水温略低"
+    },
+    {
+      "old_system_id": "OLD002",
+      "pool_name": "阳光亲子游泳馆",
+      "record_date": "2023-12-02",
+      "water_temp": 32.0,
+      "status": "已处理",
+      "remark": "已完成补偿"
+    },
+    {
+      "old_system_id": "OLD003",
+      "pool_name": "快乐水世界",
+      "record_date": "2023-12-03",
+      "water_temp": 29.8,
+      "status": "待处理",
+      "remark": "水温不达标，需跟进"
+    }
+  ]
+}

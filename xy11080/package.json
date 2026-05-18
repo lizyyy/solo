@@ -1,0 +1,31 @@
+{
+  "name": "swim-pool-water-temp-api",
+  "version": "1.0.0",
+  "description": "亲子游泳馆游泳课补水温API系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest --verbose --testTimeout=10000"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "joi": "^17.11.0",
+    "moment": "^2.29.4",
+    "exceljs": "^4.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  }
+}

@@ -1,0 +1,6 @@
+record_no,pool_name,pool_no,pool_type,record_date,time_slot,time_slot_start,time_slot_end,standard_temp_min,standard_temp_max,actual_temp,measure_time,measure_person,is_temp_compliant,affected_periods,course_id,course_name,coach_name,registered_count,attended_count,need_compensation,compensation_type,compensation_amount,compensation_quantity,compensation_table_version,is_compensation_consistent
+TEMP001,快乐宝贝游泳馆,POOL001,亲子池,2024-01-15,上午,09:00,12:00,31,33,32,09:30,张测量员,1,,,,,0,0,0,,,v1.1,1
+TEMP002,快乐宝贝游泳馆,POOL001,亲子池,2024-01-15,下午,14:00,17:00,31,33,30,14:30,张测量员,0,上午10点-12点水温偏低,COURSE001,亲子游泳启蒙班,李教练,15,12,1,课时补偿,0,2,v1.1,1
+TEMP003,快乐宝贝游泳馆,POOL002,婴儿池,2024-01-15,晚上,18:00,20:00,34,36,35,18:30,李测量员,1,,,,,8,8,0,,,v1.1,1
+TEMP004,水世界亲子游泳馆,POOL001,幼儿池,2024-01-16,上午,09:00,12:00,32,34,31,10:00,王测量员,0,全时段水温偏低,COURSE002,幼儿技能提升班,王教练,20,18,1,现金补偿,500,0,v1.1,1
+TEMP005,水世界亲子游泳馆,POOL002,儿童池,2024-01-16,下午,14:00,17:00,30,32,31,15:00,王测量员,1,,,COURSE003,儿童进阶班,赵教练,25,22,0,,,v1.1,1
