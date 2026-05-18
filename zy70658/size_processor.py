@@ -76,6 +76,8 @@ class HeaderRecognizer:
         'height': ['身高', 'height'],
         'weight': ['体重', 'weight'],
         'teacher': ['班主任', '老师', 'teacher'],
+        'is_supplement': ['补订', '增补', '追加', '是否补订', 'supplement'],
+        'remark': ['备注', '说明', 'remark', 'note'],
     }
     
     @classmethod
@@ -190,7 +192,7 @@ class ClassSummarizer:
 
 class ReportExporter:
     @staticmethod
-    def export_to_excel(records: List[Dict], summary: Dict[str, Dict], file_path: str) -> bool:
+    def export_to_excel(records: List[Dict], summary: Dict[str, Dict], file_path: str, exceptions: List[Dict] = None) -> bool:
         try:
             with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
                 df_details = pd.DataFrame(records)
@@ -212,21 +214,31 @@ class ReportExporter:
                 df_summary = pd.DataFrame(summary_data)
                 df_summary.to_excel(writer, sheet_name='班级汇总', index=False)
                 
-                workbook = writer.book
-                worksheet = writer.sheets['班级汇总']
+                if exceptions:
+                    df_exceptions = pd.DataFrame(exceptions)
+                    df_exceptions.to_excel(writer, sheet_name='异常清单', index=False)
                 
+                workbook = writer.book
                 header_format = workbook.add_format({
                     'bold': True,
                     'bg_color': '#D7E4BC',
                     'border': 1
                 })
                 
+                worksheet = writer.sheets['班级汇总']
                 for col_num, value in enumerate(df_summary.columns.values):
                     worksheet.write(0, col_num, value, header_format)
+                
+                if exceptions and '异常清单' in writer.sheets:
+                    worksheet = writer.sheets['异常清单']
+                    for col_num, value in enumerate(df_exceptions.columns.values):
+                        worksheet.write(0, col_num, value, header_format)
             
             return True
         except Exception as e:
             print(f"导出失败: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
 
@@ -244,7 +256,18 @@ def process_import_data(df: pd.DataFrame) -> ProcessResult:
         records = []
         exceptions = []
         
+        supplement_keywords = ['是', '有', '补', '1', 'true', 'yes']
+        
         for idx, row in df.iterrows():
+            is_supplement = False
+            if 'is_supplement' in header_mapping:
+                supplement_val = str(row.get(header_mapping['is_supplement'], '')).strip().lower()
+                is_supplement = any(k in supplement_val for k in supplement_keywords)
+            
+            remark = ''
+            if 'remark' in header_mapping:
+                remark = str(row.get(header_mapping['remark'], '')).strip()
+            
             record = {
                 'name': str(row.get(header_mapping.get('name', ''), '')),
                 'class_name': str(row.get(header_mapping.get('class_name', ''), '')),
@@ -252,6 +275,9 @@ def process_import_data(df: pd.DataFrame) -> ProcessResult:
                 'student_no': str(row.get(header_mapping.get('student_no', ''), '')),
                 'gender': str(row.get(header_mapping.get('gender', ''), '')),
                 'row_index': idx + 2,
+                'is_supplement': is_supplement,
+                'remark': remark,
+                'record_idx': idx,
             }
             
             standardized_size, size_exceptions = SizeStandardizer.standardize(record['original_size'])
@@ -261,7 +287,11 @@ def process_import_data(df: pd.DataFrame) -> ProcessResult:
                 for ex in size_exceptions:
                     exceptions.append({
                         'row': idx + 2,
+                        'record_idx': idx,
                         'name': record['name'],
+                        'class_name': record['class_name'],
+                        'student_no': record['student_no'],
+                        'original_size': record['original_size'],
                         'type': ex,
                         'message': f"尺码 '{record['original_size']}' 非标准格式"
                     })
@@ -270,10 +300,14 @@ def process_import_data(df: pd.DataFrame) -> ProcessResult:
         
         merged_records, duplicates = StudentMerger.merge_duplicates(records)
         
-        for dup in duplicates:
+        for i, dup in enumerate(duplicates):
             exceptions.append({
                 'row': dup.get('row_index', 0),
+                'record_idx': dup.get('record_idx', -1),
                 'name': dup.get('name', ''),
+                'class_name': dup.get('class_name', ''),
+                'student_no': dup.get('student_no', ''),
+                'original_size': dup.get('original_size', ''),
                 'type': 'duplicate_student_conflict',
                 'message': f"学生 {dup.get('name', '')} 存在多条记录且尺码不一致，需人工复核"
             })
@@ -294,8 +328,9 @@ def process_import_data(df: pd.DataFrame) -> ProcessResult:
         )
         
     except Exception as e:
+        import traceback
         return ProcessResult(
             success=False,
             error_type='processing_error',
-            error_message=str(e)
+            error_message=f"{str(e)}\n{traceback.format_exc()}"
         )

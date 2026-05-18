@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
+from pydantic import BaseModel
 import pandas as pd
 import os
 import uuid
@@ -94,7 +95,9 @@ async def import_size_data(
     db.add(batch)
     db.flush()
     
-    for record in result.data['records']:
+    size_record_ids = {}
+    
+    for i, record in enumerate(result.data['records']):
         class_obj = db.query(ClassInfo).filter(
             ClassInfo.class_name == record['class_name']
         ).first()
@@ -128,18 +131,30 @@ async def import_size_data(
             original_size=record['original_size'],
             standardized_size=record['size'],
             is_duplicate=record.get('is_duplicate', False),
+            is_supplement=record.get('is_supplement', False),
             quantity=record.get('quantity', 1)
         )
         db.add(size_record)
         db.flush()
         
         record['id'] = size_record.id
+        original_idx = record.get('record_idx', i)
+        size_record_ids[original_idx] = size_record.id
     
     for ex in result.data['exceptions']:
+        record_idx = ex.get('record_idx', -1)
+        size_record_id = size_record_ids.get(record_idx)
+        
         exception_note = ExceptionNote(
+            size_record_id=size_record_id,
             import_batch_id=batch.id,
             exception_type=ex['type'],
             message=ex['message'],
+            student_name=ex.get('name', ''),
+            class_name=ex.get('class_name', ''),
+            student_no=ex.get('student_no', ''),
+            original_size=ex.get('original_size', ''),
+            row_number=ex.get('row', 0),
             is_resolved=False
         )
         db.add(exception_note)
@@ -197,6 +212,7 @@ async def get_records(
     class_name: Optional[str] = None,
     size: Optional[str] = None,
     is_duplicate: Optional[bool] = None,
+    is_supplement: Optional[bool] = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db)
@@ -211,6 +227,8 @@ async def get_records(
         query = query.filter(SizeRecord.standardized_size == size)
     if is_duplicate is not None:
         query = query.filter(SizeRecord.is_duplicate == is_duplicate)
+    if is_supplement is not None:
+        query = query.filter(SizeRecord.is_supplement == is_supplement)
     
     total = query.count()
     records = query.order_by(SizeRecord.created_at.desc()).offset((page - 1) * page_size).limit(page_size).all()
@@ -224,9 +242,11 @@ async def get_records(
                 "id": r.id,
                 "student_name": r.student.name,
                 "class_name": r.student.class_info.class_name,
+                "student_no": r.student.student_no,
                 "original_size": r.original_size,
                 "standardized_size": r.standardized_size,
                 "is_duplicate": r.is_duplicate,
+                "is_supplement": r.is_supplement,
                 "quantity": r.quantity,
                 "created_at": r.created_at.isoformat() if r.created_at else None
             }
@@ -263,9 +283,19 @@ async def get_exceptions(
         "data": [
             {
                 "id": e.id,
+                "size_record_id": e.size_record_id,
+                "batch_id": e.import_batch_id,
                 "exception_type": e.exception_type,
                 "message": e.message,
+                "student_name": e.student_name,
+                "class_name": e.class_name,
+                "student_no": e.student_no,
+                "original_size": e.original_size,
+                "row_number": e.row_number,
                 "is_resolved": e.is_resolved,
+                "resolved_by": e.resolved_by,
+                "resolved_note": e.resolved_note,
+                "resolved_at": e.resolved_at.isoformat() if e.resolved_at else None,
                 "created_at": e.created_at.isoformat() if e.created_at else None
             }
             for e in exceptions
@@ -273,10 +303,15 @@ async def get_exceptions(
     }
 
 
-@app.put("/api/exceptions/{exception_id}/resolve", summary="标记异常为已解决")
+class ResolveExceptionRequest(BaseModel):
+    resolved_by: str = "system"
+    resolved_note: Optional[str] = None
+
+
+@app.put("/api/exceptions/{exception_id}/resolve", summary="标记异常为已解决并记录处理备注")
 async def resolve_exception(
     exception_id: int,
-    resolved_by: str = "system",
+    request: ResolveExceptionRequest,
     db: Session = Depends(get_db)
 ):
     exception = db.query(ExceptionNote).filter(ExceptionNote.id == exception_id).first()
@@ -300,11 +335,22 @@ async def resolve_exception(
         )
     
     exception.is_resolved = True
-    exception.resolved_by = resolved_by
+    exception.resolved_by = request.resolved_by
+    exception.resolved_note = request.resolved_note
     exception.resolved_at = datetime.utcnow()
     db.commit()
     
-    return {"success": True, "message": "异常已标记为已解决"}
+    return {
+        "success": True,
+        "message": "异常已标记为已解决",
+        "data": {
+            "id": exception.id,
+            "is_resolved": True,
+            "resolved_by": exception.resolved_by,
+            "resolved_note": exception.resolved_note,
+            "resolved_at": exception.resolved_at.isoformat() if exception.resolved_at else None
+        }
+    }
 
 
 @app.get("/api/summary", summary="按班级汇总尺码数据")
@@ -383,16 +429,25 @@ async def export_report(
             }
         )
     
+    exceptions_query = db.query(ExceptionNote)
+    if batch_id is not None:
+        exceptions_query = exceptions_query.filter(ExceptionNote.import_batch_id == batch_id)
+    exceptions = exceptions_query.all()
+    
     export_data = []
     summary = {}
+    exceptions_data = []
     
     for r in records:
         export_data.append({
             "班级": r.student.class_info.class_name,
             "姓名": r.student.name,
+            "学号": r.student.student_no,
             "原尺码": r.original_size,
             "标准尺码": r.standardized_size,
-            "数量": r.quantity
+            "数量": r.quantity,
+            "是否重复": "是" if r.is_duplicate else "否",
+            "是否补订": "是" if r.is_supplement else "否",
         })
         
         class_name = r.student.class_info.class_name
@@ -403,11 +458,25 @@ async def export_report(
             summary[class_name][size] = 0
         summary[class_name][size] += r.quantity
     
+    for e in exceptions:
+        exceptions_data.append({
+            "行号": e.row_number,
+            "班级": e.class_name,
+            "姓名": e.student_name,
+            "学号": e.student_no,
+            "原尺码": e.original_size,
+            "异常类型": e.exception_type,
+            "异常描述": e.message,
+            "是否已解决": "是" if e.is_resolved else "否",
+            "处理人": e.resolved_by,
+            "处理备注": e.resolved_note
+        })
+    
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     report_filename = f"校服订购报告_{timestamp}.xlsx"
     report_path = os.path.join(REPORT_DIR, report_filename)
     
-    success = ReportExporter.export_to_excel(export_data, summary, report_path)
+    success = ReportExporter.export_to_excel(export_data, summary, report_path, exceptions_data if exceptions_data else None)
     
     if not success:
         raise HTTPException(
@@ -434,7 +503,8 @@ async def export_report(
         "report_id": report.id,
         "file_name": report_filename,
         "total_students": report.total_students,
-        "total_quantity": report.total_quantity
+        "total_quantity": report.total_quantity,
+        "has_exceptions": len(exceptions_data) > 0
     }
 
 
