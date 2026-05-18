@@ -27,7 +27,7 @@ class MarkdownScanner:
 
 class LinkValidator:
     @staticmethod
-    async def validate_link(url: str) -> Tuple[bool, Optional[str]]:
+    async def validate_link_async(url: str) -> Tuple[bool, Optional[str]]:
         if not url.startswith(('http://', 'https://')):
             return True, "internal_link"
         
@@ -36,6 +36,22 @@ class LinkValidator:
                 response = await client.head(url)
                 if response.status_code >= 400:
                     response = await client.get(url)
+                    if response.status_code >= 400:
+                        return False, f"HTTP {response.status_code}"
+            return True, None
+        except Exception as e:
+            return False, str(e)
+    
+    @staticmethod
+    def validate_link(url: str) -> Tuple[bool, Optional[str]]:
+        if not url.startswith(('http://', 'https://')):
+            return True, "internal_link"
+        
+        try:
+            with httpx.Client(timeout=10.0, follow_redirects=True) as client:
+                response = client.head(url)
+                if response.status_code >= 400:
+                    response = client.get(url)
                     if response.status_code >= 400:
                         return False, f"HTTP {response.status_code}"
             return True, None
@@ -68,8 +84,18 @@ class ReferenceAnalyzer:
     def analyze_reference(
         self,
         reference: ArticleReference,
-        source_article: Article
+        source_article: Article,
+        validate_links: bool = True
     ) -> Tuple[ReferenceStatus, Optional[FailureReason], str]:
+        if validate_links:
+            link_is_valid, link_error = LinkValidator.validate_link(reference.target_url)
+            if not link_is_valid:
+                return (
+                    ReferenceStatus.NEEDS_MANUAL_REVIEW,
+                    FailureReason.LINK_BROKEN,
+                    f"链接失效: {link_error}"
+                )
+        
         target_product = None
         
         if reference.target_article_id:
@@ -91,10 +117,11 @@ class ReferenceAnalyzer:
         
         if not is_valid and failure_reason:
             product_name = target_product.name if target_product else "未知产品"
+            product_status = target_product.status.value if target_product else "未知"
             return (
                 ReferenceStatus.NEEDS_MANUAL_REVIEW,
                 failure_reason,
-                f"引用了已下线产品: {product_name} (状态: {target_product.status if target_product else '未知'})"
+                f"引用了已下线产品: {product_name} (状态: {product_status})"
             )
         
         return ReferenceStatus.VERIFIED, None, ""
@@ -134,7 +161,7 @@ class ArticleService:
         self.db.refresh(article)
         return article
 
-    def scan_articles(self, article_ids: Optional[List[int]] = None) -> Tuple[int, int, int]:
+    def scan_articles(self, article_ids: Optional[List[int]] = None, validate_links: bool = False) -> Tuple[int, int, int]:
         query = self.db.query(Article)
         if article_ids:
             query = query.filter(Article.id.in_(article_ids))
@@ -183,7 +210,7 @@ class ArticleService:
             
             for ref in references:
                 if ref.status == ReferenceStatus.PENDING:
-                    status, reason, detail = analyzer.analyze_reference(ref, article)
+                    status, reason, detail = analyzer.analyze_reference(ref, article, validate_links=validate_links)
                     ref.status = status
                     ref.failure_reason = reason
                     ref.failure_detail = detail
@@ -299,14 +326,40 @@ class ProductService:
 
     def _update_references_for_product(self, product: Product):
         if product.status in [ProductStatus.DEPRECATED, ProductStatus.END_OF_LIFE]:
-            references = self.db.query(ArticleReference).join(
-                Article, ArticleReference.source_article_id == Article.id
-            ).filter(Article.product_id == product.id).all()
+            all_references = self.db.query(ArticleReference).all()
+            analyzer = ReferenceAnalyzer(self.db)
             
-            for ref in references:
-                if ref.status != ReferenceStatus.PROCESSED:
-                    ref.status = ReferenceStatus.NEEDS_MANUAL_REVIEW
-                    ref.failure_reason = FailureReason.PRODUCT_OFFLINE
-                    ref.failure_detail = f"关联产品已下线: {product.name}"
+            for ref in all_references:
+                if ref.status == ReferenceStatus.PROCESSED:
+                    continue
+                
+                source_article = self.db.query(Article).filter(
+                    Article.id == ref.source_article_id
+                ).first()
+                
+                if not source_article:
+                    continue
+                
+                target_product = None
+                
+                if ref.target_article_id:
+                    target_article = self.db.query(Article).filter(
+                        Article.id == ref.target_article_id
+                    ).first()
+                    if target_article and target_article.product_id == product.id:
+                        target_product = product
+                
+                if not target_product:
+                    target_product = analyzer.match_product_by_keywords(
+                        source_article.content,
+                        ref.link_text or ""
+                    )
+                
+                if target_product and target_product.id == product.id:
+                    is_valid, failure_reason = analyzer.check_product_status(target_product)
+                    if not is_valid and failure_reason:
+                        ref.status = ReferenceStatus.NEEDS_MANUAL_REVIEW
+                        ref.failure_reason = failure_reason
+                        ref.failure_detail = f"引用了已下线产品: {product.name} (状态: {product.status.value})"
             
             self.db.commit()

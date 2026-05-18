@@ -26,7 +26,7 @@ class Product(ProductBase):
     updated_at: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class KnowledgeDirectoryBase(BaseModel):
@@ -45,7 +45,7 @@ class KnowledgeDirectory(KnowledgeDirectoryBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ArticleBase(BaseModel):
@@ -74,7 +74,7 @@ class Article(ArticleBase):
     last_scanned_at: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ArticleReferenceBase(BaseModel):
@@ -105,7 +105,7 @@ class ArticleReference(ArticleReferenceBase):
     updated_at: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class HealthReportBase(BaseModel):
@@ -136,7 +136,7 @@ class HealthReport(HealthReportBase):
     generated_by: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ScanRequest(BaseModel):
