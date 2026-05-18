@@ -1,0 +1,78 @@
+expiry_rules:
+  warning_days: 90
+  critical_days: 30
+  expired_label: "已过期"
+  critical_label: "临期预警"
+  warning_label: "效期提醒"
+  normal_label: "效期正常"
+
+date_formats:
+  - "%Y-%m-%d"
+  - "%Y/%m/%d"
+  - "%Y%m%d"
+  - "%Y-%m"
+  - "%Y/%m"
+  - "%d-%m-%Y"
+  - "%m/%d/%Y"
+  - "%Y年%m月%d日"
+  - "%Y年%m月"
+
+field_mapping:
+  drug_name:
+    - "药品名称"
+    - "品名"
+    - "名称"
+    - "drug_name"
+    - "name"
+  batch_number:
+    - "批号"
+    - "批次"
+    - "batch_number"
+    - "batch"
+    - "lot"
+  manufacture_date:
+    - "生产日期"
+    - "生产日"
+    - "manufacture_date"
+    - "prod_date"
+  expiry_date:
+    - "有效期至"
+    - "到期日"
+    - "失效日期"
+    - "expiry_date"
+    - "exp_date"
+    - "valid_until"
+  location:
+    - "货位"
+    - "货架"
+    - "库位"
+    - "location"
+    - "shelf"
+    - "position"
+  quantity:
+    - "数量"
+    - "库存数量"
+    - "quantity"
+    - "qty"
+    - "stock"
+  manufacturer:
+    - "生产厂家"
+    - "厂家"
+    - "manufacturer"
+    - "mfr"
+  specification:
+    - "规格"
+    - "规格型号"
+    - "specification"
+    - "spec"
+
+output:
+  format: "csv"
+  encoding: "utf-8-sig"
+  include_summary: true
+
+processing:
+  skip_empty_rows: true
+  handle_same_batch_diff_location: true
+  continue_on_error: true
+  deduplicate: true
