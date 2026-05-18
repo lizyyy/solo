@@ -1,0 +1,247 @@
+{
+  "run_id": "dirty_test",
+  "generated_at": "2026-05-19T01:42:40.076717",
+  "validation_errors": [
+    {
+      "error_type": "多宠同笼异常",
+      "message": "笼子 B01 中有 3 只宠物: 小黑, 阿福, 大黄，超过最大限制 2 只",
+      "record_id": "R006",
+      "cage_number": "B01",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.073375"
+    },
+    {
+      "error_type": "多宠同笼异常",
+      "message": "笼子 B02 中有 4 只宠物: 喵喵, 小橘, 花花, 咪咪，超过最大限制 2 只",
+      "record_id": "R007",
+      "cage_number": "B02",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.075541"
+    },
+    {
+      "error_type": "照片缺时间戳",
+      "message": "记录 R007 中有 1 张照片缺少时间戳信息",
+      "record_id": "R007",
+      "cage_number": "B02",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:42:40.075546"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 日期",
+      "record_id": "R008",
+      "cage_number": "B03",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.075563"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 笼号",
+      "record_id": "R009",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.075567"
+    },
+    {
+      "error_type": "多宠同笼提醒",
+      "message": "笼子 B06 中有 2 只宠物合笼: 旺旺, 财财",
+      "record_id": "R011",
+      "cage_number": "B06",
+      "severity": "info",
+      "timestamp": "2026-05-19T01:42:40.075775"
+    },
+    {
+      "error_type": "照片缺时间戳",
+      "message": "记录 R011 中有 1 张照片缺少时间戳信息",
+      "record_id": "R011",
+      "cage_number": "B06",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:42:40.075779"
+    },
+    {
+      "error_type": "多宠同笼异常",
+      "message": "笼子 B07 中有 4 只宠物: 滚滚, 圆圆, 球球, 团子，超过最大限制 2 只",
+      "record_id": "R012",
+      "cage_number": "B07",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.075792"
+    },
+    {
+      "error_type": "照片缺时间戳",
+      "message": "记录 R012 中有 1 张照片缺少时间戳信息",
+      "record_id": "R012",
+      "cage_number": "B07",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:42:40.075795"
+    },
+    {
+      "error_type": "日期格式错误",
+      "message": "日期格式不正确: 05-19-2026，请使用 YYYY-MM-DD 格式",
+      "record_id": "R013",
+      "cage_number": "B08",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:42:40.075997"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 记录ID",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076001"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 日期",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076003"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 笼号",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076005"
+    },
+    {
+      "error_type": "宠物信息缺失",
+      "message": "记录中没有宠物名称",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:42:40.076007"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 记录ID",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076010"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 日期",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076012"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 笼号",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076013"
+    },
+    {
+      "error_type": "宠物信息缺失",
+      "message": "记录中没有宠物名称",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:42:40.076015"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 记录ID",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076018"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 日期",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076019"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 笼号",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076021"
+    },
+    {
+      "error_type": "宠物信息缺失",
+      "message": "记录中没有宠物名称",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:42:40.076023"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 记录ID",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076025"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 日期",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076027"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 笼号",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076029"
+    },
+    {
+      "error_type": "宠物信息缺失",
+      "message": "记录中没有宠物名称",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:42:40.076031"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 记录ID",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076033"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 日期",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076035"
+    },
+    {
+      "error_type": "必填字段缺失",
+      "message": "记录缺少必填字段: 笼号",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:42:40.076037"
+    },
+    {
+      "error_type": "宠物信息缺失",
+      "message": "记录中没有宠物名称",
+      "record_id": "",
+      "cage_number": "",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:42:40.076038"
+    }
+  ],
+  "parse_errors": []
+}

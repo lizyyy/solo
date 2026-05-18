@@ -1,0 +1,31 @@
+{
+  "run_id": "rerun_v4",
+  "generated_at": "2026-05-19T01:44:07.846958",
+  "validation_errors": [
+    {
+      "error_type": "多宠同笼提醒",
+      "message": "笼子 R03 中有 2 只宠物合笼: 乐乐, 欢欢",
+      "record_id": "RR003",
+      "cage_number": "R03",
+      "severity": "info",
+      "timestamp": "2026-05-19T01:44:07.846390"
+    },
+    {
+      "error_type": "多宠同笼异常",
+      "message": "笼子 R04 中有 3 只宠物: 天天, 妮妮, 明明，超过最大限制 2 只",
+      "record_id": "RR004",
+      "cage_number": "R04",
+      "severity": "error",
+      "timestamp": "2026-05-19T01:44:07.846406"
+    },
+    {
+      "error_type": "照片缺时间戳",
+      "message": "记录 RR004 中有 1 张照片缺少时间戳信息",
+      "record_id": "RR004",
+      "cage_number": "R04",
+      "severity": "warning",
+      "timestamp": "2026-05-19T01:44:07.846410"
+    }
+  ],
+  "parse_errors": []
+}
