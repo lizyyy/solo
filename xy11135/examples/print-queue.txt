@@ -1,0 +1,15 @@
+# 文印店打印队列数据
+# 格式: 任务ID | 文件名 | 打印机 | 状态 | 时间戳 | 重试次数 | 错误信息
+
+JOB001 | 2024年度财务报表.pdf | HP-LaserJet-1楼 | SUCCESS | 2024-05-19T09:00:00 | 0
+JOB002 | 员工手册修订版.docx | HP-LaserJet-1楼 | FAILED | 2024-05-19T09:05:00 | 2 | 纸张卡住
+JOB003 | 员工手册修订版_retry1.docx | HP-LaserJet-1楼 | FAILED | 2024-05-19T09:10:00 | 3 | 纸盒空
+JOB004 | 员工手册修订版_retry2.docx | HP-LaserJet-2楼 | PENDING | 2024-05-19T09:15:00 | 2
+JOB005 | 会议资料-产品部.pptx | Canon-MF-1楼 | SUCCESS | 2024-05-19T09:20:00 | 0
+JOB006 | 客户合同扫描件.pdf | HP-LaserJet-(重命名)1楼 | SUCCESS | 2024-05-19T09:25:00 | 0
+JOB007 | 月度考勤表.xlsx | Canon-MF-2楼 | ERROR | 2024-05-19T09:30:00 | 1 | 驱动异常
+JOB008 | 市场活动海报.jpg | HP-LaserJet-2楼-new | SUCCESS | 2024-05-19T09:35:00 | 0
+JOB009 | 采购申请单.pdf | Canon-MF-1楼 | PENDING | 2024-05-19T09:40:00 | 1
+JOB010 | 入职培训材料.pdf | HP-LaserJet-1楼 | SUCCESS | 2024-05-19T09:45:00 | 0
+JOB011 | 设备维护记录.xlsx | Canon-MF-2楼-old | FAILED | 2024-05-19T09:50:00 | 2 | 网络连接超时
+JOB012 | 工资条模板.docx | HP-LaserJet-2楼 | SUCCESS | 2024-05-19T09:55:00 | 0

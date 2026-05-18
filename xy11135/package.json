@@ -1,0 +1,15 @@
+{
+  "name": "print-queue-debugger-cli",
+  "version": "1.0.0",
+  "description": "文印店打印队列排错 CLI 工具",
+  "main": "src/cli.js",
+  "bin": {
+    "pq-debug": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-test.js"
+  },
+  "keywords": ["print", "queue", "debug", "cli"],
+  "author": "",
+  "license": "MIT"
+}

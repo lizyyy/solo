@@ -1,0 +1,8 @@
+# 可复跑打印队列 - 文印店专用
+# 格式: 任务ID | 文件名 | 建议打印机 | 状态 | 时间戳 | 重试次数
+
+RERUN-JOB002 | 员工手册修订版.docx | HP-LaserJet-2楼 | PENDING | 2026-05-18T18:50:08 | 3 | 自动重跑
+RERUN-JOB003 | 员工手册修订版_retry1.docx | HP-LaserJet-2楼 | PENDING | 2026-05-18T18:50:08 | 4 | 自动重跑
+RERUN-JOB004 | 员工手册修订版_retry2.docx | HP-LaserJet-1楼 | PENDING | 2026-05-18T18:50:08 | 3 | 自动重跑
+RERUN-JOB007 | 月度考勤表.xlsx | HP-LaserJet-2楼 | PENDING | 2026-05-18T18:50:08 | 2 | 自动重跑
+RERUN-JOB011 | 设备维护记录.xlsx | 其他可用打印机 | PENDING | 2026-05-18T18:50:08 | 3 | 自动重跑

@@ -1,0 +1,66 @@
+============================================================
+     文印店打印队列排错报告
+============================================================
+生成时间: 2026/5/19 01:50:08
+
+--- 概览统计 ---
+总任务数: 12
+错误数: 1
+警告数: 1
+提示数: 0
+
+--- 问题详情 ---
+❌ [FAILED_JOBS] 发现 4 个失败任务
+   - {"jobId":"JOB002","fileName":"员工手册修订版.docx","printer":"HP-LaserJet-1楼","error":"纸张卡住"}
+   - {"jobId":"JOB003","fileName":"员工手册修订版_retry1.docx","printer":"HP-LaserJet-1楼","error":"纸盒空"}
+   - {"jobId":"JOB007","fileName":"月度考勤表.xlsx","printer":"Canon-MF-2楼","error":"驱动异常"}
+   - {"jobId":"JOB011","fileName":"设备维护记录.xlsx","printer":"Canon-MF-2楼-old","error":"网络连接超时"}
+
+⚠️ [STUCK_JOBS] 发现 2 个可能卡住的任务
+   - {"jobId":"JOB004","fileName":"员工手册修订版_retry2.docx","printer":"HP-LaserJet-2楼"}
+   - {"jobId":"JOB009","fileName":"采购申请单.pdf","printer":"Canon-MF-1楼"}
+
+--- 建议重跑任务 ---
+共 5 个任务建议重跑:
+  任务ID: JOB002
+  文件名: 员工手册修订版.docx
+  原打印机: HP-LaserJet-1楼
+  建议打印机: HP-LaserJet-2楼, Canon-MF-1楼
+
+  任务ID: JOB003
+  文件名: 员工手册修订版_retry1.docx
+  原打印机: HP-LaserJet-1楼
+  建议打印机: HP-LaserJet-2楼, Canon-MF-1楼
+
+  任务ID: JOB004
+  文件名: 员工手册修订版_retry2.docx
+  原打印机: HP-LaserJet-2楼
+  建议打印机: HP-LaserJet-1楼, Canon-MF-2楼
+
+  任务ID: JOB007
+  文件名: 月度考勤表.xlsx
+  原打印机: Canon-MF-2楼
+  建议打印机: HP-LaserJet-2楼, Canon-MF-1楼
+
+  任务ID: JOB011
+  文件名: 设备维护记录.xlsx
+  原打印机: Canon-MF-2楼-old
+  建议打印机: 其他可用打印机
+
+--- 完整任务列表 ---
+✅ JOB001 | 2024年度财务报表.pdf | HP-LaserJet-1楼 | SUCCESS | 重试0次
+❌ JOB002 | 员工手册修订版.docx | HP-LaserJet-1楼 | FAILED | 重试2次
+❌ JOB003 | 员工手册修订版_retry1.docx | HP-LaserJet-1楼 | FAILED | 重试3次
+⏳ JOB004 | 员工手册修订版_retry2.docx | HP-LaserJet-2楼 | PENDING | 重试2次
+✅ JOB005 | 会议资料-产品部.pptx | Canon-MF-1楼 | SUCCESS | 重试0次
+✅ JOB006 | 客户合同扫描件.pdf | HP-LaserJet-(重命名)1楼 | SUCCESS | 重试0次
+❓ JOB007 | 月度考勤表.xlsx | Canon-MF-2楼 | ERROR | 重试1次
+✅ JOB008 | 市场活动海报.jpg | HP-LaserJet-2楼-new | SUCCESS | 重试0次
+⏳ JOB009 | 采购申请单.pdf | Canon-MF-1楼 | PENDING | 重试1次
+✅ JOB010 | 入职培训材料.pdf | HP-LaserJet-1楼 | SUCCESS | 重试0次
+❌ JOB011 | 设备维护记录.xlsx | Canon-MF-2楼-old | FAILED | 重试2次
+✅ JOB012 | 工资条模板.docx | HP-LaserJet-2楼 | SUCCESS | 重试0次
+
+============================================================
+  报告结束
+============================================================
