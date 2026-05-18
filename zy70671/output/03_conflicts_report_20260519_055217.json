@@ -1,0 +1,190 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-19T05:52:17.753223",
+    "version": "1.0.0"
+  },
+  "summary": {
+    "raw_rows": 7,
+    "valid_count": 7,
+    "invalid_count": 0,
+    "missing_summary": {},
+    "conflict_count": 3,
+    "warning_count": 1,
+    "error_count": 0
+  },
+  "conflicts": [
+    {
+      "type": "同一供应商同一品类多次报价",
+      "supplier": "华为技术有限公司",
+      "category": "服务器",
+      "count": 3,
+      "rows": [
+        3,
+        2,
+        4
+      ]
+    },
+    {
+      "type": "同一供应商同一品类多次报价",
+      "supplier": "中兴通讯股份有限公司",
+      "category": "服务器",
+      "count": 2,
+      "rows": [
+        5,
+        6
+      ]
+    },
+    {
+      "type": "报价差异过大(>3倍)",
+      "min_price": 884.9558,
+      "max_price": 30973.4513,
+      "ratio": 35.0
+    }
+  ],
+  "warnings": [
+    "成功读取文件，原始数据: 7行 x 6列"
+  ],
+  "errors": [],
+  "records": [
+    {
+      "row_number": 8,
+      "supplier": "新华三技术有限公司",
+      "price": 1000.0,
+      "tax_rate": 13.0,
+      "tax_rate_normalized": 0.13,
+      "price_ex_tax": 884.9558,
+      "tax_amount": 115.0442,
+      "delivery": "_5days",
+      "delivery_normalized": "5天",
+      "delivery_days": 5,
+      "category": "服务器",
+      "source": "邮件20240121",
+      "missing_fields": [],
+      "is_price_valid": true,
+      "is_tax_valid": true,
+      "is_delivery_valid": true
+    },
+    {
+      "row_number": 3,
+      "supplier": "华为技术有限公司",
+      "price": 11500.0,
+      "tax_rate": 13.0,
+      "tax_rate_normalized": 0.13,
+      "price_ex_tax": 10176.9912,
+      "tax_amount": 1323.0088,
+      "delivery": "_10days",
+      "delivery_normalized": "10天",
+      "delivery_days": 10,
+      "category": "服务器",
+      "source": "邮件20240116",
+      "missing_fields": [],
+      "is_price_valid": true,
+      "is_tax_valid": true,
+      "is_delivery_valid": true
+    },
+    {
+      "row_number": 7,
+      "supplier": "浪潮电子信息产业股份有限公司",
+      "price": 13200.0,
+      "tax_rate": 13.0,
+      "tax_rate_normalized": 0.13,
+      "price_ex_tax": 11681.4159,
+      "tax_amount": 1518.5841,
+      "delivery": "_10days",
+      "delivery_normalized": "10天",
+      "delivery_days": 10,
+      "category": "服务器",
+      "source": "邮件20240120",
+      "missing_fields": [],
+      "is_price_valid": true,
+      "is_tax_valid": true,
+      "is_delivery_valid": true
+    },
+    {
+      "row_number": 2,
+      "supplier": "华为技术有限公司",
+      "price": 12500.0,
+      "tax_rate": 13.0,
+      "tax_rate_normalized": 0.13,
+      "price_ex_tax": 11061.9469,
+      "tax_amount": 1438.0531,
+      "delivery": "_15days",
+      "delivery_normalized": "15天",
+      "delivery_days": 15,
+      "category": "服务器",
+      "source": "邮件20240115",
+      "missing_fields": [],
+      "is_price_valid": true,
+      "is_tax_valid": true,
+      "is_delivery_valid": true
+    },
+    {
+      "row_number": 4,
+      "supplier": "华为技术有限公司",
+      "price": 13500.0,
+      "tax_rate": 6.0,
+      "tax_rate_normalized": 0.06,
+      "price_ex_tax": 12735.8491,
+      "tax_amount": 764.1509,
+      "delivery": "_20days",
+      "delivery_normalized": "20天",
+      "delivery_days": 20,
+      "category": "服务器",
+      "source": "邮件20240117",
+      "missing_fields": [],
+      "is_price_valid": true,
+      "is_tax_valid": true,
+      "is_delivery_valid": true
+    },
+    {
+      "row_number": 5,
+      "supplier": "中兴通讯股份有限公司",
+      "price": 11800.0,
+      "tax_rate": 13.0,
+      "tax_rate_normalized": 0.13,
+      "price_ex_tax": 10442.4779,
+      "tax_amount": 1357.5221,
+      "delivery": "_20days",
+      "delivery_normalized": "20天",
+      "delivery_days": 20,
+      "category": "服务器",
+      "source": "邮件20240118",
+      "missing_fields": [],
+      "is_price_valid": true,
+      "is_tax_valid": true,
+      "is_delivery_valid": true
+    },
+    {
+      "row_number": 6,
+      "supplier": "中兴通讯股份有限公司",
+      "price": 35000.0,
+      "tax_rate": 13.0,
+      "tax_rate_normalized": 0.13,
+      "price_ex_tax": 30973.4513,
+      "tax_amount": 4026.5487,
+      "delivery": "_25days",
+      "delivery_normalized": "25天",
+      "delivery_days": 25,
+      "category": "服务器",
+      "source": "邮件20240119",
+      "missing_fields": [],
+      "is_price_valid": true,
+      "is_tax_valid": true,
+      "is_delivery_valid": true
+    }
+  ],
+  "recommendations": {
+    "cheapest": {
+      "supplier": "新华三技术有限公司",
+      "price_ex_tax": 884.9558,
+      "delivery": "5天",
+      "row_number": 8
+    },
+    "fastest": {
+      "supplier": "新华三技术有限公司",
+      "price_ex_tax": 884.9558,
+      "delivery": "5天",
+      "row_number": 8
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import json
+import math
 import os
 from typing import Dict, List, Any
 from datetime import datetime
@@ -88,14 +89,26 @@ class ReportExporter:
                 
                 status_str = ','.join(status) if status else '正常'
                 
+                price = r.get('报价')
+                price_ex_tax = r.get('不含税价')
+                tax_amount = r.get('税额')
+                tax_rate = r.get('税率_标准化')
+                
+                def format_num(v, decimals=2):
+                    if v is None:
+                        return '-'
+                    if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+                        return '-'
+                    return f"{v:.{decimals}f}"
+                
                 table_data.append([
                     i,
                     r.get('原始行号', ''),
                     str(r.get('供应商', ''))[:15],
-                    f"{r.get('报价', 0) or 0:.2f}",
-                    f"{(r.get('税率_标准化') or 0) * 100:.1f}%" if r.get('税率_标准化') is not None else '-',
-                    f"{r.get('不含税价', 0) or 0:.2f}",
-                    f"{r.get('税额', 0) or 0:.2f}",
+                    format_num(price),
+                    f"{tax_rate * 100:.1f}%" if tax_rate is not None else '-',
+                    format_num(price_ex_tax),
+                    format_num(tax_amount),
                     r.get('交期_标准化', '-'),
                     str(r.get('采购品类', ''))[:10],
                     status_str

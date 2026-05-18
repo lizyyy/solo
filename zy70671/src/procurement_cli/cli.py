@@ -41,10 +41,15 @@ def process(input_file, output_dir, name, verbose):
         sorter = DeliverySorter()
         sort_result = sorter.process(calc_result['records'])
         
+        all_warnings = reader_result.get('warnings', []) + calc_result.get('warnings', []) + sort_result.get('warnings', [])
+        all_errors = calc_result.get('errors', []) + sort_result.get('errors', [])
+        
         final_result = {
             **reader_result,
             **calc_result,
             **sort_result,
+            'warnings': all_warnings,
+            'errors': all_errors,
         }
         
         exporter = ReportExporter()

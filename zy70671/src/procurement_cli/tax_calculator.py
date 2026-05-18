@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
+import math
 import re
 
 
@@ -10,6 +11,13 @@ class TaxCalculator:
         self.warnings = []
         self.errors = []
     
+    def _is_invalid_numeric(self, value: Any) -> bool:
+        if value is None:
+            return True
+        if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+            return True
+        return False
+    
     def validate_tax_rate(self, tax_rate: Optional[float]) -> Dict[str, Any]:
         result = {
             'valid': False,
@@ -18,7 +26,7 @@ class TaxCalculator:
             'error': None
         }
         
-        if tax_rate is None:
+        if self._is_invalid_numeric(tax_rate):
             result['error'] = '税率缺失'
             return result
         
@@ -44,11 +52,11 @@ class TaxCalculator:
             'error': None
         }
         
-        if price is None:
+        if self._is_invalid_numeric(price):
             result['error'] = '报价缺失'
             return result
         
-        if tax_rate is None:
+        if self._is_invalid_numeric(tax_rate):
             result['price_ex_tax'] = price
             result['tax_amount'] = 0
             result['warning'] = '税率缺失，默认按0计算'
@@ -74,7 +82,7 @@ class TaxCalculator:
             'error': None
         }
         
-        if price is None:
+        if self._is_invalid_numeric(price):
             result['error'] = '报价缺失'
             return result
         
@@ -104,17 +112,19 @@ class TaxCalculator:
         if tax_validation.get('warning'):
             self.warnings.append(f"行{record.get('原始行号', '?')}: {tax_validation['warning']}")
         
-        price_calc = self.calculate_price_ex_tax(
-            record.get('报价'),
-            tax_validation.get('normalized')
-        )
-        if price_calc.get('error'):
-            self.errors.append(f"行{record.get('原始行号', '?')}: {price_calc['error']}")
-        if price_calc.get('warning'):
-            self.warnings.append(f"行{record.get('原始行号', '?')}: {price_calc['warning']}")
+        price_calc = None
+        if price_validation.get('valid', False):
+            price_calc = self.calculate_price_ex_tax(
+                record.get('报价'),
+                tax_validation.get('normalized')
+            )
+            if price_calc.get('error'):
+                self.errors.append(f"行{record.get('原始行号', '?')}: {price_calc['error']}")
+            if price_calc.get('warning'):
+                self.warnings.append(f"行{record.get('原始行号', '?')}: {price_calc['warning']}")
         
-        processed['不含税价'] = price_calc.get('price_ex_tax')
-        processed['税额'] = price_calc.get('tax_amount')
+        processed['不含税价'] = price_calc.get('price_ex_tax') if price_calc else None
+        processed['税额'] = price_calc.get('tax_amount') if price_calc else None
         processed['税率_标准化'] = tax_validation.get('normalized')
         processed['报价_有效'] = price_validation.get('valid', False)
         processed['税率_有效'] = tax_validation.get('valid', False)
