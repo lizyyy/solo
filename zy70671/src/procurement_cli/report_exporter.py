@@ -121,8 +121,7 @@ class ReportExporter:
         
         lines.append("【七、比价建议】")
         lines.append("-" * 80)
-        valid_records = [r for r in result.get('sorted_records', []) 
-                        if r.get('不含税价') and r.get('不含税价') > 0 and r.get('交期_有效')]
+        valid_records = [r for r in result.get('sorted_records', []) if self._is_valid_supplier(r)]
         
         if valid_records:
             cheapest = min(valid_records, key=lambda x: x['不含税价'])
@@ -145,6 +144,23 @@ class ReportExporter:
         
         return "\n".join(lines)
     
+    def _sanitize_value(self, value):
+        if value is None:
+            return None
+        if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+            return None
+        return value
+    
+    def _is_valid_supplier(self, r: Dict[str, Any]) -> bool:
+        supplier = r.get('供应商')
+        category = r.get('采购品类')
+        price_ex_tax = r.get('不含税价')
+        has_supplier = supplier is not None and str(supplier).strip() != '' and str(supplier).strip().lower() != 'nan'
+        has_category = category is not None and str(category).strip() != '' and str(category).strip().lower() != 'nan'
+        has_valid_price = price_ex_tax is not None and price_ex_tax > 0
+        has_valid_delivery = r.get('交期_有效', False)
+        return has_supplier and has_category and has_valid_price and has_valid_delivery
+
     def generate_machine_readable(self, result: Dict[str, Any]) -> Dict[str, Any]:
         output = {
             'metadata': {
@@ -169,17 +185,17 @@ class ReportExporter:
         for r in result.get('sorted_records', []):
             record = {
                 'row_number': r.get('原始行号'),
-                'supplier': r.get('供应商'),
-                'price': r.get('报价'),
-                'tax_rate': r.get('税率'),
-                'tax_rate_normalized': r.get('税率_标准化'),
-                'price_ex_tax': r.get('不含税价'),
-                'tax_amount': r.get('税额'),
-                'delivery': r.get('交期'),
-                'delivery_normalized': r.get('交期_标准化'),
-                'delivery_days': r.get('交期_天数'),
-                'category': r.get('采购品类'),
-                'source': r.get('附件来源'),
+                'supplier': self._sanitize_value(r.get('供应商')),
+                'price': self._sanitize_value(r.get('报价')),
+                'tax_rate': self._sanitize_value(r.get('税率')),
+                'tax_rate_normalized': self._sanitize_value(r.get('税率_标准化')),
+                'price_ex_tax': self._sanitize_value(r.get('不含税价')),
+                'tax_amount': self._sanitize_value(r.get('税额')),
+                'delivery': self._sanitize_value(r.get('交期')),
+                'delivery_normalized': self._sanitize_value(r.get('交期_标准化')),
+                'delivery_days': self._sanitize_value(r.get('交期_天数')),
+                'category': self._sanitize_value(r.get('采购品类')),
+                'source': self._sanitize_value(r.get('附件来源')),
                 'missing_fields': r.get('缺项列表', []),
                 'is_price_valid': r.get('报价_有效', False),
                 'is_tax_valid': r.get('税率_有效', False),
@@ -187,8 +203,7 @@ class ReportExporter:
             }
             output['records'].append(record)
         
-        valid_records = [r for r in result.get('sorted_records', []) 
-                        if r.get('不含税价') and r.get('不含税价') > 0 and r.get('交期_有效')]
+        valid_records = [r for r in result.get('sorted_records', []) if self._is_valid_supplier(r)]
         
         if valid_records:
             cheapest = min(valid_records, key=lambda x: x['不含税价'])
@@ -196,14 +211,14 @@ class ReportExporter:
             output['recommendations'] = {
                 'cheapest': {
                     'supplier': cheapest.get('供应商'),
-                    'price_ex_tax': cheapest.get('不含税价'),
-                    'delivery': cheapest.get('交期_标准化'),
+                    'price_ex_tax': self._sanitize_value(cheapest.get('不含税价')),
+                    'delivery': self._sanitize_value(cheapest.get('交期_标准化')),
                     'row_number': cheapest.get('原始行号'),
                 },
                 'fastest': {
                     'supplier': fastest.get('供应商'),
-                    'price_ex_tax': fastest.get('不含税价'),
-                    'delivery': fastest.get('交期_标准化'),
+                    'price_ex_tax': self._sanitize_value(fastest.get('不含税价')),
+                    'delivery': self._sanitize_value(fastest.get('交期_标准化')),
                     'row_number': fastest.get('原始行号'),
                 }
             }
