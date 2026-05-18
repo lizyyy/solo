@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "approval-scan"
+version = "0.1.0"
+authors = [
+  { name="审批导出包加签超时扫描", email="dev@example.com"}
+]
+description = "审批导出包加签超时扫描 CLI"
+requires-python = ">=3.8"
+dependencies = [
+  "click>=8.0.0",
+  "pandas>=1.5.0",
+  "python-dateutil>=2.8.0",
+  "openpyxl>=3.0.0",
+]
+
+[project.scripts]
+approval-scan = "approval_scan.cli:main"
