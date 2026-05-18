@@ -1,0 +1,117 @@
+{
+  "defaultConfidence": 0.5,
+  "requiredPhotoAngles": ["top", "bottom", "side"],
+  "oldDamageRecurrenceKeywords": ["旧伤", "之前", "上次", "同样位置", "再次", "复发", "原有"],
+  "rules": [
+    {
+      "id": "R001",
+      "name": "底板划痕-轻微",
+      "description": "雪板底板出现轻微划痕，不影响使用",
+      "category": "base_scratch",
+      "severity": "minor",
+      "keywords": ["划痕", "刮伤", "轻微", "细小"],
+      "locationKeywords": ["底板", "底部", "base"],
+      "photoAngleRequirements": ["bottom"],
+      "confidence": 0.9
+    },
+    {
+      "id": "R002",
+      "name": "底板划痕-严重",
+      "description": "雪板底板出现较深划痕，可能需要修补",
+      "category": "base_scratch",
+      "severity": "severe",
+      "keywords": ["深划痕", "很深", "严重", "深度", "划痕", "修补"],
+      "locationKeywords": ["底板", "底部", "base"],
+      "photoAngleRequirements": ["bottom"],
+      "confidence": 0.95
+    },
+    {
+      "id": "R003",
+      "name": "刃口损坏",
+      "description": "雪板金属刃口出现缺口或变形",
+      "category": "edge_damage",
+      "severity": "moderate",
+      "keywords": ["刃", "边", "缺口", "变形", "卷刃"],
+      "locationKeywords": ["边缘", "侧边", "侧刃", "edge"],
+      "photoAngleRequirements": ["side", "bottom"],
+      "confidence": 0.9
+    },
+    {
+      "id": "R004",
+      "name": "面板裂纹",
+      "description": "雪板表面面板出现裂纹",
+      "category": "top_sheet_crack",
+      "severity": "moderate",
+      "keywords": ["裂纹", "开裂", "裂痕", "表面", "延伸"],
+      "locationKeywords": ["面板", "表面", "topsheet", "正面", "固定器"],
+      "photoAngleRequirements": ["top"],
+      "confidence": 0.85
+    },
+    {
+      "id": "R005",
+      "name": "固定器故障",
+      "description": "滑雪板固定器出现功能异常",
+      "category": "binding_malfunction",
+      "severity": "critical",
+      "keywords": ["固定器", "binding", "脱落", "松动", "无法固定", "断裂"],
+      "locationKeywords": ["固定器", "binding", "固定"],
+      "photoAngleRequirements": ["top", "binding"],
+      "confidence": 0.95
+    },
+    {
+      "id": "R006",
+      "name": "板芯暴露",
+      "description": "雪板内部芯材暴露，需要紧急维修",
+      "category": "core_exposure",
+      "severity": "critical",
+      "keywords": ["芯材", "暴露", "木头", "木芯", "露出", "内部", "划痕", "很深"],
+      "locationKeywords": ["底板", "侧边", "边缘"],
+      "photoAngleRequirements": ["bottom", "side"],
+      "confidence": 0.95
+    },
+    {
+      "id": "R007",
+      "name": "分层脱胶",
+      "description": "雪板各层之间出现分离现象",
+      "category": "delamination",
+      "severity": "severe",
+      "keywords": ["分层", "脱胶", "分离", "起层", "开胶"],
+      "locationKeywords": ["边缘", "侧边", "整体"],
+      "photoAngleRequirements": ["side", "top", "bottom"],
+      "confidence": 0.9
+    },
+    {
+      "id": "R008",
+      "name": "板头板尾损坏",
+      "description": "雪板板头或板尾出现损坏",
+      "category": "tip_tail_damage",
+      "severity": "moderate",
+      "keywords": ["板头", "板尾", "头部", "尾部", "tip", "tail", "撞到", "石头", "碎裂"],
+      "locationKeywords": ["板头", "板尾", "头部", "尾部", "位置"],
+      "photoAngleRequirements": ["tip", "tail"],
+      "confidence": 0.85
+    },
+    {
+      "id": "R009",
+      "name": "雪鞋卡扣损坏",
+      "description": "滑雪鞋卡扣或绑带损坏",
+      "category": "binding_malfunction",
+      "severity": "moderate",
+      "keywords": ["卡扣", "绑带", "扣", "鞋带", "扣具"],
+      "locationKeywords": ["鞋", "靴子", "boot"],
+      "photoAngleRequirements": ["top", "side"],
+      "confidence": 0.85
+    },
+    {
+      "id": "R010",
+      "name": "头盔外壳裂纹",
+      "description": "滑雪头盔外壳出现裂纹，建议更换",
+      "category": "top_sheet_crack",
+      "severity": "critical",
+      "keywords": ["头盔", "壳", "裂纹", "碎裂"],
+      "locationKeywords": ["头盔", "helmet", "头部"],
+      "photoAngleRequirements": ["top", "side"],
+      "confidence": 0.9
+    }
+  ]
+}

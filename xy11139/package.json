@@ -1,0 +1,27 @@
+{
+  "name": "ski-equipment-damage-classifier",
+  "version": "1.0.0",
+  "description": "滑雪装备租赁点雪具损伤归类 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "ski-damage": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "sample": "ts-node src/index.ts classify --input samples/damage-reports.json --config config/rules.json",
+    "sample:verbose": "ts-node src/index.ts classify --input samples/damage-reports.json --config config/rules.json --verbose"
+  },
+  "keywords": ["ski", "equipment", "damage", "classifier", "rental"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0"
+  }
+}

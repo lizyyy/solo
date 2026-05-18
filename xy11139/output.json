@@ -1,0 +1,150 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-05-18T19:08:50.126Z",
+  "summary": {
+    "totalRecords": 10,
+    "successfullyClassified": 5,
+    "partiallyClassified": 5,
+    "failedRecords": 0,
+    "oldDamageRecurrences": 4,
+    "missingPhotoAngleCases": 4
+  },
+  "results": [
+    {
+      "id": "DMG-2024-001",
+      "equipmentId": "SKI-00123",
+      "category": "base_scratch",
+      "severity": "minor",
+      "classificationConfidence": 0.6428571428571429,
+      "isOldDamageRecurrence": false,
+      "hasMissingPhotoAngles": false,
+      "notes": [
+        "匹配规则: 底板划痕-轻微"
+      ]
+    },
+    {
+      "id": "DMG-2024-002",
+      "equipmentId": "SKI-00456",
+      "category": "edge_damage",
+      "severity": "moderate",
+      "classificationConfidence": 0.65,
+      "isOldDamageRecurrence": false,
+      "hasMissingPhotoAngles": false,
+      "notes": [
+        "匹配规则: 刃口损坏"
+      ]
+    },
+    {
+      "id": "DMG-2024-003",
+      "equipmentId": "SKI-00789",
+      "category": "core_exposure",
+      "severity": "critical",
+      "classificationConfidence": 0.6909090909090909,
+      "isOldDamageRecurrence": false,
+      "hasMissingPhotoAngles": false,
+      "notes": [
+        "匹配规则: 底板划痕-轻微",
+        "匹配规则: 底板划痕-严重",
+        "匹配规则: 板芯暴露"
+      ]
+    },
+    {
+      "id": "DMG-2024-004",
+      "equipmentId": "SKI-00123",
+      "category": "base_scratch",
+      "severity": "severe",
+      "classificationConfidence": 0.5805555555555556,
+      "isOldDamageRecurrence": true,
+      "hasMissingPhotoAngles": false,
+      "notes": [
+        "匹配规则: 底板划痕-轻微",
+        "匹配规则: 底板划痕-严重",
+        "检测到旧伤复现"
+      ]
+    },
+    {
+      "id": "DMG-2024-005",
+      "equipmentId": "BOARD-00234",
+      "category": "binding_malfunction",
+      "severity": "critical",
+      "classificationConfidence": 0.6333333333333333,
+      "isOldDamageRecurrence": false,
+      "hasMissingPhotoAngles": true,
+      "notes": [
+        "匹配规则: 面板裂纹",
+        "匹配规则: 固定器故障",
+        "缺失必要照片角度: side"
+      ]
+    },
+    {
+      "id": "DMG-2024-006",
+      "equipmentId": "BIND-00567",
+      "category": "binding_malfunction",
+      "severity": "critical",
+      "classificationConfidence": 0.6861111111111111,
+      "isOldDamageRecurrence": false,
+      "hasMissingPhotoAngles": false,
+      "notes": [
+        "匹配规则: 固定器故障"
+      ]
+    },
+    {
+      "id": "DMG-2024-007",
+      "equipmentId": "BOOT-00890",
+      "category": "binding_malfunction",
+      "severity": "moderate",
+      "classificationConfidence": 0.6375,
+      "isOldDamageRecurrence": true,
+      "hasMissingPhotoAngles": true,
+      "notes": [
+        "匹配规则: 固定器故障",
+        "匹配规则: 雪鞋卡扣损坏",
+        "检测到旧伤复现",
+        "缺失必要照片角度: bottom, side"
+      ]
+    },
+    {
+      "id": "DMG-2024-008",
+      "equipmentId": "SKI-00345",
+      "category": "delamination",
+      "severity": "severe",
+      "classificationConfidence": 0.675,
+      "isOldDamageRecurrence": true,
+      "hasMissingPhotoAngles": true,
+      "notes": [
+        "匹配规则: 刃口损坏",
+        "匹配规则: 分层脱胶",
+        "检测到旧伤复现",
+        "缺失必要照片角度: top, bottom"
+      ]
+    },
+    {
+      "id": "DMG-2024-009",
+      "equipmentId": "HELM-00123",
+      "category": "top_sheet_crack",
+      "severity": "critical",
+      "classificationConfidence": 0.7071428571428572,
+      "isOldDamageRecurrence": false,
+      "hasMissingPhotoAngles": false,
+      "notes": [
+        "匹配规则: 头盔外壳裂纹"
+      ]
+    },
+    {
+      "id": "DMG-2024-010",
+      "equipmentId": "SKI-00678",
+      "category": "tip_tail_damage",
+      "severity": "moderate",
+      "classificationConfidence": 0.6071428571428571,
+      "isOldDamageRecurrence": true,
+      "hasMissingPhotoAngles": true,
+      "notes": [
+        "匹配规则: 板头板尾损坏",
+        "检测到旧伤复现",
+        "缺失必要照片角度: top, bottom, side"
+      ]
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}
