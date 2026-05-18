@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from datetime import datetime, timedelta
-from main import app, Base, engine, SessionLocal, Vehicle, Salesperson, Customer, Appointment, Maintenance, ExceptionLog
+from main import app, Base, engine, SessionLocal, Vehicle, Salesperson, Customer, Appointment, Maintenance, Fueling, ExceptionLog
 
 @pytest.fixture(scope="function")
 def db_session():
@@ -232,3 +232,121 @@ def test_seed_data(client, db_session):
     assert data["vehicles"] == 2
     assert data["salespersons"] == 2
     assert data["customers"] == 2
+
+def test_salesperson_time_conflict(client, db_session, test_data):
+    tomorrow = (datetime.now() + timedelta(days=1)).isoformat()
+    end_time = (datetime.now() + timedelta(days=1, hours=1)).isoformat()
+    client.post("/appointments/", json={
+        "vehicle_id": test_data["vehicle"].id,
+        "salesperson_id": test_data["salesperson"].id,
+        "customer_id": test_data["customer"].id,
+        "start_time": tomorrow,
+        "end_time": end_time
+    })
+    vehicle2 = Vehicle(plate_number="京B22222", model="Model 3", brand="Tesla", year=2024, current_mileage=2000.0)
+    db_session.add(vehicle2)
+    db_session.commit()
+    response = client.post("/appointments/", json={
+        "vehicle_id": vehicle2.id,
+        "salesperson_id": test_data["salesperson"].id,
+        "customer_id": test_data["customer"].id,
+        "start_time": (datetime.now() + timedelta(days=1, minutes=30)).isoformat(),
+        "end_time": (datetime.now() + timedelta(days=1, hours=1, minutes=30)).isoformat()
+    })
+    assert response.status_code == 409
+    assert "销售时间冲突" in str(response.json()["detail"]["conflicts"])
+
+def test_maintenance_not_lock_vehicle(client, db_session, test_data):
+    maintenance_start = (datetime.now() + timedelta(days=1)).isoformat()
+    maintenance_end = (datetime.now() + timedelta(days=1, hours=3)).isoformat()
+    client.post("/maintenances/", json={
+        "vehicle_id": test_data["vehicle"].id,
+        "start_time": maintenance_start,
+        "end_time": maintenance_end,
+        "type": "常规保养"
+    })
+    db_session.refresh(test_data["vehicle"])
+    assert test_data["vehicle"].status == "available"
+
+def test_create_fueling(client, db_session, test_data):
+    fueling_start = (datetime.now() + timedelta(days=1)).isoformat()
+    fueling_end = (datetime.now() + timedelta(days=1, hours=1)).isoformat()
+    response = client.post("/fuelings/", json={
+        "vehicle_id": test_data["vehicle"].id,
+        "start_time": fueling_start,
+        "end_time": fueling_end,
+        "type": "electric",
+        "amount": 50.0,
+        "cost": 100.0
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert data["type"] == "electric"
+    assert data["amount"] == 50.0
+
+def test_fueling_conflict_with_appointment(client, db_session, test_data):
+    tomorrow = (datetime.now() + timedelta(days=1)).isoformat()
+    end_time = (datetime.now() + timedelta(days=1, hours=3)).isoformat()
+    client.post("/appointments/", json={
+        "vehicle_id": test_data["vehicle"].id,
+        "salesperson_id": test_data["salesperson"].id,
+        "customer_id": test_data["customer"].id,
+        "start_time": tomorrow,
+        "end_time": end_time
+    })
+    fueling_start = (datetime.now() + timedelta(days=1, hours=1)).isoformat()
+    fueling_end = (datetime.now() + timedelta(days=1, hours=2)).isoformat()
+    response = client.post("/fuelings/", json={
+        "vehicle_id": test_data["vehicle"].id,
+        "start_time": fueling_start,
+        "end_time": fueling_end,
+        "type": "gasoline"
+    })
+    assert response.status_code == 409
+    assert "冲突" in response.json()["detail"]["message"]
+
+def test_fueling_status_update(client, db_session, test_data):
+    fueling_start = (datetime.now() + timedelta(days=1)).isoformat()
+    fueling_end = (datetime.now() + timedelta(days=1, hours=1)).isoformat()
+    fueling_response = client.post("/fuelings/", json={
+        "vehicle_id": test_data["vehicle"].id,
+        "start_time": fueling_start,
+        "end_time": fueling_end,
+        "type": "gasoline"
+    })
+    fueling_id = fueling_response.json()["id"]
+    response = client.patch(f"/fuelings/{fueling_id}/status?status=in_progress")
+    assert response.status_code == 200
+    fueling = db_session.query(Fueling).filter(Fueling.id == fueling_id).first()
+    assert fueling.status == "in_progress"
+
+def test_maintenance_status_update(client, db_session, test_data):
+    maintenance_start = (datetime.now() + timedelta(days=1)).isoformat()
+    maintenance_end = (datetime.now() + timedelta(days=1, hours=3)).isoformat()
+    mnt_response = client.post("/maintenances/", json={
+        "vehicle_id": test_data["vehicle"].id,
+        "start_time": maintenance_start,
+        "end_time": maintenance_end,
+        "type": "常规保养"
+    })
+    mnt_id = mnt_response.json()["id"]
+    response = client.patch(f"/maintenances/{mnt_id}/status?status=completed")
+    assert response.status_code == 200
+    maintenance = db_session.query(Maintenance).filter(Maintenance.id == mnt_id).first()
+    assert maintenance.status == "completed"
+
+def test_list_fuelings(client, db_session, test_data):
+    fueling_start = (datetime.now() + timedelta(days=1)).isoformat()
+    fueling_end = (datetime.now() + timedelta(days=1, hours=1)).isoformat()
+    client.post("/fuelings/", json={
+        "vehicle_id": test_data["vehicle"].id,
+        "start_time": fueling_start,
+        "end_time": fueling_end,
+        "type": "electric"
+    })
+    response = client.get("/fuelings/")
+    assert response.status_code == 200
+    assert len(response.json()) >= 1
+    response = client.get(f"/fuelings/?vehicle_id={test_data['vehicle'].id}")
+    assert response.status_code == 200
+    assert len(response.json()) >= 1

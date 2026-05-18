@@ -31,10 +31,23 @@ class MaintenanceStatus(str, Enum):
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
+class FuelingStatus(str, Enum):
+    SCHEDULED = "scheduled"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+class FuelingType(str, Enum):
+    GASOLINE = "gasoline"
+    DIESEL = "diesel"
+    ELECTRIC = "electric"
+    HYBRID = "hybrid"
+
 class VehicleStatus(str, Enum):
     AVAILABLE = "available"
     IN_TEST_DRIVE = "in_test_drive"
     IN_MAINTENANCE = "in_maintenance"
+    IN_FUELING = "in_fueling"
     LOCKED = "locked"
 
 class Vehicle(Base):
@@ -49,6 +62,7 @@ class Vehicle(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     appointments = relationship("Appointment", back_populates="vehicle")
     maintenances = relationship("Maintenance", back_populates="vehicle")
+    fuelings = relationship("Fueling", back_populates="vehicle")
     mileage_records = relationship("MileageRecord", back_populates="vehicle")
 
 class Salesperson(Base):
@@ -99,6 +113,20 @@ class Maintenance(Base):
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     vehicle = relationship("Vehicle", back_populates="maintenances")
+
+class Fueling(Base):
+    __tablename__ = "fuelings"
+    id = Column(Integer, primary_key=True, index=True)
+    vehicle_id = Column(Integer, ForeignKey("vehicles.id"))
+    start_time = Column(DateTime)
+    end_time = Column(DateTime)
+    status = Column(String, default=FuelingStatus.SCHEDULED)
+    type = Column(String)
+    amount = Column(Float, nullable=True)
+    cost = Column(Float, nullable=True)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    vehicle = relationship("Vehicle", back_populates="fuelings")
 
 class MileageRecord(Base):
     __tablename__ = "mileage_records"
@@ -227,6 +255,28 @@ class MaintenanceResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class FuelingCreate(BaseModel):
+    vehicle_id: int
+    start_time: datetime
+    end_time: datetime
+    type: str
+    amount: Optional[float] = None
+    cost: Optional[float] = None
+    notes: Optional[str] = None
+
+class FuelingResponse(BaseModel):
+    id: int
+    vehicle_id: int
+    start_time: datetime
+    end_time: datetime
+    status: str
+    type: str
+    amount: Optional[float]
+    cost: Optional[float]
+    notes: Optional[str]
+    class Config:
+        from_attributes = True
+
 class MileageRecordResponse(BaseModel):
     id: int
     vehicle_id: int
@@ -258,7 +308,7 @@ def get_db():
 def check_time_overlap(start1: datetime, end1: datetime, start2: datetime, end2: datetime) -> bool:
     return start1 < end2 and start2 < end1
 
-def check_conflicts(db: Session, vehicle_id: int, start_time: datetime, end_time: datetime, exclude_appointment_id: Optional[int] = None) -> List[str]:
+def check_conflicts(db: Session, vehicle_id: int, salesperson_id: int, start_time: datetime, end_time: datetime, exclude_appointment_id: Optional[int] = None) -> List[str]:
     conflicts = []
     query = db.query(Appointment).filter(
         Appointment.vehicle_id == vehicle_id,
@@ -269,7 +319,17 @@ def check_conflicts(db: Session, vehicle_id: int, start_time: datetime, end_time
     appointments = query.all()
     for apt in appointments:
         if check_time_overlap(start_time, end_time, apt.start_time, apt.end_time):
-            conflicts.append(f"与预约 #{apt.id} 时间冲突")
+            conflicts.append(f"与预约 #{apt.id} 车辆时间冲突")
+    sp_query = db.query(Appointment).filter(
+        Appointment.salesperson_id == salesperson_id,
+        Appointment.status.in_([AppointmentStatus.CONFIRMED, AppointmentStatus.IN_PROGRESS])
+    )
+    if exclude_appointment_id:
+        sp_query = sp_query.filter(Appointment.id != exclude_appointment_id)
+    sp_appointments = sp_query.all()
+    for apt in sp_appointments:
+        if check_time_overlap(start_time, end_time, apt.start_time, apt.end_time):
+            conflicts.append(f"与预约 #{apt.id} 销售时间冲突")
     maintenances = db.query(Maintenance).filter(
         Maintenance.vehicle_id == vehicle_id,
         Maintenance.status.in_([MaintenanceStatus.SCHEDULED, MaintenanceStatus.IN_PROGRESS])
@@ -277,6 +337,13 @@ def check_conflicts(db: Session, vehicle_id: int, start_time: datetime, end_time
     for mnt in maintenances:
         if check_time_overlap(start_time, end_time, mnt.start_time, mnt.end_time):
             conflicts.append(f"与保养时段冲突 ({mnt.type})")
+    fuelings = db.query(Fueling).filter(
+        Fueling.vehicle_id == vehicle_id,
+        Fueling.status.in_([FuelingStatus.SCHEDULED, FuelingStatus.IN_PROGRESS])
+    ).all()
+    for fug in fuelings:
+        if check_time_overlap(start_time, end_time, fug.start_time, fug.end_time):
+            conflicts.append(f"与加油/补能时段冲突 ({fug.type})")
     vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
     if vehicle and vehicle.status == VehicleStatus.LOCKED:
         conflicts.append("车辆已锁定")
@@ -323,7 +390,7 @@ def list_customers(db: Session = Depends(get_db)):
 
 @app.post("/appointments/", response_model=AppointmentResponse)
 def create_appointment(appointment: AppointmentCreate, db: Session = Depends(get_db)):
-    conflicts = check_conflicts(db, appointment.vehicle_id, appointment.start_time, appointment.end_time)
+    conflicts = check_conflicts(db, appointment.vehicle_id, appointment.salesperson_id, appointment.start_time, appointment.end_time)
     if conflicts:
         db_appointment = Appointment(**appointment.model_dump(), status=AppointmentStatus.CONFLICT)
         db.add(db_appointment)
@@ -399,7 +466,7 @@ def manual_correction(
     }
     if correction.new_start_time and correction.new_end_time:
         conflicts = check_conflicts(
-            db, appointment.vehicle_id, 
+            db, appointment.vehicle_id, appointment.salesperson_id,
             correction.new_start_time, correction.new_end_time,
             appointment_id
         )
@@ -482,12 +549,17 @@ def create_maintenance(maintenance: MaintenanceCreate, db: Session = Depends(get
     for apt in appointments:
         if check_time_overlap(maintenance.start_time, maintenance.end_time, apt.start_time, apt.end_time):
             conflicts.append(f"与预约 #{apt.id} 冲突")
+    fuelings = db.query(Fueling).filter(
+        Fueling.vehicle_id == maintenance.vehicle_id,
+        Fueling.status.in_([FuelingStatus.SCHEDULED, FuelingStatus.IN_PROGRESS])
+    ).all()
+    for fug in fuelings:
+        if check_time_overlap(maintenance.start_time, maintenance.end_time, fug.start_time, fug.end_time):
+            conflicts.append(f"与加油/补能时段冲突 ({fug.type})")
     if conflicts:
-        raise HTTPException(status_code=409, detail={"message": "保养与试驾预约冲突", "conflicts": conflicts})
+        raise HTTPException(status_code=409, detail={"message": "保养时段存在冲突", "conflicts": conflicts})
     db_maintenance = Maintenance(**maintenance.model_dump())
     db.add(db_maintenance)
-    vehicle = db.query(Vehicle).filter(Vehicle.id == maintenance.vehicle_id).first()
-    vehicle.status = VehicleStatus.LOCKED
     db.commit()
     db.refresh(db_maintenance)
     return db_maintenance
@@ -498,6 +570,64 @@ def list_maintenances(vehicle_id: Optional[int] = None, db: Session = Depends(ge
     if vehicle_id:
         query = query.filter(Maintenance.vehicle_id == vehicle_id)
     return query.all()
+
+@app.patch("/maintenances/{maintenance_id}/status")
+def update_maintenance_status(
+    maintenance_id: int,
+    status: MaintenanceStatus,
+    db: Session = Depends(get_db)
+):
+    maintenance = db.query(Maintenance).filter(Maintenance.id == maintenance_id).first()
+    if not maintenance:
+        raise HTTPException(status_code=404, detail="保养不存在")
+    maintenance.status = status
+    db.commit()
+    return {"message": "保养状态更新成功", "maintenance_id": maintenance_id, "status": status}
+
+@app.post("/fuelings/", response_model=FuelingResponse)
+def create_fueling(fueling: FuelingCreate, db: Session = Depends(get_db)):
+    appointments = db.query(Appointment).filter(
+        Appointment.vehicle_id == fueling.vehicle_id,
+        Appointment.status.in_([AppointmentStatus.CONFIRMED, AppointmentStatus.IN_PROGRESS])
+    ).all()
+    conflicts = []
+    for apt in appointments:
+        if check_time_overlap(fueling.start_time, fueling.end_time, apt.start_time, apt.end_time):
+            conflicts.append(f"与预约 #{apt.id} 冲突")
+    maintenances = db.query(Maintenance).filter(
+        Maintenance.vehicle_id == fueling.vehicle_id,
+        Maintenance.status.in_([MaintenanceStatus.SCHEDULED, MaintenanceStatus.IN_PROGRESS])
+    ).all()
+    for mnt in maintenances:
+        if check_time_overlap(fueling.start_time, fueling.end_time, mnt.start_time, mnt.end_time):
+            conflicts.append(f"与保养时段冲突 ({mnt.type})")
+    if conflicts:
+        raise HTTPException(status_code=409, detail={"message": "加油/补能时段存在冲突", "conflicts": conflicts})
+    db_fueling = Fueling(**fueling.model_dump())
+    db.add(db_fueling)
+    db.commit()
+    db.refresh(db_fueling)
+    return db_fueling
+
+@app.get("/fuelings/", response_model=List[FuelingResponse])
+def list_fuelings(vehicle_id: Optional[int] = None, db: Session = Depends(get_db)):
+    query = db.query(Fueling)
+    if vehicle_id:
+        query = query.filter(Fueling.vehicle_id == vehicle_id)
+    return query.all()
+
+@app.patch("/fuelings/{fueling_id}/status")
+def update_fueling_status(
+    fueling_id: int,
+    status: FuelingStatus,
+    db: Session = Depends(get_db)
+):
+    fueling = db.query(Fueling).filter(Fueling.id == fueling_id).first()
+    if not fueling:
+        raise HTTPException(status_code=404, detail="加油/补能不存在")
+    fueling.status = status
+    db.commit()
+    return {"message": "加油/补能状态更新成功", "fueling_id": fueling_id, "status": status}
 
 @app.post("/vehicles/{vehicle_id}/lock")
 def lock_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
