@@ -1,0 +1,21 @@
+{
+  "name": "bus-station-refund-cli",
+  "version": "1.0.0",
+  "description": "乡镇客运站客运班次退款CLI工具",
+  "main": "bin/refund.js",
+  "bin": {
+    "bus-refund": "./bin/refund.js"
+  },
+  "scripts": {
+    "start": "node bin/refund.js",
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["bus", "station", "refund", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0"
+  }
+}
