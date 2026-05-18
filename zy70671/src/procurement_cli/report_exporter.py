@@ -159,7 +159,8 @@ class ReportExporter:
         has_category = category is not None and str(category).strip() != '' and str(category).strip().lower() != 'nan'
         has_valid_price = price_ex_tax is not None and price_ex_tax > 0
         has_valid_delivery = r.get('交期_有效', False)
-        return has_supplier and has_category and has_valid_price and has_valid_delivery
+        has_valid_tax = r.get('税率_有效', False)
+        return has_supplier and has_category and has_valid_price and has_valid_delivery and has_valid_tax
 
     def generate_machine_readable(self, result: Dict[str, Any]) -> Dict[str, Any]:
         output = {

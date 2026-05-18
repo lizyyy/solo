@@ -1,0 +1,75 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-19T06:21:52.672669",
+    "version": "1.0.0"
+  },
+  "summary": {
+    "raw_rows": 2,
+    "valid_count": 1,
+    "invalid_count": 1,
+    "missing_summary": {},
+    "conflict_count": 0,
+    "warning_count": 2,
+    "error_count": 1
+  },
+  "conflicts": [],
+  "warnings": [
+    "成功读取文件，原始数据: 2行 x 6列",
+    "行2: 税率缺失，默认按0计算"
+  ],
+  "errors": [
+    "行2: 税率缺失"
+  ],
+  "records": [
+    {
+      "row_number": 2,
+      "supplier": "缺税低价公司",
+      "price": 10000.0,
+      "tax_rate": null,
+      "tax_rate_normalized": null,
+      "price_ex_tax": 10000.0,
+      "tax_amount": 0,
+      "delivery": "_10days",
+      "delivery_normalized": "10天",
+      "delivery_days": 10,
+      "category": "服务器",
+      "source": "邮件20240120",
+      "missing_fields": [],
+      "is_price_valid": true,
+      "is_tax_valid": false,
+      "is_delivery_valid": true
+    },
+    {
+      "row_number": 3,
+      "supplier": "正常价公司",
+      "price": 12000.0,
+      "tax_rate": 13.0,
+      "tax_rate_normalized": 0.13,
+      "price_ex_tax": 10619.469,
+      "tax_amount": 1380.531,
+      "delivery": "_15days",
+      "delivery_normalized": "15天",
+      "delivery_days": 15,
+      "category": "服务器",
+      "source": "邮件20240121",
+      "missing_fields": [],
+      "is_price_valid": true,
+      "is_tax_valid": true,
+      "is_delivery_valid": true
+    }
+  ],
+  "recommendations": {
+    "cheapest": {
+      "supplier": "正常价公司",
+      "price_ex_tax": 10619.469,
+      "delivery": "15天",
+      "row_number": 3
+    },
+    "fastest": {
+      "supplier": "正常价公司",
+      "price_ex_tax": 10619.469,
+      "delivery": "15天",
+      "row_number": 3
+    }
+  }
+}
