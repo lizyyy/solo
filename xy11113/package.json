@@ -1,0 +1,21 @@
+{
+  "name": "elderly-care-sign-daily-report",
+  "version": "1.0.0",
+  "description": "养老日托站养老体征日报数据清洗工具",
+  "main": "src/index.js",
+  "bin": {
+    "elderly-sign-report": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js --input examples/input --output examples/output"
+  },
+  "keywords": ["elderly-care", "daily-report", "data-cleaning"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  }
+}
