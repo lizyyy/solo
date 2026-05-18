@@ -1,0 +1,29 @@
+{
+  "name": "medical-report-distribution-cli",
+  "version": "1.0.0",
+  "description": "体检中心体检报告分发 CLI 工具",
+  "main": "dist/cli.js",
+  "bin": {
+    "medical-report": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "node dist/cli.js process samples/"
+  },
+  "keywords": ["medical", "report", "distribution", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/yargs": "^17.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}
