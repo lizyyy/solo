@@ -131,13 +131,14 @@ def calculate(input_file, output_dir, rule_file, format, no_console):
 @click.option(
     "--type",
     "-t",
-    type=click.Choice(["normal", "abnormal", "all"]),
+    type=click.Choice(["normal", "abnormal", "boundary", "empty", "all"]),
     default="all",
     help="生成样例类型",
 )
 def generate_samples(output_dir, type):
     """生成样例数据文件用于测试"""
     import json
+    import pandas as pd
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -209,9 +210,14 @@ def generate_samples(output_dir, type):
         with open(normal_path, "w", encoding="utf-8") as f:
             json.dump(normal_samples, f, ensure_ascii=False, indent=2)
         click.echo(f"✓ 正常样例已保存: {normal_path}")
+        
+        df_normal = pd.DataFrame(normal_samples)
+        excel_normal_path = os.path.join(output_dir, "sample_normal.xlsx")
+        df_normal.to_excel(excel_normal_path, index=False)
+        click.echo(f"✓ Excel正常样例已保存: {excel_normal_path}")
 
     if type in ["abnormal", "all"]:
-        click.echo("📝 生成异常样例数据...")
+        click.echo("📝 生成脏数据样例...")
         abnormal_samples = [
             {
                 "customer_id": "C001",
@@ -282,9 +288,136 @@ def generate_samples(output_dir, type):
         abnormal_path = os.path.join(output_dir, "sample_abnormal.json")
         with open(abnormal_path, "w", encoding="utf-8") as f:
             json.dump(abnormal_samples, f, ensure_ascii=False, indent=2)
-        click.echo(f"✓ 异常样例已保存: {abnormal_path}")
+        click.echo(f"✓ 脏数据样例已保存: {abnormal_path}")
+
+    if type in ["boundary", "all"]:
+        click.echo("📝 生成边界冲突样例...")
+        boundary_samples = [
+            {
+                "customer_id": "B001",
+                "customer_name": "体积阶梯边界客户-刚好50",
+                "warehouse_location": "Z-99-99",
+                "volume": 50,
+                "occupancy_days": 30,
+                "free_rent_days": 0,
+                "is_checked_out": False,
+                "notes": "刚好落在体积阶梯分界点50m³",
+            },
+            {
+                "customer_id": "B002",
+                "customer_name": "体积阶梯边界客户-刚好200",
+                "warehouse_location": "Z-99-98",
+                "volume": 200,
+                "occupancy_days": 30,
+                "free_rent_days": 0,
+                "is_checked_out": False,
+                "notes": "刚好落在体积阶梯分界点200m³",
+            },
+            {
+                "customer_id": "B003",
+                "customer_name": "体积阶梯边界客户-刚好500",
+                "warehouse_location": "Z-99-97",
+                "volume": 500,
+                "occupancy_days": 30,
+                "free_rent_days": 0,
+                "is_checked_out": False,
+                "notes": "刚好落在体积阶梯分界点500m³",
+            },
+            {
+                "customer_id": "B004",
+                "customer_name": "天数折扣边界客户-刚好7天",
+                "warehouse_location": "Z-99-96",
+                "volume": 100,
+                "occupancy_days": 7,
+                "free_rent_days": 0,
+                "is_checked_out": False,
+                "notes": "刚好落在天数折扣分界点7天",
+            },
+            {
+                "customer_id": "B005",
+                "customer_name": "天数折扣边界客户-刚好30天",
+                "warehouse_location": "Z-99-95",
+                "volume": 100,
+                "occupancy_days": 30,
+                "free_rent_days": 0,
+                "is_checked_out": False,
+                "notes": "刚好落在天数折扣分界点30天",
+            },
+            {
+                "customer_id": "B006",
+                "customer_name": "天数折扣边界客户-刚好90天",
+                "warehouse_location": "Z-99-94",
+                "volume": 100,
+                "occupancy_days": 90,
+                "free_rent_days": 0,
+                "is_checked_out": False,
+                "notes": "刚好落在天数折扣分界点90天",
+            },
+            {
+                "customer_id": "B007",
+                "customer_name": "退仓截断边界客户-刚好12点",
+                "warehouse_location": "Z-99-93",
+                "volume": 100,
+                "occupancy_days": 10,
+                "checkin_date": "2024-04-01T10:00:00",
+                "checkout_date": "2024-04-11T12:00:00",
+                "free_rent_days": 0,
+                "is_checked_out": True,
+                "notes": "刚好12:00退仓，测试截断边界",
+            },
+            {
+                "customer_id": "B008",
+                "customer_name": "退仓截断边界客户-11:59",
+                "warehouse_location": "Z-99-92",
+                "volume": 100,
+                "occupancy_days": 10,
+                "checkin_date": "2024-04-01T10:00:00",
+                "checkout_date": "2024-04-11T11:59:00",
+                "free_rent_days": 0,
+                "is_checked_out": True,
+                "notes": "11:59退仓，应触发免1天",
+            },
+            {
+                "customer_id": "B009",
+                "customer_name": "免租刚好等于占用天数",
+                "warehouse_location": "Z-99-91",
+                "volume": 100,
+                "occupancy_days": 15,
+                "free_rent_days": 15,
+                "is_checked_out": False,
+                "notes": "免租天数刚好等于占用天数，计费应为0",
+            },
+            {
+                "customer_id": "B010",
+                "customer_name": "最小体积客户",
+                "warehouse_location": "Z-99-90",
+                "volume": 0.01,
+                "occupancy_days": 1,
+                "free_rent_days": 0,
+                "is_checked_out": False,
+                "notes": "极小体积边界测试",
+            },
+        ]
+        boundary_path = os.path.join(output_dir, "sample_boundary.json")
+        with open(boundary_path, "w", encoding="utf-8") as f:
+            json.dump(boundary_samples, f, ensure_ascii=False, indent=2)
+        click.echo(f"✓ 边界冲突样例已保存: {boundary_path}")
+
+    if type in ["empty", "all"]:
+        click.echo("📝 生成空结果样例...")
+        empty_samples = []
+        empty_path = os.path.join(output_dir, "sample_empty.json")
+        with open(empty_path, "w", encoding="utf-8") as f:
+            json.dump(empty_samples, f, ensure_ascii=False, indent=2)
+        click.echo(f"✓ 空结果样例已保存: {empty_path}")
+        
+        df_empty = pd.DataFrame()
+        excel_empty_path = os.path.join(output_dir, "sample_empty.xlsx")
+        df_empty.to_excel(excel_empty_path, index=False)
+        click.echo(f"✓ Excel空结果样例已保存: {excel_empty_path}")
 
     click.echo("\n🎉 样例文件生成完成！")
+    click.echo(f"   完整样例共4类: 正常输入、脏数据、边界冲突、空结果")
     click.echo(f"   使用方法: python -m warehouse_rent_cli calculate {os.path.join(output_dir, 'sample_normal.json')}")
 
 

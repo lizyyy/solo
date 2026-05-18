@@ -24,9 +24,18 @@ class DataLoader:
 
     @staticmethod
     def load_excel(file_path: str, sheet_name: Optional[str] = None) -> List[Dict[str, Any]]:
-        df = pd.read_excel(file_path, sheet_name=sheet_name)
-        data = df.to_dict("records")
-        return [DataLoader._process_excel_row(row) for row in data]
+        result = pd.read_excel(file_path, sheet_name=sheet_name)
+        all_rows = []
+        
+        if isinstance(result, dict):
+            for sheet_df in result.values():
+                if not sheet_df.empty:
+                    all_rows.extend(sheet_df.to_dict("records"))
+        else:
+            if not result.empty:
+                all_rows = result.to_dict("records")
+        
+        return [DataLoader._process_excel_row(row) for row in all_rows]
 
     @staticmethod
     def _process_csv_row(row: Dict[str, str]) -> Dict[str, Any]:
