@@ -1,0 +1,70 @@
+{
+  "fam001": {
+    "family_id": "fam001",
+    "parent_name": "张爸爸",
+    "phone": "13800138001",
+    "children": [
+      {
+        "name": "小明",
+        "age": 5
+      },
+      {
+        "name": "小红",
+        "age": 3
+      }
+    ],
+    "total_members": 4
+  },
+  "fam002": {
+    "family_id": "fam002",
+    "parent_name": "李妈妈",
+    "phone": "13800138002",
+    "children": [
+      {
+        "name": "小刚",
+        "age": 8
+      }
+    ],
+    "total_members": 2
+  },
+  "fam003": {
+    "family_id": "fam003",
+    "parent_name": "王爸爸",
+    "phone": "13800138003",
+    "children": [
+      {
+        "name": "小华",
+        "age": 6
+      },
+      {
+        "name": "小美",
+        "age": 4
+      }
+    ],
+    "total_members": 4
+  },
+  "fam004": {
+    "family_id": "fam004",
+    "parent_name": "赵妈妈",
+    "phone": "13800138004",
+    "children": [
+      {
+        "name": "小强",
+        "age": 10
+      }
+    ],
+    "total_members": 2
+  },
+  "fam005": {
+    "family_id": "fam005",
+    "parent_name": "脏数据测试",
+    "phone": "invalid-phone",
+    "children": [
+      {
+        "name": "超龄儿童",
+        "age": 15
+      }
+    ],
+    "total_members": 2
+  }
+}

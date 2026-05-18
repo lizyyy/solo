@@ -1,0 +1,67 @@
+{
+  "activity": {
+    "activity_id": "act001",
+    "name": "周末亲子农场游",
+    "date": "2026-05-25",
+    "max_capacity": 3,
+    "min_age": 3,
+    "max_age": 12,
+    "price_per_person": 199.0,
+    "payment_lock_hours": 24
+  },
+  "summary": {
+    "total_registrations": 4,
+    "confirmed": 3,
+    "cancelled": 1,
+    "waitlisted": 0,
+    "paid": 1,
+    "payment_locked": 0,
+    "unpaid": 2,
+    "remaining_spots": 0,
+    "waitlist_length": 0,
+    "total_revenue": 398.0
+  },
+  "registrations": [
+    {
+      "registration_id": "reg001",
+      "activity_id": "act001",
+      "family_id": "fam001",
+      "status": "cancelled",
+      "registered_at": "2026-05-18T07:34:40.167331",
+      "payment_status": "refunded",
+      "payment_expires_at": "2026-05-19T07:34:40.167331",
+      "notes": null
+    },
+    {
+      "registration_id": "reg002",
+      "activity_id": "act001",
+      "family_id": "fam002",
+      "status": "confirmed",
+      "registered_at": "2026-05-18T07:34:40.167331",
+      "payment_status": "paid",
+      "payment_expires_at": null,
+      "notes": null
+    },
+    {
+      "registration_id": "reg003",
+      "activity_id": "act001",
+      "family_id": "fam003",
+      "status": "confirmed",
+      "registered_at": "2026-05-18T07:34:40.167331",
+      "payment_status": "unpaid",
+      "payment_expires_at": null,
+      "notes": null
+    },
+    {
+      "registration_id": "reg004",
+      "activity_id": "act001",
+      "family_id": "fam004",
+      "status": "confirmed",
+      "registered_at": "2026-05-18T07:34:40.167331",
+      "payment_status": "unpaid",
+      "payment_expires_at": null,
+      "notes": null
+    }
+  ],
+  "waitlist_queue": []
+}

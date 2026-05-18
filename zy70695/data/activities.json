@@ -1,0 +1,22 @@
+{
+  "act001": {
+    "activity_id": "act001",
+    "name": "周末亲子农场游",
+    "date": "2026-05-25",
+    "max_capacity": 3,
+    "min_age": 3,
+    "max_age": 12,
+    "price_per_person": 199.0,
+    "payment_lock_hours": 24
+  },
+  "act002": {
+    "activity_id": "act002",
+    "name": "空活动测试",
+    "date": "2026-06-01",
+    "max_capacity": 10,
+    "min_age": 5,
+    "max_age": 10,
+    "price_per_person": 99.0,
+    "payment_lock_hours": 24
+  }
+}

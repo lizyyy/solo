@@ -1,0 +1,26 @@
+{
+  "activity": {
+    "activity_id": "act002",
+    "name": "空活动测试",
+    "date": "2026-06-01",
+    "max_capacity": 10,
+    "min_age": 5,
+    "max_age": 10,
+    "price_per_person": 99.0,
+    "payment_lock_hours": 24
+  },
+  "summary": {
+    "total_registrations": 0,
+    "confirmed": 0,
+    "cancelled": 0,
+    "waitlisted": 0,
+    "paid": 0,
+    "payment_locked": 0,
+    "unpaid": 0,
+    "remaining_spots": 10,
+    "waitlist_length": 0,
+    "total_revenue": 0
+  },
+  "registrations": [],
+  "waitlist_queue": []
+}
