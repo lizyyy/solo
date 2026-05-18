@@ -98,15 +98,29 @@ class TableParser:
             try:
                 normalized_row = {}
                 for orig_col, norm_col in col_mapping.items():
-                    value = str(row.get(orig_col, '')).strip()
+                    raw_value = row.get(orig_col, '')
+                    if pd.isna(raw_value):
+                        value = ''
+                    else:
+                        value = str(raw_value).strip()
                     normalized_row[norm_col] = value
                 
                 if missing_cols:
                     raise ValueError(f"缺少必要列: {', '.join(missing_cols)}")
                 
+                if not normalized_row.get('网点编号'):
+                    raise ValueError("网点编号不能为空")
+                
+                if not normalized_row.get('日期'):
+                    raise ValueError("日期不能为空")
+                
                 for col in self.numeric_columns:
-                    if normalized_row.get(col):
-                        normalized_row[col] = self._parse_amount(normalized_row[col])
+                    raw_value = normalized_row.get(col, '')
+                    if raw_value:
+                        parsed_value = self._parse_amount(raw_value, col)
+                        normalized_row[col] = parsed_value
+                    else:
+                        normalized_row[col] = 0.0
                 
                 normalized_row['_original_row'] = original_row_number
                 normalized_row['_source_file'] = file_name
@@ -151,11 +165,17 @@ class TableParser:
                 
         return mapping
 
-    def _parse_amount(self, value: str) -> float:
+    def _parse_amount(self, value: str, field_name: str = "金额") -> float:
         if not value or pd.isna(value):
             return 0.0
-        cleaned = re.sub(r'[^\d.-]', '', str(value))
-        return float(cleaned) if cleaned else 0.0
+        original_value = str(value)
+        cleaned = re.sub(r'[^\d.-]', '', original_value)
+        if not cleaned:
+            raise ValueError(f"{field_name} '{original_value}' 不是有效的数字")
+        try:
+            return float(cleaned)
+        except ValueError:
+            raise ValueError(f"{field_name} '{original_value}' 不是有效的数字")
 
     def _convert_numeric_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         for col in self.numeric_columns:
