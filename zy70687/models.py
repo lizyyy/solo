@@ -66,7 +66,7 @@ class UsageRecord:
     storage_id: str
     customer_id: str
     quantity: int
-    used_at: str = field(default_factory=lambda: datetime.now().isoformat)
+    used_at: str = field(default_factory=lambda: datetime.now().isoformat())
     notes: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
