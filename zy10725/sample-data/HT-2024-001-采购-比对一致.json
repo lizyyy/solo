@@ -1,0 +1,71 @@
+{
+  "contractNo": "HT-2024-001",
+  "contractName": "办公设备采购合同",
+  "contractType": "采购合同",
+  "oldVersion": {
+    "version": "V1.0",
+    "partyA": {
+      "name": "北京科技发展有限公司"
+    },
+    "partyB": {
+      "name": "上海设备供应商有限公司"
+    },
+    "amount": {
+      "total": "580000.00"
+    },
+    "term": {
+      "startDate": "2024-01-01",
+      "endDate": "2024-12-31"
+    },
+    "payment": {
+      "terms": "分期付款"
+    },
+    "project": {
+      "name": "2024年度办公设备更新项目"
+    },
+    "attachments": [
+      { "name": "营业执照" },
+      { "name": "授权委托书" },
+      { "name": "报价单" }
+    ],
+    "signatures": [
+      { "positionId": "partyA_seal", "page": 5 },
+      { "positionId": "partyB_seal", "page": 5 },
+      { "positionId": "partyA_sign", "page": 5 },
+      { "positionId": "partyB_sign", "page": 5 }
+    ]
+  },
+  "newVersion": {
+    "version": "V1.1",
+    "partyA": {
+      "name": "北京科技发展有限公司"
+    },
+    "partyB": {
+      "name": "上海设备供应商有限公司"
+    },
+    "amount": {
+      "total": "580000.00"
+    },
+    "term": {
+      "startDate": "2024-01-01",
+      "endDate": "2024-12-31"
+    },
+    "payment": {
+      "terms": "分期付款"
+    },
+    "project": {
+      "name": "2024年度办公设备更新项目"
+    },
+    "attachments": [
+      { "name": "营业执照" },
+      { "name": "授权委托书" },
+      { "name": "报价单" }
+    ],
+    "signatures": [
+      { "positionId": "partyA_seal", "page": 5 },
+      { "positionId": "partyB_seal", "page": 5 },
+      { "positionId": "partyA_sign", "page": 5 },
+      { "positionId": "partyB_sign", "page": 5 }
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "contractNo": "HT-2024-003",
+  "contractName": "IT运维服务合同",
+  "contractType": "服务合同",
+  "oldVersion": {
+    "version": "V3.0",
+    "partyA": {
+      "name": "杭州互联网科技有限公司"
+    },
+    "partyB": {
+      "name": "南京运维服务有限公司"
+    },
+    "amount": {
+      "total": "360000.00"
+    },
+    "term": {
+      "startDate": "2024-01-15",
+      "endDate": "2025-01-14"
+    },
+    "payment": {
+      "terms": "季度付款"
+    },
+    "project": {
+      "name": "全年IT系统运维项目"
+    },
+    "attachments": [
+      { "name": "营业执照" },
+      { "name": "授权委托书" },
+      { "name": "报价单" },
+      { "name": "技术方案" }
+    ],
+    "signatures": [
+      { "positionId": "partyA_seal", "page": 4 },
+      { "positionId": "partyB_seal", "page": 4 },
+      { "positionId": "partyA_sign", "page": 4 },
+      { "positionId": "partyB_sign", "page": 4 }
+    ]
+  },
+  "newVersion": {
+    "version": "V3.1",
+    "partyA": {
+      "name": "杭州互联网科技有限公司"
+    },
+    "partyB": {
+      "name": "南京运维服务有限公司"
+    },
+    "amount": {
+      "total": "360000.00"
+    },
+    "term": {
+      "startDate": "2024-01-15",
+      "endDate": "2025-01-14"
+    },
+    "payment": {
+      "terms": "季度付款"
+    },
+    "project": {
+      "name": "全年IT系统运维项目"
+    },
+    "attachments": [
+      { "name": "营业执照" }
+    ],
+    "signatures": [
+      { "positionId": "partyA_seal", "page": 4 },
+      { "positionId": "partyB_seal", "page": 4 },
+      { "positionId": "partyA_sign", "page": 4 },
+      { "positionId": "partyB_sign", "page": 4 }
+    ]
+  }
+}

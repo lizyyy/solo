@@ -1,0 +1,66 @@
+version: "1.0"
+description: "合同版本目录重签版本比对规则配置"
+
+contractTypes:
+  - id: "purchase"
+    name: "采购合同"
+  - id: "sales"
+    name: "销售合同"
+  - id: "service"
+    name: "服务合同"
+  - id: "lease"
+    name: "租赁合同"
+
+comparisonRules:
+  - field: "partyA.name"
+    name: "甲方名称"
+    severity: "high"
+  - field: "partyB.name"
+    name: "乙方名称"
+    severity: "high"
+  - field: "amount.total"
+    name: "合同总金额"
+    severity: "high"
+  - field: "term.startDate"
+    name: "合同起始日期"
+    severity: "medium"
+  - field: "term.endDate"
+    name: "合同结束日期"
+    severity: "medium"
+  - field: "payment.terms"
+    name: "付款方式"
+    severity: "medium"
+  - field: "project.name"
+    name: "项目名称"
+    severity: "low"
+
+attachmentRules:
+  required:
+    - name: "营业执照"
+      description: "双方营业执照复印件"
+      required: true
+      severity: "high"
+    - name: "授权委托书"
+      description: "法定代表人授权委托书"
+      required: true
+      severity: "high"
+    - name: "报价单"
+      description: "详细报价清单"
+      required: true
+      severity: "medium"
+    - name: "技术方案"
+      description: "技术实施方案文档"
+      required: false
+      severity: "low"
+
+signatureRules:
+  positions:
+    - id: "partyA_seal"
+      name: "甲方签章"
+    - id: "partyB_seal"
+      name: "乙方签章"
+    - id: "partyA_sign"
+      name: "甲方法人签字"
+    - id: "partyB_sign"
+      name: "乙方法人签字"
+  tolerance: 1

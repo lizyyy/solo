@@ -1,0 +1,71 @@
+{
+  "contractNo": "HT-2024-002",
+  "contractName": "产品销售代理合同",
+  "contractType": "销售合同",
+  "oldVersion": {
+    "version": "V2.0",
+    "partyA": {
+      "name": "广州制造集团有限公司"
+    },
+    "partyB": {
+      "name": "深圳代理有限公司"
+    },
+    "amount": {
+      "total": "1200000.00"
+    },
+    "term": {
+      "startDate": "2024-03-01",
+      "endDate": "2025-02-28"
+    },
+    "payment": {
+      "terms": "月结30天"
+    },
+    "project": {
+      "name": "华南区总代理项目"
+    },
+    "attachments": [
+      { "name": "营业执照" },
+      { "name": "授权委托书" },
+      { "name": "报价单" }
+    ],
+    "signatures": [
+      { "positionId": "partyA_seal", "page": 6 },
+      { "positionId": "partyB_seal", "page": 6 },
+      { "positionId": "partyA_sign", "page": 6 },
+      { "positionId": "partyB_sign", "page": 6 }
+    ]
+  },
+  "newVersion": {
+    "version": "V2.1",
+    "partyA": {
+      "name": "广州制造集团有限公司"
+    },
+    "partyB": {
+      "name": "深圳代理有限公司"
+    },
+    "amount": {
+      "total": "1500000.00"
+    },
+    "term": {
+      "startDate": "2024-03-01",
+      "endDate": "2025-05-31"
+    },
+    "payment": {
+      "terms": "月结60天"
+    },
+    "project": {
+      "name": "华南区总代理项目"
+    },
+    "attachments": [
+      { "name": "营业执照" },
+      { "name": "授权委托书" },
+      { "name": "报价单" }
+    ],
+    "signatures": [
+      { "positionId": "partyA_seal", "page": 6 },
+      { "positionId": "partyB_seal", "page": 6 },
+      { "positionId": "partyA_sign", "page": 6 },
+      { "positionId": "partyB_sign", "page": 6 }
+    ]
+  }
+}

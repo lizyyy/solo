@@ -1,0 +1,71 @@
+{
+  "contractNo": "HT-2024-004",
+  "contractName": "办公楼租赁合同",
+  "contractType": "租赁合同",
+  "oldVersion": {
+    "version": "V4.0",
+    "partyA": {
+      "name": "成都地产开发有限公司"
+    },
+    "partyB": {
+      "name": "重庆企业管理咨询有限公司"
+    },
+    "amount": {
+      "total": "840000.00"
+    },
+    "term": {
+      "startDate": "2024-02-01",
+      "endDate": "2026-01-31"
+    },
+    "payment": {
+      "terms": "半年付款"
+    },
+    "project": {
+      "name": "总部办公楼租赁项目"
+    },
+    "attachments": [
+      { "name": "营业执照" },
+      { "name": "授权委托书" },
+      { "name": "报价单" }
+    ],
+    "signatures": [
+      { "positionId": "partyA_seal", "page": 8 },
+      { "positionId": "partyB_seal", "page": 8 },
+      { "positionId": "partyA_sign", "page": 8 },
+      { "positionId": "partyB_sign", "page": 8 }
+    ]
+  },
+  "newVersion": {
+    "version": "V4.1",
+    "partyA": {
+      "name": "成都地产开发有限公司"
+    },
+    "partyB": {
+      "name": "重庆企业管理咨询有限公司"
+    },
+    "amount": {
+      "total": "840000.00"
+    },
+    "term": {
+      "startDate": "2024-02-01",
+      "endDate": "2026-01-31"
+    },
+    "payment": {
+      "terms": "半年付款"
+    },
+    "project": {
+      "name": "总部办公楼租赁项目"
+    },
+    "attachments": [
+      { "name": "营业执照" },
+      { "name": "授权委托书" },
+      { "name": "报价单" }
+    ],
+    "signatures": [
+      { "positionId": "partyA_seal", "page": 10 },
+      { "positionId": "partyB_seal", "page": 10 },
+      { "positionId": "partyA_sign", "page": 10 },
+      { "positionId": "partyB_sign", "page": 10 }
+    ]
+  }
+}

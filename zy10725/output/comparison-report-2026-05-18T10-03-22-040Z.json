@@ -1,0 +1,120 @@
+{
+  "totalContracts": 5,
+  "matched": 1,
+  "differences": 1,
+  "missingAttachments": 1,
+  "signatureChanges": 1,
+  "errors": 1,
+  "contracts": [
+    {
+      "contractNo": "HT-2024-001",
+      "contractName": "办公设备采购合同",
+      "contractType": "采购合同",
+      "oldVersion": "V1.0",
+      "newVersion": "V1.1",
+      "status": "matched",
+      "differences": [],
+      "missingAttachments": [],
+      "signatureChanges": []
+    },
+    {
+      "contractNo": "HT-2024-002",
+      "contractName": "产品销售代理合同",
+      "contractType": "销售合同",
+      "oldVersion": "V2.0",
+      "newVersion": "V2.1",
+      "status": "difference",
+      "differences": [
+        {
+          "field": "amount.total",
+          "fieldName": "合同总金额",
+          "oldValue": "1200000.00",
+          "newValue": "1500000.00",
+          "severity": "high"
+        },
+        {
+          "field": "term.endDate",
+          "fieldName": "合同结束日期",
+          "oldValue": "2025-02-28",
+          "newValue": "2025-05-31",
+          "severity": "medium"
+        },
+        {
+          "field": "payment.terms",
+          "fieldName": "付款方式",
+          "oldValue": "月结30天",
+          "newValue": "月结60天",
+          "severity": "medium"
+        }
+      ],
+      "missingAttachments": [],
+      "signatureChanges": []
+    },
+    {
+      "contractNo": "HT-2024-003",
+      "contractName": "IT运维服务合同",
+      "contractType": "服务合同",
+      "oldVersion": "V3.0",
+      "newVersion": "V3.1",
+      "status": "missing_attachment",
+      "differences": [],
+      "missingAttachments": [
+        {
+          "name": "授权委托书",
+          "description": "法定代表人授权委托书",
+          "severity": "high"
+        },
+        {
+          "name": "报价单",
+          "description": "详细报价清单",
+          "severity": "medium"
+        }
+      ],
+      "signatureChanges": []
+    },
+    {
+      "contractNo": "HT-2024-004",
+      "contractName": "办公楼租赁合同",
+      "contractType": "租赁合同",
+      "oldVersion": "V4.0",
+      "newVersion": "V4.1",
+      "status": "signature_change",
+      "differences": [],
+      "missingAttachments": [],
+      "signatureChanges": [
+        {
+          "positionId": "partyA_seal",
+          "positionName": "甲方签章",
+          "oldPage": 8,
+          "newPage": 10
+        },
+        {
+          "positionId": "partyB_seal",
+          "positionName": "乙方签章",
+          "oldPage": 8,
+          "newPage": 10
+        },
+        {
+          "positionId": "partyA_sign",
+          "positionName": "甲方法人签字",
+          "oldPage": 8,
+          "newPage": 10
+        },
+        {
+          "positionId": "partyB_sign",
+          "positionName": "乙方法人签字",
+          "oldPage": 8,
+          "newPage": 10
+        }
+      ]
+    },
+    {
+      "contractNo": "HT-2024-005",
+      "contractName": "异常测试合同",
+      "contractType": "采购合同",
+      "status": "error",
+      "error": "缺少旧版本或新版本数据"
+    }
+  ],
+  "timestamp": "2026-05-18T10:03:22.039Z"
+}

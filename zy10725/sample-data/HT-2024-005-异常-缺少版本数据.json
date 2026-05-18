@@ -1,0 +1,28 @@
+{
+  "contractNo": "HT-2024-005",
+  "contractName": "异常测试合同",
+  "contractType": "采购合同",
+  "oldVersion": null,
+  "newVersion": {
+    "version": "V5.1",
+    "partyA": {
+      "name": "武汉科技有限公司"
+    },
+    "partyB": {
+      "name": "长沙供应商有限公司"
+    },
+    "amount": {
+      "total": "250000.00"
+    },
+    "term": {
+      "startDate": "2024-04-01",
+      "endDate": "2024-12-31"
+    },
+    "payment": {
+      "terms": "一次性付款"
+    },
+    "project": {
+      "name": "测试项目"
+    }
+  }
+}
