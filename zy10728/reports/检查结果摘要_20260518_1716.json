@@ -1,0 +1,25 @@
+{
+  "checkTime": "2026-05-18T10:16:59.844Z",
+  "statistics": {
+    "totalFiles": 3,
+    "totalSchedules": 12,
+    "totalDrivers": 9,
+    "totalVehicles": 9
+  },
+  "parseResult": {
+    "errors": 0,
+    "warnings": 4
+  },
+  "conflictResult": {
+    "total": 8,
+    "errors": 6,
+    "warnings": 2,
+    "driverConflicts": 4,
+    "vehicleConflicts": 4
+  },
+  "specialCases": {
+    "concurrentPosts": 2,
+    "maintenance": 1,
+    "crossDayShifts": 1
+  }
+}

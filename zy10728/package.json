@@ -1,0 +1,15 @@
+{
+  "name": "driver-schedule-conflict-checker",
+  "version": "1.0.0",
+  "description": "司机排班表换班冲突检查 CLI",
+  "main": "src/cli.js",
+  "type": "module",
+  "scripts": {
+    "check": "node src/cli.js",
+    "test": "node src/cli.js --samples"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "xlsx": "^0.18.5"
+  }
+}
