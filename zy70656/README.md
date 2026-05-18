@@ -4,6 +4,8 @@
 
 ## 功能特性
 
+- **真实目录扫描**：自动扫描指定目录下的票据影像文件（支持 JPG、PNG、PDF、TIFF、BMP 等格式）
+- **文件上传支持**：支持单个文件上传和批量文件上传
 - **文件名智能解析**：支持中文和英文多种命名规范，自动提取发票代码、发票号码、报销单号、金额
 - **报销单比对**：与报销明细表进行精确匹配
 - **重复检测**：基于发票代码+号码、金额等维度检测重复票据
@@ -12,6 +14,7 @@
 - **状态流转**：支持撤回、关闭等业务操作
 - **导出报告**：生成完整的归档报告
 - **审计日志**：所有异常路径保留原始输入、处理人、处理结论
+- **示例数据模式**：可选内置示例数据用于演示和测试
 
 ## 快速启动
 
@@ -39,15 +42,16 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 - 字段缺失票据
 - 金额不匹配票据
 
-## cURL 主流程示例
+## cURL 真实业务流程示例
 
-### 1. 创建影像目录并导入报销数据
+### 方式一：扫描真实票据目录（推荐生产环境使用）
 
 ```bash
-curl -X POST "http://localhost:8000/directories/" \
+curl -X POST "http://localhost:8000/directories/scan" \
   -H "Content-Type: application/json" \
   -d '{
-    "directory_path": "/invoices/2024/05",
+    "directory_path": "/data/invoices/2024/05",
+    "use_sample_data": false,
     "reimbursement_data": [
       {
         "reimbursement_id": "BX2024001",
@@ -69,34 +73,80 @@ curl -X POST "http://localhost:8000/directories/" \
   }'
 ```
 
-### 2. 执行匹配处理
+### 方式二：演示模式（使用内置示例数据）
+
+```bash
+curl -X POST "http://localhost:8000/directories/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "directory_path": "/demo/invoices",
+    "reimbursement_data": []
+  }'
+```
+
+### 方式三：批量上传票据文件
+
+```bash
+# 先创建目录
+curl -X POST "http://localhost:8000/directories/" \
+  -H "Content-Type: application/json" \
+  -d '{"directory_path": "/upload/invoices"}'
+
+# 批量上传多个票据文件
+curl -X POST "http://localhost:8000/directories/1/upload-batch" \
+  -F "files=@/path/to/invoice1.jpg" \
+  -F "files=@/path/to/invoice2.png" \
+  -F "files=@/path/to/invoice3.pdf"
+```
+
+### 方式四：导入文件名列表
+
+```bash
+curl -X POST "http://localhost:8000/directories/1/import-files" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "directory_id": 1,
+    "filenames": [
+      "BX2024001_发票代码123456789012_号码12345678_1500.00.jpg",
+      "报销单_BX2024002_87654321_2300.50.pdf"
+    ]
+  }'
+```
+
+### 执行匹配处理
 
 ```bash
 curl -X POST "http://localhost:8000/directories/1/process"
 ```
 
-### 3. 查看目录概览
+### 查看目录概览
 
 ```bash
 curl "http://localhost:8000/directories/1/overview"
 ```
 
-### 4. 查看匹配结果详情
+### 查看匹配结果详情
 
 ```bash
 curl "http://localhost:8000/directories/1/matching-results"
 ```
 
-### 5. 生成归档报告
+### 生成归档报告
 
 ```bash
-curl -X POST "http://localhost:8000/reports/?directory_id=1&generated_by=system"
+curl -X POST "http://localhost:8000/reports/?directory_id=1&generated_by=finance_user"
 ```
 
-### 6. 导出报告
+### 导出报告
 
 ```bash
 curl "http://localhost:8000/reports/1/export"
+```
+
+### 查看支持的文件格式
+
+```bash
+curl "http://localhost:8000/supported-formats"
 ```
 
 ## 冲突处理路径示例

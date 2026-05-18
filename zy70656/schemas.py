@@ -145,3 +145,17 @@ class DirectoryOverview(BaseModel):
     duplicate_count: int
     pending_count: int
     missing_count: int
+
+class InvoiceFileListRequest(BaseModel):
+    directory_id: int
+    filenames: List[str]
+
+class DirectoryScanRequest(BaseModel):
+    directory_path: str
+    use_sample_data: bool = False
+    reimbursement_data: Optional[List[dict]] = None
+
+class ScanResult(BaseModel):
+    directory_id: int
+    files_scanned: int
+    message: str

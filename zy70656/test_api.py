@@ -40,6 +40,7 @@ def cleanup():
 def test_create_directory():
     response = client.post(
         "/directories/",
+        params={"use_sample_data": True},
         json={
             "directory_path": "/test/invoices",
             "reimbursement_data": [
@@ -60,11 +61,55 @@ def test_create_directory():
     assert data["status"] == "parsing"
     assert "id" in data
 
-def test_process_matching():
+def test_create_directory_without_sample():
     response = client.post(
         "/directories/",
         json={
+            "directory_path": "/test/empty",
+            "reimbursement_data": []
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["directory_path"] == "/test/empty"
+    
+    response = client.get(f"/directories/{data['id']}/invoices")
+    invoices = response.json()
+    assert len(invoices) == 0
+
+def test_scan_and_create_directory():
+    response = client.post(
+        "/directories/scan",
+        json={
+            "directory_path": "/test/scan_test",
+            "use_sample_data": True,
+            "reimbursement_data": []
+        }
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["files_scanned"] == 5
+    assert "directory_id" in result
+
+def test_scan_nonexistent_directory():
+    response = client.post(
+        "/directories/scan",
+        json={
+            "directory_path": "/nonexistent/path/that/doesnt/exist",
+            "use_sample_data": False,
+            "reimbursement_data": []
+        }
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["files_scanned"] == 0
+
+def test_process_matching():
+    response = client.post(
+        "/directories/scan",
+        json={
             "directory_path": "/test/invoices2",
+            "use_sample_data": True,
             "reimbursement_data": [
                 {
                     "reimbursement_id": "BX2024001",
@@ -75,7 +120,7 @@ def test_process_matching():
             ]
         }
     )
-    directory_id = response.json()["id"]
+    directory_id = response.json()["directory_id"]
     
     response = client.post(f"/directories/{directory_id}/process")
     assert response.status_code == 200
@@ -83,13 +128,14 @@ def test_process_matching():
 
 def test_duplicate_detection():
     response = client.post(
-        "/directories/",
+        "/directories/scan",
         json={
             "directory_path": "/test/duplicate",
+            "use_sample_data": True,
             "reimbursement_data": []
         }
     )
-    directory_id = response.json()["id"]
+    directory_id = response.json()["directory_id"]
     
     client.post(f"/directories/{directory_id}/process")
     
@@ -101,13 +147,14 @@ def test_duplicate_detection():
 
 def test_missing_fields_detection():
     response = client.post(
-        "/directories/",
+        "/directories/scan",
         json={
             "directory_path": "/test/missing",
+            "use_sample_data": True,
             "reimbursement_data": []
         }
     )
-    directory_id = response.json()["id"]
+    directory_id = response.json()["directory_id"]
     
     client.post(f"/directories/{directory_id}/process")
     
@@ -117,15 +164,44 @@ def test_missing_fields_detection():
     has_missing = any(len(r["missing_fields"]) > 0 for r in results)
     assert has_missing, "应该检测到字段缺失"
 
-def test_manual_correction():
+def test_import_invoice_files():
     response = client.post(
         "/directories/",
         json={
-            "directory_path": "/test/correction",
+            "directory_path": "/test/import",
             "reimbursement_data": []
         }
     )
     directory_id = response.json()["id"]
+    
+    response = client.post(
+        f"/directories/{directory_id}/import-files",
+        json={
+            "directory_id": directory_id,
+            "filenames": [
+                "BX2024005_发票_999.99.jpg",
+                "报销单_BX2024006_1999.99.png"
+            ]
+        }
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["files_scanned"] == 2
+    
+    response = client.get(f"/directories/{directory_id}/invoices")
+    invoices = response.json()
+    assert len(invoices) == 2
+
+def test_manual_correction():
+    response = client.post(
+        "/directories/scan",
+        json={
+            "directory_path": "/test/correction",
+            "use_sample_data": True,
+            "reimbursement_data": []
+        }
+    )
+    directory_id = response.json()["directory_id"]
     
     response = client.get(f"/directories/{directory_id}/invoices")
     invoices = response.json()
@@ -151,13 +227,14 @@ def test_manual_correction():
 
 def test_audit_log():
     response = client.post(
-        "/directories/",
+        "/directories/scan",
         json={
             "directory_path": "/test/audit",
+            "use_sample_data": True,
             "reimbursement_data": []
         }
     )
-    directory_id = response.json()["id"]
+    directory_id = response.json()["directory_id"]
     
     response = client.get(f"/directories/{directory_id}/invoices")
     invoice_id = response.json()[0]["id"]
@@ -180,13 +257,14 @@ def test_audit_log():
 
 def test_withdraw_directory():
     response = client.post(
-        "/directories/",
+        "/directories/scan",
         json={
             "directory_path": "/test/withdraw",
+            "use_sample_data": True,
             "reimbursement_data": []
         }
     )
-    directory_id = response.json()["id"]
+    directory_id = response.json()["directory_id"]
     
     response = client.post(
         f"/directories/{directory_id}/withdraw",
@@ -203,13 +281,14 @@ def test_withdraw_directory():
 
 def test_close_directory():
     response = client.post(
-        "/directories/",
+        "/directories/scan",
         json={
             "directory_path": "/test/close",
+            "use_sample_data": True,
             "reimbursement_data": []
         }
     )
-    directory_id = response.json()["id"]
+    directory_id = response.json()["directory_id"]
     
     response = client.post(
         f"/directories/{directory_id}/close",
@@ -226,13 +305,14 @@ def test_close_directory():
 
 def test_generate_report():
     response = client.post(
-        "/directories/",
+        "/directories/scan",
         json={
             "directory_path": "/test/report",
+            "use_sample_data": True,
             "reimbursement_data": []
         }
     )
-    directory_id = response.json()["id"]
+    directory_id = response.json()["directory_id"]
     
     client.post(f"/directories/{directory_id}/process")
     
@@ -250,13 +330,14 @@ def test_generate_report():
 
 def test_export_report():
     response = client.post(
-        "/directories/",
+        "/directories/scan",
         json={
             "directory_path": "/test/export",
+            "use_sample_data": True,
             "reimbursement_data": []
         }
     )
-    directory_id = response.json()["id"]
+    directory_id = response.json()["directory_id"]
     
     client.post(f"/directories/{directory_id}/process")
     
@@ -275,13 +356,14 @@ def test_export_report():
 
 def test_directory_overview():
     response = client.post(
-        "/directories/",
+        "/directories/scan",
         json={
             "directory_path": "/test/overview",
+            "use_sample_data": True,
             "reimbursement_data": []
         }
     )
-    directory_id = response.json()["id"]
+    directory_id = response.json()["directory_id"]
     
     client.post(f"/directories/{directory_id}/process")
     
@@ -293,6 +375,21 @@ def test_directory_overview():
     assert "matched_count" in overview
     assert "duplicate_count" in overview
     assert "missing_count" in overview
+
+def test_supported_formats():
+    response = client.get("/supported-formats")
+    assert response.status_code == 200
+    data = response.json()
+    assert "supported_extensions" in data
+    assert ".jpg" in data["supported_extensions"]
+    assert ".pdf" in data["supported_extensions"]
+
+def test_upload_file_to_nonexistent_directory():
+    response = client.post(
+        "/directories/99999/upload",
+        files={"file": ("test.jpg", b"fake_image_content", "image/jpeg")}
+    )
+    assert response.status_code == 404
 
 def test_filename_parsing():
     from utils import parse_filename
