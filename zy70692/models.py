@@ -101,6 +101,21 @@ class ReminderRecord(Base):
     treatment_plan = relationship("TreatmentPlan", back_populates="reminder_records")
     schedule = relationship("DoctorSchedule")
     miss_record = relationship("MissedAppointment", uselist=False, back_populates="reminder_record")
+    status_histories = relationship("ReminderStatusHistory", back_populates="reminder_record", cascade="all, delete-orphan")
+
+
+class ReminderStatusHistory(Base):
+    __tablename__ = "reminder_status_histories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    reminder_record_id = Column(Integer, ForeignKey("reminder_records.id"), nullable=False)
+    from_status = Column(String(50))
+    to_status = Column(String(50), nullable=False)
+    changed_by = Column(String(100))
+    change_reason = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    reminder_record = relationship("ReminderRecord", back_populates="status_histories")
 
 
 class MissedAppointment(Base):

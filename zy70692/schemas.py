@@ -208,3 +208,27 @@ class ExportRequest(BaseModel):
     end_date: Optional[date] = None
     status: Optional[str] = None
     patient_id: Optional[int] = None
+
+
+class ReminderStatusHistoryBase(BaseModel):
+    reminder_record_id: int
+    from_status: Optional[str] = None
+    to_status: str
+    changed_by: Optional[str] = None
+    change_reason: Optional[str] = None
+
+
+class ReminderStatusHistoryCreate(ReminderStatusHistoryBase):
+    pass
+
+
+class ReminderStatusHistory(ReminderStatusHistoryBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ReminderRecordWithHistory(ReminderRecord):
+    status_histories: List[ReminderStatusHistory] = []

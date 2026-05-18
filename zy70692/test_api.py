@@ -256,11 +256,21 @@ def test_update_reminder_status():
     patient_id = patient_response.json()["id"]
     
     next_date = (date.today() + timedelta(days=3)).isoformat()
+    plan_response = client.post(
+        "/treatment-plans/",
+        json={
+            "patient_id": patient_id,
+            "treatment_name": "状态治疗",
+            "next_revisit_date": next_date
+        }
+    )
+    plan_id = plan_response.json()["id"]
+    
     reminder_response = client.post(
         "/reminders/",
         json={
             "patient_id": patient_id,
-            "treatment_plan_id": 1,
+            "treatment_plan_id": plan_id,
             "reminder_date": next_date,
             "status": "pending"
         }
@@ -284,11 +294,21 @@ def test_manual_correct_reminder():
     patient_id = patient_response.json()["id"]
     
     next_date = (date.today() + timedelta(days=3)).isoformat()
+    plan_response = client.post(
+        "/treatment-plans/",
+        json={
+            "patient_id": patient_id,
+            "treatment_name": "修正治疗",
+            "next_revisit_date": next_date
+        }
+    )
+    plan_id = plan_response.json()["id"]
+    
     reminder_response = client.post(
         "/reminders/",
         json={
             "patient_id": patient_id,
-            "treatment_plan_id": 1,
+            "treatment_plan_id": plan_id,
             "reminder_date": next_date,
             "status": "pending"
         }
@@ -318,11 +338,21 @@ def test_cancel_reminder():
     patient_id = patient_response.json()["id"]
     
     next_date = (date.today() + timedelta(days=3)).isoformat()
+    plan_response = client.post(
+        "/treatment-plans/",
+        json={
+            "patient_id": patient_id,
+            "treatment_name": "取消治疗",
+            "next_revisit_date": next_date
+        }
+    )
+    plan_id = plan_response.json()["id"]
+    
     reminder_response = client.post(
         "/reminders/",
         json={
             "patient_id": patient_id,
-            "treatment_plan_id": 1,
+            "treatment_plan_id": plan_id,
             "reminder_date": next_date,
             "status": "scheduled"
         }
@@ -346,11 +376,21 @@ def test_missed_appointment():
     patient_id = patient_response.json()["id"]
     
     today = date.today().isoformat()
+    plan_response = client.post(
+        "/treatment-plans/",
+        json={
+            "patient_id": patient_id,
+            "treatment_name": "爽约治疗",
+            "next_revisit_date": today
+        }
+    )
+    plan_id = plan_response.json()["id"]
+    
     reminder_response = client.post(
         "/reminders/",
         json={
             "patient_id": patient_id,
-            "treatment_plan_id": 1,
+            "treatment_plan_id": plan_id,
             "reminder_date": today,
             "status": "sent"
         }
@@ -379,11 +419,21 @@ def test_missed_appointment_via_status_update():
     patient_id = patient_response.json()["id"]
     
     today = date.today().isoformat()
+    plan_response = client.post(
+        "/treatment-plans/",
+        json={
+            "patient_id": patient_id,
+            "treatment_name": "状态爽约治疗",
+            "next_revisit_date": today
+        }
+    )
+    plan_id = plan_response.json()["id"]
+    
     reminder_response = client.post(
         "/reminders/",
         json={
             "patient_id": patient_id,
-            "treatment_plan_id": 1,
+            "treatment_plan_id": plan_id,
             "reminder_date": today,
             "status": "confirmed"
         }
@@ -546,6 +596,186 @@ def test_full_workflow():
     
     final_reminder = client.get(f"/reminders/{reminder_id}/")
     assert final_reminder.json()["status"] == "completed"
+
+
+def test_status_history_tracking():
+    patient_response = client.post(
+        "/patients/",
+        json={"name": "历史记录患者", "phone": "13900139200"}
+    )
+    patient_id = patient_response.json()["id"]
+    
+    doctor_response = client.post(
+        "/doctors/",
+        json={"name": "历史记录医生", "department": "口腔科"}
+    )
+    doctor_id = doctor_response.json()["id"]
+    
+    next_date = (date.today() + timedelta(days=3)).isoformat()
+    plan_response = client.post(
+        "/treatment-plans/",
+        json={
+            "patient_id": patient_id,
+            "doctor_id": doctor_id,
+            "treatment_name": "历史测试治疗",
+            "next_revisit_date": next_date
+        }
+    )
+    plan_id = plan_response.json()["id"]
+    
+    reminder_response = client.post(
+        "/reminders/",
+        json={
+            "patient_id": patient_id,
+            "treatment_plan_id": plan_id,
+            "reminder_date": next_date,
+            "status": "pending"
+        }
+    )
+    reminder_id = reminder_response.json()["id"]
+    
+    history_response = client.get(f"/reminders/{reminder_id}/history/")
+    assert history_response.status_code == 200
+    initial_history = history_response.json()
+    assert len(initial_history) >= 1
+    
+    client.patch(
+        f"/reminders/{reminder_id}/status/",
+        json={"status": "sent", "operator": "系统", "notes": "发送提醒"}
+    )
+    
+    client.patch(
+        f"/reminders/{reminder_id}/status/",
+        json={"status": "confirmed", "operator": "前台", "notes": "患者确认"}
+    )
+    
+    history_response = client.get(f"/reminders/{reminder_id}/history/")
+    assert history_response.status_code == 200
+    full_history = history_response.json()
+    assert len(full_history) >= 3
+    
+    reminder_with_history = client.get(f"/reminders/{reminder_id}/")
+    assert "status_histories" in reminder_with_history.json()
+
+
+def test_foreign_key_constraint():
+    next_date = (date.today() + timedelta(days=3)).isoformat()
+    
+    reminder_response = client.post(
+        "/reminders/",
+        json={
+            "patient_id": 999999,
+            "treatment_plan_id": 999999,
+            "reminder_date": next_date,
+            "status": "pending"
+        }
+    )
+    assert reminder_response.status_code == 400
+
+
+def test_export_all_types():
+    patient_response = client.post(
+        "/patients/",
+        json={"name": "导出测试患者", "phone": "13900139300"}
+    )
+    patient_id = patient_response.json()["id"]
+    
+    doctor_response = client.post(
+        "/doctors/",
+        json={"name": "导出测试医生", "department": "口腔科"}
+    )
+    doctor_id = doctor_response.json()["id"]
+    
+    next_date = (date.today() + timedelta(days=5)).isoformat()
+    plan_response = client.post(
+        "/treatment-plans/",
+        json={
+            "patient_id": patient_id,
+            "doctor_id": doctor_id,
+            "treatment_name": "导出测试治疗",
+            "next_revisit_date": next_date
+        }
+    )
+    plan_id = plan_response.json()["id"]
+    
+    reminder_response = client.post(
+        "/reminders/",
+        json={
+            "patient_id": patient_id,
+            "treatment_plan_id": plan_id,
+            "reminder_date": next_date,
+            "status": "pending"
+        }
+    )
+    reminder_id = reminder_response.json()["id"]
+    
+    client.patch(
+        f"/reminders/{reminder_id}/status/",
+        json={"status": "missed", "operator": "系统", "notes": "患者爽约"}
+    )
+    
+    client.post(
+        "/revisit-reports/",
+        json={
+            "patient_id": patient_id,
+            "report_date": next_date,
+            "doctor_name": "导出测试医生",
+            "diagnosis": "测试诊断",
+            "created_by": "导出测试医生"
+        }
+    )
+    
+    reminder_export = client.get("/export/reminders/", params={"format": "json"})
+    assert reminder_export.status_code == 200
+    assert "count" in reminder_export.json()
+    
+    missed_export = client.get("/export/missed-appointments/", params={"format": "json"})
+    assert missed_export.status_code == 200
+    assert "count" in missed_export.json()
+    
+    report_export = client.get("/export/revisit-reports/", params={"format": "json"})
+    assert report_export.status_code == 200
+    assert "count" in report_export.json()
+    
+    exception_export = client.get("/export/exceptions/", params={"format": "json"})
+    assert exception_export.status_code == 200
+    assert "count" in exception_export.json()
+    
+    reminder_csv = client.get("/export/reminders/", params={"format": "csv"})
+    assert reminder_csv.status_code == 200
+    
+    missed_csv = client.get("/export/missed-appointments/", params={"format": "csv"})
+    assert missed_csv.status_code == 200
+    
+    report_csv = client.get("/export/revisit-reports/", params={"format": "csv"})
+    assert report_csv.status_code == 200
+    
+    exception_csv = client.get("/export/exceptions/", params={"format": "csv"})
+    assert exception_csv.status_code == 200
+
+
+def test_association_validation():
+    invalid_plan_response = client.post(
+        "/treatment-plans/",
+        json={
+            "patient_id": 99999,
+            "treatment_name": "无效治疗计划",
+            "next_revisit_date": date.today().isoformat()
+        }
+    )
+    assert invalid_plan_response.status_code == 400
+    
+    invalid_schedule_response = client.post(
+        "/schedules/",
+        json={
+            "doctor_id": 99999,
+            "schedule_date": date.today().isoformat(),
+            "start_time": "10:00:00",
+            "end_time": "12:00:00",
+            "max_patients": 10
+        }
+    )
+    assert invalid_schedule_response.status_code == 400
 
 
 if __name__ == "__main__":

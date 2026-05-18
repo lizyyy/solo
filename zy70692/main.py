@@ -121,12 +121,20 @@ def read_reminders(
     return crud.get_reminder_records(db, patient_id=patient_id, status=status, start_date=start_date, end_date=end_date)
 
 
-@app.get("/reminders/{reminder_id}", response_model=schemas.ReminderRecord, tags=["提醒管理"])
+@app.get("/reminders/{reminder_id}", response_model=schemas.ReminderRecordWithHistory, tags=["提醒管理"])
 def read_reminder(reminder_id: int, db: Session = Depends(get_db)):
     db_reminder = crud.get_reminder_record(db, reminder_id=reminder_id)
     if db_reminder is None:
         raise HTTPException(status_code=404, detail="提醒记录不存在")
     return db_reminder
+
+
+@app.get("/reminders/{reminder_id}/history/", response_model=List[schemas.ReminderStatusHistory], tags=["提醒管理"])
+def read_reminder_status_history(reminder_id: int, db: Session = Depends(get_db)):
+    db_reminder = crud.get_reminder_record(db, reminder_id=reminder_id)
+    if db_reminder is None:
+        raise HTTPException(status_code=404, detail="提醒记录不存在")
+    return crud.get_reminder_status_history(db, reminder_id=reminder_id)
 
 
 @app.patch("/reminders/{reminder_id}/status/", response_model=schemas.ReminderRecord, tags=["提醒管理"])
@@ -202,6 +210,22 @@ def read_revisit_reports(
     return crud.get_revisit_reports(db, patient_id=patient_id, start_date=start_date, end_date=end_date)
 
 
+def export_data_with_format(data, filename_prefix):
+    format = "json"
+    if not data:
+        return {"data": [], "format": format, "count": 0}
+    
+    output = StringIO()
+    writer = csv.DictWriter(output, fieldnames=data[0].keys())
+    writer.writeheader()
+    writer.writerows(data)
+    csv_content = output.getvalue()
+    return JSONResponse(
+        content={"data": csv_content, "format": "csv"},
+        headers={"Content-Disposition": f"attachment; filename={filename_prefix}.csv"}
+    )
+
+
 @app.get("/export/reminders/", tags=["数据导出"])
 def export_reminders(
     start_date: Optional[date] = None,
@@ -214,16 +238,55 @@ def export_reminders(
     data = crud.export_reminder_data(db, start_date=start_date, end_date=end_date, status=status, patient_id=patient_id)
     
     if format == "csv":
-        output = StringIO()
-        if data:
-            writer = csv.DictWriter(output, fieldnames=data[0].keys())
-            writer.writeheader()
-            writer.writerows(data)
-        csv_content = output.getvalue()
-        return JSONResponse(
-            content={"data": csv_content, "format": "csv"},
-            headers={"Content-Disposition": "attachment; filename=reminders.csv"}
-        )
+        return export_data_with_format(data, "reminders")
+    
+    return {"data": data, "format": "json", "count": len(data)}
+
+
+@app.get("/export/missed-appointments/", tags=["数据导出"])
+def export_missed_appointments(
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    patient_id: Optional[int] = None,
+    format: str = "json",
+    db: Session = Depends(get_db)
+):
+    data = crud.export_missed_appointments(db, start_date=start_date, end_date=end_date, patient_id=patient_id)
+    
+    if format == "csv":
+        return export_data_with_format(data, "missed_appointments")
+    
+    return {"data": data, "format": "json", "count": len(data)}
+
+
+@app.get("/export/revisit-reports/", tags=["数据导出"])
+def export_revisit_reports(
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    patient_id: Optional[int] = None,
+    format: str = "json",
+    db: Session = Depends(get_db)
+):
+    data = crud.export_revisit_reports(db, start_date=start_date, end_date=end_date, patient_id=patient_id)
+    
+    if format == "csv":
+        return export_data_with_format(data, "revisit_reports")
+    
+    return {"data": data, "format": "json", "count": len(data)}
+
+
+@app.get("/export/exceptions/", tags=["数据导出"])
+def export_exceptions(
+    is_resolved: Optional[bool] = None,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    format: str = "json",
+    db: Session = Depends(get_db)
+):
+    data = crud.export_exception_logs(db, is_resolved=is_resolved, start_date=start_date, end_date=end_date)
+    
+    if format == "csv":
+        return export_data_with_format(data, "exception_logs")
     
     return {"data": data, "format": "json", "count": len(data)}
 
