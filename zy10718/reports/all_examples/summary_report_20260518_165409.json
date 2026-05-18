@@ -1,0 +1,261 @@
+{
+  "report_name": "广告消耗日志超投计划筛查汇总报告",
+  "report_version": "1.0",
+  "generated_at": "2026-05-18 16:54:09",
+  "exit_code": 1,
+  "exit_code_name": "PARTIAL_SUCCESS",
+  "overall_statistics": {
+    "total_records": 31,
+    "normal_records": 16,
+    "overspend_records": 9,
+    "delay_records": 6,
+    "has_parse_warnings": true,
+    "has_processing_issues": true
+  },
+  "overspend_summary": {
+    "total_overspend_amount": 68800.0,
+    "avg_overspend_ratio": 1.74,
+    "max_overspend_ratio": 2.1,
+    "affected_plans_count": 7,
+    "affected_platforms": [
+      "tencent",
+      "bytedance",
+      "alibaba",
+      "kuaishou",
+      "baidu"
+    ]
+  },
+  "delay_summary": {
+    "total_delay_hours": 640.0,
+    "avg_delay_hours": 106.7,
+    "max_delay_hours": 226.0,
+    "affected_plans_count": 6,
+    "affected_platforms": [
+      "tencent",
+      "bytedance",
+      "alibaba",
+      "kuaishou",
+      "baidu"
+    ]
+  },
+  "by_platform": {
+    "bytedance": {
+      "record_count": 10,
+      "total_cost": 132100.0,
+      "total_budget": 107000.0,
+      "avg_cost_budget_ratio": 1.23
+    },
+    "tencent": {
+      "record_count": 8,
+      "total_cost": 86600.0,
+      "total_budget": 77500.0,
+      "avg_cost_budget_ratio": 1.12
+    },
+    "alibaba": {
+      "record_count": 5,
+      "total_cost": 48500.0,
+      "total_budget": 39000.0,
+      "avg_cost_budget_ratio": 1.24
+    },
+    "baidu": {
+      "record_count": 4,
+      "total_cost": 19500.0,
+      "total_budget": 18000.0,
+      "avg_cost_budget_ratio": 1.08
+    },
+    "kuaishou": {
+      "record_count": 4,
+      "total_cost": 29600.0,
+      "total_budget": 29000.0,
+      "avg_cost_budget_ratio": 1.02
+    }
+  },
+  "by_date": {
+    "2024-01-15": {
+      "record_count": 5,
+      "total_cost": 29300.0,
+      "total_budget": 37000.0,
+      "avg_cost_budget_ratio": 0.79
+    },
+    "2024-01-16": {
+      "record_count": 3,
+      "total_cost": 22100.0,
+      "total_budget": 26000.0,
+      "avg_cost_budget_ratio": 0.85
+    },
+    "2024-06-18": {
+      "record_count": 2,
+      "total_cost": 37000.0,
+      "total_budget": 25000.0,
+      "avg_cost_budget_ratio": 1.48
+    },
+    "2024-06-19": {
+      "record_count": 2,
+      "total_cost": 35300.0,
+      "total_budget": 28000.0,
+      "avg_cost_budget_ratio": 1.26
+    },
+    "2024-06-20": {
+      "record_count": 2,
+      "total_cost": 5200.0,
+      "total_budget": 7000.0,
+      "avg_cost_budget_ratio": 0.74
+    },
+    "2024-11-11": {
+      "record_count": 5,
+      "total_cost": 84400.0,
+      "total_budget": 47000.0,
+      "avg_cost_budget_ratio": 1.8
+    },
+    "2024-11-12": {
+      "record_count": 4,
+      "total_cost": 46700.0,
+      "total_budget": 36000.0,
+      "avg_cost_budget_ratio": 1.3
+    },
+    "2024-12-30": {
+      "record_count": 1,
+      "total_cost": 9200.0,
+      "total_budget": 10000.0,
+      "avg_cost_budget_ratio": 0.92
+    },
+    "2024-12-31": {
+      "record_count": 2,
+      "total_cost": 19300.0,
+      "total_budget": 20000.0,
+      "avg_cost_budget_ratio": 0.96
+    },
+    "2025-01-01": {
+      "record_count": 1,
+      "total_cost": 7500.0,
+      "total_budget": 9000.0,
+      "avg_cost_budget_ratio": 0.83
+    },
+    "2025-01-02": {
+      "record_count": 1,
+      "total_cost": 6200.0,
+      "total_budget": 8000.0,
+      "avg_cost_budget_ratio": 0.78
+    },
+    "2025-01-03": {
+      "record_count": 1,
+      "total_cost": 5800.0,
+      "total_budget": 7000.0,
+      "avg_cost_budget_ratio": 0.83
+    },
+    "2025-01-04": {
+      "record_count": 2,
+      "total_cost": 8300.0,
+      "total_budget": 10500.0,
+      "avg_cost_budget_ratio": 0.79
+    }
+  },
+  "top_overspend_plans": [
+    {
+      "plan_id": "O002",
+      "plan_name": "年终盛典-全品类",
+      "platform": "tencent",
+      "total_overspend": 18000.0,
+      "max_overspend_ratio": 1.68,
+      "affected_days": 2
+    },
+    {
+      "plan_id": "O001",
+      "plan_name": "双11大促-爆款主推",
+      "platform": "bytedance",
+      "total_overspend": 14100.0,
+      "max_overspend_ratio": 1.85,
+      "affected_days": 2
+    },
+    {
+      "plan_id": "M001",
+      "plan_name": "618大促-主会场",
+      "platform": "bytedance",
+      "total_overspend": 13500.0,
+      "max_overspend_ratio": 1.9,
+      "affected_days": 1
+    },
+    {
+      "plan_id": "O003",
+      "plan_name": "黑五预热-跨境电商",
+      "platform": "alibaba",
+      "total_overspend": 8800.0,
+      "max_overspend_ratio": 2.1,
+      "affected_days": 1
+    },
+    {
+      "plan_id": "O005",
+      "plan_name": "新品首发-限量抢购",
+      "platform": "kuaishou",
+      "total_overspend": 5400.0,
+      "max_overspend_ratio": 1.6,
+      "affected_days": 1
+    },
+    {
+      "plan_id": "M003",
+      "plan_name": "618返场-特价专区",
+      "platform": "alibaba",
+      "total_overspend": 4500.0,
+      "max_overspend_ratio": 1.56,
+      "affected_days": 1
+    },
+    {
+      "plan_id": "O004",
+      "plan_name": "周年庆-品牌专场",
+      "platform": "baidu",
+      "total_overspend": 4500.0,
+      "max_overspend_ratio": 1.9,
+      "affected_days": 1
+    }
+  ],
+  "top_delay_plans": [
+    {
+      "plan_id": "D001",
+      "plan_name": "跨年活动-倒计时",
+      "platform": "bytedance",
+      "total_delay_hours": 226.0,
+      "max_delay_hours": 226.0,
+      "affected_days": 1
+    },
+    {
+      "plan_id": "D005",
+      "plan_name": "年货节返场",
+      "platform": "kuaishou",
+      "total_delay_hours": 111.0,
+      "max_delay_hours": 111.0,
+      "affected_days": 1
+    },
+    {
+      "plan_id": "D003",
+      "plan_name": "春节不打烊",
+      "platform": "alibaba",
+      "total_delay_hours": 84.0,
+      "max_delay_hours": 84.0,
+      "affected_days": 1
+    },
+    {
+      "plan_id": "M002",
+      "plan_name": "618大促-分会场",
+      "platform": "tencent",
+      "total_delay_hours": 82.0,
+      "max_delay_hours": 82.0,
+      "affected_days": 1
+    },
+    {
+      "plan_id": "D004",
+      "plan_name": "情人节预热",
+      "platform": "baidu",
+      "total_delay_hours": 81.0,
+      "max_delay_hours": 81.0,
+      "affected_days": 1
+    },
+    {
+      "plan_id": "D002",
+      "plan_name": "元旦促销-开门红",
+      "platform": "tencent",
+      "total_delay_hours": 56.0,
+      "max_delay_hours": 56.0,
+      "affected_days": 1
+    }
+  ]
+}

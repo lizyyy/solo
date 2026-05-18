@@ -1,0 +1,35 @@
+{
+  "report_name": "广告消耗日志超投计划筛查-超投详情报告",
+  "generated_at": "2026-05-18 16:53:40",
+  "total_overspend_records": 2,
+  "overspend_records": [
+    {
+      "type": "overspend",
+      "plan_id": "M001",
+      "plan_name": "618大促-主会场",
+      "platform": "bytedance",
+      "date": "2024-06-18",
+      "cost": 28500.0,
+      "budget": 15000.0,
+      "source_file": "ad_overspend_checker/examples/mixed_data.json",
+      "row_number": 1,
+      "overspend_ratio": 1.9,
+      "overspend_amount": 13500.0,
+      "validation_note": "消耗超预算 90.0%"
+    },
+    {
+      "type": "overspend",
+      "plan_id": "M003",
+      "plan_name": "618返场-特价专区",
+      "platform": "alibaba",
+      "date": "2024-06-19",
+      "cost": 12500.0,
+      "budget": 8000.0,
+      "source_file": "ad_overspend_checker/examples/mixed_data.json",
+      "row_number": 3,
+      "overspend_ratio": 1.56,
+      "overspend_amount": 4500.0,
+      "validation_note": "消耗超预算 56.2%"
+    }
+  ]
+}

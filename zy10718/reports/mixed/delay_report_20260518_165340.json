@@ -1,0 +1,21 @@
+{
+  "report_name": "广告消耗日志超投计划筛查-延迟回传详情报告",
+  "generated_at": "2026-05-18 16:53:40",
+  "total_delay_records": 1,
+  "delay_records": [
+    {
+      "type": "delay",
+      "plan_id": "M002",
+      "plan_name": "618大促-分会场",
+      "platform": "tencent",
+      "date": "2024-06-18",
+      "cost": 8500.0,
+      "budget": 10000.0,
+      "source_file": "ad_overspend_checker/examples/mixed_data.json",
+      "row_number": 2,
+      "delay_hours": 82.0,
+      "delay_days": 3.4,
+      "validation_note": "疑似延迟回传，报告时间比预期晚 82.0 小时"
+    }
+  ]
+}

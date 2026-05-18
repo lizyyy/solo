@@ -1,0 +1,37 @@
+{
+  "report_name": "广告消耗日志超投计划筛查-异常报告",
+  "generated_at": "2026-05-18 16:53:40",
+  "summary": {
+    "parse_warning_count": 4,
+    "processing_issue_count": 1
+  },
+  "parse_warnings": [
+    {
+      "file": "mixed_data.json",
+      "message": "行 4: 字段 'cost' 缺失或为空"
+    },
+    {
+      "file": "mixed_data.json",
+      "message": "行 4: 字段 'impressions' 缺失或为空"
+    },
+    {
+      "file": "mixed_data.json",
+      "message": "行 4: 字段 'clicks' 缺失或为空"
+    },
+    {
+      "file": "mixed_data.json",
+      "message": "行 4: budget字段格式错误，设置为0"
+    }
+  ],
+  "processing_issues": [
+    {
+      "type": "budget_change",
+      "plan_id": "M001",
+      "date": "2024-06-19",
+      "previous_budget": 15000.0,
+      "current_budget": 20000.0,
+      "file_path": "ad_overspend_checker/examples/mixed_data.json",
+      "message": "计划 M001 在 2024-06-19 发生预算变动: 15000.0 -> 20000.0"
+    }
+  ]
+}
