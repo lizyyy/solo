@@ -1,0 +1,38 @@
+维修备件小库备件采购规则配置
+================================
+
+默认口径说明:
+  1. 最小库存警戒线: 当前库存低于最小库存时触发采购建议
+  2. 最小包装量: 按供应商最小包装量向上取整计算实际采购量
+  3. 替代件: 有替代件时优先提示，可作为紧急备选方案
+  4. 可复跑: 输出文件带时间戳，重复执行不覆盖历史结果
+
+最小包装量规则:
+  default_min_package: 1
+  round_up: true
+  package_warning_threshold: 10
+
+替代件规则:
+  enable_alternative_check: true
+  show_alternative_details: true
+  alternative_warning_level: "warning"
+
+输出配置:
+  timestamp_format: "%Y%m%d_%H%M%S"
+  output_suffix: "_采购建议"
+  keep_history: true
+  max_history_files: 30
+
+验证规则:
+  required_columns:
+    - 备件编码
+    - 备件名称
+    - 数量
+    - 单位
+    - 最小库存
+    - 当前库存
+  optional_columns:
+    - 供应商
+    - 单价
+    - 最小包装量
+    - 替代件
