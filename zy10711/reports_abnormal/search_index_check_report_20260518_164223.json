@@ -1,0 +1,39 @@
+{
+  "reportName": "搜索索引任务重建窗口排查报告",
+  "generatedAt": "2026-05-18 16:42:23",
+  "summary": {
+    "totalTasks": 6,
+    "conflictCount": 10,
+    "delayCount": 1,
+    "crossDayCount": 1,
+    "failedRetryCount": 2,
+    "largeConcurrentCount": 3,
+    "exitCode": 31
+  },
+  "files": [
+    {
+      "fileName": "search_index_check_summary_20260518_164223.md",
+      "description": "排查总览报告：包含所有检查项的统计摘要和关键问题概览"
+    },
+    {
+      "fileName": "search_index_window_conflicts_20260518_164223.md",
+      "description": "窗口冲突详情报告：包含时间窗口重叠的任务对，及原始文件位置信息"
+    },
+    {
+      "fileName": "search_index_task_delays_20260518_164223.md",
+      "description": "任务拖延详情报告：包含超过阈值未开始的任务列表"
+    },
+    {
+      "fileName": "search_index_cross_day_20260518_164223.md",
+      "description": "跨天窗口报告：包含运行时间跨天的任务，需重点关注"
+    },
+    {
+      "fileName": "search_index_failed_retries_20260518_164223.md",
+      "description": "失败重试报告：包含正在重试的失败任务及重试次数"
+    },
+    {
+      "fileName": "search_index_large_concurrent_20260518_164223.md",
+      "description": "大索引并发报告：包含同时运行的大索引任务列表"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "TASK-101",
+    "indexName": "product_search_v3",
+    "shardId": 0,
+    "startTime": "2026-05-18 02:00:00",
+    "endTime": "2026-05-18 05:00:00",
+    "status": "running",
+    "retryCount": 0,
+    "isLargeIndex": true,
+    "sourceFile": "search_index_prod.conf",
+    "sourceLine": 45
+  },
+  {
+    "id": "TASK-102",
+    "indexName": "order_search_v3",
+    "shardId": 0,
+    "startTime": "2026-05-18 04:00:00",
+    "endTime": "2026-05-18 07:00:00",
+    "status": "running",
+    "retryCount": 0,
+    "isLargeIndex": true,
+    "sourceFile": "search_index_prod.conf",
+    "sourceLine": 52
+  },
+  {
+    "id": "TASK-103",
+    "indexName": "user_fulltext_index",
+    "shardId": 0,
+    "startTime": "2026-05-17 22:00:00",
+    "endTime": "2026-05-18 06:00:00",
+    "status": "running",
+    "retryCount": 0,
+    "isLargeIndex": false,
+    "sourceFile": "search_index_prod.conf",
+    "sourceLine": 59
+  },
+  {
+    "id": "TASK-104",
+    "indexName": "behavior_log_full",
+    "shardId": 0,
+    "startTime": "2026-05-18 00:00:00",
+    "endTime": "2026-05-18 08:00:00",
+    "status": "retrying",
+    "retryCount": 2,
+    "isLargeIndex": true,
+    "sourceFile": "search_index_prod.conf",
+    "sourceLine": 66
+  },
+  {
+    "id": "TASK-105",
+    "indexName": "realtime_click_stream",
+    "shardId": 0,
+    "startTime": "2026-05-17 08:00:00",
+    "endTime": "2026-05-17 10:00:00",
+    "status": "pending",
+    "retryCount": 0,
+    "isLargeIndex": false,
+    "sourceFile": "search_index_prod.conf",
+    "sourceLine": 73
+  },
+  {
+    "id": "TASK-106",
+    "indexName": "transaction_history",
+    "shardId": 0,
+    "startTime": "2026-05-18 03:00:00",
+    "endTime": "2026-05-18 06:00:00",
+    "status": "retrying",
+    "retryCount": 3,
+    "isLargeIndex": false,
+    "sourceFile": "search_index_prod.conf",
+    "sourceLine": 80
+  }
+]

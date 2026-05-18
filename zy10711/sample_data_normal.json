@@ -1,0 +1,50 @@
+[
+  {
+    "id": "TASK-001",
+    "indexName": "product_search_v2",
+    "shardId": 0,
+    "startTime": "2026-05-18 02:00:00",
+    "endTime": "2026-05-18 04:00:00",
+    "status": "success",
+    "retryCount": 0,
+    "isLargeIndex": false,
+    "sourceFile": "search_index_schedule.conf",
+    "sourceLine": 15
+  },
+  {
+    "id": "TASK-002",
+    "indexName": "order_search_v2",
+    "shardId": 0,
+    "startTime": "2026-05-18 04:30:00",
+    "endTime": "2026-05-18 06:00:00",
+    "status": "success",
+    "retryCount": 0,
+    "isLargeIndex": false,
+    "sourceFile": "search_index_schedule.conf",
+    "sourceLine": 22
+  },
+  {
+    "id": "TASK-003",
+    "indexName": "user_profile_v2",
+    "shardId": 0,
+    "startTime": "2026-05-18 06:30:00",
+    "endTime": "2026-05-18 08:00:00",
+    "status": "running",
+    "retryCount": 0,
+    "isLargeIndex": false,
+    "sourceFile": "search_index_schedule.conf",
+    "sourceLine": 29
+  },
+  {
+    "id": "TASK-004",
+    "indexName": "log_analytics_daily",
+    "shardId": 0,
+    "startTime": "2026-05-18 08:30:00",
+    "endTime": "2026-05-18 10:00:00",
+    "status": "pending",
+    "retryCount": 0,
+    "isLargeIndex": false,
+    "sourceFile": "search_index_schedule.conf",
+    "sourceLine": 36
+  }
+]
