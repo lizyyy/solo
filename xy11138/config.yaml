@@ -1,0 +1,33 @@
+time_formats:
+  - "%Y-%m-%d %H:%M:%S"
+  - "%Y/%m/%d %H:%M"
+  - "%Y年%m月%d日 %H:%M"
+  - "%m/%d/%Y %H:%M"
+  - "%Y-%m-%dT%H:%M:%S"
+
+default_queue_rules:
+  priority_order:
+    - "VIP会员"
+    - "年卡会员"
+    - "月卡会员"
+    - "次卡会员"
+  max_queue_size: 20
+  allow_manual_insert: true
+  manual_insert_privilege:
+    - "VIP会员"
+    - "店长特批"
+
+output:
+  include_audit_trail: true
+  audit_trail_columns:
+    - "操作时间"
+    - "操作人"
+    - "操作类型"
+    - "变更前"
+    - "变更后"
+    - "备注"
+
+file_types:
+  - ".xlsx"
+  - ".csv"
+  - ".xls"
