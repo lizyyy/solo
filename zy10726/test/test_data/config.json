@@ -1,0 +1,31 @@
+{
+  "releaseStatusField": "释放状态",
+  "appointmentTimeField": "预约时间",
+  "releaseTimeField": "释放时间",
+  "refundTimeField": "退费时间",
+  "operationTypeField": "操作类型",
+  "patientIdField": "患者ID",
+  "appointmentIdField": "预约ID",
+  "doctorField": "医生",
+  "departmentField": "科室",
+  "unreleasedValues": [
+    "未释放",
+    "未退费",
+    "占用中"
+  ],
+  "falseReleasedValues": [
+    "已释放",
+    "已退费"
+  ],
+  "refundDelayThresholdHours": 24,
+  "manualRescheduleKeywords": [
+    "手工改约",
+    "人工改约",
+    "后台改约"
+  ],
+  "duplicateCheckFields": [
+    "患者ID",
+    "预约时间",
+    "医生"
+  ]
+}

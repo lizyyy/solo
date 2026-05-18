@@ -1,0 +1,27 @@
+{
+  "name": "check-appointment-release-review",
+  "version": "1.0.0",
+  "description": "检查预约数据号源释放复盘 CLI",
+  "main": "src/cli.js",
+  "bin": {
+    "appointment-review": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node test/run-test.js"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2",
+    "chalk": "^4.1.2",
+    "crypto": "^1.0.1"
+  },
+  "keywords": [
+    "appointment",
+    "review",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT"
+}
