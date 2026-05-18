@@ -1,0 +1,22 @@
+{
+  "name": "customer-service-transfer-stats",
+  "version": "1.0.0",
+  "description": "客服会话导出机器人转人工统计 CLI",
+  "main": "src/cli.js",
+  "type": "module",
+  "bin": {
+    "cs-stats": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "start": "node src/cli.js"
+  },
+  "keywords": ["customer-service", "statistics", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parse": "^5.5.0",
+    "csv-stringify": "^6.4.0"
+  }
+}
