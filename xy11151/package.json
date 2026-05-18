@@ -1,0 +1,26 @@
+{
+  "name": "exhibition-cost-collector",
+  "version": "1.0.0",
+  "description": "展会搭建队展会费用归集 CLI - 支持多文件输入、稳定识别临时加项和供应商返款",
+  "main": "src/index.js",
+  "bin": {
+    "exhibition-cost": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node tests/run-test.js",
+    "demo": "node src/cli.js examples/*.csv -o test-output.csv"
+  },
+  "keywords": [
+    "exhibition",
+    "cost",
+    "collection",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  }
+}
