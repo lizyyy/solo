@@ -1,0 +1,104 @@
+[
+  {
+    "tenantId": "tenant-A",
+    "apiPath": "/api/v1/users",
+    "totalHits": 4,
+    "hitRules": [
+      {
+        "ruleId": "RL-001",
+        "ruleName": "租户API调用限额-每分钟",
+        "ruleVersion": "v1.2.0",
+        "limitType": "tenant_per_minute",
+        "hitCount": 4,
+        "reasons": [
+          "返回429状态码; 限流剩余次数为0; 命中限流标记"
+        ]
+      },
+      {
+        "ruleId": "RL-002",
+        "ruleName": "全局API调用限额-每秒",
+        "ruleVersion": "v1.0.0",
+        "limitType": "global_per_second",
+        "hitCount": 4,
+        "reasons": [
+          "返回429状态码; 限流剩余次数为0; 命中限流标记"
+        ]
+      },
+      {
+        "ruleId": "RL-003",
+        "ruleName": "IP白名单外限流",
+        "ruleVersion": "v2.1.0",
+        "limitType": "ip_based",
+        "hitCount": 4,
+        "reasons": [
+          "返回429状态码; 限流剩余次数为0; 命中限流标记"
+        ]
+      }
+    ],
+    "timestamps": [
+      "2024-01-15T10:00:04.000Z",
+      "2024-01-15T10:00:05.000Z",
+      "2024-01-15T10:00:07.000Z",
+      "2024-01-15T10:00:09.000Z"
+    ],
+    "requestIds": [
+      "req-005",
+      "req-006",
+      "req-008",
+      "req-010"
+    ],
+    "timeRange": {
+      "firstHit": "2024-01-15T10:00:04.000Z",
+      "lastHit": "2024-01-15T10:00:09.000Z",
+      "durationMs": 5000
+    }
+  },
+  {
+    "tenantId": "tenant-B",
+    "apiPath": "/api/v1/products",
+    "totalHits": 1,
+    "hitRules": [
+      {
+        "ruleId": "RL-001",
+        "ruleName": "租户API调用限额-每分钟",
+        "ruleVersion": "v1.2.0",
+        "limitType": "tenant_per_minute",
+        "hitCount": 1,
+        "reasons": [
+          "返回429状态码; 限流剩余次数为0; 命中限流标记"
+        ]
+      },
+      {
+        "ruleId": "RL-002",
+        "ruleName": "全局API调用限额-每秒",
+        "ruleVersion": "v1.0.0",
+        "limitType": "global_per_second",
+        "hitCount": 1,
+        "reasons": [
+          "返回429状态码; 限流剩余次数为0; 命中限流标记"
+        ]
+      },
+      {
+        "ruleId": "RL-003",
+        "ruleName": "IP白名单外限流",
+        "ruleVersion": "v2.1.0",
+        "limitType": "ip_based",
+        "hitCount": 1,
+        "reasons": [
+          "返回429状态码; 限流剩余次数为0; 命中限流标记"
+        ]
+      }
+    ],
+    "timestamps": [
+      "2024-01-15T10:00:06.000Z"
+    ],
+    "requestIds": [
+      "req-007"
+    ],
+    "timeRange": {
+      "firstHit": "2024-01-15T10:00:06.000Z",
+      "lastHit": "2024-01-15T10:00:06.000Z",
+      "durationMs": 0
+    }
+  }
+]

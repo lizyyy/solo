@@ -1,0 +1,65 @@
+[
+  {
+    "timestamp": "2024-01-15T10:00:04.000Z",
+    "requestId": "req-005",
+    "tenantId": "tenant-A",
+    "apiPath": "/api/v1/users",
+    "statusCode": 429,
+    "primaryRuleName": "租户API调用限额-每分钟",
+    "primaryRuleReason": "返回429状态码; 限流剩余次数为0; 命中限流标记"
+  },
+  {
+    "timestamp": "2024-01-15T10:00:04.100Z",
+    "requestId": "req-005",
+    "tenantId": "tenant-A",
+    "apiPath": "/api/v1/users",
+    "statusCode": 429,
+    "primaryRuleName": "租户API调用限额-每分钟",
+    "primaryRuleReason": "返回429状态码; 限流剩余次数为0; 命中限流标记"
+  },
+  {
+    "timestamp": "2024-01-15T10:00:04.200Z",
+    "requestId": "req-005",
+    "tenantId": "tenant-A",
+    "apiPath": "/api/v1/users",
+    "statusCode": 429,
+    "primaryRuleName": "租户API调用限额-每分钟",
+    "primaryRuleReason": "返回429状态码; 限流剩余次数为0; 命中限流标记"
+  },
+  {
+    "timestamp": "2024-01-15T10:00:05.000Z",
+    "requestId": "req-006",
+    "tenantId": "tenant-A",
+    "apiPath": "/api/v1/users",
+    "statusCode": 429,
+    "primaryRuleName": "租户API调用限额-每分钟",
+    "primaryRuleReason": "返回429状态码; 限流剩余次数为0; 命中限流标记"
+  },
+  {
+    "timestamp": "2024-01-15T10:00:06.000Z",
+    "requestId": "req-007",
+    "tenantId": "tenant-B",
+    "apiPath": "/api/v1/products",
+    "statusCode": 429,
+    "primaryRuleName": "租户API调用限额-每分钟",
+    "primaryRuleReason": "返回429状态码; 限流剩余次数为0; 命中限流标记"
+  },
+  {
+    "timestamp": "2024-01-15T10:00:08.000Z",
+    "requestId": "req-009",
+    "tenantId": "tenant-A",
+    "apiPath": "/api/v1/users",
+    "statusCode": 429,
+    "primaryRuleName": "租户API调用限额-每分钟",
+    "primaryRuleReason": "返回429状态码; 限流剩余次数为0; 命中限流标记"
+  },
+  {
+    "timestamp": "2024-01-15T10:00:09.000Z",
+    "requestId": "req-010",
+    "tenantId": "tenant-A",
+    "apiPath": "/api/v1/users",
+    "statusCode": 429,
+    "primaryRuleName": "租户API调用限额-每分钟",
+    "primaryRuleReason": "返回429状态码; 限流剩余次数为0; 命中限流标记"
+  }
+]

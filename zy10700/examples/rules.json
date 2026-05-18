@@ -1,0 +1,28 @@
+{
+  "rateLimitRules": [
+    {
+      "id": "RL-001",
+      "name": "租户API调用限额-每分钟",
+      "version": "v1.2.0",
+      "limitType": "tenant_per_minute",
+      "threshold": 100,
+      "description": "每个租户每分钟最多100次调用"
+    },
+    {
+      "id": "RL-002",
+      "name": "全局API调用限额-每秒",
+      "version": "v1.0.0",
+      "limitType": "global_per_second",
+      "threshold": 1000,
+      "description": "全局每秒最多1000次调用"
+    },
+    {
+      "id": "RL-003",
+      "name": "IP白名单外限流",
+      "version": "v2.1.0",
+      "limitType": "ip_based",
+      "threshold": 50,
+      "description": "非白名单IP每分钟最多50次调用"
+    }
+  ]
+}

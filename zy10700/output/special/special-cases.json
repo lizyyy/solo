@@ -1,0 +1,51 @@
+{
+  "clockDrift": {
+    "detected": true,
+    "count": 2,
+    "cases": [
+      {
+        "index": 2,
+        "requestId": "req-003",
+        "previousTimestamp": "2024-01-15T10:00:01.000Z",
+        "currentTimestamp": "2024-01-15T09:59:00.000Z",
+        "driftMs": 61000,
+        "severity": "high"
+      },
+      {
+        "index": 9,
+        "requestId": "req-008",
+        "previousTimestamp": "2024-01-15T10:00:06.000Z",
+        "currentTimestamp": "2024-01-15T09:58:00.000Z",
+        "driftMs": 126000,
+        "severity": "high"
+      }
+    ]
+  },
+  "gatewayRetries": {
+    "detected": true,
+    "count": 1,
+    "cases": [
+      {
+        "requestId": "req-005",
+        "retryCount": 2,
+        "totalAttempts": 3,
+        "intervalsMs": [
+          100,
+          100
+        ],
+        "tenantId": "tenant-A",
+        "apiPath": "/api/v1/users",
+        "statusCodes": [
+          429,
+          429,
+          429
+        ]
+      }
+    ]
+  },
+  "ruleVersionMismatch": {
+    "detected": false,
+    "count": 0,
+    "cases": []
+  }
+}

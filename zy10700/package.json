@@ -1,0 +1,20 @@
+{
+  "name": "gateway-rate-limit-attribution-cli",
+  "version": "1.0.0",
+  "description": "网关访问日志限流命中归因 CLI",
+  "main": "src/cli.js",
+  "bin": {
+    "gateway-rate-limit-attribution": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["gateway", "rate-limit", "attribution", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}

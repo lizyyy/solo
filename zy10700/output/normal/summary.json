@@ -1,0 +1,34 @@
+{
+  "processingTime": "2026-05-18T01:48:36.658Z",
+  "totalLogs": 10,
+  "rateLimitHits": 5,
+  "hitRate": "50.00%",
+  "affectedTenants": 2,
+  "affectedApis": 2,
+  "topHits": [
+    {
+      "tenantId": "tenant-A",
+      "apiPath": "/api/v1/users",
+      "totalHits": 4
+    },
+    {
+      "tenantId": "tenant-B",
+      "apiPath": "/api/v1/products",
+      "totalHits": 1
+    }
+  ],
+  "specialCases": {
+    "clockDrift": {
+      "detected": false,
+      "count": 0
+    },
+    "gatewayRetries": {
+      "detected": false,
+      "count": 0
+    },
+    "ruleVersionMismatch": {
+      "detected": false,
+      "count": 0
+    }
+  }
+}

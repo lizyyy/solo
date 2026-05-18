@@ -1,0 +1,10 @@
+{"timestamp": "2024-01-15T10:00:00.000Z", "requestId": "req-001", "tenantId": "tenant-A", "apiPath": "/api/v1/users", "statusCode": 200, "responseHeaders": {"x-ratelimit-remaining": "95"}}
+{"timestamp": "2024-01-15T10:00:01.000Z", "requestId": "req-002", "tenantId": "tenant-A", "apiPath": "/api/v1/users", "statusCode": 200, "responseHeaders": {"x-ratelimit-remaining": "94"}}
+{"timestamp": "2024-01-15T10:00:02.000Z", "requestId": "req-003", "tenantId": "tenant-A", "apiPath": "/api/v1/orders", "statusCode": 200, "responseHeaders": {"x-ratelimit-remaining": "89"}}
+{"timestamp": "2024-01-15T10:00:03.000Z", "requestId": "req-004", "tenantId": "tenant-B", "apiPath": "/api/v1/products", "statusCode": 200, "responseHeaders": {"x-ratelimit-remaining": "100"}}
+{"timestamp": "2024-01-15T10:00:04.000Z", "requestId": "req-005", "tenantId": "tenant-A", "apiPath": "/api/v1/users", "statusCode": 429, "responseHeaders": {"x-ratelimit-remaining": "0", "x-ratelimit-hit": "true"}}
+{"timestamp": "2024-01-15T10:00:05.000Z", "requestId": "req-006", "tenantId": "tenant-A", "apiPath": "/api/v1/users", "statusCode": 429, "responseHeaders": {"x-ratelimit-remaining": "0", "x-ratelimit-hit": "true"}}
+{"timestamp": "2024-01-15T10:00:06.000Z", "requestId": "req-007", "tenantId": "tenant-B", "apiPath": "/api/v1/products", "statusCode": 429, "responseHeaders": {"x-ratelimit-remaining": "0", "x-ratelimit-hit": "true"}}
+{"timestamp": "2024-01-15T10:00:07.000Z", "requestId": "req-008", "tenantId": "tenant-A", "apiPath": "/api/v1/users", "statusCode": 429, "responseHeaders": {"x-ratelimit-remaining": "0", "x-ratelimit-hit": "true"}}
+{"timestamp": "2024-01-15T10:00:08.000Z", "requestId": "req-009", "tenantId": "tenant-C", "apiPath": "/api/v1/payments", "statusCode": 200, "responseHeaders": {"x-ratelimit-remaining": "45"}}
+{"timestamp": "2024-01-15T10:00:09.000Z", "requestId": "req-010", "tenantId": "tenant-A", "apiPath": "/api/v1/users", "statusCode": 429, "responseHeaders": {"x-ratelimit-remaining": "0", "x-ratelimit-hit": "true"}}

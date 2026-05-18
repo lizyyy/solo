@@ -1,0 +1,3 @@
+"tenantId","apiPath","totalHits","firstHit","lastHit","durationMs","hitRules"
+"tenant-A","/api/v1/users",6,"2024-01-15T10:00:04.000Z","2024-01-15T10:00:09.000Z",5000,"租户API调用限额-每分钟(6); 全局API调用限额-每秒(6); IP白名单外限流(6)"
+"tenant-B","/api/v1/products",1,"2024-01-15T10:00:06.000Z","2024-01-15T10:00:06.000Z",0,"租户API调用限额-每分钟(1); 全局API调用限额-每秒(1); IP白名单外限流(1)"
