@@ -1,0 +1,6 @@
+retention_period_days: 48
+holiday_file: config/holidays_2025.csv
+box_number_prefix: GD
+output_dir: output
+strict_mode: false
+duplicate_warning_only: true

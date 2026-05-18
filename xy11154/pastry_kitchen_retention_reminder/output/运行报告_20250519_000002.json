@@ -1,0 +1,150 @@
+{
+  "run_timestamp": "20250519_000002",
+  "source_file": "samples/脏数据.csv",
+  "statistics": {
+    "total_rows": 10,
+    "valid_records": 1,
+    "parse_errors": 6,
+    "duplicate_box_count": 1,
+    "pending_destruction_count": 0,
+    "overdue_destruction_count": 1
+  },
+  "pending_destruction": [],
+  "overdue_destruction": [
+    {
+      "box_number": "GD008",
+      "product_name": "曲奇饼干",
+      "production_date": "2025-03-08",
+      "batch_number": "P20250308001",
+      "operator": "赵师傅",
+      "destruction_date": "2025-05-20",
+      "actual_calendar_days": 73,
+      "skipped_count": 25,
+      "skipped_dates": [
+        {
+          "date": "2025-03-09",
+          "reason": "周日"
+        },
+        {
+          "date": "2025-03-15",
+          "reason": "周六"
+        },
+        {
+          "date": "2025-03-16",
+          "reason": "周日"
+        },
+        {
+          "date": "2025-03-22",
+          "reason": "周六"
+        },
+        {
+          "date": "2025-03-23",
+          "reason": "周日"
+        },
+        {
+          "date": "2025-03-29",
+          "reason": "周六"
+        },
+        {
+          "date": "2025-03-30",
+          "reason": "周日"
+        },
+        {
+          "date": "2025-04-04",
+          "reason": "清明节（节假日）"
+        },
+        {
+          "date": "2025-04-05",
+          "reason": "清明节（节假日）"
+        },
+        {
+          "date": "2025-04-06",
+          "reason": "清明节（节假日）"
+        },
+        {
+          "date": "2025-04-12",
+          "reason": "周六"
+        },
+        {
+          "date": "2025-04-13",
+          "reason": "周日"
+        },
+        {
+          "date": "2025-04-19",
+          "reason": "周六"
+        },
+        {
+          "date": "2025-04-20",
+          "reason": "周日"
+        },
+        {
+          "date": "2025-04-26",
+          "reason": "周六"
+        },
+        {
+          "date": "2025-04-27",
+          "reason": "周日"
+        },
+        {
+          "date": "2025-05-01",
+          "reason": "劳动节（节假日）"
+        },
+        {
+          "date": "2025-05-02",
+          "reason": "劳动节（节假日）"
+        },
+        {
+          "date": "2025-05-03",
+          "reason": "劳动节（节假日）"
+        },
+        {
+          "date": "2025-05-04",
+          "reason": "劳动节（节假日）"
+        },
+        {
+          "date": "2025-05-05",
+          "reason": "劳动节（节假日）"
+        },
+        {
+          "date": "2025-05-10",
+          "reason": "周六"
+        },
+        {
+          "date": "2025-05-11",
+          "reason": "周日"
+        },
+        {
+          "date": "2025-05-17",
+          "reason": "周六"
+        },
+        {
+          "date": "2025-05-18",
+          "reason": "周日"
+        }
+      ],
+      "remarks": ""
+    }
+  ],
+  "duplicate_boxes": {
+    "GD001": [
+      {
+        "box_number": "GD001",
+        "product_name": "蛋黄酥",
+        "production_date": "2025-03-01",
+        "batch_number": "P20250301001",
+        "operator": "张师傅",
+        "remarks": "",
+        "parse_errors": []
+      },
+      {
+        "box_number": "GD001",
+        "product_name": "绿豆糕",
+        "production_date": "2025-03-02",
+        "batch_number": "P20250302001",
+        "operator": "李师傅",
+        "remarks": "重复盒号GD001",
+        "parse_errors": []
+      }
+    ]
+  }
+}
