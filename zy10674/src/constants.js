@@ -1,0 +1,28 @@
+const TICKET_STATUS = {
+  TIMING: 'timing',
+  PAUSED: 'paused',
+  RESUMED: 'resumed',
+  TIMEOUT: 'timeout'
+};
+
+const PAUSE_REASON = {
+  CUSTOMER_INFO: 'customer_info',
+  THIRD_PARTY: 'third_party',
+  INTERNAL_APPROVAL: 'internal_approval',
+  SYSTEM_MAINTENANCE: 'system_maintenance',
+  OTHER: 'other'
+};
+
+const ERROR_CODES = {
+  TICKET_NOT_FOUND: 'TICKET_NOT_FOUND',
+  INVALID_STATUS_TRANSITION: 'INVALID_STATUS_TRANSITION',
+  DUPLICATE_PAUSE: 'DUPLICATE_PAUSE',
+  INVALID_INPUT: 'INVALID_INPUT',
+  CONFLICT_RECORD: 'CONFLICT_RECORD'
+};
+
+module.exports = {
+  TICKET_STATUS,
+  PAUSE_REASON,
+  ERROR_CODES
+};
