@@ -1,0 +1,106 @@
+rules:
+  version: "1.0"
+  description: "实验样本结果重测申请对照规则配置"
+
+match_fields:
+  sample_id:
+    - "样本编号"
+    - "SampleID"
+    - "样本ID"
+  test_item:
+    - "检测项目"
+    - "TestItem"
+    - "项目"
+  retest_reason:
+    - "重测原因"
+    - "Reason"
+    - "原因"
+
+result_columns:
+  required:
+    - "样本编号"
+    - "检测项目"
+    - "结果值"
+    - "检测时间"
+    - "仪器编号"
+  optional:
+    - "操作员"
+    - "审核状态"
+    - "备注"
+
+retest_order_columns:
+  required:
+    - "样本编号"
+    - "检测项目"
+    - "申请时间"
+    - "申请人"
+    - "重测原因"
+  optional:
+    - "优先级"
+    - "备注"
+
+instrument_log_columns:
+  required:
+    - "仪器编号"
+    - "样本编号"
+    - "检测项目"
+    - "开始时间"
+    - "结束时间"
+    - "状态"
+  optional:
+    - "错误代码"
+    - "错误信息"
+    - "操作员"
+
+coverage_rules:
+  original_result_retain:
+    enabled: true
+    description: "原结果保留规则"
+    conditions:
+      - "原结果状态为'已审核'"
+      - "重测原因为'结果异常'时必须保留原结果"
+    action: "保留原始结果，重测结果作为附加结果"
+
+  instrument_failure:
+    enabled: true
+    description: "仪器失败检测规则"
+    conditions:
+      - "仪器日志状态为'失败'"
+      - "错误代码非空"
+    action: "标记为仪器失败，需人工确认后重新申请"
+
+  sample_split:
+    enabled: true
+    description: "样本拆分规则"
+    conditions:
+      - "同一编号下有多个子样本（后缀-1,-2等）"
+      - "子样本检测项目不同"
+    action: "按子样本分别对照，独立判断覆盖性"
+
+failure_visible:
+  enabled: true
+  output_columns:
+    - "样本编号"
+    - "检测项目"
+    - "失败类型"
+    - "失败详情"
+    - "原始数据位置"
+  highlight: true
+  color: "red"
+
+output:
+  format: "xlsx"
+  columns:
+    - "样本编号"
+    - "检测项目"
+    - "原始结果"
+    - "原始结果时间"
+    - "重测申请时间"
+    - "重测原因"
+    - "仪器状态"
+    - "覆盖性检查"
+    - "覆盖结果"
+    - "备注"
+  success_value: "✓ 覆盖正确"
+  fail_value: "✗ 覆盖异常"
+  pending_value: "? 待确认"

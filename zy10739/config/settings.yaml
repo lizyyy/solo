@@ -1,0 +1,16 @@
+input:
+  sample_result_pattern: "*样本结果*.{xlsx,csv}"
+  retest_order_pattern: "*重测单*.{xlsx,csv}"
+  instrument_log_pattern: "*仪器日志*.{xlsx,csv}"
+  encoding: "utf-8"
+  sheet_name: 0
+
+validation:
+  check_duplicates: true
+  check_missing_columns: true
+  check_empty_rows: true
+  fail_fast: false
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"
