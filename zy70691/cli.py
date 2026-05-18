@@ -227,6 +227,8 @@ class FlowerSubscriptionCLI:
                     print(f"  - {issue}")
         if all_ok:
             print("所有数据一致性检查通过!")
+        else:
+            sys.exit(1)
 
     def cmd_report(self, args):
         if args.subscription_id not in self.subscriptions:
@@ -259,8 +261,9 @@ class FlowerSubscriptionCLI:
             if req.change_type == ChangeType.SWAP_FLOWER:
                 print(f"  换花: {', '.join(req.old_flower_ids)} -> {', '.join(req.new_flower_ids)}")
 
-    def run(self):
+    def run(self, args=None):
         parser = argparse.ArgumentParser(description="鲜花订阅换花差价暂停恢复排查CLI")
+        parser.add_argument("--data-file", default="data.json", help="数据文件路径 (默认: data.json)")
         subparsers = parser.add_subparsers(dest="command", help="可用命令")
         list_flowers = subparsers.add_parser("list-flowers", help="列出所有花材")
         list_flowers.set_defaults(func=self.cmd_list_flowers)
@@ -300,13 +303,20 @@ class FlowerSubscriptionCLI:
         report.add_argument("--output", help="输出JSON报告文件路径")
         report.add_argument("--verify", action="store_true", help="验证人机报告一致性")
         report.set_defaults(func=self.cmd_report)
-        args = parser.parse_args()
+        args = parser.parse_args(args)
         if args.command is None:
             parser.print_help()
             return
         args.func(args)
 
 
-if __name__ == "__main__":
-    cli = FlowerSubscriptionCLI()
+def main():
+    parser = argparse.ArgumentParser(description="鲜花订阅换花差价暂停恢复排查CLI", add_help=False)
+    parser.add_argument("--data-file", default="data.json", help="数据文件路径 (默认: data.json)")
+    known_args, _ = parser.parse_known_args()
+    cli = FlowerSubscriptionCLI(known_args.data_file)
     cli.run()
+
+
+if __name__ == "__main__":
+    main()

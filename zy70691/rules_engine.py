@@ -252,11 +252,13 @@ class BusinessRulesEngine:
                            schedules: List[DeliverySchedule]) -> Tuple[bool, List[str]]:
         issues = []
         sub_schedules = [s for s in schedules if s.subscription_id == subscription.subscription_id]
-        actual_flowers = set()
-        for sched in sub_schedules:
-            actual_flowers.update(sched.flower_ids)
-        if actual_flowers and actual_flowers != set(subscription.current_flower_ids):
-            issues.append(f"花材不一致: 订阅记录{set(subscription.current_flower_ids)} vs 配送表{actual_flowers}")
+        pending_schedules = [s for s in sub_schedules if s.status != "delivered"]
+        if pending_schedules:
+            actual_flowers = set()
+            for sched in pending_schedules:
+                actual_flowers.update(sched.flower_ids)
+            if actual_flowers and actual_flowers != set(subscription.current_flower_ids):
+                issues.append(f"花材不一致: 订阅记录{set(subscription.current_flower_ids)} vs 未配送计划{actual_flowers}")
         recorded_price = sum(
             pd.difference for pd in self.price_differences
             if pd.subscription_id == subscription.subscription_id

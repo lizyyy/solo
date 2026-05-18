@@ -4,7 +4,7 @@
       "flower_id": "F001",
       "name": "红玫瑰",
       "price": 29.9,
-      "current_stock": 100,
+      "current_stock": 101,
       "min_stock": 10,
       "supplier": "供应商A",
       "last_updated": "2026-05-18T07:36:24.337753"
@@ -22,7 +22,7 @@
       "flower_id": "F003",
       "name": "向日葵",
       "price": 18.5,
-      "current_stock": 80,
+      "current_stock": 79,
       "min_stock": 8,
       "supplier": "供应商A",
       "last_updated": "2026-05-18T07:36:24.337759"
@@ -55,10 +55,10 @@
       "end_date": "2024-12-31",
       "status": "active",
       "current_flower_ids": [
-        "F001",
-        "F002"
+        "F002",
+        "F003"
       ],
-      "total_price": 64.9,
+      "total_price": 53.5,
       "pause_history": [],
       "created_at": "2026-05-18T07:36:24.337762",
       "notes": ""
@@ -155,8 +155,8 @@
       "subscription_id": "SUB001",
       "delivery_date": "2024-06-05",
       "flower_ids": [
-        "F001",
-        "F002"
+        "F002",
+        "F003"
       ],
       "status": "scheduled",
       "actual_delivery_date": null,
@@ -169,8 +169,8 @@
       "subscription_id": "SUB001",
       "delivery_date": "2024-06-12",
       "flower_ids": [
-        "F001",
-        "F002"
+        "F002",
+        "F003"
       ],
       "status": "scheduled",
       "actual_delivery_date": null,
@@ -183,8 +183,8 @@
       "subscription_id": "SUB001",
       "delivery_date": "2024-06-19",
       "flower_ids": [
-        "F001",
-        "F002"
+        "F002",
+        "F003"
       ],
       "status": "scheduled",
       "actual_delivery_date": null,
@@ -197,8 +197,8 @@
       "subscription_id": "SUB001",
       "delivery_date": "2024-06-26",
       "flower_ids": [
-        "F001",
-        "F002"
+        "F002",
+        "F003"
       ],
       "status": "scheduled",
       "actual_delivery_date": null,
@@ -211,8 +211,8 @@
       "subscription_id": "SUB001",
       "delivery_date": "2024-07-03",
       "flower_ids": [
-        "F001",
-        "F002"
+        "F002",
+        "F003"
       ],
       "status": "scheduled",
       "actual_delivery_date": null,
@@ -286,8 +286,83 @@
       "notes": ""
     }
   ],
-  "change_requests": [],
-  "price_differences": [],
-  "inventory_logs": [],
-  "executed_requests": {}
+  "change_requests": [
+    {
+      "request_id": "303399e5-d4e6-49d7-b7d6-0993504abb3d",
+      "subscription_id": "SUB001",
+      "change_type": "swap_flower",
+      "request_date": "2026-05-19T06:24:23.813146",
+      "effective_date": "2024-05-15",
+      "old_flower_ids": [
+        "F001"
+      ],
+      "new_flower_ids": [
+        "F003"
+      ],
+      "pause_end_date": null,
+      "status": "executed",
+      "requested_by": "cli_user",
+      "notes": "",
+      "execution_order": 0
+    }
+  ],
+  "price_differences": [
+    {
+      "diff_id": "bf0a385a-c01b-4fbb-9f05-785f299cebce",
+      "subscription_id": "SUB001",
+      "change_request_id": "303399e5-d4e6-49d7-b7d6-0993504abb3d",
+      "old_price": 29.9,
+      "new_price": 18.5,
+      "difference": -11.4,
+      "adjustment_type": "downgrade",
+      "recorded_at": "2026-05-19T06:24:23.813180",
+      "billing_status": "pending"
+    }
+  ],
+  "inventory_logs": [
+    {
+      "log_id": "98f867b4-e32e-49ff-8944-45df8caca036",
+      "flower_id": "F001",
+      "change_type": "return",
+      "quantity_change": 1,
+      "previous_stock": 100,
+      "new_stock": 101,
+      "reason": "换花退回",
+      "related_request_id": "303399e5-d4e6-49d7-b7d6-0993504abb3d",
+      "timestamp": "2026-05-19T06:24:23.813168"
+    },
+    {
+      "log_id": "1f34bd11-54ee-410a-af62-45a5983c714b",
+      "flower_id": "F003",
+      "change_type": "allocate",
+      "quantity_change": -1,
+      "previous_stock": 80,
+      "new_stock": 79,
+      "reason": "换花分配",
+      "related_request_id": "303399e5-d4e6-49d7-b7d6-0993504abb3d",
+      "timestamp": "2026-05-19T06:24:23.813174"
+    }
+  ],
+  "executed_requests": {
+    "SUB001": [
+      {
+        "request_id": "303399e5-d4e6-49d7-b7d6-0993504abb3d",
+        "subscription_id": "SUB001",
+        "change_type": "swap_flower",
+        "request_date": "2026-05-19T06:24:23.813146",
+        "effective_date": "2024-05-15",
+        "old_flower_ids": [
+          "F001"
+        ],
+        "new_flower_ids": [
+          "F003"
+        ],
+        "pause_end_date": null,
+        "status": "executed",
+        "requested_by": "cli_user",
+        "notes": "",
+        "execution_order": 0
+      }
+    ]
+  }
 }
