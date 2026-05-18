@@ -1,0 +1,23 @@
+{
+  "name": "gym-private-class-transfer-api",
+  "version": "1.0.0",
+  "description": "健身私教馆私教课转让 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node src/scripts/initDb.js",
+    "test": "node src/scripts/testApi.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "joi": "^17.11.0",
+    "json2csv": "^5.0.7",
+    "uuid": "^9.0.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
