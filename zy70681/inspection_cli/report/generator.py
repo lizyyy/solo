@@ -20,21 +20,39 @@ class ReportGenerator:
         self.output_dir = Path(output_dir) if output_dir else Path.cwd() / "reports"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
+    def _calculate_content_hash(self, session: InspectionSession) -> str:
+        """计算会话内容的稳定哈希，确保相同内容产生相同哈希"""
+        content_parts = [
+            session.session_id,
+            *sorted(session.stores.keys()),
+            *sorted(session.items.keys()),
+            *sorted(session.tasks.keys()),
+            *sorted(session.rechecks.keys()),
+            *sorted(session.deductions.keys()),
+            *sorted(session.photos.keys()),
+            str(len(session.parsing_errors))
+        ]
+        return stable_hash("|".join(content_parts))[:12]
+
     def generate_full_report(
         self,
         session: InspectionSession,
         rule_result: RuleResult,
         photo_manager: PhotoManager,
-        format: str = "excel"
+        format: str = "excel",
+        stable_filename: bool = False
     ) -> str:
+        content_hash = self._calculate_content_hash(session)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        session_hash = stable_hash(session.session_id)[:8]
+
+        if stable_filename:
+            filename = f"inspection_report_{content_hash}.{format.lower()}"
+        else:
+            filename = f"inspection_report_{timestamp}_{content_hash}.{format.lower()}"
 
         if format.lower() == "json":
-            filename = f"inspection_report_{timestamp}_{session_hash}.json"
             return self._generate_json_report(session, rule_result, photo_manager, filename)
         else:
-            filename = f"inspection_report_{timestamp}_{session_hash}.xlsx"
             return self._generate_excel_report(session, rule_result, photo_manager, filename)
 
     def _generate_excel_report(
@@ -61,12 +79,13 @@ class ReportGenerator:
     def _write_summary_sheet(self, writer: pd.ExcelWriter, rule_result: RuleResult) -> None:
         summary = rule_result.summary
         data = []
-        for key, value in summary.items():
+        for key in sorted(summary.keys()):
+            value = summary[key]
             if isinstance(value, dict):
-                for sub_key, sub_value in value.items():
+                for sub_key in sorted(value.keys()):
                     data.append({
                         "项目": f"{key} - {sub_key}",
-                        "值": sub_value
+                        "值": value[sub_key]
                     })
             else:
                 data.append({
@@ -79,7 +98,8 @@ class ReportGenerator:
 
     def _write_store_scores_sheet(self, writer: pd.ExcelWriter, rule_result: RuleResult) -> None:
         data = []
-        for store_id, score in rule_result.store_scores.items():
+        for store_id in sorted(rule_result.store_scores.keys()):
+            score = rule_result.store_scores[store_id]
             data.append({
                 "门店编号": store_id,
                 "门店名称": score.store_name,
@@ -102,7 +122,8 @@ class ReportGenerator:
         rule_result: RuleResult
     ) -> None:
         data = []
-        for task_id, status in rule_result.task_statuses.items():
+        for task_id in sorted(rule_result.task_statuses.keys()):
+            status = rule_result.task_statuses[task_id]
             task = session.tasks.get(task_id)
             if not task:
                 continue
@@ -129,7 +150,8 @@ class ReportGenerator:
 
     def _write_rechecks_sheet(self, writer: pd.ExcelWriter, session: InspectionSession) -> None:
         data = []
-        for recheck in session.rechecks.values():
+        for recheck_id in sorted(session.rechecks.keys()):
+            recheck = session.rechecks[recheck_id]
             store = session.stores.get(recheck.store_id)
             store_name = store.store_name if store else recheck.store_id
 
@@ -150,7 +172,8 @@ class ReportGenerator:
 
     def _write_deductions_sheet(self, writer: pd.ExcelWriter, session: InspectionSession) -> None:
         data = []
-        for ded in session.deductions.values():
+        for ded_id in sorted(session.deductions.keys()):
+            ded = session.deductions[ded_id]
             store = session.stores.get(ded.store_id)
             store_name = store.store_name if store else ded.store_id
 
@@ -178,12 +201,13 @@ class ReportGenerator:
         photo_usage = photo_manager.get_photo_usage(session)
 
         data = []
-        for photo_id, result in photo_results.items():
+        for photo_id in sorted(photo_results.keys()):
+            result = photo_results[photo_id]
             photo = session.photos.get(photo_id)
             if not photo:
                 continue
 
-            usage = ", ".join(photo_usage.get(photo_id, []))
+            usage = ", ".join(sorted(photo_usage.get(photo_id, [])))
 
             data.append({
                 "照片编号": photo_id,
@@ -198,7 +222,7 @@ class ReportGenerator:
                 "文件哈希": result.file_hash or "",
                 "尺寸": f"{result.dimensions[0]}x{result.dimensions[1]}" if result.dimensions else "",
                 "使用位置": usage,
-                "错误信息": "; ".join(result.errors),
+                "错误信息": "; ".join(sorted(result.errors)),
                 "来源位置": str(photo.source_location) if photo.source_location else ""
             })
 
@@ -233,34 +257,38 @@ class ReportGenerator:
     ) -> str:
         file_path = self.output_dir / filename
 
+        summary = dict(sorted(rule_result.summary.items()))
+        store_scores = {
+            store_id: {
+                "store_name": score.store_name,
+                "total_score": score.total_score,
+                "max_score": score.max_score,
+                "percentage": score.percentage,
+                "deduction_points": score.deduction_points,
+                "final_score": score.final_score,
+                "pass_count": score.pass_count,
+                "fail_count": score.fail_count
+            }
+            for store_id in sorted(rule_result.store_scores.keys())
+        }
+        tasks = {
+            task_id: {
+                "current_status": status.current_status.value,
+                "recheck_count": status.recheck_count,
+                "last_recheck_result": status.last_recheck_result.value if status.last_recheck_result else None,
+                "has_photo_evidence": status.has_photo_evidence,
+                "is_overdue": status.is_overdue
+            }
+            for task_id in sorted(rule_result.task_statuses.keys())
+        }
+
         report_data = {
             "session_id": session.session_id,
-            "generated_at": datetime.now().isoformat(),
-            "summary": rule_result.summary,
-            "store_scores": {
-                store_id: {
-                    "store_name": score.store_name,
-                    "total_score": score.total_score,
-                    "max_score": score.max_score,
-                    "percentage": score.percentage,
-                    "deduction_points": score.deduction_points,
-                    "final_score": score.final_score,
-                    "pass_count": score.pass_count,
-                    "fail_count": score.fail_count
-                }
-                for store_id, score in rule_result.store_scores.items()
-            },
-            "tasks": {
-                task_id: {
-                    "current_status": status.current_status.value,
-                    "recheck_count": status.recheck_count,
-                    "last_recheck_result": status.last_recheck_result.value if status.last_recheck_result else None,
-                    "has_photo_evidence": status.has_photo_evidence,
-                    "is_overdue": status.is_overdue
-                }
-                for task_id, status in rule_result.task_statuses.items()
-            },
-            "warnings": rule_result.warnings,
+            "content_hash": self._calculate_content_hash(session),
+            "summary": summary,
+            "store_scores": store_scores,
+            "tasks": tasks,
+            "warnings": sorted(rule_result.warnings),
             "parsing_errors": [
                 {
                     "error_type": e.error_type,
@@ -273,7 +301,7 @@ class ReportGenerator:
         }
 
         with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(report_data, f, ensure_ascii=False, indent=2)
+            json.dump(report_data, f, ensure_ascii=False, indent=2, sort_keys=True)
 
         return str(file_path)
 

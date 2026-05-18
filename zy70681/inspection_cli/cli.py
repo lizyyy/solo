@@ -132,14 +132,14 @@ class InspectionCLI:
             for photo_id, result in invalid_photos:
                 click.echo(f"  [{photo_id}]: {'; '.join(result.errors)}")
 
-    def generate_report(self, format: str = "excel") -> None:
+    def generate_report(self, format: str = "excel", stable_filename: bool = False) -> None:
         if not self.session:
             click.echo("没有加载数据", err=True)
             return
 
         result = self.engine.apply_rules(self.session)
         report_path = self.report_generator.generate_full_report(
-            self.session, result, self.photo_manager, format
+            self.session, result, self.photo_manager, format, stable_filename
         )
 
         click.echo(f"\n报告已生成: {report_path}")
@@ -205,8 +205,9 @@ def summary(cli_instance: InspectionCLI, files):
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
 @click.option('--format', '-f', type=click.Choice(['excel', 'json']), default='excel', help='报告格式')
 @click.option('--output-dir', '-o', type=click.Path(), help='输出目录')
+@click.option('--stable-filename', '-s', is_flag=True, default=False, help='使用稳定文件名（不包含时间戳）')
 @pass_cli
-def report(cli_instance: InspectionCLI, files, format, output_dir):
+def report(cli_instance: InspectionCLI, files, format, output_dir, stable_filename):
     """生成完整的巡检报告"""
     if not files:
         click.echo("请指定要加载的文件", err=True)
@@ -217,7 +218,7 @@ def report(cli_instance: InspectionCLI, files, format, output_dir):
 
     cli_instance.load_files(list(files))
     cli_instance.print_summary()
-    cli_instance.generate_report(format)
+    cli_instance.generate_report(format, stable_filename)
 
 
 @cli.command(name="store-report")
