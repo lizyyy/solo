@@ -1,0 +1,44 @@
+photo_check:
+  exif_check:
+    enabled: true
+    required_fields:
+      - DateTimeOriginal
+      - GPSInfo
+      - Make
+      - Model
+    min_exif_warning: true
+    
+  duplicate_detection:
+    enabled: true
+    hash_method: dhash
+    similarity_threshold: 5
+    time_window_hours: 24
+    same_store_check: true
+    
+  store_relocation:
+    enabled: true
+    gps_tolerance_meters: 500
+    historical_days: 90
+    
+  output:
+    format: json
+    include_success: true
+    include_failed: true
+    stable_output: true
+    
+  stores:
+    - store_id: BJ-001
+      name: 便利店北京朝阳路店
+      expected_gps:
+        lat: 39.92
+        lng: 116.46
+    - store_id: SH-002
+      name: 便利店上海南京路店
+      expected_gps:
+        lat: 31.23
+        lng: 121.47
+    - store_id: GZ-003
+      name: 便利店广州天河路店
+      expected_gps:
+        lat: 23.13
+        lng: 113.33

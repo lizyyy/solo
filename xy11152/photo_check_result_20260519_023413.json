@@ -1,0 +1,537 @@
+{
+  "scan_time": "2026-05-19T02:34:13.821400",
+  "input_directory": "/Users/mac/pro/solo/workspaces/xy11152/test_photos",
+  "total_files": 9,
+  "processed_files": 9,
+  "failed_files": 0,
+  "photo_records": [
+    {
+      "filename": "BJ-001_counter_noexif.jpg",
+      "filepath": "test_photos/BJ-001_counter_noexif.jpg",
+      "file_size": 2527,
+      "store_id": "BJ-001",
+      "status": "success",
+      "error": null,
+      "image_hash": "0000000000000000",
+      "exif_data": {},
+      "exif_warnings": [
+        "EXIF数据完全缺失"
+      ],
+      "missing_exif_fields": [],
+      "has_exif": false
+    },
+    {
+      "filename": "BJ-001_entrance_20240515_143000.jpg",
+      "filepath": "test_photos/BJ-001_entrance_20240515_143000.jpg",
+      "file_size": 2749,
+      "store_id": "BJ-001",
+      "status": "success",
+      "error": null,
+      "image_hash": "0000000000000000",
+      "exif_data": {
+        "0th": {
+          "Make": "iPhone",
+          "Model": "iPhone 14",
+          "ExifTag": 79,
+          "GPSTag": 113
+        },
+        "Exif": {
+          "DateTimeOriginal": "2024:05:15 14:30:00"
+        },
+        "GPS": {
+          "latitude": 39.92,
+          "longitude": 116.46
+        },
+        "parsed_datetime": "2024-05-15T14:30:00"
+      },
+      "exif_warnings": [],
+      "missing_exif_fields": [],
+      "has_exif": true
+    },
+    {
+      "filename": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "filepath": "test_photos/BJ-001_entrance_dup_20240515_143001.jpg",
+      "file_size": 2749,
+      "store_id": "BJ-001",
+      "status": "success",
+      "error": null,
+      "image_hash": "0000000000000000",
+      "exif_data": {
+        "0th": {
+          "Make": "iPhone",
+          "Model": "iPhone 14",
+          "ExifTag": 79,
+          "GPSTag": 113
+        },
+        "Exif": {
+          "DateTimeOriginal": "2024:05:15 14:30:00"
+        },
+        "GPS": {
+          "latitude": 39.92,
+          "longitude": 116.46
+        },
+        "parsed_datetime": "2024-05-15T14:30:00"
+      },
+      "exif_warnings": [],
+      "missing_exif_fields": [],
+      "has_exif": true
+    },
+    {
+      "filename": "BJ-001_fridge_nogps.jpg",
+      "filepath": "test_photos/BJ-001_fridge_nogps.jpg",
+      "file_size": 2638,
+      "store_id": "BJ-001",
+      "status": "success",
+      "error": null,
+      "image_hash": "0000000000000000",
+      "exif_data": {
+        "0th": {
+          "Make": "iPhone",
+          "Model": "iPhone 14",
+          "ExifTag": 67
+        },
+        "Exif": {
+          "DateTimeOriginal": "2024:05:15 14:30:00"
+        },
+        "GPS": {},
+        "parsed_datetime": "2024-05-15T14:30:00"
+      },
+      "exif_warnings": [
+        "缺少必填EXIF字段: GPSInfo"
+      ],
+      "missing_exif_fields": [
+        "GPSInfo"
+      ],
+      "has_exif": true
+    },
+    {
+      "filename": "BJ-001_shelves_20240515_143005.jpg",
+      "filepath": "test_photos/BJ-001_shelves_20240515_143005.jpg",
+      "file_size": 2749,
+      "store_id": "BJ-001",
+      "status": "success",
+      "error": null,
+      "image_hash": "0000000000000000",
+      "exif_data": {
+        "0th": {
+          "Make": "iPhone",
+          "Model": "iPhone 14",
+          "ExifTag": 79,
+          "GPSTag": 113
+        },
+        "Exif": {
+          "DateTimeOriginal": "2024:05:15 14:30:00"
+        },
+        "GPS": {
+          "latitude": 39.92,
+          "longitude": 116.46
+        },
+        "parsed_datetime": "2024-05-15T14:30:00"
+      },
+      "exif_warnings": [],
+      "missing_exif_fields": [],
+      "has_exif": true
+    },
+    {
+      "filename": "GZ-003_corrupted.jpg",
+      "filepath": "test_photos/GZ-003_corrupted.jpg",
+      "file_size": 40,
+      "store_id": "GZ-003",
+      "status": "success",
+      "error": null,
+      "image_hash": null,
+      "exif_data": {},
+      "exif_warnings": [
+        "EXIF解析失败: cannot identify image file 'test_photos/GZ-003_corrupted.jpg'"
+      ],
+      "missing_exif_fields": [],
+      "has_exif": false
+    },
+    {
+      "filename": "SH-002_bad_location.jpg",
+      "filepath": "test_photos/SH-002_bad_location.jpg",
+      "file_size": 2748,
+      "store_id": "SH-002",
+      "status": "success",
+      "error": null,
+      "image_hash": "0000000000000000",
+      "exif_data": {
+        "0th": {
+          "Make": "iPhone",
+          "Model": "iPhone 14",
+          "ExifTag": 79,
+          "GPSTag": 113
+        },
+        "Exif": {
+          "DateTimeOriginal": "2024:05:15 14:30:00"
+        },
+        "GPS": {
+          "latitude": 49.92,
+          "longitude": 136.46
+        },
+        "parsed_datetime": "2024-05-15T14:30:00"
+      },
+      "exif_warnings": [],
+      "missing_exif_fields": [],
+      "has_exif": true
+    },
+    {
+      "filename": "SH-002_entry_20240515_100000.jpg",
+      "filepath": "test_photos/SH-002_entry_20240515_100000.jpg",
+      "file_size": 2749,
+      "store_id": "SH-002",
+      "status": "success",
+      "error": null,
+      "image_hash": "0000000000000000",
+      "exif_data": {
+        "0th": {
+          "Make": "iPhone",
+          "Model": "iPhone 14",
+          "ExifTag": 79,
+          "GPSTag": 113
+        },
+        "Exif": {
+          "DateTimeOriginal": "2024:05:15 14:30:00"
+        },
+        "GPS": {
+          "latitude": 31.92,
+          "longitude": 121.46
+        },
+        "parsed_datetime": "2024-05-15T14:30:00"
+      },
+      "exif_warnings": [],
+      "missing_exif_fields": [],
+      "has_exif": true
+    },
+    {
+      "filename": "UNKNOWN_unknown_store.jpg",
+      "filepath": "test_photos/UNKNOWN_unknown_store.jpg",
+      "file_size": 2749,
+      "store_id": null,
+      "status": "success",
+      "error": null,
+      "image_hash": "0000000000000000",
+      "exif_data": {
+        "0th": {
+          "Make": "iPhone",
+          "Model": "iPhone 14",
+          "ExifTag": 79,
+          "GPSTag": 113
+        },
+        "Exif": {
+          "DateTimeOriginal": "2024:05:15 14:30:00"
+        },
+        "GPS": {
+          "latitude": 39.92,
+          "longitude": 116.46
+        },
+        "parsed_datetime": "2024-05-15T14:30:00"
+      },
+      "exif_warnings": [],
+      "missing_exif_fields": [],
+      "has_exif": true
+    }
+  ],
+  "exif_issues": [
+    {
+      "filename": "BJ-001_counter_noexif.jpg",
+      "type": "exif_missing",
+      "severity": "high",
+      "description": "EXIF数据完全缺失"
+    },
+    {
+      "filename": "BJ-001_fridge_nogps.jpg",
+      "type": "exif_missing",
+      "severity": "high",
+      "description": "缺少必填EXIF字段: GPSInfo"
+    },
+    {
+      "filename": "GZ-003_corrupted.jpg",
+      "type": "exif_missing",
+      "severity": "high",
+      "description": "EXIF解析失败: cannot identify image file 'test_photos/GZ-003_corrupted.jpg'"
+    }
+  ],
+  "duplicate_issues": [
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_counter_noexif.jpg",
+      "photo2": "BJ-001_entrance_20240515_143000.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_entrance_20240515_143000.jpg 与 BJ-001_counter_noexif.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_counter_noexif.jpg",
+      "photo2": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_entrance_dup_20240515_143001.jpg 与 BJ-001_counter_noexif.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_entrance_20240515_143000.jpg",
+      "photo2": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_entrance_dup_20240515_143001.jpg 与 BJ-001_entrance_20240515_143000.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_counter_noexif.jpg",
+      "photo2": "BJ-001_fridge_nogps.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_fridge_nogps.jpg 与 BJ-001_counter_noexif.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_entrance_20240515_143000.jpg",
+      "photo2": "BJ-001_fridge_nogps.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_fridge_nogps.jpg 与 BJ-001_entrance_20240515_143000.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "photo2": "BJ-001_fridge_nogps.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_fridge_nogps.jpg 与 BJ-001_entrance_dup_20240515_143001.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_counter_noexif.jpg",
+      "photo2": "BJ-001_shelves_20240515_143005.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_shelves_20240515_143005.jpg 与 BJ-001_counter_noexif.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_entrance_20240515_143000.jpg",
+      "photo2": "BJ-001_shelves_20240515_143005.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_shelves_20240515_143005.jpg 与 BJ-001_entrance_20240515_143000.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "photo2": "BJ-001_shelves_20240515_143005.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_shelves_20240515_143005.jpg 与 BJ-001_entrance_dup_20240515_143001.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "BJ-001_fridge_nogps.jpg",
+      "photo2": "BJ-001_shelves_20240515_143005.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 0,
+      "description": "照片 BJ-001_shelves_20240515_143005.jpg 与 BJ-001_fridge_nogps.jpg 完全重复"
+    },
+    {
+      "type": "duplicate_photo",
+      "severity": "high",
+      "photo1": "SH-002_bad_location.jpg",
+      "photo2": "SH-002_entry_20240515_100000.jpg",
+      "store_id": "SH-002",
+      "similarity_score": 0,
+      "description": "照片 SH-002_entry_20240515_100000.jpg 与 SH-002_bad_location.jpg 完全重复"
+    }
+  ],
+  "similar_photo_issues": [
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_counter_noexif.jpg",
+      "photo2": "BJ-001_entrance_20240515_143000.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_counter_noexif.jpg",
+      "photo2": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_counter_noexif.jpg",
+      "photo2": "BJ-001_fridge_nogps.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_counter_noexif.jpg",
+      "photo2": "BJ-001_shelves_20240515_143005.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_entrance_20240515_143000.jpg",
+      "photo2": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_entrance_20240515_143000.jpg",
+      "photo2": "BJ-001_fridge_nogps.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_entrance_20240515_143000.jpg",
+      "photo2": "BJ-001_shelves_20240515_143005.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "photo2": "BJ-001_fridge_nogps.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "photo2": "BJ-001_shelves_20240515_143005.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "BJ-001_fridge_nogps.jpg",
+      "photo2": "BJ-001_shelves_20240515_143005.jpg",
+      "store_id": "BJ-001",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    },
+    {
+      "type": "similar_photo",
+      "severity": "medium",
+      "photo1": "SH-002_bad_location.jpg",
+      "photo2": "SH-002_entry_20240515_100000.jpg",
+      "store_id": "SH-002",
+      "similarity_score": 100,
+      "hash_distance": 0,
+      "description": "照片相似度约 100%，疑似重复拍摄"
+    }
+  ],
+  "relocation_issues": [
+    {
+      "filename": "SH-002_bad_location.jpg",
+      "store_id": "SH-002",
+      "type": "store_relocation",
+      "severity": "high",
+      "distance_meters": 2423269.15,
+      "warnings": [
+        "门店迁址检测：照片GPS位置与门店 SH-002 预期位置距离 2423269 米，超出容差 500 米"
+      ]
+    },
+    {
+      "filename": "SH-002_entry_20240515_100000.jpg",
+      "store_id": "SH-002",
+      "type": "store_relocation",
+      "severity": "high",
+      "distance_meters": 76730.35,
+      "warnings": [
+        "门店迁址检测：照片GPS位置与门店 SH-002 预期位置距离 76730 米，超出容差 500 米"
+      ]
+    }
+  ],
+  "time_issues": [
+    {
+      "type": "time_too_close",
+      "severity": "low",
+      "store_id": "BJ-001",
+      "photo1": "BJ-001_entrance_20240515_143000.jpg",
+      "photo2": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "description": "照片拍摄时间间隔过短（0.0秒），可能为连拍"
+    },
+    {
+      "type": "time_too_close",
+      "severity": "low",
+      "store_id": "BJ-001",
+      "photo1": "BJ-001_entrance_dup_20240515_143001.jpg",
+      "photo2": "BJ-001_fridge_nogps.jpg",
+      "description": "照片拍摄时间间隔过短（0.0秒），可能为连拍"
+    },
+    {
+      "type": "time_too_close",
+      "severity": "low",
+      "store_id": "BJ-001",
+      "photo1": "BJ-001_fridge_nogps.jpg",
+      "photo2": "BJ-001_shelves_20240515_143005.jpg",
+      "description": "照片拍摄时间间隔过短（0.0秒），可能为连拍"
+    },
+    {
+      "type": "time_too_close",
+      "severity": "low",
+      "store_id": "SH-002",
+      "photo1": "SH-002_bad_location.jpg",
+      "photo2": "SH-002_entry_20240515_100000.jpg",
+      "description": "照片拍摄时间间隔过短（0.0秒），可能为连拍"
+    }
+  ],
+  "summary": {
+    "total_files": 9,
+    "successfully_processed": 9,
+    "failed_to_process": 0,
+    "exif_missing_or_incomplete": 3,
+    "photos_with_valid_gps": 6,
+    "duplicate_photos_found": 11,
+    "similar_photos_found": 11,
+    "store_relocation_detected": 2,
+    "time_consistency_issues": 4,
+    "failed_files_list": [],
+    "failed_files_details": []
+  }
+}
