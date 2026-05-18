@@ -1,0 +1,21 @@
+{
+  "name": "outdoor-study-insurance-cli",
+  "version": "1.0.0",
+  "description": "户外研学机构研学保险名单CLI工具",
+  "main": "src/cli.js",
+  "bin": {
+    "户外研学机构研学保险名单": "./src/cli.js",
+    "insurance-list": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js",
+    "demo": "node src/cli.js --input data/sample-input.json --output data/output.json --summary"
+  },
+  "keywords": ["研学", "保险", "户外", "CLI"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  }
+}

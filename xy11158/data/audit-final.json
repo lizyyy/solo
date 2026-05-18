@@ -1,0 +1,58 @@
+[
+  {
+    "operation": "创建记录",
+    "details": "批量加载 6 条记录",
+    "operator": "cli-user",
+    "timestamp": "2026-05-18T19:49:55.829Z",
+    "idempotencyKey": null
+  },
+  {
+    "operation": "改队",
+    "recordId": "HWYX-20240501-002",
+    "participantName": "李华",
+    "oldValue": {
+      "teamId": "TEAM-A",
+      "teamName": "雄鹰队"
+    },
+    "newValue": {
+      "teamId": "TEAM-B",
+      "teamName": "雪豹队"
+    },
+    "reason": "",
+    "operator": "cli-user",
+    "timestamp": "2026-05-18T19:49:55.832Z",
+    "idempotencyKey": null
+  },
+  {
+    "operation": "退团",
+    "recordId": "HWYX-20240501-006",
+    "participantName": "刘洋",
+    "oldValue": {
+      "status": "已报名",
+      "insuranceStatus": "投保失败"
+    },
+    "newValue": {
+      "status": "已退团",
+      "insuranceStatus": "已退保"
+    },
+    "reason": "用户申请退团",
+    "operator": "cli-user",
+    "timestamp": "2026-05-18T19:49:55.833Z",
+    "idempotencyKey": null
+  },
+  {
+    "operation": "投保成功",
+    "recordId": "HWYX-20240501-001",
+    "participantName": "张明",
+    "oldValue": {
+      "insuranceStatus": "待投保"
+    },
+    "newValue": {
+      "insuranceStatus": "投保成功"
+    },
+    "reason": "",
+    "operator": "cli-user",
+    "timestamp": "2026-05-18T19:49:55.833Z",
+    "idempotencyKey": null
+  }
+]
