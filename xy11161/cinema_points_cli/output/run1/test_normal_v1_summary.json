@@ -1,0 +1,14 @@
+{
+  "run_id": "test_normal_v1",
+  "timestamp": "2026-05-19T02:55:29.746960",
+  "input_dir": "samples/normal_input",
+  "rules_file": "rules/default.json",
+  "statistics": {
+    "total_input": 8,
+    "valid": 8,
+    "refunds": 0,
+    "group_tickets": 0,
+    "duplicates": 0,
+    "errors": 0
+  }
+}

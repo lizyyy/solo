@@ -1,0 +1,14 @@
+{
+  "run_id": "test_dirty_v1",
+  "timestamp": "2026-05-19T02:55:37.035908",
+  "input_dir": "samples/dirty_input",
+  "rules_file": "rules/default.json",
+  "statistics": {
+    "total_input": 10,
+    "valid": 4,
+    "refunds": 3,
+    "group_tickets": 3,
+    "duplicates": 0,
+    "errors": 0
+  }
+}
