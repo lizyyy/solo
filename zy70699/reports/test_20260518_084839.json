@@ -1,0 +1,80 @@
+[
+  {
+    "batch_id": "B001",
+    "material_name": "一次性口腔检查包",
+    "sterilization_id": "S001",
+    "sterilization_date": "2026-04-18 08:47:02",
+    "sterilization_expiration": "2026-06-17 08:47:02",
+    "usage_id": "U001",
+    "usage_date": "2026-05-08 08:47:02",
+    "treatment_id": "T001",
+    "treatment_date": "2026-05-08 08:47:02",
+    "patient_id": "P001",
+    "patient_name": "张三",
+    "is_valid": true,
+    "anomalies": [],
+    "anomaly_details": [],
+    "quantity_used": 1
+  },
+  {
+    "batch_id": "B002",
+    "material_name": "牙科高速手机",
+    "sterilization_id": "S003",
+    "sterilization_date": "2026-05-13 08:47:02",
+    "sterilization_expiration": "2026-07-12 08:47:02",
+    "usage_id": "U002",
+    "usage_date": "2026-05-13 08:47:02",
+    "treatment_id": "T002",
+    "treatment_date": "2026-05-13 08:47:02",
+    "patient_id": "P002",
+    "patient_name": "李四",
+    "is_valid": true,
+    "anomalies": [],
+    "anomaly_details": [],
+    "quantity_used": 1
+  },
+  {
+    "batch_id": "B003",
+    "material_name": "一次性注射器",
+    "sterilization_id": null,
+    "sterilization_date": null,
+    "sterilization_expiration": null,
+    "usage_id": "U003",
+    "usage_date": "2026-05-23 08:47:02",
+    "treatment_id": "T003",
+    "treatment_date": "2026-05-23 08:47:02",
+    "patient_id": "P003",
+    "patient_name": "王五",
+    "is_valid": false,
+    "anomalies": [
+      "NOT_STERILIZED",
+      "FUTURE_USAGE"
+    ],
+    "anomaly_details": [
+      "该批次无任何灭菌记录",
+      "使用时间在未来: 2026-05-23 08:47:02"
+    ],
+    "quantity_used": 2
+  },
+  {
+    "batch_id": "B004",
+    "material_name": "拔牙钳",
+    "sterilization_id": null,
+    "sterilization_date": null,
+    "sterilization_expiration": null,
+    "usage_id": "U004",
+    "usage_date": "2026-05-08 08:47:02",
+    "treatment_id": "T001",
+    "treatment_date": "2026-05-08 08:47:02",
+    "patient_id": "P001",
+    "patient_name": "张三",
+    "is_valid": false,
+    "anomalies": [
+      "NOT_STERILIZED"
+    ],
+    "anomaly_details": [
+      "无有效灭菌记录: 共有 1 条灭菌记录，但使用时间 2026-05-08 08:47:02 不在任何灭菌有效期内"
+    ],
+    "quantity_used": 1
+  }
+]
