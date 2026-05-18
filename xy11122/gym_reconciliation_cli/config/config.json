@@ -1,0 +1,51 @@
+{
+  "required_columns": [
+    "交易日期",
+    "会员ID",
+    "会员姓名",
+    "课包ID",
+    "课包名称",
+    "课程类型",
+    "教练ID",
+    "教练姓名",
+    "消耗课时",
+    "剩余课时",
+    "交易类型",
+    "备注",
+    "操作人",
+    "门店ID"
+  ],
+  "transaction_types": [
+    "正常消课",
+    "赠课消耗",
+    "转让消课",
+    "课包冻结",
+    "课包解冻"
+  ],
+  "gift_course_keywords": [
+    "赠课",
+    "活动",
+    "奖励",
+    "节日"
+  ],
+  "transfer_keywords": [
+    "转让",
+    "转赠"
+  ],
+  "freeze_keywords": [
+    "冻结",
+    "解冻",
+    "请假",
+    "假期"
+  ],
+  "output_dir": "reports",
+  "continue_on_failure": true,
+  "deduplicate": true,
+  "encoding": "utf-8",
+  "default_values": {
+    "消耗课时": "0",
+    "剩余课时": "0",
+    "备注": "",
+    "操作人": "系统"
+  }
+}
