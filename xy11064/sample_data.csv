@@ -1,0 +1,9 @@
+deposit_no,student_name,student_phone,instrument_type,instrument_brand,instrument_model,instrument_serial,deposit_amount,rental_start_date,expected_return_date,actual_return_date,status,store,manager,string_condition,body_condition,damage_description,damage_type,deduction_amount,refund_amount,evidence_photos,notes
+DP1716000001,张明,13800138001,小提琴,雅马哈,YVN-100,Y2023001,2000.00,2024-01-15,2024-02-15,,active,朝阳门店,李老师,全新,完好,,,0,,,初学小提琴，每周六上课
+DP1716000002,王芳,13900139002,吉他,卡马,D1C,K2023045,1500.00,2024-01-20,2024-03-20,2024-03-18,completed,海淀门店,王老师,轻微磨损,有划痕,琴身有一处划痕，琴弦有一根生锈,normal_wear,50,1450,photo1.jpg,photo2.jpg,成人零基础班
+DP1716000003,李伟,13700137003,大提琴,星海,CX-100,X2023078,3000.00,2024-02-01,2024-05-01,,active,朝阳门店,赵老师,全新,完好,,,0,,,考级用大提琴，需小心使用
+DP1716000004,赵丽,13600136004,古筝,敦煌,694DQ,D2023112,2500.00,2024-02-10,2024-04-10,2024-04-08,completed,西城门店,周老师,完好,有磕碰,琴码损坏，琴身有磕碰,human_damage,300,2200,photo3.jpg,学生搬运时不慎摔倒
+DP1716000005,刘强,13500135005,萨克斯,雅马哈,YAS-280,S2023056,4000.00,2024-02-15,2024-06-15,,active,海淀门店,吴老师,全新,完好,,,0,,,高中乐队成员租用
+DP1716000006,孙雪,13400134006,钢琴,雅马哈,CSP-150,P2023034,8000.00,2024-02-20,2024-08-20,,active,朝阳门店,郑老师,全新,完好,,,0,,,家庭租用，按月付费
+DP1716000007,周宇,13300133007,小提琴,斯特拉迪瓦里,SV-100,V2023089,5000.00,2024-03-01,2024-04-01,2024-03-30,dispute,西城门店,冯老师,断裂,严重损坏,琴弓断裂，面板开裂,human_damage,2000,,photo4.jpg,学生练琴时 anger 摔坏，正在协商
+DP1716000008,吴桐,13200132008,吉他,马丁,D-28,M2023023,3500.00,2024-03-05,2024-05-05,,active,海淀门店,陈老师,全新,完好,,,0,,,专业吉他手租用
