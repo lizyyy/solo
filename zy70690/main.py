@@ -41,7 +41,7 @@ async def business_exception_handler(request: Request, exc: BusinessException):
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     missing_fields = []
     for error in exc.errors():
-        if error["type"] == "value_error.missing":
+        if error["type"] in ["value_error.missing", "missing"]:
             field = ".".join(str(loc) for loc in error["loc"])
             missing_fields.append(field)
     

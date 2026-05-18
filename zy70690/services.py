@@ -129,6 +129,7 @@ class MaterialService:
         if existing:
             raise BusinessException(ErrorCodes.DUPLICATE_SUBMISSION, "材料代码已存在")
 
+        IDCardRuleService.check_participant_type_allowed(db, material.id_card_type, participant)
         IDCardRuleService.check_participant_limit(db, material.id_card_type, participant.id)
         
         material_data = material.dict(exclude={"participant_code"})
@@ -517,6 +518,26 @@ class IDCardRuleService:
                     )
             except json.JSONDecodeError:
                 pass
+    
+    @staticmethod
+    def check_participant_type_allowed(db: Session, card_type: IDCardType, participant: Participant):
+        rule = IDCardRuleService.get_rule_by_card_type(db, card_type)
+        if not rule or not rule.allowed_participant_types:
+            return
+        
+        import json
+        try:
+            allowed_types = json.loads(rule.allowed_participant_types)
+            participant_type_value = participant.type.value
+            
+            if participant_type_value not in allowed_types:
+                raise BusinessException(
+                    ErrorCodes.VALIDATION_ERROR,
+                    f"[{participant_type_value}]类型主体不允许申请[{card_type.value}]证件",
+                    {"participant_type": participant_type_value, "allowed_types": allowed_types}
+                )
+        except json.JSONDecodeError:
+            pass
     
     @staticmethod
     def check_participant_limit(db: Session, card_type: IDCardType, participant_id: int) -> int:

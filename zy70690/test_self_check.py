@@ -339,7 +339,52 @@ def run_self_check():
             print_result("证件必填字段校验", e.error_code == ErrorCodes.MISSING_FIELDS)
             passed_count += 1
         
-        print_section("13. MISSING_FIELDS错误码测试")
+        media_participant = ParticipantService.create_participant(
+            db,
+            ParticipantCreate(
+                participant_code="MEDIA001",
+                name="测试媒体机构",
+                type=ParticipantType.MEDIA,
+                contact_person="媒体联系人",
+                contact_phone="13900000000"
+            )
+        )
+        print_result("创建媒体主体", media_participant.type == ParticipantType.MEDIA)
+        passed_count += 1
+        
+        media_exhibitor_material = PersonMaterialCreate(
+            material_code="MAT_MEDIA_EXH",
+            participant_code="MEDIA001",
+            id_card_type=IDCardType.EXHIBITOR_PASS,
+            name="媒体人员",
+            id_card_number="110101199001019999",
+            phone="13800138000",
+            company="测试媒体机构"
+        )
+        try:
+            MaterialService.create_material(db, media_exhibitor_material)
+            print_result("媒体主体不能创建参展商证", False)
+            failed_count += 1
+        except BusinessException as e:
+            print_result("媒体主体不能创建参展商证", e.error_code == ErrorCodes.VALIDATION_ERROR and "不允许申请" in e.message)
+            passed_count += 1
+        
+        media_pass_material = PersonMaterialCreate(
+            material_code="MAT_MEDIA_PASS",
+            participant_code="MEDIA001",
+            id_card_type=IDCardType.MEDIA_PASS,
+            name="媒体人员",
+            id_card_number="110101199001018888",
+            phone="13800138001",
+            company="测试媒体机构",
+            position="记者",
+            email="media@example.com"
+        )
+        media_material = MaterialService.create_material(db, media_pass_material)
+        print_result("媒体主体可以创建记者证", media_material.id_card_type == IDCardType.MEDIA_PASS)
+        passed_count += 1
+        
+        print_section("15. MISSING_FIELDS错误码测试")
         
         incomplete_material2 = PersonMaterialCreate(
             material_code="MAT_MISSING2",
@@ -356,7 +401,7 @@ def run_self_check():
             print_result("MISSING_FIELDS错误码", e.error_code == ErrorCodes.MISSING_FIELDS)
             passed_count += 1
         
-        print_section("14. 状态不允许测试")
+        print_section("16. 状态不允许测试")
         
         try:
             MaterialService.approve_material(db, "MAT001")
@@ -366,7 +411,7 @@ def run_self_check():
             print_result("已通过材料重复审核", e.error_code == ErrorCodes.ALREADY_PROCESSED)
             passed_count += 1
         
-        print_section("15. 不存在资源测试")
+        print_section("17. 不存在资源测试")
         
         not_found = MaterialService.get_material_by_code(db, "NOT_EXIST")
         print_result("不存在材料查询返回None", not_found is None)
