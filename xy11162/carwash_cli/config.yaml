@@ -1,0 +1,63 @@
+carwash_cli:
+  name: "自助洗车场洗车设备流水处理工具"
+  version: "1.0.0"
+
+input:
+  directories:
+    normal: "./input/normal"
+    bad: "./input/bad"
+    empty: "./input/empty"
+  file_pattern: "*.csv"
+  encoding: "utf-8"
+
+output:
+  directories:
+    success: "./output/success"
+    failed: "./output/failed"
+    retry: "./output/retry"
+  format: "csv"
+  preserve_original: true
+
+validation:
+  required_fields:
+    - "设备编号"
+    - "流水号"
+    - "交易时间"
+    - "交易类型"
+    - "金额"
+    - "支付方式"
+    - "洗车状态"
+    - "站点编号"
+  
+  field_rules:
+    金额:
+      type: "number"
+      min: 0
+      max: 9999
+    补传标记:
+      type: "integer"
+      allowed: [0, 1]
+    洗车状态:
+      allowed: ["已完成", "进行中", "已取消", "异常"]
+    网络状态:
+      allowed: ["在线", "断网"]
+
+logging:
+  directory: "./logs"
+  level: "INFO"
+  format: "timestamp,file,line,error_type,error_message,field_name,field_value"
+
+retry:
+  max_attempts: 3
+  retry_on:
+    - "网络异常"
+    - "断网补传"
+    - "格式临时错误"
+
+comparison:
+  enabled: true
+  fields_to_compare:
+    - "断网补传标记"
+    - "套餐抵扣"
+    - "可复跑状态"
+  output_diff: true
