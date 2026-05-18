@@ -1,0 +1,16 @@
+{
+  "name": "elderly-care-medication-handover",
+  "version": "1.0.0",
+  "description": "养老日托站日托服药交接API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "keywords": ["elderly-care", "medication", "handover"],
+  "author": "",
+  "license": "ISC"
+}
