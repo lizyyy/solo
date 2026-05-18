@@ -1,0 +1,122 @@
+{
+  "report_info": {
+    "report_date": "2026-05-18",
+    "generated_at": "2026-05-18 08:52:27"
+  },
+  "statistics": {
+    "total": 3,
+    "completed": 2,
+    "defects": 1,
+    "completion_rate": 66.67,
+    "safety_defects": 1,
+    "maintenance_defects": 0,
+    "environment_defects": 0,
+    "operation_defects": 0,
+    "high_risk": 0,
+    "medium_risk": 1,
+    "low_risk": 0
+  },
+  "team_summaries": [
+    {
+      "team": "A班",
+      "total_items": 1,
+      "completed_items": 1,
+      "completion_rate": 100.0,
+      "safety_defects": 0,
+      "maintenance_defects": 0,
+      "high_risk": 0,
+      "medium_risk": 0,
+      "low_risk": 0
+    },
+    {
+      "team": "B班",
+      "total_items": 1,
+      "completed_items": 1,
+      "completion_rate": 100.0,
+      "safety_defects": 0,
+      "maintenance_defects": 0,
+      "high_risk": 0,
+      "medium_risk": 0,
+      "low_risk": 0
+    },
+    {
+      "team": "C班",
+      "total_items": 1,
+      "completed_items": 0,
+      "completion_rate": 0.0,
+      "safety_defects": 1,
+      "maintenance_defects": 0,
+      "high_risk": 0,
+      "medium_risk": 1,
+      "low_risk": 0
+    }
+  ],
+  "defect_records": [
+    {
+      "date": "invalid",
+      "device_id": "EQ-3006",
+      "check_item": "安全门检查",
+      "team": "C班",
+      "defect_type": "安全项",
+      "is_completed": false,
+      "inspector": "刘工",
+      "remark": "验收样例",
+      "risk_level": "中风险",
+      "rectification_deadline": "",
+      "rectification_person": "刘工",
+      "is_rectified": false
+    }
+  ],
+  "all_records": [
+    {
+      "date": "2025-05-15",
+      "device_id": "EQ-3001",
+      "check_item": "高压电路检测",
+      "team": "A班",
+      "defect_type": "安全项",
+      "is_completed": true,
+      "inspector": "张工",
+      "remark": null,
+      "risk_level": "高风险",
+      "rectification_deadline": "2025-05-16",
+      "rectification_person": null,
+      "is_rectified": false
+    },
+    {
+      "date": "2025-05-18",
+      "device_id": "EQ-3004",
+      "check_item": "机械保养",
+      "team": "B班",
+      "defect_type": "安全项",
+      "is_completed": true,
+      "inspector": null,
+      "remark": null,
+      "risk_level": "中风险",
+      "rectification_deadline": "2025-05-21",
+      "rectification_person": null,
+      "is_rectified": false
+    },
+    {
+      "date": "invalid",
+      "device_id": "EQ-3006",
+      "check_item": "安全门检查",
+      "team": "C班",
+      "defect_type": "安全项",
+      "is_completed": false,
+      "inspector": "刘工",
+      "remark": "验收样例",
+      "risk_level": "中风险",
+      "rectification_deadline": "",
+      "rectification_person": "刘工",
+      "is_rectified": false
+    }
+  ],
+  "errors": [
+    "第3行: 设备编号不能为空",
+    "第3行: 检查项不能为空",
+    "第4行: 日期不能为空",
+    "第4行: 班组不能为空",
+    "第6行: 设备编号不能为空",
+    "第8行: 班组不能为空"
+  ]
+}

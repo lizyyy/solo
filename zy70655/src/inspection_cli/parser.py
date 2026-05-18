@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 from typing import List, Tuple, Dict, Any
 from datetime import datetime
 from .models import InspectionRecord, DefectType, RiskLevel
@@ -10,6 +11,13 @@ class InspectionParser:
     def __init__(self):
         self.errors: List[str] = []
         self.warnings: List[str] = []
+
+    def _safe_str(self, value) -> str:
+        if pd.isna(value) or value is None:
+            return ""
+        if isinstance(value, float) and math.isnan(value):
+            return ""
+        return str(value).strip()
 
     def parse_excel(self, file_path: str) -> Tuple[List[InspectionRecord], List[str]]:
         self.errors = []
@@ -45,17 +53,17 @@ class InspectionParser:
 
     def _parse_row(self, row: pd.Series, row_num: int) -> InspectionRecord:
         date = self._parse_date(row.get("日期"))
-        device_id = str(row.get("设备编号", "")).strip()
-        check_item = str(row.get("检查项", "")).strip()
-        team = str(row.get("班组", "")).strip()
+        device_id = self._safe_str(row.get("设备编号"))
+        check_item = self._safe_str(row.get("检查项"))
+        team = self._safe_str(row.get("班组"))
         defect_type = self._parse_defect_type(row.get("缺项类型"))
         is_completed = self._parse_boolean(row.get("是否完成"))
-        inspector = str(row.get("巡检人", "")).strip() or None
-        remark = str(row.get("备注", "")).strip() or None
+        inspector = self._safe_str(row.get("巡检人")) or None
+        remark = self._safe_str(row.get("备注")) or None
 
         risk_level = self._calculate_risk_level(defect_type, check_item)
         rectification_deadline = self._calculate_deadline(date, risk_level)
-        rectification_person = str(row.get("整改负责人", "")).strip() or None
+        rectification_person = self._safe_str(row.get("整改负责人")) or None
         is_rectified = self._parse_boolean(row.get("是否整改"), default=False)
 
         return InspectionRecord(
