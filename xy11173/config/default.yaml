@@ -1,0 +1,68 @@
+cli:
+  name: "运动康复门店康复器械冲突分析工具"
+  version: "1.0.0"
+
+rules:
+  abnormal_keywords:
+    - "保养封锁"
+    - "器械故障"
+    - "设备维修"
+    - "患者迟到"
+    - "预约冲突"
+    - "器械占用"
+    - "无法使用"
+    - "维修中"
+    - "暂停使用"
+    - "超时使用"
+
+  normal_keywords:
+    - "正常使用"
+    - "已完成"
+    - "顺利完成"
+    - "康复训练"
+    - "治疗完成"
+    - "患者到场"
+    - "器械可用"
+
+  maintenance_lockout:
+    keywords:
+      - "保养封锁"
+      - "维修中"
+      - "暂停使用"
+      - "设备维修"
+    priority: "high"
+    suggestion: "立即安排工程师进行器械检修，确认保养完成后解除封锁状态，更新预约系统避免患者空跑"
+
+  patient_late:
+    keywords:
+      - "患者迟到"
+      - "未按时到达"
+      - "迟到"
+      - "晚到"
+    threshold_minutes: 15
+    priority: "medium"
+    suggestion: "联系患者确认是否仍需到店，调整后续预约时间，必要时安排候补患者使用器械"
+
+  rerun_available:
+    keywords:
+      - "可复跑"
+      - "重新安排"
+      - "改期"
+      - "重新预约"
+    priority: "low"
+    suggestion: "主动联系患者提供可选时间段，优先安排近期空闲时段，赠送康复咨询服务作为补偿"
+
+output:
+  normal_dir: "output/normal"
+  abnormal_dir: "output/abnormal"
+  summary_file: "output/abnormal_summary.md"
+  error_log: "output/error_log.txt"
+
+file:
+  supported_formats:
+    - ".csv"
+    - ".xlsx"
+    - ".xls"
+    - ".txt"
+  encoding: "utf-8"
+  delimiter: ","
