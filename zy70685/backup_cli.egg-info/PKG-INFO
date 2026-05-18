@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: backup-cli
+Version: 1.0.0
+Summary: 备机借用押金归还检查排查CLI工具
+Author: 手机维修店管理系统
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0.0
+Dynamic: author
+Dynamic: classifier
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

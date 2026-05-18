@@ -34,6 +34,7 @@ class SourceTracker:
         self.record_hashes: Set[str] = set()
         self.repair_order_map: Dict[str, List[SourceTrace]] = defaultdict(list)
         self.device_map: Dict[str, List[SourceTrace]] = defaultdict(list)
+        self.valid_records_map: Dict[str, ParsedRecord] = {}
 
     def track_parse_result(self, parse_result: ParseResult) -> None:
         all_records = parse_result.valid_records + parse_result.invalid_records
@@ -57,6 +58,7 @@ class SourceTracker:
                     self.repair_order_map[repair_id].append(trace)
                 if device_id:
                     self.device_map[device_id].append(trace)
+                    self.valid_records_map[f"{device_id}:{trace.line_number}"] = record
 
     def _generate_record_id(self, record: ParsedRecord) -> str:
         content = json.dumps(record.data, sort_keys=True, default=str)
@@ -71,16 +73,20 @@ class SourceTracker:
                 duplicates.append((f"维修单 {repair_id}", lines))
         
         for device_id, traces in self.device_map.items():
-            active_traces = [t for t in traces if self._is_active_record(t)]
+            active_traces = [t for t in traces if self._is_active_record(t, device_id)]
             if len(active_traces) > 1:
                 lines = [t.line_number for t in active_traces]
                 duplicates.append((f"备机 {device_id} 同时被借用", lines))
         
         return duplicates
 
-    def _is_active_record(self, trace: SourceTrace) -> bool:
-        return 'actual_return_date' not in trace.raw_content or \
-               trace.raw_content.split(',')[6].strip() == ''
+    def _is_active_record(self, trace: SourceTrace, device_id: str) -> bool:
+        record_key = f"{device_id}:{trace.line_number}"
+        if record_key in self.valid_records_map:
+            record = self.valid_records_map[record_key]
+            return 'actual_return_date' not in record.data or \
+                   record.data.get('actual_return_date') is None
+        return True
 
     def get_validation_summary(self, processed_records: List[ProcessedRecord]) -> ValidationSummary:
         total_records = len(self.traces)

@@ -50,7 +50,7 @@ class ReportGenerator:
         frozen_deposits = sum(1 for r in processed_records if r.deposit_frozen)
         
         total_deposit = sum(r.original_record.data.get('deposit_amount', 0.0) for r in processed_records)
-        total_damage_charge = sum(r.final_deposit_refund for r in processed_records if r.has_damage)
+        total_damage_charge = sum(r.summary['damage_charge'] for r in processed_records if r.has_damage)
         total_refund = sum(r.final_deposit_refund for r in processed_records if r.is_returned)
 
         with open(filename, 'w', encoding='utf-8') as f:
