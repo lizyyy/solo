@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "art-material-stats"
+version = "0.1.0"
+description = "美术培训室画材缺料统计 CLI 工具"
+requires-python = ">=3.9"
+dependencies = [
+  "click>=8.0",
+  "pandas>=2.0",
+  "openpyxl>=3.1",
+]
+
+[project.scripts]
+art-stats = "art_material_stats.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["art_material_stats"]
