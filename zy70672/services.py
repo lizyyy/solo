@@ -265,28 +265,31 @@ def manual_correction_service(db: Session, request: ManualCorrectionRequest):
     if settlement.status not in [SettlementStatus.CONFLICT, SettlementStatus.DRAFT, SettlementStatus.PROCESSING]:
         raise ValueError("Only draft, processing, or conflict settlements can be manually corrected")
 
+    correction_map = {c.settlement_item_id: c for c in request.corrections}
+
     total_final_area = 0
     total_amount = 0
+    total_gps_area = 0
+    total_confirmed_area = 0
 
-    for correction in request.corrections:
-        item = db.query(SettlementItem).filter(
-            SettlementItem.id == correction.settlement_item_id,
-            SettlementItem.settlement_id == request.settlement_id
-        ).first()
-        
-        if not item:
-            continue
-
-        item.final_area = correction.final_area
-        item.amount = correction.final_area * item.unit_price
-        if correction.notes:
-            item.notes = correction.notes
+    for item in settlement.items:
+        if item.id in correction_map:
+            correction = correction_map[item.id]
+            item.final_area = correction.final_area
+            item.amount = correction.final_area * item.unit_price
+            if correction.notes:
+                item.notes = correction.notes
 
         total_final_area += item.final_area
         total_amount += item.amount
+        total_gps_area += item.gps_area
+        if item.confirmed_area:
+            total_confirmed_area += item.confirmed_area
 
     settlement.total_final_area = total_final_area
     settlement.total_amount = total_amount
+    settlement.total_gps_area = total_gps_area
+    settlement.total_confirmed_area = total_confirmed_area
     settlement.processed_by = request.processed_by
     settlement.processed_at = datetime.now()
     settlement.status = SettlementStatus.CONFIRMED
