@@ -1,0 +1,66 @@
+{
+  "run_id": "20260519_021152",
+  "processed_at": "2026-05-19T02:11:52.488626",
+  "processed_files": {
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/good/offcut_inventory.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.484876",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/good/order_2026_001.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.485218",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/good/order_2026_002.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.485533",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/bad/duplicate_rows.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.486198",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/bad/missing_columns.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.486450",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/bad/mixed_errors.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.486661",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/bad/rotation_errors.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.486875",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/bad/unit_mixed_mm_cm.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.487086",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/empty/empty_offcuts.csv": {
+      "status": "empty",
+      "processed_at": "2026-05-19T02:11:52.487673",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/empty/only_header.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.487872",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/tests/partial_success_1.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.488260",
+      "run_id": "20260519_021152"
+    },
+    "/Users/mac/pro/solo/workspaces/xy11143/furniture_offcut_matcher/tests/partial_success_2.csv": {
+      "status": "success",
+      "processed_at": "2026-05-19T02:11:52.488621",
+      "run_id": "20260519_021152"
+    }
+  }
+}

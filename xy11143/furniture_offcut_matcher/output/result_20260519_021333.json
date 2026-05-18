@@ -1,0 +1,47 @@
+{
+  "directory": "./bad",
+  "duplicate_rows_count": 0,
+  "duplicate_rows_details": [],
+  "empty_files": 0,
+  "failed": 0,
+  "file_results": [
+    {
+      "filename": "duplicate_rows.csv",
+      "message": "Already processed in previous run",
+      "status": "skipped"
+    },
+    {
+      "filename": "missing_columns.csv",
+      "message": "Already processed in previous run",
+      "status": "skipped"
+    },
+    {
+      "filename": "mixed_errors.csv",
+      "message": "Already processed in previous run",
+      "status": "skipped"
+    },
+    {
+      "filename": "rotation_errors.csv",
+      "message": "Already processed in previous run",
+      "status": "skipped"
+    },
+    {
+      "filename": "unit_mixed_mm_cm.csv",
+      "message": "Already processed in previous run",
+      "status": "skipped"
+    }
+  ],
+  "format_errors_count": 0,
+  "format_errors_details": [],
+  "missing_columns_count": 0,
+  "missing_columns_details": [],
+  "rotation_errors_count": 0,
+  "rotation_errors_details": [],
+  "run_id": "20260519_021333",
+  "skipped": 5,
+  "successful": 0,
+  "total_errors": 0,
+  "total_files": 5,
+  "unit_mismatch_count": 0,
+  "unit_mismatch_details": []
+}

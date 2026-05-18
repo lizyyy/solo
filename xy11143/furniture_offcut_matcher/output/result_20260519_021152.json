@@ -1,0 +1,231 @@
+{
+  "directory": "tests",
+  "duplicate_rows_count": 0,
+  "duplicate_rows_details": [],
+  "empty_files": 0,
+  "failed": 0,
+  "file_results": [
+    {
+      "data": [
+        {
+          "余料编号": "T001",
+          "入库时间": "2026-05-10",
+          "剩余宽度(mm)": "600",
+          "剩余长度(mm)": "1200",
+          "匹配次数": "2",
+          "厚度(mm)": "18",
+          "原板材编号": "P001",
+          "存放位置": "A区-01",
+          "旋转限制": "无",
+          "材质": "橡木"
+        },
+        {
+          "余料编号": "T002",
+          "入库时间": "2026-05-10",
+          "剩余宽度(mm)": "400",
+          "剩余长度(mm)": "600",
+          "匹配次数": "1",
+          "厚度(mm)": "18",
+          "原板材编号": "P001",
+          "存放位置": "A区-02",
+          "旋转限制": "无",
+          "材质": "橡木"
+        },
+        {
+          "余料编号": "T004",
+          "入库时间": "2026-05-11",
+          "剩余宽度(mm)": "600",
+          "剩余长度(mm)": "1220",
+          "匹配次数": "1",
+          "厚度(mm)": "25",
+          "原板材编号": "P003",
+          "存放位置": "B区-01",
+          "旋转限制": "无",
+          "材质": "胡桃木"
+        }
+      ],
+      "duplicate_rows_count": 0,
+      "duplicate_rows_details": [],
+      "filename": "partial_success_1.csv",
+      "format_errors_count": 0,
+      "format_errors_details": [],
+      "headers": [
+        "余料编号",
+        "原板材编号",
+        "剩余长度(mm)",
+        "剩余宽度(mm)",
+        "厚度(mm)",
+        "材质",
+        "旋转限制",
+        "存放位置",
+        "入库时间",
+        "匹配次数"
+      ],
+      "missing_columns_count": 2,
+      "missing_columns_details": [
+        {
+          "actual_columns": 5,
+          "error_type": "缺列",
+          "expected_columns": 10,
+          "filename": "partial_success_1.csv",
+          "row": 4
+        },
+        {
+          "actual_columns": 9,
+          "error_type": "缺列",
+          "expected_columns": 10,
+          "filename": "partial_success_1.csv",
+          "row": 6
+        }
+      ],
+      "rotation_errors_count": 0,
+      "rotation_errors_details": [],
+      "status": "success",
+      "total_errors": 2,
+      "total_rows": 5,
+      "unit_mismatch_count": 0,
+      "unit_mismatch_details": [],
+      "valid_rows": 3
+    },
+    {
+      "data": [
+        {
+          "交货日期": "2026-05-20",
+          "家具名称": "衣柜侧板",
+          "旋转要求": "无",
+          "材质": "橡木",
+          "订单号": "ORD20260510",
+          "需求厚度(mm)": "18",
+          "需求宽度(mm)": "600",
+          "需求数量": "2",
+          "需求编号": "T001",
+          "需求长度(mm)": "200"
+        },
+        {
+          "交货日期": "2026-05-25",
+          "家具名称": "餐桌面板",
+          "旋转要求": "无",
+          "材质": "胡桃木",
+          "订单号": "ORD20260511",
+          "需求厚度(mm)": "25",
+          "需求宽度(mm)": "800",
+          "需求数量": "1",
+          "需求编号": "T003",
+          "需求长度(mm)": "1600"
+        }
+      ],
+      "duplicate_rows_count": 0,
+      "duplicate_rows_details": [],
+      "filename": "partial_success_2.csv",
+      "format_errors_count": 0,
+      "format_errors_details": [],
+      "headers": [
+        "需求编号",
+        "家具名称",
+        "需求长度(mm)",
+        "需求宽度(mm)",
+        "需求厚度(mm)",
+        "需求数量",
+        "材质",
+        "旋转要求",
+        "订单号",
+        "交货日期"
+      ],
+      "missing_columns_count": 1,
+      "missing_columns_details": [
+        {
+          "actual_columns": 8,
+          "error_type": "缺列",
+          "expected_columns": 10,
+          "filename": "partial_success_2.csv",
+          "row": 5
+        }
+      ],
+      "rotation_errors_count": 0,
+      "rotation_errors_details": [],
+      "status": "success",
+      "total_errors": 3,
+      "total_rows": 5,
+      "unit_mismatch_count": 2,
+      "unit_mismatch_details": [
+        {
+          "column": "需求宽度(mm)",
+          "converted_value_mm": 500,
+          "detected_unit": "cm (suspected)",
+          "error_type": "单位混用 - 疑似厘米值",
+          "expected_unit": "mm",
+          "filename": "partial_success_2.csv",
+          "row": 3,
+          "value": 50
+        },
+        {
+          "column": "需求厚度(mm)",
+          "converted_value_mm": 150,
+          "detected_unit": "cm (suspected)",
+          "error_type": "单位混用 - 疑似厘米值",
+          "expected_unit": "mm",
+          "filename": "partial_success_2.csv",
+          "row": 6,
+          "value": 15
+        }
+      ],
+      "valid_rows": 2
+    }
+  ],
+  "format_errors_count": 0,
+  "format_errors_details": [],
+  "missing_columns_count": 3,
+  "missing_columns_details": [
+    {
+      "actual_columns": 5,
+      "error_type": "缺列",
+      "expected_columns": 10,
+      "filename": "partial_success_1.csv",
+      "row": 4
+    },
+    {
+      "actual_columns": 9,
+      "error_type": "缺列",
+      "expected_columns": 10,
+      "filename": "partial_success_1.csv",
+      "row": 6
+    },
+    {
+      "actual_columns": 8,
+      "error_type": "缺列",
+      "expected_columns": 10,
+      "filename": "partial_success_2.csv",
+      "row": 5
+    }
+  ],
+  "rotation_errors_count": 0,
+  "rotation_errors_details": [],
+  "run_id": "20260519_021152",
+  "skipped": 0,
+  "successful": 2,
+  "total_errors": 5,
+  "total_files": 2,
+  "unit_mismatch_count": 2,
+  "unit_mismatch_details": [
+    {
+      "column": "需求宽度(mm)",
+      "converted_value_mm": 500,
+      "detected_unit": "cm (suspected)",
+      "error_type": "单位混用 - 疑似厘米值",
+      "expected_unit": "mm",
+      "filename": "partial_success_2.csv",
+      "row": 3,
+      "value": 50
+    },
+    {
+      "column": "需求厚度(mm)",
+      "converted_value_mm": 150,
+      "detected_unit": "cm (suspected)",
+      "error_type": "单位混用 - 疑似厘米值",
+      "expected_unit": "mm",
+      "filename": "partial_success_2.csv",
+      "row": 6,
+      "value": 15
+    }
+  ]
+}
