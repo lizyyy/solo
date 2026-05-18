@@ -1,4 +1,6 @@
+import csv
 from typing import List, Dict, Set
+from pathlib import Path
 from collections import defaultdict
 from .models import (
     MaterialItem,
@@ -45,6 +47,82 @@ class RuleEngine:
                 severity=severity,
             )
         )
+
+    def load_dependencies_from_csv(self, file_path: str, clear_existing: bool = False, encoding: str = "utf-8") -> int:
+        if clear_existing:
+            self.dependencies = []
+
+        path = Path(file_path)
+        if not path.exists():
+            raise FileNotFoundError(f"依赖配置文件不存在: {file_path}")
+
+        loaded_count = 0
+        invalid_rows = []
+
+        with open(path, "r", encoding=encoding, newline="") as f:
+            reader = csv.reader(f)
+            header = next(reader, None)
+
+            if header:
+                header_lower = [h.strip().lower() for h in header]
+                has_header = any(keyword in header_lower for keyword in ["主物料", "配件", "主配件"])
+                if has_header:
+                    pass
+                else:
+                    f.seek(0)
+                    reader = csv.reader(f)
+
+            for row_num, row in enumerate(reader, start=1):
+                    if not row or not any(cell.strip() for cell in row):
+                        continue
+
+                    if len(row) < 2:
+                        invalid_rows.append(row_num)
+                        continue
+
+                    main_item = row[0].strip()
+                    accessory = row[1].strip()
+
+                    if not main_item or not accessory:
+                        invalid_rows.append(row_num)
+                        continue
+
+                    ratio = 1
+                    if len(row) >= 3 and row[2].strip():
+                        try:
+                            ratio = int(row[2].strip())
+                        except ValueError:
+                            pass
+
+                    severity = SeverityLevel.CRITICAL
+                    if len(row) >= 4 and row[3].strip():
+                        severity_str = row[3].strip().upper()
+                        for sev in SeverityLevel:
+                            if sev.value == severity_str or severity_str in sev.value:
+                                severity = sev
+                                break
+
+                    self.add_dependency(main_item, accessory, ratio, severity)
+                    loaded_count += 1
+
+        return loaded_count
+
+    def clear_dependencies(self):
+        self.dependencies = []
+
+    def get_dependency_count(self) -> int:
+        return len(self.dependencies)
+
+    def list_dependencies(self) -> List[Dict]:
+        return [
+            {
+                "main_item": dep.main_item,
+                "required_accessory": dep.required_accessory,
+                "ratio": dep.ratio,
+                "severity": dep.severity.value,
+            }
+            for dep in self.dependencies
+        ]
 
     def process(self, materials: List[MaterialItem], invalid_rows: List[MaterialItem]) -> CheckResult:
         result = CheckResult()

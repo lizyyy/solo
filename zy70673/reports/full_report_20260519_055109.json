@@ -1,0 +1,269 @@
+{
+  "timestamp": "2026-05-19T05:51:09.324575",
+  "summary": {
+    "total_materials": 21,
+    "invalid_rows": 0,
+    "total_boxes": 14,
+    "total_missing": 14,
+    "missing_by_severity": {
+      "CRITICAL": 3,
+      "HIGH": 7,
+      "LOW": 3,
+      "MEDIUM": 1
+    }
+  },
+  "cities": [
+    "上海",
+    "北京",
+    "南京",
+    "广州",
+    "成都",
+    "杭州",
+    "武汉",
+    "深圳"
+  ],
+  "missing_items": [
+    {
+      "city": "北京",
+      "material_name": "支架",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 6,
+      "actual_quantity": 4,
+      "source_line": 2,
+      "source_box": "BJ-001",
+      "depends_on": "易拉宝",
+      "notes": "每易拉宝需要1个支架"
+    },
+    {
+      "city": "南京",
+      "material_name": "A字架",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 8,
+      "actual_quantity": 5,
+      "source_line": 21,
+      "source_box": "",
+      "depends_on": "指示牌",
+      "notes": "每指示牌需要1个A字架"
+    },
+    {
+      "city": "广州",
+      "material_name": "HDMI线",
+      "missing_type": "DEPENDENCY",
+      "severity": "CRITICAL",
+      "required_quantity": 6,
+      "actual_quantity": 4,
+      "source_line": 8,
+      "source_box": "GZ-001",
+      "depends_on": "电视",
+      "notes": "每电视需要2个HDMI线"
+    },
+    {
+      "city": "北京",
+      "material_name": "防风底座",
+      "missing_type": "DEPENDENCY",
+      "severity": "HIGH",
+      "required_quantity": 6,
+      "actual_quantity": 0,
+      "source_line": 2,
+      "source_box": "BJ-001",
+      "depends_on": "易拉宝",
+      "notes": "每易拉宝需要1个防风底座"
+    },
+    {
+      "city": "广州",
+      "material_name": "遥控器",
+      "missing_type": "DEPENDENCY",
+      "severity": "HIGH",
+      "required_quantity": 3,
+      "actual_quantity": 2,
+      "source_line": 8,
+      "source_box": "GZ-001",
+      "depends_on": "电视",
+      "notes": "每电视需要1个遥控器"
+    },
+    {
+      "city": "成都",
+      "material_name": "锤子",
+      "missing_type": "DEPENDENCY",
+      "severity": "HIGH",
+      "required_quantity": 1,
+      "actual_quantity": 0,
+      "source_line": 16,
+      "source_box": "",
+      "depends_on": "背景墙",
+      "notes": "每背景墙需要1个锤子"
+    },
+    {
+      "city": "杭州",
+      "material_name": "电池",
+      "missing_type": "DEPENDENCY",
+      "severity": "HIGH",
+      "required_quantity": 16,
+      "actual_quantity": 10,
+      "source_line": 14,
+      "source_box": "HZ-001",
+      "depends_on": "麦克风",
+      "notes": "每麦克风需要4个电池"
+    },
+    {
+      "city": "武汉",
+      "material_name": "灯泡",
+      "missing_type": "DEPENDENCY",
+      "severity": "HIGH",
+      "required_quantity": 16,
+      "actual_quantity": 12,
+      "source_line": 19,
+      "source_box": "WH-001",
+      "depends_on": "灯光设备",
+      "notes": "每灯光设备需要4个灯泡"
+    },
+    {
+      "city": "深圳",
+      "material_name": "签到本",
+      "missing_type": "DEPENDENCY",
+      "severity": "HIGH",
+      "required_quantity": 2,
+      "actual_quantity": 1,
+      "source_line": 11,
+      "source_box": "SZ-001",
+      "depends_on": "签到台",
+      "notes": "每签到台需要1个签到本"
+    },
+    {
+      "city": "深圳",
+      "material_name": "签字笔",
+      "missing_type": "DEPENDENCY",
+      "severity": "HIGH",
+      "required_quantity": 8,
+      "actual_quantity": 5,
+      "source_line": 11,
+      "source_box": "SZ-001",
+      "depends_on": "签到台",
+      "notes": "每签到台需要4个签字笔"
+    },
+    {
+      "city": "上海",
+      "material_name": "图钉",
+      "missing_type": "DEPENDENCY",
+      "severity": "LOW",
+      "required_quantity": 20,
+      "actual_quantity": 15,
+      "source_line": 5,
+      "source_box": "SH-001",
+      "depends_on": "KT板",
+      "notes": "每KT板需要2个图钉"
+    },
+    {
+      "city": "上海",
+      "material_name": "胶带",
+      "missing_type": "DEPENDENCY",
+      "severity": "LOW",
+      "required_quantity": 10,
+      "actual_quantity": 8,
+      "source_line": 5,
+      "source_box": "SH-001",
+      "depends_on": "KT板",
+      "notes": "每KT板需要1个胶带"
+    },
+    {
+      "city": "成都",
+      "material_name": "扎带",
+      "missing_type": "DEPENDENCY",
+      "severity": "LOW",
+      "required_quantity": 10,
+      "actual_quantity": 5,
+      "source_line": 16,
+      "source_box": "",
+      "depends_on": "背景墙",
+      "notes": "每背景墙需要10个扎带"
+    },
+    {
+      "city": "北京",
+      "material_name": "手提袋",
+      "missing_type": "DEPENDENCY",
+      "severity": "MEDIUM",
+      "required_quantity": 6,
+      "actual_quantity": 3,
+      "source_line": 2,
+      "source_box": "BJ-001",
+      "depends_on": "易拉宝",
+      "notes": "每易拉宝需要1个手提袋"
+    }
+  ],
+  "city_summary": {
+    "上海": {
+      "material_count": 3,
+      "total_quantity": 33,
+      "missing_total": 2,
+      "missing_critical": 0,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 2
+    },
+    "北京": {
+      "material_count": 3,
+      "total_quantity": 13,
+      "missing_total": 3,
+      "missing_critical": 1,
+      "missing_high": 1,
+      "missing_medium": 1,
+      "missing_low": 0
+    },
+    "南京": {
+      "material_count": 2,
+      "total_quantity": 13,
+      "missing_total": 1,
+      "missing_critical": 1,
+      "missing_high": 0,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "广州": {
+      "material_count": 3,
+      "total_quantity": 9,
+      "missing_total": 2,
+      "missing_critical": 1,
+      "missing_high": 1,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "成都": {
+      "material_count": 3,
+      "total_quantity": 6,
+      "missing_total": 2,
+      "missing_critical": 0,
+      "missing_high": 1,
+      "missing_medium": 0,
+      "missing_low": 1
+    },
+    "杭州": {
+      "material_count": 2,
+      "total_quantity": 14,
+      "missing_total": 1,
+      "missing_critical": 0,
+      "missing_high": 1,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "武汉": {
+      "material_count": 2,
+      "total_quantity": 16,
+      "missing_total": 1,
+      "missing_critical": 0,
+      "missing_high": 1,
+      "missing_medium": 0,
+      "missing_low": 0
+    },
+    "深圳": {
+      "material_count": 3,
+      "total_quantity": 8,
+      "missing_total": 2,
+      "missing_critical": 0,
+      "missing_high": 2,
+      "missing_medium": 0,
+      "missing_low": 0
+    }
+  }
+}
