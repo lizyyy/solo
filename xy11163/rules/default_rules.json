@@ -1,0 +1,11 @@
+{
+  "id_fields": ["领用单号"],
+  "special_types": {
+    "return": "返库",
+    "substitute": "替代料",
+    "manual": "手写单",
+    "retry": "可复跑"
+  },
+  "description": "物业报修中心物业材料领用处理规则",
+  "version": "1.0"
+}
