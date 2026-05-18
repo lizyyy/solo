@@ -1,0 +1,17 @@
+{
+  "normalTemperatureMax": 37.3,
+  "abnormalTemperatureMax": 37.5,
+  "requireHandFootMouthCheck": true,
+  "requireSkinCheck": true,
+  "siblingSameGarden": "recheck",
+  "allowRerun": true,
+  "_说明": {
+    "normalTemperatureMax": "正常体温上限，超过此值但低于abnormalTemperatureMax时标记为体温复测（仅提醒，不影响通过状态）",
+    "abnormalTemperatureMax": "异常体温上限，超过此值时标记为严重异常（影响通过状态）",
+    "requireHandFootMouthCheck": "是否启用手足口检查项",
+    "requireSkinCheck": "是否启用皮肤状况检查项",
+    "siblingSameGarden": "兄妹同园处理策略：'recheck'=提醒关注，'ignore'=不处理",
+    "allowRerun": "是否支持可复跑标记"
+  },
+  "_使用方法": "复制此文件为 custom.json，根据园所实际情况修改配置，运行时通过 --config config/custom.json 指定"
+}

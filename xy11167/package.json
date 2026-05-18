@@ -1,0 +1,22 @@
+{
+  "name": "nursery-health-check-cli",
+  "version": "1.0.0",
+  "description": "托育园保健室托育晨检汇总CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "health-check": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node src/index.js --input examples/sample-input.csv --output examples/sample-output.csv",
+    "test:detail": "node src/index.js --input examples/sample-input.csv --output examples/sample-output.csv --verbose"
+  },
+  "keywords": ["nursery", "health-check", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "yargs": "^17.7.2"
+  }
+}
