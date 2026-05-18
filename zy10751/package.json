@@ -1,0 +1,21 @@
+{
+  "name": "online-service-queue-overflow-stats",
+  "version": "1.0.0",
+  "description": "在线客服排队日志技能组溢出统计 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "queue-stats": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node test/run-test.js"
+  },
+  "keywords": ["客服", "排队", "溢出统计", "日志分析"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2"
+  }
+}
