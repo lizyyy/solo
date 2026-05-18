@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-18T10:37:32.864Z",
+  "toolName": "租赁订单文件自动续租冲突检测工具",
+  "summary": {
+    "totalFiles": 1,
+    "validRecords": 2,
+    "formatErrors": 1,
+    "duplicateRenewals": 0,
+    "overlappingLeases": 0,
+    "manualRenewals": 0,
+    "paymentFailures": 0,
+    "totalIssues": 1
+  },
+  "issues": {
+    "formatErrors": [
+      {
+        "type": "格式错误",
+        "errorType": "缺少必填列",
+        "原始文件": "orders-missing-cols.csv",
+        "行号": 1,
+        "消息": "缺少列: 续租状态, 扣款状态, 操作类型",
+        "原始数据": null
+      }
+    ],
+    "duplicateRenewals": [],
+    "overlappingLeases": [],
+    "manualRenewals": [],
+    "paymentFailures": []
+  }
+}

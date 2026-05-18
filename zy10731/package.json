@@ -1,0 +1,19 @@
+{
+  "name": "lease-renewal-conflict-cli",
+  "version": "1.0.0",
+  "description": "租赁订单文件自动续租冲突检测工具",
+  "main": "src/index.js",
+  "bin": {
+    "lease-conflict": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node tests/run-tests.js"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "yargs": "^17.7.2"
+  },
+  "keywords": ["lease", "rent", "conflict", "cli"],
+  "author": "",
+  "license": "ISC"
+}

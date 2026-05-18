@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-18T10:37:32.851Z",
+  "toolName": "租赁订单文件自动续租冲突检测工具",
+  "summary": {
+    "totalFiles": 0,
+    "validRecords": 0,
+    "formatErrors": 1,
+    "duplicateRenewals": 0,
+    "overlappingLeases": 0,
+    "manualRenewals": 0,
+    "paymentFailures": 0,
+    "totalIssues": 1
+  },
+  "issues": {
+    "formatErrors": [
+      {
+        "type": "格式错误",
+        "errorType": "空目录",
+        "原始文件": null,
+        "行号": 0,
+        "消息": "输入目录中没有找到CSV文件",
+        "原始数据": null
+      }
+    ],
+    "duplicateRenewals": [],
+    "overlappingLeases": [],
+    "manualRenewals": [],
+    "paymentFailures": []
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-05-18T10:37:32.866Z",
+  "toolName": "租赁订单文件自动续租冲突检测工具",
+  "summary": {
+    "totalFiles": 1,
+    "validRecords": 4,
+    "formatErrors": 1,
+    "duplicateRenewals": 1,
+    "overlappingLeases": 0,
+    "manualRenewals": 0,
+    "paymentFailures": 0,
+    "totalIssues": 2
+  },
+  "issues": {
+    "formatErrors": [
+      {
+        "type": "格式错误",
+        "errorType": "记录格式错误",
+        "原始文件": "orders-duplicate.csv",
+        "行号": 6,
+        "消息": "租赁订单编号为空; 租金金额无效",
+        "原始数据": {
+          "租赁订单编号": "",
+          "租客姓名": "杨三",
+          "房源地址": "北京市房山区长阳镇",
+          "租期开始日期": "2026-05-01",
+          "租期结束日期": "2026-11-01",
+          "租金金额": "invalid",
+          "续租状态": "自动续租",
+          "扣款状态": "扣款成功",
+          "操作类型": "新签"
+        }
+      }
+    ],
+    "duplicateRenewals": [
+      {
+        "type": "续租重复",
+        "租客姓名": "陈一",
+        "房源地址": "北京市昌平区回龙观东大街",
+        "重复续租数": 2,
+        "涉及订单": [
+          {
+            "租赁订单编号": "L202604001",
+            "租期开始日期": "2026-04-01",
+            "租期结束日期": "2026-10-01",
+            "原始文件": "orders-duplicate.csv",
+            "行号": 3
+          },
+          {
+            "租赁订单编号": "L202604001",
+            "租期开始日期": "2026-04-01",
+            "租期结束日期": "2026-10-01",
+            "原始文件": "orders-duplicate.csv",
+            "行号": 4
+          }
+        ]
+      }
+    ],
+    "overlappingLeases": [],
+    "manualRenewals": [],
+    "paymentFailures": []
+  }
+}
