@@ -1,0 +1,5 @@
+{
+  "bucket_by": ["model", "stage"],
+  "failure_statuses": ["fail", "failure", "failed", "error"],
+  "description": "设备升级日志固件失败分桶配置 - 默认按型号和阶段分桶"
+}

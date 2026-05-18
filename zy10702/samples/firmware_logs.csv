@@ -1,0 +1,8 @@
+device_id,model,stage,firmware_version,status,error_message,timestamp,is_offline
+DEV001,SmartCam-X1,download,2.3.5,fail,网络超时，下载固件失败,2024-01-15T10:30:00Z,false
+DEV002,SmartCam-X1,download,2.3.5,fail,MD5校验失败,2024-01-15T10:35:00Z,false
+DEV003,SmartCam-X1,install,2.3,fail,存储空间不足,2024-01-15T11:00:00Z,true
+DEV004,DoorLock-Pro,verify,1.5.2,fail,签名验证失败,2024-01-15T11:15:00Z,false
+DEV005,DoorLock-Pro,reboot,1.5,fail,重启超时,2024-01-15T11:30:00Z,false
+DEV006,ThermoSensor-Mini,download,3.0.1,success,,2024-01-15T12:00:00Z,false
+DEV007,ThermoSensor-Mini,install,3,fail,安装脚本执行失败,2024-01-15T12:10:00Z,true

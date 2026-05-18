@@ -1,0 +1,92 @@
+[
+  {
+    "device_id": "DEV001",
+    "model": "SmartCam-X1",
+    "stage": "download",
+    "firmware_version": "2.3",
+    "status": "fail",
+    "error_message": "网络超时，下载固件失败",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "is_offline": "true"
+  },
+  {
+    "device_id": "DEV001",
+    "model": "SmartCam-X1",
+    "stage": "download",
+    "firmware_version": "2.3",
+    "status": "fail",
+    "error_message": "网络超时，下载固件失败",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "is_offline": "true"
+  },
+  {
+    "device_id": "DEV002",
+    "model": "SmartCam-X1",
+    "stage": "download",
+    "firmware_version": "2",
+    "status": "fail",
+    "error_message": "MD5校验失败",
+    "timestamp": "2024-01-15T10:35:00Z",
+    "is_offline": "false"
+  },
+  {
+    "device_id": "DEV003",
+    "model": "SmartCam-X1",
+    "stage": "install",
+    "firmware_version": "",
+    "status": "fail",
+    "error_message": "存储空间不足",
+    "timestamp": "2024-01-15T11:00:00Z",
+    "is_offline": "true"
+  },
+  {
+    "device_id": "DEV004",
+    "model": "DoorLock-Pro",
+    "stage": "verify",
+    "firmware_version": "1.5.2",
+    "status": "fail",
+    "error_message": "签名验证失败",
+    "timestamp": "2024-01-15T11:15:00Z",
+    "is_offline": "true"
+  },
+  {
+    "device_id": "DEV005",
+    "model": "DoorLock-Pro",
+    "stage": "reboot",
+    "firmware_version": "1.5",
+    "status": "fail",
+    "error_message": "重启超时",
+    "timestamp": "2024-01-15T11:30:00Z",
+    "is_offline": "false"
+  },
+  {
+    "device_id": "DEV006",
+    "model": "ThermoSensor-Mini",
+    "stage": "download",
+    "firmware_version": "3.0.1",
+    "status": "success",
+    "error_message": "",
+    "timestamp": "2024-01-15T12:00:00Z",
+    "is_offline": "false"
+  },
+  {
+    "device_id": "DEV007",
+    "model": "ThermoSensor-Mini",
+    "stage": "install",
+    "firmware_version": "3",
+    "status": "fail",
+    "error_message": "安装脚本执行失败",
+    "timestamp": "2024-01-15T12:10:00Z",
+    "is_offline": "true"
+  },
+  {
+    "device_id": "DEV007",
+    "model": "ThermoSensor-Mini",
+    "stage": "install",
+    "firmware_version": "3",
+    "status": "fail",
+    "error_message": "安装脚本执行失败",
+    "timestamp": "2024-01-15T12:10:00Z",
+    "is_offline": "true"
+  }
+]

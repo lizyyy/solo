@@ -1,0 +1,5 @@
+{
+  "bucket_by": ["model"],
+  "failure_statuses": ["fail", "failure", "failed", "error", "timeout"],
+  "description": "设备升级日志固件失败分桶配置 v2 - 只按型号分桶，增加timeout作为失败状态"
+}
