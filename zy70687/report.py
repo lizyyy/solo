@@ -92,7 +92,14 @@ class ReportGenerator:
         elif format == "csv":
             all_items = report_data["expiring_items"] + report_data["expired_items"]
             for item in all_items:
-                item["status"] = "即将过期" if "days_left" in item else "已过期"
+                if "days_left" in item:
+                    item["status"] = "即将过期"
+                    item["days"] = item["days_left"]
+                    item["days_expired"] = 0
+                else:
+                    item["status"] = "已过期"
+                    item["days"] = -item["days_expired"]
+                    item["days_left"] = 0
             return self._dict_to_csv(all_items)
         else:
             return self._format_expiry_human_readable(report_data)
@@ -133,7 +140,10 @@ class ReportGenerator:
         if not data:
             return ""
         output = StringIO()
-        writer = csv.DictWriter(output, fieldnames=data[0].keys())
+        all_fields = set()
+        for item in data:
+            all_fields.update(item.keys())
+        writer = csv.DictWriter(output, fieldnames=sorted(all_fields), extrasaction='ignore')
         writer.writeheader()
         writer.writerows(data)
         return output.getvalue()

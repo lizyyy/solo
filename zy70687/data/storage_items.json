@@ -1,26 +1,50 @@
 [
   {
-    "storage_id": "02afcaf8",
-    "customer_id": "641d7d61",
-    "product_name": "爱他美白金版",
+    "storage_id": "df6e6527",
+    "customer_id": "fa966ed1",
+    "product_name": "过期奶粉A",
     "category": "奶粉",
     "category_enum": "milk_powder",
-    "batch_no": "AP202405",
-    "expiry_date": "2027-12-31",
-    "quantity": 3,
+    "batch_no": "EXP001",
+    "expiry_date": "2026-05-01",
+    "quantity": 2,
     "unit": "罐",
-    "created_at": "2026-05-19T06:16:22.436641"
+    "created_at": "2026-05-19T06:29:01.146119"
   },
   {
-    "storage_id": "c3d19951",
-    "customer_id": "587cada7",
-    "product_name": "爱他美白金版",
+    "storage_id": "eb3c2a1b",
+    "customer_id": "fa966ed1",
+    "product_name": "临期尿裤B",
+    "category": "尿裤",
+    "category_enum": "diaper",
+    "batch_no": "EXP002",
+    "expiry_date": "2026-05-25",
+    "quantity": 3,
+    "unit": "包",
+    "created_at": "2026-05-19T06:29:01.218909"
+  },
+  {
+    "storage_id": "8ff937e0",
+    "customer_id": "fa966ed1",
+    "product_name": "正常奶粉C",
     "category": "奶粉",
     "category_enum": "milk_powder",
-    "batch_no": "AP202405",
+    "batch_no": "SAFE001",
+    "expiry_date": "2027-12-31",
+    "quantity": 2,
+    "unit": "罐",
+    "created_at": "2026-05-19T06:29:01.278338"
+  },
+  {
+    "storage_id": "370f2cb4",
+    "customer_id": "7bd2a51c",
+    "product_name": "正常奶粉C",
+    "category": "奶粉",
+    "category_enum": "milk_powder",
+    "batch_no": "SAFE001",
     "expiry_date": "2027-12-31",
     "quantity": 1,
     "unit": "罐",
-    "created_at": "2026-05-19T06:16:51.164469"
+    "created_at": "2026-05-19T06:31:29.722620"
   }
 ]
