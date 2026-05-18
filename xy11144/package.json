@@ -1,0 +1,21 @@
+{
+  "name": "seafood-temperature-cleaner",
+  "version": "1.0.0",
+  "description": "水产批发档口海鲜温度清洗CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "seafood-clean": "./src/cli.js"
+  },
+  "scripts": {
+    "clean": "node src/cli.js",
+    "test": "node src/cli.js --input data/sample-input.csv"
+  },
+  "keywords": ["seafood", "temperature", "data-cleaning", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  }
+}

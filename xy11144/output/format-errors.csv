@@ -1,0 +1,9 @@
+行号,record_id,stall_id,stall_name,probe_id,seafood_type,batch_number,temperature,temperature_unit,record_time,operator,notes,错误详情
+18,SR-BAD01,STA01,东海海鲜行,TP-0001,龙虾,BATCH-20240515-001,5.2,°C,2024-05-15 10:30:00,张三,记录ID格式错误,"[{""field"":""record_id"",""issue"":""记录ID格式错误（应为SR-xxxxxx）"",""value"":""SR-BAD01""},{""field"":""stall_id"",""issue"":""档口ID格式错误（应为ST-Axx）"",""value"":""STA01""}]"
+20,SR-000020,ST-A01,东海海鲜行,TP0001,龙虾,BATCH-20240515-001,5.8,°C,2024-05-15 11:30:00,张三,探头ID格式错误,"[{""field"":""probe_id"",""issue"":""探头ID格式错误（应为TP-xxxx）"",""value"":""TP0001""}]"
+21,SR-000021,ST-A01,东海海鲜行,TP-0001,龙虾,BATCH-20240515-001,100.5,°C,2024-05-15 12:00:00,张三,温度超出范围,"[{""field"":""temperature"",""issue"":""温度值超出有效范围（-30°C ~ 50°C）"",""value"":""100.5""}]"
+22,SR-000022,ST-A01,东海海鲜行,TP-0001,龙虾,BATCH-20240515-001,4.8,F,2024-05-15 12:30:00,张三,温度单位错误,"[{""field"":""temperature_unit"",""issue"":""温度单位错误（应为°C）"",""value"":""F""}]"
+23,SR-000023,ST-A01,东海海鲜行,TP-0001,未知海鲜,BATCH-20240515-001,4.8,°C,2024-05-15 13:00:00,张三,海鲜品类错误,"[{""field"":""seafood_type"",""issue"":""海鲜品类不在有效列表中"",""value"":""未知海鲜""}]"
+24,SR-000024,ST-A01,东海海鲜行,TP-0001,龙虾,BAD-20240515,4.8,°C,2024-05-15 13:30:00,张三,批次号格式错误,"[{""field"":""batch_number"",""issue"":""批次号格式错误（应为BATCH-YYYYMMDD-xxx）"",""value"":""BAD-20240515""}]"
+25,SR-000025,ST-A01,东海海鲜行,TP-0001,龙虾,BATCH-20240515-001,4.8,°C,not-a-date,张三,时间格式错误,"[{""field"":""record_time"",""issue"":""记录时间格式无法解析"",""value"":""not-a-date""}]"
+26,SR-000026,ST-A01,东海海鲜行,TP-0001,龙虾,BATCH-20240515-001,5.0,°C,2024-05-15 19:00:00+05:00,张三,时区偏移错误,"[{""field"":""record_time"",""issue"":""记录时间格式无法解析"",""value"":""2024-05-15 19:00:00+05:00""}]"
