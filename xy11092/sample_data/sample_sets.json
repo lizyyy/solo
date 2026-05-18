@@ -1,0 +1,232 @@
+[
+  {
+    "set_code": "SHOW-001",
+    "set_name": "演唱会专业灯光套装",
+    "store": "朝阳门店",
+    "responsible_person": "李明",
+    "status": "available",
+    "daily_rental_price": 2500.0,
+    "customer_name": null,
+    "customer_phone": null,
+    "event_name": null,
+    "event_location": null,
+    "remarks": "大型演出专用，包含所有必要配件",
+    "items": [
+      {
+        "item_code": "PAR-LED-001",
+        "item_name": "LED全彩帕灯",
+        "category": "面光灯",
+        "brand": "珠江灯光",
+        "model": "PR-5000",
+        "quantity": 16,
+        "unit_price": 2800.0,
+        "status": "normal",
+        "serial_number": "PAR202401001-PAR202401016",
+        "condition_description": "全新设备，亮度充足"
+      },
+      {
+        "item_code": "BEAM-230-001",
+        "item_name": "230W电脑摇头光束灯",
+        "category": "效果灯",
+        "brand": "明道灯光",
+        "model": "GTD-230II",
+        "quantity": 8,
+        "unit_price": 5200.0,
+        "status": "normal",
+        "serial_number": "BEAM202401001-BEAM202401008",
+        "condition_description": "棱镜效果清晰"
+      },
+      {
+        "item_code": "SPOT-300-001",
+        "item_name": "300W电脑摇头图案灯",
+        "category": "效果灯",
+        "brand": "浩洋灯光",
+        "model": "V3000P",
+        "quantity": 4,
+        "unit_price": 7500.0,
+        "status": "normal",
+        "serial_number": "SPOT202401001-SPOT202401004",
+        "condition_description": "图案盘转动顺畅"
+      },
+      {
+        "item_code": "CON-MA2-001",
+        "item_name": "grandMA2灯光控台",
+        "category": "控制设备",
+        "brand": "MA Lighting",
+        "model": "grandMA2 Light",
+        "quantity": 1,
+        "unit_price": 35000.0,
+        "status": "normal",
+        "serial_number": "CON2024001",
+        "condition_description": "触摸屏幕响应灵敏"
+      },
+      {
+        "item_code": "DIM-12CH-001",
+        "item_name": "12路数字调光硅箱",
+        "category": "控制设备",
+        "brand": "河东灯光",
+        "model": "HDL-D12",
+        "quantity": 2,
+        "unit_price": 3200.0,
+        "status": "normal",
+        "serial_number": "DIM2024001-DIM2024002",
+        "condition_description": "调光曲线平滑"
+      },
+      {
+        "item_code": "CABLE-DMX-001",
+        "item_name": "DMX信号线",
+        "category": "配件",
+        "brand": "佳耐美",
+        "model": "L-4E6S",
+        "quantity": 20,
+        "unit_price": 150.0,
+        "status": "normal",
+        "condition_description": "每根10米，三芯屏蔽"
+      },
+      {
+        "item_code": "STAND-TRUSS-001",
+        "item_name": "铝合金灯光架",
+        "category": "配件",
+        "brand": "耀纳",
+        "model": "TN400",
+        "quantity": 12,
+        "unit_price": 800.0,
+        "status": "normal",
+        "condition_description": "2米段，配连接套"
+      }
+    ]
+  },
+  {
+    "set_code": "WED-001",
+    "set_name": "婚礼灯光基础套装",
+    "store": "海淀门店",
+    "responsible_person": "王芳",
+    "status": "rented",
+    "daily_rental_price": 800.0,
+    "customer_name": "张先生",
+    "customer_phone": "13800138000",
+    "event_name": "张先生与李小姐婚礼",
+    "event_location": "北京国贸大酒店宴会厅",
+    "remarks": "2024年5月20日使用，需提前一天进场",
+    "items": [
+      {
+        "item_code": "PAR-WARM-001",
+        "item_name": "暖光帕灯",
+        "category": "面光灯",
+        "brand": "珠江灯光",
+        "model": "PR-3000",
+        "quantity": 12,
+        "unit_price": 1800.0,
+        "status": "normal",
+        "serial_number": "PARW2024001-PARW2024012"
+      },
+      {
+        "item_code": "SPOT-LED-001",
+        "item_name": "LED追光灯",
+        "category": "效果灯",
+        "brand": "明道灯光",
+        "model": "GTD-1500FS",
+        "quantity": 2,
+        "unit_price": 4200.0,
+        "status": "normal",
+        "serial_number": "SPOTLED001-SPOTLED002"
+      },
+      {
+        "item_code": "CON-SIMPLE-001",
+        "item_name": "简易控台",
+        "category": "控制设备",
+        "brand": "力度",
+        "model": "SuperPro512",
+        "quantity": 1,
+        "unit_price": 1500.0,
+        "status": "normal"
+      }
+    ]
+  },
+  {
+    "set_code": "CORP-001",
+    "set_name": "企业年会灯光套装",
+    "store": "朝阳门店",
+    "responsible_person": "李明",
+    "status": "returned",
+    "daily_rental_price": 1200.0,
+    "customer_name": "某科技公司",
+    "customer_phone": "010-88888888",
+    "event_name": "2024年度表彰大会",
+    "event_location": "国家会议中心",
+    "remarks": "归还时发现一台帕灯损坏",
+    "items": [
+      {
+        "item_code": "PAR-RET-001",
+        "item_name": "LED帕灯",
+        "category": "面光灯",
+        "brand": "珠江灯光",
+        "model": "PR-4000",
+        "quantity": 10,
+        "unit_price": 2200.0,
+        "status": "normal",
+        "serial_number": "PARR001-PARR010"
+      },
+      {
+        "item_code": "PAR-RET-002",
+        "item_name": "LED帕灯（损坏）",
+        "category": "面光灯",
+        "brand": "珠江灯光",
+        "model": "PR-4000",
+        "quantity": 1,
+        "unit_price": 2200.0,
+        "status": "damaged",
+        "serial_number": "PARR011",
+        "condition_description": "灯泡不亮，需返厂维修"
+      },
+      {
+        "item_code": "MOV-HEAD-001",
+        "item_name": "电脑摇头灯",
+        "category": "效果灯",
+        "brand": "浩洋灯光",
+        "model": "V2000",
+        "quantity": 4,
+        "unit_price": 4500.0,
+        "status": "normal",
+        "serial_number": "MOV001-MOV004"
+      },
+      {
+        "item_code": "CON-COMPACT-001",
+        "item_name": "紧凑型控台",
+        "category": "控制设备",
+        "brand": "老虎",
+        "model": "Tiger Touch",
+        "quantity": 1,
+        "unit_price": 18000.0,
+        "status": "normal",
+        "serial_number": "CONC001"
+      }
+    ]
+  },
+  {
+    "set_code": "MAINT-001",
+    "set_name": "设备维护套装",
+    "store": "朝阳门店",
+    "responsible_person": "赵强",
+    "status": "maintenance",
+    "daily_rental_price": 0.0,
+    "customer_name": null,
+    "customer_phone": null,
+    "event_name": null,
+    "event_location": null,
+    "remarks": "季度维护中，预计3天后完成",
+    "items": [
+      {
+        "item_code": "FIX-001",
+        "item_name": "光束灯维修",
+        "category": "维修",
+        "brand": "明道灯光",
+        "model": "GTD-230",
+        "quantity": 3,
+        "unit_price": 5000.0,
+        "status": "maintenance",
+        "condition_description": "X轴电机异响，更换中"
+      }
+    ]
+  }
+]
