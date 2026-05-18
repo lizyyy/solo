@@ -1,0 +1,20 @@
+{
+  "name": "export-queue-analyzer",
+  "version": "1.0.0",
+  "description": "导出任务记录大文件排队分析 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "export-queue-analyzer": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "test:watch": "node --test --watch test/",
+    "lint": "node -e \"console.log('lint placeholder')\""
+  },
+  "keywords": ["export", "queue", "analysis", "cli"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
