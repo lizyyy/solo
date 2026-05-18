@@ -1,0 +1,18 @@
+{
+  "name": "transcode-retry-planner",
+  "version": "1.0.0",
+  "description": "转码任务目录失败重试规划 CLI",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "transcode-retry": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test:normal": "node src/cli.js samples/normal-tasks.json",
+    "test:abnormal": "node src/cli.js samples/abnormal-tasks.json"
+  },
+  "keywords": ["transcode", "retry", "planner"],
+  "author": "",
+  "license": "ISC"
+}
