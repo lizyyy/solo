@@ -1,0 +1,30 @@
+{
+  "name": "coupon-withdrawal-impact-cli",
+  "version": "1.0.0",
+  "description": "优惠券发放包主播撤券影响分析工具",
+  "main": "dist/index.js",
+  "bin": {
+    "coupon-impact": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "npm run build && npm run test:normal && npm run test:abnormal",
+    "test:normal": "node dist/cli.js --batches test-data/batches.csv --records test-data/records.csv --orders test-data/orders.csv --output test-results/normal-result.csv",
+    "test:abnormal": "node dist/cli.js --batches test-data/batches.csv --records test-data/records-abnormal.csv --orders test-data/orders-abnormal.csv --output test-results/abnormal-result.csv"
+  },
+  "keywords": ["coupon", "withdrawal", "impact", "analysis"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parse": "^5.5.0",
+    "csv-stringify": "^6.4.0"
+  }
+}
