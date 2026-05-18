@@ -1,0 +1,6 @@
+﻿conflict_type,old_label,conflicting_with,message
+duplicate_old_label,OLD-001,第3行,旧标签重复: OLD-001 在多行出现
+duplicate_new_label,OLD-001,第3行,新标签冲突: WMS-V2-SKU-001-B6AAA69E 已被其他旧标签映射
+sku_location_conflict,OLD-003,旧标签: OLD-001,SKU+库位冲突: SKU-001@A-01-01 已被其他标签使用
+duplicate_new_label,OLD-006,第8行,新标签冲突: WMS-V2-SKU-005-529CE3AC 已被其他旧标签映射
+sku_location_conflict,OLD-006,旧标签: OLD-005,SKU+库位冲突: SKU-005@B-01-01 已被其他标签使用

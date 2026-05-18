@@ -58,6 +58,7 @@ class DuplicateDetector:
                 message=f"新标签冲突: {record.new_label} 已被其他旧标签映射"
             )
             self.conflicts.append(conflict)
+            record.is_valid = False
             record.error_messages.append(conflict.message)
         elif record.new_label:
             self.new_label_seen.add(record.new_label)
@@ -74,6 +75,7 @@ class DuplicateDetector:
                     message=f"SKU+库位冲突: {record.sku}@{record.location} 已被其他标签使用"
                 )
                 self.conflicts.append(conflict)
+                record.is_valid = False
                 record.error_messages.append(conflict.message)
         else:
             self.sku_location_seen[key].append(record.old_label)

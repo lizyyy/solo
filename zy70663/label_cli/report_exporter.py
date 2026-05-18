@@ -98,9 +98,9 @@ class ReportExporter:
         total_records = len(records)
         valid_records = sum(1 for r in records if r.is_valid)
         invalid_records = total_records - valid_records
-        printed_records = sum(1 for r in records if r.print_status == "printed")
-        pending_records = sum(1 for r in records if r.print_status == "pending")
-        failed_records = sum(1 for r in records if r.print_status == "failed")
+        printed_records = sum(1 for r in records if r.is_valid and r.print_status == "printed")
+        pending_records = sum(1 for r in records if r.is_valid and r.print_status != "printed")
+        failed_records = sum(1 for r in records if r.is_valid and r.print_status == "failed")
 
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write("=" * 60 + "\n")

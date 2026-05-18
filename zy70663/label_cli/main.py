@@ -124,8 +124,8 @@ def _display_summary(records, conflicts):
     total = len(records)
     valid = sum(1 for r in records if r.is_valid)
     invalid = total - valid
-    printed = sum(1 for r in records if r.print_status == "printed")
-    pending = sum(1 for r in records if r.print_status == "pending")
+    printed = sum(1 for r in records if r.is_valid and r.print_status == "printed")
+    pending = sum(1 for r in records if r.is_valid and r.print_status != "printed")
 
     table = Table(title="处理摘要")
     table.add_column("指标")
