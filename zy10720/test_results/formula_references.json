@@ -1,0 +1,31 @@
+{
+  "formula_references": [
+    {
+      "file": "test_forms/invoice_form.json",
+      "field_path": "root.fields[4].expression",
+      "formula": "{total_price} * 0.13 + {legacy_amount}",
+      "referenced_fields": [
+        "legacy_amount",
+        "total_price"
+      ]
+    },
+    {
+      "file": "test_forms/customer_form.json",
+      "field_path": "root.fields[4].计算公式",
+      "formula": "{total_price} * 0.9 - {legacy_amount}",
+      "referenced_fields": [
+        "legacy_amount",
+        "total_price"
+      ]
+    },
+    {
+      "file": "test_forms/order_form.json",
+      "field_path": "root.fields[2].formula",
+      "formula": "{unit_price} * {quantity}",
+      "referenced_fields": [
+        "quantity",
+        "unit_price"
+      ]
+    }
+  ]
+}

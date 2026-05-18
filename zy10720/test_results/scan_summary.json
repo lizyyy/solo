@@ -1,0 +1,25 @@
+{
+  "scan_info": {
+    "scan_time": "2026-05-18T16:50:31.601669",
+    "input_path": "./test_forms",
+    "rules_file": "./test_rules.json",
+    "files_scanned": 3
+  },
+  "impact_summary": {
+    "field_renames_count": 3,
+    "field_renames_impacts": 6,
+    "hidden_fields_count": 3,
+    "hidden_fields_impacts": 4,
+    "formula_references_count": 3,
+    "deletion_fields_count": 4,
+    "deletion_impacts": 6
+  },
+  "output_files": {
+    "scan_summary.json": "扫描汇总报告，包含统计数据和概要",
+    "field_renames_impact.json": "字段改名影响详情，列出所有受影响的表单和位置",
+    "hidden_fields_impact.json": "隐藏字段影响详情，列出所有引用了隐藏字段的表单",
+    "formula_references.json": "公式引用分析，列出所有公式及其引用的字段",
+    "field_deletion_impacts.json": "字段删除影响详情，列出所有引用待删字段的表单",
+    "full_scan_report.json": "完整扫描报告，包含所有扫描结果的原始数据"
+  }
+}

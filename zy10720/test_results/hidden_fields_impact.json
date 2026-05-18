@@ -1,0 +1,52 @@
+{
+  "hidden_fields": [
+    {
+      "field_name": "internal_note",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/order_form.json",
+          "occurrences": [
+            "root.fields[4].name",
+            "root.fields[4].name (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "admin_only",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[3].name",
+            "root.fields[3].name (值包含)",
+            "root.sections[1].fields[0] (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "secret_field",
+      "impact_count": 2,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.fields[2].name",
+            "root.fields[2].name (值包含)",
+            "root.dependencies[0].target",
+            "root.dependencies[0].target (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.sections[1].fields[1] (值包含)"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,227 @@
+{
+  "scan_time": "2026-05-18T16:50:31.601669",
+  "input_path": "./test_forms",
+  "rules_file": "./test_rules.json",
+  "summary": {},
+  "field_renames": [
+    {
+      "old_name": "old_name",
+      "new_name": "new_name",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[1].name",
+            "root.fields[1].name (值包含)",
+            "root.sections[0].fields[1] (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "old_name": "customer_id",
+      "new_name": "client_id",
+      "impact_count": 2,
+      "impacts": [
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[0].name",
+            "root.fields[0].name (值包含)",
+            "root.sections[0].fields[0] (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/order_form.json",
+          "occurrences": [
+            "root.fields[1].name",
+            "root.fields[1].name (值包含)",
+            "root.validations[0].field",
+            "root.validations[0].field (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "old_name": "total_price",
+      "new_name": "grand_total",
+      "impact_count": 3,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.fields[4].expression",
+            "root.fields[4].expression (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[4].计算公式",
+            "root.fields[4].计算公式 (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/order_form.json",
+          "occurrences": [
+            "root.fields[2].name",
+            "root.fields[2].name (值包含)",
+            "root.validations[1].field",
+            "root.validations[1].field (值包含)"
+          ]
+        }
+      ]
+    }
+  ],
+  "hidden_fields": [
+    {
+      "field_name": "internal_note",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/order_form.json",
+          "occurrences": [
+            "root.fields[4].name",
+            "root.fields[4].name (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "admin_only",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[3].name",
+            "root.fields[3].name (值包含)",
+            "root.sections[1].fields[0] (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "secret_field",
+      "impact_count": 2,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.fields[2].name",
+            "root.fields[2].name (值包含)",
+            "root.dependencies[0].target",
+            "root.dependencies[0].target (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.sections[1].fields[1] (值包含)"
+          ]
+        }
+      ]
+    }
+  ],
+  "formula_references": [
+    {
+      "file": "test_forms/invoice_form.json",
+      "field_path": "root.fields[4].expression",
+      "formula": "{total_price} * 0.13 + {legacy_amount}",
+      "referenced_fields": [
+        "legacy_amount",
+        "total_price"
+      ]
+    },
+    {
+      "file": "test_forms/customer_form.json",
+      "field_path": "root.fields[4].计算公式",
+      "formula": "{total_price} * 0.9 - {legacy_amount}",
+      "referenced_fields": [
+        "legacy_amount",
+        "total_price"
+      ]
+    },
+    {
+      "file": "test_forms/order_form.json",
+      "field_path": "root.fields[2].formula",
+      "formula": "{unit_price} * {quantity}",
+      "referenced_fields": [
+        "quantity",
+        "unit_price"
+      ]
+    }
+  ],
+  "field_deletion_impacts": [
+    {
+      "field_name": "old_field_1",
+      "impact_count": 2,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.dependencies[0].trigger",
+            "root.dependencies[0].trigger (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/order_form.json",
+          "occurrences": [
+            "root.fields[3].name",
+            "root.fields[3].name (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "deprecated_field_2",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[2].name",
+            "root.fields[2].name (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "unused_field_3",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.fields[3].name",
+            "root.fields[3].name (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "legacy_amount",
+      "impact_count": 2,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.fields[1].name",
+            "root.fields[1].name (值包含)",
+            "root.fields[4].expression",
+            "root.fields[4].expression (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[4].计算公式",
+            "root.fields[4].计算公式 (值包含)"
+          ]
+        }
+      ]
+    }
+  ],
+  "files_scanned": 3
+}

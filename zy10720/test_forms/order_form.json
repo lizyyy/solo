@@ -1,0 +1,41 @@
+{
+  "form_name": "订单表单",
+  "fields": [
+    {
+      "name": "order_id",
+      "label": "订单编号",
+      "type": "string"
+    },
+    {
+      "name": "customer_id",
+      "label": "客户ID",
+      "type": "string"
+    },
+    {
+      "name": "total_price",
+      "label": "总价",
+      "type": "number",
+      "formula": "{unit_price} * {quantity}"
+    },
+    {
+      "name": "old_field_1",
+      "label": "旧字段1",
+      "type": "string"
+    },
+    {
+      "name": "internal_note",
+      "label": "内部备注",
+      "type": "text"
+    }
+  ],
+  "validations": [
+    {
+      "field": "customer_id",
+      "rule": "required"
+    },
+    {
+      "field": "total_price",
+      "rule": "positive_number"
+    }
+  ]
+}

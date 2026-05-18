@@ -1,0 +1,73 @@
+{
+  "field_renames": [
+    {
+      "old_name": "old_name",
+      "new_name": "new_name",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[1].name",
+            "root.fields[1].name (值包含)",
+            "root.sections[0].fields[1] (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "old_name": "customer_id",
+      "new_name": "client_id",
+      "impact_count": 2,
+      "impacts": [
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[0].name",
+            "root.fields[0].name (值包含)",
+            "root.sections[0].fields[0] (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/order_form.json",
+          "occurrences": [
+            "root.fields[1].name",
+            "root.fields[1].name (值包含)",
+            "root.validations[0].field",
+            "root.validations[0].field (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "old_name": "total_price",
+      "new_name": "grand_total",
+      "impact_count": 3,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.fields[4].expression",
+            "root.fields[4].expression (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[4].计算公式",
+            "root.fields[4].计算公式 (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/order_form.json",
+          "occurrences": [
+            "root.fields[2].name",
+            "root.fields[2].name (值包含)",
+            "root.validations[1].field",
+            "root.validations[1].field (值包含)"
+          ]
+        }
+      ]
+    }
+  ]
+}

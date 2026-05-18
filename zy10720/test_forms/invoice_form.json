@@ -1,0 +1,38 @@
+{
+  "form_name": "发票表单",
+  "fields": [
+    {
+      "name": "invoice_id",
+      "label": "发票ID",
+      "type": "string"
+    },
+    {
+      "name": "legacy_amount",
+      "label": "遗留金额",
+      "type": "number"
+    },
+    {
+      "name": "secret_field",
+      "label": "机密字段",
+      "type": "string"
+    },
+    {
+      "name": "unused_field_3",
+      "label": "未使用字段3",
+      "type": "boolean"
+    },
+    {
+      "name": "tax_expression",
+      "label": "税费表达式",
+      "type": "string",
+      "expression": "{total_price} * 0.13 + {legacy_amount}"
+    }
+  ],
+  "dependencies": [
+    {
+      "trigger": "old_field_1",
+      "action": "show",
+      "target": "secret_field"
+    }
+  ]
+}

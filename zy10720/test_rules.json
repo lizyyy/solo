@@ -1,0 +1,18 @@
+{
+  "fields_to_delete": [
+    "old_field_1",
+    "deprecated_field_2",
+    "unused_field_3",
+    "legacy_amount"
+  ],
+  "field_renames": {
+    "old_name": "new_name",
+    "customer_id": "client_id",
+    "total_price": "grand_total"
+  },
+  "hidden_fields": [
+    "internal_note",
+    "admin_only",
+    "secret_field"
+  ]
+}

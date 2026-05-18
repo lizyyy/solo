@@ -1,0 +1,41 @@
+{
+  "form_name": "客户表单",
+  "fields": [
+    {
+      "name": "customer_id",
+      "label": "客户ID",
+      "type": "string"
+    },
+    {
+      "name": "old_name",
+      "label": "旧名称",
+      "type": "string"
+    },
+    {
+      "name": "deprecated_field_2",
+      "label": "已弃用字段2",
+      "type": "number"
+    },
+    {
+      "name": "admin_only",
+      "label": "管理员专用",
+      "type": "text"
+    },
+    {
+      "name": "discount_calculation",
+      "label": "折扣计算",
+      "type": "formula",
+      "计算公式": "{total_price} * 0.9 - {legacy_amount}"
+    }
+  ],
+  "sections": [
+    {
+      "title": "基本信息",
+      "fields": ["customer_id", "old_name"]
+    },
+    {
+      "title": "隐藏区域",
+      "fields": ["admin_only", "secret_field"]
+    }
+  ]
+}

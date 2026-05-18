@@ -1,0 +1,72 @@
+{
+  "field_deletion_impacts": [
+    {
+      "field_name": "old_field_1",
+      "impact_count": 2,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.dependencies[0].trigger",
+            "root.dependencies[0].trigger (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/order_form.json",
+          "occurrences": [
+            "root.fields[3].name",
+            "root.fields[3].name (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "deprecated_field_2",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[2].name",
+            "root.fields[2].name (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "unused_field_3",
+      "impact_count": 1,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.fields[3].name",
+            "root.fields[3].name (值包含)"
+          ]
+        }
+      ]
+    },
+    {
+      "field_name": "legacy_amount",
+      "impact_count": 2,
+      "impacts": [
+        {
+          "file": "test_forms/invoice_form.json",
+          "occurrences": [
+            "root.fields[1].name",
+            "root.fields[1].name (值包含)",
+            "root.fields[4].expression",
+            "root.fields[4].expression (值包含)"
+          ]
+        },
+        {
+          "file": "test_forms/customer_form.json",
+          "occurrences": [
+            "root.fields[4].计算公式",
+            "root.fields[4].计算公式 (值包含)"
+          ]
+        }
+      ]
+    }
+  ]
+}
