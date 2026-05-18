@@ -1,0 +1,19 @@
+维修服务站维修照片归并 - 异常摘要
+==================================================
+正常文件: 7 个
+工单号缺横杠: 3 个
+返工单: 2 个
+可复跑输出: 2 个
+空文件: 3 个
+
+异常文件列表:
+  - WO-2024-0512_空文件_网络中断.jpg (空文件) - repair_merger.py#L50
+  - WO-2024-0510_空文件_损坏图片.jpg (空文件) - repair_merger.py#L50
+  - WO-2024-0511_零字节_上传失败.jpg (空文件) - repair_merger.py#L50
+  - WO2024-0506_缺少前缀.jpg (工单号缺横杠) - repair_merger.py#L50
+  - WO20240504_维修前_轮胎磨损.jpg (工单号缺横杠) - repair_merger.py#L50
+  - WO-2024-0508_返工_电路修复.jpg (返工单) - repair_merger.py#L50
+  - WO-2024-0507_Rework_重新喷漆.jpg (返工单) - repair_merger.py#L50
+  - WO-2024-0509_RERUN_复查确认.jpg (可复跑输出) - repair_merger.py#L50
+  - WO20240505_维修后_四轮定位.jpg (工单号缺横杠) - repair_merger.py#L50
+  - WO-2024-0501_复跑_再次检查.jpg (可复跑输出) - repair_merger.py#L50
