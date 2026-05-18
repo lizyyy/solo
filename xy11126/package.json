@@ -1,0 +1,21 @@
+{
+  "name": "wedding-material-packing-cli",
+  "version": "1.0.0",
+  "description": "婚礼策划室婚礼物料打包 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "wedding-pack": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node src/index.js --input samples/normal-input.csv --output output/normal"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0"
+  },
+  "keywords": ["wedding", "material", "packing", "cli"],
+  "author": "",
+  "license": "MIT"
+}
