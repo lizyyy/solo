@@ -1,0 +1,21 @@
+{
+  "name": "asset-overdue-reminder",
+  "version": "1.0.0",
+  "description": "资产借还台账逾期催还名单 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "asset-reminder": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node test/run-tests.js"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "xlsx": "^0.18.5",
+    "yargs": "^17.7.2"
+  },
+  "keywords": ["asset", "overdue", "reminder"],
+  "author": "",
+  "license": "MIT"
+}
