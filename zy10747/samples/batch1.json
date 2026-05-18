@@ -1,0 +1,46 @@
+[
+  {
+    "examId": "EXAM001",
+    "studentId": "STU001",
+    "studentName": "张三",
+    "subject": "高等数学",
+    "score": 45,
+    "status": "failed",
+    "certDate": "2025-06-15",
+    "retakeCount": 0,
+    "hasRetaken": false
+  },
+  {
+    "examId": "EXAM002",
+    "studentId": "STU001",
+    "studentName": "张三",
+    "subject": "线性代数",
+    "score": 88,
+    "status": "passed",
+    "certDate": "2025-06-15",
+    "retakeCount": 0,
+    "hasRetaken": false
+  },
+  {
+    "examId": "EXAM003",
+    "studentId": "STU002",
+    "studentName": "李四",
+    "subject": "高等数学",
+    "score": 52,
+    "status": "failed",
+    "certDate": "2024-01-10",
+    "retakeCount": 0,
+    "hasRetaken": false
+  },
+  {
+    "examId": "EXAM004",
+    "studentId": "STU003",
+    "studentName": "王五",
+    "subject": "大学物理",
+    "score": 38,
+    "status": "failed",
+    "certDate": "2025-03-20",
+    "retakeCount": 1,
+    "hasRetaken": true
+  }
+]

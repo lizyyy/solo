@@ -1,0 +1,20 @@
+{
+  "name": "exam-retake-scanner",
+  "version": "1.0.0",
+  "description": "考试记录文件补考资格扫描 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "exam-retake-scan": "./bin/exam-retake-scan.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.js",
+    "test:watch": "node --test --watch tests/",
+    "scan": "node bin/exam-retake-scan.js"
+  },
+  "keywords": ["exam", "retake", "scanner", "cli"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
