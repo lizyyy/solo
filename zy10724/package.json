@@ -1,0 +1,33 @@
+{
+  "name": "spare-part-return-reconciliation",
+  "version": "1.0.0",
+  "description": "备件返厂记录维修件状态对账 CLI",
+  "main": "dist/index.js",
+  "bin": {
+    "spr-reconcile": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "npm run build && node dist/cli.js --return-file test-data/return-orders.csv --inventory-file test-data/inventory.csv --inspection-file test-data/inspection-results.csv --output test-data/reconciliation-result.csv"
+  },
+  "keywords": [
+    "spare-part",
+    "reconciliation",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.0"
+  }
+}
