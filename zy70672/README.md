@@ -230,6 +230,12 @@ curl http://localhost:8000/settlements/1/export
 ### 异常处理
 
 ```bash
+# 查询异常记录列表 (支持按结算ID、状态过滤)
+curl "http://localhost:8000/exceptions/?settlement_id=1&status=pending"
+
+# 查询单条异常记录详情
+curl http://localhost:8000/exceptions/1
+
 # 处理异常记录
 curl -X POST http://localhost:8000/exceptions/handle \
   -H "Content-Type: application/json" \

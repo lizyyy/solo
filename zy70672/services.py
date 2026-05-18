@@ -12,6 +12,14 @@ import uuid
 import json
 
 
+class SettlementValidationError(Exception):
+    def __init__(self, settlement_id: int, message: str, exception_type: str):
+        self.settlement_id = settlement_id
+        self.message = message
+        self.exception_type = exception_type
+        super().__init__(message)
+
+
 def generate_settlement_no():
     return f"STL{datetime.now().strftime('%Y%m%d')}{uuid.uuid4().hex[:6].upper()}"
 
@@ -78,12 +86,18 @@ def create_settlement_service(db: Session, settlement_data: SettlementCreate):
     gps_records = gps_query.all()
 
     if not gps_records:
-        raise ExceptionRecord(
+        settlement.status = SettlementStatus.CONFLICT
+        exception = ExceptionRecord(
             settlement_id=settlement.id,
             exception_type="NO_GPS_DATA",
             original_input=json.dumps(settlement_data.dict(), ensure_ascii=False),
-            handling_notes="No GPS records found for this farmer"
+            handling_notes="No GPS records found for this farmer",
+            status="pending"
         )
+        db.add(exception)
+        db.commit()
+        db.refresh(settlement)
+        return settlement
 
     confirmation_query = db.query(Confirmation).filter(
         Confirmation.farmer_id == settlement_data.farmer_id
@@ -102,11 +116,14 @@ def create_settlement_service(db: Session, settlement_data: SettlementCreate):
     for dup1, dup2 in duplicates:
         duplicate_set.add(dup2)
 
+    has_duplicates = len(duplicates) > 0
+    has_no_confirmations = len(confirmations) == 0
+
     total_gps_area = 0
     total_confirmed_area = 0
     total_final_area = 0
     total_amount = 0
-    has_conflict = False
+    has_area_conflict = False
 
     for gps_record in gps_records:
         if gps_record.id in duplicate_set:
@@ -123,7 +140,7 @@ def create_settlement_service(db: Session, settlement_data: SettlementCreate):
         final_area = get_final_area(gps_record.gps_area, confirmed_area)
         
         if final_area is None:
-            has_conflict = True
+            has_area_conflict = True
             final_area = gps_record.gps_area
 
         area_diff, area_diff_ratio = calculate_area_diff(gps_record.gps_area, confirmed_area)
@@ -168,12 +185,34 @@ def create_settlement_service(db: Session, settlement_data: SettlementCreate):
     settlement.total_final_area = total_final_area
     settlement.total_amount = total_amount
 
-    if has_conflict:
+    if has_area_conflict:
         settlement.status = SettlementStatus.CONFLICT
         exception = ExceptionRecord(
             settlement_id=settlement.id,
             exception_type="AREA_CONFLICT",
             original_input=json.dumps(settlement_data.dict(), ensure_ascii=False),
+            status="pending"
+        )
+        db.add(exception)
+
+    if has_duplicates:
+        settlement.status = SettlementStatus.CONFLICT
+        exception = ExceptionRecord(
+            settlement_id=settlement.id,
+            exception_type="DUPLICATE_PLOT",
+            original_input=json.dumps(settlement_data.dict(), ensure_ascii=False),
+            handling_notes=f"Found {len(duplicates)} duplicate plot records",
+            status="pending"
+        )
+        db.add(exception)
+
+    if has_no_confirmations:
+        settlement.status = SettlementStatus.CONFLICT
+        exception = ExceptionRecord(
+            settlement_id=settlement.id,
+            exception_type="NO_CONFIRMATION",
+            original_input=json.dumps(settlement_data.dict(), ensure_ascii=False),
+            handling_notes="No confirmation records found for this farmer",
             status="pending"
         )
         db.add(exception)

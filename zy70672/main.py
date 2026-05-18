@@ -8,7 +8,7 @@ from schemas import (
     Farmer, FarmerCreate, Plot, PlotCreate, Project, ProjectCreate,
     GPSRecord, GPSRecordCreate, Confirmation, ConfirmationCreate,
     Settlement, SettlementCreate, SettlementUpdate, SettlementList,
-    ManualCorrectionRequest, ExceptionHandleRequest
+    ManualCorrectionRequest, ExceptionHandleRequest, ExceptionRecord
 )
 from services import (
     create_settlement_service, get_settlement_service,
@@ -16,7 +16,7 @@ from services import (
     manual_correction_service, cancel_settlement_service,
     handle_exception_service, export_settlement_service
 )
-from models import Farmer as FarmerModel, Plot as PlotModel, Project as ProjectModel, GPSRecord as GPSRecordModel, Confirmation as ConfirmationModel
+from models import Farmer as FarmerModel, Plot as PlotModel, Project as ProjectModel, GPSRecord as GPSRecordModel, Confirmation as ConfirmationModel, ExceptionRecord as ExceptionRecordModel
 
 Base.metadata.create_all(bind=engine)
 
@@ -157,6 +157,24 @@ def cancel_settlement(settlement_id: int, processed_by: str, reason: str, db: Se
         return settlement
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/exceptions/", response_model=list[ExceptionRecord], tags=["异常处理"])
+def list_exceptions(settlement_id: Optional[int] = None, status: Optional[str] = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    query = db.query(ExceptionRecordModel)
+    if settlement_id:
+        query = query.filter(ExceptionRecordModel.settlement_id == settlement_id)
+    if status:
+        query = query.filter(ExceptionRecordModel.status == status)
+    return query.offset(skip).limit(limit).all()
+
+
+@app.get("/exceptions/{exception_id}", response_model=ExceptionRecord, tags=["异常处理"])
+def get_exception(exception_id: int, db: Session = Depends(get_db)):
+    exception = db.query(ExceptionRecordModel).filter(ExceptionRecordModel.id == exception_id).first()
+    if not exception:
+        raise HTTPException(status_code=404, detail="Exception record not found")
+    return exception
 
 
 @app.post("/exceptions/handle", tags=["异常处理"])
