@@ -60,6 +60,28 @@ class DataLoader:
         return result
 
     @staticmethod
+    def _parse_datetime(value: Any) -> Optional[datetime]:
+        if pd.isna(value):
+            return None
+        if isinstance(value, datetime):
+            return value
+        try:
+            import numpy as np
+            if isinstance(value, np.datetime64):
+                return pd.Timestamp(value).to_pydatetime()
+        except ImportError:
+            pass
+        try:
+            if isinstance(value, str):
+                return datetime.fromisoformat(value)
+        except (ValueError, TypeError):
+            pass
+        try:
+            return pd.Timestamp(value).to_pydatetime()
+        except (ValueError, TypeError):
+            return None
+
+    @staticmethod
     def _process_excel_row(row: Dict[str, Any]) -> Dict[str, Any]:
         result = {}
         for key, value in row.items():
@@ -68,10 +90,7 @@ class DataLoader:
             elif key in ["volume", "occupancy_days", "free_rent_days"]:
                 result[key] = float(value) if key == "volume" else int(value)
             elif key in ["checkin_date", "checkout_date"]:
-                if isinstance(value, datetime):
-                    result[key] = value
-                else:
-                    result[key] = None
+                result[key] = DataLoader._parse_datetime(value)
             elif key == "is_checked_out":
                 if isinstance(value, bool):
                     result[key] = value
