@@ -1,0 +1,20 @@
+{
+  "name": "billing-package-overage-calculator",
+  "version": "1.0.0",
+  "description": "账单流水文件套餐超额核算 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "billing-calc": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "start": "node src/cli.js",
+    "demo": "node src/cli.js --input samples/ --output reports/"
+  },
+  "keywords": ["billing", "package", "overage", "calculator", "cli"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

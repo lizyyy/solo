@@ -1,0 +1,51 @@
+[
+  {
+    "type": "跨月补写",
+    "fileName": "abnormal_billing_202401.csv",
+    "lineNumber": 2,
+    "message": "跨月补写: 计费月份=2024-12，处理月份=2026-05",
+    "timestamp": "2026-05-18T01:57:58.168Z"
+  },
+  {
+    "type": "负数冲正",
+    "fileName": "abnormal_billing_202401.csv",
+    "lineNumber": 3,
+    "message": "负数冲正: 数据用量_GB=-5",
+    "timestamp": "2026-05-18T01:57:58.168Z"
+  },
+  {
+    "type": "负数冲正",
+    "fileName": "abnormal_billing_202401.csv",
+    "lineNumber": 4,
+    "message": "负数冲正: 套餐费用=-10",
+    "timestamp": "2026-05-18T01:57:58.168Z"
+  },
+  {
+    "type": "缺失字段",
+    "fileName": "abnormal_billing_202401.csv",
+    "lineNumber": 6,
+    "message": "字段数据用量_GB为空",
+    "timestamp": "2026-05-18T01:57:58.168Z"
+  },
+  {
+    "type": "格式无效",
+    "fileName": "abnormal_billing_202401.csv",
+    "lineNumber": 7,
+    "message": "计费月份格式无效: 202605，期望格式: YYYY-MM",
+    "timestamp": "2026-05-18T01:57:58.168Z"
+  },
+  {
+    "type": "数值无效",
+    "fileName": "abnormal_billing_202401.csv",
+    "lineNumber": 8,
+    "message": "字段套餐费用数值无效: abc",
+    "timestamp": "2026-05-18T01:57:58.168Z"
+  },
+  {
+    "type": "重复计量",
+    "fileName": "normal_billing_202401.csv",
+    "lineNumber": 2,
+    "message": "重复记录: 账单编号=BILL001, 用户ID=USER001, 计费月份=2026-05",
+    "timestamp": "2026-05-18T01:57:58.169Z"
+  }
+]

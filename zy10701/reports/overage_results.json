@@ -1,0 +1,404 @@
+{
+  "results": [
+    {
+      "userId": "USER006",
+      "usageSummary": {
+        "dataGB": 75,
+        "voiceMinutes": 700,
+        "smsCount": 350,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 0,
+        "voiceOverageMinutes": 0,
+        "smsOverageCount": 0,
+        "dataOverageFee": 0,
+        "voiceOverageFee": 0,
+        "smsOverageFee": 0,
+        "totalOverageFee": 0
+      },
+      "financialSummary": {
+        "totalPackageFee": 99,
+        "totalDiscountAmount": 15,
+        "totalActualPayment": 84,
+        "expectedPayment": 84,
+        "discountDifference": 0
+      },
+      "sourceRecords": [
+        {
+          "fileName": "abnormal_billing_202401.csv",
+          "lineNumber": 2,
+          "billingMonth": "2024-12",
+          "billNumber": "BILL006"
+        }
+      ]
+    },
+    {
+      "userId": "USER007",
+      "usageSummary": {
+        "dataGB": -5,
+        "voiceMinutes": 800,
+        "smsCount": 300,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 0,
+        "voiceOverageMinutes": 0,
+        "smsOverageCount": 0,
+        "dataOverageFee": 0,
+        "voiceOverageFee": 0,
+        "smsOverageFee": 0,
+        "totalOverageFee": 0
+      },
+      "financialSummary": {
+        "totalPackageFee": 99,
+        "totalDiscountAmount": 10,
+        "totalActualPayment": 89,
+        "expectedPayment": 89,
+        "discountDifference": 0
+      },
+      "sourceRecords": [
+        {
+          "fileName": "abnormal_billing_202401.csv",
+          "lineNumber": 3,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL007"
+        }
+      ]
+    },
+    {
+      "userId": "USER008",
+      "usageSummary": {
+        "dataGB": 80,
+        "voiceMinutes": 900,
+        "smsCount": 400,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 0,
+        "voiceOverageMinutes": 0,
+        "smsOverageCount": 0,
+        "dataOverageFee": 0,
+        "voiceOverageFee": 0,
+        "smsOverageFee": 0,
+        "totalOverageFee": 0
+      },
+      "financialSummary": {
+        "totalPackageFee": -10,
+        "totalDiscountAmount": 5,
+        "totalActualPayment": 84,
+        "expectedPayment": -15,
+        "discountDifference": 99
+      },
+      "sourceRecords": [
+        {
+          "fileName": "abnormal_billing_202401.csv",
+          "lineNumber": 4,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL008"
+        }
+      ]
+    },
+    {
+      "userId": "USER001",
+      "usageSummary": {
+        "dataGB": 171,
+        "voiceMinutes": 1600,
+        "smsCount": 600,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 71,
+        "voiceOverageMinutes": 600,
+        "smsOverageCount": 100,
+        "dataOverageFee": 35.5,
+        "voiceOverageFee": 90,
+        "smsOverageFee": 10,
+        "totalOverageFee": 135.5
+      },
+      "financialSummary": {
+        "totalPackageFee": 198,
+        "totalDiscountAmount": 20,
+        "totalActualPayment": 178,
+        "expectedPayment": 313.5,
+        "discountDifference": 135.5
+      },
+      "sourceRecords": [
+        {
+          "fileName": "abnormal_billing_202401.csv",
+          "lineNumber": 5,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL001"
+        },
+        {
+          "fileName": "normal_billing_202401.csv",
+          "lineNumber": 2,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL001"
+        }
+      ]
+    },
+    {
+      "userId": "USER010",
+      "usageSummary": {
+        "dataGB": 0,
+        "voiceMinutes": 800,
+        "smsCount": 300,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 0,
+        "voiceOverageMinutes": 0,
+        "smsOverageCount": 0,
+        "dataOverageFee": 0,
+        "voiceOverageFee": 0,
+        "smsOverageFee": 0,
+        "totalOverageFee": 0
+      },
+      "financialSummary": {
+        "totalPackageFee": 99,
+        "totalDiscountAmount": 10,
+        "totalActualPayment": 89,
+        "expectedPayment": 89,
+        "discountDifference": 0
+      },
+      "sourceRecords": [
+        {
+          "fileName": "abnormal_billing_202401.csv",
+          "lineNumber": 6,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL010"
+        }
+      ]
+    },
+    {
+      "userId": "USER011",
+      "usageSummary": {
+        "dataGB": 80,
+        "voiceMinutes": 800,
+        "smsCount": 300,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 0,
+        "voiceOverageMinutes": 0,
+        "smsOverageCount": 0,
+        "dataOverageFee": 0,
+        "voiceOverageFee": 0,
+        "smsOverageFee": 0,
+        "totalOverageFee": 0
+      },
+      "financialSummary": {
+        "totalPackageFee": 99,
+        "totalDiscountAmount": 10,
+        "totalActualPayment": 89,
+        "expectedPayment": 89,
+        "discountDifference": 0
+      },
+      "sourceRecords": [
+        {
+          "fileName": "abnormal_billing_202401.csv",
+          "lineNumber": 7,
+          "billingMonth": "202605",
+          "billNumber": "BILL011"
+        }
+      ]
+    },
+    {
+      "userId": "USER012",
+      "usageSummary": {
+        "dataGB": 80,
+        "voiceMinutes": 800,
+        "smsCount": 300,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 0,
+        "voiceOverageMinutes": 0,
+        "smsOverageCount": 0,
+        "dataOverageFee": 0,
+        "voiceOverageFee": 0,
+        "smsOverageFee": 0,
+        "totalOverageFee": 0
+      },
+      "financialSummary": {
+        "totalPackageFee": 0,
+        "totalDiscountAmount": 10,
+        "totalActualPayment": 89,
+        "expectedPayment": -10,
+        "discountDifference": 99
+      },
+      "sourceRecords": [
+        {
+          "fileName": "abnormal_billing_202401.csv",
+          "lineNumber": 8,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL012"
+        }
+      ]
+    },
+    {
+      "userId": "USER002",
+      "usageSummary": {
+        "dataGB": 120.3,
+        "voiceMinutes": 1200,
+        "smsCount": 600,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 20.3,
+        "voiceOverageMinutes": 200,
+        "smsOverageCount": 100,
+        "dataOverageFee": 10.15,
+        "voiceOverageFee": 30,
+        "smsOverageFee": 10,
+        "totalOverageFee": 50.15
+      },
+      "financialSummary": {
+        "totalPackageFee": 99,
+        "totalDiscountAmount": 20,
+        "totalActualPayment": 159.15,
+        "expectedPayment": 129.15,
+        "discountDifference": 30
+      },
+      "sourceRecords": [
+        {
+          "fileName": "normal_billing_202401.csv",
+          "lineNumber": 3,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL002"
+        }
+      ]
+    },
+    {
+      "userId": "USER003",
+      "usageSummary": {
+        "dataGB": 50,
+        "voiceMinutes": 500,
+        "smsCount": 200,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 0,
+        "voiceOverageMinutes": 0,
+        "smsOverageCount": 0,
+        "dataOverageFee": 0,
+        "voiceOverageFee": 0,
+        "smsOverageFee": 0,
+        "totalOverageFee": 0
+      },
+      "financialSummary": {
+        "totalPackageFee": 99,
+        "totalDiscountAmount": 5,
+        "totalActualPayment": 94,
+        "expectedPayment": 94,
+        "discountDifference": 0
+      },
+      "sourceRecords": [
+        {
+          "fileName": "normal_billing_202401.csv",
+          "lineNumber": 4,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL003"
+        }
+      ]
+    },
+    {
+      "userId": "USER004",
+      "usageSummary": {
+        "dataGB": 150,
+        "voiceMinutes": 900,
+        "smsCount": 450,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 50,
+        "voiceOverageMinutes": 0,
+        "smsOverageCount": 0,
+        "dataOverageFee": 25,
+        "voiceOverageFee": 0,
+        "smsOverageFee": 0,
+        "totalOverageFee": 25
+      },
+      "financialSummary": {
+        "totalPackageFee": 99,
+        "totalDiscountAmount": 0,
+        "totalActualPayment": 124,
+        "expectedPayment": 124,
+        "discountDifference": 0
+      },
+      "sourceRecords": [
+        {
+          "fileName": "normal_billing_202401.csv",
+          "lineNumber": 5,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL004"
+        }
+      ]
+    },
+    {
+      "userId": "USER005",
+      "usageSummary": {
+        "dataGB": 99.9,
+        "voiceMinutes": 999,
+        "smsCount": 499,
+        "dataLimitGB": 100,
+        "voiceLimitMinutes": 1000,
+        "smsLimitCount": 500
+      },
+      "overageDetails": {
+        "dataOverageGB": 0,
+        "voiceOverageMinutes": 0,
+        "smsOverageCount": 0,
+        "dataOverageFee": 0,
+        "voiceOverageFee": 0,
+        "smsOverageFee": 0,
+        "totalOverageFee": 0
+      },
+      "financialSummary": {
+        "totalPackageFee": 99,
+        "totalDiscountAmount": 30,
+        "totalActualPayment": 69,
+        "expectedPayment": 69,
+        "discountDifference": 0
+      },
+      "sourceRecords": [
+        {
+          "fileName": "normal_billing_202401.csv",
+          "lineNumber": 6,
+          "billingMonth": "2026-05",
+          "billNumber": "BILL005"
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "userCount": 11,
+    "overageUserCount": 3,
+    "totalDataOverageGB": 141.3,
+    "totalVoiceOverageMinutes": 800,
+    "totalSmsOverageCount": 200,
+    "totalOverageFee": 210.65,
+    "totalDiscountDifference": 363.5
+  }
+}
