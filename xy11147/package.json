@@ -1,0 +1,22 @@
+{
+  "name": "short-rent-utilities-split",
+  "version": "1.0.0",
+  "description": "短租公寓前台短租水电拆分CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "utilities-split": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node src/index.js --input examples/normal-input.csv"
+  },
+  "keywords": ["short-rent", "utilities", "split", "apartment"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2"
+  }
+}
