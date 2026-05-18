@@ -67,7 +67,7 @@ def process(files, config, output, tracking_file, no_tracking, prefix):
     else:
         from dataclasses import dataclass
         @dataclass
-        DummyTracking:
+        class DummyTracking:
             is_new: bool = False
             is_changed: bool = False
             previous_hash: str = None

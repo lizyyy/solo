@@ -18,5 +18,8 @@ dependencies = [
 [project.scripts]
 cash-recon = "cash_recon.cli:main"
 
+[tool.hatch.build.targets.wheel]
+packages = ["cash_recon"]
+
 [tool.hatch.envs.default]
 dependencies = ["pytest>=7.0.0"]
