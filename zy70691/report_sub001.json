@@ -1,0 +1,21 @@
+{
+  "subscription_id": "SUB001",
+  "period": "2024-05-01 至 2024-06-30",
+  "total_deliveries": 9,
+  "completed_deliveries": 5,
+  "paused_deliveries": 0,
+  "total_adjustments": 1,
+  "price_adjustments_total": -11.4,
+  "flower_changes": [
+    {
+      "date": "2024-05-15",
+      "old": [
+        "F001"
+      ],
+      "new": [
+        "F003"
+      ]
+    }
+  ],
+  "generated_at": "2026-05-18T07:36:24.877551"
+}

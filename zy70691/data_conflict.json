@@ -1,0 +1,173 @@
+{
+  "flowers": [
+    {
+      "flower_id": "F001",
+      "name": "红玫瑰",
+      "price": 29.9,
+      "current_stock": 1,
+      "min_stock": 10,
+      "supplier": "供应商A",
+      "last_updated": "2026-05-18T07:36:24.338593"
+    },
+    {
+      "flower_id": "F002",
+      "name": "白百合",
+      "price": 35.0,
+      "current_stock": 1,
+      "min_stock": 5,
+      "supplier": "供应商B",
+      "last_updated": "2026-05-18T07:36:24.338594"
+    },
+    {
+      "flower_id": "F003",
+      "name": "向日葵",
+      "price": 18.5,
+      "current_stock": 0,
+      "min_stock": 8,
+      "supplier": "供应商A",
+      "last_updated": "2026-05-18T07:36:24.338594"
+    }
+  ],
+  "subscriptions": [
+    {
+      "subscription_id": "SUB001",
+      "customer_id": "CUST001",
+      "plan_id": "PLAN_WEEKLY",
+      "start_date": "2024-01-01",
+      "end_date": "2024-06-30",
+      "status": "paused",
+      "current_flower_ids": [
+        "F001",
+        "F002"
+      ],
+      "total_price": 64.9,
+      "pause_history": [
+        {
+          "start_date": "2024-05-10",
+          "end_date": "2024-05-20",
+          "request_id": "REQ_OLD"
+        }
+      ],
+      "created_at": "2026-05-18T07:36:24.338596",
+      "notes": ""
+    }
+  ],
+  "schedules": [
+    {
+      "schedule_id": "SCHED000",
+      "subscription_id": "SUB001",
+      "delivery_date": "2024-05-01",
+      "flower_ids": [
+        "F001",
+        "F002"
+      ],
+      "status": "scheduled",
+      "actual_delivery_date": null,
+      "address": "上海市静安区xxx路xxx号",
+      "driver_id": "DRIVER100",
+      "notes": ""
+    },
+    {
+      "schedule_id": "SCHED001",
+      "subscription_id": "SUB001",
+      "delivery_date": "2024-05-08",
+      "flower_ids": [
+        "F001",
+        "F002"
+      ],
+      "status": "scheduled",
+      "actual_delivery_date": null,
+      "address": "上海市静安区xxx路xxx号",
+      "driver_id": "DRIVER101",
+      "notes": ""
+    },
+    {
+      "schedule_id": "SCHED002",
+      "subscription_id": "SUB001",
+      "delivery_date": "2024-05-15",
+      "flower_ids": [
+        "F001",
+        "F002"
+      ],
+      "status": "scheduled",
+      "actual_delivery_date": null,
+      "address": "上海市静安区xxx路xxx号",
+      "driver_id": "DRIVER102",
+      "notes": ""
+    },
+    {
+      "schedule_id": "SCHED003",
+      "subscription_id": "SUB001",
+      "delivery_date": "2024-05-22",
+      "flower_ids": [
+        "F001",
+        "F002"
+      ],
+      "status": "scheduled",
+      "actual_delivery_date": null,
+      "address": "上海市静安区xxx路xxx号",
+      "driver_id": "DRIVER103",
+      "notes": ""
+    },
+    {
+      "schedule_id": "SCHED004",
+      "subscription_id": "SUB001",
+      "delivery_date": "2024-05-29",
+      "flower_ids": [
+        "F001",
+        "F002"
+      ],
+      "status": "scheduled",
+      "actual_delivery_date": null,
+      "address": "上海市静安区xxx路xxx号",
+      "driver_id": "DRIVER104",
+      "notes": ""
+    },
+    {
+      "schedule_id": "SCHED005",
+      "subscription_id": "SUB001",
+      "delivery_date": "2024-06-05",
+      "flower_ids": [
+        "F001",
+        "F002"
+      ],
+      "status": "scheduled",
+      "actual_delivery_date": null,
+      "address": "上海市静安区xxx路xxx号",
+      "driver_id": "DRIVER105",
+      "notes": ""
+    },
+    {
+      "schedule_id": "SCHED006",
+      "subscription_id": "SUB001",
+      "delivery_date": "2024-06-12",
+      "flower_ids": [
+        "F001",
+        "F002"
+      ],
+      "status": "scheduled",
+      "actual_delivery_date": null,
+      "address": "上海市静安区xxx路xxx号",
+      "driver_id": "DRIVER106",
+      "notes": ""
+    },
+    {
+      "schedule_id": "SCHED007",
+      "subscription_id": "SUB001",
+      "delivery_date": "2024-06-19",
+      "flower_ids": [
+        "F001",
+        "F002"
+      ],
+      "status": "scheduled",
+      "actual_delivery_date": null,
+      "address": "上海市静安区xxx路xxx号",
+      "driver_id": "DRIVER107",
+      "notes": ""
+    }
+  ],
+  "change_requests": [],
+  "price_differences": [],
+  "inventory_logs": [],
+  "executed_requests": {}
+}
