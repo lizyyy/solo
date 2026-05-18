@@ -1,5 +1,4 @@
 from typing import Optional, List, Dict
-from datetime import datetime
 from pydantic import BaseModel, Field
 from enum import Enum
 
@@ -79,7 +78,7 @@ class MaintenancePlanResult(BaseModel):
 
 
 class ProcessResult(BaseModel):
-    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    timestamp: str = "inventory-preview"
     car_models: List[CarModel] = Field(default_factory=list)
     maintenance_items: List[MaintenanceItem] = Field(default_factory=list)
     inventory: List[PartInventory] = Field(default_factory=list)

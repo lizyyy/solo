@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-18T06:23:34.991215",
+  "timestamp": "inventory-preview",
   "summary": {
     "car_models_count": 4,
     "maintenance_items_count": 4,
@@ -196,7 +196,7 @@
           ],
           "source_trace": [
             "保养项目: BRAKE-F-001:1",
-            "使用原配: BRAKE-F-001 x1"
+            "使用替代(优先级1): BRAKE-F-001-ALT x1"
           ]
         }
       ]

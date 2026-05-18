@@ -30,13 +30,14 @@ class RulesEngine:
         self._build_alternatives_map(alternatives)
         self._build_part_names(inventory)
 
+        working_inventory = self.inventory_cache.copy()
         plan_results: List[MaintenancePlanResult] = []
 
         for car_model in sorted(car_models, key=lambda x: x.model_id):
             for maintenance in sorted(maintenance_items, key=lambda x: x.maintenance_id):
                 if car_model.model_id in maintenance.applicable_models:
                     plan_result = self._process_maintenance_plan(
-                        car_model.model_id, maintenance
+                        car_model.model_id, maintenance, working_inventory
                     )
                     plan_results.append(plan_result)
 
@@ -67,9 +68,8 @@ class RulesEngine:
             self.part_names[part.part_number] = part.part_name
 
     def _process_maintenance_plan(
-        self, car_model_id: str, maintenance: MaintenanceItem
+        self, car_model_id: str, maintenance: MaintenanceItem, working_inventory: Dict[str, int]
     ) -> MaintenancePlanResult:
-        working_inventory = self.inventory_cache.copy()
         parts_summary: List[PartRequirement] = []
 
         for part_number, required_qty in sorted(maintenance.required_parts.items()):
