@@ -1,0 +1,29 @@
+{
+  "name": "market-stall-fee-checker",
+  "version": "1.0.0",
+  "description": "农贸市场摊位办摊位收费核对 CLI 工具",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "stall-fee-check": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.js",
+    "lint": "eslint src/"
+  },
+  "keywords": [
+    "农贸市场",
+    "摊位收费",
+    "数据核对",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  }
+}
