@@ -1,0 +1,34 @@
+[
+  {
+    "client_name": "刘强",
+    "client_phone": "13700137001",
+    "original_appointment_date": "2024-05-25",
+    "original_appointment_time": "09:30",
+    "counselor_name": "李医生",
+    "store_name": "北京朝阳店",
+    "reschedule_count": 1,
+    "reschedule_reason": "出差",
+    "assignee": "张助理"
+  },
+  {
+    "client_name": "赵雪",
+    "client_phone": "13700137002",
+    "original_appointment_date": "2024-05-26",
+    "original_appointment_time": "14:00",
+    "counselor_name": "王医生",
+    "store_name": "北京朝阳店",
+    "reschedule_count": 2,
+    "reschedule_reason": "家中有事",
+    "assignee": "李助理"
+  },
+  {
+    "client_name": "孙磊",
+    "client_phone": "13700137003",
+    "original_appointment_date": "2024-05-27",
+    "original_appointment_time": "10:30",
+    "counselor_name": "张医生",
+    "store_name": "上海静安店",
+    "reschedule_count": 0,
+    "assignee": "王助理"
+  }
+]

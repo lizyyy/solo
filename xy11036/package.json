@@ -1,0 +1,19 @@
+{
+  "name": "counseling-reschedule-followup-api",
+  "version": "1.0.0",
+  "description": "心理咨询室咨询改约回访 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "init-db": "node scripts/init-db.js",
+    "test": "node scripts/test-api.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "body-parser": "^1.20.2"
+  }
+}
