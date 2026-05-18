@@ -1,0 +1,64 @@
+{
+  "total_files": 4,
+  "files_processed": 3,
+  "files_skipped": 1,
+  "files_failed": 0,
+  "total_records": 18,
+  "records_success": 13,
+  "records_skipped": 0,
+  "records_failed": 5,
+  "file_details": [
+    {
+      "file_name": "schedule_may_dirty.csv",
+      "file_path": "sample_data/schedule_may_dirty.csv",
+      "status": "partial",
+      "total_records": 10,
+      "success_records": 7,
+      "skipped_records": 0,
+      "failed_records": 3,
+      "reasons": [
+        "第3行: 施工时间跨午休时段",
+        "第4行: 车主姓名为空",
+        "第5行: 联系电话格式可能不正确",
+        "第5行: 施工时间跨午休时段",
+        "第5行: 技师可能处于请假状态: 钱师傅(请假)",
+        "第6行: 车辆编号为空",
+        "第8行: 无效的施工项目编码: INVALID",
+        "第10行: 施工时间跨午休时段",
+        "第11行: 施工开始时间早于营业时间"
+      ]
+    },
+    {
+      "file_name": "schedule_may_normal.csv",
+      "file_path": "sample_data/schedule_may_normal.csv",
+      "status": "success",
+      "total_records": 5,
+      "success_records": 5,
+      "skipped_records": 0,
+      "failed_records": 0,
+      "reasons": [
+        "第3行: 施工时间跨午休时段",
+        "第5行: 施工时间跨午休时段"
+      ]
+    },
+    {
+      "file_name": "schedule_april_invalid.csv",
+      "file_path": "sample_data/schedule_april_invalid.csv",
+      "status": "partial",
+      "total_records": 3,
+      "success_records": 1,
+      "skipped_records": 0,
+      "failed_records": 2,
+      "reasons": [
+        "第2行: 车主姓名为空; 无效的施工项目编码: NAN; 预计开始时间晚于或等于预计结束时间",
+        "第3行: 车辆编号为空; 无效的施工项目编码: P999",
+        "第4行: 施工结束时间晚于营业时间",
+        "第4行: 未知的车辆状态: 未知状态"
+      ]
+    }
+  ],
+  "skip_reasons": [
+    "nonexistent.csv: 文件不存在"
+  ],
+  "fail_reasons": []
+}
