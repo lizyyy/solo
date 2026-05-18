@@ -136,6 +136,7 @@ async def test_compensation_full_flow(client):
     result = response.json()
     assert result["record"]["status"] == "ORDER_CREATED"
     assert "order" in result
+    assert result["record"]["order_no"] == result["order"]["order_no"]
 
     # 5. 推进状态: COMPENSATING
     response = await client.put(

@@ -104,13 +104,19 @@ def create_voucher(db: Session, voucher: schemas.CompensationVoucherCreate):
     return db_voucher
 
 
-def match_transaction_to_order(db: Session, transaction_id: str) -> Optional[models.OrderDraft]:
+def match_transaction_to_order(db: Session, transaction_id: str, record_id: Optional[int] = None) -> Optional[models.OrderDraft]:
     transaction = get_transaction_by_id(db, transaction_id)
     if not transaction:
         return None
 
     existing_order = db.query(models.OrderDraft).filter(models.OrderDraft.transaction_id == transaction_id).first()
     if existing_order:
+        if record_id:
+            db_record = db.query(models.CompensationRecord).filter(models.CompensationRecord.id == record_id).first()
+            if db_record and db_record.order_no != existing_order.order_no:
+                db_record.order_no = existing_order.order_no
+                db.commit()
+                db.refresh(db_record)
         return existing_order
 
     order_no = generate_order_no()
@@ -125,6 +131,14 @@ def match_transaction_to_order(db: Session, transaction_id: str) -> Optional[mod
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+
+    if record_id:
+        db_record = db.query(models.CompensationRecord).filter(models.CompensationRecord.id == record_id).first()
+        if db_record:
+            db_record.order_no = order_no
+            db.commit()
+            db.refresh(db_record)
+
     return db_order
 
 

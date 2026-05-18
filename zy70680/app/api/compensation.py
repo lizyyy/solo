@@ -123,7 +123,7 @@ def match_order(
     if db_record is None:
         raise HTTPException(status_code=404, detail="补偿记录不存在")
 
-    order = crud.match_transaction_to_order(db, db_record.transaction_id)
+    order = crud.match_transaction_to_order(db, db_record.transaction_id, db_record.id)
     if order is None:
         raise HTTPException(status_code=404, detail="支付流水不存在")
 
@@ -134,7 +134,11 @@ def match_order(
     if error:
         raise HTTPException(status_code=400, detail=error)
 
-    return {"record": updated_record, "order": order}
+    final_record = crud.get_compensation_record_by_no(db, record_no)
+    return {
+        "record": schemas.CompensationRecord.model_validate(final_record).model_dump(),
+        "order": schemas.OrderDraft.model_validate(order).model_dump()
+    }
 
 
 @router.post("/records/{record_no}/report", response_model=schemas.CompensationReport)
