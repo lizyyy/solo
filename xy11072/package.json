@@ -1,0 +1,21 @@
+{
+  "name": "xy11072",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "init-data": "node init-data.js",
+    "test": "node test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "better-sqlite3": "^12.10.0",
+    "body-parser": "^2.2.2",
+    "express": "^5.2.1",
+    "sqlite3": "^6.0.1"
+  }
+}
