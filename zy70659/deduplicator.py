@@ -132,6 +132,21 @@ class LeadDeduplicator:
         
         return combined_score >= self.company_email_combined_threshold, combined_score
     
+    def _is_duplicate_pair(self, lead1: Lead, lead2: Lead) -> Tuple[bool, float, str]:
+        is_dup_phone, score_phone = self._is_duplicate_by_phone(lead1, lead2)
+        if is_dup_phone:
+            return True, score_phone, "手机号"
+        
+        is_dup_email, score_email = self._is_duplicate_by_email(lead1, lead2)
+        if is_dup_email:
+            return True, score_email, "邮箱"
+        
+        is_dup_ce, score_ce = self._is_duplicate_by_company_and_email(lead1, lead2)
+        if is_dup_ce:
+            return True, score_ce, "公司名+邮箱前缀"
+        
+        return False, 0.0, ""
+    
     def deduplicate(self, leads: List[Lead]) -> DeduplicationResult:
         if not leads:
             return DeduplicationResult(
@@ -151,29 +166,26 @@ class LeadDeduplicator:
                 continue
             
             group = [lead]
+            group_indices = [i]
             assigned.add(i)
             
-            for j, other in enumerate(leads):
-                if j in assigned or j == i:
-                    continue
+            group_changed = True
+            while group_changed:
+                group_changed = False
                 
-                is_dup_phone, score_phone = self._is_duplicate_by_phone(lead, other)
-                if is_dup_phone:
-                    group.append(other)
-                    assigned.add(j)
-                    continue
-                
-                is_dup_email, score_email = self._is_duplicate_by_email(lead, other)
-                if is_dup_email:
-                    group.append(other)
-                    assigned.add(j)
-                    continue
-                
-                is_dup_company_email, score_ce = self._is_duplicate_by_company_and_email(lead, other)
-                if is_dup_company_email:
-                    group.append(other)
-                    assigned.add(j)
-                    continue
+                for group_idx in group_indices:
+                    group_lead = leads[group_idx]
+                    
+                    for j, other in enumerate(leads):
+                        if j in assigned or j == group_idx:
+                            continue
+                        
+                        is_dup, _, _ = self._is_duplicate_pair(group_lead, other)
+                        if is_dup:
+                            group.append(other)
+                            group_indices.append(j)
+                            assigned.add(j)
+                            group_changed = True
             
             lead_groups.append(group)
         
@@ -207,28 +219,19 @@ class LeadDeduplicator:
         )
     
     def _get_match_reason(self, group: List[Lead]) -> Tuple[str, float]:
-        primary = group[0]
         max_score = 0.0
         reason = []
         
-        for other in group[1:]:
-            is_dup_phone, score_phone = self._is_duplicate_by_phone(primary, other)
-            if is_dup_phone:
-                if '手机号' not in reason:
-                    reason.append('手机号')
-                max_score = max(max_score, score_phone)
-            
-            is_dup_email, score_email = self._is_duplicate_by_email(primary, other)
-            if is_dup_email:
-                if '邮箱' not in reason:
-                    reason.append('邮箱')
-                max_score = max(max_score, score_email)
-            
-            is_dup_ce, score_ce = self._is_duplicate_by_company_and_email(primary, other)
-            if is_dup_ce:
-                if '公司名+邮箱前缀' not in reason:
-                    reason.append('公司名+邮箱前缀')
-                max_score = max(max_score, score_ce)
+        for i, lead1 in enumerate(group):
+            for j, lead2 in enumerate(group):
+                if i >= j:
+                    continue
+                
+                is_dup, score, reason_type = self._is_duplicate_pair(lead1, lead2)
+                if is_dup:
+                    if reason_type not in reason:
+                        reason.append(reason_type)
+                    max_score = max(max_score, score)
         
         if not reason:
             reason = ['多维度匹配']

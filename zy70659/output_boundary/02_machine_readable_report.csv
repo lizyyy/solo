@@ -1,14 +1,14 @@
 ﻿群组ID,类型,原始ID,手机号,邮箱,公司名,姓名,来源渠道,匹配原因,匹配分数,推荐保留,冲突字段,建议合并来源
-GROUP_0000,保留,0,,linxm@huawei.com,华为技术有限公司,林小明,展会,公司名+邮箱前缀,0.85,是,"[""email:lxm@huawei.com.cn|linxiaoming@huawei.com|linxm@huawei.com"", ""company:华为技术|华为集团|华为技术有限公司"", ""name:林小明|林晓鸣|林晓明""]","展会,表单,电话"
-GROUP_0000,重复,1,,linxiaoming@huawei.com,华为技术,林晓鸣,电话,公司名+邮箱前缀,0.85,否,"[""email:lxm@huawei.com.cn|linxiaoming@huawei.com|linxm@huawei.com"", ""company:华为技术|华为集团|华为技术有限公司"", ""name:林小明|林晓鸣|林晓明""]","展会,表单,电话"
-GROUP_0000,重复,2,,lxm@huawei.com.cn,华为集团,林晓明,表单,公司名+邮箱前缀,0.85,否,"[""email:lxm@huawei.com.cn|linxiaoming@huawei.com|linxm@huawei.com"", ""company:华为技术|华为集团|华为技术有限公司"", ""name:林小明|林晓鸣|林晓明""]","展会,表单,电话"
-GROUP_0001,保留,4,,zhangzong@xiaomi.com,小米集团,张总,展会,公司名+邮箱前缀 + 手机号,1.00,是,"[""phone:15800158000|158-0015-8000"", ""email:zhangzong@xiaomi.com|zhangjl@xiaomi.com"", ""company:小米|小米科技有限责任公司|小米集团"", ""name:张经理|张先生|张总""]","电话,展会,表单"
-GROUP_0001,重复,3,15800158000,zhangjl@xiaomi.com,小米科技有限责任公司,张经理,表单,公司名+邮箱前缀 + 手机号,1.00,否,"[""phone:15800158000|158-0015-8000"", ""email:zhangzong@xiaomi.com|zhangjl@xiaomi.com"", ""company:小米|小米科技有限责任公司|小米集团"", ""name:张经理|张先生|张总""]","电话,展会,表单"
-GROUP_0001,重复,5,158-0015-8000,,小米,张先生,电话,公司名+邮箱前缀 + 手机号,1.00,否,"[""phone:15800158000|158-0015-8000"", ""email:zhangzong@xiaomi.com|zhangjl@xiaomi.com"", ""company:小米|小米科技有限责任公司|小米集团"", ""name:张经理|张先生|张总""]","电话,展会,表单"
-GROUP_0002,保留,7,,wangzhuren@didi.cn,滴滴,王主任,展会,公司名+邮箱前缀,0.76,是,"[""email:wangzg@didi.com|wangzhuren@didi.cn"", ""company:滴滴出行|滴滴"", ""name:王主任|王主管""]","展会,电话"
-GROUP_0002,重复,6,15900159000,wangzg@didi.com,滴滴出行,王主管,电话,公司名+邮箱前缀,0.76,否,"[""email:wangzg@didi.com|wangzhuren@didi.cn"", ""company:滴滴出行|滴滴"", ""name:王主任|王主管""]","展会,电话"
-GROUP_0005,保留,11,161-0016-1000,zhaobs@netease.com.cn,网易(杭州)网络有限公司,赵先生,展会,手机号,1.00,是,"[""phone:16100161000|161-0016-1000"", ""email:zhaobs@netease.com.cn|zhbs@netease.com"", ""company:网易|网易(杭州)网络有限公司"", ""name:赵博士|赵先生""]","展会,电话"
-GROUP_0005,重复,10,16100161000,zhbs@netease.com,网易,赵博士,电话,手机号,1.00,否,"[""phone:16100161000|161-0016-1000"", ""email:zhaobs@netease.com.cn|zhbs@netease.com"", ""company:网易|网易(杭州)网络有限公司"", ""name:赵博士|赵先生""]","展会,电话"
+GROUP_0000,保留,0,,linxm@huawei.com,华为技术有限公司,林小明,展会,公司名+邮箱前缀,0.85,是,"[""email:linxm@huawei.com|lxm@huawei.com.cn|linxiaoming@huawei.com"", ""company:华为技术|华为技术有限公司|华为集团"", ""name:林晓鸣|林晓明|林小明""]","展会,表单,电话"
+GROUP_0000,重复,1,,linxiaoming@huawei.com,华为技术,林晓鸣,电话,公司名+邮箱前缀,0.85,否,"[""email:linxm@huawei.com|lxm@huawei.com.cn|linxiaoming@huawei.com"", ""company:华为技术|华为技术有限公司|华为集团"", ""name:林晓鸣|林晓明|林小明""]","展会,表单,电话"
+GROUP_0000,重复,2,,lxm@huawei.com.cn,华为集团,林晓明,表单,公司名+邮箱前缀,0.85,否,"[""email:linxm@huawei.com|lxm@huawei.com.cn|linxiaoming@huawei.com"", ""company:华为技术|华为技术有限公司|华为集团"", ""name:林晓鸣|林晓明|林小明""]","展会,表单,电话"
+GROUP_0001,保留,4,,zhangzong@xiaomi.com,小米集团,张总,展会,公司名+邮箱前缀 + 手机号,1.00,是,"[""phone:158-0015-8000|15800158000"", ""email:zhangzong@xiaomi.com|zhangjl@xiaomi.com"", ""company:小米集团|小米科技有限责任公司|小米"", ""name:张经理|张先生|张总""]","展会,表单,电话"
+GROUP_0001,重复,3,15800158000,zhangjl@xiaomi.com,小米科技有限责任公司,张经理,表单,公司名+邮箱前缀 + 手机号,1.00,否,"[""phone:158-0015-8000|15800158000"", ""email:zhangzong@xiaomi.com|zhangjl@xiaomi.com"", ""company:小米集团|小米科技有限责任公司|小米"", ""name:张经理|张先生|张总""]","展会,表单,电话"
+GROUP_0001,重复,5,158-0015-8000,,小米,张先生,电话,公司名+邮箱前缀 + 手机号,1.00,否,"[""phone:158-0015-8000|15800158000"", ""email:zhangzong@xiaomi.com|zhangjl@xiaomi.com"", ""company:小米集团|小米科技有限责任公司|小米"", ""name:张经理|张先生|张总""]","展会,表单,电话"
+GROUP_0002,保留,7,,wangzhuren@didi.cn,滴滴,王主任,展会,公司名+邮箱前缀,0.76,是,"[""email:wangzhuren@didi.cn|wangzg@didi.com"", ""company:滴滴|滴滴出行"", ""name:王主管|王主任""]","展会,电话"
+GROUP_0002,重复,6,15900159000,wangzg@didi.com,滴滴出行,王主管,电话,公司名+邮箱前缀,0.76,否,"[""email:wangzhuren@didi.cn|wangzg@didi.com"", ""company:滴滴|滴滴出行"", ""name:王主管|王主任""]","展会,电话"
+GROUP_0005,保留,11,161-0016-1000,zhaobs@netease.com.cn,网易(杭州)网络有限公司,赵先生,展会,手机号,1.00,是,"[""phone:16100161000|161-0016-1000"", ""email:zhbs@netease.com|zhaobs@netease.com.cn"", ""company:网易(杭州)网络有限公司|网易"", ""name:赵先生|赵博士""]","展会,电话"
+GROUP_0005,重复,10,16100161000,zhbs@netease.com,网易,赵博士,电话,手机号,1.00,否,"[""phone:16100161000|161-0016-1000"", ""email:zhbs@netease.com|zhaobs@netease.com.cn"", ""company:网易(杭州)网络有限公司|网易"", ""name:赵先生|赵博士""]","展会,电话"
 SINGLE,唯一,8,16000160000,laoli@pinduoduo.com,拼多多,李老师,展会,,,是,,
 SINGLE,唯一,9,,teacherli@pinduoduo.com.cn,上海寻梦信息技术有限公司,李教授,表单,,,是,,
 SINGLE,唯一,12,16200162000,sunys@corp.netease.com,网易公司,孙女士,表单,,,是,,
