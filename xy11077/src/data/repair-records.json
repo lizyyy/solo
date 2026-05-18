@@ -1,0 +1,178 @@
+[
+  {
+    "id": "RR1779117573048ssh0",
+    "createdAt": "2026-05-18T15:19:33.048Z",
+    "updatedAt": "2026-05-18T15:22:32.486Z",
+    "version": 2,
+    "mergeHistory": [
+      {
+        "mergedRecordIds": [
+          "RR1779117573049bbr4"
+        ],
+        "operator": "测试管理员",
+        "reason": "验收测试-正常合并",
+        "originalData": [
+          {
+            "id": "RR1779117573049bbr4",
+            "repairType": "水电",
+            "description": "宿舍日光灯闪烁，晚上看书很伤眼睛",
+            "reporter": "李四"
+          }
+        ],
+        "mergedAt": "2026-05-18T15:22:32.486Z"
+      }
+    ],
+    "reviewLog": [],
+    "building": "3号楼",
+    "roomNumber": "302",
+    "repairType": "水电",
+    "description": "卫生间水龙头漏水，已持续3天，水量较大\n\n[合并自RR1779117573049bbr4] 宿舍日光灯闪烁，晚上看书很伤眼睛",
+    "reporter": "张三",
+    "reporterPhone": "13800138001",
+    "assignedTeam": "水电维修一组",
+    "status": "merged",
+    "priority": "high",
+    "mergedIds": [
+      "RR1779117573049bbr4"
+    ]
+  },
+  {
+    "id": "RR1779117573049bbr4",
+    "createdAt": "2026-05-18T15:19:33.049Z",
+    "updatedAt": "2026-05-18T15:22:32.486Z",
+    "version": 2,
+    "mergeHistory": [],
+    "reviewLog": [],
+    "building": "3号楼",
+    "roomNumber": "302",
+    "repairType": "水电",
+    "description": "宿舍日光灯闪烁，晚上看书很伤眼睛",
+    "reporter": "李四",
+    "reporterPhone": "13800138002",
+    "assignedTeam": "水电维修一组",
+    "status": "merged_into",
+    "priority": "medium",
+    "mergedInto": "RR1779117573048ssh0"
+  },
+  {
+    "id": "RR1779117573049ukdi",
+    "createdAt": "2026-05-18T15:19:33.049Z",
+    "updatedAt": "2026-05-18T15:19:33.049Z",
+    "version": 1,
+    "mergeHistory": [],
+    "reviewLog": [],
+    "building": "3号楼",
+    "roomNumber": "302",
+    "repairType": "水电",
+    "description": "空调遥控器失灵，无法调节温度",
+    "reporter": "王五",
+    "reporterPhone": "13800138003",
+    "assignedTeam": "水电维修二组",
+    "status": "pending",
+    "priority": "medium"
+  },
+  {
+    "id": "RR17791175730498fp6",
+    "createdAt": "2026-05-18T15:19:33.049Z",
+    "updatedAt": "2026-05-18T15:19:33.049Z",
+    "version": 1,
+    "mergeHistory": [],
+    "reviewLog": [
+      {
+        "stage": "temporary_change",
+        "operator": "李师傅",
+        "operatorRole": "维修员",
+        "changes": {
+          "original": "窗户边框松动",
+          "temporary": "暂时加固处理，等待材料到位"
+        },
+        "comments": "密封胶缺货，先用胶带临时固定，已告知学生",
+        "confirmationSignature": "li_ming_20240515",
+        "timestamp": "2026-05-18T15:19:33.049Z"
+      },
+      {
+        "stage": "manager_confirm",
+        "operator": "周师傅",
+        "operatorRole": "维修队长",
+        "changes": {
+          "confirmed": true,
+          "materialArrivalDate": "2024-05-20"
+        },
+        "comments": "情况属实，已批准采购计划，预计5月20日材料到位后完成最终修复",
+        "confirmationSignature": "zhou_wei_20240515",
+        "timestamp": "2026-05-18T15:19:33.049Z"
+      },
+      {
+        "stage": "final_archive",
+        "operator": "管理员小王",
+        "operatorRole": "宿舍管理员",
+        "changes": {
+          "finalStatus": "已完成",
+          "actualCompletionDate": "2024-05-21"
+        },
+        "comments": "维修已完成，学生确认无问题，归档保存",
+        "confirmationSignature": "wang_admin_20240521",
+        "timestamp": "2026-05-18T15:19:33.049Z"
+      }
+    ],
+    "building": "5号楼",
+    "roomNumber": "518",
+    "repairType": "土木",
+    "description": "窗户边框松动，刮风时有异响",
+    "reporter": "赵六",
+    "reporterPhone": "13800138004",
+    "assignedTeam": "土木维修组",
+    "status": "in_progress",
+    "priority": "medium"
+  },
+  {
+    "id": "RR1779117573049rnmi",
+    "createdAt": "2026-05-18T15:19:33.049Z",
+    "updatedAt": "2026-05-18T15:19:33.049Z",
+    "version": 1,
+    "mergeHistory": [],
+    "reviewLog": [],
+    "building": "2号楼",
+    "roomNumber": "215",
+    "repairType": "水电",
+    "description": "插座接触不良，充电时断时续",
+    "reporter": "孙七",
+    "reporterPhone": "13800138005",
+    "assignedTeam": "水电维修一组",
+    "status": "completed",
+    "priority": "low",
+    "completedAt": "2026-05-17T15:19:33.042Z"
+  },
+  {
+    "id": "RR17791177524885mr9",
+    "createdAt": "2026-05-18T15:22:32.488Z",
+    "updatedAt": "2026-05-18T15:22:32.488Z",
+    "version": 1,
+    "mergeHistory": [],
+    "reviewLog": [],
+    "building": "1号楼",
+    "roomNumber": "101",
+    "repairType": "水电",
+    "description": "灯不亮",
+    "reporter": "小明",
+    "reporterPhone": "13800138001",
+    "importOperator": "测试导入员",
+    "importedAt": "2026-05-18T15:22:32.488Z"
+  },
+  {
+    "id": "RR1779117752488vvu9",
+    "createdAt": "2026-05-18T15:22:32.488Z",
+    "updatedAt": "2026-05-18T15:22:32.488Z",
+    "version": 1,
+    "mergeHistory": [],
+    "reviewLog": [],
+    "building": "2号楼",
+    "roomNumber": "201",
+    "repairType": "土木",
+    "description": "门锁坏",
+    "reporter": "小红",
+    "reporterPhone": "13800138002",
+    "importOperator": "测试导入员",
+    "importedAt": "2026-05-18T15:22:32.488Z"
+  }
+]
