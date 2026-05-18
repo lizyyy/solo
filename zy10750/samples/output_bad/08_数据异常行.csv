@@ -1,0 +1,6 @@
+序号,source,rowIndex,missingFields,description
+1,old,4,supplierName,数据异常 - old报价第 4 行缺失字段: supplierName
+2,old,5,productCode,数据异常 - old报价第 5 行缺失字段: productCode
+3,old,6,unitPrice,数据异常 - old报价第 6 行缺失字段: unitPrice
+4,old,8,"supplierName, unitPrice","数据异常 - old报价第 8 行缺失字段: supplierName, unitPrice"
+5,new,4,"supplierName, productCode","数据异常 - new报价第 4 行缺失字段: supplierName, productCode"

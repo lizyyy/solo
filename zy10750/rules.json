@@ -1,0 +1,12 @@
+{
+  "name": "供应商报价表二次议价比对规则配置",
+  "version": "1.0",
+  "keyFields": ["supplierName", "productCode", "productName"],
+  "requiredFields": ["supplierName", "productCode", "unitPrice"],
+  "validUntilField": "validUntil",
+  "minQtyField": "minQuantity",
+  "maxQtyField": "maxQuantity",
+  "priceField": "unitPrice",
+  "currencyField": "currency",
+  "description": "本规则用于供应商报价表二次议价比对，确保准确识别币种差异、阶梯定价、过期报价和重复数据等关键业务场景"
+}
