@@ -1,0 +1,47 @@
+[
+  {
+    "storeId": "ST001",
+    "storeName": "北京朝阳门店",
+    "itemId": "ITEM001",
+    "itemName": "经典美式咖啡",
+    "actualPrice": "无效价格",
+    "expectedPrice": 28.00,
+    "effectiveDate": "2026-05-18",
+    "snapshotTime": "2026-05-18T08:30:00",
+    "priceVersion": "V202605",
+    "orderId": "ORD20260518101",
+    "storeStatus": "OPEN",
+    "orderDate": "2026-05-18T08:25:00",
+    "versionEffectiveDate": "2026-05-15T00:00:00"
+  },
+  {
+    "storeId": "ST002",
+    "storeName": "上海浦东门店",
+    "itemId": "ITEM002",
+    "itemName": "拿铁咖啡",
+    "actualPrice": 32.00,
+    "expectedPrice": "N/A",
+    "effectiveDate": "2026-05-18",
+    "snapshotTime": "2026-05-18T08:30:00",
+    "priceVersion": "V202605",
+    "orderId": "ORD20260518102",
+    "storeStatus": "OPEN",
+    "orderDate": "2026-05-18T08:26:00",
+    "versionEffectiveDate": "2026-05-15T00:00:00"
+  },
+  {
+    "storeId": "ST003",
+    "storeName": "深圳南山门店",
+    "itemId": "ITEM003",
+    "itemName": "价格不匹配商品",
+    "actualPrice": 100.00,
+    "expectedPrice": 50.00,
+    "effectiveDate": "2026-05-18",
+    "snapshotTime": "2026-05-18T09:00:00",
+    "priceVersion": "V202605",
+    "orderId": "ORD20260518103",
+    "storeStatus": "OPEN",
+    "orderDate": "2026-05-18T08:55:00",
+    "versionEffectiveDate": "2026-05-15T00:00:00"
+  }
+]

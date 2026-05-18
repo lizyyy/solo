@@ -1,0 +1,19 @@
+{
+  "name": "price-snapshot-compare",
+  "version": "1.0.0",
+  "description": "价目表快照门店价格生效比对 CLI",
+  "main": "src/index.js",
+  "bin": {
+    "price-compare": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node tests/run.js",
+    "demo": "node src/cli.js --config config/rules.json --input samples/normal --output output/result.json"
+  },
+  "keywords": ["price", "snapshot", "compare", "cli"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

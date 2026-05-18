@@ -1,0 +1,32 @@
+[
+  {
+    "storeId": "ST004",
+    "storeName": "成都锦江门店",
+    "itemId": "ITEM001",
+    "itemName": "经典美式咖啡",
+    "actualPrice": 999.00,
+    "expectedPrice": 28.00,
+    "effectiveDate": "2026-05-18",
+    "snapshotTime": "2026-05-18T10:00:00",
+    "priceVersion": "V202605",
+    "orderId": "ORD20260518006",
+    "storeStatus": "CLOSED",
+    "orderDate": "2026-05-18T09:50:00",
+    "versionEffectiveDate": "2026-05-15T00:00:00"
+  },
+  {
+    "storeId": "ST005",
+    "storeName": "杭州西湖门店",
+    "itemId": "ITEM002",
+    "itemName": "拿铁咖啡",
+    "actualPrice": 999.00,
+    "expectedPrice": 32.00,
+    "effectiveDate": "2026-05-18",
+    "snapshotTime": "2026-05-18T10:05:00",
+    "priceVersion": "V202605",
+    "orderId": "ORD20260518007",
+    "storeStatus": "CLOSED",
+    "orderDate": "2026-05-18T09:55:00",
+    "versionEffectiveDate": "2026-05-15T00:00:00"
+  }
+]

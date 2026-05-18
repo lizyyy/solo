@@ -1,0 +1,32 @@
+[
+  {
+    "storeId": "ST001",
+    "storeName": "北京朝阳门店",
+    "itemId": "ITEM005",
+    "itemName": "历史订单商品A",
+    "actualPrice": 25.00,
+    "expectedPrice": 28.00,
+    "effectiveDate": "2026-05-18",
+    "snapshotTime": "2026-05-18T10:30:00",
+    "priceVersion": "V202604",
+    "orderId": "ORD20260420001",
+    "storeStatus": "OPEN",
+    "orderDate": "2026-04-20T14:30:00",
+    "versionEffectiveDate": "2026-05-15T00:00:00"
+  },
+  {
+    "storeId": "ST002",
+    "storeName": "上海浦东门店",
+    "itemId": "ITEM006",
+    "itemName": "历史订单商品B",
+    "actualPrice": 30.00,
+    "expectedPrice": 35.00,
+    "effectiveDate": "2026-05-18",
+    "snapshotTime": "2026-05-18T10:35:00",
+    "priceVersion": "V202603",
+    "orderId": "ORD20260315001",
+    "storeStatus": "OPEN",
+    "orderDate": "2026-03-15T09:20:00",
+    "versionEffectiveDate": "2026-05-15T00:00:00"
+  }
+]

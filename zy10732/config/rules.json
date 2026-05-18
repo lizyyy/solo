@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "description": "价目表快照门店价格生效比对规则配置",
+  "rules": {
+    "midnightEffective": {
+      "enabled": true,
+      "description": "半夜生效规则：价格在00:00-06:00生效的特殊处理",
+      "timeRange": {
+        "start": "00:00",
+        "end": "06:00"
+      },
+      "toleranceMinutes": 30
+    },
+    "storeClosed": {
+      "enabled": true,
+      "description": "门店停业规则：门店停业期间价格不生效",
+      "statusField": "storeStatus",
+      "closedValue": "CLOSED"
+    },
+    "oldOrder": {
+      "enabled": true,
+      "description": "旧订单规则：历史订单使用下单时价格版本",
+      "orderDateField": "orderDate",
+      "versionDateField": "versionEffectiveDate",
+      "gracePeriodDays": 7
+    },
+    "priceMatch": {
+      "tolerance": 0.01,
+      "description": "价格匹配容差，小于此值视为相等"
+    }
+  },
+  "fields": {
+    "storeId": "storeId",
+    "storeName": "storeName",
+    "itemId": "itemId",
+    "itemName": "itemName",
+    "actualPrice": "actualPrice",
+    "expectedPrice": "expectedPrice",
+    "effectiveDate": "effectiveDate",
+    "snapshotTime": "snapshotTime",
+    "priceVersion": "priceVersion",
+    "orderId": "orderId"
+  },
+  "output": {
+    "includeDetails": true,
+    "includeSummary": true,
+    "format": "json"
+  }
+}

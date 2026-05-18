@@ -1,0 +1,32 @@
+[
+  {
+    "storeId": "ST001",
+    "storeName": "北京朝阳门店",
+    "itemId": "ITEM003",
+    "itemName": "深夜特调咖啡",
+    "actualPrice": 25.00,
+    "expectedPrice": 25.00,
+    "effectiveDate": "2026-05-18",
+    "snapshotTime": "2026-05-18T02:30:00",
+    "priceVersion": "V202605",
+    "orderId": "ORD20260518004",
+    "storeStatus": "OPEN",
+    "orderDate": "2026-05-18T02:25:00",
+    "versionEffectiveDate": "2026-05-15T00:00:00"
+  },
+  {
+    "storeId": "ST003",
+    "storeName": "深圳南山门店",
+    "itemId": "ITEM004",
+    "itemName": "凌晨特惠套餐",
+    "actualPrice": 45.00,
+    "expectedPrice": 45.00,
+    "effectiveDate": "2026-05-18",
+    "snapshotTime": "2026-05-18T04:15:00",
+    "priceVersion": "V202605",
+    "orderId": "ORD20260518005",
+    "storeStatus": "OPEN",
+    "orderDate": "2026-05-18T04:10:00",
+    "versionEffectiveDate": "2026-05-15T00:00:00"
+  }
+]
