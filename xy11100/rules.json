@@ -1,0 +1,35 @@
+{
+  "name": "社区食堂外卖评价分拣规则",
+  "version": "1.0",
+  "fieldMapping": {
+    "orderId": "订单号",
+    "rating": "评分",
+    "content": "评价内容",
+    "userName": "用户姓名",
+    "canteenName": "食堂名称",
+    "dishName": "菜品",
+    "reviewTime": "评价时间"
+  },
+  "categories": [
+    {
+      "id": "food_quality_positive",
+      "name": "菜品质量-好评",
+      "keywords": ["香", "好吃", "美味", "正宗", "新鲜", "软烂", "劲道", "浓郁", "分量足", "入口即化", "脆"]
+    },
+    {
+      "id": "food_quality_negative",
+      "name": "菜品质量-差评",
+      "keywords": ["太稀", "腥味", "不新鲜", "太咸", "太淡", "太硬", "太老", "太柴", "咬不动", "没味道"]
+    },
+    {
+      "id": "service_positive",
+      "name": "服务-好评",
+      "keywords": ["服务好", "热情", "周到", "准时", "快", "干净", "卫生"]
+    },
+    {
+      "id": "complaint",
+      "name": "投诉建议",
+      "keywords": ["投诉", "建议", "希望", "改进", "问题", "太少", "建议"]
+    }
+  ]
+}

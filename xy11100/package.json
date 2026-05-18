@@ -1,0 +1,24 @@
+{
+  "name": "canteen-review-sorter",
+  "version": "1.0.0",
+  "description": "社区食堂外卖评价分拣 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "canteen-sort": "src/cli.js"
+  },
+  "scripts": {
+    "sort": "node src/cli.js",
+    "preview": "node src/cli.js --preview",
+    "report": "node src/cli.js --report"
+  },
+  "keywords": ["canteen", "review", "sort", "community"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "fs-extra": "^11.2.0",
+    "chalk": "^4.1.2"
+  }
+}
