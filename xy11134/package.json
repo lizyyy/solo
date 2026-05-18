@@ -1,0 +1,22 @@
+{
+  "name": "coffee-roasting-curve-compare",
+  "version": "1.0.0",
+  "description": "咖啡豆烘焙厂烘焙曲线比对CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "roast-compare": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "node bin/cli.js --input samples/input --output samples/output"
+  },
+  "keywords": ["coffee", "roasting", "curve", "compare", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2"
+  }
+}
