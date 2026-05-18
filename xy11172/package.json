@@ -1,0 +1,30 @@
+{
+  "name": "clinic-vehicle-return-cli",
+  "version": "1.0.0",
+  "description": "社区诊疗车库存回库 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "clinic-return": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": ["clinic", "vehicle", "inventory", "return"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}
