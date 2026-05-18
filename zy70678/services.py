@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import List, Dict, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, func
@@ -22,12 +22,12 @@ class MaterialReviewService:
             issues.append("缺少公章")
             is_valid = False
 
-        if material.expiry_date and material.expiry_date < check_date:
-            issues.append("证明已过期")
-            is_valid = False
-
-        if material_type.validity_days and material.issue_date:
-            calculated_expiry = material.issue_date.replace(year=material.issue_date.year + material_type.validity_days // 365)
+        if material.expiry_date:
+            if material.expiry_date < check_date:
+                issues.append("证明已过期")
+                is_valid = False
+        elif material_type.validity_days and material.issue_date:
+            calculated_expiry = material.issue_date + timedelta(days=material_type.validity_days)
             if calculated_expiry < check_date:
                 issues.append(f"证明超出{material_type.validity_days}天有效期")
                 is_valid = False
@@ -115,10 +115,12 @@ class MaterialReviewService:
                 expired_materials.append(material_type.name)
                 for issue_desc in validity_issues:
                     if "过期" in issue_desc or "超出" in issue_desc:
+                        material_issues.append(f"{material_type.name}: {issue_desc}")
                         self.create_issue(material.id, "expired", schemas.IssueLevel.ERROR, f"{material_type.name}: {issue_desc}")
 
             if "缺少公章" in validity_issues:
                 no_stamp_materials.append(material_type.name)
+                material_issues.append(f"{material_type.name}: 缺少公章")
                 self.create_issue(material.id, "no_stamp", schemas.IssueLevel.ERROR, f"{material_type.name}: 缺少公章")
 
         for missing_mat in inventory_result["missing"]:
@@ -131,10 +133,8 @@ class MaterialReviewService:
 
         if total_issues == 0:
             status = schemas.MaterialStatus.APPROVED
-        elif any(key in str(all_issues) for key in ["缺少", "过期", "公章"]):
-            status = schemas.MaterialStatus.NEED_REVIEW
         else:
-            status = schemas.MaterialStatus.PENDING
+            status = schemas.MaterialStatus.NEED_REVIEW
 
         issue_summary = {
             "missing_count": inventory_result["missing_count"],
