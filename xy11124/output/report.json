@@ -1,0 +1,472 @@
+{
+  "batchId": "18504db0fbb057eb97ca60a06179e355",
+  "processedAt": "2026-05-18T18:26:44.898Z",
+  "totalRecords": 16,
+  "passed": 6,
+  "failed": 8,
+  "warnings": 2,
+  "records": [
+    {
+      "id": "2907ce7a-4ec2-47bb-b569-ff3b3c9c6756",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-001",
+      "patientName": "王女士",
+      "treatmentPackageId": "PKG-001",
+      "treatmentPackageName": "盆底康复基础套餐",
+      "screeningDate": "2024-03-20",
+      "result": "fail",
+      "issues": [
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"王女士\"的禁忌\"高血压\"已过期 (过期日期: 2024-03-15)",
+          "details": {
+            "contraindicationId": "CI-001",
+            "contraindicationType": "高血压",
+            "expiryDate": "2024-03-15"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 2
+          }
+        },
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"王女士\"的禁忌\"糖尿病\"已过期 (过期日期: 2023-12-31)",
+          "details": {
+            "contraindicationId": "CI-002",
+            "contraindicationType": "糖尿病",
+            "expiryDate": "2023-12-31"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 3
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 2,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "53ed4386-83f2-4b06-8674-9d5909305fd6",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-001",
+      "patientName": "王女士",
+      "treatmentPackageId": "PKG-002",
+      "treatmentPackageName": "子宫复旧调理套餐",
+      "screeningDate": "2024-03-20",
+      "result": "fail",
+      "issues": [
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"王女士\"的禁忌\"高血压\"已过期 (过期日期: 2024-03-15)",
+          "details": {
+            "contraindicationId": "CI-001",
+            "contraindicationType": "高血压",
+            "expiryDate": "2024-03-15"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 2
+          }
+        },
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"王女士\"的禁忌\"糖尿病\"已过期 (过期日期: 2023-12-31)",
+          "details": {
+            "contraindicationId": "CI-002",
+            "contraindicationType": "糖尿病",
+            "expiryDate": "2023-12-31"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 3
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 3,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "2b1be553-da96-4171-a257-7a1b3bc0ba63",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-001",
+      "patientName": "王女士",
+      "treatmentPackageId": "PKG-003",
+      "treatmentPackageName": "产后形体恢复套餐",
+      "screeningDate": "2024-03-20",
+      "result": "fail",
+      "issues": [
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"王女士\"的禁忌\"高血压\"已过期 (过期日期: 2024-03-15)",
+          "details": {
+            "contraindicationId": "CI-001",
+            "contraindicationType": "高血压",
+            "expiryDate": "2024-03-15"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 2
+          }
+        },
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"王女士\"的禁忌\"糖尿病\"已过期 (过期日期: 2023-12-31)",
+          "details": {
+            "contraindicationId": "CI-002",
+            "contraindicationType": "糖尿病",
+            "expiryDate": "2023-12-31"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 3
+          }
+        },
+        {
+          "type": "package_mismatch",
+          "severity": "warning",
+          "message": "套餐\"产后形体恢复套餐\"(形体恢复)包含非预期禁忌类型: 产后抑郁",
+          "details": {
+            "packageId": "PKG-003",
+            "expectedCategory": "形体恢复",
+            "actualCategory": "产后抑郁"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 4
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 4,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "ffe8ad91-e340-4a5e-8d40-c1e79e817aeb",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-001",
+      "patientName": "王女士",
+      "treatmentPackageId": "PKG-004",
+      "treatmentPackageName": "综合调理VIP套餐",
+      "screeningDate": "2024-03-20",
+      "result": "fail",
+      "issues": [
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"王女士\"的禁忌\"高血压\"已过期 (过期日期: 2024-03-15)",
+          "details": {
+            "contraindicationId": "CI-001",
+            "contraindicationType": "高血压",
+            "expiryDate": "2024-03-15"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 2
+          }
+        },
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"王女士\"的禁忌\"糖尿病\"已过期 (过期日期: 2023-12-31)",
+          "details": {
+            "contraindicationId": "CI-002",
+            "contraindicationType": "糖尿病",
+            "expiryDate": "2023-12-31"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 3
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 5,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "ef63398f-b9d9-4cf2-8d47-610d584ffcfd",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-004",
+      "patientName": "刘女士",
+      "treatmentPackageId": "PKG-001",
+      "treatmentPackageName": "盆底康复基础套餐",
+      "screeningDate": "2024-03-20",
+      "result": "fail",
+      "issues": [
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"刘女士\"的禁忌\"急性感染\"已过期 (过期日期: 2024-03-10)",
+          "details": {
+            "contraindicationId": "CI-006",
+            "contraindicationType": "急性感染",
+            "expiryDate": "2024-03-10"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 7
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 2,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "04c4a269-19e0-47b0-b4cf-7c2a3218fa99",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-004",
+      "patientName": "刘女士",
+      "treatmentPackageId": "PKG-002",
+      "treatmentPackageName": "子宫复旧调理套餐",
+      "screeningDate": "2024-03-20",
+      "result": "fail",
+      "issues": [
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"刘女士\"的禁忌\"急性感染\"已过期 (过期日期: 2024-03-10)",
+          "details": {
+            "contraindicationId": "CI-006",
+            "contraindicationType": "急性感染",
+            "expiryDate": "2024-03-10"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 7
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 3,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "3f78ef3e-aefa-46a4-98b8-207256bc5454",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-004",
+      "patientName": "刘女士",
+      "treatmentPackageId": "PKG-003",
+      "treatmentPackageName": "产后形体恢复套餐",
+      "screeningDate": "2024-03-20",
+      "result": "fail",
+      "issues": [
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"刘女士\"的禁忌\"急性感染\"已过期 (过期日期: 2024-03-10)",
+          "details": {
+            "contraindicationId": "CI-006",
+            "contraindicationType": "急性感染",
+            "expiryDate": "2024-03-10"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 7
+          }
+        },
+        {
+          "type": "package_mismatch",
+          "severity": "warning",
+          "message": "套餐\"产后形体恢复套餐\"(形体恢复)包含非预期禁忌类型: 产后抑郁",
+          "details": {
+            "packageId": "PKG-003",
+            "expectedCategory": "形体恢复",
+            "actualCategory": "产后抑郁"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 4
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 4,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "fb2d4daf-0c02-44c0-a017-4fe07d3c9621",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-004",
+      "patientName": "刘女士",
+      "treatmentPackageId": "PKG-004",
+      "treatmentPackageName": "综合调理VIP套餐",
+      "screeningDate": "2024-03-20",
+      "result": "fail",
+      "issues": [
+        {
+          "type": "expired_contraindication",
+          "severity": "critical",
+          "message": "患者\"刘女士\"的禁忌\"急性感染\"已过期 (过期日期: 2024-03-10)",
+          "details": {
+            "contraindicationId": "CI-006",
+            "contraindicationType": "急性感染",
+            "expiryDate": "2024-03-10"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 7
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 5,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "da2410ed-5033-429e-88c3-e3fa5c2d0708",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-002",
+      "patientName": "李女士",
+      "treatmentPackageId": "PKG-003",
+      "treatmentPackageName": "产后形体恢复套餐",
+      "screeningDate": "2024-03-20",
+      "result": "warning",
+      "issues": [
+        {
+          "type": "package_mismatch",
+          "severity": "warning",
+          "message": "套餐\"产后形体恢复套餐\"(形体恢复)包含非预期禁忌类型: 产后抑郁",
+          "details": {
+            "packageId": "PKG-003",
+            "expectedCategory": "形体恢复",
+            "actualCategory": "产后抑郁"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 4
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 4,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "bd835c0b-fa82-4646-8334-e6cfa2efee4e",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-003",
+      "patientName": "张女士",
+      "treatmentPackageId": "PKG-003",
+      "treatmentPackageName": "产后形体恢复套餐",
+      "screeningDate": "2024-03-20",
+      "result": "warning",
+      "issues": [
+        {
+          "type": "package_mismatch",
+          "severity": "warning",
+          "message": "套餐\"产后形体恢复套餐\"(形体恢复)包含非预期禁忌类型: 产后抑郁",
+          "details": {
+            "packageId": "PKG-003",
+            "expectedCategory": "形体恢复",
+            "actualCategory": "产后抑郁"
+          },
+          "source": {
+            "file": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+            "line": 4
+          }
+        }
+      ],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 4,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "5201bd0e-f3e3-4c5b-a27e-d0930057a54f",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-002",
+      "patientName": "李女士",
+      "treatmentPackageId": "PKG-001",
+      "treatmentPackageName": "盆底康复基础套餐",
+      "screeningDate": "2024-03-20",
+      "result": "pass",
+      "issues": [],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 2,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "682eb538-12ed-4e1b-b33b-5f8dfbaf5111",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-002",
+      "patientName": "李女士",
+      "treatmentPackageId": "PKG-002",
+      "treatmentPackageName": "子宫复旧调理套餐",
+      "screeningDate": "2024-03-20",
+      "result": "pass",
+      "issues": [],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 3,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "74f604cb-1015-4434-b74b-47b168a53ad0",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-002",
+      "patientName": "李女士",
+      "treatmentPackageId": "PKG-004",
+      "treatmentPackageName": "综合调理VIP套餐",
+      "screeningDate": "2024-03-20",
+      "result": "pass",
+      "issues": [],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 5,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "ebdc2e6d-92f7-4400-9ce2-783f66501d48",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-003",
+      "patientName": "张女士",
+      "treatmentPackageId": "PKG-001",
+      "treatmentPackageName": "盆底康复基础套餐",
+      "screeningDate": "2024-03-20",
+      "result": "pass",
+      "issues": [],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 2,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "26b91ac2-59ef-4e4b-b31d-f5a684e56855",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-003",
+      "patientName": "张女士",
+      "treatmentPackageId": "PKG-002",
+      "treatmentPackageName": "子宫复旧调理套餐",
+      "screeningDate": "2024-03-20",
+      "result": "pass",
+      "issues": [],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 3,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    },
+    {
+      "id": "89c35357-fa37-4c14-8cec-9ea04a140a06",
+      "batchId": "18504db0fbb057eb97ca60a06179e355",
+      "patientId": "P-2024-003",
+      "patientName": "张女士",
+      "treatmentPackageId": "PKG-004",
+      "treatmentPackageName": "综合调理VIP套餐",
+      "screeningDate": "2024-03-20",
+      "result": "pass",
+      "issues": [],
+      "sourceFile": "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json",
+      "sourceLine": 5,
+      "processedAt": "2026-05-18T18:26:44.897Z"
+    }
+  ],
+  "parseErrors": [],
+  "inputFiles": [
+    "/Users/mac/pro/solo/workspaces/xy11124/examples/sample-data.json"
+  ]
+}

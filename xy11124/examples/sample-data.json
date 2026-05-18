@@ -1,0 +1,108 @@
+{
+  "contraindications": [
+    {
+      "id": "CI-001",
+      "patientId": "P-2024-001",
+      "patientName": "王女士",
+      "type": "高血压",
+      "description": "产后血压偏高，需监测",
+      "level": "medium",
+      "effectiveDate": "2024-01-15",
+      "expiryDate": "2024-03-15",
+      "status": "active"
+    },
+    {
+      "id": "CI-002",
+      "patientId": "P-2024-001",
+      "patientName": "王女士",
+      "type": "糖尿病",
+      "description": "妊娠期糖尿病，产后恢复中",
+      "level": "high",
+      "effectiveDate": "2024-01-15",
+      "expiryDate": "2023-12-31",
+      "status": "expired"
+    },
+    {
+      "id": "CI-003",
+      "patientId": "P-2024-002",
+      "patientName": "李女士",
+      "type": "剖腹产伤口未愈合",
+      "description": "剖腹产术后伤口恢复缓慢",
+      "level": "high",
+      "effectiveDate": "2024-02-01",
+      "expiryDate": "2024-05-01",
+      "status": "active"
+    },
+    {
+      "id": "CI-004",
+      "patientId": "P-2024-002",
+      "patientName": "李女士",
+      "type": "盆底肌肉严重损伤",
+      "description": "顺产导致盆底肌损伤",
+      "level": "high",
+      "effectiveDate": "2024-02-01",
+      "expiryDate": "2024-04-01",
+      "status": "active"
+    },
+    {
+      "id": "CI-005",
+      "patientId": "P-2024-003",
+      "patientName": "张女士",
+      "type": "产后抑郁",
+      "description": "产后情绪低落，需心理干预",
+      "level": "medium",
+      "effectiveDate": "2024-01-20",
+      "expiryDate": "2024-04-20",
+      "status": "active"
+    },
+    {
+      "id": "CI-006",
+      "patientId": "P-2024-004",
+      "patientName": "刘女士",
+      "type": "急性感染",
+      "description": "产褥期感染正在治疗",
+      "level": "high",
+      "effectiveDate": "2024-02-10",
+      "expiryDate": "2024-03-10",
+      "status": "active"
+    }
+  ],
+  "packages": [
+    {
+      "id": "PKG-001",
+      "name": "盆底康复基础套餐",
+      "category": "盆底康复",
+      "treatments": ["盆底肌电刺激", "生物反馈训练", "盆底肌手法修复"],
+      "contraindications": ["盆底肌肉严重损伤", "子宫复旧不良"],
+      "price": 2980,
+      "duration": 10
+    },
+    {
+      "id": "PKG-002",
+      "name": "子宫复旧调理套餐",
+      "category": "子宫复旧",
+      "treatments": ["子宫穴位按摩", "低频电刺激", "中药熏蒸"],
+      "contraindications": ["活动性出血", "急性感染", "发热"],
+      "price": 1980,
+      "duration": 8
+    },
+    {
+      "id": "PKG-003",
+      "name": "产后形体恢复套餐",
+      "category": "形体恢复",
+      "treatments": ["腹直肌分离修复", "腹部减脂", "骨盆矫正"],
+      "contraindications": ["严重贫血", "高血压", "产后抑郁"],
+      "price": 3980,
+      "duration": 12
+    },
+    {
+      "id": "PKG-004",
+      "name": "综合调理VIP套餐",
+      "category": "综合调理",
+      "treatments": ["气血调理", "乳腺疏通", "睡眠改善", "体质调理"],
+      "contraindications": ["高血压", "心脏病", "糖尿病"],
+      "price": 6880,
+      "duration": 20
+    }
+  ]
+}
