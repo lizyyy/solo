@@ -1,0 +1,131 @@
+{
+  "verificationId": "VER-1779116037206",
+  "verificationDate": "2026-05-18",
+  "affectedDishes": [
+    {
+      "dishId": "D001",
+      "dishName": "宫保鸡丁预制包",
+      "dishType": "预制菜",
+      "reason": "总部下架通知: 供应商原材料质量问题，召回相关预制菜; 3家门店剩余库存共950份; 影响1个组合菜: 超值套餐A",
+      "impactLevel": "高",
+      "affectedStores": [
+        {
+          "storeId": "S001",
+          "storeName": "朝阳门店",
+          "remainingStock": 150,
+          "unit": "份",
+          "stockValue": 4200
+        },
+        {
+          "storeId": "S002",
+          "storeName": "海淀门店",
+          "remainingStock": 200,
+          "unit": "份",
+          "stockValue": 5600
+        },
+        {
+          "storeId": "S003",
+          "storeName": "西城门店",
+          "remainingStock": 600,
+          "unit": "份",
+          "stockValue": 16800
+        }
+      ],
+      "relatedComboDishes": [
+        {
+          "dishId": "D003",
+          "dishName": "超值套餐A",
+          "status": "上架"
+        }
+      ],
+      "scheduledInfo": {
+        "isScheduled": false
+      }
+    },
+    {
+      "dishId": "D002",
+      "dishName": "鱼香肉丝预制包",
+      "dishType": "预制菜",
+      "reason": "总部下架通知: 供应商原材料质量问题，召回相关预制菜; 2家门店剩余库存共200份; 影响1个组合菜: 超值套餐A",
+      "impactLevel": "高",
+      "affectedStores": [
+        {
+          "storeId": "S001",
+          "storeName": "朝阳门店",
+          "remainingStock": 80,
+          "unit": "份",
+          "stockValue": 2080
+        },
+        {
+          "storeId": "S002",
+          "storeName": "海淀门店",
+          "remainingStock": 120,
+          "unit": "份",
+          "stockValue": 3120
+        }
+      ],
+      "relatedComboDishes": [
+        {
+          "dishId": "D003",
+          "dishName": "超值套餐A",
+          "status": "上架"
+        }
+      ],
+      "scheduledInfo": {
+        "isScheduled": false
+      }
+    }
+  ],
+  "summary": {
+    "totalAffectedDishes": 2,
+    "totalAffectedStores": 3,
+    "totalStockValue": 31800,
+    "highImpactCount": 2,
+    "mediumImpactCount": 0,
+    "lowImpactCount": 0,
+    "comboDishImpactCount": 2,
+    "scheduledConflictCount": 0,
+    "issues": [
+      {
+        "type": "库存预警",
+        "severity": "warning",
+        "message": "朝阳门店 剩余 宫保鸡丁预制包 库存150份，需尽快处理",
+        "dishId": "D001",
+        "storeId": "S001"
+      },
+      {
+        "type": "库存预警",
+        "severity": "warning",
+        "message": "海淀门店 剩余 宫保鸡丁预制包 库存200份，需尽快处理",
+        "dishId": "D001",
+        "storeId": "S002"
+      },
+      {
+        "type": "库存预警",
+        "severity": "error",
+        "message": "西城门店 剩余 宫保鸡丁预制包 库存600份，需尽快处理",
+        "dishId": "D001",
+        "storeId": "S003"
+      },
+      {
+        "type": "组合菜影响",
+        "severity": "warning",
+        "message": "宫保鸡丁预制包 下架将影响 1 个组合菜",
+        "dishId": "D001"
+      },
+      {
+        "type": "库存预警",
+        "severity": "warning",
+        "message": "海淀门店 剩余 鱼香肉丝预制包 库存120份，需尽快处理",
+        "dishId": "D002",
+        "storeId": "S002"
+      },
+      {
+        "type": "组合菜影响",
+        "severity": "warning",
+        "message": "鱼香肉丝预制包 下架将影响 1 个组合菜",
+        "dishId": "D002"
+      }
+    ]
+  }
+}

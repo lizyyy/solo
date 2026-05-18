@@ -1,0 +1,42 @@
+[
+  {
+    "dishId": "D001",
+    "dishName": "宫保鸡丁预制包",
+    "dishType": "预制菜",
+    "status": "上架",
+    "isCombo": false,
+    "category": "热菜",
+    "price": 28
+  },
+  {
+    "dishId": "D002",
+    "dishName": "鱼香肉丝预制包",
+    "dishType": "预制菜",
+    "status": "上架",
+    "isCombo": false,
+    "category": "热菜",
+    "price": 26
+  },
+  {
+    "dishId": "D003",
+    "dishName": "超值套餐A",
+    "dishType": "组合菜",
+    "status": "上架",
+    "isCombo": true,
+    "comboComponents": [
+      "D001",
+      "D002"
+    ],
+    "category": "套餐",
+    "price": 68
+  },
+  {
+    "dishId": "D004",
+    "dishName": "麻婆豆腐预制包",
+    "dishType": "预制菜",
+    "status": "上架",
+    "isCombo": false,
+    "category": "热菜",
+    "price": 18
+  }
+]

@@ -1,0 +1,77 @@
+{
+  "verificationId": "VER-1779116045847",
+  "verificationDate": "2026-05-18",
+  "affectedDishes": [
+    {
+      "dishId": "D001",
+      "dishName": "宫保鸡丁预制包",
+      "dishType": "预制菜",
+      "reason": "总部下架通知: 供应商原材料质量问题，召回相关预制菜; 1家门店剩余库存共800份; 影响1个组合菜: 超值套餐A; 该菜品定于 2024-01-14 上架，与下架通知冲突",
+      "impactLevel": "高",
+      "affectedStores": [
+        {
+          "storeId": "S001",
+          "storeName": "朝阳门店",
+          "remainingStock": 800,
+          "unit": "份",
+          "stockValue": 22400
+        }
+      ],
+      "relatedComboDishes": [
+        {
+          "dishId": "D003",
+          "dishName": "超值套餐A",
+          "status": "上架"
+        }
+      ],
+      "scheduledInfo": {
+        "isScheduled": true,
+        "scheduledTime": "2024-01-14",
+        "conflictDescription": "该菜品定于 2024-01-14 上架，与下架通知冲突"
+      }
+    }
+  ],
+  "summary": {
+    "totalAffectedDishes": 1,
+    "totalAffectedStores": 1,
+    "totalStockValue": 22400,
+    "highImpactCount": 1,
+    "mediumImpactCount": 0,
+    "lowImpactCount": 0,
+    "comboDishImpactCount": 1,
+    "scheduledConflictCount": 1,
+    "issues": [
+      {
+        "type": "库存预警",
+        "severity": "error",
+        "message": "朝阳门店 剩余 宫保鸡丁预制包 库存800份，需尽快处理",
+        "dishId": "D001",
+        "storeId": "S001"
+      },
+      {
+        "type": "组合菜影响",
+        "severity": "warning",
+        "message": "宫保鸡丁预制包 下架将影响 1 个组合菜",
+        "dishId": "D001"
+      },
+      {
+        "type": "定时上架冲突",
+        "severity": "error",
+        "message": "宫保鸡丁预制包: 该菜品定于 2024-01-14 上架，与下架通知冲突",
+        "dishId": "D001"
+      },
+      {
+        "type": "数据异常",
+        "severity": "error",
+        "message": "菜品ID D002 在菜品表中未找到",
+        "dishId": "D002"
+      },
+      {
+        "type": "数据异常",
+        "severity": "error",
+        "message": "菜品ID D999 在菜品表中未找到",
+        "dishId": "D999"
+      }
+    ]
+  }
+}
