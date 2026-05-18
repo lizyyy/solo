@@ -1,0 +1,23 @@
+{
+  "name": "store-scheduling-transfer-api",
+  "version": "1.0.0",
+  "description": "门店排班系统临时借调班次 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node src/scripts/initDB.js",
+    "seed": "node src/scripts/seedData.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4",
+    "json2csv": "^6.0.0-alpha.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
