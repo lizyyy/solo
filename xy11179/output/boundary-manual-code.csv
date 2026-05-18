@@ -1,0 +1,4 @@
+orderId,pickupCode,customerName,customerPhone,cakeName,cakeSize,orderStore,pickupStore,pickupTime,pickupType,isProxy,proxyName,proxyPhone,isManualCode,isCrossStore,status,verificationResult,remark
+ORD003,1234,王五,13800138003,芒果慕斯,10寸,西城门店,西城门店,2024-05-20 15:00,到店取货,false,,,true,false,正常,SUCCESS,【手输码】
+ORD005,A5678,孙七,13800138005,芝士蛋糕,6寸,朝阳门店,朝阳门店,2024-05-20 17:00,到店取货,false,,,true,false,正常,SUCCESS,【手输码】
+ORD008,9999,郑十,13800138008,榴莲千层,6寸,东城门店,东城门店,2024-05-20 20:00,到店取货,false,,,true,false,正常,SUCCESS,【手输码】

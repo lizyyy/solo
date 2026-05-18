@@ -1,0 +1,21 @@
+{
+  "name": "cake-pickup-code-verifier",
+  "version": "1.0.0",
+  "description": "蛋糕预订台取货码核对 CLI 工具",
+  "main": "src/cli.js",
+  "bin": {
+    "cake-pickup-verifier": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js data/sample-orders.csv data/sample-pickups.csv"
+  },
+  "keywords": ["cake", "pickup", "verification", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2"
+  }
+}
