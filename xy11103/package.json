@@ -1,0 +1,23 @@
+{
+  "name": "meeting-room-access-log-audit",
+  "version": "1.0.0",
+  "description": "共享会议室门禁日志核对CLI工具",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "access-log-audit": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test"
+  },
+  "keywords": ["meeting-room", "access-log", "audit", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "date-fns": "^3.6.0"
+  }
+}

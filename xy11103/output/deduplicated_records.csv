@@ -1,0 +1,16 @@
+员工ID,员工姓名,会议室ID,会议室名称,门禁时间,重复哈希,重复字段,来源文件
+E001,张三,MR001,第一会议室,2024-05-18 08:30:00,dec0dae07ec18d2b320bb3594b246931,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E001,张三,MR001,第一会议室,2024-05-18 10:00:00,103b5bc5972391cbc1b0a3dfbbec9b89,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E002,李四,MR002,第二会议室,2024-05-18 09:15:00,a9a32613f427b880e14c639355941fb8,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E002,李四,MR002,第二会议室,2024-05-18 11:30:00,b8c12d4b451ec8203c9d9eb7008923ef,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E003,王五,MR003,第三会议室,2024-05-18 14:00:00,20f2c64b010add7ad1ecdb6dcac841fe,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E003,王五,MR003,第三会议室,2024-05-18 16:00:00,77dc661f636ac45d7b8413befe7e6493,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E004,赵六,MR001,第一会议室,2024-05-18 22:00:00,9d6293afc695c9c18c1b4e42f9a59cc5,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E004,赵六,MR001,第一会议室,2024-05-19 00:30:00,7485cadc33610f501876d47c3db4651f,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E005,钱七,MR002,第二会议室,2024-05-18 09:30:00,9c0ff0c1c707bd5b49eb417a14920427,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E005,钱七,MR002,第二会议室,2024-05-18 09:31:00,99c742db69faf6c00fd4fd42b6f2aeae,"employeeId, roomId, accessTime",access_log_20240518_1.csv
+E001,张三,MR001,第一会议室,2024-05-18 08:30:00,dec0dae07ec18d2b320bb3594b246931,"employeeId, roomId, accessTime",access_log_20240518_2.csv
+E006,孙八,MR003,第三会议室,2024-05-18 10:00:00,bbfccc5af3b9fb0ccd8c01c911ec81b9,"employeeId, roomId, accessTime",access_log_20240518_2.csv
+E006,孙八,MR003,第三会议室,2024-05-18 12:00:00,3dbd9f042d038d4f98c78516744ecbe6,"employeeId, roomId, accessTime",access_log_20240518_2.csv
+E007,周九,MR001,第一会议室,2024-05-18 13:00:00,c8994e3cdb7bc7a88d095c5c4c96bb04,"employeeId, roomId, accessTime",access_log_20240518_2.csv
+E007,周九,MR001,第一会议室,2024-05-19 01:00:00,b73a855b77955b6d8df91ac0330df8f0,"employeeId, roomId, accessTime",access_log_20240518_2.csv

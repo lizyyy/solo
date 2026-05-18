@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2026-05-19 00:26:44",
+  "totalErrorFiles": 1,
+  "totalErrors": 3,
+  "errors": [
+    {
+      "fileName": "invalid_file.csv",
+      "errors": [
+        {
+          "row": 1,
+          "error": "缺少必填字段: employeeId, roomId, accessTime",
+          "data": "{\"这是一个无效的CSV文件\":\"用于测试错误处理机制\"}"
+        },
+        {
+          "row": 1,
+          "error": "缺少必填字段: employeeId, roomId, accessTime",
+          "data": "{\"这是一个无效的CSV文件\":\"确保某个文件解析失败时\"}"
+        },
+        {
+          "row": 1,
+          "error": "缺少必填字段: employeeId, roomId, accessTime",
+          "data": "{\"这是一个无效的CSV文件\":\"工具仍能完成其它文件的处理\"}"
+        }
+      ]
+    }
+  ]
+}
