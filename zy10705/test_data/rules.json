@@ -1,0 +1,41 @@
+{
+  "name": "直播课程资料回放权限核查规则",
+  "version": "1.0",
+  "description": "用于核查直播课程资料回放的用户权限异常情况",
+  "rules": [
+    {
+      "id": "R001",
+      "name": "退款后观看检测",
+      "description": "检测用户退款后是否仍继续观看课程",
+      "enabled": true
+    },
+    {
+      "id": "R002",
+      "name": "换班学员检测",
+      "description": "检测用户是否观看了非当前班级的课程",
+      "enabled": true
+    },
+    {
+      "id": "R003",
+      "name": "补录订单检测",
+      "description": "标记后台补录订单以便人工核实",
+      "enabled": true
+    },
+    {
+      "id": "R004",
+      "name": "越权观看检测",
+      "description": "检测无有效订单却观看课程的用户",
+      "enabled": true
+    },
+    {
+      "id": "R005",
+      "name": "漏授权检测",
+      "description": "检测已付款但未授权的用户",
+      "enabled": true
+    }
+  ],
+  "config": {
+    "refund_status_keywords": ["退款", "已退", "取消"],
+    "supplementary_order_keywords": ["补录", "补单", "后台"]
+  }
+}
