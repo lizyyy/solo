@@ -1,0 +1,32 @@
+{
+  "runId": "20260519_024408",
+  "runTime": "2026-05-18T19:44:08.673Z",
+  "summary": {
+    "total": 10,
+    "passed": 5,
+    "warning": 2,
+    "failed": 3,
+    "red冲Count": 2,
+    "totalAmount": 121500,
+    "passRate": "50.00",
+    "fileCount": 2,
+    "billCount": 10
+  },
+  "keyMetrics": {
+    "total": 10,
+    "passed": 5,
+    "failed": 3,
+    "warning": 2,
+    "red冲Count": 2,
+    "totalAmount": 121500,
+    "passRate": "50.00",
+    "errorTypes": {
+      "红冲校验_warning": 1,
+      "红冲校验_error": 1,
+      "附件缺页校验_error": 1,
+      "基础信息校验_error": 2,
+      "附件缺页校验_warning": 1,
+      "金额校验_warning": 1
+    }
+  }
+}

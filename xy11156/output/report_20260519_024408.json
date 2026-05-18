@@ -1,0 +1,538 @@
+{
+  "runId": "20260519_024408",
+  "runType": "正式",
+  "runTime": "2026-05-18T19:44:08.673Z",
+  "parseResult": [
+    {
+      "file": "maintenance_bills_2024_01.json",
+      "bills": [
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-001",
+          "billDate": "2024-01-15",
+          "amount": 25000,
+          "payer": "阳光花园业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 3,
+          "attachmentPages": 6,
+          "projectName": "电梯维保项目",
+          "communityName": "阳光花园",
+          "itemType": "设备维修",
+          "remark": "1-3号楼电梯年检及维保",
+          "status": "待校验",
+          "operator": "张三"
+        },
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-002",
+          "billDate": "2024-01-16",
+          "amount": 12000,
+          "payer": "幸福里业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 2,
+          "attachmentPages": 4,
+          "projectName": "消防设施更新",
+          "communityName": "幸福里小区",
+          "itemType": "消防设施",
+          "remark": "消防栓及灭火器更新",
+          "status": "待校验",
+          "operator": "李四"
+        },
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-003",
+          "billDate": "2024-01-17",
+          "amount": -5000,
+          "payer": "翠苑社区业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": true,
+          "relatedBillId": "WXJJ-2023-128",
+          "attachmentCount": 1,
+          "attachmentPages": 2,
+          "projectName": "管道维修退款",
+          "communityName": "翠苑社区",
+          "itemType": "退款",
+          "remark": "多收费用退回",
+          "status": "待校验",
+          "operator": "王五"
+        },
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-004",
+          "billDate": "2024-01-18",
+          "amount": 35000,
+          "payer": "锦苑小区业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 5,
+          "attachmentPages": 10,
+          "projectName": "屋顶防水工程",
+          "communityName": "锦苑小区",
+          "itemType": "土建工程",
+          "remark": "1-5号楼屋顶防水整体翻修",
+          "status": "待校验",
+          "operator": "赵六"
+        },
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-005",
+          "billDate": "2024-01-19",
+          "amount": 8000,
+          "payer": "文华苑业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 0,
+          "attachmentPages": 0,
+          "projectName": "门禁系统升级",
+          "communityName": "文华苑",
+          "itemType": "安防系统",
+          "remark": "小区大门及单元门门禁升级",
+          "status": "待校验",
+          "operator": "钱七"
+        }
+      ],
+      "metadata": {
+        "source": "json",
+        "count": 5
+      }
+    },
+    {
+      "file": "maintenance_bills_2024_02.json",
+      "bills": [
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-006",
+          "billDate": "2024-02-01",
+          "amount": 18000,
+          "payer": "碧水湾业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 2,
+          "attachmentPages": 5,
+          "projectName": "监控系统更新",
+          "communityName": "碧水湾",
+          "itemType": "安防系统",
+          "remark": "小区监控设备全面升级",
+          "status": "待校验",
+          "operator": "孙八"
+        },
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-007",
+          "billDate": "2024-02-03",
+          "amount": -3000,
+          "payer": "金色家园业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": true,
+          "relatedBillId": "",
+          "attachmentCount": 1,
+          "attachmentPages": 2,
+          "projectName": "维修费用调整",
+          "communityName": "金色家园",
+          "itemType": "调整",
+          "remark": "红冲调整",
+          "status": "待校验",
+          "operator": "周九"
+        },
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-008",
+          "billDate": "2024-02-05",
+          "amount": 22000,
+          "payer": "东方明珠业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 4,
+          "attachmentPages": 0,
+          "projectName": "外墙粉刷工程",
+          "communityName": "东方明珠",
+          "itemType": "土建工程",
+          "remark": "1-8号楼外墙整体粉刷",
+          "status": "待校验",
+          "operator": "吴十"
+        },
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-009",
+          "billDate": "",
+          "amount": 9500,
+          "payer": "世纪花园业主委员会",
+          "payee": "",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 0,
+          "attachmentPages": 0,
+          "projectName": "水泵更换",
+          "communityName": "世纪花园",
+          "itemType": "设备维修",
+          "remark": "二次供水水泵更换",
+          "status": "待校验",
+          "operator": "郑十一"
+        },
+        {
+          "billId": "",
+          "billNumber": "WXJJ-2024-010",
+          "billDate": "2024-02-10",
+          "amount": 0,
+          "payer": "翡翠城业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 0,
+          "attachmentPages": 1,
+          "projectName": "零金额测试",
+          "communityName": "翡翠城",
+          "itemType": "其他",
+          "remark": "测试零金额票据",
+          "status": "待校验",
+          "operator": "王十二"
+        }
+      ],
+      "metadata": {
+        "source": "json",
+        "count": 5
+      }
+    }
+  ],
+  "validateResult": {
+    "results": [
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-001",
+          "billDate": "2024-01-15",
+          "amount": 25000,
+          "payer": "阳光花园业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 3,
+          "attachmentPages": 6,
+          "projectName": "电梯维保项目",
+          "communityName": "阳光花园",
+          "itemType": "设备维修",
+          "remark": "1-3号楼电梯年检及维保",
+          "status": "待校验",
+          "operator": "张三"
+        },
+        "issues": [],
+        "isValid": true,
+        "status": "通过"
+      },
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-002",
+          "billDate": "2024-01-16",
+          "amount": 12000,
+          "payer": "幸福里业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 2,
+          "attachmentPages": 4,
+          "projectName": "消防设施更新",
+          "communityName": "幸福里小区",
+          "itemType": "消防设施",
+          "remark": "消防栓及灭火器更新",
+          "status": "待校验",
+          "operator": "李四"
+        },
+        "issues": [],
+        "isValid": true,
+        "status": "通过"
+      },
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-003",
+          "billDate": "2024-01-17",
+          "amount": -5000,
+          "payer": "翠苑社区业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": true,
+          "relatedBillId": "WXJJ-2023-128",
+          "attachmentCount": 1,
+          "attachmentPages": 2,
+          "projectName": "管道维修退款",
+          "communityName": "翠苑社区",
+          "itemType": "退款",
+          "remark": "多收费用退回",
+          "status": "待校验",
+          "operator": "王五"
+        },
+        "issues": [
+          {
+            "type": "红冲校验",
+            "level": "warning",
+            "message": "关联票据 WXJJ-2023-128 未在当前批次中找到",
+            "field": "relatedBillId"
+          }
+        ],
+        "isValid": true,
+        "status": "有警告"
+      },
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-004",
+          "billDate": "2024-01-18",
+          "amount": 35000,
+          "payer": "锦苑小区业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 5,
+          "attachmentPages": 10,
+          "projectName": "屋顶防水工程",
+          "communityName": "锦苑小区",
+          "itemType": "土建工程",
+          "remark": "1-5号楼屋顶防水整体翻修",
+          "status": "待校验",
+          "operator": "赵六"
+        },
+        "issues": [],
+        "isValid": true,
+        "status": "通过"
+      },
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-005",
+          "billDate": "2024-01-19",
+          "amount": 8000,
+          "payer": "文华苑业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 0,
+          "attachmentPages": 0,
+          "projectName": "门禁系统升级",
+          "communityName": "文华苑",
+          "itemType": "安防系统",
+          "remark": "小区大门及单元门门禁升级",
+          "status": "待校验",
+          "operator": "钱七"
+        },
+        "issues": [],
+        "isValid": true,
+        "status": "通过"
+      },
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-006",
+          "billDate": "2024-02-01",
+          "amount": 18000,
+          "payer": "碧水湾业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 2,
+          "attachmentPages": 5,
+          "projectName": "监控系统更新",
+          "communityName": "碧水湾",
+          "itemType": "安防系统",
+          "remark": "小区监控设备全面升级",
+          "status": "待校验",
+          "operator": "孙八"
+        },
+        "issues": [],
+        "isValid": true,
+        "status": "通过"
+      },
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-007",
+          "billDate": "2024-02-03",
+          "amount": -3000,
+          "payer": "金色家园业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": true,
+          "relatedBillId": "",
+          "attachmentCount": 1,
+          "attachmentPages": 2,
+          "projectName": "维修费用调整",
+          "communityName": "金色家园",
+          "itemType": "调整",
+          "remark": "红冲调整",
+          "status": "待校验",
+          "operator": "周九"
+        },
+        "issues": [
+          {
+            "type": "红冲校验",
+            "level": "error",
+            "message": "红冲票据必须关联原票据号",
+            "field": "relatedBillId"
+          }
+        ],
+        "isValid": false,
+        "status": "不通过"
+      },
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-008",
+          "billDate": "2024-02-05",
+          "amount": 22000,
+          "payer": "东方明珠业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 4,
+          "attachmentPages": 0,
+          "projectName": "外墙粉刷工程",
+          "communityName": "东方明珠",
+          "itemType": "土建工程",
+          "remark": "1-8号楼外墙整体粉刷",
+          "status": "待校验",
+          "operator": "吴十"
+        },
+        "issues": [
+          {
+            "type": "附件缺页校验",
+            "level": "error",
+            "message": "附件数量为 4 但页数不足 1 页",
+            "field": "attachmentPages"
+          }
+        ],
+        "isValid": false,
+        "status": "不通过"
+      },
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-009",
+          "billDate": "",
+          "amount": 9500,
+          "payer": "世纪花园业主委员会",
+          "payee": "",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 0,
+          "attachmentPages": 0,
+          "projectName": "水泵更换",
+          "communityName": "世纪花园",
+          "itemType": "设备维修",
+          "remark": "二次供水水泵更换",
+          "status": "待校验",
+          "operator": "郑十一"
+        },
+        "issues": [
+          {
+            "type": "基础信息校验",
+            "level": "error",
+            "message": "缺少必填字段: billDate",
+            "field": "billDate"
+          },
+          {
+            "type": "基础信息校验",
+            "level": "error",
+            "message": "缺少必填字段: payee",
+            "field": "payee"
+          }
+        ],
+        "isValid": false,
+        "status": "不通过"
+      },
+      {
+        "bill": {
+          "billId": "",
+          "billNumber": "WXJJ-2024-010",
+          "billDate": "2024-02-10",
+          "amount": 0,
+          "payer": "翡翠城业主委员会",
+          "payee": "市物业维修资金管理中心",
+          "isRed冲": false,
+          "relatedBillId": "",
+          "attachmentCount": 0,
+          "attachmentPages": 1,
+          "projectName": "零金额测试",
+          "communityName": "翡翠城",
+          "itemType": "其他",
+          "remark": "测试零金额票据",
+          "status": "待校验",
+          "operator": "王十二"
+        },
+        "issues": [
+          {
+            "type": "附件缺页校验",
+            "level": "warning",
+            "message": "有附件页数但附件数量为0",
+            "field": "attachmentCount"
+          },
+          {
+            "type": "金额校验",
+            "level": "warning",
+            "message": "票据金额为0",
+            "field": "amount"
+          }
+        ],
+        "isValid": true,
+        "status": "有警告"
+      }
+    ],
+    "summary": {
+      "total": 10,
+      "passed": 5,
+      "warning": 2,
+      "failed": 3,
+      "red冲Count": 2,
+      "totalAmount": 121500,
+      "passRate": "50.00"
+    },
+    "errors": [
+      {
+        "billNumber": "WXJJ-2024-007",
+        "message": "红冲票据必须关联原票据号"
+      },
+      {
+        "billNumber": "WXJJ-2024-008",
+        "message": "附件页数不足，应为至少 1 页"
+      },
+      {
+        "billNumber": "WXJJ-2024-009",
+        "message": "缺少必填字段: billDate"
+      },
+      {
+        "billNumber": "WXJJ-2024-009",
+        "message": "缺少必填字段: payee"
+      }
+    ],
+    "warnings": [
+      {
+        "billNumber": "WXJJ-2024-003",
+        "message": "关联票据 WXJJ-2023-128 未在当前批次中找到"
+      },
+      {
+        "billNumber": "WXJJ-2024-010",
+        "message": "有附件页数但附件数量为0"
+      },
+      {
+        "billNumber": "WXJJ-2024-010",
+        "message": "票据金额为0"
+      }
+    ]
+  },
+  "summary": {
+    "total": 10,
+    "passed": 5,
+    "warning": 2,
+    "failed": 3,
+    "red冲Count": 2,
+    "totalAmount": 121500,
+    "passRate": "50.00",
+    "fileCount": 2,
+    "billCount": 10
+  }
+}
