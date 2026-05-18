@@ -1,0 +1,22 @@
+{
+  "name": "imported-food-expiry-price-adjustment",
+  "version": "1.0.0",
+  "description": "进口食品店临期批次调价 CLI",
+  "main": "src/cli.js",
+  "bin": {
+    "expiry-price": "./src/cli.js"
+  },
+  "scripts": {
+    "preview": "node src/cli.js preview --input data/input.csv",
+    "execute": "node src/cli.js execute --input data/input.csv",
+    "report": "node src/cli.js report"
+  },
+  "keywords": ["imported-food", "expiry", "price-adjustment"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  }
+}
