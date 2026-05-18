@@ -1,0 +1,19 @@
+{
+  "name": "enterprise-shuttle-temporary-stop-api",
+  "version": "1.0.0",
+  "description": "企业班车队班车临时加站 API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "csv-writer": "^1.6.0",
+    "cors": "^2.8.5"
+  },
+  "keywords": ["shuttle", "temporary-stop", "enterprise"],
+  "author": "",
+  "license": "ISC"
+}
