@@ -1,0 +1,27 @@
+{
+  "name": "alcohol-rebate-ledger-cli",
+  "version": "1.0.0",
+  "description": "酒类经销商酒水返利台账 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "rebate-ledger": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test/run-test.js"
+  },
+  "keywords": [
+    "酒类",
+    "返利",
+    "台账",
+    "经销商",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "yargs": "^17.7.2"
+  }
+}
