@@ -1,0 +1,19 @@
+{
+  "name": "bakery-recipe-converter",
+  "version": "1.0.0",
+  "description": "烘焙工坊烘焙配方换算工具",
+  "main": "src/index.js",
+  "bin": {
+    "烘焙工坊烘焙配方换算": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["bakery", "recipe", "converter"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parse": "^5.5.0",
+    "csv-stringify": "^6.4.0"
+  }
+}
