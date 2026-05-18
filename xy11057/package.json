@@ -1,0 +1,22 @@
+{
+  "name": "artwork-storage-api",
+  "version": "1.0.0",
+  "description": "艺术品寄存库艺术品出入库 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "init": "node scripts/init-db.js",
+    "test": "node scripts/test-flow.js"
+  },
+  "dependencies": {
+    "csv-parser": "^3.2.1",
+    "csv-writer": "^1.6.0",
+    "express": "^4.22.2",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.7"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
