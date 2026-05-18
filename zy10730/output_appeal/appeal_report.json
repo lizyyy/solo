@@ -1,0 +1,295 @@
+{
+  "tool_name": "审核样本目录误封申诉整理",
+  "version": "0.1.0",
+  "scan_time": "2026-05-18T17:51:39.856826",
+  "input_path": "test_samples",
+  "rules_file": "rules.yaml",
+  "summary": {
+    "total_samples": 10,
+    "normal_samples": 5,
+    "thumbnail_samples": 5,
+    "duplicate_samples": 2,
+    "model_version_count": 4
+  },
+  "details": {
+    "normal_samples": [
+      {
+        "filename": "normal_image_v1.0.jpg",
+        "relative_path": "normal_image_v1.0.jpg",
+        "absolute_path": "test_samples/normal_image_v1.0.jpg",
+        "file_size": 2915,
+        "file_hash": "8148b28a1ce3d229e829be4bf07f2010",
+        "image_hash": "f8f8f8f8f0f0e080",
+        "model_version": "1.0",
+        "is_thumbnail": false,
+        "thumbnail_info": {
+          "width": 400,
+          "height": 300,
+          "reason": ""
+        }
+      },
+      {
+        "filename": "nested_v1.0.jpg",
+        "relative_path": "subdir/nested_v1.0.jpg",
+        "absolute_path": "test_samples/subdir/nested_v1.0.jpg",
+        "file_size": 3005,
+        "file_hash": "778a9eb98d30c30c9633ece3af1c6498",
+        "image_hash": "f8f0f0f0f0f0f0e0",
+        "model_version": "1.0",
+        "is_thumbnail": false,
+        "thumbnail_info": {
+          "width": 350,
+          "height": 350,
+          "reason": ""
+        }
+      },
+      {
+        "filename": "nested_ver2.jpg",
+        "relative_path": "subdir/nested_ver2.jpg",
+        "absolute_path": "test_samples/subdir/nested_ver2.jpg",
+        "file_size": 2116,
+        "file_hash": "fb9e1bb2d99141b160fbb9a9ea2fef31",
+        "image_hash": "f0f0f0f0f0f0f00f",
+        "model_version": "2",
+        "is_thumbnail": false,
+        "thumbnail_info": {
+          "width": 280,
+          "height": 220,
+          "reason": ""
+        }
+      },
+      {
+        "filename": "normal_image_v2.0.png",
+        "relative_path": "normal_image_v2.0.png",
+        "absolute_path": "test_samples/normal_image_v2.0.png",
+        "file_size": 2385,
+        "file_hash": "5178f334f00352d7751847f29283686f",
+        "image_hash": "f8f8f0f0f0f0e0e0",
+        "model_version": "2.0",
+        "is_thumbnail": false,
+        "thumbnail_info": {
+          "width": 500,
+          "height": 400,
+          "reason": ""
+        }
+      },
+      {
+        "filename": "sample_model_resnet.jpg",
+        "relative_path": "sample_model_resnet.jpg",
+        "absolute_path": "test_samples/sample_model_resnet.jpg",
+        "file_size": 2315,
+        "file_hash": "86fd76ffc09e27304249a5729e001be4",
+        "image_hash": "f0f0f0f0f0f0f0f0",
+        "model_version": "resnet",
+        "is_thumbnail": false,
+        "thumbnail_info": {
+          "width": 300,
+          "height": 250,
+          "reason": ""
+        }
+      }
+    ],
+    "thumbnail_samples": [
+      {
+        "filename": "duplicate_a.jpg",
+        "relative_path": "duplicate_a.jpg",
+        "absolute_path": "test_samples/duplicate_a.jpg",
+        "file_size": 1694,
+        "file_hash": "aebebdf17959a851cfd35194ba38db57",
+        "image_hash": "f0f0f0f0f0f00f0f",
+        "model_version": "unknown",
+        "is_thumbnail": true,
+        "thumbnail_info": {
+          "width": 250,
+          "height": 200,
+          "reason": "高度过小 (200px)"
+        },
+        "duplicate_type": "image_content",
+        "duplicate_group_size": 2
+      },
+      {
+        "filename": "duplicate_b.jpg",
+        "relative_path": "duplicate_b.jpg",
+        "absolute_path": "test_samples/duplicate_b.jpg",
+        "file_size": 1693,
+        "file_hash": "12c40b72dfe0e02686e23a5f80d18e20",
+        "image_hash": "f0f0f0f0f0f00f0f",
+        "model_version": "unknown",
+        "is_thumbnail": true,
+        "thumbnail_info": {
+          "width": 250,
+          "height": 200,
+          "reason": "高度过小 (200px)"
+        },
+        "duplicate_type": "image_content",
+        "duplicate_group_size": 2
+      },
+      {
+        "filename": "narrow_wide.jpg",
+        "relative_path": "narrow_wide.jpg",
+        "absolute_path": "test_samples/narrow_wide.jpg",
+        "file_size": 1682,
+        "file_hash": "77b806c18ea70f513789036527e4494f",
+        "image_hash": "e0f0f0f0f0f0f0f1",
+        "model_version": "unknown",
+        "is_thumbnail": true,
+        "thumbnail_info": {
+          "width": 150,
+          "height": 300,
+          "reason": "宽度过小 (150px)"
+        }
+      },
+      {
+        "filename": "thumbnail_small.jpg",
+        "relative_path": "thumbnail_small.jpg",
+        "absolute_path": "test_samples/thumbnail_small.jpg",
+        "file_size": 1069,
+        "file_hash": "14ef1ab42f9eb4eec3d17b8990fc87ad",
+        "image_hash": "c0c0c03b3b3b3f37",
+        "model_version": "unknown",
+        "is_thumbnail": true,
+        "thumbnail_info": {
+          "width": 100,
+          "height": 80,
+          "reason": "尺寸过小 (100x80)"
+        }
+      },
+      {
+        "filename": "tiny_image.png",
+        "relative_path": "tiny_image.png",
+        "absolute_path": "test_samples/tiny_image.png",
+        "file_size": 435,
+        "file_hash": "8701cd4d4294a8a6ad72d822959ca94d",
+        "image_hash": "c9cb36343889cdc7",
+        "model_version": "unknown",
+        "is_thumbnail": true,
+        "thumbnail_info": {
+          "width": 50,
+          "height": 50,
+          "reason": "尺寸过小 (50x50)"
+        }
+      }
+    ],
+    "duplicate_samples": [
+      {
+        "filename": "duplicate_a.jpg",
+        "relative_path": "duplicate_a.jpg",
+        "absolute_path": "test_samples/duplicate_a.jpg",
+        "file_size": 1694,
+        "file_hash": "aebebdf17959a851cfd35194ba38db57",
+        "image_hash": "f0f0f0f0f0f00f0f",
+        "model_version": "unknown",
+        "is_thumbnail": true,
+        "thumbnail_info": {
+          "width": 250,
+          "height": 200,
+          "reason": "高度过小 (200px)"
+        },
+        "duplicate_type": "image_content",
+        "duplicate_group_size": 2
+      },
+      {
+        "filename": "duplicate_b.jpg",
+        "relative_path": "duplicate_b.jpg",
+        "absolute_path": "test_samples/duplicate_b.jpg",
+        "file_size": 1693,
+        "file_hash": "12c40b72dfe0e02686e23a5f80d18e20",
+        "image_hash": "f0f0f0f0f0f00f0f",
+        "model_version": "unknown",
+        "is_thumbnail": true,
+        "thumbnail_info": {
+          "width": 250,
+          "height": 200,
+          "reason": "高度过小 (200px)"
+        },
+        "duplicate_type": "image_content",
+        "duplicate_group_size": 2
+      }
+    ],
+    "model_version_groups": {
+      "1.0": [
+        {
+          "filename": "normal_image_v1.0.jpg",
+          "relative_path": "normal_image_v1.0.jpg",
+          "absolute_path": "test_samples/normal_image_v1.0.jpg",
+          "file_size": 2915,
+          "file_hash": "8148b28a1ce3d229e829be4bf07f2010",
+          "image_hash": "f8f8f8f8f0f0e080",
+          "model_version": "1.0",
+          "is_thumbnail": false,
+          "thumbnail_info": {
+            "width": 400,
+            "height": 300,
+            "reason": ""
+          }
+        },
+        {
+          "filename": "nested_v1.0.jpg",
+          "relative_path": "subdir/nested_v1.0.jpg",
+          "absolute_path": "test_samples/subdir/nested_v1.0.jpg",
+          "file_size": 3005,
+          "file_hash": "778a9eb98d30c30c9633ece3af1c6498",
+          "image_hash": "f8f0f0f0f0f0f0e0",
+          "model_version": "1.0",
+          "is_thumbnail": false,
+          "thumbnail_info": {
+            "width": 350,
+            "height": 350,
+            "reason": ""
+          }
+        }
+      ],
+      "2": [
+        {
+          "filename": "nested_ver2.jpg",
+          "relative_path": "subdir/nested_ver2.jpg",
+          "absolute_path": "test_samples/subdir/nested_ver2.jpg",
+          "file_size": 2116,
+          "file_hash": "fb9e1bb2d99141b160fbb9a9ea2fef31",
+          "image_hash": "f0f0f0f0f0f0f00f",
+          "model_version": "2",
+          "is_thumbnail": false,
+          "thumbnail_info": {
+            "width": 280,
+            "height": 220,
+            "reason": ""
+          }
+        }
+      ],
+      "2.0": [
+        {
+          "filename": "normal_image_v2.0.png",
+          "relative_path": "normal_image_v2.0.png",
+          "absolute_path": "test_samples/normal_image_v2.0.png",
+          "file_size": 2385,
+          "file_hash": "5178f334f00352d7751847f29283686f",
+          "image_hash": "f8f8f0f0f0f0e0e0",
+          "model_version": "2.0",
+          "is_thumbnail": false,
+          "thumbnail_info": {
+            "width": 500,
+            "height": 400,
+            "reason": ""
+          }
+        }
+      ],
+      "resnet": [
+        {
+          "filename": "sample_model_resnet.jpg",
+          "relative_path": "sample_model_resnet.jpg",
+          "absolute_path": "test_samples/sample_model_resnet.jpg",
+          "file_size": 2315,
+          "file_hash": "86fd76ffc09e27304249a5729e001be4",
+          "image_hash": "f0f0f0f0f0f0f0f0",
+          "model_version": "resnet",
+          "is_thumbnail": false,
+          "thumbnail_info": {
+            "width": 300,
+            "height": 250,
+            "reason": ""
+          }
+        }
+      ]
+    }
+  }
+}

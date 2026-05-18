@@ -1,0 +1,30 @@
+# 审核样本目录误封申诉整理规则配置
+
+# 缩略图检测阈值
+# 宽度或高度小于等于该值的图片被判定为缩略图
+thumbnail_max_size: 200
+
+# 模型版本提取正则表达式
+# 按顺序尝试，匹配到第一个即返回
+model_version_patterns:
+  - 'v(\d+\.\d+)'           # v1.0, v2.5
+  - 'ver(\d+)'              # ver1, ver2
+  - 'model_(\w+)'           # model_resnet, model_vgg
+  - '_v(\d+)'               # _v1, _v2
+  - 'version_(\d+)'         # version_1, version_2
+
+# 支持的图片格式
+supported_formats:
+  - .jpg
+  - .jpeg
+  - .png
+  - .gif
+  - .bmp
+  - .webp
+
+# 重复检测配置
+duplicate_detection:
+  # 是否使用感知哈希检测内容相似
+  use_image_hash: true
+  # 感知哈希匹配阈值 (汉明距离)
+  hash_similarity_threshold: 0
