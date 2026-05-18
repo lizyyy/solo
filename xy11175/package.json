@@ -1,0 +1,25 @@
+{
+  "name": "tea-store-inspection-cli",
+  "version": "1.0.0",
+  "description": "茶饮加盟巡店组茶饮门店扣分 CLI 工具",
+  "main": "dist/cli.js",
+  "bin": {
+    "tea-inspection": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "test": "node dist/cli.js --input samples/normal-input.json --output samples/normal-output.json"
+  },
+  "keywords": ["tea", "inspection", "store", "audit"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0"
+  }
+}

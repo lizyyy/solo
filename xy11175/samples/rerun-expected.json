@@ -1,0 +1,125 @@
+{
+  "generatedAt": "2024-01-01T00:00:00.000Z",
+  "inspectionCount": 2,
+  "validationResult": {
+    "isValid": false,
+    "errors": [
+      {
+        "type": "photo_reuse",
+        "severity": "high",
+        "storeId": "TEA-003",
+        "storeName": "蜜雪冰城(广州天河店)",
+        "relatedData": {
+          "hash": "m1n2o3p4q5r6s7t8u9v0",
+          "photoIds": [
+            "PHOTO-001",
+            "PHOTO-003"
+          ],
+          "count": 2
+        }
+      },
+      {
+        "type": "photo_reuse",
+        "severity": "high",
+        "storeId": "TEA-003",
+        "storeName": "蜜雪冰城(广州天河店)",
+        "itemId": "ITEM-001",
+        "relatedData": {
+          "photoId": "PHOTO-002",
+          "affectedItems": [
+            "ITEM-001",
+            "ITEM-002"
+          ]
+        }
+      },
+      {
+        "type": "overdue_rectification",
+        "severity": "high",
+        "storeId": "TEA-003",
+        "storeName": "蜜雪冰城(广州天河店)",
+        "itemId": "ITEM-001",
+        "relatedData": {
+          "itemId": "ITEM-001",
+          "deadline": "2024-05-12",
+          "status": "pending",
+          "category": "卫生管理"
+        }
+      },
+      {
+        "type": "overdue_rectification",
+        "severity": "high",
+        "storeId": "TEA-003",
+        "storeName": "蜜雪冰城(广州天河店)",
+        "itemId": "ITEM-002",
+        "relatedData": {
+          "itemId": "ITEM-002",
+          "deadline": "2024-05-12",
+          "status": "pending",
+          "category": "卫生管理"
+        }
+      },
+      {
+        "type": "overdue_rectification",
+        "severity": "high",
+        "storeId": "TEA-004",
+        "storeName": "古茗(杭州西湖店)",
+        "itemId": "ITEM-001",
+        "relatedData": {
+          "itemId": "ITEM-001",
+          "deadline": "2024-05-08",
+          "status": "overdue",
+          "category": "卫生管理"
+        }
+      },
+      {
+        "type": "overdue_rectification",
+        "severity": "medium",
+        "storeId": "TEA-004",
+        "storeName": "古茗(杭州西湖店)",
+        "itemId": "ITEM-002",
+        "relatedData": {
+          "itemId": "ITEM-002",
+          "deadline": "2025-12-31"
+        }
+      },
+      {
+        "type": "invalid_data",
+        "severity": "medium",
+        "storeId": "TEA-003",
+        "storeName": "蜜雪冰城(广州天河店)",
+        "itemId": "ITEM-003",
+        "relatedData": {
+          "score": 15,
+          "maxScore": 10
+        }
+      },
+      {
+        "type": "invalid_data",
+        "severity": "medium",
+        "storeId": "TEA-003",
+        "storeName": "蜜雪冰城(广州天河店)",
+        "itemId": "ITEM-004",
+        "relatedData": {
+          "missingPhotoId": "PHOTO-005"
+        }
+      },
+      {
+        "type": "invalid_data",
+        "severity": "low",
+        "storeId": "TEA-003",
+        "storeName": "蜜雪冰城(广州天河店)",
+        "itemId": "ITEM-004",
+        "relatedData": {
+          "itemId": "ITEM-004"
+        }
+      }
+    ],
+    "summary": {
+      "totalErrors": 9,
+      "photoReuseCount": 2,
+      "overdueCount": 4,
+      "invalidDataCount": 3
+    }
+  },
+  "runId": "run_idempotent"
+}

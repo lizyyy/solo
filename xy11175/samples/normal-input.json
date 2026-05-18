@@ -1,0 +1,124 @@
+[
+  {
+    "storeId": "TEA-001",
+    "storeName": "喜茶(北京三里屯店)",
+    "inspectionDate": "2024-05-10",
+    "inspector": "张巡检",
+    "items": [
+      {
+        "itemId": "ITEM-001",
+        "category": "卫生管理",
+        "description": "操作台清洁度",
+        "score": 8,
+        "maxScore": 10,
+        "deductionReason": "操作台边缘有少量污渍",
+        "rectificationRequired": true,
+        "rectificationDeadline": "2024-05-17",
+        "rectificationStatus": "pending",
+        "rectificationPhotoId": "PHOTO-003"
+      },
+      {
+        "itemId": "ITEM-002",
+        "category": "卫生管理",
+        "description": "原材料保质期检查",
+        "score": 10,
+        "maxScore": 10,
+        "rectificationRequired": false
+      },
+      {
+        "itemId": "ITEM-003",
+        "category": "服务规范",
+        "description": "员工仪容仪表",
+        "score": 9,
+        "maxScore": 10,
+        "deductionReason": "1名员工未按标准佩戴工牌",
+        "rectificationRequired": true,
+        "rectificationDeadline": "2024-05-17",
+        "rectificationStatus": "pending",
+        "rectificationPhotoId": "PHOTO-004"
+      },
+      {
+        "itemId": "ITEM-004",
+        "category": "设备管理",
+        "description": "制冰机运行状态",
+        "score": 10,
+        "maxScore": 10,
+        "rectificationRequired": false
+      }
+    ],
+    "photos": [
+      {
+        "photoId": "PHOTO-001",
+        "photoUrl": "https://example.com/photos/tea001_001.jpg",
+        "uploadTime": "2024-05-10T09:30:00",
+        "description": "门店整体环境",
+        "md5Hash": "a1b2c3d4e5f6g7h8i9j0"
+      },
+      {
+        "photoId": "PHOTO-002",
+        "photoUrl": "https://example.com/photos/tea001_002.jpg",
+        "uploadTime": "2024-05-10T09:32:00",
+        "description": "原材料陈列",
+        "md5Hash": "k1l2m3n4o5p6q7r8s9t0"
+      },
+      {
+        "photoId": "PHOTO-003",
+        "photoUrl": "https://example.com/photos/tea001_003.jpg",
+        "uploadTime": "2024-05-10T09:35:00",
+        "description": "操作台污渍问题",
+        "md5Hash": "u1v2w3x4y5z6a7b8c9d0"
+      },
+      {
+        "photoId": "PHOTO-004",
+        "photoUrl": "https://example.com/photos/tea001_004.jpg",
+        "uploadTime": "2024-05-10T09:38:00",
+        "description": "员工工牌问题",
+        "md5Hash": "e1f2g3h4i5j6k7l8m9n0"
+      }
+    ]
+  },
+  {
+    "storeId": "TEA-002",
+    "storeName": "奈雪的茶(上海陆家嘴店)",
+    "inspectionDate": "2024-05-11",
+    "inspector": "李巡检",
+    "items": [
+      {
+        "itemId": "ITEM-001",
+        "category": "卫生管理",
+        "description": "地面清洁度",
+        "score": 10,
+        "maxScore": 10,
+        "rectificationRequired": false
+      },
+      {
+        "itemId": "ITEM-002",
+        "category": "操作规范",
+        "description": "饮品制作流程",
+        "score": 9,
+        "maxScore": 10,
+        "deductionReason": "制作过程中未按标准戴手套",
+        "rectificationRequired": true,
+        "rectificationDeadline": "2024-05-18",
+        "rectificationStatus": "completed",
+        "rectificationPhotoId": "PHOTO-002"
+      }
+    ],
+    "photos": [
+      {
+        "photoId": "PHOTO-001",
+        "photoUrl": "https://example.com/photos/tea002_001.jpg",
+        "uploadTime": "2024-05-11T14:20:00",
+        "description": "门店正门",
+        "md5Hash": "p1q2r3s4t5u6v7w8x9y0"
+      },
+      {
+        "photoId": "PHOTO-002",
+        "photoUrl": "https://example.com/photos/tea002_002.jpg",
+        "uploadTime": "2024-05-11T14:25:00",
+        "description": "整改后-员工规范操作",
+        "md5Hash": "z1a2b3c4d5e6f7g8h9i0"
+      }
+    ]
+  }
+]

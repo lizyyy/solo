@@ -1,0 +1,124 @@
+[
+  {
+    "storeId": "TEA-003",
+    "storeName": "蜜雪冰城(广州天河店)",
+    "inspectionDate": "2024-05-08",
+    "inspector": "王巡检",
+    "items": [
+      {
+        "itemId": "ITEM-001",
+        "category": "卫生管理",
+        "description": "冰柜清洁情况",
+        "score": 6,
+        "maxScore": 10,
+        "deductionReason": "冰柜内部有结冰和污渍",
+        "rectificationRequired": true,
+        "rectificationDeadline": "2024-05-12",
+        "rectificationStatus": "pending",
+        "rectificationPhotoId": "PHOTO-002"
+      },
+      {
+        "itemId": "ITEM-002",
+        "category": "卫生管理",
+        "description": "垃圾桶管理",
+        "score": 7,
+        "maxScore": 10,
+        "deductionReason": "垃圾桶未及时清理，有异味",
+        "rectificationRequired": true,
+        "rectificationDeadline": "2024-05-12",
+        "rectificationStatus": "pending",
+        "rectificationPhotoId": "PHOTO-002"
+      },
+      {
+        "itemId": "ITEM-003",
+        "category": "操作规范",
+        "description": "消毒记录完整性",
+        "score": 15,
+        "maxScore": 10,
+        "rectificationRequired": false
+      },
+      {
+        "itemId": "ITEM-004",
+        "category": "设备管理",
+        "description": "封口机维护情况",
+        "score": 5,
+        "maxScore": 10,
+        "deductionReason": "封口机有异常响声",
+        "rectificationRequired": true,
+        "rectificationStatus": "pending",
+        "rectificationPhotoId": "PHOTO-005"
+      }
+    ],
+    "photos": [
+      {
+        "photoId": "PHOTO-001",
+        "photoUrl": "https://example.com/photos/tea003_001.jpg",
+        "uploadTime": "2024-05-08T11:00:00",
+        "description": "门店内部",
+        "md5Hash": "m1n2o3p4q5r6s7t8u9v0"
+      },
+      {
+        "photoId": "PHOTO-002",
+        "photoUrl": "https://example.com/photos/tea003_002.jpg",
+        "uploadTime": "2024-05-08T11:05:00",
+        "description": "冰柜和垃圾桶问题",
+        "md5Hash": "w1x2y3z4a5b6c7d8e9f0"
+      },
+      {
+        "photoId": "PHOTO-003",
+        "photoUrl": "https://example.com/photos/tea003_003.jpg",
+        "uploadTime": "2024-05-08T11:08:00",
+        "description": "重复拍摄的门店照片",
+        "md5Hash": "m1n2o3p4q5r6s7t8u9v0"
+      }
+    ]
+  },
+  {
+    "storeId": "TEA-004",
+    "storeName": "古茗(杭州西湖店)",
+    "inspectionDate": "2024-05-05",
+    "inspector": "赵巡检",
+    "items": [
+      {
+        "itemId": "ITEM-001",
+        "category": "卫生管理",
+        "description": "杯具消毒情况",
+        "score": 7,
+        "maxScore": 10,
+        "deductionReason": "消毒柜温度不达标",
+        "rectificationRequired": true,
+        "rectificationDeadline": "2024-05-08",
+        "rectificationStatus": "overdue",
+        "rectificationPhotoId": "PHOTO-001"
+      },
+      {
+        "itemId": "ITEM-002",
+        "category": "服务规范",
+        "description": "顾客接待流程",
+        "score": 8,
+        "maxScore": 10,
+        "deductionReason": "未主动问候顾客",
+        "rectificationRequired": true,
+        "rectificationDeadline": "2025-12-31",
+        "rectificationStatus": "overdue",
+        "rectificationPhotoId": "PHOTO-002"
+      }
+    ],
+    "photos": [
+      {
+        "photoId": "PHOTO-001",
+        "photoUrl": "https://example.com/photos/tea004_001.jpg",
+        "uploadTime": "2024-05-05T16:30:00",
+        "description": "消毒柜问题",
+        "md5Hash": "g1h2i3j4k5l6m7n8o9p0"
+      },
+      {
+        "photoId": "PHOTO-002",
+        "photoUrl": "https://example.com/photos/tea004_002.jpg",
+        "uploadTime": "2024-05-05T16:35:00",
+        "description": "服务区域照片",
+        "md5Hash": "q1r2s3t4u5v6w7x8y9z0"
+      }
+    ]
+  }
+]
