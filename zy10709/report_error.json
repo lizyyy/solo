@@ -1,0 +1,154 @@
+{
+  "summary": {
+    "check_time": "2026-05-18 09:30:55",
+    "recovery_range": {
+      "total": 3,
+      "pass": 1,
+      "fail": 2,
+      "pass_rate": "33.33%"
+    },
+    "error_sms": {
+      "total": 7,
+      "pass": 3,
+      "fail": 3,
+      "warn": 1,
+      "pass_rate": "42.86%"
+    },
+    "issues": {
+      "total": 5
+    },
+    "overall_status": "FAIL"
+  },
+  "recovery_range_checks": [
+    {
+      "recovery_id": "1",
+      "phone": "138****0001",
+      "apply_time": "2024-01-20 09:00:00",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "recovery_id": "2",
+      "phone": "138****0002",
+      "apply_time": "2024-01-20 10:00:00",
+      "status": "FAIL",
+      "issues": [
+        "恢复渠道[验证码]不在退订渠道范围内"
+      ]
+    },
+    {
+      "recovery_id": "3",
+      "phone": "138****0006",
+      "apply_time": "2024-01-20 11:00:00",
+      "status": "FAIL",
+      "issues": [
+        "该号码无退订记录，无需恢复"
+      ]
+    }
+  ],
+  "error_sms_checks": [
+    {
+      "sms_id": "1",
+      "phone": "138****0001",
+      "sms_type": "营销",
+      "send_time": "2024-01-21 09:30:00",
+      "content_preview": "【XX商城】新春特惠，全场5折起，点击链接查看详情",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "sms_id": "2",
+      "phone": "138****0002",
+      "sms_type": "验证码",
+      "send_time": "2024-01-21 10:30:00",
+      "content_preview": "【XX平台】您的验证码是：123456，5分钟内有效",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "sms_id": "3",
+      "phone": "138****0004",
+      "sms_type": "营销",
+      "send_time": "2024-01-21 11:30:00",
+      "content_preview": "【XX活动】邀请好友得好礼，最高可获得100元优惠券",
+      "status": "FAIL",
+      "issues": [
+        "退订用户收到营销短信，属于误发"
+      ]
+    },
+    {
+      "sms_id": "4",
+      "phone": "138****0005",
+      "sms_type": "推广",
+      "send_time": "2024-01-21 12:30:00",
+      "content_preview": "【XX推广】新用户专享，注册即送200元大礼包",
+      "status": "FAIL",
+      "issues": [
+        "退订用户收到营销短信，属于误发"
+      ]
+    },
+    {
+      "sms_id": "5",
+      "phone": "138****0001",
+      "sms_type": "验证码",
+      "send_time": "2024-01-21 13:30:00",
+      "content_preview": "【XX登录】登录验证码：456789，如非本人操作请忽略",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "sms_id": "6",
+      "phone": "138****0003",
+      "sms_type": "活动",
+      "send_time": "2024-01-21 14:30:00",
+      "content_preview": "【XX活动】限时秒杀，今日10点开抢，手慢无",
+      "status": "FAIL",
+      "issues": [
+        "退订用户收到营销短信，属于误发"
+      ]
+    },
+    {
+      "sms_id": "7",
+      "phone": "138****0004",
+      "sms_type": "通知",
+      "send_time": "2024-01-21 15:30:00",
+      "content_preview": "【XX通知】您的订单已发货，请注意查收",
+      "status": "WARN",
+      "issues": [
+        "短信类型未明确分类，需人工复核"
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "type": "恢复范围异常",
+      "phone": "138****0002",
+      "recovery_id": "2",
+      "details": "恢复渠道[验证码]不在退订渠道范围内"
+    },
+    {
+      "type": "恢复范围异常",
+      "phone": "138****0006",
+      "recovery_id": "3",
+      "details": "该号码无退订记录，无需恢复"
+    },
+    {
+      "type": "误发短信",
+      "phone": "138****0004",
+      "sms_id": "3",
+      "details": "退订用户收到营销短信，属于误发"
+    },
+    {
+      "type": "误发短信",
+      "phone": "138****0005",
+      "sms_id": "4",
+      "details": "退订用户收到营销短信，属于误发"
+    },
+    {
+      "type": "误发短信",
+      "phone": "138****0003",
+      "sms_id": "6",
+      "details": "退订用户收到营销短信，属于误发"
+    }
+  ]
+}

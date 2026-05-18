@@ -1,0 +1,93 @@
+{
+  "summary": {
+    "check_time": "2026-05-18 09:30:31",
+    "recovery_range": {
+      "total": 3,
+      "pass": 3,
+      "fail": 0,
+      "pass_rate": "100.00%"
+    },
+    "error_sms": {
+      "total": 5,
+      "pass": 5,
+      "fail": 0,
+      "warn": 0,
+      "pass_rate": "100.00%"
+    },
+    "issues": {
+      "total": 0
+    },
+    "overall_status": "PASS"
+  },
+  "recovery_range_checks": [
+    {
+      "recovery_id": "1",
+      "phone": "138****0001",
+      "apply_time": "2024-01-20 09:00:00",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "recovery_id": "2",
+      "phone": "138****0002",
+      "apply_time": "2024-01-20 10:00:00",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "recovery_id": "3",
+      "phone": "138****0003",
+      "apply_time": "2024-01-20 11:00:00",
+      "status": "PASS",
+      "issues": []
+    }
+  ],
+  "error_sms_checks": [
+    {
+      "sms_id": "1",
+      "phone": "138****0001",
+      "sms_type": "营销",
+      "send_time": "2024-01-21 09:30:00",
+      "content_preview": "【XX商城】新春特惠，全场5折起，点击链接查看详情",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "sms_id": "2",
+      "phone": "138****0002",
+      "sms_type": "验证码",
+      "send_time": "2024-01-21 10:30:00",
+      "content_preview": "【XX平台】您的验证码是：123456，5分钟内有效",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "sms_id": "3",
+      "phone": "138****0003",
+      "sms_type": "营销",
+      "send_time": "2024-01-21 11:30:00",
+      "content_preview": "【XX活动】邀请好友得好礼，最高可获得100元优惠券",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "sms_id": "4",
+      "phone": "138****0004",
+      "sms_type": "验证码",
+      "send_time": "2024-01-21 12:30:00",
+      "content_preview": "【XX支付】您正在进行支付操作，验证码：789012，请勿泄露",
+      "status": "PASS",
+      "issues": []
+    },
+    {
+      "sms_id": "5",
+      "phone": "138****0001",
+      "sms_type": "验证码",
+      "send_time": "2024-01-21 13:30:00",
+      "content_preview": "【XX登录】登录验证码：456789，如非本人操作请忽略",
+      "status": "PASS",
+      "issues": []
+    }
+  ],
+  "issues": []
+}

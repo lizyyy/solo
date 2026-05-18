@@ -1,0 +1,37 @@
+data_files:
+  unsubscribe_table: data/unsubscribe.csv
+  recovery_applications: data/recovery.csv
+  sms_details: data/sms_details.csv
+
+fields:
+  unsubscribe:
+    phone: phone
+    unsubscribe_time: unsubscribe_time
+    unsubscribe_channels: channels
+    id: id
+  recovery:
+    phone: phone
+    apply_time: apply_time
+    recovery_channels: channels
+    id: id
+  sms:
+    phone: phone
+    sms_type: sms_type
+    send_time: send_time
+    content: content
+    id: id
+
+rules:
+  recovery_range:
+    channel_mapping:
+      marketing: 营销短信
+      verification: 验证码短信
+  error_sms:
+    marketing_sms_types:
+      - 营销
+      - 推广
+      - 活动
+    verification_sms_types:
+      - 验证码
+      - 登录
+      - 支付
