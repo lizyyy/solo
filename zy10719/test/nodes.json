@@ -1,0 +1,53 @@
+{
+  "nodes": [
+    {
+      "nodeId": "node-001",
+      "nodeName": "Web-Server-01",
+      "environment": "production",
+      "domains": ["api.example.com", "app.example.com"],
+      "certFingerprint": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+      "certSerial": "0186D8B741694EC",
+      "deployedAt": "2024-01-15T10:00:00Z",
+      "status": "active",
+      "isLegacy": false
+    },
+    {
+      "nodeId": "node-002",
+      "nodeName": "Web-Server-02",
+      "environment": "production",
+      "domains": ["api.example.com", "app.example.com"],
+      "certFingerprint": "DIFFERENT:FINGERPRINT:FOR:NODE02:TO:TEST:DIFF:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+      "certSerial": "DIFFERENTSERIAL00002",
+      "deployedAt": "2024-01-15T10:30:00Z",
+      "status": "active",
+      "isLegacy": false
+    },
+    {
+      "nodeId": "node-003",
+      "nodeName": "Legacy-Server-01",
+      "environment": "production",
+      "domains": ["legacy.example.com"],
+      "certFingerprint": "OLD:FINGERPRINT:FROM:YEAR:2020:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88",
+      "certSerial": "OLD0000000000001",
+      "deployedAt": "2020-05-20T08:00:00Z",
+      "status": "active",
+      "isLegacy": true
+    },
+    {
+      "nodeId": "node-004",
+      "nodeName": "CDN-Edge-01",
+      "environment": "staging",
+      "domains": ["cdn.example.com", "static.example.com"],
+      "status": "active",
+      "isLegacy": false
+    },
+    {
+      "nodeId": "node-005",
+      "nodeName": "API-Gateway-01",
+      "environment": "production",
+      "domains": ["api.internal.com"],
+      "status": "active",
+      "isLegacy": false
+    }
+  ]
+}

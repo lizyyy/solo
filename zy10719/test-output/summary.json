@@ -1,0 +1,22 @@
+{
+  "reportName": "证书部署清单域名证书到期检查 - 汇总报告",
+  "generatedAt": "2026-05-18T09:53:08.515Z",
+  "summary": {
+    "certFiles": 5,
+    "validCerts": 5,
+    "totalDomains": 7,
+    "totalNodes": 5,
+    "activeNodes": 5,
+    "legacyNodes": 1,
+    "deployLogs": 3,
+    "successfulDeploys": 2,
+    "issues": {
+      "total": 16,
+      "critical": 1,
+      "error": 10,
+      "warning": 4,
+      "info": 1
+    }
+  },
+  "generatedFiles": []
+}

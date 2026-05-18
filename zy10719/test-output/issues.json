@@ -1,0 +1,177 @@
+{
+  "reportName": "证书部署清单域名证书到期检查 - 问题清单",
+  "generatedAt": "2026-05-18T09:53:08.518Z",
+  "issueCount": 16,
+  "issues": [
+    {
+      "type": "missing_cert",
+      "severity": "error",
+      "message": "域名 api.internal.com 未找到匹配证书",
+      "domain": "api.internal.com",
+      "affectedNodes": 1
+    },
+    {
+      "type": "serial_mismatch",
+      "severity": "error",
+      "message": "节点 Web-Server-01 (api.example.com) 证书序列号 不一致",
+      "domain": "api.example.com",
+      "nodeId": "node-001",
+      "nodeName": "Web-Server-01",
+      "isLegacy": false,
+      "field": "证书序列号",
+      "expected": "186D8B741694EC",
+      "actual": "0186D8B741694EC"
+    },
+    {
+      "type": "serial_mismatch",
+      "severity": "error",
+      "message": "节点 Web-Server-01 (app.example.com) 证书序列号 不一致",
+      "domain": "app.example.com",
+      "nodeId": "node-001",
+      "nodeName": "Web-Server-01",
+      "isLegacy": false,
+      "field": "证书序列号",
+      "expected": "186D8B741694EC",
+      "actual": "0186D8B741694EC"
+    },
+    {
+      "type": "fingerprint_mismatch",
+      "severity": "error",
+      "message": "节点 Web-Server-02 (api.example.com) 证书指纹 不一致",
+      "domain": "api.example.com",
+      "nodeId": "node-002",
+      "nodeName": "Web-Server-02",
+      "isLegacy": false,
+      "field": "证书指纹",
+      "expected": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+      "actual": "DIFFERENT:FINGERPRINT:FOR:NODE02:TO:TEST:DIFF:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40"
+    },
+    {
+      "type": "serial_mismatch",
+      "severity": "error",
+      "message": "节点 Web-Server-02 (api.example.com) 证书序列号 不一致",
+      "domain": "api.example.com",
+      "nodeId": "node-002",
+      "nodeName": "Web-Server-02",
+      "isLegacy": false,
+      "field": "证书序列号",
+      "expected": "186D8B741694EC",
+      "actual": "DIFFERENTSERIAL00002"
+    },
+    {
+      "type": "fingerprint_mismatch",
+      "severity": "error",
+      "message": "节点 Web-Server-02 (app.example.com) 证书指纹 不一致",
+      "domain": "app.example.com",
+      "nodeId": "node-002",
+      "nodeName": "Web-Server-02",
+      "isLegacy": false,
+      "field": "证书指纹",
+      "expected": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+      "actual": "DIFFERENT:FINGERPRINT:FOR:NODE02:TO:TEST:DIFF:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40"
+    },
+    {
+      "type": "serial_mismatch",
+      "severity": "error",
+      "message": "节点 Web-Server-02 (app.example.com) 证书序列号 不一致",
+      "domain": "app.example.com",
+      "nodeId": "node-002",
+      "nodeName": "Web-Server-02",
+      "isLegacy": false,
+      "field": "证书序列号",
+      "expected": "186D8B741694EC",
+      "actual": "DIFFERENTSERIAL00002"
+    },
+    {
+      "type": "no_cert_info",
+      "severity": "error",
+      "message": "节点 CDN-Edge-01 (cdn.example.com) 节点证书信息 不一致",
+      "domain": "cdn.example.com",
+      "nodeId": "node-004",
+      "nodeName": "CDN-Edge-01",
+      "isLegacy": false,
+      "field": "节点证书信息",
+      "expected": "有证书指纹/序列号",
+      "actual": "无证书信息"
+    },
+    {
+      "type": "no_cert_info",
+      "severity": "error",
+      "message": "节点 CDN-Edge-01 (static.example.com) 节点证书信息 不一致",
+      "domain": "static.example.com",
+      "nodeId": "node-004",
+      "nodeName": "CDN-Edge-01",
+      "isLegacy": false,
+      "field": "节点证书信息",
+      "expected": "有证书指纹/序列号",
+      "actual": "无证书信息"
+    },
+    {
+      "type": "no_cert_found",
+      "severity": "error",
+      "message": "节点 API-Gateway-01 (api.internal.com) 证书文件 不一致",
+      "domain": "api.internal.com",
+      "nodeId": "node-005",
+      "nodeName": "API-Gateway-01",
+      "isLegacy": false,
+      "field": "证书文件",
+      "expected": "找到 api.internal.com 的证书",
+      "actual": "未找到匹配证书"
+    },
+    {
+      "type": "cert_expiring_soon",
+      "severity": "warning",
+      "message": "域名 cdn.example.com 证书将在 10 天后过期",
+      "domain": "cdn.example.com",
+      "affectedNodes": 1,
+      "daysRemaining": 10
+    },
+    {
+      "type": "cert_expiring_soon",
+      "severity": "warning",
+      "message": "域名 static.example.com 证书将在 10 天后过期",
+      "domain": "static.example.com",
+      "affectedNodes": 1,
+      "daysRemaining": 10
+    },
+    {
+      "type": "fingerprint_mismatch",
+      "severity": "warning",
+      "message": "节点 Legacy-Server-01 (legacy.example.com) 证书指纹 不一致",
+      "domain": "legacy.example.com",
+      "nodeId": "node-003",
+      "nodeName": "Legacy-Server-01",
+      "isLegacy": true,
+      "field": "证书指纹",
+      "expected": "68:d0:82:1a:0b:e2:db:54:b0:56:ff:3a:7f:e6:43:78:b2:6f:0e:58:40:1a:08:95:6a:8c:79:21:bc:35:03:f8",
+      "actual": "OLD:FINGERPRINT:FROM:YEAR:2020:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88"
+    },
+    {
+      "type": "serial_mismatch",
+      "severity": "warning",
+      "message": "节点 Legacy-Server-01 (legacy.example.com) 证书序列号 不一致",
+      "domain": "legacy.example.com",
+      "nodeId": "node-003",
+      "nodeName": "Legacy-Server-01",
+      "isLegacy": true,
+      "field": "证书序列号",
+      "expected": "1FAE0DB00CAF77",
+      "actual": "OLD0000000000001"
+    },
+    {
+      "type": "cert_expired",
+      "severity": "critical",
+      "message": "域名 legacy.example.com 证书已过期",
+      "domain": "legacy.example.com",
+      "affectedNodes": 1,
+      "daysRemaining": -30
+    },
+    {
+      "type": "legacy_node",
+      "severity": "info",
+      "message": "节点 Legacy-Server-01 是旧节点，需确认证书状态",
+      "nodeId": "node-003",
+      "nodeName": "Legacy-Server-01"
+    }
+  ]
+}

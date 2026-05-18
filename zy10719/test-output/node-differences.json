@@ -1,0 +1,258 @@
+{
+  "reportName": "证书部署清单域名证书到期检查 - 节点证书差异表",
+  "generatedAt": "2026-05-18T09:53:08.517Z",
+  "differenceCount": 8,
+  "differences": [
+    {
+      "domain": "api.example.com",
+      "nodeId": "node-001",
+      "nodeName": "Web-Server-01",
+      "environment": "production",
+      "isLegacy": false,
+      "differences": [
+        {
+          "type": "serial_mismatch",
+          "field": "证书序列号",
+          "expected": "186D8B741694EC",
+          "actual": "0186D8B741694EC",
+          "severity": "error"
+        }
+      ],
+      "expectedCert": {
+        "fingerprint": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+        "serial": "186d8b741694ec",
+        "validTo": "2027-05-18T09:52:09.000Z",
+        "commonName": "",
+        "sourceFile": "api-example-com.pem"
+      },
+      "actualCert": {
+        "fingerprint": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+        "serial": "0186D8B741694EC",
+        "deployedAt": "2024-01-15T10:00:00.000Z"
+      },
+      "deployHistory": {
+        "latestDeployAt": "2024-01-15T10:00:00.000Z",
+        "latestDeploySuccess": true,
+        "deployLog": "deploy-2024-01.json"
+      }
+    },
+    {
+      "domain": "app.example.com",
+      "nodeId": "node-001",
+      "nodeName": "Web-Server-01",
+      "environment": "production",
+      "isLegacy": false,
+      "differences": [
+        {
+          "type": "serial_mismatch",
+          "field": "证书序列号",
+          "expected": "186D8B741694EC",
+          "actual": "0186D8B741694EC",
+          "severity": "error"
+        }
+      ],
+      "expectedCert": {
+        "fingerprint": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+        "serial": "186d8b741694ec",
+        "validTo": "2027-05-18T09:52:09.000Z",
+        "commonName": "",
+        "sourceFile": "api-example-com.pem"
+      },
+      "actualCert": {
+        "fingerprint": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+        "serial": "0186D8B741694EC",
+        "deployedAt": "2024-01-15T10:00:00.000Z"
+      },
+      "deployHistory": {
+        "latestDeployAt": "2024-01-15T10:00:00.000Z",
+        "latestDeploySuccess": true,
+        "deployLog": "deploy-2024-01.json"
+      }
+    },
+    {
+      "domain": "api.example.com",
+      "nodeId": "node-002",
+      "nodeName": "Web-Server-02",
+      "environment": "production",
+      "isLegacy": false,
+      "differences": [
+        {
+          "type": "fingerprint_mismatch",
+          "field": "证书指纹",
+          "expected": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+          "actual": "DIFFERENT:FINGERPRINT:FOR:NODE02:TO:TEST:DIFF:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+          "severity": "error"
+        },
+        {
+          "type": "serial_mismatch",
+          "field": "证书序列号",
+          "expected": "186D8B741694EC",
+          "actual": "DIFFERENTSERIAL00002",
+          "severity": "error"
+        }
+      ],
+      "expectedCert": {
+        "fingerprint": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+        "serial": "186d8b741694ec",
+        "validTo": "2027-05-18T09:52:09.000Z",
+        "commonName": "",
+        "sourceFile": "api-example-com.pem"
+      },
+      "actualCert": {
+        "fingerprint": "DIFFERENT:FINGERPRINT:FOR:NODE02:TO:TEST:DIFF:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+        "serial": "DIFFERENTSERIAL00002",
+        "deployedAt": "2024-01-15T10:30:00.000Z"
+      },
+      "deployHistory": {
+        "latestDeployAt": "2024-01-15T10:30:00.000Z",
+        "latestDeploySuccess": true,
+        "deployLog": "deploy-2024-01.json"
+      }
+    },
+    {
+      "domain": "app.example.com",
+      "nodeId": "node-002",
+      "nodeName": "Web-Server-02",
+      "environment": "production",
+      "isLegacy": false,
+      "differences": [
+        {
+          "type": "fingerprint_mismatch",
+          "field": "证书指纹",
+          "expected": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+          "actual": "DIFFERENT:FINGERPRINT:FOR:NODE02:TO:TEST:DIFF:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+          "severity": "error"
+        },
+        {
+          "type": "serial_mismatch",
+          "field": "证书序列号",
+          "expected": "186D8B741694EC",
+          "actual": "DIFFERENTSERIAL00002",
+          "severity": "error"
+        }
+      ],
+      "expectedCert": {
+        "fingerprint": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+        "serial": "186d8b741694ec",
+        "validTo": "2027-05-18T09:52:09.000Z",
+        "commonName": "",
+        "sourceFile": "api-example-com.pem"
+      },
+      "actualCert": {
+        "fingerprint": "DIFFERENT:FINGERPRINT:FOR:NODE02:TO:TEST:DIFF:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40",
+        "serial": "DIFFERENTSERIAL00002",
+        "deployedAt": "2024-01-15T10:30:00.000Z"
+      },
+      "deployHistory": {
+        "latestDeployAt": "2024-01-15T10:30:00.000Z",
+        "latestDeploySuccess": true,
+        "deployLog": "deploy-2024-01.json"
+      }
+    },
+    {
+      "domain": "legacy.example.com",
+      "nodeId": "node-003",
+      "nodeName": "Legacy-Server-01",
+      "environment": "production",
+      "isLegacy": true,
+      "differences": [
+        {
+          "type": "fingerprint_mismatch",
+          "field": "证书指纹",
+          "expected": "68:d0:82:1a:0b:e2:db:54:b0:56:ff:3a:7f:e6:43:78:b2:6f:0e:58:40:1a:08:95:6a:8c:79:21:bc:35:03:f8",
+          "actual": "OLD:FINGERPRINT:FROM:YEAR:2020:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88",
+          "severity": "warning"
+        },
+        {
+          "type": "serial_mismatch",
+          "field": "证书序列号",
+          "expected": "1FAE0DB00CAF77",
+          "actual": "OLD0000000000001",
+          "severity": "warning"
+        }
+      ],
+      "expectedCert": {
+        "fingerprint": "68:d0:82:1a:0b:e2:db:54:b0:56:ff:3a:7f:e6:43:78:b2:6f:0e:58:40:1a:08:95:6a:8c:79:21:bc:35:03:f8",
+        "serial": "1fae0db00caf77",
+        "validTo": "2026-04-18T09:52:09.000Z",
+        "commonName": "",
+        "sourceFile": "legacy-example-com-expired.pem"
+      },
+      "actualCert": {
+        "fingerprint": "OLD:FINGERPRINT:FROM:YEAR:2020:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88",
+        "serial": "OLD0000000000001",
+        "deployedAt": "2020-05-20T08:00:00.000Z"
+      },
+      "deployHistory": null
+    },
+    {
+      "domain": "cdn.example.com",
+      "nodeId": "node-004",
+      "nodeName": "CDN-Edge-01",
+      "environment": "staging",
+      "isLegacy": false,
+      "differences": [
+        {
+          "type": "no_cert_info",
+          "field": "节点证书信息",
+          "expected": "有证书指纹/序列号",
+          "actual": "无证书信息",
+          "severity": "error"
+        }
+      ],
+      "expectedCert": {
+        "fingerprint": "c4:c9:8d:01:07:5c:a3:9c:ac:d2:24:2a:38:c6:74:60:e3:1f:c6:0f:3c:46:14:ab:72:25:de:9a:62:2e:4a:36",
+        "serial": "100ed1df8baa9f",
+        "validTo": "2026-05-28T09:52:09.000Z",
+        "commonName": "",
+        "sourceFile": "cdn-example-com-expiring.pem"
+      },
+      "actualCert": null,
+      "deployHistory": null
+    },
+    {
+      "domain": "static.example.com",
+      "nodeId": "node-004",
+      "nodeName": "CDN-Edge-01",
+      "environment": "staging",
+      "isLegacy": false,
+      "differences": [
+        {
+          "type": "no_cert_info",
+          "field": "节点证书信息",
+          "expected": "有证书指纹/序列号",
+          "actual": "无证书信息",
+          "severity": "error"
+        }
+      ],
+      "expectedCert": {
+        "fingerprint": "c4:c9:8d:01:07:5c:a3:9c:ac:d2:24:2a:38:c6:74:60:e3:1f:c6:0f:3c:46:14:ab:72:25:de:9a:62:2e:4a:36",
+        "serial": "100ed1df8baa9f",
+        "validTo": "2026-05-28T09:52:09.000Z",
+        "commonName": "",
+        "sourceFile": "cdn-example-com-expiring.pem"
+      },
+      "actualCert": null,
+      "deployHistory": null
+    },
+    {
+      "domain": "api.internal.com",
+      "nodeId": "node-005",
+      "nodeName": "API-Gateway-01",
+      "environment": "production",
+      "isLegacy": false,
+      "differences": [
+        {
+          "type": "no_cert_found",
+          "field": "证书文件",
+          "expected": "找到 api.internal.com 的证书",
+          "actual": "未找到匹配证书",
+          "severity": "error"
+        }
+      ],
+      "expectedCert": null,
+      "actualCert": null,
+      "deployHistory": null
+    }
+  ]
+}

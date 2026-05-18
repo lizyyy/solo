@@ -1,0 +1,29 @@
+[
+  {
+    "deployId": "deploy-001",
+    "nodeId": "node-001",
+    "domains": ["api.example.com", "app.example.com"],
+    "certSerial": "0123456789ABCDEF",
+    "deployedAt": "2024-01-15T10:00:00Z",
+    "deployedBy": "admin",
+    "success": true
+  },
+  {
+    "deployId": "deploy-002",
+    "nodeId": "node-002",
+    "domains": ["api.example.com", "app.example.com"],
+    "certSerial": "FEDCBA9876543210",
+    "deployedAt": "2024-01-15T10:30:00Z",
+    "deployedBy": "admin",
+    "success": true
+  },
+  {
+    "deployId": "deploy-003",
+    "nodeId": "node-001",
+    "domains": ["api.example.com"],
+    "deployedAt": "2024-01-10T09:00:00Z",
+    "deployedBy": "ops",
+    "success": false,
+    "errorMessage": "证书验证失败"
+  }
+]

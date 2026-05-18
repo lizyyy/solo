@@ -1,0 +1,185 @@
+{
+  "reportName": "证书部署清单域名证书到期检查 - 域名检查详情",
+  "generatedAt": "2026-05-18T09:53:08.517Z",
+  "domainCount": 6,
+  "domains": [
+    {
+      "domain": "api.example.com",
+      "hasCert": true,
+      "isWildcardMatch": false,
+      "wildcardSource": null,
+      "isExpired": false,
+      "isExpiringSoon": false,
+      "daysRemaining": 365,
+      "chainComplete": true,
+      "chainLength": 1,
+      "affectedNodes": 2,
+      "nodes": [
+        {
+          "nodeId": "node-001",
+          "nodeName": "Web-Server-01",
+          "isLegacy": false,
+          "environment": "production"
+        },
+        {
+          "nodeId": "node-002",
+          "nodeName": "Web-Server-02",
+          "isLegacy": false,
+          "environment": "production"
+        }
+      ],
+      "certs": [
+        {
+          "sourceFile": "api-example-com.pem",
+          "commonName": "",
+          "validTo": "2027-05-18T09:52:09.000Z",
+          "daysRemaining": 365,
+          "fingerprintSha256": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40"
+        }
+      ]
+    },
+    {
+      "domain": "app.example.com",
+      "hasCert": true,
+      "isWildcardMatch": false,
+      "wildcardSource": null,
+      "isExpired": false,
+      "isExpiringSoon": false,
+      "daysRemaining": 365,
+      "chainComplete": true,
+      "chainLength": 1,
+      "affectedNodes": 2,
+      "nodes": [
+        {
+          "nodeId": "node-001",
+          "nodeName": "Web-Server-01",
+          "isLegacy": false,
+          "environment": "production"
+        },
+        {
+          "nodeId": "node-002",
+          "nodeName": "Web-Server-02",
+          "isLegacy": false,
+          "environment": "production"
+        }
+      ],
+      "certs": [
+        {
+          "sourceFile": "api-example-com.pem",
+          "commonName": "",
+          "validTo": "2027-05-18T09:52:09.000Z",
+          "daysRemaining": 365,
+          "fingerprintSha256": "6b:79:a5:8d:bb:11:4e:96:10:9f:32:37:34:e3:e9:b8:6f:34:7f:d9:b9:55:d2:89:3f:f6:0b:f8:99:6a:9b:40"
+        }
+      ]
+    },
+    {
+      "domain": "legacy.example.com",
+      "hasCert": true,
+      "isWildcardMatch": false,
+      "wildcardSource": null,
+      "isExpired": true,
+      "isExpiringSoon": false,
+      "daysRemaining": -30,
+      "chainComplete": true,
+      "chainLength": 1,
+      "affectedNodes": 1,
+      "nodes": [
+        {
+          "nodeId": "node-003",
+          "nodeName": "Legacy-Server-01",
+          "isLegacy": true,
+          "environment": "production"
+        }
+      ],
+      "certs": [
+        {
+          "sourceFile": "legacy-example-com-expired.pem",
+          "commonName": "",
+          "validTo": "2026-04-18T09:52:09.000Z",
+          "daysRemaining": -30,
+          "fingerprintSha256": "68:d0:82:1a:0b:e2:db:54:b0:56:ff:3a:7f:e6:43:78:b2:6f:0e:58:40:1a:08:95:6a:8c:79:21:bc:35:03:f8"
+        }
+      ]
+    },
+    {
+      "domain": "cdn.example.com",
+      "hasCert": true,
+      "isWildcardMatch": false,
+      "wildcardSource": null,
+      "isExpired": false,
+      "isExpiringSoon": true,
+      "daysRemaining": 10,
+      "chainComplete": true,
+      "chainLength": 1,
+      "affectedNodes": 1,
+      "nodes": [
+        {
+          "nodeId": "node-004",
+          "nodeName": "CDN-Edge-01",
+          "isLegacy": false,
+          "environment": "staging"
+        }
+      ],
+      "certs": [
+        {
+          "sourceFile": "cdn-example-com-expiring.pem",
+          "commonName": "",
+          "validTo": "2026-05-28T09:52:09.000Z",
+          "daysRemaining": 10,
+          "fingerprintSha256": "c4:c9:8d:01:07:5c:a3:9c:ac:d2:24:2a:38:c6:74:60:e3:1f:c6:0f:3c:46:14:ab:72:25:de:9a:62:2e:4a:36"
+        }
+      ]
+    },
+    {
+      "domain": "static.example.com",
+      "hasCert": true,
+      "isWildcardMatch": false,
+      "wildcardSource": null,
+      "isExpired": false,
+      "isExpiringSoon": true,
+      "daysRemaining": 10,
+      "chainComplete": true,
+      "chainLength": 1,
+      "affectedNodes": 1,
+      "nodes": [
+        {
+          "nodeId": "node-004",
+          "nodeName": "CDN-Edge-01",
+          "isLegacy": false,
+          "environment": "staging"
+        }
+      ],
+      "certs": [
+        {
+          "sourceFile": "cdn-example-com-expiring.pem",
+          "commonName": "",
+          "validTo": "2026-05-28T09:52:09.000Z",
+          "daysRemaining": 10,
+          "fingerprintSha256": "c4:c9:8d:01:07:5c:a3:9c:ac:d2:24:2a:38:c6:74:60:e3:1f:c6:0f:3c:46:14:ab:72:25:de:9a:62:2e:4a:36"
+        }
+      ]
+    },
+    {
+      "domain": "api.internal.com",
+      "hasCert": false,
+      "isWildcardMatch": false,
+      "wildcardSource": null,
+      "isExpired": false,
+      "isExpiringSoon": false,
+      "daysRemaining": null,
+      "chainComplete": true,
+      "chainLength": 0,
+      "affectedNodes": 1,
+      "nodes": [
+        {
+          "nodeId": "node-005",
+          "nodeName": "API-Gateway-01",
+          "isLegacy": false,
+          "environment": "production"
+        }
+      ],
+      "certs": []
+    }
+  ]
+}
