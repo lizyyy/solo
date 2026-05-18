@@ -1,0 +1,18 @@
+{
+  "batchId": "PKG-2024-0501-A",
+  "note": "注意：这个 batchId 和 batch-001-normal.json 一样！会触发包号重叠合并！",
+  "tasks": [
+    {
+      "taskId": "TASK-010",
+      "annotator": "李四",
+      "status": "NEED_REWORK",
+      "needRework": true
+    },
+    {
+      "taskId": "TASK-011",
+      "annotator": "王五",
+      "status": "NEED_REWORK",
+      "needRework": true
+    }
+  ]
+}

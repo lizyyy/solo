@@ -1,0 +1,202 @@
+[
+  {
+    "taskId": "TASK-001",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "张三",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-002",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "李四",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-003",
+    "action": "EXCLUDED",
+    "reason": "not_rework",
+    "annotator": "王五",
+    "packageId": "unknown",
+    "sourceFile": "batch-001-normal.json"
+  },
+  {
+    "taskId": "TASK-004",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "张三",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-001",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "张三",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-005",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "李四",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-006",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "赵六",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-007",
+    "action": "EXCLUDED",
+    "reason": "duplicate",
+    "annotator": "钱七",
+    "packageId": "unknown",
+    "sourceFile": "batch-003-left-annotator.json"
+  },
+  {
+    "taskId": "TASK-008",
+    "action": "EXCLUDED",
+    "reason": "duplicate",
+    "annotator": "周八",
+    "packageId": "unknown",
+    "sourceFile": "batch-003-left-annotator.json"
+  },
+  {
+    "taskId": "TASK-009",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "张三",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-010",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "李四",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-011",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "王五",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-012",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "赵六",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-013",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "赵六",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-014",
+    "action": "MERGED",
+    "reason": "package_overlap",
+    "annotator": "张三",
+    "packageId": "unknown",
+    "mergedFromSources": [
+      "batch-001-normal.json",
+      "batch-002-duplicates.json",
+      "batch-003-left-annotator.json",
+      "batch-004-overlap.json",
+      "batch-005-inspection-failed.json"
+    ]
+  },
+  {
+    "taskId": "TASK-017",
+    "action": "EXCLUDED",
+    "reason": "not_rework",
+    "annotator": "张三",
+    "packageId": "PKG-2024-0503-A",
+    "sourceFile": "batch-006-csv-format.csv"
+  }
+]

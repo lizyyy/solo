@@ -1,0 +1,25 @@
+{
+  "batchId": "PKG-2024-0501-C",
+  "tasks": [
+    {
+      "taskId": "TASK-007",
+      "annotator": "钱七",
+      "status": "NEED_REWORK",
+      "needRework": true,
+      "note": "钱七已经离职，会被过滤掉！"
+    },
+    {
+      "taskId": "TASK-008",
+      "annotator": "周八",
+      "status": "NEED_REWORK",
+      "needRework": true,
+      "note": "周八也离职了！"
+    },
+    {
+      "taskId": "TASK-009",
+      "annotator": "张三",
+      "status": "NEED_REWORK",
+      "needRework": true
+    }
+  ]
+}

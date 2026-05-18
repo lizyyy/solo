@@ -1,0 +1,136 @@
+==================================================
+  标注任务导出返工拆包清理 - 可复核报告
+  Reviewable Report for Rework Tasks
+==================================================
+
+一、返工任务清单
+--------------------
+#1 任务ID: TASK-001
+  包号: unknown
+  标注员: 张三
+  状态: NEED_REWORK
+  质量分: 65
+  抽检失败: 否
+  来源文件: batch-001-normal.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#2 任务ID: TASK-002
+  包号: unknown
+  标注员: 李四
+  状态: NEED_REWORK
+  质量分: 58
+  抽检失败: 否
+  来源文件: batch-001-normal.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#3 任务ID: TASK-004
+  包号: unknown
+  标注员: 张三
+  状态: NEED_REWORK
+  质量分: 72
+  抽检失败: 否
+  来源文件: batch-001-normal.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#4 任务ID: TASK-005
+  包号: unknown
+  标注员: 李四
+  状态: NEED_REWORK
+  质量分: N/A
+  抽检失败: 否
+  来源文件: batch-002-duplicates.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#5 任务ID: TASK-006
+  包号: unknown
+  标注员: 赵六
+  状态: rejected
+  质量分: N/A
+  抽检失败: 否
+  来源文件: batch-002-duplicates.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#6 任务ID: TASK-009
+  包号: unknown
+  标注员: 张三
+  状态: NEED_REWORK
+  质量分: N/A
+  抽检失败: 否
+  来源文件: batch-003-left-annotator.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#7 任务ID: TASK-010
+  包号: unknown
+  标注员: 李四
+  状态: NEED_REWORK
+  质量分: N/A
+  抽检失败: 否
+  来源文件: batch-004-overlap.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#8 任务ID: TASK-011
+  包号: unknown
+  标注员: 王五
+  状态: NEED_REWORK
+  质量分: N/A
+  抽检失败: 否
+  来源文件: batch-004-overlap.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#9 任务ID: TASK-012
+  包号: unknown
+  标注员: 赵六
+  状态: NEED_REWORK
+  质量分: N/A
+  抽检失败: 是
+  来源文件: batch-005-inspection-failed.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#10 任务ID: TASK-013
+  包号: unknown
+  标注员: 赵六
+  状态: NEED_REWORK
+  质量分: N/A
+  抽检失败: 是
+  来源文件: batch-005-inspection-failed.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#11 任务ID: TASK-014
+  包号: unknown
+  标注员: 张三
+  状态: NEED_REWORK
+  质量分: N/A
+  抽检失败: 否
+  来源文件: batch-005-inspection-failed.json
+  ⚠️  跨文件重叠包 (来源: batch-001-normal.json, batch-002-duplicates.json, batch-003-left-annotator.json, batch-004-overlap.json, batch-005-inspection-failed.json)
+#12 任务ID: TASK-015
+  包号: PKG-2024-0503-A
+  标注员: 李四
+  状态: NEED_REWORK
+  质量分: 62
+  抽检失败: 否
+  来源文件: batch-006-csv-format.csv
+#13 任务ID: TASK-016
+  包号: PKG-2024-0503-A
+  标注员: 王五
+  状态: NEED_REWORK
+  质量分: 55
+  抽检失败: 否
+  来源文件: batch-006-csv-format.csv
+
+二、审计日志 - 排除/合并记录
+--------------------------------
+  [MERGED] TASK-001 - 原因: package_overlap (标注员: 张三, 包: unknown)
+  [MERGED] TASK-002 - 原因: package_overlap (标注员: 李四, 包: unknown)
+  [EXCLUDED] TASK-003 - 原因: not_rework (标注员: 王五, 包: unknown)
+  [MERGED] TASK-004 - 原因: package_overlap (标注员: 张三, 包: unknown)
+  [MERGED] TASK-001 - 原因: package_overlap (标注员: 张三, 包: unknown)
+  [MERGED] TASK-005 - 原因: package_overlap (标注员: 李四, 包: unknown)
+  [MERGED] TASK-006 - 原因: package_overlap (标注员: 赵六, 包: unknown)
+  [EXCLUDED] TASK-007 - 原因: duplicate (标注员: 钱七, 包: unknown)
+  [EXCLUDED] TASK-008 - 原因: duplicate (标注员: 周八, 包: unknown)
+  [MERGED] TASK-009 - 原因: package_overlap (标注员: 张三, 包: unknown)
+  [MERGED] TASK-010 - 原因: package_overlap (标注员: 李四, 包: unknown)
+  [MERGED] TASK-011 - 原因: package_overlap (标注员: 王五, 包: unknown)
+  [MERGED] TASK-012 - 原因: package_overlap (标注员: 赵六, 包: unknown)
+  [MERGED] TASK-013 - 原因: package_overlap (标注员: 赵六, 包: unknown)
+  [MERGED] TASK-014 - 原因: package_overlap (标注员: 张三, 包: unknown)
+  [EXCLUDED] TASK-017 - 原因: not_rework (标注员: 张三, 包: PKG-2024-0503-A)
+
+三、复核检查要点
+--------------------
+1. 对照 audit-log 确认排除的任务理由是否合理
+2. 检查 package 重叠合并是否正确（标记有 packageOverlap）
+3. 抽检失败任务需要优先处理（inspectionFailed=true）
+4. HIGH 风险标注员的任务需要重点复核
+5. 用 diff 命令对比历史版本，确认规则变更影响

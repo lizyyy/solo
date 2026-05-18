@@ -1,0 +1,38 @@
+{
+  "batchId": "PKG-2024-0501-A",
+  "exportTime": "2024-05-01T10:00:00Z",
+  "tasks": [
+    {
+      "taskId": "TASK-001",
+      "annotator": "张三",
+      "status": "NEED_REWORK",
+      "quality": 65,
+      "needRework": true,
+      "inspectionFailed": false
+    },
+    {
+      "taskId": "TASK-002",
+      "annotator": "李四",
+      "status": "NEED_REWORK",
+      "quality": 58,
+      "needRework": true,
+      "inspectionFailed": false
+    },
+    {
+      "taskId": "TASK-003",
+      "annotator": "王五",
+      "status": "PASSED",
+      "quality": 92,
+      "needRework": false,
+      "inspectionFailed": false
+    },
+    {
+      "taskId": "TASK-004",
+      "annotator": "张三",
+      "status": "NEED_REWORK",
+      "quality": 72,
+      "needRework": true,
+      "inspectionFailed": false
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "batchId": "PKG-2024-0501-B",
+  "tasks": [
+    {
+      "taskId": "TASK-001",
+      "annotator": "张三",
+      "status": "NEED_REWORK",
+      "needRework": true,
+      "note": "这个在 batch-001 中也存在，会被去重！"
+    },
+    {
+      "taskId": "TASK-005",
+      "annotator": "李四",
+      "status": "NEED_REWORK",
+      "needRework": true
+    },
+    {
+      "taskId": "TASK-006",
+      "annotator": "赵六",
+      "status": "rejected",
+      "needRework": true
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+taskId,action,reason,annotator,packageId,sourceFile
+TASK-001,MERGED,package_overlap,张三,unknown,
+TASK-002,MERGED,package_overlap,李四,unknown,
+TASK-003,EXCLUDED,not_rework,王五,unknown,batch-001-normal.json
+TASK-004,MERGED,package_overlap,张三,unknown,
+TASK-001,MERGED,package_overlap,张三,unknown,
+TASK-005,MERGED,package_overlap,李四,unknown,
+TASK-006,MERGED,package_overlap,赵六,unknown,
+TASK-007,EXCLUDED,duplicate,钱七,unknown,batch-003-left-annotator.json
+TASK-008,EXCLUDED,duplicate,周八,unknown,batch-003-left-annotator.json
+TASK-009,MERGED,package_overlap,张三,unknown,
+TASK-010,MERGED,package_overlap,李四,unknown,
+TASK-011,MERGED,package_overlap,王五,unknown,
+TASK-012,MERGED,package_overlap,赵六,unknown,
+TASK-013,MERGED,package_overlap,赵六,unknown,
+TASK-014,MERGED,package_overlap,张三,unknown,
+TASK-017,EXCLUDED,not_rework,张三,PKG-2024-0503-A,batch-006-csv-format.csv

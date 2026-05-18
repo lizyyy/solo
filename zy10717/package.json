@@ -1,0 +1,20 @@
+{
+  "name": "annotation-export-rework-unpack",
+  "version": "1.0.0",
+  "description": "标注任务导出返工拆包清理CLI - 处理标注导出文件，拆出返工包并避免重复分配",
+  "main": "src/index.js",
+  "bin": {
+    "annotation-unpack": "./bin/annotation-unpack.js"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "test:watch": "node --test --watch test/",
+    "demo": "node bin/annotation-unpack.js unpack samples/input samples/output"
+  },
+  "keywords": ["annotation", "rework", "unpack", "quality-control"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

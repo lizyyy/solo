@@ -1,0 +1,28 @@
+{
+  "batchId": "PKG-2024-0502-A",
+  "tasks": [
+    {
+      "taskId": "TASK-012",
+      "annotator": "赵六",
+      "status": "NEED_REWORK",
+      "needRework": true,
+      "inspectionFailed": true,
+      "note": "抽检失败！需要重点复核！"
+    },
+    {
+      "taskId": "TASK-013",
+      "annotator": "赵六",
+      "status": "NEED_REWORK",
+      "needRework": true,
+      "inspectionFailed": true,
+      "note": "又是赵六！连续抽检失败！"
+    },
+    {
+      "taskId": "TASK-014",
+      "annotator": "张三",
+      "status": "NEED_REWORK",
+      "needRework": true,
+      "inspectionFailed": false
+    }
+  ]
+}

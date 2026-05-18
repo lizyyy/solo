@@ -1,0 +1,23 @@
+{
+  "totalTasks": 18,
+  "reworkTasks": 16,
+  "duplicateRemoved": 1,
+  "leftAnnotatorRemoved": 2,
+  "overlapMerged": 1,
+  "inspectionFailed": 2,
+  "processedAt": "2026-05-18T09:52:13.719Z",
+  "inputFiles": [
+    "samples/input/batch-001-normal.json",
+    "samples/input/batch-002-duplicates.json",
+    "samples/input/batch-003-left-annotator.json",
+    "samples/input/batch-004-overlap.json",
+    "samples/input/batch-005-inspection-failed.json",
+    "samples/input/batch-006-csv-format.csv"
+  ],
+  "options": {
+    "dedup": true,
+    "strict": false,
+    "annotatorFile": "samples/active-annotators.json",
+    "format": "both"
+  }
+}

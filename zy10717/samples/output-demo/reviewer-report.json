@@ -1,0 +1,374 @@
+[
+  {
+    "annotator": "张三",
+    "tasks": [
+      {
+        "taskId": "TASK-001",
+        "packageId": "unknown",
+        "annotator": "张三",
+        "status": "NEED_REWORK",
+        "quality": 65,
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-001-normal.json",
+        "sourceIndex": 0,
+        "originalData": {
+          "taskId": "TASK-001",
+          "annotator": "张三",
+          "status": "NEED_REWORK",
+          "quality": 65,
+          "needRework": true,
+          "inspectionFailed": false
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      },
+      {
+        "taskId": "TASK-004",
+        "packageId": "unknown",
+        "annotator": "张三",
+        "status": "NEED_REWORK",
+        "quality": 72,
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-001-normal.json",
+        "sourceIndex": 3,
+        "originalData": {
+          "taskId": "TASK-004",
+          "annotator": "张三",
+          "status": "NEED_REWORK",
+          "quality": 72,
+          "needRework": true,
+          "inspectionFailed": false
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      },
+      {
+        "taskId": "TASK-009",
+        "packageId": "unknown",
+        "annotator": "张三",
+        "status": "NEED_REWORK",
+        "quality": null,
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-003-left-annotator.json",
+        "sourceIndex": 2,
+        "originalData": {
+          "taskId": "TASK-009",
+          "annotator": "张三",
+          "status": "NEED_REWORK",
+          "needRework": true
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      },
+      {
+        "taskId": "TASK-014",
+        "packageId": "unknown",
+        "annotator": "张三",
+        "status": "NEED_REWORK",
+        "quality": null,
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-005-inspection-failed.json",
+        "sourceIndex": 2,
+        "originalData": {
+          "taskId": "TASK-014",
+          "annotator": "张三",
+          "status": "NEED_REWORK",
+          "needRework": true,
+          "inspectionFailed": false
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      }
+    ],
+    "totalRework": 4,
+    "inspectionFails": 0,
+    "packages": [
+      "unknown"
+    ],
+    "riskLevel": "LOW"
+  },
+  {
+    "annotator": "李四",
+    "tasks": [
+      {
+        "taskId": "TASK-002",
+        "packageId": "unknown",
+        "annotator": "李四",
+        "status": "NEED_REWORK",
+        "quality": 58,
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-001-normal.json",
+        "sourceIndex": 1,
+        "originalData": {
+          "taskId": "TASK-002",
+          "annotator": "李四",
+          "status": "NEED_REWORK",
+          "quality": 58,
+          "needRework": true,
+          "inspectionFailed": false
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      },
+      {
+        "taskId": "TASK-005",
+        "packageId": "unknown",
+        "annotator": "李四",
+        "status": "NEED_REWORK",
+        "quality": null,
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-002-duplicates.json",
+        "sourceIndex": 1,
+        "originalData": {
+          "taskId": "TASK-005",
+          "annotator": "李四",
+          "status": "NEED_REWORK",
+          "needRework": true
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      },
+      {
+        "taskId": "TASK-010",
+        "packageId": "unknown",
+        "annotator": "李四",
+        "status": "NEED_REWORK",
+        "quality": null,
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-004-overlap.json",
+        "sourceIndex": 0,
+        "originalData": {
+          "taskId": "TASK-010",
+          "annotator": "李四",
+          "status": "NEED_REWORK",
+          "needRework": true
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      },
+      {
+        "taskId": "TASK-015",
+        "packageId": "PKG-2024-0503-A",
+        "annotator": "李四",
+        "status": "NEED_REWORK",
+        "quality": "62",
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-006-csv-format.csv",
+        "sourceIndex": 0,
+        "originalData": {
+          "taskId": "TASK-015",
+          "packageId": "PKG-2024-0503-A",
+          "annotator": "李四",
+          "status": "NEED_REWORK",
+          "quality": "62",
+          "needRework": "true",
+          "inspectionFailed": "false"
+        }
+      }
+    ],
+    "totalRework": 4,
+    "inspectionFails": 0,
+    "packages": [
+      "unknown",
+      "PKG-2024-0503-A"
+    ],
+    "riskLevel": "LOW"
+  },
+  {
+    "annotator": "赵六",
+    "tasks": [
+      {
+        "taskId": "TASK-006",
+        "packageId": "unknown",
+        "annotator": "赵六",
+        "status": "rejected",
+        "quality": null,
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-002-duplicates.json",
+        "sourceIndex": 2,
+        "originalData": {
+          "taskId": "TASK-006",
+          "annotator": "赵六",
+          "status": "rejected",
+          "needRework": true
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      },
+      {
+        "taskId": "TASK-012",
+        "packageId": "unknown",
+        "annotator": "赵六",
+        "status": "NEED_REWORK",
+        "quality": null,
+        "needRework": true,
+        "inspectionFailed": true,
+        "sourceFile": "batch-005-inspection-failed.json",
+        "sourceIndex": 0,
+        "originalData": {
+          "taskId": "TASK-012",
+          "annotator": "赵六",
+          "status": "NEED_REWORK",
+          "needRework": true,
+          "inspectionFailed": true,
+          "note": "抽检失败！需要重点复核！"
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      },
+      {
+        "taskId": "TASK-013",
+        "packageId": "unknown",
+        "annotator": "赵六",
+        "status": "NEED_REWORK",
+        "quality": null,
+        "needRework": true,
+        "inspectionFailed": true,
+        "sourceFile": "batch-005-inspection-failed.json",
+        "sourceIndex": 1,
+        "originalData": {
+          "taskId": "TASK-013",
+          "annotator": "赵六",
+          "status": "NEED_REWORK",
+          "needRework": true,
+          "inspectionFailed": true,
+          "note": "又是赵六！连续抽检失败！"
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      }
+    ],
+    "totalRework": 3,
+    "inspectionFails": 2,
+    "packages": [
+      "unknown"
+    ],
+    "riskLevel": "HIGH"
+  },
+  {
+    "annotator": "王五",
+    "tasks": [
+      {
+        "taskId": "TASK-011",
+        "packageId": "unknown",
+        "annotator": "王五",
+        "status": "NEED_REWORK",
+        "quality": null,
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-004-overlap.json",
+        "sourceIndex": 1,
+        "originalData": {
+          "taskId": "TASK-011",
+          "annotator": "王五",
+          "status": "NEED_REWORK",
+          "needRework": true
+        },
+        "mergedFromSources": [
+          "batch-001-normal.json",
+          "batch-002-duplicates.json",
+          "batch-003-left-annotator.json",
+          "batch-004-overlap.json",
+          "batch-005-inspection-failed.json"
+        ],
+        "packageOverlap": true
+      },
+      {
+        "taskId": "TASK-016",
+        "packageId": "PKG-2024-0503-A",
+        "annotator": "王五",
+        "status": "NEED_REWORK",
+        "quality": "55",
+        "needRework": true,
+        "inspectionFailed": false,
+        "sourceFile": "batch-006-csv-format.csv",
+        "sourceIndex": 1,
+        "originalData": {
+          "taskId": "TASK-016",
+          "packageId": "PKG-2024-0503-A",
+          "annotator": "王五",
+          "status": "NEED_REWORK",
+          "quality": "55",
+          "needRework": "true",
+          "inspectionFailed": "false"
+        }
+      }
+    ],
+    "totalRework": 2,
+    "inspectionFails": 0,
+    "packages": [
+      "unknown",
+      "PKG-2024-0503-A"
+    ],
+    "riskLevel": "LOW"
+  }
+]
