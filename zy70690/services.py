@@ -129,7 +129,11 @@ class MaterialService:
         if existing:
             raise BusinessException(ErrorCodes.DUPLICATE_SUBMISSION, "材料代码已存在")
 
+        IDCardRuleService.check_participant_limit(db, material.id_card_type, participant.id)
+        
         material_data = material.dict(exclude={"participant_code"})
+        IDCardRuleService.validate_material_for_card_type(db, material.id_card_type, material_data)
+        
         material_data["participant_id"] = participant.id
         
         db_material = PersonMaterial(**material_data)
@@ -486,6 +490,54 @@ class ReportService:
                 query = query.filter(BatchReport.batch_id == batch.id)
         return query.all()
 
+class IDCardRuleService:
+    @staticmethod
+    def get_rule_by_card_type(db: Session, card_type: IDCardType) -> Optional[IDCardRule]:
+        return db.query(IDCardRule).filter(IDCardRule.card_type == card_type, IDCardRule.is_active == True).first()
+    
+    @staticmethod
+    def validate_material_for_card_type(db: Session, card_type: IDCardType, material_data: dict):
+        rule = IDCardRuleService.get_rule_by_card_type(db, card_type)
+        if not rule:
+            return
+        
+        if rule.required_fields:
+            import json
+            try:
+                required_fields = json.loads(rule.required_fields)
+                missing_fields = []
+                for field in required_fields:
+                    if not material_data.get(field):
+                        missing_fields.append(field)
+                if missing_fields:
+                    raise BusinessException(
+                        ErrorCodes.MISSING_FIELDS,
+                        f"证件类型[{card_type.value}]缺少必填字段",
+                        {"missing_fields": missing_fields, "card_type": card_type.value}
+                    )
+            except json.JSONDecodeError:
+                pass
+    
+    @staticmethod
+    def check_participant_limit(db: Session, card_type: IDCardType, participant_id: int) -> int:
+        rule = IDCardRuleService.get_rule_by_card_type(db, card_type)
+        if not rule:
+            return 0
+        
+        current_count = db.query(PersonMaterial).filter(
+            PersonMaterial.participant_id == participant_id,
+            PersonMaterial.id_card_type == card_type
+        ).count()
+        
+        if current_count >= rule.max_count_per_participant:
+            raise BusinessException(
+                ErrorCodes.VALIDATION_ERROR,
+                f"参展主体已达到[{card_type.value}]证件最大数量限制",
+                {"current_count": current_count, "max_count": rule.max_count_per_participant}
+            )
+        
+        return current_count
+
 def init_default_data(db: Session):
     default_reasons = [
         {"code": "MISSING_NAME", "category": "信息缺失", "description": "姓名缺失", "needs_manual_review": False},
@@ -503,5 +555,50 @@ def init_default_data(db: Session):
         if not existing:
             reason = ReturnReason(**reason_data)
             db.add(reason)
+    
+    import json
+    default_rules = [
+        {
+            "card_type": IDCardType.EXHIBITOR_PASS,
+            "allowed_participant_types": json.dumps(["参展商", "搭建商"]),
+            "max_count_per_participant": 50,
+            "required_fields": json.dumps(["name", "id_card_number", "phone", "company"]),
+            "photo_requirements": "近期免冠彩色照片，白底，尺寸358x441"
+        },
+        {
+            "card_type": IDCardType.CONSTRUCTOR_PASS,
+            "allowed_participant_types": json.dumps(["搭建商"]),
+            "max_count_per_participant": 100,
+            "required_fields": json.dumps(["name", "id_card_number", "phone", "company"]),
+            "photo_requirements": "近期免冠彩色照片，蓝底，尺寸358x441"
+        },
+        {
+            "card_type": IDCardType.MEDIA_PASS,
+            "allowed_participant_types": json.dumps(["媒体"]),
+            "max_count_per_participant": 20,
+            "required_fields": json.dumps(["name", "id_card_number", "phone", "company", "position"]),
+            "photo_requirements": "近期免冠彩色照片，红底，尺寸358x441"
+        },
+        {
+            "card_type": IDCardType.WORKER_PASS,
+            "allowed_participant_types": json.dumps(["参展商", "搭建商", "媒体"]),
+            "max_count_per_participant": 200,
+            "required_fields": json.dumps(["name", "id_card_number", "phone"]),
+            "photo_requirements": "近期免冠彩色照片，白底，尺寸358x441"
+        },
+        {
+            "card_type": IDCardType.VIP_PASS,
+            "allowed_participant_types": json.dumps(["参展商"]),
+            "max_count_per_participant": 5,
+            "required_fields": json.dumps(["name", "id_card_number", "phone", "company", "position", "email"]),
+            "photo_requirements": "近期免冠彩色照片，白底，尺寸358x441"
+        }
+    ]
+    
+    for rule_data in default_rules:
+        existing = db.query(IDCardRule).filter(IDCardRule.card_type == rule_data["card_type"]).first()
+        if not existing:
+            rule = IDCardRule(**rule_data)
+            db.add(rule)
     
     db.commit()

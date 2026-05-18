@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import init_db, get_db, SessionLocal
@@ -11,11 +12,13 @@ from schemas import (
     MaterialSubmitRequest, MaterialReturnRequest, MaterialApproveRequest,
     BatchCreate, BatchResponse, BatchAddMaterialsRequest, BatchReturnMaterialsRequest,
     ReportGenerateRequest, ReportResponse,
+    IDCardRuleResponse,
     ErrorResponse, ErrorCodes
 )
 from services import (
     ParticipantService, MaterialService, ReturnReasonService,
-    BatchService, ReportService, BusinessException, init_default_data
+    BatchService, ReportService, BusinessException, init_default_data,
+    IDCardRuleService
 )
 import pandas as pd
 from io import BytesIO
@@ -24,13 +27,40 @@ from fastapi.responses import StreamingResponse
 app = FastAPI(title="展会制证材料退回批次报告后端API", version="1.0.0")
 
 @app.exception_handler(BusinessException)
-async def business_exception_handler(request, exc: BusinessException):
+async def business_exception_handler(request: Request, exc: BusinessException):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={
             "error_code": exc.error_code,
             "message": exc.message,
             "details": exc.details
+        }
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    missing_fields = []
+    for error in exc.errors():
+        if error["type"] == "value_error.missing":
+            field = ".".join(str(loc) for loc in error["loc"])
+            missing_fields.append(field)
+    
+    if missing_fields:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={
+                "error_code": ErrorCodes.MISSING_FIELDS,
+                "message": "缺少必填字段",
+                "details": {"missing_fields": missing_fields}
+            }
+        )
+    
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "error_code": ErrorCodes.VALIDATION_ERROR,
+            "message": "请求参数验证失败",
+            "details": {"errors": exc.errors()}
         }
     )
 
@@ -232,6 +262,18 @@ def get_report(report_code: str, db: Session = Depends(get_db)):
     if not report:
         raise BusinessException(ErrorCodes.NOT_FOUND, "报告不存在")
     return report
+
+@app.get("/id-card-rules", response_model=List[IDCardRuleResponse], tags=["证件规则"])
+def list_id_card_rules(db: Session = Depends(get_db)):
+    from models import IDCardRule
+    return db.query(IDCardRule).filter(IDCardRule.is_active == True).all()
+
+@app.get("/id-card-rules/{card_type}", response_model=IDCardRuleResponse, tags=["证件规则"])
+def get_id_card_rule(card_type: IDCardType, db: Session = Depends(get_db)):
+    rule = IDCardRuleService.get_rule_by_card_type(db, card_type)
+    if not rule:
+        raise BusinessException(ErrorCodes.NOT_FOUND, "证件规则不存在")
+    return rule
 
 if __name__ == "__main__":
     import uvicorn

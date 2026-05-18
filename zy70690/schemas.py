@@ -36,7 +36,7 @@ class ParticipantResponse(ParticipantBase):
     is_active: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ReturnReasonBase(BaseModel):
     code: str = Field(..., max_length=50)
@@ -53,7 +53,7 @@ class ReturnReasonResponse(ReturnReasonBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PersonMaterialBase(BaseModel):
     material_code: str = Field(..., max_length=100)
@@ -97,7 +97,7 @@ class PersonMaterialResponse(PersonMaterialBase):
     reviewed_at: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class MaterialSubmitRequest(BaseModel):
     material_code: str
@@ -138,7 +138,7 @@ class BatchResponse(BaseModel):
     closed_at: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ReportGenerateRequest(BaseModel):
     batch_code: str
@@ -159,7 +159,22 @@ class ReportResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class IDCardRuleBase(BaseModel):
+    card_type: IDCardType
+    allowed_participant_types: Optional[str] = None
+    max_count_per_participant: int = 100
+    required_fields: Optional[str] = None
+    photo_requirements: Optional[str] = None
+
+class IDCardRuleResponse(IDCardRuleBase):
+    id: int
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 class ErrorResponse(BaseModel):
     error_code: str

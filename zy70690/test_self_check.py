@@ -17,11 +17,14 @@ if os.path.exists("certificate_system.db"):
 from database import init_db, SessionLocal
 from services import (
     ParticipantService, MaterialService, ReturnReasonService,
-    BatchService, ReportService, BusinessException, init_default_data
+    BatchService, ReportService, BusinessException, init_default_data,
+    IDCardRuleService
 )
 from schemas import (
     ParticipantCreate, PersonMaterialCreate, ReturnReasonCreate,
-    BatchCreate, PersonMaterialUpdate, ErrorCodes
+    BatchCreate, PersonMaterialUpdate, ErrorCodes,
+    ParticipantResponse, PersonMaterialResponse, BatchResponse,
+    ReportResponse, ReturnReasonResponse
 )
 from models import MaterialStatus, ParticipantType, IDCardType
 
@@ -109,7 +112,8 @@ def run_self_check():
             name="李四",
             id_card_number="110101199001011234",
             phone="13900139000",
-            email="lisi@example.com"
+            email="lisi@example.com",
+            company="测试展览公司"
         )
         material = MaterialService.create_material(db, material_data)
         print_result("创建人员材料", True, f"ID: {material.id}, 状态: {material.status.value}")
@@ -123,7 +127,9 @@ def run_self_check():
             participant_code="EXH001",
             id_card_type=IDCardType.EXHIBITOR_PASS,
             name="王五",
-            id_card_number="110101199002025678"
+            id_card_number="110101199002025678",
+            phone="13800138000",
+            company="测试展览公司"
         )
         material2 = MaterialService.create_material(db, material2_data)
         
@@ -132,7 +138,9 @@ def run_self_check():
             participant_code="EXH001",
             id_card_type=IDCardType.EXHIBITOR_PASS,
             name="赵六",
-            id_card_number="110101199003039012"
+            id_card_number="110101199003039012",
+            phone="13700137000",
+            company="测试展览公司"
         )
         material3 = MaterialService.create_material(db, material3_data)
         print_result("批量创建测试材料", True)
@@ -287,24 +295,68 @@ def run_self_check():
         print_result("版本号递增正确", versions == [1, 1, 2])
         passed_count += 1
         
-        print_section("11. 缺失字段错误测试")
+        print_section("11. Pydantic ORM序列化测试")
         
-        invalid_material = PersonMaterialCreate(
-            material_code="MAT_INVALID",
+        participant_resp = ParticipantResponse.model_validate(participant)
+        print_result("Participant ORM序列化", participant_resp.participant_code == "EXH001")
+        passed_count += 1
+        
+        material_resp = PersonMaterialResponse.model_validate(material)
+        print_result("PersonMaterial ORM序列化", material_resp.material_code == "MAT001")
+        passed_count += 1
+        
+        batch_resp = BatchResponse.model_validate(batch)
+        print_result("Batch ORM序列化", batch_resp.batch_code == "BATCH001")
+        passed_count += 1
+        
+        report_resp = ReportResponse.model_validate(report_result["report"])
+        print_result("Report ORM序列化", report_resp.report_code == "REP001")
+        passed_count += 1
+        
+        reason_resp = ReturnReasonResponse.model_validate(reason)
+        print_result("ReturnReason ORM序列化", reason_resp.code == "CUSTOM001")
+        passed_count += 1
+        
+        print_section("12. 证件规则校验测试")
+        
+        from models import IDCardRule
+        rules = IDCardRuleService.get_rule_by_card_type(db, IDCardType.EXHIBITOR_PASS)
+        print_result("证件规则存在", rules is not None)
+        passed_count += 1
+        
+        incomplete_material = PersonMaterialCreate(
+            material_code="MAT_MISSING",
             participant_code="EXH001",
-            id_card_type=IDCardType.EXHIBITOR_PASS,
-            name="",
+            id_card_type=IDCardType.MEDIA_PASS,
+            name="测试媒体",
             id_card_number="110101199001011234"
         )
         try:
-            MaterialService.create_material(db, invalid_material)
-            print_result("空字段验证", False)
+            MaterialService.create_material(db, incomplete_material)
+            print_result("证件必填字段校验", False)
             failed_count += 1
-        except:
-            print_result("空字段验证", True)
+        except BusinessException as e:
+            print_result("证件必填字段校验", e.error_code == ErrorCodes.MISSING_FIELDS)
             passed_count += 1
         
-        print_section("12. 状态不允许测试")
+        print_section("13. MISSING_FIELDS错误码测试")
+        
+        incomplete_material2 = PersonMaterialCreate(
+            material_code="MAT_MISSING2",
+            participant_code="EXH001",
+            id_card_type=IDCardType.VIP_PASS,
+            name="测试VIP",
+            id_card_number="110101199001011234"
+        )
+        try:
+            MaterialService.create_material(db, incomplete_material2)
+            print_result("MISSING_FIELDS错误码", False)
+            failed_count += 1
+        except BusinessException as e:
+            print_result("MISSING_FIELDS错误码", e.error_code == ErrorCodes.MISSING_FIELDS)
+            passed_count += 1
+        
+        print_section("14. 状态不允许测试")
         
         try:
             MaterialService.approve_material(db, "MAT001")
@@ -314,7 +366,7 @@ def run_self_check():
             print_result("已通过材料重复审核", e.error_code == ErrorCodes.ALREADY_PROCESSED)
             passed_count += 1
         
-        print_section("13. 不存在资源测试")
+        print_section("15. 不存在资源测试")
         
         not_found = MaterialService.get_material_by_code(db, "NOT_EXIST")
         print_result("不存在材料查询返回None", not_found is None)
