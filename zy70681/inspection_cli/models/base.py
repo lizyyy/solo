@@ -65,6 +65,9 @@ class PhotoEvidence:
     description: str = ""
     taken_at: Optional[datetime] = None
     taken_by: Optional[str] = None
+    item_id: Optional[str] = None
+    task_id: Optional[str] = None
+    recheck_id: Optional[str] = None
     source_location: Optional[SourceLocation] = None
     file_hash: Optional[str] = None
 

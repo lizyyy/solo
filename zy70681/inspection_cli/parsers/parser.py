@@ -82,6 +82,7 @@ class DataParser:
         else:
             raise ValueError(f"不支持的文件格式: {file_path}")
 
+        self._link_photos(session)
         return ParseResult(session=session, stats=stats)
 
     def _parse_csv(self, file_path: str, session: InspectionSession) -> ParseResult:
@@ -343,8 +344,20 @@ class DataParser:
             description=normalize_string(get_val("描述", "说明", "description")),
             taken_at=parse_date(get_val("拍摄时间", "taken_at")),
             taken_by=normalize_string(get_val("拍摄人", "taken_by")),
+            item_id=normalize_string(get_val("巡检项编号", "item_id")),
+            task_id=normalize_string(get_val("整改任务编号", "任务编号", "task_id")),
+            recheck_id=normalize_string(get_val("复查编号", "recheck_id")),
             source_location=source_location
         )
+
+    def _link_photos(self, session: InspectionSession) -> None:
+        for photo in session.photos.values():
+            if photo.item_id and photo.item_id in session.items:
+                session.items[photo.item_id].photos.append(photo)
+            if photo.task_id and photo.task_id in session.tasks:
+                session.tasks[photo.task_id].photos.append(photo)
+            if photo.recheck_id and photo.recheck_id in session.rechecks:
+                session.rechecks[photo.recheck_id].photos.append(photo)
 
     def _get_value(self, row: Dict[str, Any], keys: Tuple[str, ...]) -> Any:
         row_lower = {k.lower(): v for k, v in row.items()}
