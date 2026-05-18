@@ -1,0 +1,23 @@
+{
+  "name": "outdoor-ad-license-cleaner",
+  "version": "1.0.0",
+  "description": "户外广告安装队广告施工证照数据清洗CLI工具",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "ad-license-clean": "./bin/ad-license-clean.js"
+  },
+  "scripts": {
+    "clean": "node bin/ad-license-clean.js",
+    "test": "node bin/ad-license-clean.js --input samples/input --output samples/output"
+  },
+  "keywords": ["户外广告", "施工证照", "数据清洗", "CLI"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "moment": "^2.29.4"
+  }
+}

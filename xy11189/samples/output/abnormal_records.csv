@@ -1,0 +1,6 @@
+teamName,licenseNumber,licenseType,issueDate,expiryDate,insuranceExpiry,workerType,retry,sourceFile,errorType,errorMessages,processTime
+,AD-2024-006,户外广告安装资质,2024-06-01,2026-05-31,2026-11-01,正式工,false,02_dirty_data.csv,VALIDATION_ERROR,缺少必填字段: teamName,2026-05-19T03:54:58+07:00
+暴雨安装队,,高空作业证,2024-07-15,2026-07-14,2026-12-15,合同工,false,02_dirty_data.csv,VALIDATION_ERROR,缺少必填字段: licenseNumber,2026-05-19T03:54:58+07:00
+雷电工程队,AD-2024-008,无效资质,2024-08-20,2026-08-19,2026-06-30,正式工,false,02_dirty_data.csv,VALIDATION_ERROR,证照类型不合法: 无效资质,2026-05-19T03:54:58+07:00
+迷雾工程队,AD-2024-012,户外广告安装资质,,,,合同工,false,02_dirty_data.csv,VALIDATION_ERROR,缺少必填字段: issueDate; 缺少必填字段: expiryDate; 缺少必填字段: insuranceExpiry,2026-05-19T03:54:58+07:00
+狂风安装队,AD-2024-013,高空作业证,2024-12-01,,2026-03-01,劳务派遣,false,02_dirty_data.csv,VALIDATION_ERROR,缺少必填字段: expiryDate,2026-05-19T03:54:58+07:00

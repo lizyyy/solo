@@ -1,0 +1,28 @@
+{
+  "requiredFields": [
+    "teamName",
+    "licenseNumber",
+    "licenseType",
+    "issueDate",
+    "expiryDate",
+    "insuranceExpiry",
+    "workerType"
+  ],
+  "insuranceExpiryDays": 30,
+  "allowedWorkerTypes": [
+    "正式工",
+    "合同工"
+  ],
+  "allowedLicenseTypes": [
+    "户外广告安装资质",
+    "高空作业证",
+    "电工证",
+    "焊工证"
+  ],
+  "dateFormat": "YYYY-MM-DD",
+  "skipOnErrors": [
+    "INSURANCE_EXPIRED",
+    "TEMP_WORKER",
+    "RETRY_RECORD"
+  ]
+}
