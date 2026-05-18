@@ -1,0 +1,26 @@
+{
+  "name": "convenience-store-inspection-api",
+  "version": "1.0.0",
+  "description": "便利店加盟督导巡店整改API系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "init": "node scripts/init.js",
+    "test": "node scripts/acceptance-test.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["便利店", "巡店整改", "API"],
+  "author": "",
+  "license": "MIT"
+}
