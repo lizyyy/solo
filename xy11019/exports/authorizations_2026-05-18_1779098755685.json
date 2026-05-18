@@ -1,0 +1,107 @@
+{
+  "exportDate": "2026-05-18T10:05:55.685Z",
+  "filter": {
+    "status": "approved"
+  },
+  "total": 2,
+  "data": [
+    {
+      "id": "auth-001",
+      "childId": "child-001",
+      "childName": "Zhang Wei",
+      "guardianId": "guardian-001",
+      "guardianName": "Zhang Qiang",
+      "pickupType": "parent",
+      "relationType": "father",
+      "effectiveStartDate": "2026-05-18",
+      "effectiveEndDate": "2026-06-17",
+      "daysOfWeek": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "startTime": "17:00",
+      "endTime": "18:00",
+      "status": "approved",
+      "statusHistory": [
+        {
+          "fromStatus": "draft",
+          "toStatus": "pending_review",
+          "changedAt": "2026-05-18T10:05:12.718Z",
+          "changedBy": "parent-001",
+          "reason": "提交审批"
+        },
+        {
+          "fromStatus": "pending_review",
+          "toStatus": "approved",
+          "changedAt": "2026-05-18T10:05:12.718Z",
+          "changedBy": "admin",
+          "reason": "信息审核通过"
+        }
+      ],
+      "notes": "父亲常规接送",
+      "emergencyContactName": "刘英",
+      "emergencyContactPhone": "13800138002",
+      "idVerificationRequired": true,
+      "photoVerified": true,
+      "submissionSource": "web_portal",
+      "submittedAt": "2026-05-18T10:05:12.718Z",
+      "submittedBy": "parent-001",
+      "reviewedAt": "2026-05-18T10:05:12.718Z",
+      "reviewedBy": "admin",
+      "reviewNotes": "身份信息已验证",
+      "createdAt": "2026-05-18T10:05:12.718Z",
+      "updatedAt": "2026-05-18T10:05:12.718Z"
+    },
+    {
+      "id": "auth-004",
+      "childId": "child-003",
+      "childName": "Wang Hao",
+      "guardianId": "guardian-004",
+      "guardianName": "Zhao Hong",
+      "pickupType": "grandparent",
+      "relationType": "grandmother",
+      "effectiveStartDate": "2026-05-18",
+      "effectiveEndDate": "2026-06-17",
+      "daysOfWeek": [
+        1,
+        3,
+        5
+      ],
+      "startTime": "16:30",
+      "endTime": "17:30",
+      "status": "approved",
+      "statusHistory": [
+        {
+          "fromStatus": "draft",
+          "toStatus": "pending_review",
+          "changedAt": "2026-05-18T10:05:12.718Z",
+          "changedBy": "parent-003",
+          "reason": "提交审批"
+        },
+        {
+          "fromStatus": "pending_review",
+          "toStatus": "approved",
+          "changedAt": "2026-05-18T10:05:12.718Z",
+          "changedBy": "admin",
+          "reason": "信息审核通过"
+        }
+      ],
+      "notes": "奶奶常规接送（周一、三、五）",
+      "emergencyContactName": "王军",
+      "emergencyContactPhone": "13800138888",
+      "idVerificationRequired": true,
+      "photoVerified": true,
+      "submissionSource": "desktop",
+      "submittedAt": "2026-05-18T10:05:12.718Z",
+      "submittedBy": "parent-003",
+      "reviewedAt": "2026-05-18T10:05:12.718Z",
+      "reviewedBy": "admin",
+      "reviewNotes": "身份信息已验证，注意哮喘急救药",
+      "createdAt": "2026-05-18T10:05:12.718Z",
+      "updatedAt": "2026-05-18T10:05:12.718Z"
+    }
+  ]
+}
