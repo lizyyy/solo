@@ -1,0 +1,18 @@
+{
+  "name": "gift-sample-api",
+  "version": "1.0.0",
+  "description": "企业礼品仓礼品定制打样 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "csv-writer": "^1.6.0"
+  },
+  "keywords": ["gift", "sample", "api"],
+  "author": "",
+  "license": "ISC"
+}
