@@ -1,0 +1,42 @@
+[
+  {
+    "id": "perm_001",
+    "name": "用户数据读取",
+    "type": "token",
+    "scope": "old_token",
+    "enabled": true,
+    "level": "read"
+  },
+  {
+    "id": "perm_002",
+    "name": "订单管理写入",
+    "type": "token",
+    "scope": "old_token",
+    "enabled": true,
+    "level": "write"
+  },
+  {
+    "id": "perm_003",
+    "name": "子应用A继承权限",
+    "type": "subapp",
+    "scope": "sub_app",
+    "inherited": true,
+    "permissions": ["read", "write"]
+  },
+  {
+    "id": "perm_004",
+    "name": "缓存会话权限",
+    "type": "cache",
+    "scope": "cache",
+    "cached": true,
+    "expireTime": 1717209600000
+  },
+  {
+    "id": "perm_005",
+    "name": "管理员配置",
+    "type": "normal",
+    "scope": "global",
+    "enabled": true,
+    "level": "admin"
+  }
+]

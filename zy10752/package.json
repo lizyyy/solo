@@ -1,0 +1,19 @@
+{
+  "name": "app-permission-downgrade-checker",
+  "version": "1.0.0",
+  "description": "应用权限清单权限降级核验 CLI - 检查降级后残留权限",
+  "main": "src/index.js",
+  "bin": {
+    "perm-check": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js",
+    "demo": "node src/cli.js --base examples/base-permissions.json --target examples/target-permissions.json --output examples/result.json"
+  },
+  "keywords": ["permission", "security", "audit", "downgrade"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
