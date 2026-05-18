@@ -1,0 +1,80 @@
+{
+  "6cbdcedf": {
+    "id": "6cbdcedf",
+    "shift_date": "2026-05-18",
+    "shift_type": "夜班",
+    "on_duty_nurse": "张小红",
+    "off_duty_nurse": "李秀英",
+    "on_duty_signature": null,
+    "off_duty_signature": null,
+    "status": "已提交",
+    "created_at": "2026-05-18 19:28:52.100130",
+    "updated_at": "2026-05-18 19:28:52.101107",
+    "baby_count": 5,
+    "maternal_conditions": [
+      {
+        "room_number": "VIP01",
+        "mother_name": "王美丽",
+        "temperature": "36.5",
+        "lochia": "正常",
+        "uterine_contraction": "良好",
+        "wound_condition": "干燥无渗血",
+        "breastfeeding": "顺利",
+        "special_care": "一级护理",
+        "notes": "产后第三天，恢复良好"
+      },
+      {
+        "room_number": "VIP02",
+        "mother_name": "刘婷婷",
+        "temperature": "36.8",
+        "lochia": "正常",
+        "uterine_contraction": "一般",
+        "wound_condition": "稍有红肿",
+        "breastfeeding": "需协助",
+        "special_care": "一级护理",
+        "notes": "产后第二天，注意观察伤口"
+      }
+    ],
+    "baby_conditions": [
+      {
+        "room_number": "VIP01",
+        "baby_name": "小宝A",
+        "gender": "男",
+        "temperature": "36.7",
+        "feeding": "母乳 30ml",
+        "defecation": "胎便已排",
+        "skin_condition": "正常",
+        "jaundice": "生理性黄疸，轻微",
+        "status": "正常",
+        "notes": "体重下降在正常范围内"
+      },
+      {
+        "room_number": "VIP02",
+        "baby_name": "小宝B",
+        "gender": "女",
+        "temperature": "36.5",
+        "feeding": "配方奶 25ml",
+        "defecation": "正常",
+        "skin_condition": "轻微红疹",
+        "jaundice": "无",
+        "status": "需关注",
+        "notes": "注意观察皮肤情况"
+      }
+    ],
+    "special_notes": "VIP02产妇血压略高，需密切监测",
+    "equipment_status": "监护仪正常，吸奶器2台可用",
+    "emergency_supplies": "急救物品齐全，在有效期内",
+    "next_shift_tasks": "1. VIP02产妇伤口换药\n2. 小宝B皮肤情况观察\n3. 晨间护理准备",
+    "manual_process_notes": "",
+    "version": 2,
+    "history": [
+      {
+        "version": 2,
+        "changed_by": "李秀英",
+        "changed_at": "2026-05-18T19:28:52.101124",
+        "change_type": "提交",
+        "remarks": ""
+      }
+    ]
+  }
+}
