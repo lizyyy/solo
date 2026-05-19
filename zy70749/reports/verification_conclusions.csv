@@ -1,0 +1,3 @@
+vendor,event_type,state,can_switch,success_rate,verified_count,failed_count,total_events,recommendation,consecutive_success,max_consecutive_success
+supplier_a,order_created,ready_to_switch,True,0.9667,145,5,150,可以切换到新webhook地址,0,145
+supplier_a,order_updated,init,False,0.0000,0,0,0,双投进行中，需收集更多数据,0,0

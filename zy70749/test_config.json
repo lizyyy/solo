@@ -1,0 +1,20 @@
+{
+  "old_endpoint": "https://example.com/old/webhook",
+  "new_endpoint": "https://example.com/new/webhook",
+  "rules": [
+    {
+      "vendor": "supplier_a",
+      "event_type": "order_created",
+      "window_seconds": 300,
+      "min_success_rate": 0.95,
+      "required_consecutive": 100
+    },
+    {
+      "vendor": "supplier_a",
+      "event_type": "order_updated",
+      "window_seconds": 300,
+      "min_success_rate": 0.95,
+      "required_consecutive": 100
+    }
+  ]
+}
