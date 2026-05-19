@@ -79,11 +79,14 @@ def test_full_api_flow():
     total += 1
     print(f"测试 {total}: 触发发布失败分析")
     response = client.post(f"/api/v1/releases/{release_id}/process")
-    if response.status_code == 200:
+    
+    if response.status_code in [200, 202]:
         data = response.json()
+        if response.status_code == 202:
+            data = data.get("detail", {})
         root_cause = data.get("root_cause")
         confidence = data.get("confidence")
-        print(f"  ✅ 成功")
+        print(f"  ✅ 成功 (状态码: {response.status_code})")
         print(f"    - 根因: {root_cause}")
         print(f"    - 置信度: {confidence}")
         print(f"    - 建议数: {len(data.get('suggested_actions', []))}")

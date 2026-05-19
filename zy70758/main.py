@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.responses import PlainTextResponse
+from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.responses import PlainTextResponse, JSONResponse
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -12,6 +13,23 @@ from markdown_generator import MarkdownReportGenerator
 
 
 app = FastAPI(title="K8s 发布失败时间线分析 API", version="1.0.0")
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    error = exc.errors()[0]
+    field = error.get("loc", ["", ""])[-1] if error.get("loc") else "unknown"
+    msg = error.get("msg", "字段验证失败")
+    return JSONResponse(
+        status_code=400,
+        content={
+            "detail": {
+                "error_code": "MISSING_FIELD",
+                "message": f"缺少 {field} 字段: {msg}",
+                "details": {"field": field, "error": msg}
+            }
+        }
+    )
 
 parser = KubectlOutputParser()
 analyzer = TimelineAnalyzer()
@@ -243,8 +261,8 @@ async def process_release(release_id: int, db: Session = Depends(get_db)):
     if not release:
         raise_http_error(ErrorCode.NOT_FOUND, "发布记录不存在", {"release_id": release_id}, status_code=404)
 
-    if release.status == "already_processed":
-        raise_http_error(ErrorCode.ALREADY_PROCESSED, "该发布已经处理过", {"release_id": release_id})
+    if release.status in ["already_processed", "completed", "failed_manual_review"]:
+        raise_http_error(ErrorCode.ALREADY_PROCESSED, "该发布已经处理过", {"release_id": release_id, "current_status": release.status})
 
     if release.status == "processing":
         raise_http_error(ErrorCode.INVALID_STATE, "该发布正在处理中", {"release_id": release_id})
@@ -326,7 +344,7 @@ async def process_release(release_id: int, db: Session = Depends(get_db)):
 
         db.commit()
 
-        return AnalysisResultResponse(
+        result = AnalysisResultResponse(
             root_cause=analysis.root_cause,
             confidence=analysis.confidence,
             suggested_actions=analysis.suggested_actions,
@@ -334,6 +352,24 @@ async def process_release(release_id: int, db: Session = Depends(get_db)):
             abnormal_pods_count=abnormal_count
         )
 
+        if analysis.confidence == "low":
+            raise_http_error(
+                ErrorCode.MANUAL_REVIEW_REQUIRED,
+                "分析置信度低，需要人工复核",
+                {
+                    "release_id": release_id,
+                    "root_cause": analysis.root_cause,
+                    "confidence": analysis.confidence,
+                    "suggested_actions": analysis.suggested_actions,
+                    "report_available": True
+                },
+                status_code=202
+            )
+
+        return result
+
+    except HTTPException:
+        raise
     except Exception as e:
         release.status = "pending"
         db.commit()
