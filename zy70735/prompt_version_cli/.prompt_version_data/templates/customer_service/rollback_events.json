@@ -1,0 +1,11 @@
+[
+  {
+    "template_name": "customer_service",
+    "from_version": "v2",
+    "to_version": "v1",
+    "rollback_time": "2026-05-19T07:50:34.892028",
+    "operator": "admin",
+    "reason": "v2效果不好，回滚到v1",
+    "rollback_id": "rb_ff7de4f9"
+  }
+]
