@@ -1,0 +1,35 @@
+[
+  {
+    "plate_id": "p001",
+    "plate_number": "京A12345",
+    "owner_name": "张三",
+    "owner_phone": "13800138001",
+    "valid_start_date": "2025-05-01",
+    "valid_end_date": "2025-06-01",
+    "vehicle_type": "轿车",
+    "visit_reason": "访客车辆",
+    "status": "active"
+  },
+  {
+    "plate_id": "p002",
+    "plate_number": "京B67890",
+    "owner_name": "王五",
+    "owner_phone": "13800138002",
+    "valid_start_date": "2025-05-15",
+    "valid_end_date": "2025-05-25",
+    "vehicle_type": "SUV",
+    "visit_reason": "临时车辆",
+    "status": "active"
+  },
+  {
+    "plate_id": "p003",
+    "plate_number": "京C11111",
+    "owner_name": "李四",
+    "owner_phone": "13800138004",
+    "valid_start_date": "2025-01-01",
+    "valid_end_date": "2025-12-31",
+    "vehicle_type": "货车",
+    "visit_reason": "长期车辆",
+    "status": "active"
+  }
+]
