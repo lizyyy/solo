@@ -1,0 +1,40 @@
+{
+  "photos": [
+    {
+      "hazard_code": "SAFE-001",
+      "photo_type": "inspection",
+      "file_name": "SAFE-001_消防通道堵塞_检查照片.jpg",
+      "file_path": "/photos/2024/01/SAFE-001_inspection.jpg",
+      "taken_by": "张三",
+      "taken_at": "2024-01-15T09:32:00",
+      "description": "从西侧拍摄的消防通道全貌"
+    },
+    {
+      "hazard_code": "SAFE-002",
+      "photo_type": "inspection",
+      "file_name": "SAFE-002_电线老化_现场照片.jpg",
+      "file_path": "/photos/2024/01/SAFE-002_inspection.jpg",
+      "taken_by": "王五",
+      "taken_at": "2024-01-16T14:22:00",
+      "description": "配电箱内部裸露电线特写"
+    },
+    {
+      "hazard_code": "INVALID-001",
+      "photo_type": "inspection",
+      "file_name": "测试不存在的隐患.jpg",
+      "file_path": "/photos/test.jpg",
+      "taken_by": "测试员",
+      "taken_at": "2024-01-20T10:00:00",
+      "description": "这条照片对应的隐患编号不存在，用于测试坏记录"
+    },
+    {
+      "hazard_code": "SAFE-003",
+      "photo_type": "rectification",
+      "file_name": "SAFE-003_防护栏修复后照片.jpg",
+      "file_path": "/photos/2024/01/SAFE-003_rectification.jpg",
+      "taken_by": "孙八",
+      "taken_at": "2024-01-22T11:15:00",
+      "description": "防护栏修复完成后的照片"
+    }
+  ]
+}
