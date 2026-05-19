@@ -15,6 +15,9 @@ class Reporter:
         if self.report.parse_errors:
             self._print_errors()
         
+        if detailed and self.report.bad_lines:
+            self._print_bad_lines()
+        
         if show_overrides_only:
             self._print_overrides_only()
         elif detailed:
@@ -33,6 +36,7 @@ class Reporter:
         print(f"发现变量数: {self.report.total_variables}")
         print(f"有覆盖变量: {self.report.variables_with_overrides}")
         print(f"缺失提示变量: {self.report.missing_variables}")
+        print(f"格式错误行: {self.report.bad_lines_count}")
         print("-" * 80)
     
     def _print_footer(self) -> None:
@@ -42,6 +46,13 @@ class Reporter:
         print("\n[解析错误]")
         for error in self.report.parse_errors:
             print(f"  ✗ {error}")
+        print()
+    
+    def _print_bad_lines(self) -> None:
+        print("\n[格式错误行]")
+        for idx, bl in enumerate(self.report.bad_lines, 1):
+            print(f"  {idx}. [{Path(bl.file_path).name}:{bl.line_number}] {bl.reason}")
+            print(f"       原行: {bl.raw_line}")
         print()
     
     def _print_summary(self) -> None:

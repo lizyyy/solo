@@ -1,5 +1,6 @@
 import re
 import os
+from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 import yaml
@@ -7,11 +8,20 @@ import yaml
 from .models import VariableDef, SourceType, SourceLevel
 
 
+@dataclass
+class BadLine:
+    file_path: str
+    line_number: int
+    raw_line: str
+    reason: str
+
+
 class BaseParser:
     def __init__(self, file_path: str):
         self.file_path = str(Path(file_path).resolve())
         self.variables: List[VariableDef] = []
         self.errors: List[str] = []
+        self.bad_lines: List[BadLine] = []
     
     def parse(self) -> List[VariableDef]:
         raise NotImplementedError
@@ -23,6 +33,14 @@ class BaseParser:
         except Exception as e:
             self.errors.append(f"Failed to read {self.file_path}: {str(e)}")
             return []
+    
+    def _looks_like_var_def(self, line: str) -> bool:
+        stripped = line.strip()
+        if not stripped or stripped.startswith('#'):
+            return False
+        if '=' in stripped:
+            return True
+        return False
 
 
 class EnvParser(BaseParser):
@@ -35,6 +53,7 @@ class EnvParser(BaseParser):
     
     def parse(self) -> List[VariableDef]:
         self.variables = []
+        self.bad_lines = []
         lines = self._read_file()
         
         for line_num, raw_line in enumerate(lines, start=1):
@@ -66,6 +85,13 @@ class EnvParser(BaseParser):
                     is_export=is_export,
                 )
                 self.variables.append(var_def)
+            elif not is_commented and self._looks_like_var_def(line):
+                self.bad_lines.append(BadLine(
+                    file_path=self.file_path,
+                    line_number=line_num,
+                    raw_line=raw_line.rstrip('\n'),
+                    reason="Invalid variable name or format",
+                ))
         
         return self.variables
     
@@ -95,6 +121,7 @@ class ShellParser(BaseParser):
     
     def parse(self) -> List[VariableDef]:
         self.variables = []
+        self.bad_lines = []
         lines = self._read_file()
         
         for line_num, raw_line in enumerate(lines, start=1):
@@ -124,6 +151,13 @@ class ShellParser(BaseParser):
                     is_export=is_export,
                 )
                 self.variables.append(var_def)
+            elif not is_commented and self._looks_like_var_def(line):
+                self.bad_lines.append(BadLine(
+                    file_path=self.file_path,
+                    line_number=line_num,
+                    raw_line=raw_line.rstrip('\n'),
+                    reason="Invalid variable name or format",
+                ))
         
         return self.variables
     

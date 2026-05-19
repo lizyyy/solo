@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 from typing import List, Dict, Optional, Set
 
-from .models import VariableDef, VariableChain, ShadowReport, SourceType, SourceLevel
-from .parser import get_parser_for_file, BaseParser
+from .models import VariableDef, VariableChain, ShadowReport, SourceType, SourceLevel, BadLineInfo
+from .parser import get_parser_for_file, BaseParser, BadLine
 
 
 class OverrideEngine:
@@ -11,12 +11,27 @@ class OverrideEngine:
         self.scan_path = str(Path(scan_path).resolve())
         self.file_patterns = file_patterns or ['.env*', '*.sh', 'docker-compose*.yml', 'docker-compose*.yaml']
         self.all_definitions: List[VariableDef] = []
+        self._default_definitions: List[VariableDef] = []
+        self._system_definitions: List[VariableDef] = []
         self.parsed_files: Set[str] = set()
         self.parse_errors: List[str] = []
+        self.bad_lines: List[BadLine] = []
     
     def scan(self, variable_filter: Optional[List[str]] = None) -> ShadowReport:
         self._find_and_parse_files()
+        self.all_definitions.extend(self._default_definitions)
+        self.all_definitions.extend(self._system_definitions)
         self._build_variable_chains(variable_filter)
+        
+        bad_line_infos = [
+            BadLineInfo(
+                file_path=bl.file_path,
+                line_number=bl.line_number,
+                raw_line=bl.raw_line,
+                reason=bl.reason,
+            )
+            for bl in self.bad_lines
+        ]
         
         report = ShadowReport(
             scan_path=self.scan_path,
@@ -24,8 +39,10 @@ class OverrideEngine:
             total_variables=len(self.variable_chains),
             variables_with_overrides=sum(1 for c in self.variable_chains.values() if c.override_chain),
             missing_variables=sum(1 for c in self.variable_chains.values() if c.is_missing),
+            bad_lines_count=len(bad_line_infos),
             variable_chains=self.variable_chains,
             parse_errors=self.parse_errors,
+            bad_lines=bad_line_infos,
         )
         
         return report
@@ -34,6 +51,7 @@ class OverrideEngine:
         self.all_definitions = []
         self.parsed_files = set()
         self.parse_errors = []
+        self.bad_lines = []
         
         base_path = Path(self.scan_path)
         
@@ -57,11 +75,18 @@ class OverrideEngine:
                 self.all_definitions.extend(variables)
                 self.parsed_files.add(file_path)
                 self.parse_errors.extend(parser.errors)
+                if hasattr(parser, 'bad_lines'):
+                    self.bad_lines.extend(parser.bad_lines)
             except Exception as e:
                 self.parse_errors.append(f"Error parsing {file_path}: {str(e)}")
     
     def _build_variable_chains(self, variable_filter: Optional[List[str]] = None) -> None:
         self.variable_chains: Dict[str, VariableChain] = {}
+        
+        if variable_filter:
+            for var_name in sorted(variable_filter):
+                if var_name not in self.variable_chains:
+                    self.variable_chains[var_name] = VariableChain(name=var_name)
         
         for var_def in self.all_definitions:
             if variable_filter and var_def.name not in variable_filter:
@@ -88,7 +113,7 @@ class OverrideEngine:
                 is_commented=False,
                 is_export=False,
             )
-            self.all_definitions.append(var_def)
+            self._default_definitions.append(var_def)
     
     def add_system_env(self, include_patterns: Optional[List[str]] = None) -> None:
         for var_name, var_value in sorted(os.environ.items()):
@@ -107,4 +132,4 @@ class OverrideEngine:
                 is_commented=False,
                 is_export=True,
             )
-            self.all_definitions.append(var_def)
+            self._system_definitions.append(var_def)

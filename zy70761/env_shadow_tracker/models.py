@@ -122,14 +122,32 @@ class VariableChain:
 
 
 @dataclass
+class BadLineInfo:
+    file_path: str
+    line_number: int
+    raw_line: str
+    reason: str
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "file_path": self.file_path,
+            "line_number": self.line_number,
+            "raw_line": self.raw_line,
+            "reason": self.reason,
+        }
+
+
+@dataclass
 class ShadowReport:
     scan_path: str
     total_files: int
     total_variables: int
     variables_with_overrides: int
     missing_variables: int
+    bad_lines_count: int
     variable_chains: Dict[str, VariableChain] = field(default_factory=dict)
     parse_errors: List[str] = field(default_factory=list)
+    bad_lines: List[BadLineInfo] = field(default_factory=list)
     
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -138,6 +156,7 @@ class ShadowReport:
             "total_variables": self.total_variables,
             "variables_with_overrides": self.variables_with_overrides,
             "missing_variables": self.missing_variables,
+            "bad_lines_count": self.bad_lines_count,
             "variable_chains": {
                 name: {
                     "name": chain.name,
@@ -151,4 +170,5 @@ class ShadowReport:
                 for name, chain in sorted(self.variable_chains.items())
             },
             "parse_errors": self.parse_errors,
+            "bad_lines": [bl.to_dict() for bl in self.bad_lines],
         }
