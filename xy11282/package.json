@@ -1,0 +1,27 @@
+{
+  "name": "pet-pharmacy-backend",
+  "version": "1.0.0",
+  "description": "宠物医院药房管理系统后端",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node src/scripts/initDB.js",
+    "seed": "node src/scripts/seedData.js",
+    "test": "node src/scripts/testAPI.js"
+  },
+  "keywords": ["pet", "pharmacy", "medicine", "veterinary"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
