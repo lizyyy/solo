@@ -1,0 +1,20 @@
+[
+  {
+    "patient_id": "P005",
+    "test_item": "肌钙蛋白I",
+    "call_time": "2024-01-15T22:18:00",
+    "caller": "夜班李护士",
+    "receiver": "张医生",
+    "receiver_role": "doctor",
+    "callback_content": "已通知患者孙七肌钙蛋白危急值，医生已安排紧急处理"
+  },
+  {
+    "patient_id": "P006",
+    "test_item": "动脉血氧分压",
+    "call_time": "2024-01-15T22:23:00",
+    "caller": "夜班李护士",
+    "receiver": "王主任",
+    "receiver_role": "director",
+    "callback_content": "患者周八血氧过低，已通知值班主任，正在进行氧疗"
+  }
+]
