@@ -54,9 +54,10 @@ class WheelParser:
             result['platform_tag'] = parts[-1]
             result['python_version'] = parts[-3]
 
-            # Check if there's a build tag (looks like a number)
-            # Position -4 is build tag if len >= 6 and it matches \d+
-            if len(parts) >= 6 and re.match(r'^\d+$', parts[-4]):
+            # Check if there's a build tag (per PEP 427)
+            # Build tag format: \d+[a-z0-9]* - starts with digit, followed by alphanumeric
+            # Position -4 is build tag if len >= 6 and it matches this pattern
+            if len(parts) >= 6 and re.match(r'^\d+[a-zA-Z0-9]*$', parts[-4]):
                 # Has build tag
                 result['package_version'] = parts[-5]
                 result['package_name'] = '-'.join(parts[:-5])
