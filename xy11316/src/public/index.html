@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校车调度服务 - API文档</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .endpoint .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        .method.get { background: #28a745; color: white; }
+        .method.post { background: #007bff; color: white; }
+        .method.put { background: #ffc107; color: #333; }
+        .method.delete { background: #dc3545; color: white; }
+        .endpoint .url {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #333;
+        }
+        .endpoint .description {
+            margin-top: 10px;
+            color: #666;
+        }
+        .endpoint .params {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .endpoint .params strong {
+            color: #555;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .severity-high { background: #f8d7da; color: #721c24; }
+        .severity-medium { background: #fff3cd; color: #856404; }
+        .severity-low { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚌 校车调度服务 API</h1>
+            <p>家长申诉、GPS轨迹匹配、迟到责任判定系统</p>
+        </div>
+
+        <div class="section">
+            <h2>📊 系统概览</h2>
+            <p><strong>健康检查:</strong> GET /api/health</p>
+            <p><strong>数据持久化:</strong> SQLite 本地数据库</p>
+            <p><strong>主要功能:</strong> 数据导入、异常检测、申诉处理、报告导出</p>
+            <div class="code-block">
+基础URL: http://localhost:3000/api
+所有接口支持 JSON 格式
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📁 数据导入接口</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/import/stops</span>
+                <div class="description">导入站点时刻表 CSV 文件</div>
+                <div class="params">
+                    <strong>参数:</strong> file (multipart/form-data) - CSV文件<br>
+                    <strong>CSV字段:</strong> stop_id, stop_name, route_id, scheduled_time, sequence
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/import/gps</span>
+                <div class="description">导入GPS轨迹 JSON 文件</div>
+                <div class="params">
+                    <strong>参数:</strong> file (multipart/form-data) - JSON文件<br>
+                    <strong>JSON字段:</strong> device_id, driver_id, driver_name, latitude, longitude, timestamp, speed
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/import/complaints</span>
+                <div class="description">导入家长申诉单 JSON 文件</div>
+                <div class="params">
+                    <strong>参数:</strong> file (multipart/form-data) - JSON文件<br>
+                    <strong>JSON字段:</strong> complaint_id, parent_name, student_name, complaint_type, complaint_time, description
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔍 异常检测接口</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">/api/anomalies/analyze</span>
+                <div class="description">分析线路异常 - 匹配GPS轨迹和时刻表</div>
+                <div class="params">
+                    <strong>请求体:</strong> { route_id, date }<br>
+                    <strong>检测内容:</strong> 迟到、站点偏离、未按规定停靠
+                </div>
+                <div class="code-block">
+curl -X POST http://localhost:3000/api/anomalies/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"route_id": "R001", "date": "2024-01-15"}'
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/anomalies</span>
+                <div class="description">查询异常记录（支持筛选）</div>
+                <div class="params">
+                    <strong>筛选参数:</strong> driver_id, driver_name, status, anomaly_type, severity, 
+                    start_date, end_date, responsibility, limit
+                </div>
+                <div class="code-block">
+# 查询待处理的高优先级异常
+GET /api/anomalies?status=pending&severity=high
+
+# 按司机查询
+GET /api/anomalies?driver_id=D001&start_date=2024-01-01
+
+# 按责任方筛选
+GET /api/anomalies?responsibility=driver
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <span class="url">/api/anomalies/:id/handle</span>
+                <div class="description">处理异常记录</div>
+                <div class="params">
+                    <strong>请求体:</strong> { handler, status, responsibility, notes }<br>
+                    <strong>状态:</strong> pending, resolved, rejected<br>
+                    <strong>责任方:</strong> driver, traffic, school, investigate
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📤 导出接口</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/export/anomalies</span>
+                <div class="description">导出异常记录为CSV（支持与查询相同的筛选条件）</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/export/complaints</span>
+                <div class="description">导出申诉记录为CSV</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>⚠️ 错误记录接口</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/import-errors</span>
+                <div class="description">查看导入错误记录（保留原始数据、错误原因、修改建议）</div>
+                <div class="params">
+                    <strong>筛选参数:</strong> import_type, resolved, start_date, end_date
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <span class="url">/api/import-errors/:id/resolve</span>
+                <div class="description">标记错误为已解决</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📜 历史记录接口</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/processing-history</span>
+                <div class="description">查看所有数据处理历史</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">/api/dashboard/summary</span>
+                <div class="description">获取仪表盘统计摘要</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📋 枚举值说明</h2>
+            
+            <h3>异常状态 (status)</h3>
+            <p>
+                <span class="status-badge status-pending">pending</span> 待处理
+                <span class="status-badge status-success">resolved</span> 已处理
+                <span class="status-badge" style="background: #f8d7da; color: #721c24;">rejected</span> 已驳回
+            </p>
+            
+            <h3>严重级别 (severity)</h3>
+            <p>
+                <span class="status-badge severity-high">high</span> 高
+                <span class="status-badge severity-medium">medium</span> 中
+                <span class="status-badge severity-low">low</span> 低
+            </p>
+            
+            <h3>责任判定 (responsibility)</h3>
+            <p>
+                <span class="status-badge" style="background: #e2e3e5; color: #383d41;">driver</span> 司机责任
+                <span class="status-badge" style="background: #d1ecf1; color: #0c5460;">traffic</span> 交通原因
+                <span class="status-badge" style="background: #d4edda; color: #155724;">school</span> 学校安排
+                <span class="status-badge" style="background: #fff3cd; color: #856404;">investigate</span> 待调查
+            </p>
+            
+            <h3>异常类型 (anomaly_type)</h3>
+            <p>late_arrival (迟到), stop_deviation (站点偏离), no_show (未到站)</p>
+        </div>
+
+        <div class="section">
+            <h2>💡 使用示例</h2>
+            <div class="code-block">
+# 1. 导入站点数据
+curl -X POST http://localhost:3000/api/import/stops \
+  -F "file=@stops.csv"
+
+# 2. 导入GPS数据
+curl -X POST http://localhost:3000/api/import/gps \
+  -F "file=@gps_data.json"
+
+# 3. 导入申诉数据
+curl -X POST http://localhost:3000/api/import/complaints \
+  -F "file=@complaints.json"
+
+# 4. 分析线路异常
+curl -X POST http://localhost:3000/api/anomalies/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"route_id": "R001", "date": "2024-01-15"}'
+
+# 5. 查询待处理异常
+curl http://localhost:3000/api/anomalies?status=pending
+
+# 6. 处理异常
+curl -X PUT http://localhost:3000/api/anomalies/1/handle \
+  -H "Content-Type: application/json" \
+  -d '{"handler": "调度员A", "status": "resolved", "responsibility": "traffic"}'
+
+# 7. 导出报告
+curl -o anomalies_report.csv http://localhost:3000/api/export/anomalies?status=pending
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+[
+  {
+    "complaint_id": "CPL20240115001",
+    "parent_name": "李女士",
+    "parent_phone": "13800138000",
+    "student_name": "小明",
+    "stop_id": "ST001",
+    "stop_name": "阳光花园南门",
+    "route_id": "R001",
+    "complaint_type": "late",
+    "complaint_time": "2024-01-15T07:15:00",
+    "description": "校车比预定时间迟到了15分钟，孩子差点迟到"
+  },
+  {
+    "complaint_id": "CPL20240115002",
+    "parent_name": "王先生",
+    "parent_phone": "13900139000",
+    "student_name": "小红",
+    "stop_id": "ST002",
+    "stop_name": "幸福小区东门",
+    "route_id": "R001",
+    "complaint_type": "no_stop",
+    "complaint_time": "2024-01-15T07:20:00",
+    "description": "校车没有在站点停靠，直接开过去了"
+  },
+  {
+    "parent_name": "缺少申诉ID的坏数据",
+    "student_name": "",
+    "complaint_type": "",
+    "complaint_time": ""
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "name": "school-bus-schedule-service",
+  "version": "1.0.0",
+  "description": "校车调度服务 - 处理家长申诉、GPS轨迹匹配和迟到责任判定",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["school-bus", "schedule", "gps", "complaint"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-parser": "^3.0.0",
+    "multer": "^1.4.5-lts.1",
+    "moment": "^2.29.4",
+    "json2csv": "^6.0.0-alpha.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
