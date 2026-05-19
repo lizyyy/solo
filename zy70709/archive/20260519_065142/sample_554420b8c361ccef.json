@@ -1,0 +1,10 @@
+{
+  "sample_id": "SAM-003",
+  "scan_rule_id": "CS-003",
+  "file_path": "/app/src/main.py",
+  "line_number": 89,
+  "evidence_content": "hardcoded key",
+  "timestamp": null,
+  "scan_tool": "semgrep",
+  "severity": "critical"
+}

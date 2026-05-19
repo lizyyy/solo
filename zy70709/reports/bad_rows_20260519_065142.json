@@ -1,0 +1,8 @@
+[
+  {
+    "file_path": "examples/suppressions.csv",
+    "row_number": 7,
+    "error_message": "Duplicate rule_id: SUP-001",
+    "raw_content": "{\"rule_id\": \"SUP-001\", \"scan_rule_id\": \"CS-001\", \"reason\": \"重复ID测试\", \"created_at\": \"2024-01-01\", \"expires_at\": \"2024-12-31\", \"created_by\": \"测试人员\", \"reviewer\": \"\", \"review_status\": \"pending\", \"sample_id\": \"\", \"sample_file_path\": \"\", \"sample_line\": \"\", \"evidence_content\": null, \"scan_tool\": null, \"severity\": null}"
+  }
+]

@@ -1,0 +1,8 @@
+rule_id,scan_rule_id,review_status,days_until_expiry,is_expired,has_samples,risk_flags,reviewer,created_by,source_file,source_line
+JSON-001,JS-101,expired,0,True,True,已过期,system,钱九,examples/suppressions.json,1
+JSON-002,PY-202,expired,0,True,False,"已过期,无证据样本",system,郑十一,examples/suppressions.json,2
+SUP-001,CS-001,expired,0,True,True,已过期,system,张三,examples/suppressions.csv,2
+SUP-002,CS-002,expired,0,True,True,已过期,system,王五,examples/suppressions.csv,3
+SUP-003,CS-003,expired,0,True,True,"已过期,压制理由过短",system,赵六,examples/suppressions.csv,4
+SUP-004,CS-004,expired,0,True,True,已过期,system,周七,examples/suppressions.csv,5
+SUP-005,CS-005,expired,0,True,False,"已过期,无证据样本,压制理由过短",system,吴八,examples/suppressions.csv,6

@@ -1,0 +1,10 @@
+{
+  "sample_id": "S-JSON-001",
+  "scan_rule_id": "JS-101",
+  "file_path": "/app/src/app.js",
+  "line_number": 128,
+  "evidence_content": "document.write(content)",
+  "timestamp": null,
+  "scan_tool": "eslint",
+  "severity": "high"
+}

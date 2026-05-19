@@ -1,0 +1,10 @@
+{
+  "sample_id": "SAM-004",
+  "scan_rule_id": "CS-004",
+  "file_path": "/app/src/debug.py",
+  "line_number": 23,
+  "evidence_content": "console.log('debug')",
+  "timestamp": null,
+  "scan_tool": "semgrep",
+  "severity": "low"
+}

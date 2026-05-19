@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "false-positive-reviewer"
+version = "0.1.0"
+description = "误报压制的到期复核样本证据排查CLI工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0",
+    "pydantic>=2.0",
+    "python-dateutil>=2.8",
+    "rich>=13.0",
+    "pandas>=2.0",
+    "jinja2>=3.0",
+]
+
+[project.scripts]
+fp-reviewer = "fp_reviewer.cli:main"

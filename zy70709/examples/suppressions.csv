@@ -1,0 +1,7 @@
+rule_id,scan_rule_id,reason,created_at,expires_at,created_by,reviewer,review_status,sample_id,sample_file_path,sample_line,evidence_content,scan_tool,severity
+SUP-001,CS-001,测试环境误报，已与安全团队确认,2024-01-15,2024-12-31,张三,李四,approved,SAM-001,/app/src/test.js,42,eval('test'),semgrep,high
+SUP-002,CS-002,第三方库已知问题，官方issue跟踪中,2024-06-01,2024-07-01,王五,,pending,SAM-002,/app/lib/third.js,156,vulnerable code,semgrep,medium
+SUP-003,CS-003,业务逻辑需要,2024-03-20,2024-05-20,赵六,,pending,SAM-003,/app/src/main.py,89,hardcoded key,semgrep,critical
+SUP-004,CS-004,正常的调试代码，已记录审计,2024-05-01,2026-01-01,周七,李四,approved,SAM-004,/app/src/debug.py,23,console.log('debug'),semgrep,low
+SUP-005,CS-005,FP,2024-04-01,2024-05-15,吴八,,pending,,,
+SUP-001,CS-001,重复ID测试,2024-01-01,2024-12-31,测试人员,,pending,,,

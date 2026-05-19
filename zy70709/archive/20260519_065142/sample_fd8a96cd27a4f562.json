@@ -1,0 +1,10 @@
+{
+  "sample_id": "SAM-002",
+  "scan_rule_id": "CS-002",
+  "file_path": "/app/lib/third.js",
+  "line_number": 156,
+  "evidence_content": "vulnerable code",
+  "timestamp": null,
+  "scan_tool": "semgrep",
+  "severity": "medium"
+}

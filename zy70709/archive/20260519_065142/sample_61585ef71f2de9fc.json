@@ -1,0 +1,10 @@
+{
+  "sample_id": "SAM-001",
+  "scan_rule_id": "CS-001",
+  "file_path": "/app/src/test.js",
+  "line_number": 42,
+  "evidence_content": "eval('test')",
+  "timestamp": null,
+  "scan_tool": "semgrep",
+  "severity": "high"
+}
