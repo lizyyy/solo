@@ -1,0 +1,4 @@
+order_no,group_leader_id,group_leader_name,user_id,user_name,total_amount,product_id,product_name,sku_id,sku_name,quantity,unit_price,subtotal,is_out_of_stock,created_at
+ORD001,GL001,张团长,U001,张三,99.9,P001,生鲜蔬菜,S001,500g,2,49.95,99.9,false,2024-01-15 10:30:00
+ORD002,GL001,张团长,U002,李四,59.8,P002,新鲜水果,S002,1kg,1,59.8,59.8,true,2024-01-15 11:20:00
+ORD003,GL002,李团长,U003,王五,120.0,P003,海鲜套餐,S003,组合装,1,120,120,false,2024-01-15 12:00:00
