@@ -1,5 +1,6 @@
 import zipfile
 import os
+import re
 import tempfile
 import hashlib
 from pathlib import Path
@@ -48,10 +49,21 @@ class WheelParser:
         }
 
         if len(parts) >= 5:
+            # Standard format: {name}-{version}-{python}-{abi}-{platform}
+            # With build tag: {name}-{version}-{build}-{python}-{abi}-{platform}
             result['platform_tag'] = parts[-1]
             result['python_version'] = parts[-3]
-            result['package_version'] = parts[-4]
-            result['package_name'] = '-'.join(parts[:-4])
+
+            # Check if there's a build tag (looks like a number)
+            # Position -4 is build tag if len >= 6 and it matches \d+
+            if len(parts) >= 6 and re.match(r'^\d+$', parts[-4]):
+                # Has build tag
+                result['package_version'] = parts[-5]
+                result['package_name'] = '-'.join(parts[:-5])
+            else:
+                # No build tag, standard format
+                result['package_version'] = parts[-4]
+                result['package_name'] = '-'.join(parts[:-4])
         elif len(parts) == 4:
             result['platform_tag'] = parts[-1]
             result['python_version'] = parts[-2]

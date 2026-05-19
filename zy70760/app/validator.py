@@ -7,20 +7,18 @@ import sys
 
 
 class WheelValidator:
-    VALID_PLATFORM_TAGS = {
-        'any',
-        'win32', 'win_amd64', 'win_arm64',
-        'manylinux1_x86_64', 'manylinux2010_x86_64', 'manylinux2014_x86_64',
-        'manylinux_2_5_x86_64', 'manylinux_2_12_x86_64', 'manylinux_2_17_x86_64',
-        'manylinux1_i686', 'manylinux2010_i686', 'manylinux2014_i686',
-        'manylinux2_5_i686', 'manylinux2_12_i686', 'manylinux2_17_i686',
-        'manylinux2014_aarch64', 'manylinux_2_17_aarch64',
-        'musllinux_1_1_x86_64', 'musllinux_1_2_x86_64',
-        'musllinux_1_1_aarch64', 'musllinux_1_2_aarch64',
-        'macosx_10_9_x86_64', 'macosx_10_10_x86_64', 'macosx_11_0_x86_64',
-        'macosx_11_0_arm64', 'macosx_12_0_arm64',
-        'macosx_10_9_universal2', 'macosx_10_10_universal2',
-    }
+    PLATFORM_TAG_PATTERNS = [
+        r'^any$',
+        r'^win32$',
+        r'^win_amd64$',
+        r'^win_arm64$',
+        r'^manylinux1_\w+$',
+        r'^manylinux2010_\w+$',
+        r'^manylinux2014_\w+$',
+        r'^manylinux_2_\d+_\w+$',
+        r'^musllinux_1_\d+_\w+$',
+        r'^macosx_\d+_\d+_\w+$',
+    ]
 
     def __init__(self, extracted_data: Dict, extracted_path: str = None):
         self.data = extracted_data
@@ -40,7 +38,12 @@ class WheelValidator:
 
         invalid_tags = []
         for tag in platform_tags:
-            if tag not in self.VALID_PLATFORM_TAGS:
+            matched = False
+            for pattern in self.PLATFORM_TAG_PATTERNS:
+                if re.match(pattern, tag):
+                    matched = True
+                    break
+            if not matched:
                 invalid_tags.append(tag)
 
         if invalid_tags:
