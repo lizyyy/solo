@@ -102,6 +102,15 @@ def create_exemption(
         raise HTTPException(status_code=404, detail="关联的失败样例不存在")
     
     if ExemptionService.check_exemption_conflict(db, exemption_data.failure_id):
+        AuditService.create_audit_log(
+            db,
+            operation_type="create_failed",
+            resource_type="exemption",
+            resource_id=exemption_data.failure_id,
+            operator=exemption_data.applicant,
+            original_input=exemption_data.model_dump(),
+            process_result={"error": "该失败样例已有生效中的豁免", "status": "conflict"}
+        )
         raise HTTPException(status_code=409, detail="该失败样例已有生效中的豁免")
     
     exemption = ExemptionService.create_exemption(db, exemption_data)
@@ -161,6 +170,15 @@ def review_exemption(
     try:
         updated = ReviewService.review_exemption(db, exemption_id, review_data)
     except ValueError as e:
+        AuditService.create_audit_log(
+            db,
+            operation_type="review_failed",
+            resource_type="exemption",
+            resource_id=exemption_id,
+            operator=review_data.reviewer,
+            original_input=review_data.model_dump(),
+            process_result={"error": str(e), "status": "conflict"}
+        )
         raise HTTPException(status_code=409, detail=str(e))
     
     AuditService.create_audit_log(
@@ -189,6 +207,15 @@ def withdraw_exemption(
     try:
         updated = ReviewService.withdraw_exemption(db, exemption_id, operator)
     except ValueError as e:
+        AuditService.create_audit_log(
+            db,
+            operation_type="withdraw_failed",
+            resource_type="exemption",
+            resource_id=exemption_id,
+            operator=operator,
+            original_input=None,
+            process_result={"error": str(e), "status": "conflict"}
+        )
         raise HTTPException(status_code=409, detail=str(e))
     
     AuditService.create_audit_log(

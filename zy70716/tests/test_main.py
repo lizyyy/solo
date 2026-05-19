@@ -618,6 +618,235 @@ class TestStateValidation:
         assert failure_check.json()["conclusion"] == "pending"
 
 
+class TestExceptionPathAuditLog:
+    def test_duplicate_exemption_creation_audit_log(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/duplicate_audit",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        first_exemption = client.post(
+            "/api/v1/exemptions",
+            json={
+                "failure_id": failure_id,
+                "exemption_reason": "第一个申请",
+                "exempt_browsers": ["ie"],
+                "expire_days": 30,
+                "applicant": "dev001"
+            }
+        )
+        first_exemption_id = first_exemption.json()["id"]
+        
+        client.put(
+            f"/api/v1/exemptions/{first_exemption_id}/review",
+            json={
+                "review_result": "approved",
+                "review_comment": "同意",
+                "reviewer": "leader001"
+            }
+        )
+        
+        logs_before = client.get("/api/v1/audit-logs").json()
+        count_before = len([log for log in logs_before if log["operation_type"] == "create_failed"])
+        
+        duplicate_response = client.post(
+            "/api/v1/exemptions",
+            json={
+                "failure_id": failure_id,
+                "exemption_reason": "重复申请",
+                "exempt_browsers": ["ie"],
+                "expire_days": 30,
+                "applicant": "dev002"
+            }
+        )
+        assert duplicate_response.status_code == 409
+        
+        logs_after = client.get("/api/v1/audit-logs").json()
+        failed_create_logs = [log for log in logs_after if log["operation_type"] == "create_failed"]
+        
+        assert len(failed_create_logs) == count_before + 1
+        assert failed_create_logs[-1]["operator"] == "dev002"
+        assert failed_create_logs[-1]["process_result"]["status"] == "conflict"
+        assert "已有生效中的豁免" in failed_create_logs[-1]["process_result"]["error"]
+        assert failed_create_logs[-1]["original_input"]["exemption_reason"] == "重复申请"
+    
+    def test_duplicate_review_audit_log(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/duplicate_review_audit",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        exemption_response = client.post(
+            "/api/v1/exemptions",
+            json={
+                "failure_id": failure_id,
+                "exemption_reason": "测试",
+                "exempt_browsers": ["ie"],
+                "expire_days": 30,
+                "applicant": "dev001"
+            }
+        )
+        exemption_id = exemption_response.json()["id"]
+        
+        client.put(
+            f"/api/v1/exemptions/{exemption_id}/review",
+            json={
+                "review_result": "approved",
+                "review_comment": "第一次审核同意",
+                "reviewer": "leader001"
+            }
+        )
+        
+        logs_before = client.get("/api/v1/audit-logs").json()
+        count_before = len([log for log in logs_before if log["operation_type"] == "review_failed"])
+        
+        second_review = client.put(
+            f"/api/v1/exemptions/{exemption_id}/review",
+            json={
+                "review_result": "approved",
+                "review_comment": "重复审核",
+                "reviewer": "leader002"
+            }
+        )
+        assert second_review.status_code == 409
+        
+        logs_after = client.get("/api/v1/audit-logs").json()
+        failed_review_logs = [log for log in logs_after if log["operation_type"] == "review_failed"]
+        
+        assert len(failed_review_logs) == count_before + 1
+        assert failed_review_logs[-1]["operator"] == "leader002"
+        assert failed_review_logs[-1]["process_result"]["status"] == "conflict"
+        assert "豁免申请已处理" in failed_review_logs[-1]["process_result"]["error"]
+        assert failed_review_logs[-1]["original_input"]["review_comment"] == "重复审核"
+    
+    def test_duplicate_withdraw_audit_log(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/duplicate_withdraw_audit",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        exemption_response = client.post(
+            "/api/v1/exemptions",
+            json={
+                "failure_id": failure_id,
+                "exemption_reason": "测试",
+                "exempt_browsers": ["ie"],
+                "expire_days": 30,
+                "applicant": "dev001"
+            }
+        )
+        exemption_id = exemption_response.json()["id"]
+        
+        client.delete(f"/api/v1/exemptions/{exemption_id}?operator=dev001")
+        
+        logs_before = client.get("/api/v1/audit-logs").json()
+        count_before = len([log for log in logs_before if log["operation_type"] == "withdraw_failed"])
+        
+        second_withdraw = client.delete(f"/api/v1/exemptions/{exemption_id}?operator=dev002")
+        assert second_withdraw.status_code == 409
+        
+        logs_after = client.get("/api/v1/audit-logs").json()
+        failed_withdraw_logs = [log for log in logs_after if log["operation_type"] == "withdraw_failed"]
+        
+        assert len(failed_withdraw_logs) == count_before + 1
+        assert failed_withdraw_logs[-1]["operator"] == "dev002"
+        assert failed_withdraw_logs[-1]["process_result"]["status"] == "conflict"
+        assert "豁免已撤回" in failed_withdraw_logs[-1]["process_result"]["error"]
+    
+    def test_exception_path_audit_log_complete_tracking(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/complete_tracking",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        first_exemption = client.post(
+            "/api/v1/exemptions",
+            json={
+                "failure_id": failure_id,
+                "exemption_reason": "第一次",
+                "exempt_browsers": ["ie"],
+                "expire_days": 30,
+                "applicant": "dev001"
+            }
+        )
+        exemption_id = first_exemption.json()["id"]
+        
+        client.put(
+            f"/api/v1/exemptions/{exemption_id}/review",
+            json={
+                "review_result": "approved",
+                "review_comment": "同意",
+                "reviewer": "leader001"
+            }
+        )
+        
+        for i in range(3):
+            client.post(
+                "/api/v1/exemptions",
+                json={
+                    "failure_id": failure_id,
+                    "exemption_reason": f"重复申请{i}",
+                    "exempt_browsers": ["ie"],
+                    "expire_days": 30,
+                    "applicant": f"dev{i+2:03d}"
+                }
+            )
+        
+        client.put(
+            f"/api/v1/exemptions/{exemption_id}/review",
+            json={
+                "review_result": "rejected",
+                "review_comment": "重复审核",
+                "reviewer": "leader002"
+            }
+        )
+        
+        client.delete(f"/api/v1/exemptions/{exemption_id}?operator=dev003")
+        
+        client.delete(f"/api/v1/exemptions/{exemption_id}?operator=dev004")
+        
+        all_logs = client.get("/api/v1/audit-logs").json()
+        
+        create_failed_logs = [log for log in all_logs if log["operation_type"] == "create_failed"]
+        review_failed_logs = [log for log in all_logs if log["operation_type"] == "review_failed"]
+        withdraw_failed_logs = [log for log in all_logs if log["operation_type"] == "withdraw_failed"]
+        
+        assert len(create_failed_logs) == 3
+        assert len(review_failed_logs) == 1
+        assert len(withdraw_failed_logs) == 1
+        
+        for i, log in enumerate(create_failed_logs):
+            assert log["operator"] == f"dev{i+2:03d}"
+            assert log["process_result"]["status"] == "conflict"
+        
+        assert review_failed_logs[0]["operator"] == "leader002"
+        assert withdraw_failed_logs[0]["operator"] == "dev004"
+
+
 class TestBrowserMatrix:
     def test_validate_browser_matrix_compatible(self, client):
         response = client.post(
