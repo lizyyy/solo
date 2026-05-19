@@ -1,0 +1,143 @@
+{
+  "vehicles": [
+    {
+      "plateNumber": "京A12345",
+      "batteryLevel": 85,
+      "status": "available",
+      "id": "efe0bca7-63ed-415f-a675-2d3057bd0b05",
+      "lastUpdate": "2026-05-19T10:50:51.039Z"
+    },
+    {
+      "plateNumber": "京B67890",
+      "batteryLevel": 92,
+      "status": "available",
+      "id": "43d3357e-e408-4f1b-853d-cb3134d12518",
+      "lastUpdate": "2026-05-19T10:50:51.048Z"
+    },
+    {
+      "plateNumber": "京C11111",
+      "batteryLevel": 45,
+      "status": "charging",
+      "id": "fbabb934-59f2-4f69-843f-c4d96d9db55c",
+      "lastUpdate": "2026-05-19T10:50:51.048Z"
+    },
+    {
+      "plateNumber": "京D22222",
+      "batteryLevel": 78,
+      "status": "available",
+      "id": "669450a6-ffba-45cf-be6b-325a1148be37",
+      "lastUpdate": "2026-05-19T10:50:51.048Z"
+    },
+    {
+      "plateNumber": "京E33333",
+      "batteryLevel": 15,
+      "status": "maintenance",
+      "id": "f5eebc5b-301d-41a4-b809-c0bd3192e428",
+      "lastUpdate": "2026-05-19T10:50:51.048Z"
+    }
+  ],
+  "chargers": [
+    {
+      "name": "CHARGER-01",
+      "status": "available",
+      "power": 100,
+      "location": "A区-01号位",
+      "id": "bf26691e-7c51-4730-9585-c864c45efdf4"
+    },
+    {
+      "name": "CHARGER-02",
+      "status": "occupied",
+      "power": 100,
+      "location": "A区-02号位",
+      "id": "ba13e676-d89f-4221-ba97-bb716fa8e610"
+    },
+    {
+      "name": "CHARGER-03",
+      "status": "available",
+      "power": 100,
+      "location": "B区-01号位",
+      "id": "df6d05b4-700a-4ce8-b8eb-899e6527b4b6"
+    }
+  ],
+  "tasks": [
+    {
+      "orderNumber": "ORD-20240101-001",
+      "description": "运输货物A到B区",
+      "priority": 5,
+      "estimatedDuration": 60,
+      "requiredBattery": 30,
+      "status": "pending",
+      "id": "127f9514-1e78-404f-862b-078296386fc5",
+      "createdAt": "2026-05-19T10:51:06.373Z"
+    },
+    {
+      "orderNumber": "ORD-20240101-002",
+      "description": "运输货物B到C区",
+      "priority": 4,
+      "estimatedDuration": 45,
+      "requiredBattery": 25,
+      "status": "pending",
+      "id": "a7f69417-01d4-427b-9d1f-abd85c39a30b",
+      "createdAt": "2026-05-19T10:51:06.375Z"
+    },
+    {
+      "orderNumber": "ORD-20240101-003",
+      "description": "运输货物C到A区",
+      "priority": 3,
+      "estimatedDuration": 30,
+      "requiredBattery": 20,
+      "status": "pending",
+      "id": "2dacd587-29ff-4b32-9507-4272e432b9ef",
+      "createdAt": "2026-05-19T10:51:06.375Z"
+    },
+    {
+      "orderNumber": "ORD-20240101-004",
+      "description": "运输货物D到D区",
+      "priority": 2,
+      "estimatedDuration": 50,
+      "requiredBattery": 35,
+      "status": "pending",
+      "id": "703e28de-738c-48b4-b25d-0ec68cfca046",
+      "createdAt": "2026-05-19T10:51:06.375Z"
+    },
+    {
+      "orderNumber": "ORD-20240101-005",
+      "description": "运输货物E到E区",
+      "priority": 1,
+      "estimatedDuration": 40,
+      "requiredBattery": 20,
+      "status": "pending",
+      "id": "1517bea5-1d62-420a-9a33-a0c5ff4ecec2",
+      "createdAt": "2026-05-19T10:51:06.375Z"
+    }
+  ],
+  "shifts": [],
+  "exceptions": [],
+  "operators": [],
+  "importHistory": [
+    {
+      "id": "b8829ee3-8522-44d7-a79f-b9d8ad32bd6b",
+      "type": "vehicles",
+      "fileName": "vehicles.csv",
+      "timestamp": "2026-05-19T10:50:51.049Z",
+      "recordCount": 0,
+      "hash": "d1d9eb750d5a3b9f66a852915163dc327e0960672aacc3ee6dd06e6829377646"
+    },
+    {
+      "id": "7f1c11d2-c804-40dd-a4db-898caf58d8ab",
+      "type": "chargers",
+      "fileName": "chargers.json",
+      "timestamp": "2026-05-19T10:51:06.205Z",
+      "recordCount": 3,
+      "hash": "63db77009520879a358eabeef709984cf96843e1da076f66faf30c7f219fdd44"
+    },
+    {
+      "id": "9d57adcf-33c4-4e75-98bf-ff630d1e8b45",
+      "type": "tasks",
+      "fileName": "tasks.csv",
+      "timestamp": "2026-05-19T10:51:06.376Z",
+      "recordCount": 0,
+      "hash": "23b847a5d51e25b958c2819f773689f74a0c315cb4d6539d0952960ae5417bb0"
+    }
+  ]
+}
