@@ -1,0 +1,10 @@
+api_path,subscriber,change_type,batch_id,notify_time,confirm_time,confirm_status,description
+/api/v1/orders,order-service,修改,BATCH_001,2024-01-15 10:00:00,2024-01-15 11:30:00,已确认,订单接口参数调整
+/api/v1/users,user-service,新增,BATCH_001,2024-01-15 10:05:00,,待确认,新增用户接口
+/api/v1/payments,payment-service,修改,BATCH_001,2024-01-10 09:00:00,,待确认,支付接口超时调整
+/api/v1/orders,order-service,修改,BATCH_001,2024-01-15 10:00:00,2024-01-15 11:30:00,已确认,重复通知测试
+/api/v2/products,product-service,废弃,BATCH_002,2024-01-08 14:00:00,,已超时,v2商品接口废弃
+/api/v1/inventory,inventory-service,删除,BATCH_002,2024-01-08 14:30:00,,待确认,库存接口下线
+/api/v1/orders,order-service,新增,BATCH_003,2024-01-20 08:00:00,,待确认,批量订单接口
+/api/v1/reports,report-service,修改,BATCH_003,2024-01-05 16:00:00,,待确认,报表接口字段扩展
+坏行测试,缺字段

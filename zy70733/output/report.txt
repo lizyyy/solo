@@ -1,0 +1,97 @@
+================================================================================
+接口变更订阅确认超时排查报告
+生成时间: 2026-05-19 07:48:46
+================================================================================
+
+【汇总信息】
+----------------------------------------
+total: 8
+by_status:
+  新增通知: 0
+  已去重: 1
+  已确认: 1
+  待确认: 0
+  已超时: 6
+  需补发: 0
+  订阅不匹配: 0
+timeout_count: 6
+pending_count: 0
+confirmed_count: 1
+duplicate_count: 1
+reissue_count: 6
+timeout_hours: 24
+subscription_count: 0
+
+【超时未确认列表】
+----------------------------------------
+1. user-service - /api/v1/users
+   批次: BATCH_001
+   超时: 20638小时
+   来源: api_change_cli/data/sample_notifications.csv:3
+
+2. payment-service - /api/v1/payments
+   批次: BATCH_001
+   超时: 20638小时
+   来源: api_change_cli/data/sample_notifications.csv:4
+
+3. product-service - /api/v2/products
+   批次: BATCH_002
+   超时: None小时
+   来源: api_change_cli/data/sample_notifications.csv:6
+
+4. inventory-service - /api/v1/inventory
+   批次: BATCH_002
+   超时: 20681小时
+   来源: api_change_cli/data/sample_notifications.csv:7
+
+5. order-service - /api/v1/orders
+   批次: BATCH_003
+   超时: 20751小时
+   来源: api_change_cli/data/sample_notifications.csv:8
+
+6. report-service - /api/v1/reports
+   批次: BATCH_003
+   超时: 20751小时
+   来源: api_change_cli/data/sample_notifications.csv:9
+
+【待确认列表】
+----------------------------------------
+无待确认记录
+
+【需补发列表】
+----------------------------------------
+1. user-service - /api/v1/users
+   批次: BATCH_001
+   原因: 超时20638小时未确认
+   来源: api_change_cli/data/sample_notifications.csv:3
+
+2. payment-service - /api/v1/payments
+   批次: BATCH_001
+   原因: 超时20638小时未确认
+   来源: api_change_cli/data/sample_notifications.csv:4
+
+3. product-service - /api/v2/products
+   批次: BATCH_002
+   原因: 标记已超时
+   来源: api_change_cli/data/sample_notifications.csv:6
+
+4. inventory-service - /api/v1/inventory
+   批次: BATCH_002
+   原因: 超时20681小时未确认
+   来源: api_change_cli/data/sample_notifications.csv:7
+
+5. order-service - /api/v1/orders
+   批次: BATCH_003
+   原因: 超时20751小时未确认
+   来源: api_change_cli/data/sample_notifications.csv:8
+
+6. report-service - /api/v1/reports
+   批次: BATCH_003
+   原因: 超时20751小时未确认
+   来源: api_change_cli/data/sample_notifications.csv:9
+
+【解析错误】
+----------------------------------------
+1. api_change_cli/data/sample_notifications.csv:10
+   错误: 缺少通知批次
+   内容: {"api_path": "坏行测试", "subscriber": "缺字段", "change_type": null, "batch_id": null, "notify_time": null...

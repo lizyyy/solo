@@ -1,0 +1,177 @@
+{
+  "generated_at": "2026-05-19T07:48:39.658431",
+  "summary": {
+    "total": 8,
+    "by_status": {
+      "新增通知": 0,
+      "已去重": 1,
+      "已确认": 1,
+      "待确认": 0,
+      "已超时": 1,
+      "需补发": 0,
+      "订阅不匹配": 5
+    },
+    "timeout_count": 1,
+    "pending_count": 0,
+    "confirmed_count": 1,
+    "duplicate_count": 1,
+    "reissue_count": 1,
+    "timeout_hours": 24,
+    "subscription_count": 1
+  },
+  "results": [
+    {
+      "record_id": "ae0f6e107b47",
+      "api_path": "/api/v1/orders",
+      "subscriber": "order-service",
+      "batch_id": "BATCH_001",
+      "status": "已确认",
+      "matched_subscription": "order-*:/api/*",
+      "timeout_hours": null,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "need_reissue": false,
+      "reissue_reason": null,
+      "match_score": 100,
+      "source_location": "api_change_cli/data/sample_notifications.csv:2"
+    },
+    {
+      "record_id": "be46ea76a7dc",
+      "api_path": "/api/v1/users",
+      "subscriber": "user-service",
+      "batch_id": "BATCH_001",
+      "status": "订阅不匹配",
+      "matched_subscription": null,
+      "timeout_hours": null,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "need_reissue": false,
+      "reissue_reason": null,
+      "match_score": 0,
+      "source_location": "api_change_cli/data/sample_notifications.csv:3"
+    },
+    {
+      "record_id": "0aa7a85b5f7e",
+      "api_path": "/api/v1/payments",
+      "subscriber": "payment-service",
+      "batch_id": "BATCH_001",
+      "status": "订阅不匹配",
+      "matched_subscription": null,
+      "timeout_hours": null,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "need_reissue": false,
+      "reissue_reason": null,
+      "match_score": 0,
+      "source_location": "api_change_cli/data/sample_notifications.csv:4"
+    },
+    {
+      "record_id": "bde293b68834",
+      "api_path": "/api/v1/orders",
+      "subscriber": "order-service",
+      "batch_id": "BATCH_001",
+      "status": "已去重",
+      "matched_subscription": "order-*:/api/*",
+      "timeout_hours": null,
+      "is_duplicate": true,
+      "duplicate_of": "/api/v1/orders:order-service:修改:BATCH_001",
+      "need_reissue": false,
+      "reissue_reason": null,
+      "match_score": 100,
+      "source_location": "api_change_cli/data/sample_notifications.csv:5"
+    },
+    {
+      "record_id": "6e01b6ae7e47",
+      "api_path": "/api/v2/products",
+      "subscriber": "product-service",
+      "batch_id": "BATCH_002",
+      "status": "订阅不匹配",
+      "matched_subscription": null,
+      "timeout_hours": null,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "need_reissue": false,
+      "reissue_reason": null,
+      "match_score": 0,
+      "source_location": "api_change_cli/data/sample_notifications.csv:6"
+    },
+    {
+      "record_id": "b61939cf4951",
+      "api_path": "/api/v1/inventory",
+      "subscriber": "inventory-service",
+      "batch_id": "BATCH_002",
+      "status": "订阅不匹配",
+      "matched_subscription": null,
+      "timeout_hours": null,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "need_reissue": false,
+      "reissue_reason": null,
+      "match_score": 0,
+      "source_location": "api_change_cli/data/sample_notifications.csv:7"
+    },
+    {
+      "record_id": "2c1b692e799a",
+      "api_path": "/api/v1/orders",
+      "subscriber": "order-service",
+      "batch_id": "BATCH_003",
+      "status": "已超时",
+      "matched_subscription": "order-*:/api/*",
+      "timeout_hours": 20399,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "need_reissue": true,
+      "reissue_reason": "超时20399小时未确认",
+      "match_score": 100,
+      "source_location": "api_change_cli/data/sample_notifications.csv:8"
+    },
+    {
+      "record_id": "5ace9fecaf5f",
+      "api_path": "/api/v1/reports",
+      "subscriber": "report-service",
+      "batch_id": "BATCH_003",
+      "status": "订阅不匹配",
+      "matched_subscription": null,
+      "timeout_hours": null,
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "need_reissue": false,
+      "reissue_reason": null,
+      "match_score": 0,
+      "source_location": "api_change_cli/data/sample_notifications.csv:9"
+    }
+  ],
+  "errors": [
+    {
+      "record_id": "ed3573d56f1d",
+      "deduplication_key": "error:api_change_cli/data/sample_notifications.csv:10",
+      "source_location": "api_change_cli/data/sample_notifications.csv:10",
+      "file_hash": "76fb3949e8f5f973",
+      "is_valid": false,
+      "record": null,
+      "error": {
+        "file_path": "api_change_cli/data/sample_notifications.csv",
+        "line_number": 10,
+        "raw_content": "{\"api_path\": \"坏行测试\", \"subscriber\": \"缺字段\", \"change_type\": null, \"batch_id\": null, \"notify_time\": null, \"confirm_time\": null, \"confirm_status\": null, \"description\": null}",
+        "error_message": "缺少通知批次"
+      }
+    }
+  ],
+  "duplicates": [
+    {
+      "record_id": "bde293b68834",
+      "api_path": "/api/v1/orders",
+      "subscriber": "order-service",
+      "batch_id": "BATCH_001",
+      "status": "已去重",
+      "matched_subscription": "order-*:/api/*",
+      "timeout_hours": null,
+      "is_duplicate": true,
+      "duplicate_of": "/api/v1/orders:order-service:修改:BATCH_001",
+      "need_reissue": false,
+      "reissue_reason": null,
+      "match_score": 100,
+      "source_location": "api_change_cli/data/sample_notifications.csv:5"
+    }
+  ]
+}
