@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database/connection');
+const { run, get, all } = require('../database/connection');
 
 function extractTables(content) {
   const tables = [];
@@ -129,124 +129,136 @@ function generateSlices(content, rule) {
   return slices;
 }
 
-router.post('/generate', (req, res) => {
-  const { document_id, rule_id } = req.body;
+router.post('/generate', async (req, res) => {
+  try {
+    const { document_id, rule_id } = req.body;
 
-  if (!document_id || !rule_id) {
-    return res.status(400).json({
-      error: '文档ID和规则ID不能为空',
-      code: 'MISSING_REQUIRED_PARAMS'
+    if (!document_id || !rule_id) {
+      return res.status(400).json({
+        error: '文档ID和规则ID不能为空',
+        code: 'MISSING_REQUIRED_FIELDS'
+      });
+    }
+
+    const document = await get('SELECT * FROM documents WHERE id = ?', [document_id]);
+    if (!document) {
+      return res.status(404).json({ error: '文档不存在', code: 'DOCUMENT_NOT_FOUND' });
+    }
+
+    const rule = await get('SELECT * FROM slice_rules WHERE id = ?', [rule_id]);
+    if (!rule) {
+      return res.status(404).json({ error: '规则不存在', code: 'RULE_NOT_FOUND' });
+    }
+
+    await run('DELETE FROM slice_previews WHERE document_id = ? AND rule_id = ?', [document_id, rule_id]);
+    await run('DELETE FROM heading_hierarchies WHERE document_id = ? AND rule_id = ?', [document_id, rule_id]);
+    await run('DELETE FROM table_fragments WHERE document_id = ? AND rule_id = ?', [document_id, rule_id]);
+
+    const slices = generateSlices(document.content, rule);
+    const tables = extractTables(document.content);
+
+    for (const slice of slices) {
+      await run(
+        `INSERT INTO slice_previews 
+         (document_id, rule_id, chunk_index, content, heading_path, chunk_length, has_table, quality_score, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'generated')`,
+        [
+          document_id, rule_id, slice.chunk_index, slice.content,
+          slice.heading_path, slice.chunk_length, slice.has_table, slice.quality_score
+        ]
+      );
+    }
+
+    const headingRegex = /^(#{1,6})\s+(.+)$/gm;
+    let headingMatch;
+    let position = 0;
+
+    while ((headingMatch = headingRegex.exec(document.content)) !== null) {
+      await run(
+        'INSERT INTO heading_hierarchies (document_id, rule_id, level, text, position) VALUES (?, ?, ?, ?, ?)',
+        [document_id, rule_id, headingMatch[1].length, headingMatch[2], position++]
+      );
+    }
+
+    for (const table of tables) {
+      await run(
+        `INSERT INTO table_fragments 
+         (document_id, rule_id, original_table, fragment_content, row_count, col_count, handling_method)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          document_id, rule_id, table.original_table, table.fragment_content,
+          table.row_count, table.col_count, table.handling_method
+        ]
+      );
+    }
+
+    res.json({
+      message: '切片预览生成成功',
+      document_id,
+      rule_id,
+      slices_count: slices.length,
+      tables_count: tables.length,
+      slices: slices.slice(0, 10)
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message, code: 'GENERATE_ERROR' });
   }
+});
 
-  const document = db.prepare('SELECT * FROM documents WHERE id = ?').get(document_id);
-  const rule = db.prepare('SELECT * FROM slice_rules WHERE id = ?').get(rule_id);
+router.get('/', async (req, res) => {
+  try {
+    const { document_id, rule_id, limit = 50, offset = 0 } = req.query;
 
-  if (!document) {
-    return res.status(404).json({ error: '文档不存在', code: 'DOCUMENT_NOT_FOUND' });
+    let query = 'SELECT * FROM slice_previews WHERE 1=1';
+    const params = [];
+
+    if (document_id) { query += ' AND document_id = ?'; params.push(document_id); }
+    if (rule_id) { query += ' AND rule_id = ?'; params.push(rule_id); }
+
+    query += ' ORDER BY chunk_index ASC LIMIT ? OFFSET ?';
+    params.push(parseInt(limit), parseInt(offset));
+
+    const previews = await all(query, params);
+
+    res.json({ data: previews });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  if (!rule) {
-    return res.status(404).json({ error: '规则不存在', code: 'RULE_NOT_FOUND' });
-  }
+});
 
-  db.prepare('DELETE FROM slice_previews WHERE document_id = ? AND rule_id = ?').run(document_id, rule_id);
-  db.prepare('DELETE FROM heading_hierarchies WHERE document_id = ? AND rule_id = ?').run(document_id, rule_id);
-  db.prepare('DELETE FROM table_fragments WHERE document_id = ? AND rule_id = ?').run(document_id, rule_id);
-
-  const slices = generateSlices(document.content, rule);
-  const tables = extractTables(document.content);
-
-  const insertSlice = db.prepare(`
-    INSERT INTO slice_previews 
-    (document_id, rule_id, chunk_index, content, heading_path, chunk_length, has_table, quality_score, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'generated')
-  `);
-
-  for (const slice of slices) {
-    insertSlice.run(
-      document_id, rule_id, slice.chunk_index, slice.content,
-      slice.heading_path, slice.chunk_length, slice.has_table, slice.quality_score
+router.get('/tables/:document_id/:rule_id', async (req, res) => {
+  try {
+    const tables = await all(
+      'SELECT * FROM table_fragments WHERE document_id = ? AND rule_id = ? ORDER BY id ASC',
+      [req.params.document_id, req.params.rule_id]
     );
+
+    res.json({ data: tables });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-  let headingMatch;
-  let position = 0;
-  const insertHeading = db.prepare(`
-    INSERT INTO heading_hierarchies (document_id, rule_id, level, text, position)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-
-  while ((headingMatch = headingRegex.exec(document.content)) !== null) {
-    insertHeading.run(document_id, rule_id, headingMatch[1].length, headingMatch[2], position++);
-  }
-
-  const insertTableFragment = db.prepare(`
-    INSERT INTO table_fragments 
-    (document_id, rule_id, original_table, fragment_content, row_count, col_count, handling_method)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  for (const table of tables) {
-    insertTableFragment.run(
-      document_id, rule_id, table.original_table, table.fragment_content,
-      table.row_count, table.col_count, table.handling_method
-    );
-  }
-
-  res.json({
-    message: '切片预览生成成功',
-    document_id,
-    rule_id,
-    slices_count: slices.length,
-    tables_count: tables.length,
-    slices: slices.slice(0, 10)
-  });
 });
 
-router.get('/', (req, res) => {
-  const { document_id, rule_id, limit = 50, offset = 0 } = req.query;
+router.get('/:id', async (req, res) => {
+  try {
+    const preview = await get('SELECT * FROM slice_previews WHERE id = ?', [req.params.id]);
 
-  let query = 'SELECT * FROM slice_previews WHERE 1=1';
-  const params = [];
+    if (!preview) {
+      return res.status(404).json({ error: '预览不存在', code: 'PREVIEW_NOT_FOUND' });
+    }
 
-  if (document_id) { query += ' AND document_id = ?'; params.push(document_id); }
-  if (rule_id) { query += ' AND rule_id = ?'; params.push(rule_id); }
+    const document = await get('SELECT title FROM documents WHERE id = ?', [preview.document_id]);
+    const rule = await get('SELECT name, version FROM slice_rules WHERE id = ?', [preview.rule_id]);
 
-  query += ' ORDER BY chunk_index ASC LIMIT ? OFFSET ?';
-  params.push(parseInt(limit), parseInt(offset));
-
-  const previews = db.prepare(query).all(...params);
-
-  res.json({ data: previews });
-});
-
-router.get('/tables/:document_id/:rule_id', (req, res) => {
-  const tables = db.prepare(`
-    SELECT * FROM table_fragments 
-    WHERE document_id = ? AND rule_id = ?
-    ORDER BY id ASC
-  `).all(req.params.document_id, req.params.rule_id);
-
-  res.json({ data: tables });
-});
-
-router.get('/:id', (req, res) => {
-  const preview = db.prepare('SELECT * FROM slice_previews WHERE id = ?').get(req.params.id);
-
-  if (!preview) {
-    return res.status(404).json({ error: '预览不存在', code: 'PREVIEW_NOT_FOUND' });
+    res.json({
+      ...preview,
+      document_title: document?.title,
+      rule_name: rule?.name,
+      rule_version: rule?.version
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  const document = db.prepare('SELECT title FROM documents WHERE id = ?').get(preview.document_id);
-  const rule = db.prepare('SELECT name, version FROM slice_rules WHERE id = ?').get(preview.rule_id);
-
-  res.json({
-    ...preview,
-    document_title: document?.title,
-    rule_name: rule?.name,
-    rule_version: rule?.version
-  });
 });
 
 module.exports = router;

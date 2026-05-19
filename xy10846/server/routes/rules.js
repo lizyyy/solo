@@ -1,162 +1,156 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database/connection');
+const { run, get, all } = require('../database/connection');
 
-router.post('/', (req, res) => {
-  const {
-    name, description, max_chunk_length, min_chunk_length,
-    preserve_tables, inherit_headers, table_handling_strategy,
-    heading_hierarchy_level, overlap_size, created_by
-  } = req.body;
+const VALID_STATUSES = ['draft', 'testing', 'active', 'deprecated'];
 
-  if (!name) {
-    return res.status(400).json({
-      error: '规则名称不能为空',
-      code: 'MISSING_RULE_NAME'
-    });
+router.post('/', async (req, res) => {
+  try {
+    const {
+      name, description, max_chunk_length, min_chunk_length,
+      overlap_size, heading_hierarchy_level, inherit_headers,
+      preserve_tables, effect_remark, responsibility_node
+    } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        error: '规则名称不能为空',
+        code: 'MISSING_REQUIRED_FIELDS'
+      });
+    }
+
+    const result = await run(
+      `INSERT INTO slice_rules 
+       (name, description, max_chunk_length, min_chunk_length, overlap_size, 
+        heading_hierarchy_level, inherit_headers, preserve_tables, effect_remark, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft')`,
+      [
+        name, description || '', max_chunk_length || 500, min_chunk_length || 100,
+        overlap_size || 50, heading_hierarchy_level || 3, inherit_headers ? 1 : 0,
+        preserve_tables ? 1 : 0, effect_remark || ''
+      ]
+    );
+
+    const rule = await get('SELECT * FROM slice_rules WHERE id = ?', [result.lastID]);
+    res.status(201).json(rule);
+  } catch (err) {
+    res.status(500).json({ error: err.message, code: 'DATABASE_ERROR' });
   }
-
-  const stmt = db.prepare(`
-    INSERT INTO slice_rules 
-    (name, description, max_chunk_length, min_chunk_length, preserve_tables, 
-     inherit_headers, table_handling_strategy, heading_hierarchy_level, overlap_size, created_by, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft')
-  `);
-
-  const result = stmt.run(
-    name, description, max_chunk_length || 500, min_chunk_length || 100,
-    preserve_tables !== undefined ? preserve_tables : 1,
-    inherit_headers !== undefined ? inherit_headers : 1,
-    table_handling_strategy || 'split',
-    heading_hierarchy_level || 3,
-    overlap_size || 50,
-    created_by || 'system'
-  );
-
-  res.status(201).json({
-    id: result.lastInsertRowid,
-    message: '切片规则创建成功',
-    rule: { id: result.lastInsertRowid, name, version: '1.0.0', status: 'draft' }
-  });
 });
 
-router.get('/', (req, res) => {
-  const { status, search, limit = 20, offset = 0 } = req.query;
+router.get('/', async (req, res) => {
+  try {
+    const { status, limit = 50, offset = 0 } = req.query;
 
-  let query = 'SELECT * FROM slice_rules WHERE 1=1';
-  const params = [];
+    let query = 'SELECT * FROM slice_rules WHERE 1=1';
+    const params = [];
 
-  if (status) {
-    query += ' AND status = ?';
-    params.push(status);
+    if (status) {
+      query += ' AND status = ?';
+      params.push(status);
+    }
+
+    query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    params.push(parseInt(limit), parseInt(offset));
+
+    const rules = await all(query, params);
+    res.json({ data: rules, total: rules.length });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  if (search) {
-    query += ' AND (name LIKE ? OR description LIKE ?)';
-    params.push(`%${search}%`, `%${search}%`);
-  }
-
-  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-  params.push(parseInt(limit), parseInt(offset));
-
-  const rules = db.prepare(query).all(...params);
-
-  const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total').split(' ORDER BY')[0];
-  const countParams = params.slice(0, -2);
-  const { total } = db.prepare(countQuery).get(...countParams);
-
-  res.json({
-    data: rules,
-    pagination: { total, limit: parseInt(limit), offset: parseInt(offset) }
-  });
 });
 
-router.get('/:id', (req, res) => {
-  const rule = db.prepare('SELECT * FROM slice_rules WHERE id = ?').get(req.params.id);
+router.get('/:id', async (req, res) => {
+  try {
+    const rule = await get('SELECT * FROM slice_rules WHERE id = ?', [req.params.id]);
 
-  if (!rule) {
-    return res.status(404).json({
-      error: '规则不存在',
-      code: 'RULE_NOT_FOUND'
-    });
+    if (!rule) {
+      return res.status(404).json({ error: '规则不存在', code: 'RULE_NOT_FOUND' });
+    }
+
+    res.json(rule);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  res.json(rule);
 });
 
-router.put('/:id', (req, res) => {
-  const {
-    name, description, max_chunk_length, min_chunk_length,
-    preserve_tables, inherit_headers, table_handling_strategy,
-    heading_hierarchy_level, overlap_size, effect_remark
-  } = req.body;
+router.put('/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
 
-  const rule = db.prepare('SELECT * FROM slice_rules WHERE id = ?').get(req.params.id);
-  if (!rule) {
-    return res.status(404).json({ error: '规则不存在', code: 'RULE_NOT_FOUND' });
+    if (!VALID_STATUSES.includes(status)) {
+      return res.status(400).json({
+        error: `无效状态，有效状态: ${VALID_STATUSES.join(', ')}`,
+        code: 'INVALID_STATUS'
+      });
+    }
+
+    const result = await run(
+      'UPDATE slice_rules SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [status, req.params.id]
+    );
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: '规则不存在', code: 'RULE_NOT_FOUND' });
+    }
+
+    const rule = await get('SELECT * FROM slice_rules WHERE id = ?', [req.params.id]);
+    res.json(rule);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  const stmt = db.prepare(`
-    UPDATE slice_rules SET
-      name = COALESCE(?, name),
-      description = COALESCE(?, description),
-      max_chunk_length = COALESCE(?, max_chunk_length),
-      min_chunk_length = COALESCE(?, min_chunk_length),
-      preserve_tables = COALESCE(?, preserve_tables),
-      inherit_headers = COALESCE(?, inherit_headers),
-      table_handling_strategy = COALESCE(?, table_handling_strategy),
-      heading_hierarchy_level = COALESCE(?, heading_hierarchy_level),
-      overlap_size = COALESCE(?, overlap_size),
-      effect_remark = COALESCE(?, effect_remark),
-      updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `);
-
-  stmt.run(
-    name, description, max_chunk_length, min_chunk_length,
-    preserve_tables, inherit_headers, table_handling_strategy,
-    heading_hierarchy_level, overlap_size, effect_remark,
-    req.params.id
-  );
-
-  res.json({ message: '规则更新成功', rule_id: req.params.id });
 });
 
-router.put('/:id/status', (req, res) => {
-  const { status } = req.body;
-  const validStatuses = ['draft', 'testing', 'approved', 'published', 'deprecated'];
+router.put('/:id', async (req, res) => {
+  try {
+    const {
+      name, description, max_chunk_length, min_chunk_length,
+      overlap_size, heading_hierarchy_level, inherit_headers,
+      preserve_tables, effect_remark
+    } = req.body;
 
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({
-      error: '无效的状态值',
-      code: 'INVALID_STATUS',
-      valid_statuses: validStatuses
-    });
+    const result = await run(
+      `UPDATE slice_rules SET 
+        name = COALESCE(?, name),
+        description = COALESCE(?, description),
+        max_chunk_length = COALESCE(?, max_chunk_length),
+        min_chunk_length = COALESCE(?, min_chunk_length),
+        overlap_size = COALESCE(?, overlap_size),
+        heading_hierarchy_level = COALESCE(?, heading_hierarchy_level),
+        inherit_headers = COALESCE(?, inherit_headers),
+        preserve_tables = COALESCE(?, preserve_tables),
+        effect_remark = COALESCE(?, effect_remark),
+        updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [
+        name, description, max_chunk_length, min_chunk_length, overlap_size,
+        heading_hierarchy_level, inherit_headers, preserve_tables, effect_remark, req.params.id
+      ]
+    );
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: '规则不存在', code: 'RULE_NOT_FOUND' });
+    }
+
+    const rule = await get('SELECT * FROM slice_rules WHERE id = ?', [req.params.id]);
+    res.json(rule);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  const result = db.prepare(
-    'UPDATE slice_rules SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-  ).run(status, req.params.id);
-
-  if (result.changes === 0) {
-    return res.status(404).json({ error: '规则不存在', code: 'RULE_NOT_FOUND' });
-  }
-
-  res.json({
-    message: '状态更新成功',
-    rule_id: req.params.id,
-    new_status: status
-  });
 });
 
-router.delete('/:id', (req, res) => {
-  const result = db.prepare('DELETE FROM slice_rules WHERE id = ?').run(req.params.id);
+router.delete('/:id', async (req, res) => {
+  try {
+    const result = await run('DELETE FROM slice_rules WHERE id = ?', [req.params.id]);
 
-  if (result.changes === 0) {
-    return res.status(404).json({ error: '规则不存在', code: 'RULE_NOT_FOUND' });
+    if (result.changes === 0) {
+      return res.status(404).json({ error: '规则不存在', code: 'RULE_NOT_FOUND' });
+    }
+
+    res.json({ message: '删除成功', id: req.params.id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  res.json({ message: '规则删除成功' });
 });
 
 module.exports = router;

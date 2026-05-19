@@ -1,38 +1,36 @@
-const db = require('../database/connection');
+const { run } = require('../database/connection');
 
 function requestLogger(req, res, next) {
   const startTime = Date.now();
-  const endpoint = req.path;
-  const method = req.method;
+  const { method, originalUrl, body } = req;
   const responsibilityNode = req.headers['x-responsibility-node'] || 'unknown';
 
   const originalSend = res.send;
-  res.send = function(body) {
+  res.send = function(data) {
     const duration = Date.now() - startTime;
-    const status = res.statusCode < 400 ? 'success' : 'error';
-    
+    let responseData = data;
+
     try {
-      const stmt = db.prepare(`
-        INSERT INTO request_logs 
-        (endpoint, method, request_input, response_result, responsibility_node, status, error_message, duration_ms)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `);
-      
-      stmt.run(
-        endpoint,
-        method,
-        JSON.stringify(req.body),
-        typeof body === 'string' ? body : JSON.stringify(body),
-        responsibilityNode,
-        status,
-        status === 'error' ? (body.error || body.message || 'Unknown error') : null,
-        duration
-      );
-    } catch (err) {
-      console.error('记录请求日志失败:', err);
+      if (typeof data === 'string') {
+        JSON.parse(data);
+        responseData = data;
+      } else if (typeof data === 'object') {
+        responseData = JSON.stringify(data);
+      }
+    } catch (e) {
+      responseData = String(data).substring(0, 1000);
     }
-    
-    originalSend.call(this, body);
+
+    const requestInput = Object.keys(body).length > 0 ? JSON.stringify(body).substring(0, 2000) : null;
+
+    run(
+      `INSERT INTO request_logs 
+       (endpoint, method, request_input, response_result, responsibility_node, status_code, duration_ms)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [originalUrl, method, requestInput, responseData?.substring(0, 4000), responsibilityNode, res.statusCode, duration]
+    ).catch(err => console.error('日志记录失败:', err.message));
+
+    return originalSend.call(this, data);
   };
 
   next();
