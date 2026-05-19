@@ -91,11 +91,8 @@ export class MatchService {
         }
       case 'exists':
         if (rule.type === 'header') {
-          if (expectedValue === 'not_exists') {
-            return !headerExists;
-          }
-          if (expectedValue === '') {
-            return !headerExists || actualValue === '' || actualValue === undefined;
+          if (expectedValue === 'not_exists' || expectedValue === '') {
+            return !headerExists || actualValue === '';
           }
           return headerExists;
         }
