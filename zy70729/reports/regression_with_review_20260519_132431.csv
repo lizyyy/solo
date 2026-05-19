@@ -1,0 +1,3 @@
+﻿Risk Level,Conclusion,Query Template,Param Signature,Old Scan Type,New Scan Type,Old Cost,New Cost,Old Rows,New Rows,Confirm Status
+CRITICAL,REGRESSED,SELECT * FROM orders WHERE user_id = ? AND status = ?,2329166159106965d486c7790905dbf0,Index Scan,Seq Scan,12.5,150.0,50,5000,CONFIRMED
+MEDIUM,FALSE_POSITIVE,SELECT COUNT(*) FROM products WHERE category = ?,60bf98f2535485a1a6015b5cbbdc6113,Index Only Scan,Bitmap Scan,5.2,25.5,1000,1000,REJECTED

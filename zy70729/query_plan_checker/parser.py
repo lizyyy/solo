@@ -56,16 +56,20 @@ class PlanParser:
         query_plans = []
         try:
             with open(path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                f.seek(0)
                 data = json.load(f)
 
             if isinstance(data, list):
+                item_positions = self._find_json_item_positions(content)
                 for idx, item in enumerate(data):
+                    actual_line = item_positions[idx] if idx < len(item_positions) else idx + 1
                     try:
-                        plan = self._parse_single_plan(item, str(path), idx + 1, plan_type)
+                        plan = self._parse_single_plan(item, str(path), actual_line, plan_type)
                         if plan:
                             query_plans.append(plan)
                     except Exception as e:
-                        self._add_parse_error(path, idx + 1, str(item), str(e), "ParseItemError")
+                        self._add_parse_error(path, actual_line, str(item), str(e), "ParseItemError")
             elif isinstance(data, dict):
                 try:
                     plan = self._parse_single_plan(data, str(path), 1, plan_type)
@@ -78,6 +82,30 @@ class PlanParser:
             self._add_parse_error(path, e.lineno, "", f"JSON decode error: {e.msg}", "JSONDecodeError")
 
         return query_plans
+
+    def _find_json_item_positions(self, content: str) -> List[int]:
+        """查找JSON数组中每个对象的起始行号"""
+        lines = content.split('\n')
+        positions = []
+        bracket_stack = []
+        in_array = False
+
+        for line_num, line in enumerate(lines, 1):
+            for col, char in enumerate(line):
+                if char == '[':
+                    bracket_stack.append(']')
+                    in_array = len(bracket_stack) == 1
+                elif char == '{':
+                    bracket_stack.append('}')
+                    if in_array and len(bracket_stack) == 2:
+                        positions.append(line_num)
+                elif char in ('}', ']'):
+                    if bracket_stack:
+                        bracket_stack.pop()
+                    if not bracket_stack:
+                        in_array = False
+
+        return positions
 
     def _parse_text_file(self, path: Path, plan_type: str) -> List[QueryPlan]:
         query_plans = []

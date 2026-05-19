@@ -1,6 +1,6 @@
 ============================================================
 Query Plan Regression Report
-Generated: 2026-05-19 07:20:40
+Generated: 2026-05-19 13:24:31
 ============================================================
 
 SUMMARY:
@@ -9,12 +9,13 @@ SUMMARY:
   total_new_plans: 3
   total_errors: 0
   regressed_count: 1
+  reviewed_count: 2
   risk_level_counts:
     CRITICAL: 1
     MEDIUM: 1
   conclusion_counts:
     REGRESSED: 1
-    NEED_INVESTIGATION: 1
+    FALSE_POSITIVE: 1
 
 REGRESSION DETAILS (By Risk Level):
 
@@ -26,6 +27,6 @@ REGRESSION DETAILS (By Risk Level):
     used_indexes: ['idx_orders_user_status'] -> []
 
   [MEDIUM] SELECT COUNT(*) FROM products WHERE category = ?...
-    Conclusion: NEED_INVESTIGATION
+    Conclusion: FALSE_POSITIVE
     scan_type: Index Only Scan -> Bitmap Scan
     estimated_cost: 5.2 -> 25.5

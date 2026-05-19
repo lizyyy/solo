@@ -13,16 +13,16 @@
     {
       "query_template": "SELECT * FROM orders WHERE user_id = ? AND status = ?",
       "summary": {
-        "scan_type": "Index Scan",
-        "estimated_cost": 12.5,
-        "estimated_rows": 50
+        "scan_type": "Seq Scan",
+        "estimated_cost": 150.0,
+        "estimated_rows": 5000
       }
     },
     {
       "query_template": "SELECT COUNT(*) FROM products WHERE category = ?",
       "summary": {
-        "scan_type": "Index Only Scan",
-        "estimated_cost": 5.2,
+        "scan_type": "Bitmap Scan",
+        "estimated_cost": 25.5,
         "estimated_rows": 1000
       }
     }

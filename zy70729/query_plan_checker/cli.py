@@ -1,7 +1,7 @@
 import click
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from datetime import datetime
 
@@ -15,13 +15,15 @@ from .models import (
 from .parser import PlanParser
 from .rules import RuleEngine
 from .reporter import ReportGenerator
+from .review import ReviewManager
 
 
 class QueryPlanChecker:
-    def __init__(self):
+    def __init__(self, review_file: str = "review_records.json"):
         self.parser = PlanParser()
         self.rule_engine = RuleEngine()
         self.reporter = ReportGenerator()
+        self.review_manager = ReviewManager(review_file)
 
     def run_check(
         self,
@@ -29,7 +31,8 @@ class QueryPlanChecker:
         new_plan_file: str,
         output_dir: Optional[str] = None,
         report_name: str = "plan_regression_report",
-        min_risk_level: str = "LOW"
+        min_risk_level: str = "LOW",
+        apply_reviews: bool = True
     ) -> CheckResult:
         old_plans, old_errors = self.parser.parse_file(old_plan_file, "old")
         new_plans, new_errors = self.parser.parse_file(new_plan_file, "new")
@@ -38,6 +41,19 @@ class QueryPlanChecker:
         self.reporter.source_tracker.track_errors(all_errors)
 
         comparisons, unmatched = self.rule_engine.compare_plans(old_plans, new_plans)
+
+        if apply_reviews:
+            for comp in comparisons:
+                review = self.review_manager.get_review(comp.parameter_set_normalized)
+                if review:
+                    comp.confirm_status = review.status
+                    comp.review_by = review.reviewer
+                    comp.review_at = review.reviewed_at
+                    comp.notes = review.notes
+                    if review.status == ConfirmStatus.CONFIRMED:
+                        comp.conclusion = RegressionConclusion.REGRESSED
+                    elif review.status == ConfirmStatus.REJECTED:
+                        comp.conclusion = RegressionConclusion.FALSE_POSITIVE
 
         min_risk = RiskLevel(min_risk_level)
         filtered_comparisons = [
@@ -64,6 +80,27 @@ class QueryPlanChecker:
 
         return check_result
 
+    def list_comparisons_for_review(
+        self,
+        old_plan_file: str,
+        new_plan_file: str,
+        min_risk_level: str = "LOW"
+    ) -> List[Tuple[str, str, str]]:
+        old_plans, _ = self.parser.parse_file(old_plan_file, "old")
+        new_plans, _ = self.parser.parse_file(new_plan_file, "new")
+        comparisons, _ = self.rule_engine.compare_plans(old_plans, new_plans)
+
+        min_risk = RiskLevel(min_risk_level)
+        result = []
+        for comp in comparisons:
+            if self._risk_priority(comp.risk_level) <= self._risk_priority(min_risk):
+                result.append((
+                    comp.parameter_set_normalized,
+                    comp.query_template,
+                    comp.risk_level.value
+                ))
+        return result
+
     def _risk_priority(self, risk_level: RiskLevel) -> int:
         priority_map = {
             RiskLevel.CRITICAL: 0,
@@ -84,6 +121,7 @@ class QueryPlanChecker:
         risk_level_counts = {}
         conclusion_counts = {}
         regressed_count = 0
+        reviewed_count = 0
 
         for comp in comparisons:
             risk_val = comp.risk_level.value
@@ -95,12 +133,16 @@ class QueryPlanChecker:
             if comp.conclusion == RegressionConclusion.REGRESSED:
                 regressed_count += 1
 
+            if comp.confirm_status != ConfirmStatus.PENDING:
+                reviewed_count += 1
+
         return {
             'total_comparisons': len(comparisons),
             'total_old_plans': len(old_plans),
             'total_new_plans': len(new_plans),
             'total_errors': len(errors),
             'regressed_count': regressed_count,
+            'reviewed_count': reviewed_count,
             'risk_level_counts': risk_level_counts,
             'conclusion_counts': conclusion_counts
         }
@@ -213,6 +255,190 @@ def version():
     from . import __version__
     click.echo(f"查询计划回归排查工具 v{__version__}")
     click.echo("Query Plan Regression Checker")
+
+
+@cli.group()
+def review():
+    """查询计划回归审核管理"""
+    pass
+
+
+@review.command(name="list")
+@click.argument('old_plan_file', type=click.Path(exists=True))
+@click.argument('new_plan_file', type=click.Path(exists=True))
+@click.option('--min-risk-level', '-r', type=click.Choice(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'NONE']),
+              default='LOW', help='最小显示风险级别')
+@click.option('--review-file', '-f', default='review_records.json', help='审核记录文件路径')
+def review_list(old_plan_file, new_plan_file, min_risk_level, review_file):
+    """列出待审核的查询计划对比"""
+    checker = QueryPlanChecker(review_file)
+
+    try:
+        items = checker.list_comparisons_for_review(old_plan_file, new_plan_file, min_risk_level)
+
+        click.echo("\n" + "=" * 80)
+        click.echo("待审核查询计划列表")
+        click.echo("=" * 80)
+
+        if not items:
+            click.echo("\n  没有符合条件的待审核项")
+        else:
+            click.echo(f"\n  共 {len(items)} 项待审核：\n")
+            for idx, (sig, template, risk) in enumerate(items, 1):
+                review_status = ""
+                review = checker.review_manager.get_review(sig)
+                if review:
+                    review_status = f" [已审核: {review.status.value}]"
+                click.echo(f"  [{idx:2d}] [{risk:10s}] {template[:60]}...")
+                click.echo(f"       签名: {sig}{review_status}")
+                click.echo()
+
+        click.echo("=" * 80 + "\n")
+
+    except Exception as e:
+        click.echo(f"❌ 错误: {str(e)}", err=True)
+        sys.exit(2)
+
+
+@review.command(name="confirm")
+@click.argument('query_signature')
+@click.argument('old_plan_file', type=click.Path(exists=True))
+@click.argument('new_plan_file', type=click.Path(exists=True))
+@click.option('--reviewer', '-u', default='', help='审核人')
+@click.option('--notes', '-m', default='', help='备注信息')
+@click.option('--review-file', '-f', default='review_records.json', help='审核记录文件路径')
+def review_confirm(query_signature, old_plan_file, new_plan_file, reviewer, notes, review_file):
+    """确认一个回归项（标记为已确认回归）"""
+    checker = QueryPlanChecker(review_file)
+
+    try:
+        items = checker.list_comparisons_for_review(old_plan_file, new_plan_file, 'NONE')
+        query_template = ""
+        for sig, template, _ in items:
+            if sig == query_signature:
+                query_template = template
+                break
+
+        if not query_template:
+            click.echo(f"⚠ 未找到签名为 {query_signature} 的查询")
+            sys.exit(1)
+
+        checker.review_manager.add_review(
+            query_signature=query_signature,
+            query_template=query_template,
+            status=ConfirmStatus.CONFIRMED,
+            reviewer=reviewer,
+            notes=notes
+        )
+
+        click.echo(f"✅ 已确认回归: {query_template[:60]}...")
+        if reviewer:
+            click.echo(f"   审核人: {reviewer}")
+        if notes:
+            click.echo(f"   备注: {notes}")
+
+    except Exception as e:
+        click.echo(f"❌ 错误: {str(e)}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(2)
+
+
+@review.command(name="reject")
+@click.argument('query_signature')
+@click.argument('old_plan_file', type=click.Path(exists=True))
+@click.argument('new_plan_file', type=click.Path(exists=True))
+@click.option('--reviewer', '-u', default='', help='审核人')
+@click.option('--notes', '-m', default='', help='备注信息')
+@click.option('--review-file', '-f', default='review_records.json', help='审核记录文件路径')
+def review_reject(query_signature, old_plan_file, new_plan_file, reviewer, notes, review_file):
+    """驳回一个回归项（标记为误报）"""
+    checker = QueryPlanChecker(review_file)
+
+    try:
+        items = checker.list_comparisons_for_review(old_plan_file, new_plan_file, 'NONE')
+        query_template = ""
+        for sig, template, _ in items:
+            if sig == query_signature:
+                query_template = template
+                break
+
+        if not query_template:
+            click.echo(f"⚠ 未找到签名为 {query_signature} 的查询")
+            sys.exit(1)
+
+        checker.review_manager.add_review(
+            query_signature=query_signature,
+            query_template=query_template,
+            status=ConfirmStatus.REJECTED,
+            reviewer=reviewer,
+            notes=notes
+        )
+
+        click.echo(f"✅ 已驳回（误报）: {query_template[:60]}...")
+        if reviewer:
+            click.echo(f"   审核人: {reviewer}")
+        if notes:
+            click.echo(f"   备注: {notes}")
+
+    except Exception as e:
+        click.echo(f"❌ 错误: {str(e)}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(2)
+
+
+@review.command(name="need-review")
+@click.argument('query_signature')
+@click.argument('old_plan_file', type=click.Path(exists=True))
+@click.argument('new_plan_file', type=click.Path(exists=True))
+@click.option('--reviewer', '-u', default='', help='审核人')
+@click.option('--notes', '-m', default='', help='备注信息')
+@click.option('--review-file', '-f', default='review_records.json', help='审核记录文件路径')
+def review_need_review(query_signature, old_plan_file, new_plan_file, reviewer, notes, review_file):
+    """标记为需要进一步审核"""
+    checker = QueryPlanChecker(review_file)
+
+    try:
+        items = checker.list_comparisons_for_review(old_plan_file, new_plan_file, 'NONE')
+        query_template = ""
+        for sig, template, _ in items:
+            if sig == query_signature:
+                query_template = template
+                break
+
+        if not query_template:
+            click.echo(f"⚠ 未找到签名为 {query_signature} 的查询")
+            sys.exit(1)
+
+        checker.review_manager.add_review(
+            query_signature=query_signature,
+            query_template=query_template,
+            status=ConfirmStatus.NEED_REVIEW,
+            reviewer=reviewer,
+            notes=notes
+        )
+
+        click.echo(f"✅ 已标记为需要进一步审核: {query_template[:60]}...")
+        if reviewer:
+            click.echo(f"   审核人: {reviewer}")
+        if notes:
+            click.echo(f"   备注: {notes}")
+
+    except Exception as e:
+        click.echo(f"❌ 错误: {str(e)}", err=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(2)
+
+
+@review.command(name="summary")
+@click.option('--review-file', '-f', default='review_records.json', help='审核记录文件路径')
+def review_summary(review_file):
+    """显示审核记录摘要"""
+    from .review import ReviewManager
+    rm = ReviewManager(review_file)
+    rm.print_summary()
 
 
 def main():

@@ -1,0 +1,18 @@
+[
+  {
+    "notes": "确认是索引丢失导致的回归",
+    "query_signature": "2329166159106965d486c7790905dbf0",
+    "query_template": "SELECT * FROM orders WHERE user_id = ? AND status = ?",
+    "reviewed_at": "2026-05-19T13:22:29.717566",
+    "reviewer": "张三",
+    "status": "CONFIRMED"
+  },
+  {
+    "notes": "这是正常的成本波动，不是回归",
+    "query_signature": "60bf98f2535485a1a6015b5cbbdc6113",
+    "query_template": "SELECT COUNT(*) FROM products WHERE category = ?",
+    "reviewed_at": "2026-05-19T13:22:40.443921",
+    "reviewer": "李四",
+    "status": "REJECTED"
+  }
+]

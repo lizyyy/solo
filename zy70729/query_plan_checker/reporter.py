@@ -13,7 +13,8 @@ from .models import (
     PlanComparison,
     ParseError,
     RiskLevel,
-    RegressionConclusion
+    RegressionConclusion,
+    ConfirmStatus
 )
 
 
@@ -397,6 +398,7 @@ class ReportGenerator:
 
         print(f"\nTotal comparisons: {check_result.summary.get('total_comparisons', 0)}")
         print(f"Parse errors: {check_result.summary.get('total_errors', 0)}")
+        print(f"Reviewed items: {check_result.summary.get('reviewed_count', 0)}")
 
         risk_counts = check_result.summary.get('risk_level_counts', {})
         print("\nRisk Level Distribution:")
@@ -412,6 +414,20 @@ class ReportGenerator:
             count = conclusion_counts.get(concl.value, 0)
             if count > 0:
                 print(f"  {concl.value:20s}: {count}")
+
+        if check_result.comparisons:
+            print("\nRegression Details (By Risk Level):")
+            for comp in check_result.comparisons:
+                if comp.risk_level != RiskLevel.NONE:
+                    review_info = ""
+                    if comp.confirm_status != ConfirmStatus.PENDING:
+                        reviewer = f" by {comp.review_by}" if comp.review_by else ""
+                        review_info = f" [已审核: {comp.confirm_status.value}{reviewer}]"
+                    print(f"  [{comp.risk_level.value}] {comp.query_template[:60]}...{review_info}")
+                    print(f"    Conclusion: {comp.conclusion.value}")
+                    for field, diff in comp.differences.items():
+                        print(f"    {field}: {diff.old_value} -> {diff.new_value}")
+                    print()
 
         if check_result.summary.get('regressed_count', 0) > 0:
             print(f"\n⚠️  Found {check_result.summary['regressed_count']} regressed queries!")
