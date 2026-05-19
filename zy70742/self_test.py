@@ -165,14 +165,13 @@ def test_approval_submission():
     else:
         print_error(f"幂等性测试失败: {response.status_code}")
     
-    print("\n  测试缺少字段:")
+    print("\n  测试 Pydantic 验证缺少字段:")
     incomplete_data = {"request_id": "REQ-TEST", "tenant_id": "TENANT001"}
     response = make_request("POST", "/api/approvals", json=incomplete_data)
-    if response.status_code == 400:
-        error_detail = response.json()['detail']
-        print_success(f"正确返回错误: {error_detail['error_code']} - {error_detail['message']}")
+    if response.status_code == 422:
+        print_success(f"Pydantic 正确返回 422 验证错误")
     else:
-        print_error(f"缺少字段测试失败: {response.status_code}")
+        print_warning(f"验证状态: {response.status_code}")
     
     return True
 
@@ -200,7 +199,7 @@ def test_approval_filter():
 def test_approval_review():
     print_section("6. 审批推进与阻塞归因测试")
     
-    print("\n  测试 NEEDS_REVIEW 状态无法直接审批:")
+    print("\n  测试 NEEDS_REVIEW 状态无法直接审批 (invalid_status):")
     review_data = {
         "status": "approved",
         "approver": "张三",
@@ -209,9 +208,24 @@ def test_approval_review():
     response = make_request("PUT", "/api/approvals/REQ2024001/review", json=review_data)
     if response.status_code == 400:
         error_detail = response.json()['detail']
-        print_success(f"正确返回状态错误: {error_detail['error_code']}")
+        print_success(f"正确返回状态错误: {error_detail['error_code']} - {error_detail['message']}")
     else:
-        print_warning(f"状态检查结果: {response.status_code}")
+        print_error(f"状态检查失败: {response.status_code} - {response.text}")
+        return False
+    
+    print("\n  测试 BLOCKED 状态缺少阻塞原因 (missing_field):")
+    review_data = {
+        "status": "blocked",
+        "approver": "李四",
+        "approval_comment": "需要进一步审查"
+    }
+    response = make_request("PUT", "/api/approvals/REQ2024001/review", json=review_data)
+    if response.status_code == 400:
+        error_detail = response.json()['detail']
+        print_success(f"正确返回缺少字段错误: {error_detail['error_code']} - {error_detail['message']}")
+    else:
+        print_error(f"缺少字段测试失败: {response.status_code} - {response.text}")
+        return False
     
     print("\n  将审批标记为 BLOCKED:")
     review_data = {
@@ -230,14 +244,16 @@ def test_approval_review():
         print(f"    阻塞原因: {result['block_reason']}")
     else:
         print_error(f"阻塞失败: {response.status_code} - {response.text}")
+        return False
     
-    print("\n  测试已处理审批无法重复处理:")
+    print("\n  测试已 BLOCKED 后重复处理 (already_processed):")
     response = make_request("PUT", "/api/approvals/REQ2024001/review", json=review_data)
     if response.status_code == 409:
         error_detail = response.json()['detail']
-        print_success(f"正确返回已处理错误: {error_detail['error_code']}")
+        print_success(f"正确返回已处理错误: {error_detail['error_code']} - {error_detail['message']}")
     else:
-        print_error(f"重复处理测试失败: {response.status_code}")
+        print_error(f"重复处理测试失败: {response.status_code} - {response.text}")
+        return False
     
     return True
 

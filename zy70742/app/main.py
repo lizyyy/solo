@@ -106,7 +106,7 @@ def review_approval(request_id: str, review: ApprovalReviewRequest, db: Session 
     service = ApprovalService(db)
     approval, error_code, processed_code = service.review_approval(request_id, review)
     
-    if processed_code == "ALREADY_PROCESSED":
+    if processed_code == "already_processed":
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail={
@@ -115,7 +115,7 @@ def review_approval(request_id: str, review: ApprovalReviewRequest, db: Session 
             }
         )
     
-    if error_code == "APPROVAL_NOT_FOUND":
+    if error_code == "approval_not_found":
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
@@ -124,7 +124,7 @@ def review_approval(request_id: str, review: ApprovalReviewRequest, db: Session 
             }
         )
     
-    if error_code == ErrorCode.MISSING_FIELD:
+    if error_code == "missing_field":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={
@@ -133,7 +133,7 @@ def review_approval(request_id: str, review: ApprovalReviewRequest, db: Session 
             }
         )
     
-    if error_code == ErrorCode.INVALID_STATUS:
+    if error_code == "invalid_status":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={

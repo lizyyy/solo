@@ -92,16 +92,16 @@ class ApprovalService:
         ).first()
 
         if not approval:
-            return None, "APPROVAL_NOT_FOUND", None
+            return None, "approval_not_found", None
 
-        if approval.status in [ApprovalStatus.APPROVED, ApprovalStatus.REJECTED]:
-            return approval, None, "ALREADY_PROCESSED"
+        if approval.status in [ApprovalStatus.APPROVED, ApprovalStatus.REJECTED, ApprovalStatus.BLOCKED]:
+            return approval, None, "already_processed"
 
         if review.status == ApprovalStatus.BLOCKED and not review.block_reason:
-            return None, "MISSING_FIELD", None
+            return None, "missing_field", None
 
         if review.status == ApprovalStatus.APPROVED and approval.status != ApprovalStatus.PENDING:
-            return None, "INVALID_STATUS", None
+            return None, "invalid_status", None
 
         approval.status = review.status
         approval.approver = review.approver
