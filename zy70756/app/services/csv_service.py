@@ -106,13 +106,6 @@ def start_conversion(
     if not db_file:
         return {"success": False, "error": "File not found"}
 
-    if db_file.status == "completed":
-        return {
-            "success": True,
-            "message": "File already converted",
-            "file_id": file_id
-        }
-
     encoding = custom_encoding if custom_encoding else db_file.detected_encoding
 
     db_file.status = "converting"
@@ -121,9 +114,19 @@ def start_conversion(
     null_rules = db.query(NullRule).filter(NullRule.csv_file_id == file_id).all()
     null_values_dict = {nr.column_name: nr.null_values for nr in null_rules}
 
+    column_mappings = db.query(ColumnMapping).filter(ColumnMapping.csv_file_id == file_id).all()
+    column_mappings_list = [
+        {
+            "original_column": mapping.original_column,
+            "normalized_column": mapping.normalized_column,
+            "is_ignored": mapping.is_ignored
+        }
+        for mapping in column_mappings
+    ]
+
     add_audit_log(
         db, file_id, "start_conversion", handler,
-        {"encoding": encoding, "null_rules_count": len(null_rules)},
+        {"encoding": encoding, "null_rules_count": len(null_rules), "mappings_count": len(column_mappings_list)},
         "Conversion started"
     )
 
@@ -143,7 +146,7 @@ def start_conversion(
     db.commit()
 
     headers, rows, bad_rows_data = parse_csv_with_encoding(
-        file_content, encoding, null_values_dict
+        file_content, encoding, null_values_dict, column_mappings_list
     )
 
     db.query(BadRow).filter(BadRow.csv_file_id == file_id).delete()
@@ -174,7 +177,7 @@ def start_conversion(
 
     add_audit_log(
         db, file_id, "complete_conversion", handler,
-        {"total_rows": summary.total_rows, "success_rows": summary.success_rows},
+        {"total_rows": summary.total_rows, "success_rows": summary.success_rows, "failed_rows": summary.failed_rows},
         "Conversion completed successfully"
     )
 
@@ -210,7 +213,82 @@ def fix_bad_row(
         "Bad row fixed manually"
     )
 
+    rebuild_ndjson_with_fixed_rows(db, bad_row.csv_file_id, handler)
+
     return bad_row
+
+
+def rebuild_ndjson_with_fixed_rows(
+    db: Session,
+    file_id: int,
+    handler: str
+) -> Dict[str, Any]:
+    db_file = get_csv_file(db, file_id)
+    if not db_file:
+        return {"success": False, "error": "File not found"}
+
+    upload_path = f"./uploads/{file_id}_{db_file.file_name}"
+    if not os.path.exists(upload_path):
+        return {"success": False, "error": "Uploaded file not found"}
+
+    with open(upload_path, "rb") as f:
+        file_content = f.read()
+
+    encoding = db_file.detected_encoding
+
+    null_rules = db.query(NullRule).filter(NullRule.csv_file_id == file_id).all()
+    null_values_dict = {nr.column_name: nr.null_values for nr in null_rules}
+
+    column_mappings = db.query(ColumnMapping).filter(ColumnMapping.csv_file_id == file_id).all()
+    column_mappings_list = [
+        {
+            "original_column": mapping.original_column,
+            "normalized_column": mapping.normalized_column,
+            "is_ignored": mapping.is_ignored
+        }
+        for mapping in column_mappings
+    ]
+
+    headers, rows, bad_rows_data = parse_csv_with_encoding(
+        file_content, encoding, null_values_dict, column_mappings_list
+    )
+
+    fixed_rows = db.query(BadRow).filter(
+        BadRow.csv_file_id == file_id,
+        BadRow.is_fixed == True
+    ).all()
+
+    for fixed_row in fixed_rows:
+        if fixed_row.fixed_data:
+            rows.append(fixed_row.fixed_data)
+
+    output_path = f"./output/{file_id}_output.ndjson"
+    success_count = convert_to_ndjson(rows, output_path)
+
+    summary = db.query(ConversionSummary).filter(ConversionSummary.csv_file_id == file_id).first()
+    if summary:
+        unfixed_bad_rows_count = db.query(BadRow).filter(
+            BadRow.csv_file_id == file_id,
+            BadRow.is_fixed == False
+        ).count()
+        summary.success_rows = success_count
+        summary.failed_rows = unfixed_bad_rows_count
+        summary.total_rows = success_count + unfixed_bad_rows_count
+        db.commit()
+        db.refresh(summary)
+
+    add_audit_log(
+        db, file_id, "rebuild_ndjson", handler,
+        {"fixed_rows_count": len(fixed_rows), "new_success_count": success_count},
+        "NDJSON rebuilt with fixed bad rows"
+    )
+
+    return {
+        "success": True,
+        "file_id": file_id,
+        "fixed_rows_included": len(fixed_rows),
+        "new_success_count": success_count
+    }
 
 
 def update_file_status(

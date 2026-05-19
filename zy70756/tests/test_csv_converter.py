@@ -89,6 +89,41 @@ class TestConverterCore:
         assert len(rows) == 2
         assert len(bad_rows) == 0
 
+    def test_parse_csv_with_column_mappings(self):
+        csv_content = "ID,User Name,Email\n1,Alice,alice@example.com\n"
+        mappings = [
+            {"original_column": "ID", "normalized_column": "user_id", "is_ignored": False},
+            {"original_column": "User Name", "normalized_column": "full_name", "is_ignored": False},
+            {"original_column": "Email", "normalized_column": "email", "is_ignored": False}
+        ]
+        headers, rows, bad_rows = parse_csv_with_encoding(
+            csv_content.encode("utf-8"), "utf-8", column_mappings=mappings
+        )
+
+        assert len(headers) == 3
+        assert "user_id" in headers
+        assert "full_name" in headers
+        assert "email" in headers
+        assert rows[0]["user_id"] == "1"
+        assert rows[0]["full_name"] == "Alice"
+        assert rows[0]["email"] == "alice@example.com"
+
+    def test_parse_csv_with_ignored_columns(self):
+        csv_content = "ID,Name,IgnoreMe,Value\n1,Alice,xxx,100\n"
+        mappings = [
+            {"original_column": "ID", "normalized_column": "id", "is_ignored": False},
+            {"original_column": "Name", "normalized_column": "name", "is_ignored": False},
+            {"original_column": "IgnoreMe", "normalized_column": "ignore_me", "is_ignored": True},
+            {"original_column": "Value", "normalized_column": "value", "is_ignored": False}
+        ]
+        headers, rows, bad_rows = parse_csv_with_encoding(
+            csv_content.encode("utf-8"), "utf-8", column_mappings=mappings
+        )
+
+        assert len(headers) == 3
+        assert "ignore_me" not in headers
+        assert "IgnoreMe" not in rows[0]
+
 
 class TestAPIEndpoints:
     def test_health_check(self, client):
@@ -298,7 +333,7 @@ class TestConversionFlow:
                 upload_response = client.post(
                     "/api/v1/csv/upload",
                     files={"file": ("test.csv", f, "text/csv")}
-                )
+            )
 
             file_id = upload_response.json()["id"]
 
@@ -308,6 +343,133 @@ class TestConversionFlow:
 
             get_response = client.get(f"/api/v1/csv/{file_id}")
             assert get_response.status_code == 404
+
+        finally:
+            os.unlink(temp_file)
+
+
+class TestColumnMappingAndBadRowFix:
+    def test_column_mapping_update_and_conversion(self, client):
+        csv_content = "ID,User Name,Email\n1,Alice,alice@example.com\n2,Bob,bob@example.com\n"
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            f.write(csv_content)
+            temp_file = f.name
+
+        try:
+            with open(temp_file, "rb") as f:
+                upload_response = client.post(
+                    "/api/v1/csv/upload",
+                    files={"file": ("test.csv", f, "text/csv")}
+                )
+            file_id = upload_response.json()["id"]
+
+            detail = client.get(f"/api/v1/csv/{file_id}")
+            mappings = detail.json()["column_mappings"]
+
+            mapping_id = None
+            for m in mappings:
+                if m["original_column"] == "User Name":
+                    mapping_id = m["id"]
+                    break
+
+            assert mapping_id is not None
+
+            update_response = client.put(
+                f"/api/v1/column-mapping/{mapping_id}",
+                json={"normalized_column": "full_name", "is_ignored": False}
+            )
+            assert update_response.status_code == 200
+            assert update_response.json()["normalized_column"] == "full_name"
+
+            convert_response = client.post(
+                f"/api/v1/csv/{file_id}/convert",
+                json={"handler": "test_operator", "auto_detect_encoding": True}
+            )
+            assert convert_response.status_code == 200
+
+            export_response = client.get(f"/api/v1/csv/{file_id}/export")
+            assert export_response.status_code == 200
+            content = export_response.content.decode("utf-8")
+
+            assert "full_name" in content
+
+        finally:
+            os.unlink(temp_file)
+
+    def test_bad_row_fix_with_handler(self, client):
+        csv_content = "ID,Name,Value\n1,Alice,100\n2,Bob\n3,Charlie,300\n"
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            f.write(csv_content)
+            temp_file = f.name
+
+        try:
+            with open(temp_file, "rb") as f:
+                upload_response = client.post(
+                    "/api/v1/csv/upload",
+                    files={"file": ("test.csv", f, "text/csv")}
+            )
+            file_id = upload_response.json()["id"]
+
+            convert_response = client.post(
+                f"/api/v1/csv/{file_id}/convert",
+                json={"handler": "test_operator", "auto_detect_encoding": True}
+            )
+            assert convert_response.status_code == 200
+
+            detail = client.get(f"/api/v1/csv/{file_id}")
+            bad_rows = detail.json()["bad_rows"]
+            assert len(bad_rows) > 0
+
+            bad_row_id = bad_rows[0]["id"]
+
+            fix_response = client.put(
+                f"/api/v1/bad-row/{bad_row_id}/fix",
+                json={
+                    "fixed_data": {"id": "2", "name": "Bob Fixed", "value": "200"},
+                    "handler": "test_handler_001"
+                }
+            )
+            assert fix_response.status_code == 200
+            assert fix_response.json()["is_fixed"] is True
+
+            audit_response = client.get(f"/api/v1/csv/{file_id}/audit-logs")
+            assert audit_response.status_code == 200
+            logs = audit_response.json()
+            fix_logs = [log for log in logs if log["action"] in ["fix_bad_row", "rebuild_ndjson"]]
+            assert len(fix_logs) >= 2
+
+        finally:
+            os.unlink(temp_file)
+
+    def test_rebuild_ndjson_endpoint(self, client):
+        csv_content = "ID,Name,Value\n1,Alice,100\n2,Bob\n3,Charlie,300\n"
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            f.write(csv_content)
+            temp_file = f.name
+
+        try:
+            with open(temp_file, "rb") as f:
+                upload_response = client.post(
+                    "/api/v1/csv/upload",
+                    files={"file": ("test.csv", f, "text/csv")}
+            )
+            file_id = upload_response.json()["id"]
+
+            convert_response = client.post(
+                f"/api/v1/csv/{file_id}/convert",
+                json={"handler": "test_operator", "auto_detect_encoding": True}
+            )
+            assert convert_response.status_code == 200
+
+            rebuild_response = client.post(
+                f"/api/v1/csv/{file_id}/rebuild",
+                json={"handler": "rebuild_operator"}
+            )
+            assert rebuild_response.status_code == 200
+            assert rebuild_response.json()["success"] is True
 
         finally:
             os.unlink(temp_file)

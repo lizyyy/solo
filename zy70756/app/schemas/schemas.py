@@ -75,6 +75,11 @@ class BadRowResponse(BaseModel):
 
 class BadRowFixRequest(BaseModel):
     fixed_data: Dict[str, Any]
+    handler: str
+
+
+class RebuildRequest(BaseModel):
+    handler: str
 
 
 class ConversionSummaryResponse(BaseModel):

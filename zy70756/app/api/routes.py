@@ -10,12 +10,14 @@ from app.schemas.schemas import (
     ColumnMappingResponse, ColumnMappingUpdate,
     BadRowResponse, BadRowFixRequest,
     ConversionSummaryResponse, AuditLogResponse,
-    StatusUpdateRequest, ConversionRequest
+    StatusUpdateRequest, ConversionRequest,
+    RebuildRequest
 )
 from app.services.csv_service import (
     create_csv_file, get_csv_files, get_csv_file,
     update_column_mapping, start_conversion,
-    fix_bad_row, update_file_status, get_ndjson_output
+    fix_bad_row, update_file_status, get_ndjson_output,
+    rebuild_ndjson_with_fixed_rows
 )
 
 router = APIRouter(prefix="/api/v1", tags=["csv-converter"])
@@ -132,8 +134,7 @@ def fix_bad_row_endpoint(
     fix_request: BadRowFixRequest,
     db: Session = Depends(get_db)
 ):
-    handler = "api_user"
-    fixed_row = fix_bad_row(db, bad_row_id, fix_request.fixed_data, handler)
+    fixed_row = fix_bad_row(db, bad_row_id, fix_request.fixed_data, fix_request.handler)
     if not fixed_row:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -190,6 +191,25 @@ def export_ndjson(
         media_type="application/x-ndjson",
         filename=f"{db_file.file_name.replace('.csv', '.ndjson')}"
     )
+
+
+@router.post("/csv/{file_id}/rebuild")
+def rebuild_ndjson_endpoint(
+    file_id: int,
+    rebuild_request: RebuildRequest,
+    db: Session = Depends(get_db)
+):
+    result = rebuild_ndjson_with_fixed_rows(
+        db, file_id, rebuild_request.handler
+    )
+
+    if not result["success"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=result.get("error", "NDJSON rebuild failed")
+        )
+
+    return result
 
 
 @router.delete("/csv/{file_id}")

@@ -29,10 +29,14 @@ def compute_file_hash(file_content: bytes) -> str:
 def parse_csv_with_encoding(
     file_content: bytes,
     encoding: str,
-    null_values: Optional[Dict[str, List[str]]] = None
+    null_values: Optional[Dict[str, List[str]]] = None,
+    column_mappings: Optional[List[Dict[str, Any]]] = None
 ) -> Tuple[List[str], List[Dict[str, Any]], List[Tuple[int, str, str]]]:
     if null_values is None:
         null_values = {}
+
+    if column_mappings is None:
+        column_mappings = []
 
     try:
         content = file_content.decode(encoding)
@@ -41,7 +45,22 @@ def parse_csv_with_encoding(
 
     reader = csv.reader(StringIO(content))
     headers = next(reader)
-    normalized_headers = [normalize_column_name(h) for h in headers]
+
+    mapping_dict = {}
+    ignored_columns = set()
+    for mapping in column_mappings:
+        original_col = mapping.get('original_column', '')
+        normalized_col = mapping.get('normalized_column', normalize_column_name(original_col))
+        is_ignored = mapping.get('is_ignored', False)
+        mapping_dict[original_col] = normalized_col
+        if is_ignored:
+            ignored_columns.add(original_col)
+
+    final_headers = []
+    for header in headers:
+        if header in ignored_columns:
+            continue
+        final_headers.append(mapping_dict.get(header, normalize_column_name(header)))
 
     rows = []
     bad_rows = []
@@ -57,8 +76,11 @@ def parse_csv_with_encoding(
                 continue
 
             row_dict = {}
-            for i, (header, norm_header) in enumerate(zip(headers, normalized_headers)):
+            for i, header in enumerate(headers):
+                if header in ignored_columns:
+                    continue
                 value = row[i].strip()
+                norm_header = mapping_dict.get(header, normalize_column_name(header))
                 col_nulls = null_values.get(norm_header, ['', 'NA', 'N/A', 'null', 'NULL'])
                 if value in col_nulls:
                     row_dict[norm_header] = None
@@ -73,7 +95,7 @@ def parse_csv_with_encoding(
                 str(e)
             ))
 
-    return normalized_headers, rows, bad_rows
+    return final_headers, rows, bad_rows
 
 
 def convert_to_ndjson(rows: List[Dict[str, Any]], output_path: str) -> int:
