@@ -1,0 +1,29 @@
+$ORIGIN example.com.
+$TTL 300
+
+@       IN  SOA     ns1.example.com. admin.example.com. (
+            2024010101
+            3600
+            1800
+            604800
+            300
+        )
+
+@       IN  NS      ns1.example.com.
+@       IN  NS      ns2.example.com.
+
+@       IN  A       192.168.1.1
+www     IN  A       192.168.1.2
+api     IN  A       192.168.1.3
+app     IN  A       192.168.1.4
+
+db      IN  CNAME   database.example.com.
+cache   IN  CNAME   redis.example.com.
+
+mail    IN  MX  10  mail1.example.com.
+mail    IN  MX  20  mail2.example.com.
+
+gray    IN  A       10.0.0.1
+beta    IN  A       10.0.0.2
+
+this is a bad line with invalid format
