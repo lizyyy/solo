@@ -1,0 +1,26 @@
+{
+  "name": "cs-quality-inspection",
+  "version": "1.0.0",
+  "description": "客服质检系统 - 自动检测转写文本中的道歉、退款承诺和敏感词",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node scripts/test-flow.ts",
+    "import": "ts-node scripts/import-data.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "csv-writer": "^1.6.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1",
+    "@types/node": "^20.8.0",
+    "@types/express": "^4.17.18",
+    "@types/uuid": "^9.0.4"
+  }
+}
