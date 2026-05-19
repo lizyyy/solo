@@ -1,0 +1,574 @@
+{
+  "applications": [
+    {
+      "reagentName": "乙醇",
+      "applicant": "张三",
+      "quantity": 10,
+      "applicationDate": "2024-01-15",
+      "department": "化学系",
+      "purpose": "实验教学",
+      "approved": true,
+      "approver": "李老师"
+    },
+    {
+      "reagentName": "浓硫酸",
+      "applicant": "李四",
+      "quantity": 5,
+      "applicationDate": "2024-01-16",
+      "department": "化学系",
+      "purpose": "科研项目",
+      "approved": true,
+      "approver": "王老师"
+    },
+    {
+      "reagentName": "蒸馏水",
+      "applicant": "王五",
+      "quantity": 20,
+      "applicationDate": "2024-01-17",
+      "department": "生物系",
+      "purpose": "细胞培养",
+      "approved": false,
+      "approver": ""
+    },
+    {
+      "reagentName": "盐酸",
+      "applicant": "赵六",
+      "quantity": 8,
+      "applicationDate": "2024-01-18",
+      "department": "材料系",
+      "purpose": "材料合成",
+      "approved": true,
+      "approver": "刘老师"
+    },
+    {
+      "reagentName": "丙酮",
+      "applicant": "钱七",
+      "quantity": 15,
+      "applicationDate": "2024-01-19",
+      "department": "化学系",
+      "purpose": "有机实验",
+      "approved": true,
+      "approver": "李老师"
+    },
+    {
+      "reagentName": "甲醛",
+      "applicant": "郑十一",
+      "quantity": 50,
+      "applicationDate": "2024-01-22",
+      "department": "医学院",
+      "purpose": "消毒",
+      "approved": true,
+      "approver": "张老师"
+    }
+  ],
+  "inventory": [
+    {
+      "reagentName": "乙醇",
+      "quantity": 50,
+      "unit": "瓶",
+      "location": "A栋-101室-货架1",
+      "batchNumber": "20231201",
+      "expirationDate": "2025-12-31"
+    },
+    {
+      "reagentName": "浓硫酸",
+      "quantity": 20,
+      "unit": "瓶",
+      "location": "A栋-102室-防爆柜",
+      "batchNumber": "20231115",
+      "expirationDate": "2025-11-30"
+    },
+    {
+      "reagentName": "蒸馏水",
+      "quantity": 100,
+      "unit": "桶",
+      "location": "B栋-201室",
+      "batchNumber": "20240101",
+      "expirationDate": "2024-06-30"
+    },
+    {
+      "reagentName": "盐酸",
+      "quantity": 5,
+      "unit": "瓶",
+      "location": "A栋-102室-防爆柜",
+      "batchNumber": "20231020",
+      "expirationDate": "2025-10-19"
+    },
+    {
+      "reagentName": "丙酮",
+      "quantity": 30,
+      "unit": "瓶",
+      "location": "A栋-102室-防爆柜",
+      "batchNumber": "20230901",
+      "expirationDate": "2025-08-31"
+    }
+  ],
+  "hazardRules": [
+    {
+      "reagentName": "乙醇",
+      "hazardLevel": "中",
+      "requiresApproval": false,
+      "maxQuantity": 50,
+      "storageRequirements": "通风干燥处，远离火源"
+    },
+    {
+      "reagentName": "浓硫酸",
+      "hazardLevel": "高",
+      "requiresApproval": true,
+      "maxQuantity": 20,
+      "storageRequirements": "防爆柜，与碱类隔离存放"
+    },
+    {
+      "reagentName": "蒸馏水",
+      "hazardLevel": "低",
+      "requiresApproval": false,
+      "maxQuantity": 200,
+      "storageRequirements": "常温保存"
+    },
+    {
+      "reagentName": "盐酸",
+      "hazardLevel": "高",
+      "requiresApproval": true,
+      "maxQuantity": 10,
+      "storageRequirements": "防爆柜，密封保存"
+    },
+    {
+      "reagentName": "丙酮",
+      "hazardLevel": "高",
+      "requiresApproval": true,
+      "maxQuantity": 20,
+      "storageRequirements": "防爆柜，远离氧化剂"
+    },
+    {
+      "reagentName": "氢氧化钠",
+      "hazardLevel": "中",
+      "requiresApproval": false,
+      "maxQuantity": 30,
+      "storageRequirements": "干燥密封保存"
+    },
+    {
+      "reagentName": "高锰酸钾",
+      "hazardLevel": "高",
+      "requiresApproval": true,
+      "maxQuantity": 10,
+      "storageRequirements": "避光保存，与有机物隔离"
+    },
+    {
+      "reagentName": "甲醛",
+      "hazardLevel": "极高",
+      "requiresApproval": true,
+      "maxQuantity": 10,
+      "storageRequirements": "专用防爆柜，双人双锁"
+    }
+  ],
+  "importHistory": [
+    {
+      "type": "applications",
+      "filePath": "/Users/mac/pro/solo/workspaces/xy11238/samples/applications.csv",
+      "successCount": 6,
+      "errorCount": 3,
+      "timestamp": "2026-05-19T07:57:34.012Z"
+    },
+    {
+      "type": "inventory",
+      "filePath": "/Users/mac/pro/solo/workspaces/xy11238/samples/inventory.json",
+      "successCount": 5,
+      "errorCount": 2,
+      "timestamp": "2026-05-19T07:57:46.195Z"
+    },
+    {
+      "type": "hazardRules",
+      "filePath": "/Users/mac/pro/solo/workspaces/xy11238/samples/hazardRules.json",
+      "successCount": 8,
+      "errorCount": 2,
+      "timestamp": "2026-05-19T07:58:35.632Z"
+    }
+  ],
+  "reviewResults": [
+    {
+      "totalApplications": 6,
+      "passed": 4,
+      "warning": 0,
+      "failed": 2,
+      "details": [
+        {
+          "application": {
+            "reagentName": "乙醇",
+            "applicant": "张三",
+            "quantity": 10,
+            "applicationDate": "2024-01-15",
+            "department": "化学系",
+            "purpose": "实验教学",
+            "approved": true,
+            "approver": "李老师"
+          },
+          "inventoryCheck": {
+            "found": true,
+            "currentStock": 50,
+            "requested": 10,
+            "sufficient": true
+          },
+          "hazardCheck": {
+            "found": true,
+            "hazardLevel": "中",
+            "requiresApproval": false,
+            "maxQuantity": 50
+          },
+          "approvalCheck": {
+            "approved": true,
+            "approver": "李老师"
+          },
+          "status": "passed",
+          "issues": []
+        },
+        {
+          "application": {
+            "reagentName": "浓硫酸",
+            "applicant": "李四",
+            "quantity": 5,
+            "applicationDate": "2024-01-16",
+            "department": "化学系",
+            "purpose": "科研项目",
+            "approved": true,
+            "approver": "王老师"
+          },
+          "inventoryCheck": {
+            "found": true,
+            "currentStock": 20,
+            "requested": 5,
+            "sufficient": true
+          },
+          "hazardCheck": {
+            "found": true,
+            "hazardLevel": "高",
+            "requiresApproval": true,
+            "maxQuantity": 20
+          },
+          "approvalCheck": {
+            "approved": true,
+            "approver": "王老师"
+          },
+          "status": "passed",
+          "issues": []
+        },
+        {
+          "application": {
+            "reagentName": "蒸馏水",
+            "applicant": "王五",
+            "quantity": 20,
+            "applicationDate": "2024-01-17",
+            "department": "生物系",
+            "purpose": "细胞培养",
+            "approved": false,
+            "approver": ""
+          },
+          "inventoryCheck": {
+            "found": true,
+            "currentStock": 100,
+            "requested": 20,
+            "sufficient": true
+          },
+          "hazardCheck": {
+            "found": true,
+            "hazardLevel": "低",
+            "requiresApproval": false,
+            "maxQuantity": 200
+          },
+          "approvalCheck": {
+            "approved": false,
+            "approver": "未指定"
+          },
+          "status": "passed",
+          "issues": []
+        },
+        {
+          "application": {
+            "reagentName": "盐酸",
+            "applicant": "赵六",
+            "quantity": 8,
+            "applicationDate": "2024-01-18",
+            "department": "材料系",
+            "purpose": "材料合成",
+            "approved": true,
+            "approver": "刘老师"
+          },
+          "inventoryCheck": {
+            "found": true,
+            "currentStock": 5,
+            "requested": 8,
+            "sufficient": false
+          },
+          "hazardCheck": {
+            "found": true,
+            "hazardLevel": "高",
+            "requiresApproval": true,
+            "maxQuantity": 10
+          },
+          "approvalCheck": {
+            "approved": true,
+            "approver": "刘老师"
+          },
+          "status": "failed",
+          "issues": [
+            {
+              "type": "inventory_insufficient",
+              "message": "库存不足：当前库存 5，申请 8",
+              "suggestion": "请减少申请数量或补充库存"
+            }
+          ]
+        },
+        {
+          "application": {
+            "reagentName": "丙酮",
+            "applicant": "钱七",
+            "quantity": 15,
+            "applicationDate": "2024-01-19",
+            "department": "化学系",
+            "purpose": "有机实验",
+            "approved": true,
+            "approver": "李老师"
+          },
+          "inventoryCheck": {
+            "found": true,
+            "currentStock": 30,
+            "requested": 15,
+            "sufficient": true
+          },
+          "hazardCheck": {
+            "found": true,
+            "hazardLevel": "高",
+            "requiresApproval": true,
+            "maxQuantity": 20
+          },
+          "approvalCheck": {
+            "approved": true,
+            "approver": "李老师"
+          },
+          "status": "passed",
+          "issues": []
+        },
+        {
+          "application": {
+            "reagentName": "甲醛",
+            "applicant": "郑十一",
+            "quantity": 50,
+            "applicationDate": "2024-01-22",
+            "department": "医学院",
+            "purpose": "消毒",
+            "approved": true,
+            "approver": "张老师"
+          },
+          "inventoryCheck": {
+            "found": false
+          },
+          "hazardCheck": {
+            "found": true,
+            "hazardLevel": "极高",
+            "requiresApproval": true,
+            "maxQuantity": 10
+          },
+          "approvalCheck": {
+            "approved": true,
+            "approver": "张老师"
+          },
+          "status": "failed",
+          "issues": [
+            {
+              "type": "inventory_not_found",
+              "message": "试剂 \"甲醛\" 在库存中未找到",
+              "suggestion": "请检查试剂名称是否正确，或先导入该试剂的库存信息"
+            },
+            {
+              "type": "quantity_exceeds_max",
+              "message": "申请数量(50)超过该危化品最大申领限额(10)",
+              "suggestion": "请将申请数量减少到 10 以下"
+            }
+          ]
+        }
+      ],
+      "timestamp": "2026-05-19T07:59:03.359Z"
+    }
+  ],
+  "errorRecords": [
+    {
+      "source": "application",
+      "rowNumber": 6,
+      "originalData": {
+        "reagentName": "",
+        "applicant": "孙八",
+        "quantity": "10",
+        "applicationDate": "2024-01-20",
+        "department": "化学系",
+        "purpose": "实验教学",
+        "approved": "true",
+        "approver": "李老师"
+      },
+      "errorType": "missing_field",
+      "errorMessage": "试剂名称不能为空",
+      "suggestion": "请填写有效的试剂名称",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:57:34.006Z"
+    },
+    {
+      "source": "application",
+      "rowNumber": 7,
+      "originalData": {
+        "reagentName": "氢氧化钠",
+        "applicant": "周九",
+        "quantity": "-5",
+        "applicationDate": "2024-01-21",
+        "department": "化学系",
+        "purpose": "酸碱实验",
+        "approved": "true",
+        "approver": "王老师"
+      },
+      "errorType": "invalid_quantity",
+      "errorMessage": "数量必须是大于0的数字",
+      "suggestion": "请修正数量为有效的正数",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:57:34.011Z"
+    },
+    {
+      "source": "application",
+      "rowNumber": 8,
+      "originalData": {
+        "reagentName": "高锰酸钾",
+        "applicant": "吴十",
+        "quantity": "3",
+        "applicationDate": "",
+        "department": "化学系",
+        "purpose": "氧化实验",
+        "approved": "true",
+        "approver": ""
+      },
+      "errorType": "missing_field",
+      "errorMessage": "申请日期不能为空",
+      "suggestion": "请填写申请日期，格式建议：YYYY-MM-DD",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:57:34.011Z"
+    },
+    {
+      "source": "inventory",
+      "rowNumber": 6,
+      "originalData": {
+        "reagentName": "",
+        "quantity": 10,
+        "unit": "瓶",
+        "location": "C栋-301室",
+        "batchNumber": "20230001",
+        "expirationDate": "2025-01-01"
+      },
+      "errorType": "missing_field",
+      "errorMessage": "试剂名称不能为空",
+      "suggestion": "请填写有效的试剂名称",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:57:46.192Z"
+    },
+    {
+      "source": "inventory",
+      "rowNumber": 7,
+      "originalData": {
+        "reagentName": "高锰酸钾",
+        "quantity": -10,
+        "unit": "瓶",
+        "location": "A栋-101室-货架2",
+        "batchNumber": "20230815",
+        "expirationDate": "2025-08-14"
+      },
+      "errorType": "invalid_quantity",
+      "errorMessage": "库存数量必须是非负数字",
+      "suggestion": "请修正数量为有效的非负数",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:57:46.195Z"
+    },
+    {
+      "source": "hazardRule",
+      "rowNumber": 9,
+      "originalData": {
+        "reagentName": "未知试剂",
+        "hazardLevel": "超级高",
+        "requiresApproval": "是",
+        "maxQuantity": 50,
+        "storageRequirements": ""
+      },
+      "errorType": "invalid_hazard_level",
+      "errorMessage": "危险等级必须是：低、中、高、极高",
+      "suggestion": "请从：低、中、高、极高 中选择一个等级",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:58:35.628Z"
+    },
+    {
+      "source": "hazardRule",
+      "rowNumber": 9,
+      "originalData": {
+        "reagentName": "未知试剂",
+        "hazardLevel": "超级高",
+        "requiresApproval": "是",
+        "maxQuantity": 50,
+        "storageRequirements": ""
+      },
+      "errorType": "invalid_type",
+      "errorMessage": "requiresApproval 必须是布尔值",
+      "suggestion": "请设置为 true 或 false",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:58:35.631Z"
+    },
+    {
+      "source": "review",
+      "rowNumber": 4,
+      "originalData": {
+        "reagentName": "盐酸",
+        "applicant": "赵六",
+        "quantity": 8,
+        "applicationDate": "2024-01-18",
+        "department": "材料系",
+        "purpose": "材料合成",
+        "approved": true,
+        "approver": "刘老师"
+      },
+      "errorType": "inventory_insufficient",
+      "errorMessage": "库存不足：当前库存 5，申请 8",
+      "suggestion": "请减少申请数量或补充库存",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:59:03.347Z"
+    },
+    {
+      "source": "review",
+      "rowNumber": 6,
+      "originalData": {
+        "reagentName": "甲醛",
+        "applicant": "郑十一",
+        "quantity": 50,
+        "applicationDate": "2024-01-22",
+        "department": "医学院",
+        "purpose": "消毒",
+        "approved": true,
+        "approver": "张老师"
+      },
+      "errorType": "inventory_not_found",
+      "errorMessage": "试剂 \"甲醛\" 在库存中未找到",
+      "suggestion": "请检查试剂名称是否正确，或先导入该试剂的库存信息",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:59:03.359Z"
+    },
+    {
+      "source": "review",
+      "rowNumber": 6,
+      "originalData": {
+        "reagentName": "甲醛",
+        "applicant": "郑十一",
+        "quantity": 50,
+        "applicationDate": "2024-01-22",
+        "department": "医学院",
+        "purpose": "消毒",
+        "approved": true,
+        "approver": "张老师"
+      },
+      "errorType": "quantity_exceeds_max",
+      "errorMessage": "申请数量(50)超过该危化品最大申领限额(10)",
+      "suggestion": "请将申请数量减少到 10 以下",
+      "resolved": false,
+      "timestamp": "2026-05-19T07:59:03.359Z"
+    }
+  ]
+}

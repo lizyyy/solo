@@ -1,0 +1,21 @@
+{
+  "name": "lab-reagent-manager",
+  "version": "1.0.0",
+  "description": "高校实验室试剂管理系统 - CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "reagent": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["laboratory", "reagent", "management", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "chalk": "^4.1.2"
+  }
+}

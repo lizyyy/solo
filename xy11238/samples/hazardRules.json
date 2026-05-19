@@ -1,0 +1,65 @@
+[
+  {
+    "reagentName": "乙醇",
+    "hazardLevel": "中",
+    "requiresApproval": false,
+    "maxQuantity": 50,
+    "storageRequirements": "通风干燥处，远离火源"
+  },
+  {
+    "reagentName": "浓硫酸",
+    "hazardLevel": "高",
+    "requiresApproval": true,
+    "maxQuantity": 20,
+    "storageRequirements": "防爆柜，与碱类隔离存放"
+  },
+  {
+    "reagentName": "蒸馏水",
+    "hazardLevel": "低",
+    "requiresApproval": false,
+    "maxQuantity": 200,
+    "storageRequirements": "常温保存"
+  },
+  {
+    "reagentName": "盐酸",
+    "hazardLevel": "高",
+    "requiresApproval": true,
+    "maxQuantity": 10,
+    "storageRequirements": "防爆柜，密封保存"
+  },
+  {
+    "reagentName": "丙酮",
+    "hazardLevel": "高",
+    "requiresApproval": true,
+    "maxQuantity": 20,
+    "storageRequirements": "防爆柜，远离氧化剂"
+  },
+  {
+    "reagentName": "氢氧化钠",
+    "hazardLevel": "中",
+    "requiresApproval": false,
+    "maxQuantity": 30,
+    "storageRequirements": "干燥密封保存"
+  },
+  {
+    "reagentName": "高锰酸钾",
+    "hazardLevel": "高",
+    "requiresApproval": true,
+    "maxQuantity": 10,
+    "storageRequirements": "避光保存，与有机物隔离"
+  },
+  {
+    "reagentName": "甲醛",
+    "hazardLevel": "极高",
+    "requiresApproval": true,
+    "maxQuantity": 10,
+    "storageRequirements": "专用防爆柜，双人双锁"
+  },
+  {
+    "reagentName": "未知试剂",
+    "hazardLevel": "超级高",
+    "requiresApproval": "是",
+    "maxQuantity": 50,
+    "storageRequirements": ""
+  }
+]
