@@ -61,7 +61,7 @@ class ReportGenerator:
                 "conflict_user_count": conflict_users,
             },
             "parse_errors": parse_errors,
-            "has_errors": failed_mapping > 0 or len(parse_errors) > 0 or total_conflicts > 0,
+            "has_errors": failed_mapping > 0 or len(parse_errors) > 0 or total_conflicts > 0 or diff_users > 0,
         })
 
     def generate_json(self, output_path: str, include_details: bool = True) -> None:
