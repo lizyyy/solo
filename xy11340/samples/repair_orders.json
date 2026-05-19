@@ -1,0 +1,64 @@
+[
+  {
+    "repairNo": "R20240501001",
+    "workOrderNo": "W20240501001",
+    "engineerId": "E001",
+    "engineerName": "张三",
+    "faultType": "压缩机损坏",
+    "faultDescription": "空调不制冷，经检查压缩机损坏",
+    "repairDate": "2024-05-01",
+    "partsUsed": [
+      { "partCode": "P001", "partName": "空调压缩机", "quantity": 1 }
+    ],
+    "oldPartsReturned": [
+      { "partCode": "P001", "partName": "空调压缩机", "quantity": 1, "returnDate": "2024-05-02", "condition": "good" }
+    ],
+    "status": "completed"
+  },
+  {
+    "repairNo": "R20240501002",
+    "workOrderNo": "W20240501002",
+    "engineerId": "E001",
+    "engineerName": "张三",
+    "faultType": "主板故障",
+    "faultDescription": "空调无法启动，主板烧坏",
+    "repairDate": "2024-05-02",
+    "partsUsed": [
+      { "partCode": "P002", "partName": "空调主板", "quantity": 1 }
+    ],
+    "oldPartsReturned": [],
+    "status": "completed"
+  },
+  {
+    "repairNo": "R20240501003",
+    "workOrderNo": "W20240502001",
+    "engineerId": "E002",
+    "engineerName": "李四",
+    "faultType": "压缩机损坏",
+    "faultDescription": "空调异响，压缩机故障",
+    "repairDate": "2024-05-03",
+    "partsUsed": [
+      { "partCode": "P001", "partName": "空调压缩机", "quantity": 1 }
+    ],
+    "oldPartsReturned": [
+      { "partCode": "P001", "partName": "空调压缩机", "quantity": 1, "returnDate": "2024-05-04", "condition": "damaged" }
+    ],
+    "status": "completed"
+  },
+  {
+    "repairNo": "R20240501004",
+    "workOrderNo": "W20240502002",
+    "engineerId": "E003",
+    "engineerName": "王五",
+    "faultType": "温控器故障",
+    "faultDescription": "冰箱不制冷，温控器损坏",
+    "repairDate": "2024-05-04",
+    "partsUsed": [
+      { "partCode": "P003", "partName": "冰箱温控器", "quantity": 1 }
+    ],
+    "oldPartsReturned": [
+      { "partCode": "P003", "partName": "冰箱温控器", "quantity": 1, "returnDate": "2024-05-05", "condition": "good" }
+    ],
+    "status": "completed"
+  }
+]

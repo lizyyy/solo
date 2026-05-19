@@ -1,0 +1,50 @@
+[
+  {
+    "ruleCode": "R001",
+    "ruleName": "空调压缩机索赔",
+    "partCode": "P001",
+    "partName": "空调压缩机",
+    "faultType": "压缩机损坏",
+    "claimAmount": 800.00,
+    "requiresOldPart": true,
+    "effectiveDate": "2024-01-01",
+    "expiryDate": "2024-12-31",
+    "status": "active"
+  },
+  {
+    "ruleCode": "R002",
+    "ruleName": "空调主板索赔",
+    "partCode": "P002",
+    "partName": "空调主板",
+    "faultType": "主板故障",
+    "claimAmount": 350.00,
+    "requiresOldPart": true,
+    "effectiveDate": "2024-01-01",
+    "expiryDate": "2024-12-31",
+    "status": "active"
+  },
+  {
+    "ruleCode": "R003",
+    "ruleName": "冰箱温控器索赔",
+    "partCode": "P003",
+    "partName": "冰箱温控器",
+    "faultType": "温控器故障",
+    "claimAmount": 120.00,
+    "requiresOldPart": true,
+    "effectiveDate": "2024-01-01",
+    "expiryDate": "2024-12-31",
+    "status": "active"
+  },
+  {
+    "ruleCode": "R004",
+    "ruleName": "洗衣机电机索赔",
+    "partCode": "P004",
+    "partName": "洗衣机电机",
+    "faultType": "电机故障",
+    "claimAmount": 450.00,
+    "requiresOldPart": false,
+    "effectiveDate": "2024-01-01",
+    "expiryDate": "2024-12-31",
+    "status": "active"
+  }
+]

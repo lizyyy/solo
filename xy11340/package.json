@@ -1,0 +1,29 @@
+{
+  "name": "warehouse-aftersales",
+  "version": "1.0.0",
+  "description": "家电售后仓库管理系统 - 领件、返修、索赔一体化",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "import:parts": "ts-node src/cli.ts import parts",
+    "import:repair": "ts-node src/cli.ts import repair",
+    "import:rules": "ts-node src/cli.ts import rules",
+    "review": "ts-node src/cli.ts review",
+    "export": "ts-node src/cli.ts export",
+    "history": "ts-node src/cli.ts history"
+  },
+  "dependencies": {
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/sqlite3": "^3.1.11",
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
