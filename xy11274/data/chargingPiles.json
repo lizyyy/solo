@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "code": "P001",
+      "name": "充电桩001",
+      "status": "available",
+      "power": 100,
+      "createdAt": "2026-05-19T10:40:32.568Z",
+      "updatedAt": "2026-05-19T10:40:32.571Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "4f1c5e15-1143-46ea-92bb-b3484b31313b"
+    },
+    {
+      "code": "P002",
+      "name": "充电桩002",
+      "status": "occupied",
+      "power": 100,
+      "createdAt": "2026-05-19T10:40:32.568Z",
+      "updatedAt": "2026-05-19T10:40:32.570Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "0f8c391a-c9b2-4639-af88-513d6c5efbeb",
+      "currentForkliftId": "f88b9c76-33f9-4c2a-b565-55f3e6422716",
+      "currentLockId": "d0b5e7ec-b10f-495b-892d-e48a527b978c"
+    }
+  ],
+  "idempotentKeys": {},
+  "savedAt": "2026-05-19T10:40:32.571Z"
+}

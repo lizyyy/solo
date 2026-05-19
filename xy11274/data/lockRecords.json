@@ -1,0 +1,49 @@
+{
+  "items": [
+    {
+      "idempotentKey": "lock-4f1c5e15-1143-46ea-92bb-b3484b31313b-d8725e13-74b8-49ea-ab10-daf375647b5d-1",
+      "chargingPileId": "4f1c5e15-1143-46ea-92bb-b3484b31313b",
+      "chargingPileCode": "P001",
+      "forkliftId": "d8725e13-74b8-49ea-ab10-daf375647b5d",
+      "forkliftCode": "F001",
+      "shiftId": "6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b",
+      "date": "2026-05-19",
+      "shiftType": "夜班",
+      "status": "released",
+      "lockTime": "2026-05-19T10:40:32.569Z",
+      "expectedReleaseTime": "2026-05-19T12:40:32.569Z",
+      "batteryLevelAtLock": 25,
+      "createdAt": "2026-05-19T10:40:32.569Z",
+      "updatedAt": "2026-05-19T10:40:32.571Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "b5f9c3c5-6255-4d36-b311-1334ef683bc0",
+      "actualReleaseTime": "2026-05-19T10:40:32.571Z",
+      "releaseReason": "充电完成，电量已恢复至85%"
+    },
+    {
+      "idempotentKey": "lock-0f8c391a-c9b2-4639-af88-513d6c5efbeb-f88b9c76-33f9-4c2a-b565-55f3e6422716-1",
+      "chargingPileId": "0f8c391a-c9b2-4639-af88-513d6c5efbeb",
+      "chargingPileCode": "P002",
+      "forkliftId": "f88b9c76-33f9-4c2a-b565-55f3e6422716",
+      "forkliftCode": "F003",
+      "shiftId": "6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b",
+      "date": "2026-05-19",
+      "shiftType": "夜班",
+      "status": "active",
+      "lockTime": "2026-05-19T10:40:32.570Z",
+      "expectedReleaseTime": "2026-05-19T12:40:32.570Z",
+      "batteryLevelAtLock": 10,
+      "createdAt": "2026-05-19T10:40:32.570Z",
+      "updatedAt": "2026-05-19T10:40:32.570Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "d0b5e7ec-b10f-495b-892d-e48a527b978c"
+    }
+  ],
+  "idempotentKeys": {
+    "lock-4f1c5e15-1143-46ea-92bb-b3484b31313b-d8725e13-74b8-49ea-ab10-daf375647b5d-1": "b5f9c3c5-6255-4d36-b311-1334ef683bc0",
+    "lock-0f8c391a-c9b2-4639-af88-513d6c5efbeb-f88b9c76-33f9-4c2a-b565-55f3e6422716-1": "d0b5e7ec-b10f-495b-892d-e48a527b978c"
+  },
+  "savedAt": "2026-05-19T10:40:32.571Z"
+}

@@ -1,0 +1,41 @@
+{
+  "items": [
+    {
+      "shiftId": "6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b",
+      "date": "2026-05-19",
+      "shiftType": "夜班",
+      "forkliftId": "d8725e13-74b8-49ea-ab10-daf375647b5d",
+      "forkliftCode": "F001",
+      "operatorName": "张师傅",
+      "taskDescription": "A区货物搬运",
+      "status": "scheduled",
+      "priority": 0,
+      "createdAt": "2026-05-19T10:40:32.570Z",
+      "updatedAt": "2026-05-19T10:40:32.570Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "d5bd8d98-960f-44c7-b3b3-82d6d9f4faa9"
+    },
+    {
+      "shiftId": "6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b",
+      "date": "2026-05-19",
+      "shiftType": "夜班",
+      "forkliftId": "a124afb6-45d3-414d-aa7c-b25142c625d6",
+      "forkliftCode": "F002",
+      "operatorName": "王师傅",
+      "taskDescription": "C区货物装卸",
+      "status": "scheduled",
+      "priority": 0,
+      "createdAt": "2026-05-19T10:40:32.571Z",
+      "updatedAt": "2026-05-19T10:40:32.571Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "65b28606-cb61-413c-8e83-43b48444cffe"
+    }
+  ],
+  "idempotentKeys": {
+    "schedule-6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b-d8725e13-74b8-49ea-ab10-daf375647b5d-1": "d5bd8d98-960f-44c7-b3b3-82d6d9f4faa9",
+    "schedule-6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b-a124afb6-45d3-414d-aa7c-b25142c625d6-1": "65b28606-cb61-413c-8e83-43b48444cffe"
+  },
+  "savedAt": "2026-05-19T10:40:32.571Z"
+}

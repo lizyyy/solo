@@ -1,0 +1,42 @@
+{
+  "items": [
+    {
+      "code": "F001",
+      "name": "叉车001",
+      "batteryLevel": 25,
+      "status": "available",
+      "createdAt": "2026-05-19T10:40:32.568Z",
+      "updatedAt": "2026-05-19T10:40:32.571Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "d8725e13-74b8-49ea-ab10-daf375647b5d",
+      "lastChargingTime": "2026-05-19T10:40:32.569Z"
+    },
+    {
+      "code": "F002",
+      "name": "叉车002",
+      "batteryLevel": 45,
+      "status": "available",
+      "createdAt": "2026-05-19T10:40:32.568Z",
+      "updatedAt": "2026-05-19T10:40:32.568Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "a124afb6-45d3-414d-aa7c-b25142c625d6"
+    },
+    {
+      "code": "F003",
+      "name": "叉车003",
+      "batteryLevel": 10,
+      "status": "charging",
+      "createdAt": "2026-05-19T10:40:32.568Z",
+      "updatedAt": "2026-05-19T10:40:32.570Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "f88b9c76-33f9-4c2a-b565-55f3e6422716",
+      "currentShift": "6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b",
+      "lastChargingTime": "2026-05-19T10:40:32.570Z"
+    }
+  ],
+  "idempotentKeys": {},
+  "savedAt": "2026-05-19T10:40:32.571Z"
+}

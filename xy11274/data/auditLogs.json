@@ -1,0 +1,223 @@
+{
+  "items": [
+    {
+      "action": "lock_acquire",
+      "entityId": "b5f9c3c5-6255-4d36-b311-1334ef683bc0",
+      "entityType": "LockRecord",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "allowed",
+      "reason": "锁定成功：低电量优先：叉车 F001 电量 25%，低于阈值 30%，享有优先级",
+      "details": {
+        "chargingPileCode": "P001",
+        "forkliftCode": "F001",
+        "batteryLevel": 25,
+        "expectedReleaseTime": "2026-05-19T12:40:32.569Z",
+        "isLowBattery": true
+      },
+      "idempotentKey": "lock-4f1c5e15-1143-46ea-92bb-b3484b31313b-d8725e13-74b8-49ea-ab10-daf375647b5d-1",
+      "createdAt": "2026-05-19T10:40:32.569Z",
+      "updatedAt": "2026-05-19T10:40:32.569Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "7941b68f-ea20-47fb-bab8-f267a514b4d0"
+    },
+    {
+      "action": "lock_acquire",
+      "entityId": "b5f9c3c5-6255-4d36-b311-1334ef683bc0",
+      "entityType": "LockRecord",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "allowed",
+      "reason": "幂等命中：已存在相同请求，返回历史结果，请求键: lock-4f1c5e15-1143-46ea-92bb-b3484b31313b-d8725e13-74b8-49ea-ab10-daf375647b5d-1",
+      "details": {
+        "idempotentKey": "lock-4f1c5e15-1143-46ea-92bb-b3484b31313b-d8725e13-74b8-49ea-ab10-daf375647b5d-1"
+      },
+      "idempotentKey": "lock-4f1c5e15-1143-46ea-92bb-b3484b31313b-d8725e13-74b8-49ea-ab10-daf375647b5d-1",
+      "createdAt": "2026-05-19T10:40:32.570Z",
+      "updatedAt": "2026-05-19T10:40:32.570Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "5234dee5-4b52-421e-8b9a-10cae8fad3ff"
+    },
+    {
+      "action": "lock_acquire",
+      "entityId": "",
+      "entityType": "LockRecord",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "blocked",
+      "reason": "充电桩已占用：P001 已被叉车 F001 锁定",
+      "details": {
+        "chargingPileId": "4f1c5e15-1143-46ea-92bb-b3484b31313b",
+        "forkliftId": "a124afb6-45d3-414d-aa7c-b25142c625d6",
+        "shiftId": "6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b"
+      },
+      "idempotentKey": "lock-4f1c5e15-1143-46ea-92bb-b3484b31313b-a124afb6-45d3-414d-aa7c-b25142c625d6-1",
+      "createdAt": "2026-05-19T10:40:32.570Z",
+      "updatedAt": "2026-05-19T10:40:32.570Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "994d38d7-e5c4-427a-b943-28dbe13a32e6"
+    },
+    {
+      "action": "lock_acquire",
+      "entityId": "d0b5e7ec-b10f-495b-892d-e48a527b978c",
+      "entityType": "LockRecord",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "allowed",
+      "reason": "锁定成功：低电量优先：叉车 F003 电量 10%，低于临界值 15%，享有最高优先级",
+      "details": {
+        "chargingPileCode": "P002",
+        "forkliftCode": "F003",
+        "batteryLevel": 10,
+        "expectedReleaseTime": "2026-05-19T12:40:32.570Z",
+        "isLowBattery": true
+      },
+      "idempotentKey": "lock-0f8c391a-c9b2-4639-af88-513d6c5efbeb-f88b9c76-33f9-4c2a-b565-55f3e6422716-1",
+      "createdAt": "2026-05-19T10:40:32.570Z",
+      "updatedAt": "2026-05-19T10:40:32.570Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "57e81f8a-0344-4171-8f32-3187e4586ed8"
+    },
+    {
+      "action": "schedule_create",
+      "entityId": "d5bd8d98-960f-44c7-b3b3-82d6d9f4faa9",
+      "entityType": "Schedule",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "allowed",
+      "reason": "排班创建成功：叉车 F001 分配给 张师傅",
+      "details": {
+        "shiftType": "夜班",
+        "taskDescription": "A区货物搬运",
+        "priority": 0
+      },
+      "idempotentKey": "schedule-6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b-d8725e13-74b8-49ea-ab10-daf375647b5d-1",
+      "createdAt": "2026-05-19T10:40:32.570Z",
+      "updatedAt": "2026-05-19T10:40:32.570Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "d9081351-6451-4e24-8fb9-2339fdd92423"
+    },
+    {
+      "action": "schedule_create",
+      "entityId": "d5bd8d98-960f-44c7-b3b3-82d6d9f4faa9",
+      "entityType": "Schedule",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "allowed",
+      "reason": "幂等命中：已存在相同排班，请求键: schedule-6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b-d8725e13-74b8-49ea-ab10-daf375647b5d-1",
+      "idempotentKey": "schedule-6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b-d8725e13-74b8-49ea-ab10-daf375647b5d-1",
+      "createdAt": "2026-05-19T10:40:32.571Z",
+      "updatedAt": "2026-05-19T10:40:32.571Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "5818b7ed-5e5b-47a1-a89a-d98b3932834e"
+    },
+    {
+      "action": "schedule_create",
+      "entityId": "",
+      "entityType": "Schedule",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "blocked",
+      "reason": "排班冲突：叉车 F001 在本班次已有排班",
+      "details": {
+        "existingScheduleId": "d5bd8d98-960f-44c7-b3b3-82d6d9f4faa9",
+        "taskDescription": "A区货物搬运"
+      },
+      "idempotentKey": "schedule-6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b-d8725e13-74b8-49ea-ab10-daf375647b5d-2",
+      "createdAt": "2026-05-19T10:40:32.571Z",
+      "updatedAt": "2026-05-19T10:40:32.571Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "5877529e-d5d7-408b-bef0-c947f9171304"
+    },
+    {
+      "action": "schedule_create",
+      "entityId": "65b28606-cb61-413c-8e83-43b48444cffe",
+      "entityType": "Schedule",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "allowed",
+      "reason": "排班创建成功：叉车 F002 分配给 王师傅",
+      "details": {
+        "shiftType": "夜班",
+        "taskDescription": "C区货物装卸",
+        "priority": 0
+      },
+      "idempotentKey": "schedule-6c3c52f4-6c74-45df-8a42-e9c8ff7e5b2b-a124afb6-45d3-414d-aa7c-b25142c625d6-1",
+      "createdAt": "2026-05-19T10:40:32.571Z",
+      "updatedAt": "2026-05-19T10:40:32.571Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "043d4d16-50c9-4467-aa70-15752f3e7530"
+    },
+    {
+      "action": "lock_release",
+      "entityId": "b5f9c3c5-6255-4d36-b311-1334ef683bc0",
+      "entityType": "LockRecord",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "allowed",
+      "reason": "释放成功：充电完成，电量已恢复至85%",
+      "details": {
+        "chargingPileCode": "P001",
+        "forkliftCode": "F001",
+        "lockDuration": "0分钟"
+      },
+      "createdAt": "2026-05-19T10:40:32.571Z",
+      "updatedAt": "2026-05-19T10:40:32.571Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "7f05bc34-cf3a-4649-a459-5ec3dbcd8853"
+    },
+    {
+      "action": "lock_release",
+      "entityId": "b5f9c3c5-6255-4d36-b311-1334ef683bc0",
+      "entityType": "LockRecord",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "blocked",
+      "reason": "锁定状态异常：当前状态为 released，无法释放",
+      "createdAt": "2026-05-19T10:40:32.571Z",
+      "updatedAt": "2026-05-19T10:40:32.571Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "4b031191-3e98-45c1-938a-0c8df6c718fb"
+    },
+    {
+      "action": "daily_report",
+      "entityType": "Report",
+      "operator": "系统管理员",
+      "role": "班长",
+      "operationResult": "allowed",
+      "reason": "日报生成成功：2026-05-19",
+      "details": {
+        "summary": {
+          "totalLocks": 2,
+          "activeLocks": 1,
+          "releasedLocks": 1,
+          "exceptionLocks": 0,
+          "totalSchedules": 2,
+          "completedSchedules": 0,
+          "cancelledSchedules": 0,
+          "pendingSchedules": 2,
+          "totalAuditLogs": 10,
+          "allowedOperations": 7,
+          "blockedOperations": 3
+        }
+      },
+      "createdAt": "2026-05-19T10:40:32.573Z",
+      "updatedAt": "2026-05-19T10:40:32.573Z",
+      "createdBy": "系统管理员",
+      "updatedBy": "系统管理员",
+      "id": "c61fc187-eb14-499a-a207-add2b3fcc2a1"
+    }
+  ],
+  "idempotentKeys": {},
+  "savedAt": "2026-05-19T10:40:32.573Z"
+}
