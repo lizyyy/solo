@@ -38,7 +38,7 @@ async def missing_field_exception_handler(request: Request, exc: MissingField):
             error_code=ErrorCode.MISSING_FIELD,
             message=f"Missing required field: {exc.field_name}",
             details={"field": exc.field_name}
-        ).dict()
+        ).model_dump(mode='json')
     )
 
 
@@ -50,7 +50,7 @@ async def invalid_status_handler(request: Request, exc: InvalidStatusTransition)
             error_code=ErrorCode.INVALID_STATUS,
             message=str(exc),
             details={}
-        ).dict()
+        ).model_dump(mode='json')
     )
 
 
@@ -62,7 +62,7 @@ async def needs_manual_review_handler(request: Request, exc: NeedsManualReview):
             error_code=ErrorCode.NEEDS_MANUAL_REVIEW,
             message=str(exc),
             details={}
-        ).dict()
+        ).model_dump(mode='json')
     )
 
 
@@ -74,7 +74,7 @@ async def already_processed_handler(request: Request, exc: AlreadyProcessed):
             error_code=ErrorCode.ALREADY_PROCESSED,
             message=str(exc),
             details={}
-        ).dict()
+        ).model_dump(mode='json')
     )
 
 
@@ -86,7 +86,7 @@ async def not_found_handler(request: Request, exc: LicenseExceptionNotFound):
             error_code=ErrorCode.NOT_FOUND,
             message=str(exc),
             details={}
-        ).dict()
+        ).model_dump(mode='json')
     )
 
 app.include_router(dependencies.router, prefix="/api/v1/dependencies", tags=["dependencies"])

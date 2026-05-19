@@ -64,7 +64,7 @@ class Dependency(DependencyBase):
     last_checked_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DependencyPathBase(BaseModel):
@@ -83,7 +83,7 @@ class DependencyPath(DependencyPathBase):
     discovered_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class LicenseBase(BaseModel):
@@ -105,7 +105,7 @@ class License(LicenseBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class LicenseExceptionBase(BaseModel):
@@ -139,7 +139,7 @@ class LicenseException(LicenseExceptionBase):
     review_notes: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class LockfileImportRequest(BaseModel):
