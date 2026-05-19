@@ -1,0 +1,30 @@
+[
+  {
+    "batch_no": "VAC2024050101",
+    "product_type": "vaccine",
+    "product_name": "新冠灭活疫苗",
+    "quantity": 200,
+    "temperature": 4.5,
+    "receiver": "张药师",
+    "is_damaged": false
+  },
+  {
+    "batch_no": "INS2024050101",
+    "product_type": "insulin",
+    "product_name": "门冬胰岛素",
+    "quantity": 100,
+    "temperature": 5.0,
+    "receiver": "李药师",
+    "is_damaged": false
+  },
+  {
+    "batch_no": "VAC2024050102",
+    "product_type": "vaccine",
+    "product_name": "乙肝疫苗",
+    "quantity": 150,
+    "temperature": 6.0,
+    "receiver": "张药师",
+    "is_damaged": true,
+    "damage_description": "运输途中外包装挤压破损"
+  }
+]
