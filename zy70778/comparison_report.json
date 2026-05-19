@@ -1,0 +1,51 @@
+{
+  "comparison_id": "comp_148cb74f5290",
+  "base_report": "baseline_v1.0",
+  "target_report": "target_v1.1",
+  "overall_conclusion": "degraded",
+  "export_time": "2024-01-01T00:00:00",
+  "scenarios": [
+    {
+      "scenario_name": "订单提交接口",
+      "base_throughput": 500.0,
+      "target_throughput": 500.0,
+      "throughput_degradation_pct": 0.0,
+      "base_p95": 100.0,
+      "target_p95": 100.0,
+      "p95_degradation_pct": 0.0,
+      "base_error_rate": 0.2,
+      "target_error_rate": 0.2,
+      "error_rate_increase_pct": 0.0,
+      "conclusion": "pass",
+      "need_manual_review": false
+    },
+    {
+      "scenario_name": "用户登录接口",
+      "base_throughput": 1000.0,
+      "target_throughput": 800.0,
+      "throughput_degradation_pct": 20.0,
+      "base_p95": 50.0,
+      "target_p95": 50.0,
+      "p95_degradation_pct": 0.0,
+      "base_error_rate": 0.1,
+      "target_error_rate": 0.1,
+      "error_rate_increase_pct": 0.0,
+      "conclusion": "degraded",
+      "need_manual_review": true
+    },
+    {
+      "scenario_name": "商品查询接口",
+      "base_throughput": 2000.0,
+      "target_throughput": 2000.0,
+      "throughput_degradation_pct": 0.0,
+      "base_p95": 30.0,
+      "target_p95": 40.0,
+      "p95_degradation_pct": 33.33,
+      "base_error_rate": 0.05,
+      "target_error_rate": 0.05,
+      "error_rate_increase_pct": 0.0,
+      "conclusion": "degraded",
+      "need_manual_review": true
+    }
+  ]
+}
