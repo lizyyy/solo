@@ -205,7 +205,11 @@ class LockfileParser:
                             break
                     if not integrity_hash:
                         integrity_hash = hashes[0]
-                registry = info.get("index", "https://pypi.org/simple")
+                index = info.get("index", "pypi")
+                if index == "pypi":
+                    registry = "https://pypi.org/simple"
+                else:
+                    registry = index
 
                 pkg = {
                     "package_name": name,

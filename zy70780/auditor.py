@@ -28,16 +28,24 @@ class HashAuditor:
                 result["error_message"] = f"Invalid integrity format: {integrity_hash}"
                 return False, PackageStatus.UNVERIFIED, result
 
-            actual_hash = None
+            actual_hashes = None
             if registry in self.registry_endpoints:
-                actual_hash, result = self._fetch_from_registry(
+                actual_hashes, result = self._fetch_from_registry(
                     package_name, version, registry, hash_type, result
                 )
 
-            result["found"] = actual_hash is not None
+            result["found"] = actual_hashes is not None and (
+                isinstance(actual_hashes, list) and len(actual_hashes) > 0 or 
+                isinstance(actual_hashes, str)
+            )
 
-            if actual_hash:
-                result["hash_match"] = actual_hash == expected_hash
+            if actual_hashes:
+                if isinstance(actual_hashes, list):
+                    result["hash_match"] = expected_hash in actual_hashes
+                    result["candidates_count"] = len(actual_hashes)
+                else:
+                    result["hash_match"] = actual_hashes == expected_hash
+                
                 if result["hash_match"]:
                     return True, PackageStatus.NORMAL, result
                 else:
@@ -100,28 +108,36 @@ class HashAuditor:
 
                 if resp.status_code == 200:
                     data = resp.json()
+                    all_digests = []
+                    
                     urls = data.get("urls", [])
                     if urls:
                         for url_info in urls:
                             digests = url_info.get("digests", {})
                             digest = digests.get(hash_type.lower())
                             if digest:
-                                return digest, result
+                                all_digests.append(digest)
                             if not digest and hash_type.lower() != "sha256":
                                 digest = digests.get("sha256")
                                 if digest:
-                                    return digest, result
+                                    all_digests.append(digest)
+                    
                     releases = data.get("releases", {}).get(version, [])
                     if releases:
                         for release in releases:
                             digests = release.get("digests", {})
                             digest = digests.get(hash_type.lower())
                             if digest:
-                                return digest, result
+                                all_digests.append(digest)
                             if not digest and hash_type.lower() != "sha256":
                                 digest = digests.get("sha256")
                                 if digest:
-                                    return digest, result
+                                    all_digests.append(digest)
+                    
+                    if all_digests:
+                        result["all_digests"] = len(all_digests)
+                        return all_digests, result
+                    
                     if not urls and not releases:
                         info = data.get("info", {})
                         if info:

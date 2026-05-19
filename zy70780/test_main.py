@@ -408,7 +408,7 @@ def test_pypi_urls_field_parsing():
             {
                 "filename": "requests-2.31.0-py3-none-any.whl",
                 "digests": {
-                    "sha256": "e6f7002f50ea85fa369c28b5201395404c2f8b469f830e0"
+                    "sha256": "a" * 64
                 }
             }
         ]
@@ -416,10 +416,12 @@ def test_pypi_urls_field_parsing():
 
     result = {}
     with patch('requests.get', return_value=mock_response):
-        actual_hash, result = auditor._fetch_from_registry(
+        actual_hashes, result = auditor._fetch_from_registry(
             "requests", "2.31.0", "https://pypi.org/simple", "sha256", result
         )
-        assert actual_hash == "e6f7002f50ea85fa369c28b5201395404c2f8b469f830e0"
+        assert isinstance(actual_hashes, list)
+        assert len(actual_hashes) == 1
+        assert "a" * 64 in actual_hashes
         assert result.get("error_message") is None
 
 
@@ -438,7 +440,7 @@ def test_verify_hash_pypi_integration():
             {
                 "filename": "requests-2.31.0-py3-none-any.whl",
                 "digests": {
-                    "sha256": "e6f7002f50ea85fa369c28b5201395404c2f8b469f830e0"
+                    "sha256": "a" * 64
                 }
             }
         ]
@@ -447,10 +449,72 @@ def test_verify_hash_pypi_integration():
     with patch('requests.get', return_value=mock_response):
         is_valid, status, result = auditor.verify_hash(
             "requests", "2.31.0",
-            "sha256:e6f7002f50ea85fa369c28b5201395404c2f8b469f830e0",
+            f"sha256:{'a' * 64}",
             "https://pypi.org/simple"
         )
         assert is_valid == True
         assert status == PackageStatus.NORMAL
         assert result.get("found") == True
         assert result.get("hash_match") == True
+
+
+def test_pypi_multiple_files_hash_match():
+    from auditor import HashAuditor
+    from unittest.mock import patch, MagicMock
+    from models import PackageStatus
+
+    auditor = HashAuditor()
+
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "info": {"name": "requests", "version": "2.31.0"},
+        "urls": [
+            {
+                "filename": "requests-2.31.0-py3-none-any.whl",
+                "digests": {"sha256": "a" * 64}  # Valid sha256 hex hash
+            },
+            {
+                "filename": "requests-2.31.0.tar.gz",
+                "digests": {"sha256": "b" * 64}  # Valid sha256 hex hash
+            }
+        ]
+    }
+
+    with patch('requests.get', return_value=mock_response):
+        is_valid, status, result = auditor.verify_hash(
+            "requests", "2.31.0",
+            f"sha256:{'b' * 64}",  # Match the sdist hash
+            "https://pypi.org/simple"
+        )
+        assert is_valid == True
+        assert status == PackageStatus.NORMAL
+        assert result.get("found") == True
+        assert result.get("hash_match") == True
+        assert result.get("candidates_count") == 2
+
+
+def test_pipfile_index_pypi_mapping():
+    from parser import LockfileParser
+
+    parser = LockfileParser()
+
+    pipfile_lock_content = json.dumps({
+        "default": {
+            "requests": {
+                "version": "==2.31.0",
+                "index": "pypi",
+                "hashes": [
+                    "sha256:e6f7002f50ea85fa369c28b5201395404c2f8b469f830e0"
+                ]
+            }
+        },
+        "develop": {}
+    })
+
+    packages, errors = parser.parse(pipfile_lock_content, "pipfile.lock")
+    assert len(errors) == 0
+    assert len(packages) == 1
+    assert packages[0]["registry"] == "https://pypi.org/simple"
+    assert packages[0]["package_name"] == "requests"
+    assert packages[0]["version"] == "2.31.0"
