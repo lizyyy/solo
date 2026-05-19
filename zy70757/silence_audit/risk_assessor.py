@@ -189,6 +189,7 @@ class RiskAssessor:
             "high_risk_count": len(high_risk_silences),
             "high_risk_silences": high_risk_silences,
             "creator_risk_summary": self._get_creator_risk_summary(),
+            "assessment_results": self.assessment_results,
         }
 
     def _get_creator_risk_summary(self) -> Dict[str, Dict[str, Any]]:

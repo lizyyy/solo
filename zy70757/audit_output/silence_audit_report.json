@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T13:58:43.721981",
+  "generated_at": "2026-05-19T19:56:25.918082",
   "invalid_items": [],
   "risk_summary": {
     "high_risk_count": 2,
@@ -199,9 +199,9 @@
           "value": "web-server"
         }
       ],
-      "risk_level": null,
-      "risk_reason": null,
-      "risk_score": null,
+      "risk_level": "MEDIUM",
+      "risk_reason": "silence already expired; no severity label in matchers (risk of broad matching)",
+      "risk_score": 60,
       "source": "test_silences.json:3",
       "starts_at": "2025-05-10T00:00:00",
       "status": "active"
@@ -252,9 +252,9 @@
           "value": "critical"
         }
       ],
-      "risk_level": null,
-      "risk_reason": null,
-      "risk_score": null,
+      "risk_level": "MEDIUM",
+      "risk_reason": "silence already expired",
+      "risk_score": 50,
       "source": "test_silences.json:1",
       "starts_at": "2025-05-15T00:00:00",
       "status": "active"

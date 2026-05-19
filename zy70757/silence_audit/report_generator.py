@@ -166,12 +166,11 @@ class ReportGenerator:
                 risk_score = ""
                 risk_reason = ""
 
-                for hr in risk_assessment.get("high_risk_silences", []):
-                    if hr["silence"].id == silence.id:
-                        risk_level = hr["risk_level"].level
-                        risk_score = hr["risk_level"].score
-                        risk_reason = hr["risk_level"].reason
-                        break
+                risk_data = risk_assessment.get("assessment_results", {}).get(silence.id, {})
+                if risk_data and risk_data.get("risk_level"):
+                    risk_level = risk_data["risk_level"].level
+                    risk_score = risk_data["risk_level"].score
+                    risk_reason = risk_data["risk_level"].reason
 
                 matchers_str = "; ".join([
                     f"{m.name}={'~' if m.is_regex else '='}{m.value}"

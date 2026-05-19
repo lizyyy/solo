@@ -41,7 +41,7 @@ silence-audit audit silences.json alerts.json -p production
 ### 仅解析静默规则文件
 
 ```bash
-silence-audit parse_silences test_silences.json
+silence-audit parse-silences test_silences.json
 ```
 
 ### 仅解析告警文件
