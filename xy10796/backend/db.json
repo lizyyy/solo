@@ -120,6 +120,21 @@
       "failedRecords": 0,
       "createdAt": "2026-05-19T18:41:29.549Z",
       "updatedAt": "2026-05-19T18:41:29.668Z"
+    },
+    {
+      "id": "bdfec393-a1e6-42fd-a9dc-12a75d5c49d9",
+      "idempotencyKey": "5873747e282d9635f8e0f09da7428113d70fa028bbda5a48cbafa4ee8364efbb",
+      "environmentId": "7f3fbe08-21f1-4d3f-9de7-20333ba9aeba",
+      "datasetId": "37269ccc-068b-43db-acd3-575e1151e73f",
+      "status": "success",
+      "importOrder": 1,
+      "retryCount": 0,
+      "maxRetries": 3,
+      "totalRecords": 0,
+      "successRecords": 0,
+      "failedRecords": 0,
+      "createdAt": "2026-05-19T19:12:42.501Z",
+      "updatedAt": "2026-05-19T19:12:42.712Z"
     }
   ],
   "seedRecords": [],

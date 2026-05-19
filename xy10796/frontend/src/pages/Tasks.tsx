@@ -12,7 +12,6 @@ import {
   Popconfirm,
   Drawer,
   Descriptions,
-  DatePicker,
   Badge,
 } from 'antd';
 import {
@@ -24,15 +23,12 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { taskApi, environmentApi, datasetApi, rollbackApi } from '../services/api';
-import { SeedTask, Environment, DatasetVersion, SeedRecord, RollbackRecord } from '../types';
-
-const { RangePicker } = DatePicker;
-const { TextArea } = Input;
+import { SeedTask, Environment, Dataset, SeedRecord, RollbackRecord } from '../types';
 
 const Tasks: React.FC = () => {
   const [tasks, setTasks] = useState<SeedTask[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
-  const [datasets, setDatasets] = useState<DatasetVersion[]>([]);
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);

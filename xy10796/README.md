@@ -212,10 +212,30 @@ pending → in_progress → completed → reviewed
 
 ## 注意事项
 
-1. 本项目使用 SQLite 作为数据库，生产环境建议切换到 PostgreSQL
+1. 本项目使用 LowDB (JSON 文件数据库)，无需编译，跨平台兼容性好
 2. 前端开发环境使用 Vite 的代理功能转发 API 请求到后端
 3. 幂等性测试脚本需要 axios 依赖，确保已安装
 4. 建议使用 Node.js 18+ 版本运行
+
+## 故障排除
+
+### 后端端口占用
+```bash
+# 查找并终止占用 3001 端口的进程
+lsof -ti:3001 | xargs kill -9
+```
+
+### TypeScript 构建错误
+```bash
+# 后端构建检查
+cd backend && ./node_modules/.bin/tsc --noEmit
+
+# 前端构建检查
+cd frontend && ./node_modules/.bin/tsc --noEmit
+```
+
+### 数据库文件
+数据库文件位于 `backend/db.json`，删除后重启服务会自动初始化
 
 ## License
 

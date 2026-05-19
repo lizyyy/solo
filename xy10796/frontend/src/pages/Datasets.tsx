@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Input, Select, message, Popconfirm, Space, InputNumber, Tag } from 'antd';
+import { Table, Button, Modal, Form, Input, Select, message, Popconfirm, Space, InputNumber } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, RocketOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { datasetApi } from '../services/api';
@@ -55,7 +55,7 @@ const Datasets: React.FC = () => {
     }
   };
 
-  const handleEdit = (record: DatasetVersion) => {
+  const handleEdit = (record: Dataset) => {
     setEditingDataset(record);
     form.setFieldsValue(record);
     setModalVisible(true);
@@ -127,7 +127,7 @@ const Datasets: React.FC = () => {
       key: 'actions',
       width: 180,
       fixed: 'right' as const,
-      render: (_: any, record: DatasetVersion) => (
+      render: (_: any, record: Dataset) => (
         <Space size="small">
           <Button icon={<EditOutlined />} size="small" onClick={() => handleEdit(record)}>
             编辑

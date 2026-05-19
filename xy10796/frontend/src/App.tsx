@@ -17,7 +17,7 @@ import Cleanup from './pages/Cleanup';
 const { Header, Sider, Content } = Layout;
 
 const App: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed] = useState(false);
   const {
     token: { colorBgContainer },
   } = theme.useToken();

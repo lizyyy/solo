@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Environment, DatasetVersion, SeedTask, CleanupStrategy, DashboardStats, TaskTrend, RollbackRecord, SeedRecord } from '../types';
+import { Environment, Dataset, SeedTask, CleanupStrategy, DashboardStats, TaskTrend, RollbackRecord, SeedRecord } from '../types';
 
 const api = axios.create({
   baseURL: '/api',
@@ -29,7 +29,7 @@ export const datasetApi = {
 export const taskApi = {
   getAll: (params?: any) => api.get<{ tasks: SeedTask[]; total: number }>('/tasks', { params }).then(res => res.data),
   getById: (id: string) => api.get<{ task: SeedTask; records: SeedRecord[]; rollbacks: RollbackRecord[] }>(`/tasks/${id}`).then(res => res.data),
-  create: (data: { environmentId: string; datasetVersionId: string; requestId?: string }) => api.post('/tasks', data),
+  create: (data: { environmentId: string; datasetId: string; requestId?: string }) => api.post('/tasks', data),
   retry: (id: string) => api.post(`/tasks/${id}/retry`),
   rollback: (id: string, reason: string) => api.post(`/tasks/${id}/rollback`, { reason }),
   export: (id: string) => api.get(`/tasks/${id}/export`, { responseType: 'blob' }),
