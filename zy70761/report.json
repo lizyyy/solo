@@ -1,0 +1,1087 @@
+{
+  "scan_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata",
+  "total_files": 4,
+  "total_variables": 17,
+  "variables_with_overrides": 7,
+  "missing_variables": 0,
+  "variable_chains": {
+    "API_KEY": {
+      "name": "API_KEY",
+      "final_value": "shell-api-key-12345",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "API_KEY",
+          "value": "shell-api-key-12345",
+          "source_type": "shell",
+          "source_level": 40,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+          "line_number": 13,
+          "raw_line": "API_KEY=shell-api-key-12345",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "API_KEY",
+        "value": "shell-api-key-12345",
+        "source_type": "shell",
+        "source_level": 40,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+        "line_number": 13,
+        "raw_line": "API_KEY=shell-api-key-12345",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "APP_DEBUG": {
+      "name": "APP_DEBUG",
+      "final_value": "true",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "APP_DEBUG",
+          "value": "false",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+          "line_number": 4,
+          "raw_line": "APP_DEBUG=false",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "APP_DEBUG",
+          "value": "true",
+          "source_type": "env",
+          "source_level": 30,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+          "line_number": 3,
+          "raw_line": "APP_DEBUG=true",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [
+        {
+          "variable_name": "APP_DEBUG",
+          "old_value": "false",
+          "new_value": "true",
+          "old_source": {
+            "name": "APP_DEBUG",
+            "value": "false",
+            "source_type": "env",
+            "source_level": 20,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+            "line_number": 4,
+            "raw_line": "APP_DEBUG=false",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "APP_DEBUG",
+            "value": "true",
+            "source_type": "env",
+            "source_level": 30,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+            "line_number": 3,
+            "raw_line": "APP_DEBUG=true",
+            "is_commented": false,
+            "is_export": false
+          }
+        }
+      ],
+      "effective_source": {
+        "name": "APP_DEBUG",
+        "value": "true",
+        "source_type": "env",
+        "source_level": 30,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+        "line_number": 3,
+        "raw_line": "APP_DEBUG=true",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "APP_ENV": {
+      "name": "APP_ENV",
+      "final_value": "compose",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "APP_ENV",
+          "value": "production",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+          "line_number": 3,
+          "raw_line": "APP_ENV=production",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "APP_ENV",
+          "value": "development",
+          "source_type": "env",
+          "source_level": 30,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+          "line_number": 2,
+          "raw_line": "APP_ENV=development",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "APP_ENV",
+          "value": "staging",
+          "source_type": "shell",
+          "source_level": 40,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+          "line_number": 4,
+          "raw_line": "export APP_ENV=staging",
+          "is_commented": false,
+          "is_export": true
+        },
+        {
+          "name": "APP_ENV",
+          "value": "compose",
+          "source_type": "compose",
+          "source_level": 50,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+          "line_number": 8,
+          "raw_line": "      APP_ENV: compose",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [
+        {
+          "variable_name": "APP_ENV",
+          "old_value": "production",
+          "new_value": "development",
+          "old_source": {
+            "name": "APP_ENV",
+            "value": "production",
+            "source_type": "env",
+            "source_level": 20,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+            "line_number": 3,
+            "raw_line": "APP_ENV=production",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "APP_ENV",
+            "value": "development",
+            "source_type": "env",
+            "source_level": 30,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+            "line_number": 2,
+            "raw_line": "APP_ENV=development",
+            "is_commented": false,
+            "is_export": false
+          }
+        },
+        {
+          "variable_name": "APP_ENV",
+          "old_value": "development",
+          "new_value": "staging",
+          "old_source": {
+            "name": "APP_ENV",
+            "value": "development",
+            "source_type": "env",
+            "source_level": 30,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+            "line_number": 2,
+            "raw_line": "APP_ENV=development",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "APP_ENV",
+            "value": "staging",
+            "source_type": "shell",
+            "source_level": 40,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+            "line_number": 4,
+            "raw_line": "export APP_ENV=staging",
+            "is_commented": false,
+            "is_export": true
+          }
+        },
+        {
+          "variable_name": "APP_ENV",
+          "old_value": "staging",
+          "new_value": "compose",
+          "old_source": {
+            "name": "APP_ENV",
+            "value": "staging",
+            "source_type": "shell",
+            "source_level": 40,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+            "line_number": 4,
+            "raw_line": "export APP_ENV=staging",
+            "is_commented": false,
+            "is_export": true
+          },
+          "new_source": {
+            "name": "APP_ENV",
+            "value": "compose",
+            "source_type": "compose",
+            "source_level": 50,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+            "line_number": 8,
+            "raw_line": "      APP_ENV: compose",
+            "is_commented": false,
+            "is_export": false
+          }
+        }
+      ],
+      "effective_source": {
+        "name": "APP_ENV",
+        "value": "compose",
+        "source_type": "compose",
+        "source_level": 50,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+        "line_number": 8,
+        "raw_line": "      APP_ENV: compose",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "APP_NAME": {
+      "name": "APP_NAME",
+      "final_value": "Docker Compose App",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "APP_NAME",
+          "value": "MyApplication",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+          "line_number": 2,
+          "raw_line": "APP_NAME=MyApplication",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "APP_NAME",
+          "value": "Shell Override App",
+          "source_type": "shell",
+          "source_level": 40,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+          "line_number": 5,
+          "raw_line": "export APP_NAME=\"Shell Override App\"",
+          "is_commented": false,
+          "is_export": true
+        },
+        {
+          "name": "APP_NAME",
+          "value": "Docker Compose App",
+          "source_type": "compose",
+          "source_level": 50,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+          "line_number": 7,
+          "raw_line": "      APP_NAME: \"Docker Compose App\"",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [
+        {
+          "variable_name": "APP_NAME",
+          "old_value": "MyApplication",
+          "new_value": "Shell Override App",
+          "old_source": {
+            "name": "APP_NAME",
+            "value": "MyApplication",
+            "source_type": "env",
+            "source_level": 20,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+            "line_number": 2,
+            "raw_line": "APP_NAME=MyApplication",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "APP_NAME",
+            "value": "Shell Override App",
+            "source_type": "shell",
+            "source_level": 40,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+            "line_number": 5,
+            "raw_line": "export APP_NAME=\"Shell Override App\"",
+            "is_commented": false,
+            "is_export": true
+          }
+        },
+        {
+          "variable_name": "APP_NAME",
+          "old_value": "Shell Override App",
+          "new_value": "Docker Compose App",
+          "old_source": {
+            "name": "APP_NAME",
+            "value": "Shell Override App",
+            "source_type": "shell",
+            "source_level": 40,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+            "line_number": 5,
+            "raw_line": "export APP_NAME=\"Shell Override App\"",
+            "is_commented": false,
+            "is_export": true
+          },
+          "new_source": {
+            "name": "APP_NAME",
+            "value": "Docker Compose App",
+            "source_type": "compose",
+            "source_level": 50,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+            "line_number": 7,
+            "raw_line": "      APP_NAME: \"Docker Compose App\"",
+            "is_commented": false,
+            "is_export": false
+          }
+        }
+      ],
+      "effective_source": {
+        "name": "APP_NAME",
+        "value": "Docker Compose App",
+        "source_type": "compose",
+        "source_level": 50,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+        "line_number": 7,
+        "raw_line": "      APP_NAME: \"Docker Compose App\"",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "APP_URL": {
+      "name": "APP_URL",
+      "final_value": "http://localhost:8080",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "APP_URL",
+          "value": "https://example.com",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+          "line_number": 5,
+          "raw_line": "APP_URL=https://example.com",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "APP_URL",
+          "value": "http://localhost:8080",
+          "source_type": "env",
+          "source_level": 30,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+          "line_number": 4,
+          "raw_line": "APP_URL=http://localhost:8080",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [
+        {
+          "variable_name": "APP_URL",
+          "old_value": "https://example.com",
+          "new_value": "http://localhost:8080",
+          "old_source": {
+            "name": "APP_URL",
+            "value": "https://example.com",
+            "source_type": "env",
+            "source_level": 20,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+            "line_number": 5,
+            "raw_line": "APP_URL=https://example.com",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "APP_URL",
+            "value": "http://localhost:8080",
+            "source_type": "env",
+            "source_level": 30,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+            "line_number": 4,
+            "raw_line": "APP_URL=http://localhost:8080",
+            "is_commented": false,
+            "is_export": false
+          }
+        }
+      ],
+      "effective_source": {
+        "name": "APP_URL",
+        "value": "http://localhost:8080",
+        "source_type": "env",
+        "source_level": 30,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+        "line_number": 4,
+        "raw_line": "APP_URL=http://localhost:8080",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "DB_HOST": {
+      "name": "DB_HOST",
+      "final_value": "compose-db",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "DB_HOST",
+          "value": "localhost",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+          "line_number": 8,
+          "raw_line": "DB_HOST=localhost",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "DB_HOST",
+          "value": "127.0.0.1",
+          "source_type": "env",
+          "source_level": 30,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+          "line_number": 7,
+          "raw_line": "DB_HOST=127.0.0.1",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "DB_HOST",
+          "value": "shell-host",
+          "source_type": "shell",
+          "source_level": 40,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+          "line_number": 9,
+          "raw_line": "export DB_HOST=shell-host",
+          "is_commented": false,
+          "is_export": true
+        },
+        {
+          "name": "DB_HOST",
+          "value": "compose-db",
+          "source_type": "compose",
+          "source_level": 50,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+          "line_number": 20,
+          "raw_line": "      DB_HOST: compose-db",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [
+        {
+          "variable_name": "DB_HOST",
+          "old_value": "localhost",
+          "new_value": "127.0.0.1",
+          "old_source": {
+            "name": "DB_HOST",
+            "value": "localhost",
+            "source_type": "env",
+            "source_level": 20,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+            "line_number": 8,
+            "raw_line": "DB_HOST=localhost",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "DB_HOST",
+            "value": "127.0.0.1",
+            "source_type": "env",
+            "source_level": 30,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+            "line_number": 7,
+            "raw_line": "DB_HOST=127.0.0.1",
+            "is_commented": false,
+            "is_export": false
+          }
+        },
+        {
+          "variable_name": "DB_HOST",
+          "old_value": "127.0.0.1",
+          "new_value": "shell-host",
+          "old_source": {
+            "name": "DB_HOST",
+            "value": "127.0.0.1",
+            "source_type": "env",
+            "source_level": 30,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+            "line_number": 7,
+            "raw_line": "DB_HOST=127.0.0.1",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "DB_HOST",
+            "value": "shell-host",
+            "source_type": "shell",
+            "source_level": 40,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+            "line_number": 9,
+            "raw_line": "export DB_HOST=shell-host",
+            "is_commented": false,
+            "is_export": true
+          }
+        },
+        {
+          "variable_name": "DB_HOST",
+          "old_value": "shell-host",
+          "new_value": "compose-db",
+          "old_source": {
+            "name": "DB_HOST",
+            "value": "shell-host",
+            "source_type": "shell",
+            "source_level": 40,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+            "line_number": 9,
+            "raw_line": "export DB_HOST=shell-host",
+            "is_commented": false,
+            "is_export": true
+          },
+          "new_source": {
+            "name": "DB_HOST",
+            "value": "compose-db",
+            "source_type": "compose",
+            "source_level": 50,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+            "line_number": 20,
+            "raw_line": "      DB_HOST: compose-db",
+            "is_commented": false,
+            "is_export": false
+          }
+        }
+      ],
+      "effective_source": {
+        "name": "DB_HOST",
+        "value": "compose-db",
+        "source_type": "compose",
+        "source_level": 50,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+        "line_number": 20,
+        "raw_line": "      DB_HOST: compose-db",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "DB_NAME": {
+      "name": "DB_NAME",
+      "final_value": "local_db",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "DB_NAME",
+          "value": "app_db",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+          "line_number": 10,
+          "raw_line": "DB_NAME=app_db",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "DB_NAME",
+          "value": "local_db",
+          "source_type": "env",
+          "source_level": 30,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+          "line_number": 9,
+          "raw_line": "DB_NAME=local_db",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [
+        {
+          "variable_name": "DB_NAME",
+          "old_value": "app_db",
+          "new_value": "local_db",
+          "old_source": {
+            "name": "DB_NAME",
+            "value": "app_db",
+            "source_type": "env",
+            "source_level": 20,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+            "line_number": 10,
+            "raw_line": "DB_NAME=app_db",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "DB_NAME",
+            "value": "local_db",
+            "source_type": "env",
+            "source_level": 30,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+            "line_number": 9,
+            "raw_line": "DB_NAME=local_db",
+            "is_commented": false,
+            "is_export": false
+          }
+        }
+      ],
+      "effective_source": {
+        "name": "DB_NAME",
+        "value": "local_db",
+        "source_type": "env",
+        "source_level": 30,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+        "line_number": 9,
+        "raw_line": "DB_NAME=local_db",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "DB_PASS": {
+      "name": "DB_PASS",
+      "final_value": "localpass",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "DB_PASS",
+          "value": "secret123",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+          "line_number": 12,
+          "raw_line": "# DB_PASS=secret123",
+          "is_commented": true,
+          "is_export": false
+        },
+        {
+          "name": "DB_PASS",
+          "value": "localpass",
+          "source_type": "env",
+          "source_level": 30,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+          "line_number": 10,
+          "raw_line": "DB_PASS=localpass",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "DB_PASS",
+        "value": "localpass",
+        "source_type": "env",
+        "source_level": 30,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+        "line_number": 10,
+        "raw_line": "DB_PASS=localpass",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "DB_PORT": {
+      "name": "DB_PORT",
+      "final_value": "3306",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "DB_PORT",
+          "value": "3306",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+          "line_number": 9,
+          "raw_line": "DB_PORT=3306",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "DB_PORT",
+          "value": "3307",
+          "source_type": "env",
+          "source_level": 30,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+          "line_number": 8,
+          "raw_line": "DB_PORT=3307",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "DB_PORT",
+          "value": "5432",
+          "source_type": "shell",
+          "source_level": 40,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+          "line_number": 10,
+          "raw_line": "export DB_PORT=5432",
+          "is_commented": false,
+          "is_export": true
+        },
+        {
+          "name": "DB_PORT",
+          "value": "3306",
+          "source_type": "compose",
+          "source_level": 50,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+          "line_number": 21,
+          "raw_line": "      DB_PORT: 3306",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [
+        {
+          "variable_name": "DB_PORT",
+          "old_value": "3306",
+          "new_value": "3307",
+          "old_source": {
+            "name": "DB_PORT",
+            "value": "3306",
+            "source_type": "env",
+            "source_level": 20,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+            "line_number": 9,
+            "raw_line": "DB_PORT=3306",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "DB_PORT",
+            "value": "3307",
+            "source_type": "env",
+            "source_level": 30,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+            "line_number": 8,
+            "raw_line": "DB_PORT=3307",
+            "is_commented": false,
+            "is_export": false
+          }
+        },
+        {
+          "variable_name": "DB_PORT",
+          "old_value": "3307",
+          "new_value": "5432",
+          "old_source": {
+            "name": "DB_PORT",
+            "value": "3307",
+            "source_type": "env",
+            "source_level": 30,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.local",
+            "line_number": 8,
+            "raw_line": "DB_PORT=3307",
+            "is_commented": false,
+            "is_export": false
+          },
+          "new_source": {
+            "name": "DB_PORT",
+            "value": "5432",
+            "source_type": "shell",
+            "source_level": 40,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+            "line_number": 10,
+            "raw_line": "export DB_PORT=5432",
+            "is_commented": false,
+            "is_export": true
+          }
+        },
+        {
+          "variable_name": "DB_PORT",
+          "old_value": "5432",
+          "new_value": "3306",
+          "old_source": {
+            "name": "DB_PORT",
+            "value": "5432",
+            "source_type": "shell",
+            "source_level": 40,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+            "line_number": 10,
+            "raw_line": "export DB_PORT=5432",
+            "is_commented": false,
+            "is_export": true
+          },
+          "new_source": {
+            "name": "DB_PORT",
+            "value": "3306",
+            "source_type": "compose",
+            "source_level": 50,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+            "line_number": 21,
+            "raw_line": "      DB_PORT: 3306",
+            "is_commented": false,
+            "is_export": false
+          }
+        }
+      ],
+      "effective_source": {
+        "name": "DB_PORT",
+        "value": "3306",
+        "source_type": "compose",
+        "source_level": 50,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+        "line_number": 21,
+        "raw_line": "      DB_PORT: 3306",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "DB_USER": {
+      "name": "DB_USER",
+      "final_value": "root",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "DB_USER",
+          "value": "root",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+          "line_number": 11,
+          "raw_line": "DB_USER=root",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "DB_USER",
+        "value": "root",
+        "source_type": "env",
+        "source_level": 20,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env",
+        "line_number": 11,
+        "raw_line": "DB_USER=root",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "LOG_LEVEL": {
+      "name": "LOG_LEVEL",
+      "final_value": "info",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "LOG_LEVEL",
+          "value": "info",
+          "source_type": "shell",
+          "source_level": 40,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+          "line_number": 6,
+          "raw_line": "export LOG_LEVEL=info",
+          "is_commented": false,
+          "is_export": true
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "LOG_LEVEL",
+        "value": "info",
+        "source_type": "shell",
+        "source_level": 40,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+        "line_number": 6,
+        "raw_line": "export LOG_LEVEL=info",
+        "is_commented": false,
+        "is_export": true
+      }
+    },
+    "MYSQL_DATABASE": {
+      "name": "MYSQL_DATABASE",
+      "final_value": "compose_db",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "MYSQL_DATABASE",
+          "value": "compose_db",
+          "source_type": "compose",
+          "source_level": 50,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+          "line_number": 18,
+          "raw_line": "      MYSQL_DATABASE: compose_db",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "MYSQL_DATABASE",
+        "value": "compose_db",
+        "source_type": "compose",
+        "source_level": 50,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+        "line_number": 18,
+        "raw_line": "      MYSQL_DATABASE: compose_db",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "MYSQL_ROOT_PASSWORD": {
+      "name": "MYSQL_ROOT_PASSWORD",
+      "final_value": "compose-pass",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "MYSQL_ROOT_PASSWORD",
+          "value": "compose-pass",
+          "source_type": "compose",
+          "source_level": 50,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+          "line_number": 17,
+          "raw_line": "      MYSQL_ROOT_PASSWORD: compose-pass",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "MYSQL_ROOT_PASSWORD",
+        "value": "compose-pass",
+        "source_type": "compose",
+        "source_level": 50,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+        "line_number": 17,
+        "raw_line": "      MYSQL_ROOT_PASSWORD: compose-pass",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "MYSQL_USER": {
+      "name": "MYSQL_USER",
+      "final_value": "compose_user",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "MYSQL_USER",
+          "value": "compose_user",
+          "source_type": "compose",
+          "source_level": 50,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+          "line_number": 19,
+          "raw_line": "      MYSQL_USER: compose_user",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "MYSQL_USER",
+        "value": "compose_user",
+        "source_type": "compose",
+        "source_level": 50,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+        "line_number": 19,
+        "raw_line": "      MYSQL_USER: compose_user",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "NGINX_HOST": {
+      "name": "NGINX_HOST",
+      "final_value": "localhost",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "NGINX_HOST",
+          "value": "localhost",
+          "source_type": "compose",
+          "source_level": 50,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+          "line_number": 9,
+          "raw_line": "      NGINX_HOST: localhost",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "NGINX_HOST",
+        "value": "localhost",
+        "source_type": "compose",
+        "source_level": 50,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+        "line_number": 9,
+        "raw_line": "      NGINX_HOST: localhost",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "NGINX_PORT": {
+      "name": "NGINX_PORT",
+      "final_value": "80",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "NGINX_PORT",
+          "value": "80",
+          "source_type": "compose",
+          "source_level": 50,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+          "line_number": 10,
+          "raw_line": "      NGINX_PORT: 80",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "NGINX_PORT",
+        "value": "80",
+        "source_type": "compose",
+        "source_level": 50,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/docker-compose.yml",
+        "line_number": 10,
+        "raw_line": "      NGINX_PORT: 80",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "SECRET_KEY": {
+      "name": "SECRET_KEY",
+      "final_value": "shell-secret-67890",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "SECRET_KEY",
+          "value": "shell-secret-67890",
+          "source_type": "shell",
+          "source_level": 40,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+          "line_number": 14,
+          "raw_line": "SECRET_KEY=shell-secret-67890",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "SECRET_KEY",
+        "value": "shell-secret-67890",
+        "source_type": "shell",
+        "source_level": 40,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/start.sh",
+        "line_number": 14,
+        "raw_line": "SECRET_KEY=shell-secret-67890",
+        "is_commented": false,
+        "is_export": false
+      }
+    }
+  },
+  "parse_errors": []
+}
