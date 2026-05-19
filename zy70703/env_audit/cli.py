@@ -105,14 +105,9 @@ pass_context = click.make_pass_decorator(Context, ensure=True)
 
 
 def output_result(ctx: Context, data: dict, human_table=None):
-    if ctx.output_format == 'json' or (ctx.quiet and not human_table):
+    if ctx.output_format == 'json' or ctx.quiet:
         click.echo(safe_json_dumps(data))
     elif human_table:
-        if 'summary' in data and data['summary']:
-            click.echo("\n=== 摘要 ===")
-            for k, v in data['summary'].items():
-                click.echo(f"  {k}: {v}")
-            click.echo("")
         click.echo(tabulate(human_table, headers='keys', tablefmt='simple'))
     else:
         click.echo(safe_json_dumps(data))
@@ -357,8 +352,15 @@ def history(ctx: Context, env_id: Optional[str], limit: int):
 def report(ctx: Context):
     """生成占用报表"""
     report_data = ctx.manager.get_occupancy_report()
+    report_data['generated_at'] = datetime.now().isoformat()
     summary = report_data['summary']
 
+    # JSON 模式或 quiet 模式：只输出纯 JSON
+    if ctx.output_format == 'json' or ctx.quiet:
+        click.echo(safe_json_dumps(report_data))
+        return
+
+    # Table 模式：输出完整人类可读报表
     click.echo(click.style("\n" + "=" * 60, fg='cyan'))
     click.echo(click.style("           预览环境占用报表", fg='cyan', bold=True))
     click.echo(click.style("=" * 60, fg='cyan'))
@@ -371,9 +373,9 @@ def report(ctx: Context):
         status_color = 'green' if env['status'] == 'available' else ('red' if env.get('is_expired') else 'yellow')
 
         table_data.append({
-            '': click.style(status_symbol, fg=status_color),
+            '状态': click.style(status_symbol, fg=status_color),
             '环境ID': env['env_id'],
-            '状态': env['status'],
+            '状态值': env['status'],
             '占用人': env['assignee'] or '-',
             '分支': env['branch'] or '-',
             '剩余': remaining
@@ -392,9 +394,6 @@ def report(ctx: Context):
     ]
     click.echo(" | ".join(summary_lines))
     click.echo("")
-
-    if ctx.output_format == 'json':
-        click.echo(json.dumps(report_data, ensure_ascii=False, indent=2, default=str))
 
 
 @cli.command()
