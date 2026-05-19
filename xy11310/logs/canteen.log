@@ -1,0 +1,8 @@
+2026-05-19 21:04:20 | INFO     | app.main:startup_event:28 - 应用启动，数据库初始化完成
+2026-05-19 21:04:34 | INFO     | app.main:startup_event:28 - 应用启动，数据库初始化完成
+2026-05-19 21:05:13 | INFO     | app.services.meal:allocate_meal:120 - 配餐成功: 32bfbeb0d4fac783ffca141caf8c29a2, 冲突数量: 1
+2026-05-19 21:05:32 | INFO     | app.services.meal:allocate_meal:61 - 配餐已存在: 32bfbeb0d4fac783ffca141caf8c29a2
+2026-05-19 21:05:44 | INFO     | app.services.meal:allocate_meal:61 - 配餐已存在: 32bfbeb0d4fac783ffca141caf8c29a2
+2026-05-19 21:05:44 | INFO     | app.services.meal:allocate_meal:120 - 配餐成功: fe33c78a34cd039220cc4093cd3043c8, 冲突数量: 1
+2026-05-19 21:05:44 | INFO     | app.services.meal:allocate_meal:120 - 配餐成功: 065cf26b1b6bd6a4305ec4c5491cb7ca, 冲突数量: 0
+2026-05-19 21:05:44 | INFO     | app.services.meal:allocate_meal:120 - 配餐成功: 5de61759f6055652866b1a0bcedb95ab, 冲突数量: 0
