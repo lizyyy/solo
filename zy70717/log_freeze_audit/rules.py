@@ -39,6 +39,11 @@ class RuleEngine:
 
         return self.result
 
+    def _get_stable_sort_key(self, record: AuditRecord) -> tuple:
+        file_path = record.source_info.file_path if record.source_info else ""
+        line_number = record.source_info.line_number if record.source_info else 0
+        return (file_path, line_number or 0, record.id)
+
     def _check_idempotency(self, records: List[AuditRecord]) -> List[AuditRecord]:
         idempotency_map: Dict[str, List[AuditRecord]] = defaultdict(list)
 
@@ -46,41 +51,46 @@ class RuleEngine:
             key = record.get_idempotency_key()
             idempotency_map[key].append(record)
 
-        valid_records = []
-        seen_keys = set()
+        for key in idempotency_map:
+            idempotency_map[key] = sorted(
+                idempotency_map[key],
+                key=self._get_stable_sort_key
+            )
 
-        for record in records:
-            key = record.get_idempotency_key()
-            if key not in seen_keys:
-                seen_keys.add(key)
-                valid_records.append(record)
-            else:
-                record_list = idempotency_map[key]
-                sorted_duplicates = sorted(record_list, key=lambda r: (r.id, id(r)))
-                primary = sorted_duplicates[0]
-                
+        valid_records = []
+        processed_keys = set()
+
+        for key, record_list in idempotency_map.items():
+            if key in processed_keys:
+                continue
+            processed_keys.add(key)
+
+            primary = record_list[0]
+            valid_records.append(primary)
+
+            for duplicate in record_list[1:]:
                 primary_source = ""
                 if primary.source_info:
                     primary_source = (
                         f"{primary.source_info.file_path}:"
                         f"{primary.source_info.line_number or 'N/A'}"
                     )
-                
+
                 duplicate_source = ""
-                if record.source_info:
+                if duplicate.source_info:
                     duplicate_source = (
-                        f"{record.source_info.file_path}:"
-                        f"{record.source_info.line_number or 'N/A'}"
+                        f"{duplicate.source_info.file_path}:"
+                        f"{duplicate.source_info.line_number or 'N/A'}"
                     )
-                
+
                 self.result.duplicates.append(
                     {
-                        "record_id": record.id,
+                        "record_id": duplicate.id,
                         "primary_id": primary.id,
                         "idempotency_key": key,
                         "primary_source": primary_source,
                         "duplicate_source": duplicate_source,
-                        "source_info": record.source_info.dict() if record.source_info else None,
+                        "source_info": duplicate.source_info.dict() if duplicate.source_info else None,
                     }
                 )
 

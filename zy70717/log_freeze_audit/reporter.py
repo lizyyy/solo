@@ -59,7 +59,7 @@ class ReportGenerator:
 
         sorted_duplicates = sorted(
             result.duplicates,
-            key=lambda x: (x["record_id"], x["primary_id"]),
+            key=lambda x: (x["primary_source"], x["duplicate_source"], x["record_id"], x["primary_id"]),
         )
 
         sorted_pending = sorted(

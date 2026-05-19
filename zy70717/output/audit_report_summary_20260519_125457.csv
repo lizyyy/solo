@@ -1,6 +1,0 @@
-﻿记录ID,操作类型,日志主题,开始时间,结束时间,冻结原因,申请人,释放条件,释放状态,审批人,审批时间,来源文件,来源行号
-F003,freeze,payment_log,2024-02-01T00:00:00,2024-02-28T23:59:59,legal,wang_wu,,,,,examples/audit_data.csv,4
-F001,freeze,user_access_log,2024-01-01T00:00:00,2024-01-31T23:59:59,complaint,zhang_san,,,,,examples/audit_data.csv,2
-R001,release,user_access_log,2024-01-01T00:00:00,2024-01-31T23:59:59,complaint,zhang_san,投诉已处理,approved,zhao_liu,2024-02-20T10:00:00,examples/audit_data.csv,5
-F002,freeze,user_access_log,2024-01-15T00:00:00,2024-02-15T23:59:59,audit,li_si,,,,,examples/audit_data.csv,3
-R002,release,user_access_log,2024-01-15T00:00:00,2024-02-15T23:59:59,audit,li_si,审计完成,pending,,,examples/audit_data.csv,6
