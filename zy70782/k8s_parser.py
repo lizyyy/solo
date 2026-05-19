@@ -81,17 +81,24 @@ class K8sResourceParser:
         has_cpu_lim = bool(cpu_lim and cpu_lim.strip())
         has_mem_lim = bool(mem_lim and mem_lim.strip())
 
-        has_requests = has_cpu_req or has_mem_req
-        has_limits = has_cpu_lim or has_mem_lim
-
         cpu_ratio = self.calculate_ratio(cpu_req, cpu_lim, is_cpu=True)
         memory_ratio = self.calculate_ratio(mem_req, mem_lim, is_cpu=False)
 
-        if not has_requests and not has_limits:
+        has_any_requests = has_cpu_req or has_mem_req
+        has_any_limits = has_cpu_lim or has_mem_lim
+        has_all_requests = has_cpu_req and has_mem_req
+        has_all_limits = has_cpu_lim and has_mem_lim
+
+        if not has_any_requests and not has_any_limits:
             return IssueType.MISSING_BOTH, cpu_ratio, memory_ratio
-        elif not has_requests:
+
+        if not has_all_requests and not has_all_limits:
+            return IssueType.MISSING_BOTH, cpu_ratio, memory_ratio
+
+        if not has_all_requests:
             return IssueType.MISSING_REQUESTS, cpu_ratio, memory_ratio
-        elif not has_limits:
+
+        if not has_all_limits:
             return IssueType.MISSING_LIMITS, cpu_ratio, memory_ratio
 
         if cpu_ratio > self.cpu_ratio_threshold or memory_ratio > self.memory_ratio_threshold:
