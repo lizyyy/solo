@@ -116,7 +116,7 @@ const updateRequestStatus = (requestId, newStatus, actor, additionalData = {}) =
   return getDeletionRequestById(requestId);
 };
 
-const executeTask = (taskId, actor, simulateSuccess = null) => {
+const executeTask = (taskId, actor, simulateSuccess = true) => {
   const task = db.execution_tasks.find(t => t.id === taskId);
   if (!task) {
     throw new Error('执行任务不存在');
@@ -139,6 +139,7 @@ const executeTask = (taskId, actor, simulateSuccess = null) => {
     processed = Math.floor(total * 0.4);
     failed = total - processed;
   } else {
+    // simulateSuccess 为 null 时，模拟部分成功（用于演示失败场景）
     processed = Math.floor(total * (0.85 + Math.random() * 0.1));
     failed = total - processed;
   }
@@ -174,6 +175,14 @@ const executeTask = (taskId, actor, simulateSuccess = null) => {
 
   failedItems.forEach(item => {
     db.failed_items.push(item);
+  });
+
+  const domain = db.data_domains.find(d => d.id === task.domain_id);
+  createAuditLog({
+    requestId: task.request_id,
+    action: `TASK_${task.status}`,
+    actor,
+    details: `任务[${domain?.name || task.domain_id}]执行完成，成功${processed}条，失败${failed}条，状态：${task.status}`
   });
 
   updateRequestOverallStatus(task.request_id);
@@ -227,6 +236,7 @@ const markRequestAsCompleted = (requestId, actor) => {
     details: '手动标记删除申请为完成'
   });
 
+  saveDatabase();
   return getDeletionRequestById(requestId);
 };
 
@@ -248,14 +258,16 @@ const retryFailedTask = (taskId, actor) => {
     .filter(f => f.task_id === taskId)
     .forEach(f => { f.status = 'RETRYING'; });
 
+  const domain = db.data_domains.find(d => d.id === task.domain_id);
   createAuditLog({
-    taskId,
-    action: 'RETRY',
+    requestId: task.request_id,
+    action: 'TASK_RETRY',
     actor,
-    details: `重试任务，当前重试次数: ${task.retry_count}`
+    details: `重试任务[${domain?.name || task.domain_id}]，当前重试次数: ${task.retry_count}`
   });
 
-  return executeTask(taskId, actor);
+  saveDatabase();
+  return executeTask(taskId, actor, true);
 };
 
 const getFailedItems = (taskId = null) => {

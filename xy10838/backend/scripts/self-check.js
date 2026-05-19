@@ -150,12 +150,9 @@ const runChecks = async () => {
   const failedTask = deletionService.executeTask(tasks2[0].id, 'executor1', false); // 强制失败
   console.log(`   ✓ 任务状态: ${failedTask.status}`);
   
-  // 重试失败任务
+  // 重试失败任务 (retryFailedTask 内部会自动重新执行，且强制成功)
   const retriedTask = deletionService.retryFailedTask(tasks2[0].id, 'operator2');
   console.log(`   ✓ 重试后状态: ${retriedTask.status}`);
-  
-  const retriedResult = deletionService.executeTask(tasks2[0].id, 'executor1', true); // 这次成功
-  console.log(`   ✓ 执行后状态: ${retriedResult.status}`);
   
   // 执行其他任务全部成功
   for (let i = 1; i < tasks2.length; i++) {

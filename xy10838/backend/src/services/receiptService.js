@@ -1,5 +1,6 @@
 const moment = require('moment');
 const { db, uuid, getNow, saveDatabase } = require('../database');
+const { createAuditLog } = require('./deletionService');
 
 const generateReceiptNo = () => {
   const dateStr = moment().format('YYYYMMDD');
@@ -68,6 +69,14 @@ const generateReceipt = (requestId, actor) => {
   };
   
   db.customer_receipts.push(receipt);
+  
+  createAuditLog({
+    requestId,
+    action: 'RECEIPT_GENERATED',
+    actor,
+    details: `生成回执 ${receiptNo}`
+  });
+  
   saveDatabase();
   return receipt;
 };
@@ -85,6 +94,15 @@ const sendReceipt = (receiptId, actor) => {
   if (receipt) {
     receipt.status = 'SENT';
     receipt.sent_at = getNow();
+    
+    createAuditLog({
+      requestId: receipt.request_id,
+      action: 'RECEIPT_SENT',
+      actor,
+      details: `回执 ${receipt.receipt_no} 已发送给客户`
+    });
+    
+    saveDatabase();
   }
   return receipt;
 };
@@ -95,6 +113,15 @@ const confirmReceipt = (receiptId, actor) => {
     receipt.status = 'CONFIRMED';
     receipt.confirmed_by = actor;
     receipt.confirmed_at = getNow();
+    
+    createAuditLog({
+      requestId: receipt.request_id,
+      action: 'RECEIPT_CONFIRMED',
+      actor,
+      details: `回执 ${receipt.receipt_no} 已被客户确认`
+    });
+    
+    saveDatabase();
   }
   return receipt;
 };
