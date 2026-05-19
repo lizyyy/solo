@@ -1,0 +1,9 @@
+$ORIGIN example.com.
+$TTL 300
+
+www     IN  A       1.1.1.1
+        IN  AAAA    ::2
+        IN  MX  10  mail.example.com.
+        IN  MX  20  mail2.example.com.
+
+api     IN  A       2.2.2.3

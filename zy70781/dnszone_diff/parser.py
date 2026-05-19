@@ -75,6 +75,13 @@ class ZoneParser:
         r"(?P<value>.+?)\s*$"
     )
     
+    RECORD_NO_NAME_RE = re.compile(
+        r"^(?:(?P<ttl>\d+)\s+)?"
+        r"(?:IN\s+)?"
+        r"(?P<type>[A-Z]+)\s+"
+        r"(?P<value>.+?)\s*$"
+    )
+    
     CONTINUATION_RE = re.compile(r"^\s*(\d+[smhdw]?)\s*$", re.IGNORECASE)
 
     def __init__(self, env: str, file_path: str):
@@ -99,11 +106,12 @@ class ZoneParser:
             lines = f.readlines()
 
         for line_num, raw_line in enumerate(lines, 1):
-            line = raw_line.strip()
+            stripped_line = raw_line.strip()
             
-            if not line or line.startswith(";"):
+            if not stripped_line or stripped_line.startswith(";"):
                 continue
 
+            is_indented = raw_line[0].isspace()
             source = SourceLocation(
                 env=self.env,
                 file_path=self.file_path,
@@ -112,7 +120,7 @@ class ZoneParser:
             )
 
             try:
-                record = self._parse_line(line, source)
+                record = self._parse_line(stripped_line, source, is_indented)
                 if record:
                     records.append(record)
             except Exception as e:
@@ -127,7 +135,7 @@ class ZoneParser:
             default_ttl=self.default_ttl,
         )
 
-    def _parse_line(self, line: str, source: SourceLocation) -> Optional[DNSRecord]:
+    def _parse_line(self, line: str, source: SourceLocation, is_indented: bool = False) -> Optional[DNSRecord]:
         if line.startswith("$ORIGIN"):
             match = self.SOI_RE.match(line)
             if match:
@@ -159,7 +167,7 @@ class ZoneParser:
                 self._multiline_sources.append(source)
                 return None
 
-        record = self._parse_record(line, source)
+        record = self._parse_record(line, source, is_indented)
         if record:
             if "(" in record.value and ")" not in record.value:
                 self._in_multiline = True
@@ -173,14 +181,24 @@ class ZoneParser:
 
         raise ValueError(f"Unrecognized line format")
 
-    def _parse_record(self, line: str, source: SourceLocation) -> Optional[DNSRecord]:
-        match = self.RECORD_RE.match(line)
+    def _parse_record(self, line: str, source: SourceLocation, is_indented: bool = False) -> Optional[DNSRecord]:
+        first_token = line.split()[0] if line.split() else ""
+        has_no_name = is_indented or first_token == "IN" or first_token.isdigit()
+        
+        if has_no_name:
+            match = self.RECORD_NO_NAME_RE.match(line)
+        else:
+            match = self.RECORD_RE.match(line)
+        
         if not match:
             return None
 
         groups = match.groupdict()
         
-        name = groups.get("name") or self.last_name or "@"
+        if has_no_name:
+            name = self.last_name or "@"
+        else:
+            name = groups.get("name") or self.last_name or "@"
         record_type = groups["type"]
         value = groups["value"].split(";")[0].strip()
         
