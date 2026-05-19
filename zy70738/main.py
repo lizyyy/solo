@@ -260,7 +260,7 @@ async def approve_exception(
             message="该记录未提交例外申请",
         )
     
-    if provenance.exception_approved:
+    if provenance.exception_approver:
         raise ProvenanceException(
             status_code=400,
             error_code="ALREADY_PROCESSED",
@@ -296,6 +296,8 @@ async def export_provenance_bundle(provenance_id: int, db: Session = Depends(get
             error_code="NOT_FOUND",
             message="镜像来源记录不存在",
         )
+    
+    os.makedirs("bundles", exist_ok=True)
     
     bundle = {
         "bundle_id": str(uuid.uuid4()),

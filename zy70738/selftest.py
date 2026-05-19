@@ -168,7 +168,7 @@ def test_approve_exception(provenance_id):
     assert data["exception_approver"] == "王五"
 
 
-@test_case("已审批例外禁止重复处理")
+@test_case("已批准例外禁止重复处理")
 def test_no_duplicate_approval(provenance_id):
     response = client.post(
         f"/api/v1/provenance/{provenance_id}/exception/approve",
@@ -177,6 +177,55 @@ def test_no_duplicate_approval(provenance_id):
     assert response.status_code == 400
     data = response.json()
     assert data["error_code"] == "ALREADY_PROCESSED"
+
+
+@test_case("创建新记录用于测试'拒绝后不能再次审批'")
+def test_create_record_for_reject_test():
+    unsigned_data = TEST_DATA.copy()
+    unsigned_data["image_tag"] = "myapp:v1.0.2"
+    unsigned_data["signature"] = None
+    unsigned_data["signer"] = None
+    response = client.post("/api/v1/provenance", json=unsigned_data)
+    assert response.status_code == 200
+    return response.json()["id"]
+
+
+@test_case("例外拒绝后禁止再次审批 - 验证幂等语义")
+def test_no_reapproval_after_reject(provenance_id):
+    # 提交例外申请
+    response = client.post(
+        f"/api/v1/provenance/{provenance_id}/exception",
+        json={"reason": "紧急发布，需要临时豁免", "requester": "李四"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "exception_pending"
+    
+    # 第一次审批：拒绝
+    response = client.post(
+        f"/api/v1/provenance/{provenance_id}/exception/approve",
+        json={"approved": False, "approver": "王五", "reason": "不符合豁免条件"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["exception_approved"] == False
+    assert data["status"] == "exception_rejected"
+    
+    # 尝试再次审批（无论批准或拒绝都应该失败）
+    response = client.post(
+        f"/api/v1/provenance/{provenance_id}/exception/approve",
+        json={"approved": True, "approver": "王五"},
+    )
+    assert response.status_code == 400
+    data = response.json()
+    assert data["error_code"] == "ALREADY_PROCESSED"
+    
+    # 尝试再次拒绝也应该失败
+    response = client.post(
+        f"/api/v1/provenance/{provenance_id}/exception/approve",
+        json={"approved": False, "approver": "其他人"},
+    )
+    assert response.status_code == 400
+    assert response.json()["error_code"] == "ALREADY_PROCESSED"
 
 
 @test_case("导出证明包")
@@ -244,6 +293,9 @@ def main():
     test_request_exception(provenance_id_2)
     test_approve_exception(provenance_id_2)
     test_no_duplicate_approval(provenance_id_2)
+    
+    provenance_id_3 = test_create_record_for_reject_test()
+    test_no_reapproval_after_reject(provenance_id_3)
     
     print_section("4. 导出功能测试")
     test_export_bundle(provenance_id_1)
