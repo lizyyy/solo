@@ -1,0 +1,19 @@
+
+[
+  {
+    "batch_id": "BATCH001",
+    "rework_reason": "右下角色差超标",
+    "rework_type": "颜色调整",
+    "rework_operator": "返工员A",
+    "rework_time": "2024-01-16 08:30:00",
+    "before_status": "ΔE=4.24, 不合格",
+    "after_status": "重新印刷后合格",
+    "is_successful": true,
+    "notes": "调整油墨配比"
+  },
+  {
+    "quality_record_id": 999,
+    "rework_reason": "测试不存在的记录",
+    "rework_type": "测试"
+  }
+]
