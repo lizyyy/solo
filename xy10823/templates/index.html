@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物流面单代理API - 总览</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-badge { font-size: 0.75rem; }
+        .card-header { background-color: #f8f9fa; }
+        .table-sm th, .table-sm td { padding: 0.5rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">物流面单代理API</span>
+            <button class="btn btn-outline-light btn-sm" onclick="initSampleData()">初始化样例数据</button>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">新建打印批次</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="batchForm">
+                            <div class="mb-3">
+                                <label class="form-label">仓库</label>
+                                <select class="form-select" id="warehouse" required>
+                                    <option value="">选择仓库</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">物流渠道</label>
+                                <select class="form-select" id="channel" required>
+                                    <option value="">选择渠道</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">面单模板</label>
+                                <select class="form-select" id="template">
+                                    <option value="">自动选择</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">订单数据</label>
+                                <textarea class="form-control" id="orderData" rows="5" placeholder='[{"order_no": "ORD001", "receiver_name": "张三", "receiver_phone": "13800138000", "receiver_address": "北京市朝阳区..."}]'></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">创建批次</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">打印批次</h5>
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadBatches()">刷新</button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>批次号</th>
+                                        <th>状态</th>
+                                        <th>总数</th>
+                                        <th>成功</th>
+                                        <th>失败</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="batchesTable">
+                                    <tr><td colspan="7" class="text-center py-3">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">面单记录</h5>
+                        <div>
+                            <select class="form-select form-select-sm d-inline" id="statusFilter" style="width: auto;" onchange="loadRecords()">
+                                <option value="">全部状态</option>
+                                <option value="created">已创建</option>
+                                <option value="generating">生成中</option>
+                                <option value="generated">已生成</option>
+                                <option value="printing">打印中</option>
+                                <option value="printed">已打印</option>
+                                <option value="failed">失败</option>
+                                <option value="exception">异常</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="exportRecords()">导出</button>
+                            <button class="btn btn-sm btn-outline-secondary ms-1" onclick="loadRecords()">刷新</button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>记录号</th>
+                                        <th>订单号</th>
+                                        <th>物流单号</th>
+                                        <th>收件人</th>
+                                        <th>状态</th>
+                                        <th>状态说明</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recordsTable">
+                                    <tr><td colspan="8" class="text-center py-3">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = '/api/v1';
+
+        function getStatusBadge(status) {
+            const badges = {
+                'pending': 'bg-secondary',
+                'processing': 'bg-info',
+                'completed': 'bg-success',
+                'partial_failed': 'bg-warning',
+                'failed': 'bg-danger',
+                'created': 'bg-secondary',
+                'generating': 'bg-info',
+                'generated': 'bg-primary',
+                'printing': 'bg-info',
+                'printed': 'bg-success',
+                'exception': 'bg-warning',
+                'cancelled': 'bg-dark'
+            };
+            const labels = {
+                'pending': '待处理',
+                'processing': '处理中',
+                'completed': '已完成',
+                'partial_failed': '部分失败',
+                'failed': '失败',
+                'created': '已创建',
+                'generating': '生成中',
+                'generated': '已生成',
+                'printing': '打印中',
+                'printed': '已打印',
+                'exception': '异常',
+                'cancelled': '已取消'
+            };
+            return `<span class="badge ${badges[status] || 'bg-secondary'} status-badge">${labels[status] || status}</span>`;
+        }
+
+        async function initSampleData() {
+            try {
+                const res = await fetch(`${API_BASE}/master-data/init`, { method: 'POST' });
+                const data = await res.json();
+                alert(data.message);
+                loadMasterData();
+            } catch (e) {
+                alert('初始化失败: ' + e.message);
+            }
+        }
+
+        async function loadMasterData() {
+            try {
+                const [warehousesRes, channelsRes] = await Promise.all([
+                    fetch(`${API_BASE}/warehouses`),
+                    fetch(`${API_BASE}/channels`)
+                ]);
+                const warehouses = await warehousesRes.json();
+                const channels = await channelsRes.json();
+
+                const warehouseSel = document.getElementById('warehouse');
+                warehouseSel.innerHTML = '<option value="">选择仓库</option>';
+                warehouses.forEach(w => {
+                    warehouseSel.innerHTML += `<option value="${w.code}">${w.name}</option>`;
+                });
+
+                const channelSel = document.getElementById('channel');
+                channelSel.innerHTML = '<option value="">选择渠道</option>';
+                channels.forEach(c => {
+                    channelSel.innerHTML += `<option value="${c.code}">${c.name}</option>`;
+                });
+
+                channelSel.onchange = async () => {
+                    const channelId = channels.find(c => c.code === channelSel.value)?.id;
+                    const templateSel = document.getElementById('template');
+                    templateSel.innerHTML = '<option value="">自动选择</option>';
+                    if (channelId) {
+                        const res = await fetch(`${API_BASE}/templates?channel_id=${channelId}`);
+                        const templates = await res.json();
+                        templates.forEach(t => {
+                            templateSel.innerHTML += `<option value="${t.code}">${t.name}</option>`;
+                        });
+                    }
+                };
+            } catch (e) {
+                console.error('加载基础数据失败', e);
+            }
+        }
+
+        async function loadBatches() {
+            try {
+                const res = await fetch(`${API_BASE}/batches`);
+                const batches = await res.json();
+                const tbody = document.getElementById('batchesTable');
+                
+                if (batches.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-3">暂无数据</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = batches.map(b => `
+                    <tr>
+                        <td><a href="/batch/${b.id}" class="text-decoration-none">${b.batch_no}</a></td>
+                        <td>${getStatusBadge(b.status)}</td>
+                        <td>${b.total_count}</td>
+                        <td>${b.success_count}</td>
+                        <td>${b.failed_count}</td>
+                        <td>${new Date(b.created_at).toLocaleString()}</td>
+                        <td>
+                            ${b.status === 'pending' ? `<button class="btn btn-sm btn-success" onclick="processBatch(${b.id})">处理</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('加载批次失败', e);
+            }
+        }
+
+        async function processBatch(batchId) {
+            try {
+                const res = await fetch(`${API_BASE}/batches/${batchId}/process`, { method: 'POST' });
+                if (res.ok) {
+                    loadBatches();
+                    loadRecords();
+                }
+            } catch (e) {
+                alert('处理批次失败: ' + e.message);
+            }
+        }
+
+        async function loadRecords() {
+            try {
+                const status = document.getElementById('statusFilter').value;
+                const url = status ? `${API_BASE}/records?status=${status}` : `${API_BASE}/records`;
+                const res = await fetch(url);
+                const records = await res.json();
+                const tbody = document.getElementById('recordsTable');
+                
+                if (records.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3">暂无数据</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = records.map(r => `
+                    <tr>
+                        <td><a href="/record/${r.id}" class="text-decoration-none">${r.record_no}</a></td>
+                        <td>${r.order_no || '-'}</td>
+                        <td>${r.tracking_no || '-'}</td>
+                        <td>${r.receiver_name || '-'}</td>
+                        <td>${getStatusBadge(r.status)}</td>
+                        <td><small>${r.status_reason || '-'}</small></td>
+                        <td>${new Date(r.created_at).toLocaleString()}</td>
+                        <td>
+                            <a href="/record/${r.id}" class="btn btn-sm btn-outline-primary">详情</a>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('加载记录失败', e);
+            }
+        }
+
+        async function exportRecords() {
+            try {
+                const status = document.getElementById('statusFilter').value;
+                const body = {};
+                if (status) body.status = status;
+                
+                const res = await fetch(`${API_BASE}/export`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'logistics_records.csv';
+                a.click();
+            } catch (e) {
+                alert('导出失败: ' + e.message);
+            }
+        }
+
+        document.getElementById('batchForm').onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const records = JSON.parse(document.getElementById('orderData').value);
+                const body = {
+                    warehouse_code: document.getElementById('warehouse').value,
+                    channel_code: document.getElementById('channel').value,
+                    template_code: document.getElementById('template').value || undefined,
+                    records: records
+                };
+                
+                const res = await fetch(`${API_BASE}/batches`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                
+                if (res.ok) {
+                    alert('批次创建成功！');
+                    document.getElementById('batchForm').reset();
+                    loadBatches();
+                } else {
+                    const err = await res.json();
+                    alert('创建失败: ' + err.detail);
+                }
+            } catch (e) {
+                alert('创建失败: ' + e.message);
+            }
+        };
+
+        loadMasterData();
+        loadBatches();
+        loadRecords();
+    </script>
+</body>
+</html>
