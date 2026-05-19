@@ -179,6 +179,10 @@ class TaskService {
       throw new Error('任务不存在');
     }
 
+    if (task.stage !== STAGES.VERIFICATION) {
+      throw new Error(`只能在验证阶段提交验证结果，当前阶段: ${task.stage}`);
+    }
+
     const now = Date.now();
     const newStatus = passed ? STATUSES.SUCCESS : STATUSES.BLOCKED;
     const reason = passed ? '验证查询通过' : '验证查询不通过，已拦截';
@@ -202,6 +206,10 @@ class TaskService {
     const task = await this.getTaskById(taskId);
     if (!task) {
       throw new Error('任务不存在');
+    }
+
+    if (task.stage !== STAGES.GRAY_RELEASE) {
+      throw new Error(`只能在灰度发布阶段调整灰度流量，当前阶段: ${task.stage}`);
     }
 
     if (percentage < 0 || percentage > 100) {
@@ -235,6 +243,11 @@ class TaskService {
 
     if (!task.current_version) {
       throw new Error('没有可回滚的版本');
+    }
+
+    const rollbackableStages = [STAGES.VERIFICATION, STAGES.GRAY_RELEASE, STAGES.FULL_SWITCH];
+    if (!rollbackableStages.includes(task.stage)) {
+      throw new Error(`不能在当前阶段回滚，必须在验证、灰度或全量切换阶段，当前阶段: ${task.stage}`);
     }
 
     const now = Date.now();
