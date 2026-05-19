@@ -1,0 +1,38 @@
+[
+  {
+    "pump_room_id": "PR-001",
+    "inspection_time": "2024-05-11T08:00:00",
+    "inspector_name": "郑十一",
+    "inspector_phone": "13100131009",
+    "water_pressure": 0.36,
+    "water_level": 2.55,
+    "pump_status": "正常",
+    "temperature": 25.8,
+    "vibration_level": "正常",
+    "remarks": "传感器自动采集"
+  },
+  {
+    "pump_room_id": "PR-002",
+    "inspection_time": "2024-05-11T09:00:00",
+    "inspector_name": "王十二",
+    "inspector_phone": "13000130010",
+    "water_pressure": 0.45,
+    "water_level": 2.7,
+    "pump_status": "告警状态",
+    "temperature": 30.0,
+    "vibration_level": "严重",
+    "remarks": "传感器告警"
+  },
+  {
+    "pump_room_id": "PR-003",
+    "inspection_time": "2024-05-11T10:00:00",
+    "inspector_name": "",
+    "inspector_phone": "12900129011",
+    "water_pressure": 0.33,
+    "water_level": 2.6,
+    "pump_status": "维修",
+    "temperature": 26.5,
+    "vibration_level": "正常",
+    "remarks": "巡检员姓名缺失"
+  }
+]
