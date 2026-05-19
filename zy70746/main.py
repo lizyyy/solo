@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 from datetime import datetime
@@ -29,12 +30,41 @@ async def startup_event():
 
 
 @app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
+async def http_exception_handler(request: Request, exc: HTTPException):
     if isinstance(exc.detail, dict) and "code" in exc.detail:
         return JSONResponse(status_code=exc.status_code, content=exc.detail)
     return JSONResponse(
         status_code=exc.status_code,
         content={"code": ErrorCode.VALIDATION_ERROR, "message": str(exc.detail)}
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    missing_fields = []
+    for error in exc.errors():
+        if error.get("type") == "missing":
+            loc = error.get("loc", [])
+            field_name = ".".join(str(x) for x in loc if x != "body")
+            missing_fields.append(field_name)
+    
+    if missing_fields:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=ErrorResponse(
+                code=ErrorCode.MISSING_FIELDS,
+                message=f"Missing required fields: {', '.join(missing_fields)}",
+                details={"missing_fields": missing_fields}
+            ).dict()
+        )
+    
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content=ErrorResponse(
+            code=ErrorCode.VALIDATION_ERROR,
+            message="Validation error",
+            details={"errors": exc.errors()}
+        ).dict()
     )
 
 
@@ -317,6 +347,7 @@ def make_decision(batch_id: str, db: Session = Depends(get_db)):
             auto_confidence=decision_result["confidence"]
         )
         db.add(decision_record)
+        db.flush()
     
     db.query(DecisionDetail).filter(DecisionDetail.decision_id == decision_record.id).delete()
     
