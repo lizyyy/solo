@@ -1,0 +1,44 @@
+[
+  {
+    "id": "B01",
+    "name": "1号集装箱泊位",
+    "maxDepth": 15.0,
+    "minDepth": 12.0,
+    "allowedCargoTypes": ["集装箱", "散货"],
+    "isAvailable": true
+  },
+  {
+    "id": "B02",
+    "name": "2号集装箱泊位",
+    "maxDepth": 16.0,
+    "minDepth": 13.0,
+    "allowedCargoTypes": ["集装箱", "散货"],
+    "isAvailable": true
+  },
+  {
+    "id": "B03",
+    "name": "3号油品泊位",
+    "maxDepth": 12.0,
+    "minDepth": 9.0,
+    "allowedCargoTypes": ["油品", "危险品"],
+    "isAvailable": true,
+    "maintenanceStart": "2026-05-28T00:00:00",
+    "maintenanceEnd": "2026-05-30T23:59:59"
+  },
+  {
+    "id": "B04",
+    "name": "4号通用泊位",
+    "maxDepth": 10.0,
+    "minDepth": 7.0,
+    "allowedCargoTypes": ["散货", "其他"],
+    "isAvailable": false
+  },
+  {
+    "id": "B05",
+    "name": "5号危险品泊位",
+    "maxDepth": 14.0,
+    "minDepth": 11.0,
+    "allowedCargoTypes": ["危险品", "油品"],
+    "isAvailable": true
+  }
+]
