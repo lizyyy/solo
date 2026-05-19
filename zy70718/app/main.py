@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -24,12 +25,60 @@ def get_db():
         db.close()
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    if not errors:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "error_code": "VALIDATION_ERROR",
+                "message": "请求参数验证失败",
+                "details": {"errors": errors}
+            }
+        )
+    
+    first_error = errors[0]
+    loc = first_error.get("loc", [])
+    msg = first_error.get("msg", "")
+    
+    if "missing" in msg.lower() or "required" in msg.lower():
+        field = loc[-1] if len(loc) > 0 else "unknown"
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error_code": "MISSING_REQUIRED_FIELD",
+                "message": f"缺少必填字段: {field}",
+                "details": {"field": field, "errors": errors}
+            }
+        )
+    
+    if "json" in msg.lower() or "parse" in msg.lower():
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error_code": "INVALID_JSON_FORMAT",
+                "message": "JSON格式解析失败",
+                "details": {"errors": errors}
+            }
+        )
+    
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error_code": "FIELD_VALIDATION_ERROR",
+            "message": f"字段验证失败: {msg}",
+            "details": {"errors": errors}
+        }
+    )
+
+
 @app.exception_handler(crud.JourneyAssetError)
 async def journey_asset_error_handler(request, exc: crud.JourneyAssetError):
     status_code = 400
     if exc.error_code == "NOT_FOUND":
         status_code = 404
-    elif exc.error_code in ["INVALID_STATUS_TRANSITION", "DELETE_NOT_ALLOWED"]:
+    elif exc.error_code in ["INVALID_STATUS_TRANSITION", "DELETE_NOT_ALLOWED", "MANUAL_REVIEW_REQUIRED"]:
         status_code = 409
     elif exc.error_code in ["ALREADY_ARCHIVED"]:
         status_code = 410
@@ -76,8 +125,31 @@ def delete_journey(journey_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/api/v1/journeys/{journey_id}/submit-review/", response_model=schemas.JourneyAssetResponse)
-def submit_for_review(journey_id: int, db: Session = Depends(get_db)):
-    return crud.submit_for_review(db=db, journey_id=journey_id)
+def submit_for_review(
+    journey_id: int,
+    require_manual: Optional[bool] = False,
+    db: Session = Depends(get_db)
+):
+    return crud.submit_for_review(db=db, journey_id=journey_id, require_manual=require_manual)
+
+
+@app.post("/api/v1/journeys/{journey_id}/approve-manual-review/", response_model=schemas.JourneyAssetResponse)
+def approve_manual_review(
+    journey_id: int,
+    reporter: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    return crud.approve_manual_review(db=db, journey_id=journey_id, reporter=reporter)
+
+
+@app.post("/api/v1/journeys/{journey_id}/reject-manual-review/", response_model=schemas.JourneyAssetResponse)
+def reject_manual_review(
+    journey_id: int,
+    reason: str,
+    reporter: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    return crud.reject_manual_review(db=db, journey_id=journey_id, reason=reason, reporter=reporter)
 
 
 @app.post("/api/v1/journeys/{journey_id}/register/", response_model=schemas.JourneyAssetResponse)

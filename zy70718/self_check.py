@@ -80,13 +80,13 @@ def test_import_journeys():
     return created_ids
 
 def test_import_validation():
-    print_info("\n=== 测试导入校验规则 ===")
+    print_info("\n=== 测试导入校验规则（统一error_code格式） ===")
     test_cases = [
         {
             "name": "缺少必填字段",
             "data": {"name": "测试", "run_frequency": "* * * * *"},
-            "expected_code": "field_required",
-            "desc": "缺少steps_definition应报错"
+            "expected_code": "MISSING_REQUIRED_FIELD",
+            "desc": "缺少steps_definition应返回统一error_code"
         },
         {
             "name": "无效JSON步骤",
@@ -110,12 +110,93 @@ def test_import_validation():
         }
     ]
 
+    all_passed = True
     for case in test_cases:
         response = requests.post(f"{BASE_URL}/journeys/", json=case['data'])
-        if response.status_code in [400, 422]:
-            print_success(f"{case['name']}: 正确返回错误")
+        data = response.json()
+        error_code = data.get('error_code', '')
+        if response.status_code in [400, 422] and 'error_code' in data:
+            print_success(f"{case['name']}: HTTP {response.status_code}, error_code={error_code}")
         else:
-            print_warning(f"{case['name']}: 状态码 {response.status_code}")
+            print_error(f"{case['name']}: 未返回统一error_code格式")
+            all_passed = False
+    return all_passed
+
+
+def test_manual_review():
+    print_info("\n=== 测试人工复核功能 ===")
+    
+    many_steps = []
+    for i in range(12):
+        many_steps.append({"step_id": f"step{i+1}", "name": f"步骤{i+1}"})
+    
+    journey_data = {
+        "name": "复杂流程巡检",
+        "description": "超过10步的复杂流程",
+        "steps_definition": json.dumps(many_steps),
+        "run_frequency": "0 */24 * * *"
+    }
+    
+    response = requests.post(f"{BASE_URL}/journeys/", json=journey_data)
+    if response.status_code != 201:
+        print_error("创建复杂旅程失败")
+        return None
+    journey_id = response.json()['id']
+    print_success(f"创建12步复杂旅程成功 (ID: {journey_id})")
+    
+    response = requests.post(f"{BASE_URL}/journeys/{journey_id}/submit-review/")
+    if response.status_code == 409:
+        data = response.json()
+        if data.get('error_code') == 'MANUAL_REVIEW_REQUIRED':
+            print_success(f"步骤>10自动触发人工复核: error_code={data.get('error_code')}")
+        else:
+            print_error(f"错误码不正确: {data.get('error_code')}")
+    else:
+        print_warning(f"状态码: {response.status_code}")
+    
+    response = requests.post(f"{BASE_URL}/journeys/{journey_id}/register/")
+    if response.status_code == 409:
+        data = response.json()
+        if data.get('error_code') == 'MANUAL_REVIEW_REQUIRED':
+            print_success(f"待人工复核时注册被正确拒绝: error_code={data.get('error_code')}")
+    
+    response = requests.post(f"{BASE_URL}/journeys/{journey_id}/approve-manual-review/", params={"reporter": "张工"})
+    if response.status_code == 200:
+        print_success("人工复核通过成功，状态变为 pending_review")
+    else:
+        print_error(f"人工复核通过失败: {response.text}")
+    
+    response = requests.post(f"{BASE_URL}/journeys/{journey_id}/register/", params={"reporter": "张工"})
+    if response.status_code == 200:
+        print_success("复核通过后注册成功")
+    
+    return journey_id
+
+
+def test_manual_review_reject():
+    print_info("\n=== 测试人工复核驳回功能 ===")
+    
+    journey_data = {
+        "name": "需要复核的旅程",
+        "steps_definition": json.dumps([{"step_id": "s1", "name": "测试步骤"}]),
+        "run_frequency": "0 */12 * * *"
+    }
+    
+    response = requests.post(f"{BASE_URL}/journeys/", json=journey_data)
+    journey_id = response.json()['id']
+    
+    response = requests.post(f"{BASE_URL}/journeys/{journey_id}/submit-review/", params={"require_manual": True})
+    if response.status_code == 409:
+        data = response.json()
+        if data.get('error_code') == 'MANUAL_REVIEW_REQUIRED':
+            print_success(f"手动标记需要人工复核成功: error_code={data.get('error_code')}")
+    
+    response = requests.post(f"{BASE_URL}/journeys/{journey_id}/reject-manual-review/", 
+                           params={"reason": "步骤定义不规范", "reporter": "李工"})
+    if response.status_code == 200:
+        print_success("人工复核驳回成功，状态变为 rejected")
+    
+    return journey_id
 
 def test_filter_journeys(journey_ids):
     print_info("\n=== 测试筛选功能 ===")
@@ -233,16 +314,52 @@ def test_export_data(journey_ids):
     print_success(f"失败样本导出成功: {export_samples}")
 
 def test_error_categories():
-    print_info("\n=== 测试错误分类响应 ===")
-
-    response = requests.get(f"{BASE_URL}/journeys/99999/")
-    if response.status_code == 404:
+    print_info("\n=== 测试完整错误分类响应 ===")
+    
+    print_info("  1. 缺字段错误 (MISSING_REQUIRED_FIELD)")
+    response = requests.post(f"{BASE_URL}/journeys/", json={"name": "测试"})
+    if response.status_code == 400:
         data = response.json()
-        print_success(f"不存在资源: HTTP 404, error_code={data.get('error_code')}")
+        if 'error_code' in data:
+            print_success(f"     缺字段错误: error_code={data.get('error_code')}")
 
-    response = requests.post(f"{BASE_URL}/journeys/99999/register/")
-    if response.status_code == 404:
-        print_success("状态不允许类错误正确处理")
+    print_info("  2. 状态不允许错误 (INVALID_STATUS_TRANSITION)")
+    response = requests.post(f"{BASE_URL}/journeys/")
+    if response.status_code in [404, 409]:
+        data = response.json()
+        if 'error_code' in data:
+            print_success(f"     状态不允许错误: error_code={data.get('error_code')}")
+        else:
+            print_success("     状态不允许类错误正确处理")
+
+    print_info("  3. 需要人工复核错误 (MANUAL_REVIEW_REQUIRED)")
+    journey_data = {
+        "name": "复核测试旅程",
+        "steps_definition": json.dumps([{"step_id": "s1", "name": "步骤1"}]),
+        "run_frequency": "0 */8 * * *"
+    }
+    response = requests.post(f"{BASE_URL}/journeys/", json=journey_data)
+    journey_id = response.json()['id']
+    response = requests.post(f"{BASE_URL}/journeys/{journey_id}/submit-review/", params={"require_manual": True})
+    if response.status_code == 409:
+        data = response.json()
+        if data.get('error_code') == 'MANUAL_REVIEW_REQUIRED':
+            print_success(f"     需要人工复核: error_code={data.get('error_code')}")
+
+    print_info("  4. 已经处理过错误 (ALREADY_ARCHIVED)")
+    sample_data = {
+        "journey_id": journey_id,
+        "sample_data": json.dumps({"error": "test"}),
+        "error_message": "测试错误"
+    }
+    response = requests.post(f"{BASE_URL}/failure-samples/", json=sample_data)
+    sample_id = response.json()['id']
+    requests.post(f"{BASE_URL}/failure-samples/{sample_id}/archive/")
+    response = requests.post(f"{BASE_URL}/failure-samples/{sample_id}/archive/")
+    if response.status_code == 410:
+        data = response.json()
+        if data.get('error_code') == 'ALREADY_ARCHIVED':
+            print_success(f"     已经处理过: error_code={data.get('error_code')}, HTTP {response.status_code}")
 
 def main():
     print_info("=" * 60)
@@ -274,6 +391,10 @@ def main():
         test_import_validation()
         test_filter_journeys(journey_ids)
         test_workflow_processing(journey_ids)
+        
+        manual_review_id = test_manual_review()
+        test_manual_review_reject()
+        
         test_failure_samples(journey_ids)
         test_registration_reports(journey_ids)
         test_export_data(journey_ids)

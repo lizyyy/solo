@@ -179,7 +179,7 @@ def update_journey_asset(db: Session, journey_id: int, journey: JourneyAssetUpda
     return db_journey
 
 
-def submit_for_review(db: Session, journey_id: int):
+def submit_for_review(db: Session, journey_id: int, require_manual: bool = False):
     db_journey = get_journey_asset(db, journey_id)
     if db_journey.status not in [JourneyStatus.DRAFT, JourneyStatus.REJECTED]:
         raise JourneyAssetError(
@@ -187,7 +187,70 @@ def submit_for_review(db: Session, journey_id: int):
             message=f"当前状态 '{db_journey.status}' 不允许提交审核",
             details={"current_status": db_journey.status, "allowed_statuses": ["draft", "rejected"]}
         )
+    
+    steps = json.loads(db_journey.steps_definition)
+    if require_manual or len(steps) > 10:
+        db_journey.status = JourneyStatus.PENDING_MANUAL_REVIEW
+        db.commit()
+        db.refresh(db_journey)
+        raise JourneyAssetError(
+            error_code="MANUAL_REVIEW_REQUIRED",
+            message="该旅程需要人工复核",
+            details={"journey_id": journey_id, "reason": "步骤数量超过10步或标记需要人工审核"}
+        )
+    
     db_journey.status = JourneyStatus.PENDING_REVIEW
+    db.commit()
+    db.refresh(db_journey)
+    return db_journey
+
+
+def approve_manual_review(db: Session, journey_id: int, reporter: str = None):
+    db_journey = get_journey_asset(db, journey_id)
+    if db_journey.status != JourneyStatus.PENDING_MANUAL_REVIEW:
+        raise JourneyAssetError(
+            error_code="INVALID_STATUS_TRANSITION",
+            message=f"只有待人工复核状态的旅程才能通过复核，当前状态: '{db_journey.status}'",
+            details={"current_status": db_journey.status, "required_status": "pending_manual_review"}
+        )
+    db_journey.status = JourneyStatus.PENDING_REVIEW
+    
+    report = RegistrationReport(
+        journey_id=journey_id,
+        report_content=json.dumps({
+            "action": "manual_review_approved",
+            "journey_name": db_journey.name,
+            "approved_at": datetime.utcnow().isoformat()
+        }, ensure_ascii=False),
+        reporter=reporter or "system"
+    )
+    db.add(report)
+    db.commit()
+    db.refresh(db_journey)
+    return db_journey
+
+
+def reject_manual_review(db: Session, journey_id: int, reason: str, reporter: str = None):
+    db_journey = get_journey_asset(db, journey_id)
+    if db_journey.status != JourneyStatus.PENDING_MANUAL_REVIEW:
+        raise JourneyAssetError(
+            error_code="INVALID_STATUS_TRANSITION",
+            message=f"只有待人工复核状态的旅程才能驳回复核，当前状态: '{db_journey.status}'",
+            details={"current_status": db_journey.status, "required_status": "pending_manual_review"}
+        )
+    db_journey.status = JourneyStatus.REJECTED
+    
+    report = RegistrationReport(
+        journey_id=journey_id,
+        report_content=json.dumps({
+            "action": "manual_review_rejected",
+            "journey_name": db_journey.name,
+            "reason": reason,
+            "rejected_at": datetime.utcnow().isoformat()
+        }, ensure_ascii=False),
+        reporter=reporter or "system"
+    )
+    db.add(report)
     db.commit()
     db.refresh(db_journey)
     return db_journey
@@ -195,6 +258,12 @@ def submit_for_review(db: Session, journey_id: int):
 
 def register_journey(db: Session, journey_id: int, reporter: str = None):
     db_journey = get_journey_asset(db, journey_id)
+    if db_journey.status == JourneyStatus.PENDING_MANUAL_REVIEW:
+        raise JourneyAssetError(
+            error_code="MANUAL_REVIEW_REQUIRED",
+            message="该旅程需要先完成人工复核才能注册",
+            details={"journey_id": journey_id, "current_status": db_journey.status}
+        )
     if db_journey.status != JourneyStatus.PENDING_REVIEW:
         raise JourneyAssetError(
             error_code="INVALID_STATUS_TRANSITION",

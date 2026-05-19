@@ -9,6 +9,7 @@ from app.database import Base
 class JourneyStatus(str, enum.Enum):
     DRAFT = "draft"
     PENDING_REVIEW = "pending_review"
+    PENDING_MANUAL_REVIEW = "pending_manual_review"
     REGISTERED = "registered"
     ARCHIVED = "archived"
     REJECTED = "rejected"
