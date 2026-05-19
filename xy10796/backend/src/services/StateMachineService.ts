@@ -163,7 +163,7 @@ export class StateMachineService {
       const rollback = db.data.rollbackRecords.find(r => r.id === rollbackRecordId);
       if (rollback) {
         rollback.rolledBackRecords = rolledBackCount;
-        rollback.status = RollbackStatus.COMPLETED;
+        rollback.status = RollbackStatus.PENDING;
         rollback.completedAt = new Date().toISOString();
         rollback.updatedAt = new Date().toISOString();
       }

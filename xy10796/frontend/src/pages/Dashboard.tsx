@@ -48,7 +48,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: '数据集',
-      dataIndex: ['DatasetVersion', 'name'],
+      dataIndex: ['Dataset', 'name'],
       key: 'dataset',
     },
     {
