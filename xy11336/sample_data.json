@@ -1,0 +1,20 @@
+{
+  "comment": "示例数据文件 - 用于测试完整流程",
+  "receive_parts": [
+    {"part_code": "COM001", "part_name": "压缩机", "quantity": 10},
+    {"part_code": "MOT001", "part_name": "电机", "quantity": 15},
+    {"part_code": "PCB001", "part_name": "控制板", "quantity": 20}
+  ],
+  "batch_operations": [
+    {
+      "operation_type": "receive",
+      "operation_id": "BATCH_REC_001",
+      "parts": [{"part_code": "BAT001", "part_name": "电池", "quantity": 50}]
+    },
+    {
+      "operation_type": "receive",
+      "operation_id": "BATCH_REC_002",
+      "parts": [{"part_code": "SEN001", "part_name": "温度传感器", "quantity": 100}]
+    }
+  ]
+}
