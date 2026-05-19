@@ -1,0 +1,134 @@
+================================================================================
+JSON Schema 测试样本报告 - user_schema
+生成时间: 2026-05-19 15:25:40
+================================================================================
+
+📊 统计汇总
+----------------------------------------
+  总样本数: 23
+  正常样本 (valid): 1
+  边界样本 (boundary): 6
+  非法样本 (invalid): 13
+  边缘案例 (edge_case): 3
+
+📁 目录结构
+----------------------------------------
+  valid/      - 正常输入样本
+  boundary/   - 边界条件样本
+  invalid/    - 非法输入样本（脏数据）
+  edge_case/  - 边缘案例（空值、冲突等）
+  index.json  - 机器可读索引文件
+  report.txt  - 本报告文件
+
+🔍 样本索引
+--------------------------------------------------------------------------------
+  1. ✅ [valid   ] valid_3ac43b08
+     说明: Valid sample
+     文件: valid/valid_3ac43b08.json
+
+  2. ⚠️ [boundary] boundary_username_minlen_90b8aa1f
+     字段: username
+     说明: String at minimum length 3
+     文件: boundary/boundary_username_minlen_90b8aa1f.json
+
+  3. ⚠️ [boundary] boundary_username_maxlen_06b5c6ed
+     字段: username
+     说明: String at maximum length 20
+     文件: boundary/boundary_username_maxlen_06b5c6ed.json
+
+  4. ⚠️ [boundary] boundary_age_min_82f4e3fc
+     字段: age
+     说明: Number at minimum value 18
+     文件: boundary/boundary_age_min_82f4e3fc.json
+
+  5. ⚠️ [boundary] boundary_age_max_6ed22e93
+     字段: age
+     说明: Number at maximum value 120
+     文件: boundary/boundary_age_max_6ed22e93.json
+
+  6. ⚠️ [boundary] boundary_tags_minitems_d709db05
+     字段: tags
+     说明: Array at minimum items 0
+     文件: boundary/boundary_tags_minitems_d709db05.json
+
+  7. ⚠️ [boundary] boundary_tags_maxitems_607dff36
+     字段: tags
+     说明: Array at maximum items 10
+     文件: boundary/boundary_tags_maxitems_607dff36.json
+
+  8. ❌ [invalid ] invalid_username_short_04b08a59
+     字段: username
+     说明: String too short: length 2 < minLength 3
+     文件: invalid/invalid_username_short_04b08a59.json
+
+  9. ❌ [invalid ] invalid_username_long_029fa86a
+     字段: username
+     说明: String too long: length 21 > maxLength 20
+     文件: invalid/invalid_username_long_029fa86a.json
+
+ 10. ❌ [invalid ] invalid_username_type_2948f6ef
+     字段: username
+     说明: Type mismatch: expected string, got int
+     文件: invalid/invalid_username_type_2948f6ef.json
+
+ 11. ❌ [invalid ] invalid_email_type_ae1c5bed
+     字段: email
+     说明: Type mismatch: expected string, got int
+     文件: invalid/invalid_email_type_ae1c5bed.json
+
+ 12. ❌ [invalid ] invalid_age_under_ff8aa384
+     字段: age
+     说明: Number below minimum: 17 < 18
+     文件: invalid/invalid_age_under_ff8aa384.json
+
+ 13. ❌ [invalid ] invalid_age_over_b0b92b6e
+     字段: age
+     说明: Number above maximum: 121 > 120
+     文件: invalid/invalid_age_over_b0b92b6e.json
+
+ 14. ❌ [invalid ] invalid_age_type_24ff92cc
+     字段: age
+     说明: Type mismatch: expected integer, got str
+     文件: invalid/invalid_age_type_24ff92cc.json
+
+ 15. ❌ [invalid ] invalid_status_enum_c7c44ba3
+     字段: status
+     说明: Value not in enum: ['active', 'inactive', 'pending']
+     文件: invalid/invalid_status_enum_c7c44ba3.json
+
+ 16. ❌ [invalid ] invalid_status_type_92d2b523
+     字段: status
+     说明: Type mismatch: expected string, got int
+     文件: invalid/invalid_status_type_92d2b523.json
+
+ 17. ❌ [invalid ] invalid_tags_type_97dc96a5
+     字段: tags
+     说明: Type mismatch: expected array, got str
+     文件: invalid/invalid_tags_type_97dc96a5.json
+
+ 18. ❌ [invalid ] invalid_missing_username_179f3a44
+     字段: username
+     说明: Missing required field 'username'
+     文件: invalid/invalid_missing_username_179f3a44.json
+
+ 19. ❌ [invalid ] invalid_missing_email_9d66c382
+     字段: email
+     说明: Missing required field 'email'
+     文件: invalid/invalid_missing_email_9d66c382.json
+
+ 20. ❌ [invalid ] invalid_missing_age_04c1fa67
+     字段: age
+     说明: Missing required field 'age'
+     文件: invalid/invalid_missing_age_04c1fa67.json
+
+ 21. 🔲 [edge_case] edge_empty
+     说明: Empty object
+     文件: edge_case/edge_empty.json
+
+ 22. 🔲 [edge_case] edge_null
+     说明: Null value
+     文件: edge_case/edge_null.json
+
+ 23. 🔲 [edge_case] edge_all_null
+     说明: All fields set to null
+     文件: edge_case/edge_all_null.json
