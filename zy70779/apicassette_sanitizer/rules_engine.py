@@ -158,13 +158,13 @@ class RulesEngine:
             ),
             (
                 "password",
-                r'"password"\s*:\s*"(?!.*_MASKED_)([^"]{4,})"',
+                r'"password"\s*:\s*"((?![^"]*_MASKED_)[^"]{4,})"',
                 self.masker.mask_generic,
                 1
             ),
             (
                 "secret",
-                r'"secret"\s*:\s*"(?!.*_MASKED_)([^"]{4,})"',
+                r'"secret"\s*:\s*"((?![^"]*_MASKED_)[^"]{4,})"',
                 self.masker.mask_generic,
                 1
             ),

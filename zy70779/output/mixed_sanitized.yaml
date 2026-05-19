@@ -1,0 +1,33 @@
+interactions:
+- request:
+    body:
+      string: '{"password":"GENERIC_MASKED_13a90cf9","token":"TOKEN_MASKED_abcd1234"}'
+    headers:
+      Content-Type:
+      - application/json
+    method: POST
+    uri: https://api.example.com/login
+  response:
+    body:
+      string: '{"secret":"GENERIC_MASKED_4196d0a1","masked":"GENERIC_MASKED_xyz123"}'
+    headers:
+      Content-Type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body:
+      string: '{"token":"TOKEN_MASKED_9999","password":"GENERIC_MASKED_3f590ed4","secret":"GENERIC_MASKED_d4c62f7e"}'
+    headers: {}
+    method: POST
+    uri: https://api.example.com/verify
+  response:
+    body:
+      string: '{"status":"ok"}'
+    headers:
+      Content-Type:
+      - application/json
+    status:
+      code: 200
+      message: OK

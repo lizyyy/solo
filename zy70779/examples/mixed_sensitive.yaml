@@ -1,0 +1,34 @@
+interactions:
+  - request:
+      method: POST
+      uri: https://api.example.com/login
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: '{"password":"mysecret12345","token":"TOKEN_MASKED_abcd1234"}'
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: '{"secret":"REAL_SECRET_VALUE","masked":"GENERIC_MASKED_xyz123"}'
+
+  - request:
+      method: POST
+      uri: https://api.example.com/verify
+      headers: {}
+      body:
+        string: '{"token":"TOKEN_MASKED_9999","password":"plain_password_here","secret":"plain_secret_here"}'
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: '{"status":"ok"}'
