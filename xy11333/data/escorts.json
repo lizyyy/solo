@@ -1,0 +1,47 @@
+[
+  {
+    "employeeId": "E001",
+    "name": "张三",
+    "phone": "13800138001",
+    "department": "门诊一部",
+    "shiftStart": "08:00",
+    "shiftEnd": "17:00",
+    "maxTaskCount": 8,
+    "skills": ["CT检查", "MRI检查", "超声检查"]
+  },
+  {
+    "employeeId": "E002",
+    "name": "李四",
+    "phone": "13800138002",
+    "department": "门诊一部",
+    "shiftStart": "08:00",
+    "shiftEnd": "17:00",
+    "maxTaskCount": 6,
+    "skills": ["X光检查", "CT检查", "抽血"]
+  },
+  {
+    "employeeId": "E003",
+    "name": "王五",
+    "phone": "13800138003",
+    "department": "门诊二部",
+    "shiftStart": "09:00",
+    "shiftEnd": "18:00",
+    "maxTaskCount": 7,
+    "skills": ["心电图", "超声检查", "内科陪检"]
+  },
+  {
+    "employeeId": "E004",
+    "name": "赵六",
+    "phone": "invalid-phone",
+    "department": "门诊二部",
+    "shiftStart": "08:30",
+    "shiftEnd": "17:30",
+    "maxTaskCount": 5,
+    "skills": ["CT检查", "MRI检查"]
+  },
+  {
+    "name": "数据缺失测试",
+    "phone": "13800138005",
+    "department": "门诊三部"
+  }
+]

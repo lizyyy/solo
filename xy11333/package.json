@@ -1,0 +1,26 @@
+{
+  "name": "outpatient-desk-ledger",
+  "version": "1.0.0",
+  "description": "门诊服务台台账系统 - 陪检任务管理",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node src/test.ts",
+    "lint": "eslint src/**/*.ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "csv-parser": "^3.0.0",
+    "date-fns": "^3.0.6",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^20.10.6",
+    "@types/uuid": "^9.0.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
