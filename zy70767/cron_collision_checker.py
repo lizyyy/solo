@@ -35,7 +35,7 @@ class CronParser:
         self.field_names = ['minute', 'hour', 'day', 'month', 'weekday']
     
     def _parse_field(self, field: str, min_val: int, max_val: int, name_map: Optional[Dict] = None) -> Set[int]:
-        """解析单个cron字段"""
+        """解析单个cron字段，严格验证所有值在合法范围内"""
         result = set()
         
         if name_map:
@@ -46,26 +46,44 @@ class CronParser:
         if field == '*':
             return set(range(min_val, max_val + 1))
         
+        def _check_range(value: int, desc: str = ""):
+            """检查值是否在合法范围内，越界则抛出异常"""
+            if not (min_val <= value <= max_val):
+                raise ValueError(f"值 {value} {desc}超出范围 [{min_val}, {max_val}]")
+        
         for part in field.split(','):
             if '-' in part and '/' not in part:
                 start, end = map(int, part.split('-'))
+                _check_range(start, "范围起始值")
+                _check_range(end, "范围结束值")
+                if start > end:
+                    raise ValueError(f"范围起始值 {start} 大于结束值 {end}")
                 result.update(range(start, end + 1))
             elif '/' in part:
                 base, step = part.split('/')
                 step = int(step)
+                if step <= 0:
+                    raise ValueError(f"步长必须为正整数: {step}")
                 if base == '*':
                     start = min_val
                     end = max_val
                 elif '-' in base:
                     start, end = map(int, base.split('-'))
+                    _check_range(start, "范围起始值")
+                    _check_range(end, "范围结束值")
+                    if start > end:
+                        raise ValueError(f"范围起始值 {start} 大于结束值 {end}")
                 else:
                     start = int(base)
+                    _check_range(start, "起始值")
                     end = max_val
                 result.update(range(start, end + 1, step))
             else:
-                result.add(int(part))
+                value = int(part)
+                _check_range(value, "单值")
+                result.add(value)
         
-        return {v for v in result if min_val <= v <= max_val}
+        return result
     
     def parse(self, cron_expr: str) -> Dict[str, Set[int]]:
         """解析cron表达式，返回各字段的取值集合"""

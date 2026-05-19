@@ -20,8 +20,8 @@
       "task_id": "task_002",
       "cron_expr": "0 * * * *",
       "resource_tags": [
-        "api:external",
-        "database:mysql"
+        "database:mysql",
+        "api:external"
       ]
     },
     {
