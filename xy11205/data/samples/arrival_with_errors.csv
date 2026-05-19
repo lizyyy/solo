@@ -1,0 +1,7 @@
+batch_number,product_type,product_name,quantity,arrival_date,receiver,signature,damage_status,damage_description
+VAC-2024-004,vaccine,肺炎疫苗,350,2024-01-20 08:30:00,赵药师,Zhao_006,none,
+,invalid_type,错误产品类型,200,2024-01-21 09:00:00,孙药师,Sun_007,none,
+VAC-2024-005,vaccine,水痘疫苗,-50,2024-01-22 10:00:00,周药师,Zhou_008,none,
+VAC-2024-006,vaccine,带状疱疹疫苗,,invalid_date,吴药师,Wu_009,none,
+,,缺少必填字段,100,2024-01-24 12:00:00,郑药师,Zheng_011,none,
+INS-2024-003,insulin,赖脯胰岛素注射液,80,2024-01-25 09:30:00,冯药师,Feng_012,none,

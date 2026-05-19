@@ -1,0 +1,28 @@
+{
+  "name": "pharmacy-inventory-system",
+  "version": "1.0.0",
+  "description": "社区药房疫苗和胰岛素到货管理系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "import:arrival": "node src/scripts/importArrival.js",
+    "import:temperature": "node src/scripts/importTemperature.js",
+    "import:photos": "node src/scripts/importPhotos.js",
+    "review": "node src/scripts/review.js",
+    "export": "node src/scripts/export.js",
+    "history": "node src/scripts/history.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "dayjs": "^1.11.10",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "MIT"
+}
