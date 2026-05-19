@@ -1,0 +1,18 @@
+{
+  "fixture_id": "fixture_20260519_081504_2679b897",
+  "status": "recorded",
+  "request_method": "POST",
+  "request_url": "https://example.com/webhook",
+  "timestamp": "2026-05-19T08:15:04.925438",
+  "handler": "tester",
+  "created_at": "2026-05-19T08:15:04.927602",
+  "updated_at": "2026-05-19T08:15:04.927606",
+  "fixture_directory": "fixtures/fixture_20260519_081504_2679b897",
+  "signature_headers": {
+    "X-Signature": "sha256=abc123def456",
+    "X-Timestamp": "1620000000"
+  },
+  "payload_hash": "f0016b8b2fcdbd47337f1585589d5b34bffe57def0727c7485948c8bf6e7aaf3",
+  "exceptions_count": 0,
+  "exceptions": []
+}
