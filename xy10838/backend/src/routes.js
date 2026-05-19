@@ -55,10 +55,20 @@ router.put('/requests/:id/status', (req, res) => {
   }
 });
 
-router.post('/tasks/:id/execute', (req, res) => {
+router.put('/requests/:id/mark-completed', (req, res) => {
   try {
     const { actor } = req.body;
-    const result = deletionService.executeTask(req.params.id, actor);
+    const result = deletionService.markRequestAsCompleted(req.params.id, actor);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/tasks/:id/execute', (req, res) => {
+  try {
+    const { actor, simulateSuccess } = req.body;
+    const result = deletionService.executeTask(req.params.id, actor, simulateSuccess);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });

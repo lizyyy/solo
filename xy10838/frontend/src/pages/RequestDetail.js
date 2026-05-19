@@ -92,6 +92,19 @@ function RequestDetail() {
     }
   };
 
+  const markAsCompleted = async () => {
+    try {
+      await fetch(`/api/requests/${id}/mark-completed`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actor: '当前用户' })
+      });
+      fetchData();
+    } catch (error) {
+      alert('标记为完成失败: ' + error.message);
+    }
+  };
+
   const getStatusClass = (status) => {
     const map = {
       'DRAFT': 'status-draft',
@@ -129,8 +142,11 @@ function RequestDetail() {
       actions.push({ label: '批准', action: () => updateStatus('APPROVED'), type: 'success' });
       actions.push({ label: '驳回', action: () => updateStatus('DRAFT'), type: 'warning' });
     }
-    if (status === 'COMPLETED' && !receipt) {
+    if (['COMPLETED', 'PARTIAL_COMPLETED'].includes(status) && !receipt) {
       actions.push({ label: '生成回执', action: generateReceipt, type: 'primary' });
+    }
+    if (status === 'PARTIAL_COMPLETED') {
+      actions.push({ label: '标记为完成', action: markAsCompleted, type: 'success' });
     }
     
     return actions;
@@ -351,7 +367,7 @@ function RequestDetail() {
             ) : (
               <div className="empty" style={{ textAlign: 'center', padding: '40px' }}>
                 暂无回执
-                {request.status === 'COMPLETED' && (
+                {['COMPLETED', 'PARTIAL_COMPLETED'].includes(request.status) && (
                   <div style={{ marginTop: '16px' }}>
                     <button className="btn btn-primary" onClick={generateReceipt}>生成回执</button>
                   </div>

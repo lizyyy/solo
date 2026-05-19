@@ -114,7 +114,7 @@ const updateRequestStatus = (requestId, newStatus, actor, additionalData = {}) =
   return getDeletionRequestById(requestId);
 };
 
-const executeTask = (taskId, actor) => {
+const executeTask = (taskId, actor, simulateSuccess = null) => {
   const task = db.execution_tasks.find(t => t.id === taskId);
   if (!task) {
     throw new Error('执行任务不存在');
@@ -128,8 +128,18 @@ const executeTask = (taskId, actor) => {
   task.started_at = getNow();
 
   const total = task.total_records;
-  const processed = Math.floor(total * (0.85 + Math.random() * 0.1));
-  const failed = total - processed;
+  let processed, failed;
+  
+  if (simulateSuccess === true) {
+    processed = total;
+    failed = 0;
+  } else if (simulateSuccess === false) {
+    processed = Math.floor(total * 0.4);
+    failed = total - processed;
+  } else {
+    processed = Math.floor(total * (0.85 + Math.random() * 0.1));
+    failed = total - processed;
+  }
 
   const failedItems = [];
   for (let i = 0; i < Math.min(failed, 5); i++) {
@@ -171,18 +181,50 @@ const executeTask = (taskId, actor) => {
 
 const updateRequestOverallStatus = (requestId) => {
   const tasks = db.execution_tasks.filter(t => t.request_id === requestId);
+  if (tasks.length === 0) return;
+
   const allCompleted = tasks.every(t => t.status === 'COMPLETED');
-  const anyFailed = tasks.some(t => t.status === 'FAILED');
   const allFinished = tasks.every(t => ['COMPLETED', 'PARTIAL_COMPLETED', 'FAILED'].includes(t.status));
+  const hasPartial = tasks.some(t => t.status === 'PARTIAL_COMPLETED');
+  const hasFailed = tasks.some(t => t.status === 'FAILED');
 
   const request = db.deletion_requests.find(r => r.id === requestId);
   if (request) {
     if (allCompleted) {
       request.status = 'COMPLETED';
-    } else if (allFinished && anyFailed) {
+    } else if (allFinished && hasFailed) {
+      request.status = 'PARTIAL_COMPLETED';
+    } else if (allFinished && hasPartial) {
       request.status = 'PARTIAL_COMPLETED';
     }
   }
+};
+
+const markRequestAsCompleted = (requestId, actor) => {
+  const request = db.deletion_requests.find(r => r.id === requestId);
+  if (!request) {
+    throw new Error('删除申请不存在');
+  }
+
+  if (!['PARTIAL_COMPLETED', 'COMPLETED'].includes(request.status)) {
+    throw new Error(`状态 ${request.status} 无法标记为完成`);
+  }
+
+  const beforeState = JSON.stringify({ status: request.status });
+  request.status = 'COMPLETED';
+  request.completed_at = getNow();
+  request.updated_at = getNow();
+
+  createAuditLog({
+    requestId,
+    action: 'MARK_COMPLETED',
+    actor,
+    beforeState,
+    afterState: JSON.stringify({ status: 'COMPLETED' }),
+    details: '手动标记删除申请为完成'
+  });
+
+  return getDeletionRequestById(requestId);
 };
 
 const retryFailedTask = (taskId, actor) => {
@@ -263,13 +305,20 @@ const getAuditLogs = (requestId = null) => {
 module.exports = {
   createDeletionRequest,
   getDeletionRequests,
+  getAllDeletionRequests: getDeletionRequests,
   getDeletionRequestById,
   updateRequestStatus,
+  markRequestAsCompleted,
   executeTask,
   retryFailedTask,
   getFailedItems,
+  getFailedItemsByRequestId: (requestId) => db.failed_items.filter(f => {
+    const task = db.execution_tasks.find(t => t.id === f.task_id);
+    return task && task.request_id === requestId;
+  }),
   resolveFailedItem,
   createAuditLog,
   getAuditLogs,
+  getTasksByRequestId: (requestId) => db.execution_tasks.filter(t => t.request_id === requestId),
   generateRequestNo
 };
