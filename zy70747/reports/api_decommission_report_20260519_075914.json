@@ -1,0 +1,61 @@
+{
+  "report_type": "api_decommission_transformation_status",
+  "generated_at": "2026-05-19T07:59:14.782528",
+  "summary": {
+    "total_apis": 1,
+    "total_callers": 2,
+    "total_extension_requests": 1,
+    "caller_status_distribution": {
+      "未开始": 0,
+      "进行中": 1,
+      "已完成": 0,
+      "已延期": 1,
+      "已拒绝": 0
+    },
+    "extension_status_distribution": {
+      "待审批": 0,
+      "已批准": 1,
+      "已拒绝": 0
+    }
+  },
+  "details": [
+    {
+      "api_name": "user/v1/login",
+      "decommission_date": "2025-03-31",
+      "callers": [
+        {
+          "caller_name": "订单系统",
+          "api_name": "user/v1/login",
+          "transformation_plan": "切换到v2接口，使用新的认证方式",
+          "planned_complete_date": "2024-11-30",
+          "status": "进行中",
+          "registered_at": "2026-05-19T07:58:44.356366",
+          "remarks": "需要配合其他系统联调"
+        },
+        {
+          "caller_name": "支付系统",
+          "api_name": "user/v1/login",
+          "transformation_plan": "重构支付流程，使用v2接口",
+          "planned_complete_date": "2025-01-15",
+          "status": "已延期",
+          "registered_at": "2026-05-19T07:58:49.433023",
+          "remarks": null
+        }
+      ],
+      "extension_requests": [
+        {
+          "caller_name": "支付系统",
+          "api_name": "user/v1/login",
+          "original_decommission_date": "2024-12-31",
+          "requested_decommission_date": "2025-03-31",
+          "reason": "需要更多时间进行兼容性测试",
+          "approval_status": "已批准",
+          "requested_at": "2026-05-19T07:58:54.473030",
+          "approved_by": "张经理",
+          "approved_at": "2026-05-19T07:59:14.715040"
+        }
+      ],
+      "created_at": "2026-05-19T07:58:37.962772"
+    }
+  ]
+}

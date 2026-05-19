@@ -1,0 +1,78 @@
+{
+  "report_type": "api_decommission_transformation_status",
+  "generated_at": "2026-05-19T07:58:27.086950",
+  "summary": {
+    "total_apis": 2,
+    "total_callers": 3,
+    "total_extension_requests": 1,
+    "caller_status_distribution": {
+      "未开始": 0,
+      "进行中": 1,
+      "已完成": 1,
+      "已延期": 1,
+      "已拒绝": 0
+    },
+    "extension_status_distribution": {
+      "待审批": 0,
+      "已批准": 1,
+      "已拒绝": 0
+    }
+  },
+  "details": [
+    {
+      "api_name": "user/v1/login",
+      "decommission_date": "2024-12-31",
+      "callers": [
+        {
+          "caller_name": "订单系统",
+          "api_name": "user/v1/login",
+          "transformation_plan": "切换v2",
+          "planned_complete_date": "2024-11-30",
+          "status": "已完成",
+          "registered_at": "2026-05-19T07:58:27.086904",
+          "remarks": null
+        },
+        {
+          "caller_name": "支付系统",
+          "api_name": "user/v1/login",
+          "transformation_plan": "重构流程",
+          "planned_complete_date": "2024-12-15",
+          "status": "进行中",
+          "registered_at": "2026-05-19T07:58:27.086913",
+          "remarks": null
+        }
+      ],
+      "extension_requests": [],
+      "created_at": "2026-05-19T07:58:27.086690"
+    },
+    {
+      "api_name": "order/v1/create",
+      "decommission_date": "2025-06-30",
+      "callers": [
+        {
+          "caller_name": "库存系统",
+          "api_name": "order/v1/create",
+          "transformation_plan": "适配新接口",
+          "planned_complete_date": "2025-02-28",
+          "status": "已延期",
+          "registered_at": "2026-05-19T07:58:27.086920",
+          "remarks": null
+        }
+      ],
+      "extension_requests": [
+        {
+          "caller_name": "库存系统",
+          "api_name": "order/v1/create",
+          "original_decommission_date": "2025-03-31",
+          "requested_decommission_date": "2025-06-30",
+          "reason": "第三方依赖未完成",
+          "approval_status": "已批准",
+          "requested_at": "2026-05-19T07:58:27.086937",
+          "approved_by": "李总",
+          "approved_at": "2026-05-19T07:58:27.086940"
+        }
+      ],
+      "created_at": "2026-05-19T07:58:27.086886"
+    }
+  ]
+}

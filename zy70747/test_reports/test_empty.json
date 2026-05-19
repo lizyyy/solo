@@ -1,0 +1,22 @@
+{
+  "report_type": "api_decommission_transformation_status",
+  "generated_at": "2026-05-19T07:58:27.078597",
+  "summary": {
+    "total_apis": 0,
+    "total_callers": 0,
+    "total_extension_requests": 0,
+    "caller_status_distribution": {
+      "未开始": 0,
+      "进行中": 0,
+      "已完成": 0,
+      "已延期": 0,
+      "已拒绝": 0
+    },
+    "extension_status_distribution": {
+      "待审批": 0,
+      "已批准": 0,
+      "已拒绝": 0
+    }
+  },
+  "details": []
+}
