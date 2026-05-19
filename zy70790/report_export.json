@@ -1,0 +1,92 @@
+{
+  "report_id": 2,
+  "report_name": "Comparison_python_java_20260519_161247",
+  "generated_at": "2026-05-19T08:12:47.036796",
+  "comparison_type": "cross_language",
+  "status_codes_analyzed": 9,
+  "discrepancies_found": 8,
+  "needs_review": true,
+  "reviewed": false,
+  "discrepancies": [
+    {
+      "status_code": 429,
+      "language_a": "python",
+      "language_b": "java",
+      "field_name": "initial_delay",
+      "value_a": "1.0",
+      "value_b": "0.5",
+      "severity": "medium",
+      "description": "python vs java: initial_delay mismatch on status 429"
+    },
+    {
+      "status_code": 429,
+      "language_a": "python",
+      "language_b": "java",
+      "field_name": "max_delay",
+      "value_a": "30.0",
+      "value_b": "20.0",
+      "severity": "medium",
+      "description": "python vs java: max_delay mismatch on status 429"
+    },
+    {
+      "status_code": 500,
+      "language_a": "python",
+      "language_b": "java",
+      "field_name": "initial_delay",
+      "value_a": "1.0",
+      "value_b": "0.5",
+      "severity": "medium",
+      "description": "python vs java: initial_delay mismatch on status 500"
+    },
+    {
+      "status_code": 500,
+      "language_a": "python",
+      "language_b": "java",
+      "field_name": "max_delay",
+      "value_a": "30.0",
+      "value_b": "20.0",
+      "severity": "medium",
+      "description": "python vs java: max_delay mismatch on status 500"
+    },
+    {
+      "status_code": 502,
+      "language_a": "python",
+      "language_b": "java",
+      "field_name": "initial_delay",
+      "value_a": "1.0",
+      "value_b": "0.5",
+      "severity": "medium",
+      "description": "python vs java: initial_delay mismatch on status 502"
+    },
+    {
+      "status_code": 502,
+      "language_a": "python",
+      "language_b": "java",
+      "field_name": "max_delay",
+      "value_a": "30.0",
+      "value_b": "20.0",
+      "severity": "medium",
+      "description": "python vs java: max_delay mismatch on status 502"
+    },
+    {
+      "status_code": 503,
+      "language_a": "python",
+      "language_b": "java",
+      "field_name": "initial_delay",
+      "value_a": "1.0",
+      "value_b": "0.5",
+      "severity": "medium",
+      "description": "python vs java: initial_delay mismatch on status 503"
+    },
+    {
+      "status_code": 503,
+      "language_a": "python",
+      "language_b": "java",
+      "field_name": "max_delay",
+      "value_a": "30.0",
+      "value_b": "20.0",
+      "severity": "medium",
+      "description": "python vs java: max_delay mismatch on status 503"
+    }
+  ]
+}
