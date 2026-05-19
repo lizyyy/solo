@@ -172,12 +172,6 @@ def create_withdraw_request(request: WithdrawRequestCreate, db: Session = Depend
     ).first()
     if not pkg:
         return create_error_response(ErrorCode.NOT_FOUND, "包版本不存在", status_code=404)
-    if pkg.status not in [PackageStatus.PUBLISHED, PackageStatus.WITHDRAW_REJECTED]:
-        return create_error_response(
-            ErrorCode.INVALID_STATUS,
-            "当前状态不允许申请撤回",
-            {"current_status": pkg.status}
-        )
     request_id = request.request_id or f"WR-{pkg.package_name}-{pkg.version}-{int(datetime.utcnow().timestamp())}"
     existing_request = db.query(WithdrawRequest).filter(WithdrawRequest.request_id == request_id).first()
     if existing_request:
@@ -195,6 +189,12 @@ def create_withdraw_request(request: WithdrawRequestCreate, db: Session = Depend
             ErrorCode.ALREADY_PROCESSED,
             "该包已有正在处理中的撤回申请",
             {"existing_request_id": existing_pending.request_id}
+        )
+    if pkg.status not in [PackageStatus.PUBLISHED, PackageStatus.WITHDRAW_REJECTED]:
+        return create_error_response(
+            ErrorCode.INVALID_STATUS,
+            "当前状态不允许申请撤回",
+            {"current_status": pkg.status}
         )
     db_request = WithdrawRequest(
         request_id=request_id,
@@ -307,12 +307,7 @@ def create_arbitration(arbitration: ArbitrationCreate, db: Session = Depends(get
         db_request.status = PackageStatus.WITHDRAW_REJECTED
         pkg.status = PackageStatus.PUBLISHED
     elif arbitration.result == ArbitrationResult.NEED_MORE_INFO:
-        return {
-            "request_id": arbitration.request_id,
-            "result": arbitration.result.value,
-            "status": "pending_more_info",
-            "comment": arbitration.comment
-        }
+        db_request.status = PackageStatus.PENDING_ARBITRATION
     db.commit()
     return {
         "request_id": arbitration.request_id,
