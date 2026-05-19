@@ -1,0 +1,5 @@
+order_id,customer_name,customer_phone,station_id,device_id,problem_description,report_time,source
+order_001,张三,13800138000,st_456,dev_123,柜门打不开,2024-01-15 09:35:00,customer_service
+order_002,李四,13900139000,st_456,dev_124,扫码失败,2024-01-15 10:20:00,customer_service
+order_003,王五,13700137000,st_457,dev_125,显示空仓但实际有电池,2024-01-15 11:05:00,app
+order_004,赵六,13600136000,st_458,,电池更换问题,2024-01-15 13:00:00,customer_service

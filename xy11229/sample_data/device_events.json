@@ -1,0 +1,34 @@
+[
+    {
+        "event_id": "evt_001",
+        "device_id": "dev_123",
+        "station_id": "st_456",
+        "event_type": "door_error",
+        "event_time": "2024-01-15 09:30:00",
+        "severity": "high",
+        "details": "柜门无法打开，电机故障"
+    },
+    {
+        "event_id": "evt_002",
+        "device_id": "dev_124",
+        "station_id": "st_456",
+        "event_type": "scan_fail",
+        "event_time": "2024-01-15 10:15:00",
+        "severity": "medium",
+        "details": "扫码识别失败，二维码模糊"
+    },
+    {
+        "event_id": "evt_003",
+        "device_id": "dev_125",
+        "station_id": "st_457",
+        "event_type": "empty_bin_false_alarm",
+        "event_time": "2024-01-15 11:00:00",
+        "severity": "low",
+        "details": "空仓误报，传感器故障"
+    },
+    {
+        "device_id": "dev_126",
+        "event_type": "other",
+        "event_time": "2024-01-15 12:00:00"
+    }
+]
