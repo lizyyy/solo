@@ -514,7 +514,55 @@ class Reporter:
         return html
 
     def load_result(self, json_path: str) -> CertAnalysisResult:
-        raise NotImplementedError("从JSON加载结果功能暂未实现")
+        import json
+        from datetime import datetime
+        
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        from .models import CertNode, AlgorithmIssue, ExpiryIssue, ChainIssue, RiskLevel, CertStatus
+        
+        chain_nodes = []
+        for node_data in data.get('chain_nodes', []):
+            node_data['not_before'] = datetime.fromisoformat(node_data['not_before'])
+            node_data['not_after'] = datetime.fromisoformat(node_data['not_after'])
+            node = CertNode(**node_data)
+            chain_nodes.append(node)
+        
+        expiry_issues = []
+        for issue_data in data.get('expiry_issues', []):
+            issue_data['status'] = CertStatus(issue_data['status'])
+            issue_data['risk_level'] = RiskLevel(issue_data['risk_level'])
+            issue_data['expiry_date'] = datetime.fromisoformat(issue_data['expiry_date'])
+            
+            cert_node_data = issue_data.pop('cert_node')
+            cert_node_data['not_before'] = datetime.fromisoformat(cert_node_data['not_before'])
+            cert_node_data['not_after'] = datetime.fromisoformat(cert_node_data['not_after'])
+            issue_data['cert_node'] = CertNode(**cert_node_data)
+            
+            issue = ExpiryIssue(**issue_data)
+            expiry_issues.append(issue)
+        
+        algorithm_issues = []
+        for issue_data in data.get('algorithm_issues', []):
+            issue_data['risk_level'] = RiskLevel(issue_data['risk_level'])
+            issue = AlgorithmIssue(**issue_data)
+            algorithm_issues.append(issue)
+        
+        chain_issues = []
+        for issue_data in data.get('chain_issues', []):
+            issue_data['risk_level'] = RiskLevel(issue_data['risk_level'])
+            issue = ChainIssue(**issue_data)
+            chain_issues.append(issue)
+        
+        data['analyzed_at'] = datetime.fromisoformat(data['analyzed_at'])
+        data['overall_risk'] = RiskLevel(data['overall_risk'])
+        data['chain_nodes'] = chain_nodes
+        data['expiry_issues'] = expiry_issues
+        data['algorithm_issues'] = algorithm_issues
+        data['chain_issues'] = chain_issues
+        
+        return CertAnalysisResult(**data)
 
     def print_batch_results(self, results: List[CertAnalysisResult]):
         print("\n" + "=" * 80)

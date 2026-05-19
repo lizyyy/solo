@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>证书分析报告 - server_cert.pem</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f7fa; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
+        .status-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 1.1em; }
+        .card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card h2 { margin-top: 0; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; }
+        .summary-item { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .summary-item .value { font-size: 2em; font-weight: bold; color: #667eea; }
+        .summary-item .label { color: #666; font-size: 0.9em; }
+        .cert-node { border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin: 10px 0; }
+        .cert-node h3 { margin: 0 0 10px 0; color: #495057; }
+        .node-props { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9em; }
+        .prop-label { color: #6c757d; }
+        .issue { border-left: 4px solid; padding: 15px; margin: 10px 0; background: #f8f9fa; border-radius: 0 8px 8px 0; }
+        .issue-critical { border-color: #dc3545; }
+        .issue-high { border-color: #fd7e14; }
+        .issue-medium { border-color: #ffc107; }
+        .issue-info { border-color: #17a2b8; }
+        .recommendations { background: #e8f4fd; padding: 20px; border-radius: 8px; }
+        .recommendations ol { margin: 10px 0 0 20px; }
+        .recommendations li { margin: 8px 0; }
+        .timestamp { text-align: right; color: #6c757d; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>证书分析报告</h1>
+            <p>文件: server_cert.pem</p>
+            <div class="status-badge" style="background-color: #28a745;">
+                HEALTHY
+            </div>
+            <div style="margin-top: 10px;">
+                风险等级: <span style="color: #17a2b8; font-weight: bold;">INFO</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 摘要统计</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="value">3</div>
+                    <div class="label">证书总数</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">1</div>
+                    <div class="label">根证书</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">1</div>
+                    <div class="label">中间证书</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">1</div>
+                    <div class="label">叶子证书</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">0</div>
+                    <div class="label">算法问题</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value">0</div>
+                    <div class="label">过期问题</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔗 证书链节点</h2>
+
+            <div class="cert-node">
+                <h3>[1] 叶子证书</h3>
+                <div class="node-props">
+                    <div><span class="prop-label">主题:</span> example.com</div>
+                    <div><span class="prop-label">颁发者:</span> Test Intermediate CA</div>
+                    <div><span class="prop-label">序列号:</span> 5D4539CDC5CF54FA9788F6E0F7F44F6249DDA378</div>
+                    <div><span class="prop-label">生效时间:</span> 2026-05-19</div>
+                    <div><span class="prop-label">过期时间:</span> 2027-05-19</div>
+                    <div><span class="prop-label">剩余天数:</span> 364 天</div>
+                    <div><span class="prop-label">签名算法:</span> sha256withrsaencryption</div>
+                    <div><span class="prop-label">公钥:</span> RSA 2048 bits</div>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.85em; color: #6c757d;">
+                    <span class="prop-label">指纹(SHA256):</span> F4:AC:B7:79:06:7E:92:18:1D:3A:3B:EF:23:E7:19:4B:E5:2F:98:A7:22:BE:E7:C5:C6:B5:C1:07:11:6F:EC:E1
+                </div>
+            </div>
+
+            <div class="cert-node">
+                <h3>[2] 中间CA</h3>
+                <div class="node-props">
+                    <div><span class="prop-label">主题:</span> Test Intermediate CA</div>
+                    <div><span class="prop-label">颁发者:</span> Test Root CA</div>
+                    <div><span class="prop-label">序列号:</span> F0E2D06C0CF09DA9A40E542319D6458CAD3BDB2</div>
+                    <div><span class="prop-label">生效时间:</span> 2026-05-19</div>
+                    <div><span class="prop-label">过期时间:</span> 2031-05-18</div>
+                    <div><span class="prop-label">剩余天数:</span> 1824 天</div>
+                    <div><span class="prop-label">签名算法:</span> sha256withrsaencryption</div>
+                    <div><span class="prop-label">公钥:</span> RSA 2048 bits</div>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.85em; color: #6c757d;">
+                    <span class="prop-label">指纹(SHA256):</span> 0C:60:A3:1A:62:E9:79:BC:52:5F:F4:24:14:6A:14:03:8A:4D:BB:85:36:E6:74:69:B4:99:9C:3A:D8:EA:F9:4B
+                </div>
+            </div>
+
+            <div class="cert-node">
+                <h3>[3] 根CA, 自签名</h3>
+                <div class="node-props">
+                    <div><span class="prop-label">主题:</span> Test Root CA</div>
+                    <div><span class="prop-label">颁发者:</span> Test Root CA</div>
+                    <div><span class="prop-label">序列号:</span> 8EE326EEC43D05C4E5BABDED70F178F6D613EB7</div>
+                    <div><span class="prop-label">生效时间:</span> 2026-05-19</div>
+                    <div><span class="prop-label">过期时间:</span> 2036-05-16</div>
+                    <div><span class="prop-label">剩余天数:</span> 3649 天</div>
+                    <div><span class="prop-label">签名算法:</span> sha256withrsaencryption</div>
+                    <div><span class="prop-label">公钥:</span> RSA 2048 bits</div>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.85em; color: #6c757d;">
+                    <span class="prop-label">指纹(SHA256):</span> 1D:C3:91:39:55:79:CC:05:96:A0:64:B5:EA:D9:BA:8F:3D:1D:D4:D9:E2:EE:2D:02:4A:5E:2E:EF:EB:33:35:EE
+                </div>
+            </div>
+</div>
+        <div class="card recommendations">
+            <h2>✅ 修复建议汇总</h2>
+<p>证书状态健康，无需立即操作。建议定期检查证书过期情况。</p>
+        </div>
+
+        <div class="timestamp">
+            报告生成时间: 2026-05-19 05:19:28 UTC
+        </div>
+    </div>
+</body>
+</html>

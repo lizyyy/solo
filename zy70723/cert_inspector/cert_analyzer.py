@@ -4,8 +4,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Tuple
 from OpenSSL import crypto
-import socket
-import ssl
 
 from .models import (
     CertConfig, CertNode, CertAnalysisResult,
@@ -37,9 +35,34 @@ class CertAnalyzer:
         except Exception as e:
             return None
 
+    def _extract_certs_from_bytes(self, data: bytes) -> List[crypto.X509]:
+        certs = []
+        
+        pem_pattern = b'-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----'
+        matches = re.findall(pem_pattern, data, re.DOTALL)
+        
+        for match in matches:
+            try:
+                cert = crypto.load_certificate(crypto.FILETYPE_PEM, match)
+                certs.append(cert)
+            except:
+                pass
+        
+        if not certs:
+            try:
+                cert = crypto.load_certificate(crypto.FILETYPE_ASN1, data)
+                certs.append(cert)
+            except:
+                pass
+        
+        return certs
+
     def parse_cert_node(self, cert: crypto.X509, cert_path: str = None) -> CertNode:
         subject = cert.get_subject()
         issuer = cert.get_issuer()
+        
+        subject_str = subject.CN if hasattr(subject, 'CN') and subject.CN else str(subject)
+        issuer_str = issuer.CN if hasattr(issuer, 'CN') and issuer.CN else str(issuer)
         
         not_before = self._parse_asn1_time(cert.get_notBefore())
         not_after = self._parse_asn1_time(cert.get_notAfter())
@@ -62,17 +85,9 @@ class CertAnalyzer:
         
         fingerprint = cert.digest('sha256').decode('utf-8')
         
-        is_self_signed = str(subject) == str(issuer)
+        is_self_signed = self._check_self_signed(cert)
         
-        ext_count = cert.get_extension_count()
-        basic_constraints = None
-        for i in range(ext_count):
-            ext = cert.get_extension(i)
-            if ext.get_short_name() == b'basicConstraints':
-                basic_constraints = str(ext)
-                break
-        
-        is_ca = basic_constraints and 'CA:TRUE' in basic_constraints
+        is_ca = self._check_is_ca(cert)
         
         is_root_ca = is_self_signed and is_ca
         is_intermediate_ca = not is_self_signed and is_ca
@@ -80,17 +95,11 @@ class CertAnalyzer:
         
         serial_number = format(cert.get_serial_number(), 'X')
         
-        pem_data = None
-        if cert_path:
-            try:
-                with open(cert_path, 'r') as f:
-                    pem_data = f.read()
-            except:
-                pass
+        pem_data = crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode('utf-8')
 
         return CertNode(
-            subject=str(subject),
-            issuer=str(issuer),
+            subject=subject_str,
+            issuer=issuer_str,
             serial_number=serial_number,
             not_before=not_before,
             not_after=not_after,
@@ -106,6 +115,57 @@ class CertAnalyzer:
             path=cert_path,
             pem_data=pem_data
         )
+
+    def _check_self_signed(self, cert: crypto.X509) -> bool:
+        try:
+            from cryptography import x509
+            from cryptography.hazmat.backends import default_backend
+            from cryptography.hazmat.primitives.asymmetric import padding
+            
+            pem = crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
+            cert2 = x509.load_pem_x509_certificate(pem, default_backend())
+            
+            pubkey = cert2.public_key()
+            
+            try:
+                pubkey.verify(
+                    cert2.signature,
+                    cert2.tbs_certificate_bytes,
+                    padding.PKCS1v15(),
+                    cert2.signature_hash_algorithm,
+                )
+                return True
+            except:
+                return False
+        except:
+            return False
+
+    def _check_is_ca(self, cert: crypto.X509) -> bool:
+        try:
+            pem = crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode('utf-8')
+            from cryptography import x509
+            from cryptography.hazmat.backends import default_backend
+            cert2 = x509.load_pem_x509_certificate(pem.encode('utf-8'), default_backend())
+            for ext in cert2.extensions:
+                if ext.oid._name == 'basicConstraints':
+                    return ext.value.ca
+        except:
+            pass
+        
+        try:
+            subject = cert.get_subject()
+            issuer = cert.get_issuer()
+            if str(subject) == str(issuer):
+                try:
+                    pubkey = cert.get_pubkey()
+                    cert.verify(pubkey)
+                    return True
+                except:
+                    pass
+        except:
+            pass
+        
+        return False
 
     def _parse_asn1_time(self, asn1_time: bytes) -> datetime:
         time_str = asn1_time.decode('utf-8')
@@ -185,7 +245,34 @@ class CertAnalyzer:
         
         return issues
 
-    def verify_chain(self, nodes: List[CertNode]) -> Tuple[bool, List[ChainIssue]]:
+    def _verify_cert_signature(self, child_cert: crypto.X509, parent_cert: crypto.X509) -> bool:
+        try:
+            from cryptography import x509
+            from cryptography.hazmat.backends import default_backend
+            from cryptography.hazmat.primitives.asymmetric import padding
+            
+            child_pem = crypto.dump_certificate(crypto.FILETYPE_PEM, child_cert)
+            parent_pem = crypto.dump_certificate(crypto.FILETYPE_PEM, parent_cert)
+            
+            child = x509.load_pem_x509_certificate(child_pem, default_backend())
+            parent = x509.load_pem_x509_certificate(parent_pem, default_backend())
+            
+            pubkey = parent.public_key()
+            
+            try:
+                pubkey.verify(
+                    child.signature,
+                    child.tbs_certificate_bytes,
+                    padding.PKCS1v15(),
+                    child.signature_hash_algorithm,
+                )
+                return True
+            except:
+                return False
+        except Exception as e:
+            return False
+
+    def verify_chain(self, nodes: List[CertNode], certs: List[crypto.X509]) -> Tuple[bool, List[ChainIssue]]:
         issues = []
         chain_valid = True
         
@@ -199,106 +286,117 @@ class CertAnalyzer:
             ))
             return False, issues
         
-        leaf_certs = [n for n in nodes if n.is_leaf_cert]
-        intermediates = [n for n in nodes if n.is_intermediate_ca]
-        roots = [n for n in nodes if n.is_root_ca]
+        sorted_nodes, sorted_certs = self._sort_chain(nodes, certs)
         
-        if len(leaf_certs) > 1:
-            issues.append(ChainIssue(
-                issue_type="MULTIPLE_LEAF_CERTS",
-                description=f"证书链中包含 {len(leaf_certs)} 个叶子证书，预期为1个",
-                risk_level=RiskLevel.MEDIUM,
-                affected_certs=[n.subject for n in leaf_certs],
-                recommendation="确保只包含一个服务器证书"
-            ))
-            chain_valid = False
-        
-        sorted_nodes = self._sort_chain(nodes)
         if len(sorted_nodes) != len(nodes):
+            missing = [n.subject for n in nodes if n not in sorted_nodes]
             issues.append(ChainIssue(
                 issue_type="INCOMPLETE_CHAIN",
-                description="证书链不完整，缺少中间证书",
+                description=f"证书链不完整，缺少 {len(missing)} 个证书的签发者",
                 risk_level=RiskLevel.HIGH,
-                affected_certs=[n.subject for n in nodes if n not in sorted_nodes],
-                recommendation="补充缺少的中间证书"
+                affected_certs=missing,
+                recommendation="补充缺少的中间证书或根证书"
             ))
             chain_valid = False
         
         for i in range(len(sorted_nodes) - 1):
-            child = sorted_nodes[i]
-            parent = sorted_nodes[i + 1]
-            if not self._verify_signature(child, parent):
+            child_node = sorted_nodes[i]
+            parent_node = sorted_nodes[i + 1]
+            child_cert = sorted_certs[i]
+            parent_cert = sorted_certs[i + 1]
+            
+            if not self._verify_cert_signature(child_cert, parent_cert):
                 issues.append(ChainIssue(
                     issue_type="SIGNATURE_VERIFICATION_FAILED",
-                    description=f"{child.subject} 的签名无法由 {parent.subject} 验证",
+                    description=f"{child_node.subject} 的签名无法由 {parent_node.subject} 验证",
                     risk_level=RiskLevel.CRITICAL,
-                    affected_certs=[child.subject, parent.subject],
-                    recommendation="检查证书链顺序和完整性"
+                    affected_certs=[child_node.subject, parent_node.subject],
+                    recommendation="检查证书链是否正确，可能需要重新签发证书"
                 ))
                 chain_valid = False
         
+        if not sorted_nodes[-1].is_self_signed and len(sorted_nodes) == 1:
+            issues.append(ChainIssue(
+                issue_type="NO_TRUST_ROOT",
+                description=f"未提供完整证书链，只有单个证书",
+                risk_level=RiskLevel.INFO,
+                affected_certs=[sorted_nodes[-1].subject],
+                recommendation="如需验证证书链，请提供链文件"
+            ))
+        
         return chain_valid, issues
 
-    def _sort_chain(self, nodes: List[CertNode]) -> List[CertNode]:
+    def _sort_chain(self, nodes: List[CertNode], certs: List[crypto.X509]) -> Tuple[List[CertNode], List[crypto.X509]]:
         if not nodes:
-            return []
+            return [], []
         
-        result = []
-        remaining = nodes.copy()
+        result_nodes = []
+        result_certs = []
         
-        leaf_nodes = [n for n in remaining if n.is_leaf_cert]
-        if not leaf_nodes:
-            leaf_nodes = [n for n in remaining if not n.is_self_signed]
+        leaf_indices = [i for i, n in enumerate(nodes) if n.is_leaf_cert]
+        if not leaf_indices:
+            leaf_indices = [i for i, n in enumerate(nodes) if not n.is_self_signed]
         
-        if leaf_nodes:
-            current = leaf_nodes[0]
+        if leaf_indices:
+            current_idx = leaf_indices[0]
         else:
-            current = remaining[0]
+            current_idx = 0
         
-        while current:
-            result.append(current)
-            if current in remaining:
-                remaining.remove(current)
+        visited = set()
+        max_iterations = len(nodes) + 1
+        iterations = 0
+        
+        while current_idx is not None and iterations < max_iterations:
+            iterations += 1
+            if current_idx in visited:
+                break
+            visited.add(current_idx)
             
-            if current.is_self_signed:
+            result_nodes.append(nodes[current_idx])
+            result_certs.append(certs[current_idx])
+            
+            current_node = nodes[current_idx]
+            
+            if current_node.is_self_signed:
                 break
             
-            next_node = None
-            for node in remaining:
-                if node.subject == current.issuer:
-                    next_node = node
+            next_idx = None
+            for i, node in enumerate(nodes):
+                if i not in visited and node.subject == current_node.issuer:
+                    next_idx = i
                     break
             
-            if not next_node:
-                break
-            
-            current = next_node
+            current_idx = next_idx
         
-        return result
-
-    def _verify_signature(self, child: CertNode, parent: CertNode) -> bool:
-        try:
-            return True
-        except:
-            return True
+        return result_nodes, result_certs
 
     def analyze_certificate(self, cert_file: str, chain_file: str = None) -> CertAnalysisResult:
         raw_errors = []
         chain_nodes = []
+        all_certs = []
         
         main_cert = self.load_certificate(cert_file)
         if main_cert:
             chain_nodes.append(self.parse_cert_node(main_cert, cert_file))
+            all_certs.append(main_cert)
         else:
             raw_errors.append(f"无法解析证书文件: {cert_file}")
         
         if chain_file:
-            chain_certs = self._extract_certs_from_file(chain_file)
-            for cert in chain_certs:
-                try:
-                    chain_nodes.append(self.parse_cert_node(cert, chain_file))
-                except Exception as e:
-                    raw_errors.append(f"解析链证书失败: {str(e)}")
+            try:
+                with open(chain_file, 'rb') as f:
+                    chain_data = f.read()
+                chain_certs = self._extract_certs_from_bytes(chain_data)
+                for cert in chain_certs:
+                    try:
+                        node = self.parse_cert_node(cert, chain_file)
+                        if not any(n.serial_number == node.serial_number for n in chain_nodes):
+                            chain_nodes.append(node)
+                            all_certs.append(cert)
+                    except Exception as e:
+                        raw_errors.append(f"解析链证书失败: {str(e)}")
+            except Exception as e:
+                raw_errors.append(f"读取链文件失败: {str(e)}")
         
         all_algorithm_issues = []
         all_expiry_issues = []
@@ -307,7 +405,7 @@ class CertAnalyzer:
             all_algorithm_issues.extend(self.check_algorithm_issues(node))
             all_expiry_issues.extend(self.check_expiry_issues(node))
         
-        chain_valid, chain_issues = self.verify_chain(chain_nodes)
+        chain_valid, chain_issues = self.verify_chain(chain_nodes, all_certs)
         
         risk_levels = (
             [i.risk_level for i in all_algorithm_issues] +
@@ -326,7 +424,9 @@ class CertAnalyzer:
         
         if not chain_valid:
             overall_status = "INVALID"
-        elif overall_risk in [RiskLevel.CRITICAL, RiskLevel.HIGH]:
+        elif overall_risk == RiskLevel.CRITICAL:
+            overall_status = "CRITICAL"
+        elif overall_risk == RiskLevel.HIGH:
             overall_status = "AT_RISK"
         elif overall_risk == RiskLevel.MEDIUM:
             overall_status = "WARNING"
@@ -343,6 +443,7 @@ class CertAnalyzer:
             "chain_issues_count": len(chain_issues),
             "expiring_soon_count": len([e for e in all_expiry_issues if e.status == CertStatus.EXPIRING_SOON]),
             "expired_count": len([e for e in all_expiry_issues if e.status == CertStatus.EXPIRED]),
+            "chain_valid": chain_valid
         }
 
         return CertAnalysisResult(
@@ -359,27 +460,6 @@ class CertAnalyzer:
             summary=summary,
             raw_errors=raw_errors
         )
-
-    def _extract_certs_from_file(self, file_path: str) -> List[crypto.X509]:
-        certs = []
-        try:
-            with open(file_path, 'rb') as f:
-                content = f.read()
-            
-            pem_pattern = b'-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----'
-            matches = re.findall(pem_pattern, content, re.DOTALL)
-            
-            for match in matches:
-                try:
-                    cert = crypto.load_certificate(crypto.FILETYPE_PEM, match)
-                    certs.append(cert)
-                except:
-                    pass
-                    
-        except Exception as e:
-            pass
-        
-        return certs
 
     def analyze_directory(self, directory: str) -> List[CertAnalysisResult]:
         results = []
