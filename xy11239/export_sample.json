@@ -1,0 +1,314 @@
+{
+  "export_time": "2026-05-19T08:03:57.046855",
+  "reagents": [
+    {
+      "id": 1,
+      "name": "乙醇",
+      "cas_no": "64-17-5",
+      "danger_level": "普通",
+      "unit": "mL",
+      "created_at": "2026-05-19T08:03:56.986283",
+      "created_by": "李老师"
+    },
+    {
+      "id": 2,
+      "name": "氰化钾",
+      "cas_no": "151-50-8",
+      "danger_level": "剧毒",
+      "unit": "g",
+      "created_at": "2026-05-19T08:03:56.992692",
+      "created_by": "李老师"
+    }
+  ],
+  "inventory_summary": [
+    {
+      "reagent_id": 1,
+      "reagent_name": "乙醇",
+      "danger_level": "普通",
+      "total_quantity": 500.0,
+      "unit": "mL"
+    },
+    {
+      "reagent_id": 2,
+      "reagent_name": "氰化钾",
+      "danger_level": "剧毒",
+      "total_quantity": 100.0,
+      "unit": "g"
+    }
+  ],
+  "applications": [
+    {
+      "id": 4,
+      "application_no": "APP202605190004",
+      "reagent_id": 1,
+      "applicant": "张学生",
+      "applicant_role": "研究生",
+      "quantity": 50.0,
+      "purpose": "测试幂等",
+      "status": "pending",
+      "required_approvals": 1,
+      "created_at": "2026-05-19T08:03:57.039261",
+      "approvals": [
+        {
+          "index": 0,
+          "approver": "",
+          "decision": null,
+          "comment": null,
+          "approved_at": null
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "application_no": "APP202605190003",
+      "reagent_id": 1,
+      "applicant": "张学生",
+      "applicant_role": "研究生",
+      "quantity": 1000.0,
+      "purpose": "调整数量后重新申请",
+      "status": "pending",
+      "required_approvals": 1,
+      "created_at": "2026-05-19T08:03:57.029054",
+      "approvals": [
+        {
+          "index": 0,
+          "approver": "",
+          "decision": null,
+          "comment": null,
+          "approved_at": null
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "application_no": "APP202605190002",
+      "reagent_id": 2,
+      "applicant": "张学生",
+      "applicant_role": "研究生",
+      "quantity": 10.0,
+      "purpose": "特定分析",
+      "status": "approved",
+      "required_approvals": 2,
+      "created_at": "2026-05-19T08:03:57.018042",
+      "approvals": [
+        {
+          "index": 0,
+          "approver": "李老师",
+          "decision": "approved",
+          "comment": "同意第一审批",
+          "approved_at": "2026-05-19T08:03:57.023352"
+        },
+        {
+          "index": 1,
+          "approver": "王主任",
+          "decision": "approved",
+          "comment": "最终同意",
+          "approved_at": "2026-05-19T08:03:57.026756"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "application_no": "APP202605190001",
+      "reagent_id": 1,
+      "applicant": "张学生",
+      "applicant_role": "研究生",
+      "quantity": 100.0,
+      "purpose": "有机合成实验",
+      "status": "completed",
+      "required_approvals": 1,
+      "created_at": "2026-05-19T08:03:57.000262",
+      "approvals": [
+        {
+          "index": 0,
+          "approver": "李老师",
+          "decision": "approved",
+          "comment": "同意，注意安全使用",
+          "approved_at": "2026-05-19T08:03:57.007906"
+        }
+      ]
+    }
+  ],
+  "operation_logs": [
+    {
+      "id": 15,
+      "operation_type": "inventory_check",
+      "application_id": null,
+      "reagent_id": 1,
+      "operator": "王管理员",
+      "operator_role": "仓库管理员",
+      "quantity": 500.0,
+      "result": "success",
+      "reason": "盘点完成，系统原数量: 400.0, 实盘数量: 500.0, 差异: 100.0, 调整后: 400.0",
+      "created_at": "2026-05-19T08:03:57.043975"
+    },
+    {
+      "id": 14,
+      "operation_type": "create_application",
+      "application_id": 4,
+      "reagent_id": 1,
+      "operator": "张学生",
+      "operator_role": "研究生",
+      "quantity": 50.0,
+      "result": "success",
+      "reason": "申请创建成功，需要1人审批 | idempotency: test-idempotent-001",
+      "created_at": "2026-05-19T08:03:57.041224"
+    },
+    {
+      "id": 13,
+      "operation_type": "resubmit",
+      "application_id": 3,
+      "reagent_id": null,
+      "operator": "张学生",
+      "operator_role": "研究生",
+      "quantity": null,
+      "result": "success",
+      "reason": "申请已重新提交",
+      "created_at": "2026-05-19T08:03:57.035645"
+    },
+    {
+      "id": 12,
+      "operation_type": "approval",
+      "application_id": 3,
+      "reagent_id": null,
+      "operator": "李老师",
+      "operator_role": "实验室管理员",
+      "quantity": null,
+      "result": "success",
+      "reason": "申请已驳回",
+      "created_at": "2026-05-19T08:03:57.033014"
+    },
+    {
+      "id": 11,
+      "operation_type": "create_application",
+      "application_id": 3,
+      "reagent_id": 1,
+      "operator": "张学生",
+      "operator_role": "研究生",
+      "quantity": 1000.0,
+      "result": "success",
+      "reason": "申请创建成功，需要1人审批",
+      "created_at": "2026-05-19T08:03:57.030333"
+    },
+    {
+      "id": 10,
+      "operation_type": "approval",
+      "application_id": 2,
+      "reagent_id": null,
+      "operator": "王主任",
+      "operator_role": "实验室主任",
+      "quantity": null,
+      "result": "success",
+      "reason": "审批完成，申请已通过",
+      "created_at": "2026-05-19T08:03:57.027852"
+    },
+    {
+      "id": 9,
+      "operation_type": "approval",
+      "application_id": 2,
+      "reagent_id": null,
+      "operator": "李老师",
+      "operator_role": "实验室管理员",
+      "quantity": null,
+      "result": "success",
+      "reason": "第1人审批通过，还需1人审批",
+      "created_at": "2026-05-19T08:03:57.024878"
+    },
+    {
+      "id": 8,
+      "operation_type": "create_application",
+      "application_id": 2,
+      "reagent_id": 2,
+      "operator": "张学生",
+      "operator_role": "研究生",
+      "quantity": 10.0,
+      "result": "success",
+      "reason": "申请创建成功，需要2人审批",
+      "created_at": "2026-05-19T08:03:57.019942"
+    },
+    {
+      "id": 7,
+      "operation_type": "stock_out",
+      "application_id": 1,
+      "reagent_id": 1,
+      "operator": "王管理员",
+      "operator_role": "仓库管理员",
+      "quantity": 100.0,
+      "result": "success",
+      "reason": "出库成功，扣减数量: 100.0",
+      "created_at": "2026-05-19T08:03:57.015262"
+    },
+    {
+      "id": 6,
+      "operation_type": "approval",
+      "application_id": 1,
+      "reagent_id": null,
+      "operator": "李老师",
+      "operator_role": "实验室管理员",
+      "quantity": null,
+      "result": "success",
+      "reason": "审批完成，申请已通过",
+      "created_at": "2026-05-19T08:03:57.009820"
+    },
+    {
+      "id": 5,
+      "operation_type": "create_application",
+      "application_id": 1,
+      "reagent_id": 1,
+      "operator": "张学生",
+      "operator_role": "研究生",
+      "quantity": 100.0,
+      "result": "success",
+      "reason": "申请创建成功，需要1人审批",
+      "created_at": "2026-05-19T08:03:57.002572"
+    },
+    {
+      "id": 4,
+      "operation_type": "add_inventory",
+      "application_id": null,
+      "reagent_id": 2,
+      "operator": "王管理员",
+      "operator_role": "仓库管理员",
+      "quantity": 100.0,
+      "result": "success",
+      "reason": "入库成功，批次: 2024002",
+      "created_at": "2026-05-19T08:03:56.998262"
+    },
+    {
+      "id": 3,
+      "operation_type": "add_inventory",
+      "application_id": null,
+      "reagent_id": 1,
+      "operator": "王管理员",
+      "operator_role": "仓库管理员",
+      "quantity": 500.0,
+      "result": "success",
+      "reason": "入库成功，批次: 2024001",
+      "created_at": "2026-05-19T08:03:56.996398"
+    },
+    {
+      "id": 2,
+      "operation_type": "create_reagent",
+      "application_id": null,
+      "reagent_id": 2,
+      "operator": "李老师",
+      "operator_role": "实验室管理员",
+      "quantity": null,
+      "result": "success",
+      "reason": "创建试剂: 氰化钾",
+      "created_at": "2026-05-19T08:03:56.993375"
+    },
+    {
+      "id": 1,
+      "operation_type": "create_reagent",
+      "application_id": null,
+      "reagent_id": 1,
+      "operator": "李老师",
+      "operator_role": "实验室管理员",
+      "quantity": null,
+      "result": "success",
+      "reason": "创建试剂: 乙醇",
+      "created_at": "2026-05-19T08:03:56.990418"
+    }
+  ]
+}
