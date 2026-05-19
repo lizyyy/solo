@@ -1,0 +1,9 @@
+id,title,description,priority,assigned_forklift,assigned_operator,scheduled_date,shift,estimated_duration
+T001,A区卸货,卸A区3号门货物,5,FL001,张三,2024-01-15,night,60
+T002,B区补货,补充B区货架库存,4,FL002,李四,2024-01-15,night,90
+T003,C区盘点,盘点C区货物数量,3,,王五,2024-01-15,night,120
+T004,D区移库,将D区货物移至E区,3,FL003,赵六,2024-01-15,night,45
+T005,E区装车,E区4号门装车发货,5,FL001,张三,2024-01-15,night,80
+T006,F区整理,整理F区堆放的货物,2,,钱七,2024-01-15,night,60
+T007,异常测试,,10,FL999,周八,2024-15-01,night,30
+,T008测试,无ID的任务,1,FL001,吴九,2024-01-15,night,30
