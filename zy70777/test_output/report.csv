@@ -1,0 +1,39 @@
+password,is_valid,test_group,description,source_file,line_number,failure_reason_count,failure_reasons
+abababa,0,length_boundary,长度小于最小值 (7 < 8),,,4,数字数量不足: 需要1个，实际0个 | 密码长度不足: 需要8个字符，实际7个 | 特殊字符数量不足: 需要1个，实际0个 | 大写字母数量不足: 需要1个，实际0个
+abababab,0,length_boundary,长度等于最小值 (8),,,3,数字数量不足: 需要1个，实际0个 | 特殊字符数量不足: 需要1个，实际0个 | 大写字母数量不足: 需要1个，实际0个
+abababababababababababababababababababababababababababababababab,0,length_boundary,长度等于最大值 (64),,,3,数字数量不足: 需要1个，实际0个 | 特殊字符数量不足: 需要1个，实际0个 | 大写字母数量不足: 需要1个，实际0个
+ababababababababababababababababababababababababababababababababa,0,length_boundary,长度大于最大值 (65 > 64),,,4,数字数量不足: 需要1个，实际0个 | 密码长度超出: 最多64个字符，实际65个 | 特殊字符数量不足: 需要1个，实际0个 | 大写字母数量不足: 需要1个，实际0个
+a0!ababa,0,uppercase_boundary,"uppercase字符数不足 (需要1, 实际0)",,,1,大写字母数量不足: 需要1个，实际0个
+Aa0!abab,1,uppercase_boundary,"uppercase字符数刚好满足 (需要1, 实际1)",,,0,
+A0!ababa,1,lowercase_boundary,"lowercase字符数不足 (需要1, 实际0)",,,0,
+aA0!abab,1,lowercase_boundary,"lowercase字符数刚好满足 (需要1, 实际1)",,,0,
+Aa!ababa,0,digit_boundary,"digit字符数不足 (需要1, 实际0)",,,1,数字数量不足: 需要1个，实际0个
+0Aa!abab,1,digit_boundary,"digit字符数刚好满足 (需要1, 实际1)",,,0,
+Aa0ababa,0,special_boundary,"special字符数不足 (需要1, 实际0)",,,1,特殊字符数量不足: 需要1个，实际0个
+!Aa0abab,1,special_boundary,"special字符数刚好满足 (需要1, 实际1)",,,0,
+Aa1!abab,1,special_char_variants,使用特殊字符: '!',,,0,
+Aa1@abab,1,special_char_variants,使用特殊字符: '@',,,0,
+Aa1#abab,1,special_char_variants,使用特殊字符: '#',,,0,
+Aa1$abab,1,special_char_variants,使用特殊字符: '$',,,0,
+Aa1%abab,1,special_char_variants,使用特殊字符: '%',,,0,
+Aa1^abab,1,special_char_variants,使用特殊字符: '^',,,0,
+Aa1&abab,1,special_char_variants,使用特殊字符: '&',,,0,
+Aa1*abab,1,special_char_variants,使用特殊字符: '*',,,0,
+Aa1(abab,1,special_char_variants,使用特殊字符: '(',,,0,
+Aa1)abab,1,special_char_variants,使用特殊字符: ')',,,0,
+Aa1_abab,1,special_char_variants,使用特殊字符: '_',,,0,
+Aa1+abab,1,special_char_variants,使用特殊字符: '+',,,0,
+Aa1-abab,1,special_char_variants,使用特殊字符: '-',,,0,
+Aa1=abab,1,special_char_variants,使用特殊字符: '=',,,0,
+Aa1[abab,1,special_char_variants,使用特殊字符: '[',,,0,
+Aa1]abab,1,special_char_variants,使用特殊字符: ']',,,0,
+Aa1{abab,1,special_char_variants,使用特殊字符: '{',,,0,
+Aa1}abab,1,special_char_variants,使用特殊字符: '}',,,0,
+Aa1|abab,1,special_char_variants,使用特殊字符: '|',,,0,
+Aa1;abab,1,special_char_variants,使用特殊字符: ';',,,0,
+Aa1:abab,1,special_char_variants,使用特殊字符: ':',,,0,
+"Aa1,abab",1,special_char_variants,"使用特殊字符: ','",,,0,
+Aa1.abab,1,special_char_variants,使用特殊字符: '.',,,0,
+Aa1<abab,1,special_char_variants,使用特殊字符: '<',,,0,
+Aa1>abab,1,special_char_variants,使用特殊字符: '>',,,0,
+Aa1?abab,1,special_char_variants,使用特殊字符: '?',,,0,

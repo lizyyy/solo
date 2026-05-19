@@ -1,0 +1,58 @@
+{
+  "results": [
+    {
+      "character_classes": [
+        "uppercase",
+        "digit",
+        "special"
+      ],
+      "description": "lowercase字符数不足 (需要1, 实际0)",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "actual": 0,
+        "char_type": "lowercase",
+        "required": 1
+      },
+      "password": "A0!ababa",
+      "source_file": null,
+      "test_group": "lowercase_boundary"
+    },
+    {
+      "character_classes": [
+        "lowercase",
+        "uppercase",
+        "digit",
+        "special"
+      ],
+      "description": "lowercase字符数刚好满足 (需要1, 实际1)",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "actual": 1,
+        "char_type": "lowercase",
+        "required": 1
+      },
+      "password": "aA0!abab",
+      "source_file": null,
+      "test_group": "lowercase_boundary"
+    }
+  ],
+  "statistics": {
+    "failure_counts": {},
+    "group_stats": {
+      "lowercase_boundary": {
+        "invalid": 0,
+        "total": 2,
+        "valid": 2,
+        "valid_rate": 1.0
+      }
+    },
+    "invalid": 0,
+    "total": 2,
+    "valid": 2,
+    "valid_rate": 1.0
+  }
+}

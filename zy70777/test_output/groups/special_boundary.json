@@ -1,0 +1,69 @@
+{
+  "results": [
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit"
+      ],
+      "description": "special字符数不足 (需要1, 实际0)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "actual": 0,
+        "char_type": "special",
+        "required": 1
+      },
+      "password": "Aa0ababa",
+      "source_file": null,
+      "test_group": "special_boundary"
+    },
+    {
+      "character_classes": [
+        "special",
+        "uppercase",
+        "lowercase",
+        "digit"
+      ],
+      "description": "special字符数刚好满足 (需要1, 实际1)",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "actual": 1,
+        "char_type": "special",
+        "required": 1
+      },
+      "password": "!Aa0abab",
+      "source_file": null,
+      "test_group": "special_boundary"
+    }
+  ],
+  "statistics": {
+    "failure_counts": {
+      "special_min": 1
+    },
+    "group_stats": {
+      "special_boundary": {
+        "invalid": 1,
+        "total": 2,
+        "valid": 1,
+        "valid_rate": 0.5
+      }
+    },
+    "invalid": 1,
+    "total": 2,
+    "valid": 1,
+    "valid_rate": 0.5
+  }
+}

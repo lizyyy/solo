@@ -1,0 +1,912 @@
+{
+  "results": [
+    {
+      "character_classes": [
+        "lowercase"
+      ],
+      "description": "长度小于最小值 (7 < 8)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "数字数量不足: 需要1个，实际0个",
+          "rule_id": "digit_min",
+          "rule_name": "数字要求",
+          "severity": "error"
+        },
+        {
+          "actual": 7,
+          "expected": 8,
+          "message": "密码长度不足: 需要8个字符，实际7个",
+          "rule_id": "length_min",
+          "rule_name": "最小长度",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "boundary": "below_min",
+        "length": 7
+      },
+      "password": "abababa",
+      "source_file": null,
+      "test_group": "length_boundary"
+    },
+    {
+      "character_classes": [
+        "lowercase"
+      ],
+      "description": "长度等于最小值 (8)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "数字数量不足: 需要1个，实际0个",
+          "rule_id": "digit_min",
+          "rule_name": "数字要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "boundary": "min",
+        "length": 8
+      },
+      "password": "abababab",
+      "source_file": null,
+      "test_group": "length_boundary"
+    },
+    {
+      "character_classes": [
+        "lowercase"
+      ],
+      "description": "长度等于最大值 (64)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "数字数量不足: 需要1个，实际0个",
+          "rule_id": "digit_min",
+          "rule_name": "数字要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "boundary": "max",
+        "length": 64
+      },
+      "password": "abababababababababababababababababababababababababababababababab",
+      "source_file": null,
+      "test_group": "length_boundary"
+    },
+    {
+      "character_classes": [
+        "lowercase"
+      ],
+      "description": "长度大于最大值 (65 > 64)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "数字数量不足: 需要1个，实际0个",
+          "rule_id": "digit_min",
+          "rule_name": "数字要求",
+          "severity": "error"
+        },
+        {
+          "actual": 65,
+          "expected": 64,
+          "message": "密码长度超出: 最多64个字符，实际65个",
+          "rule_id": "length_max",
+          "rule_name": "最大长度",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "boundary": "above_max",
+        "length": 65
+      },
+      "password": "ababababababababababababababababababababababababababababababababa",
+      "source_file": null,
+      "test_group": "length_boundary"
+    },
+    {
+      "character_classes": [
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "uppercase字符数不足 (需要1, 实际0)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "actual": 0,
+        "char_type": "uppercase",
+        "required": 1
+      },
+      "password": "a0!ababa",
+      "source_file": null,
+      "test_group": "uppercase_boundary"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "uppercase字符数刚好满足 (需要1, 实际1)",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "actual": 1,
+        "char_type": "uppercase",
+        "required": 1
+      },
+      "password": "Aa0!abab",
+      "source_file": null,
+      "test_group": "uppercase_boundary"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "digit",
+        "special"
+      ],
+      "description": "lowercase字符数不足 (需要1, 实际0)",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "actual": 0,
+        "char_type": "lowercase",
+        "required": 1
+      },
+      "password": "A0!ababa",
+      "source_file": null,
+      "test_group": "lowercase_boundary"
+    },
+    {
+      "character_classes": [
+        "lowercase",
+        "uppercase",
+        "digit",
+        "special"
+      ],
+      "description": "lowercase字符数刚好满足 (需要1, 实际1)",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "actual": 1,
+        "char_type": "lowercase",
+        "required": 1
+      },
+      "password": "aA0!abab",
+      "source_file": null,
+      "test_group": "lowercase_boundary"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "special"
+      ],
+      "description": "digit字符数不足 (需要1, 实际0)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "数字数量不足: 需要1个，实际0个",
+          "rule_id": "digit_min",
+          "rule_name": "数字要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "actual": 0,
+        "char_type": "digit",
+        "required": 1
+      },
+      "password": "Aa!ababa",
+      "source_file": null,
+      "test_group": "digit_boundary"
+    },
+    {
+      "character_classes": [
+        "digit",
+        "uppercase",
+        "lowercase",
+        "special"
+      ],
+      "description": "digit字符数刚好满足 (需要1, 实际1)",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "actual": 1,
+        "char_type": "digit",
+        "required": 1
+      },
+      "password": "0Aa!abab",
+      "source_file": null,
+      "test_group": "digit_boundary"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit"
+      ],
+      "description": "special字符数不足 (需要1, 实际0)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "actual": 0,
+        "char_type": "special",
+        "required": 1
+      },
+      "password": "Aa0ababa",
+      "source_file": null,
+      "test_group": "special_boundary"
+    },
+    {
+      "character_classes": [
+        "special",
+        "uppercase",
+        "lowercase",
+        "digit"
+      ],
+      "description": "special字符数刚好满足 (需要1, 实际1)",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "actual": 1,
+        "char_type": "special",
+        "required": 1
+      },
+      "password": "!Aa0abab",
+      "source_file": null,
+      "test_group": "special_boundary"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '!'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 0,
+        "special_char": "!"
+      },
+      "password": "Aa1!abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '@'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 1,
+        "special_char": "@"
+      },
+      "password": "Aa1@abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '#'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 2,
+        "special_char": "#"
+      },
+      "password": "Aa1#abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '$'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 3,
+        "special_char": "$"
+      },
+      "password": "Aa1$abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '%'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 4,
+        "special_char": "%"
+      },
+      "password": "Aa1%abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '^'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 5,
+        "special_char": "^"
+      },
+      "password": "Aa1^abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '&'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 6,
+        "special_char": "&"
+      },
+      "password": "Aa1&abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '*'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 7,
+        "special_char": "*"
+      },
+      "password": "Aa1*abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '('",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 8,
+        "special_char": "("
+      },
+      "password": "Aa1(abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ')'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 9,
+        "special_char": ")"
+      },
+      "password": "Aa1)abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '_'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 10,
+        "special_char": "_"
+      },
+      "password": "Aa1_abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '+'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 11,
+        "special_char": "+"
+      },
+      "password": "Aa1+abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '-'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 12,
+        "special_char": "-"
+      },
+      "password": "Aa1-abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '='",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 13,
+        "special_char": "="
+      },
+      "password": "Aa1=abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '['",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 14,
+        "special_char": "["
+      },
+      "password": "Aa1[abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ']'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 15,
+        "special_char": "]"
+      },
+      "password": "Aa1]abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '{'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 16,
+        "special_char": "{"
+      },
+      "password": "Aa1{abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '}'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 17,
+        "special_char": "}"
+      },
+      "password": "Aa1}abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '|'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 18,
+        "special_char": "|"
+      },
+      "password": "Aa1|abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ';'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 19,
+        "special_char": ";"
+      },
+      "password": "Aa1;abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ':'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 20,
+        "special_char": ":"
+      },
+      "password": "Aa1:abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ','",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 21,
+        "special_char": ","
+      },
+      "password": "Aa1,abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '.'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 22,
+        "special_char": "."
+      },
+      "password": "Aa1.abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '<'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 23,
+        "special_char": "<"
+      },
+      "password": "Aa1<abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '>'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 24,
+        "special_char": ">"
+      },
+      "password": "Aa1>abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '?'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 25,
+        "special_char": "?"
+      },
+      "password": "Aa1?abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    }
+  ],
+  "statistics": {
+    "failure_counts": {
+      "digit_min": 5,
+      "length_max": 1,
+      "length_min": 1,
+      "special_min": 5,
+      "uppercase_min": 5
+    },
+    "group_stats": {
+      "digit_boundary": {
+        "invalid": 1,
+        "total": 2,
+        "valid": 1,
+        "valid_rate": 0.5
+      },
+      "length_boundary": {
+        "invalid": 4,
+        "total": 4,
+        "valid": 0,
+        "valid_rate": 0.0
+      },
+      "lowercase_boundary": {
+        "invalid": 0,
+        "total": 2,
+        "valid": 2,
+        "valid_rate": 1.0
+      },
+      "special_boundary": {
+        "invalid": 1,
+        "total": 2,
+        "valid": 1,
+        "valid_rate": 0.5
+      },
+      "special_char_variants": {
+        "invalid": 0,
+        "total": 26,
+        "valid": 26,
+        "valid_rate": 1.0
+      },
+      "uppercase_boundary": {
+        "invalid": 1,
+        "total": 2,
+        "valid": 1,
+        "valid_rate": 0.5
+      }
+    },
+    "invalid": 7,
+    "total": 38,
+    "valid": 31,
+    "valid_rate": 0.8157894736842105
+  }
+}

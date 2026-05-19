@@ -1,0 +1,205 @@
+{
+  "results": [
+    {
+      "character_classes": [
+        "lowercase"
+      ],
+      "description": "长度小于最小值 (7 < 8)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "数字数量不足: 需要1个，实际0个",
+          "rule_id": "digit_min",
+          "rule_name": "数字要求",
+          "severity": "error"
+        },
+        {
+          "actual": 7,
+          "expected": 8,
+          "message": "密码长度不足: 需要8个字符，实际7个",
+          "rule_id": "length_min",
+          "rule_name": "最小长度",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "boundary": "below_min",
+        "length": 7
+      },
+      "password": "abababa",
+      "source_file": null,
+      "test_group": "length_boundary"
+    },
+    {
+      "character_classes": [
+        "lowercase"
+      ],
+      "description": "长度等于最小值 (8)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "数字数量不足: 需要1个，实际0个",
+          "rule_id": "digit_min",
+          "rule_name": "数字要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "boundary": "min",
+        "length": 8
+      },
+      "password": "abababab",
+      "source_file": null,
+      "test_group": "length_boundary"
+    },
+    {
+      "character_classes": [
+        "lowercase"
+      ],
+      "description": "长度等于最大值 (64)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "数字数量不足: 需要1个，实际0个",
+          "rule_id": "digit_min",
+          "rule_name": "数字要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "boundary": "max",
+        "length": 64
+      },
+      "password": "abababababababababababababababababababababababababababababababab",
+      "source_file": null,
+      "test_group": "length_boundary"
+    },
+    {
+      "character_classes": [
+        "lowercase"
+      ],
+      "description": "长度大于最大值 (65 > 64)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "数字数量不足: 需要1个，实际0个",
+          "rule_id": "digit_min",
+          "rule_name": "数字要求",
+          "severity": "error"
+        },
+        {
+          "actual": 65,
+          "expected": 64,
+          "message": "密码长度超出: 最多64个字符，实际65个",
+          "rule_id": "length_max",
+          "rule_name": "最大长度",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "特殊字符数量不足: 需要1个，实际0个",
+          "rule_id": "special_min",
+          "rule_name": "特殊字符要求",
+          "severity": "error"
+        },
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "boundary": "above_max",
+        "length": 65
+      },
+      "password": "ababababababababababababababababababababababababababababababababa",
+      "source_file": null,
+      "test_group": "length_boundary"
+    }
+  ],
+  "statistics": {
+    "failure_counts": {
+      "digit_min": 4,
+      "length_max": 1,
+      "length_min": 1,
+      "special_min": 4,
+      "uppercase_min": 4
+    },
+    "group_stats": {
+      "length_boundary": {
+        "invalid": 4,
+        "total": 4,
+        "valid": 0,
+        "valid_rate": 0.0
+      }
+    },
+    "invalid": 4,
+    "total": 4,
+    "valid": 0,
+    "valid_rate": 0.0
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "results": [
+    {
+      "character_classes": [
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "uppercase字符数不足 (需要1, 实际0)",
+      "failure_reasons": [
+        {
+          "actual": 0,
+          "expected": 1,
+          "message": "大写字母数量不足: 需要1个，实际0个",
+          "rule_id": "uppercase_min",
+          "rule_name": "大写字母要求",
+          "severity": "error"
+        }
+      ],
+      "is_valid": false,
+      "line_number": null,
+      "metadata": {
+        "actual": 0,
+        "char_type": "uppercase",
+        "required": 1
+      },
+      "password": "a0!ababa",
+      "source_file": null,
+      "test_group": "uppercase_boundary"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "uppercase字符数刚好满足 (需要1, 实际1)",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "actual": 1,
+        "char_type": "uppercase",
+        "required": 1
+      },
+      "password": "Aa0!abab",
+      "source_file": null,
+      "test_group": "uppercase_boundary"
+    }
+  ],
+  "statistics": {
+    "failure_counts": {
+      "uppercase_min": 1
+    },
+    "group_stats": {
+      "uppercase_boundary": {
+        "invalid": 1,
+        "total": 2,
+        "valid": 1,
+        "valid_rate": 0.5
+      }
+    },
+    "invalid": 1,
+    "total": 2,
+    "valid": 1,
+    "valid_rate": 0.5
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "min_length": 8,
+  "max_length": 64,
+  "min_uppercase": 1,
+  "min_lowercase": 1,
+  "min_digits": 1,
+  "min_special": 1,
+  "special_chars": "!@#$%^&*()_+-=[]{}|;:,.<>?",
+  "forbidden_patterns": [
+    "password",
+    "123456",
+    "qwerty"
+  ],
+  "forbid_consecutive": true,
+  "character_classes": []
+}

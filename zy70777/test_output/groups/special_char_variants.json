@@ -1,0 +1,513 @@
+{
+  "results": [
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '!'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 0,
+        "special_char": "!"
+      },
+      "password": "Aa1!abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '@'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 1,
+        "special_char": "@"
+      },
+      "password": "Aa1@abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '#'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 2,
+        "special_char": "#"
+      },
+      "password": "Aa1#abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '$'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 3,
+        "special_char": "$"
+      },
+      "password": "Aa1$abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '%'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 4,
+        "special_char": "%"
+      },
+      "password": "Aa1%abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '^'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 5,
+        "special_char": "^"
+      },
+      "password": "Aa1^abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '&'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 6,
+        "special_char": "&"
+      },
+      "password": "Aa1&abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '*'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 7,
+        "special_char": "*"
+      },
+      "password": "Aa1*abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '('",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 8,
+        "special_char": "("
+      },
+      "password": "Aa1(abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ')'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 9,
+        "special_char": ")"
+      },
+      "password": "Aa1)abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '_'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 10,
+        "special_char": "_"
+      },
+      "password": "Aa1_abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '+'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 11,
+        "special_char": "+"
+      },
+      "password": "Aa1+abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '-'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 12,
+        "special_char": "-"
+      },
+      "password": "Aa1-abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '='",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 13,
+        "special_char": "="
+      },
+      "password": "Aa1=abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '['",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 14,
+        "special_char": "["
+      },
+      "password": "Aa1[abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ']'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 15,
+        "special_char": "]"
+      },
+      "password": "Aa1]abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '{'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 16,
+        "special_char": "{"
+      },
+      "password": "Aa1{abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '}'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 17,
+        "special_char": "}"
+      },
+      "password": "Aa1}abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '|'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 18,
+        "special_char": "|"
+      },
+      "password": "Aa1|abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ';'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 19,
+        "special_char": ";"
+      },
+      "password": "Aa1;abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ':'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 20,
+        "special_char": ":"
+      },
+      "password": "Aa1:abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: ','",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 21,
+        "special_char": ","
+      },
+      "password": "Aa1,abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '.'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 22,
+        "special_char": "."
+      },
+      "password": "Aa1.abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '<'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 23,
+        "special_char": "<"
+      },
+      "password": "Aa1<abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '>'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 24,
+        "special_char": ">"
+      },
+      "password": "Aa1>abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    },
+    {
+      "character_classes": [
+        "uppercase",
+        "lowercase",
+        "digit",
+        "special"
+      ],
+      "description": "使用特殊字符: '?'",
+      "failure_reasons": [],
+      "is_valid": true,
+      "line_number": null,
+      "metadata": {
+        "char_index": 25,
+        "special_char": "?"
+      },
+      "password": "Aa1?abab",
+      "source_file": null,
+      "test_group": "special_char_variants"
+    }
+  ],
+  "statistics": {
+    "failure_counts": {},
+    "group_stats": {
+      "special_char_variants": {
+        "invalid": 0,
+        "total": 26,
+        "valid": 26,
+        "valid_rate": 1.0
+      }
+    },
+    "invalid": 0,
+    "total": 26,
+    "valid": 26,
+    "valid_rate": 1.0
+  }
+}
