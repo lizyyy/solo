@@ -311,6 +311,14 @@ def test_report_generation(db, executed_eviction_id):
     assert report.total_evicted == 1, "应该有1个驱逐记录"
     assert report.total_space_freed_bytes > 0, "应该释放了空间"
 
+    import json
+    report_data = json.loads(report.report_data)
+    cache_key_in_report = report_data["evictions"][0]["cache_key"]
+    print(f"  报告中的缓存键: {cache_key_in_report}")
+    assert cache_key_in_report is not None, "缓存键不应该为null"
+    assert cache_key_in_report == "test_results_v2", f"缓存键应该为test_results_v2, 实际是{cache_key_in_report}"
+    print("  ✅ 缓存键快照保存正确")
+
     print("✅ 报告生成测试通过")
 
 

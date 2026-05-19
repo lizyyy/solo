@@ -233,6 +233,7 @@ def create_eviction_request(db: Session, eviction_request: schemas.EvictionReque
     db_eviction = models.EvictionRequest(
         id=str(uuid.uuid4()),
         cache_entry_id=eviction_request.cache_entry_id,
+        cache_key=cache_entry.cache_key,
         status=status,
         requester=eviction_request.requester,
         reason=eviction_request.reason,
@@ -386,7 +387,7 @@ def create_eviction_report(db: Session, eviction_ids: List[str], generated_by: O
         "evictions": [
             {
                 "id": e.id,
-                "cache_key": e.cache_entry.cache_key if e.cache_entry else None,
+                "cache_key": e.cache_key,
                 "size_bytes": e.cache_size_bytes or (e.cache_entry.size_bytes if e.cache_entry else 0),
                 "impact_score": e.impact_score,
                 "executed_at": e.executed_at.isoformat() if e.executed_at else None

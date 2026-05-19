@@ -40,6 +40,7 @@ class EvictionRequest(Base):
 
     id = Column(String, primary_key=True, index=True)
     cache_entry_id = Column(String, ForeignKey("cache_entries.id"), nullable=False)
+    cache_key = Column(String, nullable=False)
     status = Column(String, index=True, nullable=False)
     requester = Column(String)
     reason = Column(Text)
