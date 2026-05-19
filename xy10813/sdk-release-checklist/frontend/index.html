@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDK发布检查台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-draft { background: #e5e7eb; color: #374151; }
+        .status-pending_review { background: #fef3c7; color: #92400e; }
+        .status-docs_synced { background: #dbeafe; color: #1e40af; }
+        .status-examples_verified { background: #d1fae5; color: #065f46; }
+        .status-compatibility_confirmed { background: #e0e7ff; color: #3730a3; }
+        .status-approved { background: #a7f3d0; color: #065f46; }
+        .status-published { background: #34d399; color: #064e3b; }
+        .status-rolled_back { background: #fee2e2; color: #991b1b; }
+        .status-failed { background: #fecaca; color: #7f1d1d; }
+        
+        .dirty-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            margin-right: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.25rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .diff-item,
+        .example-item,
+        .compat-item,
+        .task-item,
+        .history-item {
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .item-title {
+            font-weight: 600;
+        }
+        
+        .item-meta {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .breaking {
+            color: #ef4444;
+            font-weight: 600;
+        }
+        
+        .compare-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .compare-box {
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+        
+        .compare-box h4 {
+            margin-bottom: 0.8rem;
+            color: #555;
+        }
+        
+        .change-highlight {
+            background: #fef3c7;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ddd;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.75rem;
+            top: 0.25rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #eee;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+        
+        .validation-summary {
+            background: #fef3c7;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .validation-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.3rem 0;
+        }
+        
+        .validation-icon {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 SDK发布检查台</h1>
+    </div>
+    
+    <div class="container">
+        <div class="toolbar">
+            <button class="btn btn-primary" onclick="showCreateModal()">+ 新建发布</button>
+            <div class="filter-group">
+                <label>状态:</label>
+                <select id="statusFilter" onchange="loadSDKVersions()">
+                    <option value="">全部</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>SDK名称:</label>
+                <input type="text" id="nameFilter" placeholder="搜索..." oninput="loadSDKVersions()">
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="table-container">
+                <table id="sdkTable">
+                    <thead>
+                        <tr>
+                            <th>SDK名称</th>
+                            <th>版本</th>
+                            <th>语言</th>
+                            <th>状态</th>
+                            <th>创建人</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sdkTableBody">
+                        <tr>
+                            <td colspan="7" class="loading"><div class="spinner"></div><br>加载中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">发布详情</h2>
+                <button class="close-btn" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+    
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>新建发布</h2>
+                <button class="close-btn" onclick="closeModal('createModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="createForm" onsubmit="handleCreateSubmit(event)">
+                    <div class="row">
+                        <div class="form-group">
+                            <label>SDK名称 *</label>
+                            <input type="text" name="sdk_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>版本号 *</label>
+                            <input type="text" name="version" required placeholder="例如: 1.0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>语言</label>
+                            <input type="text" name="language" placeholder="例如: Python, JavaScript">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>变更日志</label>
+                        <textarea name="changelog" placeholder="描述本次发布的主要变更..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>发布说明</label>
+                        <textarea name="release_notes" placeholder="详细的发布说明..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>创建人</label>
+                        <input type="text" name="created_by" placeholder="您的姓名">
+                    </div>
+                    
+                    <h3 class="section-title">接口差异</h3>
+                    <div id="interfaceDiffsContainer">
+                    </div>
+                    <button type="button" class="btn btn-sm" onclick="addInterfaceDiff()">+ 添加接口差异</button>
+                    
+                    <h3 class="section-title">示例项目</h3>
+                    <div id="examplesContainer">
+                    </div>
+                    <button type="button" class="btn btn-sm" onclick="addExampleProject()">+ 添加示例项目</button>
+                    
+                    <h3 class="section-title">兼容矩阵</h3>
+                    <div id="compatibilityContainer">
+                    </div>
+                    <button type="button" class="btn btn-sm" onclick="addCompatibilityItem()">+ 添加兼容项</button>
+                    
+                    <h3 class="section-title">发布任务</h3>
+                    <div id="tasksContainer">
+                    </div>
+                    <button type="button" class="btn btn-sm" onclick="addReleaseTask()">+ 添加任务</button>
+                    
+                    <div style="margin-top: 2rem; text-align: right;">
+                        <button type="button" class="btn" onclick="closeModal('createModal')" style="margin-right: 0.5rem;">取消</button>
+                        <button type="submit" class="btn btn-primary">创建发布</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        let currentSDKId = null;
+        let statusOptions = [];
+        
+        async function init() {
+            await loadStatusOptions();
+            await loadSDKVersions();
+        }
+        
+        async function loadStatusOptions() {
+            try {
+                const response = await fetch(`${API_BASE}/status-list`);
+                const data = await response.json();
+                statusOptions = data.statuses;
+                
+                const filterSelect = document.getElementById('statusFilter');
+                filterSelect.innerHTML = '<option value="">全部</option>';
+                data.statuses.forEach(s => {
+                    filterSelect.innerHTML += `<option value="${s.value}">${s.label}</option>`;
+                });
+            } catch (e) {
+                console.error('加载状态选项失败:', e);
+            }
+        }
+        
+        async function loadSDKVersions() {
+            const status = document.getElementById('statusFilter').value;
+            const sdkName = document.getElementById('nameFilter').value;
+            
+            let url = `${API_BASE}/sdk-versions`;
+            const params = [];
+            if (status) params.push(`status=${status}`);
+            if (sdkName) params.push(`sdk_name=${encodeURIComponent(sdkName)}`);
+            if (params.length > 0) url += '?' + params.join('&');
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                renderSDKTable(data);
+            } catch (e) {
+                document.getElementById('sdkTableBody').innerHTML = 
+                    '<tr><td colspan="7" class="loading">加载失败，请确保后端服务已启动</td></tr>';
+            }
+        }
+        
+        function renderSDKTable(sdks) {
+            const tbody = document.getElementById('sdkTableBody');
+            
+            if (sdks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = sdks.map(sdk => `
+                <tr>
+                    <td>
+                        ${sdk.is_dirty ? '<span class="dirty-indicator" title="脏数据"></span>' : ''}
+                        ${sdk.sdk_name}
+                    </td>
+                    <td><strong>${sdk.version}</strong></td>
+                    <td>${sdk.language || '-'}</td>
+                    <td><span class="status-badge status-${sdk.status}">${formatStatus(sdk.status)}</span></td>
+                    <td>${sdk.created_by || '-'}</td>
+                    <td>${formatDate(sdk.created_at)}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-primary" onclick="viewDetail(${sdk.id})">查看</button>
+                            ${sdk.is_dirty ? `<button class="btn btn-sm btn-warning" onclick="cleanDirty(${sdk.id})">清理</button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function formatStatus(status) {
+            const found = statusOptions.find(s => s.value === status);
+            return found ? found.label : status;
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN');
+        }
+        
+        async function viewDetail(sdkId) {
+            currentSDKId = sdkId;
+            const modal = document.getElementById('detailModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalBody.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            modal.classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_BASE}/sdk-versions/${sdkId}`);
+                const sdk = await response.json();
+                renderDetail(sdk);
+            } catch (e) {
+                modalBody.innerHTML = '<div class="alert alert-error">加载失败</div>';
+            }
+        }
+        
+        function renderDetail(sdk) {
+            document.getElementById('modalTitle').textContent = `${sdk.sdk_name} ${sdk.version} - 发布详情`;
+            
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                ${sdk.is_dirty ? `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ 脏数据警告:</strong> ${sdk.dirty_reason || '数据状态异常'}
+                        <button class="btn btn-sm btn-warning" style="margin-left: 1rem;" onclick="cleanDirty(${sdk.id})">标记为已清理</button>
+                    </div>
+                ` : ''}
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div>
+                        <strong>当前状态:</strong> 
+                        <span class="status-badge status-${sdk.status}">${formatStatus(sdk.status)}</span>
+                    </div>
+                    <div class="actions">
+                        <select id="newStatusSelect" style="margin-right: 0.5rem;">
+                            ${statusOptions.map(s => `<option value="${s.value}" ${s.value === sdk.status ? 'selected' : ''}>${s.label}</option>`).join('')}
+                        </select>
+                        <button class="btn btn-sm btn-success" onclick="validateAndTransition()">验证并推进</button>
+                        <button class="btn btn-sm btn-danger" onclick="showRollbackModal()">回滚</button>
+                        <button class="btn btn-sm" onclick="exportSDK(${sdk.id})">导出</button>
+                    </div>
+                </div>
+                
+                <div id="validationResult"></div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('basic')">基本信息</div>
+                    <div class="tab" onclick="switchTab('diffs')">接口差异</div>
+                    <div class="tab" onclick="switchTab('examples')">示例项目</div>
+                    <div class="tab" onclick="switchTab('compatibility')">兼容矩阵</div>
+                    <div class="tab" onclick="switchTab('tasks')">发布任务</div>
+                    <div class="tab" onclick="switchTab('history')">状态历史</div>
+                    <div class="tab" onclick="switchTab('compare')">变化对比</div>
+                </div>
+                
+                <div id="tab-basic" class="tab-content active">
+                    <div class="row">
+                        <div class="form-group">
+                            <label>SDK名称</label>
+                            <input type="text" value="${sdk.sdk_name}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>版本号</label>
+                            <input type="text" value="${sdk.version}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>语言</label>
+                            <input type="text" value="${sdk.language || '-'}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>变更日志</label>
+                        <textarea readonly>${sdk.changelog || ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>发布说明</label>
+                        <textarea readonly>${sdk.release_notes || ''}</textarea>
+                    </div>
+                </div>
+                
+                <div id="tab-diffs" class="tab-content">
+                    ${sdk.interface_diffs.length === 0 ? 
+                        '<div class="empty-state">暂无接口差异记录</div>' :
+                        sdk.interface_diffs.map(diff => `
+                            <div class="diff-item">
+                                <div class="item-header">
+                                    <span class="item-title">${diff.interface_name}</span>
+                                    <span>
+                                        ${diff.breaking_change ? '<span class="breaking">[破坏性变更]</span>' : ''}
+                                        ${diff.verified ? '✅ 已验证' : '⏳ 待验证'}
+                                    </span>
+                                </div>
+                                <div class="item-meta">类型: ${diff.change_type || '-'}</div>
+                                ${diff.previous_signature ? `<div><strong>之前:</strong><br><code>${diff.previous_signature}</code></div>` : ''}
+                                ${diff.new_signature ? `<div><strong>现在:</strong><br><code>${diff.new_signature}</code></div>` : ''}
+                                <div style="margin-top: 0.5rem;">
+                                    ${!diff.verified ? `<button class="btn btn-sm btn-success" onclick="verifyDiff(${diff.id})">标记为已验证</button>` : ''}
+                                </div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+                
+                <div id="tab-examples" class="tab-content">
+                    ${sdk.example_projects.length === 0 ? 
+                        '<div class="empty-state">暂无示例项目</div>' :
+                        sdk.example_projects.map(proj => `
+                            <div class="example-item">
+                                <div class="item-header">
+                                    <span class="item-title">${proj.project_name}</span>
+                                    <span>
+                                        ${proj.verified ? '✅ 已验证' : '⏳ 待验证'}
+                                    </span>
+                                </div>
+                                <div class="item-meta">
+                                    语言: ${proj.language || '-'} | 
+                                    构建: <span class="status-badge" style="background: ${proj.build_status === 'success' ? '#d1fae5' : '#fee2e2'}; color: ${proj.build_status === 'success' ? '#065f46' : '#991b1b'}">${proj.build_status}</span> | 
+                                    测试: <span class="status-badge" style="background: ${proj.test_status === 'success' ? '#d1fae5' : '#fee2e2'}; color: ${proj.test_status === 'success' ? '#065f46' : '#991b1b'}">${proj.test_status}</span>
+                                </div>
+                                ${proj.project_url ? `<div><a href="${proj.project_url}" target="_blank">查看项目 →</a></div>` : ''}
+                                <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+                                    <button class="btn btn-sm" onclick="updateExampleStatus(${proj.id}, 'build_status', 'success')">构建成功</button>
+                                    <button class="btn btn-sm" onclick="updateExampleStatus(${proj.id}, 'test_status', 'success')">测试通过</button>
+                                    ${!proj.verified ? `<button class="btn btn-sm btn-success" onclick="verifyExample(${proj.id})">验证通过</button>` : ''}
+                                </div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+                
+                <div id="tab-compatibility" class="tab-content">
+                    ${sdk.compatibility_matrix.length === 0 ? 
+                        '<div class="empty-state">暂无兼容矩阵</div>' :
+                        sdk.compatibility_matrix.map(item => `
+                            <div class="compat-item">
+                                <div class="item-header">
+                                    <span class="item-title">${item.platform}</span>
+                                    <span>${item.confirmed ? '✅ 已确认' : '⏳ 待确认'}</span>
+                                </div>
+                                <div class="item-meta">
+                                    版本范围: ${item.min_version || '-'} ~ ${item.max_version || '-'}
+                                    ${!item.supported ? ' <span style="color: #ef4444;">(不支持)</span>' : ''}
+                                </div>
+                                ${item.notes ? `<div style="margin-top: 0.5rem;">备注: ${item.notes}</div>` : ''}
+                                <div style="margin-top: 0.5rem;">
+                                    ${!item.confirmed ? `<button class="btn btn-sm btn-success" onclick="confirmCompatibility(${item.id})">确认兼容</button>` : ''}
+                                </div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+                
+                <div id="tab-tasks" class="tab-content">
+                    ${sdk.release_tasks.length === 0 ? 
+                        '<div class="empty-state">暂无发布任务</div>' :
+                        sdk.release_tasks.map(task => `
+                            <div class="task-item">
+                                <div class="item-header">
+                                    <span class="item-title">${task.task_name}</span>
+                                    <span class="status-badge" style="background: ${task.status === 'completed' ? '#d1fae5' : '#fef3c7'}; color: ${task.status === 'completed' ? '#065f46' : '#92400e'}">${task.status === 'completed' ? '已完成' : '进行中'}</span>
+                                </div>
+                                <div class="item-meta">
+                                    类型: ${task.task_type || '-'} | 
+                                    负责人: ${task.assignee || '-'} | 
+                                    优先级: ${task.priority}
+                                </div>
+                                ${task.description ? `<div style="margin-top: 0.5rem;">${task.description}</div>` : ''}
+                                <div style="margin-top: 0.5rem;">
+                                    ${task.status !== 'completed' ? `<button class="btn btn-sm btn-success" onclick="completeTask(${task.id})">完成任务</button>` : ''}
+                                </div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+                
+                <div id="tab-history" class="tab-content">
+                    <div class="timeline">
+                        ${sdk.status_history.length === 0 ? 
+                            '<div class="empty-state">暂无状态变更记录</div>' :
+                            sdk.status_history.map(h => `
+                                <div class="timeline-item">
+                                    <div class="item-header">
+                                        <span class="item-title">${formatStatus(h.from_status || '新建')} → ${formatStatus(h.to_status)}</span>
+                                        <span class="item-meta">${formatDate(h.changed_at)}</span>
+                                    </div>
+                                    <div class="item-meta">操作人: ${h.changed_by || '系统'}</div>
+                                    ${h.reason ? `<div style="margin-top: 0.5rem;">原因: ${h.reason}</div>` : ''}
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+                
+                <div id="tab-compare" class="tab-content">
+                    ${sdk.status_history.length < 2 ? 
+                        '<div class="empty-state">状态变更不足，无法对比</div>' :
+                        renderCompareTab(sdk)
+                    }
+                </div>
+            `;
+        }
+        
+        function renderCompareTab(sdk) {
+            const history = sdk.status_history;
+            const latest = history[history.length - 1];
+            const previous = history[history.length - 2];
+            
+            return `
+                <h4>最近两次状态变更对比</h4>
+                <div class="compare-section">
+                    <div class="compare-box">
+                        <h4>之前: ${formatStatus(previous.to_status)}</h4>
+                        <p><strong>操作人:</strong> ${previous.changed_by || '系统'}</p>
+                        <p><strong>时间:</strong> ${formatDate(previous.changed_at)}</p>
+                        ${previous.reason ? `<p><strong>原因:</strong> ${previous.reason}</p>` : ''}
+                    </div>
+                    <div class="compare-box">
+                        <h4>现在: ${formatStatus(latest.to_status)}</h4>
+                        <p><strong>操作人:</strong> ${latest.changed_by || '系统'}</p>
+                        <p><strong>时间:</strong> ${formatDate(latest.changed_at)}</p>
+                        ${latest.reason ? `<p><strong>原因:</strong> ${latest.reason}</p>` : ''}
+                        <span class="change-highlight">状态变化</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <h4>验证项对比</h4>
+                    <p>✅ 接口差异验证: ${sdk.interface_diffs.filter(d => d.verified).length}/${sdk.interface_diffs.length}</p>
+                    <p>✅ 示例项目验证: ${sdk.example_projects.filter(e => e.verified).length}/${sdk.example_projects.length}</p>
+                    <p>✅ 兼容矩阵确认: ${sdk.compatibility_matrix.filter(c => c.confirmed).length}/${sdk.compatibility_matrix.length}</p>
+                    <p>✅ 发布任务完成: ${sdk.release_tasks.filter(t => t.status === 'completed').length}/${sdk.release_tasks.length}</p>
+                </div>
+            `;
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+        
+        async function validateAndTransition() {
+            const newStatus = document.getElementById('newStatusSelect').value;
+            const resultDiv = document.getElementById('validationResult');
+            
+            try {
+                const response = await fetch(`${API_BASE}/sdk-versions/${currentSDKId}/validate?target_status=${newStatus}`);
+                const validation = await response.json();
+                
+                let html = '';
+                if (validation.errors.length > 0) {
+                    html += '<div class="alert alert-error"><strong>❌ 验证失败，存在以下错误:</strong><ul>';
+                    validation.errors.forEach(e => {
+                        html += `<li>${e.field}: ${e.message}</li>`;
+                    });
+                    html += '</ul></div>';
+                }
+                
+                if (validation.warnings.length > 0) {
+                    html += '<div class="alert alert-warning"><strong>⚠️ 警告:</strong><ul>';
+                    validation.warnings.forEach(w => {
+                        html += `<li>${w.field}: ${w.message}</li>`;
+                    });
+                    html += '</ul></div>';
+                }
+                
+                if (validation.valid) {
+                    html += '<div class="alert alert-success">✅ 验证通过！是否推进状态？';
+                    html += `<button class="btn btn-sm btn-success" style="margin-left: 1rem;" onclick="doTransition('${newStatus}')">确认推进</button></div>`;
+                }
+                
+                resultDiv.innerHTML = html;
+            } catch (e) {
+                resultDiv.innerHTML = '<div class="alert alert-error">验证请求失败</div>';
+            }
+        }
+        
+        async function doTransition(newStatus) {
+            const changedBy = prompt('请输入操作人姓名:');
+            if (!changedBy) return;
+            
+            const reason = prompt('状态变更原因 (可选):');
+            
+            try {
+                const response = await fetch(`${API_BASE}/sdk-versions/${currentSDKId}/transition`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ new_status: newStatus, changed_by: changedBy, reason: reason })
+                });
+                
+                if (response.ok) {
+                    alert('状态推进成功！');
+                    viewDetail(currentSDKId);
+                    loadSDKVersions();
+                } else {
+                    const error = await response.json();
+                    alert('操作失败: ' + error.detail);
+                }
+            } catch (e) {
+                alert('请求失败');
+            }
+        }
+        
+        async function verifyDiff(diffId) {
+            const verifiedBy = prompt('请输入验证人姓名:');
+            if (!verifiedBy) return;
+            
+            try {
+                await fetch(`${API_BASE}/interface-diffs/${diffId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ verified: true, verified_by: verifiedBy })
+                });
+                viewDetail(currentSDKId);
+            } catch (e) {
+                alert('操作失败');
+            }
+        }
+        
+        async function verifyExample(projectId) {
+            const verifiedBy = prompt('请输入验证人姓名:');
+            if (!verifiedBy) return;
+            
+            try {
+                await fetch(`${API_BASE}/example-projects/${projectId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ verified: true, verified_by: verifiedBy })
+                });
+                viewDetail(currentSDKId);
+            } catch (e) {
+                alert('操作失败');
+            }
+        }
+        
+        async function updateExampleStatus(projectId, field, value) {
+            try {
+                await fetch(`${API_BASE}/example-projects/${projectId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [field]: value })
+                });
+                viewDetail(currentSDKId);
+            } catch (e) {
+                alert('操作失败');
+            }
+        }
+        
+        async function confirmCompatibility(matrixId) {
+            const confirmedBy = prompt('请输入确认人姓名:');
+            if (!confirmedBy) return;
+            
+            try {
+                await fetch(`${API_BASE}/compatibility-matrix/${matrixId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ confirmed: true, confirmed_by: confirmedBy })
+                });
+                viewDetail(currentSDKId);
+            } catch (e) {
+                alert('操作失败');
+            }
+        }
+        
+        async function completeTask(taskId) {
+            const completedBy = prompt('请输入完成人姓名:');
+            if (!completedBy) return;
+            
+            try {
+                await fetch(`${API_BASE}/release-tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'completed', completed_by: completedBy })
+                });
+                viewDetail(currentSDKId);
+            } catch (e) {
+                alert('操作失败');
+            }
+        }
+        
+        async function cleanDirty(sdkId) {
+            if (!confirm('确认标记为已清理？')) return;
+            
+            try {
+                await fetch(`${API_BASE}/sdk-versions/${sdkId}/clean-dirty`, { method: 'POST' });
+                loadSDKVersions();
+                if (currentSDKId === sdkId) viewDetail(sdkId);
+            } catch (e) {
+                alert('操作失败');
+            }
+        }
+        
+        async function showRollbackModal() {
+            const reason = prompt('请输入回滚原因:');
+            if (!reason) return;
+            
+            const rollbackVersion = prompt('回滚到版本 (可选):');
+            const executedBy = prompt('操作人姓名:');
+            if (!executedBy) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/sdk-versions/${currentSDKId}/rollback?executed_by=${encodeURIComponent(executedBy)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason, rollback_version: rollbackVersion })
+                });
+                
+                if (response.ok) {
+                    alert('回滚成功！');
+                    viewDetail(currentSDKId);
+                    loadSDKVersions();
+                } else {
+                    alert('回滚失败');
+                }
+            } catch (e) {
+                alert('请求失败');
+            }
+        }
+        
+        async function exportSDK(sdkId) {
+            try {
+                const response = await fetch(`${API_BASE}/sdk-versions/${sdkId}/export`);
+                const data = await response.json();
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sdk-release-${sdkId}.json`;
+                a.click();
+            } catch (e) {
+                alert('导出失败');
+            }
+        }
+        
+        function showCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+            document.getElementById('createForm').reset();
+            document.getElementById('interfaceDiffsContainer').innerHTML = '';
+            document.getElementById('examplesContainer').innerHTML = '';
+            document.getElementById('compatibilityContainer').innerHTML = '';
+            document.getElementById('tasksContainer').innerHTML = '';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        let diffCounter = 0;
+        function addInterfaceDiff() {
+            const container = document.getElementById('interfaceDiffsContainer');
+            const html = `
+                <div class="diff-item" id="diff-${diffCounter}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong>接口差异 #${diffCounter + 1}</strong>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="document.getElementById('diff-${diffCounter}').remove()">删除</button>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label>接口名称</label>
+                            <input type="text" name="diff_name_${diffCounter}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>变更类型</label>
+                            <input type="text" name="diff_type_${diffCounter}" placeholder="例如: add, modify, remove">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>之前的签名</label>
+                        <textarea name="diff_prev_${diffCounter}"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>新的签名</label>
+                        <textarea name="diff_new_${diffCounter}"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="diff_breaking_${diffCounter}">
+                            破坏性变更
+                        </label>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+            diffCounter++;
+        }
+        
+        let exampleCounter = 0;
+        function addExampleProject() {
+            const container = document.getElementById('examplesContainer');
+            const html = `
+                <div class="example-item" id="example-${exampleCounter}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong>示例项目 #${exampleCounter + 1}</strong>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="document.getElementById('example-${exampleCounter}').remove()">删除</button>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label>项目名称</label>
+                            <input type="text" name="example_name_${exampleCounter}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>语言</label>
+                            <input type="text" name="example_lang_${exampleCounter}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>项目URL</label>
+                        <input type="text" name="example_url_${exampleCounter}">
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+            exampleCounter++;
+        }
+        
+        let compatCounter = 0;
+        function addCompatibilityItem() {
+            const container = document.getElementById('compatibilityContainer');
+            const html = `
+                <div class="compat-item" id="compat-${compatCounter}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong>兼容项 #${compatCounter + 1}</strong>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="document.getElementById('compat-${compatCounter}').remove()">删除</button>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label>平台</label>
+                            <input type="text" name="compat_platform_${compatCounter}" required placeholder="例如: Windows, Python 3.8+">
+                        </div>
+                        <div class="form-group">
+                            <label>最低版本</label>
+                            <input type="text" name="compat_min_${compatCounter}">
+                        </div>
+                        <div class="form-group">
+                            <label>最高版本</label>
+                            <input type="text" name="compat_max_${compatCounter}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+            compatCounter++;
+        }
+        
+        let taskCounter = 0;
+        function addReleaseTask() {
+            const container = document.getElementById('tasksContainer');
+            const html = `
+                <div class="task-item" id="task-${taskCounter}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong>发布任务 #${taskCounter + 1}</strong>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="document.getElementById('task-${taskCounter}').remove()">删除</button>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label>任务名称</label>
+                            <input type="text" name="task_name_${taskCounter}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>任务类型</label>
+                            <input type="text" name="task_type_${taskCounter}">
+                        </div>
+                        <div class="form-group">
+                            <label>负责人</label>
+                            <input type="text" name="task_assignee_${taskCounter}">
+                        </div>
+                        <div class="form-group">
+                            <label>优先级</label>
+                            <select name="task_priority_${taskCounter}">
+                                <option value="low">低</option>
+                                <option value="medium" selected>中</option>
+                                <option value="high">高</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>描述</label>
+                        <textarea name="task_desc_${taskCounter}"></textarea>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+            taskCounter++;
+        }
+        
+        async function handleCreateSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const data = {
+                sdk_name: formData.get('sdk_name'),
+                version: formData.get('version'),
+                language: formData.get('language'),
+                changelog: formData.get('changelog'),
+                release_notes: formData.get('release_notes'),
+                created_by: formData.get('created_by'),
+                interface_diffs: [],
+                example_projects: [],
+                compatibility_matrix: [],
+                release_tasks: [],
+                idempotency_key: 'key-' + Date.now()
+            };
+            
+            for (let i = 0; i < diffCounter; i++) {
+                if (form.querySelector(`[name="diff_name_${i}"]`)) {
+                    data.interface_diffs.push({
+                        interface_name: formData.get(`diff_name_${i}`),
+                        change_type: formData.get(`diff_type_${i}`),
+                        previous_signature: formData.get(`diff_prev_${i}`),
+                        new_signature: formData.get(`diff_new_${i}`),
+                        breaking_change: form.querySelector(`[name="diff_breaking_${i}"]`).checked
+                    });
+                }
+            }
+            
+            for (let i = 0; i < exampleCounter; i++) {
+                if (form.querySelector(`[name="example_name_${i}"]`)) {
+                    data.example_projects.push({
+                        project_name: formData.get(`example_name_${i}`),
+                        language: formData.get(`example_lang_${i}`),
+                        project_url: formData.get(`example_url_${i}`)
+                    });
+                }
+            }
+            
+            for (let i = 0; i < compatCounter; i++) {
+                if (form.querySelector(`[name="compat_platform_${i}"]`)) {
+                    data.compatibility_matrix.push({
+                        platform: formData.get(`compat_platform_${i}`),
+                        min_version: formData.get(`compat_min_${i}`),
+                        max_version: formData.get(`compat_max_${i}`)
+                    });
+                }
+            }
+            
+            for (let i = 0; i < taskCounter; i++) {
+                if (form.querySelector(`[name="task_name_${i}"]`)) {
+                    data.release_tasks.push({
+                        task_name: formData.get(`task_name_${i}`),
+                        task_type: formData.get(`task_type_${i}`),
+                        description: formData.get(`task_desc_${i}`),
+                        assignee: formData.get(`task_assignee_${i}`),
+                        priority: formData.get(`task_priority_${i}`)
+                    });
+                }
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/sdk-versions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    alert('创建成功！');
+                    closeModal('createModal');
+                    loadSDKVersions();
+                } else {
+                    const error = await response.json();
+                    alert('创建失败: ' + error.detail);
+                }
+            } catch (e) {
+                alert('请求失败，请确保后端服务已启动');
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>
