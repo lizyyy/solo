@@ -54,27 +54,43 @@ class DuplicateApplicationRule(BaseRule):
                     )
                 )
 
-        overlapping = self._find_overlapping_windows(context.parse_result.windows)
-        for group in overlapping:
-            window_ids = [w.id for w in group]
-            results.append(
-                self._fail(
-                    f"检测到重叠窗口: {len(group)} 个窗口时间重叠",
-                    details={
-                        "window_count": len(group),
-                        "window_ids": window_ids,
-                        "windows": [
-                            {
-                                "id": w.id,
-                                "start": w.start_time.isoformat(),
-                                "end": w.end_time.isoformat(),
-                            }
-                            for w in group
-                        ],
-                    },
-                    related_records=window_ids,
+        exc_map = {exc.id: exc for exc in context.parse_result.exceptions}
+        repo_branch_windows = defaultdict(list)
+        for window in context.parse_result.windows:
+            exc = exc_map.get(window.exception_id)
+            if exc:
+                key = (exc.repository_id, exc.branch_pattern)
+                repo_branch_windows[key].append(window)
+            else:
+                key = (f"unknown_{window.id}", "unknown")
+                repo_branch_windows[key].append(window)
+
+        for (repo_id, branch), windows in repo_branch_windows.items():
+            if len(windows) < 2:
+                continue
+            overlapping = self._find_overlapping_windows(windows)
+            for group in overlapping:
+                window_ids = [w.id for w in group]
+                results.append(
+                    self._fail(
+                        f"检测到重叠窗口: 仓库={repo_id}, 分支={branch} 有 {len(group)} 个窗口时间重叠",
+                        details={
+                            "repository_id": repo_id,
+                            "branch_pattern": branch,
+                            "window_count": len(group),
+                            "window_ids": window_ids,
+                            "windows": [
+                                {
+                                    "id": w.id,
+                                    "start": w.start_time.isoformat(),
+                                    "end": w.end_time.isoformat(),
+                                }
+                                for w in group
+                            ],
+                        },
+                        related_records=window_ids,
+                    )
                 )
-            )
 
         if not results:
             results.append(self._pass("未检测到重复申请或重叠窗口"))
