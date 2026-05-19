@@ -295,10 +295,66 @@ def test_error_codes():
     print_test("缺少字段错误码", passed)
     all_passed &= passed
     
+    response = requests.post(f"{BASE_URL}/export-tasks", json={})
+    passed = response.status_code == 400 and response.json()["detail"]["code"] == "MISSING_FIELD"
+    print_test("创建任务缺字段返回MISSING_FIELD", passed, f"实际响应: {response.json()}")
+    all_passed &= passed
+    
+    return all_passed
+
+def test_pending_task_quota_consumption():
+    print(f"\n{bcolors.HEADER}{bcolors.BOLD}[8] PENDING任务配额消耗测试{bcolors.ENDC}")
+    all_passed = True
+    
+    requests.post(f"{BASE_URL}/tenants", json={
+        "tenant_id": "test_tenant_quota",
+        "tenant_name": "配额测试租户",
+        "max_concurrent_tasks": 1,
+        "max_daily_exports": 3,
+        "max_file_size_mb": 100,
+        "max_queue_size": 5,
+        "quota_window_hours": 24
+    })
+    
+    task1 = {"task_id": "quota_test_001", "tenant_id": "test_tenant_quota", "task_name": "任务1", "file_size_mb": 10, "priority": 0}
+    requests.post(f"{BASE_URL}/export-tasks", json=task1)
+    
+    task2 = {"task_id": "quota_test_002", "tenant_id": "test_tenant_quota", "task_name": "任务2", "file_size_mb": 10, "priority": 0}
+    requests.post(f"{BASE_URL}/export-tasks", json=task2)
+    
+    task3 = {"task_id": "quota_test_003", "tenant_id": "test_tenant_quota", "task_name": "任务3", "file_size_mb": 10, "priority": 0}
+    requests.post(f"{BASE_URL}/export-tasks", json=task3)
+    
+    response = requests.get(f"{BASE_URL}/tenants/test_tenant_quota/usage")
+    usage = response.json()
+    passed = usage["window_exports"] == 3
+    print_test("PENDING任务占用窗口配额", passed, f"窗口导出数: {usage['window_exports']}, 期望: 3")
+    all_passed &= passed
+    
+    task4 = {"task_id": "quota_test_004", "tenant_id": "test_tenant_quota", "task_name": "任务4", "file_size_mb": 10, "priority": 0}
+    response = requests.post(f"{BASE_URL}/export-tasks", json=task4)
+    passed = response.status_code == 429
+    print_test("配额满后拒绝新任务", passed, f"状态码: {response.status_code}")
+    all_passed &= passed
+    
+    response = requests.put(f"{BASE_URL}/export-tasks/quota_test_001/complete")
+    print_test("完成第一个任务", response.status_code == 200)
+    
+    response = requests.get(f"{BASE_URL}/export-tasks/quota_test_002")
+    passed = response.json()["status"] == "PROCESSING"
+    print_test("队列任务自动启动(无需重新扣配额)", passed, f"状态: {response.json()['status']}")
+    all_passed &= passed
+    
+    response = requests.get(f"{BASE_URL}/tenants/test_tenant_quota/usage")
+    usage = response.json()
+    passed = usage["window_exports"] == 3
+    print_test("队列任务启动后配额不变", passed, f"窗口导出数: {usage['window_exports']}")
+    all_passed &= passed
+    
     return all_passed
 
 def test_export_report():
-    print(f"\n{bcolors.HEADER}{bcolors.BOLD}[8] 用量报告导出测试{bcolors.ENDC}")
+    print(f"\n{bcolors.HEADER}{bcolors.BOLD}[9] 用量报告导出测试{bcolors.ENDC}")
     all_passed = True
     
     response = requests.get(f"{BASE_URL}/reports/usage/export", params={"tenant_id": "test_tenant_001"})
@@ -333,6 +389,7 @@ def run_all_tests():
     results.append(("配额超限拒绝", test_quota_exceeded_rejection()))
     results.append(("队列满拒绝", test_queue_full_rejection()))
     results.append(("错误码分类", test_error_codes()))
+    results.append(("PENDING任务配额", test_pending_task_quota_consumption()))
     results.append(("报告导出", test_export_report()))
     
     print(f"\n{bcolors.HEADER}{bcolors.BOLD}")

@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
@@ -9,6 +10,36 @@ import csv
 from io import StringIO
 
 app = FastAPI(title="异步导出配额拒绝理由后端API", version="1.0.0")
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    missing_fields = []
+    for error in exc.errors():
+        if error["type"] == "missing":
+            field_name = ".".join(str(loc) for loc in error["loc"])
+            missing_fields.append(field_name)
+    
+    if missing_fields:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "detail": {
+                    "code": ErrorCode.MISSING_FIELD,
+                    "message": f"缺少必填字段: {', '.join(missing_fields)}",
+                    "missing_fields": missing_fields
+                }
+            }
+        )
+    
+    return JSONResponse(
+        status_code=400,
+        content={
+            "detail": {
+                "code": ErrorCode.MISSING_FIELD,
+                "message": f"请求参数错误: {exc.errors()}"
+            }
+        }
+    )
 
 DATABASE_PATH = "export_quota.db"
 
@@ -256,7 +287,7 @@ def get_quota_usage(tenant_id: str, conn: sqlite3.Connection) -> Dict[str, Any]:
     
     cursor.execute(
         "SELECT COUNT(*) as count FROM export_tasks "
-        "WHERE tenant_id = ? AND status IN ('COMPLETED', 'PROCESSING') AND created_at >= ?",
+        "WHERE tenant_id = ? AND status IN ('COMPLETED', 'PROCESSING', 'PENDING') AND created_at >= ?",
         (tenant_id, window_start)
     )
     window_count = cursor.fetchone()["count"]
@@ -374,6 +405,14 @@ def create_export_task(task: ExportTaskCreate):
         
         usage = get_quota_usage(task.tenant_id, conn)
         
+        cursor.execute(
+            "INSERT INTO quota_usage (tenant_id, task_id, quota_type, used_value, window_start, window_end) "
+            "VALUES (?, ?, 'EXPORT_COUNT', 1, ?, ?)",
+            (task.tenant_id, task.task_id,
+             (datetime.now() - timedelta(hours=usage["window_hours"])).isoformat(),
+             datetime.now().isoformat())
+        )
+        
         if usage["concurrent_tasks"] < usage["max_concurrent"]:
             status = TaskStatus.PROCESSING
             started_at = datetime.now().isoformat()
@@ -382,14 +421,6 @@ def create_export_task(task: ExportTaskCreate):
                 "INSERT INTO export_tasks (task_id, tenant_id, task_name, file_size_mb, status, started_at, priority) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 (task.task_id, task.tenant_id, task.task_name, task.file_size_mb, status, started_at, task.priority)
-            )
-            
-            cursor.execute(
-                "INSERT INTO quota_usage (tenant_id, task_id, quota_type, used_value, window_start, window_end) "
-                "VALUES (?, ?, 'EXPORT_COUNT', 1, ?, ?)",
-                (task.tenant_id, task.task_id,
-                 (datetime.now() - timedelta(hours=usage["window_hours"])).isoformat(),
-                 datetime.now().isoformat())
             )
         else:
             status = TaskStatus.PENDING
