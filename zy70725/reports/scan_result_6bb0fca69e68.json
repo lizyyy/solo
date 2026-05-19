@@ -1,0 +1,84 @@
+{
+  "scan_id": "6bb0fca69e68",
+  "scan_date": "2024-07-01",
+  "summary": {
+    "scan_date": "2024-07-01",
+    "total_contracts": 1,
+    "total_exceptions": 2,
+    "expired_exceptions": 2,
+    "expired_with_hits": 2,
+    "expired_without_hits": 0,
+    "recovery_items_count": 2,
+    "hit_stats": {
+      "EXP-001": {
+        "null_count": 150,
+        "total_count": 10000,
+        "null_rate": 0.015
+      },
+      "EXP-002": {
+        "null_count": 0,
+        "total_count": 10000,
+        "null_rate": 0.0
+      }
+    }
+  },
+  "hit_records": [
+    {
+      "record_id": "HIT-002",
+      "contract_id": "ORD-001",
+      "field_path": "amount",
+      "rule_id": "EXP-002",
+      "null_count": 0,
+      "total_count": 10000,
+      "sample_values": [],
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy70725/templates/hit_records.json",
+      "source_line": 2,
+      "detected_at": "2026-05-19T07:19:35.095536"
+    },
+    {
+      "record_id": "HIT-001",
+      "contract_id": "ORD-001",
+      "field_path": "user_id",
+      "rule_id": "EXP-001",
+      "null_count": 150,
+      "total_count": 10000,
+      "sample_values": [
+        "",
+        "",
+        ""
+      ],
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy70725/templates/hit_records.json",
+      "source_line": 1,
+      "detected_at": "2026-05-19T07:19:35.095533"
+    }
+  ],
+  "recovery_items": [
+    {
+      "rule_id": "EXP-002",
+      "field_path": "amount",
+      "exception_date": "2024-03-15",
+      "reason": "订单金额字段校验规则调整",
+      "null_rate": 0.0,
+      "null_count": 0,
+      "total_count": 10000,
+      "recovery_status": "pending",
+      "approval_note": null,
+      "approved_by": null,
+      "approved_at": null
+    },
+    {
+      "rule_id": "EXP-001",
+      "field_path": "user_id",
+      "exception_date": "2024-06-30",
+      "reason": "历史数据迁移期间临时允许为空",
+      "null_rate": 0.015,
+      "null_count": 150,
+      "total_count": 10000,
+      "recovery_status": "pending",
+      "approval_note": null,
+      "approved_by": null,
+      "approved_at": null
+    }
+  ],
+  "bad_lines": []
+}

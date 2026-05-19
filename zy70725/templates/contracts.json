@@ -1,0 +1,25 @@
+[
+  {
+    "contract_id": "ORD-001",
+    "name": "订单数据表",
+    "version": "1.0",
+    "created_at": "2024-01-01",
+    "fields": [
+      {
+        "field_path": "order_id",
+        "is_nullable": false,
+        "description": "订单ID"
+      },
+      {
+        "field_path": "user_id",
+        "is_nullable": false,
+        "description": "用户ID"
+      },
+      {
+        "field_path": "amount",
+        "is_nullable": true,
+        "description": "订单金额"
+      }
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "rule_id": "EXP-001",
+    "contract_id": "ORD-001",
+    "field_path": "user_id",
+    "reason": "历史数据迁移期间临时允许为空",
+    "exception_date": "2024-06-30",
+    "owner": "张三",
+    "status": "active"
+  },
+  {
+    "rule_id": "EXP-002",
+    "contract_id": "ORD-001",
+    "field_path": "amount",
+    "reason": "订单金额字段校验规则调整",
+    "exception_date": "2024-03-15",
+    "owner": "李四",
+    "status": "active"
+  }
+]

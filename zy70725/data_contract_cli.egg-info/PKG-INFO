@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: data-contract-cli
+Version: 0.1.0
+Summary: 数据契约例外到期恢复排查CLI
+Author: Your Team
+Requires-Python: >=3.9
+Requires-Dist: click>=8.0
+Requires-Dist: pydantic>=2.0
+Requires-Dist: python-dateutil>=2.8
+Requires-Dist: pandas>=2.0
+Requires-Dist: openpyxl>=3.1
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
