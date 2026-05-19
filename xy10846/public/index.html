@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档切片策略台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-active { background-color: #3b82f6; color: white; }
+        .modal-overlay { background-color: rgba(0,0,0,0.5); }
+        .status-draft { background-color: #f3f4f6; color: #374151; }
+        .status-testing { background-color: #fef3c7; color: #92400e; }
+        .status-approved { background-color: #dbeafe; color: #1e40af; }
+        .status-published { background-color: #d1fae5; color: #065f46; }
+        .status-deprecated { background-color: #fee2e2; color: #991b1b; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">📄 文档切片策略台</h1>
+            <p class="text-gray-600 mt-2">知识库问答效果优化 - 切片长度、标题继承、表格处理管理</p>
+        </header>
+
+        <div class="flex gap-2 mb-6">
+            <button onclick="switchTab('documents')" id="tab-documents" class="px-4 py-2 rounded-lg font-medium tab-active">
+                📁 文档管理
+            </button>
+            <button onclick="switchTab('rules')" id="tab-rules" class="px-4 py-2 rounded-lg font-medium bg-white text-gray-700 hover:bg-gray-50">
+                ⚙️ 切片规则
+            </button>
+            <button onclick="switchTab('previews')" id="tab-previews" class="px-4 py-2 rounded-lg font-medium bg-white text-gray-700 hover:bg-gray-50">
+                👁️ 切片预览
+            </button>
+            <button onclick="switchTab('versions')" id="tab-versions" class="px-4 py-2 rounded-lg font-medium bg-white text-gray-700 hover:bg-gray-50">
+                🏷️ 版本发布
+            </button>
+            <button onclick="switchTab('logs')" id="tab-logs" class="px-4 py-2 rounded-lg font-medium bg-white text-gray-700 hover:bg-gray-50">
+                📋 请求日志
+            </button>
+        </div>
+
+        <div id="content-documents" class="tab-content">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">文档列表</h2>
+                    <button onclick="showCreateDocumentModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        + 新建文档
+                    </button>
+                </div>
+                <div class="flex gap-4 mb-4">
+                    <input type="text" id="doc-search" placeholder="搜索文档..." class="flex-1 border rounded-lg px-4 py-2">
+                    <select id="doc-status-filter" class="border rounded-lg px-4 py-2">
+                        <option value="">全部状态</option>
+                        <option value="draft">草稿</option>
+                        <option value="processing">处理中</option>
+                        <option value="completed">已完成</option>
+                        <option value="archived">已归档</option>
+                    </select>
+                    <button onclick="loadDocuments()" class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">🔍 搜索</button>
+                </div>
+                <div id="documents-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div id="content-rules" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">切片规则</h2>
+                    <button onclick="showCreateRuleModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        + 新建规则
+                    </button>
+                </div>
+                <div class="flex gap-4 mb-4">
+                    <input type="text" id="rule-search" placeholder="搜索规则..." class="flex-1 border rounded-lg px-4 py-2">
+                    <select id="rule-status-filter" class="border rounded-lg px-4 py-2">
+                        <option value="">全部状态</option>
+                        <option value="draft">草稿</option>
+                        <option value="testing">测试中</option>
+                        <option value="approved">已批准</option>
+                        <option value="published">已发布</option>
+                        <option value="deprecated">已废弃</option>
+                    </select>
+                    <button onclick="loadRules()" class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">🔍 搜索</button>
+                </div>
+                <div id="rules-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div id="content-previews" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4">切片预览</h2>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">选择文档</label>
+                        <select id="preview-document" class="w-full border rounded-lg px-4 py-2">
+                            <option value="">请选择文档</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">选择规则</label>
+                        <select id="preview-rule" class="w-full border rounded-lg px-4 py-2">
+                            <option value="">请选择规则</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="generatePreview()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 mb-4">
+                    ⚡ 生成切片预览
+                </button>
+                <div id="tables-list" class="mb-6 space-y-3"></div>
+                <h3 class="text-lg font-semibold mb-3">📄 切片列表</h3>
+                <div id="previews-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div id="content-versions" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4">版本发布与回滚</h2>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">选择规则</label>
+                    <select id="version-rule" class="w-full border rounded-lg px-4 py-2" onchange="loadVersions()">
+                        <option value="">请选择规则</option>
+                    </select>
+                </div>
+                <button onclick="showPublishModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mb-4">
+                    🚀 发布新版本
+                </button>
+                <div id="versions-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div id="content-logs" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4">请求日志</h2>
+                <div class="flex gap-4 mb-4">
+                    <select id="log-status-filter" class="border rounded-lg px-4 py-2">
+                        <option value="">全部状态</option>
+                        <option value="success">成功</option>
+                        <option value="error">失败</option>
+                    </select>
+                    <button onclick="loadLogs()" class="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200">🔄 刷新</button>
+                </div>
+                <div id="logs-list" class="space-y-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6" id="modal-content"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg hidden">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
