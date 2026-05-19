@@ -1,6 +1,6 @@
 {
   "report_meta": {
-    "generated_at": "2026-05-19T15:43:25.105912",
+    "generated_at": "2026-05-19T20:31:34.171914",
     "version": "1.0.0"
   },
   "config_summary": {
@@ -167,173 +167,23 @@
   ],
   "conflicts": [
     {
-      "type": "overlapping_prefix",
-      "severity": "low",
-      "explanation": "前缀规则重叠: 第 5 行的 '/api/' 与第 9 行的 '/api/v2/' 存在重叠匹配区域",
-      "recommendation": "建议: 1) 确认是否预期这种重叠; 2) 考虑使用更精确的路径; 3) 添加 ^~ 修饰符给重要规则",
+      "type": "regex_order_issue",
+      "severity": "high",
+      "explanation": "正则完全相同的正则表达式: 第 17 行的 '\\.php$' 与第 21 行完全相同，后者永远不会被匹配",
+      "recommendation": "建议: 1) 删除重复的规则; 2) 合并重复规则的配置内容",
       "affected_paths": [
-        "/api/example",
-        "/api/v2/test"
+        "/test/file.php$"
       ],
       "rules": [
         {
-          "line_number": 5,
-          "modifier": "",
-          "pattern": "/api/"
+          "line_number": 17,
+          "modifier": "~",
+          "pattern": "\\.php$"
         },
         {
-          "line_number": 9,
-          "modifier": "",
-          "pattern": "/api/v2/"
-        }
-      ]
-    },
-    {
-      "type": "overlapping_prefix",
-      "severity": "low",
-      "explanation": "前缀规则重叠: 第 5 行的 '/api/' 与第 13 行的 '/api/v1/' 存在重叠匹配区域",
-      "recommendation": "建议: 1) 确认是否预期这种重叠; 2) 考虑使用更精确的路径; 3) 添加 ^~ 修饰符给重要规则",
-      "affected_paths": [
-        "/api/example",
-        "/api/v1/test"
-      ],
-      "rules": [
-        {
-          "line_number": 5,
-          "modifier": "",
-          "pattern": "/api/"
-        },
-        {
-          "line_number": 13,
-          "modifier": "^~",
-          "pattern": "/api/v1/"
-        }
-      ]
-    },
-    {
-      "type": "overlapping_prefix",
-      "severity": "low",
-      "explanation": "前缀规则重叠: 第 25 行的 '/static/' 与第 29 行的 '/static/images/' 存在重叠匹配区域",
-      "recommendation": "建议: 1) 确认是否预期这种重叠; 2) 考虑使用更精确的路径; 3) 添加 ^~ 修饰符给重要规则",
-      "affected_paths": [
-        "/static/example",
-        "/static/images/test"
-      ],
-      "rules": [
-        {
-          "line_number": 25,
-          "modifier": "",
-          "pattern": "/static/"
-        },
-        {
-          "line_number": 29,
-          "modifier": "",
-          "pattern": "/static/images/"
-        }
-      ]
-    },
-    {
-      "type": "ambiguous_match",
-      "severity": "medium",
-      "explanation": "路径 '/static/images//test/file.html' 存在歧义匹配，可命中多条规则，实际命中第 29 行的 '/static/images/'",
-      "recommendation": "建议: 1) 使用精确匹配避免歧义; 2) 为重要规则添加 ^~ 修饰符; 3) 重写重叠的规则路径",
-      "affected_paths": [
-        "/static/images//test/file.html"
-      ],
-      "rules": [
-        {
-          "line_number": 29,
-          "modifier": "",
-          "pattern": "/static/images/"
-        },
-        {
-          "line_number": 25,
-          "modifier": "",
-          "pattern": "/static/"
-        }
-      ]
-    },
-    {
-      "type": "ambiguous_match",
-      "severity": "medium",
-      "explanation": "路径 '/api/v1//anything' 存在歧义匹配，可命中多条规则，实际命中第 13 行的 '/api/v1/'",
-      "recommendation": "建议: 1) 使用精确匹配避免歧义; 2) 为重要规则添加 ^~ 修饰符; 3) 重写重叠的规则路径",
-      "affected_paths": [
-        "/api/v1//anything"
-      ],
-      "rules": [
-        {
-          "line_number": 13,
-          "modifier": "^~",
-          "pattern": "/api/v1/"
-        },
-        {
-          "line_number": 5,
-          "modifier": "",
-          "pattern": "/api/"
-        }
-      ]
-    },
-    {
-      "type": "ambiguous_match",
-      "severity": "medium",
-      "explanation": "路径 '/api/v2//example' 存在歧义匹配，可命中多条规则，实际命中第 9 行的 '/api/v2/'",
-      "recommendation": "建议: 1) 使用精确匹配避免歧义; 2) 为重要规则添加 ^~ 修饰符; 3) 重写重叠的规则路径",
-      "affected_paths": [
-        "/api/v2//example"
-      ],
-      "rules": [
-        {
-          "line_number": 9,
-          "modifier": "",
-          "pattern": "/api/v2/"
-        },
-        {
-          "line_number": 5,
-          "modifier": "",
-          "pattern": "/api/"
-        }
-      ]
-    },
-    {
-      "type": "ambiguous_match",
-      "severity": "medium",
-      "explanation": "路径 '/api/v2//test/file.html' 存在歧义匹配，可命中多条规则，实际命中第 9 行的 '/api/v2/'",
-      "recommendation": "建议: 1) 使用精确匹配避免歧义; 2) 为重要规则添加 ^~ 修饰符; 3) 重写重叠的规则路径",
-      "affected_paths": [
-        "/api/v2//test/file.html"
-      ],
-      "rules": [
-        {
-          "line_number": 9,
-          "modifier": "",
-          "pattern": "/api/v2/"
-        },
-        {
-          "line_number": 5,
-          "modifier": "",
-          "pattern": "/api/"
-        }
-      ]
-    },
-    {
-      "type": "ambiguous_match",
-      "severity": "medium",
-      "explanation": "路径 '/static/images//example' 存在歧义匹配，可命中多条规则，实际命中第 29 行的 '/static/images/'",
-      "recommendation": "建议: 1) 使用精确匹配避免歧义; 2) 为重要规则添加 ^~ 修饰符; 3) 重写重叠的规则路径",
-      "affected_paths": [
-        "/static/images//example"
-      ],
-      "rules": [
-        {
-          "line_number": 29,
-          "modifier": "",
-          "pattern": "/static/images/"
-        },
-        {
-          "line_number": 25,
-          "modifier": "",
-          "pattern": "/static/"
+          "line_number": 21,
+          "modifier": "~*",
+          "pattern": "\\.php$"
         }
       ]
     }

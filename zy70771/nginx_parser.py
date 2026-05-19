@@ -69,9 +69,46 @@ class NginxParser:
 
     def parse_lines(self, lines: List[str]) -> NginxConfig:
         self.config.raw_lines = lines
+        self._detect_syntax_errors(lines)
         cleaned_lines = self._preprocess_lines(lines)
         self._parse_servers(cleaned_lines)
         return self.config
+
+    def _detect_syntax_errors(self, lines: List[str]):
+        for idx, line in enumerate(lines):
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+
+            line_num = idx + 1
+
+            if ";" not in stripped and "{" not in stripped and "}" not in stripped:
+                if not (stripped.startswith("server") and "{" in stripped):
+                    if not stripped.startswith("location"):
+                        self.config.parse_errors.append(
+                            f"第 {line_num} 行: 缺少分号或大括号"
+                        )
+
+            if stripped.startswith("location") and "{" not in stripped:
+                self.config.parse_errors.append(
+                    f"第 {line_num} 行: location 块缺少开始大括号"
+                )
+
+            if stripped.startswith("location ~"):
+                try:
+                    pattern_match = re.search(r"location\s+~[*]?\s+([^{]+)\{", stripped)
+                    if pattern_match:
+                        regex_pattern = pattern_match.group(1).strip()
+                        if regex_pattern.startswith("[") and "]" not in regex_pattern:
+                            self.config.parse_errors.append(
+                                f"第 {line_num} 行: 正则表达式字符集不完整: {regex_pattern}"
+                            )
+                        else:
+                            re.compile(regex_pattern)
+                except re.error as e:
+                    self.config.parse_errors.append(
+                        f"第 {line_num} 行: 无效的正则表达式: {str(e)}"
+                    )
 
     def _preprocess_lines(self, lines: List[str]) -> List[Dict[str, Any]]:
         result = []
@@ -89,12 +126,14 @@ class NginxParser:
         while i < len(lines):
             line_data = lines[i]
             content = line_data["content"]
+            line_num = line_data["line_number"]
 
             if content.startswith("server") and "{" in content:
-                server = ServerBlock(line_number=line_data["line_number"])
+                server = ServerBlock(line_number=line_num)
                 server.raw_content.append(line_data["raw"])
                 i += 1
                 brace_count = content.count("{") - content.count("}")
+                server_start_line = line_num
 
                 while i < len(lines) and brace_count > 0:
                     line_data = lines[i]
@@ -114,12 +153,23 @@ class NginxParser:
                         )
                         if location_data:
                             server.locations.append(location_data["rule"])
+                            brace_count += location_data["brace_delta"]
                             i = location_data["end_index"]
                             continue
 
                     i += 1
 
+                if brace_count > 0:
+                    self.config.parse_errors.append(
+                        f"第 {server_start_line} 行开始的 server 块缺少 {brace_count} 个闭合大括号"
+                    )
+
                 self.config.servers.append(server)
+            elif content.startswith("server") and "{" not in content:
+                self.config.parse_errors.append(
+                    f"第 {line_num} 行: server 块缺少开始大括号"
+                )
+                i += 1
             else:
                 i += 1
 
@@ -161,6 +211,7 @@ class NginxParser:
 
         i = start_idx + 1
         brace_count = content.count("{") - content.count("}")
+        initial_brace = brace_count
         block_content = []
 
         while i < len(lines) and brace_count > 0:
@@ -173,4 +224,5 @@ class NginxParser:
 
         rule.block_content = block_content
 
-        return {"rule": rule, "end_index": i}
+        brace_delta = 0 - initial_brace
+        return {"rule": rule, "end_index": i, "brace_delta": brace_delta}
