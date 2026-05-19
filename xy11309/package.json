@@ -1,0 +1,25 @@
+{
+  "name": "community-canteen-management",
+  "version": "1.0.0",
+  "description": "社区食堂管理系统后端",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node src/database/init.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "csv-parser": "^3.0.0",
+    "multer": "^1.4.5-lts.1",
+    "@json2csv/plainjs": "^7.0.6",
+    "joi": "^17.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": ["canteen", "elderly", "management"],
+  "author": "",
+  "license": "MIT"
+}

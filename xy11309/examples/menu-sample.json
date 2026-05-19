@@ -1,0 +1,76 @@
+[
+  {
+    "name": "小米粥",
+    "type": "早餐",
+    "ingredients": "小米,水",
+    "allergens": "",
+    "nutrition_info": "低脂低糖",
+    "price": 2
+  },
+  {
+    "name": "馒头",
+    "type": "早餐",
+    "ingredients": "面粉,酵母,水",
+    "allergens": "小麦",
+    "nutrition_info": "高碳水",
+    "price": 1
+  },
+  {
+    "name": "清蒸鲈鱼",
+    "type": "午餐",
+    "ingredients": "鲈鱼,姜,葱,盐",
+    "allergens": "鱼类",
+    "nutrition_info": "高蛋白低脂",
+    "price": 25
+  },
+  {
+    "name": "红烧肉",
+    "type": "午餐",
+    "ingredients": "猪肉,酱油,糖,姜",
+    "allergens": "",
+    "nutrition_info": "高蛋白高脂肪",
+    "price": 20
+  },
+  {
+    "name": "炒青菜",
+    "type": "午餐",
+    "ingredients": "青菜,蒜,盐,油",
+    "allergens": "",
+    "nutrition_info": "高纤维低脂",
+    "price": 8
+  },
+  {
+    "name": "蛋花汤",
+    "type": "午餐",
+    "ingredients": "鸡蛋,葱,盐",
+    "allergens": "鸡蛋",
+    "nutrition_info": "高蛋白",
+    "price": 5
+  },
+  {
+    "name": "南瓜粥",
+    "type": "晚餐",
+    "ingredients": "南瓜,大米,水",
+    "allergens": "",
+    "nutrition_info": "低脂低糖",
+    "price": 6
+  },
+  {
+    "name": "包子",
+    "type": "晚餐",
+    "ingredients": "面粉,猪肉,白菜,姜",
+    "allergens": "小麦",
+    "nutrition_info": "高碳水高蛋白",
+    "price": 3
+  },
+  {
+    "type": "早餐",
+    "ingredients": "面条,酱油,葱",
+    "price": 10
+  },
+  {
+    "name": "白米饭",
+    "type": "主食",
+    "price": 2
+  }
+]

@@ -1,0 +1,8 @@
+elderly_id,delivery_date,meal_type,menu_items,route_id,status,delivered_by,notes
+1,2024-01-15,breakfast,小米粥,馒头,1,pending,张师傅,
+1,2024-01-15,lunch,清蒸鲈鱼,炒青菜,白米饭,1,completed,张师傅,正常送达
+2,2024-01-15,lunch,红烧肉,蛋花汤,白米饭,1,delivering,李师傅,
+,2024-01-15,dinner,南瓜粥,包子,2,pending,王师傅,
+3,2024-01-16,breakfast,小米粥,馒头,1,pending,张师傅,
+4,2024-01-16,lunch,清蒸鲈鱼,炒青菜,1,cancelled,用户取消
+5,2024-01-16,dinner,南瓜粥,包子,2,completed,王师傅,老人很满意
