@@ -1,0 +1,14 @@
+2024-01-15 10:00:01 INFO connector:api_gateway supplier:acct_001 - 开始处理请求
+2024-01-15 10:00:02 INFO connector:api_gateway supplier:acct_001 - 请求成功
+2024-01-15 10:00:03 WARNING connector:api_gateway supplier:acct_001 - 检测到限流 rate limit exceeded
+2024-01-15 10:00:04 INFO connector:api_gateway supplier:acct_001 - 进入休眠 sleep 5 seconds
+2024-01-15 10:00:09 INFO connector:api_gateway supplier:acct_001 - 恢复执行 recovery
+2024-01-15 10:00:10 INFO connector:api_gateway supplier:acct_001 - 请求重试 retry 1/3
+2024-01-15 10:00:11 INFO connector:api_gateway supplier:acct_001 - 请求成功
+这是一条坏行，格式不正确
+2024-01-15 10:00:12 WARNING connector:api_gateway supplier:acct_002 - rate limit detected
+2024-01-15 10:00:13 INFO connector:api_gateway supplier:acct_002 - sleep 3s
+2024-01-15 10:00:16 ERROR connector:api_gateway supplier:acct_002 - 请求失败
+2024-01-15 10:00:17 INFO connector:api_gateway supplier:acct_002 - retry 2/3
+2024-01-15 10:00:18 INFO connector:api_gateway supplier:acct_002 - recovery
+2024-01-15 10:00:19 INFO connector:api_gateway supplier:acct_002 - 请求成功

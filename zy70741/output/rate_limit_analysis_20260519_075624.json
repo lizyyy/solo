@@ -1,0 +1,139 @@
+{
+  "analysis_time": "2026-05-19T07:56:24.419943",
+  "metadata": {
+    "input_files": [
+      "examples/sample_log1.log"
+    ],
+    "rate_limit_window": 60,
+    "min_sleep_interval": 0,
+    "max_consecutive_sleep": 10
+  },
+  "summary": {
+    "total_records": 14,
+    "total_sessions": 2,
+    "total_traces": 14,
+    "total_failure_causes": 2,
+    "bad_line_count": 1,
+    "rate_limit_count": 2,
+    "sleep_count": 2,
+    "recovery_count": 2,
+    "retry_count": 2,
+    "error_count": 1,
+    "recovered_sessions": 1,
+    "non_idempotent_sessions": 0
+  },
+  "sessions": [
+    {
+      "session_id": "api_gateway_acct_001_0",
+      "connector": "api_gateway",
+      "supplier": "acct_001",
+      "start_time": "2024-01-15T10:00:03",
+      "end_time": "2024-01-15T10:00:09",
+      "duration_seconds": 6.0,
+      "state": "recovering",
+      "rate_limit_count": 1,
+      "sleep_count": 1,
+      "total_sleep_duration": 5.0,
+      "retry_count": 0,
+      "recovery_count": 1,
+      "error_count": 0,
+      "is_recovered": true,
+      "is_idempotent": true,
+      "transitions": [
+        {
+          "from": "normal",
+          "to": "rate_limited",
+          "reason": "rate_limit_detected",
+          "timestamp": "2024-01-15T10:00:03",
+          "source_line": 3,
+          "source_file": "examples/sample_log1.log"
+        },
+        {
+          "from": "rate_limited",
+          "to": "sleeping",
+          "reason": "enter_sleep",
+          "timestamp": "2024-01-15T10:00:04",
+          "source_line": 4,
+          "source_file": "examples/sample_log1.log"
+        },
+        {
+          "from": "sleeping",
+          "to": "recovering",
+          "reason": "recovery_event",
+          "timestamp": "2024-01-15T10:00:09",
+          "source_line": 5,
+          "source_file": "examples/sample_log1.log"
+        }
+      ]
+    },
+    {
+      "session_id": "api_gateway_acct_002_0",
+      "connector": "api_gateway",
+      "supplier": "acct_002",
+      "start_time": "2024-01-15T10:00:12",
+      "end_time": "2024-01-15T10:00:18",
+      "duration_seconds": 6.0,
+      "state": "failed",
+      "rate_limit_count": 1,
+      "sleep_count": 1,
+      "total_sleep_duration": 3.0,
+      "retry_count": 0,
+      "recovery_count": 1,
+      "error_count": 1,
+      "is_recovered": false,
+      "is_idempotent": true,
+      "transitions": [
+        {
+          "from": "normal",
+          "to": "rate_limited",
+          "reason": "rate_limit_detected",
+          "timestamp": "2024-01-15T10:00:12",
+          "source_line": 9,
+          "source_file": "examples/sample_log1.log"
+        },
+        {
+          "from": "rate_limited",
+          "to": "sleeping",
+          "reason": "enter_sleep",
+          "timestamp": "2024-01-15T10:00:13",
+          "source_line": 10,
+          "source_file": "examples/sample_log1.log"
+        },
+        {
+          "from": "sleeping",
+          "to": "failed",
+          "reason": "error_during_recovery",
+          "timestamp": "2024-01-15T10:00:16",
+          "source_line": 11,
+          "source_file": "examples/sample_log1.log"
+        }
+      ]
+    }
+  ],
+  "failure_causes": [
+    {
+      "cause_type": "malformed_log_entries",
+      "description": "检测到 1 条格式错误的日志记录",
+      "confidence": 1.0,
+      "severity": "low",
+      "evidence_count": 1,
+      "evidence_sample": "这是一条坏行，格式不正确"
+    },
+    {
+      "cause_type": "errors_during_recovery",
+      "description": "恢复过程中出现 1 次错误",
+      "confidence": 0.9,
+      "severity": "high",
+      "evidence_count": 1,
+      "evidence_sample": "2024-01-15 10:00:16 ERROR connector:api_gateway supplier:acct_002 - 请求失败"
+    }
+  ],
+  "bad_lines": [
+    {
+      "source_file": "examples/sample_log1.log",
+      "line_number": 8,
+      "raw_content": "这是一条坏行，格式不正确",
+      "trace_hash": "484b4277e3f6e752fc47d7586bd202bb"
+    }
+  ]
+}

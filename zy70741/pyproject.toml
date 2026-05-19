@@ -1,0 +1,25 @@
+[project]
+name = "connector-rate-limit-cli"
+version = "0.1.0"
+description = "连接器限速休眠恢复分析命令行工具"
+authors = [
+    { name = "Developer", email = "dev@example.com" }
+]
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.optional-dependencies]
+excel = [
+    "pandas>=1.4.0",
+    "openpyxl>=3.0.0",
+]
+
+[project.scripts]
+rate-limit-cli = "connector_rate_limit_cli.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["connector_rate_limit_cli*"]
