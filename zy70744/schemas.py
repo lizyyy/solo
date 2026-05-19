@@ -31,7 +31,7 @@ class FeatureFlag(FeatureFlagBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ConflictRecordBase(BaseModel):
@@ -63,7 +63,7 @@ class ConflictRecord(ConflictRecordBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ResolutionLogBase(BaseModel):
@@ -84,7 +84,7 @@ class ResolutionLog(ResolutionLogBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ConflictEvaluationRequest(BaseModel):

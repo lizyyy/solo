@@ -260,16 +260,16 @@ pytest tests/test_conflict_engine.py -v
 
 ```
 .
-├── main.py              # FastAPI 主应用
+├── main.py              # FastAPI 主应用 (启动端口: 8001)
 ├── database.py          # 数据库模型
-├── schemas.py           # Pydantic 数据结构
+├── schemas.py           # Pydantic 数据结构 (v2 from_attributes 兼容)
 ├── conflict_engine.py   # 核心业务逻辑
 ├── seed_data.py         # 造数脚本
-├── requirements.txt     # 依赖声明
+├── requirements.txt     # 依赖声明 (Pydantic 2.5.0)
 ├── README.md           # 本文档
 └── tests/              # 测试目录
     ├── __init__.py
-    └── test_conflict_engine.py
+    └── test_conflict_engine.py  # 核心单元测试 20 passed
 ```
 
 ## 健康检查
