@@ -1,0 +1,21 @@
+{
+  "name": "invoice-callback-platform-backend",
+  "version": "1.0.0",
+  "description": "发票回调复核台后端服务",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.0",
+    "moment": "^2.29.4",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
