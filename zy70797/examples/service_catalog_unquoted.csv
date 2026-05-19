@@ -1,0 +1,5 @@
+service_name,repository,owners,alert_rules
+user-service,https://github.com/example/user-service,zhangsan@example.com,lisi,UserServiceHighErrorRate,UserServiceHighLatency
+test-service,https://github.com/example/test,dev1,dev2,TestAlertHigh,TestAlertLow
+empty-service,https://github.com/example/empty,,
+mixed-service,https://github.com/example/mixed,owner1,RuleA,RuleB,owner2

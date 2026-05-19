@@ -163,7 +163,6 @@ class ServiceCatalogParser:
         with open(self.file_path, "r", encoding="utf-8") as f:
             reader = csv.reader(f)
             headers = next(reader, [])
-            header_count = len(headers)
 
             for line_num, row in enumerate(reader, start=2):
                 raw_content = ",".join(row)
@@ -174,7 +173,7 @@ class ServiceCatalogParser:
                 )
 
                 try:
-                    row_dict = self._parse_csv_row_dict(headers, row)
+                    row_dict = self._parse_csv_row_dict_robust(headers, row)
                     entry = self._parse_csv_row(row_dict, source)
                     if entry.is_valid:
                         valid_entries.append(entry)
@@ -191,38 +190,84 @@ class ServiceCatalogParser:
 
         return valid_entries, invalid_entries
 
-    def _parse_csv_row_dict(self, headers: List[str], row: List[str]) -> Dict[str, str]:
-        row_dict = {}
-        header_count = len(headers)
-        row_count = len(row)
+    def _parse_csv_row_dict_robust(self, headers: List[str], row: List[str]) -> Dict[str, str]:
+        row_dict = {header: "" for header in headers}
+        
+        if not row:
+            return row_dict
 
-        for i, header in enumerate(headers):
-            if i < row_count:
-                row_dict[header] = row[i]
+        header_to_idx = {header: i for i, header in enumerate(headers)}
+        
+        service_name_idx = header_to_idx.get("service_name", 0)
+        repository_idx = header_to_idx.get("repository", 1)
+        owners_idx = header_to_idx.get("owners", 2)
+        alert_rules_idx = header_to_idx.get("alert_rules", 3)
 
-        extra_values = []
-        for i in range(header_count, row_count):
-            value = row[i].strip()
-            if value:
-                extra_values.append(value)
+        if service_name_idx < len(row):
+            row_dict["service_name"] = row[service_name_idx].strip()
+        
+        if repository_idx < len(row):
+            row_dict["repository"] = row[repository_idx].strip()
 
-        if extra_values:
-            if "alert_rules" in row_dict and not row_dict["alert_rules"]:
-                row_dict["alert_rules"] = ",".join(extra_values)
-            elif "owners" in row_dict and not row_dict["owners"]:
-                row_dict["owners"] = ",".join(extra_values)
-            else:
-                all_values = []
-                for header in ["owners", "alert_rules"]:
-                    if header in row_dict and row_dict[header]:
-                        all_values.append(row_dict[header])
-                all_values.extend(extra_values)
-                if "alert_rules" in row_dict:
-                    row_dict["alert_rules"] = ",".join(all_values)
-                if "owners" in row_dict:
-                    row_dict["owners"] = ",".join(all_values)
+        candidate_values = []
+        for i in range(min(owners_idx, len(row)), len(row)):
+            val = row[i].strip()
+            if val:
+                candidate_values.append(val)
+
+        owners_list, alerts_list = self._classify_and_separate_values(candidate_values)
+        row_dict["owners"] = ",".join(owners_list)
+        row_dict["alert_rules"] = ",".join(alerts_list)
 
         return row_dict
+
+    def _classify_and_separate_values(self, values: List[str]) -> Tuple[List[str], List[str]]:
+        if not values:
+            return [], []
+
+        email_owners = []
+        other_owners = []
+        alerts = []
+
+        for val in values:
+            if "@" in val:
+                email_owners.append(val)
+            elif self._looks_like_alert_rule(val):
+                alerts.append(val)
+            elif self._looks_like_owner(val):
+                other_owners.append(val)
+            else:
+                if val[0].isupper() and (len(val) > 10 or "_" in val):
+                    alerts.append(val)
+                else:
+                    other_owners.append(val)
+
+        all_owners = email_owners + other_owners
+        return all_owners, alerts
+
+    def _looks_like_alert_rule(self, val: str) -> bool:
+        if not val:
+            return False
+        
+        has_uppercase = any(c.isupper() for c in val)
+        has_alert_keywords = any(kw in val.lower() for kw in [
+            "alert", "error", "high", "latency", "rate", "traffic", "threshold",
+            "warning", "critical", "down", "up", "timeout", "fail"
+        ])
+        
+        return has_alert_keywords or (has_uppercase and "_" in val)
+
+    def _looks_like_owner(self, val: str) -> bool:
+        if not val:
+            return False
+        
+        if "@" in val:
+            return True
+        
+        if val.islower() and len(val) <= 20 and "_" not in val and "." not in val:
+            return True
+        
+        return False
 
     def _parse_csv_row(self, row: dict, source: SourceLocation) -> ServiceEntry:
         service_name = row.get("service_name", "").strip()
