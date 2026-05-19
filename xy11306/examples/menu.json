@@ -1,0 +1,59 @@
+{
+  "menu_items": [
+    {
+      "name": "清炒时蔬",
+      "category": "素菜",
+      "price": 15.0,
+      "ingredients": ["青菜", "蒜末", "盐"],
+      "allergens": [],
+      "suitable_diseases": ["高血压", "糖尿病"],
+      "unsuitable_diseases": [],
+      "is_vegetarian": true,
+      "is_soft": true
+    },
+    {
+      "name": "清蒸鲈鱼",
+      "category": "荤菜",
+      "price": 35.0,
+      "ingredients": ["鲈鱼", "姜", "葱", "蒸鱼豉油"],
+      "allergens": ["海鲜"],
+      "suitable_diseases": ["高血压"],
+      "unsuitable_diseases": ["痛风"],
+      "is_vegetarian": false,
+      "is_soft": true
+    },
+    {
+      "name": "红烧肉",
+      "category": "荤菜",
+      "price": 28.0,
+      "ingredients": ["五花肉", "酱油", "糖", "料酒"],
+      "allergens": [],
+      "suitable_diseases": [],
+      "unsuitable_diseases": ["高血压", "糖尿病", "高血脂"],
+      "is_vegetarian": false,
+      "is_soft": true
+    },
+    {
+      "name": "小米粥",
+      "category": "主食",
+      "price": 8.0,
+      "ingredients": ["小米"],
+      "allergens": [],
+      "suitable_diseases": ["高血压", "糖尿病", "胃病"],
+      "unsuitable_diseases": [],
+      "is_vegetarian": true,
+      "is_soft": true
+    },
+    {
+      "name": "白米饭",
+      "category": "主食",
+      "price": 3.0,
+      "ingredients": ["大米"],
+      "allergens": [],
+      "suitable_diseases": [],
+      "unsuitable_diseases": ["糖尿病"],
+      "is_vegetarian": true,
+      "is_soft": false
+    }
+  ]
+}

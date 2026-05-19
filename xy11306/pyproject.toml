@@ -1,0 +1,15 @@
+[project]
+name = "community-canteen"
+version = "0.1.0"
+description = "社区食堂管理系统 - 老人档案、菜单、配送管理"
+requires-python = ">=3.10"
+dependencies = [
+    "sqlalchemy>=2.0.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "click>=8.0.0",
+    "pandas>=2.0.0",
+]
+
+[project.scripts]
+canteen = "canteen.cli:main"
