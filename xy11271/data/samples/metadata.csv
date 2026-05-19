@@ -1,0 +1,6 @@
+callId,agentId,agentName,customerPhone,startTime,duration,direction,status,queueName,tags
+CALL_001_NORMAL,AGT001,小美,13800138001,2024-01-15 09:30:00,185,inbound,completed,投诉组,退款;投诉
+CALL_002_MISSING_APOLOGY,AGT002,小李,13800138002,2024-01-15 10:15:00,210,inbound,completed,物流组,发货延迟
+CALL_003_MISSING_REFUND,AGT003,小张,13800138003,2024-01-15 11:00:00,195,inbound,completed,售后组,退货
+CALL_004_WITH_SENSITIVE,AGT004,小王,13800138004,2024-01-15 14:30:00,240,inbound,completed,投诉组,敏感词;投诉
+CALL_005_FULL_ISSUES,AGT005,小陈,13800138005,2024-01-15 16:45:00,150,inbound,completed,投诉组,敏感词;服务差

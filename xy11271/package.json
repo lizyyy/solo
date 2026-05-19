@@ -1,0 +1,42 @@
+{
+  "name": "quality-inspection-system",
+  "version": "1.0.0",
+  "description": "客服质检系统 - 治理客服质检组长的乱账",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "import": "ts-node src/cli/import.ts",
+    "review": "ts-node src/cli/review.ts",
+    "export": "ts-node src/cli/export.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "fast-csv": "^4.3.6",
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.17",
+    "reflect-metadata": "^0.1.13",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "joi": "^17.11.0",
+    "uuid": "^9.0.1",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "@types/express": "^4.17.18",
+    "@types/multer": "^1.4.8",
+    "@types/uuid": "^9.0.5",
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.5",
+    "ts-jest": "^29.1.1"
+  },
+  "keywords": ["quality-inspection", "customer-service", "audit"],
+  "author": "",
+  "license": "MIT"
+}
