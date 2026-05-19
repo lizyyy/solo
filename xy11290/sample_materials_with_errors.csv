@@ -1,0 +1,8 @@
+material_code,name,type,specification,quantity_total,quantity_available,unit,location,remark
+TRUSS-001,铝合金桁架,桁架,300x300mm,100,100,根,A仓库,标准桁架
+BAD-TYPE,测试物料,无效类型,,50,50,个,,类型字段错误
+BAD-QTY,数量测试,桁架,,abc,50,个,,总数量不是整数
+NEG-QTY,负数测试,桁架,,50,-10,个,,可用数量为负
+OVER-QTY,超额测试,桁架,,50,100,个,,可用超过总数
+,无编码,桁架,,50,50,个,,缺少物料编码
+TRUSS-001,重复编码,桁架,,20,20,根,,编码重复

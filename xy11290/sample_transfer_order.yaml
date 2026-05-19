@@ -1,0 +1,13 @@
+order_code: TO-2024-001
+source_location: A仓库
+target_location: 1号展位
+operator: 张三
+approver: 李四
+remark: 春季会展第一批物料调拨
+items:
+  - material_code: TRUSS-001
+    quantity: 20
+  - material_code: LIGHT-001
+    quantity: 50
+  - material_code: SCREEN-001
+    quantity: 30
