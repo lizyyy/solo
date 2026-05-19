@@ -1,6 +1,6 @@
 {
   "report_meta": {
-    "generated_at": "2026-05-19T20:31:34.171914",
+    "generated_at": "2026-05-19T20:54:31.999207",
     "version": "1.0.0"
   },
   "config_summary": {
@@ -168,11 +168,13 @@
   "conflicts": [
     {
       "type": "regex_order_issue",
-      "severity": "high",
-      "explanation": "正则完全相同的正则表达式: 第 17 行的 '\\.php$' 与第 21 行完全相同，后者永远不会被匹配",
-      "recommendation": "建议: 1) 删除重复的规则; 2) 合并重复规则的配置内容",
+      "severity": "medium",
+      "explanation": "正则相同但修饰符不同: 第 17 行 [~] 在第 21 行 [~*] 之前。部分路径只会被第二条规则匹配: /TEST.PHP, /UPLOAD/IMAGE.PHP",
+      "recommendation": "建议: 1) 确认两条规则的意图; 2) 如不需要区分大小写可合并为 ~*; 3) 如需严格区分应调整正则使范围不重叠",
       "affected_paths": [
-        "/test/file.php$"
+        "/TEST.PHP",
+        "/UPLOAD/IMAGE.PHP",
+        "/Style.Css.Php"
       ],
       "rules": [
         {

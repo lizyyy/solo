@@ -90,20 +90,19 @@ class ConflictDetector:
                 continue
 
             shadowed_by = []
-            test_paths = self._generate_realistic_test_paths(loc)
+            test_paths = self._generate_rule_match_paths(loc)
 
-            for j, other_loc in enumerate(locations):
-                if i == j:
-                    continue
+            self_match_count = 0
+            for path in test_paths:
+                result = self.matcher.match_path(path, locations)
+                if result.matched_rule == loc:
+                    self_match_count += 1
 
-                shadow_count = 0
+            if self_match_count == 0 and len(test_paths) > 0:
                 for path in test_paths:
                     result = self.matcher.match_path(path, locations)
-                    if result.matched_rule and result.matched_rule == other_loc:
-                        shadow_count += 1
-
-                if shadow_count == len(test_paths) and shadow_count > 0:
-                    shadowed_by.append(other_loc)
+                    if result.matched_rule and result.matched_rule not in shadowed_by:
+                        shadowed_by.append(result.matched_rule)
 
             if shadowed_by:
                 conflicts.append(
@@ -113,9 +112,9 @@ class ConflictDetector:
                         rules=[loc] + shadowed_by,
                         affected_paths=test_paths[:3],
                         explanation=(
-                            f"第 {loc.line_number} 行的规则 '{loc.pattern}' "
+                            f"第 {loc.line_number} 行的规则 [{loc.modifier.value}] '{loc.pattern}' "
                             f"被完全覆盖，永远不会被匹配。覆盖它的规则: "
-                            f"{', '.join([f'第 {r.line_number} 行: {r.pattern}' for r in shadowed_by])}"
+                            f"{', '.join([f'第 {r.line_number} 行 [{r.modifier.value}]: {r.pattern}' for r in shadowed_by])}"
                         ),
                         recommendation=(
                             "建议: 1) 调整规则顺序; 2) 使用更具体的修饰符; "
@@ -125,6 +124,43 @@ class ConflictDetector:
                 )
 
         return conflicts
+
+    def _generate_rule_match_paths(self, loc: LocationRule) -> List[str]:
+        paths = []
+        if loc.modifier in (LocationModifier.NONE, LocationModifier.PREFIX):
+            paths.extend([
+                loc.pattern,
+                loc.pattern + "index.html",
+                loc.pattern + "subdir/file.jpg",
+            ])
+        elif loc.modifier == LocationModifier.REGEX_CASE_SENSITIVE:
+            base_paths = [
+                "/test.php", "/api/test.php", "/static/file.php",
+                "/admin/index.php", "/lowercase.php", "/path/to/file.php",
+            ]
+            try:
+                compiled_re = re.compile(loc.pattern)
+                for s in base_paths:
+                    s_lower = s.lower()
+                    if compiled_re.search(s_lower):
+                        paths.append(s_lower)
+            except re.error:
+                pass
+        elif loc.modifier == LocationModifier.REGEX_CASE_INSENSITIVE:
+            base_paths = [
+                "/test.php", "/test.PHP", "/test.PhP",
+                "/API/TEST.PHP", "/Lowercase.Php", "/Mixed.Case.pHp"
+            ]
+            try:
+                compiled_re = re.compile(loc.pattern, re.IGNORECASE)
+                for s in base_paths:
+                    if compiled_re.search(s):
+                        paths.append(s)
+            except re.error:
+                pass
+        else:
+            paths = ["/test/file.html", "/test.jpg", "/test.php"]
+        return list(set(paths))[:6]
 
     def _detect_regex_order_issues(self, server: ServerBlock) -> List[Conflict]:
         conflicts = []
@@ -141,48 +177,113 @@ class ConflictDetector:
                     continue
 
                 if loc1.pattern == loc2.pattern and loc1.line_number < loc2.line_number:
-                    conflicts.append(
-                        Conflict(
-                            conflict_type=ConflictType.REGEX_ORDER_ISSUE,
-                            severity="high",
-                            rules=[loc1, loc2],
-                            affected_paths=["/test/file" + loc1.pattern.replace("\\", "")],
-                            explanation=(
-                                f"正则完全相同的正则表达式: 第 {loc1.line_number} 行的 '{loc1.pattern}' "
-                                f"与第 {loc2.line_number} 行完全相同，后者永远不会被匹配"
-                            ),
-                            recommendation=(
-                                "建议: 1) 删除重复的规则; 2) 合并重复规则的配置内容"
-                            ),
+                    if loc1.modifier == loc2.modifier:
+                        conflicts.append(
+                            Conflict(
+                                conflict_type=ConflictType.REGEX_ORDER_ISSUE,
+                                severity="high",
+                                rules=[loc1, loc2],
+                                affected_paths=["/test/file" + loc1.pattern.replace("\\", "")],
+                                explanation=(
+                                    f"正则完全相同且修饰符相同: 第 {loc1.line_number} 行和第 {loc2.line_number} 行 "
+                                    f"都是 '{loc1.modifier.value} {loc1.pattern}'，后者永远不会被匹配"
+                                ),
+                                recommendation=(
+                                    "建议: 1) 删除重复的规则; 2) 合并重复规则的配置内容"
+                                ),
+                            )
                         )
-                    )
+                    else:
+                        test_paths = self._generate_case_variation_test_paths(loc1.pattern)
+                        loc2_only_paths = []
+                        for path in test_paths:
+                            result = self.matcher.match_path(path, server.locations)
+                            if result.matched_rule == loc2:
+                                loc2_only_paths.append(path)
+
+                        if loc2_only_paths:
+                            conflicts.append(
+                                Conflict(
+                                    conflict_type=ConflictType.REGEX_ORDER_ISSUE,
+                                    severity="medium",
+                                    rules=[loc1, loc2],
+                                    affected_paths=loc2_only_paths[:3],
+                                    explanation=(
+                                        f"正则相同但修饰符不同: 第 {loc1.line_number} 行 [{loc1.modifier.value}] "
+                                        f"在第 {loc2.line_number} 行 [{loc2.modifier.value}] 之前。"
+                                        f"部分路径只会被第二条规则匹配: {', '.join(loc2_only_paths[:2])}"
+                                    ),
+                                    recommendation=(
+                                        "建议: 1) 确认两条规则的意图; 2) 如不需要区分大小写可合并为 ~*; "
+                                        "3) 如需严格区分应调整正则使范围不重叠"
+                                    ),
+                                )
+                            )
+                        else:
+                            conflicts.append(
+                                Conflict(
+                                    conflict_type=ConflictType.REGEX_ORDER_ISSUE,
+                                    severity="low",
+                                    rules=[loc1, loc2],
+                                    affected_paths=["/test/file" + loc1.pattern.replace("\\", "")],
+                                    explanation=(
+                                        f"正则相同但修饰符不同: 第 {loc1.line_number} 行 [{loc1.modifier.value}] "
+                                        f"已覆盖第 {loc2.line_number} 行 [{loc2.modifier.value}] 的所有匹配场景"
+                                    ),
+                                    recommendation=(
+                                        "建议: 1) 确认是否真的需要两条规则; "
+                                        "2) 如不需要区分大小写可合并为 ~*; "
+                                        "3) 如只需要敏感匹配，删除不敏感规则"
+                                    ),
+                                )
+                            )
                     continue
 
                 if self._regex_has_overlap(loc1.pattern, loc2.pattern):
                     test_paths = self._generate_regex_overlap_paths(loc1.pattern, loc2.pattern)
                     if test_paths:
                         all_match_loc1 = True
+                        loc2_only_paths = []
                         for path in test_paths:
                             result = self.matcher.match_path(path, server.locations)
-                            if result.matched_rule != loc1:
+                            if result.matched_rule == loc2:
+                                loc2_only_paths.append(path)
+                            elif result.matched_rule != loc1:
                                 all_match_loc1 = False
-                                break
 
-                        if all_match_loc1:
+                        if all_match_loc1 and not loc2_only_paths:
                             conflicts.append(
                                 Conflict(
                                     conflict_type=ConflictType.REGEX_ORDER_ISSUE,
-                                    severity="medium",
+                                    severity="high",
                                     rules=[loc1, loc2],
                                     affected_paths=test_paths[:2],
                                     explanation=(
-                                        f"正则表达式顺序问题: 第 {loc1.line_number} 行的 '{loc1.pattern}' "
-                                        f"在第 {loc2.line_number} 行的 '{loc2.pattern}' 之前，"
-                                        f"导致后者永远不会匹配重叠的路径"
+                                        f"正则表达式完全覆盖: 第 {loc1.line_number} 行的 '{loc1.pattern}' "
+                                        f"已完全覆盖第 {loc2.line_number} 行 '{loc2.pattern}' 的所有匹配场景，"
+                                        f"后者永远不会被匹配"
                                     ),
                                     recommendation=(
                                         "建议: 1) 将更具体的正则放在前面; "
-                                        "2) 合并正则表达式; 3) 调整正则避免重叠"
+                                        "2) 合并正则表达式; 3) 删除永远不会被匹配的规则"
+                                    ),
+                                )
+                            )
+                        elif loc2_only_paths:
+                            conflicts.append(
+                                Conflict(
+                                    conflict_type=ConflictType.REGEX_ORDER_ISSUE,
+                                    severity="low",
+                                    rules=[loc1, loc2],
+                                    affected_paths=loc2_only_paths[:2],
+                                    explanation=(
+                                        f"正则存在部分重叠: 第 {loc1.line_number} 行的 '{loc1.pattern}' "
+                                        f"与第 {loc2.line_number} 行 '{loc2.pattern}' 有重叠，"
+                                        f"但部分路径仍会命中第二条规则"
+                                    ),
+                                    recommendation=(
+                                        "建议: 1) 确认两条规则的重叠是否符合预期; "
+                                        "2) 如不需要重叠，应调整正则使其区分更清晰"
                                     ),
                                 )
                             )
@@ -419,7 +520,9 @@ class ConflictDetector:
             test_strings = [
                 "/test/file.html", "/images/photo.jpg",
                 "/api/v1/test", "/static/css/style.css",
-                "/admin/index.php", "/test.php"
+                "/admin/index.php", "/test.php",
+                "/TEST.FILE.HTML", "/IMAGES/PHOTO.JPG",
+                "/API/V1/TEST.PHP"
             ]
             for s in test_strings:
                 if re.search(pattern1, s) and re.search(pattern2, s):
@@ -428,12 +531,32 @@ class ConflictDetector:
         except re.error:
             return False
 
+    def _generate_case_variation_test_paths(self, pattern: str) -> List[str]:
+        paths = []
+        base_paths = [
+            "/test.php", "/api/test.php", "/static/file.php",
+            "/admin/index.php", "/upload/image.PHP",
+            "/Test.PhP", "/API/v2/TEST.PHP", "/STYLE.CSS.PHP"
+        ]
+        try:
+            compiled_re = re.compile(pattern)
+            for s in base_paths:
+                if compiled_re.search(s) or compiled_re.search(s.lower()) or compiled_re.search(s.upper()):
+                    paths.append(s)
+                    paths.append(s.upper())
+                    paths.append(s.lower())
+                    paths.append(s.title())
+        except re.error:
+            pass
+        return list(set(paths))[:6]
+
     def _generate_regex_overlap_paths(self, pattern1: str, pattern2: str) -> List[str]:
         paths = []
         test_strings = [
             "/test/file.html", "/images/photo.jpg",
             "/api/v1/test", "/static/css/style.css",
-            "/admin/index.php", "/test.php"
+            "/admin/index.php", "/test.php",
+            "/TEST.PHP", "/Test.Php", "/API/TEST.HTML"
         ]
         try:
             for s in test_strings:
@@ -441,7 +564,7 @@ class ConflictDetector:
                     paths.append(s)
         except re.error:
             pass
-        return paths[:3]
+        return list(set(paths))[:3]
 
     def _generate_realistic_test_paths(self, loc: LocationRule) -> List[str]:
         paths = []
@@ -452,10 +575,12 @@ class ConflictDetector:
                 loc.pattern + "subdir/file.jpg",
                 loc.pattern + "test.php",
             ])
-        else:
-            paths = self._generate_regex_overlap_paths(loc.pattern, loc.pattern)
+        elif loc.modifier in (LocationModifier.REGEX_CASE_SENSITIVE, LocationModifier.REGEX_CASE_INSENSITIVE):
+            paths = self._generate_case_variation_test_paths(loc.pattern)
             if not paths:
                 paths = ["/test/file.html", "/test.jpg", "/test.php"]
+        else:
+            paths = ["/test/file.html", "/test.jpg", "/test.php"]
         return paths[:4]
 
     def _generate_ambiguity_test_paths(self, server: ServerBlock) -> List[str]:
