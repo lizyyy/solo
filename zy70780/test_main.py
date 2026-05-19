@@ -391,3 +391,66 @@ def test_poetry_pipfile_hash_parsing():
 
     hash_type, hash_value = auditor._parse_integrity("abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890")
     assert hash_type == "sha256"
+
+
+def test_pypi_urls_field_parsing():
+    from auditor import HashAuditor
+    from unittest.mock import patch, MagicMock
+    from models import PackageStatus
+
+    auditor = HashAuditor()
+
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "info": {"name": "requests", "version": "2.31.0"},
+        "urls": [
+            {
+                "filename": "requests-2.31.0-py3-none-any.whl",
+                "digests": {
+                    "sha256": "e6f7002f50ea85fa369c28b5201395404c2f8b469f830e0"
+                }
+            }
+        ]
+    }
+
+    result = {}
+    with patch('requests.get', return_value=mock_response):
+        actual_hash, result = auditor._fetch_from_registry(
+            "requests", "2.31.0", "https://pypi.org/simple", "sha256", result
+        )
+        assert actual_hash == "e6f7002f50ea85fa369c28b5201395404c2f8b469f830e0"
+        assert result.get("error_message") is None
+
+
+def test_verify_hash_pypi_integration():
+    from auditor import HashAuditor
+    from unittest.mock import patch, MagicMock
+    from models import PackageStatus
+
+    auditor = HashAuditor()
+
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "info": {"name": "requests", "version": "2.31.0"},
+        "urls": [
+            {
+                "filename": "requests-2.31.0-py3-none-any.whl",
+                "digests": {
+                    "sha256": "e6f7002f50ea85fa369c28b5201395404c2f8b469f830e0"
+                }
+            }
+        ]
+    }
+
+    with patch('requests.get', return_value=mock_response):
+        is_valid, status, result = auditor.verify_hash(
+            "requests", "2.31.0",
+            "sha256:e6f7002f50ea85fa369c28b5201395404c2f8b469f830e0",
+            "https://pypi.org/simple"
+        )
+        assert is_valid == True
+        assert status == PackageStatus.NORMAL
+        assert result.get("found") == True
+        assert result.get("hash_match") == True

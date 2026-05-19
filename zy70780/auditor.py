@@ -100,21 +100,32 @@ class HashAuditor:
 
                 if resp.status_code == 200:
                     data = resp.json()
-                    releases = data.get("releases", {}).get(version, [])
-                    if not releases:
-                        info = data.get("info", {})
-                        if info:
-                            result["error_message"] = f"No releases found for version {version}"
-                            return None, result
-                    for release in releases:
-                        digests = release.get("digests", {})
-                        digest = digests.get(hash_type.lower())
-                        if digest:
-                            return digest, result
-                        if not digest and hash_type.lower() != "sha256":
-                            digest = digests.get("sha256")
+                    urls = data.get("urls", [])
+                    if urls:
+                        for url_info in urls:
+                            digests = url_info.get("digests", {})
+                            digest = digests.get(hash_type.lower())
                             if digest:
                                 return digest, result
+                            if not digest and hash_type.lower() != "sha256":
+                                digest = digests.get("sha256")
+                                if digest:
+                                    return digest, result
+                    releases = data.get("releases", {}).get(version, [])
+                    if releases:
+                        for release in releases:
+                            digests = release.get("digests", {})
+                            digest = digests.get(hash_type.lower())
+                            if digest:
+                                return digest, result
+                            if not digest and hash_type.lower() != "sha256":
+                                digest = digests.get("sha256")
+                                if digest:
+                                    return digest, result
+                    if not urls and not releases:
+                        info = data.get("info", {})
+                        if info:
+                            result["error_message"] = f"No release urls found for version {version}"
 
         except Exception as e:
             result["error_message"] = f"Registry fetch error: {str(e)}"
