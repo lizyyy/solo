@@ -54,11 +54,26 @@ class DualDeliveryMatcher:
         time_diff = abs((event1.timestamp - event2.timestamp).total_seconds())
         return time_diff <= self.rule.dual_delivery_window_seconds
 
+    def _is_status_success(self, status_code: Optional[int]) -> bool:
+        if status_code is None:
+            return False
+        return status_code in self.rule.success_status_codes
+
     def _create_result(self, event_id: str, old_event: Optional[WebhookEvent], new_event: Optional[WebhookEvent]) -> DualDeliveryResult:
         old_received = old_event is not None
         new_received = new_event is not None
         old_ts = old_event.timestamp if old_event else None
         new_ts = new_event.timestamp if new_event else None
+        old_status_code = old_event.status_code if old_event else None
+        new_status_code = new_event.status_code if new_event else None
+
+        old_status_success = None
+        if old_received:
+            old_status_success = self._is_status_success(old_status_code)
+
+        new_status_success = None
+        if new_received:
+            new_status_success = self._is_status_success(new_status_code)
 
         time_diff = None
         if old_ts and new_ts:
@@ -72,7 +87,22 @@ class DualDeliveryMatcher:
         if old_event and new_event and old_event.payload_hash and new_event.payload_hash:
             payload_match = old_event.payload_hash == new_event.payload_hash
 
+        is_verified = False
         if old_received and new_received and within_window:
+            is_verified = True
+
+            if self.rule.check_old_endpoint and not old_status_success:
+                is_verified = False
+
+            if not new_status_success:
+                is_verified = False
+
+            if self.rule.require_payload_match and payload_match is not None and not payload_match:
+                is_verified = False
+
+        if is_verified:
+            status = EventStatus.VERIFIED
+        elif old_received and new_received and within_window:
             status = EventStatus.DUAL_DELIVERED
         elif old_received and not new_received:
             status = EventStatus.MISSING_NEW
@@ -89,6 +119,10 @@ class DualDeliveryMatcher:
             new_received=new_received,
             old_timestamp=old_ts,
             new_timestamp=new_ts,
+            old_status_code=old_status_code,
+            new_status_code=new_status_code,
+            old_status_success=old_status_success,
+            new_status_success=new_status_success,
             payload_match=payload_match,
             within_window=within_window,
             status=status,
@@ -116,7 +150,7 @@ class SwitchStateMachine:
         failed_count = 0
 
         for result in sorted_results:
-            if result.status == EventStatus.DUAL_DELIVERED and result.within_window:
+            if result.status == EventStatus.VERIFIED:
                 verified_count += 1
                 self.consecutive_success += 1
                 self.max_consecutive_success = max(self.max_consecutive_success, self.consecutive_success)

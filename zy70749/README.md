@@ -56,17 +56,39 @@ python cli.py verify-with-config \
 
 ## 核心规则说明
 
-### 双投窗口
-- 配置: `window_seconds`
-- 说明: 同一 event_id 在新旧地址的到达时间差在此窗口内才算有效双投
+### 双投验证通过条件
+事件必须同时满足以下所有条件才算验证通过（VERIFIED）：
+
+1. **双投窗口
+   - 配置: `window_seconds`
+   - 说明: 同一 event_id 在新旧地址的到达时间差在此窗口内
+
+2. **状态码校验
+   - 配置: `success_status_codes` (默认: [200, 201, 202, 204])
+   - 说明: 新地址返回的 HTTP 状态码必须在成功列表中
+   - 配置: `check_old_endpoint` (默认: True)
+   - 说明: 是否同时校验旧地址的状态码
+
+3. **Payload 一致性校验
+   - 配置: `require_payload_match` (默认: True)
+   - 说明: 新旧地址的 payload_hash 必须一致
 
 ### 成功率要求
 - 配置: `min_success_rate`
-- 说明: 双投成功事件数 / 总事件数 需达到此比例
+- 说明: VERIFIED 事件数 / 总事件数 需达到此比例
 
 ### 连续成功要求
 - 配置: `required_consecutive`
-- 说明: 要求达到的连续双投成功事件数
+- 说明: 要求达到的连续 VERIFIED 事件数
+
+### 事件状态说明
+| 状态 | 说明 |
+|------|------|
+| VERIFIED | 验证通过（全部校验都通过 |
+| DUAL_DELIVERED | 双投到达但未通过校验（状态码或 payload 失败 |
+| MISSING_NEW | 只有旧地址收到事件 |
+| MISSING_OLD | 只有新地址收到事件 |
+| FAILED | 其他失败情况 |
 
 ### 状态流转
 

@@ -44,6 +44,10 @@ class DualDeliveryResult(BaseModel):
     new_received: bool
     old_timestamp: Optional[datetime] = None
     new_timestamp: Optional[datetime] = None
+    old_status_code: Optional[int] = None
+    new_status_code: Optional[int] = None
+    old_status_success: Optional[bool] = None
+    new_status_success: Optional[bool] = None
     payload_match: Optional[bool] = None
     within_window: bool
     status: EventStatus
@@ -56,6 +60,9 @@ class VerificationRule(BaseModel):
     dual_delivery_window_seconds: int = 300
     min_success_rate: float = 0.95
     required_consecutive_success: int = 100
+    success_status_codes: list[int] = [200, 201, 202, 204]
+    require_payload_match: bool = True
+    check_old_endpoint: bool = True
 
 
 class SwitchConclusion(BaseModel):

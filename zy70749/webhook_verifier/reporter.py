@@ -115,6 +115,8 @@ class ReportGenerator:
             writer.writerow([
                 "event_id", "vendor", "event_type", "old_received", "new_received",
                 "old_timestamp", "new_timestamp", "time_diff_seconds",
+                "old_status_code", "new_status_code",
+                "old_status_success", "new_status_success",
                 "payload_match", "within_window", "status",
             ])
             for r in dual_results:
@@ -127,6 +129,10 @@ class ReportGenerator:
                     r.old_timestamp.isoformat() if r.old_timestamp else "",
                     r.new_timestamp.isoformat() if r.new_timestamp else "",
                     f"{r.time_diff_seconds:.2f}" if r.time_diff_seconds else "",
+                    r.old_status_code,
+                    r.new_status_code,
+                    r.old_status_success,
+                    r.new_status_success,
                     r.payload_match,
                     r.within_window,
                     r.status.value,
@@ -186,6 +192,10 @@ class ReportGenerator:
                     "old_timestamp": r.old_timestamp.isoformat() if r.old_timestamp else None,
                     "new_timestamp": r.new_timestamp.isoformat() if r.new_timestamp else None,
                     "time_diff_seconds": r.time_diff_seconds,
+                    "old_status_code": r.old_status_code,
+                    "new_status_code": r.new_status_code,
+                    "old_status_success": r.old_status_success,
+                    "new_status_success": r.new_status_success,
                     "payload_match": r.payload_match,
                     "within_window": r.within_window,
                     "status": r.status.value,
