@@ -44,7 +44,7 @@
             </el-table>
         </el-card>
 
-        <el-dialog v-model="showCreateDialog" title="创建周报" width="600px">
+        <el-dialog v-model="showCreateDialog" title="创建周报" width="700px">
             <el-form :model="newReport" label-width="120px">
                 <el-form-item label="周开始">
                     <el-date-picker v-model="newReport.week_start" type="datetime" style="width: 100%" />
@@ -55,10 +55,28 @@
                 <el-form-item label="摘要">
                     <el-input v-model="newReport.summary" type="textarea" />
                 </el-form-item>
+                <el-form-item label="选择风险">
+                    <el-checkbox-group v-model="selectedRiskIds">
+                        <el-checkbox
+                            v-for="risk in risks"
+                            :key="risk.id"
+                            :label="risk.id"
+                            style="display: block; margin: 8px 0;"
+                        >
+                            <span style="font-weight: 500;">{{ risk.title }}</span>
+                            <span v-if="risk.owner" style="margin-left: 10px; color: #666; font-size: 12px;">
+                                负责人: {{ risk.owner }}
+                            </span>
+                            <span v-if="risk.status" style="margin-left: 10px; color: #666; font-size: 12px;">
+                                状态: {{ getRiskStatusText(risk.status) }}
+                            </span>
+                        </el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="showCreateDialog = false">取消</el-button>
-                <el-button type="primary" @click="createReport">创建</el-button>
+                <el-button type="primary" @click="createReport" :loading="createLoading">创建</el-button>
             </template>
         </el-dialog>
 
@@ -82,9 +100,12 @@ const props = defineProps({
 
 const router = useRouter()
 const reports = ref([])
+const risks = ref([])
 const showCreateDialog = ref(false)
 const showReviewDrawer = ref(false)
 const selectedReport = ref(null)
+const selectedRiskIds = ref([])
+const createLoading = ref(false)
 const newReport = ref({
     week_start: null,
     week_end: null,
@@ -116,6 +137,17 @@ const getStatusText = (status) => {
     return statusMap[status] || status
 }
 
+const getRiskStatusText = (status) => {
+    const statusMap = {
+        'identified': '已识别',
+        'in_progress': '处理中',
+        'resolved': '已解决',
+        'mitigated': '已缓解',
+        'escalated': '已升级'
+    }
+    return statusMap[status] || status
+}
+
 const loadReports = async () => {
     try {
         const response = await projectApi.getWeeklyReports(props.projectId)
@@ -125,18 +157,45 @@ const loadReports = async () => {
     }
 }
 
+const loadRisks = async () => {
+    try {
+        const response = await projectApi.getRisks(props.projectId)
+        risks.value = response.data
+    } catch (error) {
+        ElMessage.error('加载风险列表失败')
+    }
+}
+
 const createReport = async () => {
     if (!newReport.value.week_start || !newReport.value.week_end) {
         ElMessage.warning('请选择周周期')
         return
     }
+    createLoading.value = true
     try {
-        await weeklyReportApi.create({
+        const reportResponse = await weeklyReportApi.create({
             ...newReport.value,
             project_id: props.projectId
         })
+        const reportId = reportResponse.data.id
+
+        if (selectedRiskIds.value.length > 0) {
+            await Promise.all(
+                selectedRiskIds.value.map(async (riskId) => {
+                    const risk = risks.value.find(r => r.id === riskId)
+                    await weeklyReportApi.addRisk({
+                        weekly_report_id: reportId,
+                        risk_id: riskId,
+                        status_at_report: risk?.status || '',
+                        owner_feedback_at_report: risk?.owner_feedback || ''
+                    })
+                })
+            )
+        }
+
         ElMessage.success('创建成功')
         showCreateDialog.value = false
+        selectedRiskIds.value = []
         newReport.value = {
             week_start: null,
             week_end: null,
@@ -146,6 +205,8 @@ const createReport = async () => {
         loadReports()
     } catch (error) {
         ElMessage.error('创建失败')
+    } finally {
+        createLoading.value = false
     }
 }
 
@@ -157,6 +218,12 @@ const openReviewDrawer = (report) => {
     selectedReport.value = report
     showReviewDrawer.value = true
 }
+
+watch(() => showCreateDialog, (val) => {
+    if (val && props.projectId) {
+        loadRisks()
+    }
+})
 
 watch(() => props.projectId, () => {
     if (props.projectId) {

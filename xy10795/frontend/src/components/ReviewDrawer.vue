@@ -92,7 +92,7 @@
             </el-form>
             <template #footer>
                 <el-button @click="showSendDialog = false">取消</el-button>
-                <el-button type="primary" @click="sendReport">发送</el-button>
+                <el-button type="primary" @click="sendReport" :loading="sendLoading">发送</el-button>
             </template>
         </el-dialog>
     </el-drawer>
@@ -118,6 +118,8 @@ const visible = computed({
 
 const sendRecords = ref([])
 const showSendDialog = ref(false)
+const sendLoading = ref(false)
+const currentSendOperationId = ref(null)
 const reviewForm = ref({
     review_comment: '',
     reviewed_by: ''
@@ -205,15 +207,23 @@ const sendReport = async () => {
         ElMessage.warning('请填写收件人')
         return
     }
+    if (sendLoading.value) {
+        ElMessage.info('正在发送中，请稍候...')
+        return
+    }
+    sendLoading.value = true
     try {
-        const operationId = uuidv4()
+        if (!currentSendOperationId.value) {
+            currentSendOperationId.value = uuidv4()
+        }
         await weeklyReportApi.send({
             ...sendForm.value,
             weekly_report_id: props.report.id,
-            operation_id: operationId
+            operation_id: currentSendOperationId.value
         })
         ElMessage.success('发送成功')
         showSendDialog.value = false
+        currentSendOperationId.value = null
         sendForm.value = {
             sent_to: '',
             sent_by: '',
@@ -223,6 +233,8 @@ const sendReport = async () => {
         loadSendRecords()
     } catch (error) {
         ElMessage.error('发送失败')
+    } finally {
+        sendLoading.value = false
     }
 }
 
@@ -233,6 +245,12 @@ watch(() => props.report, () => {
             reviewed_by: props.report.reviewed_by || ''
         }
         loadSendRecords()
+    }
+})
+
+watch(() => showSendDialog, (val) => {
+    if (val) {
+        currentSendOperationId.value = null
     }
 })
 
