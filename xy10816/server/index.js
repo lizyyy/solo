@@ -10,6 +10,52 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
+app.use((req, res, next) => {
+  const originalJson = res.json;
+  const originalEnd = res.end;
+  let responseBody = '';
+  const chunks = [];
+  
+  res.json = function(data) {
+    responseBody = JSON.stringify(data);
+    return originalJson.call(this, data);
+  };
+  
+  res.end = function(chunk) {
+    if (chunk) chunks.push(chunk);
+    return originalEnd.apply(this, arguments);
+  };
+  
+  res.on('finish', () => {
+    if (req.path.startsWith('/api/')) {
+      try {
+        const responsibleNode = req.headers['x-responsible-node'] || 'api-gateway';
+        const requestBody = Object.keys(req.body || {}).length > 0 
+          ? JSON.stringify(req.body) 
+          : null;
+        
+        let finalResponse = responseBody;
+        if (!finalResponse && chunks.length > 0) {
+          finalResponse = Buffer.concat(chunks).toString('utf8');
+        }
+        
+        ErrorCodeService.logApiRequest(
+          req.path,
+          req.method,
+          requestBody,
+          finalResponse || null,
+          responsibleNode,
+          res.statusCode
+        ).catch(err => console.error('审计日志记录失败:', err.message));
+      } catch (e) {
+        console.error('审计日志处理异常:', e.message);
+      }
+    }
+  });
+  
+  next();
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
