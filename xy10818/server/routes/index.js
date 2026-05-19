@@ -10,11 +10,11 @@ router.get('/event-types', appController.getAllEventTypes);
 router.post('/event-types', appController.createEventType);
 
 router.get('/subscriptions', subscriptionController.getAllSubscriptions);
+router.get('/subscriptions/export/data', subscriptionController.exportSubscriptions);
 router.get('/subscriptions/:id', subscriptionController.getSubscriptionById);
 router.post('/subscriptions', subscriptionController.createSubscription);
 router.post('/subscriptions/:id/review', subscriptionController.reviewSubscription);
 router.post('/subscriptions/:id/unsubscribe', subscriptionController.unsubscribe);
-router.get('/subscriptions/export/data', subscriptionController.exportSubscriptions);
 
 router.get('/delivery-records', subscriptionController.getDeliveryRecords);
 

@@ -38,17 +38,24 @@ Event Subscription Preference Center - 一个面向技术的全栈应用，解�
 
 ## 快速开始
 
-### 1. 安装依赖
+### 1. 环境要求
+- Node.js >= 16.x
+
+### 2. 安装依赖
 
 ```bash
-# 安装后端依赖
+# 安装后端依赖（根目录）
 npm install
 
 # 安装前端依赖
 cd client && npm install && cd ..
 ```
 
-### 2. 初始化数据库
+> ⚠️ **注意**：必须在**根目录**和**client目录**都执行 `npm install`
+> - 根目录执行后会生成 `node_modules/`（包含 express, sqlite3 等）
+> - client目录执行后会生成 `client/node_modules/`（包含 vue, vite 等）
+
+### 3. 初始化数据库
 
 ```bash
 npm run init-db
@@ -58,16 +65,18 @@ npm run init-db
 > - 2个示例应用：电商订单系统、用户中心
 > - 4个示例事件：订单创建、订单支付、用户注册、用户信息更新
 
-### 3. 启动服务
+### 4. 启动服务
 
 ```bash
 # 方式一：同时启动前后端（推荐）
 npm run dev
 
-# 方式二：单独启动后端
+# 方式二：单独启动后端 (端口 3001)
 npm run server
+# 或
+npm start
 
-# 方式三：单独启动前端
+# 方式三：单独启动前端 (端口 3000)
 cd client && npm run dev
 ```
 
@@ -75,6 +84,27 @@ cd client && npm run dev
 - 后端 API: http://localhost:3001
 - 前端页面: http://localhost:3000
 - 健康检查: http://localhost:3001/api/health
+
+### 5. 验证核心能力（启动后端后执行）
+
+```bash
+# 验证健康检查
+curl http://localhost:3001/api/health
+
+# 验证应用列表
+curl http://localhost:3001/api/apps
+
+# 验证事件类型列表
+curl http://localhost:3001/api/event-types
+
+# 验证订阅列表
+curl http://localhost:3001/api/subscriptions
+
+# 验证导出功能（核心能力 - 必须在/:id路由前匹配）
+curl http://localhost:3001/api/subscriptions/export/data?format=json
+```
+
+> ✅ **路由顺序已修复**: `/subscriptions/export/data` 优先于 `/subscriptions/:id`，确保导出接口可达
 
 ## API 接口文档
 
