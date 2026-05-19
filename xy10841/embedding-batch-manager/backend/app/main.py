@@ -103,6 +103,14 @@ def update_batch(batch_id: int, batch_update: schemas.DocumentBatchUpdate, db: S
     return db_batch
 
 
+@app.delete("/api/batches/{batch_id}", tags=["Batches"])
+def delete_batch(batch_id: int, db: Session = Depends(get_db)):
+    success = services.delete_document_batch(db, batch_id=batch_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Batch not found")
+    return {"message": "Batch deleted successfully", "batch_id": batch_id}
+
+
 @app.post("/api/batches/{batch_id}/start", response_model=schemas.DocumentBatch, tags=["Batches"])
 def start_batch(batch_id: int, db: Session = Depends(get_db)):
     db_batch = services.start_batch_processing(db, batch_id=batch_id)

@@ -540,6 +540,8 @@ def cleanup_dirty_data(db: Session, batch_id: Optional[int] = None) -> Dict[str,
         "duplicate_indexes": 0
     }
     
+    existing_batch_ids = {b.id for b in db.query(models.DocumentBatch).all()}
+    
     if batch_id:
         batches = [get_document_batch(db, batch_id)]
     else:
@@ -563,5 +565,50 @@ def cleanup_dirty_data(db: Session, batch_id: Optional[int] = None) -> Dict[str,
             cleaned["stuck_processing"] += 1
         
         db.commit()
+        
+        index_results = db.query(models.IndexResult).filter(
+            models.IndexResult.batch_id == batch.id
+        ).all()
+        
+        seen_task_ids = set()
+        seen_vector_ids = set()
+        for idx in index_results:
+            is_duplicate = False
+            if idx.task_id and idx.task_id in seen_task_ids:
+                is_duplicate = True
+            if idx.vector_id and idx.vector_id in seen_vector_ids:
+                is_duplicate = True
+            
+            if is_duplicate:
+                db.delete(idx)
+                cleaned["duplicate_indexes"] += 1
+            else:
+                if idx.task_id:
+                    seen_task_ids.add(idx.task_id)
+                if idx.vector_id:
+                    seen_vector_ids.add(idx.vector_id)
+        
+        db.commit()
+    
+    if not batch_id:
+        orphaned_tasks = db.query(models.VectorTask).filter(
+            ~models.VectorTask.batch_id.in_(existing_batch_ids)
+        ).all()
+        
+        for task in orphaned_tasks:
+            db.delete(task)
+            cleaned["orphaned_tasks"] += 1
+        
+        db.commit()
     
     return cleaned
+
+
+def delete_document_batch(db: Session, batch_id: int) -> bool:
+    db_batch = get_document_batch(db, batch_id)
+    if not db_batch:
+        return False
+    
+    db.delete(db_batch)
+    db.commit()
+    return True

@@ -41,6 +41,10 @@ class DocumentBatchCreate(DocumentBatchBase):
 
 class DocumentBatchUpdate(BaseModel):
     batch_name: Optional[str] = None
+    source_type: Optional[str] = None
+    total_documents: Optional[int] = None
+    total_chunks: Optional[int] = None
+    strategy_id: Optional[int] = None
     status: Optional[BatchStatus] = None
     progress: Optional[float] = None
     error_message: Optional[str] = None

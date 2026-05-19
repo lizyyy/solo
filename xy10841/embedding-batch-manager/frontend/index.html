@@ -294,6 +294,70 @@
         </div>
     </div>
 
+    <div id="edit-batch-modal" class="fixed inset-0 hidden z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 modal-overlay transition-opacity" onclick="closeEditBatchModal()"></div>
+            <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full fade-in">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-medium text-gray-900">编辑批次</h3>
+                    <button onclick="closeEditBatchModal()" class="text-gray-400 hover:text-gray-500">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <form id="edit-batch-form" class="px-6 py-4">
+                    <input type="hidden" id="edit-batch-id">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="edit-batch-name" class="block text-sm font-medium text-gray-700">批次名称 *</label>
+                            <input type="text" id="edit-batch-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="edit-batch-source" class="block text-sm font-medium text-gray-700">来源类型</label>
+                            <input type="text" id="edit-batch-source" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="如: PDF, Web, Markdown">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="edit-total-docs" class="block text-sm font-medium text-gray-700">文档数量</label>
+                                <input type="number" id="edit-total-docs" min="0" value="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="edit-total-chunks" class="block text-sm font-medium text-gray-700">切片数量</label>
+                                <input type="number" id="edit-total-chunks" min="0" value="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="edit-strategy-id" class="block text-sm font-medium text-gray-700">切片策略</label>
+                            <select id="edit-strategy-id" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">无</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="edit-batch-status" class="block text-sm font-medium text-gray-700">状态</label>
+                            <select id="edit-batch-status" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="pending">待处理</option>
+                                <option value="running">运行中</option>
+                                <option value="paused">已暂停</option>
+                                <option value="completed">已完成</option>
+                                <option value="failed">失败</option>
+                                <option value="partial">部分完成</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+                    <button onclick="closeEditBatchModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        取消
+                    </button>
+                    <button onclick="submitEditBatch()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        保存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
     <script>
@@ -437,6 +501,8 @@
                     <td class="px-6 py-4 text-right text-sm font-medium">
                         <div class="flex justify-end space-x-2">
                             <button onclick="viewBatchDetail(${batch.id})" class="text-blue-600 hover:text-blue-900">查看</button>
+                            <button onclick="openEditBatchModal(${batch.id})" class="text-purple-600 hover:text-purple-900">编辑</button>
+                            <button onclick="confirmDeleteBatch(${batch.id})" class="text-red-600 hover:text-red-900">删除</button>
                             ${batch.status === 'pending' ? `<button onclick="startBatch(${batch.id})" class="text-green-600 hover:text-green-900">启动</button>` : ''}
                             ${batch.status === 'running' ? `<button onclick="pauseBatch(${batch.id})" class="text-yellow-600 hover:text-yellow-900">暂停</button>` : ''}
                             ${batch.status === 'paused' ? `<button onclick="resumeBatch(${batch.id})" class="text-green-600 hover:text-green-900">恢复</button>` : ''}
@@ -629,6 +695,86 @@
 
                 showToast('批次创建成功', 'success');
                 closeCreateBatchModal();
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        async function openEditBatchModal(batchId) {
+            try {
+                const batch = await apiRequest(`/batches/${batchId}`);
+                
+                document.getElementById('edit-batch-id').value = batch.id;
+                document.getElementById('edit-batch-name').value = batch.batch_name || '';
+                document.getElementById('edit-batch-source').value = batch.source_type || '';
+                document.getElementById('edit-total-docs').value = batch.total_documents || 0;
+                document.getElementById('edit-total-chunks').value = batch.total_chunks || 0;
+                document.getElementById('edit-strategy-id').value = batch.strategy_id || '';
+                document.getElementById('edit-batch-status').value = batch.status || 'pending';
+                
+                const strategySelect = document.getElementById('edit-strategy-id');
+                strategySelect.innerHTML = '<option value="">无</option>';
+                strategies.forEach(s => {
+                    const option = document.createElement('option');
+                    option.value = s.id;
+                    option.textContent = `${s.name} (${s.chunk_size}/${s.chunk_overlap})`;
+                    strategySelect.appendChild(option);
+                });
+                
+                document.getElementById('edit-batch-modal').classList.remove('hidden');
+            } catch (error) {
+            }
+        }
+
+        function closeEditBatchModal() {
+            document.getElementById('edit-batch-modal').classList.add('hidden');
+            document.getElementById('edit-batch-form').reset();
+        }
+
+        async function submitEditBatch() {
+            const batchId = parseInt(document.getElementById('edit-batch-id').value);
+            const name = document.getElementById('edit-batch-name').value.trim();
+            const source = document.getElementById('edit-batch-source').value.trim();
+            const totalDocs = parseInt(document.getElementById('edit-total-docs').value) || 0;
+            const totalChunks = parseInt(document.getElementById('edit-total-chunks').value) || 0;
+            const strategyId = document.getElementById('edit-strategy-id').value;
+            const status = document.getElementById('edit-batch-status').value;
+
+            if (!name) {
+                showToast('请输入批次名称', 'error');
+                return;
+            }
+
+            try {
+                await apiRequest(`/batches/${batchId}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        batch_name: name,
+                        source_type: source || null,
+                        total_documents: totalDocs,
+                        total_chunks: totalChunks,
+                        strategy_id: strategyId ? parseInt(strategyId) : null,
+                        status: status
+                    })
+                });
+
+                showToast('批次更新成功', 'success');
+                closeEditBatchModal();
+                loadBatches();
+            } catch (error) {
+            }
+        }
+
+        async function confirmDeleteBatch(batchId) {
+            if (!confirm('确定要删除这个批次吗？所有关联的任务、失败片段、索引结果也会被删除！')) {
+                return;
+            }
+
+            try {
+                await apiRequest(`/batches/${batchId}`, {
+                    method: 'DELETE'
+                });
+                showToast('批次删除成功', 'success');
                 loadBatches();
             } catch (error) {
             }

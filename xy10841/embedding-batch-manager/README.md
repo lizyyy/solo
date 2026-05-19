@@ -4,6 +4,7 @@
 
 ## 🚨 修复说明
 
+### 第一轮修复 (metadata 字段问题)
 **问题**: 创建批次返回 `ResponseValidationError: metadata Input should be a valid dictionary`
 
 **原因**: 
@@ -16,7 +17,27 @@
 - **`backend/app/schemas.py`**: 添加 `@model_validator(mode="before")` 正确从 `metadata_` 解析 JSON 到 `metadata` 字段
 - **`backend/app/schemas.py`**: 所有 Schema 的 Config 配置 `from_attributes = True`
 
-验证通过！创建批次、列表查询、详情查看均能正常返回 metadata 字典。
+### 第二轮修复 (核心功能补全)
+**问题**: README 声明的功能与实际实现存在差距：
+1. 缺少删除批次 API 接口
+2. 前端缺少编辑/删除入口
+3. `cleanup_dirty_data` 只处理卡住的 processing 任务，未处理孤儿任务和重复索引
+
+**修复方案**:
+- **`backend/app/main.py`**: 添加 `DELETE /api/batches/{batch_id}` 接口
+- **`backend/app/services.py`**: 
+  - 完善 `cleanup_dirty_data` 函数，新增：
+    - `orphaned_tasks`: 清理 batch_id 不存在的孤儿任务
+    - `duplicate_indexes`: 清理相同 task_id 或 vector_id 的重复索引结果
+  - 新增 `delete_document_batch` 删除服务
+- **`backend/app/schemas.py`**: 扩展 `DocumentBatchUpdate`，支持编辑：
+  - `source_type`, `total_documents`, `total_chunks`, `strategy_id`
+- **`frontend/index.html`**: 
+  - 批次列表新增「编辑」「删除」按钮
+  - 添加编辑批次模态框，支持编辑批次基本信息
+  - 删除前有确认提示，避免误操作
+
+验证通过！创建、编辑、删除、脏数据清理全链路正常工作。
 
 ## 核心功能
 
