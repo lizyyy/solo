@@ -6,6 +6,7 @@ import {
   Modal,
   Form,
   Input,
+  InputNumber,
   Select,
   Space,
   Tag,
@@ -443,12 +444,21 @@ function CollectionDetail() {
                       style={{ width: 200 }}
                     />
                   ) : null}
-                  <Input
-                    placeholder="期望值"
-                    value={item.expected}
-                    onChange={(e) => updateAssertion(index, 'expected', e.target.value)}
-                    style={{ flex: 1 }}
-                  />
+                  {item.type === 'status_code' || item.type === 'response_time' ? (
+                    <InputNumber
+                      placeholder="期望值"
+                      value={item.expected ? Number(item.expected) : undefined}
+                      onChange={(value) => updateAssertion(index, 'expected', String(value))}
+                      style={{ flex: 1, minWidth: 150 }}
+                    />
+                  ) : (
+                    <Input
+                      placeholder="期望值"
+                      value={item.expected}
+                      onChange={(e) => updateAssertion(index, 'expected', e.target.value)}
+                      style={{ flex: 1 }}
+                    />
+                  )}
                   <Button size="small" danger onClick={() => removeAssertion(index)}>
                     删除
                   </Button>

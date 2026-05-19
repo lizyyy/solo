@@ -224,6 +224,8 @@ async function retryStep(resultId) {
     variables = JSON.parse(environment.variables || '[]');
   }
 
+  await db.run('DELETE FROM execution_results WHERE id = ?', [resultId]);
+
   const newResult = await executeStep(step, variables, result.batch_id);
   
   const allResults = await db.all('SELECT * FROM execution_results WHERE batch_id = ?', [result.batch_id]);

@@ -4,19 +4,21 @@ function evaluateAssertion(assertion, response) {
   try {
     switch (type) {
       case 'status_code':
+        const expectedStatus = Number(expected);
         return {
-          passed: response.status === expected,
+          passed: response.status === expectedStatus,
           actual: response.status,
-          expected,
-          message: `Status code: expected ${expected}, got ${response.status}`
+          expected: expectedStatus,
+          message: `Status code: expected ${expectedStatus}, got ${response.status}`
         };
       
       case 'response_time':
+        const expectedTime = Number(expected);
         return {
-          passed: response.responseTime <= expected,
+          passed: response.responseTime <= expectedTime,
           actual: response.responseTime,
-          expected,
-          message: `Response time: expected <= ${expected}ms, got ${response.responseTime}ms`
+          expected: expectedTime,
+          message: `Response time: expected <= ${expectedTime}ms, got ${response.responseTime}ms`
         };
       
       case 'json_path':
