@@ -1,0 +1,14 @@
+[
+  {
+    "trace_id": "trace-test-001",
+    "service_name": "order-service",
+    "tags": {
+      "level": "ERROR"
+    },
+    "sampled": true,
+    "reason": "RULE_MATCH:error-high",
+    "matched_rule_id": "error-high",
+    "budget_impact": 1,
+    "timestamp": "2026-05-19 12:46:44.648256"
+  }
+]

@@ -25,9 +25,9 @@ python3 cli.py list-services
 
 echo ""
 echo "--- 4. 创建采样规则 ---"
-python3 cli.py create-rule error-high order-service level ERROR --priority 100 --sampling-rate 1.0
-python3 cli.py create-rule db-slow order-service operation db_query --match-type prefix --priority 80 --sampling-rate 0.8
-python3 cli.py create-rule http-5xx order-service status_code 5 --match-type prefix --priority 90 --sampling-rate 0.9
+python3 cli.py create-rule error-high order-service level --tag-value ERROR --priority 100 --sampling-rate 1.0
+python3 cli.py create-rule db-slow order-service operation --tag-value db_query --match-type prefix --priority 80 --sampling-rate 0.8
+python3 cli.py create-rule http-5xx order-service status_code --tag-value 5 --match-type prefix --priority 90 --sampling-rate 0.9
 python3 cli.py create-rule has-trace-id order-service trace_id --match-type exists --priority 60 --sampling-rate 0.5
 
 echo ""

@@ -76,8 +76,8 @@ python cli.py create-rule <rule-id> <service-name> <tag-key> \
 
 示例：
 ```bash
-python cli.py create-rule error-high order-service level ERROR \
-    --priority 100 --sampling-rate 1.0
+python cli.py create-rule error-high order-service level \
+    --tag-value ERROR --priority 100 --sampling-rate 1.0
 ```
 
 ### 3. 采样决策

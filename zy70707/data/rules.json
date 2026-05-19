@@ -1,0 +1,15 @@
+{
+  "error-high": {
+    "rule_id": "error-high",
+    "service_name": "order-service",
+    "tag_key": "level",
+    "tag_value": "ERROR",
+    "match_type": "exact",
+    "priority": 100,
+    "sampling_rate": 1.0,
+    "budget_reservation": 0,
+    "is_active": true,
+    "created_at": "2026-05-19 12:46:44.433508",
+    "created_by": "cli"
+  }
+}

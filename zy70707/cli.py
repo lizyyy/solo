@@ -14,7 +14,7 @@ from trace_sampler.models import TagMatchType, AdjustmentStatus
 
 
 console = Console()
-engine = SamplingEngine()
+engine: Optional[SamplingEngine] = None
 
 
 @click.group()
