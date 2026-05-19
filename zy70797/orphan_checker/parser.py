@@ -236,11 +236,10 @@ class ServiceCatalogParser:
                 alerts.append(val)
             elif self._looks_like_owner(val):
                 other_owners.append(val)
+            elif self._is_likely_alert_name(val):
+                alerts.append(val)
             else:
-                if val[0].isupper() and (len(val) > 10 or "_" in val):
-                    alerts.append(val)
-                else:
-                    other_owners.append(val)
+                other_owners.append(val)
 
         all_owners = email_owners + other_owners
         return all_owners, alerts
@@ -252,10 +251,49 @@ class ServiceCatalogParser:
         has_uppercase = any(c.isupper() for c in val)
         has_alert_keywords = any(kw in val.lower() for kw in [
             "alert", "error", "high", "latency", "rate", "traffic", "threshold",
-            "warning", "critical", "down", "up", "timeout", "fail"
+            "warning", "critical", "down", "up", "timeout", "fail", "rule"
         ])
         
         return has_alert_keywords or (has_uppercase and "_" in val)
+
+    def _is_likely_alert_name(self, val: str) -> bool:
+        if not val:
+            return False
+        
+        val_lower = val.lower()
+        
+        if val.islower() and val_lower.startswith(("owner", "dev", "admin", "user", "test")):
+            return False
+        
+        if val_lower.startswith("rule"):
+            return True
+        
+        alert_prefixes = ["alert", "high", "low", "warning", "critical", "error"]
+        for prefix in alert_prefixes:
+            if val_lower.startswith(prefix):
+                return True
+        
+        has_mixed_case = not val.islower() and not val.isupper()
+        has_digit_suffix = len(val) > 1 and val[-1].isdigit()
+        
+        if has_mixed_case and has_digit_suffix and not val[:3].islower():
+            return True
+        
+        upper_count = sum(1 for c in val if c.isupper())
+        if upper_count >= 2 and len(val) <= 20:
+            return True
+        
+        if has_mixed_case and len(val) >= 5 and "_" not in val:
+            consecutive_lowers = 0
+            for i, c in enumerate(val):
+                if c.islower():
+                    consecutive_lowers += 1
+                    if consecutive_lowers >= 3 and i < len(val) - 1 and val[i+1].isupper():
+                        return True
+                elif c.isupper():
+                    consecutive_lowers = 0
+        
+        return False
 
     def _looks_like_owner(self, val: str) -> bool:
         if not val:

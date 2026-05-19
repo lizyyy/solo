@@ -66,24 +66,50 @@ def test_unquoted_csv():
                     any(owner in entry.alert_rules for owner in entry.owners)
         print(f"    Mixed: {'YES - PROBLEM!' if has_mixed else 'NO - OK'}")
     
-    user_service = next((e for e in valid if e.service_name == 'user-service'), None)
-    if user_service:
-        owners_set = set(user_service.owners)
-        alerts_set = set(user_service.alert_rules)
-        
-        expected_owners = {'zhangsan@example.com', 'lisi'}
-        expected_alerts = {'UserServiceHighErrorRate', 'UserServiceHighLatency'}
-        
-        owners_ok = owners_set == expected_owners
-        alerts_ok = alerts_set == expected_alerts
-        
-        print()
-        if owners_ok and alerts_ok:
-            print("  ✓ Unquoted CSV parsed CORRECTLY - owners and alert_rules are separated!")
+    expected_results = {
+        'user-service': {
+            'owners': {'zhangsan@example.com', 'lisi'},
+            'alerts': {'UserServiceHighErrorRate', 'UserServiceHighLatency'},
+            'desc': 'email + lowercase short owners, High keyword alerts'
+        },
+        'test-service': {
+            'owners': {'dev1', 'dev2'},
+            'alerts': {'TestAlertHigh', 'TestAlertLow'},
+            'desc': 'devX owners, Test prefix + High/Low alerts'
+        },
+        'mixed-service': {
+            'owners': {'owner1', 'owner2'},
+            'alerts': {'RuleA', 'RuleB'},
+            'desc': 'ownerX owners, RuleX alerts - key fix!'
+        }
+    }
+    
+    all_passed = True
+    print()
+    for service_name, expected in expected_results.items():
+        entry = next((e for e in valid if e.service_name == service_name), None)
+        if entry:
+            owners_ok = set(entry.owners) == expected['owners']
+            alerts_ok = set(entry.alert_rules) == expected['alerts']
+            
+            if owners_ok and alerts_ok:
+                print(f"  ✓ {service_name}: {expected['desc']}")
+            else:
+                all_passed = False
+                print(f"  ✗ {service_name}: {expected['desc']}")
+                if not owners_ok:
+                    print(f"      Owners expected {sorted(expected['owners'])}, got {sorted(entry.owners)}")
+                if not alerts_ok:
+                    print(f"      Alerts expected {sorted(expected['alerts'])}, got {sorted(entry.alert_rules)}")
         else:
-            print(f"  ✗ Unquoted CSV parsing issues:")
-            print(f"    Owners expected {sorted(expected_owners)}, got {sorted(owners_set)}")
-            print(f"    Alerts expected {sorted(expected_alerts)}, got {sorted(alerts_set)}")
+            all_passed = False
+            print(f"  ✗ {service_name}: NOT FOUND in results")
+    
+    print()
+    if all_passed:
+        print("  ✓ ALL unquoted CSV parsing tests PASSED!")
+    else:
+        print("  ✗ Some unquoted CSV parsing tests FAILED!")
     print()
 
 if __name__ == "__main__":
