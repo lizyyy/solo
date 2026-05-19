@@ -1,0 +1,21 @@
+{
+  "name": "book-library-management",
+  "version": "1.0.0",
+  "description": "公益书库入库管理系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "import": "node src/scripts/import.js",
+    "review": "node src/scripts/review.js",
+    "export": "node src/scripts/export.js",
+    "test": "node src/scripts/test.js"
+  },
+  "keywords": ["library", "book", "management"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sqlite3": "^5.1.7",
+    "csv-parser": "^3.0.0"
+  },
+  "devDependencies": {}
+}
