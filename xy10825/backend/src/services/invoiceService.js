@@ -10,7 +10,12 @@ class InvoiceService {
     if (!invoiceData.platform || !invoiceData.businessNo || !invoiceData.amount) {
       throw new Error('缺少必填字段: platform, businessNo, amount');
     }
-    return dataStore.addInvoice(invoiceData);
+    const invoice = dataStore.addInvoice(invoiceData);
+    if (invoiceData.simulateTimeout) {
+      invoice.createdAt = moment().subtract(CALLBACK_TIMEOUT_MINUTES + 1, 'minutes').toISOString();
+      invoice.addTimeline('SIMULATE_TIMEOUT', '模拟超时设置', 'system');
+    }
+    return invoice;
   }
 
   getInvoice(id) {
