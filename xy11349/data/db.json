@@ -1,0 +1,446 @@
+{
+  "qualityRecords": [
+    {
+      "batchId": "BATCH-2024-001",
+      "orderId": "ORDER-2024-A001",
+      "labValues": {
+        "L": 85.5,
+        "a": 12.3,
+        "b": -5.2
+      },
+      "paperBatch": "PAPER-A01",
+      "operator": "张三",
+      "role": "品控员",
+      "measuredAt": "2024-01-15T02:30:00.000Z",
+      "id": "747ec49b-b58c-49ed-9784-4f375984518a",
+      "createdAt": "2026-05-19T17:48:00.480Z",
+      "updatedAt": "2026-05-19T17:48:00.480Z",
+      "isDeleted": false
+    },
+    {
+      "batchId": "BATCH-2024-002",
+      "orderId": "ORDER-2024-A002",
+      "labValues": {
+        "L": 82.1,
+        "a": 15.7,
+        "b": -3.8
+      },
+      "paperBatch": "PAPER-A01",
+      "operator": "李四",
+      "role": "品控员",
+      "measuredAt": "2024-01-15T03:15:00.000Z",
+      "id": "2a557797-89c9-4572-b140-a5b9131223b2",
+      "createdAt": "2026-05-19T17:48:00.481Z",
+      "updatedAt": "2026-05-19T17:48:00.481Z",
+      "isDeleted": false
+    },
+    {
+      "batchId": "BATCH-2024-003",
+      "orderId": "ORDER-2024-B001",
+      "labValues": {
+        "L": 88.9,
+        "a": 8.2,
+        "b": -7.5
+      },
+      "paperBatch": "PAPER-B02",
+      "operator": "王五",
+      "role": "质检员",
+      "measuredAt": "2024-01-15T07:20:00.000Z",
+      "id": "0ef86c91-1d8f-47f2-889d-1e59a0988a46",
+      "createdAt": "2026-05-19T17:48:00.483Z",
+      "updatedAt": "2026-05-19T17:48:00.483Z",
+      "isDeleted": false
+    },
+    {
+      "batchId": "BATCH-2024-004",
+      "orderId": "ORDER-2024-C001",
+      "labValues": {
+        "L": 95.5,
+        "a": 10.1,
+        "b": -4.3
+      },
+      "paperBatch": "PAPER-C03",
+      "operator": "赵六",
+      "role": "品控员",
+      "measuredAt": "2024-01-16T01:45:00.000Z",
+      "id": "8698d4ae-1176-4545-a62f-3d9d97119a83",
+      "createdAt": "2026-05-19T17:48:08.677Z",
+      "updatedAt": "2026-05-19T17:48:08.677Z",
+      "isDeleted": false
+    },
+    {
+      "batchId": "BATCH-2024-010",
+      "orderId": "ORDER-2024-D001",
+      "labValues": {
+        "L": 87.2,
+        "a": 11.5,
+        "b": -6.8
+      },
+      "paperBatch": "PAPER-D04",
+      "operator": "郑十一",
+      "role": "品控员",
+      "measuredAt": "2024-01-17T01:30:00.000Z",
+      "id": "24894ff4-0803-4536-841a-3eaef384fedd",
+      "createdAt": "2026-05-19T17:48:15.339Z",
+      "updatedAt": "2026-05-19T17:48:15.339Z",
+      "isDeleted": false
+    },
+    {
+      "batchId": "BATCH-2024-011",
+      "orderId": "ORDER-2024-D002",
+      "labValues": {
+        "L": 83.8,
+        "a": 14.2,
+        "b": -4.1
+      },
+      "paperBatch": "PAPER-D04",
+      "operator": "王十二",
+      "role": "质检员",
+      "measuredAt": "2024-01-17T03:00:00.000Z",
+      "id": "3b54ab27-1956-49f9-aea4-8dc3c70b74f3",
+      "createdAt": "2026-05-19T17:48:15.339Z",
+      "updatedAt": "2026-05-19T17:48:15.339Z",
+      "isDeleted": false
+    }
+  ],
+  "reworkRecords": [
+    {
+      "qualityRecordId": "747ec49b-b58c-49ed-9784-4f375984518a",
+      "batchId": "BATCH-2024-001",
+      "reason": "颜色偏差超过标准范围，L值偏低",
+      "solution": "调整油墨配方，增加白色墨量5%",
+      "operator": "李工",
+      "role": "技术员",
+      "reworkedAt": "2024-01-15T09:00:00.000Z",
+      "id": "ffc66a0b-92da-47e9-8c8a-0b280de9a14c",
+      "createdAt": "2026-05-19T17:48:16.583Z"
+    },
+    {
+      "qualityRecordId": "2a557797-89c9-4572-b140-a5b9131223b2",
+      "batchId": "BATCH-2024-002",
+      "reason": "a值偏高导致红色偏深",
+      "solution": "减少品红墨量3%",
+      "operator": "王工",
+      "role": "技术员",
+      "reworkedAt": "2024-01-15T10:30:00.000Z",
+      "id": "a532c716-988c-43c2-8feb-1b74a078ef57",
+      "createdAt": "2026-05-19T17:48:16.584Z"
+    }
+  ],
+  "importHistories": [
+    {
+      "importType": "csv",
+      "fileName": "color-normal.csv",
+      "operator": "张三",
+      "role": "品控员",
+      "totalCount": 3,
+      "successCount": 3,
+      "failedCount": 0,
+      "status": "completed",
+      "id": "430fafdc-9a4f-42b0-902c-c3a9afd7b475",
+      "startedAt": "2026-05-19T17:48:00.467Z",
+      "completedAt": "2026-05-19T17:48:00.485Z"
+    },
+    {
+      "importType": "csv",
+      "fileName": "color-with-errors.csv",
+      "operator": "李四",
+      "role": "品控员",
+      "totalCount": 6,
+      "successCount": 1,
+      "failedCount": 5,
+      "status": "completed",
+      "id": "465193ff-c301-405b-a97c-84119e04a0b4",
+      "startedAt": "2026-05-19T17:48:08.666Z",
+      "completedAt": "2026-05-19T17:48:08.679Z"
+    },
+    {
+      "importType": "json",
+      "fileName": "order-normal.json",
+      "operator": "王五",
+      "role": "质检员",
+      "totalCount": 2,
+      "successCount": 2,
+      "failedCount": 0,
+      "status": "completed",
+      "id": "b3b753af-9831-46ea-adf3-c9b106da61c7",
+      "startedAt": "2026-05-19T17:48:15.334Z",
+      "completedAt": "2026-05-19T17:48:15.340Z"
+    },
+    {
+      "importType": "text",
+      "fileName": "rework-normal.txt",
+      "operator": "赵六",
+      "role": "技术员",
+      "totalCount": 2,
+      "successCount": 2,
+      "failedCount": 0,
+      "status": "completed",
+      "id": "a99bd267-dfaf-4014-a4d8-1a8475e272f7",
+      "startedAt": "2026-05-19T17:48:16.580Z",
+      "completedAt": "2026-05-19T17:48:16.586Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "action": "CREATE",
+      "entityType": "QualityRecord",
+      "entityId": "747ec49b-b58c-49ed-9784-4f375984518a",
+      "operator": "张三",
+      "role": "品控员",
+      "details": {
+        "batchId": "BATCH-2024-001",
+        "source": "csv_import"
+      },
+      "id": "c0331030-9d64-4ac9-82e1-4f52a0eefe84",
+      "timestamp": "2026-05-19T17:48:00.481Z"
+    },
+    {
+      "action": "CREATE",
+      "entityType": "QualityRecord",
+      "entityId": "2a557797-89c9-4572-b140-a5b9131223b2",
+      "operator": "张三",
+      "role": "品控员",
+      "details": {
+        "batchId": "BATCH-2024-002",
+        "source": "csv_import"
+      },
+      "id": "a578923d-7392-4bf7-bfc9-daff4e103a21",
+      "timestamp": "2026-05-19T17:48:00.482Z"
+    },
+    {
+      "action": "CREATE",
+      "entityType": "QualityRecord",
+      "entityId": "0ef86c91-1d8f-47f2-889d-1e59a0988a46",
+      "operator": "张三",
+      "role": "品控员",
+      "details": {
+        "batchId": "BATCH-2024-003",
+        "source": "csv_import"
+      },
+      "id": "79216ee6-4241-4335-8b1a-f41cebe2c755",
+      "timestamp": "2026-05-19T17:48:00.483Z"
+    },
+    {
+      "action": "IMPORT",
+      "entityType": "QualityRecord",
+      "operator": "张三",
+      "role": "品控员",
+      "details": {
+        "importHistoryId": "430fafdc-9a4f-42b0-902c-c3a9afd7b475",
+        "fileName": "color-normal.csv",
+        "successCount": 3,
+        "failedCount": 0
+      },
+      "id": "0e71f72b-3cbe-4498-9444-b58678f7a4fe",
+      "timestamp": "2026-05-19T17:48:00.486Z"
+    },
+    {
+      "action": "CREATE",
+      "entityType": "QualityRecord",
+      "entityId": "8698d4ae-1176-4545-a62f-3d9d97119a83",
+      "operator": "李四",
+      "role": "品控员",
+      "details": {
+        "batchId": "BATCH-2024-004",
+        "source": "csv_import"
+      },
+      "id": "43fc02c4-c629-4f70-9ca4-4d568bcb5813",
+      "timestamp": "2026-05-19T17:48:08.678Z"
+    },
+    {
+      "action": "IMPORT",
+      "entityType": "QualityRecord",
+      "operator": "李四",
+      "role": "品控员",
+      "details": {
+        "importHistoryId": "465193ff-c301-405b-a97c-84119e04a0b4",
+        "fileName": "color-with-errors.csv",
+        "successCount": 1,
+        "failedCount": 5
+      },
+      "id": "e3e03bd0-58e8-4f63-8b4d-80736dd25d5e",
+      "timestamp": "2026-05-19T17:48:08.680Z"
+    },
+    {
+      "action": "CREATE",
+      "entityType": "QualityRecord",
+      "entityId": "24894ff4-0803-4536-841a-3eaef384fedd",
+      "operator": "王五",
+      "role": "质检员",
+      "details": {
+        "batchId": "BATCH-2024-010",
+        "source": "json_import"
+      },
+      "id": "3b4068de-9ea3-4c10-a3e8-2729a27a2bb8",
+      "timestamp": "2026-05-19T17:48:15.339Z"
+    },
+    {
+      "action": "CREATE",
+      "entityType": "QualityRecord",
+      "entityId": "3b54ab27-1956-49f9-aea4-8dc3c70b74f3",
+      "operator": "王五",
+      "role": "质检员",
+      "details": {
+        "batchId": "BATCH-2024-011",
+        "source": "json_import"
+      },
+      "id": "a03285f8-db99-42e6-aaa4-f7b9dcc2bfa9",
+      "timestamp": "2026-05-19T17:48:15.340Z"
+    },
+    {
+      "action": "IMPORT",
+      "entityType": "QualityRecord",
+      "operator": "王五",
+      "role": "质检员",
+      "details": {
+        "importHistoryId": "b3b753af-9831-46ea-adf3-c9b106da61c7",
+        "fileName": "order-normal.json",
+        "successCount": 2,
+        "failedCount": 0
+      },
+      "id": "6e435473-44c0-4a5c-9455-e2edb4c18ae7",
+      "timestamp": "2026-05-19T17:48:15.341Z"
+    },
+    {
+      "action": "CREATE",
+      "entityType": "ReworkRecord",
+      "entityId": "ffc66a0b-92da-47e9-8c8a-0b280de9a14c",
+      "operator": "赵六",
+      "role": "技术员",
+      "details": {
+        "batchId": "BATCH-2024-001",
+        "source": "text_import"
+      },
+      "id": "95b3546a-25bb-4c01-a24e-161654e4f999",
+      "timestamp": "2026-05-19T17:48:16.584Z"
+    },
+    {
+      "action": "CREATE",
+      "entityType": "ReworkRecord",
+      "entityId": "a532c716-988c-43c2-8feb-1b74a078ef57",
+      "operator": "赵六",
+      "role": "技术员",
+      "details": {
+        "batchId": "BATCH-2024-002",
+        "source": "text_import"
+      },
+      "id": "5a33e79f-8cde-4f77-bf2f-190a60d29968",
+      "timestamp": "2026-05-19T17:48:16.585Z"
+    },
+    {
+      "action": "IMPORT",
+      "entityType": "ReworkRecord",
+      "operator": "赵六",
+      "role": "技术员",
+      "details": {
+        "importHistoryId": "a99bd267-dfaf-4014-a4d8-1a8475e272f7",
+        "fileName": "rework-normal.txt",
+        "successCount": 2,
+        "failedCount": 0
+      },
+      "id": "a9589960-5c2f-499f-9d91-7933c67619f1",
+      "timestamp": "2026-05-19T17:48:16.587Z"
+    },
+    {
+      "action": "REVIEW",
+      "entityType": "AllData",
+      "operator": "系统管理员",
+      "role": "管理员",
+      "details": {
+        "qualityRecordsCount": 6,
+        "reworkRecordsCount": 2,
+        "badRecordsCount": 5
+      },
+      "id": "f3c63b63-8342-47c8-826a-7c7923315835",
+      "timestamp": "2026-05-19T17:48:24.823Z"
+    },
+    {
+      "action": "REVIEW",
+      "entityType": "Batch",
+      "operator": "系统管理员",
+      "role": "管理员",
+      "details": {
+        "batchId": "BATCH-2024-001"
+      },
+      "id": "3cea1cf8-7006-4dca-a008-783d97806c98",
+      "timestamp": "2026-05-19T17:48:26.897Z"
+    },
+    {
+      "action": "EXPORT",
+      "entityType": "Data",
+      "operator": "系统管理员",
+      "role": "管理员",
+      "details": {
+        "qualityRecordsCount": 6,
+        "reworkRecordsCount": 2,
+        "includeBadRecords": true,
+        "includeAuditLogs": true
+      },
+      "id": "a4d55e3f-4ab5-4768-9221-514cdf9273f2",
+      "timestamp": "2026-05-19T17:48:28.172Z"
+    }
+  ],
+  "badRecords": [
+    {
+      "importHistoryId": "465193ff-c301-405b-a97c-84119e04a0b4",
+      "originalPosition": "color-with-errors.csv 第 2 行",
+      "rawData": "{\"batchId\":\"\",\"orderId\":\"ORDER-2024-C002\",\"L\":\"80.0\",\"a\":\"12.0\",\"b\":\"-5.0\",\"paperBatch\":\"PAPER-C03\",\"operator\":\"钱七\",\"role\":\"品控员\",\"measuredAt\":\"2024-01-16 09:30:00\"}",
+      "failureReason": "batchId: 批次号不能为空",
+      "suggestions": [
+        "请输入批次号，例如: BATCH-2024-001"
+      ],
+      "id": "d0b274ec-4c3b-4b57-b3f2-e1faba9ed872",
+      "createdAt": "2026-05-19T17:48:08.679Z",
+      "isResolved": false
+    },
+    {
+      "importHistoryId": "465193ff-c301-405b-a97c-84119e04a0b4",
+      "originalPosition": "color-with-errors.csv 第 3 行",
+      "rawData": "{\"batchId\":\"BATCH-2024-006\",\"orderId\":\"ORDER-2024-C003\",\"L\":\"invalid\",\"a\":\"12.0\",\"b\":\"-5.0\",\"paperBatch\":\"PAPER-C03\",\"operator\":\"孙八\",\"role\":\"品控员\",\"measuredAt\":\"2024-01-16 10:15:00\"}",
+      "failureReason": "L: L值 \"invalid\" 不是有效数字",
+      "suggestions": [
+        "请输入有效的数字，例如: 85.5"
+      ],
+      "id": "d8b3f3e8-3615-49d6-84fb-3ebe54261deb",
+      "createdAt": "2026-05-19T17:48:08.679Z",
+      "isResolved": false
+    },
+    {
+      "importHistoryId": "465193ff-c301-405b-a97c-84119e04a0b4",
+      "originalPosition": "color-with-errors.csv 第 4 行",
+      "rawData": "{\"batchId\":\"BATCH-2024-007\",\"orderId\":\"ORDER-2024-C004\",\"L\":\"85.5\",\"a\":\"130.0\",\"b\":\"-5.0\",\"paperBatch\":\"PAPER-C03\",\"operator\":\"周九\",\"role\":\"品控员\",\"measuredAt\":\"2024-01-16 11:00:00\"}",
+      "failureReason": "a: a值 130 超出有效范围(-128到127)",
+      "suggestions": [
+        "请输入-128到127之间的数值"
+      ],
+      "id": "1c6c8264-12c4-42b6-abbf-9a3a94daba4a",
+      "createdAt": "2026-05-19T17:48:08.679Z",
+      "isResolved": false
+    },
+    {
+      "importHistoryId": "465193ff-c301-405b-a97c-84119e04a0b4",
+      "originalPosition": "color-with-errors.csv 第 5 行",
+      "rawData": "{\"batchId\":\"BATCH-2024-008\",\"orderId\":\"ORDER-2024-C005\",\"L\":\"85.5\",\"a\":\"12.0\",\"b\":\"-5.0\",\"paperBatch\":\"PAPER-C03\",\"operator\":\"\",\"role\":\"品控员\",\"measuredAt\":\"2024-01-16 11:45:00\"}",
+      "failureReason": "operator: 操作人不能为空",
+      "suggestions": [
+        "请输入操作人姓名"
+      ],
+      "id": "c4e1ba74-4140-433f-82f0-67239dc606fa",
+      "createdAt": "2026-05-19T17:48:08.679Z",
+      "isResolved": false
+    },
+    {
+      "importHistoryId": "465193ff-c301-405b-a97c-84119e04a0b4",
+      "originalPosition": "color-with-errors.csv 第 6 行",
+      "rawData": "{\"batchId\":\"BATCH-2024-009\",\"orderId\":\"ORDER-2024-C006\",\"L\":\"85.5\",\"a\":\"12.0\",\"b\":\"-5.0\",\"paperBatch\":\"PAPER-C03\",\"operator\":\"吴十\",\"role\":\"品控员\",\"measuredAt\":\"invalid-date\"}",
+      "failureReason": "measuredAt: \"invalid-date\" 不是有效的日期格式",
+      "suggestions": [
+        "请使用正确的日期格式，例如: 2024-01-15 14:30:00"
+      ],
+      "id": "72e3844c-88ed-4eaf-b668-e2b8cc2f4600",
+      "createdAt": "2026-05-19T17:48:08.679Z",
+      "isResolved": false
+    }
+  ]
+}

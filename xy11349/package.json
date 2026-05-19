@@ -1,0 +1,33 @@
+{
+  "name": "print-quality-control",
+  "version": "1.0.0",
+  "description": "印刷车间品控数据管理系统",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "import:csv": "ts-node src/cli.ts import:csv",
+    "import:json": "ts-node src/cli.ts import:json",
+    "import:text": "ts-node src/cli.ts import:text",
+    "review": "ts-node src/cli.ts review",
+    "export": "ts-node src/cli.ts export",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "uuid": "^9.0.0",
+    "chalk": "^4.1.2",
+    "commander": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0"
+  }
+}

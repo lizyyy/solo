@@ -1,0 +1,28 @@
+[
+  {
+    "batchId": "BATCH-2024-010",
+    "orderId": "ORDER-2024-D001",
+    "labValues": {
+      "L": 87.2,
+      "a": 11.5,
+      "b": -6.8
+    },
+    "paperBatch": "PAPER-D04",
+    "operator": "郑十一",
+    "role": "品控员",
+    "measuredAt": "2024-01-17 08:30:00"
+  },
+  {
+    "batchId": "BATCH-2024-011",
+    "orderId": "ORDER-2024-D002",
+    "labValues": {
+      "L": 83.8,
+      "a": 14.2,
+      "b": -4.1
+    },
+    "paperBatch": "PAPER-D04",
+    "operator": "王十二",
+    "role": "质检员",
+    "measuredAt": "2024-01-17 10:00:00"
+  }
+]
