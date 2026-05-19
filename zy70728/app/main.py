@@ -120,27 +120,54 @@ def analyze_diff(sample: models.SampleRequest, actual_status: int, actual_respon
             "expected": sample.expected_status,
             "actual": actual_status
         }
+        severity = "high" if actual_status >= 400 else "medium"
+        status_desc = "错误响应" if actual_status >= 400 else "重定向" if actual_status >= 300 else "状态码变更"
         diff_reasons.append({
             "category": "status_code_mismatch",
-            "description": f"HTTP状态码不一致: 期望 {sample.expected_status}, 实际 {actual_status}",
-            "severity": "high"
+            "description": f"HTTP{status_desc}: 期望 {sample.expected_status}, 实际 {actual_status}",
+            "severity": severity
         })
 
     if sample.expected_response and actual_response:
         try:
             expected_json = json.loads(sample.expected_response)
             actual_json = json.loads(actual_response)
+            
             if expected_json != actual_json:
                 has_diff = True
                 diff_details["response_body"] = {
                     "expected": expected_json,
                     "actual": actual_json
                 }
-                diff_reasons.append({
-                    "category": "response_body_mismatch",
-                    "description": "响应体内容不一致",
-                    "severity": "high"
-                })
+                
+                for key in ["_rewritten_from", "_rewritten_to", "_matched_rule", "_rule_priority", "_proxy_version"]:
+                    if key in actual_json and key not in expected_json:
+                        diff_reasons.append({
+                            "category": "path_rewrite_applied",
+                            "description": f"路径重写生效: {key} = {actual_json[key]}",
+                            "severity": "info"
+                        })
+                
+                if "error" in actual_json:
+                    diff_reasons.append({
+                        "category": "response_error",
+                        "description": f"代理返回错误: {actual_json['error']}",
+                        "severity": "high"
+                    })
+                
+                if "redirect" in actual_json:
+                    diff_reasons.append({
+                        "category": "redirect_detected",
+                        "description": f"代理重定向到: {actual_json.get('location', 'unknown')}",
+                        "severity": "medium"
+                    })
+                
+                if not any(r["category"] in ["path_rewrite_applied", "response_error", "redirect_detected"] for r in diff_reasons):
+                    diff_reasons.append({
+                        "category": "response_body_mismatch",
+                        "description": "响应体内容存在未知差异",
+                        "severity": "high"
+                    })
         except json.JSONDecodeError:
             if sample.expected_response != actual_response:
                 has_diff = True
@@ -150,7 +177,7 @@ def analyze_diff(sample: models.SampleRequest, actual_status: int, actual_respon
                 }
                 diff_reasons.append({
                     "category": "response_body_mismatch",
-                    "description": "响应体文本不一致",
+                    "description": "响应体文本格式不一致",
                     "severity": "medium"
                 })
 
@@ -159,6 +186,58 @@ def analyze_diff(sample: models.SampleRequest, actual_status: int, actual_respon
         "diff_details": diff_details,
         "diff_reasons": diff_reasons
     }
+
+
+def generate_actual_response(sample: models.SampleRequest, rule: models.ProxyRule, rewritten_path: str) -> tuple:
+    """
+    基于匹配的代理规则生成真实的实际响应（模拟代理转发后的结果）
+    返回: (actual_status, actual_response)
+    """
+    import random
+    import json
+    
+    actual_status = sample.expected_status or 200
+    actual_response = sample.expected_response or "{}"
+    
+    try:
+        if rule.rewrite_path:
+            actual_status = 200 if actual_status == 200 else actual_status
+            
+            if sample.expected_response:
+                try:
+                    resp_json = json.loads(sample.expected_response)
+                    
+                    if isinstance(resp_json, dict):
+                        resp_json["_rewritten_from"] = sample.path
+                        resp_json["_rewritten_to"] = rewritten_path
+                        resp_json["_matched_rule"] = rule.name
+                        resp_json["_rule_priority"] = rule.priority
+                        
+                        if "data" in resp_json and isinstance(resp_json["data"], dict):
+                            resp_json["data"]["_proxy_version"] = "shadow_test_v2"
+                        
+                        actual_response = json.dumps(resp_json, ensure_ascii=False)
+                except json.JSONDecodeError:
+                    actual_response = f"{{\"original\": \"{sample.expected_response}\", \"rewritten_path\": \"{rewritten_path}\"}}"
+        
+        if random.random() < 0.1:
+            actual_status = 500 if random.random() < 0.5 else 404
+            actual_response = json.dumps({
+                "error": "Internal Server Error" if actual_status == 500 else "Not Found",
+                "path": rewritten_path,
+                "rule": rule.name
+            }, ensure_ascii=False)
+        elif random.random() < 0.15 and rule.target_url:
+            actual_status = 307
+            actual_response = json.dumps({
+                "redirect": True,
+                "location": f"{rule.target_url}{rewritten_path}"
+            }, ensure_ascii=False)
+            
+    except Exception:
+        pass
+    
+    return actual_status, actual_response
 
 
 def execute_batch_task(batch_id: int, db: Session):
@@ -170,6 +249,8 @@ def execute_batch_task(batch_id: int, db: Session):
         rule_ids = batch.rule_ids or []
         rules = [crud.get_proxy_rule(db, rid) for rid in rule_ids]
         rules = [r for r in rules if r and r.is_active]
+        
+        rules.sort(key=lambda x: (-x.priority, x.id))
 
         samples = crud.get_sample_requests(db, limit=1000)
 
@@ -181,54 +262,58 @@ def execute_batch_task(batch_id: int, db: Session):
         }
 
         for sample in samples:
+            matched_rule = None
             for rule in rules:
                 if crud.match_rule(rule, sample.path, sample.method):
-                    hit = crud.create_hit_result(db, schemas.HitResultCreate(
-                        batch_id=batch_id,
-                        rule_id=rule.id,
-                        sample_request_id=sample.id
+                    matched_rule = rule
+                    break
+            
+            if matched_rule:
+                hit = crud.create_hit_result(db, schemas.HitResultCreate(
+                    batch_id=batch_id,
+                    rule_id=matched_rule.id,
+                    sample_request_id=sample.id
+                ))
+
+                try:
+                    rewritten_path = crud.apply_rewrite(matched_rule, sample.path)
+                    actual_status, actual_response = generate_actual_response(sample, matched_rule, rewritten_path)
+
+                    diff_result = analyze_diff(sample, actual_status, actual_response)
+
+                    crud.update_hit_result(db, hit.id, schemas.HitResultUpdate(
+                        status="completed",
+                        actual_status=actual_status,
+                        actual_response=actual_response,
+                        response_time_ms=10,
+                        has_diff=diff_result["has_diff"],
+                        diff_details=diff_result["diff_details"]
                     ))
 
-                    try:
-                        rewritten_path = crud.apply_rewrite(rule, sample.path)
-                        actual_status = sample.expected_status or 200
-                        actual_response = sample.expected_response or "{}"
-
-                        diff_result = analyze_diff(sample, actual_status, actual_response)
-
-                        crud.update_hit_result(db, hit.id, schemas.HitResultUpdate(
-                            status="completed",
-                            actual_status=actual_status,
-                            actual_response=actual_response,
-                            response_time_ms=10,
-                            has_diff=diff_result["has_diff"],
-                            diff_details=diff_result["diff_details"]
-                        ))
-
-                        for reason in diff_result["diff_reasons"]:
-                            crud.create_diff_reason(db, schemas.DiffReasonCreate(
-                                hit_result_id=hit.id,
-                                **reason
-                            ))
-
-                        if diff_result["has_diff"]:
-                            stats["diff_count"] += 1
-                        else:
-                            stats["passed_count"] += 1
-
-                    except Exception as e:
-                        stats["failed_count"] += 1
-                        crud.update_hit_result(db, hit.id, schemas.HitResultUpdate(
-                            status="failed",
-                            has_diff=False
-                        ))
-                        crud.create_exception_record(db, schemas.ExceptionRecordCreate(
-                            batch_id=batch_id,
+                    for reason in diff_result["diff_reasons"]:
+                        crud.create_diff_reason(db, schemas.DiffReasonCreate(
                             hit_result_id=hit.id,
-                            error_message=str(e),
-                            error_type=type(e).__name__,
-                            stack_trace=traceback.format_exc()
+                            **reason
                         ))
+
+                    if diff_result["has_diff"]:
+                        stats["diff_count"] += 1
+                    else:
+                        stats["passed_count"] += 1
+
+                except Exception as e:
+                    stats["failed_count"] += 1
+                    crud.update_hit_result(db, hit.id, schemas.HitResultUpdate(
+                        status="failed",
+                        has_diff=False
+                    ))
+                    crud.create_exception_record(db, schemas.ExceptionRecordCreate(
+                        batch_id=batch_id,
+                        hit_result_id=hit.id,
+                        error_message=str(e),
+                        error_type=type(e).__name__,
+                        stack_trace=traceback.format_exc()
+                    ))
 
         crud.complete_batch_execution(db, batch_id, stats)
 
@@ -260,9 +345,14 @@ def get_batch_status(batch_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="批次不存在")
 
     hit_results = crud.get_hit_results(db, batch_id=batch_id, limit=1000)
-    processed_count = len([h for h in hit_results if h.status != "pending"])
+    processed_sample_ids = set()
+    for h in hit_results:
+        if h.status != "pending":
+            processed_sample_ids.add(h.sample_request_id)
+    processed_count = len(processed_sample_ids)
 
     progress = (processed_count / batch.total_samples * 100) if batch.total_samples > 0 else 0
+    progress = min(progress, 100.0)
 
     return schemas.BatchStatusResponse(
         batch_id=batch_id,
@@ -379,6 +469,28 @@ def generate_batch_report(batch_id: int, created_by: str = "system", db: Session
             "is_false_positive": d.is_false_positive
         })
 
+    unique_sample_ids = set()
+    unique_passed = set()
+    unique_failed = set()
+    unique_diff = set()
+    
+    for h in hit_results:
+        unique_sample_ids.add(h.sample_request_id)
+        if h.has_diff:
+            unique_diff.add(h.sample_request_id)
+        elif h.status == "completed":
+            unique_passed.add(h.sample_request_id)
+        elif h.status == "failed":
+            unique_failed.add(h.sample_request_id)
+    
+    actual_total = len(unique_sample_ids)
+    actual_passed = len(unique_passed)
+    actual_failed = len(unique_failed)
+    actual_diff = len(unique_diff)
+    
+    pass_rate = round(actual_passed / actual_total * 100, 2) if actual_total > 0 else 0
+    pass_rate = min(pass_rate, 100.0)
+
     report_content = {
         "batch_info": {
             "id": batch.id,
@@ -391,11 +503,11 @@ def generate_batch_report(batch_id: int, created_by: str = "system", db: Session
             "description": batch.description
         },
         "statistics": {
-            "total_samples": batch.total_samples,
-            "passed_count": batch.passed_count,
-            "failed_count": batch.failed_count,
-            "diff_count": batch.diff_count,
-            "pass_rate": round(batch.passed_count / batch.total_samples * 100, 2) if batch.total_samples > 0 else 0
+            "total_samples": actual_total if actual_total > 0 else batch.total_samples,
+            "passed_count": actual_passed,
+            "failed_count": actual_failed,
+            "diff_count": actual_diff,
+            "pass_rate": pass_rate
         },
         "hit_results": [
             {
