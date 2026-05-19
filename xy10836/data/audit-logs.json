@@ -50,5 +50,64 @@
       "valid": true
     },
     "timestamp": "2026-05-15T10:42:50.063Z"
+  },
+  {
+    "id": "36fa5a24-7b81-47cc-aab5-55c0479864df",
+    "action": "LEASE_CREATE_FAILED",
+    "leaseId": null,
+    "details": {
+      "input": {
+        "operator": "TEST"
+      },
+      "error": "缺少必填参数: applicant, resourceId, durationHours",
+      "operator": "TEST",
+      "result": "failed"
+    },
+    "timestamp": "2026-05-19T20:47:58.193Z"
+  },
+  {
+    "id": "77118f07-8417-4339-b9ad-a2ed846e6eb4",
+    "action": "LEASES_QUERIED",
+    "leaseId": null,
+    "details": {
+      "input": {
+        "operator": "SYSTEM"
+      },
+      "resultCount": 2,
+      "operator": "SYSTEM",
+      "result": "success"
+    },
+    "timestamp": "2026-05-19T20:47:58.241Z"
+  },
+  {
+    "id": "e354962f-a7e7-45b6-ac00-55b65c118cff",
+    "action": "LEASE_CREATED",
+    "leaseId": "e4cc5c95-eb5e-4f39-be10-44ceaef4a35a",
+    "details": {
+      "input": {
+        "applicant": "张三",
+        "resourceId": "mysql",
+        "durationHours": 8,
+        "approvalStrategy": "AUTO",
+        "reason": ""
+      },
+      "result": "success",
+      "operator": "TEST"
+    },
+    "timestamp": "2026-05-19T20:47:58.269Z"
+  },
+  {
+    "id": "547136da-3b1b-40c7-826f-0b37c4ddfdb6",
+    "action": "AUDIT_LOGS_VIEWED",
+    "leaseId": null,
+    "details": {
+      "input": {
+        "operator": "SYSTEM"
+      },
+      "logCount": 8,
+      "operator": "SYSTEM",
+      "result": "success"
+    },
+    "timestamp": "2026-05-19T20:48:18.016Z"
   }
 ]
