@@ -179,19 +179,22 @@ class TimeReportDB:
             results = [r for r in results if r.approval_status == status]
         return results
     
-    def _validate_report(self, report: TimeReport) -> tuple[bool, Optional[str]]:
+    def _validate_report(self, report: TimeReport) -> tuple[str, Optional[str]]:
+        """返回三态校验结果: 'success' / 'pending_review' / 'blocked' + 错误/提示信息"""
         if report.hours < 0:
-            return False, f"工时不能为负数 (当前: {report.hours}小时)"
+            return "blocked", f"工时不能为负数 (当前: {report.hours}小时)"
         if report.hours > 24:
-            return False, f"工时不能超过24小时 (当前: {report.hours}小时)"
+            return "blocked", f"工时不能超过24小时 (当前: {report.hours}小时)"
         try:
             datetime.strptime(report.report_date, "%Y-%m-%d")
         except ValueError:
-            return False, f"日期格式错误: {report.report_date}"
+            return "blocked", f"日期格式错误: {report.report_date}"
         valid_projects = {"P001", "P002", "P003"}
         if report.project_id not in valid_projects:
-            return False, f"项目不存在 (项目ID: {report.project_id})"
-        return True, None
+            return "blocked", f"项目不存在 (项目ID: {report.project_id})"
+        if report.hours > 8:
+            return "pending_review", f"工时超过8小时，需要项目经理复核 (当前: {report.hours}小时)"
+        return "success", None
     
     def retry(self, report_id: str) -> tuple[Optional[TimeReport], str]:
         report = self.reports.get(report_id)
@@ -200,19 +203,24 @@ class TimeReportDB:
         if not report.can_retry:
             return None, "当前状态不可重试"
         
-        is_valid, error_msg = self._validate_report(report)
+        validate_status, validate_msg = self._validate_report(report)
         report.updated_at = datetime.now().isoformat()
         
-        if is_valid:
+        if validate_status == "success":
             report.approval_status = "success"
             report.error_message = None
             report.can_retry = False
             return report, "重试成功，校验通过"
+        elif validate_status == "pending_review":
+            report.approval_status = "pending_review"
+            report.error_message = validate_msg
+            report.can_retry = False
+            return report, "重试校验通过，已进入待复核状态，需项目经理审批"
         else:
             report.approval_status = "blocked"
-            report.error_message = f"重试校验失败: {error_msg}"
+            report.error_message = f"重试校验失败: {validate_msg}"
             report.can_retry = True
-            return report, f"重试校验失败: {error_msg}"
+            return report, f"重试校验失败: {validate_msg}"
     
     def rollback(self, report_id: str) -> Optional[TimeReport]:
         report = self.reports.get(report_id)
@@ -233,20 +241,27 @@ class TimeReportDB:
         if not report:
             return {"error": "报表不存在"}
         
-        is_valid, error_msg = self._validate_report(report)
+        validate_status, validate_msg = self._validate_report(report)
         issues = []
-        if not is_valid and error_msg:
-            issues.append(error_msg)
+        if validate_status == "pending_review":
+            issues.append(validate_msg)
+            recommendation = "待项目经理复核，无需重试"
+        elif validate_status == "blocked":
+            issues.append(validate_msg)
+            recommendation = "建议修正数据后重试" if report.can_retry else "需联系管理员处理"
+        else:
+            recommendation = "数据合法，无需操作"
         
         return {
             "report_id": report_id,
             "status": report.approval_status,
+            "validate_status": validate_status,
             "current_error": report.error_message,
             "issues": issues,
             "original_input": report.original_input,
             "fill_reason": report.fill_reason,
             "can_retry": report.can_retry,
-            "recommendation": "数据合法，无需操作" if is_valid else ("建议修正数据后重试" if report.can_retry else "需联系管理员处理")
+            "recommendation": recommendation
         }
     
     def create_report(self, data: Dict) -> tuple[TimeReport, str]:
@@ -276,16 +291,22 @@ class TimeReportDB:
             updated_at=now
         )
         
-        is_valid, error_msg = self._validate_report(report)
-        if is_valid:
+        validate_status, validate_msg = self._validate_report(report)
+        if validate_status == "success":
             report.approval_status = "success"
+            report.error_message = None
             report.can_retry = False
             message = "发布成功，校验通过"
+        elif validate_status == "pending_review":
+            report.approval_status = "pending_review"
+            report.error_message = validate_msg
+            report.can_retry = False
+            message = f"发布成功，已进入待复核: {validate_msg}"
         else:
             report.approval_status = "blocked"
-            report.error_message = error_msg
+            report.error_message = validate_msg
             report.can_retry = True
-            message = f"发布失败，校验不通过: {error_msg}"
+            message = f"发布失败，校验不通过: {validate_msg}"
         
         self.reports[report_id] = report
         return report, message
@@ -317,7 +338,7 @@ def create_report():
     result = asdict(report)
     result["publish_message"] = message
     
-    if report.approval_status != "success":
+    if report.approval_status == "blocked":
         return jsonify(result), 400
     return jsonify(result)
 
@@ -335,7 +356,7 @@ def retry_report(report_id):
         return jsonify({"error": message}), 400
     result = asdict(report)
     result["retry_message"] = message
-    if report.approval_status != "success":
+    if report.approval_status == "blocked":
         return jsonify(result), 400
     return jsonify(result)
 
@@ -614,7 +635,11 @@ HTML_TEMPLATE = """
             const res = await fetch(`/api/reports/${id}/retry`, { method: 'POST' });
             const data = await res.json();
             if (res.ok) {
-                alert('重试成功！校验通过，状态已更新为成功。');
+                if (data.approval_status === 'pending_review') {
+                    alert('重试成功！校验通过，已进入待复核状态，需项目经理审批。');
+                } else {
+                    alert('重试成功！校验通过，状态已更新为成功。');
+                }
             } else {
                 alert(`重试校验失败：${data.error_message || data.retry_message || '未知错误'}`);
             }
