@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "数组边界测试 Schema",
+  "properties": {
+    "empty_array": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 0,
+      "maxItems": 0,
+      "description": "必须为空数组"
+    },
+    "optional_tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 0,
+      "maxItems": 5,
+      "description": "可选标签，0-5个"
+    },
+    "username": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 20,
+      "description": "允许空字符串"
+    }
+  }
+}

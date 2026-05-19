@@ -1,11 +1,11 @@
 {
   "schema": "user_schema",
-  "generated_at": "2026-05-19T15:25:40.114724",
-  "total_samples": 23,
+  "generated_at": "2026-05-19T20:09:41.254233",
+  "total_samples": 24,
   "samples_by_type": {
     "valid": 1,
     "boundary": 6,
-    "invalid": 13,
+    "invalid": 14,
     "edge_case": 3
   },
   "samples": [
@@ -68,34 +68,36 @@
       "field": "age"
     },
     {
-      "id": "boundary_tags_minitems_d709db05",
+      "id": "boundary_tags_minitems_e1004f31",
       "type": "boundary",
       "data": {
-        "username": "Best husband.",
-        "email": "melanie94@example.org",
-        "age": 61,
+        "username": "Source.",
+        "email": "daviscolin@example.com",
+        "age": 107,
+        "status": "inactive",
         "tags": []
       },
       "reason": "Array at minimum items 0",
       "field": "tags"
     },
     {
-      "id": "boundary_tags_maxitems_607dff36",
+      "id": "boundary_tags_maxitems_eaa1c620",
       "type": "boundary",
       "data": {
-        "username": "Best husband.",
-        "email": "melanie94@example.org",
-        "age": 61,
+        "username": "Source.",
+        "email": "daviscolin@example.com",
+        "age": 107,
+        "status": "inactive",
         "tags": [
-          "Show.",
+          "PM.",
           "xxxx",
           "xxx",
-          "Not capital.",
+          "Surface.",
           "xxxx",
-          "Human bar.",
-          "Finally.",
-          "Production present.",
-          "Training.",
+          "Show.",
+          "Not capital.",
+          "Human bar old.",
+          "Present.",
           "xx"
         ]
       },
@@ -103,139 +105,145 @@
       "field": "tags"
     },
     {
-      "id": "invalid_username_short_04b08a59",
+      "id": "invalid_username_short_d872705b",
       "type": "invalid",
       "data": {
         "username": "xx",
-        "email": "williamsjeremy@example.com",
+        "email": "janetwilliams@example.org",
         "age": 86,
-        "tags": [
-          "Base top early."
-        ]
+        "tags": []
       },
       "reason": "String too short: length 2 < minLength 3",
       "field": "username"
     },
     {
-      "id": "invalid_username_long_029fa86a",
+      "id": "invalid_username_long_08c972d0",
       "type": "invalid",
       "data": {
         "username": "xxxxxxxxxxxxxxxxxxxxx",
-        "email": "williamsjeremy@example.com",
+        "email": "janetwilliams@example.org",
         "age": 86,
-        "tags": [
-          "Base top early."
-        ]
+        "tags": []
       },
       "reason": "String too long: length 21 > maxLength 20",
       "field": "username"
     },
     {
-      "id": "invalid_username_type_2948f6ef",
+      "id": "invalid_username_type_6a69529e",
       "type": "invalid",
       "data": {
         "username": 12345,
-        "email": "williamsjeremy@example.com",
+        "email": "janetwilliams@example.org",
         "age": 86,
-        "tags": [
-          "Base top early."
-        ]
+        "tags": []
       },
       "reason": "Type mismatch: expected string, got int",
       "field": "username"
     },
     {
-      "id": "invalid_email_type_ae1c5bed",
+      "id": "invalid_email_type_138f4937",
       "type": "invalid",
       "data": {
-        "username": "Participant dark.",
+        "username": "Training high.",
         "email": 12345,
         "age": 86,
-        "tags": [
-          "Base top early."
-        ]
+        "tags": []
       },
       "reason": "Type mismatch: expected string, got int",
       "field": "email"
     },
     {
-      "id": "invalid_age_under_ff8aa384",
+      "id": "invalid_age_under_79390254",
       "type": "invalid",
       "data": {
-        "username": "Participant dark.",
-        "email": "williamsjeremy@example.com",
+        "username": "Training high.",
+        "email": "janetwilliams@example.org",
         "age": 17,
-        "tags": [
-          "Base top early."
-        ]
+        "tags": []
       },
       "reason": "Number below minimum: 17 < 18",
       "field": "age"
     },
     {
-      "id": "invalid_age_over_b0b92b6e",
+      "id": "invalid_age_over_3bbcafb8",
       "type": "invalid",
       "data": {
-        "username": "Participant dark.",
-        "email": "williamsjeremy@example.com",
+        "username": "Training high.",
+        "email": "janetwilliams@example.org",
         "age": 121,
-        "tags": [
-          "Base top early."
-        ]
+        "tags": []
       },
       "reason": "Number above maximum: 121 > 120",
       "field": "age"
     },
     {
-      "id": "invalid_age_type_24ff92cc",
+      "id": "invalid_age_type_719f746a",
       "type": "invalid",
       "data": {
-        "username": "Participant dark.",
-        "email": "williamsjeremy@example.com",
+        "username": "Training high.",
+        "email": "janetwilliams@example.org",
         "age": "not_an_integer",
-        "tags": [
-          "Base top early."
-        ]
+        "tags": []
       },
       "reason": "Type mismatch: expected integer, got str",
       "field": "age"
     },
     {
-      "id": "invalid_status_enum_c7c44ba3",
+      "id": "invalid_status_enum_97c9472d",
       "type": "invalid",
       "data": {
-        "username": "Participant dark.",
-        "email": "williamsjeremy@example.com",
+        "username": "Training high.",
+        "email": "janetwilliams@example.org",
         "age": 86,
-        "tags": [
-          "Base top early."
-        ],
+        "tags": [],
         "status": "NOT_IN_ENUM_VALUE"
       },
       "reason": "Value not in enum: ['active', 'inactive', 'pending']",
       "field": "status"
     },
     {
-      "id": "invalid_status_type_92d2b523",
+      "id": "invalid_status_type_59cb9245",
       "type": "invalid",
       "data": {
-        "username": "Participant dark.",
-        "email": "williamsjeremy@example.com",
+        "username": "Training high.",
+        "email": "janetwilliams@example.org",
         "age": 86,
-        "tags": [
-          "Base top early."
-        ],
+        "tags": [],
         "status": 12345
       },
       "reason": "Type mismatch: expected string, got int",
       "field": "status"
     },
     {
-      "id": "invalid_tags_type_97dc96a5",
+      "id": "invalid_tags_many_1eea5905",
       "type": "invalid",
       "data": {
-        "username": "Participant dark.",
-        "email": "williamsjeremy@example.com",
+        "username": "Training high.",
+        "email": "janetwilliams@example.org",
+        "age": 86,
+        "tags": [
+          "Spring figure.",
+          "Top early.",
+          "Blood husband fall.",
+          "Prove they.",
+          "Commercial.",
+          "Hear.",
+          "xxx",
+          "xx",
+          "Example.",
+          "Write.",
+          "xxx"
+        ]
+      },
+      "reason": "Array too many items: 11 > maxItems 10",
+      "field": "tags"
+    },
+    {
+      "id": "invalid_tags_type_7aa57784",
+      "type": "invalid",
+      "data": {
+        "username": "Training high.",
+        "email": "janetwilliams@example.org",
         "age": 86,
         "tags": "not_an_array"
       },
@@ -243,40 +251,34 @@
       "field": "tags"
     },
     {
-      "id": "invalid_missing_username_179f3a44",
+      "id": "invalid_missing_username_b9e57fe6",
       "type": "invalid",
       "data": {
-        "email": "williamsjeremy@example.com",
+        "email": "janetwilliams@example.org",
         "age": 86,
-        "tags": [
-          "Base top early."
-        ]
+        "tags": []
       },
       "reason": "Missing required field 'username'",
       "field": "username"
     },
     {
-      "id": "invalid_missing_email_9d66c382",
+      "id": "invalid_missing_email_55677714",
       "type": "invalid",
       "data": {
-        "username": "Participant dark.",
+        "username": "Training high.",
         "age": 86,
-        "tags": [
-          "Base top early."
-        ]
+        "tags": []
       },
       "reason": "Missing required field 'email'",
       "field": "email"
     },
     {
-      "id": "invalid_missing_age_04c1fa67",
+      "id": "invalid_missing_age_16fa6d71",
       "type": "invalid",
       "data": {
-        "username": "Participant dark.",
-        "email": "williamsjeremy@example.com",
-        "tags": [
-          "Base top early."
-        ]
+        "username": "Training high.",
+        "email": "janetwilliams@example.org",
+        "tags": []
       },
       "reason": "Missing required field 'age'",
       "field": "age"

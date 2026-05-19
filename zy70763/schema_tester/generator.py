@@ -97,7 +97,12 @@ class SchemaSampleGenerator:
         min_items = schema.get("minItems", 0)
         max_items = schema.get("maxItems", 5)
 
-        count = random.randint(max(min_items, 1), min(max_items, 5))
+        if max_items == 0:
+            return []
+
+        lower = min_items
+        upper = min(max_items, 5)
+        count = random.randint(lower, upper)
         return [self.generate_valid_sample(items) for _ in range(count)]
 
     def _generate_valid_string(self, schema: Dict[str, Any]) -> str:
@@ -120,6 +125,8 @@ class SchemaSampleGenerator:
             return str(self.fake.uuid4())
 
         length = random.randint(min_length, min(max_length, 20))
+        if length == 0:
+            return ""
         if length < 5:
             return "x" * length
         return self.fake.text(length)[:length].strip()
@@ -325,6 +332,35 @@ class SchemaSampleGenerator:
                     type=SampleType.INVALID,
                     data=data,
                     reason=f"Number above maximum: {data[field_name]} > {field_schema['maximum']}",
+                    field=field_name
+                )
+                samples.append(sample)
+
+        elif schema_type == "array":
+            item_schema = field_schema.get("items", {})
+            if "minItems" in field_schema:
+                min_items = field_schema["minItems"]
+                if min_items > 0:
+                    data = base.copy()
+                    data[field_name] = [self.generate_valid_sample(item_schema) for _ in range(min_items - 1)]
+                    sample = Sample(
+                        id=self._generate_id(data, f"invalid_{field_name}_few"),
+                        type=SampleType.INVALID,
+                        data=data,
+                        reason=f"Array too few items: {min_items - 1} < minItems {min_items}",
+                        field=field_name
+                    )
+                    samples.append(sample)
+
+            if "maxItems" in field_schema:
+                max_items = field_schema["maxItems"]
+                data = base.copy()
+                data[field_name] = [self.generate_valid_sample(item_schema) for _ in range(max_items + 1)]
+                sample = Sample(
+                    id=self._generate_id(data, f"invalid_{field_name}_many"),
+                    type=SampleType.INVALID,
+                    data=data,
+                    reason=f"Array too many items: {max_items + 1} > maxItems {max_items}",
                     field=field_name
                 )
                 samples.append(sample)

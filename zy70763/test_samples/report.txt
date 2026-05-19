@@ -1,14 +1,14 @@
 ================================================================================
 JSON Schema 测试样本报告 - user_schema
-生成时间: 2026-05-19 15:25:40
+生成时间: 2026-05-19 20:09:41
 ================================================================================
 
 📊 统计汇总
 ----------------------------------------
-  总样本数: 23
+  总样本数: 24
   正常样本 (valid): 1
   边界样本 (boundary): 6
-  非法样本 (invalid): 13
+  非法样本 (invalid): 14
   边缘案例 (edge_case): 3
 
 📁 目录结构
@@ -46,89 +46,94 @@ JSON Schema 测试样本报告 - user_schema
      说明: Number at maximum value 120
      文件: boundary/boundary_age_max_6ed22e93.json
 
-  6. ⚠️ [boundary] boundary_tags_minitems_d709db05
+  6. ⚠️ [boundary] boundary_tags_minitems_e1004f31
      字段: tags
      说明: Array at minimum items 0
-     文件: boundary/boundary_tags_minitems_d709db05.json
+     文件: boundary/boundary_tags_minitems_e1004f31.json
 
-  7. ⚠️ [boundary] boundary_tags_maxitems_607dff36
+  7. ⚠️ [boundary] boundary_tags_maxitems_eaa1c620
      字段: tags
      说明: Array at maximum items 10
-     文件: boundary/boundary_tags_maxitems_607dff36.json
+     文件: boundary/boundary_tags_maxitems_eaa1c620.json
 
-  8. ❌ [invalid ] invalid_username_short_04b08a59
+  8. ❌ [invalid ] invalid_username_short_d872705b
      字段: username
      说明: String too short: length 2 < minLength 3
-     文件: invalid/invalid_username_short_04b08a59.json
+     文件: invalid/invalid_username_short_d872705b.json
 
-  9. ❌ [invalid ] invalid_username_long_029fa86a
+  9. ❌ [invalid ] invalid_username_long_08c972d0
      字段: username
      说明: String too long: length 21 > maxLength 20
-     文件: invalid/invalid_username_long_029fa86a.json
+     文件: invalid/invalid_username_long_08c972d0.json
 
- 10. ❌ [invalid ] invalid_username_type_2948f6ef
+ 10. ❌ [invalid ] invalid_username_type_6a69529e
      字段: username
      说明: Type mismatch: expected string, got int
-     文件: invalid/invalid_username_type_2948f6ef.json
+     文件: invalid/invalid_username_type_6a69529e.json
 
- 11. ❌ [invalid ] invalid_email_type_ae1c5bed
+ 11. ❌ [invalid ] invalid_email_type_138f4937
      字段: email
      说明: Type mismatch: expected string, got int
-     文件: invalid/invalid_email_type_ae1c5bed.json
+     文件: invalid/invalid_email_type_138f4937.json
 
- 12. ❌ [invalid ] invalid_age_under_ff8aa384
+ 12. ❌ [invalid ] invalid_age_under_79390254
      字段: age
      说明: Number below minimum: 17 < 18
-     文件: invalid/invalid_age_under_ff8aa384.json
+     文件: invalid/invalid_age_under_79390254.json
 
- 13. ❌ [invalid ] invalid_age_over_b0b92b6e
+ 13. ❌ [invalid ] invalid_age_over_3bbcafb8
      字段: age
      说明: Number above maximum: 121 > 120
-     文件: invalid/invalid_age_over_b0b92b6e.json
+     文件: invalid/invalid_age_over_3bbcafb8.json
 
- 14. ❌ [invalid ] invalid_age_type_24ff92cc
+ 14. ❌ [invalid ] invalid_age_type_719f746a
      字段: age
      说明: Type mismatch: expected integer, got str
-     文件: invalid/invalid_age_type_24ff92cc.json
+     文件: invalid/invalid_age_type_719f746a.json
 
- 15. ❌ [invalid ] invalid_status_enum_c7c44ba3
+ 15. ❌ [invalid ] invalid_status_enum_97c9472d
      字段: status
      说明: Value not in enum: ['active', 'inactive', 'pending']
-     文件: invalid/invalid_status_enum_c7c44ba3.json
+     文件: invalid/invalid_status_enum_97c9472d.json
 
- 16. ❌ [invalid ] invalid_status_type_92d2b523
+ 16. ❌ [invalid ] invalid_status_type_59cb9245
      字段: status
      说明: Type mismatch: expected string, got int
-     文件: invalid/invalid_status_type_92d2b523.json
+     文件: invalid/invalid_status_type_59cb9245.json
 
- 17. ❌ [invalid ] invalid_tags_type_97dc96a5
+ 17. ❌ [invalid ] invalid_tags_many_1eea5905
+     字段: tags
+     说明: Array too many items: 11 > maxItems 10
+     文件: invalid/invalid_tags_many_1eea5905.json
+
+ 18. ❌ [invalid ] invalid_tags_type_7aa57784
      字段: tags
      说明: Type mismatch: expected array, got str
-     文件: invalid/invalid_tags_type_97dc96a5.json
+     文件: invalid/invalid_tags_type_7aa57784.json
 
- 18. ❌ [invalid ] invalid_missing_username_179f3a44
+ 19. ❌ [invalid ] invalid_missing_username_b9e57fe6
      字段: username
      说明: Missing required field 'username'
-     文件: invalid/invalid_missing_username_179f3a44.json
+     文件: invalid/invalid_missing_username_b9e57fe6.json
 
- 19. ❌ [invalid ] invalid_missing_email_9d66c382
+ 20. ❌ [invalid ] invalid_missing_email_55677714
      字段: email
      说明: Missing required field 'email'
-     文件: invalid/invalid_missing_email_9d66c382.json
+     文件: invalid/invalid_missing_email_55677714.json
 
- 20. ❌ [invalid ] invalid_missing_age_04c1fa67
+ 21. ❌ [invalid ] invalid_missing_age_16fa6d71
      字段: age
      说明: Missing required field 'age'
-     文件: invalid/invalid_missing_age_04c1fa67.json
+     文件: invalid/invalid_missing_age_16fa6d71.json
 
- 21. 🔲 [edge_case] edge_empty
+ 22. 🔲 [edge_case] edge_empty
      说明: Empty object
      文件: edge_case/edge_empty.json
 
- 22. 🔲 [edge_case] edge_null
+ 23. 🔲 [edge_case] edge_null
      说明: Null value
      文件: edge_case/edge_null.json
 
- 23. 🔲 [edge_case] edge_all_null
+ 24. 🔲 [edge_case] edge_all_null
      说明: All fields set to null
      文件: edge_case/edge_all_null.json

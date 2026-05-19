@@ -1,0 +1,99 @@
+================================================================================
+JSON Schema 测试样本报告 - test_boundary_schema
+生成时间: 2026-05-19 20:09:33
+================================================================================
+
+📊 统计汇总
+----------------------------------------
+  总样本数: 16
+  正常样本 (valid): 1
+  边界样本 (boundary): 6
+  非法样本 (invalid): 6
+  边缘案例 (edge_case): 3
+
+📁 目录结构
+----------------------------------------
+  valid/      - 正常输入样本
+  boundary/   - 边界条件样本
+  invalid/    - 非法输入样本（脏数据）
+  edge_case/  - 边缘案例（空值、冲突等）
+  index.json  - 机器可读索引文件
+  report.txt  - 本报告文件
+
+🔍 样本索引
+--------------------------------------------------------------------------------
+  1. ✅ [valid   ] valid_4e486a64
+     说明: Valid sample
+     文件: valid/valid_4e486a64.json
+
+  2. ⚠️ [boundary] boundary_empty_array_minitems_30fc03bb
+     字段: empty_array
+     说明: Array at minimum items 0
+     文件: boundary/boundary_empty_array_minitems_30fc03bb.json
+
+  3. ⚠️ [boundary] boundary_empty_array_maxitems_30fc03bb
+     字段: empty_array
+     说明: Array at maximum items 0
+     文件: boundary/boundary_empty_array_maxitems_30fc03bb.json
+
+  4. ⚠️ [boundary] boundary_optional_tags_minitems_207b2c39
+     字段: optional_tags
+     说明: Array at minimum items 0
+     文件: boundary/boundary_optional_tags_minitems_207b2c39.json
+
+  5. ⚠️ [boundary] boundary_optional_tags_maxitems_a0492783
+     字段: optional_tags
+     说明: Array at maximum items 5
+     文件: boundary/boundary_optional_tags_maxitems_a0492783.json
+
+  6. ⚠️ [boundary] boundary_username_minlen_140892e7
+     字段: username
+     说明: String at minimum length 0
+     文件: boundary/boundary_username_minlen_140892e7.json
+
+  7. ⚠️ [boundary] boundary_username_maxlen_9b63154e
+     字段: username
+     说明: String at maximum length 20
+     文件: boundary/boundary_username_maxlen_9b63154e.json
+
+  8. ❌ [invalid ] invalid_empty_array_many_10189e9a
+     字段: empty_array
+     说明: Array too many items: 1 > maxItems 0
+     文件: invalid/invalid_empty_array_many_10189e9a.json
+
+  9. ❌ [invalid ] invalid_empty_array_type_e45edbf6
+     字段: empty_array
+     说明: Type mismatch: expected array, got str
+     文件: invalid/invalid_empty_array_type_e45edbf6.json
+
+ 10. ❌ [invalid ] invalid_optional_tags_many_a0d2ffdb
+     字段: optional_tags
+     说明: Array too many items: 6 > maxItems 5
+     文件: invalid/invalid_optional_tags_many_a0d2ffdb.json
+
+ 11. ❌ [invalid ] invalid_optional_tags_type_3ba6cad1
+     字段: optional_tags
+     说明: Type mismatch: expected array, got str
+     文件: invalid/invalid_optional_tags_type_3ba6cad1.json
+
+ 12. ❌ [invalid ] invalid_username_long_d83cb1c5
+     字段: username
+     说明: String too long: length 21 > maxLength 20
+     文件: invalid/invalid_username_long_d83cb1c5.json
+
+ 13. ❌ [invalid ] invalid_username_type_dbf95944
+     字段: username
+     说明: Type mismatch: expected string, got int
+     文件: invalid/invalid_username_type_dbf95944.json
+
+ 14. 🔲 [edge_case] edge_empty
+     说明: Empty object
+     文件: edge_case/edge_empty.json
+
+ 15. 🔲 [edge_case] edge_null
+     说明: Null value
+     文件: edge_case/edge_null.json
+
+ 16. 🔲 [edge_case] edge_all_null
+     说明: All fields set to null
+     文件: edge_case/edge_all_null.json

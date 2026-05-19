@@ -1,0 +1,196 @@
+{
+  "schema": "test_boundary_schema",
+  "generated_at": "2026-05-19T20:09:33.826168",
+  "total_samples": 16,
+  "samples_by_type": {
+    "valid": 1,
+    "boundary": 6,
+    "invalid": 6,
+    "edge_case": 3
+  },
+  "samples": [
+    {
+      "id": "valid_4e486a64",
+      "type": "valid",
+      "data": {
+        "empty_array": []
+      },
+      "reason": "Valid sample",
+      "field": null
+    },
+    {
+      "id": "boundary_empty_array_minitems_30fc03bb",
+      "type": "boundary",
+      "data": {
+        "optional_tags": [
+          "Purpose brother.",
+          "xxx",
+          "Site face election.",
+          "Chair since.",
+          "xx"
+        ],
+        "empty_array": []
+      },
+      "reason": "Array at minimum items 0",
+      "field": "empty_array"
+    },
+    {
+      "id": "boundary_empty_array_maxitems_30fc03bb",
+      "type": "boundary",
+      "data": {
+        "optional_tags": [
+          "Purpose brother.",
+          "xxx",
+          "Site face election.",
+          "Chair since.",
+          "xx"
+        ],
+        "empty_array": []
+      },
+      "reason": "Array at maximum items 0",
+      "field": "empty_array"
+    },
+    {
+      "id": "boundary_optional_tags_minitems_207b2c39",
+      "type": "boundary",
+      "data": {
+        "optional_tags": [],
+        "username": "Require sit wait."
+      },
+      "reason": "Array at minimum items 0",
+      "field": "optional_tags"
+    },
+    {
+      "id": "boundary_optional_tags_maxitems_a0492783",
+      "type": "boundary",
+      "data": {
+        "optional_tags": [
+          "Begin performance.",
+          "Almost all.",
+          "Early.",
+          "Play agreement.",
+          "Decide sense rate."
+        ],
+        "username": "Require sit wait."
+      },
+      "reason": "Array at maximum items 5",
+      "field": "optional_tags"
+    },
+    {
+      "id": "boundary_username_minlen_140892e7",
+      "type": "boundary",
+      "data": {
+        "optional_tags": [
+          "Offer kind."
+        ],
+        "username": ""
+      },
+      "reason": "String at minimum length 0",
+      "field": "username"
+    },
+    {
+      "id": "boundary_username_maxlen_9b63154e",
+      "type": "boundary",
+      "data": {
+        "optional_tags": [
+          "Offer kind."
+        ],
+        "username": "xxxxxxxxxxxxxxxxxxxx"
+      },
+      "reason": "String at maximum length 20",
+      "field": "username"
+    },
+    {
+      "id": "invalid_empty_array_many_10189e9a",
+      "type": "invalid",
+      "data": {
+        "optional_tags": [],
+        "empty_array": [
+          "xxxx"
+        ]
+      },
+      "reason": "Array too many items: 1 > maxItems 0",
+      "field": "empty_array"
+    },
+    {
+      "id": "invalid_empty_array_type_e45edbf6",
+      "type": "invalid",
+      "data": {
+        "optional_tags": [],
+        "empty_array": "not_an_array"
+      },
+      "reason": "Type mismatch: expected array, got str",
+      "field": "empty_array"
+    },
+    {
+      "id": "invalid_optional_tags_many_a0d2ffdb",
+      "type": "invalid",
+      "data": {
+        "optional_tags": [
+          "List.",
+          "Fall table.",
+          "According song sure.",
+          "Save.",
+          "xx",
+          "Grow fall."
+        ]
+      },
+      "reason": "Array too many items: 6 > maxItems 5",
+      "field": "optional_tags"
+    },
+    {
+      "id": "invalid_optional_tags_type_3ba6cad1",
+      "type": "invalid",
+      "data": {
+        "optional_tags": "not_an_array"
+      },
+      "reason": "Type mismatch: expected array, got str",
+      "field": "optional_tags"
+    },
+    {
+      "id": "invalid_username_long_d83cb1c5",
+      "type": "invalid",
+      "data": {
+        "optional_tags": [],
+        "username": "xxxxxxxxxxxxxxxxxxxxx"
+      },
+      "reason": "String too long: length 21 > maxLength 20",
+      "field": "username"
+    },
+    {
+      "id": "invalid_username_type_dbf95944",
+      "type": "invalid",
+      "data": {
+        "optional_tags": [],
+        "username": 12345
+      },
+      "reason": "Type mismatch: expected string, got int",
+      "field": "username"
+    },
+    {
+      "id": "edge_empty",
+      "type": "edge_case",
+      "data": {},
+      "reason": "Empty object",
+      "field": null
+    },
+    {
+      "id": "edge_null",
+      "type": "edge_case",
+      "data": null,
+      "reason": "Null value",
+      "field": null
+    },
+    {
+      "id": "edge_all_null",
+      "type": "edge_case",
+      "data": {
+        "empty_array": null,
+        "optional_tags": null,
+        "username": null
+      },
+      "reason": "All fields set to null",
+      "field": null
+    }
+  ]
+}
