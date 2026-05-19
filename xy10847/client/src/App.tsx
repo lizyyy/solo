@@ -159,6 +159,20 @@ function App() {
     }
   };
 
+  const handleRetryFailedTask = async (taskId: string) => {
+    setActionLoading(true);
+    try {
+      const res = await taskApi.retry(taskId, true);
+      setSelectedTask(res.data);
+      setShowModal(true);
+      await loadData();
+    } catch (error) {
+      console.error('重试失败:', error);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleExport = async (taskId: string, format: 'json' | 'csv') => {
     try {
       const res = format === 'json' 
@@ -279,7 +293,7 @@ function App() {
                   <span>创建时间: {dayjs(task.created_at).format('YYYY-MM-DD HH:mm:ss')}</span>
                 </div>
                 <div className="task-actions">
-                  <button className="btn btn-danger" onClick={() => handleRetryCallback(task.id)} disabled={actionLoading}>
+                  <button className="btn btn-danger" onClick={() => handleRetryFailedTask(task.id)} disabled={actionLoading}>
                     立即重试
                   </button>
                   <button className="btn btn-default" onClick={() => handleViewDetail(task.id)}>
@@ -357,9 +371,9 @@ function App() {
                     </button>
                   )}
                   
-                  {selectedTask.status === 'transcribing' && (
+                  {(selectedTask.status === 'transcribing' || selectedTask.status === 'transcribed') && (
                     <>
-                      {getNextPendingStage(selectedTask.stages) && !getProcessingStage(selectedTask.stages) && (
+                      {selectedTask.status === 'transcribing' && getNextPendingStage(selectedTask.stages) && !getProcessingStage(selectedTask.stages) && (
                         <button 
                           className="btn btn-primary" 
                           onClick={handleAdvanceStage} 
@@ -369,7 +383,7 @@ function App() {
                         </button>
                       )}
                       
-                      {getProcessingStage(selectedTask.stages) && (
+                      {selectedTask.status === 'transcribing' && getProcessingStage(selectedTask.stages) && (
                         <button 
                           className="btn btn-success" 
                           onClick={() => handleCompleteStage(getProcessingStage(selectedTask.stages)!.stage_name)} 
@@ -389,7 +403,7 @@ function App() {
                         </button>
                       )}
                       
-                      {allStagesCompleted(selectedTask.stages) && selectedTask.fragments.length > 0 && (
+                      {selectedTask.fragments.length > 0 && selectedTask.status !== 'completed' && selectedTask.status !== 'callback_failed' && (
                         <button 
                           className="btn btn-primary" 
                           onClick={() => handleExecuteCallback(true)} 
