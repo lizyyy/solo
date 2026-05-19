@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考试防作弊巡检台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .nav-tab {
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-tab:hover, .nav-tab.active {
+            background: white;
+            color: #667eea;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stat-card .label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .stat-card.critical .value { color: #e74c3c; }
+        .stat-card.warning .value { color: #f39c12; }
+        .stat-card.normal .value { color: #27ae60; }
+        .stat-card.total .value { color: #3498db; }
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-failed { background: #fee; color: #c33; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        .status-normal { background: #d4edda; color: #155724; }
+        .status-handled { background: #d1ecf1; color: #0c5460; }
+        .status-ongoing { background: #e2e3e5; color: #383d41; }
+        .level-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .level-critical { background: #e74c3c; color: white; }
+        .level-warning { background: #f39c12; color: white; }
+        .level-notice { background: #3498db; color: white; }
+        .level-normal { background: #27ae60; color: white; }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #219a52;
+        }
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e08e0b;
+        }
+        .detail-header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .detail-header h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .detail-info {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .info-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .info-item .label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .info-item .value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .handle-info {
+            grid-column: span 4;
+            background: #fff3cd;
+            border-left: 4px solid #f39c12;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 30px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .timeline {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            bottom: 0;
+            width: 2px;
+            background: #ddd;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+        .timeline-icon.screen_switch { background: #e74c3c; color: white; }
+        .timeline-icon.camera_off { background: #f39c12; color: white; }
+        .timeline-icon.camera_on { background: #27ae60; color: white; }
+        .timeline-icon.handle { background: #3498db; color: white; }
+        .timeline-icon.appeal { background: #9b59b6; color: white; }
+        .timeline-content {
+            flex: 1;
+        }
+        .timeline-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .timeline-desc {
+            color: #666;
+            font-size: 14px;
+        }
+        .appeal-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .appeal-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .appeal-card.handled {
+            background: #d4edda;
+        }
+        .appeal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .appeal-content {
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .appeal-handle {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #27ae60;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #667eea;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 90%;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            font-size: 18px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .report-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 考试防作弊巡检台</h1>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPage('list')">会话列表</button>
+            <button class="nav-tab" onclick="showPage('appeals')">申诉管理</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="page-list" class="page active">
+            <div class="stats-row">
+                <div class="stat-card critical">
+                    <div class="label">异常分级失败</div>
+                    <div class="value" id="stat-critical">0</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="label">警告状态</div>
+                    <div class="value" id="stat-warning">0</div>
+                </div>
+                <div class="stat-card normal">
+                    <div class="label">正常状态</div>
+                    <div class="value" id="stat-normal">0</div>
+                </div>
+                <div class="stat-card total">
+                    <div class="label">总会话数</div>
+                    <div class="value" id="stat-total">0</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>考生</th>
+                            <th>学号</th>
+                            <th>考试ID</th>
+                            <th>异常等级</th>
+                            <th>切屏次数</th>
+                            <th>摄像头状态</th>
+                            <th>状态</th>
+                            <th>开始时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="session-list">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="page-detail" class="page">
+            <div class="back-btn" onclick="showPage('list')">← 返回列表</div>
+            
+            <div class="detail-header">
+                <h2 id="detail-title">考生详情</h2>
+                <div class="detail-info" id="detail-info">
+                </div>
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="openHandleModal()">处理会话</button>
+                    <button class="btn btn-warning" onclick="addEvent()">添加切屏事件</button>
+                    <button class="btn btn-success" onclick="generateReport()">生成巡检报告</button>
+                    <button class="btn" onclick="recalculateStatus()">重新计算</button>
+                </div>
+            </div>
+
+            <div class="section-title">📊 事件时间线</div>
+            <div class="timeline" id="timeline">
+            </div>
+
+            <div class="section-title">📋 申诉记录</div>
+            <div class="appeal-section" id="appeal-section">
+            </div>
+
+            <div class="section-title">📄 巡检报告</div>
+            <div class="report-section" id="report-section">
+                <p>暂无报告，点击上方按钮生成</p>
+            </div>
+        </div>
+
+        <div id="page-appeals" class="page">
+            <div class="section-title">📋 申诉列表</div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>考生</th>
+                            <th>学号</th>
+                            <th>申诉内容</th>
+                            <th>状态</th>
+                            <th>提交时间</th>
+                            <th>处理人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appeal-list">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="handle-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>处理会话</h3>
+                <button class="close-btn" onclick="closeHandleModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>处理人</label>
+                <input type="text" id="handler-name" placeholder="请输入处理人姓名">
+            </div>
+            <div class="form-group">
+                <label>处理理由</label>
+                <textarea id="handle-reason" placeholder="请输入处理理由"></textarea>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn" onclick="closeHandleModal()">取消</button>
+                <button class="btn btn-primary" onclick="submitHandle()">确认处理</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="appeal-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>处理申诉</h3>
+                <button class="close-btn" onclick="closeAppealModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>处理人</label>
+                <input type="text" id="appeal-handler" placeholder="请输入处理人姓名">
+            </div>
+            <div class="form-group">
+                <label>处理结果</label>
+                <select id="appeal-result">
+                    <option value="认可">认可</option>
+                    <option value="部分认可">部分认可</option>
+                    <option value="驳回">驳回</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>处理理由</label>
+                <textarea id="appeal-reason" placeholder="请输入处理理由，将用于复盘"></textarea>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn" onclick="closeAppealModal()">取消</button>
+                <button class="btn btn-primary" onclick="submitAppealHandle()">确认处理</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = null;
+        let currentAppealId = null;
+
+        const API_BASE = '/api';
+
+        async function fetchAPI(url, options = {}) {
+            const response = await fetch(API_BASE + url, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+            return response.json();
+        }
+
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            document.querySelector(`.nav-tab[onclick="showPage('${page}')"]`).classList.add('active');
+            
+            if (page === 'list') loadSessions();
+            if (page === 'appeals') loadAppeals();
+        }
+
+        async function loadSessions() {
+            const sessions = await fetchAPI('/sessions');
+            
+            document.getElementById('stat-total').textContent = sessions.length;
+            document.getElementById('stat-critical').textContent = sessions.filter(s => s.abnormal_level === 'critical').length;
+            document.getElementById('stat-warning').textContent = sessions.filter(s => s.abnormal_level === 'warning').length;
+            document.getElementById('stat-normal').textContent = sessions.filter(s => s.abnormal_level === 'normal').length;
+
+            const tbody = document.getElementById('session-list');
+            tbody.innerHTML = sessions.map(s => `
+                <tr>
+                    <td><strong>${s.student_name}</strong></td>
+                    <td>${s.student_id}</td>
+                    <td>${s.exam_id}</td>
+                    <td><span class="level-badge level-${s.abnormal_level}">${getLevelText(s.abnormal_level)}</span></td>
+                    <td>${s.screen_switch_count}</td>
+                    <td>${s.camera_status === 'on' ? '🟢 开启' : '🔴 关闭'}</td>
+                    <td><span class="status-badge status-${s.status}">${getStatusText(s.status)}</span></td>
+                    <td>${formatTime(s.start_time)}</td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" onclick="viewDetail('${s.id}')">查看详情</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function viewDetail(sessionId) {
+            currentSessionId = sessionId;
+            const session = await fetchAPI(`/sessions/${sessionId}`);
+            const events = await fetchAPI(`/sessions/${sessionId}/events`);
+            const appeals = await fetchAPI('/appeals');
+            const sessionAppeals = appeals.filter(a => a.session_id === sessionId);
+
+            document.getElementById('detail-title').textContent = `${session.student_name} - 考试详情`;
+            
+            let infoHtml = `
+                <div class="info-item">
+                    <div class="label">考生姓名</div>
+                    <div class="value">${session.student_name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">学号</div>
+                    <div class="value">${session.student_id}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">异常等级</div>
+                    <div class="value"><span class="level-badge level-${session.abnormal_level}">${getLevelText(session.abnormal_level)}</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="label">切屏次数</div>
+                    <div class="value">${session.screen_switch_count}</div>
+                </div>
+            `;
+
+            if (session.handler) {
+                infoHtml += `
+                    <div class="info-item handle-info">
+                        <div class="label">✅ 已处理</div>
+                        <div><strong>处理人：</strong>${session.handler}</div>
+                        <div><strong>处理时间：</strong>${formatTime(session.handled_at)}</div>
+                        <div><strong>处理理由：</strong>${session.handle_reason}</div>
+                    </div>
+                `;
+            }
+
+            if (session.appeal_handler) {
+                infoHtml += `
+                    <div class="info-item" style="grid-column: span 4; background: #d4edda; border-left: 4px solid #27ae60;">
+                        <div class="label">🔄 已申诉修正</div>
+                        <div><strong>处理结果：</strong>${session.appeal_result}</div>
+                        <div><strong>处理人：</strong>${session.appeal_handler}</div>
+                        <div><strong>处理时间：</strong>${formatTime(session.appeal_handled_at)}</div>
+                        <div><strong>修正理由（可复盘）：</strong>${session.appeal_reason}</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('detail-info').innerHTML = infoHtml;
+
+            let timelineHtml = '';
+            
+            if (session.handler) {
+                timelineHtml += `
+                    <div class="timeline-item">
+                        <div class="timeline-icon handle">✓</div>
+                        <div class="timeline-content">
+                            <div class="timeline-time">${formatTime(session.handled_at)}</div>
+                            <div class="timeline-title">会话处理</div>
+                            <div class="timeline-desc">处理人：${session.handler}<br>处理理由：${session.handle_reason}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            sessionAppeals.forEach(appeal => {
+                timelineHtml += `
+                    <div class="timeline-item">
+                        <div class="timeline-icon appeal">!</div>
+                        <div class="timeline-content">
+                            <div class="timeline-time">${formatTime(appeal.created_at)}</div>
+                            <div class="timeline-title">考生申诉</div>
+                            <div class="timeline-desc">${appeal.content}
+                                ${appeal.status === 'handled' ? `<br><strong>处理结果：${appeal.handle_result}</strong><br><strong>处理理由：${appeal.handle_reason}</strong>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(event => {
+                timelineHtml += `
+                    <div class="timeline-item">
+                        <div class="timeline-icon ${event.event_type}">${getEventIcon(event.event_type)}</div>
+                        <div class="timeline-content">
+                            <div class="timeline-time">${formatTime(event.timestamp)}</div>
+                            <div class="timeline-title">${getEventText(event.event_type)}</div>
+                            <div class="timeline-desc">${event.description}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('timeline').innerHTML = timelineHtml || '<p style="color: #999;">暂无事件记录</p>';
+
+            let appealHtml = sessionAppeals.map(appeal => `
+                <div class="appeal-card ${appeal.status === 'handled' ? 'handled' : ''}">
+                    <div class="appeal-header">
+                        <span><strong>${appeal.student_name}</strong> 的申诉</span>
+                        <span class="status-badge status-${appeal.status}">${appeal.status === 'handled' ? '已处理' : '待处理'}</span>
+                    </div>
+                    <div class="appeal-content">${appeal.content}</div>
+                    ${appeal.status === 'handled' ? `
+                        <div class="appeal-handle">
+                            <div><strong>处理人：</strong>${appeal.handler}</div>
+                            <div><strong>处理时间：</strong>${formatTime(appeal.handled_at)}</div>
+                            <div><strong>处理结果：</strong>${appeal.handle_result}</div>
+                            <div><strong>处理理由：</strong>${appeal.handle_reason}</div>
+                        </div>
+                    ` : `
+                        <button class="btn btn-primary" onclick="openAppealHandleModal('${appeal.id}')">处理申诉</button>
+                    `}
+                </div>
+            `).join('');
+
+            document.getElementById('appeal-section').innerHTML = appealHtml || '<p style="color: #999;">暂无申诉记录</p>';
+
+            showPage('detail');
+        }
+
+        async function loadAppeals() {
+            const appeals = await fetchAPI('/appeals');
+            const tbody = document.getElementById('appeal-list');
+            tbody.innerHTML = appeals.map(a => `
+                <tr>
+                    <td><strong>${a.student_name}</strong></td>
+                    <td>${a.student_id}</td>
+                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${a.content}</td>
+                    <td><span class="status-badge status-${a.status}">${a.status === 'handled' ? '已处理' : '待处理'}</span></td>
+                    <td>${formatTime(a.created_at)}</td>
+                    <td>${a.handler || '-'}</td>
+                    <td>
+                        ${a.status !== 'handled' ? `
+                            <button class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" onclick="openAppealHandleModal('${a.id}')">处理</button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getLevelText(level) {
+            const map = { critical: '严重', warning: '警告', notice: '注意', normal: '正常' };
+            return map[level] || level;
+        }
+
+        function getStatusText(status) {
+            const map = { 
+                failed: '失败', 
+                warning: '警告', 
+                normal: '正常', 
+                handled: '已处理', 
+                ongoing: '进行中',
+                appealed_corrected: '申诉修正',
+                appealed_warning: '申诉警告',
+                appealed_rejected: '申诉驳回'
+            };
+            return map[status] || status;
+        }
+
+        function getEventIcon(type) {
+            const map = { screen_switch: '⤴', camera_off: '📷', camera_on: '📷', handle: '✓', appeal: '!', correction: '🔄' };
+            return map[type] || '•';
+        }
+
+        function getEventText(type) {
+            const map = { screen_switch: '切屏事件', camera_off: '摄像头关闭', camera_on: '摄像头开启', correction: '状态修正' };
+            return map[type] || type;
+        }
+
+        function formatTime(time) {
+            return new Date(time).toLocaleString('zh-CN');
+        }
+
+        function openHandleModal() {
+            document.getElementById('handle-modal').classList.add('active');
+        }
+
+        function closeHandleModal() {
+            document.getElementById('handle-modal').classList.remove('active');
+        }
+
+        async function submitHandle() {
+            const handler = document.getElementById('handler-name').value;
+            const reason = document.getElementById('handle-reason').value;
+            
+            if (!handler || !reason) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            await fetchAPI(`/sessions/${currentSessionId}/handle`, {
+                method: 'POST',
+                body: JSON.stringify({ handler, reason })
+            });
+
+            closeHandleModal();
+            viewDetail(currentSessionId);
+        }
+
+        function openAppealHandleModal(appealId) {
+            currentAppealId = appealId;
+            document.getElementById('appeal-modal').classList.add('active');
+        }
+
+        function closeAppealModal() {
+            document.getElementById('appeal-modal').classList.remove('active');
+        }
+
+        async function submitAppealHandle() {
+            const handler = document.getElementById('appeal-handler').value;
+            const result = document.getElementById('appeal-result').value;
+            const reason = document.getElementById('appeal-reason').value;
+            
+            if (!handler || !reason) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            await fetchAPI(`/appeals/${currentAppealId}/handle`, {
+                method: 'POST',
+                body: JSON.stringify({ handler, result, reason })
+            });
+
+            closeAppealModal();
+            if (currentSessionId) {
+                viewDetail(currentSessionId);
+            } else {
+                loadAppeals();
+            }
+        }
+
+        async function addEvent() {
+            await fetchAPI('/events', {
+                method: 'POST',
+                body: JSON.stringify({
+                    session_id: currentSessionId,
+                    event_type: 'screen_switch',
+                    description: '模拟切屏事件'
+                })
+            });
+            alert('已添加切屏事件，状态已自动重新计算');
+            viewDetail(currentSessionId);
+        }
+
+        async function recalculateStatus() {
+            await fetchAPI(`/sessions/${currentSessionId}/recalculate`, { method: 'POST' });
+            alert('已重新计算状态');
+            viewDetail(currentSessionId);
+        }
+
+        async function generateReport() {
+            const report = await fetchAPI('/reports', {
+                method: 'POST',
+                body: JSON.stringify({ session_id: currentSessionId })
+            });
+
+            let eventsHtml = report.events.map(e => `
+                <div style="padding: 10px; background: white; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid ${e.event_type === 'correction' ? '#27ae60' : e.event_type === 'screen_switch' ? '#e74c3c' : '#f39c12'};">
+                    <div style="font-size: 12px; color: #999;">${formatTime(e.timestamp)}</div>
+                    <div style="font-weight: 500;">${getEventText(e.event_type)}</div>
+                    <div style="font-size: 13px; color: #666;">${e.description}</div>
+                </div>
+            `).join('');
+
+            let appealsHtml = report.appeals.map(a => `
+                <div style="padding: 15px; background: white; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid ${a.status === 'handled' ? '#27ae60' : '#f39c12'};">
+                    <div style="font-weight: 500; margin-bottom: 5px;">申诉内容</div>
+                    <div style="margin-bottom: 10px;">${a.content}</div>
+                    <div style="font-size: 12px; color: #999;">提交时间：${formatTime(a.created_at)}</div>
+                    ${a.status === 'handled' ? `
+                        <hr style="margin: 10px 0; border-color: #eee;">
+                        <div style="font-weight: 500; color: #27ae60;">处理结果：${a.handle_result}</div>
+                        <div style="font-size: 13px; color: #666; margin-top: 5px;">处理人：${a.handler}</div>
+                        <div style="font-size: 13px; color: #666;">处理时间：${formatTime(a.handled_at)}</div>
+                        <div style="font-size: 13px; color: #666; margin-top: 5px; background: #f8f9fa; padding: 8px; border-radius: 4px;"><strong>处理理由（可复盘）：</strong>${a.handle_reason}</div>
+                    ` : ''}
+                </div>
+            `).join('');
+
+            let correctionsHtml = report.corrections && report.corrections.length > 0 ? report.corrections.map(c => `
+                <div style="padding: 15px; background: #e8f8f5; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid #27ae60;">
+                    <div style="font-weight: 500; color: #27ae60;">状态修正记录</div>
+                    <div style="font-size: 13px; margin-top: 8px;">
+                        <div><strong>异常等级：</strong>${getLevelText(c.old_abnormal_level)} → ${getLevelText(c.new_abnormal_level)}</div>
+                        <div><strong>会话状态：</strong>${c.old_status} → ${c.new_status}</div>
+                        <div><strong>处理结果：</strong>${c.handle_result}</div>
+                        <div><strong>修正理由：</strong>${c.handle_reason}</div>
+                        <div style="color: #999; margin-top: 5px;">修正时间：${formatTime(c.corrected_at)}</div>
+                        <div style="color: #999;">修正人：${c.handler}</div>
+                    </div>
+                </div>
+            `).join('') : '<p style="color: #999;">暂无修正记录</p>';
+
+            document.getElementById('report-section').innerHTML = `
+                <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">📄 巡检报告 #${report.id.slice(0, 8)}</h3>
+                        <span style="padding: 6px 12px; background: ${report.review_status === '已复核' ? '#d4edda' : '#fff3cd'}; color: ${report.review_status === '已复核' ? '#155724' : '#856404'}; border-radius: 12px; font-size: 12px;">${report.review_status}</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 12px; color: #666;">考生信息</div>
+                            <div style="font-weight: 600; font-size: 16px;">${report.student_name}</div>
+                            <div style="font-size: 13px; color: #666;">学号：${report.student_id}</div>
+                            <div style="font-size: 13px; color: #666;">考试：${report.exam_id}</div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 12px; color: #666;">异常等级对比</div>
+                            <div style="font-size: 14px; margin-top: 5px;">
+                                <span style="color: ${report.original_abnormal_level === 'critical' ? '#e74c3c' : report.original_abnormal_level === 'warning' ? '#f39c12' : '#27ae60'};">原始：${getLevelText(report.original_abnormal_level)}</span>
+                                <span style="margin: 0 8px;">→</span>
+                                <span style="color: ${report.current_abnormal_level === 'critical' ? '#e74c3c' : report.current_abnormal_level === 'warning' ? '#f39c12' : '#27ae60'}; font-weight: 600;">当前：${getLevelText(report.current_abnormal_level)}</span>
+                            </div>
+                            <div style="font-size: 13px; color: #666; margin-top: 5px;">切屏次数：${report.screen_switch_count}</div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 12px; color: #666;">统计数据</div>
+                            <div style="font-weight: 600; font-size: 16px; margin-top: 5px;">
+                                <span style="color: #e74c3c;">事件 ${report.events_count}</span>
+                                <span style="margin: 0 8px; color: #ddd;">|</span>
+                                <span style="color: #3498db;">申诉 ${report.appeals_count}</span>
+                                <span style="margin: 0 8px; color: #ddd;">|</span>
+                                <span style="color: #27ae60;">修正 ${report.corrections_count || 0}</span>
+                            </div>
+                            <div style="font-size: 13px; color: #666; margin-top: 5px;">状态：${report.status}</div>
+                        </div>
+                    </div>
+
+                    ${report.handler ? `
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f39c12;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">原始处理记录</div>
+                            <div><strong>处理人：</strong>${report.handler}</div>
+                            <div><strong>处理时间：</strong>${formatTime(report.handled_at)}</div>
+                            <div><strong>处理理由：</strong>${report.handle_reason}</div>
+                        </div>
+                    ` : ''}
+
+                    ${report.appeal_handler ? `
+                        <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #27ae60;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">申诉修正记录（可复盘）</div>
+                            <div><strong>处理人：</strong>${report.appeal_handler}</div>
+                            <div><strong>处理时间：</strong>${formatTime(report.appeal_handled_at)}</div>
+                            <div><strong>处理结果：</strong>${report.appeal_result}</div>
+                            <div><strong>修正理由：</strong>${report.appeal_reason}</div>
+                        </div>
+                    ` : ''}
+
+                    <h4 style="margin: 25px 0 15px;">📋 事件时间线（可复核）</h4>
+                    ${eventsHtml}
+
+                    <h4 style="margin: 25px 0 15px;">📝 申诉记录（含处理详情）</h4>
+                    ${appealsHtml || '<p style="color: #999;">暂无申诉记录</p>'}
+
+                    <h4 style="margin: 25px 0 15px;">🔄 修正历史（可追溯）</h4>
+                    ${correctionsHtml}
+
+                    ${report.review_status !== '已复核' ? `
+                        <div style="margin-top: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <h5 style="margin-bottom: 10px;">复核操作</h5>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="text" id="reviewer-name" placeholder="复核人姓名" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                                <input type="text" id="review-comment" placeholder="复核意见（可选）" style="flex: 2; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                                <button class="btn btn-primary" onclick="submitReview('${report.id}')">确认复核</button>
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="margin-top: 25px; padding: 15px; background: #d4edda; border-radius: 8px;">
+                            <div style="font-weight: 600; color: #155724;">✓ 已复核</div>
+                            <div style="font-size: 13px; margin-top: 5px;">复核人：${report.reviewed_by}</div>
+                            <div style="font-size: 13px;">复核时间：${formatTime(report.reviewed_at)}</div>
+                            ${report.review_comment ? `<div style="font-size: 13px; margin-top: 5px;">复核意见：${report.review_comment}</div>` : ''}
+                        </div>
+                    `}
+
+                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
+                        报告ID：${report.id} | 生成时间：${formatTime(report.generated_at)} | 更新时间：${formatTime(report.updated_at)}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function submitReview(reportId) {
+            const reviewer = document.getElementById('reviewer-name').value;
+            const comment = document.getElementById('review-comment').value;
+            
+            if (!reviewer) {
+                alert('请输入复核人姓名');
+                return;
+            }
+
+            await fetchAPI(`/reports/${reportId}/review`, {
+                method: 'POST',
+                body: JSON.stringify({ reviewer, comment })
+            });
+
+            alert('复核完成！');
+            generateReport();
+        }
+
+        loadSessions();
+    </script>
+</body>
+</html>
