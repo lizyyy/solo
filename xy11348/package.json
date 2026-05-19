@@ -1,0 +1,31 @@
+{
+  "name": "print-quality-control",
+  "version": "1.0.0",
+  "description": "印刷车间品控CLI工具",
+  "main": "dist/index.js",
+  "bin": {
+    "pqc": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "keywords": ["print", "quality", "control"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "commander": "^11.0.0",
+    "csv-parse": "^5.0.0",
+    "date-fns": "^2.30.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.0.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
