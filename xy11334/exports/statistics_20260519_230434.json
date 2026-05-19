@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-05-19T23:04:34.122853",
+  "total_tasks": 2,
+  "total_escorts": 1,
+  "active_escorts": 1,
+  "by_status": {
+    "assigned": 1,
+    "cancelled": 1
+  },
+  "by_priority": {
+    "normal": 1,
+    "emergency": 1
+  },
+  "by_department": {
+    "内科": 1,
+    "急诊外科": 1
+  },
+  "escort_workload": {
+    "张三": 1
+  },
+  "avg_wait_minutes": 0.32,
+  "avg_process_minutes": 0
+}

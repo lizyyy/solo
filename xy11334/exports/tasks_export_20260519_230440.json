@@ -1,0 +1,94 @@
+[
+  {
+    "id": "ac034f29-0aa4-4609-9cec-d90b2e60bada",
+    "patient": {
+      "id": "8c46bd0c-cad2-4044-b7d6-b0172ed003f5",
+      "name": "李*",
+      "phone": "139****9002",
+      "id_card": "110101********1234",
+      "department": "内科",
+      "is_emergency": false
+    },
+    "priority": "normal",
+    "status": "assigned",
+    "created_at": "2026-05-19T23:03:57.663268",
+    "escort": {
+      "id": "b56dbba2-247a-492f-bb87-3d36690bbf12",
+      "name": "张三",
+      "phone": "138****8001",
+      "employee_id": "E001",
+      "is_active": true
+    },
+    "accepted_at": "2026-05-19T23:04:16.942470",
+    "completed_at": null,
+    "timeout_minutes": 30,
+    "position": 1,
+    "action_logs": [
+      {
+        "id": "7a329e07-baa6-474e-8995-3bc0801b643c",
+        "task_id": "ac034f29-0aa4-4609-9cec-d90b2e60bada",
+        "action_type": "create",
+        "operator": "admin",
+        "timestamp": "2026-05-19T23:03:57.663302",
+        "reason": "普通患者，按创建时间排队",
+        "from_escort_id": null,
+        "to_escort_id": null,
+        "success": true
+      },
+      {
+        "id": "c26a03f5-3cff-466f-9035-66e1608712fe",
+        "task_id": "ac034f29-0aa4-4609-9cec-d90b2e60bada",
+        "action_type": "accept",
+        "operator": "admin",
+        "timestamp": "2026-05-19T23:04:16.942524",
+        "reason": "任务处于待接单状态; 陪检员处于在职状态",
+        "from_escort_id": null,
+        "to_escort_id": "b56dbba2-247a-492f-bb87-3d36690bbf12",
+        "success": true
+      }
+    ]
+  },
+  {
+    "id": "34194700-7a24-4b65-bdeb-dd349d43de1d",
+    "patient": {
+      "id": "e44c3be8-e017-490a-bbc1-2f5f09b61056",
+      "name": "王*",
+      "phone": "137****7003",
+      "id_card": "110101********4567",
+      "department": "急诊外科",
+      "is_emergency": true
+    },
+    "priority": "emergency",
+    "status": "cancelled",
+    "created_at": "2026-05-19T23:04:02.603743",
+    "escort": null,
+    "accepted_at": null,
+    "completed_at": null,
+    "timeout_minutes": 30,
+    "position": 2,
+    "action_logs": [
+      {
+        "id": "223fd45b-f88e-4ab8-bcdc-da99f5002470",
+        "task_id": "34194700-7a24-4b65-bdeb-dd349d43de1d",
+        "action_type": "create",
+        "operator": "admin",
+        "timestamp": "2026-05-19T23:04:02.603945",
+        "reason": "急诊患者，自动提升为最高优先级，排在所有普通任务之前",
+        "from_escort_id": null,
+        "to_escort_id": null,
+        "success": true
+      },
+      {
+        "id": "614fe75d-3208-4165-b0a5-269decc600e4",
+        "task_id": "34194700-7a24-4b65-bdeb-dd349d43de1d",
+        "action_type": "cancel",
+        "operator": "admin",
+        "timestamp": "2026-05-19T23:04:24.205373",
+        "reason": "取消原因: 患者放弃检查",
+        "from_escort_id": null,
+        "to_escort_id": null,
+        "success": true
+      }
+    ]
+  }
+]
