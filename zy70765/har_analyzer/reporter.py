@@ -6,6 +6,14 @@ from jinja2 import Template
 from .parser import HarEntry
 
 
+def get_file_modification_time(file_path: str) -> str:
+    try:
+        mtime = os.path.getmtime(file_path)
+        return datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
+    except (OSError, TypeError):
+        return ""
+
+
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -51,7 +59,7 @@ HTML_TEMPLATE = """
     <div class="container">
         <h1>HAR延迟分桶分析报告</h1>
         <div class="metadata">
-            生成时间: {{ generated_at }} | 源文件: {{ source_file }}
+            {% if generated_at %}HAR文件修改时间: {{ generated_at }} | {% endif %}源文件: {{ source_file }}
         </div>
 
         <div class="summary-card">
@@ -268,13 +276,17 @@ class Reporter:
 
     def generate_html(self, output_path: str, source_file: str = "") -> None:
         template = Template(HTML_TEMPLATE)
+        generated_at = get_file_modification_time(source_file) if source_file else ""
+        by_domain = dict(sorted(self.analysis["by_domain"].items()))
+        by_resource_type = dict(sorted(self.analysis["by_resource_type"].items()))
+        by_time_bucket = self.analysis["by_time_bucket"]
         html_content = template.render(
-            generated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            generated_at=generated_at,
             source_file=source_file,
             summary=self.analysis["summary"],
-            by_domain=self.analysis["by_domain"],
-            by_resource_type=self.analysis["by_resource_type"],
-            by_time_bucket=self.analysis["by_time_bucket"],
+            by_domain=by_domain,
+            by_resource_type=by_resource_type,
+            by_time_bucket=by_time_bucket,
             anomalies=self.analysis["anomalies"],
             bad_entries=self.analysis["bad_entries"],
             get_time_bucket=self._get_time_bucket,
@@ -295,7 +307,7 @@ class Reporter:
                 "域名", "请求数", "平均延迟(ms)", "最小延迟(ms)", "最大延迟(ms)",
                 "fast_count", "normal_count", "slow_count", "very_slow_count", "extreme_count"
             ])
-            for domain, stats in self.analysis["by_domain"].items():
+            for domain, stats in sorted(self.analysis["by_domain"].items()):
                 tb = stats["time_buckets"]
                 writer.writerow([
                     domain, stats["count"],
@@ -310,7 +322,7 @@ class Reporter:
                 "资源类型", "请求数", "平均延迟(ms)", "最小延迟(ms)", "最大延迟(ms)",
                 "fast_count", "normal_count", "slow_count", "very_slow_count", "extreme_count"
             ])
-            for resource_type, stats in self.analysis["by_resource_type"].items():
+            for resource_type, stats in sorted(self.analysis["by_resource_type"].items()):
                 tb = stats["time_buckets"]
                 writer.writerow([
                     resource_type, stats["count"],
