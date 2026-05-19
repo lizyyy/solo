@@ -30,12 +30,23 @@ export class PullRecordService {
     }
 
     const result = await prisma.$transaction(async (tx) => {
+      let requestedVersion = config.version;
+      if (dto.distributionId) {
+        const distribution = await tx.distributionVersion.findUnique({
+          where: { id: dto.distributionId },
+          select: { version: true },
+        });
+        if (distribution) {
+          requestedVersion = distribution.version;
+        }
+      }
+
       const pullRecord = await tx.pullRecord.create({
         data: {
           configId: dto.configId,
           instanceId: dto.instanceId,
           distributionId: dto.distributionId,
-          requestedVersion: dto.actualVersion,
+          requestedVersion,
           actualVersion: dto.actualVersion,
           pullStatus: dto.pullStatus,
           errorMessage: dto.errorMessage,

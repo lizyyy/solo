@@ -23,8 +23,15 @@ export class DistributionService {
       throw new AppError('只有草稿状态的配置才能发布', 400);
     }
 
+    const allConfigsWithSameKey = await prisma.configItem.findMany({
+      where: { key: config.key },
+      select: { id: true },
+    });
+
+    const allConfigIds = allConfigsWithSameKey.map(c => c.id);
+
     const lastVersion = await prisma.distributionVersion.findFirst({
-      where: { configId: dto.configId },
+      where: { configId: { in: allConfigIds } },
       orderBy: { version: 'desc' },
     });
 
@@ -193,11 +200,18 @@ export class DistributionService {
           },
         });
 
-        await tx.effectiveState.update({
+        await tx.effectiveState.upsert({
           where: {
             configId_instanceId: { configId, instanceId: instance.id },
           },
-          data: {
+          create: {
+            configId,
+            instanceId: instance.id,
+            currentVersion: 0,
+            effectiveStatus: EffectiveStatus.NOT_EFFECTIVE,
+            compensateStatus: CompensateStatus.IN_PROGRESS,
+          },
+          update: {
             compensateStatus: CompensateStatus.IN_PROGRESS,
           },
         });
