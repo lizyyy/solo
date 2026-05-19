@@ -65,13 +65,12 @@ def create_task(db: Session, task: DNSPreviewTaskCreate) -> DNSPreviewTask:
 
 def get_task(db: Session, task_id: int) -> Optional[DNSPreviewTask]:
     return db.query(DNSPreviewTask).filter(
-        DNSPreviewTask.id == task_id,
-        DNSPreviewTask.is_deleted == False
+        DNSPreviewTask.id == task_id
     ).first()
 
 
 def get_tasks(db: Session, skip: int = 0, limit: int = 100, status: Optional[str] = None, domain: Optional[str] = None) -> List[DNSPreviewTask]:
-    query = db.query(DNSPreviewTask).filter(DNSPreviewTask.is_deleted == False)
+    query = db.query(DNSPreviewTask)
     if status:
         query = query.filter(DNSPreviewTask.status == status)
     if domain:
@@ -173,7 +172,6 @@ def close_task(db: Session, task_id: int, operator: str, reason: str, conclusion
         return None
 
     task.status = "closed"
-    task.is_deleted = True
     db.add(task)
 
     log_operation(

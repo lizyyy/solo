@@ -15,7 +15,7 @@ from schemas import (
 from crud import (
     create_task, get_task, get_tasks,
     update_task_status, manual_correct_task,
-    close_task, rollback_task, get_task_logs
+    close_task, rollback_task, get_task_logs, log_operation
 )
 from core_logic import StatusMachine, TTLRiskEvaluator
 
@@ -51,10 +51,15 @@ def transition_task_status(task_id: int, transition: StatusTransition, db: Sessi
     
     if not StatusMachine.can_transition(task.status, transition.target_status):
         valid_next = StatusMachine.get_valid_next_statuses(task.status)
-        raise HTTPException(
-            status_code=400,
-            detail=f"无效的状态转换: 从 {task.status} 无法转换到 {transition.target_status}。有效状态: {', '.join(valid_next)}"
+        error_detail = f"无效的状态转换: 从 {task.status} 无法转换到 {transition.target_status}。有效状态: {', '.join(valid_next)}"
+        log_operation(
+            db, task_id, "status_change:failed", transition.operator,
+            original_input=f"target_status={transition.target_status}",
+            conclusion=error_detail,
+            remark=transition.remark
         )
+        db.commit()
+        raise HTTPException(status_code=400, detail=error_detail)
     
     return update_task_status(db, task_id, transition.target_status, transition.operator, transition.remark)
 
@@ -95,7 +100,14 @@ def rollback_dns_task(task_id: int, operator: str, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="任务不存在")
     
     if task.status != "executing":
-        raise HTTPException(status_code=400, detail="只有执行中状态的任务才能回滚")
+        error_detail = "只有执行中状态的任务才能回滚"
+        log_operation(
+            db, task_id, "rollback:failed", operator,
+            original_input=f"current_status={task.status}",
+            conclusion=error_detail
+        )
+        db.commit()
+        raise HTTPException(status_code=400, detail=error_detail)
     
     return rollback_task(db, task_id, operator)
 

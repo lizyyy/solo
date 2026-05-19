@@ -528,3 +528,128 @@ async def test_evaluate_ttl(test_db):
         assert "assessments" in data
         assert len(data["assessments"]) == 2
         assert data["assessments"][0]["is_risky"] == True
+
+
+@pytest.mark.asyncio
+async def test_closed_task_still_queryable(test_db):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        task_data = {
+            "domain": "afterclose.com",
+            "record_type": "A",
+            "old_target": "1.1.1.1",
+            "new_target": "2.2.2.2",
+            "ttl_strategy": 300,
+            "created_by": "test_user",
+            "records": [
+                {
+                    "record_name": "www.afterclose.com",
+                    "record_type": "A",
+                    "old_value": "1.1.1.1",
+                    "new_value": "2.2.2.2",
+                    "old_ttl": 300,
+                    "new_ttl": 300
+                }
+            ]
+        }
+        
+        create_response = await client.post("/api/tasks/", json=task_data)
+        task_id = create_response.json()["id"]
+        
+        close_data = {
+            "operator": "admin",
+            "reason": "任务完成",
+            "conclusion": "切换成功无异常"
+        }
+        await client.post(f"/api/tasks/{task_id}/close", json=close_data)
+        
+        get_response = await client.get(f"/api/tasks/{task_id}")
+        assert get_response.status_code == 200
+        data = get_response.json()
+        assert data["status"] == "closed"
+        assert data["domain"] == "afterclose.com"
+        
+        report_response = await client.get(f"/api/tasks/{task_id}/report")
+        assert report_response.status_code == 200
+        
+        logs_response = await client.get(f"/api/tasks/{task_id}/logs")
+        assert logs_response.status_code == 200
+        logs = logs_response.json()
+        assert len(logs) >= 2
+        assert any(log["operation"] == "close" for log in logs)
+
+
+@pytest.mark.asyncio
+async def test_invalid_status_transition_has_audit_log(test_db):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        task_data = {
+            "domain": "auditlog.com",
+            "record_type": "A",
+            "old_target": "1.1.1.1",
+            "new_target": "2.2.2.2",
+            "ttl_strategy": 300,
+            "created_by": "test_user",
+            "records": [
+                {
+                    "record_name": "www.auditlog.com",
+                    "record_type": "A",
+                    "old_value": "1.1.1.1",
+                    "new_value": "2.2.2.2",
+                    "old_ttl": 300,
+                    "new_ttl": 300
+                }
+            ]
+        }
+        
+        create_response = await client.post("/api/tasks/", json=task_data)
+        task_id = create_response.json()["id"]
+        
+        transition_data = {
+            "target_status": "executing",
+            "operator": "audit_tester",
+            "remark": "尝试非法跳转"
+        }
+        await client.post(f"/api/tasks/{task_id}/status", json=transition_data)
+        
+        logs_response = await client.get(f"/api/tasks/{task_id}/logs")
+        assert logs_response.status_code == 200
+        logs = logs_response.json()
+        failed_logs = [log for log in logs if log["operation"] == "status_change:failed"]
+        assert len(failed_logs) >= 1
+        assert failed_logs[0]["operator"] == "audit_tester"
+        assert "无效的状态转换" in failed_logs[0]["conclusion"]
+
+
+@pytest.mark.asyncio
+async def test_rollback_failure_has_audit_log(test_db):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        task_data = {
+            "domain": "rollbackaudit.com",
+            "record_type": "A",
+            "old_target": "1.1.1.1",
+            "new_target": "2.2.2.2",
+            "ttl_strategy": 300,
+            "created_by": "test_user",
+            "records": [
+                {
+                    "record_name": "www.rollbackaudit.com",
+                    "record_type": "A",
+                    "old_value": "1.1.1.1",
+                    "new_value": "2.2.2.2",
+                    "old_ttl": 300,
+                    "new_ttl": 300
+                }
+            ]
+        }
+        
+        create_response = await client.post("/api/tasks/", json=task_data)
+        task_id = create_response.json()["id"]
+        
+        await client.post(f"/api/tasks/{task_id}/rollback?operator=rollback_tester")
+        
+        logs_response = await client.get(f"/api/tasks/{task_id}/logs")
+        assert logs_response.status_code == 200
+        logs = logs_response.json()
+        failed_logs = [log for log in logs if log["operation"] == "rollback:failed"]
+        assert len(failed_logs) >= 1
+        assert failed_logs[0]["operator"] == "rollback_tester"
+        assert "只有执行中状态的任务才能回滚" in failed_logs[0]["conclusion"]
