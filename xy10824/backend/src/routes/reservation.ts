@@ -12,6 +12,15 @@ router.post('/', async (req, res) => {
     if (!orderId || !poolId || !quantity) {
       return res.status(400).json({ error: 'orderId, poolId, and quantity are required' });
     }
+    if (typeof quantity !== 'number' || quantity <= 0) {
+      return res.status(400).json({ error: 'quantity must be a positive number' });
+    }
+    if (!Number.isInteger(quantity)) {
+      return res.status(400).json({ error: 'quantity must be an integer' });
+    }
+    if (expireSeconds !== undefined && (typeof expireSeconds !== 'number' || expireSeconds <= 0)) {
+      return res.status(400).json({ error: 'expireSeconds must be a positive number' });
+    }
     const reservation = await stateMachineService.createReservation({
       orderId,
       poolId,

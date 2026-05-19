@@ -10,6 +10,12 @@ router.post('/pool', async (req, res) => {
     if (!poolName) {
       return res.status(400).json({ error: 'poolName is required' });
     }
+    if (typeof initialQuantity !== 'number' || initialQuantity < 0) {
+      return res.status(400).json({ error: 'initialQuantity cannot be negative' });
+    }
+    if (!Number.isInteger(initialQuantity)) {
+      return res.status(400).json({ error: 'initialQuantity must be an integer' });
+    }
     const pool = await stateMachineService.createInventoryPool(poolName, initialQuantity);
     res.json(pool);
   } catch (error) {

@@ -45,6 +45,23 @@ async function runTests() {
     if (pool.available_quantity !== 100) throw new Error('Available quantity incorrect');
   });
 
+  await test('Create inventory pool with zero initial quantity', async () => {
+    const pool = await service.createInventoryPool('Zero Pool', 0);
+    if (!pool.pool_id) throw new Error('Pool ID not generated');
+    if (pool.total_quantity !== 0) throw new Error('Zero quantity should be allowed');
+  });
+
+  await test('Negative initial inventory should fail', async () => {
+    try {
+      await service.createInventoryPool('Negative Pool', -10);
+      throw new Error('Should have thrown negative quantity error');
+    } catch (error) {
+      if (!(error instanceof Error && error.message === 'initialQuantity must be a non-negative integer')) {
+        throw error;
+      }
+    }
+  });
+
   let poolId: string;
   await test('Get inventory pool', async () => {
     const pools = await service.listInventoryPools();
@@ -102,6 +119,36 @@ async function runTests() {
     }
   });
 
+  await test('Zero quantity reservation should fail', async () => {
+    try {
+      await service.createReservation({
+        orderId: 'ORDER_ZERO',
+        poolId,
+        quantity: 0,
+      });
+      throw new Error('Should have thrown zero quantity error');
+    } catch (error) {
+      if (!(error instanceof Error && error.message === 'quantity must be a positive integer')) {
+        throw error;
+      }
+    }
+  });
+
+  await test('Negative quantity reservation should fail', async () => {
+    try {
+      await service.createReservation({
+        orderId: 'ORDER_NEG',
+        poolId,
+        quantity: -5,
+      });
+      throw new Error('Should have thrown negative quantity error');
+    } catch (error) {
+      if (!(error instanceof Error && error.message === 'quantity must be a positive integer')) {
+        throw error;
+      }
+    }
+  });
+
   await test('Confirm reservation', async () => {
     const confirmed = await service.confirmReservation(reservationId);
     if (confirmed.status !== ReservationStatus.CONFIRMED) {
@@ -135,7 +182,7 @@ async function runTests() {
     if (pool?.available_quantity !== 90) throw new Error('Available quantity should be restored');
   });
 
-  await test('Inventory logs should exist', async () => {
+  await test('Inventory logs should exist with correct before/after values', async () => {
     const logs = await service.getInventoryLogs(poolId);
     if (logs.length === 0) throw new Error('No inventory logs found');
     const reserveLog = logs.find(l => l.change_type === 'RESERVE');
@@ -143,6 +190,24 @@ async function runTests() {
     const releaseLog = logs.find(l => l.change_type === 'RELEASE');
     if (!reserveLog || !confirmLog || !releaseLog) {
       throw new Error('Missing expected log entries');
+    }
+    
+    if (reserveLog.before_reserved !== 0) {
+      throw new Error(`RESERVE before_reserved should be 0, got ${reserveLog.before_reserved}`);
+    }
+    if (reserveLog.after_reserved !== reserveLog.before_reserved + reserveLog.quantity_change) {
+      throw new Error(`RESERVE after_reserved incorrect: ${reserveLog.before_reserved} + ${reserveLog.quantity_change} != ${reserveLog.after_reserved}`);
+    }
+    
+    if (confirmLog.after_reserved !== confirmLog.before_reserved - confirmLog.quantity_change) {
+      throw new Error(`CONFIRM after_reserved incorrect: ${confirmLog.before_reserved} - ${confirmLog.quantity_change} != ${confirmLog.after_reserved}`);
+    }
+    
+    if (releaseLog.before_reserved !== 5) {
+      throw new Error(`RELEASE before_reserved should be 5 (for ORDER_003), got ${releaseLog.before_reserved}`);
+    }
+    if (releaseLog.after_reserved !== 0) {
+      throw new Error(`RELEASE after_reserved should be 0, got ${releaseLog.after_reserved}`);
     }
   });
 

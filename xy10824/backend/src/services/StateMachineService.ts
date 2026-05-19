@@ -56,14 +56,10 @@ export class StateMachineService {
     orderId: string | null,
     changeType: string,
     quantityChange: number,
+    beforePool: InventoryPool,
+    afterPool: InventoryPool,
     operator: string = 'system'
   ) {
-    const pool = await getOne<InventoryPool>(
-      `SELECT * FROM ${TABLES.INVENTORY_POOL} WHERE pool_id = ?`,
-      [poolId]
-    );
-    if (!pool) return;
-
     await runQuery(
       `INSERT INTO ${TABLES.INVENTORY_LOG} (
         log_id, pool_id, reservation_id, order_id, change_type, quantity_change,
@@ -76,10 +72,10 @@ export class StateMachineService {
         orderId,
         changeType,
         quantityChange,
-        pool.total_quantity,
-        pool.total_quantity,
-        pool.reserved_quantity,
-        pool.reserved_quantity - quantityChange,
+        beforePool.total_quantity,
+        afterPool.total_quantity,
+        beforePool.reserved_quantity,
+        afterPool.reserved_quantity,
         operator,
       ]
     );
@@ -87,6 +83,10 @@ export class StateMachineService {
 
   async createReservation(request: CreateReservationRequest): Promise<Reservation> {
     const { orderId, poolId, quantity, expireSeconds = 1800 } = request;
+
+    if (quantity <= 0 || !Number.isInteger(quantity)) {
+      throw new Error('quantity must be a positive integer');
+    }
 
     const existing = await getOne<Reservation>(
       `SELECT * FROM ${TABLES.RESERVATION} WHERE order_id = ? AND pool_id = ? AND status IN (?, ?)`,
@@ -98,16 +98,16 @@ export class StateMachineService {
 
     await beginTransaction();
     try {
-      const pool = await getOne<InventoryPool>(
+      const beforePool = await getOne<InventoryPool>(
         `SELECT * FROM ${TABLES.INVENTORY_POOL} WHERE pool_id = ?`,
         [poolId]
       );
 
-      if (!pool) {
+      if (!beforePool) {
         throw new Error('Inventory pool not found');
       }
 
-      if (pool.available_quantity < quantity) {
+      if (beforePool.available_quantity < quantity) {
         throw new Error('Insufficient inventory');
       }
 
@@ -130,7 +130,22 @@ export class StateMachineService {
         [quantity, quantity, poolId]
       );
 
-      await this.logInventoryChange(poolId, reservationId, orderId, 'RESERVE', quantity);
+      const afterPool = await getOne<InventoryPool>(
+        `SELECT * FROM ${TABLES.INVENTORY_POOL} WHERE pool_id = ?`,
+        [poolId]
+      );
+
+      if (afterPool) {
+        await this.logInventoryChange(
+          poolId,
+          reservationId,
+          orderId,
+          'RESERVE',
+          quantity,
+          beforePool,
+          afterPool
+        );
+      }
 
       await runQuery(
         `INSERT INTO ${TABLES.TIMEOUT_TASK} (
@@ -173,6 +188,15 @@ export class StateMachineService {
 
     await beginTransaction();
     try {
+      const beforePool = await getOne<InventoryPool>(
+        `SELECT * FROM ${TABLES.INVENTORY_POOL} WHERE pool_id = ?`,
+        [reservation.pool_id]
+      );
+
+      if (!beforePool) {
+        throw new Error('Inventory pool not found');
+      }
+
       await runQuery(
         `UPDATE ${TABLES.RESERVATION} 
          SET status = ?, updated_at = CURRENT_TIMESTAMP 
@@ -189,13 +213,22 @@ export class StateMachineService {
         [reservation.quantity, reservation.quantity, reservation.pool_id]
       );
 
-      await this.logInventoryChange(
-        reservation.pool_id,
-        reservationId,
-        reservation.order_id,
-        'CONFIRM',
-        reservation.quantity
+      const afterPool = await getOne<InventoryPool>(
+        `SELECT * FROM ${TABLES.INVENTORY_POOL} WHERE pool_id = ?`,
+        [reservation.pool_id]
       );
+
+      if (afterPool) {
+        await this.logInventoryChange(
+          reservation.pool_id,
+          reservationId,
+          reservation.order_id,
+          'CONFIRM',
+          reservation.quantity,
+          beforePool,
+          afterPool
+        );
+      }
 
       await runQuery(
         `UPDATE ${TABLES.TIMEOUT_TASK} 
@@ -250,6 +283,15 @@ export class StateMachineService {
 
     await beginTransaction();
     try {
+      const beforePool = await getOne<InventoryPool>(
+        `SELECT * FROM ${TABLES.INVENTORY_POOL} WHERE pool_id = ?`,
+        [reservation.pool_id]
+      );
+
+      if (!beforePool) {
+        throw new Error('Inventory pool not found');
+      }
+
       await runQuery(
         `UPDATE ${TABLES.RESERVATION} 
          SET status = ?, updated_at = CURRENT_TIMESTAMP 
@@ -266,14 +308,23 @@ export class StateMachineService {
         [reservation.quantity, reservation.quantity, reservation.pool_id]
       );
 
-      await this.logInventoryChange(
-        reservation.pool_id,
-        reservationId,
-        reservation.order_id,
-        'RELEASE',
-        -reservation.quantity,
-        releasedBy
+      const afterPool = await getOne<InventoryPool>(
+        `SELECT * FROM ${TABLES.INVENTORY_POOL} WHERE pool_id = ?`,
+        [reservation.pool_id]
       );
+
+      if (afterPool) {
+        await this.logInventoryChange(
+          reservation.pool_id,
+          reservationId,
+          reservation.order_id,
+          'RELEASE',
+          -reservation.quantity,
+          beforePool,
+          afterPool,
+          releasedBy
+        );
+      }
 
       await runQuery(
         `INSERT INTO ${TABLES.RELEASE_RECORD} (
@@ -466,6 +517,10 @@ export class StateMachineService {
   }
 
   async createInventoryPool(poolName: string, initialQuantity: number = 0): Promise<InventoryPool> {
+    if (initialQuantity < 0 || !Number.isInteger(initialQuantity)) {
+      throw new Error('initialQuantity must be a non-negative integer');
+    }
+
     const poolId = uuidv4();
     await runQuery(
       `INSERT INTO ${TABLES.INVENTORY_POOL} (
