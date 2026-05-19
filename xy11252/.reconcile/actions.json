@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "order_id": 1,
+    "action_type": "refund",
+    "amount": 89.9,
+    "coupon_code": "",
+    "exchange_product": "",
+    "exchange_amount": 0,
+    "notes": "缺货全额退款",
+    "created_at": "2026-05-19T09:06:12.948Z"
+  },
+  {
+    "id": 2,
+    "order_id": 2,
+    "action_type": "exchange",
+    "amount": 0,
+    "coupon_code": "",
+    "exchange_product": "国产樱桃 500g",
+    "exchange_amount": 45.5,
+    "notes": "等价替换",
+    "created_at": "2026-05-19T09:06:28.328Z"
+  },
+  {
+    "id": 3,
+    "order_id": 3,
+    "action_type": "coupon",
+    "amount": 68,
+    "coupon_code": "COUPON2024001",
+    "exchange_product": "",
+    "exchange_amount": 0,
+    "notes": "发放等价优惠券",
+    "created_at": "2026-05-19T09:06:36.292Z"
+  }
+]

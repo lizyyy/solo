@@ -1,0 +1,84 @@
+[
+  {
+    "orderNo": "ORD20240001",
+    "customerName": "张三",
+    "phone": "13800138001",
+    "productName": "进口车厘子 500g",
+    "originalAmount": 89.90,
+    "handler": "李小红",
+    "status": "pending",
+    "createdAt": "2024-05-01T10:30:00Z"
+  },
+  {
+    "orderNo": "ORD20240002",
+    "customerName": "李四",
+    "phone": "13800138002",
+    "productName": "新鲜草莓 300g",
+    "originalAmount": 45.50,
+    "handler": "王大明",
+    "status": "pending",
+    "createdAt": "2024-05-01T11:15:00Z"
+  },
+  {
+    "orderNo": "ORD20240003",
+    "customerName": "王五",
+    "phone": "13800138003",
+    "productName": "有机蓝莓 250g",
+    "originalAmount": 68.00,
+    "handler": "李小红",
+    "status": "pending",
+    "createdAt": "2024-05-02T09:00:00Z"
+  },
+  {
+    "orderNo": "ORD20240004",
+    "customerName": "赵六",
+    "phone": "13800138004",
+    "productName": "精选芒果 2斤装",
+    "originalAmount": 59.90,
+    "handler": "王大明",
+    "status": "pending",
+    "createdAt": "2024-05-02T14:30:00Z"
+  },
+  {
+    "orderNo": "ORD20240005",
+    "customerName": "钱七",
+    "phone": "13800138005",
+    "productName": "阳光玫瑰葡萄 1斤",
+    "originalAmount": 75.00,
+    "handler": "张小美",
+    "status": "exception",
+    "exceptionType": "amount_mismatch",
+    "createdAt": "2024-05-03T08:45:00Z"
+  },
+  {
+    "orderNo": "ORD20240006",
+    "customerName": "孙八",
+    "phone": "13800138006",
+    "productName": "新西兰奇异果 12个",
+    "originalAmount": 128.00,
+    "handler": "张小美",
+    "status": "reviewed",
+    "createdAt": "2024-05-03T16:20:00Z"
+  },
+  {
+    "orderNo": "ORD20240007",
+    "customerName": "周九",
+    "phone": "13800138007",
+    "productName": "泰国山竹 3斤装",
+    "originalAmount": 98.50,
+    "handler": "李小红",
+    "status": "exception",
+    "exceptionType": "data_incomplete",
+    "createdAt": "2024-05-04T10:00:00Z"
+  },
+  {
+    "orderNo": "ORD20240008",
+    "customerName": "吴十",
+    "phone": "13800138008",
+    "productName": "进口牛油果 6个",
+    "originalAmount": 49.90,
+    "handler": "王大明",
+    "status": "completed",
+    "createdAt": "2024-05-04T15:30:00Z"
+  }
+]
