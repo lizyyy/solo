@@ -1,0 +1,37 @@
+{
+  "name": "vet-pharmacy-system",
+  "version": "1.0.0",
+  "description": "宠物医院药房管理系统",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "init": "ts-node scripts/initData.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-parser": "^3.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "winston": "^3.11.0",
+    "joi": "^17.11.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "pdfkit": "^0.14.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/sqlite3": "^3.1.11",
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/pdfkit": "^0.12.12",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.10",
+    "ts-jest": "^29.1.1"
+  }
+}

@@ -1,0 +1,91 @@
+[
+  {
+    "prescription_no": "PRES20240001",
+    "patient_id": "PAT001",
+    "patient_name": "旺财",
+    "species": "犬",
+    "breed": "金毛",
+    "weight": 25,
+    "weight_unit": "kg",
+    "age": "3岁",
+    "doctor_id": "DOC001",
+    "doctor_name": "张医生",
+    "diagnosis": "皮肤感染",
+    "items": [
+      {
+        "medicine_id": 1,
+        "dosage": 250,
+        "dosage_unit": "mg",
+        "quantity": 14,
+        "quantity_unit": "片",
+        "frequency": "每日2次",
+        "route": "口服",
+        "days": 7,
+        "notes": "饭后服用"
+      }
+    ]
+  },
+  {
+    "prescription_no": "PRES20240002",
+    "patient_id": "PAT002",
+    "patient_name": "咪咪",
+    "species": "猫",
+    "breed": "英短",
+    "weight": 3.5,
+    "weight_unit": "kg",
+    "age": "2岁",
+    "doctor_id": "DOC002",
+    "doctor_name": "李医生",
+    "diagnosis": "呼吸道感染",
+    "items": [
+      {
+        "medicine_id": 1,
+        "dosage": 62.5,
+        "dosage_unit": "mg",
+        "quantity": 10,
+        "quantity_unit": "片",
+        "frequency": "每日2次",
+        "route": "口服",
+        "days": 5,
+        "notes": "小心喂药"
+      },
+      {
+        "medicine_id": 5,
+        "dosage": 25,
+        "dosage_unit": "mg",
+        "quantity": 5,
+        "quantity_unit": "片",
+        "frequency": "每日1次",
+        "route": "口服",
+        "days": 5,
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "prescription_no": "PRES20240003",
+    "patient_id": "PAT003",
+    "patient_name": "豆豆",
+    "species": "犬",
+    "breed": "泰迪",
+    "weight": 2.8,
+    "weight_unit": "kg",
+    "age": "1岁",
+    "doctor_id": "DOC001",
+    "doctor_name": "张医生",
+    "diagnosis": "术后消炎",
+    "items": [
+      {
+        "medicine_id": 2,
+        "dosage": 250,
+        "dosage_unit": "mg",
+        "quantity": 7,
+        "quantity_unit": "片",
+        "frequency": "每日2次",
+        "route": "口服",
+        "days": 3,
+        "notes": "小型犬注意剂量"
+      }
+    ]
+  }
+]
