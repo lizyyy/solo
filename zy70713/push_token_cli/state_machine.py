@@ -44,6 +44,7 @@ class TokenLifecycle:
     unbind_count: int = 0
     failure_count: int = 0
     is_unsubscribed: bool = False
+    has_push_failure: bool = False
     rebound_to: Optional[str] = None
     rebound_from: List[str] = field(default_factory=list)
     failure_reason: Optional[FailureReason] = None
@@ -184,7 +185,7 @@ class TokenStateMachine:
         lifecycle.device_id = device_id or lifecycle.device_id
         lifecycle.user_id = user_id or lifecycle.user_id
         lifecycle.failure_count += 1
-        lifecycle.current_state = TokenState.FAILED
+        lifecycle.has_push_failure = True
 
         lifecycle.add_state_event(StateEvent(
             event_type="PUSH_FAILED",
@@ -205,18 +206,20 @@ class TokenStateMachine:
         if lifecycle.rebound_to:
             return FailureReason.DEVICE_REBOUND
 
-        if lifecycle.current_state == TokenState.UNBOUND:
+        if lifecycle.unbind_count > 0:
             return FailureReason.TOKEN_UNBOUND
 
-        last_state = lifecycle.state_history[-1] if lifecycle.state_history else None
-        if last_state:
-            error_code = last_state.details.get("error_code", "").upper()
-            error_msg = last_state.details.get("error_message", "").upper()
+        for event in reversed(lifecycle.state_history):
+            if event.event_type == "PUSH_FAILED":
+                error_code = event.details.get("error_code", "").upper()
+                error_msg = event.details.get("error_message", "").upper()
 
-            if any(k in error_code or k in error_msg for k in ["EXPIRED", "过期"]):
-                return FailureReason.TOKEN_EXPIRED
-            if any(k in error_code or k in error_msg for k in ["INVALID", "无效", "NOT FOUND"]):
-                return FailureReason.TOKEN_INVALID
+                if any(k in error_code or k in error_msg for k in ["EXPIRED", "过期"]):
+                    return FailureReason.TOKEN_EXPIRED
+                if any(k in error_code or k in error_msg for k in
+                       ["INVALID", "无效", "NOT FOUND", "NOT_REGISTERED", "UNREGISTERED",
+                        "MISSING_REGISTRATION", "INVALID_REGISTRATION"]):
+                    return FailureReason.TOKEN_INVALID
 
         return FailureReason.UNKNOWN
 

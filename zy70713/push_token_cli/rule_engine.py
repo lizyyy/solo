@@ -15,6 +15,9 @@ class AnalysisResult:
     rebound_devices: int = 0
     token_expired: int = 0
     token_invalid: int = 0
+    token_unbound: int = 0
+    user_unsubscribed: int = 0
+    device_rebound: int = 0
     parse_errors: List[ParseError] = field(default_factory=list)
     token_details: List[Dict] = field(default_factory=list)
 
@@ -110,13 +113,14 @@ class RuleEngine:
         result.total_tokens = len(tokens)
 
         for lifecycle in tokens:
-            if lifecycle.current_state == TokenState.BOUND:
-                result.bound_tokens += 1
+            if lifecycle.is_unsubscribed:
+                result.unsubscribed_tokens += 1
             elif lifecycle.current_state == TokenState.UNBOUND:
                 result.unbound_tokens += 1
-            elif lifecycle.current_state == TokenState.UNSUBSCRIBED:
-                result.unsubscribed_tokens += 1
-            elif lifecycle.current_state == TokenState.FAILED:
+            elif lifecycle.current_state == TokenState.BOUND:
+                result.bound_tokens += 1
+
+            if lifecycle.has_push_failure:
                 result.failed_tokens += 1
 
             if lifecycle.rebound_to or lifecycle.rebound_from:
@@ -126,6 +130,12 @@ class RuleEngine:
                 result.token_expired += 1
             elif lifecycle.failure_reason == FailureReason.TOKEN_INVALID:
                 result.token_invalid += 1
+            elif lifecycle.failure_reason == FailureReason.TOKEN_UNBOUND:
+                result.token_unbound += 1
+            elif lifecycle.failure_reason == FailureReason.USER_UNSUBSCRIBED:
+                result.user_unsubscribed += 1
+            elif lifecycle.failure_reason == FailureReason.DEVICE_REBOUND:
+                result.device_rebound += 1
 
             state_history = []
             for event in lifecycle.state_history:

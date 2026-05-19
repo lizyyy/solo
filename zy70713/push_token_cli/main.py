@@ -120,8 +120,11 @@ def _show_summary(result):
     table.add_row("已退订", f"[red]{result.unsubscribed_tokens}[/red]")
     table.add_row("推送失败", f"[red]{result.failed_tokens}[/red]")
     table.add_row("换绑设备", f"[yellow]{result.rebound_devices}[/yellow]")
-    table.add_row("Token 过期", f"[red]{result.token_expired}[/red]")
-    table.add_row("Token 无效", f"[red]{result.token_invalid}[/red]")
+    table.add_row("├─ 失败原因: 设备换绑", f"[yellow]{result.device_rebound}[/yellow]")
+    table.add_row("├─ 失败原因: 用户退订", f"[red]{result.user_unsubscribed}[/red]")
+    table.add_row("├─ 失败原因: Token 解绑", f"[cyan]{result.token_unbound}[/cyan]")
+    table.add_row("├─ 失败原因: Token 过期", f"[red]{result.token_expired}[/red]")
+    table.add_row("└─ 失败原因: Token 无效", f"[red]{result.token_invalid}[/red]")
 
     console.print(table)
 

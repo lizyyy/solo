@@ -154,6 +154,19 @@ class InputParser:
 
         return normalized
 
+    def _validate_record(self, data: Dict[str, Any], input_type: InputType) -> Optional[str]:
+        token_value = str(data.get("token", "")).strip() if data.get("token") is not None else ""
+        if not token_value:
+            return "token 字段为空或缺失"
+
+        if input_type in [InputType.BINDING, InputType.DEVICE, InputType.FAILURE, InputType.UNSUBSCRIBE]:
+            user_id = str(data.get("user_id", "")).strip() if data.get("user_id") is not None else ""
+            device_id = str(data.get("device_id", "")).strip() if data.get("device_id") is not None else ""
+            if not user_id and not device_id:
+                return "user_id 和 device_id 至少需要一个"
+
+        return None
+
     def _parse_datetime(self, value: Any) -> Optional[str]:
         if pd.isna(value) or value is None or str(value).strip() == "":
             return None
@@ -180,15 +193,26 @@ class InputParser:
             raw_content = content[row_num - 1].strip() if row_num - 1 < len(content) else ""
             try:
                 normalized = self._normalize_row(row, input_type)
-                result.records.append(
-                    ParsedRecord(
-                        record_type=input_type,
-                        data=normalized,
-                        source_file=file_path,
-                        row_number=row_num,
-                        raw_content=raw_content,
+                validation_error = self._validate_record(normalized, input_type)
+                if validation_error:
+                    result.errors.append(
+                        ParseError(
+                            row_number=row_num,
+                            source_file=file_path,
+                            raw_content=raw_content,
+                            error_message=validation_error,
+                        )
                     )
-                )
+                else:
+                    result.records.append(
+                        ParsedRecord(
+                            record_type=input_type,
+                            data=normalized,
+                            source_file=file_path,
+                            row_number=row_num,
+                            raw_content=raw_content,
+                        )
+                    )
             except Exception as e:
                 result.errors.append(
                     ParseError(
@@ -237,45 +261,69 @@ class InputParser:
 
         if isinstance(records_data[0], tuple) if records_data else False:
             for row_num, data in records_data:
+                raw = content[row_num - 1].strip() if row_num - 1 < len(content) else ""
                 try:
                     normalized = self._normalize_row(data, input_type)
-                    result.records.append(
-                        ParsedRecord(
-                            record_type=input_type,
-                            data=normalized,
-                            source_file=file_path,
-                            row_number=row_num,
-                            raw_content=content[row_num - 1].strip() if row_num - 1 < len(content) else "",
+                    validation_error = self._validate_record(normalized, input_type)
+                    if validation_error:
+                        result.errors.append(
+                            ParseError(
+                                row_number=row_num,
+                                source_file=file_path,
+                                raw_content=raw,
+                                error_message=validation_error,
+                            )
                         )
-                    )
+                    else:
+                        result.records.append(
+                            ParsedRecord(
+                                record_type=input_type,
+                                data=normalized,
+                                source_file=file_path,
+                                row_number=row_num,
+                                raw_content=raw,
+                            )
+                        )
                 except Exception as e:
                     result.errors.append(
                         ParseError(
                             row_number=row_num,
                             source_file=file_path,
-                            raw_content=content[row_num - 1].strip() if row_num - 1 < len(content) else "",
+                            raw_content=raw,
                             error_message=str(e),
                         )
                     )
         else:
             for row_num, data in enumerate(records_data, start=1):
+                raw = json.dumps(data, ensure_ascii=False) if data else ""
                 try:
                     normalized = self._normalize_row(data, input_type)
-                    result.records.append(
-                        ParsedRecord(
-                            record_type=input_type,
-                            data=normalized,
-                            source_file=file_path,
-                            row_number=row_num,
-                            raw_content=json.dumps(data, ensure_ascii=False),
+                    validation_error = self._validate_record(normalized, input_type)
+                    if validation_error:
+                        result.errors.append(
+                            ParseError(
+                                row_number=row_num,
+                                source_file=file_path,
+                                raw_content=raw,
+                                error_message=validation_error,
+                            )
                         )
-                    )
+                    else:
+                        result.records.append(
+                            ParsedRecord(
+                                record_type=input_type,
+                                data=normalized,
+                                source_file=file_path,
+                                row_number=row_num,
+                                raw_content=raw,
+                            )
+                        )
                 except Exception as e:
                     result.errors.append(
                         ParseError(
                             row_number=row_num,
                             source_file=file_path,
-                            raw_content=json.dumps(data, ensure_ascii=False) if data else "",
+                            raw_content=raw,
                             error_message=str(e),
                         )
                     )
@@ -297,16 +345,28 @@ class InputParser:
                 raw_content = " | ".join([f"{k}={v}" for k, v in row_dict.items() if pd.notna(v)])
                 try:
                     normalized = self._normalize_row(row_dict, input_type)
-                    result.records.append(
-                        ParsedRecord(
-                            record_type=input_type,
-                            data=normalized,
-                            source_file=file_path,
-                            row_number=row_num,
-                            sheet_name=sheet_name,
-                            raw_content=raw_content,
+                    validation_error = self._validate_record(normalized, input_type)
+                    if validation_error:
+                        result.errors.append(
+                            ParseError(
+                                row_number=row_num,
+                                source_file=file_path,
+                                raw_content=raw_content,
+                                error_message=validation_error,
+                                sheet_name=sheet_name,
+                            )
                         )
-                    )
+                    else:
+                        result.records.append(
+                            ParsedRecord(
+                                record_type=input_type,
+                                data=normalized,
+                                source_file=file_path,
+                                row_number=row_num,
+                                sheet_name=sheet_name,
+                                raw_content=raw_content,
+                            )
+                        )
                 except Exception as e:
                     result.errors.append(
                         ParseError(

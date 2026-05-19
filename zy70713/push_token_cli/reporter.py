@@ -58,6 +58,9 @@ class Reporter:
         lines.append("【失败原因分类】")
         lines.append(f"  Token 过期: {self.result.token_expired}")
         lines.append(f"  Token 无效: {self.result.token_invalid}")
+        lines.append(f"  用户退订: {self.result.user_unsubscribed}")
+        lines.append(f"  设备换绑: {self.result.device_rebound}")
+        lines.append(f"  Token 解绑: {self.result.token_unbound}")
         lines.append("")
 
         if self.result.parse_errors:
