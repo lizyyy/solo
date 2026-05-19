@@ -1,8 +1,9 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from sqlalchemy.orm import Session
 from app.models import MetricWindow, GapSegment, BackfillSource
 from app.schemas import MetricWindowCreate, GapSegmentCreate, BackfillSourceCreate
 from app.services.validation_service import ValidationService
+from app.models.models import OverrideStrategy
 from datetime import datetime
 
 
@@ -90,11 +91,40 @@ class GapSegmentService:
             query = query.filter(GapSegment.metric_window_id == metric_window_id)
         return query.offset(skip).limit(limit).all()
 
-    def mark_backfilled(self, gap_id: int, actual_points: Optional[int] = None) -> Optional[GapSegment]:
+    def mark_backfilled(
+        self,
+        gap_id: int,
+        actual_points: Optional[int] = None,
+        override_strategy: OverrideStrategy = OverrideStrategy.PROTECT,
+    ) -> Tuple[Optional[GapSegment], bool, str]:
+        """
+        标记缺口为已回填
+        返回: (缺口对象, 是否成功处理, 处理消息)
+        """
         db_gap = self.get_gap_segment(gap_id)
         if not db_gap:
-            return None
+            return None, False, "缺口不存在"
 
+        # 检查是否已有真实观测数据
+        has_existing = ValidationService.has_existing_observations(db_gap)
+        
+        if has_existing:
+            if override_strategy == OverrideStrategy.PROTECT:
+                # 保护模式：不修改已有数据，但仍标记为已处理（跳过回填）
+                db_gap.is_backfilled = True
+                db_gap.backfilled_at = datetime.utcnow()
+                self.db.commit()
+                self.db.refresh(db_gap)
+                return db_gap, True, "保护模式：保留原有观测数据，跳过回填覆盖"
+            elif override_strategy == OverrideStrategy.MERGE:
+                # 合并模式：保留原有数据，不覆盖
+                db_gap.is_backfilled = True
+                db_gap.backfilled_at = datetime.utcnow()
+                self.db.commit()
+                self.db.refresh(db_gap)
+                return db_gap, True, "合并模式：保留原有观测数据，不覆盖"
+        
+        # FORCE 模式 或 没有现有数据：正常回填
         db_gap.is_backfilled = True
         db_gap.backfilled_at = datetime.utcnow()
 
@@ -107,7 +137,10 @@ class GapSegmentService:
 
         self.db.commit()
         self.db.refresh(db_gap)
-        return db_gap
+        
+        if has_existing:
+            return db_gap, True, "强制模式：已覆盖原有观测数据"
+        return db_gap, True, "回填完成"
 
     def delete_gap_segment(self, gap_id: int) -> bool:
         db_gap = self.get_gap_segment(gap_id)

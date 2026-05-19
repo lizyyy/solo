@@ -141,10 +141,21 @@ def process_batch(
         )
 
         gap_service = GapSegmentService(db)
+        processing_results = []
         for window in db_batch.metric_windows:
             for gap in window.gap_segments:
                 if not gap.is_backfilled:
-                    gap_service.mark_backfilled(gap.id, gap.expected_points)
+                    _, success, msg = gap_service.mark_backfilled(
+                        gap.id,
+                        gap.expected_points,
+                        db_batch.override_strategy
+                    )
+                    processing_results.append({
+                        "gap_id": gap.id,
+                        "metric_name": window.metric_name,
+                        "success": success,
+                        "message": msg
+                    })
 
         snapshot_service = SnapshotService(db)
         snapshot_service.create_batch_result_snapshot(batch_id, operator)
@@ -153,7 +164,13 @@ def process_batch(
             batch_id, BatchStatus.COMPLETED, operator, "回填执行完成"
         )
 
-        return {"message": "批次处理完成", "batch_id": batch_id, "status": db_batch.status}
+        return {
+            "message": "批次处理完成",
+            "batch_id": batch_id,
+            "status": db_batch.status,
+            "override_strategy": db_batch.override_strategy.value,
+            "processing_details": processing_results
+        }
     except Exception as e:
         exception_service = ExceptionService(db)
         exception_service.log_exception(

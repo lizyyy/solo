@@ -87,11 +87,16 @@ class ValidationService:
                 "当前策略为PROTECT（保护模式），不允许覆盖已有观测数据",
             )
         elif strategy == OverrideStrategy.MERGE:
-            return True, "当前策略为MERGE（合并模式），将合并新旧数据"
+            return True, "当前策略为MERGE（合并模式），将保留原有数据不覆盖"
         elif strategy == OverrideStrategy.FORCE:
             return True, "当前策略为FORCE（强制模式），将覆盖已有观测数据"
 
         return False, "未知的覆盖策略"
+
+    @staticmethod
+    def has_existing_observations(gap: GapSegment) -> bool:
+        """检查缺口是否已有真实观测数据"""
+        return gap.actual_points is not None and gap.actual_points > 0
 
     @staticmethod
     def validate_status_transition(
