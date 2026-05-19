@@ -53,6 +53,7 @@ def run_selftest():
         passed = task is not None and error is None
         print_result("创建任务1", passed, error)
         all_passed = all_passed and passed
+        task1_id = task.id
 
         task2 = PipelineTaskCreate(
             pipeline_name="nightly_user_data",
@@ -64,17 +65,13 @@ def run_selftest():
         passed = task is not None and error is None
         print_result("创建任务2", passed, error)
         all_passed = all_passed and passed
-        
         task2_id = task.id
     except Exception as e:
         print_result("创建任务", False, str(e))
         all_passed = False
 
-    print("\n--- 测试2: 分片去重校验 ---")
+    print("\n--- 测试2: 分片去重校验（含PENDING） ---")
     try:
-        update = PipelineTaskUpdate(status=TaskStatus.RUNNING)
-        service.update_task_status(task2_id, update)
-        
         task_overlap = PipelineTaskCreate(
             pipeline_name="nightly_user_data",
             shard_start=500,
@@ -83,45 +80,128 @@ def run_selftest():
         )
         task, error = service.create_task(task_overlap)
         passed = task is None and "overlap" in error
-        print_result("分片重叠检测", passed, error)
+        print_result("PENDING分片重叠检测", passed, error)
+        all_passed = all_passed and passed
+
+        task_non_overlap = PipelineTaskCreate(
+            pipeline_name="nightly_user_data",
+            shard_start=2001,
+            shard_end=3000,
+            watermark=3000
+        )
+        task, error = service.create_task(task_non_overlap)
+        passed = task is not None and error is None
+        print_result("非重叠分片可创建", passed, error)
         all_passed = all_passed and passed
     except Exception as e:
         print_result("分片重叠检测", False, str(e))
         all_passed = False
 
-    print("\n--- 测试3: 状态流转 - 标记失败触发人工复核 ---")
+    print("\n--- 测试3: 状态机迁移校验 ---")
     try:
-        tasks = service.get_pending_tasks("nightly_user_data")
-        task_id = tasks[0].id
+        update = PipelineTaskUpdate(status=TaskStatus.SUCCESS)
+        task, error = service.update_task_status(task1_id, update)
+        passed = "Invalid state transition" in error
+        print_result("PENDING不能直接到SUCCESS", passed, error)
+        all_passed = all_passed and passed
 
-        for i in range(3):
-            update = PipelineTaskUpdate(
-                status=TaskStatus.FAILED,
-                fail_reason=f"Network error attempt {i+1}"
-            )
-            task, error = service.update_task_status(task_id, update)
+        update = PipelineTaskUpdate(status=TaskStatus.RUNNING)
+        task, error = service.update_task_status(task1_id, update)
+        passed = task is not None and error is None
+        print_result("PENDING可到RUNNING", passed, error)
+        all_passed = all_passed and passed
 
-        task = service.get_task(task_id)
-        passed = task.need_manual_review == True and task.retry_count == 3
+        update = PipelineTaskUpdate(status=TaskStatus.PENDING)
+        task, error = service.update_task_status(task1_id, update)
+        passed = "Invalid state transition" in error
+        print_result("RUNNING不能回到PENDING", passed, error)
+        all_passed = all_passed and passed
+
+        update = PipelineTaskUpdate(status=TaskStatus.FAILED)
+        task, error = service.update_task_status(task1_id, update)
+        passed = task is not None and error is None
+        print_result("RUNNING可到FAILED", passed, error)
+        all_passed = all_passed and passed
+
+        update = PipelineTaskUpdate(status=TaskStatus.PENDING)
+        task, error = service.update_task_status(task1_id, update)
+        passed = task is not None and error is None
+        print_result("FAILED可重置到PENDING", passed, error)
+        all_passed = all_passed and passed
+    except Exception as e:
+        print_result("状态机迁移校验", False, str(e))
+        all_passed = False
+
+    print("\n--- 测试4: SKIPPED状态不可修改 ---")
+    try:
+        update = PipelineTaskUpdate(status=TaskStatus.SKIPPED)
+        task, error = service.update_task_status(task2_id, update)
+        passed = task is not None and error is None
+        print_result("PENDING可到SKIPPED", passed, error)
+        all_passed = all_passed and passed
+
+        update = PipelineTaskUpdate(status=TaskStatus.RUNNING)
+        task, error = service.update_task_status(task2_id, update)
+        passed = "Cannot modify skipped task" in error
+        print_result("SKIPPED不可修改", passed, error)
+        all_passed = all_passed and passed
+    except Exception as e:
+        print_result("SKIPPED状态校验", False, str(e))
+        all_passed = False
+
+    print("\n--- 测试5: 状态流转 - 标记失败触发人工复核 ---")
+    try:
+        service.update_task_status(task1_id, PipelineTaskUpdate(status=TaskStatus.RUNNING))
+        
+        for i in range(5):
+            task = service.get_task(task1_id)
+            if task.status == TaskStatus.PENDING:
+                service.update_task_status(task1_id, PipelineTaskUpdate(status=TaskStatus.RUNNING))
+            if task.status == TaskStatus.FAILED:
+                service.update_task_status(task1_id, PipelineTaskUpdate(status=TaskStatus.PENDING))
+                service.update_task_status(task1_id, PipelineTaskUpdate(status=TaskStatus.RUNNING))
+            
+            task = service.get_task(task1_id)
+            if task.status == TaskStatus.RUNNING:
+                update = PipelineTaskUpdate(
+                    status=TaskStatus.FAILED,
+                    fail_reason=f"Network error attempt {i+1}"
+                )
+                task, error = service.update_task_status(task1_id, update)
+            if task and task.need_manual_review:
+                break
+
+        task = service.get_task(task1_id)
+        passed = task.need_manual_review == True
         print_result("失败3次触发人工复核", passed, f"review={task.need_manual_review}, retry={task.retry_count}")
         all_passed = all_passed and passed
     except Exception as e:
-        print_result("人工复核触发", False, str(e))
+        print_result("人工复核测试", False, str(e))
         all_passed = False
 
-    print("\n--- 测试4: 错误码区分 - 缺字段/状态不允许 ---")
+    print("\n--- 测试6: 错误码区分 - 需人工复核 ---")
     try:
+        service.update_task_status(task1_id, PipelineTaskUpdate(
+            need_manual_review=False,
+            review_comment="先清除复核标记"
+        ))
+        
+        service.update_task_status(task1_id, PipelineTaskUpdate(
+            need_manual_review=True,
+            review_comment=None
+        ))
+        
         update = PipelineTaskUpdate(status=TaskStatus.RUNNING)
-        task, error = service.update_task_status(task_id, update)
+        task, error = service.update_task_status(task1_id, update)
         passed = "manual review" in error
         print_result("未复核任务无法执行", passed, error)
         all_passed = all_passed and passed
 
         update = PipelineTaskUpdate(
-            status=TaskStatus.RUNNING,
+            need_manual_review=False,
             review_comment="已复核通过"
         )
-        task, error = service.update_task_status(task_id, update)
+        task, error = service.update_task_status(task1_id, update)
         passed = task is not None and error is None
         print_result("复核后可执行", passed, error)
         all_passed = all_passed and passed
@@ -129,39 +209,31 @@ def run_selftest():
         print_result("人工复核流程", False, str(e))
         all_passed = False
 
-    print("\n--- 测试5: 水位校验 - 不能倒退 ---")
+    print("\n--- 测试7: 水位校验 - 不能倒退 ---")
     try:
-        update = PipelineTaskUpdate(
-            status=TaskStatus.RUNNING,
+        service.update_task_status(task1_id, PipelineTaskUpdate(
             need_manual_review=False,
-            review_comment="已复核"
-        )
-        task, error = service.update_task_status(task_id, update)
+            review_comment="清除复核标记"
+        ))
         
         update = PipelineTaskUpdate(watermark=500)
-        task, error = service.update_task_status(task_id, update)
+        task, error = service.update_task_status(task1_id, update)
         passed = "Watermark cannot go backward" in error
         print_result("水位倒退检测", passed, error)
         all_passed = all_passed and passed
 
         update = PipelineTaskUpdate(watermark=1500)
-        task, error = service.update_task_status(task_id, update)
+        task, error = service.update_task_status(task1_id, update)
         passed = task is not None and task.watermark == 1500
         print_result("水位前进正常", passed, f"watermark={task.watermark if task else None}")
         all_passed = all_passed and passed
-        
-        update = PipelineTaskUpdate(status=TaskStatus.FAILED, fail_reason="准备续跑测试")
-        service.update_task_status(task_id, update)
     except Exception as e:
         print_result("水位校验", False, str(e))
         all_passed = False
 
-    print("\n--- 测试6: 续跑指令 ---")
+    print("\n--- 测试8: 续跑指令 ---")
     try:
-        service.update_task_status(task_id, PipelineTaskUpdate(
-            need_manual_review=False,
-            review_comment="强制续跑前复核"
-        ))
+        service.update_task_status(task1_id, PipelineTaskUpdate(status=TaskStatus.FAILED))
         
         cmd = ResumeCommandCreate(
             pipeline_name="nightly_user_data",
@@ -177,9 +249,8 @@ def run_selftest():
         print_result("续跑指令", False, str(e))
         all_passed = False
 
-    print("\n--- 测试7: 写入摘要导入 ---")
+    print("\n--- 测试9: 写入摘要导入 ---")
     try:
-        service.update_task_status(task2_id, PipelineTaskUpdate(status=TaskStatus.FAILED))
         tasks = service.get_pending_tasks("nightly_user_data")
 
         summaries_data = [
@@ -212,7 +283,7 @@ def run_selftest():
         print_result("写入摘要导入", False, str(e))
         all_passed = False
 
-    print("\n--- 测试8: 写入摘要导出 ---")
+    print("\n--- 测试10: 写入摘要导出 ---")
     try:
         filename, result = service.export_summaries_to_csv("nightly_user_data")
         passed = filename != "" and result["export_count"] == 2
@@ -229,7 +300,7 @@ def run_selftest():
         print_result("写入摘要导出", False, str(e))
         all_passed = False
 
-    print("\n--- 测试9: 待处理任务筛选 ---")
+    print("\n--- 测试11: 待处理任务筛选 ---")
     try:
         tasks = service.get_pending_tasks("nightly_user_data", min_watermark=1500)
         passed = len(tasks) >= 1
@@ -239,16 +310,21 @@ def run_selftest():
         print_result("任务筛选", False, str(e))
         all_passed = False
 
-    print("\n--- 测试10: 已成功任务无法修改 ---")
+    print("\n--- 测试12: 已成功任务无法修改 ---")
     try:
         tasks = service.get_pending_tasks("nightly_user_data")
-        task_id = tasks[0].id
+        test_task_id = tasks[0].id
+        
+        service.update_task_status(test_task_id, PipelineTaskUpdate(
+            need_manual_review=False,
+            review_comment="清除复核标记"
+        ))
 
-        update = PipelineTaskUpdate(status=TaskStatus.SUCCESS)
-        task, error = service.update_task_status(task_id, update)
+        service.update_task_status(test_task_id, PipelineTaskUpdate(status=TaskStatus.RUNNING))
+        service.update_task_status(test_task_id, PipelineTaskUpdate(status=TaskStatus.SUCCESS))
 
         update = PipelineTaskUpdate(status=TaskStatus.RUNNING)
-        task, error = service.update_task_status(task_id, update)
+        task, error = service.update_task_status(test_task_id, update)
         passed = "already completed" in error
         print_result("已成功任务保护", passed, error)
         all_passed = all_passed and passed

@@ -3,8 +3,17 @@ from sqlalchemy import and_, or_
 from models import PipelineTask, WriteSummary, ResumeCommand
 from schemas import PipelineTaskCreate, PipelineTaskUpdate, WriteSummaryCreate, ResumeCommandCreate, TaskStatus
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict, Set
 import json
+
+
+VALID_STATE_TRANSITIONS: Dict[str, Set[str]] = {
+    TaskStatus.PENDING: {TaskStatus.RUNNING, TaskStatus.SKIPPED},
+    TaskStatus.RUNNING: {TaskStatus.SUCCESS, TaskStatus.FAILED},
+    TaskStatus.FAILED: {TaskStatus.PENDING, TaskStatus.SKIPPED},
+    TaskStatus.SKIPPED: set(),
+    TaskStatus.SUCCESS: set(),
+}
 
 
 class PipelineService:
@@ -15,7 +24,7 @@ class PipelineService:
         existing = self.db.query(PipelineTask).filter(
             and_(
                 PipelineTask.pipeline_name == pipeline_name,
-                PipelineTask.status.in_([TaskStatus.SUCCESS, TaskStatus.RUNNING]),
+                PipelineTask.status.in_([TaskStatus.SUCCESS, TaskStatus.RUNNING, TaskStatus.PENDING]),
                 or_(
                     and_(
                         PipelineTask.shard_start <= shard_start,
@@ -33,6 +42,11 @@ class PipelineService:
             )
         ).first()
         return existing
+
+    def is_valid_state_transition(self, current_status: str, new_status: str) -> bool:
+        if new_status not in VALID_STATE_TRANSITIONS:
+            return False
+        return new_status in VALID_STATE_TRANSITIONS.get(current_status, set())
 
     def create_task(self, task_create: PipelineTaskCreate) -> Tuple[Optional[PipelineTask], Optional[str]]:
         overlap = self.check_shard_overlap(
@@ -67,10 +81,16 @@ class PipelineService:
         if task.status == TaskStatus.SUCCESS:
             return None, "Task already completed successfully"
 
+        if task.status == TaskStatus.SKIPPED:
+            return None, "Cannot modify skipped task"
+
         if task.need_manual_review and not update.review_comment:
             return None, "Need manual review comment"
 
         if update.status:
+            if not self.is_valid_state_transition(task.status, update.status):
+                return None, f"Invalid state transition from {task.status} to {update.status}"
+            
             task.status = update.status
             if update.status == TaskStatus.SUCCESS:
                 task.completed_at = datetime.utcnow()

@@ -66,6 +66,14 @@ def update_task(task_id: int, update: PipelineTaskUpdate, db: Session = Depends(
                     "message": error
                 }
             )
+        elif "Cannot modify skipped task" in error:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error_code": ErrorCode.ALREADY_PROCESSED,
+                    "message": error
+                }
+            )
         elif "manual review" in error:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -81,6 +89,11 @@ def update_task(task_id: int, update: PipelineTaskUpdate, db: Session = Depends(
                     "error_code": ErrorCode.WATERMARK_CONFLICT,
                     "message": error
                 }
+            )
+        elif "Invalid state transition" in error:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"error_code": ErrorCode.INVALID_STATUS, "message": error}
             )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
