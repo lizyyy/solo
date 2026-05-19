@@ -1,0 +1,43 @@
+interactions:
+- request:
+    body:
+      string: '{"phone": "PHONE_MASKED_5678", "password": "mySecretPass123!", "email":
+        "EMAIL_MASKED_fce0ea"}'
+    headers:
+      Authorization:
+      - TOKEN_MASKED_2b7d87af7a6bc57c
+      Content-Type:
+      - application/json
+      X-API-Key:
+      - TOKEN_MASKED_c88843ea27ed7413
+    method: POST
+    uri: https://api.example.com/login
+  response:
+    body:
+      string: '{"token": "TOKEN_MASKED_b69588c0055aa344", "user": {"phone": "PHONE_MASKED_4321",
+        "id_card": "ID_MASKED_1e1c60"}}'
+    headers:
+      Content-Type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body:
+      string: ''
+    headers:
+      Authorization:
+      - TOKEN_MASKED_3f5a8e0610cb1d5a
+    method: GET
+    uri: https://api.example.com/profile
+  response:
+    body:
+      string: '{"contacts": [{"name": "Alice", "phone": "PHONE_MASKED_2222", "email":
+        "EMAIL_MASKED_29a8f9"}, {"name": "Bob", "phone": "PHONE_657cf98e", "email":
+        "EMAIL_MASKED_5cdb3a"}]}'
+    headers:
+      Content-Type:
+      - application/json
+    status:
+      code: 200
+      message: OK

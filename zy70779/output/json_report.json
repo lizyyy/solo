@@ -1,0 +1,73 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "generated_at": "2026-05-19T16:05:01.269687",
+    "tool_name": "APIcassette脱敏排查CLI"
+  },
+  "summary": {
+    "input_file": "json_cassette.json",
+    "output_file": "json_output.json",
+    "total_sensitive_matches": 4,
+    "is_clean_after_sanitization": true,
+    "remaining_leaks_count": 0,
+    "location_breakdown": {
+      "request_headers": 2,
+      "request_body": 1,
+      "response_headers": 0,
+      "response_body": 1
+    }
+  },
+  "details": {
+    "sensitive_matches": {
+      "count": 4,
+      "by_rule": {
+        "bearer_token": 1,
+        "jwt_token": 1,
+        "phone_number": 1,
+        "api_key": 1
+      },
+      "by_location": {
+        "request_headers": 2,
+        "request_body": 1,
+        "response_body": 1
+      },
+      "items": [
+        {
+          "field_path": "interactions[0].request.headers.Authorization",
+          "rule_name": "bearer_token",
+          "location": "request_headers",
+          "masked_preview": "TOKEN_MASKED_45c7c90c427442c4"
+        },
+        {
+          "field_path": "interactions[0].request.headers.Authorization",
+          "rule_name": "jwt_token",
+          "location": "request_headers",
+          "masked_preview": "TOKEN_MASKED_a73a3c024989028f"
+        },
+        {
+          "field_path": "interactions[0].request.body",
+          "rule_name": "phone_number",
+          "location": "request_body",
+          "masked_preview": "PHONE_MASKED_1111"
+        },
+        {
+          "field_path": "interactions[0].response.body",
+          "rule_name": "api_key",
+          "location": "response_body",
+          "masked_preview": "TOKEN_MASKED_a5944324c952ae65"
+        }
+      ]
+    },
+    "remaining_leaks": {
+      "count": 0,
+      "by_rule": {},
+      "by_location": {}
+    },
+    "replacement_mapping": {
+      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.signature": "TOKEN_MASKED_45c7c90c427442c4",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.signature": "TOKEN_MASKED_a73a3c024989028f",
+      "13800001111": "PHONE_MASKED_1111",
+      "sk_test_abcdefghijklmnop": "TOKEN_MASKED_a5944324c952ae65"
+    }
+  }
+}

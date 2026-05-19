@@ -1,0 +1,10 @@
+[
+  {
+    "name": "custom_key",
+    "pattern": "custom_[a-z0-9]{16,32}"
+  },
+  {
+    "name": "internal_id",
+    "pattern": "INT-[A-Z0-9]{8,12}"
+  }
+]

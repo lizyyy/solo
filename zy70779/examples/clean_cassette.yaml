@@ -1,0 +1,18 @@
+interactions:
+  - request:
+      method: GET
+      uri: https://api.example.com/users
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: ""
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: '{"count": 2, "users": [{"id": 1, "name": "Test User 1"}, {"id": 2, "name": "Test User 2"}]}'

@@ -1,0 +1,25 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "method": "POST",
+        "uri": "https://api.example.com/auth",
+        "headers": {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.signature",
+          "Content-Type": "application/json"
+        },
+        "body": "{\"phone\": \"13800001111\", \"secret\": \"test_secret_value\"}"
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"access_token\": \"sk_test_abcdefghijklmnop\", \"expires_in\": 3600}"
+      }
+    }
+  ]
+}

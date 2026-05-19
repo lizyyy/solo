@@ -1,0 +1,40 @@
+interactions:
+  - request:
+      method: POST
+      uri: https://api.example.com/login
+      headers:
+        Authorization:
+          - Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiJKb2huIERvZSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        Content-Type:
+          - application/json
+        X-API-Key:
+          - stripe_live_key_placeholder
+      body:
+        string: '{"phone": "13812345678", "password": "mySecretPass123!", "email": "john.doe@example.com"}'
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: '{"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c", "user": {"phone": "13987654321", "id_card": "110101199001011234"}}'
+
+  - request:
+      method: GET
+      uri: https://api.example.com/profile
+      headers:
+        Authorization:
+          - Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+      body:
+        string: ""
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: '{"contacts": [{"name": "Alice", "phone": "13611112222", "email": "alice@test.org"}, {"name": "Bob", "phone": "8613733334444", "email": "bob@example.net"}]}'

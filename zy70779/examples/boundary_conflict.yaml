@@ -1,0 +1,34 @@
+interactions:
+  - request:
+      method: POST
+      uri: https://api.example.com/test
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: '{"order_no": "ORD-13812345678-001", "remark": "手机号段测试: 138开头是中国移动", "data": "eyJ0ZXN0IjoiYmFzZTY0In0="}'
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: '{"log": "用户 1381234 登录成功", "ids": ["110101", "3101011990"], "mixed": "sk_12345_not_a_real_key"}'
+
+  - request:
+      method: GET
+      uri: https://api.example.com/numbers
+      headers: {}
+      body:
+        string: ""
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json
+      body:
+        string: '{"valid_phones": ["13812345678", "13987654321"], "invalid_phones": ["1234567890", "0000000000"]}'

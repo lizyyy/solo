@@ -1,0 +1,151 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "generated_at": "2026-05-19T16:04:19.866154",
+    "tool_name": "APIcassette脱敏排查CLI"
+  },
+  "summary": {
+    "input_file": "dirty_cassette.yaml",
+    "output_file": "sanitized.yaml",
+    "total_sensitive_matches": 15,
+    "is_clean_after_sanitization": true,
+    "remaining_leaks_count": 0,
+    "location_breakdown": {
+      "request_headers": 5,
+      "request_body": 2,
+      "response_headers": 0,
+      "response_body": 8
+    }
+  },
+  "details": {
+    "sensitive_matches": {
+      "count": 15,
+      "by_rule": {
+        "bearer_token": 2,
+        "jwt_token": 3,
+        "api_key": 1,
+        "phone_number": 5,
+        "email": 3,
+        "id_card": 1
+      },
+      "by_location": {
+        "request_headers": 5,
+        "request_body": 2,
+        "response_body": 8
+      },
+      "items": [
+        {
+          "field_path": "interactions[0].request.headers.Authorization",
+          "rule_name": "bearer_token",
+          "location": "request_headers",
+          "masked_preview": "TOKEN_MASKED_2b7d87af7a6bc57c"
+        },
+        {
+          "field_path": "interactions[0].request.headers.Authorization",
+          "rule_name": "jwt_token",
+          "location": "request_headers",
+          "masked_preview": "TOKEN_MASKED_ae1f7d9edfe116bc"
+        },
+        {
+          "field_path": "interactions[0].request.headers.X-API-Key",
+          "rule_name": "api_key",
+          "location": "request_headers",
+          "masked_preview": "TOKEN_MASKED_c88843ea27ed7413"
+        },
+        {
+          "field_path": "interactions[0].request.body",
+          "rule_name": "phone_number",
+          "location": "request_body",
+          "masked_preview": "PHONE_MASKED_5678"
+        },
+        {
+          "field_path": "interactions[0].request.body",
+          "rule_name": "email",
+          "location": "request_body",
+          "masked_preview": "EMAIL_MASKED_fce0ea"
+        },
+        {
+          "field_path": "interactions[0].response.body",
+          "rule_name": "jwt_token",
+          "location": "response_body",
+          "masked_preview": "TOKEN_MASKED_b69588c0055aa344"
+        },
+        {
+          "field_path": "interactions[0].response.body",
+          "rule_name": "phone_number",
+          "location": "response_body",
+          "masked_preview": "PHONE_MASKED_4321"
+        },
+        {
+          "field_path": "interactions[0].response.body",
+          "rule_name": "phone_number",
+          "location": "response_body",
+          "masked_preview": "PHONE_MASKED_1123"
+        },
+        {
+          "field_path": "interactions[0].response.body",
+          "rule_name": "id_card",
+          "location": "response_body",
+          "masked_preview": "ID_MASKED_1e1c60"
+        },
+        {
+          "field_path": "interactions[1].request.headers.Authorization",
+          "rule_name": "bearer_token",
+          "location": "request_headers",
+          "masked_preview": "TOKEN_MASKED_3f5a8e0610cb1d5a"
+        },
+        {
+          "field_path": "interactions[1].request.headers.Authorization",
+          "rule_name": "jwt_token",
+          "location": "request_headers",
+          "masked_preview": "TOKEN_MASKED_b69588c0055aa344"
+        },
+        {
+          "field_path": "interactions[1].response.body",
+          "rule_name": "phone_number",
+          "location": "response_body",
+          "masked_preview": "PHONE_MASKED_2222"
+        },
+        {
+          "field_path": "interactions[1].response.body",
+          "rule_name": "phone_number",
+          "location": "response_body",
+          "masked_preview": "PHONE_657cf98e"
+        },
+        {
+          "field_path": "interactions[1].response.body",
+          "rule_name": "email",
+          "location": "response_body",
+          "masked_preview": "EMAIL_MASKED_29a8f9"
+        },
+        {
+          "field_path": "interactions[1].response.body",
+          "rule_name": "email",
+          "location": "response_body",
+          "masked_preview": "EMAIL_MASKED_5cdb3a"
+        }
+      ]
+    },
+    "remaining_leaks": {
+      "count": 0,
+      "by_rule": {},
+      "by_location": {}
+    },
+    "replacement_mapping": {
+      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiJKb2huIERvZSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c": "TOKEN_MASKED_2b7d87af7a6bc57c",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiJKb2huIERvZSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c": "TOKEN_MASKED_ae1f7d9edfe116bc",
+      "stripe_live_key_placeholder": "TOKEN_MASKED_c88843ea27ed7413",
+      "13812345678": "PHONE_MASKED_5678",
+      "john.doe@example.com": "EMAIL_MASKED_fce0ea",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c": "TOKEN_MASKED_b69588c0055aa344",
+      "13987654321": "PHONE_MASKED_4321",
+      "19900101123": "PHONE_MASKED_1123",
+      "110101199001011234": "ID_MASKED_1e1c60",
+      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c": "TOKEN_MASKED_3f5a8e0610cb1d5a",
+      "13611112222": "PHONE_MASKED_2222",
+      "8613733334444": "PHONE_657cf98e",
+      "alice@test.org": "EMAIL_MASKED_29a8f9",
+      "bob@example.net": "EMAIL_MASKED_5cdb3a"
+    }
+  }
+}
