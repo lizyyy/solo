@@ -1,0 +1,149 @@
+{
+  "info": {
+    "name": "示例API Collection - 用于审计测试",
+    "_postman_id": "sample-collection-12345",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "用户模块",
+      "item": [
+        {
+          "name": "获取用户列表 - 有断言和示例",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response has data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users?page={{page}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "{{page}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "成功获取用户列表",
+              "originalRequest": {
+                "method": "GET"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\"data\":[{\"id\":1,\"name\":\"张三\"},{\"id\":2,\"name\":\"李四\"}],\"total\":2}"
+            }
+          ]
+        },
+        {
+          "name": "创建用户 - 只有断言无示例",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"{{user_name}}\",\"email\":\"{{user_email}}\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "删除用户 - 无断言无示例",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "订单模块",
+      "item": [
+        {
+          "name": "获取订单详情 - 只有示例无断言",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/orders/{{order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "{{order_id}}"]
+            }
+          },
+          "response": [
+            {
+              "name": "成功获取订单详情",
+              "originalRequest": {
+                "method": "GET"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\"id\":1,\"status\":\"paid\",\"amount\":99.99}"
+            }
+          ]
+        },
+        {
+          "name": "创建订单 - 完全空白",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
