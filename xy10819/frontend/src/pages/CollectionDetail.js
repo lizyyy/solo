@@ -29,6 +29,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { collections, steps, batches, executions } from '../services/api';
 
+const { Panel } = Collapse;
+
 function CollectionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -157,12 +159,6 @@ function CollectionDetail() {
 
   const handleCompare = () => {
     setCompareModalVisible(true);
-  };
-
-  const loadCompareData = async () => {
-    if (compareBatches.length === 2) {
-      return;
-    }
   };
 
   const handleRun = async () => {
