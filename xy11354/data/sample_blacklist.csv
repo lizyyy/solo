@@ -1,0 +1,6 @@
+type,name,phone,idCard,licensePlate,reason,level
+person,危险人员A,13999999999,110101199000000001,,多次强行闯卡,high
+person,可疑人员B,13888888888,110101199000000002,,携带违禁物品,normal
+vehicle,,,110101199000000003,京Z99999,套牌车辆,high
+person,滋事人员C,13777777777,110101199000000004,,寻衅滋事,normal
+vehicle,,,110101199000000005,京X88888,未授权车辆,low
