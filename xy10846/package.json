@@ -8,7 +8,8 @@
     "dev": "node server/index.js",
     "init-db": "node server/database/init.js",
     "verify": "node verify.js",
-    "test": "bash test-api.sh"
+    "test": "bash test-api.sh",
+    "quick-start": "bash quick-start.sh"
   },
   "dependencies": {
     "express": "^4.18.2",
