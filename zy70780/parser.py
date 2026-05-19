@@ -92,18 +92,32 @@ class LockfileParser:
         errors = []
 
         try:
-            pattern = r'(.+?)@(.+?):\s*version "(.+?)"\s*resolved "(.+?)"\s*integrity (.+?)(?:\s|$)'
-            matches = re.findall(pattern, content, re.DOTALL)
+            pattern = r'^(.+?):\s*$\s*version "([^"]+)"\s*resolved "([^"]+)"\s*integrity\s+([^\s]+)'
+            matches = re.findall(pattern, content, re.MULTILINE)
 
-            for name, version_spec, version, resolved, integrity in matches:
-                pkg = {
-                    "package_name": name.strip(),
-                    "version": version.strip(),
-                    "registry": self._extract_registry(resolved.strip()),
-                    "integrity_hash": integrity.strip(),
-                    "resolved": resolved.strip()
-                }
-                packages.append(pkg)
+            for package_key, version, resolved, integrity in matches:
+                selectors = [s.strip() for s in package_key.split(",")]
+                for selector in selectors:
+                    selector = selector.strip().strip('"').strip("'")
+                    if not selector:
+                        continue
+                    
+                    if selector.startswith("@") and "/" in selector:
+                        parts = selector.rsplit("@", 1)
+                        package_name = parts[0]
+                    else:
+                        parts = selector.split("@", 1)
+                        package_name = parts[0]
+
+                    pkg = {
+                        "package_name": package_name,
+                        "version": version,
+                        "registry": self._extract_registry(resolved),
+                        "integrity_hash": integrity,
+                        "resolved": resolved
+                    }
+                    packages.append(pkg)
+                    break
 
         except Exception as e:
             errors.append(f"yarn.lock parse error: {str(e)}")
@@ -131,12 +145,17 @@ class LockfileParser:
                         match = re.search(r"/([^/@]+)", path)
                         name = match.group(1) if match else path.split("/")[-1].split("@")[0]
 
+                resolution = info.get("resolution", {})
+                integrity = info.get("integrity", "")
+                if not integrity and isinstance(resolution, dict):
+                    integrity = resolution.get("integrity", "")
+
                 pkg = {
                     "package_name": name,
                     "version": info.get("version", path.split("/")[-1].split("@")[-1]),
-                    "registry": self._extract_registry(info.get("resolution", {}).get("tarball", "")),
-                    "integrity_hash": info.get("integrity", ""),
-                    "resolved": info.get("resolution", {}).get("tarball", "")
+                    "registry": self._extract_registry(resolution.get("tarball", "") if isinstance(resolution, dict) else ""),
+                    "integrity_hash": integrity,
+                    "resolved": resolution.get("tarball", "") if isinstance(resolution, dict) else ""
                 }
                 packages.append(pkg)
 

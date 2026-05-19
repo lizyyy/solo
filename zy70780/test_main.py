@@ -518,3 +518,97 @@ def test_pipfile_index_pypi_mapping():
     assert packages[0]["registry"] == "https://pypi.org/simple"
     assert packages[0]["package_name"] == "requests"
     assert packages[0]["version"] == "2.31.0"
+
+
+def test_yarn_scoped_multi_selector():
+    from parser import LockfileParser
+
+    parser = LockfileParser()
+
+    yarn_lock_content = '''
+"@babel/core@^7.0.0", "@babel/core@^7.1.0":
+  version "7.18.5"
+  resolved "https://registry.npmjs.org/@babel/core/-/core-7.18.5.tgz"
+  integrity sha512-JGYANYP5Q8g7A6Q6PWwKz/B2jM2qM2qM2qM2qM2qM2q==
+
+lodash@^4.17.0:
+  version "4.17.21"
+  resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+'''
+
+    packages, errors = parser.parse(yarn_lock_content, "yarn.lock")
+    assert len(errors) == 0
+    assert len(packages) == 2
+
+    babel_pkg = next((p for p in packages if p["package_name"] == "@babel/core"), None)
+    assert babel_pkg is not None
+    assert babel_pkg["version"] == "7.18.5"
+    assert babel_pkg["registry"] == "https://registry.npmjs.org"
+    assert "sha512-JGYANYP5" in babel_pkg["integrity_hash"]
+
+    lodash_pkg = next((p for p in packages if p["package_name"] == "lodash"), None)
+    assert lodash_pkg is not None
+    assert lodash_pkg["version"] == "4.17.21"
+
+
+def test_pnpm_lock_resolution_integrity():
+    from parser import LockfileParser
+
+    parser = LockfileParser()
+
+    pnpm_lock_content = '''
+lockfileVersion: '6.0'
+
+packages:
+  /express/4.18.2:
+    resolution:
+      tarball: https://registry.npmjs.org/express/-/express-4.18.2.tgz
+      integrity: sha512-5/PsL6iGPdfQ/lKM1UuielYgv3BUoJfz1aUwU9vHZ+J7gyvwdQXFEBIEIaxeGf0GIcreATNyBExtalisDbuMqQ==
+    version: 4.18.2
+
+  /lodash/4.17.21:
+    resolution:
+      tarball: https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz
+    integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+    version: 4.17.21
+'''
+
+    packages, errors = parser.parse(pnpm_lock_content, "pnpm-lock.yaml")
+    assert len(errors) == 0
+    assert len(packages) == 2
+
+    express_pkg = next((p for p in packages if p["package_name"] == "express"), None)
+    assert express_pkg is not None
+    assert express_pkg["version"] == "4.18.2"
+    assert "sha512-5/PsL6iGPdf" in express_pkg["integrity_hash"]
+
+    lodash_pkg = next((p for p in packages if p["package_name"] == "lodash"), None)
+    assert lodash_pkg is not None
+    assert lodash_pkg["version"] == "4.17.21"
+    assert "sha512-v2kDEe57lecT" in lodash_pkg["integrity_hash"]
+
+
+def test_pnpm_scoped_package_parsing():
+    from parser import LockfileParser
+
+    parser = LockfileParser()
+
+    pnpm_lock_content = '''
+lockfileVersion: '6.0'
+
+packages:
+  /@babel/core/7.18.5:
+    resolution:
+      tarball: https://registry.npmjs.org/@babel/core/-/core-7.18.5.tgz
+      integrity: sha512-JGYANYP5Q8g7A6Q6PWwKz/B2jM2qM2qM2qM2qM2qM2q==
+    version: 7.18.5
+'''
+
+    packages, errors = parser.parse(pnpm_lock_content, "pnpm-lock.yaml")
+    assert len(errors) == 0
+    assert len(packages) == 1
+
+    assert packages[0]["package_name"] == "@babel/core"
+    assert packages[0]["version"] == "7.18.5"
+    assert "sha512-JGYANYP5" in packages[0]["integrity_hash"]
