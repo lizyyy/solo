@@ -151,7 +151,7 @@ def parse(ua_string, rules):
     click.echo(f"  Is PC:     {parsed.is_pc}")
     click.echo(f"  UA Hash:   {parsed.hash}")
     
-    from ua_parser import LogEntry
+    from ua_parse import LogEntry
     entry = LogEntry(line_number=0, raw_line="")
     entry.user_agent = ua_string
     entry.parsed_ua = parsed

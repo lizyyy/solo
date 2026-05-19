@@ -1,0 +1,276 @@
+{
+  "category_distribution": {
+    "client": {
+      "count": 3,
+      "percentage": 27.27,
+      "unique_ips": 3,
+      "unique_uas": 3
+    },
+    "crawler": {
+      "count": 2,
+      "percentage": 18.18,
+      "unique_ips": 2,
+      "unique_uas": 2
+    },
+    "risk": {
+      "count": 2,
+      "percentage": 18.18,
+      "unique_ips": 2,
+      "unique_uas": 2
+    },
+    "unknown": {
+      "count": 4,
+      "percentage": 36.36,
+      "unique_ips": 1,
+      "unique_uas": 1
+    }
+  },
+  "classification_rules_used": 5,
+  "clustering": {
+    "clusters": [
+      {
+        "category": "unknown",
+        "cluster_id": "CLS-UNKNOWN-06110140",
+        "common_patterns": [
+          "unknownclient"
+        ],
+        "representative_ua": "UnknownClient/1.0",
+        "sample_count": 4,
+        "sample_lines": [
+          7,
+          8,
+          9,
+          10
+        ],
+        "total_requests": 4,
+        "unique_ips": 1,
+        "unique_paths": 4
+      }
+    ],
+    "total_clusters": 1
+  },
+  "generated_at": "stable",
+  "input_file": "tmpxvvchq_u.log",
+  "invalid_lines": [
+    {
+      "line_number": 11,
+      "raw_line": "invalid log line here",
+      "reason": "parse_failed"
+    }
+  ],
+  "path_signatures": [
+    {
+      "count": 3,
+      "signature": "/",
+      "top_category": "client",
+      "unique_ips": 3,
+      "unique_uas": 3
+    },
+    {
+      "count": 1,
+      "signature": "/robots.txt",
+      "top_category": "crawler",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "signature": "/api/v1/users",
+      "top_category": "crawler",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "signature": "/admin",
+      "top_category": "risk",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "signature": "/test1",
+      "top_category": "unknown",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "signature": "/test2",
+      "top_category": "unknown",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "signature": "/test3",
+      "top_category": "unknown",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "signature": "/test4",
+      "top_category": "unknown",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "signature": "/api",
+      "top_category": "client",
+      "unique_ips": 1,
+      "unique_uas": 1
+    }
+  ],
+  "report_id": "test_21938",
+  "summary": {
+    "invalid_entries": 1,
+    "total_lines": 12,
+    "unique_ips": 8,
+    "unique_paths": 9,
+    "unique_user_agents": 8,
+    "valid_entries": 11
+  },
+  "suspicious_ips": [],
+  "top_paths": [
+    {
+      "count": 3,
+      "path": "/",
+      "top_category": "client",
+      "unique_ips": 3,
+      "unique_uas": 3
+    },
+    {
+      "count": 1,
+      "path": "/robots.txt",
+      "top_category": "crawler",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "path": "/api/v1/users",
+      "top_category": "crawler",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "path": "/admin",
+      "top_category": "risk",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "path": "/test1",
+      "top_category": "unknown",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "path": "/test2",
+      "top_category": "unknown",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "path": "/test3",
+      "top_category": "unknown",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "path": "/test4",
+      "top_category": "unknown",
+      "unique_ips": 1,
+      "unique_uas": 1
+    },
+    {
+      "count": 1,
+      "path": "/api",
+      "top_category": "client",
+      "unique_ips": 1,
+      "unique_uas": 1
+    }
+  ],
+  "top_user_agents": [
+    {
+      "count": 4,
+      "sample_preview": "UnknownClient/1.0",
+      "ua": "UnknownClient/1.0"
+    },
+    {
+      "count": 1,
+      "sample_preview": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Sa",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    },
+    {
+      "count": 1,
+      "sample_preview": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+      "ua": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+    },
+    {
+      "count": 1,
+      "sample_preview": "curl/7.68.0",
+      "ua": "curl/7.68.0"
+    },
+    {
+      "count": 1,
+      "sample_preview": "-",
+      "ua": "-"
+    },
+    {
+      "count": 1,
+      "sample_preview": "Mozilla/5.0 zgrab/0.x",
+      "ua": "Mozilla/5.0 zgrab/0.x"
+    },
+    {
+      "count": 1,
+      "sample_preview": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Vers",
+      "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1"
+    },
+    {
+      "count": 1,
+      "sample_preview": "Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.1",
+      "ua": "Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.144 Mobile Safari/537.36"
+    }
+  ],
+  "unknown_samples_summary": {
+    "top_unknown_ips": [
+      {
+        "count": 4,
+        "ip": "10.0.0.1"
+      }
+    ],
+    "top_unknown_paths": [
+      {
+        "count": 1,
+        "path": "/test1"
+      },
+      {
+        "count": 1,
+        "path": "/test2"
+      },
+      {
+        "count": 1,
+        "path": "/test3"
+      },
+      {
+        "count": 1,
+        "path": "/test4"
+      }
+    ],
+    "top_unknown_uas": [
+      {
+        "count": 4,
+        "ua": "UnknownClient/1.0"
+      }
+    ],
+    "total_unknown": 4
+  }
+}

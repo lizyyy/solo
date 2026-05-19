@@ -25,19 +25,30 @@ class Rule:
             return False
         if self.is_mobile is not None and parsed_ua.is_mobile != self.is_mobile:
             return False
-        if self.ua_families and parsed_ua.family not in self.ua_families:
-            return False
-        if self.os_families and parsed_ua.os_family not in self.os_families:
-            return False
-        if self.device_families and parsed_ua.device_family not in self.device_families:
+        
+        has_conditions = (self.ua_families or self.os_families or 
+                         self.device_families or self.compiled_patterns)
+        
+        if not has_conditions:
             return False
         
-        ua_string = entry.user_agent.lower() if entry.user_agent else ""
-        for pattern in self.compiled_patterns:
-            if pattern.search(ua_string):
-                return True
+        matched = False
         
-        return False
+        if self.ua_families and parsed_ua.family in self.ua_families:
+            matched = True
+        if self.os_families and parsed_ua.os_family in self.os_families:
+            matched = True
+        if self.device_families and parsed_ua.device_family in self.device_families:
+            matched = True
+        
+        if self.compiled_patterns and not matched:
+            ua_string = entry.user_agent.lower() if entry.user_agent else ""
+            for pattern in self.compiled_patterns:
+                if pattern.search(ua_string):
+                    matched = True
+                    break
+        
+        return matched
 
 
 class RuleMatcher:
