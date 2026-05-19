@@ -1,0 +1,4 @@
+ID,来源类型,原始数据,行号,失败原因,修改建议,创建时间
+"3","申诉单","{"complaintId":"COMP004","parentName":"赵*","parentPhone":"inv****hone","studentName":"赵*红","routeId"","5","第 5 行: parentPhone 格式错误","请填写正确的手机号格式，例如：13800138000","2026-05-19 14:30:43"
+"2","GPS JSON","{"deviceId":"GPS001","driverId":"DRIVER001","timestamp":"invalid_time","latitude":39.9068,"longitude","5","第 5 条: timestamp 格式错误","请使用正确的时间格式：YYYY-MM-DD HH:mm:ss","2026-05-19 14:30:14"
+"1","站点时刻表CSV","{"routeId":"INVALID","stopId":"","stopName":"缺ID站","scheduledTime":"2024-05-20 09:00:00","latitude":","6","第 6 行: stopId 不能为空","请填写有效的站点ID，例如：STOP001","2026-05-19 14:29:58"

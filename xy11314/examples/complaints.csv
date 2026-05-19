@@ -1,0 +1,5 @@
+complaintId,parentName,parentPhone,studentName,routeId,stopId,scheduledDate,scheduledTime,complaintType,description
+COMP001,张三,13800138000,张小明,ROUTE001,STOP001,2024-05-20,07:30:00,late,校车迟到2分钟
+COMP002,李四,13900139000,李小华,ROUTE001,STOP002,2024-05-20,07:35:00,late,校车迟到3分钟
+COMP003,王五,13700137000,王小强,ROUTE001,STOP003,2024-05-20,07:40:00,no_show,校车未到站
+COMP004,赵六,invalid_phone,赵小红,ROUTE002,STOP001,2024-05-20,08:00:00,early,校车早到

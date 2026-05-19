@@ -1,0 +1,5 @@
+ID,实体类型,实体ID,操作,操作人,时间,详情
+"4","undefined","undefined","export_adjudications","cli","2026-05-19 14:39:33","{"format":"csv","includeSensitive":false,"outputPath":"output/report.csv","recordCount":1}"
+"3","undefined","undefined","review","张调度","2026-05-19 14:36:39","{"reviewStatus":"confirmed","reviewNotes":"情况属实","previousStatus":"confirmed"}"
+"2","undefined","undefined","adjudicate","system","2026-05-19 14:34:53","{"complaintId":1,"result":"driver_fault","confidence":1,"reasons":["站点附近无GPS记录，无法确认车辆位置","司机未在该站点进行打卡","数据匹配置信度较低 (20.0%)"]}"
+"1","undefined","undefined","match","system","2026-05-19 14:34:19","{"matchId":1,"confidence":0.2,"gpsRecordsCount":0,"checkinRecordsCount":0}"
