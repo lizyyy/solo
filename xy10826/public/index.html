@@ -152,6 +152,7 @@
             <button class="tab active" data-panel="identities">身份管理</button>
             <button class="tab" data-panel="merges">合并事务</button>
             <button class="tab" data-panel="audit">审计日志</button>
+            <button class="tab" data-panel="requests">请求审计</button>
         </div>
 
         <div id="identitiesPanel" class="panel active">
@@ -239,6 +240,37 @@
                 </div>
             </div>
         </div>
+
+        <div id="requestsPanel" class="panel">
+            <div class="toolbar">
+                <select class="filter-select" id="requestFilter">
+                    <option value="">全部请求</option>
+                    <option value="true">仅错误</option>
+                    <option value="false">仅成功</option>
+                </select>
+                <button class="btn btn-primary" onclick="loadRequests()">刷新</button>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table" id="requestsTable">
+                        <thead>
+                            <tr>
+                                <th>请求ID</th>
+                                <th>方法</th>
+                                <th>路径</th>
+                                <th>操作人</th>
+                                <th>状态</th>
+                                <th>响应大小</th>
+                                <th>耗时</th>
+                                <th>时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal" id="identityDetailModal">
@@ -316,6 +348,20 @@
         </div>
     </div>
 
+    <div class="modal" id="requestDetailModal" style="z-index: 1001;">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <span class="modal-title">请求详情 - 完整审计快照</span>
+                <button class="modal-close" onclick="closeModal('requestDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="requestDetailContent">
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('requestDetailModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
@@ -329,6 +375,7 @@
             await loadIdentities();
             await loadMerges();
             await loadAudit();
+            await loadRequests();
             setupEventListeners();
         }
 
@@ -347,6 +394,7 @@
             document.getElementById('mergeSearch').addEventListener('input', debounce(loadMerges, 300));
             document.getElementById('statusFilter').addEventListener('change', loadMerges);
             document.getElementById('actionFilter').addEventListener('change', loadAudit);
+            document.getElementById('requestFilter').addEventListener('change', loadRequests);
             document.getElementById('selectAllIdentities').addEventListener('change', toggleSelectAll);
         }
 
@@ -484,6 +532,154 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        async function loadRequests() {
+            const isError = document.getElementById('requestFilter').value;
+            const params = new URLSearchParams();
+            if (isError) params.set('isError', isError);
+            params.set('limit', 50);
+
+            const result = await apiCall(API_BASE + '/audit/requests?' + params);
+            if (result.success) {
+                renderRequests(result.data);
+            }
+        }
+
+        function renderRequests(requests) {
+            const tbody = document.querySelector('#requestsTable tbody');
+            if (requests.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📋</div><div>暂无请求日志</div></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = requests.map(req => `
+                <tr>
+                    <td><code style="font-size: 11px;">${req.requestId || req.id?.substring(0, 12) || '-'}</code></td>
+                    <td><strong style="color: ${req.request?.method === 'GET' ? '#10b981' : '#667eea'}">${req.request?.method || '-'}</strong></td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${req.request?.path || '-'}</td>
+                    <td>${req.operator || '-'}</td>
+                    <td>
+                        ${req.response?.success 
+                            ? '<span class="badge badge-completed">成功</span>' 
+                            : '<span class="badge badge-failed">失败</span>'}
+                    </td>
+                    <td>${formatBytes(req.response?.responseSize || 0)}</td>
+                    <td>${req.response?.duration || 0}ms</td>
+                    <td>${formatDate(req.timestamp)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="showRequestDetail('${req.requestId || req.id}')">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function showRequestDetail(requestId) {
+            const result = await apiCall(API_BASE + '/audit/requests/' + requestId);
+            if (result.success) {
+                const req = result.data;
+                const request = req.request || {};
+                const response = req.response || {};
+
+                document.getElementById('requestDetailContent').innerHTML = `
+                    <div class="detail-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
+                        <div class="detail-item">
+                            <div class="detail-label">请求ID</div>
+                            <div class="detail-value"><code>${req.requestId}</code></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">请求方法</div>
+                            <div class="detail-value"><strong>${request.method || '-'}</strong></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">状态码</div>
+                            <div class="detail-value">
+                                ${response.statusCode} 
+                                ${response.success ? '✅' : '❌'}
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">操作人</div>
+                            <div class="detail-value">${req.operator || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">响应大小</div>
+                            <div class="detail-value">${formatBytes(response.responseSize || 0)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">响应耗时</div>
+                            <div class="detail-value">${response.duration || 0}ms</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">响应类型</div>
+                            <div class="detail-value">${response.responseType || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">客户端IP</div>
+                            <div class="detail-value">${request.ip || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">时间</div>
+                            <div class="detail-value">${formatDate(req.timestamp)}</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 12px; color: #667eea;">📥 请求输入快照</h4>
+                        <div style="background: #f8f9fa; padding: 16px; border-radius: 8px;">
+                            <div style="margin-bottom: 12px;">
+                                <strong style="color: #333;">URL:</strong> 
+                                <code style="background: white; padding: 2px 6px; border-radius: 4px;">${request.url || '-'}</code>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong style="color: #333;">查询参数:</strong>
+                                <pre style="background: white; padding: 12px; border-radius: 6px; margin-top: 6px; overflow-x: auto; font-size: 12px;">${JSON.stringify(request.queryParams || {}, null, 2)}</pre>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <strong style="color: #333;">请求体:</strong>
+                                <pre style="background: white; padding: 12px; border-radius: 6px; margin-top: 6px; overflow-x: auto; font-size: 12px;">${JSON.stringify(request.body || {}, null, 2)}</pre>
+                            </div>
+                            <div>
+                                <strong style="color: #333;">请求头:</strong>
+                                <pre style="background: white; padding: 12px; border-radius: 6px; margin-top: 6px; overflow-x: auto; font-size: 12px;">${JSON.stringify(request.headers || {}, null, 2)}</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="margin-bottom: 12px; color: #10b981;">📤 响应结果快照</h4>
+                        <div style="background: #f8f9fa; padding: 16px; border-radius: 8px;">
+                            ${response.responseType === 'csv' 
+                                ? `
+                                    <div style="margin-bottom: 12px;">
+                                        <strong style="color: #333;">CSV 预览 (前10行):</strong>
+                                        <pre style="background: white; padding: 12px; border-radius: 6px; margin-top: 6px; overflow-x: auto; font-size: 11px; max-height: 300px;">${response.csvPreview?.join('\n') || response.fullData?.substring(0, 2000) || '无数据'}</pre>
+                                    </div>
+                                    <div>
+                                        <strong style="color: #333;">总行数:</strong> ${response.csvTotalLines || '-'}
+                                    </div>
+                                ` 
+                                : `
+                                    <div>
+                                        <strong style="color: #333;">完整响应数据:</strong>
+                                        <pre style="background: white; padding: 12px; border-radius: 6px; margin-top: 6px; overflow-x: auto; font-size: 12px; max-height: 500px;">${JSON.stringify(response.fullData || {}, null, 2)}</pre>
+                                    </div>
+                                `
+                            }
+                        </div>
+                    </div>
+
+                    ${response.error ? `
+                        <div style="margin-top: 20px;">
+                            <h4 style="margin-bottom: 12px; color: #ef4444;">❌ 错误信息</h4>
+                            <div style="background: #fee2e2; padding: 16px; border-radius: 8px; color: #dc2626;">
+                                ${response.error}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+                document.getElementById('requestDetailModal').classList.add('active');
+            }
         }
 
         async function showIdentityDetail(id) {
@@ -984,6 +1180,14 @@
                 resolve_conflict: '解决冲突'
             };
             return labels[action] || action;
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
         function formatDate(dateStr) {

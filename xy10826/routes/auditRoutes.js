@@ -64,4 +64,17 @@ router.get('/requests', (req, res) => {
   }
 });
 
+router.get('/requests/:requestId', (req, res) => {
+  try {
+    const { requestId } = req.params;
+    const logs = store.getFullRequestLogs({ requestId });
+    if (logs.length === 0) {
+      return res.status(404).json({ success: false, error: '请求日志不存在' });
+    }
+    res.json({ success: true, data: logs[0] });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;
