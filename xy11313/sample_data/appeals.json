@@ -1,0 +1,44 @@
+[
+    {
+        "appeal_number": "A20240520001",
+        "student_name": "张明",
+        "parent_name": "张强",
+        "parent_phone": "13800138001",
+        "route_code": "R001",
+        "stop_name": "中心公园",
+        "bus_number": "B001",
+        "incident_date": "2024-05-20",
+        "incident_type": "late_arrival",
+        "description": "校车晚点15分钟到达，导致孩子迟到",
+        "expected_time": "07:10",
+        "actual_time": "07:25"
+    },
+    {
+        "appeal_number": "A20240520002",
+        "student_name": "李华",
+        "parent_name": "李明",
+        "parent_phone": "13800138002",
+        "route_code": "R002",
+        "stop_name": "第二小学",
+        "bus_number": "B002",
+        "incident_date": "2024-05-20",
+        "incident_type": "late_arrival",
+        "description": "校车到达时间比预计晚",
+        "expected_time": "07:15",
+        "actual_time": "07:20"
+    },
+    {
+        "appeal_number": "A20240520003",
+        "student_name": "王芳",
+        "parent_name": "王伟",
+        "parent_phone": "13800138003",
+        "route_code": "R001",
+        "stop_name": "第一小学",
+        "bus_number": "B001",
+        "incident_date": "2024-05-20",
+        "incident_type": "missing_stop",
+        "description": "校车未在站点停靠",
+        "expected_time": "07:20",
+        "actual_time": ""
+    }
+]
