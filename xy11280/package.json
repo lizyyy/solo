@@ -1,0 +1,26 @@
+{
+  "name": "vet-pharmacy-cli",
+  "version": "1.0.0",
+  "description": "宠物医院药房管理CLI - 处方、剂量计算、库存管理",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "vet-pharmacy": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "keywords": ["vet", "pharmacy", "cli", "pet", "medicine"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.3",
+    "inquirer": "^9.2.12",
+    "date-fns": "^3.3.1"
+  }
+}

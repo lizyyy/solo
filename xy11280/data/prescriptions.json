@@ -1,0 +1,84 @@
+[
+  {
+    "id": "ff09459f-79a7-4a40-8189-bb23e84187b8",
+    "prescriptionNo": "",
+    "petId": "",
+    "petName": "旺财",
+    "species": "犬",
+    "breed": "金毛",
+    "weight": 25,
+    "weightUnit": "kg",
+    "age": "3岁",
+    "doctor": "张医生",
+    "diagnosis": "皮肤感染",
+    "medicines": [
+      {
+        "medicineName": "阿莫西林",
+        "dosage": 250,
+        "dosageUnit": "mg",
+        "frequency": "每日2次",
+        "quantity": 7
+      }
+    ],
+    "notes": "注意观察过敏反应",
+    "status": "pending",
+    "reviewedBy": "",
+    "reviewedAt": "",
+    "reviewNotes": "",
+    "anomalies": [],
+    "createdAt": "2026-05-19T10:59:28.492Z",
+    "updatedAt": "2026-05-19T10:59:28.496Z"
+  },
+  {
+    "id": "3cf7b961-e6dd-4ae3-9c2f-6984f89e0019",
+    "prescriptionNo": "",
+    "petId": "",
+    "petName": "咪咪",
+    "species": "猫",
+    "breed": "英短",
+    "weight": 0.8,
+    "weightUnit": "kg",
+    "age": "2岁",
+    "doctor": "李医生",
+    "diagnosis": "呼吸道感染",
+    "medicines": [
+      {
+        "medicineName": "阿莫西林",
+        "dosage": 10,
+        "dosageUnit": "mg",
+        "frequency": "每日2次",
+        "quantity": 7
+      }
+    ],
+    "notes": "小体重患者，精确计算剂量",
+    "status": "pending",
+    "reviewedBy": "",
+    "reviewedAt": "",
+    "reviewNotes": "",
+    "anomalies": [],
+    "createdAt": "2026-05-19T10:59:28.497Z",
+    "updatedAt": "2026-05-19T10:59:28.497Z"
+  },
+  {
+    "id": "8a774fa7-0547-45af-ae1d-853f1d40c83a",
+    "prescriptionNo": "",
+    "petId": "",
+    "petName": "小白",
+    "species": "猫",
+    "breed": "",
+    "weight": 0.8,
+    "weightUnit": "kg",
+    "age": "",
+    "doctor": "王医生",
+    "diagnosis": "",
+    "medicines": [],
+    "notes": "",
+    "status": "pending",
+    "reviewedBy": "",
+    "reviewedAt": "",
+    "reviewNotes": "",
+    "anomalies": [],
+    "createdAt": "2026-05-19T11:03:44.019Z",
+    "updatedAt": "2026-05-19T11:03:44.029Z"
+  }
+]

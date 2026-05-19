@@ -1,0 +1,123 @@
+[
+  {
+    "id": "f70928c0-2c2e-45b6-8527-95710e654882",
+    "source": "dosageRules",
+    "filePath": "data/import/sample_dosage_rules.json",
+    "rowNumber": 1,
+    "originalData": {
+      "medicineName": "阿莫西林",
+      "species": "犬",
+      "minWeight": 0,
+      "maxWeight": 50,
+      "dosagePerKg": 10,
+      "dosageUnit": "mg",
+      "minDosage": 25,
+      "maxDosage": 500,
+      "frequency": "每日2次",
+      "route": "口服",
+      "notes": "饭后服用"
+    },
+    "errorMessage": "record通用名 is not defined",
+    "suggestion": "请检查必填字段是否完整，数据格式是否正确",
+    "createdAt": "2026-05-19T10:56:16.766Z"
+  },
+  {
+    "id": "0484071c-adec-458b-973c-57c309e56f7e",
+    "source": "dosageRules",
+    "filePath": "data/import/sample_dosage_rules.json",
+    "rowNumber": 2,
+    "originalData": {
+      "medicineName": "阿莫西林",
+      "species": "猫",
+      "minWeight": 0,
+      "maxWeight": 10,
+      "dosagePerKg": 12.5,
+      "dosageUnit": "mg",
+      "minDosage": 25,
+      "maxDosage": 125,
+      "frequency": "每日2次",
+      "route": "口服",
+      "notes": "注意观察是否有过敏反应"
+    },
+    "errorMessage": "record通用名 is not defined",
+    "suggestion": "请检查必填字段是否完整，数据格式是否正确",
+    "createdAt": "2026-05-19T10:56:16.769Z"
+  },
+  {
+    "id": "0f094b0e-388e-46a0-bd00-e46fcdb0a7e8",
+    "source": "dosageRules",
+    "filePath": "data/import/sample_dosage_rules.json",
+    "rowNumber": 3,
+    "originalData": {
+      "medicineName": "头孢氨苄",
+      "species": "通用",
+      "minWeight": 0,
+      "maxWeight": 100,
+      "dosagePerKg": 15,
+      "dosageUnit": "mg",
+      "minDosage": 50,
+      "maxDosage": 1500,
+      "frequency": "每日2次",
+      "route": "口服",
+      "notes": "肾功能不全者减量"
+    },
+    "errorMessage": "record通用名 is not defined",
+    "suggestion": "请检查必填字段是否完整，数据格式是否正确",
+    "createdAt": "2026-05-19T10:56:16.770Z"
+  },
+  {
+    "id": "02c18a15-92d4-454f-9f8f-0e1a502df58a",
+    "source": "inventory",
+    "filePath": "data/import/sample_inventory.csv",
+    "rowNumber": 7,
+    "originalData": {
+      "medicineName": "",
+      "batchNumber": "",
+      "quantity": "100",
+      "unit": "mg",
+      "expiryDate": "2025-01-01",
+      "location": "D-01",
+      "supplier": "",
+      "costPrice": "2.0"
+    },
+    "errorMessage": "药品名称不能为空",
+    "suggestion": "请填写药品名称或宠物名称字段",
+    "createdAt": "2026-05-19T10:57:44.814Z"
+  },
+  {
+    "id": "a75a7c1f-8361-4f34-80c5-0ca94c254fe8",
+    "source": "prescriptions",
+    "filePath": "data/import/sample_prescriptions.json",
+    "rowNumber": 3,
+    "originalData": {
+      "weight": 5,
+      "doctor": "王医生",
+      "medicines": []
+    },
+    "errorMessage": "宠物名称不能为空; 处方至少包含一种药品",
+    "suggestion": "请填写药品名称或宠物名称字段",
+    "createdAt": "2026-05-19T10:59:28.497Z"
+  },
+  {
+    "id": "8b896b83-a8f8-40ee-9c65-031719303667",
+    "source": "prescriptions",
+    "filePath": "data/import/sample_prescriptions.json",
+    "rowNumber": 4,
+    "originalData": {
+      "petName": "豆豆",
+      "species": "犬",
+      "weight": -3,
+      "doctor": "赵医生",
+      "medicines": [
+        {
+          "medicineName": "头孢氨苄",
+          "dosage": 150,
+          "dosageUnit": "mg"
+        }
+      ]
+    },
+    "errorMessage": "体重必须大于0",
+    "suggestion": "请检查宠物体重字段，确保值大于0",
+    "createdAt": "2026-05-19T10:59:28.497Z"
+  }
+]

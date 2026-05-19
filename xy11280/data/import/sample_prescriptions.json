@@ -1,0 +1,60 @@
+[
+  {
+    "petName": "旺财",
+    "species": "犬",
+    "breed": "金毛",
+    "weight": 25,
+    "weightUnit": "kg",
+    "age": "3岁",
+    "doctor": "张医生",
+    "diagnosis": "皮肤感染",
+    "medicines": [
+      {
+        "medicineName": "阿莫西林",
+        "dosage": 250,
+        "dosageUnit": "mg",
+        "frequency": "每日2次",
+        "quantity": 7
+      }
+    ],
+    "notes": "注意观察过敏反应"
+  },
+  {
+    "petName": "咪咪",
+    "species": "猫",
+    "breed": "英短",
+    "weight": 0.8,
+    "weightUnit": "kg",
+    "age": "2岁",
+    "doctor": "李医生",
+    "diagnosis": "呼吸道感染",
+    "medicines": [
+      {
+        "medicineName": "阿莫西林",
+        "dosage": 10,
+        "dosageUnit": "mg",
+        "frequency": "每日2次",
+        "quantity": 7
+      }
+    ],
+    "notes": "小体重患者，精确计算剂量"
+  },
+  {
+    "weight": 5,
+    "doctor": "王医生",
+    "medicines": []
+  },
+  {
+    "petName": "豆豆",
+    "species": "犬",
+    "weight": -3,
+    "doctor": "赵医生",
+    "medicines": [
+      {
+        "medicineName": "头孢氨苄",
+        "dosage": 150,
+        "dosageUnit": "mg"
+      }
+    ]
+  }
+]

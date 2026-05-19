@@ -1,0 +1,41 @@
+[
+  {
+    "medicineName": "阿莫西林",
+    "species": "犬",
+    "minWeight": 0,
+    "maxWeight": 50,
+    "dosagePerKg": 10,
+    "dosageUnit": "mg",
+    "minDosage": 25,
+    "maxDosage": 500,
+    "frequency": "每日2次",
+    "route": "口服",
+    "notes": "饭后服用"
+  },
+  {
+    "medicineName": "阿莫西林",
+    "species": "猫",
+    "minWeight": 0,
+    "maxWeight": 10,
+    "dosagePerKg": 12.5,
+    "dosageUnit": "mg",
+    "minDosage": 25,
+    "maxDosage": 125,
+    "frequency": "每日2次",
+    "route": "口服",
+    "notes": "注意观察是否有过敏反应"
+  },
+  {
+    "medicineName": "头孢氨苄",
+    "species": "通用",
+    "minWeight": 0,
+    "maxWeight": 100,
+    "dosagePerKg": 15,
+    "dosageUnit": "mg",
+    "minDosage": 50,
+    "maxDosage": 1500,
+    "frequency": "每日2次",
+    "route": "口服",
+    "notes": "肾功能不全者减量"
+  }
+]
