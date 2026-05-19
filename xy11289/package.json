@@ -1,0 +1,23 @@
+{
+  "name": "exhibition-equipment-manager",
+  "version": "1.0.0",
+  "description": "会展项目设备管理系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node src/scripts/initDB.js",
+    "import-sample": "node src/scripts/importSample.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "moment": "^2.29.4",
+    "json2csv": "^6.0.0-alpha.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
