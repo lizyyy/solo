@@ -4,7 +4,7 @@
       "conflict_user_count": 1,
       "total_conflicts": 1
     },
-    "generated_at": "2026-05-19T12:59:12.231588",
+    "generated_at": "stable:db62e4b7af7b",
     "has_errors": true,
     "mapping": {
       "failed_count": 2,
@@ -1470,7 +1470,7 @@
           "new_value": "",
           "reason": "多余的管理员角色",
           "corrected_by": "test",
-          "corrected_at": "2026-05-19T12:59:12.230612",
+          "corrected_at": "1978-06-05T03:36:45",
           "source_file": "examples/corrections.csv",
           "line_number": 2,
           "applied": true
@@ -1505,7 +1505,7 @@
           "new_value": "wangwu@example.com",
           "reason": "修正邮箱格式",
           "corrected_by": "test",
-          "corrected_at": "2026-05-19T12:59:12.230634",
+          "corrected_at": "2021-09-05T14:59:24",
           "source_file": "examples/corrections.csv",
           "line_number": 3,
           "applied": true

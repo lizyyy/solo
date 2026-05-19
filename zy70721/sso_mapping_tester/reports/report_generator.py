@@ -7,7 +7,7 @@ from ..core.validator import UserMappingResult
 from ..core.playback import PlaybackResult
 from ..core.conflict_detector import ConflictDetectionResult
 from ..parsers.base_parser import ParseResult
-from ..utils.hash import stable_dict
+from ..utils.hash import stable_hash, stable_sort, stable_dict
 
 
 class ReportGenerator:
@@ -22,6 +22,22 @@ class ReportGenerator:
         self.playback_results = playback_results
         self.conflict_results = conflict_results
         self.parse_results = parse_results
+        self._stable_timestamp = self._calculate_stable_timestamp()
+
+    def _calculate_stable_timestamp(self) -> str:
+        hash_input = []
+        for r in stable_sort(self.mapping_results, key=lambda x: x.user_id):
+            hash_input.append(f"map:{r.user_id}:{r.success}")
+        for r in stable_sort(self.playback_results, key=lambda x: x.user_id):
+            hash_input.append(f"play:{r.user_id}:{r.matched}:{r.has_diffs}")
+        for r in stable_sort(self.conflict_results, key=lambda x: x.user_id):
+            hash_input.append(f"conf:{r.user_id}:{len(r.conflicts)}")
+        for name in sorted(self.parse_results.keys()):
+            pr = self.parse_results[name]
+            hash_input.append(f"parse:{name}:{len(pr.items)}:{len(pr.errors)}")
+        
+        data_hash = stable_hash("|".join(hash_input))[:12]
+        return f"stable:{data_hash}"
 
     def _get_summary(self) -> Dict[str, Any]:
         total_users = len(self.mapping_results)
@@ -35,7 +51,8 @@ class ReportGenerator:
         conflict_users = sum(1 for r in self.conflict_results if r.has_conflicts)
 
         parse_errors = []
-        for name, pr in self.parse_results.items():
+        for name in sorted(self.parse_results.keys()):
+            pr = self.parse_results[name]
             for err in pr.errors:
                 parse_errors.append({
                     "category": name,
@@ -43,7 +60,7 @@ class ReportGenerator:
                 })
 
         return stable_dict({
-            "generated_at": datetime.now().isoformat(),
+            "generated_at": self._stable_timestamp,
             "mapping": {
                 "total_users": total_users,
                 "success_count": total_users - failed_mapping,
