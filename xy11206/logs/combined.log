@@ -1,0 +1,9 @@
+{"level":"info","message":"服务器运行在 http://localhost:3000","service":"pharmacy-inventory","timestamp":"2026-05-19T05:31:02.846Z"}
+{"level":"info","message":"社区药房库存管理系统启动成功","service":"pharmacy-inventory","timestamp":"2026-05-19T05:31:02.851Z"}
+{"level":"info","message":"{\"operationType\":\"other_operation\",\"operator\":\"system\",\"ip\":\"::1\",\"path\":\"/api/health\",\"method\":\"GET\",\"status\":200,\"success\":true,\"affectedRecords\":1}","service":"pharmacy-inventory","timestamp":"2026-05-19T05:31:20.119Z"}
+{"level":"info","message":"{\"operationType\":\"other_operation\",\"operator\":\"system\",\"ip\":\"::1\",\"path\":\"/import\",\"method\":\"POST\",\"status\":500,\"success\":true,\"affectedRecords\":1}","service":"pharmacy-inventory","timestamp":"2026-05-19T05:31:26.862Z"}
+{"level":"info","message":"服务器运行在 http://localhost:3000","service":"pharmacy-inventory","timestamp":"2026-05-19T05:32:26.615Z"}
+{"level":"info","message":"社区药房库存管理系统启动成功","service":"pharmacy-inventory","timestamp":"2026-05-19T05:32:26.619Z"}
+{"level":"info","message":"{\"operationType\":\"other_operation\",\"operator\":\"system\",\"ip\":\"::1\",\"path\":\"/import\",\"method\":\"POST\",\"status\":500,\"success\":true,\"affectedRecords\":1}","service":"pharmacy-inventory","timestamp":"2026-05-19T05:32:46.754Z"}
+{"level":"info","message":"{\"operationType\":\"other_operation\",\"operator\":\"system\",\"ip\":\"::1\",\"path\":\"/import\",\"method\":\"POST\",\"status\":200,\"success\":true,\"affectedRecords\":1}","service":"pharmacy-inventory","timestamp":"2026-05-19T05:32:58.312Z"}
+{"level":"info","message":"{\"operationType\":\"other_operation\",\"operator\":\"system\",\"ip\":\"::1\",\"path\":\"/2\",\"method\":\"GET\",\"status\":200,\"success\":true,\"affectedRecords\":1}","service":"pharmacy-inventory","timestamp":"2026-05-19T05:33:07.436Z"}

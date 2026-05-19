@@ -1,0 +1,5 @@
+product_code,product_name,batch_no,quantity,unit,temperature,receiver_name,receiver_phone,has_damage,damage_description,production_date,expiry_date
+VAC001,新冠疫苗,B202405001,100,支,2.5,张三,13800138000,0,,2024-01-01,2025-01-01
+VAC001,新冠疫苗,B202405002,50,支,10.0,李四,13900139000,1,包装破损,2024-02-01,2024-06-01
+INS001,甘精胰岛素注射液,B202405003,80,支,4.0,王五,13700137000,0,,2024-03-01,2026-03-01
+INS002,门冬胰岛素注射液,B202405001,60,支,-1.0,赵六,13600136000,1,冷冻损坏,2024-04-01,2026-04-01
