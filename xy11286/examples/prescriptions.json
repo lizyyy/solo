@@ -1,0 +1,56 @@
+[
+  {
+    "prescriptionNumber": "RX20240001",
+    "doctorId": "DOC001",
+    "doctorName": "张医生",
+    "petId": "PET001",
+    "petName": "豆豆",
+    "petSpecies": "金毛",
+    "petWeight": 25.5,
+    "petWeightUnit": "kg",
+    "ownerId": "OWN001",
+    "ownerName": "王小明",
+    "ownerPhone": "13800138000",
+    "diagnosis": "皮肤感染",
+    "items": [
+      {
+        "medicineCode": "MED001",
+        "medicineName": "阿莫西林片",
+        "requestedQuantity": 10,
+        "unit": "片",
+        "dosage": "每日2次，每次1片"
+      },
+      {
+        "medicineCode": "MED002",
+        "medicineName": "外用药膏",
+        "requestedQuantity": 2,
+        "unit": "瓶",
+        "dosage": "每日3次，涂于患处"
+      }
+    ],
+    "notes": "一周后复诊"
+  },
+  {
+    "prescriptionNumber": "RX20240002",
+    "doctorId": "DOC002",
+    "doctorName": "李医生",
+    "petId": "PET002",
+    "petName": "咪咪",
+    "petSpecies": "英短",
+    "petWeight": 4.2,
+    "petWeightUnit": "kg",
+    "ownerId": "OWN002",
+    "ownerName": "陈小红",
+    "ownerPhone": "13900139000",
+    "diagnosis": "肠胃炎",
+    "items": [
+      {
+        "medicineCode": "MED003",
+        "medicineName": "益生菌",
+        "requestedQuantity": 1,
+        "unit": "盒",
+        "dosage": "每日2次，每次1袋"
+      }
+    ]
+  }
+]
