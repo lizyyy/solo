@@ -1,0 +1,16 @@
+[project]
+name = "quality-control"
+version = "0.1.0"
+description = "门店品控管理 CLI 工具"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "tabulate>=0.9",
+    "openpyxl>=3.1"
+]
+
+[project.scripts]
+qc = "qc_cli.main:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
