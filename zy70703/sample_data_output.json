@@ -1,0 +1,249 @@
+{
+  "generated_at": "2026-05-19T06:51:20.069390",
+  "scenarios": [
+    {
+      "scenario": "normal",
+      "results": [
+        {
+          "success": true,
+          "lease": "lease_id='51a0da5a7488' env_id='env-01' branch_name='feature/user-login' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69547) end_time=datetime.datetime(2026, 5, 19, 14, 51, 20, 69547) reason='用户登录功能联调' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 6, 51, 20, 69556) request_id=None"
+        },
+        {
+          "success": true,
+          "lease": "lease_id='a14cf7dc7661' env_id='env-02' branch_name='feature/payment-gateway' assignee='lisi' start_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69588) end_time=datetime.datetime(2026, 5, 20, 14, 51, 20, 69588) reason='支付网关集成测试 | Renewed: 需要继续验证边界情况' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 6, 51, 20, 69591) request_id='req-001'"
+        },
+        {
+          "success": true,
+          "lease": "lease_id='a14cf7dc7661' env_id='env-02' branch_name='feature/payment-gateway' assignee='lisi' start_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69588) end_time=datetime.datetime(2026, 5, 20, 14, 51, 20, 69588) reason='支付网关集成测试 | Renewed: 需要继续验证边界情况' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 6, 51, 20, 69591) request_id='req-001'",
+          "new_end_time": "2026-05-20 14:51:20.069588"
+        },
+        {
+          "success": true,
+          "lease": "lease_id='db62d4c8fe82' env_id='env-03' branch_name='hotfix/security-patch' assignee='wangwu' start_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69608) end_time=datetime.datetime(2026, 5, 19, 10, 51, 20, 69608) reason='安全补丁紧急修复' status=<LeaseStatus.RELEASED: 'released'> release_reason='修复完成，已上线' release_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69623) created_at=datetime.datetime(2026, 5, 19, 6, 51, 20, 69610) request_id=None"
+        },
+        {
+          "success": true,
+          "env_id": "env-03",
+          "was_expired": false,
+          "force_released": false
+        }
+      ],
+      "report": {
+        "summary": {
+          "total": 5,
+          "occupied": 2,
+          "available": 3,
+          "maintenance": 0,
+          "utilization_rate": 40.0,
+          "expiring_soon": 0
+        },
+        "environments": [
+          {
+            "env_id": "env-01",
+            "status": "occupied",
+            "assignee": "zhangsan",
+            "branch": "feature/user-login",
+            "remaining_hours": 8.0,
+            "is_expired": false
+          },
+          {
+            "env_id": "env-02",
+            "status": "occupied",
+            "assignee": "lisi",
+            "branch": "feature/payment-gateway",
+            "remaining_hours": 32.0,
+            "is_expired": false
+          },
+          {
+            "env_id": "env-03",
+            "status": "available",
+            "assignee": null,
+            "branch": null,
+            "remaining_hours": null,
+            "is_expired": false
+          },
+          {
+            "env_id": "env-04",
+            "status": "available",
+            "assignee": null,
+            "branch": null,
+            "remaining_hours": null,
+            "is_expired": false
+          },
+          {
+            "env_id": "env-05",
+            "status": "available",
+            "assignee": null,
+            "branch": null,
+            "remaining_hours": null,
+            "is_expired": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "conflict",
+      "results": [
+        {
+          "success": true,
+          "lease": "lease_id='fd68658299ac' env_id='env-01' branch_name='feature/a' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69699) end_time=datetime.datetime(2026, 5, 19, 14, 51, 20, 69699) reason='A功能开发' status=<LeaseStatus.FORCE_RELEASED: 'force_released'> release_reason='管理员强制释放' release_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69731) created_at=datetime.datetime(2026, 5, 19, 6, 51, 20, 69704) request_id=None"
+        },
+        {
+          "success": false,
+          "error": "Environment env-01 is already occupied by zhangsan",
+          "conflict": {
+            "env_id": "env-01",
+            "current_assignee": "zhangsan",
+            "current_branch": "feature/a",
+            "remaining_hours": 7.999999994444445
+          }
+        },
+        {
+          "success": false,
+          "error": "Renewal conflict: environment env-01 is occupied by zhangsan, not lisi"
+        },
+        {
+          "success": false,
+          "error": "Release conflict: environment env-01 is occupied by zhangsan"
+        },
+        {
+          "success": true,
+          "env_id": "env-01",
+          "was_expired": false,
+          "force_released": true
+        },
+        {
+          "success": true,
+          "message": "Environment env-01 is already available"
+        }
+      ]
+    },
+    {
+      "scenario": "idempotent",
+      "results": [
+        {
+          "success": true,
+          "lease": "lease_id='49e9d45b81be' env_id='env-01' branch_name='feature/a' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69746) end_time=datetime.datetime(2026, 5, 19, 22, 51, 20, 69746) reason='A功能开发 | Renewed: 续租' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 6, 51, 20, 69748) request_id='same-request-id-123'"
+        },
+        {
+          "success": true,
+          "idempotent": true,
+          "message": "Duplicate request, already processed",
+          "lease": null
+        },
+        {
+          "success": true,
+          "lease": "lease_id='49e9d45b81be' env_id='env-01' branch_name='feature/a' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69746) end_time=datetime.datetime(2026, 5, 19, 22, 51, 20, 69746) reason='A功能开发 | Renewed: 续租' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 6, 51, 20, 69748) request_id='same-request-id-123'",
+          "new_end_time": "2026-05-19 22:51:20.069746"
+        },
+        {
+          "success": true,
+          "idempotent": true,
+          "message": "Duplicate request, already processed"
+        }
+      ]
+    },
+    {
+      "scenario": "expired",
+      "expired_count": 1,
+      "report": {
+        "summary": {
+          "total": 3,
+          "occupied": 2,
+          "available": 1,
+          "maintenance": 0,
+          "utilization_rate": 66.7,
+          "expiring_soon": 1
+        },
+        "environments": [
+          {
+            "env_id": "env-01",
+            "status": "available",
+            "assignee": null,
+            "branch": null,
+            "remaining_hours": null,
+            "is_expired": false
+          },
+          {
+            "env_id": "env-02",
+            "status": "occupied",
+            "assignee": "lisi",
+            "branch": "feature/almost-expired",
+            "remaining_hours": 0.5,
+            "is_expired": false
+          },
+          {
+            "env_id": "env-03",
+            "status": "occupied",
+            "assignee": "wangwu",
+            "branch": "feature/normal",
+            "remaining_hours": 8.0,
+            "is_expired": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "empty",
+      "history_count": 0,
+      "expired_count": 0,
+      "report": {
+        "summary": {
+          "total": 3,
+          "occupied": 0,
+          "available": 3,
+          "maintenance": 0,
+          "utilization_rate": 0.0,
+          "expiring_soon": 0
+        },
+        "environments": [
+          {
+            "env_id": "env-01",
+            "status": "available",
+            "assignee": null,
+            "branch": null,
+            "remaining_hours": null,
+            "is_expired": false
+          },
+          {
+            "env_id": "env-02",
+            "status": "available",
+            "assignee": null,
+            "branch": null,
+            "remaining_hours": null,
+            "is_expired": false
+          },
+          {
+            "env_id": "env-03",
+            "status": "available",
+            "assignee": null,
+            "branch": null,
+            "remaining_hours": null,
+            "is_expired": false
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "dirty_data",
+      "results": [
+        {
+          "success": false,
+          "error": "Environment env-999 not found"
+        },
+        {
+          "success": false,
+          "error": "Environment env-01 has no active lease"
+        },
+        {
+          "success": false,
+          "error": "Environment env-999 not found"
+        },
+        {
+          "success": true,
+          "lease": "lease_id='2af3dcaa0250' env_id='env-01' branch_name='' assignee='' start_time=datetime.datetime(2026, 5, 19, 6, 51, 20, 69951) end_time=datetime.datetime(2026, 5, 19, 5, 51, 20, 69951) reason='' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 6, 51, 20, 69956) request_id=None"
+        }
+      ]
+    }
+  ]
+}
