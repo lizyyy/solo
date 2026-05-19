@@ -112,6 +112,7 @@ def can_transition_status(secret: Secret, new_status: ProcessingStatus) -> bool:
             ProcessingStatus.CLOSED
         ],
         ProcessingStatus.REMINDED: [
+            ProcessingStatus.REMINDED,    # 可以再次提醒（非重复时）
             ProcessingStatus.TRANSFERRED,
             ProcessingStatus.RESOLVED,
             ProcessingStatus.CLOSED,
@@ -140,7 +141,7 @@ def apply_automatic_rules(secret: Secret, all_owners: List[Owner]) -> Secret:
         return secret
     
     should_transfer, backup_name = should_transfer_on_vacation(secret)
-    if should_transfer and backup_name:
+    if should_transfer and backup_name and can_transition_status(secret, ProcessingStatus.TRANSFERRED):
         backup_owner = next((o for o in all_owners if o.name == backup_name), None)
         if backup_owner:
             secret.transfer_owner(

@@ -7,7 +7,7 @@ from typing import Optional
 
 from models import Secret, Owner, SystemAccount, SecretLevel, ProcessingStatus, ConclusionType
 from store import SecretStore
-from rules import apply_automatic_rules, should_remind, get_reminder_content
+from rules import apply_automatic_rules, should_remind, get_reminder_content, can_transition_status
 from reporter import generate_machine_readable, generate_human_readable_report, \
     generate_secret_detail_report, export_json, export_markdown
 
@@ -140,6 +140,10 @@ def show(secret_id, json_output):
         click.echo(f"错误: 密钥ID {secret_id} 不存在", err=True)
         sys.exit(1)
     
+    owners = store.load_owners()
+    apply_automatic_rules(secret, owners)
+    store.update_secret(secret)
+    
     if json_output:
         result = generate_machine_readable([secret])
         click.echo(json.dumps(result, ensure_ascii=False, indent=2))
@@ -161,6 +165,22 @@ def remind(secret_id, channel):
     if secret.status in [ProcessingStatus.RESOLVED, ProcessingStatus.CLOSED]:
         click.echo(f"警告: 密钥已{secret.status.value}，跳过催办")
         return
+    
+    # 先创建临时的 reminder 对象检查是否重复
+    from models import ReminderRecord
+    temp_reminder = ReminderRecord(
+        reminder_channel=channel,
+        reminder_content=""
+    )
+    
+    # 检查是否重复
+    from rules import is_duplicate_reminder
+    is_duplicate = is_duplicate_reminder(secret, temp_reminder)
+    
+    # 只有非重复催办才检查状态机（避免已 reminded 状态后可以继续）
+    if not is_duplicate and not can_transition_status(secret, ProcessingStatus.REMINDED):
+        click.echo(f"错误: 密钥状态 {secret.status.value} 不能转换为 reminded", err=True)
+        sys.exit(1)
     
     content = get_reminder_content(secret)
     reminder = secret.add_reminder(channel=channel, content=content)
@@ -218,6 +238,14 @@ def transfer(secret_id, new_owner_name, operator, reason):
         click.echo(f"错误: 密钥ID {secret_id} 不存在", err=True)
         sys.exit(1)
     
+    if secret.status in [ProcessingStatus.RESOLVED, ProcessingStatus.CLOSED]:
+        click.echo(f"错误: 密钥已{secret.status.value}，不可转交", err=True)
+        sys.exit(1)
+    
+    if not can_transition_status(secret, ProcessingStatus.TRANSFERRED):
+        click.echo(f"错误: 密钥状态 {secret.status.value} 不能转换为 transferred", err=True)
+        sys.exit(1)
+    
     owners = store.load_owners()
     new_owner = next((o for o in owners if o.name == new_owner_name), None)
     if not new_owner:
@@ -247,6 +275,14 @@ def resolve(secret_id, conclusion_type, operator, remarks):
         click.echo(f"错误: 密钥ID {secret_id} 不存在", err=True)
         sys.exit(1)
     
+    if secret.status == ProcessingStatus.CLOSED:
+        click.echo(f"错误: 密钥已closed，不可处理", err=True)
+        sys.exit(1)
+    
+    if not can_transition_status(secret, ProcessingStatus.RESOLVED):
+        click.echo(f"错误: 密钥状态 {secret.status.value} 不能转换为 resolved", err=True)
+        sys.exit(1)
+    
     secret.resolve(ConclusionType(conclusion_type), operator, remarks)
     store.update_secret(secret)
     
@@ -263,6 +299,10 @@ def close(secret_id):
     secret = store.get_secret(secret_id)
     if not secret:
         click.echo(f"错误: 密钥ID {secret_id} 不存在", err=True)
+        sys.exit(1)
+    
+    if not can_transition_status(secret, ProcessingStatus.CLOSED):
+        click.echo(f"错误: 密钥状态 {secret.status.value} 不能转换为 closed", err=True)
         sys.exit(1)
     
     secret.close()

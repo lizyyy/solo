@@ -1,0 +1,220 @@
+{
+  "description": "边界冲突样例 - 包含状态机边界、转交链冲突、备份循环、同时休假等场景",
+  "owners": [
+    {
+      "name": "赵六",
+      "email": "zhaoliu@example.com",
+      "department": "技术部",
+      "is_on_vacation": false,
+      "backup_owner": "钱七"
+    },
+    {
+      "name": "钱七",
+      "email": "qianqi@example.com",
+      "department": "技术部",
+      "is_on_vacation": true,
+      "backup_owner": "赵六"
+    },
+    {
+      "name": "孙八",
+      "email": "sunba@example.com",
+      "department": "运维部",
+      "is_on_vacation": true,
+      "backup_owner": "周九"
+    },
+    {
+      "name": "周九",
+      "email": "zhoujiu@example.com",
+      "department": "运维部",
+      "is_on_vacation": true,
+      "backup_owner": null
+    },
+    {
+      "name": "吴十",
+      "email": "wushi@example.com",
+      "department": "安全部",
+      "is_on_vacation": false,
+      "backup_owner": null
+    }
+  ],
+  "secrets": [
+    {
+      "secret_id": "CONFLICT001",
+      "secret_name": "已关闭密钥-状态边界",
+      "usage": "测试已关闭密钥的操作限制",
+      "system_account": {
+        "account_id": "CF_ACCT001",
+        "system_name": "测试系统",
+        "environment": "test"
+      },
+      "expire_date": "2026-06-15",
+      "owner": {
+        "name": "赵六",
+        "email": "zhaoliu@example.com",
+        "department": "技术部",
+        "is_on_vacation": false,
+        "backup_owner": "钱七"
+      },
+      "level": "medium",
+      "status": "closed",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2026-01-01T00:00:00",
+      "updated_at": "2026-01-01T00:00:00"
+    },
+    {
+      "secret_id": "CONFLICT002",
+      "secret_name": "已处理密钥-状态边界",
+      "usage": "测试已处理密钥的操作限制",
+      "system_account": {
+        "account_id": "CF_ACCT002",
+        "system_name": "测试系统",
+        "environment": "test"
+      },
+      "expire_date": "2026-06-20",
+      "owner": {
+        "name": "赵六",
+        "email": "zhaoliu@example.com",
+        "department": "技术部",
+        "is_on_vacation": false,
+        "backup_owner": "钱七"
+      },
+      "level": "medium",
+      "status": "resolved",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": {
+        "conclusion_type": "renewed",
+        "conclusion_time": "2026-05-01T10:00:00",
+        "operator": "管理员",
+        "remarks": "已完成密钥轮换"
+      },
+      "created_at": "2026-01-01T00:00:00",
+      "updated_at": "2026-05-01T10:00:00"
+    },
+    {
+      "secret_id": "CONFLICT003",
+      "secret_name": "备份循环密钥-转交冲突",
+      "usage": "测试负责人和备份互相作为备份的循环场景",
+      "system_account": {
+        "account_id": "CF_ACCT003",
+        "system_name": "测试系统",
+        "environment": "test"
+      },
+      "expire_date": "2026-05-25",
+      "owner": {
+        "name": "钱七",
+        "email": "qianqi@example.com",
+        "department": "技术部",
+        "is_on_vacation": true,
+        "backup_owner": "赵六"
+      },
+      "level": "high",
+      "status": "pending",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2026-01-01T00:00:00",
+      "updated_at": "2026-01-01T00:00:00"
+    },
+    {
+      "secret_id": "CONFLICT004",
+      "secret_name": "双休假密钥-转交冲突",
+      "usage": "测试负责人和备份都休假的极端场景",
+      "system_account": {
+        "account_id": "CF_ACCT004",
+        "system_name": "测试系统",
+        "environment": "test"
+      },
+      "expire_date": "2026-05-23",
+      "owner": {
+        "name": "孙八",
+        "email": "sunba@example.com",
+        "department": "运维部",
+        "is_on_vacation": true,
+        "backup_owner": "周九"
+      },
+      "level": "critical",
+      "status": "pending",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2026-01-01T00:00:00",
+      "updated_at": "2026-01-01T00:00:00"
+    },
+    {
+      "secret_id": "CONFLICT005",
+      "secret_name": "已转交密钥-状态边界",
+      "usage": "测试已转交密钥继续转交的状态流转",
+      "system_account": {
+        "account_id": "CF_ACCT005",
+        "system_name": "测试系统",
+        "environment": "test"
+      },
+      "expire_date": "2026-05-28",
+      "owner": {
+        "name": "吴十",
+        "email": "wushi@example.com",
+        "department": "安全部",
+        "is_on_vacation": false,
+        "backup_owner": null
+      },
+      "level": "high",
+      "status": "transferred",
+      "reminder_records": [],
+      "transfer_history": [
+        {
+          "from_owner": "赵六",
+          "to_owner": "钱七",
+          "transfer_time": "2026-05-10T09:00:00",
+          "operator": "管理员",
+          "reason": "第一次转交"
+        },
+        {
+          "from_owner": "钱七",
+          "to_owner": "吴十",
+          "transfer_time": "2026-05-15T14:00:00",
+          "operator": "管理员",
+          "reason": "第二次转交"
+        }
+      ],
+      "conclusion": null,
+      "created_at": "2026-01-01T00:00:00",
+      "updated_at": "2026-05-15T14:00:00"
+    },
+    {
+      "secret_id": "CONFLICT006",
+      "secret_name": "已催办密钥-状态边界",
+      "usage": "测试已催办密钥的状态流转限制",
+      "system_account": {
+        "account_id": "CF_ACCT006",
+        "system_name": "测试系统",
+        "environment": "test"
+      },
+      "expire_date": "2026-05-21",
+      "owner": {
+        "name": "赵六",
+        "email": "zhaoliu@example.com",
+        "department": "技术部",
+        "is_on_vacation": false,
+        "backup_owner": "钱七"
+      },
+      "level": "high",
+      "status": "reminded",
+      "reminder_records": [
+        {
+          "reminder_id": "rem-001",
+          "reminder_time": "2026-05-18T10:00:00",
+          "reminder_channel": "email",
+          "reminder_content": "【WARNING】密钥将在3天后到期，请及时处理",
+          "is_duplicate": false
+        }
+      ],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2026-01-01T00:00:00",
+      "updated_at": "2026-05-18T10:00:00"
+    }
+  ]
+}

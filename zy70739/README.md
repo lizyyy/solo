@@ -110,11 +110,34 @@ python acceptance_test.py
 ├── requirements.txt    # 依赖列表
 ├── acceptance_test.py  # 验收测试脚本
 ├── samples/            # 样例数据目录
-│   ├── normal_data.json    # 正常样例
-│   ├── dirty_data.json     # 脏数据（边界情况）
-│   └── empty_data.json     # 空数据
+│   ├── normal_data.json      # 正常样例：标准业务场景，可完整走通全流程
+│   ├── dirty_data.json       # 脏数据样例：包含过期、重复催办、休假负责人等边界
+│   ├── conflict_data.json    # 边界冲突样例：状态机边界、转交链冲突、备份循环等
+│   └── empty_data.json       # 空数据样例：验证空输入的处理逻辑
 └── data/               # 运行时数据目录（自动创建）
 ```
+
+## 样例数据说明
+
+### normal_data.json - 正常业务场景
+包含3个典型密钥，分别处于不同到期等级（URGENT/WARNING/SAFE），负责人状态正常，用于演示标准业务流程：导入 → 列表查看 → 详情查看 → 催办 → 转交 → 处理 → 导出报告。
+
+### dirty_data.json - 脏数据边界
+- DIRTY001：已过期密钥（超期5天），测试过期处理逻辑
+- DIRTY002：即将到期密钥，测试重复催办去重
+- DIRTY003：休假负责人密钥，测试自动转交逻辑（李四休假，备份为王五）
+
+### conflict_data.json - 边界冲突场景
+包含6种复杂冲突场景，用于验证系统鲁棒性：
+- CONFLICT001：已关闭密钥，测试操作限制
+- CONFLICT002：已处理密钥，测试状态边界
+- CONFLICT003：备份循环密钥，测试转交链循环防护
+- CONFLICT004：双休假密钥，负责人和备份都休假的极端场景
+- CONFLICT005：已转交密钥，测试多次转交的状态流转
+- CONFLICT006：已催办密钥，测试提醒后状态的操作限制
+
+### empty_data.json - 空输入测试
+不含任何数据，用于验证空列表、空查询等边界情况的处理。
 
 ## 核心规则说明
 

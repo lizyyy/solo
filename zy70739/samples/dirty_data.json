@@ -13,6 +13,13 @@
       "department": "技术部",
       "is_on_vacation": true,
       "backup_owner": "王五"
+    },
+    {
+      "name": "王五",
+      "email": "wangwu@example.com",
+      "department": "运维部",
+      "is_on_vacation": false,
+      "backup_owner": null
     }
   ],
   "secrets": [

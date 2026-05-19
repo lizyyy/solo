@@ -155,24 +155,47 @@ def test_exception_case():
     secret = data["secrets"][0]
     # 状态应该自动变为transferred
     print(f"当前状态: {secret['status']}")
+    print(f"当前负责人: {secret['owner']['name']}")
+    assert secret["status"] == "transferred"
+    assert secret["owner"]["name"] == "王五"
     print("✓ 休假负责人自动转交验证通过")
+
+    # 6. 测试状态机 - 已关闭密钥不能催办
+    print("\n--- 步骤6: 测试状态机 - 已关闭密钥不能催办 ---")
+    run_command("python3 cli.py import-data samples/conflict_data.json")
+    result = run_command("python3 cli.py remind CONFLICT001", check=True)
+    assert "警告" in result.stdout or "已关闭" in result.stdout or "closed" in result.stdout.lower()
+    print(f"输出: {result.stdout.strip()}")
+    print("✓ 已关闭密钥状态机校验通过")
+
+    # 7. 测试状态机 - 已关闭密钥不能转交
+    print("\n--- 步骤7: 测试状态机 - 已关闭密钥不能转交 ---")
+    result = run_command('python3 cli.py transfer CONFLICT001 赵六 --operator 管理员 --reason "测试"', check=False)
+    assert result.returncode != 0
+    print("✓ 已关闭密钥转交限制验证通过")
+
+    # 8. 测试状态机 - 已处理密钥不能转交
+    print("\n--- 步骤8: 测试状态机 - 已处理密钥不能转交 ---")
+    result = run_command('python3 cli.py transfer CONFLICT002 钱七 --operator 管理员 --reason "测试"', check=False)
+    assert result.returncode != 0
+    print("✓ 已处理密钥转交限制验证通过")
     
-    # 6. 测试重复添加相同ID的密钥（应该报错）
-    print("\n--- 步骤6: 测试添加重复ID的密钥 (预期错误) ---")
+    # 9. 测试重复添加相同ID的密钥（应该报错）
+    print("\n--- 步骤9: 测试添加重复ID的密钥 (预期错误) ---")
     today = date.today()
     expire = today + timedelta(days=30)
     result = run_command(
         f'python3 cli.py add --secret-id DIRTY001 --secret-name 测试重复 --usage 测试 '
         f'--account-id TEST --system-name 测试系统 --environment test '
-        f'--expire-date {expire} --owner-name 张三 --owner-email test@test.com --owner-dept 测试部',
+        f'--expire-date {expire} --owner-name 赵六 --owner-email test@test.com --owner-dept 测试部',
         check=False
     )
     assert result.returncode != 0
     assert "已存在" in result.stderr or "已存在" in result.stdout
     print("✓ 重复ID的错误提示验证通过")
     
-    # 7. 测试空数据情况
-    print("\n--- 步骤7: 测试空数据情况 ---")
+    # 10. 测试空数据情况
+    print("\n--- 步骤10: 测试空数据情况 ---")
     cleanup_data()
     run_command("python3 cli.py import-data samples/empty_data.json")
     result = run_command("python3 cli.py list --json-output")
@@ -180,8 +203,8 @@ def test_exception_case():
     assert data["total_secrets"] == 0
     print("✓ 空数据情况验证通过")
     
-    # 8. 测试批量催办的预览模式
-    print("\n--- 步骤8: 测试批量催办的预览模式 ---")
+    # 11. 测试批量催办的预览模式
+    print("\n--- 步骤11: 测试批量催办的预览模式 ---")
     cleanup_data()
     run_command("python3 cli.py import-data samples/dirty_data.json")
     result = run_command("python3 cli.py remind-all --dry-run")
