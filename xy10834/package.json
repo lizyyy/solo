@@ -1,0 +1,15 @@
+{
+  "name": "config-distribution-console",
+  "version": "1.0.0",
+  "description": "配置分发一致性台 - 全栈Web应用",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "prisma:init": "cd backend && npx prisma migrate dev --name init && npx prisma db seed",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build"
+  },
+  "keywords": ["config", "distribution", "consistency", "fullstack"],
+  "author": "",
+  "license": "MIT"
+}
