@@ -1,0 +1,5 @@
+{"user_id": "user_001", "session_id": "sess_abc", "event_time": "2024-01-15T10:01:00+08:00", "event_type": "search", "query": "iphone"}
+{"user_id": "user_001", "session_id": "sess_abc", "event_time": "2024-01-15T10:02:00+08:00", "event_type": "page_view", "page": "/search_results"}
+{"user_id": "user_001", "session_id": "sess_abc", "event_time": "2024-01-15T10:40:00+08:00", "event_type": "add_to_cart", "product_id": "123"}
+{"user_id": "user_002", "session_id": "sess_xyz", "event_time": "2024-01-15T11:05:00+08:00", "event_type": "login_success"}
+{"invalid_json_line

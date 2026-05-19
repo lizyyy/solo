@@ -1,0 +1,5 @@
+{"user_id": "user_001", "session_id": "sess_abc", "event_time": "2024-01-15T10:00:00+08:00", "event_type": "page_view", "page": "/home"}
+{"user_id": "user_001", "session_id": "sess_abc", "event_time": "2024-01-15T10:00:30+08:00", "event_type": "click", "element": "search_button"}
+{"user_id": "user_001", "session_id": "sess_abc", "event_time": "2024-01-15T10:35:00+08:00", "event_type": "page_view", "page": "/product/123"}
+{"user_id": "user_002", "session_id": "sess_xyz", "event_time": "2024-01-15T11:00:00+08:00", "event_type": "page_view", "page": "/home"}
+{"user_id": "user_002", "session_id": "sess_xyz", "event_time": "2024-01-15T11:01:00+08:00", "event_type": "click", "element": "login_button"}

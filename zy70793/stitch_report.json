@@ -1,0 +1,92 @@
+{
+  "report_generated_at": "2026-05-19T16:19:07.469721",
+  "parameters": {
+    "inputs": [
+      "test_data/shard_1.jsonl",
+      "test_data/shard_2.jsonl"
+    ],
+    "user_field": "user_id",
+    "session_field": "session_id",
+    "time_field": "event_time",
+    "time_format": "iso",
+    "gap_threshold": 1800,
+    "session_timeout": 3600,
+    "output_format": "csv",
+    "output": "csv_output",
+    "report_path": "stitch_report.json",
+    "verbose": true
+  },
+  "summary": {
+    "input_files_count": 2,
+    "total_events": 9,
+    "bad_lines_count": 1,
+    "total_sessions": 2,
+    "sessions_with_gaps": 1,
+    "sessions_with_gaps_percentage": 50.0,
+    "total_gaps": 1,
+    "total_gap_seconds": 1980.0,
+    "avg_gap_seconds_per_session": 1980.0,
+    "cross_file_gaps": 1,
+    "cross_file_gaps_percentage": 100.0
+  },
+  "gap_type_distribution": {
+    "cross_file_shard_gap": 1
+  },
+  "file_statistics": {
+    "test_data/shard_1.jsonl": {
+      "events_count": 5,
+      "bad_lines_count": 0,
+      "gaps_involving_file": 1
+    },
+    "test_data/shard_2.jsonl": {
+      "events_count": 4,
+      "bad_lines_count": 1,
+      "gaps_involving_file": 1
+    }
+  },
+  "top_sessions_by_gap_count": [
+    {
+      "user_id": "user_001",
+      "session_id": "sess_abc",
+      "event_count": 6,
+      "gap_count": 1,
+      "total_gap_seconds": 1980.0,
+      "max_gap_seconds": 1980.0
+    },
+    {
+      "user_id": "user_002",
+      "session_id": "sess_xyz",
+      "event_count": 3,
+      "gap_count": 0,
+      "total_gap_seconds": 0,
+      "max_gap_seconds": 0
+    }
+  ],
+  "top_sessions_by_gap_duration": [
+    {
+      "user_id": "user_001",
+      "session_id": "sess_abc",
+      "event_count": 6,
+      "gap_count": 1,
+      "total_gap_seconds": 1980.0,
+      "max_gap_seconds": 1980.0
+    },
+    {
+      "user_id": "user_002",
+      "session_id": "sess_xyz",
+      "event_count": 3,
+      "gap_count": 0,
+      "total_gap_seconds": 0,
+      "max_gap_seconds": 0
+    }
+  ],
+  "bad_lines": [
+    {
+      "file": "test_data/shard_2.jsonl",
+      "line": 5,
+      "original_line": "{\"invalid_json_line",
+      "error": "Unterminated string starting at: line 1 column 2 (char 1)"
+    }
+  ],
+  "bad_lines_count": 1
+}
