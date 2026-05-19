@@ -6,14 +6,18 @@
       "student_id": "stu-1001",
       "student_name": "张三",
       "start_time": "2024-05-14T09:00:00",
-      "status": "failed",
-      "abnormal_level": "critical",
+      "status": "appealed_warning",
+      "abnormal_level": "warning",
       "camera_status": "off",
       "screen_switch_count": 7,
       "handler": "监考老师A",
       "handled_at": "2024-05-14T09:45:00",
       "handle_reason": "频繁切屏且摄像头长时间关闭，判定为作弊行为",
-      "updated_at": "2024-05-14T09:45:00"
+      "updated_at": "2026-05-20T01:26:45.343207",
+      "appeal_handler": "测试老师",
+      "appeal_handled_at": "2026-05-20T01:26:45.343138",
+      "appeal_result": "部分认可",
+      "appeal_reason": "经核实摄像头为系统误判，切屏次数属实给予警告处理"
     },
     {
       "id": "sess-002",
@@ -134,6 +138,14 @@
       "timestamp": "2024-05-14T09:26:00",
       "description": "切屏到其他应用",
       "duration": 0
+    },
+    {
+      "id": "749c292a-81d7-4bcb-b38c-2737eec63669",
+      "session_id": "sess-001",
+      "event_type": "correction",
+      "timestamp": "2026-05-20T01:26:45.343290",
+      "description": "申诉部分认可，异常等级由critical修正为warning：经核实摄像头为系统误判，切屏次数属实给予警告处理",
+      "duration": 0
     }
   ],
   "appeals": [
@@ -145,12 +157,158 @@
       "content": "我只是不小心切屏了，摄像头关闭是因为电脑自动休眠，我没有作弊",
       "status": "handled",
       "created_at": "2024-05-14T10:00:00",
-      "handler": "巡考主任",
-      "handled_at": "2024-05-14T10:30:00",
+      "handler": "测试老师",
+      "handled_at": "2026-05-20T01:26:45.343138",
       "handle_result": "部分认可",
-      "handle_reason": "经核实，摄像头关闭确为电脑休眠导致，但切屏次数过多，给予警告处理，成绩有效"
+      "handle_reason": "经核实摄像头为系统误判，切屏次数属实给予警告处理"
     }
   ],
-  "reports": [],
-  "corrections": []
+  "reports": [
+    {
+      "id": "57a103a3-c1de-424e-bd29-812ca5304447",
+      "session_id": "sess-001",
+      "student_name": "张三",
+      "student_id": "stu-1001",
+      "exam_id": "exam-2024-001",
+      "original_abnormal_level": "warning",
+      "current_abnormal_level": "warning",
+      "screen_switch_count": 7,
+      "status": "appealed_warning",
+      "events_count": 9,
+      "events": [
+        {
+          "id": "evt-001",
+          "session_id": "sess-001",
+          "event_type": "screen_switch",
+          "timestamp": "2024-05-14T09:15:00",
+          "description": "切屏到其他应用",
+          "duration": 0
+        },
+        {
+          "id": "evt-002",
+          "session_id": "sess-001",
+          "event_type": "screen_switch",
+          "timestamp": "2024-05-14T09:20:00",
+          "description": "切屏到其他应用",
+          "duration": 0
+        },
+        {
+          "id": "evt-003",
+          "session_id": "sess-001",
+          "event_type": "camera_off",
+          "timestamp": "2024-05-14T09:25:00",
+          "description": "摄像头关闭",
+          "duration": 180
+        },
+        {
+          "id": "evt-004",
+          "session_id": "sess-001",
+          "event_type": "screen_switch",
+          "timestamp": "2024-05-14T09:28:00",
+          "description": "切屏到其他应用",
+          "duration": 0
+        },
+        {
+          "id": "evt-005",
+          "session_id": "sess-001",
+          "event_type": "screen_switch",
+          "timestamp": "2024-05-14T09:32:00",
+          "description": "切屏到其他应用",
+          "duration": 0
+        },
+        {
+          "id": "evt-006",
+          "session_id": "sess-001",
+          "event_type": "screen_switch",
+          "timestamp": "2024-05-14T09:35:00",
+          "description": "切屏到其他应用",
+          "duration": 0
+        },
+        {
+          "id": "evt-007",
+          "session_id": "sess-001",
+          "event_type": "screen_switch",
+          "timestamp": "2024-05-14T09:38:00",
+          "description": "切屏到其他应用",
+          "duration": 0
+        },
+        {
+          "id": "evt-008",
+          "session_id": "sess-001",
+          "event_type": "screen_switch",
+          "timestamp": "2024-05-14T09:40:00",
+          "description": "切屏到其他应用",
+          "duration": 0
+        },
+        {
+          "id": "749c292a-81d7-4bcb-b38c-2737eec63669",
+          "session_id": "sess-001",
+          "event_type": "correction",
+          "timestamp": "2026-05-20T01:26:45.343290",
+          "description": "申诉部分认可，异常等级由critical修正为warning：经核实摄像头为系统误判，切屏次数属实给予警告处理",
+          "duration": 0
+        }
+      ],
+      "appeals_count": 1,
+      "appeals": [
+        {
+          "id": "appeal-001",
+          "session_id": "sess-001",
+          "student_id": "stu-1001",
+          "student_name": "张三",
+          "content": "我只是不小心切屏了，摄像头关闭是因为电脑自动休眠，我没有作弊",
+          "status": "handled",
+          "created_at": "2024-05-14T10:00:00",
+          "handler": "测试老师",
+          "handled_at": "2026-05-20T01:26:45.343138",
+          "handle_result": "部分认可",
+          "handle_reason": "经核实摄像头为系统误判，切屏次数属实给予警告处理"
+        }
+      ],
+      "corrections_count": 1,
+      "corrections": [
+        {
+          "id": "86f6f048-278a-4c05-b353-62cd1fddc9ba",
+          "session_id": "sess-001",
+          "appeal_id": "appeal-001",
+          "handler": "测试老师",
+          "handle_result": "部分认可",
+          "handle_reason": "经核实摄像头为系统误判，切屏次数属实给予警告处理",
+          "old_abnormal_level": "critical",
+          "new_abnormal_level": "warning",
+          "old_status": "failed",
+          "new_status": "appealed_warning",
+          "corrected_at": "2026-05-20T01:26:45.343275"
+        }
+      ],
+      "handler": "监考老师A",
+      "handled_at": "2024-05-14T09:45:00",
+      "handle_reason": "频繁切屏且摄像头长时间关闭，判定为作弊行为",
+      "appeal_handler": "测试老师",
+      "appeal_handled_at": "2026-05-20T01:26:45.343138",
+      "appeal_result": "部分认可",
+      "appeal_reason": "经核实摄像头为系统误判，切屏次数属实给予警告处理",
+      "review_status": "已复核",
+      "generated_at": "2026-05-20T01:27:17.781471",
+      "updated_at": "2026-05-20T01:27:17.781501",
+      "reviewed_by": "复核主任",
+      "reviewed_at": "2026-05-20T01:27:17.875302",
+      "review_comment": "处理流程规范，修正理由充分，同意复核通过"
+    }
+  ],
+  "corrections": [
+    {
+      "id": "86f6f048-278a-4c05-b353-62cd1fddc9ba",
+      "session_id": "sess-001",
+      "appeal_id": "appeal-001",
+      "handler": "测试老师",
+      "handle_result": "部分认可",
+      "handle_reason": "经核实摄像头为系统误判，切屏次数属实给予警告处理",
+      "old_abnormal_level": "critical",
+      "new_abnormal_level": "warning",
+      "old_status": "failed",
+      "new_status": "appealed_warning",
+      "corrected_at": "2026-05-20T01:26:45.343275"
+    }
+  ]
 }

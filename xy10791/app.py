@@ -175,8 +175,7 @@ def get_appeals():
     data = load_data()
     return jsonify(data['appeals'])
 
-def create_correction_record(session_id, appeal_id, handler, handle_result, handle_reason, old_level, new_level, old_status, new_status):
-    data = load_data()
+def create_correction_record(data, session_id, appeal_id, handler, handle_result, handle_reason, old_level, new_level, old_status, new_status):
     correction = {
         'id': str(uuid.uuid4()),
         'session_id': session_id,
@@ -191,7 +190,6 @@ def create_correction_record(session_id, appeal_id, handler, handle_result, hand
         'corrected_at': datetime.now().isoformat()
     }
     data['corrections'].append(correction)
-    save_data(data)
     return correction
 
 @app.route('/api/appeals/<appeal_id>/handle', methods=['POST'])
@@ -234,6 +232,7 @@ def handle_appeal(appeal_id):
         session['updated_at'] = datetime.now().isoformat()
         
         create_correction_record(
+            data,
             session['id'],
             appeal['id'],
             handle_data.get('handler'),
