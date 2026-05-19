@@ -1,0 +1,38 @@
+{"level":"info","message":"Appointment created: 1","service":"park-security","timestamp":"2026-05-20 01:01:34","visitor":"张三"}
+{"level":"info","message":"Operation logged: create on appointment","operator":"管理员","recordId":1,"service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"level":"info","message":"Operation logged: approve on appointment","operator":"管理员","recordId":1,"service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"level":"info","message":"Added to blacklist: phone - 13999999999","service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"level":"info","message":"Operation logged: add on blacklist","operator":"管理员","recordId":1,"service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"level":"info","message":"Temporary plate created: 京B99999","service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"level":"info","message":"Operation logged: create on temporary_plate","operator":"管理员","recordId":1,"service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"action":"block","identifier":"13999999999","level":"info","message":"Verification recorded: phone - failed","reason":"手机号在黑名单中：多次违规闯岗","service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"action":"allow","identifier":"13800138001","level":"info","message":"Verification recorded: phone - success","reason":"验证通过，有有效预约","service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"gate":"东门","level":"info","message":"Phone verification passed: 13800138001","service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"action":"allow","identifier":"京B99999","level":"info","message":"Verification recorded: plate - success","reason":"验证通过，有有效临时车牌","service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"gate":"西门","level":"info","message":"Plate verification passed: 京B99999","service":"park-security","timestamp":"2026-05-20 01:01:34"}
+{"level":"info","message":"Appointment created: 1","service":"park-security","timestamp":"2026-05-20 01:02:32","visitor":"张三"}
+{"level":"info","message":"Operation logged: create on appointment","operator":"管理员","recordId":1,"service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"level":"info","message":"Operation logged: approve on appointment","operator":"管理员","recordId":1,"service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"level":"info","message":"Added to blacklist: phone - 13999999999","service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"level":"info","message":"Operation logged: add on blacklist","operator":"管理员","recordId":1,"service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"level":"info","message":"Temporary plate created: 京B99999","service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"level":"info","message":"Operation logged: create on temporary_plate","operator":"管理员","recordId":1,"service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"action":"block","identifier":"13999999999","level":"info","message":"Verification recorded: phone - failed","reason":"手机号在黑名单中：多次违规闯岗","service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"action":"allow","identifier":"13800138001","level":"info","message":"Verification recorded: phone - success","reason":"验证通过，有有效预约","service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"gate":"东门","level":"info","message":"Phone verification passed: 13800138001","service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"action":"allow","identifier":"京B99999","level":"info","message":"Verification recorded: plate - success","reason":"验证通过，有有效临时车牌","service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"gate":"西门","level":"info","message":"Plate verification passed: 京B99999","service":"park-security","timestamp":"2026-05-20 01:02:32"}
+{"level":"info","message":"Appointment created: 2","service":"park-security","timestamp":"2026-05-20 01:11:42","visitor":"张三"}
+{"level":"info","message":"Operation logged: create on appointment","operator":"管理员","recordId":2,"service":"park-security","timestamp":"2026-05-20 01:11:42"}
+{"level":"info","message":"Operation logged: approve on appointment","operator":"管理员","recordId":2,"service":"park-security","timestamp":"2026-05-20 01:11:42"}
+{"action":"block","identifier":"13999999999","level":"info","message":"Verification recorded: phone - failed","reason":"手机号在黑名单中：多次违规闯岗","service":"park-security","timestamp":"2026-05-20 01:11:42"}
+{"action":"allow","identifier":"13800138001","level":"info","message":"Verification recorded: phone - success","reason":"验证通过，有有效预约","service":"park-security","timestamp":"2026-05-20 01:11:42"}
+{"gate":"东门","level":"info","message":"Phone verification passed: 13800138001","service":"park-security","timestamp":"2026-05-20 01:11:42"}
+{"action":"allow","identifier":"京B99999","level":"info","message":"Verification recorded: plate - success","reason":"验证通过，有有效临时车牌","service":"park-security","timestamp":"2026-05-20 01:11:42"}
+{"gate":"西门","level":"info","message":"Plate verification passed: 京B99999","service":"park-security","timestamp":"2026-05-20 01:11:42"}
+{"action":"force_allow","identifier":"13600000000","level":"info","message":"Verification recorded: phone - forced","reason":"越权放行：领导特批特殊访客进入园区","service":"park-security","timestamp":"2026-05-20 01:11:42"}
+{"gate":"北门","level":"warn","message":"Force allow: phone - 13600000000","operator":"安保主管","reason":"领导特批特殊访客进入园区","service":"park-security","timestamp":"2026-05-20 01:11:42"}
+{"level":"info","message":"服务器运行在端口 3000","service":"park-security","timestamp":"2026-05-20 01:11:57"}
+{"level":"info","message":"API 文档: http://localhost:3000","service":"park-security","timestamp":"2026-05-20 01:11:57"}
+{"level":"info","message":"服务器运行在端口 3000","service":"park-security","timestamp":"2026-05-20 01:12:43"}
+{"level":"info","message":"API 文档: http://localhost:3000","service":"park-security","timestamp":"2026-05-20 01:12:43"}
