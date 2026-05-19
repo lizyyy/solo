@@ -1,0 +1,267 @@
+{
+  "export_time": "2026-05-19T06:54:27.465805",
+  "statistics": {
+    "total_repos": 5,
+    "total_dependencies": 3,
+    "total_opinions": 4,
+    "total_extensions": 2,
+    "total_batches": 2,
+    "bad_rows_count": 0,
+    "validation": {
+      "approved": 1,
+      "rejected": 4,
+      "need_extension": 0,
+      "pending": 0
+    },
+    "issues_by_level": {
+      "error": 9,
+      "warning": 8,
+      "info": 9
+    }
+  },
+  "repositories": [
+    {
+      "repo_name": "service-gateway",
+      "decision": "approved",
+      "can_upgrade": true,
+      "approved_packages": [
+        "commons-utils",
+        "database-driver",
+        "security-core"
+      ],
+      "issues_count": 5,
+      "issues": [
+        {
+          "level": "info",
+          "message": "service-gateway 当前版本 3.1.0 已达到或超过目标版本 2.0.0",
+          "package_name": "commons-utils",
+          "rule_name": "version_already_met"
+        },
+        {
+          "level": "info",
+          "message": "service-gateway 当前版本 3.1.0 已达到或超过目标版本 1.5.0",
+          "package_name": "database-driver",
+          "rule_name": "version_already_met"
+        },
+        {
+          "level": "info",
+          "message": "service-gateway 当前版本 3.1.0 已达到或超过目标版本 3.0.0",
+          "package_name": "security-core",
+          "rule_name": "version_already_met"
+        },
+        {
+          "level": "info",
+          "message": "service-gateway 负责人 赵六 已同意升级",
+          "package_name": null,
+          "rule_name": "owner_approved"
+        },
+        {
+          "level": "warning",
+          "message": "service-gateway 的依赖包涉及多个升级批次: BATCH-001, BATCH-002",
+          "package_name": null,
+          "rule_name": "multiple_batches"
+        }
+      ],
+      "sources": {
+        "repository": "sample_data/repositories.csv | Sheet: N/A | Row: 5",
+        "opinions": [
+          "sample_data/opinions.csv | Sheet: N/A | Row: 5"
+        ],
+        "extensions": []
+      }
+    },
+    {
+      "repo_name": "service-notification",
+      "decision": "rejected",
+      "can_upgrade": false,
+      "approved_packages": [],
+      "issues_count": 6,
+      "issues": [
+        {
+          "level": "error",
+          "message": "service-notification 当前版本 0.9.0 低于最低要求 1.8.0",
+          "package_name": "commons-utils",
+          "rule_name": "min_version_check"
+        },
+        {
+          "level": "error",
+          "message": "service-notification 当前版本 0.9.0 低于最低要求 1.2.0",
+          "package_name": "database-driver",
+          "rule_name": "min_version_check"
+        },
+        {
+          "level": "error",
+          "message": "service-notification 当前版本 0.9.0 低于最低要求 2.5.0",
+          "package_name": "security-core",
+          "rule_name": "min_version_check"
+        },
+        {
+          "level": "warning",
+          "message": "service-notification 缺少负责人意见",
+          "package_name": null,
+          "rule_name": "missing_opinion"
+        },
+        {
+          "level": "info",
+          "message": "service-notification 已批准延期至 2024-04-01，原因: 业务高峰期，需要延期到Q2",
+          "package_name": null,
+          "rule_name": "extension_approved"
+        },
+        {
+          "level": "warning",
+          "message": "service-notification 的依赖包涉及多个升级批次: BATCH-001, BATCH-002",
+          "package_name": null,
+          "rule_name": "multiple_batches"
+        }
+      ],
+      "sources": {
+        "repository": "sample_data/repositories.csv | Sheet: N/A | Row: 6",
+        "opinions": [],
+        "extensions": [
+          "sample_data/extensions.csv | Sheet: N/A | Row: 2"
+        ]
+      }
+    },
+    {
+      "repo_name": "service-order",
+      "decision": "rejected",
+      "can_upgrade": false,
+      "approved_packages": [],
+      "issues_count": 5,
+      "issues": [
+        {
+          "level": "info",
+          "message": "service-order 当前版本 2.0.0 已达到或超过目标版本 2.0.0",
+          "package_name": "commons-utils",
+          "rule_name": "version_already_met"
+        },
+        {
+          "level": "info",
+          "message": "service-order 当前版本 2.0.0 已达到或超过目标版本 1.5.0",
+          "package_name": "database-driver",
+          "rule_name": "version_already_met"
+        },
+        {
+          "level": "error",
+          "message": "service-order 当前版本 2.0.0 低于最低要求 2.5.0",
+          "package_name": "security-core",
+          "rule_name": "min_version_check"
+        },
+        {
+          "level": "error",
+          "message": "service-order 负责人 李四 不同意升级: 存在兼容性问题",
+          "package_name": null,
+          "rule_name": "owner_rejected"
+        },
+        {
+          "level": "warning",
+          "message": "service-order 的依赖包涉及多个升级批次: BATCH-001, BATCH-002",
+          "package_name": null,
+          "rule_name": "multiple_batches"
+        }
+      ],
+      "sources": {
+        "repository": "sample_data/repositories.csv | Sheet: N/A | Row: 3",
+        "opinions": [
+          "sample_data/opinions.csv | Sheet: N/A | Row: 3"
+        ],
+        "extensions": []
+      }
+    },
+    {
+      "repo_name": "service-payment",
+      "decision": "rejected",
+      "can_upgrade": false,
+      "approved_packages": [],
+      "issues_count": 6,
+      "issues": [
+        {
+          "level": "error",
+          "message": "service-payment 当前版本 1.5.0 低于最低要求 1.8.0",
+          "package_name": "commons-utils",
+          "rule_name": "min_version_check"
+        },
+        {
+          "level": "info",
+          "message": "service-payment 当前版本 1.5.0 已达到或超过目标版本 1.5.0",
+          "package_name": "database-driver",
+          "rule_name": "version_already_met"
+        },
+        {
+          "level": "error",
+          "message": "service-payment 当前版本 1.5.0 低于最低要求 2.5.0",
+          "package_name": "security-core",
+          "rule_name": "min_version_check"
+        },
+        {
+          "level": "warning",
+          "message": "service-payment 负责人 王五 要求延期: 正在进行重构",
+          "package_name": null,
+          "rule_name": "owner_needs_extension"
+        },
+        {
+          "level": "warning",
+          "message": "service-payment 有延期申请待审批，申请至 2024-02-15，原因: 重构工作尚未完成",
+          "package_name": null,
+          "rule_name": "extension_pending"
+        },
+        {
+          "level": "warning",
+          "message": "service-payment 的依赖包涉及多个升级批次: BATCH-001, BATCH-002",
+          "package_name": null,
+          "rule_name": "multiple_batches"
+        }
+      ],
+      "sources": {
+        "repository": "sample_data/repositories.csv | Sheet: N/A | Row: 4",
+        "opinions": [
+          "sample_data/opinions.csv | Sheet: N/A | Row: 4"
+        ],
+        "extensions": [
+          "sample_data/extensions.csv | Sheet: N/A | Row: 3"
+        ]
+      }
+    },
+    {
+      "repo_name": "service-user",
+      "decision": "rejected",
+      "can_upgrade": false,
+      "approved_packages": [],
+      "issues_count": 4,
+      "issues": [
+        {
+          "level": "error",
+          "message": "service-user 当前版本 1.2.3 低于最低要求 1.8.0",
+          "package_name": "commons-utils",
+          "rule_name": "min_version_check"
+        },
+        {
+          "level": "error",
+          "message": "service-user 当前版本 1.2.3 低于最低要求 2.5.0",
+          "package_name": "security-core",
+          "rule_name": "min_version_check"
+        },
+        {
+          "level": "info",
+          "message": "service-user 负责人 张三 已同意升级",
+          "package_name": null,
+          "rule_name": "owner_approved"
+        },
+        {
+          "level": "warning",
+          "message": "service-user 的依赖包涉及多个升级批次: BATCH-001, BATCH-002",
+          "package_name": null,
+          "rule_name": "multiple_batches"
+        }
+      ],
+      "sources": {
+        "repository": "sample_data/repositories.csv | Sheet: N/A | Row: 2",
+        "opinions": [
+          "sample_data/opinions.csv | Sheet: N/A | Row: 2"
+        ],
+        "extensions": []
+      }
+    }
+  ],
+  "bad_rows": []
+}
