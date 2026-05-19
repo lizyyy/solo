@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "print-quality-control"
+version = "0.1.0"
+description = "印刷车间品控数据管理工具"
+authors = ["QC Team"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.104.0"
+uvicorn = "^0.24.0"
+sqlalchemy = "^2.0.23"
+pydantic = "^2.5.0"
+python-multipart = "^0.0.6"
+pandas = "^2.1.0"
+openpyxl = "^3.1.2"
+python-jose = "^3.3.0"
+passlib = "^1.7.4"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

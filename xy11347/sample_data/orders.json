@@ -1,0 +1,50 @@
+[
+  {
+    "order_no": "PO-2024-001",
+    "product_name": "高端包装纸盒-A款",
+    "customer": "客户A公司",
+    "paper_batch": "PAPER-2024-001",
+    "paper_type": "铜版纸250g",
+    "quantity": 5000,
+    "target_l": 95.0,
+    "target_a": -1.5,
+    "target_b": 5.2,
+    "tolerance_l": 2.0,
+    "tolerance_a": 2.0,
+    "tolerance_b": 2.0,
+    "operator": "张工",
+    "remarks": "大客户订单，品质要求高"
+  },
+  {
+    "order_no": "PO-2024-002",
+    "product_name": "宣传画册封面",
+    "customer": "客户B公司",
+    "paper_batch": "PAPER-2024-001",
+    "paper_type": "铜版纸200g",
+    "quantity": 10000,
+    "target_l": 92.5,
+    "target_a": -0.8,
+    "target_b": 3.5,
+    "tolerance_l": 2.5,
+    "tolerance_a": 2.5,
+    "tolerance_b": 2.5,
+    "operator": "李工",
+    "remarks": "加急订单"
+  },
+  {
+    "order_no": "PO-2024-003",
+    "product_name": "礼品袋印刷",
+    "customer": "客户C公司",
+    "paper_batch": "PAPER-2024-002",
+    "paper_type": "白卡纸300g",
+    "quantity": 8000,
+    "target_l": 94.0,
+    "target_a": -1.2,
+    "target_b": 4.8,
+    "tolerance_l": 2.0,
+    "tolerance_a": 2.0,
+    "tolerance_b": 2.0,
+    "operator": "王工",
+    "remarks": ""
+  }
+]
