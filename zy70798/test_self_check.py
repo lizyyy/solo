@@ -116,7 +116,20 @@ class Test03_API_Import:
                 "expiry_date": (datetime.utcnow() - timedelta(days=1)).isoformat()
             }
         )
-        assert response.status_code == 422
+        assert response.status_code == 400
+        assert response.json()['error_code'] == "VALIDATION_ERROR"
+
+    def test_create_test_missing_required_fields(self):
+        response = client.post(
+            "/api/quarantined-tests/",
+            json={
+                "test_name": "test_missing",
+            }
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert data['error_code'] == "MISSING_FIELD"
+        assert 'missing_fields' in data['details']
 
 
 class Test04_API_Filter:
@@ -280,6 +293,66 @@ class Test07_API_ErrorHandling:
         response = client.get("/api/quarantined-tests/99999")
         assert response.status_code == 404
         assert response.json()['detail']['error_code'] == "NOT_FOUND"
+
+    def test_requires_manual_review_after_ready_failure(self):
+        create_response = client.post(
+            "/api/quarantined-tests/",
+            json={
+                "test_name": "test_flaky",
+                "test_path": "tests/test_flaky.py::test_flaky",
+                "quarantine_reason": "不稳定",
+                "owner": "吴十",
+                "quarantine_date": datetime.utcnow().isoformat(),
+                "expiry_date": (datetime.utcnow() + timedelta(days=7)).isoformat()
+            }
+        )
+        test_id = create_response.json()['id']
+
+        for _ in range(3):
+            client.post(
+                f"/api/quarantined-tests/{test_id}/result",
+                json={"result": "PASS", "run_date": datetime.utcnow().isoformat()}
+            )
+
+        test_response = client.get(f"/api/quarantined-tests/{test_id}")
+        assert test_response.json()['status'] == "ready_for_cleanup"
+
+        client.post(
+            f"/api/quarantined-tests/{test_id}/result",
+            json={"result": "FAIL", "run_date": datetime.utcnow().isoformat()}
+        )
+
+        test_response = client.get(f"/api/quarantined-tests/{test_id}")
+        assert test_response.json()['status'] == "requires_manual_review"
+
+    def test_mark_cleaned_requires_manual_review(self):
+        create_response = client.post(
+            "/api/quarantined-tests/",
+            json={
+                "test_name": "test_needs_review",
+                "test_path": "tests/test_needs_review.py::test_needs_review",
+                "quarantine_reason": "不稳定",
+                "owner": "郑十一",
+                "quarantine_date": datetime.utcnow().isoformat(),
+                "expiry_date": (datetime.utcnow() + timedelta(days=7)).isoformat()
+            }
+        )
+        test_id = create_response.json()['id']
+
+        for _ in range(3):
+            client.post(
+                f"/api/quarantined-tests/{test_id}/result",
+                json={"result": "PASS", "run_date": datetime.utcnow().isoformat()}
+            )
+
+        client.post(
+            f"/api/quarantined-tests/{test_id}/result",
+            json={"result": "FAIL", "run_date": datetime.utcnow().isoformat()}
+        )
+
+        response = client.post(f"/api/quarantined-tests/{test_id}/mark-cleaned")
+        assert response.status_code == 400
+        assert response.json()['error_code'] == "REQUIRES_MANUAL_REVIEW"
 
 
 class Test08_API_ReportExport:

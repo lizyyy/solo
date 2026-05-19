@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
@@ -20,8 +21,38 @@ async def startup_event():
     init_db()
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    missing_fields = []
+    for error in exc.errors():
+        error_type = error.get("type", "")
+        if "missing" in error_type or error_type == "value_error.missing":
+            loc = error.get("loc", [])
+            field_name = ".".join([str(x) for x in loc])
+            missing_fields.append(field_name)
+    
+    if missing_fields:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error_code": ErrorCodes.MISSING_FIELD,
+                "message": "缺少必填字段",
+                "details": {"missing_fields": missing_fields}
+            }
+        )
+    
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={
+            "error_code": ErrorCodes.VALIDATION_ERROR,
+            "message": "参数验证失败",
+            "details": {"errors": exc.errors()}
+        }
+    )
+
+
 @app.exception_handler(ValueError)
-async def value_error_handler(request, exc):
+async def value_error_handler(request: Request, exc: ValueError):
     error_code = str(exc)
     if error_code == ErrorCodes.ALREADY_PROCESSED:
         return JSONResponse(

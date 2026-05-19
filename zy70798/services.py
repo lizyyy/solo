@@ -84,11 +84,13 @@ class ResultMerger:
         if result_update.result == ResultStatus.PASS:
             test.consecutive_passes += 1
         elif result_update.result == ResultStatus.FAIL:
+            if test.status == TestStatus.READY_FOR_CLEANUP.value:
+                test.status = TestStatus.REQUIRES_MANUAL_REVIEW.value
             test.consecutive_passes = 0
 
-        if test.consecutive_passes >= ResultMerger.MIN_CONSECUTIVE_PASSES_FOR_CLEANUP:
+        if test.consecutive_passes >= ResultMerger.MIN_CONSECUTIVE_PASSES_FOR_CLEANUP and test.status != TestStatus.REQUIRES_MANUAL_REVIEW.value:
             test.status = TestStatus.READY_FOR_CLEANUP.value
-        elif ExpiryCalculator.is_expired(test.expiry_date):
+        elif ExpiryCalculator.is_expired(test.expiry_date) and test.status not in [TestStatus.REQUIRES_MANUAL_REVIEW.value, TestStatus.CLEANED.value]:
             test.status = TestStatus.EXPIRED.value
 
         db.commit()
@@ -216,6 +218,9 @@ class QuarantineService:
 
         if test.status == TestStatus.CLEANED.value:
             raise ValueError(ErrorCodes.ALREADY_PROCESSED)
+
+        if test.status == TestStatus.REQUIRES_MANUAL_REVIEW.value:
+            raise ValueError(ErrorCodes.REQUIRES_MANUAL_REVIEW)
 
         if test.status not in [TestStatus.READY_FOR_CLEANUP.value, TestStatus.EXPIRED.value]:
             raise ValueError(ErrorCodes.INVALID_STATUS)
