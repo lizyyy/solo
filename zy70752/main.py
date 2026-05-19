@@ -206,7 +206,13 @@ def parse_plan(plan_content: str) -> List[Dict[str, Any]]:
         if "resource_changes" in plan_data:
             for change in plan_data["resource_changes"]:
                 resource_address = change.get("address", "")
-                actions = change.get("actions", [])
+                
+                actions = []
+                if "change" in change and "actions" in change["change"]:
+                    actions = change["change"]["actions"]
+                elif "actions" in change:
+                    actions = change["actions"]
+                
                 action_str = ",".join(actions) if actions else "no-op"
                 change_action = classify_action(action_str)
                 

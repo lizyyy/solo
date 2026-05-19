@@ -23,8 +23,8 @@ API文档: http://localhost:8000/docs
   "resource_changes": [
     {
       "address": "aws_instance.web_server",
-      "actions": ["create"],
       "change": {
+        "actions": ["create"],
         "after": {
           "instance_type": "t2.micro",
           "ami": "ami-12345",
@@ -34,8 +34,8 @@ API文档: http://localhost:8000/docs
     },
     {
       "address": "kubernetes_deployment.app",
-      "actions": ["update"],
       "change": {
+        "actions": ["update"],
         "after": {
           "replicas": 3,
           "image": "nginx:latest",
@@ -45,8 +45,8 @@ API文档: http://localhost:8000/docs
     },
     {
       "address": "database_postgresql.main",
-      "actions": ["delete"],
       "change": {
+        "actions": ["delete"],
         "after": null
       }
     }
@@ -62,7 +62,7 @@ curl -X POST http://localhost:8000/api/tasks \
   -H "Content-Type: application/json" \
   -d '{
     "plan_file_name": "sample_plan.json",
-    "plan_content": "{\"resource_changes\":[{\"address\":\"aws_instance.web_server\",\"actions\":[\"create\"],\"change\":{\"after\":{\"instance_type\":\"t2.micro\",\"ami\":\"ami-12345\",\"root_password\":\"secret123\"}}},{\"address\":\"kubernetes_deployment.app\",\"actions\":[\"update\"],\"change\":{\"after\":{\"replicas\":3,\"image\":\"nginx:latest\",\"api_token\":\"tok_abc123\"}}},{\"address\":\"database_postgresql.main\",\"actions\":[\"delete\"],\"change\":{\"after\":null}}]}",
+    "plan_content": "{\"resource_changes\":[{\"address\":\"aws_instance.web_server\",\"change\":{\"actions\":[\"create\"],\"after\":{\"instance_type\":\"t2.micro\",\"ami\":\"ami-12345\",\"root_password\":\"secret123\"}}},{\"address\":\"kubernetes_deployment.app\",\"change\":{\"actions\":[\"update\"],\"after\":{\"replicas\":3,\"image\":\"nginx:latest\",\"api_token\":\"tok_abc123\"}}},{\"address\":\"database_postgresql.main\",\"change\":{\"actions\":[\"delete\"],\"after\":null}}]}",
     "created_by": "admin"
   }'
 ```

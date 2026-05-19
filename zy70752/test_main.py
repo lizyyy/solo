@@ -39,8 +39,8 @@ TEST_PLAN_CONTENT = json.dumps({
     "resource_changes": [
         {
             "address": "aws_instance.web_server",
-            "actions": ["create"],
             "change": {
+                "actions": ["create"],
                 "after": {
                     "instance_type": "t2.micro",
                     "ami": "ami-12345",
@@ -50,8 +50,8 @@ TEST_PLAN_CONTENT = json.dumps({
         },
         {
             "address": "kubernetes_deployment.app",
-            "actions": ["update"],
             "change": {
+                "actions": ["update"],
                 "after": {
                     "replicas": 3,
                     "image": "nginx:latest",
@@ -61,8 +61,8 @@ TEST_PLAN_CONTENT = json.dumps({
         },
         {
             "address": "database_postgresql.main",
-            "actions": ["delete"],
             "change": {
+                "actions": ["delete"],
                 "after": None
             }
         }
@@ -319,3 +319,137 @@ def test_raw_input_saved():
     assert raw_data["plan_file_name"] == "test_raw.json"
     assert raw_data["created_by"] == "test_user"
     db.close()
+
+
+def test_standard_terraform_plan_json_structure():
+    terraform_standard_plan = json.dumps({
+        "format_version": "1.0",
+        "terraform_version": "1.5.0",
+        "resource_changes": [
+            {
+                "address": "aws_instance.example",
+                "type": "aws_instance",
+                "name": "example",
+                "change": {
+                    "actions": ["create"],
+                    "before": None,
+                    "after": {
+                        "ami": "ami-12345678",
+                        "instance_type": "t2.micro",
+                        "private_key": "secret"
+                    },
+                    "after_unknown": {
+                        "id": True
+                    }
+                }
+            },
+            {
+                "address": "kubernetes_deployment.app",
+                "type": "kubernetes_deployment",
+                "name": "app",
+                "change": {
+                    "actions": ["update"],
+                    "before": {
+                        "replicas": 1
+                    },
+                    "after": {
+                        "replicas": 3,
+                        "api_token": "sensitive-token"
+                    }
+                }
+            },
+            {
+                "address": "null_resource.old",
+                "type": "null_resource",
+                "name": "old",
+                "change": {
+                    "actions": ["delete"],
+                    "before": {
+                        "triggers": None
+                    },
+                    "after": None
+                }
+            },
+            {
+                "address": "null_resource.noop",
+                "type": "null_resource",
+                "name": "noop",
+                "change": {
+                    "actions": ["no-op"],
+                    "before": {},
+                    "after": {}
+                }
+            }
+        ]
+    })
+    
+    response = client.post(
+        "/api/tasks",
+        json={
+            "plan_file_name": "standard_terraform.json",
+            "plan_content": terraform_standard_plan,
+            "created_by": "test_user"
+        }
+    )
+    assert response.status_code == 200
+    task_id = response.json()["id"]
+    
+    response = client.get(f"/api/tasks/{task_id}")
+    data = response.json()
+    
+    aws_resource = next(r for r in data["resources"] if r["resource_address"] == "aws_instance.example")
+    assert aws_resource["change_action"] == "create"
+    
+    k8s_resource = next(r for r in data["resources"] if r["resource_address"] == "kubernetes_deployment.app")
+    assert k8s_resource["change_action"] == "update"
+    
+    delete_resource = next(r for r in data["resources"] if r["resource_address"] == "null_resource.old")
+    assert delete_resource["change_action"] == "delete"
+    
+    noop_resource = next(r for r in data["resources"] if r["resource_address"] == "null_resource.noop")
+    assert noop_resource["change_action"] == "no-op"
+    
+    assert "private_key" in aws_resource["sensitive_fields"]
+    assert "api_token" in k8s_resource["sensitive_fields"]
+
+
+def test_export_summary_statistics():
+    terraform_standard_plan = json.dumps({
+        "resource_changes": [
+            {
+                "address": "aws_instance.web1",
+                "change": { "actions": ["create"] }
+            },
+            {
+                "address": "aws_instance.web2",
+                "change": { "actions": ["create"] }
+            },
+            {
+                "address": "kubernetes_deployment.app",
+                "change": { "actions": ["update"] }
+            },
+            {
+                "address": "null_resource.old",
+                "change": { "actions": ["delete"] }
+            }
+        ]
+    })
+    
+    response = client.post(
+        "/api/tasks",
+        json={
+            "plan_file_name": "summary_test.json",
+            "plan_content": terraform_standard_plan,
+            "created_by": "test_user"
+        }
+    )
+    assert response.status_code == 200
+    task_id = response.json()["id"]
+    
+    export_response = client.get(f"/api/tasks/{task_id}/export")
+    export_data = export_response.json()
+    
+    assert export_data["summary"]["total_resources"] == 4
+    assert export_data["summary"]["by_action"]["create"] == 2
+    assert export_data["summary"]["by_action"]["update"] == 1
+    assert export_data["summary"]["by_action"]["delete"] == 1
