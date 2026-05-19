@@ -1,0 +1,6 @@
+artifacts:
+- name: common-lib-v1.0.0.tar.gz
+  sha256: b6247e73ba49b801ac242b3847ff6650645a02eec356dd030befbe847250eeb6
+build_number: '456'
+commit_id: abcdef1234567890abcdef1234567890abcdef12
+description: 边界冲突 - 多目录同名文件

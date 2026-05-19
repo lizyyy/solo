@@ -1,0 +1,10 @@
+artifacts:
+- name: app-v1.0.0-abcdef1234567890abcdef1234567890abcdef12-build-123.tar.gz
+  sha256: 29348503f8894d6a43b82051b9e3565a9a6ac79cfc60dae1a444ada1c71a1264
+- name: service-v1.0.0-abcdef1234567890abcdef1234567890abcdef12-build-123.jar
+  sha256: ec80faa424cb7625ea4fa743a7ac287490805e6ca9cab5f7497007a965d07f95
+- name: web-v1.0.0-abcdef1234567890abcdef1234567890abcdef12-build-123.zip
+  sha256: dd5649dbb8d8ce770eac5864d2a3c4ab9a455c766ddd6c4b456669b7db5b6997
+build_number: '123'
+commit_id: abcdef1234567890abcdef1234567890abcdef12
+description: 正常发布版本 v1.0.0

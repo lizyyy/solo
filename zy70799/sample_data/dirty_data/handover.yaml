@@ -1,0 +1,10 @@
+artifacts:
+- name: app-v1.0.0-wrongcommit-build-123.tar.gz
+  sha256: wronghash1234567890
+- name: service-v1.0.0-abcdef1234567890abcdef1234567890abcdef12-build-999.jar
+  sha256: d411b84afa5fdf02732900fb98c9d82f9d2e104853cde50f7f77e11e0a5f5dbc
+- name: web-v1.0.0-abcdef1234567890abcdef1234567890abcdef12-build-123.zip
+  sha256: expectedhashnotequal
+build_number: '123'
+commit_id: abcdef1234567890abcdef1234567890abcdef12
+description: 包含脏数据的发布版本

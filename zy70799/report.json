@@ -1,0 +1,39 @@
+{
+  "timestamp": "2026-05-19T16:19:20.457609",
+  "directories_scanned": [
+    "sample_data/conflict/artifacts1",
+    "sample_data/conflict/artifacts2"
+  ],
+  "total_artifacts_found": 2,
+  "total_artifacts_expected": 1,
+  "matched": [],
+  "missing": [],
+  "mismatched": [
+    {
+      "status": "MISMATCHED",
+      "message": "制品 common-lib-v1.0.0.tar.gz 存在但有问题: 提交号不匹配 (期望: abcdef1234567890abcdef1234567890abcdef12, 实际: 未找到); 构建号不匹配 (期望: 456, 实际: 未找到); 哈希不匹配 (期望: b6247e73ba49b801ac242b3847ff6650645a02eec356dd030befbe847250eeb6, 实际: 5554ab008eb6531254d79e7f9e9ed7ec5e5b2a58bf0c72d830c4d15595be00ff)",
+      "artifact": {
+        "file_path": "sample_data/conflict/artifacts2/common-lib-v1.0.0.tar.gz",
+        "file_name": "common-lib-v1.0.0.tar.gz",
+        "file_size": 33,
+        "sha256": "5554ab008eb6531254d79e7f9e9ed7ec5e5b2a58bf0c72d830c4d15595be00ff",
+        "commit_id": null,
+        "build_number": null,
+        "directory": ""
+      },
+      "expected": {
+        "name": "common-lib-v1.0.0.tar.gz",
+        "sha256": "b6247e73ba49b801ac242b3847ff6650645a02eec356dd030befbe847250eeb6"
+      }
+    }
+  ],
+  "orphaned": [],
+  "summary": {
+    "total_found": 2,
+    "total_expected": 1,
+    "matched": 0,
+    "missing": 0,
+    "mismatched": 1,
+    "orphaned": 0
+  }
+}

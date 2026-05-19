@@ -1,0 +1,8 @@
+artifacts:
+- name: missing-artifact-1.tar.gz
+  sha256: hash1
+- name: missing-artifact-2.jar
+  sha256: hash2
+build_number: '789'
+commit_id: abcdef1234567890abcdef1234567890abcdef12
+description: 空结果 - 期望制品不存在
