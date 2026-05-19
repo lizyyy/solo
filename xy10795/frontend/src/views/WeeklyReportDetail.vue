@@ -282,13 +282,13 @@ const loadAvailableRisks = async () => {
     }
 }
 
-watch(() => showSendDialog, (val) => {
+watch(showSendDialog, (val) => {
     if (val) {
         currentSendOperationId.value = null
     }
 })
 
-watch(() => showAddRiskDialog, (val) => {
+watch(showAddRiskDialog, (val) => {
     if (val) {
         loadAvailableRisks()
     }

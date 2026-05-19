@@ -248,7 +248,7 @@ watch(() => props.report, () => {
     }
 })
 
-watch(() => showSendDialog, (val) => {
+watch(showSendDialog, (val) => {
     if (val) {
         currentSendOperationId.value = null
     }

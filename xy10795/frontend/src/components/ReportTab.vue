@@ -219,7 +219,7 @@ const openReviewDrawer = (report) => {
     showReviewDrawer.value = true
 }
 
-watch(() => showCreateDialog, (val) => {
+watch(showCreateDialog, (val) => {
     if (val && props.projectId) {
         loadRisks()
     }
