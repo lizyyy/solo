@@ -205,6 +205,95 @@ def run_tests():
 
     test("Detect multiple violation types", test_violation_types)
 
+    def test_duplicate_modules_detection():
+        artifact_data = BuildArtifactCreate(
+            build_id="build-duplicate-modules",
+            project_name="frontend-app",
+            chunks=[
+                {
+                    "chunk_name": "chunk-a.js",
+                    "file_size": 100 * 1024,
+                    "modules": [
+                        {"module_path": "src/shared/utils.ts", "module_size": 5000, "is_third_party": False},
+                    ],
+                },
+                {
+                    "chunk_name": "chunk-b.js",
+                    "file_size": 100 * 1024,
+                    "modules": [
+                        {"module_path": "src/shared/utils.ts", "module_size": 5000, "is_third_party": False},
+                    ],
+                },
+                {
+                    "chunk_name": "chunk-c.js",
+                    "file_size": 100 * 1024,
+                    "modules": [
+                        {"module_path": "src/shared/utils.ts", "module_size": 5000, "is_third_party": False},
+                    ],
+                },
+            ],
+        )
+        artifact = create_build_artifact(db, artifact_data)
+        report = analyze_budget_violations(db, artifact)
+
+        violation_types = [v.violation_type for v in report.violations]
+        assert ViolationType.DUPLICATE_MODULES in violation_types, "DUPLICATE_MODULES violation should be detected"
+
+        duplicate_violations = [v for v in report.violations if v.violation_type == ViolationType.DUPLICATE_MODULES]
+        assert len(duplicate_violations) >= 1
+        assert "src/shared/utils.ts" in duplicate_violations[0].reason
+        assert duplicate_violations[0].needs_review == True
+
+    test("Detect duplicate modules across chunks", test_duplicate_modules_detection)
+
+    def test_filter_by_needs_review():
+        artifact_data1 = BuildArtifactCreate(
+            build_id="build-needs-review-yes",
+            project_name="test-project",
+            chunks=[
+                {
+                    "chunk_name": "huge.js",
+                    "file_size": 500 * 1024,
+                    "modules": [],
+                },
+            ],
+        )
+        artifact1 = create_build_artifact(db, artifact_data1)
+        report1 = analyze_budget_violations(db, artifact1)
+
+        artifact_data2 = BuildArtifactCreate(
+            build_id="build-needs-review-no",
+            project_name="test-project",
+            chunks=[
+                {
+                    "chunk_name": "small.js",
+                    "file_size": 50 * 1024,
+                    "modules": [],
+                },
+            ],
+        )
+        artifact2 = create_build_artifact(db, artifact_data2)
+        report2 = analyze_budget_violations(db, artifact2)
+
+        filter_needs_review = BudgetReportFilter(needs_review=True)
+        reports_needs_review = get_budget_reports(db, filter_needs_review)
+        report_ids_needs_review = [r.id for r in reports_needs_review]
+        assert report1.id in report_ids_needs_review
+
+        filter_no_needs_review = BudgetReportFilter(needs_review=False)
+        reports_no_needs_review = get_budget_reports(db, filter_no_needs_review)
+        report_ids_no_review = [r.id for r in reports_no_needs_review]
+        assert report2.id in report_ids_no_review
+
+    test("Filter reports by needs_review flag", test_filter_by_needs_review)
+
+    def test_main_entrypoint():
+        from app.main import main
+        assert callable(main)
+        print("    - main() function is callable")
+
+    test("Verify command entry point main()", test_main_entrypoint)
+
     print("\n[4] Testing Report Management")
     print("-" * 60)
 

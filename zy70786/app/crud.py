@@ -234,6 +234,32 @@ def analyze_budget_violations(
                     total_violations += 1
                     warning_violations += 1
 
+    module_occurrences: Dict[str, List[Chunk]] = {}
+    for chunk in artifact.chunks:
+        for module in chunk.modules:
+            key = module.module_path
+            if key not in module_occurrences:
+                module_occurrences[key] = []
+            module_occurrences[key].append(chunk)
+
+    for module_path, chunks_list in module_occurrences.items():
+        if len(chunks_list) > 1:
+            total_size_kb = sum(c.file_size for c in chunks_list) / 1024
+            chunk_names = ", ".join(c.chunk_name for c in chunks_list)
+            violation = Violation(
+                chunk_id=chunks_list[0].id,
+                report_id=report.id,
+                violation_type=ViolationType.DUPLICATE_MODULES,
+                actual_size=total_size_kb,
+                budget_size=None,
+                excess_size=total_size_kb,
+                reason=f"Module '{module_path}' appears in {len(chunks_list)} chunks: {chunk_names}",
+                needs_review=len(chunks_list) > 2,
+            )
+            db.add(violation)
+            total_violations += 1
+            warning_violations += 1
+
     report.total_violations = total_violations
     report.critical_violations = critical_violations
     report.warning_violations = warning_violations
@@ -275,8 +301,14 @@ def get_budget_reports(db: Session, filter_params: BudgetReportFilter) -> List[B
         query = query.filter(BudgetReport.is_processed == filter_params.is_processed)
 
     if filter_params.needs_review is not None:
-        query = query.filter(Violation.needs_review == filter_params.needs_review)
-        query = query.filter(BudgetReport.violations.any())
+        if filter_params.needs_review:
+            query = query.filter(
+                BudgetReport.violations.any(Violation.needs_review == True)
+            )
+        else:
+            query = query.filter(
+                ~BudgetReport.violations.any(Violation.needs_review == True)
+            )
 
     return query.order_by(BudgetReport.generated_at.desc()).all()
 
