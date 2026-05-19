@@ -1,0 +1,8 @@
+line_number,ip,user_agent,ua_hash,path_signature,path,status,cluster_id
+1,192.168.1.1,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",9c1ce27f08b1,/,/,200,
+6,192.168.1.4,"Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1",3c93bf3f5390,/,/,200,
+7,10.0.0.1,UnknownClient/1.0,74425267cd49,/test1,/test1,200,CLS-UNKNOWN-06110140
+8,10.0.0.1,UnknownClient/1.0,74425267cd49,/test2,/test2,200,CLS-UNKNOWN-06110140
+9,10.0.0.1,UnknownClient/1.0,74425267cd49,/test3,/test3,200,CLS-UNKNOWN-06110140
+10,10.0.0.1,UnknownClient/1.0,74425267cd49,/test4,/test4,200,CLS-UNKNOWN-06110140
+12,192.168.1.5,"Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.144 Mobile Safari/537.36",8bec53cb388e,/api,/api,200,

@@ -1,0 +1,147 @@
+# User-Agent 分类规则配置
+# priority: 优先级，数字越大优先级越高
+# category: client(客户端), crawler(爬虫), risk(风险), unknown(未知)
+
+rules:
+  - name: "企业内网浏览器"
+    category: "client"
+    priority: 90
+    ua_families:
+      - "Chrome"
+      - "Chrome Mobile"
+      - "Chrome Mobile iOS"
+      - "Firefox"
+      - "Firefox Mobile"
+      - "Firefox iOS"
+      - "Safari"
+      - "Mobile Safari"
+      - "Mobile Safari UI/WKWebView"
+      - "Edge"
+      - "Edge Mobile"
+    os_families:
+      - "Windows"
+      - "Mac OS X"
+      - "Linux"
+      - "Android"
+      - "iOS"
+      - "iPadOS"
+    is_bot: false
+
+  - name: "移动端原生APP"
+    category: "client"
+    priority: 85
+    patterns:
+      - "okhttp"
+      - "CFNetwork"
+      - "Darwin"
+      - "AndroidDownloadManager"
+      - "Mozilla/5.0.*Mobile"
+      - "Mobile Safari"
+    is_bot: false
+
+  - name: "主流搜索引擎爬虫"
+    category: "crawler"
+    priority: 95
+    patterns:
+      - "googlebot"
+      - "googlebot-image"
+      - "googlebot-video"
+      - "googlebot-news"
+      - "mediapartners-google"
+      - "bingbot"
+      - "bingpreview"
+      - "baiduspider"
+      - "baiduspider-render"
+      - "baiduspider-image"
+      - "yandexbot"
+      - "yandex"
+      - "sogou"
+      - "sogou web spider"
+      - "360spider"
+      - "haosouspider"
+      - "bytespider"
+      - "petalbot"
+      - "slurp"
+      - "duckduckbot"
+    is_bot: true
+
+  - name: "通用爬虫与抓取工具"
+    category: "crawler"
+    priority: 80
+    patterns:
+      - "crawler"
+      - "spider"
+      - "scraper"
+      - "archiver"
+      - "bot"
+      - "ahrefs"
+      - "semrush"
+      - "mj12bot"
+      - "dotbot"
+      - "rogerbot"
+      - "exabot"
+      - "facebot"
+      - "facebookexternalhit"
+      - "twitterbot"
+      - "linkedinbot"
+      - "pinterest"
+      - "screaming frog"
+    is_bot: true
+
+  - name: "安全扫描工具"
+    category: "risk"
+    priority: 100
+    patterns:
+      - "masscan"
+      - "nmap"
+      - "nmap scripting engine"
+      - "nessus"
+      - "openvas"
+      - "acunetix"
+      - "netsparker"
+      - "burp"
+      - "burpsuite"
+      - "sqlmap"
+      - "nikto"
+      - "dirbuster"
+      - "gobuster"
+      - "feroxbuster"
+      - "hydra"
+      - "medusa"
+      - "patator"
+      - "metasploit"
+      - "zgrab"
+      - "zmap"
+      - "shodan"
+      - "censys"
+      - "binaryedge"
+      - "peathound"
+      - "bloodhound"
+
+  - name: "命令行HTTP工具"
+    category: "risk"
+    priority: 80
+    patterns:
+      - "curl/"
+      - "wget/"
+      - "python-requests"
+      - "python-urllib"
+      - "go-http-client"
+      - "java/"
+      - "perl-"
+      - "php/"
+      - "ruby"
+      - "node-fetch"
+      - "axios"
+      - "postman"
+      - "insomnia"
+      - "httpie"
+
+  - name: "空User-Agent"
+    category: "risk"
+    priority: 99
+    patterns:
+      - "^-$"
+      - "^$"
+      - "^null$"
+      - "^undefined$"
