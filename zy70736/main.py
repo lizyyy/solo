@@ -49,6 +49,10 @@ def create_switch(switch: schemas.SwitchRecordCreate, db: Session = Depends(get_
     if not domain:
         raise HTTPException(status_code=404, detail="Domain not found")
 
+    existing = services.check_idempotency(db, switch.domain_id, switch.created_by, switch.switch_reason)
+    if existing:
+        return existing
+
     active_switch = services.get_active_switch_for_domain(db, switch.domain_id)
     if active_switch:
         raise HTTPException(
@@ -56,7 +60,10 @@ def create_switch(switch: schemas.SwitchRecordCreate, db: Session = Depends(get_
             detail=f"Domain already has active switch (ID: {active_switch.id})"
         )
 
-    db_switch = services.create_switch_record(db, switch)
+    db_switch = models.SwitchRecord(**switch.dict())
+    db.add(db_switch)
+    db.commit()
+    db.refresh(db_switch)
     return db_switch
 
 
@@ -167,16 +174,11 @@ def manual_correct(switch_id: int, request: schemas.ManualCorrectRequest, db: Se
     if not db_switch:
         raise HTTPException(status_code=404, detail="Switch record not found")
 
-    result = services.transition_status(
+    result = services.force_transition_status(
         db, db_switch, request.target_status,
         request.operator, request.reason,
         request.original_input
     )
-    if not result:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Cannot transition from {db_switch.status} to {request.target_status}"
-        )
     return result
 
 

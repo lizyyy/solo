@@ -71,6 +71,29 @@ def transition_status(
     return switch_record
 
 
+def force_transition_status(
+    db: Session,
+    switch_record: SwitchRecord,
+    target_status: SwitchStatus,
+    operator: str,
+    reason: str,
+    original_input: Optional[str] = None
+) -> SwitchRecord:
+    current_status = SwitchStatus(switch_record.status)
+    
+    switch_record.status = target_status
+    
+    if target_status == SwitchStatus.SWITCHED and not switch_record.switched_at:
+        switch_record.switched_at = datetime.utcnow()
+    elif target_status == SwitchStatus.RESTORED and not switch_record.restored_at:
+        switch_record.restored_at = datetime.utcnow()
+
+    log_operation(db, switch_record.id, "MANUAL_CORRECT", operator, original_input, reason)
+    db.commit()
+    db.refresh(switch_record)
+    return switch_record
+
+
 def log_operation(
     db: Session,
     switch_record_id: int,

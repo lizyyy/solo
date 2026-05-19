@@ -262,7 +262,42 @@ def test_cancel_switch():
     assert cancel_response.json()["status"] == SwitchStatus.CANCELLED
 
 
-def test_manual_correction():
+def test_manual_correction_bypass_state_machine():
+    domain_response = client.post(
+        "/domains/",
+        json={
+            "domain_name": "cdn.example.com",
+            "primary_origin": "primary.example.com",
+            "backup_origin": "backup.example.com"
+        }
+    )
+    domain_id = domain_response.json()["id"]
+
+    switch_response = client.post(
+        "/switches/",
+        json={
+            "domain_id": domain_id,
+            "switch_reason": "Test",
+            "created_by": "admin"
+        }
+    )
+    switch_id = switch_response.json()["id"]
+    assert switch_response.json()["status"] == SwitchStatus.PENDING
+
+    correct_response = client.post(
+        f"/switches/{switch_id}/correct",
+        json={
+            "target_status": SwitchStatus.CLOSED,
+            "operator": "superadmin",
+            "reason": "Manual override - bypass state machine",
+            "original_input": "Emergency fix"
+        }
+    )
+    assert correct_response.status_code == 200
+    assert correct_response.json()["status"] == SwitchStatus.CLOSED
+
+
+def test_manual_correction_any_transition():
     domain_response = client.post(
         "/domains/",
         json={
@@ -286,14 +321,13 @@ def test_manual_correction():
     correct_response = client.post(
         f"/switches/{switch_id}/correct",
         json={
-            "target_status": SwitchStatus.CLOSED,
+            "target_status": SwitchStatus.RESTORED,
             "operator": "superadmin",
-            "reason": "Manual override",
-            "original_input": "Emergency fix"
+            "reason": "Direct PENDING -> RESTORED transition via manual correct"
         }
     )
     assert correct_response.status_code == 200
-    assert correct_response.json()["status"] == SwitchStatus.CLOSED
+    assert correct_response.json()["status"] == SwitchStatus.RESTORED
 
 
 def test_report_export():
