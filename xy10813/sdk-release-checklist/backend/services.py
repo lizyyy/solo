@@ -396,6 +396,10 @@ class CompensationService:
         action_data: CompensationActionCreate,
         executed_by: str
     ) -> CompensationAction:
+        db_sdk = SDKVersionService.get_sdk_version(db, sdk_id)
+        if not db_sdk:
+            raise ValueError(f"SDK版本 {sdk_id} 不存在，无法创建补偿动作")
+        
         action = CompensationAction(
             sdk_version_id=sdk_id,
             action_type=action_data.action_type,
@@ -441,6 +445,16 @@ class CompensationService:
         db_sdk = SDKVersionService.get_sdk_version(db, sdk_id)
         if not db_sdk:
             raise ValueError(f"SDK版本 {sdk_id} 不存在")
+        
+        if db_sdk.status != ReleaseStatus.PUBLISHED:
+            raise ValueError(f"只有已发布 (published) 状态的 SDK 才能回滚，当前状态为 {db_sdk.status}")
+        
+        rollback_validation = ReleaseValidationService.validate_status_sequence(
+            db_sdk.status, ReleaseStatus.ROLLED_BACK
+        )
+        if not rollback_validation.valid:
+            error_messages = "; ".join([f"{e.field}: {e.message}" for e in rollback_validation.errors])
+            raise ValueError(f"回滚验证失败: {error_messages}")
         
         rollback_note = RollbackNote(
             sdk_version_id=sdk_id,
