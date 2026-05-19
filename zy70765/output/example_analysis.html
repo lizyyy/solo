@@ -1,0 +1,537 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAR延迟分桶分析报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f7fa; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #2c3e50; margin-bottom: 20px; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin: 25px 0 15px; font-size: 1.3em; }
+        h3 { color: #5d6d7e; margin: 15px 0 10px; font-size: 1.1em; }
+        .summary-card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .summary-item { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 6px; }
+        .summary-value { font-size: 1.8em; font-weight: bold; color: #2c3e50; }
+        .summary-label { font-size: 0.85em; color: #7f8c8d; margin-top: 5px; }
+        .table-container { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background: #34495e; color: white; font-weight: 600; }
+        tr:hover { background: #f8f9fa; }
+        .bad-row { background: #ffebee; }
+        .bad-row:hover { background: #ffcdd2; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75em; font-weight: 600; }
+        .badge-fast { background: #c8e6c9; color: #2e7d32; }
+        .badge-normal { background: #bbdefb; color: #1565c0; }
+        .badge-slow { background: #ffe082; color: #f57f17; }
+        .badge-very_slow { background: #ffab91; color: #d84315; }
+        .badge-extreme { background: #ef9a9a; color: #c62828; }
+        .badge-success { background: #c8e6c9; color: #2e7d32; }
+        .badge-error { background: #ef9a9a; color: #c62828; }
+        .progress-bar { height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 4px; }
+        .metadata { color: #7f8c8d; font-size: 0.85em; margin-bottom: 20px; }
+        .section { margin-bottom: 30px; }
+        .url-cell { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HAR延迟分桶分析报告</h1>
+        <div class="metadata">
+            生成时间: 2026-05-19 15:28:26 | 源文件: example.har
+        </div>
+
+        <div class="summary-card">
+            <h2>概览统计</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-value">12</div>
+                    <div class="summary-label">总请求数</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">12</div>
+                    <div class="summary-label">有效请求</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">0</div>
+                    <div class="summary-label">坏行数</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">6</div>
+                    <div class="summary-label">域名数</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">425.0ms</div>
+                    <div class="summary-label">P50 延迟</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">2400.0ms</div>
+                    <div class="summary-label">P95 延迟</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>按域名统计</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>域名</th>
+                            <th>请求数</th>
+                            <th>平均延迟</th>
+                            <th>最慢请求</th>
+                            <th>耗时分布</th>
+                            <th>状态码分布</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td><strong>api.example.com</strong></td>
+                            <td>2</td>
+                            <td>1000.0ms</td>
+                            <td>1200.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-very_slow">very_slow: 1</span>
+                                
+                                <span class="badge badge-slow">slow: 1</span>
+                                
+                            </td>
+                            <td>
+                                
+                                <span class="badge badge-success">success_2xx: 1</span>
+                                
+                                <span class="badge badge-error">server_error_5xx: 1</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>cdn.example.com</strong></td>
+                            <td>5</td>
+                            <td>224.0ms</td>
+                            <td>600.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-normal">normal: 2</span>
+                                
+                                <span class="badge badge-slow">slow: 1</span>
+                                
+                                <span class="badge badge-fast">fast: 2</span>
+                                
+                            </td>
+                            <td>
+                                
+                                <span class="badge badge-success">success_2xx: 5</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>fonts.example.com</strong></td>
+                            <td>1</td>
+                            <td>400.0ms</td>
+                            <td>400.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-normal">normal: 1</span>
+                                
+                            </td>
+                            <td>
+                                
+                                <span class="badge badge-success">success_2xx: 1</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>slow-api.example.com</strong></td>
+                            <td>2</td>
+                            <td>2500.0ms</td>
+                            <td>3500.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-extreme">extreme: 1</span>
+                                
+                                <span class="badge badge-very_slow">very_slow: 1</span>
+                                
+                            </td>
+                            <td>
+                                
+                                <span class="badge badge-success">success_2xx: 1</span>
+                                
+                                <span class="badge badge-error">client_error_4xx: 1</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>third-party.example.com</strong></td>
+                            <td>1</td>
+                            <td>450.0ms</td>
+                            <td>450.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-normal">normal: 1</span>
+                                
+                            </td>
+                            <td>
+                                
+                                <span class="badge badge-success">success_2xx: 1</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>www.example.com</strong></td>
+                            <td>1</td>
+                            <td>50.0ms</td>
+                            <td>50.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-fast">fast: 1</span>
+                                
+                            </td>
+                            <td>
+                                
+                                <span class="badge badge-success">success_2xx: 1</span>
+                                
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>按资源类型统计</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>资源类型</th>
+                            <th>请求数</th>
+                            <th>平均延迟</th>
+                            <th>最慢请求</th>
+                            <th>耗时分布</th>
+                            <th>涉及域名数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td><strong>document</strong></td>
+                            <td>1</td>
+                            <td>50.0ms</td>
+                            <td>50.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-fast">fast: 1</span>
+                                
+                            </td>
+                            <td>1</td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>font</strong></td>
+                            <td>1</td>
+                            <td>400.0ms</td>
+                            <td>400.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-normal">normal: 1</span>
+                                
+                            </td>
+                            <td>1</td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>image</strong></td>
+                            <td>2</td>
+                            <td>85.0ms</td>
+                            <td>90.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-fast">fast: 2</span>
+                                
+                            </td>
+                            <td>1</td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>script</strong></td>
+                            <td>3</td>
+                            <td>416.7ms</td>
+                            <td>600.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-slow">slow: 1</span>
+                                
+                                <span class="badge badge-normal">normal: 2</span>
+                                
+                            </td>
+                            <td>2</td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>stylesheet</strong></td>
+                            <td>1</td>
+                            <td>150.0ms</td>
+                            <td>150.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-normal">normal: 1</span>
+                                
+                            </td>
+                            <td>1</td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>xhr</strong></td>
+                            <td>4</td>
+                            <td>1750.0ms</td>
+                            <td>3500.0ms</td>
+                            <td>
+                                
+                                <span class="badge badge-very_slow">very_slow: 2</span>
+                                
+                                <span class="badge badge-extreme">extreme: 1</span>
+                                
+                                <span class="badge badge-slow">slow: 1</span>
+                                
+                            </td>
+                            <td>2</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>耗时分桶分布</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>分桶</th>
+                            <th>请求数</th>
+                            <th>占比</th>
+                            <th>资源类型</th>
+                            <th>域名数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td><span class="badge badge-fast">fast</span></td>
+                            <td>3</td>
+                            <td>25.0%</td>
+                            <td>2 种</td>
+                            <td>2</td>
+                        </tr>
+                        
+                        <tr>
+                            <td><span class="badge badge-normal">normal</span></td>
+                            <td>4</td>
+                            <td>33.3%</td>
+                            <td>3 种</td>
+                            <td>3</td>
+                        </tr>
+                        
+                        <tr>
+                            <td><span class="badge badge-slow">slow</span></td>
+                            <td>2</td>
+                            <td>16.7%</td>
+                            <td>2 种</td>
+                            <td>2</td>
+                        </tr>
+                        
+                        <tr>
+                            <td><span class="badge badge-very_slow">very_slow</span></td>
+                            <td>2</td>
+                            <td>16.7%</td>
+                            <td>1 种</td>
+                            <td>2</td>
+                        </tr>
+                        
+                        <tr>
+                            <td><span class="badge badge-extreme">extreme</span></td>
+                            <td>1</td>
+                            <td>8.3%</td>
+                            <td>1 种</td>
+                            <td>1</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>异常慢请求样本 (TOP 12)</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>原始位置</th>
+                            <th>耗时(ms)</th>
+                            <th>分桶</th>
+                            <th>域名</th>
+                            <th>资源类型</th>
+                            <th>状态码</th>
+                            <th>URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>1</td>
+                            <td>#4</td>
+                            <td><strong>3500.0</strong></td>
+                            <td><span class="badge badge-extreme">extreme</span></td>
+                            <td>slow-api.example.com</td>
+                            <td>xhr</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://slow-api.example.com/heavy-endpoint">https://slow-api.example.com/heavy-endpoint</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>2</td>
+                            <td>#11</td>
+                            <td><strong>1500.0</strong></td>
+                            <td><span class="badge badge-very_slow">very_slow</span></td>
+                            <td>slow-api.example.com</td>
+                            <td>xhr</td>
+                            <td>401</td>
+                            <td class="url-cell" title="https://slow-api.example.com/auth">https://slow-api.example.com/auth</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>3</td>
+                            <td>#3</td>
+                            <td><strong>1200.0</strong></td>
+                            <td><span class="badge badge-very_slow">very_slow</span></td>
+                            <td>api.example.com</td>
+                            <td>xhr</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://api.example.com/data">https://api.example.com/data</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>4</td>
+                            <td>#7</td>
+                            <td><strong>800.0</strong></td>
+                            <td><span class="badge badge-slow">slow</span></td>
+                            <td>api.example.com</td>
+                            <td>xhr</td>
+                            <td>500</td>
+                            <td class="url-cell" title="https://api.example.com/analytics">https://api.example.com/analytics</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>5</td>
+                            <td>#2</td>
+                            <td><strong>600.0</strong></td>
+                            <td><span class="badge badge-slow">slow</span></td>
+                            <td>cdn.example.com</td>
+                            <td>script</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://cdn.example.com/app.js">https://cdn.example.com/app.js</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>6</td>
+                            <td>#10</td>
+                            <td><strong>450.0</strong></td>
+                            <td><span class="badge badge-normal">normal</span></td>
+                            <td>third-party.example.com</td>
+                            <td>script</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://third-party.example.com/track.js">https://third-party.example.com/track.js</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>7</td>
+                            <td>#6</td>
+                            <td><strong>400.0</strong></td>
+                            <td><span class="badge badge-normal">normal</span></td>
+                            <td>fonts.example.com</td>
+                            <td>font</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://fonts.example.com/main.woff2">https://fonts.example.com/main.woff2</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>8</td>
+                            <td>#8</td>
+                            <td><strong>200.0</strong></td>
+                            <td><span class="badge badge-normal">normal</span></td>
+                            <td>cdn.example.com</td>
+                            <td>script</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://cdn.example.com/vendor.js">https://cdn.example.com/vendor.js</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>9</td>
+                            <td>#1</td>
+                            <td><strong>150.0</strong></td>
+                            <td><span class="badge badge-normal">normal</span></td>
+                            <td>cdn.example.com</td>
+                            <td>stylesheet</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://cdn.example.com/styles.css">https://cdn.example.com/styles.css</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>10</td>
+                            <td>#9</td>
+                            <td><strong>90.0</strong></td>
+                            <td><span class="badge badge-fast">fast</span></td>
+                            <td>cdn.example.com</td>
+                            <td>image</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://cdn.example.com/banner.jpg">https://cdn.example.com/banner.jpg</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>11</td>
+                            <td>#5</td>
+                            <td><strong>80.0</strong></td>
+                            <td><span class="badge badge-fast">fast</span></td>
+                            <td>cdn.example.com</td>
+                            <td>image</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://cdn.example.com/logo.png">https://cdn.example.com/logo.png</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>12</td>
+                            <td>#0</td>
+                            <td><strong>50.0</strong></td>
+                            <td><span class="badge badge-fast">fast</span></td>
+                            <td>www.example.com</td>
+                            <td>document</td>
+                            <td>200</td>
+                            <td class="url-cell" title="https://www.example.com/">https://www.example.com/</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        
+    </div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: har-analyzer-cli
+Version: 1.0.0
+Summary: HAR延迟分桶异常样本保留排查CLI
+Author: Dev Team
+Requires-Python: >=3.8
+Requires-Dist: jinja2>=3.0.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

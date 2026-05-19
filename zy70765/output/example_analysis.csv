@@ -1,0 +1,50 @@
+﻿=== 域名统计 ===
+域名,请求数,平均延迟(ms),最小延迟(ms),最大延迟(ms),fast_count,normal_count,slow_count,very_slow_count,extreme_count
+api.example.com,2,1000.0,800.0,1200.0,0,0,1,1,0
+cdn.example.com,5,224.0,80.0,600.0,2,2,1,0,0
+fonts.example.com,1,400.0,400.0,400.0,0,1,0,0,0
+slow-api.example.com,2,2500.0,1500.0,3500.0,0,0,0,1,1
+third-party.example.com,1,450.0,450.0,450.0,0,1,0,0,0
+www.example.com,1,50.0,50.0,50.0,1,0,0,0,0
+
+=== 资源类型统计 ===
+资源类型,请求数,平均延迟(ms),最小延迟(ms),最大延迟(ms),fast_count,normal_count,slow_count,very_slow_count,extreme_count
+document,1,50.0,50.0,50.0,1,0,0,0,0
+font,1,400.0,400.0,400.0,0,1,0,0,0
+image,2,85.0,80.0,90.0,2,0,0,0,0
+script,3,416.67,200.0,600.0,0,2,1,0,0
+stylesheet,1,150.0,150.0,150.0,0,1,0,0,0
+xhr,4,1750.0,800.0,3500.0,0,0,1,2,1
+
+=== 异常慢请求样本 ===
+排名,原始位置,耗时(ms),分桶,域名,资源类型,状态码,URL
+1,4,3500.0,extreme,slow-api.example.com,xhr,200,https://slow-api.example.com/heavy-endpoint
+2,11,1500.0,very_slow,slow-api.example.com,xhr,401,https://slow-api.example.com/auth
+3,3,1200.0,very_slow,api.example.com,xhr,200,https://api.example.com/data
+4,7,800.0,slow,api.example.com,xhr,500,https://api.example.com/analytics
+5,2,600.0,slow,cdn.example.com,script,200,https://cdn.example.com/app.js
+6,10,450.0,normal,third-party.example.com,script,200,https://third-party.example.com/track.js
+7,6,400.0,normal,fonts.example.com,font,200,https://fonts.example.com/main.woff2
+8,8,200.0,normal,cdn.example.com,script,200,https://cdn.example.com/vendor.js
+9,1,150.0,normal,cdn.example.com,stylesheet,200,https://cdn.example.com/styles.css
+10,9,90.0,fast,cdn.example.com,image,200,https://cdn.example.com/banner.jpg
+11,5,80.0,fast,cdn.example.com,image,200,https://cdn.example.com/logo.png
+12,0,50.0,fast,www.example.com,document,200,https://www.example.com/
+
+=== 坏行记录 ===
+原始位置,源文件,错误原因
+
+=== 所有请求详情 (按原始顺序) ===
+原始位置,URL,域名,资源类型,状态码,耗时(ms),分桶,是否坏行,错误原因,开始时间
+0,https://www.example.com/,www.example.com,document,200,50.0,fast,False,,2024-01-15T10:00:00.000Z
+1,https://cdn.example.com/styles.css,cdn.example.com,stylesheet,200,150.0,normal,False,,2024-01-15T10:00:00.100Z
+2,https://cdn.example.com/app.js,cdn.example.com,script,200,600.0,slow,False,,2024-01-15T10:00:00.200Z
+3,https://api.example.com/data,api.example.com,xhr,200,1200.0,very_slow,False,,2024-01-15T10:00:00.300Z
+4,https://slow-api.example.com/heavy-endpoint,slow-api.example.com,xhr,200,3500.0,extreme,False,,2024-01-15T10:00:00.400Z
+5,https://cdn.example.com/logo.png,cdn.example.com,image,200,80.0,fast,False,,2024-01-15T10:00:00.500Z
+6,https://fonts.example.com/main.woff2,fonts.example.com,font,200,400.0,normal,False,,2024-01-15T10:00:00.600Z
+7,https://api.example.com/analytics,api.example.com,xhr,500,800.0,slow,False,,2024-01-15T10:00:00.700Z
+8,https://cdn.example.com/vendor.js,cdn.example.com,script,200,200.0,normal,False,,2024-01-15T10:00:00.800Z
+9,https://cdn.example.com/banner.jpg,cdn.example.com,image,200,90.0,fast,False,,2024-01-15T10:00:00.900Z
+10,https://third-party.example.com/track.js,third-party.example.com,script,200,450.0,normal,False,,2024-01-15T10:00:01.000Z
+11,https://slow-api.example.com/auth,slow-api.example.com,xhr,401,1500.0,very_slow,False,,2024-01-15T10:00:01.100Z
