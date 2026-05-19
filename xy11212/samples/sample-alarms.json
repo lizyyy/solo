@@ -1,0 +1,57 @@
+[
+  {
+    "alarm_time": "2024-01-15T08:30:00",
+    "sensor_id": "S001",
+    "sensor_type": "压力传感器",
+    "alarm_level": "中",
+    "alarm_type": "压力过低",
+    "alarm_value": 1.5,
+    "threshold_value": 2.0,
+    "pump_room_no": "P001",
+    "remarks": "需要检查管道是否漏水"
+  },
+  {
+    "alarm_time": "2024-01-15T10:15:00",
+    "sensor_id": "S002",
+    "sensor_type": "水位传感器",
+    "alarm_level": "高",
+    "alarm_type": "水位过高",
+    "alarm_value": 3.2,
+    "threshold_value": 2.8,
+    "pump_room_no": "P002",
+    "remarks": "水位异常升高"
+  },
+  {
+    "alarm_time": "2024-01-15T14:20:00",
+    "sensor_id": "S003",
+    "sensor_type": "温度传感器",
+    "alarm_level": "紧急",
+    "alarm_type": "温度过高",
+    "alarm_value": 85,
+    "threshold_value": 60,
+    "pump_room_no": "P003",
+    "remarks": "电机过热，立即停机检查"
+  },
+  {
+    "alarm_time": "2024-01-15T16:45:00",
+    "sensor_id": "S004",
+    "sensor_type": "电源传感器",
+    "alarm_level": "低",
+    "alarm_type": "电压波动",
+    "alarm_value": 205,
+    "threshold_value": 220,
+    "pump_room_no": "P004",
+    "remarks": "电压略低，持续观察"
+  },
+  {
+    "alarm_time": "invalid_time",
+    "sensor_id": "",
+    "sensor_type": "未知传感器",
+    "alarm_level": "严重",
+    "alarm_type": "测试告警",
+    "alarm_value": "abc",
+    "threshold_value": 100,
+    "pump_room_no": "P005",
+    "remarks": "这是一条坏数据"
+  }
+]
