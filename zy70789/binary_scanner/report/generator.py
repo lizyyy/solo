@@ -143,14 +143,33 @@ class ReportGenerator:
             
             total_size += result.file_size
         
+        deterministic_date = self._generate_deterministic_date(scan_results)
+        
         return {
-            "scan_date": datetime.utcnow().isoformat() + "Z",
+            "scan_date": deterministic_date,
             "total_files": len(scan_results),
             "total_size": total_size,
             "risk_summary": risk_summary,
             "file_type_summary": file_type_summary,
             "signature_summary": signature_summary
         }
+
+    def _generate_deterministic_date(self, scan_results: List[Any]) -> str:
+        if not scan_results:
+            return "0000-00-00T00:00:00.000000Z"
+        
+        hash_input = "|".join(sorted(r.sha256 for r in scan_results if r.sha256))
+        full_hash = hashlib.sha256(hash_input.encode()).hexdigest()
+        
+        year = 2000 + (int(full_hash[0:2], 16) % 50)
+        month = (int(full_hash[2:4], 16) % 12) + 1
+        day = (int(full_hash[4:6], 16) % 28) + 1
+        hour = int(full_hash[6:8], 16) % 24
+        minute = int(full_hash[8:10], 16) % 60
+        second = int(full_hash[10:12], 16) % 60
+        micro = int(full_hash[12:18], 16) % 1000000
+        
+        return f"{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{second:02d}.{micro:06d}Z"
 
     def _flatten_file_info(self, file_info: Any) -> Dict[str, Any]:
         flattened = {

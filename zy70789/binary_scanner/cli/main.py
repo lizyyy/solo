@@ -69,7 +69,7 @@ Examples:
             self.parser.print_help()
             return 1
         
-        if parsed_args.output or parsed_args.summary:
+        if parsed_args.output:
             self._generate_output(results, parsed_args)
         
         if parsed_args.summary:
