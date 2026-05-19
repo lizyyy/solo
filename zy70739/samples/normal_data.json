@@ -1,0 +1,102 @@
+{
+  "owners": [
+    {
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "department": "技术部",
+      "is_on_vacation": false,
+      "backup_owner": "李四"
+    },
+    {
+      "name": "李四",
+      "email": "lisi@example.com",
+      "department": "技术部",
+      "is_on_vacation": false,
+      "backup_owner": "王五"
+    },
+    {
+      "name": "王五",
+      "email": "wangwu@example.com",
+      "department": "运维部",
+      "is_on_vacation": false,
+      "backup_owner": null
+    }
+  ],
+  "secrets": [
+    {
+      "secret_id": "SEC001",
+      "secret_name": "生产数据库密码",
+      "usage": "核心数据库访问凭据",
+      "system_account": {
+        "account_id": "ACCT001",
+        "system_name": "订单系统",
+        "environment": "prod"
+      },
+      "expire_date": "2026-05-21",
+      "owner": {
+        "name": "张三",
+        "email": "zhangsan@example.com",
+        "department": "技术部",
+        "is_on_vacation": false,
+        "backup_owner": "李四"
+      },
+      "level": "critical",
+      "status": "pending",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2025-01-01T00:00:00",
+      "updated_at": "2025-01-01T00:00:00"
+    },
+    {
+      "secret_id": "SEC002",
+      "secret_name": "支付API密钥",
+      "usage": "第三方支付接口调用",
+      "system_account": {
+        "account_id": "ACCT002",
+        "system_name": "支付系统",
+        "environment": "prod"
+      },
+      "expire_date": "2026-05-24",
+      "owner": {
+        "name": "李四",
+        "email": "lisi@example.com",
+        "department": "技术部",
+        "is_on_vacation": false,
+        "backup_owner": "王五"
+      },
+      "level": "high",
+      "status": "pending",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2025-01-01T00:00:00",
+      "updated_at": "2025-01-01T00:00:00"
+    },
+    {
+      "secret_id": "SEC003",
+      "secret_name": "监控系统Token",
+      "usage": "监控数据采集API",
+      "system_account": {
+        "account_id": "ACCT003",
+        "system_name": "监控系统",
+        "environment": "prod"
+      },
+      "expire_date": "2026-07-18",
+      "owner": {
+        "name": "王五",
+        "email": "wangwu@example.com",
+        "department": "运维部",
+        "is_on_vacation": false,
+        "backup_owner": null
+      },
+      "level": "medium",
+      "status": "pending",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2025-01-01T00:00:00",
+      "updated_at": "2025-01-01T00:00:00"
+    }
+  ]
+}

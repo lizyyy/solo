@@ -1,0 +1,102 @@
+{
+  "generated_at": "2026-05-19T07:53:29.420304",
+  "total_secrets": 3,
+  "summary": {
+    "by_status": {
+      "resolved": 1,
+      "pending": 2
+    },
+    "by_grade": {
+      "URGENT": 1,
+      "WARNING": 1,
+      "SAFE": 1
+    },
+    "by_level": {
+      "critical": 1,
+      "high": 1,
+      "medium": 1
+    }
+  },
+  "secrets": [
+    {
+      "secret_id": "SEC001",
+      "secret_name": "生产数据库密码",
+      "usage": "核心数据库访问凭据",
+      "system_account": {
+        "account_id": "ACCT001",
+        "system_name": "订单系统",
+        "environment": "prod"
+      },
+      "expire_date": "2026-05-21",
+      "days_until_expiry": 2,
+      "expiry_grade": "URGENT",
+      "owner": {
+        "name": "李四",
+        "email": "lisi@example.com",
+        "department": "技术部",
+        "is_on_vacation": false
+      },
+      "level": "critical",
+      "status": "resolved",
+      "reminder_count": 1,
+      "duplicate_reminder_count": 0,
+      "transfer_count": 1,
+      "has_conclusion": true,
+      "conclusion": {
+        "type": "renewed",
+        "operator": "管理员",
+        "remarks": "已完成密钥轮换，新密钥有效期1年"
+      }
+    },
+    {
+      "secret_id": "SEC002",
+      "secret_name": "支付API密钥",
+      "usage": "第三方支付接口调用",
+      "system_account": {
+        "account_id": "ACCT002",
+        "system_name": "支付系统",
+        "environment": "prod"
+      },
+      "expire_date": "2026-05-24",
+      "days_until_expiry": 5,
+      "expiry_grade": "WARNING",
+      "owner": {
+        "name": "李四",
+        "email": "lisi@example.com",
+        "department": "技术部",
+        "is_on_vacation": false
+      },
+      "level": "high",
+      "status": "pending",
+      "reminder_count": 0,
+      "duplicate_reminder_count": 0,
+      "transfer_count": 0,
+      "has_conclusion": false
+    },
+    {
+      "secret_id": "SEC003",
+      "secret_name": "监控系统Token",
+      "usage": "监控数据采集API",
+      "system_account": {
+        "account_id": "ACCT003",
+        "system_name": "监控系统",
+        "environment": "prod"
+      },
+      "expire_date": "2026-07-18",
+      "days_until_expiry": 60,
+      "expiry_grade": "SAFE",
+      "owner": {
+        "name": "王五",
+        "email": "wangwu@example.com",
+        "department": "运维部",
+        "is_on_vacation": false
+      },
+      "level": "medium",
+      "status": "pending",
+      "reminder_count": 0,
+      "duplicate_reminder_count": 0,
+      "transfer_count": 0,
+      "has_conclusion": false
+    }
+  ]
+}

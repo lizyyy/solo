@@ -1,0 +1,23 @@
+[
+  {
+    "name": "张三",
+    "email": "zhangsan@example.com",
+    "department": "技术部",
+    "is_on_vacation": false,
+    "backup_owner": "李四"
+  },
+  {
+    "name": "李四",
+    "email": "lisi@example.com",
+    "department": "技术部",
+    "is_on_vacation": false,
+    "backup_owner": "王五"
+  },
+  {
+    "name": "王五",
+    "email": "wangwu@example.com",
+    "department": "运维部",
+    "is_on_vacation": false,
+    "backup_owner": null
+  }
+]

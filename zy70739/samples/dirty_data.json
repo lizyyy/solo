@@ -1,0 +1,95 @@
+{
+  "owners": [
+    {
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "department": "技术部",
+      "is_on_vacation": false,
+      "backup_owner": "李四"
+    },
+    {
+      "name": "李四",
+      "email": "lisi@example.com",
+      "department": "技术部",
+      "is_on_vacation": true,
+      "backup_owner": "王五"
+    }
+  ],
+  "secrets": [
+    {
+      "secret_id": "DIRTY001",
+      "secret_name": "已过期密钥-超期5天",
+      "usage": "测试过期处理",
+      "system_account": {
+        "account_id": "DIRTY_ACCT001",
+        "system_name": "测试系统",
+        "environment": "test"
+      },
+      "expire_date": "2026-05-14",
+      "owner": {
+        "name": "张三",
+        "email": "zhangsan@example.com",
+        "department": "技术部",
+        "is_on_vacation": false,
+        "backup_owner": "李四"
+      },
+      "level": "critical",
+      "status": "pending",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2025-01-01T00:00:00",
+      "updated_at": "2025-01-01T00:00:00"
+    },
+    {
+      "secret_id": "DIRTY002",
+      "secret_name": "重复催办测试密钥",
+      "usage": "测试去重逻辑",
+      "system_account": {
+        "account_id": "DIRTY_ACCT002",
+        "system_name": "测试系统",
+        "environment": "test"
+      },
+      "expire_date": "2026-05-20",
+      "owner": {
+        "name": "张三",
+        "email": "zhangsan@example.com",
+        "department": "技术部",
+        "is_on_vacation": false,
+        "backup_owner": "李四"
+      },
+      "level": "high",
+      "status": "pending",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2025-01-01T00:00:00",
+      "updated_at": "2025-01-01T00:00:00"
+    },
+    {
+      "secret_id": "DIRTY003",
+      "secret_name": "休假负责人密钥",
+      "usage": "测试自动转交逻辑",
+      "system_account": {
+        "account_id": "DIRTY_ACCT003",
+        "system_name": "测试系统",
+        "environment": "test"
+      },
+      "expire_date": "2026-05-22",
+      "owner": {
+        "name": "李四",
+        "email": "lisi@example.com",
+        "department": "技术部",
+        "is_on_vacation": true,
+        "backup_owner": "王五"
+      },
+      "level": "high",
+      "status": "pending",
+      "reminder_records": [],
+      "transfer_history": [],
+      "conclusion": null,
+      "created_at": "2025-01-01T00:00:00",
+      "updated_at": "2025-01-01T00:00:00"
+    }
+  ]
+}
