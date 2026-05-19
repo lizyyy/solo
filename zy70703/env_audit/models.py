@@ -301,3 +301,71 @@ class LeaseManager:
                 continue
             history.extend(env.lease_history)
         return sorted(history, key=lambda l: l.created_at, reverse=True)[:limit]
+
+    def to_dict(self) -> Dict:
+        return {
+            'environments': {
+                env_id: {
+                    'env_id': env.env_id,
+                    'name': env.name,
+                    'status': env.status,
+                    'current_lease': env.current_lease.model_dump() if env.current_lease else None,
+                    'lease_history': [l.model_dump() for l in env.lease_history]
+                }
+                for env_id, env in self.environments.items()
+            },
+            'leases': {lease_id: lease.model_dump() for lease_id, lease in self.leases.items()},
+            'request_ids': list(self.request_ids)
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'LeaseManager':
+        manager = cls()
+        manager.request_ids = set(data.get('request_ids', []))
+
+        for env_id, env_data in data.get('environments', {}).items():
+            env = Environment(
+                env_id=env_data['env_id'],
+                name=env_data['name'],
+                status=EnvironmentStatus(env_data['status']),
+                current_lease=None,
+                lease_history=[]
+            )
+
+            if env_data.get('current_lease'):
+                lease_data = env_data['current_lease']
+                env.current_lease = Lease(
+                    lease_id=lease_data['lease_id'],
+                    env_id=lease_data['env_id'],
+                    branch_name=lease_data['branch_name'],
+                    assignee=lease_data['assignee'],
+                    start_time=datetime.fromisoformat(lease_data['start_time']) if isinstance(lease_data['start_time'], str) else lease_data['start_time'],
+                    end_time=datetime.fromisoformat(lease_data['end_time']) if isinstance(lease_data['end_time'], str) else lease_data['end_time'],
+                    reason=lease_data['reason'],
+                    status=LeaseStatus(lease_data['status']),
+                    release_reason=lease_data.get('release_reason'),
+                    release_time=datetime.fromisoformat(lease_data['release_time']) if lease_data.get('release_time') and isinstance(lease_data['release_time'], str) else lease_data.get('release_time'),
+                    created_at=datetime.fromisoformat(lease_data['created_at']) if isinstance(lease_data['created_at'], str) else lease_data['created_at'],
+                    request_id=lease_data.get('request_id')
+                )
+
+            for lease_data in env_data.get('lease_history', []):
+                lease = Lease(
+                    lease_id=lease_data['lease_id'],
+                    env_id=lease_data['env_id'],
+                    branch_name=lease_data['branch_name'],
+                    assignee=lease_data['assignee'],
+                    start_time=datetime.fromisoformat(lease_data['start_time']) if isinstance(lease_data['start_time'], str) else lease_data['start_time'],
+                    end_time=datetime.fromisoformat(lease_data['end_time']) if isinstance(lease_data['end_time'], str) else lease_data['end_time'],
+                    reason=lease_data['reason'],
+                    status=LeaseStatus(lease_data['status']),
+                    release_reason=lease_data.get('release_reason'),
+                    release_time=datetime.fromisoformat(lease_data['release_time']) if lease_data.get('release_time') and isinstance(lease_data['release_time'], str) else lease_data.get('release_time'),
+                    created_at=datetime.fromisoformat(lease_data['created_at']) if isinstance(lease_data['created_at'], str) else lease_data['created_at'],
+                    request_id=lease_data.get('request_id')
+                )
+                env.lease_history.append(lease)
+
+            manager.add_environment(env)
+
+        return manager
