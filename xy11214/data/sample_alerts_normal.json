@@ -1,0 +1,32 @@
+[
+  {
+    "sensorId": "TEMP-A1-001",
+    "sensorType": "temperature",
+    "location": "地下一层泵房A区",
+    "alertLevel": "warning",
+    "value": 32.5,
+    "threshold": 30.0,
+    "alertTime": "2024-01-15 10:30:00",
+    "isAcknowledged": 0
+  },
+  {
+    "sensorId": "PRESS-B1-002",
+    "sensorType": "pressure",
+    "location": "地下一层泵房B区",
+    "alertLevel": "critical",
+    "value": 0.45,
+    "threshold": 0.40,
+    "alertTime": "2024-01-15 11:15:00",
+    "isAcknowledged": 0
+  },
+  {
+    "sensorId": "VIB-C1-003",
+    "sensorType": "vibration",
+    "location": "地下二层泵房C区",
+    "alertLevel": "info",
+    "value": 0.22,
+    "threshold": 0.20,
+    "alertTime": "2024-01-16 09:00:00",
+    "isAcknowledged": 0
+  }
+]

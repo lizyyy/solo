@@ -1,0 +1,31 @@
+{
+  "name": "pump-room-inspection-system",
+  "version": "1.0.0",
+  "description": "地下泵房巡检管理系统",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "import:csv": "ts-node src/cli.ts import:csv",
+    "import:json": "ts-node src/cli.ts import:json",
+    "review": "ts-node src/cli.ts review",
+    "acknowledge": "ts-node src/cli.ts acknowledge",
+    "export": "ts-node src/cli.ts export",
+    "report": "ts-node src/cli.ts report",
+    "status": "ts-node src/cli.ts status"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7",
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "date-fns": "^3.0.6",
+    "csv-writer": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/sqlite3": "^3.1.11",
+    "@types/node": "^20.10.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
