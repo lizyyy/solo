@@ -426,6 +426,198 @@ class TestConflictPaths:
         assert second_withdraw.status_code == 409
 
 
+class TestStateValidation:
+    def test_invalid_review_result_rejected(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/invalid_review",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        exemption_response = client.post(
+            "/api/v1/exemptions",
+            json={
+                "failure_id": failure_id,
+                "exemption_reason": "测试",
+                "exempt_browsers": ["ie"],
+                "expire_days": 30,
+                "applicant": "dev001"
+            }
+        )
+        exemption_id = exemption_response.json()["id"]
+        
+        invalid_review = client.put(
+            f"/api/v1/exemptions/{exemption_id}/review",
+            json={
+                "review_result": "nonsense",
+                "review_comment": "无效审核",
+                "reviewer": "leader001"
+            }
+        )
+        assert invalid_review.status_code == 422
+        assert "无效的审核结果" in invalid_review.json()["detail"][0]["msg"]
+    
+    def test_invalid_conclusion_rejected(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/invalid_conclusion",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        invalid_update = client.put(
+            f"/api/v1/failures/{failure_id}/conclusion",
+            json={
+                "conclusion": "not_a_valid_conclusion",
+                "conclusion_note": "无效结论",
+                "operator": "dev001"
+            }
+        )
+        assert invalid_update.status_code == 422
+        assert "无效的结论" in invalid_update.json()["detail"][0]["msg"]
+    
+    def test_review_result_case_insensitive(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/case_insensitive",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        exemption_response = client.post(
+            "/api/v1/exemptions",
+            json={
+                "failure_id": failure_id,
+                "exemption_reason": "测试",
+                "exempt_browsers": ["ie"],
+                "expire_days": 30,
+                "applicant": "dev001"
+            }
+        )
+        exemption_id = exemption_response.json()["id"]
+        
+        review_response = client.put(
+            f"/api/v1/exemptions/{exemption_id}/review",
+            json={
+                "review_result": "APPROVED",
+                "review_comment": "大写审核",
+                "reviewer": "leader001"
+            }
+        )
+        assert review_response.status_code == 200
+        assert review_response.json()["status"] == "approved"
+        assert review_response.json()["review_result"] == "approved"
+    
+    def test_conclusion_case_insensitive(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/conclusion_case",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        update_response = client.put(
+            f"/api/v1/failures/{failure_id}/conclusion",
+            json={
+                "conclusion": "FIXED",
+                "conclusion_note": "大写结论",
+                "operator": "dev001"
+            }
+        )
+        assert update_response.status_code == 200
+        assert update_response.json()["conclusion"] == "fixed"
+    
+    def test_empty_review_result_rejected(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/empty_review",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        exemption_response = client.post(
+            "/api/v1/exemptions",
+            json={
+                "failure_id": failure_id,
+                "exemption_reason": "测试",
+                "exempt_browsers": ["ie"],
+                "expire_days": 30,
+                "applicant": "dev001"
+            }
+        )
+        exemption_id = exemption_response.json()["id"]
+        
+        invalid_review = client.put(
+            f"/api/v1/exemptions/{exemption_id}/review",
+            json={
+                "review_result": "",
+                "review_comment": "空审核结果",
+                "reviewer": "leader001"
+            }
+        )
+        assert invalid_review.status_code == 422
+    
+    def test_state_consistency_after_failed_review(self, client):
+        create_response = client.post(
+            "/api/v1/failures",
+            json={
+                "page_path": "/test/consistency",
+                "browser_matrix": {"ie": "11"},
+                "failure_cases": [{"case_id": "TEST-001"}],
+                "reporter": "qa001"
+            }
+        )
+        failure_id = create_response.json()["id"]
+        
+        exemption_response = client.post(
+            "/api/v1/exemptions",
+            json={
+                "failure_id": failure_id,
+                "exemption_reason": "测试",
+                "exempt_browsers": ["ie"],
+                "expire_days": 30,
+                "applicant": "dev001"
+            }
+        )
+        exemption_id = exemption_response.json()["id"]
+        
+        client.put(
+            f"/api/v1/exemptions/{exemption_id}/review",
+            json={
+                "review_result": "invalid_status",
+                "review_comment": "无效审核",
+                "reviewer": "leader001"
+            }
+        )
+        
+        exemption_check = client.get(f"/api/v1/exemptions/{exemption_id}")
+        assert exemption_check.json()["status"] == "pending"
+        
+        failure_check = client.get(f"/api/v1/failures/{failure_id}")
+        assert failure_check.json()["conclusion"] == "pending"
+
+
 class TestBrowserMatrix:
     def test_validate_browser_matrix_compatible(self, client):
         response = client.post(

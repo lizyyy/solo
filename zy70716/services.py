@@ -7,6 +7,34 @@ import schemas
 import re
 
 
+class StateValidationError(ValueError):
+    pass
+
+
+def validate_review_result(review_result: str) -> None:
+    review_result_lower = review_result.lower()
+    if review_result_lower not in schemas.VALID_REVIEW_RESULTS:
+        raise StateValidationError(
+            f"无效的审核结果: {review_result}. 有效值为: {', '.join(schemas.VALID_REVIEW_RESULTS)}"
+        )
+
+
+def validate_conclusion(conclusion: str) -> None:
+    conclusion_lower = conclusion.lower()
+    if conclusion_lower not in schemas.VALID_CONCLUSIONS:
+        raise StateValidationError(
+            f"无效的结论: {conclusion}. 有效值为: {', '.join(schemas.VALID_CONCLUSIONS)}"
+        )
+
+
+def validate_exemption_status(status: str) -> None:
+    status_lower = status.lower()
+    if status_lower not in schemas.VALID_EXEMPTION_STATUSES:
+        raise StateValidationError(
+            f"无效的豁免状态: {status}. 有效值为: {', '.join(schemas.VALID_EXEMPTION_STATUSES)}"
+        )
+
+
 class BrowserMatrixService:
     @staticmethod
     def validate_browser_version(browser: str, version: str, matrix: Dict[str, str]) -> bool:
@@ -128,13 +156,16 @@ class ReviewService:
         if exemption.status != "pending":
             raise ValueError("豁免申请已处理，无法重复审核")
         
-        exemption.status = review_data.review_result
-        exemption.review_result = review_data.review_result
+        validate_review_result(review_data.review_result)
+        
+        review_result_lower = review_data.review_result.lower()
+        exemption.status = review_result_lower
+        exemption.review_result = review_result_lower
         exemption.review_comment = review_data.review_comment
         exemption.reviewer = review_data.reviewer
         exemption.reviewed_at = datetime.now()
         
-        if review_data.review_result == "approved":
+        if review_result_lower == "approved":
             failure_case = db.query(models.FailureCase).filter(
                 models.FailureCase.id == exemption.failure_id
             ).first()
@@ -217,7 +248,10 @@ class FailureCaseService:
         if not failure_case:
             return None
         
-        failure_case.conclusion = conclusion_data.conclusion
+        validate_conclusion(conclusion_data.conclusion)
+        
+        conclusion_lower = conclusion_data.conclusion.lower()
+        failure_case.conclusion = conclusion_lower
         failure_case.conclusion_note = conclusion_data.conclusion_note
         
         db.commit()

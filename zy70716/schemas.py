@@ -1,6 +1,31 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from typing import Optional, List, Dict, Any
+from enum import Enum
+
+
+class ExemptionReviewResult(str, Enum):
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
+class ExemptionStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    WITHDRAWN = "withdrawn"
+
+
+class FailureCaseConclusion(str, Enum):
+    PENDING = "pending"
+    FIXED = "fixed"
+    EXEMPTED = "exempted"
+    CLOSED = "closed"
+
+
+VALID_REVIEW_RESULTS = {result.value for result in ExemptionReviewResult}
+VALID_CONCLUSIONS = {result.value for result in FailureCaseConclusion}
+VALID_EXEMPTION_STATUSES = {result.value for result in ExemptionStatus}
 
 
 class FailureCaseBase(BaseModel):
@@ -17,6 +42,18 @@ class FailureCaseCreate(FailureCaseBase):
 class FailureCaseUpdate(BaseModel):
     conclusion: Optional[str] = None
     conclusion_note: Optional[str] = None
+
+    @field_validator('conclusion')
+    @classmethod
+    def validate_conclusion(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        v_lower = v.lower()
+        if v_lower not in VALID_CONCLUSIONS:
+            raise ValueError(
+                f"无效的结论: {v}. 有效值为: {', '.join(VALID_CONCLUSIONS)}"
+            )
+        return v_lower
 
 
 class FailureCaseResponse(FailureCaseBase):
@@ -49,6 +86,16 @@ class ExemptionReview(BaseModel):
     review_comment: Optional[str] = None
     reviewer: str
 
+    @field_validator('review_result')
+    @classmethod
+    def validate_review_result(cls, v: str) -> str:
+        v_lower = v.lower()
+        if v_lower not in VALID_REVIEW_RESULTS:
+            raise ValueError(
+                f"无效的审核结果: {v}. 有效值为: {', '.join(VALID_REVIEW_RESULTS)}"
+            )
+        return v_lower
+
 
 class ExemptionResponse(BaseModel):
     id: int
@@ -73,6 +120,16 @@ class ConclusionUpdate(BaseModel):
     conclusion: str
     conclusion_note: Optional[str] = None
     operator: str
+
+    @field_validator('conclusion')
+    @classmethod
+    def validate_conclusion(cls, v: str) -> str:
+        v_lower = v.lower()
+        if v_lower not in VALID_CONCLUSIONS:
+            raise ValueError(
+                f"无效的结论: {v}. 有效值为: {', '.join(VALID_CONCLUSIONS)}"
+            )
+        return v_lower
 
 
 class AuditLogResponse(BaseModel):
