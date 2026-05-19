@@ -62,6 +62,70 @@ def verify_output_consistency(json_path, report_path):
     return all_passed
 
 
+def verify_step_behavior():
+    print(f"\n验证步骤执行行为")
+    all_passed = True
+    
+    result = subprocess.run(
+        [sys.executable, 'region_evacuation_cli.py', 
+         '--region', 'test',
+         '--tenants', 'test_data/normal_tenants.json',
+         '--plan', 'test_data/normal_plan.json',
+         '--json-out', 'output/step_test.json'],
+        capture_output=True, text=True
+    )
+    
+    with open('output/step_test.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    if data['executed_steps'] == 1 and data['skipped_steps'] == 2:
+        print(f"✅ 步骤计数正确: 执行1个, 跳过2个")
+    else:
+        print(f"❌ 步骤计数错误: 执行{data['executed_steps']}个, 跳过{data['skipped_steps']}个")
+        all_passed = False
+    
+    step_statuses = [s['status'] for s in data['evacuation_plan']]
+    if "已执行" in step_statuses and "跳过-租户阻塞" in step_statuses:
+        print(f"✅ 步骤状态正确: 包含执行和跳过状态")
+    else:
+        print(f"❌ 步骤状态异常: {step_statuses}")
+        all_passed = False
+    
+    return all_passed
+
+
+def verify_check_only():
+    print(f"\n验证 --check-only 模式行为")
+    all_passed = True
+    
+    result = subprocess.run(
+        [sys.executable, 'region_evacuation_cli.py', 
+         '--region', 'test',
+         '--tenants', 'test_data/normal_tenants.json',
+         '--plan', 'test_data/normal_plan.json',
+         '--check-only',
+         '--json-out', 'output/check_only_test.json'],
+        capture_output=True, text=True
+    )
+    
+    with open('output/check_only_test.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    if data['check_only'] == True:
+        print(f"✅ check_only 标记正确")
+    else:
+        print(f"❌ check_only 标记错误")
+        all_passed = False
+    
+    if data['executed_steps'] == 0:
+        print(f"✅ 仅检查模式下无步骤执行")
+    else:
+        print(f"❌ 仅检查模式下仍有步骤执行")
+        all_passed = False
+    
+    return all_passed
+
+
 def main():
     os.makedirs('output', exist_ok=True)
     
@@ -72,7 +136,6 @@ def main():
             '--plan', 'test_data/normal_plan.json',
             '--json-out', 'output/normal_result.json',
             '--report-out', 'output/normal_report.txt',
-            '--verbose'
         ], True),
         ("空结果测试", [
             '--region', 'shanghai',
@@ -104,23 +167,29 @@ def main():
         results.append(run_test(name, args, should_pass))
     
     print(f"\n{'='*60}")
-    print("输出一致性验证")
+    print("功能验证")
     print(f"{'='*60}")
     consistency_passed = verify_output_consistency(
         'output/normal_result.json',
         'output/normal_report.txt'
     )
+    step_behavior_passed = verify_step_behavior()
+    check_only_passed = verify_check_only()
     
     print(f"\n{'='*60}")
     print("测试总结")
     print(f"{'='*60}")
     passed = sum(results)
     total = len(results)
-    print(f"功能测试: {passed}/{total} 通过")
-    print(f"一致性验证: {'通过' if consistency_passed else '失败'}")
-    print(f"总结果: {'✅ 全部通过' if all(results) and consistency_passed else '❌ 有失败'}")
+    print(f"基础功能测试: {passed}/{total} 通过")
+    print(f"输出一致性验证: {'通过' if consistency_passed else '失败'}")
+    print(f"步骤行为验证: {'通过' if step_behavior_passed else '失败'}")
+    print(f"仅检查模式验证: {'通过' if check_only_passed else '失败'}")
     
-    return 0 if all(results) and consistency_passed else 1
+    all_passed = all(results) and consistency_passed and step_behavior_passed and check_only_passed
+    print(f"总结果: {'✅ 全部通过' if all_passed else '❌ 有失败'}")
+    
+    return 0 if all_passed else 1
 
 
 if __name__ == '__main__':

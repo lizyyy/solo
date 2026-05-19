@@ -1,5 +1,5 @@
 {
-  "region": "beijing",
+  "region": "test",
   "total_tenants": 5,
   "blocked_count": 4,
   "cleared_count": 1,
@@ -62,7 +62,7 @@
       "tenant_id": "T003",
       "target_percent": 30.0,
       "status": "已执行",
-      "executed_at": "2026-05-19T13:20:24.328615",
+      "executed_at": "2026-05-19T13:20:24.667231",
       "skip_reason": null
     },
     {
@@ -79,7 +79,7 @@
       "target_percent": 60.0,
       "status": "跳过-租户阻塞",
       "executed_at": null,
-      "skip_reason": "租户被阻塞: {'T004', 'T002', 'T001', 'T005'}"
+      "skip_reason": "租户被阻塞: {'T005', 'T002', 'T001', 'T004'}"
     }
   ],
   "executed_steps": 1,
@@ -90,6 +90,6 @@
   ],
   "data_quality_issues": [],
   "check_only": false,
-  "executed_at": "2026-05-19T13:20:24.328628",
+  "executed_at": "2026-05-19T13:20:24.667240",
   "success": true
 }
