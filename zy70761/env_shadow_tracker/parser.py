@@ -41,6 +41,16 @@ class BaseParser:
         if '=' in stripped:
             return True
         return False
+    
+    def _looks_like_var_def_or_suspect(self, line: str) -> bool:
+        stripped = line.strip()
+        if not stripped or stripped.startswith('#'):
+            return False
+        if '=' in stripped:
+            return True
+        if re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', stripped):
+            return True
+        return False
 
 
 class EnvParser(BaseParser):
@@ -85,7 +95,7 @@ class EnvParser(BaseParser):
                     is_export=is_export,
                 )
                 self.variables.append(var_def)
-            elif not is_commented and self._looks_like_var_def(line):
+            elif not is_commented and line.strip():
                 self.bad_lines.append(BadLine(
                     file_path=self.file_path,
                     line_number=line_num,
@@ -151,7 +161,7 @@ class ShellParser(BaseParser):
                     is_export=is_export,
                 )
                 self.variables.append(var_def)
-            elif not is_commented and self._looks_like_var_def(line):
+            elif not is_commented and self._looks_like_var_def_or_suspect(line):
                 self.bad_lines.append(BadLine(
                     file_path=self.file_path,
                     line_number=line_num,

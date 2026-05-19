@@ -1,10 +1,53 @@
 {
   "scan_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata",
-  "total_files": 4,
-  "total_variables": 17,
+  "total_files": 6,
+  "total_variables": 22,
   "variables_with_overrides": 7,
-  "missing_variables": 0,
+  "missing_variables": 1,
+  "bad_lines_count": 8,
   "variable_chains": {
+    "ANOTHER_GOOD": {
+      "name": "ANOTHER_GOOD",
+      "final_value": "another_value",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "ANOTHER_GOOD",
+          "value": "another_value",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+          "line_number": 5,
+          "raw_line": "ANOTHER_GOOD=another_value",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "ANOTHER_GOOD",
+          "value": "another_value",
+          "source_type": "shell",
+          "source_level": 40,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/script_with_bad_lines.sh",
+          "line_number": 11,
+          "raw_line": "export ANOTHER_GOOD=another_value",
+          "is_commented": false,
+          "is_export": true
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "ANOTHER_GOOD",
+        "value": "another_value",
+        "source_type": "env",
+        "source_level": 20,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+        "line_number": 5,
+        "raw_line": "ANOTHER_GOOD=another_value",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
     "API_KEY": {
       "name": "API_KEY",
       "final_value": "shell-api-key-12345",
@@ -429,6 +472,27 @@
         "is_commented": false,
         "is_export": false
       }
+    },
+    "COMMENTED_OUT": {
+      "name": "COMMENTED_OUT",
+      "final_value": null,
+      "is_missing": true,
+      "missing_hint": "All 1 definitions are commented out",
+      "definitions": [
+        {
+          "name": "COMMENTED_OUT",
+          "value": "commented",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+          "line_number": 8,
+          "raw_line": "#COMMENTED_OUT=commented",
+          "is_commented": true,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": null
     },
     "DB_HOST": {
       "name": "DB_HOST",
@@ -865,6 +929,79 @@
         "is_export": false
       }
     },
+    "GOOD_VAR": {
+      "name": "GOOD_VAR",
+      "final_value": "valid_value",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "GOOD_VAR",
+          "value": "valid_value",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+          "line_number": 2,
+          "raw_line": "GOOD_VAR=valid_value",
+          "is_commented": false,
+          "is_export": false
+        },
+        {
+          "name": "GOOD_VAR",
+          "value": "valid_value",
+          "source_type": "shell",
+          "source_level": 40,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/script_with_bad_lines.sh",
+          "line_number": 4,
+          "raw_line": "export GOOD_VAR=valid_value",
+          "is_commented": false,
+          "is_export": true
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "GOOD_VAR",
+        "value": "valid_value",
+        "source_type": "env",
+        "source_level": 20,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+        "line_number": 2,
+        "raw_line": "GOOD_VAR=valid_value",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
+    "LAST_GOOD": {
+      "name": "LAST_GOOD",
+      "final_value": "final_value",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "LAST_GOOD",
+          "value": "final_value",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+          "line_number": 10,
+          "raw_line": "LAST_GOOD=final_value",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "LAST_GOOD",
+        "value": "final_value",
+        "source_type": "env",
+        "source_level": 20,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+        "line_number": 10,
+        "raw_line": "LAST_GOOD=final_value",
+        "is_commented": false,
+        "is_export": false
+      }
+    },
     "LOG_LEVEL": {
       "name": "LOG_LEVEL",
       "final_value": "info",
@@ -894,6 +1031,37 @@
         "raw_line": "export LOG_LEVEL=info",
         "is_commented": false,
         "is_export": true
+      }
+    },
+    "MISSING_VALUE": {
+      "name": "MISSING_VALUE",
+      "final_value": "",
+      "is_missing": false,
+      "missing_hint": null,
+      "definitions": [
+        {
+          "name": "MISSING_VALUE",
+          "value": "",
+          "source_type": "env",
+          "source_level": 20,
+          "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+          "line_number": 9,
+          "raw_line": "MISSING_VALUE=",
+          "is_commented": false,
+          "is_export": false
+        }
+      ],
+      "override_chain": [],
+      "effective_source": {
+        "name": "MISSING_VALUE",
+        "value": "",
+        "source_type": "env",
+        "source_level": 20,
+        "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+        "line_number": 9,
+        "raw_line": "MISSING_VALUE=",
+        "is_commented": false,
+        "is_export": false
       }
     },
     "MYSQL_DATABASE": {
@@ -1083,5 +1251,55 @@
       }
     }
   },
-  "parse_errors": []
+  "parse_errors": [],
+  "bad_lines": [
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+      "line_number": 3,
+      "raw_line": "123INVALID=starts_with_number",
+      "reason": "Invalid variable name or format"
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+      "line_number": 4,
+      "raw_line": "VAR WITH SPACES=contains spaces in name",
+      "reason": "Invalid variable name or format"
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+      "line_number": 6,
+      "raw_line": "=missing_name",
+      "reason": "Invalid variable name or format"
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/.env.with_bad_lines",
+      "line_number": 7,
+      "raw_line": "BAD_FORMAT_no_equals",
+      "reason": "Invalid variable name or format"
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/script_with_bad_lines.sh",
+      "line_number": 5,
+      "raw_line": "123INVALID=starts_with_number",
+      "reason": "Invalid variable name or format"
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/script_with_bad_lines.sh",
+      "line_number": 6,
+      "raw_line": "VAR WITH SPACES=contains spaces",
+      "reason": "Invalid variable name or format"
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/script_with_bad_lines.sh",
+      "line_number": 7,
+      "raw_line": "=missing_name",
+      "reason": "Invalid variable name or format"
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70761/testdata/script_with_bad_lines.sh",
+      "line_number": 8,
+      "raw_line": "BAD_FORMAT_no_equals",
+      "reason": "Invalid variable name or format"
+    }
+  ]
 }
