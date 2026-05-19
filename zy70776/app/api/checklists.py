@@ -17,6 +17,9 @@ from app.services.checklist_service import (
     update_checklist,
     withdraw_checklist,
     close_checklist,
+    InvalidStatusTransitionError,
+    parse_checklist_text,
+    apply_parsed_checklist,
 )
 from app.services.report_service import (
     generate_check_report,
@@ -71,10 +74,31 @@ def change_status(
     conclusion: Optional[str] = Query(None, description="处理结论"),
     db: Session = Depends(get_db),
 ):
-    checklist = update_checklist_status(db, checklist_id, new_status, operator, conclusion)
+    checklist = get_checklist(db, checklist_id)
     if not checklist:
         raise HTTPException(status_code=404, detail="Checklist not found")
-    return checklist
+    try:
+        return update_checklist_status(db, checklist_id, new_status, operator, conclusion)
+    except InvalidStatusTransitionError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/{checklist_id}/parse", response_model=ReleaseChecklistResponse)
+def parse_and_update_checklist(
+    checklist_id: int,
+    operator: str = Query(..., description="操作人"),
+    db: Session = Depends(get_db),
+):
+    checklist = get_checklist(db, checklist_id)
+    if not checklist:
+        raise HTTPException(status_code=404, detail="Checklist not found")
+    
+    if not checklist.raw_input:
+        raise HTTPException(status_code=400, detail="No raw_input available for parsing")
+    
+    parsed_data = parse_checklist_text(checklist.raw_input)
+    updated_checklist = apply_parsed_checklist(db, checklist_id, parsed_data, operator)
+    return updated_checklist
 
 
 @router.post("/{checklist_id}/withdraw", response_model=ReleaseChecklistResponse)
