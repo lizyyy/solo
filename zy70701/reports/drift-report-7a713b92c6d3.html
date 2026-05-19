@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>契约漂移检测报告 - 7a713b92c6d3</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 15px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .value { font-size: 28px; font-weight: bold; }
+        .stat-card .label { font-size: 12px; opacity: 0.9; }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .section h3 {
+            font-size: 16px;
+            margin: 20px 0 10px;
+            color: #555;
+        }
+
+        .drift-list { margin-top: 15px; }
+        .drift-item {
+            padding: 15px;
+            border-left: 4px solid;
+            margin-bottom: 10px;
+            background: #fafafa;
+            border-radius: 0 8px 8px 0;
+        }
+        .drift-item.field_added { border-color: #10b981; }
+        .drift-item.field_missing { border-color: #f59e0b; }
+        .drift-item.type_mismatch { border-color: #ef4444; }
+        .drift-item.required_violation { border-color: #dc2626; }
+        .drift-item.format_mismatch { border-color: #8b5cf6; }
+
+        .drift-field { font-family: 'Monaco', monospace; font-weight: bold; margin-bottom: 8px; }
+        .drift-message { color: #666; margin-bottom: 8px; }
+        .drift-meta {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            gap: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .badge.pending { background: #fef3c7; color: #d97706; }
+        .badge.confirmed { background: #d1fae5; color: #059669; }
+        .badge.rejected { background: #fee2e2; color: #dc2626; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .info-row:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 契约漂移检测报告</h1>
+        <div>报告ID: 7a713b92c6d3 | 生成时间: 2026-05-19 06:52:26.023151</div>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="value">27</div>
+                <div class="label">漂移总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">0</div>
+                <div class="label">待确认</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">0</div>
+                <div class="label">已确认</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">2</div>
+                <div class="label">样例数量</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 契约信息</h2>
+        <div class="grid-2">
+            <div>
+                <div class="info-row">
+                    <span>接口</span>
+                    <strong>GET /api/users</strong>
+                </div>
+                <div class="info-row">
+                    <span>名称</span>
+                    <span>获取用户列表</span>
+                </div>
+                <div class="info-row">
+                    <span>版本</span>
+                    <span>1.0.0</span>
+                </div>
+            </div>
+            <div>
+                <div class="info-row">
+                    <span>字段数量</span>
+                    <span>10</span>
+                </div>
+                <div class="info-row">
+                    <span>消费方数量</span>
+                    <span>1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>⚠️ 漂移详情</h2>
+        <div class="drift-list">
+            
+            <div class="drift-item type_mismatch">
+                <div class="drift-field">code</div>
+                <div class="drift-message">字段 'code' 类型不匹配: 契约期望 integer, 样例实际 string</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>integer</code>
+                     | 
+                    实际: <code>string</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>位置: examples/sample2-drift.json:2</span>
+                    
+                    <span>类型: type_mismatch</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data</div>
+                <div class="drift-message">字段 'data' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>object</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.count</div>
+                <div class="drift-message">字段 'data.count' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>50</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>位置: examples/sample2-drift.json:7</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items</div>
+                <div class="drift-message">字段 'data.items' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>array</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].age</div>
+                <div class="drift-message">字段 'data.items[*].age' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>integer</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].created_at</div>
+                <div class="drift-message">字段 'data.items[*].created_at' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>string</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].email</div>
+                <div class="drift-message">字段 'data.items[*].email' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>string</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].id</div>
+                <div class="drift-message">字段 'data.items[*].id' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>integer</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].name</div>
+                <div class="drift-message">字段 'data.items[*].name' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>string</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.items[0].email</div>
+                <div class="drift-message">字段 'data.items[0].email' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>not-an-email</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>位置: examples/sample2-drift.json:12</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.items[0].id</div>
+                <div class="drift-message">字段 'data.items[0].id' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>2</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>位置: examples/sample2-drift.json:10</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.items[0].name</div>
+                <div class="drift-message">字段 'data.items[0].name' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>李四</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>位置: examples/sample2-drift.json:11</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.items[0].phone</div>
+                <div class="drift-message">字段 'data.items[0].phone' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>13800138000</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>位置: examples/sample2-drift.json:13</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item type_mismatch">
+                <div class="drift-field">data.total</div>
+                <div class="drift-message">字段 'data.total' 类型不匹配: 契约期望 integer, 样例实际 string</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>integer</code>
+                     | 
+                    实际: <code>string</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>位置: examples/sample2-drift.json:6</span>
+                    
+                    <span>类型: type_mismatch</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">extra_field</div>
+                <div class="drift-message">字段 'extra_field' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>this_is_new</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 779a7258</span>
+                    
+                    <span>位置: examples/sample2-drift.json:4</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data</div>
+                <div class="drift-message">字段 'data' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>object</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items</div>
+                <div class="drift-message">字段 'data.items' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>array</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].age</div>
+                <div class="drift-message">字段 'data.items[*].age' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>integer</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].created_at</div>
+                <div class="drift-message">字段 'data.items[*].created_at' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>string</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].email</div>
+                <div class="drift-message">字段 'data.items[*].email' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>string</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].id</div>
+                <div class="drift-message">字段 'data.items[*].id' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>integer</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_missing">
+                <div class="drift-field">data.items[*].name</div>
+                <div class="drift-message">字段 'data.items[*].name' 在契约中定义，但样例中缺失</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    期望: <code>string</code>
+                    
+                    
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>类型: field_missing</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.items[0].age</div>
+                <div class="drift-message">字段 'data.items[0].age' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>25</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>位置: examples/sample1.json:3</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.items[0].created_at</div>
+                <div class="drift-message">字段 'data.items[0].created_at' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>2024-01-15T10:30:00Z</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>位置: examples/sample1.json:12</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.items[0].email</div>
+                <div class="drift-message">字段 'data.items[0].email' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>zhangsan@example.com</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>位置: examples/sample1.json:10</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.items[0].id</div>
+                <div class="drift-message">字段 'data.items[0].id' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>1</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>位置: examples/sample1.json:8</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+            <div class="drift-item field_added">
+                <div class="drift-field">data.items[0].name</div>
+                <div class="drift-message">字段 'data.items[0].name' 在样例中存在，但契约中未定义</div>
+                
+                <div style="margin: 8px 0; font-family: monospace; font-size: 13px;">
+                    
+                    
+                    实际: <code>张三</code>
+                </div>
+                
+                <div class="drift-meta">
+                    <span>样例: 8f7b461b</span>
+                    
+                    <span>位置: examples/sample1.json:9</span>
+                    
+                    <span>类型: field_added</span>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+</body>
+</html>
