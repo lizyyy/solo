@@ -22,7 +22,7 @@ class ArtifactFile(ArtifactFileBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ExceptionRecordBase(BaseModel):
@@ -41,7 +41,7 @@ class ExceptionRecord(ExceptionRecordBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class HashTaskBase(BaseModel):
@@ -69,7 +69,7 @@ class HashTask(HashTaskBase):
     exceptions: List[ExceptionRecord] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ManualCorrection(BaseModel):

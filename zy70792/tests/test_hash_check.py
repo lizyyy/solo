@@ -157,7 +157,7 @@ def test_advance_task(temp_artifact_dir):
         json={
             "task_name": "advance_test",
             "artifact_dir": temp_artifact_dir,
-            "regions": "beijing, shanghai"
+            "regions": "beijing, shanghai, guangzhou"
         }
     )
     task_id = create_response.json()["id"]
