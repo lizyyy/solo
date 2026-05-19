@@ -245,9 +245,24 @@ def generate_dirty_data_scenario():
     print(f"3. 释放不存在的环境: {results[-1].get('error', '')}")
 
     results.append(manager.create_lease(
-        "env-01", "", "", -1, ""
+        "env-01", "", "zhangsan", 8, "空分支名"
     ))
-    print(f"4. 空值/负数参数: 由pydantic校验 (实际使用中会抛出ValidationError)")
+    print(f"4. 空分支名: {results[-1].get('error', '')}")
+
+    results.append(manager.create_lease(
+        "env-01", "feature/test", "", 8, "空占用人"
+    ))
+    print(f"5. 空占用人: {results[-1].get('error', '')}")
+
+    results.append(manager.create_lease(
+        "env-01", "feature/test", "zhangsan", -1, "负租期"
+    ))
+    print(f"6. 负租期: {results[-1].get('error', '')}")
+
+    results.append(manager.create_lease(
+        "env-01", "feature/test", "zhangsan", 8, ""
+    ))
+    print(f"7. 空租用理由: {results[-1].get('error', '')}")
 
     return {
         'scenario': 'dirty_data',

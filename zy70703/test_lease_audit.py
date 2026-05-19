@@ -265,20 +265,68 @@ class TestLeaseManager(unittest.TestCase):
 class TestEdgeCases(unittest.TestCase):
     """边界情况测试"""
 
-    def test_zero_duration_lease(self):
+    def test_zero_duration_lease_rejected(self):
+        """测试零时长租约被拒绝"""
         manager = LeaseManager()
         manager.add_environment(Environment(env_id="env-01", name="预览环境01"))
         result = manager.create_lease("env-01", "feature/test", "zhangsan", 0, "0小时租约")
-        self.assertTrue(result['success'])
-        lease = result['lease']
-        self.assertEqual(lease.end_time, lease.start_time)
+        self.assertFalse(result['success'])
+        self.assertTrue(result['validation_error'])
+        self.assertIn('大于0', result['error'])
 
-    def test_negative_duration_lease(self):
+    def test_negative_duration_lease_rejected(self):
+        """测试负时长租约被拒绝"""
         manager = LeaseManager()
         manager.add_environment(Environment(env_id="env-01", name="预览环境01"))
         result = manager.create_lease("env-01", "feature/test", "zhangsan", -1, "负时长")
-        self.assertTrue(result['success'])
-        self.assertTrue(result['lease'].is_expired())
+        self.assertFalse(result['success'])
+        self.assertTrue(result['validation_error'])
+        self.assertIn('大于0', result['error'])
+
+    def test_empty_branch_name_rejected(self):
+        """测试空分支名被拒绝"""
+        manager = LeaseManager()
+        manager.add_environment(Environment(env_id="env-01", name="预览环境01"))
+        result = manager.create_lease("env-01", "", "zhangsan", 8, "测试")
+        self.assertFalse(result['success'])
+        self.assertTrue(result['validation_error'])
+        self.assertIn('不能为空', result['error'])
+
+    def test_empty_assignee_rejected(self):
+        """测试空占用人被拒绝"""
+        manager = LeaseManager()
+        manager.add_environment(Environment(env_id="env-01", name="预览环境01"))
+        result = manager.create_lease("env-01", "feature/test", "   ", 8, "测试")
+        self.assertFalse(result['success'])
+        self.assertTrue(result['validation_error'])
+        self.assertIn('不能为空', result['error'])
+
+    def test_empty_reason_rejected(self):
+        """测试空理由被拒绝"""
+        manager = LeaseManager()
+        manager.add_environment(Environment(env_id="env-01", name="预览环境01"))
+        result = manager.create_lease("env-01", "feature/test", "zhangsan", 8, "")
+        self.assertFalse(result['success'])
+        self.assertTrue(result['validation_error'])
+        self.assertIn('不能为空', result['error'])
+
+    def test_renew_with_negative_duration_rejected(self):
+        """测试续租时负时长被拒绝"""
+        manager = LeaseManager()
+        manager.add_environment(Environment(env_id="env-01", name="预览环境01"))
+        manager.create_lease("env-01", "feature/test", "zhangsan", 8, "测试")
+        result = manager.renew_lease("env-01", "zhangsan", -2, "续租")
+        self.assertFalse(result['success'])
+        self.assertTrue(result['validation_error'])
+
+    def test_renew_with_empty_reason_rejected(self):
+        """测试续租时空理由被拒绝"""
+        manager = LeaseManager()
+        manager.add_environment(Environment(env_id="env-01", name="预览环境01"))
+        manager.create_lease("env-01", "feature/test", "zhangsan", 8, "测试")
+        result = manager.renew_lease("env-01", "zhangsan", 4, "   ")
+        self.assertFalse(result['success'])
+        self.assertTrue(result['validation_error'])
 
     def test_large_duration_lease(self):
         manager = LeaseManager()

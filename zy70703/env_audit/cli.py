@@ -3,7 +3,7 @@ import json
 import sys
 import os
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Any
 from tabulate import tabulate
 from functools import wraps
 
@@ -11,6 +11,34 @@ from .models import LeaseManager, Environment, EnvironmentStatus
 
 
 DEFAULT_DATA_FILE = os.path.expanduser("~/.env_audit_data.json")
+
+
+def json_serializer(obj: Any) -> Any:
+    """正确序列化 datetime 和其他类型"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, timedelta):
+        return obj.total_seconds()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
+
+def safe_json_dumps(data: Any, indent: int = 2) -> str:
+    """安全的JSON序列化，正确处理datetime等类型"""
+    return json.dumps(data, ensure_ascii=False, indent=indent, default=json_serializer)
+
+
+def validate_not_empty(value: str, field_name: str) -> str:
+    """验证字符串不为空或纯空白"""
+    if not value or not value.strip():
+        print_error(f"{field_name} 不能为空")
+    return value.strip()
+
+
+def validate_positive_duration(duration: int, field_name: str = "租期") -> int:
+    """验证租期为正数"""
+    if duration <= 0:
+        print_error(f"{field_name} 必须大于0，当前值: {duration}")
+    return duration
 
 
 def load_manager(data_file: str = None) -> LeaseManager:
@@ -33,7 +61,7 @@ def save_manager(manager: LeaseManager, data_file: str = None):
     try:
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(manager.to_dict(), f, ensure_ascii=False, indent=2, default=str)
+            json.dump(manager.to_dict(), f, ensure_ascii=False, indent=2, default=json_serializer)
     except Exception as e:
         click.echo(click.style(f"警告: 无法保存数据文件 {file_path}: {e}", fg='yellow'), err=True)
 
@@ -65,7 +93,7 @@ pass_context = click.make_pass_decorator(Context, ensure=True)
 
 def output_result(ctx: Context, data: dict, human_table=None):
     if ctx.output_format == 'json' or (ctx.quiet and not human_table):
-        click.echo(json.dumps(data, ensure_ascii=False, indent=2, default=str))
+        click.echo(safe_json_dumps(data))
     elif human_table:
         if 'summary' in data and data['summary']:
             click.echo("\n=== 摘要 ===")
@@ -74,7 +102,7 @@ def output_result(ctx: Context, data: dict, human_table=None):
             click.echo("")
         click.echo(tabulate(human_table, headers='keys', tablefmt='simple'))
     else:
-        click.echo(json.dumps(data, ensure_ascii=False, indent=2, default=str))
+        click.echo(safe_json_dumps(data))
 
 
 def print_error(message: str, exit_code: int = 1):
@@ -118,6 +146,11 @@ def cli(ctx: Context, output_format: str, quiet: bool, data_file: Optional[str])
 @persist_data
 def lease(ctx: Context, env_id: str, branch_name: str, assignee: str, duration: int, reason: str, request_id: Optional[str]):
     """租用环境 ENV_ID BRANCH_NAME ASSIGNEE"""
+    validate_not_empty(env_id, "环境ID")
+    validate_not_empty(branch_name, "分支名称")
+    validate_not_empty(assignee, "占用人")
+    validate_positive_duration(duration)
+    validate_not_empty(reason, "租用理由")
     result = ctx.manager.create_lease(env_id, branch_name, assignee, duration, reason, request_id)
 
     if result.get('idempotent'):
@@ -154,6 +187,10 @@ def lease(ctx: Context, env_id: str, branch_name: str, assignee: str, duration: 
 @persist_data
 def renew(ctx: Context, env_id: str, assignee: str, duration: int, reason: str, request_id: Optional[str]):
     """续租环境 ENV_ID ASSIGNEE"""
+    validate_not_empty(env_id, "环境ID")
+    validate_not_empty(assignee, "占用人")
+    validate_positive_duration(duration, "续租时长")
+    validate_not_empty(reason, "续租理由")
     result = ctx.manager.renew_lease(env_id, assignee, duration, reason, request_id)
 
     if result.get('idempotent'):

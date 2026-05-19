@@ -102,8 +102,42 @@ class LeaseManager:
     def is_idempotent(self, request_id: str) -> bool:
         return request_id in self.request_ids
 
+    def _validate_not_empty(self, value: str, field_name: str) -> Optional[str]:
+        """验证字符串不为空或纯空白，返回错误消息或None"""
+        if value is None:
+            return f'{field_name} 不能为 None'
+        if not isinstance(value, str) or not value.strip():
+            return f'{field_name} 不能为空'
+        return None
+
+    def _validate_positive_duration(self, duration_hours: int) -> Optional[str]:
+        """验证租期为正数，返回错误消息或None"""
+        if not isinstance(duration_hours, int) or duration_hours <= 0:
+            return f'租期必须大于0，当前值: {duration_hours}'
+        return None
+
     def create_lease(self, env_id: str, branch_name: str, assignee: str,
                      duration_hours: int, reason: str, request_id: str = None) -> Dict:
+        error = self._validate_not_empty(env_id, '环境ID')
+        if error:
+            return {'success': False, 'error': error, 'validation_error': True}
+
+        error = self._validate_not_empty(branch_name, '分支名称')
+        if error:
+            return {'success': False, 'error': error, 'validation_error': True}
+
+        error = self._validate_not_empty(assignee, '占用人')
+        if error:
+            return {'success': False, 'error': error, 'validation_error': True}
+
+        error = self._validate_positive_duration(duration_hours)
+        if error:
+            return {'success': False, 'error': error, 'validation_error': True}
+
+        error = self._validate_not_empty(reason, '租用理由')
+        if error:
+            return {'success': False, 'error': error, 'validation_error': True}
+
         if request_id and self.is_idempotent(request_id):
             return {
                 'success': True,
@@ -166,6 +200,22 @@ class LeaseManager:
 
     def renew_lease(self, env_id: str, assignee: str, duration_hours: int,
                     reason: str, request_id: str = None) -> Dict:
+        error = self._validate_not_empty(env_id, '环境ID')
+        if error:
+            return {'success': False, 'error': error, 'validation_error': True}
+
+        error = self._validate_not_empty(assignee, '占用人')
+        if error:
+            return {'success': False, 'error': error, 'validation_error': True}
+
+        error = self._validate_positive_duration(duration_hours)
+        if error:
+            return {'success': False, 'error': error, 'validation_error': True}
+
+        error = self._validate_not_empty(reason, '续租理由')
+        if error:
+            return {'success': False, 'error': error, 'validation_error': True}
+
         if request_id and self.is_idempotent(request_id):
             return {
                 'success': True,

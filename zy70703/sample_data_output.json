@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-19T12:49:19.041999",
+  "generated_at": "2026-05-19T13:07:05.835739",
   "scenarios": [
     {
       "scenario": "normal",
       "results": [
         {
           "success": true,
-          "lease": "lease_id='c63bfa9a82e5' env_id='env-01' branch_name='feature/user-login' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 42075) end_time=datetime.datetime(2026, 5, 19, 20, 49, 19, 42075) reason='用户登录功能联调' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 12, 49, 19, 42102) request_id=None"
+          "lease": "lease_id='e2c74583547f' env_id='env-01' branch_name='feature/user-login' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 13, 7, 5, 835785) end_time=datetime.datetime(2026, 5, 19, 21, 7, 5, 835785) reason='用户登录功能联调' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 13, 7, 5, 835793) request_id=None"
         },
         {
           "success": true,
-          "lease": "lease_id='618dd5bd2390' env_id='env-02' branch_name='feature/payment-gateway' assignee='lisi' start_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 42165) end_time=datetime.datetime(2026, 5, 20, 20, 49, 19, 42165) reason='支付网关集成测试 | Renewed: 需要继续验证边界情况' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 12, 49, 19, 42172) request_id='req-001'"
+          "lease": "lease_id='38151090d952' env_id='env-02' branch_name='feature/payment-gateway' assignee='lisi' start_time=datetime.datetime(2026, 5, 19, 13, 7, 5, 835823) end_time=datetime.datetime(2026, 5, 20, 21, 7, 5, 835823) reason='支付网关集成测试 | Renewed: 需要继续验证边界情况' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 13, 7, 5, 835826) request_id='req-001'"
         },
         {
           "success": true,
-          "lease": "lease_id='618dd5bd2390' env_id='env-02' branch_name='feature/payment-gateway' assignee='lisi' start_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 42165) end_time=datetime.datetime(2026, 5, 20, 20, 49, 19, 42165) reason='支付网关集成测试 | Renewed: 需要继续验证边界情况' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 12, 49, 19, 42172) request_id='req-001'",
-          "new_end_time": "2026-05-20 20:49:19.042165"
+          "lease": "lease_id='38151090d952' env_id='env-02' branch_name='feature/payment-gateway' assignee='lisi' start_time=datetime.datetime(2026, 5, 19, 13, 7, 5, 835823) end_time=datetime.datetime(2026, 5, 20, 21, 7, 5, 835823) reason='支付网关集成测试 | Renewed: 需要继续验证边界情况' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 13, 7, 5, 835826) request_id='req-001'",
+          "new_end_time": "2026-05-20 21:07:05.835823"
         },
         {
           "success": true,
-          "lease": "lease_id='07784271723a' env_id='env-03' branch_name='hotfix/security-patch' assignee='wangwu' start_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 42205) end_time=datetime.datetime(2026, 5, 19, 16, 49, 19, 42205) reason='安全补丁紧急修复' status=<LeaseStatus.RELEASED: 'released'> release_reason='修复完成，已上线' release_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 42237) created_at=datetime.datetime(2026, 5, 19, 12, 49, 19, 42210) request_id=None"
+          "lease": "lease_id='4cb19d3290c7' env_id='env-03' branch_name='hotfix/security-patch' assignee='wangwu' start_time=datetime.datetime(2026, 5, 19, 13, 7, 5, 835845) end_time=datetime.datetime(2026, 5, 19, 17, 7, 5, 835845) reason='安全补丁紧急修复' status=<LeaseStatus.RELEASED: 'released'> release_reason='修复完成，已上线' release_time=datetime.datetime(2026, 5, 19, 13, 7, 5, 835859) created_at=datetime.datetime(2026, 5, 19, 13, 7, 5, 835847) request_id=None"
         },
         {
           "success": true,
@@ -86,7 +86,7 @@
       "results": [
         {
           "success": true,
-          "lease": "lease_id='80f3f5d1ced9' env_id='env-01' branch_name='feature/a' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 42373) end_time=datetime.datetime(2026, 5, 19, 20, 49, 19, 42373) reason='A功能开发' status=<LeaseStatus.FORCE_RELEASED: 'force_released'> release_reason='管理员强制释放' release_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 42435) created_at=datetime.datetime(2026, 5, 19, 12, 49, 19, 42379) request_id=None"
+          "lease": "lease_id='6bd7d6ed8285' env_id='env-01' branch_name='feature/a' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 13, 7, 5, 835966) end_time=datetime.datetime(2026, 5, 19, 21, 7, 5, 835966) reason='A功能开发' status=<LeaseStatus.FORCE_RELEASED: 'force_released'> release_reason='管理员强制释放' release_time=datetime.datetime(2026, 5, 19, 13, 7, 5, 835994) created_at=datetime.datetime(2026, 5, 19, 13, 7, 5, 835972) request_id=None"
         },
         {
           "success": false,
@@ -95,7 +95,7 @@
             "env_id": "env-01",
             "current_assignee": "zhangsan",
             "current_branch": "feature/a",
-            "remaining_hours": 7.999999989722221
+            "remaining_hours": 7.9999999950000005
           }
         },
         {
@@ -123,7 +123,7 @@
       "results": [
         {
           "success": true,
-          "lease": "lease_id='5cd70c6f5c83' env_id='env-01' branch_name='feature/a' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 42759) end_time=datetime.datetime(2026, 5, 20, 4, 49, 19, 42759) reason='A功能开发 | Renewed: 续租' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 12, 49, 19, 42778) request_id='same-request-id-123'"
+          "lease": "lease_id='79fa2323b0b8' env_id='env-01' branch_name='feature/a' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 13, 7, 5, 836005) end_time=datetime.datetime(2026, 5, 20, 5, 7, 5, 836005) reason='A功能开发 | Renewed: 续租' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 13, 7, 5, 836007) request_id='same-request-id-123'"
         },
         {
           "success": true,
@@ -133,8 +133,8 @@
         },
         {
           "success": true,
-          "lease": "lease_id='5cd70c6f5c83' env_id='env-01' branch_name='feature/a' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 42759) end_time=datetime.datetime(2026, 5, 20, 4, 49, 19, 42759) reason='A功能开发 | Renewed: 续租' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 12, 49, 19, 42778) request_id='same-request-id-123'",
-          "new_end_time": "2026-05-20 04:49:19.042759"
+          "lease": "lease_id='79fa2323b0b8' env_id='env-01' branch_name='feature/a' assignee='zhangsan' start_time=datetime.datetime(2026, 5, 19, 13, 7, 5, 836005) end_time=datetime.datetime(2026, 5, 20, 5, 7, 5, 836005) reason='A功能开发 | Renewed: 续租' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 13, 7, 5, 836007) request_id='same-request-id-123'",
+          "new_end_time": "2026-05-20 05:07:05.836005"
         },
         {
           "success": true,
@@ -240,8 +240,24 @@
           "error": "Environment env-999 not found"
         },
         {
-          "success": true,
-          "lease": "lease_id='eb0662d70233' env_id='env-01' branch_name='' assignee='' start_time=datetime.datetime(2026, 5, 19, 12, 49, 19, 43256) end_time=datetime.datetime(2026, 5, 19, 11, 49, 19, 43256) reason='' status=<LeaseStatus.ACTIVE: 'active'> release_reason=None release_time=None created_at=datetime.datetime(2026, 5, 19, 12, 49, 19, 43271) request_id=None"
+          "success": false,
+          "error": "分支名称 不能为空",
+          "validation_error": true
+        },
+        {
+          "success": false,
+          "error": "占用人 不能为空",
+          "validation_error": true
+        },
+        {
+          "success": false,
+          "error": "租期必须大于0，当前值: -1",
+          "validation_error": true
+        },
+        {
+          "success": false,
+          "error": "租用理由 不能为空",
+          "validation_error": true
         }
       ]
     }
