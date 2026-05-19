@@ -1,0 +1,42 @@
+[
+    {
+        "plate_number": "京A12345",
+        "vehicle_type": "小型轿车",
+        "owner_name": "张三",
+        "owner_phone": "13800138001",
+        "valid_from": "2025-05-20 08:00",
+        "valid_to": "2025-05-20 18:00"
+    },
+    {
+        "plate_number": "京B67890",
+        "vehicle_type": "SUV",
+        "owner_name": "李四",
+        "owner_phone": "13800138002",
+        "valid_from": "2025-05-21 09:00",
+        "valid_to": "2025-05-23 17:00"
+    },
+    {
+        "plate_number": "京C11111",
+        "vehicle_type": "货车",
+        "owner_name": "王五",
+        "owner_phone": "13800138003",
+        "valid_from": "2025-05-20 08:00",
+        "valid_to": "2025-05-20 12:00"
+    },
+    {
+        "plate_number": "INVALID",
+        "vehicle_type": "轿车",
+        "owner_name": "赵六",
+        "owner_phone": "13800138004",
+        "valid_from": "2025-05-20 08:00",
+        "valid_to": "2025-05-20 18:00"
+    },
+    {
+        "plate_number": "京D22222",
+        "vehicle_type": "面包车",
+        "owner_name": "钱七",
+        "owner_phone": "13800138005",
+        "valid_from": "2025-05-20 18:00",
+        "valid_to": "2025-05-20 08:00"
+    }
+]

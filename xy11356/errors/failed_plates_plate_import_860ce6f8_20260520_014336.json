@@ -1,0 +1,20 @@
+{
+  "batch_id": "plate_import_860ce6f8",
+  "operator": "张主管",
+  "role": "security_supervisor",
+  "failed_records": [
+    {
+      "index": 5,
+      "data": {
+        "plate_number": "京D22222",
+        "vehicle_type": "面包车",
+        "owner_name": "钱七",
+        "owner_phone": "13800138005",
+        "valid_from": "2025-05-20 18:00",
+        "valid_to": "2025-05-20 08:00"
+      },
+      "error": "生效日期必须早于失效日期",
+      "suggestion": "请调整生效和失效日期"
+    }
+  ]
+}

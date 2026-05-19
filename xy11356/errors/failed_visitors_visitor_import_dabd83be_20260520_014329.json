@@ -1,0 +1,33 @@
+{
+  "batch_id": "visitor_import_dabd83be",
+  "operator": "张主管",
+  "role": "security_supervisor",
+  "failed_records": [
+    {
+      "row": 5,
+      "data": {
+        "name": "钱七",
+        "id_card": "invalid_id_card",
+        "phone": "13800138005",
+        "visit_date": "2025-05-22",
+        "visit_reason": "送货",
+        "visited_person": "周师傅"
+      },
+      "error": "身份证号格式不正确",
+      "suggestion": "身份证号应为18位数字，最后一位可为X"
+    },
+    {
+      "row": 6,
+      "data": {
+        "name": "孙八",
+        "id_card": "110101199006066789",
+        "phone": "bad_phone",
+        "visit_date": "2025-05-22",
+        "visit_reason": "维修",
+        "visited_person": "吴工"
+      },
+      "error": "手机号格式不正确",
+      "suggestion": "手机号应为11位数字，以1开头"
+    }
+  ]
+}
