@@ -1,0 +1,113 @@
+[
+  {
+    "run_id": "run_d800f024",
+    "sample_id": "S001",
+    "status": "passed",
+    "actual_output": {
+      "id": 123,
+      "name": "张三",
+      "email": "test@example.com"
+    },
+    "error_message": null,
+    "failure_category": null,
+    "duration_ms": 0,
+    "ran_at": "2026-05-19T07:54:19.939948",
+    "version_matched": true,
+    "checks": {
+      "version_match": true,
+      "api_call_success": true,
+      "id_matches": true,
+      "name_matches": true,
+      "email_matches": true,
+      "all_fields_match": true,
+      "output_matches": true
+    }
+  },
+  {
+    "run_id": "run_de869a75",
+    "sample_id": "S002",
+    "status": "failed",
+    "actual_output": null,
+    "error_message": "参数格式错误: 包含非法字符",
+    "failure_category": "api_changed",
+    "duration_ms": 0,
+    "ran_at": "2026-05-19T07:54:19.940483",
+    "version_matched": true,
+    "checks": {
+      "version_match": true,
+      "api_call_success": false
+    }
+  },
+  {
+    "run_id": "run_87f4b15a",
+    "sample_id": "S003",
+    "status": "passed",
+    "actual_output": {
+      "error": "rate_limit_exceeded",
+      "message": "请求频率超限"
+    },
+    "error_message": null,
+    "failure_category": null,
+    "duration_ms": 0,
+    "ran_at": "2026-05-19T07:54:19.941045",
+    "version_matched": true,
+    "checks": {
+      "version_match": true,
+      "api_call_success": true,
+      "error_matches": true,
+      "all_fields_match": true,
+      "output_matches": true
+    }
+  },
+  {
+    "run_id": "run_113ddb4f",
+    "sample_id": "S004",
+    "status": "passed",
+    "actual_output": {
+      "data": [],
+      "total": 0
+    },
+    "error_message": null,
+    "failure_category": null,
+    "duration_ms": 0,
+    "ran_at": "2026-05-19T07:54:19.941401",
+    "version_matched": true,
+    "checks": {
+      "version_match": true,
+      "api_call_success": true,
+      "data_matches": true,
+      "total_matches": true,
+      "all_fields_match": true,
+      "output_matches": true
+    }
+  },
+  {
+    "run_id": "run_839a60bb",
+    "sample_id": "S005",
+    "status": "failed",
+    "actual_output": null,
+    "error_message": "版本不匹配: 样例版本 1.0.0 != 当前版本 2.0.0",
+    "failure_category": "version_mismatch",
+    "duration_ms": 0,
+    "ran_at": "2026-05-19T07:54:19.941763",
+    "version_matched": false,
+    "checks": {
+      "version_match": false
+    }
+  },
+  {
+    "run_id": "run_3bde619b",
+    "sample_id": "S006",
+    "status": "failed",
+    "actual_output": null,
+    "error_message": "接口字段已变更: 'user_name' 改为 'username'",
+    "failure_category": "api_changed",
+    "duration_ms": 0,
+    "ran_at": "2026-05-19T07:54:19.942360",
+    "version_matched": true,
+    "checks": {
+      "version_match": true,
+      "api_call_success": false
+    }
+  }
+]

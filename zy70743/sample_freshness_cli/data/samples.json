@@ -1,0 +1,151 @@
+[
+  {
+    "sample_id": "S001",
+    "name": "正常用户查询",
+    "description": "正常输入的用户查询样例",
+    "language": "python",
+    "api_endpoint": "/api/v1/users",
+    "api_version": "2.0.0",
+    "expected_api_version": "2.0.0",
+    "code_content": "\nimport requests\n\nresponse = requests.get('/api/v1/users', params={'id': 123})\nprint(response.json())\n        ",
+    "input_data": {
+      "user_id": 123
+    },
+    "expected_output": {
+      "id": 123,
+      "name": "张三",
+      "email": "test@example.com"
+    },
+    "status": "active",
+    "created_at": "2026-05-19T07:54:00.061350",
+    "updated_at": "2026-05-19T07:54:00.061357",
+    "tags": [
+      "正常",
+      "用户",
+      "GET"
+    ],
+    "metadata": {}
+  },
+  {
+    "sample_id": "S002",
+    "name": "脏数据测试",
+    "description": "包含非法字符的脏数据样例",
+    "language": "python",
+    "api_endpoint": "/api/v1/users",
+    "api_version": "2.0.0",
+    "expected_api_version": "2.0.0",
+    "code_content": "\nimport requests\n\ndata = {'name': '<script>alert(1)</script>'}\nresponse = requests.post('/api/v1/users', json=data)\n        ",
+    "input_data": {
+      "name": "<script>alert(1)</script>"
+    },
+    "expected_output": {
+      "success": true
+    },
+    "status": "active",
+    "created_at": "2026-05-19T07:54:00.061371",
+    "updated_at": "2026-05-19T07:54:00.061371",
+    "tags": [
+      "脏数据",
+      "安全"
+    ],
+    "metadata": {}
+  },
+  {
+    "sample_id": "S003",
+    "name": "边界冲突测试",
+    "description": "请求频率超限的边界情况",
+    "language": "curl",
+    "api_endpoint": "/api/v1/orders",
+    "api_version": "1.5.0",
+    "expected_api_version": "1.5.0",
+    "code_content": "\ncurl -X GET /api/v1/orders?page=999999\n        ",
+    "input_data": {
+      "page": 999999
+    },
+    "expected_output": {
+      "error": "rate_limit_exceeded"
+    },
+    "status": "active",
+    "created_at": "2026-05-19T07:54:00.061376",
+    "updated_at": "2026-05-19T07:54:00.061376",
+    "tags": [
+      "边界冲突",
+      "限流"
+    ],
+    "metadata": {}
+  },
+  {
+    "sample_id": "S004",
+    "name": "空结果查询",
+    "description": "查询无数据返回的情况",
+    "language": "javascript",
+    "api_endpoint": "/api/v1/products",
+    "api_version": "3.0.0",
+    "expected_api_version": "3.0.0",
+    "code_content": "\nfetch('/api/v1/products?id=999999')\n  .then(res => res.json())\n  .then(data => console.log(data))\n        ",
+    "input_data": {
+      "product_id": 999999
+    },
+    "expected_output": {
+      "data": [],
+      "total": 0
+    },
+    "status": "active",
+    "created_at": "2026-05-19T07:54:00.061381",
+    "updated_at": "2026-05-19T07:54:00.061381",
+    "tags": [
+      "空结果",
+      "404"
+    ],
+    "metadata": {}
+  },
+  {
+    "sample_id": "S005",
+    "name": "版本不匹配样例",
+    "description": "API版本已升级但样例未更新",
+    "language": "python",
+    "api_endpoint": "/api/v1/users",
+    "api_version": "1.0.0",
+    "expected_api_version": "2.0.0",
+    "code_content": "\nimport requests\n\n# 旧版本API调用\nresponse = requests.get('/api/v1/users/123')\n        ",
+    "input_data": {
+      "user_id": 123
+    },
+    "expected_output": {
+      "id": 123
+    },
+    "status": "fixed",
+    "created_at": "2026-05-19T07:54:00.061385",
+    "updated_at": "2026-05-19T07:54:34.089574",
+    "tags": [
+      "版本不匹配",
+      "已过时"
+    ],
+    "metadata": {}
+  },
+  {
+    "sample_id": "S006",
+    "name": "API字段变更样例",
+    "description": "接口字段已变更的情况",
+    "language": "python",
+    "api_endpoint": "/api/v1/auth",
+    "api_version": "1.0.0",
+    "expected_api_version": "1.0.0",
+    "code_content": "\nimport requests\n\nresponse = requests.post('/api/v1/auth', json={\n    'user_name': 'test',\n    'password': '123456'\n})\n        ",
+    "input_data": {
+      "user_name": "test",
+      "password": "123456"
+    },
+    "expected_output": {
+      "token": "xxx"
+    },
+    "status": "active",
+    "created_at": "2026-05-19T07:54:00.061389",
+    "updated_at": "2026-05-19T07:54:00.061389",
+    "tags": [
+      "API变更",
+      "字段错误"
+    ],
+    "metadata": {}
+  }
+]
