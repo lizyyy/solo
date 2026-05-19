@@ -70,8 +70,8 @@ class MetaDataCreate(MetaDataBase):
 
 
 class MetaDataResponse(MetaDataBase):
-    id: int
-    wheel_file_id: int
+    id: Optional[int] = None
+    wheel_file_id: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -92,10 +92,10 @@ class EntryPointCreate(EntryPointBase):
 
 
 class EntryPointResponse(EntryPointBase):
-    id: int
-    wheel_file_id: int
-    is_valid: bool
-    validation_error: Optional[str]
+    id: Optional[int] = None
+    wheel_file_id: Optional[int] = None
+    is_valid: bool = True
+    validation_error: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -115,10 +115,10 @@ class DependencyCreate(DependencyBase):
 
 
 class DependencyResponse(DependencyBase):
-    id: int
-    wheel_file_id: int
-    is_valid: bool
-    validation_error: Optional[str]
+    id: Optional[int] = None
+    wheel_file_id: Optional[int] = None
+    is_valid: bool = True
+    validation_error: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -144,9 +144,9 @@ class ValidationReportCreate(ValidationReportBase):
 
 
 class ValidationReportResponse(ValidationReportBase):
-    id: int
-    wheel_file_id: int
-    generated_at: datetime
+    id: Optional[int] = None
+    wheel_file_id: Optional[int] = None
+    generated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -164,9 +164,9 @@ class ExceptionPathCreate(ExceptionPathBase):
 
 
 class ExceptionPathResponse(ExceptionPathBase):
-    id: int
-    wheel_file_id: int
-    handled_at: datetime
+    id: Optional[int] = None
+    wheel_file_id: Optional[int] = None
+    handled_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -185,9 +185,9 @@ class AuditLogCreate(AuditLogBase):
 
 
 class AuditLogResponse(AuditLogBase):
-    id: int
-    wheel_file_id: int
-    timestamp: datetime
+    id: Optional[int] = None
+    wheel_file_id: Optional[int] = None
+    timestamp: Optional[datetime] = None
 
     class Config:
         from_attributes = True

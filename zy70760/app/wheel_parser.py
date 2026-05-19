@@ -9,8 +9,9 @@ from email.parser import Parser
 
 
 class WheelParser:
-    def __init__(self, wheel_path: str):
+    def __init__(self, wheel_path: str, original_filename: str = None):
         self.wheel_path = wheel_path
+        self.original_filename = original_filename or os.path.basename(wheel_path)
         self.temp_dir = None
         self.extracted_path = None
 
@@ -46,7 +47,12 @@ class WheelParser:
             'platform_tag': ''
         }
 
-        if len(parts) >= 4:
+        if len(parts) >= 5:
+            result['platform_tag'] = parts[-1]
+            result['python_version'] = parts[-3]
+            result['package_version'] = parts[-4]
+            result['package_name'] = '-'.join(parts[:-4])
+        elif len(parts) == 4:
             result['platform_tag'] = parts[-1]
             result['python_version'] = parts[-2]
             result['package_version'] = parts[-3]
@@ -195,17 +201,15 @@ class WheelParser:
         return dependencies
 
     def get_platform_tags(self) -> List[str]:
-        filename = os.path.basename(self.wheel_path)
-        parsed = self.parse_wheel_filename(filename)
+        parsed = self.parse_wheel_filename(self.original_filename)
         platform_tag = parsed.get('platform_tag', '')
         return platform_tag.split('.') if platform_tag else []
 
     def extract_all(self) -> Dict:
-        filename = os.path.basename(self.wheel_path)
-        parsed_filename = self.parse_wheel_filename(filename)
+        parsed_filename = self.parse_wheel_filename(self.original_filename)
 
         return {
-            'filename': filename,
+            'filename': self.original_filename,
             'file_hash': self.get_file_hash(),
             'file_size': self.get_file_size(),
             'package_name': parsed_filename['package_name'],

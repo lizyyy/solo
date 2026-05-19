@@ -34,7 +34,7 @@ class WheelFile(Base):
     package_version = Column(String(100))
     original_filename = Column(String(255))
 
-    metadata = relationship("MetaData", back_populates="wheel_file", uselist=False)
+    wheel_metadata = relationship("MetaData", back_populates="wheel_file", uselist=False)
     entry_points = relationship("EntryPoint", back_populates="wheel_file")
     dependencies = relationship("Dependency", back_populates="wheel_file")
     validation_reports = relationship("ValidationReport", back_populates="wheel_file")
@@ -62,7 +62,7 @@ class MetaData(Base):
     requires_python = Column(String(100))
     raw_metadata = Column(Text)
 
-    wheel_file = relationship("WheelFile", back_populates="metadata")
+    wheel_file = relationship("WheelFile", back_populates="wheel_metadata")
 
 
 class EntryPoint(Base):

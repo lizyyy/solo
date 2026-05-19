@@ -46,7 +46,7 @@ async def upload_wheel(
         tmp_file_path = tmp_file.name
 
     try:
-        with WheelParser(tmp_file_path) as parser:
+        with WheelParser(tmp_file_path, file.filename) as parser:
             extracted_data = parser.extract_all()
 
             existing = get_wheel_file_by_hash(db, extracted_data['file_hash'])
@@ -131,9 +131,9 @@ async def validate_wheel(
         'platform_tag': db_wheel.platform_tag,
         'platform_tags': db_wheel.platform_tag.split('.') if db_wheel.platform_tag else [],
         'metadata': {
-            'name': db_wheel.metadata.name if db_wheel.metadata else '',
-            'version': db_wheel.metadata.version if db_wheel.metadata else ''
-        } if db_wheel.metadata else {},
+            'name': db_wheel.wheel_metadata.name if db_wheel.wheel_metadata else '',
+            'version': db_wheel.wheel_metadata.version if db_wheel.wheel_metadata else ''
+        } if db_wheel.wheel_metadata else {},
         'entry_points': [
             {
                 'group': ep.group,
@@ -354,14 +354,14 @@ def export_wheel_report(wheel_id: int, format: str = "json", db: Session = Depen
         "exception_paths": []
     }
 
-    if db_wheel.metadata:
+    if db_wheel.wheel_metadata:
         report["metadata"] = {
-            "name": db_wheel.metadata.name,
-            "version": db_wheel.metadata.version,
-            "summary": db_wheel.metadata.summary,
-            "author": db_wheel.metadata.author,
-            "license": db_wheel.metadata.license,
-            "requires_python": db_wheel.metadata.requires_python
+            "name": db_wheel.wheel_metadata.name,
+            "version": db_wheel.wheel_metadata.version,
+            "summary": db_wheel.wheel_metadata.summary,
+            "author": db_wheel.wheel_metadata.author,
+            "license": db_wheel.wheel_metadata.license,
+            "requires_python": db_wheel.wheel_metadata.requires_python
         }
 
     for ep in db_wheel.entry_points:
