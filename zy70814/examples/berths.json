@@ -1,0 +1,58 @@
+[
+  {
+    "berth_number": "A1",
+    "terminal": "A码头",
+    "description": "集装箱泊位A1",
+    "depth_at_mllw": 15.0,
+    "max_draft": 14.5,
+    "min_depth": 14.0,
+    "length": 300.0,
+    "max_vessel_length": 280.0,
+    "is_available": true,
+    "allowed_vessel_types": "集装箱,散货",
+    "allowed_cargo_types": "电子产品,日用品,汽车配件",
+    "priority": 1
+  },
+  {
+    "berth_number": "A2",
+    "terminal": "A码头",
+    "description": "集装箱泊位A2",
+    "depth_at_mllw": 14.0,
+    "max_draft": 13.5,
+    "min_depth": 13.0,
+    "length": 280.0,
+    "max_vessel_length": 260.0,
+    "is_available": true,
+    "allowed_vessel_types": "集装箱",
+    "allowed_cargo_types": "日用品,食品",
+    "priority": 2
+  },
+  {
+    "berth_number": "B2",
+    "terminal": "B码头",
+    "description": "散货泊位B2",
+    "depth_at_mllw": 15.5,
+    "max_draft": 15.0,
+    "min_depth": 14.5,
+    "length": 350.0,
+    "max_vessel_length": 330.0,
+    "is_available": true,
+    "allowed_vessel_types": "散货",
+    "allowed_cargo_types": "铁矿石,煤炭,粮食",
+    "priority": 1
+  },
+  {
+    "berth_number": "C1",
+    "terminal": "C码头",
+    "description": "油轮泊位C1",
+    "depth_at_mllw": 16.0,
+    "max_draft": 15.5,
+    "min_depth": 15.0,
+    "length": 380.0,
+    "max_vessel_length": 360.0,
+    "is_available": true,
+    "allowed_vessel_types": "油轮,化学品船",
+    "allowed_cargo_types": "原油,成品油,化学品",
+    "priority": 3
+  }
+]
