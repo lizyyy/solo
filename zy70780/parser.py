@@ -55,7 +55,13 @@ class LockfileParser:
                 for path, info in deps.items():
                     if path == "":
                         continue
-                    name = info.get("name", path.split("/")[-1])
+                    name = info.get("name")
+                    if not name:
+                        path_parts = path.split("/")
+                        if len(path_parts) >= 2 and path_parts[-2].startswith("@"):
+                            name = "/".join(path_parts[-2:])
+                        else:
+                            name = path_parts[-1]
                     pkg = {
                         "package_name": name,
                         "version": info.get("version", ""),
@@ -118,8 +124,12 @@ class LockfileParser:
                     continue
                 name = info.get("name")
                 if not name:
-                    match = re.search(r"/([^/@]+)/", path)
-                    name = match.group(1) if match else path.split("/")[-1].split("@")[0]
+                    match = re.search(r"/(@[^/]+/[^/@]+)", path)
+                    if match:
+                        name = match.group(1)
+                    else:
+                        match = re.search(r"/([^/@]+)", path)
+                        name = match.group(1) if match else path.split("/")[-1].split("@")[0]
 
                 pkg = {
                     "package_name": name,
@@ -146,11 +156,26 @@ class LockfileParser:
             deps = data.get("package", [])
 
             for info in deps:
+                package_name = info.get("name", "")
+                version = info.get("version", "")
+                files = info.get("files", [])
+                integrity_hash = ""
+                if files and len(files) > 0:
+                    for f in files:
+                        file_hash = f.get("hash", "")
+                        if file_hash.startswith("sha256:"):
+                            integrity_hash = file_hash
+                            break
+                    if not integrity_hash:
+                        integrity_hash = files[0].get("hash", "")
+                source = info.get("source", {})
+                registry = source.get("url", "https://pypi.org/simple") if source else "https://pypi.org/simple"
+
                 pkg = {
-                    "package_name": info.get("name", ""),
-                    "version": info.get("version", ""),
-                    "registry": info.get("source", {}).get("url", "https://pypi.org/simple"),
-                    "integrity_hash": info.get("files", [{}])[0].get("hash", "") if info.get("files") else "",
+                    "package_name": package_name,
+                    "version": version,
+                    "registry": registry,
+                    "integrity_hash": integrity_hash,
                 }
                 packages.append(pkg)
 
@@ -170,11 +195,23 @@ class LockfileParser:
             all_deps = {**default, **develop}
 
             for name, info in all_deps.items():
+                version = info.get("version", "").replace("==", "")
+                hashes = info.get("hashes", [])
+                integrity_hash = ""
+                if hashes and len(hashes) > 0:
+                    for h in hashes:
+                        if h.startswith("sha256:"):
+                            integrity_hash = h
+                            break
+                    if not integrity_hash:
+                        integrity_hash = hashes[0]
+                registry = info.get("index", "https://pypi.org/simple")
+
                 pkg = {
                     "package_name": name,
-                    "version": info.get("version", "").replace("==", ""),
-                    "registry": info.get("index", "https://pypi.org/simple"),
-                    "integrity_hash": info.get("hashes", [])[0] if info.get("hashes") else "",
+                    "version": version,
+                    "registry": registry,
+                    "integrity_hash": integrity_hash,
                 }
                 packages.append(pkg)
 

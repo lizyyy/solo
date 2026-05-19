@@ -323,6 +323,7 @@ def test_parser_lockfile():
 
 def test_auditor_hash_verification():
     from auditor import HashAuditor
+    from models import PackageStatus
 
     auditor = HashAuditor()
 
@@ -330,8 +331,41 @@ def test_auditor_hash_verification():
     assert hash_type == "sha512"
     assert hash_value is not None
 
-    hash_type, hash_value = auditor._parse_integrity("sha256:abcdef123456")
+    hash_type, hash_value = auditor._parse_integrity("sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890")
+    assert hash_type == "sha256"
+    assert hash_value == "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+
+    hash_type, hash_value = auditor._parse_integrity("sha512:abcdef123456")
     assert hash_type == "sha512"
+    assert hash_value == "abcdef123456"
+
+    is_valid, status, result = auditor.verify_hash("test-package", "1.0.0", "invalid-hash", "https://registry.npmjs.org")
+    assert status == PackageStatus.UNVERIFIED
+    assert is_valid == False
+
+
+def test_parser_scoped_package():
+    from parser import LockfileParser
+
+    parser = LockfileParser()
+
+    test_lockfile = {
+        "name": "test-project",
+        "lockfileVersion": 2,
+        "packages": {
+            "node_modules/@angular/core": {
+                "version": "16.0.0",
+                "resolved": "https://registry.npmjs.org/@angular/core/-/core-16.0.0.tgz",
+                "integrity": "sha512-test=="
+            }
+        }
+    }
+
+    packages, errors = parser.parse(json.dumps(test_lockfile), "package-lock.json")
+    assert len(errors) == 0
+    assert len(packages) == 1
+    assert packages[0]["package_name"] == "@angular/core"
+    assert packages[0]["version"] == "16.0.0"
 
 
 def test_registry_extraction():
@@ -344,3 +378,16 @@ def test_registry_extraction():
 
     registry = parser._extract_registry("https://unknown.com/package.tgz")
     assert registry == "https://unknown.com"
+
+
+def test_poetry_pipfile_hash_parsing():
+    from auditor import HashAuditor
+
+    auditor = HashAuditor()
+
+    hash_type, hash_value = auditor._parse_integrity("sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890")
+    assert hash_type == "sha256"
+    assert hash_value == "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+
+    hash_type, hash_value = auditor._parse_integrity("abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890")
+    assert hash_type == "sha256"

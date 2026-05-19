@@ -14,7 +14,7 @@ class HashAuditor:
             "https://pypi.org/simple": "https://pypi.org/pypi/{package}/{version}/json",
         }
 
-    def verify_hash(self, package_name: str, version: str, integrity_hash: str, registry: str) -> Tuple[bool, str, Dict]:
+    def verify_hash(self, package_name: str, version: str, integrity_hash: str, registry: str) -> Tuple[bool, PackageStatus, Dict]:
         result = {
             "found": False,
             "hash_match": False,
@@ -26,7 +26,7 @@ class HashAuditor:
             hash_type, expected_hash = self._parse_integrity(integrity_hash)
             if not hash_type:
                 result["error_message"] = f"Invalid integrity format: {integrity_hash}"
-                return False, "unknown", result
+                return False, PackageStatus.UNVERIFIED, result
 
             actual_hash = None
             if registry in self.registry_endpoints:
@@ -55,22 +55,22 @@ class HashAuditor:
 
         patterns = [
             r"^(sha512|sha256|sha1)-([A-Za-z0-9+/=]+)$",
-            r"^sha512:([A-Za-z0-9+/=]+)$",
-            r"^sha256:([A-Za-z0-9+/=]+)$",
+            r"^(sha512|sha256|sha1):([A-Za-z0-9+/=]+)$",
         ]
 
         for pattern in patterns:
             match = re.match(pattern, integrity)
             if match:
-                if len(match.groups()) == 2:
-                    return match.group(1), match.group(2)
-                else:
-                    return "sha512", match.group(1)
+                return match.group(1).lower(), match.group(2)
 
         if len(integrity) == 64:
             return "sha256", integrity
         elif len(integrity) == 128:
             return "sha512", integrity
+        elif len(integrity) == 40:
+            return "sha1", integrity
+        elif len(integrity) == 32:
+            return "md5", integrity
 
         return None, None
 
@@ -89,6 +89,9 @@ class HashAuditor:
                     if integrity:
                         _, actual_hash = self._parse_integrity(integrity)
                         return actual_hash, result
+                    shasum = dist.get("shasum", "")
+                    if shasum:
+                        return shasum, result
 
             elif "pypi" in registry:
                 url = f"https://pypi.org/pypi/{package_name}/{version}/json"
@@ -98,9 +101,18 @@ class HashAuditor:
                 if resp.status_code == 200:
                     data = resp.json()
                     releases = data.get("releases", {}).get(version, [])
-                    if releases:
-                        for release in releases:
-                            digest = release.get("digests", {}).get(hash_type.lower())
+                    if not releases:
+                        info = data.get("info", {})
+                        if info:
+                            result["error_message"] = f"No releases found for version {version}"
+                            return None, result
+                    for release in releases:
+                        digests = release.get("digests", {})
+                        digest = digests.get(hash_type.lower())
+                        if digest:
+                            return digest, result
+                        if not digest and hash_type.lower() != "sha256":
+                            digest = digests.get("sha256")
                             if digest:
                                 return digest, result
 
