@@ -1,0 +1,10 @@
+user_id,session_id,event_index,source_file,source_line,element,event_time,event_type,page,product_id,query,has_gap_before,gap_duration_seconds,gap_type
+user_001,sess_abc,0,test_data/shard_1.jsonl,1,,2024-01-15T10:00:00+08:00,page_view,/home,,,False,,
+user_001,sess_abc,1,test_data/shard_1.jsonl,2,search_button,2024-01-15T10:00:30+08:00,click,,,,False,,
+user_001,sess_abc,2,test_data/shard_2.jsonl,1,,2024-01-15T10:01:00+08:00,search,,,iphone,False,,
+user_001,sess_abc,3,test_data/shard_2.jsonl,2,,2024-01-15T10:02:00+08:00,page_view,/search_results,,,False,,
+user_001,sess_abc,4,test_data/shard_1.jsonl,3,,2024-01-15T10:35:00+08:00,page_view,/product/123,,,True,1980.0,cross_file_shard_gap
+user_001,sess_abc,5,test_data/shard_2.jsonl,3,,2024-01-15T10:40:00+08:00,add_to_cart,,123,,False,,
+user_002,sess_xyz,0,test_data/shard_1.jsonl,4,,2024-01-15T11:00:00+08:00,page_view,/home,,,False,,
+user_002,sess_xyz,1,test_data/shard_1.jsonl,5,login_button,2024-01-15T11:01:00+08:00,click,,,,False,,
+user_002,sess_xyz,2,test_data/shard_2.jsonl,4,,2024-01-15T11:05:00+08:00,login_success,,,,False,,

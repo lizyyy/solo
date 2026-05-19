@@ -73,11 +73,16 @@ class Exporter:
                 writer.writerow(row)
 
     def _export_events_csv(self, sessions: List[Dict], output_path: str):
-        sample_event = sessions[0]['events'][0] if sessions else {}
         base_fields = ['user_id', 'session_id', 'event_index', 'source_file', 'source_line']
         
-        event_fields = [k for k in sample_event.keys() if not k.startswith('_')]
-        event_fields = [f for f in event_fields if f not in ['user_id', 'session_id']]
+        all_event_fields = set()
+        for session in sessions:
+            for event in session['events']:
+                for key in event.keys():
+                    if not key.startswith('_') and key not in ['user_id', 'session_id']:
+                        all_event_fields.add(key)
+        
+        event_fields = sorted(all_event_fields)
         fieldnames = base_fields + event_fields + ['has_gap_before', 'gap_duration_seconds', 'gap_type']
         
         with open(output_path, 'w', encoding='utf-8', newline='') as f:

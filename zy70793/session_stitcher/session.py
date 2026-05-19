@@ -53,7 +53,7 @@ class SessionStitcher:
                 'end_time': last_event['_parsed_time'],
                 'event_count': len(session_events),
                 'events': session_events,
-                'sources': list({e['_source']['file'] for e in session_events})
+                'sources': sorted({e['_source']['file'] for e in session_events})
             }
             
             sessions.append(session)

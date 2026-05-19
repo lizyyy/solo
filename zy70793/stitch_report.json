@@ -1,5 +1,5 @@
 {
-  "report_generated_at": "2026-05-19T16:19:07.469721",
+  "report_generated_at": "2026-05-19T20:51:35.464242",
   "parameters": {
     "inputs": [
       "test_data/shard_1.jsonl",
@@ -11,10 +11,10 @@
     "time_format": "iso",
     "gap_threshold": 1800,
     "session_timeout": 3600,
-    "output_format": "csv",
-    "output": "csv_output",
+    "output_format": "ndjson",
+    "output": "jsonl_run2",
     "report_path": "stitch_report.json",
-    "verbose": true
+    "verbose": false
   },
   "summary": {
     "input_files_count": 2,
