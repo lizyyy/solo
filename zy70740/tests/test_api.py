@@ -170,6 +170,62 @@ def test_release_job(setup_db):
     assert data["job_id"] == "TEST-001"
 
 
+def test_release_pending_job_fails(setup_db):
+    client.post(
+        "/gpu-resources/",
+        json={"gpu_model": "A100", "total": 8, "available": 8},
+    )
+    
+    client.post(
+        "/jobs/",
+        json={
+            "job_id": "TEST-001",
+            "gpu_model": "A100",
+            "gpu_count": 2,
+            "estimated_duration": 60,
+            "priority": 10,
+            "user": "test_user",
+        },
+    )
+    
+    response = client.post("/jobs/TEST-001/release?released_by=admin")
+    assert response.status_code == 400
+    assert "not running" in response.json()["detail"]
+
+
+def test_cancel_running_job_returns_gpu(setup_db):
+    client.post(
+        "/gpu-resources/",
+        json={"gpu_model": "A100", "total": 8, "available": 8},
+    )
+    
+    client.post(
+        "/jobs/",
+        json={
+            "job_id": "TEST-001",
+            "gpu_model": "A100",
+            "gpu_count": 2,
+            "estimated_duration": 60,
+            "priority": 10,
+            "user": "test_user",
+        },
+    )
+    
+    client.post("/jobs/advance/A100")
+    
+    resources_before = client.get("/gpu-resources/").json()
+    available_before = next(r["available"] for r in resources_before if r["gpu_model"] == "A100")
+    assert available_before == 6
+    
+    response = client.delete("/jobs/TEST-001")
+    assert response.status_code == 200
+    assert response.json()["status"] == "cancelled"
+    
+    resources_after = client.get("/gpu-resources/").json()
+    available_after = next(r["available"] for r in resources_after if r["gpu_model"] == "A100")
+    assert available_after == 8
+
+
 def test_cancel_job(setup_db):
     client.post(
         "/gpu-resources/",

@@ -53,13 +53,17 @@ def update_job(job_id: str, job_update: schemas.JobUpdate, db: Session = Depends
 
 @app.delete("/jobs/{job_id}", response_model=schemas.JobResponse)
 def cancel_job(job_id: str, db: Session = Depends(get_db)):
-    db_job = crud.cancel_job(db, job_id)
+    db_job = crud.get_job(db, job_id)
     if db_job is None:
         raise HTTPException(status_code=404, detail="Job not found")
-    if db_job.status == JobStatus.RUNNING:
-        crud.update_gpu_available(db, db_job.gpu_model, db_job.gpu_count)
-    core.update_queue_positions(db, db_job.gpu_model)
-    return db_job
+    was_running = db_job.status == JobStatus.RUNNING
+    gpu_model = db_job.gpu_model
+    gpu_count = db_job.gpu_count
+    crud.cancel_job(db, job_id)
+    if was_running:
+        crud.update_gpu_available(db, gpu_model, gpu_count)
+    core.update_queue_positions(db, gpu_model)
+    return crud.get_job(db, job_id)
 
 
 @app.post("/jobs/advance/{gpu_model}", response_model=List[schemas.JobResponse])
@@ -70,9 +74,14 @@ def advance_queue(gpu_model: GPUModel, db: Session = Depends(get_db)):
 
 @app.post("/jobs/{job_id}/release", response_model=schemas.ReleaseEventResponse)
 def release_job(job_id: str, released_by: str, db: Session = Depends(get_db)):
+    db_job = crud.get_job(db, job_id)
+    if db_job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if db_job.status != JobStatus.RUNNING:
+        raise HTTPException(status_code=400, detail="Job is not running, cannot release")
     event = core.release_gpus(db, job_id, released_by)
     if event is None:
-        raise HTTPException(status_code=404, detail="Job not found")
+        raise HTTPException(status_code=500, detail="Failed to release GPU resources")
     core.priority_arbitration(db, event.gpu_model)
     return event
 

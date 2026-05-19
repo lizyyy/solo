@@ -41,8 +41,15 @@ def release_gpus(db: Session, job_id: str, released_by: str) -> models.ReleaseEv
     if not job:
         return None
     
+    if job.status != JobStatus.RUNNING:
+        return None
+    
     gpu_model = job.gpu_model
     released_gpus = job.gpu_count
+    
+    resource = crud.get_gpu_resource(db, gpu_model)
+    if resource and resource.available + released_gpus > resource.total:
+        return None
     
     crud.complete_job(db, job_id)
     crud.update_gpu_available(db, gpu_model, released_gpus)
