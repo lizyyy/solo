@@ -1,0 +1,8 @@
+pet_name,owner_name,pet_weight,weight_unit,species,breed,owner_phone,doctor_employee_id,diagnosis,notes,medicine_name,quantity,administration_route,frequency,duration
+小白,张三,2,kg,狗,金毛,13800138000,DOC001,皮肤感染,外用抗生素,头孢氨苄注射液,,皮下注射,每日一次,5天
+小白,张三,2,kg,狗,金毛,13800138000,DOC001,皮肤感染,外用抗生素,伊维菌素注射液,,皮下注射,每周一次,4周
+豆豆,李四,0.8,kg,猫,英短,13900139000,DOC002,呼吸道感染,口服抗生素,恩诺沙星片,,口服,每日两次,7天
+花花,王五,25,kg,狗,拉布拉多,13700137000,DOC001,肠胃炎,禁食观察,头孢氨苄注射液,,皮下注射,每日一次,7天
+小黑,赵六,3,kg,猫,布偶,13600136000,DOC003,寄生虫感染,驱虫治疗,伊维菌素注射液,,皮下注射,每周一次,4周
+错误测试,错误主人,1.5,kg,狗,泰迪,13500135000,INVALID_DOCTOR,测试错误医生不存在,,恩诺沙星片,,口服,每日一次,3天
+重量错误,重量错误
