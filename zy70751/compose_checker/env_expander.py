@@ -125,6 +125,45 @@ class EnvExpander:
 
         return expanded_ports, all_warnings
 
+    def expand_dict_port(self, port_dict: dict, context: Dict[str, str]) -> Tuple[Optional[PortMapping], List[str]]:
+        warnings = []
+
+        target = port_dict.get('target')
+        published = port_dict.get('published', target)
+        protocol = port_dict.get('protocol', 'tcp')
+        host_ip = port_dict.get('host_ip', '0.0.0.0')
+
+        if isinstance(target, str):
+            expanded_target, tw = self.expand_variables(target, context)
+            warnings.extend(tw)
+            try:
+                target = int(expanded_target) if expanded_target else None
+            except ValueError:
+                warnings.append(f"无效的target端口值: {expanded_target}")
+                target = None
+
+        if isinstance(published, str):
+            expanded_published, pw = self.expand_variables(published, context)
+            warnings.extend(pw)
+            try:
+                published = int(expanded_published) if expanded_published else None
+            except ValueError:
+                warnings.append(f"无效的published端口值: {expanded_published}")
+                published = None
+
+        if isinstance(host_ip, str):
+            host_ip, _ = self.expand_variables(host_ip, context)
+
+        if target is None or published is None:
+            return None, warnings
+
+        return PortMapping(
+            host_port=int(published),
+            container_port=int(target),
+            protocol=protocol,
+            host_ip=host_ip
+        ), warnings
+
     def expand_all_services(self, services: List[ServiceInfo], extra_env: Optional[Dict[str, str]] = None) -> Tuple[List[ServiceInfo], List[str]]:
         expanded_services = []
         all_warnings = []
@@ -164,6 +203,11 @@ class EnvExpander:
                         host_port=raw_port,
                         container_port=raw_port
                     ))
+                elif isinstance(raw_port, dict):
+                    port_mapping, warnings = self.expand_dict_port(raw_port, context)
+                    all_warnings.extend(warnings)
+                    if port_mapping:
+                        expanded_ports.append(port_mapping)
 
             expanded_service = ServiceInfo(
                 name=service.name,

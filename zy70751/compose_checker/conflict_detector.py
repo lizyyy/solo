@@ -25,36 +25,54 @@ class ConflictDetector:
     def detect_port_conflicts(self, services: List[ServiceInfo]) -> List[Conflict]:
         conflicts = []
 
-        port_map: Dict[Tuple[str, int, str], List[Tuple[ServiceInfo, PortMapping]]] = defaultdict(list)
+        port_by_proto: Dict[Tuple[int, str], List[Tuple[ServiceInfo, PortMapping]]] = defaultdict(list)
 
         for service in services:
             for port in service.ports:
-                key = (port.host_ip, port.host_port, port.protocol)
-                port_map[key].append((service, port))
+                key = (port.host_port, port.protocol)
+                port_by_proto[key].append((service, port))
 
-        for (host_ip, host_port, protocol), mappings in port_map.items():
-            if len(mappings) > 1:
-                sources = []
+        for (host_port, protocol), mappings in port_by_proto.items():
+            if len(mappings) <= 1:
+                continue
+
+            has_wildcard = any(p[1].host_ip == "0.0.0.0" for p in mappings)
+
+            if has_wildcard:
+                conflict_mappings = mappings
+                conflict_type = "边界冲突(通配覆盖)"
+            else:
+                ip_groups: Dict[str, List[Tuple[ServiceInfo, PortMapping]]] = defaultdict(list)
                 for service, port in mappings:
-                    sources.append(ConflictSource(
-                        service_name=service.name,
-                        compose_file=service.compose_file,
-                        details=f"{host_ip}:{host_port}:{port.container_port}/{protocol}"
-                    ))
+                    ip_groups[port.host_ip].append((service, port))
 
-                port_desc = f"{host_ip}:{host_port}/{protocol}"
-                if host_ip == "0.0.0.0":
-                    port_desc = f"*:{host_port}/{protocol}"
+                conflict_mappings = []
+                for ip, ip_mappings in ip_groups.items():
+                    if len(ip_mappings) > 1:
+                        conflict_mappings.extend(ip_mappings)
 
-                conflict = Conflict(
-                    conflict_type=ConflictType.PORT,
-                    severity=ConflictSeverity.CRITICAL,
-                    message=f"端口冲突: {port_desc} 被 {len(mappings)} 个服务占用",
-                    sources=sources,
-                    suggestion=self._get_port_suggestion(host_port, mappings),
-                    priority=100
-                )
-                conflicts.append(conflict)
+                if not conflict_mappings:
+                    continue
+
+                conflict_type = "冲突"
+
+            sources = []
+            for service, port in conflict_mappings:
+                sources.append(ConflictSource(
+                    service_name=service.name,
+                    compose_file=service.compose_file,
+                    details=f"{port.host_ip}:{host_port}:{port.container_port}/{protocol}"
+                ))
+
+            conflict = Conflict(
+                conflict_type=ConflictType.PORT,
+                severity=ConflictSeverity.CRITICAL,
+                message=f"端口{conflict_type}: *:{host_port}/{protocol} 被 {len(conflict_mappings)} 个服务占用",
+                sources=sources,
+                suggestion=self._get_port_suggestion(host_port, conflict_mappings),
+                priority=100
+            )
+            conflicts.append(conflict)
 
         return conflicts
 
