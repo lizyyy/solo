@@ -1,0 +1,38 @@
+[
+  {
+    "id": "17791694818227kp7f",
+    "pumpRoom": "1号地下泵房",
+    "anomalyType": "压力异常",
+    "description": "水压不稳，高层供水时高时低",
+    "handler": "张工程",
+    "status": "open",
+    "escalationLevel": 0,
+    "processingResult": "符合规则，允许录入",
+    "createdAt": "2026-05-19T05:44:41.822Z",
+    "updatedAt": "2026-05-19T05:44:41.824Z"
+  },
+  {
+    "id": "1779169481825904y1",
+    "pumpRoom": "2号地下泵房",
+    "anomalyType": "设备故障",
+    "description": "主水泵异响，轴承可能损坏",
+    "handler": "李主管",
+    "status": "open",
+    "escalationLevel": 0,
+    "processingResult": "符合规则，允许录入",
+    "createdAt": "2026-05-19T05:44:41.825Z",
+    "updatedAt": "2026-05-19T05:44:41.825Z"
+  },
+  {
+    "id": "177916948182665ctu",
+    "pumpRoom": "3号地下泵房",
+    "anomalyType": "压力异常",
+    "description": "压力表显示偏低",
+    "handler": "王师傅",
+    "status": "reopen",
+    "escalationLevel": 1,
+    "processingResult": "符合规则，允许录入",
+    "createdAt": "2026-05-19T05:44:41.826Z",
+    "updatedAt": "2026-05-19T05:44:41.826Z"
+  }
+]

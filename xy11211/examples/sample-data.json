@@ -1,0 +1,42 @@
+[
+  {
+    "pumpRoom": "1号地下泵房",
+    "anomalyType": "压力异常",
+    "description": "水压不稳，高层供水时高时低",
+    "handler": "张工程",
+    "status": "open",
+    "escalationLevel": 0
+  },
+  {
+    "pumpRoom": "2号地下泵房",
+    "anomalyType": "设备故障",
+    "description": "主水泵异响，轴承可能损坏",
+    "handler": "李主管",
+    "status": "open",
+    "escalationLevel": 0
+  },
+  {
+    "pumpRoom": "1号地下泵房",
+    "anomalyType": "漏水",
+    "description": "管道接口处有渗水现象",
+    "handler": "张工程",
+    "status": "closed",
+    "escalationLevel": 0
+  },
+  {
+    "pumpRoom": "3号地下泵房",
+    "anomalyType": "压力异常",
+    "description": "压力表显示偏低",
+    "handler": "王师傅",
+    "status": "reopen",
+    "escalationLevel": 1
+  },
+  {
+    "pumpRoom": "2号地下泵房",
+    "anomalyType": "电气故障",
+    "description": "控制柜指示灯不亮",
+    "handler": "李主管",
+    "status": "open",
+    "escalationLevel": 0
+  }
+]

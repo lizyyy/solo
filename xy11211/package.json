@@ -1,0 +1,21 @@
+{
+  "name": "pump-room-inspection",
+  "version": "1.0.0",
+  "description": "小区地下泵房巡检记录管理CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "pump-inspect": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-examples.js"
+  },
+  "keywords": ["inspection", "pump-room", "cli", "maintenance"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-writer": "^1.6.0",
+    "date-fns": "^2.30.0"
+  }
+}
