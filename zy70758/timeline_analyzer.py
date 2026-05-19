@@ -245,18 +245,21 @@ class TimelineAnalyzer:
 
     def build_timeline(self, events: List[Dict[str, Any]], pods: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         timeline_items = []
+        default_time = datetime.utcnow()
 
         all_events = []
         for event in events:
+            event_time = event.get('event_time') or default_time
             all_events.append({
-                'time': event.get('event_time', datetime.utcnow()),
+                'time': event_time,
                 'type': 'event',
                 'data': event
             })
 
         for pod in pods:
+            pod_time = pod.get('start_time') or default_time
             all_events.append({
-                'time': pod.get('start_time', datetime.utcnow()),
+                'time': pod_time,
                 'type': 'pod',
                 'data': pod
             })

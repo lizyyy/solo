@@ -24,6 +24,7 @@ class ParsedPod:
     status: str
     restarts: int
     age: str
+    phase: str = ""
     ip: str = ""
     node: str = ""
     nominated_node: str = ""
@@ -59,25 +60,38 @@ class KubectlOutputParser:
         events = []
         lines = output.strip().split('\n')
         header_found = False
+        header_cols = None
 
         for line in lines:
-            line = line.strip()
-            if not line:
+            if not line.strip():
                 continue
-            if line.startswith('LAST'):
+            if 'LAST' in line and 'TYPE' in line and 'REASON' in line:
                 header_found = True
+                header_cols = re.split(r'\s{2,}', line.strip())
                 continue
             if not header_found:
                 continue
 
-            parts = re.split(r'\s+', line, maxsplit=5)
-            if len(parts) >= 5:
+            parts = re.split(r'\s{2,}', line.strip())
+            if len(parts) >= 4:
                 try:
                     last_seen = parts[0]
                     event_type = parts[1]
                     reason = parts[2]
                     object_str = parts[3]
-                    message = parts[4] if len(parts) > 4 else ""
+
+                    message = ""
+                    source = ""
+                    subobject = ""
+
+                    if len(parts) == 5:
+                        message = parts[4]
+                    elif len(parts) == 6:
+                        source = parts[4]
+                        message = parts[5]
+                    elif len(parts) > 6:
+                        source = parts[4]
+                        message = ' '.join(parts[5:])
 
                     kind = "Pod"
                     obj_name = object_str
@@ -85,8 +99,6 @@ class KubectlOutputParser:
                         kind_parts = object_str.split('/', 1)
                         kind = kind_parts[0]
                         obj_name = kind_parts[1]
-
-                    source = "unknown"
 
                     event_time = KubectlOutputParser._parse_time(last_seen)
                     count_match = re.search(r'x(\d+)', last_seen)
@@ -141,6 +153,7 @@ class KubectlOutputParser:
                         status=status,
                         restarts=restarts,
                         age=age,
+                        phase=status,
                         ip=ip,
                         node=node,
                         nominated_node=nominated_node,
