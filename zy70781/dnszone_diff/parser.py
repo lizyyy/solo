@@ -144,14 +144,18 @@ class ZoneParser:
             return None
 
         if self._in_multiline:
+            stripped_line = line.strip()
             if ")" in line:
-                self._in_multiline = False
+                self._multiline_record.value += " " + stripped_line
+                self._multiline_sources.append(source)
                 self._multiline_record.sources.extend(self._multiline_sources)
+                self._in_multiline = False
                 result = self._multiline_record
                 self._multiline_record = None
                 self._multiline_sources = []
                 return result
             else:
+                self._multiline_record.value += " " + stripped_line
                 self._multiline_sources.append(source)
                 return None
 
