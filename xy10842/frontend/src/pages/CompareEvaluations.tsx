@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { evaluations } from '../services/api'
+import { evaluations, metrics } from '../services/api'
 import { Evaluation } from '../types'
 
 export default function CompareEvaluations() {

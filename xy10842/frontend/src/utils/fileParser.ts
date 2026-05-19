@@ -81,10 +81,10 @@ export function parseExcelFile(file: File): Promise<ParsedEvaluationData> {
                 result.model_version_name = value
               } else if (key.includes('模型名称') || key.includes('model name')) {
                 result.model_name = value
+              } else if (key.includes('数据集版本') || key.includes('dataset version')) {
+                result.dataset_version = value
               } else if (key.includes('数据集') || key.includes('dataset name')) {
                 result.dataset_name = value
-              } else if (key.includes('数据版本') || key.includes('dataset version')) {
-                result.dataset_version = value
               }
             } else if (currentSection === 'metrics' && row.length >= 2) {
               const metric: any = {}
@@ -212,10 +212,10 @@ export function parseCsvFile(file: File): Promise<ParsedEvaluationData> {
               result.model_version_name = value
             } else if (key.includes('模型名称') || key.includes('model name')) {
               result.model_name = value
+            } else if (key.includes('数据集版本') || key.includes('dataset version')) {
+              result.dataset_version = value
             } else if (key.includes('数据集') || key.includes('dataset name')) {
               result.dataset_name = value
-            } else if (key.includes('数据版本') || key.includes('dataset version')) {
-              result.dataset_version = value
             }
           } else if (currentSection === 'metrics' && cells.length >= 2) {
             const metric: any = {}
