@@ -1,0 +1,341 @@
+{
+  "appeals": {
+    "appeal_cf2c1c3f": {
+      "appeal_id": "appeal_cf2c1c3f",
+      "parent_id": "P001",
+      "parent_name": "张三爸爸",
+      "student_name": "张三",
+      "bus_id": "BUS001",
+      "route_id": "R001",
+      "stop_name": "阳光小区站",
+      "scheduled_time": "2026-05-19 08:00:00",
+      "actual_arrival_time": "2026-05-19 08:15:00",
+      "appeal_time": "2026-05-19 08:20:00",
+      "description": "校车今天迟到了15分钟",
+      "status": "reviewed",
+      "created_at": "2026-05-19 21:35:48.379358",
+      "created_by": "调度员001",
+      "created_by_role": "dispatcher"
+    },
+    "appeal_dc83fa61": {
+      "appeal_id": "appeal_dc83fa61",
+      "parent_id": "P002",
+      "parent_name": "李四妈妈",
+      "student_name": "李四",
+      "bus_id": "BUS001",
+      "route_id": "R001",
+      "stop_name": "幸福花园站",
+      "scheduled_time": "2026-05-19 08:10:00",
+      "actual_arrival_time": "2026-05-19 08:25:00",
+      "appeal_time": "2026-05-19 08:30:00",
+      "description": "校车今天也迟到了",
+      "status": "ruled",
+      "created_at": "2026-05-19 21:35:48.379916",
+      "created_by": "调度员001",
+      "created_by_role": "dispatcher"
+    }
+  },
+  "gps_tracks": {
+    "gps_c1c188c0": {
+      "track_id": "gps_c1c188c0",
+      "bus_id": "BUS001",
+      "route_id": "R001",
+      "date": "2026-05-19",
+      "points": [
+        {
+          "timestamp": "2026-05-19 07:30:00",
+          "latitude": 31.2304,
+          "longitude": 121.4737,
+          "accuracy": 5.0
+        },
+        {
+          "timestamp": "2026-05-19 07:45:00",
+          "latitude": 31.231,
+          "longitude": 121.474,
+          "accuracy": 5.0
+        },
+        {
+          "timestamp": "2026-05-19 08:00:00",
+          "latitude": 31.2315,
+          "longitude": 121.4745,
+          "accuracy": 5.0
+        },
+        {
+          "timestamp": "2026-05-19 08:20:00",
+          "latitude": 31.232,
+          "longitude": 121.475,
+          "accuracy": 5.0
+        }
+      ],
+      "gaps": [],
+      "created_at": "2026-05-19 21:35:48.380219",
+      "created_by": "系统",
+      "created_by_role": "dispatcher"
+    }
+  },
+  "checkins": {
+    "checkin_42f9770a": {
+      "checkin_id": "checkin_42f9770a",
+      "driver_id": "D001",
+      "driver_name": "李司机",
+      "bus_id": "BUS001",
+      "route_id": "R001",
+      "checkin_time": "2026-05-19 07:00:00",
+      "location": "停车场",
+      "status": "checked_in"
+    }
+  },
+  "matched_cases": {
+    "case_91ec9310": {
+      "case_id": "case_91ec9310",
+      "appeal_id": "appeal_cf2c1c3f",
+      "gps_track_id": "gps_c1c188c0",
+      "driver_checkin_id": "checkin_42f9770a",
+      "bus_id": "BUS001",
+      "route_id": "R001",
+      "stop_name": "阳光小区站",
+      "matched_at": "2026-05-19 21:35:48.381009",
+      "matched_by": "调度员001",
+      "matched_by_role": "dispatcher",
+      "issues": []
+    },
+    "case_7e37af9c": {
+      "case_id": "case_7e37af9c",
+      "appeal_id": "appeal_dc83fa61",
+      "gps_track_id": "gps_c1c188c0",
+      "driver_checkin_id": "checkin_42f9770a",
+      "bus_id": "BUS001",
+      "route_id": "R001",
+      "stop_name": "幸福花园站",
+      "matched_at": "2026-05-19 21:35:48.381806",
+      "matched_by": "调度员001",
+      "matched_by_role": "dispatcher",
+      "issues": []
+    }
+  },
+  "rulings": {
+    "ruling_5bd851f4": {
+      "ruling_id": "ruling_5bd851f4",
+      "case_id": "case_91ec9310",
+      "appeal_id": "appeal_cf2c1c3f",
+      "result": "gps_error",
+      "reason": "GPS数据缺口: 07:30 - 07:45, 持续15.0分钟; GPS数据缺口: 07:45 - 08:00, 持续15.0分钟; GPS数据缺口: 08:00 - 08:20, 持续20.0分钟; 判定: GPS数据存在缺口，可能是GPS设备问题",
+      "details": {
+        "late_minutes": 15.0,
+        "gps_gaps": [
+          "GPS数据缺口: 07:30 - 07:45, 持续15.0分钟",
+          "GPS数据缺口: 07:45 - 08:00, 持续15.0分钟",
+          "GPS数据缺口: 08:00 - 08:20, 持续20.0分钟"
+        ],
+        "final_result": "gps_error"
+      },
+      "ruled_at": "2026-05-19 21:35:48.382735",
+      "ruled_by": "调度员001",
+      "ruled_by_role": "dispatcher"
+    },
+    "ruling_ed5d1a64": {
+      "ruling_id": "ruling_ed5d1a64",
+      "case_id": "case_7e37af9c",
+      "appeal_id": "appeal_dc83fa61",
+      "result": "gps_error",
+      "reason": "GPS数据缺口: 07:30 - 07:45, 持续15.0分钟; GPS数据缺口: 07:45 - 08:00, 持续15.0分钟; GPS数据缺口: 08:00 - 08:20, 持续20.0分钟; 判定: GPS数据存在缺口，可能是GPS设备问题",
+      "details": {
+        "late_minutes": 15.0,
+        "gps_gaps": [
+          "GPS数据缺口: 07:30 - 07:45, 持续15.0分钟",
+          "GPS数据缺口: 07:45 - 08:00, 持续15.0分钟",
+          "GPS数据缺口: 08:00 - 08:20, 持续20.0分钟"
+        ],
+        "final_result": "gps_error"
+      },
+      "ruled_at": "2026-05-19 21:35:48.383747",
+      "ruled_by": "调度员001",
+      "ruled_by_role": "dispatcher"
+    }
+  },
+  "reviews": {
+    "review_735631a4": {
+      "review_id": "review_735631a4",
+      "case_id": "case_91ec9310",
+      "appeal_id": "appeal_cf2c1c3f",
+      "original_ruling_id": "ruling_5bd851f4",
+      "uphold": true,
+      "new_result": null,
+      "reason": "经核查，裁定准确无误",
+      "reviewed_at": "2026-05-19 21:35:48.385205",
+      "reviewed_by": "管理员001",
+      "reviewed_by_role": "admin"
+    }
+  },
+  "audit_logs": [
+    {
+      "id": "audit_1779201348.379763",
+      "entity_type": "appeal",
+      "entity_id": "appeal_cf2c1c3f",
+      "action": "create",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.379777",
+      "details": {
+        "action": "add_appeal"
+      }
+    },
+    {
+      "id": "audit_1779201348.380046",
+      "entity_type": "appeal",
+      "entity_id": "appeal_dc83fa61",
+      "action": "create",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.380051",
+      "details": {
+        "action": "add_appeal"
+      }
+    },
+    {
+      "id": "audit_1779201348.380385",
+      "entity_type": "gps_track",
+      "entity_id": "gps_c1c188c0",
+      "action": "create",
+      "operator": "系统",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.380389",
+      "details": {}
+    },
+    {
+      "id": "audit_1779201348.380727",
+      "entity_type": "checkin",
+      "entity_id": "checkin_42f9770a",
+      "action": "create",
+      "operator": "李司机",
+      "operator_role": "driver",
+      "timestamp": "2026-05-19 21:35:48.380731",
+      "details": {}
+    },
+    {
+      "id": "audit_1779201348.381208",
+      "entity_type": "matched_case",
+      "entity_id": "case_91ec9310",
+      "action": "create",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.381211",
+      "details": {}
+    },
+    {
+      "id": "audit_1779201348.381594",
+      "entity_type": "appeal",
+      "entity_id": "appeal_cf2c1c3f",
+      "action": "update_status",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.381598",
+      "details": {
+        "new_status": "matched"
+      }
+    },
+    {
+      "id": "audit_1779201348.382012",
+      "entity_type": "matched_case",
+      "entity_id": "case_7e37af9c",
+      "action": "create",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.382015",
+      "details": {}
+    },
+    {
+      "id": "audit_1779201348.382443",
+      "entity_type": "appeal",
+      "entity_id": "appeal_dc83fa61",
+      "action": "update_status",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.382446",
+      "details": {
+        "new_status": "matched"
+      }
+    },
+    {
+      "id": "audit_1779201348.382978",
+      "entity_type": "ruling",
+      "entity_id": "ruling_5bd851f4",
+      "action": "create",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.382982",
+      "details": {
+        "result": "gps_error",
+        "case_id": "case_91ec9310"
+      }
+    },
+    {
+      "id": "audit_1779201348.383464",
+      "entity_type": "appeal",
+      "entity_id": "appeal_cf2c1c3f",
+      "action": "update_status",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.383467",
+      "details": {
+        "new_status": "ruled"
+      }
+    },
+    {
+      "id": "audit_1779201348.384038",
+      "entity_type": "ruling",
+      "entity_id": "ruling_ed5d1a64",
+      "action": "create",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.384042",
+      "details": {
+        "result": "gps_error",
+        "case_id": "case_7e37af9c"
+      }
+    },
+    {
+      "id": "audit_1779201348.384851",
+      "entity_type": "appeal",
+      "entity_id": "appeal_dc83fa61",
+      "action": "update_status",
+      "operator": "调度员001",
+      "operator_role": "dispatcher",
+      "timestamp": "2026-05-19 21:35:48.384859",
+      "details": {
+        "new_status": "ruled"
+      }
+    },
+    {
+      "id": "audit_1779201348.385524",
+      "entity_type": "review",
+      "entity_id": "review_735631a4",
+      "action": "create",
+      "operator": "管理员001",
+      "operator_role": "admin",
+      "timestamp": "2026-05-19 21:35:48.385529",
+      "details": {
+        "uphold": true,
+        "case_id": "case_91ec9310"
+      }
+    },
+    {
+      "id": "audit_1779201348.386182",
+      "entity_type": "appeal",
+      "entity_id": "appeal_cf2c1c3f",
+      "action": "update_status",
+      "operator": "管理员001",
+      "operator_role": "admin",
+      "timestamp": "2026-05-19 21:35:48.386186",
+      "details": {
+        "new_status": "reviewed"
+      }
+    }
+  ],
+  "idempotency_keys": {
+    "6e730f5edb6d7e4ff8a63776d116c7d829474b47706efeab8746116844fc9895": "appeal_cf2c1c3f",
+    "bd2b4129d1598d561c0e4f0b78f26e32f9297c25f13ad65b1385aa496fccc644": "appeal_dc83fa61",
+    "8f5364f7447ce62a1bf91e7a229296521f76240968b6d8318e42dada4d575e2e": "gps_c1c188c0",
+    "7c89e192b00dfae9e1ef86ecaa63d11c7bd3f7755586aaaecc5c5bd38af0556a": "checkin_42f9770a"
+  }
+}
