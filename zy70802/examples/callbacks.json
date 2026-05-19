@@ -1,0 +1,57 @@
+[
+  {
+    "patientId": "P001",
+    "patientName": "张三",
+    "calledAt": "2024-01-15 02:35:00",
+    "calledBy": "李检验",
+    "calledTo": "13800138001",
+    "doctorName": "张医生",
+    "confirmedAt": "2024-01-15 02:36:00",
+    "confirmationNotes": "已收到，立即处理",
+    "callResult": "connected"
+  },
+  {
+    "patientId": "P002",
+    "patientName": "李四",
+    "calledAt": "2024-01-15 03:50:00",
+    "calledBy": "王检验",
+    "calledTo": "13800138002",
+    "doctorName": "李医生",
+    "confirmedAt": null,
+    "confirmationNotes": "",
+    "callResult": "connected"
+  },
+  {
+    "patientId": "P004",
+    "patientName": "赵六",
+    "calledAt": "2024-01-15 23:00:00",
+    "calledBy": "钱检验",
+    "calledTo": "13800138004",
+    "doctorName": "钱医生",
+    "confirmedAt": "2024-01-15 23:01:30",
+    "confirmationNotes": "了解，调整呼吸机参数",
+    "callResult": "connected"
+  },
+  {
+    "patientId": "P005",
+    "patientName": "孙七",
+    "calledAt": "2024-01-15 08:35:00",
+    "calledBy": "周检验",
+    "calledTo": "13800138005",
+    "doctorName": "周医生",
+    "confirmedAt": "2024-01-15 08:36:00",
+    "confirmationNotes": "已通知",
+    "callResult": "connected"
+  },
+  {
+    "patientId": "P001",
+    "patientName": "张三",
+    "calledAt": "2024-01-15 02:45:00",
+    "calledBy": "李检验",
+    "calledTo": "13800138001",
+    "doctorName": "张医生",
+    "confirmedAt": "2024-01-15 02:46:00",
+    "confirmationNotes": "已知晓",
+    "callResult": "connected"
+  }
+]
