@@ -44,26 +44,49 @@
 
 ### 前置要求
 
-- Node.js 18+
+- Node.js 18+ （推荐 v20 或更高）
 - npm 9+
 
-### 安装依赖
+### 安装依赖（重要！按顺序执行）
 
 ```bash
-# 安装根目录依赖
+# 1. 首先安装根目录依赖
 npm install
 
-# 安装后端依赖
-cd backend && npm install && cd ..
+# 2. 安装后端依赖（独立安装，不使用 workspaces）
+cd backend
+npm install
+cd ..
 
-# 安装前端依赖
-cd frontend && npm install && cd ..
+# 3. 安装前端依赖
+cd frontend
+npm install
+cd ..
+```
+
+**💡 一键安装（推荐）：**
+```bash
+npm run install:all
+```
+
+**🔧 常见问题 - 如果安装失败：**
+```bash
+# 清除缓存并重新安装后端
+cd backend
+rm -rf node_modules package-lock.json
+npm install
+
+# 清除缓存并重新安装前端
+cd ../frontend
+rm -rf node_modules package-lock.json
+npm install
 ```
 
 ### 启动开发环境
 
 ```bash
 # 方式一：同时启动前后端（推荐）
+# 需要先成功完成所有依赖安装
 npm run dev
 
 # 方式二：分别启动
@@ -72,6 +95,19 @@ npm run dev:backend
 
 # 启动前端 (端口 3000)
 npm run dev:frontend
+```
+
+### 构建生产版本
+
+```bash
+# 构建后端
+npm run build:backend
+
+# 构建前端
+npm run build:frontend
+
+# 构建所有
+npm run build
 ```
 
 ### 访问地址
