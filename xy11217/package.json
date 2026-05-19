@@ -1,0 +1,27 @@
+{
+  "name": "store-quality-control",
+  "version": "1.0.0",
+  "description": "门店品控管理系统",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node src/test.ts"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "dayjs": "^1.11.10",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/sqlite3": "^3.1.11",
+    "@types/node": "^20.11.24",
+    "@types/uuid": "^9.0.8",
+    "@types/json2csv": "^5.0.7",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}
