@@ -32,6 +32,15 @@ class ErrorCodes:
     CONFLICT = "conflict"
 
 
+VALID_LINK_STATUSES = {
+    'pending',
+    'auto_fixed',
+    'fixed',
+    'broken',
+    'candidate'
+}
+
+
 class APIError(HTTPException):
     def __init__(self, error_code: str, message: str, status_code: int = 400, details: Dict = None):
         super().__init__(status_code=status_code, detail={
@@ -218,18 +227,43 @@ async def update_link_status(link_id: int, update_data: LinkUpdateParams):
             status_code=404
         )
     
-    if link['status'] == 'fixed' and update_data.status == 'fixed':
+    if update_data.status and update_data.status not in VALID_LINK_STATUSES:
+        raise APIError(
+            error_code=ErrorCodes.INVALID_STATUS,
+            message=f"无效的状态值: {update_data.status}",
+            details={
+                "valid_statuses": list(VALID_LINK_STATUSES),
+                "provided_status": update_data.status
+            }
+        )
+    
+    if link['status'] in ['fixed', 'auto_fixed'] and update_data.status in ['fixed', 'auto_fixed']:
         raise APIError(
             error_code=ErrorCodes.ALREADY_PROCESSED,
-            message="该链接已经处理过",
+            message="该链接已经处理过，无法重复修复",
             details={"current_status": link['status']}
         )
     
     if update_data.needs_review and not update_data.reviewed_by:
         raise APIError(
-            error_code=ErrorCodes.MISSING_FIELD,
+            error_code=ErrorCodes.NEEDS_REVIEW,
             message="标记为需要人工复核时必须提供审核人",
-            details={"required_fields": ["reviewed_by"]}
+            details={
+                "required_fields": ["reviewed_by"],
+                "link_id": link_id,
+                "current_status": link['status']
+            }
+        )
+    
+    if link['needs_review'] and not update_data.reviewed_by and not update_data.status:
+        raise APIError(
+            error_code=ErrorCodes.NEEDS_REVIEW,
+            message="该链接需要人工复核，必须提供审核人才能更新",
+            details={
+                "link_id": link_id,
+                "current_status": link['status'],
+                "resolution_note": link.get('resolution_note', '')
+            }
         )
     
     update_fields = update_data.dict(exclude_unset=True)
