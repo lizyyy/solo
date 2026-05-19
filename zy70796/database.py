@@ -55,6 +55,21 @@ class PurificationReport(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+class FailedImportLog(Base):
+    __tablename__ = "failed_import_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    raw_content = Column(Text, nullable=False)
+    error_type = Column(String)
+    error_message = Column(Text)
+    batch_id = Column(String, index=True)
+    operator = Column(String)
+    line_number = Column(Integer)
+    resolution_status = Column(String, default="pending")
+    resolution_note = Column(Text)
+    resolved_by = Column(String)
+    resolved_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class AuditLog(Base):
     __tablename__ = "audit_logs"
     id = Column(Integer, primary_key=True, index=True)

@@ -220,3 +220,104 @@ def test_get_nonexistent_log(test_client):
 def test_get_nonexistent_report(test_client):
     response = test_client.get("/api/reports/999999")
     assert response.status_code == 404
+
+def test_group_id_with_none_user_agent():
+    from core import SuspiciousGrouper
+    group_id = SuspiciousGrouper.generate_group_id("192.168.1.1", None)
+    assert group_id is not None
+    assert len(group_id) == 12
+
+def test_create_single_log(test_client):
+    response = test_client.post(
+        "/api/logs",
+        json={
+            "ip": "192.168.1.100",
+            "user_agent": "Mozilla/5.0 (compatible; Googlebot/2.1)",
+            "path": "/test",
+            "method": "GET",
+            "status_code": 200
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "id" in data
+    assert data["is_crawler"] == True
+    assert data["crawler_confidence"] > 0.5
+
+def test_create_single_log_human_user(test_client):
+    response = test_client.post(
+        "/api/logs",
+        json={
+            "ip": "192.168.1.101",
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "path": "/home",
+            "method": "GET",
+            "status_code": 200
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "id" in data
+
+def test_import_failed_logs_persistence(test_client):
+    bad_log_content = '''this is not a valid log format
+    also invalid log line here
+    192.168.1.1 - - [10/Jan/2024:12:00:00 +0800] "GET /test HTTP/1.1" 200 1234'''
+    response = test_client.post(
+        "/api/logs/import?operator=test_user",
+        files={"file": ("test.log", bad_log_content, "text/plain")}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["failed"] >= 2
+    assert "batch_id" in data
+    failed_response = test_client.get(f"/api/failed-logs?batch_id={data['batch_id']}")
+    assert failed_response.status_code == 200
+    failed_logs = failed_response.json()
+    assert len(failed_logs) >= 2
+    for log in failed_logs:
+        assert log["operator"] == "test_user"
+        assert log["raw_content"] is not None
+
+def test_get_failed_log_detail(test_client):
+    failed_response = test_client.get("/api/failed-logs")
+    assert failed_response.status_code == 200
+    failed_logs = failed_response.json()
+    if failed_logs:
+        log_id = failed_logs[0]["id"]
+        detail_response = test_client.get(f"/api/failed-logs/{log_id}")
+        assert detail_response.status_code == 200
+        detail = detail_response.json()
+        assert "raw_content" in detail
+
+def test_resolve_failed_log(test_client):
+    failed_response = test_client.get("/api/failed-logs")
+    failed_logs = failed_response.json()
+    if failed_logs:
+        log_id = failed_logs[0]["id"]
+        resolve_response = test_client.put(
+            f"/api/failed-logs/{log_id}/resolve",
+            json={
+                "resolution_status": "manually_fixed",
+                "resolution_note": "已手动修复并重新导入",
+                "resolved_by": "admin"
+            }
+        )
+        assert resolve_response.status_code == 200
+        result = resolve_response.json()
+        assert result["status"] == "manually_fixed"
+
+def test_get_nonexistent_failed_log(test_client):
+    response = test_client.get("/api/failed-logs/999999")
+    assert response.status_code == 404
+
+def test_import_response_has_batch_id(test_client):
+    log_content = '192.168.1.1 - - [10/Jan/2024:12:00:00 +0800] "GET /test HTTP/1.1" 200 1234 "-" "Mozilla/5.0"'
+    response = test_client.post(
+        "/api/logs/import?operator=test_user",
+        files={"file": ("test.log", log_content, "text/plain")}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "batch_id" in data
+    assert data["batch_id"] is not None

@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
-from database import init_db, get_db, AccessLog, FilterRule, PurificationReport, AuditLog
+from database import init_db, get_db, AccessLog, FilterRule, PurificationReport, AuditLog, FailedImportLog
 from core import LogParser, CrawlerDetector, SuspiciousGrouper, AuditManager
 
 init_db()
@@ -76,7 +76,64 @@ class StatusUpdateRequest(BaseModel):
 class BatchOperationResponse(BaseModel):
     success: int
     failed: int
+    batch_id: Optional[str] = None
     message: str
+
+class LogCreateResponse(BaseModel):
+    id: int
+    is_crawler: Optional[bool]
+    crawler_confidence: float
+    status: str
+    message: str
+
+class FailedLogResolutionRequest(BaseModel):
+    resolution_status: str
+    resolution_note: Optional[str] = None
+    resolved_by: str
+
+@app.post("/api/logs", response_model=LogCreateResponse)
+def create_single_log(log_request: LogCreateRequest, db: Session = Depends(get_db)):
+    try:
+        log_data = {
+            "ip": log_request.ip,
+            "user_agent": log_request.user_agent,
+            "path": log_request.path,
+            "method": log_request.method,
+            "status_code": log_request.status_code,
+            "request_time": log_request.request_time or datetime.utcnow(),
+            "referer": log_request.referer,
+            "raw_log": f"{log_request.ip} - - [{log_request.request_time or datetime.utcnow()}] \"{log_request.method} {log_request.path} HTTP/1.1\" {log_request.status_code}"
+        }
+        is_crawler, confidence, reasons = CrawlerDetector.detect(db, log_data)
+        log = AccessLog(
+            ip=log_data["ip"],
+            user_agent=log_data.get("user_agent"),
+            path=log_data["path"],
+            method=log_data.get("method", "GET"),
+            status_code=log_data.get("status_code", 200),
+            request_time=log_data.get("request_time"),
+            referer=log_data.get("referer"),
+            raw_log=log_data["raw_log"],
+            is_crawler=is_crawler,
+            crawler_confidence=confidence,
+            crawler_type=",".join(reasons) if reasons else None,
+            status="classified" if confidence >= 0.8 else "pending_review"
+        )
+        db.add(log)
+        db.commit()
+        db.refresh(log)
+        SuspiciousGrouper.assign_groups([log])
+        db.commit()
+        return LogCreateResponse(
+            id=log.id,
+            is_crawler=log.is_crawler,
+            crawler_confidence=log.crawler_confidence,
+            status=log.status,
+            message="日志创建成功"
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"创建日志失败: {str(e)}")
 
 @app.post("/api/logs/import", response_model=BatchOperationResponse)
 async def import_logs(file: UploadFile = File(...), operator: str = "system", db: Session = Depends(get_db)):
@@ -85,28 +142,49 @@ async def import_logs(file: UploadFile = File(...), operator: str = "system", db
     success = 0
     failed = 0
     batch_id = str(uuid.uuid4())[:8]
-    for line in lines:
-        log_data = LogParser.parse_nginx_log(line) or LogParser.parse_json_log(line)
-        if log_data:
-            is_crawler, confidence, reasons = CrawlerDetector.detect(db, log_data)
-            log = AccessLog(
-                ip=log_data["ip"],
-                user_agent=log_data.get("user_agent"),
-                path=log_data["path"],
-                method=log_data.get("method", "GET"),
-                status_code=log_data.get("status_code", 200),
-                request_time=log_data.get("request_time", datetime.utcnow()),
-                referer=log_data.get("referer"),
-                response_time=log_data.get("response_time"),
-                raw_log=log_data["raw_log"],
-                is_crawler=is_crawler,
-                crawler_confidence=confidence,
-                crawler_type=",".join(reasons) if reasons else None,
-                status="classified" if confidence >= 0.8 else "pending_review"
+    for line_num, line in enumerate(lines, 1):
+        try:
+            log_data = LogParser.parse_nginx_log(line) or LogParser.parse_json_log(line)
+            if log_data:
+                is_crawler, confidence, reasons = CrawlerDetector.detect(db, log_data)
+                log = AccessLog(
+                    ip=log_data["ip"],
+                    user_agent=log_data.get("user_agent"),
+                    path=log_data["path"],
+                    method=log_data.get("method", "GET"),
+                    status_code=log_data.get("status_code", 200),
+                    request_time=log_data.get("request_time", datetime.utcnow()),
+                    referer=log_data.get("referer"),
+                    response_time=log_data.get("response_time"),
+                    raw_log=log_data["raw_log"],
+                    is_crawler=is_crawler,
+                    crawler_confidence=confidence,
+                    crawler_type=",".join(reasons) if reasons else None,
+                    status="classified" if confidence >= 0.8 else "pending_review"
+                )
+                db.add(log)
+                success += 1
+            else:
+                failed_log = FailedImportLog(
+                    raw_content=line,
+                    error_type="parse_error",
+                    error_message="无法解析日志格式，既不是Nginx格式也不是JSON格式",
+                    batch_id=batch_id,
+                    operator=operator,
+                    line_number=line_num
+                )
+                db.add(failed_log)
+                failed += 1
+        except Exception as e:
+            failed_log = FailedImportLog(
+                raw_content=line,
+                error_type=type(e).__name__,
+                error_message=str(e),
+                batch_id=batch_id,
+                operator=operator,
+                line_number=line_num
             )
-            db.add(log)
-            success += 1
-        else:
+            db.add(failed_log)
             failed += 1
     db.commit()
     all_logs = db.query(AccessLog).filter(AccessLog.group_id == None).all()
@@ -123,7 +201,7 @@ async def import_logs(file: UploadFile = File(...), operator: str = "system", db
     )
     db.add(report)
     db.commit()
-    return BatchOperationResponse(success=success, failed=failed, message=f"导入完成，批次ID: {batch_id}")
+    return BatchOperationResponse(success=success, failed=failed, batch_id=batch_id, message=f"导入完成，批次ID: {batch_id}")
 
 @app.get("/api/logs", response_model=List[LogResponse])
 def list_logs(
@@ -330,6 +408,42 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
         "top_crawler_ips": [{"ip": ip, "count": count} for ip, count in top_crawler_ips],
         "top_crawler_user_agents": [{"user_agent": ua, "count": count} for ua, count in top_crawler_ua]
     }
+
+@app.get("/api/failed-logs")
+def list_failed_logs(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=1, le=200),
+    batch_id: Optional[str] = None,
+    resolution_status: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(FailedImportLog)
+    if batch_id:
+        query = query.filter(FailedImportLog.batch_id == batch_id)
+    if resolution_status:
+        query = query.filter(FailedImportLog.resolution_status == resolution_status)
+    offset = (page - 1) * page_size
+    logs = query.order_by(desc(FailedImportLog.created_at)).offset(offset).limit(page_size).all()
+    return logs
+
+@app.get("/api/failed-logs/{log_id}")
+def get_failed_log(log_id: int, db: Session = Depends(get_db)):
+    log = db.query(FailedImportLog).filter(FailedImportLog.id == log_id).first()
+    if not log:
+        raise HTTPException(status_code=404, detail="失败日志不存在")
+    return log
+
+@app.put("/api/failed-logs/{log_id}/resolve")
+def resolve_failed_log(log_id: int, request: FailedLogResolutionRequest, db: Session = Depends(get_db)):
+    log = db.query(FailedImportLog).filter(FailedImportLog.id == log_id).first()
+    if not log:
+        raise HTTPException(status_code=404, detail="失败日志不存在")
+    log.resolution_status = request.resolution_status
+    log.resolution_note = request.resolution_note
+    log.resolved_by = request.resolved_by
+    log.resolved_at = datetime.utcnow()
+    db.commit()
+    return {"message": "处理完成", "id": log_id, "status": request.resolution_status}
 
 @app.get("/api/audit-logs")
 def list_audit_logs(

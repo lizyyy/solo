@@ -156,7 +156,8 @@ class SuspiciousGrouper:
 
     @classmethod
     def generate_group_id(cls, ip: str, user_agent: str) -> str:
-        key = f"{ip}:{user_agent[:50]}"
+        ua_safe = (user_agent or "")[:50]
+        key = f"{ip}:{ua_safe}"
         return hashlib.md5(key.encode()).hexdigest()[:12]
 
     @classmethod

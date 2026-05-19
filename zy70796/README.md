@@ -56,9 +56,36 @@ curl -X POST "http://localhost:8000/api/logs/import?operator=admin" \
 响应示例:
 ```json
 {
-  "success": 200,
-  "failed": 0,
+  "success": 198,
+  "failed": 2,
+  "batch_id": "a1b2c3d4",
   "message": "导入完成，批次ID: a1b2c3d4"
+}
+```
+
+### 1.1 单条创建访问日志
+
+```bash
+curl -X POST "http://localhost:8000/api/logs" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ip": "192.168.1.100",
+    "user_agent": "Mozilla/5.0 (compatible; Googlebot/2.1)",
+    "path": "/api/data",
+    "method": "GET",
+    "status_code": 200,
+    "referer": "https://example.com"
+  }'
+```
+
+响应示例:
+```json
+{
+  "id": 1,
+  "is_crawler": true,
+  "crawler_confidence": 0.95,
+  "status": "classified",
+  "message": "日志创建成功"
 }
 ```
 
@@ -174,6 +201,41 @@ curl "http://localhost:8000/api/statistics/dashboard"
 ```bash
 curl "http://localhost:8000/api/audit-logs?page=1&page_size=50"
 ```
+
+### 12. 导入失败日志处理（异常路径保留原始输入）
+
+```bash
+# 查询所有失败日志
+curl "http://localhost:8000/api/failed-logs?page=1&page_size=50"
+
+# 按批次ID查询失败日志
+curl "http://localhost:8000/api/failed-logs?batch_id=a1b2c3d4"
+
+# 按处理状态筛选
+curl "http://localhost:8000/api/failed-logs?resolution_status=pending"
+
+# 查看单条失败日志详情（含原始输入、错误信息、处理人）
+curl "http://localhost:8000/api/failed-logs/1"
+
+# 标记处理完成（保留处理结论）
+curl -X PUT "http://localhost:8000/api/failed-logs/1/resolve" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resolution_status": "manually_fixed",
+    "resolution_note": "已手动解析并重新导入，原始格式缺少User-Agent字段",
+    "resolved_by": "zhang_san"
+  }'
+```
+
+失败日志表保存的关键信息：
+- `raw_content`: 完整的原始错误输入
+- `error_type`: 错误类型（parse_error/ValueError等）
+- `error_message`: 具体错误信息
+- `operator`: 操作人（谁导入的）
+- `line_number`: 所在行号
+- `resolution_status`: 处理状态
+- `resolution_note`: 处理结论备注
+- `resolved_by`: 处理人
 
 ## 冲突路径与异常处理
 
