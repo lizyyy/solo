@@ -15,89 +15,130 @@ from ..models import (
 class JSONParser(BaseParser):
     def parse(self) -> ParseResult:
         result = ParseResult()
+        line_map = {}
 
         try:
             with open(self.file_path, "r", encoding="utf-8") as f:
+                file_lines = f.readlines()
+
+            with open(self.file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
+            for line_num, line_content in enumerate(file_lines, start=1):
+                stripped = line_content.strip()
+                if stripped:
+                    line_map[line_num] = stripped
+
             if isinstance(data, dict):
-                self._parse_dict(data, result)
+                self._parse_dict(data, result, file_lines)
             elif isinstance(data, list):
-                for idx, item in enumerate(data):
-                    location = SourceLocation(
-                        file_path=self.file_path,
-                        line_number=idx + 1,
-                        raw_content=json.dumps(item, ensure_ascii=False),
-                    )
-                    self._parse_item(item, location, result)
+                    for idx, item in enumerate(data):
+                        item_str = json.dumps(item, ensure_ascii=False)
+                        location = SourceLocation(
+                            file_path=self.file_path,
+                            line_number=None,
+                            raw_content=item_str[:200],
+                        )
+                        self._parse_item(item, location, result)
         except json.JSONDecodeError as e:
-            self._add_error(f"JSON解析失败: {str(e)}", SourceLocation(file_path=self.file_path))
+            self._add_error(f"JSON解析失败: {str(e)}", SourceLocation(file_path=self.file_path, line_number=getattr(e, 'lineno', None)))
         except Exception as e:
             self._add_error(f"文件解析失败: {str(e)}", SourceLocation(file_path=self.file_path))
 
         result.parse_errors = self.parse_errors
         return result
 
-    def _parse_dict(self, data: Dict[str, Any], result: ParseResult):
+    def _parse_dict(self, data: Dict[str, Any], result: ParseResult, file_lines: List[str]):
         if "repositories" in data and isinstance(data["repositories"], list):
             for idx, item in enumerate(data["repositories"]):
+                item_str = json.dumps(item, ensure_ascii=False)
+                line_num = self._find_line_number(file_lines, item)
                 location = SourceLocation(
                     file_path=self.file_path,
-                    line_number=idx + 1,
-                    raw_content=json.dumps(item, ensure_ascii=False),
+                    line_number=line_num,
+                    raw_content=item_str[:200],
                 )
                 self._parse_repository(item, location, result)
 
         if "branch_rules" in data and isinstance(data["branch_rules"], list):
             for idx, item in enumerate(data["branch_rules"]):
+                item_str = json.dumps(item, ensure_ascii=False)
+                line_num = self._find_line_number(file_lines, item)
                 location = SourceLocation(
                     file_path=self.file_path,
-                    line_number=idx + 1,
-                    raw_content=json.dumps(item, ensure_ascii=False),
+                    line_number=line_num,
+                    raw_content=item_str[:200],
                 )
                 self._parse_branch_rule(item, location, result)
 
         if "exceptions" in data and isinstance(data["exceptions"], list):
             for idx, item in enumerate(data["exceptions"]):
+                item_str = json.dumps(item, ensure_ascii=False)
+                line_num = self._find_line_number(file_lines, item)
                 location = SourceLocation(
                     file_path=self.file_path,
-                    line_number=idx + 1,
-                    raw_content=json.dumps(item, ensure_ascii=False),
+                    line_number=line_num,
+                    raw_content=item_str[:200],
                 )
                 self._parse_exception(item, location, result)
 
         if "windows" in data and isinstance(data["windows"], list):
             for idx, item in enumerate(data["windows"]):
+                item_str = json.dumps(item, ensure_ascii=False)
+                line_num = self._find_line_number(file_lines, item)
                 location = SourceLocation(
                     file_path=self.file_path,
-                    line_number=idx + 1,
-                    raw_content=json.dumps(item, ensure_ascii=False),
+                    line_number=line_num,
+                    raw_content=item_str[:200],
                 )
                 self._parse_window(item, location, result)
 
         if "recoveries" in data and isinstance(data["recoveries"], list):
             for idx, item in enumerate(data["recoveries"]):
+                item_str = json.dumps(item, ensure_ascii=False)
+                line_num = self._find_line_number(file_lines, item)
                 location = SourceLocation(
                     file_path=self.file_path,
-                    line_number=idx + 1,
-                    raw_content=json.dumps(item, ensure_ascii=False),
+                    line_number=line_num,
+                    raw_content=item_str[:200],
                 )
                 self._parse_recovery(item, location, result)
+
+    def _find_line_number(self, file_lines: List[str], item: Dict[str, Any]) -> int:
+        item_id = item.get('id') or item.get('exception_id') or item.get('window_id') or item.get('recovery_id')
+        if item_id:
+            id_pattern = f'"{item_id}"'
+            for line_num, line in enumerate(file_lines, start=1):
+                if id_pattern in line:
+                    return line_num
+        return None
 
     def _parse_item(self, item: Dict[str, Any], location: SourceLocation, result: ParseResult):
         try:
             record_type = item.get("record_type", item.get("type", "")).strip().upper()
 
-            if record_type == "REPOSITORY" or "repository_name" in item:
-                self._parse_repository(item, location, result)
-            elif record_type == "BRANCH_RULE" or "branch_pattern" in item:
-                self._parse_branch_rule(item, location, result)
-            elif record_type == "EXCEPTION" or "applicant" in item:
-                self._parse_exception(item, location, result)
-            elif record_type == "WINDOW" or "start_time" in item:
-                self._parse_window(item, location, result)
-            elif record_type == "RECOVERY" or "recovered_by" in item:
-                self._parse_recovery(item, location, result)
+            if record_type:
+                if record_type == "EXCEPTION":
+                    self._parse_exception(item, location, result)
+                elif record_type == "REPOSITORY":
+                    self._parse_repository(item, location, result)
+                elif record_type == "BRANCH_RULE":
+                    self._parse_branch_rule(item, location, result)
+                elif record_type == "WINDOW":
+                    self._parse_window(item, location, result)
+                elif record_type == "RECOVERY":
+                    self._parse_recovery(item, location, result)
+            else:
+                if "applicant" in item and item["applicant"]:
+                    self._parse_exception(item, location, result)
+                elif "recovered_by" in item and item["recovered_by"]:
+                    self._parse_recovery(item, location, result)
+                elif "start_time" in item and item["start_time"]:
+                    self._parse_window(item, location, result)
+                elif "branch_pattern" in item and item["branch_pattern"]:
+                    self._parse_branch_rule(item, location, result)
+                elif "repository_name" in item and item["repository_name"]:
+                    self._parse_repository(item, location, result)
         except Exception as e:
             self._add_error(f"数据解析失败: {str(e)}", location, item)
 

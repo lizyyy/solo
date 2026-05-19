@@ -40,6 +40,7 @@ class SourceTracker:
     def track_audit_conclusion(self, conclusion: AuditConclusion):
         for record in conclusion.records:
             issues = []
+            related_ids = set()
             for validation in record.validations:
                 if validation.status in ["FAIL", "WARN"]:
                     issues.append(
@@ -52,15 +53,23 @@ class SourceTracker:
                             "details": validation.details,
                         }
                     )
+                related_ids.update(validation.related_records)
 
             if issues:
+                source_locations = []
+                if hasattr(record, 'source') and record.source:
+                    source_locations.append(record.source)
+                for related_id in sorted(related_ids):
+                    if related_id in self.record_sources:
+                        for src in self.record_sources[related_id]:
+                            if src not in source_locations:
+                                source_locations.append(src)
+
                 tracked = TrackedRecord(
                     record_id=record.record_id,
                     record_type=record.record_type,
-                    source_locations=self.record_sources.get(record.record_id, []),
-                    related_ids=record.validations[0].related_records
-                    if record.validations
-                    else [],
+                    source_locations=source_locations,
+                    related_ids=sorted(related_ids),
                     issues=issues,
                 )
                 self.bad_records.append(tracked)

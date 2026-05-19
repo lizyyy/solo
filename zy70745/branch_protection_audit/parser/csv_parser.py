@@ -37,16 +37,28 @@ class CSVParser(BaseParser):
         try:
             record_type = row.get("record_type", row.get("type", "")).strip().upper()
 
-            if record_type == "REPOSITORY" or "repository_name" in row:
-                self._parse_repository(row, location, result)
-            elif record_type == "BRANCH_RULE" or "branch_pattern" in row:
-                self._parse_branch_rule(row, location, result)
-            elif record_type == "EXCEPTION" or "applicant" in row:
-                self._parse_exception(row, location, result)
-            elif record_type == "WINDOW" or "start_time" in row:
-                self._parse_window(row, location, result)
-            elif record_type == "RECOVERY" or "recovered_by" in row:
-                self._parse_recovery(row, location, result)
+            if record_type:
+                if record_type == "EXCEPTION":
+                    self._parse_exception(row, location, result)
+                elif record_type == "REPOSITORY":
+                    self._parse_repository(row, location, result)
+                elif record_type == "BRANCH_RULE":
+                    self._parse_branch_rule(row, location, result)
+                elif record_type == "WINDOW":
+                    self._parse_window(row, location, result)
+                elif record_type == "RECOVERY":
+                    self._parse_recovery(row, location, result)
+            else:
+                if "applicant" in row and row["applicant"]:
+                    self._parse_exception(row, location, result)
+                elif "recovered_by" in row and row["recovered_by"]:
+                    self._parse_recovery(row, location, result)
+                elif "start_time" in row and row["start_time"]:
+                    self._parse_window(row, location, result)
+                elif "branch_pattern" in row and row["branch_pattern"]:
+                    self._parse_branch_rule(row, location, result)
+                elif "repository_name" in row and row["repository_name"]:
+                    self._parse_repository(row, location, result)
         except Exception as e:
             self._add_error(f"行解析失败: {str(e)}", location, row)
 
