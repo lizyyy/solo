@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-service
+  namespace: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: python:3.11
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+      - name: sidecar
+        image: envoy:v1.28
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi

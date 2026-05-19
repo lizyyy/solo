@@ -1,0 +1,119 @@
+{
+  "report_id": 1,
+  "generated_at": "2026-05-19T08:03:04.001263",
+  "namespace": null,
+  "summary": {
+    "total_containers": 6,
+    "by_issue_type": {
+      "missing_requests": 1,
+      "missing_limits": 1,
+      "missing_both": 2,
+      "ratio_mismatch": 1,
+      "normal": 1
+    },
+    "by_status": {
+      "pending": 5,
+      "needs_review": 0,
+      "processed": 1,
+      "fixed": 0
+    }
+  },
+  "containers": [
+    {
+      "id": 1,
+      "namespace": "database",
+      "workload_name": "postgres",
+      "workload_type": "StatefulSet",
+      "container_name": "postgres",
+      "cpu_requests": "500m",
+      "memory_requests": "1Gi",
+      "cpu_limits": "500m",
+      "memory_limits": "1Gi",
+      "issue_type": "normal",
+      "status": "processed",
+      "cpu_ratio": 1.0,
+      "memory_ratio": 1.0,
+      "yaml_file_path": "/Users/lzy/pro/solo/workspaces/zy70782/test_yamls/database/postgres-statefulset.yaml"
+    },
+    {
+      "id": 2,
+      "namespace": "database",
+      "workload_name": "backup-job",
+      "workload_type": "CronJob",
+      "container_name": "backup",
+      "cpu_requests": "",
+      "memory_requests": "",
+      "cpu_limits": "",
+      "memory_limits": "",
+      "issue_type": "missing_both",
+      "status": "pending",
+      "cpu_ratio": 0.0,
+      "memory_ratio": 0.0,
+      "yaml_file_path": "/Users/lzy/pro/solo/workspaces/zy70782/test_yamls/database/postgres-statefulset.yaml"
+    },
+    {
+      "id": 3,
+      "namespace": "frontend",
+      "workload_name": "web-app",
+      "workload_type": "Deployment",
+      "container_name": "nginx",
+      "cpu_requests": "",
+      "memory_requests": "",
+      "cpu_limits": "",
+      "memory_limits": "",
+      "issue_type": "missing_both",
+      "status": "pending",
+      "cpu_ratio": 0.0,
+      "memory_ratio": 0.0,
+      "yaml_file_path": "/Users/lzy/pro/solo/workspaces/zy70782/test_yamls/frontend/web-deployment.yaml"
+    },
+    {
+      "id": 4,
+      "namespace": "frontend",
+      "workload_name": "nodejs-app",
+      "workload_type": "Deployment",
+      "container_name": "nodejs",
+      "cpu_requests": "100m",
+      "memory_requests": "128Mi",
+      "cpu_limits": "500m",
+      "memory_limits": "512Mi",
+      "issue_type": "ratio_mismatch",
+      "status": "pending",
+      "cpu_ratio": 5.0,
+      "memory_ratio": 4.0,
+      "yaml_file_path": "/Users/lzy/pro/solo/workspaces/zy70782/test_yamls/frontend/web-deployment.yaml"
+    },
+    {
+      "id": 5,
+      "namespace": "backend",
+      "workload_name": "api-service",
+      "workload_type": "Deployment",
+      "container_name": "api",
+      "cpu_requests": "",
+      "memory_requests": "",
+      "cpu_limits": "1",
+      "memory_limits": "1Gi",
+      "issue_type": "missing_requests",
+      "status": "pending",
+      "cpu_ratio": 0.0,
+      "memory_ratio": 0.0,
+      "yaml_file_path": "/Users/lzy/pro/solo/workspaces/zy70782/test_yamls/backend/api-deployment.yaml"
+    },
+    {
+      "id": 6,
+      "namespace": "backend",
+      "workload_name": "api-service",
+      "workload_type": "Deployment",
+      "container_name": "sidecar",
+      "cpu_requests": "50m",
+      "memory_requests": "64Mi",
+      "cpu_limits": "",
+      "memory_limits": "",
+      "issue_type": "missing_limits",
+      "status": "pending",
+      "cpu_ratio": 0.0,
+      "memory_ratio": 0.0,
+      "yaml_file_path": "/Users/lzy/pro/solo/workspaces/zy70782/test_yamls/backend/api-deployment.yaml"
+    }
+  ]
+}
