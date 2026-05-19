@@ -1,0 +1,41 @@
+{
+  "notebook_id": "NB003_CONFLICT",
+  "name": "聚类分析_边界冲突",
+  "path": "./notebooks/cluster.ipynb",
+  "parameters": {
+    "param_id": "ce054daf",
+    "name": "conflict_params",
+    "values": {
+      "n_clusters": 5,
+      "max_iter": 300
+    },
+    "signature": "547bc2ac969f3c87",
+    "created_at": "2026-05-19T07:10:23.892429"
+  },
+  "environment": {
+    "python_version": "3.10.0",
+    "os": "Windows-10-10.0.19045-SP0",
+    "cpu_info": "Intel(R) Xeon(R) W-1290 CPU @ 3.20GHz",
+    "memory_total": 137438953472,
+    "disk_space": 4000819544064,
+    "libraries": {
+      "numpy": "1.23.0",
+      "pandas": "1.5.0"
+    },
+    "env_hash": "conflict_hash_7890abcd"
+  },
+  "artifacts": [],
+  "reviews": [
+    {
+      "reviewer": "复核专家B",
+      "comment": "运行环境不匹配，依赖库版本冲突",
+      "status": "rejected",
+      "reviewed_at": "2026-05-19T07:10:23.892442"
+    }
+  ],
+  "review_status": "rejected",
+  "created_at": "2026-05-19T07:10:23.892441",
+  "executed_at": "2026-05-19T07:10:23.892439",
+  "execution_time": 0.0,
+  "exit_code": 0
+}
