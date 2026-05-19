@@ -2,8 +2,8 @@
   "summary": {
     "status": "completed",
     "message": "分析完成",
-    "valid_task_count": 8,
-    "error_count": 2,
+    "valid_task_count": 7,
+    "error_count": 3,
     "collision_count": 4,
     "total_risk_score": 90
   },
@@ -39,13 +39,6 @@
       ]
     },
     {
-      "task_id": "task_005",
-      "cron_expr": "invalid_cron",
-      "resource_tags": [
-        "database:mysql"
-      ]
-    },
-    {
       "task_id": "task_008",
       "cron_expr": "0 9 * * MON-FRI",
       "resource_tags": [
@@ -68,6 +61,17 @@
     }
   ],
   "errors": [
+    {
+      "index": 4,
+      "data": {
+        "task_id": "task_005",
+        "cron_expr": "invalid_cron",
+        "resource_tags": [
+          "database:mysql"
+        ]
+      },
+      "error": "Cron表达式格式无效: 无效的Cron表达式: invalid_cron (需要5个字段)"
+    },
     {
       "index": 5,
       "data": {

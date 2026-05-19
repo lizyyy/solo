@@ -95,11 +95,13 @@ class CronParser:
             current = current.replace(second=0, microsecond=0)
         
         while current <= end_time:
+            python_weekday = current.weekday()
+            cron_weekday = (python_weekday + 1) % 7
             if (current.minute in cron['minute'] and
                 current.hour in cron['hour'] and
                 current.day in cron['day'] and
                 current.month in cron['month'] and
-                current.weekday() in cron['weekday']):
+                cron_weekday in cron['weekday']):
                 runs.append(current)
             
             current += timedelta(minutes=1)
@@ -110,7 +112,7 @@ class CronParser:
 class Task:
     """任务类"""
     
-    def __init__(self, task_id: str, cron_expr: str, resource_tags: List[str]):
+    def __init__(self, task_id: str, cron_expr: str, resource_tags: List[str], parser: CronParser = None):
         self.task_id = task_id
         self.cron_expr = cron_expr
         self.resource_tags = set(resource_tags) if resource_tags else set()
@@ -119,6 +121,12 @@ class Task:
             raise ValueError("任务ID不能为空")
         if not self.cron_expr:
             raise ValueError("Cron表达式不能为空")
+        
+        if parser is not None:
+            try:
+                parser.parse(cron_expr)
+            except Exception as e:
+                raise ValueError(f"Cron表达式格式无效: {e}")
     
     def to_dict(self) -> Dict:
         return {
@@ -163,7 +171,8 @@ class CollisionChecker:
                 task = Task(
                     task_id=task_data.get('task_id', ''),
                     cron_expr=task_data.get('cron_expr', ''),
-                    resource_tags=task_data.get('resource_tags', [])
+                    resource_tags=task_data.get('resource_tags', []),
+                    parser=self.parser
                 )
                 tasks.append(task)
             except Exception as e:
