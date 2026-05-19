@@ -1,36 +1,37 @@
 {
   "metadata": {
     "version": "1.0.0",
-    "generated_at": "2026-05-19T16:04:19.866154",
+    "generated_at": "2026-05-19T20:29:32.196840",
     "tool_name": "APIcassette脱敏排查CLI"
   },
   "summary": {
     "input_file": "dirty_cassette.yaml",
     "output_file": "sanitized.yaml",
-    "total_sensitive_matches": 15,
+    "total_sensitive_matches": 16,
     "is_clean_after_sanitization": true,
     "remaining_leaks_count": 0,
     "location_breakdown": {
       "request_headers": 5,
-      "request_body": 2,
+      "request_body": 3,
       "response_headers": 0,
       "response_body": 8
     }
   },
   "details": {
     "sensitive_matches": {
-      "count": 15,
+      "count": 16,
       "by_rule": {
         "bearer_token": 2,
         "jwt_token": 3,
         "api_key": 1,
         "phone_number": 5,
         "email": 3,
+        "password": 1,
         "id_card": 1
       },
       "by_location": {
         "request_headers": 5,
-        "request_body": 2,
+        "request_body": 3,
         "response_body": 8
       },
       "items": [
@@ -50,7 +51,7 @@
           "field_path": "interactions[0].request.headers.X-API-Key",
           "rule_name": "api_key",
           "location": "request_headers",
-          "masked_preview": "TOKEN_MASKED_c88843ea27ed7413"
+          "masked_preview": "TOKEN_MASKED_5a974ee8adadb912"
         },
         {
           "field_path": "interactions[0].request.body",
@@ -63,6 +64,12 @@
           "rule_name": "email",
           "location": "request_body",
           "masked_preview": "EMAIL_MASKED_fce0ea"
+        },
+        {
+          "field_path": "interactions[0].request.body",
+          "rule_name": "password",
+          "location": "request_body",
+          "masked_preview": "GENERIC_MASKED_17f6a084"
         },
         {
           "field_path": "interactions[0].response.body",
@@ -134,9 +141,10 @@
     "replacement_mapping": {
       "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiJKb2huIERvZSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c": "TOKEN_MASKED_2b7d87af7a6bc57c",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiJKb2huIERvZSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c": "TOKEN_MASKED_ae1f7d9edfe116bc",
-      "stripe_live_key_placeholder": "TOKEN_MASKED_c88843ea27ed7413",
+      "stripe_live_key_placeholder": "TOKEN_MASKED_5a974ee8adadb912",
       "13812345678": "PHONE_MASKED_5678",
       "john.doe@example.com": "EMAIL_MASKED_fce0ea",
+      "mySecretPass123!": "GENERIC_MASKED_17f6a084",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c": "TOKEN_MASKED_b69588c0055aa344",
       "13987654321": "PHONE_MASKED_4321",
       "19900101123": "PHONE_MASKED_1123",

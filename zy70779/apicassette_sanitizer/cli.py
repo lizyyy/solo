@@ -129,14 +129,14 @@ def scan(input_file, rules, output):
 
 @cli.command()
 @click.argument('file_to_check', type=click.Path(exists=True, readable=True))
-@click.option('--depth', '-d', default=5, help='检查深度')
+@click.option('--depth', '-d', default=10, help='检查深度')
 def recheck(file_to_check, depth):
     """对文件进行深度复检，确认无敏感数据残留"""
     try:
         rules_engine = RulesEngine()
         rechecker = ReChecker(rules_engine)
         
-        result = rechecker.check_file(file_to_check)
+        result = rechecker.check_file(file_to_check, depth=depth)
         
         click.echo()
         click.echo("=" * 50)

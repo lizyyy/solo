@@ -1,15 +1,15 @@
 interactions:
 - request:
     body:
-      string: '{"phone": "PHONE_MASKED_5678", "password": "mySecretPass123!", "email":
-        "EMAIL_MASKED_fce0ea"}'
+      string: '{"phone": "PHONE_MASKED_5678", "password": "GENERIC_MASKED_17f6a084",
+        "email": "EMAIL_MASKED_fce0ea"}'
     headers:
       Authorization:
       - TOKEN_MASKED_2b7d87af7a6bc57c
       Content-Type:
       - application/json
       X-API-Key:
-      - TOKEN_MASKED_c88843ea27ed7413
+      - TOKEN_MASKED_5a974ee8adadb912
     method: POST
     uri: https://api.example.com/login
   response:

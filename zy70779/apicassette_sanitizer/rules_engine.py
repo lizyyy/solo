@@ -124,7 +124,7 @@ class RulesEngine:
             ),
             (
                 "api_key",
-                r'(?:sk_|pk_)[A-Za-z0-9_-]{16,}',
+                r'(?:sk_|pk_|api[_-]?key|stripe_|live_|test_)[A-Za-z0-9_-]{8,}',
                 self.masker.mask_token
             ),
             (
@@ -144,12 +144,12 @@ class RulesEngine:
             ),
             (
                 "password",
-                r'(?<=password["\':\s=])\s*["\'][^"\']{4,}["\']',
+                r'(?<="password":\s")(?!.*_MASKED_)[^"]{4,}(?=")',
                 self.masker.mask_generic
             ),
             (
                 "secret",
-                r'(?<=secret["\':\s=])\s*["\'][^"\']{4,}["\']',
+                r'(?<="secret":\s")(?!.*_MASKED_)[^"]{4,}(?=")',
                 self.masker.mask_generic
             ),
         ]

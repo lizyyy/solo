@@ -192,7 +192,7 @@ class ReChecker:
         _check(data, "", 0)
         return leaks
         
-    def check_file(self, file_path: str) -> Dict[str, Any]:
+    def check_file(self, file_path: str, depth: int = 10) -> Dict[str, Any]:
         _, ext = os.path.splitext(file_path)
         ext = ext.lower()
         
@@ -206,7 +206,7 @@ class ReChecker:
         else:
             data = content
             
-        leaks = self.deep_check(data)
+        leaks = self.deep_check(data, depth=depth)
         
         return {
             "file": os.path.basename(file_path),
