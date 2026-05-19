@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web:
+    image: httpd:latest
+    ports:
+      - "8080:8080"
+      - "0.0.0.0:8443:8443"
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=5432
+
+  api:
+    image: node:18
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production

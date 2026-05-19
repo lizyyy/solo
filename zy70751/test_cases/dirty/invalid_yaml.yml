@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+        - extra_invalid_line  # 错误的缩进
+    environment:
+      - KEY=value
