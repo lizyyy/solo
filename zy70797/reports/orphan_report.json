@@ -1,26 +1,13 @@
 {
-  "invalid_entries": [
-    {
-      "parse_error": "Item must be a dictionary",
-      "raw_content": "this is not a valid service entry",
-      "service_name": "invalid_type_str",
-      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:6"
-    },
-    {
-      "parse_error": "service_name is required",
-      "raw_content": "repository: invalid\nservice_name: ''\n",
-      "service_name": "unnamed_service",
-      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:7"
-    }
-  ],
+  "invalid_entries": [],
   "metadata": {
-    "generated_at": "2026-05-19T16:24:50.313107",
+    "generated_at": "2026-05-19T20:54:59.467372",
     "version": "1.0.0"
   },
   "orphan_services": [
     {
       "alert_evidence": {
-        "checked_at": "2026-05-19T16:24:50.283311",
+        "checked_at": "2026-05-19T20:54:59.443166",
         "details": {
           "configured_rules": [
             "GatewayHighTraffic"
@@ -57,7 +44,7 @@
       ],
       "repository": "git@github.com:example/api-gateway.git",
       "repository_evidence": {
-        "checked_at": "2026-05-19T16:24:50.283297",
+        "checked_at": "2026-05-19T20:54:59.443158",
         "details": {
           "github_owner": "example",
           "github_repo": "api-gateway",
@@ -68,11 +55,11 @@
         "status": "unknown"
       },
       "service_name": "api-gateway",
-      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:5"
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.csv:6"
     },
     {
       "alert_evidence": {
-        "checked_at": "2026-05-19T16:24:50.312754",
+        "checked_at": "2026-05-19T20:54:59.467192",
         "details": {
           "configured_rules": [
             "OrderServiceHighErrorRate"
@@ -109,7 +96,7 @@
       ],
       "repository": "/Users/lzy/pro/solo/workspaces/zy70797/examples/test-repo",
       "repository_evidence": {
-        "checked_at": "2026-05-19T16:24:50.312718",
+        "checked_at": "2026-05-19T20:54:59.467179",
         "details": {
           "age_days": 0,
           "branch_count": 1,
@@ -123,11 +110,11 @@
         "status": "alive"
       },
       "service_name": "order-service",
-      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:2"
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.csv:3"
     },
     {
       "alert_evidence": {
-        "checked_at": "2026-05-19T16:24:50.312949",
+        "checked_at": "2026-05-19T20:54:59.467299",
         "details": {
           "configured_rules": [
             "UserServiceHighErrorRate",
@@ -167,7 +154,7 @@
       ],
       "repository": "https://github.com/example/user-service",
       "repository_evidence": {
-        "checked_at": "2026-05-19T16:24:50.312944",
+        "checked_at": "2026-05-19T20:54:59.467297",
         "details": {
           "github_owner": "example",
           "github_repo": "user-service",
@@ -178,11 +165,11 @@
         "status": "unknown"
       },
       "service_name": "user-service",
-      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:1"
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.csv:2"
     },
     {
       "alert_evidence": {
-        "checked_at": "2026-05-19T16:24:50.283478",
+        "checked_at": "2026-05-19T20:54:59.443235",
         "details": {
           "configured_rules": [
             "LegacyRuleDoesNotExist"
@@ -216,7 +203,7 @@
       ],
       "repository": "",
       "repository_evidence": {
-        "checked_at": "2026-05-19T16:24:50.283423",
+        "checked_at": "2026-05-19T20:54:59.443208",
         "details": {
           "service_name": "legacy-service"
         },
@@ -224,11 +211,11 @@
         "status": "unknown"
       },
       "service_name": "legacy-service",
-      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:4"
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.csv:5"
     },
     {
       "alert_evidence": {
-        "checked_at": "2026-05-19T16:24:50.283493",
+        "checked_at": "2026-05-19T20:54:59.443242",
         "details": {
           "service_name": "notification-service"
         },
@@ -247,7 +234,7 @@
       "owners": [],
       "repository": "",
       "repository_evidence": {
-        "checked_at": "2026-05-19T16:24:50.283491",
+        "checked_at": "2026-05-19T20:54:59.443241",
         "details": {
           "service_name": "notification-service"
         },
@@ -255,11 +242,11 @@
         "status": "unknown"
       },
       "service_name": "notification-service",
-      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:8"
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.csv:7"
     },
     {
       "alert_evidence": {
-        "checked_at": "2026-05-19T16:24:50.312902",
+        "checked_at": "2026-05-19T20:54:59.467275",
         "details": {
           "service_name": "payment-service"
         },
@@ -278,7 +265,7 @@
       "owners": [],
       "repository": "/path/to/nonexistent/repo",
       "repository_evidence": {
-        "checked_at": "2026-05-19T16:24:50.312897",
+        "checked_at": "2026-05-19T20:54:59.467274",
         "details": {
           "checked_path": "/path/to/nonexistent/repo",
           "repository": "/path/to/nonexistent/repo",
@@ -288,11 +275,11 @@
         "status": "dead"
       },
       "service_name": "payment-service",
-      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:3"
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.csv:4"
     }
   ],
   "summary": {
-    "invalid_services": 2,
+    "invalid_services": 0,
     "orphan_services": 3,
     "status_breakdown": {
       "alive": 3,
@@ -300,7 +287,7 @@
       "error": 0,
       "unknown": 3
     },
-    "total_services": 8,
+    "total_services": 6,
     "valid_services": 6
   }
 }

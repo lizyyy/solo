@@ -1,12 +1,12 @@
 ================================================================================
 服务目录孤儿条目排查报告
-生成时间: 2026-05-19T16:24:50.313107
+生成时间: 2026-05-19T20:54:59.467372
 ================================================================================
 
 【统计汇总】
-  总服务数: 8
+  总服务数: 6
   有效服务: 6
-  无效条目: 2
+  无效条目: 0
   孤儿服务: 3
 
   状态分布:
@@ -20,7 +20,7 @@
 
   服务: legacy-service
   状态: unknown
-  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:4
+  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.csv:5
   负责人: old_dev
   原因:
     - 未配置仓库地址
@@ -28,7 +28,7 @@
 
   服务: notification-service
   状态: unknown
-  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:8
+  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.csv:7
   原因:
     - 未配置仓库地址
     - 未配置告警规则
@@ -36,7 +36,7 @@
 
   服务: payment-service
   状态: unknown
-  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:3
+  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.csv:4
   仓库: /path/to/nonexistent/repo
   原因:
     - 仓库失效: Local repository path does not exist
@@ -45,11 +45,3 @@
 
 --------------------------------------------------------------------------------
 【无效条目详情】
-
-  条目: invalid_type_str
-  错误: Item must be a dictionary
-  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:6
-
-  条目: unnamed_service
-  错误: service_name is required
-  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:7
