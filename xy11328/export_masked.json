@@ -1,0 +1,168 @@
+{
+  "tasks": [
+    {
+      "id": "6156ef27-3a91-4c28-9403-ee70d4595e18",
+      "idempotencyKey": "create-eyJwYXRpZW50Ijp7ImlkIjoiZDFhODRm",
+      "patientId": "d1a84f68-15b4-4299-9b48-60501c5ae838",
+      "patient": {
+        "id": "d1a84f68-15b4-4299-9b48-60501c5ae838",
+        "name": "王*明",
+        "idCard": "1101**********1234",
+        "phone": "138****8001",
+        "room": "内科"
+      },
+      "status": "completed",
+      "priority": "normal",
+      "checkType": "CT检查",
+      "checkLocation": "放射科",
+      "createdAt": 1779205493367,
+      "transferHistory": [],
+      "escortId": "a48f735f-f3a9-4c57-bacf-d64fe574bf76",
+      "escort": {
+        "id": "a48f735f-f3a9-4c57-bacf-d64fe574bf76",
+        "name": "张*",
+        "phone": "138****8000",
+        "employeeId": "E001",
+        "status": "busy",
+        "currentTaskId": "6156ef27-3a91-4c28-9403-ee70d4595e18"
+      },
+      "assignedAt": 1779205516778,
+      "startedAt": 1779205522807,
+      "acceptedAt": 1779205522807,
+      "waitTimeMinutes": 0,
+      "completedAt": 1779205529029,
+      "serviceTimeMinutes": 0
+    },
+    {
+      "id": "66108f4b-a995-4b27-b5b8-dd39725f4510",
+      "idempotencyKey": "create-eyJwYXRpZW50Ijp7ImlkIjoiMzcwZjE3",
+      "patientId": "370f1798-202d-4ac5-a420-a1d4156b6b34",
+      "patient": {
+        "id": "370f1798-202d-4ac5-a420-a1d4156b6b34",
+        "name": "王*明",
+        "idCard": "1101**********1234",
+        "phone": "138****8001",
+        "room": "内科"
+      },
+      "status": "assigned",
+      "priority": "normal",
+      "checkType": "CT检查",
+      "checkLocation": "放射科",
+      "createdAt": 1779205535381,
+      "transferHistory": [
+        {
+          "id": "357383ff-2b03-4ead-922c-5d8f3aab5c52",
+          "fromEscortId": "a48f735f-f3a9-4c57-bacf-d64fe574bf76",
+          "toEscortId": "2c6c2d27-8631-42ee-b309-93537fbb0e07",
+          "transferredAt": 1779205594076,
+          "reason": "临时有事",
+          "operator": "护士长"
+        }
+      ],
+      "escortId": "2c6c2d27-8631-42ee-b309-93537fbb0e07",
+      "escort": {
+        "id": "2c6c2d27-8631-42ee-b309-93537fbb0e07",
+        "name": "李*",
+        "phone": "139****9000",
+        "employeeId": "E002",
+        "status": "busy",
+        "currentTaskId": "66108f4b-a995-4b27-b5b8-dd39725f4510"
+      },
+      "assignedAt": 1779205594076
+    },
+    {
+      "id": "1419a422-ffe2-463c-b328-827c5756d9f0",
+      "idempotencyKey": "my-unique-key-001",
+      "patientId": "995c90fd-9907-49ed-a2b4-a17a45115906",
+      "patient": {
+        "id": "995c90fd-9907-49ed-a2b4-a17a45115906",
+        "name": "测**者",
+        "idCard": "1101**********9999",
+        "phone": "139****0001",
+        "room": "外科"
+      },
+      "status": "cancelled",
+      "priority": "normal",
+      "checkType": "X光检查",
+      "checkLocation": "放射科",
+      "createdAt": 1779205542955,
+      "transferHistory": [],
+      "cancelledAt": 1779205602648,
+      "remarks": "取消原因: 患者取消"
+    }
+  ],
+  "escorts": [
+    {
+      "id": "a48f735f-f3a9-4c57-bacf-d64fe574bf76",
+      "name": "张*",
+      "phone": "138****8000",
+      "employeeId": "E001",
+      "status": "available"
+    },
+    {
+      "id": "2c6c2d27-8631-42ee-b309-93537fbb0e07",
+      "name": "李*",
+      "phone": "139****9000",
+      "employeeId": "E002",
+      "status": "busy",
+      "currentTaskId": "66108f4b-a995-4b27-b5b8-dd39725f4510"
+    }
+  ],
+  "idempotencyRecords": [
+    {
+      "key": "create-eyJwYXRpZW50Ijp7ImlkIjoiZDFhODRm",
+      "taskId": "6156ef27-3a91-4c28-9403-ee70d4595e18",
+      "operation": "create",
+      "createdAt": 1779205493367
+    },
+    {
+      "key": "assign-eyJ0YXNrSWQiOiI2MTU2ZWYyNy0zYTkx",
+      "taskId": "6156ef27-3a91-4c28-9403-ee70d4595e18",
+      "operation": "assign",
+      "createdAt": 1779205516778
+    },
+    {
+      "key": "accept-eyJ0YXNrSWQiOiI2MTU2ZWYyNy0zYTkx",
+      "taskId": "6156ef27-3a91-4c28-9403-ee70d4595e18",
+      "operation": "accept",
+      "createdAt": 1779205522807
+    },
+    {
+      "key": "complete-eyJ0YXNrSWQiOiI2MTU2ZWYyNy0zYTkx",
+      "taskId": "6156ef27-3a91-4c28-9403-ee70d4595e18",
+      "operation": "complete",
+      "createdAt": 1779205529029
+    },
+    {
+      "key": "create-eyJwYXRpZW50Ijp7ImlkIjoiMzcwZjE3",
+      "taskId": "66108f4b-a995-4b27-b5b8-dd39725f4510",
+      "operation": "create",
+      "createdAt": 1779205535381
+    },
+    {
+      "key": "my-unique-key-001",
+      "taskId": "1419a422-ffe2-463c-b328-827c5756d9f0",
+      "operation": "create",
+      "createdAt": 1779205542955
+    },
+    {
+      "key": "assign-eyJ0YXNrSWQiOiI2NjEwOGY0Yi1hOTk1",
+      "taskId": "66108f4b-a995-4b27-b5b8-dd39725f4510",
+      "operation": "assign",
+      "createdAt": 1779205593977
+    },
+    {
+      "key": "transfer-eyJ0YXNrSWQiOiI2NjEwOGY0Yi1hOTk1",
+      "taskId": "66108f4b-a995-4b27-b5b8-dd39725f4510",
+      "operation": "transfer",
+      "createdAt": 1779205594076
+    },
+    {
+      "key": "cancel-eyJ0YXNrSWQiOiIxNDE5YTQyMi1mZmUy",
+      "taskId": "1419a422-ffe2-463c-b328-827c5756d9f0",
+      "operation": "cancel",
+      "createdAt": 1779205602648
+    }
+  ],
+  "lastUpdated": 1779205602649
+}
