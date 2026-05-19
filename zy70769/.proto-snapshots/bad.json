@@ -1,0 +1,186 @@
+{
+  "created_at": "2026-05-19T07:42:02.115420Z",
+  "metadata": {},
+  "proto_files": {
+    "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto": {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+      "imports": [],
+      "messages": {
+        "CreateUserRequest": {
+          "fields": {
+            "1": {
+              "label": "",
+              "location": {
+                "column_end": 16,
+                "column_start": 11,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 15,
+                "line_start": 15
+              },
+              "name": "name",
+              "number": 1,
+              "type": "string"
+            },
+            "2": {
+              "label": "",
+              "location": {
+                "column_end": 17,
+                "column_start": 11,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 16,
+                "line_start": 16
+              },
+              "name": "email",
+              "number": 2,
+              "type": "string"
+            },
+            "3": {
+              "label": "",
+              "location": {
+                "column_end": 14,
+                "column_start": 10,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 17,
+                "line_start": 17
+              },
+              "name": "age",
+              "number": 3,
+              "type": "int32"
+            }
+          },
+          "full_name": "example.user.CreateUserRequest",
+          "location": {
+            "column_end": 0,
+            "column_start": 0,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+            "line_end": 18,
+            "line_start": 14
+          },
+          "name": "CreateUserRequest",
+          "nested_messages": {}
+        },
+        "CreateUserResponse": {
+          "fields": {
+            "1": {
+              "label": "",
+              "location": {
+                "column_end": 14,
+                "column_start": 9,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 21,
+                "line_start": 21
+              },
+              "name": "user",
+              "number": 1,
+              "type": "User"
+            }
+          },
+          "full_name": "example.user.CreateUserResponse",
+          "location": {
+            "column_end": 0,
+            "column_start": 0,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+            "line_end": 22,
+            "line_start": 20
+          },
+          "name": "CreateUserResponse",
+          "nested_messages": {}
+        },
+        "User": {
+          "fields": {
+            "1": {
+              "label": "",
+              "location": {
+                "column_end": 13,
+                "column_start": 10,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 6,
+                "line_start": 6
+              },
+              "name": "id",
+              "number": 1,
+              "type": "int64"
+            },
+            "2": {
+              "label": "",
+              "location": {
+                "column_end": 21,
+                "column_start": 11,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 7,
+                "line_start": 7
+              },
+              "name": "full_name",
+              "number": 2,
+              "type": "string"
+            },
+            "3": {
+              "label": "",
+              "location": {
+                "column_end": 19,
+                "column_start": 11,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 8,
+                "line_start": 8
+              },
+              "name": "contact",
+              "number": 3,
+              "type": "string"
+            },
+            "4": {
+              "label": "",
+              "location": {
+                "column_end": 14,
+                "column_start": 10,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 9,
+                "line_start": 9
+              },
+              "name": "age",
+              "number": 4,
+              "type": "int32"
+            },
+            "5": {
+              "label": "",
+              "location": {
+                "column_end": 18,
+                "column_start": 11,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 10,
+                "line_start": 10
+              },
+              "name": "mobile",
+              "number": 5,
+              "type": "string"
+            },
+            "6": {
+              "label": "",
+              "location": {
+                "column_end": 19,
+                "column_start": 11,
+                "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+                "line_end": 11,
+                "line_start": 11
+              },
+              "name": "address",
+              "number": 6,
+              "type": "string"
+            }
+          },
+          "full_name": "example.user.User",
+          "location": {
+            "column_end": 0,
+            "column_start": 0,
+            "file_path": "/Users/lzy/pro/solo/workspaces/zy70769/examples/bad/user.proto",
+            "line_end": 12,
+            "line_start": 5
+          },
+          "name": "User",
+          "nested_messages": {}
+        }
+      },
+      "package": "example.user"
+    }
+  },
+  "version": "1.0"
+}

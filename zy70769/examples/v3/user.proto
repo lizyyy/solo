@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package example.user;
+
+message User {
+    int64 id = 1;
+    string username = 2;
+    string email = 3;
+    int32 age = 4;
+    string phone_number = 5;
+    string address = 6;
+}
+
+message CreateUserRequest {
+    string name = 1;
+    string email = 2;
+    int32 age = 3;
+}
+
+message CreateUserResponse {
+    User user = 1;
+}
