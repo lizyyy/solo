@@ -1,0 +1,375 @@
+{
+  "data": [
+    {
+      "_source": {
+        "file": "examples/missing-columns.csv",
+        "line": 2
+      },
+      "订单号": "LP20240520001",
+      "客户姓名": "测试用户",
+      "文件名": "测试_001.jpg",
+      "拍摄日期": "2024-05-20",
+      "_validation": {
+        "isValid": false,
+        "missingFields": [
+          "拍摄地点"
+        ],
+        "isEmpty": false,
+        "status": "处理失败"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "测试_001.jpg-未知",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/missing-columns.csv",
+        "line": 3
+      },
+      "订单号": "LP20240520002",
+      "客户姓名": "测试用户2",
+      "文件名": "测试_002.jpg",
+      "拍摄日期": "2024-05-21",
+      "_validation": {
+        "isValid": false,
+        "missingFields": [
+          "拍摄地点"
+        ],
+        "isEmpty": false,
+        "status": "处理失败"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "测试_002.jpg-未知",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/duplicates.csv",
+        "line": 2
+      },
+      "订单号": "LP20240501001",
+      "客户姓名": "张三",
+      "拍摄地点": "三亚",
+      "文件名": "三亚_海边_001.jpg",
+      "拍摄日期": "2024-05-01",
+      "是否补拍": "否",
+      "摄影师": "李师傅",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "三亚_海边_001.jpg-三亚",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/duplicates.csv",
+        "line": 5
+      },
+      "订单号": "LP20240501002",
+      "客户姓名": "李四",
+      "拍摄地点": "丽江",
+      "文件名": "丽江_古城_001.jpg",
+      "拍摄日期": "2024-05-02",
+      "是否补拍": "否",
+      "摄影师": "王师傅",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "丽江_古城_001.jpg-丽江",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/sanya-2024-05.csv",
+        "line": 2
+      },
+      "订单号": "LP20240501001",
+      "客户姓名": "张三",
+      "拍摄地点": "三亚",
+      "文件名": "三亚_海边_001.jpg",
+      "拍摄日期": "2024-05-01",
+      "是否补拍": "否",
+      "摄影师": "李师傅",
+      "备注": "主纱造型",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "三亚_海边_001.jpg-三亚",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/sanya-2024-05.csv",
+        "line": 3
+      },
+      "订单号": "LP20240501001",
+      "客户姓名": "张三",
+      "拍摄地点": "三亚",
+      "文件名": "三亚_海边_002.jpg",
+      "拍摄日期": "2024-05-01",
+      "是否补拍": "否",
+      "摄影师": "李师傅",
+      "备注": "主纱造型",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "三亚_海边_002.jpg-三亚",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/sanya-2024-05.csv",
+        "line": 4
+      },
+      "订单号": "LP20240501001",
+      "客户姓名": "张三",
+      "拍摄地点": "三亚",
+      "文件名": "三亚_教堂_001.jpg",
+      "拍摄日期": "2024-05-01",
+      "是否补拍": "否",
+      "摄影师": "李师傅",
+      "备注": "仪式感造型",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "三亚_教堂_001.jpg-三亚",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/sanya-2024-05.csv",
+        "line": 5
+      },
+      "订单号": "LP20240501002",
+      "客户姓名": "李四",
+      "拍摄地点": "三亚",
+      "文件名": "三亚_椰林_001.jpg",
+      "拍摄日期": "2024-05-02",
+      "是否补拍": "否",
+      "摄影师": "王师傅",
+      "备注": "清新风格",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "三亚_椰林_001.jpg-三亚",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/sanya-2024-05.csv",
+        "line": 7
+      },
+      "订单号": "LP20240501003",
+      "客户姓名": "王五",
+      "拍摄地点": "三亚",
+      "文件名": "三亚_日落_001.jpg",
+      "拍摄日期": "2024-05-03",
+      "是否补拍": "是",
+      "摄影师": "李师傅",
+      "备注": "补拍：光线更好",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": true,
+        "reshootNumber": 1,
+        "totalReshoots": 1,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "三亚_日落_001.jpg-三亚",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/sanya-2024-05.csv",
+        "line": 8
+      },
+      "订单号": "LP20240501003",
+      "客户姓名": "王五",
+      "拍摄地点": "三亚",
+      "文件名": "三亚_夜景_001.jpg",
+      "拍摄日期": "2024-05-03",
+      "是否补拍": "否",
+      "摄影师": "李师傅",
+      "备注": "夜景初拍",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 1,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "三亚_夜景_001.jpg-三亚",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/sanya-2024-05.csv",
+        "line": 9
+      },
+      "订单号": "LP20240501004",
+      "客户姓名": "赵六",
+      "拍摄地点": "三亚",
+      "文件名": "三亚_沙滩_001.jpg",
+      "拍摄日期": "2024-05-04",
+      "是否补拍": "否",
+      "摄影师": "张师傅",
+      "备注": "",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "三亚_沙滩_001.jpg-三亚",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    },
+    {
+      "_source": {
+        "file": "examples/sanya-2024-05.csv",
+        "line": 10
+      },
+      "订单号": "LP20240501005",
+      "客户姓名": "钱七",
+      "拍摄地点": "三亚",
+      "文件名": "三亚_泳池_001.jpg",
+      "拍摄日期": "2024-05-05",
+      "是否补拍": "否",
+      "摄影师": "刘师傅",
+      "备注": "客户很满意",
+      "_validation": {
+        "isValid": true,
+        "missingFields": [],
+        "isEmpty": false,
+        "status": "待处理"
+      },
+      "_reshootInfo": {
+        "isReshoot": false,
+        "reshootNumber": 0,
+        "totalReshoots": 0,
+        "hasMultipleReshoots": false
+      },
+      "_uniqueId": "三亚_泳池_001.jpg-三亚",
+      "_duplicateResolved": false,
+      "_sameFileNameDifferentLocations": false,
+      "_isDuplicate": false
+    }
+  ],
+  "errors": [
+    {
+      "file": "examples/empty.csv",
+      "error": "文件为空",
+      "skipped": true
+    }
+  ],
+  "stats": {
+    "totalFiles": 4,
+    "processedFiles": 3,
+    "failedFiles": 1,
+    "totalRecords": 16,
+    "validRecords": 10,
+    "duplicateRecords": 4,
+    "reshootRecords": 1
+  },
+  "generatedAt": "2026-05-18T21:36:42.260Z"
+}

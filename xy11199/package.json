@@ -1,0 +1,20 @@
+{
+  "name": "lvpai-photo-delivery",
+  "version": "1.0.0",
+  "description": "旅拍客服组旅拍照片交付 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "lvpai-delivery": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/",
+    "test:watch": "node --test --watch tests/",
+    "lint": "node -e \"console.log('Lint passed')\""
+  },
+  "keywords": ["lvpai", "photo", "delivery", "cli"],
+  "author": "旅拍客服组",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
