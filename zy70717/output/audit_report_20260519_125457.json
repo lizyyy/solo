@@ -1,8 +1,10 @@
 {
   "duplicates": [
     {
+      "duplicate_source": "examples/audit_data.json:1",
       "idempotency_key": "freeze_user_access_log_2024-01-01T00:00:00_2024-01-31T23:59:59_zhang_san_complaint",
       "primary_id": "F001",
+      "primary_source": "examples/audit_data.csv:2",
       "record_id": "F001",
       "source_info": {
         "file_path": "examples/audit_data.json",
@@ -11,8 +13,10 @@
       }
     },
     {
+      "duplicate_source": "examples/audit_data.json:2",
       "idempotency_key": "freeze_user_access_log_2024-01-15T00:00:00_2024-02-15T23:59:59_li_si_audit",
       "primary_id": "F002",
+      "primary_source": "examples/audit_data.csv:3",
       "record_id": "F002",
       "source_info": {
         "file_path": "examples/audit_data.json",
@@ -21,8 +25,10 @@
       }
     },
     {
+      "duplicate_source": "examples/audit_data.json:3",
       "idempotency_key": "release_user_access_log_2024-01-01T00:00:00_2024-01-31T23:59:59_zhang_san_complaint",
       "primary_id": "R001",
+      "primary_source": "examples/audit_data.json:3",
       "record_id": "R001",
       "source_info": {
         "file_path": "examples/audit_data.json",
@@ -31,7 +37,7 @@
       }
     }
   ],
-  "generated_at": "2026-05-19T07:10:06.597297",
+  "generated_at": "2026-05-19T12:54:57.178389",
   "merged_ranges": {
     "payment_log": [
       {
@@ -44,9 +50,30 @@
         ],
         "start_time": "2024-02-01T00:00:00"
       }
+    ],
+    "user_access_log": [
+      {
+        "end_time": "2024-02-15T23:59:59",
+        "reasons": [
+          "audit",
+          "complaint"
+        ],
+        "record_ids": [
+          "F001",
+          "F002"
+        ],
+        "start_time": "2024-01-01T00:00:00"
+      }
     ]
   },
-  "overlaps": [],
+  "overlaps": [
+    {
+      "overlap_end": "2024-01-31T23:59:59",
+      "overlap_start": "2024-01-15T00:00:00",
+      "record1_id": "F001",
+      "record2_id": "F002"
+    }
+  ],
   "parse_errors": [
     {
       "error_type": "ParseError",
@@ -76,18 +103,18 @@
   ],
   "summary": {
     "total_duplicates": 3,
-    "total_merged_ranges": 1,
-    "total_overlaps": 0,
+    "total_merged_ranges": 2,
+    "total_overlaps": 1,
     "total_parse_errors": 1,
     "total_pending_releases": 1,
-    "total_valid_records": 2
+    "total_valid_records": 5
   },
   "valid_records": [
     {
       "applicant": "wang_wu",
       "approval_time": null,
       "approver": null,
-      "created_at": "2026-05-19T07:10:06.596772",
+      "created_at": "2026-05-19T12:54:57.176347",
       "end_time": "2024-02-28T23:59:59",
       "freeze_reason": "legal",
       "id": "F003",
@@ -103,10 +130,67 @@
       "start_time": "2024-02-01T00:00:00"
     },
     {
+      "applicant": "zhang_san",
+      "approval_time": null,
+      "approver": null,
+      "created_at": "2026-05-19T12:54:57.176294",
+      "end_time": "2024-01-31T23:59:59",
+      "freeze_reason": "complaint",
+      "id": "F001",
+      "log_topic": "user_access_log",
+      "operation_type": "freeze",
+      "release_condition": null,
+      "release_status": null,
+      "source_info": {
+        "file_path": "examples/audit_data.csv",
+        "line_number": 2,
+        "raw_content": "id=F001,operation_type=freeze,log_topic=user_access_log,start_time=2024-01-01 00:00:00,end_time=2024-01-31 23:59:59,freeze_reason=complaint,applicant=zhang_san,release_condition=,release_status=,approval_time=,approver=None"
+      },
+      "start_time": "2024-01-01T00:00:00"
+    },
+    {
+      "applicant": "zhang_san",
+      "approval_time": "2024-02-20T10:00:00",
+      "approver": "zhao_liu",
+      "created_at": "2026-05-19T12:54:57.176372",
+      "end_time": "2024-01-31T23:59:59",
+      "freeze_reason": "complaint",
+      "id": "R001",
+      "log_topic": "user_access_log",
+      "operation_type": "release",
+      "release_condition": "投诉已处理",
+      "release_status": "approved",
+      "source_info": {
+        "file_path": "examples/audit_data.csv",
+        "line_number": 5,
+        "raw_content": "id=R001,operation_type=release,log_topic=user_access_log,start_time=2024-01-01 00:00:00,end_time=2024-01-31 23:59:59,freeze_reason=complaint,applicant=zhang_san,release_condition=投诉已处理,release_status=approved,approval_time=2024-02-20 10:00:00,approver=zhao_liu"
+      },
+      "start_time": "2024-01-01T00:00:00"
+    },
+    {
       "applicant": "li_si",
       "approval_time": null,
       "approver": null,
-      "created_at": "2026-05-19T07:10:06.596810",
+      "created_at": "2026-05-19T12:54:57.176326",
+      "end_time": "2024-02-15T23:59:59",
+      "freeze_reason": "audit",
+      "id": "F002",
+      "log_topic": "user_access_log",
+      "operation_type": "freeze",
+      "release_condition": null,
+      "release_status": null,
+      "source_info": {
+        "file_path": "examples/audit_data.csv",
+        "line_number": 3,
+        "raw_content": "id=F002,operation_type=freeze,log_topic=user_access_log,start_time=2024-01-15 00:00:00,end_time=2024-02-15 23:59:59,freeze_reason=audit,applicant=li_si,release_condition=,release_status=,approval_time=,approver=None"
+      },
+      "start_time": "2024-01-15T00:00:00"
+    },
+    {
+      "applicant": "li_si",
+      "approval_time": null,
+      "approver": null,
+      "created_at": "2026-05-19T12:54:57.176392",
       "end_time": "2024-02-15T23:59:59",
       "freeze_reason": "audit",
       "id": "R002",

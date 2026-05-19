@@ -45,7 +45,15 @@ class ReportGenerator:
         )
 
         sorted_overlaps = sorted(
-            [o.dict() for o in result.overlaps],
+            [
+                {
+                    "record1_id": o.record1_id,
+                    "record2_id": o.record2_id,
+                    "overlap_start": o.overlap_start.isoformat(),
+                    "overlap_end": o.overlap_end.isoformat(),
+                }
+                for o in result.overlaps
+            ],
             key=lambda x: (x["record1_id"], x["record2_id"]),
         )
 
@@ -235,10 +243,11 @@ class ReportGenerator:
         lines.append("-" * 40)
         if result.duplicates:
             for i, dup in enumerate(result.duplicates, 1):
-                lines.append(f"{i}. 记录ID: {dup['record_id']}")
-                lines.append(f"   主记录ID: {dup['primary_id']}")
-                if dup.get("source_info"):
-                    lines.append(f"   来源: {dup['source_info']['file_path']}:{dup['source_info'].get('line_number', 'N/A')}")
+                lines.append(f"{i}. 重复记录ID: {dup['record_id']}")
+                if dup.get("primary_source"):
+                    lines.append(f"   主记录来源: {dup['primary_source']}")
+                if dup.get("duplicate_source"):
+                    lines.append(f"   重复记录来源: {dup['duplicate_source']}")
                 lines.append("")
         else:
             lines.append("无重复申请")

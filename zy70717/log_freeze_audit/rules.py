@@ -19,48 +19,72 @@ class RuleEngine:
     def process_records(self, records: List[AuditRecord]) -> AuditResult:
         self.result = AuditResult()
 
-        sorted_records = sorted(
-            records,
-            key=lambda r: (r.log_topic, r.start_time, r.end_time, r.id)
-        )
+        def get_sort_key(record: AuditRecord):
+            file_path = record.source_info.file_path if record.source_info else ""
+            line_number = record.source_info.line_number if record.source_info else 0
+            return (file_path, line_number or 0, record.log_topic, record.start_time, record.end_time, record.id)
 
-        self._check_idempotency(sorted_records)
+        sorted_records = sorted(records, key=get_sort_key)
 
-        valid_records = [
-            r for r in sorted_records
-            if r.id not in {d["record_id"] for d in self.result.duplicates}
-        ]
+        valid_records = self._check_idempotency(sorted_records)
 
         self._check_time_range_overlaps(valid_records)
         self._merge_time_ranges(valid_records)
         self._check_release_approvals(valid_records)
 
         for record in valid_records:
-            if record.id not in self.result.valid_records:
-                self.result.valid_records[record.id] = record
+            unique_key = f"{record.id}_{id(record)}"
+            if unique_key not in self.result.valid_records:
+                self.result.valid_records[unique_key] = record
 
         return self.result
 
-    def _check_idempotency(self, records: List[AuditRecord]) -> None:
+    def _check_idempotency(self, records: List[AuditRecord]) -> List[AuditRecord]:
         idempotency_map: Dict[str, List[AuditRecord]] = defaultdict(list)
 
         for record in records:
             key = record.get_idempotency_key()
             idempotency_map[key].append(record)
 
-        for key, record_list in idempotency_map.items():
-            if len(record_list) > 1:
-                sorted_duplicates = sorted(record_list, key=lambda r: r.id)
+        valid_records = []
+        seen_keys = set()
+
+        for record in records:
+            key = record.get_idempotency_key()
+            if key not in seen_keys:
+                seen_keys.add(key)
+                valid_records.append(record)
+            else:
+                record_list = idempotency_map[key]
+                sorted_duplicates = sorted(record_list, key=lambda r: (r.id, id(r)))
                 primary = sorted_duplicates[0]
-                for duplicate in sorted_duplicates[1:]:
-                    self.result.duplicates.append(
-                        {
-                            "record_id": duplicate.id,
-                            "primary_id": primary.id,
-                            "idempotency_key": key,
-                            "source_info": duplicate.source_info.dict() if duplicate.source_info else None,
-                        }
+                
+                primary_source = ""
+                if primary.source_info:
+                    primary_source = (
+                        f"{primary.source_info.file_path}:"
+                        f"{primary.source_info.line_number or 'N/A'}"
                     )
+                
+                duplicate_source = ""
+                if record.source_info:
+                    duplicate_source = (
+                        f"{record.source_info.file_path}:"
+                        f"{record.source_info.line_number or 'N/A'}"
+                    )
+                
+                self.result.duplicates.append(
+                    {
+                        "record_id": record.id,
+                        "primary_id": primary.id,
+                        "idempotency_key": key,
+                        "primary_source": primary_source,
+                        "duplicate_source": duplicate_source,
+                        "source_info": record.source_info.dict() if record.source_info else None,
+                    }
+                )
+
+        return valid_records
 
     def _check_time_range_overlaps(self, records: List[AuditRecord]) -> None:
         freeze_records = [r for r in records if r.operation_type == OperationType.FREEZE]
