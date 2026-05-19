@@ -1,0 +1,1179 @@
+{
+  "externalIdentities": [
+    {
+      "id": "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+      "externalId": "APP_001",
+      "source": "app",
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "phone": "13800138001",
+      "createdAt": "2026-05-19T20:06:32.313Z",
+      "updatedAt": "2026-05-19T20:06:32.313Z"
+    },
+    {
+      "id": "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+      "externalId": "WEB_001",
+      "source": "web",
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "phone": "13800138001",
+      "createdAt": "2026-05-19T20:06:32.313Z",
+      "updatedAt": "2026-05-19T20:06:32.313Z"
+    },
+    {
+      "id": "4e44e98e-7214-440f-9d60-31890191e76c",
+      "externalId": "CS_001",
+      "source": "cs",
+      "name": "张先生",
+      "email": "zhangsan@example.com",
+      "phone": "13800138001",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+      "externalId": "APP_002",
+      "source": "app",
+      "name": "李四",
+      "email": "lisi@example.com",
+      "phone": "13800138002",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "03bbf1d0-f629-4570-98c6-243bbbb2b76a",
+      "externalId": "WEB_002",
+      "source": "web",
+      "name": "李四",
+      "email": "lisi@example.com",
+      "phone": "13800138002",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+      "externalId": "APP_003",
+      "source": "app",
+      "name": "王五",
+      "email": "wangwu@example.com",
+      "phone": "13800138003",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "e9c6cbf2-0321-4d71-8416-cb59b5c2e673",
+      "externalId": "CS_002",
+      "source": "cs",
+      "name": "王经理",
+      "email": "wangwu@company.com",
+      "phone": "13800138003",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "87bc7b92-a71e-4dbf-b1da-aea2d2d8f117",
+      "externalId": "WEB_003",
+      "source": "web",
+      "name": "赵六",
+      "email": "zhaoliu@example.com",
+      "phone": "13800138004",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "a835f5aa-43f4-43e7-b3e3-fcfec9292055",
+      "externalId": "APP_004",
+      "source": "app",
+      "name": "钱七",
+      "email": "qianqi@example.com",
+      "phone": "13800138005",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "a8e78e32-98a0-4bc3-8139-5212c1276a5e",
+      "externalId": "CS_003",
+      "source": "cs",
+      "name": "孙八",
+      "email": "sunba@example.com",
+      "phone": "13800138006",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "a71058c4-201e-49b4-ab51-63d8f5bf77c0",
+      "externalId": "WEB_004",
+      "source": "web",
+      "name": "周九",
+      "email": "zhoujiu@example.com",
+      "phone": "13800138007",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "e5694783-f494-4ff1-ba84-85e477b10cd8",
+      "externalId": "APP_005",
+      "source": "app",
+      "name": "吴十",
+      "email": "wushi@example.com",
+      "phone": "13800138008",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.314Z"
+    }
+  ],
+  "masterCustomers": [],
+  "mergeEvidences": [
+    {
+      "id": "28cc2837-6ae1-467b-a16d-71c635452eb1",
+      "type": "email_exact",
+      "value": "zhangsan@example.com",
+      "weight": 40,
+      "identityIds": [
+        "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+        "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce"
+      ],
+      "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "36cedf3f-ab25-4a5b-8598-6ac63f2182cc",
+      "type": "phone_exact",
+      "value": "13800138001",
+      "weight": 35,
+      "identityIds": [
+        "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+        "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce"
+      ],
+      "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "d1e248a2-ddd6-44b4-b9b3-1916fb4fa4a7",
+      "type": "name_high",
+      "value": "张三",
+      "weight": 25,
+      "identityIds": [
+        "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+        "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce"
+      ],
+      "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "a69afd7e-305f-4265-89b0-c72b116854ba",
+      "type": "email_exact",
+      "value": "zhangsan@example.com",
+      "weight": 40,
+      "identityIds": [
+        "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+        "4e44e98e-7214-440f-9d60-31890191e76c"
+      ],
+      "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "83bfa07f-5425-4b08-acc3-863a6a99cf40",
+      "type": "phone_exact",
+      "value": "13800138001",
+      "weight": 35,
+      "identityIds": [
+        "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+        "4e44e98e-7214-440f-9d60-31890191e76c"
+      ],
+      "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "8f6ee64c-6e06-474c-a799-fa1a185dc812",
+      "type": "email_exact",
+      "value": "zhangsan@example.com",
+      "weight": 40,
+      "identityIds": [
+        "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+        "4e44e98e-7214-440f-9d60-31890191e76c"
+      ],
+      "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "0537b462-58e8-400b-a5fc-71cba3bb59de",
+      "type": "phone_exact",
+      "value": "13800138001",
+      "weight": 35,
+      "identityIds": [
+        "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+        "4e44e98e-7214-440f-9d60-31890191e76c"
+      ],
+      "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.314Z"
+    },
+    {
+      "id": "c1d1fd3c-cb12-4364-9bbe-6b9f34de3670",
+      "type": "email_exact",
+      "value": "lisi@example.com",
+      "weight": 40,
+      "identityIds": [
+        "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+        "03bbf1d0-f629-4570-98c6-243bbbb2b76a"
+      ],
+      "transactionId": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "d9dbf1e0-128b-4e1a-8378-1748ab7956b9",
+      "type": "phone_exact",
+      "value": "13800138002",
+      "weight": 35,
+      "identityIds": [
+        "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+        "03bbf1d0-f629-4570-98c6-243bbbb2b76a"
+      ],
+      "transactionId": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "fdfdb76f-d292-4c51-b385-81bf4562f6e2",
+      "type": "name_high",
+      "value": "李四",
+      "weight": 25,
+      "identityIds": [
+        "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+        "03bbf1d0-f629-4570-98c6-243bbbb2b76a"
+      ],
+      "transactionId": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "423b4a9b-3d5b-4f38-806b-1b7f7fc1f90d",
+      "type": "phone_exact",
+      "value": "13800138003",
+      "weight": 35,
+      "identityIds": [
+        "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+        "e9c6cbf2-0321-4d71-8416-cb59b5c2e673"
+      ],
+      "transactionId": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+      "score": 0,
+      "createdAt": "2026-05-19T20:06:32.315Z"
+    }
+  ],
+  "conflictFields": [
+    {
+      "id": "b0602c92-ee17-4750-a730-eb8b579dd060",
+      "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "fieldName": "name",
+      "values": [
+        "张三",
+        "张先生"
+      ],
+      "sourceIdentities": [
+        {
+          "identityId": "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+          "value": "张三",
+          "source": "app"
+        },
+        {
+          "identityId": "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+          "value": "张三",
+          "source": "web"
+        },
+        {
+          "identityId": "4e44e98e-7214-440f-9d60-31890191e76c",
+          "value": "张先生",
+          "source": "cs"
+        }
+      ],
+      "resolved": false,
+      "createdAt": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "08890651-4165-4867-b567-fb5154fe18ce",
+      "transactionId": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+      "fieldName": "name",
+      "values": [
+        "王五",
+        "王经理"
+      ],
+      "sourceIdentities": [
+        {
+          "identityId": "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+          "value": "王五",
+          "source": "app"
+        },
+        {
+          "identityId": "e9c6cbf2-0321-4d71-8416-cb59b5c2e673",
+          "value": "王经理",
+          "source": "cs"
+        }
+      ],
+      "resolved": false,
+      "createdAt": "2026-05-19T20:06:32.316Z"
+    },
+    {
+      "id": "48a6f87f-13ef-4fdd-95d6-3f9840eafa9a",
+      "transactionId": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+      "fieldName": "email",
+      "values": [
+        "wangwu@example.com",
+        "wangwu@company.com"
+      ],
+      "sourceIdentities": [
+        {
+          "identityId": "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+          "value": "wangwu@example.com",
+          "source": "app"
+        },
+        {
+          "identityId": "e9c6cbf2-0321-4d71-8416-cb59b5c2e673",
+          "value": "wangwu@company.com",
+          "source": "cs"
+        }
+      ],
+      "resolved": false,
+      "createdAt": "2026-05-19T20:06:32.316Z"
+    }
+  ],
+  "undoRecords": [],
+  "impactScopes": [],
+  "auditLogs": [
+    {
+      "id": "b5c5c4cf-0f2d-4edd-98ec-a7319b188700",
+      "action": "initiate_merge",
+      "entityId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "entityType": "merge_transaction",
+      "operator": "system",
+      "details": {
+        "identityIds": [
+          "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+          "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+          "4e44e98e-7214-440f-9d60-31890191e76c"
+        ],
+        "reason": "三个渠道同一客户自动匹配合并",
+        "matchScore": 83.33333333333333
+      },
+      "timestamp": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "5349a4c2-d0f3-4df8-9bc9-a998188431f3",
+      "action": "approve_merge",
+      "entityId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "entityType": "merge_transaction",
+      "operator": "admin",
+      "details": {
+        "previousStatus": "pending"
+      },
+      "timestamp": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "ed8c9a55-9e5d-4163-aad0-69c1cfe91ced",
+      "action": "initiate_merge",
+      "entityId": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+      "entityType": "merge_transaction",
+      "operator": "system",
+      "details": {
+        "identityIds": [
+          "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+          "03bbf1d0-f629-4570-98c6-243bbbb2b76a"
+        ],
+        "reason": "App和官网同一客户",
+        "matchScore": 100
+      },
+      "timestamp": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "e7dfa288-5662-4ecd-aced-d3b4d9c578e9",
+      "action": "approve_merge",
+      "entityId": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+      "entityType": "merge_transaction",
+      "operator": "admin",
+      "details": {
+        "previousStatus": "pending"
+      },
+      "timestamp": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "d494a8c4-30cb-446d-8b47-5c22ffa44854",
+      "action": "initiate_merge",
+      "entityId": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+      "entityType": "merge_transaction",
+      "operator": "system",
+      "details": {
+        "identityIds": [
+          "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+          "e9c6cbf2-0321-4d71-8416-cb59b5c2e673"
+        ],
+        "reason": "疑似同一客户待确认",
+        "matchScore": 35
+      },
+      "timestamp": "2026-05-19T20:06:32.316Z"
+    }
+  ],
+  "mergeTransactions": [
+    {
+      "id": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+      "identityIds": [
+        "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+        "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+        "4e44e98e-7214-440f-9d60-31890191e76c"
+      ],
+      "reason": "三个渠道同一客户自动匹配合并",
+      "operator": "system",
+      "matchScore": 83.33333333333333,
+      "status": "approved",
+      "createdAt": "2026-05-19T20:06:32.314Z",
+      "updatedAt": "2026-05-19T20:06:32.315Z",
+      "approvedBy": "admin",
+      "approvedAt": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+      "identityIds": [
+        "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+        "03bbf1d0-f629-4570-98c6-243bbbb2b76a"
+      ],
+      "reason": "App和官网同一客户",
+      "operator": "system",
+      "matchScore": 100,
+      "status": "approved",
+      "createdAt": "2026-05-19T20:06:32.315Z",
+      "updatedAt": "2026-05-19T20:06:32.315Z",
+      "approvedBy": "admin",
+      "approvedAt": "2026-05-19T20:06:32.315Z"
+    },
+    {
+      "id": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+      "identityIds": [
+        "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+        "e9c6cbf2-0321-4d71-8416-cb59b5c2e673"
+      ],
+      "reason": "疑似同一客户待确认",
+      "operator": "system",
+      "matchScore": 35,
+      "status": "pending",
+      "createdAt": "2026-05-19T20:06:32.315Z",
+      "updatedAt": "2026-05-19T20:06:32.315Z"
+    }
+  ],
+  "fullRequestLogs": [
+    {
+      "id": "c25d35c8-9b0b-432e-b148-42123ba5dae3",
+      "requestId": "REQ_1779221200171_1",
+      "action": "GET_statistics",
+      "entityId": null,
+      "entityType": "api_request",
+      "operator": "system",
+      "request": {
+        "requestId": "REQ_1779221200171_1",
+        "method": "GET",
+        "path": "/api/audit/statistics",
+        "url": "/api/audit/statistics",
+        "ip": "::1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36",
+        "operator": "system",
+        "queryParams": {},
+        "body": {},
+        "params": {},
+        "timestamp": "2026-05-19T20:06:40.171Z"
+      },
+      "response": {
+        "statusCode": 200,
+        "success": true,
+        "error": null,
+        "dataSummary": {
+          "type": "object",
+          "keys": [
+            "totalIdentities",
+            "mergedIdentities",
+            "unmergedIdentities",
+            "totalMasterCustomers",
+            "totalTransactions",
+            "transactionsByStatus",
+            "identitiesBySource",
+            "requestStats"
+          ],
+          "totalKeys": 8
+        },
+        "duration": 3
+      },
+      "timestamp": "2026-05-19T20:06:40.174Z",
+      "isError": false
+    },
+    {
+      "id": "d496cce3-32b4-477d-b3b4-c6c21cd1ab09",
+      "requestId": "REQ_1779221200177_2",
+      "action": "GET_@vite_client",
+      "entityId": null,
+      "entityType": "api_request",
+      "operator": "system",
+      "request": {
+        "requestId": "REQ_1779221200177_2",
+        "method": "GET",
+        "path": "/@vite/client",
+        "url": "/@vite/client",
+        "ip": "::1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36",
+        "operator": "system",
+        "queryParams": {},
+        "body": {},
+        "params": {},
+        "timestamp": "2026-05-19T20:06:40.177Z"
+      },
+      "response": {
+        "statusCode": 200,
+        "success": false,
+        "error": null,
+        "dataSummary": null,
+        "duration": 1
+      },
+      "timestamp": "2026-05-19T20:06:40.178Z",
+      "isError": false
+    },
+    {
+      "id": "50868b62-fa1a-4017-a145-676295f209bb",
+      "requestId": "REQ_1779221200178_3",
+      "action": "GET_",
+      "entityId": null,
+      "entityType": "api_request",
+      "operator": "system",
+      "request": {
+        "requestId": "REQ_1779221200178_3",
+        "method": "GET",
+        "path": "/api/identities",
+        "url": "/api/identities?",
+        "ip": "::1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36",
+        "operator": "system",
+        "queryParams": {},
+        "body": {},
+        "params": {},
+        "timestamp": "2026-05-19T20:06:40.178Z"
+      },
+      "response": {
+        "statusCode": 200,
+        "success": true,
+        "error": null,
+        "dataSummary": {
+          "type": "array",
+          "length": 12,
+          "sample": [
+            {
+              "id": "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+              "externalId": "APP_001",
+              "source": "app",
+              "name": "张三",
+              "email": "zhangsan@example.com",
+              "phone": "13800138001",
+              "createdAt": "2026-05-19T20:06:32.313Z",
+              "updatedAt": "2026-05-19T20:06:32.313Z"
+            },
+            {
+              "id": "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+              "externalId": "WEB_001",
+              "source": "web",
+              "name": "张三",
+              "email": "zhangsan@example.com",
+              "phone": "13800138001",
+              "createdAt": "2026-05-19T20:06:32.313Z",
+              "updatedAt": "2026-05-19T20:06:32.313Z"
+            },
+            {
+              "id": "4e44e98e-7214-440f-9d60-31890191e76c",
+              "externalId": "CS_001",
+              "source": "cs",
+              "name": "张先生",
+              "email": "zhangsan@example.com",
+              "phone": "13800138001",
+              "createdAt": "2026-05-19T20:06:32.314Z",
+              "updatedAt": "2026-05-19T20:06:32.314Z"
+            }
+          ]
+        },
+        "duration": 1
+      },
+      "timestamp": "2026-05-19T20:06:40.179Z",
+      "isError": false
+    },
+    {
+      "id": "fe4c61d9-0d09-4557-9703-002a21b07037",
+      "requestId": "REQ_1779221200188_4",
+      "action": "GET_",
+      "entityId": null,
+      "entityType": "api_request",
+      "operator": "system",
+      "request": {
+        "requestId": "REQ_1779221200188_4",
+        "method": "GET",
+        "path": "/api/merges",
+        "url": "/api/merges?",
+        "ip": "::1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36",
+        "operator": "system",
+        "queryParams": {},
+        "body": {},
+        "params": {},
+        "timestamp": "2026-05-19T20:06:40.188Z"
+      },
+      "response": {
+        "statusCode": 200,
+        "success": true,
+        "error": null,
+        "dataSummary": {
+          "type": "array",
+          "length": 3,
+          "sample": [
+            {
+              "id": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+              "identityIds": [
+                "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+                "03bbf1d0-f629-4570-98c6-243bbbb2b76a"
+              ],
+              "reason": "App和官网同一客户",
+              "operator": "system",
+              "matchScore": 100,
+              "status": "approved",
+              "createdAt": "2026-05-19T20:06:32.315Z",
+              "updatedAt": "2026-05-19T20:06:32.315Z",
+              "approvedBy": "admin",
+              "approvedAt": "2026-05-19T20:06:32.315Z",
+              "identities": [
+                {
+                  "id": "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+                  "externalId": "APP_002",
+                  "source": "app",
+                  "name": "李四",
+                  "email": "lisi@example.com",
+                  "phone": "13800138002",
+                  "createdAt": "2026-05-19T20:06:32.314Z",
+                  "updatedAt": "2026-05-19T20:06:32.314Z"
+                },
+                {
+                  "id": "03bbf1d0-f629-4570-98c6-243bbbb2b76a",
+                  "externalId": "WEB_002",
+                  "source": "web",
+                  "name": "李四",
+                  "email": "lisi@example.com",
+                  "phone": "13800138002",
+                  "createdAt": "2026-05-19T20:06:32.314Z",
+                  "updatedAt": "2026-05-19T20:06:32.314Z"
+                }
+              ],
+              "evidences": [
+                {
+                  "id": "c1d1fd3c-cb12-4364-9bbe-6b9f34de3670",
+                  "type": "email_exact",
+                  "value": "lisi@example.com",
+                  "weight": 40,
+                  "identityIds": [
+                    "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+                    "03bbf1d0-f629-4570-98c6-243bbbb2b76a"
+                  ],
+                  "transactionId": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.315Z"
+                },
+                {
+                  "id": "d9dbf1e0-128b-4e1a-8378-1748ab7956b9",
+                  "type": "phone_exact",
+                  "value": "13800138002",
+                  "weight": 35,
+                  "identityIds": [
+                    "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+                    "03bbf1d0-f629-4570-98c6-243bbbb2b76a"
+                  ],
+                  "transactionId": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.315Z"
+                },
+                {
+                  "id": "fdfdb76f-d292-4c51-b385-81bf4562f6e2",
+                  "type": "name_high",
+                  "value": "李四",
+                  "weight": 25,
+                  "identityIds": [
+                    "4b46b6ee-fb2c-460b-88b7-400a8dd6bd2a",
+                    "03bbf1d0-f629-4570-98c6-243bbbb2b76a"
+                  ],
+                  "transactionId": "b008a39d-84fb-4f88-ac31-66d16370e42a",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.315Z"
+                }
+              ],
+              "conflicts": []
+            },
+            {
+              "id": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+              "identityIds": [
+                "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+                "e9c6cbf2-0321-4d71-8416-cb59b5c2e673"
+              ],
+              "reason": "疑似同一客户待确认",
+              "operator": "system",
+              "matchScore": 35,
+              "status": "pending",
+              "createdAt": "2026-05-19T20:06:32.315Z",
+              "updatedAt": "2026-05-19T20:06:32.315Z",
+              "identities": [
+                {
+                  "id": "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+                  "externalId": "APP_003",
+                  "source": "app",
+                  "name": "王五",
+                  "email": "wangwu@example.com",
+                  "phone": "13800138003",
+                  "createdAt": "2026-05-19T20:06:32.314Z",
+                  "updatedAt": "2026-05-19T20:06:32.314Z"
+                },
+                {
+                  "id": "e9c6cbf2-0321-4d71-8416-cb59b5c2e673",
+                  "externalId": "CS_002",
+                  "source": "cs",
+                  "name": "王经理",
+                  "email": "wangwu@company.com",
+                  "phone": "13800138003",
+                  "createdAt": "2026-05-19T20:06:32.314Z",
+                  "updatedAt": "2026-05-19T20:06:32.314Z"
+                }
+              ],
+              "evidences": [
+                {
+                  "id": "423b4a9b-3d5b-4f38-806b-1b7f7fc1f90d",
+                  "type": "phone_exact",
+                  "value": "13800138003",
+                  "weight": 35,
+                  "identityIds": [
+                    "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+                    "e9c6cbf2-0321-4d71-8416-cb59b5c2e673"
+                  ],
+                  "transactionId": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.315Z"
+                }
+              ],
+              "conflicts": [
+                {
+                  "id": "08890651-4165-4867-b567-fb5154fe18ce",
+                  "transactionId": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+                  "fieldName": "name",
+                  "values": [
+                    "王五",
+                    "王经理"
+                  ],
+                  "sourceIdentities": [
+                    {
+                      "identityId": "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+                      "value": "王五",
+                      "source": "app"
+                    },
+                    {
+                      "identityId": "e9c6cbf2-0321-4d71-8416-cb59b5c2e673",
+                      "value": "王经理",
+                      "source": "cs"
+                    }
+                  ],
+                  "resolved": false,
+                  "createdAt": "2026-05-19T20:06:32.316Z"
+                },
+                {
+                  "id": "48a6f87f-13ef-4fdd-95d6-3f9840eafa9a",
+                  "transactionId": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+                  "fieldName": "email",
+                  "values": [
+                    "wangwu@example.com",
+                    "wangwu@company.com"
+                  ],
+                  "sourceIdentities": [
+                    {
+                      "identityId": "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+                      "value": "wangwu@example.com",
+                      "source": "app"
+                    },
+                    {
+                      "identityId": "e9c6cbf2-0321-4d71-8416-cb59b5c2e673",
+                      "value": "wangwu@company.com",
+                      "source": "cs"
+                    }
+                  ],
+                  "resolved": false,
+                  "createdAt": "2026-05-19T20:06:32.316Z"
+                }
+              ]
+            },
+            {
+              "id": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+              "identityIds": [
+                "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+                "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+                "4e44e98e-7214-440f-9d60-31890191e76c"
+              ],
+              "reason": "三个渠道同一客户自动匹配合并",
+              "operator": "system",
+              "matchScore": 83.33333333333333,
+              "status": "approved",
+              "createdAt": "2026-05-19T20:06:32.314Z",
+              "updatedAt": "2026-05-19T20:06:32.315Z",
+              "approvedBy": "admin",
+              "approvedAt": "2026-05-19T20:06:32.315Z",
+              "identities": [
+                {
+                  "id": "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+                  "externalId": "APP_001",
+                  "source": "app",
+                  "name": "张三",
+                  "email": "zhangsan@example.com",
+                  "phone": "13800138001",
+                  "createdAt": "2026-05-19T20:06:32.313Z",
+                  "updatedAt": "2026-05-19T20:06:32.313Z"
+                },
+                {
+                  "id": "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+                  "externalId": "WEB_001",
+                  "source": "web",
+                  "name": "张三",
+                  "email": "zhangsan@example.com",
+                  "phone": "13800138001",
+                  "createdAt": "2026-05-19T20:06:32.313Z",
+                  "updatedAt": "2026-05-19T20:06:32.313Z"
+                },
+                {
+                  "id": "4e44e98e-7214-440f-9d60-31890191e76c",
+                  "externalId": "CS_001",
+                  "source": "cs",
+                  "name": "张先生",
+                  "email": "zhangsan@example.com",
+                  "phone": "13800138001",
+                  "createdAt": "2026-05-19T20:06:32.314Z",
+                  "updatedAt": "2026-05-19T20:06:32.314Z"
+                }
+              ],
+              "evidences": [
+                {
+                  "id": "28cc2837-6ae1-467b-a16d-71c635452eb1",
+                  "type": "email_exact",
+                  "value": "zhangsan@example.com",
+                  "weight": 40,
+                  "identityIds": [
+                    "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+                    "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce"
+                  ],
+                  "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.314Z"
+                },
+                {
+                  "id": "36cedf3f-ab25-4a5b-8598-6ac63f2182cc",
+                  "type": "phone_exact",
+                  "value": "13800138001",
+                  "weight": 35,
+                  "identityIds": [
+                    "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+                    "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce"
+                  ],
+                  "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.314Z"
+                },
+                {
+                  "id": "d1e248a2-ddd6-44b4-b9b3-1916fb4fa4a7",
+                  "type": "name_high",
+                  "value": "张三",
+                  "weight": 25,
+                  "identityIds": [
+                    "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+                    "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce"
+                  ],
+                  "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.314Z"
+                },
+                {
+                  "id": "a69afd7e-305f-4265-89b0-c72b116854ba",
+                  "type": "email_exact",
+                  "value": "zhangsan@example.com",
+                  "weight": 40,
+                  "identityIds": [
+                    "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+                    "4e44e98e-7214-440f-9d60-31890191e76c"
+                  ],
+                  "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.314Z"
+                },
+                {
+                  "id": "83bfa07f-5425-4b08-acc3-863a6a99cf40",
+                  "type": "phone_exact",
+                  "value": "13800138001",
+                  "weight": 35,
+                  "identityIds": [
+                    "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+                    "4e44e98e-7214-440f-9d60-31890191e76c"
+                  ],
+                  "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.314Z"
+                },
+                {
+                  "id": "8f6ee64c-6e06-474c-a799-fa1a185dc812",
+                  "type": "email_exact",
+                  "value": "zhangsan@example.com",
+                  "weight": 40,
+                  "identityIds": [
+                    "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+                    "4e44e98e-7214-440f-9d60-31890191e76c"
+                  ],
+                  "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.314Z"
+                },
+                {
+                  "id": "0537b462-58e8-400b-a5fc-71cba3bb59de",
+                  "type": "phone_exact",
+                  "value": "13800138001",
+                  "weight": 35,
+                  "identityIds": [
+                    "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+                    "4e44e98e-7214-440f-9d60-31890191e76c"
+                  ],
+                  "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+                  "score": 0,
+                  "createdAt": "2026-05-19T20:06:32.314Z"
+                }
+              ],
+              "conflicts": [
+                {
+                  "id": "b0602c92-ee17-4750-a730-eb8b579dd060",
+                  "transactionId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+                  "fieldName": "name",
+                  "values": [
+                    "张三",
+                    "张先生"
+                  ],
+                  "sourceIdentities": [
+                    {
+                      "identityId": "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+                      "value": "张三",
+                      "source": "app"
+                    },
+                    {
+                      "identityId": "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+                      "value": "张三",
+                      "source": "web"
+                    },
+                    {
+                      "identityId": "4e44e98e-7214-440f-9d60-31890191e76c",
+                      "value": "张先生",
+                      "source": "cs"
+                    }
+                  ],
+                  "resolved": false,
+                  "createdAt": "2026-05-19T20:06:32.315Z"
+                }
+              ]
+            }
+          ]
+        },
+        "duration": 1
+      },
+      "timestamp": "2026-05-19T20:06:40.189Z",
+      "isError": false
+    },
+    {
+      "id": "6b7efc91-4bad-4ff8-894b-c7e80514fabe",
+      "requestId": "REQ_1779221200198_5",
+      "action": "GET_",
+      "entityId": null,
+      "entityType": "api_request",
+      "operator": "system",
+      "request": {
+        "requestId": "REQ_1779221200198_5",
+        "method": "GET",
+        "path": "/api/audit",
+        "url": "/api/audit?limit=50",
+        "ip": "::1",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36",
+        "operator": "system",
+        "queryParams": {
+          "limit": "50"
+        },
+        "body": {},
+        "params": {},
+        "timestamp": "2026-05-19T20:06:40.199Z"
+      },
+      "response": {
+        "statusCode": 200,
+        "success": true,
+        "error": null,
+        "dataSummary": {
+          "type": "array",
+          "length": 5,
+          "sample": [
+            {
+              "id": "d494a8c4-30cb-446d-8b47-5c22ffa44854",
+              "action": "initiate_merge",
+              "entityId": "5c8fae91-b02d-43ab-b643-cb678a088a85",
+              "entityType": "merge_transaction",
+              "operator": "system",
+              "details": {
+                "identityIds": [
+                  "050cbcba-1c5d-48a4-a82a-330a9bab24b8",
+                  "e9c6cbf2-0321-4d71-8416-cb59b5c2e673"
+                ],
+                "reason": "疑似同一客户待确认",
+                "matchScore": 35
+              },
+              "timestamp": "2026-05-19T20:06:32.316Z"
+            },
+            {
+              "id": "b5c5c4cf-0f2d-4edd-98ec-a7319b188700",
+              "action": "initiate_merge",
+              "entityId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+              "entityType": "merge_transaction",
+              "operator": "system",
+              "details": {
+                "identityIds": [
+                  "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+                  "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+                  "4e44e98e-7214-440f-9d60-31890191e76c"
+                ],
+                "reason": "三个渠道同一客户自动匹配合并",
+                "matchScore": 83.33333333333333
+              },
+              "timestamp": "2026-05-19T20:06:32.315Z"
+            },
+            {
+              "id": "5349a4c2-d0f3-4df8-9bc9-a998188431f3",
+              "action": "approve_merge",
+              "entityId": "4153b4d7-11eb-469d-b620-e9daa566fef2",
+              "entityType": "merge_transaction",
+              "operator": "admin",
+              "details": {
+                "previousStatus": "pending"
+              },
+              "timestamp": "2026-05-19T20:06:32.315Z"
+            }
+          ]
+        },
+        "duration": 1
+      },
+      "timestamp": "2026-05-19T20:06:40.199Z",
+      "isError": false
+    },
+    {
+      "id": "daa3a7b1-b8a3-4745-86ab-0367b8057401",
+      "requestId": "REQ_1779221216107_6",
+      "action": "GET_",
+      "entityId": null,
+      "entityType": "api_request",
+      "operator": "system",
+      "request": {
+        "requestId": "REQ_1779221216107_6",
+        "method": "GET",
+        "path": "/api/identities",
+        "url": "/api/identities",
+        "ip": "::1",
+        "userAgent": "curl/8.7.1",
+        "operator": "system",
+        "queryParams": {},
+        "body": {},
+        "params": {},
+        "timestamp": "2026-05-19T20:06:56.107Z"
+      },
+      "response": {
+        "statusCode": 200,
+        "success": true,
+        "error": null,
+        "dataSummary": {
+          "type": "array",
+          "length": 12,
+          "sample": [
+            {
+              "id": "cb781f33-e33c-4397-87e2-bccc53ef5a30",
+              "externalId": "APP_001",
+              "source": "app",
+              "name": "张三",
+              "email": "zhangsan@example.com",
+              "phone": "13800138001",
+              "createdAt": "2026-05-19T20:06:32.313Z",
+              "updatedAt": "2026-05-19T20:06:32.313Z"
+            },
+            {
+              "id": "8ac4e444-3b59-4ec8-8a19-5e8cca9edfce",
+              "externalId": "WEB_001",
+              "source": "web",
+              "name": "张三",
+              "email": "zhangsan@example.com",
+              "phone": "13800138001",
+              "createdAt": "2026-05-19T20:06:32.313Z",
+              "updatedAt": "2026-05-19T20:06:32.313Z"
+            },
+            {
+              "id": "4e44e98e-7214-440f-9d60-31890191e76c",
+              "externalId": "CS_001",
+              "source": "cs",
+              "name": "张先生",
+              "email": "zhangsan@example.com",
+              "phone": "13800138001",
+              "createdAt": "2026-05-19T20:06:32.314Z",
+              "updatedAt": "2026-05-19T20:06:32.314Z"
+            }
+          ]
+        },
+        "duration": 1
+      },
+      "timestamp": "2026-05-19T20:06:56.108Z",
+      "isError": false
+    },
+    {
+      "id": "33940d35-64b4-4fcf-831a-d56f0517afd9",
+      "requestId": "REQ_1779221222528_7",
+      "action": "GET_statistics",
+      "entityId": null,
+      "entityType": "api_request",
+      "operator": "system",
+      "request": {
+        "requestId": "REQ_1779221222528_7",
+        "method": "GET",
+        "path": "/api/audit/statistics",
+        "url": "/api/audit/statistics",
+        "ip": "::1",
+        "userAgent": "curl/8.7.1",
+        "operator": "system",
+        "queryParams": {},
+        "body": {},
+        "params": {},
+        "timestamp": "2026-05-19T20:07:02.528Z"
+      },
+      "response": {
+        "statusCode": 200,
+        "success": true,
+        "error": null,
+        "dataSummary": {
+          "type": "object",
+          "keys": [
+            "totalIdentities",
+            "mergedIdentities",
+            "unmergedIdentities",
+            "totalMasterCustomers",
+            "totalTransactions",
+            "transactionsByStatus",
+            "identitiesBySource",
+            "requestStats"
+          ],
+          "totalKeys": 8
+        },
+        "duration": 0
+      },
+      "timestamp": "2026-05-19T20:07:02.528Z",
+      "isError": false
+    }
+  ]
+}
