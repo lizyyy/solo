@@ -1,0 +1,47 @@
+[
+    {
+        "order_number": "ORD-2024-001",
+        "batch_number": "PRINT-001",
+        "product_spec": "A4彩色宣传单 157g铜版纸",
+        "quantity": 5000,
+        "customer_info": "客户A - 市场营销部",
+        "cost_details": "总成本: 2500元",
+        "delivery_date": "2024-01-25T18:00:00"
+    },
+    {
+        "order_number": "ORD-2024-002",
+        "batch_number": "PRINT-002",
+        "product_spec": "A3海报 200g光粉纸",
+        "quantity": 1000,
+        "customer_info": "客户B - 活动策划",
+        "cost_details": "总成本: 1800元",
+        "delivery_date": "2024-01-28T18:00:00"
+    },
+    {
+        "order_number": "ORD-2024-001",
+        "batch_number": "PRINT-001",
+        "product_spec": "重复订单",
+        "quantity": 100,
+        "customer_info": "测试客户",
+        "cost_details": "测试成本",
+        "delivery_date": "2024-01-20T18:00:00"
+    },
+    {
+        "order_number": "ORD-2024-003",
+        "batch_number": "PRINT-003",
+        "product_spec": "名片 300g铜版纸 双面彩色",
+        "quantity": 2000,
+        "customer_info": "客户C - 行政部",
+        "cost_details": "总成本: 800元",
+        "delivery_date": "2024-01-22T18:00:00"
+    },
+    {
+        "order_number": "ORD-2024-004",
+        "batch_number": "",
+        "product_spec": "测试订单",
+        "quantity": 100,
+        "customer_info": "测试客户",
+        "cost_details": "测试成本",
+        "delivery_date": "2024-01-30T18:00:00"
+    }
+]
