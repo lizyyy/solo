@@ -1,0 +1,131 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-19T16:19:07.105383",
+    "version": "1.0.0"
+  },
+  "summary": {
+    "total_languages": 1,
+    "total_issues": 4,
+    "issues_by_language": {
+      "zh": 4
+    },
+    "issues_by_severity": {
+      "critical": 3,
+      "warning": 1,
+      "info": 0
+    }
+  },
+  "issues": {
+    "zh": [
+      {
+        "key": "welcome",
+        "severity": "critical",
+        "source_language": "en",
+        "target_language": "zh",
+        "source_placeholders": [
+          "app",
+          "user"
+        ],
+        "target_placeholders": [
+          "app"
+        ],
+        "missing_in_target": [
+          "user"
+        ],
+        "extra_in_target": [],
+        "source_text": "Welcome to {app}, {user}!",
+        "target_text": "欢迎来到 {app}！",
+        "suggestions": [
+          {
+            "type": "add_placeholder",
+            "placeholder": "user",
+            "suggestion": "在译文中添加占位符 {user}",
+            "context": "源文案: Welcome to {app}, {user}!",
+            "action": "将 {user} 添加到译文合适位置"
+          }
+        ]
+      },
+      {
+        "key": "error",
+        "severity": "critical",
+        "source_language": "en",
+        "target_language": "zh",
+        "source_placeholders": [
+          "code",
+          "msg"
+        ],
+        "target_placeholders": [
+          "msg"
+        ],
+        "missing_in_target": [
+          "code"
+        ],
+        "extra_in_target": [],
+        "source_text": "Error: {msg} (code {code})",
+        "target_text": "错误: {msg}",
+        "suggestions": [
+          {
+            "type": "add_placeholder",
+            "placeholder": "code",
+            "suggestion": "在译文中添加占位符 {code}",
+            "context": "源文案: Error: {msg} (code {code})",
+            "action": "将 {code} 添加到译文合适位置"
+          }
+        ]
+      },
+      {
+        "key": "notification",
+        "severity": "warning",
+        "source_language": "en",
+        "target_language": "zh",
+        "source_placeholders": [
+          "count"
+        ],
+        "target_placeholders": [
+          "count",
+          "total"
+        ],
+        "missing_in_target": [],
+        "extra_in_target": [
+          "total"
+        ],
+        "source_text": "You have {count} new messages",
+        "target_text": "你有 {count} 条新消息。共计 {total} 条",
+        "suggestions": [
+          {
+            "type": "remove_placeholder",
+            "placeholder": "total",
+            "suggestion": "从译文中移除多余占位符 {total}",
+            "context": "译文: 你有 {count} 条新消息。共计 {total} 条",
+            "action": "检查 {total} 是否确实多余，确认后删除"
+          }
+        ]
+      },
+      {
+        "key": "greeting",
+        "severity": "critical",
+        "source_language": "en",
+        "target_language": "zh",
+        "source_placeholders": [
+          "name"
+        ],
+        "target_placeholders": [],
+        "missing_in_target": [
+          "name"
+        ],
+        "extra_in_target": [],
+        "source_text": "Hello {name}!",
+        "target_text": "你好！",
+        "suggestions": [
+          {
+            "type": "add_placeholder",
+            "placeholder": "name",
+            "suggestion": "在译文中添加占位符 {name}",
+            "context": "源文案: Hello {name}!",
+            "action": "将 {name} 添加到译文合适位置"
+          }
+        ]
+      }
+    ]
+  }
+}
