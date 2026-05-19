@@ -166,7 +166,16 @@ export class TaskController {
       }
 
       await StateMachineService.rollbackTask(id, reason);
-      res.json({ message: 'Task rollback initiated' });
+      
+      await db.read();
+      const task = db.data.tasks.find(t => t.id === id);
+      const rollbackRecord = db.data.rollbackRecords.find(r => r.taskId === id);
+
+      res.json({ 
+        message: 'Task rollback completed',
+        task,
+        rollbackRecord,
+      });
     } catch (error) {
       res.status(400).json({ error: (error as Error).message });
     }

@@ -31,6 +31,7 @@ export class StateMachineService {
   private static validTransitions: Map<TaskStatus, TaskStatus[]> = new Map([
     [TaskStatus.PENDING, [TaskStatus.PROCESSING]],
     [TaskStatus.PROCESSING, [TaskStatus.SUCCESS, TaskStatus.FAILED]],
+    [TaskStatus.SUCCESS, [TaskStatus.ROLLING_BACK]],
     [TaskStatus.FAILED, [TaskStatus.ROLLING_BACK, TaskStatus.RETRYING]],
     [TaskStatus.ROLLING_BACK, [TaskStatus.ROLLED_BACK]],
     [TaskStatus.ROLLED_BACK, [TaskStatus.RETRYING]],
@@ -62,10 +63,14 @@ export class StateMachineService {
   static async processTask(taskId: string): Promise<void> {
     try {
       await db.read();
-      const task = db.data.tasks.find(t => t.id === taskId);
+      let task = db.data.tasks.find(t => t.id === taskId);
       if (!task) throw new Error('Task not found');
 
       await this.transitionTask(taskId, TaskStatus.PROCESSING);
+      
+      await db.read();
+      task = db.data.tasks.find(t => t.id === taskId);
+      if (!task) throw new Error('Task not found');
       task.startedAt = new Date().toISOString();
       await db.write();
 
@@ -103,13 +108,16 @@ export class StateMachineService {
       task.completedAt = new Date().toISOString();
 
       const finalStatus = failCount === 0 ? TaskStatus.SUCCESS : TaskStatus.FAILED;
+      await db.write();
       await this.transitionTask(taskId, finalStatus);
       
       logger.info(`Task ${taskId} completed with ${successCount} success, ${failCount} failed`);
     } catch (error) {
+      await db.read();
       const errorTask = db.data.tasks.find(t => t.id === taskId);
       if (errorTask) {
         errorTask.errorMessage = (error as Error).message;
+        await db.write();
       }
       try {
         await this.transitionTask(taskId, TaskStatus.FAILED);
@@ -117,7 +125,6 @@ export class StateMachineService {
         logger.error(`Transition failed for task ${taskId}: ${transitionError}`);
       }
       logger.error(`Task ${taskId} failed: ${error}`);
-      await db.write();
     }
   }
 
@@ -142,6 +149,7 @@ export class StateMachineService {
 
       await this.transitionTask(taskId, TaskStatus.ROLLING_BACK);
 
+      await db.read();
       const records = db.data.seedRecords.filter(r => r.taskId === taskId);
       
       let rolledBackCount = 0;
@@ -160,8 +168,8 @@ export class StateMachineService {
         rollback.updatedAt = new Date().toISOString();
       }
 
-      await this.transitionTask(taskId, TaskStatus.ROLLED_BACK);
       await db.write();
+      await this.transitionTask(taskId, TaskStatus.ROLLED_BACK);
       
       logger.info(`Task ${taskId} rolled back successfully`);
     } catch (error) {
@@ -172,7 +180,7 @@ export class StateMachineService {
 
   static async retryTask(taskId: string): Promise<void> {
     await db.read();
-    const task = db.data.tasks.find(t => t.id === taskId);
+    let task = db.data.tasks.find(t => t.id === taskId);
     if (!task) throw new Error('Task not found');
 
     if (task.retryCount >= task.maxRetries) {
