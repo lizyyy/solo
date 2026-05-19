@@ -1,0 +1,32 @@
+{
+  "name": "escort-dispatch-system",
+  "version": "1.0.0",
+  "description": "陪检员调度系统 - 门诊陪检服务管理",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "init-db": "node scripts/init-db.js",
+    "import-appointments": "node scripts/import-appointments.js",
+    "import-schedule": "node scripts/import-schedule.js",
+    "export-report": "node scripts/export-report.js",
+    "test-sample": "node scripts/test-sample.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["escort", "dispatch", "hospital", "clinic"],
+  "author": "",
+  "license": "MIT"
+}

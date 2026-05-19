@@ -1,0 +1,74 @@
+[
+  {
+    "employee_id": "E001",
+    "name": "王陪检",
+    "phone": "13900139001",
+    "department": "陪检一科",
+    "status": "active",
+    "schedules": [
+      {
+        "date": "2024-05-19",
+        "shift_type": "早班",
+        "start_time": "08:00",
+        "end_time": "16:00"
+      },
+      {
+        "date": "2024-05-20",
+        "shift_type": "中班",
+        "start_time": "12:00",
+        "end_time": "20:00"
+      }
+    ]
+  },
+  {
+    "employee_id": "E002",
+    "name": "李陪检",
+    "phone": "13900139002",
+    "department": "陪检一科",
+    "status": "active",
+    "schedules": [
+      {
+        "date": "2024-05-19",
+        "shift_type": "早班",
+        "start_time": "08:00",
+        "end_time": "16:00"
+      },
+      {
+        "date": "2024-05-20",
+        "shift_type": "晚班",
+        "start_time": "16:00",
+        "end_time": "24:00"
+      }
+    ]
+  },
+  {
+    "employee_id": "E003",
+    "name": "张陪检",
+    "phone": "13900139003",
+    "department": "陪检二科",
+    "status": "active",
+    "schedules": [
+      {
+        "date": "2024-05-19",
+        "shift_type": "中班",
+        "start_time": "12:00",
+        "end_time": "20:00"
+      }
+    ]
+  },
+  {
+    "employee_id": "E004",
+    "name": "刘陪检",
+    "phone": "13900139004",
+    "department": "陪检二科",
+    "status": "active",
+    "schedules": [
+      {
+        "date": "2024-05-19",
+        "shift_type": "晚班",
+        "start_time": "16:00",
+        "end_time": "24:00"
+      }
+    ]
+  }
+]
