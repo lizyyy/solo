@@ -1,0 +1,24 @@
+{
+  "name": "leader-operation-system",
+  "version": "1.0.0",
+  "description": "团长运营对账系统 - 处理生鲜缺货后的退款、换货、补券对账",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "import": "node src/cli.js import",
+    "review": "node src/cli.js review",
+    "export": "node src/cli.js export",
+    "test": "node src/cli.js test"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "xlsx": "^0.18.5",
+    "sqlite3": "^5.1.6",
+    "commander": "^11.0.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

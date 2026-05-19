@@ -1,0 +1,23 @@
+[
+  {
+    "rule_type": "refund",
+    "condition": "total_amount > 100",
+    "action": "full_refund",
+    "value": 1,
+    "description": "订单金额大于100元，全额退款"
+  },
+  {
+    "rule_type": "coupon",
+    "condition": "total_amount > 50 && total_amount <= 100",
+    "action": "coupon_10_percent",
+    "value": 0.1,
+    "description": "订单金额50-100元，补偿10%优惠券，最高20元"
+  },
+  {
+    "rule_type": "exchange",
+    "condition": "total_amount <= 50",
+    "action": "exchange_product",
+    "value": 0,
+    "description": "订单金额50元及以下，换货处理"
+  }
+]
