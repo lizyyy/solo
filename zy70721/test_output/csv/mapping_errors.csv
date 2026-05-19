@@ -1,0 +1,3 @@
+user_id,field_name,error_message,source_file,line_number,source_value,mapped_value
+U003,email,邮箱格式无效: wangwu@,examples/identity.csv,4,wangwu@,wangwu@
+U004,department,department不能为空,examples/identity.csv,5,,

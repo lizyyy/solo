@@ -1,0 +1,2 @@
+user_id,conflict_type,role_name,expected,actual,description,severity,source_file,line_number
+U003,missing_role,viewer,viewer,,角色缺失: viewer,error,examples/roles.csv,4

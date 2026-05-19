@@ -1,0 +1,1523 @@
+{
+  "summary": {
+    "conflicts": {
+      "conflict_user_count": 1,
+      "total_conflicts": 1
+    },
+    "generated_at": "2026-05-19T07:19:57.973649",
+    "has_errors": true,
+    "mapping": {
+      "failed_count": 2,
+      "success_count": 2,
+      "success_rate": 0.5,
+      "total_users": 4
+    },
+    "parse_errors": [],
+    "playback": {
+      "diff_count": 3,
+      "match_rate": 0.0,
+      "matched_count": 0,
+      "total_test_users": 3
+    }
+  },
+  "mapping_results": [
+    {
+      "user_id": "U001",
+      "mapped_attributes": {
+        "email": "zhangsan@example.com",
+        "username": "zhangsan",
+        "displayName": "张三",
+        "department": "技术研发部",
+        "employeeId": "E001"
+      },
+      "validation_results": [
+        {
+          "field_name": "email",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "email",
+            "target_field": "email",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required",
+              "email"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 2
+          },
+          "source_value": "zhangsan@example.com",
+          "mapped_value": "zhangsan@example.com",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 2,
+            "source_field": "email",
+            "target_field": "email",
+            "mapping_type": "direct",
+            "rule_line_number": 2,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "username",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "username",
+            "target_field": "username",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 3
+          },
+          "source_value": "zhangsan",
+          "mapped_value": "zhangsan",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 2,
+            "source_field": "username",
+            "target_field": "username",
+            "mapping_type": "direct",
+            "rule_line_number": 3,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "displayName",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "display_name",
+            "target_field": "displayName",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 4
+          },
+          "source_value": "张三",
+          "mapped_value": "张三",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 2,
+            "source_field": "display_name",
+            "target_field": "displayName",
+            "mapping_type": "direct",
+            "rule_line_number": 4,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "department",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "department",
+            "target_field": "department",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "not_empty"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 5
+          },
+          "source_value": "技术研发部",
+          "mapped_value": "技术研发部",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 2,
+            "source_field": "department",
+            "target_field": "department",
+            "mapping_type": "direct",
+            "rule_line_number": 5,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "employeeId",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "employee_id",
+            "target_field": "employeeId",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 6
+          },
+          "source_value": "E001",
+          "mapped_value": "E001",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 2,
+            "source_field": "employee_id",
+            "target_field": "employeeId",
+            "mapping_type": "direct",
+            "rule_line_number": 6,
+            "rule_file": "examples/mapping.csv"
+          }
+        }
+      ],
+      "source_user": {
+        "source_id": "U001",
+        "raw_data": {
+          "user_id": "U001",
+          "username": "zhangsan",
+          "email": "zhangsan@example.com",
+          "department": "技术研发部",
+          "display_name": "张三",
+          "employee_id": "E001"
+        },
+        "source_file": "examples/identity.csv",
+        "line_number": 2
+      },
+      "success": true,
+      "error_count": 0
+    },
+    {
+      "user_id": "U002",
+      "mapped_attributes": {
+        "email": "lisi@example.com",
+        "username": "lisi",
+        "displayName": "李四",
+        "department": "产品部",
+        "employeeId": "E002"
+      },
+      "validation_results": [
+        {
+          "field_name": "email",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "email",
+            "target_field": "email",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required",
+              "email"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 2
+          },
+          "source_value": "lisi@example.com",
+          "mapped_value": "lisi@example.com",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 3,
+            "source_field": "email",
+            "target_field": "email",
+            "mapping_type": "direct",
+            "rule_line_number": 2,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "username",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "username",
+            "target_field": "username",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 3
+          },
+          "source_value": "lisi",
+          "mapped_value": "lisi",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 3,
+            "source_field": "username",
+            "target_field": "username",
+            "mapping_type": "direct",
+            "rule_line_number": 3,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "displayName",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "display_name",
+            "target_field": "displayName",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 4
+          },
+          "source_value": "李四",
+          "mapped_value": "李四",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 3,
+            "source_field": "display_name",
+            "target_field": "displayName",
+            "mapping_type": "direct",
+            "rule_line_number": 4,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "department",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "department",
+            "target_field": "department",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "not_empty"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 5
+          },
+          "source_value": "产品部",
+          "mapped_value": "产品部",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 3,
+            "source_field": "department",
+            "target_field": "department",
+            "mapping_type": "direct",
+            "rule_line_number": 5,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "employeeId",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "employee_id",
+            "target_field": "employeeId",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 6
+          },
+          "source_value": "E002",
+          "mapped_value": "E002",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 3,
+            "source_field": "employee_id",
+            "target_field": "employeeId",
+            "mapping_type": "direct",
+            "rule_line_number": 6,
+            "rule_file": "examples/mapping.csv"
+          }
+        }
+      ],
+      "source_user": {
+        "source_id": "U002",
+        "raw_data": {
+          "user_id": "U002",
+          "username": "lisi",
+          "email": "lisi@example.com",
+          "department": "产品部",
+          "display_name": "李四",
+          "employee_id": "E002"
+        },
+        "source_file": "examples/identity.csv",
+        "line_number": 3
+      },
+      "success": true,
+      "error_count": 0
+    },
+    {
+      "user_id": "U003",
+      "mapped_attributes": {
+        "email": "wangwu@",
+        "username": "wangwu",
+        "displayName": "王五",
+        "department": "市场部",
+        "employeeId": "E003"
+      },
+      "validation_results": [
+        {
+          "field_name": "email",
+          "success": false,
+          "error_message": "邮箱格式无效: wangwu@",
+          "rule": {
+            "source_field": "email",
+            "target_field": "email",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required",
+              "email"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 2
+          },
+          "source_value": "wangwu@",
+          "mapped_value": "wangwu@",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 4,
+            "source_field": "email",
+            "target_field": "email",
+            "mapping_type": "direct",
+            "rule_line_number": 2,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "username",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "username",
+            "target_field": "username",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 3
+          },
+          "source_value": "wangwu",
+          "mapped_value": "wangwu",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 4,
+            "source_field": "username",
+            "target_field": "username",
+            "mapping_type": "direct",
+            "rule_line_number": 3,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "displayName",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "display_name",
+            "target_field": "displayName",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 4
+          },
+          "source_value": "王五",
+          "mapped_value": "王五",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 4,
+            "source_field": "display_name",
+            "target_field": "displayName",
+            "mapping_type": "direct",
+            "rule_line_number": 4,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "department",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "department",
+            "target_field": "department",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "not_empty"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 5
+          },
+          "source_value": "市场部",
+          "mapped_value": "市场部",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 4,
+            "source_field": "department",
+            "target_field": "department",
+            "mapping_type": "direct",
+            "rule_line_number": 5,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "employeeId",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "employee_id",
+            "target_field": "employeeId",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 6
+          },
+          "source_value": "E003",
+          "mapped_value": "E003",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 4,
+            "source_field": "employee_id",
+            "target_field": "employeeId",
+            "mapping_type": "direct",
+            "rule_line_number": 6,
+            "rule_file": "examples/mapping.csv"
+          }
+        }
+      ],
+      "source_user": {
+        "source_id": "U003",
+        "raw_data": {
+          "user_id": "U003",
+          "username": "wangwu",
+          "email": "wangwu@",
+          "department": "市场部",
+          "display_name": "王五",
+          "employee_id": "E003"
+        },
+        "source_file": "examples/identity.csv",
+        "line_number": 4
+      },
+      "success": false,
+      "error_count": 1
+    },
+    {
+      "user_id": "U004",
+      "mapped_attributes": {
+        "email": "zhaoliu@example.com",
+        "username": "zhaoliu",
+        "displayName": "赵六",
+        "department": "",
+        "employeeId": "E004"
+      },
+      "validation_results": [
+        {
+          "field_name": "email",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "email",
+            "target_field": "email",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required",
+              "email"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 2
+          },
+          "source_value": "zhaoliu@example.com",
+          "mapped_value": "zhaoliu@example.com",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 5,
+            "source_field": "email",
+            "target_field": "email",
+            "mapping_type": "direct",
+            "rule_line_number": 2,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "username",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "username",
+            "target_field": "username",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 3
+          },
+          "source_value": "zhaoliu",
+          "mapped_value": "zhaoliu",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 5,
+            "source_field": "username",
+            "target_field": "username",
+            "mapping_type": "direct",
+            "rule_line_number": 3,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "displayName",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "display_name",
+            "target_field": "displayName",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 4
+          },
+          "source_value": "赵六",
+          "mapped_value": "赵六",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 5,
+            "source_field": "display_name",
+            "target_field": "displayName",
+            "mapping_type": "direct",
+            "rule_line_number": 4,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "department",
+          "success": false,
+          "error_message": "department不能为空",
+          "rule": {
+            "source_field": "department",
+            "target_field": "department",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "not_empty"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 5
+          },
+          "source_value": "",
+          "mapped_value": "",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 5,
+            "source_field": "department",
+            "target_field": "department",
+            "mapping_type": "direct",
+            "rule_line_number": 5,
+            "rule_file": "examples/mapping.csv"
+          }
+        },
+        {
+          "field_name": "employeeId",
+          "success": true,
+          "error_message": null,
+          "rule": {
+            "source_field": "employee_id",
+            "target_field": "employeeId",
+            "mapping_type": "direct",
+            "transform_expression": "",
+            "constant_value": null,
+            "validation_rules": [
+              "required"
+            ],
+            "pattern": null,
+            "condition": null,
+            "source_file": "examples/mapping.csv",
+            "line_number": 6
+          },
+          "source_value": "E004",
+          "mapped_value": "E004",
+          "source_trace": {
+            "source_file": "examples/identity.csv",
+            "line_number": 5,
+            "source_field": "employee_id",
+            "target_field": "employeeId",
+            "mapping_type": "direct",
+            "rule_line_number": 6,
+            "rule_file": "examples/mapping.csv"
+          }
+        }
+      ],
+      "source_user": {
+        "source_id": "U004",
+        "raw_data": {
+          "user_id": "U004",
+          "username": "zhaoliu",
+          "email": "zhaoliu@example.com",
+          "department": "",
+          "display_name": "赵六",
+          "employee_id": "E004"
+        },
+        "source_file": "examples/identity.csv",
+        "line_number": 5
+      },
+      "success": false,
+      "error_count": 1
+    }
+  ],
+  "playback_results": [
+    {
+      "user_id": "U001",
+      "test_user": {
+        "user_id": "U001",
+        "expected_attributes": {
+          "email": "zhangsan@example.com",
+          "department": "技术研发部",
+          "username": "zhangsan"
+        },
+        "expected_roles": [
+          "developer",
+          "viewer"
+        ],
+        "source_file": "examples/test_users.csv",
+        "line_number": 2,
+        "description": "张三-测试用户1",
+        "tags": [
+          "base"
+        ]
+      },
+      "mapping_result": {
+        "user_id": "U001",
+        "mapped_attributes": {
+          "email": "zhangsan@example.com",
+          "username": "zhangsan",
+          "displayName": "张三",
+          "department": "技术研发部",
+          "employeeId": "E001"
+        },
+        "validation_results": [
+          {
+            "field_name": "email",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "email",
+              "target_field": "email",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required",
+                "email"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 2
+            },
+            "source_value": "zhangsan@example.com",
+            "mapped_value": "zhangsan@example.com",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 2,
+              "source_field": "email",
+              "target_field": "email",
+              "mapping_type": "direct",
+              "rule_line_number": 2,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "username",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "username",
+              "target_field": "username",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 3
+            },
+            "source_value": "zhangsan",
+            "mapped_value": "zhangsan",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 2,
+              "source_field": "username",
+              "target_field": "username",
+              "mapping_type": "direct",
+              "rule_line_number": 3,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "displayName",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "display_name",
+              "target_field": "displayName",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 4
+            },
+            "source_value": "张三",
+            "mapped_value": "张三",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 2,
+              "source_field": "display_name",
+              "target_field": "displayName",
+              "mapping_type": "direct",
+              "rule_line_number": 4,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "department",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "department",
+              "target_field": "department",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "not_empty"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 5
+            },
+            "source_value": "技术研发部",
+            "mapped_value": "技术研发部",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 2,
+              "source_field": "department",
+              "target_field": "department",
+              "mapping_type": "direct",
+              "rule_line_number": 5,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "employeeId",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "employee_id",
+              "target_field": "employeeId",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 6
+            },
+            "source_value": "E001",
+            "mapped_value": "E001",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 2,
+              "source_field": "employee_id",
+              "target_field": "employeeId",
+              "mapping_type": "direct",
+              "rule_line_number": 6,
+              "rule_file": "examples/mapping.csv"
+            }
+          }
+        ],
+        "source_user": {
+          "source_id": "U001",
+          "raw_data": {
+            "user_id": "U001",
+            "username": "zhangsan",
+            "email": "zhangsan@example.com",
+            "department": "技术研发部",
+            "display_name": "张三",
+            "employee_id": "E001"
+          },
+          "source_file": "examples/identity.csv",
+          "line_number": 2
+        },
+        "success": true,
+        "error_count": 0
+      },
+      "role_result": {
+        "user_id": "U001",
+        "actual_roles": [
+          "developer",
+          "viewer"
+        ],
+        "mapped_attributes": {},
+        "source_file": "examples/roles.csv",
+        "line_number": 2,
+        "timestamp": null,
+        "success": true,
+        "error_message": null
+      },
+      "attribute_diffs": [
+        {
+          "field_name": "displayName",
+          "diff_type": "unexpected",
+          "expected": null,
+          "actual": "张三"
+        },
+        {
+          "field_name": "employeeId",
+          "diff_type": "unexpected",
+          "expected": null,
+          "actual": "E001"
+        }
+      ],
+      "expected_roles": [
+        "developer",
+        "viewer"
+      ],
+      "actual_roles": [
+        "developer",
+        "viewer"
+      ],
+      "matched": false,
+      "has_diffs": true
+    },
+    {
+      "user_id": "U002",
+      "test_user": {
+        "user_id": "U002",
+        "expected_attributes": {
+          "email": "lisi@example.com",
+          "department": "产品部",
+          "username": "lisi"
+        },
+        "expected_roles": [
+          "product_owner",
+          "viewer"
+        ],
+        "source_file": "examples/test_users.csv",
+        "line_number": 3,
+        "description": "李四-测试用户2",
+        "tags": [
+          "base"
+        ]
+      },
+      "mapping_result": {
+        "user_id": "U002",
+        "mapped_attributes": {
+          "email": "lisi@example.com",
+          "username": "lisi",
+          "displayName": "李四",
+          "department": "产品部",
+          "employeeId": "E002"
+        },
+        "validation_results": [
+          {
+            "field_name": "email",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "email",
+              "target_field": "email",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required",
+                "email"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 2
+            },
+            "source_value": "lisi@example.com",
+            "mapped_value": "lisi@example.com",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 3,
+              "source_field": "email",
+              "target_field": "email",
+              "mapping_type": "direct",
+              "rule_line_number": 2,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "username",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "username",
+              "target_field": "username",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 3
+            },
+            "source_value": "lisi",
+            "mapped_value": "lisi",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 3,
+              "source_field": "username",
+              "target_field": "username",
+              "mapping_type": "direct",
+              "rule_line_number": 3,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "displayName",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "display_name",
+              "target_field": "displayName",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 4
+            },
+            "source_value": "李四",
+            "mapped_value": "李四",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 3,
+              "source_field": "display_name",
+              "target_field": "displayName",
+              "mapping_type": "direct",
+              "rule_line_number": 4,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "department",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "department",
+              "target_field": "department",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "not_empty"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 5
+            },
+            "source_value": "产品部",
+            "mapped_value": "产品部",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 3,
+              "source_field": "department",
+              "target_field": "department",
+              "mapping_type": "direct",
+              "rule_line_number": 5,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "employeeId",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "employee_id",
+              "target_field": "employeeId",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 6
+            },
+            "source_value": "E002",
+            "mapped_value": "E002",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 3,
+              "source_field": "employee_id",
+              "target_field": "employeeId",
+              "mapping_type": "direct",
+              "rule_line_number": 6,
+              "rule_file": "examples/mapping.csv"
+            }
+          }
+        ],
+        "source_user": {
+          "source_id": "U002",
+          "raw_data": {
+            "user_id": "U002",
+            "username": "lisi",
+            "email": "lisi@example.com",
+            "department": "产品部",
+            "display_name": "李四",
+            "employee_id": "E002"
+          },
+          "source_file": "examples/identity.csv",
+          "line_number": 3
+        },
+        "success": true,
+        "error_count": 0
+      },
+      "role_result": {
+        "user_id": "U002",
+        "actual_roles": [
+          "product_owner",
+          "viewer",
+          "admin"
+        ],
+        "mapped_attributes": {},
+        "source_file": "examples/roles.csv",
+        "line_number": 3,
+        "timestamp": null,
+        "success": true,
+        "error_message": null
+      },
+      "attribute_diffs": [
+        {
+          "field_name": "displayName",
+          "diff_type": "unexpected",
+          "expected": null,
+          "actual": "李四"
+        },
+        {
+          "field_name": "employeeId",
+          "diff_type": "unexpected",
+          "expected": null,
+          "actual": "E002"
+        }
+      ],
+      "expected_roles": [
+        "viewer",
+        "product_owner"
+      ],
+      "actual_roles": [
+        "admin",
+        "viewer",
+        "product_owner"
+      ],
+      "matched": false,
+      "has_diffs": true
+    },
+    {
+      "user_id": "U003",
+      "test_user": {
+        "user_id": "U003",
+        "expected_attributes": {
+          "email": "wangwu@example.com",
+          "department": "市场部",
+          "username": "wangwu"
+        },
+        "expected_roles": [
+          "marketer",
+          "viewer"
+        ],
+        "source_file": "examples/test_users.csv",
+        "line_number": 4,
+        "description": "王五-测试用户3",
+        "tags": [
+          "email_error"
+        ]
+      },
+      "mapping_result": {
+        "user_id": "U003",
+        "mapped_attributes": {
+          "email": "wangwu@",
+          "username": "wangwu",
+          "displayName": "王五",
+          "department": "市场部",
+          "employeeId": "E003"
+        },
+        "validation_results": [
+          {
+            "field_name": "email",
+            "success": false,
+            "error_message": "邮箱格式无效: wangwu@",
+            "rule": {
+              "source_field": "email",
+              "target_field": "email",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required",
+                "email"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 2
+            },
+            "source_value": "wangwu@",
+            "mapped_value": "wangwu@",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 4,
+              "source_field": "email",
+              "target_field": "email",
+              "mapping_type": "direct",
+              "rule_line_number": 2,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "username",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "username",
+              "target_field": "username",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 3
+            },
+            "source_value": "wangwu",
+            "mapped_value": "wangwu",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 4,
+              "source_field": "username",
+              "target_field": "username",
+              "mapping_type": "direct",
+              "rule_line_number": 3,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "displayName",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "display_name",
+              "target_field": "displayName",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 4
+            },
+            "source_value": "王五",
+            "mapped_value": "王五",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 4,
+              "source_field": "display_name",
+              "target_field": "displayName",
+              "mapping_type": "direct",
+              "rule_line_number": 4,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "department",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "department",
+              "target_field": "department",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "not_empty"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 5
+            },
+            "source_value": "市场部",
+            "mapped_value": "市场部",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 4,
+              "source_field": "department",
+              "target_field": "department",
+              "mapping_type": "direct",
+              "rule_line_number": 5,
+              "rule_file": "examples/mapping.csv"
+            }
+          },
+          {
+            "field_name": "employeeId",
+            "success": true,
+            "error_message": null,
+            "rule": {
+              "source_field": "employee_id",
+              "target_field": "employeeId",
+              "mapping_type": "direct",
+              "transform_expression": "",
+              "constant_value": null,
+              "validation_rules": [
+                "required"
+              ],
+              "pattern": null,
+              "condition": null,
+              "source_file": "examples/mapping.csv",
+              "line_number": 6
+            },
+            "source_value": "E003",
+            "mapped_value": "E003",
+            "source_trace": {
+              "source_file": "examples/identity.csv",
+              "line_number": 4,
+              "source_field": "employee_id",
+              "target_field": "employeeId",
+              "mapping_type": "direct",
+              "rule_line_number": 6,
+              "rule_file": "examples/mapping.csv"
+            }
+          }
+        ],
+        "source_user": {
+          "source_id": "U003",
+          "raw_data": {
+            "user_id": "U003",
+            "username": "wangwu",
+            "email": "wangwu@",
+            "department": "市场部",
+            "display_name": "王五",
+            "employee_id": "E003"
+          },
+          "source_file": "examples/identity.csv",
+          "line_number": 4
+        },
+        "success": false,
+        "error_count": 1
+      },
+      "role_result": {
+        "user_id": "U003",
+        "actual_roles": [
+          "marketer"
+        ],
+        "mapped_attributes": {},
+        "source_file": "examples/roles.csv",
+        "line_number": 4,
+        "timestamp": null,
+        "success": true,
+        "error_message": null
+      },
+      "attribute_diffs": [
+        {
+          "field_name": "displayName",
+          "diff_type": "unexpected",
+          "expected": null,
+          "actual": "王五"
+        },
+        {
+          "field_name": "email",
+          "diff_type": "value_mismatch",
+          "expected": "wangwu@example.com",
+          "actual": "wangwu@"
+        },
+        {
+          "field_name": "employeeId",
+          "diff_type": "unexpected",
+          "expected": null,
+          "actual": "E003"
+        }
+      ],
+      "expected_roles": [
+        "marketer",
+        "viewer"
+      ],
+      "actual_roles": [
+        "marketer"
+      ],
+      "matched": false,
+      "has_diffs": true
+    }
+  ],
+  "conflict_results": [
+    {
+      "user_id": "U001",
+      "conflicts": [],
+      "applied_corrections": [],
+      "has_conflicts": false
+    },
+    {
+      "user_id": "U002",
+      "conflicts": [],
+      "applied_corrections": [
+        {
+          "correction_id": "C001",
+          "user_id": "U002",
+          "correction_type": "role_remove",
+          "field_name": "roles",
+          "old_value": "admin",
+          "new_value": "",
+          "reason": "多余的管理员角色",
+          "corrected_by": "test",
+          "corrected_at": "2026-05-19T07:19:57.973312",
+          "source_file": "examples/corrections.csv",
+          "line_number": 2,
+          "applied": true
+        }
+      ],
+      "has_conflicts": false
+    },
+    {
+      "user_id": "U003",
+      "conflicts": [
+        {
+          "user_id": "U003",
+          "conflict_type": "missing_role",
+          "expected": "viewer",
+          "actual": null,
+          "role_name": "viewer",
+          "description": "角色缺失: viewer",
+          "severity": "error",
+          "source_trace": {
+            "source_file": "examples/roles.csv",
+            "line_number": 4
+          }
+        }
+      ],
+      "applied_corrections": [
+        {
+          "correction_id": "C002",
+          "user_id": "U003",
+          "correction_type": "attribute",
+          "field_name": "email",
+          "old_value": "wangwu@",
+          "new_value": "wangwu@example.com",
+          "reason": "修正邮箱格式",
+          "corrected_by": "test",
+          "corrected_at": "2026-05-19T07:19:57.973319",
+          "source_file": "examples/corrections.csv",
+          "line_number": 3,
+          "applied": true
+        }
+      ],
+      "has_conflicts": true
+    },
+    {
+      "user_id": "U004",
+      "conflicts": [],
+      "applied_corrections": [],
+      "has_conflicts": false
+    }
+  ]
+}

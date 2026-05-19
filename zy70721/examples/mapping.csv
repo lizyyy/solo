@@ -1,0 +1,6 @@
+source_field,target_field,mapping_type,transform,validation
+email,email,direct,,required|email
+username,username,direct,,required
+display_name,displayName,direct,,required
+department,department,direct,,not_empty
+employee_id,employeeId,direct,,required

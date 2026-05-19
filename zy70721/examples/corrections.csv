@@ -1,0 +1,3 @@
+correction_id,user_id,correction_type,field_name,old_value,new_value,reason,corrected_by,applied
+C001,U002,role_remove,roles,admin,,多余的管理员角色,test,true
+C002,U003,attribute,email,wangwu@,wangwu@example.com,修正邮箱格式,test,true

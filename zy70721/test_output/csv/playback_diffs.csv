@@ -1,0 +1,8 @@
+user_id,field_name,diff_type,expected,actual,test_source_file,test_line_number
+U001,displayName,unexpected,,张三,examples/test_users.csv,2
+U001,employeeId,unexpected,,E001,examples/test_users.csv,2
+U002,displayName,unexpected,,李四,examples/test_users.csv,3
+U002,employeeId,unexpected,,E002,examples/test_users.csv,3
+U003,displayName,unexpected,,王五,examples/test_users.csv,4
+U003,email,value_mismatch,wangwu@example.com,wangwu@,examples/test_users.csv,4
+U003,employeeId,unexpected,,E003,examples/test_users.csv,4
