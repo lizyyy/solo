@@ -54,8 +54,12 @@ class ShakeScorer:
             score = self._calculate_single(matrix_key, history)
             scores.append(score)
         
-        scores.sort(key=lambda s: (-s.overall_score, s.matrix_key))
+        scores.sort(key=lambda s: (s.overall_score, s.matrix_key))
         return scores
+    
+    def calculate_scores_sorted_desc(self, histories: Dict[str, MatrixRunHistory]) -> List[ShakeScore]:
+        scores = self.calculate_scores(histories)
+        return sorted(scores, key=lambda s: (-s.overall_score, s.matrix_key))
     
     def _calculate_single(self, matrix_key: str, history: MatrixRunHistory) -> ShakeScore:
         flags = []

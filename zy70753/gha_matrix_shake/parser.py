@@ -131,10 +131,15 @@ class GitHubActionsLogParser:
                 if match:
                     matrix_params[match.group(1)] = match.group(2)
             
+            explicit_status = self._check_explicit_status(raw_line)
+            if explicit_status:
+                status = explicit_status
+            
             if self._is_error_line(raw_line):
                 in_error_context = True
                 error_lines.append((idx, raw_line))
-                status = "failure"
+                if explicit_status is None:
+                    status = "failure"
             elif in_error_context and len(error_lines) < 20:
                 error_lines.append((idx, raw_line))
             else:
@@ -178,6 +183,18 @@ class GitHubActionsLogParser:
             timestamp=timestamp,
             workflow_step=workflow_step
         )
+    
+    def _check_explicit_status(self, line: str) -> Optional[str]:
+        for pattern in self.STATUS_PATTERNS:
+            match = pattern.search(line)
+            if match:
+                if match.groups():
+                    status = match.group(1).lower()
+                    if status in ['success', 'failure', 'cancelled', 'canceled']:
+                        return status if status != 'canceled' else 'cancelled'
+                else:
+                    return 'failure'
+        return None
     
     def _is_error_line(self, line: str) -> bool:
         error_indicators = [
