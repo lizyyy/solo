@@ -1,0 +1,229 @@
+{
+  "trace_id": "4a3b2c1d0e9f8g7h",
+  "generated_at": "2026-05-19T16:05:44.190823",
+  "summary": {
+    "total_entries": 13,
+    "services": [
+      "order-service",
+      "task-executor",
+      "inventory-service",
+      "api-gateway",
+      "test-service"
+    ],
+    "gaps_count": 0,
+    "missing_spans_count": 1,
+    "duplicate_spans_count": 4
+  },
+  "entries": [
+    {
+      "timestamp": "2026-05-19T10:00:00",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000005",
+      "parent_span_id": "nonexistent",
+      "service_name": "test-service",
+      "log_level": "INFO",
+      "message": "缺失父Span",
+      "raw_log": "2026-05-19 10:00:00 INFO [test-service] traceId=4a3b2c1d0e9f8g7h spanId=00000005 parentSpanId=nonexistent message=缺失父Span",
+      "source_file": "dirty_data.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:00",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000002",
+      "parent_span_id": null,
+      "service_name": "test-service",
+      "log_level": "ERROR",
+      "message": "重复的SpanID",
+      "raw_log": "2026-05-19 10:00:00 ERROR [test-service] traceId=4a3b2c1d0e9f8g7h spanId=00000002 message=重复的SpanID",
+      "source_file": "dirty_data.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:00.123000",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000001",
+      "parent_span_id": null,
+      "service_name": "api-gateway",
+      "log_level": "INFO",
+      "message": "请求进入网关",
+      "raw_log": "2026-05-19 10:00:00.123 INFO [api-gateway] traceId=4a3b2c1d0e9f8g7h, spanId=00000001, message=请求进入网关",
+      "source_file": "gateway.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:00.156000",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000001",
+      "parent_span_id": "null",
+      "service_name": "api-gateway",
+      "log_level": "INFO",
+      "message": "路由到订单服务",
+      "raw_log": "2026-05-19 10:00:00.156 INFO [api-gateway] traceId=4a3b2c1d0e9f8g7h, spanId=00000001, parentSpanId=null, message=路由到订单服务",
+      "source_file": "gateway.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:00.200000",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000002",
+      "parent_span_id": "00000001",
+      "service_name": "order-service",
+      "log_level": "INFO",
+      "message": "创建订单开始",
+      "raw_log": "2026-05-19T10:00:00.200Z INFO serviceName=order-service traceId=4a3b2c1d0e9f8g7h spanId=00000002 parentSpanId=00000001 message=创建订单开始",
+      "source_file": "app.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:00.350000",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000002",
+      "parent_span_id": "00000001",
+      "service_name": "order-service",
+      "log_level": "INFO",
+      "message": "调用库存服务",
+      "raw_log": "2026-05-19T10:00:00.350Z INFO serviceName=order-service traceId=4a3b2c1d0e9f8g7h spanId=00000002 parentSpanId=00000001 message=调用库存服务",
+      "source_file": "app.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:00.500000",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000003",
+      "parent_span_id": "00000002",
+      "service_name": "inventory-service",
+      "log_level": "INFO",
+      "message": "扣减库存",
+      "raw_log": "2026-05-19T10:00:00.500Z INFO serviceName=inventory-service traceId=4a3b2c1d0e9f8g7h spanId=00000003 parentSpanId=00000002 message=扣减库存",
+      "source_file": "app.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:00.650000",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000003",
+      "parent_span_id": "00000002",
+      "service_name": "inventory-service",
+      "log_level": "INFO",
+      "message": "库存扣减成功",
+      "raw_log": "2026-05-19T10:00:00.650Z INFO serviceName=inventory-service traceId=4a3b2c1d0e9f8g7h spanId=00000003 parentSpanId=00000002 message=库存扣减成功",
+      "source_file": "app.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:00.800000",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000002",
+      "parent_span_id": "00000001",
+      "service_name": "order-service",
+      "log_level": "INFO",
+      "message": "订单创建成功",
+      "raw_log": "2026-05-19T10:00:00.800Z INFO serviceName=order-service traceId=4a3b2c1d0e9f8g7h spanId=00000002 parentSpanId=00000001 message=订单创建成功",
+      "source_file": "app.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:01",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000004",
+      "parent_span_id": "00000002",
+      "service_name": "task-executor",
+      "log_level": "INFO",
+      "message": "异步任务开始执行",
+      "raw_log": "2026-05-19 10:00:01.000 INFO [task-executor] traceId=4a3b2c1d0e9f8g7h, spanId=00000004, parentSpanId=00000002, message=异步任务开始执行",
+      "source_file": "task.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:02.500000",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000004",
+      "parent_span_id": "00000002",
+      "service_name": "task-executor",
+      "log_level": "INFO",
+      "message": "发送通知邮件",
+      "raw_log": "2026-05-19 10:00:02.500 INFO [task-executor] traceId=4a3b2c1d0e9f8g7h, spanId=00000004, parentSpanId=00000002, message=发送通知邮件",
+      "source_file": "task.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:04",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000004",
+      "parent_span_id": "00000002",
+      "service_name": "task-executor",
+      "log_level": "INFO",
+      "message": "异步任务完成",
+      "raw_log": "2026-05-19 10:00:04.000 INFO [task-executor] traceId=4a3b2c1d0e9f8g7h, spanId=00000004, parentSpanId=00000002, message=异步任务完成",
+      "source_file": "task.log"
+    },
+    {
+      "timestamp": "2026-05-19T10:00:06.200000",
+      "trace_id": "4a3b2c1d0e9f8g7h",
+      "span_id": "00000001",
+      "parent_span_id": null,
+      "service_name": "api-gateway",
+      "log_level": "INFO",
+      "message": "响应返回客户端",
+      "raw_log": "2026-05-19 10:00:06.200 INFO [api-gateway] traceId=4a3b2c1d0e9f8g7h, spanId=00000001, message=响应返回客户端",
+      "source_file": "gateway.log"
+    }
+  ],
+  "gaps": [],
+  "missing_spans": [
+    {
+      "missing_span_id": "nonexistent",
+      "child_span_id": "00000005",
+      "service_name": "test-service",
+      "message": "缺失父Span"
+    }
+  ],
+  "duplicate_spans": [
+    {
+      "span_id": "00000002",
+      "count": 4,
+      "services": [
+        "test-service",
+        "order-service",
+        "order-service",
+        "order-service"
+      ],
+      "timestamps": [
+        "2026-05-19T10:00:00",
+        "2026-05-19T10:00:00.200000",
+        "2026-05-19T10:00:00.350000",
+        "2026-05-19T10:00:00.800000"
+      ]
+    },
+    {
+      "span_id": "00000001",
+      "count": 3,
+      "services": [
+        "api-gateway",
+        "api-gateway",
+        "api-gateway"
+      ],
+      "timestamps": [
+        "2026-05-19T10:00:00.123000",
+        "2026-05-19T10:00:00.156000",
+        "2026-05-19T10:00:06.200000"
+      ]
+    },
+    {
+      "span_id": "00000003",
+      "count": 2,
+      "services": [
+        "inventory-service",
+        "inventory-service"
+      ],
+      "timestamps": [
+        "2026-05-19T10:00:00.500000",
+        "2026-05-19T10:00:00.650000"
+      ]
+    },
+    {
+      "span_id": "00000004",
+      "count": 3,
+      "services": [
+        "task-executor",
+        "task-executor",
+        "task-executor"
+      ],
+      "timestamps": [
+        "2026-05-19T10:00:01",
+        "2026-05-19T10:00:02.500000",
+        "2026-05-19T10:00:04"
+      ]
+    }
+  ]
+}

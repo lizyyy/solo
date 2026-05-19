@@ -1,0 +1,5 @@
+2026-05-19 10:00:00.123 INFO [api-gateway] traceId=4a3b2c1d0e9f8g7h, spanId=00000001, message=请求进入网关
+2026-05-19 10:00:00.156 INFO [api-gateway] traceId=4a3b2c1d0e9f8g7h, spanId=00000001, parentSpanId=null, message=路由到订单服务
+2026-05-19 10:00:06.200 INFO [api-gateway] traceId=4a3b2c1d0e9f8g7h, spanId=00000001, message=响应返回客户端
+2026-05-19 10:00:01.000 INFO [api-gateway] traceId=1b2c3d4e5f6a7b8c, spanId=11111111, message=另一个请求
+2026-05-19 10:00:02.000 INFO [api-gateway] traceId=9z8y7x6w5v4u3t2s, spanId=99999999, message=第三个请求

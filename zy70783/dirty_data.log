@@ -1,0 +1,10 @@
+这是一行没有任何格式的脏数据
+2026-05-19 10:00:00 INFO traceId= 有空格
+2026-05-19 10:00:00 INFO spanId=123
+{"invalid_json": true, "trace_id": "abc",
+2026-05-19 10:00:00 INFO [test-service] traceId=4a3b2c1d0e9f8g7h spanId=00000005 parentSpanId=nonexistent message=缺失父Span
+2026-05-19 10:00:00 ERROR [test-service] traceId=4a3b2c1d0e9f8g7h spanId=00000002 message=重复的SpanID
+2026-05-19 10:99:99.999 INFO 无效的时间格式
+空行
+
+TRACE 级别日志 traceId=4a3b2c1d0e9f8g7h spanId=00000006

@@ -1,0 +1,3 @@
+2026-05-19 10:00:01.000 INFO [task-executor] traceId=4a3b2c1d0e9f8g7h, spanId=00000004, parentSpanId=00000002, message=异步任务开始执行
+2026-05-19 10:00:02.500 INFO [task-executor] traceId=4a3b2c1d0e9f8g7h, spanId=00000004, parentSpanId=00000002, message=发送通知邮件
+2026-05-19 10:00:04.000 INFO [task-executor] traceId=4a3b2c1d0e9f8g7h, spanId=00000004, parentSpanId=00000002, message=异步任务完成

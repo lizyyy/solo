@@ -1,0 +1,5 @@
+2026-05-19T10:00:00.200Z INFO serviceName=order-service traceId=4a3b2c1d0e9f8g7h spanId=00000002 parentSpanId=00000001 message=创建订单开始
+2026-05-19T10:00:00.350Z INFO serviceName=order-service traceId=4a3b2c1d0e9f8g7h spanId=00000002 parentSpanId=00000001 message=调用库存服务
+2026-05-19T10:00:00.500Z INFO serviceName=inventory-service traceId=4a3b2c1d0e9f8g7h spanId=00000003 parentSpanId=00000002 message=扣减库存
+2026-05-19T10:00:00.650Z INFO serviceName=inventory-service traceId=4a3b2c1d0e9f8g7h spanId=00000003 parentSpanId=00000002 message=库存扣减成功
+2026-05-19T10:00:00.800Z INFO serviceName=order-service traceId=4a3b2c1d0e9f8g7h spanId=00000002 parentSpanId=00000001 message=订单创建成功
