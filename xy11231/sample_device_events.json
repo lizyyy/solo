@@ -1,0 +1,61 @@
+[
+  {
+    "deviceId": "DEV001",
+    "eventType": "柜门打不开",
+    "eventTime": "2024-01-15T08:30:00",
+    "stationId": "ST001",
+    "cabinetId": "CAB001",
+    "errorCode": "E001",
+    "errorMessage": "柜门电机故障，无法打开",
+    "severity": "high",
+    "status": "pending",
+    "assignee": "张三"
+  },
+  {
+    "deviceId": "DEV002",
+    "eventType": "扫码失败",
+    "eventTime": "2024-01-15T09:15:00",
+    "stationId": "ST001",
+    "cabinetId": "CAB002",
+    "errorCode": "E002",
+    "errorMessage": "二维码扫描超时，请重试",
+    "severity": "medium",
+    "status": "processing",
+    "assignee": "李四"
+  },
+  {
+    "deviceId": "DEV003",
+    "eventType": "空仓误报",
+    "eventTime": "2024-01-15T10:00:00",
+    "stationId": "ST002",
+    "cabinetId": "CAB003",
+    "errorCode": "E003",
+    "errorMessage": "传感器误报仓门状态",
+    "severity": "low",
+    "status": "resolved",
+    "assignee": "张三"
+  },
+  {
+    "deviceId": "DEV004",
+    "eventType": "柜门打不开",
+    "eventTime": "2024-01-15T11:20:00",
+    "stationId": "ST002",
+    "cabinetId": "CAB004",
+    "errorCode": "E001",
+    "errorMessage": "柜门电磁锁故障",
+    "severity": "high",
+    "status": "pending",
+    "assignee": "王五"
+  },
+  {
+    "deviceId": "DEV005",
+    "eventType": "扫码失败",
+    "eventTime": "2024-01-15T14:30:00",
+    "stationId": "ST003",
+    "cabinetId": "CAB005",
+    "errorCode": "E002",
+    "errorMessage": "扫码设备网络连接超时",
+    "severity": "medium",
+    "status": "pending"
+  }
+]

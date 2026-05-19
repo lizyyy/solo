@@ -1,0 +1,25 @@
+{
+  "name": "battery-swap-ops",
+  "version": "1.0.0",
+  "description": "换电运营异常处理系统 - CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "bswap": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "csv-parser": "^3.0.0",
+    "commander": "^12.0.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

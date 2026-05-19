@@ -1,0 +1,6 @@
+ticketId,ticketType,customerId,customerName,phone,stationId,deviceId,issueType,description,status,priority,assignee,createdTime,resolvedTime
+T001,complaint,C001,张三,13800138001,ST001,DEV001,柜门打不开,用户反馈换电时柜门无法打开,open,high,李四,2024-01-15T08:45:00,
+T002,inquiry,C002,李四,13800138002,ST001,DEV002,扫码失败,扫码多次失败无法换电,processing,medium,张三,2024-01-15T09:30:00,
+T003,complaint,C003,王五,13800138003,ST002,DEV003,空仓误报,系统显示有空仓但实际没有,resolved,low,李四,2024-01-15T10:15:00,2024-01-15T11:00:00
+T004,complaint,C004,赵六,13800138004,ST002,DEV004,柜门打不开,柜门锁定无法打开,open,high,王五,2024-01-15T11:45:00,
+T005,inquiry,C005,钱七,13800138005,ST003,DEV005,扫码失败,扫码无反应,open,medium,,2024-01-15T14:45:00,
