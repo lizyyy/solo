@@ -84,7 +84,7 @@ class ReviewRecordBase(BaseModel):
 
 
 class ReviewRecordCreate(ReviewRecordBase):
-    resume_id: int
+    pass
 
 
 class ReviewRecordResponse(ReviewRecordBase):
