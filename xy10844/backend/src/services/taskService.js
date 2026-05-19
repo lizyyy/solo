@@ -80,6 +80,11 @@ class TaskService {
       throw new Error('任务不存在');
     }
 
+    const finalStages = [STAGES.COMPLETED, STAGES.ROLLED_BACK];
+    if (finalStages.includes(task.stage)) {
+      throw new Error(`任务已处于终态(${task.stage})，不可修改`);
+    }
+
     if (newStage !== task.stage) {
       const transition = STAGE_TRANSITIONS[task.stage];
       if (!transition.allowedTo.includes(newStage)) {
@@ -126,8 +131,17 @@ class TaskService {
       throw new Error('任务不存在');
     }
 
+    const finalStages = [STAGES.COMPLETED, STAGES.ROLLED_BACK];
+    if (finalStages.includes(task.stage)) {
+      throw new Error(`任务已处于终态(${task.stage})，不可暂停`);
+    }
+
     if (task.status === STATUSES.PAUSED) {
       throw new Error('任务已经暂停');
+    }
+
+    if (task.status !== STATUSES.RUNNING) {
+      throw new Error(`只能暂停执行中的任务，当前状态: ${task.status}`);
     }
 
     const now = Date.now();
@@ -150,6 +164,11 @@ class TaskService {
     const task = await this.getTaskById(taskId);
     if (!task) {
       throw new Error('任务不存在');
+    }
+
+    const finalStages = [STAGES.COMPLETED, STAGES.ROLLED_BACK];
+    if (finalStages.includes(task.stage)) {
+      throw new Error(`任务已处于终态(${task.stage})，不可恢复`);
     }
 
     if (task.status !== STATUSES.PAUSED) {
@@ -179,8 +198,18 @@ class TaskService {
       throw new Error('任务不存在');
     }
 
+    const finalStages = [STAGES.COMPLETED, STAGES.ROLLED_BACK];
+    if (finalStages.includes(task.stage)) {
+      throw new Error(`任务已处于终态(${task.stage})，不可修改验证结果`);
+    }
+
     if (task.stage !== STAGES.VERIFICATION) {
       throw new Error(`只能在验证阶段提交验证结果，当前阶段: ${task.stage}`);
+    }
+
+    const immutableStatuses = [STATUSES.BLOCKED, STATUSES.FAILED, STATUSES.SUCCESS];
+    if (immutableStatuses.includes(task.status)) {
+      throw new Error(`验证状态(${task.status})已确定，不可再次修改`);
     }
 
     const now = Date.now();
@@ -208,8 +237,18 @@ class TaskService {
       throw new Error('任务不存在');
     }
 
+    const finalStages = [STAGES.COMPLETED, STAGES.ROLLED_BACK];
+    if (finalStages.includes(task.stage)) {
+      throw new Error(`任务已处于终态(${task.stage})，不可调整灰度流量`);
+    }
+
     if (task.stage !== STAGES.GRAY_RELEASE) {
       throw new Error(`只能在灰度发布阶段调整灰度流量，当前阶段: ${task.stage}`);
+    }
+
+    const allowedStatuses = [STATUSES.RUNNING, STATUSES.PAUSED];
+    if (!allowedStatuses.includes(task.status)) {
+      throw new Error(`只能在 running 或 paused 状态调整灰度流量，当前状态: ${task.status}`);
     }
 
     if (percentage < 0 || percentage > 100) {
@@ -239,6 +278,11 @@ class TaskService {
     const task = await this.getTaskById(taskId);
     if (!task) {
       throw new Error('任务不存在');
+    }
+
+    const finalStages = [STAGES.COMPLETED, STAGES.ROLLED_BACK];
+    if (finalStages.includes(task.stage)) {
+      throw new Error(`任务已处于终态(${task.stage})，不可回滚`);
     }
 
     if (!task.current_version) {
