@@ -1,0 +1,15 @@
+{
+  "name": "safety-hazard-system",
+  "version": "1.0.0",
+  "description": "安全隐患闭环管理系统",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["safety", "hazard", "management", "inspection"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
