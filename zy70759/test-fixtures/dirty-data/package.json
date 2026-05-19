@@ -1,0 +1,10 @@
+{
+  "name": "dirty-data-package",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./dist/missing-main.js",
+    "./utils": "./dist/missing-utils.js",
+    "./invalid": 12345,
+    "./null-export": null
+  }
+}

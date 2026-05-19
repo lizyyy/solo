@@ -1,0 +1,9 @@
+{
+  "name": "missing-files-package",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./dist/index.js",
+    "./utils": "./src/utils.js",
+    "./components/*": "./dist/components/*.js"
+  }
+}

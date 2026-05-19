@@ -1,0 +1,9 @@
+{
+  "name": "normal-package",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./dist/index.js",
+    "./utils": "./dist/utils/index.js",
+    "./constants": "./dist/constants.js"
+  }
+}

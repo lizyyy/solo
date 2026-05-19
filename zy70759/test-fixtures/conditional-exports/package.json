@@ -1,0 +1,15 @@
+{
+  "name": "conditional-exports-package",
+  "version": "1.0.0",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./browser": {
+      "browser": "./dist/browser.js",
+      "default": "./dist/node.js"
+    }
+  }
+}

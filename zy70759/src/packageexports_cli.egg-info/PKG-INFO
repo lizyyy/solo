@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: packageexports-cli
+Version: 0.1.0
+Summary: Node.js package exports 入口体检排查工具
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0
+Requires-Dist: rich>=13.0

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "packageexports-cli"
+version = "0.1.0"
+description = "Node.js package exports 入口体检排查工具"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "rich>=13.0",
+]
+
+[project.scripts]
+packageexports = "packageexports_cli.main:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,10 @@
+{
+  "name": "conflicting-package",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./dist/index.js",
+    "./utils": "./dist/utils.js",
+    "./utils/helper": "./dist/utils/helper.js",
+    "./utils/*": "./dist/utils/*.js"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "invalid-json-package",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  this is invalid json syntax!
+}
