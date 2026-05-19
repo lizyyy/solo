@@ -14,11 +14,24 @@ DEFAULT_DATA_FILE = os.path.expanduser("~/.env_audit_data.json")
 
 
 def json_serializer(obj: Any) -> Any:
-    """正确序列化 datetime 和其他类型"""
+    """正确序列化 datetime、Lease 和其他类型"""
     if isinstance(obj, datetime):
         return obj.isoformat()
     if isinstance(obj, timedelta):
         return obj.total_seconds()
+    # 处理 Lease 对象
+    if hasattr(obj, 'model_dump'):
+        return obj.model_dump()
+    if hasattr(obj, '__dict__'):
+        # 尝试转换为字典
+        result = {}
+        for k, v in obj.__dict__.items():
+            if not k.startswith('_'):
+                try:
+                    result[k] = json_serializer(v)
+                except TypeError:
+                    result[k] = str(v)
+        return result
     raise TypeError(f"Type {type(obj)} not serializable")
 
 
@@ -110,12 +123,16 @@ def print_error(message: str, exit_code: int = 1):
     sys.exit(exit_code)
 
 
-def print_success(message: str):
-    click.echo(click.style(f"✓ {message}", fg='green'))
+def print_success(ctx: Context, message: str):
+    """在非 JSON 模式下打印成功消息，JSON 模式下静默"""
+    if ctx.output_format != 'json' and not ctx.quiet:
+        click.echo(click.style(f"✓ {message}", fg='green'))
 
 
-def print_warning(message: str):
-    click.echo(click.style(f"! {message}", fg='yellow'))
+def print_warning(ctx: Context, message: str):
+    """在非 JSON 模式下打印警告消息，JSON 模式下静默"""
+    if ctx.output_format != 'json' and not ctx.quiet:
+        click.echo(click.style(f"! {message}", fg='yellow'))
 
 
 @click.group()
@@ -154,7 +171,7 @@ def lease(ctx: Context, env_id: str, branch_name: str, assignee: str, duration: 
     result = ctx.manager.create_lease(env_id, branch_name, assignee, duration, reason, request_id)
 
     if result.get('idempotent'):
-        print_warning(result['message'])
+        print_warning(ctx, result['message'])
         output_result(ctx, result)
         return
 
@@ -167,7 +184,7 @@ def lease(ctx: Context, env_id: str, branch_name: str, assignee: str, duration: 
         return
 
     lease = result['lease']
-    print_success(f"成功租用环境 {env_id}")
+    print_success(ctx, f"成功租用环境 {env_id}")
     output_result(ctx, result, [{
         '环境ID': lease.env_id,
         '分支': lease.branch_name,
@@ -194,15 +211,16 @@ def renew(ctx: Context, env_id: str, assignee: str, duration: int, reason: str, 
     result = ctx.manager.renew_lease(env_id, assignee, duration, reason, request_id)
 
     if result.get('idempotent'):
-        print_warning(result['message'])
+        print_warning(ctx, result['message'])
         output_result(ctx, result)
         return
 
     if not result['success']:
         print_error(result['error'])
+        return
 
     lease = result['lease']
-    print_success(f"成功续租环境 {env_id}")
+    print_success(ctx, f"成功续租环境 {env_id}")
     output_result(ctx, result, [{
         '环境ID': lease.env_id,
         '占用人': lease.assignee,
@@ -225,12 +243,12 @@ def release(ctx: Context, env_id: str, assignee: Optional[str], reason: str, for
         print_error(result['error'])
 
     if result.get('was_expired'):
-        print_warning(f"环境 {env_id} 租约已过期")
+        print_warning(ctx, f"环境 {env_id} 租约已过期")
 
     if result.get('force_released'):
-        print_warning(f"环境 {env_id} 已被强制释放")
+        print_warning(ctx, f"环境 {env_id} 已被强制释放")
 
-    print_success(f"成功释放环境 {env_id}")
+    print_success(ctx, f"成功释放环境 {env_id}")
     output_result(ctx, result)
 
 
@@ -241,7 +259,7 @@ def check_expired(ctx: Context):
     expired = ctx.manager.check_expired_leases()
 
     if not expired:
-        print_success("没有发现过期租约")
+        print_success(ctx, "没有发现过期租约")
         output_result(ctx, {'expired_count': 0, 'leases': []})
         return
 
@@ -254,7 +272,7 @@ def check_expired(ctx: Context):
             '到期时间': lease.end_time.strftime('%Y-%m-%d %H:%M')
         })
 
-    print_warning(f"发现 {len(expired)} 个过期租约，已自动释放")
+    print_warning(ctx, f"发现 {len(expired)} 个过期租约，已自动释放")
     output_result(ctx, {
         'expired_count': len(expired),
         'leases': [l.model_dump() for l in expired]
@@ -312,7 +330,7 @@ def history(ctx: Context, env_id: Optional[str], limit: int):
     history = ctx.manager.get_lease_history(env_id, limit)
 
     if not history:
-        print_warning("没有租约历史记录")
+        print_warning(ctx, "没有租约历史记录")
         output_result(ctx, {'count': 0, 'history': []})
         return
 
@@ -387,7 +405,7 @@ def who_can_renew(ctx: Context):
     renewables = [e for e in report['environments'] if e['status'] == 'occupied' and not e.get('is_expired')]
 
     if not renewables:
-        print_warning("没有可续租的环境")
+        print_warning(ctx, "没有可续租的环境")
         output_result(ctx, {'count': 0, 'renewable': []})
         return
 
@@ -401,7 +419,7 @@ def who_can_renew(ctx: Context):
             '状态': '即将到期' if env['remaining_hours'] < 2 else '正常'
         })
 
-    print_success(f"找到 {len(renewables)} 个可续租的环境")
+    print_success(ctx, f"找到 {len(renewables)} 个可续租的环境")
     output_result(ctx, {'count': len(renewables), 'renewable': renewables}, table_data)
 
 
@@ -416,7 +434,7 @@ def who_should_release(ctx: Context):
     ]
 
     if not should_release:
-        print_success("没有需要释放的环境")
+        print_success(ctx, "没有需要释放的环境")
         output_result(ctx, {'count': 0, 'should_release': []})
         return
 
@@ -430,7 +448,7 @@ def who_should_release(ctx: Context):
             '原因': reason
         })
 
-    print_warning(f"找到 {len(should_release)} 个应该释放的环境")
+    print_warning(ctx, f"找到 {len(should_release)} 个应该释放的环境")
     output_result(ctx, {'count': len(should_release), 'should_release': should_release}, table_data)
 
 
@@ -444,7 +462,7 @@ def reset(ctx: Context):
         env.lease_history = []
     ctx.manager.leases = {}
     ctx.manager.request_ids = set()
-    print_success("所有环境状态已重置")
+    print_success(ctx, "所有环境状态已重置")
     output_result(ctx, {'reset': True, 'message': '所有环境状态已重置'})
 
 
@@ -456,7 +474,7 @@ def available(ctx: Context):
     available_envs = [e for e in report['environments'] if e['status'] == 'available']
 
     if not available_envs:
-        print_warning("没有可用环境！所有环境都被占用了")
+        print_warning(ctx, "没有可用环境！所有环境都被占用了")
         output_result(ctx, {'count': 0, 'available': []})
         return
 
@@ -467,5 +485,5 @@ def available(ctx: Context):
             '状态': '可用'
         })
 
-    print_success(f"找到 {len(available_envs)} 个可用环境")
+    print_success(ctx, f"找到 {len(available_envs)} 个可用环境")
     output_result(ctx, {'count': len(available_envs), 'available': available_envs}, table_data)
