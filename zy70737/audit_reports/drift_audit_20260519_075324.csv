@@ -1,0 +1,6 @@
+service_name,config_key,expected_value,actual_value,has_exemption,exemption_reason,exemption_expire_date,review_status,is_exemption_expired,source_location
+notification-service,email.sender,no-reply@example.com,admin@example.com,No,,,no_exemption,No,test_configs.csv:8
+notification-service,sms.enabled,true,false,No,,,no_exemption,No,test_configs.csv:9
+order-service,log.level,INFO,DEBUG,Yes,排查问题临时开启DEBUG,2024-01-01,expired,Yes,test_configs.csv:3
+payment-service,max.retry.attempts,3,5,Yes,提高重试次数提升稳定性,2099-12-31,approved,No,test_configs.csv:4
+user-service,cache.ttl,3600,7200,Yes,缓存优化延长TTL,2024-06-30,expired,Yes,test_configs.csv:6

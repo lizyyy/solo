@@ -1,0 +1,9 @@
+service_name,config_key,expected_value,actual_value
+order-service,db.connection.timeout,30,30
+order-service,log.level,INFO,DEBUG
+payment-service,max.retry.attempts,3,5
+payment-service,security.ssl.enabled,true,true
+user-service,cache.ttl,3600,7200
+user-service,rate.limit.per_minute,100,100
+notification-service,email.sender,no-reply@example.com,admin@example.com
+notification-service,sms.enabled,true,false

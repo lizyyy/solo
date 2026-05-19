@@ -1,0 +1,4 @@
+service_name,config_key,reason,expire_date,reviewer,status
+order-service,log.level,排查问题临时开启DEBUG,2024-01-01,zhangsan,approved
+payment-service,max.retry.attempts,提高重试次数提升稳定性,2099-12-31,lisi,approved
+user-service,cache.ttl,缓存优化延长TTL,2024-06-30,wangwu,pending

@@ -1,0 +1,80 @@
+{
+  "run_id": "20260519_075324",
+  "audit_time": "2026-05-19T07:53:24.919432",
+  "summary": {
+    "total_records": 5,
+    "drifted_records": 5,
+    "exempted_records": 3,
+    "expired_exemptions": 2,
+    "pending_review": 0,
+    "approved_exemptions": 1,
+    "rejected_exemptions": 0,
+    "no_exemption": 2,
+    "bad_rows_count": 0
+  },
+  "drift_records": [
+    {
+      "service_name": "notification-service",
+      "config_key": "email.sender",
+      "expected_value": "no-reply@example.com",
+      "actual_value": "admin@example.com",
+      "exemption": null,
+      "review_status": "no_exemption",
+      "is_exemption_expired": false,
+      "source_location": "test_configs.csv:8"
+    },
+    {
+      "service_name": "notification-service",
+      "config_key": "sms.enabled",
+      "expected_value": "true",
+      "actual_value": "false",
+      "exemption": null,
+      "review_status": "no_exemption",
+      "is_exemption_expired": false,
+      "source_location": "test_configs.csv:9"
+    },
+    {
+      "service_name": "order-service",
+      "config_key": "log.level",
+      "expected_value": "INFO",
+      "actual_value": "DEBUG",
+      "exemption": {
+        "reason": "排查问题临时开启DEBUG",
+        "expire_date": "2024-01-01",
+        "reviewer": "zhangsan"
+      },
+      "review_status": "expired",
+      "is_exemption_expired": true,
+      "source_location": "test_configs.csv:3"
+    },
+    {
+      "service_name": "payment-service",
+      "config_key": "max.retry.attempts",
+      "expected_value": "3",
+      "actual_value": "5",
+      "exemption": {
+        "reason": "提高重试次数提升稳定性",
+        "expire_date": "2099-12-31",
+        "reviewer": "lisi"
+      },
+      "review_status": "approved",
+      "is_exemption_expired": false,
+      "source_location": "test_configs.csv:4"
+    },
+    {
+      "service_name": "user-service",
+      "config_key": "cache.ttl",
+      "expected_value": "3600",
+      "actual_value": "7200",
+      "exemption": {
+        "reason": "缓存优化延长TTL",
+        "expire_date": "2024-06-30",
+        "reviewer": "wangwu"
+      },
+      "review_status": "expired",
+      "is_exemption_expired": true,
+      "source_location": "test_configs.csv:6"
+    }
+  ],
+  "bad_rows": []
+}
