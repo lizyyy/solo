@@ -1,5 +1,6 @@
 import hashlib
-from typing import Any, Dict, List, Optional, Set
+import re
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from .models import (
     Contract,
@@ -10,6 +11,48 @@ from .models import (
     SampleField,
     FieldDefinition,
 )
+
+
+def normalize_path_for_matching(path: str) -> str:
+    return re.sub(r'\[\d+\]', '[*]', path)
+
+
+def get_parent_path(path: str) -> Optional[str]:
+    if '.' not in path:
+        return None
+    parts = path.rsplit('.', 1)
+    return parts[0]
+
+
+def is_path_present_via_children(path: str, existing_paths: Set[str]) -> bool:
+    for p in existing_paths:
+        if p.startswith(path + '.') or p.startswith(path + '['):
+            return True
+    return False
+
+
+def match_paths(
+    contract_paths: Set[str], sample_paths: Set[str]
+) -> Tuple[Dict[str, str], Set[str], Set[str]]:
+    sample_to_contract: Dict[str, str] = {}
+    unmatched_contract: Set[str] = set(contract_paths)
+    unmatched_sample: Set[str] = set(sample_paths)
+
+    for sample_path in sample_paths:
+        normalized = normalize_path_for_matching(sample_path)
+        if normalized in contract_paths:
+            sample_to_contract[sample_path] = normalized
+            if sample_path in unmatched_sample:
+                unmatched_sample.remove(sample_path)
+            if normalized in unmatched_contract:
+                unmatched_contract.remove(normalized)
+
+    contract_paths_list = list(unmatched_contract)
+    for contract_path in contract_paths_list:
+        if is_path_present_via_children(contract_path, sample_paths):
+            unmatched_contract.remove(contract_path)
+
+    return sample_to_contract, unmatched_contract, unmatched_sample
 
 
 class DriftDetector:
@@ -51,15 +94,35 @@ class DriftDetector:
         drifts = []
         sample_fields = {f.path: f for f in sample.fields}
 
-        all_paths = set(contract_fields.keys()) | set(sample_fields.keys())
-        sorted_paths = sorted(all_paths)
+        contract_paths = set(contract_fields.keys())
+        sample_paths = set(sample_fields.keys())
 
-        for path in sorted_paths:
-            contract_field = contract_fields.get(path)
-            sample_field = sample_fields.get(path)
+        sample_to_contract, unmatched_contract, unmatched_sample = match_paths(
+            contract_paths, sample_paths
+        )
 
+        for sample_path, contract_path in sorted(sample_to_contract.items()):
+            contract_field = contract_fields[contract_path]
+            sample_field = sample_fields[sample_path]
             path_drifts = self._check_field(
-                contract, sample, path, contract_field, sample_field
+                contract, sample, sample_path, contract_field, sample_field
+            )
+            drifts.extend(path_drifts)
+
+        contract_non_array_paths = [
+            p for p in unmatched_contract if '[*]' not in p
+        ]
+        for contract_path in sorted(contract_non_array_paths):
+            contract_field = contract_fields[contract_path]
+            path_drifts = self._check_field(
+                contract, sample, contract_path, contract_field, None
+            )
+            drifts.extend(path_drifts)
+
+        for sample_path in sorted(unmatched_sample):
+            sample_field = sample_fields[sample_path]
+            path_drifts = self._check_field(
+                contract, sample, sample_path, None, sample_field
             )
             drifts.extend(path_drifts)
 
