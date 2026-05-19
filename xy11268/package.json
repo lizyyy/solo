@@ -1,0 +1,25 @@
+{
+  "name": "qa-inspection-service",
+  "version": "1.0.0",
+  "description": "客服质检服务 - 检测转写文本中的道歉、退款承诺和敏感词",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node src/scripts/initDb.js",
+    "seed-data": "node src/scripts/seedData.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-writer": "^1.6.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["qa", "inspection", "customer-service"],
+  "author": "",
+  "license": "MIT"
+}
