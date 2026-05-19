@@ -123,16 +123,31 @@ class ReplayResult(db.Model):
     executed_by = db.Column(db.String(64))
     
     def to_dict(self):
+        try:
+            masked_body = json.loads(self.masked_body) if self.masked_body else {}
+        except (json.JSONDecodeError, TypeError):
+            masked_body = {'raw': self.masked_body}
+        
+        try:
+            response_headers = json.loads(self.response_headers) if self.response_headers else {}
+        except (json.JSONDecodeError, TypeError):
+            response_headers = {'raw': self.response_headers}
+        
+        try:
+            response_body = json.loads(self.response_body) if self.response_body else None
+        except (json.JSONDecodeError, TypeError):
+            response_body = {'raw': self.response_body}
+        
         return {
             'id': self.id,
             'request_id': self.request_id,
             'environment_id': self.environment_id,
             'authorization_id': self.authorization_id,
             'status': self.status,
-            'masked_body': json.loads(self.masked_body) if self.masked_body else {},
+            'masked_body': masked_body,
             'response_status': self.response_status,
-            'response_headers': json.loads(self.response_headers) if self.response_headers else {},
-            'response_body': json.loads(self.response_body) if self.response_body else None,
+            'response_headers': response_headers,
+            'response_body': response_body,
             'response_time_ms': self.response_time_ms,
             'error_message': self.error_message,
             'started_at': self.started_at.isoformat() if self.started_at else None,
