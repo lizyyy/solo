@@ -308,6 +308,10 @@ async function viewTask(id) {
                         <label>标注结果：</label>
                         <div>${item.annotation_result}</div>
                     </div>
+                ` : item.status === 'skipped' ? `
+                    <div style="margin-top: 8px; color: #e74c3c; font-style: italic;">
+                        该样本已跳过，等待复核
+                    </div>
                 ` : item.status === 'assigned' || item.status === 'pending' ? `
                     <div style="margin-top: 10px;">
                         <textarea id="annotation-${item.id}" placeholder="输入标注结果" rows="3" style="width: 100%; padding: 8px;"></textarea>

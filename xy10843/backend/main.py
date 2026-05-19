@@ -179,7 +179,7 @@ def create_skip(skip: schemas.SkipRecordCreate, db: Session = Depends(get_db)):
     sample.locked_by = None
     sample.locked_at = None
     
-    task_item = db.query(TaskItem).filter(TaskItem.sample_id == skip.sample_id, TaskItem.status == "assigned").first()
+    task_item = db.query(TaskItem).filter(TaskItem.sample_id == skip.sample_id, TaskItem.status.in_(["assigned", "pending"])).first()
     if task_item:
         task_item.status = "skipped"
         package = db.query(TaskPackage).filter(TaskPackage.id == task_item.package_id).first()
@@ -236,8 +236,20 @@ def review_skip(
     if sample:
         if request.review_result == "reassign":
             sample.status = "pending"
+            task_item = db.query(TaskItem).filter(TaskItem.sample_id == skip.sample_id, TaskItem.status == "skipped").first()
+            if task_item:
+                task_item.status = "pending"
         elif request.review_result == "accept":
             sample.status = "completed"
+            task_item = db.query(TaskItem).filter(TaskItem.sample_id == skip.sample_id, TaskItem.status == "skipped").first()
+            if task_item:
+                task_item.status = "completed"
+                package = db.query(TaskPackage).filter(TaskPackage.id == task_item.package_id).first()
+                if package:
+                    all_finished = all(i.status in ["completed", "skipped"] for i in package.items)
+                    if all_finished:
+                        package.status = "completed"
+                        package.completed_at = datetime.utcnow()
     
     db.commit()
     return {"status": "success", "message": "Review completed"}
