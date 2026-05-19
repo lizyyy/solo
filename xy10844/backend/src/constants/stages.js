@@ -67,8 +67,7 @@ const STAGE_NAMES = {
   [STAGES.FULL_SWITCH]: '全量切换',
   [STAGES.COMPLETED]: '已完成',
   [STAGES.FAILED]: '失败',
-  [STAGES.ROLLED_BACK]: '已回滚',
-  [STAGES.PAUSED]: '已暂停'
+  [STAGES.ROLLED_BACK]: '已回滚'
 };
 
 const STATUS_NAMES = {
