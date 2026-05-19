@@ -1,0 +1,50 @@
+[
+    {
+        "key": "",
+        "source_lang": "english",
+        "target_lang": "zh",
+        "source_text": "Hello World",
+        "target_text": "你好世界",
+        "version_batch": "v2.0.0"
+    },
+    {
+        "key": "valid.entry",
+        "source_lang": "en",
+        "target_lang": "zh",
+        "source_text": "Valid Entry",
+        "target_text": "有效词条",
+        "version_batch": "v2.0.0"
+    },
+    {
+        "key": "missing.target",
+        "source_lang": "en",
+        "target_lang": "",
+        "source_text": "Missing Target",
+        "target_text": "缺失目标语言",
+        "version_batch": "v2.0.0"
+    },
+    {
+        "key": "empty.version",
+        "source_lang": "en",
+        "target_lang": "zh",
+        "source_text": "No Version",
+        "target_text": "无版本号",
+        "version_batch": ""
+    },
+    {
+        "key": "no.source.text",
+        "source_lang": "en",
+        "target_lang": "zh",
+        "source_text": "",
+        "target_text": "无源文本",
+        "version_batch": "v2.0.0"
+    },
+    {
+        "key": "another.valid",
+        "source_lang": "en",
+        "target_lang": "zh",
+        "source_text": "Another Valid",
+        "target_text": "另一个有效词条",
+        "version_batch": "v2.0.1"
+    }
+]
