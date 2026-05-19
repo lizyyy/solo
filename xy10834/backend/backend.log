@@ -1,9 +1,84 @@
-[INFO] 03:42:53 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+[INFO] 04:33:23 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
 配置分发一致性台后端服务已启动: http://localhost:3001
 API文档: http://localhost:3001/api/health
-Error: AppError: 服务实例不存在
-    at PullRecordService.reportPullResult (/Users/mac/pro/solo/workspaces/xy10834/backend/src/services/pullRecord.service.ts:29:13)
-    at reportPullResult (/Users/mac/pro/solo/workspaces/xy10834/backend/src/controllers/pullRecord.controller.ts:6:20) {
-  statusCode: 404,
-  isOperational: true
+prisma:error 
+Invalid `tx.pullRecord.create()` invocation in
+/Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts:61:29
+
+  58 });
+  59 
+  60 for (const instance of instances) {
+→ 61   await tx.pullRecord.create(
+Foreign key constraint violated: `foreign key`
+Error: PrismaClientKnownRequestError: 
+Invalid `tx.pullRecord.create()` invocation in
+/Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts:61:29
+
+  58 });
+  59 
+  60 for (const instance of instances) {
+→ 61   await tx.pullRecord.create(
+Foreign key constraint violated: `foreign key`
+    at $n.handleRequestError (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:121:7315)
+    at $n.handleAndLogRequestError (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at l (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at /Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts:61:9
+    at Proxy._transactionWithCallback (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:130:8000)
+    at DistributionService.publishVersion (/Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts:40:20)
+    at publishVersion (/Users/mac/pro/solo/workspaces/xy10834/backend/src/controllers/distribution.controller.ts:6:20) {
+  code: 'P2003',
+  clientVersion: '5.22.0',
+  meta: { modelName: 'PullRecord', field_name: 'foreign key' }
 }
+prisma:error 
+Invalid `tx.pullRecord.create()` invocation in
+/Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts:61:29
+
+  58 });
+  59 
+  60 for (const instance of instances) {
+→ 61   await tx.pullRecord.create(
+Foreign key constraint violated: `foreign key`
+Error: PrismaClientKnownRequestError: 
+Invalid `tx.pullRecord.create()` invocation in
+/Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts:61:29
+
+  58 });
+  59 
+  60 for (const instance of instances) {
+→ 61   await tx.pullRecord.create(
+Foreign key constraint violated: `foreign key`
+    at $n.handleRequestError (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:121:7315)
+    at $n.handleAndLogRequestError (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at l (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at /Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts:61:9
+    at Proxy._transactionWithCallback (/Users/mac/pro/solo/workspaces/xy10834/backend/node_modules/@prisma/client/runtime/library.js:130:8000)
+    at DistributionService.publishVersion (/Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts:40:20)
+    at publishVersion (/Users/mac/pro/solo/workspaces/xy10834/backend/src/controllers/distribution.controller.ts:6:20) {
+  code: 'P2003',
+  clientVersion: '5.22.0',
+  meta: { modelName: 'PullRecord', field_name: 'foreign key' }
+}
+[INFO] 04:35:20 Restarting: /Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts has been modified
+配置分发一致性台后端服务已启动: http://localhost:3001
+API文档: http://localhost:3001/api/health
+[INFO] 04:35:35 Restarting: /Users/mac/pro/solo/workspaces/xy10834/backend/src/services/pullRecord.service.ts has been modified
+配置分发一致性台后端服务已启动: http://localhost:3001
+API文档: http://localhost:3001/api/health
+[INFO] 04:35:46 Restarting: /Users/mac/pro/solo/workspaces/xy10834/backend/src/services/pullRecord.service.ts has been modified
+配置分发一致性台后端服务已启动: http://localhost:3001
+API文档: http://localhost:3001/api/health
+[INFO] 04:35:54 Restarting: /Users/mac/pro/solo/workspaces/xy10834/backend/src/services/pullRecord.service.ts has been modified
+配置分发一致性台后端服务已启动: http://localhost:3001
+API文档: http://localhost:3001/api/health
+[INFO] 04:36:05 Restarting: /Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts has been modified
+配置分发一致性台后端服务已启动: http://localhost:3001
+API文档: http://localhost:3001/api/health
+[INFO] 04:36:14 Restarting: /Users/mac/pro/solo/workspaces/xy10834/backend/src/services/pullRecord.service.ts has been modified
+配置分发一致性台后端服务已启动: http://localhost:3001
+API文档: http://localhost:3001/api/health
+[INFO] 04:36:25 Restarting: /Users/mac/pro/solo/workspaces/xy10834/backend/src/services/distribution.service.ts has been modified
+配置分发一致性台后端服务已启动: http://localhost:3001
+API文档: http://localhost:3001/api/health

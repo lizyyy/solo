@@ -21,8 +21,8 @@ export class PullRecordService {
       throw new AppError('配置项不存在', 404);
     }
 
-    const instance = await prisma.serviceInstance.findUnique({
-      where: { id: dto.instanceId },
+    const instance = await prisma.serviceInstance.findFirst({
+      where: { instanceId: dto.instanceId },
     });
 
     if (!instance) {
@@ -44,7 +44,7 @@ export class PullRecordService {
       const pullRecord = await tx.pullRecord.create({
         data: {
           configId: dto.configId,
-          instanceId: dto.instanceId,
+          instanceId: instance.id,
           distributionId: dto.distributionId,
           requestedVersion,
           actualVersion: dto.actualVersion,
@@ -58,12 +58,12 @@ export class PullRecordService {
           where: {
             configId_instanceId: {
               configId: dto.configId,
-              instanceId: dto.instanceId,
+              instanceId: instance.id,
             },
           },
           create: {
             configId: dto.configId,
-            instanceId: dto.instanceId,
+            instanceId: instance.id,
             currentVersion: dto.actualVersion,
             effectiveStatus: dto.actualVersion >= config.version
               ? EffectiveStatus.EFFECTIVE
