@@ -136,6 +136,53 @@ class TestStatusTransition:
         assert response.status_code == 200
         assert response.json()["status"] == IncidentStatus.INVESTIGATING
 
+    def test_invalid_transition_created_to_resolved(self, client):
+        data = create_test_incident_data()
+        create_response = client.post("/api/v1/incidents", json=data)
+        incident_id = create_response.json()["id"]
+
+        transition_data = {
+            "target_status": IncidentStatus.RESOLVED,
+            "operator": "ops_test",
+            "conclusion": "试图直接从 created 跳到 resolved"
+        }
+        response = client.post(
+            f"/api/v1/incidents/{incident_id}/status",
+            json=transition_data
+        )
+        assert response.status_code == 400
+        assert "状态流转无效" in response.json()["detail"]
+        incident_response = client.get(f"/api/v1/incidents/{incident_id}")
+        assert incident_response.json()["status"] == IncidentStatus.CREATED
+
+    def test_valid_full_workflow(self, client):
+        data = create_test_incident_data()
+        create_response = client.post("/api/v1/incidents", json=data)
+        incident_id = create_response.json()["id"]
+
+        transition_data = {
+            "target_status": IncidentStatus.INVESTIGATING,
+            "operator": "ops_test",
+            "conclusion": "开始调查"
+        }
+        response = client.post(f"/api/v1/incidents/{incident_id}/status", json=transition_data)
+        assert response.status_code == 200
+
+        transition_data["target_status"] = IncidentStatus.ATTRIBUTED
+        response = client.post(f"/api/v1/incidents/{incident_id}/status", json=transition_data)
+        assert response.status_code == 200
+
+        transition_data["target_status"] = IncidentStatus.RESOLVED
+        response = client.post(f"/api/v1/incidents/{incident_id}/status", json=transition_data)
+        assert response.status_code == 200
+
+        response = client.post(
+            f"/api/v1/incidents/{incident_id}/close",
+            params={"operator": "manager_test", "conclusion": "事故已解决"}
+        )
+        assert response.status_code == 200
+        assert response.json()["status"] == IncidentStatus.CLOSED
+
     def test_full_status_not_found(self, client):
         transition_data = {
             "target_status": IncidentStatus.INVESTIGATING,
@@ -170,6 +217,33 @@ class TestClueManagement:
         assert response.status_code == 201
         assert response.json()["description"] == "发现异常日志"
 
+    def test_add_duplicate_clue_idempotent(self, client):
+        data = create_test_incident_data()
+        create_response = client.post("/api/v1/incidents", json=data)
+        incident_id = create_response.json()["id"]
+
+        clue_data = {
+            "source_system": "test_system",
+            "clue_type": "log_anomaly",
+            "description": "发现异常日志",
+            "confidence": 0.85,
+            "is_primary": True,
+            "created_by": "dev_test"
+        }
+        response1 = client.post(f"/api/v1/incidents/{incident_id}/clues", json=clue_data)
+        assert response1.status_code == 201
+        clue_id_1 = response1.json()["id"]
+
+        response2 = client.post(f"/api/v1/incidents/{incident_id}/clues", json=clue_data)
+        assert response2.status_code == 201
+        clue_id_2 = response2.json()["id"]
+
+        assert clue_id_1 == clue_id_2
+
+        response = client.get(f"/api/v1/incidents/{incident_id}/clues")
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
     def test_get_clues(self, client):
         data = create_test_incident_data()
         create_response = client.post("/api/v1/incidents", json=data)
@@ -188,6 +262,15 @@ class TestClueManagement:
         response = client.get(f"/api/v1/incidents/{incident_id}/clues")
         assert response.status_code == 200
         assert len(response.json()) == 1
+
+
+def _transition_to_status(client, incident_id: str, target_status: str):
+    transition_data = {
+        "target_status": target_status,
+        "operator": "ops_test",
+        "conclusion": f"流转到 {target_status}"
+    }
+    return client.post(f"/api/v1/incidents/{incident_id}/status", json=transition_data)
 
 
 class TestManualCorrectAndClose:
@@ -209,7 +292,7 @@ class TestManualCorrectAndClose:
         assert response.json()["summary"] == "这是人工修正的摘要"
         assert response.json()["metric_value"] == 3000000
 
-    def test_close_incident(self, client):
+    def test_close_incident_invalid_from_created(self, client):
         data = create_test_incident_data()
         create_response = client.post("/api/v1/incidents", json=data)
         incident_id = create_response.json()["id"]
@@ -221,10 +304,29 @@ class TestManualCorrectAndClose:
                 "conclusion": "事故已解决，用户已进行了限流措施"
             }
         )
+        assert response.status_code == 400
+        assert "状态流转无效" in response.json()["detail"]
+
+    def test_close_incident_valid_from_resolved(self, client):
+        data = create_test_incident_data()
+        create_response = client.post("/api/v1/incidents", json=data)
+        incident_id = create_response.json()["id"]
+
+        _transition_to_status(client, incident_id, IncidentStatus.INVESTIGATING)
+        _transition_to_status(client, incident_id, IncidentStatus.ATTRIBUTED)
+        _transition_to_status(client, incident_id, IncidentStatus.RESOLVED)
+
+        response = client.post(
+            f"/api/v1/incidents/{incident_id}/close",
+            params={
+                "operator": "manager_test",
+                "conclusion": "事故已解决，用户已进行了限流措施"
+            }
+        )
         assert response.status_code == 200
         assert response.json()["status"] == IncidentStatus.CLOSED
 
-    def test_withdraw_incident(self, client):
+    def test_withdraw_incident_valid_from_created(self, client):
         data = create_test_incident_data()
         create_response = client.post("/api/v1/incidents", json=data)
         incident_id = create_response.json()["id"]
@@ -238,6 +340,46 @@ class TestManualCorrectAndClose:
         )
         assert response.status_code == 200
         assert response.json()["status"] == IncidentStatus.WITHDRAWN
+
+    def test_withdraw_incident_valid_from_investigating(self, client):
+        data = create_test_incident_data()
+        create_response = client.post("/api/v1/incidents", json=data)
+        incident_id = create_response.json()["id"]
+
+        _transition_to_status(client, incident_id, IncidentStatus.INVESTIGATING)
+
+        response = client.post(
+            f"/api/v1/incidents/{incident_id}/withdraw",
+            params={
+                "operator": "manager_test",
+                "reason": "误报，指标恢复正常"
+            }
+        )
+        assert response.status_code == 200
+        assert response.json()["status"] == IncidentStatus.WITHDRAWN
+
+    def test_withdraw_incident_invalid_from_closed(self, client):
+        data = create_test_incident_data()
+        create_response = client.post("/api/v1/incidents", json=data)
+        incident_id = create_response.json()["id"]
+
+        _transition_to_status(client, incident_id, IncidentStatus.INVESTIGATING)
+        _transition_to_status(client, incident_id, IncidentStatus.ATTRIBUTED)
+        _transition_to_status(client, incident_id, IncidentStatus.RESOLVED)
+        client.post(
+            f"/api/v1/incidents/{incident_id}/close",
+            params={"operator": "manager_test", "conclusion": "已关闭"}
+        )
+
+        response = client.post(
+            f"/api/v1/incidents/{incident_id}/withdraw",
+            params={
+                "operator": "manager_test",
+                "reason": "试图从已关闭状态撤回"
+            }
+        )
+        assert response.status_code == 400
+        assert "状态流转无效" in response.json()["detail"]
 
 
 class TestExportAndActions:
@@ -255,6 +397,10 @@ class TestExportAndActions:
             "created_by": "dev_test"
         }
         client.post(f"/api/v1/incidents/{incident_id}/clues", json=clue_data)
+
+        _transition_to_status(client, incident_id, IncidentStatus.INVESTIGATING)
+        _transition_to_status(client, incident_id, IncidentStatus.ATTRIBUTED)
+        _transition_to_status(client, incident_id, IncidentStatus.RESOLVED)
 
         client.post(
             f"/api/v1/incidents/{incident_id}/close",

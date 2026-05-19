@@ -89,13 +89,31 @@ class IncidentService:
         incidents = q.offset(offset).limit(query.page_size).all()
         return incidents, total
 
-    def transition_status(self, incident_id: str, transition: StatusTransition) -> Optional[Incident]:
+    VALID_STATUS_TRANSITIONS = {
+        IncidentStatus.CREATED: [IncidentStatus.INVESTIGATING, IncidentStatus.WITHDRAWN],
+        IncidentStatus.INVESTIGATING: [IncidentStatus.ATTRIBUTED, IncidentStatus.WITHDRAWN],
+        IncidentStatus.ATTRIBUTED: [IncidentStatus.RESOLVED, IncidentStatus.WITHDRAWN],
+        IncidentStatus.RESOLVED: [IncidentStatus.CLOSED, IncidentStatus.WITHDRAWN],
+        IncidentStatus.CLOSED: [],
+        IncidentStatus.WITHDRAWN: [],
+    }
+
+    def is_valid_transition(self, from_status: str, to_status: str) -> bool:
+        valid_next = self.VALID_STATUS_TRANSITIONS.get(from_status, [])
+        return to_status in valid_next
+
+    def transition_status(self, incident_id: str, transition: StatusTransition) -> tuple[Optional[Incident], bool]:
         incident = self.get_incident(incident_id)
         if not incident:
-            return None
+            return None, False
 
         from_status = incident.status
-        incident.status = transition.target_status
+        to_status = transition.target_status
+
+        if not self.is_valid_transition(from_status, to_status):
+            return incident, False
+
+        incident.status = to_status
         self.db.add(incident)
 
         action = ProcessAction(
@@ -105,17 +123,27 @@ class IncidentService:
             operator=transition.operator,
             conclusion=transition.conclusion,
             from_status=from_status,
-            to_status=transition.target_status
+            to_status=to_status
         )
         self.db.add(action)
         self.db.commit()
         self.db.refresh(incident)
-        return incident
+        return incident, True
 
     def add_clue(self, incident_id: str, clue_data: AttributionClueCreate) -> Optional[AttributionClue]:
         incident = self.get_incident(incident_id)
         if not incident:
             return None
+
+        existing_clue = self.db.query(AttributionClue).filter(
+            AttributionClue.incident_id == incident_id,
+            AttributionClue.source_system == clue_data.source_system,
+            AttributionClue.clue_type == clue_data.clue_type,
+            AttributionClue.description == clue_data.description
+        ).first()
+
+        if existing_clue:
+            return existing_clue
 
         clue = AttributionClue(
             id=self.generate_clue_id(),
@@ -177,12 +205,15 @@ class IncidentService:
         self.db.refresh(incident)
         return incident
 
-    def withdraw_incident(self, incident_id: str, operator: str, reason: str) -> Optional[Incident]:
+    def withdraw_incident(self, incident_id: str, operator: str, reason: str) -> tuple[Optional[Incident], bool]:
         incident = self.get_incident(incident_id)
         if not incident:
-            return None
+            return None, False
 
         from_status = incident.status
+        if IncidentStatus.WITHDRAWN not in self.VALID_STATUS_TRANSITIONS.get(from_status, []):
+            return incident, False
+
         incident.status = IncidentStatus.WITHDRAWN
         self.db.add(incident)
 
@@ -198,14 +229,17 @@ class IncidentService:
         self.db.add(action)
         self.db.commit()
         self.db.refresh(incident)
-        return incident
+        return incident, True
 
-    def close_incident(self, incident_id: str, operator: str, conclusion: str) -> Optional[Incident]:
+    def close_incident(self, incident_id: str, operator: str, conclusion: str) -> tuple[Optional[Incident], bool]:
         incident = self.get_incident(incident_id)
         if not incident:
-            return None
+            return None, False
 
         from_status = incident.status
+        if IncidentStatus.CLOSED not in self.VALID_STATUS_TRANSITIONS.get(from_status, []):
+            return incident, False
+
         incident.status = IncidentStatus.CLOSED
         incident.summary = conclusion
         self.db.add(incident)
@@ -222,7 +256,7 @@ class IncidentService:
         self.db.add(action)
         self.db.commit()
         self.db.refresh(incident)
-        return incident
+        return incident, True
 
     def export_incident(self, incident_id: str) -> Optional[IncidentExport]:
         incident = self.get_incident(incident_id)

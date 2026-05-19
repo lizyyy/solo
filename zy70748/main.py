@@ -69,9 +69,14 @@ def list_incidents(
 @app.post("/api/v1/incidents/{incident_id}/status", response_model=Incident)
 def transition_status(incident_id: str, transition: StatusTransition, db: Session = Depends(get_db)):
     service = IncidentService(db)
-    incident = service.transition_status(incident_id, transition)
+    incident, valid = service.transition_status(incident_id, transition)
     if not incident:
         raise HTTPException(status_code=404, detail="事故不存在")
+    if not valid:
+        raise HTTPException(
+            status_code=400,
+            detail=f"状态流转无效: 无法从 {incident.status} 直接变为 {transition.target_status}"
+        )
     return incident
 
 
@@ -122,9 +127,14 @@ def withdraw_incident(
     db: Session = Depends(get_db)
 ):
     service = IncidentService(db)
-    incident = service.withdraw_incident(incident_id, operator, reason)
+    incident, valid = service.withdraw_incident(incident_id, operator, reason)
     if not incident:
         raise HTTPException(status_code=404, detail="事故不存在")
+    if not valid:
+        raise HTTPException(
+            status_code=400,
+            detail=f"状态流转无效: 无法从 {incident.status} 直接撤回"
+        )
     return incident
 
 
@@ -136,9 +146,14 @@ def close_incident(
     db: Session = Depends(get_db)
 ):
     service = IncidentService(db)
-    incident = service.close_incident(incident_id, operator, conclusion)
+    incident, valid = service.close_incident(incident_id, operator, conclusion)
     if not incident:
         raise HTTPException(status_code=404, detail="事故不存在")
+    if not valid:
+        raise HTTPException(
+            status_code=400,
+            detail=f"状态流转无效: 无法从 {incident.status} 直接关闭"
+        )
     return incident
 
 
