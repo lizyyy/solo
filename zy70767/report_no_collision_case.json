@@ -1,0 +1,46 @@
+{
+  "summary": {
+    "status": "completed",
+    "message": "分析完成",
+    "valid_task_count": 4,
+    "error_count": 0,
+    "collision_count": 0,
+    "total_risk_score": 0
+  },
+  "valid_tasks": [
+    {
+      "task_id": "safe_task_01",
+      "cron_expr": "0 1 * * *",
+      "resource_tags": [
+        "resource:A"
+      ]
+    },
+    {
+      "task_id": "safe_task_02",
+      "cron_expr": "0 2 * * *",
+      "resource_tags": [
+        "resource:A"
+      ]
+    },
+    {
+      "task_id": "safe_task_03",
+      "cron_expr": "0 1 * * *",
+      "resource_tags": [
+        "resource:B"
+      ]
+    },
+    {
+      "task_id": "safe_task_04",
+      "cron_expr": "0 1 * * *",
+      "resource_tags": [
+        "resource:C"
+      ]
+    }
+  ],
+  "errors": [],
+  "collisions": [],
+  "time_range": {
+    "start": "2024-01-01 00:00:00",
+    "end": "2024-01-02 00:00:00"
+  }
+}

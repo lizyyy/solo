@@ -1,0 +1,32 @@
+[
+  {
+    "task_id": "boundary_task_01",
+    "cron_expr": "0 0 1 JAN *",
+    "resource_tags": ["critical:init"]
+  },
+  {
+    "task_id": "boundary_task_02",
+    "cron_expr": "0 0 1 1 *",
+    "resource_tags": ["critical:init"]
+  },
+  {
+    "task_id": "boundary_task_03",
+    "cron_expr": "59 23 31 DEC *",
+    "resource_tags": ["critical:yearly"]
+  },
+  {
+    "task_id": "boundary_task_04",
+    "cron_expr": "59 23 31 12 *",
+    "resource_tags": ["critical:yearly"]
+  },
+  {
+    "task_id": "boundary_task_05",
+    "cron_expr": "0 12 * * SUN",
+    "resource_tags": ["weekly:report"]
+  },
+  {
+    "task_id": "boundary_task_06",
+    "cron_expr": "0 12 * * 0",
+    "resource_tags": ["weekly:report"]
+  }
+]

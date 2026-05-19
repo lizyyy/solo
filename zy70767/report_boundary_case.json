@@ -1,0 +1,611 @@
+{
+  "summary": {
+    "status": "completed",
+    "message": "分析完成",
+    "valid_task_count": 6,
+    "error_count": 0,
+    "collision_count": 55,
+    "total_risk_score": 1100
+  },
+  "valid_tasks": [
+    {
+      "task_id": "boundary_task_01",
+      "cron_expr": "0 0 1 JAN *",
+      "resource_tags": [
+        "critical:init"
+      ]
+    },
+    {
+      "task_id": "boundary_task_02",
+      "cron_expr": "0 0 1 1 *",
+      "resource_tags": [
+        "critical:init"
+      ]
+    },
+    {
+      "task_id": "boundary_task_03",
+      "cron_expr": "59 23 31 DEC *",
+      "resource_tags": [
+        "critical:yearly"
+      ]
+    },
+    {
+      "task_id": "boundary_task_04",
+      "cron_expr": "59 23 31 12 *",
+      "resource_tags": [
+        "critical:yearly"
+      ]
+    },
+    {
+      "task_id": "boundary_task_05",
+      "cron_expr": "0 12 * * SUN",
+      "resource_tags": [
+        "weekly:report"
+      ]
+    },
+    {
+      "task_id": "boundary_task_06",
+      "cron_expr": "0 12 * * 0",
+      "resource_tags": [
+        "weekly:report"
+      ]
+    }
+  ],
+  "errors": [],
+  "collisions": [
+    {
+      "time_point": "2024-01-01 00:00:00",
+      "resource_tag": "critical:init",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_01",
+        "boundary_task_02"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-01-01 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-01-08 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-01-15 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-01-22 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-01-29 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-02-05 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-02-12 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-02-19 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-02-26 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-03-04 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-03-11 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-03-18 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-03-25 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-04-01 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-04-08 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-04-15 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-04-22 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-04-29 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-05-06 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-05-13 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-05-20 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-05-27 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-06-03 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-06-10 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-06-17 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-06-24 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-07-01 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-07-08 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-07-15 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-07-22 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-07-29 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-08-05 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-08-12 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-08-19 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-08-26 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-09-02 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-09-09 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-09-16 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-09-23 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-09-30 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-10-07 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-10-14 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-10-21 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-10-28 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-11-04 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-11-11 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-11-18 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-11-25 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-12-02 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-12-09 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-12-16 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-12-23 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-12-30 12:00:00",
+      "resource_tag": "weekly:report",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_05",
+        "boundary_task_06"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-12-31 23:59:00",
+      "resource_tag": "critical:yearly",
+      "task_count": 2,
+      "task_ids": [
+        "boundary_task_03",
+        "boundary_task_04"
+      ],
+      "risk_score": 20
+    }
+  ],
+  "time_range": {
+    "start": "2024-01-01 00:00:00",
+    "end": "2024-12-31 23:59:59"
+  }
+}

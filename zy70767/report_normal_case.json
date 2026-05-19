@@ -1,0 +1,141 @@
+{
+  "summary": {
+    "status": "completed",
+    "message": "分析完成",
+    "valid_task_count": 8,
+    "error_count": 2,
+    "collision_count": 4,
+    "total_risk_score": 90
+  },
+  "valid_tasks": [
+    {
+      "task_id": "task_001",
+      "cron_expr": "*/5 * * * *",
+      "resource_tags": [
+        "cache:redis",
+        "database:mysql"
+      ]
+    },
+    {
+      "task_id": "task_002",
+      "cron_expr": "0 * * * *",
+      "resource_tags": [
+        "api:external",
+        "database:mysql"
+      ]
+    },
+    {
+      "task_id": "task_003",
+      "cron_expr": "0 3 * * *",
+      "resource_tags": [
+        "database:mysql"
+      ]
+    },
+    {
+      "task_id": "task_004",
+      "cron_expr": "30 2 * * *",
+      "resource_tags": [
+        "cache:redis"
+      ]
+    },
+    {
+      "task_id": "task_005",
+      "cron_expr": "invalid_cron",
+      "resource_tags": [
+        "database:mysql"
+      ]
+    },
+    {
+      "task_id": "task_008",
+      "cron_expr": "0 9 * * MON-FRI",
+      "resource_tags": [
+        "report:daily"
+      ]
+    },
+    {
+      "task_id": "task_009",
+      "cron_expr": "0 9 * * 1-5",
+      "resource_tags": [
+        "report:daily"
+      ]
+    },
+    {
+      "task_id": "task_010",
+      "cron_expr": "59 23 31 DEC *",
+      "resource_tags": [
+        "backup:yearly"
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "index": 5,
+      "data": {
+        "": "",
+        "cron_expr": "0 0 * * *",
+        "resource_tags": [
+          "test"
+        ]
+      },
+      "error": "任务ID不能为空"
+    },
+    {
+      "index": 6,
+      "data": {
+        "task_id": "task_007",
+        "cron_expr": "",
+        "resource_tags": [
+          "test"
+        ]
+      },
+      "error": "Cron表达式不能为空"
+    }
+  ],
+  "collisions": [
+    {
+      "time_point": "2024-01-01 03:00:00",
+      "resource_tag": "database:mysql",
+      "task_count": 3,
+      "task_ids": [
+        "task_001",
+        "task_002",
+        "task_003"
+      ],
+      "risk_score": 30
+    },
+    {
+      "time_point": "2024-01-01 02:00:00",
+      "resource_tag": "database:mysql",
+      "task_count": 2,
+      "task_ids": [
+        "task_001",
+        "task_002"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-01-01 02:30:00",
+      "resource_tag": "cache:redis",
+      "task_count": 2,
+      "task_ids": [
+        "task_001",
+        "task_004"
+      ],
+      "risk_score": 20
+    },
+    {
+      "time_point": "2024-01-01 04:00:00",
+      "resource_tag": "database:mysql",
+      "task_count": 2,
+      "task_ids": [
+        "task_001",
+        "task_002"
+      ],
+      "risk_score": 20
+    }
+  ],
+  "time_range": {
+    "start": "2024-01-01 02:00:00",
+    "end": "2024-01-01 04:00:00"
+  }
+}

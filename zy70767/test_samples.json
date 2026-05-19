@@ -1,0 +1,52 @@
+[
+  {
+    "task_id": "task_001",
+    "cron_expr": "*/5 * * * *",
+    "resource_tags": ["database:mysql", "cache:redis"]
+  },
+  {
+    "task_id": "task_002",
+    "cron_expr": "0 * * * *",
+    "resource_tags": ["database:mysql", "api:external"]
+  },
+  {
+    "task_id": "task_003",
+    "cron_expr": "0 3 * * *",
+    "resource_tags": ["database:mysql"]
+  },
+  {
+    "task_id": "task_004",
+    "cron_expr": "30 2 * * *",
+    "resource_tags": ["cache:redis"]
+  },
+  {
+    "task_id": "task_005",
+    "cron_expr": "invalid_cron",
+    "resource_tags": ["database:mysql"]
+  },
+  {
+    "": "",
+    "cron_expr": "0 0 * * *",
+    "resource_tags": ["test"]
+  },
+  {
+    "task_id": "task_007",
+    "cron_expr": "",
+    "resource_tags": ["test"]
+  },
+  {
+    "task_id": "task_008",
+    "cron_expr": "0 9 * * MON-FRI",
+    "resource_tags": ["report:daily"]
+  },
+  {
+    "task_id": "task_009",
+    "cron_expr": "0 9 * * 1-5",
+    "resource_tags": ["report:daily"]
+  },
+  {
+    "task_id": "task_010",
+    "cron_expr": "59 23 31 DEC *",
+    "resource_tags": ["backup:yearly"]
+  }
+]
