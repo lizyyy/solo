@@ -1,0 +1,112 @@
+[
+  {
+    "ticketNo": "TK20240101001",
+    "customerName": "张三",
+    "customerPhone": "13800138001",
+    "stationId": "ST001",
+    "stationName": "北京朝阳换电站",
+    "description": "柜门打不开，按了开门按钮没有反应，屏幕显示正常。已尝试重启设备，问题依旧存在。",
+    "status": "pending",
+    "priority": "high",
+    "source": "phone"
+  },
+  {
+    "ticketNo": "TK20240101002",
+    "customerName": "李四",
+    "customerPhone": "13800138002",
+    "stationId": "ST001",
+    "stationName": "北京朝阳换电站",
+    "description": "扫码失败，二维码无法识别，换电APP提示无效二维码。已尝试多次扫码均失败。",
+    "status": "processing",
+    "priority": "high",
+    "source": "app"
+  },
+  {
+    "ticketNo": "TK20240101003",
+    "customerName": "王五",
+    "customerPhone": "13800138003",
+    "stationId": "ST002",
+    "stationName": "上海浦东换电站",
+    "description": "空仓误报，明明有电池但系统显示空仓。屏幕显示仓位3为空，但实际观察有电池在里面。",
+    "status": "pending",
+    "priority": "medium",
+    "source": "web"
+  },
+  {
+    "ticketNo": "TK20240101004",
+    "customerName": "赵六",
+    "customerPhone": "13800138004",
+    "stationId": "ST002",
+    "stationName": "上海浦东换电站",
+    "description": "电池故障，换电后车辆无法启动，电池指示灯不亮。已重新拔插电池仍无法使用。",
+    "status": "pending",
+    "priority": "urgent",
+    "source": "phone"
+  },
+  {
+    "ticketNo": "TK20240101005",
+    "customerName": "钱七",
+    "customerPhone": "13800138005",
+    "stationId": "ST003",
+    "stationName": "广州天河换电站",
+    "description": "系统连接不上，无法登录换电系统，网络连接正常但服务器无响应。已持续两个小时。",
+    "status": "processing",
+    "priority": "high",
+    "source": "app"
+  },
+  {
+    "ticketNo": "TK20240101006",
+    "customerName": "孙八",
+    "customerPhone": "13800138006",
+    "stationId": "ST003",
+    "stationName": "广州天河换电站",
+    "description": "仓门关闭后又自动弹开，无法锁定。每次关门后3秒左右自动弹开，无法正常换电。",
+    "status": "pending",
+    "priority": "high",
+    "source": "phone"
+  },
+  {
+    "ticketNo": "TK20240101007",
+    "customerName": "周九",
+    "customerPhone": "13800138007",
+    "stationId": "ST004",
+    "stationName": "深圳南山换电站",
+    "description": "APP扫码一直转圈，无法进入下一步。手机网络正常，其他应用可以正常使用。",
+    "status": "resolved",
+    "priority": "medium",
+    "source": "app"
+  },
+  {
+    "ticketNo": "TK20240101008",
+    "customerName": "吴十",
+    "customerPhone": "13800138008",
+    "stationId": "ST004",
+    "stationName": "深圳南山换电站",
+    "description": "系统显示5号仓为空，但进去换电时发现里面有电池，差点发生碰撞事故。",
+    "status": "pending",
+    "priority": "urgent",
+    "source": "phone"
+  },
+  {
+    "ticketNo": "TK20240101009",
+    "customerName": "郑十一",
+    "customerPhone": "13800138009",
+    "stationId": "ST005",
+    "stationName": "杭州西湖换电站",
+    "description": "电池温度过高报警，换电时提示电池温度异常，无法完成换电。环境温度正常。",
+    "status": "pending",
+    "priority": "high",
+    "source": "app"
+  },
+  {
+    "ticketNo": "TK20240101010",
+    "customerName": "王十二",
+    "customerPhone": "13800138010",
+    "stationId": "ST005",
+    "stationName": "杭州西湖换电站",
+    "description": "用户反馈其他问题，需要人工核实具体情况。",
+    "status": "pending",
+    "priority": "low",
+    "source": "web"
+  }
+]
