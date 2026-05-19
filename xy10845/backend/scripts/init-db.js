@@ -91,6 +91,13 @@ db.serialize(() => {
   db.run(`CREATE INDEX IF NOT EXISTS idx_appeals_content_id ON appeals(content_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_audit_trail_appeal_id ON audit_trail(appeal_id)`);
 
+  const reviewerStmt = db.prepare(`INSERT OR IGNORE INTO reviewers (id, name, email, department) VALUES (?, ?, ?, ?)`);
+  reviewerStmt.run('r1', '张三', 'zhangsan@example.com', '审核一组');
+  reviewerStmt.run('r2', '李四', 'lisi@example.com', '审核二组');
+  reviewerStmt.run('r3', '王五', 'wangwu@example.com', '审核一组');
+  reviewerStmt.finalize();
+  console.log('默认审核员数据已初始化');
+
   console.log('数据库表初始化完成');
 });
 

@@ -89,13 +89,13 @@
 ```bash
 cd backend
 
-# 安装依赖（首次运行需要）
+# 安装依赖（必须，首次运行需要）
 npm install
 
-# 初始化数据库
+# 初始化数据库（已包含默认审核员数据，自检可正常运行）
 npm run init-db
 
-# 导入演示数据（可选）
+# 导入完整演示数据（可选：包含示例内容、申诉、审核轨迹）
 node scripts/seed-data.js
 
 # 启动服务
@@ -109,7 +109,7 @@ npm run start
 ```bash
 cd frontend
 
-# 安装依赖（首次运行需要）
+# 安装依赖（必须，首次运行需要，包含 vite 等构建工具）
 npm install
 
 # 启动开发服务
@@ -120,10 +120,17 @@ npm run dev
 
 ### 运行自检
 
+**注意**：运行自检前请确保：
+1. 后端依赖已安装（`npm install`）
+2. 数据库已初始化（`npm run init-db`）
+3. 后端服务正在运行（`npm run start`）
+
 ```bash
 cd backend
 npm run test
 ```
+
+自检程序会验证完整的申诉状态流转链路：提交申诉 → 分派审核 → 通过/驳回申诉。
 
 ## CSV批量导入使用说明
 
