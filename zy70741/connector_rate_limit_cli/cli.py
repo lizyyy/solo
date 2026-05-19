@@ -27,8 +27,9 @@ class RateLimitAnalyzer:
         self.failure_analyzer = FailureCauseAnalyzer()
 
     def analyze_files(self, file_paths: List[str]) -> AnalysisResult:
-        records = self.parser.parse_files(file_paths)
-        return self._analyze_records(records, file_paths)
+        sorted_files = sorted(file_paths)
+        records = self.parser.parse_files(sorted_files)
+        return self._analyze_records(records, sorted_files)
 
     def _analyze_records(self, records, file_paths):
         sessions = self.session_manager.process_records(records)
@@ -42,15 +43,20 @@ class RateLimitAnalyzer:
             session_causes = self.failure_analyzer.analyze_session(session)
             all_causes.extend(session_causes)
 
-        all_causes.sort(key=lambda c: c.confidence, reverse=True)
+        all_causes.sort(key=lambda c: (-c.confidence, c.cause_type))
+        causes_by_type = {}
+        for cause in all_causes:
+            if cause.cause_type not in causes_by_type:
+                causes_by_type[cause.cause_type] = cause
+        unique_causes = list(causes_by_type.values())
 
         result = AnalysisResult()
         result.records = records
         result.sessions = sessions
         result.traces = traces
-        result.failure_causes = all_causes
+        result.failure_causes = unique_causes
         result.metadata = {
-            'input_files': file_paths,
+            'input_files': sorted(file_paths),
             'rate_limit_window': self.rule_engine.rate_limit_window,
             'min_sleep_interval': self.rule_engine.min_sleep_interval,
             'max_consecutive_sleep': self.rule_engine.max_consecutive_sleep,

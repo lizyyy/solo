@@ -77,15 +77,19 @@ class FailureCauseAnalyzer:
         causes = []
 
         if not session.is_idempotent:
+            recovery_records = [r for r in session.records if r.is_recovery]
+            description = '检测到非幂等恢复，恢复事件间隔小于配置的最小休眠间隔'
+            if session.recovery_count > 1:
+                description = f'检测到非幂等恢复，{session.recovery_count}次恢复事件间隔小于配置的最小休眠间隔'
             causes.append(FailureCause(
                 cause_type='non_idempotent_recovery',
-                description='检测到非幂等恢复，恢复事件后过快再次触发限流',
-                confidence=0.9,
+                description=description,
+                confidence=0.95,
                 severity='high',
-                evidence=session.records,
+                evidence=recovery_records,
             ))
 
-        if session.recovery_count > 1:
+        if session.recovery_count > 1 and session.is_idempotent:
             causes.append(FailureCause(
                 cause_type='multiple_recovery_events',
                 description=f'检测到多次恢复事件 ({session.recovery_count}次)，可能存在重复恢复',
@@ -146,7 +150,7 @@ class FailureCauseAnalyzer:
                     evidence=retry_records,
                 ))
 
-        causes.sort(key=lambda c: c.confidence, reverse=True)
+        causes.sort(key=lambda c: (-c.confidence, c.cause_type))
         return causes
 
     def analyze_records(self, records: List[LogRecord]) -> List[FailureCause]:
@@ -229,66 +233,77 @@ class AnalysisResult:
         self.sessions: List[SleepSession] = []
         self.traces: List[SourceTrace] = []
         self.failure_causes: List[FailureCause] = []
-        self.analysis_time: datetime = datetime.now()
         self.metadata: Dict[str, Any] = {}
 
     def to_dict(self) -> Dict[str, Any]:
+        sorted_sessions = sorted(
+            self.sessions,
+            key=lambda s: (s.connector, s.supplier, s.start_time)
+        )
+        sorted_failures = sorted(
+            self.failure_causes,
+            key=lambda c: (-c.confidence, c.cause_type)
+        )
+        sorted_bad_lines = sorted(
+            [t for t in self.traces if t.record.is_bad_line],
+            key=lambda t: (t.source_file, t.line_number)
+        )
+        
         return {
-            'analysis_time': self.analysis_time.isoformat(),
             'metadata': self.metadata,
             'summary': {
+                'bad_line_count': len([r for r in self.records if r.is_bad_line]),
+                'error_count': len([r for r in self.records if r.is_error]),
+                'non_idempotent_sessions': len([s for s in self.sessions if not s.is_idempotent]),
+                'rate_limit_count': len([r for r in self.records if r.is_rate_limit]),
+                'recovery_count': len([r for r in self.records if r.is_recovery]),
+                'recovered_sessions': len([s for s in self.sessions if s.is_recovered]),
+                'retry_count': len([r for r in self.records if r.is_retry]),
+                'sleep_count': len([r for r in self.records if r.is_sleep]),
+                'total_failure_causes': len(self.failure_causes),
                 'total_records': len(self.records),
                 'total_sessions': len(self.sessions),
                 'total_traces': len(self.traces),
-                'total_failure_causes': len(self.failure_causes),
-                'bad_line_count': len([r for r in self.records if r.is_bad_line]),
-                'rate_limit_count': len([r for r in self.records if r.is_rate_limit]),
-                'sleep_count': len([r for r in self.records if r.is_sleep]),
-                'recovery_count': len([r for r in self.records if r.is_recovery]),
-                'retry_count': len([r for r in self.records if r.is_retry]),
-                'error_count': len([r for r in self.records if r.is_error]),
-                'recovered_sessions': len([s for s in self.sessions if s.is_recovered]),
-                'non_idempotent_sessions': len([s for s in self.sessions if not s.is_idempotent]),
             },
             'sessions': [
                 {
-                    'session_id': s.session_id,
                     'connector': s.connector,
-                    'supplier': s.supplier,
-                    'start_time': s.start_time.isoformat(),
-                    'end_time': s.end_time.isoformat() if s.end_time else None,
                     'duration_seconds': s.duration_seconds(),
-                    'state': s.state.value,
-                    'rate_limit_count': s.rate_limit_count,
-                    'sleep_count': s.sleep_count,
-                    'total_sleep_duration': s.total_sleep_duration,
-                    'retry_count': s.retry_count,
-                    'recovery_count': s.recovery_count,
+                    'end_time': s.end_time.isoformat() if s.end_time else None,
                     'error_count': s.error_count,
-                    'is_recovered': s.is_recovered,
                     'is_idempotent': s.is_idempotent,
+                    'is_recovered': s.is_recovered,
+                    'rate_limit_count': s.rate_limit_count,
+                    'recovery_count': s.recovery_count,
+                    'retry_count': s.retry_count,
+                    'session_id': s.session_id,
+                    'sleep_count': s.sleep_count,
+                    'start_time': s.start_time.isoformat(),
+                    'state': s.state.value,
+                    'supplier': s.supplier,
+                    'total_sleep_duration': s.total_sleep_duration,
                     'transitions': [
                         {
                             'from': t.from_state.value,
-                            'to': t.to_state.value,
                             'reason': t.reason,
-                            'timestamp': t.timestamp.isoformat(),
-                            'source_line': t.trigger_record.line_number,
                             'source_file': t.trigger_record.file_path,
+                            'source_line': t.trigger_record.line_number,
+                            'timestamp': t.timestamp.isoformat(),
+                            'to': t.to_state.value,
                         }
                         for t in s.transitions
                     ],
                 }
-                for s in self.sessions
+                for s in sorted_sessions
             ],
-            'failure_causes': [c.to_dict() for c in self.failure_causes],
+            'failure_causes': [c.to_dict() for c in sorted_failures],
             'bad_lines': [
                 {
-                    'source_file': t.source_file,
                     'line_number': t.line_number,
                     'raw_content': t.raw_content,
+                    'source_file': t.source_file,
                     'trace_hash': t.trace_hash,
                 }
-                for t in self.traces if t.record.is_bad_line
+                for t in sorted_bad_lines
             ],
         }

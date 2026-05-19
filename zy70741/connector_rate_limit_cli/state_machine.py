@@ -210,6 +210,7 @@ class SessionManager:
         self.rule_engine = rule_engine
         self.sessions: Dict[Tuple[str, str], List[SleepSession]] = defaultdict(list)
         self.active_session: Dict[Tuple[str, str], SleepSession] = {}
+        self.last_recovery_time: Dict[Tuple[str, str], datetime] = {}
 
     def _get_key(self, record: LogRecord) -> Tuple[str, str]:
         return (record.connector or 'unknown', record.supplier or 'unknown')
@@ -252,14 +253,20 @@ class SessionManager:
                 active.retry_count += 1
             if record.is_recovery:
                 active.recovery_count += 1
+                active.is_recovered = True
+                last_recovery = self.last_recovery_time.get(key)
+                if last_recovery and record.timestamp:
+                    interval = (record.timestamp - last_recovery).total_seconds()
+                    if interval < self.rule_engine.min_sleep_interval:
+                        active.is_idempotent = False
+                self.last_recovery_time[key] = record.timestamp or datetime.now()
+                if active.is_idempotent:
+                    active.is_idempotent = self.rule_engine.check_sleep_idempotency(active)
+                active.end_time = record.timestamp or datetime.now()
+                if key in self.active_session:
+                    del self.active_session[key]
             if record.is_error:
                 active.error_count += 1
-
-            if record.is_recovery and active.state == SleepState.RECOVERING:
-                active.is_recovered = True
-                active.is_idempotent = self.rule_engine.check_sleep_idempotency(active)
-                active.end_time = record.timestamp or datetime.now()
-                del self.active_session[key]
 
         return active
 

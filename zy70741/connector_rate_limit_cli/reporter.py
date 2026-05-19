@@ -45,7 +45,6 @@ class ConsoleReporter:
         print("\n" + "=" * 80)
         print(self._colorize("连接器限速休眠恢复分析报告", 'purple'))
         print("=" * 80)
-        print(f"\n分析时间: {result.analysis_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
         print("\n" + "-" * 60)
         print(self._colorize("📊 运行摘要", 'blue'))
@@ -142,18 +141,27 @@ class FileReporter:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
+    def _generate_filename(self, result: AnalysisResult) -> str:
+        input_files = result.metadata.get('input_files', [])
+        if input_files:
+            import hashlib
+            content = '|'.join(sorted(input_files))
+            file_hash = hashlib.md5(content.encode()).hexdigest()[:8]
+            return f"rate_limit_analysis_{file_hash}"
+        return "rate_limit_analysis"
+
     def export_json(self, result: AnalysisResult, filename: str = None) -> str:
-        filename = filename or f"rate_limit_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        filename = filename or f"{self._generate_filename(result)}.json"
         filepath = self.output_dir / filename
 
         data = result.to_dict()
         with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=2, sort_keys=True)
 
         return str(filepath)
 
     def export_csv(self, result: AnalysisResult, filename: str = None) -> Dict[str, str]:
-        base_name = filename or f"rate_limit_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        base_name = filename or self._generate_filename(result)
         files = {}
 
         summary_path = self.output_dir / f"{base_name}_summary.csv"
@@ -228,12 +236,13 @@ class FileReporter:
         if not PANDAS_AVAILABLE:
             raise ImportError("pandas is required for Excel export. Install with 'pip install pandas openpyxl'")
 
-        filename = filename or f"rate_limit_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        filename = filename or f"{self._generate_filename(result)}.xlsx"
         filepath = self.output_dir / filename
 
         data = result.to_dict()
 
-        summary_df = pd.DataFrame(list(data['summary'].items()), columns=['指标', '数值'])
+        summary_items = sorted(data['summary'].items())
+        summary_df = pd.DataFrame(summary_items, columns=['指标', '数值'])
 
         sessions_df = pd.DataFrame(data['sessions'])
 
@@ -250,7 +259,7 @@ class FileReporter:
         return str(filepath)
 
     def export_all(self, result: AnalysisResult, base_filename: str = None) -> Dict[str, Any]:
-        base = base_filename or f"rate_limit_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        base = base_filename or self._generate_filename(result)
 
         outputs = {
             'json': self.export_json(result, f"{base}.json"),

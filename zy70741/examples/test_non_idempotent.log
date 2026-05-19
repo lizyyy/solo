@@ -1,0 +1,6 @@
+2024-01-15 10:00:00 INFO connector:test_api supplier:test_account - 开始处理请求
+2024-01-15 10:00:01 WARNING connector:test_api supplier:test_account - 检测到限流 rate limit exceeded
+2024-01-15 10:00:02 INFO connector:test_api supplier:test_account - 进入休眠 sleep 5 seconds
+2024-01-15 10:00:07 INFO connector:test_api supplier:test_account - 第一次恢复 recovery
+2024-01-15 10:00:08 INFO connector:test_api supplier:test_account - 第二次恢复 recovery（间隔1秒，小于60秒阈值）
+2024-01-15 10:00:09 INFO connector:test_api supplier:test_account - 请求成功
