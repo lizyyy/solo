@@ -35,7 +35,7 @@ class Tenant(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
     
-    approvals = relationship("DataResidencyApproval", back_populates="tenant")
+    approvals = relationship("DataResidencyApproval", back_populates="tenant_rel")
 
 class RegionRule(Base):
     __tablename__ = "region_rules"

@@ -71,6 +71,7 @@ class ApprovalReviewRequest(BaseModel):
     block_category: Optional[BlockReasonCategory] = None
 
 class ApprovalResponse(BaseModel):
+    id: int
     request_id: str
     tenant_id: str
     target_region: str
