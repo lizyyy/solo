@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "homestay-settlement"
+version = "0.1.0"
+description = "民宿保洁结算工具"
+authors = ["Internal Team"]
+
+[tool.poetry.scripts]
+homestay = "homestay_settlement.cli.main:cli"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.1.0"
+click = "^8.1.0"
+rich = "^13.5.0"
+sqlalchemy = "^2.0.0"
+pydantic = "^2.0.0"
+python-dateutil = "^2.8.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

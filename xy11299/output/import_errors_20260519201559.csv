@@ -1,0 +1,4 @@
+﻿ID,数据源,文件,行号,错误信息,建议修复,原始数据,导入时间
+1,room_status,room_status_with_errors.csv,3,缺少必填字段: room_number,请补充以下字段: room_number,"{'room_number': '', 'date': '2024-01-15', 'status': 'clean', 'guest_name': '李四', 'check_in': '2024-01-13', 'check_out': '2024-01-15'}",2026-05-19 13:05:02
+2,room_status,room_status_with_errors.csv,4,日期格式无效: invalid_date,请使用 YYYY-MM-DD 或 YYYY/MM/DD 格式,"{'room_number': '103', 'date': 'invalid_date', 'status': 'occupied', 'guest_name': '王五', 'check_in': '2024-01-15', 'check_out': '2024-01-17'}",2026-05-19 13:05:02
+3,room_status,room_status_with_errors.csv,5,缺少必填字段: status,请补充以下字段: status,"{'room_number': '201', 'date': '2024-01-15', 'status': '', 'guest_name': '赵六', 'check_in': '2024-01-14', 'check_out': '2024-01-15'}",2026-05-19 13:05:02

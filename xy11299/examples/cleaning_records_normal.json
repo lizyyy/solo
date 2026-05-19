@@ -1,0 +1,38 @@
+[
+    {
+        "room_number": "101",
+        "cleaning_date": "2024-01-15",
+        "cleaner_name": "王阿姨",
+        "start_time": "2024-01-15 10:00:00",
+        "end_time": "2024-01-15 10:45:00",
+        "score": 4.5,
+        "notes": "正常清洁完成"
+    },
+    {
+        "room_number": "102",
+        "cleaning_date": "2024-01-15",
+        "cleaner_name": "李阿姨",
+        "start_time": "2024-01-15 09:30:00",
+        "end_time": "2024-01-15 10:15:00",
+        "score": 4.0,
+        "notes": "正常清洁完成"
+    },
+    {
+        "room_number": "201",
+        "cleaning_date": "2024-01-15",
+        "cleaner_name": "王阿姨",
+        "start_time": "2024-01-15 11:00:00",
+        "end_time": "2024-01-15 11:20:00",
+        "score": 2.5,
+        "notes": "清洁时间较短，需要复检"
+    },
+    {
+        "room_number": "202",
+        "cleaning_date": "2024-01-15",
+        "cleaner_name": "张阿姨",
+        "start_time": "2024-01-15 14:00:00",
+        "end_time": "2024-01-15 14:50:00",
+        "score": 4.8,
+        "notes": "清洁质量良好"
+    }
+]
