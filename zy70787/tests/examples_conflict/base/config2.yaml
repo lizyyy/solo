@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: conflict-config
+  namespace: default
+data:
+  DUPLICATE_KEY: second_value
+  ANOTHER_KEY: another_value

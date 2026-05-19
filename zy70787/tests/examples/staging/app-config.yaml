@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: default
+data:
+  LOG_LEVEL: debug
+  DB_HOST: staging-db.example.com
+  FEATURE_FLAG: "true"
+  STAGING_SPECIFIC: "yes"
