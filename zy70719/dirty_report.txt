@@ -1,0 +1,142 @@
+======================================================================
+              镜像源新鲜度阻塞项目归因报告
+======================================================================
+
+报告ID: 3f5a6b54-810d-43a0-9f40-cc8f6170ba29
+生成时间: 2026-05-19 13:17:16
+镜像源: 未命名镜像源 (pypi)
+URL: https://pypi-internal.example.com/simple
+
+----------------------------------------------------------------------
+【总体状态】
+----------------------------------------------------------------------
+  总体状态: 严重
+  总包数: 5
+  新鲜: 2
+  陈旧: 0
+  严重: 2
+  平均延迟: 0.00 小时
+
+----------------------------------------------------------------------
+【脏数据问题】
+----------------------------------------------------------------------
+
+  1. [验证错误] sync_frequency_hours
+     问题: Input should be greater than 0
+     原始值: -1.0
+
+  2. [已使用默认值] sync_frequency_hours
+     问题: 使用默认同步频率 4.0 小时
+     原始值: -1.0
+
+  3. [验证错误] packages[0].name
+     问题: Value error, 包名称不能为空
+     原始值: {'name': '', 'upstream_version': '2.31.0', 'mirror_version': '2.31.0', 'is_available': True}
+
+  4. [部分有效数据] packages[0]
+     问题: 使用部分字段创建包对象
+     原始值: unknown-package-0
+
+  5. [验证错误] packages[1].upstream_version
+     问题: Value error, 上游版本不能为空
+     原始值: {'name': 'fastapi', 'upstream_version': '', 'mirror_version': '0.103.0', 'is_available': True}
+
+  6. [部分有效数据] packages[1]
+     问题: 使用部分字段创建包对象
+     原始值: fastapi
+
+  7. [格式错误] packages[4].upstream_updated_at
+     问题: 上游时间格式错误: Invalid isoformat string: 'not-a-timestamp'
+     原始值: not-a-timestamp
+
+  8. [格式错误] packages[4].mirror_updated_at
+     问题: 镜像时间格式错误: Invalid isoformat string: 'also-not-a-timestamp'
+     原始值: also-not-a-timestamp
+
+  9. [验证错误] projects[0].priority
+     问题: Input should be greater than or equal to 1
+     原始值: {'project_name': '', 'required_packages': ['requests'], 'priority': 0, 'is_manually_confirmed': False}
+
+  10. [部分有效数据] projects[0]
+     问题: 使用部分字段创建项目对象
+     原始值: unknown-project-0
+
+  11. [验证错误] projects[1].priority
+     问题: Input should be less than or equal to 5
+     原始值: {'project_name': 'test-project', 'required_packages': [], 'priority': 6, 'is_manually_confirmed': False}
+
+  12. [部分有效数据] projects[1]
+     问题: 使用部分字段创建项目对象
+     原始值: test-project
+
+----------------------------------------------------------------------
+【包新鲜度详情】
+----------------------------------------------------------------------
+
+  包名: unknown-package-0
+    状态: 新鲜
+    同步窗口内: 是
+    建议: 版本同步正常
+
+  包名: fastapi
+    状态: 新鲜
+    同步窗口内: 是
+    建议: 版本同步正常
+
+  包名: invalid-package
+    状态: 警告
+    版本差距: not-a-version vs also-invalid
+    同步窗口内: 是
+    建议: 存在版本差距，建议检查同步状态
+
+  包名: missing-mirror
+    状态: 严重
+    版本差距: 1.0.0
+    同步窗口内: 是
+    阻塞原因: 镜像同步失败
+    建议: 镜像源中不存在该包，拉取失败
+    需要人工确认: 是
+
+  包名: bad-timestamp
+    状态: 严重
+    版本差距: 0.9.0 -> 1.0.0
+    同步窗口内: 是
+    阻塞原因: 版本差距过大
+    建议: 次版本差距过大 (9)，需要立即同步
+    需要人工确认: 是
+
+----------------------------------------------------------------------
+【项目阻塞归因】
+----------------------------------------------------------------------
+
+  项目: unknown-project-0
+    优先级: P3
+    阻塞状态: 阻塞
+    阻塞包数: 1
+    阻塞包: requests
+
+  项目: test-project
+    优先级: P3
+    阻塞状态: 正常
+
+  项目: project-with-missing-pkgs
+    优先级: P2
+    阻塞状态: 阻塞
+    阻塞包数: 2
+    阻塞包: nonexistent-pkg, another-missing
+
+----------------------------------------------------------------------
+【摘要】
+----------------------------------------------------------------------
+  total_packages: 5
+  fresh_packages: 2
+  stale_packages: 0
+  critical_packages: 2
+  fresh_rate: 40.0%
+  average_delay_hours: 0.0
+  total_projects: 3
+  blocked_projects: 2
+  needs_manual_confirmation: 2
+  dirty_data_issue_count: 12
+
+======================================================================

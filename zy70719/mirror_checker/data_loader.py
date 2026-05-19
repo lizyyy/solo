@@ -40,7 +40,29 @@ class DataLoader:
             for error in e.errors():
                 field = str(error['loc'][0]) if error['loc'] else 'unknown'
                 self._add_issue(field, data.get(field), 'validation_error', error['msg'])
-            raise
+            
+            fallback_data = data.copy()
+            if 'sync_frequency_hours' not in data or data.get('sync_frequency_hours', 0) <= 0:
+                fallback_data['sync_frequency_hours'] = 4.0
+                self._add_issue('sync_frequency_hours', data.get('sync_frequency_hours'), 'fallback_applied', '使用默认同步频率 4.0 小时')
+            
+            if 'name' not in data or not data.get('name'):
+                fallback_data['name'] = '未命名镜像源'
+            if 'url' not in data or not data.get('url'):
+                fallback_data['url'] = 'unknown://unknown'
+            if 'type' not in data or not data.get('type'):
+                fallback_data['type'] = 'unknown'
+            
+            try:
+                return MirrorSource(**fallback_data)
+            except:
+                self._add_issue('mirror_source', fallback_data, 'critical_fallback_failed', '无法创建镜像源对象，使用完全默认配置')
+                return MirrorSource(
+                    name='默认镜像源',
+                    url='unknown://default',
+                    type='unknown',
+                    sync_frequency_hours=4.0
+                )
 
     def load_packages(self, file_path: str) -> List[PackageVersion]:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -49,19 +71,46 @@ class DataLoader:
         packages = []
         for idx, item in enumerate(data):
             try:
-                if 'upstream_updated_at' in item and item['upstream_updated_at']:
-                    item['upstream_updated_at'] = datetime.fromisoformat(item['upstream_updated_at'])
-                if 'mirror_updated_at' in item and item['mirror_updated_at']:
-                    item['mirror_updated_at'] = datetime.fromisoformat(item['mirror_updated_at'])
+                item_copy = item.copy()
+                
+                if 'upstream_updated_at' in item_copy and item_copy['upstream_updated_at']:
+                    try:
+                        item_copy['upstream_updated_at'] = datetime.fromisoformat(item_copy['upstream_updated_at'])
+                    except ValueError as e:
+                        self._add_issue(f"packages[{idx}].upstream_updated_at", item_copy.get('upstream_updated_at'), 'format_error', f"上游时间格式错误: {e}")
+                        item_copy['upstream_updated_at'] = None
+                
+                if 'mirror_updated_at' in item_copy and item_copy['mirror_updated_at']:
+                    try:
+                        item_copy['mirror_updated_at'] = datetime.fromisoformat(item_copy['mirror_updated_at'])
+                    except ValueError as e:
+                        self._add_issue(f"packages[{idx}].mirror_updated_at", item_copy.get('mirror_updated_at'), 'format_error', f"镜像时间格式错误: {e}")
+                        item_copy['mirror_updated_at'] = None
 
-                packages.append(PackageVersion(**item))
+                packages.append(PackageVersion(**item_copy))
             except ValidationError as e:
                 for error in e.errors():
                     field = f"packages[{idx}].{error['loc'][0]}" if error['loc'] else f"packages[{idx}]"
                     self._add_issue(field, item, 'validation_error', error['msg'])
-            except ValueError as e:
-                field = f"packages[{idx}].timestamp"
-                self._add_issue(field, item, 'format_error', f"时间格式错误: {e}")
+                
+                fallback_name = item.get('name') or f"unknown-package-{idx}"
+                fallback_upstream = item.get('upstream_version') or '0.0.0'
+                if not fallback_upstream.strip():
+                    fallback_upstream = '0.0.0'
+                
+                try:
+                    pkg = PackageVersion(
+                        name=fallback_name,
+                        upstream_version=fallback_upstream,
+                        mirror_version=item.get('mirror_version'),
+                        is_available=item.get('is_available', True)
+                    )
+                    packages.append(pkg)
+                    self._add_issue(f"packages[{idx}]", fallback_name, 'partial_valid', '使用部分字段创建包对象')
+                except Exception as e2:
+                    self._add_issue(f"packages[{idx}]", item, 'load_failed', f"无法加载包: {e2}")
+            except Exception as e:
+                self._add_issue(f"packages[{idx}]", item, 'unexpected_error', f"加载包时发生意外错误: {e}")
 
         return packages
 
@@ -77,6 +126,27 @@ class DataLoader:
                 for error in e.errors():
                     field = f"projects[{idx}].{error['loc'][0]}" if error['loc'] else f"projects[{idx}]"
                     self._add_issue(field, item, 'validation_error', error['msg'])
+                
+                fallback_name = item.get('project_name') or f"unknown-project-{idx}"
+                fallback_priority = item.get('priority', 3)
+                if fallback_priority < 1 or fallback_priority > 5:
+                    fallback_priority = 3
+                
+                try:
+                    proj = BlockedProject(
+                        project_name=fallback_name,
+                        required_packages=item.get('required_packages', []),
+                        priority=fallback_priority,
+                        contact=item.get('contact'),
+                        description=item.get('description'),
+                        is_manually_confirmed=item.get('is_manually_confirmed', False)
+                    )
+                    projects.append(proj)
+                    self._add_issue(f"projects[{idx}]", fallback_name, 'partial_valid', '使用部分字段创建项目对象')
+                except Exception as e2:
+                    self._add_issue(f"projects[{idx}]", item, 'load_failed', f"无法加载项目: {e2}")
+            except Exception as e:
+                self._add_issue(f"projects[{idx}]", item, 'unexpected_error', f"加载项目时发生意外错误: {e}")
 
         return projects
 
@@ -113,6 +183,7 @@ class DataLoader:
 
         if sample_type == "dirty":
             base_config["sync_frequency_hours"] = -1.0
+            base_config["name"] = ""
         elif sample_type == "boundary":
             base_config["sync_window"] = {
                 "name": "夜间同步窗口",
@@ -190,6 +261,14 @@ class DataLoader:
                     "upstream_version": "1.0.0",
                     "mirror_version": None,
                     "is_available": False
+                },
+                {
+                    "name": "bad-timestamp",
+                    "upstream_version": "1.0.0",
+                    "mirror_version": "0.9.0",
+                    "upstream_updated_at": "not-a-timestamp",
+                    "mirror_updated_at": "also-not-a-timestamp",
+                    "is_available": True
                 }
             ]
 
@@ -265,6 +344,12 @@ class DataLoader:
                     "project_name": "test-project",
                     "required_packages": [],
                     "priority": 6,
+                    "is_manually_confirmed": False
+                },
+                {
+                    "project_name": "project-with-missing-pkgs",
+                    "required_packages": ["nonexistent-pkg", "another-missing"],
+                    "priority": 2,
                     "is_manually_confirmed": False
                 }
             ]

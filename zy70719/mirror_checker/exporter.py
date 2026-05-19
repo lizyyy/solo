@@ -71,6 +71,27 @@ class ReportExporter:
         lines.append(f"  平均延迟: {report.average_delay_hours:.2f} 小时")
         lines.append("")
 
+        if report.has_dirty_data and report.dirty_data_issues:
+            lines.append("-" * 70)
+            lines.append("【脏数据问题】")
+            lines.append("-" * 70)
+            issue_type_map = {
+                "validation_error": "验证错误",
+                "format_error": "格式错误",
+                "fallback_applied": "已使用默认值",
+                "partial_valid": "部分有效数据",
+                "load_failed": "加载失败",
+                "unexpected_error": "意外错误",
+                "critical_fallback_failed": "关键回退失败"
+            }
+            for idx, issue in enumerate(report.dirty_data_issues, 1):
+                issue_type_display = issue_type_map.get(issue.issue_type, issue.issue_type)
+                lines.append(f"\n  {idx}. [{issue_type_display}] {issue.field}")
+                lines.append(f"     问题: {issue.message}")
+                if issue.value is not None:
+                    lines.append(f"     原始值: {issue.value}")
+            lines.append("")
+
         lines.append("-" * 70)
         lines.append("【包新鲜度详情】")
         lines.append("-" * 70)
@@ -148,6 +169,35 @@ class ReportExporter:
         summary_table.add_row("陈旧包数", f"[orange]{report.stale_packages}[/orange]")
         summary_table.add_row("严重包数", f"[red]{report.critical_packages}[/red]")
         summary_table.add_row("平均延迟", f"{report.average_delay_hours:.2f} 小时")
+        if report.has_dirty_data:
+            summary_table.add_row("脏数据问题", f"[red]{len(report.dirty_data_issues)} 个[/red]")
+
+        dirty_data_table = None
+        if report.has_dirty_data and report.dirty_data_issues:
+            dirty_data_table = Table(show_header=True, header_style="bold red", title="⚠️  脏数据问题详情")
+            dirty_data_table.add_column("序号", style="dim")
+            dirty_data_table.add_column("字段")
+            dirty_data_table.add_column("问题类型")
+            dirty_data_table.add_column("消息")
+
+            issue_type_colors = {
+                "validation_error": "red",
+                "format_error": "red",
+                "fallback_applied": "yellow",
+                "partial_valid": "yellow",
+                "load_failed": "red",
+                "unexpected_error": "red",
+                "critical_fallback_failed": "red"
+            }
+
+            for idx, issue in enumerate(report.dirty_data_issues, 1):
+                color = issue_type_colors.get(issue.issue_type, "white")
+                dirty_data_table.add_row(
+                    str(idx),
+                    issue.field,
+                    f"[{color}]{issue.issue_type}[/{color}]",
+                    issue.message
+                )
 
         packages_table = Table(show_header=True, header_style="bold cyan", title="包新鲜度详情")
         packages_table.add_column("包名")
@@ -199,15 +249,26 @@ class ReportExporter:
                 confirmed
             )
 
-        content = Group(
+        content_items = [
             title,
             subtitle,
             Text("\n\n"),
             summary_table,
+        ]
+
+        if dirty_data_table is not None:
+            content_items.extend([
+                Text("\n\n"),
+                dirty_data_table
+            ])
+
+        content_items.extend([
             Text("\n\n"),
             packages_table,
             Text("\n\n"),
             projects_table
-        )
+        ])
+
+        content = Group(*content_items)
 
         return Panel(content, border_style="blue")

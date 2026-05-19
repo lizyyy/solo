@@ -22,5 +22,13 @@
     "upstream_version": "1.0.0",
     "mirror_version": null,
     "is_available": false
+  },
+  {
+    "name": "bad-timestamp",
+    "upstream_version": "1.0.0",
+    "mirror_version": "0.9.0",
+    "upstream_updated_at": "not-a-timestamp",
+    "mirror_updated_at": "also-not-a-timestamp",
+    "is_available": true
   }
 ]

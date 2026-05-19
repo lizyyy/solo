@@ -61,7 +61,8 @@ def check(mirror_config, packages, projects, output, fmt, confirm_project, confi
             mirror_source,
             package_list,
             project_list,
-            confirmation_manager
+            confirmation_manager,
+            data_loader.get_issues() if data_loader.has_issues() else None
         )
 
         report_exporter = ReportExporter()

@@ -11,6 +11,7 @@ from .models import (
     FreshnessStatus,
     BlockReason,
     MirrorSource,
+    DirtyDataIssue,
 )
 from .rules import FreshnessRulesEngine
 
@@ -87,7 +88,8 @@ class ReportGenerator:
         mirror_source: MirrorSource,
         packages: List[PackageVersion],
         projects: List[BlockedProject],
-        confirmation_manager: Optional[ManualConfirmationManager] = None
+        confirmation_manager: Optional[ManualConfirmationManager] = None,
+        dirty_data_issues: Optional[List[DirtyDataIssue]] = None
     ) -> FreshnessReport:
         package_results: List[FreshnessCheckResult] = []
         package_results_dict: Dict[str, FreshnessCheckResult] = {}
@@ -139,6 +141,8 @@ class ReportGenerator:
             overall_status = FreshnessStatus.WARNING
 
         blocked_projects = sum(1 for r in project_results if r.is_blocked)
+        dirty_issues = dirty_data_issues or []
+        has_dirty_data = len(dirty_issues) > 0
 
         summary = {
             "total_packages": total_packages,
@@ -149,8 +153,12 @@ class ReportGenerator:
             "average_delay_hours": round(average_delay, 2),
             "total_projects": len(project_results),
             "blocked_projects": blocked_projects,
-            "needs_manual_confirmation": sum(1 for r in package_results if r.requires_manual_confirm)
+            "needs_manual_confirmation": sum(1 for r in package_results if r.requires_manual_confirm),
+            "dirty_data_issue_count": len(dirty_issues)
         }
+
+        if has_dirty_data and overall_status == FreshnessStatus.FRESH:
+            overall_status = FreshnessStatus.WARNING
 
         return FreshnessReport(
             report_id=str(uuid4()),
@@ -164,5 +172,7 @@ class ReportGenerator:
             project_results=project_results,
             package_results=package_results,
             overall_status=overall_status,
-            summary=summary
+            summary=summary,
+            dirty_data_issues=dirty_issues,
+            has_dirty_data=has_dirty_data
         )

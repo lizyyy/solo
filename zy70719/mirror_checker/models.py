@@ -107,6 +107,13 @@ class ProjectBlockResult(BaseModel):
     is_manually_confirmed: bool = False
 
 
+class DirtyDataIssue(BaseModel):
+    field: str
+    value: Any
+    issue_type: str
+    message: str
+
+
 class FreshnessReport(BaseModel):
     report_id: str
     generated_at: datetime
@@ -120,10 +127,5 @@ class FreshnessReport(BaseModel):
     package_results: List[FreshnessCheckResult]
     overall_status: FreshnessStatus
     summary: Dict[str, Any]
-
-
-class DirtyDataIssue(BaseModel):
-    field: str
-    value: Any
-    issue_type: str
-    message: str
+    dirty_data_issues: List[DirtyDataIssue] = []
+    has_dirty_data: bool = False

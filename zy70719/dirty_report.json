@@ -1,0 +1,256 @@
+{
+  "report_id": "1d43a5bf-23a4-478f-8710-8897399ecb58",
+  "generated_at": "2026-05-19T13:17:32.973393",
+  "mirror_source": {
+    "name": "未命名镜像源",
+    "url": "https://pypi-internal.example.com/simple",
+    "type": "pypi",
+    "sync_frequency_hours": 4.0,
+    "last_sync_time": "2026-05-19T11:15:13.952170",
+    "sync_window": null
+  },
+  "total_packages": 5,
+  "fresh_packages": 2,
+  "stale_packages": 0,
+  "critical_packages": 2,
+  "average_delay_hours": 0.0,
+  "project_results": [
+    {
+      "project_name": "unknown-project-0",
+      "priority": 3,
+      "is_blocked": true,
+      "blocked_packages": [
+        "requests"
+      ],
+      "block_reasons": {
+        "requests": "no_data"
+      },
+      "contact": null,
+      "description": null,
+      "is_manually_confirmed": false
+    },
+    {
+      "project_name": "test-project",
+      "priority": 3,
+      "is_blocked": false,
+      "blocked_packages": [],
+      "block_reasons": {},
+      "contact": null,
+      "description": null,
+      "is_manually_confirmed": false
+    },
+    {
+      "project_name": "project-with-missing-pkgs",
+      "priority": 2,
+      "is_blocked": true,
+      "blocked_packages": [
+        "nonexistent-pkg",
+        "another-missing"
+      ],
+      "block_reasons": {
+        "nonexistent-pkg": "no_data",
+        "another-missing": "no_data"
+      },
+      "contact": null,
+      "description": null,
+      "is_manually_confirmed": false
+    }
+  ],
+  "package_results": [
+    {
+      "package_name": "unknown-package-0",
+      "status": "fresh",
+      "version_gap_result": {
+        "package_name": "unknown-package-0",
+        "has_gap": false,
+        "version_gap": null,
+        "major_gap": 0,
+        "minor_gap": 0,
+        "patch_gap": 0,
+        "time_delay_hours": null
+      },
+      "in_sync_window": true,
+      "block_reason": null,
+      "recommendation": "版本同步正常",
+      "requires_manual_confirm": false
+    },
+    {
+      "package_name": "fastapi",
+      "status": "fresh",
+      "version_gap_result": {
+        "package_name": "fastapi",
+        "has_gap": false,
+        "version_gap": null,
+        "major_gap": 0,
+        "minor_gap": 0,
+        "patch_gap": 0,
+        "time_delay_hours": null
+      },
+      "in_sync_window": true,
+      "block_reason": null,
+      "recommendation": "版本同步正常",
+      "requires_manual_confirm": false
+    },
+    {
+      "package_name": "invalid-package",
+      "status": "warning",
+      "version_gap_result": {
+        "package_name": "invalid-package",
+        "has_gap": true,
+        "version_gap": "not-a-version vs also-invalid",
+        "major_gap": 0,
+        "minor_gap": 0,
+        "patch_gap": 0,
+        "time_delay_hours": null
+      },
+      "in_sync_window": true,
+      "block_reason": null,
+      "recommendation": "存在版本差距，建议检查同步状态",
+      "requires_manual_confirm": false
+    },
+    {
+      "package_name": "missing-mirror",
+      "status": "critical",
+      "version_gap_result": {
+        "package_name": "missing-mirror",
+        "has_gap": true,
+        "version_gap": "1.0.0",
+        "major_gap": 0,
+        "minor_gap": 0,
+        "patch_gap": 0,
+        "time_delay_hours": null
+      },
+      "in_sync_window": true,
+      "block_reason": "mirror_sync_failed",
+      "recommendation": "镜像源中不存在该包，拉取失败",
+      "requires_manual_confirm": true
+    },
+    {
+      "package_name": "bad-timestamp",
+      "status": "critical",
+      "version_gap_result": {
+        "package_name": "bad-timestamp",
+        "has_gap": true,
+        "version_gap": "0.9.0 -> 1.0.0",
+        "major_gap": 1,
+        "minor_gap": 9,
+        "patch_gap": 0,
+        "time_delay_hours": null
+      },
+      "in_sync_window": true,
+      "block_reason": "version_gap_too_large",
+      "recommendation": "次版本差距过大 (9)，需要立即同步",
+      "requires_manual_confirm": true
+    }
+  ],
+  "overall_status": "critical",
+  "summary": {
+    "total_packages": 5,
+    "fresh_packages": 2,
+    "stale_packages": 0,
+    "critical_packages": 2,
+    "fresh_rate": "40.0%",
+    "average_delay_hours": 0.0,
+    "total_projects": 3,
+    "blocked_projects": 2,
+    "needs_manual_confirmation": 2,
+    "dirty_data_issue_count": 12
+  },
+  "dirty_data_issues": [
+    {
+      "field": "sync_frequency_hours",
+      "value": -1.0,
+      "issue_type": "validation_error",
+      "message": "Input should be greater than 0"
+    },
+    {
+      "field": "sync_frequency_hours",
+      "value": -1.0,
+      "issue_type": "fallback_applied",
+      "message": "使用默认同步频率 4.0 小时"
+    },
+    {
+      "field": "packages[0].name",
+      "value": {
+        "name": "",
+        "upstream_version": "2.31.0",
+        "mirror_version": "2.31.0",
+        "is_available": true
+      },
+      "issue_type": "validation_error",
+      "message": "Value error, 包名称不能为空"
+    },
+    {
+      "field": "packages[0]",
+      "value": "unknown-package-0",
+      "issue_type": "partial_valid",
+      "message": "使用部分字段创建包对象"
+    },
+    {
+      "field": "packages[1].upstream_version",
+      "value": {
+        "name": "fastapi",
+        "upstream_version": "",
+        "mirror_version": "0.103.0",
+        "is_available": true
+      },
+      "issue_type": "validation_error",
+      "message": "Value error, 上游版本不能为空"
+    },
+    {
+      "field": "packages[1]",
+      "value": "fastapi",
+      "issue_type": "partial_valid",
+      "message": "使用部分字段创建包对象"
+    },
+    {
+      "field": "packages[4].upstream_updated_at",
+      "value": "not-a-timestamp",
+      "issue_type": "format_error",
+      "message": "上游时间格式错误: Invalid isoformat string: 'not-a-timestamp'"
+    },
+    {
+      "field": "packages[4].mirror_updated_at",
+      "value": "also-not-a-timestamp",
+      "issue_type": "format_error",
+      "message": "镜像时间格式错误: Invalid isoformat string: 'also-not-a-timestamp'"
+    },
+    {
+      "field": "projects[0].priority",
+      "value": {
+        "project_name": "",
+        "required_packages": [
+          "requests"
+        ],
+        "priority": 0,
+        "is_manually_confirmed": false
+      },
+      "issue_type": "validation_error",
+      "message": "Input should be greater than or equal to 1"
+    },
+    {
+      "field": "projects[0]",
+      "value": "unknown-project-0",
+      "issue_type": "partial_valid",
+      "message": "使用部分字段创建项目对象"
+    },
+    {
+      "field": "projects[1].priority",
+      "value": {
+        "project_name": "test-project",
+        "required_packages": [],
+        "priority": 6,
+        "is_manually_confirmed": false
+      },
+      "issue_type": "validation_error",
+      "message": "Input should be less than or equal to 5"
+    },
+    {
+      "field": "projects[1]",
+      "value": "test-project",
+      "issue_type": "partial_valid",
+      "message": "使用部分字段创建项目对象"
+    }
+  ],
+  "has_dirty_data": true
+}

@@ -12,5 +12,14 @@
     "required_packages": [],
     "priority": 6,
     "is_manually_confirmed": false
+  },
+  {
+    "project_name": "project-with-missing-pkgs",
+    "required_packages": [
+      "nonexistent-pkg",
+      "another-missing"
+    ],
+    "priority": 2,
+    "is_manually_confirmed": false
   }
 ]
