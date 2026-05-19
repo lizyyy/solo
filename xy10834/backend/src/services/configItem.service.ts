@@ -1,6 +1,6 @@
 import prisma from '../prisma';
 import { AppError } from '../middleware/errorHandler';
-import { ConfigStatus } from '@prisma/client';
+import { ConfigStatus } from '../types';
 
 export interface CreateConfigItemDTO {
   key: string;

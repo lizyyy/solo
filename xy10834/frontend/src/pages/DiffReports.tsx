@@ -14,7 +14,7 @@ import {
   SearchOutlined,
   ReloadOutlined,
   PlusOutlined,
-  FileExportOutlined,
+  ExportOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { diffApi, configApi } from '../services/api';
@@ -103,7 +103,7 @@ function DiffReportsPage() {
       width: 100,
       render: (_: any, record: DiffReport) => (
         <Button
-          icon={<FileExportOutlined />}
+          icon={<ExportOutlined />}
           size="small"
           onClick={() => handleExport(record.id)}
         >

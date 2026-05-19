@@ -7,7 +7,7 @@ import {
   CloudServerOutlined,
   DeploymentUnitOutlined,
   DownloadOutlined,
-  FileDiffOutlined,
+  FileTextOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import OverviewPage from './pages/Overview';
@@ -26,7 +26,7 @@ const menuItems = [
   { key: '/instances', icon: <CloudServerOutlined />, label: '服务实例' },
   { key: '/distributions', icon: <DeploymentUnitOutlined />, label: '分发版本' },
   { key: '/pulls', icon: <DownloadOutlined />, label: '拉取记录' },
-  { key: '/diff-reports', icon: <FileDiffOutlined />, label: '差异报告' },
+  { key: '/diff-reports', icon: <FileTextOutlined />, label: '差异报告' },
   { key: '/failed', icon: <ExclamationCircleOutlined />, label: '异常详情' },
 ];
 

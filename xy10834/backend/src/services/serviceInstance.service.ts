@@ -1,6 +1,6 @@
 import prisma from '../prisma';
 import { AppError } from '../middleware/errorHandler';
-import { InstanceStatus } from '@prisma/client';
+import { InstanceStatus } from '../types';
 
 export interface CreateServiceInstanceDTO {
   instanceId: string;

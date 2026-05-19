@@ -1,6 +1,6 @@
 import prisma from '../prisma';
 import { AppError } from '../middleware/errorHandler';
-import { PullStatus, EffectiveStatus, CompensateStatus } from '@prisma/client';
+import { PullStatus, EffectiveStatus, CompensateStatus } from '../types';
 
 export interface ReportPullResultDTO {
   configId: string;

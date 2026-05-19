@@ -1,5 +1,5 @@
 import prisma from '../prisma';
-import { PullStatus, EffectiveStatus, CompensateStatus, ConfigStatus, InstanceStatus } from '@prisma/client';
+import { PullStatus, EffectiveStatus, CompensateStatus, ConfigStatus, InstanceStatus } from '../types';
 
 export class OverviewService {
   async getStatistics() {
