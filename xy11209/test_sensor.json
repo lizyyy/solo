@@ -1,0 +1,32 @@
+[
+    {
+        "timestamp": "2024-05-15 10:00:00",
+        "location": "地下泵房1号",
+        "sensor_name": "温度传感器A1",
+        "alarm_type": "超温告警",
+        "severity": "高",
+        "value": "92℃",
+        "description": "水泵电机温度超过阈值",
+        "responsible_person": "张工"
+    },
+    {
+        "timestamp": "2024-05-15 11:30:00",
+        "location": "地下泵房2号",
+        "sensor_name": "压力传感器B2",
+        "alarm_type": "压力异常",
+        "severity": "中等",
+        "value": "0.15MPa",
+        "description": "水压低于正常范围",
+        "responsible_person": "李工"
+    },
+    {
+        "timestamp": "2024-05-15 14:00:00",
+        "location": "地下泵房3号",
+        "sensor_name": "液位传感器C1",
+        "alarm_type": "液位告警",
+        "severity": "高",
+        "value": "30cm",
+        "description": "集水坑液位过高",
+        "responsible_person": "王工"
+    }
+]
