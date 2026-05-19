@@ -142,7 +142,7 @@ def add_artifact(ctx, notebook_id, name, type, file):
     if version:
         click.echo(f"✓ 制品已添加, 版本: v{version}")
     else:
-        click.echo(f"✗ 添加失败")
+        click.echo(f"✗ 添加失败: Notebook ID '{notebook_id}' 不存在")
 
 
 @cli.command()
@@ -163,7 +163,7 @@ def review(ctx, notebook_id, reviewer, comment, status):
     if ctx.obj['storage'].add_review(notebook_id, review_comment):
         click.echo(f"✓ 复核意见已添加")
     else:
-        click.echo(f"✗ 添加失败")
+        click.echo(f"✗ 添加失败: Notebook ID '{notebook_id}' 不存在")
 
 
 @cli.command()
@@ -189,7 +189,7 @@ def archive(ctx, notebook_id, output_dir):
     if ctx.obj['storage'].archive_record(notebook_id, output_dir):
         click.echo(f"✓ 记录 {notebook_id} 已归档至 {output_dir}")
     else:
-        click.echo(f"✗ 归档失败")
+        click.echo(f"✗ 归档失败: Notebook ID '{notebook_id}' 不存在")
 
 
 @cli.command()

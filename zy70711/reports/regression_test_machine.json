@@ -1,0 +1,172 @@
+{
+  "generated_at": "2026-05-19T12:52:23.066985",
+  "total_records": 4,
+  "records": [
+    {
+      "notebook_id": "NB001_NORMAL",
+      "name": "模型训练_正常记录",
+      "path": "./notebooks/train.ipynb",
+      "parameters": {
+        "param_id": "98072a8f",
+        "name": "normal_params",
+        "values": {
+          "learning_rate": 0.001,
+          "batch_size": 32,
+          "epochs": 100,
+          "optimizer": "adam"
+        },
+        "signature": "e77ab047788d2252",
+        "created_at": "2026-05-19T07:10:23.891712"
+      },
+      "environment": {
+        "python_version": "3.10.0",
+        "os": "Darwin-22.5.0-x86_64-i386-64bit",
+        "cpu_info": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "memory_total": 34359738368,
+        "disk_space": 1000204886016,
+        "libraries": {
+          "numpy": "1.24.0",
+          "pandas": "2.0.0"
+        },
+        "env_hash": "18b9fb03dc7deced"
+      },
+      "artifacts": [],
+      "reviews": [
+        {
+          "reviewer": "数据科学家A",
+          "comment": "参数设置合理，结果可复现",
+          "status": "approved",
+          "reviewed_at": "2026-05-19T07:10:23.891763"
+        }
+      ],
+      "review_status": "approved",
+      "created_at": "2026-05-19T07:10:23.891761",
+      "executed_at": "2026-05-19T07:10:23.891757",
+      "execution_time": 0.0,
+      "exit_code": 0,
+      "verification": {
+        "params_signature_valid": true,
+        "env_hash_valid": true,
+        "review_status": "approved"
+      }
+    },
+    {
+      "notebook_id": "NB002_DIRTY",
+      "name": "相似度计算_脏数据",
+      "path": "./notebooks/similarity.ipynb",
+      "parameters": {
+        "param_id": "b66a4e29",
+        "name": "dirty_params",
+        "values": {
+          "threshold": 0.5,
+          "method": "cosine"
+        },
+        "signature": "fake_signature_123456",
+        "created_at": "2026-05-19T07:10:23.892120"
+      },
+      "environment": {
+        "python_version": "3.9.0",
+        "os": "Linux-5.15.0-generic-x86_64-with-glibc2.31",
+        "cpu_info": "AMD Ryzen 9 5900X 12-Core Processor",
+        "memory_total": 68719476736,
+        "disk_space": 2000409772032,
+        "libraries": {
+          "scipy": "1.10.0",
+          "scikit-learn": "1.2.0"
+        },
+        "env_hash": "11a97754b66ccd68"
+      },
+      "artifacts": [],
+      "reviews": [],
+      "review_status": "pending",
+      "created_at": "2026-05-19T07:10:23.892130",
+      "executed_at": "2026-05-19T07:10:23.892128",
+      "execution_time": 0.0,
+      "exit_code": 0,
+      "verification": {
+        "params_signature_valid": false,
+        "env_hash_valid": true,
+        "review_status": "pending"
+      }
+    },
+    {
+      "notebook_id": "NB004_EMPTY",
+      "name": "空参数测试_空结果",
+      "path": "./notebooks/empty.ipynb",
+      "parameters": {
+        "param_id": "df3a74c1",
+        "name": "empty_params",
+        "values": {},
+        "signature": "44136fa355b3678a",
+        "created_at": "2026-05-19T07:10:23.892699"
+      },
+      "environment": {
+        "python_version": "3.11.0",
+        "os": "Darwin-23.0.0-arm64-arm-64bit",
+        "cpu_info": "Apple M2 Pro",
+        "memory_total": 34359738368,
+        "disk_space": 1000204886016,
+        "libraries": {},
+        "env_hash": "ec9f6e47f2e95dec"
+      },
+      "artifacts": [],
+      "reviews": [],
+      "review_status": "pending",
+      "created_at": "2026-05-19T07:10:23.892708",
+      "executed_at": "2026-05-19T07:10:23.892707",
+      "execution_time": 0.0,
+      "exit_code": 1,
+      "verification": {
+        "params_signature_valid": true,
+        "env_hash_valid": true,
+        "review_status": "pending"
+      }
+    },
+    {
+      "notebook_id": "NB003_CONFLICT",
+      "name": "聚类分析_边界冲突",
+      "path": "./notebooks/cluster.ipynb",
+      "parameters": {
+        "param_id": "ce054daf",
+        "name": "conflict_params",
+        "values": {
+          "n_clusters": 5,
+          "max_iter": 300
+        },
+        "signature": "547bc2ac969f3c87",
+        "created_at": "2026-05-19T07:10:23.892429"
+      },
+      "environment": {
+        "python_version": "3.10.0",
+        "os": "Windows-10-10.0.19045-SP0",
+        "cpu_info": "Intel(R) Xeon(R) W-1290 CPU @ 3.20GHz",
+        "memory_total": 137438953472,
+        "disk_space": 4000819544064,
+        "libraries": {
+          "numpy": "1.23.0",
+          "pandas": "1.5.0"
+        },
+        "env_hash": "conflict_hash_7890abcd"
+      },
+      "artifacts": [],
+      "reviews": [
+        {
+          "reviewer": "复核专家B",
+          "comment": "运行环境不匹配，依赖库版本冲突",
+          "status": "rejected",
+          "reviewed_at": "2026-05-19T07:10:23.892442"
+        }
+      ],
+      "review_status": "rejected",
+      "created_at": "2026-05-19T07:10:23.892441",
+      "executed_at": "2026-05-19T07:10:23.892439",
+      "execution_time": 0.0,
+      "exit_code": 0,
+      "verification": {
+        "params_signature_valid": true,
+        "env_hash_valid": false,
+        "review_status": "rejected"
+      }
+    }
+  ]
+}

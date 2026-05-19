@@ -93,7 +93,12 @@ class StorageManager:
     def verify_record(self, notebook_id: str) -> Dict[str, Any]:
         record = self.load_record(notebook_id)
         if not record:
-            return {"valid": False, "error": "Record not found"}
+            return {
+                "valid": False,
+                "issues": [f"记录不存在: Notebook ID '{notebook_id}' 未找到"],
+                "record": None,
+                "error": "Record not found"
+            }
         
         issues = []
         
