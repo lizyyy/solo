@@ -1,0 +1,128 @@
+{
+  "environments": [
+    {
+      "id": "7f3fbe08-21f1-4d3f-9de7-20333ba9aeba",
+      "name": "开发环境",
+      "description": "日常开发使用环境",
+      "status": "active",
+      "createdAt": "2026-05-19T18:40:21.631Z",
+      "updatedAt": "2026-05-19T18:40:21.631Z"
+    },
+    {
+      "id": "bd84c135-f512-40df-aeea-12604d596fc5",
+      "name": "测试环境",
+      "description": "功能测试使用环境",
+      "status": "active",
+      "createdAt": "2026-05-19T18:40:21.631Z",
+      "updatedAt": "2026-05-19T18:40:21.631Z"
+    },
+    {
+      "id": "5ce34189-fc0c-446f-8f73-5bdbab30f3bd",
+      "name": "预发布环境",
+      "description": "发布前验证环境",
+      "status": "active",
+      "createdAt": "2026-05-19T18:40:21.631Z",
+      "updatedAt": "2026-05-19T18:40:21.631Z"
+    },
+    {
+      "id": "94763a83-2cf5-44ae-bf78-14f8f3576a8b",
+      "name": "生产环境",
+      "description": "正式生产环境",
+      "status": "active",
+      "createdAt": "2026-05-19T18:40:21.631Z",
+      "updatedAt": "2026-05-19T18:40:21.631Z"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "37269ccc-068b-43db-acd3-575e1151e73f",
+      "name": "用户基础数据",
+      "version": "v1.0.0",
+      "importOrder": 1,
+      "status": "published",
+      "recordCount": 1000,
+      "createdAt": "2026-05-19T18:40:21.632Z",
+      "updatedAt": "2026-05-19T18:40:21.632Z"
+    },
+    {
+      "id": "0c209c94-3b35-4805-81ce-ca009b6107ec",
+      "name": "商品基础数据",
+      "version": "v1.0.0",
+      "importOrder": 2,
+      "status": "published",
+      "recordCount": 500,
+      "createdAt": "2026-05-19T18:40:21.632Z",
+      "updatedAt": "2026-05-19T18:40:21.632Z"
+    },
+    {
+      "id": "2921829e-5bab-458d-bb15-1401fb72c70a",
+      "name": "订单数据",
+      "version": "v1.0.0",
+      "importOrder": 3,
+      "status": "published",
+      "recordCount": 2000,
+      "createdAt": "2026-05-19T18:40:21.632Z",
+      "updatedAt": "2026-05-19T18:40:21.632Z"
+    },
+    {
+      "id": "2dc46eaa-27f7-4286-a919-98fb70d16fb7",
+      "name": "日志数据",
+      "version": "v1.1.0",
+      "importOrder": 4,
+      "status": "draft",
+      "recordCount": 5000,
+      "createdAt": "2026-05-19T18:40:21.632Z",
+      "updatedAt": "2026-05-19T18:40:21.632Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "ac26c176-d8a5-45b8-8dc7-a01c34a1564b",
+      "idempotencyKey": "090b168eb450630cbb797d11dbae4b734272b81870fb4deecd3deff95ecc6a3f",
+      "environmentId": "7f3fbe08-21f1-4d3f-9de7-20333ba9aeba",
+      "datasetId": "37269ccc-068b-43db-acd3-575e1151e73f",
+      "status": "success",
+      "importOrder": 1,
+      "retryCount": 0,
+      "maxRetries": 3,
+      "totalRecords": 0,
+      "successRecords": 0,
+      "failedRecords": 0,
+      "createdAt": "2026-05-19T18:41:14.771Z",
+      "updatedAt": "2026-05-19T18:41:14.884Z"
+    },
+    {
+      "id": "35f16349-ad24-404d-92a1-8df402870568",
+      "idempotencyKey": "a1886bff45908f57bd45692f3d52e7a4c50cb9c971dc4c1f8d42d9279a502e8e",
+      "environmentId": "7f3fbe08-21f1-4d3f-9de7-20333ba9aeba",
+      "datasetId": "37269ccc-068b-43db-acd3-575e1151e73f",
+      "status": "success",
+      "importOrder": 1,
+      "retryCount": 0,
+      "maxRetries": 3,
+      "totalRecords": 0,
+      "successRecords": 0,
+      "failedRecords": 0,
+      "createdAt": "2026-05-19T18:41:28.525Z",
+      "updatedAt": "2026-05-19T18:41:28.683Z"
+    },
+    {
+      "id": "450ffbf6-acb7-4313-8de5-6e1e39a1f476",
+      "idempotencyKey": "7cfa5d822d6d71fd8e7586a4d2f3b22f54c68aebbdb3db41a1f827686d0c7809",
+      "environmentId": "7f3fbe08-21f1-4d3f-9de7-20333ba9aeba",
+      "datasetId": "37269ccc-068b-43db-acd3-575e1151e73f",
+      "status": "success",
+      "importOrder": 1,
+      "retryCount": 0,
+      "maxRetries": 3,
+      "totalRecords": 0,
+      "successRecords": 0,
+      "failedRecords": 0,
+      "createdAt": "2026-05-19T18:41:29.549Z",
+      "updatedAt": "2026-05-19T18:41:29.668Z"
+    }
+  ],
+  "seedRecords": [],
+  "rollbackRecords": [],
+  "cleanupStrategies": []
+}
