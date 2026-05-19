@@ -1,0 +1,7 @@
+﻿id,operation_type,log_topic,start_time,end_time,freeze_reason,applicant,release_condition,release_status,approval_time,approver
+F001,freeze,user_access_log,2024-01-01 00:00:00,2024-01-31 23:59:59,complaint,zhang_san,,,
+F002,freeze,user_access_log,2024-01-15 00:00:00,2024-02-15 23:59:59,audit,li_si,,,
+F003,freeze,payment_log,2024-02-01 00:00:00,2024-02-28 23:59:59,legal,wang_wu,,,
+R001,release,user_access_log,2024-01-01 00:00:00,2024-01-31 23:59:59,complaint,zhang_san,投诉已处理,approved,2024-02-20 10:00:00,zhao_liu
+R002,release,user_access_log,2024-01-15 00:00:00,2024-02-15 23:59:59,audit,li_si,审计完成,pending,,
+,freeze,bad_log,2024-01-01,2024-01-02,bad_reason,user1,,,

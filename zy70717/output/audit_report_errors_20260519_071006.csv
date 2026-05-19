@@ -1,0 +1,2 @@
+﻿错误类型,错误信息,来源文件,来源行号,原始内容
+ParseError,解析失败: 无效的冻结原因: bad_reason,examples/audit_data.csv,7,"id=,operation_type=freeze,log_topic=bad_log,start_time=2024-01-01,end_time=2024-01-02,freeze_reason=bad_reason,applicant=user1,release_condition=,release_status=,approval_time=,approver=None"

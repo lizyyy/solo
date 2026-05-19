@@ -1,0 +1,33 @@
+[
+  {
+    "id": "F001",
+    "operation_type": "freeze",
+    "log_topic": "user_access_log",
+    "start_time": "2024-01-01 00:00:00",
+    "end_time": "2024-01-31 23:59:59",
+    "freeze_reason": "complaint",
+    "applicant": "zhang_san"
+  },
+  {
+    "id": "F002",
+    "operation_type": "freeze",
+    "log_topic": "user_access_log",
+    "start_time": "2024-01-15 00:00:00",
+    "end_time": "2024-02-15 23:59:59",
+    "freeze_reason": "audit",
+    "applicant": "li_si"
+  },
+  {
+    "id": "R001",
+    "operation_type": "release",
+    "log_topic": "user_access_log",
+    "start_time": "2024-01-01 00:00:00",
+    "end_time": "2024-01-31 23:59:59",
+    "freeze_reason": "complaint",
+    "applicant": "zhang_san",
+    "release_condition": "投诉已处理",
+    "release_status": "approved",
+    "approval_time": "2024-02-20 10:00:00",
+    "approver": "zhao_liu"
+  }
+]
