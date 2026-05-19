@@ -1,0 +1,32 @@
+[
+  {
+    "id": "bbe42339-5810-4acf-b847-1fd9ef08b515",
+    "applicant": "张三",
+    "resourceId": "db-production-mysql",
+    "durationHours": 24,
+    "approvalStrategy": "AUTO",
+    "reason": "日常运维需要",
+    "status": "ACTIVE",
+    "secretToken": "lt_c8yn9himy0s8svfttumofa",
+    "createdAt": "2026-05-15T10:41:25.095Z",
+    "expiresAt": "2026-05-16T10:41:25.095Z",
+    "lastRenewedAt": null,
+    "approvedAt": "2026-05-15T10:41:25.095Z",
+    "approvedBy": "SYSTEM"
+  },
+  {
+    "id": "a7adc472-b36e-4873-8a2a-7743145ad6e6",
+    "applicant": "李四",
+    "resourceId": "redis-cache",
+    "durationHours": 12,
+    "approvalStrategy": "MANUAL",
+    "reason": "",
+    "status": "ACTIVE",
+    "secretToken": "lt_y0pdaywvlreduh96cslt2a",
+    "createdAt": "2026-05-15T10:42:08.315Z",
+    "expiresAt": "2026-05-16T22:42:08.315Z",
+    "lastRenewedAt": "2026-05-15T10:42:35.455Z",
+    "approvedAt": "2026-05-15T10:42:27.312Z",
+    "approvedBy": "管理员"
+  }
+]

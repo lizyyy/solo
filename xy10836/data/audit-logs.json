@@ -1,0 +1,54 @@
+[
+  {
+    "id": "bb46653f-5866-4777-acb6-078b5c3c8a8b",
+    "action": "LEASE_CREATED",
+    "leaseId": "bbe42339-5810-4acf-b847-1fd9ef08b515",
+    "details": {
+      "applicant": "张三",
+      "resourceId": "db-production-mysql",
+      "durationHours": 24
+    },
+    "timestamp": "2026-05-15T10:41:25.115Z"
+  },
+  {
+    "id": "ee551119-b068-4ce4-b511-1837b01d4212",
+    "action": "LEASE_CREATED",
+    "leaseId": "a7adc472-b36e-4873-8a2a-7743145ad6e6",
+    "details": {
+      "applicant": "李四",
+      "resourceId": "redis-cache",
+      "durationHours": 12
+    },
+    "timestamp": "2026-05-15T10:42:08.316Z"
+  },
+  {
+    "id": "9c600e32-3444-47e4-8a14-068ff61ff4c2",
+    "action": "LEASE_APPROVED",
+    "leaseId": "a7adc472-b36e-4873-8a2a-7743145ad6e6",
+    "details": {
+      "approver": "管理员",
+      "comment": "同意申请"
+    },
+    "timestamp": "2026-05-15T10:42:27.313Z"
+  },
+  {
+    "id": "6b859c41-0b75-4b97-8ed1-8dea2f66d4a2",
+    "action": "LEASE_RENEWED",
+    "leaseId": "a7adc472-b36e-4873-8a2a-7743145ad6e6",
+    "details": {
+      "originalExpiresAt": "2026-05-15T22:42:08.315Z",
+      "newExpiresAt": "2026-05-16T22:42:08.315Z",
+      "durationHours": 24
+    },
+    "timestamp": "2026-05-15T10:42:35.456Z"
+  },
+  {
+    "id": "13771bbf-539f-4859-9f24-cbe5b85d10a4",
+    "action": "LEASE_VALIDATED",
+    "leaseId": "a7adc472-b36e-4873-8a2a-7743145ad6e6",
+    "details": {
+      "valid": true
+    },
+    "timestamp": "2026-05-15T10:42:50.063Z"
+  }
+]
