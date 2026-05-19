@@ -1,0 +1,65 @@
+[
+    {
+        "order_number": "DEL20240501001",
+        "record_time": "2024-05-01 08:00:00",
+        "temperature": 4.2,
+        "humidity": 65.5,
+        "device_id": "TEMP001",
+        "location": "冷藏车厢A",
+        "remarks": "正常"
+    },
+    {
+        "order_number": "DEL20240501001",
+        "record_time": "2024-05-01 09:00:00",
+        "temperature": 5.1,
+        "humidity": 62.3,
+        "device_id": "TEMP001",
+        "location": "冷藏车厢A",
+        "remarks": "正常"
+    },
+    {
+        "order_number": "DEL20240501001",
+        "record_time": "2024-05-01 10:00:00",
+        "temperature": 9.5,
+        "humidity": 58.7,
+        "device_id": "TEMP001",
+        "location": "冷藏车厢A",
+        "remarks": "温度异常偏高"
+    },
+    {
+        "order_number": "DEL20240501001",
+        "record_time": "2024-05-01 11:00:00",
+        "temperature": 6.8,
+        "humidity": 60.2,
+        "device_id": "TEMP001",
+        "location": "冷藏车厢A",
+        "remarks": "恢复正常"
+    },
+    {
+        "order_number": "DEL20240501002",
+        "record_time": "2024-05-02 08:30:00",
+        "temperature": 3.5,
+        "humidity": 68.0,
+        "device_id": "TEMP002",
+        "location": "冷藏车厢B",
+        "remarks": "正常"
+    },
+    {
+        "order_number": "DEL20240501002",
+        "record_time": "2024-05-02 09:30:00",
+        "temperature": 4.0,
+        "humidity": 66.5,
+        "device_id": "TEMP002",
+        "location": "冷藏车厢B",
+        "remarks": "正常"
+    },
+    {
+        "order_number": "DEL20240501002",
+        "record_time": "2024-05-02 10:30:00",
+        "temperature": 1.0,
+        "humidity": 70.2,
+        "device_id": "TEMP002",
+        "location": "冷藏车厢B",
+        "remarks": "温度异常偏低"
+    }
+]
