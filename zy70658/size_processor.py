@@ -109,7 +109,7 @@ class HeaderRecognizer:
 
 class StudentMerger:
     @staticmethod
-    def merge_duplicates(records: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
+    def merge_duplicates(records: List[Dict]) -> Tuple[List[Dict], List[Dict], Dict]:
         student_groups = {}
         
         for record in records:
@@ -121,16 +121,19 @@ class StudentMerger:
         
         merged = []
         duplicates = []
+        conflict_mapping = {}
         
         for key, group in student_groups.items():
             if len(group) > 1:
                 base_record = group[0].copy()
                 sizes = []
                 original_sizes = []
+                record_idxs = []
                 
                 for r in group:
                     sizes.append(r.get('size', ''))
                     original_sizes.append(r.get('original_size', ''))
+                    record_idxs.append(r.get('record_idx', -1))
                 
                 unique_sizes = list(set(sizes))
                 
@@ -140,8 +143,16 @@ class StudentMerger:
                     base_record['is_duplicate'] = True
                     base_record['has_size_conflict'] = True
                     base_record['quantity'] = 1
+                    base_record['conflict_record_idxs'] = record_idxs
+                    
+                    main_record_idx = base_record.get('record_idx', -1)
                     for r in group:
+                        r['main_conflict_record_idx'] = main_record_idx
                         duplicates.append(r)
+                    
+                    for idx in record_idxs:
+                        conflict_mapping[idx] = main_record_idx
+                    
                     merged.append(base_record)
                 else:
                     base_record['size'] = unique_sizes[0]
@@ -156,7 +167,7 @@ class StudentMerger:
                 record['quantity'] = 1
                 merged.append(record)
         
-        return merged, duplicates
+        return merged, duplicates, conflict_mapping
 
 
 class ClassSummarizer:
@@ -298,12 +309,14 @@ def process_import_data(df: pd.DataFrame) -> ProcessResult:
             
             records.append(record)
         
-        merged_records, duplicates = StudentMerger.merge_duplicates(records)
+        merged_records, duplicates, conflict_mapping = StudentMerger.merge_duplicates(records)
         
-        for i, dup in enumerate(duplicates):
+        for dup in duplicates:
+            main_record_idx = dup.get('main_conflict_record_idx', dup.get('record_idx', -1))
             exceptions.append({
                 'row': dup.get('row_index', 0),
                 'record_idx': dup.get('record_idx', -1),
+                'main_record_idx': main_record_idx,
                 'name': dup.get('name', ''),
                 'class_name': dup.get('class_name', ''),
                 'student_no': dup.get('student_no', ''),
@@ -322,6 +335,7 @@ def process_import_data(df: pd.DataFrame) -> ProcessResult:
                 'summary': summary,
                 'total_summary': total_summary,
                 'exceptions': exceptions,
+                'conflict_mapping': conflict_mapping,
                 'header_mapping': header_mapping,
                 'warnings': warnings
             }

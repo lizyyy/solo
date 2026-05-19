@@ -96,6 +96,7 @@ async def import_size_data(
     db.flush()
     
     size_record_ids = {}
+    conflict_mapping = result.data.get('conflict_mapping', {})
     
     for i, record in enumerate(result.data['records']):
         class_obj = db.query(ClassInfo).filter(
@@ -143,7 +144,12 @@ async def import_size_data(
     
     for ex in result.data['exceptions']:
         record_idx = ex.get('record_idx', -1)
-        size_record_id = size_record_ids.get(record_idx)
+        
+        if ex.get('type') == 'duplicate_student_conflict':
+            main_record_idx = ex.get('main_record_idx', -1)
+            size_record_id = size_record_ids.get(main_record_idx, size_record_ids.get(record_idx))
+        else:
+            size_record_id = size_record_ids.get(record_idx)
         
         exception_note = ExceptionNote(
             size_record_id=size_record_id,

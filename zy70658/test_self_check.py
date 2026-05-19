@@ -84,7 +84,7 @@ def test_student_merger():
         {'name': '李四', 'class_name': '高一2班', 'size': '170', 'original_size': '170', 'student_no': '002'},
     ]
     
-    merged, duplicates = StudentMerger.merge_duplicates(records)
+    merged, duplicates, conflict_mapping = StudentMerger.merge_duplicates(records)
     
     all_passed = True
     
@@ -235,19 +235,19 @@ def test_export_with_exceptions():
     return all_passed
 
 
-def test_database_exception_with_size_record():
+def test_size_conflict_closed_loop():
     print("\n" + "=" * 60)
-    print("测试 7: 数据库异常记录与尺码记录关联")
+    print("测试 7: 尺码冲突闭环验证 - 所有异常都正确关联 size_record_id")
     print("=" * 60)
     
     from sqlalchemy.orm import Session
     from database import engine
     
     test_data = {
-        '学生姓名': ['张三', '李四'],
-        '班级': ['高一1班', '高一2班'],
-        '校服尺码': ['非正常尺码', '170'],
-        '学号': ['001', '002'],
+        '学生姓名': ['张三', '张三', '李四'],
+        '班级': ['高一1班', '高一1班', '高一2班'],
+        '校服尺码': ['160', '170', '175'],
+        '学号': ['001', '001', '002'],
     }
     
     df = pd.DataFrame(test_data)
@@ -257,10 +257,22 @@ def test_database_exception_with_size_record():
         print(f"  ✗ 处理失败: {result.error_message}")
         return False
     
+    all_passed = True
+    
+    duplicate_conflicts = [ex for ex in result.data['exceptions'] if ex['type'] == 'duplicate_student_conflict']
+    passed = len(duplicate_conflicts) == 2
+    all_passed = all_passed and passed
+    print(f"  {'✓' if passed else '✗'} 尺码冲突异常数: {len(duplicate_conflicts)} (预期: 2)")
+    
+    conflict_mapping = result.data.get('conflict_mapping', {})
+    passed = len(conflict_mapping) == 2
+    all_passed = all_passed and passed
+    print(f"  {'✓' if passed else '✗'} 冲突映射条目数: {len(conflict_mapping)} (预期: 2)")
+    
     db = Session(bind=engine)
     try:
         batch = ImportBatch(
-            file_name='test.xlsx',
+            file_name='test_size_conflict.xlsx',
             status='processed',
             total_records=2,
             processed_records=2,
@@ -295,11 +307,17 @@ def test_database_exception_with_size_record():
             )
             db.add(size_record)
             db.flush()
-            size_record_ids[i] = size_record.id
+            original_idx = record.get('record_idx', i)
+            size_record_ids[original_idx] = size_record.id
         
-        for i, ex in enumerate(result.data['exceptions']):
+        for ex in result.data['exceptions']:
             record_idx = ex.get('record_idx', -1)
-            size_record_id = size_record_ids.get(record_idx)
+            
+            if ex.get('type') == 'duplicate_student_conflict':
+                main_record_idx = ex.get('main_record_idx', -1)
+                size_record_id = size_record_ids.get(main_record_idx, size_record_ids.get(record_idx))
+            else:
+                size_record_id = size_record_ids.get(record_idx)
             
             exception_note = ExceptionNote(
                 size_record_id=size_record_id,
@@ -319,29 +337,37 @@ def test_database_exception_with_size_record():
         
         exceptions = db.query(ExceptionNote).filter(ExceptionNote.import_batch_id == batch.id).all()
         
-        all_passed = True
-        passed = len(exceptions) == 1
+        passed = len(exceptions) == 2
         all_passed = all_passed and passed
-        print(f"  {'✓' if passed else '✗'} 数据库异常记录数: {len(exceptions)} (预期: 1)")
+        print(f"  {'✓' if passed else '✗'} 数据库异常记录数: {len(exceptions)} (预期: 2)")
         
-        ex = exceptions[0]
-        passed = ex.size_record_id is not None
-        all_passed = all_passed and passed
-        print(f"  {'✓' if passed else '✗'} 异常关联 size_record_id: {ex.size_record_id}")
+        for i, ex in enumerate(exceptions):
+            passed = ex.size_record_id is not None
+            all_passed = all_passed and passed
+            print(f"  {'✓' if passed else '✗'} 异常 #{i+1} 关联 size_record_id: {ex.size_record_id}")
+            
+            passed = ex.student_name == '张三'
+            all_passed = all_passed and passed
+            print(f"  {'✓' if passed else '✗'} 异常 #{i+1} 学生姓名: {ex.student_name}")
+            
+            passed = ex.exception_type == 'duplicate_student_conflict'
+            all_passed = all_passed and passed
+            print(f"  {'✓' if passed else '✗'} 异常 #{i+1} 类型: {ex.exception_type}")
         
-        passed = ex.student_name == '张三'
-        all_passed = all_passed and passed
-        print(f"  {'✓' if passed else '✗'} 异常记录学生姓名: {ex.student_name} (预期: 张三)")
+        size_records = db.query(SizeRecord).filter(SizeRecord.import_batch_id == batch.id).all()
+        print(f"  ✓ 尺码记录数: {len(size_records)} (预期: 2，张三+李四各1条)")
         
-        passed = ex.row_number == 2
-        all_passed = all_passed and passed
-        print(f"  {'✓' if passed else '✗'} 异常记录行号: {ex.row_number} (预期: 2)")
+        zhangsan_sr = next((sr for sr in size_records if sr.student.name == '张三'), None)
+        if zhangsan_sr:
+            passed = zhangsan_sr.is_duplicate == True
+            all_passed = all_passed and passed
+            print(f"  {'✓' if passed else '✗'} 张三尺码记录标记重复: {zhangsan_sr.is_duplicate}")
+            
+            passed = '160 / 170' in zhangsan_sr.standardized_size
+            all_passed = all_passed and passed
+            print(f"  {'✓' if passed else '✗'} 张三尺码标准化: {zhangsan_sr.standardized_size}")
         
-        passed = ex.class_name == '高一1班'
-        all_passed = all_passed and passed
-        print(f"  {'✓' if passed else '✗'} 异常记录班级: {ex.class_name} (预期: 高一1班)")
-        
-        db.delete(ex)
+        db.query(ExceptionNote).filter(ExceptionNote.import_batch_id == batch.id).delete()
         db.query(SizeRecord).filter(SizeRecord.import_batch_id == batch.id).delete()
         db.query(Student).filter(Student.class_id.in_(db.query(ClassInfo.id).filter(ClassInfo.class_name.in_(['高一1班', '高一2班'])))).delete(synchronize_session=False)
         db.query(ClassInfo).filter(ClassInfo.class_name.in_(['高一1班', '高一2班'])).delete(synchronize_session=False)
@@ -375,7 +401,7 @@ def main():
         test_supplement_recognition,
         test_exception_details,
         test_export_with_exceptions,
-        test_database_exception_with_size_record,
+        test_size_conflict_closed_loop,
     ]
     
     results = []
