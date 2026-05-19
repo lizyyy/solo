@@ -1,0 +1,11 @@
+{
+  "bad_record_id": "bad_a7dd18ef2fc1",
+  "source": "customer_service_csv",
+  "file_name": "examples/customer_tickets.csv",
+  "row_number": 9,
+  "raw_data": "{\"ticket_id\": \"tkt_008\", \"station_id\": \"bad_station\", \"user_id\": NaN, \"user_phone\": NaN, \"title\": \"缺少必填字段\", \"description\": \"这是一条格式有问题的数据\", \"create_time\": \"bad_date\", \"status\": NaN, \"assignee\": NaN, \"priority\": NaN, \"tags\": NaN}",
+  "error_message": "2 validation errors for CustomerServiceTicket\ncreate_time\n  Input should be a valid datetime, input is too short [type=datetime_parsing, input_value='bad_date', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.5/v/datetime_parsing\nstatus\n  Input should be a valid string [type=string_type, input_value=nan, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.5/v/string_type",
+  "suggestion": "时间格式不正确，请使用 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DDTHH:MM:SS 格式",
+  "status": "pending",
+  "created_at": "2026-05-19 14:07:15.596802"
+}

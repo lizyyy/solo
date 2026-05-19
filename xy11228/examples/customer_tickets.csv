@@ -1,0 +1,9 @@
+ticket_id,station_id,user_id,user_phone,title,description,create_time,status,assignee,priority,tags
+tkt_001,st_001,user_111,13800138001,换电站5号仓门打不开,用户反馈5号仓门无法打开，尝试多次都打不开,2024-01-15 08:45:00,pending,张工,3,door|failure
+tkt_002,st_001,user_222,13800138002,扫码识别失败,用户扫码时二维码识别失败，换手机也不行,2024-01-15 09:30:00,pending,李工,2,scan|qr
+tkt_003,st_002,user_333,13800138003,3号仓显示空仓但有电池,系统显示3号仓为空，但实际有电池在里面,2024-01-15 10:15:00,pending,王工,2,bay|sensor
+tkt_004,st_002,user_444,13800138004,电池温度过高报警,换电时发现电池温度异常高，担心有安全隐患,2024-01-15 11:40:00,pending,张工,3,battery|temperature
+tkt_005,st_003,user_555,13800138005,网络连接问题,换电站网络经常断开，导致无法正常换电,2024-01-15 14:45:00,pending,李工,2,network
+tkt_006,st_003,user_666,13800138006,4号仓门解锁失败,用户取电池时4号仓门解锁失败，无法取出电池,2024-01-16 08:20:00,pending,王工,3,door|unlock
+tkt_007,st_001,,13800138007,换电速度慢,正常换电需要5分钟，这次等了15分钟,2024-01-16 09:00:00,pending,张工,1,slow
+tkt_008,bad_station,,,缺少必填字段,这是一条格式有问题的数据,bad_date

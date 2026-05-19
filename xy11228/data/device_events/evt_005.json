@@ -1,0 +1,17 @@
+{
+  "event_id": "evt_005",
+  "device_id": "dev_005",
+  "station_id": "st_001",
+  "event_type": "network_timeout",
+  "event_time": "2024-01-15 14:30:00",
+  "status": "unknown",
+  "bay_number": null,
+  "battery_id": null,
+  "user_id": null,
+  "details": {
+    "timeout_ms": 30000,
+    "message": "网络连接超时"
+  },
+  "raw_data": "{\"event_id\": \"evt_005\", \"device_id\": \"dev_005\", \"station_id\": \"st_001\", \"event_type\": \"network_timeout\", \"event_time\": \"2024-01-15 14:30:00\", \"bay_number\": null, \"battery_id\": null, \"user_id\": null, \"details\": {\"timeout_ms\": 30000, \"message\": \"网络连接超时\"}}",
+  "created_at": "2026-05-19 14:07:15.588184"
+}

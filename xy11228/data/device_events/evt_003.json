@@ -1,0 +1,17 @@
+{
+  "event_id": "evt_003",
+  "device_id": "dev_003",
+  "station_id": "st_002",
+  "event_type": "empty_bay_alarm",
+  "event_time": "2024-01-15 10:00:00",
+  "status": "unknown",
+  "bay_number": 3,
+  "battery_id": null,
+  "user_id": null,
+  "details": {
+    "error_code": "E003",
+    "message": "仓位传感器误报"
+  },
+  "raw_data": "{\"event_id\": \"evt_003\", \"device_id\": \"dev_003\", \"station_id\": \"st_002\", \"event_type\": \"empty_bay_alarm\", \"event_time\": \"2024-01-15 10:00:00\", \"bay_number\": 3, \"battery_id\": null, \"user_id\": null, \"details\": {\"error_code\": \"E003\", \"message\": \"仓位传感器误报\"}}",
+  "created_at": "2026-05-19 14:07:15.587986"
+}

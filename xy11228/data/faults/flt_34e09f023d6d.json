@@ -1,0 +1,17 @@
+{
+  "fault_id": "flt_34e09f023d6d",
+  "source_type": "device_event",
+  "source_id": "evt_004",
+  "station_id": "st_002",
+  "fault_type": "battery_issue",
+  "fault_description": "电池异常 - 电池ID: bat_456",
+  "status": "pending_review",
+  "severity": "high",
+  "assignee": null,
+  "bay_number": 7,
+  "event_time": "2024-01-15 11:20:00",
+  "confidence": 0.75,
+  "notes": null,
+  "created_at": "2026-05-19 14:07:15.597875",
+  "updated_at": "2026-05-19 14:07:15.597876"
+}

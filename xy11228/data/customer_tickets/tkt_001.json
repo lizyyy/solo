@@ -1,0 +1,18 @@
+{
+  "ticket_id": "tkt_001",
+  "station_id": "st_001",
+  "user_id": "user_111",
+  "user_phone": "13800138001.0",
+  "title": "换电站5号仓门打不开",
+  "description": "用户反馈5号仓门无法打开，尝试多次都打不开",
+  "create_time": "2024-01-15 08:45:00",
+  "status": "pending",
+  "assignee": "张工",
+  "priority": 3,
+  "tags": [
+    "door",
+    "failure"
+  ],
+  "raw_data": "{\"ticket_id\": \"tkt_001\", \"station_id\": \"st_001\", \"user_id\": \"user_111\", \"user_phone\": 13800138001.0, \"title\": \"换电站5号仓门打不开\", \"description\": \"用户反馈5号仓门无法打开，尝试多次都打不开\", \"create_time\": \"2024-01-15 08:45:00\", \"status\": \"pending\", \"assignee\": \"张工\", \"priority\": 3.0, \"tags\": \"door|failure\"}",
+  "created_at": "2026-05-19 14:07:15.594838"
+}

@@ -1,0 +1,17 @@
+{
+  "fault_id": "flt_c6f681980cf5",
+  "source_type": "customer_service",
+  "source_id": "tkt_001",
+  "station_id": "st_001",
+  "fault_type": "door_failure",
+  "fault_description": "柜门打不开问题 - 换电站5号仓门打不开",
+  "status": "confirmed",
+  "severity": "high",
+  "assignee": "张工",
+  "bay_number": null,
+  "event_time": "2024-01-15 08:45:00",
+  "confidence": 0.85,
+  "notes": "已核实，确认为柜门打不开故障",
+  "created_at": "2026-05-19 14:07:15.599104",
+  "updated_at": "2026-05-19 14:08:48.905793"
+}

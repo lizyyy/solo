@@ -1,0 +1,17 @@
+{
+  "ticket_id": "tkt_005",
+  "station_id": "st_003",
+  "user_id": "user_555",
+  "user_phone": "13800138005.0",
+  "title": "网络连接问题",
+  "description": "换电站网络经常断开，导致无法正常换电",
+  "create_time": "2024-01-15 14:45:00",
+  "status": "pending",
+  "assignee": "李工",
+  "priority": 2,
+  "tags": [
+    "network"
+  ],
+  "raw_data": "{\"ticket_id\": \"tkt_005\", \"station_id\": \"st_003\", \"user_id\": \"user_555\", \"user_phone\": 13800138005.0, \"title\": \"网络连接问题\", \"description\": \"换电站网络经常断开，导致无法正常换电\", \"create_time\": \"2024-01-15 14:45:00\", \"status\": \"pending\", \"assignee\": \"李工\", \"priority\": 2.0, \"tags\": \"network\"}",
+  "created_at": "2026-05-19 14:07:15.595733"
+}

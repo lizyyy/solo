@@ -1,0 +1,18 @@
+{
+  "ticket_id": "tkt_004",
+  "station_id": "st_002",
+  "user_id": "user_444",
+  "user_phone": "13800138004.0",
+  "title": "电池温度过高报警",
+  "description": "换电时发现电池温度异常高，担心有安全隐患",
+  "create_time": "2024-01-15 11:40:00",
+  "status": "pending",
+  "assignee": "张工",
+  "priority": 3,
+  "tags": [
+    "battery",
+    "temperature"
+  ],
+  "raw_data": "{\"ticket_id\": \"tkt_004\", \"station_id\": \"st_002\", \"user_id\": \"user_444\", \"user_phone\": 13800138004.0, \"title\": \"电池温度过高报警\", \"description\": \"换电时发现电池温度异常高，担心有安全隐患\", \"create_time\": \"2024-01-15 11:40:00\", \"status\": \"pending\", \"assignee\": \"张工\", \"priority\": 3.0, \"tags\": \"battery|temperature\"}",
+  "created_at": "2026-05-19 14:07:15.595581"
+}

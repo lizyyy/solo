@@ -1,0 +1,17 @@
+{
+  "event_id": "evt_004",
+  "device_id": "dev_004",
+  "station_id": "st_002",
+  "event_type": "battery_temperature_high",
+  "event_time": "2024-01-15 11:20:00",
+  "status": "unknown",
+  "bay_number": 7,
+  "battery_id": "bat_456",
+  "user_id": null,
+  "details": {
+    "temperature": 58,
+    "message": "电池温度超过阈值"
+  },
+  "raw_data": "{\"event_id\": \"evt_004\", \"device_id\": \"dev_004\", \"station_id\": \"st_002\", \"event_type\": \"battery_temperature_high\", \"event_time\": \"2024-01-15 11:20:00\", \"bay_number\": 7, \"battery_id\": \"bat_456\", \"user_id\": null, \"details\": {\"temperature\": 58, \"message\": \"电池温度超过阈值\"}}",
+  "created_at": "2026-05-19 14:07:15.588086"
+}

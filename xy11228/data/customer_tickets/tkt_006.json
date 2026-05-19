@@ -1,0 +1,18 @@
+{
+  "ticket_id": "tkt_006",
+  "station_id": "st_003",
+  "user_id": "user_666",
+  "user_phone": "13800138006.0",
+  "title": "4号仓门解锁失败",
+  "description": "用户取电池时4号仓门解锁失败，无法取出电池",
+  "create_time": "2024-01-16 08:20:00",
+  "status": "pending",
+  "assignee": "王工",
+  "priority": 3,
+  "tags": [
+    "door",
+    "unlock"
+  ],
+  "raw_data": "{\"ticket_id\": \"tkt_006\", \"station_id\": \"st_003\", \"user_id\": \"user_666\", \"user_phone\": 13800138006.0, \"title\": \"4号仓门解锁失败\", \"description\": \"用户取电池时4号仓门解锁失败，无法取出电池\", \"create_time\": \"2024-01-16 08:20:00\", \"status\": \"pending\", \"assignee\": \"王工\", \"priority\": 3.0, \"tags\": \"door|unlock\"}",
+  "created_at": "2026-05-19 14:07:15.595883"
+}

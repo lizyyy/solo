@@ -1,0 +1,17 @@
+{
+  "fault_id": "flt_b2dd71089ff1",
+  "source_type": "device_event",
+  "source_id": "evt_007",
+  "station_id": "st_003",
+  "fault_type": "door_failure",
+  "fault_description": "柜门打不开 - 仓号: 4",
+  "status": "pending_review",
+  "severity": "high",
+  "assignee": null,
+  "bay_number": 4,
+  "event_time": "2024-01-16 08:00:00",
+  "confidence": 0.9,
+  "notes": null,
+  "created_at": "2026-05-19 14:07:15.597542",
+  "updated_at": "2026-05-19 14:07:15.597542"
+}

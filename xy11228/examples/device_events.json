@@ -1,0 +1,104 @@
+[
+    {
+        "event_id": "evt_001",
+        "device_id": "dev_001",
+        "station_id": "st_001",
+        "event_type": "door_open_failure",
+        "event_time": "2024-01-15 08:30:00",
+        "bay_number": 5,
+        "battery_id": "bat_123",
+        "user_id": "user_456",
+        "details": {
+            "error_code": "E001",
+            "message": "柜门电机超时"
+        }
+    },
+    {
+        "event_id": "evt_002",
+        "device_id": "dev_002",
+        "station_id": "st_001",
+        "event_type": "scan_qr_failed",
+        "event_time": "2024-01-15 09:15:00",
+        "bay_number": null,
+        "battery_id": null,
+        "user_id": "user_789",
+        "details": {
+            "error_code": "E002",
+            "message": "二维码识别失败"
+        }
+    },
+    {
+        "event_id": "evt_003",
+        "device_id": "dev_003",
+        "station_id": "st_002",
+        "event_type": "empty_bay_alarm",
+        "event_time": "2024-01-15 10:00:00",
+        "bay_number": 3,
+        "battery_id": null,
+        "user_id": null,
+        "details": {
+            "error_code": "E003",
+            "message": "仓位传感器误报"
+        }
+    },
+    {
+        "event_id": "evt_004",
+        "device_id": "dev_004",
+        "station_id": "st_002",
+        "event_type": "battery_temperature_high",
+        "event_time": "2024-01-15 11:20:00",
+        "bay_number": 7,
+        "battery_id": "bat_456",
+        "user_id": null,
+        "details": {
+            "temperature": 58,
+            "message": "电池温度超过阈值"
+        }
+    },
+    {
+        "event_id": "evt_005",
+        "device_id": "dev_005",
+        "station_id": "st_001",
+        "event_type": "network_timeout",
+        "event_time": "2024-01-15 14:30:00",
+        "bay_number": null,
+        "battery_id": null,
+        "user_id": null,
+        "details": {
+            "timeout_ms": 30000,
+            "message": "网络连接超时"
+        }
+    },
+    {
+        "event_id": "evt_006",
+        "device_id": "dev_006",
+        "station_id": "st_003",
+        "event_type": "normal_operation",
+        "event_time": "2024-01-15 15:00:00",
+        "bay_number": 2,
+        "battery_id": "bat_789",
+        "user_id": "user_101",
+        "details": {
+            "message": "换电完成"
+        }
+    },
+    {
+        "event_id": "evt_007",
+        "device_id": "dev_007",
+        "station_id": "st_003",
+        "event_type": "door_unlock_failed",
+        "event_time": "2024-01-16 08:00:00",
+        "bay_number": 4,
+        "battery_id": "bat_321",
+        "user_id": "user_202",
+        "details": {
+            "error_code": "E004",
+            "message": "仓门解锁失败，请重试"
+        }
+    },
+    {
+        "event_id": "evt_008",
+        "invalid_field": "this is bad data",
+        "missing_time": true
+    }
+]

@@ -1,0 +1,17 @@
+{
+  "fault_id": "flt_5a33acbc4681",
+  "source_type": "customer_service",
+  "source_id": "tkt_002",
+  "station_id": "st_001",
+  "fault_type": "scan_failure",
+  "fault_description": "扫码失败问题 - 扫码识别失败",
+  "status": "pending_review",
+  "severity": "high",
+  "assignee": "李工",
+  "bay_number": null,
+  "event_time": "2024-01-15 09:30:00",
+  "confidence": 0.8,
+  "notes": null,
+  "created_at": "2026-05-19 14:07:15.599020",
+  "updated_at": "2026-05-19 14:07:15.599021"
+}

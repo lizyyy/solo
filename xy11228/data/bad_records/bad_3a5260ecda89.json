@@ -1,0 +1,11 @@
+{
+  "bad_record_id": "bad_3a5260ecda89",
+  "source": "device_event_json",
+  "file_name": "examples/device_events.json",
+  "row_number": 8,
+  "raw_data": "{\"event_id\": \"evt_008\", \"invalid_field\": \"this is bad data\", \"missing_time\": true}",
+  "error_message": "1 validation error for DeviceEvent\nevent_time\n  Input should be a valid datetime [type=datetime_type, input_value=None, input_type=NoneType]\n    For further information visit https://errors.pydantic.dev/2.5/v/datetime_type",
+  "suggestion": "时间格式不正确，请使用 YYYY-MM-DD HH:MM:SS 或 YYYY-MM-DDTHH:MM:SS 格式",
+  "status": "pending",
+  "created_at": "2026-05-19 14:07:15.588845"
+}

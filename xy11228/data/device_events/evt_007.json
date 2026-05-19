@@ -1,0 +1,17 @@
+{
+  "event_id": "evt_007",
+  "device_id": "dev_007",
+  "station_id": "st_003",
+  "event_type": "door_unlock_failed",
+  "event_time": "2024-01-16 08:00:00",
+  "status": "unknown",
+  "bay_number": 4,
+  "battery_id": "bat_321",
+  "user_id": "user_202",
+  "details": {
+    "error_code": "E004",
+    "message": "仓门解锁失败，请重试"
+  },
+  "raw_data": "{\"event_id\": \"evt_007\", \"device_id\": \"dev_007\", \"station_id\": \"st_003\", \"event_type\": \"door_unlock_failed\", \"event_time\": \"2024-01-16 08:00:00\", \"bay_number\": 4, \"battery_id\": \"bat_321\", \"user_id\": \"user_202\", \"details\": {\"error_code\": \"E004\", \"message\": \"仓门解锁失败，请重试\"}}",
+  "created_at": "2026-05-19 14:07:15.588371"
+}
