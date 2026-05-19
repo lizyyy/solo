@@ -23,21 +23,42 @@ os.makedirs(os.path.join(basedir, 'exports'), exist_ok=True)
 
 
 def validate_variables(content, variables):
-    if not variables:
-        return True, []
-    var_list = json.loads(variables) if isinstance(variables, str) else variables
-    missing_vars = []
-    for var in var_list:
-        var_name = var.get('name', '')
-        if f'{{{var_name}}}' not in content and f'${var_name}' not in content:
-            missing_vars.append(var_name)
-    return len(missing_vars) == 0, missing_vars
+    errors = []
+    warnings = []
+    
+    actual_vars = extract_variables_from_content(content)
+    
+    if actual_vars:
+        if not variables:
+            errors.append(f"提示词中发现未定义变量: {', '.join(actual_vars)}")
+            return False, [], errors, warnings
+        
+        var_list = json.loads(variables) if isinstance(variables, str) else variables
+        defined_var_names = [v.get('name', '') for v in var_list if v.get('name')]
+        
+        undefined_vars = [v for v in actual_vars if v not in defined_var_names]
+        if undefined_vars:
+            errors.append(f"提示词中发现未定义变量: {', '.join(undefined_vars)}")
+        
+        unused_vars = [v for v in defined_var_names if v not in actual_vars]
+        if unused_vars:
+            warnings.append(f"变量已定义但未在提示词中使用: {', '.join(unused_vars)}")
+        
+        return len(errors) == 0, [], errors, warnings
+    else:
+        if variables:
+            var_list = json.loads(variables) if isinstance(variables, str) else variables
+            defined_var_names = [v.get('name', '') for v in var_list if v.get('name')]
+            if defined_var_names:
+                warnings.append(f"已定义变量但提示词中未使用: {', '.join(defined_var_names)}")
+        
+        return True, [], [], warnings
 
 
 def extract_variables_from_content(content):
     pattern = r'\{([a-zA-Z_][a-zA-Z0-9_]*)\}'
     matches = re.findall(pattern, content)
-    return list(set(matches))
+    return sorted(list(set(matches)))
 
 
 @app.route('/api/templates', methods=['GET'])
@@ -213,9 +234,9 @@ def create_template():
     variables = data.get('variables', [])
     content = data.get('content', '')
 
-    is_valid, missing_vars = validate_variables(content, json.dumps(variables))
+    is_valid, _, errors, warnings = validate_variables(content, json.dumps(variables))
     if not is_valid:
-        return jsonify({'error': f'Variables not found in content: {", ".join(missing_vars)}'}), 400
+        return jsonify({'error': '; '.join(errors)}), 400
 
     template = PromptTemplate(
         template_id=template_id,
@@ -255,9 +276,9 @@ def create_version(template_id):
     variables = data.get('variables', [])
     content = data.get('content', '')
 
-    is_valid, missing_vars = validate_variables(content, json.dumps(variables))
+    is_valid, _, errors, warnings = validate_variables(content, json.dumps(variables))
     if not is_valid:
-        return jsonify({'error': f'Variables not found in content: {", ".join(missing_vars)}'}), 400
+        return jsonify({'error': '; '.join(errors)}), 400
 
     version = TemplateVersion(
         template_id=template_id,
@@ -504,11 +525,18 @@ def import_templates():
                 continue
 
             variables_str = str(row.get('variables', '[]'))
+            content = str(row.get('content', ''))
+            
             try:
                 variables = json.loads(variables_str)
             except:
-                variables = extract_variables_from_content(str(row.get('content', '')))
+                variables = extract_variables_from_content(content)
                 variables = [{'name': v, 'type': 'string', 'required': True} for v in variables]
+
+            is_valid, _, var_errors, _ = validate_variables(content, json.dumps(variables))
+            if not is_valid:
+                errors.append(f'Template {template_id}: {"; ".join(var_errors)}')
+                continue
 
             template = PromptTemplate(
                 template_id=template_id,
@@ -640,6 +668,23 @@ def get_stats():
         'total': total,
         'by_status': dict(by_status),
         'by_scenario': dict(by_scenario)
+    })
+
+
+@app.route('/api/validate-variables', methods=['POST'])
+def validate_variables_api():
+    data = request.json
+    content = data.get('content', '')
+    variables = data.get('variables', [])
+    
+    is_valid, _, errors, warnings = validate_variables(content, json.dumps(variables))
+    detected_variables = extract_variables_from_content(content)
+    
+    return jsonify({
+        'valid': is_valid,
+        'errors': errors,
+        'warnings': warnings,
+        'detected_variables': detected_variables
     })
 
 

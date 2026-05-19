@@ -19,6 +19,7 @@ import {
   Statistic,
   Divider,
   Popconfirm,
+  Alert,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -70,6 +71,25 @@ function TemplateDetail() {
   const [grayForm] = Form.useForm();
   const [effectForm] = Form.useForm();
   const [rejectForm] = Form.useForm();
+  const [versionValidationResult, setVersionValidationResult] = useState({ valid: true, errors: [], warnings: [], detected_variables: [] });
+
+  const validateVersionVariables = async (content, variablesStr) => {
+    try {
+      const variables = variablesStr ? variablesStr.split(',').map(v => ({
+        name: v.trim(),
+        type: 'string',
+        required: true,
+      })) : [];
+
+      const res = await templateApi.validateVariables({
+        content: content || '',
+        variables,
+      });
+      setVersionValidationResult(res.data);
+    } catch (error) {
+      console.error('Validation error:', error);
+    }
+  };
 
   const fetchDetail = async () => {
     setLoading(true);
@@ -174,6 +194,7 @@ function TemplateDetail() {
       message.success('创建新版本成功');
       setVersionModalVisible(false);
       form.resetFields();
+      setVersionValidationResult({ valid: true, errors: [], warnings: [], detected_variables: [] });
       fetchDetail();
     } catch (error) {
       message.error(error.response?.data?.error || '创建失败');
@@ -507,7 +528,10 @@ function TemplateDetail() {
       <Modal
         title="新建版本"
         open={versionModalVisible}
-        onCancel={() => setVersionModalVisible(false)}
+        onCancel={() => {
+          setVersionModalVisible(false);
+          setVersionValidationResult({ valid: true, errors: [], warnings: [], detected_variables: [] });
+        }}
         onOk={() => form.submit()}
         width={700}
       >
@@ -517,11 +541,56 @@ function TemplateDetail() {
             label="提示词内容"
             rules={[{ required: true, message: '请输入提示词内容' }]}
           >
-            <TextArea rows={8} placeholder="使用 {variable_name} 格式定义变量" />
+            <TextArea
+              rows={8}
+              placeholder="使用 {variable_name} 格式定义变量"
+              onChange={(e) => {
+                const variables = form.getFieldValue('variables');
+                validateVersionVariables(e.target.value, variables);
+              }}
+            />
           </Form.Item>
           <Form.Item name="variables" label="变量列表">
-            <Input placeholder="用逗号分隔，例如: customer_question, order_info" />
+            <Input
+              placeholder="用逗号分隔，例如: customer_question, order_info"
+              onChange={(e) => {
+                const content = form.getFieldValue('content');
+                validateVersionVariables(content, e.target.value);
+              }}
+            />
           </Form.Item>
+          {versionValidationResult.detected_variables.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <strong>检测到变量：</strong>
+              <Space wrap style={{ marginLeft: 8 }}>
+                {versionValidationResult.detected_variables.map((v, i) => (
+                  <Tag key={i} color="blue">{v}</Tag>
+                ))}
+              </Space>
+            </div>
+          )}
+          {versionValidationResult.errors.length > 0 && (
+            <Alert
+              message="变量校验失败"
+              description={versionValidationResult.errors.map((e, i) => (
+                <div key={i}>{e}</div>
+              ))}
+              type="error"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          )}
+          {versionValidationResult.warnings.length > 0 && (
+            <Alert
+              message="警告"
+              description={versionValidationResult.warnings.map((w, i) => (
+                <div key={i}>{w}</div>
+              ))}
+              type="warning"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          )}
           <Form.Item name="changelog" label="变更说明" rules={[{ required: true, message: '请输入变更说明' }]}>
             <Input placeholder="例如: 优化回复语气" />
           </Form.Item>

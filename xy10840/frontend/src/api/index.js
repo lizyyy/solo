@@ -17,6 +17,7 @@ export const templateApi = {
   rollback: (templateId, data) => api.post(`/templates/${templateId}/rollback`, data),
   publish: (templateId) => api.post(`/templates/${templateId}/publish`),
   addEffectRecord: (templateId, data) => api.post(`/templates/${templateId}/effect`, data),
+  validateVariables: (data) => api.post('/validate-variables', data),
   exportTemplates: () => {
     window.open('/api/templates/export', '_blank');
   },

@@ -18,6 +18,7 @@ import {
   Upload,
   message,
   Popconfirm,
+  Alert,
 } from 'antd';
 import {
   PlusOutlined,
@@ -56,6 +57,7 @@ function TemplateList() {
   const [stats, setStats] = useState({ total: 0, by_status: {}, by_scenario: {} });
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [importModalVisible, setImportModalVisible] = useState(false);
+  const [validationResult, setValidationResult] = useState({ valid: true, errors: [], warnings: [], detected_variables: [] });
   const [form] = Form.useForm();
 
   const fetchTemplates = async (page = 1, pageSize = 10) => {
@@ -109,6 +111,24 @@ function TemplateList() {
     fetchTemplates(pagination.current, pagination.pageSize);
   };
 
+  const validateTemplateVariables = async (content, variablesStr) => {
+    try {
+      const variables = variablesStr ? variablesStr.split(',').map(v => ({
+        name: v.trim(),
+        type: 'string',
+        required: true,
+      })) : [];
+
+      const res = await templateApi.validateVariables({
+        content: content || '',
+        variables,
+      });
+      setValidationResult(res.data);
+    } catch (error) {
+      console.error('Validation error:', error);
+    }
+  };
+
   const handleCreateTemplate = async (values) => {
     try {
       const variables = values.variables ? values.variables.split(',').map(v => ({
@@ -125,6 +145,7 @@ function TemplateList() {
       message.success('创建成功');
       setCreateModalVisible(false);
       form.resetFields();
+      setValidationResult({ valid: true, errors: [], warnings: [], detected_variables: [] });
       fetchTemplates(pagination.current, pagination.pageSize);
       fetchStats();
     } catch (error) {
@@ -361,7 +382,10 @@ function TemplateList() {
       <Modal
         title="新建提示词模板"
         open={createModalVisible}
-        onCancel={() => setCreateModalVisible(false)}
+        onCancel={() => {
+          setCreateModalVisible(false);
+          setValidationResult({ valid: true, errors: [], warnings: [], detected_variables: [] });
+        }}
         onOk={() => form.submit()}
         width={700}
       >
@@ -401,11 +425,56 @@ function TemplateList() {
             label="提示词内容"
             rules={[{ required: true, message: '请输入提示词内容' }]}
           >
-            <TextArea rows={8} placeholder="使用 {variable_name} 格式定义变量" />
+            <TextArea
+              rows={8}
+              placeholder="使用 {variable_name} 格式定义变量"
+              onChange={(e) => {
+                const variables = form.getFieldValue('variables');
+                validateTemplateVariables(e.target.value, variables);
+              }}
+            />
           </Form.Item>
           <Form.Item name="variables" label="变量列表">
-            <Input placeholder="用逗号分隔，例如: customer_question, order_info" />
+            <Input
+              placeholder="用逗号分隔，例如: customer_question, order_info"
+              onChange={(e) => {
+                const content = form.getFieldValue('content');
+                validateTemplateVariables(content, e.target.value);
+              }}
+            />
           </Form.Item>
+          {validationResult.detected_variables.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <strong>检测到变量：</strong>
+              <Space wrap style={{ marginLeft: 8 }}>
+                {validationResult.detected_variables.map((v, i) => (
+                  <Tag key={i} color="blue">{v}</Tag>
+                ))}
+              </Space>
+            </div>
+          )}
+          {validationResult.errors.length > 0 && (
+            <Alert
+              message="变量校验失败"
+              description={validationResult.errors.map((e, i) => (
+                <div key={i}>{e}</div>
+              ))}
+              type="error"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          )}
+          {validationResult.warnings.length > 0 && (
+            <Alert
+              message="警告"
+              description={validationResult.warnings.map((w, i) => (
+                <div key={i}>{w}</div>
+              ))}
+              type="warning"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          )}
           <Form.Item name="changelog" label="变更说明">
             <Input placeholder="例如: 初始版本" />
           </Form.Item>
