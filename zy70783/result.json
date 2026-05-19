@@ -1,18 +1,34 @@
 {
   "trace_id": "4a3b2c1d0e9f8g7h",
-  "generated_at": "2026-05-19T16:05:44.190823",
+  "generated_at": "2026-05-19T20:37:33.419785",
   "summary": {
     "total_entries": 13,
     "services": [
-      "order-service",
+      "api-gateway",
+      "test-service",
       "task-executor",
       "inventory-service",
-      "api-gateway",
-      "test-service"
+      "order-service"
     ],
     "gaps_count": 0,
     "missing_spans_count": 1,
     "duplicate_spans_count": 4
+  },
+  "span_primary_services": {
+    "00000005": "test-service",
+    "00000002": "order-service",
+    "00000001": "api-gateway",
+    "00000003": "inventory-service",
+    "00000004": "task-executor"
+  },
+  "service_call_graph": {
+    "api-gateway": [
+      "order-service"
+    ],
+    "order-service": [
+      "inventory-service",
+      "task-executor"
+    ]
   },
   "entries": [
     {

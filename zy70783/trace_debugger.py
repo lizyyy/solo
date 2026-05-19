@@ -227,6 +227,57 @@ class GapAnalyzer:
                 })
         return duplicates
 
+    @staticmethod
+    def get_span_primary_service(entries: List[LogEntry]) -> Dict[str, str]:
+        span_service_counts = defaultdict(lambda: defaultdict(int))
+        for entry in entries:
+            span_service_counts[entry.span_id][entry.service_name] += 1
+        
+        primary_services = {}
+        for span_id, services in span_service_counts.items():
+            primary_service = max(services.items(), key=lambda x: x[1])[0]
+            primary_services[span_id] = primary_service
+        
+        return primary_services
+
+    @staticmethod
+    def find_valid_parent_entry(child_entry: LogEntry, entries: List[LogEntry]) -> Optional[LogEntry]:
+        parent_id = child_entry.parent_span_id
+        if not parent_id:
+            return None
+        
+        null_values = {'null', 'none', '-', ''}
+        if parent_id.lower() in null_values:
+            return None
+        
+        candidates = [e for e in entries if e.span_id == parent_id]
+        if not candidates:
+            return None
+        
+        valid_candidates = [c for c in candidates if c.timestamp <= child_entry.timestamp]
+        if not valid_candidates:
+            return None
+        
+        best_parent = min(valid_candidates, key=lambda c: (child_entry.timestamp - c.timestamp).total_seconds())
+        return best_parent
+
+    @staticmethod
+    def build_service_call_graph(entries: List[LogEntry]) -> Dict[str, set]:
+        services = defaultdict(set)
+        primary_services = GapAnalyzer.get_span_primary_service(entries)
+        
+        for child_entry in entries:
+            parent_entry = GapAnalyzer.find_valid_parent_entry(child_entry, entries)
+            
+            if parent_entry and parent_entry.span_id in primary_services and child_entry.span_id in primary_services:
+                parent_service = primary_services[parent_entry.span_id]
+                child_service = primary_services[child_entry.span_id]
+                
+                if parent_service != child_service:
+                    services[parent_service].add(child_service)
+        
+        return services
+
 
 class MarkdownReporter:
     @staticmethod
@@ -303,20 +354,17 @@ class MarkdownReporter:
 
         content.append("## 四、服务调用关系")
         content.append("")
-        services = defaultdict(set)
-        for entry in entries:
-            if entry.parent_span_id:
-                parent_entry = next((e for e in entries if e.span_id == entry.parent_span_id), None)
-                if parent_entry:
-                    services[parent_entry.service_name].add(entry.service_name)
+        services = GapAnalyzer.build_service_call_graph(entries)
         
         if services:
             content.append("```mermaid")
             content.append("graph TD")
-            for src, targets in services.items():
-                for tgt in targets:
+            for src, targets in sorted(services.items()):
+                for tgt in sorted(targets):
                     content.append(f"    {src} --> {tgt}")
             content.append("```")
+            content.append("")
+            content.append("> **说明**: 基于 span 频率和时间顺序自动识别真实服务调用关系，已过滤脏数据干扰")
         else:
             content.append("(未找到明确的调用关系)")
         content.append("")
@@ -449,16 +497,22 @@ def main():
     print(f"📄 Markdown 报告已生成: {report_file}")
     
     if args.json_output:
+        primary_services = GapAnalyzer.get_span_primary_service(entries)
+        service_call_graph = GapAnalyzer.build_service_call_graph(entries)
+        service_call_graph_json = {k: list(v) for k, v in service_call_graph.items()}
+        
         json_data = {
             'trace_id': args.trace_id,
             'generated_at': datetime.now().isoformat(),
             'summary': {
                 'total_entries': len(entries),
-                'services': list(set(e.service_name for e in entries)),
+                'services': list(set(primary_services.values())),
                 'gaps_count': len(gaps),
                 'missing_spans_count': len(missing_spans),
                 'duplicate_spans_count': len(duplicate_spans)
             },
+            'span_primary_services': primary_services,
+            'service_call_graph': service_call_graph_json,
             'entries': [e.to_dict() for e in entries],
             'gaps': [
                 {
