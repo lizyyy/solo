@@ -1,0 +1,67 @@
+[
+  {
+    "reagent_code": "R001",
+    "batch_no": "B2024001",
+    "quantity": 10,
+    "original_quantity": 10,
+    "location": "A-01-01",
+    "production_date": "2024-01-01",
+    "expiry_date": "2026-01-01",
+    "supplier": "国药集团",
+    "purchase_price": 85.00,
+    "warning_threshold": 3,
+    "status": "normal"
+  },
+  {
+    "reagent_code": "R001",
+    "batch_no": "B2024002",
+    "quantity": 5,
+    "original_quantity": 5,
+    "location": "A-01-02",
+    "production_date": "2024-03-15",
+    "expiry_date": "2026-03-15",
+    "supplier": "国药集团",
+    "purchase_price": 88.00,
+    "warning_threshold": 2,
+    "status": "normal"
+  },
+  {
+    "reagent_code": "R002",
+    "batch_no": "B2024003",
+    "quantity": 15,
+    "original_quantity": 15,
+    "location": "A-01-03",
+    "production_date": "2024-02-01",
+    "expiry_date": "2026-02-01",
+    "supplier": "国药集团",
+    "purchase_price": 45.00,
+    "warning_threshold": 5,
+    "status": "normal"
+  },
+  {
+    "reagent_code": "R003",
+    "batch_no": "B2024004",
+    "quantity": 20,
+    "original_quantity": 20,
+    "location": "B-02-01",
+    "production_date": "2024-04-01",
+    "expiry_date": "2025-04-01",
+    "supplier": "国药集团",
+    "purchase_price": 28.00,
+    "warning_threshold": 8,
+    "status": "normal"
+  },
+  {
+    "reagent_code": "R004",
+    "batch_no": "B2024005",
+    "quantity": 30,
+    "original_quantity": 30,
+    "location": "C-03-01",
+    "production_date": "2024-01-10",
+    "expiry_date": "2027-01-10",
+    "supplier": "国药集团",
+    "purchase_price": 15.00,
+    "warning_threshold": 10,
+    "status": "normal"
+  }
+]

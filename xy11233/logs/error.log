@@ -1,0 +1,1 @@
+{"level":"error","message":"出库失败: 出库数量超出可出量，剩余可出: 0","stack":"Error: 出库数量超出可出量，剩余可出: 0\n    at OutboundService.processOutbound (/Users/mac/pro/solo/workspaces/xy11233/src/services/outboundService.js:43:13)\n    at async /Users/mac/pro/solo/workspaces/xy11233/src/routes/outbound.js:15:20","timestamp":"2026-05-19T07:40:14.066Z"}

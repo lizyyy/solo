@@ -1,0 +1,36 @@
+{"level":"info","message":"数据库同步完成","timestamp":"2026-05-19T07:38:47.869Z"}
+{"level":"info","message":"创建默认管理员用户","timestamp":"2026-05-19T07:38:47.875Z"}
+{"level":"info","message":"创建默认教师用户","timestamp":"2026-05-19T07:38:47.877Z"}
+{"level":"info","message":"创建默认学生用户","timestamp":"2026-05-19T07:38:47.878Z"}
+{"level":"info","message":"创建示例试剂和库存","timestamp":"2026-05-19T07:38:47.879Z"}
+{"level":"info","message":"数据初始化完成","timestamp":"2026-05-19T07:38:47.879Z"}
+{"level":"info","message":"服务器运行在 http://localhost:3000","timestamp":"2026-05-19T07:38:47.881Z"}
+{"level":"info","message":"API文档可参考各路由实现","timestamp":"2026-05-19T07:38:47.881Z"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/health","timestamp":"2026-05-19T07:39:15.073Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/requisitions","timestamp":"2026-05-19T07:39:15.088Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/requisitions/1/submit","timestamp":"2026-05-19T07:39:15.100Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/requisitions/1/approve","timestamp":"2026-05-19T07:39:15.111Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/requisitions/1","timestamp":"2026-05-19T07:39:15.116Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/outbound","timestamp":"2026-05-19T07:39:15.120Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/outbound","timestamp":"2026-05-19T07:39:15.130Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/returns","timestamp":"2026-05-19T07:39:15.133Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/inventory-check","timestamp":"2026-05-19T07:39:15.143Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/inventory-check/1/start","timestamp":"2026-05-19T07:39:15.148Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/inventory-check/item","timestamp":"2026-05-19T07:39:15.151Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/inventory-check/1/complete","timestamp":"2026-05-19T07:39:15.157Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/audit","timestamp":"2026-05-19T07:39:15.163Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/audit","timestamp":"2026-05-19T07:39:44.851Z","userAgent":"curl/8.7.1"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/health","timestamp":"2026-05-19T07:40:14.044Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/requisitions","timestamp":"2026-05-19T07:40:14.047Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/requisitions/2/submit","timestamp":"2026-05-19T07:40:14.053Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/requisitions/2/approve","timestamp":"2026-05-19T07:40:14.058Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/requisitions/2","timestamp":"2026-05-19T07:40:14.064Z","userAgent":"axios/1.16.1"}
+{"ip":"::1","level":"info","message":"HTTP POST /api/outbound","timestamp":"2026-05-19T07:40:14.066Z","userAgent":"axios/1.16.1"}
+{"level":"error","message":"出库失败: 出库数量超出可出量，剩余可出: 0","stack":"Error: 出库数量超出可出量，剩余可出: 0\n    at OutboundService.processOutbound (/Users/mac/pro/solo/workspaces/xy11233/src/services/outboundService.js:43:13)\n    at async /Users/mac/pro/solo/workspaces/xy11233/src/routes/outbound.js:15:20","timestamp":"2026-05-19T07:40:14.066Z"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/requisitions","timestamp":"2026-05-19T07:40:39.942Z","userAgent":"curl/8.7.1"}
+{"level":"info","message":"数据库同步完成","timestamp":"2026-05-19T07:41:20.569Z"}
+{"level":"info","message":"数据初始化完成","timestamp":"2026-05-19T07:41:20.574Z"}
+{"level":"info","message":"服务器运行在 http://localhost:3000","timestamp":"2026-05-19T07:41:20.575Z"}
+{"level":"info","message":"API文档可参考各路由实现","timestamp":"2026-05-19T07:41:20.576Z"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/requisitions","timestamp":"2026-05-19T07:41:44.472Z","userAgent":"curl/8.7.1"}
+{"ip":"::1","level":"info","message":"HTTP GET /api/audit","timestamp":"2026-05-19T07:42:12.572Z","userAgent":"curl/8.7.1"}
