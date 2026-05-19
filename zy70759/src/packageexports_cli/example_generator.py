@@ -145,19 +145,32 @@ class ExampleGenerator:
             pattern_has_matches = file_checks.get(entry.target_path, False)
             sample_file_exists = file_checks.get(target_sample, False)
             
-            is_valid = pattern_has_matches
+            is_valid = sample_file_exists
+            
+            issues = []
+            if not sample_file_exists:
+                if pattern_has_matches:
+                    issues.append(Issue(
+                        severity=IssueSeverity.WARNING,
+                        issue_type=IssueType.FILE_NOT_FOUND,
+                        message=f"Example import resolves to missing file (wildcard pattern matches other files): {target_sample}",
+                        export_path=export_path,
+                        target_path=target_sample,
+                    ))
+                else:
+                    issues.append(Issue(
+                        severity=IssueSeverity.ERROR,
+                        issue_type=IssueType.FILE_NOT_FOUND,
+                        message=f"Wildcard pattern matches no files: {entry.target_path}",
+                        export_path=export_path,
+                        target_path=entry.target_path,
+                    ))
             
             examples.append(ImportExample(
                 import_statement=import_stmt,
                 resolved_path=target_sample,
                 is_valid=is_valid,
-                issues=[] if sample_file_exists else [Issue(
-                    severity=IssueSeverity.INFO,
-                    issue_type=IssueType.FILE_NOT_FOUND,
-                    message=f"Example file not found (wildcard pattern has matches): {target_sample}",
-                    export_path=export_path,
-                    target_path=target_sample,
-                )],
+                issues=issues,
             ))
             
         return examples
