@@ -40,12 +40,16 @@ class WheelFileResponse(WheelFileBase):
 
 
 class WheelFileDetail(WheelFileResponse):
-    metadata: Optional["MetaDataResponse"] = None
+    metadata: Optional["MetaDataResponse"] = Field(default=None, validation_alias="wheel_metadata")
     entry_points: List["EntryPointResponse"] = Field(default_factory=list)
     dependencies: List["DependencyResponse"] = Field(default_factory=list)
     validation_reports: List["ValidationReportResponse"] = Field(default_factory=list)
     exception_paths: List["ExceptionPathResponse"] = Field(default_factory=list)
     audit_logs: List["AuditLogResponse"] = Field(default_factory=list)
+
+    model_config = {
+        "from_attributes": True
+    }
 
 
 class MetaDataBase(BaseModel):
