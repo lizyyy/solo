@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { db, uuid, getNow } = require('../database');
+const { db, uuid, getNow, saveDatabase } = require('../database');
 
 const generateReceiptNo = () => {
   const dateStr = moment().format('YYYYMMDD');
@@ -68,6 +68,7 @@ const generateReceipt = (requestId, actor) => {
   };
   
   db.customer_receipts.push(receipt);
+  saveDatabase();
   return receipt;
 };
 

@@ -13,7 +13,14 @@ app.use(express.json());
 app.use('/api', routes);
 
 const initSampleData = () => {
-  if (db.data_domains.length === 0) {
+  // 检查是否缺少 is_active 字段（避免旧数据没有 active 标记）
+  const hasInvalidDomains = db.data_domains.length > 0 && 
+    db.data_domains.some(d => d.is_active !== 0 && d.is_active !== 1);
+  
+  if (db.data_domains.length === 0 || hasInvalidDomains) {
+    // 清空并重新初始化
+    db.data_domains = [];
+    
     const sampleDomains = [
       { name: '用户个人信息', description: '用户姓名、联系方式等个人数据', retentionDays: 1095 },
       { name: '交易记录', description: '订单、支付记录等交易数据', retentionDays: 1825 },
@@ -25,7 +32,7 @@ const initSampleData = () => {
       createDomain(domain);
     });
 
-    console.log('初始化示例数据域完成');
+    console.log('初始化示例数据域完成，共', db.data_domains.length, '个');
   }
 };
 

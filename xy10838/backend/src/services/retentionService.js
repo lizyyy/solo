@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { db, uuid, getNow } = require('../database');
+const { db, uuid, getNow, saveDatabase } = require('../database');
 
 const validateRetentionPeriod = (domain, recordDate) => {
   const recordMoment = moment(recordDate);
@@ -91,6 +91,7 @@ const applyDeletionRules = (requestId) => {
     }
   }
 
+  saveDatabase();
   return results;
 };
 

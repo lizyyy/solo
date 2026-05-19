@@ -21,12 +21,13 @@ const runChecks = async () => {
   db.customer_receipts = [];
   db.audit_logs = [];
   
-  // 确保数据域存在
+  // 确保数据域存在（包含 is_active 字段，getActiveDomains 需要）
+  const now = getNow();
   db.data_domains = [
-    { id: 'domain1', name: '用户个人信息', description: '包含姓名、联系方式等个人隐私数据', retention_days: 365 },
-    { id: 'domain2', name: '交易记录', description: '包含订单、支付等金融相关数据', retention_days: 1095 },
-    { id: 'domain3', name: '行为日志', description: '包含用户访问、点击等行为数据', retention_days: 180 },
-    { id: 'domain4', name: '营销数据', description: '包含营销活动相关数据', retention_days: 90 }
+    { id: 'domain1', name: '用户个人信息', description: '包含姓名、联系方式等个人隐私数据', retention_days: 365, is_active: 1, created_at: now, updated_at: now },
+    { id: 'domain2', name: '交易记录', description: '包含订单、支付等金融相关数据', retention_days: 1095, is_active: 1, created_at: now, updated_at: now },
+    { id: 'domain3', name: '行为日志', description: '包含用户访问、点击等行为数据', retention_days: 180, is_active: 1, created_at: now, updated_at: now },
+    { id: 'domain4', name: '营销数据', description: '包含营销活动相关数据', retention_days: 90, is_active: 1, created_at: now, updated_at: now }
   ];
   saveDatabase();
   console.log('   ✓ 测试数据初始化完成');

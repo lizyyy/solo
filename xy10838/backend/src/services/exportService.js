@@ -134,9 +134,48 @@ const exportAuditLogs = (requestId = null) => {
   };
 };
 
+const exportRequestData = (requestId) => {
+  const request = db.deletion_requests.find(r => r.id === requestId);
+  if (!request) {
+    throw new Error('删除申请不存在');
+  }
+
+  const tasks = db.execution_tasks.filter(t => t.request_id === requestId);
+  const domainMap = {};
+  db.data_domains.forEach(d => { domainMap[d.id] = d.name; });
+
+  const tasksWithDomain = tasks.map(t => ({
+    ...t,
+    domain_name: domainMap[t.domain_id] || t.domain_id
+  }));
+
+  const failedItems = db.failed_items.filter(f => {
+    const task = db.execution_tasks.find(t => t.id === f.task_id);
+    return task && task.request_id === requestId;
+  });
+
+  const audits = db.audit_logs.filter(a => a.request_id === requestId);
+
+  return {
+    request,
+    tasks: tasksWithDomain,
+    failedItems,
+    audits,
+    summary: {
+      totalTasks: tasks.length,
+      totalRecords: tasks.reduce((sum, t) => sum + (t.total_records || 0), 0),
+      processedRecords: tasks.reduce((sum, t) => sum + (t.processed_records || 0), 0),
+      failedRecords: tasks.reduce((sum, t) => sum + (t.failed_records || 0), 0),
+      totalFailedItems: failedItems.length,
+      totalAudits: audits.length
+    }
+  };
+};
+
 module.exports = {
   exportDeletionRequests,
   exportExecutionTasks,
   exportFailedItems,
-  exportAuditLogs
+  exportAuditLogs,
+  exportRequestData
 };

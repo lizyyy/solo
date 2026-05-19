@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { db, uuid, getNow } = require('../database');
+const { db, uuid, getNow, saveDatabase } = require('../database');
 const { applyDeletionRules } = require('./retentionService');
 
 const generateRequestNo = () => {
@@ -33,6 +33,7 @@ const createDeletionRequest = (data) => {
     details: `创建删除申请 ${requestNo}`
   });
   
+  saveDatabase();
   return request;
 };
 
@@ -111,6 +112,7 @@ const updateRequestStatus = (requestId, newStatus, actor, additionalData = {}) =
     details: additionalData.details || `状态变更为 ${newStatus}`
   });
 
+  saveDatabase();
   return getDeletionRequestById(requestId);
 };
 
@@ -176,6 +178,7 @@ const executeTask = (taskId, actor, simulateSuccess = null) => {
 
   updateRequestOverallStatus(task.request_id);
 
+  saveDatabase();
   return task;
 };
 
