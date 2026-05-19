@@ -1,0 +1,43 @@
+[
+  {
+    "roomNumber": "101",
+    "cleanerName": "张阿姨",
+    "cleanerPhone": "13800138001",
+    "scheduledDate": "2024-01-15",
+    "startTime": "09:00",
+    "endTime": "09:45",
+    "status": "completed",
+    "qualityScore": 85,
+    "remarks": "正常保洁完成"
+  },
+  {
+    "roomNumber": "102",
+    "cleanerName": "",
+    "cleanerPhone": "13900139002",
+    "scheduledDate": "2024-01-15",
+    "startTime": "10:00",
+    "endTime": "09:50",
+    "status": "completed",
+    "qualityScore": 92,
+    "remarks": "优质保洁"
+  },
+  {
+    "roomNumber": "房间-103",
+    "cleanerName": "张阿姨",
+    "cleanerPhone": "1234567890",
+    "scheduledDate": "2024/01/15",
+    "startTime": "11:00",
+    "endTime": "11:30",
+    "status": "unknown_status",
+    "qualityScore": 150,
+    "remarks": "卫生间清洁不彻底"
+  },
+  {
+    "roomNumber": "201",
+    "cleanerName": "王阿姨",
+    "scheduledDate": "",
+    "startTime": "25:00",
+    "endTime": "26:00",
+    "status": "in_progress"
+  }
+]
