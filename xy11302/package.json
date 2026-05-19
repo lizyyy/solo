@@ -1,0 +1,24 @@
+{
+  "name": "homestay-operation-backend",
+  "version": "1.0.0",
+  "description": "民宿运营后端系统 - 保洁、客诉、返工、结算管理",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "init-db": "node src/scripts/initDB.js",
+    "import-sample": "node src/scripts/importSampleData.js"
+  },
+  "keywords": ["homestay", "operation", "backend"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4"
+  }
+}

@@ -1,0 +1,13 @@
+room_number,cleaner_name,check_date,check_time,quality_score,photo_urls,has_issue,issue_description
+101,张三,2024-01-15,14:30,75,https://example.com/photos/101_1.jpg,1,卫生间有污渍
+102,张三,2024-01-15,15:00,78,,1,缺少保洁照片,地面有头发
+103,李四,2024-01-15,14:45,92,https://example.com/photos/103_1.jpg,0,
+201,李四,2024-01-16,10:00,85,https://example.com/photos/201_1.jpg,0,
+202,王五,2024-01-16,11:30,72,https://example.com/photos/202_1.jpg,1,床单有褶皱,窗户未擦
+301,王五,2024-01-17,09:00,90,https://example.com/photos/301_1.jpg,0,
+302,赵六,2024-01-17,10:30,88,https://example.com/photos/302_1.jpg,0,
+401,赵六,2024-01-18,14:00,65,,1,质量分过低,垃圾桶未清理
+,张三,2024-01-18,15:30,87,https://example.com/photos/bad1.jpg,0,
+501,,2024-01-19,11:00,91,https://example.com/photos/bad2.jpg,0,
+502,李四,2024-01-19,,89,https://example.com/photos/502_1.jpg,0,
+601,王五,2024-01-20,10:00,150,https://example.com/photos/601_1.jpg,0,
