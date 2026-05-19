@@ -1,0 +1,3 @@
+2026-05-19 20:44:37,570 - httpx - INFO - HTTP Request: GET http://testserver/ "HTTP/1.1 200 OK"
+2026-05-19 20:45:34,549 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/elders "HTTP/1.1 200 OK"
+2026-05-19 20:45:34,555 - httpx - INFO - HTTP Request: GET http://testserver/api/v1/statistics/daily?report_date=2026-05-19 "HTTP/1.1 200 OK"
