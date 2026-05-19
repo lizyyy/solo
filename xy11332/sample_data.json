@@ -1,0 +1,94 @@
+{
+  "escorts": [
+    {
+      "name": "张三",
+      "employee_id": "ESC001",
+      "phone": "13800138001",
+      "max_tasks": 3
+    },
+    {
+      "name": "李四",
+      "employee_id": "ESC002",
+      "phone": "13800138002",
+      "max_tasks": 2
+    },
+    {
+      "name": "王五",
+      "employee_id": "ESC003",
+      "phone": "13800138003",
+      "max_tasks": 3
+    }
+  ],
+  "patients": [
+    {
+      "name": "赵小明",
+      "medical_record_no": "MR001",
+      "age": 45,
+      "gender": "男",
+      "phone": "13900139001",
+      "department": "内科"
+    },
+    {
+      "name": "钱小红",
+      "medical_record_no": "MR002",
+      "age": 32,
+      "gender": "女",
+      "phone": "13900139002",
+      "department": "急诊科"
+    },
+    {
+      "name": "孙大伟",
+      "medical_record_no": "MR003",
+      "age": 58,
+      "gender": "男",
+      "phone": "13900139003",
+      "department": "心内科"
+    },
+    {
+      "name": "周美丽",
+      "medical_record_no": "MR004",
+      "age": 28,
+      "gender": "女",
+      "phone": "13900139004",
+      "department": "妇产科"
+    }
+  ],
+  "tasks": [
+    {
+      "patient_id": 1,
+      "priority": "normal",
+      "examination_type": "CT检查",
+      "from_location": "内科病房",
+      "to_location": "CT室",
+      "estimated_duration": 30,
+      "timeout_minutes": 30
+    },
+    {
+      "patient_id": 2,
+      "priority": "emergency",
+      "examination_type": "急诊抢救",
+      "from_location": "急诊科",
+      "to_location": "抢救室",
+      "estimated_duration": 60,
+      "timeout_minutes": 5
+    },
+    {
+      "patient_id": 3,
+      "priority": "urgent",
+      "examination_type": "心电图检查",
+      "from_location": "心内科",
+      "to_location": "功能检查科",
+      "estimated_duration": 20,
+      "timeout_minutes": 15
+    },
+    {
+      "patient_id": 4,
+      "priority": "normal",
+      "examination_type": "B超检查",
+      "from_location": "妇产科",
+      "to_location": "B超室",
+      "estimated_duration": 25,
+      "timeout_minutes": 30
+    }
+  ]
+}
