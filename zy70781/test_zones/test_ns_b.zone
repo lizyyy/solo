@@ -1,0 +1,16 @@
+$ORIGIN example.com.
+$TTL 300
+
+@       IN  SOA     ns1.example.com. admin.example.com. (
+            2024010101
+            3600
+            1800
+            604800
+            300
+        )
+
+@       IN  NS      ns1.example.com.
+@       IN  NS      ns2.example.com.
+@       IN  NS      ns4.example.com.
+
+www     IN  A       192.168.1.1

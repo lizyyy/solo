@@ -74,6 +74,8 @@ class ZoneParser:
         r"(?P<type>[A-Z]+)\s+"
         r"(?P<value>.+?)\s*$"
     )
+    
+    CONTINUATION_RE = re.compile(r"^\s*(\d+[smhdw]?)\s*$", re.IGNORECASE)
 
     def __init__(self, env: str, file_path: str):
         self.env = env
@@ -81,6 +83,9 @@ class ZoneParser:
         self.origin: Optional[str] = None
         self.default_ttl: Optional[int] = None
         self.last_name: Optional[str] = None
+        self._in_multiline: bool = False
+        self._multiline_record: Optional[DNSRecord] = None
+        self._multiline_sources: List[SourceLocation] = []
 
     def parse(self) -> ZoneParseResult:
         records: List[DNSRecord] = []
@@ -138,8 +143,26 @@ class ZoneParser:
         if line.startswith("$INCLUDE"):
             return None
 
+        if self._in_multiline:
+            if ")" in line:
+                self._in_multiline = False
+                self._multiline_record.sources.extend(self._multiline_sources)
+                result = self._multiline_record
+                self._multiline_record = None
+                self._multiline_sources = []
+                return result
+            else:
+                self._multiline_sources.append(source)
+                return None
+
         record = self._parse_record(line, source)
         if record:
+            if "(" in record.value and ")" not in record.value:
+                self._in_multiline = True
+                self._multiline_record = record
+                self._multiline_sources = []
+                return None
+            
             if record.name and record.name != "@":
                 self.last_name = record.name
             return record

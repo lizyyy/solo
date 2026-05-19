@@ -4,7 +4,7 @@ from typing import Optional
 from pathlib import Path
 from tabulate import tabulate
 import yaml
-from .comparator import DiffResult, MissingRecord, TTLDiff, ValueDiff
+from .comparator import DiffResult, MissingRecordValue as MissingRecord, TTLDiff, ValueDiff
 from .parser import BadLine
 
 
@@ -47,11 +47,12 @@ class ReportGenerator:
             for mr in self.result.missing_records:
                 name = mr.name
                 rtype = mr.record_type
+                value = mr.value
                 present = ", ".join(sorted(mr.present_envs))
                 missing = ", ".join(sorted(mr.missing_envs))
-                table_data.append([name, rtype, present, missing])
+                table_data.append([name, rtype, value, present, missing])
             
-            lines.append(tabulate(table_data, headers=["记录名", "类型", "存在环境", "缺失环境"], tablefmt="simple"))
+            lines.append(tabulate(table_data, headers=["记录名", "类型", "值", "存在环境", "缺失环境"], tablefmt="simple"))
             lines.append("")
             lines.append("")
 
@@ -62,22 +63,24 @@ class ReportGenerator:
             for td in self.result.ttl_diffs:
                 name = td.name
                 rtype = td.record_type
+                value = td.value
                 ttls = [str(td.env_ttls.get(env, "-")) for env in self.result.envs]
-                table_data.append([name, rtype] + ttls)
+                table_data.append([name, rtype, value] + ttls)
             
-            headers = ["记录名", "类型"] + [f"{e} TTL" for e in self.result.envs]
+            headers = ["记录名", "类型", "值"] + [f"{e} TTL" for e in self.result.envs]
             lines.append(tabulate(table_data, headers=headers, tablefmt="simple"))
             lines.append("")
             lines.append("")
 
         if self.result.value_diffs:
-            lines.append("🔄 记录值差异")
+            lines.append("🔄 记录值集合差异")
             lines.append("-" * 40)
             for vd in self.result.value_diffs:
                 lines.append(f"  {vd.name} {vd.record_type}")
                 for env in self.result.envs:
-                    val = vd.env_values.get(env, "-")
-                    lines.append(f"    {env}: {val}")
+                    vals = vd.env_values.get(env, [])
+                    vals_str = ", ".join(vals) if vals else "-"
+                    lines.append(f"    {env}: {vals_str}")
                 lines.append("")
             lines.append("")
 
@@ -111,7 +114,7 @@ class ReportGenerator:
             data["missing_records"].append({
                 "name": mr.name,
                 "type": mr.record_type,
-                "sample_value": sample.value if sample else None,
+                "value": mr.value,
                 "present_envs": sorted(list(mr.present_envs)),
                 "missing_envs": sorted(list(mr.missing_envs)),
                 "sources": [
@@ -129,6 +132,7 @@ class ReportGenerator:
             data["ttl_diffs"].append({
                 "name": td.name,
                 "type": td.record_type,
+                "value": td.value,
                 "ttls_by_env": td.env_ttls,
             })
 
@@ -222,18 +226,18 @@ class ReportGenerator:
                     badges.append(f'<span class="badge badge-present">{env} ✓</span>')
                 for env in mr['missing_envs']:
                     badges.append(f'<span class="badge badge-missing">{env} ✗</span>')
-                html += f'            <tr><td>{mr["name"]}</td><td>{mr["type"]}</td><td>{mr["sample_value"]}</td><td>{"".join(badges)}</td></tr>\n'
+                html += f'            <tr><td>{mr["name"]}</td><td>{mr["type"]}</td><td>{mr["value"]}</td><td>{"".join(badges)}</td></tr>\n'
             html += '        </table>\n'
 
         if json_data['ttl_diffs']:
             html += '        <h2>⏱️ TTL 差异</h2>\n'
             html += '        <table>\n'
-            html += '            <tr><th>记录名</th><th>类型</th>'
+            html += '            <tr><th>记录名</th><th>类型</th><th>值</th>'
             for env in json_data['environments']:
                 html += f'<th>{env} TTL</th>'
             html += '</tr>\n'
             for td in json_data['ttl_diffs']:
-                html += f'            <tr><td>{td["name"]}</td><td>{td["type"]}</td>'
+                html += f'            <tr><td>{td["name"]}</td><td>{td["type"]}</td><td>{td["value"]}</td>'
                 for env in json_data['environments']:
                     ttl = td['ttls_by_env'].get(env, '-')
                     html += f'<td>{ttl}</td>'
@@ -241,13 +245,14 @@ class ReportGenerator:
             html += '        </table>\n'
 
         if json_data['value_diffs']:
-            html += '        <h2>🔄 记录值差异</h2>\n'
+            html += '        <h2>🔄 记录值集合差异</h2>\n'
             for vd in json_data['value_diffs']:
                 html += f'        <div class="alert alert-info">\n'
                 html += f'            <strong>{vd["name"]} {vd["type"]}</strong><br>\n'
                 for env in json_data['environments']:
-                    val = vd['values_by_env'].get(env, '-')
-                    html += f'            {env}: <span class="code">{val}</span><br>\n'
+                    vals = vd['values_by_env'].get(env, [])
+                    vals_str = ", ".join(vals) if vals else "-"
+                    html += f'            {env}: <span class="code">{vals_str}</span><br>\n'
                 html += '        </div>\n'
 
         if not json_data['summary']['has_issues']:
