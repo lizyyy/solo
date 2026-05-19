@@ -1,0 +1,23 @@
+订单号,物流单号,HS编码,商品名称,品类,数量,申报金额,币种,人民币金额,汇率,适用税率,预期税款,申报税款,税款差异,有退单,退单调整税款,需补税款,最终税款,状态,是否复核,复核人,复核时间,复核备注
+ORD001,TRK001,85171210,智能手机,电子产品,10,5000,USD,36000,7.2,0.26,9360,3240,6120,true,150,6120,9510,discrepancy,false,,,
+ORD001,TRK004,85171210,智能手机,电子产品,5,2500,USD,18000,7.2,0.26,4680,1620,3060,true,150,7740,9510,discrepancy,false,,,
+ORD002,TRK002,61091000,棉制T恤,纺织品,100,2000,USD,14400,7.2,0.23,3312,1296,2016,false,0,0,1296,discrepancy,false,,,
+ORD003,TRK003,85258013,蓝牙耳机,电子产品,50,1500,USD,10800,7.2,0.26,2808,972,1836,false,0,0,972,discrepancy,false,,,
+ORD004,TRK005,39269090,塑料玩具,玩具,200,1000,EUR,7200,7.2,0.13,936,792,144,false,0,0,792,discrepancy,false,,,
+
+=== 差异明细 ===
+订单号,差异类型,字段名,预期值,实际值,差异,说明,来源,是否已解决
+ORD001,currency,exchange_rate,0,7.2,-7.2,使用默认汇率 7.2000，未找到USD对CNY的汇率数据,system_default,false
+ORD001,return,return_adjusted_tax,0,150,-150,海关退单调整：TAX_ADJUST - 税率申报有误，实际税率为15%,customs_return,false
+ORD001,amount,tax_difference,9360,3240,6120,税款差异：预期9360.00，申报3240.00，差异6120.00,tax_calculation,false
+ORD001,currency,exchange_rate,0,7.2,-7.2,使用默认汇率 7.2000，未找到USD对CNY的汇率数据,system_default,false
+ORD001,return,return_adjusted_tax,0,150,-150,海关退单调整：TAX_ADJUST - 税率申报有误，实际税率为15%,customs_return,false
+ORD001,duplicate,duplicate_order,0,4680,-4680,订单 ORD001 重复申报，需补缴税款,duplicate_declaration,false
+ORD001,amount,tax_difference,4680,1620,3060,税款差异：预期4680.00，申报1620.00，差异3060.00,tax_calculation,false
+ORD002,currency,exchange_rate,0,7.2,-7.2,使用默认汇率 7.2000，未找到USD对CNY的汇率数据,system_default,false
+ORD002,amount,tax_difference,3312,1296,2016,税款差异：预期3312.00，申报1296.00，差异2016.00,tax_calculation,false
+ORD003,currency,exchange_rate,0,7.2,-7.2,使用默认汇率 7.2000，未找到USD对CNY的汇率数据,system_default,false
+ORD003,amount,tax_difference,2808,972,1836,税款差异：预期2808.00，申报972.00，差异1836.00,tax_calculation,false
+ORD004,currency,exchange_rate,0,7.2,-7.2,使用默认汇率 7.2000，未找到EUR对CNY的汇率数据,system_default,false
+ORD004,hs_code,tax_rate,0,0.13,-0.13,HS编码 39269090 未找到对应税则，使用默认税率13%,hs_code_not_found,false
+ORD004,amount,tax_difference,936,792,144,税款差异：预期936.00，申报792.00，差异144.00,tax_calculation,false

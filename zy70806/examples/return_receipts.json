@@ -1,0 +1,15 @@
+[
+  {
+    "receipt_no": "RTN001",
+    "order_no": "ORD001",
+    "tracking_no": "TRK001",
+    "return_date": "2024-01-20",
+    "return_code": "TAX_ADJUST",
+    "return_reason": "税率申报有误，实际税率为15%",
+    "return_category": "税务调整",
+    "adjusted_amount": 0,
+    "adjusted_tax": 150.00,
+    "require_supplement": true,
+    "status": "已处理"
+  }
+]
