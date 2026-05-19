@@ -210,7 +210,7 @@ class PermissionMatchResult(BaseModel):
 class BatchApprovalRequest(BaseModel):
     batch_number: str
     approver: str
-    approval_notes: Optional[str] = None
+    notes: Optional[str] = None
 
 
 class StatusChangeRequest(BaseModel):
