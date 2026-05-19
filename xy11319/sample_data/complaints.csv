@@ -1,0 +1,7 @@
+student_id,bus_id,complaint_date,complaint_type,description,expected_arrival,actual_arrival
+STU001,BUS001,2026-05-18,late,校车迟到到达学校,07:30,07:30
+STU002,BUS001,2026-05-18,other,车内空调不制冷,07:30,
+STU003,BUS002,2026-05-18,late,校车迟到15分钟,07:30,07:45
+STU004,BUS002,2026-05-19,late,司机打卡与实际到达时间不符,07:30,07:40
+STU005,BUS003,2026-05-18,late,严重迟到30分钟,07:30,07:55
+STU005,BUS003,2026-05-19,late,连续两天迟到,07:30,08:15

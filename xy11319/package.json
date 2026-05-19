@@ -1,0 +1,29 @@
+{
+  "name": "school-bus-reconciliation",
+  "version": "1.0.0",
+  "description": "校车调度员乱账治理系统 - 家长申诉、GPS轨迹、司机打卡对账平台",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "import": "node src/scripts/importData.js",
+    "export": "node src/scripts/exportData.js",
+    "test": "node src/scripts/testFlow.js"
+  },
+  "keywords": ["school-bus", "reconciliation", "gps", "attendance"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "winston": "^3.11.0",
+    "joi": "^17.11.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
