@@ -173,14 +173,23 @@ class ParseService:
             ParseResult.resume_id == resume_id
         ).count() + 1
         
+        server_managed_fields = {
+            'id', 'resume_id', 'version', 'parse_source',
+            'confidence_score', 'created_by', 'created_at', 'raw_content'
+        }
+        cleaned_parse_data = {
+            k: v for k, v in parse_data.items()
+            if k not in server_managed_fields
+        }
+        
         parse_result = ParseResult(
             resume_id=resume_id,
             version=latest_version,
-            **parse_data,
+            **cleaned_parse_data,
             parse_source="人工",
             confidence_score=1.0,
             created_by=reviewer,
-            raw_content=str(parse_data)
+            raw_content=str(cleaned_parse_data)
         )
         
         db.add(parse_result)
