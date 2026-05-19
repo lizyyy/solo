@@ -1,0 +1,31 @@
+[
+  {
+    "room_number": "101",
+    "cleaner_name": "张阿姨",
+    "cleaner_phone": "13800138001",
+    "cleaning_date": "2024-01-15",
+    "checkin_date": "2024-01-14",
+    "checkout_date": "2024-01-15",
+    "quality_score": 95,
+    "has_complaint": false,
+    "notes": "打扫干净"
+  },
+  {
+    "room_number": "102",
+    "cleaner_name": "李阿姨",
+    "cleaner_phone": "13800138002",
+    "cleaning_date": "2024-01-15",
+    "quality_score": 88,
+    "has_complaint": true,
+    "complaint_count": 1,
+    "rework_count": 1,
+    "notes": "卫生间有异味，已返工"
+  },
+  {
+    "room_number": "201",
+    "cleaner_name": "王阿姨",
+    "cleaner_phone": "13800138003",
+    "cleaning_date": "2024-01-16",
+    "quality_score": 92
+  }
+]
