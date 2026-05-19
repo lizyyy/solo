@@ -1,0 +1,118 @@
+{
+  "elders": [
+    {
+      "name": "刘爷爷",
+      "phone": "13800138004",
+      "address": "和谐小区1号楼",
+      "dietaryRestrictions": [
+        "低糖"
+      ],
+      "chronicConditions": [
+        "糖尿病"
+      ],
+      "deliveryRoute": "A线",
+      "roomNumber": "102",
+      "id": "ae7be00c-ce4d-4c28-95fa-a6777faf123e",
+      "createdAt": "2026-05-19T13:44:39.699Z",
+      "updatedAt": "2026-05-19T13:44:39.699Z"
+    },
+    {
+      "name": "陈奶奶",
+      "phone": "缺失电话",
+      "address": "幸福小区4号楼",
+      "dietaryRestrictions": [],
+      "chronicConditions": [
+        "高血压"
+      ],
+      "deliveryRoute": "C线",
+      "roomNumber": "401",
+      "id": "9a27c847-8616-4110-b449-f9e8137c295b",
+      "createdAt": "2026-05-19T13:44:39.699Z",
+      "updatedAt": "2026-05-19T13:44:39.699Z"
+    },
+    {
+      "name": "赵婆婆",
+      "phone": "13800138007",
+      "address": "阳光小区2号楼",
+      "dietaryRestrictions": [
+        "低糖低盐"
+      ],
+      "chronicConditions": [
+        "糖尿病"
+      ],
+      "deliveryRoute": "A线",
+      "id": "daf57200-e07d-43ca-91bd-3b4863a18ecc",
+      "createdAt": "2026-05-19T13:44:39.699Z",
+      "updatedAt": "2026-05-19T13:44:39.699Z"
+    }
+  ],
+  "menuItems": [],
+  "mealPlans": [],
+  "deliveries": [],
+  "followUps": [],
+  "importErrors": {
+    "elders": [
+      {
+        "row": 2,
+        "rawData": {
+          "name": "",
+          "phone": "13800138005",
+          "address": "幸福小区3号楼",
+          "dietaryRestrictions": "素食",
+          "chronicConditions": "高胆固醇",
+          "deliveryRoute": "B线",
+          "roomNumber": "301"
+        },
+        "error": "姓名不能为空",
+        "suggestion": "请填写老人姓名"
+      },
+      {
+        "row": 4,
+        "rawData": {
+          "name": "周爷爷",
+          "phone": "13800138006",
+          "address": ""
+        },
+        "error": "地址不能为空; 配送路线不能为空",
+        "suggestion": "请填写详细地址; 请指定配送路线，如\"A线\"、\"B线\""
+      }
+    ],
+    "menuItems": [],
+    "deliveries": []
+  },
+  "history": [
+    {
+      "id": "e7d2b718-ec0f-4526-9502-69e884ae2cb5",
+      "action": "create",
+      "entityType": "elder",
+      "entityId": "daf57200-e07d-43ca-91bd-3b4863a18ecc",
+      "details": {
+        "name": "赵婆婆",
+        "bulk": true
+      },
+      "timestamp": "2026-05-19T13:44:39.703Z"
+    },
+    {
+      "id": "bdfcf6ae-c411-4f83-9108-24237d318686",
+      "action": "create",
+      "entityType": "elder",
+      "entityId": "9a27c847-8616-4110-b449-f9e8137c295b",
+      "details": {
+        "name": "陈奶奶",
+        "bulk": true
+      },
+      "timestamp": "2026-05-19T13:44:39.703Z"
+    },
+    {
+      "id": "63506062-623f-43d2-9d6f-a239345ce659",
+      "action": "create",
+      "entityType": "elder",
+      "entityId": "ae7be00c-ce4d-4c28-95fa-a6777faf123e",
+      "details": {
+        "name": "刘爷爷",
+        "bulk": true
+      },
+      "timestamp": "2026-05-19T13:44:39.703Z"
+    }
+  ]
+}
