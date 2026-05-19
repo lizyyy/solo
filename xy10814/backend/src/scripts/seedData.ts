@@ -70,7 +70,7 @@ async function seed() {
       name: '用户未授权',
       contractId: userContract.id,
       matchRules: [
-        { type: 'header' as const, key: 'Authorization', value: '', operator: 'exists' as const }
+        { type: 'header' as const, key: 'Authorization', value: 'not_exists', operator: 'exists' as const }
       ],
       responseBody: {
         success: false,

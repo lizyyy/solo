@@ -40,10 +40,13 @@ export class MatchService {
 
     for (const rule of scene.matchRules) {
       let actualValue: any;
+      let headerExists = false;
       
       switch (rule.type) {
         case 'header':
-          actualValue = request.headers[rule.key.toLowerCase()] || request.headers[rule.key];
+          const lowerKey = rule.key.toLowerCase();
+          headerExists = lowerKey in request.headers || rule.key in request.headers;
+          actualValue = request.headers[lowerKey] ?? request.headers[rule.key];
           break;
         case 'query':
           actualValue = request.query[rule.key];
@@ -58,7 +61,7 @@ export class MatchService {
           return false;
       }
 
-      if (!this.matchRuleValue(rule, actualValue)) {
+      if (!this.matchRuleValue(rule, actualValue, headerExists)) {
         return false;
       }
     }
@@ -66,15 +69,20 @@ export class MatchService {
     return true;
   }
 
-  private static matchRuleValue(rule: any, actualValue: any): boolean {
+  private static matchRuleValue(rule: any, actualValue: any, headerExists: boolean = false): boolean {
     const expectedValue = rule.value;
     
     switch (rule.operator) {
       case 'equals':
+        if (actualValue === undefined || actualValue === null) {
+          return expectedValue === undefined || expectedValue === null || expectedValue === '';
+        }
         return String(actualValue) === String(expectedValue);
       case 'contains':
+        if (actualValue === undefined || actualValue === null) return false;
         return String(actualValue).includes(String(expectedValue));
       case 'regex':
+        if (actualValue === undefined || actualValue === null) return false;
         try {
           const regex = new RegExp(expectedValue);
           return regex.test(String(actualValue));
@@ -82,6 +90,15 @@ export class MatchService {
           return false;
         }
       case 'exists':
+        if (rule.type === 'header') {
+          if (expectedValue === 'not_exists') {
+            return !headerExists;
+          }
+          if (expectedValue === '') {
+            return !headerExists || actualValue === '' || actualValue === undefined;
+          }
+          return headerExists;
+        }
         return actualValue !== undefined && actualValue !== null;
       default:
         return false;
