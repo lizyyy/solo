@@ -87,15 +87,25 @@ class ReplayExecutor:
         if not original_request or not environment:
             return None, "请求或环境不存在"
         
-        if environment.requires_approval and not authorization_id:
-            auth = AuthorizationRecord.query.filter_by(
-                request_id=request_id,
-                environment_id=environment_id,
-                status='approved'
-            ).first()
-            if not auth:
-                return None, "该环境需要审批授权"
-            authorization_id = auth.id
+        if environment.requires_approval:
+            if authorization_id:
+                auth = AuthorizationRecord.query.filter_by(
+                    id=authorization_id,
+                    request_id=request_id,
+                    environment_id=environment_id,
+                    status='approved'
+                ).first()
+                if not auth:
+                    return None, "授权记录无效或未批准"
+            else:
+                auth = AuthorizationRecord.query.filter_by(
+                    request_id=request_id,
+                    environment_id=environment_id,
+                    status='approved'
+                ).first()
+                if not auth:
+                    return None, "该环境需要审批授权"
+                authorization_id = auth.id
         
         replay_result = ReplayResult(
             request_id=request_id,
