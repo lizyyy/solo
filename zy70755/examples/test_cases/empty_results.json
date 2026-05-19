@@ -1,0 +1,62 @@
+[
+  {
+    "description": "删除必填字段id",
+    "path": "id",
+    "value": {
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  },
+  {
+    "description": "删除必填字段name",
+    "path": "name",
+    "value": {
+      "id": 1,
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  },
+  {
+    "description": "name设置为null",
+    "path": "name",
+    "value": {
+      "id": 1,
+      "name": null,
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  },
+  {
+    "description": "name设置为空字符串",
+    "path": "name",
+    "value": {
+      "id": 1,
+      "name": "",
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  },
+  {
+    "description": "tags设置为空数组",
+    "path": "tags",
+    "value": {
+      "id": 1,
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "status": "active",
+      "tags": []
+    }
+  },
+  {
+    "description": "tags数组顺序打乱",
+    "path": "tags",
+    "value": {
+      "id": 1,
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "status": "active",
+      "tags": ["developer", "admin"]
+    }
+  }
+]

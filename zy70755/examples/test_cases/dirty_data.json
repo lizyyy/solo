@@ -1,0 +1,52 @@
+[
+  {
+    "description": "XSS注入",
+    "path": "name",
+    "value": {
+      "id": 1,
+      "name": "<script>alert('xss')</script>",
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  },
+  {
+    "description": "SQL注入",
+    "path": "name",
+    "value": {
+      "id": 1,
+      "name": "' OR 1=1 --",
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  },
+  {
+    "description": "路径遍历",
+    "path": "name",
+    "value": {
+      "id": 1,
+      "name": "../../etc/passwd",
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  },
+  {
+    "description": "空字节注入",
+    "path": "name",
+    "value": {
+      "id": 1,
+      "name": "valid\u0000name",
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  },
+  {
+    "description": "全空白字符",
+    "path": "name",
+    "value": {
+      "id": 1,
+      "name": "   ",
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  }
+]

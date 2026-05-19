@@ -1,0 +1,925 @@
+{
+  "schema_name": "User",
+  "timestamp": "2026-05-19T14:08:36.878844",
+  "original_example": {
+    "id": 1,
+    "name": "张三",
+    "email": "zhangsan@example.com",
+    "age": 25,
+    "status": "active",
+    "tags": [
+      "admin",
+      "developer"
+    ],
+    "createdAt": "2024-01-01T12:00:00Z"
+  },
+  "coverage_stats": {
+    "total_mutations": 66,
+    "passed_validations": 37,
+    "failed_validations": 29,
+    "false_positives": 0,
+    "mutation_type_coverage": {
+      "remove_required_field": 4,
+      "null_value": 8,
+      "type_mismatch": 7,
+      "empty_string": 6,
+      "dirty_data": 30,
+      "boundary_value": 3,
+      "remove_optional_field": 3,
+      "wrong_enum": 1,
+      "array_reorder": 1,
+      "array_duplicate": 1,
+      "empty_array": 1,
+      "add_extra_field": 1
+    },
+    "field_coverage": {
+      "id": 5,
+      "name": 9,
+      "email": 8,
+      "age": 8,
+      "status": 9,
+      "tags": 4,
+      "tags[0]": 7,
+      "tags[1]": 7,
+      "createdAt": 8,
+      "root": 1
+    },
+    "error_type_distribution": {
+      "required": 4,
+      "type": 15,
+      "maxLength": 1,
+      "minimum": 1,
+      "maximum": 1,
+      "enum": 8
+    }
+  },
+  "detailed_results": [
+    {
+      "mutation_type": "remove_required_field",
+      "path": "id",
+      "description": "移除必填字段: id",
+      "result": "fail",
+      "attribution": "扰动类型: remove_required_field, 影响范围: 其他字段验证失败",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "required",
+          "message": "'id' is a required property",
+          "path": "root"
+        }
+      ]
+    },
+    {
+      "mutation_type": "null_value",
+      "path": "id",
+      "description": "设置为null: id",
+      "result": "fail",
+      "attribution": "扰动类型: null_value, 影响字段: id, 验证错误: id: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'integer'",
+          "path": "id"
+        }
+      ]
+    },
+    {
+      "mutation_type": "type_mismatch",
+      "path": "id",
+      "description": "类型不匹配: id",
+      "result": "fail",
+      "attribution": "扰动类型: type_mismatch, 影响字段: id, 验证错误: id: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "'not_a_number' is not of type 'integer'",
+          "path": "id"
+        }
+      ]
+    },
+    {
+      "mutation_type": "type_mismatch",
+      "path": "id",
+      "description": "类型不匹配: id",
+      "result": "fail",
+      "attribution": "扰动类型: type_mismatch, 影响字段: id, 验证错误: id: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'integer'",
+          "path": "id"
+        }
+      ]
+    },
+    {
+      "mutation_type": "type_mismatch",
+      "path": "id",
+      "description": "类型不匹配: id",
+      "result": "fail",
+      "attribution": "扰动类型: type_mismatch, 影响字段: id, 验证错误: id: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "[] is not of type 'integer'",
+          "path": "id"
+        }
+      ]
+    },
+    {
+      "mutation_type": "remove_required_field",
+      "path": "name",
+      "description": "移除必填字段: name",
+      "result": "fail",
+      "attribution": "扰动类型: remove_required_field, 影响范围: 其他字段验证失败",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "required",
+          "message": "'name' is a required property",
+          "path": "root"
+        }
+      ]
+    },
+    {
+      "mutation_type": "null_value",
+      "path": "name",
+      "description": "设置为null: name",
+      "result": "fail",
+      "attribution": "扰动类型: null_value, 影响字段: name, 验证错误: name: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'string'",
+          "path": "name"
+        }
+      ]
+    },
+    {
+      "mutation_type": "empty_string",
+      "path": "name",
+      "description": "设置为空字符串: name",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "name",
+      "description": "脏数据注入: name",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "name",
+      "description": "脏数据注入: name",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "name",
+      "description": "脏数据注入: name",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "name",
+      "description": "脏数据注入: name",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "name",
+      "description": "脏数据注入: name",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "boundary_value",
+      "path": "name",
+      "description": "超出最大长度: name",
+      "result": "fail",
+      "attribution": "扰动类型: boundary_value, 影响字段: name, 验证错误: name: maxLength",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "maxLength",
+          "message": "'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' is too long",
+          "path": "name"
+        }
+      ]
+    },
+    {
+      "mutation_type": "remove_required_field",
+      "path": "email",
+      "description": "移除必填字段: email",
+      "result": "fail",
+      "attribution": "扰动类型: remove_required_field, 影响范围: 其他字段验证失败",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "required",
+          "message": "'email' is a required property",
+          "path": "root"
+        }
+      ]
+    },
+    {
+      "mutation_type": "null_value",
+      "path": "email",
+      "description": "设置为null: email",
+      "result": "fail",
+      "attribution": "扰动类型: null_value, 影响字段: email, 验证错误: email: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'string'",
+          "path": "email"
+        }
+      ]
+    },
+    {
+      "mutation_type": "empty_string",
+      "path": "email",
+      "description": "设置为空字符串: email",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "email",
+      "description": "脏数据注入: email",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "email",
+      "description": "脏数据注入: email",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "email",
+      "description": "脏数据注入: email",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "email",
+      "description": "脏数据注入: email",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "email",
+      "description": "脏数据注入: email",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "remove_optional_field",
+      "path": "age",
+      "description": "移除可选字段: age",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "null_value",
+      "path": "age",
+      "description": "设置为null: age",
+      "result": "fail",
+      "attribution": "扰动类型: null_value, 影响字段: age, 验证错误: age: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'integer'",
+          "path": "age"
+        }
+      ]
+    },
+    {
+      "mutation_type": "boundary_value",
+      "path": "age",
+      "description": "低于最小值: age",
+      "result": "fail",
+      "attribution": "扰动类型: boundary_value, 影响字段: age, 验证错误: age: minimum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "minimum",
+          "message": "-1 is less than the minimum of 0",
+          "path": "age"
+        }
+      ]
+    },
+    {
+      "mutation_type": "boundary_value",
+      "path": "age",
+      "description": "超出最大值: age",
+      "result": "fail",
+      "attribution": "扰动类型: boundary_value, 影响字段: age, 验证错误: age: maximum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "maximum",
+          "message": "151 is greater than the maximum of 150",
+          "path": "age"
+        }
+      ]
+    },
+    {
+      "mutation_type": "type_mismatch",
+      "path": "age",
+      "description": "类型不匹配: age",
+      "result": "fail",
+      "attribution": "扰动类型: type_mismatch, 影响字段: age, 验证错误: age: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "'not_a_number' is not of type 'integer'",
+          "path": "age"
+        }
+      ]
+    },
+    {
+      "mutation_type": "type_mismatch",
+      "path": "age",
+      "description": "类型不匹配: age",
+      "result": "fail",
+      "attribution": "扰动类型: type_mismatch, 影响字段: age, 验证错误: age: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "True is not of type 'integer'",
+          "path": "age"
+        }
+      ]
+    },
+    {
+      "mutation_type": "type_mismatch",
+      "path": "age",
+      "description": "类型不匹配: age",
+      "result": "fail",
+      "attribution": "扰动类型: type_mismatch, 影响字段: age, 验证错误: age: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'integer'",
+          "path": "age"
+        }
+      ]
+    },
+    {
+      "mutation_type": "type_mismatch",
+      "path": "age",
+      "description": "类型不匹配: age",
+      "result": "fail",
+      "attribution": "扰动类型: type_mismatch, 影响字段: age, 验证错误: age: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "[] is not of type 'integer'",
+          "path": "age"
+        }
+      ]
+    },
+    {
+      "mutation_type": "remove_required_field",
+      "path": "status",
+      "description": "移除必填字段: status",
+      "result": "fail",
+      "attribution": "扰动类型: remove_required_field, 影响范围: 其他字段验证失败",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "required",
+          "message": "'status' is a required property",
+          "path": "root"
+        }
+      ]
+    },
+    {
+      "mutation_type": "null_value",
+      "path": "status",
+      "description": "设置为null: status",
+      "result": "fail",
+      "attribution": "扰动类型: null_value, 影响字段: status, 验证错误: status: type, status: enum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'string'",
+          "path": "status"
+        },
+        {
+          "error_type": "enum",
+          "message": "None is not one of ['active', 'inactive', 'pending']",
+          "path": "status"
+        }
+      ]
+    },
+    {
+      "mutation_type": "empty_string",
+      "path": "status",
+      "description": "设置为空字符串: status",
+      "result": "fail",
+      "attribution": "扰动类型: empty_string, 影响字段: status, 验证错误: status: enum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "enum",
+          "message": "'' is not one of ['active', 'inactive', 'pending']",
+          "path": "status"
+        }
+      ]
+    },
+    {
+      "mutation_type": "wrong_enum",
+      "path": "status",
+      "description": "使用非法枚举值: status",
+      "result": "fail",
+      "attribution": "扰动类型: wrong_enum, 影响字段: status, 验证错误: status: enum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "enum",
+          "message": "'__INVALID_ENUM_VALUE__' is not one of ['active', 'inactive', 'pending']",
+          "path": "status"
+        }
+      ]
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "status",
+      "description": "脏数据注入: status",
+      "result": "fail",
+      "attribution": "扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "enum",
+          "message": "'<script>alert(1)</script>' is not one of ['active', 'inactive', 'pending']",
+          "path": "status"
+        }
+      ]
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "status",
+      "description": "脏数据注入: status",
+      "result": "fail",
+      "attribution": "扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "enum",
+          "message": "'../../etc/passwd' is not one of ['active', 'inactive', 'pending']",
+          "path": "status"
+        }
+      ]
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "status",
+      "description": "脏数据注入: status",
+      "result": "fail",
+      "attribution": "扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "enum",
+          "message": "' OR 1=1 --' is not one of ['active', 'inactive', 'pending']",
+          "path": "status"
+        }
+      ]
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "status",
+      "description": "脏数据注入: status",
+      "result": "fail",
+      "attribution": "扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "enum",
+          "message": "'\\x00\\x01\\x02' is not one of ['active', 'inactive', 'pending']",
+          "path": "status"
+        }
+      ]
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "status",
+      "description": "脏数据注入: status",
+      "result": "fail",
+      "attribution": "扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "enum",
+          "message": "'  ' is not one of ['active', 'inactive', 'pending']",
+          "path": "status"
+        }
+      ]
+    },
+    {
+      "mutation_type": "remove_optional_field",
+      "path": "tags",
+      "description": "移除可选字段: tags",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "array_reorder",
+      "path": "tags",
+      "description": "数组顺序打乱: tags",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "array_duplicate",
+      "path": "tags",
+      "description": "数组元素重复: tags",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "empty_array",
+      "path": "tags",
+      "description": "数组置空: tags",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "null_value",
+      "path": "tags[0]",
+      "description": "设置为null: tags[0]",
+      "result": "fail",
+      "attribution": "扰动类型: null_value, 影响范围: 其他字段验证失败",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'string'",
+          "path": "tags.0"
+        }
+      ]
+    },
+    {
+      "mutation_type": "empty_string",
+      "path": "tags[0]",
+      "description": "设置为空字符串: tags[0]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[0]",
+      "description": "脏数据注入: tags[0]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[0]",
+      "description": "脏数据注入: tags[0]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[0]",
+      "description": "脏数据注入: tags[0]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[0]",
+      "description": "脏数据注入: tags[0]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[0]",
+      "description": "脏数据注入: tags[0]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "null_value",
+      "path": "tags[1]",
+      "description": "设置为null: tags[1]",
+      "result": "fail",
+      "attribution": "扰动类型: null_value, 影响范围: 其他字段验证失败",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'string'",
+          "path": "tags.1"
+        }
+      ]
+    },
+    {
+      "mutation_type": "empty_string",
+      "path": "tags[1]",
+      "description": "设置为空字符串: tags[1]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[1]",
+      "description": "脏数据注入: tags[1]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[1]",
+      "description": "脏数据注入: tags[1]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[1]",
+      "description": "脏数据注入: tags[1]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[1]",
+      "description": "脏数据注入: tags[1]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "tags[1]",
+      "description": "脏数据注入: tags[1]",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "remove_optional_field",
+      "path": "createdAt",
+      "description": "移除可选字段: createdAt",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "null_value",
+      "path": "createdAt",
+      "description": "设置为null: createdAt",
+      "result": "fail",
+      "attribution": "扰动类型: null_value, 影响字段: createdAt, 验证错误: createdAt: type",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": [
+        {
+          "error_type": "type",
+          "message": "None is not of type 'string'",
+          "path": "createdAt"
+        }
+      ]
+    },
+    {
+      "mutation_type": "empty_string",
+      "path": "createdAt",
+      "description": "设置为空字符串: createdAt",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "createdAt",
+      "description": "脏数据注入: createdAt",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "createdAt",
+      "description": "脏数据注入: createdAt",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "createdAt",
+      "description": "脏数据注入: createdAt",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "createdAt",
+      "description": "脏数据注入: createdAt",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "dirty_data",
+      "path": "createdAt",
+      "description": "脏数据注入: createdAt",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    },
+    {
+      "mutation_type": "add_extra_field",
+      "path": "",
+      "description": "添加额外字段到: root",
+      "result": "pass",
+      "attribution": "验证通过",
+      "is_false_positive": false,
+      "mutated_value": "<truncated, type=dict>",
+      "errors": []
+    }
+  ],
+  "summary": {
+    "total_mutations": 66,
+    "passed": 37,
+    "failed": 29,
+    "pass_rate": 56.06,
+    "false_positives": 0,
+    "false_positive_rate": 0.0,
+    "top_error_types": {
+      "type": 15,
+      "enum": 8,
+      "required": 4,
+      "maxLength": 1,
+      "minimum": 1
+    },
+    "top_covered_fields": {
+      "name": 9,
+      "status": 9,
+      "email": 8,
+      "age": 8,
+      "createdAt": 8,
+      "tags[0]": 7,
+      "tags[1]": 7,
+      "id": 5,
+      "tags": 4,
+      "root": 1
+    },
+    "mutation_types_used": 12
+  }
+}

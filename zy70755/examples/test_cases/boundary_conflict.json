@@ -1,0 +1,55 @@
+[
+  {
+    "description": "年龄低于最小值",
+    "path": "age",
+    "value": {
+      "id": 1,
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "age": -1,
+      "status": "active"
+    }
+  },
+  {
+    "description": "年龄超出最大值",
+    "path": "age",
+    "value": {
+      "id": 1,
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "age": 151,
+      "status": "active"
+    }
+  },
+  {
+    "description": "无效的枚举值",
+    "path": "status",
+    "value": {
+      "id": 1,
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "status": "deleted",
+      "tags": ["admin"]
+    }
+  },
+  {
+    "description": "用户名超出最大长度",
+    "path": "name",
+    "value": {
+      "id": 1,
+      "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  },
+  {
+    "description": "ID类型不匹配（字符串代替整数）",
+    "path": "id",
+    "value": {
+      "id": "not-an-integer",
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "status": "active"
+    }
+  }
+]

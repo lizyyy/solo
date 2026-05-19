@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenAPI 扰动兼容校验报告 - User</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; }
+        h1, h2, h3 { color: #333; }
+        .summary { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .stat-box { display: inline-block; margin: 10px; padding: 15px; background: white; border-radius: 4px; min-width: 120px; text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #2196F3; }
+        .stat-label { font-size: 12px; color: #666; margin-top: 5px; }
+        .pass { color: #4CAF50; }
+        .fail { color: #F44336; }
+        .warning { color: #FF9800; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f5f5f5; font-weight: bold; }
+        tr:hover { background: #f9f9f9; }
+        .error-details { background: #FFF3E0; padding: 10px; border-radius: 4px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h1>OpenAPI 扰动兼容校验报告</h1>
+    <p><strong>Schema:</strong> User</p>
+    <p><strong>时间:</strong> 2026-05-19T14:09:10.435290</p>
+
+    <div class="summary">
+        <h2>概览统计</h2>
+        <div class="stat-box">
+            <div class="stat-value">66</div>
+            <div class="stat-label">总扰动数</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value pass">37</div>
+            <div class="stat-label">通过验证</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value fail">29</div>
+            <div class="stat-label">验证失败</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">56.06%</div>
+            <div class="stat-label">通过率</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value warning">0</div>
+            <div class="stat-label">假阳性</div>
+        </div>
+    </div>
+
+    <h2>错误类型分布</h2>
+    <table>
+        <tr><th>错误类型</th><th>数量</th></tr>
+        <tr><td>required</td><td>4</td></tr>
+        <tr><td>type</td><td>15</td></tr>
+        <tr><td>maxLength</td><td>1</td></tr>
+        <tr><td>minimum</td><td>1</td></tr>
+        <tr><td>maximum</td><td>1</td></tr>
+        <tr><td>enum</td><td>8</td></tr>
+
+    </table>
+
+    <h2>详细结果</h2>
+    <table>
+        <tr><th>扰动类型</th><th>路径</th><th>结果</th><th>归因</th></tr>
+        <tr>
+            <td>remove_required_field</td>
+            <td>id</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: remove_required_field, 影响范围: 其他字段验证失败</td>
+        </tr>
+        <tr>
+            <td>null_value</td>
+            <td>id</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: null_value, 影响字段: id, 验证错误: id: type</td>
+        </tr>
+        <tr>
+            <td>type_mismatch</td>
+            <td>id</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: type_mismatch, 影响字段: id, 验证错误: id: type</td>
+        </tr>
+        <tr>
+            <td>type_mismatch</td>
+            <td>id</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: type_mismatch, 影响字段: id, 验证错误: id: type</td>
+        </tr>
+        <tr>
+            <td>type_mismatch</td>
+            <td>id</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: type_mismatch, 影响字段: id, 验证错误: id: type</td>
+        </tr>
+        <tr>
+            <td>remove_required_field</td>
+            <td>name</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: remove_required_field, 影响范围: 其他字段验证失败</td>
+        </tr>
+        <tr>
+            <td>null_value</td>
+            <td>name</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: null_value, 影响字段: name, 验证错误: name: type</td>
+        </tr>
+        <tr>
+            <td>empty_string</td>
+            <td>name</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>name</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>name</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>name</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>name</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>name</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>boundary_value</td>
+            <td>name</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: boundary_value, 影响字段: name, 验证错误: name: maxLength</td>
+        </tr>
+        <tr>
+            <td>remove_required_field</td>
+            <td>email</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: remove_required_field, 影响范围: 其他字段验证失败</td>
+        </tr>
+        <tr>
+            <td>null_value</td>
+            <td>email</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: null_value, 影响字段: email, 验证错误: email: type</td>
+        </tr>
+        <tr>
+            <td>empty_string</td>
+            <td>email</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>email</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>email</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>email</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>email</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>email</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>remove_optional_field</td>
+            <td>age</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>null_value</td>
+            <td>age</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: null_value, 影响字段: age, 验证错误: age: type</td>
+        </tr>
+        <tr>
+            <td>boundary_value</td>
+            <td>age</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: boundary_value, 影响字段: age, 验证错误: age: minimum</td>
+        </tr>
+        <tr>
+            <td>boundary_value</td>
+            <td>age</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: boundary_value, 影响字段: age, 验证错误: age: maximum</td>
+        </tr>
+        <tr>
+            <td>type_mismatch</td>
+            <td>age</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: type_mismatch, 影响字段: age, 验证错误: age: type</td>
+        </tr>
+        <tr>
+            <td>type_mismatch</td>
+            <td>age</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: type_mismatch, 影响字段: age, 验证错误: age: type</td>
+        </tr>
+        <tr>
+            <td>type_mismatch</td>
+            <td>age</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: type_mismatch, 影响字段: age, 验证错误: age: type</td>
+        </tr>
+        <tr>
+            <td>type_mismatch</td>
+            <td>age</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: type_mismatch, 影响字段: age, 验证错误: age: type</td>
+        </tr>
+        <tr>
+            <td>remove_required_field</td>
+            <td>status</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: remove_required_field, 影响范围: 其他字段验证失败</td>
+        </tr>
+        <tr>
+            <td>null_value</td>
+            <td>status</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: null_value, 影响字段: status, 验证错误: status: type, status: enum</td>
+        </tr>
+        <tr>
+            <td>empty_string</td>
+            <td>status</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: empty_string, 影响字段: status, 验证错误: status: enum</td>
+        </tr>
+        <tr>
+            <td>wrong_enum</td>
+            <td>status</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: wrong_enum, 影响字段: status, 验证错误: status: enum</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>status</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>status</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>status</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>status</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>status</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: dirty_data, 影响字段: status, 验证错误: status: enum</td>
+        </tr>
+        <tr>
+            <td>remove_optional_field</td>
+            <td>tags</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>array_reorder</td>
+            <td>tags</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>array_duplicate</td>
+            <td>tags</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>empty_array</td>
+            <td>tags</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>null_value</td>
+            <td>tags[0]</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: null_value, 影响范围: 其他字段验证失败</td>
+        </tr>
+        <tr>
+            <td>empty_string</td>
+            <td>tags[0]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[0]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[0]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[0]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[0]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[0]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>null_value</td>
+            <td>tags[1]</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: null_value, 影响范围: 其他字段验证失败</td>
+        </tr>
+        <tr>
+            <td>empty_string</td>
+            <td>tags[1]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[1]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[1]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[1]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[1]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>tags[1]</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>remove_optional_field</td>
+            <td>createdAt</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>null_value</td>
+            <td>createdAt</td>
+            <td class="fail">fail</td>
+            <td>扰动类型: null_value, 影响字段: createdAt, 验证错误: createdAt: type</td>
+        </tr>
+        <tr>
+            <td>empty_string</td>
+            <td>createdAt</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>createdAt</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>createdAt</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>createdAt</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>createdAt</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>dirty_data</td>
+            <td>createdAt</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+        <tr>
+            <td>add_extra_field</td>
+            <td>root</td>
+            <td class="pass">pass</td>
+            <td>验证通过</td>
+        </tr>
+
+    </table>
+</body>
+</html>

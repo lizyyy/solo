@@ -1,0 +1,2 @@
+[console_scripts]
+openapi-fuzz = openapi_fuzz_checker.cli.main:cli
