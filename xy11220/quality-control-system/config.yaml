@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  mode: debug
+
+database:
+  driver: sqlite3
+  dsn: ./qc_system.db
+
+security:
+  mask_phone: true
+  mask_id_card: true
+  sensitive_fields:
+    - phone
+    - id_card
+    - email
+
+rules:
+  sample_retention_hours: 48
+  min_temperature: 0
+  max_temperature: 8
+  temperature_check_interval_minutes: 60
+  auto_destroy_enabled: true
+
+export:
+  enabled: true
+  format: csv
+  output_dir: ./exports
+
+logging:
+  level: info
+  format: json
+  mask_sensitive: true
