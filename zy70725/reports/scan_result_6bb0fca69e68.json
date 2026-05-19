@@ -33,7 +33,7 @@
       "sample_values": [],
       "source_file": "/Users/lzy/pro/solo/workspaces/zy70725/templates/hit_records.json",
       "source_line": 2,
-      "detected_at": "2026-05-19T07:19:35.095536"
+      "detected_at": "2024-04-21T01:31:08"
     },
     {
       "record_id": "HIT-001",
@@ -49,7 +49,7 @@
       ],
       "source_file": "/Users/lzy/pro/solo/workspaces/zy70725/templates/hit_records.json",
       "source_line": 1,
-      "detected_at": "2026-05-19T07:19:35.095533"
+      "detected_at": "2024-10-29T06:48:55"
     }
   ],
   "recovery_items": [
@@ -61,10 +61,10 @@
       "null_rate": 0.0,
       "null_count": 0,
       "total_count": 10000,
-      "recovery_status": "pending",
-      "approval_note": null,
-      "approved_by": null,
-      "approved_at": null
+      "recovery_status": "approved",
+      "approval_note": "无空值，可直接恢复严格校验",
+      "approved_by": "张三",
+      "approved_at": "2026-05-19T13:14:18.850189"
     },
     {
       "rule_id": "EXP-001",
@@ -74,10 +74,10 @@
       "null_rate": 0.015,
       "null_count": 150,
       "total_count": 10000,
-      "recovery_status": "pending",
-      "approval_note": null,
-      "approved_by": null,
-      "approved_at": null
+      "recovery_status": "rejected",
+      "approval_note": "仍有1.5%空值，需要延长例外期",
+      "approved_by": "李四",
+      "approved_at": "2026-05-19T13:15:14.577977"
     }
   ],
   "bad_lines": []

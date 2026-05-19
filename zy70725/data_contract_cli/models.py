@@ -44,7 +44,7 @@ class ExceptionRule(BaseModel):
     status: ExceptionStatus = ExceptionStatus.ACTIVE
     source_file: Optional[str] = None
     source_line: Optional[int] = None
-    created_at: datetime = Field(default_factory=datetime.now)
+    created_at: Optional[datetime] = None
 
     def is_expired(self, check_date: Optional[date] = None) -> bool:
         check_date = check_date or date.today()
@@ -61,7 +61,7 @@ class HitRecord(BaseModel):
     sample_values: List[Any] = Field(default_factory=list)
     source_file: str
     source_line: Optional[int] = None
-    detected_at: datetime = Field(default_factory=datetime.now)
+    detected_at: Optional[datetime] = None
 
     @property
     def null_rate(self) -> float:
