@@ -308,7 +308,8 @@ class ContractParser:
             content = response.get("content", {})
             for content_type, media_type in sorted(content.items()):
                 schema = media_type.get("schema", {})
-                fields.extend(self._traverse_schema(schema))
+                top_required = schema.get("required", [])
+                fields.extend(self._traverse_schema(schema, "", top_required))
 
         return sorted(fields, key=lambda f: f.path)
 

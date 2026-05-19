@@ -179,19 +179,25 @@ def detect_drift(
         return
 
     drifts = detector.detect_drifts(contract, samples)
+    new_count = store.save_drifts(drifts)
+    if new_count > 0:
+        console.print(f"[green]已保存 {new_count} 个新漂移记录[/green]")
+
     consumers = store.list_consumers()
     confirmations = [c for con in consumers for c in store.get_confirmations_for_consumer(con.id)]
 
     report = reporter.generate_report(contract, samples, drifts, consumers, confirmations)
 
     table = Table(title=f"漂移检测结果 - {contract.name}")
+    table.add_column("漂移ID", style="blue")
     table.add_column("字段路径", style="cyan")
     table.add_column("漂移类型")
-    table.add_column("样例")
+    table.add_column("样例ID")
     table.add_column("描述")
 
     for drift in sorted(report.drifts, key=lambda d: (d.sample_id, d.field_path)):
         table.add_row(
+            drift.drift_id[:8],
             drift.field_path,
             drift.diff_type.value,
             drift.sample_id[:8],
@@ -200,6 +206,7 @@ def detect_drift(
 
     console.print(table)
     console.print(f"\n总计发现 [bold red]{report.total_drifts}[/bold red] 处漂移")
+    console.print(f"使用漂移ID执行确认: contract-drift confirm set <消费方ID> <漂移ID> <状态>")
 
     if export:
         Path(output).mkdir(parents=True, exist_ok=True)
@@ -307,12 +314,24 @@ def set_confirmation(
         console.print(f"[red]错误: 消费方 {consumer_id} 不存在[/red]")
         return
 
+    drift = store.get_drift(drift_id)
+    if not drift:
+        console.print(f"[yellow]警告: 漂移 {drift_id} 不存在，使用空元数据[/yellow]")
+        contract_id = ""
+        sample_id = ""
+        field_path = ""
+    else:
+        contract_id = drift.contract_id
+        sample_id = drift.sample_id
+        field_path = drift.field_path
+        console.print(f"[dim]漂移字段: {field_path}[/dim]")
+
     store.add_confirmation(
         consumer_id=consumer_id,
         drift_id=drift_id,
-        contract_id="",
-        sample_id="",
-        field_path="",
+        contract_id=contract_id,
+        sample_id=sample_id,
+        field_path=field_path,
         status=ConfirmationStatus(status),
         comment=comment,
         confirmed_by=by,

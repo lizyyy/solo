@@ -11,6 +11,7 @@ from .models import (
     ConfirmationRecord,
     ConfirmationStatus,
     ImportResult,
+    FieldDrift,
 )
 
 
@@ -26,6 +27,7 @@ class DataStore:
         self.samples: Dict[str, Sample] = {}
         self.consumers: Dict[str, Consumer] = {}
         self.confirmations: Dict[str, ConfirmationRecord] = {}
+        self.drifts: Dict[str, FieldDrift] = {}
 
         self._sample_hashes: Set[str] = set()
         self._contract_hashes: Set[str] = set()
@@ -63,6 +65,13 @@ class DataStore:
                 confirmation = ConfirmationRecord(**item)
                 self.confirmations[confirmation.id] = confirmation
 
+        drifts_file = self.storage_path / "drifts.json"
+        if drifts_file.exists():
+            data = json.loads(drifts_file.read_text(encoding="utf-8"))
+            for item in data:
+                drift = FieldDrift(**item)
+                self.drifts[drift.drift_id] = drift
+
     def _save_to_disk(self):
         contracts_data = [c.model_dump() for c in self.contracts.values()]
         (self.storage_path / "contracts.json").write_text(
@@ -86,6 +95,42 @@ class DataStore:
         (self.storage_path / "confirmations.json").write_text(
             json.dumps(confirmations_data, default=str, indent=2, ensure_ascii=False),
             encoding="utf-8",
+        )
+
+        drifts_data = [d.model_dump() for d in self.drifts.values()]
+        (self.storage_path / "drifts.json").write_text(
+            json.dumps(drifts_data, default=str, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+    def save_drifts(self, drifts: List[FieldDrift]) -> int:
+        count = 0
+        for drift in drifts:
+            if drift.drift_id not in self.drifts:
+                count += 1
+            self.drifts[drift.drift_id] = drift
+        self._save_to_disk()
+        return count
+
+    def get_drift(self, drift_id: str) -> Optional[FieldDrift]:
+        exact = self.drifts.get(drift_id)
+        if exact:
+            return exact
+        matches = [
+            d for d in self.drifts.values()
+            if d.drift_id.startswith(drift_id)
+        ]
+        return matches[0] if matches else None
+
+    def get_drifts_for_contract(self, contract_id: str) -> List[FieldDrift]:
+        return sorted(
+            [d for d in self.drifts.values() if d.contract_id == contract_id],
+            key=lambda d: (d.sample_id, d.field_path),
+        )
+
+    def list_drifts(self) -> List[FieldDrift]:
+        return sorted(
+            self.drifts.values(), key=lambda d: (d.contract_id, d.sample_id, d.field_path)
         )
 
     def _compute_contract_hash(self, contract: Contract) -> str:
@@ -215,16 +260,14 @@ class DataStore:
         self,
         consumer_id: str,
         drift_id: str,
-        contract_id: str,
-        sample_id: str,
-        field_path: str,
         status: ConfirmationStatus,
+        contract_id: str = "",
+        sample_id: str = "",
+        field_path: str = "",
         comment: Optional[str] = None,
         confirmed_by: Optional[str] = None,
     ) -> ConfirmationRecord:
-        record_id = self._generate_confirmation_id(
-            consumer_id, drift_id, contract_id, sample_id, field_path
-        )
+        record_id = self._generate_confirmation_id(consumer_id, drift_id)
 
         existing = self.confirmations.get(record_id)
         if existing:
@@ -232,6 +275,12 @@ class DataStore:
             existing.comment = comment
             existing.confirmed_at = datetime.now()
             existing.confirmed_by = confirmed_by
+            if contract_id:
+                existing.contract_id = contract_id
+            if sample_id:
+                existing.sample_id = sample_id
+            if field_path:
+                existing.field_path = field_path
             self._save_to_disk()
             return existing
 
@@ -255,11 +304,8 @@ class DataStore:
         self,
         consumer_id: str,
         drift_id: str,
-        contract_id: str,
-        sample_id: str,
-        field_path: str,
     ) -> str:
-        key = f"{consumer_id}:{drift_id}:{contract_id}:{sample_id}:{field_path}"
+        key = f"{consumer_id}:{drift_id}"
         return hashlib.md5(key.encode()).hexdigest()[:16]
 
     def get_confirmations_for_drift(
@@ -301,6 +347,7 @@ class DataStore:
         self.samples.clear()
         self.consumers.clear()
         self.confirmations.clear()
+        self.drifts.clear()
         self._sample_hashes.clear()
         self._contract_hashes.clear()
         self._save_to_disk()
