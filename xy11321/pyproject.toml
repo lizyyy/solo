@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agri-finance"
+version = "0.1.0"
+authors = [
+  { name="Agri Finance Team" }
+]
+description = "农机合作社财务管理系统"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "click>=8.0",
+  "pydantic>=2.0",
+  "pandas>=2.0",
+  "python-dotenv>=1.0",
+  "rich>=13.0",
+]
+
+[project.scripts]
+agri-fin = "agri_finance.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
