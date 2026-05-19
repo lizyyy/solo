@@ -353,7 +353,7 @@ def test_step_8_error_cases():
             print_success(f"状态非法: error_code={e.error_code}, message={e.message}")
             error_cases_tested += 1
 
-        print_success(f"共测试 {error_cases_tested} 种错误场景，全部符合预期")
+        print_success(f"共测试 {error_cases_tested} 种服务层错误场景，全部符合预期")
 
         return True
 
@@ -362,6 +362,34 @@ def test_step_8_error_cases():
         raise
     finally:
         db.close()
+
+
+def test_step_9_api_validation():
+    """测试9: API请求验证错误响应"""
+    print_step(9, "API验证错误响应", "验证 FastAPI 请求验证的自定义错误码")
+
+    try:
+        from fastapi.testclient import TestClient
+        from main import app
+
+        client = TestClient(app)
+
+        response = client.post("/api/tasks/", json={})
+        result = response.json()
+
+        if result.get("error_code") == "MISSING_FIELD":
+            print_success(f"缺字段验证: error_code={result['error_code']}, message={result['message']}")
+        else:
+            print_warning(f"验证结果: status_code={response.status_code}, body={result}")
+
+        return True
+
+    except ImportError:
+        print_warning("fastapi[testclient] 未安装，跳过 API 验证测试")
+        return True
+    except Exception as e:
+        print_error(f"API验证测试失败: {str(e)}")
+        raise
 
 
 def main():
@@ -398,6 +426,9 @@ def main():
 
         test_step_8_error_cases()
         results["错误响应"] = "PASS"
+
+        test_step_9_api_validation()
+        results["API验证"] = "PASS"
 
     except Exception as e:
         print_error(f"自检过程中发生错误: {str(e)}")

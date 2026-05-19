@@ -1,7 +1,12 @@
 from pydantic import BaseModel, Field, validator
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict
 from models import TaskStatus, RecoveryAction
+
+
+class ImpactSummaryItem(BaseModel):
+    count: int
+    types: List[str]
 
 
 class ImpactItemBase(BaseModel):
@@ -78,7 +83,7 @@ class RecoveryReport(BaseModel):
     recovery_time: datetime
     recovered_by: str
     impact_count: int
-    impact_summary: List[dict]
+    impact_summary: Dict[str, ImpactSummaryItem]
 
 
 class ErrorResponse(BaseModel):

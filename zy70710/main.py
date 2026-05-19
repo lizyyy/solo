@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
@@ -24,13 +25,42 @@ app = FastAPI(
 
 
 @app.exception_handler(TaskException)
-async def task_exception_handler(request, exc: TaskException):
+async def task_exception_handler(request: Request, exc: TaskException):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={
             "error_code": exc.error_code,
             "message": exc.message,
             "details": exc.details
+        }
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    if errors and len(errors) > 0:
+        first_error = errors[0]
+        loc = first_error.get("loc", [])
+        field_name = ".".join([str(part) for part in loc]) if loc else "unknown"
+        msg = first_error.get("msg", "验证失败")
+        
+        if "missing" in msg.lower() or "required" in msg.lower():
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "error_code": "MISSING_FIELD",
+                    "message": f"缺少必填字段: {field_name}",
+                    "details": {"field": field_name, "raw_error": msg}
+                }
+            )
+    
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={
+            "error_code": "VALIDATION_ERROR",
+            "message": "请求参数验证失败",
+            "details": {"errors": [str(e) for e in errors]}
         }
     )
 
