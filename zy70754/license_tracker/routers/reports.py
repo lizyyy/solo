@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 import csv
 import io
 import os
@@ -54,7 +54,7 @@ async def generate_exception_report(
     approved_count = sum(1 for exc in exceptions if exc.status == ExceptionStatus.APPROVED)
 
     now = datetime.utcnow()
-    thirty_days = now + datetime.timedelta(days=30)
+    thirty_days = now + timedelta(days=30)
     expiring_count = sum(
         1 for exc in exceptions
         if exc.status == ExceptionStatus.APPROVED
