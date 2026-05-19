@@ -140,6 +140,8 @@ def submit_annotation(
         raise HTTPException(status_code=404, detail="Task item not found")
     if item.status == "completed":
         raise HTTPException(status_code=400, detail="Task already completed")
+    if item.status == "skipped":
+        raise HTTPException(status_code=400, detail="Task has been skipped")
     
     item.status = "completed"
     item.annotation_result = request.annotation_result
@@ -154,8 +156,8 @@ def submit_annotation(
     
     package = db.query(TaskPackage).filter(TaskPackage.id == item.package_id).first()
     if package:
-        all_completed = all(i.status == "completed" for i in package.items)
-        if all_completed:
+        all_finished = all(i.status in ["completed", "skipped"] for i in package.items)
+        if all_finished:
             package.status = "completed"
             package.completed_at = datetime.utcnow()
     
@@ -176,6 +178,16 @@ def create_skip(skip: schemas.SkipRecordCreate, db: Session = Depends(get_db)):
     sample.status = "skipped"
     sample.locked_by = None
     sample.locked_at = None
+    
+    task_item = db.query(TaskItem).filter(TaskItem.sample_id == skip.sample_id, TaskItem.status == "assigned").first()
+    if task_item:
+        task_item.status = "skipped"
+        package = db.query(TaskPackage).filter(TaskPackage.id == task_item.package_id).first()
+        if package:
+            all_finished = all(i.status in ["completed", "skipped"] for i in package.items)
+            if all_finished:
+                package.status = "completed"
+                package.completed_at = datetime.utcnow()
     
     db.add(db_skip)
     db.commit()
