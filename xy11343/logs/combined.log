@@ -1,0 +1,22 @@
+{"level":"info","message":"Database initialized successfully","meta":{},"timestamp":"2026-05-19T17:02:54.258Z"}
+{"level":"info","message":"Server is running on port 3000","meta":{},"timestamp":"2026-05-19T17:02:54.262Z"}
+{"level":"info","message":"API Documentation: http://localhost:3000/api/docs","meta":{},"timestamp":"2026-05-19T17:02:54.262Z"}
+{"level":"info","message":"Health Check: http://localhost:3000/api/health","meta":{},"timestamp":"2026-05-19T17:02:54.262Z"}
+{"action":"create","entityId":"0318fa97-45f2-4145-9c5d-f4aec29105c1","entityType":"part","level":"info","message":"Audit log created","meta":{},"timestamp":"2026-05-19T17:06:23.515Z"}
+{"level":"info","message":"Part created","meta":{},"part_code":"P-AC-001","part_name":"空调压缩机","timestamp":"2026-05-19T17:06:23.515Z"}
+{"action":"create","entityId":"f6531086-a0c2-4de2-a4bc-dcadeaf603de","entityType":"part","level":"info","message":"Audit log created","meta":{},"timestamp":"2026-05-19T17:06:23.554Z"}
+{"level":"info","message":"Part created","meta":{},"part_code":"P-AC-002","part_name":"控制电路板","timestamp":"2026-05-19T17:06:23.554Z"}
+{"action":"create","entityId":"fa211d6f-fdd2-4b73-a2b1-268033c0af7b","entityType":"engineer","level":"info","message":"Audit log created","meta":{},"timestamp":"2026-05-19T17:06:23.602Z"}
+{"engineer_code":"E-001","level":"info","message":"Engineer created","meta":{},"timestamp":"2026-05-19T17:06:23.603Z"}
+{"action":"claim","entityId":"d430287c-3bf9-4afb-94bb-f59d52deea24","entityType":"claim","level":"info","message":"Audit log created","meta":{},"timestamp":"2026-05-19T17:06:23.769Z"}
+{"claimId":"d430287c-3bf9-4afb-94bb-f59d52deea24","engineer_code":"E-001","level":"info","message":"Claim created","meta":{},"part_code":"P-AC-001","quantity":2,"timestamp":"2026-05-19T17:06:23.769Z"}
+{"action":"claim","level":"info","message":"Idempotent request detected, returning cached result","meta":{},"requestId":"claim-001","timestamp":"2026-05-19T17:06:23.896Z"}
+{"action":"installation","entityId":"70b52f69-27c8-4d56-98b1-08d018766b91","entityType":"installation","level":"info","message":"Audit log created","meta":{},"timestamp":"2026-05-19T17:06:24.001Z"}
+{"claim_id":"d430287c-3bf9-4afb-94bb-f59d52deea24","installationId":"70b52f69-27c8-4d56-98b1-08d018766b91","level":"info","message":"Installation created","meta":{},"timestamp":"2026-05-19T17:06:24.001Z"}
+{"action":"return","entityId":"0b36ef76-810b-4b94-8a27-8bd74d210dbf","entityType":"return","level":"info","message":"Audit log created","meta":{},"timestamp":"2026-05-19T17:06:24.059Z"}
+{"claim_id":"d430287c-3bf9-4afb-94bb-f59d52deea24","level":"info","message":"Return created","meta":{},"quantity":1,"returnId":"0b36ef76-810b-4b94-8a27-8bd74d210dbf","timestamp":"2026-05-19T17:06:24.059Z"}
+{"action":"vendor_claim","entityId":"ff322d25-8dff-45e8-9349-f3c83f2db4cb","entityType":"vendor_claim","level":"info","message":"Audit log created","meta":{},"timestamp":"2026-05-19T17:06:24.227Z"}
+{"claim_amount":850.5,"level":"info","message":"Vendor claim created","meta":{},"return_id":"0b36ef76-810b-4b94-8a27-8bd74d210dbf","timestamp":"2026-05-19T17:06:24.227Z","vendorClaimId":"ff322d25-8dff-45e8-9349-f3c83f2db4cb"}
+{"action":"write_off","entityId":"3d6d70ee-3d0a-42fb-942a-41fdce12dba8","entityType":"write_off","level":"info","message":"Audit log created","meta":{},"timestamp":"2026-05-19T17:06:24.282Z"}
+{"amount":425.25,"claim_id":"d430287c-3bf9-4afb-94bb-f59d52deea24","level":"info","message":"Write-off created","meta":{},"timestamp":"2026-05-19T17:06:24.282Z","writeOffId":"3d6d70ee-3d0a-42fb-942a-41fdce12dba8"}
+{"count":1,"filename":"claims_1779210384558.csv","level":"info","message":"Claims exported","meta":{},"timestamp":"2026-05-19T17:06:24.559Z"}
