@@ -1,0 +1,21 @@
+{
+  "name": "accompany-inspection-mgr",
+  "version": "1.0.0",
+  "description": "门诊陪检管理后端工具",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "init-db": "node src/scripts/init-db.js",
+    "import-sample": "node src/scripts/import-sample.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2",
+    "csv-writer": "^1.6.0",
+    "uuid": "^9.0.1"
+  },
+  "keywords": ["clinic", "accompany", "inspection", "management"],
+  "author": "",
+  "license": "MIT"
+}
