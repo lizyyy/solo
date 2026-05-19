@@ -1,0 +1,47 @@
+[
+  {
+    "id": "c163afcb-f83b-4cc3-a15e-a478b8ba8444",
+    "productId": "P001",
+    "productName": "新鲜草莓",
+    "shortageDate": "2024-01-16",
+    "expectedQuantity": 100,
+    "actualQuantity": 95,
+    "shortageQuantity": 5,
+    "supplierId": "S001",
+    "supplierName": "草莓农场",
+    "reason": "天气原因导致减产",
+    "status": "reported",
+    "createdAt": "2026-05-19T08:58:12.077Z",
+    "updatedAt": "2026-05-19T08:58:12.077Z"
+  },
+  {
+    "id": "69f6d85a-ef5a-46ae-8cc7-ac847da342fe",
+    "productId": "P002",
+    "productName": "进口车厘子",
+    "shortageDate": "2024-01-16",
+    "expectedQuantity": 50,
+    "actualQuantity": 45,
+    "shortageQuantity": 5,
+    "supplierId": "S002",
+    "supplierName": "进口水果供应商",
+    "reason": "海关清关延迟",
+    "status": "reported",
+    "createdAt": "2026-05-19T08:58:12.077Z",
+    "updatedAt": "2026-05-19T08:58:12.077Z"
+  },
+  {
+    "id": "90a4981a-6b7d-4bb6-92c6-ade3ecb386f4",
+    "productId": "P003",
+    "productName": "有机猕猴桃",
+    "shortageDate": "2024-01-16",
+    "expectedQuantity": 80,
+    "actualQuantity": 70,
+    "shortageQuantity": 10,
+    "supplierId": "S003",
+    "supplierName": "有机农场",
+    "reason": "运输损坏",
+    "status": "reported",
+    "createdAt": "2026-05-19T08:58:12.077Z",
+    "updatedAt": "2026-05-19T08:58:12.077Z"
+  }
+]

@@ -1,0 +1,6 @@
+orderNo,userId,userName,phone,groupLeaderId,groupLeaderName,productId,productName,quantity,unitPrice,totalAmount,paymentTime
+ORD006,U006,孙八,13800138006,G001,李团长,P001,新鲜草莓,2,29.90,59.80,2024-01-15 10:30:00
+,U007,周九,13800138007,G001,李团长,P002,进口车厘子,1,89.90,89.90,2024-01-15 11:00:00
+ORD008,U008,吴十,invalid_phone,G001,李团长,P003,有机猕猴桃,abc,19.90,59.70,2024-01-15 12:00:00
+ORD009,U009,郑十一,13800138009,G002,王团长,P001,新鲜草莓,2,29.90,100.00,2024-01-15 14:00:00
+ORD010,U010,王十二,13800138010,G002,王团长,P002,进口车厘子,invalid,89.90,179.80,invalid_date

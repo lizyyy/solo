@@ -1,0 +1,36 @@
+[
+  {
+    "ruleType": "refund",
+    "productId": "P001",
+    "productCategory": "fruit",
+    "minShortageQuantity": 1,
+    "compensationType": "refund",
+    "refundRate": 1.0,
+    "priority": 10,
+    "enabled": true,
+    "description": "草莓缺货全额退款"
+  },
+  {
+    "ruleType": "coupon",
+    "productId": "P002",
+    "productCategory": "fruit",
+    "minShortageQuantity": 1,
+    "compensationType": "coupon",
+    "couponValue": 10,
+    "priority": 5,
+    "enabled": true,
+    "description": "车厘子缺货补偿10元优惠券"
+  },
+  {
+    "ruleType": "exchange",
+    "productId": "P003",
+    "productCategory": "fruit",
+    "minShortageQuantity": 1,
+    "compensationType": "exchange",
+    "exchangeProductId": "P004",
+    "exchangeProductName": "进口香蕉",
+    "priority": 1,
+    "enabled": true,
+    "description": "猕猴桃缺货换货为香蕉"
+  }
+]
