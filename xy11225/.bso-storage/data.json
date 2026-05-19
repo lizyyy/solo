@@ -1,0 +1,123 @@
+{
+  "records": [
+    {
+      "cabinetId": "CAB-001",
+      "faultType": "柜门打不开",
+      "description": "柜门卡住了",
+      "reporter": "张三",
+      "handler": "李四",
+      "status": "待处理",
+      "isOffline": false,
+      "id": "acd1f80d-26cb-4c26-ae7e-0c160e367c61",
+      "createdAt": "2026-05-19T06:46:11.170Z",
+      "updatedAt": "2026-05-19T06:46:50.383Z",
+      "processingResult": "放行",
+      "processingReason": "所有规则校验通过，已放行",
+      "mergedFrom": [
+        "c2202c02-4cae-4bbe-9a72-709d588a4856",
+        "2f788e73-eb2d-4b27-8ce8-cc9e740c6215"
+      ]
+    },
+    {
+      "cabinetId": "CAB-001",
+      "faultType": "柜门打不开",
+      "description": "又一个柜门故障",
+      "reporter": "王五",
+      "status": "已合并",
+      "isOffline": false,
+      "id": "c2202c02-4cae-4bbe-9a72-709d588a4856",
+      "createdAt": "2026-05-19T06:46:18.634Z",
+      "updatedAt": "2026-05-19T06:46:18.635Z",
+      "processingResult": "拦截",
+      "processingReason": "检测到1小时内相同故障（柜子 CAB-001，柜门打不开），已合并到记录 acd1f80d"
+    },
+    {
+      "cabinetId": "CAB-002",
+      "faultType": "扫码失败",
+      "description": "扫不上",
+      "reporter": "王五",
+      "status": "待处理",
+      "isOffline": true,
+      "id": "c83ee2f4-686c-489b-a773-535f04869e30",
+      "createdAt": "2026-05-19T06:46:32.393Z",
+      "updatedAt": "2026-05-19T06:46:32.395Z",
+      "processingResult": "拦截",
+      "processingReason": "柜子 CAB-002 处于离线状态，已拦截"
+    },
+    {
+      "cabinetId": "CAB-001",
+      "faultType": "柜门打不开",
+      "description": "柜门机械故障，无法正常开启",
+      "reporter": "张三",
+      "handler": "李四",
+      "status": "已合并",
+      "isOffline": false,
+      "id": "2f788e73-eb2d-4b27-8ce8-cc9e740c6215",
+      "createdAt": "2026-05-19T06:46:50.377Z",
+      "updatedAt": "2026-05-19T06:46:50.383Z",
+      "processingResult": "拦截",
+      "processingReason": "检测到1小时内相同故障（柜子 CAB-001，柜门打不开），已合并到记录 acd1f80d"
+    },
+    {
+      "cabinetId": "CAB-002",
+      "faultType": "扫码失败",
+      "description": "二维码扫描器无法识别",
+      "reporter": "王五",
+      "status": "待处理",
+      "isOffline": true,
+      "id": "18b28597-a588-4354-abac-00570bb1d82b",
+      "createdAt": "2026-05-19T06:46:50.383Z",
+      "updatedAt": "2026-05-19T06:46:50.383Z",
+      "processingResult": "拦截",
+      "processingReason": "柜子 CAB-002 处于离线状态，已拦截"
+    },
+    {
+      "cabinetId": "CAB-001",
+      "faultType": "空仓误报",
+      "description": "明明有电池却显示空仓",
+      "reporter": "赵六",
+      "status": "待处理",
+      "isOffline": false,
+      "id": "1c007c6a-52e3-465a-b12f-b21cae7c9f29",
+      "createdAt": "2026-05-19T06:46:50.383Z",
+      "updatedAt": "2026-05-19T06:46:50.384Z",
+      "processingResult": "放行",
+      "processingReason": "所有规则校验通过，已放行"
+    },
+    {
+      "cabinetId": "CAB-003",
+      "faultType": "柜门打不开",
+      "description": "电子锁故障",
+      "reporter": "张三",
+      "status": "待处理",
+      "isOffline": false,
+      "id": "246cf0e9-d8cb-4560-a91b-01b2ca904845",
+      "createdAt": "2026-05-19T06:46:50.384Z",
+      "updatedAt": "2026-05-19T06:46:50.384Z",
+      "processingResult": "放行",
+      "processingReason": "所有规则校验通过，已放行"
+    }
+  ],
+  "batches": [
+    {
+      "total": 4,
+      "successCount": 4,
+      "failureCount": 0,
+      "successes": [
+        "2f788e73-eb2d-4b27-8ce8-cc9e740c6215",
+        "18b28597-a588-4354-abac-00570bb1d82b",
+        "1c007c6a-52e3-465a-b12f-b21cae7c9f29",
+        "246cf0e9-d8cb-4560-a91b-01b2ca904845"
+      ],
+      "failures": [],
+      "batchId": "11a9d743-d334-4cc5-8422-9c94c955c3ae",
+      "createdAt": "2026-05-19T06:46:50.384Z"
+    }
+  ],
+  "cabinets": {
+    "CAB-002": {
+      "isOffline": true,
+      "lastMaintenanceAt": "2026-05-19T06:46:32.339Z"
+    }
+  }
+}

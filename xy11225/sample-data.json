@@ -1,0 +1,27 @@
+[
+  {
+    "cabinetId": "CAB-001",
+    "faultType": "柜门打不开",
+    "description": "柜门机械故障，无法正常开启",
+    "reporter": "张三",
+    "handler": "李四"
+  },
+  {
+    "cabinetId": "CAB-002",
+    "faultType": "扫码失败",
+    "description": "二维码扫描器无法识别",
+    "reporter": "王五"
+  },
+  {
+    "cabinetId": "CAB-001",
+    "faultType": "空仓误报",
+    "description": "明明有电池却显示空仓",
+    "reporter": "赵六"
+  },
+  {
+    "cabinetId": "CAB-003",
+    "faultType": "柜门打不开",
+    "description": "电子锁故障",
+    "reporter": "张三"
+  }
+]
