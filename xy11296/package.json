@@ -1,0 +1,26 @@
+{
+  "name": "homestay-cleaning-system",
+  "version": "1.0.0",
+  "description": "民宿保洁管理系统 - 缺图拦截、超时扣分、返工结算",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node scripts/init-db.js",
+    "seed": "node/scripts/seed-data.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "multer": "^1.4.5-lts.1",
+    "json2csv": "^6.0.0-alpha.2",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["homestay", "cleaning", "management"],
+  "author": "",
+  "license": "MIT"
+}
