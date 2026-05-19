@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接口错误字典工作台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>🔧 接口错误字典工作台</h1>
+            <div class="header-actions">
+                <button onclick="showCreateModal()" class="btn btn-primary">+ 新建错误码</button>
+                <button onclick="exportData('json')" class="btn btn-secondary">导出 JSON</button>
+                <button onclick="exportData('csv')" class="btn btn-secondary">导出 CSV</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="filter-section">
+                    <h3>筛选条件</h3>
+                    <div class="filter-group">
+                        <label>错误码</label>
+                        <input type="text" id="filterErrorCode" placeholder="如 PAY_001">
+                    </div>
+                    <div class="filter-group">
+                        <label>接口路径</label>
+                        <input type="text" id="filterApiPath" placeholder="如 /api/payment">
+                    </div>
+                    <div class="filter-group">
+                        <label>状态</label>
+                        <select id="filterStatus">
+                            <option value="">全部</option>
+                            <option value="draft">草稿</option>
+                            <option value="pending_approval">待审批</option>
+                            <option value="approved">已通过</option>
+                            <option value="rejected">已驳回</option>
+                            <option value="deprecated">已废弃</option>
+                            <option value="merged">已归并</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>归属团队</label>
+                        <select id="filterTeam">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <button onclick="applyFilters()" class="btn btn-primary btn-block">应用筛选</button>
+                    <button onclick="resetFilters()" class="btn btn-secondary btn-block">重置</button>
+                </div>
+
+                <div class="stats-section">
+                    <h3>统计信息</h3>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalCount">0</div>
+                        <div class="stat-label">错误码总数</div>
+                    </div>
+                    <div class="stat-card approved">
+                        <div class="stat-number" id="approvedCount">0</div>
+                        <div class="stat-label">已审批</div>
+                    </div>
+                    <div class="stat-card pending">
+                        <div class="stat-number" id="pendingCount">0</div>
+                        <div class="stat-label">待审批</div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="content">
+                <div class="list-header">
+                    <h2>错误码列表</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                                <th>错误码</th>
+                                <th>接口路径</th>
+                                <th>用户文案</th>
+                                <th>团队</th>
+                                <th>状态</th>
+                                <th>版本</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="errorCodeList">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="batch-actions" id="batchActions" style="display: none;">
+                    <span>已选择 <span id="selectedCount">0</span> 项</span>
+                    <button onclick="showMergeModal()" class="btn btn-warning">归并选中</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新建错误码</h3>
+                <span class="close" onclick="closeModal('createModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="createForm">
+                    <div class="form-group">
+                        <label>错误码 *</label>
+                        <input type="text" name="error_code" required placeholder="如 PAY_001">
+                    </div>
+                    <div class="form-group">
+                        <label>接口路径 *</label>
+                        <input type="text" name="api_path" required placeholder="如 /api/payment/create">
+                    </div>
+                    <div class="form-group">
+                        <label>用户文案 *</label>
+                        <textarea name="user_message" required placeholder="用户看到的提示信息"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>调试信息</label>
+                        <textarea name="debug_message" placeholder="开发人员看到的调试信息"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>排查建议</label>
+                        <textarea name="troubleshooting" placeholder="排查问题的步骤建议"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>归属团队</label>
+                        <select name="team_id" id="createTeamSelect">
+                            <option value="">请选择团队</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('createModal')" class="btn btn-secondary">取消</button>
+                <button onclick="submitCreate()" class="btn btn-primary">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>错误码详情</h3>
+                <span class="close" onclick="closeModal('detailModal')">&times;</span>
+            </div>
+            <div class="modal-body" id="detailContent">
+            </div>
+        </div>
+    </div>
+
+    <div id="mergeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>错误码归并</h3>
+                <span class="close" onclick="closeModal('mergeModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>将选中的 <strong id="mergeCount">0</strong> 个错误码归并为一个新的错误码：</p>
+                <div class="form-group">
+                    <label>新错误码 *</label>
+                    <input type="text" id="mergeErrorCode" required placeholder="如 COMMON_001">
+                </div>
+                <div class="form-group">
+                    <label>统一用户文案 *</label>
+                    <textarea id="mergeUserMessage" required placeholder="归并后的统一提示文案"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('mergeModal')" class="btn btn-secondary">取消</button>
+                <button onclick="submitMerge()" class="btn btn-warning">确认归并</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
