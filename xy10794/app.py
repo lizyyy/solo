@@ -233,24 +233,62 @@ class TimeReportDB:
         if not report:
             return {"error": "报表不存在"}
         
+        is_valid, error_msg = self._validate_report(report)
         issues = []
-        if report.hours < 0:
-            issues.append("工时为负数")
-        if report.hours > 24:
-            issues.append("工时超过24小时")
-        try:
-            report_date = datetime.strptime(report.report_date, "%Y-%m-%d")
-        except ValueError:
-            issues.append("日期格式错误")
+        if not is_valid and error_msg:
+            issues.append(error_msg)
         
         return {
             "report_id": report_id,
             "status": report.approval_status,
+            "current_error": report.error_message,
             "issues": issues,
             "original_input": report.original_input,
             "fill_reason": report.fill_reason,
-            "recommendation": "重新提交" if issues else "正常"
+            "can_retry": report.can_retry,
+            "recommendation": "数据合法，无需操作" if is_valid else ("建议修正数据后重试" if report.can_retry else "需联系管理员处理")
         }
+    
+    def create_report(self, data: Dict) -> tuple[TimeReport, str]:
+        report_id = str(uuid.uuid4())
+        now = datetime.now().isoformat()
+        
+        try:
+            hours = float(data.get("hours", 0))
+        except (ValueError, TypeError):
+            hours = 0.0
+        
+        report = TimeReport(
+            id=report_id,
+            employee_id=str(data.get("employee_id", "")),
+            employee_name=str(data.get("employee_name", "")),
+            project_id=str(data.get("project_id", "")),
+            project_name=str(data.get("project_name", "")),
+            report_date=str(data.get("report_date", "")),
+            hours=hours,
+            original_input=data.copy(),
+            processed_result=None,
+            approval_status="pending",
+            fill_reason=None,
+            error_message=None,
+            can_retry=False,
+            created_at=now,
+            updated_at=now
+        )
+        
+        is_valid, error_msg = self._validate_report(report)
+        if is_valid:
+            report.approval_status = "success"
+            report.can_retry = False
+            message = "发布成功，校验通过"
+        else:
+            report.approval_status = "blocked"
+            report.error_message = error_msg
+            report.can_retry = True
+            message = f"发布失败，校验不通过: {error_msg}"
+        
+        self.reports[report_id] = report
+        return report, message
 
 db = TimeReportDB()
 
@@ -265,6 +303,23 @@ def get_reports():
     status = request.args.get('status')
     reports = db.search(employee_name, project_name, status)
     return jsonify([asdict(r) for r in reports])
+
+@app.route('/api/reports', methods=['POST'])
+def create_report():
+    data = request.get_json() or {}
+    required_fields = ["employee_id", "employee_name", "project_id", "project_name", "report_date", "hours"]
+    missing = [f for f in required_fields if f not in data or not str(data[f]).strip()]
+    
+    if missing:
+        return jsonify({"error": f"缺少必填字段: {', '.join(missing)}"}), 400
+    
+    report, message = db.create_report(data)
+    result = asdict(report)
+    result["publish_message"] = message
+    
+    if report.approval_status != "success":
+        return jsonify(result), 400
+    return jsonify(result)
 
 @app.route('/api/reports/<report_id>', methods=['GET'])
 def get_report(report_id):
@@ -354,6 +409,21 @@ HTML_TEMPLATE = """
         .btn-diagnose { background: #722ed1; color: white; }
         .btn-rollback { background: #faad14; color: white; }
         .btn-detail { background: #f0f0f0; color: #333; }
+        .btn-publish { background: #52c41a; color: white; padding: 10px 24px; font-size: 14px; }
+        
+        .publish-bar { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .publish-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+        .publish-header h3 { margin: 0; color: #333; font-size: 16px; }
+        .publish-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 12px; color: #666; font-weight: 500; }
+        .form-group input, .form-group select { padding: 10px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
+        .form-actions { display: flex; gap: 10px; align-items: flex-end; }
+        .form-actions button { padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-submit { background: #52c41a; color: white; border: none; }
+        .btn-submit:hover { background: #73d13d; }
+        .btn-clear { background: #f0f0f0; color: #333; border: none; }
+        .btn-clear:hover { background: #d9d9d9; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
         .modal.active { display: flex; align-items: center; justify-content: center; }
@@ -394,6 +464,48 @@ HTML_TEMPLATE = """
             <div class="stat-card stat-retry">
                 <div class="stat-value" id="retry-count">0</div>
                 <div class="stat-label">可重试</div>
+            </div>
+        </div>
+        
+        <div class="publish-bar">
+            <div class="publish-header">
+                <h3>📝 发布新工时报表</h3>
+            </div>
+            <div class="publish-form" id="publish-form">
+                <div class="form-group">
+                    <label>员工ID</label>
+                    <input type="text" id="new-employee-id" placeholder="例: E006">
+                </div>
+                <div class="form-group">
+                    <label>员工姓名</label>
+                    <input type="text" id="new-employee-name" placeholder="例: 张三">
+                </div>
+                <div class="form-group">
+                    <label>项目ID</label>
+                    <select id="new-project-id">
+                        <option value="">选择项目</option>
+                        <option value="P001">P001 - 工时系统改造</option>
+                        <option value="P002">P002 - 客户管理系统</option>
+                        <option value="P003">P003 - 财务系统</option>
+                        <option value="P999">P999 - 无效项目(测试)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>项目名称</label>
+                    <input type="text" id="new-project-name" placeholder="自动填充">
+                </div>
+                <div class="form-group">
+                    <label>填报日期</label>
+                    <input type="date" id="new-report-date" value="2026-05-20">
+                </div>
+                <div class="form-group">
+                    <label>工时(小时)</label>
+                    <input type="number" id="new-hours" placeholder="0-24" step="0.5" min="0" max="24">
+                </div>
+                <div class="form-actions">
+                    <button class="btn-clear" onclick="clearPublishForm()">清空</button>
+                    <button class="btn-submit" onclick="submitPublish()">发布提交</button>
+                </div>
             </div>
         </div>
         
@@ -527,12 +639,19 @@ HTML_TEMPLATE = """
                 <div class="detail-section">
                     <h4>诊断信息</h4>
                     <div class="detail-row"><div class="detail-label">报表ID</div><div class="detail-value">${data.report_id}</div></div>
-                    <div class="detail-row"><div class="detail-label">当前状态</div><div class="detail-value">${statusMap[data.status]?.text || data.status}</div></div>
-                    <div class="detail-row"><div class="detail-label">建议</div><div class="detail-value">${data.recommendation}</div></div>
+                    <div class="detail-row"><div class="detail-label">当前状态</div><div class="detail-value"><span class="status-badge ${statusMap[data.status]?.class}">${statusMap[data.status]?.text || data.status}</span></div></div>
+                    <div class="detail-row"><div class="detail-label">可重试</div><div class="detail-value">${data.can_retry ? '✅ 是' : '❌ 否'}</div></div>
+                    <div class="detail-row"><div class="detail-label">处理建议</div><div class="detail-value" style="font-weight:500;color:#1890ff">${data.recommendation}</div></div>
                 </div>
+                ${data.current_error ? `
                 <div class="detail-section">
-                    <h4>问题列表</h4>
-                    ${data.issues.length ? data.issues.map(i => `<div class="error-detail">${i}</div>`).join('') : '<p>无问题</p>'}
+                    <h4>当前错误明细</h4>
+                    <div class="error-detail">${data.current_error}</div>
+                </div>
+                ` : ''}
+                <div class="detail-section">
+                    <h4>校验检测到的问题</h4>
+                    ${data.issues.length ? data.issues.map(i => `<div class="error-detail">${i}</div>`).join('') : '<p style="color:#52c41a">✅ 无问题，数据合法</p>'}
                 </div>
                 <div class="detail-section">
                     <h4>原始输入</h4>
@@ -603,6 +722,53 @@ HTML_TEMPLATE = """
         document.getElementById('detail-modal').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
         });
+        
+        const projectMap = {
+            'P001': '工时系统改造',
+            'P002': '客户管理系统',
+            'P003': '财务系统',
+            'P999': '未知项目'
+        };
+        
+        document.getElementById('new-project-id').addEventListener('change', function() {
+            document.getElementById('new-project-name').value = projectMap[this.value] || '';
+        });
+        
+        function clearPublishForm() {
+            document.getElementById('new-employee-id').value = '';
+            document.getElementById('new-employee-name').value = '';
+            document.getElementById('new-project-id').value = '';
+            document.getElementById('new-project-name').value = '';
+            document.getElementById('new-hours').value = '';
+        }
+        
+        async function submitPublish() {
+            const data = {
+                employee_id: document.getElementById('new-employee-id').value,
+                employee_name: document.getElementById('new-employee-name').value,
+                project_id: document.getElementById('new-project-id').value,
+                project_name: document.getElementById('new-project-name').value,
+                report_date: document.getElementById('new-report-date').value,
+                hours: parseFloat(document.getElementById('new-hours').value) || 0
+            };
+            
+            const res = await fetch('/api/reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await res.json();
+            
+            if (res.ok) {
+                alert('✅ 发布成功！报表已创建并通过校验。');
+                clearPublishForm();
+            } else {
+                alert(`❌ 发布校验失败：\\n${result.error_message || result.error || result.publish_message}`);
+            }
+            
+            loadReports();
+        }
         
         loadReports();
     </script>
