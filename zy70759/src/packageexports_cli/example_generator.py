@@ -142,20 +142,19 @@ class ExampleGenerator:
             import_stmt = f"import example from '{self.package_name}/{sub_path}';"
             
             target_sample = entry.target_path.replace("*", sample_wildcard)
-            wildcard_entry = file_checks.get(entry.target_path)
-            if wildcard_entry is not None:
-                is_valid = wildcard_entry
-            else:
-                is_valid = file_checks.get(target_sample, False)
+            pattern_has_matches = file_checks.get(entry.target_path, False)
+            sample_file_exists = file_checks.get(target_sample, False)
+            
+            is_valid = pattern_has_matches
             
             examples.append(ImportExample(
                 import_statement=import_stmt,
                 resolved_path=target_sample,
                 is_valid=is_valid,
-                issues=[] if is_valid else [Issue(
-                    severity=IssueSeverity.WARNING,
+                issues=[] if sample_file_exists else [Issue(
+                    severity=IssueSeverity.INFO,
                     issue_type=IssueType.FILE_NOT_FOUND,
-                    message=f"Wildcard resolved file may not exist: {target_sample}",
+                    message=f"Example file not found (wildcard pattern has matches): {target_sample}",
                     export_path=export_path,
                     target_path=target_sample,
                 )],

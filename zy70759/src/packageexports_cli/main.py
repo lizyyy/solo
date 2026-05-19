@@ -29,27 +29,26 @@ def run_check(
             package_version="unknown",
             issues=parse_issues,
         )
-        return result, 1
+    else:
+        validator = FileValidator(package_root)
+        file_checks, file_issues = validator.validate_entries(parser.exports_entries)
         
-    validator = FileValidator(package_root)
-    file_checks, file_issues = validator.validate_entries(parser.exports_entries)
-    
-    example_generator = ExampleGenerator(package_data.get("name", "package"))
-    import_examples = example_generator.generate_examples(
-        parser.exports_entries,
-        file_checks,
-    )
-    
-    all_issues = parse_issues + file_issues
-    
-    result = ValidationResult(
-        package_name=package_data.get("name", "unknown"),
-        package_version=package_data.get("version", "unknown"),
-        exports_entries=parser.exports_entries,
-        issues=all_issues,
-        import_examples=import_examples,
-        file_checks=file_checks,
-    )
+        example_generator = ExampleGenerator(package_data.get("name", "package"))
+        import_examples = example_generator.generate_examples(
+            parser.exports_entries,
+            file_checks,
+        )
+        
+        all_issues = parse_issues + file_issues
+        
+        result = ValidationResult(
+            package_name=package_data.get("name", "unknown"),
+            package_version=package_data.get("version", "unknown"),
+            exports_entries=parser.exports_entries,
+            issues=all_issues,
+            import_examples=import_examples,
+            file_checks=file_checks,
+        )
     
     report_gen = ReportGenerator(console)
     

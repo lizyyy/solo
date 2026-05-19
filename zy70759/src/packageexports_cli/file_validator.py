@@ -119,7 +119,7 @@ class FileValidator:
                 },
             ))
         else:
-            for match_path in matching_files[:5]:
+            for match_path in matching_files:
                 rel_path = Path(match_path).relative_to(self.package_root)
                 self.file_checks[f"./{rel_path}"] = True
                 
