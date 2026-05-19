@@ -1,0 +1,86 @@
+[
+  {
+    "id": "mpcaxf7nxsbsr",
+    "type": "import",
+    "total": 5,
+    "success": 2,
+    "failed": 3,
+    "successItems": [
+      {
+        "id": "mpcaxf7jnpqv6",
+        "reagentId": "R001"
+      },
+      {
+        "id": "mpcaxf7maoizy",
+        "reagentId": "R002"
+      }
+    ],
+    "failedItems": [
+      {
+        "originalIndex": 2,
+        "data": {
+          "试剂ID": "R999",
+          "数量": "2",
+          "申请人": "李四",
+          "部门": "生物系",
+          "用途": "试剂不存在"
+        },
+        "errors": [
+          "试剂 R999 不存在"
+        ]
+      },
+      {
+        "originalIndex": 3,
+        "data": {
+          "试剂ID": "R002",
+          "数量": "100",
+          "申请人": "王五",
+          "部门": "化工学院",
+          "用途": "库存不足"
+        },
+        "errors": [
+          "库存不足: 浓硫酸 当前库存 15 瓶，申请 100 瓶"
+        ]
+      },
+      {
+        "originalIndex": 4,
+        "data": {
+          "试剂ID": "R005",
+          "数量": "0",
+          "申请人": "赵六",
+          "部门": "材料系",
+          "用途": "数量为0"
+        },
+        "errors": [
+          "申请数量必须大于0"
+        ]
+      }
+    ],
+    "createdAt": "2026-05-19T07:18:38.147Z",
+    "lastRetryAt": "2026-05-19T07:25:00.967Z",
+    "updatedAt": "2026-05-19T07:25:00.968Z"
+  },
+  {
+    "id": "mpcb4ykbwtfzc",
+    "type": "import",
+    "total": 3,
+    "success": 3,
+    "failed": 0,
+    "successItems": [
+      {
+        "id": "mpcb4yk6qrt45",
+        "reagentId": "R001"
+      },
+      {
+        "id": "mpcb4ykb1y92x",
+        "reagentId": "R004"
+      },
+      {
+        "id": "mpcb4ykbwmeqq",
+        "reagentId": "R003"
+      }
+    ],
+    "failedItems": [],
+    "createdAt": "2026-05-19T07:24:29.819Z"
+  }
+]

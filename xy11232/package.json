@@ -1,0 +1,21 @@
+{
+  "name": "lab-reagent-cli",
+  "version": "1.0.0",
+  "description": "高校实验室试剂库存与审批管理CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "reagent": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-tests.js"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "keywords": ["laboratory", "reagent", "inventory", "approval", "cli"],
+  "author": "",
+  "license": "MIT"
+}

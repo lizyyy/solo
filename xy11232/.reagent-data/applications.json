@@ -1,0 +1,60 @@
+[
+  {
+    "id": "mpcaxf7jnpqv6",
+    "reagentId": "R001",
+    "quantity": 5,
+    "applicant": "张三",
+    "department": "化学系",
+    "purpose": "正常申请",
+    "status": "approved",
+    "createdAt": "2026-05-19T07:18:38.143Z",
+    "approvalHistory": [],
+    "updatedAt": "2026-05-19T07:18:57.821Z"
+  },
+  {
+    "id": "mpcaxf7maoizy",
+    "reagentId": "R002",
+    "quantity": 5,
+    "applicant": "孙七",
+    "department": "环境系",
+    "purpose": "高危试剂需要双人审批",
+    "status": "approved",
+    "createdAt": "2026-05-19T07:18:38.146Z",
+    "approvalHistory": [],
+    "updatedAt": "2026-05-19T07:24:19.069Z"
+  },
+  {
+    "id": "mpcb4yk6qrt45",
+    "reagentId": "R001",
+    "quantity": 5,
+    "applicant": "张三",
+    "department": "化学系",
+    "purpose": "实验课",
+    "status": "pending",
+    "createdAt": "2026-05-19T07:24:29.814Z",
+    "approvalHistory": [],
+    "updatedAt": "2026-05-19T07:24:37.926Z"
+  },
+  {
+    "id": "mpcb4ykb1y92x",
+    "reagentId": "R004",
+    "quantity": 10,
+    "applicant": "李四",
+    "department": "生物系",
+    "purpose": "科研项目",
+    "status": "pending",
+    "createdAt": "2026-05-19T07:24:29.819Z",
+    "approvalHistory": []
+  },
+  {
+    "id": "mpcb4ykbwmeqq",
+    "reagentId": "R003",
+    "quantity": 3,
+    "applicant": "王五",
+    "department": "化工学院",
+    "purpose": "毕业论文",
+    "status": "pending",
+    "createdAt": "2026-05-19T07:24:29.819Z",
+    "approvalHistory": []
+  }
+]

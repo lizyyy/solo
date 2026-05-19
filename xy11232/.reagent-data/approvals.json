@@ -1,0 +1,34 @@
+[
+  {
+    "id": "mpcaxue2hsk0c",
+    "applicationId": "mpcaxf7jnpqv6",
+    "approver": "管理员",
+    "status": "approved",
+    "reason": "普通试剂审批通过",
+    "createdAt": "2026-05-19T07:18:57.818Z"
+  },
+  {
+    "id": "mpcay0ypyis8z",
+    "applicationId": "mpcaxf7maoizy",
+    "approver": "管理员",
+    "status": "approved",
+    "reason": "第一个审批人同意",
+    "createdAt": "2026-05-19T07:19:06.337Z"
+  },
+  {
+    "id": "mpcb4q9l80lk9",
+    "applicationId": "mpcaxf7maoizy",
+    "approver": "李主任",
+    "status": "approved",
+    "reason": "第二人审批通过",
+    "createdAt": "2026-05-19T07:24:19.065Z"
+  },
+  {
+    "id": "mpcb54selqevk",
+    "applicationId": "mpcb4yk6qrt45",
+    "approver": "王老师",
+    "status": "rejected",
+    "reason": "用途描述不详细，请补充",
+    "createdAt": "2026-05-19T07:24:37.886Z"
+  }
+]

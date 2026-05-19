@@ -1,0 +1,118 @@
+[
+  {
+    "id": "mpcb5mlka4b3z",
+    "timestamp": "2026-05-19T07:25:00.968Z",
+    "action": "retry",
+    "details": {
+      "batchId": "mpcaxf7nxsbsr",
+      "success": 0,
+      "failed": 3
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "id": "mpcb5ddv1j9pc",
+    "timestamp": "2026-05-19T07:24:49.027Z",
+    "action": "export",
+    "details": {
+      "file": "test-output.csv",
+      "type": "all",
+      "count": 5
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "id": "mpcb54tjxsyl1",
+    "timestamp": "2026-05-19T07:24:37.927Z",
+    "action": "resubmit",
+    "details": {
+      "applicationId": "mpcb4yk6qrt45"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "id": "mpcb54sflxqtn",
+    "timestamp": "2026-05-19T07:24:37.887Z",
+    "action": "reject",
+    "details": {
+      "applicationId": "mpcb4yk6qrt45",
+      "approver": "王老师",
+      "reason": "用途描述不详细，请补充"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "id": "mpcb4ykcqlal8",
+    "timestamp": "2026-05-19T07:24:29.820Z",
+    "action": "import",
+    "details": {
+      "file": "sample-normal.csv",
+      "batchId": "mpcb4ykbwtfzc",
+      "success": 3,
+      "failed": 0
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "id": "mpcb4q9pw9q4g",
+    "timestamp": "2026-05-19T07:24:19.069Z",
+    "action": "approve",
+    "details": {
+      "applicationId": "mpcaxf7maoizy",
+      "approver": "李主任",
+      "reason": "第二人审批通过"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "id": "mpcay0ypavyl8",
+    "timestamp": "2026-05-19T07:19:06.337Z",
+    "action": "approve",
+    "details": {
+      "applicationId": "mpcaxf7maoizy",
+      "approver": "管理员",
+      "reason": "第一个审批人同意"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "id": "mpcaxue65rjq8",
+    "timestamp": "2026-05-19T07:18:57.822Z",
+    "action": "approve",
+    "details": {
+      "applicationId": "mpcaxf7jnpqv6",
+      "approver": "管理员",
+      "reason": "普通试剂审批通过"
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "id": "mpcaxf7nld3df",
+    "timestamp": "2026-05-19T07:18:38.147Z",
+    "action": "import",
+    "details": {
+      "file": "sample-mixed.csv",
+      "batchId": "mpcaxf7nxsbsr",
+      "success": 2,
+      "failed": 3
+    },
+    "success": true,
+    "error": null
+  },
+  {
+    "id": "mpcaxa8pw49m4",
+    "timestamp": "2026-05-19T07:18:31.705Z",
+    "action": "init",
+    "details": "初始化数据存储",
+    "success": true,
+    "error": null
+  }
+]
