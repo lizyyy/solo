@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import sys
 import time
+import uuid
 import requests
 import json
 from typing import Dict, Any
 
 BASE_URL = "http://localhost:8000"
+
+def generate_device_id() -> str:
+    return f"DEV-{uuid.uuid4().hex[:8]}"
 
 def print_step(step: str, title: str):
     print(f"\n{'='*60}")
@@ -22,9 +26,10 @@ def test_import_evidence():
     """测试1: 导入证据 - 正常流程"""
     print_step("1", "导入证据 - 正常流程")
     
+    device_id = generate_device_id()
     test_data = {
-        "device_id": "DEV-001",
-        "proof_material": "hash:abc123def, signature:xyz789, timestamp:2024-01-15T10:30:00Z",
+        "device_id": device_id,
+        "proof_material": f"hash:{uuid.uuid4().hex}, signature:{uuid.uuid4().hex}, timestamp:2024-01-15T10:30:00Z",
         "firmware_version": "v2.1.0",
         "expected_firmware": "v2.1.0"
     }
@@ -46,9 +51,10 @@ def test_firmware_mismatch():
     """测试2: 固件版本不匹配 - 需要人工复核"""
     print_step("2", "固件版本不匹配 - 需要人工复核")
     
+    device_id = generate_device_id()
     test_data = {
-        "device_id": "DEV-002",
-        "proof_material": "hash:def456ghi, signature:uvw012, timestamp:2024-01-15T11:00:00Z",
+        "device_id": device_id,
+        "proof_material": f"hash:{uuid.uuid4().hex}, signature:{uuid.uuid4().hex}, timestamp:2024-01-15T11:00:00Z",
         "firmware_version": "v1.0.0",
         "expected_firmware": "v2.1.0"
     }
@@ -75,8 +81,9 @@ def test_proof_validation_failed():
     """测试3: 证明材料校验失败 - 强制隔离"""
     print_step("3", "证明材料校验失败 - 强制隔离")
     
+    device_id = generate_device_id()
     test_data = {
-        "device_id": "DEV-003",
+        "device_id": device_id,
         "proof_material": "invalid data",
         "firmware_version": "v2.1.0",
         "expected_firmware": "v2.1.0"
@@ -103,9 +110,11 @@ def test_duplicate_submission():
     """测试4: 重复上报幂等性"""
     print_step("4", "重复上报幂等性测试")
     
+    device_id = generate_device_id()
+    proof_material = f"hash:{uuid.uuid4().hex}, signature:{uuid.uuid4().hex}, timestamp:2024-01-15T12:00:00Z"
     test_data = {
-        "device_id": "DEV-004",
-        "proof_material": "hash:jkl789mno, signature:pqr345, timestamp:2024-01-15T12:00:00Z",
+        "device_id": device_id,
+        "proof_material": proof_material,
         "firmware_version": "v2.1.0",
         "expected_firmware": "v2.1.0"
     }
@@ -113,7 +122,7 @@ def test_duplicate_submission():
     try:
         response1 = requests.post(f"{BASE_URL}/api/evidence/review", json=test_data)
         if response1.status_code != 200:
-            print_result(False, f"第一次上报失败: {response1.status_code}")
+            print_result(False, f"第一次上报失败: {response1.status_code} - {response1.text}")
             return None
         
         response2 = requests.post(f"{BASE_URL}/api/evidence/review", json=test_data)
@@ -137,18 +146,23 @@ def test_missing_fields():
     """测试5: 缺失字段验证"""
     print_step("5", "缺失字段验证")
     
+    device_id = generate_device_id()
     test_data = {
-        "device_id": "DEV-005"
+        "device_id": device_id
     }
     
     try:
         response = requests.post(f"{BASE_URL}/api/evidence/review", json=test_data)
-        if response.status_code == 422:
+        if response.status_code == 400:
             result = response.json()
-            print_result(True, "缺失字段正确返回422错误", result)
-            return True
+            if result.get("error_code") == "missing_fields":
+                print_result(True, "缺失字段正确返回 missing_fields 错误码", result)
+                return True
+            else:
+                print_result(False, f"错误码不正确，预期 missing_fields，得到: {result.get('error_code')}", result)
+                return False
         else:
-            print_result(False, f"预期422但得到: {response.status_code} - {response.text}")
+            print_result(False, f"预期400但得到: {response.status_code} - {response.text}")
             return False
     except Exception as e:
         print_result(False, f"请求异常: {str(e)}")
@@ -158,11 +172,21 @@ def test_filter_by_device():
     """测试6: 按设备编号筛选"""
     print_step("6", "按设备编号筛选")
     
+    device_id = generate_device_id()
+    test_data = {
+        "device_id": device_id,
+        "proof_material": f"hash:{uuid.uuid4().hex}, signature:{uuid.uuid4().hex}, timestamp:2024-01-15T13:00:00Z",
+        "firmware_version": "v2.1.0",
+        "expected_firmware": "v2.1.0"
+    }
+    
     try:
-        response = requests.get(f"{BASE_URL}/api/evidence/list", params={"device_id": "DEV-001"})
+        requests.post(f"{BASE_URL}/api/evidence/review", json=test_data)
+        
+        response = requests.get(f"{BASE_URL}/api/evidence/list", params={"device_id": device_id})
         if response.status_code == 200:
             results = response.json()
-            if all(r.get("device_id") == "DEV-001" for r in results):
+            if all(r.get("device_id") == device_id for r in results):
                 print_result(True, f"按设备筛选成功，找到 {len(results)} 条记录")
                 return True
             else:
@@ -179,7 +203,17 @@ def test_filter_by_isolation_status():
     """测试7: 按隔离状态筛选"""
     print_step("7", "按隔离状态筛选")
     
+    device_id = generate_device_id()
+    test_data = {
+        "device_id": device_id,
+        "proof_material": "invalid proof for isolation test",
+        "firmware_version": "v2.1.0",
+        "expected_firmware": "v2.1.0"
+    }
+    
     try:
+        requests.post(f"{BASE_URL}/api/evidence/review", json=test_data)
+        
         response = requests.get(f"{BASE_URL}/api/evidence/list", params={"isolation_status": "isolated"})
         if response.status_code == 200:
             results = response.json()
@@ -200,7 +234,17 @@ def test_filter_by_needs_review():
     """测试8: 按需要复核筛选"""
     print_step("8", "按需要复核筛选")
     
+    device_id = generate_device_id()
+    test_data = {
+        "device_id": device_id,
+        "proof_material": f"hash:{uuid.uuid4().hex}, signature:{uuid.uuid4().hex}, timestamp:2024-01-15T14:00:00Z",
+        "firmware_version": "v1.0.0",
+        "expected_firmware": "v2.1.0"
+    }
+    
     try:
+        requests.post(f"{BASE_URL}/api/evidence/review", json=test_data)
+        
         response = requests.get(f"{BASE_URL}/api/evidence/list", params={"needs_review": True})
         if response.status_code == 200:
             results = response.json()
@@ -217,15 +261,31 @@ def test_filter_by_needs_review():
         print_result(False, f"请求异常: {str(e)}")
         return False
 
-def test_manual_review(report_id: str):
+def test_manual_review():
     """测试9: 人工复核处理"""
     print_step("9", "人工复核处理")
     
-    if not report_id:
-        print_result(False, "没有可用的待复核报告")
-        return False
+    device_id = generate_device_id()
+    test_data = {
+        "device_id": device_id,
+        "proof_material": f"hash:{uuid.uuid4().hex}, signature:{uuid.uuid4().hex}, timestamp:2024-01-15T15:00:00Z",
+        "firmware_version": "v1.0.0",
+        "expected_firmware": "v2.1.0"
+    }
     
     try:
+        response1 = requests.post(f"{BASE_URL}/api/evidence/review", json=test_data)
+        if response1.status_code != 400:
+            print_result(False, f"创建待复核记录失败，预期400得到: {response1.status_code}")
+            return False
+        
+        result1 = response1.json()
+        report_id = result1.get("detail", {}).get("details", {}).get("report_id")
+        
+        if not report_id:
+            print_result(False, "无法获取待复核报告ID")
+            return False
+        
         response = requests.post(
             f"{BASE_URL}/api/evidence/{report_id}/review",
             params={"approve": True, "review_notes": "审核通过，确认异常"}
@@ -241,15 +301,26 @@ def test_manual_review(report_id: str):
         print_result(False, f"请求异常: {str(e)}")
         return False
 
-def test_export_evidence(report_id: str):
+def test_export_evidence():
     """测试10: 导出证据报告"""
     print_step("10", "导出证据报告")
     
-    if not report_id:
-        print_result(False, "没有可用的报告ID")
-        return False
+    device_id = generate_device_id()
+    test_data = {
+        "device_id": device_id,
+        "proof_material": f"hash:{uuid.uuid4().hex}, signature:{uuid.uuid4().hex}, timestamp:2024-01-15T16:00:00Z",
+        "firmware_version": "v2.1.0",
+        "expected_firmware": "v2.1.0"
+    }
     
     try:
+        response1 = requests.post(f"{BASE_URL}/api/evidence/review", json=test_data)
+        if response1.status_code != 200:
+            print_result(False, "创建测试记录失败")
+            return False
+        
+        report_id = response1.json().get("report_id")
+        
         response = requests.get(f"{BASE_URL}/api/evidence/export/{report_id}")
         if response.status_code == 200:
             result = response.json()
@@ -267,15 +338,26 @@ def test_export_evidence(report_id: str):
         print_result(False, f"请求异常: {str(e)}")
         return False
 
-def test_get_single_evidence(report_id: str):
+def test_get_single_evidence():
     """测试11: 获取单条证据详情"""
     print_step("11", "获取单条证据详情")
     
-    if not report_id:
-        print_result(False, "没有可用的报告ID")
-        return False
+    device_id = generate_device_id()
+    test_data = {
+        "device_id": device_id,
+        "proof_material": f"hash:{uuid.uuid4().hex}, signature:{uuid.uuid4().hex}, timestamp:2024-01-15T17:00:00Z",
+        "firmware_version": "v2.1.0",
+        "expected_firmware": "v2.1.0"
+    }
     
     try:
+        response1 = requests.post(f"{BASE_URL}/api/evidence/review", json=test_data)
+        if response1.status_code != 200:
+            print_result(False, "创建测试记录失败")
+            return False
+        
+        report_id = response1.json().get("report_id")
+        
         response = requests.get(f"{BASE_URL}/api/evidence/{report_id}")
         if response.status_code == 200:
             result = response.json()
@@ -339,13 +421,13 @@ def main():
         filter3_result = test_filter_by_needs_review()
         results.append(("按需要复核筛选", filter3_result))
         
-        review_result = test_manual_review(report_id2)
+        review_result = test_manual_review()
         results.append(("人工复核处理", review_result))
         
-        export_result = test_export_evidence(report_id1)
+        export_result = test_export_evidence()
         results.append(("导出证据报告", export_result))
         
-        get_result = test_get_single_evidence(report_id1)
+        get_result = test_get_single_evidence()
         results.append(("获取单条证据", get_result))
         
     finally:

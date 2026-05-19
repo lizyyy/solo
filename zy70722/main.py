@@ -1,7 +1,9 @@
 from datetime import datetime
 from enum import Enum
 from typing import Optional, List
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import create_engine, Column, String, DateTime, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -92,6 +94,35 @@ class ErrorResponse(BaseModel):
 
 
 app = FastAPI(title="IoT设备可信证据隔离动作证明材料API", version="1.0.0")
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    missing_fields = []
+    for error in exc.errors():
+        if error.get("type") == "missing":
+            loc = error.get("loc", [])
+            if len(loc) > 1:
+                missing_fields.append(loc[1])
+    
+    if missing_fields:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error_code": ErrorCode.MISSING_FIELDS,
+                "message": "缺少必需字段",
+                "details": {"missing_fields": missing_fields}
+            }
+        )
+    
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error_code": "invalid_request",
+            "message": "请求参数无效",
+            "details": {"errors": exc.errors()}
+        }
+    )
 
 
 def get_db():
