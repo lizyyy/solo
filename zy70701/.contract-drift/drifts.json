@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "drift_id": "e6a95b37fb1d2266",
+    "contract_id": "ff7334601693",
+    "sample_id": "cb634fd65529f8aa",
+    "field_path": "code",
+    "diff_type": "required_violation",
+    "expected": "integer",
+    "actual": null,
+    "expected_type": "integer",
+    "actual_type": null,
+    "sample_source": null,
+    "contract_source": null,
+    "message": "必填字段 'code' 在样例中缺失"
+  },
+  {
+    "drift_id": "55441f5b2328b201",
+    "contract_id": "ff7334601693",
+    "sample_id": "cb634fd65529f8aa",
+    "field_path": "data",
+    "diff_type": "required_violation",
+    "expected": "object",
+    "actual": null,
+    "expected_type": "object",
+    "actual_type": null,
+    "sample_source": null,
+    "contract_source": null,
+    "message": "必填字段 'data' 在样例中缺失"
+  },
+  {
+    "drift_id": "1712c641b5c2efc4",
+    "contract_id": "ff7334601693",
+    "sample_id": "cb634fd65529f8aa",
+    "field_path": "data.items",
+    "diff_type": "field_missing",
+    "expected": "array",
+    "actual": null,
+    "expected_type": "array",
+    "actual_type": null,
+    "sample_source": null,
+    "contract_source": null,
+    "message": "字段 'data.items' 在契约中定义，但样例中缺失"
+  },
+  {
+    "drift_id": "e7ffe1b8a3d35f5b",
+    "contract_id": "ff7334601693",
+    "sample_id": "cb634fd65529f8aa",
+    "field_path": "data.total",
+    "diff_type": "field_missing",
+    "expected": "integer",
+    "actual": null,
+    "expected_type": "integer",
+    "actual_type": null,
+    "sample_source": null,
+    "contract_source": null,
+    "message": "字段 'data.total' 在契约中定义，但样例中缺失"
+  }
+]

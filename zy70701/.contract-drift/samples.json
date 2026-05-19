@@ -112,7 +112,32 @@
     "raw_content": "{\n  \"code\": 200,\n  \"message\": \"success\",\n  \"data\": {\n    \"total\": 100,\n    \"items\": [\n      {\n        \"id\": 1,\n        \"name\": \"张三\",\n        \"email\": \"zhangsan@example.com\",\n        \"age\": 25,\n        \"created_at\": \"2024-01-15T10:30:00Z\"\n      }\n    ]\n  }\n}\n",
     "file_format": "json",
     "source_file": "examples/sample1.json",
-    "imported_at": "2026-05-19 13:07:01.153603",
+    "imported_at": "2026-05-19 13:20:38.999410",
     "import_hash": "8f7b461b46b238a9480c4b52c18ed2f750f5009bbf33d5b72cb4a233c57079b2"
+  },
+  {
+    "id": "cb634fd65529f8aa",
+    "name": "sample-missing-required.json",
+    "contract_id": "ff7334601693",
+    "fields": [
+      {
+        "path": "message",
+        "value": "missing code and data",
+        "inferred_type": "string",
+        "source": {
+          "file_path": "examples/sample-missing-required.json",
+          "line_start": 2,
+          "line_end": 2,
+          "column_start": null,
+          "column_end": null,
+          "raw_content": null
+        }
+      }
+    ],
+    "raw_content": "{\n  \"message\": \"missing code and data\"\n}\n",
+    "file_format": "json",
+    "source_file": "examples/sample-missing-required.json",
+    "imported_at": "2026-05-19 13:20:39.676070",
+    "import_hash": "cb634fd65529f8aa8b3ec27f9d6bd1b05dc4705cbec0613f046760799669285c"
   }
 ]

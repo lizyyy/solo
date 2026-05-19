@@ -49,9 +49,9 @@ paths:
                               type: string
                               format: date-time
                               description: 创建时间
-                  required:
-                    - code
-                    - data
+                required:
+                  - code
+                  - data
   /api/users/{id}:
     get:
       summary: 获取单个用户
@@ -88,3 +88,6 @@ paths:
                       created_at:
                         type: string
                         format: date-time
+                required:
+                  - code
+                  - data
