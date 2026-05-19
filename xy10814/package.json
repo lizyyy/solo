@@ -1,0 +1,15 @@
+{
+  "name": "mock-contract-replayer",
+  "version": "1.0.0",
+  "description": "Mock 合约回放器 - 接口联调环境不稳定时的响应回放系统",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "start": "cd backend && npm start"
+  },
+  "keywords": ["mock", "contract", "replay", "api"],
+  "author": "Platform Team",
+  "license": "MIT"
+}
