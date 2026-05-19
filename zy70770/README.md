@@ -106,8 +106,13 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 - `POST /api/batches/group` - 创建轮换批次
 - `GET /api/batches` - 查询批次列表
 - `GET /api/batches/{batch_id}/items` - 查询批次详情
+- `PUT /api/batches/{batch_id}/approve` - 批量批准批次中所有需要复核的项
 - `PUT /api/batches/{batch_id}/execute` - 执行批次
 - `PUT /api/batches/{batch_id}/rollback` - 回滚批次
+
+### 轮换项管理
+- `GET /api/batches/items/{item_id}` - 查询单个轮换项详情
+- `PUT /api/batches/items/{item_id}` - 更新轮换项（包括批准状态、备注、新值等）
 
 ### 报告导出
 - `POST /api/reports/generate` - 生成轮换报告
@@ -156,20 +161,52 @@ curl -X POST "http://localhost:8000/api/batches/group" \
   }'
 ```
 
-### 4. 执行批次（先人工复核）
+### 4. 查看批次详情和待复核项
 
 ```bash
-# 先查看批次中需要复核的项，在系统中批准后执行
+# 查看批次下的所有轮换项
+curl -X GET "http://localhost:8000/api/batches/1/items"
+
+# 查看单个轮换项详情
+curl -X GET "http://localhost:8000/api/batches/items/1"
+```
+
+### 5. 人工复核批准
+
+#### 方式一：逐个批准轮换项
+
+```bash
+# 批准单个轮换项（设置状态为 APPROVED，添加复核备注）
+curl -X PUT "http://localhost:8000/api/batches/items/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "APPROVED",
+    "review_note": "已核对密码，确认无误",
+    "new_value": "new_secure_password_123"
+  }'
+```
+
+#### 方式二：批量批准整个批次
+
+```bash
+# 一键批准批次中所有需要复核的轮换项
+curl -X PUT "http://localhost:8000/api/batches/1/approve"
+```
+
+### 6. 执行批次轮换
+
+```bash
+# 所有需要复核的项都批准后，可以执行批次
 curl -X PUT "http://localhost:8000/api/batches/1/execute"
 ```
 
-### 5. 如遇问题可回滚
+### 7. 如遇问题可回滚
 
 ```bash
 curl -X PUT "http://localhost:8000/api/batches/1/rollback"
 ```
 
-### 6. 生成轮换报告
+### 8. 生成轮换报告
 
 ```bash
 curl -X POST "http://localhost:8000/api/reports/generate" \

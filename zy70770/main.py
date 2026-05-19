@@ -468,6 +468,136 @@ def mask_sensitive_value(value: str) -> str:
     return value[:2] + "*" * (len(value) - 4) + value[-2:]
 
 
+@app.get("/api/batches/items/{item_id}", response_model=schemas.RotationItem)
+def get_rotation_item(item_id: int, db: Session = Depends(get_db)):
+    item = db.query(RotationItem).filter(RotationItem.id == item_id).first()
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error_code": APIErrorCodes.NOT_FOUND,
+                "message": "轮换项不存在",
+                "details": {"item_id": item_id}
+            }
+        )
+    
+    variable = db.query(EnvVariable).filter(EnvVariable.id == item.variable_id).first()
+    return {
+        "id": item.id,
+        "batch_id": item.batch_id,
+        "variable_id": item.variable_id,
+        "variable_key": variable.key if variable else None,
+        "new_value": item.new_value,
+        "rollback_value_masked": mask_sensitive_value(item.rollback_value) if item.variable_id else None,
+        "status": item.status,
+        "requires_review": item.requires_review,
+        "review_note": item.review_note,
+        "executed_at": item.executed_at,
+        "rolled_back_at": item.rolled_back_at,
+        "created_at": item.created_at,
+        "updated_at": item.updated_at
+    }
+
+
+@app.put("/api/batches/items/{item_id}", response_model=schemas.RotationItem)
+def update_rotation_item(
+    item_id: int,
+    update_data: schemas.RotationItemUpdate,
+    db: Session = Depends(get_db)
+):
+    item = db.query(RotationItem).filter(RotationItem.id == item_id).first()
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error_code": APIErrorCodes.NOT_FOUND,
+                "message": "轮换项不存在",
+                "details": {"item_id": item_id}
+            }
+        )
+    
+    if item.status in [VariableStatus.COMPLETED, VariableStatus.ROLLED_BACK]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_code": APIErrorCodes.INVALID_STATUS,
+                "message": "已完成或已回滚的轮换项不可修改",
+                "details": {"item_id": item_id, "current_status": item.status}
+            }
+        )
+    
+    update_dict = update_data.model_dump(exclude_unset=True)
+    for key, value in update_dict.items():
+        setattr(item, key, value)
+    
+    item.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(item)
+    
+    variable = db.query(EnvVariable).filter(EnvVariable.id == item.variable_id).first()
+    return {
+        "id": item.id,
+        "batch_id": item.batch_id,
+        "variable_id": item.variable_id,
+        "variable_key": variable.key if variable else None,
+        "new_value": item.new_value,
+        "rollback_value_masked": mask_sensitive_value(item.rollback_value) if item.variable_id else None,
+        "status": item.status,
+        "requires_review": item.requires_review,
+        "review_note": item.review_note,
+        "executed_at": item.executed_at,
+        "rolled_back_at": item.rolled_back_at,
+        "created_at": item.created_at,
+        "updated_at": item.updated_at
+    }
+
+
+@app.put("/api/batches/{batch_id}/approve")
+def approve_batch_for_review(batch_id: int, db: Session = Depends(get_db)):
+    batch = db.query(RotationBatch).filter(RotationBatch.id == batch_id).first()
+    if not batch:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error_code": APIErrorCodes.NOT_FOUND,
+                "message": "批次不存在",
+                "details": {"batch_id": batch_id}
+            }
+        )
+    
+    if batch.status not in [VariableStatus.PENDING, VariableStatus.REVIEW_REQUIRED]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_code": APIErrorCodes.INVALID_STATUS,
+                "message": "只有待处理或需要复核状态的批次才能批准",
+                "details": {"batch_id": batch_id, "current_status": batch.status}
+            }
+        )
+    
+    items = db.query(RotationItem).filter(
+        RotationItem.batch_id == batch_id,
+        RotationItem.requires_review == True
+    ).all()
+    
+    approved_count = 0
+    for item in items:
+        if item.status not in [VariableStatus.COMPLETED, VariableStatus.ROLLED_BACK]:
+            item.status = VariableStatus.APPROVED
+            item.review_note = "已通过批量复核批准"
+            approved_count += 1
+    
+    batch.status = VariableStatus.APPROVED
+    db.commit()
+    
+    return {
+        "success": True,
+        "message": f"已批准 {approved_count} 个需要复核的轮换项",
+        "batch_id": batch_id,
+        "approved_count": approved_count
+    }
+
+
 @app.put("/api/batches/{batch_id}/execute")
 def execute_batch(batch_id: int, db: Session = Depends(get_db)):
     batch = db.query(RotationBatch).filter(RotationBatch.id == batch_id).first()
