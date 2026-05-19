@@ -1,0 +1,365 @@
+{
+  "audit_info": {
+    "audit_id": "9c0642c4-44dd-4cd4-9a8d-c994fc1e975f",
+    "generated_at": "2026-05-19T08:16:56.695497",
+    "total_records": 4,
+    "pass_count": 2,
+    "warn_count": 1,
+    "fail_count": 1,
+    "skip_count": 0
+  },
+  "summary": {
+    "总记录数": 4,
+    "通过数": 2,
+    "警告数": 1,
+    "失败数": 1,
+    "跳过数": 0,
+    "通过率": "50.0%",
+    "仓库数量": 2,
+    "例外申请数量": 3,
+    "放开窗口数量": 2,
+    "恢复动作数量": 1,
+    "解析错误数量": 0
+  },
+  "source_tracking": {
+    "总问题记录数": 2,
+    "涉及文件数": 1,
+    "问题文件列表": [
+      "examples/sample_data.json"
+    ],
+    "按文件统计问题": {
+      "examples/sample_data.json": [
+        {
+          "record_id": "exc-003",
+          "record_type": "EXCEPTION_ONLY",
+          "line_number": 3,
+          "row_index": null,
+          "sheet_name": null,
+          "issue_message": "例外申请待审批: 赵六 - 新功能上线前的集成测试",
+          "issue_status": "WARN",
+          "rule_id": "R001"
+        }
+      ]
+    },
+    "按问题类型统计": {
+      "FAIL": 3,
+      "WARN": 2
+    }
+  },
+  "bad_records_with_locations": [
+    {
+      "record_id": "exc-002_win-002",
+      "record_type": "NO_RECOVERY",
+      "source_locations": [],
+      "related_ids": [
+        "exc-002"
+      ],
+      "issues": [
+        {
+          "rule_id": "R001",
+          "rule_name": "例外审批校验",
+          "status": "FAIL",
+          "message": "例外申请已批准但未记录审批人: 王五 - 数据库迁移需要临时放开保护",
+          "level": "ERROR",
+          "details": {
+            "exception_id": "exc-002",
+            "applicant": "王五",
+            "reason": "数据库迁移需要临时放开保护",
+            "status": "APPROVED",
+            "requested_at": "2024-01-16T14:30:00",
+            "source_location": "examples/sample_data.json | Line:2"
+          }
+        },
+        {
+          "rule_id": "R002",
+          "rule_name": "放开窗口到期校验",
+          "status": "FAIL",
+          "message": "放开窗口已到期但仍处于活动状态: 2024-01-16 15:00:00 ~ 2024-01-16 17:00:00",
+          "level": "ERROR",
+          "details": {
+            "window_id": "win-002",
+            "exception_id": "exc-002",
+            "start_time": "2024-01-16T15:00:00",
+            "end_time": "2024-01-16T17:00:00",
+            "audit_time": "2026-05-19T08:16:56.695497",
+            "is_active": true,
+            "overdue_hours": 20487.28,
+            "source_location": "examples/sample_data.json | Line:2"
+          }
+        },
+        {
+          "rule_id": "R002",
+          "rule_name": "放开窗口到期校验",
+          "status": "FAIL",
+          "message": "放开窗口已到期但仍处于活动状态: 2024-01-16 15:00:00 ~ 2024-01-16 17:00:00",
+          "level": "ERROR",
+          "details": {
+            "window_id": "win-002",
+            "exception_id": "exc-002",
+            "start_time": "2024-01-16T15:00:00",
+            "end_time": "2024-01-16T17:00:00",
+            "audit_time": "2026-05-19T08:16:56.695497",
+            "is_active": true,
+            "overdue_hours": 20487.28,
+            "source_location": "examples/sample_data.json | Line:2"
+          }
+        },
+        {
+          "rule_id": "R003",
+          "rule_name": "恢复动作校验",
+          "status": "WARN",
+          "message": "活动窗口暂无恢复记录: win-002",
+          "level": "WARNING",
+          "details": {
+            "window_id": "win-002",
+            "source_location": "examples/sample_data.json | Line:2"
+          }
+        }
+      ],
+      "issue_count": 4
+    },
+    {
+      "record_id": "exc-003",
+      "record_type": "EXCEPTION_ONLY",
+      "source_locations": [
+        {
+          "file_path": "examples/sample_data.json",
+          "sheet_name": null,
+          "line_number": 3,
+          "row_index": null,
+          "location_string": "examples/sample_data.json | Line:3"
+        }
+      ],
+      "related_ids": [
+        "exc-003"
+      ],
+      "issues": [
+        {
+          "rule_id": "R001",
+          "rule_name": "例外审批校验",
+          "status": "WARN",
+          "message": "例外申请待审批: 赵六 - 新功能上线前的集成测试",
+          "level": "WARNING",
+          "details": {
+            "exception_id": "exc-003",
+            "applicant": "赵六",
+            "reason": "新功能上线前的集成测试",
+            "status": "PENDING",
+            "source_location": "examples/sample_data.json | Line:3"
+          }
+        }
+      ],
+      "issue_count": 1
+    }
+  ],
+  "parse_errors": [],
+  "audit_records": [
+    {
+      "record_id": "exc-001_win-001_rec-001",
+      "record_type": "FULL_AUDIT",
+      "overall_status": "PASS",
+      "repository_name": "repo-001",
+      "branch_pattern": "main",
+      "applicant": "张三",
+      "approver": "李四",
+      "window_start": "2024-01-15T09:30:00",
+      "window_end": "2024-01-15T11:30:00",
+      "actual_end": "2024-01-15T11:25:00",
+      "recovered_by": "李四",
+      "recovered_at": "2024-01-15T11:25:00",
+      "validations": [
+        {
+          "rule_id": "R001",
+          "rule_name": "例外审批校验",
+          "status": "PASS",
+          "level": "INFO",
+          "message": "例外申请审批正常: 张三 -> 李四",
+          "details": {
+            "exception_id": "exc-001",
+            "applicant": "张三",
+            "approver": "李四",
+            "source_location": "examples/sample_data.json | Line:1"
+          }
+        },
+        {
+          "rule_id": "R002",
+          "rule_name": "放开窗口到期校验",
+          "status": "PASS",
+          "level": "INFO",
+          "message": "窗口正常关闭: 2024-01-15 09:30:00 ~ 2024-01-15 11:25:00",
+          "details": {
+            "window_id": "win-001",
+            "exception_id": "exc-001",
+            "source_location": "examples/sample_data.json | Line:1"
+          }
+        },
+        {
+          "rule_id": "R002",
+          "rule_name": "放开窗口到期校验",
+          "status": "PASS",
+          "level": "INFO",
+          "message": "窗口正常关闭: 2024-01-15 09:30:00 ~ 2024-01-15 11:25:00",
+          "details": {
+            "window_id": "win-001",
+            "exception_id": "exc-001",
+            "source_location": "examples/sample_data.json | Line:1"
+          }
+        },
+        {
+          "rule_id": "R003",
+          "rule_name": "恢复动作校验",
+          "status": "PASS",
+          "level": "INFO",
+          "message": "恢复成功: 李四 at 2024-01-15 11:25:00",
+          "details": {
+            "recovery_id": "rec-001",
+            "window_id": "win-001",
+            "source_location": "examples/sample_data.json | Line:1"
+          }
+        },
+        {
+          "rule_id": "R003",
+          "rule_name": "恢复动作校验",
+          "status": "PASS",
+          "level": "INFO",
+          "message": "恢复成功: 李四 at 2024-01-15 11:25:00",
+          "details": {
+            "recovery_id": "rec-001",
+            "window_id": "win-001",
+            "source_location": "examples/sample_data.json | Line:1"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "exc-002_win-002",
+      "record_type": "NO_RECOVERY",
+      "overall_status": "FAIL",
+      "repository_name": "repo-002",
+      "branch_pattern": "master",
+      "applicant": "王五",
+      "approver": null,
+      "window_start": "2024-01-16T15:00:00",
+      "window_end": "2024-01-16T17:00:00",
+      "actual_end": null,
+      "recovered_by": null,
+      "recovered_at": null,
+      "validations": [
+        {
+          "rule_id": "R001",
+          "rule_name": "例外审批校验",
+          "status": "FAIL",
+          "level": "ERROR",
+          "message": "例外申请已批准但未记录审批人: 王五 - 数据库迁移需要临时放开保护",
+          "details": {
+            "exception_id": "exc-002",
+            "applicant": "王五",
+            "reason": "数据库迁移需要临时放开保护",
+            "status": "APPROVED",
+            "requested_at": "2024-01-16T14:30:00",
+            "source_location": "examples/sample_data.json | Line:2"
+          }
+        },
+        {
+          "rule_id": "R002",
+          "rule_name": "放开窗口到期校验",
+          "status": "FAIL",
+          "level": "ERROR",
+          "message": "放开窗口已到期但仍处于活动状态: 2024-01-16 15:00:00 ~ 2024-01-16 17:00:00",
+          "details": {
+            "window_id": "win-002",
+            "exception_id": "exc-002",
+            "start_time": "2024-01-16T15:00:00",
+            "end_time": "2024-01-16T17:00:00",
+            "audit_time": "2026-05-19T08:16:56.695497",
+            "is_active": true,
+            "overdue_hours": 20487.28,
+            "source_location": "examples/sample_data.json | Line:2"
+          }
+        },
+        {
+          "rule_id": "R002",
+          "rule_name": "放开窗口到期校验",
+          "status": "FAIL",
+          "level": "ERROR",
+          "message": "放开窗口已到期但仍处于活动状态: 2024-01-16 15:00:00 ~ 2024-01-16 17:00:00",
+          "details": {
+            "window_id": "win-002",
+            "exception_id": "exc-002",
+            "start_time": "2024-01-16T15:00:00",
+            "end_time": "2024-01-16T17:00:00",
+            "audit_time": "2026-05-19T08:16:56.695497",
+            "is_active": true,
+            "overdue_hours": 20487.28,
+            "source_location": "examples/sample_data.json | Line:2"
+          }
+        },
+        {
+          "rule_id": "R003",
+          "rule_name": "恢复动作校验",
+          "status": "WARN",
+          "level": "WARNING",
+          "message": "活动窗口暂无恢复记录: win-002",
+          "details": {
+            "window_id": "win-002",
+            "source_location": "examples/sample_data.json | Line:2"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "exc-003",
+      "record_type": "EXCEPTION_ONLY",
+      "overall_status": "WARN",
+      "repository_name": "repo-001",
+      "branch_pattern": "develop",
+      "applicant": "赵六",
+      "approver": "钱七",
+      "window_start": null,
+      "window_end": null,
+      "actual_end": null,
+      "recovered_by": null,
+      "recovered_at": null,
+      "validations": [
+        {
+          "rule_id": "R001",
+          "rule_name": "例外审批校验",
+          "status": "WARN",
+          "level": "WARNING",
+          "message": "例外申请待审批: 赵六 - 新功能上线前的集成测试",
+          "details": {
+            "exception_id": "exc-003",
+            "applicant": "赵六",
+            "reason": "新功能上线前的集成测试",
+            "status": "PENDING",
+            "source_location": "examples/sample_data.json | Line:3"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "rule_R004_3",
+      "record_type": "RULE_LEVEL",
+      "overall_status": "PASS",
+      "repository_name": "系统级",
+      "branch_pattern": "N/A",
+      "applicant": null,
+      "approver": null,
+      "window_start": null,
+      "window_end": null,
+      "actual_end": null,
+      "recovered_by": null,
+      "recovered_at": null,
+      "validations": [
+        {
+          "rule_id": "R004",
+          "rule_name": "重复申请幂等校验",
+          "status": "PASS",
+          "level": "INFO",
+          "message": "未检测到重复申请或重叠窗口",
+          "details": {}
+        }
+      ]
+    }
+  ]
+}

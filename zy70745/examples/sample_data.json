@@ -1,0 +1,74 @@
+{
+  "repositories": [
+    {
+      "id": "repo-001",
+      "name": "frontend-app",
+      "url": "https://github.com/org/frontend-app"
+    },
+    {
+      "id": "repo-002",
+      "name": "backend-service",
+      "url": "https://github.com/org/backend-service"
+    }
+  ],
+  "exceptions": [
+    {
+      "id": "exc-001",
+      "repository_id": "repo-001",
+      "branch_pattern": "main",
+      "applicant": "张三",
+      "approver": "李四",
+      "reason": "紧急生产热修复，需要跳过分支保护直接合并",
+      "requested_at": "2024-01-15 09:00:00",
+      "status": "APPROVED"
+    },
+    {
+      "id": "exc-002",
+      "repository_id": "repo-002",
+      "branch_pattern": "master",
+      "applicant": "王五",
+      "approver": null,
+      "reason": "数据库迁移需要临时放开保护",
+      "requested_at": "2024-01-16 14:30:00",
+      "status": "APPROVED"
+    },
+    {
+      "id": "exc-003",
+      "repository_id": "repo-001",
+      "branch_pattern": "develop",
+      "applicant": "赵六",
+      "approver": "钱七",
+      "reason": "新功能上线前的集成测试",
+      "requested_at": "2024-01-17 10:00:00",
+      "status": "PENDING"
+    }
+  ],
+  "windows": [
+    {
+      "id": "win-001",
+      "exception_id": "exc-001",
+      "start_time": "2024-01-15 09:30:00",
+      "end_time": "2024-01-15 11:30:00",
+      "actual_end_time": "2024-01-15 11:25:00",
+      "is_active": false
+    },
+    {
+      "id": "win-002",
+      "exception_id": "exc-002",
+      "start_time": "2024-01-16 15:00:00",
+      "end_time": "2024-01-16 17:00:00",
+      "actual_end_time": null,
+      "is_active": true
+    }
+  ],
+  "recoveries": [
+    {
+      "id": "rec-001",
+      "window_id": "win-001",
+      "recovered_by": "李四",
+      "recovered_at": "2024-01-15 11:25:00",
+      "recovery_method": "手动恢复",
+      "is_successful": true
+    }
+  ]
+}

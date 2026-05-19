@@ -1,0 +1,4 @@
+record_type,id,repository_id,branch_pattern,applicant,approver,reason,requested_at,status
+EXCEPTION,exc-csv-001,repo-csv-001,main,张三,李四,紧急Bug修复,2024-02-01 10:00:00,APPROVED
+EXCEPTION,exc-csv-002,repo-csv-002,master,王五,,无审批人例外,2024-02-02 14:00:00,APPROVED
+EXCEPTION,exc-csv-003,repo-csv-001,develop,赵六,钱七,待审批测试,2024-02-03 09:00:00,PENDING
