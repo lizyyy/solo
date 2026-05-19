@@ -177,12 +177,12 @@ function insertInitialData(): Promise<void> {
         db.run(`
           INSERT INTO callback_targets (id, name, description, url, method, timeoutMs, maxRetries, retryIntervalMs, isActive, createdAt, updatedAt)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, ['target-1', '工单通知服务', '发送工单超时通知', 'http://localhost:3001/webhook/notify', 'POST', 5000, 3, 60000, 1, now, now]);
+        `, ['target-1', '工单通知服务', '发送工单超时通知', 'http://localhost:3000/webhook/notify', 'POST', 5000, 3, 60000, 1, now, now]);
         
         db.run(`
           INSERT INTO callback_targets (id, name, description, url, method, timeoutMs, maxRetries, retryIntervalMs, isActive, createdAt, updatedAt)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, ['target-2', '监控告警系统', '超时事件告警', 'http://localhost:3001/webhook/alert', 'POST', 3000, 5, 30000, 1, now, now]);
+        `, ['target-2', '监控告警系统', '超时事件告警', 'http://localhost:3000/webhook/alert', 'POST', 3000, 5, 30000, 1, now, now]);
       }
       resolve();
     });

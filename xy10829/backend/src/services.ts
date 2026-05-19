@@ -384,8 +384,9 @@ async function processRetryBatch(batchId: string): Promise<void> {
     }
   }
 
+  const finalStatus = failedCount > 0 ? EventStatus.FAILED : EventStatus.SUCCESS;
   await runQuery('UPDATE retry_batches SET status = ?, completedAt = ?, successCount = ?, failedCount = ? WHERE id = ?', 
-    [EventStatus.SUCCESS, new Date().toISOString(), successCount, failedCount, batchId]);
+    [finalStatus, new Date().toISOString(), successCount, failedCount, batchId]);
 }
 
 let retryScannerInterval: NodeJS.Timeout | null = null;
