@@ -1,0 +1,58 @@
+{
+  "summary": {
+    "total": 5,
+    "valid": 5,
+    "invalid": 0,
+    "fixable": 0,
+    "unfixable": 0
+  },
+  "clusters": {
+    "VALID": {
+      "count": 5,
+      "fixable": 0,
+      "samples": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "generated_at": "2026-05-19T16:10:56.907155",
+  "messages": [
+    {
+      "line_num": 1,
+      "error": null,
+      "error_category": null,
+      "fixable": false,
+      "fix_note": null
+    },
+    {
+      "line_num": 2,
+      "error": null,
+      "error_category": null,
+      "fixable": false,
+      "fix_note": null
+    },
+    {
+      "line_num": 3,
+      "error": null,
+      "error_category": null,
+      "fixable": false,
+      "fix_note": null
+    },
+    {
+      "line_num": 4,
+      "error": null,
+      "error_category": null,
+      "fixable": false,
+      "fix_note": null
+    },
+    {
+      "line_num": 5,
+      "error": null,
+      "error_category": null,
+      "fixable": false,
+      "fix_note": null
+    }
+  ]
+}

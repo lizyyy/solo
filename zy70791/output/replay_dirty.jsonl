@@ -1,0 +1,6 @@
+{"id": 1, "type": "order_created", "timestamp": 1620000000, "data": {"order_id": "ORD001", "amount": 99.9}}
+{"id": 3, "type": "payment_received", "timestamp": 1620000001, "data": {"order_id": "ORD001", "method": "alipay"}}
+{"id": 5, "type": "user_registered", "timestamp": 1620000003, "data": {"user_id": "U001"}}
+{"id": 6, "type": "timeout_error", "data": {"error": "request timeout after 30s"}}
+{"id": 7, "type": "rate_limit_hit", "data": {"error": "rate limit exceeded, try again later"}}
+{"id": 8, "type": "order_created", "timestamp": 1620000004, "data": {"order_id": "ORD002"}}

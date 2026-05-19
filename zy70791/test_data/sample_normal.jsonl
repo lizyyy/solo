@@ -1,0 +1,5 @@
+{"id": 1, "type": "order_created", "timestamp": 1620000000, "data": {"order_id": "ORD001", "amount": 99.9}}
+{"id": 2, "type": "payment_received", "timestamp": 1620000001, "data": {"order_id": "ORD001", "method": "alipay"}}
+{"id": 3, "type": "user_registered", "timestamp": 1620000002, "data": {"user_id": "U001", "email": "test@example.com"}}
+{"id": 4, "type": "order_created", "timestamp": 1620000003, "data": {"order_id": "ORD002", "amount": 199.9}}
+{"id": 5, "type": "shipping_started", "timestamp": 1620000004, "data": {"order_id": "ORD001", "carrier": "SF"}}

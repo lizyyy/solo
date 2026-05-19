@@ -1,0 +1,7 @@
+{"id": 1, "type": "normal_message", "data": {}}
+{"id": 2, "type": "empty_object"}
+{"id": 3, "type": "deep_nested", "a": {"b": {"c": {"d": {"e": "f"}}}}}
+{"id": 4, "type": "unicode_special", "data": "你好世界 🌍"}
+{"id": 5, "type": "very_long_field", "data": "A" * 1000}
+{"id": 6, "type": "null_values", "field1": null, "field2": "", "field3": 0}
+{"id": 7, "type": "array_data", "items": [1, 2, 3, 4, 5]}

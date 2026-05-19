@@ -1,0 +1,20 @@
+--- Line 2 ---
+Error: JSON解析失败: Unterminated string starting at: line 1 column 19 (char 18)
+Category: INVALID_JSON
+Raw: {"id": 2, "type": "invalid_json_missing_bracket
+
+--- Line 4 ---
+Error: JSON解析失败: Expecting property name enclosed in double quotes: line 1 column 11 (char 10)
+Category: INVALID_JSON
+Raw: {"id": 4, type: "bad_json_unquoted_key", "timestamp": 1620000002}
+
+--- Line 7 ---
+Error: JSON解析失败: Expecting value: line 1 column 1 (char 0)
+Category: INVALID_JSON
+Raw: this is not even json at all
+
+--- Line 9 ---
+Error: JSON解析失败: Unterminated string starting at: line 1 column 13 (char 12)
+Category: INVALID_JSON
+Raw: {"invalid": "truncated_json
+

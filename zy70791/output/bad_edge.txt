@@ -1,0 +1,5 @@
+--- Line 5 ---
+Error: JSON解析失败: Expecting ',' delimiter: line 1 column 50 (char 49)
+Category: INVALID_JSON
+Raw: {"id": 5, "type": "very_long_field", "data": "A" * 1000}
+
