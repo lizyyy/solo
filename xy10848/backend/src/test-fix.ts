@@ -170,4 +170,7 @@ async function runAllTests() {
   }
 }
 
-runAllTests().catch(console.error);
+runAllTests().catch((err) => {
+  console.error('❌ 测试执行出错:', err);
+  process.exit(1);
+});

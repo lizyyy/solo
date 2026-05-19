@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "description": "图片生成额度管理API系统",
   "scripts": {
-    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "setup": "npm install && npm run install:all && npm run seed",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
     "seed": "cd backend && npm run seed",
+    "test": "cd backend && npm test",
     "dev:server": "cd backend && npm run dev",
     "dev:client": "cd frontend && npm run dev",
     "build:server": "cd backend && npm run build",
     "build:client": "cd frontend && npm run build",
+    "build": "npm run build:server && npm run build:client",
     "start": "cd backend && npm start"
   },
   "keywords": ["quota", "api", "image-generation"],

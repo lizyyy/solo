@@ -1,28 +1,64 @@
-import sqlite3 from 'sqlite3';
-import { open, Database } from 'sqlite';
-import * as path from 'path';
-import * as fs from 'fs';
-
-let db: Database | null = null;
-
-export async function getDb(): Promise<Database> {
-  if (!db) {
-    const dbDir = path.resolve(__dirname, '..');
-    if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true });
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
     }
-    const dbPath = path.join(dbDir, 'quota.db');
-    db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database
-    });
-    await initTables(db);
-  }
-  return db;
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getDb = getDb;
+const sqlite3_1 = __importDefault(require("sqlite3"));
+const sqlite_1 = require("sqlite");
+const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
+let db = null;
+async function getDb() {
+    if (!db) {
+        const dbDir = path.resolve(__dirname, '..');
+        if (!fs.existsSync(dbDir)) {
+            fs.mkdirSync(dbDir, { recursive: true });
+        }
+        const dbPath = path.join(dbDir, 'quota.db');
+        db = await (0, sqlite_1.open)({
+            filename: dbPath,
+            driver: sqlite3_1.default.Database
+        });
+        await initTables(db);
+    }
+    return db;
 }
-
-async function initTables(db: Database) {
-  await db.exec(`
+async function initTables(db) {
+    await db.exec(`
     CREATE TABLE IF NOT EXISTS members (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
