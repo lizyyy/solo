@@ -63,7 +63,7 @@ def create_intercept_record(db: Session, record: InterceptRecordCreate) -> Inter
         tag_set=record.tag_set,
         estimated_cardinality=record.estimated_cardinality,
         reason=record.reason,
-        status=InterceptStatus.PENDING,
+        status=InterceptStatus.PENDING.value,
     )
     db.add(db_record)
     db.commit()
@@ -82,7 +82,7 @@ def get_intercept_records(
     if metric_name:
         query = query.filter(InterceptRecord.metric_name == metric_name)
     if status:
-        query = query.filter(InterceptRecord.status == status)
+        query = query.filter(InterceptRecord.status == status.value)
     return query.order_by(InterceptRecord.created_at.desc()).offset(skip).limit(limit).all()
 
 
@@ -100,10 +100,10 @@ def review_intercept_record(
     record = get_intercept_record_by_id(db, record_id)
     if not record:
         return None
-    if record.status != InterceptStatus.PENDING:
+    if record.status != InterceptStatus.PENDING.value:
         raise ValueError("ALREADY_PROCESSED")
 
-    record.status = status
+    record.status = status.value
     record.reviewer = reviewer
     record.review_comment = review_comment
     record.reviewed_at = datetime.utcnow()
@@ -144,8 +144,8 @@ def generate_daily_report(db: Session, report_date: str) -> GuardrailReport:
     records = db.query(InterceptRecord).all()
 
     total_intercepted = len(records)
-    total_approved = len([r for r in records if r.status == InterceptStatus.APPROVED])
-    total_rejected = len([r for r in records if r.status == InterceptStatus.REJECTED])
+    total_approved = len([r for r in records if r.status == InterceptStatus.APPROVED.value])
+    total_rejected = len([r for r in records if r.status == InterceptStatus.REJECTED.value])
 
     metric_counts: Dict[str, int] = {}
     for r in records:

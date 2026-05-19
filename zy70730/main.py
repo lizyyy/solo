@@ -112,7 +112,7 @@ async def api_create_intercept(
     db: Session = Depends(get_db),
 ):
     db_record = create_intercept_record(db, record)
-    return db_record
+    return InterceptRecordResponse.model_validate(db_record)
 
 
 @app.get(
@@ -127,7 +127,8 @@ async def api_list_intercepts(
     limit: int = 100,
     db: Session = Depends(get_db),
 ):
-    return get_intercept_records(db, metric_name, status, skip, limit)
+    records = get_intercept_records(db, metric_name, status, skip, limit)
+    return [InterceptRecordResponse.model_validate(r) for r in records]
 
 
 @app.get(
@@ -142,7 +143,7 @@ async def api_get_intercept(
     record = get_intercept_record_by_id(db, record_id)
     if not record:
         raise HTTPException(status_code=404, detail="记录不存在")
-    return record
+    return InterceptRecordResponse.model_validate(record)
 
 
 @app.post(
@@ -182,7 +183,7 @@ async def api_review_intercept(
             },
         )
 
-    return record
+    return InterceptRecordResponse.model_validate(record)
 
 
 @app.post(

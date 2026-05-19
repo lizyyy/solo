@@ -79,8 +79,9 @@ class InterceptRecordResponse(BaseModel):
     created_at: datetime
     reviewed_at: Optional[datetime]
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 
 class ReviewRequest(BaseModel):
