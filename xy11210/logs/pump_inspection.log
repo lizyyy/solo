@@ -1,0 +1,16 @@
+{"timestamp": "2026-05-19T05:49:03.760723", "level": "ERROR", "module": "main", "function": "init_database", "line": 23, "data": {"action": "database_init_failed", "error": "password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])"}}
+{"timestamp": "2026-05-19T05:49:03.761031", "level": "INFO", "module": "main", "function": "startup_event", "line": 69, "data": {"action": "app_startup"}}
+{"timestamp": "2026-05-19T05:50:37.382888", "level": "ERROR", "module": "main", "function": "init_database", "line": 23, "data": {"action": "database_init_failed", "error": "password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])"}}
+{"timestamp": "2026-05-19T05:52:55.413885", "level": "INFO", "module": "user_service", "function": "create_user", "line": 39, "data": {"action": "create_user", "user_id": 1, "username": "admin"}}
+{"timestamp": "2026-05-19T05:52:55.414118", "level": "INFO", "module": "user_service", "function": "init_default_user", "line": 74, "data": {"action": "init_default_admin"}}
+{"timestamp": "2026-05-19T05:52:55.645986", "level": "INFO", "module": "user_service", "function": "create_user", "line": 39, "data": {"action": "create_user", "user_id": 2, "username": "engineer"}}
+{"timestamp": "2026-05-19T05:52:55.646141", "level": "INFO", "module": "user_service", "function": "init_default_user", "line": 87, "data": {"action": "init_default_engineer"}}
+{"timestamp": "2026-05-19T05:52:55.902655", "level": "INFO", "module": "user_service", "function": "create_user", "line": 39, "data": {"action": "create_user", "user_id": 3, "username": "worker"}}
+{"timestamp": "2026-05-19T05:52:55.902837", "level": "INFO", "module": "user_service", "function": "init_default_user", "line": 100, "data": {"action": "init_default_worker"}}
+{"timestamp": "2026-05-19T05:52:55.909741", "level": "INFO", "module": "pump_room_service", "function": "create_pump_room", "line": 41, "data": {"action": "create_pump_room", "pump_room_id": 1, "code": "PR-001"}}
+{"timestamp": "2026-05-19T05:52:55.910794", "level": "INFO", "module": "pump_room_service", "function": "init_default_pump_rooms", "line": 61, "data": {"action": "init_default_pump_room", "code": "PR-001"}}
+{"timestamp": "2026-05-19T05:52:55.913727", "level": "INFO", "module": "pump_room_service", "function": "create_pump_room", "line": 41, "data": {"action": "create_pump_room", "pump_room_id": 2, "code": "PR-002"}}
+{"timestamp": "2026-05-19T05:52:55.913919", "level": "INFO", "module": "pump_room_service", "function": "init_default_pump_rooms", "line": 61, "data": {"action": "init_default_pump_room", "code": "PR-002"}}
+{"timestamp": "2026-05-19T05:52:55.915972", "level": "INFO", "module": "pump_room_service", "function": "create_pump_room", "line": 41, "data": {"action": "create_pump_room", "pump_room_id": 3, "code": "PR-003"}}
+{"timestamp": "2026-05-19T05:52:55.916080", "level": "INFO", "module": "pump_room_service", "function": "init_default_pump_rooms", "line": 61, "data": {"action": "init_default_pump_room", "code": "PR-003"}}
+{"timestamp": "2026-05-19T05:52:55.916135", "level": "INFO", "module": "main", "function": "init_database", "line": 21, "data": {"action": "database_initialized"}}
