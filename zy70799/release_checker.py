@@ -228,13 +228,14 @@ def match_artifacts(
     )
 
 
-def format_report_human(report: CheckReport) -> str:
+def format_report_human(report: CheckReport, fail_on_orphaned: bool = True) -> str:
     lines = []
     lines.append("=" * 80)
     lines.append("           Release 制品索引提交匹配排查报告")
     lines.append("=" * 80)
     lines.append(f"检查时间: {report.timestamp}")
     lines.append(f"扫描目录: {', '.join(report.directories_scanned) or '未指定'}")
+    lines.append(f"漏写检测:   {'启用 (多余制品将导致 FAIL)' if fail_on_orphaned else '禁用 (多余制品仅提示)'}")
     lines.append("")
     lines.append("-" * 80)
     lines.append("                              检查摘要")
@@ -244,7 +245,7 @@ def format_report_human(report: CheckReport) -> str:
     lines.append(f"  完全匹配:     {report.summary['matched']}")
     lines.append(f"  缺失制品:     {report.summary['missing']}")
     lines.append(f"  属性不匹配:   {report.summary['mismatched']}")
-    lines.append(f"  多余制品:     {report.summary['orphaned']}")
+    lines.append(f"  多余制品:     {report.summary['orphaned']} {'(将导致 FAIL)' if fail_on_orphaned and report.summary['orphaned'] > 0 else ''}")
     lines.append("")
     
     if report.matched:
@@ -279,7 +280,7 @@ def format_report_human(report: CheckReport) -> str:
     
     if report.orphaned:
         lines.append("-" * 80)
-        lines.append("                              多余的制品")
+        lines.append("                        交接文档漏写的制品")
         lines.append("-" * 80)
         for item in report.orphaned:
             lines.append(f"  ? {item.message}")
@@ -289,14 +290,18 @@ def format_report_human(report: CheckReport) -> str:
     
     lines.append("=" * 80)
     
-    status = "PASS" if report.summary['missing'] == 0 and report.summary['mismatched'] == 0 else "FAIL"
+    if fail_on_orphaned:
+        status = "PASS" if report.summary['missing'] == 0 and report.summary['mismatched'] == 0 and report.summary['orphaned'] == 0 else "FAIL"
+    else:
+        status = "PASS" if report.summary['missing'] == 0 and report.summary['mismatched'] == 0 else "FAIL"
+    
     lines.append(f"最终检查结果: {status}")
     lines.append("=" * 80)
     
     return "\n".join(lines)
 
 
-def report_to_dict(report: CheckReport) -> dict:
+def report_to_dict(report: CheckReport, fail_on_orphaned: bool = True) -> dict:
     def result_to_dict(r: CheckResult) -> dict:
         d = {
             "status": r.status,
@@ -308,11 +313,18 @@ def report_to_dict(report: CheckReport) -> dict:
             d["expected"] = r.expected
         return d
     
+    if fail_on_orphaned:
+        final_status = "PASS" if report.summary['missing'] == 0 and report.summary['mismatched'] == 0 and report.summary['orphaned'] == 0 else "FAIL"
+    else:
+        final_status = "PASS" if report.summary['missing'] == 0 and report.summary['mismatched'] == 0 else "FAIL"
+    
     return {
         "timestamp": report.timestamp,
         "directories_scanned": report.directories_scanned,
+        "fail_on_orphaned": fail_on_orphaned,
         "total_artifacts_found": report.total_artifacts_found,
         "total_artifacts_expected": report.total_artifacts_expected,
+        "final_status": final_status,
         "matched": [result_to_dict(r) for r in report.matched],
         "missing": [result_to_dict(r) for r in report.missing],
         "mismatched": [result_to_dict(r) for r in report.mismatched],
@@ -338,7 +350,8 @@ def cli():
 @click.option('--output', '-o', type=click.Path(), help='机器可读输出文件路径 (JSON)')
 @click.option('--follow-links', is_flag=True, help='遍历目录时跟随符号链接')
 @click.option('--quiet', '-q', is_flag=True, help='只输出机器可读格式')
-def check(directories, handover, commit, build, output, follow_links, quiet):
+@click.option('--allow-orphaned', is_flag=True, help='允许存在未在交接文档中记录的制品（仅警告，不影响最终结果）')
+def check(directories, handover, commit, build, output, follow_links, quiet, allow_orphaned):
     """检查制品目录与交接文档的匹配情况
     
     DIRECTORIES: 要扫描的制品目录列表
@@ -346,6 +359,8 @@ def check(directories, handover, commit, build, output, follow_links, quiet):
     if not directories:
         click.echo("错误: 至少需要指定一个要扫描的目录", err=True)
         return
+    
+    fail_on_orphaned = not allow_orphaned
     
     all_artifacts = []
     for directory in directories:
@@ -365,11 +380,11 @@ def check(directories, handover, commit, build, output, follow_links, quiet):
     report.directories_scanned = list(directories)
     
     if not quiet:
-        click.echo(format_report_human(report))
+        click.echo(format_report_human(report, fail_on_orphaned=fail_on_orphaned))
     
     if output:
         with open(output, 'w', encoding='utf-8') as f:
-            json.dump(report_to_dict(report), f, ensure_ascii=False, indent=2)
+            json.dump(report_to_dict(report, fail_on_orphaned=fail_on_orphaned), f, ensure_ascii=False, indent=2)
         if not quiet:
             click.echo(f"\n机器可读报告已保存到: {output}")
 
