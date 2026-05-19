@@ -1,0 +1,121 @@
+
+[
+  {
+    "transcript_id": "TRANS_001",
+    "session_id": "SESSION_001",
+    "agent_id": "AGENT_001",
+    "customer_id": "CUST_001",
+    "start_time": "2024-01-15T09:30:00",
+    "end_time": "2024-01-15T09:45:00",
+    "utterances": [
+      {
+        "index": 0,
+        "speaker": "客户",
+        "speaker_role": "customer",
+        "start_time": 0.0,
+        "end_time": 5.2,
+        "text": "你好，我要投诉你们的产品质量有问题"
+      },
+      {
+        "index": 1,
+        "speaker": "客服",
+        "speaker_role": "agent",
+        "start_time": 5.5,
+        "end_time": 10.0,
+        "text": "您好，请问您遇到了什么问题呢？"
+      },
+      {
+        "index": 2,
+        "speaker": "客户",
+        "speaker_role": "customer",
+        "start_time": 10.2,
+        "end_time": 18.5,
+        "text": "我买的手机用了不到一周就坏了，这是什么垃圾产品啊！"
+      },
+      {
+        "index": 3,
+        "speaker": "客服",
+        "speaker_role": "agent",
+        "start_time": 18.8,
+        "end_time": 25.0,
+        "text": "非常抱歉给您带来了不好的体验，我们会尽快为您处理"
+      }
+    ]
+  },
+  {
+    "transcript_id": "TRANS_002",
+    "session_id": "SESSION_002",
+    "agent_id": "AGENT_002",
+    "customer_id": "CUST_002",
+    "start_time": "2024-01-15T10:00:00",
+    "end_time": "2024-01-15T10:20:00",
+    "utterances": [
+      {
+        "index": 0,
+        "speaker": "客户",
+        "speaker_role": "customer",
+        "start_time": 0.0,
+        "end_time": 8.0,
+        "text": "喂，我想咨询一下退款的事情"
+      },
+      {
+        "index": 1,
+        "speaker": null,
+        "speaker_role": null,
+        "start_time": 8.5,
+        "end_time": 15.0,
+        "text": "好的，请您提供一下订单号好吗？"
+      },
+      {
+        "index": 2,
+        "speaker": "客户",
+        "speaker_role": "customer",
+        "start_time": 12.0,
+        "end_time": 20.0,
+        "text": "订单号是123456789，你们处理太慢了"
+      }
+    ]
+  },
+  {
+    "transcript_id": "TRANS_003",
+    "session_id": "SESSION_003",
+    "agent_id": "AGENT_001",
+    "customer_id": "CUST_003",
+    "start_time": "2024-01-15T14:00:00",
+    "end_time": "2024-01-15T14:30:00",
+    "utterances": [
+      {
+        "index": 0,
+        "speaker": "客户",
+        "speaker_role": "customer",
+        "start_time": 0.0,
+        "end_time": 6.0,
+        "text": "我想申请售后服务"
+      },
+      {
+        "index": 1,
+        "speaker": "客服",
+        "speaker_role": "agent",
+        "start_time": 6.5,
+        "end_time": 12.0,
+        "text": "您好，请问有什么可以帮助您的？"
+      },
+      {
+        "index": 2,
+        "speaker": "客户",
+        "speaker_role": "customer",
+        "start_time": 12.5,
+        "end_time": 20.0,
+        "text": "我买的东西和描述不符，我要退货"
+      },
+      {
+        "index": 3,
+        "speaker": "客服",
+        "speaker_role": "agent",
+        "start_time": 20.5,
+        "end_time": 30.0,
+        "text": "非常抱歉给您带来了不便，我们可以为您办理退款，请您提供一下退款账号"
+      }
+    ]
+  }
+]

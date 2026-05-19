@@ -1,0 +1,4 @@
+transcript_id,session_id,agent_id,is_scanned,has_issues,issue_count,review_status,reviewed_by,review_comment,created_at,issues_details
+TRANS_001,SESSION_001,AGENT_001,True,True,2,pending,,,2026-05-19T09:52:20,REFUND_MISSING:对话中检测到客户投诉/不满，但未检测到退款承诺相关内容，外包转写可能遗漏; SENSITIVE_WORDS:检测到敏感词: '垃圾'
+TRANS_002,SESSION_002,AGENT_002,True,True,4,pending,,,2026-05-19T09:52:20,SPEAKER_MISSING:说话人数量不足，仅识别到1个说话人，最少需要2个; SPEAKER_MISSING:第1条说话人信息缺失; TIMESTAMP_OVERLAP:时间戳重叠: 第1条与第2条重叠3.00秒，超过允许值0.5秒; APOLOGY_MISSING:对话中未检测到道歉用语，外包转写可能遗漏了客服的道歉内容
+TRANS_003,SESSION_003,AGENT_001,True,False,0,pending,,,2026-05-19T09:52:20,
