@@ -1,0 +1,15 @@
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0 24px;
+}
+
+.app-content {
+  padding: 24px;
+  background: #f0f2f5;
+}
