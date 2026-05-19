@@ -1,0 +1,13 @@
+2024-01-15T10:00:00.000Z ##[group]Set up job
+2024-01-15T10:00:01.000Z Current runner version: '2.311.0'
+2024-01-15T10:00:02.000Z ##[endgroup]
+2024-01-15T10:00:03.000Z ##[group]Run actions/checkout@v4
+2024-01-15T10:00:05.000Z matrix: os=ubuntu, python=3.10
+2024-01-15T10:00:10.000Z ##[endgroup]
+2024-01-15T10:00:15.000Z ##[group]Install dependencies
+2024-01-15T10:00:45.000Z pip install -r requirements.txt
+2024-01-15T10:01:30.000Z ##[endgroup]
+2024-01-15T10:01:35.000Z ##[group]Run tests
+2024-01-15T10:02:30.000Z pytest tests/
+2024-01-15T10:04:00.000Z All tests passed!
+2024-01-15T10:04:01.000Z Process completed with exit code 0.
