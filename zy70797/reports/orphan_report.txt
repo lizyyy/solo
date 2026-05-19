@@ -1,0 +1,55 @@
+================================================================================
+服务目录孤儿条目排查报告
+生成时间: 2026-05-19T16:24:50.313107
+================================================================================
+
+【统计汇总】
+  总服务数: 8
+  有效服务: 6
+  无效条目: 2
+  孤儿服务: 3
+
+  状态分布:
+    ALIVE: 3
+    DEAD: 0
+    UNKNOWN: 3
+    ERROR: 0
+
+--------------------------------------------------------------------------------
+【孤儿服务详情】
+
+  服务: legacy-service
+  状态: unknown
+  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:4
+  负责人: old_dev
+  原因:
+    - 未配置仓库地址
+    - 告警规则失效: Missing 1 alert rule(s): LegacyRuleDoesNotExist
+
+  服务: notification-service
+  状态: unknown
+  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:8
+  原因:
+    - 未配置仓库地址
+    - 未配置告警规则
+    - 未配置负责人
+
+  服务: payment-service
+  状态: unknown
+  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:3
+  仓库: /path/to/nonexistent/repo
+  原因:
+    - 仓库失效: Local repository path does not exist
+    - 未配置告警规则
+    - 未配置负责人
+
+--------------------------------------------------------------------------------
+【无效条目详情】
+
+  条目: invalid_type_str
+  错误: Item must be a dictionary
+  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:6
+
+  条目: unnamed_service
+  错误: service_name is required
+  位置: /Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:7

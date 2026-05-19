@@ -1,0 +1,7 @@
+service_name,repository,owners,alert_rules
+user-service,https://github.com/example/user-service,zhangsan@example.com,lisi,UserServiceHighErrorRate,UserServiceHighLatency
+order-service,/Users/lzy/pro/solo/workspaces/zy70797/examples/test-repo,"wangwu@example.com, zhangsan@example.com",OrderServiceHighErrorRate
+payment-service,/path/to/nonexistent/repo,,
+legacy-service,,old_dev,LegacyRuleDoesNotExist
+api-gateway,git@github.com:example/api-gateway.git,"zhaoliu, qianqi",GatewayHighTraffic
+notification-service,,,

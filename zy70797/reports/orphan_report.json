@@ -1,0 +1,306 @@
+{
+  "invalid_entries": [
+    {
+      "parse_error": "Item must be a dictionary",
+      "raw_content": "this is not a valid service entry",
+      "service_name": "invalid_type_str",
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:6"
+    },
+    {
+      "parse_error": "service_name is required",
+      "raw_content": "repository: invalid\nservice_name: ''\n",
+      "service_name": "unnamed_service",
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:7"
+    }
+  ],
+  "metadata": {
+    "generated_at": "2026-05-19T16:24:50.313107",
+    "version": "1.0.0"
+  },
+  "orphan_services": [
+    {
+      "alert_evidence": {
+        "checked_at": "2026-05-19T16:24:50.283311",
+        "details": {
+          "configured_rules": [
+            "GatewayHighTraffic"
+          ],
+          "matched_rules": [
+            "GatewayHighTraffic"
+          ],
+          "service_name": "api-gateway"
+        },
+        "message": "All 1 alert rule(s) found",
+        "status": "alive"
+      },
+      "alert_rules": [
+        "GatewayHighTraffic"
+      ],
+      "is_orphan": false,
+      "orphan_reasons": [],
+      "overall_status": "alive",
+      "owner_evidence": {
+        "qianqi": [
+          "alert",
+          "catalog",
+          "repository"
+        ],
+        "zhaoliu": [
+          "alert",
+          "catalog",
+          "repository"
+        ]
+      },
+      "owners": [
+        "qianqi",
+        "zhaoliu"
+      ],
+      "repository": "git@github.com:example/api-gateway.git",
+      "repository_evidence": {
+        "checked_at": "2026-05-19T16:24:50.283297",
+        "details": {
+          "github_owner": "example",
+          "github_repo": "api-gateway",
+          "repository": "git@github.com:example/api-gateway.git",
+          "service_name": "api-gateway"
+        },
+        "message": "Remote GitHub repository detected (network check disabled)",
+        "status": "unknown"
+      },
+      "service_name": "api-gateway",
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:5"
+    },
+    {
+      "alert_evidence": {
+        "checked_at": "2026-05-19T16:24:50.312754",
+        "details": {
+          "configured_rules": [
+            "OrderServiceHighErrorRate"
+          ],
+          "matched_rules": [
+            "OrderServiceHighErrorRate"
+          ],
+          "service_name": "order-service"
+        },
+        "message": "All 1 alert rule(s) found",
+        "status": "alive"
+      },
+      "alert_rules": [
+        "OrderServiceHighErrorRate"
+      ],
+      "is_orphan": false,
+      "orphan_reasons": [],
+      "overall_status": "alive",
+      "owner_evidence": {
+        "wangwu@example.com": [
+          "alert",
+          "catalog",
+          "repository"
+        ],
+        "zhangsan@example.com": [
+          "alert",
+          "catalog",
+          "repository"
+        ]
+      },
+      "owners": [
+        "wangwu@example.com",
+        "zhangsan@example.com"
+      ],
+      "repository": "/Users/lzy/pro/solo/workspaces/zy70797/examples/test-repo",
+      "repository_evidence": {
+        "checked_at": "2026-05-19T16:24:50.312718",
+        "details": {
+          "age_days": 0,
+          "branch_count": 1,
+          "last_commit_author": "Test User",
+          "last_commit_date": "2026-05-19T16:22:25",
+          "last_commit_hash": "326d262f349f6450d04717cc2919967951bba743",
+          "repository": "/Users/lzy/pro/solo/workspaces/zy70797/examples/test-repo",
+          "service_name": "order-service"
+        },
+        "message": "Repository is active",
+        "status": "alive"
+      },
+      "service_name": "order-service",
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:2"
+    },
+    {
+      "alert_evidence": {
+        "checked_at": "2026-05-19T16:24:50.312949",
+        "details": {
+          "configured_rules": [
+            "UserServiceHighErrorRate",
+            "UserServiceHighLatency"
+          ],
+          "matched_rules": [
+            "UserServiceHighErrorRate",
+            "UserServiceHighLatency"
+          ],
+          "service_name": "user-service"
+        },
+        "message": "All 2 alert rule(s) found",
+        "status": "alive"
+      },
+      "alert_rules": [
+        "UserServiceHighErrorRate",
+        "UserServiceHighLatency"
+      ],
+      "is_orphan": false,
+      "orphan_reasons": [],
+      "overall_status": "alive",
+      "owner_evidence": {
+        "lisi": [
+          "alert",
+          "catalog",
+          "repository"
+        ],
+        "zhangsan@example.com": [
+          "alert",
+          "catalog",
+          "repository"
+        ]
+      },
+      "owners": [
+        "lisi",
+        "zhangsan@example.com"
+      ],
+      "repository": "https://github.com/example/user-service",
+      "repository_evidence": {
+        "checked_at": "2026-05-19T16:24:50.312944",
+        "details": {
+          "github_owner": "example",
+          "github_repo": "user-service",
+          "repository": "https://github.com/example/user-service",
+          "service_name": "user-service"
+        },
+        "message": "Remote GitHub repository detected (network check disabled)",
+        "status": "unknown"
+      },
+      "service_name": "user-service",
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:1"
+    },
+    {
+      "alert_evidence": {
+        "checked_at": "2026-05-19T16:24:50.283478",
+        "details": {
+          "configured_rules": [
+            "LegacyRuleDoesNotExist"
+          ],
+          "matched_rules": [],
+          "missing_rules": [
+            "LegacyRuleDoesNotExist"
+          ],
+          "service_name": "legacy-service"
+        },
+        "message": "Missing 1 alert rule(s): LegacyRuleDoesNotExist",
+        "status": "dead"
+      },
+      "alert_rules": [
+        "LegacyRuleDoesNotExist"
+      ],
+      "is_orphan": true,
+      "orphan_reasons": [
+        "未配置仓库地址",
+        "告警规则失效: Missing 1 alert rule(s): LegacyRuleDoesNotExist"
+      ],
+      "overall_status": "unknown",
+      "owner_evidence": {
+        "old_dev": [
+          "alert",
+          "catalog"
+        ]
+      },
+      "owners": [
+        "old_dev"
+      ],
+      "repository": "",
+      "repository_evidence": {
+        "checked_at": "2026-05-19T16:24:50.283423",
+        "details": {
+          "service_name": "legacy-service"
+        },
+        "message": "No repository URL configured",
+        "status": "unknown"
+      },
+      "service_name": "legacy-service",
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:4"
+    },
+    {
+      "alert_evidence": {
+        "checked_at": "2026-05-19T16:24:50.283493",
+        "details": {
+          "service_name": "notification-service"
+        },
+        "message": "No alert rules configured",
+        "status": "unknown"
+      },
+      "alert_rules": [],
+      "is_orphan": true,
+      "orphan_reasons": [
+        "未配置仓库地址",
+        "未配置告警规则",
+        "未配置负责人"
+      ],
+      "overall_status": "unknown",
+      "owner_evidence": {},
+      "owners": [],
+      "repository": "",
+      "repository_evidence": {
+        "checked_at": "2026-05-19T16:24:50.283491",
+        "details": {
+          "service_name": "notification-service"
+        },
+        "message": "No repository URL configured",
+        "status": "unknown"
+      },
+      "service_name": "notification-service",
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:8"
+    },
+    {
+      "alert_evidence": {
+        "checked_at": "2026-05-19T16:24:50.312902",
+        "details": {
+          "service_name": "payment-service"
+        },
+        "message": "No alert rules configured",
+        "status": "unknown"
+      },
+      "alert_rules": [],
+      "is_orphan": true,
+      "orphan_reasons": [
+        "仓库失效: Local repository path does not exist",
+        "未配置告警规则",
+        "未配置负责人"
+      ],
+      "overall_status": "unknown",
+      "owner_evidence": {},
+      "owners": [],
+      "repository": "/path/to/nonexistent/repo",
+      "repository_evidence": {
+        "checked_at": "2026-05-19T16:24:50.312897",
+        "details": {
+          "checked_path": "/path/to/nonexistent/repo",
+          "repository": "/path/to/nonexistent/repo",
+          "service_name": "payment-service"
+        },
+        "message": "Local repository path does not exist",
+        "status": "dead"
+      },
+      "service_name": "payment-service",
+      "source_location": "/Users/lzy/pro/solo/workspaces/zy70797/examples/service_catalog.yaml:3"
+    }
+  ],
+  "summary": {
+    "invalid_services": 2,
+    "orphan_services": 3,
+    "status_breakdown": {
+      "alive": 3,
+      "dead": 0,
+      "error": 0,
+      "unknown": 3
+    },
+    "total_services": 8,
+    "valid_services": 6
+  }
+}

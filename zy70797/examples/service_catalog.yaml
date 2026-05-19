@@ -1,0 +1,46 @@
+- service_name: "user-service"
+  repository: "https://github.com/example/user-service"
+  owners:
+    - "zhangsan@example.com"
+    - "lisi"
+  alert_rules:
+    - "UserServiceHighErrorRate"
+    - "UserServiceHighLatency"
+
+- service_name: "order-service"
+  repository: "/Users/lzy/pro/solo/workspaces/zy70797/examples/test-repo"
+  owners:
+    - "wangwu@example.com"
+    - "zhangsan@example.com"
+  alert_rules:
+    - "OrderServiceHighErrorRate"
+
+- service_name: "payment-service"
+  repository: "/path/to/nonexistent/repo"
+  owners: []
+  alert_rules: []
+
+- service_name: "legacy-service"
+  repository: ""
+  owners:
+    - "old_dev"
+  alert_rules:
+    - "LegacyRuleDoesNotExist"
+
+- service_name: "api-gateway"
+  repository: "git@github.com:example/api-gateway.git"
+  owners:
+    - "zhaoliu"
+    - "qianqi"
+  alert_rules:
+    - "GatewayHighTraffic"
+
+- "this is not a valid service entry"
+
+- service_name: ""
+  repository: "invalid"
+
+- service_name: "notification-service"
+  repository: ""
+  owners: []
+  alert_rules: []

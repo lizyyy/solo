@@ -1,0 +1,34 @@
+groups:
+  - name: service_alerts
+    rules:
+      - alert: UserServiceHighErrorRate
+        expr: sum(rate(errors_total{service="user-service"}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "User service high error rate"
+
+      - alert: UserServiceHighLatency
+        expr: histogram_quantile(0.95, rate(request_duration_seconds_bucket{service="user-service"}[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "User service high latency"
+
+      - alert: OrderServiceHighErrorRate
+        expr: sum(rate(errors_total{service="order-service"}[5m])) > 0.03
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Order service high error rate"
+
+      - alert: GatewayHighTraffic
+        expr: sum(rate(requests_total{service="api-gateway"}[1m])) > 1000
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API gateway high traffic"
