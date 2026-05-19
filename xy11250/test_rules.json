@@ -1,0 +1,29 @@
+[
+  {
+    "rule_id": "R001",
+    "rule_type": "out_of_stock",
+    "condition_type": "quantity",
+    "condition_value": 1,
+    "compensation_type": "refund",
+    "compensation_value": 1.0,
+    "description": "缺货商品全额退款"
+  },
+  {
+    "rule_id": "R002",
+    "rule_type": "out_of_stock",
+    "condition_type": "amount",
+    "condition_value": 50,
+    "compensation_type": "coupon",
+    "compensation_value": 10,
+    "description": "缺货金额超过50元，补偿10元优惠券"
+  },
+  {
+    "rule_id": "R003",
+    "rule_type": "apology",
+    "condition_type": "quantity",
+    "condition_value": 5,
+    "compensation_type": "exchange",
+    "compensation_value": 1,
+    "description": "缺货数量超过5件，额外赠送1份商品"
+  }
+]

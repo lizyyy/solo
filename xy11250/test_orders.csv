@@ -1,0 +1,7 @@
+order_id,user_id,user_name,user_phone,product_id,product_name,quantity,price,total_amount,order_time,status
+ORD001,UID123456,张三,13800138001,PRD001,新鲜苹果,5,8.5,42.5,2024-01-15 09:30:00,pending
+ORD002,UID234567,李四,13900139002,PRD002,有机白菜,3,5.0,15.0,2024-01-15 10:15:00,pending
+ORD003,UID345678,王五,13700137003,PRD001,新鲜苹果,2,8.5,17.0,2024-01-15 11:00:00,pending
+ORD004,UID456789,赵六,13600136004,PRD003,澳洲牛肉,1,68.0,68.0,2024-01-15 12:30:00,pending
+ORD005,UID567890,孙七,13500135005,PRD002,有机白菜,10,5.0,50.0,2024-01-15 14:00:00,pending
+,UID678901,周八,invalid_phone,PRD004,错误记录,0,10.0,0.0,2024-01-15 15:00:00,pending
