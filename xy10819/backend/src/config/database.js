@@ -25,86 +25,89 @@ function init() {
   });
 }
 
-function createTables() {
+function runAsync(query, params = []) {
   return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      db.run(`PRAGMA foreign_keys = ON`);
-
-      db.run(`
-        CREATE TABLE IF NOT EXISTS collections (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          description TEXT,
-          environment_id TEXT,
-          status TEXT DEFAULT 'active',
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      db.run(`
-        CREATE TABLE IF NOT EXISTS environments (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          variables TEXT,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      db.run(`
-        CREATE TABLE IF NOT EXISTS steps (
-          id TEXT PRIMARY KEY,
-          collection_id TEXT NOT NULL,
-          name TEXT NOT NULL,
-          method TEXT NOT NULL,
-          url TEXT NOT NULL,
-          headers TEXT,
-          body TEXT,
-          assertions TEXT,
-          order_index INTEGER DEFAULT 0,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE
-        )
-      `);
-
-      db.run(`
-        CREATE TABLE IF NOT EXISTS batches (
-          id TEXT PRIMARY KEY,
-          collection_id TEXT NOT NULL,
-          status TEXT DEFAULT 'pending',
-          started_at DATETIME,
-          completed_at DATETIME,
-          total_steps INTEGER DEFAULT 0,
-          passed_steps INTEGER DEFAULT 0,
-          failed_steps INTEGER DEFAULT 0,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE
-        )
-      `);
-
-      db.run(`
-        CREATE TABLE IF NOT EXISTS execution_results (
-          id TEXT PRIMARY KEY,
-          batch_id TEXT NOT NULL,
-          step_id TEXT NOT NULL,
-          status TEXT DEFAULT 'pending',
-          request_data TEXT,
-          response_data TEXT,
-          response_status INTEGER,
-          response_time INTEGER,
-          assertions_result TEXT,
-          error_message TEXT,
-          screenshot_path TEXT,
-          executed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (batch_id) REFERENCES batches(id) ON DELETE CASCADE,
-          FOREIGN KEY (step_id) REFERENCES steps(id) ON DELETE CASCADE
-        )
-      `);
-
-      resolve();
+    db.run(query, params, function(err) {
+      if (err) reject(err);
+      else resolve({ lastID: this.lastID, changes: this.changes });
     });
   });
+}
+
+async function createTables() {
+  await runAsync(`PRAGMA foreign_keys = ON`);
+
+  await runAsync(`
+    CREATE TABLE IF NOT EXISTS collections (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      description TEXT,
+      environment_id TEXT,
+      status TEXT DEFAULT 'active',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await runAsync(`
+    CREATE TABLE IF NOT EXISTS environments (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      variables TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await runAsync(`
+    CREATE TABLE IF NOT EXISTS steps (
+      id TEXT PRIMARY KEY,
+      collection_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      method TEXT NOT NULL,
+      url TEXT NOT NULL,
+      headers TEXT,
+      body TEXT,
+      assertions TEXT,
+      order_index INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE
+    )
+  `);
+
+  await runAsync(`
+    CREATE TABLE IF NOT EXISTS batches (
+      id TEXT PRIMARY KEY,
+      collection_id TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      started_at DATETIME,
+      completed_at DATETIME,
+      total_steps INTEGER DEFAULT 0,
+      passed_steps INTEGER DEFAULT 0,
+      failed_steps INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE
+    )
+  `);
+
+  await runAsync(`
+    CREATE TABLE IF NOT EXISTS execution_results (
+      id TEXT PRIMARY KEY,
+      batch_id TEXT NOT NULL,
+      step_id TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      request_data TEXT,
+      response_data TEXT,
+      response_status INTEGER,
+      response_time INTEGER,
+      assertions_result TEXT,
+      error_message TEXT,
+      screenshot_path TEXT,
+      executed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (batch_id) REFERENCES batches(id) ON DELETE CASCADE,
+      FOREIGN KEY (step_id) REFERENCES steps(id) ON DELETE CASCADE
+    )
+  `);
 }
 
 function run(query, params = []) {
