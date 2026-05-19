@@ -29,6 +29,29 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/export/csv', async (req, res) => {
+  try {
+    const filters = {
+      appealStatus: req.query.status
+    };
+    const csv = await ExportService.exportToCSV(filters);
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=appeals.csv');
+    res.send(csv);
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/report/generate', async (req, res) => {
+  try {
+    const report = await ExportService.generateReport();
+    res.json({ success: true, data: report });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const detail = await AppealService.getAppealDetail(req.params.id);
@@ -78,29 +101,6 @@ router.post('/:id/escalate', async (req, res) => {
     const { operatorId, operatorName } = req.body;
     const result = await AppealService.escalateAppeal(req.params.id, operatorId, operatorName);
     res.json({ success: true, data: result });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
-
-router.get('/export/csv', async (req, res) => {
-  try {
-    const filters = {
-      appealStatus: req.query.status
-    };
-    const csv = await ExportService.exportToCSV(filters);
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=appeals.csv');
-    res.send(csv);
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
-
-router.get('/report/generate', async (req, res) => {
-  try {
-    const report = await ExportService.generateReport();
-    res.json({ success: true, data: report });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
