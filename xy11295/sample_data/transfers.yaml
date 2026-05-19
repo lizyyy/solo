@@ -1,0 +1,59 @@
+- order_no: DB20240519001
+  material_code: HJ001
+  booth_code: Z001
+  quantity: 20
+  borrower: 陈师傅
+  operator: 仓库管理员A
+  transfer_time: 2024-05-19 08:30:00
+  expected_return_time: 2024-05-21 18:00:00
+  remark: 主舞台搭建
+
+- order_no: DB20240519002
+  material_code: DJ001
+  booth_code: Z001
+  quantity: 30
+  borrower: 陈师傅
+  operator: 仓库管理员A
+  transfer_time: 2024-05-19 09:15:00
+  expected_return_time: 2024-05-21 18:00:00
+  remark: 主舞台照明
+
+- order_no: DB20240519003
+  material_code: PM001
+  booth_code: Z002
+  quantity: 15
+  borrower: 刘工
+  operator: 仓库管理员B
+  transfer_time: 2024-05-19 10:00:00
+  expected_return_time: 2024-05-22 12:00:00
+  remark: 科技展区背景屏
+
+- order_no: DB20240519004
+  material_code: HJ002
+  booth_code: Z003
+  quantity: 10
+  borrower: 周工
+  operator: 仓库管理员A
+  transfer_time: 2024-05-19 11:30:00
+  expected_return_time: 2024-05-22 18:00:00
+  remark: 品牌墙搭建
+
+- order_no: DB20240519005
+  material_code: DJ002
+  booth_code: Z004
+  quantity: 12
+  borrower: 吴师傅
+  operator: 仓库管理员B
+  transfer_time: 2024-05-19 14:00:00
+  expected_return_time: 2024-05-23 18:00:00
+  remark: 互动区灯光秀
+
+- order_no: DB20240519006
+  material_code: PM003
+  booth_code: Z005
+  quantity: 2
+  borrower: 郑工
+  operator: 仓库管理员A
+  transfer_time: 2024-05-19 15:30:00
+  expected_return_time: 2024-05-20 20:00:00
+  remark: 新闻发布会签到屏
