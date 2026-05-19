@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { evaluations } from '../services/api'
+import { parseExcelFile, parseCsvFile, generateTemplateExcel, generateTemplateCsv, ParsedEvaluationData } from '../utils/fileParser'
 
 interface MetricInput {
   metric_name: string
@@ -22,6 +23,9 @@ export default function ImportEvaluation() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [uploadMode, setUploadMode] = useState(false)
+  const [fileName, setFileName] = useState('')
+  const [parsedData, setParsedData] = useState<ParsedEvaluationData | null>(null)
 
   const [formData, setFormData] = useState({
     model_version_name: '',
@@ -70,6 +74,58 @@ export default function ImportEvaluation() {
     setFailureSamples(failureSamples.filter((_, i) => i !== index))
   }
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setFileName(file.name)
+    setLoading(true)
+
+    try {
+      let data: ParsedEvaluationData
+      if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+        data = await parseExcelFile(file)
+      } else if (file.name.endsWith('.csv')) {
+        data = await parseCsvFile(file)
+      } else {
+        alert('不支持的文件格式，请上传 CSV 或 Excel 文件')
+        setLoading(false)
+        return
+      }
+
+      setParsedData(data)
+      setFormData({
+        model_version_name: data.model_version_name,
+        model_name: data.model_name,
+        dataset_name: data.dataset_name,
+        dataset_version: data.dataset_version,
+      })
+      setMetrics(data.metrics.map(m => ({
+        metric_name: m.metric_name,
+        metric_value: String(m.metric_value),
+        metric_unit: m.metric_unit || '',
+        threshold: m.threshold ? String(m.threshold) : '',
+        is_alert: m.is_alert,
+      })))
+      setFailureSamples(data.failure_samples)
+    } catch (error) {
+      console.error('解析文件失败:', error)
+      alert('文件解析失败，请检查文件格式')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const downloadTemplate = (format: 'xlsx' | 'csv') => {
+    const blob = format === 'xlsx' ? generateTemplateExcel() : generateTemplateCsv()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `评测模板.${format}`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -78,9 +134,11 @@ export default function ImportEvaluation() {
       const data = {
         ...formData,
         metrics: metrics.map(m => ({
-          ...m,
+          metric_name: m.metric_name,
           metric_value: parseFloat(m.metric_value),
+          metric_unit: m.metric_unit,
           threshold: m.threshold ? parseFloat(m.threshold) : null,
+          is_alert: m.is_alert,
         })),
         failure_samples: failureSamples,
       }
@@ -107,6 +165,73 @@ export default function ImportEvaluation() {
           评测导入成功！正在跳转到评测列表...
         </div>
       )}
+
+      <div className="bg-white shadow rounded-lg p-6 mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">导入方式</h3>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => downloadTemplate('xlsx')}
+              className="px-3 py-1 bg-green-100 text-green-700 rounded-md hover:bg-green-200 text-sm"
+            >
+              下载 Excel 模板
+            </button>
+            <button
+              type="button"
+              onClick={() => downloadTemplate('csv')}
+              className="px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 text-sm"
+            >
+              下载 CSV 模板
+            </button>
+          </div>
+        </div>
+
+        <div className="flex gap-4 mb-4">
+          <button
+            type="button"
+            onClick={() => setUploadMode(false)}
+            className={`px-4 py-2 rounded-md ${!uploadMode ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+          >
+            手动填写
+          </button>
+          <button
+            type="button"
+            onClick={() => setUploadMode(true)}
+            className={`px-4 py-2 rounded-md ${uploadMode ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+          >
+            文件上传
+          </button>
+        </div>
+
+        {uploadMode && (
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <input
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={handleFileUpload}
+              className="hidden"
+              id="file-upload"
+            />
+            <label htmlFor="file-upload" className="cursor-pointer">
+              <div className="text-gray-600">
+                <p className="text-lg mb-2">📁 点击或拖拽上传文件</p>
+                <p className="text-sm text-gray-500">支持 CSV 和 Excel 格式</p>
+              </div>
+            </label>
+            {fileName && (
+              <div className="mt-4 text-green-600">
+                ✓ 已解析: {fileName}
+                {parsedData && (
+                  <p className="text-sm mt-1">
+                    {parsedData.metrics.length} 个指标, {parsedData.failure_samples.length} 个失败样本
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white shadow rounded-lg p-6">

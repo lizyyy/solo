@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { evaluations, metrics } from '../services/api'
-import { Evaluation, Metric } from '../types'
+import { evaluations } from '../services/api'
+import { Evaluation } from '../types'
 
 export default function Dashboard() {
   const [recentEvaluations, setRecentEvaluations] = useState<Evaluation[]>([])

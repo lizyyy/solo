@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { evaluations, metrics, modelVersions } from '../services/api'
-import { Evaluation, Metric, ModelVersion } from '../types'
+import { metrics } from '../services/api'
+import { Metric } from '../types'
 
 export default function History() {
   const [metricHistory, setMetricHistory] = useState<any[]>([])
