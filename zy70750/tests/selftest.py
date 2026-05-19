@@ -15,7 +15,7 @@ from app.models.models import (
     RegressionTask, RegressionResult, DiffReport, FailedRecord
 )
 from app.services.regression_processor import RegressionProcessor
-from app.core.constants import TaskStatus
+from app.core.constants import TaskStatus, ErrorCode
 
 
 class SelfTest:
@@ -295,6 +295,28 @@ class SelfTest:
         assert not result["success"], "对已完成的任务应该返回错误"
         assert result.get("error_code") == "already_processed", "错误码不正确"
         self.log("对已完成任务返回正确错误码: already_processed")
+
+        need_review_task = RegressionTask(
+            name="需要人工复核的任务",
+            log_directory_id=log_dir.id,
+            status=TaskStatus.NEED_REVIEW
+        )
+        self.db.add(need_review_task)
+        self.db.commit()
+        
+        diff = DiffReport(
+            task_id=need_review_task.id,
+            diff_type="content_change",
+            severity="medium",
+            is_reviewed=False
+        )
+        self.db.add(diff)
+        self.db.commit()
+
+        result = processor.process_task(need_review_task.id)
+        assert not result["success"], "对需要人工复核的任务应该返回错误"
+        assert result.get("error_code") == ErrorCode.NEED_MANUAL_REVIEW, f"错误码不正确, 期望 need_manual_review, 实际 {result.get('error_code')}"
+        self.log("对需要人工复核的任务返回正确错误码: need_manual_review")
 
     def cleanup(self):
         print("\n" + "="*60)

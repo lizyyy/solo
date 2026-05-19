@@ -36,16 +36,28 @@ class RegressionProcessor:
         self.db = db
         self.masking_engine = MaskingEngine(db)
 
-    def process_task(self, task_id: int) -> Dict[str, Any]:
+    def process_task(self, task_id: int, force_restart: bool = False) -> Dict[str, Any]:
         task = self.db.query(RegressionTask).filter(RegressionTask.id == task_id).first()
         if not task:
             return {"success": False, "error": "Task not found"}
 
-        if task.status == TaskStatus.COMPLETED:
+        if task.status == TaskStatus.COMPLETED or task.status == TaskStatus.REVIEWED:
             return {"success": False, "error": "Task already processed", "error_code": "already_processed"}
 
         if task.status == TaskStatus.PROCESSING:
             return {"success": False, "error": "Task is already processing", "error_code": "invalid_status"}
+
+        if task.status == TaskStatus.NEED_REVIEW and not force_restart:
+            unreviewed_count = self.db.query(DiffReport).filter(
+                DiffReport.task_id == task_id,
+                DiffReport.is_reviewed == False
+            ).count()
+            return {
+                "success": False,
+                "error": f"Task has {unreviewed_count} unreviewed diffs, need manual review first",
+                "error_code": "need_manual_review",
+                "unreviewed_count": unreviewed_count
+            }
 
         log_dir = self.db.query(LogDirectory).filter(
             LogDirectory.id == task.log_directory_id

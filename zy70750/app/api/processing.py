@@ -16,6 +16,7 @@ router = APIRouter(prefix="/api/v1", tags=["processing"])
 def start_task(
     task_id: int,
     background_tasks: BackgroundTasks,
+    force_restart: bool = False,
     db: Session = Depends(get_db)
 ):
     task = db.query(models.RegressionTask).filter(
@@ -49,10 +50,24 @@ def start_task(
             }
         )
 
+    if task.status == TaskStatus.NEED_REVIEW and not force_restart:
+        unreviewed_count = db.query(models.DiffReport).filter(
+            models.DiffReport.task_id == task_id,
+            models.DiffReport.is_reviewed == False
+        ).count()
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": f"Task has {unreviewed_count} unreviewed diffs, need manual review first. Use force_restart=true to bypass.",
+                "error_code": ErrorCode.NEED_MANUAL_REVIEW,
+                "unreviewed_count": unreviewed_count
+            }
+        )
+
     processor = RegressionProcessor(db)
 
     def process():
-        processor.process_task(task_id)
+        processor.process_task(task_id, force_restart=force_restart)
 
     background_tasks.add_task(process)
 
@@ -185,6 +200,7 @@ def resolve_failed_record(
 @router.post("/export")
 def export_data(
     request: schemas.ExportRequest,
+    require_reviewed: bool = False,
     db: Session = Depends(get_db)
 ):
     if not request.task_ids:
@@ -195,6 +211,30 @@ def export_data(
                 "error_code": ErrorCode.MISSING_FIELD
             }
         )
+
+    if require_reviewed:
+        unreviewed_tasks = []
+        for task_id in request.task_ids:
+            task = db.query(models.RegressionTask).filter(
+                models.RegressionTask.id == task_id
+            ).first()
+            if task and task.status == TaskStatus.NEED_REVIEW:
+                unreviewed_count = db.query(models.DiffReport).filter(
+                    models.DiffReport.task_id == task_id,
+                    models.DiffReport.is_reviewed == False
+                ).count()
+                if unreviewed_count > 0:
+                    unreviewed_tasks.append({"task_id": task_id, "name": task.name, "unreviewed_count": unreviewed_count})
+        
+        if unreviewed_tasks:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "message": "Some tasks have unreviewed diffs, need manual review first",
+                    "error_code": ErrorCode.NEED_MANUAL_REVIEW,
+                    "unreviewed_tasks": unreviewed_tasks
+                }
+            )
 
     export_data = {"tasks": []}
 
