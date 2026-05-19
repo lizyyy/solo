@@ -1,0 +1,23 @@
+[
+  {
+    "station_id": "CHA001",
+    "is_occupied": true,
+    "vehicle_plate": "浙A12345",
+    "power_kw": 120.5,
+    "last_updated": "2024-01-15 20:30:00"
+  },
+  {
+    "station_id": "",
+    "is_occupied": false,
+    "vehicle_plate": null,
+    "power_kw": 120.5,
+    "last_updated": "2024-01-15 20:00:00"
+  },
+  {
+    "station_id": "CHA003",
+    "is_occupied": true,
+    "vehicle_plate": "沪B67890",
+    "power_kw": 120.5,
+    "last_updated": "2024-01-15 21:00:00"
+  }
+]

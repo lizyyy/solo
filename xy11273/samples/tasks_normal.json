@@ -1,0 +1,26 @@
+[
+  {
+    "task_id": "T001",
+    "task_type": "loading",
+    "priority": "high",
+    "description": "装卸A区货物，共20托",
+    "assignee": "张三",
+    "scheduled_time": "2024-01-15 22:00:00"
+  },
+  {
+    "task_id": "T002",
+    "task_type": "inspection",
+    "priority": "normal",
+    "description": "叉车日常安全检查",
+    "assignee": "李四",
+    "scheduled_time": "2024-01-15 22:30:00"
+  },
+  {
+    "task_id": "T003",
+    "task_type": "charging",
+    "priority": "urgent",
+    "description": "紧急充电调度",
+    "assignee": "王五",
+    "scheduled_time": "2024-01-15 23:00:00"
+  }
+]
