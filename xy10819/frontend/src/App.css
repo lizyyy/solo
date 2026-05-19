@@ -1,0 +1,50 @@
+.ant-layout-sider {
+  background: #001529 !important;
+}
+
+.ant-menu-dark {
+  background: #001529 !important;
+}
+
+.ant-card-head-title {
+  font-weight: 600;
+}
+
+.status-tag-success {
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+.status-tag-error {
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+.status-tag-processing {
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  color: #1890ff;
+}
+
+.detail-panel {
+  background: #fafafa;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.screenshot-container {
+  width: 100%;
+  max-height: 500px;
+  overflow: auto;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+.screenshot-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
