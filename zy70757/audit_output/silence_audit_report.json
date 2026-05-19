@@ -1,0 +1,271 @@
+{
+  "generated_at": "2026-05-19T13:58:43.721981",
+  "invalid_items": [],
+  "risk_summary": {
+    "high_risk_count": 2,
+    "risk_distribution": {
+      "CRITICAL": 1,
+      "HIGH": 1,
+      "MEDIUM": 2
+    },
+    "statistics": {
+      "average_hits_per_silence": 3.0,
+      "high_hit_count": 0,
+      "hit_distribution": {
+        "silence-001": 2,
+        "silence-002": 5,
+        "silence-003": 2,
+        "silence-004": 3
+      },
+      "no_hit_count": 0,
+      "total_hits": 12,
+      "total_silences": 4
+    }
+  },
+  "silences": [
+    {
+      "comment": "",
+      "created_by": "",
+      "ends_at": "2025-01-02T00:00:00",
+      "id": "silence-002",
+      "matched_alert_count": 5,
+      "matched_alerts": [
+        {
+          "annotations": {
+            "description": "The primary database instance has been down for 5 minutes",
+            "summary": "Database is not responding"
+          },
+          "labels": {
+            "alertname": "DatabaseDown",
+            "instance": "db-01",
+            "service": "database",
+            "severity": "critical"
+          },
+          "source": "test_alerts.json:1"
+        },
+        {
+          "annotations": {
+            "description": "Replica database is down",
+            "summary": "Database is not responding"
+          },
+          "labels": {
+            "alertname": "DatabaseDown",
+            "instance": "db-02",
+            "service": "database",
+            "severity": "critical"
+          },
+          "source": "test_alerts.json:2"
+        },
+        {
+          "annotations": {
+            "summary": "High CPU usage detected"
+          },
+          "labels": {
+            "alertname": "HighCPUUsage",
+            "instance": "web-01",
+            "service": "web-server",
+            "severity": "warning"
+          },
+          "source": "test_alerts.json:3"
+        },
+        {
+          "annotations": {},
+          "labels": {
+            "alertname": "HighCPUUsage",
+            "instance": "web-02",
+            "service": "web-server",
+            "severity": "warning"
+          },
+          "source": "test_alerts.json:4"
+        },
+        {
+          "annotations": {},
+          "labels": {
+            "alertname": "HighMemoryUsage",
+            "instance": "app-01",
+            "service": "api",
+            "severity": "warning"
+          },
+          "source": "test_alerts.json:5"
+        }
+      ],
+      "matchers": [
+        {
+          "is_regex": true,
+          "name": "instance",
+          "value": ".*"
+        }
+      ],
+      "risk_level": "CRITICAL",
+      "risk_reason": "silence already expired; no creator specified; no meaningful comment; no severity label in matchers (risk of broad matching); wildcard regex matcher detected (high risk); only one matcher (broad matching risk)",
+      "risk_score": 100,
+      "source": "test_silences.json:2",
+      "starts_at": "2025-01-01T00:00:00",
+      "status": "active"
+    },
+    {
+      "comment": "suppress noisy alerts",
+      "created_by": "unknown",
+      "ends_at": "2025-05-20T00:00:00",
+      "id": "silence-004",
+      "matched_alert_count": 3,
+      "matched_alerts": [
+        {
+          "annotations": {
+            "summary": "High CPU usage detected"
+          },
+          "labels": {
+            "alertname": "HighCPUUsage",
+            "instance": "web-01",
+            "service": "web-server",
+            "severity": "warning"
+          },
+          "source": "test_alerts.json:3"
+        },
+        {
+          "annotations": {},
+          "labels": {
+            "alertname": "HighCPUUsage",
+            "instance": "web-02",
+            "service": "web-server",
+            "severity": "warning"
+          },
+          "source": "test_alerts.json:4"
+        },
+        {
+          "annotations": {},
+          "labels": {
+            "alertname": "HighMemoryUsage",
+            "instance": "app-01",
+            "service": "api",
+            "severity": "warning"
+          },
+          "source": "test_alerts.json:5"
+        }
+      ],
+      "matchers": [
+        {
+          "is_regex": false,
+          "name": "severity",
+          "value": "warning"
+        }
+      ],
+      "risk_level": "HIGH",
+      "risk_reason": "silence already expired; no creator specified; only one matcher (broad matching risk)",
+      "risk_score": 80,
+      "source": "test_silences.json:4",
+      "starts_at": "2025-05-01T00:00:00",
+      "status": "active"
+    },
+    {
+      "comment": "Temporary suppression during deployment",
+      "created_by": "developer1",
+      "ends_at": "2025-06-20T00:00:00",
+      "id": "silence-003",
+      "matched_alert_count": 2,
+      "matched_alerts": [
+        {
+          "annotations": {
+            "summary": "High CPU usage detected"
+          },
+          "labels": {
+            "alertname": "HighCPUUsage",
+            "instance": "web-01",
+            "service": "web-server",
+            "severity": "warning"
+          },
+          "source": "test_alerts.json:3"
+        },
+        {
+          "annotations": {},
+          "labels": {
+            "alertname": "HighCPUUsage",
+            "instance": "web-02",
+            "service": "web-server",
+            "severity": "warning"
+          },
+          "source": "test_alerts.json:4"
+        }
+      ],
+      "matchers": [
+        {
+          "is_regex": false,
+          "name": "alertname",
+          "value": "HighCPUUsage"
+        },
+        {
+          "is_regex": false,
+          "name": "service",
+          "value": "web-server"
+        }
+      ],
+      "risk_level": null,
+      "risk_reason": null,
+      "risk_score": null,
+      "source": "test_silences.json:3",
+      "starts_at": "2025-05-10T00:00:00",
+      "status": "active"
+    },
+    {
+      "comment": "Maintenance window for database upgrade",
+      "created_by": "ops-team",
+      "ends_at": "2025-05-16T00:00:00",
+      "id": "silence-001",
+      "matched_alert_count": 2,
+      "matched_alerts": [
+        {
+          "annotations": {
+            "description": "The primary database instance has been down for 5 minutes",
+            "summary": "Database is not responding"
+          },
+          "labels": {
+            "alertname": "DatabaseDown",
+            "instance": "db-01",
+            "service": "database",
+            "severity": "critical"
+          },
+          "source": "test_alerts.json:1"
+        },
+        {
+          "annotations": {
+            "description": "Replica database is down",
+            "summary": "Database is not responding"
+          },
+          "labels": {
+            "alertname": "DatabaseDown",
+            "instance": "db-02",
+            "service": "database",
+            "severity": "critical"
+          },
+          "source": "test_alerts.json:2"
+        }
+      ],
+      "matchers": [
+        {
+          "is_regex": false,
+          "name": "alertname",
+          "value": "DatabaseDown"
+        },
+        {
+          "is_regex": false,
+          "name": "severity",
+          "value": "critical"
+        }
+      ],
+      "risk_level": null,
+      "risk_reason": null,
+      "risk_score": null,
+      "source": "test_silences.json:1",
+      "starts_at": "2025-05-15T00:00:00",
+      "status": "active"
+    }
+  ],
+  "summary": {
+    "invalid_alerts": 0,
+    "invalid_silences": 0,
+    "total_alerts": 5,
+    "total_silences": 4,
+    "valid_alerts": 5,
+    "valid_silences": 4
+  }
+}

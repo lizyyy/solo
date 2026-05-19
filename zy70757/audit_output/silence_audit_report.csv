@@ -1,0 +1,5 @@
+Silence ID,Created By,Comment,Status,Expires At,Matched Alerts,Risk Level,Risk Score,Risk Reason,Source,Matchers
+silence-002,,,active,2025-01-02T00:00:00,5,CRITICAL,100,silence already expired; no creator specified; no meaningful comment; no severity label in matchers (risk of broad matching); wildcard regex matcher detected (high risk); only one matcher (broad matching risk),test_silences.json:2,instance=~.*
+silence-004,unknown,suppress noisy alerts,active,2025-05-20T00:00:00,3,HIGH,80,silence already expired; no creator specified; only one matcher (broad matching risk),test_silences.json:4,severity==warning
+silence-003,developer1,Temporary suppression during deployment,active,2025-06-20T00:00:00,2,,,,test_silences.json:3,alertname==HighCPUUsage; service==web-server
+silence-001,ops-team,Maintenance window for database upgrade,active,2025-05-16T00:00:00,2,,,,test_silences.json:1,alertname==DatabaseDown; severity==critical

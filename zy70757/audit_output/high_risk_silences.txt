@@ -1,0 +1,39 @@
+================================================================================
+HIGH RISK SILENCES REPORT
+================================================================================
+
+Generated: 2026-05-19T13:58:43.722492
+Total High/Critical Risk Silences: 2
+
+--------------------------------------------------------------------------------
+#1 - RISK CRITICAL (100/100)
+--------------------------------------------------------------------------------
+Silence ID: silence-002
+Created By: 
+Comment: 
+Status: active
+Expires At: 2025-01-02T00:00:00
+Matched Alerts: 5
+Source: test_silences.json:2
+
+Risk Reasons: silence already expired; no creator specified; no meaningful comment; no severity label in matchers (risk of broad matching); wildcard regex matcher detected (high risk); only one matcher (broad matching risk)
+
+Matchers:
+  - instance~.*
+
+--------------------------------------------------------------------------------
+#2 - RISK HIGH (80/100)
+--------------------------------------------------------------------------------
+Silence ID: silence-004
+Created By: unknown
+Comment: suppress noisy alerts
+Status: active
+Expires At: 2025-05-20T00:00:00
+Matched Alerts: 3
+Source: test_silences.json:4
+
+Risk Reasons: silence already expired; no creator specified; only one matcher (broad matching risk)
+
+Matchers:
+  - severity=warning
+

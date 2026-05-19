@@ -1,0 +1,47 @@
+================================================================================
+SILENCE AUDIT SUMMARY REPORT
+================================================================================
+
+Generated: 2026-05-19T13:58:43.722584
+
+--- SILENCE STATISTICS ---
+Total Silences: 4
+  Valid: 4
+  Invalid: 0
+
+--- ALERT STATISTICS ---
+Total Alerts: 5
+  Valid: 5
+  Invalid: 0
+
+--- MATCH STATISTICS ---
+Total Hits: 12
+Average Hits per Silence: 3.00
+No Hit Silences: 0
+High Hit Silences (>=10): 0
+
+--- RISK DISTRIBUTION ---
+CRITICAL: 1
+HIGH: 1
+MEDIUM: 2
+LOW: 0
+INFO: 0
+
+High/Critical Risk Total: 2
+
+--- CREATOR RISK SUMMARY ---
+
+developer1:
+  Total Silences: 1
+  Critical/High Risk: 0
+  Average Risk Score: 60.0
+
+ops-team:
+  Total Silences: 1
+  Critical/High Risk: 0
+  Average Risk Score: 50.0
+
+unknown:
+  Total Silences: 2
+  Critical/High Risk: 2
+  Average Risk Score: 90.0

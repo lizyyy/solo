@@ -1,0 +1,48 @@
+[
+  {
+    "id": "silence-001",
+    "createdBy": "ops-team",
+    "comment": "Maintenance window for database upgrade",
+    "startsAt": "2025-05-15T00:00:00Z",
+    "endsAt": "2025-05-16T00:00:00Z",
+    "status": "active",
+    "matchers": [
+      {"name": "alertname", "value": "DatabaseDown", "isRegex": false},
+      {"name": "severity", "value": "critical", "isRegex": false}
+    ]
+  },
+  {
+    "id": "silence-002",
+    "createdBy": "",
+    "comment": "",
+    "startsAt": "2025-01-01T00:00:00Z",
+    "endsAt": "2025-01-02T00:00:00Z",
+    "status": "active",
+    "matchers": [
+      {"name": "instance", "value": ".*", "isRegex": true}
+    ]
+  },
+  {
+    "id": "silence-003",
+    "createdBy": "developer1",
+    "comment": "Temporary suppression during deployment",
+    "startsAt": "2025-05-10T00:00:00Z",
+    "endsAt": "2025-06-20T00:00:00Z",
+    "status": "active",
+    "matchers": [
+      {"name": "alertname", "value": "HighCPUUsage", "isRegex": false},
+      {"name": "service", "value": "web-server", "isRegex": false}
+    ]
+  },
+  {
+    "id": "silence-004",
+    "createdBy": "unknown",
+    "comment": "suppress noisy alerts",
+    "startsAt": "2025-05-01T00:00:00Z",
+    "endsAt": "2025-05-20T00:00:00Z",
+    "status": "active",
+    "matchers": [
+      {"name": "severity", "value": "warning", "isRegex": false}
+    ]
+  }
+]

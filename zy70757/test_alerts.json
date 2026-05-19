@@ -1,0 +1,60 @@
+{
+  "alerts": [
+    {
+      "labels": {
+        "alertname": "DatabaseDown",
+        "severity": "critical",
+        "instance": "db-01",
+        "service": "database"
+      },
+      "annotations": {
+        "summary": "Database is not responding",
+        "description": "The primary database instance has been down for 5 minutes"
+      },
+      "startsAt": "2025-05-15T10:30:00Z"
+    },
+    {
+      "labels": {
+        "alertname": "DatabaseDown",
+        "severity": "critical",
+        "instance": "db-02",
+        "service": "database"
+      },
+      "annotations": {
+        "summary": "Database is not responding",
+        "description": "Replica database is down"
+      },
+      "startsAt": "2025-05-15T10:35:00Z"
+    },
+    {
+      "labels": {
+        "alertname": "HighCPUUsage",
+        "severity": "warning",
+        "instance": "web-01",
+        "service": "web-server"
+      },
+      "annotations": {
+        "summary": "High CPU usage detected"
+      },
+      "startsAt": "2025-05-15T11:00:00Z"
+    },
+    {
+      "labels": {
+        "alertname": "HighCPUUsage",
+        "severity": "warning",
+        "instance": "web-02",
+        "service": "web-server"
+      },
+      "startsAt": "2025-05-15T11:05:00Z"
+    },
+    {
+      "labels": {
+        "alertname": "HighMemoryUsage",
+        "severity": "warning",
+        "instance": "app-01",
+        "service": "api"
+      },
+      "startsAt": "2025-05-15T12:00:00Z"
+    }
+  ]
+}
