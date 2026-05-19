@@ -51,8 +51,8 @@ def retry_compensation(db: Session, log_id: int) -> Optional[models.Compensation
     log.status = "processing"
     
     try:
-        details = log.details
-        if details.get("action") == "process_product":
+        if log.action == "process_product":
+            details = log.details
             product_data = details.get("product_data", {})
             batch = db.query(models.SyncBatch).filter(models.SyncBatch.batch_id == log.batch_id).first()
             
@@ -78,8 +78,8 @@ def retry_compensation(db: Session, log_id: int) -> Optional[models.Compensation
                     )
                     db.add(product)
                     batch.success_items += 1
-                    batch.failed_items -= 1 if batch.failed_items > 0 else 0
-                    batch.processed_items += 1
+                    if batch.failed_items > 0:
+                        batch.failed_items -= 1
                 
                 elif existing_product and existing_product.raw_data != product_data:
                     conflict = models.ConflictItem(
@@ -92,6 +92,8 @@ def retry_compensation(db: Session, log_id: int) -> Optional[models.Compensation
                     )
                     db.add(conflict)
                     batch.conflict_items += 1
+                    if batch.failed_items > 0:
+                        batch.failed_items -= 1
                     
                     pending = models.PendingConfirmation(
                         batch_id=batch.id,
@@ -102,6 +104,15 @@ def retry_compensation(db: Session, log_id: int) -> Optional[models.Compensation
                         status=ConfirmationStatus.PENDING
                     )
                     db.add(pending)
+                
+                batch.processed_items = batch.success_items + batch.failed_items + batch.conflict_items
+                
+                if batch.conflict_items > 0:
+                    batch.status = SyncStatus.CONFLICT
+                elif batch.failed_items > 0:
+                    batch.status = SyncStatus.PARTIAL
+                else:
+                    batch.status = SyncStatus.SUCCESS
         
         log.status = "success"
         log.completed_at = datetime.now()
