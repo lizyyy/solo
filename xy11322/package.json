@@ -1,0 +1,36 @@
+{
+  "name": "agri-finance-billing",
+  "version": "1.0.0",
+  "description": "农机合作社财务计费系统",
+  "main": "dist/index.js",
+  "bin": {
+    "agri-bill": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "uuid": "^9.0.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/json2csv": "^5.0.3",
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "@types/yargs": "^17.0.24",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  },
+  "keywords": ["agriculture", "billing", "finance"],
+  "author": "",
+  "license": "MIT"
+}

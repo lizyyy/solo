@@ -1,0 +1,6 @@
+recordNo,operator,tractorNo,operatorName,startTime,endTime,workHours,workArea,fuelConsumption,billingType,hourlyRate,areaRate,fuelRate,minimumCharge
+REC001,张三,TR001,李四,2024-01-15 08:00:00,2024-01-15 12:00:00,4,20,15,hourly,150,80,7.5,200
+REC002,张三,TR002,王五,2024-01-15 13:00:00,2024-01-15 18:00:00,5,30,20,area,150,80,7.5,200
+REC003,李四,TR001,赵六,2024-01-16 22:00:00,2024-01-17 02:00:00,4,15,10,mixed,150,80,7.5,200
+REC004,李四,TR003,孙七,2024-01-16 09:00:00,2024-01-16 10:00:00,1,5,3,fuel,150,80,7.5,200
+REC005,王五,TR002,周八,2024-01-17 08:00:00,2024-01-17 16:00:00,8,50,30,hourly,150,80,7.5,200

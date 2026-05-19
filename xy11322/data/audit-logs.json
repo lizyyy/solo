@@ -1,0 +1,372 @@
+[
+  {
+    "id": "54c310cb-d1ba-418c-a814-c3a222a8e453",
+    "action": "create_record",
+    "operator": "张三",
+    "timestamp": "2026-05-19T15:16:28.818Z",
+    "details": {
+      "recordId": "87a199ff-c76c-4c68-b381-c7013a36fcef",
+      "recordNo": "REC001"
+    }
+  },
+  {
+    "id": "0bc3873b-ec1e-42d5-a953-34d98d0904ed",
+    "action": "create_record",
+    "operator": "张三",
+    "timestamp": "2026-05-19T15:16:28.820Z",
+    "details": {
+      "recordId": "a9b51229-364f-47fb-8351-ebf1bee67d17",
+      "recordNo": "REC002"
+    }
+  },
+  {
+    "id": "c499572a-70ad-4c4b-99c2-720ffea859d1",
+    "action": "create_record",
+    "operator": "张三",
+    "timestamp": "2026-05-19T15:16:28.820Z",
+    "details": {
+      "recordId": "7fb4f241-1b5b-464d-a021-b9f292e03486",
+      "recordNo": "REC003"
+    }
+  },
+  {
+    "id": "42527c20-272a-418b-bec9-c9a0f860a116",
+    "action": "create_record",
+    "operator": "张三",
+    "timestamp": "2026-05-19T15:16:28.820Z",
+    "details": {
+      "recordId": "62dede20-c7e0-48e7-aa62-7afe77cca0d3",
+      "recordNo": "REC004"
+    }
+  },
+  {
+    "id": "a04e05bc-397d-48d4-aa3a-3fd72655cbbb",
+    "action": "create_record",
+    "operator": "张三",
+    "timestamp": "2026-05-19T15:16:28.821Z",
+    "details": {
+      "recordId": "283c3bdd-b9b1-4603-8ec3-d41516e55b40",
+      "recordNo": "REC005"
+    }
+  },
+  {
+    "id": "e42ce894-d065-4a51-a38e-0c6211590be0",
+    "action": "update_record",
+    "operator": "李四",
+    "timestamp": "2026-05-19T15:16:38.463Z",
+    "details": {
+      "recordId": "87a199ff-c76c-4c68-b381-c7013a36fcef",
+      "updates": {
+        "calculatedAmount": 600,
+        "finalAmount": 600,
+        "exceptions": [],
+        "status": "valid"
+      }
+    }
+  },
+  {
+    "id": "af25ac6d-c64d-4ec8-9e66-231e9bdbbba6",
+    "action": "calculate_billing",
+    "operator": "李四",
+    "timestamp": "2026-05-19T15:16:38.464Z",
+    "details": {
+      "recordId": "87a199ff-c76c-4c68-b381-c7013a36fcef",
+      "recordNo": "REC001",
+      "result": {
+        "success": true,
+        "recordId": "87a199ff-c76c-4c68-b381-c7013a36fcef",
+        "recordNo": "REC001",
+        "calculatedAmount": 600,
+        "finalAmount": 600,
+        "adjustments": [],
+        "exceptions": [],
+        "status": "valid"
+      }
+    }
+  },
+  {
+    "id": "db825ba5-1677-495d-8ecd-0ac80b51deee",
+    "action": "update_record",
+    "operator": "李四",
+    "timestamp": "2026-05-19T15:16:38.464Z",
+    "details": {
+      "recordId": "a9b51229-364f-47fb-8351-ebf1bee67d17",
+      "updates": {
+        "calculatedAmount": 2400,
+        "finalAmount": 2400,
+        "exceptions": [],
+        "status": "valid"
+      }
+    }
+  },
+  {
+    "id": "071feace-9a4d-4a3e-adba-1d062deb8c6b",
+    "action": "calculate_billing",
+    "operator": "李四",
+    "timestamp": "2026-05-19T15:16:38.464Z",
+    "details": {
+      "recordId": "a9b51229-364f-47fb-8351-ebf1bee67d17",
+      "recordNo": "REC002",
+      "result": {
+        "success": true,
+        "recordId": "a9b51229-364f-47fb-8351-ebf1bee67d17",
+        "recordNo": "REC002",
+        "calculatedAmount": 2400,
+        "finalAmount": 2400,
+        "adjustments": [],
+        "exceptions": [],
+        "status": "valid"
+      }
+    }
+  },
+  {
+    "id": "bb8ec03a-6c76-4cdf-bd2d-efec3e11da0a",
+    "action": "update_record",
+    "operator": "李四",
+    "timestamp": "2026-05-19T15:16:38.464Z",
+    "details": {
+      "recordId": "7fb4f241-1b5b-464d-a021-b9f292e03486",
+      "updates": {
+        "calculatedAmount": 1875,
+        "finalAmount": 1875,
+        "exceptions": [
+          {
+            "type": "cross_day",
+            "message": "作业跨天: 从 Tue Jan 16 2024 到 Wed Jan 17 2024",
+            "severity": "warning",
+            "field": "time",
+            "timestamp": "2026-05-19T15:16:38.464Z"
+          }
+        ],
+        "status": "valid"
+      }
+    }
+  },
+  {
+    "id": "df48c975-e4e2-45b7-8080-3fc501c02310",
+    "action": "calculate_billing",
+    "operator": "李四",
+    "timestamp": "2026-05-19T15:16:38.465Z",
+    "details": {
+      "recordId": "7fb4f241-1b5b-464d-a021-b9f292e03486",
+      "recordNo": "REC003",
+      "result": {
+        "success": true,
+        "recordId": "7fb4f241-1b5b-464d-a021-b9f292e03486",
+        "recordNo": "REC003",
+        "calculatedAmount": 1875,
+        "finalAmount": 1875,
+        "adjustments": [
+          {
+            "type": "cross_day_split",
+            "reason": "跨天作业已按日期拆分计算",
+            "amount": 0,
+            "applied": true
+          }
+        ],
+        "exceptions": [
+          {
+            "type": "cross_day",
+            "message": "作业跨天: 从 Tue Jan 16 2024 到 Wed Jan 17 2024",
+            "severity": "warning",
+            "field": "time",
+            "timestamp": "2026-05-19T15:16:38.464Z"
+          }
+        ],
+        "status": "valid"
+      }
+    }
+  },
+  {
+    "id": "c9eee815-4dfa-40a5-b315-55e62556d914",
+    "action": "update_record",
+    "operator": "李四",
+    "timestamp": "2026-05-19T15:16:38.465Z",
+    "details": {
+      "recordId": "62dede20-c7e0-48e7-aa62-7afe77cca0d3",
+      "updates": {
+        "calculatedAmount": 200,
+        "finalAmount": 200,
+        "exceptions": [
+          {
+            "type": "below_minimum",
+            "message": "计算金额 22.5 低于最低收费 200",
+            "severity": "warning",
+            "field": "amount",
+            "timestamp": "2026-05-19T15:16:38.465Z"
+          }
+        ],
+        "status": "valid"
+      }
+    }
+  },
+  {
+    "id": "cef69e7c-8e10-4b58-8898-7cd6583d9c88",
+    "action": "calculate_billing",
+    "operator": "李四",
+    "timestamp": "2026-05-19T15:16:38.465Z",
+    "details": {
+      "recordId": "62dede20-c7e0-48e7-aa62-7afe77cca0d3",
+      "recordNo": "REC004",
+      "result": {
+        "success": true,
+        "recordId": "62dede20-c7e0-48e7-aa62-7afe77cca0d3",
+        "recordNo": "REC004",
+        "calculatedAmount": 200,
+        "finalAmount": 200,
+        "adjustments": [
+          {
+            "type": "minimum_charge",
+            "reason": "计算金额 22.5 低于最低收费 200",
+            "amount": 177.5,
+            "applied": true
+          }
+        ],
+        "exceptions": [
+          {
+            "type": "below_minimum",
+            "message": "计算金额 22.5 低于最低收费 200",
+            "severity": "warning",
+            "field": "amount",
+            "timestamp": "2026-05-19T15:16:38.465Z"
+          }
+        ],
+        "status": "valid"
+      }
+    }
+  },
+  {
+    "id": "4e905ce1-6fce-4ecf-9882-755db4a365bd",
+    "action": "update_record",
+    "operator": "李四",
+    "timestamp": "2026-05-19T15:16:38.465Z",
+    "details": {
+      "recordId": "283c3bdd-b9b1-4603-8ec3-d41516e55b40",
+      "updates": {
+        "calculatedAmount": 1200,
+        "finalAmount": 1200,
+        "exceptions": [],
+        "status": "valid"
+      }
+    }
+  },
+  {
+    "id": "7b12a770-868c-496c-9246-20a47cf87b0b",
+    "action": "update_record",
+    "operator": "王五",
+    "timestamp": "2026-05-19T15:16:56.166Z",
+    "details": {
+      "recordId": "87a199ff-c76c-4c68-b381-c7013a36fcef",
+      "updates": {
+        "isBilled": true,
+        "billedAt": "2026-05-19T15:16:56.165Z",
+        "billedBy": "王五",
+        "status": "billed"
+      }
+    }
+  },
+  {
+    "id": "e1c05768-21c5-4dd6-80dc-a33294e6e759",
+    "action": "bill_record",
+    "operator": "王五",
+    "timestamp": "2026-05-19T15:16:56.167Z",
+    "details": {
+      "recordId": "87a199ff-c76c-4c68-b381-c7013a36fcef",
+      "recordNo": "REC001",
+      "finalAmount": 600
+    }
+  },
+  {
+    "id": "752f6c8f-a1e4-4ff7-8c04-3b254cc9d66b",
+    "action": "update_record",
+    "operator": "王五",
+    "timestamp": "2026-05-19T15:16:56.167Z",
+    "details": {
+      "recordId": "a9b51229-364f-47fb-8351-ebf1bee67d17",
+      "updates": {
+        "isBilled": true,
+        "billedAt": "2026-05-19T15:16:56.167Z",
+        "billedBy": "王五",
+        "status": "billed"
+      }
+    }
+  },
+  {
+    "id": "444edfbe-8b4d-409f-97ae-a61eadf4d0ab",
+    "action": "bill_record",
+    "operator": "王五",
+    "timestamp": "2026-05-19T15:16:56.167Z",
+    "details": {
+      "recordId": "a9b51229-364f-47fb-8351-ebf1bee67d17",
+      "recordNo": "REC002",
+      "finalAmount": 2400
+    }
+  },
+  {
+    "id": "556b8a98-9ed7-4956-8f25-4e8834c0faf9",
+    "action": "update_record",
+    "operator": "王五",
+    "timestamp": "2026-05-19T15:16:56.167Z",
+    "details": {
+      "recordId": "7fb4f241-1b5b-464d-a021-b9f292e03486",
+      "updates": {
+        "isBilled": true,
+        "billedAt": "2026-05-19T15:16:56.167Z",
+        "billedBy": "王五",
+        "status": "billed"
+      }
+    }
+  },
+  {
+    "id": "cfa1f71e-01d5-4b51-8e2c-f3a4a539e3e2",
+    "action": "bill_record",
+    "operator": "王五",
+    "timestamp": "2026-05-19T15:16:56.167Z",
+    "details": {
+      "recordId": "7fb4f241-1b5b-464d-a021-b9f292e03486",
+      "recordNo": "REC003",
+      "finalAmount": 1875
+    }
+  },
+  {
+    "id": "23fbc9ca-4887-44ef-97b9-36b0ad5a0ff1",
+    "action": "update_record",
+    "operator": "王五",
+    "timestamp": "2026-05-19T15:16:56.167Z",
+    "details": {
+      "recordId": "62dede20-c7e0-48e7-aa62-7afe77cca0d3",
+      "updates": {
+        "isBilled": true,
+        "billedAt": "2026-05-19T15:16:56.167Z",
+        "billedBy": "王五",
+        "status": "billed"
+      }
+    }
+  },
+  {
+    "id": "287745be-e591-47bc-838a-9946119569d5",
+    "action": "bill_record",
+    "operator": "王五",
+    "timestamp": "2026-05-19T15:16:56.167Z",
+    "details": {
+      "recordId": "62dede20-c7e0-48e7-aa62-7afe77cca0d3",
+      "recordNo": "REC004",
+      "finalAmount": 200
+    }
+  },
+  {
+    "id": "99044b8d-6219-4092-bb5b-cec0df129d0c",
+    "action": "update_record",
+    "operator": "王五",
+    "timestamp": "2026-05-19T15:16:56.167Z",
+    "details": {
+      "recordId": "283c3bdd-b9b1-4603-8ec3-d41516e55b40",
+      "updates": {
+        "isBilled": true,
+        "billedAt": "2026-05-19T15:16:56.167Z",
+        "billedBy": "王五",
+        "status": "billed"
+      }
+    }
+  }
+]
