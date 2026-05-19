@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "generated_at": "2026-05-19T20:53:46.168110",
+    "tool_name": "APIcassette脱敏排查CLI"
+  },
+  "summary": {
+    "input_file": "compact_json.yaml",
+    "output_file": "compact_sanitized.yaml",
+    "total_sensitive_matches": 4,
+    "is_clean_after_sanitization": true,
+    "remaining_leaks_count": 0,
+    "location_breakdown": {
+      "request_headers": 0,
+      "request_body": 1,
+      "response_headers": 0,
+      "response_body": 3
+    }
+  },
+  "details": {
+    "sensitive_matches": {
+      "count": 4,
+      "by_rule": {
+        "password": 2,
+        "secret": 2
+      },
+      "by_location": {
+        "request_body": 1,
+        "response_body": 3
+      },
+      "items": [
+        {
+          "field_path": "interactions[0].request.body",
+          "rule_name": "password",
+          "location": "request_body",
+          "masked_preview": "GENERIC_MASKED_13a90cf9"
+        },
+        {
+          "field_path": "interactions[0].response.body",
+          "rule_name": "secret",
+          "location": "response_body",
+          "masked_preview": "GENERIC_MASKED_d2cb8735"
+        },
+        {
+          "field_path": "interactions[1].response.body",
+          "rule_name": "password",
+          "location": "response_body",
+          "masked_preview": "GENERIC_MASKED_649a19b1"
+        },
+        {
+          "field_path": "interactions[1].response.body",
+          "rule_name": "secret",
+          "location": "response_body",
+          "masked_preview": "GENERIC_MASKED_34689342"
+        }
+      ]
+    },
+    "remaining_leaks": {
+      "count": 0,
+      "by_rule": {},
+      "by_location": {}
+    },
+    "replacement_mapping": {
+      "mysecret12345": "GENERIC_MASKED_13a90cf9",
+      "thisisalongsecretvalue": "GENERIC_MASKED_d2cb8735",
+      "password1234": "GENERIC_MASKED_649a19b1",
+      "secret9876": "GENERIC_MASKED_34689342"
+    }
+  }
+}

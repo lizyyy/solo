@@ -38,10 +38,11 @@ class SanitizationResult:
 
 
 class SensitiveRule:
-    def __init__(self, name: str, pattern: str, mask_func=None):
+    def __init__(self, name: str, pattern: str, mask_func=None, value_group=None):
         self.name = name
         self.pattern = re.compile(pattern, re.IGNORECASE)
         self.mask_func = mask_func or self.default_mask
+        self.value_group = value_group
         
     def default_mask(self, value: str) -> str:
         return "*" * len(value)
@@ -50,15 +51,28 @@ class SensitiveRule:
         matches = []
         if isinstance(value, str):
             for match in self.pattern.finditer(value):
-                original = match.group()
-                masked = self.mask_func(original)
-                matches.append(SensitiveMatch(
-                    field_path=path,
-                    original_value=original,
-                    masked_value=masked,
-                    rule_name=self.name,
-                    location=location
-                ))
+                if self.value_group is not None:
+                    original = match.group(self.value_group)
+                    full_match = match.group()
+                    masked = self.mask_func(original)
+                    full_masked = full_match.replace(original, masked)
+                    matches.append(SensitiveMatch(
+                        field_path=path,
+                        original_value=original,
+                        masked_value=masked,
+                        rule_name=self.name,
+                        location=location
+                    ))
+                else:
+                    original = match.group()
+                    masked = self.mask_func(original)
+                    matches.append(SensitiveMatch(
+                        field_path=path,
+                        original_value=original,
+                        masked_value=masked,
+                        rule_name=self.name,
+                        location=location
+                    ))
         return matches
 
 
@@ -144,18 +158,25 @@ class RulesEngine:
             ),
             (
                 "password",
-                r'(?<="password":\s")(?!.*_MASKED_)[^"]{4,}(?=")',
-                self.masker.mask_generic
+                r'"password"\s*:\s*"(?!.*_MASKED_)([^"]{4,})"',
+                self.masker.mask_generic,
+                1
             ),
             (
                 "secret",
-                r'(?<="secret":\s")(?!.*_MASKED_)[^"]{4,}(?=")',
-                self.masker.mask_generic
+                r'"secret"\s*:\s*"(?!.*_MASKED_)([^"]{4,})"',
+                self.masker.mask_generic,
+                1
             ),
         ]
         
-        for name, pattern, mask_func in default_rules:
-            self.rules.append(SensitiveRule(name, pattern, mask_func))
+        for rule in default_rules:
+            if len(rule) == 4:
+                name, pattern, mask_func, value_group = rule
+                self.rules.append(SensitiveRule(name, pattern, mask_func, value_group))
+            else:
+                name, pattern, mask_func = rule
+                self.rules.append(SensitiveRule(name, pattern, mask_func))
             
     def _load_custom_rules(self, custom_rules: List[Dict]):
         for rule in custom_rules:
