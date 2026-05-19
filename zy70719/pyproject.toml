@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mirror-freshness-checker"
+version = "1.0.0"
+description = "镜像源新鲜度阻塞项目归因排查CLI工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+    "packaging>=21.0",
+]
+
+[project.scripts]
+mirror-check = "mirror_checker.cli:main"

@@ -1,0 +1,129 @@
+{
+  "report_id": "878a13b0-8016-42db-a2ef-cb4683014ca0",
+  "generated_at": "2026-05-19T07:11:31.194812",
+  "mirror_source": {
+    "name": "内网PyPI镜像源",
+    "url": "https://pypi-internal.example.com/simple",
+    "type": "pypi",
+    "sync_frequency_hours": 4.0,
+    "last_sync_time": "2026-05-19T05:11:04.116900",
+    "sync_window": null
+  },
+  "total_packages": 4,
+  "fresh_packages": 1,
+  "stale_packages": 0,
+  "critical_packages": 2,
+  "average_delay_hours": 24.0,
+  "project_results": [
+    {
+      "project_name": "web-backend",
+      "priority": 1,
+      "is_blocked": true,
+      "blocked_packages": [
+        "fastapi"
+      ],
+      "block_reasons": {
+        "fastapi": "version_gap_too_large"
+      },
+      "contact": "team-a@example.com",
+      "description": "Web服务后端项目",
+      "is_manually_confirmed": false
+    },
+    {
+      "project_name": "data-pipeline",
+      "priority": 2,
+      "is_blocked": true,
+      "blocked_packages": [
+        "pandas"
+      ],
+      "block_reasons": {
+        "pandas": "version_gap_too_large"
+      },
+      "contact": "team-b@example.com",
+      "description": "数据处理流水线",
+      "is_manually_confirmed": false
+    }
+  ],
+  "package_results": [
+    {
+      "package_name": "requests",
+      "status": "fresh",
+      "version_gap_result": {
+        "package_name": "requests",
+        "has_gap": false,
+        "version_gap": null,
+        "major_gap": 0,
+        "minor_gap": 0,
+        "patch_gap": 0,
+        "time_delay_hours": 0.0
+      },
+      "in_sync_window": true,
+      "block_reason": null,
+      "recommendation": "版本同步正常",
+      "requires_manual_confirm": false
+    },
+    {
+      "package_name": "fastapi",
+      "status": "critical",
+      "version_gap_result": {
+        "package_name": "fastapi",
+        "has_gap": true,
+        "version_gap": "0.103.0 -> 0.104.0",
+        "major_gap": 0,
+        "minor_gap": 1,
+        "patch_gap": 0,
+        "time_delay_hours": 24.0
+      },
+      "in_sync_window": true,
+      "block_reason": "version_gap_too_large",
+      "recommendation": "同步延迟超过 24.0 小时，需要紧急处理",
+      "requires_manual_confirm": true
+    },
+    {
+      "package_name": "pandas",
+      "status": "critical",
+      "version_gap_result": {
+        "package_name": "pandas",
+        "has_gap": true,
+        "version_gap": "1.5.3 -> 2.1.3",
+        "major_gap": 1,
+        "minor_gap": 4,
+        "patch_gap": 0,
+        "time_delay_hours": 60.0
+      },
+      "in_sync_window": true,
+      "block_reason": "version_gap_too_large",
+      "recommendation": "同步延迟超过 60.0 小时，需要紧急处理",
+      "requires_manual_confirm": true
+    },
+    {
+      "package_name": "numpy",
+      "status": "warning",
+      "version_gap_result": {
+        "package_name": "numpy",
+        "has_gap": true,
+        "version_gap": "1.25.2 -> 1.26.0",
+        "major_gap": 0,
+        "minor_gap": 1,
+        "patch_gap": 2,
+        "time_delay_hours": 12.0
+      },
+      "in_sync_window": true,
+      "block_reason": null,
+      "recommendation": "同步延迟 12.0 小时，建议关注",
+      "requires_manual_confirm": false
+    }
+  ],
+  "overall_status": "critical",
+  "summary": {
+    "total_packages": 4,
+    "fresh_packages": 1,
+    "stale_packages": 0,
+    "critical_packages": 2,
+    "fresh_rate": "25.0%",
+    "average_delay_hours": 24.0,
+    "total_projects": 2,
+    "blocked_projects": 2,
+    "needs_manual_confirmation": 2
+  }
+}

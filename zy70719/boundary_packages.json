@@ -1,0 +1,32 @@
+[
+  {
+    "name": "package-fresh",
+    "upstream_version": "1.0.0",
+    "mirror_version": "1.0.0",
+    "upstream_updated_at": "2026-05-19T07:11:44.213753",
+    "mirror_updated_at": "2026-05-19T07:11:44.213753",
+    "is_available": true
+  },
+  {
+    "name": "package-warning",
+    "upstream_version": "1.3.0",
+    "mirror_version": "1.0.0",
+    "upstream_updated_at": "2026-05-19T02:11:44.213753",
+    "mirror_updated_at": "2026-05-18T22:11:44.213753",
+    "is_available": true
+  },
+  {
+    "name": "package-critical",
+    "upstream_version": "3.0.0",
+    "mirror_version": "1.0.0",
+    "upstream_updated_at": "2026-05-18T06:11:44.213753",
+    "mirror_updated_at": "2026-05-17T06:11:44.213753",
+    "is_available": true
+  },
+  {
+    "name": "package-unavailable",
+    "upstream_version": "2.0.0",
+    "mirror_version": null,
+    "is_available": false
+  }
+]

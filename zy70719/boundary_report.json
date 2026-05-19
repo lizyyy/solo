@@ -1,0 +1,150 @@
+{
+  "report_id": "eba5e0f0-926b-400c-adcd-36ff28b75fa3",
+  "generated_at": "2026-05-19T07:11:44.398051",
+  "mirror_source": {
+    "name": "内网PyPI镜像源",
+    "url": "https://pypi-internal.example.com/simple",
+    "type": "pypi",
+    "sync_frequency_hours": 4.0,
+    "last_sync_time": "2026-05-19T05:11:44.213742",
+    "sync_window": {
+      "name": "夜间同步窗口",
+      "start_time": "00:00",
+      "end_time": "06:00",
+      "max_delay_hours": 6.0
+    }
+  },
+  "total_packages": 4,
+  "fresh_packages": 1,
+  "stale_packages": 0,
+  "critical_packages": 2,
+  "average_delay_hours": 9.333333333333334,
+  "project_results": [
+    {
+      "project_name": "all-blocked",
+      "priority": 1,
+      "is_blocked": true,
+      "blocked_packages": [
+        "package-critical",
+        "package-unavailable"
+      ],
+      "block_reasons": {
+        "package-critical": "version_gap_too_large",
+        "package-unavailable": "mirror_sync_failed"
+      },
+      "contact": "urgent@example.com",
+      "description": "所有依赖都阻塞的项目",
+      "is_manually_confirmed": false
+    },
+    {
+      "project_name": "partially-blocked",
+      "priority": 2,
+      "is_blocked": true,
+      "blocked_packages": [
+        "package-warning"
+      ],
+      "block_reasons": {
+        "package-warning": "outside_sync_window"
+      },
+      "contact": "normal@example.com",
+      "description": "部分依赖阻塞",
+      "is_manually_confirmed": false
+    },
+    {
+      "project_name": "confirmed-project",
+      "priority": 3,
+      "is_blocked": false,
+      "blocked_packages": [
+        "package-critical"
+      ],
+      "block_reasons": {
+        "package-critical": "version_gap_too_large"
+      },
+      "contact": "confirmed@example.com",
+      "description": "已人工确认放行",
+      "is_manually_confirmed": true
+    }
+  ],
+  "package_results": [
+    {
+      "package_name": "package-fresh",
+      "status": "fresh",
+      "version_gap_result": {
+        "package_name": "package-fresh",
+        "has_gap": false,
+        "version_gap": null,
+        "major_gap": 0,
+        "minor_gap": 0,
+        "patch_gap": 0,
+        "time_delay_hours": 0.0
+      },
+      "in_sync_window": false,
+      "block_reason": null,
+      "recommendation": "版本同步正常",
+      "requires_manual_confirm": false
+    },
+    {
+      "package_name": "package-warning",
+      "status": "warning",
+      "version_gap_result": {
+        "package_name": "package-warning",
+        "has_gap": true,
+        "version_gap": "1.0.0 -> 1.3.0",
+        "major_gap": 0,
+        "minor_gap": 3,
+        "patch_gap": 0,
+        "time_delay_hours": 4.0
+      },
+      "in_sync_window": false,
+      "block_reason": "outside_sync_window",
+      "recommendation": "同步延迟 4.0 小时，建议关注（当前不在同步窗口期）",
+      "requires_manual_confirm": true
+    },
+    {
+      "package_name": "package-critical",
+      "status": "critical",
+      "version_gap_result": {
+        "package_name": "package-critical",
+        "has_gap": true,
+        "version_gap": "1.0.0 -> 3.0.0",
+        "major_gap": 2,
+        "minor_gap": 0,
+        "patch_gap": 0,
+        "time_delay_hours": 24.0
+      },
+      "in_sync_window": false,
+      "block_reason": "version_gap_too_large",
+      "recommendation": "同步延迟超过 24.0 小时，需要紧急处理（当前不在同步窗口期）",
+      "requires_manual_confirm": true
+    },
+    {
+      "package_name": "package-unavailable",
+      "status": "critical",
+      "version_gap_result": {
+        "package_name": "package-unavailable",
+        "has_gap": true,
+        "version_gap": "2.0.0",
+        "major_gap": 0,
+        "minor_gap": 0,
+        "patch_gap": 0,
+        "time_delay_hours": null
+      },
+      "in_sync_window": false,
+      "block_reason": "mirror_sync_failed",
+      "recommendation": "镜像源中不存在该包，拉取失败",
+      "requires_manual_confirm": true
+    }
+  ],
+  "overall_status": "critical",
+  "summary": {
+    "total_packages": 4,
+    "fresh_packages": 1,
+    "stale_packages": 0,
+    "critical_packages": 2,
+    "fresh_rate": "25.0%",
+    "average_delay_hours": 9.33,
+    "total_projects": 3,
+    "blocked_projects": 2,
+    "needs_manual_confirmation": 3
+  }
+}

@@ -1,0 +1,24 @@
+[
+  {
+    "project_name": "web-backend",
+    "required_packages": [
+      "requests",
+      "fastapi"
+    ],
+    "priority": 1,
+    "contact": "team-a@example.com",
+    "description": "Web服务后端项目",
+    "is_manually_confirmed": false
+  },
+  {
+    "project_name": "data-pipeline",
+    "required_packages": [
+      "pandas",
+      "numpy"
+    ],
+    "priority": 2,
+    "contact": "team-b@example.com",
+    "description": "数据处理流水线",
+    "is_manually_confirmed": false
+  }
+]

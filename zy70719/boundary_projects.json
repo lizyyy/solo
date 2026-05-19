@@ -1,0 +1,34 @@
+[
+  {
+    "project_name": "all-blocked",
+    "required_packages": [
+      "package-critical",
+      "package-unavailable"
+    ],
+    "priority": 1,
+    "contact": "urgent@example.com",
+    "description": "所有依赖都阻塞的项目",
+    "is_manually_confirmed": false
+  },
+  {
+    "project_name": "partially-blocked",
+    "required_packages": [
+      "package-fresh",
+      "package-warning"
+    ],
+    "priority": 2,
+    "contact": "normal@example.com",
+    "description": "部分依赖阻塞",
+    "is_manually_confirmed": false
+  },
+  {
+    "project_name": "confirmed-project",
+    "required_packages": [
+      "package-critical"
+    ],
+    "priority": 3,
+    "contact": "confirmed@example.com",
+    "description": "已人工确认放行",
+    "is_manually_confirmed": true
+  }
+]
