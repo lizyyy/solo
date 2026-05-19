@@ -1,0 +1,14 @@
+ID,操作类型,实体类型,实体ID,操作人,状态,原因,创建时间
+mpchvqcnqpemnqyj4oq,create,forklift,FL001,system,success,创建叉车,2026-05-19T10:33:16.583Z
+mpchvqcp0w6a7jio4plg,create,forklift,FL002,system,success,创建叉车,2026-05-19T10:33:16.585Z
+mpchvqcqqlqmrdqmqfm,create,forklift,FL003,system,success,创建叉车,2026-05-19T10:33:16.586Z
+mpchvqcrymc4nzq0me,create,station,ST001,system,success,创建充电桩,2026-05-19T10:33:16.587Z
+mpchvqcsvz9wkzsvn1o,create,station,ST002,system,success,创建充电桩,2026-05-19T10:33:16.588Z
+mpchvqct7j8tpn7ze0p,create,station,ST003,system,success,创建充电桩,2026-05-19T10:33:16.589Z
+mpchvqcut7wr858cmbg,create,shift,SH001,张班长,success,创建班次,2026-05-19T10:33:16.590Z
+mpchvqcu55c0vr49nmn,create,shift,SH002,李班长,success,创建班次,2026-05-19T10:33:16.590Z
+mpchvqcweq0ng1ek0r,lock_validate,station,ST001,王司机,success,所有规则通过，允许锁桩,2026-05-19T10:33:16.592Z
+mpchvqcxncqmxfsukue,lock,station,ST001,王司机,success,锁桩成功，预计释放时间：2026-05-19T18:33:16.592Z,2026-05-19T10:33:16.593Z
+mpchvqcyvh85q9zxmha,lock_validate,station,ST001,王司机,blocked,规则拦截：重复锁桩：该叉车在本班次内已锁定此充电桩,2026-05-19T10:33:16.594Z
+mpchvqczafau37s831o,lock_validate,station,ST001,赵司机,blocked,规则拦截：存在1辆电量更低的叉车正在充电，请优先安排低电量叉车; 充电桩被占用：被叉车FL002锁定,2026-05-19T10:33:16.595Z
+mpchvqd1z43t4c01r6,lock_validate,station,ST002,赵司机,blocked,规则拦截：存在1辆电量更低的叉车正在充电，请优先安排低电量叉车,2026-05-19T10:33:16.597Z

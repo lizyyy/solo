@@ -1,0 +1,19 @@
+{
+  "name": "forklift-scheduling-system",
+  "version": "1.0.0",
+  "description": "叉车排班与充电管理系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/test.js"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7",
+    "csv-writer": "^1.6.0",
+    "csv-parser": "^3.0.0",
+    "yargs": "^17.7.2"
+  },
+  "keywords": ["forklift", "scheduling", "charging"],
+  "author": "",
+  "license": "MIT"
+}

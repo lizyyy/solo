@@ -1,0 +1,4 @@
+异常ID,异常类型,严重程度,描述,是否处理,创建时间
+mpchvqcz2vkzw9mu61p,LOCK_FAILED,medium,规则拦截：重复锁桩：该叉车在本班次内已锁定此充电桩,false,2026-05-19T10:33:16.595Z
+mpchvqd00zsksglnqn5p,LOCK_FAILED,medium,规则拦截：存在1辆电量更低的叉车正在充电，请优先安排低电量叉车; 充电桩被占用：被叉车FL002锁定,false,2026-05-19T10:33:16.596Z
+mpchvqd1tmq33gjn5y,LOCK_FAILED,medium,规则拦截：存在1辆电量更低的叉车正在充电，请优先安排低电量叉车,false,2026-05-19T10:33:16.597Z
