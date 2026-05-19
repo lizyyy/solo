@@ -177,19 +177,66 @@ app.post('/api/batches/:id/start', (req, res) => {
     
     const msg = store.getMessage(msgId);
     const rules = store.getRules().filter(r => r.enabled);
-    const shouldSkip = rules.some(r => 
-      (!r.topic || r.topic === msg?.topic) &&
-      (!r.deadReason || r.deadReason === msg?.deadReason)
-    );
+    
+    const shouldSkip = rules.some(rule => {
+      const hasTopicFilter = !!rule.topic;
+      const hasDeadReasonFilter = !!rule.deadReason;
+      const hasPayloadPatternFilter = !!rule.payloadPattern;
+      
+      const topicMatch = !hasTopicFilter || rule.topic === msg?.topic;
+      const deadReasonMatch = !hasDeadReasonFilter || rule.deadReason === msg?.deadReason;
+      
+      let payloadPatternMatch = true;
+      if (hasPayloadPatternFilter && msg?.payload) {
+        try {
+          const regex = new RegExp(rule.payloadPattern!);
+          const payloadStr = JSON.stringify(msg.payload);
+          payloadPatternMatch = regex.test(payloadStr);
+        } catch (e) {
+          payloadPatternMatch = false;
+        }
+      }
+      
+      if (hasTopicFilter || hasDeadReasonFilter || hasPayloadPatternFilter) {
+        return topicMatch && deadReasonMatch && payloadPatternMatch;
+      }
+      
+      return false;
+    });
     
     if (shouldSkip) {
+      const matchedRule = rules.find(rule => {
+        const hasTopicFilter = !!rule.topic;
+        const hasDeadReasonFilter = !!rule.deadReason;
+        const hasPayloadPatternFilter = !!rule.payloadPattern;
+        
+        const topicMatch = !hasTopicFilter || rule.topic === msg?.topic;
+        const deadReasonMatch = !hasDeadReasonFilter || rule.deadReason === msg?.deadReason;
+        
+        let payloadPatternMatch = true;
+        if (hasPayloadPatternFilter && msg?.payload) {
+          try {
+            const regex = new RegExp(rule.payloadPattern!);
+            const payloadStr = JSON.stringify(msg.payload);
+            payloadPatternMatch = regex.test(payloadStr);
+          } catch (e) {
+            payloadPatternMatch = false;
+          }
+        }
+        
+        if (hasTopicFilter || hasDeadReasonFilter || hasPayloadPatternFilter) {
+          return topicMatch && deadReasonMatch && payloadPatternMatch;
+        }
+        return false;
+      });
+      
       store.updateMessage(msgId, { status: 'skipped' });
       store.addHistory(msgId, {
         timestamp: Date.now(),
         action: 'skipped_by_rule',
         status: 'skipped',
         operator: 'system',
-        note: '命中跳过规则'
+        note: matchedRule ? `命中规则: ${matchedRule.name}` : '命中跳过规则'
       });
       store.updateBatch(req.params.id, { skippedCount: (currentBatch?.skippedCount || 0) + 1 });
     } else {
