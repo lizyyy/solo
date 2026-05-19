@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>离线表单同步控制台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #2a5298;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #f0f0f0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-synced {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-conflict {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-has_conflicts {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-rolled_back {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .detail-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .json-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .conflict-item {
+            background: #fff5f5;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .conflict-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .conflict-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .value-box {
+            padding: 10px;
+            border-radius: 6px;
+            background: white;
+        }
+
+        .value-box.server {
+            border-left: 3px solid #28a745;
+        }
+
+        .value-box.client {
+            border-left: 3px solid #dc3545;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2a5298;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #28a745;
+        }
+
+        .toast.error {
+            background: #dc3545;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .rollback-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 离线表单同步控制台</h1>
+        <p>管理离线表单数据同步、冲突解决和版本回滚</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-devices">0</div>
+                <div class="stat-label">离线设备</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-drafts">0</div>
+                <div class="stat-label">表单草稿</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-batches">0</div>
+                <div class="stat-label">同步批次</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-conflicts">0</div>
+                <div class="stat-label">待解决冲突</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-success" onclick="loadSampleData()">加载样例数据</button>
+            <button class="btn btn-primary" onclick="openModal('sync-modal')">发起同步</button>
+            <button class="btn btn-warning" onclick="exportData()">导出数据</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('drafts')">表单草稿</button>
+            <button class="tab" onclick="switchTab('batches')">同步批次</button>
+            <button class="tab" onclick="switchTab('conflicts')">冲突管理</button>
+            <button class="tab" onclick="switchTab('devices')">设备管理</button>
+        </div>
+
+        <div id="drafts-tab" class="tab-content active">
+            <div class="card">
+                <div class="card-title">表单草稿列表</div>
+                <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+                    <input type="text" class="search-box" placeholder="搜索表单..." onkeyup="filterDrafts()">
+                    <select class="filter-select" id="draft-status-filter" onchange="filterDrafts()">
+                        <option value="">全部状态</option>
+                        <option value="draft">草稿</option>
+                        <option value="synced">已同步</option>
+                        <option value="conflict">有冲突</option>
+                        <option value="rolled_back">已回滚</option>
+                    </select>
+                </div>
+                <table id="drafts-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>表单类型</th>
+                            <th>版本</th>
+                            <th>状态</th>
+                            <th>创建人</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="batches-tab" class="tab-content">
+            <div class="card">
+                <div class="card-title">同步批次列表</div>
+                <table id="batches-table">
+                    <thead>
+                        <tr>
+                            <th>批次号</th>
+                            <th>状态</th>
+                            <th>总数</th>
+                            <th>成功</th>
+                            <th>冲突</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="conflicts-tab" class="tab-content">
+            <div class="card">
+                <div class="card-title">冲突列表</div>
+                <table id="conflicts-table">
+                    <thead>
+                        <tr>
+                            <th>字段名</th>
+                            <th>服务端值</th>
+                            <th>客户端值</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="devices-tab" class="tab-content">
+            <div class="card">
+                <div class="card-title">设备列表</div>
+                <button class="btn btn-primary" style="margin-bottom: 15px;" onclick="openModal('device-modal')">添加设备</button>
+                <table id="devices-table">
+                    <thead>
+                        <tr>
+                            <th>设备名称</th>
+                            <th>设备类型</th>
+                            <th>状态</th>
+                            <th>最后同步</th>
+                            <th>创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="sync-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>发起同步</h3>
+                <button class="close-btn" onclick="closeModal('sync-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>选择设备</label>
+                <select id="sync-device"></select>
+            </div>
+            <div class="form-group">
+                <label>表单类型</label>
+                <input type="text" id="sync-form-type" value="安全检查">
+            </div>
+            <div class="form-group">
+                <label>表单数据 (JSON)</label>
+                <textarea id="sync-form-data">{"检查地点": "C车间", "检查人": "测试用户", "安全评分": 88}</textarea>
+            </div>
+            <div class="form-group">
+                <label>版本号</label>
+                <input type="number" id="sync-version" value="1">
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('sync-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitSync()">提交同步</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="conflict-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>解决冲突</h3>
+                <button class="close-btn" onclick="closeModal('conflict-modal')">&times;</button>
+            </div>
+            <div id="conflict-detail"></div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('conflict-modal')">取消</button>
+                <button class="btn btn-success" onclick="resolveConflict('server_wins')">使用服务端值</button>
+                <button class="btn btn-danger" onclick="resolveConflict('client_wins')">使用客户端值</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="draft-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>草稿详情</h3>
+                <button class="close-btn" onclick="closeModal('draft-detail-modal')">&times;</button>
+            </div>
+            <div id="draft-detail-content"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="device-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加设备</h3>
+                <button class="close-btn" onclick="closeModal('device-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>设备名称</label>
+                <input type="text" id="device-name" placeholder="例如：现场平板-003">
+            </div>
+            <div class="form-group">
+                <label>设备类型</label>
+                <select id="device-type">
+                    <option value="tablet">平板</option>
+                    <option value="mobile">手机</option>
+                    <option value="laptop">笔记本</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('device-modal')">取消</button>
+                <button class="btn btn-primary" onclick="createDevice()">创建设备</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentConflictId = null;
+        let allDrafts = [];
+
+        async function fetchData(endpoint) {
+            const response = await fetch(`${API_BASE}${endpoint}`);
+            return response.json();
+        }
+
+        async function postData(endpoint, data) {
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return response.json();
+        }
+
+        async function loadStats() {
+            const devices = await fetchData('/devices');
+            const drafts = await fetchData('/drafts');
+            const batches = await fetchData('/batches');
+            const conflicts = await fetchData('/conflicts?resolved=false');
+
+            document.getElementById('stat-devices').textContent = devices.length;
+            document.getElementById('stat-drafts').textContent = drafts.length;
+            document.getElementById('stat-batches').textContent = batches.length;
+            document.getElementById('stat-conflicts').textContent = conflicts.length;
+        }
+
+        async function loadDrafts() {
+            const drafts = await fetchData('/drafts');
+            allDrafts = drafts;
+            renderDrafts(drafts);
+        }
+
+        function renderDrafts(drafts) {
+            const tbody = document.querySelector('#drafts-table tbody');
+            tbody.innerHTML = drafts.map(draft => `
+                <tr>
+                    <td>${draft.id.substring(0, 8)}...</td>
+                    <td>${draft.form_type}</td>
+                    <td>v${draft.version}</td>
+                    <td><span class="status-badge status-${draft.status}">${draft.status}</span></td>
+                    <td>${draft.created_by || '-'}</td>
+                    <td>${new Date(draft.created_at).toLocaleString('zh-CN')}</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="viewDraftDetail('${draft.id}')">查看</button>
+                        <button class="btn btn-warning action-btn" onclick="loadRollbacks('${draft.id}')">回滚</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterDrafts() {
+            const search = document.querySelector('.search-box').value.toLowerCase();
+            const status = document.getElementById('draft-status-filter').value;
+            
+            let filtered = allDrafts.filter(d => 
+                d.form_type.toLowerCase().includes(search) ||
+                (d.created_by && d.created_by.toLowerCase().includes(search))
+            );
+            
+            if (status) {
+                filtered = filtered.filter(d => d.status === status);
+            }
+            
+            renderDrafts(filtered);
+        }
+
+        async function viewDraftDetail(draftId) {
+            const draft = await fetchData(`/drafts/${draftId}`);
+            const rollbacks = await fetchData(`/drafts/${draftId}/rollbacks`);
+            
+            document.getElementById('draft-detail-content').innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">ID</div>
+                        <div class="detail-value">${draft.id}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">表单类型</div>
+                        <div class="detail-value">${draft.form_type}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">版本</div>
+                        <div class="detail-value">v${draft.version}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">状态</div>
+                        <div class="detail-value"><span class="status-badge status-${draft.status}">${draft.status}</span></div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>表单数据</label>
+                    <div class="json-preview">${JSON.stringify(draft.form_data, null, 2)}</div>
+                </div>
+                ${rollbacks.length > 0 ? `
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>历史版本 (${rollbacks.length})</label>
+                        ${rollbacks.map(rb => `
+                            <div class="rollback-item">
+                                <div>
+                                    <strong>版本 ${rb.version_number}</strong>
+                                    <div style="font-size: 12px; color: #666;">${rb.rollback_reason || '无说明'}</div>
+                                </div>
+                                <button class="btn btn-warning action-btn" onclick="rollbackDraft('${draft.id}', '${rb.id}')">回滚到此版本</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
+            openModal('draft-detail-modal');
+        }
+
+        async function loadRollbacks(draftId) {
+            viewDraftDetail(draftId);
+        }
+
+        async function rollbackDraft(draftId, rollbackId) {
+            const result = await postData(`/drafts/${draftId}/rollback/${rollbackId}`, {});
+            showToast('回滚成功', 'success');
+            closeModal('draft-detail-modal');
+            loadAll();
+        }
+
+        async function loadBatches() {
+            const batches = await fetchData('/batches');
+            const tbody = document.querySelector('#batches-table tbody');
+            tbody.innerHTML = batches.map(batch => `
+                <tr>
+                    <td>${batch.batch_number}</td>
+                    <td><span class="status-badge status-${batch.status}">${batch.status}</span></td>
+                    <td>${batch.total_items}</td>
+                    <td>${batch.success_count}</td>
+                    <td>${batch.conflict_count}</td>
+                    <td>${new Date(batch.created_at).toLocaleString('zh-CN')}</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="viewBatchDetail('${batch.id}')">详情</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function viewBatchDetail(batchId) {
+            const result = await postData('/export', { batch_id: batchId });
+            if (result.length > 0) {
+                const batch = result[0];
+                document.getElementById('draft-detail-content').innerHTML = `
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">批次号</div>
+                            <div class="detail-value">${batch.batch_number}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">状态</div>
+                            <div class="detail-value"><span class="status-badge status-${batch.status}">${batch.status}</span></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">设备</div>
+                            <div class="detail-value">${batch.device_name || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">统计</div>
+                            <div class="detail-value">${batch.success_count}成功 / ${batch.conflict_count}冲突</div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>状态说明</label>
+                        <div class="detail-value">${batch.status_explanation}</div>
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>表单列表 (${batch.drafts.length})</label>
+                        ${batch.drafts.map(d => `
+                            <div style="padding: 10px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px;">
+                                <div><strong>${d.form_type}</strong> - 版本 ${d.version}</div>
+                                <div style="font-size: 12px; color: #666;">状态: ${d.status} - ${d.status_reason}</div>
+                                ${d.conflicts.length > 0 ? `
+                                    <div style="margin-top: 8px; padding: 8px; background: #fff5f5; border-radius: 4px;">
+                                        <div style="font-weight: 500; color: #dc3545;">冲突字段 (${d.conflicts.length}):</div>
+                                        ${d.conflicts.map(c => `
+                                            <div style="font-size: 12px; margin-top: 4px;">
+                                                • ${c.field_name}: 服务端="${c.server_value}", 客户端="${c.client_value}"
+                                                ${c.resolved ? ` [已解决: ${c.resolution_strategy}]` : ''}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                openModal('draft-detail-modal');
+            }
+        }
+
+        async function loadConflicts() {
+            const conflicts = await fetchData('/conflicts');
+            const tbody = document.querySelector('#conflicts-table tbody');
+            tbody.innerHTML = conflicts.map(conflict => `
+                <tr>
+                    <td>${conflict.field_name}</td>
+                    <td>${JSON.stringify(conflict.server_value)}</td>
+                    <td>${JSON.stringify(conflict.client_value)}</td>
+                    <td><span class="status-badge ${conflict.resolved ? 'status-synced' : 'status-conflict'}">${conflict.resolved ? '已解决' : '待解决'}</span></td>
+                    <td>${new Date(conflict.created_at).toLocaleString('zh-CN')}</td>
+                    <td>
+                        ${!conflict.resolved ? `
+                            <button class="btn btn-primary action-btn" onclick="openConflictModal('${conflict.id}')">解决</button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function openConflictModal(conflictId) {
+            currentConflictId = conflictId;
+            const conflict = await fetchData(`/conflicts/${conflictId}`);
+            
+            document.getElementById('conflict-detail').innerHTML = `
+                <div class="conflict-item">
+                    <div class="conflict-header">
+                        <strong>字段: ${conflict.field_name}</strong>
+                        <span class="status-badge status-conflict">待解决</span>
+                    </div>
+                    <p style="font-size: 13px; color: #666;">${conflict.conflict_description || ''}</p>
+                    <div class="conflict-values">
+                        <div class="value-box server">
+                            <div style="font-size: 12px; color: #28a745; font-weight: 500;">服务端值 (版本 ${conflict.server_version})</div>
+                            <div style="margin-top: 5px;">${JSON.stringify(conflict.server_value)}</div>
+                        </div>
+                        <div class="value-box client">
+                            <div style="font-size: 12px; color: #dc3545; font-weight: 500;">客户端值 (版本 ${conflict.client_version})</div>
+                            <div style="margin-top: 5px;">${JSON.stringify(conflict.client_value)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            openModal('conflict-modal');
+        }
+
+        async function resolveConflict(strategy) {
+            const result = await postData('/conflicts/resolve', {
+                conflict_id: currentConflictId,
+                resolution: strategy,
+                resolved_by: 'admin'
+            });
+            showToast('冲突已解决', 'success');
+            closeModal('conflict-modal');
+            loadAll();
+        }
+
+        async function loadDevices() {
+            const devices = await fetchData('/devices');
+            const tbody = document.querySelector('#devices-table tbody');
+            tbody.innerHTML = devices.map(device => `
+                <tr>
+                    <td>${device.device_name}</td>
+                    <td>${device.device_type}</td>
+                    <td><span class="status-badge status-${device.status}">${device.status}</span></td>
+                    <td>${device.last_sync_time ? new Date(device.last_sync_time).toLocaleString('zh-CN') : '-'}</td>
+                    <td>${new Date(device.created_at).toLocaleString('zh-CN')}</td>
+                </tr>
+            `).join('');
+
+            const select = document.getElementById('sync-device');
+            select.innerHTML = devices.map(d => `<option value="${d.id}">${d.device_name}</option>`).join('');
+        }
+
+        async function createDevice() {
+            const name = document.getElementById('device-name').value;
+            const type = document.getElementById('device-type').value;
+            
+            if (!name) {
+                showToast('请输入设备名称', 'error');
+                return;
+            }
+
+            await postData('/devices', { device_name: name, device_type: type });
+            showToast('设备创建成功', 'success');
+            closeModal('device-modal');
+            loadAll();
+        }
+
+        async function submitSync() {
+            const deviceId = document.getElementById('sync-device').value;
+            const formType = document.getElementById('sync-form-type').value;
+            const formData = document.getElementById('sync-form-data').value;
+            const version = parseInt(document.getElementById('sync-version').value);
+
+            try {
+                JSON.parse(formData);
+            } catch {
+                showToast('JSON格式错误', 'error');
+                return;
+            }
+
+            const result = await postData('/sync', {
+                device_id: deviceId,
+                drafts: [{
+                    form_type: formType,
+                    form_data: JSON.parse(formData),
+                    device_id: deviceId,
+                    version: version,
+                    created_by: '控制台用户'
+                }]
+            });
+
+            showToast(`同步完成: ${result.success_count}成功, ${result.conflict_count}冲突`, 'success');
+            closeModal('sync-modal');
+            loadAll();
+        }
+
+        async function loadSampleData() {
+            await postData('/sample-data', {});
+            showToast('样例数据加载成功', 'success');
+            loadAll();
+        }
+
+        async function exportData() {
+            const result = await postData('/export', {});
+            const dataStr = JSON.stringify(result, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sync_export_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('数据导出成功', 'success');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        async function loadAll() {
+            await Promise.all([
+                loadStats(),
+                loadDrafts(),
+                loadBatches(),
+                loadConflicts(),
+                loadDevices()
+            ]);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAll);
+    </script>
+</body>
+</html>
