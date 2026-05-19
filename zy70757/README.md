@@ -47,7 +47,7 @@ silence-audit parse-silences test_silences.json
 ### 仅解析告警文件
 
 ```bash
-silence-audit parse_alerts test_alerts.json
+silence-audit parse-alerts test_alerts.json
 ```
 
 ### 启用详细输出
