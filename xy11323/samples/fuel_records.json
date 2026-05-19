@@ -1,0 +1,42 @@
+[
+  {
+    "record_no": "FUEL001",
+    "machine_no": "T-001",
+    "fuel_date": "2024-05-01",
+    "fuel_type": "柴油",
+    "liters": 50.0,
+    "price_per_liter": 7.5
+  },
+  {
+    "record_no": "FUEL002",
+    "machine_no": "T-002",
+    "fuel_date": "2024-05-01",
+    "fuel_type": "柴油",
+    "liters": 40.0,
+    "price_per_liter": 7.5
+  },
+  {
+    "record_no": "",
+    "machine_no": "T-003",
+    "fuel_date": "2024-05-02",
+    "fuel_type": "柴油",
+    "liters": 45.0,
+    "price_per_liter": 7.5
+  },
+  {
+    "record_no": "FUEL004",
+    "machine_no": "T-004",
+    "fuel_date": "2024-05-02",
+    "fuel_type": "",
+    "liters": 30.0,
+    "price_per_liter": 7.5
+  },
+  {
+    "record_no": "FUEL005",
+    "machine_no": "T-005",
+    "fuel_date": "2024-05-03",
+    "fuel_type": "柴油",
+    "liters": -5.0,
+    "price_per_liter": 7.5
+  }
+]
