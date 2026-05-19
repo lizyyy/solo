@@ -296,25 +296,34 @@
         <div class="sub-form-section">
           <div v-for="(quiz, index) in createForm.quizzes" :key="index" class="sub-form-item">
             <el-row :gutter="15">
-              <el-col :span="6">
+              <el-col :span="5">
                 <el-input v-model="quiz.quiz_id" placeholder="测验ID" size="small" />
               </el-col>
-              <el-col :span="8">
+              <el-col :span="7">
                 <el-input v-model="quiz.quiz_name" placeholder="测验名称" size="small" />
               </el-col>
               <el-col :span="3">
                 <el-input-number v-model="quiz.attempt_count" :min="0" size="small" placeholder="尝试次数" />
               </el-col>
               <el-col :span="3">
-                <el-input-number v-model="quiz.highest_score" :min="0" :max="100" size="small" placeholder="最高分" />
+                <el-input-number v-model="quiz.passing_score" :min="0" :max="100" size="small" placeholder="及格分" />
               </el-col>
               <el-col :span="3">
-                <el-input-number v-model="quiz.latest_score" :min="0" :max="100" size="small" placeholder="最新分" />
+                <el-input-number v-model="quiz.highest_score" :min="0" :max="100" size="small" placeholder="最高分" @change="updateQuizPassStatus(index)" />
               </el-col>
-              <el-col :span="1">
-                <el-button type="danger" link size="small" @click="removeQuiz(index)">
-                  <el-icon><Delete /></el-icon>
-                </el-button>
+              <el-col :span="2">
+                <el-switch v-model="quiz.is_passed" active-text="通过" inactive-text="未通过" size="small" />
+              </el-col>
+            </el-row>
+            <el-row :gutter="15" style="margin-top: 8px;">
+              <el-col :span="24">
+                <el-alert
+                  :title="getQuizStatusText(quiz)"
+                  :type="quiz.is_passed ? 'success' : 'warning'"
+                  :closable="false"
+                  size="small"
+                  show-icon
+                />
               </el-col>
             </el-row>
           </div>
@@ -487,10 +496,15 @@ const handlePublish = async (row) => {
 
 const generateCertificate = async (row) => {
   try {
-    await ElMessageBox.confirm('确认根据该学员进度生成证书资格？', '提示', {
-      confirmButtonText: '确定',
+    const hasValidQuiz = row.passed_quizzes > 0
+    const hasFullProgress = row.overall_progress >= 100
+    
+    let confirmMsg = `确认根据该学员进度生成证书资格？\n\n当前状态:\n- 总体进度: ${row.overall_progress}%\n- 通过测验: ${row.passed_quizzes}/${row.total_quizzes}\n\n证书资格条件: 总体进度 100% 且通过至少 1 个测验\n\n当前状态: ${hasFullProgress && hasValidQuiz ? '✅ 符合资格条件' : '❌ 暂不符合资格条件'}`
+
+    await ElMessageBox.confirm(confirmMsg, '提示', {
+      confirmButtonText: '确定生成',
       cancelButtonText: '取消',
-      type: 'info'
+      type: hasFullProgress && hasValidQuiz ? 'success' : 'warning'
     })
     
     const response = await certificateApi.createFromProgress({
@@ -499,11 +513,19 @@ const generateCertificate = async (row) => {
     })
     
     if (response.data.success) {
-      ElMessage.success(`证书资格生成成功，符合资格: ${response.data.data.is_eligible ? '是' : '否'}`)
+      const isEligible = response.data.data.is_eligible
+      const msg = isEligible 
+        ? '✅ 证书资格生成成功，该学员符合证书颁发条件！'
+        : '⚠️ 证书资格已生成，但该学员暂不符合颁发条件（需总体进度100%且通过至少1个测验）'
+      if (isEligible) {
+        ElMessage.success(msg)
+      } else {
+        ElMessage.warning(msg)
+      }
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('生成失败')
+      ElMessage.error('生成失败: ' + (error.response?.data?.detail || error.message || '未知错误'))
     }
   }
 }
@@ -542,12 +564,32 @@ const addQuiz = () => {
   createForm.quizzes.push({
     quiz_id: '',
     quiz_name: '',
-    attempt_count: 0,
+    attempt_count: 1,
     highest_score: 0,
     latest_score: 0,
     passing_score: 60,
     is_passed: false
   })
+}
+
+const updateQuizPassStatus = (index) => {
+  const quiz = createForm.quizzes[index]
+  if (quiz && quiz.highest_score >= 0) {
+    quiz.is_passed = quiz.highest_score >= quiz.passing_score
+  }
+}
+
+const getQuizStatusText = (quiz) => {
+  if (!quiz.quiz_name) {
+    return '请填写测验信息'
+  }
+  const passed = quiz.highest_score >= quiz.passing_score
+  const diff = quiz.highest_score - quiz.passing_score
+  if (passed) {
+    return `${quiz.quiz_name}: 最高分 ${quiz.highest_score} 分，及格分 ${quiz.passing_score} 分，超出 ${diff} 分 ✓`
+  } else {
+    return `${quiz.quiz_name}: 最高分 ${quiz.highest_score} 分，及格分 ${quiz.passing_score} 分，还差 ${Math.abs(diff)} 分`
+  }
 }
 
 const removeQuiz = (index) => {
@@ -576,10 +618,30 @@ const submitCreate = async () => {
     return
   }
 
+  createForm.quizzes.forEach((quiz, index) => {
+    if (quiz.highest_score >= 0 && quiz.passing_score >= 0) {
+      quiz.is_passed = quiz.highest_score >= quiz.passing_score
+    }
+  })
+
   createForm.total_chapters = createForm.chapters.length
   createForm.completed_chapters = createForm.chapters.filter(c => c.is_completed).length
   createForm.total_quizzes = createForm.quizzes.length
   createForm.passed_quizzes = createForm.quizzes.filter(q => q.is_passed).length
+
+  const hasValidQuiz = createForm.quizzes.length > 0 && createForm.passed_quizzes > 0
+  const hasFullProgress = createForm.overall_progress >= 100
+
+  if (!hasFullProgress || !hasValidQuiz) {
+    const warning = []
+    if (!hasFullProgress) {
+      warning.push(`总体进度 ${createForm.overall_progress}%（需达到 100%）`)
+    }
+    if (!hasValidQuiz) {
+      warning.push(`通过测验 ${createForm.passed_quizzes}/${createForm.quizzes.length}（至少需要通过 1 个测验）`)
+    }
+    ElMessage.warning(`注意: 证书资格条件可能不满足 - ${warning.join(', ')}`)
+  }
 
   try {
     const response = await progressApi.create(createForm)
