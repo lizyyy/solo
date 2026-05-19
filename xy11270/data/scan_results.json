@@ -1,0 +1,86 @@
+{
+  "TEST001": {
+    "transcript_id": "TEST001",
+    "scanned_at": "2026-05-19T17:16:03.564709",
+    "violations": [],
+    "passed": true,
+    "review_required": false,
+    "rule_version": "1.0.0",
+    "scan_details": {
+      "total_segments": 3,
+      "speaker_count": 2,
+      "duration_seconds": 12.0,
+      "rule_version": "1.0.0"
+    }
+  },
+  "TEST002": {
+    "transcript_id": "TEST002",
+    "scanned_at": "2026-05-19T17:16:03.569512",
+    "violations": [
+      {
+        "type": "missing_speaker",
+        "message": "第 1 段缺少说话人标识",
+        "severity": "low",
+        "segment_index": 0,
+        "details": null
+      },
+      {
+        "type": "timestamp_overlap",
+        "message": "段 1 与段 2 时间戳重叠: 2.0s > 1.5s",
+        "severity": "medium",
+        "segment_index": 0,
+        "details": {
+          "overlap_seconds": 0.5
+        }
+      },
+      {
+        "type": "missing_refund_promise",
+        "message": "检测到退款请求，但未发现明确的退款承诺或处理说明",
+        "severity": "high",
+        "segment_index": null,
+        "details": null
+      },
+      {
+        "type": "sensitive_word",
+        "message": "段 3 包含敏感词: 垃圾",
+        "severity": "high",
+        "segment_index": 2,
+        "details": {
+          "sensitive_words": [
+            "垃圾"
+          ]
+        }
+      }
+    ],
+    "passed": false,
+    "review_required": true,
+    "rule_version": "1.0.0",
+    "scan_details": {
+      "total_segments": 3,
+      "speaker_count": 2,
+      "duration_seconds": 7.0,
+      "rule_version": "1.0.0"
+    },
+    "review": {
+      "transcript_id": "TEST002",
+      "status": "approved",
+      "reviewer": "质检组长",
+      "comment": "情况属实，已核实",
+      "reviewed_at": "2026-05-19T17:16:03.575211"
+    }
+  },
+  "TEST_SENSITIVE_13800138000": {
+    "transcript_id": "TEST_SENSITIVE_13800138000",
+    "scanned_at": "2026-05-19T17:16:03.725831",
+    "violations": [],
+    "passed": true,
+    "review_required": false,
+    "rule_version": "1.0.0",
+    "scan_details": {
+      "total_segments": 1,
+      "speaker_count": 1,
+      "duration_seconds": 5.0,
+      "rule_version": "1.0.0"
+    }
+  }
+}
