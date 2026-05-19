@@ -1,0 +1,105 @@
+================================================================================
+推送 Token 生命周期排查报告
+生成时间: 2026-05-19 07:10:29
+================================================================================
+
+【统计概览】
+  Token 总数: 5
+  已绑定: 1
+  已解绑: 0
+  已退订: 0
+  推送失败: 4
+  换绑设备: 2
+
+【失败原因分类】
+  Token 过期: 1
+  Token 无效: 0
+
+【Token 详情】
+
+--- Token #1: APA91bF8xQZ1abcdefgh... ---
+  用户ID: user_001
+  设备ID: device_001
+  当前状态: 推送失败
+  创建时间: 2024-01-01 10:00:00
+  失败原因: 设备换绑
+  绑定次数: 1 / 解绑次数: 0
+  已换绑到新Token: APA91bF8xQZ4abcdefghijklmnopqrst
+  状态流转:
+    [2024-01-01 10:00:00] TOKEN_CREATED <sample_data/tokens.csv:2>
+    [2024-01-01 10:05:00] TOKEN_BOUND (user_id=user_001, device_id=device_001) <sample_data/bindings.csv:2>
+    [2024-02-12 09:00:00] PUSH_FAILED (error_code=INVALID_REGISTRATION, error_message=Invalid registration token) <sample_data/failures.csv:2>
+  数据来源:
+    - sample_data/tokens.csv:2
+    - sample_data/bindings.csv:2
+    - sample_data/failures.csv:2
+
+--- Token #2: APA91bF8xQZ2abcdefgh... ---
+  用户ID: user_002
+  设备ID: device_002
+  当前状态: 推送失败
+  创建时间: 2024-01-02 14:20:00
+  失败原因: 未知原因
+  绑定次数: 1 / 解绑次数: 1
+  状态流转:
+    [2024-01-02 14:20:00] TOKEN_CREATED <sample_data/tokens.csv:3>
+    [2024-01-02 14:25:00] TOKEN_BOUND (user_id=user_002, device_id=device_002) <sample_data/bindings.csv:3>
+    [2024-02-01 00:00:00] TOKEN_UNBOUND <sample_data/bindings.csv:3>
+    [2024-02-12 10:30:00] PUSH_FAILED (error_code=NOT_REGISTERED, error_message=Token not registered) <sample_data/failures.csv:3>
+  数据来源:
+    - sample_data/tokens.csv:3
+    - sample_data/bindings.csv:3
+    - sample_data/failures.csv:3
+
+--- Token #3: APA91bF8xQZ3abcdefgh... ---
+  用户ID: user_003
+  设备ID: device_003
+  当前状态: 推送失败
+  创建时间: 2024-01-03 09:10:00
+  失败原因: 用户退订
+  绑定次数: 1 / 解绑次数: 0
+  状态流转:
+    [2024-01-03 09:10:00] TOKEN_CREATED <sample_data/tokens.csv:4>
+    [2024-01-03 09:15:00] TOKEN_BOUND (user_id=user_003, device_id=device_003) <sample_data/bindings.csv:4>
+    [2024-02-10 12:00:00] USER_UNSUBSCRIBED (reason=用户主动退订) <sample_data/unsubscribes.csv:2>
+    [2024-02-12 11:15:00] PUSH_FAILED (error_code=UNSUBSCRIBED, error_message=User has unsubscribed) <sample_data/failures.csv:4>
+  数据来源:
+    - sample_data/tokens.csv:4
+    - sample_data/bindings.csv:4
+    - sample_data/unsubscribes.csv:2
+    - sample_data/failures.csv:4
+
+--- Token #4: APA91bF8xQZ4abcdefgh... ---
+  用户ID: user_004
+  设备ID: device_001
+  当前状态: 已绑定
+  创建时间: 2024-02-10 15:00:00
+  失败原因: 未知原因
+  绑定次数: 1 / 解绑次数: 0
+  接替旧Token: APA91bF8xQZ1abcdefghijklmnopqrst
+  状态流转:
+    [2024-02-10 15:00:00] TOKEN_CREATED <sample_data/tokens.csv:5>
+    [2024-02-10 15:05:00] TOKEN_BOUND (user_id=user_004, device_id=device_001) <sample_data/bindings.csv:5>
+  数据来源:
+    - sample_data/tokens.csv:5
+    - sample_data/bindings.csv:5
+
+--- Token #5: APA91bF8xQZ5abcdefgh... ---
+  用户ID: user_005
+  设备ID: device_005
+  当前状态: 推送失败
+  创建时间: 2024-01-25 08:00:00
+  失败原因: Token过期
+  绑定次数: 1 / 解绑次数: 0
+  状态流转:
+    [2024-01-25 08:00:00] TOKEN_CREATED <sample_data/tokens.csv:6>
+    [2024-01-25 08:05:00] TOKEN_BOUND (user_id=user_005, device_id=device_005) <sample_data/bindings.csv:6>
+    [2024-02-13 14:20:00] PUSH_FAILED (error_code=EXPIRED, error_message=Token expired) <sample_data/failures.csv:5>
+  数据来源:
+    - sample_data/tokens.csv:6
+    - sample_data/bindings.csv:6
+    - sample_data/failures.csv:5
+
+================================================================================
+报告结束
+================================================================================

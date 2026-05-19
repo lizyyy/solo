@@ -1,0 +1,248 @@
+{
+  "generated_at": "2026-05-19 07:10:53",
+  "summary": {
+    "total_tokens": 5,
+    "bound_tokens": 1,
+    "unbound_tokens": 0,
+    "unsubscribed_tokens": 0,
+    "failed_tokens": 4,
+    "rebound_devices": 2,
+    "token_expired": 1,
+    "token_invalid": 0
+  },
+  "parse_errors": [],
+  "token_details": [
+    {
+      "token": "APA91bF8xQZ1abcdefghijklmnopqrst",
+      "user_id": "user_001",
+      "device_id": "device_001",
+      "current_state": "FAILED",
+      "failure_reason": "DEVICE_REBOUND",
+      "create_time": "2024-01-01 10:00:00",
+      "bind_count": 1,
+      "unbind_count": 0,
+      "failure_count": 1,
+      "is_unsubscribed": false,
+      "rebound_to": "APA91bF8xQZ4abcdefghijklmnopqrst",
+      "rebound_from": [],
+      "state_history": [
+        {
+          "event": "TOKEN_CREATED",
+          "time": "2024-01-01 10:00:00",
+          "source": "sample_data/tokens.csv:2",
+          "details": {}
+        },
+        {
+          "event": "TOKEN_BOUND",
+          "time": "2024-01-01 10:05:00",
+          "source": "sample_data/bindings.csv:2",
+          "details": {
+            "user_id": "user_001",
+            "device_id": "device_001"
+          }
+        },
+        {
+          "event": "PUSH_FAILED",
+          "time": "2024-02-12 09:00:00",
+          "source": "sample_data/failures.csv:2",
+          "details": {
+            "error_code": "INVALID_REGISTRATION",
+            "error_message": "Invalid registration token"
+          }
+        }
+      ],
+      "source_traces": [
+        "sample_data/tokens.csv:2",
+        "sample_data/bindings.csv:2",
+        "sample_data/failures.csv:2"
+      ]
+    },
+    {
+      "token": "APA91bF8xQZ2abcdefghijklmnopqrst",
+      "user_id": "user_002",
+      "device_id": "device_002",
+      "current_state": "FAILED",
+      "failure_reason": "UNKNOWN",
+      "create_time": "2024-01-02 14:20:00",
+      "bind_count": 1,
+      "unbind_count": 1,
+      "failure_count": 1,
+      "is_unsubscribed": false,
+      "rebound_to": "",
+      "rebound_from": [],
+      "state_history": [
+        {
+          "event": "TOKEN_CREATED",
+          "time": "2024-01-02 14:20:00",
+          "source": "sample_data/tokens.csv:3",
+          "details": {}
+        },
+        {
+          "event": "TOKEN_BOUND",
+          "time": "2024-01-02 14:25:00",
+          "source": "sample_data/bindings.csv:3",
+          "details": {
+            "user_id": "user_002",
+            "device_id": "device_002"
+          }
+        },
+        {
+          "event": "TOKEN_UNBOUND",
+          "time": "2024-02-01 00:00:00",
+          "source": "sample_data/bindings.csv:3",
+          "details": {}
+        },
+        {
+          "event": "PUSH_FAILED",
+          "time": "2024-02-12 10:30:00",
+          "source": "sample_data/failures.csv:3",
+          "details": {
+            "error_code": "NOT_REGISTERED",
+            "error_message": "Token not registered"
+          }
+        }
+      ],
+      "source_traces": [
+        "sample_data/tokens.csv:3",
+        "sample_data/bindings.csv:3",
+        "sample_data/failures.csv:3"
+      ]
+    },
+    {
+      "token": "APA91bF8xQZ3abcdefghijklmnopqrst",
+      "user_id": "user_003",
+      "device_id": "device_003",
+      "current_state": "FAILED",
+      "failure_reason": "USER_UNSUBSCRIBED",
+      "create_time": "2024-01-03 09:10:00",
+      "bind_count": 1,
+      "unbind_count": 0,
+      "failure_count": 1,
+      "is_unsubscribed": true,
+      "rebound_to": "",
+      "rebound_from": [],
+      "state_history": [
+        {
+          "event": "TOKEN_CREATED",
+          "time": "2024-01-03 09:10:00",
+          "source": "sample_data/tokens.csv:4",
+          "details": {}
+        },
+        {
+          "event": "TOKEN_BOUND",
+          "time": "2024-01-03 09:15:00",
+          "source": "sample_data/bindings.csv:4",
+          "details": {
+            "user_id": "user_003",
+            "device_id": "device_003"
+          }
+        },
+        {
+          "event": "USER_UNSUBSCRIBED",
+          "time": "2024-02-10 12:00:00",
+          "source": "sample_data/unsubscribes.csv:2",
+          "details": {
+            "reason": "用户主动退订"
+          }
+        },
+        {
+          "event": "PUSH_FAILED",
+          "time": "2024-02-12 11:15:00",
+          "source": "sample_data/failures.csv:4",
+          "details": {
+            "error_code": "UNSUBSCRIBED",
+            "error_message": "User has unsubscribed"
+          }
+        }
+      ],
+      "source_traces": [
+        "sample_data/tokens.csv:4",
+        "sample_data/bindings.csv:4",
+        "sample_data/unsubscribes.csv:2",
+        "sample_data/failures.csv:4"
+      ]
+    },
+    {
+      "token": "APA91bF8xQZ4abcdefghijklmnopqrst",
+      "user_id": "user_004",
+      "device_id": "device_001",
+      "current_state": "BOUND",
+      "failure_reason": "UNKNOWN",
+      "create_time": "2024-02-10 15:00:00",
+      "bind_count": 1,
+      "unbind_count": 0,
+      "failure_count": 0,
+      "is_unsubscribed": false,
+      "rebound_to": "",
+      "rebound_from": [
+        "APA91bF8xQZ1abcdefghijklmnopqrst"
+      ],
+      "state_history": [
+        {
+          "event": "TOKEN_CREATED",
+          "time": "2024-02-10 15:00:00",
+          "source": "sample_data/tokens.csv:5",
+          "details": {}
+        },
+        {
+          "event": "TOKEN_BOUND",
+          "time": "2024-02-10 15:05:00",
+          "source": "sample_data/bindings.csv:5",
+          "details": {
+            "user_id": "user_004",
+            "device_id": "device_001"
+          }
+        }
+      ],
+      "source_traces": [
+        "sample_data/tokens.csv:5",
+        "sample_data/bindings.csv:5"
+      ]
+    },
+    {
+      "token": "APA91bF8xQZ5abcdefghijklmnopqrst",
+      "user_id": "user_005",
+      "device_id": "device_005",
+      "current_state": "FAILED",
+      "failure_reason": "TOKEN_EXPIRED",
+      "create_time": "2024-01-25 08:00:00",
+      "bind_count": 1,
+      "unbind_count": 0,
+      "failure_count": 1,
+      "is_unsubscribed": false,
+      "rebound_to": "",
+      "rebound_from": [],
+      "state_history": [
+        {
+          "event": "TOKEN_CREATED",
+          "time": "2024-01-25 08:00:00",
+          "source": "sample_data/tokens.csv:6",
+          "details": {}
+        },
+        {
+          "event": "TOKEN_BOUND",
+          "time": "2024-01-25 08:05:00",
+          "source": "sample_data/bindings.csv:6",
+          "details": {
+            "user_id": "user_005",
+            "device_id": "device_005"
+          }
+        },
+        {
+          "event": "PUSH_FAILED",
+          "time": "2024-02-13 14:20:00",
+          "source": "sample_data/failures.csv:5",
+          "details": {
+            "error_code": "EXPIRED",
+            "error_message": "Token expired"
+          }
+        }
+      ],
+      "source_traces": [
+        "sample_data/tokens.csv:6",
+        "sample_data/bindings.csv:6",
+        "sample_data/failures.csv:5"
+      ]
+    }
+  ]
+}

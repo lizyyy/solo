@@ -1,0 +1,5 @@
+﻿token,user_id,device_id,fail_time,error_code,error_message
+APA91bF8xQZ1abcdefghijklmnopqrst,user_001,device_001,2024-02-12 09:00:00,INVALID_REGISTRATION,Invalid registration token
+APA91bF8xQZ2abcdefghijklmnopqrst,user_002,device_002,2024-02-12 10:30:00,NOT_REGISTERED,Token not registered
+APA91bF8xQZ3abcdefghijklmnopqrst,user_003,device_003,2024-02-12 11:15:00,UNSUBSCRIBED,User has unsubscribed
+APA91bF8xQZ5abcdefghijklmnopqrst,user_005,device_005,2024-02-13 14:20:00,EXPIRED,Token expired
