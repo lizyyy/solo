@@ -1,0 +1,31 @@
+{
+  "name": "hazard-closure-system",
+  "version": "1.0.0",
+  "description": "隐患闭环管理系统 - 巡检照片、整改责任人、复查结果一体化管理",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "import:hazards": "node src/cli.js import-hazards",
+    "import:photos": "node src/cli.js import-photos",
+    "import:reviews": "node src/cli.js import-reviews",
+    "review": "node src/cli.js review",
+    "export": "node src/cli.js export",
+    "status": "node src/cli.js status",
+    "test:sample": "node src/cli.js test-sample"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "yargs": "^17.7.2",
+    "xlsx": "^0.18.5",
+    "chalk": "^4.1.2",
+    "joi": "^17.11.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "",
+  "license": "MIT"
+}
