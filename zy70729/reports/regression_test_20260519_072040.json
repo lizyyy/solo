@@ -1,0 +1,133 @@
+{
+  "comparisons": [
+    {
+      "conclusion": "REGRESSED",
+      "confirm_status": "PENDING",
+      "differences": {
+        "estimated_cost": {
+          "change_percent": 1100.0,
+          "new_value": 150.0,
+          "old_value": 12.5
+        },
+        "estimated_rows": {
+          "change_percent": 9900.0,
+          "new_value": 5000,
+          "old_value": 50
+        },
+        "scan_type": {
+          "change_percent": 0.0,
+          "new_value": "Seq Scan",
+          "old_value": "Index Scan"
+        },
+        "used_indexes": {
+          "change_percent": 0.0,
+          "new_value": [],
+          "old_value": [
+            "idx_orders_user_status"
+          ]
+        }
+      },
+      "new_plan": {
+        "estimated_cost": 150.0,
+        "estimated_rows": 5000,
+        "join_type": "NONE",
+        "scan_type": "Seq Scan",
+        "source_location": {
+          "column": null,
+          "file_path": "test_data/new_plans.json",
+          "line_number": 2,
+          "raw_content": "{\"query_template\": \"SELECT * FROM orders WHERE user_id = ? AND status = ?\", \"parameter_set\": {\"user_id\": 456, \"status\": \"active\"}, \"plan\": {\"Plan\": {\"Node Type\": \"Seq Scan\", \"Plan Rows\": 5000, \"Total Cost\": 150.0}}, \"db_version\": \"13.0\", \"generated_at\": \"2024-01-02T10:00:01\"}"
+        },
+        "used_indexes": []
+      },
+      "notes": "",
+      "old_plan": {
+        "estimated_cost": 12.5,
+        "estimated_rows": 50,
+        "join_type": "NONE",
+        "scan_type": "Index Scan",
+        "source_location": {
+          "column": null,
+          "file_path": "test_data/old_plans.json",
+          "line_number": 2,
+          "raw_content": "{\"query_template\": \"SELECT * FROM orders WHERE user_id = ? AND status = ?\", \"parameter_set\": {\"user_id\": 456, \"status\": \"active\"}, \"plan\": {\"Plan\": {\"Node Type\": \"Index Scan\", \"Index Name\": \"idx_orders_user_status\", \"Plan Rows\": 50, \"Total Cost\": 12.5}}, \"db_version\": \"12.0\", \"generated_at\": \"2024-01-01T10:00:01\"}"
+        },
+        "used_indexes": [
+          "idx_orders_user_status"
+        ]
+      },
+      "parameter_set_normalized": "2329166159106965d486c7790905dbf0",
+      "query_template": "SELECT * FROM orders WHERE user_id = ? AND status = ?",
+      "review_by": "",
+      "risk_level": "CRITICAL"
+    },
+    {
+      "conclusion": "NEED_INVESTIGATION",
+      "confirm_status": "PENDING",
+      "differences": {
+        "estimated_cost": {
+          "change_percent": 390.38461538461536,
+          "new_value": 25.5,
+          "old_value": 5.2
+        },
+        "scan_type": {
+          "change_percent": 0.0,
+          "new_value": "Bitmap Scan",
+          "old_value": "Index Only Scan"
+        }
+      },
+      "new_plan": {
+        "estimated_cost": 25.5,
+        "estimated_rows": 1000,
+        "join_type": "NONE",
+        "scan_type": "Bitmap Scan",
+        "source_location": {
+          "column": null,
+          "file_path": "test_data/new_plans.json",
+          "line_number": 3,
+          "raw_content": "{\"query_template\": \"SELECT COUNT(*) FROM products WHERE category = ?\", \"parameter_set\": {\"category\": \"electronics\"}, \"plan\": {\"Plan\": {\"Node Type\": \"Bitmap Scan\", \"Index Name\": \"idx_products_category\", \"Plan Rows\": 1000, \"Total Cost\": 25.5}}, \"db_version\": \"13.0\", \"generated_at\": \"2024-01-02T10:00:02\"}"
+        },
+        "used_indexes": [
+          "idx_products_category"
+        ]
+      },
+      "notes": "",
+      "old_plan": {
+        "estimated_cost": 5.2,
+        "estimated_rows": 1000,
+        "join_type": "NONE",
+        "scan_type": "Index Only Scan",
+        "source_location": {
+          "column": null,
+          "file_path": "test_data/old_plans.json",
+          "line_number": 3,
+          "raw_content": "{\"query_template\": \"SELECT COUNT(*) FROM products WHERE category = ?\", \"parameter_set\": {\"category\": \"electronics\"}, \"plan\": {\"Plan\": {\"Node Type\": \"Index Only Scan\", \"Index Name\": \"idx_products_category\", \"Plan Rows\": 1000, \"Total Cost\": 5.2}}, \"db_version\": \"12.0\", \"generated_at\": \"2024-01-01T10:00:02\"}"
+        },
+        "used_indexes": [
+          "idx_products_category"
+        ]
+      },
+      "parameter_set_normalized": "60bf98f2535485a1a6015b5cbbdc6113",
+      "query_template": "SELECT COUNT(*) FROM products WHERE category = ?",
+      "review_by": "",
+      "risk_level": "MEDIUM"
+    }
+  ],
+  "generated_at": "2026-05-19T07:20:40.385673",
+  "parse_errors": [],
+  "summary": {
+    "conclusion_counts": {
+      "NEED_INVESTIGATION": 1,
+      "REGRESSED": 1
+    },
+    "regressed_count": 1,
+    "risk_level_counts": {
+      "CRITICAL": 1,
+      "MEDIUM": 1
+    },
+    "total_comparisons": 2,
+    "total_errors": 0,
+    "total_new_plans": 3,
+    "total_old_plans": 3
+  }
+}

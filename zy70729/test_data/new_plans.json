@@ -1,0 +1,43 @@
+[
+    {
+        "query_template": "SELECT * FROM users WHERE id = ?",
+        "parameter_set": {"id": 123},
+        "plan": {
+            "Plan": {
+                "Node Type": "Index Scan",
+                "Index Name": "users_pkey",
+                "Plan Rows": 1,
+                "Total Cost": 0.28
+            }
+        },
+        "db_version": "13.0",
+        "generated_at": "2024-01-02T10:00:00"
+    },
+    {
+        "query_template": "SELECT * FROM orders WHERE user_id = ? AND status = ?",
+        "parameter_set": {"user_id": 456, "status": "active"},
+        "plan": {
+            "Plan": {
+                "Node Type": "Seq Scan",
+                "Plan Rows": 5000,
+                "Total Cost": 150.00
+            }
+        },
+        "db_version": "13.0",
+        "generated_at": "2024-01-02T10:00:01"
+    },
+    {
+        "query_template": "SELECT COUNT(*) FROM products WHERE category = ?",
+        "parameter_set": {"category": "electronics"},
+        "plan": {
+            "Plan": {
+                "Node Type": "Bitmap Scan",
+                "Index Name": "idx_products_category",
+                "Plan Rows": 1000,
+                "Total Cost": 25.50
+            }
+        },
+        "db_version": "13.0",
+        "generated_at": "2024-01-02T10:00:02"
+    }
+]

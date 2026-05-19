@@ -1,0 +1,31 @@
+{
+  "plans_count": 3,
+  "errors_count": 0,
+  "plans": [
+    {
+      "query_template": "SELECT * FROM users WHERE id = ?",
+      "summary": {
+        "scan_type": "Index Scan",
+        "estimated_cost": 0.28,
+        "estimated_rows": 1
+      }
+    },
+    {
+      "query_template": "SELECT * FROM orders WHERE user_id = ? AND status = ?",
+      "summary": {
+        "scan_type": "Index Scan",
+        "estimated_cost": 12.5,
+        "estimated_rows": 50
+      }
+    },
+    {
+      "query_template": "SELECT COUNT(*) FROM products WHERE category = ?",
+      "summary": {
+        "scan_type": "Index Only Scan",
+        "estimated_cost": 5.2,
+        "estimated_rows": 1000
+      }
+    }
+  ],
+  "errors": []
+}
