@@ -1,0 +1,4 @@
+tenant_id,tenant_name,local_resources,traffic_percent,status,cross_region_synced
+T101,金融风控A,"[""local-db-fc"", ""remote-log""]",70.0,active,true
+T102,消息推送B,"[""global-mq""]",40.0,active,true
+T103,内容分发C,"[""local-cdn-node"", ""region-shenzhen-local-oss""]",90.0,maintenance,false

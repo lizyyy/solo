@@ -1,0 +1,26 @@
+[
+  {
+    "tenant_id": "T001",
+    "tenant_name": "测试租户1",
+    "local_resources": ["local-db-01", null, ""],
+    "traffic_percent": "invalid_number",
+    "status": "active",
+    "cross_region_synced": "yes"
+  },
+  {
+    "tenant_id": "",
+    "tenant_name": "没有ID的租户",
+    "local_resources": [],
+    "traffic_percent": 150.0,
+    "status": null,
+    "cross_region_synced": true
+  },
+  {
+    "tenant_id": "T003",
+    "tenant_name": "流量负数",
+    "local_resources": ["local-res"],
+    "traffic_percent": -50.0,
+    "status": "active",
+    "cross_region_synced": false
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "tenant_id": "T001",
+    "tenant_name": "电商平台A",
+    "local_resources": ["local-db-01", "local-cache-01"],
+    "traffic_percent": 100.0,
+    "status": "active",
+    "cross_region_synced": false
+  },
+  {
+    "tenant_id": "T002",
+    "tenant_name": "支付系统B",
+    "local_resources": ["region-shanghai-local-oss"],
+    "traffic_percent": 80.0,
+    "status": "active",
+    "cross_region_synced": true
+  },
+  {
+    "tenant_id": "T003",
+    "tenant_name": "用户中心C",
+    "local_resources": ["remote-db", "global-cache"],
+    "traffic_percent": 50.0,
+    "status": "active",
+    "cross_region_synced": true
+  },
+  {
+    "tenant_id": "T004",
+    "tenant_name": "订单系统D",
+    "local_resources": [],
+    "traffic_percent": 60.0,
+    "status": "suspended",
+    "cross_region_synced": true
+  },
+  {
+    "tenant_id": "T005",
+    "tenant_name": "搜索服务E",
+    "local_resources": ["local-es-cluster", "region-beijing-local-db"],
+    "traffic_percent": 100.0,
+    "status": "maintenance",
+    "cross_region_synced": false
+  }
+]

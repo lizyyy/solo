@@ -1,0 +1,38 @@
+{
+  "region": "guangzhou",
+  "total_tenants": 3,
+  "blocked_count": 2,
+  "cleared_count": 1,
+  "blocked_tenants": [
+    {
+      "tenant_id": "T101",
+      "tenant_name": "金融风控A",
+      "block_reasons": [
+        "本地资源绑定"
+      ],
+      "local_resources": [
+        "local-db-fc"
+      ],
+      "current_traffic_percent": 70.0,
+      "suggestion": "解绑本地资源: local-db-fc"
+    },
+    {
+      "tenant_id": "T103",
+      "tenant_name": "内容分发C",
+      "block_reasons": [
+        "本地资源绑定",
+        "租户状态异常",
+        "跨区同步未完成"
+      ],
+      "local_resources": [
+        "local-cdn-node",
+        "region-shenzhen-local-oss"
+      ],
+      "current_traffic_percent": 90.0,
+      "suggestion": "解绑本地资源: local-cdn-node, region-shenzhen-local-oss; 修复租户状态: 当前为 maintenance; 等待跨区域同步完成"
+    }
+  ],
+  "evacuation_plan": [],
+  "executed_at": "2026-05-19T07:18:14.758240",
+  "success": true
+}

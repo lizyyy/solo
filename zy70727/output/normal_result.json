@@ -1,0 +1,84 @@
+{
+  "region": "beijing",
+  "total_tenants": 5,
+  "blocked_count": 4,
+  "cleared_count": 1,
+  "blocked_tenants": [
+    {
+      "tenant_id": "T001",
+      "tenant_name": "电商平台A",
+      "block_reasons": [
+        "本地资源绑定",
+        "跨区同步未完成"
+      ],
+      "local_resources": [
+        "local-db-01",
+        "local-cache-01"
+      ],
+      "current_traffic_percent": 100.0,
+      "suggestion": "解绑本地资源: local-db-01, local-cache-01; 等待跨区域同步完成"
+    },
+    {
+      "tenant_id": "T002",
+      "tenant_name": "支付系统B",
+      "block_reasons": [
+        "本地资源绑定"
+      ],
+      "local_resources": [
+        "region-shanghai-local-oss"
+      ],
+      "current_traffic_percent": 80.0,
+      "suggestion": "解绑本地资源: region-shanghai-local-oss"
+    },
+    {
+      "tenant_id": "T004",
+      "tenant_name": "订单系统D",
+      "block_reasons": [
+        "租户状态异常"
+      ],
+      "local_resources": [],
+      "current_traffic_percent": 60.0,
+      "suggestion": "修复租户状态: 当前为 suspended"
+    },
+    {
+      "tenant_id": "T005",
+      "tenant_name": "搜索服务E",
+      "block_reasons": [
+        "本地资源绑定",
+        "租户状态异常",
+        "跨区同步未完成"
+      ],
+      "local_resources": [
+        "local-es-cluster",
+        "region-beijing-local-db"
+      ],
+      "current_traffic_percent": 100.0,
+      "suggestion": "解绑本地资源: local-es-cluster, region-beijing-local-db; 修复租户状态: 当前为 maintenance; 等待跨区域同步完成"
+    }
+  ],
+  "evacuation_plan": [
+    {
+      "step_id": "STEP-001",
+      "tenant_id": "T003",
+      "target_percent": 30.0,
+      "status": "pending",
+      "executed_at": "2026-05-19T07:18:14.533089"
+    },
+    {
+      "step_id": "STEP-002",
+      "tenant_id": "T003",
+      "target_percent": 0.0,
+      "status": "pending",
+      "executed_at": "2026-05-19T07:18:14.533137"
+    },
+    {
+      "step_id": "STEP-003",
+      "tenant_id": "T002",
+      "target_percent": 60.0,
+      "status": "pending",
+      "executed_at": "2026-05-19T07:18:14.533142"
+    }
+  ],
+  "executed_at": "2026-05-19T07:18:14.533143",
+  "success": true
+}

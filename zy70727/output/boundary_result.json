@@ -1,0 +1,41 @@
+{
+  "region": "shenzhen",
+  "total_tenants": 3,
+  "blocked_count": 2,
+  "cleared_count": 1,
+  "blocked_tenants": [
+    {
+      "tenant_id": "T001",
+      "tenant_name": "全量本地资源租户",
+      "block_reasons": [
+        "本地资源绑定",
+        "跨区同步未完成"
+      ],
+      "local_resources": [
+        "local-db",
+        "local-cache",
+        "local-oss",
+        "region-beijing-local-mq"
+      ],
+      "current_traffic_percent": 100.0,
+      "suggestion": "解绑本地资源: local-db, local-cache, local-oss, region-beijing-local-mq; 等待跨区域同步完成"
+    },
+    {
+      "tenant_id": "T003",
+      "tenant_name": "多阻塞原因租户",
+      "block_reasons": [
+        "本地资源绑定",
+        "租户状态异常",
+        "跨区同步未完成"
+      ],
+      "local_resources": [
+        "local-resource-1"
+      ],
+      "current_traffic_percent": 50.0,
+      "suggestion": "解绑本地资源: local-resource-1; 修复租户状态: 当前为 suspended; 等待跨区域同步完成"
+    }
+  ],
+  "evacuation_plan": [],
+  "executed_at": "2026-05-19T07:18:14.670376",
+  "success": true
+}
