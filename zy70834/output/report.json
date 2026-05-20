@@ -1,0 +1,327 @@
+{
+  "summary": {
+    "totalStudents": 6,
+    "totalChecked": 5,
+    "pending": 0,
+    "approved": 2,
+    "rejected": 3,
+    "needsMoreInfo": 1,
+    "feverCases": 1,
+    "overdueMedications": 2,
+    "unconfirmedMedications": 1,
+    "discrepanciesByType": {
+      "FEVER_DETECTED": 1,
+      "OVERDUE_MEDICATION": 2,
+      "PARENT_NOT_CONFIRMED": 1,
+      "STUDENT_NOT_IN_CLASS": 0,
+      "MEDICATION_NOT_RECORDED": 1,
+      "SYMPTOMS_UNCHECKED": 1,
+      "DATA_MISMATCH": 0
+    }
+  },
+  "results": [
+    {
+      "id": "457f07a8-76ba-4774-91e0-89a384f11521",
+      "reconciliationDate": "2026-05-20",
+      "studentId": "S001",
+      "studentName": "张三",
+      "className": "一年级1班",
+      "healthCheck": {
+        "id": "18916b9b-469f-44f7-9ab8-9ffc5890f424",
+        "studentId": "S001",
+        "studentName": "张三",
+        "checkDate": "2026-05-20",
+        "temperature": 36.5,
+        "hasSymptoms": false,
+        "symptoms": [],
+        "isIsolated": false,
+        "checker": "李老师",
+        "source": "csv"
+      },
+      "medication": {
+        "id": "a788e022-d332-4f59-9792-09421360c39d",
+        "studentId": "S001",
+        "studentName": "张三",
+        "medicationName": "小儿感冒颗粒",
+        "category": "感冒药",
+        "dosage": "1袋/次",
+        "frequency": "每日3次",
+        "expirationDate": "2026-12-31",
+        "parentConfirmed": true,
+        "confirmedDate": "2026-05-19",
+        "authorizedBy": "张家长",
+        "effectiveDate": "2026-05-20",
+        "expiryDate": "2026-05-22"
+      },
+      "student": {
+        "id": "27fc29d8-0efb-4b80-a4d4-fd06e7ebeee4",
+        "studentId": "S001",
+        "name": "张三",
+        "className": "一年级1班",
+        "grade": "一年级",
+        "parentPhone": "13800000001"
+      },
+      "discrepancies": [
+        {
+          "id": "4313c163-b388-4e16-a491-164ea41c4181",
+          "type": "OVERDUE_MEDICATION",
+          "severity": "HIGH",
+          "description": "药品\"小儿感冒颗粒\"将于2026-05-22到期，剩余有效期不足3天",
+          "explanation": "授权药品已过期或有效期不足3天",
+          "relatedRecordId": "a788e022-d332-4f59-9792-09421360c39d",
+          "relatedRecordType": "medication"
+        }
+      ],
+      "status": "REJECTED",
+      "version": 2,
+      "reviewedBy": "张校医",
+      "reviewedAt": "2026-05-19",
+      "reviewNotes": "已联系家长，学生已接回家隔离"
+    },
+    {
+      "id": "d74baac4-f159-4cfd-879e-aadb4bc3c214",
+      "reconciliationDate": "2026-05-20",
+      "studentId": "S002",
+      "studentName": "李四",
+      "className": "一年级1班",
+      "healthCheck": {
+        "id": "46724e9f-0397-4045-b258-438192642785",
+        "studentId": "S002",
+        "studentName": "李四",
+        "checkDate": "2026-05-20",
+        "temperature": 37.5,
+        "hasSymptoms": true,
+        "symptoms": [
+          "咳嗽",
+          "乏力"
+        ],
+        "isIsolated": true,
+        "checker": "李老师",
+        "notes": "发热待查",
+        "source": "csv"
+      },
+      "medication": {
+        "id": "23fd1e81-e1bf-4d7b-a649-ce593732bfcd",
+        "studentId": "S002",
+        "studentName": "李四",
+        "medicationName": "布洛芬混悬液",
+        "category": "退烧药",
+        "dosage": "5ml/次",
+        "frequency": "必要时",
+        "expirationDate": "2026-05-18",
+        "parentConfirmed": false,
+        "authorizedBy": "李家长",
+        "effectiveDate": "2026-05-20",
+        "expiryDate": "2026-05-25"
+      },
+      "student": {
+        "id": "c081ee6b-5a9f-4503-abdf-62ba83de311b",
+        "studentId": "S002",
+        "name": "李四",
+        "className": "一年级1班",
+        "grade": "一年级",
+        "parentPhone": "13800000002"
+      },
+      "discrepancies": [
+        {
+          "id": "e12f2932-3151-487d-865b-9796a9369abc",
+          "type": "FEVER_DETECTED",
+          "severity": "HIGH",
+          "description": "体温37.5°C，超过警戒线，已按规定隔离",
+          "explanation": "晨检发现体温异常，需启动发热隔离流程",
+          "relatedRecordId": "46724e9f-0397-4045-b258-438192642785",
+          "relatedRecordType": "healthCheck"
+        },
+        {
+          "id": "d85eb41c-7757-4c88-aa3e-9228652da019",
+          "type": "PARENT_NOT_CONFIRMED",
+          "severity": "MEDIUM",
+          "description": "药品\"布洛芬混悬液\"未获得家长签字确认，不能给药",
+          "explanation": "家长未对用药进行签字确认",
+          "relatedRecordId": "23fd1e81-e1bf-4d7b-a649-ce593732bfcd",
+          "relatedRecordType": "medication"
+        }
+      ],
+      "status": "REJECTED",
+      "version": 1
+    },
+    {
+      "id": "6d735a0a-378d-45e0-be0f-5944041f5a0e",
+      "reconciliationDate": "2026-05-20",
+      "studentId": "S003",
+      "studentName": "王五",
+      "className": "一年级1班",
+      "healthCheck": {
+        "id": "aadb220a-7b95-421b-b81c-e51b4f79c370",
+        "studentId": "S003",
+        "studentName": "王五",
+        "checkDate": "2026-05-20",
+        "temperature": 36.8,
+        "hasSymptoms": false,
+        "symptoms": [],
+        "isIsolated": false,
+        "checker": "王老师",
+        "source": "csv"
+      },
+      "medication": {
+        "id": "1ce2f298-e1c7-495f-bcff-59abf62ba373",
+        "studentId": "S003",
+        "studentName": "王五",
+        "medicationName": "蒙脱石散",
+        "category": "肠胃药",
+        "dosage": "1袋/次",
+        "frequency": "每日2次",
+        "expirationDate": "2027-01-15",
+        "parentConfirmed": true,
+        "confirmedDate": "2026-05-18",
+        "authorizedBy": "王家长",
+        "effectiveDate": "2026-05-20",
+        "expiryDate": "2026-05-21"
+      },
+      "student": {
+        "id": "7772bed2-cf0f-4fbc-96d9-da5f8e196412",
+        "studentId": "S003",
+        "name": "王五",
+        "className": "一年级1班",
+        "grade": "一年级",
+        "parentPhone": "13800000003"
+      },
+      "discrepancies": [
+        {
+          "id": "2ed54e7f-00ff-4536-8a66-b185611e95bc",
+          "type": "OVERDUE_MEDICATION",
+          "severity": "HIGH",
+          "description": "药品\"蒙脱石散\"将于2026-05-21到期，剩余有效期不足3天",
+          "explanation": "授权药品已过期或有效期不足3天",
+          "relatedRecordId": "1ce2f298-e1c7-495f-bcff-59abf62ba373",
+          "relatedRecordType": "medication"
+        }
+      ],
+      "status": "REJECTED",
+      "version": 1
+    },
+    {
+      "id": "4bdf4650-c9cd-40ce-be5e-18346a543420",
+      "reconciliationDate": "2026-05-20",
+      "studentId": "S004",
+      "studentName": "赵六",
+      "className": "一年级1班",
+      "healthCheck": {
+        "id": "3835da0a-be0c-431a-a384-998bb88dcb91",
+        "studentId": "S004",
+        "studentName": "赵六",
+        "checkDate": "2026-05-20",
+        "temperature": 37.2,
+        "hasSymptoms": true,
+        "symptoms": [
+          "流涕"
+        ],
+        "isIsolated": false,
+        "checker": "李老师",
+        "source": "csv"
+      },
+      "medication": {
+        "id": "2b5bffb1-4211-4023-a44a-60e97bf103ad",
+        "studentId": "S004",
+        "studentName": "赵六",
+        "medicationName": "氯雷他定糖浆",
+        "category": "抗过敏药",
+        "dosage": "5ml/次",
+        "frequency": "每日1次",
+        "expirationDate": "2026-08-20",
+        "parentConfirmed": true,
+        "confirmedDate": "2026-05-15",
+        "authorizedBy": "赵家长",
+        "effectiveDate": "2026-05-20",
+        "expiryDate": "2026-06-20"
+      },
+      "student": {
+        "id": "46c0cef5-a7e6-4d7e-9b43-67bf055814a8",
+        "studentId": "S004",
+        "name": "赵六",
+        "className": "一年级1班",
+        "grade": "一年级",
+        "parentPhone": "13800000004"
+      },
+      "discrepancies": [
+        {
+          "id": "26577aa0-26de-4fdf-9dd3-83782810e619",
+          "type": "SYMPTOMS_UNCHECKED",
+          "severity": "MEDIUM",
+          "description": "报告有症状：流涕，但未说明处理措施",
+          "explanation": "学生有症状但未在备注中说明处理措施",
+          "relatedRecordId": "3835da0a-be0c-431a-a384-998bb88dcb91",
+          "relatedRecordType": "healthCheck"
+        }
+      ],
+      "status": "NEEDS_MORE_INFO",
+      "version": 2,
+      "reviewedBy": "张校医",
+      "reviewedAt": "2026-05-19",
+      "reviewNotes": "[修改] medication.parentConfirmed: false → true (原因: 家长刚刚电话确认，已补签字)"
+    },
+    {
+      "id": "4651c9a6-c2e0-46c1-8685-bbc182356e65",
+      "reconciliationDate": "2026-05-20",
+      "studentId": "S005",
+      "studentName": "钱七",
+      "className": "一年级1班",
+      "healthCheck": {
+        "id": "ad038aec-9fde-49ac-9f53-ba22b2c856d7",
+        "studentId": "S005",
+        "studentName": "钱七",
+        "checkDate": "2026-05-20",
+        "temperature": 36.6,
+        "hasSymptoms": false,
+        "symptoms": [],
+        "isIsolated": false,
+        "checker": "王老师",
+        "source": "csv"
+      },
+      "student": {
+        "id": "66a6c211-7d8a-4c53-88a8-a6ff64c11b70",
+        "studentId": "S005",
+        "name": "钱七",
+        "className": "一年级1班",
+        "grade": "一年级",
+        "parentPhone": "13800000005"
+      },
+      "discrepancies": [
+        {
+          "id": "9104c6f7-8a42-46cc-94e1-2ac15ac97fc5",
+          "type": "MEDICATION_NOT_RECORDED",
+          "severity": "LOW",
+          "description": "学生钱七有晨检记录但无对应用药授权",
+          "explanation": "有晨检记录但无对应用药授权",
+          "relatedRecordId": "ad038aec-9fde-49ac-9f53-ba22b2c856d7",
+          "relatedRecordType": "healthCheck"
+        }
+      ],
+      "status": "APPROVED",
+      "version": 2,
+      "reviewedBy": "张校医",
+      "reviewedAt": "2026-05-19",
+      "reviewNotes": "人工审核通过"
+    },
+    {
+      "id": "38de95bf-34ce-43b3-bf46-e194f8ba32a8",
+      "reconciliationDate": "2026-05-20",
+      "studentId": "S006",
+      "studentName": "孙八",
+      "className": "一年级1班",
+      "student": {
+        "id": "eb6df507-f177-4b50-b90b-bf00524f0eb3",
+        "studentId": "S006",
+        "name": "孙八",
+        "className": "一年级1班",
+        "grade": "一年级",
+        "parentPhone": "13800000006"
+      },
+      "discrepancies": [],
+      "status": "APPROVED",
+      "version": 1
+    }
+  ],
+  "generatedAt": "2026-05-19",
+  "generatedBy": "张校医"
+}

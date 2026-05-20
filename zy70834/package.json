@@ -1,0 +1,27 @@
+{
+  "name": "health-check-reconciliation",
+  "version": "1.0.0",
+  "description": "晨检对账服务 - 处理晨检数据、用药授权与班级名单的自动对账",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node src/demo.ts"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/json2csv": "^5.0.7",
+    "@types/uuid": "^9.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": ["health-check", "reconciliation", "school-health"],
+  "author": "",
+  "license": "MIT"
+}

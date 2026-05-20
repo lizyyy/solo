@@ -1,0 +1,57 @@
+[
+  {
+    "studentId": "S001",
+    "studentName": "张三",
+    "medicationName": "小儿感冒颗粒",
+    "category": "感冒药",
+    "dosage": "1袋/次",
+    "frequency": "每日3次",
+    "expirationDate": "2026-12-31",
+    "parentConfirmed": true,
+    "confirmedDate": "2026-05-19",
+    "authorizedBy": "张家长",
+    "effectiveDate": "2026-05-20",
+    "expiryDate": "2026-05-22"
+  },
+  {
+    "studentId": "S002",
+    "studentName": "李四",
+    "medicationName": "布洛芬混悬液",
+    "category": "退烧药",
+    "dosage": "5ml/次",
+    "frequency": "必要时",
+    "expirationDate": "2026-05-18",
+    "parentConfirmed": false,
+    "authorizedBy": "李家长",
+    "effectiveDate": "2026-05-20",
+    "expiryDate": "2026-05-25"
+  },
+  {
+    "studentId": "S003",
+    "studentName": "王五",
+    "medicationName": "蒙脱石散",
+    "category": "肠胃药",
+    "dosage": "1袋/次",
+    "frequency": "每日2次",
+    "expirationDate": "2027-01-15",
+    "parentConfirmed": true,
+    "confirmedDate": "2026-05-18",
+    "authorizedBy": "王家长",
+    "effectiveDate": "2026-05-20",
+    "expiryDate": "2026-05-21"
+  },
+  {
+    "studentId": "S004",
+    "studentName": "赵六",
+    "medicationName": "氯雷他定糖浆",
+    "category": "抗过敏药",
+    "dosage": "5ml/次",
+    "frequency": "每日1次",
+    "expirationDate": "2026-08-20",
+    "parentConfirmed": true,
+    "confirmedDate": "2026-05-15",
+    "authorizedBy": "赵家长",
+    "effectiveDate": "2026-05-20",
+    "expiryDate": "2026-06-20"
+  }
+]
