@@ -19,8 +19,8 @@ router.post('/create', (req, res) => {
 
       if (idempotency_key) {
         db.get(`SELECT task_id, status, need_approval FROM export_tasks 
-                WHERE created_by = ? AND task_name = ? AND parameters = ?`,
-          [created_by, task_name, JSON.stringify(parameters || {})],
+                WHERE created_by = ? AND task_name = ? AND parameters = ? AND role_id = ?`,
+          [created_by, task_name, JSON.stringify(parameters || {}), role.id],
           (err, existingTask) => {
             if (err) return res.status(500).json({ error: err.message });
             if (existingTask) {
@@ -267,11 +267,11 @@ router.get('/statistics/overview', (req, res) => {
   `, (err, statusCounts) => {
     db.get('SELECT COUNT(*) as total FROM export_tasks', (err, total) => {
       db.get('SELECT COUNT(*) as today FROM export_tasks WHERE DATE(created_at) = DATE("now")', (err, today) => {
-        db.get('SELECT COUNT(*) as failed FROM export_tasks WHERE status = "failed"', (err, failed) => {
+        db.get('SELECT COUNT(*) as count FROM export_tasks WHERE status = "failed"', (err, failed) => {
           res.json({
             total: total ? total.total : 0,
             today: today ? today.today : 0,
-            failed: failed ? failed.total : 0,
+            failed: failed ? failed.count : 0,
             status_breakdown: statusCounts || []
           });
         });
