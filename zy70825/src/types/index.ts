@@ -75,6 +75,7 @@ export interface RuleResult {
 export interface RuleContext {
   influencers: Map<string, Influencer>;
   existingShipments: ShipmentItem[];
+  currentBatchShipments: ShipmentItem[];
   currentDate: Date;
 }
 

@@ -79,12 +79,26 @@ const duplicateShipmentRule = {
         const issues = [];
         const suggestions = [];
         let status = 'normal';
-        const duplicates = context.existingShipments.filter(s => s.sampleId === item.sampleId &&
+        const historicalDuplicates = context.existingShipments.filter(s => s.sampleId === item.sampleId &&
             s.id !== item.id &&
             s.status !== 'returned');
-        if (duplicates.length > 0) {
+        const batchDuplicates = context.currentBatchShipments.filter(s => s.sampleId === item.sampleId &&
+            s.id !== item.id &&
+            s.status !== 'returned');
+        const allDuplicates = [...historicalDuplicates, ...batchDuplicates];
+        if (allDuplicates.length > 0) {
             status = 'failed';
-            issues.push(`样品 ${item.sampleName} (${item.sampleId}) 已被寄送但未归还，共 ${duplicates.length} 笔`);
+            const historicalCount = historicalDuplicates.length;
+            const batchCount = batchDuplicates.length;
+            if (historicalCount > 0 && batchCount > 0) {
+                issues.push(`样品 ${item.sampleName} (${item.sampleId}) 存在重复寄送：历史 ${historicalCount} 笔未归还，本批次 ${batchCount} 笔重复`);
+            }
+            else if (historicalCount > 0) {
+                issues.push(`样品 ${item.sampleName} (${item.sampleId}) 已被寄送但未归还，共 ${historicalCount} 笔`);
+            }
+            else {
+                issues.push(`样品 ${item.sampleName} (${item.sampleId}) 在本批次中重复寄送 ${batchCount} 次`);
+            }
             suggestions.push('该样品当前处于借出状态，不能重复寄送');
             suggestions.push('请先确认之前的寄送记录是否已归还');
         }
@@ -150,6 +164,7 @@ class RulesEngineService {
         const context = {
             influencers,
             existingShipments,
+            currentBatchShipments: items,
             currentDate: new Date()
         };
         const normalItems = [];
