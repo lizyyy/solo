@@ -1,0 +1,59 @@
+{
+  "vaccines": [
+    {
+      "code": "MMR",
+      "name": "麻腮风疫苗",
+      "quantity": 50,
+      "expiryDate": "2025-12-31",
+      "manufacturer": "上海生物制品研究所",
+      "batchNumber": "MMR2024001",
+      "waitingListCount": 3
+    },
+    {
+      "code": "DPT",
+      "name": "百白破疫苗",
+      "quantity": 0,
+      "expiryDate": "2025-06-30",
+      "manufacturer": "武汉生物制品研究所",
+      "batchNumber": "DPT2024001",
+      "expectedRestock": "2024-07-15",
+      "waitingListCount": 12
+    },
+    {
+      "code": "HBV",
+      "name": "乙肝疫苗",
+      "quantity": 30,
+      "expiryDate": "2025-03-15",
+      "manufacturer": "北京生物制品研究所",
+      "batchNumber": "HBV2024001",
+      "waitingListCount": 0
+    },
+    {
+      "code": "POLIO",
+      "name": "脊髓灰质炎疫苗",
+      "quantity": 45,
+      "expiryDate": "2025-09-30",
+      "manufacturer": "中国医学科学院医学生物学研究所",
+      "batchNumber": "POL2024001",
+      "waitingListCount": 2
+    },
+    {
+      "code": "BCG",
+      "name": "卡介苗",
+      "quantity": 25,
+      "expiryDate": "2025-01-31",
+      "manufacturer": "成都生物制品研究所",
+      "batchNumber": "BCG2024001",
+      "waitingListCount": 1
+    },
+    {
+      "code": "FLU",
+      "name": "流感疫苗",
+      "quantity": 100,
+      "expiryDate": "2024-12-31",
+      "manufacturer": "华兰生物疫苗有限公司",
+      "batchNumber": "FLU2024001",
+      "waitingListCount": 0
+    }
+  ]
+}
