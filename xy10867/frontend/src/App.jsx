@@ -102,7 +102,8 @@ function App() {
 
   const handleMerge = async (values) => {
     try {
-      await vulnerabilityApi.merge(values.targetId, selectedRowKeys, operator);
+      const sourceIds = selectedRowKeys.filter(id => id !== values.targetId);
+      await vulnerabilityApi.merge(values.targetId, sourceIds, operator);
       message.success('合并成功');
       setMergeModalVisible(false);
       setSelectedRowKeys([]);
@@ -159,18 +160,6 @@ function App() {
       }
     } catch (error) {
       message.error(error.response?.data?.error || '操作失败');
-    }
-  };
-
-  const handleExport = async (format) => {
-    try {
-      const res = await vulnerabilityApi.export(format);
-      if (res.data.success) {
-        window.open(`/api/vulnerabilities/exports/${res.data.data.filename}`);
-        message.success(`导出成功，共 ${res.data.data.count} 条记录`);
-      }
-    } catch (error) {
-      message.error('导出失败');
     }
   };
 
