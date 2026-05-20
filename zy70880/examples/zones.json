@@ -1,0 +1,20 @@
+[
+  {
+    "zone_code": "ZONE-001",
+    "name": "低温冷库A区",
+    "temperature_range": "-18℃ ~ -25℃",
+    "area": 500
+  },
+  {
+    "zone_code": "ZONE-002",
+    "name": "中温冷库B区",
+    "temperature_range": "0℃ ~ 5℃",
+    "area": 800
+  },
+  {
+    "zone_code": "ZONE-003",
+    "name": "超低温冷库C区",
+    "temperature_range": "-35℃ ~ -45℃",
+    "area": 300
+  }
+]

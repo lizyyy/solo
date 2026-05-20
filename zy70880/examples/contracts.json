@@ -1,0 +1,38 @@
+[
+  {
+    "contract_no": "CONT-2024-001",
+    "tenant_code": "TENANT-001",
+    "tenant_name": "鲜丰冷链物流有限公司",
+    "zone_code": "ZONE-001",
+    "zone_name": "低温冷库A区",
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "allocation_ratio": 0.6,
+    "electricity_price": 1.2,
+    "status": "active"
+  },
+  {
+    "contract_no": "CONT-2024-002",
+    "tenant_code": "TENANT-002",
+    "tenant_name": "冰泉食品股份有限公司",
+    "zone_code": "ZONE-001",
+    "zone_name": "低温冷库A区",
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "allocation_ratio": 0.4,
+    "electricity_price": 1.2,
+    "status": "active"
+  },
+  {
+    "contract_no": "CONT-2024-003",
+    "tenant_code": "TENANT-003",
+    "tenant_name": "极地冷藏集团",
+    "zone_code": "ZONE-002",
+    "zone_name": "中温冷库B区",
+    "start_date": "2024-02-01",
+    "end_date": "2024-11-30",
+    "allocation_ratio": 1.0,
+    "electricity_price": 1.0,
+    "status": "active"
+  }
+]
