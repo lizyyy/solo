@@ -154,12 +154,8 @@ export const validationRules: ValidationRule[] = [
 
   {
     name: '临时插队规则',
-    description: '检查优先级船舶是否有合理插队理由，避免冲突',
+    description: '检查泊位时间冲突，处理优先级船舶插队合理性',
     validate: (schedule, berths, tides, existingSchedules) => {
-      if (!schedule.isPriority) {
-        return { valid: true, status: 'normal' };
-      }
-
       const berthSchedules = existingSchedules.filter(
         s => s.berthId === schedule.berthId && s.status !== 'failed'
       );
@@ -177,41 +173,51 @@ export const validationRules: ValidationRule[] = [
 
       if (conflictingSchedules.length > 0) {
         const conflictVessels = conflictingSchedules.map(s => s.vesselName).join(', ');
-        
-        if (!schedule.confirmedByAgent) {
+
+        if (schedule.isPriority) {
+          if (!schedule.confirmedByAgent) {
+            return {
+              valid: false,
+              status: 'pending',
+              errorReason: `优先级船舶与现有船期冲突：${conflictVessels}`,
+              suggestions: [
+                '需要船代书面确认插队申请',
+                '联系受影响船舶的船代协调',
+                '考虑调整到其他空闲泊位'
+              ]
+            };
+          }
+
           return {
-            valid: false,
+            valid: true,
             status: 'pending',
-            errorReason: `优先级船舶与现有船期冲突：${conflictVessels}`,
-            suggestions: [
-              '需要船代书面确认插队申请',
-              '联系受影响船舶的船代协调',
-              '考虑调整到其他空闲泊位'
-            ]
+            errorReason: `插队已确认，需通知受影响的 ${conflictVessels}`,
+            suggestions: ['立即通知调度室调整计划', '准备补偿方案']
           };
         }
 
         return {
-          valid: true,
-          status: 'pending',
-          errorReason: `插队已确认，需通知受影响的 ${conflictVessels}`,
-          suggestions: ['立即通知调度室调整计划', '准备补偿方案']
+          valid: false,
+          status: 'failed',
+          errorReason: `与已有船期时间冲突：${conflictVessels}`,
+          suggestions: [
+            '调整到其他泊位',
+            '修改作业时间窗口',
+            '如需插队请设置优先级并提交插队申请'
+          ]
         };
       }
 
-      if (schedule.confirmedByAgent) {
+      if (schedule.isPriority && !schedule.confirmedByAgent) {
         return {
           valid: true,
-          status: 'normal'
+          status: 'pending',
+          errorReason: '优先级船舶需要船代确认',
+          suggestions: ['请上传船代确认函', '联系代理完成确认流程']
         };
       }
 
-      return {
-        valid: true,
-        status: 'pending',
-        errorReason: '优先级船舶需要船代确认',
-        suggestions: ['请上传船代确认函', '联系代理完成确认流程']
-      };
+      return { valid: true, status: 'normal' };
     }
   },
 

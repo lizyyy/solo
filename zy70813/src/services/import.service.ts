@@ -101,11 +101,16 @@ export async function processImport(
   const existingSchedules: VesselSchedule[] = [];
   importBatches.forEach(batch => {
     batch.result.normal.forEach(item => {
-      if (item.record.id) {
+      existingSchedules.push(item.record as VesselSchedule);
+    });
+    batch.result.pending.forEach(item => {
+      if (item.record.status !== 'failed') {
         existingSchedules.push(item.record as VesselSchedule);
       }
     });
   });
+
+  const currentBatchValidSchedules: VesselSchedule[] = [];
 
   for (const schedule of schedules) {
     const recordHash = generateRecordHash(schedule);
@@ -131,7 +136,8 @@ export async function processImport(
       batchId
     };
 
-    const validation = validateSchedule(fullSchedule, berths, tides, existingSchedules);
+    const allSchedulesForValidation = [...existingSchedules, ...currentBatchValidSchedules];
+    const validation = validateSchedule(fullSchedule, berths, tides, allSchedulesForValidation);
     fullSchedule.status = validation.status;
 
     const resultItem: ImportResultItem = {
@@ -142,6 +148,10 @@ export async function processImport(
     };
 
     processedHashes.add(recordHash);
+
+    if (validation.status !== 'failed') {
+      currentBatchValidSchedules.push(fullSchedule);
+    }
 
     switch (validation.status) {
       case 'normal':
