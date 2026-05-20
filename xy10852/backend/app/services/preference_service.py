@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple, Dict, Any
 from datetime import datetime
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 
 from app.models.models import (
     UserPreference, ChangeHistory, SendInterception, AnomalyQueue,
@@ -9,7 +9,7 @@ from app.models.models import (
     InterceptionStatus, SourcePriority
 )
 from app.schemas.preference import (
-    PreferenceCreate, PreferenceUpdate, ValidationResult, ConflictInfo
+    PreferenceCreate, ValidationResult, ConflictInfo
 )
 
 
@@ -28,9 +28,10 @@ class PreferenceService:
     def get_source_priority(self, source: SourceType) -> int:
         return self.SOURCE_PRIORITY_MAP.get(source, 0)
 
-    def find_existing_preference(
+    def find_existing_preferences(
         self, user_id: str, channel: ChannelType, business_scene: BusinessScene
-    ) -> Optional[UserPreference]:
+    ) -> List[UserPreference]:
+        """查找所有匹配的偏好（不同来源可能有多个）"""
         return self.db.query(UserPreference).filter(
             and_(
                 UserPreference.user_id == user_id,
@@ -38,29 +39,65 @@ class PreferenceService:
                 UserPreference.business_scene == business_scene,
                 UserPreference.status != PreferenceStatus.MERGED
             )
+        ).all()
+
+    def find_preference_by_source(
+        self, user_id: str, channel: ChannelType, business_scene: BusinessScene, source: SourceType
+    ) -> Optional[UserPreference]:
+        """按来源查找特定的偏好"""
+        return self.db.query(UserPreference).filter(
+            and_(
+                UserPreference.user_id == user_id,
+                UserPreference.channel == channel,
+                UserPreference.business_scene == business_scene,
+                UserPreference.source == source,
+                UserPreference.status != PreferenceStatus.MERGED
+            )
         ).first()
 
     def check_conflict(
         self, preference_data: PreferenceCreate
     ) -> Tuple[bool, Optional[ConflictInfo]]:
-        existing = self.find_existing_preference(
+        """检查是否存在高优先级冲突"""
+        existing_all = self.find_existing_preferences(
             preference_data.user_id,
             preference_data.channel,
             preference_data.business_scene
         )
         
-        if not existing:
+        if not existing_all:
             return False, None
 
         new_priority = self.get_source_priority(preference_data.source)
         
-        conflict_type = "priority_conflict" if new_priority < existing.source_priority else "value_conflict"
-        
-        return True, ConflictInfo(
-            existing_preference=existing,
-            new_preference=preference_data,
-            conflict_type=conflict_type
+        existing_same_source = self.find_preference_by_source(
+            preference_data.user_id,
+            preference_data.channel,
+            preference_data.business_scene,
+            preference_data.source
         )
+        
+        if existing_same_source:
+            # 相同来源，允许更新
+            return True, ConflictInfo(
+                existing_preference=existing_same_source,
+                new_preference=preference_data,
+                conflict_type="same_source_update"
+            )
+        
+        highest_priority = max(p.source_priority for p in existing_all)
+        
+        if new_priority < highest_priority:
+            # 新优先级低于现有最高优先级，拦截
+            highest_pref = next(p for p in existing_all if p.source_priority == highest_priority)
+            return True, ConflictInfo(
+                existing_preference=highest_pref,
+                new_preference=preference_data,
+                conflict_type="priority_conflict"
+            )
+        
+        # 新优先级更高或相等，允许创建/更新
+        return False, None
 
     def create_change_history(
         self,
@@ -106,8 +143,10 @@ class PreferenceService:
         
         if has_conflict and conflict_info:
             existing = conflict_info.existing_preference
+            conflict_type = conflict_info.conflict_type
             
-            if source_priority < existing.source_priority:
+            if conflict_type == "priority_conflict":
+                # 低优先级，创建异常
                 anomaly = AnomalyQueue(
                     user_id=preference_data.user_id,
                     channel=preference_data.channel,
@@ -116,7 +155,7 @@ class PreferenceService:
                     description=f"来源{preference_data.source}优先级低于现有来源，无法覆盖",
                     source=preference_data.source,
                     status="pending",
-                    metadata={
+                    meta_data={
                         "existing_source": existing.source.value,
                         "existing_priority": existing.source_priority,
                         "new_source": preference_data.source.value,
@@ -128,50 +167,34 @@ class PreferenceService:
                 
                 return existing, False
             
-            elif source_priority == existing.source_priority:
-                old_value = {"enabled": existing.enabled, "metadata": existing.meta_data}
-                
-                existing.enabled = preference_data.enabled
-                existing.meta_data = preference_data.meta_data or {}
-                existing.status = PreferenceStatus.ACTIVE
-                
-                new_value = {"enabled": preference_data.enabled, "metadata": preference_data.meta_data}
-                
-                self.create_change_history(
-                    existing, old_value, new_value, preference_data.source, "merge_update", operator
-                )
-                
-                self.db.flush()
-                return existing, True
-            
-            else:
+            elif conflict_type == "same_source_update":
+                # 相同来源，更新
                 old_value = {
-                    "enabled": existing.enabled,
+                    "enabled": existing.enabled, 
+                    "metadata": existing.meta_data,
                     "source": existing.source.value,
-                    "source_priority": existing.source_priority,
-                    "metadata": existing.meta_data
+                    "source_priority": existing.source_priority
                 }
                 
                 existing.enabled = preference_data.enabled
-                existing.source = preference_data.source
-                existing.source_priority = source_priority
                 existing.meta_data = preference_data.meta_data or {}
                 existing.status = PreferenceStatus.ACTIVE
                 
                 new_value = {
-                    "enabled": preference_data.enabled,
+                    "enabled": preference_data.enabled, 
+                    "metadata": preference_data.meta_data,
                     "source": preference_data.source.value,
-                    "source_priority": source_priority,
-                    "metadata": preference_data.meta_data
+                    "source_priority": source_priority
                 }
                 
                 self.create_change_history(
-                    existing, old_value, new_value, preference_data.source, "priority_override", operator
+                    existing, old_value, new_value, preference_data.source, "same_source_update", operator
                 )
                 
                 self.db.flush()
                 return existing, True
-
+        
+        # 新偏好或更高优先级来源，创建新记录
         preference = UserPreference(
             user_id=preference_data.user_id,
             channel=preference_data.channel,
@@ -187,8 +210,18 @@ class PreferenceService:
         self.db.add(preference)
         self.db.flush()
         
+        # 创建历史记录 - 初始值放在 new_value 中
+        create_value = {
+            "user_id": preference_data.user_id,
+            "channel": preference_data.channel.value,
+            "business_scene": preference_data.business_scene.value,
+            "enabled": preference_data.enabled,
+            "source": preference_data.source.value,
+            "expires_at": None,
+            "meta_data": preference_data.meta_data or {}
+        }
         self.create_change_history(
-            preference, {}, preference_data.model_dump(), preference_data.source, "create", operator
+            preference, {}, create_value, preference_data.source, "create", operator
         )
         
         return preference, True
@@ -196,14 +229,8 @@ class PreferenceService:
     def merge_preferences(
         self, user_id: str, channel: ChannelType, business_scene: BusinessScene, operator: str = "system"
     ) -> Optional[UserPreference]:
-        preferences = self.db.query(UserPreference).filter(
-            and_(
-                UserPreference.user_id == user_id,
-                UserPreference.channel == channel,
-                UserPreference.business_scene == business_scene,
-                UserPreference.status.in_([PreferenceStatus.ACTIVE, PreferenceStatus.CONFLICT, PreferenceStatus.PENDING])
-            )
-        ).order_by(UserPreference.source_priority.desc()).all()
+        preferences = self.find_existing_preferences(user_id, channel, business_scene)
+        preferences = sorted(preferences, key=lambda p: p.source_priority, reverse=True)
 
         if not preferences:
             return None
@@ -239,7 +266,8 @@ class PreferenceService:
     def validate_before_send(
         self, user_id: str, channel: ChannelType, business_scene: BusinessScene
     ) -> Tuple[ValidationResult, Optional[SendInterception]]:
-        preference = self.find_existing_preference(user_id, channel, business_scene)
+        preference = self.find_existing_preferences(user_id, channel, business_scene)
+        highest_pref = max(preference, key=lambda p: p.source_priority) if preference else None
         
         interception = SendInterception(
             user_id=user_id,
@@ -251,7 +279,7 @@ class PreferenceService:
         self.db.add(interception)
         self.db.flush()
 
-        if not preference:
+        if not highest_pref:
             interception.status = InterceptionStatus.BLOCKED
             interception.reason = "未找到用户偏好配置"
             interception.interception_rule = "preference_not_found"
@@ -262,23 +290,23 @@ class PreferenceService:
                 rule="preference_not_found"
             ), interception
 
-        if preference.status not in [PreferenceStatus.ACTIVE, PreferenceStatus.MERGED]:
+        if highest_pref.status not in [PreferenceStatus.ACTIVE, PreferenceStatus.MERGED]:
             interception.status = InterceptionStatus.BLOCKED
-            interception.reason = f"偏好状态异常: {preference.status.value}"
+            interception.reason = f"偏好状态异常: {highest_pref.status.value}"
             interception.interception_rule = "invalid_preference_status"
-            interception.preference_id = preference.id
+            interception.preference_id = highest_pref.id
             self.db.flush()
             return ValidationResult(
                 allowed=False,
-                reason=f"偏好状态异常: {preference.status.value}",
+                reason=f"偏好状态异常: {highest_pref.status.value}",
                 rule="invalid_preference_status"
             ), interception
 
-        if not preference.enabled:
+        if not highest_pref.enabled:
             interception.status = InterceptionStatus.BLOCKED
             interception.reason = "用户已关闭该渠道通知"
             interception.interception_rule = "preference_disabled"
-            interception.preference_id = preference.id
+            interception.preference_id = highest_pref.id
             self.db.flush()
             return ValidationResult(
                 allowed=False,
@@ -286,11 +314,11 @@ class PreferenceService:
                 rule="preference_disabled"
             ), interception
 
-        if preference.expires_at and preference.expires_at < datetime.now():
+        if highest_pref.expires_at and highest_pref.expires_at < datetime.now():
             interception.status = InterceptionStatus.BLOCKED
             interception.reason = "偏好配置已过期"
             interception.interception_rule = "preference_expired"
-            interception.preference_id = preference.id
+            interception.preference_id = highest_pref.id
             self.db.flush()
             return ValidationResult(
                 allowed=False,
@@ -299,7 +327,7 @@ class PreferenceService:
             ), interception
 
         interception.status = InterceptionStatus.ALLOWED
-        interception.preference_id = preference.id
+        interception.preference_id = highest_pref.id
         self.db.flush()
         
         return ValidationResult(allowed=True), interception

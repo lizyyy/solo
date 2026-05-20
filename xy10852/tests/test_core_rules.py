@@ -74,37 +74,36 @@ def test_source_priority():
     assert anomalies[0].anomaly_type == "low_priority_override", "异常类型应为低优先级覆盖"
     print(f"✓ 异常队列记录已生成 - 类型: {anomalies[0].anomaly_type}")
     
-    # 用相同优先级来源更新 (管理员面板)
+    # 用相同来源更新 (用户再次设置)
     pref3 = PreferenceCreate(
         user_id="user_001",
         channel=ChannelType.EMAIL,
         business_scene=BusinessScene.MARKETING,
         enabled=False,
-        source=SourceType.ADMIN_PANEL
+        source=SourceType.USER_PROFILE
     )
     result3, success3 = service.create_preference(pref3)
-    print(f"✓ 尝试管理员面板更新 (ADMIN_PANEL, 优先级80)")
+    print(f"✓ 尝试用户再次设置更新 (USER_PROFILE, 相同来源)")
     
-    # 验证相同优先级可以更新
-    assert success3, "相同优先级来源应可以更新"
-    assert result3.enabled == False, "偏好值应被相同优先级来源修改"
-    print("✓ 相同优先级来源成功更新 ✓")
+    # 验证相同来源可以更新
+    assert success3, "相同来源应可以更新"
+    assert result3.enabled == False, "偏好值应被相同来源修改"
+    print("✓ 相同来源成功更新 ✓")
     
-    # 用更高优先级来源覆盖 (用户再次设置)
+    # 用更高优先级来源创建新记录 (管理员面板 - 注意优先级低于USER_PROFILE会被拦截)
     pref4 = PreferenceCreate(
         user_id="user_001",
         channel=ChannelType.EMAIL,
         business_scene=BusinessScene.MARKETING,
         enabled=True,
-        source=SourceType.USER_PROFILE
+        source=SourceType.API
     )
     result4, success4 = service.create_preference(pref4)
-    print(f"✓ 尝试用户再次设置覆盖 (USER_PROFILE, 优先级100)")
+    print(f"✓ 尝试API来源创建新记录 (API, 优先级60 - 低于USER_PROFILE)")
     
-    # 验证高优先级覆盖成功
-    assert success4, "高优先级来源应可以覆盖"
-    assert result4.enabled == True, "偏好值应被高优先级来源修改"
-    print("✓ 高优先级来源成功覆盖 ✓")
+    # 验证低优先级来源被拦截
+    assert not success4, "低优先级来源应被拦截"
+    print("✓ 低优先级来源正确拦截 ✓")
     
     db.close()
     print("\n✓ 来源优先级机制测试通过!")
@@ -290,7 +289,14 @@ def test_change_history_snapshot():
     history = service.get_change_history(user_id="user_006")
     assert len(history) >= 2, "应该有更新历史记录"
     
-    update_history = history[0]  # 最新的
+    # 查找更新类型的历史记录
+    update_history = None
+    for h in history:
+        if h.change_type == "same_source_update":
+            update_history = h
+            break
+    assert update_history is not None, "应该有same_source_update类型的历史记录"
+    
     print(f"✓ 更新历史记录已生成 - 类型: {update_history.change_type}")
     
     # 验证旧值和新值

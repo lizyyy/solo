@@ -37,16 +37,6 @@ def get_preferences(
     return service.get_user_preferences(user_id, channel, business_scene, status, skip, limit)
 
 
-@router.get("/{preference_id}", response_model=PreferenceResponse)
-def get_preference(preference_id: int, db: Session = Depends(get_db)):
-    service = PreferenceService(db)
-    preferences = service.get_user_preferences(skip=0, limit=1000)
-    for p in preferences:
-        if p.id == preference_id:
-            return p
-    raise HTTPException(status_code=404, detail="偏好配置未找到")
-
-
 @router.post("/merge", response_model=Optional[PreferenceResponse])
 def merge_preferences(request: PreferenceMergeRequest, db: Session = Depends(get_db)):
     service = PreferenceService(db)
@@ -84,18 +74,6 @@ def validate_before_send(
     return result
 
 
-@router.get("/interceptions", response_model=List[SendInterceptionResponse])
-def get_interceptions(
-    user_id: Optional[str] = None,
-    status: Optional[InterceptionStatus] = None,
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db)
-):
-    service = PreferenceService(db)
-    return service.get_interceptions(user_id, status, skip, limit)
-
-
 @router.get("/interceptions/report")
 def get_interception_report(
     start_date: Optional[str] = None,
@@ -109,6 +87,18 @@ def get_interception_report(
     end = datetime.fromisoformat(end_date) if end_date else None
     
     return service.generate_interception_report(start, end)
+
+
+@router.get("/interceptions", response_model=List[SendInterceptionResponse])
+def get_interceptions(
+    user_id: Optional[str] = None,
+    status: Optional[InterceptionStatus] = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    service = PreferenceService(db)
+    return service.get_interceptions(user_id, status, skip, limit)
 
 
 @router.get("/anomalies", response_model=List[AnomalyQueueResponse])
@@ -220,3 +210,13 @@ def get_stats_summary(db: Session = Depends(get_db)):
             "block_rate": blocked_interceptions / total_interceptions if total_interceptions > 0 else 0
         }
     }
+
+
+@router.get("/{preference_id}", response_model=PreferenceResponse)
+def get_preference(preference_id: int, db: Session = Depends(get_db)):
+    service = PreferenceService(db)
+    preferences = service.get_user_preferences(skip=0, limit=1000)
+    for p in preferences:
+        if p.id == preference_id:
+            return p
+    raise HTTPException(status_code=404, detail="偏好配置未找到")
