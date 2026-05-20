@@ -1,0 +1,179 @@
+{
+  "reportId": "dd3bc1a8-2b47-408f-ba42-fede8f97f0ff",
+  "generatedAt": "2026-05-19T22:17:45.838Z",
+  "batchCode": "BATCH2024Q1",
+  "summary": {
+    "totalShipments": 6,
+    "returnedOnTime": 3,
+    "overdue": 1,
+    "damaged": 1,
+    "lost": 0,
+    "totalDeduction": 1297,
+    "pendingReview": 2,
+    "reviewed": 4
+  },
+  "records": [
+    {
+      "id": "3ca7e769-8086-4537-89c9-78781a35cc68",
+      "shipmentId": "ship001",
+      "batchCode": "BATCH2024Q1",
+      "influencerName": "张美妆",
+      "sampleName": "口红A",
+      "sampleCode": "SKU001",
+      "originalStatus": "returned",
+      "currentStatus": "returned",
+      "reviewStatus": "reviewed",
+      "deductionAmount": 0,
+      "isModified": false
+    },
+    {
+      "id": "92e1a062-0038-47f6-9792-30109ed3d507",
+      "shipmentId": "ship001",
+      "batchCode": "BATCH2024Q1",
+      "influencerName": "张美妆",
+      "sampleName": "眼影盘B",
+      "sampleCode": "SKU002",
+      "originalStatus": "returned",
+      "currentStatus": "returned",
+      "reviewStatus": "reviewed",
+      "deductionAmount": 0,
+      "isModified": false
+    },
+    {
+      "id": "f7e05e6f-89d2-4ed8-97d4-84821a62dddb",
+      "shipmentId": "ship002",
+      "batchCode": "BATCH2024Q1",
+      "influencerName": "李穿搭",
+      "sampleName": "口红A",
+      "sampleCode": "SKU001",
+      "originalStatus": "shipped",
+      "currentStatus": "returned",
+      "discrepancy": {
+        "id": "fdbd7615-1000-4f34-907c-6a6ac0b3ab1d",
+        "shipmentId": "ship002",
+        "type": "overdue_not_returned",
+        "description": "样品超期未还，应还日期2024-03-20，已超期12天",
+        "amount": 199,
+        "source": "系统自动检测 - 超期未还",
+        "isResolved": true,
+        "resolution": "确认样品已于3月28日归还，免除扣款"
+      },
+      "reviewStatus": "reviewed",
+      "deductionAmount": 0,
+      "isModified": true,
+      "reviewNotes": "确认样品已于3月28日归还，免除扣款",
+      "reviewer": "样品管理员-张三",
+      "reviewTime": "2026-05-19T22:17:45.838Z"
+    },
+    {
+      "id": "1909d176-f88f-4638-a030-82e48463b4d6",
+      "shipmentId": "ship003",
+      "batchCode": "BATCH2024Q1",
+      "influencerName": "王护肤",
+      "sampleName": "精华液C",
+      "sampleCode": "SKU003",
+      "originalStatus": "damaged",
+      "currentStatus": "damaged",
+      "discrepancy": {
+        "id": "81897298-1a66-455a-a584-0f07cfb034ef",
+        "shipmentId": "ship003",
+        "type": "damaged_deduction",
+        "description": "样品归还时破损，需按价值扣款",
+        "amount": 798,
+        "source": "系统自动检测 - 破损扣款",
+        "isResolved": true,
+        "resolution": "经协商，破损样品按¥300扣款处理"
+      },
+      "reviewStatus": "reviewed",
+      "deductionAmount": 300,
+      "isModified": true,
+      "reviewNotes": "经协商，破损样品按¥300扣款处理",
+      "reviewer": "样品管理员-张三",
+      "reviewTime": "2026-05-19T22:17:45.838Z"
+    },
+    {
+      "id": "a81433f8-bd26-4ac5-aacf-8ea83f80392b",
+      "shipmentId": "ship004",
+      "batchCode": "BATCH2024Q1",
+      "influencerName": "张美妆",
+      "sampleName": "口红A",
+      "sampleCode": "SKU001",
+      "originalStatus": "shipped",
+      "currentStatus": "shipped",
+      "discrepancy": {
+        "id": "967cbdf6-c866-48b3-ac16-5ef632ca6533",
+        "shipmentId": "ship004",
+        "type": "duplicate_shipment",
+        "description": "同样品重复寄送，达人张美妆已收到相同样品",
+        "amount": 199,
+        "source": "系统自动检测 - 重复寄送（与ship001重复",
+        "isResolved": false
+      },
+      "reviewStatus": "pending_review",
+      "deductionAmount": 398,
+      "isModified": false
+    },
+    {
+      "id": "999bc863-a082-4eac-a904-1280ce188e35",
+      "shipmentId": "ship005",
+      "batchCode": "BATCH2024Q1",
+      "influencerName": "赵时尚",
+      "sampleName": "香水D",
+      "sampleCode": "SKU004",
+      "originalStatus": "overdue",
+      "currentStatus": "overdue",
+      "discrepancy": {
+        "id": "f51ec654-d300-41ed-8e25-4fe5f5b28375",
+        "shipmentId": "ship005",
+        "type": "overdue_not_returned",
+        "description": "样品超期未还，应还日期2024-03-06，当前已超期",
+        "amount": 599,
+        "source": "系统自动检测 - 超期未还",
+        "isResolved": false
+      },
+      "reviewStatus": "pending_review",
+      "deductionAmount": 599,
+      "isModified": false
+    }
+  ],
+  "discrepancies": [
+    {
+      "id": "fdbd7615-1000-4f34-907c-6a6ac0b3ab1d",
+      "shipmentId": "ship002",
+      "type": "overdue_not_returned",
+      "description": "样品超期未还，应还日期2024-03-20，已超期12天",
+      "amount": 199,
+      "source": "系统自动检测 - 超期未还",
+      "isResolved": true,
+      "resolution": "确认样品已于3月28日归还，免除扣款"
+    },
+    {
+      "id": "81897298-1a66-455a-a584-0f07cfb034ef",
+      "shipmentId": "ship003",
+      "type": "damaged_deduction",
+      "description": "样品归还时破损，需按价值扣款",
+      "amount": 798,
+      "source": "系统自动检测 - 破损扣款",
+      "isResolved": true,
+      "resolution": "经协商，破损样品按¥300扣款处理"
+    },
+    {
+      "id": "967cbdf6-c866-48b3-ac16-5ef632ca6533",
+      "shipmentId": "ship004",
+      "type": "duplicate_shipment",
+      "description": "同样品重复寄送，达人张美妆已收到相同样品",
+      "amount": 199,
+      "source": "系统自动检测 - 重复寄送（与ship001重复",
+      "isResolved": false
+    },
+    {
+      "id": "f51ec654-d300-41ed-8e25-4fe5f5b28375",
+      "shipmentId": "ship005",
+      "type": "overdue_not_returned",
+      "description": "样品超期未还，应还日期2024-03-06，当前已超期",
+      "amount": 599,
+      "source": "系统自动检测 - 超期未还",
+      "isResolved": false
+    }
+  ]
+}

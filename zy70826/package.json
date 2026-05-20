@@ -1,0 +1,24 @@
+{
+  "name": "mcn-sample-reconciliation",
+  "version": "1.0.0",
+  "description": "MCN样品对账服务 - 样品寄送、归还、破损管理",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "demo": "ts-node src/demo.ts"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "@types/json2csv": "^5.0.7",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}

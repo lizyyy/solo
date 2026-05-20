@@ -1,0 +1,7 @@
+shipmentId,batchCode,batchName,brand,influencerId,influencerName,sampleCode,sampleName,quantity,unitValue,shipDate,dueDate,returnDate,status,photoProof,notes
+ship001,BATCH2024Q1,2024春季新品,美妆品牌X,inf001,张美妆,SKU001,口红A,1,199,2024-03-01,2024-03-15,2024-03-14,returned,photo1.jpg,完好归还
+ship001,BATCH2024Q1,2024春季新品,美妆品牌X,inf001,张美妆,SKU002,眼影盘B,1,299,2024-03-01,2024-03-15,2024-03-14,returned,photo1.jpg,完好归还
+ship002,BATCH2024Q1,2024春季新品,美妆品牌X,inf002,李穿搭,SKU001,口红A,1,199,2024-03-05,2024-03-20,,shipped,,
+ship003,BATCH2024Q1,2024春季新品,美妆品牌X,inf003,王护肤,SKU003,精华液C,2,399,2024-03-02,2024-03-16,2024-03-18,damaged,photo2.jpg;photo3.jpg,瓶身破损
+ship004,BATCH2024Q1,2024春季新品,美妆品牌X,inf001,张美妆,SKU001,口红A,1,199,2024-03-10,2024-03-25,,shipped,,重复寄送
+ship005,BATCH2024Q1,2024春季新品,美妆品牌X,inf004,赵时尚,SKU004,香水D,1,599,2024-02-20,2024-03-06,,overdue,,超期未还
