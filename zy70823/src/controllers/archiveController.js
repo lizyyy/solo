@@ -77,7 +77,7 @@ class ArchiveController {
 
       const materials = await Database.all(`
         SELECT m.*, 
-               (SELECT handler FROM process_logs WHERE material_id = m.id ORDER BY created_at DESC LIMIT 1) as last_handler
+               (SELECT handler FROM process_logs WHERE material_id = m.id ORDER BY id DESC LIMIT 1) as last_handler
         FROM materials m 
         WHERE m.batch_id = ?`,
         [batch_id]

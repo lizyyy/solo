@@ -47,8 +47,7 @@ class MaterialController {
           updateParams
         );
 
-        const batch = await Database.get('SELECT * FROM batches WHERE id = ?', [material.batch_id]);
-        if (batch && status && status !== 'pending') {
+        if (status && status !== 'pending' && material.status === 'pending') {
           await Database.run(
             'UPDATE batches SET processed_count = processed_count + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
             [material.batch_id]
