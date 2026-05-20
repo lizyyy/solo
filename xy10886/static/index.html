@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检验结果回传台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-blue-800 mb-8">检验结果回传台</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">总申请数</div>
+                <div class="text-3xl font-bold text-gray-800" id="totalCount">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">待回传</div>
+                <div class="text-3xl font-bold text-yellow-600" id="pendingCount">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">待读取</div>
+                <div class="text-3xl font-bold text-blue-600" id="returnedCount">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">已读取</div>
+                <div class="text-3xl font-bold text-green-600" id="readCount">0</div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 mb-6">
+            <button onclick="openCreateModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                + 新建检验申请
+            </button>
+            <button onclick="openReturnModal()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                实验室回传
+            </button>
+            <button onclick="downloadExcel()" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition">
+                下载回传明细
+            </button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 mb-6">
+            <div class="flex flex-wrap gap-4">
+                <div class="flex-1 min-w-48">
+                    <label class="block text-sm text-gray-600 mb-1">患者姓名</label>
+                    <input type="text" id="filterPatient" placeholder="输入患者姓名" 
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex-1 min-w-48">
+                    <label class="block text-sm text-gray-600 mb-1">样本条码</label>
+                    <input type="text" id="filterBarcode" placeholder="输入样本条码" 
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex-1 min-w-48">
+                    <label class="block text-sm text-gray-600 mb-1">回传状态</label>
+                    <select id="filterStatus" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">全部状态</option>
+                        <option value="待回传">待回传</option>
+                        <option value="已回传待读取">已回传待读取</option>
+                        <option value="已读取">已读取</option>
+                        <option value="条码不一致">条码不一致</option>
+                        <option value="复核未通过">复核未通过</option>
+                        <option value="附件缺失">附件缺失</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="loadRequests()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition">
+                        查询
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">患者信息</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">样本条码</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">检验类型</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">申请信息</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">状态</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">回传信息</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">读取信息</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">新建检验申请</h2>
+            <form id="createForm" onsubmit="createRequest(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">患者ID</label>
+                        <input type="text" name="patient_id" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">患者姓名</label>
+                        <input type="text" name="patient_name" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">样本条码</label>
+                        <input type="text" name="barcode" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">检验类型</label>
+                        <input type="text" name="test_type" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">申请医生</label>
+                        <input type="text" name="apply_doctor" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">科室</label>
+                        <input type="text" name="department" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="button" onclick="closeCreateModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 transition">取消</button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="returnModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">实验室回传结果</h2>
+            <form id="returnForm" onsubmit="returnResult(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">回传条码</label>
+                        <input type="text" name="barcode" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">正确条码（如条码不一致请填写）</label>
+                        <input type="text" name="correct_barcode" placeholder="留空表示条码一致" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">复核人</label>
+                        <input type="text" name="reviewer" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="review_pass" name="review_pass" checked class="w-4 h-4 text-blue-600">
+                        <label for="review_pass" class="text-sm text-gray-600">复核通过</label>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">结果附件</label>
+                        <input type="file" name="attachment" class="w-full px-3 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">备注</label>
+                        <textarea name="notes" rows="2" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="button" onclick="closeReturnModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 transition">取消</button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">回传</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="readModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">确认读取</h2>
+            <form id="readForm" onsubmit="markAsRead(event)">
+                <input type="hidden" id="readRequestId" name="request_id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">读取人姓名</label>
+                        <input type="text" name="reader" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button type="button" onclick="closeReadModal()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 transition">取消</button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">确认读取</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+
+        function getStatusClass(status) {
+            const classes = {
+                '待回传': 'bg-yellow-100 text-yellow-800',
+                '已回传待读取': 'bg-blue-100 text-blue-800',
+                '已读取': 'bg-green-100 text-green-800',
+                '条码不一致': 'bg-red-100 text-red-800',
+                '复核未通过': 'bg-orange-100 text-orange-800',
+                '附件缺失': 'bg-gray-100 text-gray-800'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN');
+        }
+
+        async function loadRequests() {
+            const patient = document.getElementById('filterPatient').value;
+            const barcode = document.getElementById('filterBarcode').value;
+            const status = document.getElementById('filterStatus').value;
+
+            let url = `${API_BASE}/api/test-requests?`;
+            if (patient) url += `patient_name=${encodeURIComponent(patient)}&`;
+            if (barcode) url += `barcode=${encodeURIComponent(barcode)}&`;
+            if (status) url += `status=${encodeURIComponent(status)}`;
+
+            const response = await fetch(url);
+            const requests = await response.json();
+            
+            const tbody = document.getElementById('requestsTable');
+            tbody.innerHTML = requests.map(req => `
+                <tr class="border-t hover:bg-gray-50">
+                    <td class="px-4 py-3">
+                        <div class="font-medium text-gray-800">${req.patient_name}</div>
+                        <div class="text-sm text-gray-500">ID: ${req.patient_id}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="font-mono text-sm">${req.barcode}</span>
+                        ${req.barcode_match === false ? '<span class="text-red-600 text-xs block">条码不匹配</span>' : ''}
+                    </td>
+                    <td class="px-4 py-3 text-sm">${req.test_type}</td>
+                    <td class="px-4 py-3">
+                        <div class="text-sm">${req.apply_doctor}</div>
+                        <div class="text-xs text-gray-500">${req.department}</div>
+                        <div class="text-xs text-gray-400">${formatDate(req.apply_time)}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(req.status)}">
+                            ${req.status}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        ${req.reviewer ? `
+                            <div class="text-gray-700">复核人: ${req.reviewer}</div>
+                            <div class="text-gray-500 text-xs">${formatDate(req.return_time)}</div>
+                            ${req.review_pass === false ? '<span class="text-orange-600 text-xs">复核未通过</span>' : ''}
+                            ${!req.attachment_path && req.return_time ? '<span class="text-gray-600 text-xs">附件缺失</span>' : ''}
+                        ` : '-'}
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        ${req.reader ? `
+                            <div class="text-gray-700">${req.reader}</div>
+                            <div class="text-gray-500 text-xs">${formatDate(req.read_time)}</div>
+                        ` : '-'}
+                    </td>
+                    <td class="px-4 py-3">
+                        ${req.status === '已回传待读取' ? `
+                            <button onclick="openReadModal('${req.id}')" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                确认读取
+                            </button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+
+            loadStatistics();
+        }
+
+        async function loadStatistics() {
+            const response = await fetch(`${API_BASE}/api/statistics`);
+            const stats = await response.json();
+            
+            document.getElementById('totalCount').textContent = stats.total;
+            document.getElementById('pendingCount').textContent = stats.pending;
+            document.getElementById('returnedCount').textContent = stats.returned;
+            document.getElementById('readCount').textContent = stats.read;
+        }
+
+        function openCreateModal() {
+            document.getElementById('createModal').classList.remove('hidden');
+            document.getElementById('createModal').classList.add('flex');
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.add('hidden');
+            document.getElementById('createModal').classList.remove('flex');
+            document.getElementById('createForm').reset();
+        }
+
+        async function createRequest(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            await fetch(`${API_BASE}/api/test-requests`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            closeCreateModal();
+            loadRequests();
+        }
+
+        function openReturnModal() {
+            document.getElementById('returnModal').classList.remove('hidden');
+            document.getElementById('returnModal').classList.add('flex');
+        }
+
+        function closeReturnModal() {
+            document.getElementById('returnModal').classList.add('hidden');
+            document.getElementById('returnModal').classList.remove('flex');
+            document.getElementById('returnForm').reset();
+        }
+
+        async function returnResult(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            const wrongBarcode = formData.get('barcode');
+            const correctBarcode = formData.get('correct_barcode');
+            const reviewer = formData.get('reviewer');
+            const reviewPass = formData.get('review_pass') === 'on';
+            const notes = formData.get('notes');
+            const attachment = formData.get('attachment');
+
+            if (correctBarcode && correctBarcode !== wrongBarcode) {
+                await fetch(`${API_BASE}/api/return-result-wrong-barcode`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        wrong_barcode: wrongBarcode,
+                        correct_barcode: correctBarcode,
+                        review_pass: reviewPass,
+                        reviewer: reviewer,
+                        notes: notes
+                    })
+                });
+            } else {
+                const returnFormData = new FormData();
+                returnFormData.append('barcode', wrongBarcode);
+                returnFormData.append('review_pass', reviewPass);
+                returnFormData.append('reviewer', reviewer);
+                if (notes) returnFormData.append('notes', notes);
+                if (attachment && attachment.name) returnFormData.append('attachment', attachment);
+
+                await fetch(`${API_BASE}/api/return-result`, {
+                    method: 'POST',
+                    body: returnFormData
+                });
+            }
+            
+            closeReturnModal();
+            loadRequests();
+        }
+
+        function openReadModal(requestId) {
+            document.getElementById('readRequestId').value = requestId;
+            document.getElementById('readModal').classList.remove('hidden');
+            document.getElementById('readModal').classList.add('flex');
+        }
+
+        function closeReadModal() {
+            document.getElementById('readModal').classList.add('hidden');
+            document.getElementById('readModal').classList.remove('flex');
+            document.getElementById('readForm').reset();
+        }
+
+        async function markAsRead(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            await fetch(`${API_BASE}/api/read-receipt`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            closeReadModal();
+            loadRequests();
+        }
+
+        function downloadExcel() {
+            window.location.href = `${API_BASE}/api/download-excel`;
+        }
+
+        loadRequests();
+    </script>
+</body>
+</html>
