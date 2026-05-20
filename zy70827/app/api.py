@@ -168,15 +168,13 @@ def get_task_deposits(task_id: int, db: Session = Depends(get_db)):
 @router.post("/users", response_model=dict, summary="创建用户")
 def create_user(username: str, password: str, full_name: str = None, email: str = None, db: Session = Depends(get_db)):
     from app.models import User
-    from passlib.context import CryptContext
-    
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    from app.security import hash_password
     
     existing_user = db.query(User).filter(User.username == username).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="用户名已存在")
     
-    hashed_password = pwd_context.hash(password)
+    hashed_password = hash_password(password)
     user = User(
         username=username,
         full_name=full_name,

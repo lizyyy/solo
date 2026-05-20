@@ -1,5 +1,6 @@
 from app.database import SessionLocal, engine, Base
 from app.models import User, SampleTask
+from app.security import hash_password
 
 
 def init_db():
@@ -9,11 +10,12 @@ def init_db():
     
     existing_user = db.query(User).filter(User.username == "admin").first()
     if not existing_user:
+        hashed_pwd = hash_password("123456")
         user = User(
             username="admin",
             full_name="样品管理员",
             email="admin@example.com",
-            hashed_password="fake_hash_for_testing"
+            hashed_password=hashed_pwd
         )
         db.add(user)
         db.commit()
