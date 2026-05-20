@@ -110,26 +110,82 @@ router.get('/refunds/:id', asyncHandler(async (req, res) => {
 
 router.post('/refunds/:id/submit', asyncHandler(async (req, res) => {
   const { operator } = req.body;
-  const result = await service.submitToChannel(req.params.id, operator);
-  res.json({ success: true, ...result });
+  const refundId = req.params.id;
+  
+  try {
+    const result = await service.submitToChannel(refundId, operator);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    await service.logRequest(
+      refundId, 
+      'submit_to_channel_failed', 
+      { refundId, operator }, 
+      { success: false, error: error.message },
+      operator,
+      'submit_status_check'
+    );
+    res.status(400).json({ success: false, error: error.message });
+  }
 }));
 
 router.post('/refunds/:id/query', asyncHandler(async (req, res) => {
   const { operator } = req.body;
-  const result = await service.queryChannelStatus(req.params.id, operator);
-  res.json({ success: true, ...result });
+  const refundId = req.params.id;
+  
+  try {
+    const result = await service.queryChannelStatus(refundId, operator);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    await service.logRequest(
+      refundId, 
+      'query_channel_failed', 
+      { refundId, operator }, 
+      { success: false, error: error.message },
+      operator,
+      'channel_query_handler'
+    );
+    res.status(400).json({ success: false, error: error.message });
+  }
 }));
 
 router.post('/refunds/:id/review', asyncHandler(async (req, res) => {
   const { reviewer, comment, decision } = req.body;
-  const result = await service.manualReview(req.params.id, reviewer, comment, decision);
-  res.json({ success: true, ...result });
+  const refundId = req.params.id;
+  
+  try {
+    const result = await service.manualReview(refundId, reviewer, comment, decision);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    await service.logRequest(
+      refundId, 
+      'manual_review_failed', 
+      { refundId, reviewer, comment, decision }, 
+      { success: false, error: error.message },
+      reviewer,
+      'manual_review_handler'
+    );
+    res.status(400).json({ success: false, error: error.message });
+  }
 }));
 
 router.post('/refunds/:id/archive', asyncHandler(async (req, res) => {
   const { operator } = req.body;
-  const result = await service.archiveReceipt(req.params.id, operator);
-  res.json({ success: true, ...result });
+  const refundId = req.params.id;
+  
+  try {
+    const result = await service.archiveReceipt(refundId, operator);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    await service.logRequest(
+      refundId, 
+      'archive_receipt_failed', 
+      { refundId, operator }, 
+      { success: false, error: error.message },
+      operator,
+      'receipt_archiver'
+    );
+    res.status(400).json({ success: false, error: error.message });
+  }
 }));
 
 router.post('/refunds/:id/fix', asyncHandler(async (req, res) => {
