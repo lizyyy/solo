@@ -140,12 +140,47 @@ def create_bff_endpoint(db: Session, endpoint: schemas.BffEndpointCreate, create
 
 def update_bff_endpoint(db: Session, endpoint_id: int, endpoint: schemas.BffEndpointUpdate):
     db_endpoint = get_bff_endpoint(db, endpoint_id)
-    if db_endpoint:
-        update_data = endpoint.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
-            setattr(db_endpoint, key, value)
-        db.commit()
-        db.refresh(db_endpoint)
+    if not db_endpoint:
+        return None
+    
+    update_data = endpoint.model_dump(exclude_unset=True)
+    
+    # 分离出 upstreams 和 fields，单独处理
+    upstreams_data = update_data.pop('upstreams', None)
+    fields_data = update_data.pop('fields', None)
+    
+    # 更新基本字段
+    for key, value in update_data.items():
+        setattr(db_endpoint, key, value)
+    
+    # 处理 upstreams 更新：先删后增
+    if upstreams_data is not None:
+        db.query(models.EndpointUpstream).filter(
+            models.EndpointUpstream.endpoint_id == endpoint_id
+        ).delete()
+        
+        for upstream in upstreams_data:
+            db_upstream = models.EndpointUpstream(
+                endpoint_id=endpoint_id,
+                **upstream.model_dump() if hasattr(upstream, 'model_dump') else upstream
+            )
+            db.add(db_upstream)
+    
+    # 处理 fields 更新：先删后增
+    if fields_data is not None:
+        db.query(models.AggregateField).filter(
+            models.AggregateField.endpoint_id == endpoint_id
+        ).delete()
+        
+        for field in fields_data:
+            db_field = models.AggregateField(
+                endpoint_id=endpoint_id,
+                **field.model_dump() if hasattr(field, 'model_dump') else field
+            )
+            db.add(db_field)
+    
+    db.commit()
+    db.refresh(db_endpoint)
     return db_endpoint
 
 

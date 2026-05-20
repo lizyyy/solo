@@ -141,7 +141,8 @@ class AggregateFieldBase(BaseModel):
 
 
 class AggregateFieldCreate(AggregateFieldBase):
-    pass
+    endpoint_id: Optional[int] = None
+    page_module_id: Optional[int] = None
 
 
 class AggregateField(AggregateFieldBase):
@@ -189,6 +190,8 @@ class BffEndpointUpdate(BaseModel):
     degradation_strategy: Optional[DegradationStrategy] = None
     degradation_default_value: Optional[Dict[str, Any]] = None
     timeout: Optional[int] = None
+    upstreams: Optional[List[EndpointUpstreamCreate]] = None
+    fields: Optional[List[AggregateFieldCreate]] = None
 
 
 class BffEndpoint(BffEndpointBase):

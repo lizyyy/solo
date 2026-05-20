@@ -123,6 +123,39 @@ const EndpointList = () => {
     setFilters(prev => ({ ...prev, status: value }));
   };
 
+  const handleBatchImport = async (file) => {
+    try {
+      const res = await bffEndpointApi.batchImport(file);
+      message.success(
+        `导入完成：成功 ${res.data.success_count} 条，失败 ${res.data.failed_count} 条`
+      );
+      if (res.data.errors && res.data.errors.length > 0) {
+        message.warning(`部分失败: ${res.data.errors.slice(0, 3).join(', ')}`);
+      }
+      fetchData();
+    } catch (error) {
+      message.error('导入失败: ' + (error.response?.data?.detail || error.message));
+    }
+    return false; // 阻止自动上传
+  };
+
+  const handleExportReport = async () => {
+    try {
+      const res = await callHistoryApi.export({ format: 'xlsx' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `bff_report_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      message.success('导出成功');
+    } catch (error) {
+      message.error('导出失败: ' + (error.response?.data?.detail || error.message));
+    }
+  };
+
   const handleAdd = () => {
     setEditItem(null);
     form.resetFields();
@@ -133,9 +166,35 @@ const EndpointList = () => {
 
   const handleEdit = (record) => {
     setEditItem(record);
-    form.setFieldsValue(record);
-    setTempUpstreams(record.upstreams || []);
-    setTempFields(record.fields || []);
+    
+    // 对象转 JSON 字符串用于表单显示
+    const formData = {
+      ...record,
+      degradation_default_value: record.degradation_default_value 
+        ? JSON.stringify(record.degradation_default_value, null, 2) 
+        : '',
+      orchestration_rules: record.orchestration_rules 
+        ? JSON.stringify(record.orchestration_rules, null, 2) 
+        : '',
+    };
+    form.setFieldsValue(formData);
+    
+    // 处理 upstreams 中的 JSON 字段
+    const formattedUpstreams = (record.upstreams || []).map(u => ({
+      ...u,
+      input_mapping: u.input_mapping ? JSON.stringify(u.input_mapping, null, 2) : '',
+      output_mapping: u.output_mapping ? JSON.stringify(u.output_mapping, null, 2) : '',
+    }));
+    setTempUpstreams(formattedUpstreams);
+    
+    // 处理 fields 中的 JSON 字段
+    const formattedFields = (record.fields || []).map(f => ({
+      ...f,
+      transformation: f.transformation ? JSON.stringify(f.transformation, null, 2) : '',
+      default_value: f.default_value ? JSON.stringify(f.default_value, null, 2) : '',
+    }));
+    setTempFields(formattedFields);
+    
     setModalVisible(true);
   };
 
@@ -153,15 +212,29 @@ const EndpointList = () => {
     try {
       const values = await form.validateFields();
       
+      // 安全解析 JSON
+      const safeParseJSON = (str) => {
+        if (!str || str.trim() === '') return null;
+        try {
+          return JSON.parse(str);
+        } catch (e) {
+          console.warn('JSON parse error:', e);
+          return {};
+        }
+      };
+      
       const endpointData = {
         ...values,
+        // 字符串转对象：降级默认值和编排规则
+        degradation_default_value: safeParseJSON(values.degradation_default_value),
+        orchestration_rules: safeParseJSON(values.orchestration_rules),
         upstreams: tempUpstreams.map(u => ({
           upstream_api_id: u.upstream_api_id,
           order: u.order || 0,
           parallel: u.parallel || false,
           required: u.required !== false,
-          input_mapping: u.input_mapping ? JSON.parse(u.input_mapping) : null,
-          output_mapping: u.output_mapping ? JSON.parse(u.output_mapping) : null,
+          input_mapping: safeParseJSON(u.input_mapping),
+          output_mapping: safeParseJSON(u.output_mapping),
         })),
         fields: tempFields.map(f => ({
           name: f.name,
@@ -169,8 +242,8 @@ const EndpointList = () => {
           source_type: f.source_type || 'upstream',
           source_upstream_id: f.source_upstream_id || null,
           source_path: f.source_path || '',
-          transformation: f.transformation ? JSON.parse(f.transformation) : null,
-          default_value: f.default_value ? JSON.parse(f.default_value) : null,
+          transformation: safeParseJSON(f.transformation),
+          default_value: safeParseJSON(f.default_value),
           required: f.required || false,
           trim_enabled: f.trim_enabled !== false,
         })),
@@ -389,6 +462,16 @@ const EndpointList = () => {
         <Space>
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
             新建端点
+          </Button>
+          <Upload
+            showUploadList={false}
+            beforeUpload={handleBatchImport}
+            accept=".json,.csv"
+          >
+            <Button icon={<UploadOutlined />}>批量导入</Button>
+          </Upload>
+          <Button icon={<DownloadOutlined />} onClick={handleExportReport}>
+            导出报告
           </Button>
           <Button icon={<ReloadOutlined />} onClick={fetchData}>
             刷新
