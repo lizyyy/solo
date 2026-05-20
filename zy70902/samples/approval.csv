@@ -1,0 +1,4 @@
+cableCarId,approvalType,applicant,approver,approvedAt,status,validFrom,validTo,remarks
+CC001,release,张工,李经理,2026-05-10,approved,2026-05-01,2026-05-05,已超期
+CC002,release,刘工,王经理,2026-05-16,approved,2026-05-16,2026-06-15,正常
+CC003,trial_run,陈工,,pending,,,等待审批

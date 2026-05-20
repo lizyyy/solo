@@ -1,0 +1,68 @@
+[
+  {
+    "cableCarId": "CC001",
+    "sensorType": "试运行监测",
+    "sensorId": "SEN001",
+    "readings": [
+      {
+        "timestamp": "2026-05-15T08:00:00Z",
+        "value": 25.5,
+        "unit": "km/h",
+        "status": "normal"
+      },
+      {
+        "timestamp": "2026-05-15T08:15:00Z",
+        "value": 26.0,
+        "unit": "km/h",
+        "status": "normal"
+      }
+    ],
+    "trialRunDuration": 20,
+    "trialRunPassed": true,
+    "collectedAt": "2026-05-15T09:00:00Z"
+  },
+  {
+    "cableCarId": "CC002",
+    "sensorType": "试运行监测",
+    "sensorId": "SEN002",
+    "readings": [
+      {
+        "timestamp": "2026-05-16T08:00:00Z",
+        "value": 25.5,
+        "unit": "km/h",
+        "status": "normal"
+      },
+      {
+        "timestamp": "2026-05-16T08:30:00Z",
+        "value": 26.0,
+        "unit": "km/h",
+        "status": "warning"
+      },
+      {
+        "timestamp": "2026-05-16T09:00:00Z",
+        "value": 25.8,
+        "unit": "km/h",
+        "status": "normal"
+      }
+    ],
+    "trialRunDuration": 60,
+    "trialRunPassed": true,
+    "collectedAt": "2026-05-16T10:00:00Z"
+  },
+  {
+    "cableCarId": "CC003",
+    "sensorType": "试运行监测",
+    "sensorId": "SEN003",
+    "readings": [
+      {
+        "timestamp": "2026-05-17T08:00:00Z",
+        "value": 25.5,
+        "unit": "km/h",
+        "status": "normal"
+      }
+    ],
+    "trialRunDuration": 45,
+    "trialRunPassed": false,
+    "collectedAt": "2026-05-17T09:00:00Z"
+  }
+]

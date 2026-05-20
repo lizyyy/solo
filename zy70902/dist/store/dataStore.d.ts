@@ -1,0 +1,36 @@
+import { MaintenanceRecord, SensorData, ApprovalRecord, ReconciliationResult, ReviewRecord, ReportData, BatchImportResult } from '../types';
+declare class DataStore {
+    private maintenanceRecords;
+    private sensorData;
+    private approvalRecords;
+    private reconciliationResults;
+    private reviewRecords;
+    private reports;
+    private batchImports;
+    addMaintenanceRecord(record: Omit<MaintenanceRecord, 'id' | 'importedAt' | 'source'>): MaintenanceRecord;
+    addSensorData(data: Omit<SensorData, 'id' | 'importedAt' | 'source'>): SensorData;
+    addApprovalRecord(record: Omit<ApprovalRecord, 'id' | 'importedAt'>): ApprovalRecord;
+    getMaintenanceRecord(id: string): MaintenanceRecord | undefined;
+    getSensorData(id: string): SensorData | undefined;
+    getApprovalRecord(id: string): ApprovalRecord | undefined;
+    getAllMaintenanceRecords(): MaintenanceRecord[];
+    getAllSensorData(): SensorData[];
+    getAllApprovalRecords(): ApprovalRecord[];
+    getMaintenanceByCableCar(cableCarId: string): MaintenanceRecord[];
+    getSensorByCableCar(cableCarId: string): SensorData[];
+    getApprovalByCableCar(cableCarId: string): ApprovalRecord[];
+    addReconciliationResult(result: Omit<ReconciliationResult, 'id' | 'createdAt'>): ReconciliationResult;
+    getReconciliationResult(id: string): ReconciliationResult | undefined;
+    getAllReconciliationResults(): ReconciliationResult[];
+    updateReconciliationResult(id: string, updates: Partial<ReconciliationResult>): ReconciliationResult | undefined;
+    addReviewRecord(record: Omit<ReviewRecord, 'id' | 'reviewedAt'>): ReviewRecord;
+    getReviewRecordsByDiff(diffId: string): ReviewRecord[];
+    addReport(report: Omit<ReportData, 'id' | 'generatedAt'>): ReportData;
+    getReport(id: string): ReportData | undefined;
+    getAllReports(): ReportData[];
+    addBatchImport(batch: Omit<BatchImportResult, 'batchId' | 'importedAt'>): BatchImportResult;
+    getBatchImport(batchId: string): BatchImportResult | undefined;
+    clearAll(): void;
+}
+export declare const dataStore: DataStore;
+export {};

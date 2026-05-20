@@ -1,0 +1,9 @@
+cableCarId,maintenanceDate,maintenanceType,inspector,itemCode,itemName,isKeyItem,inspectionResult,signedBy,signedAt,remarks
+CC001,2026-05-15,regular,张工,ITEM001,制动系统检查,true,pass,李主管,2026-05-15,正常
+CC001,2026-05-15,regular,张工,ITEM002,钢丝绳磨损检测,true,fail,,,需要更换
+CC001,2026-05-15,regular,张工,ITEM003,电气系统测试,false,pass,王工,2026-05-15,
+CC002,2026-05-16,regular,刘工,ITEM001,制动系统检查,true,pass,赵主管,2026-05-16,
+CC002,2026-05-16,regular,刘工,ITEM002,钢丝绳磨损检测,true,pass,赵主管,2026-05-16,正常
+CC002,2026-05-16,regular,刘工,ITEM003,电气系统测试,false,pass,,,
+CC003,2026-05-17,regular,陈工,ITEM001,制动系统检查,true,pass,,,
+CC003,2026-05-17,regular,陈工,ITEM002,钢丝绳磨损检测,true,pass,周主管,2026-05-17,
