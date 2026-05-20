@@ -6,7 +6,9 @@ import {
   ReconciliationRecord,
   ReconciliationSummary,
   Discrepancy,
-  generateId
+  generateId,
+  getAllDiscrepancyTypes,
+  getAllDiscrepancyDescriptions
 } from './types';
 
 export class ReportService {
@@ -42,9 +44,10 @@ export class ReportService {
       { label: '样品编码', value: 'sampleCode' },
       { label: '原始状态', value: 'originalStatus' },
       { label: '当前状态', value: 'currentStatus' },
-      { label: '差异类型', value: 'discrepancy?.type' },
-      { label: '差异描述', value: 'discrepancy?.description' },
-      { label: '差异来源', value: 'discrepancy?.source' },
+      { label: '差异数量', value: (record: ReconciliationRecord) => record.discrepancies.length },
+      { label: '差异类型', value: (record: ReconciliationRecord) => getAllDiscrepancyTypes(record) },
+      { label: '差异描述', value: (record: ReconciliationRecord) => getAllDiscrepancyDescriptions(record) },
+      { label: '差异来源', value: (record: ReconciliationRecord) => record.discrepancies.map(d => d.source).join(' | ') },
       { label: '扣款金额', value: 'deductionAmount' },
       { label: '复核状态', value: 'reviewStatus' },
       { label: '复核人', value: 'reviewer' },

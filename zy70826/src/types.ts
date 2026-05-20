@@ -78,13 +78,25 @@ export interface ReconciliationRecord {
   sampleCode: string;
   originalStatus: SampleStatus;
   currentStatus: SampleStatus;
-  discrepancy?: Discrepancy;
+  discrepancies: Discrepancy[];
   reviewStatus: ReviewStatus;
   reviewer?: string;
   reviewTime?: string;
   reviewNotes?: string;
   deductionAmount: number;
   isModified: boolean;
+}
+
+export function getPrimaryDiscrepancy(record: ReconciliationRecord): Discrepancy | undefined {
+  return record.discrepancies.length > 0 ? record.discrepancies[0] : undefined;
+}
+
+export function getAllDiscrepancyTypes(record: ReconciliationRecord): string {
+  return record.discrepancies.map(d => d.type).join('; ');
+}
+
+export function getAllDiscrepancyDescriptions(record: ReconciliationRecord): string {
+  return record.discrepancies.map(d => d.description).join(' | ');
 }
 
 export interface ReconciliationSummary {

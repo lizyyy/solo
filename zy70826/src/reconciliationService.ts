@@ -139,7 +139,7 @@ export class ReconciliationService {
     shipments.forEach(shipment => {
       shipment.items.forEach(item => {
         const discrepancies = discrepancyMap.get(shipment.id) || [];
-        const primaryDiscrepancy = discrepancies.length > 0 ? discrepancies[0] : undefined;
+        const itemDiscrepancies = discrepancies.map(d => ({ ...d }));
         const totalDeduction = discrepancies.reduce((sum, d) => sum + d.amount, 0);
 
         records.push({
@@ -151,7 +151,7 @@ export class ReconciliationService {
           sampleCode: item.sampleCode,
           originalStatus: shipment.status,
           currentStatus: shipment.status,
-          discrepancy: primaryDiscrepancy,
+          discrepancies: itemDiscrepancies,
           reviewStatus: discrepancies.length > 0 ? ReviewStatus.PENDING_REVIEW : ReviewStatus.REVIEWED,
           deductionAmount: discrepancies.length > 0 ? totalDeduction : 0,
           isModified: false

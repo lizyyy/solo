@@ -1,0 +1,7 @@
+﻿"批次代码","达人姓名","样品名称","样品编码","原始状态","当前状态","差异数量","差异类型","差异描述","差异来源","扣款金额","复核状态","复核人","复核备注","是否已修改"
+"BATCH2024Q1","张美妆","口红A","SKU001","returned","returned",0,"","","",0,"reviewed",,,false
+"BATCH2024Q1","张美妆","眼影盘B","SKU002","returned","returned",0,"","","",0,"reviewed",,,false
+"BATCH2024Q1","李穿搭","口红A","SKU001","shipped","returned",1,"overdue_not_returned","样品超期未还，应还日期2024-03-20，已超期12天","系统自动检测 - 超期未还",0,"reviewed","样品管理员-张三","确认样品已于3月28日归还，免除扣款",true
+"BATCH2024Q1","王护肤","精华液C","SKU003","damaged","damaged",1,"damaged_deduction","样品归还时破损，需按价值扣款","系统自动检测 - 破损扣款",300,"reviewed","样品管理员-张三","经协商，破损样品按¥300扣款处理",true
+"BATCH2024Q1","张美妆","口红A","SKU001","shipped","shipped",2,"duplicate_shipment; overdue_not_returned","同样品重复寄送，达人张美妆已收到相同样品 | 样品超期未还，应还日期2024-03-25，已超期7天","系统自动检测 - 重复寄送（与ship001重复 | 系统自动检测 - 超期未还",398,"pending_review",,,false
+"BATCH2024Q1","赵时尚","香水D","SKU004","overdue","overdue",1,"overdue_not_returned","样品超期未还，应还日期2024-03-06，当前已超期","系统自动检测 - 超期未还",599,"pending_review",,,false

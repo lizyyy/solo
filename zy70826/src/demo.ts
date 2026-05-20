@@ -3,7 +3,7 @@ import { ImportService } from './importService';
 import { ReconciliationService } from './reconciliationService';
 import { ReviewService, ReviewUpdate } from './reviewService';
 import { ReportService } from './reportService';
-import { SampleStatus } from './types';
+import { SampleStatus, getAllDiscrepancyTypes } from './types';
 
 async function runDemo() {
   console.log('========================================');
@@ -32,12 +32,18 @@ async function runDemo() {
   console.log(`  - 总扣款金额: ¥${summary.totalDeduction}`);
   console.log(`  - 待复核: ${summary.pendingReview}\n`);
 
-  console.log('步骤 4: 显示待复核的差异...');
-  discrepancies.forEach((d, index) => {
-    console.log(`  ${index + 1}. [${d.type}]`);
-    console.log(`     描述: ${d.description}`);
-    console.log(`     金额: ¥${d.amount}`);
-    console.log(`     来源: ${d.source}\n`);
+  console.log('步骤 4: 显示待复核的差异（按记录分组）...');
+  records.filter(r => r.discrepancies.length > 0).forEach((record, index) => {
+    console.log(`  记录 ${index + 1}: ${record.influencerName} - ${record.sampleName}`);
+    console.log(`     差异数量: ${record.discrepancies.length}`);
+    console.log(`     差异类型: ${getAllDiscrepancyTypes(record)}`);
+    record.discrepancies.forEach((d, dIndex) => {
+      console.log(`       ${dIndex + 1}. [${d.type}]`);
+      console.log(`          描述: ${d.description}`);
+      console.log(`          金额: ¥${d.amount}`);
+      console.log(`          来源: ${d.source}`);
+    });
+    console.log();
   });
 
   console.log('步骤 5: 进行人工复核...');
@@ -72,6 +78,8 @@ async function runDemo() {
     console.log(`  ${index + 1}. ${r.influencerName} - ${r.sampleName}`);
     console.log(`     状态变化: ${r.originalStatus} → ${r.currentStatus}`);
     console.log(`     扣款金额: ¥${r.deductionAmount}`);
+    console.log(`     差异数量: ${r.discrepancies.length}`);
+    console.log(`     差异类型: ${getAllDiscrepancyTypes(r)}`);
     console.log(`     复核人: ${r.reviewer}`);
     console.log(`     备注: ${r.reviewNotes}\n`);
   });

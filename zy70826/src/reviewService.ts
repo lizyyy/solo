@@ -53,9 +53,11 @@ export class ReviewService {
       record.deductionAmount = update.deductionAmount;
     }
 
-    if (update.resolveDiscrepancy && record.discrepancy) {
-      record.discrepancy.isResolved = true;
-      record.discrepancy.resolution = update.reviewNotes || '人工复核后标记为已解决';
+    if (update.resolveDiscrepancy) {
+      record.discrepancies.forEach(d => {
+        d.isResolved = true;
+        d.resolution = update.reviewNotes || '人工复核后标记为已解决';
+      });
     }
 
     if (update.reviewNotes) {
@@ -68,7 +70,7 @@ export class ReviewService {
     record.isModified = true;
 
     if (this.needsManualDiscrepancy(record, update)) {
-      record.discrepancy = {
+      record.discrepancies.push({
         id: generateId(),
         shipmentId: record.shipmentId,
         type: DiscrepancyType.MANUAL_CORRECTION,
@@ -76,7 +78,7 @@ export class ReviewService {
         amount: record.deductionAmount,
         source: `人工操作 - ${reviewer}`,
         isResolved: true
-      };
+      });
     }
 
     this.summary = this.recalculateSummary();
@@ -97,7 +99,7 @@ export class ReviewService {
   }
 
   private needsManualDiscrepancy(record: ReconciliationRecord, update: ReviewUpdate): boolean {
-    if (!record.discrepancy && (update.newStatus || update.deductionAmount !== undefined)) {
+    if (record.discrepancies.length === 0 && (update.newStatus || update.deductionAmount !== undefined)) {
       return true;
     }
     return false;
@@ -144,9 +146,7 @@ export class ReviewService {
   }
 
   getDiscrepancies(): Discrepancy[] {
-    return this.records
-      .filter(r => r.discrepancy)
-      .map(r => r.discrepancy!);
+    return this.records.flatMap(r => r.discrepancies);
   }
 
   getModifiedRecords(): ReconciliationRecord[] {
