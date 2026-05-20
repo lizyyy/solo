@@ -9,7 +9,12 @@ from .schemas import (
     ReportSummary,
     RecordStatus,
     DiscrepancyType,
-    ReviewAction
+    ReviewAction,
+    AppointmentDB,
+    VaccineInventoryDB,
+    ContraindicationRuleDB,
+    ReconciliationRecordDB,
+    AuditLogDB
 )
 from .database import Base, engine, get_db
 
@@ -25,6 +30,11 @@ __all__ = [
     "RecordStatus",
     "DiscrepancyType",
     "ReviewAction",
+    "AppointmentDB",
+    "VaccineInventoryDB",
+    "ContraindicationRuleDB",
+    "ReconciliationRecordDB",
+    "AuditLogDB",
     "Base",
     "engine",
     "get_db"

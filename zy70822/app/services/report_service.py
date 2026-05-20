@@ -53,7 +53,7 @@ class ReportService:
         processed = sum(v for k, v in summary["status_breakdown"].items() 
                        if k not in [RecordStatus.PENDING.value, RecordStatus.NEEDS_REVIEW.value])
         if len(records) > 0:
-            summary["review_completion_rate"] = round(processed / len(records) * 100, 2)
+            summary["review_progress"] = round(processed / len(records) * 100, 2)
 
         return summary
 
