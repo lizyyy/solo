@@ -1,0 +1,83 @@
+{
+  "alerts": [
+    {
+      "alert_id": "ALERT-20240520-0001",
+      "stream_id": "STREAM-001",
+      "violation_type": "涉政敏感词",
+      "start_time": 1716200000,
+      "end_time": 1716200015,
+      "model_name": "sensitive_word_detection_v2",
+      "confidence": 0.95,
+      "content_summary": "主播在直播中提及敏感政治词汇，需要立即处理",
+      "evidence_url": "/evidence/STREAM-001/frame_1716200005.jpg",
+      "violation_level": "严重"
+    },
+    {
+      "alert_id": "ALERT-20240520-0004",
+      "stream_id": "STREAM-001",
+      "violation_type": "低俗内容",
+      "start_time": 1716200050,
+      "end_time": 1716200060,
+      "model_name": "obscene_content_detection_v1",
+      "confidence": 0.85,
+      "content_summary": "直播画面出现低俗不雅内容",
+      "evidence_url": "/evidence/STREAM-001/frame_1716200055.jpg",
+      "violation_level": "中等"
+    },
+    {
+      "alert_id": "ALERT-20240520-0006",
+      "stream_id": "STREAM-002",
+      "violation_type": "版权侵权",
+      "start_time": 1716200100,
+      "end_time": 1716200130,
+      "model_name": "copyright_detection_v3",
+      "confidence": 0.91,
+      "content_summary": "直播中播放未经授权的音乐作品",
+      "evidence_url": "/evidence/STREAM-002/frame_1716200110.jpg",
+      "violation_level": "中等"
+    },
+    {
+      "alert_id": "ALERT-20240520-0008",
+      "stream_id": "STREAM-003",
+      "violation_type": "危险行为",
+      "start_time": 1716200200,
+      "end_time": 1716200210,
+      "model_name": "dangerous_behavior_detection_v1",
+      "confidence": 0.78,
+      "content_summary": "主播展示危险行为",
+      "evidence_url": "/evidence/STREAM-003/frame_1716200205.jpg",
+      "violation_level": "轻微",
+      "is_false_positive": true,
+      "deduplication_info": {
+        "status": "false_positive_recovered",
+        "recovered_at": "2026-05-20T04:24:06.005133"
+      }
+    },
+    {
+      "alert_id": "ALERT-20240520-0009",
+      "stream_id": "STREAM-003",
+      "violation_type": "吸烟行为",
+      "start_time": 1716200220,
+      "end_time": 1716200230,
+      "model_name": "smoking_detection_v2",
+      "confidence": 0.94,
+      "content_summary": "直播中出现吸烟场景",
+      "evidence_url": "/evidence/STREAM-003/frame_1716200225.jpg",
+      "violation_level": "中等"
+    }
+  ],
+  "statistics": {
+    "total_input": 10,
+    "total_output": 5,
+    "overlap_merged": 0,
+    "model_duplicates_removed": 5,
+    "false_positives_recovered": 1
+  },
+  "deduplication_version": "1.0.0",
+  "config_used": {
+    "overlap_enabled": true,
+    "model_duplicate_enabled": true,
+    "fp_recovery_enabled": true,
+    "merge_strategy": "merge_evidence"
+  }
+}

@@ -1,0 +1,57 @@
+# 直播告警样本违规片段去重配置
+deduplication:
+  # 片段重叠检测配置
+  overlap:
+    enabled: true
+    # 时间重叠阈值 (秒) - 超过此阈值视为重叠片段
+    time_overlap_threshold: 5
+    # 内容相似度阈值 (0-1) - 超过此阈值视为内容相似
+    content_similarity_threshold: 0.85
+    # 合并策略: keep_first | keep_longest | merge_evidence
+    merge_strategy: merge_evidence
+
+  # 模型重复检测配置
+  model_duplicate:
+    enabled: true
+    # 同一模型在时间窗口内的重复告警视为重复 (秒)
+    time_window: 300
+    # 置信度差异阈值 - 置信度差异小于此值视为同一检测
+    confidence_diff_threshold: 0.1
+
+  # 误报恢复配置
+  false_positive_recovery:
+    enabled: true
+    # 误报标记字段
+    fp_marker_field: "is_false_positive"
+    # 保留误报记录但标记为已恢复
+    keep_fp_with_marker: true
+
+output:
+  # 输出格式: json | csv | yaml
+  format: json
+  # 是否保留原始证据链
+  preserve_evidence_chain: true
+  # 是否输出来源信息
+  include_source_info: true
+
+fields:
+  # 告警唯一ID字段
+  alert_id: "alert_id"
+  # 直播流ID字段
+  stream_id: "stream_id"
+  # 违规类型字段
+  violation_type: "violation_type"
+  # 开始时间字段 (秒级时间戳)
+  start_time: "start_time"
+  # 结束时间字段 (秒级时间戳)
+  end_time: "end_time"
+  # 模型名称字段
+  model_name: "model_name"
+  # 置信度字段
+  confidence: "confidence"
+  # 内容摘要字段
+  content_summary: "content_summary"
+  # 证据URL字段
+  evidence_url: "evidence_url"
+  # 违规等级字段
+  violation_level: "violation_level"
