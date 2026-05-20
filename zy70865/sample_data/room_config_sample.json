@@ -1,0 +1,30 @@
+[
+    {
+        "room_type": "standard",
+        "linen_config": {
+            "bedsheet": 2,
+            "pillowcase": 4,
+            "towel": 2
+        }
+    },
+    {
+        "room_type": "deluxe",
+        "linen_config": {
+            "bedsheet": 2,
+            "pillowcase": 4,
+            "towel": 3,
+            "bathrobe": 2,
+            "quilt_cover": 1
+        }
+    },
+    {
+        "room_type": "suite",
+        "linen_config": {
+            "bedsheet": 2,
+            "pillowcase": 6,
+            "towel": 4,
+            "bathrobe": 2,
+            "quilt_cover": 2
+        }
+    }
+]
