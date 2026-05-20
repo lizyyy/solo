@@ -65,33 +65,94 @@ class FileParserService {
         let published_date = '';
         let publisher = '';
         let batch_nos = [];
+        let isInBatchSection = false;
 
-        for (const line of lines) {
-          if (line.startsWith('# ') || line.startsWith('## ')) {
-            const header = line.replace(/^#+\s*/, '');
-            if (header.includes('召回') || header.includes('Recall')) {
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          const trimmedLine = line.trim();
+
+          if (line.startsWith('# ')) {
+            const header = line.replace(/^#+\s*/, '').trim();
+            if (!title && (header.includes('召回') || header.includes('Recall'))) {
               title = header;
-              const noMatch = header.match(/[A-Za-z0-9-]+/);
-              if (noMatch) recall_no = noMatch[0];
+              const noMatch = header.match(/RC[A-Za-z0-9-]+/);
+              if (noMatch) {
+                recall_no = noMatch[0];
+              } else {
+                const noMatchFallback = header.match(/[A-Za-z0-9-]{6,}/);
+                if (noMatchFallback) recall_no = noMatchFallback[0];
+              }
             }
-          } else if (line.includes('批号') || line.includes('BatchNo') || line.includes('批次')) {
-            const matches = line.match(/[A-Za-z0-9-]{6,}/g);
+          }
+
+          if (trimmedLine.startsWith('## ') || trimmedLine.startsWith('### ')) {
+            const sectionTitle = trimmedLine.replace(/^#+\s*/, '').trim();
+            isInBatchSection = sectionTitle.includes('涉及批次') || 
+                               sectionTitle.includes('批次') || 
+                               sectionTitle.includes('Affected') ||
+                               sectionTitle.includes('Batch');
+          }
+
+          if (isInBatchSection) {
+            const matches = trimmedLine.match(/BATCH[A-Za-z0-9-]+/g);
             if (matches) {
               batch_nos = [...new Set([...batch_nos, ...matches])];
             }
-          } else if (line.includes('原因') || line.includes('Reason')) {
-            reason = line.replace(/^.*[:：]\s*/, '').trim();
-          } else if (line.includes('级别') || line.includes('Level') || line.includes('等级')) {
-            if (line.includes('紧急') || line.includes('urgent') || line.includes('high')) {
+          }
+
+          if (!isInBatchSection) {
+            const matches = trimmedLine.match(/BATCH[A-Za-z0-9-]+/g);
+            if (matches) {
+              batch_nos = [...new Set([...batch_nos, ...matches])];
+            }
+          }
+
+          if (trimmedLine.startsWith('- **召回原因**') || 
+              trimmedLine.startsWith('- **原因**') ||
+              trimmedLine.startsWith('**召回原因**') ||
+              trimmedLine.startsWith('**原因**')) {
+            reason = trimmedLine.replace(/^.*[:：]\s*/, '').trim()
+                                .replace(/^\*\*/, '')
+                                .replace(/\*\*$/, '')
+                                .trim();
+          }
+
+          if (trimmedLine.includes('召回级别') || trimmedLine.includes('紧急程度') || 
+              trimmedLine.includes('Urgency') || trimmedLine.includes('Severity')) {
+            if (trimmedLine.includes('紧急') || trimmedLine.includes('urgent') || 
+                trimmedLine.includes('high') || trimmedLine.includes('Urgent')) {
               level = 'urgent';
-            } else if (line.includes('警告') || line.includes('warning') || line.includes('medium')) {
+            } else if (trimmedLine.includes('警告') || trimmedLine.includes('warning') || 
+                       trimmedLine.includes('medium')) {
               level = 'warning';
             }
-          } else if (line.includes('发布日期') || line.includes('Published')) {
-            const dateMatch = line.match(/\d{4}[-/]\d{2}[-/]\d{2}/);
+          }
+
+          if (trimmedLine.includes('发布日期') || trimmedLine.includes('Published') || 
+              trimmedLine.includes('发布时间')) {
+            const dateMatch = trimmedLine.match(/\d{4}[-/]\d{2}[-/]\d{2}/);
             if (dateMatch) published_date = dateMatch[0];
-          } else if (line.includes('发布人') || line.includes('Publisher')) {
-            publisher = line.replace(/^.*[:：]\s*/, '').trim();
+          }
+
+          if (trimmedLine.includes('发布人') || trimmedLine.includes('Publisher') ||
+              trimmedLine.includes('发布单位')) {
+            const match = trimmedLine.match(/[:：]\s*(.+)$/);
+            if (match) {
+              publisher = match[1].trim().replace(/^\*\*/, '').replace(/\*\*$/, '').trim();
+            }
+          }
+        }
+
+        if (!reason) {
+          for (let i = 0; i < lines.length; i++) {
+            if (lines[i].includes('## 召回原因') || lines[i].includes('### 召回原因')) {
+              for (let j = i + 1; j < lines.length && j < i + 5; j++) {
+                if (lines[j].trim() && !lines[j].startsWith('#')) {
+                  reason = lines[j].trim();
+                  break;
+                }
+              }
+            }
           }
         }
 
