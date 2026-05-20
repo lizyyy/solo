@@ -45,5 +45,14 @@
     "patient_id": "P203",
     "patient_name": "吴十",
     "event_time": "2024-01-15T18:00:00"
+  },
+  {
+    "flow_id": "FLOW006",
+    "flow_type": "admission",
+    "patient_id": "P204",
+    "patient_name": "郑十一",
+    "to_ward": "INTERNAL",
+    "to_bed": "001",
+    "event_time": "2024-01-15T19:00:00"
   }
 ]

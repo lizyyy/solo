@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from typing import Dict, Any, Optional, Tuple
 from .models import (
     BedInfo, PatientFlow, CleaningOrder,
     BedStatus, PatientFlowType, CleaningOrderStatus,
@@ -21,8 +21,8 @@ class BedManagementRules:
     def mark_batch_processed(self, batch_id: str):
         self.processed_batches.add(batch_id)
 
-    def check_duplicate_occupation(self, bed_info: BedInfo, patient_flow: PatientFlow) -> tuple[bool, str]:
-        bed_key = f"{bed_info.ward_code}-{bed_info.bed_number}"
+    def check_duplicate_occupation(self, bed_info: BedInfo, patient_flow: PatientFlow) -> Tuple[bool, str]:
+        bed_key = f"{bed_info.ward_code}-{str(bed_info.bed_number).zfill(3)}"
         if bed_key in self.bed_cache:
             existing = self.bed_cache[bed_key]
             if (existing.status == BedStatus.OCCUPIED and 
@@ -45,7 +45,7 @@ class BedManagementRules:
                             f"请确认保洁状态")
         return False, ""
 
-    def validate_bed_info(self, bed_info: BedInfo, original_data: Dict[str, Any]) -> tuple[str, ResultItem | None]:
+    def validate_bed_info(self, bed_info: BedInfo, original_data: Dict[str, Any]) -> Tuple[str, Optional[ResultItem]]:
         if bed_info.status == BedStatus.OCCUPIED and not bed_info.patient_id:
             return "failed", ResultItem(
                 record_type="bed",
@@ -73,7 +73,33 @@ class BedManagementRules:
 
         return "success", None
 
-    def validate_patient_flow(self, patient_flow: PatientFlow, original_data: Dict[str, Any]) -> tuple[str, ResultItem | None]:
+    def validate_patient_flow(self, patient_flow: PatientFlow, original_data: Dict[str, Any]) -> Tuple[str, Optional[ResultItem]]:
+        if patient_flow.flow_type == PatientFlowType.ADMISSION:
+            if not patient_flow.to_bed or not patient_flow.to_ward:
+                return "failed", ResultItem(
+                    record_type="patient_flow",
+                    record_id=patient_flow.flow_id,
+                    original_data=original_data,
+                    suggestion="入院记录必须包含目标病区和床位信息"
+                )
+
+            temp_bed = BedInfo(
+                batch_id=patient_flow.batch_id,
+                ward_code=patient_flow.to_ward or "",
+                bed_number=patient_flow.to_bed or "",
+                status=BedStatus.OCCUPIED,
+                patient_id=patient_flow.patient_id,
+                last_updated=patient_flow.event_time
+            )
+            is_dup, dup_msg = self.check_duplicate_occupation(temp_bed, patient_flow)
+            if is_dup:
+                return "failed", ResultItem(
+                    record_type="patient_flow",
+                    record_id=patient_flow.flow_id,
+                    original_data=original_data,
+                    suggestion=dup_msg
+                )
+
         if patient_flow.flow_type == PatientFlowType.TRANSFER:
             if not patient_flow.from_bed or not patient_flow.to_bed:
                 return "failed", ResultItem(
@@ -120,7 +146,7 @@ class BedManagementRules:
 
         return "success", None
 
-    def validate_cleaning_order(self, cleaning_order: CleaningOrder, original_data: Dict[str, Any]) -> tuple[str, ResultItem | None]:
+    def validate_cleaning_order(self, cleaning_order: CleaningOrder, original_data: Dict[str, Any]) -> Tuple[str, Optional[ResultItem]]:
         is_timeout, timeout_msg = self.check_cleaning_timeout(cleaning_order)
         if is_timeout:
             return "pending", ResultItem(
@@ -151,5 +177,5 @@ class BedManagementRules:
         return "success", None
 
     def update_bed_cache(self, bed_info: BedInfo):
-        bed_key = f"{bed_info.ward_code}-{bed_info.bed_number}"
+        bed_key = f"{bed_info.ward_code}-{str(bed_info.bed_number).zfill(3)}"
         self.bed_cache[bed_key] = bed_info

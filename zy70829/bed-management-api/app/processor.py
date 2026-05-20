@@ -1,12 +1,23 @@
 import pandas as pd
+import math
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List, Tuple
 from .models import (
     BedInfo, PatientFlow, CleaningOrder,
     BedStatus, PatientFlowType, CleaningOrderStatus,
     ResultItem, ImportResponse
 )
 from .rules import BedManagementRules
+
+
+def clean_nan_values(data: Dict[str, Any]) -> Dict[str, Any]:
+    cleaned = {}
+    for k, v in data.items():
+        if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+            cleaned[k] = None
+        else:
+            cleaned[k] = v
+    return cleaned
 
 
 class DataProcessor:
@@ -19,13 +30,13 @@ class DataProcessor:
         except (ValueError, TypeError):
             return datetime.now()
 
-    def parse_bed_csv(self, csv_content: str, batch_id: str) -> list[tuple[str, ResultItem | None, BedInfo | None]]:
+    def parse_bed_csv(self, csv_content: str, batch_id: str) -> List[Tuple[str, Optional[ResultItem], Optional[BedInfo]]]:
         results = []
         from io import StringIO
         df = pd.read_csv(StringIO(csv_content))
         
         for _, row in df.iterrows():
-            original_data = row.to_dict()
+            original_data = clean_nan_values(row.to_dict())
             try:
                 bed_info = BedInfo(
                     batch_id=batch_id,
@@ -58,7 +69,7 @@ class DataProcessor:
         
         return results
 
-    def parse_patient_flow_json(self, json_data: list[Dict[str, Any]], batch_id: str) -> list[tuple[str, ResultItem | None, PatientFlow | None]]:
+    def parse_patient_flow_json(self, json_data: List[Dict[str, Any]], batch_id: str) -> List[Tuple[str, Optional[ResultItem], Optional[PatientFlow]]]:
         results = []
         
         for item in json_data:
@@ -95,7 +106,7 @@ class DataProcessor:
         
         return results
 
-    def parse_cleaning_orders_json(self, json_data: list[Dict[str, Any]], batch_id: str) -> list[tuple[str, ResultItem | None, CleaningOrder | None]]:
+    def parse_cleaning_orders_json(self, json_data: List[Dict[str, Any]], batch_id: str) -> List[Tuple[str, Optional[ResultItem], Optional[CleaningOrder]]]:
         results = []
         
         for item in json_data:
@@ -133,9 +144,9 @@ class DataProcessor:
 
     def process_import(self, 
                       batch_id: str,
-                      bed_csv: str | None = None,
-                      patient_flows: list[Dict[str, Any]] | None = None,
-                      cleaning_orders: list[Dict[str, Any]] | None = None) -> ImportResponse:
+                      bed_csv: Optional[str] = None,
+                      patient_flows: Optional[List[Dict[str, Any]]] = None,
+                      cleaning_orders: Optional[List[Dict[str, Any]]] = None) -> ImportResponse:
         
         if self.rules.is_batch_processed(batch_id):
             return ImportResponse(

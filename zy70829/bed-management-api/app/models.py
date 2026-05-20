@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -75,7 +75,7 @@ class ImportResponse(BaseModel):
     success_count: int
     pending_count: int
     failed_count: int
-    success_items: list[ResultItem]
-    pending_items: list[ResultItem]
-    failed_items: list[ResultItem]
+    success_items: List[ResultItem]
+    pending_items: List[ResultItem]
+    failed_items: List[ResultItem]
     processed_at: datetime = Field(default_factory=datetime.now)
