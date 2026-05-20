@@ -1,0 +1,25 @@
+{
+  "name": "reimbursement-invoice-matching-system",
+  "version": "1.0.0",
+  "description": "报销票据匹配API - 全栈Web应用",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd server && npm run build && cd ../client && npm run build",
+    "seed": "cd server && npm run seed",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [
+    "reimbursement",
+    "invoice",
+    "matching",
+    "api",
+    "expense"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
