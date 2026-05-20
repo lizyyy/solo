@@ -1,0 +1,80 @@
+{
+  "batchId": "BATCH-2024-01-001",
+  "hotelId": "HOTEL-001",
+  "hotelName": "XX大酒店",
+  "submitDate": "2024-01-15T00:00:00.000Z",
+  "washDate": "2024-01-14T00:00:00.000Z",
+  "returnDate": "2024-01-15T00:00:00.000Z",
+  "handler": "李经理",
+  "roomStandards": [
+    {
+      "roomType": "standard",
+      "roomCount": 50,
+      "linenItems": [
+        {
+          "linenType": "bed_sheet",
+          "sendQuantity": 100,
+          "returnQuantity": 95,
+          "damagedQuantity": 5,
+          "damageCompensation": 100
+        },
+        {
+          "linenType": "pillowcase",
+          "sendQuantity": 200,
+          "returnQuantity": 195,
+          "damagedQuantity": 5,
+          "damageCompensation": 50
+        },
+        {
+          "linenType": "towel",
+          "sendQuantity": 100,
+          "returnQuantity": 98,
+          "damagedQuantity": 2,
+          "damageCompensation": 30
+        }
+      ]
+    },
+    {
+      "roomType": "deluxe",
+      "roomCount": 20,
+      "linenItems": [
+        {
+          "linenType": "bed_sheet",
+          "sendQuantity": 40,
+          "returnQuantity": 38,
+          "damagedQuantity": 2,
+          "damageCompensation": 40
+        },
+        {
+          "linenType": "bath_towel",
+          "sendQuantity": 40,
+          "returnQuantity": 39,
+          "damagedQuantity": 1,
+          "damageCompensation": 25
+        }
+      ]
+    }
+  ],
+  "billingItems": [
+    {
+      "linenType": "bed_sheet",
+      "billedQuantity": 140,
+      "billedAmount": 700
+    },
+    {
+      "linenType": "pillowcase",
+      "billedQuantity": 200,
+      "billedAmount": 400
+    },
+    {
+      "linenType": "towel",
+      "billedQuantity": 100,
+      "billedAmount": 300
+    },
+    {
+      "linenType": "bath_towel",
+      "billedQuantity": 40,
+      "billedAmount": 200
+    }
+  ]
+}
