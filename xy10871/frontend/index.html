@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 教程进度服务</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .lesson-item {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #e0e0e0;
+            background: #fafafa;
+            transition: all 0.3s;
+        }
+        .lesson-item:hover {
+            transform: translateX(4px);
+        }
+        .lesson-item.completed {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+        .lesson-item.current {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+        .lesson-item.locked {
+            opacity: 0.5;
+        }
+        .lesson-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .lesson-status {
+            font-size: 12px;
+            color: #666;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .badge-completed {
+            background: #d1fae5;
+            color: #059669;
+        }
+        .badge-current {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .badge-pending {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .result-box {
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .result-success {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+        }
+        .result-error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+        }
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .request-item {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .request-success {
+            background: #f0fdf4;
+            border-left: 3px solid #10b981;
+        }
+        .request-error {
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+        }
+        .request-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+        .api-credentials {
+            background: #1a1a2e;
+            color: #a5b4fc;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+        .suggestion {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            margin-top: 12px;
+            border-radius: 0 6px 6px 0;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            background: #f3f4f6;
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .admin-section {
+            display: none;
+        }
+        .admin-section.active {
+            display: block;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+        .certificate-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        pre {
+            background: #1a1a2e;
+            color: #a5b4fc;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 API 教程进度服务</h1>
+            <p>边看教程边真实调用接口，掌握 API 开发最佳实践</p>
+        </div>
+
+        <div class="grid">
+            <div class="column">
+                <div class="card">
+                    <h2>📚 教程关卡</h2>
+                    <div id="lessons-list"></div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h2>🔑 我的凭证</h2>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="text" id="api-key" placeholder="输入你的 API Key" value="ak_test_001">
+                    </div>
+                    <div class="api-credentials" id="credentials-display">
+                        加载中...
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="card">
+                    <h2>🎯 练习控制台</h2>
+                    <div id="current-lesson"></div>
+                    
+                    <div id="practice-form" style="display: none;">
+                        <div class="form-group">
+                            <label>请求方法</label>
+                            <select id="request-method">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>请求 URL</label>
+                            <input type="text" id="request-url" placeholder="/oauth/token">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>请求头 (JSON 格式)</label>
+                            <textarea id="request-headers" rows="3" placeholder='{"Authorization": "Bearer xxx"}'></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>请求体 (JSON 格式)</label>
+                            <textarea id="request-body" rows="5" placeholder='{"client_id": "xxx"}'></textarea>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="submit-btn" onclick="submitPractice()">
+                            提交练习
+                        </button>
+                        
+                        <div id="practice-result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="card">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab('history')">📜 请求历史</div>
+                        <div class="tab" onclick="switchTab('admin')">⚙️ 管理后台</div>
+                    </div>
+                    
+                    <div id="history-section" class="admin-section active">
+                        <div id="requests-list"></div>
+                    </div>
+                    
+                    <div id="admin-section" class="admin-section">
+                        <button class="btn btn-primary" style="width: 100%; margin-bottom: 16px;" onclick="loadAdminData()">
+                            刷新统计数据
+                        </button>
+                        <div id="admin-stats"></div>
+                        
+                        <div style="margin-top: 24px;">
+                            <h3 style="font-size: 14px; margin-bottom: 12px;">导出完成证明</h3>
+                            <div class="form-group">
+                                <label>开发者 ID</label>
+                                <input type="number" id="dev-id" value="1">
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="exportCertificate()">
+                                生成证明
+                            </button>
+                            <div id="certificate-result"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentLessonId = null;
+        let lessons = [];
+
+        function getApiKey() {
+            return document.getElementById('api-key').value;
+        }
+
+        async function loadLessons() {
+            try {
+                const response = await fetch(`${API_BASE}/api/lessons`);
+                const result = await response.json();
+                lessons = result.data;
+                renderLessons();
+            } catch (e) {
+                console.error('加载关卡失败:', e);
+            }
+        }
+
+        async function loadProgress() {
+            try {
+                const response = await fetch(`${API_BASE}/api/progress`, {
+                    headers: { 'X-API-Key': getApiKey() }
+                });
+                const result = await response.json();
+                
+                if (result.code === 0) {
+                    updateCredentials(result.data.developer);
+                    updateProgress(result.data.progress);
+                    if (result.data.current_lesson) {
+                        showCurrentLesson(result.data.current_lesson);
+                    }
+                }
+            } catch (e) {
+                console.error('加载进度失败:', e);
+            }
+        }
+
+        async function loadRequests() {
+            try {
+                const response = await fetch(`${API_BASE}/api/requests?limit=20`, {
+                    headers: { 'X-API-Key': getApiKey() }
+                });
+                const result = await response.json();
+                
+                if (result.code === 0) {
+                    renderRequests(result.data);
+                }
+            } catch (e) {
+                console.error('加载请求历史失败:', e);
+            }
+        }
+
+        function updateCredentials(dev) {
+            document.getElementById('credentials-display').innerHTML = `
+                <div><strong>开发者:</strong> ${dev.name}</div>
+                <div><strong>邮箱:</strong> ${dev.email}</div>
+                <div><strong>API Key:</strong> ak_test_001</div>
+                <div><strong>API Secret:</strong> sk_test_001_secret</div>
+            `;
+        }
+
+        function renderLessons() {
+            const container = document.getElementById('lessons-list');
+            container.innerHTML = lessons.map((lesson, index) => `
+                <div class="lesson-item" id="lesson-${lesson.id}">
+                    <div class="lesson-title">第 ${lesson.order} 关：${lesson.title}</div>
+                    <div class="lesson-status">${lesson.method} ${lesson.endpoint}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateProgress(progress) {
+            progress.forEach(p => {
+                const el = document.getElementById(`lesson-${p.lesson_id}`);
+                if (el) {
+                    el.classList.remove('completed', 'current', 'locked');
+                    if (p.status === 'completed') {
+                        el.classList.add('completed');
+                        el.querySelector('.lesson-title').innerHTML += ` <span class="status-badge badge-completed">已完成</span>`;
+                    } else if (p.status === 'in_progress') {
+                        el.classList.add('current');
+                        el.querySelector('.lesson-title').innerHTML += ` <span class="status-badge badge-current">进行中</span>`;
+                    } else {
+                        el.classList.add('locked');
+                        el.querySelector('.lesson-title').innerHTML += ` <span class="status-badge badge-pending">未开始</span>`;
+                    }
+                    if (p.attempts > 0) {
+                        el.querySelector('.lesson-status').innerHTML += ` (尝试 ${p.attempts} 次)`;
+                    }
+                }
+            });
+        }
+
+        function showCurrentLesson(lesson) {
+            currentLessonId = lesson.lesson_id;
+            const lessonDetail = lessons.find(l => l.id === lesson.lesson_id);
+            const container = document.getElementById('current-lesson');
+            
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #f59e0b; margin-bottom: 8px;">📍 当前关卡</h3>
+                    <h2 style="font-size: 20px; margin-bottom: 8px;">${lesson.lesson_title}</h2>
+                    <p style="color: #666; margin-bottom: 12px;">${lessonDetail.description}</p>
+                    <div style="background: #fef3c7; padding: 12px; border-radius: 6px; font-size: 13px;">
+                        <strong>💡 提示：</strong>${lessonDetail.hint}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('practice-form').style.display = 'block';
+            document.getElementById('request-method').value = lessonDetail.method;
+            document.getElementById('request-url').value = lessonDetail.endpoint;
+        }
+
+        async function submitPractice() {
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = '提交中...';
+
+            try {
+                let headers = {};
+                let body = {};
+                
+                try {
+                    headers = JSON.parse(document.getElementById('request-headers').value || '{}');
+                } catch (e) {
+                        headers = {};
+                    }
+                
+                try {
+                    body = JSON.parse(document.getElementById('request-body').value || '{}');
+                } catch (e) {
+                        body = {};
+                    }
+
+                const response = await fetch(`${API_BASE}/api/practice`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': getApiKey()
+                    },
+                    body: JSON.stringify({
+                        lesson_id: currentLessonId,
+                        method: document.getElementById('request-method').value,
+                        url: document.getElementById('request-url').value,
+                        headers: headers,
+                        body: body
+                    })
+                });
+
+                const result = await response.json();
+                showPracticeResult(result.data);
+                loadProgress();
+                loadRequests();
+            } catch (e) {
+                console.error('提交失败:', e);
+                alert('提交失败，请检查服务是否启动');
+            }
+
+            btn.disabled = false;
+            btn.textContent = '提交练习';
+        }
+
+        function showPracticeResult(data) {
+            const container = document.getElementById('practice-result');
+            if (data.is_success) {
+                container.innerHTML = `
+                    <div class="result-box result-success">
+                        <div class="result-title">✅ 练习通过！</div>
+                        <p>恭喜你完成了这一关！你可以继续下一关了。</p>
+                        <p style="margin-top: 8px; font-size: 13px;">尝试次数: ${data.attempts}</p>
+                        <pre style="margin-top: 12px;">${JSON.stringify(data.response, null, 2)}</pre>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="result-box result-error">
+                        <div class="result-title">❌ 练习失败</div>
+                        <p><strong>错误原因：</strong>${data.error_message}</p>
+                        <div class="suggestion">
+                            <strong>💡 下一步建议：</strong>${data.next_suggestion}
+                        </div>
+                        <p style="margin-top: 8px; font-size: 13px;">这是第 ${data.attempts} 次尝试</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderRequests(requests) {
+            const container = document.getElementById('requests-list');
+            if (requests.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">暂无请求记录</p>';
+                return;
+            }
+            
+            container.innerHTML = requests.map(r => `
+                <div class="request-item ${r.is_success ? 'request-success' : 'request-error'}">
+                    <div><strong>${r.is_success ? '✅ 成功' : '❌ 失败'}</strong> - 关卡 ${r.lesson_id}</div>
+                    ${!r.is_success ? `<div style="font-size: 12px; margin-top: 4px;">${r.error_message}</div>` : ''}
+                    <div class="request-time">${new Date(r.created_at).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + '-section').classList.add('active');
+        }
+
+        async function loadAdminData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/stuck-points`);
+                const result = await response.json();
+                
+                if (result.code === 0) {
+                    renderAdminStats(result.data);
+                }
+            } catch (e) {
+                console.error('加载统计数据失败:', e);
+            }
+        }
+
+        function renderAdminStats(stats) {
+            const container = document.getElementById('admin-stats');
+            container.innerHTML = stats.map(s => `
+                <div class="stat-row">
+                    <div>
+                        <div style="font-weight: 500;">${s.lesson_title}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${s.completion_rate}%"></div>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 14px;">完成率: ${s.completion_rate}%</div>
+                        <div style="font-size: 12px; color: #666;">卡住: ${s.stuck} 人</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function exportCertificate() {
+            const devId = document.getElementById('dev-id').value;
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/certificate/${devId}`);
+                const result = await response.json();
+                
+                const container = document.getElementById('certificate-result');
+                const data = result.data;
+                
+                if (data.is_completed) {
+                    container.innerHTML = `
+                        <div class="certificate-box">
+                            <h3>🏆 API 教程完成证明</h3>
+                            <p style="margin: 16px 0; font-size: 18px;">${data.developer_name}</p>
+                            <p>已完成全部 ${data.total_lessons} 个关卡</p>
+                            <p style="margin-top: 16px; font-size: 12px; opacity: 0.8;">
+                                证书编号: ${data.certificate_id}<br>
+                                颁发日期: ${new Date(data.issued_at).toLocaleDateString()}
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div style="background: #fef3c7; padding: 16px; border-radius: 8px; margin-top: 12px;">
+                            <strong>⚠️ 尚未完成所有关卡</strong>
+                            <p style="margin-top: 8px;">已完成: ${data.completed_lessons} / ${data.total_lessons}</p>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                console.error('生成证明失败:', e);
+            }
+        }
+
+        document.getElementById('api-key').addEventListener('change', () => {
+            loadProgress();
+            loadRequests();
+        });
+
+        loadLessons().then(() => {
+            loadProgress();
+            loadRequests();
+        });
+    </script>
+</body>
+</html>
