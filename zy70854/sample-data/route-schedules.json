@@ -1,0 +1,42 @@
+[
+  {
+    "routeNumber": "1路",
+    "busNumber": "京A12345",
+    "driverName": "刘师傅",
+    "driverId": "D001",
+    "date": "2024-01-15",
+    "startTime": "06:00",
+    "endTime": "14:00",
+    "stops": ["前门站", "天安门东站", "王府井站", "西单站"]
+  },
+  {
+    "routeNumber": "1路",
+    "busNumber": "京A12345",
+    "driverName": "刘师傅",
+    "driverId": "D001",
+    "date": "2024-01-16",
+    "startTime": "06:00",
+    "endTime": "14:00",
+    "stops": ["前门站", "天安门东站", "王府井站", "西单站", "中关村站", "五道口站"]
+  },
+  {
+    "routeNumber": "2路",
+    "busNumber": "京B23456",
+    "driverName": "陈师傅",
+    "driverId": "D002",
+    "date": "2024-01-15",
+    "startTime": "08:00",
+    "endTime": "16:00",
+    "stops": ["西单站", "西直门站", "动物园站"]
+  },
+  {
+    "routeNumber": "3路",
+    "busNumber": "京C34567",
+    "driverName": "吴师傅",
+    "driverId": "D004",
+    "date": "2024-01-16",
+    "startTime": "07:00",
+    "endTime": "15:00",
+    "stops": ["颐和园站", "圆明园站", "北京大学站"]
+  }
+]
