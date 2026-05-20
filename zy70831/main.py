@@ -2,12 +2,13 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Any
 import hashlib
 import json
 import uuid
 import io
 import pandas as pd
+from urllib.parse import quote
 
 from database import Base, engine, get_db, Batch, BedTurnoverRecord, AuditLog
 import schemas
@@ -20,9 +21,20 @@ app = FastAPI(
     version="1.0.0"
 )
 
+def json_serializer(obj: Any) -> Any:
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
+def safe_json_dumps(data: Any, **kwargs) -> str:
+    return json.dumps(data, default=json_serializer, **kwargs)
+
+def records_to_serializable_dict(records: List[Any]) -> List[dict]:
+    return [json.loads(safe_json_dumps(r.model_dump())) for r in records]
+
 def calculate_batch_hash(records: List[dict]) -> str:
-    sorted_records = sorted(records, key=lambda x: json.dumps(x, sort_keys=True))
-    records_json = json.dumps(sorted_records, sort_keys=True, ensure_ascii=False)
+    sorted_records = sorted(records, key=lambda x: safe_json_dumps(x, sort_keys=True))
+    records_json = safe_json_dumps(sorted_records, sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(records_json.encode('utf-8')).hexdigest()
 
 def calculate_admission_days(admission_date: datetime, discharge_date: Optional[datetime]) -> Optional[int]:
@@ -57,7 +69,7 @@ def log_audit(
 
 @app.post("/api/batches", response_model=schemas.BatchResponse, summary="提交床位周转批次")
 def submit_batch(request: schemas.BatchSubmitRequest, db: Session = Depends(get_db)):
-    records_dict = [record.model_dump() for record in request.records]
+    records_dict = records_to_serializable_dict(request.records)
     batch_hash = calculate_batch_hash(records_dict)
 
     existing_batch = db.query(Batch).filter(Batch.batch_hash == batch_hash).first()
@@ -82,7 +94,7 @@ def submit_batch(request: schemas.BatchSubmitRequest, db: Session = Depends(get_
         id=batch_id,
         batch_hash=batch_hash,
         submitted_by=request.submitted_by,
-        raw_data=json.dumps(records_dict, ensure_ascii=False),
+        raw_data=safe_json_dumps(records_dict, ensure_ascii=False),
         remark=request.remark,
         status="completed"
     )
@@ -365,11 +377,12 @@ def download_report(batch_id: str, db: Session = Depends(get_db)):
     output.seek(0)
     
     filename = f"床位周转报告_{batch_id[:8]}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+    encoded_filename = quote(filename)
     
     return StreamingResponse(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
     )
 
 if __name__ == "__main__":
