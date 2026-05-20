@@ -65,7 +65,18 @@ export class ReconciliationEngine {
     const callbacks = this.dataStore.getAllCallbacks();
     const dutySchedules = this.dataStore.getAllDutySchedules();
 
-    const matchingCallbacks = this.findMatchingCallbacks(cv, callbacks);
+    let matchingCallbacks: CallbackRecord[];
+    if (existingReconciliation.callbackId) {
+      const existingCallback = callbacks.find(cb => cb.id === existingReconciliation.callbackId);
+      if (existingCallback) {
+        matchingCallbacks = [existingCallback];
+      } else {
+        matchingCallbacks = this.findMatchingCallbacks(cv, callbacks);
+      }
+    } else {
+      matchingCallbacks = this.findMatchingCallbacks(cv, callbacks);
+    }
+
     const discrepancies = this.detectDiscrepancies(cv, matchingCallbacks, dutySchedules);
 
     const status: ReconciliationStatus = discrepancies.length === 0 ? 'matched' : 'mismatched';

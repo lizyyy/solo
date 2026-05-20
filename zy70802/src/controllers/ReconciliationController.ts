@@ -168,8 +168,11 @@ export class ReconciliationController {
       }
 
       const processedUpdates = { ...updates };
-      if (processedUpdates.confirmedAt && typeof processedUpdates.confirmedAt === 'string') {
-        processedUpdates.confirmedAt = new Date(processedUpdates.confirmedAt);
+      const dateFields = ['calledAt', 'confirmedAt'];
+      for (const field of dateFields) {
+        if (processedUpdates[field] && typeof processedUpdates[field] === 'string') {
+          processedUpdates[field] = new Date(processedUpdates[field]);
+        }
       }
 
       const result = await this.reviewService.modifyCallback(id, processedUpdates, reviewer, notes);
