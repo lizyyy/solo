@@ -1,0 +1,42 @@
+[
+  {
+    "sample_no": "S001",
+    "chamber_id": "CH-001",
+    "condition_code": "25℃/60%RH",
+    "temperature": 25,
+    "humidity": 60,
+    "sampling_month": 0,
+    "sampling_date": "2024-01-15",
+    "planned_test_date": "2024-01-20"
+  },
+  {
+    "sample_no": "S001",
+    "chamber_id": "CH-001",
+    "condition_code": "25℃/60%RH",
+    "temperature": 25,
+    "humidity": 60,
+    "sampling_month": 3,
+    "sampling_date": "2024-04-15",
+    "planned_test_date": "2024-04-20"
+  },
+  {
+    "sample_no": "S001",
+    "chamber_id": "CH-002",
+    "condition_code": "40℃/75%RH",
+    "temperature": 40,
+    "humidity": 75,
+    "sampling_month": 0,
+    "sampling_date": "2024-01-15",
+    "planned_test_date": "2024-01-20"
+  },
+  {
+    "sample_no": "S002",
+    "chamber_id": "CH-001",
+    "condition_code": "25℃/60%RH",
+    "temperature": 25,
+    "humidity": 60,
+    "sampling_month": 6,
+    "sampling_date": "2024-07-15",
+    "planned_test_date": "2024-07-20"
+  }
+]
