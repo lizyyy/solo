@@ -1,0 +1,54 @@
+[
+  {
+    "student_id": "S2024001",
+    "name": "张三",
+    "department": "计算机学院",
+    "major": "计算机科学与技术",
+    "exam_score": 385,
+    "preferences": [
+      {"advisor_id": "T001"},
+      {"advisor_id": "T002"}
+    ]
+  },
+  {
+    "student_id": "S2024002",
+    "name": "李四",
+    "department": "计算机学院",
+    "major": "计算机科学与技术",
+    "exam_score": 378,
+    "preferences": [
+      {"advisor_id": "T002"},
+      {"advisor_id": "T001"}
+    ]
+  },
+  {
+    "student_id": "S2024003",
+    "name": "王五",
+    "department": "电子工程学院",
+    "major": "电子信息",
+    "exam_score": 390,
+    "preferences": [
+      {"advisor_id": "T003"}
+    ]
+  },
+  {
+    "student_id": "S2024004",
+    "name": "赵六",
+    "department": "机械工程学院",
+    "major": "机械工程",
+    "exam_score": 365,
+    "preferences": [
+      {"advisor_id": "T004"}
+    ]
+  },
+  {
+    "student_id": "S2024005",
+    "name": "孙七",
+    "department": "材料科学学院",
+    "major": "材料科学与工程",
+    "exam_score": 372,
+    "preferences": [
+      {"advisor_id": "T005"}
+    ]
+  }
+]
