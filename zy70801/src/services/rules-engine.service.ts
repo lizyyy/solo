@@ -1,6 +1,7 @@
 import dayjs from '../utils/dayjs';
 import { CriticalValueRecord, CallbackRecord, DutyRecord, FailedRecord } from '../types';
 import { all } from '../db';
+import { convertKeysToCamelCase } from '../utils/case';
 
 const CALLBACK_TIMEOUT_MINUTES = 30;
 const REPEAT_CRITICAL_HOURS = 24;
@@ -233,34 +234,37 @@ export const processRecordWithRules = async (
 };
 
 export const getHistoryForReview = async (criticalValueId: string) => {
-  const criticalValue = await all(
+  const criticalValueRaw = await all(
     'SELECT * FROM critical_values WHERE id = ?',
     [criticalValueId]
   );
 
-  if (!criticalValue || criticalValue.length === 0) {
+  if (!criticalValueRaw || criticalValueRaw.length === 0) {
     return null;
   }
 
-  const callbacks = await all(
+  const criticalValues = convertKeysToCamelCase<CriticalValueRecord[]>(criticalValueRaw);
+  const criticalValue = criticalValues[0];
+
+  const callbacksRaw = await all(
     'SELECT * FROM callback_records WHERE patient_id = ? ORDER BY callback_time DESC',
-    [criticalValue[0].patient_id]
+    [criticalValue.patientId]
   );
 
-  const confirmRecords = await all(
+  const confirmRecordsRaw = await all(
     'SELECT * FROM confirm_records WHERE critical_value_id = ? ORDER BY confirm_time DESC',
     [criticalValueId]
   );
 
-  const samePatientRecords = await all(
+  const samePatientRecordsRaw = await all(
     'SELECT * FROM critical_values WHERE patient_id = ? AND id != ? ORDER BY test_time DESC LIMIT 10',
-    [criticalValue[0].patient_id, criticalValueId]
+    [criticalValue.patientId, criticalValueId]
   );
 
   return {
-    criticalValue: criticalValue[0],
-    callbacks,
-    confirmRecords,
-    samePatientHistory: samePatientRecords
+    criticalValue,
+    callbacks: convertKeysToCamelCase<CallbackRecord[]>(callbacksRaw),
+    confirmRecords: convertKeysToCamelCase(confirmRecordsRaw),
+    samePatientHistory: convertKeysToCamelCase<CriticalValueRecord[]>(samePatientRecordsRaw)
   };
 };

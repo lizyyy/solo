@@ -4,6 +4,7 @@ import { run, get, all } from '../db';
 import { Batch, CriticalValueRecord, CallbackRecord, DutyRecord, ProcessResult, FailedRecord } from '../types';
 import { calculateFileHash } from './parser.service';
 import { processRecordWithRules } from './rules-engine.service';
+import { convertKeysToCamelCase } from '../utils/case';
 
 export const checkDuplicateBatch = async (fileHash: string): Promise<Batch | null> => {
   const existing = await get<Batch>(
@@ -169,8 +170,10 @@ export const processCriticalValueBatch = async (
 ): Promise<ProcessResult> => {
   await updateBatchStatus(batchId, 'processing', records.length, 0);
 
-  const allCallbacks = await all<CallbackRecord>('SELECT * FROM callback_records');
-  const allDuties = await all<DutyRecord>('SELECT * FROM duty_records');
+  const allCallbacksRaw = await all('SELECT * FROM callback_records');
+  const allDutiesRaw = await all('SELECT * FROM duty_records');
+  const allCallbacks = convertKeysToCamelCase<CallbackRecord[]>(allCallbacksRaw);
+  const allDuties = convertKeysToCamelCase<DutyRecord[]>(allDutiesRaw);
 
   const normal: CriticalValueRecord[] = [];
   const pending: CriticalValueRecord[] = [];
@@ -210,8 +213,8 @@ export const processCriticalValueBatch = async (
 };
 
 export const getBatchById = async (batchId: string): Promise<Batch | null> => {
-  const result = await get<Batch>('SELECT * FROM batches WHERE id = ?', [batchId]);
-  return result || null;
+  const result = await get('SELECT * FROM batches WHERE id = ?', [batchId]);
+  return result ? convertKeysToCamelCase<Batch>(result) : null;
 };
 
 export const getBatchRecords = async (batchId: string, status?: string) => {
@@ -225,9 +228,11 @@ export const getBatchRecords = async (batchId: string, status?: string) => {
 
   sql += ' ORDER BY created_at DESC';
 
-  return await all(sql, params);
+  const result = await all(sql, params);
+  return convertKeysToCamelCase(result);
 };
 
 export const getAllBatches = async (limit: number = 50): Promise<Batch[]> => {
-  return await all<Batch>('SELECT * FROM batches ORDER BY created_at DESC LIMIT ?', [limit]);
+  const result = await all('SELECT * FROM batches ORDER BY created_at DESC LIMIT ?', [limit]);
+  return convertKeysToCamelCase<Batch[]>(result);
 };
