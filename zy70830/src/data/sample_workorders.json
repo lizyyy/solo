@@ -1,0 +1,70 @@
+{
+  "workOrders": [
+    {
+      "bedId": "BED_A104",
+      "bedNumber": "A104",
+      "ward": "内科",
+      "patientId": "",
+      "patientName": "",
+      "requestedBy": "张护士",
+      "requestedAt": "2024-01-23T09:00:00Z",
+      "startedAt": "2024-01-23T09:30:00Z",
+      "status": "in_progress",
+      "assignedTo": "清洁员甲",
+      "priority": "normal",
+      "notes": "出院终末消毒"
+    },
+    {
+      "bedId": "BED_A103",
+      "bedNumber": "A103",
+      "ward": "内科",
+      "patientId": "",
+      "patientName": "",
+      "requestedBy": "李护士",
+      "requestedAt": "2024-01-23T07:00:00Z",
+      "startedAt": "2024-01-23T07:30:00Z",
+      "completedAt": "2024-01-23T08:15:00Z",
+      "status": "completed",
+      "assignedTo": "清洁员乙",
+      "priority": "normal",
+      "notes": "日常清洁",
+      "cleaningDurationMinutes": 45,
+      "qualityCheckPassed": true,
+      "checkedBy": "李护士",
+      "checkedAt": "2024-01-23T08:20:00Z"
+    },
+    {
+      "bedId": "BED_B203",
+      "bedNumber": "B203",
+      "ward": "外科",
+      "patientId": "PAT_DISCHARGED",
+      "patientName": "已出院患者",
+      "requestedBy": "孙护士",
+      "requestedAt": "2024-01-23T06:00:00Z",
+      "startedAt": "2024-01-23T06:30:00Z",
+      "completedAt": "2024-01-23T07:15:00Z",
+      "status": "completed",
+      "assignedTo": "清洁员丙",
+      "priority": "urgent",
+      "notes": "术后出院终末消毒",
+      "cleaningDurationMinutes": 45,
+      "qualityCheckPassed": true,
+      "checkedBy": "孙护士",
+      "checkedAt": "2024-01-23T07:20:00Z"
+    },
+    {
+      "bedId": "BED_CLEANING_TIMEOUT",
+      "bedNumber": "C304",
+      "ward": "儿科",
+      "patientId": "",
+      "patientName": "",
+      "requestedBy": "郑护士",
+      "requestedAt": "2024-01-22T08:00:00Z",
+      "startedAt": "2024-01-22T08:30:00Z",
+      "status": "pending",
+      "assignedTo": "清洁员丁",
+      "priority": "normal",
+      "notes": "常规清洁"
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "patients": [
+    {
+      "medicalRecordNumber": "MRN001",
+      "name": "张三",
+      "age": 65,
+      "gender": "男",
+      "diagnosis": "冠心病",
+      "status": "admitted",
+      "bedId": "BED_A101",
+      "admissionDate": "2024-01-15T08:30:00Z",
+      "attendingPhysician": "王医生",
+      "responsibleNurse": "张护士",
+      "history": [
+        {
+          "timestamp": "2024-01-15T08:30:00Z",
+          "action": "入院",
+          "newStatus": "admitted",
+          "newBedId": "BED_A101",
+          "newWard": "内科",
+          "performedBy": "系统",
+          "notes": "急诊入院"
+        },
+        {
+          "timestamp": "2024-01-18T14:20:00Z",
+          "action": "床位调整",
+          "previousBedId": "BED_A102",
+          "newBedId": "BED_A101",
+          "performedBy": "张护士",
+          "notes": "转入ICU观察"
+        }
+      ]
+    },
+    {
+      "medicalRecordNumber": "MRN002",
+      "name": "李四",
+      "age": 45,
+      "gender": "男",
+      "diagnosis": "急性阑尾炎",
+      "status": "admitted",
+      "bedId": "BED_A102",
+      "admissionDate": "2024-01-20T10:00:00Z",
+      "expectedDischargeDate": "2024-01-25T00:00:00Z",
+      "attendingPhysician": "李医生",
+      "responsibleNurse": "李护士",
+      "history": [
+        {
+          "timestamp": "2024-01-20T10:00:00Z",
+          "action": "入院",
+          "newStatus": "admitted",
+          "newBedId": "BED_A102",
+          "newWard": "外科",
+          "performedBy": "系统",
+          "notes": "术后转入外科"
+        }
+      ]
+    },
+    {
+      "medicalRecordNumber": "MRN003",
+      "name": "王五",
+      "age": 58,
+      "gender": "女",
+      "diagnosis": "骨折",
+      "status": "admitted",
+      "bedId": "BED_B201",
+      "admissionDate": "2024-01-19T09:00:00Z",
+      "attendingPhysician": "赵医生",
+      "responsibleNurse": "孙护士",
+      "history": [
+        {
+          "timestamp": "2024-01-19T09:00:00Z",
+          "action": "入院",
+          "newStatus": "admitted",
+          "newBedId": "BED_B201",
+          "newWard": "外科",
+          "performedBy": "系统",
+          "notes": "骨科手术"
+        }
+      ]
+    },
+    {
+      "medicalRecordNumber": "MRN004",
+      "name": "赵六",
+      "age": 8,
+      "gender": "男",
+      "diagnosis": "肺炎",
+      "status": "admitted",
+      "bedId": "BED_C301",
+      "admissionDate": "2024-01-21T11:00:00Z",
+      "attendingPhysician": "陈医生",
+      "responsibleNurse": "吴护士",
+      "history": [
+        {
+          "timestamp": "2024-01-21T11:00:00Z",
+          "action": "入院",
+          "newStatus": "admitted",
+          "newBedId": "BED_C301",
+          "newWard": "儿科",
+          "performedBy": "系统",
+          "notes": "小儿肺炎"
+        }
+      ]
+    },
+    {
+      "medicalRecordNumber": "MRN005",
+      "name": "钱七",
+      "age": 5,
+      "gender": "女",
+      "diagnosis": "流感",
+      "status": "admitted",
+      "bedId": "BED_C302",
+      "admissionDate": "2024-01-22T08:00:00Z",
+      "attendingPhysician": "刘医生",
+      "responsibleNurse": "郑护士",
+      "history": [
+        {
+          "timestamp": "2024-01-22T08:00:00Z",
+          "action": "入院",
+          "newStatus": "admitted",
+          "newBedId": "BED_C302",
+          "newWard": "儿科",
+          "performedBy": "系统",
+          "notes": "流感住院"
+        }
+      ]
+    },
+    {
+      "medicalRecordNumber": "MRN006",
+      "name": "孙八",
+      "age": 30,
+      "gender": "男",
+      "diagnosis": "急性肠胃炎",
+      "status": "transferred",
+      "bedId": "BED_C303",
+      "admissionDate": "2024-01-20T14:00:00Z",
+      "transferDate": "2024-01-23T10:00:00Z",
+      "transferFromWard": "儿科",
+      "transferToWard": "内科",
+      "attendingPhysician": "周医生",
+      "history": [
+        {
+          "timestamp": "2024-01-20T14:00:00Z",
+          "action": "入院",
+          "newStatus": "admitted",
+          "newBedId": "BED_C303",
+          "newWard": "儿科",
+          "performedBy": "系统",
+          "notes": "肠胃炎"
+        },
+        {
+          "timestamp": "2024-01-23T10:00:00Z",
+          "action": "转科",
+          "previousStatus": "admitted",
+          "newStatus": "transferred",
+          "previousWard": "儿科",
+          "newWard": "内科",
+          "performedBy": "周医生",
+          "notes": "病情变化转科"
+        }
+      ]
+    },
+    {
+      "medicalRecordNumber": "MRN007",
+      "name": "周九",
+      "age": 72,
+      "gender": "女",
+      "diagnosis": "高血压",
+      "status": "discharged",
+      "admissionDate": "2024-01-10T09:00:00Z",
+      "actualDischargeDate": "2024-01-20T10:00:00Z",
+      "outcome": "recovery_discharge",
+      "attendingPhysician": "吴医生",
+      "history": [
+        {
+          "timestamp": "2024-01-10T09:00:00Z",
+          "action": "入院",
+          "newStatus": "admitted",
+          "newWard": "内科",
+          "performedBy": "系统",
+          "notes": "高血压控制"
+        },
+        {
+          "timestamp": "2024-01-20T10:00:00Z",
+          "action": "出院",
+          "previousStatus": "admitted",
+          "newStatus": "discharged",
+          "outcome": "recovery_discharge",
+          "performedBy": "吴医生",
+          "notes": "康复出院"
+        }
+      ]
+    }
+  ]
+}
