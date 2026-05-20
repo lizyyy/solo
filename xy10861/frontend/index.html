@@ -819,7 +819,7 @@
                     <td>${v.description || '-'}</td>
                     <td>
                         <button class="btn btn-secondary btn-small" onclick="viewVariableDetail(${JSON.stringify(v).replace(/"/g, '&quot;')})">详情</button>
-                        <button class="btn btn-success btn-small" onclick="openSyncModal('${v.key}', ${v.environment_id}, '${v.raw_value}')">同步</button>
+                        <button class="btn btn-success btn-small" onclick="openSyncModal('${v.key}', ${v.environment_id}, '', ${v.is_sensitive})">同步</button>
                     </td>
                 </tr>
             `).join('');
@@ -841,7 +841,7 @@
                 </div>
                 <div class="detail-section">
                     <div class="detail-label">值</div>
-                    <div class="detail-value code">${variable.raw_value}</div>
+                    <div class="detail-value code">${variable.value}${variable.is_sensitive ? ' <span style="color:#888;font-size:12px;">(已遮蔽)</span>' : ''}</div>
                 </div>
                 <div class="detail-section">
                     <div class="detail-label">敏感</div>
@@ -853,7 +853,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
-                    <button class="btn btn-primary" onclick="openSyncModal('${variable.key}', ${variable.environment_id}, '${variable.raw_value}')">同步变量</button>
+                    <button class="btn btn-primary" onclick="openSyncModal('${variable.key}', ${variable.environment_id}, '', ${variable.is_sensitive})">同步变量</button>
                 </div>
             `;
             openModalContent(content);
@@ -1338,8 +1338,10 @@
             loadChangeRequests();
         }
         
-        function openSyncModal(key, sourceEnvId, value) {
+        function openSyncModal(key, sourceEnvId, value, is_sensitive = false) {
             const envOptions = environments.map(e => `<option value="${e.id}" ${e.id == sourceEnvId ? 'selected' : ''}>${e.name}</option>`).join('');
+            const displayValue = is_sensitive ? '' : value;
+            const placeholder = is_sensitive ? '敏感变量，请手动输入新值' : '请输入新值';
             const content = `
                 <div class="modal-header">
                     <h2 class="modal-title">同步变量</h2>
@@ -1360,8 +1362,8 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">新值</label>
-                    <input type="text" class="form-input" id="sync-new-value" value="${value}">
+                    <label class="form-label">新值${is_sensitive ? ' 🔒' : ''}</label>
+                    <input type="${is_sensitive ? 'password' : 'text'}" class="form-input" id="sync-new-value" value="${displayValue}" placeholder="${placeholder}">
                 </div>
                 <div class="form-group">
                     <label class="form-label">操作人</label>

@@ -13,6 +13,7 @@ import json
 from models import init_db, get_db, Environment, EnvVariable, ChangeRequest, SyncRecord, DiffSnapshot
 from services import EnvDiffService
 from demo_data import generate_demo_data
+from security import encrypt_value
 
 
 class CreateEnvironmentRequest(BaseModel):
@@ -170,10 +171,12 @@ async def create_variable(
     if existing:
         raise HTTPException(status_code=400, detail="Variable already exists")
     
+    value_to_store = encrypt_value(request.value) if request.is_sensitive else request.value
+    
     var = EnvVariable(
         environment_id=env_id,
         key=request.key,
-        value=request.value,
+        value=value_to_store,
         is_sensitive=request.is_sensitive,
         description=request.description
     )
@@ -195,9 +198,14 @@ async def update_variable(
         raise HTTPException(status_code=404, detail="Variable not found")
     
     if request.value is not None:
-        var.value = request.value
+        if request.is_sensitive if request.is_sensitive is not None else var.is_sensitive:
+            var.value = encrypt_value(request.value)
+        else:
+            var.value = request.value
     if request.is_sensitive is not None:
         var.is_sensitive = request.is_sensitive
+        if request.is_sensitive and request.value is None:
+            var.value = encrypt_value(var.value)
     if request.description is not None:
         var.description = request.description
     

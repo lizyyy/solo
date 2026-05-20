@@ -4,6 +4,7 @@ from io import StringIO
 from datetime import datetime
 from sqlalchemy.orm import Session
 from models import Environment, EnvVariable, DiffSnapshot, ChangeRequest, SyncRecord
+from security import encrypt_value, decrypt_value, mask_value
 from typing import List, Dict, Any, Optional
 
 class EnvDiffService:
@@ -11,22 +12,23 @@ class EnvDiffService:
         self.db = db
     
     def mask_sensitive_value(self, value: str, mask_char: str = "*", visible_chars: int = 4) -> str:
-        if not value:
-            return value
-        if len(value) <= visible_chars * 2:
-            return mask_char * len(value)
-        return value[:visible_chars] + mask_char * (len(value) - visible_chars * 2) + value[-visible_chars:]
+        return mask_value(value, mask_char, visible_chars)
+    
+    def get_decrypted_value(self, var: EnvVariable) -> str:
+        if var.is_sensitive:
+            return decrypt_value(var.value)
+        return var.value
     
     def mask_variables(self, variables: List[EnvVariable]) -> List[Dict[str, Any]]:
         result = []
         for var in variables:
+            display_value = self.get_decrypted_value(var)
             var_dict = {
                 "id": var.id,
                 "environment_id": var.environment_id,
                 "environment_name": var.environment.name if var.environment else None,
                 "key": var.key,
-                "value": self.mask_sensitive_value(var.value) if var.is_sensitive else var.value,
-                "raw_value": var.value,
+                "value": self.mask_sensitive_value(display_value) if var.is_sensitive else display_value,
                 "is_sensitive": var.is_sensitive,
                 "description": var.description,
                 "created_at": var.created_at.isoformat() if var.created_at else None,
@@ -57,31 +59,33 @@ class EnvDiffService:
             var2 = vars2.get(key)
             
             if var1 and not var2:
+                val1_decrypted = self.get_decrypted_value(var1)
                 only_in_env1.append({
                     "key": key,
-                    "value": self.mask_sensitive_value(var1.value) if var1.is_sensitive else var1.value,
+                    "value": self.mask_sensitive_value(val1_decrypted) if var1.is_sensitive else val1_decrypted,
                     "is_sensitive": var1.is_sensitive
                 })
             elif var2 and not var1:
+                val2_decrypted = self.get_decrypted_value(var2)
                 only_in_env2.append({
                     "key": key,
-                    "value": self.mask_sensitive_value(var2.value) if var2.is_sensitive else var2.value,
+                    "value": self.mask_sensitive_value(val2_decrypted) if var2.is_sensitive else val2_decrypted,
                     "is_sensitive": var2.is_sensitive
                 })
             else:
-                val1 = var1.value
-                val2 = var2.value
-                if val1 != val2:
+                val1_decrypted = self.get_decrypted_value(var1)
+                val2_decrypted = self.get_decrypted_value(var2)
+                if val1_decrypted != val2_decrypted:
                     differences.append({
                         "key": key,
-                        "env1_value": self.mask_sensitive_value(val1) if var1.is_sensitive else val1,
-                        "env2_value": self.mask_sensitive_value(val2) if var2.is_sensitive else val2,
+                        "env1_value": self.mask_sensitive_value(val1_decrypted) if var1.is_sensitive else val1_decrypted,
+                        "env2_value": self.mask_sensitive_value(val2_decrypted) if var2.is_sensitive else val2_decrypted,
                         "is_sensitive": var1.is_sensitive or var2.is_sensitive
                     })
                 else:
                     matches.append({
                         "key": key,
-                        "value": self.mask_sensitive_value(val1) if var1.is_sensitive else val1,
+                        "value": self.mask_sensitive_value(val1_decrypted) if var1.is_sensitive else val1_decrypted,
                         "is_sensitive": var1.is_sensitive
                     })
         
@@ -128,15 +132,27 @@ class EnvDiffService:
             EnvVariable.key == variable_key
         ).first()
         
+        is_sensitive = (source_var and source_var.is_sensitive) or (target_var and target_var.is_sensitive)
+        
+        source_val = self.get_decrypted_value(source_var) if source_var else None
+        target_val = self.get_decrypted_value(target_var) if target_var else None
+        
+        if is_sensitive:
+            source_val = self.mask_sensitive_value(source_val) if source_val else None
+            target_val = self.mask_sensitive_value(target_val) if target_val else None
+            proposed_val_masked = self.mask_sensitive_value(proposed_value)
+        else:
+            proposed_val_masked = proposed_value
+        
         cr = ChangeRequest(
             title=title,
             description=description,
             source_env_id=source_env_id,
             target_env_id=target_env_id,
             variable_key=variable_key,
-            source_value=source_var.value if source_var else None,
-            target_value=target_var.value if target_var else None,
-            proposed_value=proposed_value,
+            source_value=source_val,
+            target_value=target_val,
+            proposed_value=proposed_val_masked,
             status="pending",
             requested_by=requested_by
         )
@@ -185,17 +201,24 @@ class EnvDiffService:
             EnvVariable.key == variable_key
         ).first()
         
-        old_value = target_var.value if target_var else None
+        is_sensitive = (source_var and source_var.is_sensitive) or (target_var and target_var.is_sensitive)
+        
+        old_value = self.get_decrypted_value(target_var) if target_var else None
+        
+        value_to_store = encrypt_value(new_value) if is_sensitive else new_value
+        
+        old_value_display = self.mask_sensitive_value(old_value) if is_sensitive and old_value else old_value
+        new_value_display = self.mask_sensitive_value(new_value) if is_sensitive else new_value
         
         try:
             if target_var:
-                target_var.value = new_value
+                target_var.value = value_to_store
             else:
                 target_var = EnvVariable(
                     environment_id=target_env_id,
                     key=variable_key,
-                    value=new_value,
-                    is_sensitive=source_var.is_sensitive if source_var else False,
+                    value=value_to_store,
+                    is_sensitive=is_sensitive,
                     description=source_var.description if source_var else None
                 )
                 self.db.add(target_var)
@@ -207,8 +230,8 @@ class EnvDiffService:
                 source_env_id=source_env_id,
                 target_env_id=target_env_id,
                 variable_key=variable_key,
-                old_value=old_value,
-                new_value=new_value,
+                old_value=old_value_display,
+                new_value=new_value_display,
                 synced_by=synced_by,
                 status="success"
             )
@@ -223,8 +246,8 @@ class EnvDiffService:
                 source_env_id=source_env_id,
                 target_env_id=target_env_id,
                 variable_key=variable_key,
-                old_value=old_value,
-                new_value=new_value,
+                old_value=old_value_display,
+                new_value=new_value_display,
                 synced_by=synced_by,
                 status="failed",
                 error_message=str(e)

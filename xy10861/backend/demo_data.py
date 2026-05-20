@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from models import Environment, EnvVariable, ChangeRequest, SyncRecord, init_db, SessionLocal
+from security import encrypt_value
 from datetime import datetime, timedelta
 import random
 
@@ -74,10 +75,12 @@ def generate_demo_data():
                 if var_data["key"] in env_specific_values[env_name]:
                     var_data["value"] = env_specific_values[env_name][var_data["key"]]
                 
+                value_to_store = encrypt_value(var_data["value"]) if var_data["is_sensitive"] else var_data["value"]
+                
                 var = EnvVariable(
                     environment_id=env.id,
                     key=var_data["key"],
-                    value=var_data["value"],
+                    value=value_to_store,
                     is_sensitive=var_data["is_sensitive"],
                     description=var_data["description"]
                 )
