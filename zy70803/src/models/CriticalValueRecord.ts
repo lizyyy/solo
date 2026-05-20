@@ -19,14 +19,14 @@ export class CriticalValueRecord {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  patientId: string;
+  @Column({ nullable: true })
+  patientId?: string;
 
-  @Column()
-  patientName: string;
+  @Column({ nullable: true })
+  patientName?: string;
 
-  @Column()
-  department: string;
+  @Column({ nullable: true })
+  department?: string;
 
   @Column({ nullable: true })
   ward?: string;
@@ -34,17 +34,17 @@ export class CriticalValueRecord {
   @Column({ nullable: true })
   bedNo?: string;
 
-  @Column()
-  testItem: string;
+  @Column({ nullable: true })
+  testItem?: string;
 
-  @Column()
-  testValue: string;
+  @Column({ nullable: true })
+  testValue?: string;
 
   @Column({ nullable: true })
   referenceRange?: string;
 
-  @Column()
-  testTime: Date;
+  @Column({ nullable: true })
+  testTime?: Date;
 
   @Column({ nullable: true })
   reporter: string;
