@@ -1,0 +1,32 @@
+[
+  {
+    "student_id": "S001",
+    "supervisor_id": "T001",
+    "preference_order": 1,
+    "is_cross_major": false
+  },
+  {
+    "student_id": "S001",
+    "supervisor_id": "T002",
+    "preference_order": 2,
+    "is_cross_major": false
+  },
+  {
+    "student_id": "S002",
+    "supervisor_id": "T001",
+    "preference_order": 1,
+    "is_cross_major": false
+  },
+  {
+    "student_id": "S003",
+    "supervisor_id": "T004",
+    "preference_order": 1,
+    "is_cross_major": false
+  },
+  {
+    "student_id": "S004",
+    "supervisor_id": "T002",
+    "preference_order": 1,
+    "is_cross_major": true
+  }
+]

@@ -1,0 +1,99 @@
+{
+  "session_id": "778bc452-b0be-4dc8-9e53-c52bdeb226b8",
+  "session_name": "2024年硕士研究生招生对账",
+  "generated_at": "2026-05-20T07:19:36.493505",
+  "created_by": "研究生院-张秘书",
+  "is_locked": false,
+  "statistics": {
+    "total_records": 8,
+    "pending_count": 0,
+    "approved_count": 1,
+    "rejected_count": 0,
+    "supplement_count": 0,
+    "conflict_count": 7,
+    "cross_major_count": 1,
+    "duplicate_count": 2,
+    "approval_rate": 12.5
+  },
+  "quota_warnings": [
+    {
+      "supervisor_id": "T003",
+      "supervisor_name": "王教授",
+      "total_quota": 3,
+      "used_quota": 1,
+      "remaining_quota": 2,
+      "allocated_count": 3,
+      "student_name": "钱七"
+    },
+    {
+      "supervisor_id": "T003",
+      "supervisor_name": "王教授",
+      "total_quota": 3,
+      "used_quota": 1,
+      "remaining_quota": 2,
+      "allocated_count": 3,
+      "student_name": "孙八"
+    },
+    {
+      "supervisor_id": "T003",
+      "supervisor_name": "王教授",
+      "total_quota": 3,
+      "used_quota": 1,
+      "remaining_quota": 2,
+      "allocated_count": 3,
+      "student_name": "李四"
+    }
+  ],
+  "supervisor_summary": [
+    {
+      "supervisor_id": "T001",
+      "supervisor_name": "张教授",
+      "department": "计算机学院",
+      "major": "计算机科学与技术",
+      "total_quota": 3,
+      "remaining_quota": 2,
+      "allocated_count": 2,
+      "approved_count": 0,
+      "conflict_count": 2
+    },
+    {
+      "supervisor_id": "T002",
+      "supervisor_name": "李教授",
+      "department": "计算机学院",
+      "major": "软件工程",
+      "total_quota": 2,
+      "remaining_quota": 2,
+      "allocated_count": 2,
+      "approved_count": 0,
+      "conflict_count": 2
+    },
+    {
+      "supervisor_id": "T004",
+      "supervisor_name": "赵教授",
+      "department": "数学学院",
+      "major": "应用数学",
+      "total_quota": 2,
+      "remaining_quota": 2,
+      "allocated_count": 1,
+      "approved_count": 1,
+      "conflict_count": 0
+    },
+    {
+      "supervisor_id": "T003",
+      "supervisor_name": "王教授",
+      "department": "电子信息学院",
+      "major": "电子科学与技术",
+      "total_quota": 3,
+      "remaining_quota": 2,
+      "allocated_count": 3,
+      "approved_count": 0,
+      "conflict_count": 3
+    }
+  ],
+  "batch_distribution": {
+    "第一志愿": 4,
+    "第二志愿": 1,
+    "调剂第一批": 2,
+    "调剂第二批": 1
+  }
+}

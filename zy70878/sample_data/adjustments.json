@@ -1,0 +1,32 @@
+[
+  {
+    "student_id": "S005",
+    "from_supervisor_id": null,
+    "to_supervisor_id": "T003",
+    "adjustment_batch": "ADJUSTMENT_BATCH_1",
+    "adjustment_time": "2024-04-15T10:30:00",
+    "operator": "研究生院-李老师",
+    "reason": "第一志愿未录取，调剂至电子信息学院",
+    "source_batch": "第一批调剂"
+  },
+  {
+    "student_id": "S006",
+    "from_supervisor_id": "T001",
+    "to_supervisor_id": "T003",
+    "adjustment_batch": "ADJUSTMENT_BATCH_2",
+    "adjustment_time": "2024-04-20T14:00:00",
+    "operator": "研究生院-王老师",
+    "reason": "导师名额已满，调剂至其他导师",
+    "source_batch": "第二批调剂"
+  },
+  {
+    "student_id": "S002",
+    "from_supervisor_id": null,
+    "to_supervisor_id": "T003",
+    "adjustment_batch": "ADJUSTMENT_BATCH_1",
+    "adjustment_time": "2024-04-16T09:00:00",
+    "operator": "研究生院-李老师",
+    "reason": "跨专业申请，经考核通过调剂",
+    "source_batch": "第一批调剂"
+  }
+]
