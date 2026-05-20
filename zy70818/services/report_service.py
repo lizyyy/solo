@@ -11,7 +11,7 @@ from models.inventory import InventoryItem
 from models.recall import RecallNotice
 from models.consumption import ConsumptionItem
 from models.reconciliation import ReconciliationResult, Discrepancy, DiscrepancyType
-from models.report import ReportData, ReportType, ReportDetailItem, ReportSummaryItem
+from models.report import ReportData, ReportType, ReportFormat, ReportDetailItem, ReportSummaryItem
 from utils.storage import store
 
 
@@ -177,12 +177,15 @@ class ReportGenerator:
 
     def _export_report(self, report: ReportData, report_format: ReportFormat) -> Path:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f"{report.report_type.value}_{timestamp}.{report_format.value}"
+        report_type_value = report.report_type.value if hasattr(report.report_type, 'value') else report.report_type
+        format_value = report_format.value if hasattr(report_format, 'value') else report_format
+        filename = f"{report_type_value}_{timestamp}.{format_value}"
         file_path = self.data_dir / filename
 
-        if report_format == ReportFormat.EXCEL:
+        format_str = report_format.value if hasattr(report_format, 'value') else report_format
+        if format_str == ReportFormat.EXCEL or format_str == 'xlsx':
             self._export_excel(report, file_path)
-        elif report_format == ReportFormat.CSV:
+        elif format_str == ReportFormat.CSV or format_str == 'csv':
             self._export_csv(report, file_path)
 
         return file_path

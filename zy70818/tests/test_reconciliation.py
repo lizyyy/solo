@@ -5,8 +5,20 @@ import sys
 sys.path.insert(0, '.')
 
 from datetime import date
+from services.import_service import import_service
 from services.reconciliation_service import reconciliation_engine, review_service
 from models.reconciliation import ReviewAction
+
+
+def import_test_data():
+    print("导入测试数据...")
+    with open('data/sample_inventory.csv', 'r', encoding='utf-8-sig') as f:
+        import_service.import_inventory(f.read())
+    with open('data/sample_recall.md', 'r', encoding='utf-8') as f:
+        import_service.import_recall(f.read())
+    with open('data/sample_consumption.csv', 'r', encoding='utf-8-sig') as f:
+        import_service.import_consumption(f.read())
+    print("数据导入完成!")
 
 
 def test_full_reconciliation():
@@ -74,6 +86,7 @@ if __name__ == '__main__':
     print("对账功能测试")
     print("=" * 50)
 
+    import_test_data()
     result = test_full_reconciliation()
     test_discrepancy_explanation(result)
     test_review_process(result)

@@ -5,9 +5,21 @@ import sys
 sys.path.insert(0, '.')
 
 from datetime import date
+from services.import_service import import_service
 from services.reconciliation_service import reconciliation_engine
 from services.report_service import report_generator
 from models.report import ReportType, ReportFormat
+
+
+def import_test_data():
+    print("导入测试数据...")
+    with open('data/sample_inventory.csv', 'r', encoding='utf-8-sig') as f:
+        import_service.import_inventory(f.read())
+    with open('data/sample_recall.md', 'r', encoding='utf-8') as f:
+        import_service.import_recall(f.read())
+    with open('data/sample_consumption.csv', 'r', encoding='utf-8-sig') as f:
+        import_service.import_consumption(f.read())
+    print("数据导入完成!")
 
 
 def test_report_generation():
@@ -79,6 +91,7 @@ if __name__ == '__main__':
     print("报告生成测试")
     print("=" * 50)
 
+    import_test_data()
     test_report_generation()
 
     print("\n" + "=" * 50)
