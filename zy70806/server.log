@@ -1,133 +1,133 @@
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.048ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="declarations"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.104ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="declarations"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.050ms] [34;1m[rows:4][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "declarations" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.134ms] [34;1m[rows:4][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "declarations" AND sql IS NOT NULL order by type = "table" desc
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.019ms] [34;1m[rows:-][0m SELECT * FROM `declarations` LIMIT 1
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.029ms] [34;1m[rows:-][0m SELECT * FROM `declarations` LIMIT 1
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.006ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "declarations" AND name = "idx_declarations_order_no"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.011ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "declarations" AND name = "idx_declarations_batch_id"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.004ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "declarations" AND name = "idx_declarations_hs_code"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.043ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "declarations" AND name = "idx_declarations_order_no"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.005ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "declarations" AND name = "idx_declarations_batch_id"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.024ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "declarations" AND name = "idx_declarations_hs_code"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.004ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="tariffs"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.010ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="tariffs"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.021ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "tariffs" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.064ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "tariffs" AND sql IS NOT NULL order by type = "table" desc
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.007ms] [34;1m[rows:-][0m SELECT * FROM `tariffs` LIMIT 1
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.022ms] [34;1m[rows:-][0m SELECT * FROM `tariffs` LIMIT 1
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.004ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "tariffs" AND name = "idx_tariffs_batch_id"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.026ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "tariffs" AND name = "idx_tariffs_batch_id"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.004ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "tariffs" AND name = "idx_tariffs_hs_code"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.019ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "tariffs" AND name = "idx_tariffs_hs_code"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.003ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="return_receipts"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.011ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="return_receipts"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.017ms] [34;1m[rows:4][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "return_receipts" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.051ms] [34;1m[rows:4][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "return_receipts" AND sql IS NOT NULL order by type = "table" desc
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.006ms] [34;1m[rows:-][0m SELECT * FROM `return_receipts` LIMIT 1
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.021ms] [34;1m[rows:-][0m SELECT * FROM `return_receipts` LIMIT 1
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.003ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "return_receipts" AND name = "idx_return_receipts_batch_id"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.013ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "return_receipts" AND name = "idx_return_receipts_batch_id"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.003ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "return_receipts" AND name = "idx_return_receipts_receipt_no"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.010ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "return_receipts" AND name = "idx_return_receipts_receipt_no"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.003ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "return_receipts" AND name = "idx_return_receipts_order_no"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.009ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "return_receipts" AND name = "idx_return_receipts_order_no"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.003ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reconciliation_batches"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.007ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reconciliation_batches"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.014ms] [34;1m[rows:1][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "reconciliation_batches" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.050ms] [34;1m[rows:1][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "reconciliation_batches" AND sql IS NOT NULL order by type = "table" desc
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.006ms] [34;1m[rows:-][0m SELECT * FROM `reconciliation_batches` LIMIT 1
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.020ms] [34;1m[rows:-][0m SELECT * FROM `reconciliation_batches` LIMIT 1
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.003ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reconciliation_items"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.010ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reconciliation_items"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.016ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "reconciliation_items" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.040ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "reconciliation_items" AND sql IS NOT NULL order by type = "table" desc
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.010ms] [34;1m[rows:-][0m SELECT * FROM `reconciliation_items` LIMIT 1
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.034ms] [34;1m[rows:-][0m SELECT * FROM `reconciliation_items` LIMIT 1
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.004ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "reconciliation_items" AND name = "idx_reconciliation_items_batch_id"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.018ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "reconciliation_items" AND name = "idx_reconciliation_items_order_no"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.003ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "reconciliation_items" AND name = "idx_reconciliation_items_order_no"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.009ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "reconciliation_items" AND name = "idx_reconciliation_items_batch_id"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.003ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="discrepancies"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.007ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="discrepancies"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.015ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "discrepancies" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.043ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "discrepancies" AND sql IS NOT NULL order by type = "table" desc
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.005ms] [34;1m[rows:-][0m SELECT * FROM `discrepancies` LIMIT 1
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.014ms] [34;1m[rows:-][0m SELECT * FROM `discrepancies` LIMIT 1
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.013ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "discrepancies" AND name = "idx_discrepancies_reconciliation_item_id"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.019ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "discrepancies" AND name = "idx_discrepancies_batch_id"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.007ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "discrepancies" AND name = "idx_discrepancies_batch_id"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.011ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "discrepancies" AND name = "idx_discrepancies_reconciliation_item_id"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.005ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="review_records"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.009ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="review_records"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.098ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "review_records" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.081ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "review_records" AND sql IS NOT NULL order by type = "table" desc
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.012ms] [34;1m[rows:-][0m SELECT * FROM `review_records` LIMIT 1
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.017ms] [34;1m[rows:-][0m SELECT * FROM `review_records` LIMIT 1
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.009ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "review_records" AND name = "idx_review_records_reconciliation_item_id"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.027ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "review_records" AND name = "idx_review_records_reconciliation_item_id"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.006ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "review_records" AND name = "idx_review_records_batch_id"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.013ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "review_records" AND name = "idx_review_records_batch_id"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.005ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="exchange_rates"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.010ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="exchange_rates"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.023ms] [34;1m[rows:2][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "exchange_rates" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.052ms] [34;1m[rows:2][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "exchange_rates" AND sql IS NOT NULL order by type = "table" desc
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.006ms] [34;1m[rows:-][0m SELECT * FROM `exchange_rates` LIMIT 1
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.021ms] [34;1m[rows:-][0m SELECT * FROM `exchange_rates` LIMIT 1
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.005ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "exchange_rates" AND name = "idx_exchange_rates_rate_date"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.025ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "exchange_rates" AND name = "idx_exchange_rates_rate_date"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.004ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reports"
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.013ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reports"
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.017ms] [34;1m[rows:2][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "reports" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.135ms] [34;1m[rows:2][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "reports" AND sql IS NOT NULL order by type = "table" desc
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.005ms] [34;1m[rows:-][0m SELECT * FROM `reports` LIMIT 1
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.048ms] [34;1m[rows:-][0m SELECT * FROM `reports` LIMIT 1
 
-2026/05/20 05:35:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
 [0m[33m[0.018ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "reports" AND name = "idx_reports_batch_id"
-2026/05/20 05:35:24 Database connected and migrated successfully
+2026/05/20 16:39:02 Database connected and migrated successfully
 [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
 
 [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
@@ -156,119 +156,14 @@
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080
-[GIN] 2026/05/20 - 05:35:32 | 200 |        55.5µs |       127.0.0.1 | GET      "/health"
+[GIN-debug] [ERROR] listen tcp :8080: bind: address already in use
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                [GIN] 2026/05/20 - 16:39:06 | 200 |      23.375µs |       127.0.0.1 | GET      "/health"
 
-2026/05/20 05:35:40 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:109
-[0m[33m[1.969ms] [34;1m[rows:1][0m INSERT INTO `reconciliation_batches` (`id`,`created_at`,`updated_at`,`name`,`declaration_count`,`tariff_count`,`return_receipt_count`,`status`,`matched_count`,`discrepancy_count`,`reviewed_count`,`total_tax_expected`,`total_tax_declared`,`total_tax_difference`,`processed_at`,`completed_at`) VALUES ("87e4645d-9933-47d5-a519-e03eec355fd4","2026-05-20 05:35:40.079","2026-05-20 05:35:40.079","2024年1月对账测试",0,0,0,"pending",0,0,0,"0","0","0",NULL,NULL)
-[GIN] 2026/05/20 - 05:35:40 | 201 |      2.7025ms |       127.0.0.1 | POST     "/api/batches"
+2026/05/20 16:39:06 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:109
+[0m[33m[2.094ms] [34;1m[rows:1][0m INSERT INTO `reconciliation_batches` (`id`,`created_at`,`updated_at`,`name`,`declaration_count`,`tariff_count`,`return_receipt_count`,`status`,`matched_count`,`discrepancy_count`,`reviewed_count`,`total_tax_expected`,`total_tax_declared`,`total_tax_difference`,`processed_at`,`completed_at`) VALUES ("19a99e06-75fd-4adc-8eca-007fc78ce0eb","2026-05-20 16:39:06.65","2026-05-20 16:39:06.65","Test",0,0,0,"pending",0,0,0,"0","0","0",NULL,NULL)
+[GIN] 2026/05/20 - 16:39:06 | 201 |     2.31625ms |       127.0.0.1 | POST     "/api/batches"
+[GIN] 2026/05/20 - 16:39:25 | 200 |      63.292µs |       127.0.0.1 | GET      "/health"
 
-2026/05/20 05:35:47 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:23
-[0m[33m[1.577ms] [34;1m[rows:5][0m INSERT INTO `declarations` (`id`,`created_at`,`updated_at`,`batch_id`,`order_no`,`tracking_no`,`declarant`,`declare_date`,`hs_code`,`product_name`,`category`,`quantity`,`unit_price`,`total_amount`,`currency`,`declared_tax_amount`,`status`,`raw_data`) VALUES ("b232bd5f-48b7-4e92-a664-2afe4a66fb7f","2026-05-20 05:35:47.614","2026-05-20 05:35:47.614","87e4645d-9933-47d5-a519-e03eec355fd4","ORD001","TRK001","测试公司","2024-01-15 00:00:00","85171210","智能手机","电子产品",10,"500","5000","USD","450","","[\"ORD001\",\"TRK001\",\"测试公司\",\"2024-01-15\",\"85171210\",\"智能手机\",\"电子产品\",\"10\",\"500.00\",\"5000.00\",\"USD\",\"450.00\"]"),("ec7e66a4-e908-480d-bf7b-1d6d921b1282","2026-05-20 05:35:47.614","2026-05-20 05:35:47.614","87e4645d-9933-47d5-a519-e03eec355fd4","ORD002","TRK002","测试公司","2024-01-15 00:00:00","61091000","棉制T恤","纺织品",100,"20","2000","USD","180","","[\"ORD002\",\"TRK002\",\"测试公司\",\"2024-01-15\",\"61091000\",\"棉制T恤\",\"纺织品\",\"100\",\"20.00\",\"2000.00\",\"USD\",\"180.00\"]"),("e7316e8d-fccd-48ef-b12e-b892a5ca8f6b","2026-05-20 05:35:47.614","2026-05-20 05:35:47.614","87e4645d-9933-47d5-a519-e03eec355fd4","ORD003","TRK003","测试公司","2024-01-16 00:00:00","85258013","蓝牙耳机","电子产品",50,"30","1500","USD","135","","[\"ORD003\",\"TRK003\",\"测试公司\",\"2024-01-16\",\"85258013\",\"蓝牙耳机\",\"电子产品\",\"50\",\"30.00\",\"1500.00\",\"USD\",\"135.00\"]"),("1d64125e-2d49-4fe7-91e1-3f56b7a903e8","2026-05-20 05:35:47.614","2026-05-20 05:35:47.614","87e4645d-9933-47d5-a519-e03eec355fd4","ORD001","TRK004","测试公司","2024-01-17 00:00:00","85171210","智能手机","电子产品",5,"500","2500","USD","225","","[\"ORD001\",\"TRK004\",\"测试公司\",\"2024-01-17\",\"85171210\",\"智能手机\",\"电子产品\",\"5\",\"500.00\",\"2500.00\",\"USD\",\"225.00\"]"),("97963d44-ec8b-4b0a-91be-537656dfa1f4","2026-05-20 05:35:47.614","2026-05-20 05:35:47.614","87e4645d-9933-47d5-a519-e03eec355fd4","ORD004","TRK005","测试公司","2024-01-18 00:00:00","39269090","塑料玩具","玩具",200,"5","1000","EUR","110","","[\"ORD004\",\"TRK005\",\"测试公司\",\"2024-01-18\",\"39269090\",\"塑料玩具\",\"玩具\",\"200\",\"5.00\",\"1000.00\",\"EUR\",\"110.00\"]")
-[GIN] 2026/05/20 - 05:35:47 | 200 |    2.170625ms |       127.0.0.1 | POST     "/api/batches/87e4645d-9933-47d5-a519-e03eec355fd4/import/declarations"
-
-2026/05/20 05:35:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:52
-[0m[33m[3.269ms] [34;1m[rows:3][0m INSERT INTO `tariffs` (`id`,`created_at`,`updated_at`,`batch_id`,`hs_code`,`product_name`,`category`,`parent_hs_code`,`tax_rate`,`consumption_tax`,`vat_rate`,`effective_date`,`expiry_date`,`is_active`,`raw_data`) VALUES ("57e55c89-891e-4f25-9937-555980748b13","2026-05-20 05:35:54.655","2026-05-20 05:35:54.655","87e4645d-9933-47d5-a519-e03eec355fd4","85171210","智能手机","电子产品","85171200","0.13","0","0.13","2024-01-01 00:00:00",NULL,true,"{\"category\":\"电子产品\",\"consumption_tax\":0,\"effective_date\":\"2024-01-01\",\"hs_code\":\"85171210\",\"is_active\":true,\"parent_hs_code\":\"85171200\",\"product_name\":\"智能手机\",\"tax_rate\":0.13,\"vat_rate\":0.13}"),("6f1cddd5-da10-4bdc-ba15-e3b026df3e12","2026-05-20 05:35:54.655","2026-05-20 05:35:54.655","87e4645d-9933-47d5-a519-e03eec355fd4","61091000","棉制T恤","纺织品","61090000","0.1","0","0.13","2024-01-01 00:00:00",NULL,true,"{\"category\":\"纺织品\",\"consumption_tax\":0,\"effective_date\":\"2024-01-01\",\"hs_code\":\"61091000\",\"is_active\":true,\"parent_hs_code\":\"61090000\",\"product_name\":\"棉制T恤\",\"tax_rate\":0.1,\"vat_rate\":0.13}"),("4e8f6177-9ada-4312-9f0e-9b6d0be8b53c","2026-05-20 05:35:54.655","2026-05-20 05:35:54.655","87e4645d-9933-47d5-a519-e03eec355fd4","85258013","蓝牙耳机","电子产品","85258000","0.13","0","0.13","2024-01-01 00:00:00",NULL,true,"{\"category\":\"电子产品\",\"consumption_tax\":0,\"effective_date\":\"2024-01-01\",\"hs_code\":\"85258013\",\"is_active\":true,\"parent_hs_code\":\"85258000\",\"product_name\":\"蓝牙耳机\",\"tax_rate\":0.13,\"vat_rate\":0.13}")
-[GIN] 2026/05/20 - 05:35:54 | 200 |    3.591542ms |       127.0.0.1 | POST     "/api/batches/87e4645d-9933-47d5-a519-e03eec355fd4/import/tariffs"
-
-2026/05/20 05:35:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:84
-[0m[33m[1.237ms] [34;1m[rows:1][0m INSERT INTO `return_receipts` (`id`,`created_at`,`updated_at`,`batch_id`,`receipt_no`,`order_no`,`tracking_no`,`return_date`,`return_code`,`return_reason`,`return_category`,`adjusted_amount`,`adjusted_tax`,`require_supplement`,`supplement_deadline`,`status`,`raw_data`) VALUES ("e8b62c7f-a544-4081-a137-33accfa3ccde","2026-05-20 05:35:54.764","2026-05-20 05:35:54.764","87e4645d-9933-47d5-a519-e03eec355fd4","RTN001","ORD001","TRK001","2024-01-20 00:00:00","TAX_ADJUST","税率申报有误，实际税率为15%","税务调整","0","150",true,NULL,"已处理","{\"adjusted_amount\":0,\"adjusted_tax\":150,\"order_no\":\"ORD001\",\"receipt_no\":\"RTN001\",\"require_supplement\":true,\"return_category\":\"税务调整\",\"return_code\":\"TAX_ADJUST\",\"return_date\":\"2024-01-20\",\"return_reason\":\"税率申报有误，实际税率为15%\",\"status\":\"已处理\",\"tracking_no\":\"TRK001\"}")
-[GIN] 2026/05/20 - 05:35:54 | 200 |    1.354208ms |       127.0.0.1 | POST     "/api/batches/87e4645d-9933-47d5-a519-e03eec355fd4/import/return-receipts"
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:118
-[0m[33m[0.255ms] [34;1m[rows:1][0m SELECT * FROM `reconciliation_batches` WHERE id = "87e4645d-9933-47d5-a519-e03eec355fd4" ORDER BY `reconciliation_batches`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:113
-[0m[33m[0.440ms] [34;1m[rows:1][0m UPDATE `reconciliation_batches` SET `created_at`="2026-05-20 05:35:40.079",`updated_at`="2026-05-20 05:36:01.42",`name`="2024年1月对账测试",`declaration_count`=0,`tariff_count`=0,`return_receipt_count`=0,`status`="processing",`matched_count`=0,`discrepancy_count`=0,`reviewed_count`=0,`total_tax_expected`="0",`total_tax_declared`="0",`total_tax_difference`="0",`processed_at`=NULL,`completed_at`=NULL WHERE `id` = "87e4645d-9933-47d5-a519-e03eec355fd4"
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:28
-[0m[33m[0.087ms] [34;1m[rows:5][0m SELECT * FROM `declarations` WHERE batch_id = "87e4645d-9933-47d5-a519-e03eec355fd4"
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:95
-[0m[33m[0.076ms] [34;1m[rows:1][0m SELECT * FROM `return_receipts` WHERE order_no = "ORD001" ORDER BY `return_receipts`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [31;1m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:270 [35;1mrecord not found
-[0m[33m[0.221ms] [34;1m[rows:0][0m SELECT * FROM `exchange_rates` WHERE from_currency = "USD" AND to_currency = "CNY" AND rate_date <= "2024-01-15 00:00:00" ORDER BY rate_date DESC,`exchange_rates`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:60
-[0m[33m[0.172ms] [34;1m[rows:1][0m SELECT * FROM `tariffs` WHERE (hs_code = "85171210" AND is_active = true) AND effective_date <= "2024-01-15 00:00:00" AND (expiry_date IS NULL OR expiry_date > "2024-01-15 00:00:00") ORDER BY `tariffs`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [31;1m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:270 [35;1mrecord not found
-[0m[33m[0.079ms] [34;1m[rows:0][0m SELECT * FROM `exchange_rates` WHERE from_currency = "USD" AND to_currency = "CNY" AND rate_date <= "2024-01-17 00:00:00" ORDER BY rate_date DESC,`exchange_rates`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:60
-[0m[33m[0.085ms] [34;1m[rows:1][0m SELECT * FROM `tariffs` WHERE (hs_code = "85171210" AND is_active = true) AND effective_date <= "2024-01-17 00:00:00" AND (expiry_date IS NULL OR expiry_date > "2024-01-17 00:00:00") ORDER BY `tariffs`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [31;1m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:95 [35;1mrecord not found
-[0m[33m[0.041ms] [34;1m[rows:0][0m SELECT * FROM `return_receipts` WHERE order_no = "ORD002" ORDER BY `return_receipts`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [31;1m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:270 [35;1mrecord not found
-[0m[33m[0.035ms] [34;1m[rows:0][0m SELECT * FROM `exchange_rates` WHERE from_currency = "USD" AND to_currency = "CNY" AND rate_date <= "2024-01-15 00:00:00" ORDER BY rate_date DESC,`exchange_rates`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:60
-[0m[33m[0.069ms] [34;1m[rows:1][0m SELECT * FROM `tariffs` WHERE (hs_code = "61091000" AND is_active = true) AND effective_date <= "2024-01-15 00:00:00" AND (expiry_date IS NULL OR expiry_date > "2024-01-15 00:00:00") ORDER BY `tariffs`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [31;1m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:95 [35;1mrecord not found
-[0m[33m[0.090ms] [34;1m[rows:0][0m SELECT * FROM `return_receipts` WHERE order_no = "ORD003" ORDER BY `return_receipts`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [31;1m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:270 [35;1mrecord not found
-[0m[33m[0.050ms] [34;1m[rows:0][0m SELECT * FROM `exchange_rates` WHERE from_currency = "USD" AND to_currency = "CNY" AND rate_date <= "2024-01-16 00:00:00" ORDER BY rate_date DESC,`exchange_rates`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:60
-[0m[33m[0.058ms] [34;1m[rows:1][0m SELECT * FROM `tariffs` WHERE (hs_code = "85258013" AND is_active = true) AND effective_date <= "2024-01-16 00:00:00" AND (expiry_date IS NULL OR expiry_date > "2024-01-16 00:00:00") ORDER BY `tariffs`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [31;1m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:95 [35;1mrecord not found
-[0m[33m[0.023ms] [34;1m[rows:0][0m SELECT * FROM `return_receipts` WHERE order_no = "ORD004" ORDER BY `return_receipts`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [31;1m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:270 [35;1mrecord not found
-[0m[33m[0.020ms] [34;1m[rows:0][0m SELECT * FROM `exchange_rates` WHERE from_currency = "EUR" AND to_currency = "CNY" AND rate_date <= "2024-01-18 00:00:00" ORDER BY rate_date DESC,`exchange_rates`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [31;1m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:60 [35;1mrecord not found
-[0m[33m[0.022ms] [34;1m[rows:0][0m SELECT * FROM `tariffs` WHERE (hs_code = "39269090" AND is_active = true) AND effective_date <= "2024-01-18 00:00:00" AND (expiry_date IS NULL OR expiry_date > "2024-01-18 00:00:00") ORDER BY `tariffs`.`id` LIMIT 1
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:151
-[0m[33m[1.017ms] [34;1m[rows:5][0m INSERT INTO `reconciliation_items` (`id`,`created_at`,`updated_at`,`batch_id`,`order_no`,`tracking_no`,`declaration_id`,`tariff_id`,`return_receipt_id`,`hs_code`,`product_name`,`category`,`quantity`,`declared_amount`,`declared_currency`,`declared_amount_cny`,`exchange_rate`,`applicable_tax_rate`,`expected_tax_amount`,`declared_tax_amount`,`tax_difference`,`has_return_receipt`,`return_adjusted_tax`,`supplement_tax_needed`,`final_tax_amount`,`status`,`is_reviewed`,`reviewed_at`,`reviewed_by`,`review_notes`) VALUES ("183a8fe9-ff03-4a61-b52b-6129fe5f9f18","2026-05-20 05:36:01.422","2026-05-20 05:36:01.422","87e4645d-9933-47d5-a519-e03eec355fd4","ORD001","TRK001","b232bd5f-48b7-4e92-a664-2afe4a66fb7f","57e55c89-891e-4f25-9937-555980748b13","e8b62c7f-a544-4081-a137-33accfa3ccde","85171210","智能手机","电子产品",10,"5000","USD","36000","7.2","0.26","9360","3240","6120",true,"150","6120","9510","discrepancy",false,NULL,"",""),("8237975f-0a5c-4212-8121-66f507bf3de6","2026-05-20 05:36:01.422","2026-05-20 05:36:01.422","87e4645d-9933-47d5-a519-e03eec355fd4","ORD001","TRK004","1d64125e-2d49-4fe7-91e1-3f56b7a903e8","57e55c89-891e-4f25-9937-555980748b13","e8b62c7f-a544-4081-a137-33accfa3ccde","85171210","智能手机","电子产品",5,"2500","USD","18000","7.2","0.26","4680","1620","3060",true,"150","7740","9510","discrepancy",false,NULL,"",""),("5d941e06-3be9-4212-8051-5952c824503b","2026-05-20 05:36:01.422","2026-05-20 05:36:01.422","87e4645d-9933-47d5-a519-e03eec355fd4","ORD002","TRK002","ec7e66a4-e908-480d-bf7b-1d6d921b1282","6f1cddd5-da10-4bdc-ba15-e3b026df3e12","","61091000","棉制T恤","纺织品",100,"2000","USD","14400","7.2","0.23","3312","1296","2016",false,"0","0","1296","discrepancy",false,NULL,"",""),("b11b3c3a-2b89-4e03-92ba-586fefd785a9","2026-05-20 05:36:01.422","2026-05-20 05:36:01.422","87e4645d-9933-47d5-a519-e03eec355fd4","ORD003","TRK003","e7316e8d-fccd-48ef-b12e-b892a5ca8f6b","4e8f6177-9ada-4312-9f0e-9b6d0be8b53c","","85258013","蓝牙耳机","电子产品",50,"1500","USD","10800","7.2","0.26","2808","972","1836",false,"0","0","972","discrepancy",false,NULL,"",""),("f64540c9-7650-438c-aeb6-f64ac7a43a7f","2026-05-20 05:36:01.422","2026-05-20 05:36:01.422","87e4645d-9933-47d5-a519-e03eec355fd4","ORD004","TRK005","97963d44-ec8b-4b0a-91be-537656dfa1f4","","","39269090","塑料玩具","玩具",200,"1000","EUR","7200","7.2","0.13","936","792","144",false,"0","0","792","discrepancy",false,NULL,"","")
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:228
-[0m[33m[2.207ms] [34;1m[rows:14][0m INSERT INTO `discrepancies` (`id`,`created_at`,`updated_at`,`batch_id`,`reconciliation_item_id`,`order_no`,`discrepancy_type`,`field_name`,`expected_value`,`actual_value`,`difference`,`explanation`,`source`,`resolution`,`is_resolved`) VALUES ("93cc74a2-d1d5-4d6b-a15b-9124f9a9378b","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD001","currency","exchange_rate","0","7.2","-7.2","使用默认汇率 7.2000，未找到USD对CNY的汇率数据","system_default","",false),("df9c9bab-6759-47b0-8bc0-51bf47bf638a","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD001","return","return_adjusted_tax","0","150","-150","海关退单调整：TAX_ADJUST - 税率申报有误，实际税率为15%","customs_return","",false),("32a15942-3e97-4458-be54-b5acd4b875cc","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD001","amount","tax_difference","9360","3240","6120","税款差异：预期9360.00，申报3240.00，差异6120.00","tax_calculation","",false),("90db0384-638f-4398-921a-fe4c6dba511d","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD001","currency","exchange_rate","0","7.2","-7.2","使用默认汇率 7.2000，未找到USD对CNY的汇率数据","system_default","",false),("58ac8586-d2d6-4689-8181-0c5ac5625f22","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD001","return","return_adjusted_tax","0","150","-150","海关退单调整：TAX_ADJUST - 税率申报有误，实际税率为15%","customs_return","",false),("a9cbc82d-aaaf-4d94-87f0-0310b84dc474","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD001","duplicate","duplicate_order","0","4680","-4680","订单 ORD001 重复申报，需补缴税款","duplicate_declaration","",false),("1c828036-de7c-401b-801c-c37a73844e32","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD001","amount","tax_difference","4680","1620","3060","税款差异：预期4680.00，申报1620.00，差异3060.00","tax_calculation","",false),("bdd9f2ef-9e61-4f8e-ae88-1e43641ccc2a","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD002","currency","exchange_rate","0","7.2","-7.2","使用默认汇率 7.2000，未找到USD对CNY的汇率数据","system_default","",false),("e5abd1ed-cdef-44d6-8914-b2bef3296370","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD002","amount","tax_difference","3312","1296","2016","税款差异：预期3312.00，申报1296.00，差异2016.00","tax_calculation","",false),("e780be5f-de4d-47c9-a826-606ff932b38b","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD003","currency","exchange_rate","0","7.2","-7.2","使用默认汇率 7.2000，未找到USD对CNY的汇率数据","system_default","",false),("8ed28fbb-a60c-41b8-8840-1e445507c3b4","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD003","amount","tax_difference","2808","972","1836","税款差异：预期2808.00，申报972.00，差异1836.00","tax_calculation","",false),("260b7c68-71eb-42fe-8b54-cb9690f55804","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD004","currency","exchange_rate","0","7.2","-7.2","使用默认汇率 7.2000，未找到EUR对CNY的汇率数据","system_default","",false),("f765d1ed-a1e9-432e-b44e-65e5a95582dc","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD004","hs_code","tax_rate","0","0.13","-0.13","HS编码 39269090 未找到对应税则，使用默认税率13%","hs_code_not_found","",false),("50ab91b3-4c83-45b4-a082-2fba9220bce7","2026-05-20 05:36:01.425","2026-05-20 05:36:01.425","87e4645d-9933-47d5-a519-e03eec355fd4","","ORD004","amount","tax_difference","936","792","144","税款差异：预期936.00，申报792.00，差异144.00","tax_calculation","",false)
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:199
-[0m[33m[0.516ms] [34;1m[rows:1][0m SELECT 
-			COUNT(CASE WHEN status = 'matched' THEN 1 END) as matched_count,
-			COUNT(CASE WHEN status = 'discrepancy' THEN 1 END) as discrepancy_count,
-			COUNT(CASE WHEN is_reviewed = 1 THEN 1 END) as reviewed_count,
-			COALESCE(SUM(expected_tax_amount), 0) as total_expected,
-			COALESCE(SUM(declared_tax_amount), 0) as total_declared,
-			COALESCE(SUM(tax_difference), 0) as total_difference
-		 FROM `reconciliation_items` WHERE batch_id = "87e4645d-9933-47d5-a519-e03eec355fd4"
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:207
-[0m[33m[0.801ms] [34;1m[rows:1][0m UPDATE `reconciliation_batches` SET `discrepancy_count`=5,`matched_count`=0,`reviewed_count`=0,`total_tax_declared`="7920",`total_tax_difference`="13176",`total_tax_expected`="21096",`updated_at`="2026-05-20 05:36:01.428" WHERE id = "87e4645d-9933-47d5-a519-e03eec355fd4"
-
-2026/05/20 05:36:01 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:113
-[0m[33m[1.161ms] [34;1m[rows:1][0m UPDATE `reconciliation_batches` SET `created_at`="2026-05-20 05:35:40.079",`updated_at`="2026-05-20 05:36:01.429",`name`="2024年1月对账测试",`declaration_count`=5,`tariff_count`=0,`return_receipt_count`=0,`status`="processed",`matched_count`=0,`discrepancy_count`=0,`reviewed_count`=0,`total_tax_expected`="0",`total_tax_declared`="0",`total_tax_difference`="0",`processed_at`="2026-05-20 05:36:01.428",`completed_at`=NULL WHERE `id` = "87e4645d-9933-47d5-a519-e03eec355fd4"
-[GIN] 2026/05/20 - 05:36:01 | 200 |   10.526541ms |       127.0.0.1 | POST     "/api/batches/87e4645d-9933-47d5-a519-e03eec355fd4/process"
-
-2026/05/20 05:36:08 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:239
-[0m[33m[0.291ms] [34;1m[rows:14][0m SELECT * FROM `discrepancies` WHERE batch_id = "87e4645d-9933-47d5-a519-e03eec355fd4"
-[GIN] 2026/05/20 - 05:36:08 | 200 |     628.459µs |       127.0.0.1 | GET      "/api/batches/87e4645d-9933-47d5-a519-e03eec355fd4/discrepancies"
-
-2026/05/20 05:36:16 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:156
-[0m[33m[2.242ms] [34;1m[rows:5][0m SELECT * FROM `reconciliation_items` WHERE batch_id = "87e4645d-9933-47d5-a519-e03eec355fd4"
-
-2026/05/20 05:36:16 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:118
-[0m[33m[0.276ms] [34;1m[rows:1][0m SELECT * FROM `reconciliation_batches` WHERE id = "87e4645d-9933-47d5-a519-e03eec355fd4" ORDER BY `reconciliation_batches`.`id` LIMIT 1
-
-2026/05/20 05:36:16 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:239
-[0m[33m[0.381ms] [34;1m[rows:14][0m SELECT * FROM `discrepancies` WHERE batch_id = "87e4645d-9933-47d5-a519-e03eec355fd4"
-
-2026/05/20 05:36:16 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:291
-[0m[33m[1.846ms] [34;1m[rows:1][0m INSERT INTO `reports` (`id`,`created_at`,`updated_at`,`batch_id`,`report_type`,`report_name`,`generated_by`,`generated_at`,`file_format`,`file_size`,`file_path`) VALUES ("aa0291d4-118b-4ffb-8e7b-afe9cf5151c3","2026-05-20 05:36:16.797","2026-05-20 05:36:16.797","87e4645d-9933-47d5-a519-e03eec355fd4","full","2024年1月对账测试_full_20260520_053616","测试用户","2026-05-20 05:36:16.797","csv",0,"reports/2024年1月对账测试_full_20260520_053616.csv")
-[GIN] 2026/05/20 - 05:36:16 | 200 |       7.155ms |       127.0.0.1 | POST     "/api/reports"
-
-2026/05/20 05:36:16 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:156
-[0m[33m[0.175ms] [34;1m[rows:5][0m SELECT * FROM `reconciliation_items` WHERE batch_id = "87e4645d-9933-47d5-a519-e03eec355fd4"
-[GIN] 2026/05/20 - 05:36:16 | 200 |     303.208µs |       127.0.0.1 | GET      "/api/batches/87e4645d-9933-47d5-a519-e03eec355fd4/summary/category"
-
-2026/05/20 05:36:24 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:156
-[0m[33m[0.409ms] [34;1m[rows:5][0m SELECT * FROM `reconciliation_items` WHERE batch_id = "87e4645d-9933-47d5-a519-e03eec355fd4"
-[GIN] 2026/05/20 - 05:36:24 | 200 |      923.75µs |       127.0.0.1 | GET      "/api/batches/87e4645d-9933-47d5-a519-e03eec355fd4/items"
+2026/05/20 16:39:25 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:109
+[0m[33m[5.974ms] [34;1m[rows:1][0m INSERT INTO `reconciliation_batches` (`id`,`created_at`,`updated_at`,`name`,`declaration_count`,`tariff_count`,`return_receipt_count`,`status`,`matched_count`,`discrepancy_count`,`reviewed_count`,`total_tax_expected`,`total_tax_declared`,`total_tax_difference`,`processed_at`,`completed_at`) VALUES ("6df3ba1e-4ba2-4a40-b5e6-1c2bccb31a9b","2026-05-20 16:39:25.335","2026-05-20 16:39:25.335","Test",0,0,0,"pending",0,0,0,"0","0","0",NULL,NULL)
+[GIN] 2026/05/20 - 16:39:25 | 201 |    6.242583ms |       127.0.0.1 | POST     "/api/batches"

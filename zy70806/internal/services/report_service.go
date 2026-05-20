@@ -232,16 +232,11 @@ func (s *ReportService) GetBatchReports(batchID string) ([]*models.Report, error
 }
 
 func (s *ReportService) GetReportFilePath(reportID string) (string, error) {
-	reports, err := s.reportRepo.GetByBatchID("")
+	report, err := s.reportRepo.GetByID(reportID)
 	if err != nil {
 		return "", err
 	}
-	for _, r := range reports {
-		if r.ID == reportID {
-			return r.FilePath, nil
-		}
-	}
-	return "", fmt.Errorf("report not found")
+	return report.FilePath, nil
 }
 
 func formatTime(t *time.Time) string {

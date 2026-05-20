@@ -240,6 +240,16 @@ func (r *DiscrepancyRepository) GetByBatchID(batchID string) ([]*models.Discrepa
 	return discrepancies, err
 }
 
+func (r *DiscrepancyRepository) BatchResolveByItemID(itemID string) error {
+	return config.DB.Model(&models.Discrepancy{}).
+		Where("reconciliation_item_id = ?", itemID).
+		Update("is_resolved", true).Error
+}
+
+func (r *DiscrepancyRepository) Update(discrepancy *models.Discrepancy) error {
+	return config.DB.Save(discrepancy).Error
+}
+
 type ReviewRecordRepository struct{}
 
 func NewReviewRecordRepository() *ReviewRecordRepository {
@@ -295,4 +305,13 @@ func (r *ReportRepository) GetByBatchID(batchID string) ([]*models.Report, error
 	var reports []*models.Report
 	err := config.DB.Where("batch_id = ?", batchID).Order("created_at DESC").Find(&reports).Error
 	return reports, err
+}
+
+func (r *ReportRepository) GetByID(id string) (*models.Report, error) {
+	var report models.Report
+	err := config.DB.First(&report, "id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &report, nil
 }

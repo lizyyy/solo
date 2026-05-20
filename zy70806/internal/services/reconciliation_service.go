@@ -67,8 +67,12 @@ func (s *ReconciliationService) ProcessBatch(batchID string) (*ReconciliationRes
 		orderMap[d.OrderNo] = append(orderMap[d.OrderNo], d)
 	}
 
-	var allItems []*models.ReconciliationItem
-	var allDiscrepancies []*models.Discrepancy
+	type itemWithDiscrepancies struct {
+		item         *models.ReconciliationItem
+		discrepancies []*models.Discrepancy
+	}
+
+	var allItemPairs []itemWithDiscrepancies
 
 	for orderNo, orderDeclarations := range orderMap {
 		returnReceipt, _ := s.returnReceiptRepo.GetByOrderNo(orderNo)
@@ -86,8 +90,7 @@ func (s *ReconciliationService) ProcessBatch(batchID string) (*ReconciliationRes
 				continue
 			}
 
-			allItems = append(allItems, item)
-			allDiscrepancies = append(allDiscrepancies, discrepancies...)
+			allItemPairs = append(allItemPairs, itemWithDiscrepancies{item, discrepancies})
 
 			if item.Status == models.ItemStatusMatched {
 				result.MatchedItems++
@@ -105,9 +108,22 @@ func (s *ReconciliationService) ProcessBatch(batchID string) (*ReconciliationRes
 		}
 	}
 
+	var allItems []*models.ReconciliationItem
+	for _, pair := range allItemPairs {
+		allItems = append(allItems, pair.item)
+	}
+
 	if len(allItems) > 0 {
 		if err := s.itemRepo.BatchCreate(allItems); err != nil {
 			return nil, err
+		}
+	}
+
+	var allDiscrepancies []*models.Discrepancy
+	for _, pair := range allItemPairs {
+		for _, d := range pair.discrepancies {
+			d.ReconciliationItemID = pair.item.ID
+			allDiscrepancies = append(allDiscrepancies, d)
 		}
 	}
 
@@ -117,15 +133,15 @@ func (s *ReconciliationService) ProcessBatch(batchID string) (*ReconciliationRes
 		}
 	}
 
-	if err := s.itemRepo.UpdateBatchSummary(batchID); err != nil {
-		return nil, err
-	}
-
 	now := time.Now()
 	batch.Status = models.BatchStatusProcessed
 	batch.ProcessedAt = &now
 	batch.DeclarationCount = result.TotalItems
 	if err := s.batchRepo.Update(batch); err != nil {
+		return nil, err
+	}
+
+	if err := s.itemRepo.UpdateBatchSummary(batchID); err != nil {
 		return nil, err
 	}
 

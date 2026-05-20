@@ -91,11 +91,8 @@ func (s *ReviewService) ReviewItem(req *ReviewRequest) (*ReviewResult, error) {
 	}
 
 	if req.ResolveDiscrepancies {
-		discrepancies, err := s.discrepancyRepo.GetByItemID(req.ItemID)
-		if err == nil {
-			for _, d := range discrepancies {
-				d.IsResolved = true
-			}
+		if err := s.discrepancyRepo.BatchResolveByItemID(req.ItemID); err != nil {
+			return nil, err
 		}
 	}
 
