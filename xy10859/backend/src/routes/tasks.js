@@ -284,8 +284,8 @@ function simulateExport(taskId) {
   const success = Math.random() > 0.2;
   
   if (success) {
-    db.run(`UPDATE export_tasks SET status = 'completed', file_path = '/exports/' || taskId || '.csv', updated_at = CURRENT_TIMESTAMP WHERE task_id = ?`,
-      [taskId]);
+    db.run(`UPDATE export_tasks SET status = 'completed', file_path = ?, updated_at = CURRENT_TIMESTAMP WHERE task_id = ?`,
+      ['/exports/' + taskId + '.csv', taskId]);
   } else {
     const errors = ['数据源连接超时', '脱敏规则执行异常', '文件写入失败', '内存不足'];
     const errorMsg = errors[Math.floor(Math.random() * errors.length)];
