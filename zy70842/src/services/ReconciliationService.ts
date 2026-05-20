@@ -11,7 +11,9 @@ import {
   ReviewResult,
   ReviewAction,
   ReconciliationSummary,
-  DeductionItem
+  DeductionItem,
+  DepositDeductionRecord,
+  DepositDeductionType
 } from '../models/types';
 import { dataStore } from '../models/store';
 
@@ -67,6 +69,7 @@ class ReconciliationService {
     discrepancies.push(...this.checkTimeConflict(record));
     discrepancies.push(...this.checkMissingDocuments(record));
     discrepancies.push(...this.checkFeeMismatch(record));
+    discrepancies.push(...this.checkDepositDeduction(record));
 
     for (const disc of discrepancies) {
       record.discrepancies.push(disc);
@@ -272,6 +275,98 @@ class ReconciliationService {
     return typeMap[type] || type;
   }
 
+  private checkDepositDeduction(record: ReconciliationRecord): Discrepancy[] {
+    const discrepancies: Discrepancy[] = [];
+    const depositDeductions = dataStore.getDepositDeductionsByApplicationId(record.applicationId);
+
+    if (depositDeductions.length === 0) {
+      return discrepancies;
+    }
+
+    const totalDeductionAmount = depositDeductions.reduce((sum, d) => sum + d.amount, 0);
+    const verifiedDeductions = depositDeductions.filter(d => d.isVerified);
+    const unverifiedDeductions = depositDeductions.filter(d => !d.isVerified);
+
+    if (totalDeductionAmount > 0) {
+      discrepancies.push({
+        id: uuidv4(),
+        reconciliationId: record.id,
+        type: DiscrepancyType.DEPOSIT_DEDUCTION,
+        description: `存在${depositDeductions.length}项押金扣减记录，合计¥${totalDeductionAmount}`,
+        sourceField: 'deposit.deductions',
+        expectedValue: `押金全额退还: ¥${record.depositAmount}`,
+        actualValue: `扣减后实际退还: ¥${Math.max(0, record.depositAmount - totalDeductionAmount)}`,
+        severity: totalDeductionAmount > record.depositAmount * 0.5 ? 'HIGH' : 'MEDIUM',
+        status: DiscrepancyStatus.PENDING,
+        requiresManualReview: true,
+        explanation: this.generateDepositDeductionExplanation(depositDeductions, totalDeductionAmount, record.depositAmount),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
+      for (const deduction of depositDeductions) {
+        const deductionItem: DeductionItem = {
+          id: uuidv4(),
+          type: `押金扣减-${this.getDepositDeductionTypeName(deduction.deductionType)}`,
+          amount: deduction.amount,
+          reason: deduction.description,
+          createdAt: new Date().toISOString()
+        };
+        record.deductions.push(deductionItem);
+      }
+    }
+
+    if (unverifiedDeductions.length > 0) {
+      discrepancies.push({
+        id: uuidv4(),
+        reconciliationId: record.id,
+        type: DiscrepancyType.DEPOSIT_DEDUCTION,
+        description: `${unverifiedDeductions.length}项押金扣减记录待核实`,
+        sourceField: 'deposit.deductions.unverified',
+        expectedValue: '所有扣减记录需核实确认',
+        actualValue: `${unverifiedDeductions.length}项未核实`,
+        severity: 'MEDIUM',
+        status: DiscrepancyStatus.PENDING,
+        requiresManualReview: true,
+        explanation: `以下${unverifiedDeductions.length}项扣减记录需要人工核实确认：${unverifiedDeductions.map(d => d.description).join('；')}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+
+    return discrepancies;
+  }
+
+  private generateDepositDeductionExplanation(
+    deductions: DepositDeductionRecord[],
+    totalAmount: number,
+    depositAmount: number
+  ): string {
+    const explanation: string[] = [];
+    explanation.push(`商户押金¥${depositAmount}，共有${deductions.length}项扣减记录，合计扣减¥${totalAmount}。`);
+    
+    for (const deduction of deductions) {
+      const status = deduction.isVerified ? '已核实' : '待核实';
+      explanation.push(`- ${this.getDepositDeductionTypeName(deduction.deductionType)}：¥${deduction.amount}（${status}）-${deduction.description}`);
+    }
+
+    const remaining = Math.max(0, depositAmount - totalAmount);
+    explanation.push(`扣减后实际应退押金：¥${remaining}。请招商运营确认扣减项目的合理性和准确性。`);
+
+    return explanation.join(' ');
+  }
+
+  private getDepositDeductionTypeName(type: DepositDeductionType): string {
+    const typeMap: Record<DepositDeductionType, string> = {
+      [DepositDeductionType.FACILITY_DAMAGE]: '设施损坏赔偿',
+      [DepositDeductionType.CLEANING_FEE]: '清洁费用',
+      [DepositDeductionType.OVERTIME_PENALTY]: '超时罚款',
+      [DepositDeductionType.VIOLATION_FINE]: '违规罚款',
+      [DepositDeductionType.OTHER]: '其他'
+    };
+    return typeMap[type] || type;
+  }
+
   async reviewDiscrepancy(
     reconciliationId: string,
     discrepancyId: string,
@@ -357,9 +452,19 @@ class ReconciliationService {
   }
 
   private recalculateAmount(record: ReconciliationRecord): void {
-    const totalDeductions = record.deductions.reduce((sum, d) => sum + d.amount, 0);
-    record.actualBoothFee = Math.max(0, record.boothFee - totalDeductions);
-    record.actualDepositAmount = record.depositAmount;
+    let boothFeeDeductions = 0;
+    let depositDeductions = 0;
+
+    for (const deduction of record.deductions) {
+      if (deduction.type.startsWith('押金扣减-')) {
+        depositDeductions += deduction.amount;
+      } else {
+        boothFeeDeductions += deduction.amount;
+      }
+    }
+
+    record.actualBoothFee = Math.max(0, record.boothFee - boothFeeDeductions);
+    record.actualDepositAmount = Math.max(0, record.depositAmount - depositDeductions);
     record.totalAmount = record.actualBoothFee + record.actualDepositAmount;
   }
 

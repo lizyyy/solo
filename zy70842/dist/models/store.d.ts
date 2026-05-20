@@ -1,0 +1,32 @@
+import { BoothApplication, LicenseAttachment, VenueCalendar, ReconciliationRecord, DepositDeductionRecord } from './types';
+declare class DataStore {
+    private boothApplications;
+    private licenseAttachments;
+    private venueCalendars;
+    private reconciliationRecords;
+    private depositDeductions;
+    constructor();
+    private initializeSampleData;
+    addBoothApplication(app: BoothApplication): void;
+    getBoothApplication(id: string): BoothApplication | undefined;
+    getAllBoothApplications(): BoothApplication[];
+    getBoothApplicationsByNo(applicationNo: string): BoothApplication | undefined;
+    addLicenseAttachment(license: LicenseAttachment): void;
+    getLicenseAttachmentsByApplicationId(applicationId: string): LicenseAttachment[];
+    getAllLicenseAttachments(): LicenseAttachment[];
+    addVenueCalendar(calendar: VenueCalendar): void;
+    getVenueCalendarByLocationAndDate(location: string, date: string): VenueCalendar | undefined;
+    getVenueCalendarByDateRange(location: string, startDate: string, endDate: string): VenueCalendar[];
+    getAllVenueCalendars(): VenueCalendar[];
+    addReconciliationRecord(record: ReconciliationRecord): void;
+    getReconciliationRecord(id: string): ReconciliationRecord | undefined;
+    getReconciliationByApplicationId(applicationId: string): ReconciliationRecord | undefined;
+    getAllReconciliationRecords(): ReconciliationRecord[];
+    updateReconciliationRecord(id: string, updates: Partial<ReconciliationRecord>): ReconciliationRecord | undefined;
+    addDepositDeduction(deduction: DepositDeductionRecord): void;
+    getDepositDeductionsByApplicationId(applicationId: string): DepositDeductionRecord[];
+    getAllDepositDeductions(): DepositDeductionRecord[];
+    clearAll(): void;
+}
+export declare const dataStore: DataStore;
+export {};

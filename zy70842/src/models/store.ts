@@ -6,7 +6,9 @@ import {
   ReconciliationRecord,
   Discrepancy,
   ReviewAction,
-  DeductionItem
+  DeductionItem,
+  DepositDeductionRecord,
+  DepositDeductionType
 } from './types';
 
 class DataStore {
@@ -14,6 +16,7 @@ class DataStore {
   private licenseAttachments: Map<string, LicenseAttachment> = new Map();
   private venueCalendars: Map<string, VenueCalendar> = new Map();
   private reconciliationRecords: Map<string, ReconciliationRecord> = new Map();
+  private depositDeductions: Map<string, DepositDeductionRecord> = new Map();
 
   constructor() {
     this.initializeSampleData();
@@ -146,6 +149,47 @@ class DataStore {
       };
       this.venueCalendars.set(cal3.id, cal3);
     });
+
+    const depositDeduction1: DepositDeductionRecord = {
+      id: uuidv4(),
+      applicationId: sampleApp1.id,
+      deductionType: DepositDeductionType.FACILITY_DAMAGE,
+      amount: 300,
+      description: '摊位桌面有划痕，需要修复',
+      reportedBy: '现场管理员-王芳',
+      reportedAt: '2026-06-08T09:30:00Z',
+      isVerified: true,
+      evidence: '照片_20260608_桌面划痕.jpg',
+      notes: '经与商户确认，同意从押金中扣除修复费'
+    };
+
+    const depositDeduction2: DepositDeductionRecord = {
+      id: uuidv4(),
+      applicationId: sampleApp1.id,
+      deductionType: DepositDeductionType.CLEANING_FEE,
+      amount: 150,
+      description: '摊位遗留大量油污，需深度清洁',
+      reportedBy: '保洁主管-李明',
+      reportedAt: '2026-06-08T14:00:00Z',
+      isVerified: true,
+      notes: '清洁费用从押金中扣除'
+    };
+
+    const depositDeduction3: DepositDeductionRecord = {
+      id: uuidv4(),
+      applicationId: sampleApp2.id,
+      deductionType: DepositDeductionType.OVERTIME_PENALTY,
+      amount: 200,
+      description: '活动结束后超时1小时未撤场',
+      reportedBy: '现场管理员-王芳',
+      reportedAt: '2026-06-04T18:30:00Z',
+      isVerified: false,
+      notes: '商户称有特殊情况，待核实'
+    };
+
+    this.depositDeductions.set(depositDeduction1.id, depositDeduction1);
+    this.depositDeductions.set(depositDeduction2.id, depositDeduction2);
+    this.depositDeductions.set(depositDeduction3.id, depositDeduction3);
   }
 
   addBoothApplication(app: BoothApplication): void {
@@ -220,11 +264,24 @@ class DataStore {
     return undefined;
   }
 
+  addDepositDeduction(deduction: DepositDeductionRecord): void {
+    this.depositDeductions.set(deduction.id, deduction);
+  }
+
+  getDepositDeductionsByApplicationId(applicationId: string): DepositDeductionRecord[] {
+    return Array.from(this.depositDeductions.values()).filter(d => d.applicationId === applicationId);
+  }
+
+  getAllDepositDeductions(): DepositDeductionRecord[] {
+    return Array.from(this.depositDeductions.values());
+  }
+
   clearAll(): void {
     this.boothApplications.clear();
     this.licenseAttachments.clear();
     this.venueCalendars.clear();
     this.reconciliationRecords.clear();
+    this.depositDeductions.clear();
   }
 }
 

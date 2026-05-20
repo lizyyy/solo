@@ -14,6 +14,14 @@ export enum DiscrepancyType {
   MANUAL_REVIEW = 'MANUAL_REVIEW'
 }
 
+export enum DepositDeductionType {
+  FACILITY_DAMAGE = 'FACILITY_DAMAGE',
+  CLEANING_FEE = 'CLEANING_FEE',
+  OVERTIME_PENALTY = 'OVERTIME_PENALTY',
+  VIOLATION_FINE = 'VIOLATION_FINE',
+  OTHER = 'OTHER'
+}
+
 export enum DiscrepancyStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
@@ -145,6 +153,19 @@ export interface ReconciliationSummary {
     feeMismatch: number;
     manualReview: number;
   };
+}
+
+export interface DepositDeductionRecord {
+  id: string;
+  applicationId: string;
+  deductionType: DepositDeductionType;
+  amount: number;
+  description: string;
+  reportedBy: string;
+  reportedAt: string;
+  isVerified: boolean;
+  evidence?: string;
+  notes?: string;
 }
 
 export interface ImportResult {

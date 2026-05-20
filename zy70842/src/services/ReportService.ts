@@ -112,23 +112,42 @@ class ReportService {
     doc.fontSize(14).text('二、费用明细', { underline: true });
     doc.moveDown();
     doc.fontSize(12);
-    doc.text(`申请摊位费: ¥${record.boothFee.toFixed(2)}`);
-    doc.text(`申请押金金额: ¥${record.depositAmount.toFixed(2)}`);
     
-    if (record.deductions.length > 0) {
-      doc.moveDown();
-      doc.text('费用扣减明细:');
-      for (const deduction of record.deductions) {
+    const boothFeeDeductions = record.deductions.filter(d => !d.type.startsWith('押金扣减-'));
+    const depositDeductions = record.deductions.filter(d => d.type.startsWith('押金扣减-'));
+    
+    doc.text(`申请摊位费: ¥${record.boothFee.toFixed(2)}`);
+    if (boothFeeDeductions.length > 0) {
+      doc.text('摊位费扣减明细:');
+      for (const deduction of boothFeeDeductions) {
         doc.text(`  - ${deduction.type}: ¥${deduction.amount.toFixed(2)}`);
         doc.text(`    原因: ${deduction.reason}`);
       }
     }
-    
-    const totalDeductions = record.deductions.reduce((sum, d) => sum + d.amount, 0);
-    doc.moveDown();
+    const totalBoothFeeDeductions = boothFeeDeductions.reduce((sum, d) => sum + d.amount, 0);
+    if (totalBoothFeeDeductions > 0) {
+      doc.text(`摊位费扣减合计: ¥${totalBoothFeeDeductions.toFixed(2)}`);
+    }
     doc.text(`实际摊位费: ¥${record.actualBoothFee.toFixed(2)}`);
-    doc.text(`实际押金金额: ¥${record.actualDepositAmount.toFixed(2)}`);
-    doc.text(`费用扣减合计: ¥${totalDeductions.toFixed(2)}`);
+    
+    doc.moveDown();
+    doc.text(`申请押金金额: ¥${record.depositAmount.toFixed(2)}`);
+    if (depositDeductions.length > 0) {
+      doc.text('押金扣减明细:');
+      for (const deduction of depositDeductions) {
+        doc.text(`  - ${deduction.type}: ¥${deduction.amount.toFixed(2)}`);
+        doc.text(`    原因: ${deduction.reason}`);
+      }
+    }
+    const totalDepositDeductions = depositDeductions.reduce((sum, d) => sum + d.amount, 0);
+    if (totalDepositDeductions > 0) {
+      doc.text(`押金扣减合计: ¥${totalDepositDeductions.toFixed(2)}`);
+    }
+    doc.text(`实际应退押金: ¥${record.actualDepositAmount.toFixed(2)}`);
+    
+    doc.moveDown();
+    const totalDeductions = record.deductions.reduce((sum, d) => sum + d.amount, 0);
+    doc.text(`费用扣减总计: ¥${totalDeductions.toFixed(2)}`);
     doc.fontSize(14).text(`应缴总金额: ¥${record.totalAmount.toFixed(2)}`);
     doc.moveDown();
 
