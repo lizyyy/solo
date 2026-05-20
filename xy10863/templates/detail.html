@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恢复申请详情 - 备份恢复申请台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-badge { padding: 0.35em 0.65em; font-size: 0.75em; }
+        .status-warning { background-color: #ffc107; color: #000; }
+        .status-info { background-color: #0dcaf0; color: #000; }
+        .status-danger { background-color: #dc3545; color: #fff; }
+        .status-primary { background-color: #0d6efd; color: #fff; }
+        .status-success { background-color: #198754; color: #fff; }
+        .status-secondary { background-color: #6c757d; color: #fff; }
+        .timeline { border-left: 3px solid #dee2e6; margin-left: 15px; padding-left: 20px; }
+        .timeline-item { position: relative; margin-bottom: 20px; }
+        .timeline-item::before { content: ''; position: absolute; left: -28px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: #0d6efd; border: 3px solid #fff; box-shadow: 0 0 0 2px #dee2e6; }
+        .step-completed::before { background: #198754; }
+        .step-failed::before { background: #dc3545; }
+        .step-pending::before { background: #6c757d; }
+        .nav-tabs .nav-link.active { font-weight: 600; }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a href="/" class="navbar-brand mb-0 h1">← 🔄 备份恢复申请台</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div id="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">加载中...</span>
+            </div>
+            <p class="mt-2">加载中...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" id="recordTitle">申请详情</h5>
+                    <div>
+                        <span id="statusBadge" class="status-badge rounded-pill me-2">状态</span>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportRecord()">导出</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>申请ID:</strong> <span id="recordId"></span></div>
+                        <div class="col-md-3"><strong>申请人:</strong> <span id="applicant"></span></div>
+                        <div class="col-md-3"><strong>创建时间:</strong> <span id="createdAt"></span></div>
+                        <div class="col-md-3"><strong>完成时间:</strong> <span id="completedAt">-</span></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>备份点:</strong> <span id="backupPoint"></span></div>
+                        <div class="col-md-4"><strong>源环境:</strong> <span id="sourceEnv"></span></div>
+                        <div class="col-md-4"><strong>目标环境:</strong> <span id="targetEnv"></span></div>
+                    </div>
+                    <div class="mb-3">
+                        <strong>描述:</strong>
+                        <p id="description" class="mb-0 mt-1">-</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>恢复原因:</strong>
+                        <p id="reason" class="mb-0 mt-1">-</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>恢复范围:</strong>
+                        <pre id="restoreScope" class="mb-0 mt-1 bg-light p-2 rounded small"></pre>
+                    </div>
+                </div>
+                <div class="card-footer" id="actionsBar">
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs mb-4" id="detailTabs">
+                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#steps">执行步骤</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#approvals">审批意见</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#verifications">验证结果</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#changelog">变更日志</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="steps">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="stepsTimeline" class="timeline"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="approvals">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="approvalsList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="verifications">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="verificationsList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="changelog">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="changelogList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="approveModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">审批操作</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">审批人</label>
+                        <input type="text" class="form-control" id="approver" value="admin">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">审批意见</label>
+                        <textarea class="form-control" id="approveComment" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" onclick="submitApproval(false)">拒绝</button>
+                    <button type="button" class="btn btn-success" onclick="submitApproval(true)">批准</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="operatorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="operatorModalTitle">操作确认</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">操作人</label>
+                        <input type="text" class="form-control" id="operator" value="admin">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-control" id="operatorComment" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="operatorSubmit">确认执行</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const recordId = window.location.pathname.split('/').pop();
+        let currentRecord = null;
+        let pendingAction = null;
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'pending_approval': 'status-warning',
+                'approved': 'status-info',
+                'rejected': 'status-danger',
+                'drill_started': 'status-primary',
+                'drill_completed': 'status-success',
+                'drill_failed': 'status-danger',
+                'execution_started': 'status-primary',
+                'execution_in_progress': 'status-primary',
+                'execution_failed': 'status-danger',
+                'verification_pending': 'status-warning',
+                'verification_in_progress': 'status-primary',
+                'verification_failed': 'status-danger',
+                'completed': 'status-success',
+                'rollback_pending': 'status-warning',
+                'rollback_in_progress': 'status-primary',
+                'rolled_back': 'status-info',
+                'cancelled': 'status-secondary'
+            };
+            return statusMap[status] || 'status-secondary';
+        }
+
+        function getStatusLabel(status) {
+            const labelMap = {
+                'pending_approval': '待审批',
+                'approved': '已批准',
+                'rejected': '已拒绝',
+                'drill_started': '演练中',
+                'drill_completed': '演练完成',
+                'drill_failed': '演练失败',
+                'execution_started': '执行开始',
+                'execution_in_progress': '执行中',
+                'execution_failed': '执行失败',
+                'verification_pending': '待验证',
+                'verification_in_progress': '验证中',
+                'verification_failed': '验证失败',
+                'completed': '已完成',
+                'rollback_pending': '待回滚',
+                'rollback_in_progress': '回滚中',
+                'rolled_back': '已回滚',
+                'cancelled': '已取消'
+            };
+            return labelMap[status] || status;
+        }
+
+        async function loadRecord() {
+            try {
+                const response = await fetch(`/api/v1/records/${recordId}`);
+                currentRecord = await response.json();
+                renderRecord(currentRecord);
+                
+                const actionsResponse = await fetch(`/api/v1/records/${recordId}/available-actions`);
+                const actionsData = await actionsResponse.json();
+                renderActions(actionsData.actions);
+            } catch (error) {
+                console.error('加载失败:', error);
+                document.getElementById('loading').innerHTML = '<p class="text-danger">加载失败，请刷新重试</p>';
+            }
+        }
+
+        function renderRecord(record) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+
+            document.getElementById('recordId').textContent = '#' + record.id;
+            document.getElementById('recordTitle').textContent = record.title;
+            document.getElementById('applicant').textContent = record.applicant;
+            document.getElementById('createdAt').textContent = new Date(record.created_at).toLocaleString();
+            document.getElementById('completedAt').textContent = record.completed_at ? new Date(record.completed_at).toLocaleString() : '-';
+            document.getElementById('backupPoint').textContent = record.backup_point_id;
+            document.getElementById('sourceEnv').textContent = record.source_environment;
+            document.getElementById('targetEnv').textContent = record.target_environment;
+            document.getElementById('description').textContent = record.description || '-';
+            document.getElementById('reason').textContent = record.reason;
+            document.getElementById('restoreScope').textContent = JSON.stringify(record.restore_scope, null, 2);
+
+            const badge = document.getElementById('statusBadge');
+            badge.textContent = getStatusLabel(record.status);
+            badge.className = `status-badge rounded-pill me-2 ${getStatusClass(record.status)}`;
+
+            renderSteps(record.execution_steps || [], record.status);
+            renderApprovals(record.approvals || []);
+            renderVerifications(record.verification_results || [], record.status);
+            renderChangelog(record.change_logs || []);
+        }
+
+        function renderSteps(steps, currentStatus) {
+            if (steps.length === 0) {
+                document.getElementById('stepsTimeline').innerHTML = '<p class="text-muted">暂无执行步骤</p>';
+                return;
+            }
+
+            let html = '';
+            const activeStatuses = ['drill_started', 'execution_in_progress', 'rollback_in_progress'];
+            const canCompleteSteps = activeStatuses.includes(currentStatus);
+            
+            for (const step of steps.sort((a, b) => a.step_number - b.step_number)) {
+                const statusClass = step.status === 'completed' ? 'step-completed' : 
+                                    step.status === 'failed' ? 'step-failed' : 'step-pending';
+                const statusBadge = step.status === 'completed' ? 'bg-success' : 
+                                    step.status === 'failed' ? 'bg-danger' : 'bg-secondary';
+                
+                html += `
+                    <div class="timeline-item ${statusClass}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">步骤 ${step.step_number}: ${step.step_name}</h6>
+                                <p class="mb-1 small text-muted">${step.description || '-'}</p>
+                                ${step.result ? `<p class="mb-1 small"><strong>执行结果:</strong> ${step.result}</p>` : ''}
+                                ${step.error_message ? `<p class="mb-1 small text-danger"><strong>错误信息:</strong> ${step.error_message}</p>` : ''}
+                            </div>
+                            <div class="text-end ms-3">
+                                <div class="mb-2">
+                                    <span class="badge ${statusBadge}">${step.status === 'completed' ? '已完成' : step.status === 'failed' ? '失败' : '待执行'}</span>
+                                </div>
+                                ${step.status === 'pending' && canCompleteSteps ? `
+                                    <button class="btn btn-sm btn-outline-success" onclick="completeStep(${step.id}, '${step.step_name}')">完成</button>
+                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="failStep(${step.id}, '${step.step_name}')">标记失败</button>
+                                ` : ''}
+                                ${step.completed_at ? `<p class="mb-0 mt-1 small text-muted">${new Date(step.completed_at).toLocaleString()}</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById('stepsTimeline').innerHTML = html;
+        }
+
+        function renderApprovals(approvals) {
+            if (approvals.length === 0) {
+                document.getElementById('approvalsList').innerHTML = '<p class="text-muted">暂无审批记录</p>';
+                return;
+            }
+
+            let html = '<div class="list-group">';
+            for (const approval of approvals) {
+                const badgeClass = approval.status === 'approved' ? 'bg-success' : 'bg-danger';
+                html += `
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">${approval.approver}</h6>
+                                <p class="mb-1 small">${approval.approval_type}</p>
+                                ${approval.comment ? `<p class="mb-0 small text-muted">"${approval.comment}"</p>` : ''}
+                            </div>
+                            <div class="text-end">
+                                <span class="badge ${badgeClass}">${approval.status === 'approved' ? '批准' : '拒绝'}</span>
+                                ${approval.approved_at ? `<p class="mb-0 mt-1 small text-muted">${new Date(approval.approved_at).toLocaleString()}</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            document.getElementById('approvalsList').innerHTML = html;
+        }
+
+        function renderVerifications(verifications, currentStatus) {
+            if (verifications.length === 0) {
+                document.getElementById('verificationsList').innerHTML = '<p class="text-muted">暂无验证记录</p>';
+                return;
+            }
+
+            const canVerify = ['verification_in_progress', 'verification_pending'].includes(currentStatus);
+
+            let html = '<div class="list-group">';
+            for (const v of verifications) {
+                const badgeClass = v.passed ? 'bg-success' : v.passed === false ? 'bg-danger' : 'bg-secondary';
+                html += `
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">${v.verification_type}</h6>
+                                <p class="mb-1 small">${v.description || '-'}</p>
+                                <p class="mb-0 small"><strong>预期:</strong> ${v.expected_value || '-'}</p>
+                                ${v.actual_value ? `<p class="mb-0 small"><strong>实际:</strong> ${v.actual_value}</p>` : ''}
+                                ${v.remarks ? `<p class="mb-0 small text-muted"><strong>备注:</strong> ${v.remarks}</p>` : ''}
+                            </div>
+                            <div class="text-end ms-3">
+                                <div class="mb-2">
+                                    <span class="badge ${badgeClass}">${v.passed ? '通过' : v.passed === false ? '不通过' : '待验证'}</span>
+                                </div>
+                                ${v.passed === undefined && canVerify ? `
+                                    <button class="btn btn-sm btn-outline-success" onclick="completeVerification(${v.id}, true)">通过</button>
+                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="completeVerification(${v.id}, false)">不通过</button>
+                                ` : ''}
+                                ${v.verified_by ? `<p class="mb-0 mt-1 small">${v.verified_by}</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            document.getElementById('verificationsList').innerHTML = html;
+        }
+
+        async function completeStep(stepId, stepName) {
+            const result = prompt(`请输入步骤 \"${stepName}\" 的执行结果:`, '步骤执行成功');
+            if (result === null) return;
+
+            try {
+                const response = await fetch(`/api/v1/records/${recordId}/steps/${stepId}/complete?result=${encodeURIComponent(result)}&operator=当前用户`, { method: 'POST' });
+                if (response.ok) {
+                    loadRecord();
+                    alert('步骤完成！');
+                } else {
+                    const error = await response.json();
+                    alert('操作失败: ' + (error.detail || '未知错误'));
+                }
+            } catch (error) {
+                alert('请求失败: ' + error.message);
+            }
+        }
+
+        async function failStep(stepId, stepName) {
+            const errorMsg = prompt(`请输入步骤 \"${stepName}\" 的错误信息:`, '执行失败');
+            if (errorMsg === null) return;
+
+            try {
+                const response = await fetch(`/api/v1/records/${recordId}/steps/${stepId}/complete?error_message=${encodeURIComponent(errorMsg)}&operator=当前用户`, { method: 'POST' });
+                if (response.ok) {
+                    loadRecord();
+                    alert('步骤已标记为失败！');
+                } else {
+                    const error = await response.json();
+                    alert('操作失败: ' + (error.detail || '未知错误'));
+                }
+            } catch (error) {
+                alert('请求失败: ' + error.message);
+            }
+        }
+
+        async function completeVerification(verificationId, passed) {
+            try {
+                const response = await fetch(`/api/v1/records/${recordId}/verifications/${verificationId}/complete`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        status: 'completed',
+                        passed: passed,
+                        actual_value: passed ? '验证通过' : '验证不通过',
+                        verified_by: '当前用户'
+                    })
+                });
+                if (response.ok) {
+                    loadRecord();
+                    alert('验证完成！');
+                } else {
+                    const error = await response.json();
+                    alert('操作失败: ' + (error.detail || '未知错误'));
+                }
+            } catch (error) {
+                alert('请求失败: ' + error.message);
+            }
+        }
+
+        function renderChangelog(logs) {
+            if (logs.length === 0) {
+                document.getElementById('changelogList').innerHTML = '<p class="text-muted">暂无变更记录</p>';
+                return;
+            }
+
+            let html = '<div class="timeline">';
+            for (const log of logs.sort((a, b) => new Date(b.changed_at) - new Date(a.changed_at))) {
+                html += `
+                    <div class="timeline-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">${log.action}</h6>
+                                ${log.previous_status ? `<p class="mb-1 small">${getStatusLabel(log.previous_status)} → ${getStatusLabel(log.new_status)}</p>` : ''}
+                                ${log.comment ? `<p class="mb-0 small text-muted">"${log.comment}"</p>` : ''}
+                            </div>
+                            <div class="text-end">
+                                <p class="mb-0 small"><strong>${log.changed_by}</strong></p>
+                                <p class="mb-0 small text-muted">${new Date(log.changed_at).toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            document.getElementById('changelogList').innerHTML = html;
+        }
+
+        function renderActions(actions) {
+            if (actions.length === 0) {
+                document.getElementById('actionsBar').innerHTML = '<span class="text-muted">当前状态无可执行操作</span>';
+                return;
+            }
+
+            let html = '';
+            for (const action of actions) {
+                const btnClass = action.style === 'success' ? 'btn-success' :
+                                 action.style === 'danger' ? 'btn-danger' :
+                                 action.style === 'warning' ? 'btn-warning' :
+                                 action.style === 'secondary' ? 'btn-secondary' : 'btn-primary';
+                html += `<button class="btn ${btnClass} btn-sm me-2" onclick="handleAction('${action.action}')">${action.label}</button>`;
+            }
+            document.getElementById('actionsBar').innerHTML = html;
+        }
+
+        function handleAction(action) {
+            pendingAction = action;
+            
+            if (action === 'approve' || action === 'reject') {
+                new bootstrap.Modal(document.getElementById('approveModal')).show();
+            } else {
+                const titles = {
+                    'start_drill': '开始演练',
+                    'complete_drill': '完成演练',
+                    'start_execution': '开始执行',
+                    'finish_execution': '完成所有执行步骤',
+                    'start_verification': '开始验证',
+                    'complete_verification': '完成所有验证',
+                    'start_rollback': '开始回滚',
+                    'complete_rollback': '完成回滚',
+                    'retry_execution': '重试执行',
+                    'cancel': '取消申请'
+                };
+                document.getElementById('operatorModalTitle').textContent = titles[action] || '操作确认';
+                document.getElementById('operatorSubmit').onclick = () => submitAction(action);
+                new bootstrap.Modal(document.getElementById('operatorModal')).show();
+            }
+        }
+
+        async function submitApproval(approved) {
+            const approver = document.getElementById('approver').value;
+            const comment = document.getElementById('approveComment').value;
+
+            try {
+                const response = await fetch(`/api/v1/records/${recordId}/approve`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({approved, approver, comment})
+                });
+
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('approveModal')).hide();
+                    loadRecord();
+                    alert('审批成功！');
+                } else {
+                    const error = await response.json();
+                    alert('操作失败: ' + (error.detail || '未知错误'));
+                }
+            } catch (error) {
+                alert('请求失败: ' + error.message);
+            }
+        }
+
+        async function submitAction(action) {
+            const operator = document.getElementById('operator').value;
+            const comment = document.getElementById('operatorComment').value;
+
+            const endpoints = {
+                'start_drill': 'start-drill',
+                'complete_drill': 'complete-drill',
+                'start_execution': 'start-execution',
+                'finish_execution': 'complete-all-steps',
+                'start_verification': 'start-verification',
+                'complete_verification': 'complete-all-verifications',
+                'start_rollback': 'start-rollback',
+                'complete_rollback': 'complete-rollback',
+                'retry_execution': 'retry-execution'
+            };
+
+            try {
+                const response = await fetch(`/api/v1/records/${recordId}/${endpoints[action]}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({operator, comment})
+                });
+
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('operatorModal')).hide();
+                    loadRecord();
+                    alert('操作成功！');
+                } else {
+                    const error = await response.json();
+                    alert('操作失败: ' + (error.detail || '未知错误'));
+                }
+            } catch (error) {
+                alert('请求失败: ' + error.message);
+            }
+        }
+
+        async function exportRecord() {
+            try {
+                const response = await fetch(`/api/v1/records/${recordId}/export`);
+                const data = await response.json();
+                const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `restore-record-${recordId}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('导出失败: ' + error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRecord();
+        });
+    </script>
+</body>
+</html>

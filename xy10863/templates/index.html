@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>备份恢复申请台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-badge { padding: 0.35em 0.65em; font-size: 0.75em; }
+        .status-warning { background-color: #ffc107; color: #000; }
+        .status-info { background-color: #0dcaf0; color: #000; }
+        .status-danger { background-color: #dc3545; color: #fff; }
+        .status-primary { background-color: #0d6efd; color: #fff; }
+        .status-success { background-color: #198754; color: #fff; }
+        .status-secondary { background-color: #6c757d; color: #fff; }
+        .card-hover:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateY(-2px); transition: all 0.3s; }
+        .stat-card { border-left: 4px solid; }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">🔄 备份恢复申请台</span>
+            <div>
+                <button class="btn btn-primary btn-sm" onclick="loadStatistics()">刷新统计</button>
+                <button class="btn btn-success btn-sm ms-2" onclick="showCreateModal()">新建申请</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div id="statistics" class="row mb-4"></div>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">恢复申请列表</h5>
+                <div class="d-flex gap-2">
+                    <select id="filterStatus" class="form-select form-select-sm" onchange="loadRecords()">
+                        <option value="">全部状态</option>
+                    </select>
+                    <input type="text" id="filterApplicant" class="form-control form-control-sm" placeholder="搜索申请人..." onkeyup="if(event.key==='Enter')loadRecords()">
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div id="recordsList" class="table-responsive"></div>
+                <nav id="pagination" class="mt-3 px-3"></nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新建恢复申请</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">申请标题 *</label>
+                                <input type="text" class="form-control" name="title" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">申请人 *</label>
+                                <input type="text" class="form-control" name="applicant" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">申请描述</label>
+                            <textarea class="form-control" name="description" rows="2"></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">备份点 *</label>
+                                <select class="form-select" name="backup_point_id" required onchange="updateBackupInfo()">
+                                    <option value="">请选择备份点</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">备份时间</label>
+                                <input type="text" class="form-control" id="backupTime" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">源环境 *</label>
+                                <input type="text" class="form-control" name="source_environment" required value="production">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">目标环境 *</label>
+                                <select class="form-select" name="target_environment" required>
+                                    <option value="staging">演练环境 (staging)</option>
+                                    <option value="production">生产环境 (production)</option>
+                                    <option value="testing">测试环境 (testing)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">恢复范围 (JSON格式) *</label>
+                            <textarea class="form-control font-monospace" name="restore_scope" rows="3" required>{"databases": ["main_db"], "tables": ["users", "orders"], "point_in_time": "latest"}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">恢复原因 *</label>
+                            <textarea class="form-control" name="reason" rows="3" required placeholder="请详细说明恢复原因..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="submitCreate()">提交申请</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentPage = 1;
+        let pageSize = 10;
+        let backupPoints = [];
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'pending_approval': 'status-warning',
+                'approved': 'status-info',
+                'rejected': 'status-danger',
+                'drill_started': 'status-primary',
+                'drill_completed': 'status-success',
+                'drill_failed': 'status-danger',
+                'execution_started': 'status-primary',
+                'execution_in_progress': 'status-primary',
+                'execution_failed': 'status-danger',
+                'verification_pending': 'status-warning',
+                'verification_in_progress': 'status-primary',
+                'verification_failed': 'status-danger',
+                'completed': 'status-success',
+                'rollback_pending': 'status-warning',
+                'rollback_in_progress': 'status-primary',
+                'rolled_back': 'status-info',
+                'cancelled': 'status-secondary'
+            };
+            return statusMap[status] || 'status-secondary';
+        }
+
+        function getStatusLabel(status) {
+            const labelMap = {
+                'pending_approval': '待审批',
+                'approved': '已批准',
+                'rejected': '已拒绝',
+                'drill_started': '演练中',
+                'drill_completed': '演练完成',
+                'drill_failed': '演练失败',
+                'execution_started': '执行开始',
+                'execution_in_progress': '执行中',
+                'execution_failed': '执行失败',
+                'verification_pending': '待验证',
+                'verification_in_progress': '验证中',
+                'verification_failed': '验证失败',
+                'completed': '已完成',
+                'rollback_pending': '待回滚',
+                'rollback_in_progress': '回滚中',
+                'rolled_back': '已回滚',
+                'cancelled': '已取消'
+            };
+            return labelMap[status] || status;
+        }
+
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/v1/statistics');
+                const data = await response.json();
+                const statusDisplay = data.status_display || {};
+                
+                let statsHtml = '';
+                statsHtml += `
+                    <div class="col-md-3">
+                        <div class="card stat-card border-primary card-hover">
+                            <div class="card-body">
+                                <h6 class="text-muted">总申请数</h6>
+                                <h3 class="mb-0">${data.total}</h3>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                const colors = ['border-warning', 'border-info', 'border-primary', 'border-success', 'border-danger'];
+                let colorIdx = 0;
+                
+                for (const [status, count] of Object.entries(data.by_status || {})) {
+                    const display = statusDisplay[status] || {label: status};
+                    statsHtml += `
+                        <div class="col-md-3">
+                            <div class="card stat-card ${colors[colorIdx % colors.length]} card-hover">
+                                <div class="card-body">
+                                    <h6 class="text-muted">${display.label}</h6>
+                                    <h3 class="mb-0">${count}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    colorIdx++;
+                }
+                
+                document.getElementById('statistics').innerHTML = statsHtml;
+            } catch (error) {
+                console.error('加载统计失败:', error);
+            }
+        }
+
+        async function loadRecords() {
+            const status = document.getElementById('filterStatus').value;
+            const applicant = document.getElementById('filterApplicant').value;
+            
+            let url = `/api/v1/records?page=${currentPage}&page_size=${pageSize}`;
+            if (status) url += `&status=${status}`;
+            if (applicant) url += `&applicant=${applicant}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.items.length === 0) {
+                    document.getElementById('recordsList').innerHTML = `
+                        <div class="text-center py-5 text-muted">
+                            <h5>暂无记录</h5>
+                            <p>点击右上角"新建申请"创建第一条恢复申请</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>标题</th>
+                                <th>申请人</th>
+                                <th>备份点</th>
+                                <th>目标环境</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                for (const record of data.items) {
+                    html += `
+                        <tr>
+                            <td><strong>#${record.id}</strong></td>
+                            <td>${record.title}</td>
+                            <td>${record.applicant}</td>
+                            <td><small class="text-muted">${record.backup_point_id.substring(0, 15)}...</small></td>
+                            <td><span class="badge bg-light text-dark">${record.target_environment}</span></td>
+                            <td><span class="status-badge rounded-pill ${getStatusClass(record.status)}">${getStatusLabel(record.status)}</span></td>
+                            <td><small>${new Date(record.created_at).toLocaleString()}</small></td>
+                            <td>
+                                <a href="/detail/${record.id}" class="btn btn-sm btn-outline-primary">查看详情</a>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                html += '</tbody></table>';
+                document.getElementById('recordsList').innerHTML = html;
+
+                const totalPages = Math.ceil(data.total / pageSize);
+                let paginationHtml = `<span class="text-muted small">共 ${data.total} 条记录</span>`;
+                if (totalPages > 1) {
+                    paginationHtml += '<ul class="pagination pagination-sm justify-content-end">';
+                    paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changePage(${currentPage - 1})">上一页</a></li>`;
+                    for (let i = 1; i <= totalPages; i++) {
+                        paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+                    }
+                    paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changePage(${currentPage + 1})">下一页</a></li>`;
+                    paginationHtml += '</ul>';
+                }
+                document.getElementById('pagination').innerHTML = paginationHtml;
+
+            } catch (error) {
+                console.error('加载记录失败:', error);
+            }
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            loadRecords();
+            return false;
+        }
+
+        async function loadBackupPoints() {
+            try {
+                const response = await fetch('/api/v1/backup-points');
+                backupPoints = await response.json();
+                
+                const select = document.querySelector('select[name="backup_point_id"]');
+                select.innerHTML = '<option value="">请选择备份点</option>';
+                for (const bp of backupPoints) {
+                    select.innerHTML += `<option value="${bp.backup_id}" data-time="${bp.backup_time}">${bp.backup_id} (${bp.environment})</option>`;
+                }
+            } catch (error) {
+                console.error('加载备份点失败:', error);
+            }
+        }
+
+        function updateBackupInfo() {
+            const select = document.querySelector('select[name="backup_point_id"]');
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption && selectedOption.dataset.time) {
+                document.getElementById('backupTime').value = new Date(selectedOption.dataset.time).toLocaleString();
+            }
+        }
+
+        function showCreateModal() {
+            const modal = new bootstrap.Modal(document.getElementById('createModal'));
+            modal.show();
+        }
+
+        async function submitCreate() {
+            const form = document.getElementById('createForm');
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => data[key] = value);
+            
+            try {
+                data.restore_scope = JSON.parse(data.restore_scope);
+            } catch (e) {
+                alert('恢复范围必须是有效的JSON格式');
+                return;
+            }
+
+            const backupPoint = backupPoints.find(bp => bp.backup_id === data.backup_point_id);
+            if (backupPoint) {
+                data.backup_point_time = backupPoint.backup_time;
+            }
+
+            try {
+                const response = await fetch('/api/v1/records', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('createModal')).hide();
+                    loadRecords();
+                    loadStatistics();
+                    alert('申请创建成功！');
+                } else {
+                    const error = await response.json();
+                    alert('创建失败: ' + (error.detail || '未知错误'));
+                }
+            } catch (error) {
+                alert('请求失败: ' + error.message);
+            }
+        }
+
+        async function initStatusFilter() {
+            const statuses = [
+                {value: 'pending_approval', label: '待审批'},
+                {value: 'approved', label: '已批准'},
+                {value: 'drill_started', label: '演练中'},
+                {value: 'execution_in_progress', label: '执行中'},
+                {value: 'verification_pending', label: '待验证'},
+                {value: 'completed', label: '已完成'},
+                {value: 'execution_failed', label: '执行失败'},
+                {value: 'rolled_back', label: '已回滚'},
+                {value: 'rejected', label: '已拒绝'},
+                {value: 'cancelled', label: '已取消'}
+            ];
+            
+            const select = document.getElementById('filterStatus');
+            for (const s of statuses) {
+                select.innerHTML += `<option value="${s.value}">${s.label}</option>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initStatusFilter();
+            loadStatistics();
+            loadRecords();
+            loadBackupPoints();
+        });
+    </script>
+</body>
+</html>
