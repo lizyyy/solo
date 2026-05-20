@@ -59,7 +59,7 @@ export class ReconciliationController {
         return res.status(400).json({ error: '请上传CSV文件' });
       }
 
-      const result = await this.importService.importDutySchedulesFromCSV(req.file.path);
+      const result = await this.importService.importDutySchedulesFromCSVBuffer(req.file.buffer);
 
       res.json({
         success: true,

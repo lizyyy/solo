@@ -3,7 +3,8 @@ import multer from 'multer';
 import { ReconciliationController } from './controllers/ReconciliationController';
 
 const router = Router();
-const upload = multer({ dest: 'uploads/' });
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 const controller = new ReconciliationController();
 
 router.post('/import/critical-values', upload.single('file'), controller.importCriticalValues.bind(controller));

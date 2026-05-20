@@ -293,6 +293,49 @@ export class ImportService {
     });
   }
 
+  async importDutySchedulesFromCSVBuffer(buffer: Buffer): Promise<ImportResult<DutySchedule>> {
+    const results: Omit<DutySchedule, 'id'>[] = [];
+    const errors: string[] = [];
+    let rowNumber = 0;
+
+    return new Promise((resolve) => {
+      const stream = Readable.from(buffer.toString());
+      stream
+        .pipe(csvParser())
+        .on('data', (data: Record<string, string>) => {
+          rowNumber++;
+          try {
+            const record = this.parseDutyScheduleRow(data, rowNumber);
+            if (record) {
+              results.push(record);
+            }
+          } catch (e) {
+            errors.push(`行 ${rowNumber}: ${(e as Error).message}`);
+          }
+        })
+        .on('end', () => {
+          const imported = this.dataStore.addDutySchedules(results);
+          resolve({
+            success: errors.length === 0,
+            data: imported,
+            errors,
+            totalCount: rowNumber,
+            importedCount: imported.length,
+          });
+        })
+        .on('error', (err: Error) => {
+          errors.push(`文件读取错误: ${err.message}`);
+          resolve({
+            success: false,
+            data: [],
+            errors,
+            totalCount: rowNumber,
+            importedCount: 0,
+          });
+        });
+    });
+  }
+
   private parseDutyScheduleRow(data: any, rowNumber: number): Omit<DutySchedule, 'id'> {
     const dateStr = data['日期'] || data['date'];
     const shift = data['班次'] || data['shift'] || 'morning';
