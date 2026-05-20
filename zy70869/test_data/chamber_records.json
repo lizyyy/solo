@@ -1,0 +1,44 @@
+[
+  {
+    "chamber_id": "CHAMBER-A",
+    "record_time": "2024-05-15T08:00:00",
+    "temperature": 25.0,
+    "humidity": 60.0
+  },
+  {
+    "chamber_id": "CHAMBER-A",
+    "record_time": "2024-05-15T12:00:00",
+    "temperature": 25.1,
+    "humidity": 60.5
+  },
+  {
+    "chamber_id": "CHAMBER-A",
+    "record_time": "2024-05-15T16:00:00",
+    "temperature": 24.9,
+    "humidity": 59.8
+  },
+  {
+    "chamber_id": "CHAMBER-B",
+    "record_time": "2024-05-08T10:00:00",
+    "temperature": 26.5,
+    "humidity": 65.0
+  },
+  {
+    "chamber_id": "CHAMBER-B",
+    "record_time": "2024-05-08T14:00:00",
+    "temperature": 26.8,
+    "humidity": 66.0
+  },
+  {
+    "chamber_id": "CHAMBER-C",
+    "record_time": "2024-05-18T09:00:00",
+    "temperature": 40.0,
+    "humidity": 75.0
+  },
+  {
+    "chamber_id": "CHAMBER-C",
+    "record_time": "2024-05-18T15:00:00",
+    "temperature": 40.2,
+    "humidity": 75.5
+  }
+]

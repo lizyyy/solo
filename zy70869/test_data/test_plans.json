@@ -1,0 +1,26 @@
+[
+  {
+    "plan_id": "PLAN-001",
+    "test_type": "稳定性试验",
+    "material_code": "MAT-001",
+    "sampling_window_days": 7,
+    "sampling_start_date": "2024-05-10",
+    "required_temperature_min": 25.0,
+    "required_temperature_max": 25.0,
+    "test_duration_days": 180,
+    "extension_allowed": true,
+    "max_extension_days": 30
+  },
+  {
+    "plan_id": "PLAN-002",
+    "test_type": "加速试验",
+    "material_code": "MAT-002",
+    "sampling_window_days": 5,
+    "sampling_start_date": "2024-05-15",
+    "required_temperature_min": 40.0,
+    "required_temperature_max": 40.0,
+    "test_duration_days": 90,
+    "extension_allowed": true,
+    "max_extension_days": 15
+  }
+]

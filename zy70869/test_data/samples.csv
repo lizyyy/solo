@@ -1,0 +1,7 @@
+sample_id,batch_id,material_code,sample_date,sample_time,test_type,chamber_id,extension_approved,extension_days
+S001,BATCH-2024-001,MAT-001,2024-05-15,09:30,稳定性试验,CHAMBER-A,True,0
+S002,BATCH-2024-002,MAT-001,2024-05-20,10:15,稳定性试验,CHAMBER-A,True,0
+S003,BATCH-2024-003,MAT-001,2024-05-08,14:00,稳定性试验,CHAMBER-B,False,0
+S004,BATCH-2024-004,MAT-002,2024-05-18,11:30,加速试验,CHAMBER-C,True,15
+S005,BATCH-2024-005,MAT-002,2024-05-25,16:45,加速试验,CHAMBER-C,False,20
+S006,BATCH-2024-001,MAT-001,2024-05-16,09:00,稳定性试验,CHAMBER-A,True,0
