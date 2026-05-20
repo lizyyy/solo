@@ -2,7 +2,14 @@ const store = require('../models/store');
 
 const checkContraindications = (appointment) => {
   const rules = store.getContraindicationRules();
-  const childContraindications = (appointment.contraindications || '').split(/[,，、]/).map(c => c.trim().toLowerCase());
+  const childContraindications = (appointment.contraindications || '')
+    .split(/[,，、]/)
+    .map(c => c.trim().toLowerCase())
+    .filter(c => c.length > 0);
+  
+  if (childContraindications.length === 0) {
+    return [];
+  }
   
   const violations = [];
   
@@ -198,15 +205,15 @@ const processAppointments = (appointments) => {
     switch (result.status) {
       case 'success':
         success.push(record);
-        store.addAppointment({ ...apt, status: 'confirmed' });
+        store.addAppointment({ ...apt, status: apt.isReschedule ? 'rescheduled' : 'confirmed' });
         break;
       case 'waitlist':
         waitlist.push(record);
-        store.addAppointment({ ...apt, status: 'waitlist' });
+        store.addAppointment({ ...apt, status: apt.isReschedule ? 'rescheduled' : 'waitlist' });
         break;
       case 'needs_confirmation':
         needsConfirmation.push(record);
-        store.addAppointment({ ...apt, status: 'pending_confirmation' });
+        store.addAppointment({ ...apt, status: apt.isReschedule ? 'rescheduled' : 'pending_confirmation' });
         break;
       case 'failed':
       default:

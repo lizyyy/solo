@@ -8,10 +8,7 @@ const parseAppointmentCSV = (filePath) => {
     let rowNumber = 0;
 
     fs.createReadStream(filePath)
-      .pipe(csv({
-        headers: true,
-        skipComments: true
-      }))
+      .pipe(csv())
       .on('headers', (headers) => {
         const requiredHeaders = ['childId', 'childName', 'vaccineCode', 'vaccineName', 'appointmentDate'];
         const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
