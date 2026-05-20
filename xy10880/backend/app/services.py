@@ -312,6 +312,25 @@ class UpgradeReceiptService:
         conn = get_connection()
         cursor = conn.cursor()
         
+        cursor.execute('SELECT status FROM gray_batches WHERE id = ?', (batch_id,))
+        batch = row_to_dict(cursor.fetchone())
+        
+        if not batch:
+            conn.close()
+            raise Exception("批次不存在")
+        
+        if batch['status'] == BatchStatus.PAUSED.value:
+            conn.close()
+            raise Exception("批次已暂停，无法添加新设备")
+        
+        if batch['status'] == BatchStatus.ROLLED_BACK.value:
+            conn.close()
+            raise Exception("批次已回滚，无法添加新设备")
+        
+        if batch['status'] == BatchStatus.COMPLETED.value:
+            conn.close()
+            raise Exception("批次已完成，无法添加新设备")
+        
         cursor.execute(
             '''INSERT INTO upgrade_receipts 
                (batch_id, device_sn, status, created_at) 
@@ -344,6 +363,17 @@ class UpgradeReceiptService:
             conn.close()
             return False, "回执不存在"
         
+        cursor.execute('SELECT status FROM gray_batches WHERE id = ?', (receipt['batch_id'],))
+        batch = row_to_dict(cursor.fetchone())
+        
+        if batch['status'] == BatchStatus.PAUSED.value:
+            conn.close()
+            return False, "批次已暂停，无法开始升级"
+        
+        if batch['status'] != BatchStatus.RUNNING.value:
+            conn.close()
+            return False, f"批次状态不正确: {batch['status']}"
+        
         cursor.execute(
             'UPDATE upgrade_receipts SET status = ?, started_at = ? WHERE id = ?',
             (UpgradeStatus.IN_PROGRESS.value, now_str(), receipt_id)
@@ -365,6 +395,17 @@ class UpgradeReceiptService:
             return False, "回执不存在"
         
         batch_id = receipt['batch_id']
+        
+        cursor.execute('SELECT status FROM gray_batches WHERE id = ?', (batch_id,))
+        batch = row_to_dict(cursor.fetchone())
+        
+        if receipt['status'] != UpgradeStatus.IN_PROGRESS.value:
+            if batch['status'] == BatchStatus.PAUSED.value:
+                conn.close()
+                return False, "批次已暂停，无法完成升级"
+            if batch['status'] != BatchStatus.RUNNING.value:
+                conn.close()
+                return False, f"批次状态不正确: {batch['status']}"
         
         new_status = UpgradeStatus.SUCCESS.value if success else UpgradeStatus.FAILED.value
         

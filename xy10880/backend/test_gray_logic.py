@@ -217,7 +217,8 @@ def test_report_generation():
     batch = GrayBatchService.create(
         name="报告测试批次",
         model_id=model['id'],
-        firmware_id=firmware['id']
+        firmware_id=firmware['id'],
+        pause_threshold=0.9
     )
     GrayBatchService.start_batch(batch['id'])
     
@@ -267,6 +268,69 @@ def test_bulk_import():
     
     print(f"✅ 批量导入成功 - 导入 {result['created']} 台设备")
 
+def test_pause_blocks_upgrade():
+    model = DeviceModelService.create(
+        model_name="暂停阻断测试",
+        model_code="TEST-BLOCK"
+    )
+    firmware = FirmwareService.create(model['id'], "1.0.0")
+    
+    batch = GrayBatchService.create(
+        name="暂停阻断测试批次",
+        model_id=model['id'],
+        firmware_id=firmware['id'],
+        pause_threshold=0.5
+    )
+    GrayBatchService.start_batch(batch['id'])
+    
+    for i in range(1, 6):
+        UpgradeReceiptService.create(batch['id'], f"BLOCK{i:03d}")
+    
+    receipts = UpgradeReceiptService.get_by_batch(batch['id'])
+    
+    success, msg = UpgradeReceiptService.start_upgrade(receipts[0]['id'])
+    assert success is True, f"运行中批次应该能开始升级: {msg}"
+    print(f"   ✅ 运行中可以开始升级")
+    
+    success, msg = UpgradeReceiptService.complete_upgrade(
+        receipts[0]['id'],
+        success=True
+    )
+    assert success is True
+    print(f"   ✅ 运行中可以完成升级")
+    
+    success, msg = GrayBatchService.pause_batch(batch['id'], "手动暂停测试")
+    assert success is True
+    
+    updated_batch = GrayBatchService.get_by_id(batch['id'])
+    assert updated_batch['status'] == 'paused'
+    print(f"   批次状态: {updated_batch['status']}")
+    print(f"   暂停原因: {updated_batch['pause_reason']}")
+    
+    success, msg = UpgradeReceiptService.start_upgrade(receipts[1]['id'])
+    assert success is False, "暂停后不应该能开始新升级"
+    assert "暂停" in msg
+    print(f"   ✅ 暂停后开始升级被阻断: {msg}")
+    
+    success, msg = UpgradeReceiptService.complete_upgrade(receipts[2]['id'], success=True)
+    assert success is False, "暂停后不应该能完成升级"
+    assert "暂停" in msg
+    print(f"   ✅ 暂停后完成升级被阻断: {msg}")
+    
+    try:
+        UpgradeReceiptService.create(batch['id'], "BLOCK-NEW")
+        assert False, "暂停后应该无法创建新回执"
+    except Exception as e:
+        assert "暂停" in str(e)
+        print(f"   ✅ 暂停后添加新设备被阻断: {str(e)}")
+    
+    success, msg = GrayBatchService.resume_batch(batch['id'])
+    assert success is True
+    
+    success, msg = UpgradeReceiptService.start_upgrade(receipts[1]['id'])
+    assert success is True, "恢复后应该能开始升级"
+    print(f"   ✅ 恢复后可以开始升级")
+
 def main():
     print("\n" + "🚀"*30)
     print("设备固件灰度系统 - 核心逻辑自检脚本")
@@ -286,17 +350,24 @@ def main():
     firmware = test_firmware_version(model)
     results.append(("固件版本管理", True))
     
-    batch = test_create_batch(model, firmware)
-    results.append(("创建灰度批次", True))
+    def test_upgrade_flow_with_new_batch():
+        batch = GrayBatchService.create(
+            name="升级流程测试批次",
+            model_id=model['id'],
+            firmware_id=firmware['id'],
+            pause_threshold=0.5
+        )
+        GrayBatchService.start_batch(batch['id'])
+        test_create_receipts(batch)
+        test_upgrade_flow(batch)
     
-    results.append(("启动批次", run_test("启动批次", lambda: test_start_batch(batch))))
-    results.append(("创建设备回执", run_test("创建设备回执", lambda: test_create_receipts(batch))))
-    results.append(("升级流程模拟", run_test("升级流程模拟", lambda: test_upgrade_flow(batch))))
+    results.append(("升级流程模拟", run_test("升级流程模拟", test_upgrade_flow_with_new_batch)))
     results.append(("自动暂停触发", run_test("自动暂停触发", test_auto_pause_trigger)))
     results.append(("手动暂停/恢复", run_test("手动暂停/恢复", test_manual_pause_resume)))
     results.append(("批次回滚功能", run_test("批次回滚功能", test_rollback)))
     results.append(("报告生成", run_test("报告生成", test_report_generation)))
     results.append(("批量导入设备", run_test("批量导入设备", test_bulk_import)))
+    results.append(("暂停阻断推送", run_test("暂停阻断推送", test_pause_blocks_upgrade)))
     
     print("\n" + "📊"*30)
     print("测试结果汇总")
