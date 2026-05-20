@@ -1,0 +1,38 @@
+[
+    {
+        "person_id": "P001",
+        "person_name": "张三",
+        "date": "2024-01-15",
+        "total_points": 24,
+        "gap_count": 0,
+        "max_gap_minutes": 0,
+        "out_of_bounds": false
+    },
+    {
+        "person_id": "P002",
+        "person_name": "李四",
+        "date": "2024-01-15",
+        "total_points": 18,
+        "gap_count": 2,
+        "max_gap_minutes": 45,
+        "out_of_bounds": false
+    },
+    {
+        "person_id": "P003",
+        "person_name": "王五",
+        "date": "2024-01-15",
+        "total_points": 12,
+        "gap_count": 5,
+        "max_gap_minutes": 150,
+        "out_of_bounds": false
+    },
+    {
+        "person_id": "P004",
+        "person_name": "赵六",
+        "date": "2024-01-15",
+        "total_points": 20,
+        "gap_count": 1,
+        "max_gap_minutes": 30,
+        "out_of_bounds": true
+    }
+]
