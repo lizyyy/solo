@@ -1,0 +1,47 @@
+[
+  {
+    "userId": "USER-001",
+    "userName": "李明",
+    "department": "业务一部",
+    "allowedClassifications": ["public", "internal"],
+    "maxBorrowDays": 30,
+    "maxRenewals": 2,
+    "isActive": true
+  },
+  {
+    "userId": "USER-002",
+    "userName": "王芳",
+    "department": "业务二部",
+    "allowedClassifications": ["public", "internal", "confidential"],
+    "maxBorrowDays": 30,
+    "maxRenewals": 2,
+    "isActive": true
+  },
+  {
+    "userId": "USER-003",
+    "userName": "张伟",
+    "department": "技术部",
+    "allowedClassifications": ["public", "internal"],
+    "maxBorrowDays": 30,
+    "maxRenewals": 2,
+    "isActive": true
+  },
+  {
+    "userId": "USER-004",
+    "userName": "陈静",
+    "department": "行政部",
+    "allowedClassifications": ["public", "internal", "confidential", "top_secret"],
+    "maxBorrowDays": 60,
+    "maxRenewals": 3,
+    "isActive": true
+  },
+  {
+    "userId": "USER-006",
+    "userName": "周经理",
+    "department": "档案室",
+    "allowedClassifications": ["public", "internal", "confidential", "top_secret"],
+    "maxBorrowDays": 90,
+    "maxRenewals": 5,
+    "isActive": true
+  }
+]

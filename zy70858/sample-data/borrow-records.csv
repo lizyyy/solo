@@ -1,0 +1,8 @@
+recordId,caseId,borrowerId,borrowerName,borrowDate,dueDate,returnDate,status,renewalCount,handlerSignature,remarks
+REC-001,CASE-001,USER-001,李明,2024-10-01,2024-10-31,,borrowed,0,张三,正常借阅
+REC-002,CASE-002,USER-001,李明,2024-09-15,2024-10-15,,borrowed,1,李四,已续借一次
+REC-003,CASE-003,USER-002,王芳,2024-08-01,2024-08-31,,overdue,2,王五,续借两次，已超期
+REC-004,CASE-004,USER-003,张伟,2024-09-20,2024-10-20,,borrowed,0,赵六,绝密文件借阅
+REC-005,CASE-001,USER-004,陈静,2024-10-05,2024-11-05,2024-11-02,returned,0,张三,已按时归还
+REC-006,CASE-005,USER-005,刘强,2024-07-01,2024-07-31,,overdue,3,孙七,续借超限，严重超期
+REC-007,CASE-003,USER-001,李明,2024-10-10,2024-11-10,,borrowed,0,王五,机密文件 - 需要人工复核权限

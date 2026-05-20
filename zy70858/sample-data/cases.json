@@ -1,0 +1,47 @@
+[
+  {
+    "caseId": "CASE-001",
+    "caseNumber": "A-2024-001",
+    "title": "公开信息汇总报告",
+    "classification": "public",
+    "createDate": "2024-01-15",
+    "handler": "张三",
+    "description": "年度公开信息汇总，不含敏感内容"
+  },
+  {
+    "caseId": "CASE-002",
+    "caseNumber": "B-2024-002",
+    "title": "内部人员调整方案",
+    "classification": "internal",
+    "createDate": "2024-02-20",
+    "handler": "李四",
+    "description": "部门内部人员调整计划，仅限内部查看"
+  },
+  {
+    "caseId": "CASE-003",
+    "caseNumber": "C-2024-003",
+    "title": "机密项目可行性研究",
+    "classification": "confidential",
+    "createDate": "2024-03-10",
+    "handler": "王五",
+    "description": "重点项目可行性研究报告，涉密内容"
+  },
+  {
+    "caseId": "CASE-004",
+    "caseNumber": "D-2024-004",
+    "title": "绝密级核心技术文档",
+    "classification": "top_secret",
+    "createDate": "2024-04-05",
+    "handler": "赵六",
+    "description": "核心技术研发文档，仅限最高授权人员查看"
+  },
+  {
+    "caseId": "CASE-005",
+    "caseNumber": "E-2024-005",
+    "title": "普通业务合同存档",
+    "classification": "public",
+    "createDate": "2024-05-12",
+    "handler": "孙七",
+    "description": "日常业务合同，无涉密内容"
+  }
+]
