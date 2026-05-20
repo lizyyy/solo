@@ -137,8 +137,8 @@ def test_preference_merge():
     
     print(f"✓ 执行偏好合并")
     assert merged is not None, "合并应该返回结果"
-    assert merged.status == PreferenceStatus.MERGED, "合并后状态应为MERGED"
-    print(f"✓ 合并后状态: {merged.status}")
+    assert merged.status == PreferenceStatus.ACTIVE, "主偏好应保持ACTIVE状态用于发送校验"
+    print(f"✓ 合并后主偏好状态: {merged.status} (保持ACTIVE)")
     
     # 验证元数据合并
     print(f"✓ 合并后元数据: {merged.meta_data}")
@@ -146,6 +146,17 @@ def test_preference_merge():
     assert "extra_1" in merged.meta_data, "元数据应包含所有来源的数据"
     assert "extra_2" in merged.meta_data, "元数据应包含所有来源的数据"
     print("✓ 元数据成功合并 ✓")
+    
+    # 验证合并后发送前校验仍可正常工作
+    print("\n验证合并后发送前校验:")
+    validation_result, _ = service.validate_before_send(
+        "user_002",
+        ChannelType.SMS,
+        BusinessScene.TRANSACTIONAL
+    )
+    assert validation_result.allowed, "合并后主偏好应可用于发送校验"
+    print(f"  ✓ 合并后发送校验结果: allowed={validation_result.allowed}")
+    print("✓ 合并后发送校验正常工作 ✓")
     
     db.close()
     print("\n✓ 偏好合并功能测试通过!")

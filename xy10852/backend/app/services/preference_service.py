@@ -245,9 +245,8 @@ class PreferenceService:
         old_value = {"metadata": primary.meta_data, "status": primary.status.value}
         
         primary.meta_data = merged_metadata
-        primary.status = PreferenceStatus.MERGED
         
-        new_value = {"metadata": merged_metadata, "status": PreferenceStatus.MERGED.value}
+        new_value = {"metadata": merged_metadata, "status": primary.status.value}
         
         self.create_change_history(
             primary, old_value, new_value, primary.source, "merge", operator
