@@ -72,39 +72,48 @@
 - Node.js >= 16
 - npm >= 8
 
-### 一键安装所有依赖
+### 重要前置：必须先安装依赖
+
+**所有命令执行前，必须先安装对应目录的依赖。未安装依赖会报 `command not found` 错误。**
+
+### 一键安装所有依赖（推荐）
 
 ```bash
-# 在项目根目录执行，会安装所有依赖
+# 在项目根目录执行，会自动安装根目录、server、client 的所有依赖
 npm run install:all
 ```
 
 或者分步安装：
 
 ```bash
-# 安装根目录依赖（用于 concurrently 等工具）
+# 1. 安装根目录依赖（用于 concurrently 同时启动前后端）
 npm install
 
-# 安装后端依赖
-cd server && npm install
+# 2. 安装后端依赖（express、sqlite3 等）
+cd server && npm install && cd ..
 
-# 安装前端依赖
-cd ../client && npm install
+# 3. 安装前端依赖（vite、react、tailwindcss 等）
+cd client && npm install && cd ..
 ```
 
 ### 启动服务
 
 **注意：数据库会在后端首次启动时自动初始化，无需手动执行初始化脚本。**
 
+#### 方式一：分别启动（推荐，日志更清晰）
+
 ```bash
-# 方式一：分别启动（推荐，日志更清晰）
-# 终端1 - 启动后端服务
+# 终端1 - 启动后端服务（必须先安装 server 依赖）
 cd server && npm run dev
 
-# 终端2 - 启动前端应用
+# 终端2 - 启动前端应用（必须先安装 client 依赖）
 cd client && npm run dev
+```
 
-# 方式二：根目录同时启动（需要先安装根目录依赖）
+#### 方式二：根目录同时启动（必须先安装根目录依赖）
+
+```bash
+# 必须先执行 npm install 安装根目录的 concurrently
 npm run dev
 ```
 
@@ -114,12 +123,23 @@ npm run dev
 ### 构建生产版本
 
 ```bash
-# 构建前端
+# 构建前端（必须先安装 client 依赖）
 npm run build
 
-# 启动生产环境后端
+# 启动生产环境后端（必须先安装 server 依赖）
 npm start
 ```
+
+### 常见问题
+
+**Q: 报 `concurrently: command not found`？**
+> A: 根目录未安装依赖，执行 `npm install` 后重试。
+
+**Q: 报 `vite: command not found`？**
+> A: client 目录未安装依赖，进入 client 目录执行 `npm install` 后重试。
+
+**Q: 报 `express: module not found`？**
+> A: server 目录未安装依赖，进入 server 目录执行 `npm install` 后重试。
 
 ## API 接口
 

@@ -76,6 +76,10 @@ const initDatabase = async () => {
   if (!tablesExist) {
     logger.info('数据库表不存在，开始初始化...');
     
+    await new Promise((resolve) => {
+      db.run('PRAGMA foreign_keys = ON', () => resolve());
+    });
+    
     const createTables = [
       `CREATE TABLE IF NOT EXISTS target_databases (
         id TEXT PRIMARY KEY,

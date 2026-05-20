@@ -19,6 +19,13 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.error('数据库连接失败:', err.message);
   } else {
     console.log('已连接到 SQLite 数据库');
+    db.run('PRAGMA foreign_keys = ON', (err) => {
+      if (err) {
+        console.error('开启外键约束失败:', err.message);
+      } else {
+        console.log('已开启 SQLite 外键约束');
+      }
+    });
   }
 });
 

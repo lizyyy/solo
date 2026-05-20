@@ -69,6 +69,18 @@ class MigrationService {
   }
 
   async createPreviewBatch(data) {
+    const [scriptExists, databaseExists] = await Promise.all([
+      get('SELECT id FROM migration_scripts WHERE id = ?', [data.migration_script_id]),
+      get('SELECT id FROM target_databases WHERE id = ?', [data.target_database_id])
+    ]);
+
+    if (!scriptExists) {
+      throw new Error(`迁移脚本不存在: ${data.migration_script_id}`);
+    }
+    if (!databaseExists) {
+      throw new Error(`目标数据库不存在: ${data.target_database_id}`);
+    }
+
     const id = uuidv4();
     const lastBatch = await get(
       'SELECT MAX(batch_number) as max_batch FROM preview_batches WHERE migration_script_id = ?',
