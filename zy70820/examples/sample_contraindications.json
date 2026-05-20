@@ -1,0 +1,23 @@
+[
+  {
+    "vaccineCode": "VAC001",
+    "vaccineName": "乙肝疫苗",
+    "condition": "严重过敏体质",
+    "description": "对酵母或疫苗成分有严重过敏史者",
+    "severity": "high"
+  },
+  {
+    "vaccineCode": "VAC002",
+    "vaccineName": "卡介苗",
+    "condition": "免疫缺陷",
+    "description": "先天性免疫缺陷或正在接受免疫抑制治疗者",
+    "severity": "high"
+  },
+  {
+    "vaccineCode": "VAC002",
+    "vaccineName": "卡介苗",
+    "condition": "发热",
+    "description": "体温超过37.5℃需暂缓接种",
+    "severity": "medium"
+  }
+]

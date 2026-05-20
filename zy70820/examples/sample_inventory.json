@@ -1,0 +1,35 @@
+[
+  {
+    "vaccineCode": "VAC001",
+    "vaccineName": "乙肝疫苗",
+    "manufacturer": "深圳康泰",
+    "batchNo": "B2024001",
+    "expirationDate": "2025-12-31",
+    "quantity": 100,
+    "availableQuantity": 3,
+    "minimumAgeMonths": 0,
+    "intervalDays": 30
+  },
+  {
+    "vaccineCode": "VAC002",
+    "vaccineName": "卡介苗",
+    "manufacturer": "成都生物",
+    "batchNo": "B2024002",
+    "expirationDate": "2025-12-31",
+    "quantity": 50,
+    "availableQuantity": 50,
+    "minimumAgeMonths": 0,
+    "intervalDays": 0
+  },
+  {
+    "vaccineCode": "VAC003",
+    "vaccineName": "脊灰疫苗",
+    "manufacturer": "北京天坛",
+    "batchNo": "B2024003",
+    "expirationDate": "2025-12-31",
+    "quantity": 80,
+    "availableQuantity": 0,
+    "minimumAgeMonths": 2,
+    "intervalDays": 30
+  }
+]

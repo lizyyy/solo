@@ -1,0 +1,348 @@
+{
+  "childProfiles": [
+    {
+      "name": "张三",
+      "idCard": "110101202001011234",
+      "birthDate": "2020-01-01",
+      "gender": "male",
+      "guardianName": "张父",
+      "guardianPhone": "13800138001",
+      "address": "北京市朝阳区",
+      "vaccineHistory": [],
+      "id": "35c651fb-9d56-45d3-95f2-2ed565931c6a",
+      "createdAt": "2026-05-19T21:56:34.329Z",
+      "updatedAt": "2026-05-19T21:56:34.329Z"
+    },
+    {
+      "name": "李四",
+      "idCard": "110101202002022345",
+      "birthDate": "2020-02-02",
+      "gender": "male",
+      "guardianName": "李父",
+      "guardianPhone": "13800138002",
+      "address": "北京市海淀区",
+      "vaccineHistory": [],
+      "id": "7fedc43b-4ad6-46ec-9d95-b2f4e7dc575d",
+      "createdAt": "2026-05-19T21:56:34.330Z",
+      "updatedAt": "2026-05-19T21:56:34.330Z"
+    },
+    {
+      "name": "王五",
+      "idCard": "110101201903033456",
+      "birthDate": "2019-03-03",
+      "gender": "female",
+      "guardianName": "王父",
+      "guardianPhone": "13800138003",
+      "address": "北京市西城区",
+      "vaccineHistory": [],
+      "id": "fd256b6b-2722-4714-b111-5656cbd63b48",
+      "createdAt": "2026-05-19T21:56:34.330Z",
+      "updatedAt": "2026-05-19T21:56:34.330Z"
+    },
+    {
+      "name": "赵六",
+      "idCard": "110101202004044567",
+      "birthDate": "2020-04-04",
+      "gender": "male",
+      "guardianName": "赵父",
+      "guardianPhone": "13800138004",
+      "address": "北京市东城区",
+      "vaccineHistory": [],
+      "id": "d11f03f9-3a5b-4571-9cfe-62badd92864e",
+      "createdAt": "2026-05-19T21:56:34.331Z",
+      "updatedAt": "2026-05-19T21:56:34.331Z"
+    },
+    {
+      "name": "钱七",
+      "idCard": "110101201905055678",
+      "birthDate": "2019-05-05",
+      "gender": "female",
+      "guardianName": "钱父",
+      "guardianPhone": "13800138005",
+      "address": "北京市丰台区",
+      "vaccineHistory": [],
+      "id": "2bf07d7f-b2fe-498b-862e-87fb38e043a5",
+      "createdAt": "2026-05-19T21:56:34.331Z",
+      "updatedAt": "2026-05-19T21:56:34.331Z"
+    }
+  ],
+  "vaccineInventories": [
+    {
+      "vaccineCode": "VAC001",
+      "vaccineName": "乙肝疫苗",
+      "manufacturer": "深圳康泰",
+      "batchNo": "B2024001",
+      "expirationDate": "2025-12-31",
+      "quantity": 100,
+      "availableQuantity": 3,
+      "minimumAgeMonths": 0,
+      "intervalDays": 30,
+      "id": "8bc93d2a-508b-4d77-82f5-e4d398801bc9",
+      "createdAt": "2026-05-19T21:56:21.318Z",
+      "updatedAt": "2026-05-19T21:56:21.318Z"
+    },
+    {
+      "vaccineCode": "VAC002",
+      "vaccineName": "卡介苗",
+      "manufacturer": "成都生物",
+      "batchNo": "B2024002",
+      "expirationDate": "2025-12-31",
+      "quantity": 50,
+      "availableQuantity": 50,
+      "minimumAgeMonths": 0,
+      "intervalDays": 30,
+      "id": "fe6d7015-356d-484b-bd48-b2b8eb76d89e",
+      "createdAt": "2026-05-19T21:56:21.318Z",
+      "updatedAt": "2026-05-19T21:56:21.318Z"
+    },
+    {
+      "vaccineCode": "VAC003",
+      "vaccineName": "脊灰疫苗",
+      "manufacturer": "北京天坛",
+      "batchNo": "B2024003",
+      "expirationDate": "2025-12-31",
+      "quantity": 80,
+      "availableQuantity": 80,
+      "minimumAgeMonths": 2,
+      "intervalDays": 30,
+      "id": "5cfd566c-2d56-42a7-a108-21d57c4fc9c9",
+      "createdAt": "2026-05-19T21:56:21.319Z",
+      "updatedAt": "2026-05-19T21:56:21.319Z"
+    }
+  ],
+  "appointmentRecords": [
+    {
+      "batchId": "a1f15023-f790-4f21-b107-2f308c03d412",
+      "childId": "35c651fb-9d56-45d3-95f2-2ed565931c6a",
+      "childName": "张三",
+      "childIdCard": "110101202001011234",
+      "vaccineCode": "VAC001",
+      "vaccineName": "乙肝疫苗",
+      "doseNumber": 1,
+      "appointmentDate": "2024-01-15",
+      "status": "rejected",
+      "id": "54e0f0be-e4ff-49ff-b0e7-b77da2e75554",
+      "operationLogs": [
+        {
+          "operationType": "import",
+          "operator": "system",
+          "reason": "从CSV导入，行号: 1",
+          "newStatus": "pending",
+          "id": "6618019c-7eed-40ee-822f-1165d2ee25d0",
+          "timestamp": "2026-05-19T21:56:34.330Z"
+        },
+        {
+          "operationType": "contraindication_block",
+          "operator": "张医生",
+          "reason": "禁忌规则: 对酵母或疫苗成分有严重过敏史者",
+          "previousStatus": "pending",
+          "newStatus": "rejected",
+          "id": "0431a975-b7c0-4a7c-8116-3c025a4c6294",
+          "timestamp": "2026-05-19T21:56:34.482Z"
+        }
+      ],
+      "createdAt": "2026-05-19T21:56:34.329Z",
+      "updatedAt": "2026-05-19T21:56:34.482Z",
+      "blockReason": "禁忌规则: 对酵母或疫苗成分有严重过敏史者",
+      "processedBy": "张医生",
+      "processedAt": "2026-05-19T21:56:34.482Z"
+    },
+    {
+      "batchId": "a1f15023-f790-4f21-b107-2f308c03d412",
+      "childId": "7fedc43b-4ad6-46ec-9d95-b2f4e7dc575d",
+      "childName": "李四",
+      "childIdCard": "110101202002022345",
+      "vaccineCode": "VAC001",
+      "vaccineName": "乙肝疫苗",
+      "doseNumber": 1,
+      "appointmentDate": "2024-01-15",
+      "status": "rejected",
+      "id": "eed6f395-4d98-4949-a89e-317af39a750f",
+      "operationLogs": [
+        {
+          "operationType": "import",
+          "operator": "system",
+          "reason": "从CSV导入，行号: 2",
+          "newStatus": "pending",
+          "id": "5d3ea796-ae1a-4b2b-ac6c-9eb788f2f653",
+          "timestamp": "2026-05-19T21:56:34.330Z"
+        },
+        {
+          "operationType": "contraindication_block",
+          "operator": "张医生",
+          "reason": "禁忌规则: 对酵母或疫苗成分有严重过敏史者",
+          "previousStatus": "pending",
+          "newStatus": "rejected",
+          "id": "009f81b9-baa1-4cba-8f6f-b1004ffdc257",
+          "timestamp": "2026-05-19T21:56:34.482Z"
+        }
+      ],
+      "createdAt": "2026-05-19T21:56:34.330Z",
+      "updatedAt": "2026-05-19T21:56:34.482Z",
+      "blockReason": "禁忌规则: 对酵母或疫苗成分有严重过敏史者",
+      "processedBy": "张医生",
+      "processedAt": "2026-05-19T21:56:34.482Z"
+    },
+    {
+      "batchId": "a1f15023-f790-4f21-b107-2f308c03d412",
+      "childId": "fd256b6b-2722-4714-b111-5656cbd63b48",
+      "childName": "王五",
+      "childIdCard": "110101201903033456",
+      "vaccineCode": "VAC002",
+      "vaccineName": "卡介苗",
+      "doseNumber": 1,
+      "appointmentDate": "2024-01-16",
+      "status": "rejected",
+      "id": "cbf6e512-c540-4b1e-9291-551c79ea948e",
+      "operationLogs": [
+        {
+          "operationType": "import",
+          "operator": "system",
+          "reason": "从CSV导入，行号: 3",
+          "newStatus": "pending",
+          "id": "98254f01-cc5d-4e99-bb4a-e1518e5a4dc2",
+          "timestamp": "2026-05-19T21:56:34.330Z"
+        },
+        {
+          "operationType": "contraindication_block",
+          "operator": "张医生",
+          "reason": "禁忌规则: 先天性免疫缺陷或正在接受免疫抑制治疗者",
+          "previousStatus": "pending",
+          "newStatus": "rejected",
+          "id": "31556f71-405f-40d9-bb6f-e2136d6fabc7",
+          "timestamp": "2026-05-19T21:56:34.482Z"
+        }
+      ],
+      "createdAt": "2026-05-19T21:56:34.330Z",
+      "updatedAt": "2026-05-19T21:56:34.482Z",
+      "blockReason": "禁忌规则: 先天性免疫缺陷或正在接受免疫抑制治疗者",
+      "processedBy": "张医生",
+      "processedAt": "2026-05-19T21:56:34.482Z"
+    },
+    {
+      "batchId": "a1f15023-f790-4f21-b107-2f308c03d412",
+      "childId": "d11f03f9-3a5b-4571-9cfe-62badd92864e",
+      "childName": "赵六",
+      "childIdCard": "110101202004044567",
+      "vaccineCode": "VAC001",
+      "vaccineName": "乙肝疫苗",
+      "doseNumber": 2,
+      "appointmentDate": "2024-01-16",
+      "status": "pending",
+      "id": "8a74fc60-9c47-44f1-bb74-20fc9013570d",
+      "operationLogs": [
+        {
+          "operationType": "import",
+          "operator": "system",
+          "reason": "从CSV导入，行号: 4",
+          "newStatus": "pending",
+          "id": "80699b39-befb-410c-830f-feb9312103af",
+          "timestamp": "2026-05-19T21:56:34.331Z"
+        },
+        {
+          "operationType": "contraindication_block",
+          "operator": "张医生",
+          "reason": "禁忌规则: 对酵母或疫苗成分有严重过敏史者",
+          "previousStatus": "pending",
+          "newStatus": "rejected",
+          "id": "81b5f8db-be27-47bb-ab4b-aa74d04255fe",
+          "timestamp": "2026-05-19T21:56:34.482Z"
+        },
+        {
+          "operationType": "return",
+          "operator": "李医生",
+          "reason": "退回待处理: 需要补充过敏史详细信息",
+          "previousStatus": "rejected",
+          "newStatus": "pending",
+          "id": "c4476203-c1d3-485a-a53d-06dad6efd3c9",
+          "timestamp": "2026-05-19T21:57:05.421Z"
+        }
+      ],
+      "createdAt": "2026-05-19T21:56:34.331Z",
+      "updatedAt": "2026-05-19T21:57:05.421Z",
+      "blockReason": "禁忌规则: 对酵母或疫苗成分有严重过敏史者",
+      "processedBy": "张医生",
+      "processedAt": "2026-05-19T21:56:34.482Z",
+      "notes": "需要补充过敏史详细信息"
+    },
+    {
+      "batchId": "a1f15023-f790-4f21-b107-2f308c03d412",
+      "childId": "2bf07d7f-b2fe-498b-862e-87fb38e043a5",
+      "childName": "钱七",
+      "childIdCard": "110101201905055678",
+      "vaccineCode": "VAC003",
+      "vaccineName": "脊灰疫苗",
+      "doseNumber": 1,
+      "appointmentDate": "2024-01-17",
+      "status": "rejected",
+      "id": "ff463ee2-616e-48ae-a007-3db0c034c039",
+      "operationLogs": [
+        {
+          "operationType": "import",
+          "operator": "system",
+          "reason": "从CSV导入，行号: 5",
+          "newStatus": "pending",
+          "id": "c4cbc547-2353-4fdc-8909-51b412c785d9",
+          "timestamp": "2026-05-19T21:56:34.331Z"
+        },
+        {
+          "operationType": "duplicate_block",
+          "operator": "张医生",
+          "reason": "该儿童在本批次中已有预约记录",
+          "previousStatus": "pending",
+          "newStatus": "rejected",
+          "id": "f737752c-77fe-4ef0-89c4-ac363a040c40",
+          "timestamp": "2026-05-19T21:56:34.483Z"
+        }
+      ],
+      "createdAt": "2026-05-19T21:56:34.331Z",
+      "updatedAt": "2026-05-19T21:56:34.483Z",
+      "blockReason": "该儿童在本批次中已有预约记录",
+      "processedBy": "张医生",
+      "processedAt": "2026-05-19T21:56:34.482Z"
+    }
+  ],
+  "contraindicationRules": [
+    {
+      "vaccineCode": "VAC001",
+      "vaccineName": "乙肝疫苗",
+      "condition": "严重过敏体质",
+      "description": "对酵母或疫苗成分有严重过敏史者",
+      "severity": "high",
+      "id": "b76888d7-22dc-4380-a821-72af0fbdaf0b",
+      "createdAt": "2026-05-19T21:56:21.366Z"
+    },
+    {
+      "vaccineCode": "VAC002",
+      "vaccineName": "卡介苗",
+      "condition": "免疫缺陷",
+      "description": "先天性免疫缺陷或正在接受免疫抑制治疗者",
+      "severity": "high",
+      "id": "5d8a4d19-5da9-47cc-8760-3d63e70be51c",
+      "createdAt": "2026-05-19T21:56:21.366Z"
+    },
+    {
+      "vaccineCode": "VAC002",
+      "vaccineName": "卡介苗",
+      "condition": "发热",
+      "description": "体温超过37.5℃需暂缓接种",
+      "severity": "medium",
+      "id": "1cb1d106-e307-4a30-bbf4-ab9a5d72b27e",
+      "createdAt": "2026-05-19T21:56:21.366Z"
+    }
+  ],
+  "batches": [
+    {
+      "batchNo": "BATCH2024001",
+      "name": "2024年1月第一批次",
+      "vaccineCode": "VAC001",
+      "vaccineName": "乙肝疫苗",
+      "totalCount": 5,
+      "processedCount": 0,
+      "status": "active",
+      "createdBy": "admin",
+      "id": "a1f15023-f790-4f21-b107-2f308c03d412",
+      "createdAt": "2026-05-19T21:56:21.184Z"
+    }
+  ]
+}
