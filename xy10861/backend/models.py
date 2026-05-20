@@ -62,6 +62,7 @@ class ChangeRequest(Base):
     source_value = Column(Text)
     target_value = Column(Text)
     proposed_value = Column(Text)
+    is_sensitive = Column(Boolean, default=False)
     status = Column(String(50), default="pending")
     requested_by = Column(String(100))
     approved_by = Column(String(100), nullable=True)

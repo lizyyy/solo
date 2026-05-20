@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models import Environment, EnvVariable, ChangeRequest, SyncRecord, init_db, SessionLocal
-from security import encrypt_value
+from security import encrypt_value, decrypt_value
 from datetime import datetime, timedelta
 import random
 
@@ -140,15 +140,23 @@ def generate_demo_data():
                 EnvVariable.key == cr_data["variable_key"]
             ).first()
             
+            is_sensitive = (source_var and source_var.is_sensitive) or (target_var and target_var.is_sensitive)
+            
+            source_val = decrypt_value(source_var.value) if (source_var and source_var.is_sensitive) else (source_var.value if source_var else None)
+            target_val = decrypt_value(target_var.value) if (target_var and target_var.is_sensitive) else (target_var.value if target_var else None)
+            
+            proposed_val = encrypt_value(cr_data["proposed_value"]) if is_sensitive else cr_data["proposed_value"]
+            
             cr = ChangeRequest(
                 title=cr_data["title"],
                 description=cr_data["description"],
                 source_env_id=source_env.id,
                 target_env_id=target_env.id,
                 variable_key=cr_data["variable_key"],
-                source_value=source_var.value if source_var else None,
-                target_value=target_var.value if target_var else None,
-                proposed_value=cr_data["proposed_value"],
+                source_value=source_val,
+                target_value=target_val,
+                proposed_value=proposed_val,
+                is_sensitive=is_sensitive,
                 status=cr_data["status"],
                 requested_by=cr_data["requested_by"],
                 approved_by=cr_data.get("approved_by"),
@@ -166,6 +174,7 @@ def generate_demo_data():
                 "variable_key": "LOG_LEVEL",
                 "old_value": "DEBUG",
                 "new_value": "INFO",
+                "is_sensitive": False,
                 "synced_by": "developer@example.com",
                 "status": "success",
                 "days_ago": 5
@@ -176,6 +185,7 @@ def generate_demo_data():
                 "variable_key": "DB_PASSWORD",
                 "old_value": "old_staging_pass",
                 "new_value": "staging_pass_789#",
+                "is_sensitive": True,
                 "synced_by": "ops@example.com",
                 "status": "success",
                 "days_ago": 7
@@ -186,19 +196,27 @@ def generate_demo_data():
                 "variable_key": "API_BASE_URL",
                 "old_value": "",
                 "new_value": "https://api.example.com",
+                "is_sensitive": False,
                 "synced_by": "admin@example.com",
                 "status": "success",
                 "days_ago": 10
             }
         ]
         
+        def mask_val(v, is_sensitive):
+            if not is_sensitive or not v:
+                return v
+            if len(v) <= 8:
+                return "*" * len(v)
+            return v[:4] + "*" * (len(v) - 8) + v[-4:]
+        
         for sr_data in sync_records:
             sr = SyncRecord(
                 source_env_id=env_objects[sr_data["source_env"]].id,
                 target_env_id=env_objects[sr_data["target_env"]].id,
                 variable_key=sr_data["variable_key"],
-                old_value=sr_data["old_value"],
-                new_value=sr_data["new_value"],
+                old_value=mask_val(sr_data["old_value"], sr_data["is_sensitive"]),
+                new_value=mask_val(sr_data["new_value"], sr_data["is_sensitive"]),
                 synced_by=sr_data["synced_by"],
                 status=sr_data["status"],
                 created_at=datetime.utcnow() - timedelta(days=sr_data["days_ago"])

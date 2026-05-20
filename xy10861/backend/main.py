@@ -287,29 +287,11 @@ async def get_change_requests(
     
     crs = query.all()
     
+    service = EnvDiffService(db)
+    
     return {
         "success": True,
-        "data": [
-            {
-                "id": cr.id,
-                "title": cr.title,
-                "description": cr.description,
-                "source_env_id": cr.source_env_id,
-                "target_env_id": cr.target_env_id,
-                "source_env_name": cr.source_env.name if cr.source_env else None,
-                "target_env_name": cr.target_env.name if cr.target_env else None,
-                "variable_key": cr.variable_key,
-                "source_value": cr.source_value,
-                "target_value": cr.target_value,
-                "proposed_value": cr.proposed_value,
-                "status": cr.status,
-                "requested_by": cr.requested_by,
-                "approved_by": cr.approved_by,
-                "approved_at": cr.approved_at.isoformat() if cr.approved_at else None,
-                "created_at": cr.created_at.isoformat() if cr.created_at else None
-            }
-            for cr in crs
-        ]
+        "data": [service.mask_change_request(cr) for cr in crs]
     }
 
 @app.post("/api/change-requests")
@@ -386,12 +368,25 @@ async def sync_variable(
 ):
     service = EnvDiffService(db)
     try:
+        real_new_value = request.new_value
+        source_env_id = request.source_env_id
+        target_env_id = request.target_env_id
+        variable_key = request.variable_key
+        
+        if request.change_request_id:
+            cr = db.query(ChangeRequest).filter(ChangeRequest.id == request.change_request_id).first()
+            if cr and cr.status == "approved":
+                real_new_value = service.get_change_request_real_proposed_value(cr)
+                source_env_id = cr.source_env_id
+                target_env_id = cr.target_env_id
+                variable_key = cr.variable_key
+        
         record = service.sync_variable(
             cr_id=request.change_request_id,
-            source_env_id=request.source_env_id,
-            target_env_id=request.target_env_id,
-            variable_key=request.variable_key,
-            new_value=request.new_value,
+            source_env_id=source_env_id,
+            target_env_id=target_env_id,
+            variable_key=variable_key,
+            new_value=real_new_value,
             synced_by=request.synced_by
         )
         

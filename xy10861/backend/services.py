@@ -37,6 +37,33 @@ class EnvDiffService:
             result.append(var_dict)
         return result
     
+    def mask_change_request(self, cr: ChangeRequest) -> Dict[str, Any]:
+        proposed_val = decrypt_value(cr.proposed_value) if cr.is_sensitive else cr.proposed_value
+        return {
+            "id": cr.id,
+            "title": cr.title,
+            "description": cr.description,
+            "source_env_id": cr.source_env_id,
+            "source_env_name": cr.source_env.name if cr.source_env else None,
+            "target_env_id": cr.target_env_id,
+            "target_env_name": cr.target_env.name if cr.target_env else None,
+            "variable_key": cr.variable_key,
+            "source_value": self.mask_sensitive_value(cr.source_value) if cr.is_sensitive else cr.source_value,
+            "target_value": self.mask_sensitive_value(cr.target_value) if cr.is_sensitive else cr.target_value,
+            "proposed_value": self.mask_sensitive_value(proposed_val) if cr.is_sensitive else proposed_val,
+            "is_sensitive": cr.is_sensitive,
+            "status": cr.status,
+            "requested_by": cr.requested_by,
+            "approved_by": cr.approved_by,
+            "approved_at": cr.approved_at.isoformat() if cr.approved_at else None,
+            "created_at": cr.created_at.isoformat() if cr.created_at else None
+        }
+    
+    def get_change_request_real_proposed_value(self, cr: ChangeRequest) -> str:
+        if cr.is_sensitive:
+            return decrypt_value(cr.proposed_value)
+        return cr.proposed_value
+    
     def compare_environments(self, env1_id: int, env2_id: int, created_by: str = "system") -> Dict[str, Any]:
         env1 = self.db.query(Environment).filter(Environment.id == env1_id).first()
         env2 = self.db.query(Environment).filter(Environment.id == env2_id).first()
@@ -138,11 +165,9 @@ class EnvDiffService:
         target_val = self.get_decrypted_value(target_var) if target_var else None
         
         if is_sensitive:
-            source_val = self.mask_sensitive_value(source_val) if source_val else None
-            target_val = self.mask_sensitive_value(target_val) if target_val else None
-            proposed_val_masked = self.mask_sensitive_value(proposed_value)
+            proposed_val_stored = encrypt_value(proposed_value)
         else:
-            proposed_val_masked = proposed_value
+            proposed_val_stored = proposed_value
         
         cr = ChangeRequest(
             title=title,
@@ -152,7 +177,8 @@ class EnvDiffService:
             variable_key=variable_key,
             source_value=source_val,
             target_value=target_val,
-            proposed_value=proposed_val_masked,
+            proposed_value=proposed_val_stored,
+            is_sensitive=is_sensitive,
             status="pending",
             requested_by=requested_by
         )
