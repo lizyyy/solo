@@ -6,16 +6,19 @@ class CheckRecordModel {
       const {
         batch_id, student_id, student_name, class_name,
         temperature, has_medication, medication_details,
-        parent_confirmed, parent_name, parent_phone, handler
+        parent_confirmed, parent_name, parent_phone, handler,
+        status, abnormal_type
       } = recordData;
       
       db.run(
         `INSERT INTO check_records 
          (batch_id, student_id, student_name, class_name, temperature, 
-          has_medication, medication_details, parent_confirmed, parent_name, parent_phone, handler, last_handler)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          has_medication, medication_details, parent_confirmed, parent_name, parent_phone, 
+          handler, last_handler, status, abnormal_type)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [batch_id, student_id, student_name, class_name, temperature,
-         has_medication, medication_details, parent_confirmed, parent_name, parent_phone, handler, handler],
+         has_medication, medication_details, parent_confirmed, parent_name, parent_phone,
+         handler, handler, status, abnormal_type],
         function(err) {
           if (err) reject(err);
           else resolve({ id: this.lastID, ...recordData });
@@ -165,19 +168,25 @@ class CheckRecordModel {
       db.get(
         `SELECT 
           COUNT(*) as total,
-          SUM(CASE WHEN status = 'normal' THEN 1 ELSE 0 END) as normal,
-          SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-          SUM(CASE WHEN status = 'blocked' THEN 1 ELSE 0 END) as blocked,
-          SUM(CASE WHEN abnormal_type = 'fever_quarantine' THEN 1 ELSE 0 END) as fever_quarantine,
-          SUM(CASE WHEN abnormal_type = 'medication_auth' THEN 1 ELSE 0 END) as medication_auth,
-          SUM(CASE WHEN abnormal_type = 'parent_unconfirmed' THEN 1 ELSE 0 END) as parent_unconfirmed
+          COALESCE(SUM(CASE WHEN cr.status = 'normal' THEN 1 ELSE 0 END), 0) as normal,
+          COALESCE(SUM(CASE WHEN cr.status = 'pending' THEN 1 ELSE 0 END), 0) as pending,
+          COALESCE(SUM(CASE WHEN cr.status = 'blocked' THEN 1 ELSE 0 END), 0) as blocked,
+          COALESCE(SUM(CASE WHEN cr.abnormal_type = 'fever_quarantine' THEN 1 ELSE 0 END), 0) as fever_quarantine,
+          COALESCE(SUM(CASE WHEN cr.abnormal_type = 'medication_auth' THEN 1 ELSE 0 END), 0) as medication_auth,
+          COALESCE(SUM(CASE WHEN cr.abnormal_type = 'parent_unconfirmed' THEN 1 ELSE 0 END), 0) as parent_unconfirmed
          FROM check_records cr
          JOIN batches b ON cr.batch_id = b.id
          WHERE b.check_date = ?`,
         [check_date],
         (err, row) => {
-          if (err) reject(err);
-          else resolve(row);
+          if (err) {
+            reject(err);
+          } else {
+            resolve(row || {
+              total: 0, normal: 0, pending: 0, blocked: 0,
+              fever_quarantine: 0, medication_auth: 0, parent_unconfirmed: 0
+            });
+          }
         }
       );
     });
