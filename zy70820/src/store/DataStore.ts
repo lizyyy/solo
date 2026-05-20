@@ -71,9 +71,11 @@ export class DataStore {
     }
   }
 
-  createChildProfile(profile: Omit<ChildProfile, 'id' | 'createdAt' | 'updatedAt'>): ChildProfile {
+  createChildProfile(profile: Omit<ChildProfile, 'id' | 'createdAt' | 'updatedAt' | 'healthConditions' | 'vaccineHistory'> & Partial<Pick<ChildProfile, 'healthConditions' | 'vaccineHistory'>>): ChildProfile {
     const now = new Date().toISOString();
     const newProfile: ChildProfile = {
+      healthConditions: [],
+      vaccineHistory: [],
       ...profile,
       id: uuidv4(),
       createdAt: now,
@@ -255,9 +257,11 @@ export class DataStore {
     return maxOrder + 1;
   }
 
-  bulkInsertChildProfiles(profiles: Omit<ChildProfile, 'id' | 'createdAt' | 'updatedAt'>[]): ChildProfile[] {
+  bulkInsertChildProfiles(profiles: Array<Omit<ChildProfile, 'id' | 'createdAt' | 'updatedAt' | 'healthConditions' | 'vaccineHistory'> & Partial<Pick<ChildProfile, 'healthConditions' | 'vaccineHistory'>>>): ChildProfile[] {
     const now = new Date().toISOString();
     const newProfiles = profiles.map(p => ({
+      healthConditions: [],
+      vaccineHistory: [],
       ...p,
       id: uuidv4(),
       createdAt: now,

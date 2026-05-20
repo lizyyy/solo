@@ -87,6 +87,8 @@ class DataStore {
     createChildProfile(profile) {
         const now = new Date().toISOString();
         const newProfile = {
+            healthConditions: [],
+            vaccineHistory: [],
             ...profile,
             id: (0, uuid_1.v4)(),
             createdAt: now,
@@ -249,6 +251,8 @@ class DataStore {
     bulkInsertChildProfiles(profiles) {
         const now = new Date().toISOString();
         const newProfiles = profiles.map(p => ({
+            healthConditions: [],
+            vaccineHistory: [],
             ...p,
             id: (0, uuid_1.v4)(),
             createdAt: now,

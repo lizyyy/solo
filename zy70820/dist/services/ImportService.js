@@ -142,6 +142,10 @@ class ImportService {
         if (!childName || !childIdCard || !vaccineCode) {
             throw new Error(`缺少必要字段: 儿童姓名、身份证号、疫苗编码`);
         }
+        const healthConditionsRaw = row['健康状况'] || row['healthConditions'] || '';
+        const healthConditions = healthConditionsRaw
+            ? healthConditionsRaw.split(/[,，;；]/).map((c) => c.trim()).filter((c) => c)
+            : [];
         let childId;
         let childProfile = DataStore_1.dataStore.getChildProfileByIdCard(childIdCard);
         if (!childProfile) {
@@ -153,8 +157,11 @@ class ImportService {
                 guardianName: row['监护人姓名'] || row['guardianName'] || '',
                 guardianPhone: row['监护人电话'] || row['guardianPhone'] || '',
                 address: row['住址'] || row['address'] || '',
-                vaccineHistory: []
+                healthConditions
             });
+        }
+        else if (healthConditions.length > 0 && childProfile.healthConditions.length === 0) {
+            childProfile = DataStore_1.dataStore.updateChildProfile(childProfile.id, { healthConditions }) || childProfile;
         }
         childId = childProfile.id;
         const record = DataStore_1.dataStore.createAppointmentRecord({

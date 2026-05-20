@@ -46,23 +46,39 @@ class BusinessService {
         return { valid: true };
     }
     checkContraindications(childId, vaccineCode) {
+        const child = DataStore_1.dataStore.getChildProfileById(childId);
         const rules = DataStore_1.dataStore.getContraindicationRulesByVaccineCode(vaccineCode);
         const reasons = [];
+        if (!child) {
+            return { blocked: false, reasons };
+        }
+        const childConditions = child.healthConditions.map(c => c.toLowerCase());
         for (const rule of rules) {
-            if (rule.severity === 'high') {
-                reasons.push(`禁忌规则: ${rule.description}`);
+            const ruleCondition = rule.condition.toLowerCase();
+            const ruleDesc = rule.description.toLowerCase();
+            const conditionMatch = childConditions.some(c => c.includes(ruleCondition) ||
+                ruleCondition.includes(c) ||
+                ruleDesc.includes(c) ||
+                c.length > 0 && ruleDesc.split('').filter(ch => c.includes(ch)).length > c.length * 0.5);
+            if (conditionMatch && rule.severity === 'high') {
+                reasons.push(`禁忌匹配: ${rule.condition} - ${rule.description}`);
+            }
+            else if (conditionMatch && rule.severity === 'medium') {
+                reasons.push(`注意事项: ${rule.condition} - ${rule.description}（需进一步确认）`);
             }
         }
+        const blocked = reasons.some(r => r.startsWith('禁忌匹配'));
         return {
-            blocked: reasons.length > 0,
+            blocked,
             reasons
         };
     }
-    checkDuplicateAppointment(childId, vaccineCode, batchId) {
+    checkDuplicateAppointment(childId, vaccineCode, batchId, excludeRecordId) {
         const existingRecords = DataStore_1.dataStore.getAppointmentRecordsByChildId(childId);
         const duplicate = existingRecords.some(r => r.vaccineCode === vaccineCode &&
             r.batchId === batchId &&
-            r.status !== types_1.RecordStatus.REJECTED);
+            r.status !== types_1.RecordStatus.REJECTED &&
+            r.id !== excludeRecordId);
         if (duplicate) {
             return {
                 duplicate: true,
@@ -82,22 +98,24 @@ class BusinessService {
         const previousStatus = record.status;
         const contraindicationCheck = this.checkContraindications(record.childId, record.vaccineCode);
         if (contraindicationCheck.blocked) {
+            const blockReasons = contraindicationCheck.reasons.filter(r => r.startsWith('禁忌匹配'));
             DataStore_1.dataStore.updateAppointmentRecord(recordId, {
                 status: types_1.RecordStatus.REJECTED,
-                blockReason: contraindicationCheck.reasons.join('; '),
+                blockReason: blockReasons.join('; '),
                 processedBy: operator,
                 processedAt: new Date().toISOString()
             });
             DataStore_1.dataStore.addOperationLog(recordId, {
                 operationType: types_1.OperationType.CONTRAINDICATION_BLOCK,
                 operator,
-                reason: contraindicationCheck.reasons.join('; '),
+                reason: blockReasons.join('; '),
                 previousStatus,
                 newStatus: types_1.RecordStatus.REJECTED
             });
             return { success: true, record: DataStore_1.dataStore.getAppointmentRecordById(recordId) };
         }
-        const duplicateCheck = this.checkDuplicateAppointment(record.childId, record.vaccineCode, record.batchId);
+        const precautionNotes = contraindicationCheck.reasons.filter(r => r.startsWith('注意事项'));
+        const duplicateCheck = this.checkDuplicateAppointment(record.childId, record.vaccineCode, record.batchId, record.id);
         if (duplicateCheck.duplicate) {
             DataStore_1.dataStore.updateAppointmentRecord(recordId, {
                 status: types_1.RecordStatus.REJECTED,
@@ -151,17 +169,19 @@ class BusinessService {
         const inventory = DataStore_1.dataStore.getVaccineInventoryByCode(record.vaccineCode);
         if (!inventory || inventory.availableQuantity <= 0) {
             const waitlistOrder = DataStore_1.dataStore.getNextWaitlistOrder(record.batchId);
+            const notes = precautionNotes.length > 0 ? precautionNotes.join('; ') : record.notes;
             DataStore_1.dataStore.updateAppointmentRecord(recordId, {
                 status: types_1.RecordStatus.WAITLISTED,
                 waitlistOrder,
                 waitlistSource: '疫苗库存不足',
                 processedBy: operator,
-                processedAt: new Date().toISOString()
+                processedAt: new Date().toISOString(),
+                notes
             });
             DataStore_1.dataStore.addOperationLog(recordId, {
                 operationType: types_1.OperationType.WAITLIST,
                 operator,
-                reason: `疫苗库存不足，候补顺序: ${waitlistOrder}`,
+                reason: `疫苗库存不足，候补顺序: ${waitlistOrder}${precautionNotes.length > 0 ? '; ' + precautionNotes.join('; ') : ''}`,
                 previousStatus,
                 newStatus: types_1.RecordStatus.WAITLISTED
             });
@@ -170,15 +190,17 @@ class BusinessService {
         DataStore_1.dataStore.updateVaccineInventory(inventory.id, {
             availableQuantity: inventory.availableQuantity - 1
         });
+        const approveNotes = precautionNotes.length > 0 ? precautionNotes.join('; ') : record.notes;
         DataStore_1.dataStore.updateAppointmentRecord(recordId, {
             status: types_1.RecordStatus.APPROVED,
             processedBy: operator,
-            processedAt: new Date().toISOString()
+            processedAt: new Date().toISOString(),
+            notes: approveNotes
         });
         DataStore_1.dataStore.addOperationLog(recordId, {
             operationType: types_1.OperationType.APPROVE,
             operator,
-            reason: '审核通过',
+            reason: `审核通过${precautionNotes.length > 0 ? '; ' + precautionNotes.join('; ') : ''}`,
             previousStatus,
             newStatus: types_1.RecordStatus.APPROVED
         });

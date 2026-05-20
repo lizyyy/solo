@@ -120,6 +120,11 @@ export class ImportService {
       throw new Error(`缺少必要字段: 儿童姓名、身份证号、疫苗编码`);
     }
 
+    const healthConditionsRaw = row['健康状况'] || row['healthConditions'] || '';
+    const healthConditions = healthConditionsRaw 
+      ? healthConditionsRaw.split(/[,，;；]/).map((c: string) => c.trim()).filter((c: string) => c)
+      : [];
+
     let childId: string;
     let childProfile = dataStore.getChildProfileByIdCard(childIdCard);
 
@@ -132,8 +137,10 @@ export class ImportService {
         guardianName: row['监护人姓名'] || row['guardianName'] || '',
         guardianPhone: row['监护人电话'] || row['guardianPhone'] || '',
         address: row['住址'] || row['address'] || '',
-        vaccineHistory: []
+        healthConditions
       });
+    } else if (healthConditions.length > 0 && childProfile.healthConditions.length === 0) {
+      childProfile = dataStore.updateChildProfile(childProfile.id, { healthConditions }) || childProfile;
     }
     childId = childProfile.id;
 

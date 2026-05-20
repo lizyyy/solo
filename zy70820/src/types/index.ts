@@ -29,6 +29,7 @@ export interface ChildProfile {
   guardianName: string;
   guardianPhone: string;
   address: string;
+  healthConditions: string[];
   vaccineHistory: VaccineHistoryItem[];
   createdAt: string;
   updatedAt: string;
