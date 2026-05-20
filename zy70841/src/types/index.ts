@@ -93,3 +93,23 @@ export interface SubmissionRecord {
   processed: boolean;
   effective: boolean;
 }
+
+export interface DocumentUploadResult {
+  documentId: string;
+  type: DocumentType;
+  documentNumber: string;
+  companyName?: string;
+  boothNumber?: string;
+  uploaded: boolean;
+  message?: string;
+}
+
+export interface CalendarImportResult {
+  eventId: string;
+  boothNumber: string;
+  startTime: string;
+  endTime: string;
+  companyName: string;
+  imported: boolean;
+  message?: string;
+}

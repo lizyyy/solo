@@ -18,10 +18,12 @@ export class ValidationService {
     const issues: IssueDetail[] = [];
     const suggestions: string[] = [];
 
-    this.validateDocuments(application, issues, suggestions);
-    this.validateTimeConflict(application, batchApplications, issues, suggestions);
-    this.validateDeposit(application, issues, suggestions);
-    this.validateRequiredFields(application, issues, suggestions);
+    const mergedApplication = this.mergeWithExternalDocuments(application);
+
+    this.validateDocuments(mergedApplication, issues, suggestions);
+    this.validateTimeConflict(mergedApplication, batchApplications, issues, suggestions);
+    this.validateDeposit(mergedApplication, issues, suggestions);
+    this.validateRequiredFields(mergedApplication, issues, suggestions);
 
     const status = this.determineStatus(issues);
 
@@ -30,11 +32,51 @@ export class ValidationService {
       boothNumber: application.boothNumber,
       companyName: application.companyName,
       status,
-      originalData: this.getOriginalData(application),
+      originalData: this.getOriginalData(mergedApplication),
       issues,
       suggestions,
       processedAt: moment().toISOString(),
       traceId: uuidv4()
+    };
+  }
+
+  private mergeWithExternalDocuments(application: BoothApplication): BoothApplication {
+    const externalDocs = store.getDocumentsByCompany(application.companyName);
+    const boothDocs = store.getDocumentsByBooth(application.boothNumber);
+    
+    const allExternalDocs = [...externalDocs, ...boothDocs];
+    
+    if (allExternalDocs.length === 0) {
+      return application;
+    }
+
+    const mergedDocuments = [...application.documents];
+
+    for (const extDoc of allExternalDocs) {
+      const existingIndex = mergedDocuments.findIndex(d => d.type === extDoc.type);
+      
+      if (existingIndex >= 0) {
+        const existing = mergedDocuments[existingIndex];
+        if (!existing.documentNumber && extDoc.documentNumber) {
+          mergedDocuments[existingIndex] = { ...existing, ...extDoc };
+        }
+      } else {
+        mergedDocuments.push({
+          id: extDoc.id,
+          type: extDoc.type,
+          documentNumber: extDoc.documentNumber,
+          issueDate: extDoc.issueDate,
+          expiryDate: extDoc.expiryDate,
+          fileName: extDoc.fileName,
+          fileUrl: extDoc.fileUrl,
+          verified: extDoc.verified
+        });
+      }
+    }
+
+    return {
+      ...application,
+      documents: mergedDocuments
     };
   }
 

@@ -175,4 +175,90 @@ router.get('/submissions', (_req: Request, res: Response) => {
   }
 });
 
+router.post('/documents/upload', upload.single('file'), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: '请上传证照清单CSV文件' });
+    }
+
+    const documents = await csvParser.parseDocumentList(req.file.buffer);
+
+    for (const doc of documents) {
+      store.saveDocument(doc);
+    }
+
+    res.json({
+      success: true,
+      total: documents.length,
+      data: documents.map(d => ({
+        documentId: d.id,
+        type: d.type,
+        documentNumber: d.documentNumber,
+        companyName: d.companyName,
+        boothNumber: d.boothNumber,
+        expiryDate: d.expiryDate,
+        uploaded: true
+      }))
+    });
+  } catch (error) {
+    console.error('证照清单上传错误:', error);
+    res.status(500).json({ error: '处理证照清单失败', message: (error as Error).message });
+  }
+});
+
+router.get('/documents', (_req: Request, res: Response) => {
+  try {
+    const documents = store.getAllDocuments();
+    res.json({
+      success: true,
+      total: documents.length,
+      data: documents
+    });
+  } catch (error) {
+    res.status(500).json({ error: '获取证照列表失败' });
+  }
+});
+
+router.get('/documents/company/:companyName', (req: Request, res: Response) => {
+  try {
+    const documents = store.getDocumentsByCompany(req.params.companyName);
+    res.json({
+      success: true,
+      total: documents.length,
+      data: documents
+    });
+  } catch (error) {
+    res.status(500).json({ error: '获取公司证照失败' });
+  }
+});
+
+router.post('/calendar/import', upload.single('file'), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: '请上传场地日历CSV文件' });
+    }
+
+    const events = await csvParser.parseCalendar(req.file.buffer);
+
+    store.importCalendarEvents(events);
+
+    res.json({
+      success: true,
+      total: events.length,
+      data: events.map(e => ({
+        eventId: e.id,
+        boothNumber: e.boothNumber,
+        startTime: e.startTime,
+        endTime: e.endTime,
+        companyName: e.companyName,
+        status: e.status,
+        imported: true
+      }))
+    });
+  } catch (error) {
+    console.error('场地日历导入错误:', error);
+    res.status(500).json({ error: '导入场地日历失败', message: (error as Error).message });
+  }
+});
+
 export default router;

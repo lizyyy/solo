@@ -1,6 +1,6 @@
 import csv from 'csv-parser';
 import { Readable } from 'stream';
-import { BoothApplication, DocumentType, DocumentInfo } from '../types';
+import { BoothApplication, DocumentType, DocumentInfo, CalendarEvent } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 
@@ -90,7 +90,7 @@ export class CsvParserService {
     });
   }
 
-  async parseDocumentList(buffer: Buffer): Promise<DocumentInfo[]> {
+  async parseDocumentList(buffer: Buffer): Promise<(DocumentInfo & { companyName?: string; boothNumber?: string })[]> {
     const results: ParsedRow[] = [];
     
     return new Promise((resolve, reject) => {
@@ -107,9 +107,35 @@ export class CsvParserService {
             issueDate: row['签发日期'] || '',
             expiryDate: row['到期日期'] || '',
             fileName: row['文件名'],
-            verified: false
+            verified: (row['已验证'] || '').toLowerCase() === 'true',
+            companyName: row['公司名称'],
+            boothNumber: row['摊位编号']
           }));
           resolve(documents);
+        })
+        .on('error', reject);
+    });
+  }
+
+  async parseCalendar(buffer: Buffer): Promise<CalendarEvent[]> {
+    const results: ParsedRow[] = [];
+    
+    return new Promise((resolve, reject) => {
+      const stream = Readable.from(buffer.toString());
+      
+      stream
+        .pipe(csv())
+        .on('data', (data: ParsedRow) => results.push(data))
+        .on('end', () => {
+          const events = results.map(row => ({
+            id: uuidv4(),
+            boothNumber: row['摊位编号'] || '',
+            startTime: row['开始时间'] || row['进场时间'] || '',
+            endTime: row['结束时间'] || row['退场时间'] || '',
+            companyName: row['公司名称'] || '',
+            status: this.mapCalendarStatus(row['状态'] || row['预约状态'])
+          } as CalendarEvent));
+          resolve(events);
         })
         .on('error', reject);
     });
@@ -123,6 +149,21 @@ export class CsvParserService {
       '押金收据': DocumentType.DEPOSIT_RECEIPT
     };
     return typeMap[type] || DocumentType.BUSINESS_LICENSE;
+  }
+
+  private mapCalendarStatus(status: string): 'confirmed' | 'tentative' | 'cancelled' {
+    const statusMap: Record<string, 'confirmed' | 'tentative' | 'cancelled'> = {
+      '已确认': 'confirmed',
+      '确认': 'confirmed',
+      'confirmed': 'confirmed',
+      '待确认': 'tentative',
+      '暂定': 'tentative',
+      'tentative': 'tentative',
+      '已取消': 'cancelled',
+      '取消': 'cancelled',
+      'cancelled': 'cancelled'
+    };
+    return statusMap[status] || 'tentative';
   }
 }
 

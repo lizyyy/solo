@@ -1,10 +1,11 @@
-import { BoothApplication, CalendarEvent, ProcessReport, SubmissionRecord } from '../types';
+import { BoothApplication, CalendarEvent, ProcessReport, SubmissionRecord, DocumentInfo } from '../types';
 
 class MemoryStore {
   private applications: Map<string, BoothApplication> = new Map();
   private calendarEvents: Map<string, CalendarEvent> = new Map();
   private reports: Map<string, ProcessReport> = new Map();
   private submissions: Map<string, SubmissionRecord> = new Map();
+  private documents: Map<string, DocumentInfo & { companyName?: string; boothNumber?: string }> = new Map();
 
   saveApplication(app: BoothApplication): void {
     this.applications.set(app.id, app);
@@ -68,11 +69,38 @@ class MemoryStore {
     return Array.from(this.submissions.values());
   }
 
+  saveDocument(doc: DocumentInfo & { companyName?: string; boothNumber?: string }): void {
+    this.documents.set(doc.id, doc);
+  }
+
+  getDocument(id: string): (DocumentInfo & { companyName?: string; boothNumber?: string }) | undefined {
+    return this.documents.get(id);
+  }
+
+  getDocumentsByCompany(companyName: string): (DocumentInfo & { companyName?: string; boothNumber?: string })[] {
+    return Array.from(this.documents.values()).filter(d => d.companyName === companyName);
+  }
+
+  getDocumentsByBooth(boothNumber: string): (DocumentInfo & { companyName?: string; boothNumber?: string })[] {
+    return Array.from(this.documents.values()).filter(d => d.boothNumber === boothNumber);
+  }
+
+  getAllDocuments(): (DocumentInfo & { companyName?: string; boothNumber?: string })[] {
+    return Array.from(this.documents.values());
+  }
+
+  importCalendarEvents(events: CalendarEvent[]): void {
+    for (const event of events) {
+      this.calendarEvents.set(event.id, event);
+    }
+  }
+
   clearAll(): void {
     this.applications.clear();
     this.calendarEvents.clear();
     this.reports.clear();
     this.submissions.clear();
+    this.documents.clear();
   }
 }
 
