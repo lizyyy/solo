@@ -9,16 +9,24 @@ import pandas as pd
 from app.database import get_db
 from app.services import CustomsService
 from app.schemas import (
-    DeclarationBatch, DeclarationItem, HsCode, RejectionNotice,
-    TaxCertificate, OperationLog, BatchDetailResponse, ItemDetailResponse,
+    DeclarationBatch as DeclarationBatchSchema,
+    DeclarationItem as DeclarationItemSchema,
+    HsCode as HsCodeSchema,
+    RejectionNotice as RejectionNoticeSchema,
+    TaxCertificate as TaxCertificateSchema,
+    OperationLog as OperationLogSchema,
+    BatchDetailResponse, ItemDetailResponse,
     TaxCertificateTraceResponse
 )
-from app.models import DeclarationItemStatus, BatchStatus
+from app.models import (
+    DeclarationBatch, DeclarationItem, HsCode, RejectionNotice,
+    TaxCertificate, OperationLog, DeclarationItemStatus, BatchStatus
+)
 
 router = APIRouter(prefix="/api", tags=["customs"])
 
 
-@router.post("/hs-codes/import", response_model=List[HsCode])
+@router.post("/hs-codes/import", response_model=List[HsCodeSchema])
 async def import_hs_codes(
     json_file: UploadFile = File(...),
     operator: str = "system",
@@ -32,7 +40,7 @@ async def import_hs_codes(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/batches/import", response_model=DeclarationBatch)
+@router.post("/batches/import", response_model=DeclarationBatchSchema)
 async def import_declaration_batch(
     csv_file: UploadFile = File(...),
     batch_no: str = "",
@@ -54,7 +62,7 @@ async def import_declaration_batch(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/rejection-notices", response_model=RejectionNotice)
+@router.post("/rejection-notices", response_model=RejectionNoticeSchema)
 async def create_rejection_notice(
     batch_id: int,
     rejection_no: str,
@@ -73,7 +81,7 @@ async def create_rejection_notice(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/items/{item_id}/convert-currency", response_model=DeclarationItem)
+@router.post("/items/{item_id}/convert-currency", response_model=DeclarationItemSchema)
 async def convert_item_currency(
     item_id: int,
     target_currency: str,
@@ -91,7 +99,7 @@ async def convert_item_currency(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/items/merge-category", response_model=List[DeclarationItem])
+@router.post("/items/merge-category", response_model=List[DeclarationItemSchema])
 async def merge_items_category(
     item_ids: List[int],
     target_category_code: str,
@@ -107,7 +115,7 @@ async def merge_items_category(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.post("/items/{item_id}/supplement-tax", response_model=TaxCertificate)
+@router.post("/items/{item_id}/supplement-tax", response_model=TaxCertificateSchema)
 async def supplement_item_tax(
     item_id: int,
     certificate_no: str,
@@ -132,7 +140,7 @@ async def supplement_item_tax(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.put("/items/{item_id}/status", response_model=DeclarationItem)
+@router.put("/items/{item_id}/status", response_model=DeclarationItemSchema)
 async def update_item_status(
     item_id: int,
     status: DeclarationItemStatus,
@@ -149,7 +157,7 @@ async def update_item_status(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.put("/items/{item_id}/return", response_model=DeclarationItem)
+@router.put("/items/{item_id}/return", response_model=DeclarationItemSchema)
 async def return_item_for_correction(
     item_id: int,
     operator: str,
@@ -231,7 +239,7 @@ async def get_batch_by_no(
     return batch
 
 
-@router.get("/rejection-notices/{rejection_no}", response_model=RejectionNotice)
+@router.get("/rejection-notices/{rejection_no}", response_model=RejectionNoticeSchema)
 async def get_rejection_notice(
     rejection_no: str,
     db: Session = Depends(get_db)
@@ -243,7 +251,7 @@ async def get_rejection_notice(
     return notice
 
 
-@router.get("/tax-certificates/{certificate_no}", response_model=TaxCertificate)
+@router.get("/tax-certificates/{certificate_no}", response_model=TaxCertificateSchema)
 async def get_tax_certificate(
     certificate_no: str,
     db: Session = Depends(get_db)
@@ -267,7 +275,7 @@ async def trace_tax_certificate(
     return trace_data
 
 
-@router.get("/batches", response_model=List[DeclarationBatch])
+@router.get("/batches", response_model=List[DeclarationBatchSchema])
 async def list_batches(
     status: Optional[BatchStatus] = None,
     skip: int = 0,
@@ -293,7 +301,7 @@ async def get_item_detail(
     return item
 
 
-@router.get("/operation-logs", response_model=List[OperationLog])
+@router.get("/operation-logs", response_model=List[OperationLogSchema])
 async def list_operation_logs(
     batch_id: Optional[int] = None,
     item_id: Optional[int] = None,
