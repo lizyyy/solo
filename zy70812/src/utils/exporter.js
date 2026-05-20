@@ -45,17 +45,17 @@ function getRecordsForExport(filters = {}) {
 
     if (filters.agent_confirmed !== undefined) {
       query += ' AND sr.agent_confirmed = ?';
-      params.push(filters.agent_confirmed ? 1 : 0);
+      params.push(filters.agent_confirmed === 'true' ? 1 : 0);
     }
 
     if (filters.berth_locked !== undefined) {
       query += ' AND sr.berth_locked = ?';
-      params.push(filters.berth_locked ? 1 : 0);
+      params.push(filters.berth_locked === 'true' ? 1 : 0);
     }
 
     if (filters.loading_plan_confirmed !== undefined) {
       query += ' AND sr.loading_plan_confirmed = ?';
-      params.push(filters.loading_plan_confirmed ? 1 : 0);
+      params.push(filters.loading_plan_confirmed === 'true' ? 1 : 0);
     }
 
     if (filters.vessel_name) {

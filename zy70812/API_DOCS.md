@@ -121,10 +121,18 @@
 
 ### 5. 数据导入
 
-#### 导入船舶数据 (CSV)
+#### 导入船舶数据 (CSV) - 可生成调度记录
 - **POST** `/api/import/vessels`
 - Content-Type: `multipart/form-data`
-- 字段: `file`
+- 字段:
+  - `file`: 船期CSV文件
+  - `create_records`: (可选) "true" 表示同时生成调度记录
+  - `batch_id`: (可选) 批次ID，关联到生成的记录
+  - `created_by`: (可选) 创建人，默认 "system"
+
+- CSV支持字段:
+  - 基础: vessel_name, vessel_imo, draft, length, width, agent
+  - 调度: berth_no, arrival_date, departure_date, planned_berth_time, handling_type, cargo_quantity
 
 #### 导入泊位数据 (JSON)
 - **POST** `/api/import/berths`

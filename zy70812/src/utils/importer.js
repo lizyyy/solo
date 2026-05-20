@@ -2,7 +2,64 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const db = require('../models/database');
 
-function importVesselSchedule(filePath) {
+function generateRecordNo() {
+  const date = new Date();
+  const prefix = 'R' + date.getFullYear().toString().slice(-2) + 
+    (date.getMonth() + 1).toString().padStart(2, '0') +
+    date.getDate().toString().padStart(2, '0');
+  return new Promise((resolve, reject) => {
+    db.get('SELECT MAX(record_no) as max FROM scheduling_records WHERE record_no LIKE ?', 
+      [prefix + '%'], (err, row) => {
+        if (err) return reject(err);
+        let seq = 1;
+        if (row && row.max) {
+          seq = parseInt(row.max.slice(-4)) + 1;
+        }
+        resolve(prefix + seq.toString().padStart(4, '0'));
+      }
+    );
+  });
+}
+
+function createSchedulingRecord(data) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const recordNo = await generateRecordNo();
+      
+      db.run(`
+        INSERT INTO scheduling_records 
+        (batch_id, record_no, vessel_id, berth_id, arrival_date, departure_date, 
+         planned_berth_time, handling_type, cargo_quantity, created_by, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        data.batch_id || null,
+        recordNo,
+        data.vessel_id,
+        data.berth_id || null,
+        data.arrival_date || new Date().toISOString().split('T')[0],
+        data.departure_date || null,
+        data.planned_berth_time || null,
+        data.handling_type || '',
+        data.cargo_quantity ? parseFloat(data.cargo_quantity) : null,
+        data.created_by || 'system',
+        'pending'
+      ], function(err) {
+        if (err) return reject(err);
+        resolve({
+          id: this.lastID,
+          record_no: recordNo,
+          vessel_id: data.vessel_id,
+          berth_id: data.berth_id,
+          batch_id: data.batch_id
+        });
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+function importVesselSchedule(filePath, options = {}) {
   return new Promise((resolve, reject) => {
     const results = [];
     fs.createReadStream(filePath)
@@ -13,7 +70,26 @@ function importVesselSchedule(filePath) {
           const imported = [];
           for (const row of results) {
             const vessel = await upsertVessel(row);
-            imported.push(vessel);
+            
+            if (options.create_records) {
+              const berthId = await resolveBerthId(row.berth_no);
+              
+              const record = await createSchedulingRecord({
+                batch_id: options.batch_id,
+                vessel_id: vessel.id,
+                berth_id: berthId,
+                arrival_date: row.arrival_date || row.arrivalDate,
+                departure_date: row.departure_date || row.departureDate,
+                planned_berth_time: row.planned_berth_time || row.berthTime,
+                handling_type: row.handling_type || row.handlingType,
+                cargo_quantity: row.cargo_quantity || row.cargoQuantity,
+                created_by: options.created_by || 'system'
+              });
+              
+              imported.push({ vessel, record });
+            } else {
+              imported.push(vessel);
+            }
           }
           resolve(imported);
         } catch (error) {
@@ -21,6 +97,19 @@ function importVesselSchedule(filePath) {
         }
       })
       .on('error', reject);
+  });
+}
+
+function resolveBerthId(berthNo) {
+  return new Promise((resolve, reject) => {
+    if (!berthNo) {
+      resolve(null);
+      return;
+    }
+    db.get('SELECT id FROM berths WHERE berth_no = ?', [berthNo], (err, row) => {
+      if (err) return reject(err);
+      resolve(row ? row.id : null);
+    });
   });
 }
 
@@ -201,5 +290,7 @@ module.exports = {
   importBerths,
   importTideSchedule,
   upsertVessel,
-  upsertBerth
+  upsertBerth,
+  createSchedulingRecord,
+  generateRecordNo
 };
