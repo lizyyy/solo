@@ -1,0 +1,22 @@
+{
+  "name": "incident-review-api",
+  "version": "1.0.0",
+  "description": "事故复盘资料 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "joi": "^17.9.2",
+    "moment": "^2.29.4",
+    "xlsx": "^0.18.5",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
