@@ -5,108 +5,6 @@ const { v4: uuidv4 } = require('uuid');
 const dbPath = path.join(__dirname, '../data/audit.db');
 const db = new sqlite3.Database(dbPath);
 
-const initDatabase = () => {
-  return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      db.run(`CREATE TABLE IF NOT EXISTS connection_sessions (
-        id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
-        device_id TEXT NOT NULL,
-        room_id TEXT NOT NULL,
-        status TEXT NOT NULL,
-        connected_at INTEGER NOT NULL,
-        disconnected_at INTEGER,
-        disconnect_reason TEXT,
-        created_at INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS user_devices (
-        id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
-        device_id TEXT NOT NULL,
-        device_type TEXT NOT NULL,
-        device_info TEXT,
-        ip_address TEXT,
-        last_seen INTEGER NOT NULL,
-        created_at INTEGER NOT NULL,
-        UNIQUE(user_id, device_id)
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS heartbeat_events (
-        id TEXT PRIMARY KEY,
-        session_id TEXT NOT NULL,
-        user_id TEXT NOT NULL,
-        room_id TEXT NOT NULL,
-        timestamp INTEGER NOT NULL,
-        payload TEXT,
-        created_at INTEGER NOT NULL,
-        FOREIGN KEY (session_id) REFERENCES connection_sessions(id)
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS room_members (
-        id TEXT PRIMARY KEY,
-        room_id TEXT NOT NULL,
-        user_id TEXT NOT NULL,
-        session_id TEXT NOT NULL,
-        joined_at INTEGER NOT NULL,
-        left_at INTEGER,
-        is_online INTEGER NOT NULL DEFAULT 1,
-        created_at INTEGER NOT NULL,
-        FOREIGN KEY (session_id) REFERENCES connection_sessions(id)
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS disconnect_reasons (
-        id TEXT PRIMARY KEY,
-        session_id TEXT NOT NULL,
-        reason_code TEXT NOT NULL,
-        reason_message TEXT,
-        detected_at INTEGER NOT NULL,
-        metadata TEXT,
-        FOREIGN KEY (session_id) REFERENCES connection_sessions(id)
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS online_snapshots (
-        id TEXT PRIMARY KEY,
-        room_id TEXT NOT NULL,
-        online_count INTEGER NOT NULL,
-        member_list TEXT NOT NULL,
-        snapshot_at INTEGER NOT NULL,
-        created_at INTEGER NOT NULL
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS audit_logs (
-        id TEXT PRIMARY KEY,
-        request_id TEXT NOT NULL,
-        action TEXT NOT NULL,
-        input_data TEXT,
-        result_data TEXT,
-        responsible_node TEXT NOT NULL,
-        status TEXT NOT NULL,
-        error_message TEXT,
-        timestamp INTEGER NOT NULL,
-        created_at INTEGER NOT NULL
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS anomaly_queue (
-        id TEXT PRIMARY KEY,
-        type TEXT NOT NULL,
-        severity TEXT NOT NULL,
-        session_id TEXT,
-        room_id TEXT,
-        user_id TEXT,
-        description TEXT NOT NULL,
-        metadata TEXT,
-        status TEXT NOT NULL DEFAULT 'pending',
-        resolved_at INTEGER,
-        created_at INTEGER NOT NULL
-      )`);
-
-      resolve();
-    });
-  });
-};
-
 const runQuery = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function(err) {
@@ -132,6 +30,134 @@ const allQuery = (sql, params = []) => {
       else resolve(rows);
     });
   });
+};
+
+const migrateUserDevicesTable = async () => {
+  try {
+    const cols = await allQuery(`PRAGMA table_info(user_devices)`);
+    const hasDeviceId = cols.some(c => c.name === 'device_id');
+    
+    if (!hasDeviceId) {
+      await runQuery(`ALTER TABLE user_devices ADD COLUMN device_id TEXT`);
+      await runQuery(`
+        UPDATE user_devices 
+        SET device_id = 'legacy_device_' || substr(id, 1, 8) 
+        WHERE device_id IS NULL
+      `);
+      const existingRecords = await allQuery(`SELECT id, user_id, device_id FROM user_devices`);
+      const seen = new Set();
+      for (const r of existingRecords) {
+        const key = `${r.user_id}|${r.device_id}`;
+        if (seen.has(key)) {
+          await runQuery(`DELETE FROM user_devices WHERE id = ?`, [r.id]);
+        } else {
+          seen.add(key);
+        }
+      }
+    }
+  } catch (err) {
+    if (!err.message.includes('no such table')) {
+      throw err;
+    }
+  }
+};
+
+const initDatabase = async () => {
+  await runQuery(`CREATE TABLE IF NOT EXISTS connection_sessions (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    device_id TEXT NOT NULL,
+    room_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    connected_at INTEGER NOT NULL,
+    disconnected_at INTEGER,
+    disconnect_reason TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`);
+
+  await runQuery(`CREATE TABLE IF NOT EXISTS user_devices (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    device_id TEXT NOT NULL,
+    device_type TEXT NOT NULL,
+    device_info TEXT,
+    ip_address TEXT,
+    last_seen INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    UNIQUE(user_id, device_id)
+  )`);
+
+  await migrateUserDevicesTable();
+
+  await runQuery(`CREATE TABLE IF NOT EXISTS heartbeat_events (
+    id TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    room_id TEXT NOT NULL,
+    timestamp INTEGER NOT NULL,
+    payload TEXT,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (session_id) REFERENCES connection_sessions(id)
+  )`);
+
+  await runQuery(`CREATE TABLE IF NOT EXISTS room_members (
+    id TEXT PRIMARY KEY,
+    room_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    joined_at INTEGER NOT NULL,
+    left_at INTEGER,
+    is_online INTEGER NOT NULL DEFAULT 1,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (session_id) REFERENCES connection_sessions(id)
+  )`);
+
+  await runQuery(`CREATE TABLE IF NOT EXISTS disconnect_reasons (
+    id TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    reason_code TEXT NOT NULL,
+    reason_message TEXT,
+    detected_at INTEGER NOT NULL,
+    metadata TEXT,
+    FOREIGN KEY (session_id) REFERENCES connection_sessions(id)
+  )`);
+
+  await runQuery(`CREATE TABLE IF NOT EXISTS online_snapshots (
+    id TEXT PRIMARY KEY,
+    room_id TEXT NOT NULL,
+    online_count INTEGER NOT NULL,
+    member_list TEXT NOT NULL,
+    snapshot_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL
+  )`);
+
+  await runQuery(`CREATE TABLE IF NOT EXISTS audit_logs (
+    id TEXT PRIMARY KEY,
+    request_id TEXT NOT NULL,
+    action TEXT NOT NULL,
+    input_data TEXT,
+    result_data TEXT,
+    responsible_node TEXT NOT NULL,
+    status TEXT NOT NULL,
+    error_message TEXT,
+    timestamp INTEGER NOT NULL,
+    created_at INTEGER NOT NULL
+  )`);
+
+  await runQuery(`CREATE TABLE IF NOT EXISTS anomaly_queue (
+    id TEXT PRIMARY KEY,
+    type TEXT NOT NULL,
+    severity TEXT NOT NULL,
+    session_id TEXT,
+    room_id TEXT,
+    user_id TEXT,
+    description TEXT NOT NULL,
+    metadata TEXT,
+    status TEXT NOT NULL DEFAULT 'pending',
+    resolved_at INTEGER,
+    created_at INTEGER NOT NULL
+  )`);
 };
 
 module.exports = {
