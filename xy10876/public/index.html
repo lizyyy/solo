@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>退款异常处理 API 控制台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #0f0; min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { border-bottom: 1px solid #0f0; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; text-shadow: 0 0 10px #0f0; }
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .status-pending { background: #666; color: #fff; }
+        .status-processing { background: #0066cc; color: #fff; }
+        .status-success { background: #00aa00; color: #fff; }
+        .status-failed { background: #cc0000; color: #fff; }
+        .status-need_review { background: #ff6600; color: #fff; }
+        .status-manual_success { background: #008844; color: #fff; }
+        .status-manual_failed { background: #880000; color: #fff; }
+        .status-archived { background: #444; color: #fff; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #111; border: 1px solid #0f0; cursor: pointer; transition: all 0.3s; }
+        .tab:hover, .tab.active { background: #0f0; color: #000; }
+        .panel { display: none; background: #111; border: 1px solid #0f0; padding: 20px; }
+        .panel.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #0f0; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 8px; background: #000; border: 1px solid #0f0; color: #0f0; font-family: inherit;
+        }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .btn { padding: 8px 16px; background: #000; border: 1px solid #0f0; color: #0f0; cursor: pointer; font-family: inherit; transition: all 0.3s; }
+        .btn:hover { background: #0f0; color: #000; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-danger { border-color: #f00; color: #f00; }
+        .btn-danger:hover { background: #f00; color: #000; }
+        .btn-warning { border-color: #ff0; color: #ff0; }
+        .btn-warning:hover { background: #ff0; color: #000; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #222; color: #0f0; }
+        tr:hover { background: #222; }
+        .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+        .action-btns .btn { padding: 4px 8px; font-size: 12px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: #111; border: 1px solid #0f0; padding: 20px; max-width: 900px; max-height: 80vh; overflow-y: auto; width: 90%; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #0f0; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h4 { margin-bottom: 10px; color: #0f0; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .detail-item { display: flex; }
+        .detail-label { width: 120px; color: #888; }
+        .detail-value { flex: 1; }
+        .log-entry { background: #000; padding: 10px; margin-bottom: 5px; border-left: 3px solid #0f0; font-size: 12px; }
+        .log-meta { color: #888; margin-bottom: 5px; }
+        .console-log { background: #000; padding: 15px; margin-top: 15px; max-height: 300px; overflow-y: auto; font-size: 12px; }
+        .console-line { margin-bottom: 5px; }
+        .console-success { color: #0f0; }
+        .console-error { color: #f00; }
+        .console-info { color: #0ff; }
+        .close-btn { background: none; border: 1px solid #f00; color: #f00; width: 30px; height: 30px; cursor: pointer; font-size: 18px; }
+        .close-btn:hover { background: #f00; color: #000; }
+        .alert { padding: 10px; margin-bottom: 15px; border: 1px solid; }
+        .alert-info { border-color: #0ff; color: #0ff; }
+        .alert-warning { border-color: #ff0; color: #ff0; }
+        .highlight { background: #0f0; color: #000; padding: 0 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>═══ 退款异常处理 API 控制台 ═══</h1>
+            <p style="color: #666; margin-top: 5px;">Refund Exception Handling API Console v1.0</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="dashboard">仪表盘</div>
+            <div class="tab" data-tab="refunds">退款单管理</div>
+            <div class="tab" data-tab="logs">操作日志</div>
+            <div class="tab" data-tab="test">测试工具</div>
+        </div>
+
+        <div id="dashboard" class="panel active">
+            <h3>系统状态</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>服务状态</label>
+                    <input type="text" id="serviceStatus" value="检查中..." readonly>
+                </div>
+                <div class="form-group">
+                    <label>退款单总数</label>
+                    <input type="text" id="totalRefunds" value="0" readonly>
+                </div>
+                <div class="form-group">
+                    <label>处理中</label>
+                    <input type="text" id="processingCount" value="0" readonly>
+                </div>
+                <div class="form-group">
+                    <label>需人工复核</label>
+                    <input type="text" id="reviewCount" value="0" readonly>
+                </div>
+            </div>
+            <div class="alert alert-info">
+                <strong>快速操作指南:</strong><br>
+                1. 先在「测试工具」中创建模拟支付单<br>
+                2. 再创建退款单，状态变为 pending<br>
+                3. 点击「提交渠道」触发退款，观察状态变化<br>
+                4. 若返回 processing，可点击「查询渠道」再次确认<br>
+                5. 重试3次失败后进入 need_review 状态，需人工复核
+            </div>
+        </div>
+
+        <div id="refunds" class="panel">
+            <h3>退款单查询</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>退款单号</label>
+                    <input type="text" id="searchRefundNo" placeholder="输入退款单号...">
+                </div>
+                <div class="form-group">
+                    <label>原支付单号</label>
+                    <input type="text" id="searchPaymentNo" placeholder="输入支付单号...">
+                </div>
+                <div class="form-group">
+                    <label>状态筛选</label>
+                    <select id="searchStatus">
+                        <option value="">全部</option>
+                        <option value="pending">待提交</option>
+                        <option value="processing">处理中</option>
+                        <option value="success">成功</option>
+                        <option value="failed">失败</option>
+                        <option value="need_review">需人工复核</option>
+                        <option value="manual_success">人工确认成功</option>
+                        <option value="manual_failed">人工确认失败</option>
+                        <option value="archived">已归档</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>渠道</label>
+                    <select id="searchChannel">
+                        <option value="">全部</option>
+                        <option value="alipay">支付宝</option>
+                        <option value="wechat">微信支付</option>
+                        <option value="unionpay">银联</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" onclick="searchRefunds()">查询</button>
+            <button class="btn" onclick="refreshRefunds()">刷新</button>
+
+            <table id="refundsTable">
+                <thead>
+                    <tr>
+                        <th>退款单号</th>
+                        <th>支付单号</th>
+                        <th>金额</th>
+                        <th>渠道</th>
+                        <th>状态</th>
+                        <th>重试次数</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="logs" class="panel">
+            <h3>操作日志</h3>
+            <button class="btn" onclick="refreshLogs()">刷新日志</button>
+            <div id="logsContainer" style="margin-top: 15px;"></div>
+        </div>
+
+        <div id="test" class="panel">
+            <h3>测试工具</h3>
+            
+            <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #333;">
+                <h4 style="margin-bottom: 15px;">1. 创建模拟支付单</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>支付单号</label>
+                        <input type="text" id="testPaymentNo" value="TEST_ORDER_001">
+                    </div>
+                    <div class="form-group">
+                        <label>金额</label>
+                        <input type="number" id="testAmount" value="99.99" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>渠道</label>
+                        <select id="testChannel">
+                            <option value="alipay">支付宝</option>
+                            <option value="wechat">微信支付</option>
+                            <option value="unionpay">银联</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="createTestPayment()">创建支付单</button>
+            </div>
+
+            <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #333;">
+                <h4 style="margin-bottom: 15px;">2. 创建退款单</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>原支付单号</label>
+                        <input type="text" id="refundPaymentNo" placeholder="输入刚才创建的支付单号">
+                    </div>
+                    <div class="form-group">
+                        <label>退款金额</label>
+                        <input type="number" id="refundAmount" value="99.99" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>操作人</label>
+                        <input type="text" id="refundOperator" value="test_user">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>退款原因</label>
+                    <textarea id="refundReason" rows="2">用户申请退款</textarea>
+                </div>
+                <button class="btn" onclick="createRefund()">创建退款单</button>
+                <button class="btn btn-warning" onclick="createRefund()">重复创建(测试幂等)</button>
+            </div>
+
+            <div class="console-log" id="testConsole">
+                <div class="console-line console-info">>>> 测试控制台已就绪</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>退款单详情</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentRefundId = null;
+
+        function formatTime(timestamp) {
+            if (!timestamp) return '-';
+            return new Date(timestamp).toLocaleString('zh-CN');
+        }
+
+        function getStatusClass(status) {
+            return `status-${status}`;
+        }
+
+        function getStatusText(status) {
+            const map = {
+                pending: '待提交',
+                processing: '处理中',
+                success: '成功',
+                failed: '失败',
+                need_review: '需人工复核',
+                manual_success: '人工确认成功',
+                manual_failed: '人工确认失败',
+                archived: '已归档'
+            };
+            return map[status] || status;
+        }
+
+        function consoleLog(message, type = 'info') {
+            const console = document.getElementById('testConsole');
+            const line = document.createElement('div');
+            line.className = `console-line console-${type}`;
+            line.textContent = `>>> ${message}`;
+            console.appendChild(line);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        async function apiRequest(url, options = {}) {
+            try {
+                const response = await fetch(API_BASE + url, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        async function checkHealth() {
+            const result = await apiRequest('/health');
+            document.getElementById('serviceStatus').value = result.success ? '运行正常 ✓' : '异常 ✗';
+            return result.success;
+        }
+
+        async function loadDashboard() {
+            await checkHealth();
+            const result = await apiRequest('/refunds');
+            if (result.success) {
+                document.getElementById('totalRefunds').value = result.data.length;
+                document.getElementById('processingCount').value = 
+                    result.data.filter(r => r.status === 'processing').length;
+                document.getElementById('reviewCount').value = 
+                    result.data.filter(r => r.status === 'need_review').length;
+            }
+        }
+
+        async function searchRefunds() {
+            const params = new URLSearchParams({
+                refundNo: document.getElementById('searchRefundNo').value,
+                paymentOrderNo: document.getElementById('searchPaymentNo').value,
+                status: document.getElementById('searchStatus').value,
+                channel: document.getElementById('searchChannel').value
+            });
+            const result = await apiRequest('/refunds?' + params.toString());
+            renderRefundsTable(result.data || []);
+        }
+
+        async function refreshRefunds() {
+            const result = await apiRequest('/refunds');
+            renderRefundsTable(result.data || []);
+        }
+
+        function renderRefundsTable(refunds) {
+            const tbody = document.querySelector('#refundsTable tbody');
+            if (refunds.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #666;">暂无数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = refunds.map(r => `
+                <tr>
+                    <td>${r.refund_no}</td>
+                    <td>${r.payment_order_no}</td>
+                    <td>¥${r.amount.toFixed(2)}</td>
+                    <td>${r.channel}</td>
+                    <td><span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span></td>
+                    <td>${r.retry_count}/${r.max_retries}</td>
+                    <td>${formatTime(r.created_at)}</td>
+                    <td class="action-btns">
+                        <button class="btn" onclick="viewDetail('${r.id}')">详情</button>
+                        ${['pending', 'failed'].includes(r.status) ? 
+                            `<button class="btn" onclick="submitToChannel('${r.id}')">提交渠道</button>` : ''}
+                        ${r.status === 'processing' ? 
+                            `<button class="btn btn-warning" onclick="queryChannel('${r.id}')">查询渠道</button>` : ''}
+                        ${r.status === 'need_review' ? 
+                            `<button class="btn btn-warning" onclick="showReviewDialog('${r.id}')">人工复核</button>` : ''}
+                        ${['success', 'manual_success', 'manual_failed'].includes(r.status) ? 
+                            `<button class="btn" onclick="archiveRefund('${r.id}')">归档</button>` : ''}
+                        <button class="btn btn-danger" onclick="showFixDialog('${r.id}')">修复数据</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function viewDetail(id) {
+            const result = await apiRequest(`/refunds/${id}`);
+            if (!result.success) {
+                alert('加载失败: ' + result.error);
+                return;
+            }
+            currentRefundId = id;
+            renderDetail(result.data);
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function renderDetail(data) {
+            const r = data.refund;
+            const content = document.getElementById('detailContent');
+            content.innerHTML = `
+                <div class="detail-section">
+                    <h4>基本信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">退款单号:</span><span class="detail-value">${r.refund_no}</span></div>
+                        <div class="detail-item"><span class="detail-label">支付单号:</span><span class="detail-value">${r.payment_order_no}</span></div>
+                        <div class="detail-item"><span class="detail-label">退款金额:</span><span class="detail-value">¥${r.amount.toFixed(2)}</span></div>
+                        <div class="detail-item"><span class="detail-label">渠道:</span><span class="detail-value">${r.channel}</span></div>
+                        <div class="detail-item"><span class="detail-label">状态:</span><span class="detail-value"><span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span></span></div>
+                        <div class="detail-item"><span class="detail-label">重试次数:</span><span class="detail-value">${r.retry_count}/${r.max_retries}</span></div>
+                        <div class="detail-item"><span class="detail-label">操作人:</span><span class="detail-value">${r.operator || '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">创建时间:</span><span class="detail-value">${formatTime(r.created_at)}</span></div>
+                    </div>
+                    <div class="detail-item" style="margin-top: 10px;"><span class="detail-label">退款原因:</span><span class="detail-value">${r.reason || '-'}</span></div>
+                </div>
+
+                ${data.channelStatuses.length > 0 ? `
+                <div class="detail-section">
+                    <h4>渠道交互记录 (${data.channelStatuses.length})</h4>
+                    ${data.channelStatuses.map(c => `
+                        <div class="log-entry">
+                            <div class="log-meta">${formatTime(c.requested_at)} | 渠道ID: ${c.channel_refund_id || '-'}</div>
+                            <div>状态: <span class="status-badge status-${c.status}">${c.status}</span></div>
+                            <div style="margin-top: 5px;">响应: ${JSON.parse(c.channel_response).message}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                ${data.reviews.length > 0 ? `
+                <div class="detail-section">
+                    <h4>人工复核记录 (${data.reviews.length})</h4>
+                    ${data.reviews.map(rev => `
+                        <div class="log-entry">
+                            <div class="log-meta">${formatTime(rev.created_at)} | 复核人: ${rev.reviewer}</div>
+                            <div>结论: <span class="highlight">${rev.decision === 'approve' ? '确认成功' : '确认失败'}</span></div>
+                            <div style="margin-top: 5px;">备注: ${rev.comment}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                ${data.logs.length > 0 ? `
+                <div class="detail-section">
+                    <h4>操作日志 (${data.logs.length})</h4>
+                    ${data.logs.map(log => `
+                        <div class="log-entry">
+                            <div class="log-meta">${formatTime(log.created_at)} | 动作: ${log.action} | 节点: ${log.responsibility_node}</div>
+                            <div>请求: ${log.request_data}</div>
+                            <div style="margin-top: 5px;">响应: ${log.response_data}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                ${data.receipt ? `
+                <div class="detail-section">
+                    <h4>回执归档</h4>
+                    <div class="log-entry">
+                        <div class="log-meta">归档时间: ${formatTime(data.receipt.archived_at)}</div>
+                        <div>回执ID: ${data.receipt.id}</div>
+                    </div>
+                </div>
+                ` : ''}
+
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333;">
+                    <h4>快捷操作</h4>
+                    <div class="action-btns" style="margin-top: 10px;">
+                        ${['pending', 'failed'].includes(r.status) ? 
+                            `<button class="btn" onclick="submitToChannel('${r.id}'); closeModal();">提交渠道</button>` : ''}
+                        ${r.status === 'processing' ? 
+                            `<button class="btn btn-warning" onclick="queryChannel('${r.id}'); closeModal();">查询渠道</button>` : ''}
+                        ${r.status === 'need_review' ? 
+                            `<button class="btn btn-warning" onclick="showReviewDialog('${r.id}');">人工复核</button>` : ''}
+                        ${['success', 'manual_success', 'manual_failed'].includes(r.status) ? 
+                            `<button class="btn" onclick="archiveRefund('${r.id}'); closeModal();">归档</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+            currentRefundId = null;
+        }
+
+        async function submitToChannel(id) {
+            const result = await apiRequest(`/refunds/${id}/submit`, {
+                method: 'POST',
+                body: JSON.stringify({ operator: 'console_user' })
+            });
+            if (result.success) {
+                alert(`提交成功! 新状态: ${result.refund.status}\n渠道响应: ${result.channelResponse.message}`);
+            } else {
+                alert(`提交失败: ${result.error}`);
+            }
+            refreshRefunds();
+            loadDashboard();
+        }
+
+        async function queryChannel(id) {
+            const result = await apiRequest(`/refunds/${id}/query`, {
+                method: 'POST',
+                body: JSON.stringify({ operator: 'console_user' })
+            });
+            if (result.success) {
+                alert(`查询完成! 新状态: ${result.refund.status}\n查询响应: ${result.queryResponse.message}`);
+            } else {
+                alert(`查询失败: ${result.error}`);
+            }
+            refreshRefunds();
+            loadDashboard();
+        }
+
+        async function showReviewDialog(id) {
+            const decision = confirm('人工复核: \n\n点击 [确定] = 人工确认退款成功\n点击 [取消] = 人工确认退款失败');
+            const comment = prompt('请输入复核备注:', decision ? '人工核实，退款已成功' : '人工核实，退款失败');
+            if (!comment) return;
+
+            const result = await apiRequest(`/refunds/${id}/review`, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    reviewer: 'console_reviewer', 
+                    comment, 
+                    decision: decision ? 'approve' : 'reject' 
+                })
+            });
+            if (result.success) {
+                alert(`复核完成! 新状态: ${result.refund.status}`);
+            } else {
+                alert(`复核失败: ${result.error}`);
+            }
+            refreshRefunds();
+            loadDashboard();
+        }
+
+        async function archiveRefund(id) {
+            const result = await apiRequest(`/refunds/${id}/archive`, {
+                method: 'POST',
+                body: JSON.stringify({ operator: 'console_user' })
+            });
+            if (result.success) {
+                alert(`归档成功! 回执ID: ${result.receipt.id}`);
+            } else {
+                alert(`归档失败: ${result.error}`);
+            }
+            refreshRefunds();
+            loadDashboard();
+        }
+
+        async function showFixDialog(id) {
+            const newStatus = prompt('请输入目标状态:\n\n可选值: pending, processing, success, failed, need_review, manual_success, manual_failed, archived', 'pending');
+            if (!newStatus) return;
+
+            const reason = prompt('修复原因(用于日志记录):', '脏数据修复');
+            if (!reason) return;
+
+            const result = await apiRequest(`/refunds/${id}/fix`, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    newStatus, 
+                    operator: `admin_fix:${reason}` 
+                })
+            });
+            if (result.success) {
+                alert(`修复成功! 新状态: ${result.refund.status}`);
+            } else {
+                alert(`修复失败: ${result.error}`);
+            }
+            refreshRefunds();
+            loadDashboard();
+        }
+
+        async function refreshLogs() {
+            const result = await apiRequest('/logs?limit=200');
+            const container = document.getElementById('logsContainer');
+            if (!result.success) {
+                container.innerHTML = '<p style="color: #f00;">加载日志失败</p>';
+                return;
+            }
+            container.innerHTML = result.data.map(log => `
+                <div class="log-entry">
+                    <div class="log-meta">
+                        ${formatTime(log.created_at)} | 
+                        动作: <span class="highlight">${log.action}</span> | 
+                        责任节点: ${log.responsibility_node}
+                        ${log.refund_no ? ` | 退款单: ${log.refund_no}` : ''}
+                    </div>
+                    <div>请求: ${log.request_data}</div>
+                    <div>响应: ${log.response_data}</div>
+                </div>
+            `).join('');
+        }
+
+        async function createTestPayment() {
+            const orderNo = document.getElementById('testPaymentNo').value;
+            const amount = parseFloat(document.getElementById('testAmount').value);
+            const channel = document.getElementById('testChannel').value;
+
+            consoleLog(`创建支付单: ${orderNo}, 金额: ${amount}, 渠道: ${channel}`, 'info');
+            const result = await apiRequest('/payments', {
+                method: 'POST',
+                body: JSON.stringify({ orderNo, amount, channel })
+            });
+            if (result.success) {
+                consoleLog(`支付单创建成功! ID: ${result.paymentId}`, 'success');
+                document.getElementById('refundPaymentNo').value = orderNo;
+            } else {
+                consoleLog(`创建失败: ${result.error}`, 'error');
+            }
+        }
+
+        async function createRefund() {
+            const paymentOrderNo = document.getElementById('refundPaymentNo').value;
+            const amount = parseFloat(document.getElementById('refundAmount').value);
+            const reason = document.getElementById('refundReason').value;
+            const operator = document.getElementById('refundOperator').value;
+
+            consoleLog(`创建退款单: 支付单=${paymentOrderNo}, 金额=${amount}`, 'info');
+            const result = await apiRequest('/refunds', {
+                method: 'POST',
+                body: JSON.stringify({ paymentOrderNo, amount, reason, operator })
+            });
+            if (result.success) {
+                if (result.isDuplicate) {
+                    consoleLog(`幂等命中! 该支付单已有进行中的退款: ${result.refund.refund_no}`, 'warning');
+                } else {
+                    consoleLog(`退款单创建成功! 单号: ${result.refund.refund_no}, 状态: ${result.refund.status}`, 'success');
+                }
+                refreshRefunds();
+                loadDashboard();
+            } else {
+                consoleLog(`创建失败: ${result.error}`, 'error');
+            }
+        }
+
+        loadDashboard();
+        refreshRefunds();
+        refreshLogs();
+    </script>
+</body>
+</html>
