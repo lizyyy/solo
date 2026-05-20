@@ -107,7 +107,7 @@ export default function BatchDetail() {
     try {
       const data = await publishBatchesApi.export(id);
       const csvContent = [
-        ['批次ID', '批次名称', '批次状态', '同义词组ID', '同义词组名称', '版本', '应用范围', '同义词', '命中变化数', '平均变化率', '回滚次数', '最后状态', '状态说明'].join(','),
+        ['批次ID', '批次名称', '批次状态', '同义词组ID', '同义词组名称', '版本', '应用范围', '同义词', '命中变化数', '平均变化率', '回滚次数', '最后状态', '最后状态原因', '状态解释说明'].join(','),
         ...data.map(item => [
           item.batch_id,
           item.batch_name,
@@ -121,6 +121,7 @@ export default function BatchDetail() {
           item.hit_change_avg_percent,
           item.rollback_count,
           item.last_status,
+          item.last_status_reason,
           item.status_explanation
         ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
       ].join('\n');

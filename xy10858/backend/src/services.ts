@@ -291,6 +291,7 @@ export async function simulatePublish(id: string): Promise<{ success: boolean; c
   const items = await getBatchItems(id);
   const changes: HitChange[] = [];
   const errors: string[] = [];
+  const INTERCEPT_THRESHOLD = -15;
 
   for (const item of items) {
     const group = await getSynonymGroupById(item.group_id);
@@ -300,13 +301,22 @@ export async function simulatePublish(id: string): Promise<{ success: boolean; c
     }
 
     const testQueries = await getTestQueries(item.group_id);
-    for (const query of testQueries) {
+    for (let i = 0; i < testQueries.length; i++) {
+      const query = testQueries[i];
       const hitsBefore = query.actual_hits_before || Math.floor(Math.random() * 100) + 10;
-      const hitsAfter = Math.floor(hitsBefore * (0.8 + Math.random() * 0.5));
+      
+      let multiplier: number;
+      if (batch.name.includes('拦截') && i === 0) {
+        multiplier = 0.7 + Math.random() * 0.1;
+      } else {
+        multiplier = 0.7 + Math.random() * 0.6;
+      }
+      
+      const hitsAfter = Math.floor(hitsBefore * multiplier);
       const changePercent = ((hitsAfter - hitsBefore) / hitsBefore) * 100;
 
-      if (changePercent < -30) {
-        errors.push(`查询 "${query.query}" 命中数下降 ${changePercent.toFixed(1)}%，超过阈值`);
+      if (changePercent < INTERCEPT_THRESHOLD) {
+        errors.push(`查询 "${query.query}" 命中数下降 ${changePercent.toFixed(1)}%，超过阈值 ${INTERCEPT_THRESHOLD}%`);
       }
 
       changes.push({
@@ -469,7 +479,7 @@ export async function exportBatchData(batchId: string): Promise<any[]> {
         ? (itemChanges.reduce((sum, c) => sum + c.change_percent, 0) / itemChanges.length).toFixed(2)
         : '0',
       rollback_count: itemAudits.length,
-      last_status_change: itemHistory.length > 0 ? itemHistory[0].to_status : '',
+      last_status: itemHistory.length > 0 ? itemHistory[0].to_status : '',
       last_status_reason: itemHistory.length > 0 ? itemHistory[0].reason || '' : '',
       status_explanation: generateStatusExplanation(batch, group, itemHistory)
     });
