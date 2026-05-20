@@ -6,7 +6,7 @@ from app.models.base import BaseModel
 class Berth(BaseModel):
     __tablename__ = "berths"
 
-    berth_number = Column(String(20), nullable=False, unique=True, index=True)
+    berth_number = Column(String(20), nullable=False, index=True)
     reconciliation_records = relationship("ReconciliationRecord", back_populates="berth")
     terminal = Column(String(100))
     description = Column(String(255))

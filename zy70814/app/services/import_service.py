@@ -82,19 +82,13 @@ class ImportService:
             berth_data["source_file"] = filename
             berth_data["batch_id"] = batch_id
 
-            existing = (
-                self.db.query(Berth).filter(Berth.berth_number == berth_data["berth_number"]).first()
-            )
-            if existing:
-                for key, value in berth_data.items():
-                    setattr(existing, key, value)
-                berths.append(existing)
-            else:
-                berth = Berth(**berth_data)
-                self.db.add(berth)
-                berths.append(berth)
+            berth = Berth(**berth_data)
+            self.db.add(berth)
+            berths.append(berth)
 
         self.db.commit()
+        for berth in berths:
+            self.db.refresh(berth)
         return berths, batch_id
 
     def _parse_berth_item(self, item: Dict[str, Any]) -> Dict[str, Any]:
