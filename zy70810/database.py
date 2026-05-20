@@ -90,8 +90,12 @@ class ReconciliationRecord(Base):
     contract_status = Column(String)
     contract_end_date = Column(Date)
     contract_count = Column(Integer, default=0)
+    has_multiple_contracts = Column(Boolean, default=False)
+    has_expired_contract = Column(Boolean, default=False)
+    has_missing_contract = Column(Boolean, default=False)
     
     maintenance_status = Column(String)
+    has_maintenance_overdue = Column(Boolean, default=False)
     last_maintenance_date = Column(Date)
     next_maintenance_date = Column(Date)
     maintenance_overdue_days = Column(Integer, default=0)
@@ -99,6 +103,7 @@ class ReconciliationRecord(Base):
     photo_status = Column(String)
     photo_count = Column(Integer, default=0)
     latest_photo_date = Column(Date)
+    has_photo_missing = Column(Boolean, default=False)
     
     overall_status = Column(String)
     issues = Column(Text)

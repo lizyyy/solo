@@ -38,8 +38,9 @@ def process_device_reconciliation(db: Session, task_id: int, device: Device, tod
     
     has_multiple_contracts = contract_count > 1
     has_expired_contract = False
+    has_missing_contract = contract_count == 0
     
-    if contract_count == 0:
+    if has_missing_contract:
         contract_status = "missing"
         issues.append("无有效维保合同")
     elif has_multiple_contracts:
@@ -57,8 +58,9 @@ def process_device_reconciliation(db: Session, task_id: int, device: Device, tod
     
     maintenance_status = "normal"
     overdue_days = calculate_overdue_days(device.next_maintenance_date)
+    has_maintenance_overdue = overdue_days > 0
     
-    if overdue_days > 0:
+    if has_maintenance_overdue:
         maintenance_status = "overdue"
         issues.append(f"维保已过期{overdue_days}天，上次维保：{device.last_maintenance_date}")
     elif not device.last_maintenance_date:
@@ -68,8 +70,9 @@ def process_device_reconciliation(db: Session, task_id: int, device: Device, tod
     photo_count = len(photos)
     photo_status = "normal"
     latest_photo_date = None
+    has_photo_missing = photo_count == 0
     
-    if photo_count == 0:
+    if has_photo_missing:
         photo_status = "missing"
         issues.append("无巡检照片")
     else:
@@ -92,11 +95,16 @@ def process_device_reconciliation(db: Session, task_id: int, device: Device, tod
         contract_status=contract_status,
         contract_end_date=contract_end_date,
         contract_count=contract_count,
+        has_multiple_contracts=has_multiple_contracts,
+        has_expired_contract=has_expired_contract,
+        has_missing_contract=has_missing_contract,
         maintenance_status=maintenance_status,
+        has_maintenance_overdue=has_maintenance_overdue,
         last_maintenance_date=device.last_maintenance_date,
         next_maintenance_date=device.next_maintenance_date,
         maintenance_overdue_days=overdue_days,
         photo_status=photo_status,
+        has_photo_missing=has_photo_missing,
         photo_count=photo_count,
         latest_photo_date=latest_photo_date,
         overall_status=overall_status,
@@ -131,10 +139,10 @@ def update_reconciliation_summary(db: Session, task_id: int):
     
     total = len(records)
     normal_count = sum(1 for r in records if r.overall_status == "normal")
-    maintenance_overdue = sum(1 for r in records if r.maintenance_status == "overdue")
-    multiple_contracts = sum(1 for r in records if r.contract_status == "multiple")
-    photo_missing = sum(1 for r in records if r.photo_status == "missing")
-    contract_expired = sum(1 for r in records if r.contract_status == "expired")
+    maintenance_overdue = sum(1 for r in records if r.has_maintenance_overdue)
+    multiple_contracts = sum(1 for r in records if r.has_multiple_contracts)
+    photo_missing = sum(1 for r in records if r.has_photo_missing)
+    contract_expired = sum(1 for r in records if r.has_expired_contract)
     needs_review = sum(1 for r in records if r.needs_review)
     reviewed = sum(1 for r in records if r.is_reviewed)
     
