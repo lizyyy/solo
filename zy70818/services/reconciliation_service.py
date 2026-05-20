@@ -382,6 +382,9 @@ class ReconciliationEngine:
 
 
 class ReviewService:
+    def __init__(self):
+        self.engine = ReconciliationEngine()
+
     def review_discrepancy(
         self,
         reconciliation_id: str,
@@ -390,10 +393,10 @@ class ReviewService:
         notes: str,
         reviewed_by: str,
         adjustment_quantity: Optional[int] = None
-    ) -> Tuple[bool, str]:
+    ) -> Tuple[bool, str, ReconciliationResult]:
         reconciliation = store.get('reconciliation', reconciliation_id, ReconciliationResult)
         if not reconciliation:
-            return False, "对账任务不存在"
+            return False, "对账任务不存在", None
 
         disc_index = None
         target_disc = None
@@ -404,9 +407,8 @@ class ReviewService:
                 break
 
         if not target_disc:
-            return False, "差异记录不存在"
+            return False, "差异记录不存在", None
 
-        old_value = target_disc.is_reviewed
         target_disc.is_reviewed = True
         target_disc.review_action = action
         target_disc.review_notes = notes
@@ -417,15 +419,11 @@ class ReviewService:
         if adjustment_quantity is not None:
             self._update_inventory_quantity(target_disc, adjustment_quantity)
 
-        reconciliation.discrepancies[disc_index] = target_disc
-        reconciliation.unresolved_discrepancy_count = max(0, reconciliation.unresolved_discrepancy_count - 1)
+        updated_reconciliation = self._recalculate_reconciliation(reconciliation, reviewed_by)
 
-        if reconciliation.unresolved_discrepancy_count == 0:
-            reconciliation.status = ReconciliationStatus.COMPLETED
+        store.update('reconciliation', reconciliation_id, updated_reconciliation)
 
-        store.update('reconciliation', reconciliation_id, reconciliation)
-
-        return True, "复核完成"
+        return True, "复核完成，数据已重新计算", updated_reconciliation
 
     def _update_inventory_quantity(self, discrepancy: Discrepancy, new_quantity: int):
         inventory_items = store.get_all('inventory', InventoryItem)
@@ -435,6 +433,64 @@ class ReviewService:
                 item.quantity = new_quantity
                 store.update('inventory', item.id, item)
                 break
+
+    def _recalculate_reconciliation(
+        self,
+        old_reconciliation: ReconciliationResult,
+        reviewed_by: str
+    ) -> ReconciliationResult:
+        inventory_items = store.get_all('inventory', InventoryItem)
+        recall_notices = store.get_all('recall', RecallNotice)
+        consumption_items = store.get_all('consumption', ConsumptionItem)
+
+        new_discrepancies = []
+        new_discrepancies.extend(self.engine._check_recall_batches(inventory_items, recall_notices))
+        new_discrepancies.extend(self.engine._check_expiry_status(inventory_items))
+        new_discrepancies.extend(self.engine._check_transfer_records(consumption_items))
+        new_discrepancies.extend(self.engine._check_quantity_balance(inventory_items, consumption_items))
+
+        reviewed_discrepancies = {d.id: d for d in old_reconciliation.discrepancies if d.is_reviewed}
+
+        final_discrepancies = []
+        for new_disc in new_discrepancies:
+            matching_reviewed = None
+            for reviewed_id, reviewed_disc in reviewed_discrepancies.items():
+                if (reviewed_disc.batch_number == new_disc.batch_number and
+                    reviewed_disc.store_name == new_disc.store_name and
+                    reviewed_disc.type == new_disc.type):
+                    matching_reviewed = reviewed_disc
+                    break
+
+            if matching_reviewed:
+                new_disc.id = matching_reviewed.id
+                new_disc.is_reviewed = True
+                new_disc.review_action = matching_reviewed.review_action
+                new_disc.review_notes = matching_reviewed.review_notes
+                new_disc.reviewed_by = matching_reviewed.reviewed_by
+                new_disc.reviewed_at = matching_reviewed.reviewed_at
+                new_disc.adjustment_quantity = matching_reviewed.adjustment_quantity
+
+            if not new_disc.id:
+                new_disc.id = store.generate_id()
+
+            final_discrepancies.append(new_disc)
+
+        old_reconciliation.discrepancies = final_discrepancies
+        old_reconciliation.discrepancy_count = len(final_discrepancies)
+        old_reconciliation.unresolved_discrepancy_count = len([d for d in final_discrepancies if not d.is_reviewed])
+        old_reconciliation.recalled_batch_count = len([d for d in final_discrepancies if d.type == DiscrepancyType.RECALL])
+        old_reconciliation.near_expiry_count = len([d for d in final_discrepancies if d.type == DiscrepancyType.NEAR_EXPIRY])
+        old_reconciliation.expired_count = len([d for d in final_discrepancies if d.type == DiscrepancyType.EXPIRED])
+        old_reconciliation.transfer_count = len([d for d in final_discrepancies if d.type == DiscrepancyType.TRANSFER])
+        old_reconciliation.summary_data = self.engine._build_summary_data(inventory_items, consumption_items, final_discrepancies)
+        old_reconciliation.updated_at = datetime.now()
+
+        if old_reconciliation.unresolved_discrepancy_count == 0:
+            old_reconciliation.status = ReconciliationStatus.COMPLETED
+        else:
+            old_reconciliation.status = ReconciliationStatus.REVIEWING
+
+        return old_reconciliation
 
 
 reconciliation_engine = ReconciliationEngine()

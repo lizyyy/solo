@@ -81,7 +81,7 @@ async def get_discrepancies(reconciliation_id: str):
 
 @router.post("/{reconciliation_id}/discrepancies/{discrepancy_id}/review", summary="复核差异")
 async def review_discrepancy(reconciliation_id: str, discrepancy_id: str, request: ReviewRequest):
-    success, message = review_service.review_discrepancy(
+    success, message, updated_recon = review_service.review_discrepancy(
         reconciliation_id=reconciliation_id,
         discrepancy_id=discrepancy_id,
         action=request.action,
@@ -91,7 +91,18 @@ async def review_discrepancy(reconciliation_id: str, discrepancy_id: str, reques
     )
     if not success:
         raise HTTPException(status_code=400, detail=message)
-    return {"success": True, "message": message}
+    return {
+        "success": True,
+        "message": message,
+        "updated_statistics": {
+            "total_discrepancies": updated_recon.discrepancy_count,
+            "unresolved_discrepancies": updated_recon.unresolved_discrepancy_count,
+            "recalled_batch_count": updated_recon.recalled_batch_count,
+            "near_expiry_count": updated_recon.near_expiry_count,
+            "expired_count": updated_recon.expired_count,
+            "transfer_count": updated_recon.transfer_count
+        } if updated_recon else None
+    }
 
 
 @router.delete("/{reconciliation_id}", summary="删除对账任务")

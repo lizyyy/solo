@@ -11,6 +11,8 @@ print("=" * 60)
 tests = [
     ("数据导入测试", "tests/test_import.py"),
     ("对账功能测试", "tests/test_reconciliation.py"),
+    ("数量平衡测试", "tests/test_quantity_balance.py"),
+    ("复核同步测试", "tests/test_review_sync.py"),
     ("报告生成测试", "tests/test_report.py"),
     ("API接口测试", "tests/test_api.py"),
 ]
