@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Table, Button, Tag, Space, Modal, Form, Input, Select, message, Card, Statistic, Row, Col, Timeline, Dropdown } from 'antd';
-import { PlusOutlined, ExportOutlined, HistoryOutlined, SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, SafetyCertificateOutlined, ToolOutlined, EyeOutlined } from '@ant-design/icons';
+import { Layout, Table, Button, Tag, Space, Modal, Form, Input, Select, message, Card, Statistic, Row, Col, Timeline, Dropdown, Checkbox, Alert } from 'antd';
+import { PlusOutlined, ExportOutlined, HistoryOutlined, SearchOutlined, CheckCircleOutlined, CloseCircleOutlined, SafetyCertificateOutlined, ToolOutlined, EyeOutlined, MergeOutlined, FileTextOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { vulnerabilityApi } from './services/api';
 
@@ -29,14 +29,18 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [mergeModalVisible, setMergeModalVisible] = useState(false);
   const [selectedVulnerability, setSelectedVulnerability] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
   const [verifications, setVerifications] = useState([]);
   const [form] = Form.useForm();
   const [actionForm] = Form.useForm();
+  const [mergeForm] = Form.useForm();
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [currentAction, setCurrentAction] = useState(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [operator] = useState('current-user');
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
 
   useEffect(() => {
     loadVulnerabilities();
@@ -45,7 +49,7 @@ function App() {
   const loadVulnerabilities = async () => {
     setLoading(true);
     try {
-      const res = await vulnerabilityApi.getAll();
+      const res = await vulnerabilityApi.getAll({}, operator);
       if (res.data.success) {
         setVulnerabilities(res.data.data);
       }
@@ -58,7 +62,7 @@ function App() {
   const loadDetail = async (id) => {
     try {
       const [vulnRes, logsRes, verifRes] = await Promise.all([
-        vulnerabilityApi.getById(id),
+        vulnerabilityApi.getById(id, operator),
         vulnerabilityApi.getAuditLogs(id),
         vulnerabilityApi.getVerifications(id)
       ]);
@@ -73,17 +77,51 @@ function App() {
 
   const handleCreate = async (values) => {
     try {
-      await vulnerabilityApi.create({
+      const res = await vulnerabilityApi.create({
         ...values,
         affectedServices: values.affectedServices ? values.affectedServices.split(',').map(s => s.trim()) : [],
         operator
       });
-      message.success('创建成功');
+      
+      if (res.data.data.duplicatesFound && res.data.data.duplicatesFound > 0) {
+        setDuplicateWarning({
+          packageName: values.packageName,
+          count: res.data.data.duplicatesFound,
+          existingDuplicates: res.data.data.existingDuplicates
+        });
+      }
+      
+      message.success(res.data.data.merged ? '检测到重复漏洞，已自动归并' : '创建成功');
       setCreateModalVisible(false);
       form.resetFields();
       loadVulnerabilities();
     } catch (error) {
       message.error(error.response?.data?.error || '创建失败');
+    }
+  };
+
+  const handleMerge = async (values) => {
+    try {
+      await vulnerabilityApi.merge(values.targetId, selectedRowKeys, operator);
+      message.success('合并成功');
+      setMergeModalVisible(false);
+      setSelectedRowKeys([]);
+      mergeForm.resetFields();
+      loadVulnerabilities();
+    } catch (error) {
+      message.error(error.response?.data?.error || '合并失败');
+    }
+  };
+
+  const handleExport = async (format, includeDetails) => {
+    try {
+      const res = await vulnerabilityApi.export(format, {}, operator, includeDetails);
+      if (res.data.success) {
+        window.open(`/api/vulnerabilities/exports/${res.data.data.filename}`);
+        message.success(`导出成功，共 ${res.data.data.count} 条记录${includeDetails ? '（含完整审计轨迹）' : ''}`);
+      }
+    } catch (error) {
+      message.error('导出失败');
     }
   };
 
@@ -158,6 +196,13 @@ function App() {
         break;
     }
     return actions;
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (newSelectedRowKeys) => {
+      setSelectedRowKeys(newSelectedRowKeys);
+    }
   };
 
   const columns = [
@@ -266,8 +311,11 @@ function App() {
           <Dropdown
             menu={{
               items: [
-                { key: 'csv', label: '导出 CSV', onClick: () => handleExport('csv') },
-                { key: 'json', label: '导出 JSON', onClick: () => handleExport('json') }
+                { key: 'csv-basic', label: '基础 CSV', icon: <ExportOutlined />, onClick: () => handleExport('csv', false) },
+                { key: 'json-basic', label: '基础 JSON', icon: <ExportOutlined />, onClick: () => handleExport('json', false) },
+                { type: 'divider' },
+                { key: 'csv-full', label: '完整报告 CSV (含审计/验证)', icon: <FileTextOutlined />, onClick: () => handleExport('csv', true) },
+                { key: 'json-full', label: '完整报告 JSON (含审计/验证)', icon: <FileTextOutlined />, onClick: () => handleExport('json', true) }
               ]
             }}
           >
@@ -306,7 +354,36 @@ function App() {
           </Col>
         </Row>
 
-        <Card title="异常队列" extra={`共 ${vulnerabilities.length} 条记录`}>
+        <Card 
+          title="异常队列" 
+          extra={
+            <Space>
+              <span>共 {vulnerabilities.length} 条记录</span>
+              {selectedRowKeys.length > 1 && (
+                <Button 
+                  type="primary" 
+                  icon={<MergeOutlined />} 
+                  onClick={() => {
+                    setMergeModalVisible(true);
+                    mergeForm.setFieldsValue({ targetId: selectedRowKeys[0] });
+                  }}
+                >
+                  合并选中 ({selectedRowKeys.length})
+                </Button>
+              )}
+            </Space>
+          }
+        >
+          {duplicateWarning && (
+            <Alert
+              message={`检测到 ${duplicateWarning.packageName} 有 ${duplicateWarning.count} 条重复漏洞记录`}
+              type="warning"
+              showIcon
+              closable
+              onClose={() => setDuplicateWarning(null)}
+              style={{ marginBottom: 16 }}
+            />
+          )}
           <Table
             columns={columns}
             dataSource={vulnerabilities}
@@ -314,6 +391,7 @@ function App() {
             loading={loading}
             rowClassName={(record) => `status-${record.status.toLowerCase()}`}
             pagination={{ pageSize: 10 }}
+            rowSelection={rowSelection}
           />
         </Card>
       </Content>
@@ -466,6 +544,49 @@ function App() {
             )}
           </div>
         )}
+      </Modal>
+
+      <Modal
+        title="合并漏洞"
+        open={mergeModalVisible}
+        onCancel={() => setMergeModalVisible(false)}
+        onOk={() => mergeForm.submit()}
+        width={600}
+      >
+        <Alert
+          message="合并说明"
+          description="合并后，源漏洞的所有操作记录将被合并到目标漏洞中，源漏洞会被标记为已关闭。此操作不可逆。"
+          type="warning"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+        <Form form={mergeForm} layout="vertical" onFinish={handleMerge}>
+          <Form.Item name="targetId" label="目标漏洞（保留）" rules={[{ required: true, message: '请选择目标漏洞' }]}>
+            <Select placeholder="选择要保留的目标漏洞">
+              {selectedRowKeys.map(id => {
+                const vuln = vulnerabilities.find(v => v.id === id);
+                return vuln ? (
+                  <Option key={id} value={id}>
+                    {vuln.package_name}@{vuln.package_version} - {vuln.cve_id} ({vuln.status})
+                  </Option>
+                ) : null;
+              })}
+            </Select>
+          </Form.Item>
+          <div>
+            <p><strong>将被合并的漏洞（共 {selectedRowKeys.length - 1} 个）:</strong></p>
+            <ul>
+              {selectedRowKeys.filter(id => id !== mergeForm.getFieldValue('targetId')).map(id => {
+                const vuln = vulnerabilities.find(v => v.id === id);
+                return vuln ? (
+                  <li key={id}>
+                    {vuln.package_name}@{vuln.package_version} - {vuln.cve_id}
+                  </li>
+                ) : null;
+              })}
+            </ul>
+          </div>
+        </Form>
       </Modal>
     </Layout>
   );

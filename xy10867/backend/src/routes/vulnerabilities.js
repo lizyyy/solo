@@ -16,8 +16,8 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
   try {
-    const { status, severity } = req.query;
-    const result = await VulnerabilityService.getVulnerabilities({ status, severity });
+    const { status, severity, operator } = req.query;
+    const result = await VulnerabilityService.getVulnerabilities({ status, severity }, operator);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -26,7 +26,8 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const result = await VulnerabilityService.getVulnerability(req.params.id);
+    const { operator } = req.query;
+    const result = await VulnerabilityService.getVulnerability(req.params.id, operator);
     if (!result) {
       return res.status(404).json({ success: false, error: '漏洞不存在' });
     }
@@ -116,8 +117,8 @@ router.get('/:id/verifications', async (req, res) => {
 
 router.post('/export', async (req, res) => {
   try {
-    const { format = 'csv', filters = {} } = req.body;
-    const result = await ExportService.exportVulnerabilities(format, filters);
+    const { format = 'csv', filters = {}, operator, includeDetails = false } = req.body;
+    const result = await ExportService.exportVulnerabilities(format, filters, operator, includeDetails);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
