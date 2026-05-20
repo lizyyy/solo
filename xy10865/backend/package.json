@@ -1,0 +1,15 @@
+{
+  "name": "dependency-health-checker-backend",
+  "version": "1.0.0",
+  "description": "依赖健康检查台 - 后端API服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0"
+  }
+}
