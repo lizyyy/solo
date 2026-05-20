@@ -34,6 +34,10 @@ class ReconciliationBatch(BaseModel):
     berth_file = Column(String(255))
     tide_file = Column(String(255))
     
+    vessel_batch_id = Column(String(100), index=True)
+    berth_batch_id = Column(String(100), index=True)
+    tide_batch_id = Column(String(100), index=True)
+    
     status = Column(String(50), default=ReconciliationStatus.PENDING)
     total_records = Column(Integer, default=0)
     passed_records = Column(Integer, default=0)

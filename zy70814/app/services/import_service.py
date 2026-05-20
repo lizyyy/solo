@@ -175,6 +175,9 @@ class ImportService:
             vessel_schedule_file=vessel_file,
             berth_file=berth_file,
             tide_file=tide_file,
+            vessel_batch_id=vessel_batch_id,
+            berth_batch_id=berth_batch_id,
+            tide_batch_id=tide_batch_id,
             status="pending",
             created_by=created_by,
         )

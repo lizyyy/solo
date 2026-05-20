@@ -125,6 +125,23 @@ curl -X POST "http://localhost:8000/api/v1/review/batch" \
   }'
 ```
 
+### 4.5 修改数据并重新计算
+
+当人工复核发现数据需要修正时，可通过此接口修改船期数据并自动触发重新对账：
+
+```bash
+# 修改吃水深度并重新计算
+curl -X POST "http://localhost:8000/api/v1/record/1/update-and-recalculate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft": 14.0,
+    "operator": "调度员A"
+  }'
+
+# 查看单条船期详情
+curl "http://localhost:8000/api/v1/vessel/1"
+```
+
 ### 5. 导出报告
 
 ```bash

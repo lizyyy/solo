@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, Body
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -16,7 +16,7 @@ from app.services.import_service import ImportService
 from app.services.reconciliation_service import ReconciliationService
 from app.services.review_service import ReviewService
 from app.services.report_service import ReportService
-from app.models import ReconciliationBatch, ReconciliationRecord
+from app.models import ReconciliationBatch, ReconciliationRecord, VesselSchedule
 
 router = APIRouter(prefix="/api/v1", tags=["reconciliation"])
 
@@ -144,8 +144,6 @@ def get_record_details(
 ):
     reconciliation_service = ReconciliationService(db)
     record = reconciliation_service.get_record_details(record_id)
-
-    discrepancies = db.query(ReconciliationRecord.discrepancies).filter(ReconciliationRecord.id == record_id).first()
 
     review_service = ReviewService(db)
     history = review_service.get_review_history(record_id)
@@ -406,3 +404,99 @@ def create_batch(
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"批次创建失败: {str(e)}")
+
+
+@router.put("/vessel/{vessel_id}", response_model=Response)
+def update_vessel(
+    vessel_id: int,
+    updates: dict = Body(..., description="要更新的字段和值"),
+    operator: Optional[str] = Query(None, description="操作人"),
+    db: Session = Depends(get_db),
+):
+    try:
+        vessel = db.query(VesselSchedule).filter(VesselSchedule.id == vessel_id).first()
+        if not vessel:
+            raise HTTPException(status_code=404, detail="船舶不存在")
+
+        old_values = {}
+        for key, value in updates.items():
+            if hasattr(vessel, key) and key not in ["id", "created_at", "updated_at"]:
+                old_values[key] = getattr(vessel, key)
+                setattr(vessel, key, value)
+
+        db.commit()
+        db.refresh(vessel)
+
+        return Response(
+            code=200,
+            message="船舶信息更新成功",
+            data={
+                "vessel_id": vessel.id,
+                "updated_fields": list(old_values.keys()),
+                "old_values": old_values,
+            },
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"更新失败: {str(e)}")
+
+
+@router.post("/record/{record_id}/update-and-recalculate", response_model=Response)
+def update_record_and_recalculate(
+    record_id: int,
+    updates: dict = Body(..., description="要更新的字段和值"),
+    operator: Optional[str] = Query(None, description="操作人"),
+    db: Session = Depends(get_db),
+):
+    try:
+        review_service = ReviewService(db)
+        record = review_service.update_vessel_and_recalculate(
+            record_id=record_id,
+            updates=updates,
+            updated_by=operator,
+        )
+
+        return Response(
+            code=200,
+            message="数据更新并重新计算完成",
+            data={
+                "record_id": record.id,
+                "new_status": record.status,
+                "discrepancy_count": record.discrepancy_count,
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"更新重算失败: {str(e)}")
+
+
+@router.get("/vessel/{vessel_id}", response_model=Response)
+def get_vessel_details(
+    vessel_id: int,
+    db: Session = Depends(get_db),
+):
+    vessel = db.query(VesselSchedule).filter(VesselSchedule.id == vessel_id).first()
+    if not vessel:
+        raise HTTPException(status_code=404, detail="船舶不存在")
+
+    return Response(
+        code=200,
+        message="查询成功",
+        data={
+            "id": vessel.id,
+            "vessel_name": vessel.vessel_name,
+            "vessel_imo": vessel.vessel_imo,
+            "voyage_number": vessel.voyage_number,
+            "draft": vessel.draft,
+            "eta": vessel.eta,
+            "etd": vessel.etd,
+            "berth_number": vessel.berth_number,
+            "is_cut_in": vessel.is_cut_in,
+            "cut_in_reason": vessel.cut_in_reason,
+            "batch_id": vessel.batch_id,
+            "source_file": vessel.source_file,
+            "created_at": vessel.created_at,
+        },
+    )

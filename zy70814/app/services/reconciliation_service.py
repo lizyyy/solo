@@ -29,9 +29,20 @@ class ReconciliationService:
         if not batch:
             raise ValueError(f"Batch {batch_id} not found")
 
-        vessels = self.db.query(VesselSchedule).all()
-        berths = {b.berth_number: b for b in self.db.query(Berth).all()}
-        tides = self.db.query(TideRecord).order_by(TideRecord.record_date).all()
+        vessel_query = self.db.query(VesselSchedule)
+        if batch.vessel_batch_id:
+            vessel_query = vessel_query.filter(VesselSchedule.batch_id == batch.vessel_batch_id)
+        vessels = vessel_query.all()
+
+        berth_query = self.db.query(Berth)
+        if batch.berth_batch_id:
+            berth_query = berth_query.filter(Berth.batch_id == batch.berth_batch_id)
+        berths = {b.berth_number: b for b in berth_query.all()}
+
+        tide_query = self.db.query(TideRecord)
+        if batch.tide_batch_id:
+            tide_query = tide_query.filter(TideRecord.batch_id == batch.tide_batch_id)
+        tides = tide_query.order_by(TideRecord.record_date).all()
 
         self.db.query(ReconciliationRecord).filter(ReconciliationRecord.batch_id == batch_id).delete()
         self.db.query(DiscrepancyLog).filter(DiscrepancyLog.batch_id == batch_id).delete()

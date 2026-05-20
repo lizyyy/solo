@@ -174,16 +174,23 @@ class ReviewService:
         )
         self.db.add(history)
 
-        batch = self.db.query(ReconciliationBatch).filter(ReconciliationBatch.batch_id == record.batch_id).first()
+        batch_id = record.batch_id
+        vessel_id = record.vessel_schedule_id
+
+        batch = self.db.query(ReconciliationBatch).filter(ReconciliationBatch.batch_id == batch_id).first()
         if batch:
             self.reconciliation_service.run_reconciliation(batch.batch_id)
 
-        record.status = ReconciliationStatus.REVIEWING
-        record.is_reviewed = False
-        self.db.commit()
-        self.db.refresh(record)
+        new_record = (
+            self.db.query(ReconciliationRecord)
+            .filter(
+                ReconciliationRecord.batch_id == batch_id,
+                ReconciliationRecord.vessel_schedule_id == vessel_id,
+            )
+            .first()
+        )
 
-        return record
+        return new_record
 
     def get_review_history(self, record_id: int) -> List[ReviewHistory]:
         return (
