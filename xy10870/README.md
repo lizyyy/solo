@@ -74,8 +74,10 @@ chmod +x run_backend.sh
 
 方式二：手动启动
 ```bash
-# 安装依赖
+# 进入 backend 目录（重要！所有命令必须在 backend 目录内执行）
 cd backend
+
+# 安装依赖
 pip install -r requirements.txt
 
 # 初始化数据库和模拟数据
@@ -84,6 +86,8 @@ python init_data.py
 # 启动服务
 python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
+
+> ⚠️ **重要提示**: 所有后端命令（包括初始化数据库和启动服务）必须在 `backend` 目录内执行，确保数据库路径一致。
 
 后端服务启动后，访问以下地址：
 - API 文档: http://localhost:8000/docs (Swagger UI)

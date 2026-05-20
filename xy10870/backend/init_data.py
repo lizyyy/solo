@@ -77,8 +77,8 @@ def init_data():
             ],
         }
         
-        statuses = [RequestStatus.SUCCESS, RequestStatus.FAILED, RequestStatus.TIMEOUT, RequestStatus.RUNNING, RequestStatus.PENDING]
-        weights = [0.7, 0.2, 0.05, 0.03, 0.02]
+        statuses = [RequestStatus.SUCCESS, RequestStatus.FAILED, RequestStatus.TIMEOUT]
+        weights = [0.75, 0.2, 0.05]
         
         for i in range(50):
             student = random.choice(all_students)
