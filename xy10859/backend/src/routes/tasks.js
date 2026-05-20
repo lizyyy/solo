@@ -5,7 +5,7 @@ const db = require('../database/init');
 const MaskingService = require('../utils/masking');
 
 router.post('/create', (req, res) => {
-  const { role_code, task_name, parameters, created_by } = req.body;
+  const { role_code, task_name, parameters, created_by, idempotency_key } = req.body;
   
   if (!role_code || !task_name || !created_by) {
     return res.status(400).json({ error: '缺少必要参数' });
@@ -17,28 +17,57 @@ router.post('/create', (req, res) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!role) return res.status(404).json({ error: '角色不存在' });
 
-      const taskId = uuidv4();
-      const needApproval = role_code === 'admin' ? 0 : 1;
-      
-      db.run(`INSERT INTO export_tasks (task_id, role_id, task_name, parameters, need_approval, created_by, status) 
-              VALUES (?, ?, ?, ?, ?, ?, 'pending')`,
-        [taskId, role.id, task_name, JSON.stringify(parameters || {}), needApproval, created_by],
-        function(err) {
-          if (err) {
-            if (err.message.includes('UNIQUE')) {
-              return res.status(409).json({ error: '任务ID冲突，请重试' });
+      if (idempotency_key) {
+        db.get(`SELECT task_id, status, need_approval FROM export_tasks 
+                WHERE created_by = ? AND task_name = ? AND parameters = ?`,
+          [created_by, task_name, JSON.stringify(parameters || {})],
+          (err, existingTask) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (existingTask) {
+              return res.status(409).json({ 
+                error: '任务已存在，请勿重复提交',
+                task_id: existingTask.task_id,
+                status: existingTask.status
+              });
             }
-            return res.status(500).json({ error: err.message });
+            createTask();
           }
-          
-          res.json({ 
-            task_id: taskId, 
-            status: 'pending',
-            need_approval: needApproval,
-            strategy_version: role.strategy_version
-          });
-        }
-      );
+        );
+      } else {
+        createTask();
+      }
+
+      function createTask() {
+        const taskId = uuidv4();
+        const needApproval = role_code === 'admin' ? 0 : 1;
+        const initialStatus = role_code === 'admin' ? 'processing' : 'pending';
+        
+        db.run(`INSERT INTO export_tasks (task_id, role_id, task_name, parameters, need_approval, created_by, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [taskId, role.id, task_name, JSON.stringify(parameters || {}), needApproval, created_by, initialStatus],
+          function(err) {
+            if (err) {
+              if (err.message.includes('UNIQUE')) {
+                return res.status(409).json({ error: '任务ID冲突，请重试' });
+              }
+              return res.status(500).json({ error: err.message });
+            }
+            
+            if (role_code === 'admin') {
+              setTimeout(() => {
+                simulateExport(taskId);
+              }, 1000);
+            }
+            
+            res.json({ 
+              task_id: taskId, 
+              status: initialStatus,
+              need_approval: needApproval,
+              strategy_version: role.strategy_version
+            });
+          }
+        );
+      }
     }
   );
 });

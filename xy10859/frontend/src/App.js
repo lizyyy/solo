@@ -181,6 +181,14 @@ function App() {
               </Button>
             </>
           )}
+          {record.status === 'pending' && record.need_approval === 0 && (
+            <Button type="primary" size="small" icon={<CheckOutlined />} onClick={() => handleApprove(record.task_id)}>
+              执行
+            </Button>
+          )}
+          {record.status === 'processing' && (
+            <Tag color="blue">处理中...</Tag>
+          )}
           {record.status === 'failed' && (
             <Button type="primary" size="small" icon={<ReloadOutlined />} onClick={() => handleRetry(record.task_id)}>
               重试
@@ -293,6 +301,10 @@ function App() {
               <Select.Option value="90d">最近90天</Select.Option>
             </Select>
           </Form.Item>
+          <Form.Item name="idempotency_key" valuePropName="checked" initialValue={true}>
+            <input type="checkbox" style={{ marginRight: 8 }} />
+            启用幂等检查（防止重复提交）
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading} block>
               创建任务
@@ -312,6 +324,14 @@ function App() {
           </Button>,
           <Button key="approve" type="primary" onClick={() => handleApprove(selectedTask.task.task_id)}>
             通过
+          </Button>
+        ] : selectedTask?.task?.status === 'pending' && selectedTask?.task?.need_approval === 0 ? [
+          <Button key="execute" type="primary" onClick={() => handleApprove(selectedTask.task.task_id)}>
+            立即执行
+          </Button>
+        ] : selectedTask?.task?.status === 'processing' ? [
+          <Button key="refresh" onClick={() => handleViewDetail(selectedTask.task.task_id)}>
+            刷新状态
           </Button>
         ] : selectedTask?.task?.status === 'failed' ? [
           <Button key="retry" type="primary" onClick={() => handleRetry(selectedTask.task.task_id)}>

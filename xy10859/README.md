@@ -110,8 +110,8 @@ npm start
 
 ## 关键特性
 
-1. **幂等性处理** - UUID 任务ID，防重复提交
-2. **状态机流转** - pending → processing → completed/failed
+1. **幂等性处理** - 参数哈希去重，支持 idempotency_key 防止重复提交
+2. **状态机流转** - 管理员：直接 processing → completed；其他角色：pending → 审批 → processing → completed/failed
 3. **异常重试机制** - 支持手动重试失败任务
 4. **审批工作流** - 非管理员角色需审批才能导出
 5. **违规拦截** - 检测未正确脱敏的数据并拦截
