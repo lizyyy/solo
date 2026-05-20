@@ -1,0 +1,34 @@
+[
+  {
+    "person_id": "P001",
+    "name": "张三",
+    "department": "民一庭",
+    "position": "法官",
+    "permission_level": 3,
+    "can_access_secret": false
+  },
+  {
+    "person_id": "P002",
+    "name": "李四",
+    "department": "刑庭",
+    "position": "法官助理",
+    "permission_level": 2,
+    "can_access_secret": true
+  },
+  {
+    "person_id": "P003",
+    "name": "王五",
+    "department": "档案室",
+    "position": "档案管理员",
+    "permission_level": 4,
+    "can_access_secret": true
+  },
+  {
+    "person_id": "P004",
+    "name": "赵六",
+    "department": "执行局",
+    "position": "书记员",
+    "permission_level": 1,
+    "can_access_secret": false
+  }
+]

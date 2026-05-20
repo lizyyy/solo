@@ -1,0 +1,32 @@
+[
+  {
+    "case_no": "（2024）京民初字第001号",
+    "case_name": "张三诉李四合同纠纷案",
+    "case_type": "民事",
+    "is_secret": false,
+    "create_date": "2024-01-15"
+  },
+  {
+    "case_no": "（2024）京刑初字第002号",
+    "case_name": "王某盗窃案",
+    "case_type": "刑事",
+    "is_secret": true,
+    "secret_level": "秘密",
+    "create_date": "2024-02-20"
+  },
+  {
+    "case_no": "（2024）京民初字第003号",
+    "case_name": "某公司股权纠纷案",
+    "case_type": "民事",
+    "is_secret": false,
+    "create_date": "2024-03-10"
+  },
+  {
+    "case_no": "（2024）京行初字第004号",
+    "case_name": "某行政处罚案",
+    "case_type": "行政",
+    "is_secret": true,
+    "secret_level": "机密",
+    "create_date": "2024-03-15"
+  }
+]
