@@ -12,6 +12,7 @@ tests = [
     ("数据导入测试", "tests/test_import.py"),
     ("对账功能测试", "tests/test_reconciliation.py"),
     ("报告生成测试", "tests/test_report.py"),
+    ("API接口测试", "tests/test_api.py"),
 ]
 
 for name, path in tests:

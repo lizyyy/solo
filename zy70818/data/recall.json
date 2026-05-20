@@ -1,7 +1,7 @@
 {
-  "6479a5b5-597e-4283-a999-81770173e521": {
-    "id": "6479a5b5-597e-4283-a999-81770173e521",
-    "notice_number": "RC202605210552",
+  "c1693fdf-2528-434c-8019-abfd1bf3730f": {
+    "id": "c1693fdf-2528-434c-8019-abfd1bf3730f",
+    "notice_number": "RC202605210617",
     "title": "关于召回公告",
     "issuer": "药品监督管理局",
     "issue_date": "2026-05-21",
@@ -19,8 +19,83 @@
     "reason": "该批次产品存在包装密封性问题，可能导致无菌失效。",
     "requirements": "1. 立即停止使用该批次产品 2. 清点库存并上报 3. 联系供应商办理退货",
     "status": "生效中",
-    "created_at": "2026-05-21T05:52:02.083293",
-    "updated_at": "2026-05-21T05:52:02.083294",
+    "created_at": "2026-05-21T06:17:11.870686",
+    "updated_at": "2026-05-21T06:17:11.870686",
+    "source_file": null,
+    "remarks": null
+  },
+  "dd2b384d-be67-4c3f-b8ba-eabc07a96d6d": {
+    "id": "dd2b384d-be67-4c3f-b8ba-eabc07a96d6d",
+    "notice_number": "RC202605210617",
+    "title": "关于召回公告",
+    "issuer": "药品监督管理局",
+    "issue_date": "2026-05-21",
+    "effective_date": "2026-05-21",
+    "recall_level": "二级召回",
+    "material_name": "IMP202301001",
+    "batches": [
+      {
+        "batch_number": "IMP202301001",
+        "affected_quantity": 0,
+        "manufacture_date": null,
+        "expiry_date": null
+      }
+    ],
+    "reason": "该批次产品存在包装密封性问题，可能导致无菌失效。",
+    "requirements": "1. 立即停止使用该批次产品 2. 清点库存并上报 3. 联系供应商办理退货",
+    "status": "生效中",
+    "created_at": "2026-05-21T06:17:12.266429",
+    "updated_at": "2026-05-21T06:17:12.266430",
+    "source_file": null,
+    "remarks": null
+  },
+  "d14000f5-1fa3-4f25-98bf-36fc1faecf29": {
+    "id": "d14000f5-1fa3-4f25-98bf-36fc1faecf29",
+    "notice_number": "RC202605210617",
+    "title": "关于召回公告",
+    "issuer": "药品监督管理局",
+    "issue_date": "2026-05-21",
+    "effective_date": "2026-05-21",
+    "recall_level": "二级召回",
+    "material_name": "IMP202301001",
+    "batches": [
+      {
+        "batch_number": "IMP202301001",
+        "affected_quantity": 0,
+        "manufacture_date": null,
+        "expiry_date": null
+      }
+    ],
+    "reason": "该批次产品存在包装密封性问题，可能导致无菌失效。",
+    "requirements": "1. 立即停止使用该批次产品 2. 清点库存并上报 3. 联系供应商办理退货",
+    "status": "生效中",
+    "created_at": "2026-05-21T06:17:12.735496",
+    "updated_at": "2026-05-21T06:17:12.735498",
+    "source_file": null,
+    "remarks": null
+  },
+  "475a6090-2def-4eb0-b3bf-5a911ae6d7b8": {
+    "id": "475a6090-2def-4eb0-b3bf-5a911ae6d7b8",
+    "notice_number": "RC202605210617",
+    "title": "关于召回公告",
+    "issuer": "药品监督管理局",
+    "issue_date": "2026-05-21",
+    "effective_date": "2026-05-21",
+    "recall_level": "二级召回",
+    "material_name": "IMP202301001",
+    "batches": [
+      {
+        "batch_number": "IMP202301001",
+        "affected_quantity": 0,
+        "manufacture_date": null,
+        "expiry_date": null
+      }
+    ],
+    "reason": "该批次产品存在包装密封性问题，可能导致无菌失效。",
+    "requirements": "1. 立即停止使用该批次产品 2. 清点库存并上报 3. 联系供应商办理退货",
+    "status": "生效中",
+    "created_at": "2026-05-21T06:17:13.515668",
+    "updated_at": "2026-05-21T06:17:13.515669",
     "source_file": null,
     "remarks": null
   }

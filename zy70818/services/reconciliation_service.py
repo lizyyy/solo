@@ -227,23 +227,53 @@ class ReconciliationEngine:
     ) -> List[Discrepancy]:
         discrepancies = []
 
-        inventory_map = defaultdict(lambda: defaultdict(int))
+        inventory_map = defaultdict(lambda: {'quantity': 0, 'material': '未知'})
         for item in inventory:
             key = (item.batch_number, item.store_name)
             inventory_map[key]['quantity'] += item.quantity
             inventory_map[key]['material'] = item.material_name
 
-        consumption_map = defaultdict(lambda: defaultdict(int))
+        normal_consumption_map = defaultdict(int)
+        transfer_in_map = defaultdict(int)
+        transfer_out_map = defaultdict(int)
+        material_names = {}
+
         for item in consumption:
             key = (item.batch_number, item.store_name)
-            consumption_map[key]['quantity'] += item.quantity
+            material_names[(item.batch_number, item.store_name)] = item.material_name
+            if item.transfer_to_store:
+                material_names[(item.batch_number, item.transfer_to_store)] = item.material_name
+            if item.transfer_from_store:
+                material_names[(item.batch_number, item.transfer_from_store)] = item.material_name
 
-        for key, inv_data in inventory_map.items():
+            if not item.is_transfer:
+                normal_consumption_map[key] += item.quantity
+            if item.transfer_to_store:
+                transfer_in_key = (item.batch_number, item.transfer_to_store)
+                transfer_in_map[transfer_in_key] += item.quantity
+            if item.transfer_from_store:
+                transfer_out_key = (item.batch_number, item.transfer_from_store)
+                transfer_out_map[transfer_out_key] += item.quantity
+
+        all_keys = set()
+        all_keys.update(inventory_map.keys())
+        all_keys.update(normal_consumption_map.keys())
+        all_keys.update(transfer_in_map.keys())
+        all_keys.update(transfer_out_map.keys())
+
+        for key in all_keys:
             batch, store_name = key
-            con_data = consumption_map.get(key, {'quantity': 0})
-            expected_quantity = inv_data['quantity']
+            inv_data = inventory_map.get(key, {'quantity': 0, 'material': material_names.get(key, '未知')})
+            actual_quantity = inv_data.get('quantity', 0)
+            consumed = normal_consumption_map.get(key, 0)
+            transfer_in = transfer_in_map.get(key, 0)
+            transfer_out = transfer_out_map.get(key, 0)
 
-            if expected_quantity <= 0 and con_data['quantity'] > 0:
+            has_activity = consumed > 0 or transfer_in > 0 or transfer_out > 0
+            if not has_activity:
+                continue
+
+            if actual_quantity <= 0:
                 disc = Discrepancy(
                     type=DiscrepancyType.BATCH_NOT_FOUND,
                     batch_number=batch,
@@ -253,9 +283,25 @@ class ReconciliationEngine:
                     explanation=self.explanation.explain_batch_not_found(
                         batch, inv_data.get('material', '未知'), store_name
                     ),
-                    expected_value=con_data['quantity'],
-                    actual_value=0,
-                    quantity_diff=-con_data['quantity']
+                    expected_value=consumed + transfer_out,
+                    actual_value=actual_quantity,
+                    quantity_diff=actual_quantity - (consumed + transfer_out)
+                )
+                discrepancies.append(disc)
+            elif transfer_in > 0:
+                disc = Discrepancy(
+                    type=DiscrepancyType.QUANTITY_MISMATCH,
+                    batch_number=batch,
+                    material_name=inv_data.get('material', '未知'),
+                    store_name=store_name,
+                    description=f"批号 {batch} 调入未入账",
+                    explanation=self.explanation.explain_quantity_mismatch(
+                        batch, inv_data.get('material', '未知'), store_name,
+                        actual_quantity + transfer_in, actual_quantity
+                    ),
+                    expected_value=actual_quantity + transfer_in,
+                    actual_value=actual_quantity,
+                    quantity_diff=-transfer_in
                 )
                 discrepancies.append(disc)
 
