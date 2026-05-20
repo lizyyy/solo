@@ -119,13 +119,10 @@ def update_release_order_status(db: Session, release_order_id: int, transition: 
         if pending_approvals:
             return None, "存在未完成的审批"
         
-        pending_checks = [c for c in db_release.check_items if c.status == CheckItemStatus.PENDING]
-        if pending_checks:
-            return None, "存在未完成的检查项，请先完成所有检查"
-        
-        failed_checks = [c for c in db_release.check_items if c.status == CheckItemStatus.FAILED]
-        if failed_checks:
-            return None, "存在未通过的检查项"
+        non_passed_checks = [c for c in db_release.check_items if c.status != CheckItemStatus.PASSED]
+        if non_passed_checks:
+            non_passed_names = [c.name for c in non_passed_checks]
+            return None, f"存在未通过的检查项: {', '.join(non_passed_names)}。所有检查项必须标记为 '通过' 才能放行"
     
     previous_status = db_release.status
     db_release.status = transition.target_status

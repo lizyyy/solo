@@ -242,7 +242,7 @@ export default function ReleaseOrderDetail() {
             renderItem={(approval) => (
               <List.Item
                 actions={
-                  approval.approved === undefined
+                  approval.approved == null
                     ? [
                         <Button
                           type="primary"
@@ -271,7 +271,7 @@ export default function ReleaseOrderDetail() {
                       <Text type="secondary">
                         创建于 {dayjs(approval.created_at).format('YYYY-MM-DD HH:mm')}
                       </Text>
-                      {approval.approved !== undefined && (
+                      {approval.approved != null && (
                         <>
                           <Tag color={approval.approved ? 'green' : 'red'}>
                             {approval.approved ? '已通过' : '已拒绝'}
