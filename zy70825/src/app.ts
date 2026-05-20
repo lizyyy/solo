@@ -45,7 +45,7 @@ app.post('/api/upload/shipments', upload.single('csvFile'), async (req, res) => 
     const influencers = await dataStore.getInfluencers();
     const existingShipments = await dataStore.getAllShipments();
     
-    const result = rulesEngine.processItems(shipments, influencers, existingShipments);
+    const result = rulesEngine.processItems(shipments, influencers, existingShipments, batchId);
     
     const batch: UploadBatch = {
       id: batchId,

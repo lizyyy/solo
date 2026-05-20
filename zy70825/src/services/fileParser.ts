@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as csv from 'csv-parser';
+import csv from 'csv-parser';
 import { v4 as uuidv4 } from 'uuid';
 import { ShipmentItem, Influencer } from '../types';
 

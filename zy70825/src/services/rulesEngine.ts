@@ -1,5 +1,4 @@
-import { ShipmentItem, Rule, RuleContext, RuleResult, ProcessingStatus, ProcessedItem, ProcessingResult } from '../types';
-import { v4 as uuidv4 } from 'uuid';
+import { ShipmentItem, Rule, RuleContext, RuleResult, ProcessingStatus, ProcessedItem, ProcessingResult, Influencer } from '../types';
 
 const overdueRule: Rule = {
   id: 'overdue-check',
@@ -167,7 +166,7 @@ export class RulesEngineService {
     returnWithoutPhotoRule
   ];
 
-  processItems(items: ShipmentItem[], influencers: Map<string, Influencer>, existingShipments: ShipmentItem[]): ProcessingResult {
+  processItems(items: ShipmentItem[], influencers: Map<string, Influencer>, existingShipments: ShipmentItem[], batchId: string): ProcessingResult {
     const context: RuleContext = {
       influencers,
       existingShipments,
@@ -181,7 +180,7 @@ export class RulesEngineService {
     items.forEach(item => {
       const allIssues: string[] = [];
       const allSuggestions: string[] = [];
-      let finalStatus: ProcessingStatus = 'normal';
+      let finalStatus = 'normal' as ProcessingStatus;
 
       this.rules.forEach(rule => {
         const result = rule.check(item, context);
@@ -218,7 +217,7 @@ export class RulesEngineService {
     });
 
     return {
-      batchId: uuidv4(),
+      batchId,
       normalItems,
       pendingItems,
       failedItems,
