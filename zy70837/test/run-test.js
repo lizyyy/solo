@@ -8,13 +8,19 @@ const PORT = 3000;
 
 function uploadTest() {
   console.log('🧪 开始测试4S店车辆管理API...\n');
+  console.log('📋 测试场景:');
+  console.log('   - 违章回执1: 车牌存在 + 有借车记录 (京C11111, 王五借车期间)');
+  console.log('   - 违章回执2: 车牌不在车辆清单 (京X99999)');
+  console.log('   - 违章回执3: 无车牌号信息\n');
 
   const form = new FormData();
   
-  form.append('batchId', 'test_batch_001');
+  form.append('batchId', 'test_batch_violation_v3');
   form.append('borrowReturnCsv', fs.createReadStream(path.join(__dirname, '../test-data/borrow_return.csv')));
   form.append('vehiclesJson', fs.createReadStream(path.join(__dirname, '../test-data/vehicles.json')));
   form.append('violationReceipts', fs.createReadStream(path.join(__dirname, '../test-data/violation_receipt_1.json')));
+  form.append('violationReceipts', fs.createReadStream(path.join(__dirname, '../test-data/violation_receipt_2_unknown_plate.json')));
+  form.append('violationReceipts', fs.createReadStream(path.join(__dirname, '../test-data/violation_receipt_3_no_plate.json')));
 
   const options = {
     hostname: BASE_URL,
@@ -42,10 +48,24 @@ function uploadTest() {
         console.log(`  ⚠️  待确认: ${summary.pending} 条`);
         console.log(`  ❌ 失败: ${summary.failed} 条`);
         
+        const confirmedViolations = result.data.normalItems.filter(i => i.type === 'violation' && i.ownershipConfirmed);
+        if (confirmedViolations.length > 0) {
+          console.log('\n✅ 违章归属已确认:');
+          confirmedViolations.forEach((item, idx) => {
+            console.log(`  ${idx + 1}. ${item.detail}`);
+            if (item.matchedInfo) {
+              console.log(`     车辆: ${item.matchedInfo.vehicleBrand} ${item.matchedInfo.vehicleModel}`);
+              console.log(`     借车人: ${item.matchedInfo.borrower}`);
+              console.log(`     借车时间: ${item.matchedInfo.borrowTime}`);
+            }
+          });
+        }
+        
         if (result.data.pendingItems.length > 0) {
           console.log('\n⚠️  待确认项详情:');
           result.data.pendingItems.forEach((item, idx) => {
-            console.log(`  ${idx + 1}. ${item.warnings[0].message}`);
+            const prefix = item.type === 'violation' ? '违章-' : '';
+            console.log(`  ${idx + 1}. [${prefix}${item.type}] ${item.warnings[0].message}`);
           });
         }
         

@@ -107,7 +107,7 @@ function validateVehicles(vehicles) {
   return { normal, pending, failed };
 }
 
-function validateViolationReceipt(receipt) {
+function validateViolationReceipt(receipt, vehicleList = [], borrowReturnRecords = []) {
   const normal = [];
   const pending = [];
   const failed = [];
@@ -119,24 +119,62 @@ function validateViolationReceipt(receipt) {
   };
 
   const warnings = [];
+  const matchedInfo = {};
 
-  if (!receipt.plateNumber && !receipt.车牌号) {
+  const violationPlate = receipt.plateNumber || receipt.车牌号;
+  const violationTimeStr = receipt.violationTime || receipt.违章时间;
+  const violationTime = violationTimeStr ? moment(violationTimeStr) : null;
+
+  if (!violationPlate) {
     warnings.push({
-      type: 'violation_ownership_unclear',
-      message: '违章归属不明确：回执中未包含车牌号信息',
-      detail: '请核对违章车辆与试驾车信息'
+      type: 'violation_plate_missing',
+      message: '违章归属不明确：回执中未包含车牌号信息，无法自动匹配',
+      detail: '请手动核对违章车辆与试驾车信息'
     });
-  }
+  } else {
+    const matchedVehicle = vehicleList.find(v => 
+      (v.plateNumber === violationPlate) || (v.车牌号 === violationPlate)
+    );
 
-  if (receipt.violationTime || receipt.违章时间) {
-    const violationTime = moment(receipt.violationTime || receipt.违章时间);
-    if (violationTime.isValid()) {
+    if (matchedVehicle) {
+      matchedInfo.vehicle = matchedVehicle;
+      matchedInfo.vehicleBrand = matchedVehicle.brand || matchedVehicle.品牌 || '未知';
+      matchedInfo.vehicleModel = matchedVehicle.model || matchedVehicle.车型 || '未知';
+      
+      if (violationTime && violationTime.isValid()) {
+        const matchedBorrowRecord = borrowReturnRecords.find(record => {
+          const recordPlate = record.车牌号;
+          if (recordPlate !== violationPlate) return false;
+          
+          const borrowTime = moment(record.借出时间);
+          const returnTime = record.归还时间 ? moment(record.归还时间) : moment();
+          
+          return violationTime.isBetween(borrowTime, returnTime, null, '[]');
+        });
+
+        if (matchedBorrowRecord) {
+          matchedInfo.borrower = matchedBorrowRecord.借车人;
+          matchedInfo.borrowTime = matchedBorrowRecord.借出时间;
+          matchedInfo.returnTime = matchedBorrowRecord.归还时间 || '未归还';
+        } else {
+          warnings.push({
+            type: 'violation_borrower_not_found',
+            message: `违章车辆(${violationPlate})已匹配，但违章时间段无对应借车记录`,
+            detail: `违章时间: ${violationTime.format('YYYY-MM-DD HH:mm')}，请核对借车记录`
+          });
+        }
+      }
+    } else {
       warnings.push({
-        type: 'violation_time_check',
-        message: '违章时间待确认：请核对该时间段内的借车记录',
-        detail: `违章时间: ${violationTime.format('YYYY-MM-DD HH:mm')}`
+        type: 'violation_vehicle_not_in_list',
+        message: `违章车辆(${violationPlate})不在试驾车清单中`,
+        detail: '请确认该车辆是否为本店试驾车，或检查车牌号输入是否正确'
       });
     }
+  }
+
+  if (Object.keys(matchedInfo).length > 0) {
+    item.matchedInfo = matchedInfo;
   }
 
   if (warnings.length > 0) {
@@ -144,6 +182,13 @@ function validateViolationReceipt(receipt) {
       ...item,
       warnings: warnings,
       actionRequired: true
+    });
+  } else if (matchedInfo.vehicle && matchedInfo.borrower) {
+    normal.push({
+      ...item,
+      status: 'valid',
+      ownershipConfirmed: true,
+      detail: `违章车辆 ${violationPlate} 归属确认，借车人: ${matchedInfo.borrower}`
     });
   } else {
     normal.push({

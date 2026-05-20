@@ -32,14 +32,8 @@ module.exports = (upload) => {
         failedItems: []
       };
 
-      if (files.borrowReturnCsv && files.borrowReturnCsv.length > 0) {
-        const csvPath = files.borrowReturnCsv[0].path;
-        const csvData = await uploadService.parseCsv(csvPath);
-        const validationResult = validationService.validateBorrowReturnRecords(csvData);
-        result.normalItems.push(...validationResult.normal);
-        result.pendingItems.push(...validationResult.pending);
-        result.failedItems.push(...validationResult.failed);
-      }
+      let vehicleList = [];
+      let borrowReturnRecords = [];
 
       if (files.vehiclesJson && files.vehiclesJson.length > 0) {
         const jsonPath = files.vehiclesJson[0].path;
@@ -48,12 +42,29 @@ module.exports = (upload) => {
         result.normalItems.push(...validationResult.normal);
         result.pendingItems.push(...validationResult.pending);
         result.failedItems.push(...validationResult.failed);
+        
+        vehicleList = Array.isArray(vehicleData) ? vehicleData : (vehicleData.vehicles || [vehicleData]);
+      }
+
+      if (files.borrowReturnCsv && files.borrowReturnCsv.length > 0) {
+        const csvPath = files.borrowReturnCsv[0].path;
+        const csvData = await uploadService.parseCsv(csvPath);
+        const validationResult = validationService.validateBorrowReturnRecords(csvData);
+        result.normalItems.push(...validationResult.normal);
+        result.pendingItems.push(...validationResult.pending);
+        result.failedItems.push(...validationResult.failed);
+        
+        borrowReturnRecords = csvData;
       }
 
       if (files.violationReceipts && files.violationReceipts.length > 0) {
         for (const receipt of files.violationReceipts) {
           const receiptData = await uploadService.parseReceipt(receipt);
-          const validationResult = validationService.validateViolationReceipt(receiptData);
+          const validationResult = validationService.validateViolationReceipt(
+            receiptData, 
+            vehicleList, 
+            borrowReturnRecords
+          );
           result.normalItems.push(...validationResult.normal);
           result.pendingItems.push(...validationResult.pending);
           result.failedItems.push(...validationResult.failed);
