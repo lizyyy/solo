@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作业判分回调台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .stat-card .label {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .stat-card.warning .value {
+            color: #f59e0b;
+        }
+        
+        .stat-card.danger .value {
+            color: #ef4444;
+        }
+        
+        .stat-card.success .value {
+            color: #10b981;
+        }
+        
+        .filters {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filters select, .filters button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        
+        .filters button {
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .filters button:hover {
+            background: #5a67d8;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        tr:hover {
+            background: #f8fafc;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-grading {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-graded {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        .status-callback_pending {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+        
+        .status-callback_failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-manual_review {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+        }
+        
+        .action-btn.view {
+            background: #667eea;
+            color: white;
+        }
+        
+        .action-btn.view:hover {
+            background: #5a67d8;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        .detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .detail-modal.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.25rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .section h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-item {
+            background: #f8fafc;
+            padding: 0.75rem;
+            border-radius: 4px;
+        }
+        
+        .info-item .label {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-item .value {
+            font-weight: 500;
+        }
+        
+        .action-area {
+            background: #fef3c7;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+        
+        .action-area h4 {
+            margin-bottom: 0.75rem;
+            color: #92400e;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-buttons button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .action-buttons .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .action-buttons .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .action-buttons .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .action-buttons .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.5rem;
+            top: 0.25rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background: #667eea;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -1.125rem;
+            top: 1rem;
+            width: 2px;
+            height: calc(100% - 0.5rem);
+            background: #ddd;
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .timeline-item .time {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        .timeline-item .event {
+            font-weight: 500;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            color: white;
+            z-index: 2000;
+            display: none;
+        }
+        
+        .toast.success {
+            background: #10b981;
+        }
+        
+        .toast.error {
+            background: #ef4444;
+        }
+        
+        .toast.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 作业判分回调台</h1>
+    </div>
+    
+    <div class="container">
+        <div class="stats-grid" id="statsGrid">
+            <div class="loading">加载中...</div>
+        </div>
+        
+        <div class="filters">
+            <select id="statusFilter">
+                <option value="">全部状态</option>
+                <option value="pending">待处理</option>
+                <option value="grading">判分中</option>
+                <option value="graded">已判分</option>
+                <option value="callback_pending">回调待处理</option>
+                <option value="callback_failed">回调失败</option>
+                <option value="success">成功</option>
+                <option value="manual_review">待人工复核</option>
+            </select>
+            <button onclick="loadSubmissions()">刷新</button>
+            <button onclick="exportData()">导出</button>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>提交ID</th>
+                        <th>学生ID</th>
+                        <th>作业ID</th>
+                        <th>课程ID</th>
+                        <th>状态</th>
+                        <th>分数</th>
+                        <th>提交时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="submissionsTable">
+                    <tr><td colspan="8" class="loading">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="detail-modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>提交详情</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        
+        const statusLabels = {
+            'pending': '待处理',
+            'grading': '判分中',
+            'graded': '已判分',
+            'callback_pending': '回调待处理',
+            'callback_failed': '回调失败',
+            'success': '成功',
+            'manual_review': '待人工复核'
+        };
+        
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/statistics/`);
+                const stats = await response.json();
+                
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card">
+                        <div class="label">总提交数</div>
+                        <div class="value">${stats.total_submissions}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">待处理</div>
+                        <div class="value">${stats.pending}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">判分中</div>
+                        <div class="value">${stats.grading}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">回调待处理</div>
+                        <div class="value">${stats.callback_pending}</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="label">回调失败</div>
+                        <div class="value">${stats.callback_failed}</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="label">成功</div>
+                        <div class="value">${stats.success}</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="label">待人工复核</div>
+                        <div class="value">${stats.manual_review}</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="label">未解决异常</div>
+                        <div class="value">${stats.unresolved_exceptions}</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('加载统计失败:', error);
+            }
+        }
+        
+        async function loadSubmissions() {
+            const status = document.getElementById('statusFilter').value;
+            let url = `${API_BASE}/submissions/?limit=100`;
+            if (status) {
+                url += `&status=${status}`;
+            }
+            
+            try {
+                const response = await fetch(url);
+                const submissions = await response.json();
+                
+                const tbody = document.getElementById('submissionsTable');
+                tbody.innerHTML = submissions.map(sub => `
+                    <tr>
+                        <td><code>${sub.submission_id.substring(0, 12)}...</code></td>
+                        <td>${sub.student_id}</td>
+                        <td>${sub.assignment_id}</td>
+                        <td>${sub.course_id}</td>
+                        <td><span class="status-badge status-${sub.status}">${statusLabels[sub.status]}</span></td>
+                        <td>${sub.final_score !== null ? sub.final_score : '-'}</td>
+                        <td>${new Date(sub.submit_time).toLocaleString()}</td>
+                        <td>
+                            <button class="action-btn view" onclick="viewDetail('${sub.submission_id}')">查看</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('加载提交列表失败:', error);
+            }
+        }
+        
+        async function viewDetail(submissionId) {
+            try {
+                const response = await fetch(`${API_BASE}/submissions/${submissionId}`);
+                const data = await response.json();
+                
+                const modal = document.getElementById('detailModal');
+                const body = document.getElementById('modalBody');
+                
+                let html = `
+                    <div class="section">
+                        <h3>基本信息</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="label">提交ID</div>
+                                <div class="value"><code>${data.submission_id}</code></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">学生ID</div>
+                                <div class="value">${data.student_id}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">作业ID</div>
+                                <div class="value">${data.assignment_id}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">课程ID</div>
+                                <div class="value">${data.course_id}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">状态</div>
+                                <div class="value"><span class="status-badge status-${data.status}">${statusLabels[data.status]}</span></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">最终分数</div>
+                                <div class="value">${data.final_score !== null ? data.final_score : '-'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">提交时间</div>
+                                <div class="value">${new Date(data.submit_time).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                if (data.grading_tasks.length > 0) {
+                    html += `
+                        <div class="section">
+                            <h3>判分任务</h3>
+                            ${data.grading_tasks.map(task => `
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="label">任务ID</div>
+                                        <div class="value"><code>${task.task_id.substring(0, 12)}...</code></div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="label">判分类型</div>
+                                        <div class="value">${task.grader_type}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="label">原始分数</div>
+                                        <div class="value">${task.raw_score !== null ? task.raw_score : '-'}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="label">完成时间</div>
+                                        <div class="value">${task.completed_at ? new Date(task.completed_at).toLocaleString() : '进行中'}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+                if (data.callback_payloads.length > 0) {
+                    html += `
+                        <div class="section">
+                            <h3>回调载荷</h3>
+                            ${data.callback_payloads.map(payload => `
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="label">载荷ID</div>
+                                        <div class="value"><code>${payload.payload_id.substring(0, 12)}...</code></div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="label">签名验证</div>
+                                        <div class="value">${payload.is_signature_valid ? '✅ 通过' : '❌ 失败'}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="label">分数</div>
+                                        <div class="value">${payload.score !== null ? payload.score : '-'}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="label">成绩写入</div>
+                                        <div class="value">${payload.grade_written ? '✅ 已写入' : '❌ 未写入'}</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0.5rem;">
+                                    <div class="label" style="margin-bottom: 0.25rem;">原始载荷:</div>
+                                    <div class="code-block">${payload.raw_payload}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+                if (data.exception_logs.length > 0) {
+                    html += `
+                        <div class="section">
+                            <h3>异常日志</h3>
+                            ${data.exception_logs.map(exc => `
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="label">异常类型</div>
+                                        <div class="value">${exc.exception_type}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="label">错误信息</div>
+                                        <div class="value">${exc.error_message}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="label">状态</div>
+                                        <div class="value">${exc.resolved ? '✅ 已解决' : '⚠️ 未解决'}</div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="label">发生时间</div>
+                                        <div class="value">${new Date(exc.occurred_at).toLocaleString()}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+                if (data.retry_records.length > 0) {
+                    html += `
+                        <div class="section">
+                            <h3>操作历史</h3>
+                            <div class="timeline">
+                                ${data.retry_records.map(record => `
+                                    <div class="timeline-item">
+                                        <div class="time">${new Date(record.triggered_at).toLocaleString()}</div>
+                                        <div class="event">${record.triggered_by} 执行了 ${record.retry_type}</div>
+                                        <div class="detail">${statusLabels[record.previous_status]} → ${statusLabels[record.new_status]}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="section">
+                        <h3>复核操作</h3>
+                        <div class="action-area">
+                            <h4>状态更新</h4>
+                            <div class="action-buttons">
+                                <select id="newStatus" class="action-btn">
+                                    <option value="pending">待处理</option>
+                                    <option value="grading">判分中</option>
+                                    <option value="graded">已判分</option>
+                                    <option value="callback_pending">回调待处理</option>
+                                    <option value="callback_failed">回调失败</option>
+                                    <option value="success">成功</option>
+                                    <option value="manual_review">待人工复核</option>
+                                </select>
+                                <button class="btn-primary" onclick="updateStatus('${data.submission_id}')">更新状态</button>
+                            </div>
+                        </div>
+                        
+                        ${data.callback_payloads.length > 0 ? `
+                            <div class="action-area" style="margin-top: 1rem;">
+                                <h4>回调操作</h4>
+                                <div class="action-buttons">
+                                    <button class="btn-warning" onclick="verifySignature('${data.callback_payloads[0].payload_id}')">验证签名</button>
+                                    <button class="btn-success" onclick="writeGrade('${data.callback_payloads[0].payload_id}')">写入成绩</button>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="action-area" style="margin-top: 1rem;">
+                            <h4>重试操作</h4>
+                            <div class="action-buttons">
+                                <button class="btn-primary" onclick="retryCallback('${data.submission_id}', 'callback')">重试回调</button>
+                                <button class="btn-success" onclick="retryCallback('${data.submission_id}', 'grade_write')">写入成绩</button>
+                                <button class="btn-warning" onclick="retryCallback('${data.submission_id}', 'manual')">标记人工复核</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                body.innerHTML = html;
+                modal.classList.add('active');
+            } catch (error) {
+                console.error('加载详情失败:', error);
+                showToast('加载详情失败', 'error');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+        
+        async function updateStatus(submissionId) {
+            const newStatus = document.getElementById('newStatus').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/submissions/${submissionId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: newStatus,
+                        updated_by: 'teacher'
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('状态更新成功', 'success');
+                    closeModal();
+                    loadSubmissions();
+                    loadStats();
+                } else {
+                    showToast('状态更新失败', 'error');
+                }
+            } catch (error) {
+                console.error('更新状态失败:', error);
+                showToast('状态更新失败', 'error');
+            }
+        }
+        
+        async function verifySignature(payloadId) {
+            try {
+                const response = await fetch(`${API_BASE}/callback-payloads/${payloadId}/verify`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showToast('签名验证完成', 'success');
+                    const submissionId = document.querySelector('#modalBody code').textContent.trim();
+                    viewDetail(submissionId);
+                    loadSubmissions();
+                    loadStats();
+                } else {
+                    showToast('签名验证失败', 'error');
+                }
+            } catch (error) {
+                console.error('验证签名失败:', error);
+                showToast('签名验证失败', 'error');
+            }
+        }
+        
+        async function writeGrade(payloadId) {
+            const score = prompt('请输入分数:');
+            if (score === null || score === '') return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/callback-payloads/${payloadId}/write-grade`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        payload_id: payloadId,
+                        score: parseFloat(score)
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('成绩写入成功', 'success');
+                    const submissionId = document.querySelector('#modalBody code').textContent.trim();
+                    viewDetail(submissionId);
+                    loadSubmissions();
+                    loadStats();
+                } else {
+                    showToast('成绩写入失败', 'error');
+                }
+            } catch (error) {
+                console.error('写入成绩失败:', error);
+                showToast('成绩写入失败', 'error');
+            }
+        }
+        
+        async function retryCallback(submissionId, retryType) {
+            try {
+                const response = await fetch(`${API_BASE}/retry/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        submission_id: submissionId,
+                        retry_type: retryType,
+                        triggered_by: 'teacher'
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('重试操作成功', 'success');
+                    viewDetail(submissionId);
+                    loadSubmissions();
+                    loadStats();
+                } else {
+                    showToast('重试操作失败', 'error');
+                }
+            } catch (error) {
+                console.error('重试失败:', error);
+                showToast('重试操作失败', 'error');
+            }
+        }
+        
+        async function exportData() {
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/export/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: status || null
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'submissions_export.xlsx';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showToast('导出成功', 'success');
+                } else {
+                    showToast('导出失败', 'error');
+                }
+            } catch (error) {
+                console.error('导出失败:', error);
+                showToast('导出失败', 'error');
+            }
+        }
+        
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} active`;
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+        
+        document.getElementById('statusFilter').addEventListener('change', loadSubmissions);
+        
+        loadStats();
+        loadSubmissions();
+    </script>
+</body>
+</html>
