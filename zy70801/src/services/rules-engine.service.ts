@@ -256,6 +256,11 @@ export const getHistoryForReview = async (criticalValueId: string) => {
     [criticalValueId]
   );
 
+  const confirmRecords = convertKeysToCamelCase<any[]>(confirmRecordsRaw).map(record => ({
+    ...record,
+    originalData: record.originalData ? JSON.parse(record.originalData) : undefined
+  }));
+
   const samePatientRecordsRaw = await all(
     'SELECT * FROM critical_values WHERE patient_id = ? AND id != ? ORDER BY test_time DESC LIMIT 10',
     [criticalValue.patientId, criticalValueId]
@@ -264,7 +269,7 @@ export const getHistoryForReview = async (criticalValueId: string) => {
   return {
     criticalValue,
     callbacks: convertKeysToCamelCase<CallbackRecord[]>(callbacksRaw),
-    confirmRecords: convertKeysToCamelCase(confirmRecordsRaw),
+    confirmRecords,
     samePatientHistory: convertKeysToCamelCase<CriticalValueRecord[]>(samePatientRecordsRaw)
   };
 };

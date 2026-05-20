@@ -1,18 +1,36 @@
 [
   {
-    "criticalValueId": "REPLACE_WITH_ACTUAL_ID_1",
+    "patientId": "P002",
+    "patientName": "李四",
+    "testItem": "血糖",
     "confirmTime": "2024-01-15 09:00:00",
     "confirmer": "张主任",
     "confirmerPhone": "13700137001",
     "confirmResult": "confirmed",
-    "confirmNote": "已通知家属，患者病情稳定，继续观察"
+    "confirmNote": "已通知家属，患者病情稳定，继续观察，建议调整降糖方案",
+    "sourceSystem": "HIS系统",
+    "externalId": "HIS-CONF-2024-001"
   },
   {
-    "criticalValueId": "REPLACE_WITH_ACTUAL_ID_2",
+    "patientId": "P004",
+    "patientName": "赵六",
+    "testItem": "血钾",
     "confirmTime": "2024-01-15 10:30:00",
     "confirmer": "李主任",
     "confirmerPhone": "13700137002",
     "confirmResult": "confirmed",
-    "confirmNote": "已采取治疗措施，建议2小时后复查"
+    "confirmNote": "已采取治疗措施，建议2小时后复查电解质",
+    "sourceSystem": "LIS系统",
+    "externalId": "LIS-CONF-2024-001"
+  },
+  {
+    "patientId": "INVALID",
+    "patientName": "不存在的患者",
+    "testItem": "测试",
+    "confirmTime": "2024-01-15 11:00:00",
+    "confirmer": "测试人",
+    "confirmerPhone": "13800000000",
+    "confirmResult": "confirmed",
+    "confirmNote": "这条记录应该被标记为无效，因为危急值ID不存在"
   }
 ]

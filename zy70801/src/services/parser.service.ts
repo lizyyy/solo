@@ -112,12 +112,15 @@ export const parseConfirmJSON = async (filePath: string, batchId: string): Promi
   for (const item of items) {
     records.push({
       id: uuidv4(),
+      batchId,
       criticalValueId: item.criticalValueId || item.危急值ID || item.critical_value_id || '',
       confirmTime: item.confirmTime || item.确认时间 || item.confirm_time || dayjs().toISOString(),
       confirmer: item.confirmer || item.确认人 || '',
       confirmerPhone: item.confirmerPhone || item.确认人电话 || item.confirmer_phone || '',
       confirmResult: (item.confirmResult || item.确认结果 || 'confirmed') as 'confirmed' | 'rejected',
       confirmNote: item.confirmNote || item.确认备注 || '',
+      source: 'json',
+      originalData: item,
       createdAt: dayjs().toISOString()
     });
   }

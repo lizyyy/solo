@@ -179,7 +179,7 @@ router.post('/upload/confirm', upload.single('file'), async (req, res) => {
     }
 
     const { batch, isDuplicate, existingBatch } = await createBatch(
-      'critical_value' as any,
+      'confirm',
       req.file.originalname,
       req.file.path
     );
@@ -198,8 +198,8 @@ router.post('/upload/confirm', upload.single('file'), async (req, res) => {
 
     const records = await parseConfirmJSON(req.file.path, batch.id);
     await updateBatchStatus(batch.id, 'processing', records.length, 0);
-    await saveConfirmRecords(records);
-    await updateBatchStatus(batch.id, 'completed', records.length, records.length);
+    const { valid, invalid } = await saveConfirmRecords(records);
+    await updateBatchStatus(batch.id, 'completed', records.length, valid.length);
 
     fs.unlinkSync(req.file.path);
 
@@ -207,8 +207,11 @@ router.post('/upload/confirm', upload.single('file'), async (req, res) => {
       success: true,
       batchId: batch.id,
       batchNo: batch.batchNo,
-      recordCount: records.length,
-      records
+      totalCount: records.length,
+      validCount: valid.length,
+      invalidCount: invalid.length,
+      validRecords: valid,
+      invalidRecords: invalid
     });
   } catch (error: any) {
     res.status(500).json({ error: '处理失败', message: error.message });

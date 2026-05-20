@@ -93,13 +93,17 @@ import('../db').then(async ({ default: db, run }) => {
       await run(`
       CREATE TABLE IF NOT EXISTS confirm_records (
         id TEXT PRIMARY KEY,
+        batch_id TEXT,
         critical_value_id TEXT NOT NULL,
         confirm_time TEXT NOT NULL,
         confirmer TEXT NOT NULL,
         confirmer_phone TEXT,
         confirm_result TEXT NOT NULL,
         confirm_note TEXT,
+        source TEXT,
+        original_data TEXT,
         created_at TEXT NOT NULL,
+        FOREIGN KEY (batch_id) REFERENCES batches(id),
         FOREIGN KEY (critical_value_id) REFERENCES critical_values(id)
       )
     `);

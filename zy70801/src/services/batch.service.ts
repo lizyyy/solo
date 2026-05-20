@@ -15,7 +15,7 @@ export const checkDuplicateBatch = async (fileHash: string): Promise<Batch | nul
 };
 
 export const createBatch = async (
-  type: 'critical_value' | 'callback' | 'duty',
+  type: 'critical_value' | 'callback' | 'duty' | 'confirm',
   fileName: string,
   filePath: string
 ): Promise<{ batch: Batch; isDuplicate: boolean; existingBatch?: Batch }> => {
@@ -164,48 +164,83 @@ export const saveDutyRecords = async (records: DutyRecord[]): Promise<void> => {
   }
 };
 
-export const saveConfirmRecords = async (records: ConfirmRecord[]): Promise<void> => {
+export const saveConfirmRecords = async (records: ConfirmRecord[]): Promise<{ valid: ConfirmRecord[], invalid: ConfirmRecord[] }> => {
+  const valid: ConfirmRecord[] = [];
+  const invalid: ConfirmRecord[] = [];
+
   for (const record of records) {
+    const existingCriticalValue = await get(
+      'SELECT id FROM critical_values WHERE id = ?',
+      [record.criticalValueId]
+    );
+
+    if (!existingCriticalValue) {
+      invalid.push({
+        ...record,
+        confirmNote: (record.confirmNote || '') + ' [校验失败: 危急值ID不存在]'
+      });
+      continue;
+    }
+
     await run(
       `INSERT INTO confirm_records 
-       (id, critical_value_id, confirm_time, confirmer, confirmer_phone, confirm_result, confirm_note, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, batch_id, critical_value_id, confirm_time, confirmer, confirmer_phone, confirm_result, confirm_note, source, original_data, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         record.id,
+        record.batchId || null,
         record.criticalValueId,
         record.confirmTime,
         record.confirmer,
         record.confirmerPhone,
         record.confirmResult,
         record.confirmNote || null,
+        record.source || null,
+        record.originalData ? JSON.stringify(record.originalData) : null,
         record.createdAt
       ]
     );
+    valid.push(record);
   }
+
+  return { valid, invalid };
 };
 
 export const createSingleConfirmRecord = async (record: Omit<ConfirmRecord, 'id' | 'createdAt'>): Promise<ConfirmRecord> => {
+  const existingCriticalValue = await get(
+    'SELECT id FROM critical_values WHERE id = ?',
+    [record.criticalValueId]
+  );
+
+  if (!existingCriticalValue) {
+    throw new Error('危急值ID不存在，无法创建确认记录');
+  }
+
   const id = uuidv4();
   const createdAt = dayjs().toISOString();
   
   const newRecord: ConfirmRecord = {
     ...record,
     id,
-    createdAt
+    createdAt,
+    source: record.source || 'manual'
   };
 
   await run(
     `INSERT INTO confirm_records 
-     (id, critical_value_id, confirm_time, confirmer, confirmer_phone, confirm_result, confirm_note, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+     (id, batch_id, critical_value_id, confirm_time, confirmer, confirmer_phone, confirm_result, confirm_note, source, original_data, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       newRecord.id,
+      newRecord.batchId || null,
       newRecord.criticalValueId,
       newRecord.confirmTime,
       newRecord.confirmer,
       newRecord.confirmerPhone,
       newRecord.confirmResult,
       newRecord.confirmNote || null,
+      newRecord.source || null,
+      newRecord.originalData ? JSON.stringify(newRecord.originalData) : null,
       newRecord.createdAt
     ]
   );

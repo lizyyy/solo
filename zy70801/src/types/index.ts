@@ -55,19 +55,22 @@ export interface DutyRecord {
 
 export interface ConfirmRecord {
   id?: string;
+  batchId?: string;
   criticalValueId: string;
   confirmTime: string;
   confirmer: string;
   confirmerPhone: string;
   confirmResult: 'confirmed' | 'rejected';
   confirmNote?: string;
+  source?: string;
+  originalData?: any;
   createdAt?: string;
 }
 
 export interface Batch {
   id: string;
   batchNo: string;
-  type: 'critical_value' | 'callback' | 'duty';
+  type: 'critical_value' | 'callback' | 'duty' | 'confirm';
   fileName: string;
   fileHash: string;
   recordCount: number;
