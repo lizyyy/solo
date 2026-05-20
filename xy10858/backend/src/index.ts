@@ -111,9 +111,7 @@ async function initSampleData() {
     await updateBatchStatus(batch2.id, 'reviewing', '开始复核');
     await updateBatchStatus(batch2.id, 'approved', '复核通过');
     await executePublish(batch2.id);
-    await setTimeout(async () => {
-      await rollbackBatch(batch2.id, '发现搜索结果相关性下降，需要优化同义词配置');
-    }, 100);
+    await rollbackBatch(batch2.id, '发现搜索结果相关性下降，需要优化同义词配置');
 
     const batch3 = await createPublishBatch({
       name: '2024年第三季度同义词发布-拦截测试',
