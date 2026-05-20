@@ -141,8 +141,10 @@ class MarkdownRecallParser:
                     current_section = 'batches'
                 elif '原因' in section or '理由' in section:
                     current_section = 'reason'
-                elif '级别' in section or '等级' in section:
+                elif '召回级别' in section or '风险等级' in section or section == '级别' or section == '等级':
                     current_section = 'level'
+                elif '要求' in section or '措施' in section:
+                    current_section = 'other'
             else:
                 if current_section == 'date':
                     try:

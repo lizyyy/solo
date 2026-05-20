@@ -9,13 +9,35 @@ class InventoryRulesEngine:
         self.db = db
         self.WARNING_DAYS = 90
 
+    def _material_name_match(self, inventory_material: str, recall_material: str) -> bool:
+        if not inventory_material or not recall_material:
+            return False
+        
+        inv = inventory_material.lower()
+        rec = recall_material.lower()
+        
+        if inv in rec or rec in inv:
+            return True
+        
+        keywords = ['种植体', '麻药', '器械包', '器械', '耗材', '系统', '种植', '阿替卡因', '碧兰麻', '一次性']
+        for kw in keywords:
+            if kw in inv and kw in rec:
+                return True
+        
+        return False
+
     def check_recall_batch(self, batch_number: str, material_name: str) -> Tuple[bool, str]:
         active_recalls = self.db.query(RecallNotice).filter(RecallNotice.is_active == 1).all()
         
         for recall in active_recalls:
             affected_batches = [b.strip() for b in recall.affected_batches.split(',') if b.strip()]
-            if batch_number in affected_batches and material_name in recall.affected_material:
-                return True, f"该批次在召回范围内：{recall.title}，原因：{recall.reason}"
+            
+            if batch_number in affected_batches:
+                if self._material_name_match(material_name, recall.affected_material):
+                    return True, f"该批次在召回范围内：{recall.title}，原因：{recall.reason}"
+                else:
+                    return True, f"批号命中召回列表，请确认材料匹配：{recall.title}，召回产品：{recall.affected_material}"
+        
         return False, ""
 
     def check_near_expiry(self, expiry_date: datetime) -> Tuple[bool, str]:
@@ -33,7 +55,7 @@ class InventoryRulesEngine:
             Inventory.batch_number == batch_number,
             Inventory.store_id != current_store_id,
             Inventory.is_processed == True,
-            Inventory.process_status == "normal"
+            Inventory.process_status.in_(["normal", "pending"])
         ).first()
         
         if existing:
