@@ -17,9 +17,9 @@ const uploadMaterial = (req, res) => {
   }
 
   const id = uuidv4();
-  const sql = 'INSERT INTO raw_materials (id, batch_id, source_type, file_name, uploaded_by) VALUES (?, ?, ?, ?, ?)';
+  const sql = 'INSERT INTO raw_materials (id, batch_id, source_type, file_name, file_original_name, uploaded_by) VALUES (?, ?, ?, ?, ?, ?)';
   
-  db.run(sql, [id, batch_id, 'file', file.originalname, req.body.uploaded_by || 'system'], function(err) {
+  db.run(sql, [id, batch_id, 'file', file.filename, file.originalname, req.body.uploaded_by || 'system'], function(err) {
     if (err) {
       fs.unlinkSync(file.path);
       return res.status(500).json({ error: err.message });
@@ -29,7 +29,8 @@ const uploadMaterial = (req, res) => {
       id,
       batch_id,
       source_type: 'file',
-      file_name: file.originalname,
+      file_name: file.filename,
+      file_original_name: file.originalname,
       status: 'pending'
     });
   });

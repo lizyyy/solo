@@ -20,12 +20,17 @@ db.serialize(() => {
     batch_id TEXT NOT NULL,
     source_type TEXT NOT NULL,
     file_name TEXT,
+    file_original_name TEXT,
     content TEXT,
     status TEXT DEFAULT 'pending',
     uploaded_by TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (batch_id) REFERENCES batches(id)
   )`);
+  
+  db.run(`ALTER TABLE raw_materials ADD COLUMN file_original_name TEXT`, (err) => {
+    // 忽略字段已存在的错误
+  });
 
   db.run(`CREATE TABLE IF NOT EXISTS details (
     id TEXT PRIMARY KEY,

@@ -78,9 +78,16 @@ const processBatch = async (batchId, processor = 'system') => {
         let data = [];
         
         if (material.source_type === 'file') {
-          const filePath = path.join(__dirname, '../../uploads', material.file_name);
+          let filePath = path.join(__dirname, '../../uploads', material.file_name);
+          
+          if (!fs.existsSync(filePath) && material.file_original_name) {
+            filePath = path.join(__dirname, '../../uploads', material.file_original_name);
+          }
+          
           if (fs.existsSync(filePath)) {
             data = await parseCsvContent(filePath);
+          } else {
+            console.warn(`文件不存在: ${material.file_name} (原始文件名: ${material.file_original_name || 'N/A'})`);
           }
         } else if (material.source_type === 'manual') {
           data = JSON.parse(material.content);
