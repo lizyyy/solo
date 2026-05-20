@@ -12,7 +12,9 @@ export function getStatusDescription(status: string): string {
     'overdue': '超期未还',
     'damaged': '样品破损',
     'returned': '已归还',
-    'deducted': '已扣款'
+    'deducted': '已扣款',
+    'duplicate': '重复寄送',
+    'rejected': '已拒绝'
   };
   return descriptions[status] || status;
 }

@@ -3,11 +3,19 @@ import path from 'path';
 import fs from 'fs';
 
 const dbPath = process.env.DB_PATH || './data/samples.db';
+const uploadPath = process.env.UPLOAD_PATH || './uploads';
 const dbDir = path.dirname(dbPath);
 
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+export function ensureDirectories(): void {
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+  if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+  }
 }
+
+ensureDirectories();
 
 const db = new sqlite3.Database(dbPath);
 

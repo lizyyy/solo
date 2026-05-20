@@ -16,7 +16,7 @@ export async function createBatch(batchData: Omit<Batch, 'id' | 'createdAt' | 'u
       batchData.status || 'pending',
       batchData.handler,
       batchData.remark,
-      function(err) {
+      function(this: any, err: Error | null) {
         if (err) reject(err);
         else resolve({ ...batchData, id: this.lastID } as Batch);
       }
@@ -51,7 +51,7 @@ export async function createSampleRecord(recordData: Omit<SampleRecord, 'id' | '
       recordData.photos,
       recordData.handler,
       recordData.remark,
-      function(err) {
+      function(this: any, err: Error | null) {
         if (err) reject(err);
         else resolve({ ...recordData, id: this.lastID } as SampleRecord);
       }
@@ -72,7 +72,7 @@ export async function addOperationLog(logData: Omit<OperationLog, 'id' | 'create
       logData.operator,
       logData.reason,
       logData.remark,
-      function(err) {
+      function(this: any, err: Error | null) {
         if (err) reject(err);
         else resolve({ ...logData, id: this.lastID } as OperationLog);
       }
@@ -83,19 +83,19 @@ export async function addOperationLog(logData: Omit<OperationLog, 'id' | 'create
 
 export async function getSampleRecord(recordId: string): Promise<SampleRecord | null> {
   return new Promise((resolve, reject) => {
-    db.get('SELECT * FROM sample_records WHERE recordId = ?', [recordId], (err, row) => {
+    db.get('SELECT * FROM sample_records WHERE recordId = ?', [recordId], (err: Error | null, row: any) => {
       if (err) reject(err);
       else resolve(row as SampleRecord || null);
     });
   });
 }
 
-export async function updateSampleRecord(recordId: string, updates: Partial<SampleRecord>, operator: string, operation: string, reason?: string): Promise<void> {
+export async function updateSampleRecord(recordId: string, updates: Partial<SampleRecord>, operator: string, operation: OperationLog['operation'], reason?: string): Promise<void> {
   const setClauses = Object.keys(updates).map(key => `${key} = ?`).join(', ');
   const values = [...Object.values(updates), recordId];
 
   return new Promise((resolve, reject) => {
-    db.run(`UPDATE sample_records SET ${setClauses}, updatedAt = CURRENT_TIMESTAMP WHERE recordId = ?`, values, async (err) => {
+    db.run(`UPDATE sample_records SET ${setClauses}, updatedAt = CURRENT_TIMESTAMP WHERE recordId = ?`, values, async (err: Error | null) => {
       if (err) reject(err);
       else {
         await addOperationLog({ recordId, operation, operator, reason });
@@ -112,41 +112,38 @@ export async function getRecordsByQuery(params: {
   status?: string;
   hasDeduction?: boolean;
 }): Promise<SampleRecord[]> {
-  let query = 'SELECT * FROM sample_records WHERE 1=1';
+  let query = 'SELECT sr.* FROM sample_records sr';
   const values: any[] = [];
+  const conditions: string[] = [];
 
   if (params.brand) {
-    const brand = params.brand;
-    return new Promise((resolve, reject) => {
-      db.all(`
-        SELECT sr.* FROM sample_records sr
-        JOIN batches b ON sr.batchId = b.batchId
-        WHERE b.brand = ?
-      `, [brand], (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows as SampleRecord[]);
-      });
-    });
+    query += ' JOIN batches b ON sr.batchId = b.batchId';
+    conditions.push('b.brand = ?');
+    values.push(params.brand);
   }
 
   if (params.batchId) {
-    query += ' AND batchId = ?';
+    conditions.push('sr.batchId = ?');
     values.push(params.batchId);
   }
   if (params.influencerId) {
-    query += ' AND influencerId = ?';
+    conditions.push('sr.influencerId = ?');
     values.push(params.influencerId);
   }
   if (params.status) {
-    query += ' AND status = ?';
+    conditions.push('sr.status = ?');
     values.push(params.status);
   }
   if (params.hasDeduction) {
-    query += ' AND deductionAmount > 0';
+    conditions.push('sr.deductionAmount > 0');
+  }
+
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
   }
 
   return new Promise((resolve, reject) => {
-    db.all(query, values, (err, rows) => {
+    db.all(query, values, (err: Error | null, rows: any[]) => {
       if (err) reject(err);
       else resolve(rows as SampleRecord[]);
     });
@@ -155,7 +152,7 @@ export async function getRecordsByQuery(params: {
 
 export async function getOperationLogs(recordId: string): Promise<OperationLog[]> {
   return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM operation_logs WHERE recordId = ? ORDER BY createdAt DESC', [recordId], (err, rows) => {
+    db.all('SELECT * FROM operation_logs WHERE recordId = ? ORDER BY createdAt DESC', [recordId], (err: Error | null, rows: any[]) => {
       if (err) reject(err);
       else resolve(rows as OperationLog[]);
     });
@@ -168,7 +165,7 @@ export async function importInfluencers(influencers: Omit<Influencer, 'id' | 'cr
       db.run(`
         INSERT OR REPLACE INTO influencers (influencerId, name, platform, followers, category, contact)
         VALUES (?, ?, ?, ?, ?, ?)
-      `, [influencer.influencerId, influencer.name, influencer.platform, influencer.followers, influencer.category, influencer.contact], (err) => {
+      `, [influencer.influencerId, influencer.name, influencer.platform, influencer.followers, influencer.category, influencer.contact], (err: Error | null) => {
         if (err) reject(err);
         else resolve();
       });
@@ -181,7 +178,7 @@ export async function checkDuplicateSample(sampleId: string, influencerId: strin
     db.get(`
       SELECT COUNT(*) as count FROM sample_records
       WHERE sampleId = ? AND influencerId = ? AND status != 'returned'
-    `, [sampleId, influencerId], (err, row: any) => {
+    `, [sampleId, influencerId], (err: Error | null, row: any) => {
       if (err) reject(err);
       else resolve(row.count > 0);
     });
@@ -190,7 +187,7 @@ export async function checkDuplicateSample(sampleId: string, influencerId: strin
 
 export async function getInfluencer(influencerId: string): Promise<Influencer | null> {
   return new Promise((resolve, reject) => {
-    db.get('SELECT * FROM influencers WHERE influencerId = ?', [influencerId], (err, row) => {
+    db.get('SELECT * FROM influencers WHERE influencerId = ?', [influencerId], (err: Error | null, row: any) => {
       if (err) reject(err);
       else resolve(row as Influencer || null);
     });
@@ -199,7 +196,7 @@ export async function getInfluencer(influencerId: string): Promise<Influencer | 
 
 export async function getBatch(batchId: string): Promise<Batch | null> {
   return new Promise((resolve, reject) => {
-    db.get('SELECT * FROM batches WHERE batchId = ?', [batchId], (err, row) => {
+    db.get('SELECT * FROM batches WHERE batchId = ?', [batchId], (err: Error | null, row: any) => {
       if (err) reject(err);
       else resolve(row as Batch || null);
     });
@@ -208,7 +205,7 @@ export async function getBatch(batchId: string): Promise<Batch | null> {
 
 export async function getAllBatches(): Promise<Batch[]> {
   return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM batches ORDER BY createdAt DESC', (err, rows) => {
+    db.all('SELECT * FROM batches ORDER BY createdAt DESC', (err: Error | null, rows: any[]) => {
       if (err) reject(err);
       else resolve(rows as Batch[]);
     });
@@ -220,7 +217,7 @@ export async function updateOverdueRecords(): Promise<void> {
     db.all(`
       SELECT * FROM sample_records
       WHERE status IN ('pending', 'sent', 'received') AND actualReturnDate IS NULL
-    `, (err, rows) => {
+    `, (err: Error | null, rows: any[]) => {
       if (err) reject(err);
       else resolve(rows as SampleRecord[]);
     });
@@ -232,7 +229,7 @@ export async function updateOverdueRecords(): Promise<void> {
         record.recordId,
         { status: 'overdue' },
         'system',
-        'overdue',
+        'processed',
         '系统自动标记为超期未还'
       );
     }

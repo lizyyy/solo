@@ -44,7 +44,7 @@ export interface SampleRecord {
   sendDate: string;
   expectedReturnDate: string;
   actualReturnDate?: string;
-  status: 'pending' | 'sent' | 'received' | 'overdue' | 'damaged' | 'returned' | 'deducted';
+  status: 'pending' | 'sent' | 'received' | 'overdue' | 'damaged' | 'returned' | 'deducted' | 'duplicate' | 'rejected';
   deposit: number;
   deductionAmount?: number;
   deductionReason?: string;
@@ -58,7 +58,7 @@ export interface SampleRecord {
 export interface OperationLog {
   id?: number;
   recordId: string;
-  operation: 'created' | 'processed' | 'returned' | 'deducted' | 'modified' | 'approved';
+  operation: 'created' | 'processed' | 'returned' | 'deducted' | 'modified' | 'approved' | 'duplicate' | 'rejected';
   operator: string;
   reason?: string;
   remark?: string;

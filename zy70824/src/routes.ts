@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import csv from 'csv-parser';
 import fs from 'fs';
-import { Parser } from 'json2csv';
+const { Parser } = require('json2csv');
 import { generateId, getStatusDescription, formatDate } from './utils';
 import {
   createBatch,
@@ -16,7 +16,8 @@ import {
   getInfluencer,
   getBatch,
   getAllBatches,
-  updateOverdueRecords
+  updateOverdueRecords,
+  addOperationLog
 } from './services';
 import { SampleRecord } from './types';
 
@@ -52,17 +53,20 @@ router.post('/import/csv', upload.single('file'), async (req, res) => {
       return res.status(400).json({ success: false, error: '未上传文件' });
     }
 
+    const filePath = req.file.path;
     const results: any[] = [];
-    const errors: string[] = [];
+    const warnings: string[] = [];
     const batchId = req.body.batchId || generateId('BATCH');
+    const handler = req.body.handler || 'admin';
 
-    fs.createReadStream(req.file.path)
+    fs.createReadStream(filePath)
       .pipe(csv())
       .on('data', (data) => results.push(data))
       .on('end', async () => {
         try {
           let batchCreated = false;
           let batchData: any = null;
+          let successCount = 0;
 
           for (const row of results) {
             const sampleId = row.sampleId || row['样品ID'];
@@ -74,17 +78,6 @@ router.post('/import/csv', upload.single('file'), async (req, res) => {
             const deposit = parseFloat(row.deposit || row['押金'] || 0);
             const brand = row.brand || row['品牌'] || '未知品牌';
 
-            if (!sampleId || !influencerId) {
-              errors.push(`行数据不完整: ${JSON.stringify(row)}`);
-              continue;
-            }
-
-            const isDuplicate = await checkDuplicateSample(sampleId, influencerId);
-            if (isDuplicate) {
-              errors.push(`样品${sampleId}已寄送给达人${influencerId}且未归还`);
-              continue;
-            }
-
             if (!batchCreated) {
               batchData = await createBatch({
                 batchId,
@@ -92,36 +85,103 @@ router.post('/import/csv', upload.single('file'), async (req, res) => {
                 sendDate,
                 expectedReturnDate,
                 status: 'processing',
-                handler: req.body.handler || 'admin'
+                handler
               });
               batchCreated = true;
             }
 
             const recordId = generateId('REC');
+
+            if (!sampleId || !influencerId) {
+              const warningMsg = `行数据不完整: sampleId=${sampleId}, influencerId=${influencerId}`;
+              warnings.push(warningMsg);
+              
+              await createSampleRecord({
+                recordId,
+                batchId,
+                sampleId: sampleId || 'UNKNOWN',
+                sampleName: sampleName || '未知样品',
+                influencerId: influencerId || 'UNKNOWN',
+                influencerName: influencerName || '未知达人',
+                sendDate,
+                expectedReturnDate,
+                status: 'rejected',
+                deposit,
+                handler,
+                remark: warningMsg
+              });
+              await addOperationLog({
+                recordId,
+                operation: 'rejected',
+                operator: handler,
+                reason: warningMsg,
+                remark: 'CSV导入时数据不完整'
+              });
+              continue;
+            }
+
+            const isDuplicate = await checkDuplicateSample(sampleId, influencerId);
+            if (isDuplicate) {
+              const warningMsg = `样品${sampleId}已寄送给达人${influencerId}且未归还`;
+              warnings.push(warningMsg);
+              
+              await createSampleRecord({
+                recordId,
+                batchId,
+                sampleId,
+                sampleName: sampleName || '未知样品',
+                influencerId,
+                influencerName: influencerName || '未知达人',
+                sendDate,
+                expectedReturnDate,
+                status: 'duplicate',
+                deposit,
+                handler,
+                remark: warningMsg
+              });
+              await addOperationLog({
+                recordId,
+                operation: 'duplicate',
+                operator: handler,
+                reason: warningMsg,
+                remark: '检测到重复寄送，系统自动拒绝'
+              });
+              continue;
+            }
+
             await createSampleRecord({
               recordId,
               batchId,
               sampleId,
-              sampleName,
+              sampleName: sampleName || '未知样品',
               influencerId,
-              influencerName,
+              influencerName: influencerName || '未知达人',
               sendDate,
               expectedReturnDate,
               status: 'sent',
               deposit,
-              handler: req.body.handler || 'admin'
+              handler
             });
+            await addOperationLog({
+              recordId,
+              operation: 'created',
+              operator: handler,
+              reason: 'CSV导入创建',
+              remark: '批量导入寄送单'
+            });
+            successCount++;
           }
 
-          fs.unlinkSync(req.file.path);
+          fs.unlinkSync(filePath);
 
           res.json({
             success: true,
             data: {
               batch: batchData,
-              imported: results.length - errors.length,
+              imported: successCount,
+              warnings: warnings.length,
               total: results.length,
-              errors
+              warningsDetail: warnings
             }
           });
         } catch (error: any) {
