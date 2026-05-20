@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遥测异常确认系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 0; margin-bottom: 30px; border-radius: 8px; }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header p { opacity: 0.9; margin-top: 5px; }
+
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #cce5ff; color: #004085; }
+        .status-ignored { background: #e2e3e5; color: #383d41; }
+        .status-ticketed { background: #d1ecf1; color: #0c5460; }
+        .status-recovered { background: #d4edda; color: #155724; }
+        .status-closed { background: #f8d7da; color: #721c24; }
+
+        .severity-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .severity-low { background: #e8f5e9; color: #2e7d32; }
+        .severity-medium { background: #fff8e1; color: #f57f17; }
+        .severity-high { background: #ffebee; color: #c62828; }
+        .severity-critical { background: #b71c1c; color: white; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .stat-card .value { font-size: 32px; font-weight: 700; }
+
+        .filters { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-group label { font-size: 13px; font-weight: 500; color: #555; }
+        .filter-group select, .filter-group input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd6; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-warning:hover { background: #e0a800; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+
+        .table-container { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; font-size: 13px; color: #555; }
+        tr:hover { background: #f8f9fa; }
+        .device-id { font-family: monospace; font-size: 13px; background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
+        .value-compare { display: flex; flex-direction: column; gap: 2px; }
+        .value-change { font-size: 11px; color: #666; }
+        .value-up { color: #dc3545; }
+        .value-down { color: #28a745; }
+
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 20px; }
+        .pagination button { padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination span { font-size: 14px; color: #666; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 8px; max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 18px; }
+        .modal-body { padding: 20px; }
+
+        .detail-section { margin-bottom: 24px; }
+        .detail-section h3 { font-size: 16px; margin-bottom: 12px; color: #333; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .detail-item { background: #f8f9fa; padding: 12px; border-radius: 6px; }
+        .detail-item label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+        .detail-item .value { font-size: 14px; font-weight: 500; }
+
+        .value-diff { display: flex; gap: 20px; align-items: center; }
+        .diff-item { text-align: center; }
+        .diff-item label { font-size: 12px; color: #666; }
+        .diff-item .value { font-size: 18px; font-weight: 700; }
+        .diff-arrow { font-size: 24px; color: #999; }
+
+        .history-list { max-height: 300px; overflow-y: auto; }
+        .history-item { padding: 12px; border-left: 3px solid #667eea; background: #f8f9fa; margin-bottom: 8px; border-radius: 0 4px 4px 0; }
+        .history-item .type { font-size: 12px; font-weight: 600; color: #667eea; }
+        .history-item .time { font-size: 11px; color: #999; margin-top: 4px; }
+        .history-item .operator { font-size: 12px; color: #666; margin-top: 4px; }
+        .history-item .data { font-size: 13px; margin-top: 8px; background: white; padding: 8px; border-radius: 4px; }
+
+        .action-bar { display: flex; gap: 10px; padding: 20px; border-top: 1px solid #eee; background: #f8f9fa; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .batch-actions { display: flex; gap: 10px; align-items: center; }
+        .selected-count { font-size: 13px; color: #666; }
+
+        .nav-tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
+        .nav-tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; font-weight: 500; color: #666; }
+        .nav-tab.active { border-bottom-color: #667eea; color: #667eea; }
+
+        .hidden { display: none !important; }
+
+        .compensation-section { background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .compensation-section h4 { color: #856404; margin-bottom: 10px; }
+        .compensation-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 24px; border-radius: 6px; color: white; font-size: 14px; z-index: 2000; opacity: 0; transform: translateY(20px); transition: all 0.3s; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+        .toast.info { background: #17a2b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="padding: 0 20px;">
+                <h1>遥测异常确认系统</h1>
+                <p>设备指标异常检测与运维复核管理平台</p>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>待处理</h3>
+                <div class="value" id="stat-pending">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>已确认</h3>
+                <div class="value" id="stat-confirmed">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>已恢复</h3>
+                <div class="value" id="stat-recovered">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>已转工单</h3>
+                <div class="value" id="stat-ticketed">0</div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="anomalies">异常列表</div>
+            <div class="nav-tab" data-tab="compensation">补偿管理</div>
+            <div class="nav-tab" data-tab="health">系统健康</div>
+        </div>
+
+        <div id="tab-anomalies">
+            <div class="filters">
+                <div class="filter-group">
+                    <label>状态:</label>
+                    <select id="filter-status">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="confirmed">已确认</option>
+                        <option value="ignored">已忽略</option>
+                        <option value="ticketed">已转工单</option>
+                        <option value="recovered">已恢复</option>
+                        <option value="closed">已关闭</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>严重程度:</label>
+                    <select id="filter-severity">
+                        <option value="">全部</option>
+                        <option value="low">低</option>
+                        <option value="medium">中</option>
+                        <option value="high">高</option>
+                        <option value="critical">严重</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>设备ID:</label>
+                    <input type="text" id="filter-device" placeholder="搜索设备">
+                </div>
+                <div class="filter-group">
+                    <button class="btn btn-primary" onclick="loadAnomalies()">查询</button>
+                </div>
+                <div class="filter-group">
+                    <button class="btn btn-success" onclick="exportData()">导出</button>
+                </div>
+            </div>
+
+            <div class="batch-actions" id="batch-actions" style="display: none; margin-bottom: 15px;">
+                <span class="selected-count">已选择 <span id="selected-count">0</span> 条</span>
+                <button class="btn btn-primary" onclick="batchConfirm()">批量确认</button>
+                <button class="btn btn-warning" onclick="batchIgnore()">批量忽略</button>
+                <button class="btn btn-danger" onclick="batchClose()">批量关闭</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"><input type="checkbox" id="select-all" onchange="toggleSelectAll()"></th>
+                            <th>ID</th>
+                            <th>设备ID</th>
+                            <th>标题</th>
+                            <th>严重程度</th>
+                            <th>状态</th>
+                            <th>数值变化</th>
+                            <th>检测时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="anomalies-table">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="prev-page" onclick="changePage(-1)">上一页</button>
+                <span id="page-info">第 1 页，共 1 页</span>
+                <button id="next-page" onclick="changePage(1)">下一页</button>
+            </div>
+        </div>
+
+        <div id="tab-compensation" class="hidden">
+            <div class="compensation-section">
+                <h4>数据修复工具</h4>
+                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">用于修复脏数据、状态不一致等问题</p>
+                <div class="compensation-actions">
+                    <button class="btn btn-warning" onclick="createCompensationTask('fix_status_inconsistency')">修复状态不一致</button>
+                    <button class="btn btn-warning" onclick="createCompensationTask('rebuild_history')">重建历史记录</button>
+                    <button class="btn btn-danger" onclick="cleanupDirtyData()">清理脏数据</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>任务类型</th>
+                            <th>描述</th>
+                            <th>状态</th>
+                            <th>重试次数</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="compensation-tasks">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-health" class="hidden">
+            <div class="table-container" style="padding: 20px;">
+                <h3 style="margin-bottom: 20px;">系统健康状态</h3>
+                <div id="health-status"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>异常详情</h2>
+                <button class="btn" onclick="closeModal()">关闭</button>
+            </div>
+            <div class="modal-body" id="detail-content">
+            </div>
+            <div class="action-bar" id="action-bar">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="action-modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="action-title">执行操作</h2>
+                <button class="btn" onclick="closeActionModal()">取消</button>
+            </div>
+            <div class="modal-body">
+                <form id="action-form">
+                    <div class="form-group">
+                        <label>操作人ID</label>
+                        <input type="text" id="operator-id" value="op_001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>操作人姓名</label>
+                        <input type="text" id="operator-name" value="系统管理员" required>
+                    </div>
+                    <div class="form-group" id="reason-group" style="display: none;">
+                        <label>忽略原因分类</label>
+                        <select id="ignore-category">
+                            <option value="false_positive">误报</option>
+                            <option value="known_issue">已知问题</option>
+                            <option value="planned_maintenance">计划维护</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="ticket-group" style="display: none;">
+                        <label>工单ID</label>
+                        <input type="text" id="ticket-id" placeholder="输入工单编号">
+                        <label style="margin-top: 10px;">工单标题</label>
+                        <input type="text" id="ticket-title" placeholder="工单标题">
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea id="action-comment" placeholder="输入操作备注..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="submitAction()">确认执行</button>
+                <button class="btn" onclick="closeActionModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/api/v1';
+        let currentPage = 1;
+        let pageSize = 20;
+        let totalPages = 1;
+        let selectedAnomalies = new Set();
+        let currentAnomaly = null;
+        let currentAction = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAnomalies();
+            loadStats();
+            setupTabs();
+        });
+
+        function setupTabs() {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabName = this.dataset.tab;
+                    document.querySelectorAll('[id^="tab-"]').forEach(t => t.classList.add('hidden'));
+                    document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+                    if (tabName === 'compensation') {
+                        loadCompensationTasks();
+                    } else if (tabName === 'health') {
+                        loadHealthStatus();
+                    }
+                });
+            });
+        }
+
+        async function fetchAPI(url, options = {}) {
+            try {
+                const response = await fetch(API_BASE + url, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || '请求失败');
+                }
+                return await response.json();
+            } catch (error) {
+                showToast(error.message, 'error');
+                throw error;
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const status = await fetchAPI('/compensation/health/status');
+                const counts = status.anomaly_status_counts || {};
+                document.getElementById('stat-pending').textContent = counts.pending || 0;
+                document.getElementById('stat-confirmed').textContent = counts.confirmed || 0;
+                document.getElementById('stat-recovered').textContent = counts.recovered || 0;
+                document.getElementById('stat-ticketed').textContent = counts.ticketed || 0;
+            } catch (e) {}
+        }
+
+        async function loadAnomalies() {
+            const status = document.getElementById('filter-status').value;
+            const severity = document.getElementById('filter-severity').value;
+            const device = document.getElementById('filter-device').value;
+
+            let url = `/anomalies?page=${currentPage}&page_size=${pageSize}`;
+            if (status) url += `&status=${status}`;
+            if (severity) url += `&severity=${severity}`;
+            if (device) url += `&device_id=${device}`;
+
+            const data = await fetchAPI(url);
+            renderAnomalies(data.items);
+
+            totalPages = Math.ceil(data.total / pageSize);
+            document.getElementById('page-info').textContent = `第 ${currentPage} 页，共 ${totalPages} 页`;
+            document.getElementById('prev-page').disabled = currentPage <= 1;
+            document.getElementById('next-page').disabled = currentPage >= totalPages;
+        }
+
+        function renderAnomalies(anomalies) {
+            const tbody = document.getElementById('anomalies-table');
+            tbody.innerHTML = anomalies.map(a => {
+                const change = calculateChange(a.previous_value, a.current_value);
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="anomaly-checkbox" value="${a.id}" onchange="toggleSelect(${a.id})" ${selectedAnomalies.has(a.id) ? 'checked' : ''}></td>
+                        <td>${a.id}</td>
+                        <td><span class="device-id">${a.device_id}</span></td>
+                        <td>${a.title}</td>
+                        <td><span class="severity-badge severity-${a.severity}">${getSeverityText(a.severity)}</span></td>
+                        <td><span class="status-badge status-${a.status}">${getStatusText(a.status)}</span></td>
+                        <td>
+                            <div class="value-compare">
+                                <div>${a.current_value !== null ? a.current_value.toFixed(2) : '-'}</div>
+                                ${change ? `<div class="value-change ${change.class}">${change.text}</div>` : ''}
+                            </div>
+                        </td>
+                        <td>${formatDate(a.detected_at)}</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 4px 8px; font-size: 12px;" onclick="viewDetail(${a.id})">查看</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function calculateChange(prev, current) {
+            if (prev === null || current === null) return null;
+            const diff = current - prev;
+            const percent = ((diff / prev) * 100).toFixed(1);
+            return {
+                class: diff > 0 ? 'value-up' : 'value-down',
+                text: `${diff > 0 ? '+' : ''}${percent}% (${diff > 0 ? '+' : ''}${diff.toFixed(2)})`
+            };
+        }
+
+        function getStatusText(status) {
+            const map = {
+                pending: '待处理', confirmed: '已确认', ignored: '已忽略',
+                ticketed: '已转工单', recovered: '已恢复', closed: '已关闭'
+            };
+            return map[status] || status;
+        }
+
+        function getSeverityText(severity) {
+            const map = { low: '低', medium: '中', high: '高', critical: '严重' };
+            return map[severity] || severity;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleString('zh-CN');
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            loadAnomalies();
+        }
+
+        function toggleSelect(id) {
+            if (selectedAnomalies.has(id)) {
+                selectedAnomalies.delete(id);
+            } else {
+                selectedAnomalies.add(id);
+            }
+            updateBatchActions();
+        }
+
+        function toggleSelectAll() {
+            const checkboxes = document.querySelectorAll('.anomaly-checkbox');
+            const allChecked = document.getElementById('select-all').checked;
+            checkboxes.forEach(cb => {
+                const id = parseInt(cb.value);
+                if (allChecked) {
+                    selectedAnomalies.add(id);
+                    cb.checked = true;
+                } else {
+                    selectedAnomalies.delete(id);
+                    cb.checked = false;
+                }
+            });
+            updateBatchActions();
+        }
+
+        function updateBatchActions() {
+            document.getElementById('selected-count').textContent = selectedAnomalies.size;
+            document.getElementById('batch-actions').style.display = selectedAnomalies.size > 0 ? 'flex' : 'none';
+        }
+
+        async function viewDetail(id) {
+            const anomaly = await fetchAPI(`/anomalies/${id}`);
+            const history = await fetchAPI(`/anomalies/${id}/history`);
+            currentAnomaly = anomaly;
+
+            renderDetail(anomaly, history);
+            renderActionBar(anomaly);
+            document.getElementById('detail-modal').classList.add('active');
+        }
+
+        function renderDetail(anomaly, history) {
+            const content = document.getElementById('detail-content');
+            content.innerHTML = `
+                <div class="detail-section">
+                    <h3>基本信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>异常ID</label>
+                            <div class="value">${anomaly.id}</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>设备ID</label>
+                            <div class="value device-id">${anomaly.device_id}</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>标题</label>
+                            <div class="value">${anomaly.title}</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>严重程度</label>
+                            <div><span class="severity-badge severity-${anomaly.severity}">${getSeverityText(anomaly.severity)}</span></div>
+                        </div>
+                        <div class="detail-item">
+                            <label>状态</label>
+                            <div><span class="status-badge status-${anomaly.status}">${getStatusText(anomaly.status)}</span></div>
+                        </div>
+                        <div class="detail-item">
+                            <label>检测时间</label>
+                            <div class="value">${formatDate(anomaly.detected_at)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>数值变化对比</h3>
+                    <div class="value-diff">
+                        <div class="diff-item">
+                            <label>之前值</label>
+                            <div class="value">${anomaly.previous_value !== null ? anomaly.previous_value.toFixed(2) : '-'}</div>
+                        </div>
+                        <div class="diff-arrow">→</div>
+                        <div class="diff-item">
+                            <label>当前值</label>
+                            <div class="value">${anomaly.current_value !== null ? anomaly.current_value.toFixed(2) : '-'}</div>
+                        </div>
+                        <div class="diff-arrow">→</div>
+                        <div class="diff-item">
+                            <label>阈值</label>
+                            <div class="value">${anomaly.threshold_value !== null ? anomaly.threshold_value.toFixed(2) : '-'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                ${anomaly.description ? `
+                <div class="detail-section">
+                    <h3>描述</h3>
+                    <p style="padding: 12px; background: #f8f9fa; border-radius: 6px;">${anomaly.description}</p>
+                </div>` : ''}
+
+                <div class="detail-section">
+                    <h3>操作历史 (${history.length})</h3>
+                    <div class="history-list">
+                        ${history.map(h => `
+                            <div class="history-item">
+                                <div class="type">${getHistoryTypeText(h.type)}</div>
+                                <div class="operator">操作人: ${h.operator}</div>
+                                <div class="time">${formatDate(h.timestamp)}</div>
+                                <div class="data">${formatHistoryData(h.type, h.data)}</div>
+                            </div>
+                        `).join('')}
+                        ${history.length === 0 ? '<p style="color: #999; text-align: center; padding: 20px;">暂无操作历史</p>' : ''}
+                    </div>
+                </div>
+
+                <div class="detail-section" style="background: #fff3cd; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #856404;">数据修复工具</h4>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-warning" style="padding: 6px 12px; font-size: 12px;" onclick="repairAnomaly('reset_status')">重置状态</button>
+                        <button class="btn btn-warning" style="padding: 6px 12px; font-size: 12px;" onclick="repairAnomaly('fix_missing_timestamps')">修复缺失时间戳</button>
+                        <button class="btn btn-warning" style="padding: 6px 12px; font-size: 12px;" onclick="repairAnomaly('fix_status_inconsistency')">修复状态不一致</button>
+                        <button class="btn btn-warning" style="padding: 6px 12px; font-size: 12px;" onclick="repairAnomaly('rebuild_history')">重建操作历史</button>
+                        <button class="btn btn-warning" style="padding: 6px 12px; font-size: 12px;" onclick="repairAnomaly('remove_duplicate_history')">删除重复历史</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getHistoryTypeText(type) {
+            const map = {
+                status_change: '状态变更',
+                ignore_reason: '忽略原因',
+                ticket_link: '关联工单',
+                recovery: '恢复事件'
+            };
+            return map[type] || type;
+        }
+
+        function formatHistoryData(type, data) {
+            if (!data) return '-';
+            if (type === 'status_change') {
+                return `从 ${getStatusText(data.previous_status || '-')} 变更为 ${getStatusText(data.new_status)}${data.comment ? '（备注：' + data.comment + '）' : ''}`;
+            }
+            if (type === 'ignore_reason') {
+                return `分类: ${data.category}${data.detail ? '，详情: ' + data.detail : ''}`;
+            }
+            if (type === 'ticket_link') {
+                return `工单ID: ${data.ticket_id}${data.ticket_title ? '，标题: ' + data.ticket_title : ''}`;
+            }
+            if (type === 'recovery') {
+                return `恢复值: ${data.recovered_value || '-'}${data.recovery_method ? '，方式: ' + data.recovery_method : ''}`;
+            }
+            return JSON.stringify(data);
+        }
+
+        function renderActionBar(anomaly) {
+            const bar = document.getElementById('action-bar');
+            let buttons = [];
+
+            if (anomaly.status === 'pending') {
+                buttons.push('<button class="btn btn-primary" onclick="openAction(\'confirm\')">确认异常</button>');
+                buttons.push('<button class="btn btn-warning" onclick="openAction(\'ignore\')">忽略异常</button>');
+                buttons.push('<button class="btn btn-success" onclick="openAction(\'ticket\')">转工单</button>');
+            }
+            if (anomaly.status === 'confirmed') {
+                buttons.push('<button class="btn btn-success" onclick="openAction(\'ticket\')">转工单</button>');
+                buttons.push('<button class="btn btn-success" onclick="openAction(\'recover\')">标记恢复</button>');
+                buttons.push('<button class="btn btn-warning" onclick="openAction(\'ignore\')">忽略</button>');
+            }
+            if (anomaly.status === 'ticketed') {
+                buttons.push('<button class="btn btn-success" onclick="openAction(\'recover\')">标记恢复</button>');
+                buttons.push('<button class="btn btn-danger" onclick="openAction(\'close\')">关闭</button>');
+            }
+            if (anomaly.status === 'recovered') {
+                buttons.push('<button class="btn btn-danger" onclick="openAction(\'close\')">关闭</button>');
+            }
+
+            bar.innerHTML = buttons.join('') || '<span style="color: #999;">该状态下无可用操作</span>';
+        }
+
+        function openAction(action) {
+            currentAction = action;
+            const titles = {
+                confirm: '确认异常',
+                ignore: '忽略异常',
+                ticket: '转工单',
+                recover: '标记恢复',
+                close: '关闭异常'
+            };
+            document.getElementById('action-title').textContent = titles[action] || '执行操作';
+            document.getElementById('reason-group').style.display = action === 'ignore' ? 'block' : 'none';
+            document.getElementById('ticket-group').style.display = action === 'ticket' ? 'block' : 'none';
+            document.getElementById('action-modal').classList.add('active');
+        }
+
+        async function submitAction() {
+            const operatorId = document.getElementById('operator-id').value;
+            const operatorName = document.getElementById('operator-name').value;
+            const comment = document.getElementById('action-comment').value;
+
+            let newStatus;
+            let body = {
+                new_status: newStatus,
+                operator_id: operatorId,
+                operator_name: operatorName,
+                comment: comment
+            };
+
+            switch (currentAction) {
+                case 'confirm':
+                    body.new_status = 'confirmed';
+                    break;
+                case 'ignore':
+                    body.new_status = 'ignored';
+                    body.reason_category = document.getElementById('ignore-category').value;
+                    break;
+                case 'ticket':
+                    body.new_status = 'ticketed';
+                    body.ticket_id = document.getElementById('ticket-id').value;
+                    body.ticket_title = document.getElementById('ticket-title').value;
+                    if (!body.ticket_id) {
+                        showToast('请输入工单ID', 'error');
+                        return;
+                    }
+                    break;
+                case 'recover':
+                    body.new_status = 'recovered';
+                    break;
+                case 'close':
+                    body.new_status = 'closed';
+                    break;
+            }
+
+            try {
+                await fetchAPI(`/anomalies/${currentAnomaly.id}/status`, {
+                    method: 'PUT',
+                    body: JSON.stringify(body)
+                });
+                showToast('操作成功', 'success');
+                closeActionModal();
+                closeModal();
+                loadAnomalies();
+                loadStats();
+            } catch (e) {}
+        }
+
+        async function batchConfirm() {
+            await batchAction('confirm');
+        }
+
+        async function batchIgnore() {
+            await batchAction('ignore');
+        }
+
+        async function batchClose() {
+            await batchAction('close');
+        }
+
+        async function batchAction(action) {
+            if (selectedAnomalies.size === 0) return;
+            try {
+                const result = await fetchAPI('/anomalies/batch', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        anomaly_ids: Array.from(selectedAnomalies),
+                        action: action,
+                        operator_id: 'op_001',
+                        operator_name: '批量操作',
+                        comment: '批量处理'
+                    })
+                });
+                showToast(`成功处理 ${result.success} 条，失败 ${result.failed} 条`, result.failed > 0 ? 'info' : 'success');
+                selectedAnomalies.clear();
+                loadAnomalies();
+                loadStats();
+            } catch (e) {}
+        }
+
+        async function repairAnomaly(repairType) {
+            try {
+                await fetchAPI(`/compensation/anomalies/${currentAnomaly.id}/repair?repair_type=${repairType}`, {
+                    method: 'POST'
+                });
+                showToast('修复成功', 'success');
+                viewDetail(currentAnomaly.id);
+                loadStats();
+            } catch (e) {}
+        }
+
+        async function exportData() {
+            const status = document.getElementById('filter-status').value;
+            const body = { format: 'xlsx' };
+            if (status) body.status = [status];
+
+            try {
+                const response = await fetch(API_BASE + '/anomalies/export', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'anomalies.xlsx';
+                a.click();
+                showToast('导出成功', 'success');
+            } catch (e) {}
+        }
+
+        async function loadCompensationTasks() {
+            const tasks = await fetchAPI('/compensation/tasks');
+            const tbody = document.getElementById('compensation-tasks');
+            tbody.innerHTML = tasks.map(t => `
+                <tr>
+                    <td>${t.id}</td>
+                    <td>${t.task_type}</td>
+                    <td>${t.task_description || '-'}</td>
+                    <td><span class="status-badge status-${t.status === 'completed' ? 'recovered' : t.status === 'failed' ? 'closed' : 'pending'}">${t.status}</span></td>
+                    <td>${t.retry_count}/${t.max_retries}</td>
+                    <td>${formatDate(t.created_at)}</td>
+                    <td>
+                        ${t.status !== 'completed' ? `<button class="btn btn-primary" style="padding: 4px 8px; font-size: 12px;" onclick="executeTask(${t.id})">执行</button>` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function createCompensationTask(type) {
+            try {
+                await fetchAPI('/compensation/tasks', {
+                    method: 'POST',
+                    body: JSON.stringify({ task_type: type, task_description: '手动创建的补偿任务' })
+                });
+                showToast('补偿任务已创建', 'success');
+                loadCompensationTasks();
+            } catch (e) {}
+        }
+
+        async function executeTask(id) {
+            try {
+                await fetchAPI(`/compensation/tasks/${id}/execute`, { method: 'POST' });
+                showToast('任务执行成功', 'success');
+                loadCompensationTasks();
+            } catch (e) {}
+        }
+
+        async function cleanupDirtyData() {
+            try {
+                const result = await fetchAPI('/compensation/cleanup/dirty_data', { method: 'POST' });
+                showToast('清理完成', 'success');
+                loadStats();
+            } catch (e) {}
+        }
+
+        async function loadHealthStatus() {
+            const status = await fetchAPI('/compensation/health/status');
+            document.getElementById('health-status').innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>系统健康状态</label>
+                        <div class="value" style="color: ${status.is_healthy ? '#28a745' : '#dc3545'}">
+                            ${status.is_healthy ? '✓ 正常' : '✗ 需要注意'}
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <label>待处理异常数</label>
+                        <div class="value">${status.pending_anomalies}</div>
+                    </div>
+                    <div class="detail-item">
+                        <label>待执行补偿任务</label>
+                        <div class="value">${status.compensation_tasks_pending}</div>
+                    </div>
+                    <div class="detail-item">
+                        <label>失败的补偿任务</label>
+                        <div class="value">${status.compensation_tasks_failed}</div>
+                    </div>
+                </div>
+                <h4 style="margin: 20px 0 10px;">异常状态分布</h4>
+                <div class="detail-grid">
+                    ${Object.entries(status.anomaly_status_counts || {}).map(([k, v]) => `
+                        <div class="detail-item">
+                            <label>${getStatusText(k)}</label>
+                            <div class="value">${v}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+        }
+
+        function closeActionModal() {
+            document.getElementById('action-modal').classList.remove('active');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
