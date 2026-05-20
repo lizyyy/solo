@@ -1,5 +1,5 @@
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 from typing import List, Dict, Any
 import json
 
@@ -71,7 +71,7 @@ def parse_date(value) -> datetime.date:
 
 def to_json_str(data: Dict[str, Any]) -> str:
     def default_converter(o):
-        if isinstance(o, (datetime.date, datetime)):
+        if isinstance(o, (date, datetime)):
             return o.isoformat()
         return str(o)
     return json.dumps(data, default=default_converter, ensure_ascii=False)
