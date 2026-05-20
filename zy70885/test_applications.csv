@@ -1,0 +1,8 @@
+application_type,applicant,department,contract_id,seal_type,approver,approval_level,has_attachment,is_resubmit,remark
+合同盖章,张三,市场部,CT001,公章,李四,1,True,False,正常合同
+合同盖章,王五,销售部,CT002,合同专用章,赵六,1,False,False,大额合同审批不足
+授权审批,钱七,采购部,CT003,法人章,孙八,3,False,False,采购合同缺附件
+快递寄出,周九,财务部,CT004,公章,吴十,3,False,False,快递需凭证
+合同盖章,郑十一,技术部,CT005,合同专用章,王十二,2,True,True,撤回重提
+合同盖章,冯十三,人事部,CT006,部门章,陈十四,1,True,False,低额正常
+合同盖章,褚十五,运营部,CT001,合同专用章,李四,3,True,False,跨部门申请
