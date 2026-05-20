@@ -431,13 +431,15 @@
                     ...options
                 });
                 const data = await res.json();
-                setTimeout(loadStats, 100);
-                setTimeout(loadRequests, 200);
                 return data;
             } catch (e) {
                 console.error('API Error:', e);
                 throw e;
             }
+        }
+
+        async function refreshStatsAndLogs() {
+            await Promise.all([loadStats(), loadRequests()]);
         }
 
         async function loadStats() {
@@ -631,6 +633,7 @@
             
             closeModal('status-advance-modal');
             loadServices();
+            refreshStatsAndLogs();
         }
 
         async function showBindEnvironmentModal(serviceId) {
@@ -668,6 +671,7 @@
             
             closeModal('bind-env-modal');
             loadServices();
+            refreshStatsAndLogs();
         }
 
         async function unbindEnvironment(serviceId, environmentId) {
@@ -679,6 +683,7 @@
             });
             
             showServiceDetail(serviceId);
+            refreshStatsAndLogs();
         }
 
         async function loadEnvironments() {
@@ -756,6 +761,7 @@
             
             closeModal('add-environment-modal');
             loadEnvironments();
+            refreshStatsAndLogs();
         }
 
         async function loadEndpoints() {
@@ -891,6 +897,7 @@
             await apiCall('/services', { method: 'POST', body: JSON.stringify({ name, description, ownerId }) });
             closeModal('add-service-modal');
             loadServices();
+            refreshStatsAndLogs();
         }
 
         async function showAddEndpointModal() {
@@ -918,6 +925,7 @@
             await apiCall('/endpoints', { method: 'POST', body: JSON.stringify({ serviceId, method, path, description, ownerId }) });
             closeModal('add-endpoint-modal');
             loadEndpoints();
+            refreshStatsAndLogs();
         }
 
         function showAddOwnerModal() {
@@ -933,6 +941,7 @@
             await apiCall('/owners', { method: 'POST', body: JSON.stringify({ name, email, team, phone }) });
             closeModal('add-owner-modal');
             loadOwners();
+            refreshStatsAndLogs();
         }
 
         async function showChangeOwnerModal(serviceId) {
@@ -949,6 +958,7 @@
             await apiCall(`/services/${currentServiceId}/change-owner`, { method: 'POST', body: JSON.stringify({ newOwnerId, reason }) });
             closeModal('change-owner-modal');
             loadServices();
+            refreshStatsAndLogs();
         }
 
         function showAlertLostModal(serviceId) {
@@ -963,6 +973,7 @@
             closeModal('alert-lost-modal');
             loadServices();
             loadAlerts();
+            refreshStatsAndLogs();
         }
 
         async function exportDirectory() {
