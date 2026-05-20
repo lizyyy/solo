@@ -55,11 +55,13 @@ class TrackingRecordModel {
     return allAsync('SELECT * FROM tracking_records WHERE record_type = ? ORDER BY handled_at DESC', [recordType]);
   }
 
-  static async updateStatus(recordId, status, reason, handler, remarks = null) {
+  static async updateStatus(recordIdentifier, status, reason, handler, remarks = null) {
+    const isRecordNo = String(recordIdentifier).startsWith('REC-');
+    
     const sql = `UPDATE tracking_records 
       SET status = ?, reason = ?, handler = ?, remarks = ?, handled_at = CURRENT_TIMESTAMP 
-      WHERE id = ?`;
-    return runAsync(sql, [status, reason, handler, remarks, recordId]);
+      WHERE ${isRecordNo ? 'record_no = ?' : 'id = ?'}`;
+    return runAsync(sql, [status, reason, handler, remarks, recordIdentifier]);
   }
 
   static async getHistory(filters = {}) {
@@ -95,7 +97,9 @@ class TrackingRecordModel {
     return allAsync(sql, params);
   }
 
-  static async getFullRecord(recordId) {
+  static async getFullRecord(recordIdentifier) {
+    const isRecordNo = String(recordIdentifier).startsWith('REC-');
+    
     const sql = `
       SELECT 
         tr.*,
@@ -116,9 +120,9 @@ class TrackingRecordModel {
       LEFT JOIN patients p ON tr.patient_id = p.patient_id
       LEFT JOIN patient_transfers pt ON tr.transfer_id = pt.transfer_id
       LEFT JOIN cleaning_orders co ON tr.order_id = co.order_id
-      WHERE tr.id = ?
+      WHERE ${isRecordNo ? 'tr.record_no = ?' : 'tr.id = ?'}
     `;
-    return getAsync(sql, [recordId]);
+    return getAsync(sql, [recordIdentifier]);
   }
 
   static async getAll() {

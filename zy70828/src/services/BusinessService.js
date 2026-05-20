@@ -7,6 +7,16 @@ const OperationLogModel = require('../models/OperationLogModel');
 const moment = require('moment');
 
 class BusinessService {
+  static async findRecordByIdentifier(recordIdentifier) {
+    const isRecordNo = String(recordIdentifier).startsWith('REC-');
+    if (isRecordNo) {
+      return TrackingRecordModel.findByRecordNo(recordIdentifier);
+    } else {
+      const result = await TrackingRecordModel.getFullRecord(recordIdentifier);
+      return result;
+    }
+  }
+
   static async processPatientTransfer(transferId, handler, remarks = null) {
     const transfer = await PatientTransferModel.findByTransferId(transferId);
     if (!transfer) throw new Error('流转记录不存在');
@@ -68,13 +78,13 @@ class BusinessService {
   }
 
   static async approveRecord(recordId, handler, reason, remarks = null) {
-    const record = await TrackingRecordModel.findByRecordNo(recordId);
+    const record = await this.findRecordByIdentifier(recordId);
     if (!record) throw new Error('记录不存在');
 
     const beforeStatus = record.status;
 
     await TrackingRecordModel.updateStatus(
-      record.id, 'approved', reason, handler, remarks
+      recordId, 'approved', reason, handler, remarks
     );
 
     await OperationLogModel.create({
@@ -104,13 +114,13 @@ class BusinessService {
   }
 
   static async rejectRecord(recordId, handler, reason, remarks = null) {
-    const record = await TrackingRecordModel.findByRecordNo(recordId);
+    const record = await this.findRecordByIdentifier(recordId);
     if (!record) throw new Error('记录不存在');
 
     const beforeStatus = record.status;
 
     await TrackingRecordModel.updateStatus(
-      record.id, 'rejected', reason, handler, remarks
+      recordId, 'rejected', reason, handler, remarks
     );
 
     await OperationLogModel.create({
@@ -137,13 +147,13 @@ class BusinessService {
   }
 
   static async sendBackForModification(recordId, handler, reason, remarks = null) {
-    const record = await TrackingRecordModel.findByRecordNo(recordId);
+    const record = await this.findRecordByIdentifier(recordId);
     if (!record) throw new Error('记录不存在');
 
     const beforeStatus = record.status;
 
     await TrackingRecordModel.updateStatus(
-      record.id, 'send_back', reason, handler, remarks
+      recordId, 'send_back', reason, handler, remarks
     );
 
     await OperationLogModel.create({

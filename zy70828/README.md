@@ -168,6 +168,20 @@ curl -o records.csv http://localhost:3000/api/export/records?ward=内科一病�
 curl http://localhost:3000/api/records/REC-xxx/audit-trail
 ```
 
+### 8. 检查清洁超时工单
+```bash
+curl http://localhost:3000/api/records/check-timeout
+```
+
+## 💡 重要说明
+
+### 记录编号使用
+系统支持两种方式标识追踪记录：
+- **对外记录编号**（推荐使用）：格式为 `REC-YYYYMMDDHHmmss-NNN`（如 `REC-20260520062132-194`）
+- **数据库ID**：数字格式（如 `11`）
+
+所有接口（查询详情、批准、驳回、退回修改、审计追踪）均支持这两种格式。
+
 ## 🔧 数据模型
 
 ### 追踪记录状态
