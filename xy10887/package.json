@@ -1,0 +1,27 @@
+{
+  "name": "consent-version-api",
+  "version": "1.0.0",
+  "description": "医疗项目知情同意版本管理系统",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon backend/server.js",
+    "client": "cd frontend && npm start",
+    "install:all": "npm install && cd frontend && npm install"
+  },
+  "keywords": ["consent", "medical", "versioning"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "pdfkit": "^0.13.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.0"
+  }
+}
