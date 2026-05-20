@@ -17,7 +17,7 @@ const httpRequest = (url: string, options: any, payload: string): Promise<any> =
     const req = client.request(url, options, (res) => {
       let data = '';
       res.on('data', (chunk) => data += chunk);
-      res.on('end', () => resolve({ status: res.statusCode, body: data, headers: res.headers }));
+      res.on('end', () => resolve({ statusCode: res.statusCode, body: data, headers: res.headers }));
     });
     
     req.on('error', reject);
@@ -49,7 +49,10 @@ export const sendCallbackRequest = async (targetUrl: string, payload: any, secre
     
     try {
       const responseBody = JSON.parse(result.body);
-      const success = result.statusCode === 200 && responseBody.code === 0;
+      // 判断逻辑：HTTP 200 + (没有code字段 或 code === 0)
+      // 兼容标准REST接口和有业务码的接口
+      const hasCodeField = responseBody.code !== undefined;
+      const success = result.statusCode === 200 && (!hasCodeField || responseBody.code === 0);
       
       return {
         success,
@@ -57,6 +60,7 @@ export const sendCallbackRequest = async (targetUrl: string, payload: any, secre
         response: responseBody
       };
     } catch {
+      // 非JSON响应，只要HTTP 200即视为成功
       return {
         success: result.statusCode === 200,
         statusCode: result.statusCode,
@@ -311,7 +315,8 @@ export const executeCallback = async (taskId: string, useDemoMode = true): Promi
     ['success', taskId]
   );
 
-  await updateTaskStatus(taskId, 'completed', 'system', '回调成功，任务完成');
+  const remark = `回调成功，HTTP ${callbackResult.statusCode}，已通知业务系统`;
+  await updateTaskStatus(taskId, 'completed', 'system', remark);
 
   return { success: true, response: callbackResult };
 };

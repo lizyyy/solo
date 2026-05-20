@@ -197,11 +197,32 @@ curl -X POST http://localhost:3001/api/tasks/{taskId}/complete-stage \
   -H "Content-Type: application/json" \
   -d '{"stage_name": "audio_analysis"}'
 
-# 5. 执行回调
+# 5. 执行回调（真实HTTP投递）
 curl -X POST http://localhost:3001/api/tasks/{taskId}/callback \
   -H "Content-Type: application/json" \
-  -d '{"demo_mode": true}'
+  -d '{"demo_mode": false}'
 ```
+
+## 🔧 问题修复记录
+
+### 第三轮修复（核心回调闭环）
+**问题**：真实HTTP回调即使返回200也被判定失败，导致最终无法完成对账
+
+**修复内容**：
+1. **字段名不匹配** - [taskService.ts#L20](file:///Users/mac/pro/solo/workspaces/xy10847/server/services/taskService.ts#L20)
+   - `httpRequest` 返回字段：`{ status: 200 }` → 修正为 `{ statusCode: 200 }`
+   - 与 `sendCallbackRequest` 读取字段统一
+
+2. **成功判断逻辑优化** - [taskService.ts#L52-L55](file:///Users/mac/pro/solo/workspaces/xy10847/server/services/taskService.ts#L52-L55)
+   - 原逻辑：仅当 `code === 0` 时判定成功
+   - 新逻辑：HTTP 200 + (无code字段 或 code === 0) 即判定成功
+   - 兼容 httpbin.org 等标准测试接口
+
+3. **状态历史增强** - [taskService.ts#L318](file:///Users/mac/pro/solo/workspaces/xy10847/server/services/taskService.ts#L318)
+   - 回调成功后，状态历史备注显示：`"回调成功，HTTP 200，已通知业务系统"`
+   - 提供对账凭据
+
+**验证效果**：点击"强制执行真实HTTP回调" → 发送真实POST到 https://httpbin.org/post → HTTP 200 → 任务状态变为 completed ✅ → 完成对账
 
 ## 🔒 签名验证机制
 
