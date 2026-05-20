@@ -5,13 +5,16 @@ import fs from 'fs';
 import {
   parseCriticalValueCSV,
   parseCallbackJSON,
-  parseDutyCSV
+  parseDutyCSV,
+  parseConfirmJSON
 } from './services/parser.service';
 import {
   createBatch,
   processCriticalValueBatch,
   saveCallbackRecords,
   saveDutyRecords,
+  saveConfirmRecords,
+  createSingleConfirmRecord,
   getBatchById,
   getBatchRecords,
   getAllBatches,
@@ -163,6 +166,75 @@ router.post('/upload/duty', upload.single('file'), async (req, res) => {
       batchNo: batch.batchNo,
       recordCount: records.length,
       records
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: '处理失败', message: error.message });
+  }
+});
+
+router.post('/upload/confirm', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: '未上传文件' });
+    }
+
+    const { batch, isDuplicate, existingBatch } = await createBatch(
+      'critical_value' as any,
+      req.file.originalname,
+      req.file.path
+    );
+
+    if (isDuplicate) {
+      fs.unlinkSync(req.file.path);
+      return res.status(409).json({
+        error: '文件已存在，重复提交',
+        existingBatch: {
+          id: existingBatch?.id,
+          batchNo: existingBatch?.batchNo,
+          createdAt: existingBatch?.createdAt
+        }
+      });
+    }
+
+    const records = await parseConfirmJSON(req.file.path, batch.id);
+    await updateBatchStatus(batch.id, 'processing', records.length, 0);
+    await saveConfirmRecords(records);
+    await updateBatchStatus(batch.id, 'completed', records.length, records.length);
+
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      success: true,
+      batchId: batch.id,
+      batchNo: batch.batchNo,
+      recordCount: records.length,
+      records
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: '处理失败', message: error.message });
+  }
+});
+
+router.post('/confirm', async (req, res) => {
+  try {
+    const { criticalValueId, confirmTime, confirmer, confirmerPhone, confirmResult, confirmNote } = req.body;
+
+    if (!criticalValueId || !confirmer || !confirmResult) {
+      return res.status(400).json({ error: '缺少必填字段: criticalValueId, confirmer, confirmResult' });
+    }
+
+    const record = await createSingleConfirmRecord({
+      criticalValueId,
+      confirmTime: confirmTime || new Date().toISOString(),
+      confirmer,
+      confirmerPhone: confirmerPhone || '',
+      confirmResult,
+      confirmNote
+    });
+
+    res.json({
+      success: true,
+      record
     });
   } catch (error: any) {
     res.status(500).json({ error: '处理失败', message: error.message });

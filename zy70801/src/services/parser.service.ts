@@ -1,6 +1,6 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import { CriticalValueRecord, CallbackRecord, DutyRecord } from '../types';
+import { CriticalValueRecord, CallbackRecord, DutyRecord, ConfirmRecord } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import crypto from 'crypto';
@@ -100,6 +100,29 @@ export const parseDutyCSV = async (filePath: string, batchId: string): Promise<D
       })
       .on('error', reject);
   });
+};
+
+export const parseConfirmJSON = async (filePath: string, batchId: string): Promise<ConfirmRecord[]> => {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const data = JSON.parse(content);
+  const records: ConfirmRecord[] = [];
+
+  const items = Array.isArray(data) ? data : (data.records || data.data || []);
+
+  for (const item of items) {
+    records.push({
+      id: uuidv4(),
+      criticalValueId: item.criticalValueId || item.危急值ID || item.critical_value_id || '',
+      confirmTime: item.confirmTime || item.确认时间 || item.confirm_time || dayjs().toISOString(),
+      confirmer: item.confirmer || item.确认人 || '',
+      confirmerPhone: item.confirmerPhone || item.确认人电话 || item.confirmer_phone || '',
+      confirmResult: (item.confirmResult || item.确认结果 || 'confirmed') as 'confirmed' | 'rejected',
+      confirmNote: item.confirmNote || item.确认备注 || '',
+      createdAt: dayjs().toISOString()
+    });
+  }
+
+  return records;
 };
 
 export const calculateFileHash = (filePath: string): string => {

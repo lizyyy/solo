@@ -21,7 +21,8 @@ echo ""
 echo ""
 
 echo "4. 上传危急值记录 (第一次)"
-curl -s -X POST -F "file=@examples/critical-values.csv" "$BASE_URL/upload/critical-value"
+RESULT=$(curl -s -X POST -F "file=@examples/critical-values.csv" "$BASE_URL/upload/critical-value")
+echo "$RESULT"
 echo ""
 echo ""
 
@@ -30,14 +31,34 @@ curl -s -X POST -F "file=@examples/critical-values.csv" "$BASE_URL/upload/critic
 echo ""
 echo ""
 
-echo "6. 获取批次列表"
+NORMAL_ID=$(echo "$RESULT" | grep -o '"id":"[^"]*"' | head -3 | tail -1 | cut -d'"' -f4)
+echo "6. 创建单条医生确认记录 (针对正常项: $NORMAL_ID)"
+curl -s -X POST -H "Content-Type: application/json" -d "{
+  \"criticalValueId\": \"$NORMAL_ID\",
+  \"confirmer\": \"张主任\",
+  \"confirmerPhone\": \"13700137001\",
+  \"confirmResult\": \"confirmed\",
+  \"confirmNote\": \"已复核，情况属实，已通知临床科室\"
+}" "$BASE_URL/confirm"
+echo ""
+echo ""
+
+echo "7. 值班主任复核追溯 (查看确认记录是否存在)"
+curl -s "$BASE_URL/critical-values/$NORMAL_ID/review"
+echo ""
+echo ""
+
+echo "8. 获取批次列表"
 curl -s "$BASE_URL/batches?limit=5"
 echo ""
 echo ""
 
-echo "7. 获取统计数据"
+echo "9. 获取统计数据"
 curl -s "$BASE_URL/statistics"
 echo ""
 echo ""
 
 echo "=== 测试完成 ==="
+echo ""
+echo "提示: 可使用以下命令单独查询复核追溯:"
+echo "curl $BASE_URL/critical-values/$NORMAL_ID/review"

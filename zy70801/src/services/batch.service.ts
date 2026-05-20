@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import { run, get, all } from '../db';
-import { Batch, CriticalValueRecord, CallbackRecord, DutyRecord, ProcessResult, FailedRecord } from '../types';
+import { Batch, CriticalValueRecord, CallbackRecord, DutyRecord, ProcessResult, FailedRecord, ConfirmRecord } from '../types';
 import { calculateFileHash } from './parser.service';
 import { processRecordWithRules } from './rules-engine.service';
 import { convertKeysToCamelCase } from '../utils/case';
@@ -162,6 +162,55 @@ export const saveDutyRecords = async (records: DutyRecord[]): Promise<void> => {
       ]
     );
   }
+};
+
+export const saveConfirmRecords = async (records: ConfirmRecord[]): Promise<void> => {
+  for (const record of records) {
+    await run(
+      `INSERT INTO confirm_records 
+       (id, critical_value_id, confirm_time, confirmer, confirmer_phone, confirm_result, confirm_note, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        record.id,
+        record.criticalValueId,
+        record.confirmTime,
+        record.confirmer,
+        record.confirmerPhone,
+        record.confirmResult,
+        record.confirmNote || null,
+        record.createdAt
+      ]
+    );
+  }
+};
+
+export const createSingleConfirmRecord = async (record: Omit<ConfirmRecord, 'id' | 'createdAt'>): Promise<ConfirmRecord> => {
+  const id = uuidv4();
+  const createdAt = dayjs().toISOString();
+  
+  const newRecord: ConfirmRecord = {
+    ...record,
+    id,
+    createdAt
+  };
+
+  await run(
+    `INSERT INTO confirm_records 
+     (id, critical_value_id, confirm_time, confirmer, confirmer_phone, confirm_result, confirm_note, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      newRecord.id,
+      newRecord.criticalValueId,
+      newRecord.confirmTime,
+      newRecord.confirmer,
+      newRecord.confirmerPhone,
+      newRecord.confirmResult,
+      newRecord.confirmNote || null,
+      newRecord.createdAt
+    ]
+  );
+
+  return newRecord;
 };
 
 export const processCriticalValueBatch = async (
