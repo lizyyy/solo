@@ -1,0 +1,181 @@
+{
+  "reconciliation_id": "0e6766c6-5556-4dec-be33-bf13089bf11a",
+  "batch_date": "2026-05-20",
+  "created_at": "2026-05-20T07:40:39.516536",
+  "summary": {
+    "total_records": 3,
+    "matched_records": 1,
+    "discrepancy_records": 1,
+    "pending_review": 2,
+    "reviewed_records": 1,
+    "approved_records": 0,
+    "rejected_records": 0,
+    "needs_more_info": 0,
+    "total_cash_amount": 150000.0,
+    "total_check_amount": 60000.0,
+    "grand_total": 210000.0,
+    "discrepancy_breakdown": {
+      "amount_mismatch": 1,
+      "missing_double_sign": 1,
+      "error_mismatch": 1,
+      "missing_teller": 4
+    }
+  },
+  "records": [
+    {
+      "transfer_id": "T001",
+      "box_id": "BOX-A01",
+      "verification_status": "matched",
+      "original_record": {
+        "transfer_id": "T001",
+        "box_id": "BOX-A01",
+        "transfer_date": "2024-05-20",
+        "transfer_time": "08:30:00",
+        "sender_id": "U001",
+        "sender_name": "张三",
+        "receiver_id": "U002",
+        "receiver_name": "李四",
+        "cash_amount": 50000.0,
+        "check_amount": 20000.0,
+        "total_amount": 70000.0,
+        "first_signatory": "U001",
+        "second_signatory": "U003",
+        "first_sign_time": "2024-05-20 08:31:00",
+        "second_sign_time": "2024-05-20 08:32:00",
+        "remarks": "正常早班交接"
+      },
+      "discrepancies": [],
+      "review_notes": [],
+      "is_adjusted": false
+    },
+    {
+      "transfer_id": "T002",
+      "box_id": "BOX-A02",
+      "verification_status": "reviewed",
+      "original_record": {
+        "transfer_id": "T002",
+        "box_id": "BOX-A02",
+        "transfer_date": "2024-05-20",
+        "transfer_time": "17:30:00",
+        "sender_id": "U002",
+        "sender_name": "李四",
+        "receiver_id": "U001",
+        "receiver_name": "张三",
+        "cash_amount": 45000.0,
+        "check_amount": 25000.0,
+        "total_amount": 69000.0,
+        "first_signatory": "U002",
+        "second_signatory": null,
+        "first_sign_time": "2024-05-20 17:31:00",
+        "second_sign_time": null,
+        "remarks": "缺少第二签核"
+      },
+      "discrepancies": [
+        {
+          "discrepancy_id": "f9cbc6a3-39dd-4afe-9985-7b4eb2da88e3",
+          "discrepancy_type": "amount_mismatch",
+          "field_name": "total_amount",
+          "expected_value": 70000.0,
+          "actual_value": 69000.0,
+          "description": "金额不平: 现金(45,000.00) + 支票(25,000.00) = 70,000.00，但记录总金额为 69,000.00，差异 1,000.00 元",
+          "severity": "high"
+        },
+        {
+          "discrepancy_id": "4750ece6-0c9c-4d18-a87a-223c4aa29426",
+          "discrepancy_type": "missing_double_sign",
+          "field_name": "signatories",
+          "expected_value": "双人签核",
+          "actual_value": "缺少: 第二签核人",
+          "description": "缺双签: 交接需要双人确认，但第二签核人未签字。涉及人员: 移交人李四，接收人张三",
+          "severity": "high"
+        },
+        {
+          "discrepancy_id": "d94509a2-20ed-448f-bb8a-0f9710cc7bf0",
+          "discrepancy_type": "error_mismatch",
+          "field_name": "error_E001",
+          "expected_value": "差错已闭环",
+          "actual_value": "差错未处理",
+          "description": "差错未闭环: [缺少双签] 晚班交接缺少第二签核人确认（上报人: 王五）",
+          "severity": "high"
+        }
+      ],
+      "review_notes": [
+        "[复核意见] 已核实，当天系统故障，双签已补签，准予放行",
+        "[状态变更] 复核通过，准予放行"
+      ],
+      "is_adjusted": false,
+      "review_action": "approve",
+      "reviewer_id": "M001",
+      "reviewer_name": "运营主管",
+      "review_time": "2026-05-20T07:40:39.516483"
+    },
+    {
+      "transfer_id": "T003",
+      "box_id": "BOX-A01",
+      "verification_status": "discrepancy",
+      "original_record": {
+        "transfer_id": "T003",
+        "box_id": "BOX-A01",
+        "transfer_date": "2024-05-21",
+        "transfer_time": "08:25:00",
+        "sender_id": "U001",
+        "sender_name": "张三",
+        "receiver_id": "U002",
+        "receiver_name": "李四",
+        "cash_amount": 55000.0,
+        "check_amount": 15000.0,
+        "total_amount": 70000.0,
+        "first_signatory": "U001",
+        "second_signatory": "U003",
+        "first_sign_time": "2024-05-21 08:26:00",
+        "second_sign_time": "2024-05-21 08:27:00",
+        "remarks": "金额计算错误"
+      },
+      "discrepancies": [
+        {
+          "discrepancy_id": "26700be3-0aa3-4d0c-b2ad-b4f722453124",
+          "discrepancy_type": "missing_teller",
+          "field_name": "teller_schedule",
+          "expected_value": "柜员U001当日排班记录",
+          "actual_value": "无记录",
+          "description": "柜员缺失: 张三 在 2024-05-21 没有排班记录，但参与了本次交接",
+          "severity": "medium"
+        },
+        {
+          "discrepancy_id": "09f58702-b175-41da-9908-2b03835bd982",
+          "discrepancy_type": "missing_teller",
+          "field_name": "teller_schedule",
+          "expected_value": "柜员U002当日排班记录",
+          "actual_value": "无记录",
+          "description": "柜员缺失: 李四 在 2024-05-21 没有排班记录，但参与了本次交接",
+          "severity": "medium"
+        },
+        {
+          "discrepancy_id": "09f7178a-5c60-4942-a124-8287b00a2f12",
+          "discrepancy_type": "missing_teller",
+          "field_name": "teller_schedule",
+          "expected_value": "柜员U001当日排班记录",
+          "actual_value": "无记录",
+          "description": "柜员缺失: U001 在 2024-05-21 没有排班记录，但参与了本次交接",
+          "severity": "medium"
+        },
+        {
+          "discrepancy_id": "35ea42fc-d4da-48c3-90e3-e3ada66ee925",
+          "discrepancy_type": "missing_teller",
+          "field_name": "teller_schedule",
+          "expected_value": "柜员U003当日排班记录",
+          "actual_value": "无记录",
+          "description": "柜员缺失: U003 在 2024-05-21 没有排班记录，但参与了本次交接",
+          "severity": "medium"
+        }
+      ],
+      "review_notes": [
+        "[重新计算] 核实原始凭证，确认为55000现金+15000支票"
+      ],
+      "is_adjusted": true,
+      "adjusted_cash_amount": 55000.0,
+      "adjusted_check_amount": 15000.0,
+      "adjusted_total_amount": 70000.0
+    }
+  ]
+}
