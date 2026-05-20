@@ -44,11 +44,15 @@ class DataProcessor:
     def parse_bed_csv(self, csv_content: str, batch_id: str) -> List[Tuple[str, Optional[ResultItem], Optional[BedInfo]]]:
         results = []
         from io import StringIO
-        df = pd.read_csv(StringIO(csv_content))
+        df = pd.read_csv(StringIO(csv_content), dtype=str)
         
         for _, row in df.iterrows():
-            original_data = clean_nan_values(row.to_dict())
+            row_dict = row.to_dict()
+            original_data = {k: safe_str(v) for k, v in row_dict.items()}
             try:
+                is_locked_val = safe_str(row.get('is_locked', ''))
+                is_locked = is_locked_val is not None and is_locked_val.lower() in ('true', '1', 'yes')
+                
                 bed_info = BedInfo(
                     batch_id=batch_id,
                     ward_code=safe_str(row.get('ward_code', '')) or "",
@@ -57,23 +61,29 @@ class DataProcessor:
                     patient_id=safe_str(row.get('patient_id', '')),
                     patient_name=safe_str(row.get('patient_name', '')),
                     last_updated=self.parse_datetime(str(row.get('last_updated', ''))),
-                    is_locked=bool(row.get('is_locked', False)),
+                    is_locked=is_locked,
                     lock_reason=safe_str(row.get('lock_reason', ''))
                 )
+                original_bed_number = safe_str(row.get('bed_number', '')) or ''
+                record_id = f"{bed_info.ward_code}-{original_bed_number}"
+                
                 status, result = self.rules.validate_bed_info(bed_info, original_data)
                 if status == "success":
                     self.rules.update_bed_cache(bed_info)
                     results.append((status, ResultItem(
                         record_type="bed",
-                        record_id=f"{bed_info.ward_code}-{bed_info.bed_number}",
+                        record_id=record_id,
                         original_data=original_data
                     ), bed_info))
                 else:
+                    if result:
+                        result.record_id = record_id
                     results.append((status, result, bed_info))
             except Exception as e:
+                error_bed_number = safe_str(row.get('bed_number', '')) or 'unknown'
                 results.append(("failed", ResultItem(
                     record_type="bed",
-                    record_id=str(row.get('bed_number', 'unknown')),
+                    record_id=f"{safe_str(row.get('ward_code', '')) or ''}-{error_bed_number}",
                     original_data=original_data,
                     suggestion=f"数据解析失败: {str(e)}"
                 ), None))
