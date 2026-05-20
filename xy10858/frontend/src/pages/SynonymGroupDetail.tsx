@@ -15,6 +15,9 @@ export default function SynonymGroupDetail() {
   const [compareVersions, setCompareVersions] = useState<{ v1: number; v2: number } | null>(null);
   const [newTestQuery, setNewTestQuery] = useState('');
   const [statusReason, setStatusReason] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ synonyms: '', application_scope: '', description: '' });
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (id) loadData();
@@ -62,6 +65,41 @@ export default function SynonymGroupDetail() {
     }
   }
 
+  function startEditing() {
+    if (!group) return;
+    setEditForm({
+      synonyms: group.synonyms.join(', '),
+      application_scope: group.application_scope,
+      description: group.description || ''
+    });
+    setIsEditing(true);
+  }
+
+  async function saveEdit() {
+    if (!id || !group) return;
+    setUpdating(true);
+    try {
+      const synonyms = editForm.synonyms.split(',').map(s => s.trim()).filter(Boolean);
+      if (synonyms.length === 0) {
+        alert('请至少输入一个同义词');
+        setUpdating(false);
+        return;
+      }
+      await synonymGroupsApi.update(id, {
+        synonyms,
+        application_scope: editForm.application_scope,
+        description: editForm.description || undefined
+      });
+      setIsEditing(false);
+      loadData();
+      alert('更新成功！版本号已递增');
+    } catch (error) {
+      alert('更新失败: ' + (error as Error).message);
+    } finally {
+      setUpdating(false);
+    }
+  }
+
   function getNextStatuses(current: string): string[] {
     const transitions: Record<string, string[]> = {
       draft: ['pending_review'],
@@ -96,33 +134,87 @@ export default function SynonymGroupDetail() {
         </div>
       </div>
 
-      {nextStatuses.length > 0 && (
+      {!isEditing && (nextStatuses.length > 0 || group.status === 'draft') && (
         <div style={{ background: 'white', padding: '20px', borderRadius: '8px', marginBottom: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '16px' }}>状态操作</h3>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <input
-              type="text"
-              placeholder="操作原因（可选）"
-              value={statusReason}
-              onChange={e => setStatusReason(e.target.value)}
-              style={{ flex: 1, padding: '10px', border: '1px solid #d1d5db', borderRadius: '6px' }}
-            />
-            {nextStatuses.map(status => (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '16px' }}>操作</h3>
+            {group.status !== 'published' && (
               <button
-                key={status}
-                onClick={() => handleStatusChange(status)}
-                style={{
-                  padding: '10px 20px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  color: 'white',
-                  background: status === 'approved' ? '#10b981' : status === 'rejected' ? '#ef4444' : '#3b82f6'
-                }}
+                onClick={startEditing}
+                style={{ padding: '8px 16px', background: '#6b7280', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' }}
               >
-                {status === 'approved' ? '通过审批' : status === 'rejected' ? '驳回' : status === 'draft' ? '退回草稿' : '提交审批'}
+                编辑同义词（创建新版本）
               </button>
-            ))}
+            )}
+          </div>
+          {nextStatuses.length > 0 && (
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder="操作原因（可选）"
+                value={statusReason}
+                onChange={e => setStatusReason(e.target.value)}
+                style={{ flex: 1, padding: '10px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+              />
+              {nextStatuses.map(status => (
+                <button
+                  key={status}
+                  onClick={() => handleStatusChange(status)}
+                  style={{
+                    padding: '10px 20px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    color: 'white',
+                    background: status === 'approved' ? '#10b981' : status === 'rejected' ? '#ef4444' : '#3b82f6'
+                  }}
+                >
+                  {status === 'approved' ? '通过审批' : status === 'rejected' ? '驳回' : status === 'draft' ? '退回草稿' : '提交审批'}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {isEditing && (
+        <div style={{ background: 'white', padding: '24px', borderRadius: '8px', marginBottom: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <h3 style={{ marginBottom: '16px', fontSize: '16px' }}>编辑同义词 v{group?.version} → v{Number(group?.version || 0) + 1}</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500, fontSize: '14px' }}>同义词（英文逗号分隔）</label>
+              <input
+                type="text"
+                value={editForm.synonyms}
+                onChange={e => setEditForm({ ...editForm, synonyms: e.target.value })}
+                style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500, fontSize: '14px' }}>应用范围</label>
+              <input
+                type="text"
+                value={editForm.application_scope}
+                onChange={e => setEditForm({ ...editForm, application_scope: e.target.value })}
+                style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500, fontSize: '14px' }}>描述</label>
+              <textarea
+                value={editForm.description}
+                onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '80px' }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button onClick={() => setIsEditing(false)} disabled={updating} style={{ padding: '10px 20px', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer', background: 'white' }}>
+                取消
+              </button>
+              <button onClick={saveEdit} disabled={updating} style={{ padding: '10px 20px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
+                {updating ? '保存中...' : '保存（创建新版本）'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -260,7 +260,53 @@ export default function BatchDetail() {
                 {simulationResult.errors.map((e: string, i: number) => <div key={i}>• {e}</div>)}
               </div>
             )}
-            <p style={{ color: '#6b7280', fontSize: '14px' }}>共 {simulationResult.changes?.length || 0} 个查询命中变化</p>
+            <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '12px' }}>共 {simulationResult.changes?.length || 0} 个查询命中变化</p>
+            
+            {simulationResult.changes && simulationResult.changes.length > 0 && (
+              <div style={{ marginTop: '16px', overflow: 'auto' }}>
+                <h5 style={{ marginBottom: '12px', fontWeight: 600 }}>命中明细对比</h5>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(0,0,0,0.05)' }}>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>查询词</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #e5e7eb' }}>发布前命中</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #e5e7eb' }}>发布后命中</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #e5e7eb' }}>变化量</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #e5e7eb' }}>变化率</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {simulationResult.changes.map((change: any, i: number) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                        <td style={{ padding: '10px 12px', fontWeight: 500 }}>{change.query}</td>
+                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>{change.hits_before}</td>
+                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>{change.hits_after}</td>
+                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                          <span style={{ color: change.hits_after - change.hits_before < 0 ? '#ef4444' : '#10b981' }}>
+                            {change.hits_after - change.hits_before > 0 ? '+' : ''}{change.hits_after - change.hits_before}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                          <span style={{ 
+                            color: change.change_percent < 0 ? '#ef4444' : '#10b981',
+                            fontWeight: 600,
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            background: change.change_percent < -20 ? '#fee2e2' : change.change_percent < 0 ? '#fef3c7' : '#dcfce7'
+                          }}>
+                            {change.change_percent > 0 ? '+' : ''}{change.change_percent.toFixed(2)}%
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div style={{ marginTop: '12px', fontSize: '12px', color: '#6b7280' }}>
+                  <span style={{ display: 'inline-block', marginRight: '16px' }}>🔴 红色 = 命中下降超过 20%</span>
+                  <span style={{ display: 'inline-block' }}>🟡 黄色 = 命中下降 0-20%</span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

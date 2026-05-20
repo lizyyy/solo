@@ -101,6 +101,7 @@ export async function updateSynonymGroup(
     synonyms?: string[];
     application_scope?: string;
     description?: string;
+    createNewVersion?: boolean;
   }
 ): Promise<SynonymGroup> {
   const group = await getSynonymGroupById(id);
@@ -108,12 +109,15 @@ export async function updateSynonymGroup(
     throw new Error('同义词组不存在');
   }
 
-  if (group.status === 'published') {
-    throw new Error('已发布的同义词组不能直接修改，请创建新版本');
+  if (group.status === 'published' && !data.createNewVersion) {
+    throw new Error('已发布的同义词组需要创建新版本才能修改');
   }
 
   const updates: string[] = [];
   const params: any[] = [];
+  let newSynonyms = group.synonyms;
+  let newScope = group.application_scope;
+  let newDescription = group.description;
 
   if (data.name !== undefined) {
     updates.push('name = ?');
@@ -122,25 +126,34 @@ export async function updateSynonymGroup(
   if (data.synonyms !== undefined) {
     updates.push('synonyms = ?');
     params.push(JSON.stringify(data.synonyms));
+    newSynonyms = data.synonyms;
   }
   if (data.application_scope !== undefined) {
     updates.push('application_scope = ?');
     params.push(data.application_scope);
+    newScope = data.application_scope;
   }
   if (data.description !== undefined) {
     updates.push('description = ?');
     params.push(data.description);
+    newDescription = data.description;
   }
 
   if (updates.length === 0) {
     return group;
   }
 
+  const newVersion = group.version + 1;
+  updates.push('version = ?');
+  params.push(newVersion);
   updates.push('updated_at = ?');
   params.push(now());
   params.push(id);
 
   await run(`UPDATE synonym_groups SET ${updates.join(', ')} WHERE id = ?`, params);
+
+  await saveSynonymVersion(id, newVersion, newSynonyms, newScope, newDescription);
+
   return getSynonymGroupById(id) as Promise<SynonymGroup>;
 }
 
@@ -374,20 +387,29 @@ export async function rollbackBatch(id: string, reason: string): Promise<Publish
   const items = await getBatchItems(id);
   for (const item of items) {
     const versions = await getSynonymVersions(item.group_id);
+    const group = await getSynonymGroupById(item.group_id);
+    let rollbackToVersion = item.version;
+
     if (versions.length >= 2) {
       const prevVersion = versions[1];
+      rollbackToVersion = prevVersion.version;
       await run(
         'UPDATE synonym_groups SET synonyms = ?, application_scope = ?, version = ?, status = ?, updated_at = ? WHERE id = ?',
         [JSON.stringify(prevVersion.synonyms), prevVersion.application_scope, prevVersion.version, 'rollbacked', now(), item.group_id]
       );
-
+    } else {
       await run(
-        'INSERT INTO rollback_audits (id, batch_id, group_id, rollback_from_version, rollback_to_version, reason, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [uuidv4(), id, item.group_id, item.version, prevVersion.version, reason, now(), CURRENT_USER]
+        'UPDATE synonym_groups SET status = ?, updated_at = ? WHERE id = ?',
+        ['rollbacked', now(), item.group_id]
       );
-
-      await addStatusHistory('synonym_group', item.group_id, 'published', 'rollbacked', reason);
     }
+
+    await run(
+      'INSERT INTO rollback_audits (id, batch_id, group_id, rollback_from_version, rollback_to_version, reason, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [uuidv4(), id, item.group_id, item.version, rollbackToVersion, reason, now(), CURRENT_USER]
+    );
+
+    await addStatusHistory('synonym_group', item.group_id, 'published', 'rollbacked', reason);
   }
 
   return updateBatchStatus(id, 'rollbacked', reason);
