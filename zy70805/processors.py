@@ -157,6 +157,10 @@ class DeclarationProcessor:
         self.tariff_rules = tariff_rules
         self.return_receipts = return_receipts
         self.return_receipt_map = {r.order_id: r for r in return_receipts}
+        self.tariff_rule_map = {r.hs_code: r for r in tariff_rules}
+    
+    def _match_tariff_rule(self, hs_code: str) -> Optional[TariffRule]:
+        return self.tariff_rule_map.get(hs_code)
     
     def process_declarations(self, declarations: List[CustomsDeclaration], batch_id: str) -> ProcessingResult:
         self.currency_converter.clear_notes()
@@ -240,24 +244,33 @@ class DeclarationProcessor:
                 boundary_note="重复校验规则：同一批次内相同订单ID+相同金额视为重复"
             )
         
-        category, tariff_rate, category_note = self.category_merger.merge_category(
-            dec.category_code, dec.product_name, dec.order_id
-        )
+        matched_tariff = self._match_tariff_rule(dec.category_code)
+        if matched_tariff:
+            category = matched_tariff.category_name
+            tariff_rate = matched_tariff.tariff_rate
+            self.category_merger.merger_notes.append(
+                f"订单{dec.order_id}: 税则JSON匹配 - HS编码{dec.category_code} -> {category}，税率{tariff_rate*100}%"
+            )
+        else:
+            category, tariff_rate, category_note = self.category_merger.merge_category(
+                dec.category_code, dec.product_name, dec.order_id
+            )
         
         if category == "其他品类":
             return PendingItem(
                 order_id=dec.order_id,
                 original_data=original_data,
-                pending_reason=f"品类归并异常：{category_note}" if category_note else "品类未匹配到标准分类",
-                suggestion=f"请人工确认商品'{dec.product_name}'的正确品类编码"
+                pending_reason=f"品类编码{dec.category_code}未匹配到税则JSON及内置品类规则",
+                suggestion=f"请人工确认商品'{dec.product_name}'的正确品类编码，或在税则JSON中添加该HS编码"
             )
         
         if abs(dec.declared_tariff_rate - tariff_rate) > 0.05:
+            rate_source = "税则JSON" if matched_tariff else "内置默认"
             return PendingItem(
                 order_id=dec.order_id,
                 original_data=original_data,
-                pending_reason=f"税率差异过大：申报税率{dec.declared_tariff_rate*100}%，标准税率{tariff_rate*100}%",
-                suggestion="请确认申报税率是否正确，或联系税则管理员更新标准税率"
+                pending_reason=f"税率差异过大：申报税率{dec.declared_tariff_rate*100}%，{rate_source}税率{tariff_rate*100}%",
+                suggestion=f"请确认申报税率是否正确，或更新税则JSON中的税率"
             )
         
         tariff_amount = round(cny_amount * tariff_rate, 2)
