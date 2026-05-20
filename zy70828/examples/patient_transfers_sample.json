@@ -1,0 +1,41 @@
+[
+  {
+    "transfer_id": "TF001",
+    "patient_id": "P001",
+    "name": "张三",
+    "gender": "男",
+    "age": 45,
+    "diagnosis": "冠心病",
+    "from_department": "急诊",
+    "to_department": "内科",
+    "from_bed": "E001",
+    "to_bed": "A001",
+    "transfer_type": "transfer"
+  },
+  {
+    "transfer_id": "TF002",
+    "patient_id": "P002",
+    "name": "李四",
+    "gender": "女",
+    "age": 62,
+    "diagnosis": "骨折",
+    "from_department": "内科",
+    "to_department": "外科",
+    "from_bed": "A002",
+    "to_bed": "B001",
+    "transfer_type": "transfer"
+  },
+  {
+    "transfer_id": "TF003",
+    "patient_id": "P003",
+    "name": "王五",
+    "gender": "男",
+    "age": 55,
+    "diagnosis": "重症肺炎",
+    "from_department": "外科",
+    "to_department": "重症医学科",
+    "from_bed": "B002",
+    "to_bed": "C001",
+    "transfer_type": "transfer"
+  }
+]
