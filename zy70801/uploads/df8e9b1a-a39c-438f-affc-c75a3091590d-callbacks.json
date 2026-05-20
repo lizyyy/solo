@@ -1,0 +1,35 @@
+[
+  {
+    "patientId": "P001",
+    "patientName": "张三",
+    "callbackTime": "2024-01-15 08:35:00",
+    "callbackPerson": "李检验师",
+    "callbackPhone": "13800138001",
+    "receiver": "王医生",
+    "receiverPhone": "13900139001",
+    "callbackContent": "患者血钾2.8mmol/L，低于危急值，请注意处理",
+    "callbackResult": "success"
+  },
+  {
+    "patientId": "P002",
+    "patientName": "李四",
+    "callbackTime": "2024-01-15 08:50:00",
+    "callbackPerson": "张检验师",
+    "callbackPhone": "13800138002",
+    "receiver": "刘护士",
+    "receiverPhone": "13900139002",
+    "callbackContent": "患者血糖22.5mmol/L，高于危急值，请立即处理",
+    "callbackResult": "success"
+  },
+  {
+    "patientId": "P004",
+    "patientName": "赵六",
+    "callbackTime": "2024-01-15 10:05:00",
+    "callbackPerson": "王检验师",
+    "callbackPhone": "13800138003",
+    "receiver": "陈医生",
+    "receiverPhone": "13900139003",
+    "callbackContent": "患者血钾5.8mmol/L，高于危急值",
+    "callbackResult": "success"
+  }
+]

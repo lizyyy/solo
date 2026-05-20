@@ -210,7 +210,8 @@ export const processCriticalValueBatch = async (
 };
 
 export const getBatchById = async (batchId: string): Promise<Batch | null> => {
-  return await get<Batch>('SELECT * FROM batches WHERE id = ?', [batchId]);
+  const result = await get<Batch>('SELECT * FROM batches WHERE id = ?', [batchId]);
+  return result || null;
 };
 
 export const getBatchRecords = async (batchId: string, status?: string) => {

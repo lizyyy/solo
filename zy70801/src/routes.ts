@@ -75,7 +75,6 @@ router.post('/upload/critical-value', upload.single('file'), async (req, res) =>
 
     res.json({
       success: true,
-      batchId: batch.id,
       batchNo: batch.batchNo,
       ...result
     });

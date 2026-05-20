@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import db from '../db';
 
 const dataDir = path.join(process.cwd(), 'data');
 
@@ -8,9 +7,10 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const initTables = async () => {
-  try {
-    await db.run(`
+import('../db').then(async ({ default: db, run }) => {
+  const initTables = async () => {
+    try {
+      await run(`
       CREATE TABLE IF NOT EXISTS batches (
         id TEXT PRIMARY KEY,
         batch_no TEXT UNIQUE NOT NULL,
@@ -25,7 +25,7 @@ const initTables = async () => {
       )
     `);
 
-    await db.run(`
+      await run(`
       CREATE TABLE IF NOT EXISTS critical_values (
         id TEXT PRIMARY KEY,
         batch_id TEXT NOT NULL,
@@ -50,7 +50,7 @@ const initTables = async () => {
       )
     `);
 
-    await db.run(`
+      await run(`
       CREATE TABLE IF NOT EXISTS callback_records (
         id TEXT PRIMARY KEY,
         batch_id TEXT NOT NULL,
@@ -72,7 +72,7 @@ const initTables = async () => {
       )
     `);
 
-    await db.run(`
+      await run(`
       CREATE TABLE IF NOT EXISTS duty_records (
         id TEXT PRIMARY KEY,
         batch_id TEXT NOT NULL,
@@ -90,7 +90,7 @@ const initTables = async () => {
       )
     `);
 
-    await db.run(`
+      await run(`
       CREATE TABLE IF NOT EXISTS confirm_records (
         id TEXT PRIMARY KEY,
         critical_value_id TEXT NOT NULL,
@@ -104,26 +104,30 @@ const initTables = async () => {
       )
     `);
 
-    await db.run(`
+      await run(`
       CREATE INDEX IF NOT EXISTS idx_critical_patient ON critical_values(patient_id, test_time)
     `);
 
-    await db.run(`
+      await run(`
       CREATE INDEX IF NOT EXISTS idx_batch_hash ON batches(file_hash)
     `);
 
-    console.log('数据库表初始化成功');
-  } catch (error) {
-    console.error('数据库初始化失败:', error);
-    throw error;
-  }
-};
+      console.log('数据库表初始化成功');
+    } catch (error) {
+      console.error('数据库初始化失败:', error);
+      throw error;
+    }
+  };
 
-initTables().then(() => {
-  db.close();
-  process.exit(0);
+  initTables().then(() => {
+    db.close();
+    process.exit(0);
+  }).catch((error) => {
+    console.error(error);
+    db.close();
+    process.exit(1);
+  });
 }).catch((error) => {
-  console.error(error);
-  db.close();
+  console.error('加载数据库模块失败:', error);
   process.exit(1);
 });

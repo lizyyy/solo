@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import dayjs from '../utils/dayjs';
 import { CriticalValueRecord, CallbackRecord, DutyRecord, FailedRecord } from '../types';
 import { all } from '../db';
 
