@@ -45,13 +45,13 @@ pip install -r requirements.txt
 ### 2. 启动服务
 
 ```bash
-python main.py
+python3 main.py
 ```
 
 或使用 uvicorn:
 
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 服务启动后访问:

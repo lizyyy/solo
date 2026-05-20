@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Union
 from models import (
     CustomsDeclaration, TariffRule, ReturnReceipt,
     ProcessingResult, NormalItem, PendingItem, FailedItem
@@ -191,7 +191,7 @@ class DeclarationProcessor:
             duplicate_notes=self.duplicate_tax_detector.get_notes()
         )
     
-    def _process_single_declaration(self, dec: CustomsDeclaration) -> Optional[NormalItem | PendingItem | FailedItem]:
+    def _process_single_declaration(self, dec: CustomsDeclaration) -> Optional[Union[NormalItem, PendingItem, FailedItem]]:
         original_data = dec.model_dump()
         
         if dec.order_id in self.return_receipt_map:

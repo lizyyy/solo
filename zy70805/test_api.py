@@ -2,7 +2,7 @@ import requests
 import json
 
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://127.0.0.1:9000"
 
 
 def test_health_check():
@@ -147,6 +147,6 @@ if __name__ == "__main__":
         
     except requests.exceptions.ConnectionError:
         print("错误: 无法连接到服务器，请先启动服务:")
-        print("  python main.py")
+        print("  python3 main.py")
         print("  或")
-        print("  uvicorn main:app --reload --host 0.0.0.0 --port 8000")
+        print("  python3 -m uvicorn main:app --reload --host 127.0.0.1 --port 9000")
