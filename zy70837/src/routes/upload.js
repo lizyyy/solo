@@ -15,16 +15,24 @@ module.exports = (upload) => {
   ]), async (req, res, next) => {
     try {
       const batchId = req.body.batchId || `batch_${Date.now()}`;
-      
-      if (await deduplicationService.isBatchProcessed(batchId)) {
+      const files = req.files;
+
+      const duplicateCheck = await deduplicationService.checkDuplicate(batchId, files);
+      if (duplicateCheck.isDuplicate) {
+        const message = duplicateCheck.type === 'batchId' 
+          ? '该批次已处理，请勿重复提交'
+          : '相同内容的文件已提交过，请勿重复上传';
+        
         return res.status(400).json({
           success: false,
-          message: '该批次已处理，请勿重复提交',
-          batchId: batchId
+          message: message,
+          duplicateType: duplicateCheck.type,
+          batchId: batchId,
+          existingBatchId: duplicateCheck.existingBatchId || batchId,
+          processedAt: duplicateCheck.processedAt
         });
       }
 
-      const files = req.files;
       const result = {
         batchId: batchId,
         normalItems: [],
@@ -71,7 +79,7 @@ module.exports = (upload) => {
         }
       }
 
-      await deduplicationService.markBatchProcessed(batchId, {
+      await deduplicationService.markBatchProcessed(batchId, duplicateCheck.fileHash, {
         fileCount: Object.values(files).flat().length,
         processedAt: new Date().toISOString()
       });
@@ -80,6 +88,7 @@ module.exports = (upload) => {
         success: true,
         data: {
           batchId: result.batchId,
+          fileHash: duplicateCheck.fileHash,
           summary: {
             total: result.normalItems.length + result.pendingItems.length + result.failedItems.length,
             normal: result.normalItems.length,

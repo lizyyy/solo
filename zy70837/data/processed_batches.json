@@ -1,14 +1,17 @@
 {
-  "test_batch_001": {
-    "processedAt": "2026-05-19T22:38:41.366Z",
-    "fileCount": 3
+  "batch_1779318823192": {
+    "processedAt": "2026-05-20T23:13:43.201Z",
+    "fileHash": "b765c5725321b92dfb53f0ce833ab7de89fb07a854ef90edee236a94219e2ea4",
+    "fileCount": 2
   },
-  "test_batch_violation_v2": {
-    "processedAt": "2026-05-20T22:52:53.780Z",
-    "fileCount": 5
+  "batch_1779318823210": {
+    "processedAt": "2026-05-20T23:13:43.211Z",
+    "fileHash": "06491e25aab05b14f52bb07b84fddc15c6c8b8f246da8b2f816938bd26b4ea47",
+    "fileCount": 1
   },
-  "test_batch_violation_v3": {
-    "processedAt": "2026-05-20T22:54:40.199Z",
-    "fileCount": 5
+  "test_dedup_batch_001": {
+    "processedAt": "2026-05-20T23:13:43.213Z",
+    "fileHash": "9cdee633a569d854e09368b409dda796b5e693fc10765b222683e30bff866430",
+    "fileCount": 2
   }
 }
