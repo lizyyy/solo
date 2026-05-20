@@ -219,31 +219,42 @@ class MutexLockService:
         return True, "Lock force released"
 
     def _record_lock_failure(self, task_id: int, instance_id: str, reason: str):
+        now = self._now()
         failed_lock = Lock(
             task_id=task_id,
             instance_id=instance_id,
             status=LockStatus.FAILED,
+            acquired_at=now,
+            expires_at=now,
+            last_heartbeat_at=now,
             failed_reason=reason,
             acquire_attempts=1
         )
         self.db.add(failed_lock)
+        self.db.flush()
 
         duplicate_log = ExecutionLog(
             task_id=task_id,
+            lock_id=failed_lock.id,
             instance_id=instance_id,
             status=TaskStatus.FAILED,
             is_duplicate=True,
             error_message=reason
         )
         self.db.add(duplicate_log)
+        self.db.flush()
 
         self._add_abnormal_queue(
             task_id=task_id,
             instance_id=instance_id,
             abnormal_type="lock_acquire_failed",
             description=reason,
-            severity="warning"
+            severity="warning",
+            lock_id=failed_lock.id,
+            execution_log_id=duplicate_log.id
         )
+
+        self.db.commit()
 
     def _add_abnormal_queue(
         self,
