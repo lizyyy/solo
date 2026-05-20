@@ -1,0 +1,57 @@
+[
+  {
+    "order_no": "WO2024050001",
+    "product_model": "PCB-A001",
+    "planned_qty": 100,
+    "actual_qty": 98,
+    "start_date": "2024-05-15 08:00:00",
+    "end_date": "2024-05-15 18:00:00",
+    "production_line": "产线A",
+    "status": "已完成",
+    "material_batch_no": "BATCH001"
+  },
+  {
+    "order_no": "WO2024050002",
+    "product_model": "PCB-A001",
+    "planned_qty": 150,
+    "actual_qty": 145,
+    "start_date": "2024-05-15 08:00:00",
+    "end_date": "2024-05-16 12:00:00",
+    "production_line": "产线A",
+    "status": "已完成",
+    "material_batch_no": "BATCH001"
+  },
+  {
+    "order_no": "WO2024050003",
+    "product_model": "PCB-B002",
+    "planned_qty": 80,
+    "actual_qty": 78,
+    "start_date": "2024-05-16 08:00:00",
+    "end_date": "2024-05-16 17:00:00",
+    "production_line": "产线B",
+    "status": "已完成",
+    "material_batch_no": "BATCH003"
+  },
+  {
+    "order_no": "WO2024050004",
+    "product_model": "PCB-C003",
+    "planned_qty": 200,
+    "actual_qty": 195,
+    "start_date": "2024-05-16 08:00:00",
+    "end_date": "2024-05-17 15:00:00",
+    "production_line": "产线C",
+    "status": "进行中",
+    "material_batch_no": "BATCH004"
+  },
+  {
+    "order_no": "WO2024050005",
+    "product_model": "PCB-D004",
+    "planned_qty": 120,
+    "actual_qty": 0,
+    "start_date": "2024-05-17 08:00:00",
+    "end_date": "",
+    "production_line": "产线D",
+    "status": "待开始",
+    "material_batch_no": "BATCH005"
+  }
+]
