@@ -1,0 +1,47 @@
+[
+  {
+    "studentId": "S2024001",
+    "studentName": "张三",
+    "studentMajor": "计算机科学与技术",
+    "mentorId": "M001",
+    "mentorName": "张明教授",
+    "priority": 1,
+    "isTransfer": false
+  },
+  {
+    "studentId": "S2024002",
+    "studentName": "李四",
+    "studentMajor": "计算机科学与技术",
+    "mentorId": "M001",
+    "mentorName": "张明教授",
+    "priority": 1,
+    "isTransfer": false
+  },
+  {
+    "studentId": "S2024003",
+    "studentName": "王五",
+    "studentMajor": "软件工程",
+    "mentorId": "M002",
+    "mentorName": "李华教授",
+    "priority": 2,
+    "isTransfer": true
+  },
+  {
+    "studentId": "S2024004",
+    "studentName": "赵六",
+    "studentMajor": "金融学",
+    "mentorId": "M003",
+    "mentorName": "王芳教授",
+    "priority": 1,
+    "isTransfer": false
+  },
+  {
+    "studentId": "S2024005",
+    "studentName": "钱七",
+    "studentMajor": "企业管理",
+    "mentorId": "M005",
+    "mentorName": "刘洋教授",
+    "priority": 1,
+    "isTransfer": false
+  }
+]
