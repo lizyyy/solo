@@ -66,6 +66,18 @@ app.get('/', (req, res) => {
         <span class="method">POST</span> <span class="url">/api/records/process-transfer</span> - 处理患者转科
       </div>
       <div class="endpoint">
+        <span class="method">GET</span> <span class="url">/api/records/check-timeout</span> - 检查清洁超时工单
+      </div>
+      <div class="endpoint">
+        <span class="method">POST</span> <span class="url">/api/records/cleaning/accept</span> - 保洁接单
+      </div>
+      <div class="endpoint">
+        <span class="method">POST</span> <span class="url">/api/records/cleaning/complete</span> - 保洁完成
+      </div>
+      <div class="endpoint">
+        <span class="method">GET</span> <span class="url">/api/records/cleaning/history</span> - 保洁历史查询(支持按接单人筛选)
+      </div>
+      <div class="endpoint">
         <span class="method">POST</span> <span class="url">/api/records/:id/approve</span> - 批准记录
       </div>
       <div class="endpoint">
@@ -75,10 +87,10 @@ app.get('/', (req, res) => {
         <span class="method">POST</span> <span class="url">/api/records/:id/send-back</span> - 退回修改
       </div>
       <div class="endpoint">
-        <span class="method">GET</span> <span class="url">/api/records/:id</span> - 查询记录详情
+        <span class="method">GET</span> <span class="url">/api/records/:id</span> - 查询记录详情(支持REC-xxx格式)
       </div>
       <div class="endpoint">
-        <span class="method">GET</span> <span class="url">/api/records/:id/audit-trail</span> - 审计追踪
+        <span class="method">GET</span> <span class="url">/api/records/:id/audit-trail</span> - 审计追踪(支持REC-xxx格式)
       </div>
       <div class="endpoint">
         <span class="method">GET</span> <span class="url">/api/records/</span> - 查询记录列表
@@ -92,7 +104,7 @@ app.get('/', (req, res) => {
         <span class="method">GET</span> <span class="url">/api/export/beds</span> - 导出床位状态
       </div>
       <div class="endpoint">
-        <span class="method">GET</span> <span class="url">/api/export/cleaning-orders</span> - 导出保洁工单
+        <span class="method">GET</span> <span class="url">/api/export/cleaning-orders</span> - 导出保洁工单(支持按接单人/状态/病区筛选)
       </div>
       <div class="endpoint">
         <span class="method">GET</span> <span class="url">/api/export/patient-outcome</span> - 导出患者转归

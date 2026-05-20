@@ -69,13 +69,19 @@ class ExportService {
     };
   }
 
-  static async exportCleaningOrders(status = null) {
-    let orders;
-    if (status) {
-      orders = await CleaningOrderModel.getAll();
-      orders = orders.filter(o => o.status === status);
-    } else {
-      orders = await CleaningOrderModel.getAll();
+  static async exportCleaningOrders(filters = {}) {
+    let orders = await CleaningOrderModel.getAll();
+    
+    if (filters.status) {
+      orders = orders.filter(o => o.status === filters.status);
+    }
+    
+    if (filters.assigned_to) {
+      orders = orders.filter(o => o.assigned_to === filters.assigned_to);
+    }
+    
+    if (filters.ward) {
+      orders = orders.filter(o => o.ward === filters.ward);
     }
 
     const fields = [

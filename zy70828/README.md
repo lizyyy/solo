@@ -195,6 +195,7 @@ curl http://localhost:3000/api/records/check-timeout
 ### 记录类型
 - `bed_import` - 床位导入
 - `patient_transfer` - 患者转科
+- `cleaning_order` - 保洁工单
 - `cleaning_timeout` - 保洁超时
 
 ## 🧪 运行测试

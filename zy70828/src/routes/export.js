@@ -47,8 +47,12 @@ router.get('/beds', async (req, res) => {
 
 router.get('/cleaning-orders', async (req, res) => {
   try {
-    const status = req.query.status;
-    const result = await ExportService.exportCleaningOrders(status);
+    const filters = {
+      status: req.query.status,
+      assigned_to: req.query.assigned_to,
+      ward: req.query.ward
+    };
+    const result = await ExportService.exportCleaningOrders(filters);
 
     const filename = `cleaning_orders_${Date.now()}.csv`;
     

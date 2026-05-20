@@ -242,6 +242,97 @@ class BusinessService {
 
     return timeoutOrders;
   }
+
+  static async acceptCleaningOrder(orderId, handler, remarks = null) {
+    const order = await CleaningOrderModel.findByOrderId(orderId);
+    if (!order) throw new Error('保洁工单不存在');
+    if (order.status === 'completed') throw new Error('工单已完成，无法接单');
+    if (order.status === 'processing') throw new Error('工单已被接单');
+
+    await CleaningOrderModel.startOrder(orderId);
+
+    const trackingRecords = await TrackingRecordModel.findByBedNo(order.bed_no);
+    const relatedRecord = trackingRecords.find(r => r.order_id === orderId);
+    
+    if (relatedRecord) {
+      await TrackingRecordModel.updateStatus(
+        relatedRecord.id, 'processing', '保洁人员已接单，正在清洁', handler, remarks
+      );
+
+      await OperationLogModel.create({
+        record_id: relatedRecord.id,
+        operation: 'accept_order',
+        before_status: 'pending',
+        after_status: 'processing',
+        reason: '保洁人员接单',
+        operator: handler,
+        remarks: remarks
+      });
+    }
+
+    return { success: true, orderId: orderId };
+  }
+
+  static async completeCleaningOrder(orderId, handler, remarks = null) {
+    const order = await CleaningOrderModel.findByOrderId(orderId);
+    if (!order) throw new Error('保洁工单不存在');
+    if (order.status === 'completed') throw new Error('工单已完成');
+    if (order.status === 'pending') throw new Error('工单尚未接单');
+
+    await CleaningOrderModel.completeOrder(orderId);
+
+    const trackingRecords = await TrackingRecordModel.findByBedNo(order.bed_no);
+    const relatedRecord = trackingRecords.find(r => r.order_id === orderId);
+    
+    if (relatedRecord) {
+      await TrackingRecordModel.updateStatus(
+        relatedRecord.id, 'approved', '保洁已完成，床位可用', handler, remarks
+      );
+
+      await OperationLogModel.create({
+        record_id: relatedRecord.id,
+        operation: 'complete_order',
+        before_status: 'processing',
+        after_status: 'approved',
+        reason: '保洁完成验收通过',
+        operator: handler,
+        remarks: remarks
+      });
+    }
+
+    const bed = await BedModel.findByBedNo(order.bed_no);
+    if (bed && bed.status === 'cleaning') {
+      await BedModel.updateStatus(order.bed_no, 'available', null);
+    }
+
+    return { success: true, orderId: orderId };
+  }
+
+  static async getCleaningOrderHistory(filters = {}) {
+    let records = await TrackingRecordModel.getHistory({});
+    records = records.filter(r => r.record_type === 'cleaning_order' || r.record_type === 'cleaning_timeout');
+    
+    if (filters.assigned_to) {
+      const orderIds = [];
+      const allOrders = await CleaningOrderModel.getAll();
+      for (const order of allOrders) {
+        if (order.assigned_to === filters.assigned_to) {
+          orderIds.push(order.order_id);
+        }
+      }
+      records = records.filter(r => orderIds.includes(r.order_id));
+    }
+    
+    if (filters.status) {
+      records = records.filter(r => r.status === filters.status);
+    }
+    
+    if (filters.ward) {
+      records = records.filter(r => r.ward === filters.ward);
+    }
+
+    return records;
+  }
 }
 
 module.exports = BusinessService;

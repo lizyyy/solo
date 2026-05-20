@@ -59,6 +59,10 @@ class CleaningOrderModel {
   static async getAll() {
     return allAsync('SELECT * FROM cleaning_orders ORDER BY created_at DESC');
   }
+
+  static async findByAssignedTo(assignedTo) {
+    return allAsync('SELECT * FROM cleaning_orders WHERE assigned_to = ? ORDER BY created_at DESC', [assignedTo]);
+  }
 }
 
 module.exports = CleaningOrderModel;

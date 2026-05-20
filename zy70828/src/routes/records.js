@@ -43,6 +43,72 @@ router.get('/check-timeout', async (req, res) => {
   }
 });
 
+router.post('/cleaning/accept', async (req, res) => {
+  try {
+    const { order_id, handler, remarks } = req.body;
+    if (!order_id) {
+      return res.status(400).json({ error: '请提供工单编号' });
+    }
+
+    const result = await BusinessService.acceptCleaningOrder(
+      order_id,
+      handler || 'admin',
+      remarks
+    );
+
+    res.json({
+      success: true,
+      message: '保洁工单已接单',
+      data: result
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/cleaning/complete', async (req, res) => {
+  try {
+    const { order_id, handler, remarks } = req.body;
+    if (!order_id) {
+      return res.status(400).json({ error: '请提供工单编号' });
+    }
+
+    const result = await BusinessService.completeCleaningOrder(
+      order_id,
+      handler || 'admin',
+      remarks
+    );
+
+    res.json({
+      success: true,
+      message: '保洁工单已完成',
+      data: result
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/cleaning/history', async (req, res) => {
+  try {
+    const filters = {
+      assigned_to: req.query.assigned_to,
+      status: req.query.status,
+      ward: req.query.ward
+    };
+
+    const records = await BusinessService.getCleaningOrderHistory(filters);
+
+    res.json({
+      success: true,
+      count: records.length,
+      data: records
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.get('/batches/list', async (req, res) => {
   try {
     const batches = await BatchModel.getAll();

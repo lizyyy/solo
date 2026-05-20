@@ -111,13 +111,39 @@ class ImportService {
 
     let processed = 0;
     for (const order of ordersData) {
+      const orderId = order.order_id || order.orderId || 'CL-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+      
       await CleaningOrderModel.create({
-        order_id: order.order_id || order.orderId || 'CL-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+        order_id: orderId,
         bed_no: order.bed_no,
         ward: order.ward,
         assigned_to: order.assigned_to,
         timeout_hours: order.timeout_hours || 2
       });
+
+      const record = await TrackingRecordModel.create({
+        batch_id: batch.id,
+        order_id: orderId,
+        bed_no: order.bed_no,
+        ward: order.ward,
+        department: null,
+        record_type: 'cleaning_order',
+        status: 'pending',
+        reason: '保洁工单已创建，待接单',
+        handler: handler,
+        remarks: order.assigned_to ? `指派给：${order.assigned_to}` : null
+      });
+
+      await OperationLogModel.create({
+        record_id: record.id,
+        operation: 'create_order',
+        before_status: null,
+        after_status: 'pending',
+        reason: '保洁工单导入创建',
+        operator: handler,
+        remarks: order.assigned_to ? `指派给：${order.assigned_to}` : null
+      });
+
       processed++;
     }
 
