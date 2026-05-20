@@ -119,6 +119,10 @@ def update_release_order_status(db: Session, release_order_id: int, transition: 
         if pending_approvals:
             return None, "存在未完成的审批"
         
+        pending_checks = [c for c in db_release.check_items if c.status == CheckItemStatus.PENDING]
+        if pending_checks:
+            return None, "存在未完成的检查项，请先完成所有检查"
+        
         failed_checks = [c for c in db_release.check_items if c.status == CheckItemStatus.FAILED]
         if failed_checks:
             return None, "存在未通过的检查项"
@@ -293,13 +297,17 @@ def create_rollback_record(db: Session, release_order_id: int, rollback: Rollbac
 
 def check_timeout_release_orders(db: Session):
     now = datetime.utcnow()
-    timeout_orders = db.query(ReleaseOrder).filter(
+    approved_orders = db.query(ReleaseOrder).filter(
         and_(
             ReleaseOrder.status == ReleaseStatus.APPROVED,
-            ReleaseOrder.scheduled_at.isnot(None),
-            ReleaseOrder.scheduled_at + timedelta(hours=ReleaseOrder.timeout_hours) < now
+            ReleaseOrder.scheduled_at.isnot(None)
         )
     ).all()
+    
+    timeout_orders = []
+    for order in approved_orders:
+        if order.scheduled_at + timedelta(hours=order.timeout_hours) < now:
+            timeout_orders.append(order)
     
     for order in timeout_orders:
         order.status = ReleaseStatus.TIMEOUT
