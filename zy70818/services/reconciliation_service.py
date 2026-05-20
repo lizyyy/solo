@@ -273,7 +273,10 @@ class ReconciliationEngine:
             if not has_activity:
                 continue
 
-            if actual_quantity <= 0:
+            total_out = consumed + transfer_out
+            total_in = actual_quantity + transfer_in
+
+            if actual_quantity <= 0 and total_out > 0:
                 disc = Discrepancy(
                     type=DiscrepancyType.BATCH_NOT_FOUND,
                     batch_number=batch,
@@ -283,9 +286,42 @@ class ReconciliationEngine:
                     explanation=self.explanation.explain_batch_not_found(
                         batch, inv_data.get('material', '未知'), store_name
                     ),
-                    expected_value=consumed + transfer_out,
+                    expected_value=total_out,
                     actual_value=actual_quantity,
-                    quantity_diff=actual_quantity - (consumed + transfer_out)
+                    quantity_diff=actual_quantity - total_out
+                )
+                discrepancies.append(disc)
+            elif total_out > total_in:
+                disc = Discrepancy(
+                    type=DiscrepancyType.QUANTITY_MISMATCH,
+                    batch_number=batch,
+                    material_name=inv_data.get('material', '未知'),
+                    store_name=store_name,
+                    description=f"批号 {batch} 库存不足",
+                    explanation=self.explanation.explain_quantity_mismatch(
+                        batch, inv_data.get('material', '未知'), store_name,
+                        total_out, total_in
+                    ),
+                    expected_value=total_out,
+                    actual_value=total_in,
+                    quantity_diff=total_in - total_out
+                )
+                discrepancies.append(disc)
+            elif total_out > 0:
+                disc = Discrepancy(
+                    type=DiscrepancyType.QUANTITY_MISMATCH,
+                    batch_number=batch,
+                    material_name=inv_data.get('material', '未知'),
+                    store_name=store_name,
+                    description=f"批号 {batch} 数量对账",
+                    explanation=(
+                        f"批号 [{batch}] ({inv_data.get('material', '未知')}) 在门店 [{store_name}] 数量对账："
+                        f"当前库存 {actual_quantity} + 调入 {transfer_in} - 消耗 {consumed} - 调出 {transfer_out} = "
+                        f"理论期初 {actual_quantity + transfer_in - consumed - transfer_out}"
+                    ),
+                    expected_value=actual_quantity + transfer_in - transfer_out - consumed,
+                    actual_value=actual_quantity,
+                    quantity_diff=consumed + transfer_out - transfer_in
                 )
                 discrepancies.append(disc)
             elif transfer_in > 0:
