@@ -1,5 +1,5 @@
 const { Parser } = require('json2csv');
-const { TaskDAO, MaterialDAO, ExportDAO } = require('../daos');
+const { TaskDAO, MaterialDAO, ExportDAO, AuditLogDAO } = require('../daos');
 const { TASK_STATUS } = require('../utils');
 
 class ExportService {
@@ -9,15 +9,32 @@ class ExportService {
       throw new Error('任务不存在');
     }
 
+    const oldStatus = task.status;
+    const oldLastProcessor = task.last_processor;
+
+    await AuditLogDAO.create({
+      taskId,
+      operator: exportedBy,
+      changeReason: '导出任务数据',
+      oldStatus,
+      newStatus: TASK_STATUS.EXPORTED,
+      oldData: JSON.stringify({ status: oldStatus, last_processor: oldLastProcessor }),
+      newData: JSON.stringify({ status: TASK_STATUS.EXPORTED, last_processor: exportedBy })
+    });
+
+    await TaskDAO.updateStatus(taskId, TASK_STATUS.EXPORTED, exportedBy);
+
+    const updatedTask = await TaskDAO.findById(taskId);
+
     const materials = await MaterialDAO.findByTaskId(taskId);
 
     const exportData = {
       task: {
-        id: task.id,
-        submitter: task.submitter,
-        status: task.status,
-        created_at: task.created_at,
-        last_processor: task.last_processor
+        id: updatedTask.id,
+        submitter: updatedTask.submitter,
+        status: updatedTask.status,
+        created_at: updatedTask.created_at,
+        last_processor: updatedTask.last_processor
       },
       materials: materials.map(m => ({
         key_number: m.key_number,
@@ -36,8 +53,6 @@ class ExportService {
       exportedBy,
       exportData
     });
-
-    await TaskDAO.updateStatus(taskId, TASK_STATUS.EXPORTED, exportedBy);
 
     return exportData;
   }
