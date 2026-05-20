@@ -10,7 +10,7 @@ from io import StringIO
 FEVER_THRESHOLD = 37.5
 
 
-def validate_record(db: Session, record: MorningCheckRecord) -> dict:
+def validate_record(db: Session, record: MorningCheckRecord, auto_log: bool = False) -> dict:
     issues = []
     
     if record.temperature >= FEVER_THRESHOLD:
@@ -30,7 +30,8 @@ def validate_record(db: Session, record: MorningCheckRecord) -> dict:
                 issues.append({
                     "type": "medication_expired",
                     "reason": f"药品「{med_auth.medication_name}」已过期，有效期至{med_auth.expiration_date.strftime('%Y-%m-%d')}",
-                    "severity": "high"
+                    "severity": "high",
+                    "medication_name": med_auth.medication_name
                 })
     
     if not record.parent_confirmed:
@@ -47,7 +48,72 @@ def validate_record(db: Session, record: MorningCheckRecord) -> dict:
             "severity": "medium"
         })
     
+    if auto_log and issues:
+        for issue in issues:
+            log_action = "system_flag"
+            if issue["type"] == "fever_isolation":
+                log_action = "flag_fever"
+            elif issue["type"] == "medication_expired":
+                log_action = "flag_expired_med"
+            elif issue["type"] == "parent_not_confirmed":
+                log_action = "flag_no_confirm"
+            elif issue["type"] == "missing_signature":
+                log_action = "flag_no_signature"
+            
+            log = ProcessingLog(
+                batch_id=record.batch_id,
+                record_id=record.id,
+                action=log_action,
+                reason=issue["reason"],
+                handler="系统自动校验",
+                details=f"校验类型: {issue['type']}, 严重程度: {issue['severity']}",
+                handled_at=datetime.now()
+            )
+            db.add(log)
+        db.commit()
+    
     return issues
+
+
+def validate_batch_records(db: Session, batch_id: int) -> dict:
+    records = db.query(MorningCheckRecord).filter(
+        MorningCheckRecord.batch_id == batch_id
+    ).all()
+    
+    results = {
+        "total": len(records),
+        "with_issues": 0,
+        "fever_cases": 0,
+        "expired_meds": 0,
+        "missing_confirm": 0,
+        "missing_signature": 0,
+        "records_with_issues": []
+    }
+    
+    for record in records:
+        issues = validate_record(db, record, auto_log=True)
+        
+        if issues:
+            results["with_issues"] += 1
+            record_info = {
+                "record_id": record.id,
+                "student_name": record.student_name,
+                "student_id": record.student_id,
+                "issues": issues
+            }
+            results["records_with_issues"].append(record_info)
+            
+            for issue in issues:
+                if issue["type"] == "fever_isolation":
+                    results["fever_cases"] += 1
+                elif issue["type"] == "medication_expired":
+                    results["expired_meds"] += 1
+                elif issue["type"] == "parent_not_confirmed":
+                    results["missing_confirm"] += 1
+                elif issue["type"] == "missing_signature":
+                    results["missing_signature"] += 1
+    
+    return results
 
 
 def process_record(db: Session, record_id: int, action: str, reason: str, handler: str, details: str = None):

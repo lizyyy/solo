@@ -19,11 +19,12 @@ class BatchResponse(BaseModel):
     processed_records: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MorningCheckRecordResponse(BaseModel):
     id: int
+    medication_id: Optional[int]
     student_id: str
     student_name: str
     class_name: str
@@ -39,7 +40,7 @@ class MorningCheckRecordResponse(BaseModel):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ProcessingLogResponse(BaseModel):
@@ -52,7 +53,7 @@ class ProcessingLogResponse(BaseModel):
     details: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RecordProcessRequest(BaseModel):

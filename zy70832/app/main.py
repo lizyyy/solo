@@ -15,7 +15,7 @@ from app.import_service import (
     import_medication_json, import_morning_check_csv
 )
 from app.business_service import (
-    validate_record, process_record, get_records_by_filters,
+    validate_record, validate_batch_records, process_record, get_records_by_filters,
     export_records_to_csv, get_record_with_logs
 )
 
@@ -117,14 +117,33 @@ def search_records(
 
 
 @app.get("/api/records/{record_id}/validate", tags=["记录处理"])
-def validate_single_record(record_id: int, db: Session = Depends(get_db)):
-    """校验单条记录的问题"""
+def validate_single_record(
+    record_id: int,
+    auto_log: bool = True,
+    db: Session = Depends(get_db)
+):
+    """校验单条记录的问题，自动留存处理日志"""
     record = db.query(MorningCheckRecord).filter(MorningCheckRecord.id == record_id).first()
     if not record:
         raise HTTPException(status_code=404, detail="记录不存在")
     
-    issues = validate_record(db, record)
-    return {"record_id": record_id, "issues": issues}
+    issues = validate_record(db, record, auto_log=auto_log)
+    return {"record_id": record_id, "issues": issues, "auto_logged": auto_log}
+
+
+@app.post("/api/batches/{batch_id}/validate-all", tags=["记录处理"])
+def validate_all_records_in_batch(batch_id: int, db: Session = Depends(get_db)):
+    """批量校验批次内所有记录，自动生成可追踪处理日志"""
+    db_batch = db.query(Batch).filter(Batch.id == batch_id).first()
+    if not db_batch:
+        raise HTTPException(status_code=404, detail="批次不存在")
+    
+    results = validate_batch_records(db, batch_id)
+    return {
+        "batch_id": batch_id,
+        "batch_number": db_batch.batch_number,
+        "validation_results": results
+    }
 
 
 @app.post("/api/records/{record_id}/process", tags=["记录处理"])

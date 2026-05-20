@@ -89,6 +89,16 @@ def import_morning_check_csv(db: Session, batch_id: int, csv_content: str) -> in
     from io import StringIO
     df = pd.read_csv(StringIO(csv_content))
     
+    med_auths = db.query(MedicationAuthorization).filter(
+        MedicationAuthorization.batch_id == batch_id
+    ).all()
+    med_auth_map = {m.student_id: m for m in med_auths}
+    
+    class_lists = db.query(ClassList).filter(
+        ClassList.batch_id == batch_id
+    ).all()
+    class_list_map = {c.student_id: c for c in class_lists}
+    
     count = 0
     for _, row in df.iterrows():
         check_time_str = str(row.get('检查时间', row.get('check_time', datetime.now().isoformat())))
@@ -103,16 +113,32 @@ def import_morning_check_csv(db: Session, batch_id: int, csv_content: str) -> in
         except:
             temperature = 36.5
         
+        student_id = str(row.get('学号', row.get('student_id', '')))
+        
+        medication_id = None
+        parent_signature = None
+        parent_confirmed = False
+        
+        if student_id in med_auth_map:
+            med_auth = med_auth_map[student_id]
+            medication_id = med_auth.id
+            if med_auth.parent_signature:
+                parent_signature = med_auth.parent_signature
+                parent_confirmed = True
+        
         record = MorningCheckRecord(
             batch_id=batch_id,
-            student_id=str(row.get('学号', row.get('student_id', ''))),
+            student_id=student_id,
             student_name=str(row.get('姓名', row.get('student_name', ''))),
             class_name=str(row.get('班级', row.get('class_name', ''))),
             class_teacher=str(row.get('班主任', row.get('class_teacher', ''))),
             temperature=temperature,
             check_time=check_time,
             symptoms=str(row.get('症状', row.get('symptoms', ''))),
-            status="pending"
+            status="pending",
+            medication_id=medication_id,
+            parent_signature=parent_signature,
+            parent_confirmed=parent_confirmed
         )
         db.add(record)
         count += 1
