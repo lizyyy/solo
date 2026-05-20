@@ -1,0 +1,22 @@
+{
+  "name": "park-security-system",
+  "version": "1.0.0",
+  "description": "园区安保管理系统 - 访客预约、临时车牌、黑名单核验",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "node tests/run-tests.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "joi": "^17.11.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
