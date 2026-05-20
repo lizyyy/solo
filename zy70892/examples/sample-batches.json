@@ -1,0 +1,35 @@
+[
+  {
+    "batchNo": "BATCH20240520001",
+    "materialCode": "MAT001",
+    "materialName": "电子元件A型",
+    "quantity": 1500,
+    "productionDate": "2024-05-20",
+    "workstation": "WS01",
+    "operator": "张三",
+    "status": "pending",
+    "remark": "日常生产批次"
+  },
+  {
+    "batchNo": "BATCH20240520002",
+    "materialCode": "MAT002",
+    "materialName": "电路板B型",
+    "quantity": 800,
+    "productionDate": "2024-05-20",
+    "workstation": "WS02",
+    "operator": "李四",
+    "status": "processing",
+    "remark": "紧急订单批次"
+  },
+  {
+    "batchNo": "BATCH20240519001",
+    "materialCode": "MAT003",
+    "materialName": "连接器C型",
+    "quantity": 2000,
+    "productionDate": "2024-05-19",
+    "workstation": "WS01",
+    "operator": "王五",
+    "status": "completed",
+    "remark": "已完成检验"
+  }
+]

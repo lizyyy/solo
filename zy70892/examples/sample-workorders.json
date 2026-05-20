@@ -1,0 +1,29 @@
+[
+  {
+    "orderNo": "WO20240520001",
+    "productCode": "PROD001",
+    "productName": "智能终端A型",
+    "plannedQuantity": 500,
+    "actualQuantity": 0,
+    "workstation": "WS03",
+    "shift": "早班",
+    "operator": "赵六",
+    "startTime": "2024-05-20T08:00:00",
+    "status": "in_progress",
+    "remark": "A类产品生产订单"
+  },
+  {
+    "orderNo": "WO20240519001",
+    "productCode": "PROD002",
+    "productName": "智能终端B型",
+    "plannedQuantity": 300,
+    "actualQuantity": 295,
+    "workstation": "WS04",
+    "shift": "晚班",
+    "operator": "钱七",
+    "startTime": "2024-05-19T20:00:00",
+    "endTime": "2024-05-20T04:00:00",
+    "status": "completed",
+    "remark": "已完成，5件不合格待返修"
+  }
+]
