@@ -29,11 +29,24 @@ router.post('/session/connect', async (req, res) => {
       [sessionId, userId, deviceId, roomId, 'connected', now, now, now]
     );
     
-    await db.runQuery(
-      `INSERT OR REPLACE INTO user_devices (id, user_id, device_id, device_type, device_info, ip_address, last_seen, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [db.uuidv4(), userId, deviceId, deviceType, JSON.stringify(deviceInfo), ipAddress, now, now]
+    const existingDevice = await db.getQuery(
+      `SELECT id FROM user_devices WHERE user_id = ? AND device_id = ?`,
+      [userId, deviceId]
     );
+    
+    if (existingDevice) {
+      await db.runQuery(
+        `UPDATE user_devices SET device_type = ?, device_info = ?, ip_address = ?, last_seen = ?
+         WHERE id = ?`,
+        [deviceType, JSON.stringify(deviceInfo), ipAddress, now, existingDevice.id]
+      );
+    } else {
+      await db.runQuery(
+        `INSERT INTO user_devices (id, user_id, device_id, device_type, device_info, ip_address, last_seen, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [db.uuidv4(), userId, deviceId, deviceType, JSON.stringify(deviceInfo), ipAddress, now, now]
+      );
+    }
     
     const memberId = db.uuidv4();
     await db.runQuery(

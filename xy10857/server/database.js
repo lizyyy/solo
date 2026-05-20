@@ -36,22 +36,70 @@ const migrateUserDevicesTable = async () => {
   try {
     const cols = await allQuery(`PRAGMA table_info(user_devices)`);
     const hasDeviceId = cols.some(c => c.name === 'device_id');
+    const indexes = await allQuery(`PRAGMA index_list(user_devices)`);
+    const hasUniqueIndex = indexes.some(i => i.name === 'idx_user_device_unique');
     
     if (!hasDeviceId) {
-      await runQuery(`ALTER TABLE user_devices ADD COLUMN device_id TEXT`);
-      await runQuery(`
-        UPDATE user_devices 
-        SET device_id = 'legacy_device_' || substr(id, 1, 8) 
-        WHERE device_id IS NULL
-      `);
-      const existingRecords = await allQuery(`SELECT id, user_id, device_id FROM user_devices`);
+      const oldData = await allQuery(`SELECT * FROM user_devices`);
+      
+      await runQuery(`DROP TABLE IF EXISTS user_devices`);
+      
+      await runQuery(`CREATE TABLE user_devices (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        device_id TEXT NOT NULL,
+        device_type TEXT NOT NULL,
+        device_info TEXT,
+        ip_address TEXT,
+        last_seen INTEGER NOT NULL,
+        created_at INTEGER NOT NULL,
+        UNIQUE(user_id, device_id)
+      )`);
+      
+      await runQuery(`CREATE UNIQUE INDEX IF NOT EXISTS idx_user_device_unique ON user_devices(user_id, device_id)`);
+      
       const seen = new Set();
-      for (const r of existingRecords) {
-        const key = `${r.user_id}|${r.device_id}`;
-        if (seen.has(key)) {
-          await runQuery(`DELETE FROM user_devices WHERE id = ?`, [r.id]);
-        } else {
+      for (const r of oldData) {
+        const deviceId = r.device_id || `legacy_device_${r.id.substring(0, 8)}`;
+        const key = `${r.user_id}|${deviceId}`;
+        if (!seen.has(key)) {
           seen.add(key);
+          await runQuery(
+            `INSERT INTO user_devices (id, user_id, device_id, device_type, device_info, ip_address, last_seen, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [r.id, r.user_id, deviceId, r.device_type, r.device_info, r.ip_address, r.last_seen, r.created_at]
+          );
+        }
+      }
+    } else if (!hasUniqueIndex) {
+      const oldData = await allQuery(`SELECT * FROM user_devices`);
+      
+      await runQuery(`DROP TABLE IF EXISTS user_devices`);
+      
+      await runQuery(`CREATE TABLE user_devices (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        device_id TEXT NOT NULL,
+        device_type TEXT NOT NULL,
+        device_info TEXT,
+        ip_address TEXT,
+        last_seen INTEGER NOT NULL,
+        created_at INTEGER NOT NULL,
+        UNIQUE(user_id, device_id)
+      )`);
+      
+      await runQuery(`CREATE UNIQUE INDEX IF NOT EXISTS idx_user_device_unique ON user_devices(user_id, device_id)`);
+      
+      const seen = new Set();
+      for (const r of oldData) {
+        const key = `${r.user_id}|${r.device_id}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          await runQuery(
+            `INSERT INTO user_devices (id, user_id, device_id, device_type, device_info, ip_address, last_seen, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [r.id, r.user_id, r.device_id, r.device_type, r.device_info, r.ip_address, r.last_seen, r.created_at]
+          );
         }
       }
     }
