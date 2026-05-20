@@ -1,0 +1,6 @@
+userId,username,department,position,maxSecurityLevel,canBorrow,canApprove,maxBorrowCount
+USER001,张三,财务部,经理,机密,true,true,20
+USER002,李四,研发部,工程师,秘密,true,false,10
+USER003,王五,技术部,总监,绝密,true,true,15
+USER004,赵六,综合办,职员,内部,true,false,5
+USER005,钱七,宣传部,部长,公开,true,true,10

@@ -1,0 +1,52 @@
+[
+  {
+    "caseId": "CASE001",
+    "title": "2023年度财务审计报告",
+    "securityLevel": "机密",
+    "department": "财务部",
+    "createDate": "2023-01-15",
+    "description": "包含公司全年财务数据、审计意见及附件",
+    "keywords": ["审计", "财务", "2023"],
+    "status": "在库"
+  },
+  {
+    "caseId": "CASE002",
+    "title": "员工人事档案-研发部",
+    "securityLevel": "秘密",
+    "department": "人事部",
+    "createDate": "2023-03-20",
+    "description": "研发部全体员工人事档案及劳动合同",
+    "keywords": ["人事", "员工", "研发部"],
+    "status": "在库"
+  },
+  {
+    "caseId": "CASE003",
+    "title": "项目X技术文档",
+    "securityLevel": "绝密",
+    "department": "技术部",
+    "createDate": "2023-06-10",
+    "description": "核心项目技术方案、架构设计、源代码说明",
+    "keywords": ["技术", "项目X", "核心"],
+    "status": "在库"
+  },
+  {
+    "caseId": "CASE004",
+    "title": "2023年度工作总结报告",
+    "securityLevel": "内部",
+    "department": "综合办",
+    "createDate": "2023-12-25",
+    "description": "各部门年度工作总结及下年度计划",
+    "keywords": ["总结", "年度", "计划"],
+    "status": "在库"
+  },
+  {
+    "caseId": "CASE005",
+    "title": "公开信息发布记录",
+    "securityLevel": "公开",
+    "department": "宣传部",
+    "createDate": "2024-01-05",
+    "description": "对外公开信息发布记录及审批流程",
+    "keywords": ["公开", "宣传", "发布"],
+    "status": "在库"
+  }
+]
