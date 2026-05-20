@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 import json
@@ -218,22 +219,34 @@ class SyncService:
 
         draft = conflict.draft
         if draft:
-            draft.form_data[conflict.field_name] = final_value
-            
-            all_conflicts_resolved = all(c.resolved for c in draft.conflicts)
-            if all_conflicts_resolved:
-                draft.status = "synced"
-                draft.version += 1
+            new_form_data = dict(draft.form_data)
+            new_form_data[conflict.field_name] = final_value
+            draft.form_data = new_form_data
+            flag_modified(draft, "form_data")
 
         batch = conflict.batch
         if batch:
+            batch_id = batch.id
+            self.db.commit()
+            
             unresolved_count = self.db.query(FieldConflict).filter(
-                FieldConflict.batch_id == batch.id,
+                FieldConflict.batch_id == batch_id,
                 FieldConflict.resolved == False
             ).count()
             if unresolved_count == 0:
+                batch = self.db.query(SyncBatch).filter(SyncBatch.id == batch_id).first()
                 batch.status = "completed"
                 batch.completed_at = datetime.now()
+                flag_modified(batch, "status")
+
+        if draft:
+            draft_conflicts = self.db.query(FieldConflict).filter(
+                FieldConflict.draft_id == draft.id
+            ).all()
+            all_conflicts_resolved = all(c.resolved for c in draft_conflicts)
+            if all_conflicts_resolved:
+                draft.status = "synced"
+                draft.version += 1
 
         self.db.commit()
 
