@@ -51,6 +51,33 @@ export class ReconciliationEngine {
     return results;
   }
 
+  async reconcileSingle(criticalValueId: string): Promise<ReconciliationResult | undefined> {
+    const existingReconciliation = this.dataStore.getReconciliationsByCriticalValueId(criticalValueId);
+    if (!existingReconciliation) {
+      return undefined;
+    }
+
+    const cv = this.dataStore.getCriticalValue(criticalValueId);
+    if (!cv) {
+      return undefined;
+    }
+
+    const callbacks = this.dataStore.getAllCallbacks();
+    const dutySchedules = this.dataStore.getAllDutySchedules();
+
+    const matchingCallbacks = this.findMatchingCallbacks(cv, callbacks);
+    const discrepancies = this.detectDiscrepancies(cv, matchingCallbacks, dutySchedules);
+
+    const status: ReconciliationStatus = discrepancies.length === 0 ? 'matched' : 'mismatched';
+
+    return this.dataStore.updateReconciliation(existingReconciliation.id, {
+      callbackId: matchingCallbacks.length > 0 ? matchingCallbacks[0].id : undefined,
+      status,
+      discrepancies,
+      matchedAt: new Date(),
+    });
+  }
+
   private findMatchingCallbacks(cv: CriticalValueRecord, allCallbacks: CallbackRecord[]): CallbackRecord[] {
     const potentialMatches = allCallbacks.filter(cb => {
       if (cb.criticalValueId === cv.id) return true;

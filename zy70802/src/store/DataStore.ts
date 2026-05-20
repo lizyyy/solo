@@ -147,6 +147,12 @@ export class DataStore {
     this.reconciliations.clear();
   }
 
+  getReconciliationsByCriticalValueId(criticalValueId: string): ReconciliationResult | undefined {
+    return Array.from(this.reconciliations.values()).find(
+      r => r.criticalValueId === criticalValueId
+    );
+  }
+
   addReviewAction(action: Omit<ReviewAction, 'id'>): ReviewAction {
     const id = uuidv4();
     const newAction = { ...action, id };

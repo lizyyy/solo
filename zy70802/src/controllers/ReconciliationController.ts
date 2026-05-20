@@ -167,7 +167,12 @@ export class ReconciliationController {
         return res.status(400).json({ error: '请提供修改人姓名' });
       }
 
-      const result = await this.reviewService.modifyCallback(id, updates, reviewer, notes);
+      const processedUpdates = { ...updates };
+      if (processedUpdates.confirmedAt && typeof processedUpdates.confirmedAt === 'string') {
+        processedUpdates.confirmedAt = new Date(processedUpdates.confirmedAt);
+      }
+
+      const result = await this.reviewService.modifyCallback(id, processedUpdates, reviewer, notes);
 
       res.json({
         success: true,

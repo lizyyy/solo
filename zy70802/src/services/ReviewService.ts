@@ -83,7 +83,7 @@ export class ReviewService {
       notes,
     });
 
-    await this.engine.runReconciliation();
+    await this.engine.reconcileSingle(reconciliation.criticalValueId);
 
     return this.dataStore.getReconciliation(reconciliationId);
   }
