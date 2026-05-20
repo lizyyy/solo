@@ -1,0 +1,17 @@
+{
+  "name": "service-directory-api",
+  "version": "1.0.0",
+  "description": "服务目录归属 API - 全栈Web应用",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0"
+  },
+  "keywords": ["service-directory", "ownership", "api"]
+}

@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务目录归属 API 控制台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #16213e; }
+        .header h1 { color: #00d4ff; font-size: 24px; }
+        .stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: #16213e; padding: 20px; border-radius: 10px; text-align: center; }
+        .stat-card .number { font-size: 28px; font-weight: bold; color: #00d4ff; }
+        .stat-card .label { color: #888; margin-top: 5px; font-size: 12px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; background: #16213e; border: none; color: #eee; cursor: pointer; border-radius: 5px; transition: all 0.3s; }
+        .tab.active { background: #00d4ff; color: #000; }
+        .tab:hover { background: #0f3460; }
+        .search-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-bar input, .search-bar select { flex: 1; min-width: 150px; padding: 10px; background: #16213e; border: 1px solid #0f3460; color: #eee; border-radius: 5px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 500; transition: all 0.3s; }
+        .btn-primary { background: #00d4ff; color: #000; }
+        .btn-danger { background: #e94560; color: #fff; }
+        .btn-success { background: #00ff88; color: #000; }
+        .btn-warning { background: #ffaa00; color: #000; }
+        .btn-small { padding: 5px 10px; font-size: 12px; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        .card { background: #16213e; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #0f3460; }
+        .card-title { font-size: 18px; font-weight: 600; color: #00d4ff; }
+        .list { display: flex; flex-direction: column; gap: 10px; }
+        .list-item { background: #0f3460; padding: 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        .list-item:hover { background: #1a4a8a; transform: translateX(5px); }
+        .list-item .name { font-weight: 600; font-size: 16px; margin-bottom: 5px; }
+        .list-item .meta { color: #888; font-size: 13px; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-right: 5px; }
+        .badge-active { background: #00ff88; color: #000; }
+        .badge-inactive { background: #666; color: #fff; }
+        .badge-risk { background: #e94560; color: #fff; }
+        .badge-planning { background: #9b59b6; color: #fff; }
+        .badge-development { background: #3498db; color: #fff; }
+        .badge-testing { background: #f39c12; color: #000; }
+        .badge-maintenance { background: #e67e22; color: #fff; }
+        .badge-deprecated { background: #95a5a6; color: #fff; }
+        .badge-env-dev { background: #3498db; color: #fff; }
+        .badge-env-test { background: #f39c12; color: #000; }
+        .badge-env-staging { background: #9b59b6; color: #fff; }
+        .badge-env-prod { background: #27ae60; color: #fff; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #16213e; padding: 30px; border-radius: 15px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 20px; font-weight: 600; color: #00d4ff; }
+        .close-btn { background: none; border: none; color: #888; font-size: 24px; cursor: pointer; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #aaa; font-size: 13px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #0f3460; border: 1px solid #1a4a8a; color: #eee; border-radius: 5px; font-size: 14px; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h4 { color: #00d4ff; margin-bottom: 10px; font-size: 14px; }
+        .detail-row { display: flex; padding: 8px 0; border-bottom: 1px solid #0f3460; flex-wrap: wrap; }
+        .detail-label { width: 120px; color: #888; }
+        .detail-value { flex: 1; min-width: 200px; }
+        .actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .alert-item { border-left: 4px solid #e94560; padding-left: 15px; }
+        .transition-item { border-left: 4px solid #00d4ff; padding-left: 15px; }
+        .endpoint-item { border-left: 4px solid #00ff88; padding-left: 15px; }
+        .env-item { border-left: 4px solid #9b59b6; padding-left: 15px; }
+        .hidden { display: none !important; }
+        .empty-state { text-align: center; padding: 40px; color: #666; }
+        .request-log { font-family: monospace; font-size: 11px; background: #0a0a1a; padding: 10px; border-radius: 5px; max-height: 300px; overflow-y: auto; }
+        .request-item { padding: 5px; border-bottom: 1px solid #1a1a2e; }
+        .request-method { font-weight: bold; margin-right: 10px; }
+        .method-GET { color: #00ff88; }
+        .method-POST { color: #00d4ff; }
+        .method-PATCH { color: #ffaa00; }
+        .method-DELETE { color: #e94560; }
+        .status-flow { display: flex; align-items: center; gap: 10px; margin: 15px 0; padding: 15px; background: #0f3460; border-radius: 8px; flex-wrap: wrap; }
+        .status-node { padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-node.current { border: 2px solid #00d4ff; box-shadow: 0 0 10px rgba(0,212,255,0.5); }
+        .status-arrow { color: #00d4ff; font-size: 20px; }
+        .env-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 服务目录归属 API 控制台</h1>
+            <button class="btn btn-primary" onclick="exportDirectory()">📥 导出目录</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card"><div class="number" id="stat-services">0</div><div class="label">服务数</div></div>
+            <div class="stat-card"><div class="number" id="stat-endpoints">0</div><div class="label">接口数</div></div>
+            <div class="stat-card"><div class="number" id="stat-owners">0</div><div class="label">负责人</div></div>
+            <div class="stat-card"><div class="number" id="stat-environments">0</div><div class="label">环境数</div></div>
+            <div class="stat-card"><div class="number" id="stat-alerts">0</div><div class="label">活跃告警</div></div>
+            <div class="stat-card"><div class="number" id="stat-risk">0</div><div class="label">失联风险</div></div>
+            <div class="stat-card"><div class="number" id="stat-requests">0</div><div class="label">API请求</div></div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('services')">服务管理</button>
+            <button class="tab" onclick="switchTab('environments')">运行环境</button>
+            <button class="tab" onclick="switchTab('endpoints')">接口清单</button>
+            <button class="tab" onclick="switchTab('owners')">负责人</button>
+            <button class="tab" onclick="switchTab('alerts')">告警中心</button>
+            <button class="tab" onclick="switchTab('requests')">请求日志</button>
+        </div>
+
+        <div id="tab-services" class="tab-content">
+            <div class="search-bar">
+                <input type="text" id="service-search" placeholder="搜索服务名称或描述...">
+                <select id="service-status-filter">
+                    <option value="">全部状态</option>
+                    <option value="planning">规划中</option>
+                    <option value="development">开发中</option>
+                    <option value="testing">测试中</option>
+                    <option value="active">已上线</option>
+                    <option value="maintenance">维护中</option>
+                    <option value="deprecated">已废弃</option>
+                </select>
+                <button class="btn btn-primary" onclick="showAddServiceModal()">+ 新增服务</button>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-title">服务列表</div></div>
+                <div class="list" id="services-list"></div>
+            </div>
+        </div>
+
+        <div id="tab-environments" class="tab-content hidden">
+            <div class="search-bar">
+                <input type="text" id="env-search" placeholder="搜索环境名称...">
+                <select id="env-type-filter">
+                    <option value="">全部类型</option>
+                    <option value="dev">开发环境</option>
+                    <option value="test">测试环境</option>
+                    <option value="staging">预发布环境</option>
+                    <option value="prod">生产环境</option>
+                </select>
+                <button class="btn btn-primary" onclick="showAddEnvironmentModal()">+ 新增环境</button>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-title">运行环境列表</div></div>
+                <div class="list" id="environments-list"></div>
+            </div>
+        </div>
+
+        <div id="tab-endpoints" class="tab-content hidden">
+            <div class="search-bar">
+                <input type="text" id="endpoint-search" placeholder="搜索接口路径...">
+                <select id="endpoint-method-filter">
+                    <option value="">全部方法</option>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
+                </select>
+                <button class="btn btn-primary" onclick="showAddEndpointModal()">+ 新增接口</button>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-title">接口清单</div></div>
+                <div class="list" id="endpoints-list"></div>
+            </div>
+        </div>
+
+        <div id="tab-owners" class="tab-content hidden">
+            <div class="search-bar">
+                <input type="text" id="owner-search" placeholder="搜索负责人...">
+                <button class="btn btn-primary" onclick="showAddOwnerModal()">+ 新增负责人</button>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-title">负责人列表</div></div>
+                <div class="list" id="owners-list"></div>
+            </div>
+        </div>
+
+        <div id="tab-alerts" class="tab-content hidden">
+            <div class="card">
+                <div class="card-header"><div class="card-title">告警中心</div></div>
+                <div class="list" id="alerts-list"></div>
+            </div>
+        </div>
+
+        <div id="tab-requests" class="tab-content hidden">
+            <div class="card">
+                <div class="card-header"><div class="card-title">API 请求日志</div></div>
+                <div class="request-log" id="requests-log"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="service-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">服务详情</div>
+                <button class="close-btn" onclick="closeModal('service-modal')">&times;</button>
+            </div>
+            <div id="service-detail"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-service-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增服务</div>
+                <button class="close-btn" onclick="closeModal('add-service-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>服务名称 *</label>
+                <input type="text" id="new-service-name">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="new-service-desc"></textarea>
+            </div>
+            <div class="form-group">
+                <label>负责人 *</label>
+                <select id="new-service-owner"></select>
+            </div>
+            <button class="btn btn-success" onclick="createService()">创建服务</button>
+        </div>
+    </div>
+
+    <div class="modal" id="add-environment-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增运行环境</div>
+                <button class="close-btn" onclick="closeModal('add-environment-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>环境名称 *</label>
+                <input type="text" id="new-env-name" placeholder="如：生产环境、测试环境">
+            </div>
+            <div class="form-group">
+                <label>环境类型 *</label>
+                <select id="new-env-type">
+                    <option value="dev">开发环境</option>
+                    <option value="test">测试环境</option>
+                    <option value="staging">预发布环境</option>
+                    <option value="prod">生产环境</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>访问地址</label>
+                <input type="text" id="new-env-url" placeholder="https://api.example.com">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="new-env-desc"></textarea>
+            </div>
+            <button class="btn btn-success" onclick="createEnvironment()">创建环境</button>
+        </div>
+    </div>
+
+    <div class="modal" id="add-endpoint-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增接口</div>
+                <button class="close-btn" onclick="closeModal('add-endpoint-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>所属服务 *</label>
+                <select id="new-endpoint-service"></select>
+            </div>
+            <div class="form-group">
+                <label>方法 *</label>
+                <select id="new-endpoint-method">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>路径 *</label>
+                <input type="text" id="new-endpoint-path" placeholder="/api/v1/resource">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="new-endpoint-desc"></textarea>
+            </div>
+            <div class="form-group">
+                <label>接口负责人</label>
+                <select id="new-endpoint-owner"></select>
+            </div>
+            <button class="btn btn-success" onclick="createEndpoint()">创建接口</button>
+        </div>
+    </div>
+
+    <div class="modal" id="add-owner-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增负责人</div>
+                <button class="close-btn" onclick="closeModal('add-owner-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>姓名 *</label>
+                <input type="text" id="new-owner-name">
+            </div>
+            <div class="form-group">
+                <label>邮箱 *</label>
+                <input type="email" id="new-owner-email">
+            </div>
+            <div class="form-group">
+                <label>团队</label>
+                <input type="text" id="new-owner-team">
+            </div>
+            <div class="form-group">
+                <label>电话</label>
+                <input type="text" id="new-owner-phone">
+            </div>
+            <button class="btn btn-success" onclick="createOwner()">创建负责人</button>
+        </div>
+    </div>
+
+    <div class="modal" id="change-owner-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">变更负责人</div>
+                <button class="close-btn" onclick="closeModal('change-owner-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>新负责人 *</label>
+                <select id="change-owner-select"></select>
+            </div>
+            <div class="form-group">
+                <label>变更原因</label>
+                <textarea id="change-owner-reason"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="confirmChangeOwner()">确认变更</button>
+        </div>
+    </div>
+
+    <div class="modal" id="alert-lost-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">标记失联风险</div>
+                <button class="close-btn" onclick="closeModal('alert-lost-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>备注说明</label>
+                <textarea id="alert-lost-notes"></textarea>
+            </div>
+            <button class="btn btn-danger" onclick="confirmAlertLost()">确认标记</button>
+        </div>
+    </div>
+
+    <div class="modal" id="status-advance-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">服务状态推进</div>
+                <button class="close-btn" onclick="closeModal('status-advance-modal')">&times;</button>
+            </div>
+            <div id="status-flow-display"></div>
+            <div class="form-group">
+                <label>目标状态 *</label>
+                <select id="target-status-select"></select>
+            </div>
+            <div class="form-group">
+                <label>变更原因</label>
+                <textarea id="status-change-reason"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="confirmStatusAdvance()">确认推进</button>
+        </div>
+    </div>
+
+    <div class="modal" id="bind-env-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">绑定运行环境</div>
+                <button class="close-btn" onclick="closeModal('bind-env-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>选择环境 *</label>
+                <select id="bind-env-select"></select>
+            </div>
+            <button class="btn btn-primary" onclick="confirmBindEnvironment()">确认绑定</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentServiceId = null;
+
+        const STATUS_LABELS = {
+            'planning': '规划中',
+            'development': '开发中',
+            'testing': '测试中',
+            'active': '已上线',
+            'maintenance': '维护中',
+            'deprecated': '已废弃'
+        };
+
+        const ENV_TYPE_LABELS = {
+            'dev': '开发',
+            'test': '测试',
+            'staging': '预发布',
+            'prod': '生产'
+        };
+
+        async function init() {
+            await loadStats();
+            await loadServices();
+            await loadEnvironments();
+            await loadOwners();
+            await loadEndpoints();
+            await loadAlerts();
+            await loadRequests();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('service-search').addEventListener('input', loadServices);
+            document.getElementById('service-status-filter').addEventListener('change', loadServices);
+            document.getElementById('env-search').addEventListener('input', loadEnvironments);
+            document.getElementById('env-type-filter').addEventListener('change', loadEnvironments);
+            document.getElementById('endpoint-search').addEventListener('input', loadEndpoints);
+            document.getElementById('endpoint-method-filter').addEventListener('change', loadEndpoints);
+            document.getElementById('owner-search').addEventListener('input', loadOwners);
+        }
+
+        async function apiCall(path, options = {}) {
+            try {
+                const res = await fetch(API_BASE + path, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                const data = await res.json();
+                setTimeout(loadStats, 100);
+                setTimeout(loadRequests, 200);
+                return data;
+            } catch (e) {
+                console.error('API Error:', e);
+                throw e;
+            }
+        }
+
+        async function loadStats() {
+            const stats = await apiCall('/stats');
+            document.getElementById('stat-services').textContent = stats.services;
+            document.getElementById('stat-endpoints').textContent = stats.endpoints;
+            document.getElementById('stat-owners').textContent = stats.owners;
+            document.getElementById('stat-environments').textContent = stats.environments || 0;
+            document.getElementById('stat-alerts').textContent = stats.activeAlerts;
+            document.getElementById('stat-risk').textContent = stats.atRiskServices;
+            document.getElementById('stat-requests').textContent = stats.totalRequests;
+        }
+
+        async function loadServices() {
+            const search = document.getElementById('service-search').value;
+            const status = document.getElementById('service-status-filter').value;
+            let url = '/services';
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (status) params.append('status', status);
+            if (params.toString()) url += '?' + params.toString();
+            
+            const services = await apiCall(url);
+            const owners = await apiCall('/owners');
+            const environments = await apiCall('/environments');
+            const ownerMap = {};
+            const envMap = {};
+            owners.forEach(o => ownerMap[o.id] = o);
+            environments.forEach(e => envMap[e.id] = e);
+
+            const list = document.getElementById('services-list');
+            if (services.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无服务数据</div>';
+                return;
+            }
+
+            list.innerHTML = services.map(s => {
+                const envTags = (s.environments || []).map(envId => {
+                    const env = envMap[envId];
+                    return env ? `<span class="badge badge-env-${env.type}">${env.name}</span>` : '';
+                }).join('');
+
+                return `
+                <div class="list-item" onclick="showServiceDetail('${s.id}')">
+                    <div class="name">
+                        ${s.contactLostRisk ? '<span class="badge badge-risk">失联风险</span>' : ''}
+                        <span class="badge badge-${s.status}">${STATUS_LABELS[s.status] || s.status}</span>
+                        ${s.name}
+                    </div>
+                    <div class="meta">负责人: ${ownerMap[s.ownerId]?.name || '未知'} | ${s.description || '无描述'}</div>
+                    ${envTags ? `<div class="env-tags">${envTags}</div>` : ''}
+                </div>
+            `}).join('');
+        }
+
+        async function showServiceDetail(id) {
+            const service = await apiCall('/services/' + id);
+            const owners = await apiCall('/owners');
+            const environments = await apiCall('/environments');
+            const statusFlow = await apiCall(`/services/${id}/status-flow`);
+            
+            let html = `
+                <div class="detail-section">
+                    <h4>状态流转</h4>
+                    <div class="status-flow">
+                        ${renderStatusFlow(statusFlow.currentStatus, statusFlow.allowedTransitions)}
+                    </div>
+                    <button class="btn btn-warning btn-small" onclick="showStatusAdvanceModal('${id}')">推进状态 →</button>
+                </div>
+                <div class="detail-section">
+                    <h4>基本信息</h4>
+                    <div class="detail-row"><div class="detail-label">服务名称</div><div class="detail-value">${service.name}</div></div>
+                    <div class="detail-row"><div class="detail-label">状态</div><div class="detail-value"><span class="badge badge-${service.status}">${STATUS_LABELS[service.status] || service.status}</span></div></div>
+                    <div class="detail-row"><div class="detail-label">失联风险</div><div class="detail-value">${service.contactLostRisk ? '<span class="badge badge-risk">是</span>' : '否'}</div></div>
+                    <div class="detail-row"><div class="detail-label">描述</div><div class="detail-value">${service.description || '无'}</div></div>
+                </div>
+                <div class="detail-section">
+                    <h4>负责人信息</h4>
+                    ${service.owner ? `
+                        <div class="detail-row"><div class="detail-label">姓名</div><div class="detail-value">${service.owner.name}</div></div>
+                        <div class="detail-row"><div class="detail-label">邮箱</div><div class="detail-value">${service.owner.email}</div></div>
+                        <div class="detail-row"><div class="detail-label">团队</div><div class="detail-value">${service.owner.team || '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">电话</div><div class="detail-value">${service.owner.phone || '-'}</div></div>
+                    ` : '<div class="meta">未找到负责人信息</div>'}
+                </div>
+                <div class="detail-section">
+                    <h4>运行环境 (${service.environments?.length || 0})
+                        <button class="btn btn-primary btn-small" style="margin-left:10px;" onclick="showBindEnvironmentModal('${id}')">+ 绑定</button>
+                    </h4>
+                    ${service.environments?.length > 0 ? service.environments.map(e => `
+                        <div class="detail-row env-item">
+                            <div class="detail-label"><span class="badge badge-env-${e.type}">${ENV_TYPE_LABELS[e.type]}</span></div>
+                            <div class="detail-value">
+                                ${e.name}
+                                ${e.url ? `<a href="${e.url}" target="_blank" style="color:#00d4ff;">${e.url}</a>` : ''}
+                                <button class="btn btn-danger btn-small" style="margin-left:10px;" onclick="unbindEnvironment('${id}', '${e.id}')">解绑</button>
+                            </div>
+                        </div>
+                    `).join('') : '<div class="meta">暂无绑定环境</div>'}
+                </div>
+                <div class="detail-section">
+                    <h4>接口清单 (${service.endpoints.length})</h4>
+                    ${service.endpoints.length > 0 ? service.endpoints.map(e => `
+                        <div class="detail-row endpoint-item">
+                            <div class="detail-label"><span class="badge badge-active">${e.method}</span></div>
+                            <div class="detail-value">${e.path} ${e.description ? '- ' + e.description : ''}</div>
+                        </div>
+                    `).join('') : '<div class="meta">暂无接口</div>'}
+                </div>
+                <div class="detail-section">
+                    <h4>变更记录 (${service.transitions.length})</h4>
+                    ${service.transitions.length > 0 ? service.transitions.map(t => {
+                        if (t.transitionType === 'owner_change') {
+                            const oldOwner = owners.find(o => o.id === t.oldOwnerId);
+                            const newOwner = owners.find(o => o.id === t.newOwnerId);
+                            return `
+                                <div class="detail-row transition-item">
+                                    <div class="detail-label">${new Date(t.createdAt).toLocaleDateString()}</div>
+                                    <div class="detail-value">负责人变更: ${oldOwner?.name || '未知'} → ${newOwner?.name || '未知'}${t.reason ? ' (' + t.reason + ')' : ''}</div>
+                                </div>
+                            `;
+                        } else if (t.transitionType === 'status_change') {
+                            return `
+                                <div class="detail-row transition-item">
+                                    <div class="detail-label">${new Date(t.createdAt).toLocaleDateString()}</div>
+                                    <div class="detail-value">状态变更: ${STATUS_LABELS[t.oldStatus] || t.oldStatus} → ${STATUS_LABELS[t.newStatus] || t.newStatus}${t.reason ? ' (' + t.reason + ')' : ''}</div>
+                                </div>
+                            `;
+                        }
+                        return '';
+                    }).join('') : '<div class="meta">暂无变更记录</div>'}
+                </div>
+                <div class="actions">
+                    <button class="btn btn-warning" onclick="showStatusAdvanceModal('${id}')">推进状态</button>
+                    <button class="btn btn-primary" onclick="showChangeOwnerModal('${id}')">变更负责人</button>
+                    ${!service.contactLostRisk ? `<button class="btn btn-danger" onclick="showAlertLostModal('${id}')">标记失联风险</button>` : ''}
+                    <button class="btn btn-success" onclick="showAddEndpointModalForService('${id}')">添加接口</button>
+                    <button class="btn btn-primary" onclick="showBindEnvironmentModal('${id}')">绑定环境</button>
+                </div>
+            `;
+            document.getElementById('service-detail').innerHTML = html;
+            document.getElementById('service-modal').classList.add('active');
+        }
+
+        function renderStatusFlow(currentStatus, allowedTransitions) {
+            const flow = ['planning', 'development', 'testing', 'active'];
+            return flow.map((status, index) => {
+                const isCurrent = status === currentStatus;
+                const isAllowed = allowedTransitions.includes(status);
+                let classes = `status-node badge-${status}`;
+                if (isCurrent) classes += ' current';
+                let arrow = index < flow.length - 1 ? '<span class="status-arrow">→</span>' : '';
+                return `<span class="${classes}">${STATUS_LABELS[status]}</span>${arrow}`;
+            }).join('');
+        }
+
+        async function showStatusAdvanceModal(serviceId) {
+            currentServiceId = serviceId;
+            closeModal('service-modal');
+            
+            const statusFlow = await apiCall(`/services/${serviceId}/status-flow`);
+            const display = document.getElementById('status-flow-display');
+            display.innerHTML = `
+                <div class="status-flow">
+                    ${renderStatusFlow(statusFlow.currentStatus, statusFlow.allowedTransitions)}
+                </div>
+                <p style="color:#888;font-size:13px;">当前状态: <strong>${STATUS_LABELS[statusFlow.currentStatus]}</strong></p>
+            `;
+            
+            const select = document.getElementById('target-status-select');
+            if (statusFlow.allowedTransitions.length === 0) {
+                select.innerHTML = '<option value="">无可推进状态</option>';
+            } else {
+                select.innerHTML = statusFlow.allowedTransitions.map(s => 
+                    `<option value="${s}">${STATUS_LABELS[s]}</option>`
+                ).join('');
+            }
+            
+            document.getElementById('status-advance-modal').classList.add('active');
+        }
+
+        async function confirmStatusAdvance() {
+            const targetStatus = document.getElementById('target-status-select').value;
+            const reason = document.getElementById('status-change-reason').value;
+            if (!targetStatus) return alert('请选择目标状态');
+            
+            await apiCall(`/services/${currentServiceId}/advance-status`, {
+                method: 'POST',
+                body: JSON.stringify({ targetStatus, reason })
+            });
+            
+            closeModal('status-advance-modal');
+            loadServices();
+        }
+
+        async function showBindEnvironmentModal(serviceId) {
+            currentServiceId = serviceId;
+            closeModal('service-modal');
+            
+            const [environments, service] = await Promise.all([
+                apiCall('/environments'),
+                apiCall('/services/' + serviceId)
+            ]);
+            
+            const boundEnvIds = service.environments?.map(e => e.id) || [];
+            const availableEnvs = environments.filter(e => !boundEnvIds.includes(e.id));
+            
+            const select = document.getElementById('bind-env-select');
+            if (availableEnvs.length === 0) {
+                select.innerHTML = '<option value="">无可用环境</option>';
+            } else {
+                select.innerHTML = availableEnvs.map(e => 
+                    `<option value="${e.id}">${e.name} (${ENV_TYPE_LABELS[e.type]})</option>`
+                ).join('');
+            }
+            
+            document.getElementById('bind-env-modal').classList.add('active');
+        }
+
+        async function confirmBindEnvironment() {
+            const environmentId = document.getElementById('bind-env-select').value;
+            if (!environmentId) return alert('请选择环境');
+            
+            await apiCall(`/services/${currentServiceId}/bind-environment`, {
+                method: 'POST',
+                body: JSON.stringify({ environmentId })
+            });
+            
+            closeModal('bind-env-modal');
+            loadServices();
+        }
+
+        async function unbindEnvironment(serviceId, environmentId) {
+            if (!confirm('确认解绑该环境？')) return;
+            
+            await apiCall(`/services/${serviceId}/unbind-environment`, {
+                method: 'POST',
+                body: JSON.stringify({ environmentId })
+            });
+            
+            showServiceDetail(serviceId);
+        }
+
+        async function loadEnvironments() {
+            const search = document.getElementById('env-search').value;
+            const type = document.getElementById('env-type-filter').value;
+            let url = '/environments';
+            const params = new URLSearchParams();
+            if (type) params.append('type', type);
+            if (params.toString()) url += '?' + params.toString();
+            
+            let environments = await apiCall(url);
+            if (search) {
+                const s = search.toLowerCase();
+                environments = environments.filter(e => e.name.toLowerCase().includes(s));
+            }
+
+            const list = document.getElementById('environments-list');
+            if (environments.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无环境数据</div>';
+                return;
+            }
+
+            list.innerHTML = environments.map(e => `
+                <div class="list-item" onclick="showEnvironmentDetail('${e.id}')">
+                    <div class="name">
+                        <span class="badge badge-env-${e.type}">${ENV_TYPE_LABELS[e.type]}</span>
+                        <span class="badge badge-${e.status}">${e.status === 'active' ? '可用' : '停用'}</span>
+                        ${e.name}
+                    </div>
+                    <div class="meta">${e.url || '无地址'} | ${e.description || '无描述'}</div>
+                </div>
+            `).join('');
+        }
+
+        async function showEnvironmentDetail(id) {
+            const env = await apiCall('/environments/' + id);
+            let html = `
+                <div class="detail-section">
+                    <h4>环境信息</h4>
+                    <div class="detail-row"><div class="detail-label">环境名称</div><div class="detail-value">${env.name}</div></div>
+                    <div class="detail-row"><div class="detail-label">类型</div><div class="detail-value"><span class="badge badge-env-${env.type}">${ENV_TYPE_LABELS[env.type]}</span></div></div>
+                    <div class="detail-row"><div class="detail-label">状态</div><div class="detail-value"><span class="badge badge-${env.status}">${env.status === 'active' ? '可用' : '停用'}</span></div></div>
+                    <div class="detail-row"><div class="detail-label">访问地址</div><div class="detail-value">${env.url ? `<a href="${env.url}" target="_blank" style="color:#00d4ff;">${env.url}</a>` : '-'}</div></div>
+                    <div class="detail-row"><div class="detail-label">描述</div><div class="detail-value">${env.description || '无'}</div></div>
+                </div>
+                <div class="detail-section">
+                    <h4>部署的服务 (${env.services?.length || 0})</h4>
+                    ${env.services?.length > 0 ? env.services.map(s => `
+                        <div class="detail-row env-item">
+                            <div class="detail-label"><span class="badge badge-${s.status}">${STATUS_LABELS[s.status]}</span></div>
+                            <div class="detail-value">${s.name}</div>
+                        </div>
+                    `).join('') : '<div class="meta">暂无服务部署</div>'}
+                </div>
+            `;
+            document.getElementById('service-detail').innerHTML = html;
+            document.getElementById('service-modal').classList.add('active');
+        }
+
+        function showAddEnvironmentModal() {
+            document.getElementById('add-environment-modal').classList.add('active');
+        }
+
+        async function createEnvironment() {
+            const name = document.getElementById('new-env-name').value;
+            const type = document.getElementById('new-env-type').value;
+            const url = document.getElementById('new-env-url').value;
+            const description = document.getElementById('new-env-desc').value;
+            if (!name || !type) return alert('请填写必填项');
+            
+            await apiCall('/environments', {
+                method: 'POST',
+                body: JSON.stringify({ name, type, url, description })
+            });
+            
+            closeModal('add-environment-modal');
+            loadEnvironments();
+        }
+
+        async function loadEndpoints() {
+            const search = document.getElementById('endpoint-search').value;
+            const method = document.getElementById('endpoint-method-filter').value;
+            let url = '/endpoints';
+            if (method) url += '?method=' + method;
+            
+            let endpoints = await apiCall(url);
+            if (search) {
+                endpoints = endpoints.filter(e => e.path.toLowerCase().includes(search.toLowerCase()));
+            }
+            
+            const services = await apiCall('/services');
+            const serviceMap = {};
+            services.forEach(s => serviceMap[s.id] = s);
+
+            const list = document.getElementById('endpoints-list');
+            if (endpoints.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无接口数据</div>';
+                return;
+            }
+
+            list.innerHTML = endpoints.map(e => `
+                <div class="list-item">
+                    <div class="name">
+                        <span class="badge badge-active">${e.method}</span>
+                        ${e.path}
+                    </div>
+                    <div class="meta">所属服务: ${serviceMap[e.serviceId]?.name || '未知'} | ${e.description || '无描述'}</div>
+                </div>
+            `).join('');
+        }
+
+        async function loadOwners() {
+            const search = document.getElementById('owner-search').value;
+            let owners = await apiCall('/owners');
+            if (search) {
+                const s = search.toLowerCase();
+                owners = owners.filter(o => o.name.toLowerCase().includes(s) || o.email.toLowerCase().includes(s));
+            }
+
+            const list = document.getElementById('owners-list');
+            if (owners.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无负责人数据</div>';
+                return;
+            }
+
+            list.innerHTML = owners.map(o => `
+                <div class="list-item" onclick="showOwnerDetail('${o.id}')">
+                    <div class="name">
+                        <span class="badge badge-${o.active ? 'active' : 'inactive'}">${o.active ? '在职' : '离职'}</span>
+                        ${o.name}
+                    </div>
+                    <div class="meta">${o.email} | ${o.team || '未分配团队'}</div>
+                </div>
+            `).join('');
+        }
+
+        async function showOwnerDetail(id) {
+            const owner = await apiCall('/owners/' + id);
+            let html = `
+                <div class="detail-section">
+                    <h4>基本信息</h4>
+                    <div class="detail-row"><div class="detail-label">姓名</div><div class="detail-value">${owner.name}</div></div>
+                    <div class="detail-row"><div class="detail-label">邮箱</div><div class="detail-value">${owner.email}</div></div>
+                    <div class="detail-row"><div class="detail-label">团队</div><div class="detail-value">${owner.team || '-'}</div></div>
+                    <div class="detail-row"><div class="detail-label">负责服务数</div><div class="detail-value">${owner.services.length}</div></div>
+                    <div class="detail-row"><div class="detail-label">负责接口数</div><div class="detail-value">${owner.endpoints.length}</div></div>
+                </div>
+                <div class="detail-section">
+                    <h4>负责的服务</h4>
+                    ${owner.services.length > 0 ? owner.services.map(s => `
+                        <div class="detail-row transition-item">
+                            <div class="detail-label"><span class="badge badge-${s.status}">${STATUS_LABELS[s.status]}</span></div>
+                            <div class="detail-value">${s.name}</div>
+                        </div>
+                    `).join('') : '<div class="meta">暂无负责服务</div>'}
+                </div>
+            `;
+            document.getElementById('service-detail').innerHTML = html;
+            document.getElementById('service-modal').classList.add('active');
+        }
+
+        async function loadAlerts() {
+            const alerts = await apiCall('/alerts?status=open');
+            const services = await apiCall('/services');
+            const serviceMap = {};
+            services.forEach(s => serviceMap[s.id] = s);
+
+            const list = document.getElementById('alerts-list');
+            if (alerts.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无活跃告警</div>';
+                return;
+            }
+
+            list.innerHTML = alerts.map(a => `
+                <div class="list-item alert-item">
+                    <div class="name">
+                        <span class="badge badge-risk">${a.type === 'contact_lost' ? '失联告警' : a.type}</span>
+                        ${serviceMap[a.serviceId]?.name || '未知服务'}
+                    </div>
+                    <div class="meta">${a.notes || '无备注'} | ${new Date(a.createdAt).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        async function loadRequests() {
+            const requests = await apiCall('/requests');
+            const log = document.getElementById('requests-log');
+            log.innerHTML = requests.map(r => `
+                <div class="request-item">
+                    <span class="request-method method-${r.method}">${r.method}</span>
+                    <span>${r.path}</span>
+                    <span style="color:#666;">${new Date(r.timestamp).toLocaleTimeString()}</span>
+                    <span style="color:${r.statusCode < 400 ? '#00ff88' : '#e94560'};">(${r.statusCode})</span>
+                </div>
+            `).join('');
+        }
+
+        async function showAddServiceModal() {
+            const owners = await apiCall('/owners');
+            const select = document.getElementById('new-service-owner');
+            select.innerHTML = owners.map(o => `<option value="${o.id}">${o.name} (${o.team || '-'})</option>`).join('');
+            document.getElementById('add-service-modal').classList.add('active');
+        }
+
+        async function createService() {
+            const name = document.getElementById('new-service-name').value;
+            const description = document.getElementById('new-service-desc').value;
+            const ownerId = document.getElementById('new-service-owner').value;
+            if (!name || !ownerId) return alert('请填写必填项');
+            await apiCall('/services', { method: 'POST', body: JSON.stringify({ name, description, ownerId }) });
+            closeModal('add-service-modal');
+            loadServices();
+        }
+
+        async function showAddEndpointModal() {
+            const [services, owners] = await Promise.all([apiCall('/services'), apiCall('/owners')]);
+            document.getElementById('new-endpoint-service').innerHTML = services.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            document.getElementById('new-endpoint-owner').innerHTML = '<option value="">同服务负责人</option>' + owners.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+            document.getElementById('add-endpoint-modal').classList.add('active');
+        }
+
+        async function showAddEndpointModalForService(serviceId) {
+            closeModal('service-modal');
+            const [services, owners] = await Promise.all([apiCall('/services'), apiCall('/owners')]);
+            document.getElementById('new-endpoint-service').innerHTML = services.map(s => `<option value="${s.id}" ${s.id === serviceId ? 'selected' : ''}>${s.name}</option>`).join('');
+            document.getElementById('new-endpoint-owner').innerHTML = '<option value="">同服务负责人</option>' + owners.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+            document.getElementById('add-endpoint-modal').classList.add('active');
+        }
+
+        async function createEndpoint() {
+            const serviceId = document.getElementById('new-endpoint-service').value;
+            const method = document.getElementById('new-endpoint-method').value;
+            const path = document.getElementById('new-endpoint-path').value;
+            const description = document.getElementById('new-endpoint-desc').value;
+            const ownerId = document.getElementById('new-endpoint-owner').value || undefined;
+            if (!serviceId || !method || !path) return alert('请填写必填项');
+            await apiCall('/endpoints', { method: 'POST', body: JSON.stringify({ serviceId, method, path, description, ownerId }) });
+            closeModal('add-endpoint-modal');
+            loadEndpoints();
+        }
+
+        function showAddOwnerModal() {
+            document.getElementById('add-owner-modal').classList.add('active');
+        }
+
+        async function createOwner() {
+            const name = document.getElementById('new-owner-name').value;
+            const email = document.getElementById('new-owner-email').value;
+            const team = document.getElementById('new-owner-team').value;
+            const phone = document.getElementById('new-owner-phone').value;
+            if (!name || !email) return alert('请填写必填项');
+            await apiCall('/owners', { method: 'POST', body: JSON.stringify({ name, email, team, phone }) });
+            closeModal('add-owner-modal');
+            loadOwners();
+        }
+
+        async function showChangeOwnerModal(serviceId) {
+            currentServiceId = serviceId;
+            const owners = await apiCall('/owners');
+            document.getElementById('change-owner-select').innerHTML = owners.map(o => `<option value="${o.id}">${o.name} (${o.team || '-'})</option>`).join('');
+            closeModal('service-modal');
+            document.getElementById('change-owner-modal').classList.add('active');
+        }
+
+        async function confirmChangeOwner() {
+            const newOwnerId = document.getElementById('change-owner-select').value;
+            const reason = document.getElementById('change-owner-reason').value;
+            await apiCall(`/services/${currentServiceId}/change-owner`, { method: 'POST', body: JSON.stringify({ newOwnerId, reason }) });
+            closeModal('change-owner-modal');
+            loadServices();
+        }
+
+        function showAlertLostModal(serviceId) {
+            currentServiceId = serviceId;
+            closeModal('service-modal');
+            document.getElementById('alert-lost-modal').classList.add('active');
+        }
+
+        async function confirmAlertLost() {
+            const notes = document.getElementById('alert-lost-notes').value;
+            await apiCall(`/services/${currentServiceId}/alert-lost`, { method: 'POST', body: JSON.stringify({ notes }) });
+            closeModal('alert-lost-modal');
+            loadServices();
+            loadAlerts();
+        }
+
+        async function exportDirectory() {
+            window.open(API_BASE + '/export/directory');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            if (tabName === 'services') loadServices();
+            if (tabName === 'environments') loadEnvironments();
+            if (tabName === 'endpoints') loadEndpoints();
+            if (tabName === 'owners') loadOwners();
+            if (tabName === 'alerts') loadAlerts();
+            if (tabName === 'requests') loadRequests();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        init();
+    </script>
+</body>
+</html>
