@@ -1,0 +1,8 @@
+[
+    {"application_no": "HT2024001", "stamp_date": "2024-01-16", "stamp_operator": "印章管理员A", "stamp_type": "公章", "stamp_count": 1, "is_supplementary": false, "is_withdrawn": false, "remarks": "正常盖章"},
+    {"application_no": "HT2024002", "stamp_date": "2024-01-17", "stamp_operator": "印章管理员A", "stamp_type": "合同专用章", "stamp_count": 2, "is_supplementary": false, "is_withdrawn": false, "remarks": "正常盖章"},
+    {"application_no": "HT2024003", "stamp_date": "2024-01-18", "stamp_operator": "印章管理员B", "stamp_type": "公章", "stamp_count": 1, "is_supplementary": true, "supplementary_reason": "附件遗漏补盖", "is_withdrawn": false, "remarks": "补盖附件"},
+    {"application_no": "HT2024004", "stamp_date": "2024-01-18", "stamp_operator": "印章管理员A", "stamp_type": "合同专用章", "stamp_count": 1, "is_supplementary": false, "is_withdrawn": true, "withdrawal_reason": "合同条款变更", "remarks": "撤回重提"},
+    {"application_no": "HT2024004", "stamp_date": "2024-01-19", "stamp_operator": "印章管理员A", "stamp_type": "合同专用章", "stamp_count": 1, "is_supplementary": false, "is_withdrawn": false, "remarks": "重新盖章"},
+    {"application_no": "HT2024005", "stamp_date": "2024-01-20", "stamp_operator": "测试用户", "stamp_type": "公章", "stamp_count": 3, "is_supplementary": false, "is_withdrawn": false, "remarks": "未授权测试"}
+]
