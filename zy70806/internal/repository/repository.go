@@ -151,6 +151,10 @@ func (r *ReconciliationItemRepository) BatchCreate(items []*models.Reconciliatio
 	return config.DB.Create(items).Error
 }
 
+func (r *ReconciliationItemRepository) DeleteByBatchID(batchID string) error {
+	return config.DB.Where("batch_id = ?", batchID).Delete(&models.ReconciliationItem{}).Error
+}
+
 func (r *ReconciliationItemRepository) GetByBatchID(batchID string) ([]*models.ReconciliationItem, error) {
 	var items []*models.ReconciliationItem
 	err := config.DB.Where("batch_id = ?", batchID).Find(&items).Error
@@ -248,6 +252,10 @@ func (r *DiscrepancyRepository) BatchResolveByItemID(itemID string) error {
 
 func (r *DiscrepancyRepository) Update(discrepancy *models.Discrepancy) error {
 	return config.DB.Save(discrepancy).Error
+}
+
+func (r *DiscrepancyRepository) DeleteByBatchID(batchID string) error {
+	return config.DB.Where("batch_id = ?", batchID).Delete(&models.Discrepancy{}).Error
 }
 
 type ReviewRecordRepository struct{}

@@ -52,6 +52,13 @@ func (s *ReconciliationService) ProcessBatch(batchID string) (*ReconciliationRes
 		return nil, err
 	}
 
+	if err := s.discrepancyRepo.DeleteByBatchID(batchID); err != nil {
+		return nil, err
+	}
+	if err := s.itemRepo.DeleteByBatchID(batchID); err != nil {
+		return nil, err
+	}
+
 	declarations, err := s.declarationRepo.GetByBatchID(batchID)
 	if err != nil {
 		return nil, err

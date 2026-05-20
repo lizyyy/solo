@@ -1,133 +1,106 @@
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.104ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="declarations"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.659ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="declarations"
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.134ms] [34;1m[rows:4][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "declarations" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.865ms] [34;1m[rows:0][0m CREATE TABLE `declarations` (`id` varchar(36),`created_at` datetime,`updated_at` datetime,`batch_id` varchar(36),`order_no` varchar(100),`tracking_no` varchar(100),`declarant` varchar(100),`declare_date` datetime,`hs_code` varchar(50),`product_name` varchar(255),`category` varchar(100),`quantity` integer,`unit_price` decimal(20,4),`total_amount` decimal(20,4),`currency` varchar(10),`declared_tax_amount` decimal(20,4),`status` varchar(50),`raw_data` text,PRIMARY KEY (`id`))
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.029ms] [34;1m[rows:-][0m SELECT * FROM `declarations` LIMIT 1
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.662ms] [34;1m[rows:0][0m CREATE INDEX `idx_declarations_hs_code` ON `declarations`(`hs_code`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.011ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "declarations" AND name = "idx_declarations_batch_id"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.581ms] [34;1m[rows:0][0m CREATE INDEX `idx_declarations_order_no` ON `declarations`(`order_no`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.043ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "declarations" AND name = "idx_declarations_order_no"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.545ms] [34;1m[rows:0][0m CREATE INDEX `idx_declarations_batch_id` ON `declarations`(`batch_id`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.024ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "declarations" AND name = "idx_declarations_hs_code"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.064ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="tariffs"
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.010ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="tariffs"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.603ms] [34;1m[rows:0][0m CREATE TABLE `tariffs` (`id` varchar(36),`created_at` datetime,`updated_at` datetime,`batch_id` varchar(36),`hs_code` varchar(50),`product_name` varchar(255),`category` varchar(100),`parent_hs_code` varchar(50),`tax_rate` decimal(10,6),`consumption_tax` decimal(10,6),`vat_rate` decimal(10,6),`effective_date` datetime,`expiry_date` datetime,`is_active` numeric,`raw_data` text,PRIMARY KEY (`id`))
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.064ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "tariffs" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.476ms] [34;1m[rows:0][0m CREATE INDEX `idx_tariffs_hs_code` ON `tariffs`(`hs_code`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.022ms] [34;1m[rows:-][0m SELECT * FROM `tariffs` LIMIT 1
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.521ms] [34;1m[rows:0][0m CREATE INDEX `idx_tariffs_batch_id` ON `tariffs`(`batch_id`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.026ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "tariffs" AND name = "idx_tariffs_batch_id"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.012ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="return_receipts"
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.019ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "tariffs" AND name = "idx_tariffs_hs_code"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.720ms] [34;1m[rows:0][0m CREATE TABLE `return_receipts` (`id` varchar(36),`created_at` datetime,`updated_at` datetime,`batch_id` varchar(36),`receipt_no` varchar(100),`order_no` varchar(100),`tracking_no` varchar(100),`return_date` datetime,`return_code` varchar(50),`return_reason` text,`return_category` varchar(100),`adjusted_amount` decimal(20,4),`adjusted_tax` decimal(20,4),`require_supplement` numeric,`supplement_deadline` datetime,`status` varchar(50),`raw_data` text,PRIMARY KEY (`id`))
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.011ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="return_receipts"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.479ms] [34;1m[rows:0][0m CREATE INDEX `idx_return_receipts_batch_id` ON `return_receipts`(`batch_id`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.051ms] [34;1m[rows:4][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "return_receipts" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.574ms] [34;1m[rows:0][0m CREATE INDEX `idx_return_receipts_order_no` ON `return_receipts`(`order_no`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.021ms] [34;1m[rows:-][0m SELECT * FROM `return_receipts` LIMIT 1
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.549ms] [34;1m[rows:0][0m CREATE INDEX `idx_return_receipts_receipt_no` ON `return_receipts`(`receipt_no`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.013ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "return_receipts" AND name = "idx_return_receipts_batch_id"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.043ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reconciliation_batches"
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.010ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "return_receipts" AND name = "idx_return_receipts_receipt_no"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.672ms] [34;1m[rows:0][0m CREATE TABLE `reconciliation_batches` (`id` varchar(36),`created_at` datetime,`updated_at` datetime,`name` varchar(200),`declaration_count` integer,`tariff_count` integer,`return_receipt_count` integer,`status` varchar(50),`matched_count` integer,`discrepancy_count` integer,`reviewed_count` integer,`total_tax_expected` decimal(20,4),`total_tax_declared` decimal(20,4),`total_tax_difference` decimal(20,4),`processed_at` datetime,`completed_at` datetime,PRIMARY KEY (`id`))
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.009ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "return_receipts" AND name = "idx_return_receipts_order_no"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.029ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reconciliation_items"
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.007ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reconciliation_batches"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[2.082ms] [34;1m[rows:0][0m CREATE TABLE `reconciliation_items` (`id` varchar(36),`created_at` datetime,`updated_at` datetime,`batch_id` varchar(36),`order_no` varchar(100),`tracking_no` varchar(100),`declaration_id` varchar(36),`tariff_id` varchar(36),`return_receipt_id` varchar(36),`hs_code` varchar(50),`product_name` varchar(255),`category` varchar(100),`quantity` integer,`declared_amount` decimal(20,4),`declared_currency` varchar(10),`declared_amount_cny` decimal(20,4),`exchange_rate` decimal(12,6),`applicable_tax_rate` decimal(10,6),`expected_tax_amount` decimal(20,4),`declared_tax_amount` decimal(20,4),`tax_difference` decimal(20,4),`has_return_receipt` numeric,`return_adjusted_tax` decimal(20,4),`supplement_tax_needed` decimal(20,4),`final_tax_amount` decimal(20,4),`status` varchar(50),`is_reviewed` numeric,`reviewed_at` datetime,`reviewed_by` varchar(100),`review_notes` text,PRIMARY KEY (`id`))
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.050ms] [34;1m[rows:1][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "reconciliation_batches" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.901ms] [34;1m[rows:0][0m CREATE INDEX `idx_reconciliation_items_order_no` ON `reconciliation_items`(`order_no`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.020ms] [34;1m[rows:-][0m SELECT * FROM `reconciliation_batches` LIMIT 1
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.797ms] [34;1m[rows:0][0m CREATE INDEX `idx_reconciliation_items_batch_id` ON `reconciliation_items`(`batch_id`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.010ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reconciliation_items"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.023ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="discrepancies"
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.040ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "reconciliation_items" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.685ms] [34;1m[rows:0][0m CREATE TABLE `discrepancies` (`id` varchar(36),`created_at` datetime,`updated_at` datetime,`batch_id` varchar(36),`reconciliation_item_id` varchar(36),`order_no` varchar(100),`discrepancy_type` varchar(50),`field_name` varchar(100),`expected_value` decimal(20,4),`actual_value` decimal(20,4),`difference` decimal(20,4),`explanation` text,`source` varchar(100),`resolution` varchar(50),`is_resolved` numeric,PRIMARY KEY (`id`))
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.034ms] [34;1m[rows:-][0m SELECT * FROM `reconciliation_items` LIMIT 1
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.702ms] [34;1m[rows:0][0m CREATE INDEX `idx_discrepancies_reconciliation_item_id` ON `discrepancies`(`reconciliation_item_id`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.018ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "reconciliation_items" AND name = "idx_reconciliation_items_order_no"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.713ms] [34;1m[rows:0][0m CREATE INDEX `idx_discrepancies_batch_id` ON `discrepancies`(`batch_id`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.009ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "reconciliation_items" AND name = "idx_reconciliation_items_batch_id"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.022ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="review_records"
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.007ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="discrepancies"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.700ms] [34;1m[rows:0][0m CREATE TABLE `review_records` (`id` varchar(36),`created_at` datetime,`updated_at` datetime,`reconciliation_item_id` varchar(36),`batch_id` varchar(36),`order_no` varchar(100),`reviewer` varchar(100),`review_action` varchar(50),`old_tax_amount` decimal(20,4),`new_tax_amount` decimal(20,4),`old_tax_rate` decimal(10,6),`new_tax_rate` decimal(10,6),`notes` text,PRIMARY KEY (`id`))
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.043ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "discrepancies" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.699ms] [34;1m[rows:0][0m CREATE INDEX `idx_review_records_batch_id` ON `review_records`(`batch_id`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.014ms] [34;1m[rows:-][0m SELECT * FROM `discrepancies` LIMIT 1
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.678ms] [34;1m[rows:0][0m CREATE INDEX `idx_review_records_reconciliation_item_id` ON `review_records`(`reconciliation_item_id`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.019ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "discrepancies" AND name = "idx_discrepancies_batch_id"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.009ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="exchange_rates"
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.011ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "discrepancies" AND name = "idx_discrepancies_reconciliation_item_id"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.551ms] [34;1m[rows:0][0m CREATE TABLE `exchange_rates` (`id` varchar(36),`created_at` datetime,`updated_at` datetime,`from_currency` varchar(10),`to_currency` varchar(10),`rate_date` datetime,`rate` decimal(12,6),`source` varchar(100),PRIMARY KEY (`id`))
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.009ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="review_records"
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.364ms] [34;1m[rows:0][0m CREATE INDEX `idx_exchange_rates_rate_date` ON `exchange_rates`(`rate_date`)
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.081ms] [34;1m[rows:3][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "review_records" AND sql IS NOT NULL order by type = "table" desc
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.024ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reports"
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.017ms] [34;1m[rows:-][0m SELECT * FROM `review_records` LIMIT 1
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.708ms] [34;1m[rows:0][0m CREATE TABLE `reports` (`id` varchar(36),`created_at` datetime,`updated_at` datetime,`batch_id` varchar(36),`report_type` varchar(50),`report_name` varchar(200),`generated_by` varchar(100),`generated_at` datetime,`file_format` varchar(20),`file_size` integer,`file_path` varchar(500),PRIMARY KEY (`id`))
 
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.027ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "review_records" AND name = "idx_review_records_reconciliation_item_id"
-
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.013ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "review_records" AND name = "idx_review_records_batch_id"
-
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.010ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="exchange_rates"
-
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.052ms] [34;1m[rows:2][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "exchange_rates" AND sql IS NOT NULL order by type = "table" desc
-
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.021ms] [34;1m[rows:-][0m SELECT * FROM `exchange_rates` LIMIT 1
-
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.025ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "exchange_rates" AND name = "idx_exchange_rates_rate_date"
-
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.013ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type='table' AND name="reports"
-
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.135ms] [34;1m[rows:2][0m SELECT sql FROM sqlite_master WHERE type IN ("table","index") AND tbl_name = "reports" AND sql IS NOT NULL order by type = "table" desc
-
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.048ms] [34;1m[rows:-][0m SELECT * FROM `reports` LIMIT 1
-
-2026/05/20 16:39:02 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
-[0m[33m[0.018ms] [34;1m[rows:-][0m SELECT count(*) FROM sqlite_master WHERE type = "index" AND tbl_name = "reports" AND name = "idx_reports_batch_id"
-2026/05/20 16:39:02 Database connected and migrated successfully
+2026/05/20 20:42:54 [32m/Users/lzy/pro/solo/workspaces/zy70806/config/config.go:23
+[0m[33m[0.651ms] [34;1m[rows:0][0m CREATE INDEX `idx_reports_batch_id` ON `reports`(`batch_id`)
+2026/05/20 20:42:54 Database connected and migrated successfully
 [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
 
 [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
@@ -156,14 +129,3 @@
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080
-[GIN-debug] [ERROR] listen tcp :8080: bind: address already in use
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                [GIN] 2026/05/20 - 16:39:06 | 200 |      23.375µs |       127.0.0.1 | GET      "/health"
-
-2026/05/20 16:39:06 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:109
-[0m[33m[2.094ms] [34;1m[rows:1][0m INSERT INTO `reconciliation_batches` (`id`,`created_at`,`updated_at`,`name`,`declaration_count`,`tariff_count`,`return_receipt_count`,`status`,`matched_count`,`discrepancy_count`,`reviewed_count`,`total_tax_expected`,`total_tax_declared`,`total_tax_difference`,`processed_at`,`completed_at`) VALUES ("19a99e06-75fd-4adc-8eca-007fc78ce0eb","2026-05-20 16:39:06.65","2026-05-20 16:39:06.65","Test",0,0,0,"pending",0,0,0,"0","0","0",NULL,NULL)
-[GIN] 2026/05/20 - 16:39:06 | 201 |     2.31625ms |       127.0.0.1 | POST     "/api/batches"
-[GIN] 2026/05/20 - 16:39:25 | 200 |      63.292µs |       127.0.0.1 | GET      "/health"
-
-2026/05/20 16:39:25 [32m/Users/lzy/pro/solo/workspaces/zy70806/internal/repository/repository.go:109
-[0m[33m[5.974ms] [34;1m[rows:1][0m INSERT INTO `reconciliation_batches` (`id`,`created_at`,`updated_at`,`name`,`declaration_count`,`tariff_count`,`return_receipt_count`,`status`,`matched_count`,`discrepancy_count`,`reviewed_count`,`total_tax_expected`,`total_tax_declared`,`total_tax_difference`,`processed_at`,`completed_at`) VALUES ("6df3ba1e-4ba2-4a40-b5e6-1c2bccb31a9b","2026-05-20 16:39:25.335","2026-05-20 16:39:25.335","Test",0,0,0,"pending",0,0,0,"0","0","0",NULL,NULL)
-[GIN] 2026/05/20 - 16:39:25 | 201 |    6.242583ms |       127.0.0.1 | POST     "/api/batches"

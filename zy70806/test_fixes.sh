@@ -1,127 +1,134 @@
 #!/bin/bash
 set -e
 
-echo "=== Test Script for Bug Fixes ==="
+CURL="curl -s --noproxy '*'"
+
+echo "=== Test Script for Round 2 Bug Fixes ==="
 echo ""
 
-# 1. Create Batch
-echo "1. Creating batch..."
-BATCH_RESPONSE=$(curl -s -X POST http://localhost:8080/api/batches \
+echo "=== 1. Creating batch ==="
+BATCH_RESPONSE=$($CURL -X POST http://localhost:8080/api/batches \
   -H "Content-Type: application/json" \
-  -d '{"name": "Test Batch 2024"}')
-BATCH_ID=$(echo "$BATCH_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+  -d '{"name": "Test Batch Round 2"}')
+BATCH_ID=$(echo "$BATCH_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id', d.get('error', 'ERROR')))")
 echo "   Batch ID: $BATCH_ID"
+echo "$BATCH_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print('   Status:', d.get('status', d.get('error', 'ERROR')))" 2>/dev/null || echo "   Response: $BATCH_RESPONSE"
 
-# 2. Import Declarations
 echo ""
-echo "2. Importing declarations..."
-curl -s -X POST "http://localhost:8080/api/batches/$BATCH_ID/import/declarations" \
+echo "=== 2. Importing declarations ==="
+$CURL -X POST "http://localhost:8080/api/batches/$BATCH_ID/import/declarations" \
   -F "file=@examples/declarations.csv" > /dev/null
 echo "   Done"
 
-# 3. Import Tariffs
 echo ""
-echo "3. Importing tariffs..."
-curl -s -X POST "http://localhost:8080/api/batches/$BATCH_ID/import/tariffs" \
+echo "=== 3. Importing tariffs ==="
+$CURL -X POST "http://localhost:8080/api/batches/$BATCH_ID/import/tariffs" \
   -F "file=@examples/tariffs.json" > /dev/null
 echo "   Done"
 
-# 4. Import Return Receipts
 echo ""
-echo "4. Importing return receipts..."
-curl -s -X POST "http://localhost:8080/api/batches/$BATCH_ID/import/return-receipts" \
+echo "=== 4. Importing return receipts ==="
+$CURL -X POST "http://localhost:8080/api/batches/$BATCH_ID/import/return-receipts" \
   -F "file=@examples/return_receipts.json" > /dev/null
 echo "   Done"
 
-# 5. Process Batch
 echo ""
-echo "5. Processing batch..."
-curl -s -X POST "http://localhost:8080/api/batches/$BATCH_ID/process" > /dev/null
+echo "=== 5. First ProcessBatch (should create items) ==="
+$CURL -X POST "http://localhost:8080/api/batches/$BATCH_ID/process" > /dev/null
 echo "   Done"
 
-# 6. Check Batch Summary (Bug Fix #4: No zero counts)
 echo ""
-echo "6. Checking batch summary..."
-BATCH_DATA=$(curl -s "http://localhost:8080/api/batches/$BATCH_ID")
-MATCHED_COUNT=$(echo "$BATCH_DATA" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('matched_count',-1))")
-DISC_COUNT=$(echo "$BATCH_DATA" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('discrepancy_count',-1))")
-TOTAL_TAX=$(echo "$BATCH_DATA" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('total_tax_expected',-1))")
-echo "   Matched: $MATCHED_COUNT, Discrepancy: $DISC_COUNT, TotalTax: $TOTAL_TAX"
-if [ "$MATCHED_COUNT" = "0" ] && [ "$DISC_COUNT" = "0" ]; then
-    echo "   FAIL: Counts are still zero!"
+echo "=== 6. Get item count before second process ==="
+ITEMS_BEFORE=$($CURL "http://localhost:8080/api/batches/$BATCH_ID/items" | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d))")
+echo "   Item count: $ITEMS_BEFORE"
+
+echo ""
+echo "=== 7. Second ProcessBatch (should NOT duplicate items) ==="
+$CURL -X POST "http://localhost:8080/api/batches/$BATCH_ID/process" > /dev/null
+echo "   Done"
+
+echo ""
+echo "=== 8. Get item count after second process (Bug Fix #2) ==="
+ITEMS_AFTER=$($CURL "http://localhost:8080/api/batches/$BATCH_ID/items" | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d))")
+echo "   Item count before: $ITEMS_BEFORE, after: $ITEMS_AFTER"
+if [ "$ITEMS_BEFORE" = "$ITEMS_AFTER" ]; then
+    echo "   PASS: No duplicate items after re-process!"
 else
-    echo "   PASS: Batch summary counts are not zero!"
+    echo "   FAIL: Items duplicated! Before=$ITEMS_BEFORE, After=$ITEMS_AFTER"
 fi
 
-# 7. Check Discrepancies have item_id (Bug Fix #1)
 echo ""
-echo "7. Checking discrepancies have reconciliation_item_id..."
-DISCREPANCIES=$(curl -s "http://localhost:8080/api/batches/$BATCH_ID/discrepancies")
-EMPTY_ID_COUNT=$(echo "$DISCREPANCIES" | python3 -c "import sys,json; d=json.load(sys.stdin); print(sum(1 for x in d if x.get('reconciliation_item_id') in ('', None)))")
-TOTAL_DISC=$(echo "$DISCREPANCIES" | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d))")
-echo "   Total discrepancies: $TOTAL_DISC, Empty item_id: $EMPTY_ID_COUNT"
-if [ "$EMPTY_ID_COUNT" = "0" ]; then
-    echo "   PASS: All discrepancies have reconciliation_item_id!"
-else
-    echo "   FAIL: Some discrepancies have empty item_id!"
-fi
-
-# 8. Get reconciliation items
-echo ""
-echo "8. Getting reconciliation items..."
-ITEMS=$(curl -s "http://localhost:8080/api/batches/$BATCH_ID/items")
+echo "=== 9. Get first item for review test ==="
+ITEMS=$($CURL "http://localhost:8080/api/batches/$BATCH_ID/items")
 FIRST_ITEM_ID=$(echo "$ITEMS" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d[0]['id'])")
-echo "   First item ID: $FIRST_ITEM_ID"
+FIRST_ITEM_TAX=$(echo "$ITEMS" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d[0]['final_tax_amount'])")
+echo "   Item ID: $FIRST_ITEM_ID"
+echo "   Final tax before review: $FIRST_ITEM_TAX"
 
-# 9. Review item (Bug Fix #2: Resolve discrepancies)
 echo ""
-echo "9. Reviewing item with resolve_discrepancies=true..."
-REVIEW_RESPONSE=$(curl -s -X POST "http://localhost:8080/api/items/review" \
+echo "=== 10. Review with ONLY new_tax_rate (Bug Fix #1) ==="
+echo "   Sending: new_tax_rate=0.15, NO new_tax_amount"
+REVIEW_RESPONSE=$($CURL -X POST "http://localhost:8080/api/items/review" \
   -H "Content-Type: application/json" \
   -d "{
     \"item_id\": \"$FIRST_ITEM_ID\",
     \"reviewer\": \"TestUser\",
     \"new_tax_rate\": 0.15,
-    \"notes\": \"Adjusted rate\",
+    \"notes\": \"Only adjust rate\",
     \"resolve_discrepancies\": true
 }")
-echo "   Review done"
+echo "   Review response: $(echo "$REVIEW_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print('Old:', d.get('old_tax_amount','ERR'), 'New:', d.get('new_tax_amount','ERR'))" 2>/dev/null || echo "$REVIEW_RESPONSE")"
 
-# 10. Check if discrepancies were resolved
 echo ""
-echo "10. Checking if discrepancies were resolved..."
-ITEM_DISCREPANCIES=$(curl -s "http://localhost:8080/api/items/$FIRST_ITEM_ID/trace")
-UNRESOLVED_COUNT=$(echo "$ITEM_DISCREPANCIES" | python3 -c "import sys,json; d=json.load(sys.stdin); print(sum(1 for x in d.get('discrepancies',[]) if not x.get('is_resolved', False)))")
-echo "   Unresolved discrepancies after review: $UNRESOLVED_COUNT"
-if [ "$UNRESOLVED_COUNT" = "0" ]; then
-    echo "   PASS: All discrepancies resolved after review!"
+echo "=== 11. Check final_tax_amount was NOT set to 0 ==="
+ITEM_AFTER=$($CURL "http://localhost:8080/api/items/$FIRST_ITEM_ID/trace")
+FINAL_TAX_AFTER=$(echo "$ITEM_AFTER" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['item']['final_tax_amount'])")
+echo "   Final tax after review: $FINAL_TAX_AFTER"
+
+if [ "$FINAL_TAX_AFTER" = "0" ] || [ "$FINAL_TAX_AFTER" = "0E-10" ] || [ "$FINAL_TAX_AFTER" = "0.0000" ]; then
+    echo "   FAIL: final_tax_amount was incorrectly set to 0!"
 else
-    echo "   FAIL: Some discrepancies still not resolved!"
+    echo "   PASS: final_tax_amount preserved ($FINAL_TAX_AFTER)!"
 fi
 
-# 11. Generate report (Bug Fix #3: Report download)
 echo ""
-echo "11. Generating report..."
-REPORT_RESPONSE=$(curl -s -X POST "http://localhost:8080/api/reports" \
+echo "=== 12. Check discrepancies resolved (from round 1) ==="
+UNRESOLVED=$(echo "$ITEM_AFTER" | python3 -c "import sys,json; d=json.load(sys.stdin); print(sum(1 for x in d.get('discrepancies',[]) if not x.get('is_resolved', False)))")
+echo "   Unresolved discrepancies: $UNRESOLVED"
+if [ "$UNRESOLVED" = "0" ]; then
+    echo "   PASS: All discrepancies resolved!"
+else
+    echo "   FAIL: $UNRESOLVED discrepancies still not resolved"
+fi
+
+echo ""
+echo "=== 13. Check batch summary is NOT zero ==="
+BATCH_DATA=$($CURL "http://localhost:8080/api/batches/$BATCH_ID")
+MATCHED=$(echo "$BATCH_DATA" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('matched_count',-1))")
+DISC=$(echo "$BATCH_DATA" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('discrepancy_count',-1))")
+echo "   Matched: $MATCHED, Discrepancy: $DISC"
+if [ "$MATCHED" = "-1" ] || [ "$DISC" = "-1" ]; then
+    echo "   FAIL: Could not get batch summary!"
+elif [ "$MATCHED" = "0" ] && [ "$DISC" = "0" ]; then
+    echo "   FAIL: Batch summary is still zero!"
+else
+    echo "   PASS: Batch summary has real values!"
+fi
+
+echo ""
+echo "=== 14. Test report generation and download (round 1) ==="
+REPORT_RESPONSE=$($CURL -X POST "http://localhost:8080/api/reports" \
   -H "Content-Type: application/json" \
-  -d "{
-    \"batch_id\": \"$BATCH_ID\",
-    \"report_type\": \"full\",
-    \"format\": \"csv\",
-    \"generated_by\": \"TestUser\"
-}")
-REPORT_ID=$(echo "$REPORT_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+  -d "{\"batch_id\":\"$BATCH_ID\",\"report_type\":\"full\",\"format\":\"csv\",\"generated_by\":\"Test\"}")
+REPORT_ID=$(echo "$REPORT_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('id','ERROR'))")
 echo "   Report ID: $REPORT_ID"
 
-# 12. Test report download
-echo ""
-echo "12. Testing report download..."
-DOWNLOAD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/api/reports/$REPORT_ID/download")
-echo "   Download status code: $DOWNLOAD_STATUS"
+DOWNLOAD_STATUS=$($CURL -o /dev/null -w "%{http_code}" "http://localhost:8080/api/reports/$REPORT_ID/download")
+echo "   Download status: $DOWNLOAD_STATUS"
 if [ "$DOWNLOAD_STATUS" = "200" ]; then
     echo "   PASS: Report download works!"
 else
-    echo "   FAIL: Report download failed with status $DOWNLOAD_STATUS!"
+    echo "   FAIL: Report download failed!"
 fi
 
 echo ""

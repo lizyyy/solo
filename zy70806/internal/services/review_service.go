@@ -26,12 +26,12 @@ func NewReviewService() *ReviewService {
 }
 
 type ReviewRequest struct {
-	ItemID          string          `json:"item_id"`
-	Reviewer        string          `json:"reviewer"`
-	NewTaxRate      decimal.Decimal `json:"new_tax_rate"`
-	NewTaxAmount    decimal.Decimal `json:"new_tax_amount"`
-	Notes           string          `json:"notes"`
-	ResolveDiscrepancies bool       `json:"resolve_discrepancies"`
+	ItemID                string           `json:"item_id"`
+	Reviewer              string           `json:"reviewer"`
+	NewTaxRate            *decimal.Decimal `json:"new_tax_rate,omitempty"`
+	NewTaxAmount          *decimal.Decimal `json:"new_tax_amount,omitempty"`
+	Notes                 string           `json:"notes"`
+	ResolveDiscrepancies  bool             `json:"resolve_discrepancies"`
 }
 
 type ReviewResult struct {
@@ -52,15 +52,15 @@ func (s *ReviewService) ReviewItem(req *ReviewRequest) (*ReviewResult, error) {
 	oldTaxRate := item.ApplicableTaxRate
 	oldTaxAmount := item.FinalTaxAmount
 
-	if req.NewTaxRate.GreaterThan(decimal.Zero) {
-		item.ApplicableTaxRate = req.NewTaxRate
-		expectedTax := item.DeclaredAmountCNY.Mul(req.NewTaxRate)
+	if req.NewTaxRate != nil {
+		item.ApplicableTaxRate = *req.NewTaxRate
+		expectedTax := item.DeclaredAmountCNY.Mul(*req.NewTaxRate)
 		item.ExpectedTaxAmount = expectedTax
 		item.TaxDifference = expectedTax.Sub(item.DeclaredTaxAmount)
 	}
 
-	if req.NewTaxAmount.GreaterThanOrEqual(decimal.Zero) {
-		item.FinalTaxAmount = req.NewTaxAmount
+	if req.NewTaxAmount != nil {
+		item.FinalTaxAmount = *req.NewTaxAmount
 	}
 
 	item.IsReviewed = true
