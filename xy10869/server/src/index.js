@@ -66,8 +66,13 @@ const initDatabase = async () => {
   const fs = require('fs');
   const dataDir = path.join(__dirname, '../../data');
   
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+  try {
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+      logger.info('已创建数据目录:', dataDir);
+    }
+  } catch (err) {
+    logger.warn('创建数据目录失败（可能已存在或权限问题）:', err.message);
   }
   
   const db = new sqlite3.Database(dbPath);
