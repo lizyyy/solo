@@ -1,0 +1,56 @@
+[
+  {
+    "id": "RULE_001",
+    "name": "618母婴节双倍积分",
+    "type": "multiplier",
+    "startTime": "2026-05-20 00:00:00",
+    "endTime": "2026-06-20 23:59:59",
+    "conditions": {
+      "minAmount": 100,
+      "storeIds": ["STORE001", "STORE002", "STORE003"]
+    },
+    "multiplier": 2,
+    "priority": 10,
+    "enabled": true
+  },
+  {
+    "id": "RULE_002",
+    "name": "钻石会员专属三倍",
+    "type": "multiplier",
+    "startTime": "2026-01-01 00:00:00",
+    "endTime": "2026-12-31 23:59:59",
+    "conditions": {
+      "memberLevels": ["diamond"]
+    },
+    "multiplier": 3,
+    "priority": 20,
+    "enabled": true
+  },
+  {
+    "id": "RULE_003",
+    "name": "新客首单赠500积分",
+    "type": "bonus",
+    "startTime": "2026-01-01 00:00:00",
+    "endTime": "2026-12-31 23:59:59",
+    "conditions": {
+      "minAmount": 200
+    },
+    "bonusPoints": 500,
+    "maxPointsPerTransaction": 5000,
+    "priority": 5,
+    "enabled": true
+  },
+  {
+    "id": "RULE_004",
+    "name": "超高倍率测试（会被限制）",
+    "type": "multiplier",
+    "startTime": "2026-05-20 00:00:00",
+    "endTime": "2026-05-25 23:59:59",
+    "conditions": {
+      "minAmount": 1000
+    },
+    "multiplier": 15,
+    "priority": 50,
+    "enabled": true
+  }
+]

@@ -1,0 +1,321 @@
+{
+  "batches": [
+    {
+      "id": "BATCH-36BEC13719F9",
+      "batchHash": "641aaa065c734534b57b16db1e9e2c2b",
+      "totalCount": 7,
+      "successCount": 3,
+      "pendingCount": 3,
+      "failedCount": 1,
+      "totalPoints": 2804,
+      "createdAt": "2026-05-20T11:26:45.015Z"
+    }
+  ],
+  "records": [
+    {
+      "id": "7562b7ed-f4e5-4d02-b43e-aacf27d236bc",
+      "batchId": "BATCH-36BEC13719F9",
+      "receiptNo": "RCP000001",
+      "memberPhone": "13800138001",
+      "transactionTime": "2026-05-20 10:30:00",
+      "amount": 328.5,
+      "calculatedPoints": 1656,
+      "status": "success",
+      "rawData": {
+        "receiptNo": "RCP000001",
+        "memberPhone": "13800138001",
+        "transactionTime": "2026-05-20 10:30:00",
+        "transactionType": "purchase",
+        "amount": 328.5,
+        "storeId": "STORE001",
+        "productId": "",
+        "productName": "婴儿奶粉3段",
+        "activityId": "",
+        "operator": "张姐"
+      },
+      "appliedRules": [
+        "RULE_001",
+        "RULE_003"
+      ],
+      "traceId": "TRACE-FA24D6D0899E426D",
+      "createdAt": "2026-05-20T11:26:45.014Z"
+    },
+    {
+      "id": "9428c64e-f402-44e4-b35f-28c90fdcb096",
+      "batchId": "BATCH-36BEC13719F9",
+      "receiptNo": "RCP000002",
+      "memberPhone": "13800138003",
+      "transactionTime": "2026-05-20 11:15:00",
+      "amount": 1580,
+      "calculatedPoints": 5000,
+      "status": "pending",
+      "rawData": {
+        "receiptNo": "RCP000002",
+        "memberPhone": "13800138003",
+        "transactionTime": "2026-05-20 11:15:00",
+        "transactionType": "purchase",
+        "amount": 1580,
+        "storeId": "STORE001",
+        "productId": "",
+        "productName": "婴儿推车全套",
+        "activityId": "",
+        "operator": "李姐"
+      },
+      "appliedRules": [
+        "RULE_004",
+        "RULE_002",
+        "RULE_001",
+        "RULE_003"
+      ],
+      "traceId": "TRACE-1653EF7A62EF4270",
+      "createdAt": "2026-05-20T11:26:45.014Z"
+    },
+    {
+      "id": "4ffe826c-4eae-445a-b171-d28fd89af838",
+      "batchId": "BATCH-36BEC13719F9",
+      "receiptNo": "RCP000003",
+      "memberPhone": "13800138002",
+      "transactionTime": "2026-05-20 14:20:00",
+      "amount": 88,
+      "calculatedPoints": 88,
+      "status": "success",
+      "rawData": {
+        "receiptNo": "RCP000003",
+        "memberPhone": "13800138002",
+        "transactionTime": "2026-05-20 14:20:00",
+        "transactionType": "purchase",
+        "amount": 88,
+        "storeId": "STORE002",
+        "productId": "",
+        "productName": "儿童湿巾5包",
+        "activityId": "",
+        "operator": "王姐"
+      },
+      "appliedRules": [],
+      "traceId": "TRACE-13B4C99EE0A3473B",
+      "createdAt": "2026-05-20T11:26:45.014Z"
+    },
+    {
+      "id": "ef1ed974-24aa-4b11-96ac-a2a06a85cec2",
+      "batchId": "BATCH-36BEC13719F9",
+      "receiptNo": "RCP000004",
+      "memberPhone": "13800138001",
+      "transactionTime": "2026-05-20 16:45:00",
+      "amount": 164.25,
+      "calculatedPoints": 0,
+      "status": "pending",
+      "errorCode": "RETURN_WITHOUT_PURCHASE",
+      "errorMessage": "未找到对应的原始消费记录",
+      "suggestion": "未找到对应消费记录，请核实退货小票是否属于本系统",
+      "rawData": {
+        "receiptNo": "RCP000004",
+        "memberPhone": "13800138001",
+        "transactionTime": "2026-05-20 16:45:00",
+        "transactionType": "return",
+        "amount": 164.25,
+        "storeId": "STORE001",
+        "productId": "",
+        "productName": "奶粉退货半罐",
+        "activityId": "",
+        "operator": "张姐"
+      },
+      "appliedRules": [],
+      "traceId": "TRACE-2C32B001E1154332",
+      "createdAt": "2026-05-20T11:26:45.015Z"
+    },
+    {
+      "id": "c21eba19-b199-4e47-8150-a1da2e1ee9b6",
+      "batchId": "BATCH-36BEC13719F9",
+      "receiptNo": "RCP000005",
+      "memberPhone": "13999999999",
+      "transactionTime": "2026-05-20 09:00:00",
+      "amount": 299,
+      "calculatedPoints": 0,
+      "status": "failed",
+      "errorCode": "MEMBER_NOT_FOUND",
+      "errorMessage": "会员 13999999999 不存在",
+      "suggestion": "请检查会员手机号是否正确，或先为该顾客注册会员",
+      "rawData": {
+        "receiptNo": "RCP000005",
+        "memberPhone": "13999999999",
+        "transactionTime": "2026-05-20 09:00:00",
+        "transactionType": "purchase",
+        "amount": 299,
+        "storeId": "STORE003",
+        "productId": "",
+        "productName": "纸尿裤XL号",
+        "activityId": "",
+        "operator": "赵姐"
+      },
+      "appliedRules": [],
+      "traceId": "TRACE-30BC632720194029",
+      "createdAt": "2026-05-20T11:26:45.015Z"
+    },
+    {
+      "id": "f8dfdaac-b2f3-4537-ba99-abb682a94b1b",
+      "batchId": "BATCH-36BEC13719F9",
+      "receiptNo": "RCP000006",
+      "memberPhone": "13800138004",
+      "transactionTime": "2026-05-20 15:30:00",
+      "amount": 1250,
+      "calculatedPoints": 5000,
+      "status": "pending",
+      "rawData": {
+        "receiptNo": "RCP000006",
+        "memberPhone": "13800138004",
+        "transactionTime": "2026-05-20 15:30:00",
+        "transactionType": "purchase",
+        "amount": 1250,
+        "storeId": "STORE002",
+        "productId": "",
+        "productName": "安全座椅",
+        "activityId": "",
+        "operator": "刘姐"
+      },
+      "appliedRules": [
+        "RULE_004",
+        "RULE_001",
+        "RULE_003"
+      ],
+      "traceId": "TRACE-C16F2E257A464226",
+      "createdAt": "2026-05-20T11:26:45.015Z"
+    },
+    {
+      "id": "11af465f-efc1-4ed8-9eba-1c7b19d3f6d2",
+      "batchId": "BATCH-36BEC13719F9",
+      "receiptNo": "RCP000007",
+      "memberPhone": "13800138002",
+      "transactionTime": "2026-05-19 20:00:00",
+      "amount": 560,
+      "calculatedPoints": 1060,
+      "status": "success",
+      "rawData": {
+        "receiptNo": "RCP000007",
+        "memberPhone": "13800138002",
+        "transactionTime": "2026-05-19 20:00:00",
+        "transactionType": "purchase",
+        "amount": 560,
+        "storeId": "STORE001",
+        "productId": "",
+        "productName": "婴儿床品套装",
+        "activityId": "",
+        "operator": "李姐"
+      },
+      "appliedRules": [
+        "RULE_003"
+      ],
+      "traceId": "TRACE-444017C824F8481A",
+      "createdAt": "2026-05-20T11:26:45.015Z"
+    }
+  ],
+  "members": [
+    {
+      "phone": "13800138001",
+      "name": "张妈妈",
+      "level": "gold",
+      "totalPoints": 5680,
+      "availablePoints": 3200,
+      "joinDate": "2024-01-15",
+      "lastActiveTime": "2026-05-18"
+    },
+    {
+      "phone": "13800138002",
+      "name": "李阿姨",
+      "level": "silver",
+      "totalPoints": 2150,
+      "availablePoints": 850,
+      "joinDate": "2024-03-20",
+      "lastActiveTime": "2026-05-15"
+    },
+    {
+      "phone": "13800138003",
+      "name": "王女士",
+      "level": "diamond",
+      "totalPoints": 12800,
+      "availablePoints": 9500,
+      "joinDate": "2023-06-10",
+      "lastActiveTime": "2026-05-19"
+    },
+    {
+      "phone": "13800138004",
+      "name": "陈奶奶",
+      "level": "normal",
+      "totalPoints": 680,
+      "availablePoints": 680,
+      "joinDate": "2025-02-28",
+      "lastActiveTime": "2026-04-10"
+    }
+  ],
+  "rules": [
+    {
+      "id": "RULE_001",
+      "name": "618母婴节双倍积分",
+      "type": "multiplier",
+      "startTime": "2026-05-20 00:00:00",
+      "endTime": "2026-06-20 23:59:59",
+      "conditions": {
+        "minAmount": 100,
+        "productCategories": [],
+        "memberLevels": [],
+        "storeIds": [
+          "STORE001",
+          "STORE002",
+          "STORE003"
+        ]
+      },
+      "multiplier": 2,
+      "priority": 10,
+      "enabled": true
+    },
+    {
+      "id": "RULE_002",
+      "name": "钻石会员专属三倍",
+      "type": "multiplier",
+      "startTime": "2026-01-01 00:00:00",
+      "endTime": "2026-12-31 23:59:59",
+      "conditions": {
+        "productCategories": [],
+        "memberLevels": [
+          "diamond"
+        ],
+        "storeIds": []
+      },
+      "multiplier": 3,
+      "priority": 20,
+      "enabled": true
+    },
+    {
+      "id": "RULE_003",
+      "name": "新客首单赠500积分",
+      "type": "bonus",
+      "startTime": "2026-01-01 00:00:00",
+      "endTime": "2026-12-31 23:59:59",
+      "conditions": {
+        "minAmount": 200,
+        "productCategories": [],
+        "memberLevels": [],
+        "storeIds": []
+      },
+      "bonusPoints": 500,
+      "maxPointsPerTransaction": 5000,
+      "priority": 5,
+      "enabled": true
+    },
+    {
+      "id": "RULE_004",
+      "name": "超高倍率测试（会被限制）",
+      "type": "multiplier",
+      "startTime": "2026-05-20 00:00:00",
+      "endTime": "2026-05-25 23:59:59",
+      "conditions": {
+        "minAmount": 1000,
+        "productCategories": [],
+        "memberLevels": [],
+        "storeIds": []
+      },
+      "multiplier": 15,
+      "priority": 50,
+      "enabled": true
+    }
+  ]
+}
