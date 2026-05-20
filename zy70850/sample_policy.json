@@ -1,0 +1,26 @@
+{
+  "policy_id": "P001",
+  "policy_number": "POL-2024-001",
+  "insured_name": "张三",
+  "id_number": "310101199001011234",
+  "effective_date": "2023-11-20T00:00:00",
+  "expiry_date": "2024-11-20T00:00:00",
+  "coverages": [
+    {
+      "coverage_type": "住院医疗",
+      "limit_amount": 50000,
+      "used_amount": 10000,
+      "deductible": 100,
+      "ratio": 0.9
+    },
+    {
+      "coverage_type": "门诊医疗",
+      "limit_amount": 10000,
+      "used_amount": 2000,
+      "deductible": 50,
+      "ratio": 0.8
+    }
+  ],
+  "total_limit": 60000,
+  "remaining_limit": 48000
+}
