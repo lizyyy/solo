@@ -33,16 +33,17 @@ class TaskClassificationService:
                 'row_number': task_data.row_number
             })
         
-        existing_task = self.db.query(SampleTask).filter(
-            SampleTask.task_no == task_data.task_no
-        ).first()
-        if existing_task:
-            errors.append({
-                'error_type': 'duplicate',
-                'error_field': 'task_no',
-                'error_message': f'任务编号 {task_data.task_no} 已存在',
-                'row_number': task_data.row_number
-            })
+        if task_data.task_no:
+            existing_task = self.db.query(SampleTask).filter(
+                SampleTask.task_no == task_data.task_no
+            ).first()
+            if existing_task:
+                errors.append({
+                    'error_type': 'duplicate',
+                    'error_field': 'task_no',
+                    'error_message': f'任务编号 {task_data.task_no} 已存在',
+                    'row_number': task_data.row_number
+                })
         
         if task_data.talent_schedule:
             if task_data.talent_schedule.live_date:
@@ -55,21 +56,22 @@ class TaskClassificationService:
                         'row_number': task_data.row_number
                     })
         
-        for idx, sample in enumerate(task_data.samples):
-            if not sample.sample_code:
-                errors.append({
-                    'error_type': 'missing_field',
-                    'error_field': f'samples[{idx}].sample_code',
-                    'error_message': f'第{idx+1}个样品编号不能为空',
-                    'row_number': task_data.row_number
-                })
-            if not sample.sample_name:
-                errors.append({
-                    'error_type': 'missing_field',
-                    'error_field': f'samples[{idx}].sample_name',
-                    'error_message': f'第{idx+1}个样品名称不能为空',
-                    'row_number': task_data.row_number
-                })
+        if task_data.samples:
+            for idx, sample in enumerate(task_data.samples):
+                if not sample.sample_code:
+                    errors.append({
+                        'error_type': 'missing_field',
+                        'error_field': f'samples[{idx}].sample_code',
+                        'error_message': f'第{idx+1}个样品编号不能为空',
+                        'row_number': task_data.row_number
+                    })
+                if not sample.sample_name:
+                    errors.append({
+                        'error_type': 'missing_field',
+                        'error_field': f'samples[{idx}].sample_name',
+                        'error_message': f'第{idx+1}个样品名称不能为空',
+                        'row_number': task_data.row_number
+                    })
         
         return errors
     
@@ -112,8 +114,11 @@ class TaskService:
         else:
             status = TaskStatus.PROCESSING
         
+        has_duplicate = any(e['error_type'] == 'duplicate' for e in errors)
+        task_no_to_save = None if has_duplicate else task_data.task_no
+        
         task = SampleTask(
-            task_no=task_data.task_no,
+            task_no=task_no_to_save,
             batch_no=task_data.batch_no,
             status=status,
             category=category,
@@ -135,15 +140,16 @@ class TaskService:
             talent_schedule = self._create_or_get_talent_schedule(task_data.talent_schedule)
             task.talent_schedule_id = talent_schedule.id
         
-        for sample_item in task_data.samples:
-            sample = Sample(
-                task_id=task.id,
-                sample_code=sample_item.sample_code,
-                sample_name=sample_item.sample_name,
-                quantity=sample_item.quantity,
-                unit=sample_item.unit
-            )
-            self.db.add(sample)
+        if task_data.samples:
+            for sample_item in task_data.samples:
+                sample = Sample(
+                    task_id=task.id,
+                    sample_code=sample_item.sample_code,
+                    sample_name=sample_item.sample_name,
+                    quantity=sample_item.quantity,
+                    unit=sample_item.unit
+                )
+                self.db.add(sample)
         
         if task_data.deposit:
             deposit = DepositRecord(

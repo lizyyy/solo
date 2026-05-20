@@ -26,24 +26,24 @@ class UserResponse(UserBase):
 
 
 class SampleItem(BaseModel):
-    sample_code: str = Field(..., max_length=50)
-    sample_name: str = Field(..., max_length=200)
+    sample_code: Optional[str] = Field(None, max_length=50)
+    sample_name: Optional[str] = Field(None, max_length=200)
     quantity: int = Field(default=1, ge=1)
     unit: str = Field(default="件", max_length=20)
 
 
 class BrandBatchInput(BaseModel):
-    batch_no: str = Field(..., max_length=50)
-    brand_name: str = Field(..., max_length=200)
+    batch_no: Optional[str] = Field(None, max_length=50)
+    brand_name: Optional[str] = Field(None, max_length=200)
     product_line: Optional[str] = Field(None, max_length=100)
     batch_date: Optional[datetime] = None
 
 
 class TalentScheduleInput(BaseModel):
-    schedule_no: str = Field(..., max_length=50)
-    talent_name: str = Field(..., max_length=100)
+    schedule_no: Optional[str] = Field(None, max_length=50)
+    talent_name: Optional[str] = Field(None, max_length=100)
     talent_id: Optional[str] = Field(None, max_length=50)
-    live_date: datetime
+    live_date: Optional[datetime] = None
     platform: Optional[str] = Field(None, max_length=50)
     room_id: Optional[str] = Field(None, max_length=50)
 
@@ -55,10 +55,10 @@ class DepositInput(BaseModel):
 
 
 class SampleTaskCreate(BaseModel):
-    task_no: str = Field(..., max_length=50)
+    task_no: Optional[str] = Field(None, max_length=50)
     batch_no: Optional[str] = Field(None, max_length=50)
     
-    samples: List[SampleItem]
+    samples: Optional[List[SampleItem]] = None
     brand_batch: Optional[BrandBatchInput] = None
     talent_schedule: Optional[TalentScheduleInput] = None
     deposit: Optional[DepositInput] = None
@@ -72,10 +72,13 @@ class SampleTaskCreate(BaseModel):
     @validator('raw_data', pre=True, always=True)
     def ensure_raw_data(cls, v, values):
         if v is None:
+            samples_data = []
+            if values.get('samples'):
+                samples_data = [s.model_dump() for s in values.get('samples', [])]
             task_data = {
                 'task_no': values.get('task_no'),
                 'batch_no': values.get('batch_no'),
-                'samples': [s.dict() for s in values.get('samples', [])],
+                'samples': samples_data,
                 'submitted_by': values.get('submitted_by')
             }
             return task_data
@@ -84,7 +87,7 @@ class SampleTaskCreate(BaseModel):
 
 class SampleTaskResponse(BaseModel):
     id: int
-    task_no: str
+    task_no: Optional[str]
     batch_no: Optional[str]
     status: TaskStatus
     category: Optional[DataCategory]

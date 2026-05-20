@@ -45,7 +45,7 @@ class SampleTask(Base):
     __tablename__ = "sample_tasks"
     
     id = Column(Integer, primary_key=True, index=True)
-    task_no = Column(String(50), unique=True, index=True, nullable=False)
+    task_no = Column(String(50), index=True, nullable=True)
     batch_no = Column(String(50), index=True)
     
     status = Column(Enum(TaskStatus), default=TaskStatus.PROCESSING)
@@ -77,8 +77,8 @@ class Sample(Base):
     id = Column(Integer, primary_key=True, index=True)
     task_id = Column(Integer, ForeignKey("sample_tasks.id"), nullable=False)
     
-    sample_code = Column(String(50), index=True, nullable=False)
-    sample_name = Column(String(200), nullable=False)
+    sample_code = Column(String(50), index=True, nullable=True)
+    sample_name = Column(String(200), nullable=True)
     quantity = Column(Integer, default=1)
     unit = Column(String(20), default="件")
     

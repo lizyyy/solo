@@ -195,3 +195,68 @@ def get_users(db: Session = Depends(get_db)):
     from app.models import User
     users = db.query(User).all()
     return [{"id": u.id, "username": u.username, "full_name": u.full_name} for u in users]
+
+
+@router.get("/tasks/{task_id}/report", summary="生成任务最终报告（可追溯）")
+def get_task_report(task_id: int, db: Session = Depends(get_db)):
+    from app.export_service import ExportService
+    try:
+        export_service = ExportService(db)
+        report = export_service.generate_task_report(task_id)
+        return report
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.post("/export/json", summary="批量导出任务为JSON格式")
+def export_tasks_json(task_ids: List[int], db: Session = Depends(get_db)):
+    from app.export_service import ExportService
+    from fastapi.responses import Response
+    
+    export_service = ExportService(db)
+    json_content = export_service.export_tasks_to_json(task_ids)
+    
+    return Response(
+        content=json_content,
+        media_type="application/json",
+        headers={
+            "Content-Disposition": f"attachment; filename=tasks_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        }
+    )
+
+
+@router.post("/export/csv", summary="批量导出任务为CSV格式")
+def export_tasks_csv(task_ids: List[int], db: Session = Depends(get_db)):
+    from app.export_service import ExportService
+    from fastapi.responses import Response
+    
+    export_service = ExportService(db)
+    csv_content = export_service.export_tasks_to_csv(task_ids)
+    
+    return Response(
+        content=csv_content.encode('utf-8-sig'),
+        media_type="text/csv; charset=utf-8-sig",
+        headers={
+            "Content-Disposition": f"attachment; filename=tasks_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        }
+    )
+
+
+@router.get("/export/summary", summary="获取导出摘要")
+def get_export_summary(
+    status: str = None,
+    category: str = None,
+    db: Session = Depends(get_db)
+):
+    from app.export_service import ExportService
+    from app.models import TaskStatus, DataCategory
+    
+    status_enum = TaskStatus(status) if status else None
+    category_enum = DataCategory(category) if category else None
+    
+    export_service = ExportService(db)
+    summary = export_service.export_all_tasks(
+        status=status_enum,
+        category=category_enum
+    )
+    return summary
