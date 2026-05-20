@@ -39,6 +39,15 @@ export const bffEndpointApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
+  getUpstreams: (id) => api.get(`/bff-endpoints/${id}/upstreams`),
+  addUpstream: (id, data) => api.post(`/bff-endpoints/${id}/upstreams`, data),
+  updateUpstream: (id, data) => api.put(`/bff-endpoints/upstreams/${id}`, data),
+  deleteUpstream: (id) => api.delete(`/bff-endpoints/upstreams/${id}`),
+  getFields: (id) => api.get(`/bff-endpoints/${id}/fields`),
+  addField: (id, data) => api.post(`/bff-endpoints/${id}/fields`, data),
+  updateField: (id, data) => api.put(`/bff-endpoints/fields/${id}`, data),
+  deleteField: (id) => api.delete(`/bff-endpoints/fields/${id}`),
+  invalidateCache: (id) => api.post(`/bff-endpoints/${id}/cache/invalidate`),
 };
 
 export const callHistoryApi = {

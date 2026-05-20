@@ -290,3 +290,83 @@ async def batch_import_endpoints(
         raise HTTPException(status_code=400, detail="Invalid JSON file")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
+
+
+@app.get("/bff-endpoints/{endpoint_id}/upstreams", response_model=List[schemas.EndpointUpstream])
+def read_endpoint_upstreams(endpoint_id: int, db: Session = Depends(get_db)):
+    return crud.get_endpoint_upstreams(db, endpoint_id=endpoint_id)
+
+
+@app.post("/bff-endpoints/{endpoint_id}/upstreams", response_model=schemas.EndpointUpstream)
+def create_endpoint_upstream(endpoint_id: int, upstream: schemas.EndpointUpstreamCreate, db: Session = Depends(get_db)):
+    return crud.create_endpoint_upstream(db, endpoint_id=endpoint_id, upstream=upstream)
+
+
+@app.put("/bff-endpoints/upstreams/{upstream_id}", response_model=schemas.EndpointUpstream)
+def update_endpoint_upstream(upstream_id: int, upstream: schemas.EndpointUpstreamCreate, db: Session = Depends(get_db)):
+    db_upstream = crud.update_endpoint_upstream(db, upstream_id=upstream_id, upstream=upstream)
+    if db_upstream is None:
+        raise HTTPException(status_code=404, detail="Endpoint upstream not found")
+    return db_upstream
+
+
+@app.delete("/bff-endpoints/upstreams/{upstream_id}", response_model=schemas.EndpointUpstream)
+def delete_endpoint_upstream(upstream_id: int, db: Session = Depends(get_db)):
+    db_upstream = crud.delete_endpoint_upstream(db, upstream_id=upstream_id)
+    if db_upstream is None:
+        raise HTTPException(status_code=404, detail="Endpoint upstream not found")
+    return db_upstream
+
+
+@app.get("/bff-endpoints/{endpoint_id}/fields", response_model=List[schemas.AggregateField])
+def read_aggregate_fields(endpoint_id: int, db: Session = Depends(get_db)):
+    return crud.get_aggregate_fields(db, endpoint_id=endpoint_id)
+
+
+@app.post("/bff-endpoints/{endpoint_id}/fields", response_model=schemas.AggregateField)
+def create_aggregate_field(endpoint_id: int, field: schemas.AggregateFieldCreate, db: Session = Depends(get_db)):
+    field_data = field.model_dump()
+    field_data["endpoint_id"] = endpoint_id
+    return crud.create_aggregate_field(db, field=schemas.AggregateFieldCreate(**field_data))
+
+
+@app.put("/bff-endpoints/fields/{field_id}", response_model=schemas.AggregateField)
+def update_aggregate_field(field_id: int, field: schemas.AggregateFieldCreate, db: Session = Depends(get_db)):
+    db_field = crud.update_aggregate_field(db, field_id=field_id, field=field)
+    if db_field is None:
+        raise HTTPException(status_code=404, detail="Aggregate field not found")
+    return db_field
+
+
+@app.delete("/bff-endpoints/fields/{field_id}", response_model=schemas.AggregateField)
+def delete_aggregate_field(field_id: int, db: Session = Depends(get_db)):
+    db_field = crud.delete_aggregate_field(db, field_id=field_id)
+    if db_field is None:
+        raise HTTPException(status_code=404, detail="Aggregate field not found")
+    return db_field
+
+
+@app.post("/bff-endpoints/{endpoint_id}/cache/invalidate")
+def invalidate_endpoint_cache(endpoint_id: int, db: Session = Depends(get_db)):
+    from .orchestrator import OrchestrationEngine
+    engine = OrchestrationEngine(db)
+    engine.cache_manager.invalidate(endpoint_id=endpoint_id)
+    return {"message": "Cache invalidated successfully", "endpoint_id": endpoint_id}
+
+
+@app.post("/cache/invalidate")
+def invalidate_cache_by_key(cache_key: str, db: Session = Depends(get_db)):
+    from .orchestrator import OrchestrationEngine
+    engine = OrchestrationEngine(db)
+    engine.cache_manager.invalidate(cache_key=cache_key)
+    return {"message": "Cache invalidated successfully", "cache_key": cache_key}
+
+
+@app.get("/cache/entries")
+def list_cache_entries(endpoint_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    from .models import CacheEntry
+    query = db.query(CacheEntry)
+    if endpoint_id:
+        query = query.filter(CacheEntry.endpoint_id == endpoint_id)
+    entries = query.offset(skip).limit(limit).all()
+    return {"total": query.count(), "entries": entries}

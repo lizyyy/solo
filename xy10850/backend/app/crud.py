@@ -157,6 +157,79 @@ def delete_bff_endpoint(db: Session, endpoint_id: int):
     return db_endpoint
 
 
+def get_endpoint_upstreams(db: Session, endpoint_id: int):
+    return db.query(models.EndpointUpstream).filter(models.EndpointUpstream.endpoint_id == endpoint_id).all()
+
+
+def get_endpoint_upstream(db: Session, upstream_id: int):
+    return db.query(models.EndpointUpstream).filter(models.EndpointUpstream.id == upstream_id).first()
+
+
+def create_endpoint_upstream(db: Session, endpoint_id: int, upstream: schemas.EndpointUpstreamCreate):
+    db_upstream = models.EndpointUpstream(endpoint_id=endpoint_id, **upstream.model_dump())
+    db.add(db_upstream)
+    db.commit()
+    db.refresh(db_upstream)
+    return db_upstream
+
+
+def update_endpoint_upstream(db: Session, upstream_id: int, upstream: schemas.EndpointUpstreamCreate):
+    db_upstream = get_endpoint_upstream(db, upstream_id)
+    if db_upstream:
+        for key, value in upstream.model_dump(exclude_unset=True).items():
+            setattr(db_upstream, key, value)
+        db.commit()
+        db.refresh(db_upstream)
+    return db_upstream
+
+
+def delete_endpoint_upstream(db: Session, upstream_id: int):
+    db_upstream = get_endpoint_upstream(db, upstream_id)
+    if db_upstream:
+        db.delete(db_upstream)
+        db.commit()
+    return db_upstream
+
+
+def get_aggregate_fields(db: Session, endpoint_id: int = None, page_module_id: int = None):
+    query = db.query(models.AggregateField)
+    if endpoint_id:
+        query = query.filter(models.AggregateField.endpoint_id == endpoint_id)
+    if page_module_id:
+        query = query.filter(models.AggregateField.page_module_id == page_module_id)
+    return query.all()
+
+
+def get_aggregate_field(db: Session, field_id: int):
+    return db.query(models.AggregateField).filter(models.AggregateField.id == field_id).first()
+
+
+def create_aggregate_field(db: Session, field: schemas.AggregateFieldCreate):
+    db_field = models.AggregateField(**field.model_dump())
+    db.add(db_field)
+    db.commit()
+    db.refresh(db_field)
+    return db_field
+
+
+def update_aggregate_field(db: Session, field_id: int, field: schemas.AggregateFieldCreate):
+    db_field = get_aggregate_field(db, field_id)
+    if db_field:
+        for key, value in field.model_dump(exclude_unset=True).items():
+            setattr(db_field, key, value)
+        db.commit()
+        db.refresh(db_field)
+    return db_field
+
+
+def delete_aggregate_field(db: Session, field_id: int):
+    db_field = get_aggregate_field(db, field_id)
+    if db_field:
+        db.delete(db_field)
+        db.commit()
+    return db_field
+
+
 def transition_endpoint_status(db: Session, endpoint_id: int, new_status: EndpointStatus, reason: str = None):
     db_endpoint = get_bff_endpoint(db, endpoint_id)
     if db_endpoint:

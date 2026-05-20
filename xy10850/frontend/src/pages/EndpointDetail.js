@@ -18,6 +18,7 @@ import {
   Input,
   Select,
   Divider,
+  Collapse,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -27,6 +28,10 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   ClockCircleOutlined,
+  DeleteOutlined,
+  DatabaseOutlined,
+  ApiOutlined,
+  ClearOutlined,
 } from '@ant-design/icons';
 import { bffEndpointApi, callHistoryApi } from '../services/api';
 import dayjs from 'dayjs';
@@ -35,6 +40,7 @@ import ReactECharts from 'echarts-for-react';
 const { TabPane } = Tabs;
 const { TextArea } = Input;
 const { Option } = Select;
+const { Panel } = Collapse;
 
 const statusColors = {
   draft: 'default',
@@ -98,7 +104,16 @@ const EndpointDetail = () => {
       message.success('执行成功');
       fetchData();
     } catch (error) {
-      message.error('执行失败');
+      message.error('执行失败: ' + (error.response?.data?.detail || error.message));
+    }
+  };
+
+  const handleInvalidateCache = async () => {
+    try {
+      await bffEndpointApi.invalidateCache(id);
+      message.success('缓存已失效');
+    } catch (error) {
+      message.error('缓存失效失败');
     }
   };
 
@@ -242,6 +257,63 @@ const EndpointDetail = () => {
     },
   ];
 
+  const upstreamColumns = [
+    { title: '顺序', dataIndex: 'order', key: 'order', width: 80 },
+    { title: '上游ID', dataIndex: 'upstream_api_id', key: 'upstream_api_id', width: 100 },
+    {
+      title: '并行',
+      dataIndex: 'parallel',
+      key: 'parallel',
+      width: 80,
+      render: (v) => v ? <Tag color="blue">是</Tag> : '否',
+    },
+    {
+      title: '必填',
+      dataIndex: 'required',
+      key: 'required',
+      width: 80,
+      render: (v) => v ? <Tag color="green">是</Tag> : '否',
+    },
+    {
+      title: '输入映射',
+      dataIndex: 'input_mapping',
+      key: 'input_mapping',
+      render: (v) => v ? <pre style={{ fontSize: 12, maxWidth: 300, overflow: 'auto' }}>{JSON.stringify(v, null, 2)}</pre> : '-',
+    },
+    {
+      title: '输出映射',
+      dataIndex: 'output_mapping',
+      key: 'output_mapping',
+      render: (v) => v ? <pre style={{ fontSize: 12, maxWidth: 300, overflow: 'auto' }}>{JSON.stringify(v, null, 2)}</pre> : '-',
+    },
+  ];
+
+  const fieldColumns = [
+    { title: '字段名', dataIndex: 'name', key: 'name', width: 150 },
+    { title: '输出路径', dataIndex: 'path', key: 'path', width: 150 },
+    { title: '来源上游', dataIndex: 'source_upstream_id', key: 'source_upstream_id', width: 100 },
+    { title: '来源路径', dataIndex: 'source_path', key: 'source_path', width: 150 },
+    {
+      title: '必填',
+      dataIndex: 'required',
+      key: 'required',
+      width: 80,
+      render: (v) => v ? <Tag color="red">是</Tag> : '否',
+    },
+    {
+      title: '转换规则',
+      dataIndex: 'transformation',
+      key: 'transformation',
+      render: (v) => v ? JSON.stringify(v) : '-',
+    },
+    {
+      title: '默认值',
+      dataIndex: 'default_value',
+      key: 'default_value',
+      render: (v) => v ? JSON.stringify(v) : '-',
+    },
+  ];
+
   if (!endpoint) {
     return <div>加载中...</div>;
   }
@@ -253,7 +325,6 @@ const EndpointDetail = () => {
           <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/endpoints')}>
             返回列表
           </Button>
-          <Button icon={<EditOutlined />}>编辑</Button>
           <Button
             type="primary"
             icon={<PlayCircleOutlined />}
@@ -262,12 +333,19 @@ const EndpointDetail = () => {
           >
             执行测试
           </Button>
+          <Button
+            icon={<ClearOutlined />}
+            onClick={handleInvalidateCache}
+            disabled={!endpoint.cache_enabled}
+          >
+            清除缓存
+          </Button>
           <Button icon={<ReloadOutlined />} onClick={fetchData}>刷新</Button>
         </Space>
       </div>
 
       <Card title="端点基本信息" style={{ marginBottom: 16 }} loading={loading}>
-        <Descriptions column={3}>
+        <Descriptions column={3} bordered>
           <Descriptions.Item label="ID">{endpoint.id}</Descriptions.Item>
           <Descriptions.Item label="名称">{endpoint.name}</Descriptions.Item>
           <Descriptions.Item label="路径">{endpoint.path}</Descriptions.Item>
@@ -281,14 +359,28 @@ const EndpointDetail = () => {
             {endpoint.cache_enabled ? <Tag color="green">启用</Tag> : <Tag>禁用</Tag>}
           </Descriptions.Item>
           <Descriptions.Item label="缓存 TTL">{endpoint.cache_ttl} 秒</Descriptions.Item>
+          <Descriptions.Item label="缓存键模板">{endpoint.cache_key_template || '-'}</Descriptions.Item>
           <Descriptions.Item label="降级策略">{endpoint.degradation_strategy}</Descriptions.Item>
           <Descriptions.Item label="创建时间">
             {dayjs(endpoint.created_at).format('YYYY-MM-DD HH:mm:ss')}
           </Descriptions.Item>
+          <Descriptions.Item label="更新时间">
+            {endpoint.updated_at ? dayjs(endpoint.updated_at).format('YYYY-MM-DD HH:mm:ss') : '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="创建人">{endpoint.created_by || '-'}</Descriptions.Item>
           <Descriptions.Item label="描述" span={3}>
             {endpoint.description || '-'}
           </Descriptions.Item>
         </Descriptions>
+
+        <Collapse style={{ marginTop: 16 }}>
+          <Panel header="降级默认值" key="degradation">
+            <pre>{JSON.stringify(endpoint.degradation_default_value || {}, null, 2)}</pre>
+          </Panel>
+          <Panel header="编排规则" key="orchestration">
+            <pre>{JSON.stringify(endpoint.orchestration_rules || {}, null, 2)}</pre>
+          </Panel>
+        </Collapse>
       </Card>
 
       <Row gutter={16} style={{ marginBottom: 16 }}>
@@ -339,6 +431,7 @@ const EndpointDetail = () => {
             <ReactECharts option={getChartOption()} style={{ height: 400 }} />
           </Card>
         </TabPane>
+
         <TabPane tab="调用历史" key="2">
           <Table
             columns={historyColumns}
@@ -347,6 +440,7 @@ const EndpointDetail = () => {
             pagination={{ pageSize: 10 }}
           />
         </TabPane>
+
         <TabPane tab="事件时间线" key="3">
           <Card>
             <Timeline mode="left">
@@ -364,34 +458,34 @@ const EndpointDetail = () => {
             </Timeline>
           </Card>
         </TabPane>
-        <TabPane tab="上游接口配置" key="4">
+
+        <TabPane tab={<span><ApiOutlined /> 上游接口配置 ({endpoint.upstreams?.length || 0})</span>} key="4">
           <Card>
             <Table
-              columns={[
-                { title: '上游ID', dataIndex: 'upstream_api_id', key: 'upstream_api_id' },
-                { title: '顺序', dataIndex: 'order', key: 'order', width: 80 },
-                { title: '并行', dataIndex: 'parallel', key: 'parallel', width: 80, render: v => v ? '是' : '否' },
-                { title: '必填', dataIndex: 'required', key: 'required', width: 80, render: v => v ? '是' : '否' },
-              ]}
+              columns={upstreamColumns}
               dataSource={endpoint.upstreams || []}
-              rowKey="id"
+              rowKey={(record, index) => index}
               pagination={false}
             />
           </Card>
         </TabPane>
-        <TabPane tab="聚合字段配置" key="5">
+
+        <TabPane tab={<span><DatabaseOutlined /> 聚合字段配置 ({endpoint.fields?.length || 0})</span>} key="5">
           <Card>
             <Table
-              columns={[
-                { title: '字段名', dataIndex: 'name', key: 'name' },
-                { title: '路径', dataIndex: 'path', key: 'path' },
-                { title: '来源上游', dataIndex: 'source_upstream_id', key: 'source_upstream_id' },
-                { title: '来源路径', dataIndex: 'source_path', key: 'source_path' },
-                { title: '必填', dataIndex: 'required', key: 'required', width: 80, render: v => v ? '是' : '否' },
-              ]}
+              columns={fieldColumns}
               dataSource={endpoint.fields || []}
-              rowKey="id"
+              rowKey={(record, index) => index}
               pagination={false}
+              expandable={{
+                expandedRowRender: (record) => (
+                  <div>
+                    <p><strong>字段名称:</strong> {record.name}</p>
+                    <p><strong>输出路径:</strong> {record.path}</p>
+                    <p><strong>来源路径:</strong> {record.source_path}</p>
+                  </div>
+                ),
+              }}
             />
           </Card>
         </TabPane>
@@ -405,32 +499,47 @@ const EndpointDetail = () => {
           setExecuteModalVisible(false);
           setExecuteResult(null);
         }}
-        width={800}
+        width={900}
         okText="执行"
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="skip" label="跳过缓存" valuePropName="checked" initialValue={false}>
-            <Select>
-              <Option value={false}>否</Option>
-              <Option value={true}>是</Option>
-            </Select>
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={8}>
+              <Form.Item name="skip_cache" label="跳过缓存" valuePropName="checked" initialValue={false}>
+                <Select>
+                  <Option value={false}>否 (优先使用缓存)</Option>
+                  <Option value={true}>是 (强制调用上游)</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="request_body" label="请求参数 (JSON)">
-            <TextArea rows={6} placeholder='{"key": "value"}' />
+            <TextArea rows={6} placeholder='{"userId": 123, "token": "abc"}' />
           </Form.Item>
         </Form>
 
         {executeResult && (
           <>
             <Divider>执行结果</Divider>
-            <Descriptions column={2} size="small">
+            <Descriptions column={2} size="small" bordered>
               <Descriptions.Item label="请求ID">{executeResult.metadata?.request_id}</Descriptions.Item>
               <Descriptions.Item label="缓存命中">{executeResult.metadata?.cache_hit ? '是' : '否'}</Descriptions.Item>
               <Descriptions.Item label="降级返回">{executeResult.metadata?.degraded ? '是' : '否'}</Descriptions.Item>
               <Descriptions.Item label="响应时间">{executeResult.metadata?.response_time_ms?.toFixed(2)}ms</Descriptions.Item>
+              {executeResult.metadata?.error && (
+                <Descriptions.Item label="错误信息" span={2}>{executeResult.metadata.error}</Descriptions.Item>
+              )}
             </Descriptions>
             <Card title="返回数据" size="small" style={{ marginTop: 16 }}>
-              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+              <pre style={{ 
+                whiteSpace: 'pre-wrap', 
+                wordBreak: 'break-all',
+                maxHeight: 400,
+                overflow: 'auto',
+                background: '#f5f5f5',
+                padding: 12,
+                borderRadius: 4,
+              }}>
                 {JSON.stringify(executeResult.data, null, 2)}
               </pre>
             </Card>
