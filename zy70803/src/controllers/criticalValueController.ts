@@ -8,15 +8,15 @@ const router = Router();
 const criticalValueService = new CriticalValueService();
 
 const createRecordSchema = Joi.object({
-  patientId: Joi.string().required(),
-  patientName: Joi.string().required(),
-  department: Joi.string().required(),
+  patientId: Joi.string().optional().allow(''),
+  patientName: Joi.string().optional().allow(''),
+  department: Joi.string().optional().allow(''),
   ward: Joi.string().optional(),
   bedNo: Joi.string().optional(),
-  testItem: Joi.string().required(),
-  testValue: Joi.string().required(),
+  testItem: Joi.string().optional().allow(''),
+  testValue: Joi.string().optional().allow(''),
   referenceRange: Joi.string().optional(),
-  testTime: Joi.date().required(),
+  testTime: Joi.date().optional(),
   reporter: Joi.string().optional(),
   smsContent: Joi.string().optional(),
   smsTime: Joi.date().optional(),

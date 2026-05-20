@@ -49,7 +49,21 @@ async function runTests() {
   console.log(`  ✓ 缺少ward、bedNo、referenceRange仍可入库 - 验证通过`);
   console.log(`  ✓ 补充要求: ${pendingRecord.supplementRequirements}`);
 
-  console.log('\n3. 测试创建记录（已拦截数据）');
+  console.log('\n3. 测试创建记录（关键字段缺失 - 严重待补充数据，原API会400拒绝，现在可入库分类）');
+  const severePendingRecord = await service.createRecord({
+    patientId: '',
+    patientName: '',
+    department: '',
+    testItem: '',
+    testValue: '',
+    testTime: undefined
+  }, '夜班组-王');
+  console.log(`  ✓ 记录创建成功，ID: ${severePendingRecord.id}`);
+  console.log(`  ✓ 分类: ${severePendingRecord.category}`);
+  console.log(`  ✓ 关键字段缺失不返回400，而是入库待补充分类 - 验证通过`);
+  console.log(`  ✓ 补充要求: ${severePendingRecord.supplementRequirements}`);
+
+  console.log('\n4. 测试创建记录（已拦截数据）');
   const blockedRecord = await service.createRecord({
     patientId: 'P003',
     patientName: '王五',
@@ -64,7 +78,7 @@ async function runTests() {
   console.log(`  ✓ 分类: ${blockedRecord.category}`);
   console.log(`  ✓ 拦截原因: ${blockedRecord.blockReason}`);
 
-  console.log('\n4. 测试更新状态');
+  console.log('\n5. 测试更新状态');
   const updatedRecord = await service.updateStatus(
     normalRecord.id,
     TaskStatus.MANUAL_CONFIRMED,
@@ -73,14 +87,14 @@ async function runTests() {
   );
   console.log(`  ✓ 状态更新成功: ${updatedRecord?.status}`);
 
-  console.log('\n5. 测试获取历史记录');
+  console.log('\n6. 测试获取历史记录');
   const history = await service.getRecordHistory(normalRecord.id);
   console.log(`  ✓ 获取到 ${history.length} 条历史记录`);
   history.forEach((log, index) => {
     console.log(`    ${index + 1}. ${log.changeTime.toLocaleString()} - ${log.operator} 修改了 ${log.fieldName}`);
   });
 
-  console.log('\n6. 测试统计数据（带日期范围）');
+  console.log('\n7. 测试统计数据（带日期范围）');
   const startDate = new Date('2024-01-01');
   const endDate = new Date('2024-12-31');
   const stats = await service.getStatistics(startDate, endDate);
@@ -91,12 +105,15 @@ async function runTests() {
   console.log(`  ✓ 有电话回告: ${stats.hasPhoneCall}`);
   console.log(`  ✓ 有医生确认: ${stats.hasDoctorConfirmation}`);
   console.log(`  ✓ Between日期查询生效 - 验证通过`);
+  if (stats.byCategory.pendingSupplement >= 2) {
+    console.log(`  ✓ 待补充记录包含普通缺失和严重缺失两类 - 验证通过`);
+  }
 
-  console.log('\n7. 测试导出前后统计一致性');
+  console.log('\n8. 测试导出前后统计一致性');
   const statsBeforeExport = await service.getStatistics(startDate, endDate);
   console.log(`  ✓ 导出前统计 - 总记录: ${statsBeforeExport.total}, 已导出: ${statsBeforeExport.byStatus.exported}`);
   
-  console.log('\n8. 测试导出数据（先更新状态，再导出，确保一致性）');
+  console.log('\n9. 测试导出数据（先更新状态，再导出，确保一致性）');
   console.log(`  ✓ 导出前状态: normalRecord=${normalRecord.status}, pendingRecord=${pendingRecord.status}`);
   const exportBuffer = await service.exportRecords('导出管理员', startDate, endDate);
   console.log(`  ✓ 导出成功，数据大小: ${exportBuffer.length} 字节`);
@@ -104,17 +121,20 @@ async function runTests() {
   const exportedNormalRecord = await service.getRecordById(normalRecord.id);
   const exportedPendingRecord = await service.getRecordById(pendingRecord.id);
   const exportedBlockedRecord = await service.getRecordById(blockedRecord.id);
+  const exportedSeverePendingRecord = await service.getRecordById(severePendingRecord.id);
   console.log(`  ✓ 导出后查询状态: normalRecord=${exportedNormalRecord?.status}`);
   console.log(`  ✓ 导出后查询状态: pendingRecord=${exportedPendingRecord?.status}`);
   console.log(`  ✓ 导出后查询状态: blockedRecord=${exportedBlockedRecord?.status}`);
+  console.log(`  ✓ 导出后查询状态: severePendingRecord=${exportedSeverePendingRecord?.status}`);
   
   if (exportedNormalRecord?.status === TaskStatus.EXPORTED &&
       exportedPendingRecord?.status === TaskStatus.EXPORTED &&
-      exportedBlockedRecord?.status === TaskStatus.EXPORTED) {
-    console.log(`  ✓ 导出后查询接口状态为exported - 验证通过`);
+      exportedBlockedRecord?.status === TaskStatus.EXPORTED &&
+      exportedSeverePendingRecord?.status === TaskStatus.EXPORTED) {
+    console.log(`  ✓ 所有记录（含严重待补充）导出后状态为exported - 验证通过`);
   }
 
-  console.log('\n9. 验证导出后统计一致性');
+  console.log('\n10. 验证导出后统计一致性');
   const statsAfterExport = await service.getStatistics(startDate, endDate);
   console.log(`  ✓ 导出后统计 - 总记录: ${statsAfterExport.total}, 已导出: ${statsAfterExport.byStatus.exported}`);
   if (statsAfterExport.byStatus.exported === statsAfterExport.total) {
@@ -122,7 +142,7 @@ async function runTests() {
     console.log(`  ✓ 导出文件状态与查询接口统计保持一致 - 核心目标达成`);
   }
 
-  console.log('\n10. 验证导出记录的审计日志');
+  console.log('\n11. 验证导出记录的审计日志');
   const exportHistory = await service.getRecordHistory(normalRecord.id);
   const exportStatusChange = exportHistory.find(h => h.fieldName === 'status' && h.newValue === TaskStatus.EXPORTED);
   if (exportStatusChange) {
@@ -136,6 +156,7 @@ async function runTests() {
   console.log('  3. 导出功能新增operator参数，先更新状态再导出');
   console.log('  4. 导出文件状态与查询接口统计保持一致');
   console.log('  5. 状态变更记录审计日志，满足复盘追溯要求');
+  console.log('  6. API验证放宽，关键字段缺失不返回400，而是入库待补充分类');
   
   process.exit(0);
 }
