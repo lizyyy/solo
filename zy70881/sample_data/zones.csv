@@ -1,0 +1,4 @@
+zone_id,zone_name,base_temperature,power_multiplier,area_sqm
+Z01,低温冷藏区,-18,1.0,500
+Z02,超低温冷冻区,-25,1.3,300
+Z03,普通保鲜区,0,0.8,200
