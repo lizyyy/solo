@@ -22,11 +22,23 @@ const materialSchema = Joi.object({
 const validateMaterial = (data) => {
   const { error, value } = materialSchema.validate(data, { abortEarly: false });
   if (error) {
-    const errors = error.details.map(detail => ({
-      field: detail.path.join('.'),
-      message: detail.message,
-      position: `第${detail.path[0] + 1}条记录`
-    }));
+    const errors = error.details.map(detail => {
+      const path = detail.path;
+      let position = '材料头部';
+      
+      if (path[0] === 'ships' && typeof path[1] === 'number') {
+        position = `第${path[1] + 1}条船舶记录`;
+      } else if (path[0] === 'batch_no' || path[0] === 'submitted_by' || path[0] === 'schedule_date') {
+        position = '材料头部';
+      }
+      
+      return {
+        field: path.join('.'),
+        message: detail.message,
+        position: position,
+        original_path: detail.path
+      };
+    });
     return { valid: false, errors };
   }
   return { valid: true, value };

@@ -2,10 +2,10 @@ const moment = require('moment');
 const db = require('../database/db');
 
 class SchedulerService {
-  async getAvailableBerths(shipDraught, shipLength) {
+  async getAvailableBerths(shipLength) {
     return await db.all(
-      'SELECT * FROM berths WHERE max_draught >= ? AND max_length >= ? AND is_available = 1',
-      [shipDraught, shipLength]
+      'SELECT * FROM berths WHERE max_length >= ? AND is_available = 1',
+      [shipLength]
     );
   }
 
@@ -64,14 +64,14 @@ class SchedulerService {
     });
 
     for (const ship of sortedShips) {
-      const berths = await this.getAvailableBerths(ship.draught, ship.length);
+      const berths = await this.getAvailableBerths(ship.length);
       
       if (berths.length === 0) {
         results.push({
           ship_name: ship.ship_name,
           imo_no: ship.imo_no,
           success: false,
-          message: '无符合吃水和长度要求的可用泊位'
+          message: '无符合长度要求的可用泊位'
         });
         continue;
       }
@@ -224,6 +224,23 @@ class SchedulerService {
       'SELECT * FROM berth_adjustments WHERE assignment_id = ? ORDER BY adjusted_at DESC',
       [assignmentId]
     );
+  }
+
+  async addTideData(tideData) {
+    const { date, time, height, tide_type } = tideData;
+    const result = await db.run(`
+      INSERT INTO tides (date, time, height, tide_type)
+      VALUES (?, ?, ?, ?)
+    `, [date, time, height, tide_type]);
+    return result.lastID;
+  }
+
+  async getTideDataByDateRange(startDate, endDate) {
+    return await db.all(`
+      SELECT * FROM tides 
+      WHERE date >= ? AND date <= ? 
+      ORDER BY time ASC
+    `, [startDate, endDate]);
   }
 }
 

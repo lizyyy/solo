@@ -66,5 +66,8 @@ POST /api/tasks/:taskId/export  - 导出任务
 POST /api/tasks/berth-assignments/:assignmentId/lock   - 锁定泊位
 POST /api/tasks/berth-assignments/:assignmentId/adjust - 调整泊位
 GET  /api/tasks/berth-assignments/:assignmentId/adjustments - 获取调整记录
+
+POST /api/tasks/tides           - 添加潮汐数据
+GET  /api/tasks/tides           - 获取潮汐数据
   `);
 });

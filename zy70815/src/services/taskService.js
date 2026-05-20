@@ -48,6 +48,25 @@ class TaskService {
           sourcePosition: `第${index + 1}条船舶记录`
         });
       });
+      
+      fields.push({
+        taskId,
+        fieldPath: `ships[${index}].berth_no`,
+        originalValue: '',
+        sourcePosition: `第${index + 1}条船舶记录-调度结果`
+      });
+      fields.push({
+        taskId,
+        fieldPath: `ships[${index}].estimated_berth_time`,
+        originalValue: '',
+        sourcePosition: `第${index + 1}条船舶记录-调度结果`
+      });
+      fields.push({
+        taskId,
+        fieldPath: `ships[${index}].estimated_departure_time`,
+        originalValue: '',
+        sourcePosition: `第${index + 1}条船舶记录-调度结果`
+      });
     });
 
     for (const field of fields) {
@@ -133,6 +152,31 @@ class TaskService {
         shipsWithDbId,
         material.schedule_date
       );
+
+      for (let i = 0; i < shipsWithDbId.length; i++) {
+        const shipId = shipsWithDbId[i].db_id;
+        const shipResult = scheduleResults.find(r => r.imo_no === shipsWithDbId[i].imo_no);
+        const shipData = await db.get('SELECT * FROM ships WHERE id = ?', [shipId]);
+        
+        if (shipData) {
+          await db.run(`
+            UPDATE field_tracking SET final_value = ?
+            WHERE task_id = ? AND field_path = ?
+          `, [shipData.estimated_berth_time || '', taskId, `ships[${i}].estimated_berth_time`]);
+          
+          await db.run(`
+            UPDATE field_tracking SET final_value = ?
+            WHERE task_id = ? AND field_path = ?
+          `, [shipData.estimated_departure_time || '', taskId, `ships[${i}].estimated_departure_time`]);
+        }
+        
+        if (shipResult && shipResult.success) {
+          await db.run(`
+            UPDATE field_tracking SET final_value = ?
+            WHERE task_id = ? AND field_path = ?
+          `, [shipResult.berth_no || '', taskId, `ships[${i}].berth_no`]);
+        }
+      }
 
       const successCount = scheduleResults.filter(r => r.success).length;
       const totalCount = scheduleResults.length;
@@ -256,7 +300,64 @@ class TaskService {
     `, [taskId]);
   }
 
+  async updateFieldFinalValue(taskId, fieldPath, finalValue) {
+    await db.run(`
+      UPDATE field_tracking SET final_value = ?
+      WHERE task_id = ? AND field_path = ?
+    `, [String(finalValue), taskId, fieldPath]);
+  }
+
+  async generateFinalReport(taskId) {
+    const taskData = await this.getTask(taskId);
+    if (!taskData) return null;
+
+    const { task, ships, assignments, statusHistory, auditLogs } = taskData;
+
+    for (const ship of ships) {
+      const shipIndex = ships.findIndex(s => s.id === ship.id);
+      
+      this.updateFieldFinalValue(taskId, `ships[${shipIndex}].estimated_berth_time`, ship.estimated_berth_time || '');
+      this.updateFieldFinalValue(taskId, `ships[${shipIndex}].estimated_departure_time`, ship.estimated_departure_time || '');
+      
+      const assignment = assignments.find(a => a.ship_id === ship.id);
+      if (assignment) {
+        this.updateFieldFinalValue(taskId, `ships[${shipIndex}].berth_no`, assignment.berth_no || '');
+      }
+    }
+
+    const report = {
+      report_id: `RPT-${taskId}-${Date.now()}`,
+      generated_at: new Date().toISOString(),
+      task_info: {
+        batch_no: task.batch_no,
+        submitted_by: task.submitted_by,
+        submitted_at: task.submitted_at,
+        status: task.status
+      },
+      ships_summary: ships.map(ship => {
+        const assignment = assignments.find(a => a.ship_id === ship.id);
+        return {
+          ship_name: ship.ship_name,
+          imo_no: ship.imo_no,
+          draught: ship.draught,
+          length: ship.length,
+          arrival_time: ship.arrival_time,
+          berth_no: assignment ? assignment.berth_no : null,
+          estimated_berth_time: ship.estimated_berth_time,
+          estimated_departure_time: ship.estimated_departure_time,
+          is_jump_queue: ship.is_jump_queue
+        };
+      }),
+      status_history: statusHistory,
+      audit_trail: auditLogs
+    };
+
+    return report;
+  }
+
   async exportTask(taskId, exportedBy) {
+    const report = await this.generateFinalReport(taskId);
+    
     await db.run(`
       UPDATE tasks SET status = 'exported', exported_at = CURRENT_TIMESTAMP, exported_by = ?
       WHERE id = ?
@@ -267,7 +368,12 @@ class TaskService {
       VALUES (?, 'exported', ?, '任务已导出')
     `, [taskId, exportedBy]);
 
-    return await this.getTask(taskId);
+    return {
+      success: true,
+      message: '任务已导出，最终报告已生成',
+      report,
+      task: await this.getTask(taskId)
+    };
   }
 }
 

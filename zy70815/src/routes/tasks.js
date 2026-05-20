@@ -3,6 +3,43 @@ const router = express.Router();
 const taskService = require('../services/taskService');
 const schedulerService = require('../services/schedulerService');
 
+router.post('/tides', async (req, res) => {
+  try {
+    const tideData = req.body;
+    const tideId = await schedulerService.addTideData(tideData);
+    res.json({ 
+      success: true, 
+      message: '潮汐数据添加成功',
+      tide_id: tideId 
+    });
+  } catch (error) {
+    console.error('添加潮汐数据失败:', error);
+    res.status(500).json({
+      success: false,
+      error: '服务器内部错误',
+      message: error.message
+    });
+  }
+});
+
+router.get('/tides', async (req, res) => {
+  try {
+    const { start_date, end_date } = req.query;
+    const tides = await schedulerService.getTideDataByDateRange(
+      start_date || '2024-01-01',
+      end_date || '2024-12-31'
+    );
+    res.json({ success: true, data: tides });
+  } catch (error) {
+    console.error('获取潮汐数据失败:', error);
+    res.status(500).json({
+      success: false,
+      error: '服务器内部错误',
+      message: error.message
+    });
+  }
+});
+
 router.post('/submit', async (req, res) => {
   try {
     const result = await taskService.createTask(req.body);
