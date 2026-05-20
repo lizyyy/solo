@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备固件灰度管理系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>设备固件灰度管理系统</h1>
+            <nav>
+                <button onclick="showSection('batches')">灰度批次</button>
+                <button onclick="showSection('devices')">设备型号</button>
+                <button onclick="showSection('firmware')">固件版本</button>
+            </nav>
+        </header>
+
+        <section id="batches-section" class="active">
+            <div class="toolbar">
+                <div class="filters">
+                    <select id="status-filter" onchange="loadBatches()">
+                        <option value="">全部状态</option>
+                        <option value="created">已创建</option>
+                        <option value="running">运行中</option>
+                        <option value="paused">已暂停</option>
+                        <option value="completed">已完成</option>
+                        <option value="rolled_back">已回滚</option>
+                    </select>
+                    <select id="model-filter" onchange="loadBatches()">
+                        <option value="">全部型号</option>
+                    </select>
+                </div>
+                <button onclick="showCreateBatchModal()" class="btn-primary">创建批次</button>
+            </div>
+
+            <div id="batches-list" class="list-container"></div>
+        </section>
+
+        <section id="batch-detail-section" style="display:none">
+            <div class="detail-header">
+                <button onclick="showSection('batches')" class="btn-secondary">返回列表</button>
+                <h2 id="batch-title">批次详情</h2>
+                <div class="batch-actions" id="batch-actions"></div>
+            </div>
+
+            <div class="detail-content">
+                <div class="batch-info" id="batch-info"></div>
+
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="showTab('timeline')">时间线</button>
+                    <button class="tab-btn" onclick="showTab('receipts')">升级回执</button>
+                    <button class="tab-btn" onclick="showTab('report')">报告</button>
+                </div>
+
+                <div id="timeline-tab" class="tab-content active">
+                    <div id="timeline-container" class="timeline"></div>
+                </div>
+
+                <div id="receipts-tab" class="tab-content">
+                    <div class="toolbar">
+                        <button onclick="showBulkImportModal()" class="btn-primary">批量导入设备</button>
+                    </div>
+                    <div id="receipts-list" class="list-container"></div>
+                </div>
+
+                <div id="report-tab" class="tab-content">
+                    <div id="report-content"></div>
+                    <button onclick="downloadReport()" class="btn-primary">下载报告</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="devices-section" style="display:none">
+            <div class="toolbar">
+                <button onclick="showCreateDeviceModal()" class="btn-primary">创建设备型号</button>
+            </div>
+            <div id="devices-list" class="list-container"></div>
+        </section>
+
+        <section id="firmware-section" style="display:none">
+            <div class="toolbar">
+                <button onclick="showCreateFirmwareModal()" class="btn-primary">创建固件版本</button>
+            </div>
+            <div id="firmware-list" class="list-container"></div>
+        </section>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay" style="display:none">
+        <div class="modal" id="modal-content"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
