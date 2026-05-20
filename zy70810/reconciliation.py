@@ -36,10 +36,13 @@ def process_device_reconciliation(db: Session, task_id: int, device: Device, tod
     contract_status = "normal"
     contract_end_date = None
     
+    has_multiple_contracts = contract_count > 1
+    has_expired_contract = False
+    
     if contract_count == 0:
         contract_status = "missing"
         issues.append("无有效维保合同")
-    elif contract_count > 1:
+    elif has_multiple_contracts:
         contract_status = "multiple"
         issues.append(f"存在{contract_count}份有效合同，需确认")
     
@@ -47,9 +50,10 @@ def process_device_reconciliation(db: Session, task_id: int, device: Device, tod
         latest_contract = max(contracts, key=lambda c: c.end_date)
         contract_end_date = latest_contract.end_date
         if contract_end_date and contract_end_date < today:
-            contract_status = "expired"
-            if contract_count == 1:
-                issues.append("合同已过期")
+            has_expired_contract = True
+            issues.append("合同已过期")
+            if not has_multiple_contracts:
+                contract_status = "expired"
     
     maintenance_status = "normal"
     overdue_days = calculate_overdue_days(device.next_maintenance_date)
