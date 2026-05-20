@@ -1,0 +1,87 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-header {
+  background: #fff;
+  padding: 0 24px;
+  border-bottom: 1px solid #e8e8e8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-logo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.app-content {
+  padding: 24px;
+  background: #f0f2f5;
+}
+
+.content-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  min-height: calc(100vh - 184px);
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-DRAFT { background: #f0f0f0; color: #666; }
+.status-SUBMITTED { background: #e6f7ff; color: #1890ff; }
+.status-AUTO_AUDITING { background: #fff7e6; color: #fa8c16; }
+.status-PENDING_REVIEW { background: #fff1f0; color: #f5222d; }
+.status-AUTO_PASSED { background: #f6ffed; color: #52c41a; }
+.status-APPROVED { background: #f6ffed; color: #52c41a; }
+.status-RELEASED { background: #e6f7ff; color: #1890ff; }
+.status-ROLLED_BACK { background: #fff1f0; color: #f5222d; }
+.status-REJECTED { background: #fff1f0; color: #f5222d; }
+
+.risk-LOW { background: #f6ffed; color: #52c41a; }
+.risk-MEDIUM { background: #fff7e6; color: #fa8c16; }
+.risk-HIGH { background: #fff1f0; color: #f5222d; }
+
+.stat-card {
+  text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+}

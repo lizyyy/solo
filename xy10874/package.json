@@ -1,0 +1,28 @@
+{
+  "name": "plugin-market-audit",
+  "version": "1.0.0",
+  "description": "插件市场审核API系统",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon backend/server.js",
+    "client": "cd frontend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install",
+    "build": "cd frontend && npm run build"
+  },
+  "keywords": ["plugin", "audit", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.0"
+  }
+}
