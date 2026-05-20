@@ -1,0 +1,20 @@
+[
+    {
+        "work_order_id": "WO20240501001",
+        "product_model": "MODEL-X2024",
+        "quantity": 500,
+        "production_line": "LINE-A",
+        "start_date": "2024-05-01",
+        "end_date": null,
+        "status": "in_progress"
+    },
+    {
+        "work_order_id": "WO20240501002",
+        "product_model": "MODEL-Y2024",
+        "quantity": 300,
+        "production_line": "LINE-B",
+        "start_date": "2024-04-28",
+        "end_date": "2024-05-02",
+        "status": "completed"
+    }
+]
