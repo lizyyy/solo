@@ -29,7 +29,7 @@ class ReportService:
             "status_breakdown": {},
             "discrepancy_breakdown": {},
             "approval_rate": 0,
-            "review_completion_rate": 0
+            "review_progress": 0
         }
 
         for status in RecordStatus:
@@ -111,7 +111,7 @@ class ReportService:
                 },
                 {
                     "指标": "复核完成率",
-                    "数值": f"{summary['review_completion_rate']}%"
+                    "数值": f"{summary['review_progress']}%"
                 }
             ])
             for status, count in summary["status_breakdown"].items():
