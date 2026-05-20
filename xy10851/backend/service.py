@@ -107,20 +107,23 @@ class SyncService:
 
         for draft_data in sync_request.drafts:
             existing_draft = self.find_existing_draft(draft_data)
+            sync_info = None
 
-            is_duplicate = False
             if existing_draft and existing_draft.sync_batch_id:
                 existing_batch = self.db.query(SyncBatch).filter(SyncBatch.id == existing_draft.sync_batch_id).first()
                 if existing_batch and existing_batch.id != batch.id:
-                    is_duplicate = True
-                    processed_drafts.append({
-                        "id": existing_draft.id,
-                        "status": "duplicate",
-                        "message": "该草稿已在之前的批次中同步过（幂等处理）"
-                    })
-            
-            if is_duplicate:
-                continue
+                    version_same = draft_data.version == existing_draft.version
+                    data_same = draft_data.form_data == existing_draft.form_data
+                    
+                    if version_same and data_same:
+                        processed_drafts.append({
+                            "id": existing_draft.id,
+                            "status": "duplicate",
+                            "message": "该草稿已在之前的批次中同步过（幂等处理）"
+                        })
+                        continue
+                    else:
+                        sync_info = f"重新同步: 版本{'不匹配' if not version_same else ''}{'数据有差异' if not data_same else ''}"
 
             conflicts = self.detect_conflicts(draft_data, existing_draft)
 
