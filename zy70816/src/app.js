@@ -8,6 +8,10 @@ const approvalsRoute = require('./routes/approvals');
 const transfersRoute = require('./routes/transfers');
 const inventoryRoute = require('./routes/inventory');
 const exportsRoute = require('./routes/exports');
+const recallsRoute = require('./routes/recalls');
+const consumptionRoute = require('./routes/consumption');
+const substitutesRoute = require('./routes/substitutes');
+const confirmationsRoute = require('./routes/confirmations');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +25,10 @@ app.use('/api/approvals', approvalsRoute);
 app.use('/api/transfers', transfersRoute);
 app.use('/api/inventory', inventoryRoute);
 app.use('/api/exports', exportsRoute);
+app.use('/api/recalls', recallsRoute);
+app.use('/api/consumption', consumptionRoute);
+app.use('/api/substitutes', substitutesRoute);
+app.use('/api/confirmations', confirmationsRoute);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: '口腔连锁采购追踪系统运行正常' });
@@ -29,7 +37,7 @@ app.get('/api/health', (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     name: '口腔连锁采购追踪系统',
-    version: '1.0.0',
+    version: '1.1.0',
     description: '支持库存CSV、召回公告Markdown、门店消耗表接入，生成可追踪记录',
     endpoints: {
       batches: '/api/batches',
@@ -37,6 +45,10 @@ app.get('/', (req, res) => {
       transfers: '/api/transfers',
       inventory: '/api/inventory',
       exports: '/api/exports',
+      recalls: '/api/recalls',
+      consumption: '/api/consumption',
+      substitutes: '/api/substitutes',
+      confirmations: '/api/confirmations',
       health: '/api/health'
     }
   });

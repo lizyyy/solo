@@ -136,6 +136,21 @@ const createTables = () => {
         FOREIGN KEY (substitute_batch_id) REFERENCES batches(id)
       )`);
 
+      db.run(`CREATE TABLE IF NOT EXISTS store_confirmations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        batch_id INTEGER NOT NULL,
+        store_id INTEGER NOT NULL,
+        confirmation_type TEXT NOT NULL,
+        status TEXT DEFAULT 'pending',
+        notes TEXT,
+        confirmed_by TEXT,
+        confirmed_at DATETIME,
+        created_by TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (batch_id) REFERENCES batches(id),
+        FOREIGN KEY (store_id) REFERENCES stores(id)
+      )`);
+
       db.run(`CREATE TABLE IF NOT EXISTS audit_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         batch_id INTEGER,

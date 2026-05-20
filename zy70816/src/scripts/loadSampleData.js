@@ -61,6 +61,30 @@ const loadSampleData = () => {
             else resolve();
           });
         });
+        await new Promise((resolve, reject) => {
+          db.run(`DELETE FROM store_confirmations`, (err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+        await new Promise((resolve, reject) => {
+          db.run(`DELETE FROM substitute_products`, (err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+        await new Promise((resolve, reject) => {
+          db.run(`DELETE FROM consumption`, (err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+        await new Promise((resolve, reject) => {
+          db.run(`DELETE FROM audit_logs`, (err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
 
         console.log('插入门店数据...');
         const stores = [
@@ -246,6 +270,68 @@ const loadSampleData = () => {
           );
         });
 
+        console.log('插入替代耗材记录...');
+        await new Promise((resolve, reject) => {
+          db.run(
+            `INSERT INTO substitute_products (original_batch_id, substitute_batch_id, reason, handled_by, created_at)
+             VALUES (?, ?, ?, ?, ?)`,
+            [
+              5,
+              1,
+              '原批次质量抽检不合格，使用替代批次供货',
+              '采购主管-张伟',
+              '2024-05-11 14:20:00'
+            ],
+            function(err) {
+              if (err) reject(err);
+              else resolve();
+            }
+          );
+        });
+
+        console.log('插入门店确认记录...');
+        const confirmations = [
+          { batch_id: 5, store_id: 1, type: 'freeze', status: 'pending', notes: '请北京门店确认该批次冻结处理情况', created_by: '质量部' },
+          { batch_id: 1, store_id: 2, type: 'recall', status: 'confirmed', notes: '已收到召回通知，库存已隔离', confirmed_by: '上海门店-库管', confirmed_at: '2024-05-16 10:00:00', created_by: '质量部' },
+          { batch_id: 6, store_id: 2, type: 'other', status: 'pending', notes: '请确认补充资料是否齐全', created_by: '审核员' }
+        ];
+
+        for (const conf of confirmations) {
+          await new Promise((resolve, reject) => {
+            db.run(
+              `INSERT INTO store_confirmations (batch_id, store_id, confirmation_type, status, notes, confirmed_by, confirmed_at, created_by)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+              [conf.batch_id, conf.store_id, conf.type, conf.status, conf.notes, conf.confirmed_by, conf.confirmed_at, conf.created_by],
+              function(err) {
+                if (err) reject(err);
+                else resolve();
+              }
+            );
+          });
+        }
+
+        console.log('插入消耗记录...');
+        const consumptions = [
+          { store_id: 1, batch_id: 1, date: '2024-05-15', quantity: 5, used_by: '李医生', patient: '张某某-种植牙', notes: '常规种植手术' },
+          { store_id: 1, batch_id: 2, date: '2024-05-16', quantity: 10, used_by: '王医生', patient: '刘某某-正畸', notes: '托槽更换' },
+          { store_id: 2, batch_id: 1, date: '2024-05-17', quantity: 3, used_by: '陈医生', patient: '赵某某-种植牙', notes: '前牙种植' },
+          { store_id: 3, batch_id: 4, date: '2024-05-18', quantity: 50, used_by: '周护士', patient: '日常诊疗', notes: '器械盒消耗' }
+        ];
+
+        for (const cons of consumptions) {
+          await new Promise((resolve, reject) => {
+            db.run(
+              `INSERT INTO consumption (store_id, batch_id, consumption_date, quantity, used_by, patient_info, notes)
+               VALUES (?, ?, ?, ?, ?, ?, ?)`,
+              [cons.store_id, cons.batch_id, cons.date, cons.quantity, cons.used_by, cons.patient, cons.notes],
+              function(err) {
+                if (err) reject(err);
+                else resolve();
+              }
+            );
+          });
+        }
+
         await new Promise((resolve, reject) => {
           db.run('COMMIT', (err) => {
             if (err) reject(err);
@@ -258,33 +344,42 @@ const loadSampleData = () => {
         console.log('样例数据加载完成！');
         console.log('========================================');
         console.log('');
-        console.log('【重要样例说明】');
+        console.log('【核心追踪闭环样例说明】');
         console.log('');
-        console.log('1. 批号冻结样例:');
+        console.log('1. 批号冻结 + 门店确认:');
         console.log('   批号: BATCH202404001-FROZEN');
         console.log('   产品: 牙科种植体');
         console.log('   冻结原因: 质量抽检不合格，等待供应商复核');
         console.log('   冻结人: 质量管理员-王芳');
-        console.log('   存放位置: 隔离区-QA');
+        console.log('   门店确认: 已发送北京门店确认通知（待处理）');
+        console.log('   替代耗材: 已设置替代批次 BATCH202401001');
         console.log('');
         console.log('2. 人工修正审批样例:');
         console.log('   批号: BATCH202404002-CORRECT');
         console.log('   产品: 光固化树脂');
         console.log('   当前状态: 已退回，等待修正');
         console.log('   退回原因: 质检报告缺少生产厂家盖章');
-        console.log('   审批流程:');
-        console.log('     - 提交审核 → 退回修改 → 重新提交');
+        console.log('   审批流程: 提交审核 → 退回修改 → 重新提交');
+        console.log('   门店确认: 已发送上海门店资料确认（待处理）');
         console.log('');
-        console.log('3. 近效期预警:');
+        console.log('3. 召回处理 + 门店确认:');
+        console.log('   批号: BATCH202401001');
+        console.log('   召回公告: RC202405001');
+        console.log('   召回原因: 产品涂层质量问题');
+        console.log('   门店确认: 上海门店已确认收到并隔离');
+        console.log('');
+        console.log('4. 近效期预警:');
         console.log('   批号 BATCH202403001 (牙科高速手机) 将于2025年3月到期');
         console.log('   批号 BATCH202403002 (一次性口腔器械盒) 将于2025年9月到期');
         console.log('');
-        console.log('4. 召回批号:');
-        console.log('   批号 BATCH202401001 (牙科种植体) 涉及召回');
-        console.log('   召回原因: 产品涂层质量问题');
-        console.log('');
         console.log('5. 跨门店调拨:');
-        console.log('   从北京门店调拨100盒一次性器械盒至广州门店');
+        console.log('   单号: TF202405001');
+        console.log('   内容: 从北京门店调拨100盒一次性器械盒至广州门店');
+        console.log('   状态: 已确认');
+        console.log('');
+        console.log('6. 消耗记录追踪:');
+        console.log('   已录入4条消耗记录，包含使用人、患者信息');
+        console.log('   支持按门店、批号、日期范围查询汇总');
         console.log('');
         console.log('========================================');
         resolve();
