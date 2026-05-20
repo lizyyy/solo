@@ -1,0 +1,6 @@
+recordId,vehicleId,vehiclePlate,borrower,borrowerDepartment,borrowTime,expectedReturnTime,actualReturnTime,borrowMileage,returnMileage,fuelCardId,fuelBalanceBefore,fuelBalanceAfter,status,remarks
+BR001,VH001,京A12345,张三,销售一部,2024-01-15 09:00:00,2024-01-15 18:00:00,2024-01-15 17:30:00,12500,12680,FC001,500,320,normal,客户试驾
+BR002,VH002,京B23456,李四,销售二部,2024-01-16 10:00:00,2024-01-16 17:00:00,,15800,,FC002,380,,pending,未归还
+BR003,VH003,京C34567,王五,销售一部,2024-01-17 08:30:00,2024-01-17 12:00:00,2024-01-18 09:00:00,8900,9150,FC003,420,180,abnormal,超时归还
+BR004,VH001,京A12345,赵六,销售二部,2024-01-18 14:00:00,2024-01-18 18:00:00,2024-01-18 17:45:00,12680,12850,FC001,320,150,normal,
+BR005,VH004,京D45678,钱七,销售一部,2024-01-19 09:30:00,2024-01-19 16:00:00,,23000,,FC004,600,,pending,

@@ -1,0 +1,62 @@
+[
+  {
+    "vehicleId": "VH001",
+    "plateNumber": "京A12345",
+    "brand": "奔驰",
+    "model": "E300L",
+    "color": "黑色",
+    "vin": "LE4ZG4CB8NL123456",
+    "currentMileage": 12850,
+    "fuelCardId": "FC001",
+    "fuelCardBalance": 150,
+    "keyCount": 2,
+    "status": "available",
+    "assignedSalesperson": "张三",
+    "purchaseDate": "2023-06-15"
+  },
+  {
+    "vehicleId": "VH002",
+    "plateNumber": "京B23456",
+    "brand": "宝马",
+    "model": "530Li",
+    "color": "白色",
+    "vin": "LBVKY5109NSM65432",
+    "currentMileage": 15800,
+    "fuelCardId": "FC002",
+    "fuelCardBalance": 380,
+    "keyCount": 2,
+    "status": "borrowed",
+    "assignedSalesperson": "李四",
+    "purchaseDate": "2023-07-20"
+  },
+  {
+    "vehicleId": "VH003",
+    "plateNumber": "京C34567",
+    "brand": "奥迪",
+    "model": "A6L",
+    "color": "银色",
+    "vin": "LFV3A24G7N3098765",
+    "currentMileage": 9150,
+    "fuelCardId": "FC003",
+    "fuelCardBalance": 180,
+    "keyCount": 1,
+    "status": "available",
+    "assignedSalesperson": "王五",
+    "purchaseDate": "2023-08-10"
+  },
+  {
+    "vehicleId": "VH004",
+    "plateNumber": "京D45678",
+    "brand": "丰田",
+    "model": "凯美瑞",
+    "color": "灰色",
+    "vin": "LVGBR74K6NG123789",
+    "currentMileage": 23000,
+    "fuelCardId": "FC004",
+    "fuelCardBalance": 600,
+    "keyCount": 2,
+    "status": "borrowed",
+    "assignedSalesperson": "钱七",
+    "purchaseDate": "2023-05-08"
+  }
+]

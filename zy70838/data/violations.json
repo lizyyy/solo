@@ -1,0 +1,52 @@
+[
+  {
+    "violationId": "VL001",
+    "vehiclePlate": "京A12345",
+    "vehicleId": "VH001",
+    "violationTime": "2024-01-15 14:30:00",
+    "violationType": "超速行驶",
+    "violationLocation": "朝阳区建国门外大街",
+    "points": 3,
+    "fineAmount": 200,
+    "status": "unprocessed",
+    "driverName": "张三",
+    "source": "traffic_bureau"
+  },
+  {
+    "violationId": "VL002",
+    "vehiclePlate": "京C34567",
+    "vehicleId": "VH003",
+    "violationTime": "2024-01-17 10:15:00",
+    "violationType": "违规停车",
+    "violationLocation": "海淀区中关村大街",
+    "points": 0,
+    "fineAmount": 100,
+    "status": "unprocessed",
+    "source": "traffic_bureau"
+  },
+  {
+    "violationId": "VL003",
+    "vehiclePlate": "京A12345",
+    "vehicleId": "VH001",
+    "violationTime": "2024-01-18 16:45:00",
+    "violationType": "不按导向车道行驶",
+    "violationLocation": "东城区王府井大街",
+    "points": 2,
+    "fineAmount": 100,
+    "status": "unprocessed",
+    "driverName": "赵六",
+    "source": "traffic_bureau"
+  },
+  {
+    "violationId": "VL004",
+    "vehiclePlate": "京B23456",
+    "vehicleId": "VH002",
+    "violationTime": "2024-01-16 14:20:00",
+    "violationType": "闯红灯",
+    "violationLocation": "西城区西单大街",
+    "points": 6,
+    "fineAmount": 200,
+    "status": "unprocessed",
+    "source": "traffic_bureau"
+  }
+]
