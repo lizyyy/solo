@@ -12,7 +12,7 @@ from ..models.models import (
 )
 from ..schemas.schemas import RunRequestCreate, RunRequestUpdate
 from .quota_service import QuotaService
-from .code_executor import CodeExecutor, ExecutionResult
+from ..core.code_executor import CodeExecutor, ExecutionResult
 from ..core.config import settings
 
 
@@ -188,7 +188,7 @@ class RequestService:
 
     @staticmethod
     def execute_request(request_id: str):
-        from ..database.database import SessionLocal
+        from ..core.database import SessionLocal
         import time
 
         def execute():
