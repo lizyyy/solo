@@ -1,0 +1,29 @@
+[
+  {
+    "id": "Z001",
+    "name": "冷冻库A区",
+    "type": "frozen",
+    "targetTemp": -18,
+    "multiplier": 1.2,
+    "tenantId": "T001",
+    "isVacant": false
+  },
+  {
+    "id": "Z002",
+    "name": "冷藏库B区",
+    "type": "chilled",
+    "targetTemp": 4,
+    "multiplier": 1.0,
+    "tenantId": "T001",
+    "isVacant": false
+  },
+  {
+    "id": "Z003",
+    "name": "常温库C区",
+    "type": "ambient",
+    "targetTemp": 25,
+    "multiplier": 0.8,
+    "isVacant": true,
+    "vacantStartDate": "2023-12-01"
+  }
+]

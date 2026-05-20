@@ -1,0 +1,24 @@
+{
+  "tenantId": "T001",
+  "tenantName": "生鲜冷链物流有限公司",
+  "zoneIds": ["Z001", "Z002"],
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31",
+  "baseMultiplier": 1.0,
+  "overtimeMultiplier": 1.5,
+  "ratePerKwh": 1.2,
+  "baseRent": 15000,
+  "overtimeHours": [
+    {
+      "date": "2024-01-15",
+      "hours": 4,
+      "reason": "春节前备货加班"
+    },
+    {
+      "date": "2024-01-16",
+      "hours": 3,
+      "reason": "春节前备货加班"
+    }
+  ],
+  "status": "active"
+}
