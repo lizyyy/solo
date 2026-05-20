@@ -13,6 +13,7 @@ import {
   Typography,
   message,
 } from 'antd';
+import type { TableProps } from 'antd';
 import {
   PlusOutlined,
   ReloadOutlined,
@@ -108,7 +109,7 @@ const PromoCodes: React.FC = () => {
     return <Tag color={info.color}>{info.text}</Tag>;
   };
 
-  const columns = [
+  const columns: TableProps<PromoCode>['columns'] = [
     {
       title: '优惠码',
       dataIndex: 'code',
@@ -132,7 +133,7 @@ const PromoCodes: React.FC = () => {
       dataIndex: 'discount_value',
       key: 'discount_value',
       width: 100,
-      render: (value: number, record: any) => (
+      render: (value: number, record) => (
         <span style={{ fontWeight: 'bold', color: '#ff4d4f' }}>
           {record.discount_type === 'percentage' ? `${value}%` : `¥${value}`}
         </span>
@@ -143,7 +144,7 @@ const PromoCodes: React.FC = () => {
       dataIndex: 'max_usage',
       key: 'max_usage',
       width: 100,
-      render: (max: number, record: any) => `${record.current_usage}/${max}`,
+      render: (max: number, record) => `${record.current_usage}/${max}`,
     },
     {
       title: '状态',
@@ -156,7 +157,7 @@ const PromoCodes: React.FC = () => {
       title: '有效期',
       key: 'validity',
       width: 250,
-      render: (_: any, record: any) => (
+      render: (_, record) => (
         <div style={{ fontSize: 12 }}>
           <div>开始: {moment(record.valid_from).format('YYYY-MM-DD HH:mm')}</div>
           <div>结束: {moment(record.valid_to).format('YYYY-MM-DD HH:mm')}</div>
@@ -175,7 +176,7 @@ const PromoCodes: React.FC = () => {
       key: 'action',
       width: 150,
       fixed: 'right',
-      render: (_: any, record: any) => (
+      render: (_, record) => (
         <Space>
           {record.status === PromoCodeStatus.ACTIVE && (
             <Button

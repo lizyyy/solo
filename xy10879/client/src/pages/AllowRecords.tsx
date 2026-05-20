@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Space, Tag, Typography, message } from 'antd';
+import { Table, Button, Tag, Typography, message } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
+import type { TableProps } from 'antd';
 import { riskApi } from '../services/api';
 import { AllowRecord } from '../types';
 import moment from 'moment';
@@ -33,7 +34,7 @@ const AllowRecords: React.FC = () => {
     }
   };
 
-  const columns = [
+  const columns: TableProps<AllowRecord>['columns'] = [
     {
       title: '优惠码',
       dataIndex: 'promo_code',
@@ -54,7 +55,7 @@ const AllowRecords: React.FC = () => {
       key: 'user_id',
       width: 150,
       ellipsis: true,
-      render: (id: string) => id || '-',
+      render: (id: string | null | undefined) => id || '-',
     },
     {
       title: 'IP地址',
@@ -89,7 +90,7 @@ const AllowRecords: React.FC = () => {
       dataIndex: 'approved_by',
       key: 'approved_by',
       width: 120,
-      render: (by: string) => by || '-',
+      render: (by: string | null | undefined) => by || '-',
     },
     {
       title: '时间',

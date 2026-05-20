@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Statistic, Table, Tag, Typography, Spin, Alert } from 'antd';
+import type { TableProps } from 'antd';
 import {
   StopOutlined,
   CheckCircleOutlined,
@@ -61,7 +62,7 @@ const Dashboard: React.FC = () => {
     return <Tag color={info.color}>{info.text}</Tag>;
   };
 
-  const columns = [
+  const columns: TableProps<BlockEvent>['columns'] = [
     {
       title: '优惠码',
       dataIndex: 'promo_code',

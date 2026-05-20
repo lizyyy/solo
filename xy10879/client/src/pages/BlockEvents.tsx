@@ -10,10 +10,9 @@ import {
   Tag,
   Descriptions,
   message,
-  Spin,
-  Popconfirm,
   Typography,
 } from 'antd';
+import type { TableProps } from 'antd';
 import {
   EyeOutlined,
   CheckCircleOutlined,
@@ -163,7 +162,7 @@ const BlockEvents: React.FC = () => {
     }
   };
 
-  const columns = [
+  const columns: TableProps<BlockEvent>['columns'] = [
     {
       title: '优惠码',
       dataIndex: 'promo_code',
@@ -189,7 +188,7 @@ const BlockEvents: React.FC = () => {
       dataIndex: 'risk_score',
       key: 'risk_score',
       width: 100,
-      sorter: (a: any, b: any) => a.risk_score - b.risk_score,
+      sorter: (a, b) => a.risk_score - b.risk_score,
       render: (score: number) => (
         <span style={{ color: score >= 60 ? '#ff4d4f' : score >= 30 ? '#fa8c16' : '#52c41a', fontWeight: 'bold' }}>
           {score}
@@ -213,7 +212,7 @@ const BlockEvents: React.FC = () => {
         { text: '人工放行', value: EventStatus.MANUAL_ALLOWED },
         { text: '已补偿', value: EventStatus.COMPENSATED },
       ],
-      onFilter: (value: string | number | boolean, record: any) => record.status === value,
+      onFilter: (value, record) => record.status === value,
       render: (status: EventStatus) => getStatusTag(status),
     },
     {
@@ -227,8 +226,7 @@ const BlockEvents: React.FC = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 160,
-      sorter: (a: any, b: any) =>
-        new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      sorter: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
       render: (time: string) => moment(time).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
@@ -236,7 +234,7 @@ const BlockEvents: React.FC = () => {
       key: 'action',
       width: 200,
       fixed: 'right',
-      render: (_: any, record: any) => (
+      render: (_, record) => (
         <Space>
           <Button
             type="link"
