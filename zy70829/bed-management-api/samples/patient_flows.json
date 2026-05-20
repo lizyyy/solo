@@ -1,0 +1,49 @@
+[
+  {
+    "flow_id": "FLOW001",
+    "flow_type": "admission",
+    "patient_id": "P201",
+    "patient_name": "孙八",
+    "to_ward": "INTERNAL",
+    "to_bed": "003",
+    "event_time": "2024-01-15T14:00:00"
+  },
+  {
+    "flow_id": "FLOW002",
+    "flow_type": "discharge",
+    "patient_id": "P001",
+    "patient_name": "张三",
+    "from_ward": "INTERNAL",
+    "from_bed": "001",
+    "event_time": "2024-01-15T15:00:00"
+  },
+  {
+    "flow_id": "FLOW003",
+    "flow_type": "transfer",
+    "patient_id": "P002",
+    "patient_name": "李四",
+    "from_ward": "INTERNAL",
+    "from_bed": "002",
+    "to_ward": "SURGERY",
+    "to_bed": "002",
+    "event_time": "2024-01-15T16:00:00"
+  },
+  {
+    "flow_id": "FLOW004",
+    "flow_type": "transfer",
+    "patient_id": "P202",
+    "patient_name": "周九",
+    "from_ward": "INTERNAL",
+    "from_bed": "001",
+    "to_ward": "INTERNAL",
+    "to_bed": "001",
+    "event_time": "2024-01-15T17:00:00"
+  },
+  {
+    "flow_id": "FLOW005",
+    "flow_type": "discharge",
+    "patient_id": "P203",
+    "patient_name": "吴十",
+    "event_time": "2024-01-15T18:00:00"
+  }
+]

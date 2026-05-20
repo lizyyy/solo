@@ -1,0 +1,10 @@
+ward_code,bed_number,status,patient_id,patient_name,last_updated,is_locked,lock_reason
+INTERNAL,001,occupied,P001,张三,2024-01-15T08:00:00,False,
+INTERNAL,002,occupied,P002,李四,2024-01-15T09:00:00,False,
+INTERNAL,003,vacant,,,2024-01-15T10:00:00,False,
+INTERNAL,004,cleaning,,,2024-01-15T11:00:00,False,
+INTERNAL,005,transfer_locked,P003,王五,2024-01-15T12:00:00,True,transfer
+INTERNAL,006,occupied,,无名患者,2024-01-15T13:00:00,False,
+INTERNAL,007,vacant,P007,赵六,2024-01-15T14:00:00,False,
+SURGERY,001,occupied,P101,钱七,2024-01-15T08:30:00,False,
+SURGERY,002,vacant,,,2024-01-15T09:30:00,False,

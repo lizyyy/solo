@@ -1,0 +1,38 @@
+[
+  {
+    "order_id": "CLEAN001",
+    "ward_code": "INTERNAL",
+    "bed_number": "004",
+    "create_time": "2024-01-13T10:00:00",
+    "start_time": "2024-01-13T10:30:00",
+    "status": "in_progress",
+    "cleaning_staff": "李阿姨"
+  },
+  {
+    "order_id": "CLEAN002",
+    "ward_code": "INTERNAL",
+    "bed_number": "001",
+    "create_time": "2024-01-15T15:30:00",
+    "status": "pending",
+    "cleaning_staff": null
+  },
+  {
+    "order_id": "CLEAN003",
+    "ward_code": "SURGERY",
+    "bed_number": "002",
+    "create_time": "2024-01-15T16:30:00",
+    "start_time": "2024-01-15T17:00:00",
+    "complete_time": "2024-01-15T17:45:00",
+    "status": "completed",
+    "cleaning_staff": "王阿姨"
+  },
+  {
+    "order_id": "CLEAN004",
+    "ward_code": "INTERNAL",
+    "bed_number": "007",
+    "create_time": "2024-01-15T14:30:00",
+    "complete_time": null,
+    "status": "completed",
+    "cleaning_staff": "张阿姨"
+  }
+]
