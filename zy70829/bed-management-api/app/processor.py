@@ -20,6 +20,17 @@ def clean_nan_values(data: Dict[str, Any]) -> Dict[str, Any]:
     return cleaned
 
 
+def safe_str(value: Any) -> Optional[str]:
+    if value is None:
+        return None
+    if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+        return None
+    s = str(value).strip()
+    if s == "" or s.lower() == "nan":
+        return None
+    return s
+
+
 class DataProcessor:
     def __init__(self, rules_engine: BedManagementRules):
         self.rules = rules_engine
@@ -40,14 +51,14 @@ class DataProcessor:
             try:
                 bed_info = BedInfo(
                     batch_id=batch_id,
-                    ward_code=str(row.get('ward_code', '')).strip(),
-                    bed_number=str(row.get('bed_number', '')).strip(),
-                    status=BedStatus(str(row.get('status', 'vacant')).strip().lower()),
-                    patient_id=str(row.get('patient_id', '')).strip() or None,
-                    patient_name=str(row.get('patient_name', '')).strip() or None,
+                    ward_code=safe_str(row.get('ward_code', '')) or "",
+                    bed_number=safe_str(row.get('bed_number', '')) or "",
+                    status=BedStatus(safe_str(row.get('status', 'vacant')).lower()),
+                    patient_id=safe_str(row.get('patient_id', '')),
+                    patient_name=safe_str(row.get('patient_name', '')),
                     last_updated=self.parse_datetime(str(row.get('last_updated', ''))),
                     is_locked=bool(row.get('is_locked', False)),
-                    lock_reason=str(row.get('lock_reason', '')).strip() or None
+                    lock_reason=safe_str(row.get('lock_reason', ''))
                 )
                 status, result = self.rules.validate_bed_info(bed_info, original_data)
                 if status == "success":
