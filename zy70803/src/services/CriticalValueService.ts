@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, Between, In } from 'typeorm';
 import { CriticalValueRecord, DataCategory, TaskStatus } from '../models/CriticalValueRecord';
 import { AppDataSource } from '../database/data-source';
 import { ClassificationService } from './ClassificationService';
@@ -179,7 +179,7 @@ export class CriticalValueService {
   async getStatistics(startDate?: Date, endDate?: Date) {
     const where: any = {};
     if (startDate && endDate) {
-      where.createdAt = { $between: [startDate, endDate] };
+      where.createdAt = Between(startDate, endDate);
     }
 
     const allRecords = await this.recordRepository.find({ where });
@@ -205,10 +205,10 @@ export class CriticalValueService {
     return statistics;
   }
 
-  async exportRecords(startDate?: Date, endDate?: Date): Promise<Buffer> {
+  async exportRecords(operator: string, startDate?: Date, endDate?: Date): Promise<Buffer> {
     const where: any = {};
     if (startDate && endDate) {
-      where.createdAt = { $between: [startDate, endDate] };
+      where.createdAt = Between(startDate, endDate);
     }
 
     const records = await this.recordRepository.find({
@@ -248,7 +248,28 @@ export class CriticalValueService {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, '危急值回告记录');
 
-    return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    const recordIds = records.map(r => r.id);
+    if (recordIds.length > 0) {
+      await this.recordRepository.update(
+        { id: In(recordIds) },
+        { status: TaskStatus.EXPORTED }
+      );
+
+      for (const record of records) {
+        await this.auditService.logChange(
+          record.id,
+          operator,
+          'status',
+          record.status,
+          TaskStatus.EXPORTED,
+          '数据已导出归档'
+        );
+      }
+    }
+
+    return buffer;
   }
 
   private getCategoryText(category: DataCategory): string {

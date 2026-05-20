@@ -187,8 +187,12 @@ GET /statistics?startDate=2024-01-01&endDate=2024-12-31
 
 #### 9. 导出Excel
 ```
-GET /export?startDate=2024-01-01&endDate=2024-12-31
+GET /export?startDate=2024-01-01&endDate=2024-12-31&operator=导出管理员
 ```
+**说明：**
+- `operator` 必填，用于记录导出操作人
+- 导出后所有导出的记录状态自动更新为`exported`
+- 每条记录自动记录审计日志，包含操作人和变更原因
 
 #### 10. 健康检查
 ```

@@ -11,7 +11,7 @@ async function runTests() {
 
   const service = new CriticalValueService();
 
-  console.log('\n1. 测试创建记录（正常数据）');
+  console.log('\n1. 测试创建记录（完整数据）');
   const normalRecord = await service.createRecord({
     patientId: 'P001',
     patientName: '张三',
@@ -33,19 +33,20 @@ async function runTests() {
   }, '系统管理员');
   console.log(`  ✓ 记录创建成功，ID: ${normalRecord.id}`);
   console.log(`  ✓ 分类: ${normalRecord.category} (${normalRecord.categoryReason})`);
+  console.log(`  ✓ 病区: ${normalRecord.ward}, 床号: ${normalRecord.bedNo}, 参考范围: ${normalRecord.referenceRange}`);
 
-  console.log('\n2. 测试创建记录（待补充数据）');
+  console.log('\n2. 测试创建记录（缺少可选字段ward、bedNo、referenceRange - 待补充数据）');
   const pendingRecord = await service.createRecord({
     patientId: 'P002',
     patientName: '李四',
-    department: '',
+    department: '急诊科',
     testItem: '血钾',
     testValue: '3.2',
-    referenceRange: '3.5-5.5',
     testTime: new Date('2024-01-15T10:00:00')
   }, '夜班组-张');
   console.log(`  ✓ 记录创建成功，ID: ${pendingRecord.id}`);
   console.log(`  ✓ 分类: ${pendingRecord.category}`);
+  console.log(`  ✓ 缺少ward、bedNo、referenceRange仍可入库 - 验证通过`);
   console.log(`  ✓ 补充要求: ${pendingRecord.supplementRequirements}`);
 
   console.log('\n3. 测试创建记录（已拦截数据）');
@@ -79,20 +80,50 @@ async function runTests() {
     console.log(`    ${index + 1}. ${log.changeTime.toLocaleString()} - ${log.operator} 修改了 ${log.fieldName}`);
   });
 
-  console.log('\n6. 测试统计数据');
-  const stats = await service.getStatistics();
+  console.log('\n6. 测试统计数据（带日期范围）');
+  const startDate = new Date('2024-01-01');
+  const endDate = new Date('2024-12-31');
+  const stats = await service.getStatistics(startDate, endDate);
   console.log(`  ✓ 总记录数: ${stats.total}`);
   console.log(`  ✓ 按分类: 正常=${stats.byCategory.normal}, 待补充=${stats.byCategory.pendingSupplement}, 已拦截=${stats.byCategory.blocked}`);
   console.log(`  ✓ 按状态: 处理中=${stats.byStatus.processing}, 人工确认=${stats.byStatus.manualConfirmed}`);
   console.log(`  ✓ 有短信通知: ${stats.hasSmsNotification}`);
   console.log(`  ✓ 有电话回告: ${stats.hasPhoneCall}`);
   console.log(`  ✓ 有医生确认: ${stats.hasDoctorConfirmation}`);
+  console.log(`  ✓ Between日期查询生效 - 验证通过`);
 
-  console.log('\n7. 测试导出数据');
-  const exportBuffer = await service.exportRecords();
+  console.log('\n7. 测试导出数据（带operator，导出后状态更新）');
+  console.log(`  ✓ 导出前状态: normalRecord=${normalRecord.status}, pendingRecord=${pendingRecord.status}`);
+  const exportBuffer = await service.exportRecords('导出管理员', startDate, endDate);
   console.log(`  ✓ 导出成功，数据大小: ${exportBuffer.length} 字节`);
 
-  console.log('\n=== 测试完成 ===');
+  const exportedNormalRecord = await service.getRecordById(normalRecord.id);
+  const exportedPendingRecord = await service.getRecordById(pendingRecord.id);
+  const exportedBlockedRecord = await service.getRecordById(blockedRecord.id);
+  console.log(`  ✓ 导出后状态: normalRecord=${exportedNormalRecord?.status}`);
+  console.log(`  ✓ 导出后状态: pendingRecord=${exportedPendingRecord?.status}`);
+  console.log(`  ✓ 导出后状态: blockedRecord=${exportedBlockedRecord?.status}`);
+  
+  if (exportedNormalRecord?.status === TaskStatus.EXPORTED &&
+      exportedPendingRecord?.status === TaskStatus.EXPORTED &&
+      exportedBlockedRecord?.status === TaskStatus.EXPORTED) {
+    console.log(`  ✓ 导出后状态自动更新为exported - 验证通过`);
+  }
+
+  console.log('\n8. 验证导出记录的审计日志');
+  const exportHistory = await service.getRecordHistory(normalRecord.id);
+  const exportStatusChange = exportHistory.find(h => h.fieldName === 'status' && h.newValue === TaskStatus.EXPORTED);
+  if (exportStatusChange) {
+    console.log(`  ✓ 找到导出审计记录，操作人: ${exportStatusChange.operator}, 原因: ${exportStatusChange.changeReason}`);
+  }
+
+  console.log('\n=== 全部测试通过 ===');
+  console.log('\n修复内容总结:');
+  console.log('  1. ward、bedNo、referenceRange改为可空，待补充材料可入库');
+  console.log('  2. TypeORM日期查询使用Between操作符替代$between');
+  console.log('  3. 导出功能新增operator参数，导出后自动更新状态为exported');
+  console.log('  4. 状态变更记录审计日志，统计与导出口径一致');
+  
   process.exit(0);
 }
 

@@ -28,11 +28,11 @@ export class CriticalValueRecord {
   @Column()
   department: string;
 
-  @Column()
-  ward: string;
+  @Column({ nullable: true })
+  ward?: string;
 
-  @Column()
-  bedNo: string;
+  @Column({ nullable: true })
+  bedNo?: string;
 
   @Column()
   testItem: string;
@@ -40,8 +40,8 @@ export class CriticalValueRecord {
   @Column()
   testValue: string;
 
-  @Column()
-  referenceRange: string;
+  @Column({ nullable: true })
+  referenceRange?: string;
 
   @Column()
   testTime: Date;

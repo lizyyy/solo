@@ -249,7 +249,11 @@ router.get('/export', async (req: Request, res: Response) => {
     const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
     const operator = req.query.operator as string;
 
-    const buffer = await criticalValueService.exportRecords(startDate, endDate);
+    if (!operator) {
+      return res.status(400).json({ error: '操作人必填' });
+    }
+
+    const buffer = await criticalValueService.exportRecords(operator, startDate, endDate);
 
     const fileName = `危急值回告记录_${moment().format('YYYYMMDD_HHmmss')}.xlsx`;
 

@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { AuditLog } from '../models/AuditLog';
 import { AppDataSource } from '../database/data-source';
 
@@ -68,7 +68,7 @@ export class AuditService {
   async getOperatorHistory(operator: string, startDate?: Date, endDate?: Date): Promise<AuditLog[]> {
     const where: any = { operator };
     if (startDate && endDate) {
-      where.changeTime = { $between: [startDate, endDate] };
+      where.changeTime = Between(startDate, endDate);
     }
     return await this.auditLogRepository.find({
       where,
