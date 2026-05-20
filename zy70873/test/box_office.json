@@ -1,0 +1,41 @@
+[
+  {
+    "cinema_id": "C001",
+    "cinema_name": "万达影城(国贸店)",
+    "film_id": "F001",
+    "film_name": "流浪地球3",
+    "stat_date": "2024-01-15",
+    "total_box_office": 9750,
+    "net_box_office": 8500,
+    "service_fee": 585,
+    "ticket_count": 200,
+    "refund_count": 7,
+    "refund_amount": 350
+  },
+  {
+    "cinema_id": "C001",
+    "cinema_name": "万达影城(国贸店)",
+    "film_id": "F002",
+    "film_name": "满江红2",
+    "stat_date": "2024-01-15",
+    "total_box_office": 4500,
+    "net_box_office": 4000,
+    "service_fee": 200,
+    "ticket_count": 100,
+    "refund_count": 0,
+    "refund_amount": 0
+  },
+  {
+    "cinema_id": "C002",
+    "cinema_name": "万达影城(朝阳店)",
+    "film_id": "F001",
+    "film_name": "流浪地球3",
+    "stat_date": "2024-01-15",
+    "total_box_office": 26400,
+    "net_box_office": 23000,
+    "service_fee": 1650,
+    "ticket_count": 330,
+    "refund_count": 13,
+    "refund_amount": 1040
+  }
+]

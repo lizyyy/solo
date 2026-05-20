@@ -1,0 +1,25 @@
+{
+  "name": "cinema-subsidy-calculator",
+  "version": "1.0.0",
+  "description": "影院排片补贴核算API系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node test/run-test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "moment": "^2.29.4",
+    "crypto": "^1.0.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["cinema", "subsidy", "box-office", "calculator"],
+  "author": "",
+  "license": "MIT"
+}

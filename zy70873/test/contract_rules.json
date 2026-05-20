@@ -1,0 +1,47 @@
+[
+  {
+    "rule_name": "流浪地球3场次补贴",
+    "film_id": "F001",
+    "film_name": "流浪地球3",
+    "start_date": "2024-01-10",
+    "end_date": "2024-01-20",
+    "subsidy_type": "per_show",
+    "subsidy_amount": 200,
+    "daily_subsidy_cap": 1000,
+    "total_subsidy_cap": 5000,
+    "min_box_office_commitment": 5000,
+    "refund_deduction_rate": 0.3,
+    "cross_day_subsidy_multiplier": 1.5,
+    "min_ticket_price": 30,
+    "priority": 1
+  },
+  {
+    "rule_name": "流浪地球3人次补贴",
+    "film_id": "F001",
+    "film_name": "流浪地球3",
+    "cinema_id": "C002",
+    "cinema_name": "万达影城(朝阳店)",
+    "start_date": "2024-01-10",
+    "end_date": "2024-01-20",
+    "subsidy_type": "per_ticket",
+    "subsidy_amount": 5,
+    "daily_subsidy_cap": null,
+    "total_subsidy_cap": null,
+    "refund_deduction_rate": 0.3,
+    "cross_day_subsidy_multiplier": 1.2,
+    "priority": 2
+  },
+  {
+    "rule_name": "满江红2票房分成补贴",
+    "film_id": "F002",
+    "film_name": "满江红2",
+    "start_date": "2024-01-10",
+    "end_date": "2024-01-25",
+    "subsidy_type": "box_office_percentage",
+    "subsidy_rate": 0.1,
+    "daily_subsidy_cap": 2000,
+    "total_subsidy_cap": 10000,
+    "refund_deduction_rate": 0.2,
+    "priority": 1
+  }
+]
