@@ -88,6 +88,7 @@ class BillingSummaryResponse(BaseModel):
     billable_calls: int
     base_amount: float
     manual_discount: float
+    manual_surcharge: float
     final_amount: float
     notes: Optional[str] = None
     created_at: datetime

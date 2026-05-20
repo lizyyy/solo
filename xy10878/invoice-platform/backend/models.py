@@ -68,6 +68,7 @@ class BillingSummary(Base):
     billable_calls = Column(Integer, default=0)
     base_amount = Column(Float, default=0.0)
     manual_discount = Column(Float, default=0.0)
+    manual_surcharge = Column(Float, default=0.0)
     final_amount = Column(Float, default=0.0)
     notes = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)

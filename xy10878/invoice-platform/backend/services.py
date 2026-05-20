@@ -124,6 +124,7 @@ def lock_billing_period(db: Session, period_id: str):
             billable_calls=billable_calls,
             base_amount=base_amount,
             manual_discount=0.0,
+            manual_surcharge=0.0,
             final_amount=base_amount,
             notes=f"规则版本: {rule_version}, 单价: {rule.price_per_call}元/次, 免费额度: {rule.free_quota}次"
         )
@@ -155,9 +156,10 @@ def create_adjustment(db: Session, adjustment_data: AdjustmentCreate):
     
     if adjustment_data.adjustment_type == "discount":
         summary.manual_discount += adjustment_data.amount
-        summary.final_amount = max(0, summary.base_amount - summary.manual_discount)
     elif adjustment_data.adjustment_type == "surcharge":
-        summary.final_amount += adjustment_data.amount
+        summary.manual_surcharge += adjustment_data.amount
+    
+    summary.final_amount = max(0, summary.base_amount - summary.manual_discount + summary.manual_surcharge)
     
     db.commit()
     db.refresh(adjustment)
@@ -195,6 +197,10 @@ def submit_invoice(db: Session, invoice_data: InvoiceSubmit):
         if invoice_data.invoice_number:
             existing_invoice.invoice_number = invoice_data.invoice_number
         invoice = existing_invoice
+        
+        db.query(VarianceRecord).filter(
+            VarianceRecord.invoice_id == invoice.id
+        ).delete()
     else:
         invoice_number = invoice_data.invoice_number or f"INV-{datetime.now().strftime('%Y%m%d')}-{generate_id()[:8]}"
         invoice = Invoice(
@@ -251,33 +257,36 @@ def generate_variances(db: Session, invoice: Invoice, summaries: list):
             db.add(variance)
         
         summary_adjustments = adjustments_by_summary.get(summary.id, [])
-        for adj in summary_adjustments:
+        sorted_adjustments = sorted(summary_adjustments, key=lambda x: x.created_at)
+        
+        current_amount = summary.base_amount
+        for adj in sorted_adjustments:
+            expected_for_adj = current_amount
+            
             if adj.adjustment_type == "discount":
-                variance = VarianceRecord(
-                    id=generate_id(),
-                    invoice_id=invoice.id,
-                    rule_version=summary.rule_version,
-                    variance_type="manual_discount",
-                    expected_amount=summary.base_amount,
-                    actual_amount=summary.base_amount - adj.amount,
-                    variance_amount=-adj.amount,
-                    description=f"人工折扣: {adj.amount}元, 原因: {adj.reason}, 操作人: {adj.adjusted_by or '未知'}",
-                    source_rule=f"调整记录ID: {adj.id}, 类型: 折扣"
-                )
-                db.add(variance)
+                actual_after_adj = max(0, current_amount - adj.amount)
+                variance_amount = -adj.amount
+                variance_type = "manual_discount"
+                desc_prefix = "人工折扣"
             elif adj.adjustment_type == "surcharge":
-                variance = VarianceRecord(
-                    id=generate_id(),
-                    invoice_id=invoice.id,
-                    rule_version=summary.rule_version,
-                    variance_type="manual_surcharge",
-                    expected_amount=summary.base_amount - summary.manual_discount,
-                    actual_amount=summary.final_amount,
-                    variance_amount=adj.amount,
-                    description=f"额外收费: {adj.amount}元, 原因: {adj.reason}, 操作人: {adj.adjusted_by or '未知'}",
-                    source_rule=f"调整记录ID: {adj.id}, 类型: 额外收费"
-                )
-                db.add(variance)
+                actual_after_adj = current_amount + adj.amount
+                variance_amount = adj.amount
+                variance_type = "manual_surcharge"
+                desc_prefix = "额外收费"
+            
+            variance = VarianceRecord(
+                id=generate_id(),
+                invoice_id=invoice.id,
+                rule_version=summary.rule_version,
+                variance_type=variance_type,
+                expected_amount=expected_for_adj,
+                actual_amount=actual_after_adj,
+                variance_amount=variance_amount,
+                description=f"{desc_prefix}: {adj.amount}元, 原因: {adj.reason}, 操作人: {adj.adjusted_by or '未知'}",
+                source_rule=f"调整记录ID: {adj.id}, 类型: {'折扣' if adj.adjustment_type == 'discount' else '额外收费'}"
+            )
+            db.add(variance)
+            current_amount = actual_after_adj
 
 def approve_invoice(db: Session, invoice_id: str):
     invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
