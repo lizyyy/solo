@@ -24,7 +24,7 @@ export class BatchProcessService {
 
     for (const app of applications) {
       store.saveApplication(app);
-      const result = validationService.validateApplication(app);
+      const result = validationService.validateApplication(app, applications);
       results.push(result);
     }
 

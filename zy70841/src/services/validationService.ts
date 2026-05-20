@@ -11,12 +11,15 @@ import {
 import { store } from '../store/memoryStore';
 
 export class ValidationService {
-  validateApplication(application: BoothApplication): ValidationResult {
+  validateApplication(
+    application: BoothApplication,
+    batchApplications: BoothApplication[] = []
+  ): ValidationResult {
     const issues: IssueDetail[] = [];
     const suggestions: string[] = [];
 
     this.validateDocuments(application, issues, suggestions);
-    this.validateTimeConflict(application, issues, suggestions);
+    this.validateTimeConflict(application, batchApplications, issues, suggestions);
     this.validateDeposit(application, issues, suggestions);
     this.validateRequiredFields(application, issues, suggestions);
 
@@ -41,6 +44,7 @@ export class ValidationService {
     suggestions: string[]
   ): void {
     const requiredTypes = [DocumentType.BUSINESS_LICENSE, DocumentType.FIRE_SAFETY];
+    const activityEnd = moment(application.endTime);
     
     for (const requiredType of requiredTypes) {
       const doc = application.documents.find(d => d.type === requiredType);
@@ -58,28 +62,60 @@ export class ValidationService {
         continue;
       }
 
-      if (doc.expiryDate && this.isDocumentExpired(doc.expiryDate)) {
+      const docValidation = this.validateDocumentValidity(doc, activityEnd, requiredType);
+      if (docValidation.hasIssue) {
         const docName = this.getDocumentTypeName(requiredType);
         issues.push({
           field: `documents.${requiredType}.expiryDate`,
           reason: FailureReason.DOCUMENT_EXPIRED,
-          message: `${docName}已过期或即将过期`,
+          message: docValidation.message,
           currentValue: doc.expiryDate,
           expectedValue: `有效期需覆盖活动期间（${application.startTime} 至 ${application.endTime}）`
         });
-        suggestions.push(`${docName}有效期至 ${doc.expiryDate}，请在活动开始前更新证照`);
+        suggestions.push(docValidation.suggestion);
       }
     }
   }
 
-  private isDocumentExpired(expiryDate: string): boolean {
-    const expiry = moment(expiryDate);
+  private validateDocumentValidity(
+    doc: { expiryDate: string },
+    activityEnd: moment.Moment,
+    docType: DocumentType
+  ): { hasIssue: boolean; message: string; suggestion: string } {
+    const expiry = moment(doc.expiryDate);
     const today = moment();
-    return expiry.isBefore(today.add(7, 'days'));
+    const docName = this.getDocumentTypeName(docType);
+
+    if (expiry.isBefore(today)) {
+      return {
+        hasIssue: true,
+        message: `${docName}已过期`,
+        suggestion: `${docName}已过期，请立即更新证照`
+      };
+    }
+
+    if (expiry.isBefore(activityEnd)) {
+      return {
+        hasIssue: true,
+        message: `${docName}在活动期间到期`,
+        suggestion: `${docName}有效期至 ${doc.expiryDate}，活动结束于 ${activityEnd.format('YYYY-MM-DD')}，请更新证照以覆盖整个活动期`
+      };
+    }
+
+    if (expiry.isBefore(today.add(7, 'days'))) {
+      return {
+        hasIssue: true,
+        message: `${docName}即将过期`,
+        suggestion: `${docName}有效期至 ${doc.expiryDate}，将在7天内过期，请及时更新`
+      };
+    }
+
+    return { hasIssue: false, message: '', suggestion: '' };
   }
 
   private validateTimeConflict(
     application: BoothApplication,
+    batchApplications: BoothApplication[],
     issues: IssueDetail[],
     suggestions: string[]
   ): void {
@@ -125,6 +161,27 @@ export class ValidationService {
           expectedValue: `与 ${event.companyName} 的 ${event.startTime} - ${event.endTime} 重叠`
         });
         suggestions.push(`建议调整时间至 ${this.findAlternativeSlot(appStart, appEnd, eventStart, eventEnd)}`);
+      }
+    }
+
+    for (const otherApp of batchApplications) {
+      if (otherApp.id === application.id) continue;
+      if (otherApp.boothNumber !== application.boothNumber) continue;
+
+      const otherStart = moment(otherApp.startTime);
+      const otherEnd = moment(otherApp.endTime);
+
+      if (!otherStart.isValid() || !otherEnd.isValid()) continue;
+
+      if (this.hasOverlap(appStart, appEnd, otherStart, otherEnd)) {
+        issues.push({
+          field: 'time',
+          reason: FailureReason.TIME_CONFLICT,
+          message: `摊位 ${application.boothNumber} 同批次内时间冲突`,
+          currentValue: `${application.startTime} - ${application.endTime}`,
+          expectedValue: `与同批次 ${otherApp.companyName} 的 ${otherApp.startTime} - ${otherApp.endTime} 重叠`
+        });
+        suggestions.push(`同批次内存在时间重叠，请调整其中一个申请的时间`);
       }
     }
   }
@@ -230,7 +287,8 @@ export class ValidationService {
 
     const fatalReasons = [
       FailureReason.DOCUMENT_EXPIRED,
-      FailureReason.MISSING_DOCUMENT
+      FailureReason.MISSING_DOCUMENT,
+      FailureReason.TIME_CONFLICT
     ];
 
     const hasFatalIssue = issues.some(issue => fatalReasons.includes(issue.reason));
