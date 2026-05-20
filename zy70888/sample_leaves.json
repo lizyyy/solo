@@ -1,0 +1,24 @@
+[
+    {
+        "object_name": "张三",
+        "object_id_card": "110101199001011234",
+        "object_level": "A级",
+        "leave_start_time": "2024-01-20T08:00:00",
+        "leave_end_time": "2024-01-22T18:00:00",
+        "leave_scope": "本市范围内",
+        "leave_reason": "家中有事需要处理",
+        "approver": "李社工",
+        "approve_time": "2024-01-19T10:00:00"
+    },
+    {
+        "object_name": "李四",
+        "object_id_card": "110101199002022345",
+        "object_level": "B级",
+        "leave_start_time": "2024-01-25T08:00:00",
+        "leave_end_time": "2024-01-28T18:00:00",
+        "leave_scope": "本省范围内",
+        "leave_reason": "外地探亲",
+        "approver": "王社工",
+        "approve_time": "2024-01-24T14:00:00"
+    }
+]

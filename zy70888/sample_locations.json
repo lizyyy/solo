@@ -1,0 +1,22 @@
+[
+    {
+        "object_name": "张三",
+        "object_id_card": "110101199001011234",
+        "object_level": "A级",
+        "start_time": "2024-01-15T00:00:00",
+        "end_time": "2024-01-15T23:59:59",
+        "locations": "朝阳区家中 -> 朝阳区司法所 -> 朝阳区超市 -> 朝阳区家中",
+        "has_gap": false,
+        "gap_details": ""
+    },
+    {
+        "object_name": "李四",
+        "object_id_card": "110101199002022345",
+        "object_level": "B级",
+        "start_time": "2024-01-15T00:00:00",
+        "end_time": "2024-01-15T23:59:59",
+        "locations": "海淀区家中 -> 海淀区司法所 -> 海淀区公园",
+        "has_gap": true,
+        "gap_details": "14:00-16:30 无定位数据"
+    }
+]
