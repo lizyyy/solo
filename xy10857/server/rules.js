@@ -189,11 +189,17 @@ const generateAuditExport = async (filters = {}) => {
     roomId ? [roomId] : []
   );
   
+  let anomalyWhere = [];
+  let anomalyParams = [];
+  if (roomId) { anomalyWhere.push('room_id = ?'); anomalyParams.push(roomId); }
+  if (userId) { anomalyWhere.push('user_id = ?'); anomalyParams.push(userId); }
+  const anomalyWhereSql = anomalyWhere.length > 0 ? `WHERE ${anomalyWhere.join(' AND ')}` : '';
+  
   const anomalies = await db.allQuery(
     `SELECT * FROM anomaly_queue
-     ${whereClauses.length > 0 ? `WHERE ${whereClauses.map((c, i) => c.replace('cs.', 'aq.')).join(' AND ')}` : ''}
+     ${anomalyWhereSql}
      ORDER BY created_at DESC`,
-    params
+    anomalyParams
   );
   
   return {
