@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用量计费发票台</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif; background: #f5f7fa; }
+        #app { min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 28px; font-weight: 600; }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #303133; border-left: 4px solid #667eea; padding-left: 12px; }
+        .status-draft { color: #909399; }
+        .status-submitted { color: #409eff; }
+        .status-approved { color: #67c23a; }
+        .status-rejected { color: #f56c6c; }
+        .amount-positive { color: #f56c6c; }
+        .amount-negative { color: #67c23a; }
+        .flex-row { display: flex; gap: 16px; align-items: center; }
+        .flex-grow { flex-grow: 1; }
+        .mt-20 { margin-top: 20px; }
+        .mb-10 { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>📊 用量计费发票台</h1>
+        </div>
+        
+        <div class="container">
+            <el-tabs v-model="activeTab">
+                <el-tab-pane label="客户管理" name="customers">
+                    <div class="card">
+                        <div class="card-title">客户列表</div>
+                        <el-button type="primary" @click="showCustomerDialog = true">+ 新增客户</el-button>
+                        <el-table :data="customers" style="width: 100%; margin-top: 16px;" border>
+                            <el-table-column prop="id" label="客户ID" width="200"></el-table-column>
+                            <el-table-column prop="name" label="客户名称"></el-table-column>
+                            <el-table-column prop="contact" label="联系人"></el-table-column>
+                            <el-table-column prop="email" label="邮箱"></el-table-column>
+                            <el-table-column label="操作" width="120">
+                                <template #default="scope">
+                                    <el-button size="small" @click="selectCustomer(scope.row)">选择</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="定价规则" name="rules">
+                    <div class="card">
+                        <div class="card-title">定价规则列表</div>
+                        <el-button type="primary" @click="showRuleDialog = true">+ 新增规则</el-button>
+                        <el-table :data="pricingRules" style="width: 100%; margin-top: 16px;" border>
+                            <el-table-column prop="version" label="规则版本" width="120"></el-table-column>
+                            <el-table-column prop="customer_id" label="客户ID" width="200"></el-table-column>
+                            <el-table-column prop="free_quota" label="免费额度" width="100"></el-table-column>
+                            <el-table-column prop="price_per_call" label="单价(元)" width="100"></el-table-column>
+                            <el-table-column prop="effective_date" label="生效时间" width="180">
+                                <template #default="scope">
+                                    {{ formatDate(scope.row.effective_date) }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="description" label="描述"></el-table-column>
+                        </el-table>
+                    </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="调用明细" name="calls">
+                    <div class="card">
+                        <div class="card-title">调用明细</div>
+                        <el-button type="primary" @click="importSampleCalls">导入示例数据</el-button>
+                        <el-table :data="callDetails" style="width: 100%; margin-top: 16px;" border max-height="500">
+                            <el-table-column prop="customer_id" label="客户ID" width="200"></el-table-column>
+                            <el-table-column prop="api_name" label="API名称" width="150"></el-table-column>
+                            <el-table-column prop="call_time" label="调用时间" width="180">
+                                <template #default="scope">
+                                    {{ formatDate(scope.row.call_time) }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="rule_version" label="规则版本" width="120"></el-table-column>
+                            <el-table-column prop="is_billed" label="是否已计费" width="100">
+                                <template #default="scope">
+                                    <el-tag :type="scope.row.is_billed ? 'success' : 'info'">
+                                        {{ scope.row.is_billed ? '是' : '否' }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="账期管理" name="periods">
+                    <div class="card">
+                        <div class="card-title">账期列表</div>
+                        <div class="flex-row mb-10">
+                            <el-select v-model="selectedCustomerId" placeholder="选择客户" style="width: 200px;" @change="loadPeriods">
+                                <el-option v-for="c in customers" :key="c.id" :label="c.name" :value="c.id"></el-option>
+                            </el-select>
+                            <el-button type="primary" @click="showPeriodDialog = true">+ 新建账期</el-button>
+                        </div>
+                        <el-table :data="billingPeriods" style="width: 100%; margin-top: 16px;" border>
+                            <el-table-column prop="id" label="账期ID" width="250"></el-table-column>
+                            <el-table-column prop="period_start" label="开始时间" width="180">
+                                <template #default="scope">
+                                    {{ formatDate(scope.row.period_start) }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="period_end" label="结束时间" width="180">
+                                <template #default="scope">
+                                    {{ formatDate(scope.row.period_end) }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="is_locked" label="是否锁定" width="100">
+                                <template #default="scope">
+                                    <el-tag :type="scope.row.is_locked ? 'success' : 'warning'">
+                                        {{ scope.row.is_locked ? '已锁定' : '未锁定' }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" width="280">
+                                <template #default="scope">
+                                    <el-button size="small" type="primary" @click="viewPeriod(scope.row)">查看</el-button>
+                                    <el-button size="small" :type="scope.row.is_locked ? 'info' : 'warning'" :disabled="scope.row.is_locked" @click="lockPeriod(scope.row)">
+                                        {{ scope.row.is_locked ? '已锁定' : '锁定账期' }}
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+
+                    <el-dialog v-model="showPeriodDetail" title="账期详情" width="1000px">
+                        <div v-if="currentPeriod">
+                            <el-descriptions :column="2" border>
+                                <el-descriptions-item label="账期ID">{{ currentPeriod.id }}</el-descriptions-item>
+                                <el-descriptions-item label="状态">
+                                    <el-tag :type="currentPeriod.is_locked ? 'success' : 'warning'">
+                                        {{ currentPeriod.is_locked ? '已锁定' : '未锁定' }}
+                                    </el-tag>
+                                </el-descriptions-item>
+                                <el-descriptions-item label="开始时间">{{ formatDate(currentPeriod.period_start) }}</el-descriptions-item>
+                                <el-descriptions-item label="结束时间">{{ formatDate(currentPeriod.period_end) }}</el-descriptions-item>
+                            </el-descriptions>
+
+                            <div class="card-title mt-20">计费汇总</div>
+                            <el-table :data="currentPeriod.summaries || []" border>
+                                <el-table-column prop="rule_version" label="规则版本" width="120"></el-table-column>
+                                <el-table-column prop="total_calls" label="总调用" width="100"></el-table-column>
+                                <el-table-column prop="free_calls" label="免费调用" width="100"></el-table-column>
+                                <el-table-column prop="billable_calls" label="计费调用" width="100"></el-table-column>
+                                <el-table-column prop="base_amount" label="基础金额" width="120">
+                                    <template #default="scope">¥{{ scope.row.base_amount.toFixed(2) }}</template>
+                                </el-table-column>
+                                <el-table-column prop="manual_discount" label="人工折扣" width="120">
+                                    <template #default="scope">¥{{ scope.row.manual_discount.toFixed(2) }}</template>
+                                </el-table-column>
+                                <el-table-column prop="final_amount" label="最终金额" width="120">
+                                    <template #default="scope">¥{{ scope.row.final_amount.toFixed(2) }}</template>
+                                </el-table-column>
+                                <el-table-column label="操作" width="150">
+                                    <template #default="scope">
+                                        <el-button size="small" @click="showAdjustmentDialog(scope.row)">调整</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+
+                            <div class="card-title mt-20">发票信息</div>
+                            <div v-if="currentPeriod.invoice">
+                                <el-descriptions :column="2" border>
+                                    <el-descriptions-item label="发票编号">{{ currentPeriod.invoice.invoice_number }}</el-descriptions-item>
+                                    <el-descriptions-item label="状态">
+                                        <el-tag :class="getStatusClass(currentPeriod.invoice.status)">
+                                            {{ getStatusText(currentPeriod.invoice.status) }}
+                                        </el-tag>
+                                    </el-descriptions-item>
+                                    <el-descriptions-item label="总金额">¥{{ currentPeriod.invoice.total_amount.toFixed(2) }}</el-descriptions-item>
+                                    <el-descriptions-item label="提交时间">{{ formatDate(currentPeriod.invoice.submitted_at) }}</el-descriptions-item>
+                                </el-descriptions>
+                                <div class="flex-row mt-20">
+                                    <el-button v-if="currentPeriod.invoice.status === 'submitted'" type="success" @click="approveInvoice(currentPeriod.invoice.id)">审批通过</el-button>
+                                    <el-button v-if="currentPeriod.invoice.status === 'submitted'" type="danger" @click="showRejectDialog(currentPeriod.invoice.id)">驳回</el-button>
+                                    <el-button type="primary" @click="exportInvoice(currentPeriod.invoice.id)">导出Excel</el-button>
+                                </div>
+                            </div>
+                            <div v-else class="flex-row mt-20">
+                                <el-button type="primary" :disabled="!currentPeriod.is_locked" @click="submitInvoice(currentPeriod.id)">
+                                    {{ currentPeriod.is_locked ? '提交发票申请' : '请先锁定账期' }}
+                                </el-button>
+                            </div>
+
+                            <div class="card-title mt-20">差异清单</div>
+                            <el-table :data="currentPeriod.variances || []" border v-if="currentPeriod.variances && currentPeriod.variances.length > 0">
+                                <el-table-column prop="rule_version" label="规则版本" width="120"></el-table-column>
+                                <el-table-column prop="variance_type" label="差异类型" width="150"></el-table-column>
+                                <el-table-column prop="expected_amount" label="预期金额" width="120">
+                                    <template #default="scope">¥{{ scope.row.expected_amount.toFixed(2) }}</template>
+                                </el-table-column>
+                                <el-table-column prop="actual_amount" label="实际金额" width="120">
+                                    <template #default="scope">¥{{ scope.row.actual_amount.toFixed(2) }}</template>
+                                </el-table-column>
+                                <el-table-column prop="variance_amount" label="差异金额" width="120">
+                                    <template #default="scope">
+                                        <span :class="scope.row.variance_amount >= 0 ? 'amount-positive' : 'amount-negative'">
+                                            ¥{{ scope.row.variance_amount.toFixed(2) }}
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="description" label="差异说明" width="200"></el-table-column>
+                                <el-table-column prop="source_rule" label="来源规则"></el-table-column>
+                            </el-table>
+                            <el-empty v-else description="暂无差异记录"></el-empty>
+                        </div>
+                    </el-dialog>
+                </el-tab-pane>
+
+                <el-tab-pane label="发票管理" name="invoices">
+                    <div class="card">
+                        <div class="card-title">发票列表</div>
+                        <el-table :data="invoices" style="width: 100%; margin-top: 16px;" border>
+                            <el-table-column prop="invoice_number" label="发票编号" width="200"></el-table-column>
+                            <el-table-column prop="billing_period_id" label="账期ID" width="250"></el-table-column>
+                            <el-table-column prop="total_amount" label="总金额" width="120">
+                                <template #default="scope">¥{{ scope.row.total_amount.toFixed(2) }}</template>
+                            </el-table-column>
+                            <el-table-column prop="status" label="状态" width="120">
+                                <template #default="scope">
+                                    <el-tag :class="getStatusClass(scope.row.status)">
+                                        {{ getStatusText(scope.row.status) }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="rejection_reason" label="驳回原因" width="200"></el-table-column>
+                            <el-table-column prop="submitted_at" label="提交时间" width="180">
+                                <template #default="scope">
+                                    {{ formatDate(scope.row.submitted_at) }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" width="200">
+                                <template #default="scope">
+                                    <el-button size="small" type="primary" @click="exportInvoice(scope.row.id)">导出</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
+        </div>
+
+        <el-dialog v-model="showCustomerDialog" title="新增客户" width="500px">
+            <el-form :model="newCustomer" label-width="100px">
+                <el-form-item label="客户ID">
+                    <el-input v-model="newCustomer.id"></el-input>
+                </el-form-item>
+                <el-form-item label="客户名称">
+                    <el-input v-model="newCustomer.name"></el-input>
+                </el-form-item>
+                <el-form-item label="联系人">
+                    <el-input v-model="newCustomer.contact"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱">
+                    <el-input v-model="newCustomer.email"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showCustomerDialog = false">取消</el-button>
+                <el-button type="primary" @click="createCustomer">确定</el-button>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showRuleDialog" title="新增定价规则" width="600px">
+            <el-form :model="newRule" label-width="120px">
+                <el-form-item label="规则版本">
+                    <el-input v-model="newRule.version"></el-input>
+                </el-form-item>
+                <el-form-item label="客户">
+                    <el-select v-model="newRule.customer_id" style="width: 100%;">
+                        <el-option v-for="c in customers" :key="c.id" :label="c.name" :value="c.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="免费额度">
+                    <el-input-number v-model="newRule.free_quota" :min="0" style="width: 100%;"></el-input-number>
+                </el-form-item>
+                <el-form-item label="单价(元)">
+                    <el-input-number v-model="newRule.price_per_call" :min="0" :precision="2" style="width: 100%;"></el-input-number>
+                </el-form-item>
+                <el-form-item label="生效时间">
+                    <el-date-picker v-model="newRule.effective_date" type="datetime" style="width: 100%;"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="描述">
+                    <el-input v-model="newRule.description" type="textarea"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showRuleDialog = false">取消</el-button>
+                <el-button type="primary" @click="createRule">确定</el-button>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showPeriodDialog" title="新建账期" width="600px">
+            <el-form :model="newPeriod" label-width="100px">
+                <el-form-item label="账期ID">
+                    <el-input v-model="newPeriod.id"></el-input>
+                </el-form-item>
+                <el-form-item label="客户">
+                    <el-select v-model="newPeriod.customer_id" style="width: 100%;">
+                        <el-option v-for="c in customers" :key="c.id" :label="c.name" :value="c.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="开始时间">
+                    <el-date-picker v-model="newPeriod.period_start" type="datetime" style="width: 100%;"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="结束时间">
+                    <el-date-picker v-model="newPeriod.period_end" type="datetime" style="width: 100%;"></el-date-picker>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showPeriodDialog = false">取消</el-button>
+                <el-button type="primary" @click="createPeriod">确定</el-button>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showAdjustment" title="人工调整" width="500px">
+            <el-form :model="adjustment" label-width="100px">
+                <el-form-item label="调整类型">
+                    <el-select v-model="adjustment.adjustment_type" style="width: 100%;">
+                        <el-option label="折扣" value="discount"></el-option>
+                        <el-option label="额外收费" value="surcharge"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="调整金额(元)">
+                    <el-input-number v-model="adjustment.amount" :min="0" :precision="2" style="width: 100%;"></el-input-number>
+                </el-form-item>
+                <el-form-item label="调整原因">
+                    <el-input v-model="adjustment.reason" type="textarea"></el-input>
+                </el-form-item>
+                <el-form-item label="操作人">
+                    <el-input v-model="adjustment.adjusted_by"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showAdjustment = false">取消</el-button>
+                <el-button type="primary" @click="submitAdjustment">确定</el-button>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showReject" title="驳回发票" width="500px">
+            <el-form label-width="100px">
+                <el-form-item label="驳回原因">
+                    <el-input v-model="rejectReason" type="textarea"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showReject = false">取消</el-button>
+                <el-button type="danger" @click="submitReject">确定驳回</el-button>
+            </template>
+        </el-dialog>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+        const API_BASE = 'http://localhost:8000';
+
+        createApp({
+            setup() {
+                const activeTab = ref('customers');
+                const customers = ref([]);
+                const pricingRules = ref([]);
+                const callDetails = ref([]);
+                const billingPeriods = ref([]);
+                const invoices = ref([]);
+                const selectedCustomerId = ref('');
+                
+                const showCustomerDialog = ref(false);
+                const showRuleDialog = ref(false);
+                const showPeriodDialog = ref(false);
+                const showPeriodDetail = ref(false);
+                const showAdjustment = ref(false);
+                const showReject = ref(false);
+                
+                const newCustomer = ref({ id: '', name: '', contact: '', email: '' });
+                const newRule = ref({ id: '', version: '', customer_id: '', free_quota: 1000, price_per_call: 0.1, effective_date: new Date(), description: '' });
+                const newPeriod = ref({ id: '', customer_id: '', period_start: null, period_end: null });
+                const currentPeriod = ref(null);
+                const adjustment = ref({ billing_summary_id: '', adjustment_type: 'discount', amount: 0, reason: '', adjusted_by: '' });
+                const rejectReason = ref('');
+                const rejectingInvoiceId = ref('');
+
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '-';
+                    const d = new Date(dateStr);
+                    return d.toLocaleString('zh-CN');
+                };
+
+                const getStatusText = (status) => {
+                    const map = { draft: '草稿', submitted: '已提交', approved: '已通过', rejected: '已驳回', invoiced: '已开票' };
+                    return map[status] || status;
+                };
+
+                const getStatusClass = (status) => {
+                    const map = { 
+                        draft: 'status-draft', 
+                        submitted: 'status-submitted', 
+                        approved: 'status-approved', 
+                        rejected: 'status-rejected',
+                        invoiced: 'status-approved'
+                    };
+                    return map[status] || '';
+                };
+
+                const apiCall = async (url, options = {}) => {
+                    try {
+                        const res = await fetch(`${API_BASE}${url}`, {
+                            headers: { 'Content-Type': 'application/json' },
+                            ...options
+                        });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.detail || '请求失败');
+                        return data;
+                    } catch (e) {
+                        ElementPlus.ElMessage.error(e.message);
+                        throw e;
+                    }
+                };
+
+                const loadCustomers = async () => {
+                    customers.value = await apiCall('/customers/');
+                };
+
+                const loadPricingRules = async () => {
+                    pricingRules.value = await apiCall('/pricing-rules/');
+                };
+
+                const loadCallDetails = async () => {
+                    callDetails.value = await apiCall('/call-details/');
+                };
+
+                const loadPeriods = async () => {
+                    let url = '/billing-periods/';
+                    if (selectedCustomerId.value) url += `?customer_id=${selectedCustomerId.value}`;
+                    billingPeriods.value = await apiCall(url);
+                };
+
+                const loadInvoices = async () => {
+                    invoices.value = await apiCall('/invoices/');
+                };
+
+                const createCustomer = async () => {
+                    await apiCall('/customers/', {
+                        method: 'POST',
+                        body: JSON.stringify(newCustomer.value)
+                    });
+                    showCustomerDialog.value = false;
+                    ElementPlus.ElMessage.success('客户创建成功');
+                    loadCustomers();
+                    newCustomer.value = { id: '', name: '', contact: '', email: '' };
+                };
+
+                const createRule = async () => {
+                    newRule.value.id = newRule.value.version;
+                    await apiCall('/pricing-rules/', {
+                        method: 'POST',
+                        body: JSON.stringify(newRule.value)
+                    });
+                    showRuleDialog.value = false;
+                    ElementPlus.ElMessage.success('规则创建成功');
+                    loadPricingRules();
+                };
+
+                const createPeriod = async () => {
+                    await apiCall('/billing-periods/', {
+                        method: 'POST',
+                        body: JSON.stringify(newPeriod.value)
+                    });
+                    showPeriodDialog.value = false;
+                    ElementPlus.ElMessage.success('账期创建成功');
+                    loadPeriods();
+                };
+
+                const selectCustomer = (customer) => {
+                    selectedCustomerId.value = customer.id;
+                    activeTab.value = 'periods';
+                    loadPeriods();
+                };
+
+                const viewPeriod = async (period) => {
+                    currentPeriod.value = await apiCall(`/billing-periods/${period.id}`);
+                    showPeriodDetail.value = true;
+                };
+
+                const lockPeriod = async (period) => {
+                    await apiCall(`/billing-periods/${period.id}/lock/`, { method: 'POST' });
+                    ElementPlus.ElMessage.success('账期锁定成功');
+                    loadPeriods();
+                };
+
+                const showAdjustmentDialog = (summary) => {
+                    adjustment.value.billing_summary_id = summary.id;
+                    adjustment.value.amount = 0;
+                    adjustment.value.reason = '';
+                    adjustment.value.adjusted_by = '';
+                    showAdjustment.value = true;
+                };
+
+                const submitAdjustment = async () => {
+                    await apiCall('/adjustments/', {
+                        method: 'POST',
+                        body: JSON.stringify(adjustment.value)
+                    });
+                    showAdjustment.value = false;
+                    ElementPlus.ElMessage.success('调整成功');
+                    if (currentPeriod.value) {
+                        viewPeriod({ id: currentPeriod.value.id });
+                    }
+                };
+
+                const submitInvoice = async (periodId) => {
+                    await apiCall('/invoices/submit/', {
+                        method: 'POST',
+                        body: JSON.stringify({ billing_period_id: periodId })
+                    });
+                    ElementPlus.ElMessage.success('发票提交成功');
+                    viewPeriod({ id: periodId });
+                    loadInvoices();
+                };
+
+                const approveInvoice = async (invoiceId) => {
+                    await apiCall(`/invoices/${invoiceId}/approve/`, { method: 'POST' });
+                    ElementPlus.ElMessage.success('发票审批通过');
+                    viewPeriod({ id: currentPeriod.value.id });
+                    loadInvoices();
+                };
+
+                const showRejectDialog = (invoiceId) => {
+                    rejectingInvoiceId.value = invoiceId;
+                    rejectReason.value = '';
+                    showReject.value = true;
+                };
+
+                const submitReject = async () => {
+                    await apiCall(`/invoices/${rejectingInvoiceId.value}/reject/`, {
+                        method: 'POST',
+                        body: JSON.stringify({ rejection_reason: rejectReason.value })
+                    });
+                    showReject.value = false;
+                    ElementPlus.ElMessage.success('发票已驳回');
+                    viewPeriod({ id: currentPeriod.value.id });
+                    loadInvoices();
+                };
+
+                const exportInvoice = async (invoiceId) => {
+                    const result = await apiCall(`/invoices/${invoiceId}/export/`, { method: 'POST' });
+                    ElementPlus.ElMessage.success(`导出成功: ${result.file_path}`);
+                };
+
+                const importSampleCalls = async () => {
+                    ElementPlus.ElMessage.info('请运行 backend/init_test_data.py 导入测试数据');
+                };
+
+                onMounted(() => {
+                    loadCustomers();
+                    loadPricingRules();
+                    loadCallDetails();
+                    loadPeriods();
+                    loadInvoices();
+                });
+
+                return {
+                    activeTab, customers, pricingRules, callDetails, billingPeriods, invoices,
+                    selectedCustomerId, showCustomerDialog, showRuleDialog, showPeriodDialog,
+                    showPeriodDetail, showAdjustment, showReject, newCustomer, newRule, newPeriod,
+                    currentPeriod, adjustment, rejectReason, formatDate, getStatusText,
+                    getStatusClass, createCustomer, createRule, createPeriod, selectCustomer,
+                    viewPeriod, lockPeriod, showAdjustmentDialog, submitAdjustment, submitInvoice,
+                    approveInvoice, showRejectDialog, submitReject, exportInvoice, importSampleCalls
+                };
+            }
+        }).use(ElementPlus).mount('#app');
+    </script>
+</body>
+</html>
