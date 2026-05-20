@@ -362,6 +362,16 @@ const fixDirtyData = async (refundId, newStatus, operator) => {
     throw new Error('已归档的退款单禁止修改，保证数据完整性');
   }
 
+  const validStatuses = Object.values(REFUND_STATUS);
+  if (!validStatuses.includes(newStatus)) {
+    await logRequest(refundId, 'fix_dirty_data_denied', 
+      { oldStatus: refund.status, newStatus, reason: '无效的目标状态' }, 
+      { success: false, code: 'INVALID_STATUS', validStatuses },
+      operator, 'data_correction_handler'
+    );
+    throw new Error(`无效的目标状态: ${newStatus}。合法状态: ${validStatuses.join(', ')}`);
+  }
+
   const now = Date.now();
   await dbRun(
     `UPDATE refunds SET status = ?, updated_at = ? WHERE id = ?`,
@@ -380,6 +390,7 @@ const fixDirtyData = async (refundId, newStatus, operator) => {
 module.exports = {
   REFUND_STATUS,
   CHANNEL_STATUS,
+  logRequest,
   createPayment,
   createRefund,
   submitToChannel,

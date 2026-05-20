@@ -239,6 +239,36 @@
         </div>
     </div>
 
+    <div id="fixModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>脏数据修复</h3>
+                <button class="close-btn" onclick="closeFixModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>目标状态</label>
+                <select id="fixStatusSelect">
+                    <option value="pending">pending (待提交)</option>
+                    <option value="processing">processing (处理中)</option>
+                    <option value="success">success (成功)</option>
+                    <option value="failed">failed (失败)</option>
+                    <option value="need_review">need_review (需人工复核)</option>
+                    <option value="manual_success">manual_success (人工确认成功)</option>
+                    <option value="manual_failed">manual_failed (人工确认失败)</option>
+                    <option value="archived">archived (已归档)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>修复原因</label>
+                <input type="text" id="fixReason" placeholder="请输入修复原因" value="脏数据修复">
+            </div>
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn" onclick="closeFixModal()" style="margin-right: 10px;">取消</button>
+                <button class="btn btn-danger" onclick="confirmFix()">确认修复</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = '/api';
         let currentRefundId = null;
@@ -526,14 +556,29 @@
             loadDashboard();
         }
 
-        async function showFixDialog(id) {
-            const newStatus = prompt('请输入目标状态:\n\n可选值: pending, processing, success, failed, need_review, manual_success, manual_failed, archived', 'pending');
-            if (!newStatus) return;
+        let currentFixRefundId = null;
 
-            const reason = prompt('修复原因(用于日志记录):', '脏数据修复');
-            if (!reason) return;
+        function showFixDialog(id) {
+            currentFixRefundId = id;
+            document.getElementById('fixStatusSelect').value = 'pending';
+            document.getElementById('fixReason').value = '脏数据修复';
+            document.getElementById('fixModal').classList.add('active');
+        }
 
-            const result = await apiRequest(`/refunds/${id}/fix`, {
+        function closeFixModal() {
+            currentFixRefundId = null;
+            document.getElementById('fixModal').classList.remove('active');
+        }
+
+        async function confirmFix() {
+            if (!currentFixRefundId) return;
+            
+            const newStatus = document.getElementById('fixStatusSelect').value;
+            const reason = document.getElementById('fixReason').value || '脏数据修复';
+
+            closeFixModal();
+            
+            const result = await apiRequest(`/refunds/${currentFixRefundId}/fix`, {
                 method: 'POST',
                 body: JSON.stringify({ 
                     newStatus, 
