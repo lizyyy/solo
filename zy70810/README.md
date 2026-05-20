@@ -35,12 +35,12 @@ pip install -r requirements.txt
 python main.py
 ```
 
-服务将在 http://localhost:8000 启动
+服务将在 http://localhost:8001 启动
 
 ### 3. 访问API文档
 
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- Swagger UI: http://localhost:8001/docs
+- ReDoc: http://localhost:8001/redoc
 
 ### 4. 运行演示脚本
 
