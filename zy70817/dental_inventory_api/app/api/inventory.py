@@ -42,6 +42,7 @@ async def process_inventory_direct(
 @router.get("/trace/{batch_number}")
 async def trace_replacement(
     batch_number: str,
+    trace_type: str = "complete",
     db: Session = Depends(get_db)
 ):
     inventory = db.query(Inventory).filter(
@@ -52,16 +53,32 @@ async def trace_replacement(
         raise HTTPException(status_code=404, detail="未找到该批次记录")
     
     engine = InventoryRulesEngine(db)
-    has_trace, msg, history = engine.check_replacement_trace(inventory.replaced_batch or batch_number)
     
-    return {
-        "batch_number": batch_number,
-        "material_name": inventory.material_name,
-        "is_replacement": inventory.is_replacement,
-        "replaced_batch_number": inventory.replaced_batch,
-        "trace_message": msg,
-        "source_history": history
-    }
+    if trace_type == "source":
+        has_trace, msg, history = engine.get_replacement_source_trace(batch_number)
+        return {
+            "batch_number": batch_number,
+            "material_name": inventory.material_name,
+            "is_replacement": inventory.is_replacement,
+            "replaced_batch_number": inventory.replaced_batch,
+            "trace_type": "source",
+            "trace_message": msg,
+            "source_history": history
+        }
+    elif trace_type == "replacements":
+        has_reps, msg, replacements = engine.get_all_replacements_for_batch(batch_number)
+        return {
+            "batch_number": batch_number,
+            "material_name": inventory.material_name,
+            "is_replacement": inventory.is_replacement,
+            "replaced_batch_number": inventory.replaced_batch,
+            "trace_type": "replacements",
+            "trace_message": msg,
+            "replacements": replacements
+        }
+    else:
+        complete_trace = engine.get_complete_trace(batch_number)
+        return complete_trace
 
 @router.get("/records")
 async def get_processing_records(

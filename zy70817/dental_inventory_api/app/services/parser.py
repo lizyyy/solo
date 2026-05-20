@@ -6,44 +6,61 @@ from io import StringIO
 
 class CSVParser:
     @staticmethod
+    def _normalize_header(col: str) -> str:
+        return col.strip().lower().replace(' ', '_')
+    
+    @staticmethod
+    def _get_row_value(row: pd.Series, *keys: str) -> Any:
+        for key in keys:
+            normalized_key = CSVParser._normalize_header(key)
+            if normalized_key in row.index and pd.notna(row[normalized_key]):
+                return row[normalized_key]
+        return None
+    
+    @staticmethod
     def parse_inventory(file_content: str) -> List[Dict[str, Any]]:
         df = pd.read_csv(StringIO(file_content))
-        df.columns = [col.strip().lower().replace(' ', '_') for col in df.columns]
+        df.columns = [CSVParser._normalize_header(col) for col in df.columns]
         
         inventory_items = []
         for _, row in df.iterrows():
             item = {
-                'batch_number': str(row.get('batch_number', row.get('批号', ''))).strip(),
-                'material_name': str(row.get('material_name', row.get('材料名称', ''))).strip(),
-                'material_type': str(row.get('material_type', row.get('材料类型', row.get('品类', '')))).strip(),
-                'spec': str(row.get('spec', row.get('规格', ''))).strip(),
-                'quantity': float(row.get('quantity', row.get('数量', 0))),
-                'unit': str(row.get('unit', row.get('单位', ''))).strip(),
-                'supplier': str(row.get('supplier', row.get('供应商', ''))).strip(),
-                'store_id': str(row.get('store_id', row.get('门店ID', row.get('门店编号', '')))).strip(),
-                'store_name': str(row.get('store_name', row.get('门店名称', ''))).strip(),
+                'batch_number': str(CSVParser._get_row_value(row, 'batch_number', '批号') or '').strip(),
+                'material_name': str(CSVParser._get_row_value(row, 'material_name', '材料名称') or '').strip(),
+                'material_type': str(CSVParser._get_row_value(row, 'material_type', '材料类型', '品类') or '').strip(),
+                'spec': str(CSVParser._get_row_value(row, 'spec', '规格') or '').strip(),
+                'quantity': float(CSVParser._get_row_value(row, 'quantity', '数量') or 0),
+                'unit': str(CSVParser._get_row_value(row, 'unit', '单位') or '').strip(),
+                'supplier': str(CSVParser._get_row_value(row, 'supplier', '供应商') or '').strip(),
+                'store_id': str(CSVParser._get_row_value(row, 'store_id', '门店ID', '门店编号', '门店id') or '').strip(),
+                'store_name': str(CSVParser._get_row_value(row, 'store_name', '门店名称') or '').strip(),
             }
             
-            expiry_date = row.get('expiry_date', row.get('有效期', row.get('过期日期')))
+            expiry_date = CSVParser._get_row_value(row, 'expiry_date', '有效期', '过期日期')
             if pd.notna(expiry_date):
                 try:
                     item['expiry_date'] = pd.to_datetime(expiry_date).to_pydatetime()
                 except:
                     pass
             
-            production_date = row.get('production_date', row.get('生产日期'))
+            production_date = CSVParser._get_row_value(row, 'production_date', '生产日期')
             if pd.notna(production_date):
                 try:
                     item['production_date'] = pd.to_datetime(production_date).to_pydatetime()
                 except:
                     pass
             
-            if pd.notna(row.get('is_replacement')):
-                item['is_replacement'] = bool(row['is_replacement'])
-            if pd.notna(row.get('replaced_batch')):
-                item['replaced_batch'] = str(row['replaced_batch']).strip()
-            if pd.notna(row.get('original_source')):
-                item['original_source'] = str(row['original_source']).strip()
+            is_replacement = CSVParser._get_row_value(row, 'is_replacement')
+            if pd.notna(is_replacement):
+                item['is_replacement'] = bool(is_replacement)
+            
+            replaced_batch = CSVParser._get_row_value(row, 'replaced_batch', '被替代批号', '替换批号')
+            if pd.notna(replaced_batch) and str(replaced_batch).strip():
+                item['replaced_batch'] = str(replaced_batch).strip()
+            
+            original_source = CSVParser._get_row_value(row, 'original_source', '原始来源', '来源说明')
+            if pd.notna(original_source) and str(original_source).strip():
+                item['original_source'] = str(original_source).strip()
             
             inventory_items.append(item)
         
@@ -52,32 +69,39 @@ class CSVParser:
     @staticmethod
     def parse_consumption(file_content: str) -> List[Dict[str, Any]]:
         df = pd.read_csv(StringIO(file_content))
-        df.columns = [col.strip().lower().replace(' ', '_') for col in df.columns]
+        df.columns = [CSVParser._normalize_header(col) for col in df.columns]
         
         consumption_items = []
         for _, row in df.iterrows():
             item = {
-                'store_id': str(row.get('store_id', row.get('门店ID', ''))).strip(),
-                'store_name': str(row.get('store_name', row.get('门店名称', ''))).strip(),
-                'batch_number': str(row.get('batch_number', row.get('批号', ''))).strip(),
-                'material_name': str(row.get('material_name', row.get('材料名称', ''))).strip(),
-                'quantity': float(row.get('quantity', row.get('消耗数量', 0))),
-                'unit': str(row.get('unit', row.get('单位', ''))).strip(),
+                'store_id': str(CSVParser._get_row_value(row, 'store_id', '门店ID', '门店id') or '').strip(),
+                'store_name': str(CSVParser._get_row_value(row, 'store_name', '门店名称') or '').strip(),
+                'batch_number': str(CSVParser._get_row_value(row, 'batch_number', '批号') or '').strip(),
+                'material_name': str(CSVParser._get_row_value(row, 'material_name', '材料名称') or '').strip(),
+                'quantity': float(CSVParser._get_row_value(row, 'quantity', '消耗数量', '数量') or 0),
+                'unit': str(CSVParser._get_row_value(row, 'unit', '单位') or '').strip(),
             }
             
-            consumption_date = row.get('consumption_date', row.get('消耗日期'))
+            consumption_date = CSVParser._get_row_value(row, 'consumption_date', '消耗日期')
             if pd.notna(consumption_date):
                 try:
                     item['consumption_date'] = pd.to_datetime(consumption_date).to_pydatetime()
                 except:
                     item['consumption_date'] = datetime.now()
+            else:
+                item['consumption_date'] = datetime.now()
             
-            if pd.notna(row.get('patient_id')):
-                item['patient_id'] = str(row['patient_id']).strip()
-            if pd.notna(row.get('dentist')):
-                item['dentist'] = str(row['dentist']).strip()
-            if pd.notna(row.get('notes')):
-                item['notes'] = str(row['notes']).strip()
+            patient_id = CSVParser._get_row_value(row, 'patient_id', '患者ID', '患者id')
+            if pd.notna(patient_id) and str(patient_id).strip():
+                item['patient_id'] = str(patient_id).strip()
+            
+            dentist = CSVParser._get_row_value(row, 'dentist', '牙医', '医生')
+            if pd.notna(dentist) and str(dentist).strip():
+                item['dentist'] = str(dentist).strip()
+            
+            notes = CSVParser._get_row_value(row, 'notes', '备注', '说明')
+            if pd.notna(notes) and str(notes).strip():
+                item['notes'] = str(notes).strip()
             
             consumption_items.append(item)
         

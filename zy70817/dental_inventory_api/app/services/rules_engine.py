@@ -44,23 +44,26 @@ class InventoryRulesEngine:
         existing = self.db.query(InventoryProcessingRecord).filter(
             InventoryProcessingRecord.batch_number == batch_number,
             InventoryProcessingRecord.store_id == store_id,
-            InventoryProcessingRecord.status == "normal"
+            InventoryProcessingRecord.status.in_(["normal", "pending"])
         ).first()
         
         if existing:
-            return True, f"该批次已在本店处理过，请勿重复提交（处理时间：{existing.process_date.strftime('%Y-%m-%d %H:%M')}）"
+            status_text = "正常入库" if existing.status == "normal" else "待确认"
+            return True, f"该批次已在本店处理过（{status_text}），请勿重复提交（处理时间：{existing.process_date.strftime('%Y-%m-%d %H:%M')}）"
         return False, ""
 
-    def check_replacement_trace(self, replaced_batch: str) -> Tuple[bool, str, List[Dict[str, Any]]]:
-        if not replaced_batch:
+    def get_replacement_source_trace(self, batch_number: str) -> Tuple[bool, str, List[Dict[str, Any]]]:
+        if not batch_number:
             return False, "", []
         
         history = []
-        current_batch = replaced_batch
+        current_batch = batch_number
         max_depth = 10
         depth = 0
+        visited = set()
         
-        while current_batch and depth < max_depth:
+        while current_batch and current_batch not in visited and depth < max_depth:
+            visited.add(current_batch)
             record = self.db.query(Inventory).filter(
                 Inventory.batch_number == current_batch
             ).first()
@@ -72,10 +75,12 @@ class InventoryRulesEngine:
                     'store_id': record.store_id,
                     'store_name': record.store_name,
                     'created_at': record.created_at.strftime('%Y-%m-%d %H:%M'),
-                    'original_source': record.original_source
+                    'original_source': record.original_source,
+                    'is_replacement': record.is_replacement,
+                    'replaced_batch': record.replaced_batch
                 })
                 
-                if record.replaced_batch:
+                if record.is_replacement and record.replaced_batch:
                     current_batch = record.replaced_batch
                     depth += 1
                 else:
@@ -84,8 +89,94 @@ class InventoryRulesEngine:
                 break
         
         if history:
-            return True, f"该替代耗材可追溯{len(history)}条历史记录", history
-        return False, "未找到该替代耗材的历史来源记录", []
+            return True, f"可追溯{len(history)}条来源记录", history
+        return False, "未找到该批次的历史来源记录", []
+
+    def get_all_replacements_for_batch(self, original_batch: str) -> Tuple[bool, str, List[Dict[str, Any]]]:
+        if not original_batch:
+            return False, "", []
+        
+        replacements = []
+        queue = [original_batch]
+        visited = set()
+        max_depth = 10
+        depth = 0
+        
+        while queue and depth < max_depth:
+            level_size = len(queue)
+            for _ in range(level_size):
+                current_batch = queue.pop(0)
+                if current_batch in visited:
+                    continue
+                visited.add(current_batch)
+                
+                direct_replacements = self.db.query(Inventory).filter(
+                    Inventory.replaced_batch == current_batch,
+                    Inventory.is_replacement == True
+                ).all()
+                
+                for rep in direct_replacements:
+                    rep_info = {
+                        'batch_number': rep.batch_number,
+                        'material_name': rep.material_name,
+                        'store_id': rep.store_id,
+                        'store_name': rep.store_name,
+                        'created_at': rep.created_at.strftime('%Y-%m-%d %H:%M'),
+                        'original_source': rep.original_source,
+                        'replaces_batch': rep.replaced_batch,
+                        'replacement_level': depth + 1
+                    }
+                    replacements.append(rep_info)
+                    queue.append(rep.batch_number)
+            
+            depth += 1
+        
+        if replacements:
+            return True, f"找到{len(replacements)}个替代批次", replacements
+        return False, "该批次暂无替代耗材记录", []
+
+    def get_complete_trace(self, batch_number: str) -> Dict[str, Any]:
+        result = {
+            'batch_number': batch_number,
+            'source_trace': [],
+            'replacements': [],
+            'summary': ''
+        }
+        
+        current_record = self.db.query(Inventory).filter(
+            Inventory.batch_number == batch_number
+        ).first()
+        
+        if not current_record:
+            result['summary'] = '未找到该批次记录'
+            return result
+        
+        result['current'] = {
+            'batch_number': current_record.batch_number,
+            'material_name': current_record.material_name,
+            'is_replacement': current_record.is_replacement,
+            'replaced_batch': current_record.replaced_batch
+        }
+        
+        has_source, source_msg, source_history = self.get_replacement_source_trace(batch_number)
+        result['source_trace'] = source_history
+        
+        has_reps, reps_msg, replacements = self.get_all_replacements_for_batch(batch_number)
+        result['replacements'] = replacements
+        
+        parts = []
+        if has_source and len(source_history) > 1:
+            parts.append(f"来源可追溯{len(source_history)}层")
+        if has_reps:
+            parts.append(f"下游有{len(replacements)}个替代品")
+        if not parts:
+            parts.append("该批次无替代关联记录")
+        result['summary'] = '；'.join(parts)
+        
+        return result
+
+    def check_replacement_trace(self, replaced_batch: str) -> Tuple[bool, str, List[Dict[str, Any]]]:
+        return self.get_replacement_source_trace(replaced_batch)
 
     def process_inventory_item(self, item: Dict[str, Any]) -> Dict[str, Any]:
         result = {
@@ -186,6 +277,25 @@ class InventoryRulesEngine:
                 self.db.add(inventory)
                 normal_items.append(result)
             elif result['status'] == 'pending':
+                inventory = Inventory(
+                    batch_number=item['batch_number'],
+                    material_name=item['material_name'],
+                    material_type=item.get('material_type'),
+                    spec=item.get('spec'),
+                    quantity=item['quantity'],
+                    unit=item['unit'],
+                    production_date=item.get('production_date'),
+                    expiry_date=item.get('expiry_date'),
+                    supplier=item.get('supplier'),
+                    store_id=item['store_id'],
+                    store_name=item.get('store_name'),
+                    is_replacement=item.get('is_replacement', False),
+                    replaced_batch=item.get('replaced_batch'),
+                    original_source=item.get('original_source'),
+                    is_processed=True,
+                    process_status='pending'
+                )
+                self.db.add(inventory)
                 pending_items.append(result)
             else:
                 failed_items.append(result)
