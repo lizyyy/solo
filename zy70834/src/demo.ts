@@ -37,24 +37,54 @@ async function main() {
   console.log('👨‍⚕️ 第四步: 人工复核处理');
 
   const rejectedResults = api.getResultsByStatus('REJECTED');
-  if (rejectedResults.length > 0) {
-    console.log(`   处理驳回记录: ${rejectedResults[0].studentName}`);
-    console.log(`     原因: 发热隔离流程已执行，校医确认同意`);
-    api.rejectResult(rejectedResults[0].id, '张校医', '已联系家长，学生已接回家隔离');
+  console.log(`   共 ${rejectedResults.length} 条驳回记录，逐条处理：`);
+
+  for (const result of rejectedResults) {
+    const hasFever = result.discrepancies.some(d => d.type === 'FEVER_DETECTED');
+    const hasExpiredMed = result.discrepancies.some(d => d.type === 'OVERDUE_MEDICATION');
+    const hasUnconfirmed = result.discrepancies.some(d => d.type === 'PARENT_NOT_CONFIRMED');
+
+    if (hasFever) {
+      console.log(`   ✅ 确认发热隔离: ${result.studentName}`);
+      console.log(`      差异: 体温异常，${hasExpiredMed ? '药品临期，' : ''}${hasUnconfirmed ? '家长未确认' : ''}`);
+      api.rejectResult(result.id, '张校医', 
+        '发热病例确认：已启动隔离流程，联系家长接回；' + 
+        (hasUnconfirmed ? '用药需家长补签字后再给药' : '按规定处理'));
+    } else if (hasExpiredMed) {
+      console.log(`   ⚠️ 药品临期: ${result.studentName}`);
+      console.log(`      差异: ${result.medication?.medicationName} 有效期不足`);
+      api.rejectResult(result.id, '张校医', 
+        `药品"${result.medication?.medicationName}"临期，已通知家长更换新药或暂停给药`);
+    }
+
+    if (hasUnconfirmed) {
+      console.log(`   📝 补签确认: ${result.studentName} 家长刚刚完成确认`);
+      api.modifyResult(result.id, '张校医', [
+        {
+          field: 'medication.parentConfirmed',
+          oldValue: false,
+          newValue: true,
+          reason: '家长电话确认同意，后续补纸质签字',
+        }
+      ]);
+    }
   }
 
   const needsInfoResults = api.getResultsByStatus('NEEDS_MORE_INFO');
-  if (needsInfoResults.length > 0) {
-    console.log(`   修改记录: ${needsInfoResults[0].studentName}`);
-    console.log(`     操作: 家长刚刚完成确认`);
-    api.modifyResult(needsInfoResults[0].id, '张校医', [
-      {
-        field: 'medication.parentConfirmed',
-        oldValue: false,
-        newValue: true,
-        reason: '家长刚刚电话确认，已补签字',
-      },
-    ]);
+  for (const result of needsInfoResults) {
+    const hasUnchecked = result.discrepancies.some(d => d.type === 'SYMPTOMS_UNCHECKED');
+    if (hasUnchecked) {
+      console.log(`   📋 补充症状说明: ${result.studentName}`);
+      console.log(`      差异: 有流涕症状但未标注处理措施`);
+      api.modifyResult(result.id, '张校医', [
+        {
+          field: 'healthCheck.notes',
+          oldValue: result.healthCheck?.notes || '',
+          newValue: '轻微流涕，精神状态良好，已登记观察，无需特殊处理',
+          reason: '晨检老师补充说明：症状轻微，不影响入校',
+        }
+      ]);
+    }
   }
 
   const pendingResults = api.getResultsByStatus('PENDING');
