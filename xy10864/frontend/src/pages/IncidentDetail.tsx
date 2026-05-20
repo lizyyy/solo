@@ -219,13 +219,17 @@ const IncidentDetail: React.FC = () => {
   const handleAddFailureReason = async (values: any) => {
     if (!id) return;
     try {
-      const res = await incidentApi.addFailureReason(id, values.reason);
+      const res = await incidentApi.addFailureReason(id, {
+        reason: values.reason,
+        operator: values.operator,
+        category: values.category,
+      });
       setIncident(res.data);
       message.success('失败原因添加成功');
       setFailureModal(false);
       form.resetFields();
-    } catch (error) {
-      message.error('添加失败');
+    } catch (error: any) {
+      message.error(error.response?.data?.error || '添加失败');
     }
   };
 
@@ -478,8 +482,16 @@ const IncidentDetail: React.FC = () => {
                 <List.Item>
                   <List.Item.Meta
                     avatar={<PlayCircleOutlined />}
-                    title={`失败原因 #${idx + 1}`}
-                    description={item}
+                    title={
+                      <Space>
+                        <span style={{ fontWeight: 'bold' }}>失败原因 #{idx + 1}</span>
+                        <Tag color="blue">{item.category || '未分类'}</Tag>
+                        <span style={{ color: '#666', fontSize: 12 }}>
+                          记录人: {item.operator} | {moment(item.timestamp).format('YYYY-MM-DD HH:mm')}
+                        </span>
+                      </Space>
+                    }
+                    description={item.reason}
                   />
                 </List.Item>
               )}
@@ -776,7 +788,20 @@ const IncidentDetail: React.FC = () => {
       <Modal title="添加失败原因" open={failureModal} onCancel={() => setFailureModal(false)} footer={null}>
         <Form form={form} layout="vertical" onFinish={handleAddFailureReason}>
           <Form.Item name="reason" label="失败原因描述" rules={[{ required: true }]}>
-            <TextArea rows={6} placeholder="请详细描述失败的原因，便于后续追溯和分析" />
+            <TextArea rows={4} placeholder="请详细描述失败的原因，便于后续追溯和分析" />
+          </Form.Item>
+          <Form.Item name="operator" label="记录人" rules={[{ required: true }]}>
+            <Input placeholder="请输入记录人姓名" />
+          </Form.Item>
+          <Form.Item name="category" label="分类">
+            <Select placeholder="请选择分类">
+              <Option value="代码缺陷">代码缺陷</Option>
+              <Option value="配置错误">配置错误</Option>
+              <Option value="网络问题">网络问题</Option>
+              <Option value="依赖问题">依赖问题</Option>
+              <Option value="人为操作">人为操作</Option>
+              <Option value="其他">其他</Option>
+            </Select>
           </Form.Item>
           <Form.Item>
             <Space>

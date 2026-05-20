@@ -13,13 +13,15 @@ const incidentSchema = Joi.object({
 });
 
 const statusTransitionRules = {
-  detecting: ['verifying', 'archived'],
-  verifying: ['fixing', 'detecting', 'archived'],
-  fixing: ['monitoring', 'verifying', 'archived'],
-  monitoring: ['reviewing', 'fixing', 'archived'],
-  reviewing: ['archived', 'monitoring'],
+  detecting: ['verifying'],
+  verifying: ['fixing'],
+  fixing: ['monitoring'],
+  monitoring: ['reviewing'],
+  reviewing: ['archived'],
   archived: [],
 };
+
+const STATUS_FLOW = ['detecting', 'verifying', 'fixing', 'monitoring', 'reviewing', 'archived'];
 
 exports.createIncident = async (req, res) => {
   try {
@@ -131,6 +133,17 @@ exports.addTimeline = async (req, res) => {
       return res.status(404).json({ error: 'Incident not found' });
     }
 
+    const { event, operator, timestamp } = req.body;
+    const existingEvent = incident.timelines.find(t => 
+      t.event === event && 
+      t.operator === operator &&
+      Math.abs(new Date(t.timestamp) - new Date(timestamp || Date.now())) < 1000
+    );
+
+    if (existingEvent) {
+      return res.status(409).json({ error: '重复的时间线事件，已跳过', incident });
+    }
+
     incident.timelines.push({
       ...req.body,
       timestamp: req.body.timestamp || new Date(),
@@ -151,6 +164,12 @@ exports.addEvidence = async (req, res) => {
       return res.status(404).json({ error: 'Incident not found' });
     }
 
+    const { url, title } = req.body;
+    const existingEvidence = incident.evidences.find(e => e.url === url);
+    if (existingEvidence) {
+      return res.status(409).json({ error: '证据链接已存在', incident });
+    }
+
     incident.evidences.push(req.body);
     await incident.save();
     res.json(incident);
@@ -166,6 +185,15 @@ exports.addAffectedInterface = async (req, res) => {
       return res.status(404).json({ error: 'Incident not found' });
     }
 
+    const { name, path } = req.body;
+    const existingInterface = incident.affectedInterfaces.find(a => 
+      a.name === name || (a.path && a.path === path)
+    );
+
+    if (existingInterface) {
+      return res.status(409).json({ error: '影响接口已存在', incident });
+    }
+
     incident.affectedInterfaces.push(req.body);
     await incident.save();
     res.json(incident);
@@ -179,6 +207,15 @@ exports.addActionItem = async (req, res) => {
     const incident = await Incident.findById(req.params.id);
     if (!incident) {
       return res.status(404).json({ error: 'Incident not found' });
+    }
+
+    const { title } = req.body;
+    const existingActionItem = incident.actionItems.find(a => 
+      a.title === title && a.status !== 'completed'
+    );
+
+    if (existingActionItem) {
+      return res.status(409).json({ error: '相同标题的待办行动项已存在', incident });
     }
 
     incident.actionItems.push(req.body);
@@ -202,14 +239,20 @@ exports.updateActionItemStatus = async (req, res) => {
     }
 
     const oldStatus = actionItem.status;
-    actionItem.status = req.body.status;
-    if (req.body.status === 'completed') {
+    const newStatus = req.body.status;
+
+    if (oldStatus === newStatus) {
+      return res.status(409).json({ error: '状态未变更，已跳过', incident });
+    }
+
+    actionItem.status = newStatus;
+    if (newStatus === 'completed') {
       actionItem.completedAt = new Date();
     }
 
     incident.timelines.push({
       timestamp: new Date(),
-      event: `行动项状态变更: ${oldStatus} -> ${req.body.status}`,
+      event: `行动项状态变更: ${oldStatus} -> ${newStatus}`,
       operator: req.body.operator,
       description: `行动项: ${actionItem.title}`,
     });
@@ -280,10 +323,27 @@ exports.addFailureReason = async (req, res) => {
       return res.status(404).json({ error: 'Incident not found' });
     }
 
+    const { reason, operator, category } = req.body;
+    if (!reason || !operator) {
+      return res.status(400).json({ error: '失败原因和操作人为必填字段' });
+    }
+
+    const existingReason = incident.failureReasons.find(f => 
+      f.reason === reason && f.operator === operator
+    );
+    if (existingReason) {
+      return res.status(409).json({ error: '相同的失败原因已记录', incident });
+    }
+
     if (!incident.failureReasons) {
       incident.failureReasons = [];
     }
-    incident.failureReasons.push(req.body.reason);
+    incident.failureReasons.push({
+      reason,
+      operator,
+      category: category || '未分类',
+      timestamp: new Date(),
+    });
 
     await incident.save();
     res.json(incident);
@@ -346,7 +406,10 @@ exports.exportIncident = async (req, res) => {
       })),
       失败原因追溯: (incident.failureReasons || []).map((r, i) => ({
         序号: i + 1,
-        失败原因: r,
+        失败原因: r.reason,
+        分类: r.category || '未分类',
+        记录人: r.operator,
+        记录时间: new Date(r.timestamp).toLocaleString(),
       })),
       手动补偿记录: incident.compensationRecords.map((c, i) => ({
         序号: i + 1,

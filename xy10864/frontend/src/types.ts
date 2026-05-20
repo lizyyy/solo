@@ -55,6 +55,14 @@ export interface CompensationRecord {
   executedAt: string;
 }
 
+export interface FailureReason {
+  _id: string;
+  reason: string;
+  operator: string;
+  category?: string;
+  timestamp: string;
+}
+
 export interface Incident {
   _id: string;
   incidentId: string;
@@ -72,7 +80,7 @@ export interface Incident {
   actionItems: ActionItem[];
   reviewConclusion?: ReviewConclusion;
   compensationRecords: CompensationRecord[];
-  failureReasons: string[];
+  failureReasons: FailureReason[];
   tags: string[];
   archivedAt?: string;
   archivedBy?: string;

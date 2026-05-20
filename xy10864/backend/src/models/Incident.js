@@ -56,6 +56,13 @@ const compensationRecordSchema = new mongoose.Schema({
   executedAt: Date,
 }, { _id: true, timestamps: true });
 
+const failureReasonSchema = new mongoose.Schema({
+  reason: { type: String, required: true },
+  operator: { type: String, required: true },
+  category: String,
+  timestamp: { type: Date, default: Date.now },
+}, { _id: true, timestamps: true });
+
 const incidentSchema = new mongoose.Schema({
   incidentId: { type: String, unique: true, required: true },
   title: { type: String, required: true },
@@ -82,7 +89,7 @@ const incidentSchema = new mongoose.Schema({
   reviewConclusion: reviewConclusionSchema,
   compensationRecords: [compensationRecordSchema],
   
-  failureReasons: [String],
+  failureReasons: [failureReasonSchema],
   tags: [String],
   
   archivedAt: Date,

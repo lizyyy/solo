@@ -37,8 +37,8 @@ export const incidentApi = {
   addCompensation: (id: string, data: { type: string; description: string; operator: string; result?: string }) =>
     api.post<Incident>(`/incidents/${id}/compensation`, data),
   
-  addFailureReason: (id: string, reason: string) =>
-    api.post<Incident>(`/incidents/${id}/failure-reason`, { reason }),
+  addFailureReason: (id: string, data: { reason: string; operator: string; category?: string }) =>
+    api.post<Incident>(`/incidents/${id}/failure-reason`, data),
   
   export: (id: string) =>
     api.get(`/incidents/${id}/export`, { responseType: 'blob' }),
