@@ -1,0 +1,61 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f0f2f5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.severity-critical {
+  color: #ff4d4f !important;
+  font-weight: bold;
+}
+
+.severity-high {
+  color: #fa8c16 !important;
+  font-weight: bold;
+}
+
+.severity-medium {
+  color: #faad14 !important;
+}
+
+.severity-low {
+  color: #52c41a !important;
+}
+
+.status-pending {
+  background: #f0f0f0;
+}
+
+.status-analyzing {
+  background: #e6f7ff;
+}
+
+.status-exempted {
+  background: #f6ffed;
+}
+
+.status-fixing {
+  background: #fff7e6;
+}
+
+.status-verified {
+  background: #f9f0ff;
+}
+
+.status-closed {
+  background: #f5f5f5;
+  opacity: 0.7;
+}

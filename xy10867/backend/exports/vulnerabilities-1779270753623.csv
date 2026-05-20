@@ -1,0 +1,8 @@
+ID,包名,版本,生态,CVE ID,严重程度,CVSS分数,状态,受影响服务,豁免理由,修复批次,创建时间
+fd37c861-4b03-4792-8d07-c766047e13b5,axios,0.21.1,npm,CVE-2020-28469,CRITICAL,9.8,ANALYZING,api-gateway,,,2026-05-20 09:47:55
+4311fe09-918e-4fdd-be95-51f96f4b4d57,jquery,3.4.1,npm,CVE-2019-11358,CRITICAL,9.1,VERIFIED,"admin-portal, customer-portal",,,2026-05-20 09:47:55
+a9639df1-0928-4447-b35a-4e8b515dc99c,spring-core,5.3.0,maven,CVE-2020-7656,HIGH,7.5,EXEMPTED,"file-service, upload-service",该功能未在生产环境使用，风险可控,,2026-05-20 09:47:55
+24beff7b-5362-410a-a276-d816c2fe60d7,express,4.17.1,npm,CVE-2022-24999,HIGH,8.2,ANALYZING,auth-service,,,2026-05-20 09:47:55
+f6e5d109-1884-428b-9538-c913ab4d2728,django,3.2.0,pypi,CVE-2021-23358,MEDIUM,5.3,FIXING,payment-service,,BATCH-2024-01,2026-05-20 09:47:55
+6d2f977d-d4f9-4f66-9b21-db32d3838032,numpy,1.21.0,pypi,CVE-2021-33430,MEDIUM,5.9,PENDING,data-processing,,,2026-05-20 09:47:55
+0cd76888-a1e4-4a7e-861f-5e44df1043ce,netty,4.1.0,maven,CVE-2021-21290,LOW,3.7,CLOSED,realtime-service,,,2026-05-20 09:47:55
