@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import CertificateService from '../services/CertificateService';
 import dayjs from 'dayjs';
+import { getQueryString } from '../utils/request';
 
 const router = Router();
 
@@ -30,7 +31,8 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.get('/application/:applicationId', async (req: Request, res: Response) => {
   try {
-    const certificates = await CertificateService.getCertificatesByApplication(parseInt(req.params.applicationId));
+    const applicationIdParam = Array.isArray(req.params.applicationId) ? req.params.applicationId[0] : req.params.applicationId;
+    const certificates = await CertificateService.getCertificatesByApplication(parseInt(applicationIdParam));
     res.json(certificates);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -40,8 +42,9 @@ router.get('/application/:applicationId', async (req: Request, res: Response) =>
 router.post('/application/:applicationId/check', async (req: Request, res: Response) => {
   try {
     const { operator } = req.body;
+    const applicationIdParam = Array.isArray(req.params.applicationId) ? req.params.applicationId[0] : req.params.applicationId;
     const result = await CertificateService.checkCertificates(
-      parseInt(req.params.applicationId),
+      parseInt(applicationIdParam),
       operator || 'system'
     );
     res.json(result);
@@ -52,7 +55,8 @@ router.post('/application/:applicationId/check', async (req: Request, res: Respo
 
 router.get('/version/:version', async (req: Request, res: Response) => {
   try {
-    const certificates = await CertificateService.getCertificatesByVersion(req.params.version);
+    const versionParam = Array.isArray(req.params.version) ? req.params.version[0] : req.params.version;
+    const certificates = await CertificateService.getCertificatesByVersion(versionParam);
     res.json(certificates);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

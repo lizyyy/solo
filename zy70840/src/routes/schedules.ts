@@ -1,22 +1,26 @@
 import { Router, Request, Response } from 'express';
 import ScheduleService from '../services/ScheduleService';
 import dayjs from 'dayjs';
+import { getQueryString } from '../utils/request';
 
 const router = Router();
 
 router.get('/check', async (req: Request, res: Response) => {
   try {
-    const { venueName, location, startDate, endDate } = req.query;
+    const venueName = getQueryString(req.query.venueName);
+    const location = getQueryString(req.query.location);
+    const startDateStr = getQueryString(req.query.startDate);
+    const endDateStr = getQueryString(req.query.endDate);
 
-    if (!venueName || !location || !startDate || !endDate) {
+    if (!venueName || !location || !startDateStr || !endDateStr) {
       return res.status(400).json({ error: '必填字段不能为空' });
     }
 
     const result = await ScheduleService.checkConflict(
-      venueName as string,
-      location as string,
-      dayjs(startDate as string).toDate(),
-      dayjs(endDate as string).toDate()
+      venueName,
+      location,
+      dayjs(startDateStr).toDate(),
+      dayjs(endDateStr).toDate()
     );
 
     res.json(result);
@@ -27,17 +31,20 @@ router.get('/check', async (req: Request, res: Response) => {
 
 router.get('/venue', async (req: Request, res: Response) => {
   try {
-    const { venueName, location, startDate, endDate } = req.query;
+    const venueName = getQueryString(req.query.venueName);
+    const location = getQueryString(req.query.location);
+    const startDateStr = getQueryString(req.query.startDate);
+    const endDateStr = getQueryString(req.query.endDate);
 
-    if (!venueName || !location || !startDate || !endDate) {
+    if (!venueName || !location || !startDateStr || !endDateStr) {
       return res.status(400).json({ error: '必填字段不能为空' });
     }
 
     const schedules = await ScheduleService.getSchedulesByVenueAndDate(
-      venueName as string,
-      location as string,
-      dayjs(startDate as string).toDate(),
-      dayjs(endDate as string).toDate()
+      venueName,
+      location,
+      dayjs(startDateStr).toDate(),
+      dayjs(endDateStr).toDate()
     );
 
     res.json(schedules);
@@ -93,7 +100,8 @@ router.post('/block', async (req: Request, res: Response) => {
 
 router.post('/release/:applicationId', async (req: Request, res: Response) => {
   try {
-    await ScheduleService.releaseSchedule(parseInt(req.params.applicationId));
+    const applicationIdParam = Array.isArray(req.params.applicationId) ? req.params.applicationId[0] : req.params.applicationId;
+    await ScheduleService.releaseSchedule(parseInt(applicationIdParam));
     res.json({ success: true });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

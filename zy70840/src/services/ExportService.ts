@@ -68,8 +68,8 @@ class ExportService {
         { association: 'batch', attributes: ['batchNo', 'name'] },
         ...(includeDetails ? [
           { association: 'certificates' },
-          { association: 'logs', order: [['operatedAt', 'DESC']] },
-          { association: 'depositFlows', order: [['operatedAt', 'DESC']] },
+          { association: 'logs' },
+          { association: 'depositFlows' },
         ] : []),
       ],
     });
@@ -86,30 +86,38 @@ class ExportService {
       [ApplicationStatus.RETURNED]: '已退回',
     };
 
-    const records = applications.map(app => ({
-      applicationNo: app.applicationNo,
-      batchNo: (app as any).batch?.batchNo || '',
-      merchantName: app.merchantName,
-      contactPerson: app.contactPerson,
-      contactPhone: app.contactPhone,
-      stallType: app.stallType,
-      stallLocation: app.stallLocation,
-      startDate: dayjs(app.startDate).format('YYYY-MM-DD'),
-      endDate: dayjs(app.endDate).format('YYYY-MM-DD'),
-      depositAmount: app.depositAmount,
-      status: statusMap[app.status] || app.status,
-      certificateVersion: app.certificateVersion || '',
-      processedBy: app.processedBy || '',
-      processedAt: app.processedAt ? dayjs(app.processedAt).format('YYYY-MM-DD HH:mm:ss') : '',
-      importedAt: dayjs(app.importedAt).format('YYYY-MM-DD HH:mm:ss'),
-      ...(includeDetails ? {
-        issues: (app as any).logs
-          ?.filter((l: any) => l.logType !== 'status_change')
-          .map((l: any) => l.readableReason)
-          .join('; ') || '',
-        lastLog: (app as any).logs?.[0]?.readableReason || '',
-      } : {}),
-    }));
+    const records = applications.map(app => {
+      const appData = app as any;
+      if (appData.logs) {
+        appData.logs.sort((a: any, b: any) => 
+          new Date(b.operatedAt).getTime() - new Date(a.operatedAt).getTime()
+        );
+      }
+      return {
+        applicationNo: app.applicationNo,
+        batchNo: appData.batch?.batchNo || '',
+        merchantName: app.merchantName,
+        contactPerson: app.contactPerson,
+        contactPhone: app.contactPhone,
+        stallType: app.stallType,
+        stallLocation: app.stallLocation,
+        startDate: dayjs(app.startDate).format('YYYY-MM-DD'),
+        endDate: dayjs(app.endDate).format('YYYY-MM-DD'),
+        depositAmount: app.depositAmount,
+        status: statusMap[app.status] || app.status,
+        certificateVersion: app.certificateVersion || '',
+        processedBy: app.processedBy || '',
+        processedAt: app.processedAt ? dayjs(app.processedAt).format('YYYY-MM-DD HH:mm:ss') : '',
+        importedAt: dayjs(app.importedAt).format('YYYY-MM-DD HH:mm:ss'),
+        ...(includeDetails ? {
+          issues: appData.logs
+            ?.filter((l: any) => l.logType !== 'status_change')
+            .map((l: any) => l.readableReason)
+            .join('; ') || '',
+          lastLog: appData.logs?.[0]?.readableReason || '',
+        } : {}),
+      };
+    });
 
     const headers = [
       { id: 'applicationNo', title: '申请编号' },

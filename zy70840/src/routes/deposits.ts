@@ -2,18 +2,21 @@ import { Router, Request, Response } from 'express';
 import DepositService from '../services/DepositService';
 import { FlowType } from '../models/DepositFlow';
 import dayjs from 'dayjs';
+import { getQueryNumber, getQueryString } from '../utils/request';
 
 const router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
-    const applicationId = req.query.applicationId ? parseInt(req.query.applicationId as string) : undefined;
-    const flowType = req.query.flowType as FlowType;
-    const operator = req.query.operator as string;
-    const startDate = req.query.startDate ? dayjs(req.query.startDate as string).toDate() : undefined;
-    const endDate = req.query.endDate ? dayjs(req.query.endDate as string).toDate() : undefined;
+    const page = getQueryNumber(req.query.page) || 1;
+    const pageSize = getQueryNumber(req.query.pageSize) || 20;
+    const applicationId = getQueryNumber(req.query.applicationId);
+    const flowType = getQueryString(req.query.flowType) as FlowType | undefined;
+    const operator = getQueryString(req.query.operator);
+    const startDateStr = getQueryString(req.query.startDate);
+    const endDateStr = getQueryString(req.query.endDate);
+    const startDate = startDateStr ? dayjs(startDateStr).toDate() : undefined;
+    const endDate = endDateStr ? dayjs(endDateStr).toDate() : undefined;
 
     const result = await DepositService.listFlows(page, pageSize, {
       applicationId,
@@ -31,7 +34,8 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/application/:applicationId', async (req: Request, res: Response) => {
   try {
-    const flows = await DepositService.getFlowsByApplication(parseInt(req.params.applicationId));
+    const applicationIdParam = Array.isArray(req.params.applicationId) ? req.params.applicationId[0] : req.params.applicationId;
+    const flows = await DepositService.getFlowsByApplication(parseInt(applicationIdParam));
     res.json(flows);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -102,7 +106,8 @@ router.post('/refund', async (req: Request, res: Response) => {
 
 router.get('/balance/:applicationId', async (req: Request, res: Response) => {
   try {
-    const balance = await DepositService.getCurrentBalance(parseInt(req.params.applicationId));
+    const applicationIdParam = Array.isArray(req.params.applicationId) ? req.params.applicationId[0] : req.params.applicationId;
+    const balance = await DepositService.getCurrentBalance(parseInt(applicationIdParam));
     res.json({ balance });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

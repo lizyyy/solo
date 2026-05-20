@@ -1,4 +1,4 @@
-import * as csvParser from 'csv-parser';
+import csvParser from 'csv-parser';
 import { Readable } from 'stream';
 import Application, { ApplicationStatus } from '../models/Application';
 import BatchService from './BatchService';
@@ -31,7 +31,7 @@ class CsvImportService {
       const readable = Readable.from(fileBuffer);
       readable
         .pipe(csvParser())
-        .on('data', (data) => results.push(data))
+        .on('data', (data: any) => results.push(data as CsvRow))
         .on('end', () => resolve(results))
         .on('error', reject);
     });

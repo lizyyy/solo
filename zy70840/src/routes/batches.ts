@@ -4,6 +4,7 @@ import BatchService from '../services/BatchService';
 import CsvImportService from '../services/CsvImportService';
 import ApplicationService from '../services/ApplicationService';
 import { BatchStatus } from '../models/Batch';
+import { getQueryNumber, getQueryString, getParamString } from '../utils/request';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -23,9 +24,9 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
-    const status = req.query.status as BatchStatus;
+    const page = getQueryNumber(req.query.page) || 1;
+    const pageSize = getQueryNumber(req.query.pageSize) || 20;
+    const status = getQueryString(req.query.status) as BatchStatus | undefined;
     const result = await BatchService.listBatches(page, pageSize, status);
     res.json(result);
   } catch (err: any) {
@@ -35,7 +36,7 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const batch = await BatchService.getBatchById(parseInt(req.params.id));
+    const batch = await BatchService.getBatchById(parseInt(getParamString(req.params.id)));
     if (!batch) {
       return res.status(404).json({ error: '批次不存在' });
     }
@@ -47,7 +48,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 router.post('/:id/import', upload.single('file'), async (req: Request, res: Response) => {
   try {
-    const batchId = parseInt(req.params.id);
+    const batchId = parseInt(getParamString(req.params.id));
     const operator = req.body.operator || 'system';
     
     if (!req.file) {
@@ -69,9 +70,9 @@ router.post('/:id/import', upload.single('file'), async (req: Request, res: Resp
 
 router.get('/:id/applications', async (req: Request, res: Response) => {
   try {
-    const batchId = parseInt(req.params.id);
-    const page = parseInt(req.query.page as string) || 1;
-    const pageSize = parseInt(req.query.pageSize as string) || 20;
+    const batchId = parseInt(getParamString(req.params.id));
+    const page = getQueryNumber(req.query.page) || 1;
+    const pageSize = getQueryNumber(req.query.pageSize) || 20;
     
     const result = await ApplicationService.listApplications(page, pageSize, { batchId });
     res.json(result);
@@ -83,7 +84,7 @@ router.get('/:id/applications', async (req: Request, res: Response) => {
 router.patch('/:id/status', async (req: Request, res: Response) => {
   try {
     const { status } = req.body;
-    const batch = await BatchService.updateBatchStatus(parseInt(req.params.id), status);
+    const batch = await BatchService.updateBatchStatus(parseInt(getParamString(req.params.id)), status);
     res.json(batch);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

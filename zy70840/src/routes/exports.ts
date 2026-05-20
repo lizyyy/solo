@@ -60,7 +60,8 @@ router.post('/deposit-flows', async (req: Request, res: Response) => {
 
 router.get('/download/:filename', async (req: Request, res: Response) => {
   try {
-    const filePath = ExportService.getExportFilePath(req.params.filename);
+    const filenameParam = Array.isArray(req.params.filename) ? req.params.filename[0] : req.params.filename;
+    const filePath = ExportService.getExportFilePath(filenameParam);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: '文件不存在' });

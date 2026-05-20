@@ -64,20 +64,21 @@ class ScheduleService {
       if (this.isDateOverlap(startDate, endDate, schedule.startDate, schedule.endDate)) {
         let conflictType = '';
         let readableConflict = '';
+        const scheduleWithApp = schedule as any;
 
         if (schedule.status === ScheduleStatus.BLOCKED) {
           conflictType = 'blocked';
           readableConflict = `该档期已被封禁，原因：${schedule.blockedReason || '未说明'}，封禁人：${schedule.blockedBy}`;
         } else {
           conflictType = 'occupied';
-          readableConflict = `档期冲突，冲突申请：【${schedule.application?.applicationNo || '未知'}】- ${schedule.application?.merchantName || '未知商户'}，占用时间：${dayjs(schedule.startDate).format('YYYY-MM-DD')} 至 ${dayjs(schedule.endDate).format('YYYY-MM-DD')}`;
+          readableConflict = `档期冲突，冲突申请：【${scheduleWithApp.application?.applicationNo || '未知'}】- ${scheduleWithApp.application?.merchantName || '未知商户'}，占用时间：${dayjs(schedule.startDate).format('YYYY-MM-DD')} 至 ${dayjs(schedule.endDate).format('YYYY-MM-DD')}`;
         }
 
         conflicts.push({
           scheduleId: schedule.id,
           applicationId: schedule.applicationId,
-          applicationNo: schedule.application?.applicationNo || null,
-          merchantName: schedule.application?.merchantName || null,
+          applicationNo: scheduleWithApp.application?.applicationNo || null,
+          merchantName: scheduleWithApp.application?.merchantName || null,
           startDate: schedule.startDate,
           endDate: schedule.endDate,
           conflictType,
