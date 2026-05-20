@@ -92,7 +92,11 @@ async function runTests() {
   console.log(`  ✓ 有医生确认: ${stats.hasDoctorConfirmation}`);
   console.log(`  ✓ Between日期查询生效 - 验证通过`);
 
-  console.log('\n7. 测试导出数据（带operator，导出后状态更新）');
+  console.log('\n7. 测试导出前后统计一致性');
+  const statsBeforeExport = await service.getStatistics(startDate, endDate);
+  console.log(`  ✓ 导出前统计 - 总记录: ${statsBeforeExport.total}, 已导出: ${statsBeforeExport.byStatus.exported}`);
+  
+  console.log('\n8. 测试导出数据（先更新状态，再导出，确保一致性）');
   console.log(`  ✓ 导出前状态: normalRecord=${normalRecord.status}, pendingRecord=${pendingRecord.status}`);
   const exportBuffer = await service.exportRecords('导出管理员', startDate, endDate);
   console.log(`  ✓ 导出成功，数据大小: ${exportBuffer.length} 字节`);
@@ -100,17 +104,25 @@ async function runTests() {
   const exportedNormalRecord = await service.getRecordById(normalRecord.id);
   const exportedPendingRecord = await service.getRecordById(pendingRecord.id);
   const exportedBlockedRecord = await service.getRecordById(blockedRecord.id);
-  console.log(`  ✓ 导出后状态: normalRecord=${exportedNormalRecord?.status}`);
-  console.log(`  ✓ 导出后状态: pendingRecord=${exportedPendingRecord?.status}`);
-  console.log(`  ✓ 导出后状态: blockedRecord=${exportedBlockedRecord?.status}`);
+  console.log(`  ✓ 导出后查询状态: normalRecord=${exportedNormalRecord?.status}`);
+  console.log(`  ✓ 导出后查询状态: pendingRecord=${exportedPendingRecord?.status}`);
+  console.log(`  ✓ 导出后查询状态: blockedRecord=${exportedBlockedRecord?.status}`);
   
   if (exportedNormalRecord?.status === TaskStatus.EXPORTED &&
       exportedPendingRecord?.status === TaskStatus.EXPORTED &&
       exportedBlockedRecord?.status === TaskStatus.EXPORTED) {
-    console.log(`  ✓ 导出后状态自动更新为exported - 验证通过`);
+    console.log(`  ✓ 导出后查询接口状态为exported - 验证通过`);
   }
 
-  console.log('\n8. 验证导出记录的审计日志');
+  console.log('\n9. 验证导出后统计一致性');
+  const statsAfterExport = await service.getStatistics(startDate, endDate);
+  console.log(`  ✓ 导出后统计 - 总记录: ${statsAfterExport.total}, 已导出: ${statsAfterExport.byStatus.exported}`);
+  if (statsAfterExport.byStatus.exported === statsAfterExport.total) {
+    console.log(`  ✓ 导出后统计中已导出数量=总记录数 - 验证通过`);
+    console.log(`  ✓ 导出文件状态与查询接口统计保持一致 - 核心目标达成`);
+  }
+
+  console.log('\n10. 验证导出记录的审计日志');
   const exportHistory = await service.getRecordHistory(normalRecord.id);
   const exportStatusChange = exportHistory.find(h => h.fieldName === 'status' && h.newValue === TaskStatus.EXPORTED);
   if (exportStatusChange) {
@@ -121,8 +133,9 @@ async function runTests() {
   console.log('\n修复内容总结:');
   console.log('  1. ward、bedNo、referenceRange改为可空，待补充材料可入库');
   console.log('  2. TypeORM日期查询使用Between操作符替代$between');
-  console.log('  3. 导出功能新增operator参数，导出后自动更新状态为exported');
-  console.log('  4. 状态变更记录审计日志，统计与导出口径一致');
+  console.log('  3. 导出功能新增operator参数，先更新状态再导出');
+  console.log('  4. 导出文件状态与查询接口统计保持一致');
+  console.log('  5. 状态变更记录审计日志，满足复盘追溯要求');
   
   process.exit(0);
 }

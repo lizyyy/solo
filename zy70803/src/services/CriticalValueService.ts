@@ -217,7 +217,32 @@ export class CriticalValueService {
       relations: ['auditLogs']
     });
 
-    const exportData = records.map(record => ({
+    const recordIds = records.map(r => r.id);
+    if (recordIds.length > 0) {
+      await this.recordRepository.update(
+        { id: In(recordIds) },
+        { status: TaskStatus.EXPORTED }
+      );
+
+      for (const record of records) {
+        await this.auditService.logChange(
+          record.id,
+          operator,
+          'status',
+          record.status,
+          TaskStatus.EXPORTED,
+          '数据已导出归档'
+        );
+      }
+    }
+
+    const updatedRecords = await this.recordRepository.find({
+      where,
+      order: { createdAt: 'DESC' },
+      relations: ['auditLogs']
+    });
+
+    const exportData = updatedRecords.map(record => ({
       '记录ID': record.id,
       '患者ID': record.patientId,
       '患者姓名': record.patientName,
@@ -248,28 +273,7 @@ export class CriticalValueService {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, '危急值回告记录');
 
-    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
-
-    const recordIds = records.map(r => r.id);
-    if (recordIds.length > 0) {
-      await this.recordRepository.update(
-        { id: In(recordIds) },
-        { status: TaskStatus.EXPORTED }
-      );
-
-      for (const record of records) {
-        await this.auditService.logChange(
-          record.id,
-          operator,
-          'status',
-          record.status,
-          TaskStatus.EXPORTED,
-          '数据已导出归档'
-        );
-      }
-    }
-
-    return buffer;
+    return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
   }
 
   private getCategoryText(category: DataCategory): string {
