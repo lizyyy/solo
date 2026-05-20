@@ -1,7 +1,7 @@
 {
   "workOrders": [
     {
-      "bedId": "BED_A104",
+      "bedId": "A104",
       "bedNumber": "A104",
       "ward": "内科",
       "patientId": "",
@@ -15,7 +15,7 @@
       "notes": "出院终末消毒"
     },
     {
-      "bedId": "BED_A103",
+      "bedId": "A103",
       "bedNumber": "A103",
       "ward": "内科",
       "patientId": "",
@@ -34,10 +34,10 @@
       "checkedAt": "2024-01-23T08:20:00Z"
     },
     {
-      "bedId": "BED_B203",
+      "bedId": "B203",
       "bedNumber": "B203",
       "ward": "外科",
-      "patientId": "PAT_DISCHARGED",
+      "patientId": "",
       "patientName": "已出院患者",
       "requestedBy": "孙护士",
       "requestedAt": "2024-01-23T06:00:00Z",
@@ -53,18 +53,18 @@
       "checkedAt": "2024-01-23T07:20:00Z"
     },
     {
-      "bedId": "BED_CLEANING_TIMEOUT",
-      "bedNumber": "C304",
+      "bedId": "C303",
+      "bedNumber": "C303",
       "ward": "儿科",
-      "patientId": "",
-      "patientName": "",
+      "patientId": "MRN006",
+      "patientName": "孙八",
       "requestedBy": "郑护士",
       "requestedAt": "2024-01-22T08:00:00Z",
       "startedAt": "2024-01-22T08:30:00Z",
       "status": "pending",
       "assignedTo": "清洁员丁",
       "priority": "normal",
-      "notes": "常规清洁"
+      "notes": "转科前清洁准备"
     }
   ]
 }

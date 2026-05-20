@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import * as moment from 'moment';
+import moment from 'moment';
 import {
   Bed,
   Patient,
@@ -47,22 +47,24 @@ export class ReconciliationEngine {
 
     dataStore.clearDiscrepancies();
 
-    const beds = ward 
-      ? dataStore.getAllBeds().filter(b => b.ward === ward) 
-      : dataStore.getAllBeds();
-    const patients = dataStore.getAllPatients();
-    const workOrders = dataStore.getAllWorkOrders();
+    const allBeds = dataStore.getAllBeds();
+    const allPatients = dataStore.getAllPatients();
+    const allWorkOrders = dataStore.getAllWorkOrders();
 
-    this.updateReconciliationStats(record, beds, patients, workOrders);
+    const filteredBeds = ward 
+      ? allBeds.filter(b => b.ward === ward) 
+      : allBeds;
+
+    this.updateReconciliationStats(record, filteredBeds, allPatients, allWorkOrders);
 
     const discrepancies: Discrepancy[] = [];
 
-    discrepancies.push(...this.checkStatusMismatch(beds, patients));
-    discrepancies.push(...this.checkDuplicateOccupancy(patients));
-    discrepancies.push(...this.checkTransferLockBed(beds, patients));
-    discrepancies.push(...this.checkCleaningTimeout(workOrders));
-    discrepancies.push(...this.checkPatientsInCleaning(beds, workOrders));
-    discrepancies.push(...this.checkDataConsistency(beds, patients, workOrders));
+    discrepancies.push(...this.checkStatusMismatch(filteredBeds, allPatients));
+    discrepancies.push(...this.checkDuplicateOccupancy(allPatients));
+    discrepancies.push(...this.checkTransferLockBed(filteredBeds, allPatients));
+    discrepancies.push(...this.checkCleaningTimeout(allWorkOrders));
+    discrepancies.push(...this.checkPatientsInCleaning(filteredBeds, allWorkOrders));
+    discrepancies.push(...this.checkDataConsistency(allBeds, allPatients, allWorkOrders));
 
     discrepancies.forEach(d => dataStore.addDiscrepancy(d));
 
@@ -113,9 +115,11 @@ export class ReconciliationEngine {
     const discrepancies: Discrepancy[] = [];
 
     beds.forEach(bed => {
-      const patient = patients.find(p => p.id === bed.currentPatientId);
+      const patient = patients.find(p => 
+        bed.currentPatientId && (p.id === bed.currentPatientId || p.medicalRecordNumber === bed.currentPatientId)
+      );
 
-      if (bed.status === BedStatus.OCCUPIED && !patient) {
+      if (bed.status === BedStatus.OCCUPIED && !patient && bed.currentPatientId) {
         discrepancies.push(this.createDiscrepancy(
           DiscrepancyType.STATUS_MISMATCH,
           'high',
@@ -123,7 +127,7 @@ export class ReconciliationEngine {
           undefined,
           undefined,
           '床位状态不一致',
-          `床位 ${bed.bedNumber} 标记为占用状态，但没有关联患者信息。可能患者流转记录缺失或床位状态错误`,
+          `床位 ${bed.bedNumber} 标记为占用状态，但未找到患者 ${bed.currentPatientId} 的流转记录。可能患者数据缺失或床位表错误`,
           { bedStatus: bed.status }
         ));
       }
@@ -136,22 +140,27 @@ export class ReconciliationEngine {
           patient,
           undefined,
           '床位与患者状态不一致',
-          `床位 ${bed.bedNumber} 标记为占用，但患者 ${patient.name} 状态为 ${patient.status}（应为 admitted）`,
+          `床位 ${bed.bedNumber} 标记为占用，但患者 ${patient.name} (${patient.medicalRecordNumber}) 状态为 ${patient.status}（应为 admitted）`,
           { bedStatus: bed.status, patientStatus: patient.status }
         ));
       }
 
-      if (bed.status === BedStatus.VACANT && patient && patient.status === PatientStatus.ADMITTED) {
-        discrepancies.push(this.createDiscrepancy(
-          DiscrepancyType.STATUS_MISMATCH,
-          'high',
-          bed,
-          patient,
-          undefined,
-          '床位与患者状态不一致',
-          `床位 ${bed.bedNumber} 标记为空床，但患者 ${patient.name} 状态为住院中。可能患者流转记录缺失转出记录`,
-          { bedStatus: bed.status, patientStatus: patient.status }
-        ));
+      if (bed.status === BedStatus.VACANT) {
+        const patientInBed = patients.find(p => 
+          p.currentBedId === bed.id || p.currentBedId === bed.bedNumber
+        );
+        if (patientInBed && patientInBed.status === PatientStatus.ADMITTED) {
+          discrepancies.push(this.createDiscrepancy(
+            DiscrepancyType.STATUS_MISMATCH,
+            'high',
+            bed,
+            patientInBed,
+            undefined,
+            '床位与患者状态不一致',
+            `床位 ${bed.bedNumber} 标记为空床，但患者 ${patientInBed.name} 状态为住院中。可能患者转出记录缺失`,
+            { bedStatus: bed.status, patientStatus: patientInBed.status }
+          ));
+        }
       }
     });
 
@@ -195,7 +204,9 @@ export class ReconciliationEngine {
 
     beds.forEach(bed => {
       if (bed.status === BedStatus.TRANSFER || bed.isLocked) {
-        const patient = patients.find(p => p.id === bed.currentPatientId);
+        const patient = patients.find(p => 
+          bed.currentPatientId && (p.id === bed.currentPatientId || p.medicalRecordNumber === bed.currentPatientId)
+        );
         
         if (patient && patient.status !== PatientStatus.TRANSFERRED) {
           discrepancies.push(this.createDiscrepancy(
@@ -205,12 +216,12 @@ export class ReconciliationEngine {
             patient,
             undefined,
             '转科锁床状态不一致',
-            `床位 ${bed.bedNumber} 标记为转科/锁定状态，但患者 ${patient.name} 状态为 ${patient.status}。可能转科记录未同步`,
+            `床位 ${bed.bedNumber} 标记为转科/锁定状态，但患者 ${patient.name} (${patient.medicalRecordNumber}) 状态为 ${patient.status}。可能转科记录未同步`,
             { bedStatus: bed.status, patientStatus: patient.status }
           ));
         }
 
-        if (!patient && bed.status === BedStatus.TRANSFER) {
+        if (!patient && bed.status === BedStatus.TRANSFER && bed.currentPatientId) {
           discrepancies.push(this.createDiscrepancy(
             DiscrepancyType.TRANSFER_LOCK_BED,
             'medium',
@@ -218,14 +229,16 @@ export class ReconciliationEngine {
             undefined,
             undefined,
             '转科锁床无关联患者',
-            `床位 ${bed.bedNumber} 标记为转科状态，但没有关联患者。可能需要确认是否需要解锁`,
+            `床位 ${bed.bedNumber} 标记为转科状态，关联患者 ${bed.currentPatientId} 不存在。可能转科已完成但床位未解锁`,
             { bedStatus: bed.status }
           ));
         }
       }
 
       if (bed.status === BedStatus.TRANSFER && !bed.isLocked) {
-        const patient = patients.find(p => p.id === bed.currentPatientId);
+        const patient = patients.find(p => 
+          bed.currentPatientId && (p.id === bed.currentPatientId || p.medicalRecordNumber === bed.currentPatientId)
+        );
         discrepancies.push(this.createDiscrepancy(
           DiscrepancyType.TRANSFER_LOCK_BED,
           'medium',
@@ -252,7 +265,7 @@ export class ReconciliationEngine {
         const duration = now.diff(startTime, 'minutes');
 
         if (duration > this.CLEANING_TIMEOUT_MINUTES) {
-          const bed = dataStore.getBed(wo.bedId);
+          const bed = dataStore.getAllBeds().find(b => b.id === wo.bedId || b.bedNumber === wo.bedNumber);
           discrepancies.push(this.createDiscrepancy(
             DiscrepancyType.CLEANING_TIMEOUT,
             'high',
@@ -277,7 +290,9 @@ export class ReconciliationEngine {
 
     beds.forEach(bed => {
       if (bed.status === BedStatus.CLEANING) {
-        const patient = dataStore.getAllPatients().find(p => p.currentBedId === bed.id);
+        const patient = dataStore.getAllPatients().find(p => 
+          p.currentBedId === bed.id || p.currentBedId === bed.bedNumber
+        );
         if (patient && patient.status === PatientStatus.ADMITTED) {
           discrepancies.push(this.createDiscrepancy(
             DiscrepancyType.BED_NOT_CLEANED,
@@ -286,13 +301,15 @@ export class ReconciliationEngine {
             patient,
             undefined,
             '清洁中床位仍有患者',
-            `床位 ${bed.bedNumber} 标记为清洁中，但患者 ${patient.name} 仍在该床位且状态为住院中`,
+            `床位 ${bed.bedNumber} 标记为清洁中，但患者 ${patient.name} (${patient.medicalRecordNumber}) 仍在该床位且状态为住院中`,
             { bedStatus: bed.status, patientStatus: patient.status }
           ));
         }
 
-        const recentWorkOrder = workOrders.find(wo => wo.bedId === bed.id && 
-          (wo.status === CleaningStatus.IN_PROGRESS || wo.status === CleaningStatus.PENDING));
+        const recentWorkOrder = workOrders.find(wo => 
+          (wo.bedId === bed.id || wo.bedNumber === bed.bedNumber) && 
+          (wo.status === CleaningStatus.IN_PROGRESS || wo.status === CleaningStatus.PENDING)
+        );
         if (!recentWorkOrder) {
           discrepancies.push(this.createDiscrepancy(
             DiscrepancyType.BED_NOT_CLEANED,
@@ -314,12 +331,13 @@ export class ReconciliationEngine {
   private checkDataConsistency(beds: Bed[], patients: Patient[], workOrders: CleaningWorkOrder[]): Discrepancy[] {
     const discrepancies: Discrepancy[] = [];
     const bedIdSet = new Set(beds.map(b => b.id));
-    const patientBedIds = new Set(patients.filter(p => p.currentBedId).map(p => p.currentBedId!));
-    const workOrderBedIds = new Set(workOrders.map(wo => wo.bedId));
+    const bedNumberSet = new Set(beds.map(b => b.bedNumber));
+    const patientIdSet = new Set(patients.map(p => p.id));
+    const patientMRNSet = new Set(patients.map(p => p.medicalRecordNumber));
 
-    patientBedIds.forEach(bedId => {
-      if (!bedIdSet.has(bedId)) {
-        const patient = patients.find(p => p.currentBedId === bedId);
+    patients.filter(p => p.currentBedId).forEach(patient => {
+      const bedId = patient.currentBedId!;
+      if (!bedIdSet.has(bedId) && !bedNumberSet.has(bedId)) {
         discrepancies.push(this.createDiscrepancy(
           DiscrepancyType.DATA_INCONSISTENCY,
           'high',
@@ -327,15 +345,31 @@ export class ReconciliationEngine {
           patient,
           undefined,
           '患者引用不存在床位',
-          `患者 ${patient?.name || 'unknown'} 引用了不存在的床位ID: ${bedId}`,
-          { patientStatus: patient?.status }
+          `患者 ${patient.name} (${patient.medicalRecordNumber}) 引用了不存在的床位: ${bedId}`,
+          { patientStatus: patient.status }
         ));
       }
     });
 
-    workOrderBedIds.forEach(bedId => {
-      if (!bedIdSet.has(bedId)) {
-        const wo = workOrders.find(w => w.bedId === bedId);
+    beds.filter(b => b.currentPatientId).forEach(bed => {
+      const patientId = bed.currentPatientId!;
+      if (!patientIdSet.has(patientId) && !patientMRNSet.has(patientId)) {
+        discrepancies.push(this.createDiscrepancy(
+          DiscrepancyType.DATA_INCONSISTENCY,
+          'high',
+          bed,
+          undefined,
+          undefined,
+          '床位引用不存在患者',
+          `床位 ${bed.bedNumber} 引用了不存在的患者: ${patientId}`,
+          { bedStatus: bed.status }
+        ));
+      }
+    });
+
+    workOrders.forEach(wo => {
+      const bedId = wo.bedId;
+      if (!bedIdSet.has(bedId) && !bedNumberSet.has(bedId)) {
         discrepancies.push(this.createDiscrepancy(
           DiscrepancyType.DATA_INCONSISTENCY,
           'medium',
@@ -343,8 +377,8 @@ export class ReconciliationEngine {
           undefined,
           wo,
           '清洁工单引用不存在床位',
-          `清洁工单引用了不存在的床位ID: ${bedId}`,
-          { cleaningStatus: wo?.status }
+          `清洁工单引用了不存在的床位: ${bedId} (${wo.bedNumber})`,
+          { cleaningStatus: wo.status }
         ));
       }
     });

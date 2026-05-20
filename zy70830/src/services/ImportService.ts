@@ -1,7 +1,7 @@
 import * as fs from 'fs';
-import * as csv from 'csv-parser';
+import csv from 'csv-parser';
 import { v4 as uuidv4 } from 'uuid';
-import * as moment from 'moment';
+import moment from 'moment';
 import {
   Bed,
   Patient,
@@ -94,7 +94,7 @@ export class ImportService {
     };
 
     return {
-      id: uuidv4(),
+      id: row.bedNumber.trim(),
       bedNumber: row.bedNumber.trim(),
       ward: row.ward.trim(),
       room: row.room.trim(),
@@ -185,14 +185,19 @@ export class ImportService {
       'other': PatientOutcome.OTHER
     };
 
+    const normalizeBedId = (bedId: string | undefined): string | undefined => {
+      if (!bedId) return undefined;
+      return bedId.replace(/^BED_/, '').trim();
+    };
+
     const history: PatientHistoryRecord[] = (data.history || []).map((h: any) => ({
       id: uuidv4(),
       timestamp: new Date(h.timestamp),
       action: h.action,
       previousStatus: h.previousStatus ? statusMap[h.previousStatus.toLowerCase()] : undefined,
       newStatus: h.newStatus ? statusMap[h.newStatus.toLowerCase()] : undefined,
-      previousBedId: h.previousBedId,
-      newBedId: h.newBedId,
+      previousBedId: normalizeBedId(h.previousBedId),
+      newBedId: normalizeBedId(h.newBedId),
       previousWard: h.previousWard,
       newWard: h.newWard,
       outcome: h.outcome ? outcomeMap[h.outcome.toLowerCase()] : undefined,
@@ -202,14 +207,14 @@ export class ImportService {
     }));
 
     return {
-      id: uuidv4(),
+      id: data.medicalRecordNumber.trim(),
       medicalRecordNumber: data.medicalRecordNumber.trim(),
       name: data.name.trim(),
       age: parseInt(data.age, 10),
       gender: data.gender.trim(),
       diagnosis: data.diagnosis.trim(),
       status,
-      currentBedId: data.bedId?.trim() || undefined,
+      currentBedId: normalizeBedId(data.bedId),
       admissionDate: new Date(data.admissionDate),
       expectedDischargeDate: data.expectedDischargeDate ? new Date(data.expectedDischargeDate) : undefined,
       actualDischargeDate: data.actualDischargeDate ? new Date(data.actualDischargeDate) : undefined,
@@ -290,12 +295,22 @@ export class ImportService {
       throw new Error(`Invalid cleaning status: ${data.status}`);
     }
 
+    const normalizeBedId = (bedId: string | undefined): string | undefined => {
+      if (!bedId) return undefined;
+      return bedId.replace(/^BED_/, '').trim();
+    };
+
+    const normalizePatientId = (patientId: string | undefined): string | undefined => {
+      if (!patientId || patientId === '') return undefined;
+      return patientId.trim();
+    };
+
     return {
       id: uuidv4(),
-      bedId: data.bedId.trim(),
+      bedId: normalizeBedId(data.bedId) || data.bedNumber.trim(),
       bedNumber: data.bedNumber.trim(),
       ward: data.ward.trim(),
-      patientId: data.patientId?.trim() || undefined,
+      patientId: normalizePatientId(data.patientId),
       patientName: data.patientName?.trim() || undefined,
       requestedBy: data.requestedBy.trim(),
       requestedAt: new Date(data.requestedAt),
@@ -318,37 +333,38 @@ export class ImportService {
   validateBedPatientConsistency(): { valid: boolean; issues: string[] } {
     const beds = dataStore.getAllBeds();
     const patients = dataStore.getAllPatients();
+    const workOrders = dataStore.getAllWorkOrders();
     const issues: string[] = [];
-
-    const patientBedMap = new Map<string, string>();
-    patients.forEach(p => {
-      if (p.currentBedId) {
-        patientBedMap.set(p.currentBedId, p.id);
-      }
-    });
 
     beds.forEach(bed => {
       if (bed.currentPatientId && bed.status === BedStatus.VACANT) {
-        issues.push(`Bed ${bed.bedNumber} is marked vacant but has patient ${bed.currentPatientId}`);
+        issues.push(`床位 ${bed.bedNumber} 标记为空床但有关联患者 ${bed.currentPatientId}`);
       }
       if (bed.currentPatientId) {
-        const patient = patients.find(p => p.id === bed.currentPatientId);
+        const patient = patients.find(p => p.id === bed.currentPatientId || p.medicalRecordNumber === bed.currentPatientId);
         if (!patient) {
-          issues.push(`Bed ${bed.bedNumber} references non-existent patient ${bed.currentPatientId}`);
-        } else if (patient.currentBedId !== bed.id) {
-          issues.push(`Patient ${patient.name} is not assigned to bed ${bed.bedNumber} but bed references them`);
+          issues.push(`床位 ${bed.bedNumber} 引用不存在的患者 ${bed.currentPatientId}`);
+        } else if (patient.currentBedId !== bed.id && patient.currentBedId !== bed.bedNumber) {
+          issues.push(`患者 ${patient.name} 不在床位 ${bed.bedNumber} 上，但床位引用了该患者`);
         }
       }
     });
 
     patients.forEach(patient => {
       if (patient.currentBedId) {
-        const bed = beds.find(b => b.id === patient.currentBedId);
+        const bed = beds.find(b => b.id === patient.currentBedId || b.bedNumber === patient.currentBedId);
         if (!bed) {
-          issues.push(`Patient ${patient.name} references non-existent bed ${patient.currentBedId}`);
-        } else if (bed.currentPatientId !== patient.id) {
-          issues.push(`Bed ${bed.bedNumber} is not assigned to patient ${patient.name} but patient references it`);
+          issues.push(`患者 ${patient.name} (${patient.medicalRecordNumber}) 引用不存在的床位 ${patient.currentBedId}`);
+        } else if (bed.currentPatientId !== patient.id && bed.currentPatientId !== patient.medicalRecordNumber) {
+          issues.push(`床位 ${bed.bedNumber} 未分配给患者 ${patient.name}，但患者引用了该床位`);
         }
+      }
+    });
+
+    workOrders.forEach(wo => {
+      const bed = beds.find(b => b.id === wo.bedId || b.bedNumber === wo.bedNumber);
+      if (!bed) {
+        issues.push(`清洁工单 ${wo.id} 引用不存在的床位 ${wo.bedId} (${wo.bedNumber})`);
       }
     });
 

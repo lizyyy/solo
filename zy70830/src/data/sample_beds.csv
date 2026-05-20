@@ -1,11 +1,11 @@
 bedNumber,ward,room,status,patientId,isLocked,lockReason,assignedNurse,notes
-A101,内科,A区,occupied,PAT001,false,,张护士,重症监护
-A102,内科,A区,occupied,PAT002,false,,李护士,
+A101,内科,A区,occupied,MRN001,false,,张护士,重症监护
+A102,内科,A区,occupied,MRN002,false,,李护士,
 A103,内科,A区,vacant,,,false,,王护士,已清洁
 A104,内科,A区,cleaning,,,false,,赵护士,清洁中
-B201,外科,B区,occupied,PAT003,false,,孙护士,术后观察
+B201,外科,B区,occupied,MRN003,false,,孙护士,术后观察
 B202,外科,B区,locked,,true,维修中,,床位维护
 B203,外科,B区,vacant,,,false,,周护士,已消毒
-C301,儿科,C区,occupied,PAT004,false,,吴护士,
-C302,儿科,C区,occupied,PAT005,false,,郑护士,
-C303,儿科,C区,transfer,PAT006,true,转科准备,,待转出
+C301,儿科,C区,occupied,MRN004,false,,吴护士,
+C302,儿科,C区,occupied,MRN005,false,,郑护士,
+C303,儿科,C区,transfer,MRN006,true,转科准备,,待转出
