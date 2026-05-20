@@ -72,10 +72,17 @@
 - Node.js >= 16
 - npm >= 8
 
-### 安装依赖
+### 一键安装所有依赖
 
 ```bash
-# 安装根目录依赖
+# 在项目根目录执行，会安装所有依赖
+npm run install:all
+```
+
+或者分步安装：
+
+```bash
+# 安装根目录依赖（用于 concurrently 等工具）
 npm install
 
 # 安装后端依赖
@@ -85,29 +92,34 @@ cd server && npm install
 cd ../client && npm install
 ```
 
-### 初始化数据库
-
-```bash
-cd server
-node scripts/init-db.js
-```
-
 ### 启动服务
 
+**注意：数据库会在后端首次启动时自动初始化，无需手动执行初始化脚本。**
+
 ```bash
-# 方式一：分别启动
-# 终端1 - 后端
+# 方式一：分别启动（推荐，日志更清晰）
+# 终端1 - 启动后端服务
 cd server && npm run dev
 
-# 终端2 - 前端
+# 终端2 - 启动前端应用
 cd client && npm run dev
 
-# 方式二：根目录同时启动（需要安装 concurrently）
+# 方式二：根目录同时启动（需要先安装根目录依赖）
 npm run dev
 ```
 
 - 后端服务: http://localhost:3001
 - 前端应用: http://localhost:3000
+
+### 构建生产版本
+
+```bash
+# 构建前端
+npm run build
+
+# 启动生产环境后端
+npm start
+```
 
 ## API 接口
 
