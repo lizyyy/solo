@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ReconciliationResult, Discrepancy, TraceLink } from '../types';
 import { store } from '../models/Store';
+import { reviewService } from './ReviewService';
 
 export class ReportService {
   async exportReportToExcel(
@@ -13,7 +14,7 @@ export class ReportService {
     filePath: string;
     filename: string;
   }> {
-    const report = store.getReconciliation(reportId);
+    const report = reviewService.recalculateReportSummary(reportId);
     if (!report) {
       throw new Error(`对账报告 ${reportId} 不存在`);
     }
@@ -290,6 +291,7 @@ export class ReportService {
 
   private findRelatedReport(recordId: string): any {
     const reports = store.getAllReconciliations();
+    
     for (const report of reports) {
       if (report.discrepancies.includes(recordId)) {
         return {
@@ -301,6 +303,35 @@ export class ReportService {
         };
       }
     }
+
+    for (const report of reports) {
+      for (const dId of report.discrepancies) {
+        const d = store.getDiscrepancy(dId);
+        if (d && d.sourceRecordId === recordId) {
+          return {
+            id: report.id,
+            reconciliationId: report.reconciliationId,
+            period: report.period,
+            generatedAt: report.generatedAt,
+            status: report.status,
+            relatedDiscrepancyId: dId,
+            discrepancyType: d.type
+          };
+        }
+        if (d && d.relatedRecordIds.includes(recordId)) {
+          return {
+            id: report.id,
+            reconciliationId: report.reconciliationId,
+            period: report.period,
+            generatedAt: report.generatedAt,
+            status: report.status,
+            relatedDiscrepancyId: dId,
+            discrepancyType: d.type
+          };
+        }
+      }
+    }
+
     return null;
   }
 

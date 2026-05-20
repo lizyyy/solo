@@ -130,6 +130,7 @@ export interface ReconciliationResult {
 }
 
 export interface TraceLink {
+  id: string;
   recordId: string;
   recordType: 'borrow' | 'vehicle' | 'violation' | 'discrepancy' | 'review' | 'report';
   timestamp: Date;

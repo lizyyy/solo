@@ -20,6 +20,7 @@ export class ReviewService {
     success: boolean;
     review: ReviewRecord;
     updatedRecords: any[];
+    updatedReports: ReconciliationResult[];
   }> {
     const discrepancy = store.getDiscrepancy(discrepancyId);
     if (!discrepancy) {
@@ -87,11 +88,44 @@ export class ReviewService {
       resolution: comments
     });
 
+    const affectedReports = this.updateReportsForDiscrepancy(discrepancyId, newStatus);
+
     return {
       success: true,
       review,
-      updatedRecords
+      updatedRecords,
+      updatedReports: affectedReports
     };
+  }
+
+  private updateReportsForDiscrepancy(
+    discrepancyId: string,
+    newStatus: Discrepancy['status']
+  ): ReconciliationResult[] {
+    const reports = store.getAllReconciliations();
+    const updatedReports: ReconciliationResult[] = [];
+
+    for (const report of reports) {
+      if (report.discrepancies.includes(discrepancyId)) {
+        const resolvedCount = report.discrepancies.filter(dId => {
+          const d = store.getDiscrepancy(dId);
+          return d?.status === 'resolved';
+        }).length;
+
+        const updatedReport = store.updateReconciliation(report.id, {
+          summary: {
+            ...report.summary,
+            resolvedDiscrepancies: resolvedCount
+          }
+        });
+
+        if (updatedReport) {
+          updatedReports.push(updatedReport);
+        }
+      }
+    }
+
+    return updatedReports;
   }
 
   async recalculateReconciliation(
@@ -198,7 +232,30 @@ export class ReviewService {
     return updatedReport;
   }
 
+  recalculateReportSummary(reportId: string): ReconciliationResult {
+    const report = store.getReconciliation(reportId);
+    if (!report) {
+      throw new Error(`对账报告 ${reportId} 不存在`);
+    }
+
+    const discrepancies = report.discrepancies
+      .map(id => store.getDiscrepancy(id))
+      .filter(Boolean) as Discrepancy[];
+
+    const resolvedCount = discrepancies.filter(d => d.status === 'resolved').length;
+
+    return store.updateReconciliation(reportId, {
+      summary: {
+        ...report.summary,
+        totalDiscrepancies: discrepancies.length,
+        resolvedDiscrepancies: resolvedCount
+      }
+    })!;
+  }
+
   getReportSummary(reportId: string): any {
+    this.recalculateReportSummary(reportId);
+    
     const report = store.getReconciliation(reportId);
     if (!report) {
       throw new Error(`对账报告 ${reportId} 不存在`);

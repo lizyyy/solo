@@ -262,7 +262,7 @@ class DataStore {
 
   addTraceLink(link: Omit<TraceLink, 'id'>): string {
     const id = uuidv4();
-    this.traceLinks.set(id, { ...link, recordId: id });
+    this.traceLinks.set(id, { ...link, id });
     return id;
   }
 
@@ -270,20 +270,32 @@ class DataStore {
     const chain: TraceLink[] = [];
     const visited = new Set<string>();
     
-    const traverse = (currentId: string) => {
-      if (visited.has(currentId)) return;
-      visited.add(currentId);
+    const traverse = (currentRecordId: string) => {
+      if (visited.has(currentRecordId)) return;
+      visited.add(currentRecordId);
       
-      const link = Array.from(this.traceLinks.values()).find(l => l.recordId === currentId);
-      if (link) {
-        chain.push(link);
+      const links = Array.from(this.traceLinks.values()).filter(l => l.recordId === currentRecordId);
+      links.forEach(link => {
+        if (!chain.find(c => c.id === link.id)) {
+          chain.push(link);
+        }
         if (link.prevLinks) {
           link.prevLinks.forEach(traverse);
         }
         if (link.nextLinks) {
           link.nextLinks.forEach(traverse);
         }
-      }
+      });
+      
+      const relatedLinks = Array.from(this.traceLinks.values()).filter(l => 
+        l.prevLinks?.includes(currentRecordId) || l.nextLinks?.includes(currentRecordId)
+      );
+      relatedLinks.forEach(link => {
+        if (!chain.find(c => c.id === link.id)) {
+          chain.push(link);
+          traverse(link.recordId);
+        }
+      });
     };
     
     traverse(recordId);
