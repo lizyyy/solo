@@ -44,8 +44,10 @@ export class ReportService {
     const resolvedDiscrepancies = allDiscrepancies.filter(d => d.isResolved).length;
     const pendingDiscrepancies = allDiscrepancies.filter(d => !d.isResolved).length;
 
+    const updatedRecord = dataStore.refreshReconciliationStats(recordId);
+
     return {
-      summary: record,
+      summary: updatedRecord || record,
       discrepancies: allDiscrepancies,
       beds,
       patients,

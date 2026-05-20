@@ -33,6 +33,10 @@ class ReviewService {
             notes: `Review: ${result}, Action: ${action}, Notes: ${notes}`,
             source: types_1.DataSource.MANUAL_REVIEW
         });
+        const latestRecord = DataStore_1.dataStore.getLatestReconciliationRecord();
+        if (latestRecord) {
+            DataStore_1.dataStore.refreshReconciliationStats(latestRecord.id);
+        }
         return {
             success: true,
             decision,

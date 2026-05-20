@@ -20,8 +20,9 @@ class ReportService {
         const reviewDecisions = DataStore_1.dataStore.getAllReviewDecisions();
         const resolvedDiscrepancies = allDiscrepancies.filter(d => d.isResolved).length;
         const pendingDiscrepancies = allDiscrepancies.filter(d => !d.isResolved).length;
+        const updatedRecord = DataStore_1.dataStore.refreshReconciliationStats(recordId);
         return {
-            summary: record,
+            summary: updatedRecord || record,
             discrepancies: allDiscrepancies,
             beds,
             patients,

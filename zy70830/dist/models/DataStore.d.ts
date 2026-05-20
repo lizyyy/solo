@@ -40,6 +40,9 @@ export declare class DataStore {
     getAllAuditLogs(): AuditLog[];
     addReconciliationRecord(record: ReconciliationRecord): void;
     getReconciliationRecord(id: string): ReconciliationRecord | undefined;
+    getLatestReconciliationRecord(): ReconciliationRecord | undefined;
+    updateReconciliationRecord(id: string, updates: Partial<ReconciliationRecord>): ReconciliationRecord | undefined;
+    refreshReconciliationStats(recordId: string): ReconciliationRecord | undefined;
     getAllReconciliationRecords(): ReconciliationRecord[];
     addReviewDecision(decision: ReviewDecision): void;
     getReviewDecision(id: string): ReviewDecision | undefined;

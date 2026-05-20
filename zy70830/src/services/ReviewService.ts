@@ -52,6 +52,11 @@ export class ReviewService {
       source: DataSource.MANUAL_REVIEW
     });
 
+    const latestRecord = dataStore.getLatestReconciliationRecord();
+    if (latestRecord) {
+      dataStore.refreshReconciliationStats(latestRecord.id);
+    }
+
     return {
       success: true,
       decision,

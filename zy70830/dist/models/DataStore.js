@@ -138,6 +138,32 @@ class DataStore {
     getReconciliationRecord(id) {
         return this.reconciliationRecords.find(r => r.id === id);
     }
+    getLatestReconciliationRecord() {
+        if (this.reconciliationRecords.length === 0)
+            return undefined;
+        return [...this.reconciliationRecords].sort((a, b) => new Date(b.reconciliationDate).getTime() - new Date(a.reconciliationDate).getTime())[0];
+    }
+    updateReconciliationRecord(id, updates) {
+        const index = this.reconciliationRecords.findIndex(r => r.id === id);
+        if (index !== -1) {
+            this.reconciliationRecords[index] = { ...this.reconciliationRecords[index], ...updates };
+            return this.reconciliationRecords[index];
+        }
+        return undefined;
+    }
+    refreshReconciliationStats(recordId) {
+        const record = this.getReconciliationRecord(recordId);
+        if (!record)
+            return undefined;
+        const allDiscrepancies = this.getAllDiscrepancies();
+        const resolvedCount = allDiscrepancies.filter(d => d.isResolved).length;
+        const pendingCount = allDiscrepancies.filter(d => !d.isResolved).length;
+        return this.updateReconciliationRecord(recordId, {
+            discrepanciesFound: allDiscrepancies.length,
+            discrepanciesResolved: resolvedCount,
+            discrepanciesPending: pendingCount
+        });
+    }
     getAllReconciliationRecords() {
         return [...this.reconciliationRecords];
     }
