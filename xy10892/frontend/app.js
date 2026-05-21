@@ -147,9 +147,9 @@ async function loadDashboard() {
     
     for (const doc of recentDocs) {
         try {
-            const history = await apiCall(`/documents/${doc.id}/history`);
-            if (history.length > 0) {
-                const lastHistory = history[history.length - 1];
+            const statusHistory = await apiCall(`/documents/${doc.id}/history`);
+            if (statusHistory.length > 0) {
+                const lastHistory = statusHistory[statusHistory.length - 1];
                 const item = document.createElement('div');
                 item.className = 'activity-item';
                 item.innerHTML = `
@@ -243,31 +243,31 @@ async function viewDocument(docId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-detail').classList.add('active');
     
-    const document = await apiCall(`/documents/${docId}`);
-    currentDocument = document;
+    const docData = await apiCall(`/documents/${docId}`);
+    currentDocument = docData;
     
     const hits = await apiCall(`/documents/${docId}/hits`);
-    const history = await apiCall(`/documents/${docId}/history`);
+    const statusHistory = await apiCall(`/documents/${docId}/history`);
     const versions = await apiCall(`/documents/${docId}/versions`);
     
-    document.getElementById('detailTitle').textContent = document.filename;
-    document.getElementById('currentStatus').className = `status-badge status-${document.status}`;
-    document.getElementById('currentStatus').textContent = statusLabels[document.status];
+    document.getElementById('detailTitle').textContent = docData.filename;
+    document.getElementById('currentStatus').className = `status-badge status-${docData.status}`;
+    document.getElementById('currentStatus').textContent = statusLabels[docData.status];
     
-    renderDocumentContent(document);
-    renderActionButtons(document.status, document);
+    renderDocumentContent(docData);
+    renderActionButtons(docData.status, docData);
     renderHits(hits);
-    renderHistory(history);
-    renderReviews(document.reviews || []);
+    renderHistory(statusHistory);
+    renderReviews(docData.reviews || []);
     renderVersions(versions);
     
     switchTab('content');
 }
 
-function renderDocumentContent(document) {
+function renderDocumentContent(docData) {
     const container = document.getElementById('tab-content');
     
-    if (!document.content) {
+    if (!docData.content) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📝</div>
@@ -284,14 +284,14 @@ function renderDocumentContent(document) {
                 <h3>原始内容</h3>
                 <button class="btn btn-secondary" onclick="showContentInputModal()">编辑内容</button>
             </div>
-            <pre class="content-display">${escapeHtml(document.content)}</pre>
+            <pre class="content-display">${escapeHtml(docData.content)}</pre>
         </div>
-        ${document.masked_content ? `
+        ${docData.masked_content ? `
         <div class="content-section" style="margin-top: 1.5rem;">
             <div class="content-header">
                 <h3>脱敏后内容</h3>
             </div>
-            <pre class="content-display masked">${escapeHtml(document.masked_content)}</pre>
+            <pre class="content-display masked">${escapeHtml(docData.masked_content)}</pre>
         </div>
         ` : ''}
     `;
@@ -303,7 +303,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-function renderActionButtons(status, document) {
+function renderActionButtons(status, docData) {
     const container = document.getElementById('actionButtons');
     container.innerHTML = '';
     
@@ -311,7 +311,7 @@ function renderActionButtons(status, document) {
     
     switch (status) {
         case 'created':
-            if (document.content) {
+            if (docData.content) {
                 buttons.push({ text: '开始扫描', class: 'btn-primary', action: startScan });
             } else {
                 buttons.push({ text: '录入内容', class: 'btn-warning', action: showContentInputModal });
@@ -322,7 +322,7 @@ function renderActionButtons(status, document) {
             buttons.push({ text: '驳回', class: 'btn-danger', action: () => showReviewModal('reject') });
             break;
         case 'error':
-            if (document.content) {
+            if (docData.content) {
                 buttons.push({ text: '重试扫描', class: 'btn-warning', action: retryScan });
             } else {
                 buttons.push({ text: '录入内容', class: 'btn-warning', action: showContentInputModal });
@@ -381,11 +381,11 @@ function renderHits(hits) {
     });
 }
 
-function renderHistory(history) {
+function renderHistory(statusHistory) {
     const container = document.getElementById('tab-history');
     container.innerHTML = '';
     
-    if (history.length === 0) {
+    if (statusHistory.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📜</div>
@@ -395,7 +395,7 @@ function renderHistory(history) {
         return;
     }
     
-    history.slice().reverse().forEach(item => {
+    statusHistory.slice().reverse().forEach(item => {
         const div = document.createElement('div');
         div.className = 'history-item';
         div.innerHTML = `
