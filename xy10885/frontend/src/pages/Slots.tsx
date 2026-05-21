@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { slotsApi, systemsApi, locksApi } from '../api';
 import { useAppStore } from '../store';

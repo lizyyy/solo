@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { slotsApi, locksApi, vouchersApi, conflictsApi } from '../api';
 
 export default function Dashboard() {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { exportApi } from '../api';
 import { useAppStore } from '../store';
 
@@ -7,7 +7,7 @@ export default function ImportExport() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedFile(file);
   };

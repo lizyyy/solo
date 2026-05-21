@@ -52,7 +52,7 @@ export const logsApi = {
 
 export const exportApi = {
   exportSlots: () => window.open('/api/export/slots', '_blank'),
-  exportVouchers: (params?: any) => window.open('/api/export/vouchers', '_blank'),
+  exportVouchers: () => window.open('/api/export/vouchers', '_blank'),
   exportStatistics: () => window.open('/api/export/statistics', '_blank')
 };
 

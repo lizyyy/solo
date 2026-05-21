@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { vouchersApi } from '../api';
 import { useAppStore } from '../store';
 

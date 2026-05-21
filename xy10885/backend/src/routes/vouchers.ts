@@ -12,9 +12,9 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/code/:code', async (req, res) => {
   try {
-    const voucher = await voucherService.getVoucherById(req.params.id);
+    const voucher = await voucherService.getVoucherByCode(req.params.code);
     if (!voucher) {
       return res.status(404).json({ success: false, error: '预约凭证不存在' });
     }
@@ -24,9 +24,9 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.get('/code/:code', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const voucher = await voucherService.getVoucherByCode(req.params.code);
+    const voucher = await voucherService.getVoucherById(req.params.id);
     if (!voucher) {
       return res.status(404).json({ success: false, error: '预约凭证不存在' });
     }
