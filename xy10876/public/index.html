@@ -573,12 +573,13 @@
         async function confirmFix() {
             if (!currentFixRefundId) return;
             
+            const refundId = currentFixRefundId;
             const newStatus = document.getElementById('fixStatusSelect').value;
             const reason = document.getElementById('fixReason').value || '脏数据修复';
 
             closeFixModal();
             
-            const result = await apiRequest(`/refunds/${currentFixRefundId}/fix`, {
+            const result = await apiRequest(`/refunds/${refundId}/fix`, {
                 method: 'POST',
                 body: JSON.stringify({ 
                     newStatus, 
