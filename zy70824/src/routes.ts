@@ -120,9 +120,9 @@ router.post('/import/csv', upload.single('file'), async (req, res) => {
               continue;
             }
 
-            const isDuplicate = await checkDuplicateSample(sampleId, influencerId);
-            if (isDuplicate) {
-              const warningMsg = `样品${sampleId}已寄送给达人${influencerId}且未归还`;
+            const duplicateCheck = await checkDuplicateSample(sampleId);
+            if (duplicateCheck.isDuplicate) {
+              const warningMsg = `样品${sampleId}已寄送给${duplicateCheck.existingInfluencer}且未归还，不可改寄其他达人`;
               warnings.push(warningMsg);
               
               await createSampleRecord({
@@ -144,7 +144,7 @@ router.post('/import/csv', upload.single('file'), async (req, res) => {
                 operation: 'duplicate',
                 operator: handler,
                 reason: warningMsg,
-                remark: '检测到重复寄送，系统自动拒绝'
+                remark: '检测到同样品重复寄送，系统自动拒绝'
               });
               continue;
             }
@@ -260,7 +260,7 @@ router.post('/records/:recordId/return', async (req, res) => {
 
 router.get('/records', async (req, res) => {
   try {
-    const { brand, batchId, influencerId, status, hasDeduction } = req.query;
+    const { brand, batchId, influencerId, status, hasDeduction, sendDateStart, sendDateEnd, expectedReturnDateStart, expectedReturnDateEnd } = req.query;
 
     await updateOverdueRecords();
 
@@ -269,7 +269,11 @@ router.get('/records', async (req, res) => {
       batchId: batchId as string,
       influencerId: influencerId as string,
       status: status as string,
-      hasDeduction: hasDeduction === 'true'
+      hasDeduction: hasDeduction === 'true',
+      sendDateStart: sendDateStart as string,
+      sendDateEnd: sendDateEnd as string,
+      expectedReturnDateStart: expectedReturnDateStart as string,
+      expectedReturnDateEnd: expectedReturnDateEnd as string
     });
 
     const recordsWithDescription = records.map(record => ({
@@ -300,7 +304,7 @@ router.get('/records/:recordId/logs', async (req, res) => {
 
 router.get('/export', async (req, res) => {
   try {
-    const { brand, batchId, influencerId, status, hasDeduction } = req.query;
+    const { brand, batchId, influencerId, status, hasDeduction, sendDateStart, sendDateEnd, expectedReturnDateStart, expectedReturnDateEnd } = req.query;
 
     await updateOverdueRecords();
 
@@ -309,7 +313,11 @@ router.get('/export', async (req, res) => {
       batchId: batchId as string,
       influencerId: influencerId as string,
       status: status as string,
-      hasDeduction: hasDeduction === 'true'
+      hasDeduction: hasDeduction === 'true',
+      sendDateStart: sendDateStart as string,
+      sendDateEnd: sendDateEnd as string,
+      expectedReturnDateStart: expectedReturnDateStart as string,
+      expectedReturnDateEnd: expectedReturnDateEnd as string
     });
 
     const exportData = records.map(record => ({

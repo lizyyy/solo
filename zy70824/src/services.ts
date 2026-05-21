@@ -111,6 +111,10 @@ export async function getRecordsByQuery(params: {
   influencerId?: string;
   status?: string;
   hasDeduction?: boolean;
+  sendDateStart?: string;
+  sendDateEnd?: string;
+  expectedReturnDateStart?: string;
+  expectedReturnDateEnd?: string;
 }): Promise<SampleRecord[]> {
   let query = 'SELECT sr.* FROM sample_records sr';
   const values: any[] = [];
@@ -137,10 +141,28 @@ export async function getRecordsByQuery(params: {
   if (params.hasDeduction) {
     conditions.push('sr.deductionAmount > 0');
   }
+  if (params.sendDateStart) {
+    conditions.push('sr.sendDate >= ?');
+    values.push(params.sendDateStart);
+  }
+  if (params.sendDateEnd) {
+    conditions.push('sr.sendDate <= ?');
+    values.push(params.sendDateEnd);
+  }
+  if (params.expectedReturnDateStart) {
+    conditions.push('sr.expectedReturnDate >= ?');
+    values.push(params.expectedReturnDateStart);
+  }
+  if (params.expectedReturnDateEnd) {
+    conditions.push('sr.expectedReturnDate <= ?');
+    values.push(params.expectedReturnDateEnd);
+  }
 
   if (conditions.length > 0) {
     query += ' WHERE ' + conditions.join(' AND ');
   }
+
+  query += ' ORDER BY sr.sendDate DESC, sr.createdAt DESC';
 
   return new Promise((resolve, reject) => {
     db.all(query, values, (err: Error | null, rows: any[]) => {
@@ -173,14 +195,22 @@ export async function importInfluencers(influencers: Omit<Influencer, 'id' | 'cr
   }
 }
 
-export async function checkDuplicateSample(sampleId: string, influencerId: string): Promise<boolean> {
+export async function checkDuplicateSample(sampleId: string, influencerId?: string): Promise<{ isDuplicate: boolean; existingInfluencer?: string }> {
   return new Promise((resolve, reject) => {
     db.get(`
-      SELECT COUNT(*) as count FROM sample_records
-      WHERE sampleId = ? AND influencerId = ? AND status != 'returned'
-    `, [sampleId, influencerId], (err: Error | null, row: any) => {
+      SELECT influencerId, influencerName FROM sample_records
+      WHERE sampleId = ? AND status NOT IN ('returned', 'duplicate', 'rejected')
+      LIMIT 1
+    `, [sampleId], (err: Error | null, row: any) => {
       if (err) reject(err);
-      else resolve(row.count > 0);
+      else if (row) {
+        resolve({
+          isDuplicate: true,
+          existingInfluencer: `${row.influencerName} (${row.influencerId})`
+        });
+      } else {
+        resolve({ isDuplicate: false });
+      }
     });
   });
 }
