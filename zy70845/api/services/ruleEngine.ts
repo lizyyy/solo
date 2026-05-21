@@ -3,7 +3,8 @@ import {
   ValidationContext,
   ValidationResult,
   SkuAlias,
-} from '../../shared/types';
+  DataSource,
+} from '../../shared/types.js';
 
 export const skuAliasMap: SkuAlias[] = [
   {
@@ -107,7 +108,7 @@ export const rules: ValidationRule[] = [
             confidence: 0.5,
           };
         }
-      } catch (e) {
+      } catch {
         return { passed: true };
       }
       return { passed: true };
@@ -186,7 +187,7 @@ export function getItemStatus(
   return 'normal';
 }
 
-export function normalizeItem(item: any, source: string, storeId: string) {
+export function normalizeItem(item: any, source: DataSource, storeId: string) {
   const sku = String(item.sku || item['商品编码'] || item.skuCode || '');
   const skuName = String(
     item.skuName || item['商品名称'] || item.name || ''

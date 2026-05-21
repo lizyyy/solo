@@ -6,14 +6,14 @@ import {
   ImportResponse,
   DataSource,
   ValidationContext,
-} from '../../shared/types';
+} from '../../shared/types.js';
 import {
   applyRules,
   getItemStatus,
   normalizeItem,
   getStandardSku,
   skuAliasMap,
-} from './ruleEngine';
+} from './ruleEngine.js';
 
 const batchStore = new Map<string, ImportResponse>();
 
@@ -33,22 +33,23 @@ export function getAllBatches(): ImportResponse[] {
   return Array.from(batchStore.values());
 }
 
-export function parseCsv(content: string): any[] {
-  const result = Papa.parse(content, {
+export function parseCsv(content: string): unknown[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const result = (Papa as any).parse(content, {
     header: true,
     skipEmptyLines: true,
     encoding: 'UTF-8',
   });
-  return result.data;
+  return result.data as unknown[];
 }
 
-export function parseJson(content: string): any[] {
+export function parseJson(content: string): unknown[] {
   const data = JSON.parse(content);
   return Array.isArray(data) ? data : [data];
 }
 
 export function processData(
-  items: any[],
+  items: unknown[],
   source: DataSource,
   storeId: string,
   batchId: string
@@ -100,7 +101,7 @@ export function processData(
         sku: standardSku?.sku || normalized.sku,
         skuName: standardSku?.name || normalized.skuName,
         quantity: normalized.quantity,
-        source: normalized.source as DataSource,
+        source: normalized.source,
         reason: warnings.map((w) => w.message).join('; '),
         confidence: Math.min(
           ...warnings.map((w) => w.confidence || 0.5)
@@ -114,7 +115,7 @@ export function processData(
       failed.push({
         id: itemId,
         originalData: normalized.originalData,
-        source: normalized.source as DataSource,
+        source: normalized.source,
         errorType: errors[0]?.errorType || 'UNKNOWN_ERROR',
         errorMessage: errors.map((e) => e.message).join('; '),
         suggestion: errors[0]?.suggestion || '请检查数据格式是否正确',

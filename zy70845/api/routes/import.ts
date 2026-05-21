@@ -9,8 +9,21 @@ import {
   getBatchResult,
   saveBatchResult,
   getAllBatches,
-} from '../services/dataProcessor';
-import { ImportResponse, DataSource } from '../../shared/types';
+} from '../services/dataProcessor.js';
+import { ImportResponse } from '../../shared/types.js';
+
+interface MulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
+}
+
+interface MulterFiles {
+  [fieldname: string]: MulterFile[];
+}
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -41,13 +54,11 @@ router.post(
         });
       }
 
-      const files = req.files as {
-        [fieldname: string]: Express.Multer.File[];
-      };
+      const files = (req as unknown as { files: MulterFiles }).files || {};
 
-      let inventoryItems: any[] = [];
-      let salesItems: any[] = [];
-      let replenishmentItems: any[] = [];
+      let inventoryItems: unknown[] = [];
+      let salesItems: unknown[] = [];
+      let replenishmentItems: unknown[] = [];
 
       if (files.inventoryCsv && files.inventoryCsv[0]) {
         const csvContent = files.inventoryCsv[0].buffer.toString('utf-8');
@@ -70,19 +81,19 @@ router.post(
 
       const inventoryResult = processData(
         inventoryItems,
-        'inventory' as DataSource,
+        'inventory',
         storeId,
         batchId
       );
       const salesResult = processData(
         salesItems,
-        'sales' as DataSource,
+        'sales',
         storeId,
         batchId
       );
       const replenishmentResult = processData(
         replenishmentItems,
-        'replenishment' as DataSource,
+        'replenishment',
         storeId,
         batchId
       );
@@ -150,6 +161,30 @@ router.get('/batches', (_req: Request, res: Response) => {
       summary: b.summary,
     })),
   });
+});
+
+export default router;
+});
+
+export default router;
+
+  res.json(result);
+});
+
+router.get('/batches', (_req: Request, res: Response) => {
+  const batches = getAllBatches();
+  res.json({
+    total: batches.length,
+    batches: batches.map((b) => ({
+      batchId: b.batchId,
+      storeId: b.storeId,
+      processedAt: b.processedAt,
+      summary: b.summary,
+    })),
+  });
+});
+
+export default router;
 });
 
 export default router;
