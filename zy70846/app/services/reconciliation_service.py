@@ -22,11 +22,12 @@ class ReconciliationService:
         inventory: InventoryRecord,
         sales: SalesRecord,
         replenishment: ReplenishmentRecord
-    ) -> Tuple[Dict[str, List], Dict[str, int], Dict[str, int], Dict[str, int]]:
+    ) -> Tuple[Dict, Dict, Dict, Dict, Dict, set]:
         
         inventory_map: Dict[str, List[InventoryItem]] = defaultdict(list)
         sales_map: Dict[str, int] = defaultdict(int)
-        replenish_map: Dict[str, int] = defaultdict(int)
+        replenish_actual_map: Dict[str, int] = defaultdict(int)
+        replenish_request_map: Dict[str, int] = defaultdict(int)
         unit_price_map: Dict[str, float] = {}
         
         for item in inventory.items:
@@ -43,12 +44,20 @@ class ReconciliationService:
         
         for item in replenishment.items:
             mapped_sku = storage.get_sku_by_alias(item.sku_name) or item.sku
-            replenish_map[mapped_sku] += item.actual_quantity
+            replenish_actual_map[mapped_sku] += item.actual_quantity
+            replenish_request_map[mapped_sku] += item.requested_quantity
             if item.unit_price and mapped_sku not in unit_price_map:
                 unit_price_map[mapped_sku] = item.unit_price
         
-        all_skus = set(inventory_map.keys()) | set(sales_map.keys()) | set(replenish_map.keys())
-        return dict(inventory_map), dict(sales_map), dict(replenish_map), unit_price_map, all_skus
+        all_skus = set(inventory_map.keys()) | set(sales_map.keys()) | set(replenish_actual_map.keys())
+        return (
+            dict(inventory_map), 
+            dict(sales_map), 
+            dict(replenish_actual_map),
+            dict(replenish_request_map),
+            dict(unit_price_map), 
+            all_skus
+        )
     
     def _is_expiring_soon(self, expiry_date: Optional[date], days: int = 30) -> bool:
         if not expiry_date:
@@ -65,6 +74,7 @@ class ReconciliationService:
         inventory_qty: int,
         sales_qty: int,
         replenish_qty: int,
+        replenish_request_qty: int,
         is_sku_alias: bool,
         is_expiring: bool
     ) -> str:
@@ -74,48 +84,32 @@ class ReconciliationService:
             explanations.append(f"商品名称存在别名映射: {sku_name}")
         
         if is_expiring:
-            explanations.append("该商品临期（30天内到期），可能影响实际库存")
+            explanations.append("该商品临期（30天内到期）")
         
         if discrepancy_type == DiscrepancyType.OVERSTOCK:
             explanations.append(
-                f"盘盈: 实际库存({inventory_qty}) > 理论库存(上期+补货-销售)，"
-                f"差异{abs(discrepancy_qty)}个。可能原因: 上期盘点偏差、补货多送、销售漏录"
+                f"盘盈: 实际库存({inventory_qty}) > 合理库存范围，差异{abs(discrepancy_qty)}个。"
+                f"可能原因: 上期盘点偏差、补货多送、销售漏录"
             )
         elif discrepancy_type == DiscrepancyType.UNDERSTOCK:
             explanations.append(
-                f"盘亏: 实际库存({inventory_qty}) < 理论库存，差异{abs(discrepancy_qty)}个。"
+                f"盘亏: 实际库存({inventory_qty}) < 合理库存范围，差异{abs(discrepancy_qty)}个。"
                 f"可能原因: 损耗、被盗、销售多录、补货少送"
             )
         elif discrepancy_type == DiscrepancyType.OVER_REPLENISH:
             explanations.append(
-                f"补货差异: 实际补货多于申请，差异{abs(discrepancy_qty)}个"
+                f"补货多送: 申请{replenish_request_qty}个，实际{replenish_qty}个，多送{abs(discrepancy_qty)}个"
             )
         elif discrepancy_type == DiscrepancyType.UNDER_REPLENISH:
             explanations.append(
-                f"补货差异: 实际补货少于申请，差异{abs(discrepancy_qty)}个"
+                f"补货少送: 申请{replenish_request_qty}个，实际{replenish_qty}个，少送{abs(discrepancy_qty)}个"
             )
         elif discrepancy_type == DiscrepancyType.EXPIRING_SOON:
-            explanations.append("商品临期预警")
+            explanations.append("商品临期预警，需尽快促销处理")
         elif discrepancy_type == DiscrepancyType.SKU_ALIAS:
-            explanations.append("SKU名称不统一，已自动映射合并")
+            explanations.append("SKU名称不统一，已自动映射合并统计")
         
         return " | ".join(explanations)
-    
-    def _determine_discrepancy_type(
-        self,
-        discrepancy_qty: int,
-        is_expiring: bool,
-        is_sku_alias: bool
-    ) -> DiscrepancyType:
-        if is_sku_alias:
-            return DiscrepancyType.SKU_ALIAS
-        if is_expiring:
-            return DiscrepancyType.EXPIRING_SOON
-        if discrepancy_qty > 0:
-            return DiscrepancyType.OVERSTOCK
-        elif discrepancy_qty < 0:
-            return DiscrepancyType.UNDERSTOCK
-        return DiscrepancyType.UNKNOWN
     
     def create_reconciliation(
         self,
@@ -163,7 +157,7 @@ class ReconciliationService:
         sales: SalesRecord,
         replenishment: ReplenishmentRecord
     ):
-        inv_map, sales_map, replenish_map, price_map, all_skus = self._get_sku_data_map(
+        inv_map, sales_map, replenish_actual_map, replenish_request_map, price_map, all_skus = self._get_sku_data_map(
             inventory, sales, replenishment
         )
         
@@ -174,71 +168,152 @@ class ReconciliationService:
             inv_items = inv_map.get(sku, [])
             inv_qty = sum(item.quantity for item in inv_items)
             sales_qty = sales_map.get(sku, 0)
-            replenish_qty = replenish_map.get(sku, 0)
-            
-            prev_inventory = inv_qty + sales_qty - replenish_qty
-            expected_qty = prev_inventory + replenish_qty - sales_qty
-            actual_qty = inv_qty
-            discrepancy_qty = actual_qty - expected_qty
-            unit_price = price_map.get(sku, 0)
-            discrepancy_value = abs(discrepancy_qty) * unit_price
+            replenish_actual_qty = replenish_actual_map.get(sku, 0)
+            replenish_request_qty = replenish_request_map.get(sku, 0)
             
             is_sku_alias = any(storage.get_sku_by_alias(item.sku_name) == sku for item in inv_items)
             is_expiring = any(self._is_expiring_soon(item.expiry_date) for item in inv_items)
             expiry_date = next((item.expiry_date for item in inv_items if item.expiry_date), None)
             
             sku_name = inv_items[0].sku_name if inv_items else sku
+            unit_price = price_map.get(sku, 0)
             
-            has_discrepancy = discrepancy_qty != 0 or is_sku_alias or is_expiring
+            replenish_diff = replenish_actual_qty - replenish_request_qty
             
-            discrepancy_type = self._determine_discrepancy_type(discrepancy_qty, is_expiring, is_sku_alias)
-            explanation = self._generate_discrepancy_explanation(
-                discrepancy_type, sku, sku_name, discrepancy_qty,
-                inv_qty, sales_qty, replenish_qty, is_sku_alias, is_expiring
-            )
+            net_flow = replenish_actual_qty - sales_qty
+            inventory_reasonableness = abs(net_flow) * 0.1
+            stock_diff = inv_qty - net_flow if abs(inv_qty - net_flow) > inventory_reasonableness else 0
             
-            discrepancy = DiscrepancyDetail(
-                id=storage.generate_id(),
-                sku=sku,
-                sku_name=sku_name,
-                discrepancy_type=discrepancy_type,
-                discrepancy_qty=discrepancy_qty,
-                discrepancy_value=discrepancy_value,
-                inventory_qty=inv_qty,
-                sales_qty=sales_qty,
-                replenish_qty=replenish_qty,
-                expected_qty=expected_qty,
-                actual_qty=actual_qty,
-                explanation=explanation,
-                source_records=[inventory.id, sales.id, replenishment.id],
-                is_sku_alias=is_sku_alias,
-                is_expiring_soon=is_expiring,
-                expiry_date=expiry_date
-            )
-            discrepancies.append(discrepancy)
+            if replenish_diff != 0:
+                rep_type = DiscrepancyType.OVER_REPLENISH if replenish_diff > 0 else DiscrepancyType.UNDER_REPLENISH
+                explanation = self._generate_discrepancy_explanation(
+                    rep_type, sku, sku_name, replenish_diff,
+                    inv_qty, sales_qty, replenish_actual_qty, replenish_request_qty,
+                    is_sku_alias, is_expiring
+                )
+                discrepancy = DiscrepancyDetail(
+                    id=storage.generate_id(),
+                    sku=sku,
+                    sku_name=sku_name,
+                    discrepancy_type=rep_type,
+                    discrepancy_qty=replenish_diff,
+                    discrepancy_value=abs(replenish_diff) * unit_price,
+                    inventory_qty=inv_qty,
+                    sales_qty=sales_qty,
+                    replenish_qty=replenish_actual_qty,
+                    expected_qty=replenish_request_qty,
+                    actual_qty=replenish_actual_qty,
+                    explanation=explanation,
+                    source_records=[inventory.id, sales.id, replenishment.id],
+                    is_sku_alias=is_sku_alias,
+                    is_expiring_soon=is_expiring,
+                    expiry_date=expiry_date
+                )
+                discrepancies.append(discrepancy)
+                summary.discrepant_skus += 1
+                summary.total_discrepancy_qty += abs(replenish_diff)
+                summary.total_discrepancy_value += abs(replenish_diff) * unit_price
+                if replenish_diff > 0:
+                    summary.overstock_qty += replenish_diff
+                else:
+                    summary.understock_qty += abs(replenish_diff)
+            
+            if stock_diff != 0 and replenish_diff == 0:
+                stock_type = DiscrepancyType.OVERSTOCK if stock_diff > 0 else DiscrepancyType.UNDERSTOCK
+                explanation = self._generate_discrepancy_explanation(
+                    stock_type, sku, sku_name, stock_diff,
+                    inv_qty, sales_qty, replenish_actual_qty, replenish_request_qty,
+                    is_sku_alias, is_expiring
+                )
+                discrepancy = DiscrepancyDetail(
+                    id=storage.generate_id(),
+                    sku=sku,
+                    sku_name=sku_name,
+                    discrepancy_type=stock_type,
+                    discrepancy_qty=stock_diff,
+                    discrepancy_value=abs(stock_diff) * unit_price,
+                    inventory_qty=inv_qty,
+                    sales_qty=sales_qty,
+                    replenish_qty=replenish_actual_qty,
+                    expected_qty=net_flow,
+                    actual_qty=inv_qty,
+                    explanation=explanation,
+                    source_records=[inventory.id, sales.id, replenishment.id],
+                    is_sku_alias=is_sku_alias,
+                    is_expiring_soon=is_expiring,
+                    expiry_date=expiry_date
+                )
+                discrepancies.append(discrepancy)
+                summary.discrepant_skus += 1
+                summary.total_discrepancy_qty += abs(stock_diff)
+                summary.total_discrepancy_value += abs(stock_diff) * unit_price
+                if stock_diff > 0:
+                    summary.overstock_qty += stock_diff
+                else:
+                    summary.understock_qty += abs(stock_diff)
+            
+            if is_expiring and replenish_diff == 0 and stock_diff == 0:
+                explanation = self._generate_discrepancy_explanation(
+                    DiscrepancyType.EXPIRING_SOON, sku, sku_name, 0,
+                    inv_qty, sales_qty, replenish_actual_qty, replenish_request_qty,
+                    is_sku_alias, is_expiring
+                )
+                discrepancy = DiscrepancyDetail(
+                    id=storage.generate_id(),
+                    sku=sku,
+                    sku_name=sku_name,
+                    discrepancy_type=DiscrepancyType.EXPIRING_SOON,
+                    discrepancy_qty=inv_qty,
+                    discrepancy_value=inv_qty * unit_price,
+                    inventory_qty=inv_qty,
+                    sales_qty=sales_qty,
+                    replenish_qty=replenish_actual_qty,
+                    expected_qty=inv_qty,
+                    actual_qty=inv_qty,
+                    explanation=explanation,
+                    source_records=[inventory.id, sales.id, replenishment.id],
+                    is_sku_alias=is_sku_alias,
+                    is_expiring_soon=is_expiring,
+                    expiry_date=expiry_date
+                )
+                discrepancies.append(discrepancy)
+                summary.discrepant_skus += 1
+                summary.expiring_skus += 1
+            
+            if is_sku_alias and replenish_diff == 0 and stock_diff == 0 and not is_expiring:
+                explanation = self._generate_discrepancy_explanation(
+                    DiscrepancyType.SKU_ALIAS, sku, sku_name, 0,
+                    inv_qty, sales_qty, replenish_actual_qty, replenish_request_qty,
+                    is_sku_alias, is_expiring
+                )
+                discrepancy = DiscrepancyDetail(
+                    id=storage.generate_id(),
+                    sku=sku,
+                    sku_name=sku_name,
+                    discrepancy_type=DiscrepancyType.SKU_ALIAS,
+                    discrepancy_qty=0,
+                    discrepancy_value=0,
+                    inventory_qty=inv_qty,
+                    sales_qty=sales_qty,
+                    replenish_qty=replenish_actual_qty,
+                    expected_qty=inv_qty,
+                    actual_qty=inv_qty,
+                    explanation=explanation,
+                    source_records=[inventory.id, sales.id, replenishment.id],
+                    is_sku_alias=is_sku_alias,
+                    is_expiring_soon=is_expiring,
+                    expiry_date=expiry_date
+                )
+                discrepancies.append(discrepancy)
+                summary.discrepant_skus += 1
+                summary.alias_skus += 1
             
             summary.total_skus += 1
             summary.total_inventory_qty += inv_qty
             summary.total_sales_qty += sales_qty
-            summary.total_replenish_qty += replenish_qty
-            
-            if has_discrepancy:
-                summary.discrepant_skus += 1
-                summary.total_discrepancy_qty += abs(discrepancy_qty)
-                summary.total_discrepancy_value += discrepancy_value
-                
-                if discrepancy_qty > 0:
-                    summary.overstock_qty += discrepancy_qty
-                elif discrepancy_qty < 0:
-                    summary.understock_qty += abs(discrepancy_qty)
-                
-                if is_expiring:
-                    summary.expiring_skus += 1
-                if is_sku_alias:
-                    summary.alias_skus += 1
-            else:
-                summary.matched_skus += 1
+            summary.total_replenish_qty += replenish_actual_qty
         
+        summary.matched_skus = summary.total_skus - summary.discrepant_skus + summary.alias_skus
         summary.expected_inventory = summary.total_inventory_qty - summary.overstock_qty + summary.understock_qty
         summary.actual_inventory = summary.total_inventory_qty
         
@@ -302,9 +377,12 @@ class ReconciliationService:
         if action == ReviewAction.APPROVE:
             discrepancy.is_resolved = True
         elif action == ReviewAction.REVISE and revised_qty is not None:
+            old_discrepancy_qty = discrepancy.discrepancy_qty
             discrepancy.actual_qty = revised_qty
             discrepancy.discrepancy_qty = revised_qty - discrepancy.expected_qty
-            discrepancy.discrepancy_value = abs(discrepancy.discrepancy_qty) * (discrepancy.discrepancy_value / abs(discrepancy.discrepancy_qty) if discrepancy.discrepancy_qty != 0 else 0)
+            if old_discrepancy_qty != 0:
+                unit_value = discrepancy.discrepancy_value / abs(old_discrepancy_qty)
+                discrepancy.discrepancy_value = abs(discrepancy.discrepancy_qty) * unit_value
         
         record.review_history.append({
             "discrepancy_id": discrepancy_id,

@@ -1,20 +1,21 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Query
 from fastapi.responses import StreamingResponse
-from typing import List, Optional
+from typing import Optional
 from datetime import date
+from urllib.parse import quote
 import json
 
 from app.schemas.common import ReviewAction, ApiResponse
-from app.schemas.inventory import InventoryRecord
-from app.schemas.sales import SalesRecord
-from app.schemas.replenishment import ReplenishmentRecord
-from app.schemas.reconciliation import ReconciliationRecord
 from app.services.import_service import import_service
 from app.services.reconciliation_service import reconciliation_service
-from app.services.report_service import report_service
 from app.storage.memory import storage
 
 router = APIRouter(prefix="/api", tags=["对账系统"])
+
+
+def get_content_disposition(filename: str) -> str:
+    encoded_filename = quote(filename, encoding='utf-8')
+    return f"attachment; filename*=UTF-8''{encoded_filename}"
 
 
 @router.post("/inventory/import", response_model=ApiResponse)
@@ -149,13 +150,14 @@ async def get_audit_log(reconciliation_id: str):
 @router.get("/reconciliation/{reconciliation_id}/report/excel")
 async def download_excel_report(reconciliation_id: str):
     try:
+        from app.services.report_service import report_service
         report_data = report_service.generate_excel_report(reconciliation_id)
         record = storage.get_reconciliation(reconciliation_id)
         filename = f"对账报告_{record.store_name}_{date.today().isoformat()}.xlsx"
         return StreamingResponse(
             report_data,
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": get_content_disposition(filename)}
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -164,13 +166,14 @@ async def download_excel_report(reconciliation_id: str):
 @router.get("/reconciliation/{reconciliation_id}/report/csv")
 async def download_csv_report(reconciliation_id: str):
     try:
+        from app.services.report_service import report_service
         report_data = report_service.generate_csv_report(reconciliation_id)
         record = storage.get_reconciliation(reconciliation_id)
         filename = f"对账报告_{record.store_name}_{date.today().isoformat()}.csv"
         return StreamingResponse(
             report_data,
             media_type="text/csv; charset=utf-8",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": get_content_disposition(filename)}
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -178,16 +181,14 @@ async def download_csv_report(reconciliation_id: str):
 
 @router.post("/sample-data", response_model=ApiResponse)
 async def create_sample_data():
-    from datetime import timedelta
-    
     inv_content = """sku,sku_name,quantity,unit_price,expiry_date,category
-SKU001,可口可乐,120,3.5,2025-03-15,饮料
+SKU001,可口可乐,120,3.5,2026-06-15,饮料
 SKU002,百事可乐,80,3.5,,饮料
-SKU003,农夫山泉,150,2.0,2025-02-28,饮料
-SKU004,乐事薯片,45,8.0,2025-01-20,零食
-SKU005,康师傅方便面,60,4.5,2025-03-10,食品
+SKU003,农夫山泉,150,2.0,2026-05-28,饮料
+SKU004,乐事薯片,45,8.0,2026-06-20,零食
+SKU005,康师傅方便面,60,4.5,2026-07-10,食品
 SKU006,统一冰红茶,90,3.0,,饮料
-SKU007,旺仔牛奶,55,5.0,2025-02-15,饮料
+SKU007,旺仔牛奶,55,5.0,2026-06-15,饮料
 SKU008,奥利奥饼干,30,12.0,,零食
 """
     inv_record = import_service.import_inventory_csv(
@@ -234,6 +235,18 @@ SKU008,奥利奥饼干,35,35,9.0,零食
             "inventory_id": inv_record.id,
             "sales_id": sales_record.id,
             "replenishment_id": rep_record.id,
-            "reconciliation_id": reconciliation.id
+            "reconciliation_id": reconciliation.id,
+            "summary": {
+                "total_skus": reconciliation.summary.total_skus,
+                "discrepant_skus": reconciliation.summary.discrepant_skus,
+                "overstock_qty": reconciliation.summary.overstock_qty,
+                "understock_qty": reconciliation.summary.understock_qty,
+                "expiring_skus": reconciliation.summary.expiring_skus,
+                "alias_skus": reconciliation.summary.alias_skus,
+            },
+            "discrepancies": [
+                {"sku": d.sku, "type": d.discrepancy_type.value, "qty": d.discrepancy_qty}
+                for d in reconciliation.discrepancies
+            ]
         }
     )
