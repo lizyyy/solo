@@ -48,13 +48,24 @@
 
 ### 前置要求
 - Node.js >= 16
-- npm 或 yarn
+- npm >= 8
 
-### 后端启动
+### 一键安装（推荐）
 
 ```bash
-# 进入后端目录
+# 在项目根目录执行
+chmod +x setup.sh && ./setup.sh
+```
+
+### 手动安装
+
+#### 后端
+
+```bash
 cd backend
+
+# 清理旧依赖（如果存在）
+rm -rf node_modules package-lock.json
 
 # 安装依赖
 npm install
@@ -62,33 +73,153 @@ npm install
 # 初始化数据库
 npm run init-db
 
-# 导入测试数据（可选）
+# 导入测试数据
 npm run seed-data
+
+# 验证安装是否成功
+node -e "require('express'); require('sqlite3'); console.log('后端依赖验证通过')"
 
 # 启动服务（端口 3001）
 npm start
-
-# 开发模式
-npm run dev
 ```
 
-### 前端启动
+#### 前端
 
 ```bash
-# 进入前端目录
 cd frontend
+
+# 清理旧依赖（如果存在）
+rm -rf node_modules package-lock.json
 
 # 安装依赖
 npm install
+
+# 验证安装是否成功
+node -e "require('vite'); console.log('前端依赖验证通过')"
 
 # 启动开发服务器（端口 3000）
 npm run dev
 ```
 
+### 验证安装成功
+
+**后端验证：**
+```bash
+# 启动后端后，在另一个终端执行
+curl http://localhost:3001/api/health
+
+# 预期返回:
+# {"success":true,"message":"药品库存接口台服务正常","timestamp":"..."}
+```
+
+**前端验证：**
+- 浏览器访问 http://localhost:3000
+- 应该能看到「药品库存接口台」页面和导航菜单
+
 ### 访问地址
 - 前端应用: http://localhost:3000
 - 后端API: http://localhost:3001
 - 健康检查: http://localhost:3001/api/health
+
+---
+
+## 功能验证步骤
+
+### 1. 验证占用释放（完整闭环）
+
+```
+路径: 库存批次 → 详情 → 占用记录 → 释放
+```
+
+1. 启动后端和前端服务
+2. 浏览器访问 http://localhost:3000
+3. 点击导航栏「库存批次」
+4. 点击任意批次的「详情」按钮
+5. 查看「占用记录」表格
+6. 点击某条记录的「释放」按钮
+7. **预期结果**: 
+   - 占用记录状态由 `active` 变为 `released`
+   - 显示释放时间
+   - 批次的「已占用」数量减少
+
+### 2. 验证多源同步（真实数据关联）
+
+```
+路径: 多源同步 → 选择来源系统 → 开始同步 → 返回库存批次查看
+```
+
+1. 点击导航栏「多源同步」
+2. 选择一个来源系统（如「HIS系统」）
+3. 选择同步类型（全量/增量）
+4. 输入操作人姓名
+5. 点击「开始同步」
+6. 等待 1.5 秒（模拟同步延迟）
+7. 返回「库存批次」页面
+8. **预期结果**:
+   - 列表中出现新的批次（批号格式: `SYNCHI2026001` 等）
+   - 新批次关联真实药品（不是 mock-med-*）
+   - 同步日志表格中新增一条 `success` 记录
+
+### 3. 验证临期拦截
+
+```bash
+# 使用 API 直接测试
+# 先获取一个临期批次的 ID（15天内过期）
+curl http://localhost:3001/api/inventory/batches?expiry_status=critical
+
+# 尝试占用临期批次（应该失败）
+curl -X POST http://localhost:3001/api/inventory/batches/occupy \
+  -H "Content-Type: application/json" \
+  -d '{
+    "batch_id": "<临期批次ID>",
+    "quantity": 10,
+    "operator": "测试"
+  }'
+
+# 预期返回: 400 Bad Request
+# {"success":false,"error":"该药品已临期，剩余有效期: 15天，禁止占用"}
+```
+
+---
+
+## 故障排查
+
+### 问题: `Cannot find module 'express'`
+**原因**: 依赖未正确安装
+**解决**:
+```bash
+cd backend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### 问题: `vite: command not found`
+**原因**: 前端依赖未正确安装
+**解决**:
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### 问题: 端口被占用
+**解决**:
+```bash
+# 查找占用进程
+lsof -i :3001  # 后端
+lsof -i :3000  # 前端
+
+# 或修改端口
+# 后端: 修改 src/server.js 中的 PORT
+# 前端: 修改 vite.config.js 中的 server.port
+```
+
+### 问题: 数据库文件不存在
+**解决**:
+```bash
+cd backend
+npm run init-db
+```
 
 ## API 接口示例
 

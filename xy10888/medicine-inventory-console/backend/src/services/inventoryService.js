@@ -462,13 +462,24 @@ class InventoryService {
 
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    const mockData = this.generateMockSyncData(source, syncType);
+    const existingMedicines = await all('SELECT id, code, name FROM medicines ORDER BY id');
+    if (existingMedicines.length === 0) {
+      const err = new Error('系统中无药品数据，请先导入药品基础数据');
+      err.statusCode = 400;
+      await run(
+        'UPDATE sync_logs SET status = ?, error_message = ?, completed_at = CURRENT_TIMESTAMP WHERE id = ?',
+        ['failed', err.message, syncLogId]
+      );
+      throw err;
+    }
+
+    const syncData = this.generateSyncData(source, syncType, existingMedicines);
 
     await run('BEGIN TRANSACTION');
     try {
       let recordCount = 0;
 
-      for (const item of mockData) {
+      for (const item of syncData) {
         const existing = await get(
           'SELECT id, quantity FROM inventory_batches WHERE medicine_id = ? AND batch_no = ? AND source_id = ?',
           [item.medicine_id, item.batch_no, sourceId]
@@ -507,18 +518,21 @@ class InventoryService {
     return get('SELECT * FROM sync_logs WHERE id = ?', [syncLogId]);
   }
 
-  generateMockSyncData(source, syncType) {
-    const medicines = [
-      { medicine_id: 'mock-med-001', name: '阿莫西林胶囊', batch_no: 'SYNC2024001', expiry_date: '2025-06-30', quantity: 100 },
-      { medicine_id: 'mock-med-002', name: '布洛芬缓释胶囊', batch_no: 'SYNC2024002', expiry_date: '2025-03-15', quantity: 50 },
-      { medicine_id: 'mock-med-003', name: '维生素C片', batch_no: 'SYNC2024003', expiry_date: '2026-01-20', quantity: 200 }
-    ];
+  generateSyncData(source, syncType, existingMedicines) {
+    const today = new Date();
+    const syncPrefix = `SYNC${source.type.substring(0, 2).toUpperCase()}${today.getFullYear()}`;
+    
+    const medicinesToSync = syncType === 'full' 
+      ? existingMedicines 
+      : [existingMedicines[Math.floor(Math.random() * existingMedicines.length)]];
 
-    if (syncType === 'full') {
-      return medicines;
-    } else {
-      return [medicines[Math.floor(Math.random() * medicines.length)]];
-    }
+    return medicinesToSync.map((med, idx) => ({
+      medicine_id: med.id,
+      name: med.name,
+      batch_no: `${syncPrefix}${String(idx + 1).padStart(3, '0')}`,
+      expiry_date: new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()).toISOString().split('T')[0],
+      quantity: Math.floor(Math.random() * 150) + 50
+    }));
   }
 
   async listSyncLogs(params = {}) {
