@@ -45,7 +45,7 @@ def upload_materials(upload: schemas.RawMaterialUpload, db: Session = Depends(ge
     if batch.status != "created":
         raise HTTPException(status_code=400, detail="批次已处理，不能重复上传")
 
-    material_hash = crud.calculate_material_hash([m.dict() for m in upload.materials])
+    material_hash = crud.calculate_material_hash([m.model_dump() for m in upload.materials])
 
     existing_batch = crud.get_batch_by_hash(db, material_hash)
     if existing_batch and existing_batch.id != batch.id:
@@ -59,17 +59,14 @@ def upload_materials(upload: schemas.RawMaterialUpload, db: Session = Depends(ge
 
     crud.update_batch_hash(db, batch.id, material_hash)
 
-    line_numbers = [m.line_number for m in upload.materials]
-    if len(line_numbers) != len(set(line_numbers)):
-        raise HTTPException(status_code=400, detail="存在重复行号")
-
     crud.create_raw_materials(db, batch.id, upload.materials)
 
     return {
         "status": "success",
         "batch_no": batch.batch_no,
         "material_count": len(upload.materials),
-        "material_hash": material_hash
+        "material_hash": material_hash,
+        "note": "材料已上传，触发处理时将进行逐条验证"
     }
 
 
@@ -100,10 +97,14 @@ def trigger_process(process_req: schemas.ProcessRequest, db: Session = Depends(g
 
     report_path = utils.process_batch(db, batch.id)
 
+    error_count = sum(1 for m in crud.get_raw_materials_by_batch(db, batch.id) if m.is_error)
+
     return {
         "status": "success",
         "batch_no": batch.batch_no,
-        "processed_count": len(materials),
+        "total_count": len(materials),
+        "success_count": len(materials) - error_count,
+        "error_count": error_count,
         "report_path": report_path
     }
 
@@ -143,7 +144,7 @@ def create_sku_alias(alias: schemas.SkuAliasCreate, db: Session = Depends(get_db
     return crud.create_sku_alias(db, alias)
 
 
-@app.get("/api/sku-aliases", tags=["SKU管理"])
+@app.get("/api/sku-aliases", response_model=List[schemas.SkuAliasResponse], tags=["SKU管理"])
 def list_sku_aliases(db: Session = Depends(get_db)):
     return crud.get_all_sku_aliases(db)
 

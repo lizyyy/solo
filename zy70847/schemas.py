@@ -22,13 +22,13 @@ class BatchResponse(BaseModel):
 
 
 class RawMaterialItem(BaseModel):
-    line_number: int
-    sku_name: str
-    sku_code: str
-    quantity: int
-    location_code: str
-    location_name: str
-    inventory_time: datetime
+    line_number: Optional[int] = None
+    sku_name: Optional[str] = None
+    sku_code: Optional[str] = None
+    quantity: Optional[int] = None
+    location_code: Optional[str] = None
+    location_name: Optional[str] = None
+    inventory_time: Optional[datetime] = None
     expiry_date: Optional[datetime] = None
 
 
@@ -40,13 +40,13 @@ class RawMaterialUpload(BaseModel):
 class RawMaterialResponse(BaseModel):
     id: int
     batch_id: int
-    line_number: int
-    sku_name: str
-    sku_code: str
-    quantity: int
-    location_code: str
-    location_name: str
-    inventory_time: datetime
+    line_number: Optional[int] = None
+    sku_name: Optional[str] = None
+    sku_code: Optional[str] = None
+    quantity: Optional[int] = None
+    location_code: Optional[str] = None
+    location_name: Optional[str] = None
+    inventory_time: Optional[datetime] = None
     expiry_date: Optional[datetime] = None
     is_error: bool
     error_message: Optional[str] = None
@@ -74,9 +74,9 @@ class ProcessRecordResponse(BaseModel):
     id: int
     batch_id: int
     raw_material_id: int
-    canonical_sku: str
-    adjusted_quantity: int
-    priority_score: float
+    canonical_sku: Optional[str] = None
+    adjusted_quantity: Optional[int] = None
+    priority_score: Optional[float] = None
     inventory_time_diff: Optional[int] = None
     status: str
     step: str

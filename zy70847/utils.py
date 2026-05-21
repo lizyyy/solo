@@ -4,22 +4,40 @@ import crud
 import models
 import pandas as pd
 import os
+from collections import defaultdict
 
 
 REPORTS_DIR = "./reports"
 os.makedirs(REPORTS_DIR, exist_ok=True)
 
 
-def validate_raw_material(material, line_number: int):
+def validate_raw_material(material, line_number: int, duplicate_line_numbers: set):
     errors = []
 
-    required_fields = ['sku_name', 'sku_code', 'quantity', 'location_code', 'location_name', 'inventory_time']
-    for field in required_fields:
-        if not getattr(material, field, None):
-            errors.append(f"缺少必填字段: {field}")
+    if material.line_number is None:
+        errors.append("缺少行号")
+    elif material.line_number in duplicate_line_numbers:
+        errors.append(f"存在重复行号: {material.line_number}")
 
-    if material.quantity is not None and material.quantity < 0:
+    if material.sku_name is None or material.sku_name == "":
+        errors.append("缺少必填字段: sku_name")
+
+    if material.sku_code is None or material.sku_code == "":
+        errors.append("缺少必填字段: sku_code")
+
+    if material.quantity is None:
+        errors.append("缺少必填字段: quantity")
+    elif material.quantity < 0:
         errors.append("数量不能为负数")
+
+    if material.location_code is None or material.location_code == "":
+        errors.append("缺少必填字段: location_code")
+
+    if material.location_name is None or material.location_name == "":
+        errors.append("缺少必填字段: location_name")
+
+    if material.inventory_time is None:
+        errors.append("缺少必填字段: inventory_time")
 
     if material.expiry_date and material.inventory_time:
         if material.expiry_date < material.inventory_time:
@@ -43,23 +61,24 @@ def calculate_priority_score(material):
         elif days_to_expiry <= 14:
             score += 30
 
-    score += min(material.quantity * 0.1, 20)
+    if material.quantity:
+        score += min(material.quantity * 0.1, 20)
 
     return score
 
 
-def process_single_material(db: Session, material: models.RawMaterial, batch_id: int):
+def process_single_material(db: Session, material: models.RawMaterial, batch_id: int, duplicate_line_numbers: set):
     crud.create_process_record(
-        db, batch_id, material.id, material.sku_code, material.quantity, 0,
+        db, batch_id, material.id, material.sku_code or "", material.quantity or 0, 0,
         "processing", "start", "开始处理材料"
     )
 
-    errors = validate_raw_material(material, material.line_number)
+    errors = validate_raw_material(material, material.line_number or 0, duplicate_line_numbers)
     if errors:
         error_msg = "; ".join(errors)
         crud.update_raw_material_error(db, material.id, error_msg)
         crud.create_process_record(
-            db, batch_id, material.id, material.sku_code, material.quantity, 0,
+            db, batch_id, material.id, material.sku_code or "", material.quantity or 0, 0,
             "error", "validation", f"验证失败: {error_msg}"
         )
         return False
@@ -73,7 +92,7 @@ def process_single_material(db: Session, material: models.RawMaterial, batch_id:
 
     standard_time = crud.get_standard_inventory_time(db, material.location_code)
     inventory_time_diff = None
-    if standard_time:
+    if standard_time and material.inventory_time:
         time_diff = abs((material.inventory_time - standard_time).total_seconds() // 3600)
         inventory_time_diff = int(time_diff)
         crud.create_process_record(
@@ -96,8 +115,14 @@ def process_single_material(db: Session, material: models.RawMaterial, batch_id:
 def process_batch(db: Session, batch_id: int):
     materials = crud.get_raw_materials_by_batch(db, batch_id)
 
+    line_number_counts = defaultdict(int)
+    for m in materials:
+        if m.line_number is not None:
+            line_number_counts[m.line_number] += 1
+    duplicate_line_numbers = {num for num, count in line_number_counts.items() if count > 1}
+
     for material in materials:
-        process_single_material(db, material, batch_id)
+        process_single_material(db, material, batch_id, duplicate_line_numbers)
 
     report_path = generate_report(db, batch_id)
 
@@ -135,9 +160,7 @@ def generate_report(db: Session, batch_id: int):
 
     df = pd.DataFrame(data)
 
-    batch = crud.get_batch_by_no(db, str(batch_id))
-    if not batch:
-        batch = db.query(models.Batch).filter(models.Batch.id == batch_id).first()
+    batch = db.query(models.Batch).filter(models.Batch.id == batch_id).first()
 
     filename = f"replenishment_report_{batch.batch_no}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx"
     filepath = os.path.join(REPORTS_DIR, filename)
