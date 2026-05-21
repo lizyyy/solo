@@ -44,17 +44,43 @@
 - Axios HTTP客户端
 - Vite 构建工具
 
+## 快速验证（零依赖，立即执行）
+
+在安装依赖前，先验证代码结构完整性：
+
+```bash
+node verify.js
+```
+
+预期输出：**17 通过, 0 失败**
+
+---
+
 ## 本地运行说明
 
 ### 前置要求
 - Node.js >= 16
 - npm >= 8
 
-### 一键安装（推荐）
+### 运行方式一：一键安装脚本（推荐）
 
 ```bash
-# 在项目根目录执行
 chmod +x setup.sh && ./setup.sh
+```
+
+### 运行方式二：Docker 容器化（无需本地 Node.js）
+
+```bash
+# 构建并启动
+docker-compose up -d
+
+# 访问: http://localhost:3001
+
+# 查看日志
+docker-compose logs -f
+
+# 停止
+docker-compose down
 ```
 
 ### 手动安装

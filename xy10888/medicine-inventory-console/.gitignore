@@ -1,5 +1,4 @@
 node_modules/
-package-lock.json
 data/*.db
 *.log
 .DS_Store
@@ -7,3 +6,4 @@ data/*.db
 .idea/
 dist/
 tmp/
+*.local

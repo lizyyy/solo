@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  medicine-inventory:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    volumes:
+      - ./backend/data:/app/backend/data
+    restart: unless-stopped
