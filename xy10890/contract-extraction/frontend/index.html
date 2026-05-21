@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合同条款抽取系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #16a34a;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --critical-color: #7c2d12;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .risk-low { background-color: #dcfce7; color: #166534; }
+        .risk-medium { background-color: #fef3c7; color: #92400e; }
+        .risk-high { background-color: #fee2e2; color: #991b1b; }
+        .risk-critical { background-color: #fecaca; color: #7f1d1d; }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .status-uploaded { background-color: #e0e7ff; color: #3730a3; }
+        .status-extracting { background-color: #fef3c7; color: #92400e; }
+        .status-extracted { background-color: #dcfce7; color: #166534; }
+        .status-reviewing { background-color: #fce7f3; color: #9d174d; }
+        .status-approved { background-color: #d1fae5; color: #065f46; }
+        .status-failed { background-color: #fee2e2; color: #991b1b; }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e2e8f0;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+        
+        .clause-card {
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+        }
+        
+        .table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .table thead th {
+            background-color: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+            color: #475569;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .pagination .page-link {
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .stats-card.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .stats-card.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stats-card.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #64748b;
+            padding: 12px 20px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #2563eb;
+            background-color: transparent;
+            border-bottom: 2px solid #2563eb;
+        }
+        
+        .spinner-sm {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .revision-history {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                合同条款抽取系统
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-link" id="statsSummary"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list-tab-pane" type="button">
+                    合同列表
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-tab-pane" type="button">
+                    批量上传
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="export-tab" data-bs-toggle="tab" data-bs-target="#export-tab-pane" type="button">
+                    导出报告
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="mainTabsContent">
+            <div class="tab-pane fade show active" id="list-tab-pane" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stats-card p-3">
+                            <h6 class="mb-1 text-white-50">合同总数</h6>
+                            <h3 class="mb-0" id="totalContracts">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card success p-3">
+                            <h6 class="mb-1 text-white-50">已完成抽取</h6>
+                            <h3 class="mb-0" id="extractedCount">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card warning p-3">
+                            <h6 class="mb-1 text-white-50">高风险合同</h6>
+                            <h3 class="mb-0" id="highRiskCount">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card info p-3">
+                            <h6 class="mb-1 text-white-50">抽取失败</h6>
+                            <h3 class="mb-0" id="failedCount">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="searchInput" placeholder="搜索合同名称、甲乙双方...">
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="statusFilter">
+                                    <option value="">全部状态</option>
+                                    <option value="uploaded">已上传</option>
+                                    <option value="extracting">抽取中</option>
+                                    <option value="extracted">已抽取</option>
+                                    <option value="reviewing">审核中</option>
+                                    <option value="approved">已通过</option>
+                                    <option value="failed">失败</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="riskFilter">
+                                    <option value="">全部风险</option>
+                                    <option value="low">低风险</option>
+                                    <option value="medium">中风险</option>
+                                    <option value="high">高风险</option>
+                                    <option value="critical">极高风险</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary w-100" id="searchBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    搜索
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-outline-danger w-100" id="retryFailedBtn">
+                                    重试失败任务
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">
+                                            <input type="checkbox" id="selectAll" class="form-check-input">
+                                        </th>
+                                        <th>ID</th>
+                                        <th>文件名</th>
+                                        <th>合同名称</th>
+                                        <th>甲方</th>
+                                        <th>乙方</th>
+                                        <th>状态</th>
+                                        <th>风险等级</th>
+                                        <th>条款数</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contractTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted" id="showingRange">显示 0-0 条，共 0 条</small>
+                            <nav>
+                                <ul class="pagination mb-0" id="pagination">
+                                </ul>
+                            </nav>
+                            <div class="d-flex gap-2">
+                                <select class="form-select form-select-sm" id="pageSizeSelect" style="width: 100px;">
+                                    <option value="10">10条/页</option>
+                                    <option value="20" selected>20条/页</option>
+                                    <option value="50">50条/页</option>
+                                </select>
+                                <button class="btn btn-primary btn-sm" id="batchExtractBtn">
+                                    批量抽取
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="upload-tab-pane" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">批量上传合同文件</h5>
+                        <div class="upload-area mb-4" id="uploadArea">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <p class="mt-3 mb-1 text-muted">拖拽文件到此处或点击上传</p>
+                            <p class="text-muted small">支持 PDF、DOC、DOCX、TXT 格式，单个文件不超过 50MB</p>
+                            <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.txt" style="display: none;">
+                        </div>
+                        <div id="uploadedFiles" class="mb-4"></div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" id="uploadBtn" disabled>
+                                <span class="spinner-border spinner-sm d-none me-2" id="uploadSpinner"></span>
+                                开始上传
+                            </button>
+                            <button class="btn btn-outline-secondary" id="clearFilesBtn" disabled>
+                                清空列表
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="export-tab-pane" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">导出报告</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">导出格式</label>
+                                <select class="form-select" id="exportFormat">
+                                    <option value="excel">Excel (.xlsx)</option>
+                                    <option value="csv">CSV (.csv)</option>
+                                    <option value="json">JSON (.json)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">导出内容</label>
+                                <div class="d-flex gap-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="includeClauses" checked>
+                                        <label class="form-check-label">包含条款内容</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="includeRevisions">
+                                        <label class="form-check-label">包含修订历史</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <h6 class="mb-3">选择要导出的合同</h6>
+                            <div id="exportContractList" class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-primary me-2" id="selectAllExport">全选</button>
+                                <button class="btn btn-sm btn-outline-secondary" id="deselectAllExport">取消全选</button>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button class="btn btn-primary" id="exportBtn">
+                                导出报告
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="contractDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">合同详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-4" id="detailTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="detail-info-tab" data-bs-toggle="tab" data-bs-target="#detail-info-pane">
+                                基本信息
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="detail-clauses-tab" data-bs-toggle="tab" data-bs-target="#detail-clauses-pane">
+                                条款列表
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="detail-timeline-tab" data-bs-toggle="tab" data-bs-target="#detail-timeline-pane">
+                                时间线
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="detail-versions-tab" data-bs-toggle="tab" data-bs-target="#detail-versions-pane">
+                                版本历史
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="detailTabsContent">
+                        <div class="tab-pane fade show active" id="detail-info-pane" role="tabpanel">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">文件名</label>
+                                    <p id="detailFilename" class="fw-medium">-</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-muted small">状态</label>
+                                    <p id="detailStatus">-</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-muted small">风险等级</label>
+                                    <p id="detailRisk">-</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">合同名称</label>
+                                    <input type="text" class="form-control" id="detailContractName">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-muted small">甲方</label>
+                                    <input type="text" class="form-control" id="detailPartyA">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-muted small">乙方</label>
+                                    <input type="text" class="form-control" id="detailPartyB">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">状态更新</label>
+                                    <select class="form-select" id="detailStatusSelect">
+                                        <option value="uploaded">已上传</option>
+                                        <option value="extracting">抽取中</option>
+                                        <option value="extracted">已抽取</option>
+                                        <option value="reviewing">审核中</option>
+                                        <option value="approved">已通过</option>
+                                        <option value="rejected">已拒绝</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">重试次数</label>
+                                    <p id="detailRetryCount" class="fw-medium">-</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 d-flex gap-2">
+                                <button class="btn btn-primary" id="saveContractBtn">保存更改</button>
+                                <button class="btn btn-outline-primary" id="extractContractBtn">开始抽取</button>
+                                <button class="btn btn-outline-danger" id="retryContractBtn">重试抽取</button>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="detail-clauses-pane" role="tabpanel">
+                            <div id="clausesList"></div>
+                        </div>
+
+                        <div class="tab-pane fade" id="detail-timeline-pane" role="tabpanel">
+                            <div class="timeline" id="timelineList"></div>
+                        </div>
+
+                        <div class="tab-pane fade" id="detail-versions-pane" role="tabpanel">
+                            <div class="mb-3">
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small">选择旧版本</label>
+                                        <select class="form-select form-select-sm" id="compareVersionA">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small">选择新版本</label>
+                                        <select class="form-select form-select-sm" id="compareVersionB">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-primary btn-sm w-100" id="compareVersionsBtn">
+                                            对比版本
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="versionsList"></div>
+                            <div id="versionCompareResult" class="mt-4" style="display: none;">
+                                <h6 class="mb-3">版本对比结果</h6>
+                                <div id="compareResultContent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
