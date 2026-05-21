@@ -56,7 +56,8 @@ def fix_status_inconsistency_single(anomaly: AnomalyRecord, db: Session) -> dict
     if anomaly.status == AnomalyStatus.TICKETED:
         has_ticket = db.query(TicketLink).filter(TicketLink.anomaly_id == anomaly.id).first()
         if not has_ticket:
-            pass
+            anomaly.status = AnomalyStatus.CONFIRMED
+            changes.append("状态从 ticketed 回退为 confirmed（因为缺失工单关联记录）")
 
     if anomaly.recovered_at is not None and anomaly.status not in [AnomalyStatus.RECOVERED, AnomalyStatus.CLOSED]:
         anomaly.status = AnomalyStatus.RECOVERED

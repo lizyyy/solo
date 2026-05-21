@@ -308,45 +308,48 @@ async def batch_action(batch_request: BatchActionRequest, db: Session = Depends(
                 continue
 
             if batch_request.action == "confirm":
-                if anomaly.status == AnomalyStatus.PENDING:
-                    anomaly.status = AnomalyStatus.CONFIRMED
-                    anomaly.confirmed_at = datetime.utcnow()
+                original_status = anomaly.status
+                if original_status == AnomalyStatus.PENDING:
                     history = ConfirmationHistory(
                         anomaly_id=anomaly_id,
                         operator_id=batch_request.operator_id,
                         operator_name=batch_request.operator_name,
-                        previous_status=AnomalyStatus.PENDING,
+                        previous_status=original_status,
                         new_status=AnomalyStatus.CONFIRMED,
                         comment=batch_request.comment
                     )
                     db.add(history)
+                    anomaly.status = AnomalyStatus.CONFIRMED
+                    anomaly.confirmed_at = datetime.utcnow()
                     results.append({"id": anomaly_id, "status": "confirmed"})
             elif batch_request.action == "ignore":
-                if anomaly.status in [AnomalyStatus.PENDING, AnomalyStatus.CONFIRMED]:
-                    anomaly.status = AnomalyStatus.IGNORED
+                original_status = anomaly.status
+                if original_status in [AnomalyStatus.PENDING, AnomalyStatus.CONFIRMED]:
                     history = ConfirmationHistory(
                         anomaly_id=anomaly_id,
                         operator_id=batch_request.operator_id,
                         operator_name=batch_request.operator_name,
-                        previous_status=anomaly.status,
+                        previous_status=original_status,
                         new_status=AnomalyStatus.IGNORED,
                         comment=batch_request.comment
                     )
                     db.add(history)
+                    anomaly.status = AnomalyStatus.IGNORED
                     results.append({"id": anomaly_id, "status": "ignored"})
             elif batch_request.action == "close":
-                if anomaly.status in [AnomalyStatus.RECOVERED, AnomalyStatus.IGNORED]:
-                    anomaly.status = AnomalyStatus.CLOSED
-                    anomaly.closed_at = datetime.utcnow()
+                original_status = anomaly.status
+                if original_status in [AnomalyStatus.RECOVERED, AnomalyStatus.IGNORED]:
                     history = ConfirmationHistory(
                         anomaly_id=anomaly_id,
                         operator_id=batch_request.operator_id,
                         operator_name=batch_request.operator_name,
-                        previous_status=anomaly.status,
+                        previous_status=original_status,
                         new_status=AnomalyStatus.CLOSED,
                         comment=batch_request.comment
                     )
                     db.add(history)
+                    anomaly.status = AnomalyStatus.CLOSED
+                    anomaly.closed_at = datetime.utcnow()
                     results.append({"id": anomaly_id, "status": "closed"})
             else:
                 errors.append({"id": anomaly_id, "error": "不支持的操作"})
