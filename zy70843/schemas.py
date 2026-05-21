@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 from datetime import datetime, date
 from typing import Optional, List
 from models import MaterialStatus, DepositStatus
@@ -21,19 +21,6 @@ class BoothCertificateCreate(BaseModel):
     deposit_status: DepositStatus = Field(DepositStatus.UNPAID, description="押金状态")
     
     processor: str = Field(..., description="处理人")
-    
-    @validator('schedule_end_date')
-    def validate_schedule_dates(cls, v, values):
-        if v and values.get('schedule_start_date') and v < values.get('schedule_start_date'):
-            raise ValueError("场地档期结束日期不能早于开始日期")
-        return v
-    
-    @validator('entry_time')
-    def validate_entry_time(cls, v, values):
-        if v and values.get('schedule_start_date'):
-            if v.date() < values.get('schedule_start_date'):
-                raise ValueError("进场时间不能早于场地档期开始日期")
-        return v
 
 
 class BoothCertificateResponse(BaseModel):
