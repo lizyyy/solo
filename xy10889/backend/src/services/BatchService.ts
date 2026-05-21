@@ -90,9 +90,7 @@ export class BatchService {
     }
 
     await runInsert('UPDATE samples SET batchId = ? WHERE id = ?', [batchId, sampleId]);
-    if (!sample.batchId) {
-      await runInsert('UPDATE batches SET sampleCount = sampleCount + 1 WHERE id = ?', [batchId]);
-    }
+    await runInsert('UPDATE batches SET sampleCount = sampleCount + 1 WHERE id = ?', [batchId]);
   }
 
   static async removeSampleFromBatch(batchId: string, sampleId: string): Promise<void> {
