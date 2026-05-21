@@ -9,7 +9,7 @@ const { Parser } = require('json2csv');
 
 const dataDir = path.join(__dirname, '..', 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-const dbPath = path.join(dataDir, 'store.db');
+const dbPath = process.env.DB_PATH || path.join(dataDir, 'store.db');
 const db = new sqlite3.Database(dbPath);
 
 function run(sql, params) {
