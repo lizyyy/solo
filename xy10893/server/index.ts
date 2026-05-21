@@ -115,12 +115,18 @@ app.post('/api/disputes/:id/export', async (req, res) => {
     const { evidenceIds, operator } = req.body;
     const allEvidences = await getEvidences(req.params.id);
     const selectedEvidences = allEvidences.filter(e => evidenceIds.includes(e.id));
-    const existingTypes = allEvidences.map(e => e.type);
-    const missingTypes = REQUIRED_EVIDENCE_TYPES.filter(t => !existingTypes.includes(t));
+    const selectedTypes = selectedEvidences.map(e => e.type);
+    const missingTypes = REQUIRED_EVIDENCE_TYPES.filter(t => !selectedTypes.includes(t));
 
     if (missingTypes.length > 0) {
+      const typeMap: Record<string, string> = {
+        order_screenshot: '订单截图',
+        chat_history: '聊天记录',
+        operation_log: '操作日志',
+        contract: '合同附件'
+      };
       return res.status(400).json({ 
-        error: '材料缺失，无法导出',
+        error: `导出材料不完整，缺少: ${missingTypes.map(t => typeMap[t] || t).join('、')}`,
         missingEvidence: missingTypes
       });
     }

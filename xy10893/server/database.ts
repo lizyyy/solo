@@ -237,12 +237,16 @@ function generateReportContent(evidences: Evidence[], batch: ExportBatch): strin
   return report;
 }
 
-export async function generateBatchZip(batchId: string, evidences: Evidence[]): Promise<string> {
+export async function generateBatchZip(batchId: string, evidences: Evidence[], force: boolean = false): Promise<string> {
   if (!fs.existsSync(downloadsDir)) {
     fs.mkdirSync(downloadsDir, { recursive: true });
   }
 
   const zipPath = path.join(downloadsDir, `${batchId}.zip`);
+  
+  if (force && fs.existsSync(zipPath)) {
+    fs.unlinkSync(zipPath);
+  }
   
   if (fs.existsSync(zipPath)) {
     return `/api/downloads/${batchId}.zip`;
@@ -298,7 +302,7 @@ export async function reauthorizeBatch(batchId: string): Promise<ExportBatch> {
     if (ev) evidences.push(ev);
   }
 
-  const downloadUrl = await generateBatchZip(batchId, evidences);
+  const downloadUrl = await generateBatchZip(batchId, evidences, true);
 
   await db.run(
     'UPDATE exportBatches SET status = ?, expiresAt = ?, downloadUrl = ? WHERE id = ?',

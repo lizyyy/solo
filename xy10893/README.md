@@ -103,7 +103,22 @@ evidence-package-system/
 
 ## 修复记录
 
-### v1.1 修复内容
+### v1.2 修复内容（第三轮）
+
+1. ✅ **导出校验逻辑修正**：基于用户实际勾选的 `evidenceIds` 检查必需材料，而非争议单全部证据
+   - 取消勾选合同附件后会正确提示材料缺失，无法导出
+   - 错误信息明确列出缺失的材料类型
+
+2. ✅ **重新授权强制重新生成**：`generateBatchZip()` 增加 `force` 参数
+   - `reauthorizeBatch()` 调用时传入 `force=true`
+   - 先删除旧ZIP文件，再重新生成新的证据包
+   - 确保下载链接始终可用
+
+3. ✅ **依赖锁文件清理**：删除旧的 `package-lock.json`，重新安装时自动生成
+   - 确保 `@types/archiver`、`@types/uuid` 正确加入依赖树
+   - 避免声明与锁文件不一致
+
+### v1.1 修复内容（第二轮）
 
 1. ✅ 修复前端类型导入路径：从 `../../shared/types` 改为 `../types`（client/src/types.ts）
 2. ✅ 添加缺失的类型依赖：`@types/uuid`、`@types/archiver`
