@@ -74,4 +74,27 @@ export const exceptionApi = {
   resolve: (id: string, data: { resolvedBy: string; resolution: string }) => api.patch(`/exceptions/${id}/resolve`, data)
 };
 
+export interface Batch {
+  id: string;
+  batchNumber: string;
+  status: string;
+  origin: string;
+  destination: string;
+  estimatedArrival?: string;
+  actualArrival?: string;
+  courier: string;
+  sampleCount: number;
+  createdAt: string;
+}
+
+export const batchApi = {
+  getAll: (params?: { status?: string }) => api.get<{ success: boolean; data: Batch[] }>('/batches', { params }),
+  getById: (id: string) => api.get<{ success: boolean; data: Batch }>(`/batches/${id}`),
+  create: (data: Partial<Batch>) => api.post('/batches', data),
+  updateStatus: (id: string, data: { status: string }) => api.patch(`/batches/${id}/status`, data),
+  addSample: (id: string, sampleId: string) => api.post(`/batches/${id}/samples`, { sampleId }),
+  removeSample: (id: string, sampleId: string) => api.delete(`/batches/${id}/samples/${sampleId}`),
+  getSamples: (id: string) => api.get<{ success: boolean; data: Sample[] }>(`/batches/${id}/samples`)
+};
+
 export default api;

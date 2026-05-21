@@ -87,5 +87,14 @@ export class ExceptionService {
     }
 
     await SampleService.updateSampleStatus(sampleId, newStatus, handler, `手动补偿: ${notes}`);
+
+    const unresolvedExceptions = await this.getExceptions({ sampleId, resolved: false });
+    const now = new Date().toISOString();
+    for (const exception of unresolvedExceptions) {
+      await runInsert(
+        'UPDATE exceptionRecords SET resolved = 1, resolvedAt = ?, resolvedBy = ?, resolution = ? WHERE id = ?',
+        [now, handler, `手动补偿: ${notes}`, exception.id]
+      );
+    }
   }
 }

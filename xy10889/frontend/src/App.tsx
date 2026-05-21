@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import dayjs from 'dayjs';
-import { sampleApi, exceptionApi, Sample as SampleType, ExceptionRecord, Transfer, ResponsibilityLink } from './services/api';
+import { sampleApi, exceptionApi, batchApi, Sample as SampleType, ExceptionRecord, Transfer, ResponsibilityLink, Batch as BatchType } from './services/api';
 
 const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
@@ -50,6 +50,20 @@ const exceptionTypeLabels: Record<string, string> = {
   OTHER: '其他'
 };
 
+const batchStatusColors: Record<string, string> = {
+  PREPARING: 'blue',
+  SHIPPING: 'orange',
+  DELIVERED: 'green',
+  EXCEPTION: 'red'
+};
+
+const batchStatusLabels: Record<string, string> = {
+  PREPARING: '准备中',
+  SHIPPING: '运输中',
+  DELIVERED: '已送达',
+  EXCEPTION: '异常'
+};
+
 function App() {
   const [currentMenu, setCurrentMenu] = useState('dashboard');
   const [samples, setSamples] = useState<SampleType[]>([]);
@@ -65,19 +79,28 @@ function App() {
   const [statusModalVisible, setStatusModalVisible] = useState(false);
   const [compensateModalVisible, setCompensateModalVisible] = useState(false);
   const [transferModalVisible, setTransferModalVisible] = useState(false);
+  const [resolveExceptionModalVisible, setResolveExceptionModalVisible] = useState(false);
+  const [selectedException, setSelectedException] = useState<ExceptionRecord | null>(null);
+  const [batches, setBatches] = useState<BatchType[]>([]);
+  const [selectedBatch, setSelectedBatch] = useState<BatchType | null>(null);
+  const [batchDetailVisible, setBatchDetailVisible] = useState(false);
+  const [createBatchModalVisible, setCreateBatchModalVisible] = useState(false);
+  const [batchSamples, setBatchSamples] = useState<SampleType[]>([]);
   const [form] = Form.useForm();
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const [samplesRes, exceptionsRes, statsRes] = await Promise.all([
+      const [samplesRes, exceptionsRes, statsRes, batchesRes] = await Promise.all([
         sampleApi.getAll(),
         exceptionApi.getAll(),
-        sampleApi.getStatistics()
+        sampleApi.getStatistics(),
+        batchApi.getAll()
       ]);
       setSamples(samplesRes.data.data);
       setExceptions(exceptionsRes.data?.data || []);
       setStatistics(statsRes.data.data);
+      setBatches(batchesRes.data?.data || []);
     } catch (error) {
       message.error('加载数据失败');
     }
@@ -167,9 +190,61 @@ function App() {
     }
   };
 
+  const handleResolveException = async (values: any) => {
+    if (!selectedException) return;
+    try {
+      await exceptionApi.resolve(selectedException.id, values);
+      message.success('异常已解决');
+      setResolveExceptionModalVisible(false);
+      form.resetFields();
+      loadData();
+      if (selectedSample) {
+        loadSampleDetail(selectedSample);
+      }
+    } catch (error: any) {
+      message.error(error.response?.data?.error || '解决失败');
+    }
+  };
+
   const handleExport = (sample: SampleType) => {
     sampleApi.export(sample.id);
     message.success('正在导出，请稍候...');
+  };
+
+  const handleCreateBatch = async (values: any) => {
+    try {
+      await batchApi.create(values);
+      message.success('批次创建成功');
+      setCreateBatchModalVisible(false);
+      form.resetFields();
+      loadData();
+    } catch (error: any) {
+      message.error(error.response?.data?.error || '创建失败');
+    }
+  };
+
+  const loadBatchDetail = async (batch: BatchType) => {
+    setSelectedBatch(batch);
+    setBatchDetailVisible(true);
+    try {
+      const samplesRes = await batchApi.getSamples(batch.id);
+      setBatchSamples(samplesRes.data.data);
+    } catch (error) {
+      message.error('加载批次详情失败');
+    }
+  };
+
+  const handleUpdateBatchStatus = async (batchId: string, status: string) => {
+    try {
+      await batchApi.updateStatus(batchId, { status });
+      message.success('批次状态更新成功');
+      loadData();
+      if (selectedBatch) {
+        loadBatchDetail(selectedBatch);
+      }
+    } catch (error: any) {
+      message.error(error.response?.data?.error || '更新失败');
+    }
   };
 
   const pieData = statistics ? Object.entries(statistics.byStatus).map(([key, value]) => ({
@@ -273,6 +348,29 @@ function App() {
       dataIndex: 'reportedAt',
       key: 'reportedAt',
       render: (time: string) => dayjs(time).format('YYYY-MM-DD HH:mm')
+    },
+    {
+      title: '操作',
+      key: 'actions',
+      render: (_: any, record: ExceptionRecord) => (
+        <Space>
+          {!record.resolved && (
+            <Button 
+              size="small" 
+              type="primary" 
+              onClick={() => {
+                setSelectedException(record);
+                setResolveExceptionModalVisible(true);
+              }}
+            >
+              解决
+            </Button>
+          )}
+          {record.resolved && (
+            <Tag color="green">已解决</Tag>
+          )}
+        </Space>
+      )
     }
   ];
 
@@ -286,6 +384,11 @@ function App() {
       key: 'samples',
       icon: <ExperimentOutlined />,
       label: '样本管理'
+    },
+    {
+      key: 'batches',
+      icon: <SyncOutlined />,
+      label: '批次管理'
     },
     {
       key: 'exceptions',
@@ -311,7 +414,9 @@ function App() {
       <Layout>
         <Header style={{ background: 'white', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
           <Title level={3} style={{ margin: 0 }}>
-            {currentMenu === 'dashboard' ? '控制台总览' : currentMenu === 'samples' ? '样本管理' : '异常管理'}
+            {currentMenu === 'dashboard' ? '控制台总览' : 
+             currentMenu === 'samples' ? '样本管理' : 
+             currentMenu === 'batches' ? '批次管理' : '异常管理'}
           </Title>
           <Button icon={<ReloadOutlined />} onClick={loadData} loading={loading}>
             刷新
@@ -414,6 +519,52 @@ function App() {
                   columns={sampleColumns}
                   rowKey="id"
                   loading={loading}
+                />
+              </Card>
+            </div>
+          )}
+
+          {currentMenu === 'batches' && (
+            <div>
+              <Card>
+                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateBatchModalVisible(true)}>
+                    创建批次
+                  </Button>
+                </div>
+                <Table
+                  dataSource={batches}
+                  rowKey="id"
+                  loading={loading}
+                  columns={[
+                    { title: '批次号', dataIndex: 'batchNumber', key: 'batchNumber', render: (text: string) => <Text strong>{text}</Text> },
+                    { title: '状态', dataIndex: 'status', key: 'status', render: (status: string) => <Tag color={batchStatusColors[status]}>{batchStatusLabels[status]}</Tag> },
+                    { title: '起点', dataIndex: 'origin', key: 'origin' },
+                    { title: '终点', dataIndex: 'destination', key: 'destination' },
+                    { title: '承运方', dataIndex: 'courier', key: 'courier' },
+                    { title: '样本数', dataIndex: 'sampleCount', key: 'sampleCount' },
+                    { title: '预计到达', dataIndex: 'estimatedArrival', key: 'estimatedArrival', render: (time?: string) => time ? dayjs(time).format('YYYY-MM-DD HH:mm') : '-' },
+                    { title: '实际到达', dataIndex: 'actualArrival', key: 'actualArrival', render: (time?: string) => time ? dayjs(time).format('YYYY-MM-DD HH:mm') : '-' },
+                    {
+                      title: '操作',
+                      key: 'actions',
+                      render: (_: any, record: BatchType) => (
+                        <Space>
+                          <Button size="small" onClick={() => loadBatchDetail(record)}>详情</Button>
+                          {record.status === 'PREPARING' && (
+                            <Button size="small" type="primary" onClick={() => handleUpdateBatchStatus(record.id, 'SHIPPING')}>
+                              发货
+                            </Button>
+                          )}
+                          {record.status === 'SHIPPING' && (
+                            <Button size="small" type="primary" onClick={() => handleUpdateBatchStatus(record.id, 'DELIVERED')}>
+                              确认送达
+                            </Button>
+                          )}
+                        </Space>
+                      )
+                    }
+                  ]}
                 />
               </Card>
             </div>
@@ -560,13 +711,25 @@ function App() {
               <Card title="异常记录">
                 {sampleExceptions.map((exception) => (
                   <div key={exception.id} style={{ padding: '12px', background: exception.resolved ? '#f6ffed' : '#fff2f0', marginBottom: 8, borderRadius: 4 }}>
-                    <Space>
+                    <Space style={{ marginBottom: 8 }}>
                       <Tag color={exception.resolved ? 'green' : 'red'}>
                         {exception.resolved ? '已解决' : '未解决'}
                       </Tag>
                       <Tag color="orange">{exceptionTypeLabels[exception.type] || exception.type}</Tag>
+                      {!exception.resolved && (
+                        <Button 
+                          size="small" 
+                          type="primary" 
+                          onClick={() => {
+                            setSelectedException(exception);
+                            setResolveExceptionModalVisible(true);
+                          }}
+                        >
+                          解决异常
+                        </Button>
+                      )}
                     </Space>
-                    <p style={{ marginTop: 8 }}>{exception.description}</p>
+                    <p>{exception.description}</p>
                     <p><Text type="secondary">报告人: {exception.reportedBy} @ {dayjs(exception.reportedAt).format('YYYY-MM-DD HH:mm')}</Text></p>
                     {exception.resolved && (
                       <p><Text type="success">解决方案: {exception.resolution} (by {exception.resolvedBy})</Text></p>
@@ -665,6 +828,131 @@ function App() {
             </Button>
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title="解决异常"
+        open={resolveExceptionModalVisible}
+        onCancel={() => setResolveExceptionModalVisible(false)}
+        footer={null}
+      >
+        <Form form={form} layout="vertical" onFinish={handleResolveException}>
+          {selectedException && (
+            <div style={{ marginBottom: 16, padding: 12, background: '#fff2f0', borderRadius: 4 }}>
+              <p><Text strong>异常类型:</Text> {exceptionTypeLabels[selectedException.type] || selectedException.type}</p>
+              <p><Text strong>描述:</Text> {selectedException.description}</p>
+              <p><Text strong>报告人:</Text> {selectedException.reportedBy}</p>
+            </div>
+          )}
+          <Form.Item name="resolvedBy" label="处理人" rules={[{ required: true }]}>
+            <Input placeholder="处理人姓名" />
+          </Form.Item>
+          <Form.Item name="resolution" label="解决方案" rules={[{ required: true }]}>
+            <Input.TextArea rows={3} placeholder="请详细说明解决方案" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              确认解决
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        title="创建批次"
+        open={createBatchModalVisible}
+        onCancel={() => setCreateBatchModalVisible(false)}
+        footer={null}
+      >
+        <Form form={form} layout="vertical" onFinish={handleCreateBatch}>
+          <Form.Item name="batchNumber" label="批次号" rules={[{ required: true }]}>
+            <Input placeholder="例如: BATCH2024001" />
+          </Form.Item>
+          <Form.Item name="origin" label="起点" rules={[{ required: true }]}>
+            <Input placeholder="例如: 北京采集中心" />
+          </Form.Item>
+          <Form.Item name="destination" label="终点" rules={[{ required: true }]}>
+            <Input placeholder="例如: 北京中心实验室" />
+          </Form.Item>
+          <Form.Item name="courier" label="承运方" rules={[{ required: true }]}>
+            <Input placeholder="例如: 顺丰冷链" />
+          </Form.Item>
+          <Form.Item name="estimatedArrival" label="预计到达时间">
+            <Input type="datetime-local" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              创建批次
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="批次详情"
+        open={batchDetailVisible}
+        onCancel={() => setBatchDetailVisible(false)}
+        footer={null}
+        width={800}
+      >
+        {selectedBatch && (
+          <div>
+            <Card title="批次信息" style={{ marginBottom: 16 }}>
+              <Row gutter={16}>
+                <Col span={8}>
+                  <Text strong>批次号:</Text> {selectedBatch.batchNumber}
+                </Col>
+                <Col span={8}>
+                  <Text strong>状态:</Text> <Tag color={batchStatusColors[selectedBatch.status]}>{batchStatusLabels[selectedBatch.status]}</Tag>
+                </Col>
+                <Col span={8}>
+                  <Text strong>样本数:</Text> {selectedBatch.sampleCount}
+                </Col>
+                <Col span={8}>
+                  <Text strong>起点:</Text> {selectedBatch.origin}
+                </Col>
+                <Col span={8}>
+                  <Text strong>终点:</Text> {selectedBatch.destination}
+                </Col>
+                <Col span={8}>
+                  <Text strong>承运方:</Text> {selectedBatch.courier}
+                </Col>
+              </Row>
+              <div style={{ marginTop: 16 }}>
+                <Space>
+                  {selectedBatch.status === 'PREPARING' && (
+                    <Button type="primary" onClick={() => handleUpdateBatchStatus(selectedBatch.id, 'SHIPPING')}>
+                      发货
+                    </Button>
+                  )}
+                  {selectedBatch.status === 'SHIPPING' && (
+                    <Button type="primary" onClick={() => handleUpdateBatchStatus(selectedBatch.id, 'DELIVERED')}>
+                      确认送达
+                    </Button>
+                  )}
+                </Space>
+              </div>
+            </Card>
+
+            <Card title="批次样本">
+              {batchSamples.length > 0 ? (
+                <Table
+                  dataSource={batchSamples}
+                  rowKey="id"
+                  size="small"
+                  columns={[
+                    { title: '条码', dataIndex: 'barcode', key: 'barcode' },
+                    { title: '类型', dataIndex: 'type', key: 'type' },
+                    { title: '状态', dataIndex: 'status', key: 'status', render: (status: string) => <Tag color={statusColors[status]}>{statusLabels[status]}</Tag> },
+                    { title: '当前处理人', dataIndex: 'currentHandler', key: 'currentHandler' },
+                  ]}
+                  pagination={false}
+                />
+              ) : (
+                <Text type="secondary">暂无样本</Text>
+              )}
+            </Card>
+          </div>
+        )}
       </Modal>
     </Layout>
   );
