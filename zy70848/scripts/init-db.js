@@ -59,6 +59,7 @@ db.serialize(() => {
       rule_type TEXT NOT NULL,
       condition_json TEXT NOT NULL,
       action TEXT NOT NULL,
+      reason TEXT,
       is_active INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
