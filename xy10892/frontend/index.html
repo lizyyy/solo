@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档脱敏任务管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔒 文档脱敏任务管理系统</h1>
+            <div class="header-actions">
+                <button onclick="showUploadModal()" class="btn btn-primary">📤 上传文档</button>
+                <button onclick="createDocument()" class="btn btn-secondary">+ 新建文档</button>
+                <button onclick="refreshData()" class="btn btn-secondary">🔄 刷新</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <button class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+                        📊 总览
+                    </button>
+                    <button class="nav-item" data-view="pending" onclick="switchView('pending')">
+                        ⏳ 待复核 <span class="badge" id="pendingCount">0</span>
+                    </button>
+                    <button class="nav-item" data-view="exception" onclick="switchView('exception')">
+                        ⚠️ 异常队列 <span class="badge badge-danger" id="exceptionCount">0</span>
+                    </button>
+                    <button class="nav-item" data-view="all" onclick="switchView('all')">
+                        📁 全部文档
+                    </button>
+                    <button class="nav-item" data-view="rules" onclick="switchView('rules')">
+                        ⚙️ 脱敏规则
+                    </button>
+                </nav>
+            </aside>
+
+            <section class="content-area">
+                <div id="view-dashboard" class="view active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalDocs">0</div>
+                            <div class="stat-label">文档总数</div>
+                        </div>
+                        <div class="stat-card stat-warning">
+                            <div class="stat-value" id="pendingReview">0</div>
+                            <div class="stat-label">待复核</div>
+                        </div>
+                        <div class="stat-card stat-danger">
+                            <div class="stat-value" id="errorDocs">0</div>
+                            <div class="stat-label">异常</div>
+                        </div>
+                        <div class="stat-card stat-success">
+                            <div class="stat-value" id="exportedDocs">0</div>
+                            <div class="stat-label">已导出</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">最近活动</div>
+                    <div id="recentActivity" class="activity-list"></div>
+                </div>
+
+                <div id="view-pending" class="view">
+                    <div class="section-title">⏳ 待复核队列</div>
+                    <div id="pendingList" class="document-list"></div>
+                </div>
+
+                <div id="view-exception" class="view">
+                    <div class="section-title">⚠️ 异常队列</div>
+                    <div id="exceptionList" class="document-list"></div>
+                </div>
+
+                <div id="view-all" class="view">
+                    <div class="section-title">📁 全部文档</div>
+                    <div id="allDocsList" class="document-list"></div>
+                </div>
+
+                <div id="view-rules" class="view">
+                    <div class="section-title">⚙️ 脱敏规则</div>
+                    <div id="rulesList" class="rules-list"></div>
+                </div>
+
+                <div id="view-detail" class="view">
+                    <div class="detail-header">
+                        <button onclick="goBack()" class="btn btn-secondary">← 返回</button>
+                        <h2 id="detailTitle">文档详情</h2>
+                    </div>
+                    
+                    <div class="detail-content">
+                        <div class="status-section">
+                            <div class="status-info">
+                                <span>当前状态：</span>
+                                <span id="currentStatus" class="status-badge"></span>
+                            </div>
+                            <div id="actionButtons" class="action-buttons"></div>
+                        </div>
+
+                        <div class="tabs">
+                            <button class="tab-btn active" data-tab="content" onclick="switchTab('content')">文档内容</button>
+                            <button class="tab-btn" data-tab="hits" onclick="switchTab('hits')">敏感命中</button>
+                            <button class="tab-btn" data-tab="history" onclick="switchTab('history')">状态轨迹</button>
+                            <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')">复核记录</button>
+                            <button class="tab-btn" data-tab="versions" onclick="switchTab('versions')">版本管理</button>
+                        </div>
+
+                        <div id="tab-content" class="tab-content active"></div>
+                        <div id="tab-hits" class="tab-content"></div>
+                        <div id="tab-history" class="tab-content"></div>
+                        <div id="tab-reviews" class="tab-content"></div>
+                        <div id="tab-versions" class="tab-content"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">操作</h3>
+                <button onclick="closeModal()" class="close-btn">&times;</button>
+            </div>
+            <div id="modalBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
