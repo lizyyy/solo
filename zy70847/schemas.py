@@ -18,7 +18,7 @@ class BatchResponse(BaseModel):
     report_path: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RawMaterialItem(BaseModel):
@@ -52,12 +52,22 @@ class RawMaterialResponse(BaseModel):
     error_message: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SkuAliasCreate(BaseModel):
     canonical_sku: str
     alias_sku: str
+
+
+class SkuAliasResponse(BaseModel):
+    id: int
+    canonical_sku: str
+    alias_sku: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 
 class ProcessRecordResponse(BaseModel):
@@ -74,7 +84,7 @@ class ProcessRecordResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ProcessTraceResponse(BaseModel):
