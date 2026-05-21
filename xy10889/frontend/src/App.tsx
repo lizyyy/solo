@@ -86,6 +86,8 @@ function App() {
   const [batchDetailVisible, setBatchDetailVisible] = useState(false);
   const [createBatchModalVisible, setCreateBatchModalVisible] = useState(false);
   const [batchSamples, setBatchSamples] = useState<SampleType[]>([]);
+  const [addSampleModalVisible, setAddSampleModalVisible] = useState(false);
+  const [availableSamples, setAvailableSamples] = useState<SampleType[]>([]);
   const [form] = Form.useForm();
 
   const loadData = async () => {
@@ -245,6 +247,38 @@ function App() {
     } catch (error: any) {
       message.error(error.response?.data?.error || '更新失败');
     }
+  };
+
+  const handleAddSampleToBatch = async (sampleId: string) => {
+    if (!selectedBatch) return;
+    try {
+      await batchApi.addSample(selectedBatch.id, sampleId);
+      message.success('样本已加入批次');
+      loadData();
+      loadBatchDetail(selectedBatch);
+      setAddSampleModalVisible(false);
+    } catch (error: any) {
+      message.error(error.response?.data?.error || '添加失败');
+    }
+  };
+
+  const handleRemoveSampleFromBatch = async (sampleId: string) => {
+    if (!selectedBatch) return;
+    try {
+      await batchApi.removeSample(selectedBatch.id, sampleId);
+      message.success('样本已移出批次');
+      loadData();
+      loadBatchDetail(selectedBatch);
+    } catch (error: any) {
+      message.error(error.response?.data?.error || '移除失败');
+    }
+  };
+
+  const openAddSampleModal = () => {
+    const inBatchIds = new Set(batchSamples.map(s => s.id));
+    const available = samples.filter(s => !inBatchIds.has(s.id));
+    setAvailableSamples(available);
+    setAddSampleModalVisible(true);
   };
 
   const pieData = statistics ? Object.entries(statistics.byStatus).map(([key, value]) => ({
@@ -933,7 +967,12 @@ function App() {
               </div>
             </Card>
 
-            <Card title="批次样本">
+            <Card 
+              title="批次样本" 
+              extra={<Button type="primary" size="small" icon={<PlusOutlined />} onClick={openAddSampleModal}>
+                添加样本
+              </Button>}
+            >
               {batchSamples.length > 0 ? (
                 <Table
                   dataSource={batchSamples}
@@ -944,6 +983,15 @@ function App() {
                     { title: '类型', dataIndex: 'type', key: 'type' },
                     { title: '状态', dataIndex: 'status', key: 'status', render: (status: string) => <Tag color={statusColors[status]}>{statusLabels[status]}</Tag> },
                     { title: '当前处理人', dataIndex: 'currentHandler', key: 'currentHandler' },
+                    {
+                      title: '操作',
+                      key: 'actions',
+                      render: (_: any, record: SampleType) => (
+                        <Button size="small" danger onClick={() => handleRemoveSampleFromBatch(record.id)}>
+                          移出
+                        </Button>
+                      )
+                    }
                   ]}
                   pagination={false}
                 />
@@ -952,6 +1000,40 @@ function App() {
               )}
             </Card>
           </div>
+        )}
+      </Modal>
+
+      <Modal
+        title="添加样本到批次"
+        open={addSampleModalVisible}
+        onCancel={() => setAddSampleModalVisible(false)}
+        footer={null}
+        width={700}
+      >
+        {availableSamples.length > 0 ? (
+          <Table
+            dataSource={availableSamples}
+            rowKey="id"
+            size="small"
+            columns={[
+              { title: '条码', dataIndex: 'barcode', key: 'barcode' },
+              { title: '类型', dataIndex: 'type', key: 'type' },
+              { title: '状态', dataIndex: 'status', key: 'status', render: (status: string) => <Tag color={statusColors[status]}>{statusLabels[status]}</Tag> },
+              { title: '当前位置', dataIndex: 'currentLocation', key: 'currentLocation' },
+              {
+                title: '操作',
+                key: 'actions',
+                render: (_: any, record: SampleType) => (
+                  <Button size="small" type="primary" onClick={() => handleAddSampleToBatch(record.id)}>
+                    添加
+                  </Button>
+                )
+              }
+            ]}
+            pagination={false}
+          />
+        ) : (
+          <Text type="secondary">没有可添加的样本</Text>
         )}
       </Modal>
     </Layout>

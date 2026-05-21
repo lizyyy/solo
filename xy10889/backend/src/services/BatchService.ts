@@ -76,11 +76,31 @@ export class BatchService {
       throw new Error('批次不存在');
     }
 
+    const sample = await runGet('SELECT id, batchId FROM samples WHERE id = ?', [sampleId]);
+    if (!sample) {
+      throw new Error('样本不存在');
+    }
+
+    if (sample.batchId === batchId) {
+      return;
+    }
+
+    if (sample.batchId && sample.batchId !== batchId) {
+      await runInsert('UPDATE batches SET sampleCount = sampleCount - 1 WHERE id = ? AND sampleCount > 0', [sample.batchId]);
+    }
+
     await runInsert('UPDATE samples SET batchId = ? WHERE id = ?', [batchId, sampleId]);
-    await runInsert('UPDATE batches SET sampleCount = sampleCount + 1 WHERE id = ?', [batchId]);
+    if (!sample.batchId) {
+      await runInsert('UPDATE batches SET sampleCount = sampleCount + 1 WHERE id = ?', [batchId]);
+    }
   }
 
   static async removeSampleFromBatch(batchId: string, sampleId: string): Promise<void> {
+    const sample = await runGet('SELECT id, batchId FROM samples WHERE id = ?', [sampleId]);
+    if (!sample || sample.batchId !== batchId) {
+      return;
+    }
+
     await runInsert('UPDATE samples SET batchId = NULL WHERE id = ?', [sampleId]);
     await runInsert('UPDATE batches SET sampleCount = sampleCount - 1 WHERE id = ? AND sampleCount > 0', [batchId]);
   }
