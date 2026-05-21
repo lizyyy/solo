@@ -22,7 +22,15 @@
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": ["bus", "lost-found", "service"],
+  "keywords": [
+    "bus",
+    "lost-found",
+    "service"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "directories": {
+    "example": "examples"
+  },
+  "type": "commonjs"
 }

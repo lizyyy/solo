@@ -32,4 +32,7 @@ router.get('/export', itemController.exportItems);
 router.post('/tasks/check-overdue', itemController.checkOverdue);
 router.post('/tasks/check-same-name', itemController.checkSameName);
 
+
+router.post("/items/:itemId/mask-sensitive", itemController.maskSensitiveInfo);
+router.post("/items/batch-mask-sensitive", itemController.batchMaskSensitiveInfo);
 module.exports = router;

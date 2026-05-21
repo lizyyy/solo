@@ -246,8 +246,8 @@ class ItemController {
 
   async checkOverdue(req, res) {
     try {
-      const { overdueDays = 30 } = req.body;
-      const result = await itemService.checkOverdueItems(parseInt(overdueDays));
+      const { overdueDays = 30, operator } = req.body;
+      const result = await itemService.checkOverdueItems(parseInt(overdueDays), operator);
       res.json({ success: true, data: result });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -256,7 +256,8 @@ class ItemController {
 
   async checkSameName(req, res) {
     try {
-      const result = await itemService.checkSameNameItems();
+      const { operator } = req.body;
+      const result = await itemService.checkSameNameItems(operator);
       res.json({ success: true, data: result });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -267,6 +268,38 @@ class ItemController {
     try {
       const { imageDataList, batchNo, uploadedBy } = req.body;
       const result = await importService.importImageIndex(imageDataList, batchNo, uploadedBy);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async maskSensitiveInfo(req, res) {
+    try {
+      const { itemId } = req.params;
+      const { operator, fieldsToMask } = req.body;
+      const result = await itemService.maskSensitiveInfo(
+        parseInt(itemId),
+        operator,
+        fieldsToMask
+      );
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async batchMaskSensitiveInfo(req, res) {
+    try {
+      const { itemIds, operator, fieldsToMask } = req.body;
+      if (!itemIds || !Array.isArray(itemIds) || itemIds.length === 0) {
+        return res.status(400).json({ success: false, error: "请提供有效的物品ID列表" });
+      }
+      const result = await itemService.batchMaskSensitiveInfo(
+        itemIds.map(function(id) { return parseInt(id); }),
+        operator,
+        fieldsToMask
+      );
       res.json({ success: true, data: result });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
