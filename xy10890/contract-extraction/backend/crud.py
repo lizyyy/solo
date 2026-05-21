@@ -120,13 +120,31 @@ def create_contract_version(db: Session, contract: Contract, created_by: str, ch
     
     next_version = 1 if not last_version else last_version.version_number + 1
     
+    clauses = get_clauses_by_contract(db, contract.id)
+    clauses_snapshot = [
+        {
+            "id": clause.id,
+            "clause_title": clause.clause_title,
+            "original_text": clause.original_text,
+            "extracted_text": clause.extracted_text,
+            "revised_text": clause.revised_text,
+            "risk_level": clause.risk_level.value if clause.risk_level else None,
+            "risk_reason": clause.risk_reason,
+            "confidence_score": clause.confidence_score,
+            "is_approved": clause.is_approved,
+            "clause_type_id": clause.clause_type_id
+        }
+        for clause in clauses
+    ]
+    
     db_version = ContractVersion(
         contract_id=contract.id,
         version_number=next_version,
         status=contract.status,
         overall_risk=contract.overall_risk,
         created_by=created_by,
-        change_log=change_log
+        change_log=change_log,
+        clauses_snapshot=clauses_snapshot
     )
     db.add(db_version)
     db.commit()

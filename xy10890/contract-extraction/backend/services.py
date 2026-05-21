@@ -206,24 +206,36 @@ class DataCleanupService:
 
 class VersionCompareService:
     @staticmethod
-    def compare_contract_versions(clauses_v1: List[Clause], clauses_v2: List[Clause]) -> Dict[str, Any]:
+    def _get_clause_text(clause_data: Any) -> str:
+        if isinstance(clause_data, dict):
+            return clause_data.get("revised_text") or clause_data.get("extracted_text") or ""
+        return clause_data.revised_text or clause_data.extracted_text or ""
+
+    @staticmethod
+    def _get_clause_title(clause_data: Any) -> str:
+        if isinstance(clause_data, dict):
+            return clause_data.get("clause_title") or ""
+        return clause_data.clause_title or ""
+
+    @staticmethod
+    def compare_contract_versions(clauses_v1: List[Any], clauses_v2: List[Any]) -> Dict[str, Any]:
         changes = {
             "added": [],
             "removed": [],
             "modified": []
         }
         
-        v1_titles = {c.clause_title: c for c in clauses_v1 if c.clause_title}
-        v2_titles = {c.clause_title: c for c in clauses_v2 if c.clause_title}
+        v1_titles = {VersionCompareService._get_clause_title(c): c for c in clauses_v1 if VersionCompareService._get_clause_title(c)}
+        v2_titles = {VersionCompareService._get_clause_title(c): c for c in clauses_v2 if VersionCompareService._get_clause_title(c)}
         
         for title in v2_titles:
             if title not in v1_titles:
                 changes["added"].append({"title": title, "clause": v2_titles[title]})
-            elif (v1_titles[title].revised_text or v1_titles[title].extracted_text) != (v2_titles[title].revised_text or v2_titles[title].extracted_text):
+            elif VersionCompareService._get_clause_text(v1_titles[title]) != VersionCompareService._get_clause_text(v2_titles[title]):
                 changes["modified"].append({
                     "title": title,
-                    "old_text": v1_titles[title].revised_text or v1_titles[title].extracted_text,
-                    "new_text": v2_titles[title].revised_text or v2_titles[title].extracted_text
+                    "old_text": VersionCompareService._get_clause_text(v1_titles[title]),
+                    "new_text": VersionCompareService._get_clause_text(v2_titles[title])
                 })
         
         for title in v1_titles:
@@ -233,9 +245,8 @@ class VersionCompareService:
         return changes
 
     @staticmethod
-    def get_version_clauses(db: Session, contract_id: int, version_number: int) -> List[Clause]:
+    def get_version_clauses_snapshot(db: Session, contract_id: int, version_number: int) -> List[Dict[str, Any]]:
         from models import ContractVersion
-        from crud import get_clauses_by_contract
         
         version = db.query(ContractVersion).filter(
             ContractVersion.contract_id == contract_id,
@@ -245,7 +256,7 @@ class VersionCompareService:
         if not version:
             return []
         
-        return get_clauses_by_contract(db, contract_id)
+        return version.clauses_snapshot or []
 
     @staticmethod
     def compare_versions_by_number(db: Session, contract_id: int, version_a: int, version_b: int) -> Dict[str, Any]:
@@ -268,8 +279,9 @@ class VersionCompareService:
         if not v1 or not v2:
             raise ValueError("指定的版本不存在")
         
-        clauses = get_clauses_by_contract(db, contract_id)
-        changes = VersionCompareService.compare_contract_versions(clauses, clauses)
+        clauses_v1 = v1.clauses_snapshot or []
+        clauses_v2 = v2.clauses_snapshot or []
+        changes = VersionCompareService.compare_contract_versions(clauses_v1, clauses_v2)
         
         contract_changes = {}
         if v1.status != v2.status:
@@ -289,9 +301,31 @@ class VersionCompareService:
             "contract_id": contract_id,
             "version_a": version_a,
             "version_b": version_b,
-            "added_clauses": [{"clause_title": c["title"], "new_text": c["clause"].revised_text or c["clause"].extracted_text, "change_type": "added"} for c in changes["added"]],
-            "removed_clauses": [{"clause_title": c["title"], "old_text": c["clause"].revised_text or c["clause"].extracted_text, "change_type": "removed"} for c in changes["removed"]],
-            "modified_clauses": [{"clause_title": c["title"], "old_text": c["old_text"], "new_text": c["new_text"], "change_type": "modified"} for c in changes["modified"]],
+            "added_clauses": [
+                {
+                    "clause_title": c["title"],
+                    "new_text": VersionCompareService._get_clause_text(c["clause"]),
+                    "change_type": "added"
+                }
+                for c in changes["added"]
+            ],
+            "removed_clauses": [
+                {
+                    "clause_title": c["title"],
+                    "old_text": VersionCompareService._get_clause_text(c["clause"]),
+                    "change_type": "removed"
+                }
+                for c in changes["removed"]
+            ],
+            "modified_clauses": [
+                {
+                    "clause_title": c["title"],
+                    "old_text": c["old_text"],
+                    "new_text": c["new_text"],
+                    "change_type": "modified"
+                }
+                for c in changes["modified"]
+            ],
             "contract_changes": contract_changes
         }
 
@@ -316,7 +350,8 @@ class CompensationService:
         return {
             "success": True,
             "message": "已触发重试",
-            "retry_count": contract.retry_count + 1
+            "retry_count": contract.retry_count + 1,
+            "contract_id": contract_id
         }
     
     @staticmethod

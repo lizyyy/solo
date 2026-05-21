@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum, Float, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum, Float, Boolean, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
@@ -111,6 +111,7 @@ class ContractVersion(Base):
     overall_risk = Column(Enum(RiskLevel))
     created_by = Column(String(100))
     change_log = Column(Text)
+    clauses_snapshot = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     contract = relationship("Contract", back_populates="versions")

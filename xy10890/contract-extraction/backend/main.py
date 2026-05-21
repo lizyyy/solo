@@ -91,13 +91,15 @@ def list_contracts(
     page_size: int = Query(20, ge=1, le=100),
     status: Optional[ContractStatus] = None,
     risk_level: Optional[RiskLevel] = None,
+    overall_risk: Optional[RiskLevel] = None,
     search: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
+    final_risk = risk_level or overall_risk
     skip = (page - 1) * page_size
     contracts = get_contracts(db, skip=skip, limit=page_size, status=status, 
-                              risk_level=risk_level, search=search)
-    total = count_contracts(db, status=status, risk_level=risk_level, search=search)
+                              risk_level=final_risk, search=search)
+    total = count_contracts(db, status=status, risk_level=final_risk, search=search)
     
     items = []
     for contract in contracts:
@@ -240,16 +242,30 @@ def update_status(
 
 
 @app.post("/api/contracts/{contract_id}/retry")
-def retry_extraction_endpoint(contract_id: int, db: Session = Depends(get_db)):
+def retry_extraction_endpoint(
+    contract_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     result = CompensationService.handle_failed_extraction(db, contract_id)
     if not result["success"]:
         raise HTTPException(status_code=400, detail=result["message"])
+    
+    background_tasks.add_task(ExtractionService.extract_clauses_async, contract_id, db)
+    
     return result
 
 
 @app.post("/api/contracts/bulk-retry")
-def bulk_retry_extraction(db: Session = Depends(get_db)):
+def bulk_retry_extraction(
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     result = CompensationService.bulk_retry_failed_extractions(db)
+    
+    for contract_id in result.get("retried_ids", []):
+        background_tasks.add_task(ExtractionService.extract_clauses_async, contract_id, db)
+    
     return result
 
 
