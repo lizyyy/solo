@@ -36,6 +36,12 @@ class ReconciliationService:
         )
         
         self.results[claim.claim_id] = result
+        
+        if status == ClaimStatus.APPROVED:
+            self.rules_engine.register_processed_claim(claim)
+            if result.final_approved_amount:
+                policy.remaining_limit -= result.final_approved_amount
+        
         return result
 
     def _determine_status(self, issues: List[IssueDetail]) -> ClaimStatus:
@@ -66,6 +72,8 @@ class ReconciliationService:
         claim = self.data_importer.get_claim(review_request.claim_id)
         policy = self.data_importer.get_policy(claim.policy_id) if claim else None
         
+        was_approved_before = result.status == ClaimStatus.APPROVED
+        
         if review_request.action == ReviewAction.APPROVE:
             result.status = ClaimStatus.APPROVED
             result.final_approved_amount = review_request.adjusted_amount or result.system_calculated_amount
@@ -94,7 +102,7 @@ class ReconciliationService:
         result.reviewed_by = review_request.reviewer
         result.reviewed_at = datetime.now()
         
-        if claim and result.status == ClaimStatus.APPROVED:
+        if claim and result.status == ClaimStatus.APPROVED and not was_approved_before:
             self.rules_engine.register_processed_claim(claim)
             if policy and result.final_approved_amount:
                 policy.remaining_limit -= result.final_approved_amount
@@ -113,7 +121,6 @@ class ReconciliationService:
         if not claim or not policy:
             return result
         
-        original = self.original_issues.get(claim_id, [])
         new_issues = self.rules_engine.validate_claim(claim, policy)
         
         result.issues = new_issues
@@ -123,6 +130,9 @@ class ReconciliationService:
             result.status = self._determine_status(new_issues)
             if result.status == ClaimStatus.APPROVED:
                 result.final_approved_amount = result.system_calculated_amount
+                self.rules_engine.register_processed_claim(claim)
+                if result.final_approved_amount:
+                    policy.remaining_limit -= result.final_approved_amount
         
         return result
 

@@ -1,16 +1,18 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.responses import Response
-from typing import List
+from typing import List, Optional
+from datetime import datetime
 import json
+import uuid
 
 from models import (
     ClaimApplication, Policy, ReconciliationResult, ReconciliationSummary,
-    ReviewRequest, IssueType
+    ReviewRequest, IssueType, ClaimItem, Material, MaterialType, ClaimStatus
 )
 from reconciliation import ReconciliationService
 from report_generator import ReportGenerator
 
-app = FastAPI(title="理赔对账服务 API", version="1.0.0")
+app = FastAPI(title="理赔对账服务 API", version="1.1.0")
 
 reconciliation_service = ReconciliationService()
 report_generator = ReportGenerator()
@@ -47,6 +49,108 @@ async def process_claim_direct(claim: ClaimApplication, policy: Policy):
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"处理失败: {str(e)}")
+
+
+@app.post("/api/import/materials/csv", summary="导入材料清单CSV")
+async def import_materials_csv(materials_csv: UploadFile = File(...)):
+    try:
+        content = await materials_csv.read()
+        materials = reconciliation_service.data_importer.parse_materials_csv(content.decode('utf-8'))
+        return {
+            "message": f"成功导入 {len(materials)} 条材料记录",
+            "materials": materials
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"材料清单导入失败: {str(e)}")
+
+
+@app.post("/api/import/claim_items/csv", summary="导入费用明细CSV")
+async def import_claim_items_csv(claim_items_csv: UploadFile = File(...)):
+    try:
+        content = await claim_items_csv.read()
+        items = reconciliation_service.data_importer.parse_claim_items_csv(content.decode('utf-8'))
+        return {
+            "message": f"成功导入 {len(items)} 条费用明细记录",
+            "claim_items": items
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"费用明细导入失败: {str(e)}")
+
+
+@app.post("/api/import/batch", response_model=ReconciliationResult, summary="批量导入（材料清单CSV+保单JSON+费用明细CSV）并对账")
+async def batch_import_and_reconcile(
+    policy_json: UploadFile = File(...),
+    materials_csv: Optional[UploadFile] = File(None),
+    claim_items_csv: Optional[UploadFile] = File(None),
+    claim_id: str = Form(default=None),
+    claim_number: str = Form(...),
+    applicant_name: str = Form(...),
+    applicant_id: str = Form(...),
+    claim_date: str = Form(default=None)
+):
+    try:
+        policy_content = await policy_json.read()
+        policy_data = json.loads(policy_content.decode('utf-8'))
+        policy = Policy(**policy_data)
+        
+        materials = []
+        if materials_csv:
+            materials_content = await materials_csv.read()
+            materials = reconciliation_service.data_importer.parse_materials_csv(materials_content.decode('utf-8-sig'))
+        
+        claim_items = []
+        if claim_items_csv:
+            items_content = await claim_items_csv.read()
+            claim_items = reconciliation_service.data_importer.parse_claim_items_csv(items_content.decode('utf-8-sig'))
+        
+        total_claimed = sum(item.claimed_amount for item in claim_items) if claim_items else 0
+        
+        claim = ClaimApplication(
+            claim_id=claim_id or str(uuid.uuid4()),
+            claim_number=claim_number,
+            policy_id=policy.policy_id,
+            applicant_name=applicant_name,
+            applicant_id=applicant_id,
+            claim_date=datetime.fromisoformat(claim_date) if claim_date else datetime.now(),
+            materials=materials,
+            claim_items=claim_items,
+            total_claimed_amount=total_claimed,
+            status=ClaimStatus.PENDING
+        )
+        
+        reconciliation_service.data_importer.imported_claims[claim.claim_id] = claim
+        reconciliation_service.data_importer.imported_policies[policy.policy_id] = policy
+        
+        result = reconciliation_service.process_claim(claim, policy)
+        return result
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail=f"批量导入失败: {str(e)}")
+
+
+@app.post("/api/import/rules", summary="导入规则表（JSON格式）")
+async def import_rules(rules_json: UploadFile = File(...)):
+    try:
+        content = await rules_json.read()
+        rules = json.loads(content.decode('utf-8'))
+        
+        updated = reconciliation_service.rules_engine.update_rules(rules)
+        
+        return {
+            "message": "规则更新成功",
+            "updated_rules": updated,
+            "current_rules": reconciliation_service.rules_engine.get_all_rules()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"规则导入失败: {str(e)}")
+
+
+@app.get("/api/rules", summary="获取当前所有规则配置")
+async def get_all_rules():
+    return {
+        "rules": reconciliation_service.rules_engine.get_all_rules()
+    }
 
 
 @app.get("/api/claims", response_model=List[ReconciliationResult], summary="获取所有对账结果")
@@ -101,7 +205,7 @@ async def get_justification(claim_id: str):
     if not result:
         raise HTTPException(status_code=404, detail="未找到该理赔记录")
     
-    justification = report_generator.generate_justification_for_claim(result)
+    justification = reconciliation_service.generate_justification_text(claim_id)
     return {"justification": justification}
 
 
@@ -167,9 +271,20 @@ async def clear_all_data():
 async def root():
     return {
         "service": "理赔对账服务",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "status": "running",
-        "docs": "/docs"
+        "docs": "/docs",
+        "features": [
+            "材料清单CSV导入",
+            "费用明细CSV导入",
+            "保单JSON导入",
+            "规则表动态配置",
+            "重复报案检测",
+            "缺发票检测",
+            "金额超限检测",
+            "人工复核",
+            "报告导出"
+        ]
     }
 
 
