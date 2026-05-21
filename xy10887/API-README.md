@@ -15,6 +15,7 @@ cd frontend && npm install && cd ..
 ```bash
 node backend/init-data.js
 ```
+**注意**: 此脚本会清理现有演示数据（templates、signatures、resign_tasks）后重新插入标准测试用例，确保状态可复现。
 
 ### 3. 启动后端服务
 ```bash
