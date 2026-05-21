@@ -93,7 +93,29 @@ async function runTests() {
   }
   
   try {
-    console.log('\n4. 测试审批流程（按顺序）...');
+    console.log('\n4. 测试草稿状态审批拦截...');
+    const draftPolicy = await PolicyService.createPolicy({
+      policyCode: 'POL-TEST-DRAFT',
+      title: '草稿测试制度',
+      approvalNodes: [{ nodeName: '测试审批', approverRole: 'TEST' }]
+    }, 'user_test');
+    
+    const draftDetail = await PolicyService.getPolicyDetail(draftPolicy.id);
+    const draftNode = draftDetail.approvalNodes[0];
+    
+    try {
+      await PolicyService.approveNode(draftNode.id, 'user_test', '草稿状态直接审批');
+      console.log('   ✗ 草稿状态审批应该失败但成功了');
+    } catch (e) {
+      assert(e.message.includes('只有审批中的制度可以审批'), '草稿状态审批被拦截: ' + e.message);
+    }
+    
+  } catch (e) {
+    console.log('   ✗ 草稿审批测试失败:', e.message);
+  }
+  
+  try {
+    console.log('\n5. 测试审批流程（按顺序）...');
     let result = await PolicyService.approveNode(approvalNodeId, 'manager_001', '同意');
     assert(result.status === 'NEXT_NODE', '第一个节点审批通过，进入下一节点');
     
@@ -116,7 +138,7 @@ async function runTests() {
   }
   
   try {
-    console.log('\n5. 测试发布流程...');
+    console.log('\n6. 测试发布流程...');
     const result = await PolicyService.publishPolicy(policyId1);
     assert(result.policy.status === 'PUBLISHED', '制度发布成功，状态为 PUBLISHED');
     result.channels.forEach(c => {
@@ -128,7 +150,7 @@ async function runTests() {
   }
   
   try {
-    console.log('\n6. 测试 policy2 先审批再发布...');
+    console.log('\n7. 测试 policy2 先审批再发布...');
     await PolicyService.submitForApproval(policyId2);
     
     const detail = await PolicyService.getPolicyDetail(policyId2);
@@ -153,7 +175,7 @@ async function runTests() {
   }
   
   try {
-    console.log('\n7. 测试重试发布...');
+    console.log('\n8. 测试重试发布...');
     if (failedChannelId) {
       try {
         await PolicyService.retryPublish(failedChannelId);
@@ -169,7 +191,7 @@ async function runTests() {
   }
   
   try {
-    console.log('\n8. 测试阅读确认...');
+    console.log('\n9. 测试阅读确认...');
     const result = await PolicyService.confirmReading(policyId1, 'employee_001', '张三');
     assert(result.userName === '张三', '阅读确认成功');
     
@@ -192,7 +214,7 @@ async function runTests() {
   }
   
   try {
-    console.log('\n9. 测试引用检查...');
+    console.log('\n10. 测试引用检查...');
     const references = await PolicyService.checkReferences('POL-001');
     assert(references.length > 0, '找到引用 POL-001 的文档');
     references.forEach(r => {
@@ -203,7 +225,7 @@ async function runTests() {
   }
   
   try {
-    console.log('\n10. 测试废止流程（有引用的情况）...');
+    console.log('\n11. 测试废止流程（有引用的情况）...');
     try {
       await PolicyService.abolishPolicy(policyId1, '制度过期', 'admin');
       console.log('   ✗ 有引用时废止应该失败但成功了');
@@ -216,7 +238,7 @@ async function runTests() {
   }
   
   try {
-    console.log('\n11. 测试状态流转约束...');
+    console.log('\n12. 测试状态流转约束...');
     const draftPolicy = await PolicyService.createPolicy({
       policyCode: 'POL-003',
       title: '测试约束制度',
@@ -244,7 +266,7 @@ async function runTests() {
   }
   
   try {
-    console.log('\n12. 测试导出功能...');
+    console.log('\n13. 测试导出功能...');
     const exportData = await PolicyService.exportPolicies({});
     assert(exportData.length >= 3, `导出数据成功，共 ${exportData.length} 条`);
   } catch (e) {
@@ -252,7 +274,7 @@ async function runTests() {
   }
   
   try {
-    console.log('\n13. 测试废止流程（无引用的情况）...');
+    console.log('\n14. 测试废止流程（无引用的情况）...');
     const noRefPolicy = await PolicyService.createPolicy({
       policyCode: 'POL-004',
       title: '待废止制度',

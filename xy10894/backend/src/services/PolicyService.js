@@ -59,6 +59,12 @@ class PolicyService {
     if (!node) throw new Error('审批节点不存在');
     
     const policyVersionId = node.policyVersionId;
+    const policy = await PolicyVersion.findById(policyVersionId);
+    
+    if (policy.status !== PolicyStatus.APPROVING) {
+      throw new Error(`只有审批中的制度可以审批，当前状态：${policy.status}`);
+    }
+    
     const allNodes = await ApprovalNode.findByPolicyVersionId(policyVersionId);
     
     const pendingNodes = allNodes.filter(n => n.status === ApprovalStatus.PENDING);
@@ -90,6 +96,12 @@ class PolicyService {
     if (!node) throw new Error('审批节点不存在');
     
     const policyVersionId = node.policyVersionId;
+    const policy = await PolicyVersion.findById(policyVersionId);
+    
+    if (policy.status !== PolicyStatus.APPROVING) {
+      throw new Error(`只有审批中的制度可以驳回，当前状态：${policy.status}`);
+    }
+    
     const allNodes = await ApprovalNode.findByPolicyVersionId(policyVersionId);
     
     const pendingNodes = allNodes.filter(n => n.status === ApprovalStatus.PENDING);

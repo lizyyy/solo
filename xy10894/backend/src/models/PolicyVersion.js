@@ -16,12 +16,12 @@ class PolicyVersion {
   static create(data, createdBy) {
     return new Promise((resolve, reject) => {
       const id = uuidv4();
-      const { policyCode, versionNumber, title, content, applicableDepartments, createdByName } = data;
+      const { policyCode, versionNumber, title, content, applicableDepartments } = data;
       
       db.run(
-        `INSERT INTO policy_versions (id, policy_code, version_number, title, content, created_by, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-        [id, policyCode, versionNumber, title, JSON.stringify(content), createdBy],
+        `INSERT INTO policy_versions (id, policy_code, version_number, title, content, applicable_departments, created_by, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+        [id, policyCode, versionNumber, title, JSON.stringify(content), JSON.stringify(applicableDepartments || []), createdBy],
         function(err) {
           if (err) reject(err);
           else resolve({ id, ...data, createdBy, createdAt: new Date() });
