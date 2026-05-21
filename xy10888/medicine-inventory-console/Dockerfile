@@ -11,7 +11,6 @@ RUN cd frontend && npm install --production=false
 COPY backend ./backend
 COPY frontend ./frontend
 
-RUN cd backend && npm run init-db && npm run seed-data
 RUN cd frontend && npm run build
 
 FROM node:18-alpine

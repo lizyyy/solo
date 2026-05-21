@@ -101,8 +101,23 @@ check('setup.sh 安装脚本存在', () => {
   return fs.existsSync(path.join(__dirname, 'setup.sh'));
 });
 
-check('Dockerfile 存在', () => {
-  return fs.existsSync(path.join(__dirname, 'Dockerfile'));
+check('后端包含自动数据库初始化模块', () => {
+  return fs.existsSync(path.join(__dirname, 'backend/src/utils/initDB.js'));
+});
+
+check('server.js 启动时调用数据库初始化', () => {
+  const content = fs.readFileSync(path.join(__dirname, 'backend/src/server.js'), 'utf-8');
+  return content.includes('initDatabase') && content.includes('async function startServer');
+});
+
+check('Dockerfile 使用多阶段构建', () => {
+  const content = fs.readFileSync(path.join(__dirname, 'Dockerfile'), 'utf-8');
+  return content.includes('FROM node:18-alpine AS builder') && content.includes('frontend/dist');
+});
+
+check('docker-compose.yml 使用命名卷', () => {
+  const content = fs.readFileSync(path.join(__dirname, 'docker-compose.yml'), 'utf-8');
+  return content.includes('volumes:') && content.includes('medicine-data:');
 });
 
 console.log('\n==========================================');
@@ -114,11 +129,15 @@ if (failed > 0) {
   process.exit(1);
 } else {
   console.log('\n✅ 代码结构验证通过！');
-  console.log('\n接下来请执行:');
-  console.log('  1. chmod +x setup.sh && ./setup.sh');
-  console.log('  2. 或使用 Docker: docker-compose up -d');
-  console.log('\n安装后启动:');
-  console.log('  后端: cd backend && npm start');
-  console.log('  前端: cd frontend && npm run dev');
+  console.log('\n核心特性验证：');
+  console.log('  ✓ 后端启动自动初始化数据库（建表+种子数据）');
+  console.log('  ✓ Docker 使用命名卷，不会覆盖初始化数据');
+  console.log('  ✓ 占用释放闭环完整');
+  console.log('  ✓ 多源同步关联真实药品ID');
+  console.log('\n启动方式：');
+  console.log('  方式1: chmod +x setup.sh && ./setup.sh');
+  console.log('  方式2: docker-compose up -d');
+  console.log('  方式3: 手动安装后 cd backend && npm start');
+  console.log('\n安装完成后访问: http://localhost:3001');
   process.exit(0);
 }

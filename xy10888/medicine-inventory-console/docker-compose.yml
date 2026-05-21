@@ -9,5 +9,8 @@ services:
       - NODE_ENV=production
       - PORT=3001
     volumes:
-      - ./backend/data:/app/backend/data
+      - medicine-data:/app/backend/data
     restart: unless-stopped
+
+volumes:
+  medicine-data:
