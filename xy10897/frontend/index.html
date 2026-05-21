@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开发者访问申请台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3a5f 0%, #2d5a87 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.85);
+            border-radius: 8px;
+            margin: 4px 8px;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        .card-dashboard {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-approved { background-color: #d4edda; color: #155724; }
+        .status-rejected { background-color: #f8d7da; color: #721c24; }
+        .status-active { background-color: #d1ecf1; color: #0c5460; }
+        .status-revoked { background-color: #e2e3e5; color: #383d41; }
+        .status-expired { background-color: #f5c6cb; color: #721c24; }
+        .badge { padding: 6px 12px; border-radius: 20px; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .audit-chain-item {
+            border-left: 3px solid #007bff;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        .log-success { border-left-color: #28a745; }
+        .log-failed { border-left-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block sidebar">
+                <div class="position-sticky pt-3">
+                    <h5 class="text-white px-3 mb-4">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 3V7M8 3V7M3 11H21"></path>
+                        </svg>
+                        访问申请台
+                    </h5>
+                    <ul class="nav flex-column" id="navTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-page="dashboard">
+                                📊 数据概览
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="apply">
+                                📝 提交申请
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="approvals">
+                                ⏳ 待审批 <span class="badge bg-warning ms-1" id="pendingCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="credentials">
+                                🔑 凭证管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="expiring">
+                                ⚠️ 即将到期 <span class="badge bg-danger ms-1" id="expiringCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="audit">
+                                📋 审计日志
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="recycled">
+                                ♻️ 回收流水
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-page="test">
+                                🧪 功能测试
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+                <div id="page-dashboard" class="page-content fade-in">
+                    <h2 class="mb-4">数据概览</h2>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3">
+                            <div class="card card-dashboard">
+                                <div class="card-body text-center">
+                                    <h3 class="text-warning" id="stat-pending">0</h3>
+                                    <p class="text-muted mb-0">待审批申请</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-dashboard">
+                                <div class="card-body text-center">
+                                    <h3 class="text-success" id="stat-approved">0</h3>
+                                    <p class="text-muted mb-0">已批准申请</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-dashboard">
+                                <div class="card-body text-center">
+                                    <h3 class="text-info" id="stat-active">0</h3>
+                                    <p class="text-muted mb-0">有效凭证</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-dashboard">
+                                <div class="card-body text-center">
+                                    <h3 class="text-secondary" id="stat-revoked">0</h3>
+                                    <p class="text-muted mb-0">已回收凭证</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card card-dashboard">
+                        <div class="card-header bg-white">
+                            <h5>快速操作</h5>
+                        </div>
+                        <div class="card-body">
+                            <button class="btn btn-primary me-2" onclick="showPage('apply')">提交新申请</button>
+                            <button class="btn btn-success me-2" onclick="showPage('approvals')">处理审批</button>
+                            <button class="btn btn-info me-2" onclick="loadDemoData()">加载演示数据</button>
+                            <button class="btn btn-secondary" onclick="refreshAll()">刷新数据</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-apply" class="page-content fade-in d-none">
+                    <h2 class="mb-4">提交访问申请</h2>
+                    <div class="card card-dashboard">
+                        <div class="card-body">
+                            <form id="applicationForm">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">申请人姓名</label>
+                                        <input type="text" class="form-control" name="applicant_name" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">邮箱</label>
+                                        <input type="email" class="form-control" name="applicant_email" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">公司/团队</label>
+                                        <input type="text" class="form-control" name="applicant_company" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">申请接口权限</label>
+                                    <div class="row g-2" id="scopeCheckboxes">
+                                    </div>
+                                    <input type="hidden" name="api_scopes" id="apiScopes">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">有效期（天）</label>
+                                    <select class="form-select" name="validity_days">
+                                        <option value="7">7 天</option>
+                                        <option value="14">14 天</option>
+                                        <option value="30" selected>30 天</option>
+                                        <option value="90">90 天</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">申请理由</label>
+                                    <textarea class="form-control" name="reason" rows="4" required placeholder="请详细说明使用场景和必要性..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg">提交申请</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-approvals" class="page-content fade-in d-none">
+                    <h2 class="mb-4">待审批申请</h2>
+                    <div id="pendingApplicationsList"></div>
+                </div>
+
+                <div id="page-credentials" class="page-content fade-in d-none">
+                    <h2 class="mb-4">凭证管理</h2>
+                    <div id="activeCredentialsList"></div>
+                </div>
+
+                <div id="page-expiring" class="page-content fade-in d-none">
+                    <h2 class="mb-4">即将到期凭证</h2>
+                    <div id="expiringCredentialsList"></div>
+                </div>
+
+                <div id="page-audit" class="page-content fade-in d-none">
+                    <h2 class="mb-4">审计日志</h2>
+                    <div class="mb-3">
+                        <label class="form-label">筛选凭证ID（可选）</label>
+                        <input type="number" class="form-control" id="filterCredentialId" placeholder="输入凭证ID查看完整链路">
+                        <button class="btn btn-sm btn-info mt-2" onclick="viewAuditChain()">查看完整审计链路</button>
+                    </div>
+                    <div id="auditChainView" class="mb-4 d-none">
+                        <div class="card card-dashboard">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">完整审计链路</h5>
+                            </div>
+                            <div class="card-body" id="auditChainContent"></div>
+                        </div>
+                    </div>
+                    <div id="auditLogsList"></div>
+                </div>
+
+                <div id="page-recycled" class="page-content fade-in d-none">
+                    <h2 class="mb-4">回收流水</h2>
+                    <div id="recycledCredentialsList"></div>
+                </div>
+
+                <div id="page-test" class="page-content fade-in d-none">
+                    <h2 class="mb-4">功能测试</h2>
+                    <div class="card card-dashboard mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">访问验证测试</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="testAccessForm">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">API Key</label>
+                                        <input type="text" class="form-control" name="api_key" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">API Secret</label>
+                                        <input type="password" class="form-control" name="api_secret" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">测试接口</label>
+                                        <select class="form-select" name="endpoint">
+                                            <option value="/api/users">/api/users (GET)</option>
+                                            <option value="/api/orders">/api/orders (GET)</option>
+                                            <option value="/api/products">/api/products (GET)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">请求方法</label>
+                                        <select class="form-select" name="method">
+                                            <option value="GET">GET</option>
+                                            <option value="POST">POST</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">测试访问</button>
+                            </form>
+                            <div id="testResult" class="mt-3 d-none"></div>
+                        </div>
+                    </div>
+                    <div class="card card-dashboard">
+                        <div class="card-header">
+                            <h5 class="mb-0">验收测试场景</h5>
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li><strong>重复提交测试：</strong>在提交申请页面使用相同信息重复提交，验证不会重复创建</li>
+                                <li><strong>超范围申请测试：</strong>手动构造包含无效scope的申请，验证会被自动拒绝</li>
+                                <li><strong>越权访问测试：</strong>使用仅有users:read权限的凭证访问orders接口</li>
+                                <li><strong>完整链路审计：</strong>在审计页面输入凭证ID，查看从发放到回收的完整日志</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
