@@ -164,27 +164,3 @@ router.get('/batches', (_req: Request, res: Response) => {
 });
 
 export default router;
-});
-
-export default router;
-
-  res.json(result);
-});
-
-router.get('/batches', (_req: Request, res: Response) => {
-  const batches = getAllBatches();
-  res.json({
-    total: batches.length,
-    batches: batches.map((b) => ({
-      batchId: b.batchId,
-      storeId: b.storeId,
-      processedAt: b.processedAt,
-      summary: b.summary,
-    })),
-  });
-});
-
-export default router;
-});
-
-export default router;

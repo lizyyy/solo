@@ -11,12 +11,12 @@ import cors from 'cors'
 // import path from 'path'
 import dotenv from 'dotenv'
 // import { fileURLToPath } from 'url'
-import authRoutes from './routes/auth.js';
+import authRoutes from './routes/auth.js'
 import importRoutes from './routes/import.js'
 
 // for esm mode
 // const __filename = fileURLToPath(import.meta.url)
-// const _dirname = path.dirname(__filename)
+// const __dirname = path.dirname(__filename)
 
 // load env
 dotenv.config()

@@ -34,7 +34,7 @@ export function getAllBatches(): ImportResponse[] {
 }
 
 export function parseCsv(content: string): unknown[] {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   const result = (Papa as any).parse(content, {
     header: true,
     skipEmptyLines: true,
