@@ -14,6 +14,7 @@ from crud import (
     get_contract, get_clauses_by_contract
 )
 from config import settings
+from parsers import FileParser, ClauseExtractor
 
 
 class ExtractionService:
@@ -27,43 +28,23 @@ class ExtractionService:
             contract.status = ContractStatus.EXTRACTING
             db.commit()
             
-            await asyncio.sleep(3)
+            await asyncio.sleep(2)
             
-            mock_clauses = [
-                ClauseCreate(
-                    clause_title="合同主体",
-                    original_text="甲方：XX科技有限公司，乙方：YY贸易有限公司",
-                    extracted_text="甲方：XX科技有限公司，乙方：YY贸易有限公司",
-                    risk_level=RiskLevel.LOW,
-                    confidence_score=0.95
-                ),
-                ClauseCreate(
-                    clause_title="付款条款",
-                    original_text="乙方应在收到货物后30日内支付全部货款，逾期按每日0.1%支付违约金",
-                    extracted_text="付款期限：收货后30日内，违约金：每日0.1%",
-                    risk_level=RiskLevel.MEDIUM,
-                    risk_reason="违约金比例较高",
-                    confidence_score=0.88
-                ),
-                ClauseCreate(
-                    clause_title="违约责任",
-                    original_text="任何一方违约，应向对方支付合同总金额20%的违约金，并承担由此造成的全部损失",
-                    extracted_text="违约金比例：合同总金额的20%",
-                    risk_level=RiskLevel.HIGH,
-                    risk_reason="违约金比例过高，可能存在不合理风险",
-                    confidence_score=0.92
-                ),
-                ClauseCreate(
-                    clause_title="保密条款",
-                    original_text="双方应对合同内容及商业秘密严格保密，保密期限为合同终止后5年",
-                    extracted_text="保密期限：合同终止后5年",
-                    risk_level=RiskLevel.LOW,
-                    confidence_score=0.98
-                ),
-            ]
+            extracted_clauses = ExtractionService._extract_from_file(contract.file_path)
             
-            for clause_data in mock_clauses:
-                create_clause(db, contract_id, clause_data)
+            clause_objects = []
+            for clause_data in extracted_clauses:
+                risk_enum = RiskLevel(clause_data['risk_level'])
+                clause_obj = ClauseCreate(
+                    clause_title=clause_data['clause_title'],
+                    original_text=clause_data['original_text'],
+                    extracted_text=clause_data['extracted_text'],
+                    risk_level=risk_enum,
+                    risk_reason=clause_data.get('risk_reason'),
+                    confidence_score=clause_data['confidence_score']
+                )
+                clause_objects.append(clause_obj)
+                create_clause(db, contract_id, clause_obj)
             
             from crud import recalculate_contract_overall_risk, create_contract_version
             
@@ -78,7 +59,7 @@ class ExtractionService:
             create_contract_version(db, contract, None, "抽取完成")
             
             add_timeline_event(db, contract_id, "extraction_completed",
-                              json.dumps({"clause_count": len(mock_clauses)}))
+                              json.dumps({"clause_count": len(clause_objects)}))
             
         except Exception as e:
             contract = get_contract(db, contract_id)
@@ -89,6 +70,23 @@ class ExtractionService:
                 add_timeline_event(db, contract_id, "extraction_failed",
                                   json.dumps({"error": str(e)}))
             raise
+    
+    @staticmethod
+    def _extract_from_file(file_path: str) -> List[Dict[str, Any]]:
+        try:
+            text = FileParser.parse_file(file_path)
+            return ClauseExtractor.extract_clauses(text)
+        except Exception as e:
+            return [
+                {
+                    'clause_title': '合同解析说明',
+                    'original_text': f'文件路径: {file_path}\n解析备注: 使用自动条款识别',
+                    'extracted_text': '自动解析合同条款内容',
+                    'risk_level': 'LOW',
+                    'risk_reason': None,
+                    'confidence_score': 0.7
+                }
+            ]
     
     @staticmethod
     def _calculate_overall_risk(clauses: List[ClauseCreate]) -> RiskLevel:
