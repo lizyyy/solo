@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "医疗项目知情同意版本管理系统",
   "scripts": {
-    "start": "node backend/server.js",
+    "start": "HOST=127.0.0.1 node backend/server.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "nodemon backend/server.js",
+    "server": "HOST=127.0.0.1 nodemon backend/server.js",
     "client": "cd frontend && npm start",
-    "install:all": "npm install && cd frontend && npm install"
+    "install:all": "npm install && cd frontend && npm install",
+    "init-data": "node backend/init-data.js"
   },
   "keywords": ["consent", "medical", "versioning"],
   "author": "",

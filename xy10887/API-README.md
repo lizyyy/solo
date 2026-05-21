@@ -21,13 +21,17 @@ node backend/init-data.js
 ```bash
 node backend/server.js
 ```
-后端运行在: http://localhost:3001
+后端运行在: http://127.0.0.1:3001
 
 ### 4. 启动前端服务（新开终端）
 ```bash
 cd frontend && npm start
 ```
-前端运行在: http://localhost:3000
+前端运行在: http://127.0.0.1:3000
+
+**注意**: 前后端默认绑定 `127.0.0.1` 避免端口权限问题。如需修改端口/主机：
+- 后端: `HOST=127.0.0.1 PORT=3001 node backend/server.js`
+- 前端: 修改 `frontend/.env` 中的 HOST 和 PORT
 
 ---
 
