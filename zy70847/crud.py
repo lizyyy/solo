@@ -48,8 +48,25 @@ def update_batch_status(db: Session, batch_id: int, status: str, report_path: st
 
 
 def calculate_material_hash(materials: list):
-    sorted_materials = sorted(materials, key=lambda x: x.get('line_number', 0))
-    material_str = json.dumps([m.dict() if hasattr(m, 'dict') else m for m in sorted_materials], sort_keys=True, default=str)
+    def get_sort_key(item):
+        if hasattr(item, 'line_number'):
+            ln = item.line_number
+        elif isinstance(item, dict):
+            ln = item.get('line_number')
+        else:
+            ln = 0
+        return ln if ln is not None else 0
+
+    sorted_materials = sorted(materials, key=get_sort_key)
+    
+    def to_dict(item):
+        if hasattr(item, 'model_dump'):
+            return item.model_dump()
+        elif hasattr(item, 'dict'):
+            return item.dict()
+        return item
+    
+    material_str = json.dumps([to_dict(m) for m in sorted_materials], sort_keys=True, default=str)
     return hashlib.md5(material_str.encode('utf-8')).hexdigest()
 
 
