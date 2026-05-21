@@ -4,12 +4,31 @@ from typing import List
 import pandas as pd
 import json
 from io import StringIO
+from datetime import datetime
 from database import get_db
 from models import ClaimSubmission, ClaimMaterial, AuditResult, PolicyInfo, AuditRule
 from schemas import ClaimSubmissionCreate, MaterialItem, ResultStatus, ClaimAuditResponse, AuditResultResponse
 from rule_engine import rule_engine
 
 router = APIRouter()
+
+def parse_datetime(date_str):
+    if isinstance(date_str, datetime):
+        return date_str
+    if not date_str:
+        return None
+    formats = [
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S.%f",
+        "%Y-%m-%d"
+    ]
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            continue
+    raise HTTPException(status_code=400, detail=f"日期格式无法解析: {date_str}")
 
 @router.post("/upload-csv")
 async def upload_materials_csv(
@@ -51,6 +70,11 @@ async def upload_materials_csv(
 async def upload_policy_json(file: UploadFile = File(...), db: Session = Depends(get_db)):
     content = await file.read()
     policy_data = json.loads(content.decode('utf-8'))
+    
+    date_fields = ['effective_date', 'expiry_date']
+    for field in date_fields:
+        if field in policy_data:
+            policy_data[field] = parse_datetime(policy_data[field])
     
     existing = db.query(PolicyInfo).filter(PolicyInfo.policy_no == policy_data["policy_no"]).first()
     if existing:
