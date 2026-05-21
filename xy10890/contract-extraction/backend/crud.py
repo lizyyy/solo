@@ -167,6 +167,8 @@ def create_clause(db: Session, contract_id: int, clause: ClauseCreate) -> Clause
     db.commit()
     db.refresh(db_clause)
     
+    recalculate_contract_overall_risk(db, contract_id)
+    
     add_timeline_event(db, contract_id, "clause_added",
                        json.dumps({"clause_id": db_clause.id, "title": clause.clause_title}))
     return db_clause
@@ -176,6 +178,8 @@ def update_clause(db: Session, clause_id: int, clause_update: ClauseUpdate, upda
     db_clause = get_clause(db, clause_id)
     if not db_clause:
         return None
+    
+    old_risk = db_clause.risk_level
     
     if clause_update.revised_text and clause_update.revised_text != db_clause.revised_text:
         create_clause_revision(db, db_clause, clause_update.revised_text, 
@@ -190,6 +194,12 @@ def update_clause(db: Session, clause_id: int, clause_update: ClauseUpdate, upda
     
     db.commit()
     db.refresh(db_clause)
+    
+    if clause_update.risk_level and old_risk != clause_update.risk_level:
+        contract = recalculate_contract_overall_risk(db, db_clause.contract_id)
+        if contract:
+            create_contract_version(db, contract, updated_by, 
+                                   f"条款风险变更: {old_risk.value} → {clause_update.risk_level.value}")
     
     add_timeline_event(db, db_clause.contract_id, "clause_updated",
                        json.dumps({"clause_id": clause_id}), updated_by)
@@ -215,16 +225,52 @@ def create_clause_revision(db: Session, clause: Clause, new_text: str, revised_b
     db.commit()
 
 
+def recalculate_contract_overall_risk(db: Session, contract_id: int) -> Optional[Contract]:
+    from models import RiskLevel
+    
+    risk_scores = {
+        RiskLevel.LOW: 1,
+        RiskLevel.MEDIUM: 2,
+        RiskLevel.HIGH: 3,
+        RiskLevel.CRITICAL: 4
+    }
+    
+    contract = get_contract(db, contract_id)
+    if not contract:
+        return None
+    
+    clauses = get_clauses_by_contract(db, contract_id)
+    if not clauses:
+        contract.overall_risk = RiskLevel.LOW
+    else:
+        max_risk_score = max(risk_scores[clause.risk_level] for clause in clauses)
+        for level, score in risk_scores.items():
+            if score == max_risk_score:
+                contract.overall_risk = level
+                break
+    
+    db.commit()
+    db.refresh(contract)
+    return contract
+
+
 def annotate_risk(db: Session, clause_id: int, risk_level: RiskLevel, risk_reason: str = None, annotated_by: str = None) -> Optional[Clause]:
     db_clause = get_clause(db, clause_id)
     if not db_clause:
         return None
     
+    old_risk = db_clause.risk_level
     db_clause.risk_level = risk_level
     db_clause.risk_reason = risk_reason
     
     db.commit()
     db.refresh(db_clause)
+    
+    if old_risk != risk_level:
+        contract = recalculate_contract_overall_risk(db, db_clause.contract_id)
+        if contract:
+            create_contract_version(db, contract, annotated_by, 
+                                   f"条款风险变更: {old_risk.value} → {risk_level.value}")
     
     add_timeline_event(db, db_clause.contract_id, "risk_annotated",
                        json.dumps({"clause_id": clause_id, "risk_level": risk_level.value}), annotated_by)

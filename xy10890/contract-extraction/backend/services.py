@@ -65,12 +65,17 @@ class ExtractionService:
             for clause_data in mock_clauses:
                 create_clause(db, contract_id, clause_data)
             
-            overall_risk = ExtractionService._calculate_overall_risk(mock_clauses)
+            from crud import recalculate_contract_overall_risk, create_contract_version
             
             contract.status = ContractStatus.EXTRACTED
-            contract.overall_risk = overall_risk
             contract.extracted_at = datetime.now()
             db.commit()
+            db.refresh(contract)
+            
+            recalculate_contract_overall_risk(db, contract_id)
+            db.refresh(contract)
+            
+            create_contract_version(db, contract, None, "抽取完成")
             
             add_timeline_event(db, contract_id, "extraction_completed",
                               json.dumps({"clause_count": len(mock_clauses)}))
