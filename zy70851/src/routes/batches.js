@@ -75,7 +75,7 @@ router.patch('/:batchId/status', async (req, res) => {
     const { batchId } = req.params;
     const { status, message } = req.body;
 
-    const validStatuses = ['pending', 'processing', 'completed', 'failed', 'exported'];
+    const validStatuses = ['pending', 'processing', 'completed', 'failed', 'manual_confirm', 'exported'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: '无效的状态' });
     }

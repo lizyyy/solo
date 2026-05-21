@@ -56,6 +56,10 @@ db.serialize(() => {
       next_actions TEXT,
       needs_manual_review INTEGER DEFAULT 0,
       review_reason TEXT,
+      manual_confirm_operator TEXT,
+      manual_confirm_result TEXT,
+      manual_confirm_remark TEXT,
+      manual_confirm_time DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (claim_id) REFERENCES claim_materials(id),
       FOREIGN KEY (batch_id) REFERENCES batches(id)

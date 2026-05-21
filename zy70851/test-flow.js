@@ -19,6 +19,12 @@ function request(options, data = null) {
   });
 }
 
+function generateClaimNo(prefix) {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substr(2, 4).toUpperCase();
+  return `${prefix}-${timestamp}-${random}`;
+}
+
 async function runTest() {
   console.log('=== 保险理赔预审系统完整流程测试 ===\n');
 
@@ -39,14 +45,22 @@ async function runTest() {
   console.log(`   批次号: ${batchResponse.batch_no}`);
   console.log('   ✓ 创建成功\n');
 
-  console.log('2. 上传理赔材料...');
+  console.log('2. 上传理赔材料（使用动态报案号）...');
+  const claim001 = generateClaimNo('CLAIM');
+  const claim002 = generateClaimNo('CLAIM');
+  const claim003 = generateClaimNo('CLAIM');
+  const claim004 = generateClaimNo('CLAIM');
+  const claim005 = generateClaimNo('CLAIM');
+
+  const idCard = Date.now().toString().slice(0, 12) + '1234';
+
   const claimsData = {
     claims: [
-      { claim_no: 'CLAIM-001', policy_no: 'POL-2024-001', insured_name: '张三', insured_id_card: '110101199001011234', accident_date: '2024-01-15', claim_amount: 3000, diagnosis: '急性阑尾炎', hospital: '北京协和医院', materials: ['身份证', '住院发票', '出院小结', '费用清单', '诊断证明'] },
-      { claim_no: 'CLAIM-002', policy_no: 'POL-2024-002', insured_name: '李四', insured_id_card: '110101199002022345', accident_date: '2024-02-20', claim_amount: 60000, diagnosis: '骨折', hospital: '上海瑞金医院', materials: ['身份证', '住院发票', '出院小结', '费用清单', '诊断证明'] },
-      { claim_no: 'CLAIM-003', policy_no: 'POL-2024-003', insured_name: '王五', insured_id_card: '110101199003033456', accident_date: '2024-03-10', claim_amount: 8000, diagnosis: '肺炎', hospital: '广州中山医院', materials: ['身份证', '住院发票'] },
-      { claim_no: 'CLAIM-004', policy_no: 'POL-2024-004', insured_name: '赵六', insured_id_card: '110101199004044567', accident_date: '2024-04-05', claim_amount: 5000, diagnosis: '抑郁症', hospital: '深圳人民医院', materials: ['身份证', '住院发票', '出院小结', '费用清单', '诊断证明'] },
-      { claim_no: 'CLAIM-005', policy_no: 'POL-2024-001', insured_name: '张三', insured_id_card: '110101199001011234', accident_date: '2024-01-15', claim_amount: 2000, diagnosis: '急性阑尾炎', hospital: '北京协和医院', materials: ['身份证', '住院发票', '出院小结', '费用清单', '诊断证明'] }
+      { claim_no: claim001, policy_no: 'POL-2024-001', insured_name: '张三', insured_id_card: idCard, accident_date: '2024-01-15', claim_amount: 3000, diagnosis: '急性阑尾炎', hospital: '北京协和医院', materials: ['身份证', '住院发票', '出院小结', '费用清单', '诊断证明'] },
+      { claim_no: claim002, policy_no: 'POL-2024-002', insured_name: '李四', insured_id_card: '220101199002022345', accident_date: '2024-02-20', claim_amount: 60000, diagnosis: '骨折', hospital: '上海瑞金医院', materials: ['身份证', '住院发票', '出院小结', '费用清单', '诊断证明'] },
+      { claim_no: claim003, policy_no: 'POL-2024-003', insured_name: '王五', insured_id_card: '330101199003033456', accident_date: '2024-03-10', claim_amount: 8000, diagnosis: '肺炎', hospital: '广州中山医院', materials: ['身份证', '住院发票'] },
+      { claim_no: claim004, policy_no: 'POL-2024-004', insured_name: '赵六', insured_id_card: '440101199004044567', accident_date: '2024-04-05', claim_amount: 5000, diagnosis: '抑郁症', hospital: '深圳人民医院', materials: ['身份证', '住院发票', '出院小结', '费用清单', '诊断证明'] },
+      { claim_no: claim005, policy_no: 'POL-2024-001', insured_name: '张三', insured_id_card: idCard, accident_date: '2024-01-15', claim_amount: 2000, diagnosis: '急性阑尾炎', hospital: '北京协和医院', materials: ['身份证', '住院发票', '出院小结', '费用清单', '诊断证明'] }
     ]
   };
   const uploadResponse = await request({
@@ -79,15 +93,37 @@ async function runTest() {
   console.log('5. 预审结果详情:');
   for (const result of precheckResult.results) {
     const categoryNames = { normal: '正常', supplement: '待补充', blocked: '已拦截' };
-    console.log(`   ${result.claim_no} (${result.claim_id}): ${categoryNames[result.category] || result.category}`);
+    console.log(`   ${result.claim_no}: ${categoryNames[result.category] || result.category}`);
     console.log(`      原因: ${result.reasons.join(', ')}`);
     if (result.needs_manual_review) {
-      console.log(`      ⚠️  需要人工复核`);
+      console.log(`      ⚠️  需要人工复核 (claim_id: ${result.claim_id})`);
     }
   }
   console.log('');
 
-  console.log('6. 查看批次摘要...');
+  const manualReviewClaims = precheckResult.results.filter(r => r.needs_manual_review);
+  if (manualReviewClaims.length > 0) {
+    console.log('6. 测试人工确认接口...');
+    const confirmResults = manualReviewClaims.map(r => ({
+      claim_id: r.claim_id,
+      result: '通过',
+      remark: '审核通过，金额符合规定'
+    }));
+    const confirmResponse = await request({
+      ...baseOptions,
+      path: `/api/batches/${batchId}/manual-confirm`,
+      method: 'POST'
+    }, {
+      operator: '审核专员李四',
+      confirm_results: confirmResults,
+      remark: '批次审核完成'
+    });
+    console.log(`   确认成功: ${confirmResponse.confirmed_count} 条`);
+    console.log(`   操作人: ${confirmResponse.operator}`);
+    console.log('   ✓ 人工确认完成\n');
+  }
+
+  console.log('7. 查看批次摘要...');
   const summary = await request({
     ...baseOptions,
     path: `/api/reports/batch/${batchId}/summary`,
@@ -98,7 +134,7 @@ async function runTest() {
   console.log(`   预审完成: ${summary.precheck_completed} 条`);
   console.log('   ✓ 获取摘要完成\n');
 
-  console.log('7. 导出 CSV 报告...');
+  console.log('8. 导出 CSV 报告...');
   const exportResponse = await request({
     ...baseOptions,
     path: `/api/reports/batch/${batchId}/export`,
@@ -109,7 +145,7 @@ async function runTest() {
   console.log(`   记录数: ${exportResponse.record_count} 条`);
   console.log('   ✓ 导出完成\n');
 
-  console.log('8. 查看批次任务历史...');
+  console.log('9. 查看批次任务历史...');
   const batchDetail = await request({
     ...baseOptions,
     path: `/api/batches/${batchId}`,
@@ -117,8 +153,8 @@ async function runTest() {
   });
   console.log(`   当前批次状态: ${batchDetail.batch.status}`);
   console.log(`   任务历史 (共${batchDetail.tasks.length}条):`);
-  batchDetail.tasks.forEach((task, i) => {
-    console.log(`     ${i + 1}. [${task.status}] ${task.message} (${task.created_at})`);
+  batchDetail.tasks.slice(0, 10).forEach((task, i) => {
+    console.log(`     ${i + 1}. [${task.status}] ${task.message}`);
   });
   console.log('');
 
