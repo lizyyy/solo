@@ -107,7 +107,8 @@ export async function releaseLock(lockId: string, releaseData: {
 }) {
   const lock = await getQuery('SELECT * FROM lock_records WHERE id = ?', [lockId]);
   if (!lock) throw new Error('锁号记录不存在');
-  if (lock.status !== 'locked') throw new Error('该锁号已释放或已确认');
+  if (lock.status === 'released') throw new Error('该锁号已释放');
+  if (!['locked', 'confirmed'].includes(lock.status)) throw new Error(`锁号状态 ${lock.status} 不允许释放`);
   
   try {
     await runQuery('BEGIN TRANSACTION');

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { Routes, Route, NavLink } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Slots from './pages/Slots';
 import SlotDetail from './pages/SlotDetail';
@@ -11,7 +11,6 @@ import ImportExport from './pages/ImportExport';
 import { useAppStore } from './store';
 
 function App() {
-  const location = useLocation();
   const { notification, clearNotification } = useAppStore();
 
   useEffect(() => {

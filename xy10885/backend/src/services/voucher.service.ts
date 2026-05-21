@@ -153,31 +153,52 @@ export async function cancelVoucher(voucherId: string, operator?: { id: string; 
   
   const beforeState = { ...voucher };
   
-  await runQuery(
-    'UPDATE appointment_vouchers SET status = "cancelled", cancel_time = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [voucherId]
-  );
-  
-  const { releaseLock } = await import('./lock.service');
-  await releaseLock(voucher.lock_id, {
-    reason: '预约凭证取消，释放号源',
-    release_type: 'cancel',
-    operator_id: operator?.id,
-    operator_name: operator?.name
-  });
-  
-  const updatedVoucher = await getVoucherById(voucherId);
-  
-  await createOperationLog({
-    operation_type: 'cancel_voucher',
-    entity_type: 'voucher',
-    entity_id: voucherId,
-    operator_id: operator?.id,
-    operator_name: operator?.name,
-    before_state: beforeState,
-    after_state: updatedVoucher,
-    result: 'success'
-  });
-  
-  return updatedVoucher;
+  try {
+    await runQuery('BEGIN TRANSACTION');
+    
+    await runQuery(
+      'UPDATE appointment_vouchers SET status = "cancelled", cancel_time = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [voucherId]
+    );
+    
+    const { releaseLock } = await import('./lock.service');
+    await releaseLock(voucher.lock_id, {
+      reason: '预约凭证取消，释放号源',
+      release_type: 'cancel',
+      operator_id: operator?.id,
+      operator_name: operator?.name
+    });
+    
+    await runQuery('COMMIT');
+    
+    const updatedVoucher = await getVoucherById(voucherId);
+    
+    await createOperationLog({
+      operation_type: 'cancel_voucher',
+      entity_type: 'voucher',
+      entity_id: voucherId,
+      operator_id: operator?.id,
+      operator_name: operator?.name,
+      before_state: beforeState,
+      after_state: updatedVoucher,
+      result: 'success'
+    });
+    
+    return updatedVoucher;
+  } catch (error) {
+    await runQuery('ROLLBACK');
+    
+    await createOperationLog({
+      operation_type: 'cancel_voucher',
+      entity_type: 'voucher',
+      entity_id: voucherId,
+      operator_id: operator?.id,
+      operator_name: operator?.name,
+      before_state: beforeState,
+      result: 'failed',
+      error_message: error instanceof Error ? error.message : '未知错误'
+    });
+    
+    throw error;
+  }
 }
