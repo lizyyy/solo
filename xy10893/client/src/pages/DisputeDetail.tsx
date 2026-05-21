@@ -39,6 +39,7 @@ export default function DisputeDetail() {
   const [selectedEvidences, setSelectedEvidences] = useState<string[]>([])
   const [accessRecords, setAccessRecords] = useState<AccessRecord[]>([])
   const [message, setMessage] = useState<{ type: string; text: string } | null>(null)
+  const [hashMismatchIds, setHashMismatchIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (id) {
@@ -47,6 +48,15 @@ export default function DisputeDetail() {
         .then(data => {
           setData(data)
           setSelectedEvidences(data.evidences.map((e: Evidence) => e.id))
+          
+          const mismatched = new Set<string>()
+          data.evidences.forEach((ev: Evidence) => {
+            if (ev.hash.startsWith('00000000')) {
+              mismatched.add(ev.id)
+            }
+          })
+          setHashMismatchIds(mismatched)
+          
           setLoading(false)
         })
     }
@@ -185,6 +195,17 @@ export default function DisputeDetail() {
         </div>
       )}
 
+      {hashMismatchIds.size > 0 && (
+        <div className="alert alert-danger">
+          <strong>⚠️ 哈希校验异常（{hashMismatchIds.size} 项）</strong>
+          <ul style={{ marginTop: '8px', marginLeft: '20px' }}>
+            {evidences.filter(e => hashMismatchIds.has(e.id)).map(e => (
+              <li key={e.id}>{e.name} - 哈希值与登记不一致，可能已被篡改</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="grid grid-2">
         <div className="card">
           <h3 className="card-title">📋 证据目录 ({evidences.length})</h3>
@@ -193,7 +214,16 @@ export default function DisputeDetail() {
               <p style={{ color: '#6b7280' }}>暂无证据</p>
             ) : (
               evidences.map(evidence => (
-                <div key={evidence.id} className="checkbox-item">
+                <div 
+                  key={evidence.id} 
+                  className="checkbox-item"
+                  style={{ 
+                    borderLeft: hashMismatchIds.has(evidence.id) ? '3px solid #ef4444' : 'none',
+                    paddingLeft: hashMismatchIds.has(evidence.id) ? '12px' : undefined,
+                    backgroundColor: hashMismatchIds.has(evidence.id) ? '#fef2f2' : undefined,
+                    borderRadius: '4px'
+                  }}
+                >
                   <input
                     type="checkbox"
                     id={evidence.id}
@@ -206,11 +236,16 @@ export default function DisputeDetail() {
                       <span className="badge badge-pending" style={{ marginLeft: '8px' }}>
                         {typeMap[evidence.type]}
                       </span>
+                      {hashMismatchIds.has(evidence.id) && (
+                        <span className="badge badge-expired" style={{ marginLeft: '8px' }}>
+                          哈希异常
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: '12px', color: '#6b7280' }}>
                       来源: {evidence.source} | {evidence.fileSize} bytes
                     </div>
-                    <div style={{ fontSize: '11px', color: '#9ca3af' }}>
+                    <div style={{ fontSize: '11px', color: hashMismatchIds.has(evidence.id) ? '#dc2626' : '#9ca3af' }}>
                       SHA256: {evidence.hash.substring(0, 20)}...
                     </div>
                   </label>

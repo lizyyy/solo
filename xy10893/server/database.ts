@@ -374,4 +374,18 @@ export async function seedTestData(): Promise<void> {
   await db.run('UPDATE disputes SET status = ?, updatedAt = ? WHERE id = ?', 
     ['expired', expiredDate, dispute4.id]);
   await addAccessRecord(batch4.id, '客服B', 'download');
+
+  const dispute5 = await createDispute('ORD-2024-005', '孙七');
+  const ev5_1 = await addEvidence(dispute5.id, 'order_screenshot', '订单截图.png', 'order_system', '订单内容截图数据...');
+  const ev5_2 = await addEvidence(dispute5.id, 'chat_history', '聊天记录.html', 'chat_platform', '客服与用户的聊天记录...');
+  const ev5_3 = await addEvidence(dispute5.id, 'operation_log', '操作日志.txt', 'log_system', '系统操作日志记录...');
+  const ev5_4 = await addEvidence(dispute5.id, 'contract', '服务合同.pdf', 'contract_system', '电子合同内容...');
+  
+  const tamperedHash = '0000000000000000000000000000000000000000000000000000000000000000';
+  await db.run('UPDATE evidences SET hash = ? WHERE id = ?', [tamperedHash, ev5_2.id]);
+  
+  const batch5 = await createBatch(dispute5.id, [ev5_1.id, ev5_2.id, ev5_3.id, ev5_4.id]);
+  const downloadUrl5 = await generateBatchZip(batch5.id, [ev5_1, ev5_2, ev5_3, ev5_4]);
+  await updateBatchStatus(batch5.id, 'ready', downloadUrl5);
+  await addAccessRecord(batch5.id, '客服C', 'download');
 }
