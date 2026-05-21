@@ -127,6 +127,24 @@ function checkNearExpiry(expiryDate) {
   return diffDays <= 7 && diffDays > 0;
 }
 
+async function detectSKUAlias(skuName, skuCode) {
+  if (!skuName) return null;
+  const mappings = await all('SELECT * FROM sku_mappings');
+  const normalizedName = skuName.toLowerCase().trim();
+  for (const mapping of mappings) {
+    if (mapping.alias) {
+      const aliases = mapping.alias.split(/[,，、]/).map(a => a.toLowerCase().trim());
+      if (aliases.includes(normalizedName) || aliases.some(a => normalizedName.includes(a) || a.includes(normalizedName))) {
+        return { alias: skuName, sku_code: mapping.sku_code, sku_name: mapping.sku_name };
+      }
+    }
+    if (mapping.sku_name.toLowerCase().trim() === normalizedName) {
+      return null;
+    }
+  }
+  return null;
+}
+
 app.post('/api/import/inventory/:batchId', upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Please upload CSV file' });
   const batchId = req.params.batchId;
@@ -135,6 +153,7 @@ app.post('/api/import/inventory/:batchId', upload.single('file'), async (req, re
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
     const records = [];
     const nearExpiryItems = [];
+    const aliasDetections = [];
     const stream = Readable.from(req.file.buffer.toString());
     stream.pipe(csv()).on('data', (row) => {
       const skuCode = row.sku_code || row.skuCode || row['SKU编码'] || '';
@@ -147,8 +166,21 @@ app.post('/api/import/inventory/:batchId', upload.single('file'), async (req, re
       if (isNearExpiry) nearExpiryItems.push({ sku_code: skuCode, sku_name: skuName, expiry_date: expiryDate });
       records.push({ batch_id: batchId, sku_code: skuCode, sku_name: skuName, quantity, unit_price: unitPrice, expiry_date: expiryDate, is_near_expiry: isNearExpiry ? 1 : 0, inventory_person: inventoryPerson });
     }).on('end', async () => {
-      for (const rec of records) await run('INSERT INTO inventory_records (batch_id, sku_code, sku_name, quantity, unit_price, expiry_date, is_near_expiry, inventory_person) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [rec.batch_id, rec.sku_code, rec.sku_name, rec.quantity, rec.unit_price, rec.expiry_date, rec.is_near_expiry, rec.inventory_person]);
-      res.json({ batch_id: batchId, imported: records.length, near_expiry_count: nearExpiryItems.length, near_expiry_items: nearExpiryItems.slice(0, 10) });
+      for (const rec of records) {
+        const aliasMatch = await detectSKUAlias(rec.sku_name, rec.sku_code);
+        let finalSkuCode = rec.sku_code;
+        let finalSkuName = rec.sku_name;
+        if (aliasMatch && !rec.sku_code) {
+          finalSkuCode = aliasMatch.sku_code;
+          finalSkuName = aliasMatch.sku_name;
+          aliasDetections.push({ batch_id: batchId, detected_alias: rec.sku_name, mapped_sku: aliasMatch.sku_code, record_type: 'inventory' });
+        }
+        await run('INSERT INTO inventory_records (batch_id, sku_code, sku_name, quantity, unit_price, expiry_date, is_near_expiry, inventory_person) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [rec.batch_id, finalSkuCode, finalSkuName, rec.quantity, rec.unit_price, rec.expiry_date, rec.is_near_expiry, rec.inventory_person]);
+      }
+      for (const alias of aliasDetections) {
+        await run('INSERT INTO sku_alias_detections (batch_id, detected_alias, mapped_sku, record_type) VALUES (?, ?, ?, ?)', [alias.batch_id, alias.detected_alias, alias.mapped_sku, alias.record_type]);
+      }
+      res.json({ batch_id: batchId, imported: records.length, near_expiry_count: nearExpiryItems.length, near_expiry_items: nearExpiryItems.slice(0, 10), alias_detections: aliasDetections });
     });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -160,10 +192,24 @@ app.post('/api/import/sales/:batchId', async (req, res) => {
     const batch = await get('SELECT * FROM batches WHERE id = ?', [batchId]);
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
     const records = Array.isArray(salesData) ? salesData : (salesData.records || []);
+    const aliasDetections = [];
     for (const record of records) {
-      await run('INSERT INTO sales_records (batch_id, sku_code, sku_name, quantity, amount, sale_time) VALUES (?, ?, ?, ?, ?, ?)', [batchId, record.sku_code || record.skuCode || '', record.sku_name || record.skuName || '', record.quantity || 0, record.amount || record.total || 0, record.sale_time || record.saleTime || null]);
+      const skuName = record.sku_name || record.skuName || '';
+      const skuCode = record.sku_code || record.skuCode || '';
+      const aliasMatch = await detectSKUAlias(skuName, skuCode);
+      let finalSkuCode = skuCode;
+      let finalSkuName = skuName;
+      if (aliasMatch && !skuCode) {
+        finalSkuCode = aliasMatch.sku_code;
+        finalSkuName = aliasMatch.sku_name;
+        aliasDetections.push({ batch_id: batchId, detected_alias: skuName, mapped_sku: aliasMatch.sku_code, record_type: 'sales' });
+      }
+      await run('INSERT INTO sales_records (batch_id, sku_code, sku_name, quantity, amount, sale_time) VALUES (?, ?, ?, ?, ?, ?)', [batchId, finalSkuCode, finalSkuName, record.quantity || 0, record.amount || record.total || 0, record.sale_time || record.saleTime || null]);
     }
-    res.json({ batch_id: batchId, imported: records.length });
+    for (const alias of aliasDetections) {
+      await run('INSERT INTO sku_alias_detections (batch_id, detected_alias, mapped_sku, record_type) VALUES (?, ?, ?, ?)', [alias.batch_id, alias.detected_alias, alias.mapped_sku, alias.record_type]);
+    }
+    res.json({ batch_id: batchId, imported: records.length, alias_detections: aliasDetections });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -176,6 +222,7 @@ app.post('/api/import/replenishment/:batchId', async (req, res) => {
     const records = Array.isArray(data) ? data : (data.records || []);
     const differences = [];
     const nearExpiryItems = [];
+    const aliasDetections = [];
     for (const record of records) {
       const expectedQty = record.expected_qty || record.expectedQty || 0;
       const actualQty = record.actual_qty || record.actualQty || 0;
@@ -185,9 +232,22 @@ app.post('/api/import/replenishment/:batchId', async (req, res) => {
       else if (diff < 0) { differenceType = 'under'; differences.push({ type: 'under', sku: record.sku_code, diff, expected: expectedQty, actual: actualQty }); }
       const isNearExpiry = checkNearExpiry(record.expiry_date);
       if (isNearExpiry) nearExpiryItems.push({ sku_code: record.sku_code, expiry_date: record.expiry_date });
-      await run('INSERT INTO replenishment_records (batch_id, sku_code, sku_name, expected_qty, actual_qty, difference_type, unit_price, expiry_date, is_near_expiry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [batchId, record.sku_code || '', record.sku_name || '', expectedQty, actualQty, differenceType, record.unit_price || 0, record.expiry_date || null, isNearExpiry ? 1 : 0]);
+      const skuName = record.sku_name || '';
+      const skuCode = record.sku_code || '';
+      const aliasMatch = await detectSKUAlias(skuName, skuCode);
+      let finalSkuCode = skuCode;
+      let finalSkuName = skuName;
+      if (aliasMatch && !skuCode) {
+        finalSkuCode = aliasMatch.sku_code;
+        finalSkuName = aliasMatch.sku_name;
+        aliasDetections.push({ batch_id: batchId, detected_alias: skuName, mapped_sku: aliasMatch.sku_code, record_type: 'replenishment' });
+      }
+      await run('INSERT INTO replenishment_records (batch_id, sku_code, sku_name, expected_qty, actual_qty, difference_type, unit_price, expiry_date, is_near_expiry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [batchId, finalSkuCode, finalSkuName, expectedQty, actualQty, differenceType, record.unit_price || 0, record.expiry_date || null, isNearExpiry ? 1 : 0]);
     }
-    res.json({ batch_id: batchId, imported: records.length, over_count: differences.filter(d => d.type === 'over').length, under_count: differences.filter(d => d.type === 'under').length, differences: differences.slice(0, 20), near_expiry_count: nearExpiryItems.length, near_expiry_items: nearExpiryItems });
+    for (const alias of aliasDetections) {
+      await run('INSERT INTO sku_alias_detections (batch_id, detected_alias, mapped_sku, record_type) VALUES (?, ?, ?, ?)', [alias.batch_id, alias.detected_alias, alias.mapped_sku, alias.record_type]);
+    }
+    res.json({ batch_id: batchId, imported: records.length, over_count: differences.filter(d => d.type === 'over').length, under_count: differences.filter(d => d.type === 'under').length, differences: differences.slice(0, 20), near_expiry_count: nearExpiryItems.length, near_expiry_items: nearExpiryItems, alias_detections: aliasDetections });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
