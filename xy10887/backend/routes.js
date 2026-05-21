@@ -154,8 +154,15 @@ router.post('/resign-tasks/generate', async (req, res) => {
     }
 
     const oldSignatures = await dbAll(
-      'SELECT DISTINCT patient_id, patient_name, template_id, template_version FROM signatures WHERE status = "active" AND template_version != ?',
-      [new_template_version]
+      `SELECT DISTINCT s1.patient_id, s1.patient_name, s1.template_id, s1.template_version 
+       FROM signatures s1 
+       WHERE s1.status = "active" 
+       AND s1.template_version != ?
+       AND s1.patient_id NOT IN (
+         SELECT s2.patient_id FROM signatures s2 
+         WHERE s2.status = "active" AND s2.template_version = ?
+       )`,
+      [new_template_version, new_template_version]
     );
 
     const tasks = [];
