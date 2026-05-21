@@ -72,7 +72,10 @@ export default function Conflicts() {
             <option value="resolved">已解决</option>
             <option value="ignored">已忽略</option>
           </select>
-          <button className="btn btn-secondary" onClick={() => setFilters({ patient_id: '', status: '' }}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setFilters({ patient_id: '', status: '' })}
+          >
             重置
           </button>
         </div>

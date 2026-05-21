@@ -161,8 +161,8 @@ export async function cancelVoucher(voucherId: string, operator?: { id: string; 
       [voucherId]
     );
     
-    const { releaseLock } = await import('./lock.service');
-    await releaseLock(voucher.lock_id, {
+    const { releaseLockInternal } = await import('./lock.service');
+    await releaseLockInternal(voucher.lock_id, {
       reason: '预约凭证取消，释放号源',
       release_type: 'cancel',
       operator_id: operator?.id,

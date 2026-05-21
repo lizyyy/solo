@@ -99,7 +99,7 @@ export async function createLock(lockData: {
   }
 }
 
-export async function releaseLock(lockId: string, releaseData: {
+export async function releaseLockInternal(lockId: string, releaseData: {
   reason: string;
   release_type: 'timeout' | 'manual' | 'cancel' | 'system';
   operator_id?: string;
@@ -110,51 +110,59 @@ export async function releaseLock(lockId: string, releaseData: {
   if (lock.status === 'released') throw new Error('该锁号已释放');
   if (!['locked', 'confirmed'].includes(lock.status)) throw new Error(`锁号状态 ${lock.status} 不允许释放`);
   
+  await runQuery(
+    'UPDATE lock_records SET status = "released", updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [lockId]
+  );
+  
+  await runQuery(
+    'UPDATE department_slots SET available_count = available_count + 1, locked_count = locked_count - 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [lock.slot_id]
+  );
+  
+  const releaseId = uuidv4();
+  await runQuery(
+    `INSERT INTO release_events (id, lock_id, reason, release_type, operator_id, operator_name)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [
+      releaseId,
+      lockId,
+      releaseData.reason,
+      releaseData.release_type,
+      releaseData.operator_id,
+      releaseData.operator_name
+    ]
+  );
+  
+  await updateSlotAvailability(lock.slot_id);
+  
+  const updatedLock = await getQuery('SELECT * FROM lock_records WHERE id = ?', [lockId]);
+  
+  await createOperationLog({
+    operation_type: 'release_lock',
+    entity_type: 'lock',
+    entity_id: lockId,
+    operator_id: releaseData.operator_id,
+    operator_name: releaseData.operator_name,
+    before_state: lock,
+    after_state: updatedLock,
+    result: 'success'
+  });
+  
+  return { lock: updatedLock, releaseId, originalLock: lock };
+}
+
+export async function releaseLock(lockId: string, releaseData: {
+  reason: string;
+  release_type: 'timeout' | 'manual' | 'cancel' | 'system';
+  operator_id?: string;
+  operator_name?: string;
+}) {
   try {
     await runQuery('BEGIN TRANSACTION');
-    
-    await runQuery(
-      'UPDATE lock_records SET status = "released", updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [lockId]
-    );
-    
-    await runQuery(
-      'UPDATE department_slots SET available_count = available_count + 1, locked_count = locked_count - 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [lock.slot_id]
-    );
-    
-    const releaseId = uuidv4();
-    await runQuery(
-      `INSERT INTO release_events (id, lock_id, reason, release_type, operator_id, operator_name)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        releaseId,
-        lockId,
-        releaseData.reason,
-        releaseData.release_type,
-        releaseData.operator_id,
-        releaseData.operator_name
-      ]
-    );
-    
+    const result = await releaseLockInternal(lockId, releaseData);
     await runQuery('COMMIT');
-    
-    await updateSlotAvailability(lock.slot_id);
-    
-    const updatedLock = await getQuery('SELECT * FROM lock_records WHERE id = ?', [lockId]);
-    
-    await createOperationLog({
-      operation_type: 'release_lock',
-      entity_type: 'lock',
-      entity_id: lockId,
-      operator_id: releaseData.operator_id,
-      operator_name: releaseData.operator_name,
-      before_state: lock,
-      after_state: updatedLock,
-      result: 'success'
-    });
-    
-    return { lock: updatedLock, releaseId };
+    return result;
   } catch (error) {
     await runQuery('ROLLBACK');
     throw error;
