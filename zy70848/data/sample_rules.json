@@ -1,0 +1,53 @@
+[
+  {
+    "ruleCode": "MISSING_INVOICE",
+    "ruleName": "缺少发票检测",
+    "ruleType": "material",
+    "condition": {
+      "field": "has_invoice",
+      "operator": "equals",
+      "value": 0
+    },
+    "action": "flag_for_review",
+    "reason": "缺少理赔发票，需补充材料",
+    "isActive": true
+  },
+  {
+    "ruleCode": "AMOUNT_EXCEEDS_LIMIT",
+    "ruleName": "金额超限检测",
+    "ruleType": "amount",
+    "condition": {
+      "field": "claim_amount",
+      "operator": "greater_than",
+      "value": 50000
+    },
+    "action": "flag_for_review",
+    "reason": "理赔金额超过5万元限额，需人工复核",
+    "isActive": true
+  },
+  {
+    "ruleCode": "DUPLICATE_CASE",
+    "ruleName": "重复报案检测",
+    "ruleType": "duplicate",
+    "condition": {
+      "field": "case_no",
+      "operator": "duplicate_check"
+    },
+    "action": "flag_for_review",
+    "reason": "该案件号已存在，涉嫌重复报案",
+    "isActive": true
+  },
+  {
+    "ruleCode": "LOW_AMOUNT_AUTO_APPROVE",
+    "ruleName": "小额自动通过",
+    "ruleType": "amount",
+    "condition": {
+      "field": "claim_amount",
+      "operator": "less_than",
+      "value": 5000
+    },
+    "action": "auto_approve",
+    "reason": "小额理赔自动通过",
+    "isActive": true
+  }
+]

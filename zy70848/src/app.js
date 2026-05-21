@@ -5,6 +5,7 @@ const path = require('path');
 
 const batchesRouter = require('./routes/batches');
 const claimsRouter = require('./routes/claims');
+const rulesRouter = require('./routes/rules');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -15,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api/batches', batchesRouter);
 app.use('/api/claims', claimsRouter);
+app.use('/api/rules', rulesRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: '理赔内勤后端服务运行正常' });
@@ -28,6 +30,7 @@ app.get('/', (req, res) => {
     endpoints: {
       batches: '/api/batches',
       claims: '/api/claims',
+      rules: '/api/rules',
       health: '/api/health'
     }
   });
