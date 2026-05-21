@@ -12,6 +12,10 @@ test_content = """甲方：张三，身份证号：110101199001011234
 联系电话：13900139000，邮箱：lisi@company.com
 住址：上海市浦东新区陆家嘴环路1000号
 
+丙方：王五、赵六，身份证号：440101198808088888
+联系电话：13700137000，邮箱：wangwu@test.com
+住址：广州市天河区珠江新城
+
 鉴于甲方需要向乙方提供服务，双方约定如下：
 1. 甲方保证所提供信息真实有效
 2. 乙方对甲方信息负有保密义务
@@ -19,6 +23,7 @@ test_content = """甲方：张三，身份证号：110101199001011234
 
 甲方签字：张三
 乙方签字：李四
+共同签字：张三/李四/王五
 日期：2024年1月15日"""
 
 print("=" * 70)
@@ -146,6 +151,50 @@ print("      脱敏内容预览:")
 for line in masked_content.split('\n')[:5]:
     if line.strip():
         print(f"        {line[:80]}")
+
+checks = [
+    ("身份证号1完整脱敏", "110101199001011234" not in masked_content),
+    ("身份证号2完整脱敏", "310101198505055678" not in masked_content),
+    ("身份证号3完整脱敏", "440101198808088888" not in masked_content),
+    ("身份证号替换正确", "身份证号：**************" in masked_content),
+    ("身份证号未被手机号截断", "138****80004" not in masked_content),
+    ("手机号1脱敏", "13800138000" not in masked_content),
+    ("手机号2脱敏", "13900139000" not in masked_content),
+    ("手机号3脱敏", "13700137000" not in masked_content),
+    ("手机号替换正确", "138****8000" in masked_content),
+    ("姓名张三脱敏", "甲方：**" in masked_content or "：**" in masked_content),
+    ("姓名李四脱敏", "乙方：**" in masked_content or "：**" in masked_content),
+    ("姓名王五赵六脱敏", "丙方：**" in masked_content or "：**" in masked_content),
+    ("签字张三脱敏", "甲方签字：**" in masked_content),
+    ("签字李四脱敏", "乙方签字：**" in masked_content),
+    ("共同签字脱敏", "共同签字：**/**/**" in masked_content or "**/**" in masked_content),
+    ("邮箱1脱敏", "zhangsan@example.com" not in masked_content),
+    ("邮箱2脱敏", "lisi@company.com" not in masked_content),
+    ("邮箱3脱敏", "wangwu@test.com" not in masked_content),
+    ("住址1脱敏", "北京市朝阳区建国路88号" not in masked_content),
+    ("住址2脱敏", "上海市浦东新区陆家嘴环路1000号" not in masked_content),
+    ("住址3脱敏", "广州市天河区珠江新城" not in masked_content),
+]
+
+print()
+print("      脱敏正确性验证:")
+all_passed = True
+for name, passed in checks:
+    status = "✅" if passed else "❌"
+    print(f"        {status} {name}")
+    if not passed:
+        all_passed = False
+
+print()
+if all_passed:
+    print(f"  ✅ 脱敏内容验证全部通过")
+else:
+    print(f"  ❌ 部分脱敏验证失败，请检查")
+    print("      完整脱敏内容:")
+    for line in masked_content.split('\n'):
+        if line.strip():
+            print(f"        {line}")
+
 print(f"  ✅ 命中报告下载成功 ({len(report_content)} 字符)")
 print("      报告预览:")
 for line in report_content.split('\n')[:8]:

@@ -81,48 +81,126 @@ def apply_masking(content: str, rules):
     if not content:
         return content, []
     
-    hits = []
     lines = content.split('\n')
+    all_hits = []
     
-    for rule in rules:
+    rule_priority = {
+        'id_card': 1,
+        'address': 2,
+        'name': 3,
+        'phone': 4,
+        'email': 5,
+    }
+    
+    for rule in sorted(rules, key=lambda r: rule_priority.get(r.rule_type, 99)):
         try:
             pattern = re.compile(rule.pattern)
             for line_num, line in enumerate(lines, 1):
+                line_hits = []
                 for match in pattern.finditer(line):
+                    full_match_start = match.start()
+                    full_match_end = match.end()
                     matched_text = match.group()
-                    actual_text = matched_text
-                    column_offset = match.start() + 1
                     
-                    if rule.rule_type == 'name' and matched_text.startswith(('：', ':')):
-                        name_part = matched_text.lstrip('：:').strip()
-                        if name_part:
-                            actual_text = name_part
-                            column_offset = match.start() + matched_text.index(name_part) + 1
+                    if rule.rule_type == 'name':
+                        if matched_text.startswith(('：', ':')):
+                            name_match = re.search(r'([\u4e00-\u9fa5]{2,3}(?:\s*[/、,，\s]\s*[\u4e00-\u9fa5]{2,3})*)', matched_text)
+                            if name_match:
+                                actual_text = name_match.group(1)
+                                actual_start = match.start() + name_match.start(1)
+                                actual_end = match.start() + name_match.end(1)
+                            else:
+                                continue
+                        else:
+                            actual_text = matched_text
+                            actual_start = match.start()
+                            actual_end = match.end()
+                        
+                        column_offset = actual_start + 1
                     elif rule.rule_type == 'id_card' and '身份证号' in matched_text:
                         id_match = re.search(r'\d{17}[\dXx]', matched_text)
                         if id_match:
                             actual_text = id_match.group()
-                            column_offset = match.start() + id_match.start() + 1
+                            actual_start = match.start() + id_match.start()
+                            actual_end = match.start() + id_match.end()
+                            column_offset = actual_start + 1
+                        else:
+                            continue
+                    else:
+                        actual_text = matched_text
+                        actual_start = match.start()
+                        actual_end = match.end()
+                        column_offset = match.start() + 1
                     
-                    hits.append({
+                    line_hits.append({
                         'rule_id': rule.id,
+                        'rule_type': rule.rule_type,
                         'matched_text': actual_text,
                         'full_match': matched_text,
+                        'full_start': full_match_start,
+                        'full_end': full_match_end,
+                        'actual_start': actual_start,
+                        'actual_end': actual_end,
                         'line_number': line_num,
                         'column_number': column_offset,
                         'context': line.strip(),
-                        'replacement': rule.replacement
+                        'replacement': rule.replacement,
+                        'pattern': rule.pattern
                     })
+                
+                all_hits.extend(line_hits)
         except re.error:
             continue
     
-    for hit in sorted(hits, key=lambda x: (x['line_number'], -x['column_number'])):
-        lines[hit['line_number'] - 1] = lines[hit['line_number'] - 1].replace(
-            hit.get('full_match', hit['matched_text']), hit['replacement'], 1
-        )
+    final_hits = []
+    for line_num in range(1, len(lines) + 1):
+        line_hits = [h for h in all_hits if h['line_number'] == line_num]
+        covered_ranges = []
+        
+        for hit in sorted(line_hits, key=lambda h: rule_priority.get(h['rule_type'], 99)):
+            overlap = False
+            for (s, e) in covered_ranges:
+                if not (hit['full_end'] <= s or hit['full_start'] >= e):
+                    overlap = True
+                    break
+            
+            if not overlap:
+                covered_ranges.append((hit['full_start'], hit['full_end']))
+                final_hits.append(hit)
+    
+    for hit in sorted(final_hits, key=lambda x: (x['line_number'], -x['full_start'])):
+        line_idx = hit['line_number'] - 1
+        original_line = lines[line_idx]
+        full_match = hit['full_match']
+        replacement = hit['replacement']
+        start_pos = hit['full_start']
+        
+        new_line = original_line[:start_pos] + replacement + original_line[start_pos + len(full_match):]
+        lines[line_idx] = new_line
+        
+        offset = len(replacement) - len(full_match)
+        for other_hit in final_hits:
+            if other_hit['line_number'] == hit['line_number'] and other_hit['full_start'] > hit['full_start']:
+                other_hit['full_start'] += offset
+                other_hit['full_end'] += offset
+                other_hit['actual_start'] += offset
+                other_hit['actual_end'] += offset
+                other_hit['column_number'] += offset
+    
+    clean_hits = []
+    for hit in final_hits:
+        clean_hit = {
+            'rule_id': hit['rule_id'],
+            'matched_text': hit['matched_text'],
+            'line_number': hit['line_number'],
+            'column_number': hit['column_number'],
+            'context': hit['context'],
+            'replacement': hit['replacement']
+        }
+        clean_hits.append(clean_hit)
     
     masked_content = '\n'.join(lines)
-    return masked_content, hits
+    return masked_content, clean_hits
 
 def scan_document(db: Session, document_id: int):
     document = get_document(db, document_id)
@@ -320,12 +398,14 @@ def init_default_rules(db: Session):
         return
     
     default_rules = [
-        {"name": "姓名脱敏", "rule_type": models.MaskingRuleType.NAME, 
-         "pattern": r"[：:]\s*[\u4e00-\u9fa5]{2,3}\s*(?=，|,|身份证|电话|住址|签字)", "replacement": "：**"},
+        {"name": "姓名脱敏-冒号格式", "rule_type": models.MaskingRuleType.NAME, 
+         "pattern": r"[：:]\s*[\u4e00-\u9fa5]{2,3}(?:\s*[/、,，\s]\s*[\u4e00-\u9fa5]{2,3})*\s*(?=，|,|身份证|电话|住址|签字|。|；|;|\s|$)", "replacement": "：**"},
+        {"name": "姓名脱敏-签字格式", "rule_type": models.MaskingRuleType.NAME, 
+         "pattern": r"[\u4e00-\u9fa5]{2,3}\s*[/、,，\s]\s*[\u4e00-\u9fa5]{2,3}(?:\s*[/、,，\s]\s*[\u4e00-\u9fa5]{2,3})*(?=\s*签字|\s*签名|$)", "replacement": "**/**"},
         {"name": "身份证号脱敏", "rule_type": models.MaskingRuleType.ID_CARD, 
          "pattern": r"身份证号[：:]\s*\d{17}[\dXx]", "replacement": "身份证号：**************"},
         {"name": "手机号脱敏", "rule_type": models.MaskingRuleType.PHONE, 
-         "pattern": r"1[3-9]\d{9}", "replacement": "138****8000"},
+         "pattern": r"(?<![\d])1[3-9]\d{9}(?![\d])", "replacement": "138****8000"},
         {"name": "邮箱脱敏", "rule_type": models.MaskingRuleType.EMAIL, 
          "pattern": r"[\w.-]+@[\w.-]+\.\w+", "replacement": "***@example.com"},
         {"name": "住址脱敏", "rule_type": models.MaskingRuleType.ADDRESS, 
