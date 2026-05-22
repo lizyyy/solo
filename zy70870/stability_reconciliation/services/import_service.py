@@ -67,23 +67,31 @@ class DataImportService:
             test_results = self._parse_test_results(row)
             
             extension_approved = row.get("extension_approved")
-            if extension_approved is not None:
+            is_value_present = (
+                not pd.isna(extension_approved) 
+                and extension_approved is not None 
+                and str(extension_approved).strip() != ""
+            )
+            
+            if is_value_present:
                 if test_results is None:
                     test_results = {}
                 if isinstance(extension_approved, str):
-                    test_results["extension_approved"] = extension_approved.lower() in ["true", "1", "yes"]
+                    test_results["extension_approved"] = extension_approved.strip().lower() in ["true", "1", "yes", "y", "是"]
                 else:
                     test_results["extension_approved"] = bool(extension_approved)
             
-            if row.get("extension_note"):
+            extension_note = row.get("extension_note")
+            if not pd.isna(extension_note) and extension_note is not None and str(extension_note).strip() != "":
                 if test_results is None:
                     test_results = {}
-                test_results["extension_note"] = str(row.get("extension_note"))
+                test_results["extension_note"] = str(extension_note).strip()
             
-            if row.get("extension_approved_by"):
+            extension_approved_by = row.get("extension_approved_by")
+            if not pd.isna(extension_approved_by) and extension_approved_by is not None and str(extension_approved_by).strip() != "":
                 if test_results is None:
                     test_results = {}
-                test_results["extension_approved_by"] = str(row.get("extension_approved_by"))
+                test_results["extension_approved_by"] = str(extension_approved_by).strip()
             
             sample = Sample(
                 id=sample_id,

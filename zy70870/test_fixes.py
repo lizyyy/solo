@@ -183,12 +183,12 @@ S003,6月,2024-07-01,,40°C/75%RH,箱体B,pending,,
     
     extended_sample = next((s for s in samples if s.sample_id == "S002"), None)
     if extended_sample:
-        print(f"  延期样品状态: {extended_sample.status}")
-        print(f"  延期样品test_results: {extended_sample.test_results}")
+        print(f"  已审批延期样品状态: {extended_sample.status}")
+        print(f"  已审批延期样品test_results: {extended_sample.test_results}")
         
         if extended_sample.status == "extended" and extended_sample.test_results:
             if extended_sample.test_results.get("extension_approved") == True:
-                print("  ✓ 延期审批字段正确导入!")
+                print("  ✓ 已审批延期字段正确导入!")
                 result = True
             else:
                 print("  ✗ extension_approved 不正确")
@@ -203,6 +203,76 @@ S003,6月,2024-07-01,,40°C/75%RH,箱体B,pending,,
     db.rollback()
     db.close()
     return result
+
+
+def test_extension_approved_empty_field_bug():
+    """测试空值extension_approved字段不会被误判为True"""
+    print("\n测试5: 空值extension_approved不会被误判为True...")
+    
+    db = SessionLocal()
+    
+    protocol = TestProtocol(
+        id=f"PROTO-TEST-{uuid.uuid4().hex[:6].upper()}",
+        protocol_name="测试方案",
+        product_name="测试产品",
+        batch_number="BATCH-001",
+        conditions={},
+        sampling_points=[],
+        status="active"
+    )
+    db.add(protocol)
+    db.commit()
+    
+    csv_content = """sample_id,sampling_point,planned_sampling_date,actual_sampling_date,condition,storage_location,status,extension_approved,extension_note
+S001,0月,2024-01-01,2024-01-10,25°C/60%RH,箱体A,extended,,
+S002,3月,2024-04-01,2024-04-10,25°C/60%RH,箱体A,extended, ,
+S003,6月,2024-07-01,2024-07-10,25°C/60%RH,箱体B,extended,true,已审批
+"""
+    
+    import_service = DataImportService(db)
+    samples = import_service.import_samples_csv(csv_content, protocol.id)
+    
+    print(f"  导入了 {len(samples)} 个样品")
+    
+    engine = ReconciliationEngine(db)
+    
+    results = []
+    for sample in samples:
+        discrepancies = engine._check_extension_approval(sample)
+        has_unapproved = any(d.type == "extension_unapproved" for d in discrepancies)
+        print(f"  样品 {sample.sample_id}: status={sample.status}, extension_approved={sample.test_results.get('extension_approved') if sample.test_results else None}, 检测到未审批差异={has_unapproved}")
+        results.append((sample.sample_id, sample.test_results.get('extension_approved') if sample.test_results else None, has_unapproved))
+    
+    s001_result = next((r for r in results if r[0] == "S001"), None)
+    s002_result = next((r for r in results if r[0] == "S002"), None)
+    s003_result = next((r for r in results if r[0] == "S003"), None)
+    
+    all_pass = True
+    
+    if s001_result and s001_result[1] is None and s001_result[2] == True:
+        print("  ✓ S001 (空字符串): 正确识别为未审批(None)，产生extension_unapproved差异")
+    else:
+        print(f"  ✗ S001 失败: extension_approved={s001_result[1]}, 有差异={s001_result[2]}")
+        all_pass = False
+    
+    if s002_result and s002_result[1] is None and s002_result[2] == True:
+        print("  ✓ S002 (空格): 正确识别为未审批(None)，产生extension_unapproved差异")
+    else:
+        print(f"  ✗ S002 失败: extension_approved={s002_result[1]}, 有差异={s002_result[2]}")
+        all_pass = False
+    
+    if s003_result and s003_result[1] == True and s003_result[2] == False:
+        print("  ✓ S003 (true): 正确识别为已审批，无差异")
+    else:
+        print(f"  ✗ S003 失败: extension_approved={s003_result[1]}, 有差异={s003_result[2]}")
+        all_pass = False
+    
+    if all_pass:
+        print("  ✓ 测试通过! 空值字段不会被误判为已审批")
+    
+    db.rollback()
+    db.close()
+    return all_pass
 
 
 def test_full_workflow():
@@ -282,6 +352,7 @@ if __name__ == "__main__":
     results.append(("重新计算不新增记录", test_recalculate_does_not_duplicate()))
     results.append(("样品导入延期字段", test_sample_import_with_extension_fields()))
     results.append(("完整对账流程", test_full_workflow()))
+    results.append(("空值延期字段不被误判", test_extension_approved_empty_field_bug()))
     
     print("\n" + "=" * 60)
     print("测试总结:")
