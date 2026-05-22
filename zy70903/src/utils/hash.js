@@ -1,8 +1,22 @@
 const crypto = require('crypto');
 
+function sortObject(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sortObject);
+  }
+  return Object.keys(obj).sort().reduce((result, key) => {
+    result[key] = sortObject(obj[key]);
+    return result;
+  }, {});
+}
+
 function generateMaterialHash(data) {
-  const sorted = JSON.stringify(data, Object.keys(data).sort());
-  return crypto.createHash('sha256').update(sorted).digest('hex');
+  const sortedData = sortObject(data);
+  const serialized = JSON.stringify(sortedData);
+  return crypto.createHash('sha256').update(serialized).digest('hex');
 }
 
 function generateBatchNo() {

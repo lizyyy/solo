@@ -1,0 +1,7 @@
+
+> cable-car-inspection-api@1.0.0 start
+> node src/app.js
+
+景区缆车检修放行API服务已启动，监听端口: 3000
+健康检查: http://localhost:3000/health
+API文档: http://localhost:3000/api/
