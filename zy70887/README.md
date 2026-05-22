@@ -246,15 +246,18 @@ GET /api/audit/material/:materialId/history
 │   │   ├── Task.js         # 任务模型
 │   │   ├── Material.js     # 材料模型
 │   │   ├── AuditLog.js     # 审计日志模型
-│   │   └── Permission.js   # 权限模型
+│   │   ├── Permission.js   # 权限模型
+│   │   └── ExportReport.js # 导出报告模型
 │   ├── controllers/
 │   │   ├── taskController.js
 │   │   ├── materialController.js
-│   │   └── auditController.js
+│   │   ├── auditController.js
+│   │   └── exportController.js
 │   └── routes/
 │       ├── taskRoutes.js
 │       ├── materialRoutes.js
-│       └── auditRoutes.js
+│       ├── auditRoutes.js
+│       └── exportRoutes.js
 ├── data/                   # SQLite数据库文件目录
 ├── package.json
 └── README.md

@@ -57,13 +57,6 @@ class Permission {
       return { allowed: false, reason: '没有快递寄送权限' };
     }
     
-    if (stampType === 'authorized') {
-      const hasStampAuthorized = await this.checkPermission(userId, 'stamp_authorized');
-      if (!hasStampAuthorized) {
-        return { allowed: false, reason: '没有授权盖章权限，无法进入快递环节' };
-      }
-    }
-    
     return { allowed: true };
   }
 

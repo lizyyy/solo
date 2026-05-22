@@ -147,12 +147,12 @@ exports.updateTaskStatus = async (req, res) => {
       });
     }
 
-    const validStatuses = ['pending', 'processing', 'failed', 'manual_confirm', 'exported'];
+    const validStatuses = ['pending', 'processing', 'failed', 'manual_confirm'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
         error: '无效的状态值',
-        message: `状态必须是以下值之一: ${validStatuses.join(', ')}`
+        message: `状态必须是以下值之一: ${validStatuses.join(', ')}。如需导出请使用 /api/export/task/:taskId 接口`
       });
     }
 
@@ -165,19 +165,15 @@ exports.updateTaskStatus = async (req, res) => {
       });
     }
 
-    if (status === 'exported') {
-      const hasExportPermission = await Permission.checkPermission(operator_id, 'export');
-      if (!hasExportPermission) {
-        return res.status(403).json({
-          success: false,
-          error: '权限不足',
-          message: '没有导出权限'
-        });
-      }
-      await Task.markAsExported(taskId);
-    } else {
-      await Task.updateStatus(taskId, status);
+    if (task.status === 'exported') {
+      return res.status(400).json({
+        success: false,
+        error: '状态不可修改',
+        message: '已导出的任务状态不能修改'
+      });
     }
+
+    await Task.updateStatus(taskId, status);
 
     await AuditLog.create({
       taskId,

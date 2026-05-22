@@ -72,6 +72,23 @@ CREATE TABLE IF NOT EXISTS permissions (
   UNIQUE(user_id, permission_type)
 );
 
+CREATE TABLE IF NOT EXISTS export_reports (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  task_id INTEGER NOT NULL UNIQUE,
+  report_no TEXT UNIQUE NOT NULL,
+  exporter_id INTEGER NOT NULL,
+  total_contracts INTEGER NOT NULL DEFAULT 0,
+  total_amount DECIMAL(15,2) NOT NULL DEFAULT 0,
+  stamp_type TEXT NOT NULL,
+  materials_summary TEXT NOT NULL,
+  exported_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (task_id) REFERENCES tasks(id),
+  FOREIGN KEY (exporter_id) REFERENCES users(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_export_reports_task_id ON export_reports(task_id);
+CREATE INDEX IF NOT EXISTS idx_export_reports_report_no ON export_reports(report_no);
+
 CREATE INDEX IF NOT EXISTS idx_tasks_batch_hash ON tasks(batch_hash);
 CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
 CREATE INDEX IF NOT EXISTS idx_materials_contract_no ON materials(contract_no);

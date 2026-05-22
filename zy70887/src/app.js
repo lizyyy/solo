@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const taskRoutes = require('./routes/taskRoutes');
 const materialRoutes = require('./routes/materialRoutes');
 const auditRoutes = require('./routes/auditRoutes');
+const exportRoutes = require('./routes/exportRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,11 +21,12 @@ app.get('/', (req, res) => {
   res.json({
     success: true,
     message: '法务合同盖章排队 API 服务',
-    version: '1.0.0',
+    version: '1.1.0',
     endpoints: {
       tasks: '/api/tasks',
       materials: '/api/materials',
-      audit: '/api/audit'
+      audit: '/api/audit',
+      export: '/api/export'
     }
   });
 });
@@ -32,6 +34,7 @@ app.get('/', (req, res) => {
 app.use('/api/tasks', taskRoutes);
 app.use('/api/materials', materialRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/export', exportRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
