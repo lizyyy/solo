@@ -5,7 +5,8 @@ import {
   ReviewAction,
   ReconciliationResult,
   BorrowStatus,
-  Discrepancy
+  Discrepancy,
+  DiscrepancyType
 } from '../types';
 import { ReconciliationEngine } from './ReconciliationEngine';
 
@@ -23,7 +24,8 @@ export class ReviewService {
     reviewerName: string,
     action: ReviewAction,
     comment: string,
-    updates?: Partial<BorrowRecord>
+    updates?: Partial<BorrowRecord>,
+    resolveDiscrepancyTypes?: DiscrepancyType[]
   ): {
     success: boolean;
     record?: BorrowRecord;
@@ -59,8 +61,10 @@ export class ReviewService {
 
     this.reviewLogs.push(log);
 
-    if (action === ReviewAction.APPROVED || action === ReviewAction.MANUAL_CORRECTION) {
-      this.resolveRecordDiscrepancies(recordId);
+    if (action === ReviewAction.APPROVED) {
+      this.resolveAllRecordDiscrepancies(recordId);
+    } else if (action === ReviewAction.MANUAL_CORRECTION && resolveDiscrepancyTypes) {
+      this.resolveSpecificDiscrepancies(recordId, resolveDiscrepancyTypes);
     }
 
     const recordDiscrepancies = this.engine.getAllDiscrepancies()
@@ -79,20 +83,25 @@ export class ReviewService {
     reviewerId: string,
     reviewerName: string,
     updates: Partial<BorrowRecord>,
-    reason: string
+    reason: string,
+    resolveTypes?: DiscrepancyType[]
   ): {
     success: boolean;
     record: BorrowRecord;
     log: ReviewLog;
     recalculatedResult: ReconciliationResult;
   } {
+    const autoResolveTypes = this.detectResolveTypes(updates);
+    const typesToResolve = resolveTypes || autoResolveTypes;
+
     const result = this.reviewRecord(
       recordId,
       reviewerId,
       reviewerName,
       ReviewAction.MANUAL_CORRECTION,
       `人工修正: ${reason}`,
-      updates
+      updates,
+      typesToResolve
     );
 
     const recalculatedResult = this.engine.runReconciliation();
@@ -105,7 +114,35 @@ export class ReviewService {
     };
   }
 
-  private resolveRecordDiscrepancies(recordId: string): void {
+  private detectResolveTypes(updates: Partial<BorrowRecord>): DiscrepancyType[] {
+    const types: DiscrepancyType[] = [];
+
+    if ('renewalCount' in updates) {
+      types.push(DiscrepancyType.RENEWAL_LIMIT_EXCEEDED);
+    }
+
+    if ('dueDate' in updates || 'returnDate' in updates) {
+      types.push(DiscrepancyType.OVERDUE);
+    }
+
+    if ('status' in updates && updates.status === BorrowStatus.RETURNED) {
+      types.push(DiscrepancyType.OVERDUE);
+      types.push(DiscrepancyType.RENEWAL_LIMIT_EXCEEDED);
+    }
+
+    return types;
+  }
+
+  private resolveSpecificDiscrepancies(recordId: string, types: DiscrepancyType[]): void {
+    const discrepancies = this.engine.getAllDiscrepancies();
+    discrepancies.forEach(d => {
+      if (d.recordId === recordId && types.includes(d.type)) {
+        this.engine.resolveDiscrepancy(d.discrepancyId);
+      }
+    });
+  }
+
+  private resolveAllRecordDiscrepancies(recordId: string): void {
     const discrepancies = this.engine.getAllDiscrepancies();
     discrepancies.forEach(d => {
       if (d.recordId === recordId) {

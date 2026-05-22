@@ -36,6 +36,15 @@
     "isActive": true
   },
   {
+    "userId": "USER-005",
+    "userName": "刘强",
+    "department": "综合部",
+    "allowedClassifications": ["public", "internal"],
+    "maxBorrowDays": 30,
+    "maxRenewals": 2,
+    "isActive": true
+  },
+  {
     "userId": "USER-006",
     "userName": "周经理",
     "department": "档案室",

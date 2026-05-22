@@ -119,16 +119,19 @@ export class ReconciliationEngine {
   }
 
   private checkRenewalLimit(record: BorrowRecord, userPermission?: UserPermission, existingResolved?: Map<string, boolean>): void {
-    if (!userPermission) return;
+    const defaultMaxRenewals = 2;
+    const maxRenewals = userPermission?.maxRenewals ?? defaultMaxRenewals;
+    const userName = userPermission?.userName || record.borrowerName;
 
-    if (record.renewalCount > userPermission.maxRenewals) {
+    if (record.renewalCount > maxRenewals) {
+      const userInfo = userPermission ? `用户【${userName}】` : `借阅人【${userName}】（无权限记录，使用默认值）`;
       this.addDiscrepancy({
         type: DiscrepancyType.RENEWAL_LIMIT_EXCEEDED,
         recordId: record.recordId,
         caseId: record.caseId,
         severity: 'medium',
         description: `续借次数超限: ${record.renewalCount}次`,
-        explanation: `用户【${userPermission.userName}】最大续借次数为${userPermission.maxRenewals}次，当前已续借${record.renewalCount}次，超出${record.renewalCount - userPermission.maxRenewals}次。需核实审批记录。`
+        explanation: `${userInfo}最大续借次数为${maxRenewals}次，当前已续借${record.renewalCount}次，超出${record.renewalCount - maxRenewals}次。需核实审批记录。`
       }, existingResolved);
     }
   }
