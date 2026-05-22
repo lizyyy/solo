@@ -94,4 +94,75 @@ router.patch('/:batchId/status', async (req, res) => {
   }
 });
 
+
+router.post('/:batchId/manual-confirm', async (req, res) => {
+  try {
+    const { batchId } = req.params;
+    const { operator, confirm_results, remark } = req.body;
+
+    const batch = await get('SELECT * FROM batches WHERE id = ?', [batchId]);
+    if (!batch) {
+      return res.status(404).json({ error: '批次不存在' });
+    }
+
+    const precheckResults = await all(
+      'SELECT * FROM precheck_results WHERE batch_id = ? AND needs_manual_review = 1',
+      [batchId]
+    );
+
+    if (precheckResults.length === 0) {
+      return res.status(400).json({ error: '该批次没有需要人工复核的案件' });
+    }
+
+    if (!Array.isArray(confirm_results)) {
+      return res.status(400).json({ error: 'confirm_results 必须是数组' });
+    }
+
+    for (const confirm of confirm_results) {
+      const result = await get('SELECT * FROM precheck_results WHERE claim_id = ?', [confirm.claim_id]);
+      if (!result) continue;
+
+      await run(
+        'UPDATE precheck_results SET needs_manual_review = 0, manual_confirm_operator = ?, manual_confirm_result = ?, manual_confirm_remark = ?, manual_confirm_time = CURRENT_TIMESTAMP WHERE claim_id = ?',
+        [operator, confirm.result, confirm.remark || '', confirm.claim_id]
+      );
+
+      const taskId = uuidv4();
+      await run(
+        'INSERT INTO task_status (id, batch_id, claim_id, status, message) VALUES (?, ?, ?, ?, ?)',
+        [taskId, batchId, confirm.claim_id, 'manual_confirm', '人工确认结果：' + confirm.result + '，操作人：' + operator]
+      );
+    }
+
+    const remainingManual = await all(
+      'SELECT * FROM precheck_results WHERE batch_id = ? AND needs_manual_review = 1',
+      [batchId]
+    );
+
+    const batchStatus = remainingManual.length > 0 ? 'manual_confirm' : 'completed';
+    await run(
+      'UPDATE batches SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [batchStatus, batchId]
+    );
+
+    const batchTaskId = uuidv4();
+    await run(
+      'INSERT INTO task_status (id, batch_id, status, message) VALUES (?, ?, ?, ?)',
+      [batchTaskId, batchId, batchStatus, '批次人工确认完成，共确认 ' + confirm_results.length + ' 条，操作人：' + operator]
+    );
+
+    res.json({
+      success: true,
+      batch_id: batchId,
+      confirmed_count: confirm_results.length,
+      remaining_count: remainingManual.length,
+      batch_status: batchStatus,
+      operator,
+      remark
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

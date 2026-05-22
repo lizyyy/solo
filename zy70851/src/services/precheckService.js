@@ -203,9 +203,13 @@ const precheckSingleClaim = async (claim) => {
     );
 
     const taskId = uuidv4();
+    const taskStatus = categoryResult.needsManualReview ? 'manual_confirm' : 'completed';
+    const taskMessage = categoryResult.needsManualReview
+      ? `预审完成，金额超限，需要人工复核（${categoryResult.reviewReason}）`
+      : `预审完成，分类：${categoryResult.category}`;
     await run(
       'INSERT INTO task_status (id, batch_id, claim_id, status, message) VALUES (?, ?, ?, ?, ?)',
-      [taskId, claim.batch_id, claim.id, 'completed', `预审完成，分类：${categoryResult.category}`]
+      [taskId, claim.batch_id, claim.id, taskStatus, taskMessage]
     );
 
     return {
@@ -268,12 +272,18 @@ const precheckBatch = async (batchId) => {
     }
   }
 
+  const hasManualReview = results.some(r => r.needs_manual_review);
+  const batchFinalStatus = hasManualReview ? 'manual_confirm' : 'completed';
+  const batchFinalMessage = hasManualReview
+    ? `批量预审完成，成功${results.length}条，失败${errors.length}条，含${results.filter(r => r.needs_manual_review).length}条需人工复核`
+    : `批量预审完成，成功${results.length}条，失败${errors.length}条`;
+
   await run(
     'INSERT INTO task_status (id, batch_id, status, message) VALUES (?, ?, ?, ?)',
-    [uuidv4(), batchId, 'completed', `批量预审完成，成功${results.length}条，失败${errors.length}条`]
+    [uuidv4(), batchId, batchFinalStatus, batchFinalMessage]
   );
 
-  await run('UPDATE batches SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', ['completed', batchId]);
+  await run('UPDATE batches SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [batchFinalStatus, batchId]);
 
   return {
     batch_id: batchId,
