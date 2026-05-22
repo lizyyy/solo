@@ -224,6 +224,8 @@ export class DataStore {
     endDate?: string;
     status?: RecordStatus;
     contractId?: string;
+    minSeats?: number;
+    maxSeats?: number;
   }): ProcessingRecord[] {
     let results = Array.from(this.records.values());
 
@@ -244,6 +246,21 @@ export class DataStore {
     }
     if (params.endDate) {
       results = results.filter(r => r.date <= params.endDate!);
+    }
+    if (params.settlementPeriod) {
+      results = results.filter(r => {
+        const batch = this.batches.get(r.batchId);
+        return batch?.settlementPeriod === params.settlementPeriod;
+      });
+    }
+    if (params.minSeats !== undefined || params.maxSeats !== undefined) {
+      results = results.filter(r => {
+        const showtime = this.showtimes.get(r.showtimeId);
+        if (!showtime) return false;
+        if (params.minSeats !== undefined && showtime.seats < params.minSeats) return false;
+        if (params.maxSeats !== undefined && showtime.seats > params.maxSeats) return false;
+        return true;
+      });
     }
 
     return results;

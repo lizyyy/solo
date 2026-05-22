@@ -21,7 +21,9 @@ export class QueryController {
         startDate,
         endDate,
         status,
-        contractId
+        contractId,
+        minSeats,
+        maxSeats
       } = req.query;
 
       const queryParams = {
@@ -31,7 +33,9 @@ export class QueryController {
         startDate: startDate as string,
         endDate: endDate as string,
         status: status as RecordStatus,
-        contractId: contractId as string
+        contractId: contractId as string,
+        minSeats: minSeats ? parseInt(minSeats as string, 10) : undefined,
+        maxSeats: maxSeats ? parseInt(maxSeats as string, 10) : undefined
       };
 
       const records = this.dataStore.queryRecords(queryParams);
@@ -91,6 +95,8 @@ export class QueryController {
         endDate,
         status,
         contractId,
+        minSeats,
+        maxSeats,
         format = 'csv',
         includeBoundaryDetails = 'true'
       } = req.query;
@@ -102,7 +108,9 @@ export class QueryController {
         startDate: startDate as string,
         endDate: endDate as string,
         status: status as RecordStatus,
-        contractId: contractId as string
+        contractId: contractId as string,
+        minSeats: minSeats ? parseInt(minSeats as string, 10) : undefined,
+        maxSeats: maxSeats ? parseInt(maxSeats as string, 10) : undefined
       };
 
       const options: ExportOptions = {

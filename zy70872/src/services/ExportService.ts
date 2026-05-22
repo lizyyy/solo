@@ -84,6 +84,8 @@ export class ExportService {
       endDate?: string;
       status?: RecordStatus;
       contractId?: string;
+      minSeats?: number;
+      maxSeats?: number;
     },
     options: ExportOptions
   ): {
@@ -129,6 +131,14 @@ export class ExportService {
         [RecordStatus.RETURNED]: '退回修改'
       };
       conditions.push(`状态：${statusLabels[params.status as RecordStatus]}`);
+    }
+    if (params.contractId) conditions.push(`合同ID：${params.contractId}`);
+    if (params.minSeats !== undefined && params.maxSeats !== undefined) {
+      conditions.push(`座位数：${params.minSeats}-${params.maxSeats}`);
+    } else if (params.minSeats !== undefined) {
+      conditions.push(`座位数≥${params.minSeats}`);
+    } else if (params.maxSeats !== undefined) {
+      conditions.push(`座位数≤${params.maxSeats}`);
     }
 
     const conditionStr = conditions.length > 0 ? conditions.join('，') : '全部数据';
