@@ -1,0 +1,44 @@
+[
+  {
+    "baggage_tag_no": "CA1234567890",
+    "responsible_segment": "PEK",
+    "segments": [
+      {
+        "flight_no": "CA1234",
+        "departure": "PEK",
+        "arrival": "SHA",
+        "departure_time": "2026-05-20T08:00:00",
+        "arrival_time": "2026-05-20T10:30:00",
+        "is_responsible": true
+      }
+    ]
+  },
+  {
+    "baggage_tag_no": "MU9876543210",
+    "responsible_segment": "SHA",
+    "segments": [
+      {
+        "flight_no": "MU5678",
+        "departure": "SHA",
+        "arrival": "CAN",
+        "departure_time": "2026-05-15T14:00:00",
+        "arrival_time": "2026-05-15T16:45:00",
+        "is_responsible": true
+      }
+    ]
+  },
+  {
+    "baggage_tag_no": "HU5566778899",
+    "responsible_segment": "PEK",
+    "segments": [
+      {
+        "flight_no": "HU7890",
+        "departure": "PEK",
+        "arrival": "SZX",
+        "departure_time": "2026-05-01T11:00:00",
+        "arrival_time": "2026-05-01T14:20:00",
+        "is_responsible": true
+      }
+    ]
+  }
+]
