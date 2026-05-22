@@ -83,13 +83,13 @@ export class ReviewService {
     return updatedRecord;
   }
 
-  async modifyRecord(
+  modifyRecord(
     recordId: string,
     userId: string,
     userName: string,
     comment: string,
     modifications: Partial<BillingRecord>
-  ): Promise<BillingRecord | undefined> {
+  ): BillingRecord | undefined {
     const record = dataStore.getBillingRecord(recordId);
     if (!record) return undefined;
 
@@ -105,6 +105,8 @@ export class ReviewService {
       'totalAmount',
     ];
 
+    const finalModifications: Partial<BillingRecord> = { ...modifications };
+
     for (const field of allowedFields) {
       if (field in modifications) {
         const oldValue = (record as any)[field];
@@ -113,6 +115,21 @@ export class ReviewService {
           changes[field] = { old: oldValue, new: newValue };
         }
       }
+    }
+
+    const costFieldsChanged = 'electricityCost' in modifications || 'baseRent' in modifications || 'overtimeSurcharge' in modifications;
+    if (costFieldsChanged && !('totalAmount' in modifications)) {
+      const newElectricityCost = modifications.electricityCost !== undefined ? modifications.electricityCost : record.electricityCost;
+      const newBaseRent = modifications.baseRent !== undefined ? modifications.baseRent : record.baseRent;
+      const newOvertimeSurcharge = modifications.overtimeSurcharge !== undefined ? modifications.overtimeSurcharge : record.overtimeSurcharge;
+      
+      const newTotalAmount = newElectricityCost + newBaseRent + newOvertimeSurcharge;
+      finalModifications.totalAmount = newTotalAmount;
+      
+      changes['totalAmount'] = {
+        old: record.totalAmount,
+        new: newTotalAmount,
+      };
     }
 
     if ('anomalies' in modifications && modifications.anomalies) {
@@ -138,7 +155,7 @@ export class ReviewService {
     };
 
     const updatedRecord = dataStore.updateBillingRecord(recordId, {
-      ...modifications,
+      ...finalModifications,
       reviewNotes: [...record.reviewNotes, reviewNote],
       updatedAt: new Date(),
     });
@@ -171,17 +188,14 @@ export class ReviewService {
     return updatedRecord;
   }
 
-  async recalculateAndReview(
+  recalculateAndReview(
     recordId: string,
     userId: string,
     userName: string,
     comment: string
-  ): Promise<BillingRecord | undefined> {
-    const recalculated = await billingCalculatorService.recalculateRecord(recordId);
+  ): BillingRecord | undefined {
+    const recalculated = billingCalculatorService.recalculateRecord(recordId);
     if (!recalculated) return undefined;
-
-    const record = dataStore.getBillingRecord(recordId);
-    if (!record) return undefined;
 
     const reviewNote: ReviewNote = {
       id: uuidv4(),
@@ -193,7 +207,7 @@ export class ReviewService {
     };
 
     return dataStore.updateBillingRecord(recordId, {
-      reviewNotes: [...record.reviewNotes, reviewNote],
+      reviewNotes: [...recalculated.reviewNotes, reviewNote],
     });
   }
 

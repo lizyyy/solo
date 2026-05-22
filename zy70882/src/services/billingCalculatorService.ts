@@ -44,12 +44,12 @@ export class BillingCalculatorService {
     return records;
   }
 
-  private async calculateTenantZoneBilling(
+  private calculateTenantZoneBillingData(
     contract: TenantContract,
     zone: TemperatureZone,
     periodStart: Date,
     periodEnd: Date
-  ): Promise<BillingRecord> {
+  ): Omit<BillingRecord, 'id' | 'createdAt' | 'updatedAt'> {
     const calculationDetails: CalculationDetail[] = [];
     const anomalies: Anomaly[] = [];
 
@@ -219,7 +219,7 @@ export class BillingCalculatorService {
       result: totalAmount,
     });
 
-    const record = dataStore.addBillingRecord({
+    return {
       periodStart,
       periodEnd,
       tenantId: contract.tenantId,
@@ -241,9 +241,17 @@ export class BillingCalculatorService {
       reviewStatus: ReviewStatus.PENDING,
       reviewNotes: [],
       calculationDetails,
-    });
+    };
+  }
 
-    return record;
+  private async calculateTenantZoneBilling(
+    contract: TenantContract,
+    zone: TemperatureZone,
+    periodStart: Date,
+    periodEnd: Date
+  ): Promise<BillingRecord> {
+    const billingData = this.calculateTenantZoneBillingData(contract, zone, periodStart, periodEnd);
+    return dataStore.addBillingRecord(billingData);
   }
 
   private isOvertimeForReading(reading: MeterReading, contract: TenantContract): boolean {
@@ -284,7 +292,7 @@ export class BillingCalculatorService {
     return anomalies;
   }
 
-  async recalculateRecord(recordId: string): Promise<BillingRecord | undefined> {
+  recalculateRecord(recordId: string): BillingRecord | undefined {
     const existingRecord = dataStore.getBillingRecord(recordId);
     if (!existingRecord) return undefined;
 
@@ -293,20 +301,18 @@ export class BillingCalculatorService {
 
     if (!contract || !zone) return undefined;
 
-    const newRecord = await this.calculateTenantZoneBilling(
+    const billingData = this.calculateTenantZoneBillingData(
       contract,
       zone,
       existingRecord.periodStart,
       existingRecord.periodEnd
     );
 
-    dataStore.updateBillingRecord(recordId, {
-      ...newRecord,
+    return dataStore.updateBillingRecord(recordId, {
+      ...billingData,
       reviewNotes: existingRecord.reviewNotes,
       reviewStatus: existingRecord.reviewStatus,
     });
-
-    return dataStore.getBillingRecord(recordId);
   }
 
   getBillingSummary(periodStart: Date, periodEnd: Date): BillingSummary {
