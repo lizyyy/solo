@@ -62,6 +62,29 @@ class DataImportService:
             planned_date = self._parse_date(row.get("planned_sampling_date"))
             actual_date = self._parse_date(row.get("actual_sampling_date"))
             
+            status = str(row.get("status", "imported")).lower() if row.get("status") else "imported"
+            
+            test_results = self._parse_test_results(row)
+            
+            extension_approved = row.get("extension_approved")
+            if extension_approved is not None:
+                if test_results is None:
+                    test_results = {}
+                if isinstance(extension_approved, str):
+                    test_results["extension_approved"] = extension_approved.lower() in ["true", "1", "yes"]
+                else:
+                    test_results["extension_approved"] = bool(extension_approved)
+            
+            if row.get("extension_note"):
+                if test_results is None:
+                    test_results = {}
+                test_results["extension_note"] = str(row.get("extension_note"))
+            
+            if row.get("extension_approved_by"):
+                if test_results is None:
+                    test_results = {}
+                test_results["extension_approved_by"] = str(row.get("extension_approved_by"))
+            
             sample = Sample(
                 id=sample_id,
                 protocol_id=protocol_id,
@@ -71,8 +94,8 @@ class DataImportService:
                 actual_sampling_date=actual_date,
                 condition=str(row.get("condition", "")),
                 storage_location=str(row.get("storage_location", "")),
-                test_results=self._parse_test_results(row),
-                status="imported"
+                test_results=test_results,
+                status=status
             )
             samples.append(sample)
             self.db.add(sample)
@@ -168,9 +191,13 @@ class DataImportService:
             "sample_id": ["S001", "S002", "S003"],
             "sampling_point": ["0月", "3月", "6月"],
             "planned_sampling_date": ["2024-01-01", "2024-04-01", "2024-07-01"],
-            "actual_sampling_date": ["2024-01-02", "2024-04-01", ""],
+            "actual_sampling_date": ["2024-01-02", "2024-04-10", ""],
             "condition": ["25°C/60%RH", "25°C/60%RH", "40°C/75%RH"],
             "storage_location": ["箱体A", "箱体A", "箱体B"],
+            "status": ["imported", "extended", "pending"],
+            "extension_approved": ["", "true", ""],
+            "extension_note": ["", "春节假期延期取样，QA已审批", ""],
+            "extension_approved_by": ["", "QA001", ""],
             "test_purity_result": [99.5, 99.3, 99.1],
             "test_content_result": [100.2, 99.8, 99.5]
         }

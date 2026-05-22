@@ -12,7 +12,7 @@ from stability_reconciliation.schemas.reconciliation import (
     TestProtocolResponse, SampleResponse, ChamberRecordResponse,
     ReconciliationRecordResponse, ReconciliationReviewRequest,
     ReportResponse, ReportGenerateRequest, TraceResponse,
-    TraceRecord, ReconciliationBatchResponse
+    TraceRecord, ReconciliationBatchResponse, ExtensionApprovalRequest
 )
 from stability_reconciliation.services.import_service import DataImportService
 from stability_reconciliation.services.reconciliation_engine import ReconciliationEngine
@@ -435,6 +435,99 @@ def get_review_statistics(batch_id: Optional[str] = None, protocol_id: Optional[
                           db: Session = Depends(get_db)):
     review_service = ReviewService(db)
     return review_service.get_review_statistics(batch_id=batch_id, protocol_id=protocol_id)
+
+
+@app.post("/api/samples/extension/approve")
+def approve_sample_extension(request: ExtensionApprovalRequest, db: Session = Depends(get_db)):
+    sample = db.query(Sample).filter(Sample.id == request.sample_id).first()
+    
+    if not sample:
+        raise HTTPException(status_code=404, detail="Sample not found")
+    
+    if sample.test_results is None:
+        sample.test_results = {}
+    
+    sample.test_results["extension_approved"] = request.is_approved
+    sample.test_results["extension_note"] = request.extension_note
+    sample.test_results["extension_approved_by"] = request.approved_by
+    sample.test_results["extension_approved_at"] = datetime.utcnow().isoformat()
+    
+    sample.status = "extended" if request.is_approved else sample.status
+    sample.updated_at = datetime.utcnow()
+    
+    db.commit()
+    
+    return {
+        "message": "Extension approval recorded",
+        "sample_id": sample.id,
+        "sample_code": sample.sample_id,
+        "is_approved": request.is_approved
+    }
+
+
+@app.get("/api/samples/extension/list/{protocol_id}")
+def list_extended_samples(protocol_id: str, status: Optional[str] = None,
+                          db: Session = Depends(get_db)):
+    query = db.query(Sample).filter(Sample.protocol_id == protocol_id)
+    
+    if status:
+        query = query.filter(Sample.status == status)
+    else:
+        query = query.filter(Sample.status == "extended")
+    
+    samples = query.all()
+    
+    result = []
+    for sample in samples:
+        test_results = sample.test_results or {}
+        result.append({
+            "sample_id": sample.id,
+            "sample_code": sample.sample_id,
+            "sampling_point": sample.sampling_point,
+            "planned_sampling_date": sample.planned_sampling_date,
+            "actual_sampling_date": sample.actual_sampling_date,
+            "condition": sample.condition,
+            "extension_approved": test_results.get("extension_approved", False),
+            "extension_note": test_results.get("extension_note", ""),
+            "extension_approved_by": test_results.get("extension_approved_by", ""),
+            "extension_approved_at": test_results.get("extension_approved_at", "")
+        })
+    
+    return {
+        "protocol_id": protocol_id,
+        "total": len(result),
+        "samples": result
+    }
+
+
+@app.post("/api/samples/extension/trigger-recalc/{protocol_id}")
+def recalc_extension_reconciliation(protocol_id: str, db: Session = Depends(get_db)):
+    from stability_reconciliation.services.reconciliation_engine import ReconciliationEngine
+    from stability_reconciliation.models.database import ReconciliationRecord
+    
+    extended_samples = db.query(Sample).filter(
+        Sample.protocol_id == protocol_id,
+        Sample.status == "extended"
+    ).all()
+    
+    engine = ReconciliationEngine(db)
+    updated_count = 0
+    
+    for sample in extended_samples:
+        records = db.query(ReconciliationRecord).filter(
+            ReconciliationRecord.sample_id == sample.id
+        ).all()
+        
+        for record in records:
+            engine.recalculate_reconciliation(record.id, {})
+            updated_count += 1
+    
+    return {
+        "message": "Recalculation completed",
+        "protocol_id": protocol_id,
+        "extended_samples_count": len(extended_samples),
+        "updated_records_count": updated_count
+    }
 
 
 if __name__ == "__main__":

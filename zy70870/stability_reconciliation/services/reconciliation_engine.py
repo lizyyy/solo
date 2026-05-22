@@ -46,10 +46,8 @@ class ReconciliationEngine:
         
         return batch_id, reconciliation_records, summary
 
-    def _reconcile_sample(self, sample: Sample, protocol: TestProtocol, 
-                          batch_id: str) -> Tuple[ReconciliationRecord, List[DiscrepancyDetail]]:
-        record_id = f"RECON-{uuid.uuid4().hex[:8].upper()}"
-        
+    def _calculate_sample_discrepancies(self, sample: Sample, protocol: TestProtocol
+                                      ) -> Tuple[List[DiscrepancyDetail], Dict[str, Any], str]:
         discrepancies = []
         
         discrepancies.extend(self._check_sampling_window(sample))
@@ -59,6 +57,14 @@ class ReconciliationEngine:
         status = "discrepancy" if discrepancies else "matched"
         
         calculation_details = self._generate_calculation_details(sample, protocol, discrepancies)
+        
+        return discrepancies, calculation_details, status
+
+    def _reconcile_sample(self, sample: Sample, protocol: TestProtocol, 
+                          batch_id: str) -> Tuple[ReconciliationRecord, List[DiscrepancyDetail]]:
+        record_id = f"RECON-{uuid.uuid4().hex[:8].upper()}"
+        
+        discrepancies, calculation_details, status = self._calculate_sample_discrepancies(sample, protocol)
         
         record = ReconciliationRecord(
             id=record_id,
@@ -193,16 +199,23 @@ class ReconciliationEngine:
     def _check_extension_approval(self, sample: Sample) -> List[DiscrepancyDetail]:
         discrepancies = []
         
-        if sample.status == "extended" and not sample.test_results and "extension_approved" not in sample.test_results:
-            discrepancies.append(DiscrepancyDetail(
-                type="extension_unapproved",
-                source="protocol_compliance",
-                description="样品延期但未找到审批记录",
-                severity="high",
-                evidence={
-                    "sample_status": sample.status
-                }
-            ))
+        if sample.status == "extended":
+            has_approval = False
+            if sample.test_results and isinstance(sample.test_results, dict):
+                has_approval = sample.test_results.get("extension_approved", False)
+            
+            if not has_approval:
+                discrepancies.append(DiscrepancyDetail(
+                    type="extension_unapproved",
+                    source="protocol_compliance",
+                    description="样品延期但未找到审批记录",
+                    severity="high",
+                    evidence={
+                        "sample_status": sample.status,
+                        "has_test_results": sample.test_results is not None,
+                        "extension_approved": has_approval
+                    }
+                ))
         
         return discrepancies
 
@@ -255,13 +268,13 @@ class ReconciliationEngine:
         sample = self.db.query(Sample).filter(Sample.id == record.sample_id).first()
         protocol = self.db.query(TestProtocol).filter(TestProtocol.id == record.protocol_id).first()
         
-        new_record, discrepancies = self._reconcile_sample(sample, protocol, record.reconciliation_batch_id)
+        discrepancies, calculation_details, new_status = self._calculate_sample_discrepancies(sample, protocol)
         
-        record.status = new_record.status
-        record.discrepancy_type = new_record.discrepancy_type
-        record.discrepancy_source = new_record.discrepancy_source
-        record.discrepancy_description = new_record.discrepancy_description
-        record.calculation_details = new_record.calculation_details
+        record.status = new_status
+        record.discrepancy_type = discrepancies[0].type if discrepancies else None
+        record.discrepancy_source = discrepancies[0].source if discrepancies else None
+        record.discrepancy_description = discrepancies[0].description if discrepancies else None
+        record.calculation_details = calculation_details
         record.updated_at = datetime.utcnow()
         
         self.db.commit()

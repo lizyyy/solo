@@ -189,3 +189,24 @@ class TraceRecord(BaseModel):
 class TraceResponse(BaseModel):
     sample_id: str
     trace_path: List[TraceRecord]
+
+
+class ExtensionApprovalRequest(BaseModel):
+    sample_id: str
+    extension_note: str
+    approved_by: str
+    is_approved: bool = True
+
+
+class SampleExtensionResponse(BaseModel):
+    sample_id: str
+    sample_internal_id: str
+    sampling_point: str
+    status: str
+    extension_approved: bool
+    extension_note: Optional[str] = None
+    extension_approved_by: Optional[str] = None
+    extension_approved_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
