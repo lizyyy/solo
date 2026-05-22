@@ -1,5 +1,6 @@
 import pandas as pd
-from typing import List, Dict, Any, Tuple
+import math
+from typing import List, Dict, Any, Tuple, Set
 from datetime import datetime
 from collections import defaultdict
 from models import (
@@ -14,10 +15,30 @@ from models import (
 
 class DataProcessor:
     def __init__(self):
-        self.processed_batches: set = set()
         self.work_orders: Dict[str, WorkOrder] = {}
         self.material_batches: Dict[str, MaterialBatch] = {}
         self.repair_records: List[RepairRecord] = []
+        self._seen_records: Set[str] = set()
+
+    def _is_empty_value(self, value: Any) -> bool:
+        if value is None:
+            return True
+        if isinstance(value, float) and math.isnan(value):
+            return True
+        if isinstance(value, str) and value.strip() == "":
+            return True
+        return False
+
+    def _clean_nan_values(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        cleaned = {}
+        for k, v in data.items():
+            if isinstance(v, float) and math.isnan(v):
+                cleaned[k] = None
+            elif isinstance(v, dict):
+                cleaned[k] = self._clean_nan_values(v)
+            else:
+                cleaned[k] = v
+        return cleaned
 
     def parse_date(self, date_str: str) -> datetime:
         formats = [
@@ -27,6 +48,7 @@ class DataProcessor:
             "%Y/%m/%d",
             "%Y%m%d"
         ]
+        date_str = str(date_str).strip()
         for fmt in formats:
             try:
                 return datetime.strptime(date_str, fmt)
@@ -39,13 +61,18 @@ class DataProcessor:
         errors = []
         for item in data:
             try:
+                end_date_val = item.get("end_date")
+                end_date = None
+                if not self._is_empty_value(end_date_val):
+                    end_date = self.parse_date(str(end_date_val))
+
                 wo = WorkOrder(
                     work_order_id=item["work_order_id"],
                     product_model=item["product_model"],
                     quantity=int(item["quantity"]),
                     production_line=item["production_line"],
                     start_date=self.parse_date(str(item["start_date"])),
-                    end_date=self.parse_date(str(item["end_date"])) if item.get("end_date") else None,
+                    end_date=end_date,
                     status=item.get("status", "active")
                 )
                 self.work_orders[wo.work_order_id] = wo
@@ -77,12 +104,13 @@ class DataProcessor:
         if not station_id or not station_id.strip():
             return False, "工位编号不能为空"
         if not station_id.startswith(("S", "ST", "W")) and not station_id[0].isdigit():
-            return False, "工位编号格式不正确，应以S/ST/W开头或数字"
+            return False, "工位编号格式不正确"
         return True, ""
 
-    def check_batch_duplicate(self, material_batch: str, defect_type: str = None) -> Tuple[bool, str]:
-        if material_batch in self.processed_batches:
-            return True, f"物料批次 {material_batch} 已处理，无法重复提交"
+    def check_duplicate_record(self, material_batch: str, defect_type: str, work_order_id: str) -> Tuple[bool, str]:
+        record_key = f"{material_batch}:{defect_type}:{work_order_id}"
+        if record_key in self._seen_records:
+            return True, f"完全重复的记录（批次{material_batch}，缺陷{defect_type}，工单{work_order_id}）"
         return False, ""
 
     def check_multi_defect(self, material_batch: str, current_defect: str) -> Tuple[bool, str, List[str]]:
@@ -104,70 +132,77 @@ class DataProcessor:
 
     def check_responsibility_station(self, station_id: str) -> Tuple[bool, str]:
         valid_stations = {"S01", "S02", "S03", "S04", "S05", "ST01", "ST02", "W01", "W02"}
-        if station_id not in valid_stations and not station_id.startswith(("S", "ST", "W")):
-            return False, f"工位 {station_id} 不在责任工位列表中，请人工确认"
+        if station_id not in valid_stations:
+            if station_id.startswith(("S", "ST", "W")):
+                return False, f"工位{station_id}不在标准列表中，需确认"
+            return False, f"工位{station_id}格式异常，请人工确认"
         return True, ""
 
     def process_repair_record(self, row: Dict[str, Any]) -> ProcessedItem:
-        raw_data = row.copy()
-        errors = []
+        raw_data = self._clean_nan_values(row.copy())
+        station_errors = []
+        fatal_errors = []
+        warning_msgs = []
         suggestion_parts = []
 
         try:
-            material_batch = str(row.get("material_batch", ""))
+            material_batch = str(row.get("material_batch", "")).strip()
             station_id = str(row.get("station_id", "")).strip()
             work_order_id = str(row.get("work_order_id", "")).strip()
             defect_type = str(row.get("defect_type", "")).strip()
 
-            is_dup, dup_msg = self.check_batch_duplicate(material_batch)
+            is_dup, dup_msg = self.check_duplicate_record(material_batch, defect_type, work_order_id)
             if is_dup:
-                errors.append(dup_msg)
-                suggestion_parts.append("请检查是否重复提交或使用新批次号")
+                fatal_errors.append(dup_msg)
+                suggestion_parts.append("请勿重复提交完全相同的记录")
 
             station_valid, station_msg = self.validate_station_id(station_id)
             if not station_valid:
-                errors.append(station_msg)
-                suggestion_parts.append("请修正工位编号格式")
+                station_errors.append(station_msg)
 
             station_resp, station_resp_msg = self.check_responsibility_station(station_id)
             if not station_resp:
-                errors.append(station_resp_msg)
-                suggestion_parts.append("请联系质量工程师确认工位归属")
+                station_errors.append(station_resp_msg)
 
             is_closed, closed_msg = self.check_repair_closed(work_order_id)
             if is_closed:
-                errors.append(closed_msg)
-                suggestion_parts.append("该工单已完成返修，无需重复录入")
+                fatal_errors.append(closed_msg)
+                suggestion_parts.append("该工单已完成返修闭环")
 
             multi_defect, multi_msg, existing = self.check_multi_defect(material_batch, defect_type)
             if multi_defect:
-                errors.append(multi_msg)
+                warning_msgs.append(multi_msg)
                 suggestion_parts.append(f"建议排查批次质量问题，已有缺陷：{', '.join(existing)}")
 
-            if errors:
-                if "已处理，无法重复提交" in str(errors):
-                    return ProcessedItem(
-                        status=RecordStatus.FAILED,
-                        raw_data=raw_data,
-                        suggestion="; ".join(suggestion_parts),
-                        error_code="BATCH_DUPLICATE"
-                    )
-                elif "工位" in str(errors) and len(errors) == 1:
-                    return ProcessedItem(
-                        status=RecordStatus.PENDING,
-                        raw_data=raw_data,
-                        suggestion="; ".join(suggestion_parts),
-                        error_code="STATION_PENDING"
-                    )
-                else:
-                    return ProcessedItem(
-                        status=RecordStatus.FAILED,
-                        raw_data=raw_data,
-                        suggestion="; ".join(suggestion_parts),
-                        error_code="VALIDATION_FAILED"
-                    )
+            if fatal_errors:
+                return ProcessedItem(
+                    status=RecordStatus.FAILED,
+                    raw_data=raw_data,
+                    suggestion="; ".join(suggestion_parts) if suggestion_parts else "; ".join(fatal_errors),
+                    error_code="FATAL_ERROR"
+                )
 
-            repair_date = self.parse_date(str(row.get("repair_date", datetime.now().isoformat())))
+            if station_errors:
+                suggestion_parts = [f"工位问题：{'; '.join(station_errors)}"]
+                suggestion_parts.append("请联系质量工程师确认工位归属后重新提交")
+                return ProcessedItem(
+                    status=RecordStatus.PENDING,
+                    raw_data=raw_data,
+                    suggestion="; ".join(suggestion_parts),
+                    error_code="STATION_PENDING"
+                )
+
+            repair_date_val = row.get("repair_date", datetime.now().isoformat())
+            repair_date = self.parse_date(str(repair_date_val))
+
+            close_date_val = row.get("close_date")
+            close_date = None
+            if not self._is_empty_value(close_date_val):
+                close_date = self.parse_date(str(close_date_val))
+
+            is_closed_val = row.get("is_closed", False)
+            if isinstance(is_closed_val, str):
+                is_closed_val = is_closed_val.lower() in ("true", "1", "yes")
 
             record = RepairRecord(
                 repair_id=f"R{len(self.repair_records) + 1:06d}",
@@ -177,13 +212,22 @@ class DataProcessor:
                 defect_type=defect_type,
                 repair_date=repair_date,
                 operator=str(row.get("operator", "")),
-                is_closed=bool(row.get("is_closed", False)),
-                close_date=self.parse_date(str(row["close_date"])) if row.get("close_date") else None,
+                is_closed=bool(is_closed_val),
+                close_date=close_date,
                 raw_data=raw_data
             )
 
             self.repair_records.append(record)
-            self.processed_batches.add(material_batch)
+            record_key = f"{material_batch}:{defect_type}:{work_order_id}"
+            self._seen_records.add(record_key)
+
+            if warning_msgs:
+                return ProcessedItem(
+                    status=RecordStatus.NORMAL,
+                    record=record,
+                    raw_data=raw_data,
+                    suggestion="; ".join(warning_msgs)
+                )
 
             return ProcessedItem(
                 status=RecordStatus.NORMAL,
@@ -219,16 +263,18 @@ class DataProcessor:
                 failed_items.append(item)
 
         summary = {
-            "batch_count": len(self.processed_batches),
+            "batch_count": len(set(r.material_batch for r in self.repair_records)),
             "work_order_count": len(self.work_orders),
-            "station_distribution": defaultdict(int),
-            "defect_distribution": defaultdict(int)
+            "station_distribution": {},
+            "defect_distribution": {}
         }
 
         for item in normal_items:
             if item.record:
-                summary["station_distribution"][item.record.station_id] += 1
-                summary["defect_distribution"][item.record.defect_type] += 1
+                sid = item.record.station_id
+                summary["station_distribution"][sid] = summary["station_distribution"].get(sid, 0) + 1
+                did = item.record.defect_type
+                summary["defect_distribution"][did] = summary["defect_distribution"].get(did, 0) + 1
 
         return ProcessResult(
             total_count=len(records),
@@ -238,5 +284,5 @@ class DataProcessor:
             normal_items=normal_items,
             pending_items=pending_items,
             failed_items=failed_items,
-            summary=dict(summary)
+            summary=summary
         )
