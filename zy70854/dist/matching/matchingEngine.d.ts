@@ -7,7 +7,9 @@ export declare class MatchingEngine {
     matchPassengerToDriver(passengerItems: PassengerLostItem[], driverItems: DriverTurnedInItem[], routeSchedules: RouteSchedule[]): MatchRecord[];
     matchDriverToWarehouse(driverItems: DriverTurnedInItem[], warehouseItems: WarehouseItem[], existingMatches: MatchRecord[]): MatchRecord[];
     private findDriverCandidates;
+    private createCandidateFromExactMatch;
     private findWarehouseCandidates;
+    private createWarehouseCandidateFromExactMatch;
     private createMatchRecord;
     private createUnmatchedRecord;
     private isDateMatch;

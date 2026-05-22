@@ -13,7 +13,7 @@ import {
 
 export class MatchingEngine {
   private readonly OVERDUE_DAYS = 90;
-  private readonly MATCH_THRESHOLD = 0.6;
+  private readonly MATCH_THRESHOLD = 0.3;
   private readonly SENSITIVE_KEYWORDS = ['身份证', '护照', '银行卡', '钱包', '手机', '密码', '卡号'];
 
   private fuseOptions: Fuse.IFuseOptions<any> = {
@@ -26,7 +26,7 @@ export class MatchingEngine {
       { name: 'routeNumber', weight: 0.1 },
       { name: 'lostLocation', weight: 0.05 }
     ],
-    threshold: 0.4,
+    threshold: 0.6,
     includeScore: true,
     ignoreLocation: true
   };
@@ -133,6 +133,20 @@ export class MatchingEngine {
     routeSchedules: RouteSchedule[]
   ): MatchCandidate[] {
     const candidates: MatchCandidate[] = [];
+    
+    const exactMatches = driverItems.filter(d => 
+      d.itemName === passenger.itemName && 
+      d.routeNumber === passenger.routeNumber &&
+      this.isDateMatch(passenger.lostDate, d.foundDate)
+    );
+    
+    if (exactMatches.length > 0) {
+      for (const driver of exactMatches) {
+        candidates.push(this.createCandidateFromExactMatch(passenger, driver));
+      }
+      return candidates;
+    }
+    
     const searchResult = driverFuse.search(passenger.itemName + ' ' + passenger.itemDescription);
 
     for (const result of searchResult) {
@@ -201,12 +215,73 @@ export class MatchingEngine {
     return candidates.sort((a, b) => b.matchScore - a.matchScore);
   }
 
+  private createCandidateFromExactMatch(
+    passenger: PassengerLostItem,
+    driver: DriverTurnedInItem
+  ): MatchCandidate {
+    const matchedFields: string[] = ['itemName', 'routeNumber', 'date'];
+    const differences: DifferenceType[] = [];
+    const explanations: string[] = [];
+    let score = 0.95;
+
+    if (passenger.itemCategory === driver.itemCategory) {
+      matchedFields.push('itemCategory');
+      score += 0.02;
+    }
+    if (passenger.itemColor === driver.itemColor) {
+      matchedFields.push('itemColor');
+      score += 0.02;
+    }
+    if (passenger.busNumber && driver.busNumber && passenger.busNumber === driver.busNumber) {
+      matchedFields.push('busNumber');
+      score += 0.01;
+    }
+
+    const isSameName = false;
+    const isOverdue = this.checkOverdue(driver.foundDate);
+    if (isOverdue) {
+      differences.push(DifferenceType.OVERDUE);
+      explanations.push(`逾期警告: 该物品自 ${driver.foundDate} 起已超过 ${this.OVERDUE_DAYS} 天无人认领`);
+    }
+
+    const hasSensitiveInfo = this.checkSensitiveInfo(passenger.itemDescription + ' ' + driver.itemDescription);
+    if (hasSensitiveInfo) {
+      differences.push(DifferenceType.SENSITIVE_INFO);
+      explanations.push(`敏感信息提醒: 该物品描述包含敏感信息,处理时请注意隐私保护`);
+    }
+
+    return {
+      passengerItem: passenger,
+      driverItem: driver,
+      matchScore: Math.min(score, 1),
+      matchedFields,
+      differences,
+      differenceExplanations: explanations,
+      isSameName,
+      isOverdue,
+      hasSensitiveInfo
+    };
+  }
+
   private findWarehouseCandidates(
     driver: DriverTurnedInItem,
     warehouseFuse: Fuse<WarehouseItem>,
     warehouseItems: WarehouseItem[]
   ): MatchCandidate[] {
     const candidates: MatchCandidate[] = [];
+    
+    const exactMatches = warehouseItems.filter(w => 
+      w.itemName === driver.itemName && 
+      w.bagNumber === driver.bagNumber
+    );
+    
+    if (exactMatches.length > 0) {
+      for (const warehouse of exactMatches) {
+        candidates.push(this.createWarehouseCandidateFromExactMatch(driver, warehouse));
+      }
+      return candidates;
+    }
+    
     const searchResult = warehouseFuse.search(driver.itemName + ' ' + driver.itemDescription);
 
     for (const result of searchResult) {
@@ -267,6 +342,50 @@ export class MatchingEngine {
     }
 
     return candidates.sort((a, b) => b.matchScore - a.matchScore);
+  }
+
+  private createWarehouseCandidateFromExactMatch(
+    driver: DriverTurnedInItem,
+    warehouse: WarehouseItem
+  ): MatchCandidate {
+    const matchedFields: string[] = ['itemName', 'bagNumber'];
+    const differences: DifferenceType[] = [];
+    const explanations: string[] = [];
+    let score = 0.95;
+
+    if (driver.itemCategory === warehouse.itemCategory) {
+      matchedFields.push('itemCategory');
+      score += 0.02;
+    }
+    if (driver.itemColor === warehouse.itemColor) {
+      matchedFields.push('itemColor');
+      score += 0.02;
+    }
+
+    const isSameName = false;
+    const isOverdue = this.checkOverdue(warehouse.receiptDate);
+    if (isOverdue) {
+      differences.push(DifferenceType.OVERDUE);
+      explanations.push(`逾期警告: 该物品自 ${warehouse.receiptDate} 起已超过 ${this.OVERDUE_DAYS} 天无人认领`);
+    }
+
+    const hasSensitiveInfo = this.checkSensitiveInfo(driver.itemDescription + ' ' + warehouse.itemDescription);
+    if (hasSensitiveInfo) {
+      differences.push(DifferenceType.SENSITIVE_INFO);
+      explanations.push(`敏感信息提醒: 该物品描述包含敏感信息,处理时请注意隐私保护`);
+    }
+
+    return {
+      driverItem: driver,
+      warehouseItem: warehouse,
+      matchScore: Math.min(score, 1),
+      matchedFields,
+      differences,
+      differenceExplanations: explanations,
+      isSameName,
+      isOverdue,
+      hasSensitiveInfo
+    };
   }
 
   private createMatchRecord(

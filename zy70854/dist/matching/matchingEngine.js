@@ -10,7 +10,7 @@ const types_1 = require("../types");
 class MatchingEngine {
     constructor() {
         this.OVERDUE_DAYS = 90;
-        this.MATCH_THRESHOLD = 0.6;
+        this.MATCH_THRESHOLD = 0.3;
         this.SENSITIVE_KEYWORDS = ['身份证', '护照', '银行卡', '钱包', '手机', '密码', '卡号'];
         this.fuseOptions = {
             keys: [
@@ -22,7 +22,7 @@ class MatchingEngine {
                 { name: 'routeNumber', weight: 0.1 },
                 { name: 'lostLocation', weight: 0.05 }
             ],
-            threshold: 0.4,
+            threshold: 0.6,
             includeScore: true,
             ignoreLocation: true
         };
@@ -92,6 +92,15 @@ class MatchingEngine {
     }
     findDriverCandidates(passenger, driverFuse, driverItems, routeSchedules) {
         const candidates = [];
+        const exactMatches = driverItems.filter(d => d.itemName === passenger.itemName &&
+            d.routeNumber === passenger.routeNumber &&
+            this.isDateMatch(passenger.lostDate, d.foundDate));
+        if (exactMatches.length > 0) {
+            for (const driver of exactMatches) {
+                candidates.push(this.createCandidateFromExactMatch(passenger, driver));
+            }
+            return candidates;
+        }
         const searchResult = driverFuse.search(passenger.itemName + ' ' + passenger.itemDescription);
         for (const result of searchResult) {
             const driver = result.item;
@@ -151,8 +160,56 @@ class MatchingEngine {
         }
         return candidates.sort((a, b) => b.matchScore - a.matchScore);
     }
+    createCandidateFromExactMatch(passenger, driver) {
+        const matchedFields = ['itemName', 'routeNumber', 'date'];
+        const differences = [];
+        const explanations = [];
+        let score = 0.95;
+        if (passenger.itemCategory === driver.itemCategory) {
+            matchedFields.push('itemCategory');
+            score += 0.02;
+        }
+        if (passenger.itemColor === driver.itemColor) {
+            matchedFields.push('itemColor');
+            score += 0.02;
+        }
+        if (passenger.busNumber && driver.busNumber && passenger.busNumber === driver.busNumber) {
+            matchedFields.push('busNumber');
+            score += 0.01;
+        }
+        const isSameName = false;
+        const isOverdue = this.checkOverdue(driver.foundDate);
+        if (isOverdue) {
+            differences.push(types_1.DifferenceType.OVERDUE);
+            explanations.push(`逾期警告: 该物品自 ${driver.foundDate} 起已超过 ${this.OVERDUE_DAYS} 天无人认领`);
+        }
+        const hasSensitiveInfo = this.checkSensitiveInfo(passenger.itemDescription + ' ' + driver.itemDescription);
+        if (hasSensitiveInfo) {
+            differences.push(types_1.DifferenceType.SENSITIVE_INFO);
+            explanations.push(`敏感信息提醒: 该物品描述包含敏感信息,处理时请注意隐私保护`);
+        }
+        return {
+            passengerItem: passenger,
+            driverItem: driver,
+            matchScore: Math.min(score, 1),
+            matchedFields,
+            differences,
+            differenceExplanations: explanations,
+            isSameName,
+            isOverdue,
+            hasSensitiveInfo
+        };
+    }
     findWarehouseCandidates(driver, warehouseFuse, warehouseItems) {
         const candidates = [];
+        const exactMatches = warehouseItems.filter(w => w.itemName === driver.itemName &&
+            w.bagNumber === driver.bagNumber);
+        if (exactMatches.length > 0) {
+            for (const warehouse of exactMatches) {
+                candidates.push(this.createWarehouseCandidateFromExactMatch(driver, warehouse));
+            }
+            return candidates;
+        }
         const searchResult = warehouseFuse.search(driver.itemName + ' ' + driver.itemDescription);
         for (const result of searchResult) {
             const warehouse = result.item;
@@ -203,6 +260,42 @@ class MatchingEngine {
             });
         }
         return candidates.sort((a, b) => b.matchScore - a.matchScore);
+    }
+    createWarehouseCandidateFromExactMatch(driver, warehouse) {
+        const matchedFields = ['itemName', 'bagNumber'];
+        const differences = [];
+        const explanations = [];
+        let score = 0.95;
+        if (driver.itemCategory === warehouse.itemCategory) {
+            matchedFields.push('itemCategory');
+            score += 0.02;
+        }
+        if (driver.itemColor === warehouse.itemColor) {
+            matchedFields.push('itemColor');
+            score += 0.02;
+        }
+        const isSameName = false;
+        const isOverdue = this.checkOverdue(warehouse.receiptDate);
+        if (isOverdue) {
+            differences.push(types_1.DifferenceType.OVERDUE);
+            explanations.push(`逾期警告: 该物品自 ${warehouse.receiptDate} 起已超过 ${this.OVERDUE_DAYS} 天无人认领`);
+        }
+        const hasSensitiveInfo = this.checkSensitiveInfo(driver.itemDescription + ' ' + warehouse.itemDescription);
+        if (hasSensitiveInfo) {
+            differences.push(types_1.DifferenceType.SENSITIVE_INFO);
+            explanations.push(`敏感信息提醒: 该物品描述包含敏感信息,处理时请注意隐私保护`);
+        }
+        return {
+            driverItem: driver,
+            warehouseItem: warehouse,
+            matchScore: Math.min(score, 1),
+            matchedFields,
+            differences,
+            differenceExplanations: explanations,
+            isSameName,
+            isOverdue,
+            hasSensitiveInfo
+        };
     }
     createMatchRecord(passengerItemId, driverItemId, warehouseItemId, candidate) {
         const now = new Date().toISOString();
