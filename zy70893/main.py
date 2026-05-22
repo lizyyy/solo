@@ -1,6 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
-from typing import List, Dict, Any
+from typing import Dict, Any
 import json
 from models import ProcessResult
 from processor import DataProcessor
@@ -24,7 +23,8 @@ async def root():
             "POST /upload/work-order": "上传工单JSON",
             "POST /upload/material-batch": "上传物料批次JSON",
             "POST /process": "直接提交JSON数据处理",
-            "GET /stats": "获取当前处理统计"
+            "GET /stats": "获取当前处理统计",
+            "POST /reset": "重置处理器"
         }
     }
 
@@ -106,8 +106,9 @@ async def process_data(data: Dict[str, Any]):
 
 @app.get("/stats")
 async def get_stats():
+    processed_batches = set(r.material_batch for r in processor.repair_records)
     return {
-        "processed_batches": len(processor.processed_batches),
+        "processed_batches": len(processed_batches),
         "work_orders_count": len(processor.work_orders),
         "material_batches_count": len(processor.material_batches),
         "repair_records_count": len(processor.repair_records)
