@@ -18,7 +18,7 @@ class DataProcessor:
         self.work_orders: Dict[str, WorkOrder] = {}
         self.material_batches: Dict[str, MaterialBatch] = {}
         self.repair_records: List[RepairRecord] = []
-        self._seen_records: Set[str] = set()
+        self.processed_batches: Set[str] = set()
 
     def _is_empty_value(self, value: Any) -> bool:
         if value is None:
@@ -107,19 +107,13 @@ class DataProcessor:
             return False, "工位编号格式不正确"
         return True, ""
 
-    def check_duplicate_record(self, material_batch: str, defect_type: str, work_order_id: str) -> Tuple[bool, str]:
-        record_key = f"{material_batch}:{defect_type}:{work_order_id}"
-        if record_key in self._seen_records:
-            return True, f"完全重复的记录（批次{material_batch}，缺陷{defect_type}，工单{work_order_id}）"
+    def check_batch_duplicate(self, material_batch: str) -> Tuple[bool, str]:
+        if material_batch in self.processed_batches:
+            return True, f"物料批次 {material_batch} 已处理，无法重复提交"
         return False, ""
 
-    def check_multi_defect(self, material_batch: str, current_defect: str) -> Tuple[bool, str, List[str]]:
-        batch_defects = defaultdict(set)
-        for record in self.repair_records:
-            if record.material_batch == material_batch:
-                batch_defects[material_batch].add(record.defect_type)
-
-        existing_defects = list(batch_defects.get(material_batch, set()))
+    def check_multi_defect(self, material_batch: str, current_defect: str, current_batch_defects: Set[str]) -> Tuple[bool, str, List[str]]:
+        existing_defects = list(current_batch_defects - {current_defect})
         if len(existing_defects) >= 3:
             return True, f"该批次已存在{len(existing_defects)}种缺陷，超过阈值", existing_defects
         return False, "", existing_defects
@@ -138,7 +132,7 @@ class DataProcessor:
             return False, f"工位{station_id}格式异常，请人工确认"
         return True, ""
 
-    def process_repair_record(self, row: Dict[str, Any]) -> ProcessedItem:
+    def process_repair_record(self, row: Dict[str, Any], current_batch_defects: Dict[str, Set[str]]) -> ProcessedItem:
         raw_data = self._clean_nan_values(row.copy())
         station_errors = []
         fatal_errors = []
@@ -151,10 +145,10 @@ class DataProcessor:
             work_order_id = str(row.get("work_order_id", "")).strip()
             defect_type = str(row.get("defect_type", "")).strip()
 
-            is_dup, dup_msg = self.check_duplicate_record(material_batch, defect_type, work_order_id)
+            is_dup, dup_msg = self.check_batch_duplicate(material_batch)
             if is_dup:
                 fatal_errors.append(dup_msg)
-                suggestion_parts.append("请勿重复提交完全相同的记录")
+                suggestion_parts.append("该批次已处理过，请检查是否重复提交")
 
             station_valid, station_msg = self.validate_station_id(station_id)
             if not station_valid:
@@ -169,7 +163,12 @@ class DataProcessor:
                 fatal_errors.append(closed_msg)
                 suggestion_parts.append("该工单已完成返修闭环")
 
-            multi_defect, multi_msg, existing = self.check_multi_defect(material_batch, defect_type)
+            if material_batch not in current_batch_defects:
+                current_batch_defects[material_batch] = set()
+            current_batch_defects[material_batch].add(defect_type)
+            multi_defect, multi_msg, existing = self.check_multi_defect(
+                material_batch, defect_type, current_batch_defects[material_batch]
+            )
             if multi_defect:
                 warning_msgs.append(multi_msg)
                 suggestion_parts.append(f"建议排查批次质量问题，已有缺陷：{', '.join(existing)}")
@@ -179,7 +178,7 @@ class DataProcessor:
                     status=RecordStatus.FAILED,
                     raw_data=raw_data,
                     suggestion="; ".join(suggestion_parts) if suggestion_parts else "; ".join(fatal_errors),
-                    error_code="FATAL_ERROR"
+                    error_code="BATCH_DUPLICATE"
                 )
 
             if station_errors:
@@ -218,8 +217,7 @@ class DataProcessor:
             )
 
             self.repair_records.append(record)
-            record_key = f"{material_batch}:{defect_type}:{work_order_id}"
-            self._seen_records.add(record_key)
+            self.processed_batches.add(material_batch)
 
             if warning_msgs:
                 return ProcessedItem(
@@ -252,9 +250,10 @@ class DataProcessor:
         normal_items = []
         pending_items = []
         failed_items = []
+        current_batch_defects: Dict[str, Set[str]] = {}
 
         for row in records:
-            item = self.process_repair_record(row)
+            item = self.process_repair_record(row, current_batch_defects)
             if item.status == RecordStatus.NORMAL:
                 normal_items.append(item)
             elif item.status == RecordStatus.PENDING:
@@ -263,7 +262,7 @@ class DataProcessor:
                 failed_items.append(item)
 
         summary = {
-            "batch_count": len(set(r.material_batch for r in self.repair_records)),
+            "batch_count": len(self.processed_batches),
             "work_order_count": len(self.work_orders),
             "station_distribution": {},
             "defect_distribution": {}
