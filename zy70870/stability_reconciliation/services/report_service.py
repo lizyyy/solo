@@ -38,7 +38,7 @@ class ReportService:
         if report_type == "detailed":
             file_path = self._generate_detailed_excel(records, samples, protocol, reconciliation_batch_id)
         elif report_type == "json":
-            file_path = self._generate_json_report(records, samples, protocol, reconciliation_batch_id)
+            file_path = self._generate_json_report(records, samples, protocol, reconciliation_batch_id, summary_data)
         else:
             file_path = self._generate_summary_excel(records, samples, protocol, reconciliation_batch_id)
         
@@ -206,7 +206,7 @@ class ReportService:
 
     def _generate_json_report(self, records: List[ReconciliationRecord],
                              samples: List[Sample], protocol: TestProtocol,
-                             batch_id: str) -> str:
+                             batch_id: str, summary_data: Dict[str, Any]) -> str:
         file_path = f"{self.report_dir}/reconciliation_report_{batch_id}.json"
         
         report_data = {
@@ -218,13 +218,7 @@ class ReportService:
             },
             "reconciliation_batch": batch_id,
             "generated_at": datetime.utcnow().isoformat(),
-            "summary": {
-                "total_samples": len(samples),
-                "total_records": len(records),
-                "matched": sum(1 for r in records if r.status == "matched"),
-                "discrepancy": sum(1 for r in records if r.status == "discrepancy"),
-                "resolved": sum(1 for r in records if r.is_resolved)
-            },
+            "summary": summary_data.get("summary_statistics", {}),
             "samples": [],
             "reconciliation_records": []
         }

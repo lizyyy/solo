@@ -436,6 +436,123 @@ def test_report_summary_sync_after_review():
     return all_pass
 
 
+def test_download_file_sync_after_review():
+    """测试复核后下载的文件数据同步"""
+    print("\n测试7: 复核后下载的文件数据同步...")
+    
+    import json
+    import os
+    
+    db = SessionLocal()
+    
+    protocol = TestProtocol(
+        id=f"PROTO-TEST-{uuid.uuid4().hex[:6].upper()}",
+        protocol_name="测试方案",
+        product_name="测试产品",
+        batch_number="BATCH-001",
+        conditions={},
+        sampling_points=[],
+        status="active"
+    )
+    db.add(protocol)
+    
+    for i in range(3):
+        sample = Sample(
+            id=f"SAMP-TEST-{uuid.uuid4().hex[:6].upper()}",
+            protocol_id=protocol.id,
+            sample_id=f"S00{i+1}",
+            sampling_point=f"{i*3}月",
+            planned_sampling_date=datetime.now() + timedelta(days=i*90),
+            actual_sampling_date=datetime.now() + timedelta(days=i*90 + (10 if i > 0 else 0)),
+            condition="25°C/60%RH",
+            storage_location="箱体A",
+            status="extended" if i > 0 else "imported",
+            test_results={"extension_approved": False} if i > 0 else {}
+        )
+        db.add(sample)
+    
+    db.commit()
+    
+    engine = ReconciliationEngine(db)
+    batch_id, records, summary = engine.run_reconciliation(protocol.id)
+    
+    print(f"  对账批次: {batch_id}")
+    
+    from stability_reconciliation.services.report_service import ReportService
+    report_service = ReportService(db)
+    report = report_service.generate_reconciliation_report(
+        protocol_id=protocol.id,
+        reconciliation_batch_id=batch_id,
+        report_type="json",
+        generated_by="QA001"
+    )
+    
+    print(f"  生成报告: {report.file_path}")
+    
+    with open(report.file_path, 'r', encoding='utf-8') as f:
+        initial_data = json.load(f)
+    
+    initial_file_resolved = initial_data['summary']['resolved_records']
+    initial_file_pending = initial_data['summary']['pending_review']
+    initial_record_resolved = initial_data['reconciliation_records'][0]['is_resolved']
+    
+    print(f"  初始JSON文件 - resolved: {initial_file_resolved}, pending: {initial_file_pending}")
+    print(f"  初始JSON文件 - 第1条记录is_resolved: {initial_record_resolved}")
+    
+    assert initial_file_resolved == 0, f"初始resolved应该为0，实际是{initial_file_resolved}"
+    assert initial_record_resolved == False, "初始记录is_resolved应该为False"
+    
+    review_service = ReviewService(db)
+    
+    record_to_review = records[0]
+    print(f"  复核记录: {record_to_review.id}")
+    
+    review_service.review_reconciliation(
+        reconciliation_id=record_to_review.id,
+        review_comment="已确认差异，正常审批流程",
+        is_resolved=True,
+        resolution_note="符合延期审批流程",
+        reviewer="QA001"
+    )
+    
+    with open(report.file_path, 'r', encoding='utf-8') as f:
+        final_data = json.load(f)
+    
+    final_file_resolved = final_data['summary']['resolved_records']
+    final_file_pending = final_data['summary']['pending_review']
+    final_record_resolved = final_data['reconciliation_records'][0]['is_resolved']
+    
+    print(f"  复核后JSON文件 - resolved: {final_file_resolved}, pending: {final_file_pending}")
+    print(f"  复核后JSON文件 - 第1条记录is_resolved: {final_record_resolved}")
+    
+    all_pass = True
+    
+    if final_file_resolved == 1:
+        print("  ✓ JSON文件resolved_records正确更新为1")
+    else:
+        print(f"  ✗ JSON文件resolved_records错误: {final_file_resolved} (预期1)")
+        all_pass = False
+    
+    if final_file_pending == 2:
+        print("  ✓ JSON文件pending_review正确更新为2")
+    else:
+        print(f"  ✗ JSON文件pending_review错误: {final_file_pending} (预期2)")
+        all_pass = False
+    
+    if final_record_resolved == True:
+        print("  ✓ JSON文件中记录is_resolved正确更新为True")
+    else:
+        print(f"  ✗ JSON文件中记录is_resolved错误: {final_record_resolved} (预期True)")
+        all_pass = False
+    
+    if all_pass:
+        print("  ✓ 测试通过! 复核后下载的文件数据正确同步")
+    
+    db.rollback()
+    db.close()
+    return all_pass
+
+
 if __name__ == "__main__":
     print("=" * 60)
     print("开始测试修复...")
@@ -450,6 +567,7 @@ if __name__ == "__main__":
     results.append(("完整对账流程", test_full_workflow()))
     results.append(("空值延期字段不被误判", test_extension_approved_empty_field_bug()))
     results.append(("复核后报告汇总同步", test_report_summary_sync_after_review()))
+    results.append(("复核后下载文件同步", test_download_file_sync_after_review()))
     
     print("\n" + "=" * 60)
     print("测试总结:")

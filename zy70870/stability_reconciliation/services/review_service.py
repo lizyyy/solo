@@ -109,6 +109,7 @@ class ReviewService:
     def _sync_related_data(self, record: ReconciliationRecord):
         from sqlalchemy.orm.attributes import flag_modified
         from stability_reconciliation.models.database import ReconciliationRecord as RR
+        from stability_reconciliation.models.database import TestProtocol, Sample
         
         reports = self.db.query(Report).filter(
             Report.reconciliation_batch_id == record.reconciliation_batch_id
@@ -159,8 +160,187 @@ class ReviewService:
             report.summary_data["last_updated"] = datetime.utcnow().isoformat()
             
             flag_modified(report, "summary_data")
+            
+            protocol = self.db.query(TestProtocol).filter(
+                TestProtocol.id == report.protocol_id
+            ).first()
+            samples = self.db.query(Sample).filter(
+                Sample.protocol_id == report.protocol_id
+            ).all()
+            
+            self._regenerate_report_file(report, all_records, samples, protocol)
         
         self.db.commit()
+    
+    def _regenerate_report_file(self, report: Report, records: list,
+                                samples: list, protocol: "TestProtocol"):
+        import json
+        import pandas as pd
+        import os
+        
+        if not os.path.exists(report.file_path):
+            return
+        
+        file_ext = os.path.splitext(report.file_path)[1].lower()
+        
+        if file_ext == '.json':
+            self._regenerate_json_report(report, records, samples, protocol)
+        elif file_ext in ['.xlsx', '.xls']:
+            if 'detailed' in report.file_path:
+                self._regenerate_detailed_excel(report, records, samples, protocol)
+            else:
+                self._regenerate_summary_excel(report, records, samples, protocol)
+    
+    def _regenerate_json_report(self, report: Report, records: list,
+                                 samples: list, protocol: "TestProtocol"):
+        import json
+        
+        summary_stats = report.summary_data.get("summary_statistics", {})
+        
+        report_data = {
+            "protocol_info": {
+                "id": protocol.id,
+                "name": protocol.protocol_name,
+                "product": protocol.product_name,
+                "batch_number": protocol.batch_number
+            },
+            "reconciliation_batch": report.reconciliation_batch_id,
+            "generated_at": datetime.utcnow().isoformat(),
+            "summary": summary_stats,
+            "samples": [],
+            "reconciliation_records": []
+        }
+        
+        for sample in samples:
+            report_data["samples"].append({
+                "id": sample.id,
+                "sample_id": sample.sample_id,
+                "sampling_point": sample.sampling_point,
+                "planned_sampling_date": sample.planned_sampling_date.isoformat() if sample.planned_sampling_date else None,
+                "actual_sampling_date": sample.actual_sampling_date.isoformat() if sample.actual_sampling_date else None,
+                "condition": sample.condition,
+                "storage_location": sample.storage_location
+            })
+        
+        for record in records:
+            report_data["reconciliation_records"].append({
+                "id": record.id,
+                "sample_id": record.sample_id,
+                "status": record.status,
+                "discrepancy_type": record.discrepancy_type,
+                "discrepancy_source": record.discrepancy_source,
+                "discrepancy_description": record.discrepancy_description,
+                "is_resolved": record.is_resolved,
+                "resolution_note": record.resolution_note,
+                "resolved_by": record.resolved_by,
+                "resolved_at": record.resolved_at.isoformat() if record.resolved_at else None,
+                "calculation_details": record.calculation_details
+            })
+        
+        with open(report.file_path, 'w', encoding='utf-8') as f:
+            json.dump(report_data, f, ensure_ascii=False, indent=2)
+    
+    def _regenerate_summary_excel(self, report: Report, records: list,
+                                   samples: list, protocol: "TestProtocol"):
+        import pandas as pd
+        
+        writer = pd.ExcelWriter(report.file_path, engine='xlsxwriter')
+        
+        summary_stats = report.summary_data.get("summary_statistics", {})
+        summary_df = pd.DataFrame([{
+            "项目": protocol.protocol_name,
+            "产品": protocol.product_name,
+            "批次号": protocol.batch_number,
+            "对账批次": report.reconciliation_batch_id,
+            "样品总数": summary_stats.get("total_records", len(samples)),
+            "匹配数": summary_stats.get("matched_records", 0),
+            "差异数": summary_stats.get("discrepancy_records", 0),
+            "已解决": summary_stats.get("resolved_records", 0),
+            "待审核": summary_stats.get("pending_review", 0),
+            "生成时间": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        }])
+        summary_df.to_excel(writer, sheet_name="汇总", index=False)
+        
+        sample_data = []
+        for sample in samples:
+            record = next((r for r in records if r.sample_id == sample.id), None)
+            sample_data.append({
+                "样品ID": sample.sample_id,
+                "取样点": sample.sampling_point,
+                "计划取样日期": sample.planned_sampling_date.strftime("%Y-%m-%d") if sample.planned_sampling_date else "",
+                "实际取样日期": sample.actual_sampling_date.strftime("%Y-%m-%d") if sample.actual_sampling_date else "",
+                "存储条件": sample.condition,
+                "箱体位置": sample.storage_location,
+                "对账状态": record.status if record else "未对账",
+                "差异类型": record.discrepancy_type if record else "",
+                "是否解决": "是" if record and record.is_resolved else "否"
+            })
+        
+        pd.DataFrame(sample_data).to_excel(writer, sheet_name="样品列表", index=False)
+        
+        writer.close()
+    
+    def _regenerate_detailed_excel(self, report: Report, records: list,
+                                     samples: list, protocol: "TestProtocol"):
+        import pandas as pd
+        
+        writer = pd.ExcelWriter(report.file_path, engine='xlsxwriter')
+        
+        summary_stats = report.summary_data.get("summary_statistics", {})
+        summary_df = pd.DataFrame([{
+            "项目": protocol.protocol_name,
+            "产品": protocol.product_name,
+            "批次号": protocol.batch_number,
+            "对账批次": report.reconciliation_batch_id,
+            "样品总数": summary_stats.get("total_records", len(samples)),
+            "匹配数": summary_stats.get("matched_records", 0),
+            "差异数": summary_stats.get("discrepancy_records", 0),
+            "已解决": summary_stats.get("resolved_records", 0),
+            "待审核": summary_stats.get("pending_review", 0),
+            "生成时间": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        }])
+        summary_df.to_excel(writer, sheet_name="汇总", index=False)
+        
+        discrepancy_data = []
+        for record in records:
+            if record.status == "discrepancy" or record.is_resolved:
+                sample = next((s for s in samples if s.id == record.sample_id), None)
+                calc_details = record.calculation_details or {}
+                
+                discrepancy_data.append({
+                    "对账记录ID": record.id,
+                    "样品ID": sample.sample_id if sample else "",
+                    "取样点": sample.sampling_point if sample else "",
+                    "差异类型": record.discrepancy_type,
+                    "差异来源": record.discrepancy_source,
+                    "差异描述": record.discrepancy_description,
+                    "是否解决": "是" if record.is_resolved else "否",
+                    "解决说明": record.resolution_note or "",
+                    "解决人": record.resolved_by or "",
+                    "解决时间": record.resolved_at.strftime("%Y-%m-%d %H:%M:%S") if record.resolved_at else "",
+                    "有效性评估": calc_details.get("validity_assessment", "")
+                })
+        
+        pd.DataFrame(discrepancy_data).to_excel(writer, sheet_name="差异详情", index=False)
+        
+        review_data = []
+        for record in records:
+            if record.review_comments:
+                sample = next((s for s in samples if s.id == record.sample_id), None)
+                for comment in record.review_comments:
+                    review_data.append({
+                        "对账记录ID": record.id,
+                        "样品ID": sample.sample_id if sample else "",
+                        "评论内容": comment.get("comment", ""),
+                        "评论人": comment.get("reviewer", ""),
+                        "评论时间": comment.get("timestamp", ""),
+                        "是否解决": "是" if comment.get("is_resolved") else "否"
+                    })
+        
+        if review_data:
+            pd.DataFrame(review_data).to_excel(writer, sheet_name="审核记录", index=False)
+        
+        writer.close()
 
     def _trigger_recalculation_for_sample(self, sample_id: str):
         from stability_reconciliation.services.reconciliation_engine import ReconciliationEngine
