@@ -108,6 +108,7 @@ class Database:
                 washing_quantity INTEGER NOT NULL,
                 recovery_quantity INTEGER NOT NULL,
                 damage_quantity INTEGER NOT NULL,
+                lost_quantity INTEGER DEFAULT 0,
                 shortage_quantity INTEGER NOT NULL,
                 duplicate_quantity INTEGER DEFAULT 0,
                 duplicate_amount REAL DEFAULT 0,

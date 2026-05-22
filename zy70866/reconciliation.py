@@ -122,8 +122,8 @@ class ReconciliationEngine:
             recovery_quantity = recovery['total_recovery']
             damage_quantity = recovery['damaged_quantity']
             lost_quantity = recovery['lost_quantity']
-            shortage_from_washing = max(0, washing_quantity - recovery_quantity)
-            shortage_quantity = shortage_from_washing + lost_quantity
+            gap_quantity = max(0, washing_quantity - recovery_quantity)
+            shortage_quantity = gap_quantity + lost_quantity
             duplicate_quantity = duplicate.get('total_duplicate_quantity', 0)
             duplicate_amount = duplicate.get('total_duplicate_amount', 0)
             unit_price = washing['unit_price'] if washing['unit_price'] > 0 else 0
@@ -136,6 +136,7 @@ class ReconciliationEngine:
                 'recovery_quantity': recovery_quantity,
                 'damage_quantity': damage_quantity,
                 'lost_quantity': lost_quantity,
+                'gap_quantity': gap_quantity,
                 'shortage_quantity': shortage_quantity,
                 'duplicate_quantity': duplicate_quantity,
                 'duplicate_amount': duplicate_amount,
@@ -205,15 +206,15 @@ class ReconciliationEngine:
             cursor.execute(
                 '''INSERT INTO reconciliation_details 
                    (batch_id, linen_type, washing_quantity, recovery_quantity, damage_quantity,
-                    shortage_quantity, unit_price, washing_amount, shortage_compensation,
+                    lost_quantity, shortage_quantity, unit_price, washing_amount, shortage_compensation,
                     damage_compensation, final_amount, status, discrepancy_type, discrepancy_reason,
                     duplicate_quantity, duplicate_amount)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                 (batch_id, linen_type, data['washing_quantity'], data['recovery_quantity'],
-                 data['damage_quantity'], data['shortage_quantity'], data['unit_price'],
-                 data['washing_amount'], data['shortage_compensation'], data['damage_compensation'],
-                 data['final_amount'], status, discrepancy_type, discrepancy_reason,
-                 data['duplicate_quantity'], data['duplicate_amount'])
+                 data['damage_quantity'], data['lost_quantity'], data['shortage_quantity'],
+                 data['unit_price'], data['washing_amount'], data['shortage_compensation'],
+                 data['damage_compensation'], data['final_amount'], status, discrepancy_type,
+                 discrepancy_reason, data['duplicate_quantity'], data['duplicate_amount'])
             )
             detail_id = cursor.lastrowid
             if discrepancy_type:
@@ -247,13 +248,20 @@ class ReconciliationEngine:
 
     def _create_discrepancy_logs(self, cursor, detail_id: int, linen_type: str, data: Dict):
         if data['shortage_quantity'] > 0:
-            lost_note = f"（含回收单丢失{data.get('lost_quantity', 0)}件）" if data.get('lost_quantity', 0) > 0 else ""
+            gap_qty = data.get('gap_quantity', data['shortage_quantity'] - data.get('lost_quantity', 0))
+            lost_qty = data.get('lost_quantity', 0)
+            parts = []
+            if gap_qty > 0:
+                parts.append(f"送洗-回收缺口{gap_qty}件")
+            if lost_qty > 0:
+                parts.append(f"回收单丢失{lost_qty}件")
+            detail_note = f"（{', '.join(parts)}）" if parts else ""
             cursor.execute(
                 '''INSERT INTO discrepancy_logs 
                    (detail_id, discrepancy_type, description, expected_value, actual_value, difference)
                    VALUES (?, ?, ?, ?, ?, ?)''',
                 (detail_id, DiscrepancyType.SHORTAGE.value,
-                 f"{linen_type}短少{data['shortage_quantity']}件{lost_note}，应赔付{data['shortage_compensation']:.2f}元",
+                 f"{linen_type}短少{data['shortage_quantity']}件{detail_note}，应赔付{data['shortage_compensation']:.2f}元",
                  data['washing_quantity'], data['recovery_quantity'], data['shortage_quantity'])
             )
         if data['damage_quantity'] > 0:

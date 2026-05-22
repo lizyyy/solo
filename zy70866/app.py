@@ -186,6 +186,7 @@ def revise_detail(detail_id):
         washing_quantity=data.get('washing_quantity'),
         recovery_quantity=data.get('recovery_quantity'),
         damage_quantity=data.get('damage_quantity'),
+        lost_quantity=data.get('lost_quantity'),
         shortage_quantity=data.get('shortage_quantity'),
         duplicate_quantity=data.get('duplicate_quantity'),
         duplicate_amount=data.get('duplicate_amount'),
