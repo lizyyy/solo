@@ -66,6 +66,7 @@ async function initSampleData() {
       handedOverBy: '王五',
       firstSignature: '',
       secondSignature: 'sign004',
+      errorNumber: 'ERR-001535-001',
       issues: [
         {
           type: 'amount_mismatch',
@@ -110,6 +111,7 @@ async function initSampleData() {
       handedOverBy: '赵六',
       firstSignature: 'sign005',
       secondSignature: 'sign006',
+      errorNumber: 'ERR-001535-002',
       issues: [
         {
           type: 'cross_day_transfer',
@@ -158,8 +160,8 @@ async function initSampleData() {
   console.log('');
   console.log('样例说明：');
   console.log('- 柜员张三 (T001) - 尾箱 CASH-001：记录正常，待处理');
-  console.log('- 柜员李四 (T002) - 尾箱 CASH-002：金额差异-500元，缺少签名，已退回修改');
-  console.log('- 柜员王五 (T003) - 尾箱 CASH-003：跨日交接，主管已确认放行');
+  console.log('- 柜员李四 (T002) - 尾箱 CASH-002：差错编号 ERR-001535-001，金额差异-500元 + 缺少签名，已退回修改');
+  console.log('- 柜员王五 (T003) - 尾箱 CASH-003：差错编号 ERR-001535-002，跨日交接，主管已确认放行');
 }
 
 initSampleData().catch(console.error);

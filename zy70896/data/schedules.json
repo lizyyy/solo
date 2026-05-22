@@ -1,0 +1,30 @@
+[
+  {
+    "tellerId": "T001",
+    "date": "2024-01-15",
+    "shift": "morning",
+    "supervisorId": "S001",
+    "supervisorName": "王主管"
+  },
+  {
+    "tellerId": "T002",
+    "date": "2024-01-15",
+    "shift": "afternoon",
+    "supervisorId": "S001",
+    "supervisorName": "王主管"
+  },
+  {
+    "tellerId": "T003",
+    "date": "2024-01-15",
+    "shift": "full",
+    "supervisorId": "S002",
+    "supervisorName": "李主管"
+  },
+  {
+    "tellerId": "T001",
+    "date": "2024-01-16",
+    "shift": "full",
+    "supervisorId": "S001",
+    "supervisorName": "王主管"
+  }
+]

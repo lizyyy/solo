@@ -1,0 +1,114 @@
+[
+  {
+    "id": "37243b85-c1a6-49a5-983a-d7a0c47e04e2",
+    "batchId": "sample-batch-001",
+    "tellerId": "T001",
+    "tellerName": "张三",
+    "cashBoxId": "CASH-001",
+    "transferDate": "2024-01-15",
+    "transferTime": "08:30:00",
+    "previousAmount": 50000,
+    "currentAmount": 50000,
+    "difference": 0,
+    "receivedBy": "张三",
+    "handedOverBy": "李四",
+    "firstSignature": "sign001",
+    "secondSignature": "sign002",
+    "issues": [],
+    "status": "pending",
+    "processingHistory": [
+      {
+        "status": "pending",
+        "handledBy": "system",
+        "handledAt": "2026-05-22T15:00:01.745Z"
+      }
+    ],
+    "createdAt": "2026-05-22T15:00:01.745Z",
+    "updatedAt": "2026-05-22T15:00:01.745Z"
+  },
+  {
+    "id": "5563f89a-e74b-49b9-bc3b-75314c049b6a",
+    "batchId": "sample-batch-001",
+    "tellerId": "T002",
+    "tellerName": "李四",
+    "cashBoxId": "CASH-002",
+    "transferDate": "2024-01-15",
+    "transferTime": "08:35:00",
+    "previousAmount": 45000,
+    "currentAmount": 44500,
+    "difference": -500,
+    "receivedBy": "李四",
+    "handedOverBy": "王五",
+    "firstSignature": "",
+    "secondSignature": "sign004",
+    "errorNumber": "ERR-001535-001",
+    "issues": [
+      {
+        "type": "amount_mismatch",
+        "description": "金额差异 -500.00 元，需要核实",
+        "detectedAt": "2026-05-22T15:00:01.745Z"
+      },
+      {
+        "type": "missing_signature",
+        "description": "缺少双签确认，请补充签名",
+        "detectedAt": "2026-05-22T15:00:01.745Z"
+      }
+    ],
+    "status": "needs_review",
+    "processingHistory": [
+      {
+        "status": "needs_review",
+        "handledBy": "system",
+        "handledAt": "2026-05-22T15:00:01.745Z"
+      },
+      {
+        "status": "returned",
+        "handledBy": "S001",
+        "handledAt": "2026-05-22T14:00:01.745Z",
+        "comment": "金额不符，请重新核对现金"
+      }
+    ],
+    "createdAt": "2026-05-22T15:00:01.745Z",
+    "updatedAt": "2026-05-22T15:00:01.745Z"
+  },
+  {
+    "id": "b8cb002f-6a42-4074-8462-f13f5b0133a9",
+    "batchId": "sample-batch-001",
+    "tellerId": "T003",
+    "tellerName": "王五",
+    "cashBoxId": "CASH-003",
+    "transferDate": "2024-01-14",
+    "transferTime": "17:00:00",
+    "previousAmount": 62000,
+    "currentAmount": 62000,
+    "difference": 0,
+    "receivedBy": "王五",
+    "handedOverBy": "赵六",
+    "firstSignature": "sign005",
+    "secondSignature": "sign006",
+    "errorNumber": "ERR-001535-002",
+    "issues": [
+      {
+        "type": "cross_day_transfer",
+        "description": "跨日交接记录，请确认排班信息",
+        "detectedAt": "2026-05-22T15:00:01.745Z"
+      }
+    ],
+    "status": "processed",
+    "processingHistory": [
+      {
+        "status": "needs_review",
+        "handledBy": "system",
+        "handledAt": "2026-05-22T15:00:01.745Z"
+      },
+      {
+        "status": "processed",
+        "handledBy": "S002",
+        "handledAt": "2026-05-22T14:30:01.745Z",
+        "comment": "已确认，特殊情况加班交接"
+      }
+    ],
+    "createdAt": "2026-05-22T15:00:01.745Z",
+    "updatedAt": "2026-05-22T15:00:01.745Z"
+  }
+]

@@ -12,7 +12,7 @@ import {
   ScheduleEntry,
   Teller
 } from '../types';
-import * as csvParser from 'csv-parser';
+import csvParser from 'csv-parser';
 import * as stream from 'stream';
 import { Readable } from 'stream';
 import { Parser } from 'json2csv';
@@ -67,7 +67,7 @@ export class TransferService {
 
       bufferStream
         .pipe(csvParser())
-        .on('data', (row) => {
+        .on('data', (row: Record<string, string>) => {
           const teller = tellers.find(t => t.tellerId === row.tellerId);
           const now = new Date().toISOString();
           
@@ -76,7 +76,7 @@ export class TransferService {
           const difference = currentAmount - previousAmount;
 
           const partialRecord: Partial<TransferRecord> = {
-            tellerId: row.tellerId,
+            tellerId: row.tellerId || '',
             tellerName: teller?.name || row.tellerName || '',
             cashBoxId: teller?.cashBoxId || row.cashBoxId || '',
             transferDate: row.transferDate,
@@ -91,15 +91,28 @@ export class TransferService {
           };
 
           const issues = this.detectIssues(partialRecord, schedules);
+          const hasIssues = issues.length > 0;
 
           const record: TransferRecord = {
             id: uuidv4(),
             batchId,
-            ...partialRecord,
+            tellerId: partialRecord.tellerId || '',
+            tellerName: partialRecord.tellerName || '',
+            cashBoxId: partialRecord.cashBoxId || '',
+            transferDate: partialRecord.transferDate || '',
+            transferTime: partialRecord.transferTime || '',
+            previousAmount: partialRecord.previousAmount || 0,
+            currentAmount: partialRecord.currentAmount || 0,
+            difference: partialRecord.difference || 0,
+            receivedBy: partialRecord.receivedBy || '',
+            handedOverBy: partialRecord.handedOverBy || '',
+            firstSignature: partialRecord.firstSignature || '',
+            secondSignature: partialRecord.secondSignature || '',
             issues,
-            status: issues.length > 0 ? RecordStatus.NEEDS_REVIEW : RecordStatus.PENDING,
+            errorNumber: hasIssues ? this.generateErrorNumber() : undefined,
+            status: hasIssues ? RecordStatus.NEEDS_REVIEW : RecordStatus.PENDING,
             processingHistory: [{
-              status: issues.length > 0 ? RecordStatus.NEEDS_REVIEW : RecordStatus.PENDING,
+              status: hasIssues ? RecordStatus.NEEDS_REVIEW : RecordStatus.PENDING,
               handledBy: 'system',
               handledAt: now
             }],
