@@ -56,9 +56,9 @@ class DataStore {
     return Array.from(this.tenantContracts.values());
   }
 
-  addTemperatureZone(zone: Omit<TemperatureZone, 'id'>): TemperatureZone {
-    const id = uuidv4();
-    const newZone = { ...zone, id };
+  addTemperatureZone(zone: Omit<TemperatureZone, 'id'> & { id?: string }): TemperatureZone {
+    const id = zone.id || uuidv4();
+    const newZone = { ...zone, id } as TemperatureZone;
     this.temperatureZones.set(id, newZone);
     return newZone;
   }

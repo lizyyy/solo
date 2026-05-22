@@ -1,31 +1,45 @@
-import csv from 'csv-parser';
-import { Readable } from 'stream';
 import { MeterReading, TenantContract, TemperatureZone, MultiplierChange } from '../types';
 import { dataStore } from '../store/dataStore';
 import moment from 'moment';
 
 export class DataImportService {
   async parseMeterCSV(fileBuffer: Buffer, sourceFileName: string): Promise<{ readings: Omit<MeterReading, 'id'>[]; errors: string[] }> {
-    const results: any[] = [];
     const errors: string[] = [];
     const readings: Omit<MeterReading, 'id'>[] = [];
 
     return new Promise((resolve) => {
-      const stream = Readable.from(fileBuffer.toString());
-      stream
-        .pipe(csv({ headers: true }))
-        .on('data', (data: any) => results.push(data))
-        .on('end', () => {
-          results.forEach((row, index) => {
-            try {
-              const reading = this.parseMeterRow(row, sourceFileName);
-              readings.push(reading);
-            } catch (e: any) {
-              errors.push(`行 ${index + 2}: ${e.message}`);
-            }
+      let content = fileBuffer.toString('utf8');
+      content = content.replace(/^\uFEFF/, '');
+
+      const lines = content.split(/\r?\n/).filter(line => line.trim());
+      if (lines.length < 2) {
+        resolve({ readings: [], errors: ['CSV文件为空或格式错误'] });
+        return;
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+
+      for (let i = 1; i < lines.length; i++) {
+        try {
+          const values = lines[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+          if (values.length !== headers.length) {
+            errors.push(`行 ${i + 1}: 列数不匹配`);
+            continue;
+          }
+
+          const row: any = {};
+          headers.forEach((header, index) => {
+            row[header] = values[index];
           });
-          resolve({ readings, errors });
-        });
+
+          const reading = this.parseMeterRow(row, sourceFileName);
+          readings.push(reading);
+        } catch (e: any) {
+          errors.push(`行 ${i + 1}: ${e.message}`);
+        }
+      }
+
+      resolve({ readings, errors });
     });
   }
 
@@ -128,14 +142,13 @@ export class DataImportService {
   async importZones(zonesData: any[]): Promise<TemperatureZone[]> {
     const zones: TemperatureZone[] = [];
     for (const zoneData of zonesData) {
-      const zone = await this.validateZoneData(zoneData);
-      const { id, ...zoneWithoutId } = zone;
-      zones.push(dataStore.addTemperatureZone(zoneWithoutId));
+      const zone = this.validateZoneData(zoneData);
+      zones.push(dataStore.addTemperatureZone(zone));
     }
     return zones;
   }
 
-  private async validateZoneData(data: any): Promise<TemperatureZone> {
+  private validateZoneData(data: any): Omit<TemperatureZone, 'id'> & { id?: string } {
     const requiredFields = ['name', 'type', 'targetTemp', 'multiplier', 'isVacant'];
     for (const field of requiredFields) {
       if (data[field] === undefined) {
@@ -148,8 +161,7 @@ export class DataImportService {
       throw new Error(`温区类型无效，必须是: ${validTypes.join(', ')}`);
     }
 
-    return {
-      id: '',
+    const result: Omit<TemperatureZone, 'id'> & { id?: string } = {
       name: data.name.trim(),
       type: data.type,
       targetTemp: parseFloat(data.targetTemp),
@@ -158,6 +170,12 @@ export class DataImportService {
       isVacant: data.isVacant === true || data.isVacant === 'true',
       vacantStartDate: data.vacantStartDate ? moment(data.vacantStartDate).toDate() : undefined,
     };
+
+    if (data.id) {
+      result.id = data.id.trim();
+    }
+
+    return result;
   }
 
   async importMultiplierChanges(changesData: any[]): Promise<MultiplierChange[]> {
