@@ -126,9 +126,10 @@ def update_electricity_detail(
     detail_id: int,
     detail_update: schemas.ElectricityDetailUpdate,
     modified_by: Optional[str] = "system",
+    change_reason: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
-    db_detail = crud.update_electricity_detail(db, detail_id=detail_id, detail_update=detail_update, modified_by=modified_by)
+    db_detail = crud.update_electricity_detail(db, detail_id=detail_id, detail_update=detail_update, modified_by=modified_by, change_reason=change_reason)
     if db_detail is None:
         raise HTTPException(status_code=404, detail="明细不存在")
     return db_detail
@@ -153,7 +154,8 @@ def modify_conclusion(
         db,
         detail_id=detail_id,
         detail_update=detail_update,
-        modified_by=request.modified_by
+        modified_by=request.modified_by,
+        change_reason=request.change_reason
     )
 
 

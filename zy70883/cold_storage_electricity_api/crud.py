@@ -135,12 +135,14 @@ def get_electricity_details_by_batch(db: Session, batch_id: int, category: DataC
     return query.all()
 
 
-def update_electricity_detail(db: Session, detail_id: int, detail_update: ElectricityDetailUpdate, modified_by: str = None):
+def update_electricity_detail(db: Session, detail_id: int, detail_update: ElectricityDetailUpdate, modified_by: str = None, change_reason: str = None):
     db_detail = get_electricity_detail(db, detail_id)
     if not db_detail:
         return None
     
     update_data = detail_update.model_dump(exclude_unset=True)
+    
+    previous_category = db_detail.category if 'category' in update_data else None
     
     for field, new_value in update_data.items():
         old_value = getattr(db_detail, field)
@@ -152,7 +154,7 @@ def update_electricity_detail(db: Session, detail_id: int, detail_update: Electr
                 old_value=str(old_value),
                 new_value=str(new_value),
                 modified_by=modified_by or "system",
-                change_reason=update_data.get("category_reason", "更新数据")
+                change_reason=change_reason or "更新数据"
             )
     
     for key, value in update_data.items():
@@ -167,7 +169,7 @@ def update_electricity_detail(db: Session, detail_id: int, detail_update: Electr
             action=ProcessingAction.MODIFY_CONCLUSION,
             operator=modified_by or "system",
             remark=update_data.get("category_reason", ""),
-            previous_category=db_detail.category,
+            previous_category=previous_category,
             new_category=update_data['category']
         )
     

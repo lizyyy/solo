@@ -157,15 +157,16 @@ def test_get_traces(detail_id):
         print(f"连接失败: {e}")
 
 
-def test_modify_conclusion(detail_id):
+def test_modify_conclusion(detail_id, expected_old_category):
     """测试修改分类结论"""
     print(f"\n=== 测试修改明细 {detail_id} 的分类结论 ===")
     url = f"{BASE_URL}/api/electricity-details/{detail_id}/modify-conclusion"
+    expected_change_reason = "联系抄表员确认，读数顺序写反了"
     data = {
         "new_category": "normal",
         "category_reason": "人工审核通过，读数异常为抄表顺序错误，已核实",
         "modified_by": "张主管",
-        "change_reason": "联系抄表员确认，读数顺序写反了"
+        "change_reason": expected_change_reason
     }
     
     try:
@@ -175,8 +176,88 @@ def test_modify_conclusion(detail_id):
             result = response.json()
             print(f"修改成功! 新分类: {result['category']}")
             print(f"原因: {result['category_reason']}")
+            return True
     except Exception as e:
         print(f"连接失败: {e}")
+    return False
+
+
+def verify_audit_logs(detail_id, expected_change_reason):
+    """验证审计日志的正确性"""
+    print(f"\n=== 验证明细 {detail_id} 的审计日志 ===")
+    url = f"{BASE_URL}/api/electricity-details/{detail_id}/audit-logs"
+    
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            logs = response.json()
+            print(f"获取到 {len(logs)} 条审计记录")
+            
+            category_logs = [log for log in logs if log['field_name'] == 'category']
+            if category_logs:
+                latest_log = category_logs[0]
+                actual_reason = latest_log['change_reason']
+                
+                print(f"\n  字段: {latest_log['field_name']}")
+                print(f"  修改人: {latest_log['modified_by']}")
+                print(f"  旧值: {latest_log['old_value']}")
+                print(f"  新值: {latest_log['new_value']}")
+                print(f"  修改原因: {actual_reason}")
+                
+                if actual_reason == expected_change_reason:
+                    print(f"\n  ✅ 审计日志验证通过! change_reason 正确")
+                    return True
+                else:
+                    print(f"\n  ❌ 审计日志验证失败!")
+                    print(f"     期望: {expected_change_reason}")
+                    print(f"     实际: {actual_reason}")
+                    return False
+            else:
+                print("  未找到 category 字段的修改记录")
+    except Exception as e:
+        print(f"连接失败: {e}")
+    return False
+
+
+def verify_processing_traces(detail_id, expected_old_category, expected_new_category):
+    """验证处理轨迹中前后分类的正确性"""
+    print(f"\n=== 验证明细 {detail_id} 的处理轨迹 ===")
+    url = f"{BASE_URL}/api/electricity-details/{detail_id}/traces"
+    
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            traces = response.json()
+            print(f"获取到 {len(traces)} 条轨迹")
+            
+            modify_traces = [t for t in traces if t['action'] == 'modify_conclusion']
+            if modify_traces:
+                latest_trace = modify_traces[0]
+                
+                print(f"\n  操作: {latest_trace['action']}")
+                print(f"  操作人: {latest_trace['operator']}")
+                print(f"  修改前分类: {latest_trace['previous_category']}")
+                print(f"  修改后分类: {latest_trace['new_category']}")
+                print(f"  备注: {latest_trace['remark']}")
+                
+                old_ok = latest_trace['previous_category'] == expected_old_category
+                new_ok = latest_trace['new_category'] == expected_new_category
+                
+                if old_ok and new_ok:
+                    print(f"\n  ✅ 处理轨迹验证通过! 前后分类正确")
+                    return True
+                else:
+                    print(f"\n  ❌ 处理轨迹验证失败!")
+                    if not old_ok:
+                        print(f"     修改前分类 - 期望: {expected_old_category}, 实际: {latest_trace['previous_category']}")
+                    if not new_ok:
+                        print(f"     修改后分类 - 期望: {expected_new_category}, 实际: {latest_trace['new_category']}")
+                    return False
+            else:
+                print("  未找到 modify_conclusion 操作记录")
+    except Exception as e:
+        print(f"连接失败: {e}")
+    return False
 
 
 def test_get_audit_logs(detail_id):
@@ -262,8 +343,29 @@ def main():
         test_get_traces(detail_ids[0])
         
         if len(detail_ids) >= 3:
-            test_modify_conclusion(detail_ids[2])
-            test_get_audit_logs(detail_ids[2])
+            blocked_detail_id = detail_ids[2]
+            expected_old_category = "blocked"
+            expected_new_category = "normal"
+            expected_change_reason = "联系抄表员确认，读数顺序写反了"
+            
+            modify_success = test_modify_conclusion(blocked_detail_id, expected_old_category)
+            
+            if modify_success:
+                print("\n" + "-" * 50)
+                print("开始验证修复效果")
+                print("-" * 50)
+                
+                audit_ok = verify_audit_logs(blocked_detail_id, expected_change_reason)
+                trace_ok = verify_processing_traces(blocked_detail_id, expected_old_category, expected_new_category)
+                
+                print("\n" + "-" * 50)
+                if audit_ok and trace_ok:
+                    print("✅ 所有修复验证通过!")
+                else:
+                    print("❌ 部分修复验证失败!")
+                print("-" * 50)
+            
+            test_get_audit_logs(blocked_detail_id)
     
     test_archive_batch(batch_id)
     
