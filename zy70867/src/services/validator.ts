@@ -200,6 +200,11 @@ function mapToErrorCode(joiType: string): ErrorCode {
 
 function validateDateLogic(data: ReconciliationSubmitRequest): ErrorDetail[] {
   const errors: ErrorDetail[] = [];
+  
+  if (!data.submitDate || !data.washDate || !data.returnDate) {
+    return errors;
+  }
+  
   const submitDate = new Date(data.submitDate);
   const washDate = new Date(data.washDate);
   const returnDate = new Date(data.returnDate);
@@ -226,7 +231,14 @@ function validateDateLogic(data: ReconciliationSubmitRequest): ErrorDetail[] {
 function validateQuantityLogic(data: ReconciliationSubmitRequest): ErrorDetail[] {
   const errors: ErrorDetail[] = [];
 
+  if (!data.roomStandards || !Array.isArray(data.roomStandards)) {
+    return errors;
+  }
+
   data.roomStandards.forEach((roomStandard, roomIndex) => {
+    if (!roomStandard.linenItems || !Array.isArray(roomStandard.linenItems)) {
+      return;
+    }
     roomStandard.linenItems.forEach((item, itemIndex) => {
       const totalExpected = item.sendQuantity;
       const totalActual = item.returnQuantity + item.damagedQuantity;

@@ -110,4 +110,26 @@ describe('Validator Service', () => {
     expect(result.errors[0].rowIndex).toBe(0);
     expect(result.errors[0].field).toContain('roomStandards');
   });
+
+  test('缺少roomStandards应该返回待补充状态而不抛错', () => {
+    const data = { ...validData } as any;
+    delete data.roomStandards;
+    
+    expect(() => {
+      const result = validateRequest(data);
+      expect(result.processingStatus).toBe(ProcessingStatus.PENDING_SUPPLEMENT);
+      expect(result.errors.length).toBeGreaterThan(0);
+    }).not.toThrow();
+  });
+
+  test('日期字段缺失时应该返回待补充状态而不抛错', () => {
+    const data = { ...validData } as any;
+    delete data.washDate;
+    
+    expect(() => {
+      const result = validateRequest(data);
+      expect(result.processingStatus).toBe(ProcessingStatus.PENDING_SUPPLEMENT);
+      expect(result.errors.length).toBeGreaterThan(0);
+    }).not.toThrow();
+  });
 });

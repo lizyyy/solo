@@ -54,15 +54,15 @@ export async function submitReconciliation(
 
   const record: ReconciliationRecord = {
     id: recordId,
-    batchId: data.batchId,
-    hotelId: data.hotelId,
-    hotelName: data.hotelName,
-    submitDate: data.submitDate,
-    washDate: data.washDate,
-    returnDate: data.returnDate,
-    handler: data.handler,
-    roomStandards: data.roomStandards,
-    billingItems: data.billingItems,
+    batchId: data.batchId || '',
+    hotelId: data.hotelId || '',
+    hotelName: data.hotelName || '',
+    submitDate: data.submitDate || now,
+    washDate: data.washDate || now,
+    returnDate: data.returnDate || now,
+    handler: data.handler || '',
+    roomStandards: data.roomStandards || [],
+    billingItems: data.billingItems || [],
     processingStatus: validation.processingStatus,
     statusReason: validation.statusReason,
     errorDetails: validation.errors,
@@ -252,23 +252,72 @@ export async function generateExportData(recordId: string): Promise<ExportRecord
   const exportRecords: ExportRecord[] = [];
 
   const linenTotalSendMap = new Map<string, number>();
+  const linenRoomItemsMap = new Map<string, Array<{roomType: string; sendQuantity: number; index: number}>>();
+  
+  let itemIndex = 0;
   record.roomStandards.forEach(roomStandard => {
     roomStandard.linenItems.forEach(item => {
       const current = linenTotalSendMap.get(item.linenType) || 0;
       linenTotalSendMap.set(item.linenType, current + item.sendQuantity);
+      
+      if (!linenRoomItemsMap.has(item.linenType)) {
+        linenRoomItemsMap.set(item.linenType, []);
+      }
+      linenRoomItemsMap.get(item.linenType)!.push({
+        roomType: roomStandard.roomType,
+        sendQuantity: item.sendQuantity,
+        index: itemIndex
+      });
+      itemIndex++;
     });
   });
 
+  const allocatedQuantities = new Map<number, number>();
+  const allocatedAmounts = new Map<number, number>();
+
+  linenRoomItemsMap.forEach((roomItems, linenType) => {
+    const billingItem = record.billingItems.find(b => b.linenType === linenType);
+    if (!billingItem || roomItems.length === 0) {
+      roomItems.forEach(item => {
+        allocatedQuantities.set(item.index, 0);
+        allocatedAmounts.set(item.index, 0);
+      });
+      return;
+    }
+
+    const totalSend = linenTotalSendMap.get(linenType) || 0;
+    if (totalSend === 0) {
+      roomItems.forEach(item => {
+        allocatedQuantities.set(item.index, 0);
+        allocatedAmounts.set(item.index, 0);
+      });
+      return;
+    }
+
+    let allocatedQtySum = 0;
+    let allocatedAmtSum = 0;
+    
+    roomItems.forEach((item, idx) => {
+      const ratio = item.sendQuantity / totalSend;
+      if (idx < roomItems.length - 1) {
+        const qty = Math.floor(billingItem.billedQuantity * ratio);
+        const amt = Math.floor(billingItem.billedAmount * ratio * 100) / 100;
+        allocatedQuantities.set(item.index, qty);
+        allocatedAmounts.set(item.index, amt);
+        allocatedQtySum += qty;
+        allocatedAmtSum += amt;
+      } else {
+        const qty = billingItem.billedQuantity - allocatedQtySum;
+        const amt = Number((billingItem.billedAmount - allocatedAmtSum).toFixed(2));
+        allocatedQuantities.set(item.index, qty);
+        allocatedAmounts.set(item.index, amt);
+      }
+    });
+  });
+
+  itemIndex = 0;
   record.roomStandards.forEach(roomStandard => {
     roomStandard.linenItems.forEach(item => {
-      const billingItem = record.billingItems.find(b => b.linenType === item.linenType);
-      const linenStats = statistics.byLinenType.find(l => l.linenType === item.linenType);
-      const totalSendForLinen = linenTotalSendMap.get(item.linenType) || 1;
-      
-      const allocationRatio = totalSendForLinen > 0 ? item.sendQuantity / totalSendForLinen : 0;
-      const allocatedBilledQuantity = billingItem ? Math.round(billingItem.billedQuantity * allocationRatio) : 0;
-      const allocatedBilledAmount = billingItem ? Number((billingItem.billedAmount * allocationRatio).toFixed(2)) : 0;
-
       exportRecords.push({
         batchId: record.batchId,
         hotelName: record.hotelName,
@@ -280,12 +329,13 @@ export async function generateExportData(recordId: string): Promise<ExportRecord
         returnQuantity: item.returnQuantity,
         damagedQuantity: item.damagedQuantity,
         damageCompensation: item.damageCompensation,
-        billedQuantity: allocatedBilledQuantity,
-        billedAmount: allocatedBilledAmount,
+        billedQuantity: allocatedQuantities.get(itemIndex) || 0,
+        billedAmount: allocatedAmounts.get(itemIndex) || 0,
         discrepancy: item.returnQuantity + item.damagedQuantity - item.sendQuantity,
         processingStatus: record.processingStatus,
         statusReason: record.statusReason
       });
+      itemIndex++;
     });
   });
 
