@@ -44,6 +44,18 @@ ProcessHistory.belongsTo(RepairRecord, {
   as: 'repairRecord'
 });
 
+ProcessHistory.belongsTo(Defect, {
+  foreignKey: 'recordId',
+  constraints: false,
+  as: 'defect'
+});
+
+ProcessHistory.belongsTo(Batch, {
+  foreignKey: 'recordId',
+  constraints: false,
+  as: 'batch'
+});
+
 module.exports = {
   sequelize,
   Batch,

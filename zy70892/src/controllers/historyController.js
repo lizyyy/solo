@@ -3,7 +3,10 @@ const HistoryService = require('../services/historyService');
 class HistoryController {
   static async getHistories(req, res) {
     try {
-      const { page = 1, pageSize = 20, operator, action, recordId } = req.query;
+      const { 
+        page = 1, pageSize = 20, operator, action, recordId,
+        workstation, defectType, batchNo, startDate, endDate
+      } = req.query;
 
       if (recordId) {
         const histories = await HistoryService.getHistoriesByRecordId(recordId);
@@ -14,7 +17,12 @@ class HistoryController {
         page: parseInt(page),
         pageSize: parseInt(pageSize),
         operator,
-        action
+        action,
+        workstation,
+        defectType,
+        batchNo,
+        startDate,
+        endDate
       });
 
       res.json({

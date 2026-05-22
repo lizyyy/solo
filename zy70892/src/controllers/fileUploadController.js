@@ -57,6 +57,31 @@ class FileUploadController {
             remark: row.备注 || ''
           });
 
+          if (row.缺陷类型 || row.defectType) {
+            const defectType = row.缺陷类型 || row.defectType || '未知类型';
+            const defectCode = row.缺陷编码 || row.defectCode || `DEF${Date.now()}${i}`;
+            const severity = row.严重程度 || row.severity || 'minor';
+            const description = row.缺陷描述 || row.description || defectType;
+
+            await Defect.create({
+              repairRecordId: repairRecord.id,
+              batchId,
+              workOrderId,
+              defectCode,
+              defectType,
+              description,
+              severity,
+              workstation: row.返修工位 || row.workstation || 'unknown',
+              responsibleStation: row.责任工位 || '',
+              discoveredBy: row.操作员 || 'system',
+              discoveredAt: new Date(),
+              rootCause: row.根本原因 || '',
+              causeAnalysis: row.原因分析 || '',
+              status: 'open',
+              remark: `CSV导入生成 - ${defectType}`
+            });
+          }
+
           await HistoryService.addHistory(
             repairRecord.id,
             'CSV导入创建',
@@ -216,9 +241,9 @@ class FileUploadController {
 
       if (type === 'repair') {
         template = [
-          ['批次号', '工单号', '产品序列号', '返修工位', '责任工位', '操作员', '缺陷描述', '根本原因', '处理方案', '使用物料', '返修耗时', '处理人', '状态', '备注'].join(','),
-          ['BATCH001', 'WO001', 'SN001', 'WS01', 'WS02', '张三', '外观划痕', '操作不当', '打磨抛光', '砂纸', '30', '李四', 'pending', '示例数据'].join(','),
-          ['BATCH002', 'WO002', 'SN002', 'WS02', 'WS01', '王五', '尺寸超差', '设备问题', '返工重做', '', '60', '赵六', 'processing', '示例数据'].join(',')
+          ['批次号', '工单号', '产品序列号', '返修工位', '责任工位', '操作员', '缺陷类型', '缺陷编码', '严重程度', '缺陷描述', '根本原因', '处理方案', '使用物料', '返修耗时', '处理人', '状态', '备注'].join(','),
+          ['BATCH001', 'WO001', 'SN001', 'WS01', 'WS02', '张三', '外观缺陷', 'DEF001', 'minor', '表面划痕', '操作不当', '打磨抛光', '砂纸', '30', '李四', 'pending', '示例数据'].join(','),
+          ['BATCH002', 'WO002', 'SN002', 'WS02', 'WS01', '王五', '尺寸超差', 'DEF002', 'major', '尺寸不合格', '设备问题', '返工重做', '', '60', '赵六', 'processing', '示例数据'].join(',')
         ].join('\n');
       } else if (type === 'workorder') {
         template = [

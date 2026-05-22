@@ -62,11 +62,12 @@ class RepairController {
     try {
       const {
         page = 1, pageSize = 20, recordNo, workstation, responsibleStation,
-        status, isClosed, batchNo, startDate, endDate
+        status, isClosed, batchNo, startDate, endDate, defectType
       } = req.query;
 
       const where = {};
       const batchWhere = {};
+      const defectWhere = {};
 
       if (recordNo) where.recordNo = { [Op.like]: `%${recordNo}%` };
       if (workstation) where.workstation = workstation;
@@ -77,6 +78,7 @@ class RepairController {
       if (startDate && endDate) {
         where.createdAt = { [Op.between]: [new Date(startDate), new Date(endDate)] };
       }
+      if (defectType) defectWhere.defectType = { [Op.like]: `%${defectType}%` };
 
       const result = await RepairRecord.findAndCountAll({
         where,
@@ -86,8 +88,14 @@ class RepairController {
         include: [
           { association: 'batch', where: batchWhere, required: Object.keys(batchWhere).length > 0 },
           { association: 'workOrder' },
-          { association: 'defects', attributes: ['id', 'defectCode', 'defectType'] }
-        ]
+          { 
+            association: 'defects', 
+            attributes: ['id', 'defectCode', 'defectType'],
+            where: Object.keys(defectWhere).length > 0 ? defectWhere : undefined,
+            required: Object.keys(defectWhere).length > 0
+          }
+        ],
+        distinct: true
       });
 
       res.json({
@@ -313,13 +321,15 @@ class RepairController {
   static async exportRecords(req, res) {
     try {
       const {
-        workstation, responsibleStation, status, isClosed,
-        batchNo, startDate, endDate
+        recordNo, workstation, responsibleStation, status, isClosed,
+        batchNo, startDate, endDate, defectType
       } = req.query;
 
       const where = {};
       const batchWhere = {};
+      const defectWhere = {};
 
+      if (recordNo) where.recordNo = { [Op.like]: `%${recordNo}%` };
       if (workstation) where.workstation = workstation;
       if (responsibleStation) where.responsibleStation = responsibleStation;
       if (status) where.status = status;
@@ -328,14 +338,22 @@ class RepairController {
       if (startDate && endDate) {
         where.createdAt = { [Op.between]: [new Date(startDate), new Date(endDate)] };
       }
+      if (defectType) defectWhere.defectType = { [Op.like]: `%${defectType}%` };
 
       const records = await RepairRecord.findAll({
         where,
         order: [['createdAt', 'DESC']],
         include: [
           { association: 'batch', where: batchWhere, required: Object.keys(batchWhere).length > 0 },
-          { association: 'workOrder' }
-        ]
+          { association: 'workOrder' },
+          { 
+            association: 'defects', 
+            attributes: ['id', 'defectCode', 'defectType'],
+            where: Object.keys(defectWhere).length > 0 ? defectWhere : undefined,
+            required: Object.keys(defectWhere).length > 0
+          }
+        ],
+        distinct: true
       });
 
       const exportData = records.map(r => ({
