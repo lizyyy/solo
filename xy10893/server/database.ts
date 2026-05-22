@@ -37,6 +37,7 @@ export async function initDB(): Promise<Database> {
       source TEXT NOT NULL,
       hash TEXT NOT NULL,
       fileSize INTEGER NOT NULL,
+      content TEXT NOT NULL,
       createdAt TEXT NOT NULL,
       FOREIGN KEY (disputeId) REFERENCES disputes(id)
     );
@@ -69,6 +70,17 @@ export function generateHash(content: string): string {
   return crypto.createHash('sha256').update(content).digest('hex');
 }
 
+export async function validateEvidenceHashes(evidences: Evidence[]): Promise<string[]> {
+  const mismatchIds: string[] = [];
+  for (const ev of evidences) {
+    const currentHash = generateHash(ev.content);
+    if (currentHash !== ev.hash) {
+      mismatchIds.push(ev.id);
+    }
+  }
+  return mismatchIds;
+}
+
 export async function createDispute(orderId: string, customerName: string): Promise<Dispute> {
   const db = await initDB();
   const now = new Date().toISOString();
@@ -96,11 +108,11 @@ export async function addEvidence(
   const fileSize = Buffer.byteLength(content, 'utf8');
 
   await db.run(
-    'INSERT INTO evidences (id, disputeId, type, name, source, hash, fileSize, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    [id, disputeId, type, name, source, hash, fileSize, now]
+    'INSERT INTO evidences (id, disputeId, type, name, source, hash, fileSize, content, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [id, disputeId, type, name, source, hash, fileSize, content, now]
   );
 
-  return { id, disputeId, type, name, source, hash, fileSize, createdAt: now };
+  return { id, disputeId, type, name, source, hash, fileSize, content, createdAt: now };
 }
 
 export async function getDisputes(): Promise<Dispute[]> {

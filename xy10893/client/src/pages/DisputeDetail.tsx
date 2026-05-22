@@ -48,14 +48,7 @@ export default function DisputeDetail() {
         .then(data => {
           setData(data)
           setSelectedEvidences(data.evidences.map((e: Evidence) => e.id))
-          
-          const mismatched = new Set<string>()
-          data.evidences.forEach((ev: Evidence) => {
-            if (ev.hash.startsWith('00000000')) {
-              mismatched.add(ev.id)
-            }
-          })
-          setHashMismatchIds(mismatched)
+          setHashMismatchIds(new Set(data.validation.hashMismatch))
           
           setLoading(false)
         })

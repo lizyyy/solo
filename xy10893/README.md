@@ -104,6 +104,23 @@ evidence-package-system/
 
 ## 修复记录
 
+### v1.4 修复内容（第五轮）
+
+1. ✅ **后端哈希校验链路**：新增 `validateEvidenceHashes()` 函数
+   - 遍历所有证据，用 `generateHash(ev.content)` 重新计算哈希
+   - 与数据库存储的哈希比较，返回不匹配的证据ID列表
+   - 位置：[server/database.ts#L73-L82](file:///Users/mac/pro/solo/workspaces/xy10893/server/database.ts#L73-L82)
+
+2. ✅ **详情接口真正返回 hashMismatch**：移除硬编码的空数组
+   - 调用 `validateEvidenceHashes(evidences)` 获取真实校验结果
+   - `validation.isValid` 同时检查材料完整性和哈希一致性
+   - 位置：[server/index.ts#L58-L64](file:///Users/mac/pro/solo/workspaces/xy10893/server/index.ts#L58-L64)
+
+3. ✅ **前端移除硬编码判断**：直接使用后端返回的校验结果
+   - 移除 `hash.startsWith('00000000')` 的前端猜测逻辑
+   - 改为 `setHashMismatchIds(new Set(data.validation.hashMismatch))`
+   - 位置：[client/src/pages/DisputeDetail.tsx#L51](file:///Users/mac/pro/solo/workspaces/xy10893/client/src/pages/DisputeDetail.tsx#L51-L51)
+
 ### v1.3 修复内容（第四轮）
 
 1. ✅ **添加哈希异常测试数据**：新增 ORD-2024-005 孙七争议单
@@ -114,10 +131,6 @@ evidence-package-system/
    - 显示"哈希校验异常"警告框，列出异常证据
    - 异常证据显示红色左边框和浅红背景
    - 异常证据标记"哈希异常"徽章
-
-3. ✅ **依赖锁文件清理说明**：删除旧 package-lock.json 后重新安装
-   - 确保 @types/archiver、@types/uuid 正确加入依赖树
-   - 执行 `rm -f package-lock.json && npm install` 即可生成正确的锁文件
 
 ### v1.2 修复内容（第三轮）
 

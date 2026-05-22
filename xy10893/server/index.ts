@@ -17,7 +17,8 @@ import {
   seedTestData,
   generateHash,
   generateBatchZip,
-  getEvidence
+  getEvidence,
+  validateEvidenceHashes
 } from './database';
 import { ValidationResult, Evidence, ExportBatch } from '../shared/types';
 
@@ -54,11 +55,12 @@ app.get('/api/disputes/:id', async (req, res) => {
     
     const existingTypes = evidences.map(e => e.type);
     const missingTypes = REQUIRED_EVIDENCE_TYPES.filter(t => !existingTypes.includes(t));
+    const hashMismatch = await validateEvidenceHashes(evidences);
     
     const validation: ValidationResult = {
-      isValid: missingTypes.length === 0,
+      isValid: missingTypes.length === 0 && hashMismatch.length === 0,
       missingEvidence: missingTypes,
-      hashMismatch: []
+      hashMismatch
     };
 
     res.json({
