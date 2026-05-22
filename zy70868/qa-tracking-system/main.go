@@ -61,6 +61,8 @@ func main() {
 
 		nodes := api.Group("/nodes")
 		{
+			nodes.POST("", handlers.CreateSampleNode)
+			nodes.POST("/import", handlers.ImportSampleNodesCSV)
 			nodes.GET("", handlers.ListSampleNodes)
 			nodes.GET("/:node_id/trace", handlers.TraceSampleNode)
 		}

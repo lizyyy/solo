@@ -5,6 +5,7 @@ import (
 	"qa-tracking-system/services"
 	"qa-tracking-system/utils"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -211,4 +212,90 @@ func ImportChamberRecords(c *gin.Context) {
 		"count":   len(chamberRecords),
 		"data":    chamberRecords,
 	})
+}
+
+func ImportSampleNodesCSV(c *gin.Context) {
+	file, _, err := c.Request.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "请上传CSV文件"})
+		return
+	}
+	defer file.Close()
+
+	sampleID, _ := strconv.Atoi(c.PostForm("sample_id"))
+
+	records, err := utils.ParseCSV(file)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	nodes, err := services.ImportSampleNodes(uint(sampleID), records)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "导入成功",
+		"count":   len(nodes),
+		"data":    nodes,
+	})
+}
+
+type CreateSampleNodeRequest struct {
+	SampleID       uint   `json:"sample_id" binding:"required"`
+	NodeID         string `json:"node_id" binding:"required"`
+	ParentNodeID   string `json:"parent_node_id"`
+	NodeName       string `json:"node_name" binding:"required"`
+	NodeType       string `json:"node_type" binding:"required"`
+	Status         string `json:"status" binding:"required"`
+	Operator       string `json:"operator" binding:"required"`
+	SamplingWindow string `json:"sampling_window"`
+	ActualTime     string `json:"actual_time"`
+	Remark         string `json:"remark"`
+}
+
+func CreateSampleNode(c *gin.Context) {
+	var req CreateSampleNodeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var samplingWindow, actualTime *time.Time
+	if req.SamplingWindow != "" {
+		if t, err := utils.ParseTime(req.SamplingWindow); err == nil {
+			samplingWindow = &t
+		}
+	}
+	if req.ActualTime != "" {
+		if t, err := utils.ParseTime(req.ActualTime); err == nil {
+			actualTime = &t
+		}
+	}
+
+	var remark *string
+	if req.Remark != "" {
+		remark = &req.Remark
+	}
+
+	node, err := services.CreateSampleNode(
+		req.SampleID,
+		req.NodeID,
+		req.ParentNodeID,
+		req.NodeName,
+		req.NodeType,
+		req.Status,
+		req.Operator,
+		samplingWindow,
+		actualTime,
+		remark,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, node)
 }

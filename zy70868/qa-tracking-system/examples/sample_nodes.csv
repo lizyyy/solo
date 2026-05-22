@@ -1,0 +1,8 @@
+node_id,parent_node_id,node_name,node_type,status,sampling_window,actual_time,remark,operator
+NODE-S001-001,,原始取样,sampling,completed,2024-01-15 09:30:00,2024-01-15 09:28:30,车间现场取样,王五
+NODE-S001-002,NODE-S001-001,第一次分样,split,completed,2024-01-15 10:00:00,2024-01-15 10:02:15,实验室分样,赵六
+NODE-S001-003,NODE-S001-002,第二次分样,split,completed,2024-01-15 11:00:00,2024-01-15 11:05:00,检测前分样,钱七
+NODE-S001-004,NODE-S001-003,含量检测,test,completed,2024-01-15 14:00:00,2024-01-15 13:58:00,高效液相检测,孙八
+NODE-S001-005,NODE-S001-003,溶出度检测,test,in_progress,2024-01-15 15:00:00,,溶出仪正在运行,孙八
+NODE-S002-001,,原始取样,sampling,completed,2024-01-15 09:35:00,2024-01-15 09:33:15,车间现场取样,王五
+NODE-S002-002,NODE-S002-001,稳定性试验,stability,completed,2024-01-15 10:30:00,2024-01-15 10:32:00,放入稳定性试验箱CH001,周九

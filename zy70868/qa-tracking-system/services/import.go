@@ -150,6 +150,71 @@ func ImportChamberRecords(sampleID uint, records [][]string) ([]models.ChamberRe
 	return chamberRecords, nil
 }
 
+func ImportSampleNodes(sampleID uint, records [][]string) ([]models.SampleNode, error) {
+	if len(records) < 2 {
+		return nil, nil
+	}
+
+	var nodes []models.SampleNode
+	for i := 1; i < len(records); i++ {
+		record := records[i]
+		if len(record) < 5 {
+			continue
+		}
+
+		var samplingWindow *time.Time
+		if len(record) > 5 && record[5] != "" {
+			if t, err := utils.ParseTime(record[5]); err == nil {
+				samplingWindow = &t
+			}
+		}
+
+		var actualTime *time.Time
+		if len(record) > 6 && record[6] != "" {
+			if t, err := utils.ParseTime(record[6]); err == nil {
+				actualTime = &t
+			}
+		}
+
+		var remark *string
+		if len(record) > 7 && record[7] != "" {
+			remark = &record[7]
+		}
+
+		var parentNodeID *string
+		if record[1] != "" {
+			parentNodeID = &record[1]
+		}
+
+		node := models.SampleNode{
+			SampleID:       sampleID,
+			NodeID:         record[0],
+			ParentNodeID:   parentNodeID,
+			NodeName:       record[2],
+			NodeType:       record[3],
+			Status:         record[4],
+			Operator:       getArrayValue(record, 8, "system"),
+			SamplingWindow: samplingWindow,
+			ActualTime:     actualTime,
+			Remark:         remark,
+		}
+
+		if record[1] == "" {
+			node.ParentNodeID = nil
+		}
+
+		nodes = append(nodes, node)
+	}
+
+	for i := range nodes {
+		if err := config.DB.Create(&nodes[i]).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	return nodes, nil
+}
+
 func getStringValue(data map[string]interface{}, key, defaultValue string) string {
 	if v, ok := data[key].(string); ok {
 		return v

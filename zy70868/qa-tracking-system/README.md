@@ -168,18 +168,67 @@ GET /api/v1/chambers/:chamber_id/history?start_time=&end_time=
 
 ---
 
-### 5. 取样节点管理
+### 5. 取样节点管理（核心追溯功能）
 
-#### 5.1 查询取样节点列表
+#### 5.1 导入取样节点CSV
+```
+POST /api/v1/nodes/import
+```
+表单数据：
+- `file`: CSV文件
+- `sample_id`: 样品ID
+
+CSV格式：
+```
+node_id,parent_node_id,node_name,node_type,status,sampling_window,actual_time,remark,operator
+NODE-S001-001,,原始取样,sampling,completed,2024-01-15 09:30:00,2024-01-15 09:28:30,车间现场取样,王五
+NODE-S001-002,NODE-S001-001,第一次分样,split,completed,2024-01-15 10:00:00,2024-01-15 10:02:15,实验室分样,赵六
+NODE-S001-003,NODE-S001-002,第二次分样,split,completed,2024-01-15 11:00:00,2024-01-15 11:05:00,检测前分样,钱七
+NODE-S001-004,NODE-S001-003,含量检测,test,completed,2024-01-15 14:00:00,2024-01-15 13:58:00,高效液相检测,孙八
+```
+
+#### 5.2 手动创建取样节点
+```
+POST /api/v1/nodes
+```
+请求体：
+```json
+{
+  "sample_id": 1,
+  "node_id": "NODE-S001-005",
+  "parent_node_id": "NODE-S001-004",
+  "node_name": "复检含量检测",
+  "node_type": "test",
+  "status": "completed",
+  "operator": "王检测员",
+  "actual_time": "2024-01-16 09:00:00",
+  "remark": "原始数据异常，进行复检"
+}
+```
+
+#### 5.3 查询取样节点列表
 ```
 GET /api/v1/nodes?sample_id=&offset=0&limit=10
 ```
 
-#### 5.2 节点追溯（关键功能）
+#### 5.4 节点追溯（核心功能）
 ```
 GET /api/v1/nodes/:node_id/trace
 ```
 返回从根节点到当前节点的完整追溯链，可追踪每个节点的来源。
+
+**追溯示例返回：**
+```json
+{
+  "depth": 4,
+  "trace": [
+    {"node_id": "NODE-S001-001", "node_name": "原始取样", "node_type": "sampling", "operator": "王五", "status": "completed"},
+    {"node_id": "NODE-S001-002", "node_name": "第一次分样", "node_type": "split", "operator": "赵六", "status": "completed"},
+    {"node_id": "NODE-S001-003", "node_name": "第二次分样", "node_type": "split", "operator": "钱七", "status": "completed"},
+    {"node_id": "NODE-S001-004", "node_name": "含量检测", "node_type": "test", "operator": "孙八", "status": "completed"}
+  ]
+}
+```
 
 ---
 
