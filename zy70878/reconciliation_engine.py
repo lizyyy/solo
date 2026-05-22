@@ -110,7 +110,7 @@ class ReconciliationEngine:
             self._check_major_mismatch(item)
             self._check_duplicate_admission(item)
 
-            if item.conflicts:
+            if item.conflicts and item.status == AdmissionStatus.PENDING:
                 item.status = AdmissionStatus.CONFLICT
 
     def _check_quota_conflict(self, item: ReconciliationItem) -> None:
@@ -244,5 +244,12 @@ class ReconciliationEngine:
                         detected_duplicates.add(item.student_id)
 
     def recalculate_after_review(self, item_id: str) -> None:
-        self._detect_conflicts()
+        for item in self.session.items.values():
+            if item.status == AdmissionStatus.PENDING:
+                item.conflicts.clear()
+                self._check_quota_conflict(item)
+                self._check_major_mismatch(item)
+                self._check_duplicate_admission(item)
+                if item.conflicts:
+                    item.status = AdmissionStatus.CONFLICT
         self._update_summary()
