@@ -193,13 +193,114 @@ router.post('/recovery', upload.single('file'), async (req, res) => {
       );
     });
     
+    const sendItems = await new Promise((resolve, reject) => {
+      db.all(`SELECT * FROM laundry_items WHERE batch_id = ?`, [batch_id], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+    
+    const sendMap = {};
+    sendItems.forEach(item => {
+      const key = `${item.room_type}|${item.item_name}`;
+      sendMap[key] = item;
+    });
+    
+    const recoveryMap = {};
+    const compensationItems = [];
+    
     for (const item of recoveryData.items || []) {
+      const roomType = item.room_type || item.roomType;
+      const itemName = item.item_name || item.itemName;
+      const qty = parseInt(item.quantity || 0);
+      const key = `${roomType}|${itemName}`;
+      
+      recoveryMap[key] = qty;
+      
       await new Promise((resolve, reject) => {
         db.run(
           `INSERT INTO recovery_items (recovery_id, room_type, item_name, quantity)
            VALUES (?, ?, ?, ?)`,
-          [recoveryResult.id, item.room_type || item.roomType, 
-           item.item_name || item.itemName, parseInt(item.quantity || 0)],
+          [recoveryResult.id, roomType, itemName, qty],
+          function(err) {
+            if (err) reject(err);
+            else resolve();
+          }
+        );
+      });
+      
+      const sendItem = sendMap[key];
+      if (sendItem) {
+        await new Promise((resolve, reject) => {
+          db.run(
+            `UPDATE laundry_items SET recovery_quantity = ? WHERE id = ?`,
+            [qty, sendItem.id],
+            (err) => {
+              if (err) reject(err);
+              else resolve();
+            }
+          );
+        });
+        
+        const diff = sendItem.send_quantity - qty;
+        if (diff > 0) {
+          compensationItems.push({
+            batch_id,
+            room_type: roomType,
+            item_name: itemName,
+            shortage_qty: diff,
+            damage_qty: 0,
+            duplicate_qty: 0,
+            reason: `送洗${sendItem.send_quantity}件，回收${qty}件，短少${diff}件`,
+            handler: handler,
+            status: 'pending',
+            remark: '系统自动检测差异，待人工审核确认'
+          });
+        } else if (diff < 0) {
+          compensationItems.push({
+            batch_id,
+            room_type: roomType,
+            item_name: itemName,
+            shortage_qty: 0,
+            damage_qty: 0,
+            duplicate_qty: Math.abs(diff),
+            reason: `送洗${sendItem.send_quantity}件，回收${qty}件，多回${Math.abs(diff)}件，疑似重复计费`,
+            handler: handler,
+            status: 'pending',
+            remark: '系统自动检测差异，待人工审核确认'
+          });
+        }
+      }
+    }
+    
+    for (const item of sendItems) {
+      const key = `${item.room_type}|${item.item_name}`;
+      if (!recoveryMap[key]) {
+        compensationItems.push({
+          batch_id,
+          room_type: item.room_type,
+          item_name: item.item_name,
+          shortage_qty: item.send_quantity,
+          damage_qty: 0,
+          duplicate_qty: 0,
+          reason: `送洗${item.send_quantity}件，回收0件，全部短少`,
+          handler: handler,
+          status: 'pending',
+          remark: '系统自动检测差异，待人工审核确认'
+        });
+      }
+    }
+    
+    for (const comp of compensationItems) {
+      await new Promise((resolve, reject) => {
+        db.run(
+          `INSERT INTO compensation_records 
+           (batch_id, item_name, room_type, shortage_qty, damage_qty, duplicate_qty, 
+            reason, handler, status, remark)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [comp.batch_id, comp.item_name, comp.room_type, comp.shortage_qty, 
+           comp.damage_qty, comp.duplicate_qty, comp.reason, comp.handler, 
+           comp.status, comp.remark],
           function(err) {
             if (err) reject(err);
             else resolve();
@@ -209,12 +310,19 @@ router.post('/recovery', upload.single('file'), async (req, res) => {
     }
     
     await logOperation('recovery', 'recovery_records', recoveryResult.id, handler,
-                      'import_recovery', '导入回收单JSON', null, 'pending');
+                      'import_recovery', `导入回收单JSON，自动生成${compensationItems.length}条差异记录`, null, 'pending');
     
     db.run('COMMIT');
     fs.unlinkSync(req.file.path);
     
-    res.json({ success: true, data: { recovery_id: recoveryResult.id } });
+    res.json({ 
+      success: true, 
+      data: { 
+        recovery_id: recoveryResult.id,
+        auto_compensation_count: compensationItems.length,
+        compensation_items: compensationItems
+      } 
+    });
   } catch (err) {
     db.run('ROLLBACK');
     res.status(500).json({ success: false, error: err.message });

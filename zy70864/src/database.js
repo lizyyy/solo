@@ -7,12 +7,13 @@ const db = new sqlite3.Database(dbPath);
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS room_types (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    room_type TEXT NOT NULL UNIQUE,
+    room_type TEXT NOT NULL,
     item_name TEXT NOT NULL,
     quantity INTEGER NOT NULL,
     unit TEXT DEFAULT '件',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(room_type, item_name)
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS laundry_batches (
