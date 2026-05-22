@@ -403,4 +403,67 @@ export class BatchController {
       });
     }
   }
+
+  static async uploadReceiptsCSV(req: Request, res: Response) {
+    try {
+      const { batchId } = req.params;
+      const { operator, activityCode, members } = req.body;
+      
+      if (!operator || !activityCode) {
+        return res.status(400).json({
+          success: false,
+          message: '缺少必要参数：operator, activityCode'
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: '请上传 CSV 文件'
+        });
+      }
+
+      const activityRule = dataStore.getActivityRule(activityCode);
+      if (!activityRule) {
+        return res.status(404).json({
+          success: false,
+          message: '活动规则不存在'
+        });
+      }
+
+      const batch = dataStore.getBatch(batchId);
+      if (!batch) {
+        return res.status(404).json({
+          success: false,
+          message: '批次不存在'
+        });
+      }
+
+      const receipts = await FileParser.parseReceiptsCSVFromBuffer(req.file.buffer);
+      
+      const parsedMembers = members ? FileParser.parseMembersFromJSON(JSON.parse(members)) : [];
+      
+      const result = batchService.processBatch(
+        batchId,
+        receipts,
+        parsedMembers,
+        activityRule,
+        operator
+      );
+
+      res.json({
+        success: true,
+        data: {
+          ...result,
+          fileName: req.file.originalname,
+          fileSize: req.file.size
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
 }

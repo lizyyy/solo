@@ -1,5 +1,6 @@
 import * as fs from 'fs';
-import * as csv from 'csv-parser';
+import csv from 'csv-parser';
+import { Readable } from 'stream';
 import { Receipt, Member, MemberLevel } from '../types';
 
 export class FileParser {
@@ -8,6 +9,36 @@ export class FileParser {
       const receipts: Receipt[] = [];
       
       fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (row: any) => {
+          const receipt: Receipt = {
+            id: row.id || `r_${Date.now()}_${Math.random()}`,
+            receiptNo: row.receiptNo || row['小票编号'],
+            storeCode: row.storeCode || row['门店编码'],
+            storeName: row.storeName || row['门店名称'],
+            memberId: row.memberId || row['会员ID'],
+            memberPhone: row.memberPhone || row['会员手机号'],
+            transactionTime: new Date(row.transactionTime || row['交易时间']),
+            totalAmount: parseFloat(row.totalAmount || row['总金额'] || 0),
+            discountAmount: parseFloat(row.discountAmount || row['优惠金额'] || 0),
+            payAmount: parseFloat(row.payAmount || row['实付金额'] || 0),
+            items: row.items ? JSON.parse(row.items) : [],
+            isReturn: (row.isReturn || row['是否退货']) === 'true' || (row.isReturn || row['是否退货']) === '是',
+            originalReceiptNo: row.originalReceiptNo || row['原小票编号']
+          };
+          receipts.push(receipt);
+        })
+        .on('end', () => resolve(receipts))
+        .on('error', reject);
+    });
+  }
+
+  static parseReceiptsCSVFromBuffer(buffer: Buffer): Promise<Receipt[]> {
+    return new Promise((resolve, reject) => {
+      const receipts: Receipt[] = [];
+      const stream = Readable.from(buffer.toString('utf-8'));
+      
+      stream
         .pipe(csv())
         .on('data', (row: any) => {
           const receipt: Receipt = {

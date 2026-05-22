@@ -1,0 +1,226 @@
+{
+  "batches": [
+    {
+      "id": "9607f850-8530-4205-a09a-49ebaa814568",
+      "batchNo": "BATCH1779466795628",
+      "name": "CSV测试批次",
+      "activityCode": "PROMO_2024_001",
+      "storeCode": "STORE001",
+      "totalCount": 4,
+      "processedCount": 0,
+      "approvedCount": 0,
+      "rejectedCount": 0,
+      "returnedCount": 0,
+      "status": "PROCESSING",
+      "createdBy": "test_admin",
+      "createdAt": "2026-05-22T16:19:55.628Z",
+      "updatedAt": "2026-05-22T16:20:23.880Z"
+    }
+  ],
+  "processingRecords": [
+    {
+      "id": "0d973ee6-3969-41cb-8a36-12f4189a63df",
+      "batchId": "9607f850-8530-4205-a09a-49ebaa814568",
+      "receiptNo": "RX20240503101",
+      "memberId": "M001",
+      "memberLevel": "GOLD",
+      "transactionTime": "2024-05-03T02:30:00.000Z",
+      "totalAmount": 580,
+      "activityCode": "PROMO_2024_001",
+      "activityName": "五一黄金周双倍积分活动",
+      "calculatedPoints": 1160,
+      "status": "PENDING",
+      "isReturn": false,
+      "auditTrail": [
+        {
+          "operationType": "BATCH_CREATED",
+          "operator": "admin",
+          "reason": "批次导入创建记录",
+          "timestamp": "2026-05-22T16:20:23.880Z",
+          "newStatus": "PENDING"
+        }
+      ],
+      "createdAt": "2026-05-22T16:20:23.880Z",
+      "updatedAt": "2026-05-22T16:20:23.880Z"
+    },
+    {
+      "id": "304d48c4-15a3-4862-a348-334d4228976d",
+      "batchId": "9607f850-8530-4205-a09a-49ebaa814568",
+      "receiptNo": "RX20240503102",
+      "memberId": "M002",
+      "memberLevel": "PLATINUM",
+      "transactionTime": "2024-05-03T03:00:00.000Z",
+      "totalAmount": 1280,
+      "activityCode": "PROMO_2024_001",
+      "activityName": "五一黄金周双倍积分活动",
+      "calculatedPoints": 2560,
+      "status": "PENDING",
+      "isReturn": false,
+      "auditTrail": [
+        {
+          "operationType": "BATCH_CREATED",
+          "operator": "admin",
+          "reason": "批次导入创建记录",
+          "timestamp": "2026-05-22T16:20:23.880Z",
+          "newStatus": "PENDING"
+        }
+      ],
+      "createdAt": "2026-05-22T16:20:23.880Z",
+      "updatedAt": "2026-05-22T16:20:23.880Z"
+    },
+    {
+      "id": "9b029e39-56c7-4629-9920-461bfd8e4937",
+      "batchId": "9607f850-8530-4205-a09a-49ebaa814568",
+      "receiptNo": "RT20240503103",
+      "memberId": "M001",
+      "memberLevel": "GOLD",
+      "transactionTime": "2024-05-03T06:00:00.000Z",
+      "totalAmount": 200,
+      "activityCode": "PROMO_2024_001",
+      "activityName": "五一黄金周双倍积分活动",
+      "calculatedPoints": -400,
+      "status": "PENDING",
+      "isReturn": true,
+      "originalReceiptNo": "RX20240501099",
+      "boundaryInfo": {
+        "type": "RETURN_REVERSAL",
+        "description": "退货冲正记录",
+        "detail": "小票RT20240503103为退货单，关联原小票RX20240501099，积分将反向计算",
+        "suggestion": "请核对退货商品与原购买商品是否一致，确认后放行"
+      },
+      "auditTrail": [
+        {
+          "operationType": "BATCH_CREATED",
+          "operator": "admin",
+          "reason": "批次导入创建记录",
+          "timestamp": "2026-05-22T16:20:23.880Z",
+          "newStatus": "PENDING"
+        }
+      ],
+      "createdAt": "2026-05-22T16:20:23.880Z",
+      "updatedAt": "2026-05-22T16:20:23.880Z"
+    },
+    {
+      "id": "6d0c7c9d-8452-4491-b162-f774f055c7aa",
+      "batchId": "9607f850-8530-4205-a09a-49ebaa814568",
+      "receiptNo": "RX20240503104",
+      "memberId": "M003",
+      "memberLevel": "SILVER",
+      "transactionTime": "2024-05-03T07:30:00.000Z",
+      "totalAmount": 320,
+      "activityCode": "PROMO_2024_001",
+      "activityName": "五一黄金周双倍积分活动",
+      "calculatedPoints": 640,
+      "status": "PENDING",
+      "isReturn": false,
+      "auditTrail": [
+        {
+          "operationType": "BATCH_CREATED",
+          "operator": "admin",
+          "reason": "批次导入创建记录",
+          "timestamp": "2026-05-22T16:20:23.880Z",
+          "newStatus": "PENDING"
+        }
+      ],
+      "createdAt": "2026-05-22T16:20:23.880Z",
+      "updatedAt": "2026-05-22T16:20:23.880Z"
+    }
+  ],
+  "members": [],
+  "activityRules": [
+    {
+      "id": "7e0daddd-e2b0-4209-886d-d79a30783177",
+      "activityCode": "PROMO_2024_001",
+      "activityName": "五一黄金周双倍积分活动",
+      "startTime": "2024-05-01T00:00:00.000Z",
+      "endTime": "2024-05-07T00:00:00.000Z",
+      "applicableStores": [
+        "STORE001",
+        "STORE002",
+        "STORE003"
+      ],
+      "applicableLevels": [
+        "SILVER",
+        "GOLD",
+        "PLATINUM"
+      ],
+      "minAmount": 100,
+      "pointMultiplier": 2,
+      "maxPointsPerReceipt": 5000,
+      "description": "五一期间会员消费享双倍积分，单票最高5000积分"
+    },
+    {
+      "id": "e4cd0325-a074-4327-80b5-1a9754652472",
+      "activityCode": "PROMO_2024_002",
+      "activityName": "新店开业三倍积分",
+      "startTime": "2024-06-01T00:00:00.000Z",
+      "endTime": "2024-06-30T00:00:00.000Z",
+      "applicableStores": [
+        "STORE004"
+      ],
+      "applicableLevels": [
+        "NORMAL",
+        "SILVER",
+        "GOLD",
+        "PLATINUM"
+      ],
+      "minAmount": 50,
+      "pointMultiplier": 3,
+      "maxPointsPerReceipt": 10000,
+      "description": "新店开业期间所有会员三倍积分"
+    }
+  ],
+  "operationLogs": [
+    {
+      "batchId": "9607f850-8530-4205-a09a-49ebaa814568",
+      "operationType": "BATCH_CREATED",
+      "operator": "test_admin",
+      "reason": "创建新批次",
+      "detail": "批次BATCH1779466795628创建成功，活动：PROMO_2024_001，门店：STORE001",
+      "id": "35fefb43-5a17-4c5e-b434-46cf44445b3d",
+      "createdAt": "2026-05-22T16:19:55.628Z"
+    },
+    {
+      "recordId": "0d973ee6-3969-41cb-8a36-12f4189a63df",
+      "batchId": "9607f850-8530-4205-a09a-49ebaa814568",
+      "operationType": "BATCH_CREATED",
+      "operator": "admin",
+      "reason": "批次导入创建记录",
+      "detail": "批次导入创建记录",
+      "id": "515e15ae-2f33-4b02-a4b1-6a55fc1b1cf6",
+      "createdAt": "2026-05-22T16:20:23.880Z"
+    },
+    {
+      "recordId": "304d48c4-15a3-4862-a348-334d4228976d",
+      "batchId": "9607f850-8530-4205-a09a-49ebaa814568",
+      "operationType": "BATCH_CREATED",
+      "operator": "admin",
+      "reason": "批次导入创建记录",
+      "detail": "批次导入创建记录",
+      "id": "51adc6cb-2a59-457d-84b1-77c1584f4dff",
+      "createdAt": "2026-05-22T16:20:23.880Z"
+    },
+    {
+      "recordId": "9b029e39-56c7-4629-9920-461bfd8e4937",
+      "batchId": "9607f850-8530-4205-a09a-49ebaa814568",
+      "operationType": "BATCH_CREATED",
+      "operator": "admin",
+      "reason": "批次导入创建记录",
+      "detail": "批次导入创建记录。边界说明：退货冲正记录 - 小票RT20240503103为退货单，关联原小票RX20240501099，积分将反向计算",
+      "id": "476042a8-4b37-4098-b23b-4cb44a48c89c",
+      "createdAt": "2026-05-22T16:20:23.880Z"
+    },
+    {
+      "recordId": "6d0c7c9d-8452-4491-b162-f774f055c7aa",
+      "batchId": "9607f850-8530-4205-a09a-49ebaa814568",
+      "operationType": "BATCH_CREATED",
+      "operator": "admin",
+      "reason": "批次导入创建记录",
+      "detail": "批次导入创建记录",
+      "id": "20173cd7-f706-49e2-bbb5-a93a76f1f04e",
+      "createdAt": "2026-05-22T16:20:23.880Z"
+    }
+  ],
+  "receipts": [],
+  "savedAt": "2026-05-22T16:24:44.357Z"
+}
