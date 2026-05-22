@@ -261,6 +261,8 @@ export class ReconciliationService {
   }
 
   private calculateSummary(diffs: DiffDetail[], totalCableCars: number): ReconciliationSummary {
+    const activeDiffs = diffs.filter(d => d.status !== 'resolved');
+
     const byType = {
       trial_run_insufficient: 0,
       key_item_unsigned: 0,
@@ -277,18 +279,18 @@ export class ReconciliationService {
       low: 0,
     };
 
-    for (const diff of diffs) {
+    for (const diff of activeDiffs) {
       byType[diff.type]++;
       bySeverity[diff.severity]++;
     }
 
     const cableCarsWithHighSeverity = new Set(
-      diffs.filter(d => d.severity === 'high').map(d => d.cableCarId)
+      activeDiffs.filter(d => d.severity === 'high').map(d => d.cableCarId)
     );
     const passedCount = totalCableCars - cableCarsWithHighSeverity.size;
 
     return {
-      totalDiffs: diffs.length,
+      totalDiffs: activeDiffs.length,
       byType,
       bySeverity,
       trialRunIssues: byType.trial_run_insufficient,
