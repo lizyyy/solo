@@ -33,14 +33,29 @@ class BorrowRecordBase(BaseModel):
     action_type: Optional[str] = None
 
 
-class ImportResultItem(BaseModel):
-    record_no: Optional[str] = None
-    original_data: Dict[str, Any]
-    result_type: str
+class CheckResultItem(BaseModel):
     rule_code: Optional[str] = None
     rule_name: Optional[str] = None
+    result_type: Optional[str] = None
     message: str
     suggestion: Optional[str] = None
+
+
+class ImportResultItem(BaseModel):
+    record_no: Optional[str] = None
+    case_no: Optional[str] = None
+    person_id: Optional[str] = None
+    person_name: Optional[str] = None
+    borrow_date: Optional[datetime] = None
+    due_date: Optional[datetime] = None
+    return_date: Optional[datetime] = None
+    renew_count: Optional[int] = None
+    action_type: Optional[str] = None
+    original_data: Dict[str, Any]
+    result_type: str
+    message: str
+    suggestion: Optional[str] = None
+    check_results: List[CheckResultItem]
 
 
 class ImportResponse(BaseModel):

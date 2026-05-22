@@ -194,6 +194,20 @@ def process_borrow_records(
             "action_type": record.get("action_type"),
         }
 
+        check_results_list = [
+            {
+                "rule_code": r.rule_code,
+                "rule_name": r.rule_name,
+                "result_type": r.result_type.value,
+                "message": r.message,
+                "suggestion": r.suggestion,
+            }
+            for r in rule_results
+        ]
+
+        summary_message = "; ".join([r.message for r in rule_results]) if rule_results else ""
+        summary_suggestion = "; ".join([r.suggestion for r in rule_results if r.suggestion]) if rule_results else None
+
         if result_type == ResultType.SUCCESS:
             success_items.append(output_data)
             success_count += 1
@@ -202,15 +216,9 @@ def process_borrow_records(
                 **output_data,
                 "original_data": raw_data,
                 "result_type": "confirm",
-                "check_results": [
-                    {
-                        "rule_code": r.rule_code,
-                        "rule_name": r.rule_name,
-                        "message": r.message,
-                        "suggestion": r.suggestion,
-                    }
-                    for r in rule_results
-                ],
+                "message": summary_message,
+                "suggestion": summary_suggestion,
+                "check_results": check_results_list,
             })
             confirm_count += 1
         else:
@@ -218,15 +226,9 @@ def process_borrow_records(
                 **output_data,
                 "original_data": raw_data,
                 "result_type": "fail",
-                "check_results": [
-                    {
-                        "rule_code": r.rule_code,
-                        "rule_name": r.rule_name,
-                        "message": r.message,
-                        "suggestion": r.suggestion,
-                    }
-                    for r in rule_results
-                ],
+                "message": summary_message,
+                "suggestion": summary_suggestion,
+                "check_results": check_results_list,
             })
             fail_count += 1
 

@@ -69,7 +69,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ### 1. 导入案件信息
 
 ```bash
-curl -X POST "http://localhost:8000/api/import/cases \
+curl -X POST "http://localhost:8000/api/import/cases" \
   -H "Content-Type: multipart/form-data" \
   -F "file=@examples/cases.json"
 ```
@@ -93,19 +93,19 @@ curl -X POST "http://localhost:8000/api/import/borrow" \
 ### 4. 查看批次列表
 
 ```bash
-curl "http://localhost:8000/api/batches
+curl "http://localhost:8000/api/batches"
 ```
 
 ### 5. 查看批次详情报告
 
 ```bash
-curl "http://localhost:8000/api/batches/{batch_id}
+curl "http://localhost:8000/api/batches/{batch_id}"
 ```
 
 ### 6. 单条记录追溯
 
 ```bash
-curl "http://localhost:8000/api/records/R001/trace
+curl "http://localhost:8000/api/records/R001/trace"
 ```
 
 ## 示例数据说明
