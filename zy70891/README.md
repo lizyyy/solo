@@ -196,35 +196,37 @@ curl -o report.csv http://localhost:3001/api/batches/BATCH_ID/export
 echo "=== 社区矫正签到预警系统完整流程测试 ==="
 echo ""
 
+TEST_DATA='{
+  "submitter": "李社工",
+  "records": [
+    {
+      "object_id": "PER001",
+      "object_name": "赵六",
+      "checkin_date": "2024-01-16",
+      "risk_level": "低风险",
+      "has_checkin": true,
+      "checkin_source": "APP签到",
+      "has_leave": false,
+      "location_gap_hours": 1,
+      "location_abnormal": false
+    },
+    {
+      "object_id": "PER002",
+      "object_name": "钱七",
+      "checkin_date": "2024-01-16",
+      "risk_level": "高风险",
+      "has_checkin": false,
+      "has_leave": false,
+      "location_gap_hours": 6,
+      "location_abnormal": true
+    }
+  ]
+}'
+
 echo "1. 提交第一批材料..."
 RESULT=$(curl -s -X POST http://localhost:3001/api/batches \
   -H "Content-Type: application/json" \
-  -d '{
-    "submitter": "李社工",
-    "records": [
-      {
-        "object_id": "PER001",
-        "object_name": "赵六",
-        "checkin_date": "2024-01-16",
-        "risk_level": "低风险",
-        "has_checkin": true,
-        "checkin_source": "APP签到",
-        "has_leave": false,
-        "location_gap_hours": 1,
-        "location_abnormal": false
-      },
-      {
-        "object_id": "PER002",
-        "object_name": "钱七",
-        "checkin_date": "2024-01-16",
-        "risk_level": "高风险",
-        "has_checkin": false,
-        "has_leave": false,
-        "location_gap_hours": 6,
-        "location_abnormal": true
-      }
-    ]
-  }')
+  -d "$TEST_DATA")
 
 BATCH_ID=$(echo $RESULT | grep -o '"batchId":"[^"]*"' | cut -d'"' -f4)
 echo "批次ID: $BATCH_ID"
@@ -245,28 +247,19 @@ curl -s -o "report_${BATCH_ID}.csv" "http://localhost:3001/api/batches/$BATCH_ID
 echo "报告已导出: report_${BATCH_ID}.csv"
 echo ""
 
-echo "5. 测试重复提交检测..."
-curl -s -X POST http://localhost:3001/api/batches \
+echo "5. 测试重复提交检测（使用完全相同的数据）..."
+DUPLICATE_RESULT=$(curl -s -X POST http://localhost:3001/api/batches \
   -H "Content-Type: application/json" \
-  -d '{
-    "submitter": "李社工",
-    "records": [
-      {
-        "object_id": "PER001",
-        "object_name": "赵六",
-        "checkin_date": "2024-01-16",
-        "risk_level": "低风险",
-        "has_checkin": true
-      },
-      {
-        "object_id": "PER002",
-        "object_name": "钱七",
-        "checkin_date": "2024-01-16",
-        "risk_level": "高风险",
-        "has_checkin": false
-      }
-    ]
-  }' | grep -E '"warning"|"message"'
+  -d "$TEST_DATA")
+
+echo "$DUPLICATE_RESULT" | grep -E '"warning"|"message"|"isDuplicate"'
+echo ""
+
+if echo "$DUPLICATE_RESULT" | grep -q '"isDuplicate":true'; then
+  echo "✅ 重复提交检测成功！"
+else
+  echo "❌ 重复提交检测失败！"
+fi
 echo ""
 
 echo "=== 测试流程完成 ==="

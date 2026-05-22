@@ -12,7 +12,7 @@ if (!fs.existsSync(dataDir)) {
 const batchesRouter = require('./routes/batches');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
