@@ -1,0 +1,38 @@
+[
+  {
+    "medicine_code": "MED001",
+    "medicine_name": "阿莫西林胶囊",
+    "specification": "0.5g*24粒",
+    "batch_number": "20240101",
+    "expiry_date": "2026-06-30T00:00:00",
+    "quantity": 100,
+    "unit": "盒",
+    "original_price": 25.5,
+    "adjusted_price": 18.0,
+    "source_type": "inventory_export"
+  },
+  {
+    "medicine_code": "MED002",
+    "medicine_name": "布洛芬缓释片",
+    "specification": "0.3g*20片",
+    "batch_number": "20240215",
+    "expiry_date": "2026-08-15T00:00:00",
+    "quantity": 50,
+    "unit": "盒",
+    "original_price": 32.0,
+    "adjusted_price": 24.0,
+    "source_type": "transfer_order"
+  },
+  {
+    "medicine_code": "MED003",
+    "medicine_name": "维生素C片",
+    "specification": "100mg*100片",
+    "batch_number": "20240301",
+    "expiry_date": "2026-03-01T00:00:00",
+    "quantity": 200,
+    "unit": "瓶",
+    "original_price": 15.0,
+    "adjusted_price": 10.0,
+    "source_type": "return_photo"
+  }
+]

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "town-pharmacy-receipt"
+version = "0.1.0"
+description = "乡镇药房近效期异常回执状态机系统"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "sqlalchemy>=2.0.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-multipart>=0.0.6",
+    "click>=8.0.0",
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+receipt-cli = "receipt_system.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
