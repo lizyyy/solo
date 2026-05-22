@@ -81,7 +81,14 @@ class ReviewerService:
             for discrepancy in record.discrepancies:
                 dtype = discrepancy.discrepancy_type.value
                 summary.discrepancy_breakdown[dtype] = summary.discrepancy_breakdown.get(dtype, 0) + 1
-        summary.pending_review = summary.discrepancy_records + (summary.reviewed_records - summary.approved_records - summary.rejected_records - summary.needs_more_info)
+        summary.pending_review = 0
+        for record in records:
+            if record.verification_status in [
+                VerificationStatus.PENDING,
+                VerificationStatus.DISCREPANCY,
+                VerificationStatus.REVIEWED
+            ]:
+                summary.pending_review += 1
         return summary
 
     def get_record_explanation(self, record: TransferReconciliation) -> str:
@@ -89,7 +96,7 @@ class ReviewerService:
         lines.append(f"交接编号: {record.transfer_id}")
         lines.append(f"尾箱编号: {record.box_id}")
         lines.append(f"当前状态: {self._status_to_chinese(record.verification_status)}")
-        if record.verification_status in [VerificationStatus.APPROVED, VerificationStatus.REJECTED]:
+        if record.verification_status in [VerificationStatus.APPROVED, VerificationStatus.REJECTED, VerificationStatus.NEEDS_MORE_INFO, VerificationStatus.REVIEWED]:
             lines.append(f"处理结果: {self._action_to_chinese(record.review_action)}")
             lines.append(f"复核人: {record.reviewer_name} ({record.reviewer_id})")
             if record.review_time:

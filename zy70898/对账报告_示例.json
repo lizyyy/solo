@@ -1,12 +1,12 @@
 {
-  "reconciliation_id": "ebcc4c3f-d411-4eb7-8afd-cda8fe7c958e",
+  "reconciliation_id": "fea7bd0c-ce5e-47aa-9dbf-3fa08949d3f7",
   "batch_date": "2026-05-22",
-  "created_at": "2026-05-22T23:30:04.669059",
+  "created_at": "2026-05-22T23:48:04.102098",
   "summary": {
     "total_records": 3,
     "matched_records": 1,
     "discrepancy_records": 1,
-    "pending_review": 0,
+    "pending_review": 1,
     "reviewed_records": 0,
     "approved_records": 1,
     "rejected_records": 0,
@@ -72,7 +72,7 @@
       },
       "discrepancies": [
         {
-          "discrepancy_id": "805dc9f0-ec67-4edf-8f2a-779dac9452fc",
+          "discrepancy_id": "db127326-72fc-4f3e-9949-b23c4d17cb7b",
           "discrepancy_type": "amount_mismatch",
           "field_name": "total_amount",
           "expected_value": 70000.0,
@@ -81,7 +81,7 @@
           "severity": "high"
         },
         {
-          "discrepancy_id": "a35e92d2-062e-4c50-9b7d-e1c796ac3ad6",
+          "discrepancy_id": "aab536c7-8eee-45e5-9a4f-156706d79b64",
           "discrepancy_type": "missing_double_sign",
           "field_name": "signatories",
           "expected_value": "双人签核",
@@ -90,7 +90,7 @@
           "severity": "high"
         },
         {
-          "discrepancy_id": "2bf33f6b-ea7f-4993-9300-46ca5ec561f4",
+          "discrepancy_id": "7d50f037-c194-40ab-b25a-7f8664545661",
           "discrepancy_type": "error_mismatch",
           "field_name": "error_E001",
           "expected_value": "差错已闭环",
@@ -107,7 +107,7 @@
       "review_action": "approve",
       "reviewer_id": "M001",
       "reviewer_name": "运营主管",
-      "review_time": "2026-05-22T23:30:04.669002"
+      "review_time": "2026-05-22T23:48:04.102046"
     },
     {
       "transfer_id": "T003",
@@ -133,7 +133,7 @@
       },
       "discrepancies": [
         {
-          "discrepancy_id": "a0f7e1b7-997f-4357-a361-9d166403e557",
+          "discrepancy_id": "e627078e-ae2e-4dbf-afb0-62a94e4c1d31",
           "discrepancy_type": "missing_teller",
           "field_name": "teller_schedule",
           "expected_value": "柜员U001当日排班记录",
@@ -142,7 +142,7 @@
           "severity": "medium"
         },
         {
-          "discrepancy_id": "38dbea01-d07d-4785-923c-e20ff40b89eb",
+          "discrepancy_id": "10e69c61-d83c-438f-bab5-38221a3ef2b2",
           "discrepancy_type": "missing_teller",
           "field_name": "teller_schedule",
           "expected_value": "柜员U002当日排班记录",
@@ -151,7 +151,7 @@
           "severity": "medium"
         },
         {
-          "discrepancy_id": "e388b559-6809-403e-9867-a870d4270368",
+          "discrepancy_id": "102ba853-549c-4761-8421-2fa553a39780",
           "discrepancy_type": "missing_teller",
           "field_name": "teller_schedule",
           "expected_value": "柜员U001当日排班记录",
@@ -160,7 +160,7 @@
           "severity": "medium"
         },
         {
-          "discrepancy_id": "2505a8ab-1a80-49b9-95ce-9bd3495afc46",
+          "discrepancy_id": "9963ff16-29b8-4417-ad73-e70266492218",
           "discrepancy_type": "missing_teller",
           "field_name": "teller_schedule",
           "expected_value": "柜员U003当日排班记录",
