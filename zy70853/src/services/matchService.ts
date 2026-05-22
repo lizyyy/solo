@@ -188,7 +188,9 @@ export class MatchService {
   }
 
   private matchDriverToWarehouse(normalItems: MatchResult[], pendingItems: MatchResult[]) {
-    for (const item of [...normalItems, ...pendingItems]) {
+    const allItems = [...normalItems, ...pendingItems];
+    
+    for (const item of allItems) {
       if (!item.driverRecord) continue;
 
       let bestMatch: WarehouseRecord | null = null;
@@ -211,6 +213,8 @@ export class MatchService {
       }
 
       if (bestMatch) {
+        const originalStatus = item.status;
+        
         item.warehouseRecord = bestMatch;
         item.confidence = Math.round((item.confidence + highestConfidence) / 2);
         item.notes.push(...additionalNotes);
@@ -226,6 +230,20 @@ export class MatchService {
         } else if (item.confidence < 60 && item.status === MatchStatus.NORMAL) {
           item.status = MatchStatus.PENDING;
           item.notes.unshift('仓库匹配后置信度下降，转为待确认');
+        }
+        
+        if (originalStatus === MatchStatus.PENDING && item.status === MatchStatus.NORMAL) {
+          const index = pendingItems.findIndex(i => i.matchId === item.matchId);
+          if (index !== -1) {
+            pendingItems.splice(index, 1);
+            normalItems.push(item);
+          }
+        } else if (originalStatus === MatchStatus.NORMAL && item.status === MatchStatus.PENDING) {
+          const index = normalItems.findIndex(i => i.matchId === item.matchId);
+          if (index !== -1) {
+            normalItems.splice(index, 1);
+            pendingItems.push(item);
+          }
         }
         
         this.matchedIds.add(bestMatch.id);
