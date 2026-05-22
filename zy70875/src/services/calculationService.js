@@ -45,19 +45,27 @@ function validateScreeningData(screening) {
   return { valid: true };
 }
 
+function getLocalDateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function calculateCrossDaySplit(startTime, endTime, totalBoxOffice) {
   const start = new Date(startTime);
   const end = new Date(endTime);
   
-  const startDate = start.toISOString().split('T')[0];
-  const endDate = end.toISOString().split('T')[0];
+  const startDate = getLocalDateString(start);
+  const endDate = getLocalDateString(end);
   
   if (startDate === endDate) {
     return [{ date: startDate, amount: totalBoxOffice }];
   }
   
   const midnight = new Date(start);
-  midnight.setHours(24, 0, 0, 0);
+  midnight.setDate(midnight.getDate() + 1);
+  midnight.setHours(0, 0, 0, 0);
   
   const totalDuration = end - start;
   const day1Duration = midnight - start;
