@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum LedgerStatus {
+  DRAFT
+  SUBMITTED
+  REJECTED
+  CONFIRMED
+  AUDITED
+  ARCHIVED
+}
+
+enum DataSource {
+  DRIVER_PHOTO
+  WMS_BOX
+  TEMPERATURE_LOG
+  SCAN_DETAIL
+}
+
+enum Role {
+  WAREHOUSE_STAFF
+  DRIVER
+  SUPERVISOR
+  AUDITOR
+  ADMIN
+}
+
+model Ledger {
+  id              String        @id @default(cuid())
+  boxNo           String
+  batchNo         String
+  driverId         String
+  driverName       String
+  driverPhone     String
+  receiveDate     DateTime
+  crossDaySign  Boolean      @default(false)
+  boxNameChange Boolean      @default(false)
+  originalBoxNo  String?
+  temperatureMin Float?
+  temperatureMax Float?
+  compensationAmount Decimal?
+  status          LedgerStatus @default(DRAFT)
+  createdBy       String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  confirmedBy        String?
+  confirmedAt     DateTime?
+  rejectedBy         String?
+  rejectedAt      DateTime?
+  rejectionReason String?
+  auditedBy       String?
+  auditedAt        DateTime?
+  changeReason    String?
+  sensitiveFields Json?
+  scanDetails     ScanDetail[]
+  statusHistories   StatusHistory[]
+  failedRecords   FailedRecord[]
+  attachments     Attachment[]
+  @@index([status])
+  @@index([batchNo])
+}
+
+model ScanDetail {
+  id              String   @id @default(cuid())
+  ledgerId        String
+  scanTime         DateTime
+  scanLocation     String
+  operator         String
+  temperature      Float?
+  boxCondition     String?
+  remark          String?
+  createdAt        DateTime @default(now())
+  ledger           Ledger   @relation(fields: [ledgerId], references: [id], onDelete: Cascade)
+}
+
+model StatusHistory {
+  id              String       @id @default(cuid())
+  ledgerId        String
+  fromStatus      LedgerStatus?
+  toStatus        LedgerStatus
+  changedBy       String
+  changeReason    String
+  diffBefore      Json?
+  diffAfter       Json?
+  createdAt       DateTime     @default(now())
+  ledger          Ledger       @relation(fields: [ledgerId], references: [id], onDelete: Cascade)
+}
+
+model FailedRecord {
+  id              String   @id @default(cuid())
+  ledgerId        String
+  source          DataSource
+  rawData         Json
+  errorMessage    String
+  failedAt        DateTime @default(now())
+  resolved        Boolean  @default(false)
+  resolvedBy      String?
+  resolvedAt       DateTime?
+  ledger          Ledger   @relation(fields: [ledgerId], references: [id], onDelete: Cascade)
+}
+
+model Attachment {
+  id              String     @id @default(cuid())
+  ledgerId        String
+  source          DataSource
+  fileName        String
+  fileUrl         String
+  fileHash        String
+  uploadedBy      String
+  uploadedAt       DateTime   @default(now())
+  ledger          Ledger     @relation(fields: [ledgerId], references: [id], onDelete: Cascade)
+}
