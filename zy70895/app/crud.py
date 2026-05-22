@@ -179,30 +179,40 @@ def get_material_with_audit(db: Session, material_id: int):
     }
 
 
-def get_statistics(db: Session):
-    total = db.query(func.count(models.Material.id)).scalar()
-    pending = db.query(func.count(models.Material.id)).filter(models.Material.status == MaterialStatus.PENDING).scalar()
-    processing = db.query(func.count(models.Material.id)).filter(models.Material.status == MaterialStatus.PROCESSING).scalar()
-    completed = db.query(func.count(models.Material.id)).filter(models.Material.status == MaterialStatus.COMPLETED).scalar()
-    rejected = db.query(func.count(models.Material.id)).filter(models.Material.status == MaterialStatus.REJECTED).scalar()
+def get_statistics(db: Session, batch_id: Optional[int] = None):
+    query = db.query(models.Material)
+    if batch_id:
+        query = query.filter(models.Material.batch_id == batch_id)
     
-    top_reasons = db.query(
+    total = query.count()
+    pending = query.filter(models.Material.status == MaterialStatus.PENDING).count()
+    processing = query.filter(models.Material.status == MaterialStatus.PROCESSING).count()
+    completed = query.filter(models.Material.status == MaterialStatus.COMPLETED).count()
+    rejected = query.filter(models.Material.status == MaterialStatus.REJECTED).count()
+    
+    top_reasons_query = db.query(
         models.Material.rework_reason,
         func.count(models.Material.id).label('count')
     ).filter(
         models.Material.rework_reason.isnot(None)
-    ).group_by(
+    )
+    if batch_id:
+        top_reasons_query = top_reasons_query.filter(models.Material.batch_id == batch_id)
+    top_reasons = top_reasons_query.group_by(
         models.Material.rework_reason
     ).order_by(
         func.count(models.Material.id).desc()
     ).limit(10).all()
     
-    top_workstations = db.query(
+    top_workstations_query = db.query(
         models.Material.workstation,
         func.count(models.Material.id).label('count')
     ).filter(
         models.Material.workstation.isnot(None)
-    ).group_by(
+    )
+    if batch_id:
+        top_workstations_query = top_workstations_query.filter(models.Material.batch_id == batch_id)
+    top_workstations = top_workstations_query.group_by(
         models.Material.workstation
     ).order_by(
         func.count(models.Material.id).desc()

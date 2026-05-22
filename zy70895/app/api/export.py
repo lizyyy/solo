@@ -5,6 +5,7 @@ from typing import Optional
 import pandas as pd
 from io import BytesIO
 from datetime import datetime
+from urllib.parse import quote
 from app.database import get_db
 from app import crud, schemas
 
@@ -12,8 +13,11 @@ router = APIRouter(prefix="/export", tags=["导出管理"])
 
 
 @router.get("/statistics", response_model=schemas.StatisticsResponse)
-def get_statistics(db: Session = Depends(get_db)):
-    return crud.get_statistics(db)
+def get_statistics(
+    batch_id: Optional[int] = Query(None, description="批次ID，不传则统计所有"),
+    db: Session = Depends(get_db)
+):
+    return crud.get_statistics(db, batch_id=batch_id)
 
 
 @router.get("/excel")
@@ -32,11 +36,12 @@ def export_to_excel(
     output.seek(0)
     
     filename = f"返修归因导出_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    encoded_filename = quote(filename)
     
     return StreamingResponse(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
     )
 
 
@@ -46,7 +51,7 @@ def export_json(
     db: Session = Depends(get_db)
 ):
     export_data = crud.get_export_data(db, batch_id=batch_id)
-    statistics = crud.get_statistics(db)
+    statistics = crud.get_statistics(db, batch_id=batch_id)
     
     return {
         "statistics": statistics,
