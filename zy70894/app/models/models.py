@@ -23,7 +23,12 @@ class RepairRecord(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     source_file = Column(String)
 
-    work_order = relationship("WorkOrder", back_populates="repair_records")
+    work_order = relationship(
+        "WorkOrder",
+        back_populates="repair_records",
+        foreign_keys=[work_order_no],
+        primaryjoin="RepairRecord.work_order_no == WorkOrder.order_no"
+    )
     review_records = relationship("ReviewRecord", back_populates="repair_record")
     comparison_results = relationship("ComparisonResult", back_populates="repair_record")
 
@@ -45,7 +50,12 @@ class WorkOrder(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     source_file = Column(String)
 
-    repair_records = relationship("RepairRecord", back_populates="work_order")
+    repair_records = relationship(
+        "RepairRecord",
+        back_populates="work_order",
+        foreign_keys="RepairRecord.work_order_no",
+        primaryjoin="WorkOrder.order_no == RepairRecord.work_order_no"
+    )
 
 
 class MaterialBatch(Base):
