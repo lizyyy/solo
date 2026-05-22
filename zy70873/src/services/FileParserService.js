@@ -98,6 +98,33 @@ class FileParserService {
     });
   }
 
+  static normalizeFileName(name) {
+    return name.toLowerCase().replace(/[_\-\s]/g, '');
+  }
+
+  static hasField(obj, ...fieldNames) {
+    for (const name of fieldNames) {
+      if (obj[name] !== undefined) return true;
+    }
+    return false;
+  }
+
+  static detectJsonContentType(data) {
+    const sample = Array.isArray(data) ? data[0] : data;
+    if (!sample || typeof sample !== 'object') return null;
+
+    if (this.hasField(sample, 'ruleName', 'rule_name', 'subsidyAmount', 'subsidy_amount')) {
+      return 'contractRules';
+    }
+    if (this.hasField(sample, 'totalBoxOffice', 'total_box_office', 'netBoxOffice', 'net_box_office', 'statDate', 'stat_date')) {
+      return 'boxOffices';
+    }
+    if (this.hasField(sample, 'showDate', 'show_date', 'startTime', 'start_time', 'soldSeats', 'sold_seats')) {
+      return 'showtimes';
+    }
+    return null;
+  }
+
   static async parseUploadedFiles(files) {
     const result = {
       showtimes: [],
@@ -109,34 +136,34 @@ class FileParserService {
     for (const file of files) {
       const ext = path.extname(file.originalname).toLowerCase();
       const fileName = file.originalname.toLowerCase();
+      const normalizedName = this.normalizeFileName(file.originalname);
 
       try {
-        if (ext === '.csv' && fileName.includes('showtime')) {
+        if (ext === '.csv' && (fileName.includes('showtime') || fileName.includes('场次') || normalizedName.includes('showtimes'))) {
           result.showtimes = await this.parseShowtimesCSV(file.path);
-        } else if (ext === '.csv' && fileName.includes('场次')) {
-          result.showtimes = await this.parseShowtimesCSV(file.path);
-        } else if (ext === '.json' && fileName.includes('boxoffice')) {
+        } else if (ext === '.json' && (normalizedName.includes('boxoffice') || fileName.includes('票房'))) {
           result.boxOffices = await this.parseBoxOfficeJSON(file.path);
-        } else if (ext === '.json' && fileName.includes('票房')) {
-          result.boxOffices = await this.parseBoxOfficeJSON(file.path);
-        } else if (ext === '.json' && fileName.includes('contract')) {
-          result.contractRules = await this.parseContractRulesJSON(file.path);
-        } else if (ext === '.json' && fileName.includes('规则')) {
+        } else if (ext === '.json' && (normalizedName.includes('contract') || fileName.includes('规则') || normalizedName.includes('rules'))) {
           result.contractRules = await this.parseContractRulesJSON(file.path);
         } else if (ext === '.csv') {
           const parsed = await this.parseCSV(file.path, Showtime);
-          if (parsed.length > 0 && parsed[0].filmId && parsed[0].showDate) {
+          if (parsed.length > 0 && (parsed[0].filmId || parsed[0].showDate)) {
             result.showtimes = parsed;
           }
         } else if (ext === '.json') {
           try {
             const parsed = await this.parseJSON(file.path);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              if (parsed[0].ruleName || parsed[0].subsidyAmount) {
-                result.contractRules = parsed.map(item => new ContractRule(item));
-              } else if (parsed[0].totalBoxOffice !== undefined) {
-                result.boxOffices = parsed.map(item => new BoxOffice(item));
-              }
+            const contentType = this.detectJsonContentType(parsed);
+            
+            if (contentType === 'contractRules') {
+              const rules = Array.isArray(parsed) ? parsed : (parsed.rules || parsed.data || [parsed]);
+              result.contractRules = rules.map(item => new ContractRule(item));
+            } else if (contentType === 'boxOffices') {
+              const boxOffices = Array.isArray(parsed) ? parsed : (parsed.data || [parsed]);
+              result.boxOffices = boxOffices.map(item => new BoxOffice(item));
+            } else if (contentType === 'showtimes') {
+              const showtimes = Array.isArray(parsed) ? parsed : (parsed.data || [parsed]);
+              result.showtimes = showtimes.map(item => new Showtime(item));
             }
           } catch (e) {
             result.errors.push(`文件 ${file.originalname} 解析失败: ${e.message}`);
