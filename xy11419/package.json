@@ -1,0 +1,22 @@
+{
+  "name": "property-maintenance-traceability-api",
+  "version": "1.0.0",
+  "description": "物业维修派单权限追责台账 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "seed": "node src/scripts/seed.js",
+    "test": "node src/scripts/demo.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0",
+    "multer": "^1.4.5-lts.1",
+    "json2csv": "^6.0.0-alpha.2",
+    "archiver": "^6.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
