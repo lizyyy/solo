@@ -1,20 +1,20 @@
 {
   "batches": [
     {
-      "id": "BATCH-36BEC13719F9",
-      "batchHash": "641aaa065c734534b57b16db1e9e2c2b",
+      "id": "BATCH-93AEFAA4AE40",
+      "batchHash": "836de634727640becc68cfa664301240",
       "totalCount": 7,
-      "successCount": 3,
-      "pendingCount": 3,
+      "successCount": 4,
+      "pendingCount": 2,
       "failedCount": 1,
-      "totalPoints": 2804,
-      "createdAt": "2026-05-20T11:26:45.015Z"
+      "totalPoints": 1976,
+      "createdAt": "2026-05-22T16:01:16.251Z"
     }
   ],
   "records": [
     {
-      "id": "7562b7ed-f4e5-4d02-b43e-aacf27d236bc",
-      "batchId": "BATCH-36BEC13719F9",
+      "id": "586235aa-3ba2-43bd-b620-926899c3384d",
+      "batchId": "BATCH-93AEFAA4AE40",
       "receiptNo": "RCP000001",
       "memberPhone": "13800138001",
       "transactionTime": "2026-05-20 10:30:00",
@@ -37,12 +37,12 @@
         "RULE_001",
         "RULE_003"
       ],
-      "traceId": "TRACE-FA24D6D0899E426D",
-      "createdAt": "2026-05-20T11:26:45.014Z"
+      "traceId": "TRACE-D41D73C4252A4D90",
+      "createdAt": "2026-05-22T16:01:16.247Z"
     },
     {
-      "id": "9428c64e-f402-44e4-b35f-28c90fdcb096",
-      "batchId": "BATCH-36BEC13719F9",
+      "id": "51ae876a-3cce-4f00-8636-35549225a4a7",
+      "batchId": "BATCH-93AEFAA4AE40",
       "receiptNo": "RCP000002",
       "memberPhone": "13800138003",
       "transactionTime": "2026-05-20 11:15:00",
@@ -67,12 +67,12 @@
         "RULE_001",
         "RULE_003"
       ],
-      "traceId": "TRACE-1653EF7A62EF4270",
-      "createdAt": "2026-05-20T11:26:45.014Z"
+      "traceId": "TRACE-6CB970358D774685",
+      "createdAt": "2026-05-22T16:01:16.247Z"
     },
     {
-      "id": "4ffe826c-4eae-445a-b171-d28fd89af838",
-      "batchId": "BATCH-36BEC13719F9",
+      "id": "61cc90bc-8104-4ee9-9787-c7e86ed1d103",
+      "batchId": "BATCH-93AEFAA4AE40",
       "receiptNo": "RCP000003",
       "memberPhone": "13800138002",
       "transactionTime": "2026-05-20 14:20:00",
@@ -92,23 +92,20 @@
         "operator": "王姐"
       },
       "appliedRules": [],
-      "traceId": "TRACE-13B4C99EE0A3473B",
-      "createdAt": "2026-05-20T11:26:45.014Z"
+      "traceId": "TRACE-ABF7A98AECCE4494",
+      "createdAt": "2026-05-22T16:01:16.248Z"
     },
     {
-      "id": "ef1ed974-24aa-4b11-96ac-a2a06a85cec2",
-      "batchId": "BATCH-36BEC13719F9",
-      "receiptNo": "RCP000004",
+      "id": "4476047b-abc0-4f3e-af4a-95497687386d",
+      "batchId": "BATCH-93AEFAA4AE40",
+      "receiptNo": "RCP000001R",
       "memberPhone": "13800138001",
       "transactionTime": "2026-05-20 16:45:00",
       "amount": 164.25,
-      "calculatedPoints": 0,
-      "status": "pending",
-      "errorCode": "RETURN_WITHOUT_PURCHASE",
-      "errorMessage": "未找到对应的原始消费记录",
-      "suggestion": "未找到对应消费记录，请核实退货小票是否属于本系统",
+      "calculatedPoints": -828,
+      "status": "success",
       "rawData": {
-        "receiptNo": "RCP000004",
+        "receiptNo": "RCP000001R",
         "memberPhone": "13800138001",
         "transactionTime": "2026-05-20 16:45:00",
         "transactionType": "return",
@@ -119,13 +116,15 @@
         "activityId": "",
         "operator": "张姐"
       },
-      "appliedRules": [],
-      "traceId": "TRACE-2C32B001E1154332",
-      "createdAt": "2026-05-20T11:26:45.015Z"
+      "appliedRules": [
+        "return_reversal"
+      ],
+      "traceId": "TRACE-FE6B9DA5CD714B9C",
+      "createdAt": "2026-05-22T16:01:16.249Z"
     },
     {
-      "id": "c21eba19-b199-4e47-8150-a1da2e1ee9b6",
-      "batchId": "BATCH-36BEC13719F9",
+      "id": "ffed1eb1-5448-49a1-98ed-995b16059fe6",
+      "batchId": "BATCH-93AEFAA4AE40",
       "receiptNo": "RCP000005",
       "memberPhone": "13999999999",
       "transactionTime": "2026-05-20 09:00:00",
@@ -148,12 +147,12 @@
         "operator": "赵姐"
       },
       "appliedRules": [],
-      "traceId": "TRACE-30BC632720194029",
-      "createdAt": "2026-05-20T11:26:45.015Z"
+      "traceId": "TRACE-10066664370549C9",
+      "createdAt": "2026-05-22T16:01:16.250Z"
     },
     {
-      "id": "f8dfdaac-b2f3-4537-ba99-abb682a94b1b",
-      "batchId": "BATCH-36BEC13719F9",
+      "id": "c166054e-9f0f-47c3-a1eb-c168154c9519",
+      "batchId": "BATCH-93AEFAA4AE40",
       "receiptNo": "RCP000006",
       "memberPhone": "13800138004",
       "transactionTime": "2026-05-20 15:30:00",
@@ -177,12 +176,12 @@
         "RULE_001",
         "RULE_003"
       ],
-      "traceId": "TRACE-C16F2E257A464226",
-      "createdAt": "2026-05-20T11:26:45.015Z"
+      "traceId": "TRACE-7D3FE2D2CFF24E98",
+      "createdAt": "2026-05-22T16:01:16.250Z"
     },
     {
-      "id": "11af465f-efc1-4ed8-9eba-1c7b19d3f6d2",
-      "batchId": "BATCH-36BEC13719F9",
+      "id": "11aa7e24-ff82-4ca6-9216-36fca56719f7",
+      "batchId": "BATCH-93AEFAA4AE40",
       "receiptNo": "RCP000007",
       "memberPhone": "13800138002",
       "transactionTime": "2026-05-19 20:00:00",
@@ -204,8 +203,8 @@
       "appliedRules": [
         "RULE_003"
       ],
-      "traceId": "TRACE-444017C824F8481A",
-      "createdAt": "2026-05-20T11:26:45.015Z"
+      "traceId": "TRACE-1A1E06F5045A470F",
+      "createdAt": "2026-05-22T16:01:16.250Z"
     }
   ],
   "members": [

@@ -148,9 +148,11 @@ export class RulesEngine {
       );
     }
 
-    const originalPoints = originalPurchase.calculated_points || 0;
+    const originalPoints = originalPurchase.calculatedPoints || 0;
     const returnRatio = Math.min(receipt.amount / originalPurchase.amount, 1);
     const returnPoints = Math.floor(originalPoints * returnRatio);
+
+    warnings.push(`匹配原始消费: ${originalPurchase.receiptNo}, 原始积分: ${originalPoints}, 扣回: ${returnPoints}`);
 
     return {
       receiptNo: receipt.receiptNo,
@@ -164,8 +166,37 @@ export class RulesEngine {
   }
 
   private findOriginalPurchase(receipt: ReceiptItem): any {
-    const history = this.db.getReceiptHistory(receipt.receiptNo.replace('R', ''));
-    return history.find(r => r.status === 'success' && r.rawData.transactionType === 'purchase');
+    const memberRecords = this.db.getRecordsByMember(receipt.memberPhone);
+    const successPurchases = memberRecords.filter(
+      (r: any) => r.status === 'success' && r.rawData.transactionType === 'purchase'
+    );
+
+    if (successPurchases.length === 0) return null;
+
+    const exactMatch = successPurchases.find(
+      (r: any) => r.receiptNo === receipt.receiptNo.replace(/R$/i, '') || 
+                  r.receiptNo === receipt.receiptNo.replace(/^R/i, '')
+    );
+    if (exactMatch) return exactMatch;
+
+    const receiptTime = moment(receipt.transactionTime);
+    const within7Days = successPurchases.filter((r: any) => {
+      const purchaseTime = moment(r.transactionTime);
+      return receiptTime.diff(purchaseTime, 'days') <= 7 &&
+             receiptTime.diff(purchaseTime, 'days') >= 0;
+    });
+
+    if (within7Days.length > 0) {
+      const sortedByTime = within7Days.sort((a: any, b: any) => 
+        moment(b.transactionTime).diff(moment(a.transactionTime))
+      );
+      return sortedByTime[0];
+    }
+
+    const sortedByTime = successPurchases.sort((a: any, b: any) => 
+      moment(b.transactionTime).diff(moment(a.transactionTime))
+    );
+    return sortedByTime[0];
   }
 
   private getApplicableRules(receipt: ReceiptItem, member: Member, rules: ActivityRule[]): ActivityRule[] {

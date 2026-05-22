@@ -48,7 +48,7 @@ npm install
 npm run dev
 ```
 
-服务将在 `http://localhost:3000` 启动
+服务将在 `http://localhost:3001` 启动
 
 ### 3. 运行测试脚本
 
@@ -64,7 +64,7 @@ chmod +x test-api.sh
 
 ### 基础地址
 
-`http://localhost:3000`
+`http://localhost:3001`
 
 ---
 
@@ -231,7 +231,7 @@ Content-Type: `application/json`
 │   ├── types/
 │   │   └── index.ts          # 类型定义
 │   ├── database/
-│   │   └── index.ts          # SQLite数据库层
+│   │   └── index.ts          # JSON文件持久化层
 │   └── services/
 │       ├── rulesEngine.ts    # 规则引擎核心
 │       └── dataParser.ts     # 数据解析器
@@ -251,7 +251,7 @@ Content-Type: `application/json`
 
 ```bash
 # 1. 清理数据库（可选）
-rm -f points.db
+rm -f data-store.json
 
 # 2. 启动服务
 npm install
