@@ -62,7 +62,7 @@ async def upload_handover_files(
                     }
                     for item in result["normal_items"]
                 ],
-                "pending_items": [],
+                "pending_items": result["pending_items"],
                 "failed_items": result["failed_items"],
                 "statistics": result["statistics"]
             }
@@ -133,6 +133,11 @@ async def get_batch_details(batch_number: str, db: Session = Depends(get_db)):
         models.HandoverRecord.status == "normal"
     ).all()
     
+    pending_items = db.query(models.HandoverRecord).filter(
+        models.HandoverRecord.batch_id == batch.id,
+        models.HandoverRecord.status == "pending"
+    ).all()
+    
     failed_items = db.query(models.ErrorRecord).filter(
         models.ErrorRecord.batch_id == batch.id
     ).all()
@@ -148,6 +153,7 @@ async def get_batch_details(batch_number: str, db: Session = Depends(get_db)):
                 "status": batch.status
             },
             "normal_count": len(normal_items),
+            "pending_count": len(pending_items),
             "failed_count": len(failed_items),
             "error_records": [
                 {

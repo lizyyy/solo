@@ -2,7 +2,7 @@ import csv
 import json
 import hashlib
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from io import StringIO
 from sqlalchemy.orm import Session
 from app.models import Batch, HandoverRecord, ErrorRecord, TellerSchedule
@@ -10,6 +10,8 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+LARGE_AMOUNT_THRESHOLD = 100000.0
 
 
 def generate_batch_number() -> str:
@@ -23,7 +25,8 @@ def generate_error_code(batch_id: int, error_type: str, index: int) -> str:
         "missing_signature": "SIG",
         "cross_day": "DAY",
         "data_format": "FMT",
-        "duplicate": "DUP"
+        "duplicate": "DUP",
+        "pending_review": "PEN"
     }
     prefix = prefix_map.get(error_type, "ERR")
     return f"{prefix}-{batch_id:04d}-{index:04d}"
@@ -66,11 +69,25 @@ def parse_schedule_json(content: str) -> List[Dict[str, Any]]:
     return schedules
 
 
-def check_duplicate_batch(db: Session, records: List[Dict[str, Any]]) -> bool:
+def get_duplicate_check_fields(record: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "handover_date": record.get("handover_date", ""),
+        "branch_code": record.get("branch_code", ""),
+        "teller_from": record.get("teller_from", ""),
+        "teller_to": record.get("teller_to", ""),
+        "cashbox_number": record.get("cashbox_number", ""),
+        "system_amount": record.get("system_amount", 0),
+        "actual_amount": record.get("actual_amount", 0)
+    }
+
+
+def check_duplicate_batch(db: Session, records: List[Dict[str, Any]]) -> Tuple[bool, Optional[str]]:
     if not records:
-        return False
+        return False, None
     
-    record_hash = hashlib.md5(json.dumps(records, sort_keys=True).encode()).hexdigest()
+    check_records = [get_duplicate_check_fields(r) for r in records]
+    record_hash = hashlib.md5(json.dumps(check_records, sort_keys=True).encode()).hexdigest()
+    
     existing_batches = db.query(Batch).all()
     
     for batch in existing_batches:
@@ -78,14 +95,45 @@ def check_duplicate_batch(db: Session, records: List[Dict[str, Any]]) -> bool:
         if handovers:
             handover_data = [{
                 "handover_date": h.handover_date,
+                "branch_code": h.branch_code,
                 "teller_from": h.teller_from,
                 "teller_to": h.teller_to,
-                "cashbox_number": h.cashbox_number
+                "cashbox_number": h.cashbox_number,
+                "system_amount": h.system_amount,
+                "actual_amount": h.actual_amount
             } for h in handovers]
             existing_hash = hashlib.md5(json.dumps(handover_data, sort_keys=True).encode()).hexdigest()
             if existing_hash == record_hash:
-                return True
-    return False
+                return True, batch.batch_number
+    return False, None
+
+
+def check_pending_review(record: Dict[str, Any]) -> Tuple[bool, str, str]:
+    system_amt = record.get("system_amount", 0)
+    actual_amt = record.get("actual_amount", 0)
+    cashbox_num = record.get("cashbox_number", "")
+    confirmer_1 = record.get("confirmer_1", "")
+    confirmer_2 = record.get("confirmer_2", "")
+    
+    reasons = []
+    suggestions = []
+    
+    if system_amt >= LARGE_AMOUNT_THRESHOLD or actual_amt >= LARGE_AMOUNT_THRESHOLD:
+        reasons.append(f"大额交接")
+        suggestions.append(f"金额超过{LARGE_AMOUNT_THRESHOLD/10000:.0f}万，需主管复核确认")
+    
+    if cashbox_num.startswith("S") or "主管" in cashbox_num:
+        reasons.append("特殊尾箱")
+        suggestions.append("特殊尾箱交接需主管授权确认")
+    
+    if confirmer_1 and confirmer_2 and (confirmer_1 == confirmer_2 or confirmer_1 == record.get("teller_from") or confirmer_2 == record.get("teller_to")):
+        reasons.append("关联确认")
+        suggestions.append("确认人与交接人有关联，需第三方复核")
+    
+    if reasons:
+        return True, "待确认：" + "、".join(reasons), "；".join(suggestions)
+    
+    return False, "", ""
 
 
 def validate_amount_mismatch(record: Dict[str, Any]) -> Tuple[bool, str, str]:
@@ -158,8 +206,9 @@ def process_handover_records(
     schedule_records: List[Dict[str, Any]]
 ) -> Dict[str, Any]:
     
-    if check_duplicate_batch(db, handover_records):
-        raise ValueError("该批次数据已提交过，请勿重复提交。")
+    is_duplicate, existing_batch = check_duplicate_batch(db, handover_records)
+    if is_duplicate:
+        raise ValueError(f"该批次数据已提交过（批次号：{existing_batch}），请勿重复提交。")
     
     batch_number = generate_batch_number()
     batch = Batch(batch_number=batch_number, total_records=len(handover_records))
@@ -173,6 +222,8 @@ def process_handover_records(
     
     for record in handover_records:
         errors = []
+        pending_reasons = []
+        pending_suggestions = []
         
         has_amount_error, amount_desc, amount_suggestion = validate_amount_mismatch(record)
         if has_amount_error:
@@ -185,6 +236,12 @@ def process_handover_records(
         has_crossday_error, crossday_desc, crossday_suggestion = validate_cross_day_handover(record, schedule_records)
         if has_crossday_error:
             errors.append(("cross_day", crossday_desc, crossday_suggestion))
+        
+        if not errors:
+            has_pending, pending_desc, pending_suggest = check_pending_review(record)
+            if has_pending:
+                pending_reasons.append(pending_desc)
+                pending_suggestions.append(pending_suggest)
         
         handover = HandoverRecord(
             batch_id=batch.id,
@@ -200,7 +257,7 @@ def process_handover_records(
             confirmer_1=record.get("confirmer_1", ""),
             confirmer_2=record.get("confirmer_2", ""),
             handover_time=record.get("handover_time", ""),
-            status="normal" if not errors else "failed"
+            status="normal" if not errors and not pending_reasons else ("pending" if pending_reasons else "failed")
         )
         db.add(handover)
         db.flush()
@@ -229,6 +286,43 @@ def process_handover_records(
                     "original_data": record
                 })
             handover.status = "failed"
+        elif pending_reasons:
+            error_index += 1
+            error_code = generate_error_code(batch.id, "pending_review", error_index)
+            
+            error_record = ErrorRecord(
+                batch_id=batch.id,
+                handover_record_id=handover.id,
+                error_code=error_code,
+                error_type="pending_review",
+                error_description="；".join(pending_reasons),
+                suggestion="；".join(pending_suggestions),
+                original_data=json.dumps(record, ensure_ascii=False)
+            )
+            db.add(error_record)
+            
+            pending_items.append({
+                "id": handover.id,
+                "batch_id": handover.batch_id,
+                "handover_date": handover.handover_date,
+                "branch_code": handover.branch_code,
+                "branch_name": handover.branch_name,
+                "teller_from": handover.teller_from,
+                "teller_to": handover.teller_to,
+                "cashbox_number": handover.cashbox_number,
+                "system_amount": handover.system_amount,
+                "actual_amount": handover.actual_amount,
+                "difference": handover.difference,
+                "confirmer_1": handover.confirmer_1,
+                "confirmer_2": handover.confirmer_2,
+                "handover_time": handover.handover_time,
+                "status": handover.status,
+                "created_at": handover.created_at.isoformat(),
+                "pending_reason": "；".join(pending_reasons),
+                "pending_suggestion": "；".join(pending_suggestions),
+                "review_code": error_code
+            })
+            handover.status = "pending"
         else:
             normal_items.append(handover)
     
