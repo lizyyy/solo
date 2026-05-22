@@ -75,7 +75,8 @@ class ReviewManager:
 
     def revise_detail(self, detail_id: int, washing_quantity: Optional[int] = None,
                       recovery_quantity: Optional[int] = None, damage_quantity: Optional[int] = None,
-                      shortage_quantity: Optional[int] = None, note: str = "", operator: str = "") -> Dict:
+                      shortage_quantity: Optional[int] = None, duplicate_quantity: Optional[int] = None,
+                      duplicate_amount: Optional[float] = None, note: str = "", operator: str = "") -> Dict:
         conn = self.db.get_connection()
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM reconciliation_details WHERE id = ?', (detail_id,))
@@ -86,26 +87,32 @@ class ReviewManager:
         new_washing = washing_quantity if washing_quantity is not None else detail['washing_quantity']
         new_recovery = recovery_quantity if recovery_quantity is not None else detail['recovery_quantity']
         new_damage = damage_quantity if damage_quantity is not None else detail['damage_quantity']
-        new_shortage = shortage_quantity if shortage_quantity is not None else detail['shortage_quantity']
+        new_duplicate_quantity = duplicate_quantity if duplicate_quantity is not None else detail['duplicate_quantity']
+        new_duplicate_amount = duplicate_amount if duplicate_amount is not None else detail['duplicate_amount']
+        if shortage_quantity is not None:
+            new_shortage = shortage_quantity
+        else:
+            new_shortage = max(0, new_washing - new_recovery)
         unit_price = detail['unit_price']
         washing_amount = new_washing * unit_price
         shortage_compensation = new_shortage * unit_price
         damage_compensation = new_damage * unit_price * 0.5
-        final_amount = washing_amount - shortage_compensation - damage_compensation
+        final_amount = washing_amount - shortage_compensation - damage_compensation - new_duplicate_amount
         discrepancy_type, discrepancy_reason = self._detect_discrepancy_type(
-            new_washing, new_recovery, new_damage, new_shortage
+            new_washing, new_recovery, new_damage, new_shortage, new_duplicate_quantity
         )
         status = RecordStatus.MATCHED.value if not discrepancy_type else RecordStatus.DISCREPANCY.value
         cursor.execute(
             '''UPDATE reconciliation_details 
                SET washing_quantity = ?, recovery_quantity = ?, damage_quantity = ?, 
-                   shortage_quantity = ?, washing_amount = ?, shortage_compensation = ?,
+                   shortage_quantity = ?, duplicate_quantity = ?, duplicate_amount = ?,
+                   washing_amount = ?, shortage_compensation = ?,
                    damage_compensation = ?, final_amount = ?, status = ?, 
                    discrepancy_type = ?, discrepancy_reason = ?, review_note = ?, 
                    updated_at = ?
                WHERE id = ?''',
-            (new_washing, new_recovery, new_damage, new_shortage, washing_amount,
-             shortage_compensation, damage_compensation, final_amount, status,
+            (new_washing, new_recovery, new_damage, new_shortage, new_duplicate_quantity, new_duplicate_amount,
+             washing_amount, shortage_compensation, damage_compensation, final_amount, status,
              discrepancy_type, discrepancy_reason, note, datetime.now(), detail_id)
         )
         if operator:
@@ -115,6 +122,21 @@ class ReviewManager:
                    VALUES (?, ?, ?, ?, ?, ?)''',
                 (detail_id, ReviewAction.REVISE.value, detail['status'], status, note, operator)
             )
+        cursor.execute(
+            '''DELETE FROM discrepancy_logs WHERE detail_id = ?''', (detail_id,)
+        )
+        if discrepancy_type:
+            self._recreate_discrepancy_logs(cursor, detail_id, {
+                'linen_type': detail['linen_type'],
+                'shortage_quantity': new_shortage,
+                'shortage_compensation': shortage_compensation,
+                'washing_quantity': new_washing,
+                'recovery_quantity': new_recovery,
+                'damage_quantity': new_damage,
+                'damage_compensation': damage_compensation,
+                'duplicate_quantity': new_duplicate_quantity,
+                'duplicate_amount': new_duplicate_amount
+            })
         cursor.execute(
             '''SELECT SUM(washing_quantity) as total_washing,
                        SUM(recovery_quantity) as total_recovery,
@@ -138,28 +160,62 @@ class ReviewManager:
         return {
             'success': True,
             'detail_id': detail_id,
-            'final_amount': final_amount
+            'final_amount': final_amount,
+            'shortage_quantity': new_shortage,
+            'shortage_compensation': shortage_compensation
         }
 
     def _detect_discrepancy_type(self, washing_quantity: int, recovery_quantity: int,
-                                  damage_quantity: int, shortage_quantity: int) -> tuple:
+                                  damage_quantity: int, shortage_quantity: int,
+                                  duplicate_quantity: int = 0) -> tuple:
         reasons = []
-        discrepancy_type = None
+        types = []
         if shortage_quantity > 0:
             reasons.append(f"短少{shortage_quantity}件")
-            discrepancy_type = DiscrepancyType.SHORTAGE.value
+            types.append(DiscrepancyType.SHORTAGE.value)
         if damage_quantity > 0:
             reasons.append(f"破损{damage_quantity}件")
-            if not discrepancy_type:
-                discrepancy_type = DiscrepancyType.DAMAGE.value
-            else:
-                discrepancy_type = DiscrepancyType.MISMATCH.value
+            types.append(DiscrepancyType.DAMAGE.value)
+        if duplicate_quantity > 0:
+            reasons.append(f"重复计费{duplicate_quantity}件")
+            types.append(DiscrepancyType.DUPLICATE.value)
         if washing_quantity > 0 and recovery_quantity > washing_quantity:
             over_recovery = recovery_quantity - washing_quantity
             reasons.append(f"多回收{over_recovery}件")
-            discrepancy_type = DiscrepancyType.MISMATCH.value
+            types.append(DiscrepancyType.MISMATCH.value)
+        discrepancy_type = types[0] if len(types) == 1 else (DiscrepancyType.MISMATCH.value if types else None)
         reason_text = "、".join(reasons) if reasons else ""
         return discrepancy_type, reason_text
+
+    def _recreate_discrepancy_logs(self, cursor, detail_id: int, data: Dict):
+        linen_type = data.get('linen_type', '')
+        if data.get('shortage_quantity', 0) > 0:
+            cursor.execute(
+                '''INSERT INTO discrepancy_logs 
+                   (detail_id, discrepancy_type, description, expected_value, actual_value, difference)
+                   VALUES (?, ?, ?, ?, ?, ?)''',
+                (detail_id, DiscrepancyType.SHORTAGE.value,
+                 f"{linen_type}短少{data['shortage_quantity']}件，应赔付{data['shortage_compensation']:.2f}元",
+                 data['washing_quantity'], data['recovery_quantity'], data['shortage_quantity'])
+            )
+        if data.get('damage_quantity', 0) > 0:
+            cursor.execute(
+                '''INSERT INTO discrepancy_logs 
+                   (detail_id, discrepancy_type, description, expected_value, actual_value, difference)
+                   VALUES (?, ?, ?, ?, ?, ?)''',
+                (detail_id, DiscrepancyType.DAMAGE.value,
+                 f"{linen_type}破损{data['damage_quantity']}件，应扣减{data['damage_compensation']:.2f}元",
+                 0, data['damage_quantity'], data['damage_quantity'])
+            )
+        if data.get('duplicate_quantity', 0) > 0:
+            cursor.execute(
+                '''INSERT INTO discrepancy_logs 
+                   (detail_id, discrepancy_type, description, expected_value, actual_value, difference)
+                   VALUES (?, ?, ?, ?, ?, ?)''',
+                (detail_id, DiscrepancyType.DUPLICATE.value,
+                 f"{linen_type}检测到重复计费{data['duplicate_quantity']}件，应扣除{data['duplicate_amount']:.2f}元",
+                 0, data['duplicate_quantity'], data['duplicate_quantity'])
+            )
 
     def batch_approve(self, batch_id: int, operator: str) -> Dict:
         conn = self.db.get_connection()
@@ -202,26 +258,29 @@ class ReportGenerator:
             'details': []
         }
         for detail in details:
+            detail_dict = dict(detail)
             detail_report = {
-                'linen_type': detail['linen_type'],
-                'washing_quantity': detail['washing_quantity'],
-                'recovery_quantity': detail['recovery_quantity'],
-                'damage_quantity': detail['damage_quantity'],
-                'shortage_quantity': detail['shortage_quantity'],
-                'unit_price': detail['unit_price'],
-                'washing_amount': detail['washing_amount'],
-                'shortage_compensation': detail['shortage_compensation'],
-                'damage_compensation': detail['damage_compensation'],
-                'final_amount': detail['final_amount'],
-                'status': detail['status'],
-                'discrepancy_type': detail['discrepancy_type'],
-                'discrepancy_reason': detail['discrepancy_reason'],
-                'review_note': detail['review_note'],
-                'reviewed_by': detail['reviewed_by'],
-                'reviewed_at': detail['reviewed_at']
+                'linen_type': detail_dict['linen_type'],
+                'washing_quantity': detail_dict['washing_quantity'],
+                'recovery_quantity': detail_dict['recovery_quantity'],
+                'damage_quantity': detail_dict['damage_quantity'],
+                'shortage_quantity': detail_dict['shortage_quantity'],
+                'duplicate_quantity': detail_dict.get('duplicate_quantity', 0),
+                'duplicate_amount': detail_dict.get('duplicate_amount', 0),
+                'unit_price': detail_dict['unit_price'],
+                'washing_amount': detail_dict['washing_amount'],
+                'shortage_compensation': detail_dict['shortage_compensation'],
+                'damage_compensation': detail_dict['damage_compensation'],
+                'final_amount': detail_dict['final_amount'],
+                'status': detail_dict['status'],
+                'discrepancy_type': detail_dict['discrepancy_type'],
+                'discrepancy_reason': detail_dict['discrepancy_reason'],
+                'review_note': detail_dict['review_note'],
+                'reviewed_by': detail_dict['reviewed_by'],
+                'reviewed_at': detail_dict['reviewed_at']
             }
-            if detail['discrepancy_type']:
-                detail_report['discrepancy_explanation'] = self._generate_explanation(detail)
+            if detail_dict['discrepancy_type']:
+                detail_report['discrepancy_explanation'] = self._generate_explanation(detail_dict)
             report['details'].append(detail_report)
         conn.close()
         return report
@@ -230,13 +289,18 @@ class ReportGenerator:
         explanations = []
         if detail['shortage_quantity'] > 0:
             explanations.append(
-                f"【短少赔付】{detail['linen_type']}送洗{detail['washing_quantity']}件，回收{detail['recovery_quantity']}件，"
+                f"【短少赔付】{detail['linen_type']}送洗{detail['washing_quantity']}件，实际回收（干净+破损）{detail['recovery_quantity']}件，"
                 f"短少{detail['shortage_quantity']}件，按单价{detail['unit_price']:.2f}元计算，应赔付{detail['shortage_compensation']:.2f}元。"
             )
         if detail['damage_quantity'] > 0:
             explanations.append(
                 f"【破损扣减】{detail['linen_type']}回收中发现破损{detail['damage_quantity']}件，"
                 f"按单价50%计算，应扣减{detail['damage_compensation']:.2f}元。"
+            )
+        if detail.get('duplicate_quantity', 0) > 0:
+            explanations.append(
+                f"【重复计费】{detail['linen_type']}检测到重复计费{detail['duplicate_quantity']}件，"
+                f"应扣除{detail.get('duplicate_amount', 0):.2f}元。"
             )
         if detail['recovery_quantity'] > detail['washing_quantity']:
             over = detail['recovery_quantity'] - detail['washing_quantity']
@@ -265,8 +329,8 @@ class ReportGenerator:
             writer.writerow(['总金额(元)', report['summary']['total_amount']])
             writer.writerow([])
             writer.writerow([
-                '布草类型', '送洗数量', '回收数量', '破损数量', '短少数量',
-                '单价', '送洗金额', '短少赔付', '破损扣减', '最终金额',
+                '布草类型', '送洗数量', '回收数量', '破损数量', '短少数量', '重复数量',
+                '单价', '送洗金额', '短少赔付', '破损扣减', '重复扣减', '最终金额',
                 '状态', '差异原因', '复核说明', '差异说明'
             ])
             for detail in report['details']:
@@ -276,10 +340,12 @@ class ReportGenerator:
                     detail['recovery_quantity'],
                     detail['damage_quantity'],
                     detail['shortage_quantity'],
+                    detail.get('duplicate_quantity', 0),
                     detail['unit_price'],
                     detail['washing_amount'],
                     detail['shortage_compensation'],
                     detail['damage_compensation'],
+                    detail.get('duplicate_amount', 0),
                     detail['final_amount'],
                     detail['status'],
                     detail['discrepancy_reason'] or '',

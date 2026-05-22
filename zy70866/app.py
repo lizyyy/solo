@@ -187,10 +187,22 @@ def revise_detail(detail_id):
         recovery_quantity=data.get('recovery_quantity'),
         damage_quantity=data.get('damage_quantity'),
         shortage_quantity=data.get('shortage_quantity'),
+        duplicate_quantity=data.get('duplicate_quantity'),
+        duplicate_amount=data.get('duplicate_amount'),
         note=data.get('note', ''),
         operator=data.get('operator', 'system')
     )
     return jsonify(result)
+
+
+@app.route('/api/detect-duplicates', methods=['GET'])
+def detect_duplicates():
+    start_date = request.args.get('start_date', '2024-01-01')
+    end_date = request.args.get('end_date', '2024-12-31')
+    db = get_db()
+    engine = ReconciliationEngine(db)
+    duplicates = engine.detect_duplicate_washing(start_date, end_date)
+    return jsonify(duplicates)
 
 @app.route('/api/review/batch-approve/<int:batch_id>', methods=['POST'])
 def batch_approve(batch_id):

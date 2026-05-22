@@ -109,6 +109,8 @@ class Database:
                 recovery_quantity INTEGER NOT NULL,
                 damage_quantity INTEGER NOT NULL,
                 shortage_quantity INTEGER NOT NULL,
+                duplicate_quantity INTEGER DEFAULT 0,
+                duplicate_amount REAL DEFAULT 0,
                 unit_price REAL NOT NULL,
                 washing_amount REAL NOT NULL,
                 shortage_compensation REAL NOT NULL,
