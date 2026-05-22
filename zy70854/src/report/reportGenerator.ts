@@ -305,13 +305,15 @@ export class ReportGenerator {
   }
 
   private getStatusText(status: ItemStatus): string {
-    const statusMap: Record<ItemStatus, string> = {
+    const statusMap: Partial<Record<ItemStatus, string>> = {
       [ItemStatus.PENDING]: '待处理',
       [ItemStatus.MATCHED]: '已匹配',
       [ItemStatus.UNMATCHED]: '未匹配',
       [ItemStatus.REVIEWING]: '复核中',
       [ItemStatus.APPROVED]: '已审批',
       [ItemStatus.REJECTED]: '已驳回',
+      [ItemStatus.RETURNED]: '已归还',
+      [ItemStatus.CLAIMED]: '已认领',
       [ItemStatus.OVERDUE]: '已逾期'
     };
     return statusMap[status] || status;

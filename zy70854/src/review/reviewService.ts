@@ -13,10 +13,38 @@ import {
 export class ReviewService {
   private reviewHistory: Map<string, ReviewRecord[]> = new Map();
 
-  startReview(matchId: string, reviewer: string): MatchRecord | null {
-    const match = this.getMatchById(matchId);
-    if (!match) return null;
+  recordReview(
+    matchId: string,
+    reviewer: string,
+    action: ReviewAction,
+    previousStatus: ItemStatus,
+    newStatus: ItemStatus,
+    reason: string,
+    changes: { field: string; oldValue: string; newValue: string }[] = []
+  ): ReviewRecord {
+    const now = new Date();
+    const reviewRecord: ReviewRecord = {
+      id: uuidv4(),
+      matchId,
+      reviewer,
+      reviewDate: now.toISOString().split('T')[0],
+      reviewTime: now.toTimeString().split(' ')[0],
+      action,
+      previousStatus,
+      newStatus,
+      reason,
+      changes
+    };
 
+    if (!this.reviewHistory.has(matchId)) {
+      this.reviewHistory.set(matchId, []);
+    }
+    this.reviewHistory.get(matchId)!.push(reviewRecord);
+
+    return reviewRecord;
+  }
+
+  startReview(match: MatchRecord, reviewer: string): { match: MatchRecord; reviewRecord: ReviewRecord } {
     if (match.status !== ItemStatus.MATCHED && match.status !== ItemStatus.UNMATCHED) {
       throw new Error('该记录状态不允许开始复核');
     }
@@ -25,8 +53,8 @@ export class ReviewService {
     match.status = ItemStatus.REVIEWING;
     match.updatedAt = new Date().toISOString();
 
-    this.addReviewRecord(
-      matchId,
+    const reviewRecord = this.recordReview(
+      match.id,
       reviewer,
       ReviewAction.REQUEST_MORE_INFO,
       previousStatus,
@@ -35,13 +63,10 @@ export class ReviewService {
       []
     );
 
-    return match;
+    return { match, reviewRecord };
   }
 
-  approveMatch(matchId: string, reviewer: string, reason: string): MatchRecord | null {
-    const match = this.getMatchById(matchId);
-    if (!match) return null;
-
+  approveMatch(match: MatchRecord, reviewer: string, reason: string): { match: MatchRecord; reviewRecord: ReviewRecord } {
     if (match.status !== ItemStatus.REVIEWING && match.status !== ItemStatus.MATCHED) {
       throw new Error('该记录状态不允许审批通过');
     }
@@ -50,8 +75,8 @@ export class ReviewService {
     match.status = ItemStatus.APPROVED;
     match.updatedAt = new Date().toISOString();
 
-    this.addReviewRecord(
-      matchId,
+    const reviewRecord = this.recordReview(
+      match.id,
       reviewer,
       ReviewAction.APPROVE,
       previousStatus,
@@ -60,13 +85,10 @@ export class ReviewService {
       []
     );
 
-    return match;
+    return { match, reviewRecord };
   }
 
-  rejectMatch(matchId: string, reviewer: string, reason: string): MatchRecord | null {
-    const match = this.getMatchById(matchId);
-    if (!match) return null;
-
+  rejectMatch(match: MatchRecord, reviewer: string, reason: string): { match: MatchRecord; reviewRecord: ReviewRecord } {
     if (match.status !== ItemStatus.REVIEWING && match.status !== ItemStatus.MATCHED) {
       throw new Error('该记录状态不允许驳回');
     }
@@ -75,8 +97,8 @@ export class ReviewService {
     match.status = ItemStatus.REJECTED;
     match.updatedAt = new Date().toISOString();
 
-    this.addReviewRecord(
-      matchId,
+    const reviewRecord = this.recordReview(
+      match.id,
       reviewer,
       ReviewAction.REJECT,
       previousStatus,
@@ -85,11 +107,11 @@ export class ReviewService {
       []
     );
 
-    return match;
+    return { match, reviewRecord };
   }
 
   manualMatch(
-    matchId: string,
+    match: MatchRecord,
     reviewer: string,
     reason: string,
     targetIds: {
@@ -97,10 +119,7 @@ export class ReviewService {
       driverItemId?: string;
       warehouseItemId?: string;
     }
-  ): MatchRecord | null {
-    const match = this.getMatchById(matchId);
-    if (!match) return null;
-
+  ): { match: MatchRecord; reviewRecord: ReviewRecord } {
     const previousStatus = match.status;
     const changes: { field: string; oldValue: string; newValue: string }[] = [];
 
@@ -138,8 +157,8 @@ export class ReviewService {
     match.differenceExplanations.push(`人工匹配: ${reason}`);
     match.updatedAt = new Date().toISOString();
 
-    this.addReviewRecord(
-      matchId,
+    const reviewRecord = this.recordReview(
+      match.id,
       reviewer,
       ReviewAction.MANUAL_MATCH,
       previousStatus,
@@ -148,24 +167,21 @@ export class ReviewService {
       changes
     );
 
-    return match;
+    return { match, reviewRecord };
   }
 
   unmatch(
-    matchId: string,
+    match: MatchRecord,
     reviewer: string,
     reason: string
-  ): MatchRecord | null {
-    const match = this.getMatchById(matchId);
-    if (!match) return null;
-
+  ): { match: MatchRecord; reviewRecord: ReviewRecord } {
     const previousStatus = match.status;
     match.status = ItemStatus.UNMATCHED;
     match.differenceExplanations.push(`解除匹配: ${reason}`);
     match.updatedAt = new Date().toISOString();
 
-    this.addReviewRecord(
-      matchId,
+    const reviewRecord = this.recordReview(
+      match.id,
       reviewer,
       ReviewAction.UNMATCH,
       previousStatus,
@@ -174,24 +190,21 @@ export class ReviewService {
       []
     );
 
-    return match;
+    return { match, reviewRecord };
   }
 
   requestMoreInfo(
-    matchId: string,
+    match: MatchRecord,
     reviewer: string,
     reason: string
-  ): MatchRecord | null {
-    const match = this.getMatchById(matchId);
-    if (!match) return null;
-
+  ): { match: MatchRecord; reviewRecord: ReviewRecord } {
     const previousStatus = match.status;
     match.status = ItemStatus.REVIEWING;
     match.differenceExplanations.push(`要求补充信息: ${reason}`);
     match.updatedAt = new Date().toISOString();
 
-    this.addReviewRecord(
-      matchId,
+    const reviewRecord = this.recordReview(
+      match.id,
       reviewer,
       ReviewAction.REQUEST_MORE_INFO,
       previousStatus,
@@ -200,18 +213,14 @@ export class ReviewService {
       []
     );
 
-    return match;
+    return { match, reviewRecord };
   }
 
   addDifferenceExplanation(
-    matchId: string,
-    reviewer: string,
+    match: MatchRecord,
     explanation: string,
     differenceType?: DifferenceType
-  ): MatchRecord | null {
-    const match = this.getMatchById(matchId);
-    if (!match) return null;
-
+  ): MatchRecord {
     match.differenceExplanations.push(explanation);
     if (differenceType && !match.differences.includes(differenceType)) {
       match.differences.push(differenceType);
@@ -223,6 +232,14 @@ export class ReviewService {
 
   getReviewHistory(matchId: string): ReviewRecord[] {
     return this.reviewHistory.get(matchId) || [];
+  }
+
+  getAllReviewHistory(): ReviewRecord[] {
+    const allRecords: ReviewRecord[] = [];
+    this.reviewHistory.forEach(records => {
+      allRecords.push(...records);
+    });
+    return allRecords;
   }
 
   getReviewRecordsByReviewer(reviewer: string): ReviewRecord[] {
@@ -246,39 +263,6 @@ export class ReviewService {
     });
 
     return allRecords;
-  }
-
-  private addReviewRecord(
-    matchId: string,
-    reviewer: string,
-    action: ReviewAction,
-    previousStatus: ItemStatus,
-    newStatus: ItemStatus,
-    reason: string,
-    changes: { field: string; oldValue: string; newValue: string }[]
-  ): void {
-    const now = new Date();
-    const reviewRecord: ReviewRecord = {
-      id: uuidv4(),
-      matchId,
-      reviewer,
-      reviewDate: now.toISOString().split('T')[0],
-      reviewTime: now.toTimeString().split(' ')[0],
-      action,
-      previousStatus,
-      newStatus,
-      reason,
-      changes
-    };
-
-    if (!this.reviewHistory.has(matchId)) {
-      this.reviewHistory.set(matchId, []);
-    }
-    this.reviewHistory.get(matchId)!.push(reviewRecord);
-  }
-
-  private getMatchById(matchId: string): MatchRecord | null {
-    return null;
   }
 
   getAuditTrail(matchId: string): string[] {

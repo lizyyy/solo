@@ -180,6 +180,20 @@ export function createServer() {
     res.json({ success: true, match: result });
   });
 
+  app.post('/api/batches/:batchId/matches/:matchId/request-info', (req, res) => {
+    const { reviewer, reason } = req.body;
+    const result = reconciliationService.requestMoreInfo(
+      req.params.batchId,
+      req.params.matchId,
+      reviewer || '未知用户',
+      reason || '要求补充信息'
+    );
+    if (!result) {
+      return res.status(404).json({ error: '匹配记录不存在' });
+    }
+    res.json({ success: true, match: result });
+  });
+
   app.post('/api/batches/:batchId/recalculate', (req, res) => {
     try {
       const matches = reconciliationService.recalculateMatching(req.params.batchId);

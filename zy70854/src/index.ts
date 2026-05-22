@@ -18,6 +18,7 @@ app.listen(PORT, () => {
   console.log('  POST /api/batches/:id/matches/:matchId/reject - 审批驳回');
   console.log('  POST /api/batches/:id/matches/:matchId/manual-match - 人工匹配');
   console.log('  POST /api/batches/:id/matches/:matchId/unmatch - 解除匹配');
+  console.log('  POST /api/batches/:id/matches/:matchId/request-info - 要求补充信息');
   console.log('  POST /api/batches/:id/recalculate - 重新计算匹配');
   console.log('  POST /api/batches/:id/complete - 完成对账批次');
   console.log('  GET  /api/batches/:id/report?format=json|csv|excel|text - 下载报告');

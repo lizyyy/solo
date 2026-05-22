@@ -1,4 +1,4 @@
-import * as csvParser from 'csv-parser';
+import csvParser from 'csv-parser';
 import { Readable } from 'stream';
 import { v4 as uuidv4 } from 'uuid';
 import {

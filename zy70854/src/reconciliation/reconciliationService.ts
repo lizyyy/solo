@@ -166,21 +166,35 @@ export class ReconciliationService {
   }
 
   approveMatch(batchId: string, matchId: string, reviewer: string, reason: string): MatchRecord | null {
-    const result = this.reviewService.approveMatch(matchId, reviewer, reason);
-    if (result) {
-      this.updateMatchInBatch(batchId, result);
-      this.updateBatchStatistics(batchId);
-    }
-    return result;
+    const matches = this.batchMatches.get(batchId);
+    if (!matches) return null;
+
+    const matchIndex = matches.findIndex(m => m.id === matchId);
+    if (matchIndex === -1) return null;
+
+    const match = { ...matches[matchIndex] };
+    const result = this.reviewService.approveMatch(match, reviewer, reason);
+    
+    matches[matchIndex] = result.match;
+    this.updateBatchStatistics(batchId);
+    
+    return result.match;
   }
 
   rejectMatch(batchId: string, matchId: string, reviewer: string, reason: string): MatchRecord | null {
-    const result = this.reviewService.rejectMatch(matchId, reviewer, reason);
-    if (result) {
-      this.updateMatchInBatch(batchId, result);
-      this.updateBatchStatistics(batchId);
-    }
-    return result;
+    const matches = this.batchMatches.get(batchId);
+    if (!matches) return null;
+
+    const matchIndex = matches.findIndex(m => m.id === matchId);
+    if (matchIndex === -1) return null;
+
+    const match = { ...matches[matchIndex] };
+    const result = this.reviewService.rejectMatch(match, reviewer, reason);
+    
+    matches[matchIndex] = result.match;
+    this.updateBatchStatistics(batchId);
+    
+    return result.match;
   }
 
   manualMatch(
@@ -194,21 +208,51 @@ export class ReconciliationService {
       warehouseItemId?: string;
     }
   ): MatchRecord | null {
-    const result = this.reviewService.manualMatch(matchId, reviewer, reason, targetIds);
-    if (result) {
-      this.updateMatchInBatch(batchId, result);
-      this.updateBatchStatistics(batchId);
-    }
-    return result;
+    const matches = this.batchMatches.get(batchId);
+    if (!matches) return null;
+
+    const matchIndex = matches.findIndex(m => m.id === matchId);
+    if (matchIndex === -1) return null;
+
+    const match = { ...matches[matchIndex] };
+    const result = this.reviewService.manualMatch(match, reviewer, reason, targetIds);
+    
+    matches[matchIndex] = result.match;
+    this.updateBatchStatistics(batchId);
+    
+    return result.match;
   }
 
   unmatch(batchId: string, matchId: string, reviewer: string, reason: string): MatchRecord | null {
-    const result = this.reviewService.unmatch(matchId, reviewer, reason);
-    if (result) {
-      this.updateMatchInBatch(batchId, result);
-      this.updateBatchStatistics(batchId);
-    }
-    return result;
+    const matches = this.batchMatches.get(batchId);
+    if (!matches) return null;
+
+    const matchIndex = matches.findIndex(m => m.id === matchId);
+    if (matchIndex === -1) return null;
+
+    const match = { ...matches[matchIndex] };
+    const result = this.reviewService.unmatch(match, reviewer, reason);
+    
+    matches[matchIndex] = result.match;
+    this.updateBatchStatistics(batchId);
+    
+    return result.match;
+  }
+
+  requestMoreInfo(batchId: string, matchId: string, reviewer: string, reason: string): MatchRecord | null {
+    const matches = this.batchMatches.get(batchId);
+    if (!matches) return null;
+
+    const matchIndex = matches.findIndex(m => m.id === matchId);
+    if (matchIndex === -1) return null;
+
+    const match = { ...matches[matchIndex] };
+    const result = this.reviewService.requestMoreInfo(match, reviewer, reason);
+    
+    matches[matchIndex] = result.match;
+    this.updateBatchStatistics(batchId);
+    
+    return result.match;
   }
 
   private updateMatchInBatch(batchId: string, updatedMatch: MatchRecord): void {
