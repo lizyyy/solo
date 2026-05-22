@@ -1,4 +1,4 @@
-import * as csv from 'csv-parser';
+import csv from 'csv-parser';
 import { Readable } from 'stream';
 import { Mentor, Application, TransferRecord } from '../types';
 import { dataStore } from '../store/DataStore';
@@ -15,7 +15,7 @@ export class FileParserService {
           headers: ['id', 'name', 'department', 'major', 'direction', 'quota', 'usedQuota'],
           skipLines: 1
         }))
-        .on('data', (row) => {
+        .on('data', (row: any) => {
           mentors.push({
             id: row.id?.trim() || dataStore.generateId(),
             name: row.name?.trim() || '',

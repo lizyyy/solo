@@ -61,27 +61,36 @@ export class ValidationService {
 
   private checkDuplicateApplication(app: Application): ValidationError | null {
     const existingApps = dataStore.getApplicationsByStudent(app.studentId);
-    const hasConfirmed = existingApps.some(a => 
-      a.status === 'confirmed' && a.mentorId === app.mentorId
-    );
     
-    if (hasConfirmed) {
+    const hasConfirmedAny = existingApps.some(a => a.status === 'confirmed');
+    if (hasConfirmedAny) {
+      const confirmedApp = existingApps.find(a => a.status === 'confirmed');
       return {
         rule: 'duplicate',
-        message: '该学生已被此导师录取，重复申请',
-        suggestion: '跳过该记录，或取消原有录取后重新导入'
+        message: `该学生已被导师${confirmedApp?.mentorName}确认录取，不能重复录取`,
+        suggestion: '取消该学生其他志愿，或取消原有录取后重新申请'
       };
     }
 
-    const hasNormal = existingApps.some(a => 
+    const hasNormalAny = existingApps.some(a => a.status === 'normal');
+    const hasNormalSameMentor = existingApps.some(a => 
       a.status === 'normal' && a.mentorId === app.mentorId
     );
     
-    if (hasNormal) {
+    if (hasNormalSameMentor) {
       return {
         rule: 'duplicate',
         message: '该学生志愿已存在，重复导入',
         suggestion: '确认是否为更新操作，如需更新请先标记原有记录为无效'
+      };
+    }
+
+    if (hasNormalAny) {
+      const normalApp = existingApps.find(a => a.status === 'normal');
+      return {
+        rule: 'duplicate',
+        message: `该学生已有导师${normalApp?.mentorName}的正常志愿，需确认志愿优先级`,
+        suggestion: '标记为待人工确认，或取消原有志愿后重新导入'
       };
     }
 

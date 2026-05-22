@@ -26,7 +26,7 @@ router.post('/import/batch', upload.fields([
       });
     }
 
-    let mentors, applications, transfers;
+    let mentors: any, applications: any, transfers: any;
 
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     

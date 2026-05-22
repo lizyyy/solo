@@ -139,6 +139,12 @@ async function runTest() {
     console.log('  ✓ 名额占用规则生效: 导师名额满时无法继续录取');
   }
   
+  const multiMentorApp = result.details.applications?.pending?.find(a => a.message?.includes('需确认志愿优先级'));
+  if (multiMentorApp) {
+    console.log('  ✓ 重复录取规则生效: 同一学生申请不同导师时标记为待人工确认');
+    console.log(`     学生: ${multiMentorApp.data.studentName} 已有其他导师志愿，需确认优先级`);
+  }
+  
   console.log();
 
   console.log('='.repeat(60));

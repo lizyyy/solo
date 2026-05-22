@@ -71,6 +71,13 @@ export class ProcessingService {
             data: app,
             message: validationError.message
           });
+        } else if (validationError.rule === 'duplicate' && validationError.message.includes('需确认志愿优先级')) {
+          app.status = 'pending';
+          dataStore.addApplication(app);
+          result.pending.push({
+            data: app,
+            message: validationError.message
+          });
         } else if (validationError.rule === 'quota' && validationError.message.includes('即将用尽')) {
           app.status = 'normal';
           dataStore.addApplication(app);
