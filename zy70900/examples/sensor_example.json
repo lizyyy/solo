@@ -1,0 +1,22 @@
+[
+  {
+    "cableCarNo": "LC001",
+    "sensorType": "温度传感器",
+    "sensorValue": 45.2,
+    "sensorUnit": "°C",
+    "collectTime": "2024-01-15T10:30:00Z",
+    "thresholdMin": 0,
+    "thresholdMax": 60,
+    "isNormal": true
+  },
+  {
+    "cableCarNo": "LC001",
+    "sensorType": "振动传感器",
+    "sensorValue": 2.3,
+    "sensorUnit": "mm/s",
+    "collectTime": "2024-01-15T10:30:00Z",
+    "thresholdMin": 0,
+    "thresholdMax": 5,
+    "isNormal": true
+  }
+]
