@@ -73,6 +73,36 @@ const exceptionLogSchema = new mongoose.Schema({
   remarks: {
     type: String
   },
+  reassigned: {
+    type: Boolean,
+    default: false
+  },
+  reassignedAt: {
+    type: Date
+  },
+  reassignedReason: {
+    type: String
+  },
+  reassignedBy: {
+    type: String
+  },
+  reassignHistory: [{
+    fromHandler: {
+      type: String
+    },
+    toHandler: {
+      type: String
+    },
+    reason: {
+      type: String
+    },
+    remarks: {
+      type: String
+    },
+    reassignedAt: {
+      type: Date
+    }
+  }],
   createdAt: {
     type: Date,
     default: Date.now

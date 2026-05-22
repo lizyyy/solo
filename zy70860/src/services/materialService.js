@@ -2,6 +2,7 @@ const MaterialRecord = require('../models/MaterialRecord');
 const Inventory = require('../models/Inventory');
 const ExceptionLog = require('../models/ExceptionLog');
 const AuditLog = require('../models/AuditLog');
+const RepairOrder = require('../models/RepairOrder');
 const { generateRecordId, generateLogId } = require('../utils/idGenerator');
 
 class MaterialService {
@@ -23,6 +24,14 @@ class MaterialService {
         reason: recordData.reason,
         newStatus: 'pending'
       });
+
+      if (recordData.recordType === 'emergency') {
+        await this.createExceptionLog(record, 'emergency_usage', {
+          quantity: recordData.requestedQuantity,
+          reason: recordData.reason || '紧急领用',
+          handler: recordData.applicant || 'system'
+        });
+      }
 
       return { success: true, data: record };
     } catch (error) {
@@ -326,6 +335,189 @@ class MaterialService {
           auditTrail: record.auditTrail,
           auditLogs,
           exceptionLogs
+        }
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async validateOrderNumber(orderNumber) {
+    try {
+      if (!orderNumber) {
+        return {
+          success: false,
+          valid: false,
+          error: '抢修单号不能为空'
+        };
+      }
+
+      const repairOrder = await RepairOrder.findOne({ orderNumber });
+      const relatedRecords = await MaterialRecord.find({ orderNumber });
+
+      const orderPattern = /^[A-Za-z0-9]{3,20}$/;
+      const formatValid = orderPattern.test(orderNumber);
+
+      return {
+        success: true,
+        valid: repairOrder !== null,
+        orderNumber,
+        formatValid,
+        repairOrder: repairOrder || null,
+        relatedRecords: relatedRecords.length,
+        message: repairOrder ? '抢修单号有效' : '抢修单号不存在'
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async confirmReceipt(recordId, receiver, receiptNotes) {
+    try {
+      const record = await MaterialRecord.findOne({ recordId });
+      if (!record) {
+        return { success: false, error: '记录不存在' };
+      }
+
+      const previousStatus = record.status;
+      record.receivedBy = receiver;
+      record.receivedAt = new Date();
+      record.receiptNotes = receiptNotes;
+      record.receiptConfirmed = true;
+
+      record.addAuditTrail('收件回执', receiver, receiptNotes);
+      await record.save();
+
+      await this.createAuditLog({
+        recordId: record.recordId,
+        orderNumber: record.orderNumber,
+        action: '收件回执',
+        previousStatus,
+        newStatus: record.status,
+        operator: receiver,
+        reason: receiptNotes,
+        changes: { receiptConfirmed: true, receivedBy: receiver }
+      });
+
+      return {
+        success: true,
+        data: {
+          recordId: record.recordId,
+          receiver,
+          receivedAt: record.receivedAt,
+          receiptNotes,
+          receiptConfirmed: true
+        }
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async reassignException(logId, newHandler, reason, remarks) {
+    try {
+      const exceptionLog = await ExceptionLog.findOne({ logId });
+      if (!exceptionLog) {
+        return { success: false, error: '异常日志不存在' };
+      }
+
+      const previousHandler = exceptionLog.handler;
+      exceptionLog.handler = newHandler;
+      exceptionLog.status = 'pending';
+      exceptionLog.reassigned = true;
+      exceptionLog.reassignedAt = new Date();
+      exceptionLog.reassignedReason = reason;
+      exceptionLog.reassignedBy = newHandler;
+
+      if (!exceptionLog.reassignHistory) {
+        exceptionLog.reassignHistory = [];
+      }
+      exceptionLog.reassignHistory.push({
+        fromHandler: previousHandler,
+        toHandler: newHandler,
+        reason,
+        remarks,
+        reassignedAt: new Date()
+      });
+
+      await exceptionLog.save();
+
+      const record = await MaterialRecord.findOne({ recordId: exceptionLog.recordId });
+      if (record) {
+        record.addAuditTrail('异常重派', newHandler, `原处理人: ${previousHandler}, 原因: ${reason}`);
+        await record.save();
+      }
+
+      await this.createAuditLog({
+        recordId: exceptionLog.recordId,
+        orderNumber: exceptionLog.orderNumber,
+        action: '异常重派',
+        operator: newHandler,
+        reason,
+        remarks,
+        changes: {
+          previousHandler,
+          newHandler
+        }
+      });
+
+      return {
+        success: true,
+        data: {
+          logId,
+          previousHandler,
+          newHandler,
+          reason,
+          reassignedAt: exceptionLog.reassignedAt,
+          status: 'pending'
+        }
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async resolveException(logId, handler, resolution, remarks) {
+    try {
+      const exceptionLog = await ExceptionLog.findOne({ logId });
+      if (!exceptionLog) {
+        return { success: false, error: '异常日志不存在' };
+      }
+
+      exceptionLog.status = 'resolved';
+      exceptionLog.resolution = resolution;
+      exceptionLog.resolvedBy = handler;
+      exceptionLog.resolvedTime = new Date();
+      exceptionLog.remarks = remarks || exceptionLog.remarks;
+
+      await exceptionLog.save();
+
+      const record = await MaterialRecord.findOne({ recordId: exceptionLog.recordId });
+      if (record) {
+        record.addAuditTrail('异常解决', handler, `解决方案: ${resolution}`);
+        await record.save();
+      }
+
+      await this.createAuditLog({
+        recordId: exceptionLog.recordId,
+        orderNumber: exceptionLog.orderNumber,
+        action: '异常解决',
+        operator: handler,
+        reason: resolution,
+        remarks,
+        changes: {
+          exceptionStatus: 'resolved'
+        }
+      });
+
+      return {
+        success: true,
+        data: {
+          logId,
+          status: 'resolved',
+          resolution,
+          resolvedBy: handler,
+          resolvedTime: exceptionLog.resolvedTime
         }
       };
     } catch (error) {

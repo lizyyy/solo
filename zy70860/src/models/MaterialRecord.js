@@ -142,6 +142,19 @@ const materialRecordSchema = new mongoose.Schema({
   exceptionTime: {
     type: Date
   },
+  receiptConfirmed: {
+    type: Boolean,
+    default: false
+  },
+  receivedBy: {
+    type: String
+  },
+  receivedAt: {
+    type: Date
+  },
+  receiptNotes: {
+    type: String
+  },
   createdAt: {
     type: Date,
     default: Date.now

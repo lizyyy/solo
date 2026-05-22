@@ -135,6 +135,20 @@ npm start
 | GET | `/api/statistics` | 获取统计信息 |
 | GET | `/health` | 健康检查 |
 
+### 校验与回执接口
+
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| GET | `/api/orders/:orderNumber/validate` | 抢修单号校验 |
+| PUT | `/api/records/:recordId/receipt` | 收件回执确认 |
+
+### 异常处理接口
+
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| PUT | `/api/exceptions/:logId/reassign` | 异常重派 |
+| PUT | `/api/exceptions/:logId/resolve` | 异常解决 |
+
 ## 状态流转
 
 ```

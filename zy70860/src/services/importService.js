@@ -45,52 +45,60 @@ class ImportService {
     return new Promise((resolve, reject) => {
       const results = [];
       const errors = [];
+      const savePromises = [];
       let rowNumber = 0;
 
       fs.createReadStream(filePath)
         .pipe(csv())
-        .on('data', async (row) => {
+        .on('data', (row) => {
           rowNumber++;
-          try {
-            const inventoryData = {
-              materialCode: row.materialCode || row['物料编码'],
-              materialName: row.materialName || row['物料名称'],
-              specification: row.specification || row['规格'],
-              unit: row.unit || row['单位'],
-              quantity: parseFloat(row.quantity || row['数量']) || 0,
-              batchNumber: row.batchNumber || row['批次号'],
-              warehouse: row.warehouse || row['仓库'],
-              location: row.location || row['库位'],
-              safetyStock: parseFloat(row.safetyStock || row['安全库存']) || 0,
-              unitPrice: parseFloat(row.unitPrice || row['单价']) || 0,
-              supplier: row.supplier || row['供应商'],
-              remarks: row.remarks || row['备注']
-            };
+          const currentRow = rowNumber;
+          
+          const savePromise = (async () => {
+            try {
+              const inventoryData = {
+                materialCode: row.materialCode || row['物料编码'],
+                materialName: row.materialName || row['物料名称'],
+                specification: row.specification || row['规格'],
+                unit: row.unit || row['单位'],
+                quantity: parseFloat(row.quantity || row['数量']) || 0,
+                batchNumber: row.batchNumber || row['批次号'],
+                warehouse: row.warehouse || row['仓库'],
+                location: row.location || row['库位'],
+                safetyStock: parseFloat(row.safetyStock || row['安全库存']) || 0,
+                unitPrice: parseFloat(row.unitPrice || row['单价']) || 0,
+                supplier: row.supplier || row['供应商'],
+                remarks: row.remarks || row['备注']
+              };
 
-            if (!inventoryData.materialCode || !inventoryData.batchNumber) {
-              errors.push({ row: rowNumber, error: '缺少物料编码或批次号' });
-              return;
+              if (!inventoryData.materialCode || !inventoryData.batchNumber) {
+                errors.push({ row: currentRow, error: '缺少物料编码或批次号' });
+                return;
+              }
+
+              const existingInventory = await Inventory.findOne({
+                materialCode: inventoryData.materialCode,
+                batchNumber: inventoryData.batchNumber
+              });
+
+              if (existingInventory) {
+                Object.assign(existingInventory, inventoryData);
+                await existingInventory.save();
+                results.push({ row: currentRow, materialCode: inventoryData.materialCode, status: 'updated' });
+              } else {
+                const newInventory = new Inventory(inventoryData);
+                await newInventory.save();
+                results.push({ row: currentRow, materialCode: inventoryData.materialCode, status: 'created' });
+              }
+            } catch (error) {
+              errors.push({ row: currentRow, error: error.message });
             }
-
-            const existingInventory = await Inventory.findOne({
-              materialCode: inventoryData.materialCode,
-              batchNumber: inventoryData.batchNumber
-            });
-
-            if (existingInventory) {
-              Object.assign(existingInventory, inventoryData);
-              await existingInventory.save();
-              results.push({ row: rowNumber, materialCode: inventoryData.materialCode, status: 'updated' });
-            } else {
-              const newInventory = new Inventory(inventoryData);
-              await newInventory.save();
-              results.push({ row: rowNumber, materialCode: inventoryData.materialCode, status: 'created' });
-            }
-          } catch (error) {
-            errors.push({ row: rowNumber, error: error.message });
-          }
+          })();
+          
+          savePromises.push(savePromise);
         })
-        .on('end', () => {
+        .on('end', async () => {
+          await Promise.all(savePromises);
           resolve({
             success: errors.length === 0,
             total: results.length + errors.length,
@@ -110,47 +118,56 @@ class ImportService {
     return new Promise((resolve, reject) => {
       const results = [];
       const errors = [];
+      const savePromises = [];
       let rowNumber = 0;
 
       fs.createReadStream(filePath)
         .pipe(csv())
-        .on('data', async (row) => {
+        .on('data', (row) => {
           rowNumber++;
-          try {
-            const recordData = {
-              recordId: generateRecordId(),
-              orderNumber: row.orderNumber || row['抢修单号'],
-              vehicleId: row.vehicleId || row['车辆ID'],
-              teamName: row.teamName || row['班组'],
-              materialCode: row.materialCode || row['物料编码'],
-              materialName: row.materialName || row['物料名称'],
-              specification: row.specification || row['规格'],
-              unit: row.unit || row['单位'],
-              requestedQuantity: parseFloat(row.requestedQuantity || row['申请数量']) || 0,
-              actualQuantity: parseFloat(row.actualQuantity || row['实际数量']) || 0,
-              batchNumber: row.batchNumber || row['批次号'],
-              warehouse: row.warehouse || row['仓库'],
-              recordType: row.recordType || row['记录类型'] || 'normal',
-              applicant: row.applicant || row['申请人'],
-              reason: row.reason || row['原因'],
-              remarks: row.remarks || row['备注']
-            };
+          const currentRow = rowNumber;
+          
+          const savePromise = (async () => {
+            try {
+              const recordId = generateRecordId();
+              const recordData = {
+                recordId,
+                orderNumber: row.orderNumber || row['抢修单号'],
+                vehicleId: row.vehicleId || row['车辆ID'],
+                teamName: row.teamName || row['班组'],
+                materialCode: row.materialCode || row['物料编码'],
+                materialName: row.materialName || row['物料名称'],
+                specification: row.specification || row['规格'],
+                unit: row.unit || row['单位'],
+                requestedQuantity: parseFloat(row.requestedQuantity || row['申请数量']) || 0,
+                actualQuantity: parseFloat(row.actualQuantity || row['实际数量']) || 0,
+                batchNumber: row.batchNumber || row['批次号'],
+                warehouse: row.warehouse || row['仓库'],
+                recordType: row.recordType || row['记录类型'] || 'normal',
+                applicant: row.applicant || row['申请人'],
+                reason: row.reason || row['原因'],
+                remarks: row.remarks || row['备注']
+              };
 
-            if (!recordData.orderNumber || !recordData.materialCode) {
-              errors.push({ row: rowNumber, error: '缺少抢修单号或物料编码' });
-              return;
+              if (!recordData.orderNumber || !recordData.materialCode) {
+                errors.push({ row: currentRow, error: '缺少抢修单号或物料编码' });
+                return;
+              }
+
+              const newRecord = new MaterialRecord(recordData);
+              newRecord.addAuditTrail('导入创建', recordData.applicant || 'system', 'CSV导入');
+              await newRecord.save();
+              
+              results.push({ row: currentRow, recordId, status: 'created' });
+            } catch (error) {
+              errors.push({ row: currentRow, error: error.message });
             }
-
-            const newRecord = new MaterialRecord(recordData);
-            newRecord.addAuditTrail('导入创建', recordData.applicant || 'system', 'CSV导入');
-            await newRecord.save();
-            
-            results.push({ row: rowNumber, recordId: recordData.recordId, status: 'created' });
-          } catch (error) {
-            errors.push({ row: rowNumber, error: error.message });
-          }
+          })();
+          
+          savePromises.push(savePromise);
         })
-        .on('end', () => {
+        .on('end', async () => {
+          await Promise.all(savePromises);
           resolve({
             success: errors.length === 0,
             total: results.length + errors.length,

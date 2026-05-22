@@ -355,6 +355,68 @@ class MaterialController {
       res.status(500).json({ success: false, error: error.message });
     }
   }
+
+  static async validateOrderNumber(req, res) {
+    try {
+      const { orderNumber } = req.params;
+      const result = await MaterialService.validateOrderNumber(orderNumber);
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  static async confirmReceipt(req, res) {
+    try {
+      const { recordId } = req.params;
+      const { receiver, receiptNotes } = req.body;
+      
+      const result = await MaterialService.confirmReceipt(recordId, receiver, receiptNotes);
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  static async reassignException(req, res) {
+    try {
+      const { logId } = req.params;
+      const { newHandler, reason, remarks } = req.body;
+      
+      const result = await MaterialService.reassignException(logId, newHandler, reason, remarks);
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  static async resolveException(req, res) {
+    try {
+      const { logId } = req.params;
+      const { handler, resolution, remarks } = req.body;
+      
+      const result = await MaterialService.resolveException(logId, handler, resolution, remarks);
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
 }
 
 module.exports = MaterialController;

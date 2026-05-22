@@ -235,7 +235,11 @@ class QueryService {
             exceptionType: record.exceptionType,
             exceptionReason: record.exceptionReason,
             exceptionHandler: record.exceptionHandler,
-            exceptionTime: record.exceptionTime
+            exceptionTime: record.exceptionTime,
+            receiptConfirmed: record.receiptConfirmed,
+            receivedBy: record.receivedBy,
+            receivedAt: record.receivedAt,
+            receiptNotes: record.receiptNotes
           },
           repairOrder: repairOrder ? {
             repairType: repairOrder.repairType,

@@ -35,4 +35,10 @@ router.post('/import/vehicles', upload.single('file'), MaterialController.import
 router.post('/import/inventory', upload.single('file'), MaterialController.importInventory);
 router.post('/import/records', upload.single('file'), MaterialController.importMaterialRecords);
 
+router.get('/orders/:orderNumber/validate', MaterialController.validateOrderNumber);
+router.put('/records/:recordId/receipt', MaterialController.confirmReceipt);
+
+router.put('/exceptions/:logId/reassign', MaterialController.reassignException);
+router.put('/exceptions/:logId/resolve', MaterialController.resolveException);
+
 module.exports = router;

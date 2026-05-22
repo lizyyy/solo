@@ -46,6 +46,10 @@ class ExportService {
         { label: '异常原因', value: 'exceptionReason' },
         { label: '异常处理人', value: 'exceptionHandler' },
         { label: '异常时间', value: 'exceptionTime' },
+        { label: '收件确认', value: 'receiptConfirmed' },
+        { label: '收件人', value: 'receivedBy' },
+        { label: '收件时间', value: 'receivedAt' },
+        { label: '收件备注', value: 'receiptNotes' },
         { label: '创建时间', value: 'createdAt' },
         { label: '更新时间', value: 'updatedAt' }
       ];
@@ -213,6 +217,12 @@ class ExportService {
       reportContent.push(`原因: ${data.basicInfo.reason}`);
       reportContent.push(`拒绝原因: ${data.basicInfo.rejectionReason || '-'}`);
       reportContent.push(`退回原因: ${data.basicInfo.returnReason || '-'}`);
+      reportContent.push(`收件确认: ${data.basicInfo.receiptConfirmed ? '是' : '否'}`);
+      if (data.basicInfo.receiptConfirmed) {
+        reportContent.push(`收件人: ${data.basicInfo.receivedBy}`);
+        reportContent.push(`收件时间: ${data.basicInfo.receivedAt}`);
+        reportContent.push(`收件备注: ${data.basicInfo.receiptNotes || '-'}`);
+      }
       reportContent.push('');
 
       if (data.repairOrder) {
