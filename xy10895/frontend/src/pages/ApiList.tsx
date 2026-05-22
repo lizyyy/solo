@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Table,
+  Card,
   Input,
   Select,
   Space,
   Tag,
   Button,
-  Card,
   Row,
   Col,
   Statistic,
-  message,
 } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import apiService, { ApiEntry } from '../services/api';
 
@@ -91,7 +91,7 @@ const ApiList: React.FC = () => {
     fetchStats();
   }, [filters, pagination.page, pagination.limit]);
 
-  const columns = [
+  const columns: ColumnsType<ApiEntry> = [
     {
       title: '名称',
       dataIndex: 'name',
@@ -128,7 +128,7 @@ const ApiList: React.FC = () => {
         { text: '废弃', value: 'deprecated' },
         { text: '归档', value: 'archived' },
       ],
-      onFilter: (value: string | number | boolean, record: ApiEntry) => record.status === value,
+      onFilter: (value, record: ApiEntry) => record.status === value,
     },
     {
       title: '负责人',
