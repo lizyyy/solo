@@ -65,8 +65,9 @@ class ReconciliationItem(BaseModel):
     raw_wash_data: Optional[Dict[str, Any]] = None
     raw_recycle_data: Optional[Dict[str, Any]] = None
     suggestion: Optional[str] = None
-    compensation: Optional[CompensationRecord] = None
+    compensations: List[CompensationRecord] = Field(default_factory=list)
     damage_details: Optional[Dict[str, Any]] = None
+    shortage_details: Optional[Dict[str, Any]] = None
 
 
 class ReconciliationResult(BaseModel):

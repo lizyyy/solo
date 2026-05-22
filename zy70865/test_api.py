@@ -29,6 +29,8 @@ def test_reconcile():
     print(f"成功: {result['success']}")
     print(f"消息: {result['message']}")
     
+    first_compensation_id = None
+    
     if result['result']:
         r = result['result']
         print(f"\n总送洗: {r['total_wash']}")
@@ -38,17 +40,29 @@ def test_reconcile():
         print(f"失败项: {r['failed_count']}")
         print(f"赔付总额: {r['total_compensation']} 元")
         
-        if r['failed_items']:
-            print("\n=== 失败项（需赔付） ===")
-            for item in r['failed_items']:
-                print(f"  - {item['item_type']}: {item['suggestion']}")
-                if item.get('compensation'):
-                    comp = item['compensation']
-                    print(f"    赔付ID: {comp['compensation_id']}")
-                    print(f"    赔付金额: {comp['total_amount']} 元")
-                    return comp['compensation_id']
+        print("\n=== 详细分类 ===")
+        print("\n【正常项】:")
+        for item in r['normal_items']:
+            print(f"  - {item['item_type']}: {item['suggestion']}")
+        
+        print("\n【待确认项】:")
+        for item in r['pending_items']:
+            print(f"  - {item['item_type']}: {item['suggestion']}")
+        
+        print("\n【失败项（需赔付）】:")
+        for item in r['failed_items']:
+            print(f"  - {item['item_type']}: {item['suggestion']}")
+            if item.get('compensations'):
+                for comp in item['compensations']:
+                    if first_compensation_id is None:
+                        first_compensation_id = comp['compensation_id']
+                    print(f"    * {comp['reason']}")
+                    print(f"      赔付ID: {comp['compensation_id']}")
+                    print(f"      赔付金额: {comp['total_amount']} 元")
+        
+        print(f"\n预期验证: bedsheet 应同时有破损和短少赔付，合计赔付 (2+5)×35=245 元")
     
-    return None
+    return first_compensation_id
 
 def test_duplicate_submit():
     """测试重复提交"""

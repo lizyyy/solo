@@ -145,23 +145,22 @@ class ReconciliationEngine:
                 raw_recycle_data=raw_recycle[0] if raw_recycle else None
             )
 
-            if abs(difference) <= 1 and damage_qty == 0:
-                item.status = ItemStatus.NORMAL
-                item.suggestion = "数量一致，无破损，对账正常"
-                normal_items.append(item)
-            
-            elif damage_qty > 0:
+            suggestions = []
+            has_failure = False
+            has_pending = False
+
+            if damage_qty > 0:
                 responsibility, damage_suggestion = self.analyze_damage(recycle_data, item_type)
                 
                 if responsibility == "laundry":
-                    item.status = ItemStatus.FAILED
+                    has_failure = True
                     compensation = self.create_compensation(
                         batch_id, item_type,
                         f"洗涤厂责任破损，破损数量: {damage_qty}",
                         damage_qty,
                         f"洗涤厂需赔付 {damage_qty} 件 {item_type}，总金额: {self.get_item_price(item_type) * damage_qty} 元"
                     )
-                    item.compensation = compensation
+                    item.compensations.append(compensation)
                     item.damage_details = {
                         "damage_quantity": damage_qty,
                         "responsibility": responsibility,
@@ -169,50 +168,63 @@ class ReconciliationEngine:
                     }
                     total_compensation += compensation.total_amount
                     db.add_compensation(compensation)
-                    failed_items.append(item)
+                    suggestions.append(f"破损赔付{damage_qty}件")
                 
                 elif responsibility == "pending":
-                    item.status = ItemStatus.PENDING
-                    item.suggestion = damage_suggestion
+                    has_pending = True
                     item.damage_details = {
                         "damage_quantity": damage_qty,
                         "responsibility": "pending",
                         "suggestion": damage_suggestion
                     }
-                    pending_items.append(item)
+                    suggestions.append(f"破损待确认")
                 
                 else:
-                    item.status = ItemStatus.NORMAL
-                    item.suggestion = damage_suggestion
                     item.damage_details = {
                         "damage_quantity": damage_qty,
                         "responsibility": responsibility
                     }
-                    normal_items.append(item)
-            
-            elif difference > 2:
-                item.status = ItemStatus.FAILED
+                    suggestions.append(f"破损{damage_qty}件(酒店责任)")
+
+            if difference > 2:
+                has_failure = True
                 compensation = self.create_compensation(
                     batch_id, item_type,
                     f"送洗数量与回收数量不符，短少数量: {difference}",
                     difference,
                     f"洗涤厂需赔付短少的 {difference} 件 {item_type}，总金额: {self.get_item_price(item_type) * difference} 元"
                 )
-                item.compensation = compensation
-                item.suggestion = f"短少 {difference} 件，超出正常损耗范围，建议向洗涤厂索赔"
+                item.compensations.append(compensation)
+                item.shortage_details = {
+                    "shortage_quantity": difference,
+                    "suggestion": f"短少 {difference} 件，超出正常损耗范围"
+                }
                 total_compensation += compensation.total_amount
                 db.add_compensation(compensation)
-                failed_items.append(item)
+                suggestions.append(f"短少赔付{difference}件")
             
             elif difference < 0:
-                item.status = ItemStatus.PENDING
-                item.suggestion = f"回收数量 {abs(difference)} 件多于送洗数量，需核实是否为往期遗留物品"
-                pending_items.append(item)
+                has_pending = True
+                suggestions.append(f"多回收{abs(difference)}件待核实")
             
-            else:
+            elif 1 < difference <= 2:
+                has_pending = True
+                suggestions.append(f"差异{difference}件待复核")
+
+            if has_failure:
+                item.status = ItemStatus.FAILED
+                item.suggestion = "失败: " + "；".join(suggestions) + "，需向洗涤厂索赔"
+                failed_items.append(item)
+            elif has_pending:
                 item.status = ItemStatus.PENDING
-                item.suggestion = f"差异 {difference} 件在正常范围内，建议人工复核"
+                item.suggestion = "待确认: " + "；".join(suggestions)
                 pending_items.append(item)
+            elif not suggestions:
+                item.suggestion = "数量一致，无破损，对账正常"
+                normal_items.append(item)
+            else:
+                item.suggestion = "正常: " + "；".join(suggestions)
+                normal_items.append(item)
 
         if duplicate_warnings:
             for warning in duplicate_warnings:
