@@ -1,0 +1,31 @@
+{
+  "name": "property-maintenance-inspector",
+  "version": "1.0.0",
+  "description": "物业维修派单多源导入巡检 CLI",
+  "main": "dist/index.js",
+  "bin": {
+    "pmi": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "sqlite3": "^5.1.7",
+    "csv-parser": "^3.0.0",
+    "xlsx": "^0.18.5",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "uuid": "^9.0.1",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/sqlite3": "^3.1.11",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1"
+  }
+}
