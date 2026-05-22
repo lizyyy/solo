@@ -18,6 +18,18 @@
     "humidity": 59.8
   },
   {
+    "chamber_id": "CHAMBER-A",
+    "record_time": "2024-05-20T08:00:00",
+    "temperature": 25.2,
+    "humidity": 60.0
+  },
+  {
+    "chamber_id": "CHAMBER-A",
+    "record_time": "2024-05-20T12:00:00",
+    "temperature": 25.3,
+    "humidity": 60.2
+  },
+  {
     "chamber_id": "CHAMBER-B",
     "record_time": "2024-05-08T10:00:00",
     "temperature": 26.5,
@@ -40,5 +52,17 @@
     "record_time": "2024-05-18T15:00:00",
     "temperature": 40.2,
     "humidity": 75.5
+  },
+  {
+    "chamber_id": "CHAMBER-C",
+    "record_time": "2024-05-25T08:00:00",
+    "temperature": 40.1,
+    "humidity": 75.0
+  },
+  {
+    "chamber_id": "CHAMBER-C",
+    "record_time": "2024-05-25T14:00:00",
+    "temperature": 39.8,
+    "humidity": 74.5
   }
 ]

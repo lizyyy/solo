@@ -116,21 +116,27 @@ class SampleProcessor:
     def process(self, samples: List[Sample], plans: List[TestPlan],
                 chamber_records: List[ChamberRecord],
                 check_duplicate: bool = True) -> ValidationResult:
-        valid_samples: List[Sample] = []
+        processed_samples: List[Sample] = []
         duplicates_skipped: List[str] = []
+        current_batch_keys: Set[Tuple[str, str, str]] = set()
 
         for sample in samples:
-            if check_duplicate and self.dedup_manager.is_duplicate(sample):
-                duplicates_skipped.append(f"{sample.batch_id}-{sample.material_code}-{sample.test_type}")
-            else:
-                valid_samples.append(sample)
+            batch_key = self.dedup_manager.generate_batch_key(sample)
+            batch_key_str = f"{batch_key[0]}-{batch_key[1]}-{batch_key[2]}"
 
-        result_items = RuleEngine.process_samples(valid_samples, plans, chamber_records)
+            if check_duplicate:
+                if self.dedup_manager.is_duplicate(sample) or batch_key in current_batch_keys:
+                    duplicates_skipped.append(batch_key_str)
+                    continue
+
+            current_batch_keys.add(batch_key)
+            processed_samples.append(sample)
+
+        result_items = RuleEngine.process_samples(processed_samples, plans, chamber_records)
 
         for item in result_items:
-            if item.status == ItemStatus.NORMAL:
-                sample = next(s for s in valid_samples if s.sample_id == item.sample_id)
-                self.dedup_manager.mark_processed(sample)
+            sample = next(s for s in processed_samples if s.sample_id == item.sample_id)
+            self.dedup_manager.mark_processed(sample)
 
         normal = [r for r in result_items if r.status == ItemStatus.NORMAL]
         pending = [r for r in result_items if r.status == ItemStatus.PENDING_CONFIRMATION]

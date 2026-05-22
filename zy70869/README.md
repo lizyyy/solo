@@ -62,7 +62,7 @@ python test_script.py
   "failed": [...],
   "summary": {
     "total_submitted": 6,
-    "normal_count": 3,
+    "normal_count": 2,
     "pending_confirmation_count": 2,
     "failed_count": 1,
     "duplicates_skipped_count": 1

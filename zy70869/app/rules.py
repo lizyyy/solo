@@ -69,17 +69,22 @@ class RuleEngine:
         if not sample.chamber_id:
             return None, False
 
+        sample_date = sample.sample_date
+        window_start = datetime.combine(sample_date, datetime.min.time())
+        window_end = datetime.combine(sample_date, datetime.max.time())
+
         sample_records = [
             r for r in chamber_records
             if r.chamber_id == sample.chamber_id
+            and window_start <= r.record_time <= window_end
         ]
 
         if not sample_records:
             return FailureDetail(
                 rule_name="chamber_records_missing",
-                description=f"环境箱{sample.chamber_id}无温度记录",
-                suggestion="补充环境箱温度记录后重新提交",
-                boundary_info=f"环境箱编号: {sample.chamber_id}"
+                description=f"环境箱{sample.chamber_id}在取样日无匹配温度记录",
+                suggestion="补充取样日当天的环境箱温度记录后重新提交",
+                boundary_info=f"环境箱编号: {sample.chamber_id}, 取样日期: {sample_date}"
             ), False
 
         over_temp_records = []
@@ -96,7 +101,7 @@ class RuleEngine:
         if over_temp_records:
             return FailureDetail(
                 rule_name="chamber_temperature_violation",
-                description=f"环境箱{sample.chamber_id}有{len(over_temp_records)}条超温记录",
+                description=f"环境箱{sample.chamber_id}在取样日有{len(over_temp_records)}条超温记录",
                 suggestion="评估超温对试验的影响，必要时重新安排试验",
                 boundary_info=f"温度范围: {plan.required_temperature_min}~{plan.required_temperature_max}℃, 异常记录: {'; '.join(over_temp_records[:3])}"
             ), True
