@@ -31,7 +31,7 @@ class ItemService {
     const { status, routeNo, shiftNo, driverName, page = 1, pageSize = 20 } = params;
     const offset = (page - 1) * pageSize;
     let sql = "SELECT * FROM lost_items WHERE 1=1";
-    const countSql = "SELECT COUNT(*) as count FROM lost_items WHERE 1=1";
+    let countSql = "SELECT COUNT(*) as count FROM lost_items WHERE 1=1";
     const values = [];
     const countValues = [];
 
