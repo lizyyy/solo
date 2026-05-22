@@ -35,6 +35,17 @@ def create_batch(db: Session, batch_hash: str, record_type: RecordType,
     return batch
 
 
+def _clean_nan(obj):
+    import math
+    if isinstance(obj, dict):
+        return {k: _clean_nan(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_clean_nan(item) for item in obj]
+    elif isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+        return None
+    return obj
+
+
 def parse_checkin_csv(csv_content: str) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     valid_records = []
     invalid_records = []
@@ -49,11 +60,12 @@ def parse_checkin_csv(csv_content: str) -> Tuple[List[Dict[str, Any]], List[Dict
         
         for idx, row in df.iterrows():
             try:
+                row_dict = _clean_nan(row.to_dict())
                 record = {
                     'person_id': str(row.get('person_id', '')).strip(),
                     'person_name': str(row.get('person_name', '')).strip() if pd.notna(row.get('person_name')) else None,
                     'location': str(row.get('location', '')).strip() if pd.notna(row.get('location')) else None,
-                    'raw_data': json.dumps(row.to_dict(), ensure_ascii=False)
+                    'raw_data': json.dumps(row_dict, ensure_ascii=False)
                 }
                 
                 checkin_time_str = row.get('checkin_time')
@@ -67,7 +79,7 @@ def parse_checkin_csv(csv_content: str) -> Tuple[List[Dict[str, Any]], List[Dict
                 if not record['person_id']:
                     invalid_records.append({
                         'row': idx + 2,
-                        'data': row.to_dict(),
+                        'data': row_dict,
                         'error': 'person_id不能为空'
                     })
                     continue
@@ -75,9 +87,10 @@ def parse_checkin_csv(csv_content: str) -> Tuple[List[Dict[str, Any]], List[Dict
                 valid_records.append(record)
                 
             except Exception as e:
+                row_dict = _clean_nan(row.to_dict())
                 invalid_records.append({
                     'row': idx + 2,
-                    'data': row.to_dict(),
+                    'data': row_dict,
                     'error': str(e)
                 })
     

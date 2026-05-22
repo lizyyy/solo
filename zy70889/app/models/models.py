@@ -7,10 +7,10 @@ from app.core.database import Base
 
 
 class DataSource(str, enum.Enum):
-    APP = "app"
-    WECHAT = "wechat"
-    MANUAL = "manual"
-    OTHER = "other"
+    APP = "APP"
+    WECHAT = "WECHAT"
+    MANUAL = "MANUAL"
+    OTHER = "OTHER"
 
 
 class ProcessingStatus(str, enum.Enum):

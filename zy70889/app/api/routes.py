@@ -12,6 +12,7 @@ from app.services.data_import import (
     save_checkin_records, save_leave_records, save_location_records
 )
 from app.services.rules_engine import RulesEngine
+from app.schemas.schemas import ProcessingResultItem
 
 router = APIRouter(prefix="/api/v1", tags=["community-correction"])
 
@@ -59,16 +60,16 @@ async def upload_checkin(
         failed_items = [r for r in processed_results if r.status == ProcessingStatus.FAILED]
         
         for invalid in invalid_records:
-            failed_items.append({
-                "person_id": str(invalid.get('data', {}).get('person_id', 'unknown')),
-                "person_name": str(invalid.get('data', {}).get('person_name', '')),
-                "status": ProcessingStatus.FAILED,
-                "rule_code": "PARSE_ERROR",
-                "rule_name": "数据解析失败",
-                "suggestion": f"第{invalid.get('row', '?')}行数据格式错误，请检查并重新提交",
-                "original_data": invalid.get('data'),
-                "detail": invalid.get('error')
-            })
+            failed_items.append(ProcessingResultItem(
+                person_id=str(invalid.get('data', {}).get('person_id', 'unknown')),
+                person_name=str(invalid.get('data', {}).get('person_name', '')),
+                status=ProcessingStatus.FAILED,
+                rule_code="PARSE_ERROR",
+                rule_name="数据解析失败",
+                suggestion=f"第{invalid.get('row', '?')}行数据格式错误，请检查并重新提交",
+                original_data=invalid.get('data'),
+                detail=invalid.get('error')
+            ))
         
         batch.processed = True
         db.commit()
@@ -124,31 +125,31 @@ async def upload_leave(
         
         normal_items = []
         for record in saved_records:
-            normal_items.append({
-                "person_id": record.person_id,
-                "person_name": record.person_name,
-                "status": ProcessingStatus.NORMAL,
-                "rule_code": "LEAVE_APPROVED",
-                "rule_name": "请假已批准",
-                "suggestion": "请假记录已保存，可用于签到时的请假覆盖判断",
-                "original_data": record.raw_data,
-                "detail": f"请假时间: {record.start_time} 至 {record.end_time}"
-            })
+            normal_items.append(ProcessingResultItem(
+                person_id=record.person_id,
+                person_name=record.person_name,
+                status=ProcessingStatus.NORMAL,
+                rule_code="LEAVE_APPROVED",
+                rule_name="请假已批准",
+                suggestion="请假记录已保存，可用于签到时的请假覆盖判断",
+                original_data=record.raw_data,
+                detail=f"请假时间: {record.start_time} 至 {record.end_time}"
+            ))
         
         pending_items = []
         failed_items = []
         
         for invalid in invalid_records:
-            failed_items.append({
-                "person_id": str(invalid.get('data', {}).get('person_id', 'unknown')),
-                "person_name": str(invalid.get('data', {}).get('person_name', '')),
-                "status": ProcessingStatus.FAILED,
-                "rule_code": "PARSE_ERROR",
-                "rule_name": "数据解析失败",
-                "suggestion": f"第{invalid.get('index', '?')}条数据格式错误，请检查并重新提交",
-                "original_data": invalid.get('data'),
-                "detail": invalid.get('error')
-            })
+            failed_items.append(ProcessingResultItem(
+                person_id=str(invalid.get('data', {}).get('person_id', 'unknown')),
+                person_name=str(invalid.get('data', {}).get('person_name', '')),
+                status=ProcessingStatus.FAILED,
+                rule_code="PARSE_ERROR",
+                rule_name="数据解析失败",
+                suggestion=f"第{invalid.get('index', '?')}条数据格式错误，请检查并重新提交",
+                original_data=invalid.get('data'),
+                detail=invalid.get('error')
+            ))
         
         batch.processed = True
         db.commit()
@@ -215,16 +216,16 @@ async def upload_location(
         failed_items = [r for r in processed_results if r.status == ProcessingStatus.FAILED]
         
         for invalid in invalid_records:
-            failed_items.append({
-                "person_id": str(invalid.get('data', {}).get('person_id', 'unknown')),
-                "person_name": str(invalid.get('data', {}).get('person_name', '')),
-                "status": ProcessingStatus.FAILED,
-                "rule_code": "PARSE_ERROR",
-                "rule_name": "数据解析失败",
-                "suggestion": f"第{invalid.get('index', '?')}条数据格式错误，请检查并重新提交",
-                "original_data": invalid.get('data'),
-                "detail": invalid.get('error')
-            })
+            failed_items.append(ProcessingResultItem(
+                person_id=str(invalid.get('data', {}).get('person_id', 'unknown')),
+                person_name=str(invalid.get('data', {}).get('person_name', '')),
+                status=ProcessingStatus.FAILED,
+                rule_code="PARSE_ERROR",
+                rule_name="数据解析失败",
+                suggestion=f"第{invalid.get('index', '?')}条数据格式错误，请检查并重新提交",
+                original_data=invalid.get('data'),
+                detail=invalid.get('error')
+            ))
         
         batch.processed = True
         db.commit()

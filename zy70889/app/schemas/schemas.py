@@ -1,14 +1,15 @@
-from pydantic import BaseModel, Field
+import json
 from datetime import datetime
-from typing import Optional, List, Any, Dict
 from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 
+from pydantic import BaseModel, field_validator
 
 class DataSource(str, Enum):
-    APP = "app"
-    WECHAT = "wechat"
-    MANUAL = "manual"
-    OTHER = "other"
+    APP = "APP"
+    WECHAT = "WECHAT"
+    MANUAL = "MANUAL"
+    OTHER = "OTHER"
 
 
 class ProcessingStatus(str, Enum):
@@ -60,8 +61,22 @@ class ProcessingResultItem(BaseModel):
     rule_code: Optional[str] = None
     rule_name: Optional[str] = None
     suggestion: Optional[str] = None
-    original_data: Optional[Dict[str, Any]] = None
+    original_data: Optional[Union[str, Dict[str, Any]]] = None
     detail: Optional[str] = None
+
+    @field_validator("original_data", mode="before")
+    @classmethod
+    def parse_original_data(cls, v):
+        if v is None:
+            return None
+        if isinstance(v, dict):
+            return v
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except (json.JSONDecodeError, TypeError):
+                return {"raw_value": v}
+        return v
 
 
 class UploadResponse(BaseModel):
@@ -87,9 +102,23 @@ class ResultQueryResponse(BaseModel):
     rule_code: Optional[str] = None
     rule_name: Optional[str] = None
     suggestion: Optional[str] = None
-    original_data: Optional[Dict[str, Any]] = None
+    original_data: Optional[Union[str, Dict[str, Any]]] = None
     detail: Optional[str] = None
     created_at: datetime
+
+    @field_validator("original_data", mode="before")
+    @classmethod
+    def parse_original_data(cls, v):
+        if v is None:
+            return None
+        if isinstance(v, dict):
+            return v
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except (json.JSONDecodeError, TypeError):
+                return {"raw_value": v}
+        return v
 
 
 class ReportItem(BaseModel):
