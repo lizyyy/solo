@@ -74,7 +74,7 @@ async function init() {
     const batchResult = await runQuery(
       `INSERT INTO laundry_batches (batch_no, send_date, total_items, status, created_by)
        VALUES (?, ?, ?, ?, ?)`,
-      ['BATCH-20240520-001', '2024-05-20', 410, 'pending', '张经理']
+      ['BATCH-20240520-001', '2024-05-20', 440, 'pending', '张经理']
     );
     const batchId = batchResult.lastID;
 
@@ -130,9 +130,9 @@ async function init() {
     console.log('');
     console.log('📊 已创建数据:');
     console.log(`  - 房型配置: ${roomTypesCount[0].cnt}条 (标准间/大床房/豪华套房 各物品)`);
-    console.log(`  - 洗涤批次: 1个 (BATCH-20240520-001)`);
-    console.log(`  - 送洗明细: ${laundryItemsCount[0].cnt}条 (共410件)`);
-    console.log(`  - 回收记录: 1条 (共回收403件)`);
+    console.log('  - 洗涤批次: 1个 (BATCH-20240520-001)');
+    console.log(`  - 送洗明细: ${laundryItemsCount[0].cnt}条 (共440件)`);
+    console.log('  - 回收记录: 1条 (共回收433件)');
     console.log(`  - 赔付记录: ${compCount[0].cnt}条 (系统自动生成，需要人工审核修正)`);
     console.log('  - 操作日志: 已记录导入操作');
     console.log('');
@@ -145,7 +145,7 @@ async function init() {
     console.log('📝 数据一致性验证:');
     console.log('  - laundry_items.recovery_quantity 已正确回写');
     console.log('  - 导出明细行数 = 13条 (与送洗明细一致)');
-    console.log('  - 送洗总数 410件，回收总数 403件，差异 7件');
+    console.log('  - 送洗总数 440件，回收总数 433件，差异 7件');
     console.log('');
     console.log('🚀 启动服务: npm start');
     

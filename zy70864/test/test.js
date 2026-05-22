@@ -179,7 +179,7 @@ async function runTests() {
     console.log('  2. ✅ recovery_quantity 回写: 13条明细全部更新');
     console.log('  3. ✅ 自动差异比对: 自动生成4条短少赔付记录');
     console.log('  4. ✅ 导出一致性: 导出13行 = 查询13行');
-    console.log('  5. ✅ 数据吻合: 410送 - 403回 = 7短少 = 赔付合计');
+    console.log('  5. ✅ 数据吻合: 440送 - 433回 = 7短少 = 赔付合计');
     console.log('  6. ✅ 完整追踪: 每个状态变更留有操作人、时间、原因');
     console.log('');
     console.log('💡 现在酒店后勤可以可靠说明:');
