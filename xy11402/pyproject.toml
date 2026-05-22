@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "cold-chain-retry-queue"
+version = "0.1.0"
+description = "冷链中转重试补偿队列 API"
+authors = ["仓配组"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.104.0"
+uvicorn = "^0.24.0"
+sqlalchemy = "^2.0.0"
+pydantic = "^2.5.0"
+pydantic-settings = "^2.1.0"
+apscheduler = "^3.10.0"
+python-multipart = "^0.0.6"
+openpyxl = "^3.1.0"
+pandas = "^2.1.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+httpx = "^0.25.0"

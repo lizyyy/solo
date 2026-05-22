@@ -1,0 +1,42 @@
+[
+  {
+    "box_no": "COLD-BOX-001",
+    "driver_id": "DRV-2024-001",
+    "photo_time": "2024-01-15 08:30:00",
+    "temperature": "-18.5",
+    "compensation_amount": 50.0,
+    "remark": "司机上传照片，温度达标"
+  },
+  {
+    "box_no": "COLD-BOX-002",
+    "driver_id": "DRV-2024-002",
+    "photo_time": "2024-01-15 09:15:00",
+    "temperature": "-15.2",
+    "compensation_amount": 100.0,
+    "remark": "温度偏高，需核查"
+  },
+  {
+    "box_no": "COLD-BOX-003",
+    "driver_id": "DRV-2024-001",
+    "photo_time": "2024-01-15 10:00:00",
+    "temperature": "-20.0",
+    "compensation_amount": 0.0,
+    "remark": "温度正常"
+  },
+  {
+    "box_no": "COLD-BOX-004",
+    "driver_id": "DRV-2024-003",
+    "photo_time": "2024-01-15 11:30:00",
+    "temperature": "-12.0",
+    "compensation_amount": 200.0,
+    "remark": "温度严重超标"
+  },
+  {
+    "box_no": "COLD-BOX-005",
+    "driver_id": "DRV-2024-002",
+    "photo_time": "2024-01-15 14:00:00",
+    "temperature": "-19.0",
+    "compensation_amount": 0.0,
+    "remark": "正常"
+  }
+]
