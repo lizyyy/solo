@@ -42,24 +42,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
-  try {
-    const result = await batchService.getBatchById(req.params.id);
-    res.json({ success: true, data: result });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-router.post('/:id/import-meter', upload.single('file'), async (req, res) => {
-  try {
-    const result = await importService.importMeterCSV(req.file.path, req.params.id);
-    res.json({ success: true, data: result });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
 router.post('/import-contracts', upload.single('file'), async (req, res) => {
   try {
     const result = await importService.importContractJSON(req.file.path);
@@ -78,9 +60,9 @@ router.post('/import-zones', async (req, res) => {
   }
 });
 
-router.get('/:id/readings', async (req, res) => {
+router.get('/allocations', async (req, res) => {
   try {
-    const result = await queryService.getReadingsByBatch(req.params.id, req.query);
+    const result = await queryService.getTenantAllocations(req.query.tenant_id, req.query.batch_id);
     res.json({ success: true, data: result, count: result.length });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -135,6 +117,48 @@ router.get('/meters/:meterId/multiplier', async (req, res) => {
   }
 });
 
+router.get('/meters/:meterId/multiplier-history', async (req, res) => {
+  try {
+    const result = await queryService.getMeterMultiplierHistory(req.params.meterId);
+    res.json({ success: true, data: result, count: result.length });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.post('/meters/:meterId/change-multiplier', async (req, res) => {
+  try {
+    const { new_multiplier, reason, changed_by } = req.body;
+    const result = await queryService.changeMeterMultiplier(
+      req.params.meterId,
+      new_multiplier,
+      reason,
+      changed_by
+    );
+    res.json({ success: true, data: result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.post('/:id/import-meter', upload.single('file'), async (req, res) => {
+  try {
+    const result = await importService.importMeterCSV(req.file.path, req.params.id);
+    res.json({ success: true, data: result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.get('/:id/readings', async (req, res) => {
+  try {
+    const result = await queryService.getReadingsByBatch(req.params.id, req.query);
+    res.json({ success: true, data: result, count: result.length });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 router.get('/:id/export-readings', async (req, res) => {
   try {
     const result = await queryService.exportReadings(req.params.id, req.query);
@@ -166,10 +190,10 @@ router.post('/:id/calculate-allocations', async (req, res) => {
   }
 });
 
-router.get('/allocations', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const result = await queryService.getTenantAllocations(req.query.tenant_id, req.query.batch_id);
-    res.json({ success: true, data: result, count: result.length });
+    const result = await batchService.getBatchById(req.params.id);
+    res.json({ success: true, data: result });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

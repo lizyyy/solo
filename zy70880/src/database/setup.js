@@ -112,6 +112,18 @@ const createTables = () => {
         FOREIGN KEY (batch_id) REFERENCES batches(id),
         FOREIGN KEY (contract_id) REFERENCES contracts(id),
         FOREIGN KEY (reading_id) REFERENCES meter_readings(id)
+      )`);
+
+      db.run(`CREATE TABLE IF NOT EXISTS meter_multiplier_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        meter_id INTEGER NOT NULL,
+        old_multiplier REAL NOT NULL,
+        new_multiplier REAL NOT NULL,
+        reason TEXT NOT NULL,
+        changed_by TEXT NOT NULL,
+        changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        remarks TEXT,
+        FOREIGN KEY (meter_id) REFERENCES meters(id)
       )`, (err) => {
         if (err) reject(err);
         else {
@@ -331,6 +343,53 @@ const addProcessingExample = async () => {
   }
 };
 
+const addMultiplierHistoryExample = async () => {
+  const meter = await new Promise((resolve, reject) => {
+    db.get(`SELECT id, multiplier FROM meters WHERE meter_no = ?`, ['METER-A01'], (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+
+  if (meter) {
+    await new Promise((resolve, reject) => {
+      db.run(`
+        INSERT INTO meter_multiplier_history (meter_id, old_multiplier, new_multiplier, reason, changed_by, remarks)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `, [
+        meter.id,
+        10,
+        meter.multiplier,
+        '冷库设备扩容，互感器从100/5升级为200/5，倍率调整',
+        '设备维护-王工',
+        '2024年3月完成设备升级，经校验倍率准确'
+      ], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    await new Promise((resolve, reject) => {
+      db.run(`
+        INSERT INTO meter_multiplier_history (meter_id, old_multiplier, new_multiplier, reason, changed_by, remarks)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `, [
+        meter.id,
+        5,
+        10,
+        '首次安装调试，设置初始倍率',
+        '安装队-李师傅',
+        '2023年12月冷库竣工，设备验收合格'
+      ], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    console.log('电表倍率历史示例数据已添加');
+  }
+};
+
 const setupAll = async () => {
   try {
     await createTables();
@@ -338,6 +397,7 @@ const setupAll = async () => {
     await seedTenants();
     await seedContracts();
     await seedMeters();
+    await addMultiplierHistoryExample();
     const batchId = await seedBatch();
     console.log('批次创建完成，ID:', batchId);
     await seedReadings(batchId);

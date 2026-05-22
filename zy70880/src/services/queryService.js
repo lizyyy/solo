@@ -67,13 +67,77 @@ const getContractsByZone = async (zoneId) => {
 
 const getMeterMultipliers = async (meterId) => {
   return new Promise((resolve, reject) => {
-    db.all(`
+    db.get(`
       SELECT * FROM meters WHERE id = ?
-    `, [meterId], (err, rows) => {
+    `, [meterId], (err, row) => {
       if (err) reject(err);
-      else resolve(rows[0]);
+      else resolve(row);
     });
   });
+};
+
+const getMeterMultiplierHistory = async (meterId) => {
+  return new Promise((resolve, reject) => {
+    db.all(`
+      SELECT 
+        mmh.*,
+        m.meter_no,
+        m.name as meter_name
+      FROM meter_multiplier_history mmh
+      LEFT JOIN meters m ON mmh.meter_id = m.id
+      WHERE mmh.meter_id = ?
+      ORDER BY mmh.changed_at DESC
+    `, [meterId], (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+};
+
+const changeMeterMultiplier = async (meterId, newMultiplier, reason, changedBy, remarks = '') => {
+  const meter = await new Promise((resolve, reject) => {
+    db.get('SELECT multiplier FROM meters WHERE id = ?', [meterId], (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+
+  if (!meter) {
+    throw new Error('电表不存在');
+  }
+
+  const oldMultiplier = meter.multiplier;
+
+  await new Promise((resolve, reject) => {
+    db.run(`
+      INSERT INTO meter_multiplier_history 
+      (meter_id, old_multiplier, new_multiplier, reason, changed_by, remarks)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [meterId, oldMultiplier, newMultiplier, reason, changedBy, remarks], (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+
+  await new Promise((resolve, reject) => {
+    db.run(`
+      UPDATE meters 
+      SET multiplier = ?, multiplier_changed = 1, last_multiplier = ?, multiplier_change_date = DATE('now')
+      WHERE id = ?
+    `, [newMultiplier, oldMultiplier, meterId], (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+
+  return {
+    success: true,
+    meter_id: meterId,
+    old_multiplier: oldMultiplier,
+    new_multiplier: newMultiplier,
+    reason,
+    changed_by: changedBy
+  };
 };
 
 const getTenantAllocations = async (tenantId, batchId) => {
@@ -231,6 +295,8 @@ module.exports = {
   getReadingsByBatch,
   getContractsByZone,
   getMeterMultipliers,
+  getMeterMultiplierHistory,
+  changeMeterMultiplier,
   getTenantAllocations,
   exportReadings,
   exportAllocations,

@@ -111,6 +111,18 @@ const createTables = () => {
         FOREIGN KEY (reading_id) REFERENCES meter_readings(id)
       )`);
 
+      db.run(`CREATE TABLE IF NOT EXISTS meter_multiplier_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        meter_id INTEGER NOT NULL,
+        old_multiplier REAL NOT NULL,
+        new_multiplier REAL NOT NULL,
+        reason TEXT NOT NULL,
+        changed_by TEXT NOT NULL,
+        changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        remarks TEXT,
+        FOREIGN KEY (meter_id) REFERENCES meters(id)
+      )`);
+
       console.log('所有表创建成功');
       resolve();
     });
