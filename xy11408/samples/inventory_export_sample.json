@@ -1,0 +1,28 @@
+{
+  "export_date": "2024-05-20",
+  "pharmacy_name": "康益大药房",
+  "pharmacy_region": "华东区-浙江省-杭州市",
+  "source_type": "inventory_export",
+  "records": [
+    {
+      "record_no": "ACC2024052000001",
+      "medicine_name": "阿莫西林胶囊",
+      "medicine_code": "AMX001",
+      "batch_no": "B2024011234",
+      "expiry_date": "2024-12-31",
+      "quantity": 100,
+      "unit": "盒",
+      "near_expiry_days": 30
+    },
+    {
+      "record_no": "ACC2024052000002",
+      "medicine_name": "布洛芬缓释片",
+      "medicine_code": "BFL002",
+      "batch_no": "B2024025678",
+      "expiry_date": "2025-03-15",
+      "quantity": 50,
+      "unit": "盒",
+      "near_expiry_days": 60
+    }
+  ]
+}
