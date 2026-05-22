@@ -524,6 +524,144 @@ class MaterialService {
       return { success: false, error: error.message };
     }
   }
+
+  static async createRepairOrder(orderData) {
+    try {
+      const existingOrder = await RepairOrder.findOne({ orderNumber: orderData.orderNumber });
+      if (existingOrder) {
+        return { success: false, error: '抢修单号已存在' };
+      }
+
+      const repairOrder = new RepairOrder(orderData);
+      await repairOrder.save();
+
+      await this.createAuditLog({
+        recordId: orderData.orderNumber,
+        orderNumber: orderData.orderNumber,
+        action: '创建抢修单',
+        operator: orderData.reporter || orderData.responsiblePerson || 'system',
+        reason: orderData.description,
+        newStatus: orderData.status || 'pending'
+      });
+
+      return { success: true, data: repairOrder };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async createRepairOrderBatch(ordersData) {
+    try {
+      const results = [];
+      
+      for (const orderData of ordersData) {
+        const result = await this.createRepairOrder(orderData);
+        results.push(result);
+      }
+
+      return { success: true, total: results.length, results };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async getRepairOrder(orderNumber) {
+    try {
+      const repairOrder = await RepairOrder.findOne({ orderNumber });
+      if (!repairOrder) {
+        return { success: false, error: '抢修单不存在' };
+      }
+      return { success: true, data: repairOrder };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async updateRepairOrder(orderNumber, updateData) {
+    try {
+      const repairOrder = await RepairOrder.findOne({ orderNumber });
+      if (!repairOrder) {
+        return { success: false, error: '抢修单不存在' };
+      }
+
+      const previousStatus = repairOrder.status;
+      Object.assign(repairOrder, updateData);
+      await repairOrder.save();
+
+      await this.createAuditLog({
+        recordId: orderNumber,
+        orderNumber,
+        action: '更新抢修单',
+        previousStatus,
+        newStatus: repairOrder.status,
+        operator: updateData.responsiblePerson || 'system',
+        remarks: updateData.remarks
+      });
+
+      return { success: true, data: repairOrder };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async queryRepairOrders(filters = {}, options = {}) {
+    try {
+      const query = {};
+
+      if (filters.orderNumber) {
+        query.orderNumber = filters.orderNumber;
+      }
+      if (filters.teamName) {
+        query.teamName = filters.teamName;
+      }
+      if (filters.status) {
+        query.status = filters.status;
+      }
+      if (filters.repairType) {
+        query.repairType = filters.repairType;
+      }
+      if (filters.priority) {
+        query.priority = filters.priority;
+      }
+      if (filters.startDate || filters.endDate) {
+        query.createdAt = {};
+        if (filters.startDate) {
+          query.createdAt.$gte = new Date(filters.startDate);
+        }
+        if (filters.endDate) {
+          query.createdAt.$lte = new Date(filters.endDate);
+        }
+      }
+
+      const page = parseInt(options.page) || 1;
+      const pageSize = parseInt(options.pageSize) || 50;
+      const skip = (page - 1) * pageSize;
+
+      const sort = { createdAt: -1 };
+
+      const orders = await RepairOrder.find(query)
+        .sort(sort)
+        .skip(skip)
+        .limit(pageSize);
+
+      const total = await RepairOrder.countDocuments(query);
+
+      return {
+        success: true,
+        data: {
+          orders,
+          pagination: {
+            page,
+            pageSize,
+            total,
+            totalPages: Math.ceil(total / pageSize)
+          }
+        }
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
 }
 
 module.exports = MaterialService;

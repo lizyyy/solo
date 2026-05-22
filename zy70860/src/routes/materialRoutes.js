@@ -41,4 +41,11 @@ router.put('/records/:recordId/receipt', MaterialController.confirmReceipt);
 router.put('/exceptions/:logId/reassign', MaterialController.reassignException);
 router.put('/exceptions/:logId/resolve', MaterialController.resolveException);
 
+router.post('/repair-orders', MaterialController.createRepairOrder);
+router.post('/repair-orders/batch', MaterialController.createRepairOrderBatch);
+router.get('/repair-orders', MaterialController.queryRepairOrders);
+router.get('/repair-orders/:orderNumber', MaterialController.getRepairOrder);
+router.put('/repair-orders/:orderNumber', MaterialController.updateRepairOrder);
+router.post('/import/repair-orders', upload.single('file'), MaterialController.importRepairOrders);
+
 module.exports = router;

@@ -417,6 +417,116 @@ class MaterialController {
       res.status(500).json({ success: false, error: error.message });
     }
   }
+
+  static async createRepairOrder(req, res) {
+    try {
+      const result = await MaterialService.createRepairOrder(req.body);
+      if (result.success) {
+        res.status(201).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  static async createRepairOrderBatch(req, res) {
+    try {
+      const orders = req.body.orders;
+      if (!Array.isArray(orders)) {
+        return res.status(400).json({ success: false, error: 'orders must be an array' });
+      }
+      
+      const result = await MaterialService.createRepairOrderBatch(orders);
+      if (result.success) {
+        res.status(201).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  static async getRepairOrder(req, res) {
+    try {
+      const { orderNumber } = req.params;
+      const result = await MaterialService.getRepairOrder(orderNumber);
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(404).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  static async updateRepairOrder(req, res) {
+    try {
+      const { orderNumber } = req.params;
+      const result = await MaterialService.updateRepairOrder(orderNumber, req.body);
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  static async queryRepairOrders(req, res) {
+    try {
+      const filters = {
+        orderNumber: req.query.orderNumber,
+        teamName: req.query.teamName,
+        status: req.query.status,
+        repairType: req.query.repairType,
+        priority: req.query.priority,
+        startDate: req.query.startDate,
+        endDate: req.query.endDate
+      };
+
+      const options = {
+        page: req.query.page,
+        pageSize: req.query.pageSize
+      };
+
+      const result = await MaterialService.queryRepairOrders(filters, options);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  static async importRepairOrders(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, error: 'No file uploaded' });
+      }
+
+      const fileName = req.file.originalname.toLowerCase();
+      let result;
+      
+      if (fileName.endsWith('.json')) {
+        result = await ImportService.importRepairOrdersFromFile(req.file.path);
+      } else if (fileName.endsWith('.csv')) {
+        result = await ImportService.importRepairOrdersFromCSV(req.file.path);
+      } else {
+        return res.status(400).json({ success: false, error: 'Unsupported file format, please use JSON or CSV' });
+      }
+
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
 }
 
 module.exports = MaterialController;

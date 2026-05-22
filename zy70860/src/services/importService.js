@@ -3,7 +3,9 @@ const csv = require('csv-parser');
 const Vehicle = require('../models/Vehicle');
 const Inventory = require('../models/Inventory');
 const MaterialRecord = require('../models/MaterialRecord');
-const { generateRecordId } = require('../utils/idGenerator');
+const ExceptionLog = require('../models/ExceptionLog');
+const RepairOrder = require('../models/RepairOrder');
+const { generateRecordId, generateLogId } = require('../utils/idGenerator');
 
 class ImportService {
   static async importVehiclesFromJSON(jsonData) {
@@ -156,7 +158,33 @@ class ImportService {
 
               const newRecord = new MaterialRecord(recordData);
               newRecord.addAuditTrail('导入创建', recordData.applicant || 'system', 'CSV导入');
+              
+              if (recordData.recordType === 'emergency') {
+                newRecord.hasException = true;
+                newRecord.exceptionType = 'emergency_usage';
+                newRecord.exceptionReason = recordData.reason || '紧急领用（CSV导入）';
+                newRecord.exceptionHandler = recordData.applicant || 'system';
+                newRecord.exceptionTime = new Date();
+                newRecord.addAuditTrail('异常记录', recordData.applicant || 'system', '异常类型: emergency_usage, 原因: ' + (recordData.reason || '紧急领用（CSV导入）'));
+              }
+              
               await newRecord.save();
+              
+              if (recordData.recordType === 'emergency') {
+                const exceptionLog = new ExceptionLog({
+                  logId: generateLogId(),
+                  recordId: recordId,
+                  orderNumber: recordData.orderNumber,
+                  exceptionType: 'emergency_usage',
+                  materialCode: recordData.materialCode,
+                  materialName: recordData.materialName,
+                  batchNumber: recordData.batchNumber,
+                  quantity: recordData.requestedQuantity,
+                  reason: recordData.reason || '紧急领用（CSV导入）',
+                  handler: recordData.applicant || 'system'
+                });
+                await exceptionLog.save();
+              }
               
               results.push({ row: currentRow, recordId, status: 'created' });
             } catch (error) {
@@ -209,6 +237,113 @@ class ImportService {
     } catch (error) {
       return { success: false, error: error.message };
     }
+  }
+
+  static async importRepairOrdersFromJSON(jsonData) {
+    try {
+      const orders = Array.isArray(jsonData) ? jsonData : [jsonData];
+      const results = [];
+
+      for (const orderData of orders) {
+        const existingOrder = await RepairOrder.findOne({ orderNumber: orderData.orderNumber });
+        
+        if (existingOrder) {
+          Object.assign(existingOrder, orderData);
+          await existingOrder.save();
+          results.push({ orderNumber: orderData.orderNumber, status: 'updated', data: existingOrder });
+        } else {
+          const newOrder = new RepairOrder(orderData);
+          await newOrder.save();
+          results.push({ orderNumber: orderData.orderNumber, status: 'created', data: newOrder });
+        }
+      }
+
+      return { success: true, total: results.length, results };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async importRepairOrdersFromFile(filePath) {
+    try {
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      const jsonData = JSON.parse(fileContent);
+      return await this.importRepairOrdersFromJSON(jsonData);
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async importRepairOrdersFromCSV(filePath) {
+    return new Promise((resolve, reject) => {
+      const results = [];
+      const errors = [];
+      const savePromises = [];
+      let rowNumber = 0;
+
+      fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (row) => {
+          rowNumber++;
+          const currentRow = rowNumber;
+          
+          const savePromise = (async () => {
+            try {
+              const orderData = {
+                orderNumber: row.orderNumber || row['抢修单号'],
+                repairType: row.repairType || row['抢修类型'] || 'other',
+                location: row.location || row['地点'],
+                description: row.description || row['描述'],
+                priority: row.priority || row['优先级'] || 'medium',
+                status: row.status || row['状态'] || 'pending',
+                vehicleId: row.vehicleId || row['车辆ID'],
+                teamName: row.teamName || row['班组'],
+                reporter: row.reporter || row['报告人'],
+                reportTime: row.reportTime || row['报告时间'] ? new Date(row.reportTime || row['报告时间']) : undefined,
+                startTime: row.startTime || row['开始时间'] ? new Date(row.startTime || row['开始时间']) : undefined,
+                endTime: row.endTime || row['结束时间'] ? new Date(row.endTime || row['结束时间']) : undefined,
+                responsiblePerson: row.responsiblePerson || row['负责人'],
+                remarks: row.remarks || row['备注']
+              };
+
+              if (!orderData.orderNumber || !orderData.location) {
+                errors.push({ row: currentRow, error: '缺少抢修单号或地点' });
+                return;
+              }
+
+              const existingOrder = await RepairOrder.findOne({ orderNumber: orderData.orderNumber });
+
+              if (existingOrder) {
+                Object.assign(existingOrder, orderData);
+                await existingOrder.save();
+                results.push({ row: currentRow, orderNumber: orderData.orderNumber, status: 'updated' });
+              } else {
+                const newOrder = new RepairOrder(orderData);
+                await newOrder.save();
+                results.push({ row: currentRow, orderNumber: orderData.orderNumber, status: 'created' });
+              }
+            } catch (error) {
+              errors.push({ row: currentRow, error: error.message });
+            }
+          })();
+          
+          savePromises.push(savePromise);
+        })
+        .on('end', async () => {
+          await Promise.all(savePromises);
+          resolve({
+            success: errors.length === 0,
+            total: results.length + errors.length,
+            imported: results.length,
+            errors: errors.length,
+            results,
+            errorDetails: errors
+          });
+        })
+        .on('error', (error) => {
+          reject({ success: false, error: error.message });
+        });
+    });
   }
 }
 

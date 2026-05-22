@@ -149,6 +149,17 @@ npm start
 | PUT | `/api/exceptions/:logId/reassign` | 异常重派 |
 | PUT | `/api/exceptions/:logId/resolve` | 异常解决 |
 
+### 抢修单管理接口（完成校验闭环）
+
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| POST | `/api/repair-orders` | 创建抢修单 |
+| POST | `/api/repair-orders/batch` | 批量创建抢修单 |
+| GET | `/api/repair-orders` | 查询抢修单列表 |
+| GET | `/api/repair-orders/:orderNumber` | 获取单条抢修单 |
+| PUT | `/api/repair-orders/:orderNumber` | 更新抢修单 |
+| POST | `/api/import/repair-orders` | 导入抢修单（JSON/CSV） |
+
 ## 状态流转
 
 ```
