@@ -41,8 +41,8 @@ class ReviewerService:
             reconciliation.verification_status = VerificationStatus.NEEDS_MORE_INFO
             reconciliation.review_notes.append("[状态变更] 需补充材料后再审")
         elif action == ReviewAction.RECALCULATE:
+            reconciliation.verification_status = VerificationStatus.REVIEWED
             reconciliation.review_notes.append("[状态变更] 执行重新计算")
-        reconciliation.verification_status = VerificationStatus.REVIEWED
         return reconciliation
 
     def add_note(
