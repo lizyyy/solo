@@ -421,6 +421,259 @@ const renewRecord = async (req, res) => {
   }
 };
 
+const returnRecord = async (req, res) => {
+  try {
+    const { recordId, operator, operatorId, returnDate, comment } = req.body;
+    
+    const record = await BorrowRecord.findOne({ recordId });
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        message: '记录不存在'
+      });
+    }
+    
+    if (record.status === '已归还') {
+      return res.status(400).json({
+        success: false,
+        message: '该记录已完成归还，无需重复操作'
+      });
+    }
+    
+    const actualReturnDate = returnDate ? new Date(returnDate) : new Date();
+    const previousStatus = record.status;
+    const overdueDays = calculateOverdueDays(record.dueDate, actualReturnDate);
+    
+    record.status = '已归还';
+    record.returnDate = actualReturnDate;
+    record.overdueDays = overdueDays;
+    record.isOverdue = overdueDays > 0;
+    
+    let returnReason = '卷宗正常归还';
+    let readableReason = `卷宗于${actualReturnDate.toLocaleDateString('zh-CN')}归还，借阅周期结束`;
+    
+    if (overdueDays > 0) {
+      returnReason = `超期${overdueDays}天归还`;
+      readableReason = `卷宗于${actualReturnDate.toLocaleDateString('zh-CN')}归还，超期${overdueDays}天，已记录超期情况`;
+    }
+    
+    record.addAction(
+      '归还',
+      operator || '系统管理员',
+      returnReason,
+      readableReason,
+      comment || ''
+    );
+    
+    await record.save();
+    
+    const userInfo = await UserPermission.findOne({ userId: record.borrowerId });
+    if (userInfo && userInfo.currentBorrowCount > 0) {
+      userInfo.currentBorrowCount -= 1;
+      await userInfo.save();
+    }
+    
+    const caseInfo = await Case.findOne({ caseId: record.caseId });
+    if (caseInfo) {
+      caseInfo.status = '在库';
+      await caseInfo.save();
+    }
+    
+    if (record.batchId) {
+      const batch = await Batch.findOne({ batchId: record.batchId });
+      if (batch) {
+        const unprocessedRecords = await BorrowRecord.countDocuments({
+          batchId: record.batchId,
+          status: { $nin: ['已借出', '已归还', '已退回', '已取消'] }
+        });
+        if (unprocessedRecords === 0) {
+          batch.status = '已完成';
+          batch.completedAt = new Date();
+          if (!batch.processedBy) {
+            batch.processedBy = operator;
+            batch.processedById = operatorId;
+          }
+          await batch.save();
+        }
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: overdueDays > 0 ? '归还成功（含超期记录）' : '归还成功',
+      record: {
+        recordId: record.recordId,
+        status: record.status,
+        returnDate: record.returnDate.toLocaleDateString('zh-CN'),
+        overdueDays,
+        isOverdue: overdueDays > 0,
+        statusExplanation: record.getCurrentStatusExplanation()
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '归还操作失败',
+      error: error.message
+    });
+  }
+};
+
+const batchReturn = async (req, res) => {
+  try {
+    const { recordIds, operator, operatorId, returnDate } = req.body;
+    
+    if (!Array.isArray(recordIds) || recordIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '请提供需要归还的记录ID列表'
+      });
+    }
+    
+    const results = {
+      success: [],
+      failed: [],
+      total: recordIds.length
+    };
+    
+    for (const recordId of recordIds) {
+      try {
+        const record = await BorrowRecord.findOne({ recordId });
+        if (!record) {
+          results.failed.push({ recordId, reason: '记录不存在' });
+          continue;
+        }
+        
+        if (record.status === '已归还') {
+          results.failed.push({ recordId, reason: '已归还，无需重复操作' });
+          continue;
+        }
+        
+        const actualReturnDate = returnDate ? new Date(returnDate) : new Date();
+        const overdueDays = calculateOverdueDays(record.dueDate, actualReturnDate);
+        
+        record.status = '已归还';
+        record.returnDate = actualReturnDate;
+        record.overdueDays = overdueDays;
+        record.isOverdue = overdueDays > 0;
+        
+        const readableReason = overdueDays > 0 
+          ? `卷宗于${actualReturnDate.toLocaleDateString('zh-CN')}归还，超期${overdueDays}天`
+          : `卷宗于${actualReturnDate.toLocaleDateString('zh-CN')}归还，借阅周期结束`;
+        
+        record.addAction(
+          '归还',
+          operator || '系统管理员',
+          overdueDays > 0 ? `超期${overdueDays}天归还` : '卷宗正常归还',
+          readableReason,
+          '批量归还'
+        );
+        
+        await record.save();
+        
+        const userInfo = await UserPermission.findOne({ userId: record.borrowerId });
+        if (userInfo && userInfo.currentBorrowCount > 0) {
+          userInfo.currentBorrowCount -= 1;
+          await userInfo.save();
+        }
+        
+        const caseInfo = await Case.findOne({ caseId: record.caseId });
+        if (caseInfo) {
+          caseInfo.status = '在库';
+          await caseInfo.save();
+        }
+        
+        results.success.push({ 
+          recordId, 
+          caseTitle: record.caseTitle,
+          overdueDays,
+          isOverdue: overdueDays > 0
+        });
+      } catch (err) {
+        results.failed.push({ recordId, reason: err.message });
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: `批量归还完成：成功${results.success.length}条，失败${results.failed.length}条`,
+      results
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '批量归还操作失败',
+      error: error.message
+    });
+  }
+};
+
+const getReceipt = async (req, res) => {
+  try {
+    const { recordId } = req.params;
+    
+    const record = await BorrowRecord.findOne({ recordId });
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        message: '记录不存在'
+      });
+    }
+    
+    const borrowAction = record.operationHistory.find(a => a.action === '借出' || a.action === '提交');
+    const returnAction = record.operationHistory.find(a => a.action === '归还');
+    
+    const receipt = {
+      recordId: record.recordId,
+      batchId: record.batchId,
+      caseInfo: {
+        caseId: record.caseId,
+        title: record.caseTitle,
+        securityLevel: record.securityLevel
+      },
+      borrowerInfo: {
+        borrowerId: record.borrowerId,
+        name: record.borrowerName,
+        department: record.borrowerDepartment
+      },
+      borrowInfo: {
+        borrowDate: record.borrowDate.toLocaleDateString('zh-CN'),
+        dueDate: record.dueDate.toLocaleDateString('zh-CN'),
+        purpose: record.purpose,
+        renewCount: record.renewCount,
+        operator: borrowAction?.operator || '未知'
+      },
+      returnInfo: record.returnDate ? {
+        returnDate: record.returnDate.toLocaleDateString('zh-CN'),
+        overdueDays: record.overdueDays,
+        isOverdue: record.isOverdue,
+        operator: returnAction?.operator || '未知',
+        comment: returnAction?.comment || ''
+      } : null,
+      status: record.status,
+      statusExplanation: record.getCurrentStatusExplanation(),
+      receiptGeneratedAt: new Date().toLocaleString('zh-CN'),
+      operationSummary: record.operationHistory.map(h => ({
+        action: h.action,
+        operator: h.operator,
+        time: h.timestamp.toLocaleString('zh-CN'),
+        reason: h.readableReason || h.reason
+      }))
+    };
+    
+    res.json({
+      success: true,
+      receipt
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '获取回执失败',
+      error: error.message
+    });
+  }
+};
+
 const getRecordDetail = async (req, res) => {
   try {
     const { recordId } = req.params;
@@ -463,5 +716,8 @@ module.exports = {
   exportDetails,
   sendOverdueReminder,
   renewRecord,
+  returnRecord,
+  batchReturn,
+  getReceipt,
   getRecordDetail
 };

@@ -89,6 +89,8 @@ archive-management-system/
 │   ├── cases.json             # 案件示例数据
 │   ├── borrow.csv             # 借阅示例数据
 │   └── permissions.csv        # 权限示例数据
+├── tests/                     # 测试文件
+│   └── run-tests.js           # 接口测试脚本
 ├── uploads/                   # 文件上传目录（自动创建）
 ├── .env                       # 环境变量
 ├── .env.example               # 环境变量示例

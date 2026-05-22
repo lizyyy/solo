@@ -56,7 +56,10 @@ router.post('/borrow/return-modify', borrowController.returnModify);
 router.post('/borrow/approve-release', borrowController.approveAndRelease);
 router.post('/borrow/overdue-reminder', borrowController.sendOverdueReminder);
 router.post('/borrow/renew', borrowController.renewRecord);
+router.post('/borrow/return', borrowController.returnRecord);
+router.post('/borrow/batch-return', borrowController.batchReturn);
 router.get('/borrow/detail/:recordId', borrowController.getRecordDetail);
+router.get('/borrow/receipt/:recordId', borrowController.getReceipt);
 router.post('/borrow/export', borrowController.exportDetails);
 
 router.post('/import/borrow-csv', upload.single('file'), async (req, res) => {
