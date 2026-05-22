@@ -47,6 +47,27 @@ router.post('/:id/import-csv', upload.single('csv'), async (req, res) => {
   }
 });
 
+router.post('/:id/import-json', upload.single('json'), async (req, res) => {
+  try {
+    const batchId = req.params.id;
+    const result = await importService.importContractsFromJSON(req.file.path, batchId);
+    fs.unlinkSync(req.file.path);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.post('/:id/import-json-data', async (req, res) => {
+  try {
+    const batchId = req.params.id;
+    const result = await importService.importContractsFromJSONData(req.body, batchId);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 router.get('/', async (req, res) => {
   try {
     const batches = await batchService.getAllBatches();

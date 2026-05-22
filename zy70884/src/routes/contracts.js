@@ -5,6 +5,24 @@ const contractService = require('../services/contractService');
 const exportService = require('../services/exportService');
 const { getLogsByContractId } = require('../services/auditService');
 
+router.get('/export/detail', async (req, res) => {
+  try {
+    const handler = req.headers['x-handler'] || 'system';
+    const { seal_type, authorizer, express_no } = req.query;
+    const result = await exportService.exportDetailWithTrace({
+      seal_type,
+      authorizer,
+      express_no
+    }, handler);
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.send(result.csv);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 router.get('/', async (req, res) => {
   try {
     const { seal_type, authorizer, express_no } = req.query;

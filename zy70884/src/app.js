@@ -45,6 +45,8 @@ app.listen(PORT, () => {
   console.log('  GET  /api/batches - 获取所有批次');
   console.log('  GET  /api/batches/:id - 获取批次详情');
   console.log('  POST /api/batches/:id/import-csv - 导入合同CSV');
+  console.log('  POST /api/batches/:id/import-json - 导入合同元数据JSON(文件)');
+  console.log('  POST /api/batches/:id/import-json-data - 导入合同元数据JSON(请求体)');
   console.log('  PUT  /api/batches/:id/status - 更新批次状态');
   console.log('  POST /api/batches/:id/return - 退回修改');
   console.log('  GET  /api/batches/:id/export - 导出批次数据');

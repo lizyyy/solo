@@ -362,6 +362,25 @@ zy70884/
      -F "csv=@contracts.csv"
    ```
 
+   或导入JSON元数据：
+   ```bash
+   curl -X POST http://localhost:3000/api/batches/1/import-json-data \
+     -H "Content-Type: application/json" \
+     -H "x-handler: 法务助理" \
+     -d '[
+       {
+         "contract_no": "HT2024001",
+         "contract_name": "软件开发合同",
+         "party_a": "科技有限公司",
+         "party_b": "软件供应商",
+         "amount": 800000,
+         "seal_type": "合同专用章",
+         "authorizer": "李四",
+         "express_no": "SF123456789"
+       }
+     ]'
+   ```
+
 4. **标记处理**
    ```bash
    curl -X PUT http://localhost:3000/api/contracts/1/process \
