@@ -10,7 +10,7 @@ from app.database import get_db
 from app import schemas, models
 from app.services import ImportService, ReconciliationEngine, ReviewService, ReportService
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter()
 
 
 @router.post("/import/applications", response_model=schemas.ImportResponse)
