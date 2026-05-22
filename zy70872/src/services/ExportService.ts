@@ -2,7 +2,7 @@ import { Parser } from 'json2csv';
 import moment from 'moment';
 import { DataStore } from '../models/DataStore';
 import { ProcessingService } from './ProcessingService';
-import { ProcessingRecord, RecordStatus, ExportOptions, BoundaryLog } from '../types';
+import { ProcessingRecord, RecordStatus, ExportOptions, BoundaryLog, BoundaryType } from '../types';
 
 export class ExportService {
   private dataStore: DataStore;
@@ -128,7 +128,7 @@ export class ExportService {
         [RecordStatus.REJECTED]: '已拒绝',
         [RecordStatus.RETURNED]: '退回修改'
       };
-      conditions.push(`状态：${statusLabels[params.status]}`);
+      conditions.push(`状态：${statusLabels[params.status as RecordStatus]}`);
     }
 
     const conditionStr = conditions.length > 0 ? conditions.join('，') : '全部数据';
@@ -150,9 +150,9 @@ export class ExportService {
 
     for (const record of boundaryRecords) {
       const types = new Set(record.boundaryLogs.map(log => log.type));
-      if (types.has('cross_day')) crossDayCount++;
-      if (types.has('subsidy_limit')) subsidyLimitCount++;
-      if (types.has('refund_deduction')) refundDeductionCount++;
+      if (types.has(BoundaryType.CROSS_DAY)) crossDayCount++;
+      if (types.has(BoundaryType.SUBSIDY_LIMIT)) subsidyLimitCount++;
+      if (types.has(BoundaryType.REFUND_DEDUCTION)) refundDeductionCount++;
     }
 
     return {
@@ -162,5 +162,13 @@ export class ExportService {
       refundDeductionCount,
       boundaryRecords
     };
+  }
+
+  public getBoundaryExplanation(log: BoundaryLog): string {
+    return this.processingService.getBoundaryExplanation(log);
+  }
+
+  public getBoundaryExplanations(record: ProcessingRecord): string[] {
+    return record.boundaryLogs.map(log => this.getBoundaryExplanation(log));
   }
 }

@@ -40,7 +40,8 @@ export class BatchController {
 
   public async uploadShowtimes(req: Request, res: Response): Promise<void> {
     try {
-      const { batchId, handler } = req.body;
+      const { batchId } = req.params;
+      const { handler } = req.body;
 
       if (!batchId || !handler) {
         res.status(400).json({ error: '批次ID和处理人不能为空' });
@@ -83,7 +84,8 @@ export class BatchController {
 
   public uploadBoxOffice(req: Request, res: Response): void {
     try {
-      const { batchId, handler } = req.body;
+      const { batchId } = req.params;
+      const { handler } = req.body;
 
       if (!batchId || !handler) {
         res.status(400).json({ error: '批次ID和处理人不能为空' });

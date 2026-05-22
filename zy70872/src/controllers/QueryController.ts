@@ -65,9 +65,7 @@ export class QueryController {
         return;
       }
 
-      const boundaryExplanations = record.boundaryLogs.map(log => 
-        this.exportService.processingService.getBoundaryExplanation(log)
-      );
+      const boundaryExplanations = this.exportService.getBoundaryExplanations(record);
 
       res.json({
         record,

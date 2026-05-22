@@ -1,5 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
 import { Showtime, BoxOffice, Contract, ProcessingRecord, Batch, RecordStatus } from '../types';
+
+interface PersistedData {
+  showtimes: Showtime[];
+  boxOffices: BoxOffice[];
+  contracts: Contract[];
+  records: ProcessingRecord[];
+  batches: Batch[];
+}
 
 export class DataStore {
   private static instance: DataStore;
@@ -10,13 +20,73 @@ export class DataStore {
   private records: Map<string, ProcessingRecord> = new Map();
   private batches: Map<string, Batch> = new Map();
 
-  private constructor() {}
+  private readonly dataDir: string;
+  private readonly dataFile: string;
+  private autoSave: boolean = true;
+
+  private constructor() {
+    this.dataDir = path.resolve(process.cwd(), 'data');
+    this.dataFile = path.join(this.dataDir, 'cinema-data.json');
+    this.ensureDataDirectory();
+    this.loadFromDisk();
+  }
 
   public static getInstance(): DataStore {
     if (!DataStore.instance) {
       DataStore.instance = new DataStore();
     }
     return DataStore.instance;
+  }
+
+  private ensureDataDirectory(): void {
+    if (!fs.existsSync(this.dataDir)) {
+      fs.mkdirSync(this.dataDir, { recursive: true });
+    }
+  }
+
+  private loadFromDisk(): void {
+    try {
+      if (fs.existsSync(this.dataFile)) {
+        const data = fs.readFileSync(this.dataFile, 'utf8');
+        const persisted: PersistedData = JSON.parse(data);
+        
+        this.showtimes = new Map(persisted.showtimes?.map(s => [s.id, s]) || []);
+        this.boxOffices = new Map(persisted.boxOffices?.map(b => [b.id, b]) || []);
+        this.contracts = new Map(persisted.contracts?.map(c => [c.id, c]) || []);
+        this.records = new Map(persisted.records?.map(r => [r.id, r]) || []);
+        this.batches = new Map(persisted.batches?.map(b => [b.id, b]) || []);
+        
+        console.log(`[DataStore] 已从磁盘加载数据: ${this.batches.size} 个批次, ${this.records.size} 条记录`);
+      }
+    } catch (error) {
+      console.error('[DataStore] 加载数据失败:', error);
+    }
+  }
+
+  private saveToDisk(): void {
+    if (!this.autoSave) return;
+    
+    try {
+      const data: PersistedData = {
+        showtimes: Array.from(this.showtimes.values()),
+        boxOffices: Array.from(this.boxOffices.values()),
+        contracts: Array.from(this.contracts.values()),
+        records: Array.from(this.records.values()),
+        batches: Array.from(this.batches.values())
+      };
+      
+      fs.writeFileSync(this.dataFile, JSON.stringify(data, null, 2), 'utf8');
+    } catch (error) {
+      console.error('[DataStore] 保存数据失败:', error);
+    }
+  }
+
+  public setAutoSave(enabled: boolean): void {
+    this.autoSave = enabled;
+  }
+
+  public forceSave(): void {
+    this.saveToDisk();
   }
 
   public createBatch(name: string, createdBy: string, settlementPeriod?: string): Batch {
@@ -32,6 +102,7 @@ export class DataStore {
       settlementPeriod
     };
     this.batches.set(batch.id, batch);
+    this.saveToDisk();
     return batch;
   }
 
@@ -44,6 +115,7 @@ export class DataStore {
     if (!batch) return undefined;
     const updated = { ...batch, ...updates };
     this.batches.set(id, updated);
+    this.saveToDisk();
     return updated;
   }
 
@@ -55,6 +127,7 @@ export class DataStore {
     const id = uuidv4();
     const st: Showtime = { ...showtime, id };
     this.showtimes.set(id, st);
+    this.saveToDisk();
     return st;
   }
 
@@ -70,6 +143,7 @@ export class DataStore {
     const id = uuidv4();
     const bo: BoxOffice = { ...boxOffice, id };
     this.boxOffices.set(id, bo);
+    this.saveToDisk();
     return bo;
   }
 
@@ -88,6 +162,7 @@ export class DataStore {
       createdAt: new Date().toISOString()
     };
     this.contracts.set(c.id, c);
+    this.saveToDisk();
     return c;
   }
 
@@ -116,6 +191,7 @@ export class DataStore {
       updatedAt: now
     };
     this.records.set(r.id, r);
+    this.saveToDisk();
     return r;
   }
 
@@ -128,6 +204,7 @@ export class DataStore {
       updatedAt: new Date().toISOString() 
     };
     this.records.set(id, updated);
+    this.saveToDisk();
     return updated;
   }
 
@@ -178,5 +255,10 @@ export class DataStore {
     this.contracts.clear();
     this.records.clear();
     this.batches.clear();
+    this.saveToDisk();
+  }
+
+  public getDataFilePath(): string {
+    return this.dataFile;
   }
 }

@@ -1,0 +1,617 @@
+{
+  "showtimes": [
+    {
+      "filmName": "流浪地球3",
+      "hallName": "1号厅",
+      "startTime": "19:00",
+      "endTime": "21:30",
+      "date": "2026-05-20",
+      "seats": 120,
+      "price": 45,
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "isCrossDay": false,
+      "id": "55894804-85a2-4e3f-b569-1e35b609360b"
+    },
+    {
+      "filmName": "流浪地球3",
+      "hallName": "2号厅",
+      "startTime": "22:00",
+      "endTime": "00:30",
+      "date": "2026-05-20",
+      "seats": 100,
+      "price": 40,
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "isCrossDay": true,
+      "id": "95bee900-6cfd-43d5-9280-12cfb1fa8b34"
+    },
+    {
+      "filmName": "哪吒闹海",
+      "hallName": "1号厅",
+      "startTime": "14:00",
+      "endTime": "15:45",
+      "date": "2026-05-20",
+      "seats": 120,
+      "price": 35,
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "isCrossDay": false,
+      "id": "1d768995-7769-4bbe-a7fc-35296e1a802c"
+    },
+    {
+      "filmName": "哪吒闹海",
+      "hallName": "3号厅",
+      "startTime": "10:00",
+      "endTime": "11:45",
+      "date": "2026-05-20",
+      "seats": 80,
+      "price": 30,
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "isCrossDay": false,
+      "id": "50425ecf-5535-454c-b6c5-bae43a66ff95"
+    },
+    {
+      "filmName": "速度与激情11",
+      "hallName": "IMAX厅",
+      "startTime": "20:00",
+      "endTime": "22:15",
+      "date": "2026-05-20",
+      "seats": 150,
+      "price": 60,
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "isCrossDay": false,
+      "id": "1882d1ee-16e1-4874-939d-a210aac44189"
+    },
+    {
+      "filmName": "流浪地球3",
+      "hallName": "1号厅",
+      "startTime": "19:00",
+      "endTime": "21:30",
+      "date": "2026-05-20",
+      "seats": 120,
+      "price": 45,
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "isCrossDay": false,
+      "id": "6051510e-4ec8-485f-9a5c-0fee78f08a9a"
+    },
+    {
+      "filmName": "流浪地球3",
+      "hallName": "2号厅",
+      "startTime": "22:00",
+      "endTime": "00:30",
+      "date": "2026-05-20",
+      "seats": 100,
+      "price": 40,
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "isCrossDay": true,
+      "id": "a01d0af2-2c0d-4807-9942-739d3f2467b5"
+    },
+    {
+      "filmName": "哪吒闹海",
+      "hallName": "1号厅",
+      "startTime": "14:00",
+      "endTime": "15:45",
+      "date": "2026-05-20",
+      "seats": 120,
+      "price": 35,
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "isCrossDay": false,
+      "id": "c254a901-7898-43d1-a6a0-c6a7738b4209"
+    },
+    {
+      "filmName": "哪吒闹海",
+      "hallName": "3号厅",
+      "startTime": "10:00",
+      "endTime": "11:45",
+      "date": "2026-05-20",
+      "seats": 80,
+      "price": 30,
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "isCrossDay": false,
+      "id": "628a25e0-1b25-4a3c-9cea-757f486081bc"
+    },
+    {
+      "filmName": "速度与激情11",
+      "hallName": "IMAX厅",
+      "startTime": "20:00",
+      "endTime": "22:15",
+      "date": "2026-05-20",
+      "seats": 150,
+      "price": 60,
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "isCrossDay": false,
+      "id": "cd387532-06c3-47a0-869c-a851656664fe"
+    }
+  ],
+  "boxOffices": [
+    {
+      "showtimeId": "",
+      "filmName": "流浪地球3",
+      "date": "2026-05-20",
+      "ticketsSold": 180,
+      "grossAmount": 8100,
+      "refundAmount": 500,
+      "subsidyAmount": 810,
+      "netAmount": 8410,
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "id": "fdff5465-1ec1-4b69-a71b-454b0c9c0a3d"
+    },
+    {
+      "showtimeId": "",
+      "filmName": "哪吒闹海",
+      "date": "2026-05-20",
+      "ticketsSold": 150,
+      "grossAmount": 5250,
+      "refundAmount": 0,
+      "subsidyAmount": 525,
+      "netAmount": 5775,
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "id": "6d570a08-33ff-4f88-8b2c-443becf93475"
+    },
+    {
+      "showtimeId": "",
+      "filmName": "速度与激情11",
+      "date": "2026-05-20",
+      "ticketsSold": 140,
+      "grossAmount": 8400,
+      "refundAmount": 200,
+      "subsidyAmount": 500,
+      "netAmount": 8700,
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "id": "4d137eb5-9eae-4b9d-a36a-7f8e960f0aa8"
+    },
+    {
+      "showtimeId": "",
+      "filmName": "流浪地球3",
+      "date": "2026-05-20",
+      "ticketsSold": 180,
+      "grossAmount": 8100,
+      "refundAmount": 500,
+      "subsidyAmount": 810,
+      "netAmount": 8410,
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "id": "6ac9f565-f880-4a1f-bd99-d61a0abaedd7"
+    },
+    {
+      "showtimeId": "",
+      "filmName": "哪吒闹海",
+      "date": "2026-05-20",
+      "ticketsSold": 150,
+      "grossAmount": 5250,
+      "refundAmount": 0,
+      "subsidyAmount": 525,
+      "netAmount": 5775,
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "id": "026fcc84-f97d-43cb-8b14-525ebd3d79e5"
+    },
+    {
+      "showtimeId": "",
+      "filmName": "速度与激情11",
+      "date": "2026-05-20",
+      "ticketsSold": 140,
+      "grossAmount": 8400,
+      "refundAmount": 200,
+      "subsidyAmount": 500,
+      "netAmount": 8700,
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "id": "93bbe7ba-ae11-4e9b-8fe4-0e5d56239dd6"
+    }
+  ],
+  "contracts": [
+    {
+      "filmName": "流浪地球3",
+      "effectiveStartDate": "2026-05-01",
+      "effectiveEndDate": "2026-06-30",
+      "subsidyRate": 0.1,
+      "subsidyMaxAmount": 500,
+      "refundDeductionRate": 0.2,
+      "settlementCycle": "weekly",
+      "id": "368b604f-3422-4c5e-bdf3-4c887f64586f",
+      "createdAt": "2026-05-22T13:05:01.567Z"
+    },
+    {
+      "filmName": "哪吒闹海",
+      "effectiveStartDate": "2026-05-01",
+      "effectiveEndDate": "2026-06-30",
+      "subsidyRate": 0.1,
+      "subsidyMaxAmount": 1000,
+      "refundDeductionRate": 0.15,
+      "settlementCycle": "weekly",
+      "id": "df4a2acb-075b-4367-91c5-1e828e024046",
+      "createdAt": "2026-05-22T13:05:01.571Z"
+    },
+    {
+      "filmName": "速度与激情11",
+      "effectiveStartDate": "2026-05-01",
+      "effectiveEndDate": "2026-06-30",
+      "subsidyRate": 0.08,
+      "subsidyMaxAmount": 800,
+      "refundDeductionRate": 0.25,
+      "settlementCycle": "monthly",
+      "id": "33b50b4b-587b-4df1-a3cd-ab8523c2c12e",
+      "createdAt": "2026-05-22T13:05:01.573Z"
+    },
+    {
+      "filmName": "流浪地球3",
+      "effectiveStartDate": "2026-05-01",
+      "effectiveEndDate": "2026-06-30",
+      "subsidyRate": 0.1,
+      "subsidyMaxAmount": 500,
+      "refundDeductionRate": 0.2,
+      "settlementCycle": "weekly",
+      "id": "99e5077a-6d34-4cd7-8895-21f479d5a093",
+      "createdAt": "2026-05-22T13:08:07.568Z"
+    },
+    {
+      "filmName": "哪吒闹海",
+      "effectiveStartDate": "2026-05-01",
+      "effectiveEndDate": "2026-06-30",
+      "subsidyRate": 0.1,
+      "subsidyMaxAmount": 1000,
+      "refundDeductionRate": 0.15,
+      "settlementCycle": "weekly",
+      "id": "33d8063d-69a4-44b3-af9d-7eb4128a4bba",
+      "createdAt": "2026-05-22T13:08:07.570Z"
+    },
+    {
+      "filmName": "速度与激情11",
+      "effectiveStartDate": "2026-05-01",
+      "effectiveEndDate": "2026-06-30",
+      "subsidyRate": 0.08,
+      "subsidyMaxAmount": 800,
+      "refundDeductionRate": 0.25,
+      "settlementCycle": "monthly",
+      "id": "5bea49bd-49ba-408e-8ba7-8f7f5287ec3a",
+      "createdAt": "2026-05-22T13:08:07.572Z"
+    }
+  ],
+  "records": [
+    {
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "showtimeId": "55894804-85a2-4e3f-b569-1e35b609360b",
+      "boxOfficeId": "fdff5465-1ec1-4b69-a71b-454b0c9c0a3d",
+      "contractId": "368b604f-3422-4c5e-bdf3-4c887f64586f",
+      "filmName": "流浪地球3",
+      "hallName": "1号厅",
+      "date": "2026-05-20",
+      "status": "returned",
+      "boundaryLogs": [
+        {
+          "type": "subsidy_limit",
+          "reason": "补贴金额超出合同约定上限",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:05:01.586Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "grossAmount": 8100,
+            "subsidyRate": 0.1,
+            "calculatedAmount": 810,
+            "maxAmount": 500,
+            "actualAmount": 500,
+            "explanation": "按10.0%计算应补贴810.00元，超出合同上限500.00元，按上限发放"
+          }
+        },
+        {
+          "type": "refund_deduction",
+          "reason": "按合同约定进行退票扣减",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:05:01.586Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "refundAmount": 500,
+            "deductionRate": 0.2,
+            "deductionAmount": 100,
+            "explanation": "退票金额500.00元，按20.0%扣减100.00元"
+          }
+        }
+      ],
+      "currentHandler": "运营主管李四",
+      "id": "cff405b3-0cdf-4477-9167-3cc58d2ed852",
+      "createdAt": "2026-05-22T13:05:01.586Z",
+      "updatedAt": "2026-05-22T13:08:07.592Z",
+      "remarks": "场次时间与实际排片不符，请核实后重新提交"
+    },
+    {
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "showtimeId": "95bee900-6cfd-43d5-9280-12cfb1fa8b34",
+      "boxOfficeId": "fdff5465-1ec1-4b69-a71b-454b0c9c0a3d",
+      "contractId": "368b604f-3422-4c5e-bdf3-4c887f64586f",
+      "filmName": "流浪地球3",
+      "hallName": "2号厅",
+      "date": "2026-05-20",
+      "status": "pending",
+      "boundaryLogs": [
+        {
+          "type": "subsidy_limit",
+          "reason": "补贴金额超出合同约定上限",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:05:01.586Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "grossAmount": 8100,
+            "subsidyRate": 0.1,
+            "calculatedAmount": 810,
+            "maxAmount": 500,
+            "actualAmount": 500,
+            "explanation": "按10.0%计算应补贴810.00元，超出合同上限500.00元，按上限发放"
+          }
+        },
+        {
+          "type": "refund_deduction",
+          "reason": "按合同约定进行退票扣减",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:05:01.586Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "refundAmount": 500,
+            "deductionRate": 0.2,
+            "deductionAmount": 100,
+            "explanation": "退票金额500.00元，按20.0%扣减100.00元"
+          }
+        },
+        {
+          "type": "cross_day",
+          "reason": "系统检测到跨日场次",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:05:01.586Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "hallName": "2号厅",
+            "startTime": "22:00",
+            "endTime": "00:30",
+            "date": "2026-05-20",
+            "explanation": "场次跨日：2026-05-20 22:00 - 00:30，次日场次需单独核算"
+          }
+        }
+      ],
+      "currentHandler": "运营专员张三",
+      "id": "a285a344-a279-4b77-b0dd-f90c0d5ace95",
+      "createdAt": "2026-05-22T13:05:01.586Z",
+      "updatedAt": "2026-05-22T13:05:01.586Z"
+    },
+    {
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "showtimeId": "1d768995-7769-4bbe-a7fc-35296e1a802c",
+      "boxOfficeId": "6d570a08-33ff-4f88-8b2c-443becf93475",
+      "contractId": "df4a2acb-075b-4367-91c5-1e828e024046",
+      "filmName": "哪吒闹海",
+      "hallName": "1号厅",
+      "date": "2026-05-20",
+      "status": "pending",
+      "boundaryLogs": [],
+      "currentHandler": "运营专员张三",
+      "id": "d1c6c74a-1e2f-460b-9203-ed35b44ec890",
+      "createdAt": "2026-05-22T13:05:01.586Z",
+      "updatedAt": "2026-05-22T13:05:01.586Z"
+    },
+    {
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "showtimeId": "50425ecf-5535-454c-b6c5-bae43a66ff95",
+      "boxOfficeId": "6d570a08-33ff-4f88-8b2c-443becf93475",
+      "contractId": "df4a2acb-075b-4367-91c5-1e828e024046",
+      "filmName": "哪吒闹海",
+      "hallName": "3号厅",
+      "date": "2026-05-20",
+      "status": "pending",
+      "boundaryLogs": [],
+      "currentHandler": "运营专员张三",
+      "id": "f7f7e999-d8c2-4a93-a0a0-807136413664",
+      "createdAt": "2026-05-22T13:05:01.586Z",
+      "updatedAt": "2026-05-22T13:05:01.586Z"
+    },
+    {
+      "batchId": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "showtimeId": "1882d1ee-16e1-4874-939d-a210aac44189",
+      "boxOfficeId": "4d137eb5-9eae-4b9d-a36a-7f8e960f0aa8",
+      "contractId": "33b50b4b-587b-4df1-a3cd-ab8523c2c12e",
+      "filmName": "速度与激情11",
+      "hallName": "IMAX厅",
+      "date": "2026-05-20",
+      "status": "pending",
+      "boundaryLogs": [
+        {
+          "type": "refund_deduction",
+          "reason": "按合同约定进行退票扣减",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:05:01.587Z",
+          "details": {
+            "filmName": "速度与激情11",
+            "refundAmount": 200,
+            "deductionRate": 0.25,
+            "deductionAmount": 50,
+            "explanation": "退票金额200.00元，按25.0%扣减50.00元"
+          }
+        }
+      ],
+      "currentHandler": "运营专员张三",
+      "id": "d5df927c-417a-44c8-b782-1e20a03e3aa0",
+      "createdAt": "2026-05-22T13:05:01.587Z",
+      "updatedAt": "2026-05-22T13:05:01.587Z"
+    },
+    {
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "showtimeId": "6051510e-4ec8-485f-9a5c-0fee78f08a9a",
+      "boxOfficeId": "6ac9f565-f880-4a1f-bd99-d61a0abaedd7",
+      "contractId": "368b604f-3422-4c5e-bdf3-4c887f64586f",
+      "filmName": "流浪地球3",
+      "hallName": "1号厅",
+      "date": "2026-05-20",
+      "status": "approved",
+      "boundaryLogs": [
+        {
+          "type": "subsidy_limit",
+          "reason": "补贴金额超出合同约定上限",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:08:07.581Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "grossAmount": 8100,
+            "subsidyRate": 0.1,
+            "calculatedAmount": 810,
+            "maxAmount": 500,
+            "actualAmount": 500,
+            "explanation": "按10.0%计算应补贴810.00元，超出合同上限500.00元，按上限发放"
+          }
+        },
+        {
+          "type": "refund_deduction",
+          "reason": "按合同约定进行退票扣减",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:08:07.581Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "refundAmount": 500,
+            "deductionRate": 0.2,
+            "deductionAmount": 100,
+            "explanation": "退票金额500.00元，按20.0%扣减100.00元"
+          }
+        }
+      ],
+      "currentHandler": "运营主管李四",
+      "id": "3d304cd5-c0c9-4309-b1a8-29d57db780cb",
+      "createdAt": "2026-05-22T13:08:07.581Z",
+      "updatedAt": "2026-05-22T13:08:07.593Z"
+    },
+    {
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "showtimeId": "a01d0af2-2c0d-4807-9942-739d3f2467b5",
+      "boxOfficeId": "6ac9f565-f880-4a1f-bd99-d61a0abaedd7",
+      "contractId": "368b604f-3422-4c5e-bdf3-4c887f64586f",
+      "filmName": "流浪地球3",
+      "hallName": "2号厅",
+      "date": "2026-05-20",
+      "status": "approved",
+      "boundaryLogs": [
+        {
+          "type": "subsidy_limit",
+          "reason": "补贴金额超出合同约定上限",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:08:07.581Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "grossAmount": 8100,
+            "subsidyRate": 0.1,
+            "calculatedAmount": 810,
+            "maxAmount": 500,
+            "actualAmount": 500,
+            "explanation": "按10.0%计算应补贴810.00元，超出合同上限500.00元，按上限发放"
+          }
+        },
+        {
+          "type": "refund_deduction",
+          "reason": "按合同约定进行退票扣减",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:08:07.581Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "refundAmount": 500,
+            "deductionRate": 0.2,
+            "deductionAmount": 100,
+            "explanation": "退票金额500.00元，按20.0%扣减100.00元"
+          }
+        },
+        {
+          "type": "cross_day",
+          "reason": "系统检测到跨日场次",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:08:07.581Z",
+          "details": {
+            "filmName": "流浪地球3",
+            "hallName": "2号厅",
+            "startTime": "22:00",
+            "endTime": "00:30",
+            "date": "2026-05-20",
+            "explanation": "场次跨日：2026-05-20 22:00 - 00:30，次日场次需单独核算"
+          }
+        }
+      ],
+      "currentHandler": "运营主管李四",
+      "id": "93182937-520d-46a4-96a1-e4c6adcb3ed1",
+      "createdAt": "2026-05-22T13:08:07.581Z",
+      "updatedAt": "2026-05-22T13:08:07.593Z"
+    },
+    {
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "showtimeId": "c254a901-7898-43d1-a6a0-c6a7738b4209",
+      "boxOfficeId": "026fcc84-f97d-43cb-8b14-525ebd3d79e5",
+      "contractId": "df4a2acb-075b-4367-91c5-1e828e024046",
+      "filmName": "哪吒闹海",
+      "hallName": "1号厅",
+      "date": "2026-05-20",
+      "status": "approved",
+      "boundaryLogs": [],
+      "currentHandler": "运营主管李四",
+      "id": "ccc5d64a-5626-4b56-89b3-b2c47dfc1da2",
+      "createdAt": "2026-05-22T13:08:07.581Z",
+      "updatedAt": "2026-05-22T13:08:07.593Z"
+    },
+    {
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "showtimeId": "628a25e0-1b25-4a3c-9cea-757f486081bc",
+      "boxOfficeId": "026fcc84-f97d-43cb-8b14-525ebd3d79e5",
+      "contractId": "df4a2acb-075b-4367-91c5-1e828e024046",
+      "filmName": "哪吒闹海",
+      "hallName": "3号厅",
+      "date": "2026-05-20",
+      "status": "approved",
+      "boundaryLogs": [],
+      "currentHandler": "运营主管李四",
+      "id": "49fecbc1-bd40-4a01-84ac-0875908767f5",
+      "createdAt": "2026-05-22T13:08:07.582Z",
+      "updatedAt": "2026-05-22T13:08:07.594Z"
+    },
+    {
+      "batchId": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "showtimeId": "cd387532-06c3-47a0-869c-a851656664fe",
+      "boxOfficeId": "93bbe7ba-ae11-4e9b-8fe4-0e5d56239dd6",
+      "contractId": "33b50b4b-587b-4df1-a3cd-ab8523c2c12e",
+      "filmName": "速度与激情11",
+      "hallName": "IMAX厅",
+      "date": "2026-05-20",
+      "status": "approved",
+      "boundaryLogs": [
+        {
+          "type": "refund_deduction",
+          "reason": "按合同约定进行退票扣减",
+          "handler": "运营专员张三",
+          "timestamp": "2026-05-22T13:08:07.582Z",
+          "details": {
+            "filmName": "速度与激情11",
+            "refundAmount": 200,
+            "deductionRate": 0.25,
+            "deductionAmount": 50,
+            "explanation": "退票金额200.00元，按25.0%扣减50.00元"
+          }
+        }
+      ],
+      "currentHandler": "运营主管李四",
+      "id": "7ddef822-c9ed-46f3-a4f1-b75f086184c2",
+      "createdAt": "2026-05-22T13:08:07.582Z",
+      "updatedAt": "2026-05-22T13:08:07.594Z"
+    }
+  ],
+  "batches": [
+    {
+      "id": "fd9f8b01-528c-4423-b0cf-619ea2d6049a",
+      "name": "2026年5月第3周结算批次",
+      "status": "pending",
+      "showtimeCount": 5,
+      "boxOfficeCount": 3,
+      "recordCount": 5,
+      "createdAt": "2026-05-22T13:05:01.576Z",
+      "createdBy": "运营专员张三",
+      "settlementPeriod": "2026-W21"
+    },
+    {
+      "id": "8b934057-5c14-4157-94b2-cdf9f412f2e7",
+      "name": "2026年5月第3周结算批次",
+      "status": "approved",
+      "showtimeCount": 5,
+      "boxOfficeCount": 3,
+      "recordCount": 5,
+      "createdAt": "2026-05-22T13:08:07.574Z",
+      "createdBy": "运营专员张三",
+      "settlementPeriod": "2026-W21",
+      "processedAt": "2026-05-22T13:08:07.594Z",
+      "processedBy": "运营主管李四"
+    }
+  ]
+}
