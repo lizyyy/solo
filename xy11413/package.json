@@ -1,0 +1,30 @@
+{
+  "name": "tea-chain-material-verification",
+  "version": "1.0.0",
+  "description": "连锁茶饮原料验收回放链路 API",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "seed": "ts-node src/scripts/seed.ts",
+    "test": "ts-node src/tests/automation-check.ts",
+    "export": "ts-node src/scripts/export.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.5.0",
+    "@types/sqlite3": "^3.1.8",
+    "@types/uuid": "^9.0.2",
+    "@types/json2csv": "^5.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}
