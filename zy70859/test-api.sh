@@ -56,12 +56,11 @@ MATERIAL2_ID=$(echo "$MATERIAL2_RESPONSE" | jq -r '.material.id')
 echo "材料2 ID: $MATERIAL2_ID"
 echo ""
 
-echo "5. 登记材料3 - 包含非法标识，应标记为已拦截"
+echo "5. 登记材料3 - 缺少卷宗编号，应标记为待补充"
 MATERIAL3_RESPONSE=$(curl -s -X POST "$BASE_URL/batches/$BATCH_ID/materials" \
   -H "Content-Type: application/json" \
   -d '{
     "materialData": {
-      "document_number": "TEST-FY-2024-00125",
       "case_number": "(2024)京民初字第125号",
       "document_type": "正卷",
       "borrower": "王五法官",
@@ -74,12 +73,30 @@ MATERIAL3_ID=$(echo "$MATERIAL3_RESPONSE" | jq -r '.material.id')
 echo "材料3 ID: $MATERIAL3_ID"
 echo ""
 
+echo "6. 登记材料4 - 包含非法标识，应标记为已拦截"
+MATERIAL4_RESPONSE=$(curl -s -X POST "$BASE_URL/batches/$BATCH_ID/materials" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "materialData": {
+      "document_number": "TEST-FY-2024-00126",
+      "case_number": "(2024)京民初字第126号",
+      "document_type": "正卷",
+      "borrower": "赵六法官",
+      "borrow_date": "2024-05-16"
+    },
+    "processedBy": "档案室管理员-张三"
+  }')
+echo "$MATERIAL4_RESPONSE" | jq .
+MATERIAL4_ID=$(echo "$MATERIAL4_RESPONSE" | jq -r '.material.id')
+echo "材料4 ID: $MATERIAL4_ID"
+echo ""
+
 echo "6. 查看批次下所有材料"
 curl -s "$BASE_URL/batches/$BATCH_ID/materials" | jq .
 echo ""
 
-echo "7. 人工修改材料3状态 - 从拦截改为正常"
-curl -s -X PATCH "$BASE_URL/materials/$MATERIAL3_ID/status" \
+echo "7. 人工修改材料4状态 - 从拦截改为正常"
+curl -s -X PATCH "$BASE_URL/materials/$MATERIAL4_ID/status" \
   -H "Content-Type: application/json" \
   -d '{
     "newStatus": "normal",
@@ -89,25 +106,29 @@ curl -s -X PATCH "$BASE_URL/materials/$MATERIAL3_ID/status" \
   }' | jq .
 echo ""
 
-echo "8. 查看材料1的完整追溯信息"
+echo "8. 查看材料1的完整追溯信息（正常卷宗）"
 curl -s "$BASE_URL/materials/$MATERIAL1_ID/trail" | jq .
 echo ""
 
-echo "9. 查看材料3的审计日志（谁改过结论）"
-curl -s "$BASE_URL/materials/$MATERIAL3_ID/audit-logs" | jq .
+echo "9. 查看材料3的完整追溯信息（缺少卷宗编号-待补充）"
+curl -s "$BASE_URL/materials/$MATERIAL3_ID/trail" | jq .
 echo ""
 
-echo "10. 查看材料3的处理轨迹"
-curl -s "$BASE_URL/materials/$MATERIAL3_ID/processing-trails" | jq .
+echo "10. 查看材料4的审计日志（谁改过结论）"
+curl -s "$BASE_URL/materials/$MATERIAL4_ID/audit-logs" | jq .
 echo ""
 
-echo "11. 触发批次重算"
+echo "11. 查看材料4的处理轨迹"
+curl -s "$BASE_URL/materials/$MATERIAL4_ID/processing-trails" | jq .
+echo ""
+
+echo "12. 触发批次重算"
 curl -s -X POST "$BASE_URL/batches/$BATCH_ID/recalculate" \
   -H "Content-Type: application/json" \
   -d '{"processedBy": "档案室管理员-张三"}' | jq .
 echo ""
 
-echo "12. 查看统计数据"
+echo "13. 查看统计数据"
 curl -s "$BASE_URL/statistics" | jq .
 echo ""
 

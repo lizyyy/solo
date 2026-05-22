@@ -13,7 +13,7 @@ export interface Batch {
 export interface Material {
   id: string;
   batch_id: string;
-  document_number: string;
+  document_number?: string;
   case_number?: string;
   document_type?: string;
   borrower?: string;

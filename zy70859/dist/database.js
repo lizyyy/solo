@@ -27,7 +27,7 @@ async function initDatabase() {
     CREATE TABLE IF NOT EXISTS materials (
       id TEXT PRIMARY KEY,
       batch_id TEXT NOT NULL,
-      document_number TEXT NOT NULL,
+      document_number TEXT,
       case_number TEXT,
       document_type TEXT,
       borrower TEXT,
