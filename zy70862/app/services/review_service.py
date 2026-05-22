@@ -107,26 +107,15 @@ class ReviewService:
                 existing_trace.quantity = updates.get("quantity", existing_trace.quantity)
                 existing_trace.remark = f"复核更新: 数量={requisition.quantity}, 批次={requisition.batch_no}"
 
-        db.query(ReconciliationDiff).filter(
-            ReconciliationDiff.requisition_id == requisition_id
-        ).delete()
-
-        new_diffs = ReconciliationService._analyze_requisition_diff(db, requisition)
-        for diff_data in new_diffs:
-            diff = ReconciliationDiff(**diff_data)
-            db.add(diff)
-
-        ReconciliationService._check_negative_inventory(db)
-        ReconciliationService._generate_summary(db, datetime.now())
-
         db.commit()
 
-        ReconciliationService.run_auto_reconciliation(db)
+        result = ReconciliationService.run_auto_reconciliation(db)
 
         return {
             "success": True,
             "requisition_id": requisition_id,
-            "new_diffs_count": len(new_diffs)
+            "total_diffs": result["total_diffs"],
+            "summary": result["summary"]
         }
 
     @staticmethod

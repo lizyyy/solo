@@ -29,19 +29,35 @@ class ReconciliationService:
         requisitions = db.query(MaterialRequisition).all()
 
         diff_results = []
-        import uuid
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S%f')
         for idx, req in enumerate(requisitions):
             diffs = ReconciliationService._analyze_requisition_diff(db, req, idx)
             diff_results.extend(diffs)
+
+        negative_items = db.query(Inventory).filter(Inventory.quantity < 0).all()
+        for idx, item in enumerate(negative_items):
+            diff_results.append({
+                "diff_no": f"NEG_{timestamp}_{len(diff_results)}",
+                "diff_type": "NEGATIVE_INVENTORY",
+                "material_code": item.material_code,
+                "material_name": item.material_name,
+                "requisition_quantity": 0,
+                "vehicle_quantity": 0,
+                "inventory_quantity": item.quantity,
+                "diff_quantity": item.quantity,
+                "explanation": f"库存负数预警：{item.material_name} 当前库存{item.quantity}{item.unit}，低于安全库存{item.safety_stock}{item.unit}",
+                "status": "pending",
+                "is_approved": False
+            })
 
         for diff_data in diff_results:
             diff = ReconciliationDiff(**diff_data)
             db.add(diff)
 
+        db.flush()
+
         summary = ReconciliationService._generate_summary(db, check_date)
         db.add(summary)
-
-        ReconciliationService._check_negative_inventory(db, len(diff_results))
 
         db.commit()
 
@@ -138,35 +154,6 @@ class ReconciliationService:
                 })
 
         return diffs
-
-    @staticmethod
-    def _check_negative_inventory(db: Session, start_idx: int = 0):
-        negative_items = db.query(Inventory).filter(Inventory.quantity < 0).all()
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S%f')
-
-        for idx, item in enumerate(negative_items):
-            existing_diff = db.query(ReconciliationDiff).filter(
-                and_(
-                    ReconciliationDiff.diff_type == "NEGATIVE_INVENTORY",
-                    ReconciliationDiff.material_code == item.material_code
-                )
-            ).first()
-
-            if not existing_diff:
-                diff = ReconciliationDiff(
-                    diff_no=f"NEG_{timestamp}_{start_idx + idx}",
-                    diff_type="NEGATIVE_INVENTORY",
-                    material_code=item.material_code,
-                    material_name=item.material_name,
-                    requisition_quantity=0,
-                    vehicle_quantity=0,
-                    inventory_quantity=item.quantity,
-                    diff_quantity=item.quantity,
-                    explanation=f"库存负数预警：{item.material_name} 当前库存{item.quantity}{item.unit}，低于安全库存{item.safety_stock}{item.unit}",
-                    status="pending",
-                    is_approved=False
-                )
-                db.add(diff)
 
     @staticmethod
     def _generate_summary(db: Session, summary_date: datetime) -> ReconciliationSummary:
