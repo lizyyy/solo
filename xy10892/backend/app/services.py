@@ -109,12 +109,30 @@ def apply_masking(content: str, rules):
                                 actual_text = name_match.group(1)
                                 actual_start = match.start() + name_match.start(1)
                                 actual_end = match.start() + name_match.end(1)
+                                
+                                name_count = len(re.findall(r'[\u4e00-\u9fa5]{2,3}', actual_text))
+                                if name_count > 1:
+                                    separator = re.search(r'[/、,，\s]', actual_text)
+                                    sep = separator.group() if separator else '/'
+                                    replacement = sep.join(['**'] * name_count)
+                                    prefix = matched_text[:name_match.start(1)]
+                                    remaining = matched_text[name_match.end(1):]
+                                    rule_replacement = prefix + replacement + remaining
+                                else:
+                                    rule_replacement = rule.replacement
                             else:
                                 continue
                         else:
                             actual_text = matched_text
                             actual_start = match.start()
                             actual_end = match.end()
+                            name_count = len(re.findall(r'[\u4e00-\u9fa5]{2,3}', actual_text))
+                            if name_count > 1:
+                                separator = re.search(r'[/、,，\s]', actual_text)
+                                sep = separator.group() if separator else '/'
+                                rule_replacement = sep.join(['**'] * name_count)
+                            else:
+                                rule_replacement = rule.replacement
                         
                         column_offset = actual_start + 1
                     elif rule.rule_type == 'id_card' and '身份证号' in matched_text:
@@ -124,6 +142,7 @@ def apply_masking(content: str, rules):
                             actual_start = match.start() + id_match.start()
                             actual_end = match.start() + id_match.end()
                             column_offset = actual_start + 1
+                            rule_replacement = rule.replacement
                         else:
                             continue
                     else:
@@ -131,6 +150,7 @@ def apply_masking(content: str, rules):
                         actual_start = match.start()
                         actual_end = match.end()
                         column_offset = match.start() + 1
+                        rule_replacement = rule.replacement
                     
                     line_hits.append({
                         'rule_id': rule.id,
@@ -144,7 +164,7 @@ def apply_masking(content: str, rules):
                         'line_number': line_num,
                         'column_number': column_offset,
                         'context': line.strip(),
-                        'replacement': rule.replacement,
+                        'replacement': rule_replacement,
                         'pattern': rule.pattern
                     })
                 
