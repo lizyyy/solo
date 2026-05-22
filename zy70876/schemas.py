@@ -210,6 +210,8 @@ class ExportRequest(BaseModel):
     status: Optional[str] = None
     research_direction: Optional[str] = None
     major: Optional[str] = None
+    preference_priority: Optional[int] = None
+    preference_advisor_id: Optional[int] = None
 
 
 class ProcessRequest(BaseModel):

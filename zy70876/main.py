@@ -41,6 +41,18 @@ def get_students(skip: int = 0, limit: int = 100, db: Session = Depends(get_db))
     return db.query(models.Student).offset(skip).limit(limit).all()
 
 
+@app.get("/api/preferences", tags=["志愿管理"])
+def get_preferences(
+    student_id: Optional[int] = None,
+    advisor_id: Optional[int] = None,
+    priority: Optional[int] = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    return services.PreferenceService.get_preferences_with_details(db, student_id, advisor_id, priority, skip, limit)
+
+
 @app.post("/api/batches", response_model=schemas.Batch, tags=["批次管理"])
 def create_batch(batch: schemas.BatchCreate, db: Session = Depends(get_db)):
     existing = db.query(models.Batch).filter(models.Batch.batch_code == batch.batch_code).first()
@@ -64,8 +76,20 @@ async def import_adjustments(file: UploadFile = File(...), created_by: str = "ad
 
 
 @app.get("/api/adjustments", response_model=List[schemas.AdjustmentRecord], tags=["调剂管理"])
-def get_adjustments(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return db.query(models.AdjustmentRecord).offset(skip).limit(limit).all()
+def get_adjustments(
+    student_id: Optional[int] = None,
+    batch_id: Optional[int] = None,
+    batch_code: Optional[str] = None,
+    from_advisor_id: Optional[int] = None,
+    to_advisor_id: Optional[int] = None,
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    return services.AdjustmentService.query_adjustments(
+        db, student_id, batch_id, batch_code, from_advisor_id, to_advisor_id, status, skip, limit
+    )
 
 
 @app.post("/api/allocations", response_model=schemas.AllocationRecord, tags=["分配管理"])
@@ -92,12 +116,15 @@ def query_allocations(
     status: Optional[str] = None,
     research_direction: Optional[str] = None,
     major: Optional[str] = None,
+    preference_priority: Optional[int] = None,
+    preference_advisor_id: Optional[int] = None,
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
     return services.AllocationService.query_allocations(
-        db, advisor_id, student_id, batch_id, status, research_direction, major, skip, limit
+        db, advisor_id, student_id, batch_id, status, research_direction, major,
+        preference_priority, preference_advisor_id, skip, limit
     )
 
 

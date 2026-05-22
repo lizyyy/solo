@@ -82,6 +82,55 @@ class AdvisorService:
         return advisors
 
 
+class PreferenceService:
+    @staticmethod
+    def query_preferences(
+        db: Session,
+        student_id: Optional[int] = None,
+        advisor_id: Optional[int] = None,
+        priority: Optional[int] = None,
+        skip: int = 0,
+        limit: int = 100
+    ) -> List[models.Preference]:
+        query = db.query(models.Preference)
+        
+        if student_id:
+            query = query.filter(models.Preference.student_id == student_id)
+        if advisor_id:
+            query = query.filter(models.Preference.advisor_id == advisor_id)
+        if priority:
+            query = query.filter(models.Preference.priority == priority)
+        
+        return query.offset(skip).limit(limit).all()
+    
+    @staticmethod
+    def get_preferences_with_details(
+        db: Session,
+        student_id: Optional[int] = None,
+        advisor_id: Optional[int] = None,
+        priority: Optional[int] = None,
+        skip: int = 0,
+        limit: int = 100
+    ):
+        preferences = PreferenceService.query_preferences(db, student_id, advisor_id, priority, skip, limit)
+        result = []
+        for pref in preferences:
+            student = db.query(models.Student).filter(models.Student.id == pref.student_id).first()
+            advisor = db.query(models.Advisor).filter(models.Advisor.id == pref.advisor_id).first()
+            result.append({
+                "id": pref.id,
+                "student_id": pref.student_id,
+                "student_name": student.name if student else "",
+                "student_no": student.student_id if student else "",
+                "advisor_id": pref.advisor_id,
+                "advisor_name": advisor.name if advisor else "",
+                "advisor_no": advisor.advisor_id if advisor else "",
+                "priority": pref.priority,
+                "created_at": pref.created_at
+            })
+        return result
+
+
 class StudentService:
     @staticmethod
     def import_preferences_from_json(db: Session, json_content: str, created_by: str) -> List[models.Preference]:
@@ -237,6 +286,8 @@ class AllocationService:
         status: Optional[str] = None,
         research_direction: Optional[str] = None,
         major: Optional[str] = None,
+        preference_priority: Optional[int] = None,
+        preference_advisor_id: Optional[int] = None,
         skip: int = 0,
         limit: int = 100
     ) -> List[models.AllocationRecord]:
@@ -251,9 +302,24 @@ class AllocationService:
         if status:
             query = query.filter(models.AllocationRecord.status == status)
         if research_direction:
-            query = query.join(models.Advisor).filter(models.Advisor.research_direction.contains(research_direction))
+            query = query.join(models.Advisor, models.AllocationRecord.advisor_id == models.Advisor.id)\
+                        .filter(models.Advisor.research_direction.contains(research_direction))
         if major:
-            query = query.join(models.Student).filter(models.Student.major == major)
+            query = query.join(models.Student, models.AllocationRecord.student_id == models.Student.id)\
+                        .filter(models.Student.major == major)
+        if preference_priority is not None or preference_advisor_id:
+            query = query.join(
+                models.Preference,
+                and_(
+                    models.AllocationRecord.student_id == models.Preference.student_id,
+                    models.AllocationRecord.advisor_id == models.Preference.advisor_id
+                ),
+                isouter=True
+            )
+            if preference_priority is not None:
+                query = query.filter(models.Preference.priority == preference_priority)
+            if preference_advisor_id:
+                query = query.filter(models.Preference.advisor_id == preference_advisor_id)
         
         return query.offset(skip).limit(limit).all()
     
@@ -271,6 +337,8 @@ class AllocationService:
             status=export_request.status,
             research_direction=export_request.research_direction,
             major=export_request.major,
+            preference_priority=export_request.preference_priority,
+            preference_advisor_id=export_request.preference_advisor_id,
             limit=10000
         )
         
@@ -317,6 +385,36 @@ class AdjustmentService:
         db.commit()
         db.refresh(db_adjustment)
         return db_adjustment
+    
+    @staticmethod
+    def query_adjustments(
+        db: Session,
+        student_id: Optional[int] = None,
+        batch_id: Optional[int] = None,
+        batch_code: Optional[str] = None,
+        from_advisor_id: Optional[int] = None,
+        to_advisor_id: Optional[int] = None,
+        status: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 100
+    ) -> List[models.AdjustmentRecord]:
+        query = db.query(models.AdjustmentRecord)
+        
+        if student_id:
+            query = query.filter(models.AdjustmentRecord.student_id == student_id)
+        if batch_id:
+            query = query.filter(models.AdjustmentRecord.batch_id == batch_id)
+        if batch_code:
+            query = query.join(models.Batch, models.AdjustmentRecord.batch_id == models.Batch.id)\
+                        .filter(models.Batch.batch_code == batch_code)
+        if from_advisor_id:
+            query = query.filter(models.AdjustmentRecord.from_advisor_id == from_advisor_id)
+        if to_advisor_id:
+            query = query.filter(models.AdjustmentRecord.to_advisor_id == to_advisor_id)
+        if status:
+            query = query.filter(models.AdjustmentRecord.status == status)
+        
+        return query.offset(skip).limit(limit).all()
     
     @staticmethod
     def import_adjustments(db: Session, adjustments_data: List[dict], created_by: str) -> List[models.AdjustmentRecord]:
