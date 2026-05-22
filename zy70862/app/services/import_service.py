@@ -17,8 +17,19 @@ class ImportService:
 
             for idx, row in df.iterrows():
                 try:
+                    requisition_no = str(row.get("领料单号", f"REQ{datetime.now().strftime('%Y%m%d')}_{idx}"))
+
+                    existing = db.query(MaterialRequisition).filter(
+                        MaterialRequisition.requisition_no == requisition_no
+                    ).first()
+
+                    if existing:
+                        error_count += 1
+                        errors.append(f"第{idx+2}行: 领料单号 {requisition_no} 已存在，跳过导入")
+                        continue
+
                     requisition = MaterialRequisition(
-                        requisition_no=str(row.get("领料单号", f"REQ{datetime.now().strftime('%Y%m%d')}_{idx}")),
+                        requisition_no=requisition_no,
                         repair_team=str(row.get("抢修队", "")),
                         vehicle_no=str(row.get("车牌号", "")),
                         requisition_date=pd.to_datetime(row.get("领料日期", datetime.now())).to_pydatetime(),
@@ -33,6 +44,7 @@ class ImportService:
                         status="pending"
                     )
                     db.add(requisition)
+                    db.flush()
                     imported_count += 1
 
                     if requisition.batch_no:
@@ -47,7 +59,8 @@ class ImportService:
                             quantity=requisition.quantity,
                             operator=requisition.operator,
                             operation_date=requisition.requisition_date,
-                            remark=f"领料单导入: {requisition.requisition_no}"
+                            remark=f"领料单导入: {requisition.requisition_no}",
+                            requisition_id=requisition.id
                         )
                         db.add(batch_trace)
 

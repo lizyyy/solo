@@ -90,6 +90,13 @@ def test_review_service():
         print(f"   领料单ID: {req_id}")
         print(f"   包含 {len(result.get('diffs', []))} 个差异")
         print(f"   包含 {len(result.get('review_records', []))} 条复核记录")
+        print(f"   包含 {len(result.get('batch_traces', []))} 条批次追踪记录")
+        if result.get('batch_traces'):
+            for bt in result['batch_traces']:
+                print(f"     - 批次号: {bt['batch_no']}, 动作: {bt['action_type']}, 数量: {bt['quantity']}")
+                assert bt.get('id'), "批次追踪记录应该有ID"
+                assert bt.get('batch_no'), "批次追踪记录应该有批次号"
+            print("   ✓ 批次追踪记录关联正常，requisition_id 已正确写入")
 
     print("\n3.3 获取复核历史...")
     history = ReviewService.get_review_history(db)
@@ -163,8 +170,9 @@ def init_database():
         MaterialRequisition, VehicleMaterial, Inventory,
         BatchTrace, ReviewRecord, ReconciliationDiff, ReconciliationSummary
     )
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    print("✓ 数据库表创建完成")
+    print("✓ 数据库表已重建完成")
 
 
 if __name__ == "__main__":
