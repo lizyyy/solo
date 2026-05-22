@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: retry-compensation-queue
+  datasource:
+    url: jdbc:h2:mem:tea_compensation;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+compensation:
+  queue:
+    max-retry-count: 5
+    retry-interval-minutes: 5
+    dead-letter-after-hours: 24

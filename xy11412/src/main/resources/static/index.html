@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>连锁茶饮原料重试补偿队列 API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            padding: 40px 0;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 16px;
+            font-size: 1.3rem;
+            border-left: 4px solid #667eea;
+            padding-left: 12px;
+        }
+        .api-list {
+            list-style: none;
+        }
+        .api-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .api-item:last-child {
+            border-bottom: none;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-right: 12px;
+            min-width: 80px;
+            text-align: center;
+        }
+        .method.POST { background: #49cc90; color: white; }
+        .method.GET { background: #61affe; color: white; }
+        .method.PUT { background: #fca130; color: white; }
+        .method.DELETE { background: #f93e3e; color: white; }
+        .api-path {
+            font-family: 'Monaco', monospace;
+            color: #333;
+            flex: 1;
+        }
+        .api-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .info-card {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .info-card h3 {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+        .info-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .links {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .links a {
+            display: inline-block;
+            padding: 10px 24px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍵 连锁茶饮原料重试补偿队列 API</h1>
+            <p>订货表 · 损耗登记 · 总部价格表 · 二次确认单</p>
+        </div>
+
+        <div class="section">
+            <div class="links">
+                <a href="/h2-console" target="_blank">H2 数据库控制台</a>
+                <a href="#" onclick="alert('请使用 Postman 或 curl 调用 API')">API 使用说明</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>核心特性</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>4</h3>
+                    <p>任务类型</p>
+                </div>
+                <div class="info-card">
+                    <h3>13</h3>
+                    <p>状态流转</p>
+                </div>
+                <div class="info-card">
+                    <h3>5</h3>
+                    <p>最大重试次数</p>
+                </div>
+                <div class="info-card">
+                    <h3>3</h3>
+                    <p>重复策略</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>任务管理 API</h2>
+            <ul class="api-list">
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks</span>
+                    <span class="api-desc">提交任务（支持重复策略：忽略/覆盖/追加）</span>
+                </li>
+                <li class="api-item">
+                    <span class="method GET">GET</span>
+                    <span class="api-path">/api/tasks/{id}</span>
+                    <span class="api-desc">获取任务详情</span>
+                </li>
+                <li class="api-item">
+                    <span class="method GET">GET</span>
+                    <span class="api-path">/api/tasks/{id}/detail</span>
+                    <span class="api-desc">获取任务完整详情（含明细、日志、审计）</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks/query</span>
+                    <span class="api-desc">分页查询任务列表</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks/{id}/cancel</span>
+                    <span class="api-desc">取消/撤回任务</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks/{id}/freeze</span>
+                    <span class="api-desc">冻结任务（导出前冻结）</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks/{id}/unfreeze</span>
+                    <span class="api-desc">解冻任务</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks/{id}/manual-takeover</span>
+                    <span class="api-desc">人工接管</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks/{id}/compensate</span>
+                    <span class="api-desc">补偿入账</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks/{id}/close</span>
+                    <span class="api-desc">关闭任务</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks/{id}/judge</span>
+                    <span class="api-desc">人工改判状态</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/tasks/{id}/retry</span>
+                    <span class="api-desc">手动触发重试</span>
+                </li>
+                <li class="api-item">
+                    <span class="method GET">GET</span>
+                    <span class="api-path">/api/tasks/{id}/logs</span>
+                    <span class="api-desc">获取任务操作日志</span>
+                </li>
+                <li class="api-item">
+                    <span class="method GET">GET</span>
+                    <span class="api-path">/api/tasks/{id}/export</span>
+                    <span class="api-desc">导出任务Excel</span>
+                </li>
+                <li class="api-item">
+                    <span class="method GET">GET</span>
+                    <span class="api-path">/api/tasks/{id}/validate</span>
+                    <span class="api-desc">数据一致性校验</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>死信队列 API</h2>
+            <ul class="api-list">
+                <li class="api-item">
+                    <span class="method GET">GET</span>
+                    <span class="api-path">/api/dead-letters</span>
+                    <span class="api-desc">分页查询死信列表</span>
+                </li>
+                <li class="api-item">
+                    <span class="method POST">POST</span>
+                    <span class="api-path">/api/dead-letters/{id}/recover</span>
+                    <span class="api-desc">从死信恢复（生成新批次号）</span>
+                </li>
+                <li class="api-item">
+                    <span class="method GET">GET</span>
+                    <span class="api-path">/api/dead-letters/stats/count-unrecovered</span>
+                    <span class="api-desc">未恢复死信数量</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>边界情况覆盖</h2>
+            <ul class="api-list" style="color: #555;">
+                <li class="api-item">✅ 重复提交（忽略/覆盖/追加三种策略）</li>
+                <li class="api-item">✅ 撤回后再提交（取消后重新生成批次）</li>
+                <li class="api-item">✅ 部分失败（明细级状态追踪）</li>
+                <li class="api-item">✅ 人工改判（仅人工处理中可改）</li>
+                <li class="api-item">✅ 导出前冻结（冻结后不可修改）</li>
+                <li class="api-item">✅ 异常不吞（全局异常处理+日志）</li>
+                <li class="api-item">✅ 数据一致性校验（导出前自动校验）</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>加盟商视角关注点</h2>
+            <ul class="api-list" style="color: #555;">
+                <li class="api-item">📊 可重试分类（按状态筛选查询）</li>
+                <li class="api-item">📭 死信处理（独立死信队列+恢复机制）</li>
+                <li class="api-item">🔄 恢复后续跑（死信恢复后自动排队）</li>
+                <li class="api-item">📝 完整轨迹（操作日志+审计历史双记录）</li>
+                <li class="api-item">✅ 数据一致（列表、详情、历史、导出一致）</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
