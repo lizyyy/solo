@@ -2,6 +2,8 @@ import {
   PassengerRecord,
   DriverRecord,
   WarehouseRecord,
+  RouteShift,
+  ImageIndex,
   MatchResult,
   MatchStatus,
   FailedRecord,
@@ -23,13 +25,23 @@ export class MatchService {
   private passengers: PassengerRecord[] = [];
   private drivers: DriverRecord[] = [];
   private warehouses: WarehouseRecord[] = [];
+  private routeShifts: RouteShift[] = [];
+  private imageIndexes: ImageIndex[] = [];
   private failedRecords: FailedRecord[] = [];
   private matchedIds: Set<string> = new Set();
 
-  setData(passengers: PassengerRecord[], drivers: DriverRecord[], warehouses: WarehouseRecord[]) {
+  setData(
+    passengers: PassengerRecord[], 
+    drivers: DriverRecord[], 
+    warehouses: WarehouseRecord[],
+    routeShifts: RouteShift[] = [],
+    imageIndexes: ImageIndex[] = []
+  ) {
     this.passengers = passengers;
     this.drivers = drivers;
     this.warehouses = warehouses;
+    this.routeShifts = routeShifts;
+    this.imageIndexes = imageIndexes;
     this.failedRecords = [];
     this.matchedIds.clear();
   }
@@ -40,6 +52,8 @@ export class MatchService {
 
     this.validateRecords();
     this.checkOverdueItems();
+
+    this.applyRouteShiftValidation();
 
     for (const passenger of this.passengers) {
       if (this.matchedIds.has(passenger.id)) continue;
@@ -56,6 +70,8 @@ export class MatchService {
     }
 
     this.matchDriverToWarehouse(normalItems, pendingItems);
+
+    this.associateImageIndexes(normalItems, pendingItems);
 
     const unmatched = this.handleUnmatchedItems();
     pendingItems.push(...unmatched);
@@ -289,6 +305,111 @@ export class MatchService {
     }
 
     return Math.round(confidence);
+  }
+
+  private applyRouteShiftValidation() {
+    if (this.routeShifts.length === 0) return;
+
+    const routeMap = new Map<string, RouteShift>();
+    for (const rs of this.routeShifts) {
+      const key = `${rs.routeId}-${rs.shiftId}`;
+      routeMap.set(key, rs);
+    }
+
+    for (const driver of this.drivers) {
+      if (this.matchedIds.has(driver.id)) continue;
+      
+      if (driver.routeId && driver.shiftId) {
+        const key = `${driver.routeId}-${driver.shiftId}`;
+        const routeShift = routeMap.get(key);
+        
+        if (routeShift) {
+          if (routeShift.driverId && driver.driverId && routeShift.driverId !== driver.driverId) {
+            if (routeShift.busNumber) {
+              driver.busNumber = driver.busNumber || routeShift.busNumber;
+            }
+          }
+          if (routeShift.busNumber && !driver.busNumber) {
+            driver.busNumber = routeShift.busNumber;
+          }
+        }
+      }
+    }
+
+    for (const passenger of this.passengers) {
+      if (this.matchedIds.has(passenger.id)) continue;
+      
+      if (passenger.routeId && passenger.shiftId) {
+        const key = `${passenger.routeId}-${passenger.shiftId}`;
+        const routeShift = routeMap.get(key);
+        
+        if (routeShift && routeShift.driverId) {
+          const matchingDriver = this.drivers.find(d => 
+            d.driverId === routeShift.driverId
+          );
+          if (matchingDriver) {
+            passenger.routeId = passenger.routeId || routeShift.routeId;
+          }
+        }
+      }
+    }
+  }
+
+  private associateImageIndexes(normalItems: MatchResult[], pendingItems: MatchResult[]) {
+    if (this.imageIndexes.length === 0) return;
+
+    const allItems = [...normalItems, ...pendingItems];
+    
+    for (const item of allItems) {
+      const itemIds: string[] = [];
+      
+      if (item.passengerRecord) itemIds.push(item.passengerRecord.id);
+      if (item.driverRecord) itemIds.push(item.driverRecord.id);
+      if (item.warehouseRecord) itemIds.push(item.warehouseRecord.id);
+
+      const matchedImages = this.imageIndexes.filter(img => 
+        itemIds.includes(img.itemId)
+      );
+
+      if (matchedImages.length > 0) {
+        const imageInfo = matchedImages.map(img => ({
+          path: img.imagePath,
+          uploadDate: img.uploadDate,
+          source: img.source
+        }));
+        
+        const note = `关联图片 ${matchedImages.length} 张: ${imageInfo.map(i => i.path).join(', ')}`;
+        
+        if (!item.notes.some(n => n.includes('关联图片'))) {
+          item.notes.push(note);
+        }
+      }
+    }
+
+    const unassociatedImages = this.imageIndexes.filter(img => {
+      const allItemIds = new Set<string>();
+      for (const item of allItems) {
+        if (item.passengerRecord) allItemIds.add(item.passengerRecord.id);
+        if (item.driverRecord) allItemIds.add(item.driverRecord.id);
+        if (item.warehouseRecord) allItemIds.add(item.warehouseRecord.id);
+      }
+      return !allItemIds.has(img.itemId);
+    });
+
+    for (const img of unassociatedImages) {
+      this.failedRecords.push({
+        originalData: {
+          itemId: img.itemId,
+          imagePath: img.imagePath,
+          uploadDate: img.uploadDate,
+          source: img.source
+        },
+        failReason: FailReason.MISMATCH,
+        failDescription: `图片索引未找到对应物品记录`,
+        suggestion: '请核对物品编号是否正确，或补充对应的物品记录',
+        source: img.source
+      });
+    }
   }
 }
 

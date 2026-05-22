@@ -1,0 +1,34 @@
+[
+  {
+    "routeId": "R001",
+    "routeName": "1路公交",
+    "shiftId": "S001",
+    "shiftTime": "08:00",
+    "driverId": "D01",
+    "busNumber": "京A12345"
+  },
+  {
+    "routeId": "R001",
+    "routeName": "1路公交",
+    "shiftId": "S002",
+    "shiftTime": "14:00",
+    "driverId": "D03",
+    "busNumber": "京C11111"
+  },
+  {
+    "routeId": "R002",
+    "routeName": "2路公交",
+    "shiftId": "S001",
+    "shiftTime": "09:00",
+    "driverId": "D02",
+    "busNumber": "京B67890"
+  },
+  {
+    "routeId": "R003",
+    "routeName": "3路公交",
+    "shiftId": "S001",
+    "shiftTime": "10:00",
+    "driverId": "D04",
+    "busNumber": "京D22222"
+  }
+]
