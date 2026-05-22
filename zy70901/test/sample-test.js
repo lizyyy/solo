@@ -83,6 +83,48 @@ function testLocalValidation() {
   console.log(`   状态: ${result5.status === 'normal' ? '✅ 正常' : '❌ 异常'}`);
   console.log('');
 
+  console.log('📋 测试6: LC-003 真实场景复现 (控制柜=否,签字确认=空)');
+  const inspectionLC003 = {
+    "设备编号": "LC-003",
+    "检修日期": "2026-05-03",
+    "检修类型": "年检",
+    "检修人员": "王五",
+    "试运行时长": "60",
+    "试运行次数": "8",
+    "主驱动电机": "是",
+    "制动系统": "是",
+    "钢丝绳": "是",
+    "控制柜": "否",
+    "签字确认": ""
+  };
+  const result6 = validateRules('inspection', inspectionLC003);
+  console.log(`   状态: ${result6.status === 'failed' ? '❌ 失败(正确)' : '❌ 错误: 应该失败但通过了!'}`);
+  console.log(`   Issues数量: ${result6.issues.length}`);
+  if (result6.mainFailure) {
+    console.log(`   失败代码: ${result6.mainFailure.code}`);
+    console.log(`   原因: ${result6.mainFailure.readableExplanation}`);
+    console.log(`   建议: ${result6.suggestion}`);
+  }
+  console.log('');
+
+  console.log('📋 测试7: 试运行达标但无签字 (应该因为关键项未签而失败)');
+  const inspection4 = {
+    "设备编号": "LC-999",
+    "试运行时长": "45",
+    "试运行次数": "5",
+    "主驱动电机": "是",
+    "制动系统": "是",
+    "钢丝绳": "是",
+    "控制柜": "是",
+    "签字确认": ""
+  };
+  const result7 = validateRules('inspection', inspection4);
+  console.log(`   状态: ${result7.status === 'failed' ? '❌ 失败(正确)' : '❌ 错误: 应该失败但通过了!'}`);
+  if (result7.mainFailure) {
+    console.log(`   原因: ${result7.mainFailure.readableExplanation}`);
+  }
+  console.log('');
+
   console.log('🎉 测试完成！');
   console.log('\n📊 规则覆盖情况:');
   console.log('   ✅ 试运行不足 - 已覆盖');

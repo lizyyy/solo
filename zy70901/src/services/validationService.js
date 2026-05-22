@@ -36,11 +36,6 @@ const RULES = {
 };
 
 function validateRules(type, record) {
-  let issues = [];
-  let status = NORMAL;
-  let mainFailure = null;
-  let suggestion = '';
-
   switch (type) {
     case 'inspection':
       return validateInspection(record);
@@ -51,20 +46,18 @@ function validateRules(type, record) {
     case 'manual':
       return validateManual(record);
     default:
-      issues.push({
-        rule: RULES.MISSING_APPROVAL,
-        message: '未知记录类型',
-        detail: '无法识别的记录类型，需要人工确认'
-      });
-      status = PENDING;
+      return {
+        status: PENDING,
+        issues: [{
+          rule: RULES.MISSING_APPROVAL,
+          message: '未知记录类型',
+          detail: '无法识别的记录类型，需要人工确认',
+          readableExplanation: '无法识别的记录类型，需要人工确认'
+        }],
+        mainFailure: null,
+        suggestion: '请确认记录类型后重新提交'
+      };
   }
-
-  return {
-    status,
-    issues,
-    mainFailure,
-    suggestion
-  };
 }
 
 function validateInspection(record) {
@@ -102,28 +95,44 @@ function validateInspection(record) {
   }
 
   const keyItems = ['主驱动电机', '制动系统', '钢丝绳', '控制柜'];
-  const signedItems = Object.keys(record).filter(key => 
+  
+  const uncheckedItems = [];
+  keyItems.forEach(item => {
+    const itemKey = Object.keys(record).find(key => key.includes(item));
+    if (!itemKey) {
+      uncheckedItems.push(`${item}(字段缺失)`);
+    } else if (record[itemKey] !== '是' && record[itemKey] !== '已检查' && record[itemKey] !== true) {
+      uncheckedItems.push(`${item}(${record[itemKey] || '未填写'})`);
+    }
+  });
+  
+  const signatureKey = Object.keys(record).find(key => 
     key.includes('签字') || key.includes('签名') || key.includes('sign')
   );
-  
-  const hasKeySignature = keyItems.some(item => 
-    Object.keys(record).some(key => 
-      key.includes(item) && (record[key] === '是' || record[key] === '已检查' || record[key] === true)
-    )
-  ) && signedItems.length > 0;
+  const hasSignature = signatureKey && record[signatureKey] && String(record[signatureKey]).trim() !== '';
 
-  if (!hasKeySignature && issues.length === 0) {
+  const hasKeyItemIssues = uncheckedItems.length > 0 || !hasSignature;
+
+  if (hasKeyItemIssues && status !== FAILED) {
+    const details = [];
+    if (uncheckedItems.length > 0) {
+      details.push(`关键项未通过检查: ${uncheckedItems.join('、')}`);
+    }
+    if (!hasSignature) {
+      details.push('缺少负责人签字确认');
+    }
+    
     const issue = {
       rule: RULES.KEY_ITEM_UNSIGNED,
-      message: '关键项缺少签字确认',
-      detail: '检修单中关键安全项目缺少负责人签字',
-      readableExplanation: `📝 ${record.设备编号 || record.equipmentId || '未知设备'} - ${RULES.KEY_ITEM_UNSIGNED.name}：检修单中关键安全项目（主驱动、制动、钢丝绳、电气控制）缺少负责人签字确认。这属于严重安全隐患，无签字的检修记录不具备法律效力。`
+      message: '关键项检查不完整或未签字',
+      detail: details.join('；'),
+      readableExplanation: `📝 ${record.设备编号 || record.equipmentId || '未知设备'} - ${RULES.KEY_ITEM_UNSIGNED.name}：${details.join('；')}。关键安全项目（主驱动、制动、钢丝绳、控制柜）必须全部检查合格并由负责人签字确认，否则检修记录无效，设备不得投入运营。`
     };
     
     issues.push(issue);
     status = FAILED;
     mainFailure = { ...RULES.KEY_ITEM_UNSIGNED, ...issue };
-    suggestion = '建议：1) 立即联系检修班长或技术负责人补签；2) 确认关键项目确实已完成检查；3) 如未完成，需重新执行关键项检修流程。';
+    suggestion = '建议：1) 确认所有关键安全项目已完成检查并标记为"是"；2) 联系检修班长或技术负责人签字确认；3) 如有关键项未通过，需重新检修直至合格。';
   }
 
   return { issues, status, mainFailure, suggestion };
@@ -180,7 +189,6 @@ function validateApproval(record) {
   let mainFailure = null;
   let suggestion = '';
 
-  const approveDate = record.审批日期 || record.approvalDate || record.date;
   const validUntil = record.有效期至 || record.validUntil;
   const approver = record.审批人 || record.approver;
   const today = new Date();
