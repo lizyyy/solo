@@ -36,19 +36,35 @@ app.listen(PORT, () => {
 ║                                                            ║
 ║     服务地址: http://localhost:${PORT}                     ║
 ║                                                            ║
-║     API端点:                                               ║
-║       GET  /health                                        ║
+║     数据导入 API:                                          ║
+║       GET    /api/reconciliation/import/template/:type    ║
+║       POST   /api/reconciliation/import/sample-data       ║
+║       POST   /api/reconciliation/import/persons           ║
+║       POST   /api/reconciliation/import/attendance        ║
+║       POST   /api/reconciliation/import/attendance/json   ║
+║       POST   /api/reconciliation/import/leave             ║
+║       POST   /api/reconciliation/import/leave/json        ║
+║       POST   /api/reconciliation/import/location          ║
+║       POST   /api/reconciliation/import/location/json     ║
 ║                                                            ║
-║       POST /api/reconciliation/import/sample-data         ║
-║       POST /api/reconciliation/reconcile                  ║
-║       GET  /api/reconciliation/records/:id                ║
-║       GET  /api/reconciliation/records/:id/summary        ║
-║       GET  /api/reconciliation/records/:id/with-differences ║
-║       POST /api/reconciliation/review                     ║
-║       POST /api/reconciliation/correct                    ║
-║       POST /api/reconciliation/recalculate/:id            ║
-║       GET  /api/reconciliation/export/excel/:id           ║
-║       GET  /api/reconciliation/export/csv/:id             ║
+║     对账管理 API:                                          ║
+║       POST   /api/reconciliation/reconcile                ║
+║       GET    /api/reconciliation/reconciliation-ids       ║
+║       GET    /api/reconciliation/records/:id              ║
+║       GET    /api/reconciliation/records/:id/summary      ║
+║       GET    /api/reconciliation/records/:id/with-differences ║
+║                                                            ║
+║     复核管理 API:                                          ║
+║       POST   /api/reconciliation/review                   ║
+║       POST   /api/reconciliation/correct                  ║
+║       POST   /api/reconciliation/recalculate/:id          ║
+║                                                            ║
+║     报告导出 API:                                          ║
+║       GET    /api/reconciliation/export/excel/:id         ║
+║       GET    /api/reconciliation/export/csv/:id           ║
+║                                                            ║
+║     健康检查:                                              ║
+║       GET    /health                                       ║
 ║                                                            ║
 ╚════════════════════════════════════════════════════════════╝
   `);

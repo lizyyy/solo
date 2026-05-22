@@ -1,10 +1,14 @@
 import { Router, Request, Response } from 'express';
+import multer from 'multer';
+import * as path from 'path';
+import * as fs from 'fs';
+import { FileFilterCallback } from 'multer';
 import { ImportService } from '../services/ImportService';
 import { ReconciliationService } from '../services/ReconciliationService';
 import { ReviewService } from '../services/ReviewService';
 import { ExportService } from '../services/ExportService';
 import { DataStore } from '../store/DataStore';
-import { ObjectLevel, AttendanceStatus, LeaveStatus, LeaveType, ReviewStatus } from '../types';
+import { ObjectLevel, AttendanceStatus, LeaveStatus, LeaveType, ReviewStatus, Person } from '../types';
 
 const router = Router();
 const importService = new ImportService();
@@ -13,10 +17,41 @@ const reviewService = new ReviewService();
 const exportService = new ExportService();
 const store = DataStore.getInstance();
 
-router.post('/import/sample-data', (req: Request, res: Response) => {
-  const date = req.body.date || '2024-01-15';
+const uploadDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-  const persons = [
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage,
+  fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
+    if (file.fieldname === 'attendance' && !file.originalname.endsWith('.csv')) {
+      return cb(new Error('签到数据必须是CSV文件'));
+    }
+    if ((file.fieldname === 'leave' || file.fieldname === 'location') && !file.originalname.endsWith('.json')) {
+      return cb(new Error('请假和定位数据必须是JSON文件'));
+    }
+    cb(null, true);
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024
+  }
+});
+
+router.post('/import/sample-data', (req: Request, res: Response) => {
+  const date = req.body.date || new Date().toISOString().split('T')[0];
+
+  const persons: Person[] = [
     { id: 'P001', name: '张三', idCard: '110101199001010001', level: ObjectLevel.LEVEL_A, department: '第一司法所', manager: '王主任' },
     { id: 'P002', name: '李四', idCard: '110101199002020002', level: ObjectLevel.LEVEL_A, department: '第一司法所', manager: '王主任' },
     { id: 'P003', name: '王五', idCard: '110101199003030003', level: ObjectLevel.LEVEL_B, department: '第二司法所', manager: '李主任' },
@@ -112,8 +147,314 @@ router.post('/import/sample-data', (req: Request, res: Response) => {
   });
 });
 
+router.post('/import/persons', (req: Request, res: Response) => {
+  try {
+    const persons: Person[] = req.body;
+    
+    if (!Array.isArray(persons)) {
+      return res.status(400).json({
+        success: false,
+        message: '请求体必须是人员数组'
+      });
+    }
+
+    const result = importService.importPersons(persons);
+
+    res.json({
+      success: result.success,
+      message: result.success ? '人员信息导入成功' : '人员信息导入部分失败',
+      data: {
+        total: result.totalCount,
+        success: result.successCount,
+        failed: result.failedCount,
+        errors: result.errors
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: '人员信息导入失败',
+      error: error.message
+    });
+  }
+});
+
+router.post('/import/attendance', upload.single('attendance'), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: '请上传签到CSV文件'
+      });
+    }
+
+    const result = await importService.importAttendanceCSV(req.file.path);
+
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      success: result.success,
+      message: result.success ? '签到数据导入成功' : '签到数据导入部分失败',
+      data: {
+        total: result.totalCount,
+        success: result.successCount,
+        failed: result.failedCount,
+        errors: result.errors,
+        records: result.data
+      }
+    });
+  } catch (error: any) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({
+      success: false,
+      message: '签到数据导入失败',
+      error: error.message
+    });
+  }
+});
+
+router.post('/import/attendance/json', async (req: Request, res: Response) => {
+  try {
+    const data = req.body;
+    const records = Array.isArray(data) ? data : [data];
+
+    let successCount = 0;
+    let failedCount = 0;
+    const errors: string[] = [];
+
+    records.forEach((a: any, index: number) => {
+      try {
+        if (!a.personId || !a.personName || !a.date) {
+          throw new Error(`缺少必要字段: personId, personName, date`);
+        }
+        store.addAttendance({
+          id: store.generateId(),
+          personId: a.personId,
+          personName: a.personName,
+          date: a.date,
+          signInTime: a.signInTime,
+          signOutTime: a.signOutTime,
+          expectedSignInTime: a.expectedSignInTime || '09:00',
+          expectedSignOutTime: a.expectedSignOutTime || '18:00',
+          status: a.status || AttendanceStatus.NORMAL,
+          source: a.source || 'API导入',
+          location: a.location,
+          remark: a.remark,
+          createdAt: store.now(),
+          updatedAt: store.now()
+        });
+        successCount++;
+      } catch (e: any) {
+        failedCount++;
+        errors.push(`第${index + 1}条: ${e.message}`);
+      }
+    });
+
+    res.json({
+      success: failedCount === 0,
+      message: failedCount === 0 ? '签到数据导入成功' : '签到数据导入部分失败',
+      data: {
+        total: records.length,
+        success: successCount,
+        failed: failedCount,
+        errors
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: '签到数据导入失败',
+      error: error.message
+    });
+  }
+});
+
+router.post('/import/leave', upload.single('leave'), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: '请上传请假JSON文件'
+      });
+    }
+
+    const result = await importService.importLeaveJSON(req.file.path);
+
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      success: result.success,
+      message: result.success ? '请假数据导入成功' : '请假数据导入部分失败',
+      data: {
+        total: result.totalCount,
+        success: result.successCount,
+        failed: result.failedCount,
+        errors: result.errors,
+        records: result.data
+      }
+    });
+  } catch (error: any) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({
+      success: false,
+      message: '请假数据导入失败',
+      error: error.message
+    });
+  }
+});
+
+router.post('/import/leave/json', async (req: Request, res: Response) => {
+  try {
+    const data = req.body;
+    const records = Array.isArray(data) ? data : [data];
+
+    let successCount = 0;
+    let failedCount = 0;
+    const errors: string[] = [];
+
+    records.forEach((l: any, index: number) => {
+      try {
+        if (!l.personId || !l.personName || !l.startDate || !l.endDate || !l.reason) {
+          throw new Error(`缺少必要字段: personId, personName, startDate, endDate, reason`);
+        }
+        store.addLeave({
+          id: store.generateId(),
+          personId: l.personId,
+          personName: l.personName,
+          leaveType: l.leaveType || LeaveType.OTHER,
+          startDate: l.startDate,
+          endDate: l.endDate,
+          startTime: l.startTime,
+          endTime: l.endTime,
+          reason: l.reason,
+          status: l.status || LeaveStatus.PENDING,
+          approver: l.approver,
+          approveTime: l.approveTime,
+          source: l.source || 'API导入',
+          createdAt: store.now(),
+          updatedAt: store.now()
+        });
+        successCount++;
+      } catch (e: any) {
+        failedCount++;
+        errors.push(`第${index + 1}条: ${e.message}`);
+      }
+    });
+
+    res.json({
+      success: failedCount === 0,
+      message: failedCount === 0 ? '请假数据导入成功' : '请假数据导入部分失败',
+      data: {
+        total: records.length,
+        success: successCount,
+        failed: failedCount,
+        errors
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: '请假数据导入失败',
+      error: error.message
+    });
+  }
+});
+
+router.post('/import/location', upload.single('location'), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: '请上传定位JSON文件'
+      });
+    }
+
+    const result = await importService.importLocationTrace(req.file.path);
+
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      success: result.success,
+      message: result.success ? '定位数据导入成功' : '定位数据导入部分失败',
+      data: {
+        total: result.totalCount,
+        success: result.successCount,
+        failed: result.failedCount,
+        errors: result.errors,
+        records: result.data
+      }
+    });
+  } catch (error: any) {
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({
+      success: false,
+      message: '定位数据导入失败',
+      error: error.message
+    });
+  }
+});
+
+router.post('/import/location/json', async (req: Request, res: Response) => {
+  try {
+    const data = req.body;
+    const records = Array.isArray(data) ? data : [data];
+
+    let successCount = 0;
+    let failedCount = 0;
+    const errors: string[] = [];
+
+    records.forEach((t: any, index: number) => {
+      try {
+        if (!t.personId || !t.personName || !t.date || !t.tracePoints) {
+          throw new Error(`缺少必要字段: personId, personName, date, tracePoints`);
+        }
+        store.addLocationTrace({
+          id: store.generateId(),
+          personId: t.personId,
+          personName: t.personName,
+          date: t.date,
+          tracePoints: t.tracePoints,
+          totalDistance: t.totalDistance,
+          anomalyCount: t.anomalyCount || t.tracePoints.filter((p: any) => p.isAnomaly).length,
+          isComplete: t.isComplete !== false,
+          source: t.source || 'API导入',
+          createdAt: store.now(),
+          updatedAt: store.now()
+        });
+        successCount++;
+      } catch (e: any) {
+        failedCount++;
+        errors.push(`第${index + 1}条: ${e.message}`);
+      }
+    });
+
+    res.json({
+      success: failedCount === 0,
+      message: failedCount === 0 ? '定位数据导入成功' : '定位数据导入部分失败',
+      data: {
+        total: records.length,
+        success: successCount,
+        failed: failedCount,
+        errors
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: '定位数据导入失败',
+      error: error.message
+    });
+  }
+});
+
 router.post('/reconcile', (req: Request, res: Response) => {
-  const date = req.body.date || '2024-01-15';
+  const date = req.body.date || new Date().toISOString().split('T')[0];
   const result = reconciliationService.performReconciliation(date);
 
   res.json({
@@ -121,6 +462,7 @@ router.post('/reconcile', (req: Request, res: Response) => {
     message: '对账完成',
     data: {
       reconciliationId: result.reconciliationId,
+      date: date,
       totalRecords: result.records.length,
       recordsWithDifferences: result.records.filter(r => r.differences.length > 0).length
     }
@@ -133,6 +475,7 @@ router.get('/records/:reconciliationId', (req: Request, res: Response) => {
 
   res.json({
     success: true,
+    count: records.length,
     data: records
   });
 });
@@ -266,8 +609,79 @@ router.get('/reconciliation-ids', (req: Request, res: Response) => {
 
   res.json({
     success: true,
+    count: ids.length,
     data: ids
   });
+});
+
+router.get('/import/template/:type', (req: Request, res: Response) => {
+  const type = req.params.type;
+  
+  if (type === 'attendance') {
+    const csvHeader = 'personId,personName,date,signInTime,signOutTime,expectedSignInTime,expectedSignOutTime,status,source,location,remark\n';
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="attendance_template.csv"');
+    res.send('\ufeff' + csvHeader);
+  } else if (type === 'leave') {
+    const template = [{
+      personId: 'P001',
+      personName: '示例人员',
+      leaveType: 'sick',
+      startDate: '2024-01-15',
+      endDate: '2024-01-15',
+      startTime: '09:00',
+      endTime: '18:00',
+      reason: '请假原因说明',
+      status: 'approved',
+      approver: '审批人',
+      approveTime: '2024-01-14 16:00',
+      source: '请假系统'
+    }];
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="leave_template.json"');
+    res.send(JSON.stringify(template, null, 2));
+  } else if (type === 'location') {
+    const template = [{
+      personId: 'P001',
+      personName: '示例人员',
+      date: '2024-01-15',
+      tracePoints: [
+        {
+          timestamp: '2024-01-15 08:30:00',
+          latitude: 39.9042,
+          longitude: 116.4074,
+          location: '司法所',
+          accuracy: 10,
+          isAnomaly: false,
+          anomalyReason: ''
+        }
+      ],
+      totalDistance: 0,
+      anomalyCount: 0,
+      isComplete: true,
+      source: '定位系统'
+    }];
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="location_template.json"');
+    res.send(JSON.stringify(template, null, 2));
+  } else if (type === 'persons') {
+    const template = [{
+      id: 'P001',
+      name: '示例人员',
+      idCard: '110101199001010001',
+      level: 'A',
+      department: '第一司法所',
+      manager: '王主任'
+    }];
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="persons_template.json"');
+    res.send(JSON.stringify(template, null, 2));
+  } else {
+    res.status(400).json({
+      success: false,
+      message: '不支持的模板类型，可选类型: attendance, leave, location, persons'
+    });
+  }
 });
 
 export default router;
