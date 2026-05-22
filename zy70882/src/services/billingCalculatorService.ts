@@ -97,41 +97,120 @@ export class BillingCalculatorService {
       c => c.effectiveDate >= periodStart && c.effectiveDate <= periodEnd
     );
 
+    const baseZoneMultiplier = contract.baseMultiplier * zone.multiplier;
+    let appliedMultiplier = baseZoneMultiplier;
+    let finalConsumption = 0;
+
     if (multiplierChanges.length > 0) {
-      multiplierChanges.forEach(change => {
+      const sortedChanges = [...multiplierChanges].sort((a, b) =>
+        a.effectiveDate.getTime() - b.effectiveDate.getTime()
+      );
+
+      const segments: { start: Date; end: Date; multiplier: number }[] = [];
+      let currentMultiplier = baseZoneMultiplier;
+      let segmentStart = periodStart;
+
+      for (const change of sortedChanges) {
+        segments.push({
+          start: segmentStart,
+          end: change.effectiveDate,
+          multiplier: currentMultiplier,
+        });
+        currentMultiplier = contract.baseMultiplier * change.newMultiplier;
+        segmentStart = change.effectiveDate;
+      }
+
+      segments.push({
+        start: segmentStart,
+        end: periodEnd,
+        multiplier: currentMultiplier,
+      });
+
+      segments.forEach((segment, idx) => {
+        const segmentReadings = readings.filter(r =>
+          r.timestamp >= segment.start && r.timestamp < segment.end
+        );
+        const segmentConsumption = segmentReadings.reduce((sum, r) => sum + r.consumption, 0);
+        const segmentBilled = segmentConsumption * segment.multiplier;
+        finalConsumption += segmentBilled;
+
+        calculationDetails.push({
+          step: `4-${idx + 1}`,
+          description: `分段计费 (${moment(segment.start).format('MM-DD HH:mm')} ~ ${moment(segment.end).format('MM-DD HH:mm')})`,
+          formula: '时段用电量 × 时段倍率',
+          inputs: {
+            segmentConsumption: segmentConsumption.toFixed(2),
+            segmentMultiplier: segment.multiplier.toFixed(2),
+            readingsCount: segmentReadings.length,
+          },
+          result: segmentBilled,
+        });
+      });
+
+      if (totalConsumption > 0) {
+        appliedMultiplier = finalConsumption / totalConsumption;
+      }
+
+      sortedChanges.forEach((change) => {
+        const afterReadings = readings.filter(r => r.timestamp >= change.effectiveDate);
+        const afterConsumption = afterReadings.reduce((sum, r) => sum + r.consumption, 0);
+        const oldMultiplier = contract.baseMultiplier * change.oldMultiplier;
+        const newMultiplier = contract.baseMultiplier * change.newMultiplier;
+        const oldCost = afterConsumption * oldMultiplier * contract.ratePerKwh;
+        const newCost = afterConsumption * newMultiplier * contract.ratePerKwh;
+        const affectedAmount = newCost - oldCost;
+
         const anomaly: Anomaly = {
           id: uuidv4(),
           type: 'multiplier_change',
           severity: 'medium',
           timestamp: change.effectiveDate,
           description: `倍率变更: ${change.oldMultiplier} → ${change.newMultiplier}`,
-          explanation: `原因: ${change.reason}`,
-          affectedAmount: 0,
+          explanation: `原因: ${change.reason}。变更后影响用电量: ${afterConsumption.toFixed(2)} kWh，差额: ${affectedAmount >= 0 ? '+' : ''}¥${affectedAmount.toFixed(2)}`,
+          affectedAmount,
           resolved: false,
         };
         anomalies.push(anomaly);
       });
+
+      calculationDetails.push({
+        step: '5',
+        description: '加权平均倍率',
+        formula: 'Σ(分段计费电量) / 总用电量',
+        inputs: {
+          segmentCount: segments.length,
+          changesCount: sortedChanges.length,
+        },
+        result: appliedMultiplier,
+      });
+
+      calculationDetails.push({
+        step: '6',
+        description: '最终计费电量',
+        formula: 'Σ(各时段用电量 × 对应倍率)',
+        inputs: { totalSegments: segments.length },
+        result: finalConsumption,
+      });
+    } else {
+      appliedMultiplier = baseZoneMultiplier;
+      finalConsumption = totalConsumption * appliedMultiplier;
+
+      calculationDetails.push({
+        step: '4',
+        description: '应用倍率计算',
+        formula: '合同基础倍率 × 温区倍率',
+        inputs: { contractMultiplier: contract.baseMultiplier, zoneMultiplier: zone.multiplier },
+        result: appliedMultiplier,
+      });
+
+      calculationDetails.push({
+        step: '5',
+        description: '最终计费电量',
+        formula: '总用电量 × 应用倍率',
+        inputs: { totalConsumption, appliedMultiplier },
+        result: finalConsumption,
+      });
     }
-
-    const appliedMultiplier = contract.baseMultiplier * zone.multiplier;
-
-    calculationDetails.push({
-      step: '4',
-      description: '应用倍率计算',
-      formula: '合同基础倍率 × 温区倍率',
-      inputs: { contractMultiplier: contract.baseMultiplier, zoneMultiplier: zone.multiplier },
-      result: appliedMultiplier,
-    });
-
-    let finalConsumption = totalConsumption * appliedMultiplier;
-
-    calculationDetails.push({
-      step: '5',
-      description: '最终计费电量',
-      formula: '总用电量 × 应用倍率',
-      inputs: { totalConsumption, appliedMultiplier },
-      result: finalConsumption,
-    });
 
     let vacancyAdjustment = 0;
     if (zone.isVacant && zone.vacantStartDate) {
@@ -141,7 +220,7 @@ export class BillingCalculatorService {
         vacancyAdjustment = -finalConsumption * vacancyRatio * 0.5;
 
         calculationDetails.push({
-          step: '6',
+          step: multiplierChanges.length > 0 ? '7' : '6',
           description: '空置期减免',
           formula: '计费电量 × 空置天数占比 × 50%',
           inputs: { vacancyDays: vacancyOverlap / (1000 * 60 * 60 * 24), vacancyRatio: vacancyRatio.toFixed(2) },
@@ -166,10 +245,10 @@ export class BillingCalculatorService {
     const electricityCost = adjustedConsumption * contract.ratePerKwh;
 
     calculationDetails.push({
-      step: '7',
+      step: multiplierChanges.length > 0 ? (vacancyAdjustment !== 0 ? '8' : '7') : (vacancyAdjustment !== 0 ? '7' : '6'),
       description: '电费计算',
       formula: '(计费电量 + 空置调整) × 电价',
-      inputs: { adjustedConsumption, ratePerKwh: contract.ratePerKwh },
+      inputs: { adjustedConsumption: adjustedConsumption.toFixed(2), ratePerKwh: contract.ratePerKwh },
       result: electricityCost,
     });
 
@@ -177,7 +256,7 @@ export class BillingCalculatorService {
 
     if (overtimeSurcharge > 0) {
       calculationDetails.push({
-        step: '8',
+        step: multiplierChanges.length > 0 ? (vacancyAdjustment !== 0 ? '9' : '8') : (vacancyAdjustment !== 0 ? '8' : '7'),
         description: '加班附加费',
         formula: '加班用电量 × (加班倍率 - 1) × 电价',
         inputs: { overtimeConsumption, overtimeMultiplier: contract.overtimeMultiplier, ratePerKwh: contract.ratePerKwh },
@@ -202,7 +281,9 @@ export class BillingCalculatorService {
     const baseRent = contract.baseRent;
 
     calculationDetails.push({
-      step: '9',
+      step: multiplierChanges.length > 0 
+        ? (vacancyAdjustment !== 0 ? (overtimeSurcharge > 0 ? '10' : '9') : (overtimeSurcharge > 0 ? '9' : '8'))
+        : (vacancyAdjustment !== 0 ? (overtimeSurcharge > 0 ? '9' : '8') : (overtimeSurcharge > 0 ? '8' : '7')),
       description: '基础租金',
       formula: '合同约定基础租金',
       inputs: { contractBaseRent: contract.baseRent },
@@ -212,7 +293,9 @@ export class BillingCalculatorService {
     const totalAmount = electricityCost + overtimeSurcharge + baseRent;
 
     calculationDetails.push({
-      step: '10',
+      step: multiplierChanges.length > 0 
+        ? (vacancyAdjustment !== 0 ? (overtimeSurcharge > 0 ? '11' : '10') : (overtimeSurcharge > 0 ? '10' : '9'))
+        : (vacancyAdjustment !== 0 ? (overtimeSurcharge > 0 ? '10' : '9') : (overtimeSurcharge > 0 ? '9' : '8')),
       description: '总费用',
       formula: '电费 + 加班附加费 + 基础租金',
       inputs: { electricityCost, overtimeSurcharge, baseRent },
