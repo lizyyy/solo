@@ -63,7 +63,13 @@ class Session(Base):
     imported_at = Column(DateTime, server_default=func.now())
 
     contract = relationship("FilmContract", back_populates="sessions")
-    boxoffice = relationship("BoxOfficeRecord", back_populates="session", uselist=False)
+    boxoffice = relationship(
+        "BoxOfficeRecord",
+        primaryjoin="Session.session_code == BoxOfficeRecord.session_code",
+        foreign_keys=[session_code],
+        uselist=False,
+        viewonly=True
+    )
     reconciliation = relationship("ReconciliationRecord", back_populates="session", uselist=False)
 
 
@@ -86,7 +92,13 @@ class BoxOfficeRecord(Base):
     imported_at = Column(DateTime, server_default=func.now())
 
     contract = relationship("FilmContract", back_populates="boxoffice_records")
-    session = relationship("Session", back_populates="boxoffice")
+    session = relationship(
+        "Session",
+        primaryjoin="BoxOfficeRecord.session_code == Session.session_code",
+        foreign_keys=[session_code],
+        uselist=False,
+        viewonly=True
+    )
     reconciliation = relationship("ReconciliationRecord", back_populates="boxoffice", uselist=False)
 
 
@@ -123,6 +135,7 @@ class ReconciliationRecord(Base):
 
     session = relationship("Session", back_populates="reconciliation")
     boxoffice = relationship("BoxOfficeRecord", back_populates="reconciliation")
+    contract = relationship("FilmContract", foreign_keys=[contract_id])
     review_logs = relationship("ReviewLog", back_populates="reconciliation")
 
 
