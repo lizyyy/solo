@@ -165,11 +165,11 @@ export class MatchService {
     if (!bestMatch) return null;
 
     let status = MatchStatus.PENDING;
-    if (highestConfidence >= 80) {
+    if (highestConfidence >= 75) {
       status = MatchStatus.NORMAL;
-      notes.unshift('三项信息高度匹配，可直接确认');
-    } else if (highestConfidence >= 50) {
-      notes.unshift('信息部分匹配，需要人工确认');
+      notes.unshift('乘客-司机信息高度匹配，可直接确认');
+    } else if (highestConfidence >= 45) {
+      notes.unshift('信息部分匹配，待仓库入库确认后可判定');
     } else {
       notes.unshift('匹配度较低，建议重新核对');
     }
@@ -215,7 +215,15 @@ export class MatchService {
         item.confidence = Math.round((item.confidence + highestConfidence) / 2);
         item.notes.push(...additionalNotes);
         
-        if (item.confidence < 60 && item.status === MatchStatus.NORMAL) {
+        if (item.passengerRecord && item.driverRecord && item.warehouseRecord) {
+          item.confidence = Math.min(100, item.confidence + 10);
+          item.notes.push('乘客-司机-仓库三方匹配，可信度提升');
+        }
+        
+        if (item.confidence >= 70 && item.status !== MatchStatus.NORMAL) {
+          item.status = MatchStatus.NORMAL;
+          item.notes.unshift('匹配度达标，可确认认领');
+        } else if (item.confidence < 60 && item.status === MatchStatus.NORMAL) {
           item.status = MatchStatus.PENDING;
           item.notes.unshift('仓库匹配后置信度下降，转为待确认');
         }
@@ -293,6 +301,10 @@ export class MatchService {
     const nameSimilarity = calculateStringSimilarity(record1.itemName, record2.itemName);
     confidence += (nameSimilarity / 100) * weights.itemName;
 
+    if (isSameNameItem(record1.itemName, record2.itemName)) {
+      confidence += 15;
+    }
+
     const descSimilarity = calculateStringSimilarity(record1.description, record2.description);
     confidence += (descSimilarity / 100) * weights.description;
 
@@ -304,7 +316,7 @@ export class MatchService {
       confidence += weights.route;
     }
 
-    return Math.round(confidence);
+    return Math.min(100, Math.round(confidence));
   }
 
   private applyRouteShiftValidation() {

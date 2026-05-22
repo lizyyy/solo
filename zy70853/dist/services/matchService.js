@@ -125,12 +125,12 @@ class MatchService {
         if (!bestMatch)
             return null;
         let status = types_1.MatchStatus.PENDING;
-        if (highestConfidence >= 80) {
+        if (highestConfidence >= 75) {
             status = types_1.MatchStatus.NORMAL;
-            notes.unshift('三项信息高度匹配，可直接确认');
+            notes.unshift('乘客-司机信息高度匹配，可直接确认');
         }
-        else if (highestConfidence >= 50) {
-            notes.unshift('信息部分匹配，需要人工确认');
+        else if (highestConfidence >= 45) {
+            notes.unshift('信息部分匹配，待仓库入库确认后可判定');
         }
         else {
             notes.unshift('匹配度较低，建议重新核对');
@@ -169,7 +169,15 @@ class MatchService {
                 item.warehouseRecord = bestMatch;
                 item.confidence = Math.round((item.confidence + highestConfidence) / 2);
                 item.notes.push(...additionalNotes);
-                if (item.confidence < 60 && item.status === types_1.MatchStatus.NORMAL) {
+                if (item.passengerRecord && item.driverRecord && item.warehouseRecord) {
+                    item.confidence = Math.min(100, item.confidence + 10);
+                    item.notes.push('乘客-司机-仓库三方匹配，可信度提升');
+                }
+                if (item.confidence >= 70 && item.status !== types_1.MatchStatus.NORMAL) {
+                    item.status = types_1.MatchStatus.NORMAL;
+                    item.notes.unshift('匹配度达标，可确认认领');
+                }
+                else if (item.confidence < 60 && item.status === types_1.MatchStatus.NORMAL) {
                     item.status = types_1.MatchStatus.PENDING;
                     item.notes.unshift('仓库匹配后置信度下降，转为待确认');
                 }
@@ -232,6 +240,9 @@ class MatchService {
         };
         const nameSimilarity = (0, matchUtils_1.calculateStringSimilarity)(record1.itemName, record2.itemName);
         confidence += (nameSimilarity / 100) * weights.itemName;
+        if ((0, matchUtils_1.isSameNameItem)(record1.itemName, record2.itemName)) {
+            confidence += 15;
+        }
         const descSimilarity = (0, matchUtils_1.calculateStringSimilarity)(record1.description, record2.description);
         confidence += (descSimilarity / 100) * weights.description;
         if (record1.date && record2.date && record1.date === record2.date) {
@@ -240,7 +251,7 @@ class MatchService {
         if (record1.routeId && record2.routeId && record1.routeId === record2.routeId) {
             confidence += weights.route;
         }
-        return Math.round(confidence);
+        return Math.min(100, Math.round(confidence));
     }
     applyRouteShiftValidation() {
         if (this.routeShifts.length === 0)
