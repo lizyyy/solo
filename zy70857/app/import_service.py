@@ -146,14 +146,28 @@ def process_borrow_records(
             is_duplicate = check_duplicate_record(db, record)
 
         if is_duplicate:
-            fail_items.append({
-                "record_no": record.get("record_no"),
-                "original_data": raw_data,
-                "result_type": "fail",
+            duplicate_result = {
                 "rule_code": "DUPLICATE_RECORD",
                 "rule_name": "重复记录校验",
+                "result_type": "fail",
                 "message": "该借阅记录已存在，不允许重复导入",
                 "suggestion": "请检查记录是否重复，或使用新的记录编号",
+            }
+            fail_items.append({
+                "record_no": record.get("record_no"),
+                "case_no": record.get("case_no"),
+                "person_id": record.get("person_id"),
+                "person_name": record.get("person_name"),
+                "borrow_date": record.get("borrow_date"),
+                "due_date": record.get("due_date"),
+                "return_date": record.get("return_date"),
+                "renew_count": record.get("renew_count"),
+                "action_type": record.get("action_type"),
+                "original_data": raw_data,
+                "result_type": "fail",
+                "message": duplicate_result["message"],
+                "suggestion": duplicate_result["suggestion"],
+                "check_results": [duplicate_result],
             })
             fail_count += 1
             continue
