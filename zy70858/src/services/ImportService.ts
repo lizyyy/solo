@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as csvParser from 'csv-parser';
+import csvParser from 'csv-parser';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Case,
@@ -60,7 +60,7 @@ export class ImportService {
 
       fs.createReadStream(filePath)
         .pipe(csvParser())
-        .on('data', (row) => {
+        .on('data', (row: Record<string, string>) => {
           rowCount++;
           try {
             const record = this.validateBorrowRecord(row, rowCount);
@@ -76,7 +76,7 @@ export class ImportService {
           result.success = result.errors.length === 0;
           resolve(result);
         })
-        .on('error', (error) => {
+        .on('error', (error: Error) => {
           result.errors.push(`CSV文件读取失败: ${error.message}`);
           resolve(result);
         });
@@ -187,7 +187,7 @@ export class ImportService {
     }
 
     allowedClassifications = allowedClassifications.filter((c: string) =>
-      Object.values(ClassificationLevel).includes(c.toLowerCase()
+      (Object.values(ClassificationLevel) as string[]).includes(c.toLowerCase())
     );
 
     if (allowedClassifications.length === 0) {

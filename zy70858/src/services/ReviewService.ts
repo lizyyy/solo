@@ -12,7 +12,6 @@ import { ReconciliationEngine } from './ReconciliationEngine';
 export class ReviewService {
   private engine: ReconciliationEngine;
   private reviewLogs: ReviewLog[] = [];
-  private resolvedDiscrepancies: Set<string> = new Set();
 
   constructor(engine: ReconciliationEngine) {
     this.engine = engine;
@@ -64,13 +63,14 @@ export class ReviewService {
       this.resolveRecordDiscrepancies(recordId);
     }
 
-    const newResult = this.engine.runReconciliation();
+    const recordDiscrepancies = this.engine.getAllDiscrepancies()
+      .filter(d => d.recordId === recordId);
 
     return {
       success: true,
       record,
       log,
-      discrepancies: newResult.discrepancies.filter(d => d.recordId === recordId)
+      discrepancies: recordDiscrepancies
     };
   }
 
@@ -106,7 +106,12 @@ export class ReviewService {
   }
 
   private resolveRecordDiscrepancies(recordId: string): void {
-    this.resolvedDiscrepancies.add(recordId);
+    const discrepancies = this.engine.getAllDiscrepancies();
+    discrepancies.forEach(d => {
+      if (d.recordId === recordId) {
+        this.engine.resolveDiscrepancy(d.discrepancyId);
+      }
+    });
   }
 
   getReviewLogs(recordId?: string): ReviewLog[] {
@@ -117,16 +122,7 @@ export class ReviewService {
   }
 
   recalculateReconciliation(): ReconciliationResult {
-    const result = this.engine.runReconciliation();
-
-    result.discrepancies = result.discrepancies.map(d => ({
-      ...d,
-      isResolved: this.resolvedDiscrepancies.has(d.recordId)
-    }));
-
-    result.reviewedRecords = [...this.resolvedDiscrepancies];
-
-    return result;
+    return this.engine.runReconciliation();
   }
 
   approveDiscrepancy(
@@ -135,8 +131,7 @@ export class ReviewService {
     reviewerName: string,
     reason: string
   ): { success: boolean; discrepancy?: Discrepancy } {
-    const result = this.engine.runReconciliation();
-    const discrepancy = result.discrepancies.find(d => d.discrepancyId === discrepancyId);
+    const discrepancy = this.engine.getDiscrepancy(discrepancyId);
 
     if (!discrepancy) {
       throw new Error(`差异记录不存在: ${discrepancyId}`);
@@ -153,10 +148,11 @@ export class ReviewService {
     };
 
     this.reviewLogs.push(log);
-    this.resolvedDiscrepancies.add(discrepancy.recordId);
-    discrepancy.isResolved = true;
+    this.engine.resolveDiscrepancy(discrepancyId);
 
-    return { success: true, discrepancy };
+    const updatedDiscrepancy = this.engine.getDiscrepancy(discrepancyId);
+
+    return { success: true, discrepancy: updatedDiscrepancy };
   }
 
   rejectBorrow(

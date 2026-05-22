@@ -96,7 +96,7 @@ export class ReportService {
     this.addReviewLogsSheet(workbook, reportData);
 
     const buffer = await workbook.xlsx.writeBuffer();
-    return buffer as Buffer;
+    return Buffer.from(buffer as unknown as ArrayBuffer);
   }
 
   private renderPDFHeader(doc: PDFKit.PDFDocument, reportData: ReportData): void {
@@ -118,12 +118,12 @@ export class ReportService {
     const summary = reportData.summary;
     doc.text(`总借阅记录数: ${summary.totalBorrowed}`);
     doc.text(`已归还数: ${summary.returned}`);
-    doc.text(`超期未还数: ${summary.overdue}`, {
-      fill: summary.overdue > 0 ? 'red' : 'black'
-    });
-    doc.text(`待复核数: ${summary.pendingReview}`, {
-      fill: summary.pendingReview > 0 ? 'orange' : 'black'
-    });
+    doc.fillColor(summary.overdue > 0 ? 'red' : 'black');
+    doc.text(`超期未还数: ${summary.overdue}`);
+    doc.fillColor('black');
+    doc.fillColor(summary.pendingReview > 0 ? 'orange' : 'black');
+    doc.text(`待复核数: ${summary.pendingReview}`);
+    doc.fillColor('black');
 
     doc.moveDown();
     const reviewSummary = this.reviewService.getReviewSummary();
@@ -150,14 +150,14 @@ export class ReportService {
         doc.text(`${index + 1}. 案件: ${caseInfo?.caseNumber || '未知'} - ${caseInfo?.title || '未知'}`, {
           continued: true
         });
-        doc.text(` | 严重程度: ${this.getSeverityText(d.severity)}`, {
-          fill: d.severity === 'high' ? 'red' : d.severity === 'medium' ? 'orange' : 'black'
-        });
+        doc.fillColor(d.severity === 'high' ? 'red' : d.severity === 'medium' ? 'orange' : 'black');
+        doc.text(` | 严重程度: ${this.getSeverityText(d.severity)}`);
+        doc.fillColor('black');
         doc.text(`   问题: ${d.description}`);
         doc.text(`   说明: ${d.explanation}`);
-        doc.text(`   状态: ${d.isResolved ? '已解决' : '未解决'}`, {
-          fill: d.isResolved ? 'green' : 'red'
-        });
+        doc.fillColor(d.isResolved ? 'green' : 'red');
+        doc.text(`   状态: ${d.isResolved ? '已解决' : '未解决'}`);
+        doc.fillColor('black');
         doc.moveDown(0.5);
       });
 
@@ -197,14 +197,11 @@ export class ReportService {
       doc.text(row.borrowDate, x, y, { width: colWidths[4] }); x += colWidths[4];
       doc.text(row.dueDate, x, y, { width: colWidths[5] }); x += colWidths[5];
       doc.text(row.status, x, y, { width: colWidths[6] }); x += colWidths[6];
-      doc.text(row.issues.length > 0 ? '有问题' : '正常', x, y, {
-        width: colWidths[7],
-        fill: row.issues.length > 0 ? 'red' : 'black'
-      }); x += colWidths[7];
-      doc.text(row.reviewStatus, x, y, {
-        width: colWidths[8],
-        fill: row.reviewStatus === '已复核' ? 'green' : 'orange'
-      });
+      doc.fillColor(row.issues.length > 0 ? 'red' : 'black');
+      doc.text(row.issues.length > 0 ? '有问题' : '正常', x, y, { width: colWidths[7] }); x += colWidths[7];
+      doc.fillColor(row.reviewStatus === '已复核' ? 'green' : 'orange');
+      doc.text(row.reviewStatus, x, y, { width: colWidths[8] });
+      doc.fillColor('black');
 
       y += 15;
     });

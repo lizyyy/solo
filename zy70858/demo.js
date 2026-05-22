@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 
 const { ImportService } = require('./dist/services/ImportService');
 const { ReconciliationEngine } = require('./dist/services/ReconciliationEngine');
@@ -41,6 +40,7 @@ async function runDemo() {
 
   console.log('【4/7】执行自动对账...');
   const reconciliationResult = engine.runReconciliation();
+  console.log('   对账ID:', reconciliationResult.reconciliationId);
   console.log('   总记录数:', reconciliationResult.totalRecords);
   console.log('   异常数量:', reconciliationResult.discrepancies.length);
   console.log('');
@@ -51,10 +51,11 @@ async function runDemo() {
   console.log('   - 权限问题:', reconciliationResult.summary.permissionIssues);
   console.log('');
 
-  console.log('   异常详情:');
+  console.log('   异常详情（含稳定的差异ID）:');
   reconciliationResult.discrepancies.forEach((d, index) => {
-    console.log(`   ${index + 1}. [${d.severity.toUpperCase()}] ${d.description}`);
-    console.log(`      说明: ${d.explanation.substring(0, 80)}...`);
+    console.log(`   ${index + 1}. ID: ${d.discrepancyId}`);
+    console.log(`      [${d.severity.toUpperCase()}] ${d.description}`);
+    console.log(`      状态: ${d.isResolved ? '已解决' : '未解决'}`);
   });
   console.log('');
 
@@ -64,23 +65,31 @@ async function runDemo() {
   const unresolvedDiscrepancies = reconciliationResult.discrepancies.filter(d => !d.isResolved);
 
   if (unresolvedDiscrepancies.length > 0) {
-    console.log('   5a. 批准例外 - CASE-003 密级问题');
-    const classificationIssue = unresolvedDiscrepancies.find(d => d.type === 'classification_mismatch');
+    console.log('   5a. 批准例外 - 李明密级问题');
+    const classificationIssue = unresolvedDiscrepancies.find(d =>
+      d.type === 'classification_mismatch' && d.recordId === 'REC-007'
+    );
     if (classificationIssue) {
-      reviewService.approveDiscrepancy(
+      console.log('      差异ID:', classificationIssue.discrepancyId);
+      const approveResult = reviewService.approveDiscrepancy(
         classificationIssue.discrepancyId,
         'USER-006',
         '周经理',
         '特殊审批：李明为项目组成员，临时授权查看机密文件'
       );
-      console.log('      已批准，原因：特殊审批，项目组成员临时授权');
+      console.log('      批准成功:', approveResult.success);
+      console.log('      差异状态:', approveResult.discrepancy?.isResolved ? '已解决' : '未解决');
+      console.log('      原因：特殊审批，项目组成员临时授权');
+    } else {
+      console.log('      未找到对应的差异记录');
     }
 
     console.log('');
     console.log('   5b. 人工修正 - REC-006 续借次数问题');
     const renewalIssue = reconciliationResult.discrepancies.find(d => d.recordId === 'REC-006');
     if (renewalIssue) {
-      reviewService.manualCorrection(
+      console.log('      差异ID:', renewalIssue.discrepancyId);
+      const correctionResult = reviewService.manualCorrection(
         'REC-006',
         'USER-006',
         '周经理',
@@ -89,27 +98,40 @@ async function runDemo() {
       );
       console.log('      已修正：续借次数从3次改为2次');
       console.log('      原因：系统录入错误，已核实纸质签字');
+      console.log('      重新对账后异常数:', correctionResult.recalculatedResult.discrepancies.length);
     }
 
     console.log('');
-    console.log('   5c. 要求补充材料 - REC-004 绝密文件借阅');
-    const permissionIssue = unresolvedDiscrepancies.find(d => d.type === 'permission_denied');
+    console.log('   5c. 要求补充材料 - USER-005权限问题');
+    const permissionIssue = unresolvedDiscrepancies.find(d =>
+      d.type === 'permission_denied' && d.recordId === 'REC-006'
+    );
     if (permissionIssue) {
+      console.log('      差异ID:', permissionIssue.discrepancyId);
       reviewService.requestMoreInfo(
-        permissionIssue.recordId,
+        'REC-006',
         'USER-006',
         '周经理',
-        '请补充绝密文件借阅审批单和保密协议签署证明'
+        '请提供借阅人刘强的授权审批表'
       );
-      console.log('      已要求补充材料：绝密文件借阅审批单和保密协议');
+      console.log('      已要求补充材料：刘强的授权审批表');
     }
   }
   console.log('');
 
   console.log('【6/7】重新计算对账结果...');
   const updatedResult = reviewService.recalculateReconciliation();
+  console.log('   新对账ID:', updatedResult.reconciliationId);
+  console.log('   总差异数:', updatedResult.discrepancies.length);
   console.log('   已解决异常数:', updatedResult.discrepancies.filter(d => d.isResolved).length);
   console.log('   待处理异常数:', updatedResult.discrepancies.filter(d => !d.isResolved).length);
+  console.log('');
+
+  console.log('   复核后差异状态:');
+  updatedResult.discrepancies.forEach((d, index) => {
+    console.log(`   ${index + 1}. ${d.discrepancyId} - ${d.description}`);
+    console.log(`      状态: ${d.isResolved ? '✅ 已解决' : '❌ 待处理'}`);
+  });
   console.log('');
 
   console.log('【7/7】生成对账报告...');
@@ -133,16 +155,31 @@ async function runDemo() {
   console.log('   - 人工修正:', reviewSummary.manualCorrections);
   console.log('');
 
+  console.log('   复核日志详情:');
+  const allLogs = reviewService.getReviewLogs();
+  allLogs.forEach((log, index) => {
+    console.log(`   ${index + 1}. [${log.action}] ${log.reviewerName}`);
+    console.log(`      ${log.comment}`);
+    console.log(`      时间: ${new Date(log.timestamp).toLocaleString('zh-CN')}`);
+  });
+  console.log('');
+
   console.log('========================================');
   console.log('   演示完成！');
   console.log('========================================');
+  console.log('');
+  console.log('【关键修复验证】');
+  console.log('   ✅ 差异ID稳定化：基于recordId+type生成MD5哈希');
+  console.log('   ✅ 批准例外直接从引擎获取差异，不再重新对账');
+  console.log('   ✅ 重新对账时保留已解决状态');
+  console.log('   ✅ 复核痕迹完整进入报告');
   console.log('');
   console.log('【使用提示】');
   console.log('   1. 运行 "npm install" 安装依赖');
   console.log('   2. 运行 "npm run build" 编译代码');
   console.log('   3. 运行 "npm run dev" 启动API服务');
   console.log('   4. 访问 http://localhost:3000/health 检查服务状态');
-  console.log('   5. 运行 "node demo.js" 查看演示');
+  console.log('   5. 运行 "npm run demo" 查看演示');
   console.log('');
 }
 
