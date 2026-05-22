@@ -11,6 +11,7 @@ from stability_reconciliation.models.database import (
 )
 from stability_reconciliation.services.reconciliation_engine import ReconciliationEngine
 from stability_reconciliation.services.import_service import DataImportService
+from stability_reconciliation.services.review_service import ReviewService
 from datetime import datetime, timedelta
 import uuid
 
@@ -340,6 +341,101 @@ def test_full_workflow():
     return result
 
 
+def test_report_summary_sync_after_review():
+    """测试复核后报告汇总同步更新"""
+    print("\n测试6: 复核后报告汇总同步更新...")
+    
+    db = SessionLocal()
+    
+    protocol = TestProtocol(
+        id=f"PROTO-TEST-{uuid.uuid4().hex[:6].upper()}",
+        protocol_name="测试方案",
+        product_name="测试产品",
+        batch_number="BATCH-001",
+        conditions={},
+        sampling_points=[],
+        status="active"
+    )
+    db.add(protocol)
+    
+    for i in range(3):
+        sample = Sample(
+            id=f"SAMP-TEST-{uuid.uuid4().hex[:6].upper()}",
+            protocol_id=protocol.id,
+            sample_id=f"S00{i+1}",
+            sampling_point=f"{i*3}月",
+            planned_sampling_date=datetime.now() + timedelta(days=i*90),
+            actual_sampling_date=datetime.now() + timedelta(days=i*90 + (10 if i > 0 else 0)),
+            condition="25°C/60%RH",
+            storage_location="箱体A",
+            status="extended" if i > 0 else "imported",
+            test_results={"extension_approved": False} if i > 0 else {}
+        )
+        db.add(sample)
+    
+    db.commit()
+    
+    engine = ReconciliationEngine(db)
+    batch_id, records, summary = engine.run_reconciliation(protocol.id)
+    
+    print(f"  对账批次: {batch_id}")
+    print(f"  对账记录数: {len(records)}, 有差异: {summary.get('discrepancy_count', 0)}")
+    
+    from stability_reconciliation.services.report_service import ReportService
+    report_service = ReportService(db)
+    report = report_service.generate_reconciliation_report(
+        protocol_id=protocol.id,
+        reconciliation_batch_id=batch_id,
+        report_type="json",
+        generated_by="QA001"
+    )
+    
+    initial_stats = report.summary_data.get("summary_statistics", {})
+    print(f"  初始报告 - resolved: {initial_stats.get('resolved_records')}, pending: {initial_stats.get('pending_review')}")
+    
+    assert initial_stats.get("resolved_records") == 0, "初始resolved应该为0"
+    assert initial_stats.get("pending_review") == len(records), "初始pending应该等于记录数"
+    
+    review_service = ReviewService(db)
+    
+    record_to_review = records[0]
+    print(f"  复核记录: {record_to_review.id}")
+    
+    review_service.review_reconciliation(
+        reconciliation_id=record_to_review.id,
+        review_comment="已确认差异，正常审批流程",
+        is_resolved=True,
+        resolution_note="符合延期审批流程",
+        reviewer="QA001"
+    )
+    
+    db.refresh(report)
+    final_stats = report.summary_data.get("summary_statistics", {})
+    print(f"  复核后报告 - resolved: {final_stats.get('resolved_records')}, pending: {final_stats.get('pending_review')}")
+    
+    all_pass = True
+    
+    if final_stats.get("resolved_records") == 1:
+        print("  ✓ resolved_records 正确更新为1")
+    else:
+        print(f"  ✗ resolved_records 错误: {final_stats.get('resolved_records')} (预期1)")
+        all_pass = False
+    
+    expected_pending = len(records) - 1
+    if final_stats.get("pending_review") == expected_pending:
+        print(f"  ✓ pending_review 正确更新为 {expected_pending}")
+    else:
+        print(f"  ✗ pending_review 错误: {final_stats.get('pending_review')} (预期{expected_pending})")
+        all_pass = False
+    
+    if all_pass:
+        print("  ✓ 测试通过! 复核后报告汇总正确同步更新")
+    
+    db.rollback()
+    db.close()
+    return all_pass
+
+
 if __name__ == "__main__":
     print("=" * 60)
     print("开始测试修复...")
@@ -353,6 +449,7 @@ if __name__ == "__main__":
     results.append(("样品导入延期字段", test_sample_import_with_extension_fields()))
     results.append(("完整对账流程", test_full_workflow()))
     results.append(("空值延期字段不被误判", test_extension_approved_empty_field_bug()))
+    results.append(("复核后报告汇总同步", test_report_summary_sync_after_review()))
     
     print("\n" + "=" * 60)
     print("测试总结:")

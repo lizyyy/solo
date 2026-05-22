@@ -72,8 +72,6 @@ class ReviewService:
         
         self._sync_related_data(record)
         
-        self.db.commit()
-        
         return record
 
     def update_sample_data(self, sample_id: str, updates: Dict[str, Any],
@@ -109,21 +107,60 @@ class ReviewService:
         return sample
 
     def _sync_related_data(self, record: ReconciliationRecord):
+        from sqlalchemy.orm.attributes import flag_modified
+        from stability_reconciliation.models.database import ReconciliationRecord as RR
+        
         reports = self.db.query(Report).filter(
             Report.reconciliation_batch_id == record.reconciliation_batch_id
         ).all()
         
+        if not reports:
+            return
+        
+        all_records = self.db.query(RR).filter(
+            RR.reconciliation_batch_id == record.reconciliation_batch_id
+        ).all()
+        
+        total = len(all_records)
+        matched = sum(1 for r in all_records if r.status == "matched")
+        discrepancy = sum(1 for r in all_records if r.status == "discrepancy")
+        resolved = sum(1 for r in all_records if r.is_resolved)
+        pending = total - resolved
+        
+        discrepancy_types = {}
+        discrepancy_sources = {}
+        for r in all_records:
+            if r.discrepancy_type:
+                discrepancy_types[r.discrepancy_type] = discrepancy_types.get(r.discrepancy_type, 0) + 1
+            if r.discrepancy_source:
+                discrepancy_sources[r.discrepancy_source] = discrepancy_sources.get(r.discrepancy_source, 0) + 1
+        
         for report in reports:
-            if report.summary_data:
-                summary = report.summary_data
-                
-                if record.is_resolved:
-                    summary["resolved_count"] = summary.get("resolved_count", 0) + 1
-                    summary["pending_count"] = max(0, summary.get("pending_count", 1) - 1)
-                else:
-                    summary["pending_count"] = summary.get("pending_count", 0) + 1
-                
-                report.summary_data = summary
+            if not report.summary_data:
+                report.summary_data = {}
+            
+            if "summary_statistics" not in report.summary_data:
+                report.summary_data["summary_statistics"] = {}
+            
+            report.summary_data["summary_statistics"].update({
+                "total_records": total,
+                "matched_records": matched,
+                "discrepancy_records": discrepancy,
+                "resolved_records": resolved,
+                "pending_review": pending,
+                "resolution_rate": resolved / total if total > 0 else 0
+            })
+            
+            report.summary_data["discrepancy_breakdown"] = {
+                "by_type": discrepancy_types,
+                "by_source": discrepancy_sources
+            }
+            
+            report.summary_data["last_updated"] = datetime.utcnow().isoformat()
+            
+            flag_modified(report, "summary_data")
+        
+        self.db.commit()
 
     def _trigger_recalculation_for_sample(self, sample_id: str):
         from stability_reconciliation.services.reconciliation_engine import ReconciliationEngine

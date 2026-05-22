@@ -1,0 +1,150 @@
+{
+  "protocol_info": {
+    "id": "PROTO-TEST-EAE2FE",
+    "name": "测试方案",
+    "product": "测试产品",
+    "batch_number": "BATCH-001"
+  },
+  "reconciliation_batch": "BATCH-2AC118AB",
+  "generated_at": "2026-05-22T13:51:51.266396",
+  "summary": {
+    "total_samples": 3,
+    "total_records": 3,
+    "matched": 1,
+    "discrepancy": 2,
+    "resolved": 0
+  },
+  "samples": [
+    {
+      "id": "SAMP-TEST-4CF14C",
+      "sample_id": "S001",
+      "sampling_point": "0月",
+      "planned_sampling_date": "2026-05-22T21:51:51.260220",
+      "actual_sampling_date": "2026-05-22T21:51:51.260225",
+      "condition": "25°C/60%RH",
+      "storage_location": "箱体A"
+    },
+    {
+      "id": "SAMP-TEST-1CC486",
+      "sample_id": "S002",
+      "sampling_point": "3月",
+      "planned_sampling_date": "2026-08-20T21:51:51.260252",
+      "actual_sampling_date": "2026-08-30T21:51:51.260254",
+      "condition": "25°C/60%RH",
+      "storage_location": "箱体A"
+    },
+    {
+      "id": "SAMP-TEST-4EB561",
+      "sample_id": "S003",
+      "sampling_point": "6月",
+      "planned_sampling_date": "2026-11-18T21:51:51.260278",
+      "actual_sampling_date": "2026-11-28T21:51:51.260279",
+      "condition": "25°C/60%RH",
+      "storage_location": "箱体A"
+    }
+  ],
+  "reconciliation_records": [
+    {
+      "id": "RECON-D1EDDBBE",
+      "sample_id": "SAMP-TEST-4CF14C",
+      "status": "matched",
+      "discrepancy_type": null,
+      "discrepancy_source": null,
+      "discrepancy_description": null,
+      "is_resolved": false,
+      "resolution_note": null,
+      "resolved_by": null,
+      "resolved_at": null,
+      "calculation_details": {
+        "sample_info": {
+          "sample_id": "S001",
+          "sampling_point": "0月",
+          "condition": "25°C/60%RH"
+        },
+        "protocol_info": {
+          "protocol_name": "测试方案",
+          "product_name": "测试产品"
+        },
+        "discrepancy_summary": {
+          "count": 0,
+          "types": [],
+          "sources": []
+        },
+        "calculation_timestamp": "2026-05-22T13:51:51.262222",
+        "validity_assessment": "valid"
+      }
+    },
+    {
+      "id": "RECON-741F7117",
+      "sample_id": "SAMP-TEST-1CC486",
+      "status": "discrepancy",
+      "discrepancy_type": "sampling_window",
+      "discrepancy_source": "sampling_schedule",
+      "discrepancy_description": "取样日期超出允许窗口10天。计划日期: 2026-08-20, 实际日期: 2026-08-30",
+      "is_resolved": false,
+      "resolution_note": null,
+      "resolved_by": null,
+      "resolved_at": null,
+      "calculation_details": {
+        "sample_info": {
+          "sample_id": "S002",
+          "sampling_point": "3月",
+          "condition": "25°C/60%RH"
+        },
+        "protocol_info": {
+          "protocol_name": "测试方案",
+          "product_name": "测试产品"
+        },
+        "discrepancy_summary": {
+          "count": 2,
+          "types": [
+            "sampling_window",
+            "extension_unapproved"
+          ],
+          "sources": [
+            "sampling_schedule",
+            "protocol_compliance"
+          ]
+        },
+        "calculation_timestamp": "2026-05-22T13:51:51.262754",
+        "validity_assessment": "questionable"
+      }
+    },
+    {
+      "id": "RECON-C5EC0DED",
+      "sample_id": "SAMP-TEST-4EB561",
+      "status": "discrepancy",
+      "discrepancy_type": "sampling_window",
+      "discrepancy_source": "sampling_schedule",
+      "discrepancy_description": "取样日期超出允许窗口10天。计划日期: 2026-11-18, 实际日期: 2026-11-28",
+      "is_resolved": false,
+      "resolution_note": null,
+      "resolved_by": null,
+      "resolved_at": null,
+      "calculation_details": {
+        "sample_info": {
+          "sample_id": "S003",
+          "sampling_point": "6月",
+          "condition": "25°C/60%RH"
+        },
+        "protocol_info": {
+          "protocol_name": "测试方案",
+          "product_name": "测试产品"
+        },
+        "discrepancy_summary": {
+          "count": 2,
+          "types": [
+            "sampling_window",
+            "extension_unapproved"
+          ],
+          "sources": [
+            "sampling_schedule",
+            "protocol_compliance"
+          ]
+        },
+        "calculation_timestamp": "2026-05-22T13:51:51.263050",
+        "validity_assessment": "questionable"
+      }
+    }
+  ]
+}
