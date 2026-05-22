@@ -1,0 +1,21 @@
+
+=== 报修单信息 ===
+"order_no","resident_id","resident_name","room_no","repair_type","description","report_time","status"
+"ORD-E79E2336","E2E-001","Test User","9-999","water_electric","E2E test - water leak","2024-03-01T09:00:00.000Z","pending"
+
+=== 维修回执 ===
+"receipt_no","repairman_name","arrival_time","complete_time","repair_content","is_rework","is_part_replacement","labor_fee"
+"RCT-8AB64DFA","Test Master","2024-03-01T10:00:00.000Z","2024-03-01T11:30:00.000Z","replace pipe",0,1,100
+"RCT-9DA741DA","Test Master","2024-03-02T14:00:00.000Z","2024-03-02T15:00:00.000Z","rework - seal",1,0,50
+
+=== 材料领用 ===
+"usage_no","material_code","material_name","quantity","unit_price","total_price","receiver","receive_time"
+"MAT-36244EF5","M003","pipe connector",2,15,30,"Test Master","2024-03-01T09:30:00.000Z"
+
+=== 退款流水 ===
+"trans_no","refund_amount","refund_reason","trans_time","operator"
+"REF-C4C2C37C",30,"rework discount","2024-03-03T10:00:00.000Z","finance"
+
+=== 对账汇总 ===
+"总工费","总材料费","总退款","净额","回执数量","返修次数","换件次数","对账状态"
+150,30,30,150,2,1,1,"有异常"
