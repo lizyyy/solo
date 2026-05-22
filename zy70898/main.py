@@ -24,6 +24,11 @@ reporter = ReportGenerator()
 
 reconciliation_results: dict = {}
 
+def _get_file_suffix(filename: str) -> str:
+    ext = os.path.splitext(filename)[1].lower()
+    return ext if ext in ['.json', '.csv'] else '.json'
+
+
 
 @app.post("/api/import/sample", summary="生成示例数据")
 async def import_sample():
@@ -41,21 +46,25 @@ async def reconcile(
     errors_file: UploadFile = File(..., description="差错记录文件(JSON/CSV)"),
     batch_date: Optional[str] = None
 ):
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as tf:
+    transfers_suffix = _get_file_suffix(transfers_file.filename or 'transfers.json')
+    schedules_suffix = _get_file_suffix(schedules_file.filename or 'schedules.json')
+    errors_suffix = _get_file_suffix(errors_file.filename or 'errors.json')
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=transfers_suffix) as tf:
         tf.write(await transfers_file.read())
         tf_path = tf.name
     try:
         transfers = importer.import_transfers(tf_path)
     finally:
         os.unlink(tf_path)
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as tf:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=schedules_suffix) as tf:
         tf.write(await schedules_file.read())
         sf_path = tf.name
     try:
         schedules = importer.import_schedules(sf_path)
     finally:
         os.unlink(sf_path)
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as tf:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=errors_suffix) as tf:
         tf.write(await errors_file.read())
         ef_path = tf.name
     try:
