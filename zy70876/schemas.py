@@ -31,7 +31,7 @@ class Advisor(AdvisorBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class StudentBase(BaseModel):
@@ -62,7 +62,7 @@ class Student(StudentBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PreferenceBase(BaseModel):
@@ -80,7 +80,7 @@ class Preference(PreferenceBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class BatchBase(BaseModel):
@@ -106,7 +106,7 @@ class Batch(BatchBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AdjustmentRecordBase(BaseModel):
@@ -134,7 +134,7 @@ class AdjustmentRecord(AdjustmentRecordBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AllocationRecordBase(BaseModel):
@@ -160,7 +160,7 @@ class AllocationRecord(AllocationRecordBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AuditLogBase(BaseModel):
@@ -181,7 +181,7 @@ class AuditLog(AuditLogBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class AllocationDetail(AllocationRecord):
