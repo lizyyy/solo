@@ -251,10 +251,23 @@ export async function generateExportData(recordId: string): Promise<ExportRecord
 
   const exportRecords: ExportRecord[] = [];
 
+  const linenTotalSendMap = new Map<string, number>();
+  record.roomStandards.forEach(roomStandard => {
+    roomStandard.linenItems.forEach(item => {
+      const current = linenTotalSendMap.get(item.linenType) || 0;
+      linenTotalSendMap.set(item.linenType, current + item.sendQuantity);
+    });
+  });
+
   record.roomStandards.forEach(roomStandard => {
     roomStandard.linenItems.forEach(item => {
       const billingItem = record.billingItems.find(b => b.linenType === item.linenType);
       const linenStats = statistics.byLinenType.find(l => l.linenType === item.linenType);
+      const totalSendForLinen = linenTotalSendMap.get(item.linenType) || 1;
+      
+      const allocationRatio = totalSendForLinen > 0 ? item.sendQuantity / totalSendForLinen : 0;
+      const allocatedBilledQuantity = billingItem ? Math.round(billingItem.billedQuantity * allocationRatio) : 0;
+      const allocatedBilledAmount = billingItem ? Number((billingItem.billedAmount * allocationRatio).toFixed(2)) : 0;
 
       exportRecords.push({
         batchId: record.batchId,
@@ -267,9 +280,9 @@ export async function generateExportData(recordId: string): Promise<ExportRecord
         returnQuantity: item.returnQuantity,
         damagedQuantity: item.damagedQuantity,
         damageCompensation: item.damageCompensation,
-        billedQuantity: billingItem?.billedQuantity || 0,
-        billedAmount: billingItem?.billedAmount || 0,
-        discrepancy: linenStats?.discrepancy || 0,
+        billedQuantity: allocatedBilledQuantity,
+        billedAmount: allocatedBilledAmount,
+        discrepancy: item.returnQuantity + item.damagedQuantity - item.sendQuantity,
         processingStatus: record.processingStatus,
         statusReason: record.statusReason
       });
