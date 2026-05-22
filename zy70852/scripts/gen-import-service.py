@@ -1,4 +1,6 @@
-const fs = require("fs");
+import os
+
+content = '''const fs = require("fs");
 const csv = require("csv-parser");
 const moment = require("moment");
 const db = require("../models/database");
@@ -224,3 +226,9 @@ class ImportService {
 }
 
 module.exports = new ImportService();
+'''
+
+with open('src/services/importService.js', 'w') as f:
+    f.write(content)
+
+print('importService.js 已生成')
