@@ -88,6 +88,24 @@ router.get('/pending', async (req, res, next) => {
   }
 });
 
+router.get('/alarms/active', async (req, res, next) => {
+  try {
+    const alarms = await DBUtils.getAll(`
+      SELECT se.*, mp.medication_name, p.name as pet_name, o.room_number
+      FROM shift_executions se
+      JOIN medication_plans mp ON se.medication_plan_id = mp.id
+      JOIN pets p ON mp.pet_id = p.id
+      JOIN orders o ON mp.order_id = o.id
+      WHERE se.has_alarm = 1 AND se.alarm_acknowledged = 0
+      ORDER BY se.scheduled_time DESC
+    `);
+
+    ResponseUtil.success(res, alarms);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/:id', async (req, res, next) => {
   try {
     const execution = await DBUtils.getOne(`
@@ -248,24 +266,6 @@ router.patch('/:id/correct', async (req, res, next) => {
       execution: updated,
       compensation_notes: compensation_notes || '人工修正完成'
     }, '喂药记录已人工修正');
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get('/alarms/active', async (req, res, next) => {
-  try {
-    const alarms = await DBUtils.getAll(`
-      SELECT se.*, mp.medication_name, p.name as pet_name, o.room_number
-      FROM shift_executions se
-      JOIN medication_plans mp ON se.medication_plan_id = mp.id
-      JOIN pets p ON mp.pet_id = p.id
-      JOIN orders o ON mp.order_id = o.id
-      WHERE se.has_alarm = 1 AND se.alarm_acknowledged = 0
-      ORDER BY se.scheduled_time DESC
-    `);
-
-    ResponseUtil.success(res, alarms);
   } catch (err) {
     next(err);
   }

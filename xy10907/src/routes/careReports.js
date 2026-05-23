@@ -178,26 +178,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.get('/:id', async (req, res, next) => {
-  try {
-    const report = await DBUtils.getOne(`
-      SELECT cr.*, p.name as pet_name, o.room_number
-      FROM care_reports cr
-      JOIN pets p ON cr.pet_id = p.id
-      JOIN orders o ON cr.order_id = o.id
-      WHERE cr.id = ?
-    `, [req.params.id]);
-
-    if (!report) {
-      return await ResponseUtil.notFound(req, res, '护理报告不存在');
-    }
-
-    ResponseUtil.success(res, report);
-  } catch (err) {
-    next(err);
-  }
-});
-
 router.get('/export/csv', async (req, res, next) => {
   try {
     const { order_id, pet_id, start_date, end_date } = req.query;
@@ -248,6 +228,26 @@ router.get('/export/csv', async (req, res, next) => {
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="care_report_${moment().format('YYYYMMDDHHmmss')}.csv"`);
     res.send('\uFEFF' + csv);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/:id', async (req, res, next) => {
+  try {
+    const report = await DBUtils.getOne(`
+      SELECT cr.*, p.name as pet_name, o.room_number
+      FROM care_reports cr
+      JOIN pets p ON cr.pet_id = p.id
+      JOIN orders o ON cr.order_id = o.id
+      WHERE cr.id = ?
+    `, [req.params.id]);
+
+    if (!report) {
+      return await ResponseUtil.notFound(req, res, '护理报告不存在');
+    }
+
+    ResponseUtil.success(res, report);
   } catch (err) {
     next(err);
   }
