@@ -1,0 +1,26 @@
+{
+  "name": "park-visitor-compensation-queue",
+  "version": "1.0.0",
+  "description": "园区访客通行重试补偿队列 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init": "node scripts/init-db.js",
+    "seed": "node scripts/seed-data.js",
+    "bad-data": "node scripts/generate-bad-data.js",
+    "report": "node scripts/generate-report.js",
+    "test": "node scripts/run-tests.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^11.7.2",
+    "uuid": "^9.0.1",
+    "cors": "^2.8.5",
+    "json2csv": "^6.0.0-alpha.2",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
