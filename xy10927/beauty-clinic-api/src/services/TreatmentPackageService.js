@@ -1,8 +1,12 @@
 const { v4: uuidv4 } = require('uuid');
 const { run, get, all } = require('../db');
+const { validateCustomerExists, validateStoreExists, validatePackageStoreMatch } = require('../utils/validation');
 
 class TreatmentPackageService {
   async createPackage(data) {
+    await validateCustomerExists(data.customer_id);
+    await validateStoreExists(data.store_id);
+
     const id = uuidv4();
     const now = new Date().toISOString();
     const remainingCount = data.total_count;
@@ -103,6 +107,9 @@ class TreatmentPackageService {
   }
 
   async verify(packageId, storeId, count, useGiftCount = 0, operator, remark = '') {
+    await validateStoreExists(storeId);
+    await validatePackageStoreMatch(packageId, storeId);
+
     const pkg = await this.getPackageById(packageId);
     if (!pkg) throw new Error('套餐不存在');
     if (pkg.status !== 'active') throw new Error('套餐状态异常');

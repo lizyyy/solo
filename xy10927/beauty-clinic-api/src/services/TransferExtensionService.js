@@ -1,8 +1,20 @@
 const { v4: uuidv4 } = require('uuid');
 const { run, get, all } = require('../db');
+const { validatePackageExists, validateStoreExists } = require('../utils/validation');
 
 class TransferExtensionService {
   async createTransferRequest(packageId, fromStoreId, toStoreId, requestNote, operator) {
+    const pkg = await validatePackageExists(packageId);
+    await validateStoreExists(fromStoreId);
+    await validateStoreExists(toStoreId);
+    
+    if (pkg.current_store_id !== fromStoreId) {
+      throw new Error('转出门店与套餐当前门店不符');
+    }
+    if (fromStoreId === toStoreId) {
+      throw new Error('转入门店与转出门店不能相同');
+    }
+
     const id = uuidv4();
     const now = new Date().toISOString();
 
@@ -75,11 +87,10 @@ class TransferExtensionService {
   }
 
   async createExtensionRequest(packageId, newExpireDate, reason, operator) {
+    const pkg = await validatePackageExists(packageId);
+
     const id = uuidv4();
     const now = new Date().toISOString();
-
-    const pkg = await get('SELECT * FROM treatment_packages WHERE id = ?', [packageId]);
-    if (!pkg) throw new Error('套餐不存在');
 
     await run(`
       INSERT INTO extension_requests 

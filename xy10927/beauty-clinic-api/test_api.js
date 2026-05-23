@@ -59,8 +59,9 @@ async function testAPI() {
     });
     console.log('   状态:', packages.status, '数量:', packages.body.data?.length || 0);
 
+    let pkg = null;
     if (packages.body.data && packages.body.data.length > 0) {
-      const pkg = packages.body.data[0];
+      pkg = packages.body.data[0];
       console.log('\n5. 套餐详情验证:');
       console.log('   套餐名:', pkg.name);
       console.log('   总次数:', pkg.total_count);
@@ -166,9 +167,45 @@ async function testAPI() {
       console.log('   状态:', badVerifyResult.status, badVerifyResult.body.status);
       console.log('   错误信息:', badVerifyResult.body.error);
       console.log('   ✓ 正确拦截了无效请求');
+
+      console.log('\n11. 测试核销 - 错误门店校验...');
+      const badStoreVerify = await makeRequest({
+        hostname: 'localhost',
+        port: 3000,
+        path: `/api/packages/${pkg.id}/verify`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }, {
+        store_id: 'invalid-store-id',
+        count: 1,
+        use_gift_count: 0,
+        operator: 'tester',
+        remark: '测试错误门店'
+      });
+      console.log('   状态:', badStoreVerify.status, badStoreVerify.body.status);
+      console.log('   错误信息:', badStoreVerify.body.error);
+      console.log('   ✓ 正确拦截了错误门店的核销');
+
+      console.log('\n12. 测试转店申请 - 门店不一致校验...');
+      const badTransfer = await makeRequest({
+        hostname: 'localhost',
+        port: 3000,
+        path: '/api/transfers',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }, {
+        package_id: pkg.id,
+        from_store_id: 'wrong-store-id',
+        to_store_id: stores.body.data[1].id,
+        request_note: '测试转店',
+        operator: 'tester'
+      });
+      console.log('   状态:', badTransfer.status, badTransfer.body.status);
+      console.log('   错误信息:', badTransfer.body.error);
+      console.log('   ✓ 正确拦截了门店不一致的转店申请');
     }
 
-    console.log('\n11. 查询转店申请...');
+    console.log('\n13. 查询转店申请...');
     const transfers = await makeRequest({
       hostname: 'localhost',
       port: 3000,
@@ -177,7 +214,7 @@ async function testAPI() {
     });
     console.log('    状态:', transfers.status, '数量:', transfers.body.data?.length || 0);
 
-    console.log('\n12. 查询延期申请...');
+    console.log('\n14. 查询延期申请...');
     const extensions = await makeRequest({
       hostname: 'localhost',
       port: 3000,
@@ -186,7 +223,7 @@ async function testAPI() {
     });
     console.log('    状态:', extensions.status, '数量:', extensions.body.data?.length || 0);
 
-    console.log('\n13. 查询异常日志...');
+    console.log('\n15. 查询异常日志...');
     const exceptions = await makeRequest({
       hostname: 'localhost',
       port: 3000,
@@ -195,7 +232,7 @@ async function testAPI() {
     });
     console.log('    状态:', exceptions.status, '数量:', exceptions.body.data?.length || 0);
 
-    console.log('\n14. 查询人工修正记录...');
+    console.log('\n16. 查询人工修正记录...');
     const corrections = await makeRequest({
       hostname: 'localhost',
       port: 3000,
@@ -203,6 +240,26 @@ async function testAPI() {
       method: 'GET'
     });
     console.log('    状态:', corrections.status, '数量:', corrections.body.data?.length || 0);
+
+    console.log('\n17. 测试创建套餐 - 错误门店校验...');
+    const badStorePkg = await makeRequest({
+      hostname: 'localhost',
+      port: 3000,
+      path: '/api/packages',
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    }, {
+      customer_id: customers.body.data[0].id,
+      name: '测试套餐',
+      total_count: 10,
+      purchase_date: '2024-01-01',
+      expire_date: '2025-01-01',
+      store_id: 'invalid-store-id',
+      operator: 'tester'
+    });
+    console.log('    状态:', badStorePkg.status, badStorePkg.body.status);
+    console.log('    错误信息:', badStorePkg.body.error);
+    console.log('    ✓ 正确拦截了错误门店的套餐创建');
 
     console.log('\n=== 测试完成 ===');
     console.log('\n状态码说明:');

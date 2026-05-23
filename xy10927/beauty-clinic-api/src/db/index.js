@@ -17,6 +17,14 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
+db.run('PRAGMA foreign_keys = ON', (err) => {
+  if (err) {
+    console.error('启用外键约束失败:', err.message);
+  } else {
+    console.log('外键约束已启用');
+  }
+});
+
 const run = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function(err) {
