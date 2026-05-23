@@ -2,6 +2,8 @@
 
 本地后端API服务，提供停车场月租扣费、道闸事件处理、补扣申请、对账导出等功能。
 
+> **双版本实现**: 项目同时提供 **Go (gin)** 和 **Node.js (Express)** 两个版本，功能完全一致。
+
 ## 功能特性
 
 - **车辆管理**: 车辆注册、充值、查询
@@ -14,12 +16,43 @@
 
 ## 技术栈
 
-- **框架**: Express.js
-- **数据库**: SQLite (better-sqlite3)
-- **日期处理**: Moment.js
-- **CSV导出**: csv-writer
+### Go 版本 (推荐)
+- **框架**: Gin
+- **数据库**: SQLite (go-sqlite3)
+- **端口**: 8080
+- **文件**: `main.go`, `go.mod`
 
-## 快速开始
+### Node.js 版本
+- **框架**: Express.js
+- **数据库**: SQLite (sqlite3)
+- **端口**: 3000
+- **目录**: `src/`, `package.json`
+
+---
+
+## 快速开始 (Go 版本)
+
+### 1. 编译运行
+
+```bash
+# 下载依赖
+go mod tidy
+
+# 编译并运行
+go run main.go
+```
+
+Go 服务运行在 `http://localhost:8080`
+
+### 2. 健康检查
+
+```bash
+curl http://localhost:8080/api/v1/health
+```
+
+---
+
+## 快速开始 (Node.js 版本)
 
 ### 1. 安装依赖
 
@@ -37,11 +70,9 @@ node test/sampleData.js
 
 ```bash
 npm start
-# 开发模式
-npm run dev
 ```
 
-服务默认运行在 `http://localhost:3000`
+Node.js 服务运行在 `http://localhost:3000`
 
 ## API 接口文档
 
