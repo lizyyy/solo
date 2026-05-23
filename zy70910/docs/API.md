@@ -2,7 +2,7 @@
 
 ## 基础信息
 
-- **Base URL**: `http://localhost:3000/api`
+- **Base URL**: `http://localhost:3000/api/v1`
 - **Content-Type**: `application/json`
 - **字符编码**: UTF-8
 

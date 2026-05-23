@@ -1,4 +1,6 @@
-require('dotenv').config();
+const fs = require('fs');
+
+const content = `require('dotenv').config();
 const db = require('../config/database');
 
 const createTables = () => {
@@ -76,3 +78,7 @@ setTimeout(() => {
     }
   });
 }, 1000);
+`;
+
+fs.writeFileSync('src/scripts/init-db.js', content);
+console.log('Created init-db.js successfully!');

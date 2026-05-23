@@ -2,10 +2,10 @@
   "name": "new-energy-reconciliation-service",
   "version": "1.0.0",
   "description": "新能源对账服务 - 用于处理新能源电站电费对账、数据核对和报表生成",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
     "test": "jest"
   },
   "keywords": [

@@ -30,18 +30,96 @@
 
 ### 安装依赖
 
+```bash
 npm install
+```
 
 ### 配置环境变量
 
-复制 .env 文件并根据需要修改配置
+复制 `.env` 文件并根据需要修改配置
+
+### 初始化数据库
+
+```bash
+npm run init-db
+```
 
 ### 启动服务
 
-开发模式：npm run dev
-生产模式：npm start
+开发模式：
+```bash
+npm run dev
+```
+
+生产模式：
+```bash
+npm start
+```
 
 服务默认运行在 http://localhost:3000
+
+## API 接口
+
+### Base URL
+```
+http://localhost:3000/api/v1
+```
+
+### 数据导入接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/import/orders/csv` | POST | 导入订单CSV |
+| `/import/charger-logs/json` | POST | 导入桩端日志JSON |
+| `/import/payment-records` | POST | 导入支付记录 |
+
+### 对账任务接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/reconciliation/tasks` | POST | 创建对账任务 |
+| `/reconciliation/tasks` | GET | 获取对账任务列表 |
+| `/reconciliation/tasks/:taskId` | GET | 获取对账任务详情 |
+| `/reconciliation/tasks/:taskId/execute` | POST | 执行对账任务 |
+
+### 差异管理接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/discrepancies` | GET | 获取差异列表 |
+| `/discrepancies/:discrepancyId` | GET | 获取差异详情 |
+
+### 复核管理接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/review/discrepancies/:discrepancyId/approve` | POST | 通过差异 |
+| `/review/discrepancies/:discrepancyId/reject` | POST | 驳回差异 |
+| `/review/discrepancies/:discrepancyId/request-info` | POST | 请求补充信息 |
+| `/review/discrepancies/:discrepancyId/history` | GET | 获取复核历史 |
+
+### 报告管理接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/reports/:taskId/generate` | POST | 生成对账报告 |
+| `/reports/:reportId/download` | GET | 下载报告 |
+
+### 健康检查
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/health` | GET | 服务健康检查 |
+
+## 使用示例
+
+运行完整测试流程：
+```bash
+cd examples
+./test-flow.sh
+```
+
+详细文档请查看 [API文档](docs/API.md) 和 [使用指南](docs/使用指南.md)
 
 ## 许可证
 
