@@ -1,0 +1,31 @@
+{
+  "name": "homestay-cleaning-audit-api",
+  "version": "1.0.0",
+  "description": "民宿保洁排班验收回放链路 API",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts",
+    "seed": "ts-node scripts/seed-data.ts",
+    "test-request": "ts-node scripts/test-requests.ts",
+    "replay": "ts-node scripts/replay-anomalies.ts",
+    "export": "ts-node scripts/export-data.ts",
+    "reconcile": "ts-node scripts/reconcile.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "body-parser": "^1.20.2",
+    "csv-writer": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.5.0",
+    "@types/sqlite3": "^3.1.8",
+    "@types/uuid": "^9.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}
