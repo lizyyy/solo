@@ -77,10 +77,10 @@ http://localhost:3000/api/v1
 
 | 接口 | 方法 | 说明 |
 |------|------|------|
-| `/reconciliation/tasks` | POST | 创建对账任务 |
-| `/reconciliation/tasks` | GET | 获取对账任务列表 |
-| `/reconciliation/tasks/:taskId` | GET | 获取对账任务详情 |
-| `/reconciliation/tasks/:taskId/execute` | POST | 执行对账任务 |
+| `/reconciliation` | POST | 创建对账任务 |
+| `/reconciliation` | GET | 获取对账任务列表 |
+| `/reconciliation/:taskId` | GET | 获取对账任务详情 |
+| `/reconciliation/:taskId/execute` | POST | 执行对账任务 |
 
 ### 差异管理接口
 

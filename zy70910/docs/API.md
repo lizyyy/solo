@@ -23,7 +23,7 @@
 
 ### 1.1 导入订单CSV
 
-**接口地址**: `POST /import/orders`
+**接口地址**: `POST /import/orders/csv`
 
 **请求方式**: `multipart/form-data`
 
