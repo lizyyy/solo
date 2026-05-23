@@ -33,6 +33,11 @@ async function logOperation(operator, operation, targetType, targetId, detail) {
 app.post("/api/batches", async (req, res) => {
   try {
     const { batch_no, name, handler, remark, operator } = req.body;
+    const existing = await runQuery("SELECT * FROM batches WHERE batch_no = ?", [batch_no]);
+    if (existing.length > 0) {
+      await logOperation(operator || "system", "create_batch_idempotent", "batch", existing[0].id, "幂等返回已存在批次: " + batch_no);
+      return res.json({ success: true, data: existing[0], idempotent: true });
+    }
     const id = uuidv4();
     await runInsert("INSERT INTO batches (id, batch_no, name, handler, remark) VALUES (?, ?, ?, ?, ?)", [id, batch_no, name, handler, remark]);
     await logOperation(operator || "system", "create_batch", "batch", id, "创建批次: " + batch_no);
@@ -218,10 +223,12 @@ app.post("/api/orders/:id/process", async (req, res) => {
   try {
     const { id } = req.params;
     const { status, handler, reason, remark, operator } = req.body;
+    const previousRecords = await runQuery("SELECT * FROM processing_records WHERE order_id = ? ORDER BY created_at DESC LIMIT 1", [id]);
+    const previousStatus = previousRecords.length > 0 ? previousRecords[0].status : null;
     const processId = uuidv4();
-    await runInsert("INSERT INTO processing_records (id, order_id, status, handler, reason, remark) VALUES (?, ?, ?, ?, ?, ?)", [processId, id, status, handler, reason, remark]);
-    await logOperation(operator || handler || "system", "process_order", "order", id, "标记处理状态: " + status + ", 处理人: " + handler);
-    res.json({ success: true, data: { id: processId, status, handler } });
+    await runInsert("INSERT INTO processing_records (id, order_id, status, handler, reason, remark, previous_status) VALUES (?, ?, ?, ?, ?, ?, ?)", [processId, id, status, handler, reason, remark, previousStatus]);
+    await logOperation(operator || handler || "system", "process_order", "order", id, "标记处理状态: " + status + ", 处理人: " + handler + ", 变更前状态: " + (previousStatus || "无"));
+    res.json({ success: true, data: { id: processId, status, handler, previousStatus } });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -355,6 +362,150 @@ app.get("/api/exception-records", async (req, res) => {
     params.push(parseInt(pageSize), (parseInt(page) - 1) * parseInt(pageSize));
     const exceptions = await runQuery(sql, params);
     res.json({ success: true, data: exceptions, total: countResult[0].total, page: parseInt(page), pageSize: parseInt(pageSize) });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post("/api/refund/recalculate", async (req, res) => {
+  try {
+    const { batch_id, operator } = req.body;
+    const orders = await runQuery("SELECT * FROM orders WHERE batch_id = ?", [batch_id]);
+    const results = [];
+    
+    for (const order of orders) {
+      const checks = [];
+      
+      const paymentReceipts = await runQuery("SELECT * FROM payment_receipts WHERE order_no = ?", [order.order_no]);
+      const chargerLogs = await runQuery("SELECT * FROM charger_logs WHERE charger_id = ?", [order.charger_id]);
+      const refundRecords = await runQuery("SELECT * FROM processing_records WHERE order_id = ? AND status = 'refunded'", [order.id]);
+      
+      const hasPayment = paymentReceipts.length > 0;
+      const hasChargerLog = chargerLogs.length > 0;
+      if (hasPayment && !hasChargerLog) {
+        checks.push({
+          type: "uninitiated_charge",
+          description: "未启动扣费检测：有支付记录但无充电日志",
+          suggestion: "建议核实是否实际充电，考虑全额退款"
+        });
+      }
+      
+      if (refundRecords.length > 1) {
+        checks.push({
+          type: "duplicate_refund",
+          description: "重复退款检测：同一订单多次退款记录",
+          suggestion: "退款次数: " + refundRecords.length + "次，建议核查"
+        });
+      }
+      
+      const platformChannelMap = {
+        "alipay": ["支付宝"],
+        "wechat": ["微信支付"],
+        "cloud": ["云闪付"]
+      };
+      const validChannels = platformChannelMap[order.platform] || [];
+      const paymentChannelMatch = paymentReceipts.some(r => validChannels.includes(r.payment_method) || validChannels.some(v => (r.payment_method || "").includes(v)));
+      if (hasPayment && !paymentChannelMatch && validChannels.length > 0) {
+        checks.push({
+          type: "cross_platform_mismatch",
+          description: "跨平台订单检测：平台与支付渠道不匹配",
+          suggestion: "订单平台: " + order.platform + ", 实际支付渠道: " + (paymentReceipts[0]?.payment_method || "未知")
+        });
+      }
+      
+      results.push({
+        order_id: order.id,
+        order_no: order.order_no,
+        amount: order.amount,
+        checks: checks,
+        risk_level: checks.length === 0 ? "normal" : checks.length >= 2 ? "high" : "medium"
+      });
+    }
+    
+    await logOperation(operator || "system", "refund_recalculate", "batch", batch_id, "重新计算退款审核: " + orders.length + "条订单");
+    res.json({ success: true, data: results, total: orders.length });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get("/api/orders/:id/trace", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const orders = await runQuery("SELECT * FROM orders WHERE id = ?", [id]);
+    if (orders.length === 0) {
+      return res.status(404).json({ success: false, error: "订单不存在" });
+    }
+    const order = orders[0];
+    
+    const chargerLogs = await runQuery("SELECT * FROM charger_logs WHERE charger_id = ? ORDER BY event_time DESC", [order.charger_id]);
+    const paymentReceipts = await runQuery("SELECT * FROM payment_receipts WHERE order_no = ? ORDER BY created_at DESC", [order.order_no]);
+    const processingRecords = await runQuery("SELECT * FROM processing_records WHERE order_id = ? ORDER BY created_at DESC", [id]);
+    const exceptionRecords = await runQuery("SELECT * FROM exception_records WHERE order_id = ? ORDER BY created_at DESC", [id]);
+    const operationLogs = await runQuery("SELECT * FROM operation_logs WHERE target_id = ? AND target_type = 'order' ORDER BY created_at DESC", [id]);
+    
+    res.json({
+      success: true,
+      data: {
+        order: order,
+        charger_logs: chargerLogs,
+        payment_receipts: paymentReceipts,
+        processing_records: processingRecords,
+        exception_records: exceptionRecords,
+        operation_logs: operationLogs
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get("/api/reports/batch/:batchId", async (req, res) => {
+  try {
+    const { batchId } = req.params;
+    const batches = await runQuery("SELECT * FROM batches WHERE id = ?", [batchId]);
+    if (batches.length === 0) {
+      return res.status(404).json({ success: false, error: "批次不存在" });
+    }
+    const batch = batches[0];
+    
+    const orders = await runQuery("SELECT * FROM orders WHERE batch_id = ?", [batchId]);
+    const totalAmount = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
+    const totalElectricity = orders.reduce((sum, o) => sum + (o.electricity || 0), 0);
+    
+    const processingRecords = await runQuery("SELECT * FROM processing_records WHERE order_id IN (SELECT id FROM orders WHERE batch_id = ?)", [batchId]);
+    const statusStats = {};
+    for (const record of processingRecords) {
+      statusStats[record.status] = (statusStats[record.status] || 0) + 1;
+    }
+    
+    const exceptionRecords = await runQuery("SELECT * FROM exception_records WHERE batch_id = ?", [batchId]);
+    const exceptionStats = {};
+    for (const record of exceptionRecords) {
+      exceptionStats[record.exception_type] = (exceptionStats[record.exception_type] || 0) + 1;
+    }
+    
+    const chargerLogs = await runQuery("SELECT * FROM charger_logs WHERE batch_id = ?", [batchId]);
+    const paymentReceipts = await runQuery("SELECT * FROM payment_receipts WHERE batch_id = ?", [batchId]);
+    
+    const report = {
+      batch_info: batch,
+      summary: {
+        total_orders: orders.length,
+        total_amount: totalAmount,
+        total_electricity: totalElectricity,
+        avg_amount: orders.length > 0 ? totalAmount / orders.length : 0,
+        charger_log_count: chargerLogs.length,
+        payment_receipt_count: paymentReceipts.length
+      },
+      status_statistics: statusStats,
+      exception_statistics: exceptionStats,
+      order_count: orders.length,
+      processing_count: processingRecords.length,
+      exception_count: exceptionRecords.length
+    };
+    
+    res.json({ success: true, data: report });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
