@@ -10,7 +10,7 @@ import sys
 import time
 from typing import Dict, Any
 
-BASE_URL = "http://localhost:8001"
+BASE_URL = "http://localhost:8000"
 
 
 class Colors:

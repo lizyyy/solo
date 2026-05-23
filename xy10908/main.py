@@ -1,10 +1,14 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exception_handlers import RequestValidationError
+from fastapi.exceptions import HTTPException as FastAPIHTTPException
 from sqlalchemy.orm import Session, sessionmaker
 from typing import List, Optional
 import json
 import traceback
+from starlette.requests import Request as StarletteRequest
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.concurrency import iterate_in_threadpool
 
 from database import engine, get_db, Base
 import models
@@ -33,6 +37,28 @@ def safe_log_exception(endpoint: str, raw_input: str, error_message: str, proces
     except Exception:
         pass
 
+
+class RequestBodyCaptureMiddleware(BaseHTTPMiddleware):
+    """中间件：捕获请求体，用于异常日志记录"""
+    async def dispatch(self, request: Request, call_next):
+        try:
+            body = await request.body()
+            request.state.raw_body = body
+            request.state.raw_body_str = body.decode(errors="replace") if body else ""
+        except Exception:
+            request.state.raw_body = b""
+            request.state.raw_body_str = ""
+        
+        async def receive() -> dict:
+            return {"type": "http.request", "body": request.state.raw_body, "more_body": False}
+        
+        new_request = StarletteRequest(request.scope, receive=receive)
+        new_request.state.raw_body = request.state.raw_body
+        new_request.state.raw_body_str = request.state.raw_body_str
+        
+        return await call_next(new_request)
+
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -41,16 +67,38 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_middleware(RequestBodyCaptureMiddleware)
+
+
+def get_request_body(request: Request) -> str:
+    """安全获取请求体"""
+    try:
+        return getattr(request.state, "raw_body_str", "")
+    except Exception:
+        return ""
+
+
+def safe_serialize_errors(errors):
+    """安全序列化验证错误，移除不可序列化对象"""
+    try:
+        result = []
+        for err in errors:
+            err_dict = {}
+            for key, value in err.items():
+                if key == "ctx":
+                    err_dict[key] = {k: str(v) for k, v in value.items()}
+                else:
+                    err_dict[key] = value
+            result.append(err_dict)
+        return result
+    except Exception:
+        return str(errors)
+
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     try:
-        body = await request.body()
-        try:
-            raw_input = body.decode()
-        except:
-            raw_input = str(body)
-        
+        raw_input = get_request_body(request)
         safe_log_exception(
             endpoint=request.url.path,
             raw_input=raw_input,
@@ -65,7 +113,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={
             "success": False,
             "message": "请求参数验证失败",
-            "errors": exc.errors()
+            "errors": safe_serialize_errors(exc.errors())
         }
     )
 
@@ -73,12 +121,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     try:
-        body = await request.body()
-        try:
-            raw_input = body.decode()
-        except:
-            raw_input = str(body)
-        
+        raw_input = get_request_body(request)
         safe_log_exception(
             endpoint=request.url.path,
             raw_input=raw_input,
@@ -97,15 +140,33 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 
 
+@app.exception_handler(json.JSONDecodeError)
+async def json_decode_exception_handler(request: Request, exc: json.JSONDecodeError):
+    try:
+        raw_input = get_request_body(request)
+        safe_log_exception(
+            endpoint=request.url.path,
+            raw_input=raw_input,
+            error_message=f"JSON 解码错误: {str(exc)}",
+            processing_result="非法 JSON 请求"
+        )
+    except Exception:
+        pass
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "success": False,
+            "message": "非法 JSON 请求格式",
+            "error_type": "json_decode_error"
+        }
+    )
+
+
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
     try:
-        body = await request.body()
-        try:
-            raw_input = body.decode()
-        except:
-            raw_input = str(body)
-        
+        raw_input = get_request_body(request)
         safe_log_exception(
             endpoint=request.url.path,
             raw_input=raw_input,

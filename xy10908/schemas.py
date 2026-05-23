@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, ValidationInfo
 from datetime import datetime
 from typing import Optional, List
 
@@ -24,8 +24,8 @@ class Cabinet(CabinetBase):
 class SKUStockBase(BaseModel):
     sku_code: str
     sku_name: Optional[str] = None
-    current_quantity: int = 0
-    unit_price: float = 0.0
+    current_quantity: int = Field(default=0, ge=0, description="库存数量必须为非负数")
+    unit_price: float = Field(default=0.0, ge=0.0, description="单价必须为非负数")
     expiration_date: Optional[datetime] = None
 
 
@@ -44,8 +44,8 @@ class SKUStock(SKUStockBase):
 class ReplenishmentItemBase(BaseModel):
     sku_code: str
     sku_name: Optional[str] = None
-    replenish_quantity: int
-    unit_price: float = 0.0
+    replenish_quantity: int = Field(gt=0, description="补货数量必须为正数")
+    unit_price: float = Field(default=0.0, ge=0.0, description="单价必须为非负数")
     expiration_date: Optional[datetime] = None
 
 
@@ -67,8 +67,8 @@ class DamageRecordBase(BaseModel):
     sku_code: str
     sku_name: Optional[str] = None
     damage_type: str
-    quantity: int
-    unit_price: float = 0.0
+    quantity: int = Field(ge=0, description="货损数量必须为非负数")
+    unit_price: float = Field(default=0.0, ge=0.0, description="单价必须为非负数")
     reason: Optional[str] = None
 
 
@@ -89,8 +89,8 @@ class DamageRecord(DamageRecordBase):
 class ExpiredRemovalBase(BaseModel):
     sku_code: str
     sku_name: Optional[str] = None
-    quantity: int
-    unit_price: float = 0.0
+    quantity: int = Field(ge=0, description="临期下架数量必须为非负数")
+    unit_price: float = Field(default=0.0, ge=0.0, description="单价必须为非负数")
     expiration_date: Optional[datetime] = None
 
 
