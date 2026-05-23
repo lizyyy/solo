@@ -57,15 +57,15 @@ class ImportService {
                         results.push(order);
                 }
                 catch (e) {
-                    errors.push('行 ' + lineNumber + ': ' + e.message);
+                    errors.push(`行 ${lineNumber}: ${e.message}`);
                 }
             })
                 .on('end', () => {
-                dataStore_1.default.dataStore.dataS;
+                dataStore_1.default.saveServiceOrders(results);
                 resolve({ success: errors.length === 0, data: results, errors, totalCount: lineNumber, validCount: results.length });
             })
                 .on('error', (err) => {
-                errors.push('文件读取错误: ' + err.message);
+                errors.push(`文件读取错误: ${err.message}`);
                 resolve({ success: false, data: results, errors, totalCount: lineNumber, validCount: results.length });
             });
         });
@@ -83,14 +83,14 @@ class ImportService {
                     schedules.push(schedule);
                 }
                 catch (e) {
-                    errors.push('条目 ' + (index + 1) + ': ' + e.message);
+                    errors.push(`条目 ${index + 1}: ${e.message}`);
                 }
             });
             dataStore_1.default.saveSchedules(schedules);
             return { success: errors.length === 0, data: schedules, errors, totalCount: scheduleArray.length, validCount: schedules.length };
         }
         catch (e) {
-            return { success: false, data: [], errors: ['JSON解析错误: ' + e.message], totalCount: 0, validCount: 0 };
+            return { success: false, data: [], errors: [`JSON解析错误: ${e.message}`], totalCount: 0, validCount: 0 };
         }
     }
     async importElderProfilesFromJSON(filePath) {
@@ -106,25 +106,25 @@ class ImportService {
                     elders.push(elder);
                 }
                 catch (e) {
-                    errors.push('条目 ' + (index + 1) + ': ' + e.message);
+                    errors.push(`条目 ${index + 1}: ${e.message}`);
                 }
             });
             dataStore_1.default.saveElders(elders);
             return { success: errors.length === 0, data: elders, errors, totalCount: elderArray.length, validCount: elders.length };
         }
         catch (e) {
-            return { success: false, data: [], errors: ['JSON解析错误: ' + e.message], totalCount: 0, validCount: 0 };
+            return { success: false, data: [], errors: [`JSON解析错误: ${e.message}`], totalCount: 0, validCount: 0 };
         }
     }
     parseServiceOrder(data, lineNumber) {
         const requiredFields = ['orderNo', 'elderId', 'elderName', 'nurseId', 'nurseName', 'serviceDate', 'serviceTime', 'serviceItems', 'actualDuration', 'status'];
         const missing = requiredFields.filter(f => !data[f]);
         if (missing.length > 0)
-            throw new Error('缺少必填字段: ' + missing.join(', '));
+            throw new Error(`缺少必填字段: ${missing.join(', ')}`);
         const statusMap = { '已完成': 'completed', '待处理': 'pending', '已取消': 'cancelled' };
         const status = statusMap[data.status];
         if (!status)
-            throw new Error('无效的状态值: ' + data.status);
+            throw new Error(`无效的状态值: ${data.status}`);
         return {
             id: (0, uuid_1.v4)(),
             orderNo: data.orderNo,
@@ -146,7 +146,7 @@ class ImportService {
         const requiredFields = ['nurseId', 'nurseName', 'date', 'timeSlots'];
         const missing = requiredFields.filter(f => !data[f]);
         if (missing.length > 0)
-            throw new Error('缺少必填字段: ' + missing.join(', '));
+            throw new Error(`缺少必填字段: ${missing.join(', ')}`);
         if (!Array.isArray(data.timeSlots))
             throw new Error('timeSlots 必须是数组');
         return {
@@ -170,7 +170,7 @@ class ImportService {
         const requiredFields = ['id', 'name', 'idCard', 'phone', 'address', 'district'];
         const missing = requiredFields.filter(f => !data[f]);
         if (missing.length > 0)
-            throw new Error('缺少必填字段: ' + missing.join(', '));
+            throw new Error(`缺少必填字段: ${missing.join(', ')}`);
         return {
             id: data.id,
             name: data.name,
