@@ -1,0 +1,23 @@
+{
+  "name": "domestic-worker-trial-api",
+  "version": "1.0.0",
+  "description": "家政阿姨试工 API 服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "init-db": "node scripts/init-db.js",
+    "seed": "node scripts/seed-data.js",
+    "test": "node scripts/test-api.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1",
+    "joi": "^17.11.0",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
