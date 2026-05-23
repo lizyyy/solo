@@ -19,7 +19,7 @@ router.post('/', async (req, res, next) => {
   try {
     const { error, value } = petSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const id = await DBUtils.insert('pets', value);
@@ -68,7 +68,7 @@ router.get('/:id', async (req, res, next) => {
   try {
     const pet = await DBUtils.getOne('SELECT * FROM pets WHERE id = ?', [req.params.id]);
     if (!pet) {
-      return ResponseUtil.notFound(res, '宠物档案不存在');
+      return await ResponseUtil.notFound(req, res, '宠物档案不存在');
     }
     ResponseUtil.success(res, pet);
   } catch (err) {
@@ -80,12 +80,12 @@ router.put('/:id', async (req, res, next) => {
   try {
     const { error, value } = petSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const existing = await DBUtils.getOne('SELECT * FROM pets WHERE id = ?', [req.params.id]);
     if (!existing) {
-      return ResponseUtil.notFound(res, '宠物档案不存在');
+      return await ResponseUtil.notFound(req, res, '宠物档案不存在');
     }
 
     await DBUtils.update('pets', value, req.params.id);
@@ -100,7 +100,7 @@ router.delete('/:id', async (req, res, next) => {
   try {
     const existing = await DBUtils.getOne('SELECT * FROM pets WHERE id = ?', [req.params.id]);
     if (!existing) {
-      return ResponseUtil.notFound(res, '宠物档案不存在');
+      return await ResponseUtil.notFound(req, res, '宠物档案不存在');
     }
 
     const activeOrders = await DBUtils.getOne(
@@ -108,7 +108,7 @@ router.delete('/:id', async (req, res, next) => {
       [req.params.id]
     );
     if (activeOrders.count > 0) {
-      return ResponseUtil.conflict(res, '该宠物有活跃寄养订单，无法删除');
+      return await ResponseUtil.conflict(req, res, '该宠物有活跃寄养订单，无法删除');
     }
 
     await DBUtils.delete('pets', req.params.id);

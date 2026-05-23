@@ -100,7 +100,7 @@ router.get('/:id', async (req, res, next) => {
     `, [req.params.id]);
 
     if (!execution) {
-      return ResponseUtil.notFound(res, '班次执行记录不存在');
+      return await ResponseUtil.notFound(req, res, '班次执行记录不存在');
     }
 
     ResponseUtil.success(res, execution);
@@ -113,7 +113,7 @@ router.patch('/:id/execute', async (req, res, next) => {
   try {
     const { error, value } = executeSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const existing = await DBUtils.getOne(
@@ -121,11 +121,11 @@ router.patch('/:id/execute', async (req, res, next) => {
       [req.params.id]
     );
     if (!existing) {
-      return ResponseUtil.notFound(res, '班次执行记录不存在');
+      return await ResponseUtil.notFound(req, res, '班次执行记录不存在');
     }
 
     if (existing.status === 'completed') {
-      return ResponseUtil.conflict(res, '该班次已执行，无需重复操作');
+      return await ResponseUtil.conflict(req, res, '该班次已执行，无需重复操作');
     }
 
     await DBUtils.update('shift_executions', {
@@ -151,7 +151,7 @@ router.patch('/:id/missed', async (req, res, next) => {
   try {
     const { administered_by, notes } = req.body;
     if (!administered_by) {
-      return ResponseUtil.invalidInput(res, '操作人不能为空');
+      return await ResponseUtil.invalidInput(req, res, '操作人不能为空');
     }
 
     const existing = await DBUtils.getOne(
@@ -159,7 +159,7 @@ router.patch('/:id/missed', async (req, res, next) => {
       [req.params.id]
     );
     if (!existing) {
-      return ResponseUtil.notFound(res, '班次执行记录不存在');
+      return await ResponseUtil.notFound(req, res, '班次执行记录不存在');
     }
 
     await DBUtils.update('shift_executions', {
@@ -185,7 +185,7 @@ router.patch('/:id/alarm/acknowledge', async (req, res, next) => {
   try {
     const { error, value } = alarmSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const existing = await DBUtils.getOne(
@@ -193,11 +193,11 @@ router.patch('/:id/alarm/acknowledge', async (req, res, next) => {
       [req.params.id]
     );
     if (!existing) {
-      return ResponseUtil.notFound(res, '班次执行记录不存在');
+      return await ResponseUtil.notFound(req, res, '班次执行记录不存在');
     }
 
     if (!existing.has_alarm) {
-      return ResponseUtil.conflict(res, '该班次无待确认的告警');
+      return await ResponseUtil.conflict(req, res, '该班次无待确认的告警');
     }
 
     await DBUtils.update('shift_executions', {
@@ -220,7 +220,7 @@ router.patch('/:id/correct', async (req, res, next) => {
   try {
     const { administered_by, actual_dosage, notes, compensation_notes } = req.body;
     if (!administered_by || !actual_dosage) {
-      return ResponseUtil.invalidInput(res, '操作人和实际剂量不能为空');
+      return await ResponseUtil.invalidInput(req, res, '操作人和实际剂量不能为空');
     }
 
     const existing = await DBUtils.getOne(
@@ -228,7 +228,7 @@ router.patch('/:id/correct', async (req, res, next) => {
       [req.params.id]
     );
     if (!existing) {
-      return ResponseUtil.notFound(res, '班次执行记录不存在');
+      return await ResponseUtil.notFound(req, res, '班次执行记录不存在');
     }
 
     await DBUtils.update('shift_executions', {

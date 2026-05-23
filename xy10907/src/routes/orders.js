@@ -18,16 +18,16 @@ router.post('/', async (req, res, next) => {
   try {
     const { error, value } = orderSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const pet = await DBUtils.getOne('SELECT * FROM pets WHERE id = ?', [value.pet_id]);
     if (!pet) {
-      return ResponseUtil.notFound(res, '宠物档案不存在');
+      return await ResponseUtil.notFound(req, res, '宠物档案不存在');
     }
 
     if (moment(value.check_out_date).isBefore(value.check_in_date)) {
-      return ResponseUtil.invalidInput(res, '退房日期不能早于入住日期');
+      return await ResponseUtil.invalidInput(req, res, '退房日期不能早于入住日期');
     }
 
     const id = await DBUtils.insert('orders', value);
@@ -91,7 +91,7 @@ router.get('/:id', async (req, res, next) => {
       WHERE o.id = ?
     `, [req.params.id]);
     if (!order) {
-      return ResponseUtil.notFound(res, '寄养订单不存在');
+      return await ResponseUtil.notFound(req, res, '寄养订单不存在');
     }
     ResponseUtil.success(res, order);
   } catch (err) {
@@ -103,12 +103,12 @@ router.put('/:id', async (req, res, next) => {
   try {
     const { error, value } = orderSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const existing = await DBUtils.getOne('SELECT * FROM orders WHERE id = ?', [req.params.id]);
     if (!existing) {
-      return ResponseUtil.notFound(res, '寄养订单不存在');
+      return await ResponseUtil.notFound(req, res, '寄养订单不存在');
     }
 
     await DBUtils.update('orders', value, req.params.id);
@@ -128,12 +128,12 @@ router.patch('/:id/status', async (req, res, next) => {
   try {
     const { status } = req.body;
     if (!['active', 'completed', 'cancelled'].includes(status)) {
-      return ResponseUtil.invalidInput(res, '无效的订单状态');
+      return await ResponseUtil.invalidInput(req, res, '无效的订单状态');
     }
 
     const existing = await DBUtils.getOne('SELECT * FROM orders WHERE id = ?', [req.params.id]);
     if (!existing) {
-      return ResponseUtil.notFound(res, '寄养订单不存在');
+      return await ResponseUtil.notFound(req, res, '寄养订单不存在');
     }
 
     await DBUtils.update('orders', { status }, req.params.id);

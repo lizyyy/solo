@@ -18,7 +18,7 @@ router.post('/', async (req, res, next) => {
   try {
     const { error, value } = reportSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const id = await DBUtils.insert('care_reports', value);
@@ -34,17 +34,17 @@ router.post('/generate', async (req, res, next) => {
     const { order_id, pet_id, start_date, end_date, generated_by } = req.body;
 
     if (!order_id || !pet_id) {
-      return ResponseUtil.invalidInput(res, '订单ID和宠物ID不能为空');
+      return await ResponseUtil.invalidInput(req, res, '订单ID和宠物ID不能为空');
     }
 
     const order = await DBUtils.getOne('SELECT * FROM orders WHERE id = ?', [order_id]);
     if (!order) {
-      return ResponseUtil.notFound(res, '寄养订单不存在');
+      return await ResponseUtil.notFound(req, res, '寄养订单不存在');
     }
 
     const pet = await DBUtils.getOne('SELECT * FROM pets WHERE id = ?', [pet_id]);
     if (!pet) {
-      return ResponseUtil.notFound(res, '宠物档案不存在');
+      return await ResponseUtil.notFound(req, res, '宠物档案不存在');
     }
 
     const start = start_date ? moment(start_date) : moment(order.check_in_date);
@@ -189,7 +189,7 @@ router.get('/:id', async (req, res, next) => {
     `, [req.params.id]);
 
     if (!report) {
-      return ResponseUtil.notFound(res, '护理报告不存在');
+      return await ResponseUtil.notFound(req, res, '护理报告不存在');
     }
 
     ResponseUtil.success(res, report);
@@ -239,7 +239,7 @@ router.get('/export/csv', async (req, res, next) => {
     const reports = await DBUtils.getAll(sql, params);
 
     if (reports.length === 0) {
-      return ResponseUtil.notFound(res, '没有可导出的报告数据');
+      return await ResponseUtil.notFound(req, res, '没有可导出的报告数据');
     }
 
     const json2csvParser = new Parser();

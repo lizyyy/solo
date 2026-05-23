@@ -24,7 +24,7 @@ const errorHandler = async (err, req, res, next) => {
   try {
     await DBUtils.insert('exception_logs', {
       request_id: requestId,
-      endpoint: req.path,
+      endpoint: req.originalUrl || req.path,
       method: req.method,
       original_input: originalInput,
       error_message: err.stack || err.message,

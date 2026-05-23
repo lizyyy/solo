@@ -115,16 +115,16 @@ router.post('/', async (req, res, next) => {
   try {
     const { error, value } = medicationPlanSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const order = await DBUtils.getOne('SELECT * FROM orders WHERE id = ?', [value.order_id]);
     if (!order) {
-      return ResponseUtil.notFound(res, '寄养订单不存在');
+      return await ResponseUtil.notFound(req, res, '寄养订单不存在');
     }
 
     if (moment(value.end_date).isBefore(value.start_date)) {
-      return ResponseUtil.invalidInput(res, '结束日期不能早于开始日期');
+      return await ResponseUtil.invalidInput(req, res, '结束日期不能早于开始日期');
     }
 
     const planId = await DBUtils.insert('medication_plans', { ...value, version: 1, is_active: 1 });
@@ -213,7 +213,7 @@ router.get('/:id', async (req, res, next) => {
       WHERE mp.id = ?
     `, [req.params.id]);
     if (!plan) {
-      return ResponseUtil.notFound(res, '喂药计划不存在');
+      return await ResponseUtil.notFound(req, res, '喂药计划不存在');
     }
 
     const executions = await DBUtils.getAll(
@@ -231,7 +231,7 @@ router.post('/:id/change-request', async (req, res, next) => {
   try {
     const { error, value } = changeRequestSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const existingPlan = await DBUtils.getOne(
@@ -239,7 +239,7 @@ router.post('/:id/change-request', async (req, res, next) => {
       [req.params.id]
     );
     if (!existingPlan) {
-      return ResponseUtil.notFound(res, '喂药计划不存在');
+      return await ResponseUtil.notFound(req, res, '喂药计划不存在');
     }
 
     const existingRequest = await DBUtils.getOne(
@@ -295,7 +295,7 @@ router.post('/:id/versions', async (req, res, next) => {
       [req.params.id]
     );
     if (!existingPlan) {
-      return ResponseUtil.notFound(res, '喂药计划不存在');
+      return await ResponseUtil.notFound(req, res, '喂药计划不存在');
     }
 
     const { error, value } = medicationPlanSchema.validate({
@@ -306,7 +306,7 @@ router.post('/:id/versions', async (req, res, next) => {
       medication_name: existingPlan.medication_name
     });
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const newVersion = existingPlan.version + 1;
@@ -345,7 +345,7 @@ router.get('/:id/history', async (req, res, next) => {
       [req.params.id]
     );
     if (!currentPlan) {
-      return ResponseUtil.notFound(res, '喂药计划不存在');
+      return await ResponseUtil.notFound(req, res, '喂药计划不存在');
     }
 
     const history = await DBUtils.getAll(`

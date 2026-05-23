@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const { logException } = require('./exceptionLogger');
 
 class ResponseUtil {
   static success(res, data, message = '操作成功', statusCode = 200) {
@@ -37,18 +38,22 @@ class ResponseUtil {
     });
   }
 
-  static notFound(res, message = '资源不存在') {
+  static async notFound(req, res, message = '资源不存在') {
+    const requestId = await logException(req, 'not_found', message);
     return res.status(404).json({
       success: false,
+      request_id: requestId,
       status: 'not_found',
       message,
       data: null
     });
   }
 
-  static invalidInput(res, message = '输入参数无效', errors = null) {
+  static async invalidInput(req, res, message = '输入参数无效', errors = null) {
+    const requestId = await logException(req, 'invalid_input', message, null, errors);
     return res.status(400).json({
       success: false,
+      request_id: requestId,
       status: 'invalid_input',
       message,
       errors,
@@ -56,9 +61,11 @@ class ResponseUtil {
     });
   }
 
-  static conflict(res, message = '资源冲突', data = null) {
+  static async conflict(req, res, message = '资源冲突', data = null) {
+    const requestId = await logException(req, 'conflict', message);
     return res.status(409).json({
       success: false,
+      request_id: requestId,
       status: 'conflict',
       message,
       data

@@ -57,7 +57,7 @@ router.get('/:id', async (req, res, next) => {
     );
 
     if (!confirmation) {
-      return ResponseUtil.notFound(res, '变更确认记录不存在');
+      return await ResponseUtil.notFound(req, res, '变更确认记录不存在');
     }
 
     try {
@@ -76,7 +76,7 @@ router.patch('/:id/approve', async (req, res, next) => {
   try {
     const { error, value } = reviewSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const confirmation = await DBUtils.getOne(
@@ -85,11 +85,11 @@ router.patch('/:id/approve', async (req, res, next) => {
     );
 
     if (!confirmation) {
-      return ResponseUtil.notFound(res, '变更确认记录不存在');
+      return await ResponseUtil.notFound(req, res, '变更确认记录不存在');
     }
 
     if (confirmation.status !== 'pending_review') {
-      return ResponseUtil.conflict(res, '该变更请求已处理，无法重复审批');
+      return await ResponseUtil.conflict(req, res, '该变更请求已处理，无法重复审批');
     }
 
     let newData;
@@ -153,7 +153,7 @@ router.patch('/:id/reject', async (req, res, next) => {
   try {
     const { error, value } = reviewSchema.validate(req.body);
     if (error) {
-      return ResponseUtil.invalidInput(res, '参数验证失败', error.details);
+      return await ResponseUtil.invalidInput(req, res, '参数验证失败', error.details);
     }
 
     const confirmation = await DBUtils.getOne(
@@ -162,11 +162,11 @@ router.patch('/:id/reject', async (req, res, next) => {
     );
 
     if (!confirmation) {
-      return ResponseUtil.notFound(res, '变更确认记录不存在');
+      return await ResponseUtil.notFound(req, res, '变更确认记录不存在');
     }
 
     if (confirmation.status !== 'pending_review') {
-      return ResponseUtil.conflict(res, '该变更请求已处理，无法重复审批');
+      return await ResponseUtil.conflict(req, res, '该变更请求已处理，无法重复审批');
     }
 
     await DBUtils.update('change_confirmations', {
