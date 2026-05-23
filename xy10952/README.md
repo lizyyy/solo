@@ -14,14 +14,30 @@
 - ✅ **异常保留**: 坏行和异常样本保留原始行号位置
 - ✅ **文件冲突处理**: 支持覆盖和追加模式
 
-## 快速开始（无需安装依赖）
+## 快速开始（零依赖！）
 
-### 方式一：直接运行完整功能（推荐）
+### 方式一：直接运行核心 CLI（推荐）
 
-项目包含一个零依赖的完整版本，可以直接运行体验所有核心功能：
+**核心 CLI 入口已完全零依赖，可以直接运行：
 
 ```bash
-node run-simple.js
+# 查看帮助
+node src/index.js --help
+
+# 查看版本
+node src/index.js --version
+
+# 基本运行
+node src/index.js
+
+# 强制覆盖输出
+node src/index.js --force
+
+# 自定义输入输出路径
+node src/index.js --orders ./data/orders.csv --output ./output
+
+# 追加模式
+node src/index.js --append
 ```
 
 这将直接运行分账工具，输出：
@@ -41,31 +57,15 @@ node run-simple.js
 node test-simple.mjs
 ```
 
-## 完整 CLI 版本（需安装依赖）
+## 可选：npm 安装使用
 
-如需使用 commander 的完整参数解析功能：
+项目也支持通过 npm 安装使用（可选，不影响核心功能）：
 
 ```bash
 npm install
-```
 
-安装完成后验证 CLI 入口：
-
-```bash
-node src/index.js --help
-```
-
-运行：
-
-```bash
-# 基本运行
-npm start
-
-# 强制覆盖输出
+# 通过 npm start 运行
 npm start -- --force
-
-# 自定义路径
-npm start -- --orders ./data/orders.csv --output ./output
 ```
 
 ## 使用方法
@@ -214,21 +214,16 @@ npm start -- --orders ~/my-orders.csv --output ~/my-reports
 
 ```
 .
-├── src/                  # 完整 CLI 版本（需 npm install）
-│   ├── index.js          # CLI入口和参数解析
-│   ├── config.js         # 配置管理
-│   ├── validator.js      # 数据校验
-│   ├── processor.js      # 核心分账逻辑
-│   └── reporter.js       # 报告生成
+├── src/
+│   └── index.js          # 核心 CLI 入口（零依赖！直接运行）
 ├── data/                 # 示例输入数据（包含测试坏行）
 │   ├── orders.csv        # 订单数据（含缺失金额、空金额等测试用例）
 │   ├── leaders.csv       # 团长数据
 │   ├── refunds.csv       # 退款数据
 │   └── commission.json   # 佣金配置
 ├── output/               # 输出目录
-├── run-simple.js         # 零依赖完整版本（推荐直接运行）
 ├── test-simple.mjs       # 核心逻辑测试（无需依赖）
-├── package.json
+├── package.json          # 可选 npm 支持
 └── README.md
 ```
 

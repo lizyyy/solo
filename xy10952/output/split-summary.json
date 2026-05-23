@@ -1,6 +1,6 @@
 {
   "summary": {
-    "generatedAt": "2026-05-23T18:17:52.600Z",
+    "generatedAt": "2026-05-23T18:35:09.533Z",
     "totalOrders": 11,
     "totalUniqueOrders": 11,
     "totalDuplicateOrders": 1,
@@ -318,7 +318,8 @@
       "rowIndex": 16,
       "type": "order",
       "errors": [
-        "缺少订单金额"
+        "缺少订单金额",
+        "订单金额无效"
       ],
       "originalRow": {
         "订单ID": "ORD014",
@@ -332,6 +333,7 @@
       "rowIndex": 17,
       "type": "order",
       "errors": [
+        "缺少订单金额",
         "订单金额无效"
       ],
       "originalRow": {
@@ -339,7 +341,7 @@
         "团长ID": "L003",
         "商品名称": "空字符串金额",
         "数量": "3",
-        "金额": "\"\""
+        "金额": ""
       }
     }
   ],
