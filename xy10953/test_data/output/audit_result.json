@@ -1,0 +1,60 @@
+{
+  "summary": {
+    "total_tickets": 10,
+    "valid_tickets": 9,
+    "tickets_with_recording": 6,
+    "tickets_without_recording": 3,
+    "recordings_found": 7,
+    "recordings_unmatched": 1,
+    "duration_mismatches": 1,
+    "sample_count": 3,
+    "missing_categories": {
+      "坐席编号不匹配": 2,
+      "时长差异过大": 1,
+      "通话时长过短": 1,
+      "缺少坐席编号": 1,
+      "录音文件缺失": 1
+    }
+  },
+  "bad_rows": [
+    {
+      "row_number": 9,
+      "error": "工单号为空",
+      "original_data": [
+        "",
+        "A1004",
+        "2:30"
+      ]
+    }
+  ],
+  "sampled_tickets": [
+    {
+      "row_number": 2,
+      "ticket_id": "20240100001",
+      "agent_id": "A1001",
+      "duration_seconds": 180,
+      "recording_file": "test_data/recordings/T20240100001_A1001_180s.wav"
+    },
+    {
+      "row_number": 6,
+      "ticket_id": "20240100005",
+      "agent_id": "A1003",
+      "duration_seconds": 60,
+      "recording_file": "test_data/recordings/ticket-20240100005-agent-1003_60s.wav"
+    },
+    {
+      "row_number": 4,
+      "ticket_id": "20240100003",
+      "agent_id": "A1001",
+      "duration_seconds": 95,
+      "recording_file": "test_data/recordings/T20240100003_A1001_95s.wav"
+    }
+  ],
+  "unmatched_recordings": [
+    {
+      "file_path": "test_data/recordings/UNKNOWN_001.wav",
+      "parsed_ticket_id": null,
+      "parsed_agent_id": null
+    }
+  ]
+}
