@@ -253,12 +253,23 @@ class ChangeRequestService:
         change_request.compensation_amount = review.compensation_amount or 0
 
         if review.status == ChangeStatus.APPROVED:
+            original_count = len(change_request.original_seat_ids)
+            new_count = len(change_request.requested_seat_ids)
+
             SeatService.release_seats(db, change_request.original_seat_ids)
             SeatService.lock_seats(db, change_request.requested_seat_ids, change_request.order_id)
 
+            show = db.query(Show).filter(Show.id == change_request.show_id).first()
+            seat_diff = original_count - new_count
+            show.available_seats += seat_diff
+
             order = db.query(GroupOrder).filter(GroupOrder.id == change_request.order_id).first()
             order.requested_seats_count = change_request.new_seat_count
+            order.actual_seats_count = new_count
             order.status = OrderStatus.MODIFIED
+
+            new_seats = db.query(Seat).filter(Seat.id.in_(change_request.requested_seat_ids)).all()
+            order.total_amount = sum(s.price for s in new_seats)
 
             windows = db.query(ReserveWindow).filter(
                 ReserveWindow.order_id == change_request.order_id,
