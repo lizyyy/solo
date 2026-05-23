@@ -31,6 +31,20 @@ class CourseDao {
     });
   }
 
+  findCoursesByCertificateType(certificateTypeId) {
+    return new Promise((resolve, reject) => {
+      db.all(`
+        SELECT c.*, ct.name as certificate_name
+        FROM courses c
+        JOIN certificate_types ct ON c.certificate_type_id = ct.id
+        WHERE c.certificate_type_id = ?
+      `, [certificateTypeId], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  }
+
   createCourseScore(score) {
     return new Promise((resolve, reject) => {
       const id = uuidv4();

@@ -31,8 +31,8 @@ for (const file of requiredFiles) {
   if (!exists) allPresent = false;
 }
 
-console.log('\n🔧 检查代码修复:');
-const checks = [
+console.log('\n🔧 检查第一轮修复:');
+const checksRound1 = [
   {
     name: 'data/ 目录自动创建',
     file: 'src/config/database.js',
@@ -60,7 +60,48 @@ const checks = [
   }
 ];
 
-for (const check of checks) {
+for (const check of checksRound1) {
+  const content = fs.readFileSync(path.join(__dirname, '..', check.file), 'utf-8');
+  const passed = check.pattern.test(content);
+  console.log(`  ${passed ? '✅' : '❌'} ${check.name}`);
+  if (!passed) allPresent = false;
+}
+
+console.log('\n🔧 检查第二轮修复（核心逻辑）:');
+const checksRound2 = [
+  {
+    name: '按证书类型过滤课程 findCoursesByCertificateType',
+    file: 'src/daos/courseDao.js',
+    pattern: /findCoursesByCertificateType/
+  },
+  {
+    name: '资格验证使用 findCoursesByCertificateType',
+    file: 'src/services/renewalService.js',
+    pattern: /findCoursesByCertificateType.*certificateTypeId/
+  },
+  {
+    name: '无成绩时默认不合格 requiredCourses.length > 0',
+    file: 'src/services/renewalService.js',
+    pattern: /isQualified.*=.*requiredCourses\.length > 0/
+  },
+  {
+    name: '缺证状态 hasValidCertificate 判断',
+    file: 'src/services/renewalService.js',
+    pattern: /hasValidCertificate/
+  },
+  {
+    name: '新增待培训状态',
+    file: 'src/services/renewalService.js',
+    pattern: /待培训/
+  },
+  {
+    name: '新增待取证状态',
+    file: 'src/services/renewalService.js',
+    pattern: /待取证/
+  }
+];
+
+for (const check of checksRound2) {
   const content = fs.readFileSync(path.join(__dirname, '..', check.file), 'utf-8');
   const passed = check.pattern.test(content);
   console.log(`  ${passed ? '✅' : '❌'} ${check.name}`);

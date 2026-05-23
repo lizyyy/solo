@@ -32,19 +32,46 @@ class RenewalService {
       throw new Error('员工不存在');
     }
 
-    const scores = await courseDao.findEmployeeCourseScores(employeeId);
+    const requiredCourses = await courseDao.findCoursesByCertificateType(certificateTypeId);
+    const allScores = await courseDao.findEmployeeCourseScores(employeeId);
     const retakes = await courseDao.findEmployeeRetakeRecords(employeeId);
-    
+
+    const relevantScoreMap = new Map();
+    for (const score of allScores) {
+      const existing = relevantScoreMap.get(score.course_id);
+      if (!existing || new Date(score.exam_date) > new Date(existing.exam_date)) {
+        relevantScoreMap.set(score.course_id, score);
+      }
+    }
+
     const details = {
       employeeName: employee.name,
       position: employee.position,
+      certificateTypeId: certificateTypeId,
+      requiredCourseCount: requiredCourses.length,
       courses: [],
-      pendingRetakes: 0
+      pendingRetakes: 0,
+      missingCourses: []
     };
 
-    let isQualified = true;
+    let isQualified = requiredCourses.length > 0;
 
-    for (const score of scores) {
+    for (const course of requiredCourses) {
+      const score = relevantScoreMap.get(course.id);
+      
+      if (!score) {
+        isQualified = false;
+        details.missingCourses.push(course.name);
+        details.courses.push({
+          courseName: course.name,
+          score: null,
+          examDate: null,
+          status: '未考试',
+          retakeCount: 0
+        });
+        continue;
+      }
+
       const courseRetakes = retakes.filter(r => r.course_id === score.course_id);
       const passedRetake = courseRetakes.find(r => r.is_passed);
       const pendingRetake = courseRetakes.find(r => r.status === 'pending');
@@ -96,7 +123,10 @@ class RenewalService {
         );
 
         let daysUntilExpiry = null;
+        let hasValidCertificate = false;
+        
         if (cert) {
+          hasValidCertificate = true;
           const expiryDate = new Date(cert.expiry_date);
           const today = new Date(checklistDate);
           daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
@@ -104,15 +134,17 @@ class RenewalService {
 
         const qualification = await this.checkEmployeeQualification(employee.id, req.certificate_type_id);
         
-        let status = 'pending';
-        if (daysUntilExpiry < 0) {
+        let status = '待取证';
+        if (!hasValidCertificate) {
+          status = qualification.isQualified ? '待取证' : '待培训';
+        } else if (daysUntilExpiry < 0) {
           status = '已过期';
         } else if (daysUntilExpiry <= 30) {
           status = '即将过期';
-        } else if (qualification.isQualified) {
-          status = '符合条件';
-        } else {
+        } else if (!qualification.isQualified) {
           status = '待补考';
+        } else {
+          status = '符合条件';
         }
 
         const checklist = await renewalDao.createRenewalChecklist({
