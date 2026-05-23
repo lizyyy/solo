@@ -135,4 +135,22 @@ router.post('/:id/completion-proof/:proofId/verify', async (req, res) => {
   }
 });
 
+router.get('/:id/reminders', async (req, res) => {
+  try {
+    const reminders = await repairOrderService.getReminderRecords(req.params.id);
+    res.json({ success: true, data: reminders });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/reminders/all/list', async (req, res) => {
+  try {
+    const reminders = await repairOrderService.getReminderRecords();
+    res.json({ success: true, data: reminders });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;

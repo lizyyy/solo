@@ -309,6 +309,25 @@ class RepairOrderService {
     return await dbGet(sql, [orderId]);
   }
 
+  async getReminderRecords(orderId = null) {
+    let sql = `
+      SELECT rr.*, ro.order_no, b.building_no, r.room_no
+      FROM reminder_records rr
+      JOIN repair_orders ro ON rr.repair_order_id = ro.id
+      JOIN rooms r ON ro.room_id = r.id
+      JOIN buildings b ON r.building_id = b.id
+    `;
+    const params = [];
+
+    if (orderId) {
+      sql += ' WHERE rr.repair_order_id = ?';
+      params.push(orderId);
+    }
+
+    sql += ' ORDER BY rr.reminded_at DESC';
+    return await dbAll(sql, params);
+  }
+
   async submitCompletionProof(orderId, proofData) {
     const order = await this.getOrderById(orderId);
     if (!order) {
@@ -459,6 +478,8 @@ class RepairOrderService {
       const statusHistory = await this.getStatusHistory(order.id);
       const outsourceInfo = await this.getOutsourceInfo(order.id);
       const proofs = await this.getCompletionProofs(order.id);
+      const reminders = await this.getReminderRecords(order.id);
+      const duplicateCount = reminders.filter(r => r.is_duplicate).length;
       
       exportData.push({
         工单编号: order.order_no,
@@ -479,6 +500,9 @@ class RepairOrderService {
         外包公司: outsourceInfo?.outsource_company || '',
         完工证明数量: proofs.length,
         是否已复核: order.status === 'verified' ? '是' : '否',
+        重复催办次数: duplicateCount,
+        催办总次数: reminders.length,
+        是否已合并: order.is_merged ? '是' : '否',
         状态变更次数: statusHistory.length
       });
     }

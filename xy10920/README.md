@@ -37,11 +37,12 @@ npm install
 npm run init-db
 ```
 
-### 3. 导入样例数据
+### 3. 导入样例数据（可重复执行）
 
 ```bash
 npm run seed
 ```
+> 每次执行会自动清理旧数据，重新插入干净的样例数据，不会撞唯一约束。
 
 ### 4. 启动服务
 
@@ -205,6 +206,16 @@ Content-Type: application/json
 }
 ```
 
+#### 查询单个工单的催办记录
+```
+GET /api/repair-orders/:id/reminders
+```
+
+#### 查询所有催办记录（含重复催办）
+```
+GET /api/repair-orders/reminders/all/list
+```
+
 ### 2. 报告与异常
 
 #### 导出报告
@@ -270,7 +281,15 @@ curl -X POST http://localhost:3000/api/repair-orders \
 
 2. 预期返回：`isDuplicate: true`，提示已合并
 3. 查询原工单，确认优先级已提升为 urgent
-4. 查看催办记录，确认为重复催办
+4. 查看该工单的催办记录
+```bash
+curl http://localhost:3000/api/repair-orders/1/reminders
+```
+5. 查看所有催办记录（物业统计重复催办）
+```bash
+curl http://localhost:3000/api/repair-orders/reminders/all/list
+```
+6. 导出报告，确认重复催办次数字段已记录
 
 ### 场景三：异常拦截
 

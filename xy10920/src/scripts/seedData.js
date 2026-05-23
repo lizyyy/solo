@@ -5,7 +5,18 @@ const dbPath = path.join(__dirname, '../../data/property_repair.db');
 const db = new sqlite3.Database(dbPath);
 
 db.serialize(() => {
-  console.log('开始初始化基础数据...');
+  console.log('开始初始化基础数据（先清理旧数据）...');
+
+  db.run('DELETE FROM reminder_records');
+  db.run('DELETE FROM status_history');
+  db.run('DELETE FROM outsource_assignments');
+  db.run('DELETE FROM completion_proofs');
+  db.run('DELETE FROM exception_records');
+  db.run('DELETE FROM repair_orders');
+  db.run('DELETE FROM rooms');
+  db.run('DELETE FROM buildings');
+  db.run('DELETE FROM handlers');
+  console.log('旧数据已清理');
 
   const buildings = [
     { building_no: '1栋', building_name: '1号楼', total_floors: 18 },
