@@ -13,11 +13,9 @@ class BatchStatus(str, enum.Enum):
 
 
 class GrievanceStatus(str, enum.Enum):
-    PENDING = "pending"
-    REVIEWING = "reviewing"
     APPROVED = "approved"
+    PENDING = "pending"
     REJECTED = "rejected"
-    PARTIAL = "partial"
 
 
 class RuleLevel(str, enum.Enum):
@@ -36,6 +34,7 @@ class Batch(Base):
     total_count = Column(Integer, default=0)
     success_count = Column(Integer, default=0)
     fail_count = Column(Integer, default=0)
+    pending_count = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     grievances = relationship("Grievance", back_populates="batch")

@@ -65,15 +65,15 @@ class OverdueDeclarationRule(BaseRule):
             )
         else:
             days_diff = (grievance.apply_time - grievance.flight_date).days
-            is_overdue = days_diff > 30
+            is_overdue = days_diff > 45
             grievance.is_overdue = is_overdue
             if is_overdue:
                 result = RuleResult(
                     rule_name=self.rule_name,
                     rule_code=self.rule_code,
                     passed=False,
-                    message=f"超时申报：航班日期至申请时间间隔 {days_diff} 天，超过30天期限",
-                    detail={"days_diff": days_diff, "limit_days": 30}
+                    message=f"超时申报：航班日期至申请时间间隔 {days_diff} 天，超过45天期限",
+                    detail={"days_diff": days_diff, "limit_days": 45}
                 )
             else:
                 result = RuleResult(
@@ -81,7 +81,7 @@ class OverdueDeclarationRule(BaseRule):
                     rule_code=self.rule_code,
                     passed=True,
                     message=f"申报及时：航班日期至申请时间间隔 {days_diff} 天",
-                    detail={"days_diff": days_diff, "limit_days": 30}
+                    detail={"days_diff": days_diff, "limit_days": 45}
                 )
         self._create_history(grievance, result)
         return result
@@ -271,11 +271,41 @@ class RulesEngine:
         for rule in self.rules:
             result = rule.evaluate(grievance)
             results.append(result)
-        all_passed = all(r.passed for r in results)
-        if all_passed:
-            grievance.status = GrievanceStatus.APPROVED
-        else:
+        
+        result_map = {r.rule_code: r for r in results}
+        
+        responsible_result = result_map.get("RULE_002")
+        if responsible_result and not responsible_result.passed:
             grievance.status = GrievanceStatus.REJECTED
+            self.db.commit()
+            return results
+        
+        overdue_result = result_map.get("RULE_001")
+        if overdue_result and not overdue_result.passed:
+            days_diff = overdue_result.detail.get("days_diff", 0)
+            if days_diff > 45:
+                grievance.status = GrievanceStatus.REJECTED
+                self.db.commit()
+                return results
+        
+        photo_result = result_map.get("RULE_004")
+        compensation_result = result_map.get("RULE_003")
+        
+        has_pending_issue = False
+        if photo_result and not photo_result.passed:
+            has_pending_issue = True
+        if compensation_result and not compensation_result.passed:
+            has_pending_issue = True
+        if overdue_result and not overdue_result.passed:
+            days_diff = overdue_result.detail.get("days_diff", 0)
+            if days_diff <= 45:
+                has_pending_issue = True
+        
+        if has_pending_issue:
+            grievance.status = GrievanceStatus.PENDING
+        else:
+            grievance.status = GrievanceStatus.APPROVED
+        
         self.db.commit()
         return results
 
