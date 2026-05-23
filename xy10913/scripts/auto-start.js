@@ -20,14 +20,33 @@ function checkDependencies() {
 
 function installDependencies() {
   console.log('📦 正在安装依赖...');
-  const result = spawnSync('npm', ['install', '--no-audit', '--no-fund'], {
-    cwd: projectRoot,
-    stdio: 'inherit',
-    shell: true
-  });
   
-  if (result.status !== 0) {
-    console.error('❌ 依赖安装失败');
+  const npmSources = [
+    { name: '官方源', 
+    args: ['install', '--no-audit', '--no-fund']
+  ];
+  
+  let installed = false;
+  for (const source of npmSources) {
+    console.log(`   尝试使用 ${source.name}...`);
+    const result = spawnSync('npm', source.args, {
+      cwd: projectRoot,
+      stdio: 'inherit',
+      shell: true
+    });
+    
+    if (result.status === 0) {
+      installed = true;
+      break;
+    }
+    console.log(`   ${source.name} 安装失败，尝试下一个...\n`);
+  }
+  
+  if (!installed) {
+    console.error('\n❌ 依赖安装失败');
+    console.error('💡 请尝试手动执行:');
+    console.error('   npm install');
+    console.error('   或配置 npm 镜像源后重试');
     process.exit(1);
   }
   console.log('✅ 依赖安装完成\n');

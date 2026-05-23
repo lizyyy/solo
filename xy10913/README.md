@@ -2,52 +2,67 @@
 
 摄影器材租赁店押金管理后端 API 服务，提供押金冻结、损坏扣款、逾期续租等审计流程。
 
-## ✅ 快速开始（零配置）
+## ⚡ 极速体验（零依赖，推荐）
 
-### 一键自检验证（推荐）
-
-**进入目录后直接执行，会自动安装依赖并运行完整测试：**
+**无需 npm install，直接运行！** 使用 Node.js 内置模块，100% 兼容原有功能。
 
 ```bash
 cd /Users/mac/pro/solo/workspaces/xy10913
+
+# 一键完整自检（自动启动服务 + 运行所有测试）
+npm run quick-test
+# 或
+node test/self-test-standalone.js
+
+# 一键启动服务
+npm run quick-start
+# 或
+node src/standalone.js
+```
+
+✅ **零依赖版本特性：**
+- 无需安装任何 npm 包
+- 本地 JSON 文件持久化（data/standalone-db.json）
+- 完整功能：押金冻结/损坏扣款/续租幂等/结算导出
+- 完全兼容原版 API 接口
+
+---
+
+## ✅ 快速开始（完整版）
+
+如果需要 SQLite 持久化版本：
+
+```bash
+# 自动安装依赖 + 启动服务
+npm start
+
+# 自动安装依赖 + 完整自检
 npm test
 ```
 
-`npm test` 会自动完成：
-1. ✅ 自动检测并安装依赖（如果没装）
-2. ✅ 自动启动 API 服务
-3. ✅ 运行完整自检套件
+## 🧪 自检覆盖范围
 
-### 一键启动服务
+所有版本均验证以下押金审计流程：
 
-```bash
-cd /Users/mac/pro/solo/workspaces/xy10913
-npm start
-```
+| 测试场景 | 验证内容 |
+|---------|---------|
+| **正常流程** | 创建设备→创建租赁→冻结押金→续租→损坏扣款→结算 |
+| **幂等性验证** | 相同 request_id 重复请求不产生新流水 |
+| **损坏扣款审计** | remaining_deposit 更新 + damage_deduction 流水生成 |
+| **异常处理** | 脏数据/无效ID 的错误处理和 exception_logs 留痕 |
+| **导出一致性** | CSV 导出内容和条数验证 |
 
-`npm start` 会自动完成：
-1. ✅ 自动检测并安装依赖（如果没装）
-2. ✅ 启动租赁设备押金 API 服务
+## 🔧 完整命令说明
 
-### 自检验证覆盖
-
-完整的押金审计流程验证：
-- ✅ **正常流程**：创建设备→创建租赁→冻结押金→续租→损坏扣款→结算
-- ✅ **幂等性验证**：相同 request_id 重复请求不产生新流水
-- ✅ **损坏扣款审计**：验证 remaining_deposit 更新 + damage_deduction 流水生成
-- ✅ **异常处理**：脏数据/无效ID 的错误处理和 exception_logs 留痕
-- ✅ **导出一致性**：CSV 导出内容和条数验证
-
-## 🔧 命令说明
-
-| 命令 | 说明 | 自动安装依赖 |
-|------|------|-------------|
-| `npm start` | 启动 API 服务 | ✅ |
-| `npm test` | 运行完整自检 | ✅ |
-| `npm run verify` | 同 npm test | ✅ |
-| `npm run start-direct` | 直接启动（跳过依赖检查） | ❌ |
-| `npm run test-direct` | 直接测试（跳过依赖检查） | ❌ |
-| `npm run init-data` | 初始化样例设备数据 | ❌ |
+| 命令 | 说明 | 依赖要求 |
+|------|------|---------|
+| `npm run quick-test` | ⭐ 零依赖一键自检 | 无需安装 |
+| `npm run quick-start` | ⭐ 零依赖启动服务 | 无需安装 |
+| `npm test` | 完整版自检（自动装依赖） | 首次需联网 |
+| `npm start` | 完整版启动服务（自动装依赖） | 首次需联网 |
+| `npm run start-direct` | 直接启动 SQLite 版 | 已安装依赖 |
+| `npm run test-direct` | 直接运行 SQLite 版测试 | 已安装依赖 |
+| `npm run init-data` | 初始化样例设备数据 | 已安装依赖 |
 
 ## 📋 功能特性
 

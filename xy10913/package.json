@@ -12,7 +12,13 @@
     "test-direct": "node test/self-test.js",
     "start-direct": "node src/app.js",
     "init-data": "node scripts/init-sample-data.js",
-    "demo": "node scripts/auto-start.js"
+    "demo": "node scripts/auto-start.js",
+    "start-standalone": "node src/standalone.js",
+    "start-light": "node src/standalone.js",
+    "test-standalone": "node test/self-test-standalone.js",
+    "test-light": "node test/self-test-standalone.js",
+    "quick-start": "node src/standalone.js",
+    "quick-test": "node test/self-test-standalone.js"
   },
   "dependencies": {
     "express": "^4.18.2",
