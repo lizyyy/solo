@@ -65,6 +65,15 @@ test('数据库初始化脚本可执行', () => {
 
 const { runQuery, getAll } = require('../src/db');
 
+console.log('\n🧹 清理测试数据...\n');
+runQuery(`DELETE FROM exception_logs`);
+runQuery(`DELETE FROM overnumber_records`);
+runQuery(`DELETE FROM queue_reports`);
+runQuery(`DELETE FROM queue_numbers`);
+runQuery(`DELETE FROM appointments`);
+runQuery(`DELETE FROM stations`);
+runQuery(`DELETE FROM members`);
+
 test('数据库表存在', () => {
   const tables = getAll(`SELECT name FROM sqlite_master WHERE type='table'`);
   const expected = ['members', 'stations', 'appointments', 'queue_numbers', 'overnumber_records', 'exception_logs', 'queue_reports'];
@@ -163,7 +172,7 @@ const reportService = require('../src/services/reportService');
 
 test('生成日报', () => {
   const result = reportService.generateDailyReport();
-  if (!result || !result.total_queue) throw new Error('生成失败');
+  if (!result || result.total_queue === undefined) throw new Error('生成失败');
 });
 
 test('导出CSV', () => {

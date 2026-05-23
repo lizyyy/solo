@@ -1,4 +1,4 @@
-# 洗车会员排队API - 接口文档
+# 洗车会员排队API - 接口文档 (Go版本)
 
 ## 服务信息
 - **服务地址**: http://localhost:3000
@@ -8,16 +8,16 @@
 
 ```bash
 # 1. 安装依赖
-npm install
+go mod tidy
 
 # 2. 初始化数据库和示例数据
-npm run setup
+go run scripts/seed_data.go
 
 # 3. 运行自检（可选）
-npm run test
+go run scripts/self_test.go
 
 # 4. 启动服务
-npm start
+go run main.go
 ```
 
 ---
@@ -32,7 +32,7 @@ npm start
 {
   "success": true,
   "message": "洗车会员排队API服务运行正常",
-  "timestamp": "2024-01-15T10:00:00.000Z"
+  "data": {}
 }
 ```
 
@@ -50,20 +50,35 @@ npm start
 ```json
 {
   "name": "张三",
-  "phone": "13800138001",
-  "level": "VIP会员",
-  "balance": 500
+  "phone": "13800138001"
+}
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "member_no": "M202401150001",
+    "name": "张三",
+    "phone": "13800138001",
+    "level": "普通会员",
+    "balance": 0
+  }
 }
 ```
 
 ### GET /api/members
 获取会员列表
 
-### GET /api/members/:id
-根据ID查询会员
-
 ### GET /api/members/phone/:phone
 根据手机号查询会员
+
+**注意**: 此路由必须在 `/:id` 之前定义，避免路由匹配错误
+
+### GET /api/members/:id
+根据ID查询会员
 
 ### PUT /api/members/:id
 更新会员信息
@@ -78,7 +93,8 @@ npm start
 **请求体**:
 ```json
 {
-  "name": "1号工位"
+  "name": "1号工位",
+  "service_type": "normal"
 }
 ```
 
@@ -103,19 +119,19 @@ npm start
 {
   "member_id": 1,
   "appointment_id": null,
-  "service_type": "标准洗"
+  "service_type": "normal"
 }
 ```
 
 **核心规则**:
-- 服务类型必须是: 标准洗、精洗、打蜡、内饰清洁、镀膜
+- 服务类型必须是: normal(标准洗), detail(精洗), wax(打蜡), interior(内饰清洁), coating(镀膜)
 - 同一会员不能同时有多个等待或服务中的排队号
 
 ### GET /api/queue
 获取排队列表
 
 **查询参数**:
-- `status`: 按状态筛选（等待中、服务中、已完成、已过号、已取消）
+- `status`: 按状态筛选（waiting, servicing, completed, overnumbered, cancelled）
 
 ### GET /api/queue/:id
 查询单个排队记录
@@ -156,7 +172,7 @@ npm start
 **请求体**:
 ```json
 {
-  "status": "等待中",
+  "status": "waiting",
   "position": 5,
   "station_id": 2
 }
@@ -173,7 +189,7 @@ npm start
 ```json
 {
   "member_id": 1,
-  "service_type": "精洗",
+  "service_type": "detail",
   "appointment_date": "2024-01-16",
   "appointment_time": "14:00"
 }
@@ -246,6 +262,7 @@ npm start
 ### 会员 (members)
 | 字段 | 说明 |
 |------|------|
+| id | 主键ID |
 | member_no | 会员编号 |
 | name | 姓名 |
 | phone | 手机号（唯一） |
@@ -255,15 +272,17 @@ npm start
 ### 工位 (stations)
 | 字段 | 说明 |
 |------|------|
+| id | 主键ID |
 | station_no | 工位编号 |
 | name | 工位名称 |
-| status | 状态（空闲、忙碌、维护中） |
-| current_queue_id | 当前服务的排队ID |
+| status | 状态（idle、busy、maintenance） |
+| service_type | 服务类型 |
 
 ### 排队号 (queue_numbers)
 | 字段 | 说明 |
 |------|------|
-| queue_no | 排队编号 |
+| id | 主键ID |
+| queue_number | 排队编号 |
 | member_id | 关联会员 |
 | appointment_id | 关联预约 |
 | service_type | 服务类型 |
@@ -277,6 +296,7 @@ npm start
 ### 过号记录 (overnumber_records)
 | 字段 | 说明 |
 |------|------|
+| id | 主键ID |
 | queue_id | 原排队ID |
 | original_queue_no | 原排队号 |
 | new_queue_id | 补排后的新排队ID |
@@ -286,6 +306,7 @@ npm start
 ### 异常日志 (exception_logs)
 | 字段 | 说明 |
 |------|------|
+| id | 主键ID |
 | api_path | 接口路径 |
 | request_method | 请求方法 |
 | raw_input | 原始输入数据 |
@@ -300,7 +321,7 @@ npm start
 2. **预约锁位**: 预约确认时自动锁定工位
 3. **工位分配**: 叫号时自动分配空闲工位
 4. **过号补排**: 过号后可补排，位置自动延后3位
-5. **状态流转**: 等待中 → 服务中 → 已完成 / 已过号 / 已取消
+5. **状态流转**: waiting → servicing → completed / overnumbered / cancelled
 
 ---
 
