@@ -58,7 +58,7 @@ try:
     print("  1.2 调用导入规则API...")
     response = client.post(
         "/api/import/rules",
-        files={"file": ("custom_rules.json", rule_file, "application/json"}
+        files={"file": ("custom_rules.json", rule_file, "application/json")}
     )
     
     if response.status_code == 200:
