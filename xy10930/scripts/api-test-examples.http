@@ -1,0 +1,125 @@
+# 水站桶押金流转API测试示例
+# 基础URL: http://localhost:3000/api
+
+### 1. 健康检查
+GET http://localhost:3000/api/health
+Content-Type: application/json
+
+### 2. 获取客户列表
+GET http://localhost:3000/api/customers
+Content-Type: application/json
+
+### 3. 创建客户
+POST http://localhost:3000/api/customers
+Content-Type: application/json
+
+{
+  "name": "测试客户",
+  "phone": "13900139001",
+  "address": "测试地址"
+}
+
+### 4. 获取库存桶列表
+GET http://localhost:3000/api/buckets?status=in_stock
+Content-Type: application/json
+
+### 5. 正常创建配送单（核心流程1）
+# 请先获取一个客户ID并替换下面的customer_id
+POST http://localhost:3000/api/delivery-orders
+Content-Type: application/json
+
+{
+  "customer_id": "REPLACE_WITH_CUSTOMER_ID",
+  "bucket_count": 2,
+  "deposit_amount": 100,
+  "delivery_address": "新的配送地址",
+  "order_no": "DO20240115001",
+  "created_by": "操作员A",
+  "remark": "首次配送"
+}
+
+### 6. 重复提交同一单号（测试拦截功能）
+POST http://localhost:3000/api/delivery-orders
+Content-Type: application/json
+
+{
+  "customer_id": "REPLACE_WITH_CUSTOMER_ID",
+  "bucket_count": 2,
+  "deposit_amount": 100,
+  "order_no": "DO20240115001",
+  "created_by": "操作员A"
+}
+
+### 7. 查看异常日志
+GET http://localhost:3000/api/exceptions
+Content-Type: application/json
+
+### 8. 获取单个客户详情
+# 请替换为实际的客户ID
+GET http://localhost:3000/api/customers/REPLACE_WITH_CUSTOMER_ID
+Content-Type: application/json
+
+### 9. 创建退桶记录（核心流程2）
+# 请先获取在用的桶编号
+POST http://localhost:3000/api/return-records
+Content-Type: application/json
+
+{
+  "customer_id": "REPLACE_WITH_CUSTOMER_ID",
+  "bucket_nos": ["A0001", "A0002"],
+  "deduction_amount": 0,
+  "deduction_reason": "",
+  "operator": "操作员B",
+  "remark": "正常退桶"
+}
+
+### 10. 异常场景：退桶时可用押金不足
+# 先创建一个大金额的配送单，然后尝试退款超过押金的金额
+POST http://localhost:3000/api/return-records
+Content-Type: application/json
+
+{
+  "customer_id": "REPLACE_WITH_CUSTOMER_ID",
+  "bucket_nos": ["A0003", "A0004"],
+  "deduction_amount": 500,
+  "operator": "操作员B"
+}
+
+### 11. 查看配送单状态历史
+# 请替换为实际的配送单ID
+GET http://localhost:3000/api/status-history/delivery_order/REPLACE_WITH_ORDER_ID
+Content-Type: application/json
+
+### 12. 人工修正押金
+# 请替换为实际的客户ID和异常ID（可选）
+POST http://localhost:3000/api/manual-corrections
+Content-Type: application/json
+
+{
+  "customer_id": "REPLACE_WITH_CUSTOMER_ID",
+  "correction_type": "deposit",
+  "after_value": 200,
+  "reason": "系统计算错误，手动调整押金",
+  "operator": "管理员",
+  "related_exception_id": "REPLACE_WITH_EXCEPTION_ID"
+}
+
+### 13. 获取押金报表
+GET http://localhost:3000/api/reports/deposit
+Content-Type: application/json
+
+### 14. 导出押金报表CSV
+GET http://localhost:3000/api/reports/deposit/export
+Content-Type: application/json
+
+### 15. 导出客户报表
+GET http://localhost:3000/api/reports/customers/export
+Content-Type: application/json
+
+### 16. 导出异常日志
+GET http://localhost:3000/api/reports/exceptions/export
+Content-Type: application/json
+
+### 17. 下载导出的文件
+# 请替换为实际的文件名
+GET http://localhost:3000/api/exports/deposit_report_2024-01-15T00-00-00.000Z.csv
