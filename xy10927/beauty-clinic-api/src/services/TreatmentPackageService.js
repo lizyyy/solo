@@ -106,6 +106,9 @@ class TreatmentPackageService {
     const pkg = await this.getPackageById(packageId);
     if (!pkg) throw new Error('套餐不存在');
     if (pkg.status !== 'active') throw new Error('套餐状态异常');
+    if (count <= 0) throw new Error('核销次数必须大于0');
+    if (useGiftCount < 0) throw new Error('使用赠送次数不能为负数');
+    if (useGiftCount > count) throw new Error('使用赠送次数不能大于总核销次数');
 
     const usePaidCount = count - useGiftCount;
     if (useGiftCount > 0 && pkg.gift_count < useGiftCount) throw new Error('赠送次数不足');
@@ -151,18 +154,33 @@ class TreatmentPackageService {
   async manualCorrect(packageId, beforeData, afterData, reason, operator) {
     const now = new Date().toISOString();
     const correctionId = uuidv4();
+    const pkg = await this.getPackageById(packageId);
+
+    const finalAfterData = {
+      total_count: afterData.total_count !== undefined ? afterData.total_count : pkg.total_count,
+      remaining_count: afterData.remaining_count !== undefined ? afterData.remaining_count : pkg.remaining_count,
+      gift_count: afterData.gift_count !== undefined ? afterData.gift_count : pkg.gift_count,
+      status: afterData.status !== undefined ? afterData.status : pkg.status
+    };
+
+    const finalBeforeData = {
+      total_count: beforeData.total_count !== undefined ? beforeData.total_count : pkg.total_count,
+      remaining_count: beforeData.remaining_count !== undefined ? beforeData.remaining_count : pkg.remaining_count,
+      gift_count: beforeData.gift_count !== undefined ? beforeData.gift_count : pkg.gift_count,
+      status: beforeData.status !== undefined ? beforeData.status : pkg.status
+    };
 
     await run(`
       INSERT INTO manual_corrections 
       (id, target_type, target_id, before_data, after_data, reason, operator, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, [correctionId, 'treatment_package', packageId, JSON.stringify(beforeData), JSON.stringify(afterData), reason, operator, now]);
+    `, [correctionId, 'treatment_package', packageId, JSON.stringify(finalBeforeData), JSON.stringify(finalAfterData), reason, operator, now]);
 
     await run(`
       UPDATE treatment_packages 
       SET total_count = ?, remaining_count = ?, gift_count = ?, status = ?, updated_at = ?
       WHERE id = ?
-    `, [afterData.total_count, afterData.remaining_count, afterData.gift_count, afterData.status, now, packageId]);
+    `, [finalAfterData.total_count, finalAfterData.remaining_count, finalAfterData.gift_count, finalAfterData.status, now, packageId]);
 
     return get('SELECT * FROM manual_corrections WHERE id = ?', [correctionId]);
   }

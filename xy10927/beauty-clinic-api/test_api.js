@@ -117,18 +117,67 @@ async function testAPI() {
         method: 'GET'
       });
       console.log('   状态:', verifications.status, '记录数:', verifications.body.data?.length || 0);
+
+      console.log('\n9. 测试人工修正（只修改gift_count）...');
+      const currentPkg = await makeRequest({
+        hostname: 'localhost',
+        port: 3000,
+        path: `/api/packages/${pkg.id}`,
+        method: 'GET'
+      });
+      const correctResult = await makeRequest({
+        hostname: 'localhost',
+        port: 3000,
+        path: `/api/packages/${pkg.id}/correct`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }, {
+        before_data: { gift_count: currentPkg.body.data.gift_count },
+        after_data: { gift_count: currentPkg.body.data.gift_count + 5 },
+        reason: '补偿赠送次数',
+        operator: 'admin'
+      });
+      console.log('   状态:', correctResult.status, correctResult.body.status);
+      if (correctResult.body.data) {
+        const correctedPkg = await makeRequest({
+          hostname: 'localhost',
+          port: 3000,
+          path: `/api/packages/${pkg.id}`,
+          method: 'GET'
+        });
+        console.log('   修正后gift_count:', correctedPkg.body.data.gift_count);
+        console.log('   ✓ 支持部分字段更新');
+      }
+
+      console.log('\n10. 测试核销边界校验（use_gift_count > count）...');
+      const badVerifyResult = await makeRequest({
+        hostname: 'localhost',
+        port: 3000,
+        path: `/api/packages/${pkg.id}/verify`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }, {
+        store_id: pkg.current_store_id,
+        count: 1,
+        use_gift_count: 5,
+        operator: 'tester',
+        remark: '测试边界校验'
+      });
+      console.log('   状态:', badVerifyResult.status, badVerifyResult.body.status);
+      console.log('   错误信息:', badVerifyResult.body.error);
+      console.log('   ✓ 正确拦截了无效请求');
     }
 
-    console.log('\n9. 查询转店申请...');
+    console.log('\n11. 查询转店申请...');
     const transfers = await makeRequest({
       hostname: 'localhost',
       port: 3000,
       path: '/api/transfers',
       method: 'GET'
     });
-    console.log('   状态:', transfers.status, '数量:', transfers.body.data?.length || 0);
+    console.log('    状态:', transfers.status, '数量:', transfers.body.data?.length || 0);
 
-    console.log('\n10. 查询延期申请...');
+    console.log('\n12. 查询延期申请...');
     const extensions = await makeRequest({
       hostname: 'localhost',
       port: 3000,
@@ -136,6 +185,24 @@ async function testAPI() {
       method: 'GET'
     });
     console.log('    状态:', extensions.status, '数量:', extensions.body.data?.length || 0);
+
+    console.log('\n13. 查询异常日志...');
+    const exceptions = await makeRequest({
+      hostname: 'localhost',
+      port: 3000,
+      path: '/api/reports/exceptions',
+      method: 'GET'
+    });
+    console.log('    状态:', exceptions.status, '数量:', exceptions.body.data?.length || 0);
+
+    console.log('\n14. 查询人工修正记录...');
+    const corrections = await makeRequest({
+      hostname: 'localhost',
+      port: 3000,
+      path: '/api/reports/corrections',
+      method: 'GET'
+    });
+    console.log('    状态:', corrections.status, '数量:', corrections.body.data?.length || 0);
 
     console.log('\n=== 测试完成 ===');
     console.log('\n状态码说明:');

@@ -123,16 +123,23 @@ curl -X POST http://localhost:3000/api/packages/<套餐ID>/correct \
   -d '{
     "before_data": {
       "total_count": 48,
-      "remaining_count": 36
+      "remaining_count": 36,
+      "gift_count": 2
     },
     "after_data": {
       "total_count": 50,
-      "remaining_count": 38
+      "remaining_count": 38,
+      "gift_count": 3,
+      "status": "active"
     },
-    "reason": "系统计算错误，补加2次",
+    "reason": "系统计算错误，补加2次购买和1次赠送",
     "operator": "admin"
   }'
 ```
+- 支持部分字段更新，未提供的字段会自动保留当前值
+- `before_data`: 修正前的数据（用于记录，可省略未修改的字段）
+- `after_data`: 修正后的数据（可只传需要修改的字段）
+- 可修改字段：`total_count`, `remaining_count`, `gift_count`, `status`
 
 ### 5. 转店申请
 
