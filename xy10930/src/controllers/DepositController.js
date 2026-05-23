@@ -97,8 +97,8 @@ class DepositController {
   }
 
   async confirmDeliveryOrder(req, res) {
+    const { id } = req.params;
     try {
-      const { id } = req.params;
       const { operator } = req.body;
 
       if (!operator) {
@@ -117,8 +117,8 @@ class DepositController {
   }
 
   async cancelDeliveryOrder(req, res) {
+    const { id } = req.params;
     try {
-      const { id } = req.params;
       const { operator } = req.body;
 
       if (!operator) {
