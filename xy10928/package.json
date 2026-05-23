@@ -1,0 +1,21 @@
+{
+  "name": "express-package-station-api",
+  "version": "1.0.0",
+  "description": "快递驿站滞留API服务",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "node tests/self-check.js",
+    "init-data": "node scripts/init-data.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "csv-writer": "^1.6.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
