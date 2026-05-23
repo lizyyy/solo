@@ -128,13 +128,51 @@ def test_location_check():
         print("✗ 测试4失败")
     
     print("\n" + "="*60)
-    print("测试5: 查看异常日志")
+    print("测试5: 志愿者不存在 - 应该被拒绝")
+    print("="*60)
+    checkin_data5 = {
+        "volunteer_id": 99999,
+        "shift_id": shift_id,
+        "checkin_lat": 39.9042,
+        "checkin_lng": 116.4074
+    }
+    r = requests.post(f"{BASE_URL}/checkins/", json=checkin_data5)
+    result5 = print_response("不存在志愿者签到", r)
+    
+    if r.status_code == 400:
+        print("✓ 测试5通过: 不存在志愿者被正确拒绝")
+    else:
+        print("✗ 测试5失败: 不存在志愿者未被拒绝")
+    
+    print("\n" + "="*60)
+    print("测试6: 查看异常日志 - 验证异常可追溯")
     print("="*60)
     r = requests.get(f"{BASE_URL}/exceptions/")
     exceptions = print_response("异常日志列表", r)
     
+    location_errors = [e for e in exceptions if e['exception_type'] == 'location_error']
+    checkin_errors = [e for e in exceptions if e['exception_type'] == 'checkin_error']
+    
+    print(f"\n异常统计: 位置错误 {len(location_errors)} 条, 签到错误 {len(checkin_errors)} 条")
+    if len(location_errors) >= 1 and len(checkin_errors) >= 1:
+        print("✓ 异常日志可追溯: 包含位置校验和志愿者校验的异常记录")
+    else:
+        print("✗ 异常日志不完整")
+    
     print("\n" + "="*60)
-    print("位置校验功能测试完成!")
+    print("测试7: 验证异常日志包含原始输入")
+    print("="*60)
+    if exceptions and len(exceptions) > 0:
+        latest = exceptions[0]
+        print(f"最新异常 ID: {latest['id']}")
+        print(f"异常类型: {latest['exception_type']}")
+        print(f"关联记录: {latest['related_type']}={latest['related_id']}")
+        print(f"原始输入: {latest['raw_input'][:100]}...")
+        print(f"处理结论: {latest['handling_conclusion']}")
+        print("✓ 异常日志包含完整追溯信息")
+    
+    print("\n" + "="*60)
+    print("所有测试完成!")
     print("="*60)
 
 if __name__ == "__main__":

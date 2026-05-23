@@ -7,7 +7,7 @@ from models import (
     Volunteer, Location, Shift, CheckInRecord, ShiftSwap,
     DurationCertification, ServiceReport, ReportDetail,
     ExceptionLog, ManualCorrection,
-    ShiftStatus, CheckInStatus, SwapStatus, CertificationStatus,
+    VolunteerStatus, ShiftStatus, CheckInStatus, SwapStatus, CertificationStatus,
     ReportStatus, ExceptionType
 )
 from schemas import (
@@ -163,6 +163,23 @@ def verify_checkin_location(db: Session, shift_id: int, lat: float, lng: float):
 
 def create_checkin(db: Session, checkin: CheckInCreate):
     raw_input = checkin.model_dump()
+    
+    volunteer = get_volunteer(db, checkin.volunteer_id)
+    if not volunteer:
+        msg = f"志愿者不存在: id={checkin.volunteer_id}"
+        log_exception(
+            db, ExceptionType.CHECKIN_ERROR, raw_input,
+            f"签到被拒绝: {msg}", "volunteer", checkin.volunteer_id, msg
+        )
+        return None, msg
+    
+    if volunteer.status != VolunteerStatus.ACTIVE:
+        msg = f"志愿者状态异常: {volunteer.status.value}"
+        log_exception(
+            db, ExceptionType.CHECKIN_ERROR, raw_input,
+            f"签到被拒绝: {msg}", "volunteer", checkin.volunteer_id, msg
+        )
+        return None, msg
     
     capacity_ok, capacity_msg = check_shift_capacity(db, checkin.shift_id)
     if not capacity_ok:

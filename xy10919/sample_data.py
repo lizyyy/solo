@@ -1,8 +1,12 @@
 import requests
 import json
+import time
 from datetime import datetime, timedelta
 
 BASE_URL = "http://localhost:8000"
+
+def get_unique_suffix():
+    return str(int(time.time()))[-4:]
 
 def print_response(title, response):
     print(f"\n{'='*60}")
@@ -17,13 +21,38 @@ def print_response(title, response):
         print(response.text)
         return response.text
 
+def get_or_create_volunteer(volunteer_base, suffix):
+    phone = f"{volunteer_base['phone'][:-4]}{suffix}"
+    email = volunteer_base.get('email', '').replace('@', f'+{suffix}@') if volunteer_base.get('email') else None
+    
+    r = requests.get(f"{BASE_URL}/volunteers/")
+    if r.status_code == 200:
+        existing = [v for v in r.json() if v['phone'] == phone]
+        if existing:
+            print(f"  复用已存在志愿者: {existing[0]['name']}")
+            return existing[0]
+    
+    vol_data = {
+        "name": f"{volunteer_base['name']}_{suffix}",
+        "phone": phone,
+        "email": email
+    }
+    r = requests.post(f"{BASE_URL}/volunteers/", json=vol_data)
+    if r.status_code == 200:
+        print(f"  创建志愿者: {vol_data['name']}")
+        return r.json()
+    print(f"  创建志愿者失败: {r.text}")
+    return None
+
 def create_sample_data():
     print("开始创建样例数据...")
+    suffix = get_unique_suffix()
+    print(f"使用唯一后缀: {suffix}")
     
     locations = [
-        {"name": "社区服务中心", "address": "北京市朝阳区某某路1号", "latitude": 39.9042, "longitude": 116.4074, "radius_meters": 100, "require_location_check": True},
-        {"name": "老年活动站", "address": "北京市海淀区某某路2号", "latitude": 39.9542, "longitude": 116.3374, "radius_meters": 150, "require_location_check": True},
-        {"name": "环保志愿点", "address": "北京市西城区某某路3号", "latitude": 39.9242, "longitude": 116.3874, "radius_meters": 120, "require_location_check": False}
+        {"name": f"社区服务中心_{suffix}", "address": "北京市朝阳区某某路1号", "latitude": 39.9042, "longitude": 116.4074, "radius_meters": 100, "require_location_check": True},
+        {"name": f"老年活动站_{suffix}", "address": "北京市海淀区某某路2号", "latitude": 39.9542, "longitude": 116.3374, "radius_meters": 150, "require_location_check": True},
+        {"name": f"环保志愿点_{suffix}", "address": "北京市西城区某某路3号", "latitude": 39.9242, "longitude": 116.3874, "radius_meters": 120, "require_location_check": False}
     ]
     
     created_locations = []
@@ -33,7 +62,7 @@ def create_sample_data():
         if r.status_code == 200:
             created_locations.append(data)
     
-    volunteers = [
+    volunteer_bases = [
         {"name": "张三", "phone": "13800138001", "email": "zhangsan@example.com"},
         {"name": "李四", "phone": "13800138002", "email": "lisi@example.com"},
         {"name": "王五", "phone": "13800138003", "email": "wangwu@example.com"},
@@ -41,12 +70,14 @@ def create_sample_data():
         {"name": "钱七", "phone": "13800138005", "email": "qianqi@example.com"}
     ]
     
+    print(f"\n{'='*60}")
+    print("创建/复用志愿者")
+    print(f"{'='*60}")
     created_volunteers = []
-    for i, vol in enumerate(volunteers):
-        r = requests.post(f"{BASE_URL}/volunteers/", json=vol)
-        data = print_response(f"创建志愿者 {i+1}", r)
-        if r.status_code == 200:
-            created_volunteers.append(data)
+    for vol_base in volunteer_bases:
+        vol = get_or_create_volunteer(vol_base, suffix)
+        if vol:
+            created_volunteers.append(vol)
     
     shifts = []
     today = datetime.now()
@@ -57,7 +88,7 @@ def create_sample_data():
         
         loc_idx = i % len(created_locations)
         shifts.append({
-            "name": f"第{i+1}期志愿服务",
+            "name": f"第{i+1}期志愿服务_{suffix}",
             "location_id": created_locations[loc_idx]["id"],
             "start_time": start_time.isoformat(),
             "end_time": end_time.isoformat(),
@@ -96,7 +127,7 @@ def create_sample_data():
             )
             print_response(f"志愿者签退 {i+1}", r)
     
-    if created_volunteers and created_shifts:
+    if created_volunteers and created_shifts and len(created_volunteers) >= 4:
         swap_data = {
             "shift_id": created_shifts[0]["id"],
             "requester_id": created_volunteers[0]["id"],
@@ -176,3 +207,5 @@ if __name__ == "__main__":
         print("  uvicorn main:app --reload")
     except Exception as e:
         print(f"\n发生错误: {e}")
+        import traceback
+        traceback.print_exc()
