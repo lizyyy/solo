@@ -1,4 +1,4 @@
-from typing import List, Dict
+content = '''from typing import List, Dict
 from models import OrderRecord, ChargingLog, PaymentReceipt, FailedRecord, ProcessResult
 
 def apply_rules(orders, charging_logs, payments, batch_id):
@@ -107,3 +107,8 @@ def apply_rules(orders, charging_logs, payments, batch_id):
         pending_items=pending_items,
         failed_items=failed_items
     )
+'''
+
+with open('rules.py', 'w', encoding='utf-8') as f:
+    f.write(content)
+print('rules.py fixed, lines:', len(content.splitlines()))

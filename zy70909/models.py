@@ -47,7 +47,6 @@ class PaymentReceipt(BaseModel):
     type: str
     raw_data: Dict[str, Any]
 
-
 class FailedRecord(BaseModel):
     record_id: str
     record_type: str
@@ -63,6 +62,9 @@ class ProcessResult(BaseModel):
     normal_count: int
     pending_count: int
     failed_count: int
+    normal_items: List[Dict[str, Any]]
+    pending_items: List[Dict[str, Any]]
+    failed_items: List[FailedRecord]
     normal_items: List[Dict[str, Any]]
     pending_items: List[Dict[str, Any]]
     failed_items: List[FailedRecord]
