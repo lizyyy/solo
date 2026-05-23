@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>充电桩巡检重试补偿队列</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { color: #333; margin-bottom: 20px; font-size: 24px; }
+    h2 { color: #444; margin: 20px 0 10px; font-size: 18px; }
+    
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+    .tab { padding: 10px 20px; background: #e0e0e0; border: none; cursor: pointer; font-size: 14px; border-radius: 4px 4px 0 0; }
+    .tab.active { background: #2196F3; color: white; }
+    
+    .tab-content { display: none; background: white; padding: 20px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .tab-content.active { display: block; }
+    
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .stat-card { background: #f9f9f9; padding: 15px; border-radius: 4px; border-left: 4px solid #2196F3; }
+    .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+    .stat-card .value { font-size: 28px; font-weight: bold; color: #333; }
+    .stat-card ul { list-style: none; margin-top: 10px; }
+    .stat-card li { padding: 5px 0; font-size: 13px; color: #555; display: flex; justify-content: space-between; }
+    
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f5f5f5; font-weight: 600; color: #444; }
+    tr:hover { background: #f9f9f9; }
+    
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+    .badge-pending { background: #FFF3CD; color: #856404; }
+    .badge-queued { background: #CCE5FF; color: #004085; }
+    .badge-processing { background: #B8DAFF; color: #004085; }
+    .badge-retrying { background: #FFE5D0; color: #854504; }
+    .badge-manual { background: #D1ECF1; color: #0C5460; }
+    .badge-compensated { background: #D4EDDA; color: #155724; }
+    .badge-closed { background: #E2E3E5; color: #495057; }
+    .badge-dead { background: #F8D7DA; color: #721C24; }
+    
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #444; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    
+    button { padding: 8px 16px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #1976D2; }
+    button.secondary { background: #6c757d; }
+    button.secondary:hover { background: #5a6268; }
+    button.danger { background: #dc3545; }
+    button.success { background: #28a745; }
+    
+    .btn-group { display: flex; gap: 5px; }
+    .btn-group button { padding: 4px 8px; font-size: 12px; }
+    
+    .filters { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    .filters select, .filters input { padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+    
+    .detail-panel { background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px; }
+    .detail-panel h4 { margin-bottom: 10px; }
+    .detail-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; padding: 5px 0; font-size: 13px; }
+    .detail-row .label { color: #666; }
+    
+    .history-list { max-height: 300px; overflow-y: auto; }
+    .history-item { padding: 10px; border-bottom: 1px solid #eee; }
+    .history-item .time { font-size: 11px; color: #888; }
+    .history-item .operator { font-weight: 500; }
+    .history-item .reason { color: #666; margin-top: 5px; }
+
+    .dirty-record { border-left: 3px solid #ffc107; }
+    .dirty-record.resolved { border-left-color: #28a745; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>充电桩巡检重试补偿队列</h1>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="dashboard">片区经理看板</button>
+      <button class="tab" data-tab="workorders">工单列表</button>
+      <button class="tab" data-tab="create">创建工单</button>
+      <button class="tab" data-tab="dirty">脏记录</button>
+    </div>
+    
+    <div id="dashboard" class="tab-content active">
+      <h2>可重试分类</h2>
+      <div class="dashboard-grid" id="retryable-stats"></div>
+      
+      <h2>死信处理</h2>
+      <div class="dashboard-grid" id="deadletter-stats"></div>
+      
+      <h2>恢复后续跑 & 人工接管</h2>
+      <div class="dashboard-grid" id="other-stats"></div>
+    </div>
+    
+    <div id="workorders" class="tab-content">
+      <div class="filters">
+        <select id="filter-status">
+          <option value="">全部状态</option>
+          <option value="pending">待处理</option>
+          <option value="queued">已排队</option>
+          <option value="processing">处理中</option>
+          <option value="retrying">重试中</option>
+          <option value="manual_takeover">人工接管</option>
+          <option value="compensated">已补偿</option>
+          <option value="closed">已关闭</option>
+          <option value="dead_letter">死信</option>
+        </select>
+        <select id="filter-source">
+          <option value="">全部来源</option>
+          <option value="pile_alarm">桩端告警</option>
+          <option value="inspection">巡检表</option>
+          <option value="customer_complaint">客服投诉单</option>
+          <option value="store_handover">门店交接纸</option>
+        </select>
+        <select id="filter-category">
+          <option value="">全部分类</option>
+          <option value="network_issue">网络问题</option>
+          <option value="system_error">系统错误</option>
+          <option value="data_inconsistency">数据不一致</option>
+          <option value="pending_confirmation">待确认</option>
+          <option value="other">其他</option>
+        </select>
+        <button onclick="loadWorkOrders()">查询</button>
+        <button onclick="exportData('json')">导出JSON</button>
+        <button onclick="exportData('csv')">导出CSV</button>
+      </div>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>工单号</th>
+            <th>来源</th>
+            <th>状态</th>
+            <th>重试次数</th>
+            <th>分类</th>
+            <th>故障时长</th>
+            <th>创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="workorder-list"></tbody>
+      </table>
+      
+      <div id="workorder-detail" class="detail-panel" style="display:none;">
+        <h4>工单详情</h4>
+        <div id="detail-content"></div>
+        <h4>状态历史</h4>
+        <div class="history-list" id="history-list"></div>
+        <div class="form-row" style="margin-top:15px;">
+          <div class="form-group">
+            <label>操作人</label>
+            <input type="text" id="action-operator" value="system">
+          </div>
+          <div class="form-group">
+            <label>原因/备注</label>
+            <input type="text" id="action-reason">
+          </div>
+        </div>
+        <div class="btn-group">
+          <button onclick="enqueueWorkOrder()">加入队列</button>
+          <button onclick="showRetryModal()">重试</button>
+          <button onclick="showManualModal()">人工接管</button>
+          <button onclick="showCompensateModal()">补偿入账</button>
+          <button onclick="closeWorkOrder()">关闭工单</button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="create" class="tab-content">
+      <h2>创建工单</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label>数据源 *</label>
+          <select id="create-source">
+            <option value="pile_alarm">桩端告警</option>
+            <option value="inspection">巡检表</option>
+            <option value="customer_complaint">客服投诉单</option>
+            <option value="store_handover">门店交接纸</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>来源ID *</label>
+          <input type="text" id="create-sourceId">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>充电桩ID</label>
+          <input type="text" id="create-pileId">
+        </div>
+        <div class="form-group">
+          <label>门店ID</label>
+          <input type="text" id="create-storeId">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>告警时间</label>
+          <input type="datetime-local" id="create-alarmTime">
+        </div>
+        <div class="form-group">
+          <label>恢复时间</label>
+          <input type="datetime-local" id="create-recoverTime">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>故障描述</label>
+        <textarea id="create-faultDescription" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label>客服备注</label>
+        <textarea id="create-customerRemark" rows="2"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>操作人 *</label>
+          <input type="text" id="create-operator">
+        </div>
+        <div class="form-group">
+          <label>最大重试次数</label>
+          <input type="number" id="create-maxRetries" value="3">
+        </div>
+      </div>
+      <button onclick="createWorkOrder()">创建工单</button>
+    </div>
+    
+    <div id="dirty" class="tab-content">
+      <h2>脏记录列表</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>类型</th>
+            <th>字段</th>
+            <th>期望值</th>
+            <th>实际值</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="dirty-list"></tbody>
+      </table>
+    </div>
+    
+    <div id="modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000;">
+      <div style="background:white; padding:20px; border-radius:4px; max-width:400px; margin:100px auto;">
+        <h3 id="modal-title">操作</h3>
+        <div id="modal-content"></div>
+        <div style="text-align:right; margin-top:20px;">
+          <button class="secondary" onclick="closeModal()">取消</button>
+          <button id="modal-confirm">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentWorkOrderId = null;
+    
+    const statusLabels = {
+      pending: '待处理', queued: '已排队', processing: '处理中', retrying: '重试中',
+      manual_takeover: '人工接管', compensated: '已补偿', closed: '已关闭', dead_letter: '死信'
+    };
+    const statusBadgeClass = {
+      pending: 'badge-pending', queued: 'badge-queued', processing: 'badge-processing',
+      retrying: 'badge-retrying', manual_takeover: 'badge-manual', compensated: 'badge-compensated',
+      closed: 'badge-closed', dead_letter: 'badge-dead'
+    };
+    const sourceLabels = {
+      pile_alarm: '桩端告警', inspection: '巡检表',
+      customer_complaint: '客服投诉单', store_handover: '门店交接纸'
+    };
+    const categoryLabels = {
+      network_issue: '网络问题', system_error: '系统错误',
+      data_inconsistency: '数据不一致', pending_confirmation: '待确认', other: '其他'
+    };
+    const dirtyTypeLabels = {
+      missing_fields: '缺字段', cross_day: '跨日', name_change: '改名',
+      amount_conflict: '金额冲突', quantity_conflict: '数量冲突'
+    };
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+        
+        if (tab.dataset.tab === 'dashboard') loadDashboard();
+        if (tab.dataset.tab === 'workorders') loadWorkOrders();
+        if (tab.dataset.tab === 'dirty') loadDirtyRecords();
+      });
+    });
+
+    async function loadDashboard() {
+      const res = await fetch('/api/dashboard');
+      const data = await res.json();
+      
+      document.getElementById('retryable-stats').innerHTML = Object.entries(data.retryableByCategory)
+        .map(([k, v]) => `<div class="stat-card"><h3>${categoryLabels[k]}</h3><div class="value">${v}</div></div>`).join('');
+      
+      document.getElementById('deadletter-stats').innerHTML = `
+        <div class="stat-card" style="grid-column: span 2;">
+          <h3>死信总数</h3>
+          <div class="value">${data.deadLetterStats.total}</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+            <div>
+              <h4>按分类</h4>
+              <ul>${Object.entries(data.deadLetterStats.byCategory).map(([k, v]) => `<li>${categoryLabels[k]}<span>${v}</span></li>`).join('')}</ul>
+            </div>
+            <div>
+              <h4>按来源</h4>
+              <ul>${Object.entries(data.deadLetterStats.bySource).map(([k, v]) => `<li>${sourceLabels[k]}<span>${v}</span></li>`).join('')}</ul>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('other-stats').innerHTML = `
+        <div class="stat-card"><h3>恢复后续跑</h3><div class="value">${data.recoveryFollowUps}</div></div>
+        <div class="stat-card"><h3>待人工接管</h3><div class="value">${data.pendingManualTakeover}</div></div>
+      `;
+    }
+
+    async function loadWorkOrders() {
+      const status = document.getElementById('filter-status').value;
+      const source = document.getElementById('filter-source').value;
+      const category = document.getElementById('filter-category').value;
+      
+      let url = '/api/workorders?';
+      if (status) url += `status=${status}&`;
+      if (source) url += `source=${source}&`;
+      if (category) url += `retryCategory=${category}&`;
+      
+      const res = await fetch(url);
+      const result = await res.json();
+      
+      document.getElementById('workorder-list').innerHTML = result.data.map(o => `
+        <tr>
+          <td><a href="#" onclick="showDetail('${o.id}')">${o.orderNo}</a></td>
+          <td>${sourceLabels[o.source]}</td>
+          <td><span class="badge ${statusBadgeClass[o.status]}">${statusLabels[o.status]}</span></td>
+          <td>${o.retryCount}/${o.maxRetries}</td>
+          <td>${o.retryCategory ? categoryLabels[o.retryCategory] : '-'}</td>
+          <td>${o.faultDurationMinutes ? o.faultDurationMinutes + '分钟' : '-'}</td>
+          <td>${new Date(o.createdAt).toLocaleString()}</td>
+          <td class="btn-group">
+            <button onclick="showDetail('${o.id}')">查看</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function showDetail(id) {
+      currentWorkOrderId = id;
+      const [orderRes, historyRes] = await Promise.all([
+        fetch(`/api/workorders/${id}`),
+        fetch(`/api/workorders/${id}/history`)
+      ]);
+      
+      const order = await orderRes.json();
+      const history = await historyRes.json();
+      
+      document.getElementById('detail-content').innerHTML = `
+        <div class="detail-row"><span class="label">工单号:</span><span>${order.orderNo}</span></div>
+        <div class="detail-row"><span class="label">来源:</span><span>${sourceLabels[order.source]}</span></div>
+        <div class="detail-row"><span class="label">状态:</span><span>${statusLabels[order.status]}</span></div>
+        <div class="detail-row"><span class="label">充电桩:</span><span>${order.sourceData.pileName || order.sourceData.pileId || '-'}</span></div>
+        <div class="detail-row"><span class="label">门店:</span><span>${order.sourceData.storeName || order.sourceData.storeId || '-'}</span></div>
+        <div class="detail-row"><span class="label">故障时长:</span><span>${order.faultDurationMinutes ? order.faultDurationMinutes + '分钟' : '-'}</span></div>
+        <div class="detail-row"><span class="label">补偿金额:</span><span>${order.compensationAmount || '-'}</span></div>
+        <div class="detail-row"><span class="label">原始数据:</span><span style="word-break:break-all;">${order.rawContent}</span></div>
+      `;
+      
+      document.getElementById('history-list').innerHTML = history.map(h => `
+        <div class="history-item">
+          <div class="time">${new Date(h.timestamp).toLocaleString()} - <span class="operator">${h.operator}</span></div>
+          <div><span class="badge ${statusBadgeClass[h.status]}">${statusLabels[h.status]}</span></div>
+          <div class="reason">${h.reason}</div>
+        </div>
+      `).join('');
+      
+      document.getElementById('workorder-detail').style.display = 'block';
+    }
+
+    async function enqueueWorkOrder() {
+      const operator = document.getElementById('action-operator').value;
+      await fetch(`/api/workorders/${currentWorkOrderId}/enqueue`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator })
+      });
+      loadWorkOrders();
+      showDetail(currentWorkOrderId);
+    }
+
+    function showRetryModal() {
+      document.getElementById('modal-title').textContent = '选择重试分类';
+      document.getElementById('modal-content').innerHTML = `
+        <div class="form-group">
+          <label>重试分类</label>
+          <select id="retry-category">
+            <option value="network_issue">网络问题</option>
+            <option value="system_error">系统错误</option>
+            <option value="data_inconsistency">数据不一致</option>
+            <option value="pending_confirmation">待确认</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+      `;
+      document.getElementById('modal-confirm').onclick = retryWorkOrder;
+      document.getElementById('modal').style.display = 'block';
+    }
+
+    async function retryWorkOrder() {
+      const operator = document.getElementById('action-operator').value;
+      const category = document.getElementById('retry-category').value;
+      await fetch(`/api/workorders/${currentWorkOrderId}/retry`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator, retryCategory: category })
+      });
+      closeModal();
+      loadWorkOrders();
+      showDetail(currentWorkOrderId);
+    }
+
+    function showManualModal() {
+      document.getElementById('modal-title').textContent = '人工接管';
+      document.getElementById('modal-content').innerHTML = `
+        <div class="form-group">
+          <label>原因</label>
+          <textarea id="manual-reason" rows="3"></textarea>
+        </div>
+      `;
+      document.getElementById('modal-confirm').onclick = manualTakeover;
+      document.getElementById('modal').style.display = 'block';
+    }
+
+    async function manualTakeover() {
+      const operator = document.getElementById('action-operator').value;
+      const reason = document.getElementById('manual-reason').value;
+      await fetch(`/api/workorders/${currentWorkOrderId}/manual`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator, reason })
+      });
+      closeModal();
+      loadWorkOrders();
+      showDetail(currentWorkOrderId);
+    }
+
+    function showCompensateModal() {
+      document.getElementById('modal-title').textContent = '补偿入账';
+      document.getElementById('modal-content').innerHTML = `
+        <div class="form-group">
+          <label>补偿金额</label>
+          <input type="number" id="compensate-amount" step="0.01">
+        </div>
+      `;
+      document.getElementById('modal-confirm').onclick = compensateWorkOrder;
+      document.getElementById('modal').style.display = 'block';
+    }
+
+    async function compensateWorkOrder() {
+      const operator = document.getElementById('action-operator').value;
+      const amount = parseFloat(document.getElementById('compensate-amount').value);
+      await fetch(`/api/workorders/${currentWorkOrderId}/compensate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator, amount })
+      });
+      closeModal();
+      loadWorkOrders();
+      showDetail(currentWorkOrderId);
+    }
+
+    async function closeWorkOrder() {
+      const operator = document.getElementById('action-operator').value;
+      const reason = document.getElementById('action-reason').value || '正常关闭';
+      await fetch(`/api/workorders/${currentWorkOrderId}/close`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator, reason })
+      });
+      loadWorkOrders();
+      showDetail(currentWorkOrderId);
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    async function createWorkOrder() {
+      const data = {
+        source: document.getElementById('create-source').value,
+        sourceId: document.getElementById('create-sourceId').value,
+        sourceData: {
+          pileId: document.getElementById('create-pileId').value,
+          storeId: document.getElementById('create-storeId').value,
+          alarmTime: document.getElementById('create-alarmTime').value,
+          recoverTime: document.getElementById('create-recoverTime').value,
+          faultDescription: document.getElementById('create-faultDescription').value,
+          customerRemark: document.getElementById('create-customerRemark').value,
+        },
+        operator: document.getElementById('create-operator').value,
+        maxRetries: parseInt(document.getElementById('create-maxRetries').value),
+      };
+      
+      if (!data.sourceId || !data.operator) {
+        alert('请填写必填项');
+        return;
+      }
+      
+      const res = await fetch('/api/workorders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (res.ok) {
+        alert('创建成功');
+        document.querySelectorAll('#create input, #create textarea').forEach(el => el.value = '');
+      }
+    }
+
+    async function loadDirtyRecords() {
+      const res = await fetch('/api/dirty-records');
+      const records = await res.json();
+      
+      document.getElementById('dirty-list').innerHTML = records.map(r => `
+        <tr class="dirty-record ${r.isResolved ? 'resolved' : ''}">
+          <td>${dirtyTypeLabels[r.type]}</td>
+          <td>${r.fieldName || '-'}</td>
+          <td>${r.expectedValue || '-'}</td>
+          <td>${r.actualValue || '-'}</td>
+          <td>${r.isResolved ? '已解决' : '待处理'}</td>
+          <td>${new Date(r.createdAt).toLocaleString()}</td>
+          <td>
+            ${!r.isResolved ? `<button onclick="resolveDirty('${r.id}')">解决</button>` : '-'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function resolveDirty(id) {
+      const opinion = prompt('请输入处理意见:');
+      if (!opinion) return;
+      
+      await fetch(`/api/dirty-records/${id}/resolve`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator: 'system', opinion })
+      });
+      loadDirtyRecords();
+    }
+
+    async function exportData(format) {
+      const status = document.getElementById('filter-status').value;
+      const source = document.getElementById('filter-source').value;
+      let url = `/api/export?format=${format}`;
+      if (status) url += `&status=${status}`;
+      if (source) url += `&source=${source}`;
+      window.location.href = url;
+    }
+
+    loadDashboard();
+    loadWorkOrders();
+    loadDirtyRecords();
+  </script>
+</body>
+</html>
