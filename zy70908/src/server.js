@@ -383,19 +383,31 @@ app.post("/api/refund/recalculate", async (req, res) => {
       const hasPayment = paymentReceipts.length > 0;
       const hasChargerLog = chargerLogs.length > 0;
       if (hasPayment && !hasChargerLog) {
+        const exceptionType = "uninitiated_charge";
+        const description = "未启动扣费检测：有支付记录但无充电日志";
         checks.push({
-          type: "uninitiated_charge",
-          description: "未启动扣费检测：有支付记录但无充电日志",
+          type: exceptionType,
+          description: description,
           suggestion: "建议核实是否实际充电，考虑全额退款"
         });
+        await runInsert(
+          "INSERT INTO exception_records (id, order_id, batch_id, exception_type, description, handler, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [uuidv4(), order.id, batch_id, exceptionType, description, operator || "system", "open"]
+        );
       }
       
       if (refundRecords.length > 1) {
+        const exceptionType = "duplicate_refund";
+        const description = "重复退款检测：同一订单" + refundRecords.length + "次退款记录";
         checks.push({
-          type: "duplicate_refund",
-          description: "重复退款检测：同一订单多次退款记录",
-          suggestion: "退款次数: " + refundRecords.length + "次，建议核查"
+          type: exceptionType,
+          description: description,
+          suggestion: "建议核查重复退款原因"
         });
+        await runInsert(
+          "INSERT INTO exception_records (id, order_id, batch_id, exception_type, description, handler, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [uuidv4(), order.id, batch_id, exceptionType, description, operator || "system", "open"]
+        );
       }
       
       const platformChannelMap = {
@@ -406,11 +418,17 @@ app.post("/api/refund/recalculate", async (req, res) => {
       const validChannels = platformChannelMap[order.platform] || [];
       const paymentChannelMatch = paymentReceipts.some(r => validChannels.includes(r.payment_method) || validChannels.some(v => (r.payment_method || "").includes(v)));
       if (hasPayment && !paymentChannelMatch && validChannels.length > 0) {
+        const exceptionType = "cross_platform_mismatch";
+        const description = "跨平台订单检测：订单平台" + order.platform + "与实际支付渠道" + (paymentReceipts[0]?.payment_method || "未知") + "不匹配";
         checks.push({
-          type: "cross_platform_mismatch",
-          description: "跨平台订单检测：平台与支付渠道不匹配",
-          suggestion: "订单平台: " + order.platform + ", 实际支付渠道: " + (paymentReceipts[0]?.payment_method || "未知")
+          type: exceptionType,
+          description: description,
+          suggestion: "建议核实支付渠道有效性"
         });
+        await runInsert(
+          "INSERT INTO exception_records (id, order_id, batch_id, exception_type, description, handler, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [uuidv4(), order.id, batch_id, exceptionType, description, operator || "system", "open"]
+        );
       }
       
       results.push({
@@ -422,8 +440,8 @@ app.post("/api/refund/recalculate", async (req, res) => {
       });
     }
     
-    await logOperation(operator || "system", "refund_recalculate", "batch", batch_id, "重新计算退款审核: " + orders.length + "条订单");
-    res.json({ success: true, data: results, total: orders.length });
+    await logOperation(operator || "system", "refund_recalculate", "batch", batch_id, "重新计算退款审核: " + orders.length + "条订单，异常已持久化");
+    res.json({ success: true, data: results, total: orders.length, persisted: true });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
