@@ -133,7 +133,10 @@ def cancel_meeting_appointment(db: Session, appointment_id: int, cancel_record: 
 def generate_pass_code(db: Session, appointment_id: int):
     appointment = get_meeting_appointment(db, appointment_id)
     if not appointment:
-        return None
+        return None, "预约不存在"
+
+    if appointment.status == models.MeetingStatus.CANCELLED.value:
+        return None, "预约已取消，无法生成放行码"
 
     code = str(uuid.uuid4())[:8].upper()
     expired_at = appointment.end_time
@@ -146,7 +149,7 @@ def generate_pass_code(db: Session, appointment_id: int):
     db.add(db_pass_code)
     db.commit()
     db.refresh(db_pass_code)
-    return db_pass_code
+    return db_pass_code, "放行码生成成功"
 
 
 def get_pass_code(db: Session, code: str):
@@ -157,6 +160,10 @@ def verify_pass_code(db: Session, code: str, verified_by: str = None):
     db_pass_code = get_pass_code(db, code)
     if not db_pass_code:
         return None, "放行码不存在"
+
+    appointment = db_pass_code.appointment
+    if appointment and appointment.status == models.MeetingStatus.CANCELLED.value:
+        return db_pass_code, "关联预约已取消，放行码无效"
 
     now = datetime.now()
     if db_pass_code.status == models.PassCodeStatus.USED.value:
@@ -172,7 +179,6 @@ def verify_pass_code(db: Session, code: str, verified_by: str = None):
     db_pass_code.used_at = now
     db_pass_code.used_by = verified_by
 
-    appointment = db_pass_code.appointment
     if appointment and appointment.parking_spot:
         appointment.parking_spot.status = models.ParkingSpotStatus.OCCUPIED.value
 

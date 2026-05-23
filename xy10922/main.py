@@ -317,7 +317,7 @@ def read_appointment(appointment_id: int, db: Session = Depends(get_db)):
 
 @app.put("/appointments/{appointment_id}", response_model=schemas.ApiResponse)
 def update_appointment(appointment_id: int, appointment_update: schemas.MeetingAppointmentUpdate, db: Session = Depends(get_db)):
-    db_appointment = crud.update_meeting_appointment(db, appointment_id, appointment_update)
+    db_appointment = crud.get_meeting_appointment(db, appointment_id)
     if db_appointment is None:
         return schemas.ApiResponse(
             success=False,
@@ -325,6 +325,27 @@ def update_appointment(appointment_id: int, appointment_update: schemas.MeetingA
             message="预约不存在",
             data=None
         )
+
+    original_status = db_appointment.status
+
+    db_appointment = crud.update_meeting_appointment(db, appointment_id, appointment_update)
+
+    if appointment_update.status == models.MeetingStatus.CANCELLED.value and original_status != models.MeetingStatus.CANCELLED.value:
+        if db_appointment.parking_spot_id:
+            crud.release_parking_spot(db, db_appointment.parking_spot_id)
+
+        for pass_code in db_appointment.pass_codes:
+            pass_code.status = models.PassCodeStatus.CANCELLED.value
+        db.commit()
+        db.refresh(db_appointment)
+
+        return schemas.ApiResponse(
+            success=True,
+            status=RequestStatus.APPROVED.value,
+            message="预约已取消，车位已释放，放行码已失效",
+            data={"appointment": schemas.MeetingAppointment.model_validate(db_appointment).model_dump()}
+        )
+
     return schemas.ApiResponse(
         success=True,
         status=RequestStatus.APPROVED.value,
@@ -354,18 +375,18 @@ def cancel_appointment(appointment_id: int, cancel_record: schemas.CancelRecordC
 
 @app.post("/appointments/{appointment_id}/pass-code", response_model=schemas.ApiResponse)
 def generate_pass_code(appointment_id: int, db: Session = Depends(get_db)):
-    db_pass_code = crud.generate_pass_code(db, appointment_id)
+    db_pass_code, message = crud.generate_pass_code(db, appointment_id)
     if db_pass_code is None:
         return schemas.ApiResponse(
             success=False,
             status=RequestStatus.REJECTED.value,
-            message="预约不存在",
+            message=message,
             data=None
         )
     return schemas.ApiResponse(
         success=True,
         status=RequestStatus.APPROVED.value,
-        message="放行码生成成功",
+        message=message,
         data={"pass_code": schemas.PassCode.model_validate(db_pass_code).model_dump()}
     )
 
@@ -381,6 +402,14 @@ def verify_pass_code(verify_request: schemas.PassCodeVerifyRequest, db: Session 
             data=None
         )
     if db_pass_code.status != models.PassCodeStatus.USED.value:
+        return schemas.ApiResponse(
+            success=False,
+            status=RequestStatus.REJECTED.value,
+            message=message,
+            data={"pass_code": schemas.PassCode.model_validate(db_pass_code).model_dump()}
+        )
+    appointment = db_pass_code.appointment
+    if appointment and appointment.status == models.MeetingStatus.CANCELLED.value:
         return schemas.ApiResponse(
             success=False,
             status=RequestStatus.REJECTED.value,
