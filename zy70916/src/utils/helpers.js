@@ -20,8 +20,30 @@ function generateOrderNo() {
   return 'SO-' + dateStr + '-' + random;
 }
 
+function checkSkillMatch(nurseSkills, requiredSkills) {
+  if (!nurseSkills || !requiredSkills) return { matched: true, missing: [] };
+  const nurseSkillList = String(nurseSkills).split(',').map(s => s.trim().toLowerCase());
+  const requiredList = String(requiredSkills).split(',').map(s => s.trim().toLowerCase());
+  const missing = requiredList.filter(s => !nurseSkillList.includes(s));
+  return { matched: missing.length === 0, missing };
+}
+
+function checkDistrictMatch(nurseDistrict, serviceDistrict) {
+  return nurseDistrict && serviceDistrict && nurseDistrict === serviceDistrict;
+}
+
+function calculateDistance(district1, address) {
+  if (!district1 || !address) return 0;
+  const combined = district1 + '|' + address;
+  const hash = crypto.createHash('md5').update(combined).digest('hex');
+  return (parseInt(hash.slice(0, 6), 16) % 500) / 10 + 0.5;
+}
+
 module.exports = {
   generateBatchNo,
   generateRecordNo,
-  generateOrderNo
+  generateOrderNo,
+  checkSkillMatch,
+  checkDistrictMatch,
+  calculateDistance
 };
