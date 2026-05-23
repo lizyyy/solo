@@ -22,12 +22,22 @@ if [ $? -ne 0 ]; then
 fi
 
 echo ""
+echo "运行验证测试..."
+python3 test_verification.py
+
+if [ $? -ne 0 ]; then
+    echo "❌ 验证测试失败，请检查错误信息"
+    exit 1
+fi
+
+echo ""
 echo "========================================"
-echo "✅ 后端服务即将启动"
+echo "✅ 所有验证通过，后端服务即将启动"
 echo "📊 API 地址: http://localhost:8000"
 echo "📚 API 文档: http://localhost:8000/docs"
 echo "🌐 前端页面: $SCRIPT_DIR/frontend/index.html"
 echo "⏰ 后台任务: 自动回收过期凭证（每分钟检查一次）"
+echo "💾 数据库位置: $SCRIPT_DIR/backend/dev_access.db"
 echo "========================================"
 echo ""
 

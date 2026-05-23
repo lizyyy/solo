@@ -2,7 +2,38 @@
 
 外包协作开发者访问凭证管理系统
 
-## ✅ 问题修复记录
+## ✅ 问题修复记录（第二轮）
+
+### 1. SQLite 数据库路径修复
+**问题**: 使用相对路径 `sqlite:///./dev_access.db`，在只读环境或不同工作目录下启动时报 `sqlite3.OperationalError: unable to open database file`
+
+**修复**: 
+- 使用绝对路径，基于 `database.py` 文件位置动态计算
+- 添加目录可写性检查
+- 提供内存数据库作为备选方案（目录不可写时自动降级）
+
+**修改文件**: [backend/app/database.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/app/database.py)
+
+
+### 2. 延迟数据库表创建
+**问题**: 导入 `main.py` 时立即执行 `models.Base.metadata.create_all(bind=engine)`，导入即触发数据库操作
+
+**修复**: 将数据库初始化和表创建移到 FastAPI lifespan 中，应用启动时才执行
+
+**修改文件**: [backend/main.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/main.py#L37-L61)
+
+
+### 3. 启动前验证测试
+**问题**: 无法确认项目是否真的可安装、可运行、可验证
+
+**修复**: 更新 `start.sh` 启动脚本，启动前先运行 `test_verification.py` 验证所有功能
+
+**修改文件**:
+- [start.sh](file:///Users/mac/pro/solo/workspaces/xy10897/start.sh)
+- [backend/test_verification.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/test_verification.py)
+
+
+## ✅ 问题修复记录（第一轮）
 
 ### 1. Pydantic 2.x 兼容性修复
 **问题**: schemas.py 使用 `orm_mode = True`（Pydantic 1.x 语法），在 Pydantic 2.5.0 中失效
@@ -34,9 +65,9 @@
 **修复**: 添加 `create_expired_credential_demo()` 服务函数，创建过期时间为昨天的凭证，并自动生成"签发"和"过期"两条审计日志
 
 **修改文件**:
-- [backend/app/services.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/app/services.py#L266-L320)
-- [backend/main.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/main.py#L154-L156) (新增 API 端点)
-- [frontend/app.js](file:///Users/mac/pro/solo/workspaces/xy10897/frontend/app.js#L392-L416) (调用新 API)
+- [backend/app/services.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/app/services.py)
+- [backend/main.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/main.py)
+- [frontend/app.js](file:///Users/mac/pro/solo/workspaces/xy10897/frontend/app.js)
 
 
 ## 功能特性

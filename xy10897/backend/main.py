@@ -1,15 +1,24 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 from typing import List
 from datetime import datetime
 import asyncio
 from contextlib import asynccontextmanager
 
 from app import models, schemas, services
-from app.database import engine, get_db, SessionLocal
+from app.database import Base, init_database, get_database_url
 
-models.Base.metadata.create_all(bind=engine)
+engine = None
+SessionLocal = None
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 async def auto_expire_credentials():
@@ -27,10 +36,28 @@ async def auto_expire_credentials():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    task = asyncio.create_task(auto_expire_credentials())
-    print("后台任务已启动：自动回收过期凭证（每分钟检查一次）")
+    global engine, SessionLocal
+    
+    print("=" * 60)
+    print("正在初始化数据库...")
+    
+    try:
+        engine = init_database(use_memory_fallback=True)
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        
+        Base.metadata.create_all(bind=engine)
+        print(f"✅ 数据库初始化成功: {get_database_url()}")
+    except Exception as e:
+        print(f"❌ 数据库初始化失败: {e}")
+        raise
+    
+    expire_task = asyncio.create_task(auto_expire_credentials())
+    print("✅ 后台任务已启动：自动回收过期凭证（每分钟检查一次）")
+    print("=" * 60)
+    
     yield
-    task.cancel()
+    
+    expire_task.cancel()
     print("后台任务已停止")
 
 

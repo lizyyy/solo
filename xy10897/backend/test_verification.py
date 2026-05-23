@@ -5,15 +5,21 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from sqlalchemy.orm import sessionmaker
 from app import schemas, models, services, auth
-from app.database import SessionLocal, engine
+from app.database import Base, init_database
 from datetime import datetime, timedelta
 
 print("=== 验证测试脚本 ===")
 print()
 
-models.Base.metadata.create_all(bind=engine)
+print("正在初始化数据库...")
+engine = init_database(use_memory_fallback=True)
+Base.metadata.create_all(bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
+print("✅ 数据库初始化成功")
+print()
 
 print("1. 测试 Pydantic 2.x 兼容性 (from_attributes)...")
 try:
