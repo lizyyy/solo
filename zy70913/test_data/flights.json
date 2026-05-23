@@ -1,0 +1,34 @@
+[
+  {
+    "flight_no": "CA1234",
+    "airline": "中国国际航空",
+    "departure": "北京",
+    "arrival": "上海",
+    "is_responsible": true,
+    "delay_minutes": 0
+  },
+  {
+    "flight_no": "MU5678",
+    "airline": "东方航空",
+    "departure": "广州",
+    "arrival": "深圳",
+    "is_responsible": true,
+    "delay_minutes": 240
+  },
+  {
+    "flight_no": "CZ9012",
+    "airline": "南方航空",
+    "departure": "成都",
+    "arrival": "重庆",
+    "is_responsible": false,
+    "delay_minutes": 0
+  },
+  {
+    "flight_no": "HU3456",
+    "airline": "海南航空",
+    "departure": "杭州",
+    "arrival": "南京",
+    "is_responsible": true,
+    "delay_minutes": 0
+  }
+]
