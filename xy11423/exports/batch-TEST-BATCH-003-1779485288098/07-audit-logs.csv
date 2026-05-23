@@ -1,0 +1,4 @@
+ID,批次ID,项目类型,操作,旧值,新值,操作人,角色,备注,时间
+4b7de1f6-49bb-404f-b0af-f1141108ff4a,1b0fcb3f-81c7-43e6-acfb-fc65b2cd07dc,,batch_frozen,success,frozen,test-admin,admin,冻结批次用于导出,"5/23/2026, 5:28:08 AM"
+11e6db3a-6a89-4f3c-9870-3752ae9c6ef7,1b0fcb3f-81c7-43e6-acfb-fc65b2cd07dc,,batch_submitted,draft,success,test-user,tester,提交批次,"5/23/2026, 5:28:08 AM"
+26342e36-29df-4df8-a904-66d3a7a0ebbd,1b0fcb3f-81c7-43e6-acfb-fc65b2cd07dc,,batch_created,,"{""batchNo"":""TEST-BATCH-003"",""vin"":""TESTVIN987654321"",""plateNumber"":""京A12345""}",test-user,tester,创建批次,"5/23/2026, 5:28:08 AM"
