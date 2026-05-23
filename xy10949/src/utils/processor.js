@@ -56,42 +56,70 @@ export function mergeContiguousBookings(bookingsByRoom) {
   const merged = {};
   
   for (const [roomName, bookings] of Object.entries(bookingsByRoom)) {
-    const sorted = [...bookings].sort((a, b) => a.checkIn - b.checkIn);
+    const groups = {};
+    
+    for (const booking of bookings) {
+      const isLock = booking.reason && 
+        (booking.reason.includes('锁') || booking.reason.includes('维护') || 
+         booking.reason.includes('自用') || booking.reason.includes('block'));
+      
+      let groupKey;
+      if (isLock) {
+        groupKey = `lock:${booking.reason}`;
+      } else if (booking.guest) {
+        groupKey = `guest:${booking.guest}`;
+      } else {
+        groupKey = `other:${booking.id}`;
+      }
+      
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(booking);
+    }
+    
     const result = [];
     
-    for (const booking of sorted) {
-      if (result.length === 0) {
-        result.push({
-          ...booking,
-          checkIn: booking.checkIn,
-          checkOut: booking.checkOut,
-          sources: [booking]
-        });
-      } else {
-        const last = result[result.length - 1];
+    for (const groupBookings of Object.values(groups)) {
+      const sorted = [...groupBookings].sort((a, b) => a.checkIn - b.checkIn);
+      
+      if (sorted.length === 0) continue;
+      
+      let current = {
+        ...sorted[0],
+        checkIn: sorted[0].checkIn,
+        checkOut: sorted[0].checkOut,
+        sources: [sorted[0]]
+      };
+      
+      for (let i = 1; i < sorted.length; i++) {
+        const booking = sorted[i];
+        const isContiguous = booking.checkIn.getTime() === current.checkOut.getTime();
+        const isOverlapping = booking.checkIn.getTime() <= current.checkOut.getTime();
         
-        const isSameGuest = booking.guest && last.guest && booking.guest === last.guest;
-        const isSameReason = booking.reason === last.reason;
-        const isContiguous = booking.checkIn.getTime() === last.checkOut.getTime();
-        
-        if (isContiguous && (isSameGuest || isSameReason)) {
-          last.checkOut = booking.checkOut;
-          last.sources.push(booking);
-          if (!last.guest && booking.guest) {
-            last.guest = booking.guest;
+        if (isContiguous || isOverlapping) {
+          if (booking.checkOut > current.checkOut) {
+            current.checkOut = booking.checkOut;
+          }
+          current.sources.push(booking);
+          if (!current.guest && booking.guest) {
+            current.guest = booking.guest;
           }
         } else {
-          result.push({
+          result.push(current);
+          current = {
             ...booking,
             checkIn: booking.checkIn,
             checkOut: booking.checkOut,
             sources: [booking]
-          });
+          };
         }
       }
+      
+      result.push(current);
     }
     
-    merged[roomName] = result;
+    merged[roomName] = result.sort((a, b) => a.checkIn - b.checkIn);
   }
   
   return merged;
