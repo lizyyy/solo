@@ -25,6 +25,7 @@ db.serialize(() => {
       phone TEXT UNIQUE NOT NULL,
       gender TEXT,
       birthday TEXT,
+      status TEXT NOT NULL DEFAULT 'active',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
