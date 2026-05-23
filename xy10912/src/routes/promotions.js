@@ -14,12 +14,12 @@ router.post('/', validate('promotionWindow'), async (req, res, next) => {
   try {
     const priceVersion = await priceVersionDAO.findById(req.body.price_version_id);
     if (!priceVersion) {
-      return notFoundResponse(res, '价签版本不存在');
+      return await notFoundResponse(res, '价签版本不存在', req);
     }
 
     const existing = await promotionWindowDAO.findByCode(req.body.promotion_code);
     if (existing) {
-      return duplicateResponse(res, '促销编码已存在');
+      return await duplicateResponse(res, '促销编码已存在', req);
     }
 
     req.body.status = 'scheduled';
@@ -83,7 +83,7 @@ router.get('/:code', async (req, res, next) => {
   try {
     const promotion = await promotionWindowDAO.findByCode(req.params.code);
     if (!promotion) {
-      return notFoundResponse(res, '促销窗口不存在');
+      return await notFoundResponse(res, '促销窗口不存在', req);
     }
     return successResponse(res, promotion);
   } catch (err) {
@@ -96,7 +96,7 @@ router.patch('/:code/start', async (req, res, next) => {
   try {
     const promotion = await promotionWindowDAO.findByCode(req.params.code);
     if (!promotion) {
-      return notFoundResponse(res, '促销窗口不存在');
+      return await notFoundResponse(res, '促销窗口不存在', req);
     }
 
     await promotionWindowDAO.update(promotion.id, {
@@ -116,7 +116,7 @@ router.patch('/:code/end', async (req, res, next) => {
   try {
     const promotion = await promotionWindowDAO.findByCode(req.params.code);
     if (!promotion) {
-      return notFoundResponse(res, '促销窗口不存在');
+      return await notFoundResponse(res, '促销窗口不存在', req);
     }
 
     await promotionWindowDAO.update(promotion.id, {

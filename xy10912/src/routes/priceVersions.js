@@ -12,12 +12,12 @@ router.post('/', validate('priceVersion'), async (req, res, next) => {
   try {
     const product = await productDAO.findByBarcode(req.body.barcode);
     if (!product) {
-      return notFoundResponse(res, '商品不存在');
+      return await notFoundResponse(res, '商品不存在', req);
     }
 
     const existing = await priceVersionDAO.findByVersionCode(req.body.version_code);
     if (existing) {
-      return duplicateResponse(res, '价签版本编码已存在');
+      return await duplicateResponse(res, '价签版本编码已存在', req);
     }
 
     req.body.status = 'pending';
@@ -75,7 +75,7 @@ router.get('/:code', async (req, res, next) => {
   try {
     const priceVersion = await priceVersionDAO.findByVersionCode(req.params.code);
     if (!priceVersion) {
-      return notFoundResponse(res, '价签版本不存在');
+      return await notFoundResponse(res, '价签版本不存在', req);
     }
     return successResponse(res, priceVersion);
   } catch (err) {
@@ -88,7 +88,7 @@ router.patch('/:code/activate', async (req, res, next) => {
   try {
     const priceVersion = await priceVersionDAO.findByVersionCode(req.params.code);
     if (!priceVersion) {
-      return notFoundResponse(res, '价签版本不存在');
+      return await notFoundResponse(res, '价签版本不存在', req);
     }
 
     await priceVersionDAO.update(priceVersion.id, {
@@ -108,7 +108,7 @@ router.patch('/:code/deactivate', async (req, res, next) => {
   try {
     const priceVersion = await priceVersionDAO.findByVersionCode(req.params.code);
     if (!priceVersion) {
-      return notFoundResponse(res, '价签版本不存在');
+      return await notFoundResponse(res, '价签版本不存在', req);
     }
 
     await priceVersionDAO.update(priceVersion.id, {
@@ -137,7 +137,7 @@ router.patch('/:code/status', async (req, res, next) => {
 
     const priceVersion = await priceVersionDAO.findByVersionCode(req.params.code);
     if (!priceVersion) {
-      return notFoundResponse(res, '价签版本不存在');
+      return await notFoundResponse(res, '价签版本不存在', req);
     }
 
     await priceVersionDAO.update(priceVersion.id, {

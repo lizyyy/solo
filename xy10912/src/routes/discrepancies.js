@@ -14,12 +14,12 @@ router.post('/', validate('discrepancyReport'), async (req, res, next) => {
   try {
     const store = await storeDAO.findByCode(req.body.store_code);
     if (!store) {
-      return notFoundResponse(res, '门店不存在');
+      return await notFoundResponse(res, '门店不存在', req);
     }
 
     const product = await productDAO.findByBarcode(req.body.barcode);
     if (!product) {
-      return notFoundResponse(res, '商品不存在');
+      return await notFoundResponse(res, '商品不存在', req);
     }
 
     req.body.status = 'pending_review';
@@ -77,7 +77,7 @@ router.get('/:code', async (req, res, next) => {
   try {
     const discrepancy = await discrepancyReportDAO.findByCode(req.params.code);
     if (!discrepancy) {
-      return notFoundResponse(res, '差异报告不存在');
+      return await notFoundResponse(res, '差异报告不存在', req);
     }
     return successResponse(res, discrepancy);
   } catch (err) {
@@ -90,7 +90,7 @@ router.patch('/:code/review', validate('discrepancyReview'), async (req, res, ne
   try {
     const discrepancy = await discrepancyReportDAO.findByCode(req.params.code);
     if (!discrepancy) {
-      return notFoundResponse(res, '差异报告不存在');
+      return await notFoundResponse(res, '差异报告不存在', req);
     }
 
     const updateData = {
@@ -131,7 +131,7 @@ router.patch('/:code/status', async (req, res, next) => {
 
     const discrepancy = await discrepancyReportDAO.findByCode(req.params.code);
     if (!discrepancy) {
-      return notFoundResponse(res, '差异报告不存在');
+      return await notFoundResponse(res, '差异报告不存在', req);
     }
 
     await discrepancyReportDAO.update(discrepancy.id, {

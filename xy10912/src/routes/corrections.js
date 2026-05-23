@@ -14,18 +14,18 @@ router.post('/', validate('manualCorrection'), async (req, res, next) => {
   try {
     const store = await storeDAO.findByCode(req.body.store_code);
     if (!store) {
-      return notFoundResponse(res, '门店不存在');
+      return await notFoundResponse(res, '门店不存在', req);
     }
 
     const product = await productDAO.findByBarcode(req.body.barcode);
     if (!product) {
-      return notFoundResponse(res, '商品不存在');
+      return await notFoundResponse(res, '商品不存在', req);
     }
 
     if (req.body.discrepancy_id) {
       const discrepancy = await discrepancyReportDAO.findById(req.body.discrepancy_id);
       if (!discrepancy) {
-        return notFoundResponse(res, '关联的差异报告不存在');
+        return await notFoundResponse(res, '关联的差异报告不存在', req);
       }
     }
 
@@ -67,7 +67,7 @@ router.get('/:code', async (req, res, next) => {
   try {
     const correction = await manualCorrectionDAO.findByCode(req.params.code);
     if (!correction) {
-      return notFoundResponse(res, '人工修正记录不存在');
+      return await notFoundResponse(res, '人工修正记录不存在', req);
     }
     return successResponse(res, correction);
   } catch (err) {

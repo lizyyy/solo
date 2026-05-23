@@ -13,12 +13,12 @@ router.post('/', validate('confirmation'), async (req, res, next) => {
   try {
     const store = await storeDAO.findByCode(req.body.store_code);
     if (!store) {
-      return notFoundResponse(res, '门店不存在');
+      return await notFoundResponse(res, '门店不存在', req);
     }
 
     const priceVersion = await priceVersionDAO.findById(req.body.price_version_id);
     if (!priceVersion) {
-      return notFoundResponse(res, '价签版本不存在');
+      return await notFoundResponse(res, '价签版本不存在', req);
     }
 
     const existing = await confirmationDAO.findByStoreAndVersion(
@@ -26,7 +26,7 @@ router.post('/', validate('confirmation'), async (req, res, next) => {
       req.body.price_version_id
     );
     if (existing) {
-      return duplicateResponse(res, '该门店已确认过此价签版本');
+      return await duplicateResponse(res, '该门店已确认过此价签版本', req);
     }
 
     const result = await confirmationDAO.create(req.body);
@@ -67,7 +67,7 @@ router.get('/:code', async (req, res, next) => {
   try {
     const confirmation = await confirmationDAO.findByCode(req.params.code);
     if (!confirmation) {
-      return notFoundResponse(res, '确认记录不存在');
+      return await notFoundResponse(res, '确认记录不存在', req);
     }
     return successResponse(res, confirmation);
   } catch (err) {

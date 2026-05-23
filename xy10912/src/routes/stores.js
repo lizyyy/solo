@@ -11,7 +11,7 @@ router.post('/', validate('store'), async (req, res, next) => {
   try {
     const existing = await storeDAO.findByCode(req.body.store_code);
     if (existing) {
-      return duplicateResponse(res, '门店编码已存在');
+      return await duplicateResponse(res, '门店编码已存在', req);
     }
 
     const result = await storeDAO.create(req.body);
@@ -52,7 +52,7 @@ router.get('/:code', async (req, res, next) => {
   try {
     const store = await storeDAO.findByCode(req.params.code);
     if (!store) {
-      return notFoundResponse(res, '门店不存在');
+      return await notFoundResponse(res, '门店不存在', req);
     }
     return successResponse(res, store);
   } catch (err) {
@@ -65,7 +65,7 @@ router.put('/:code', validate('store'), async (req, res, next) => {
   try {
     const store = await storeDAO.findByCode(req.params.code);
     if (!store) {
-      return notFoundResponse(res, '门店不存在');
+      return await notFoundResponse(res, '门店不存在', req);
     }
 
     req.body.updated_at = new Date().toISOString();

@@ -39,7 +39,7 @@ router.get('/:code', async (req, res, next) => {
   try {
     const exception = await exceptionLogDAO.findByCode(req.params.code);
     if (!exception) {
-      return notFoundResponse(res, '异常记录不存在');
+      return await notFoundResponse(res, '异常记录不存在', req);
     }
     return successResponse(res, exception);
   } catch (err) {
@@ -54,7 +54,7 @@ router.patch('/:code/handle', async (req, res, next) => {
     
     const exception = await exceptionLogDAO.findByCode(req.params.code);
     if (!exception) {
-      return notFoundResponse(res, '异常记录不存在');
+      return await notFoundResponse(res, '异常记录不存在', req);
     }
 
     await exceptionLogDAO.update(exception.id, {

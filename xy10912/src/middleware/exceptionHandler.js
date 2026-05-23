@@ -37,7 +37,7 @@ const exceptionHandler = async (err, req, res, next) => {
   });
 };
 
-const logException = async (req, error, conclusion = 'pending') => {
+const logException = async (req, error, conclusion = 'pending', status = 'pending') => {
   const exceptionCode = generateExceptionCode();
   try {
     await exceptionLogDAO.create({
@@ -50,13 +50,17 @@ const logException = async (req, error, conclusion = 'pending') => {
       }),
       error_message: typeof error === 'string' ? error : error.message,
       processing_conclusion: conclusion,
-      status: 'pending'
+      status: status
     });
     return exceptionCode;
   } catch (logErr) {
     console.error('记录异常日志失败:', logErr);
     return null;
   }
+};
+
+const logBusinessException = async (req, errorType, errorMessage, conclusion = 'handled') => {
+  return await logException(req, errorMessage, `${errorType}: ${conclusion}`, 'handled');
 };
 
 const notFoundHandler = (req, res) => {
@@ -67,4 +71,4 @@ const notFoundHandler = (req, res) => {
   });
 };
 
-module.exports = { exceptionHandler, logException, notFoundHandler };
+module.exports = { exceptionHandler, logException, logBusinessException, notFoundHandler };

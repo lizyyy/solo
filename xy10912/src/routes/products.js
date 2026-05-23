@@ -11,7 +11,7 @@ router.post('/', validate('product'), async (req, res, next) => {
   try {
     const existing = await productDAO.findByBarcode(req.body.barcode);
     if (existing) {
-      return duplicateResponse(res, '商品条码已存在');
+      return await duplicateResponse(res, '商品条码已存在', req);
     }
 
     const result = await productDAO.create(req.body);
@@ -52,7 +52,7 @@ router.get('/:barcode', async (req, res, next) => {
   try {
     const product = await productDAO.findByBarcode(req.params.barcode);
     if (!product) {
-      return notFoundResponse(res, '商品不存在');
+      return await notFoundResponse(res, '商品不存在', req);
     }
     return successResponse(res, product);
   } catch (err) {
@@ -65,7 +65,7 @@ router.put('/:barcode', validate('product'), async (req, res, next) => {
   try {
     const product = await productDAO.findByBarcode(req.params.barcode);
     if (!product) {
-      return notFoundResponse(res, '商品不存在');
+      return await notFoundResponse(res, '商品不存在', req);
     }
 
     req.body.updated_at = new Date().toISOString();

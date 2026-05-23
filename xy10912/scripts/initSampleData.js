@@ -186,6 +186,27 @@ const sampleCorrections = [
   { correction_code: 'CORR002', discrepancy_id: null, store_code: 'ST004', barcode: '6901234567890', old_price: 8.80, new_price: 6.90, corrected_by: '店长B', correction_time: now.format('YYYY-MM-DD HH:mm:ss'), reason: '价签更新错误，人工修正', status: 'completed' }
 ];
 
+function clearTables() {
+  return new Promise((resolve, reject) => {
+    console.log('清空现有数据...');
+    const tables = ['manual_corrections', 'exception_logs', 'discrepancy_reports', 'confirmations', 'promotion_windows', 'price_versions', 'products', 'stores'];
+    let completed = 0;
+    
+    tables.forEach(table => {
+      db.run(`DELETE FROM ${table}`, (err) => {
+        if (err) reject(err);
+        db.run(`DELETE FROM sqlite_sequence WHERE name = ?`, [table], () => {
+          completed++;
+          if (completed === tables.length) {
+            console.log('✓ 已清空所有数据表\n');
+            resolve();
+          }
+        });
+      });
+    });
+  });
+}
+
 function insertData() {
   return new Promise((resolve, reject) => {
     console.log('开始插入示例数据...\n');
@@ -201,7 +222,7 @@ function insertData() {
       }
     }
 
-    const storeStmt = db.prepare('INSERT INTO stores (store_code, store_name, address, manager, phone, status) VALUES (?, ?, ?, ?, ?, ?)');
+    const storeStmt = db.prepare('INSERT OR REPLACE INTO stores (store_code, store_name, address, manager, phone, status) VALUES (?, ?, ?, ?, ?, ?)');
     sampleStores.forEach(store => {
       storeStmt.run(store.store_code, store.store_name, store.address, store.manager, store.phone, store.status);
     });
@@ -211,7 +232,7 @@ function insertData() {
       checkDone();
     });
 
-    const productStmt = db.prepare('INSERT INTO products (barcode, product_name, category, base_price, unit) VALUES (?, ?, ?, ?, ?)');
+    const productStmt = db.prepare('INSERT OR REPLACE INTO products (barcode, product_name, category, base_price, unit) VALUES (?, ?, ?, ?, ?)');
     sampleProducts.forEach(product => {
       productStmt.run(product.barcode, product.product_name, product.category, product.base_price, product.unit);
     });
@@ -221,9 +242,9 @@ function insertData() {
       checkDone();
     });
 
-    const pvStmt = db.prepare('INSERT INTO price_versions (version_code, version_name, barcode, price, price_type, status, effective_start, effective_end, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-    samplePriceVersions.forEach(pv => {
-      pvStmt.run(pv.version_code, pv.version_name, pv.barcode, pv.price, pv.price_type, pv.status, pv.effective_start, pv.effective_end, pv.created_by);
+    const pvStmt = db.prepare('INSERT OR REPLACE INTO price_versions (id, version_code, version_name, barcode, price, price_type, status, effective_start, effective_end, created_by) VALUES ((SELECT id FROM price_versions WHERE version_code = ?), ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    samplePriceVersions.forEach((pv, idx) => {
+      pvStmt.run(pv.version_code, pv.version_code, pv.version_name, pv.barcode, pv.price, pv.price_type, pv.status, pv.effective_start, pv.effective_end, pv.created_by);
     });
     pvStmt.finalize((err) => {
       if (err) reject(err);
@@ -231,9 +252,9 @@ function insertData() {
       checkDone();
     });
 
-    const promoStmt = db.prepare('INSERT INTO promotion_windows (promotion_code, promotion_name, price_version_id, start_time, end_time, store_codes, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+    const promoStmt = db.prepare('INSERT OR REPLACE INTO promotion_windows (id, promotion_code, promotion_name, price_version_id, start_time, end_time, store_codes, status, created_by) VALUES ((SELECT id FROM promotion_windows WHERE promotion_code = ?), ?, ?, ?, ?, ?, ?, ?, ?)');
     samplePromotions.forEach(promo => {
-      promoStmt.run(promo.promotion_code, promo.promotion_name, promo.price_version_id, promo.start_time, promo.end_time, promo.store_codes, promo.status, promo.created_by);
+      promoStmt.run(promo.promotion_code, promo.promotion_code, promo.promotion_name, promo.price_version_id, promo.start_time, promo.end_time, promo.store_codes, promo.status, promo.created_by);
     });
     promoStmt.finalize((err) => {
       if (err) reject(err);
@@ -241,9 +262,9 @@ function insertData() {
       checkDone();
     });
 
-    const confStmt = db.prepare('INSERT INTO confirmations (confirmation_code, store_code, price_version_id, confirmer, confirmation_time, status, remarks) VALUES (?, ?, ?, ?, ?, ?, ?)');
+    const confStmt = db.prepare('INSERT OR REPLACE INTO confirmations (id, confirmation_code, store_code, price_version_id, confirmer, confirmation_time, status, remarks) VALUES ((SELECT id FROM confirmations WHERE confirmation_code = ?), ?, ?, ?, ?, ?, ?, ?)');
     sampleConfirmations.forEach(conf => {
-      confStmt.run(conf.confirmation_code, conf.store_code, conf.price_version_id, conf.confirmer, conf.confirmation_time, conf.status, conf.remarks);
+      confStmt.run(conf.confirmation_code, conf.confirmation_code, conf.store_code, conf.price_version_id, conf.confirmer, conf.confirmation_time, conf.status, conf.remarks);
     });
     confStmt.finalize((err) => {
       if (err) reject(err);
@@ -251,9 +272,9 @@ function insertData() {
       checkDone();
     });
 
-    const dispStmt = db.prepare('INSERT INTO discrepancy_reports (report_code, store_code, barcode, price_version_id, expected_price, actual_price, discrepancy_type, status, reported_by, reviewed_by, review_time, resolution, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    const dispStmt = db.prepare('INSERT OR REPLACE INTO discrepancy_reports (id, report_code, store_code, barcode, price_version_id, expected_price, actual_price, discrepancy_type, status, reported_by, reviewed_by, review_time, resolution, remarks) VALUES ((SELECT id FROM discrepancy_reports WHERE report_code = ?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     sampleDiscrepancies.forEach(disp => {
-      dispStmt.run(disp.report_code, disp.store_code, disp.barcode, disp.price_version_id, disp.expected_price, disp.actual_price, disp.discrepancy_type, disp.status, disp.reported_by, disp.reviewed_by, disp.review_time, disp.resolution, disp.remarks);
+      dispStmt.run(disp.report_code, disp.report_code, disp.store_code, disp.barcode, disp.price_version_id, disp.expected_price, disp.actual_price, disp.discrepancy_type, disp.status, disp.reported_by, disp.reviewed_by, disp.review_time, disp.resolution, disp.remarks);
     });
     dispStmt.finalize((err) => {
       if (err) reject(err);
@@ -261,9 +282,9 @@ function insertData() {
       checkDone();
     });
 
-    const corrStmt = db.prepare('INSERT INTO manual_corrections (correction_code, discrepancy_id, store_code, barcode, old_price, new_price, corrected_by, correction_time, reason, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    const corrStmt = db.prepare('INSERT OR REPLACE INTO manual_corrections (id, correction_code, discrepancy_id, store_code, barcode, old_price, new_price, corrected_by, correction_time, reason, status) VALUES ((SELECT id FROM manual_corrections WHERE correction_code = ?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     sampleCorrections.forEach(corr => {
-      corrStmt.run(corr.correction_code, corr.discrepancy_id, corr.store_code, corr.barcode, corr.old_price, corr.new_price, corr.corrected_by, corr.correction_time, corr.reason, corr.status);
+      corrStmt.run(corr.correction_code, corr.correction_code, corr.discrepancy_id, corr.store_code, corr.barcode, corr.old_price, corr.new_price, corr.corrected_by, corr.correction_time, corr.reason, corr.status);
     });
     corrStmt.finalize((err) => {
       if (err) reject(err);
@@ -273,19 +294,26 @@ function insertData() {
   });
 }
 
-console.log('初始化数据表...');
+console.log('='.repeat(50));
+console.log('可重复示例数据初始化工具');
+console.log('='.repeat(50) + '\n');
+
 initTables()
   .then(() => {
     console.log('✓ 数据表初始化完成\n');
+    return clearTables();
+  })
+  .then(() => {
     return insertData();
   })
   .then(() => {
     db.close();
-    console.log('\n数据库连接已关闭。');
+    console.log('\n✓ 数据库连接已关闭。');
+    console.log('✓ 示例数据初始化完成，可重复执行！');
     process.exit(0);
   })
   .catch(err => {
-    console.error('初始化失败:', err);
+    console.error('\n✗ 初始化失败:', err);
     db.close();
     process.exit(1);
   });
