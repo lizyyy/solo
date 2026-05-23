@@ -1,0 +1,25 @@
+{
+  "name": "after-sales-photo-audit",
+  "version": "1.0.0",
+  "description": "售后照片清点CLI工具 - 用于检测维修照片完整性、识别重复文件、生成归档报告",
+  "main": "src/index.js",
+  "bin": {
+    "photo-audit": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node src/self-test.js",
+    "self-check": "node src/self-test.js"
+  },
+  "keywords": ["after-sales", "photo", "audit", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

@@ -1,0 +1,836 @@
+{
+  "validFiles": [
+    {
+      "name": "C005-WO001-after.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/C005-WO001-after.jpg",
+      "relativePath": "C005-WO001-after.jpg",
+      "size": 13,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "C005-WO001-after.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/C005-WO001-after.jpg",
+        "customerId": "005",
+        "workOrderId": "001",
+        "photoType": "after",
+        "index": null,
+        "error": null,
+        "raw": "C005-WO001-after.jpg"
+      }
+    },
+    {
+      "name": "C005-WO001-before.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/C005-WO001-before.jpg",
+      "relativePath": "C005-WO001-before.jpg",
+      "size": 13,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "C005-WO001-before.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/C005-WO001-before.jpg",
+        "customerId": "005",
+        "workOrderId": "001",
+        "photoType": "before",
+        "index": null,
+        "error": null,
+        "raw": "C005-WO001-before.jpg"
+      }
+    },
+    {
+      "name": "CUST001-WO001-after.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO001-after.jpg",
+      "relativePath": "CUST001-WO001-after.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.916Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST001-WO001-after.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO001-after.jpg",
+        "customerId": "CUST001",
+        "workOrderId": "WO001",
+        "photoType": "after",
+        "index": null,
+        "error": null,
+        "raw": "CUST001-WO001-after.jpg"
+      }
+    },
+    {
+      "name": "CUST001-WO001-before.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO001-before.jpg",
+      "relativePath": "CUST001-WO001-before.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.916Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST001-WO001-before.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO001-before.jpg",
+        "customerId": "CUST001",
+        "workOrderId": "WO001",
+        "photoType": "before",
+        "index": null,
+        "error": null,
+        "raw": "CUST001-WO001-before.jpg"
+      }
+    },
+    {
+      "name": "CUST001-WO002-after.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO002-after.jpg",
+      "relativePath": "CUST001-WO002-after.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.916Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST001-WO002-after.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO002-after.jpg",
+        "customerId": "CUST001",
+        "workOrderId": "WO002",
+        "photoType": "after",
+        "index": null,
+        "error": null,
+        "raw": "CUST001-WO002-after.jpg"
+      }
+    },
+    {
+      "name": "CUST001-WO002-before.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO002-before.jpg",
+      "relativePath": "CUST001-WO002-before.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.916Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST001-WO002-before.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO002-before.jpg",
+        "customerId": "CUST001",
+        "workOrderId": "WO002",
+        "photoType": "before",
+        "index": null,
+        "error": null,
+        "raw": "CUST001-WO002-before.jpg"
+      }
+    },
+    {
+      "name": "CUST002-WO001-before.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST002-WO001-before.jpg",
+      "relativePath": "CUST002-WO001-before.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.916Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST002-WO001-before.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST002-WO001-before.jpg",
+        "customerId": "CUST002",
+        "workOrderId": "WO001",
+        "photoType": "before",
+        "index": null,
+        "error": null,
+        "raw": "CUST002-WO001-before.jpg"
+      }
+    },
+    {
+      "name": "CUST003-WO001-after.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO001-after.jpg",
+      "relativePath": "CUST003-WO001-after.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.916Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST003-WO001-after.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO001-after.jpg",
+        "customerId": "CUST003",
+        "workOrderId": "WO001",
+        "photoType": "after",
+        "index": null,
+        "error": null,
+        "raw": "CUST003-WO001-after.jpg"
+      }
+    },
+    {
+      "name": "CUST003-WO002-after.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO002-after.jpg",
+      "relativePath": "CUST003-WO002-after.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST003-WO002-after.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO002-after.jpg",
+        "customerId": "CUST003",
+        "workOrderId": "WO002",
+        "photoType": "after",
+        "index": null,
+        "error": null,
+        "raw": "CUST003-WO002-after.jpg"
+      }
+    },
+    {
+      "name": "CUST003-WO002-before.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO002-before.jpg",
+      "relativePath": "CUST003-WO002-before.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST003-WO002-before.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO002-before.jpg",
+        "customerId": "CUST003",
+        "workOrderId": "WO002",
+        "photoType": "before",
+        "index": null,
+        "error": null,
+        "raw": "CUST003-WO002-before.jpg"
+      }
+    },
+    {
+      "name": "CUST004-WO001-after.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-after.jpg",
+      "relativePath": "CUST004-WO001-after.jpg",
+      "size": 13,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST004-WO001-after.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-after.jpg",
+        "customerId": "CUST004",
+        "workOrderId": "WO001",
+        "photoType": "after",
+        "index": null,
+        "error": null,
+        "raw": "CUST004-WO001-after.jpg"
+      }
+    },
+    {
+      "name": "CUST004-WO001-before-01.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-before-01.jpg",
+      "relativePath": "CUST004-WO001-before-01.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST004-WO001-before-01.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-before-01.jpg",
+        "customerId": "CUST004",
+        "workOrderId": "WO001",
+        "photoType": "before",
+        "index": 1,
+        "error": null,
+        "raw": "CUST004-WO001-before-01.jpg"
+      }
+    },
+    {
+      "name": "CUST004-WO001-before-02.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-before-02.jpg",
+      "relativePath": "CUST004-WO001-before-02.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST004-WO001-before-02.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-before-02.jpg",
+        "customerId": "CUST004",
+        "workOrderId": "WO001",
+        "photoType": "before",
+        "index": 2,
+        "error": null,
+        "raw": "CUST004-WO001-before-02.jpg"
+      }
+    },
+    {
+      "name": "CUST007-WO001-repair.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST007-WO001-repair.jpg",
+      "relativePath": "CUST007-WO001-repair.jpg",
+      "size": 13,
+      "mtime": "2026-05-23T17:20:14.918Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST007-WO001-repair.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST007-WO001-repair.jpg",
+        "customerId": "CUST007",
+        "workOrderId": "WO001",
+        "photoType": "repair",
+        "index": null,
+        "error": null,
+        "raw": "CUST007-WO001-repair.jpg"
+      }
+    },
+    {
+      "name": "WO006-CUST006-after.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/WO006-CUST006-after.jpg",
+      "relativePath": "WO006-CUST006-after.jpg",
+      "size": 13,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "WO006-CUST006-after.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/WO006-CUST006-after.jpg",
+        "customerId": "CUST006",
+        "workOrderId": "WO006",
+        "photoType": "after",
+        "index": null,
+        "error": null,
+        "raw": "WO006-CUST006-after.jpg"
+      }
+    },
+    {
+      "name": "WO006-CUST006-before.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/WO006-CUST006-before.jpg",
+      "relativePath": "WO006-CUST006-before.jpg",
+      "size": 13,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "WO006-CUST006-before.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/WO006-CUST006-before.jpg",
+        "customerId": "CUST006",
+        "workOrderId": "WO006",
+        "photoType": "before",
+        "index": null,
+        "error": null,
+        "raw": "WO006-CUST006-before.jpg"
+      }
+    },
+    {
+      "name": "CUST008-WO001-after.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/subfolder1/CUST008-WO001-after.jpg",
+      "relativePath": "subfolder1/CUST008-WO001-after.jpg",
+      "size": 16,
+      "mtime": "2026-05-23T17:20:14.919Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST008-WO001-after.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/subfolder1/CUST008-WO001-after.jpg",
+        "customerId": "CUST008",
+        "workOrderId": "WO001",
+        "photoType": "after",
+        "index": null,
+        "error": null,
+        "raw": "CUST008-WO001-after.jpg"
+      }
+    },
+    {
+      "name": "CUST008-WO001-before.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/subfolder1/CUST008-WO001-before.jpg",
+      "relativePath": "subfolder1/CUST008-WO001-before.jpg",
+      "size": 16,
+      "mtime": "2026-05-23T17:20:14.919Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "CUST008-WO001-before.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/subfolder1/CUST008-WO001-before.jpg",
+        "customerId": "CUST008",
+        "workOrderId": "WO001",
+        "photoType": "before",
+        "index": null,
+        "error": null,
+        "raw": "CUST008-WO001-before.jpg"
+      }
+    },
+    {
+      "name": "客户001-工单001-维修前.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户001-工单001-维修前.jpg",
+      "relativePath": "客户001-工单001-维修前.jpg",
+      "size": 13,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "客户001-工单001-维修前.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户001-工单001-维修前.jpg",
+        "customerId": "001",
+        "workOrderId": "001",
+        "photoType": "before",
+        "index": null,
+        "error": null,
+        "raw": "客户001-工单001-维修前.jpg"
+      }
+    },
+    {
+      "name": "客户001-工单001-维修后.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户001-工单001-维修后.jpg",
+      "relativePath": "客户001-工单001-维修后.jpg",
+      "size": 13,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "客户001-工单001-维修后.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户001-工单001-维修后.jpg",
+        "customerId": "001",
+        "workOrderId": "001",
+        "photoType": "after",
+        "index": null,
+        "error": null,
+        "raw": "客户001-工单001-维修后.jpg"
+      }
+    },
+    {
+      "name": "客户002-工单001-维修前.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户002-工单001-维修前.jpg",
+      "relativePath": "客户002-工单001-维修前.jpg",
+      "size": 13,
+      "mtime": "2026-05-23T17:20:14.917Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": true,
+        "filename": "客户002-工单001-维修前.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户002-工单001-维修前.jpg",
+        "customerId": "002",
+        "workOrderId": "001",
+        "photoType": "before",
+        "index": null,
+        "error": null,
+        "raw": "客户002-工单001-维修前.jpg"
+      }
+    }
+  ],
+  "invalidFiles": [
+    {
+      "name": "CUST001-WO001.png",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO001.png",
+      "relativePath": "CUST001-WO001.png",
+      "size": 8,
+      "mtime": "2026-05-23T17:20:14.918Z",
+      "extension": ".png",
+      "parsed": {
+        "valid": false,
+        "filename": "CUST001-WO001.png",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO001.png",
+        "customerId": null,
+        "workOrderId": null,
+        "photoType": null,
+        "index": null,
+        "error": "缺少: 客户标识, 照片类型",
+        "raw": "CUST001-WO001.png"
+      }
+    },
+    {
+      "name": "WO999-no-type.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/WO999-no-type.jpg",
+      "relativePath": "WO999-no-type.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.918Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": false,
+        "filename": "WO999-no-type.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/WO999-no-type.jpg",
+        "customerId": null,
+        "workOrderId": null,
+        "photoType": null,
+        "index": null,
+        "error": "缺少: 客户标识, 照片类型",
+        "raw": "WO999-no-type.jpg"
+      }
+    },
+    {
+      "name": "no-customer-id.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/no-customer-id.jpg",
+      "relativePath": "no-customer-id.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.918Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": false,
+        "filename": "no-customer-id.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/no-customer-id.jpg",
+        "customerId": null,
+        "workOrderId": null,
+        "photoType": null,
+        "index": null,
+        "error": "缺少: 客户标识, 工单标识, 照片类型",
+        "raw": "no-customer-id.jpg"
+      }
+    },
+    {
+      "name": "random-image.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/random-image.jpg",
+      "relativePath": "random-image.jpg",
+      "size": 12,
+      "mtime": "2026-05-23T17:20:14.918Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": false,
+        "filename": "random-image.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/random-image.jpg",
+        "customerId": null,
+        "workOrderId": null,
+        "photoType": null,
+        "index": null,
+        "error": "缺少: 客户标识, 工单标识, 照片类型",
+        "raw": "random-image.jpg"
+      }
+    },
+    {
+      "name": "short.jpg",
+      "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/short.jpg",
+      "relativePath": "short.jpg",
+      "size": 7,
+      "mtime": "2026-05-23T17:20:14.918Z",
+      "extension": ".jpg",
+      "parsed": {
+        "valid": false,
+        "filename": "short.jpg",
+        "filePath": "/Users/mac/pro/solo/workspaces/xy10943/test-data/short.jpg",
+        "customerId": null,
+        "workOrderId": null,
+        "photoType": null,
+        "index": null,
+        "error": "缺少: 客户标识, 工单标识, 照片类型",
+        "raw": "short.jpg"
+      }
+    }
+  ],
+  "missingPhotos": {
+    "totalWorkOrders": 12,
+    "completeWorkOrders": 8,
+    "incompleteWorkOrders": 4,
+    "missingItems": [
+      {
+        "customerId": "CUST002",
+        "workOrderId": "WO001",
+        "missingTypes": [
+          "after"
+        ],
+        "presentTypes": [
+          "before"
+        ],
+        "files": [
+          "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST002-WO001-before.jpg"
+        ]
+      },
+      {
+        "customerId": "CUST003",
+        "workOrderId": "WO001",
+        "missingTypes": [
+          "before"
+        ],
+        "presentTypes": [
+          "after"
+        ],
+        "files": [
+          "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO001-after.jpg"
+        ]
+      },
+      {
+        "customerId": "CUST007",
+        "workOrderId": "WO001",
+        "missingTypes": [
+          "before",
+          "after"
+        ],
+        "presentTypes": [
+          "repair"
+        ],
+        "files": [
+          "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST007-WO001-repair.jpg"
+        ]
+      },
+      {
+        "customerId": "002",
+        "workOrderId": "001",
+        "missingTypes": [
+          "after"
+        ],
+        "presentTypes": [
+          "before"
+        ],
+        "files": [
+          "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户002-工单001-维修前.jpg"
+        ]
+      }
+    ],
+    "workOrders": {
+      "005-001": {
+        "customerId": "005",
+        "workOrderId": "001",
+        "files": [
+          {
+            "type": "after",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/C005-WO001-after.jpg",
+            "name": "C005-WO001-after.jpg"
+          },
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/C005-WO001-before.jpg",
+            "name": "C005-WO001-before.jpg"
+          }
+        ],
+        "presentTypes": [
+          "after",
+          "before"
+        ],
+        "missingTypes": []
+      },
+      "CUST001-WO001": {
+        "customerId": "CUST001",
+        "workOrderId": "WO001",
+        "files": [
+          {
+            "type": "after",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO001-after.jpg",
+            "name": "CUST001-WO001-after.jpg"
+          },
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO001-before.jpg",
+            "name": "CUST001-WO001-before.jpg"
+          }
+        ],
+        "presentTypes": [
+          "after",
+          "before"
+        ],
+        "missingTypes": []
+      },
+      "CUST001-WO002": {
+        "customerId": "CUST001",
+        "workOrderId": "WO002",
+        "files": [
+          {
+            "type": "after",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO002-after.jpg",
+            "name": "CUST001-WO002-after.jpg"
+          },
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST001-WO002-before.jpg",
+            "name": "CUST001-WO002-before.jpg"
+          }
+        ],
+        "presentTypes": [
+          "after",
+          "before"
+        ],
+        "missingTypes": []
+      },
+      "CUST002-WO001": {
+        "customerId": "CUST002",
+        "workOrderId": "WO001",
+        "files": [
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST002-WO001-before.jpg",
+            "name": "CUST002-WO001-before.jpg"
+          }
+        ],
+        "presentTypes": [
+          "before"
+        ],
+        "missingTypes": [
+          "after"
+        ]
+      },
+      "CUST003-WO001": {
+        "customerId": "CUST003",
+        "workOrderId": "WO001",
+        "files": [
+          {
+            "type": "after",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO001-after.jpg",
+            "name": "CUST003-WO001-after.jpg"
+          }
+        ],
+        "presentTypes": [
+          "after"
+        ],
+        "missingTypes": [
+          "before"
+        ]
+      },
+      "CUST003-WO002": {
+        "customerId": "CUST003",
+        "workOrderId": "WO002",
+        "files": [
+          {
+            "type": "after",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO002-after.jpg",
+            "name": "CUST003-WO002-after.jpg"
+          },
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST003-WO002-before.jpg",
+            "name": "CUST003-WO002-before.jpg"
+          }
+        ],
+        "presentTypes": [
+          "after",
+          "before"
+        ],
+        "missingTypes": []
+      },
+      "CUST004-WO001": {
+        "customerId": "CUST004",
+        "workOrderId": "WO001",
+        "files": [
+          {
+            "type": "after",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-after.jpg",
+            "name": "CUST004-WO001-after.jpg"
+          },
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-before-01.jpg",
+            "name": "CUST004-WO001-before-01.jpg"
+          },
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-before-02.jpg",
+            "name": "CUST004-WO001-before-02.jpg"
+          }
+        ],
+        "presentTypes": [
+          "after",
+          "before"
+        ],
+        "missingTypes": []
+      },
+      "CUST007-WO001": {
+        "customerId": "CUST007",
+        "workOrderId": "WO001",
+        "files": [
+          {
+            "type": "repair",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST007-WO001-repair.jpg",
+            "name": "CUST007-WO001-repair.jpg"
+          }
+        ],
+        "presentTypes": [
+          "repair"
+        ],
+        "missingTypes": [
+          "before",
+          "after"
+        ]
+      },
+      "CUST006-WO006": {
+        "customerId": "CUST006",
+        "workOrderId": "WO006",
+        "files": [
+          {
+            "type": "after",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/WO006-CUST006-after.jpg",
+            "name": "WO006-CUST006-after.jpg"
+          },
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/WO006-CUST006-before.jpg",
+            "name": "WO006-CUST006-before.jpg"
+          }
+        ],
+        "presentTypes": [
+          "after",
+          "before"
+        ],
+        "missingTypes": []
+      },
+      "CUST008-WO001": {
+        "customerId": "CUST008",
+        "workOrderId": "WO001",
+        "files": [
+          {
+            "type": "after",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/subfolder1/CUST008-WO001-after.jpg",
+            "name": "CUST008-WO001-after.jpg"
+          },
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/subfolder1/CUST008-WO001-before.jpg",
+            "name": "CUST008-WO001-before.jpg"
+          }
+        ],
+        "presentTypes": [
+          "after",
+          "before"
+        ],
+        "missingTypes": []
+      },
+      "001-001": {
+        "customerId": "001",
+        "workOrderId": "001",
+        "files": [
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户001-工单001-维修前.jpg",
+            "name": "客户001-工单001-维修前.jpg"
+          },
+          {
+            "type": "after",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户001-工单001-维修后.jpg",
+            "name": "客户001-工单001-维修后.jpg"
+          }
+        ],
+        "presentTypes": [
+          "before",
+          "after"
+        ],
+        "missingTypes": []
+      },
+      "002-001": {
+        "customerId": "002",
+        "workOrderId": "001",
+        "files": [
+          {
+            "type": "before",
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/客户002-工单001-维修前.jpg",
+            "name": "客户002-工单001-维修前.jpg"
+          }
+        ],
+        "presentTypes": [
+          "before"
+        ],
+        "missingTypes": [
+          "after"
+        ]
+      }
+    }
+  },
+  "duplicates": {
+    "totalDuplicates": 1,
+    "duplicateGroups": [
+      {
+        "customerId": "CUST004",
+        "workOrderId": "WO001",
+        "photoType": "before",
+        "hash": "d1a383f48b3953f33cca828924120cfa",
+        "count": 2,
+        "files": [
+          {
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-before-01.jpg",
+            "name": "CUST004-WO001-before-01.jpg",
+            "size": 12,
+            "mtime": "2026-05-23T17:20:14.917Z"
+          },
+          {
+            "path": "/Users/mac/pro/solo/workspaces/xy10943/test-data/CUST004-WO001-before-02.jpg",
+            "name": "CUST004-WO001-before-02.jpg",
+            "size": 12,
+            "mtime": "2026-05-23T17:20:14.917Z"
+          }
+        ]
+      }
+    ],
+    "detectionMethod": "content-hash"
+  },
+  "photoTypes": [
+    "before",
+    "after"
+  ],
+  "options": {}
+}
