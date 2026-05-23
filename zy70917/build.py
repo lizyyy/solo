@@ -1,10 +1,7 @@
-import sys
+import os
 
-def main():
-    parts = []
-    
-    # Part 1: Header and basic types
-    parts.append(r'''package main
+# 完整的Go代码 - 护理站排班API
+main_go = '''package main
 
 import (
 	"crypto/md5"
@@ -44,7 +41,12 @@ type NurseCalendar struct {
 	Calendar                         []DaySchedule
 }
 
-type SkillItem struct type SkillItem struct type SkillItem struct type SkillItemule struct {
+type SkillItem struct {
+	SkillName string
+	Level     SkillLevel
+}
+
+type DaySchedule struct {
 	Date        string
 	IsAvailable bool
 	TimeSlots   []TimeSlot
@@ -105,10 +107,7 @@ const (
 	RuleCodeNurseUnavailable      = "NURSE_UNAVAILABLE"
 	RuleCodeCancellationNoBackup  = "CANCELLATION_NO_BACKUP"
 )
-''')
 
-    # Part 2: RuleEngine struct and basic methods
-    parts.append(r'''
 type RuleEngine struct {
 	nurses           map[string]NurseCalendar
 	elders           map[string]ElderProfile
@@ -127,15 +126,11 @@ func NewRuleEngine() *RuleEngine {
 }
 
 func (e *RuleEngine) LoadNurses(calendars []NurseCalendar) {
-	for _, n := range calendars {
-		e.nurses[n.NurseID] = n
-	}
+	for _, n := range calendars { e.nurses[n.NurseID] = n }
 }
 
 func (e *RuleEngine) LoadElders(profiles []ElderProfile) {
-	for _, p := range profiles {
-		e.elders[p.ElderID] = p
-	}
+	for _, p := range profiles { e.elders[p.ElderID] = p }
 }
 
 func (e *RuleEngine) ValidateServiceOrder(order ServiceOrder) ([]FailureReason, []string) {
@@ -172,14 +167,9 @@ func (e *RuleEngine) ValidateServiceOrder(order ServiceOrder) ([]FailureReason, 
 	}
 	return reasons, suggestions
 }
-''')
 
-    # Part 3: Rule check functions
-    parts.append(r'''
 func (e *RuleEngine) checkSkillMatch(order ServiceOrder, nurse NurseCalendar) ([]FailureReason, []string) {
-	if order.RequiredSkill == "" {
-		return nil, nil
-	}
+	if order.RequiredSkill == "" { return nil, nil }
 	required := strings.TrimSpace(order.RequiredSkill)
 	reqLevel := SkillLevel(strings.ToLower(order.SkillLevel))
 
@@ -193,16 +183,14 @@ func (e *RuleEngine) checkSkillMatch(order ServiceOrder, nurse NurseCalendar) ([
 	}
 	if matched == nil {
 		names := make([]string, len(nurse.Skills))
-		for i, s := range nurse.Skills {
-			names[i] = fmt.Sprintf("%s(%s)", s.SkillName, s.Level)
-		}
+		for i, s := range nurse.Skills { names[i] = fmt.Sprintf("%s(%s)", s.SkillName, s.Level) }
 		return []FailureReason{{RuleCodeSkillMismatch, "技能不匹配",
 			"护士技能与服务所需技能不匹配",
 			fmt.Sprintf("服务需要「%s」，但护士%s仅具备: %s", required, nurse.NurseName, strings.Join(names, "、")),
 		}}, []string{fmt.Sprintf("建议更换具备「%s」技能的护士", required)}
 	}
 	if reqLevel != "" {
-		lo := map[SkillLevel]int{SkillLevelBasic: 1, SkillLevelIntermediate: 2, SkillLevelAdvanced: 3}
+		lo := map[SkillLevel]int{SkillLevelBasic:1, SkillLevelIntermediate:2, SkillLevelAdvanced:3}
 		if lo[matched.Level] < lo[reqLevel] {
 			return []FailureReason{{RuleCodeSkillLevelInsufficient, "技能等级不足",
 				"护士技能等级低于服务要求",
@@ -216,22 +204,14 @@ func (e *RuleEngine) checkSkillMatch(order ServiceOrder, nurse NurseCalendar) ([
 
 func (e *RuleEngine) checkDistrict(order ServiceOrder, nurse NurseCalendar, elder ElderProfile, exists bool) ([]FailureReason, []string) {
 	dist := order.District
-	if dist == "" && exists {
-		dist = elder.District
-	}
+	if dist == "" && exists { dist = elder.District }
 	if dist != "" && nurse.WorkDistrict != "" && dist != nurse.WorkDistrict {
 		key := fmt.Sprintf("%s-%s", nurse.WorkDistrict, dist)
 		rev := fmt.Sprintf("%s-%s", dist, nurse.WorkDistrict)
 		t := 45
-		if v, ok := e.districtDistance[key]; ok {
-			t = v
-		} else if v, ok := e.districtDistance[rev]; ok {
-			t = v
-		}
+		if v, ok := e.districtDistance[key]; ok { t = v } else if v, ok := e.districtDistance[rev]; ok { t = v }
 		sug := fmt.Sprintf("可安排跨区，预留%d分钟路程", t)
-		if t > 30 {
-			sug = fmt.Sprintf("路程较长(%d分钟)，优先安排本区域护士", t)
-		}
+		if t > 30 { sug = fmt.Sprintf("路程较长(%d分钟)，优先安排本区域护士", t) }
 		return []FailureReason{{RuleCodeCrossDistrict, "跨区域服务",
 			"护士工作区域与服务区域不一致",
 			fmt.Sprintf("护士%s负责「%s」，服务在「%s」，路程约%d分钟",
@@ -240,17 +220,11 @@ func (e *RuleEngine) checkDistrict(order ServiceOrder, nurse NurseCalendar, elde
 	}
 	return nil, nil
 }
-''')
 
-    # Part 4: More rule check functions
-    parts.append(r'''
 func (e *RuleEngine) checkTimeAvailability(order ServiceOrder, nurse NurseCalendar) ([]FailureReason, []string) {
 	var day *DaySchedule
 	for i := range nurse.Calendar {
-		if nurse.Calendar[i].Date == order.ServiceDate {
-			day = &nurse.Calendar[i]
-			break
-		}
+		if nurse.Calendar[i].Date == order.ServiceDate { day = &nurse.Calendar[i]; break }
 	}
 	if day == nil || !day.IsAvailable {
 		return []FailureReason{{RuleCodeNurseUnavailable, "护士当日不可用",
@@ -277,21 +251,15 @@ func (e *RuleEngine) checkTimeAvailability(order ServiceOrder, nurse NurseCalend
 func (e *RuleEngine) checkCancellationBackup(order ServiceOrder, nurse NurseCalendar, exists bool) ([]FailureReason, []string) {
 	var backup *NurseCalendar
 	for _, n := range e.nurses {
-		if n.NurseID == order.NurseID {
-			continue
-		}
+		if n.NurseID == order.NurseID { continue }
 		has := false
 		for _, s := range n.Skills {
 			if strings.Contains(s.SkillName, order.RequiredSkill) ||
 				strings.Contains(order.RequiredSkill, s.SkillName) {
-				has = true
-				break
+				has = true; break
 			}
 		}
-		if has && n.WorkDistrict == order.District {
-			backup = &n
-			break
-		}
+		if has && n.WorkDistrict == order.District { backup = &n; break }
 	}
 	if backup == nil {
 		return []FailureReason{{RuleCodeCancellationNoBackup, "取消后无补位护士",
@@ -302,35 +270,22 @@ func (e *RuleEngine) checkCancellationBackup(order ServiceOrder, nurse NurseCale
 	}
 	return nil, nil
 }
-''')
 
-    # Part 5: Parser functions
-    parts.append(r'''
 func ParseServiceOrdersCSV(c string) ([]ServiceOrder, error) {
 	r := csv.NewReader(strings.NewReader(c))
 	rec, err := r.ReadAll()
-	if err != nil {
-		return nil, fmt.Errorf("CSV失败: %w", err)
-	}
-	if len(rec) < 2 {
-		return nil, fmt.Errorf("CSV为空")
-	}
+	if err != nil { return nil, fmt.Errorf("CSV失败: %w", err) }
+	if len(rec) < 2 { return nil, fmt.Errorf("CSV为空") }
 	hm := make(map[string]int)
-	for i, h := range rec[0] {
-		hm[strings.TrimSpace(h)] = i
-	}
+	for i, h := range rec[0] { hm[strings.TrimSpace(h)] = i }
 	var res []ServiceOrder
 	for _, row := range rec[1:] {
 		getf := func(n string) string {
-			if i, ok := hm[n]; ok && i < len(row) {
-				return strings.TrimSpace(row[i])
-			}
+			if i, ok := hm[n]; ok && i < len(row) { return strings.TrimSpace(row[i]) }
 			return ""
 		}
 		cancelled := false
-		if v := getf("是否取消"); v != "" {
-			cancelled = strings.ToLower(v) == "是" || v == "1"
-		}
+		if v := getf("是否取消"); v != "" { cancelled = strings.ToLower(v) == "是" || v == "1" }
 		res = append(res, ServiceOrder{
 			ID: getf("服务单编号"), ElderID: getf("老人编号"), NurseID: getf("护士编号"),
 			ServiceType: getf("服务类型"), RequiredSkill: getf("所需技能"), SkillLevel: getf("技能等级"),
@@ -346,9 +301,7 @@ func ParseNurseCalendarJSON(c string) ([]NurseCalendar, error) {
 	var list []NurseCalendar
 	if err := json.Unmarshal([]byte(c), &list); err != nil {
 		var single NurseCalendar
-		if err2 := json.Unmarshal([]byte(c), &single); err2 != nil {
-			return nil, err
-		}
+		if err2 := json.Unmarshal([]byte(c), &single); err2 != nil { return nil, err }
 		list = []NurseCalendar{single}
 	}
 	return list, nil
@@ -357,31 +310,21 @@ func ParseNurseCalendarJSON(c string) ([]NurseCalendar, error) {
 func ParseElderProfilesCSV(c string) ([]ElderProfile, error) {
 	r := csv.NewReader(strings.NewReader(c))
 	rec, err := r.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-	if len(rec) < 2 {
-		return nil, nil
-	}
+	if err != nil { return nil, err }
+	if len(rec) < 2 { return nil, nil }
 	hm := make(map[string]int)
-	for i, h := range rec[0] {
-		hm[strings.TrimSpace(h)] = i
-	}
+	for i, h := range rec[0] { hm[strings.TrimSpace(h)] = i }
 	var res []ElderProfile
 	for _, row := range rec[1:] {
 		getf := func(n string) string {
-			if i, ok := hm[n]; ok && i < len(row) {
-				return strings.TrimSpace(row[i])
-			}
+			if i, ok := hm[n]; ok && i < len(row) { return strings.TrimSpace(row[i]) }
 			return ""
 		}
 		age, _ := strconv.Atoi(getf("年龄"))
 		care := []string{}
 		if s := getf("所需护理项目"); s != "" {
 			for _, item := range strings.Split(s, "、") {
-				if item = strings.TrimSpace(item); item != "" {
-					care = append(care, item)
-				}
+				if item = strings.TrimSpace(item); item != "" { care = append(care, item) }
 			}
 		}
 		res = append(res, ElderProfile{
@@ -401,10 +344,7 @@ func ServiceOrderToMap(o ServiceOrder) map[string]interface{} {
 		"所在区域": o.District, "是否取消": o.IsCancelled, "取消原因": o.CancelReason, "备注": o.Remark,
 	}
 }
-''')
 
-    # Part 6: BatchStorage and Handler
-    parts.append(r'''
 type BatchStorage struct {
 	mu      sync.RWMutex
 	batches map[string]Batch
@@ -412,10 +352,7 @@ type BatchStorage struct {
 }
 
 func NewBatchStorage() *BatchStorage {
-	return &BatchStorage{
-		batches: make(map[string]Batch),
-		results: make(map[string]ProcessResult),
-	}
+	return &BatchStorage{batches: make(map[string]Batch), results: make(map[string]ProcessResult)}
 }
 
 func (s *BatchStorage) Checksum(a, b, c string) string {
@@ -424,65 +361,32 @@ func (s *BatchStorage) Checksum(a, b, c string) string {
 }
 
 func (s *BatchStorage) Dup(cs string) (bool, string) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	for id, b := range s.batches {
-		if b.Checksum == cs {
-			return true, id
-		}
-	}
+	s.mu.RLock(); defer s.mu.RUnlock()
+	for id, b := range s.batches { if b.Checksum == cs { return true, id } }
 	return false, ""
 }
 
-func (s *BatchStorage) SaveBatch(b Batch) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.batches[b.BatchID] = b
-}
-
-func (s *BatchStorage) SaveResult(r ProcessResult) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.results[r.BatchID] = r
-}
-
-func (s *BatchStorage) Result(id string) (ProcessResult, bool) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	r, ok := s.results[id]
-	return r, ok
-}
-
+func (s *BatchStorage) SaveBatch(b Batch) { s.mu.Lock(); defer s.mu.Unlock(); s.batches[b.BatchID] = b }
+func (s *BatchStorage) SaveResult(r ProcessResult) { s.mu.Lock(); defer s.mu.Unlock(); s.results[r.BatchID] = r }
+func (s *BatchStorage) Result(id string) (ProcessResult, bool) { s.mu.RLock(); defer s.mu.RUnlock(); r, ok := s.results[id]; return r, ok }
 func (s *BatchStorage) Batches() []Batch {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.RLock(); defer s.mu.RUnlock()
 	res := make([]Batch, 0, len(s.batches))
-	for _, b := range s.batches {
-		res = append(res, b)
-	}
+	for _, b := range s.batches { res = append(res, b) }
 	return res
 }
 
-type Handler struct {
-	st *BatchStorage
-}
+type Handler struct{ st *BatchStorage }
 
-func NewHandler() *Handler {
-	return &Handler{st: NewBatchStorage()}
-}
-''')
+func NewHandler() *Handler { return &Handler{st: NewBatchStorage()} }
 
-    # Part 7: API Handlers and main
-    parts.append(r'''
 func (h *Handler) Upload(c *gin.Context) {
 	var req UploadRequest
 	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(400, gin.H{"error": "参数错误: " + err.Error()})
-		return
+		c.JSON(400, gin.H{"error": "参数错误: " + err.Error()}); return
 	}
 	if req.ServiceOrders == "" && req.NurseCalendar == "" && req.ElderProfiles == "" {
-		c.JSON(400, gin.H{"error": "至少上传一种文件"})
-		return
+		c.JSON(400, gin.H{"error": "至少上传一种文件"}); return
 	}
 	cs := h.st.Checksum(req.ServiceOrders, req.NurseCalendar, req.ElderProfiles)
 	if dup, id := h.st.Dup(cs); dup {
@@ -491,28 +395,19 @@ func (h *Handler) Upload(c *gin.Context) {
 		return
 	}
 	bid := req.BatchID
-	if bid == "" {
-		bid = "BATCH-" + uuid.New().String()[:8]
-	}
+	if bid == "" { bid = "BATCH-" + uuid.New().String()[:8] }
 	h.st.SaveBatch(Batch{BatchID: bid, SubmittedAt: time.Now(), Checksum: cs, Status: "processing"})
 	re := ProcessResult{}
 	eng := NewRuleEngine()
 	if req.NurseCalendar != "" {
-		if ns, err := ParseNurseCalendarJSON(req.NurseCalendar); err == nil {
-			eng.LoadNurses(ns)
-		}
+		if ns, err := ParseNurseCalendarJSON(req.NurseCalendar); err == nil { eng.LoadNurses(ns) }
 	}
 	if req.ElderProfiles != "" {
-		if es, err := ParseElderProfilesCSV(req.ElderProfiles); err == nil {
-			eng.LoadElders(es)
-		}
+		if es, err := ParseElderProfilesCSV(req.ElderProfiles); err == nil { eng.LoadElders(es) }
 	}
 	if req.ServiceOrders != "" {
 		ords, err := ParseServiceOrdersCSV(req.ServiceOrders)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error(), "batch_id": bid})
-			return
-		}
+		if err != nil { c.JSON(500, gin.H{"error": err.Error(), "batch_id": bid}); return }
 		for _, o := range ords {
 			fr, sg := eng.ValidateServiceOrder(o)
 			om := ServiceOrderToMap(o)
@@ -521,10 +416,7 @@ func (h *Handler) Upload(c *gin.Context) {
 			} else {
 				crit := false
 				for _, r := range fr {
-					if r.RuleCode == RuleCodeSkillMismatch || r.RuleCode == RuleCodeNurseUnavailable {
-						crit = true
-						break
-					}
+					if r.RuleCode == RuleCodeSkillMismatch || r.RuleCode == RuleCodeNurseUnavailable { crit = true; break }
 				}
 				if crit {
 					re.Failed = append(re.Failed, FailedItem{
@@ -541,9 +433,7 @@ func (h *Handler) Upload(c *gin.Context) {
 	}
 	re.Summary = ResultSummary{
 		TotalCount:   len(re.Normal) + len(re.Pending) + len(re.Failed),
-		NormalCount:  len(re.Normal),
-		PendingCount: len(re.Pending),
-		FailedCount:  len(re.Failed),
+		NormalCount:  len(re.Normal), PendingCount: len(re.Pending), FailedCount: len(re.Failed),
 	}
 	re.BatchID = bid
 	re.ProcessedAt = time.Now()
@@ -553,11 +443,8 @@ func (h *Handler) Upload(c *gin.Context) {
 }
 
 func (h *Handler) GetResult(c *gin.Context) {
-	if r, ok := h.st.Result(c.Param("batch_id")); ok {
-		c.JSON(200, r)
-	} else {
-		c.JSON(404, gin.H{"error": "不存在"})
-	}
+	if r, ok := h.st.Result(c.Param("batch_id")); ok { c.JSON(200, r)
+	} else { c.JSON(404, gin.H{"error": "不存在"}) }
 }
 
 func (h *Handler) ListBatches(c *gin.Context) {
@@ -576,15 +463,8 @@ func main() {
 	log.Println("GET  /api/result/:id - 查询结果")
 	log.Fatal(r.Run(":8080"))
 }
-''')
+'''
 
-    with open('main.go', 'w', encoding='utf-8') as f:
-        for i, p in enumerate(parts):
-            f.write(p)
-            print(f"Part {i+1}: {len(p.splitlines())} lines")
-    
-    total = sum(len(p.splitlines()) for p in parts)
-    print(f"Total: {total} lines")
-
-if __name__ == '__main__':
-    main()
+with open('main.go', 'w', encoding='utf-8') as f:
+    f.write(main_go)
+print(f"Created main.go with {len(main_go.splitlines())} lines")

@@ -1,4 +1,7 @@
-code = r'''package main
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+go_code = '''package main
 
 import (
 	"crypto/md5"
@@ -461,6 +464,7 @@ func main() {
 	log.Fatal(r.Run(":8080"))
 }
 '''
-with open('main.go', 'w', encoding='utf-8') as f:
-    f.write(code)
-print(f"Generated main.go with {len(code.splitlines())} lines")
+
+with open('app/main.go', 'w', encoding='utf-8') as f:
+    f.write(go_code)
+print(f"Successfully wrote {len(go_code)} bytes to app/main.go")

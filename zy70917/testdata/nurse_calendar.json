@@ -1,0 +1,77 @@
+[
+  {
+    "NurseID": "N001",
+    "NurseName": "张护士",
+    "WorkDistrict": "东城区",
+    "Skills": [
+      {"SkillName": "基础护理", "Level": "basic"},
+      {"SkillName": "压疮护理", "Level": "advanced"},
+      {"SkillName": "日常照料", "Level": "intermediate"}
+    ],
+    "Calendar": [
+      {
+        "Date": "2024-01-15",
+        "IsAvailable": true,
+        "TimeSlots": [
+          {"StartTime": "08:00", "EndTime": "09:00", "Status": "free"},
+          {"StartTime": "10:00", "EndTime": "11:00", "Status": "occupied"},
+          {"StartTime": "14:00", "EndTime": "15:00", "Status": "free"}
+        ]
+      },
+      {
+        "Date": "2024-01-16",
+        "IsAvailable": true,
+        "TimeSlots": [
+          {"StartTime": "08:00", "EndTime": "17:00", "Status": "free"}
+        ]
+      }
+    ]
+  },
+  {
+    "NurseID": "N002",
+    "NurseName": "李护士",
+    "WorkDistrict": "西城区",
+    "Skills": [
+      {"SkillName": "基础护理", "Level": "basic"},
+      {"SkillName": "康复治疗", "Level": "advanced"},
+      {"SkillName": "临终关怀", "Level": "basic"}
+    ],
+    "Calendar": [
+      {
+        "Date": "2024-01-15",
+        "IsAvailable": true,
+        "TimeSlots": [
+          {"StartTime": "08:00", "EndTime": "12:00", "Status": "free"}
+        ]
+      },
+      {
+        "Date": "2024-01-16",
+        "IsAvailable": true,
+        "TimeSlots": []
+      }
+    ]
+  },
+  {
+    "NurseID": "N003",
+    "NurseName": "王护士",
+    "WorkDistrict": "海淀区",
+    "Skills": [
+      {"SkillName": "基础护理", "Level": "basic"},
+      {"SkillName": "输液护理", "Level": "intermediate"}
+    ],
+    "Calendar": [
+      {
+        "Date": "2024-01-15",
+        "IsAvailable": false,
+        "TimeSlots": []
+      },
+      {
+        "Date": "2024-01-16",
+        "IsAvailable": true,
+        "TimeSlots": [
+          {"StartTime": "08:00", "EndTime": "10:00", "Status": "free"}
+        ]
+      }
+    ]
+  }
+]
