@@ -11,6 +11,9 @@ from app.services import (
 )
 from app.models import ReviewStatus
 
+global_store = DataStore()
+
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -28,7 +31,7 @@ def create_app() -> FastAPI:
     )
 
     def get_data_store() -> DataStore:
-        return DataStore()
+        return global_store
 
     def get_data_importer(store: DataStore = Depends(get_data_store)) -> DataImporter:
         return DataImporter(store)
@@ -329,4 +332,3 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-

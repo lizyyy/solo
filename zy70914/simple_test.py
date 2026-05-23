@@ -1,0 +1,25 @@
+import sys
+sys.path.insert(0, ".")
+from fastapi.testclient import TestClient
+from main import app
+c = TestClient(app)
+print("Test 1: Import claims")
+f = open("sample_data/claims.csv", "rb")
+r = c.post("/api/import/claims/csv", files={"file": ("claims.csv", f, "text/csv")})
+f.close()
+print("  Imported:", r.json().get("imported"))
+print("Test 2: Check persistence")
+r = c.get("/api/statistics/claims")
+print("  Total claims:", r.json().get("total_claims"))
+print("Test 3: Import flights")
+f = open("sample_data/flights.json", "rb")
+r = c.post("/api/import/flights/json", files={"file": ("flights.json", f, "application/json")})
+f.close()
+print("  Imported flights:", r.json().get("imported"))
+print("Test 4: Auto compare")
+r = c.post("/api/compare/all")
+print("  Compared:", r.json().get("total"))
+print("Test 5: Summary")
+r = c.get("/api/statistics/summary")
+print("  Summary success:", r.json().get("success"))
+
