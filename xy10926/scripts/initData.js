@@ -1,5 +1,6 @@
 const db = require('../src/utils/database');
 const initDatabase = require('../src/utils/initDB');
+const { TaskService } = require('../src/models/TaskService');
 
 console.log('开始初始化示例数据...\n');
 
@@ -61,7 +62,11 @@ const insertTask = db.prepare(`
 `);
 
 taskData.forEach(t => {
-  insertTask.run(t.propertyId, t.taskDate, t.cleanerName, t.status, '例行保洁任务');
+  const result = insertTask.run(t.propertyId, t.taskDate, t.cleanerName, t.status, '例行保洁任务');
+  const taskId = result.lastInsertRowid;
+  if (taskId) {
+    TaskService.initializeTaskCheckItems(taskId, t.propertyId);
+  }
   console.log(`✓ 保洁任务: 房源 ${t.propertyId} - ${t.taskDate} - ${t.cleanerName}`);
 });
 
