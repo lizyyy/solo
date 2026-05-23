@@ -1,0 +1,127 @@
+{
+  "summary": {
+    "total_files": 6,
+    "parsed": 5,
+    "archived": 5,
+    "errors": 1,
+    "missing_matches": 0,
+    "duplicates": 1,
+    "process_time": "2026-05-24T02:27:13.303737"
+  },
+  "archived": [
+    {
+      "original": "BX20240002_9876543210_888.00.pdf",
+      "parsed_info": {
+        "original_name": "BX20240002_9876543210_888.00.pdf",
+        "reimbursement_id": "BX20240002",
+        "invoice_code": "9876543210",
+        "amount": 888.0,
+        "parsed": true
+      },
+      "matched": true,
+      "match_score": 7,
+      "matched_record": {
+        "reimbursement_id": "BX20240002",
+        "invoice_code": "9876543210",
+        "amount": 888.0
+      },
+      "new_filename": "BX20240002_9876543210_888.00.pdf"
+    },
+    {
+      "original": "IMG_001_0123456789.png",
+      "parsed_info": {
+        "original_name": "IMG_001_0123456789.png",
+        "reimbursement_id": null,
+        "invoice_code": "0123456789",
+        "amount": null,
+        "parsed": true
+      },
+      "matched": true,
+      "match_score": 2,
+      "matched_record": {
+        "reimbursement_id": "BX20240001",
+        "invoice_code": "123456789",
+        "amount": 1234.56
+      },
+      "new_filename": "BX20240001_123456789_1234.56.png"
+    },
+    {
+      "original": "scan_500.50.jpg",
+      "parsed_info": {
+        "original_name": "scan_500.50.jpg",
+        "reimbursement_id": null,
+        "invoice_code": null,
+        "amount": 500.5,
+        "parsed": true
+      },
+      "matched": true,
+      "match_score": 2,
+      "matched_record": {
+        "reimbursement_id": "BX20240003",
+        "invoice_code": "1122334455",
+        "amount": 500.5
+      },
+      "new_filename": "BX20240003_1122334455_500.50.jpg"
+    },
+    {
+      "original": "BX20240001_1234.56.jpg",
+      "parsed_info": {
+        "original_name": "BX20240001_1234.56.jpg",
+        "reimbursement_id": "BX20240001",
+        "invoice_code": null,
+        "amount": 1234.56,
+        "parsed": true
+      },
+      "matched": true,
+      "match_score": 5,
+      "matched_record": {
+        "reimbursement_id": "BX20240001",
+        "invoice_code": "123456789",
+        "amount": 1234.56
+      },
+      "new_filename": "BX20240001_123456789_1234.56.jpg"
+    },
+    {
+      "original": "BX20240001_duplicate.jpg",
+      "parsed_info": {
+        "original_name": "BX20240001_duplicate.jpg",
+        "reimbursement_id": "BX20240001",
+        "invoice_code": null,
+        "amount": null,
+        "parsed": true
+      },
+      "matched": true,
+      "match_score": 3,
+      "matched_record": {
+        "reimbursement_id": "BX20240001",
+        "invoice_code": "123456789",
+        "amount": 1234.56
+      },
+      "new_filename": "BX20240001_123456789_1234.56.jpg"
+    }
+  ],
+  "duplicates": [
+    {
+      "file1": "BX20240001_1234.56.jpg",
+      "file2": "BX20240001_duplicate.jpg",
+      "hash": "3e7705498e8be60520841409ebc69bc1"
+    }
+  ],
+  "errors": [
+    {
+      "original": "bad_file.jpg",
+      "parsed_info": {
+        "original_name": "bad_file.jpg",
+        "reimbursement_id": null,
+        "invoice_code": null,
+        "amount": null,
+        "parsed": false
+      },
+      "matched": false,
+      "match_score": 0,
+      "matched_record": null,
+      "error": "无法从文件名解析任何信息"
+    }
+  ],
+  "missing_matches": []
+}
