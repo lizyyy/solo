@@ -1,0 +1,171 @@
+{
+  "generatedAt": "2026-05-23T18:27:20.622Z",
+  "summary": {
+    "totalRecords": 10,
+    "validRecords": 7,
+    "badRecords": 3,
+    "duplicateRecords": 1,
+    "bySize": {
+      "160": 1,
+      "165": 1,
+      "170": 1,
+      "XL": 2,
+      "M": 1
+    },
+    "byClass": {
+      "高一1班": {
+        "total": 3,
+        "sizes": {
+          "160": 1,
+          "165": 1,
+          "XL": 1
+        }
+      },
+      "高一2班": {
+        "total": 3,
+        "sizes": {
+          "170": 1,
+          "XL": 1,
+          "M": 1
+        }
+      }
+    }
+  },
+  "classSizeMatrix": {
+    "高一1班": {
+      "160": 1,
+      "165": 1,
+      "XL": 1
+    },
+    "高一2班": {
+      "170": 1,
+      "XL": 1,
+      "M": 1
+    }
+  },
+  "students": [
+    {
+      "name": "张三",
+      "className": "高一1班",
+      "size": "160",
+      "originalSize": "160cm",
+      "supplement": "",
+      "remark": "重复记录",
+      "originalRow": 2
+    },
+    {
+      "name": "李四",
+      "className": "高一1班",
+      "size": "165",
+      "originalSize": "165",
+      "supplement": "",
+      "remark": "",
+      "originalRow": 3
+    },
+    {
+      "name": "王五",
+      "className": "高一2班",
+      "size": "XL",
+      "originalSize": "XL",
+      "supplement": "是",
+      "remark": "",
+      "originalRow": 4
+    },
+    {
+      "name": "赵六",
+      "className": "高一2班",
+      "size": "170",
+      "originalSize": "170",
+      "supplement": "",
+      "remark": "",
+      "originalRow": 5
+    },
+    {
+      "name": "周八",
+      "className": "高一1班",
+      "size": "",
+      "originalSize": "",
+      "supplement": "",
+      "remark": "缺尺码",
+      "originalRow": 9
+    },
+    {
+      "name": "吴九",
+      "className": "高一1班",
+      "size": "XL",
+      "originalSize": "加大",
+      "supplement": "",
+      "remark": "",
+      "originalRow": 10
+    },
+    {
+      "name": "郑十",
+      "className": "高一2班",
+      "size": "M",
+      "originalSize": "中号",
+      "supplement": "",
+      "remark": "",
+      "originalRow": 11
+    }
+  ],
+  "badRows": [
+    {
+      "row": 7,
+      "data": {
+        "name": "",
+        "className": "高一2班",
+        "size": "175",
+        "supplement": "",
+        "remark": "缺姓名"
+      },
+      "errors": [
+        "缺少姓名信息"
+      ],
+      "warnings": [
+        "尺码 \"175\" 不在标准范围内，已保留原始值"
+      ]
+    },
+    {
+      "row": 8,
+      "data": {
+        "name": "孙七",
+        "className": "",
+        "size": "180",
+        "supplement": "",
+        "remark": "缺班级"
+      },
+      "errors": [
+        "缺少班级信息"
+      ],
+      "warnings": []
+    },
+    {
+      "row": 9,
+      "data": {
+        "name": "周八",
+        "className": "高一1班",
+        "size": "",
+        "supplement": "",
+        "remark": "缺尺码"
+      },
+      "errors": [
+        "缺少尺码信息"
+      ],
+      "warnings": []
+    }
+  ],
+  "duplicates": [
+    {
+      "name": "张三",
+      "className": "高一1班",
+      "originalRows": [
+        2,
+        6
+      ],
+      "sizes": [
+        "160",
+        "160"
+      ]
+    }
+  ]
+}

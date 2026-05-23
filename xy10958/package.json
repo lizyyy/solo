@@ -1,0 +1,26 @@
+{
+  "name": "uniform-size-stat-cli",
+  "version": "1.0.0",
+  "description": "校服尺码统计CLI工具 - 处理学生尺码数据，按班级和尺码汇总",
+  "main": "src/index.js",
+  "bin": {
+    "uniform-stat": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/self-test.js",
+    "self-test": "node src/self-test.js"
+  },
+  "keywords": ["uniform", "size", "statistics", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "xlsx": "^0.18.5"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
