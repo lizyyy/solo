@@ -26,7 +26,7 @@ func generateStationNo() (string, error) {
 	return fmt.Sprintf("S%03d", seq+1), nil
 }
 
-func CreateStation(name string) (*models.Station, error) {
+func CreateStation(name string, serviceType ...string) (*models.Station, error) {
 	if name == "" {
 		return nil, fmt.Errorf("工位名称不能为空")
 	}
@@ -50,6 +50,11 @@ func CreateStation(name string) (*models.Station, error) {
 	}
 
 	return GetStationByID(int(id))
+}
+
+func UpdateStationStatus(id int, status string) error {
+	_, err := database.DB.Exec(`UPDATE stations SET status = ? WHERE id = ?`, status, id)
+	return err
 }
 
 func GetStationByID(id int) (*models.Station, error) {

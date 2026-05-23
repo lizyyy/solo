@@ -25,9 +25,23 @@ func generateMemberNo() (string, error) {
 	return fmt.Sprintf("M%06d", seq+1), nil
 }
 
-func CreateMember(name, phone, level string, balance float64) (*models.Member, error) {
+func CreateMember(name, phone string, params ...interface{}) (*models.Member, error) {
 	if name == "" || phone == "" {
 		return nil, fmt.Errorf("姓名和手机号不能为空")
+	}
+
+	level := "普通会员"
+	balance := 0.0
+
+	if len(params) >= 1 {
+		if l, ok := params[0].(string); ok {
+			level = l
+		}
+	}
+	if len(params) >= 2 {
+		if b, ok := params[1].(float64); ok {
+			balance = b
+		}
 	}
 
 	var existingID int

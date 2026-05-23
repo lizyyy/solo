@@ -75,22 +75,19 @@ func createMembers() {
 }
 
 func createStations() {
-	stations := []struct {
-		name        string
-		serviceType string
-	}{
-		{"1号工位", "normal"},
-		{"2号工位", "normal"},
-		{"3号工位", "detail"},
-		{"4号工位", "detailing"},
+	stations := []string{
+		"1号工位",
+		"2号工位",
+		"3号工位",
+		"4号工位",
 	}
 
-	for _, s := range stations {
-		_, err := services.CreateStation(s.name, s.serviceType)
+	for _, name := range stations {
+		_, err := services.CreateStation(name)
 		if err != nil {
-			fmt.Printf("  ⚠️  创建工位失败 %s: %v\n", s.name, err)
+			fmt.Printf("  ⚠️  创建工位失败 %s: %v\n", name, err)
 		} else {
-			fmt.Printf("  ✅ %s (%s)\n", s.name, s.serviceType)
+			fmt.Printf("  ✅ %s\n", name)
 		}
 	}
 }

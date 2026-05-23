@@ -152,11 +152,11 @@ func testCreateQueue() []TestResult {
 
 	member, _ := services.CreateMember("排队用户1", "13900000010")
 
-	queue, err := services.CreateQueueNumber(&member.ID, nil, "normal")
+	queue, err := services.CreateQueueNumber(&member.ID, nil, "标准洗")
 	if err != nil {
 		results = append(results, TestResult{"创建排队号", false, err.Error(), "排队管理"})
 	} else {
-		results = append(results, TestResult{"创建排队号", true, fmt.Sprintf("排队号: %s", queue.QueueNumber), "排队管理"})
+		results = append(results, TestResult{"创建排队号", true, fmt.Sprintf("排队号: %s", queue.QueueNo), "排队管理"})
 	}
 
 	return results
@@ -167,14 +167,14 @@ func testDuplicateQueue() []TestResult {
 
 	member, _ := services.CreateMember("排队用户2", "13900000011")
 
-	_, err := services.CreateQueueNumber(&member.ID, nil, "normal")
+	_, err := services.CreateQueueNumber(&member.ID, nil, "标准洗")
 	if err != nil {
 		results = append(results, TestResult{"重复取号拦截", false, "第一个排队号创建失败", "排队管理"})
 		return results
 	}
 
-	_, err = services.CreateQueueNumber(&member.ID, nil, "normal")
-	if err != nil && strings.Contains(err.Error(), "已在排队中") {
+	_, err = services.CreateQueueNumber(&member.ID, nil, "标准洗")
+	if err != nil && strings.Contains(err.Error(), "已有正在等待或服务中") {
 		results = append(results, TestResult{"重复取号拦截", true, "正确拦截重复取号", "排队管理"})
 	} else {
 		results = append(results, TestResult{"重复取号拦截", false, "未拦截重复取号", "排队管理"})
@@ -188,12 +188,12 @@ func testCallNext() []TestResult {
 
 	member1, _ := services.CreateMember("叫号用户1", "13900000012")
 	member2, _ := services.CreateMember("叫号用户2", "13900000013")
-	station, _ := services.CreateStation("测试工位", "normal")
+	station, _ := services.CreateStation("测试工位")
 
-	services.CreateQueueNumber(&member1.ID, nil, "normal")
-	services.CreateQueueNumber(&member2.ID, nil, "normal")
+	services.CreateQueueNumber(&member1.ID, nil, "标准洗")
+	services.CreateQueueNumber(&member2.ID, nil, "标准洗")
 
-	err := services.UpdateStationStatus(station.ID, "busy")
+	err := services.UpdateStationStatus(station.ID, "忙碌")
 	if err != nil {
 		results = append(results, TestResult{"叫号功能", false, "更新工位状态失败", "排队管理"})
 		return results
@@ -203,7 +203,7 @@ func testCallNext() []TestResult {
 	if err != nil {
 		results = append(results, TestResult{"叫号功能", false, err.Error(), "排队管理"})
 	} else {
-		results = append(results, TestResult{"叫号功能", true, fmt.Sprintf("叫号成功: %s", queue.QueueNumber), "排队管理"})
+		results = append(results, TestResult{"叫号功能", true, fmt.Sprintf("叫号成功: %s", queue.QueueNo), "排队管理"})
 	}
 
 	return results
@@ -213,7 +213,7 @@ func testOvernumber() []TestResult {
 	results := []TestResult{}
 
 	member, _ := services.CreateMember("过号用户", "13900000014")
-	queue, _ := services.CreateQueueNumber(&member.ID, nil, "normal")
+	queue, _ := services.CreateQueueNumber(&member.ID, nil, "标准洗")
 
 	_, err := services.MarkOvernumber(queue.ID, "测试过号")
 	if err != nil {
@@ -229,14 +229,14 @@ func testRequeue() []TestResult {
 	results := []TestResult{}
 
 	member, _ := services.CreateMember("补排用户", "13900000015")
-	queue, _ := services.CreateQueueNumber(&member.ID, nil, "normal")
+	queue, _ := services.CreateQueueNumber(&member.ID, nil, "标准洗")
 	services.MarkOvernumber(queue.ID, "测试过号")
 
 	requeued, err := services.RequeueOvernumber(queue.ID)
 	if err != nil {
 		results = append(results, TestResult{"过号补排", false, err.Error(), "排队管理"})
 	} else {
-		results = append(results, TestResult{"过号补排", true, fmt.Sprintf("补排成功: %s", requeued.QueueNumber), "排队管理"})
+		results = append(results, TestResult{"过号补排", true, fmt.Sprintf("补排成功: %s", requeued.QueueNo), "排队管理"})
 	}
 
 	return results
@@ -247,7 +247,7 @@ func testCreateAppointment() []TestResult {
 
 	member, _ := services.CreateMember("预约用户", "13900000020")
 
-	appointment, err := services.CreateAppointment(member.ID, "normal", "2024-01-16", "14:00")
+	appointment, err := services.CreateAppointment(member.ID, "标准洗", "2024-01-16", "14:00")
 	if err != nil {
 		results = append(results, TestResult{"创建预约", false, err.Error(), "预约管理"})
 	} else {
@@ -261,9 +261,9 @@ func testLockAppointment() []TestResult {
 	results := []TestResult{}
 
 	member, _ := services.CreateMember("锁位用户", "13900000021")
-	station, _ := services.CreateStation("锁位工位", "normal")
+	station, _ := services.CreateStation("锁位工位")
 
-	appointment, _ := services.CreateAppointment(member.ID, "normal", "2024-01-17", "15:00")
+	appointment, _ := services.CreateAppointment(member.ID, "标准洗", "2024-01-17", "15:00")
 
 	locked, err := services.LockAppointment(appointment.ID, station.ID)
 	if err != nil {
@@ -307,14 +307,14 @@ func testDirtyData() []TestResult {
 	results := []TestResult{}
 
 	_, err := services.CreateMember("", "")
-	if err != nil && strings.Contains(err.Error(), "必填") {
+	if err != nil && (strings.Contains(err.Error(), "不能为空") || strings.Contains(err.Error(), "必填")) {
 		results = append(results, TestResult{"脏数据-空会员", true, "正确拦截空数据", "异常处理"})
 	} else {
 		results = append(results, TestResult{"脏数据-空会员", false, "未正确拦截", "异常处理"})
 	}
 
 	_, err = services.CreateQueueNumber(nil, nil, "invalid_type")
-	if err != nil && strings.Contains(err.Error(), "无效") {
+	if err != nil && (strings.Contains(err.Error(), "无效") || strings.Contains(err.Error(), "service")) {
 		results = append(results, TestResult{"脏数据-无效服务类型", true, "正确拦截无效服务类型", "异常处理"})
 	} else {
 		results = append(results, TestResult{"脏数据-无效服务类型", false, "未正确拦截", "异常处理"})

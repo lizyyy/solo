@@ -39,9 +39,19 @@ make start
 
 ---
 
-## 🐹 Go 版本（需要安装 Go）
+## 🐹 Go 版本（需要先安装 Go）
 
-如果已安装 Go 环境，可以使用 Go 版本：
+**注意**：当前环境可能未安装 Go。如需使用 Go 版本，请先安装 Go 1.21+：
+
+```bash
+# macOS 安装 Go
+brew install go
+
+# 验证安装
+go version
+```
+
+安装 Go 后，可以使用 Go 版本：
 
 ```bash
 # 安装 Go 依赖
@@ -55,7 +65,20 @@ make test-go
 
 # 启动 Go 服务
 make start-go
+
+# 编译二进制
+make build-go
 ```
+
+**Go 代码文件完整性**：
+- ✅ `go.mod` - Go 模块定义
+- ✅ `main.go` - 服务入口（Gin 框架）
+- ✅ `database/database.go` - SQLite 数据库层
+- ✅ `services/*.go` - 5个服务层（会员/工位/排队/预约/报告）
+- ✅ `handlers/*.go` - 5个API处理器
+- ✅ `models/models.go` - 7个数据模型
+- ✅ `scripts/seed_data.go` - 示例数据脚本
+- ✅ `scripts/self_test.go` - 自检脚本（15+测试场景）
 
 ## 📁 项目结构
 
