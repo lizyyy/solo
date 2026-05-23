@@ -80,6 +80,7 @@ function initDatabase() {
         order_id TEXT NOT NULL,
         batch_id TEXT,
         status TEXT NOT NULL,
+        previous_status TEXT,
         handler TEXT NOT NULL,
         reason TEXT,
         remark TEXT,
