@@ -1,0 +1,23 @@
+{
+  "name": "event-checkin-api",
+  "version": "1.0.0",
+  "description": "赛事检录资格 API 服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "init-db": "node src/scripts/initDB.js",
+    "seed": "node src/scripts/seedData.js",
+    "test": "node src/scripts/testAPI.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "keywords": ["event", "checkin", "api"],
+  "author": "",
+  "license": "MIT"
+}
