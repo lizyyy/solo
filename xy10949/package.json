@@ -1,0 +1,27 @@
+{
+  "name": "homestay-calendar-import",
+  "version": "1.0.0",
+  "description": "民宿房态导入CLI工具 - 合并多平台房态日历",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "homestay-import": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "keywords": ["homestay", "calendar", "ics", "csv", "booking"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parse": "^5.5.3",
+    "date-fns": "^3.3.1",
+    "ics-js": "^0.10.2",
+    "chalk": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

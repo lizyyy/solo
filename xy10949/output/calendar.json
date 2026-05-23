@@ -1,0 +1,394 @@
+{
+  "generatedAt": "2026-05-23T18:10:28.037Z",
+  "sources": [
+    {
+      "filePath": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+      "platform": "airbnb",
+      "rowCount": 6
+    },
+    {
+      "filePath": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+      "platform": "tujia",
+      "rowCount": 4
+    },
+    {
+      "filePath": "/Users/mac/pro/solo/workspaces/xy10949/examples/calendar.ics",
+      "platform": "xiecheng",
+      "rowCount": 2
+    }
+  ],
+  "stats": {
+    "totalRooms": 3,
+    "validBookings": 10,
+    "invalidRecords": 2,
+    "mergedBookings": 8,
+    "lockBookings": 2
+  },
+  "errors": [
+    {
+      "message": "缺少房源标识",
+      "row": 6,
+      "column": "room",
+      "value": "",
+      "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv"
+    },
+    {
+      "message": "缺少入住日期",
+      "row": 7,
+      "column": "checkIn",
+      "value": null,
+      "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv"
+    }
+  ],
+  "conflicts": [
+    {
+      "type": "booking_conflict",
+      "roomName": "海景房A",
+      "overlapStart": "2024-06-02",
+      "overlapEnd": "2024-06-03",
+      "nights": 1,
+      "message": "订单冲突: 2024-06-02 至 2024-06-03",
+      "bookings": [
+        {
+          "id": "airbnb-2",
+          "platform": "airbnb",
+          "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+          "rowIndex": 2,
+          "guest": "张先生",
+          "reason": "",
+          "checkIn": "2024-06-01",
+          "checkOut": "2024-06-03"
+        },
+        {
+          "id": "tujia-4",
+          "platform": "tujia",
+          "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+          "rowIndex": 4,
+          "guest": "冲突订单",
+          "reason": "与Airbnb冲突",
+          "checkIn": "2024-06-02",
+          "checkOut": "2024-06-04"
+        }
+      ]
+    },
+    {
+      "type": "booking_conflict",
+      "roomName": "海景房A",
+      "overlapStart": "2024-06-03",
+      "overlapEnd": "2024-06-04",
+      "nights": 1,
+      "message": "订单冲突: 2024-06-03 至 2024-06-04",
+      "bookings": [
+        {
+          "id": "tujia-4",
+          "platform": "tujia",
+          "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+          "rowIndex": 4,
+          "guest": "冲突订单",
+          "reason": "与Airbnb冲突",
+          "checkIn": "2024-06-02",
+          "checkOut": "2024-06-04"
+        },
+        {
+          "id": "airbnb-3",
+          "platform": "airbnb",
+          "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+          "rowIndex": 3,
+          "guest": "张先生",
+          "reason": "连住订单被拆分",
+          "checkIn": "2024-06-03",
+          "checkOut": "2024-06-05"
+        }
+      ]
+    }
+  ],
+  "mergedBookings": {
+    "海景房A": [
+      {
+        "id": "airbnb-2",
+        "roomName": "海景房A",
+        "roomId": "海景房A",
+        "checkIn": "2024-06-01",
+        "checkOut": "2024-06-03",
+        "nights": 2,
+        "guest": "张先生",
+        "reason": "",
+        "platform": "airbnb",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+        "rowIndex": 2,
+        "sources": [
+          {
+            "id": "airbnb-2",
+            "platform": "airbnb",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+            "rowIndex": 2
+          }
+        ]
+      },
+      {
+        "id": "tujia-4",
+        "roomName": "海景房A",
+        "roomId": "海景房A",
+        "checkIn": "2024-06-02",
+        "checkOut": "2024-06-04",
+        "nights": 2,
+        "guest": "冲突订单",
+        "reason": "与Airbnb冲突",
+        "platform": "tujia",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+        "rowIndex": 4,
+        "sources": [
+          {
+            "id": "tujia-4",
+            "platform": "tujia",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+            "rowIndex": 4
+          }
+        ]
+      },
+      {
+        "id": "airbnb-3",
+        "roomName": "海景房A",
+        "roomId": "海景房A",
+        "checkIn": "2024-06-03",
+        "checkOut": "2024-06-05",
+        "nights": 2,
+        "guest": "张先生",
+        "reason": "连住订单被拆分",
+        "platform": "airbnb",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+        "rowIndex": 3,
+        "sources": [
+          {
+            "id": "airbnb-3",
+            "platform": "airbnb",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+            "rowIndex": 3
+          }
+        ]
+      },
+      {
+        "id": "tujia-2",
+        "roomName": "海景房A",
+        "roomId": "海景房A",
+        "checkIn": "2024-06-15",
+        "checkOut": "2024-06-18",
+        "nights": 3,
+        "guest": "陈小姐",
+        "reason": "",
+        "platform": "tujia",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+        "rowIndex": 2,
+        "sources": [
+          {
+            "id": "tujia-2",
+            "platform": "tujia",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+            "rowIndex": 2
+          }
+        ]
+      },
+      {
+        "id": "airbnb-5",
+        "roomName": "海景房A",
+        "roomId": "海景房A",
+        "checkIn": "2024-06-20",
+        "checkOut": "2024-06-22",
+        "nights": 2,
+        "guest": "王先生",
+        "reason": "",
+        "platform": "airbnb",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+        "rowIndex": 5,
+        "sources": [
+          {
+            "id": "airbnb-5",
+            "platform": "airbnb",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+            "rowIndex": 5
+          }
+        ]
+      }
+    ],
+    "山景房B": [
+      {
+        "id": "airbnb-4",
+        "roomName": "山景房B",
+        "roomId": "山景房B",
+        "checkIn": "2024-06-10",
+        "checkOut": "2024-06-15",
+        "nights": 5,
+        "guest": "李女士",
+        "reason": "",
+        "platform": "airbnb",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+        "rowIndex": 4,
+        "sources": [
+          {
+            "id": "airbnb-4",
+            "platform": "airbnb",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+            "rowIndex": 4
+          }
+        ]
+      }
+    ],
+    "园景房C": [
+      {
+        "id": "xiecheng-ics-1",
+        "roomName": "园景房C",
+        "roomId": "园景房C",
+        "checkIn": "2024-06-25",
+        "checkOut": "2024-06-28",
+        "nights": 3,
+        "guest": "吴女士",
+        "reason": "",
+        "platform": "xiecheng",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/calendar.ics",
+        "rowIndex": 4,
+        "sources": [
+          {
+            "id": "xiecheng-ics-1",
+            "platform": "xiecheng",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/calendar.ics",
+            "rowIndex": 4
+          }
+        ]
+      },
+      {
+        "id": "tujia-5",
+        "roomName": "园景房C",
+        "roomId": "园景房C",
+        "checkIn": "2024-07-01",
+        "checkOut": "2024-07-05",
+        "nights": 4,
+        "guest": "周先生",
+        "reason": "",
+        "platform": "tujia",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+        "rowIndex": 5,
+        "sources": [
+          {
+            "id": "tujia-5",
+            "platform": "tujia",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+            "rowIndex": 5
+          }
+        ]
+      }
+    ]
+  },
+  "lockBookings": {
+    "海景房A": [
+      {
+        "id": "xiecheng-ics-2",
+        "roomName": "海景房A",
+        "roomId": "海景房A",
+        "checkIn": "2024-07-10",
+        "checkOut": "2024-07-15",
+        "nights": 5,
+        "guest": "",
+        "reason": "锁房-自用",
+        "platform": "xiecheng",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/calendar.ics",
+        "rowIndex": 10,
+        "sources": [
+          {
+            "id": "xiecheng-ics-2",
+            "platform": "xiecheng",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/calendar.ics",
+            "rowIndex": 10
+          }
+        ]
+      }
+    ],
+    "山景房B": [
+      {
+        "id": "tujia-3",
+        "roomName": "山景房B",
+        "roomId": "山景房B",
+        "checkIn": "2024-06-01",
+        "checkOut": "2024-06-05",
+        "nights": 4,
+        "guest": "",
+        "reason": "锁房-维护",
+        "platform": "tujia",
+        "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+        "rowIndex": 3,
+        "sources": [
+          {
+            "id": "tujia-3",
+            "platform": "tujia",
+            "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/tujia.csv",
+            "rowIndex": 3
+          }
+        ]
+      }
+    ],
+    "园景房C": []
+  },
+  "invalidRecords": [
+    {
+      "id": "airbnb-6",
+      "roomId": "",
+      "roomName": "",
+      "checkIn": "2024-06-25",
+      "checkOut": "2024-06-27",
+      "checkInStr": "2024-06-25",
+      "checkOutStr": "2024-06-27",
+      "reason": "缺少房源信息",
+      "guest": "赵先生",
+      "platform": "airbnb",
+      "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+      "rowIndex": 6,
+      "rawRow": {
+        "房源": "",
+        "入住日期": "2024-06-25",
+        "退房日期": "2024-06-27",
+        "客人姓名": "赵先生",
+        "备注": "缺少房源信息"
+      },
+      "hasErrors": true,
+      "errors": [
+        {
+          "message": "缺少房源标识",
+          "row": 6,
+          "column": "room",
+          "value": "",
+          "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv"
+        }
+      ]
+    },
+    {
+      "id": "airbnb-7",
+      "roomId": "山景房B",
+      "roomName": "山景房B",
+      "checkIn": "invalid",
+      "checkOut": "2024-07-01",
+      "checkInStr": "invalid",
+      "checkOutStr": "2024-07-01",
+      "reason": "日期格式错误",
+      "guest": "孙先生",
+      "platform": "airbnb",
+      "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv",
+      "rowIndex": 7,
+      "rawRow": {
+        "房源": "山景房B",
+        "入住日期": "invalid",
+        "退房日期": "2024-07-01",
+        "客人姓名": "孙先生",
+        "备注": "日期格式错误"
+      },
+      "hasErrors": true,
+      "errors": [
+        {
+          "message": "缺少入住日期",
+          "row": 7,
+          "column": "checkIn",
+          "value": null,
+          "source": "/Users/mac/pro/solo/workspaces/xy10949/examples/airbnb.csv"
+        }
+      ]
+    }
+  ]
+}
