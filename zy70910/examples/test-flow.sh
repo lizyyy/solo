@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_URL="http://localhost:3000/api/v1"
+BASE_URL="http://localhost:3000/api"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "========================================"
@@ -9,7 +9,7 @@ echo "========================================"
 echo ""
 
 echo "[1/8] 检查服务是否启动..."
-if curl -s "$BASE_URL/health" > /dev/null 2>&1; then
+if curl -s "$BASE_URL/health > /dev/null 2>&1; then
     echo "      ✓ 服务运行正常"
 else
     echo "      ✗ 服务未启动，请先启动服务: npm start"
@@ -18,21 +18,21 @@ fi
 echo ""
 
 echo "[2/8] 导入订单CSV文件..."
-ORDER_RESULT=$(curl -s -X POST "$BASE_URL/import/orders/csv" \
+ORDER_RESULT=$(curl -s -X POST "$BASE_URL/import/orders" \
   -F "file=@$SCRIPT_DIR/sample-orders.csv")
 ORDER_SUCCESS=$(echo $ORDER_RESULT | grep -o '"successCount":[0-9]*' | grep -o '[0-9]*')
 echo "      ✓ 成功导入 $ORDER_SUCCESS 条订单记录"
 echo ""
 
 echo "[3/8] 导入桩端日志JSON文件..."
-CHARGER_RESULT=$(curl -s -X POST "$BASE_URL/import/charger-logs/json" \
+CHARGER_RESULT=$(curl -s -X POST "$BASE_URL/import/charger-logs" \
   -F "file=@$SCRIPT_DIR/sample-charger-logs.json")
 CHARGER_SUCCESS=$(echo $CHARGER_RESULT | grep -o '"successCount":[0-9]*' | grep -o '[0-9]*')
 echo "      ✓ 成功导入 $CHARGER_SUCCESS 条桩端日志"
 echo ""
 
 echo "[4/8] 导入支付记录CSV文件..."
-PAYMENT_RESULT=$(curl -s -X POST "$BASE_URL/import/payment-records" \
+PAYMENT_RESULT=$(curl -s -X POST "$BASE_URL/import/payments" \
   -F "file=@$SCRIPT_DIR/sample-payments.csv")
 PAYMENT_SUCCESS=$(echo $PAYMENT_RESULT | grep -o '"successCount":[0-9]*' | grep -o '[0-9]*')
 echo "      ✓ 成功导入 $PAYMENT_SUCCESS 条支付记录"
