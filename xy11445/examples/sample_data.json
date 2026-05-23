@@ -1,0 +1,66 @@
+[
+  {
+    "order_no": "WO20260501001",
+    "pile_no": "PILE-NS-001",
+    "area": "南山片区",
+    "source": "pile_alarm",
+    "alarm_type": "离线告警",
+    "alarm_level": "严重",
+    "alarm_time": "2026-05-01T08:30:00",
+    "alarm_content": "充电桩离线超过2小时，疑似网络故障或设备断电",
+    "fault_duration": 8.5,
+    "handler": "张工",
+    "extra_data": {
+      "last_online_time": "2026-05-01T06:15:00",
+      "retry_count": 3
+    }
+  },
+  {
+    "order_no": "WO20260501002",
+    "pile_no": "PILE-NS-002",
+    "area": "南山片区",
+    "source": "inspection_form",
+    "alarm_type": "巡检异常",
+    "alarm_level": "一般",
+    "alarm_time": "2026-05-01T10:00:00",
+    "alarm_content": "日常巡检发现屏幕显示异常，触控无响应",
+    "fault_duration": 2.0,
+    "handler": "李工"
+  },
+  {
+    "order_no": "WO20260501003",
+    "pile_no": "PILE-FT-001",
+    "area": "福田片区",
+    "source": "customer_complaint",
+    "alarm_type": "充电故障",
+    "alarm_level": "严重",
+    "alarm_time": "2026-05-01T14:20:00",
+    "alarm_content": "客户投诉充电中断，已完成3笔退款",
+    "fault_duration": 4.5,
+    "handler": "王工"
+  },
+  {
+    "order_no": "WO20260501004",
+    "pile_no": "PILE-LH-001",
+    "area": "罗湖片区",
+    "source": "pile_alarm",
+    "alarm_type": "过温告警",
+    "alarm_level": "严重",
+    "alarm_time": "2026-05-01T16:45:00",
+    "alarm_content": "模块温度超过85度，自动停机保护",
+    "fault_duration": 12.0,
+    "handler": "赵工"
+  },
+  {
+    "order_no": "WO20260501005",
+    "pile_no": "PILE-NS-003",
+    "area": "南山片区",
+    "source": "manual_supplement",
+    "alarm_type": "人为损坏",
+    "alarm_level": "一般",
+    "alarm_time": "2026-05-01T09:00:00",
+    "alarm_content": "临时补录：充电枪线缆被车辆碾压损坏",
+    "fault_duration": 24.0,
+    "handler": "刘工"
+  }
+]
