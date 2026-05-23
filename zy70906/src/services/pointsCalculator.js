@@ -21,16 +21,13 @@ class PointsCalculator {
     
     for (const promo of promotions) {
       if (promo.isApplicable(receipt.transactionDate, receipt.storeId, receipt.amount)) {
-        const promoPoints = promo.calculatePoints(basePoints);
-        if (promoPoints > finalPoints) {
-          finalPoints = promoPoints;
-          appliedPromotions.push({
-            id: promo.id,
-            name: promo.name,
-            multiplier: promo.pointsMultiplier,
-            points: promoPoints
-          });
-        }
+        finalPoints *= promo.pointsMultiplier;
+        appliedPromotions.push({
+          id: promo.id,
+          name: promo.name,
+          multiplier: promo.pointsMultiplier,
+          points: finalPoints
+        });
       }
     }
 
@@ -50,6 +47,7 @@ class PointsCalculator {
     const recons = store.getAllReconciliations();
     
     for (const recon of recons) {
+      if (recon.status === 'approved' || recon.status === 'rejected') continue;
       const receipt = store.getReceipt(recon.receiptId);
       const member = store.getMember(recon.memberNo);
       if (receipt) {

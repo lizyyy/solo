@@ -1,0 +1,5 @@
+receiptNo,storeId,storeName,memberNo,type,amount,points,transactionDate,cashier,remark
+R001,S001,Downtown Store,M001,purchase,500.00,750,2025-01-01T10:00:00,Alice,New Year purchase
+DUP1,S001,Downtown Store,M002,purchase,100.00,100,2025-01-02T11:00:00,Bob,Duplicate test 1
+DUP1,S001,Downtown Store,M002,purchase,100.00,100,2025-01-02T11:00:00,Bob,Duplicate test 2
+R999,S001,Downtown Store,M003,purchase,200.00,240,2025-01-03T12:00:00,Carol,Status protection test

@@ -6,6 +6,13 @@ class DiscrepancyDetector {
   detectDiscrepancies(recon, receipt, member) {
     if (!recon || !receipt) return;
     
+    if (recon.status === RECON_STATUS.APPROVED || recon.status === RECON_STATUS.REJECTED) {
+      return recon;
+    }
+    
+    recon.discrepancyTypes = [];
+    recon.discrepancyReasons = [];
+    
     if (recon.expectedPoints !== recon.actualPoints) {
       const diff = recon.expectedPoints - recon.actualPoints;
       recon.addDiscrepancy(
@@ -48,17 +55,13 @@ class DiscrepancyDetector {
 
   findDuplicates(receipt) {
     const allReceipts = store.getAllReceipts();
-    return allReceipts.filter(r => 
-      r.receiptNo !== receipt.receiptNo && 
-      r.memberNo === receipt.memberNo && 
-      r.amount === receipt.amount && 
-      r.transactionDate === receipt.transactionDate
-    );
+    return allReceipts.filter(r => r.id !== receipt.id && r.receiptNo === receipt.receiptNo);
   }
 
   checkAllReconciliations() {
     const recons = store.getAllReconciliations();
     for (const recon of recons) {
+      if (recon.status === RECON_STATUS.APPROVED || recon.status === RECON_STATUS.REJECTED) continue;
       const receipt = store.getReceipt(recon.receiptId);
       const member = store.getMember(recon.memberNo);
       this.detectDiscrepancies(recon, receipt, member);
