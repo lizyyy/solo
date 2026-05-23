@@ -1,0 +1,11 @@
+const fs = require("fs");
+const code = [];
+code.push("const express = require(\"express\");");
+code.push("const bodyParser = require(\"body-parser\");");
+code.push("const CryptoJS = require(\"crypto-js\");");
+code.push("const app = express();");
+code.push("const PORT = process.env.PORT || 3000;");
+code.push("app.use(bodyParser.json());");
+code.push(\"const data = { batches: [], materials: [], elderly: [], nurses: [], schedules: [], auditLogs: [], processTraces: [] };\");
+code.push("const counters = { batch:1, material:1, elderly:1, nurse:1, schedule:1, audit:1, trace:1 };");
+code.push("function hash(d) { const str = typeof d === \"string\" ? d : JSON.stringify(d); return CryptoJS.SHA256(str).toString(CryptoJS.enc.Hex); }");
