@@ -141,8 +141,11 @@ try:
             models.PassCode.appointment_id == appt.id
         ).first()
         if not existing_pc:
-            pass_code = crud.generate_pass_code(db, appt.id)
-            print(f"生成放行码: {pass_code.code} (预约ID: {appt.id})")
+            pass_code, msg = crud.generate_pass_code(db, appt.id)
+            if pass_code:
+                print(f"生成放行码: {pass_code.code} (预约ID: {appt.id})")
+            else:
+                print(f"生成放行码失败: {msg} (预约ID: {appt.id})")
         else:
             print(f"放行码已存在: {existing_pc.code} (预约ID: {appt.id})")
 
