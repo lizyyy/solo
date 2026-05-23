@@ -1,0 +1,73 @@
+[
+  {
+    "id": "41cfd761-5d58-4d94-b1a8-f906de36c192",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "action": "submit",
+    "operator": "班长A",
+    "role": "team_leader",
+    "timestamp": "2026-05-23T08:21:56.327Z",
+    "details": {
+      "fromStatus": "draft"
+    }
+  },
+  {
+    "id": "16b6aba1-08af-4dcd-8ddc-abf2bb04edeb",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "action": "withdraw",
+    "operator": "班长A",
+    "role": "team_leader",
+    "timestamp": "2026-05-23T08:21:56.327Z",
+    "details": {
+      "fromStatus": "submitted",
+      "reason": "需要补充信息"
+    }
+  },
+  {
+    "id": "5d4defd6-1e91-4d40-b59a-6e5625c833d5",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "action": "submit",
+    "operator": "班长A",
+    "role": "team_leader",
+    "timestamp": "2026-05-23T08:21:56.327Z",
+    "details": {
+      "fromStatus": "draft"
+    }
+  },
+  {
+    "id": "c4c2a88e-6f06-4763-a6f1-96fd5eb7fe83",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "action": "secondary_confirm",
+    "operator": "片区经理",
+    "role": "area_manager",
+    "timestamp": "2026-05-23T08:21:56.328Z",
+    "details": {
+      "fromStatus": "submitted"
+    }
+  },
+  {
+    "id": "9cdff40d-d481-4cfa-a926-b2430c77c861",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "action": "manual_update",
+    "operator": "管理员",
+    "role": "admin",
+    "timestamp": "2026-05-23T08:21:56.328Z",
+    "details": {
+      "updates": {
+        "faultDuration": 30
+      },
+      "reason": "告警恢复时间有误，实际30分钟"
+    }
+  },
+  {
+    "id": "3a323eb9-f19b-4532-a574-5a09929b7dea",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "action": "freeze",
+    "operator": "片区经理",
+    "role": "area_manager",
+    "timestamp": "2026-05-23T08:21:56.328Z",
+    "details": {
+      "fromStatus": "secondary_confirmed",
+      "reason": "月报导出前冻结"
+    }
+  }
+]

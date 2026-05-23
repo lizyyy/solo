@@ -1,0 +1,31 @@
+[
+  {
+    "pileId": "P001",
+    "alarmCode": "E001",
+    "alarmLevel": "error",
+    "alarmTime": "2026-05-20T08:30:00+08:00",
+    "recoverTime": "2026-05-20T09:15:00+08:00",
+    "alarmDescription": "离线告警 - 通信中断",
+    "area": "A区",
+    "handler": "张三"
+  },
+  {
+    "pileId": "P002",
+    "alarmCode": "E002",
+    "alarmLevel": "warning",
+    "alarmTime": "2026-05-20T10:00:00+08:00",
+    "alarmDescription": "过温告警",
+    "area": "B区",
+    "handler": "李四"
+  },
+  {
+    "pileId": "P001",
+    "alarmCode": "E001",
+    "alarmLevel": "error",
+    "alarmTime": "2026-05-20T08:30:00+08:00",
+    "recoverTime": "2026-05-20T09:15:00+08:00",
+    "alarmDescription": "离线告警 - 通信中断",
+    "area": "A区",
+    "handler": "张三"
+  }
+]

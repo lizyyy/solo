@@ -1,0 +1,157 @@
+{
+  "fcc9fc64-5a0c-4106-8871-259bcef96152": {
+    "id": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "factKey": "P001:2026-05-20T00:E001",
+    "pileId": "P001",
+    "status": "frozen",
+    "faultStatus": "resolved",
+    "faultStartTime": "2026-05-20T00:30:00.000Z",
+    "faultEndTime": "2026-05-20T01:15:00.000Z",
+    "faultDuration": 30,
+    "faultType": "E001",
+    "faultDescription": "离线告警 - 通信中断",
+    "handler": "张三",
+    "handlerRole": "operator",
+    "area": "A区",
+    "evidences": [
+      "bd1ee469-8299-4503-99f3-58aac8ce63f4",
+      "aa8e4a20-70ef-4981-9809-b4e6fb59f13f"
+    ],
+    "changeLogs": [],
+    "createdAt": "2026-05-23T08:21:56.325Z",
+    "updatedAt": "2026-05-23T08:21:56.328Z",
+    "isManuallyModified": true,
+    "sensitiveFields": [
+      "handler"
+    ],
+    "version": 8,
+    "submittedAt": "2026-05-23T08:21:56.327Z",
+    "modificationReason": "月报导出前冻结",
+    "frozenAt": "2026-05-23T08:21:56.328Z"
+  },
+  "87b9e0c6-d825-49e9-9033-2d4848058a21": {
+    "id": "87b9e0c6-d825-49e9-9033-2d4848058a21",
+    "factKey": "P002:2026-05-20T02:E002",
+    "pileId": "P002",
+    "status": "draft",
+    "faultStatus": "pending",
+    "faultStartTime": "2026-05-20T02:00:00.000Z",
+    "faultDuration": 0,
+    "faultType": "E002",
+    "faultDescription": "过温告警",
+    "handler": "李四",
+    "handlerRole": "operator",
+    "area": "B区",
+    "evidences": [
+      "0ea63b79-f89f-43bc-95e4-2e54174fff68"
+    ],
+    "changeLogs": [],
+    "createdAt": "2026-05-23T08:21:56.325Z",
+    "updatedAt": "2026-05-23T08:21:56.325Z",
+    "isManuallyModified": false,
+    "sensitiveFields": [
+      "handler"
+    ],
+    "version": 1
+  },
+  "47e8a8f2-35e9-4c77-850a-4c0b345a79db": {
+    "id": "47e8a8f2-35e9-4c77-850a-4c0b345a79db",
+    "factKey": "P001:2026-05-20T01:inspection",
+    "pileId": "P001",
+    "status": "draft",
+    "faultStatus": "pending",
+    "faultStartTime": "2026-05-20T01:30:00.000Z",
+    "faultDuration": 0,
+    "faultType": "inspection_found",
+    "faultDescription": "巡检发现问题: 通信模块松动, 外壳有裂痕",
+    "handler": "王五",
+    "handlerRole": "operator",
+    "area": "A区",
+    "evidences": [
+      "7640465d-51f6-49cf-a14a-f3a531418ec2"
+    ],
+    "changeLogs": [],
+    "createdAt": "2026-05-23T08:21:56.326Z",
+    "updatedAt": "2026-05-23T08:21:56.326Z",
+    "isManuallyModified": false,
+    "sensitiveFields": [
+      "handler"
+    ],
+    "version": 1
+  },
+  "77fa076a-33e7-45c7-82f8-679cd62792a4": {
+    "id": "77fa076a-33e7-45c7-82f8-679cd62792a4",
+    "factKey": "P002:2026-05-20T06:inspection",
+    "pileId": "P002",
+    "status": "draft",
+    "faultStatus": "false_alarm",
+    "faultStartTime": "2026-05-20T06:00:00.000Z",
+    "faultDuration": 0,
+    "faultType": "inspection_normal",
+    "faultDescription": "巡检正常, 检查项目: 外观检查, 功能测试",
+    "handler": "赵六",
+    "handlerRole": "operator",
+    "area": "B区",
+    "evidences": [
+      "399c1ff3-481d-4717-987c-cdb4b964ea25"
+    ],
+    "changeLogs": [],
+    "createdAt": "2026-05-23T08:21:56.326Z",
+    "updatedAt": "2026-05-23T08:21:56.326Z",
+    "isManuallyModified": false,
+    "sensitiveFields": [
+      "handler"
+    ],
+    "version": 1
+  },
+  "02f46a80-2f58-4728-9e72-294c5f963010": {
+    "id": "02f46a80-2f58-4728-9e72-294c5f963010",
+    "factKey": "P001:2026-05-20T00:charging_failure",
+    "pileId": "P001",
+    "status": "draft",
+    "faultStatus": "pending",
+    "faultStartTime": "2026-05-20T00:45:00.000Z",
+    "faultDuration": 0,
+    "faultType": "complaint_charging_failure",
+    "faultDescription": "客户投诉: 车辆无法充电，屏幕显示离线",
+    "handler": "客服小张",
+    "handlerRole": "operator",
+    "area": "A区",
+    "evidences": [
+      "12959b52-0639-469f-b7c2-ff12e3800d44"
+    ],
+    "changeLogs": [],
+    "createdAt": "2026-05-23T08:21:56.327Z",
+    "updatedAt": "2026-05-23T08:21:56.327Z",
+    "isManuallyModified": false,
+    "sensitiveFields": [
+      "handler",
+      "processor"
+    ],
+    "version": 1
+  },
+  "07b128c0-c85f-4469-9e58-473a67a1ce05": {
+    "id": "07b128c0-c85f-4469-9e58-473a67a1ce05",
+    "factKey": "P002:2026-05-20T03:slow_charging",
+    "pileId": "P002",
+    "status": "draft",
+    "faultStatus": "pending",
+    "faultStartTime": "2026-05-20T03:30:00.000Z",
+    "faultDuration": 0,
+    "faultType": "complaint_slow_charging",
+    "faultDescription": "客户投诉: 充电速度慢，只有正常的一半",
+    "area": "B区",
+    "evidences": [
+      "66d612cd-733d-45a0-bf9c-75ef71f50651"
+    ],
+    "changeLogs": [],
+    "createdAt": "2026-05-23T08:21:56.327Z",
+    "updatedAt": "2026-05-23T08:21:56.327Z",
+    "isManuallyModified": false,
+    "sensitiveFields": [
+      "handler",
+      "processor"
+    ],
+    "version": 1
+  }
+}

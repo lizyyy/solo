@@ -1,0 +1,68 @@
+{
+  "06ec4ad1-fc97-4f03-ae85-7fe384553422": {
+    "id": "06ec4ad1-fc97-4f03-ae85-7fe384553422",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "field": "status",
+    "oldValue": "draft",
+    "newValue": "submitted",
+    "changedBy": "班长A",
+    "changedAt": "2026-05-23T08:21:56.327Z",
+    "changeReason": "提交记录",
+    "isManualOverride": false
+  },
+  "159f0dfc-128c-427a-9319-92a8465599b8": {
+    "id": "159f0dfc-128c-427a-9319-92a8465599b8",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "field": "status",
+    "oldValue": "submitted",
+    "newValue": "draft",
+    "changedBy": "班长A",
+    "changedAt": "2026-05-23T08:21:56.327Z",
+    "changeReason": "需要补充信息",
+    "isManualOverride": false
+  },
+  "449fd90b-b892-442e-a578-1888cfd3037e": {
+    "id": "449fd90b-b892-442e-a578-1888cfd3037e",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "field": "status",
+    "oldValue": "draft",
+    "newValue": "submitted",
+    "changedBy": "班长A",
+    "changedAt": "2026-05-23T08:21:56.327Z",
+    "changeReason": "提交记录",
+    "isManualOverride": false
+  },
+  "0e98fa22-b69a-4db1-9527-cdacc1e09b19": {
+    "id": "0e98fa22-b69a-4db1-9527-cdacc1e09b19",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "field": "status",
+    "oldValue": "submitted",
+    "newValue": "secondary_confirmed",
+    "changedBy": "片区经理",
+    "changedAt": "2026-05-23T08:21:56.328Z",
+    "changeReason": "二次确认通过",
+    "isManualOverride": false
+  },
+  "dbf46763-89ef-44eb-a189-522e0b592995": {
+    "id": "dbf46763-89ef-44eb-a189-522e0b592995",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "field": "faultDuration",
+    "oldValue": 45,
+    "newValue": 30,
+    "changedBy": "管理员",
+    "changedAt": "2026-05-23T08:21:56.328Z",
+    "changeReason": "告警恢复时间有误，实际30分钟",
+    "isManualOverride": true
+  },
+  "0a11e4fb-ec53-4203-ac70-ce86a9db7bff": {
+    "id": "0a11e4fb-ec53-4203-ac70-ce86a9db7bff",
+    "recordId": "fcc9fc64-5a0c-4106-8871-259bcef96152",
+    "field": "status",
+    "oldValue": "secondary_confirmed",
+    "newValue": "frozen",
+    "changedBy": "片区经理",
+    "changedAt": "2026-05-23T08:21:56.328Z",
+    "changeReason": "月报导出前冻结",
+    "isManualOverride": false
+  }
+}

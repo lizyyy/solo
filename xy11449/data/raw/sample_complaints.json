@@ -1,0 +1,21 @@
+[
+  {
+    "complaintId": "C001",
+    "pileId": "P001",
+    "customerId": "U10001",
+    "complaintType": "charging_failure",
+    "complaintTime": "2026-05-20T08:45:00+08:00",
+    "description": "车辆无法充电，屏幕显示离线",
+    "handler": "客服小张",
+    "area": "A区"
+  },
+  {
+    "complaintId": "C002",
+    "pileId": "P002",
+    "customerId": "U10002",
+    "complaintType": "slow_charging",
+    "complaintTime": "2026-05-20T11:30:00+08:00",
+    "description": "充电速度慢，只有正常的一半",
+    "area": "B区"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "inspectionId": "I001",
+    "pileId": "P001",
+    "inspector": "王五",
+    "inspectionTime": "2026-05-20T09:30:00+08:00",
+    "inspectionItems": "外观检查, 线路检查, 接地检查",
+    "foundIssues": "通信模块松动, 外壳有裂痕",
+    "status": "needs_repair",
+    "area": "A区"
+  },
+  {
+    "inspectionId": "I002",
+    "pileId": "P002",
+    "inspector": "赵六",
+    "inspectionTime": "2026-05-20T14:00:00+08:00",
+    "inspectionItems": "外观检查, 功能测试",
+    "foundIssues": "",
+    "status": "normal",
+    "area": "B区"
+  }
+]
