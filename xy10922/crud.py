@@ -302,10 +302,18 @@ def manual_correction(db: Session, correction: schemas.ManualCorrectionRequest):
         appointment.status = correction.new_status
 
     if correction.new_spot_id:
+        new_spot = get_parking_spot(db, correction.new_spot_id)
+        if not new_spot:
+            return None, "新车位不存在"
+        if new_spot.status != models.ParkingSpotStatus.AVAILABLE.value:
+            return None, f"新车位状态为 {new_spot.status}，不可用"
+
         if appointment.parking_spot_id:
             release_parking_spot(db, appointment.parking_spot_id)
         appointment.parking_spot_id = correction.new_spot_id
-        lock_parking_spot(db, correction.new_spot_id, appointment.id)
+        locked_spot = lock_parking_spot(db, correction.new_spot_id, appointment.id)
+        if not locked_spot:
+            return None, "新车位锁定失败"
 
     appointment.request_status = models.RequestStatus.PENDING_REVIEW.value
     appointment.remarks = f"人工修正: {correction.correction_reason}"

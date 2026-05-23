@@ -227,6 +227,14 @@ def create_appointment(appointment: schemas.MeetingAppointmentCreate, db: Sessio
             data=None
         )
 
+    if appointment.end_time <= appointment.start_time:
+        return schemas.ApiResponse(
+            success=False,
+            status=RequestStatus.REJECTED.value,
+            message="会议结束时间必须晚于开始时间",
+            data=None
+        )
+
     if appointment.parking_spot_id:
         db_spot = crud.get_parking_spot(db, appointment.parking_spot_id)
         if not db_spot:
@@ -247,6 +255,13 @@ def create_appointment(appointment: schemas.MeetingAppointmentCreate, db: Sessio
         available_spot = crud.find_available_spot(db)
         if available_spot:
             appointment.parking_spot_id = available_spot.id
+        else:
+            return schemas.ApiResponse(
+                success=False,
+                status=RequestStatus.REJECTED.value,
+                message="没有可用的临时车位",
+                data=None
+            )
 
     db_appointment = crud.create_meeting_appointment(db, appointment)
 
