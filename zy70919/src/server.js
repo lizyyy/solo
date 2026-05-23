@@ -111,9 +111,19 @@ app.put('/api/schedules/:id', (req, res) => {
 app.post('/api/schedules/:id/cancel', (req, res) => {
   const { cancel_type, reason, operator } = req.body;
   if (!cancel_type || !reason || !operator) return res.status(400).json({error:'Missing fields'});
-  req.body.updates = { status: 'cancelled', cancel_type, cancel_reason: reason };
-  req.body.reason = reason; req.body.operator = operator;
-  app._router.handle(req, res);
+  const s = data.schedules.find(x => x.id == req.params.id);
+  if (!s) return res.status(404).json({error:'Not found'});
+  const updates = { status: 'cancelled', cancel_type, cancel_reason: reason };
+  for (const [k,v] of Object.entries(updates)) {
+    if (s[k]!==undefined && String(s[k]||'' )!==String(v||'')) {
+      data.auditLogs.push({id: counters.audit++, schedule_id: s.id, field_name: k, old_value: String(s[k]||''), new_value: String(v||''), change_reason: reason, changed_by: operator, created_at: now()});
+    }
+  }
+  Object.assign(s, updates); s.last_handler = operator; s.handled_at = now(); s.updated_at = now();
+  data.processTraces.push({id: counters.trace++, schedule_id: s.id, action:'updated', operator, detail: reason, created_at: now()});
+  const e = data.elderly.find(x => x.id === s.elderly_id);
+  const n = data.nurses.find(x => x.id === s.nurse_id);
+  res.json({...s, elderly_name:e?.name||'', nurse_name:n?.name||''});
 });
 
 app.get('/api/schedules/export/:batchId', (req, res) => {
