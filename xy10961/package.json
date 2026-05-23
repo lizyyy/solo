@@ -1,0 +1,40 @@
+{
+  "name": "sales-visit-merge-cli",
+  "version": "1.0.0",
+  "description": "售楼处来访合并工具 - 处理渠道表和来访登记表的重复认领问题",
+  "main": "dist/index.js",
+  "bin": {
+    "sales-visit-merge": "./bin/run.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "postinstall": "npm run build 2>/dev/null || echo 'Build skipped, run npm run build manually'",
+    "start": "node dist/index.js",
+    "merge": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node dist/index.js -v examples/来访表示例.xlsx -c examples/渠道表示例.xlsx -o output"
+  },
+  "keywords": [
+    "sales",
+    "visit",
+    "merge",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "xlsx": "^0.18.5",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/chalk": "^2.2.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
