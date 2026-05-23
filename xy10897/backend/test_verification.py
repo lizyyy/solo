@@ -5,20 +5,30 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import inspect
 from app import schemas, models, services, auth
-from app.database import Base, init_database
+from app.database import Base, get_engine, get_session_factory, init_database_schema
 from datetime import datetime, timedelta
 
 print("=== 验证测试脚本 ===")
 print()
 
 print("正在初始化数据库...")
-engine = init_database(use_memory_fallback=True)
-Base.metadata.create_all(bind=engine)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = get_engine(use_memory_fallback=True)
+init_database_schema()
+SessionLocal = get_session_factory()
 db = SessionLocal()
 print("✅ 数据库初始化成功")
+print()
+
+print("0. 测试数据库表存在性...")
+inspector = inspect(engine)
+tables = inspector.get_table_names()
+assert "applicants" in tables, f"缺少 applicants 表，现有表: {tables}"
+assert "applications" in tables, f"缺少 applications 表"
+assert "credentials" in tables, f"缺少 credentials 表"
+assert "audit_logs" in tables, f"缺少 audit_logs 表"
+print(f"   ✅ 所有表存在: {tables}")
 print()
 
 print("1. 测试 Pydantic 2.x 兼容性 (from_attributes)...")

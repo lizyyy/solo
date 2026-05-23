@@ -22,11 +22,22 @@ if [ $? -ne 0 ]; then
 fi
 
 echo ""
-echo "运行验证测试..."
+echo "运行单元测试（验证核心功能）..."
 python3 test_verification.py
 
 if [ $? -ne 0 ]; then
-    echo "❌ 验证测试失败，请检查错误信息"
+    echo "❌ 单元测试失败，请检查错误信息"
+    exit 1
+fi
+
+echo ""
+echo "启动服务并运行 HTTP API 集成测试..."
+python3 test_http_api.py &
+TEST_PID=$!
+wait $TEST_PID
+
+if [ $? -ne 0 ]; then
+    echo "❌ HTTP API 集成测试失败，请检查错误信息"
     exit 1
 fi
 

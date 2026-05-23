@@ -1,19 +1,24 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
 import asyncio
 from contextlib import asynccontextmanager
 
 from app import models, schemas, services
-from app.database import Base, init_database, get_database_url
-
-engine = None
-SessionLocal = None
+from app.database import (
+    Base, 
+    get_engine, 
+    get_session_factory, 
+    init_database_schema, 
+    get_database_url,
+    is_initialized
+)
 
 
 def get_db():
+    SessionLocal = get_session_factory()
     db = SessionLocal()
     try:
         yield db
@@ -24,11 +29,13 @@ def get_db():
 async def auto_expire_credentials():
     while True:
         try:
-            db = SessionLocal()
-            count = services.expire_credentials(db)
-            if count > 0:
-                print(f"[{datetime.now()}] 自动回收了 {count} 个过期凭证")
-            db.close()
+            if is_initialized():
+                SessionLocal = get_session_factory()
+                db = SessionLocal()
+                count = services.expire_credentials(db)
+                if count > 0:
+                    print(f"[{datetime.now()}] 自动回收了 {count} 个过期凭证")
+                db.close()
         except Exception as e:
             print(f"自动回收任务出错: {e}")
         await asyncio.sleep(60)
@@ -36,16 +43,12 @@ async def auto_expire_credentials():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global engine, SessionLocal
-    
     print("=" * 60)
     print("正在初始化数据库...")
     
     try:
-        engine = init_database(use_memory_fallback=True)
-        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-        
-        Base.metadata.create_all(bind=engine)
+        engine = get_engine(use_memory_fallback=True)
+        init_database_schema()
         print(f"✅ 数据库初始化成功: {get_database_url()}")
     except Exception as e:
         print(f"❌ 数据库初始化失败: {e}")

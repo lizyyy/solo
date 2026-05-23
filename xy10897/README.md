@@ -2,6 +2,30 @@
 
 外包协作开发者访问凭证管理系统
 
+## ✅ 问题修复记录（第三轮）
+
+### 1. 内存数据库连接池修复
+**问题**: 使用 `sqlite:///:memory:` 时，每个连接创建独立的内存数据库，导致一个连接创建的表在另一个连接中看不到（`no such table` 错误）
+
+**修复**: 
+- 添加 `StaticPool` 确保所有请求复用同一个数据库连接
+- 使用线程安全的单例模式管理数据库引擎
+- 内存数据库和文件数据库都能正确工作
+
+**修改文件**: [backend/app/database.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/app/database.py#L31-L53)
+
+
+### 2. HTTP API 集成测试
+**问题**: `test_verification.py` 复用同一 Session，不能代表真实 HTTP 路由的完整链路
+
+**修复**: 创建 `test_http_api.py`，使用真实 HTTP 请求验证完整链路：申请→审批→签发→访问→越权→撤销→审计
+
+**修改文件**:
+- [backend/test_http_api.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/test_http_api.py)
+- [backend/requirements.txt](file:///Users/mac/pro/solo/workspaces/xy10897/backend/requirements.txt) (添加 requests)
+- [start.sh](file:///Users/mac/pro/solo/workspaces/xy10897/start.sh) (运行 HTTP 集成测试)
+
+
 ## ✅ 问题修复记录（第二轮）
 
 ### 1. SQLite 数据库路径修复
@@ -20,7 +44,7 @@
 
 **修复**: 将数据库初始化和表创建移到 FastAPI lifespan 中，应用启动时才执行
 
-**修改文件**: [backend/main.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/main.py#L37-L61)
+**修改文件**: [backend/main.py](file:///Users/mac/pro/solo/workspaces/xy10897/backend/main.py)
 
 
 ### 3. 启动前验证测试
