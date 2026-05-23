@@ -1,0 +1,347 @@
+{
+  "summary": {
+    "generatedAt": "2026-05-23T18:17:52.600Z",
+    "totalOrders": 11,
+    "totalUniqueOrders": 11,
+    "totalDuplicateOrders": 1,
+    "totalLeaders": 4,
+    "totalSales": 1300.5,
+    "totalRefunds": 220,
+    "totalNetSales": 1080.5,
+    "totalCommission": 119.10000000000001,
+    "totalPlatformFees": 54.025000000000006,
+    "platformFeeRate": 0.05,
+    "errorCount": 5,
+    "warningCount": 0
+  },
+  "orderDetails": [
+    {
+      "orderId": "ORD001",
+      "leaderId": "L001",
+      "leaderName": "张团长",
+      "productName": "有机苹果",
+      "quantity": 2,
+      "originalAmount": 89,
+      "refundAmount": 0,
+      "netAmount": 89,
+      "hasRefund": false,
+      "refunds": [],
+      "rowIndex": 2
+    },
+    {
+      "orderId": "ORD002",
+      "leaderId": "L001",
+      "leaderName": "张团长",
+      "productName": "新鲜橙子",
+      "quantity": 3,
+      "originalAmount": 67.5,
+      "refundAmount": 0,
+      "netAmount": 67.5,
+      "hasRefund": false,
+      "refunds": [],
+      "rowIndex": 3
+    },
+    {
+      "orderId": "ORD003",
+      "leaderId": "L002",
+      "leaderName": "李团长",
+      "productName": "进口牛奶",
+      "quantity": 5,
+      "originalAmount": 125,
+      "refundAmount": 25,
+      "netAmount": 100,
+      "hasRefund": true,
+      "refunds": [
+        {
+          "amount": 25,
+          "reason": "部分退货"
+        }
+      ],
+      "rowIndex": 4
+    },
+    {
+      "orderId": "ORD004",
+      "leaderId": "L002",
+      "leaderName": "李团长",
+      "productName": "全麦面包",
+      "quantity": 4,
+      "originalAmount": 56,
+      "refundAmount": 0,
+      "netAmount": 56,
+      "hasRefund": false,
+      "refunds": [],
+      "rowIndex": 5
+    },
+    {
+      "orderId": "ORD005",
+      "leaderId": "L003",
+      "leaderName": "王团长",
+      "productName": "有机鸡蛋",
+      "quantity": 2,
+      "originalAmount": 45,
+      "refundAmount": 45,
+      "netAmount": 0,
+      "hasRefund": true,
+      "refunds": [
+        {
+          "amount": 45,
+          "reason": "全额退款"
+        }
+      ],
+      "rowIndex": 6
+    },
+    {
+      "orderId": "ORD006",
+      "leaderId": "L003",
+      "leaderName": "王团长",
+      "productName": "酸奶礼盒",
+      "quantity": 3,
+      "originalAmount": 98,
+      "refundAmount": 0,
+      "netAmount": 98,
+      "hasRefund": false,
+      "refunds": [],
+      "rowIndex": 7
+    },
+    {
+      "orderId": "ORD007",
+      "leaderId": "L001",
+      "leaderName": "张团长",
+      "productName": "蜂蜜",
+      "quantity": 2,
+      "originalAmount": 78,
+      "refundAmount": 0,
+      "netAmount": 78,
+      "hasRefund": false,
+      "refunds": [],
+      "rowIndex": 8
+    },
+    {
+      "orderId": "ORD008",
+      "leaderId": "L002",
+      "leaderName": "李团长",
+      "productName": "坚果礼盒",
+      "quantity": 1,
+      "originalAmount": 168,
+      "refundAmount": 50,
+      "netAmount": 118,
+      "hasRefund": true,
+      "refunds": [
+        {
+          "amount": 50,
+          "reason": "质量问题"
+        }
+      ],
+      "rowIndex": 9
+    },
+    {
+      "orderId": "ORD009",
+      "leaderId": "L003",
+      "leaderName": "王团长",
+      "productName": "橄榄油",
+      "quantity": 2,
+      "originalAmount": 156,
+      "refundAmount": 0,
+      "netAmount": 156,
+      "hasRefund": false,
+      "refunds": [],
+      "rowIndex": 10
+    },
+    {
+      "orderId": "ORD010",
+      "leaderId": "L001",
+      "leaderName": "张团长",
+      "productName": "红酒",
+      "quantity": 1,
+      "originalAmount": 298,
+      "refundAmount": 100,
+      "netAmount": 198,
+      "hasRefund": true,
+      "refunds": [
+        {
+          "amount": 100,
+          "reason": "客户取消"
+        }
+      ],
+      "rowIndex": 11
+    },
+    {
+      "orderId": "ORD013",
+      "leaderId": "L001",
+      "leaderName": "张团长",
+      "productName": "正常订单",
+      "quantity": 2,
+      "originalAmount": 120,
+      "refundAmount": 0,
+      "netAmount": 120,
+      "hasRefund": false,
+      "refunds": [],
+      "rowIndex": 15
+    }
+  ],
+  "leaderCommission": [
+    {
+      "leaderId": "L001",
+      "name": "张团长",
+      "orderCount": 5,
+      "totalSales": 652.5,
+      "totalRefunds": 100,
+      "netSales": 552.5,
+      "commissionRate": 0.12,
+      "commission": 66.3,
+      "platformFee": 27.625,
+      "finalAmount": 38.675
+    },
+    {
+      "leaderId": "L002",
+      "name": "李团长",
+      "orderCount": 3,
+      "totalSales": 349,
+      "totalRefunds": 75,
+      "netSales": 274,
+      "commissionRate": 0.1,
+      "commission": 27.400000000000002,
+      "platformFee": 13.700000000000001,
+      "finalAmount": 13.700000000000001
+    },
+    {
+      "leaderId": "L003",
+      "name": "王团长",
+      "orderCount": 3,
+      "totalSales": 299,
+      "totalRefunds": 45,
+      "netSales": 254,
+      "commissionRate": 0.1,
+      "commission": 25.400000000000002,
+      "platformFee": 12.700000000000001,
+      "finalAmount": 12.700000000000001
+    },
+    {
+      "leaderId": "L004",
+      "name": "赵团长",
+      "orderCount": 0,
+      "totalSales": 0,
+      "totalRefunds": 0,
+      "netSales": 0,
+      "commissionRate": 0.1,
+      "commission": 0,
+      "platformFee": 0,
+      "finalAmount": 0
+    }
+  ],
+  "refundOffsets": [
+    {
+      "orderId": "ORD003",
+      "leaderId": "L002",
+      "leaderName": "李团长",
+      "originalAmount": 125,
+      "refundAmount": 25,
+      "refundReason": "部分退货",
+      "netAfterRefund": 100,
+      "refundIndex": 1
+    },
+    {
+      "orderId": "ORD005",
+      "leaderId": "L003",
+      "leaderName": "王团长",
+      "originalAmount": 45,
+      "refundAmount": 45,
+      "refundReason": "全额退款",
+      "netAfterRefund": 0,
+      "refundIndex": 1
+    },
+    {
+      "orderId": "ORD008",
+      "leaderId": "L002",
+      "leaderName": "李团长",
+      "originalAmount": 168,
+      "refundAmount": 50,
+      "refundReason": "质量问题",
+      "netAfterRefund": 118,
+      "refundIndex": 1
+    },
+    {
+      "orderId": "ORD010",
+      "leaderId": "L001",
+      "leaderName": "张团长",
+      "originalAmount": 298,
+      "refundAmount": 100,
+      "refundReason": "客户取消",
+      "netAfterRefund": 198,
+      "refundIndex": 1
+    }
+  ],
+  "errors": [
+    {
+      "rowIndex": 12,
+      "type": "duplicate",
+      "errors": [
+        "重复订单 ID: ORD001"
+      ],
+      "originalRow": {
+        "订单ID": "ORD001",
+        "团长ID": "L001",
+        "商品名称": "重复订单测试",
+        "数量": "1",
+        "金额": "99.00"
+      }
+    },
+    {
+      "rowIndex": 13,
+      "type": "order",
+      "errors": [
+        "缺少订单ID"
+      ],
+      "originalRow": {
+        "订单ID": "",
+        "团长ID": "无效ID测试",
+        "商品名称": "缺少团长ID",
+        "数量": "1",
+        "金额": "50.00"
+      }
+    },
+    {
+      "rowIndex": 14,
+      "type": "order",
+      "errors": [
+        "订单金额无效"
+      ],
+      "originalRow": {
+        "订单ID": "ORD012",
+        "团长ID": "L004",
+        "商品名称": "金额无效测试",
+        "数量": "1",
+        "金额": "-10.00"
+      }
+    },
+    {
+      "rowIndex": 16,
+      "type": "order",
+      "errors": [
+        "缺少订单金额"
+      ],
+      "originalRow": {
+        "订单ID": "ORD014",
+        "团长ID": "L002",
+        "商品名称": "缺失金额测试",
+        "数量": "2",
+        "金额": ""
+      }
+    },
+    {
+      "rowIndex": 17,
+      "type": "order",
+      "errors": [
+        "订单金额无效"
+      ],
+      "originalRow": {
+        "订单ID": "ORD015",
+        "团长ID": "L003",
+        "商品名称": "空字符串金额",
+        "数量": "3",
+        "金额": "\"\""
+      }
+    }
+  ],
+  "warnings": []
+}

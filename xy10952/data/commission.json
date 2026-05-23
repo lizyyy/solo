@@ -1,0 +1,21 @@
+{
+  "platformFeeRate": 0.05,
+  "commissionTiers": [
+    {
+      "minSales": 0,
+      "rate": 0.10
+    },
+    {
+      "minSales": 500,
+      "rate": 0.12
+    },
+    {
+      "minSales": 1000,
+      "rate": 0.15
+    },
+    {
+      "minSales": 2000,
+      "rate": 0.18
+    }
+  ]
+}

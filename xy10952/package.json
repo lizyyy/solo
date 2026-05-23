@@ -1,0 +1,24 @@
+{
+  "name": "community-order-split",
+  "version": "1.0.0",
+  "description": "社群订单分账CLI工具",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "order-split": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "keywords": ["order", "split", "commission", "community"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.3"
+  }
+}
