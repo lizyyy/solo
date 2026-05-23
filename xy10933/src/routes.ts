@@ -19,7 +19,7 @@ router.get('/equipment', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: equipment };
     res.json(response);
   } catch (error: any) {
-    await logException('get_equipment', req.query, error.message);
+    await services.logException('get_equipment', req.query, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -35,7 +35,7 @@ router.get('/equipment/:id', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: equipment };
     res.json(response);
   } catch (error: any) {
-    await logException('get_equipment_by_id', req.params, error.message);
+    await services.logException('get_equipment_by_id', req.params, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -47,7 +47,7 @@ router.post('/equipment', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: equipment, message: '器材创建成功' };
     res.status(201).json(response);
   } catch (error: any) {
-    await logException('create_equipment', req.body, error.message);
+    await services.logException('create_equipment', req.body, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -60,7 +60,7 @@ router.get('/accessories', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: accessories };
     res.json(response);
   } catch (error: any) {
-    await logException('get_accessories', req.query, error.message);
+    await services.logException('get_accessories', req.query, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -72,7 +72,7 @@ router.get('/rental-orders', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: orders };
     res.json(response);
   } catch (error: any) {
-    await logException('get_rental_orders', req.query, error.message);
+    await services.logException('get_rental_orders', req.query, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -88,7 +88,7 @@ router.get('/rental-orders/:id', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: order };
     res.json(response);
   } catch (error: any) {
-    await logException('get_rental_order_by_id', req.params, error.message);
+    await services.logException('get_rental_order_by_id', req.params, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -100,7 +100,7 @@ router.get('/rental-orders/:id/accessories', async (req: Request, res: Response)
     const response: ApiResponse = { success: true, data: accessories };
     res.json(response);
   } catch (error: any) {
-    await logException('get_rental_accessories', req.params, error.message);
+    await services.logException('get_rental_accessories', req.params, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -112,7 +112,7 @@ router.post('/rental-orders', async (req: Request, res: Response) => {
     const missingFields = requiredFields.filter(field => !(field in req.body));
     
     if (missingFields.length > 0) {
-      await logException('create_rental_order_missing_fields', req.body, `缺少必填字段: ${missingFields.join(', ')}`);
+      await services.logException('create_rental_order_missing_fields', req.body, `缺少必填字段: ${missingFields.join(', ')}`);
       const response: ApiResponse = { success: false, error: `缺少必填字段: ${missingFields.join(', ')}` };
       return res.status(400).json(response);
     }
@@ -121,7 +121,7 @@ router.post('/rental-orders', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: order, message: '借用单创建成功' };
     res.status(201).json(response);
   } catch (error: any) {
-    await logException('create_rental_order', req.body, error.message);
+    await services.logException('create_rental_order', req.body, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -139,7 +139,7 @@ router.patch('/rental-orders/:id/status', async (req: Request, res: Response) =>
     const response: ApiResponse = { success: true, data: order, message: '状态更新成功' };
     res.json(response);
   } catch (error: any) {
-    await logException('update_rental_order_status', { ...req.params, ...req.body }, error.message);
+    await services.logException('update_rental_order_status', { ...req.params, ...req.body }, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -151,7 +151,7 @@ router.post('/return-inspections', async (req: Request, res: Response) => {
     const missingFields = requiredFields.filter(field => !(field in req.body));
     
     if (missingFields.length > 0) {
-      await logException('create_inspection_missing_fields', req.body, `缺少必填字段: ${missingFields.join(', ')}`);
+      await services.logException('create_inspection_missing_fields', req.body, `缺少必填字段: ${missingFields.join(', ')}`);
       const response: ApiResponse = { success: false, error: `缺少必填字段: ${missingFields.join(', ')}` };
       return res.status(400).json(response);
     }
@@ -160,7 +160,7 @@ router.post('/return-inspections', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: inspection, message: '归还检查创建成功' };
     res.status(201).json(response);
   } catch (error: any) {
-    await logException('create_return_inspection', req.body, error.message);
+    await services.logException('create_return_inspection', req.body, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -172,7 +172,7 @@ router.post('/deposit-deductions', async (req: Request, res: Response) => {
     const missingFields = requiredFields.filter(field => !(field in req.body));
     
     if (missingFields.length > 0) {
-      await logException('create_deduction_missing_fields', req.body, `缺少必填字段: ${missingFields.join(', ')}`);
+      await services.logException('create_deduction_missing_fields', req.body, `缺少必填字段: ${missingFields.join(', ')}`);
       const response: ApiResponse = { success: false, error: `缺少必填字段: ${missingFields.join(', ')}` };
       return res.status(400).json(response);
     }
@@ -181,7 +181,7 @@ router.post('/deposit-deductions', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: deduction, message: '扣款申请创建成功' };
     res.status(201).json(response);
   } catch (error: any) {
-    await logException('create_deposit_deduction', req.body, error.message);
+    await services.logException('create_deposit_deduction', req.body, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -203,7 +203,7 @@ router.patch('/deposit-deductions/:id/approve', async (req: Request, res: Respon
     };
     res.json(response);
   } catch (error: any) {
-    await logException('approve_deposit_deduction', { ...req.params, ...req.body }, error.message);
+    await services.logException('approve_deposit_deduction', { ...req.params, ...req.body }, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -223,7 +223,7 @@ router.post('/manual-corrections', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, message: '人工修正记录已创建' };
     res.status(201).json(response);
   } catch (error: any) {
-    await logException('create_manual_correction', req.body, error.message);
+    await services.logException('create_manual_correction', req.body, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -235,7 +235,7 @@ router.get('/rental-orders/:id/report', async (req: Request, res: Response) => {
     const response: ApiResponse = { success: true, data: report };
     res.json(response);
   } catch (error: any) {
-    await logException('generate_rental_report', req.params, error.message);
+    await services.logException('generate_rental_report', req.params, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
@@ -269,7 +269,7 @@ router.get('/rental-orders/:id/export/csv', async (req: Request, res: Response) 
     res.setHeader('Content-Disposition', `attachment; filename="rental-report-${report.order_no}.csv"`);
     res.send('\uFEFF' + csv);
   } catch (error: any) {
-    await logException('export_rental_report_csv', req.params, error.message);
+    await services.logException('export_rental_report_csv', req.params, error.message);
     const response: ApiResponse = { success: false, error: error.message };
     res.status(500).json(response);
   }
