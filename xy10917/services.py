@@ -16,13 +16,17 @@ from config import settings
 
 class SeatService:
     @staticmethod
-    def check_seats_available(db: Session, seat_ids: List[int]) -> tuple[bool, List[int], List[int]]:
-        seats = db.query(Seat).filter(Seat.id.in_(seat_ids)).all()
+    def check_seats_available(db: Session, seat_ids: List[int], show_id: Optional[int] = None) -> tuple[bool, List[int], List[int], List[int]]:
+        query = db.query(Seat).filter(Seat.id.in_(seat_ids))
+        seats = query.all()
         found_ids = {s.id for s in seats}
         missing_ids = [sid for sid in seat_ids if sid not in found_ids]
+        wrong_show_ids = []
+        if show_id is not None:
+            wrong_show_ids = [s.id for s in seats if s.show_id != show_id]
         unavailable = [s.id for s in seats if s.status != SeatStatus.AVAILABLE]
-        all_valid = len(missing_ids) == 0 and len(unavailable) == 0
-        return all_valid, unavailable, missing_ids
+        all_valid = len(missing_ids) == 0 and len(unavailable) == 0 and len(wrong_show_ids) == 0
+        return all_valid, unavailable, missing_ids, wrong_show_ids
 
     @staticmethod
     def lock_seats(db: Session, seat_ids: List[int], order_id: int) -> List[Seat]:
@@ -84,11 +88,15 @@ class ReserveWindowService:
 class OrderService:
     @staticmethod
     def create_order(db: Session, order_data: GroupOrderCreate) -> tuple[Optional[GroupOrder], Optional[ReserveWindow], Optional[ExceptionLog]]:
-        all_available, unavailable, missing = SeatService.check_seats_available(db, order_data.seat_ids)
+        all_available, unavailable, missing, wrong_show = SeatService.check_seats_available(
+            db, order_data.seat_ids, order_data.show_id
+        )
         if not all_available:
             error_parts = []
             if missing:
                 error_parts.append(f"座位不存在: {missing}")
+            if wrong_show:
+                error_parts.append(f"座位不属于当前演出: {wrong_show}")
             if unavailable:
                 error_parts.append(f"座位不可用: {unavailable}")
             exc_log = ExceptionLogService.create_log(
@@ -198,11 +206,15 @@ class ChangeRequestService:
             )
             return None, exc_log
 
-        all_available, unavailable, missing = SeatService.check_seats_available(db, data.requested_seat_ids)
+        all_available, unavailable, missing, wrong_show = SeatService.check_seats_available(
+            db, data.requested_seat_ids, data.show_id
+        )
         if not all_available:
             error_parts = []
             if missing:
                 error_parts.append(f"目标座位不存在: {missing}")
+            if wrong_show:
+                error_parts.append(f"目标座位不属于当前演出: {wrong_show}")
             if unavailable:
                 error_parts.append(f"目标座位不可用: {unavailable}")
             exc_log = ExceptionLogService.create_log(
