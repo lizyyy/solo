@@ -5,12 +5,14 @@
   "main": "src/app.js",
   "scripts": {
     "setup": "npm install && npm run init-data",
-    "start": "node src/app.js",
-    "dev": "node src/app.js",
-    "test": "node test/self-test.js",
-    "verify": "node test/self-test.js",
+    "start": "node scripts/auto-start.js",
+    "dev": "node scripts/auto-start.js",
+    "test": "node scripts/auto-test.js",
+    "verify": "node scripts/auto-test.js",
+    "test-direct": "node test/self-test.js",
+    "start-direct": "node src/app.js",
     "init-data": "node scripts/init-sample-data.js",
-    "demo": "node scripts/init-sample-data.js && node src/app.js"
+    "demo": "node scripts/auto-start.js"
   },
   "dependencies": {
     "express": "^4.18.2",
