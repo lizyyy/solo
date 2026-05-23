@@ -21,8 +21,21 @@ if (!fs.existsSync(exportDir)) fs.mkdirSync(exportDir, { recursive: true });
 const dbPath = path.join(__dirname, 'data/database.sqlite');
 const db = new sqlite3.Database(dbPath);
 
+function deepSort(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map(deepSort);
+  }
+  if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).sort().reduce((acc, key) => {
+      acc[key] = deepSort(obj[key]);
+      return acc;
+    }, {});
+  }
+  return obj;
+}
+
 function generateMaterialHash(materials) {
-  const sorted = JSON.stringify(materials, Object.keys(materials).sort());
+  const sorted = JSON.stringify(deepSort(materials));
   return crypto.createHash("sha256").update(sorted).digest("hex");
 }
 function generateId() { return crypto.randomUUID(); }
