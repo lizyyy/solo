@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const visitorService = require('../services/visitorService');
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const application = visitorService.createApplication(req.body);
+    const application = await visitorService.createApplication(req.body);
     res.json({
       success: true,
       data: application
@@ -17,7 +17,7 @@ router.post('/', (req, res) => {
   }
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const filters = {
       status: req.query.status,
@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
       limit: parseInt(req.query.limit) || 50,
       offset: parseInt(req.query.offset) || 0
     };
-    const applications = visitorService.getApplications(filters);
+    const applications = await visitorService.getApplications(filters);
     res.json({
       success: true,
       data: applications
@@ -40,9 +40,9 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const application = visitorService.getApplicationById(req.params.id);
+    const application = await visitorService.getApplicationById(req.params.id);
     if (!application) {
       return res.status(404).json({
         success: false,
@@ -61,9 +61,9 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.put('/:id/status', (req, res) => {
+router.put('/:id/status', async (req, res) => {
   try {
-    const application = visitorService.updateStatus(
+    const application = await visitorService.updateStatus(
       req.params.id,
       req.body.status,
       req.body.approved_by
@@ -80,9 +80,9 @@ router.put('/:id/status', (req, res) => {
   }
 });
 
-router.post('/:id/checkin', (req, res) => {
+router.post('/:id/checkin', async (req, res) => {
   try {
-    const application = visitorService.checkIn(req.params.id, req.body.actual_time);
+    const application = await visitorService.checkIn(req.params.id, req.body.actual_time);
     res.json({
       success: true,
       data: application
@@ -95,9 +95,9 @@ router.post('/:id/checkin', (req, res) => {
   }
 });
 
-router.post('/:id/checkout', (req, res) => {
+router.post('/:id/checkout', async (req, res) => {
   try {
-    const application = visitorService.checkOut(req.params.id, req.body.actual_time);
+    const application = await visitorService.checkOut(req.params.id, req.body.actual_time);
     res.json({
       success: true,
       data: application

@@ -2,7 +2,7 @@ const db = require('../database/db');
 const { v4: uuidv4 } = require('uuid');
 
 class BlacklistService {
-  addToBlacklist(data) {
+  async addToBlacklist(data) {
     const id = uuidv4();
 
     const stmt = db.prepare(`
@@ -12,7 +12,7 @@ class BlacklistService {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    stmt.run(
+    await stmt.run(
       id,
       data.personnel_id || null,
       data.id_card || null,
@@ -27,12 +27,12 @@ class BlacklistService {
     return this.getBlacklistById(id);
   }
 
-  getBlacklistById(id) {
+  async getBlacklistById(id) {
     const stmt = db.prepare('SELECT * FROM blacklist WHERE id = ?');
-    return stmt.get(id);
+    return await stmt.get(id);
   }
 
-  getBlacklist(filters = {}) {
+  async getBlacklist(filters = {}) {
     let sql = 'SELECT * FROM blacklist WHERE 1=1';
     const params = [];
 
@@ -51,20 +51,20 @@ class BlacklistService {
     params.push(filters.offset || 0);
 
     const stmt = db.prepare(sql);
-    return stmt.all(...params);
+    return await stmt.all(...params);
   }
 
-  updateBlacklistStatus(id, status, remarks = null) {
+  async updateBlacklistStatus(id, status, remarks = null) {
     const stmt = db.prepare(`
       UPDATE blacklist 
       SET status = ?, remarks = COALESCE(?, remarks)
       WHERE id = ?
     `);
-    stmt.run(status, remarks, id);
+    await stmt.run(status, remarks, id);
     return this.getBlacklistById(id);
   }
 
-  removeFromBlacklist(id, removedBy = null) {
+  async removeFromBlacklist(id, removedBy = null) {
     return this.updateBlacklistStatus(id, 'inactive', `移除操作人: ${removedBy}`);
   }
 }

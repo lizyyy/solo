@@ -4,16 +4,16 @@ const accessControlService = require('./accessControlService');
 const exceptionService = require('./exceptionService');
 
 class GateEventService {
-  createEvent(eventData) {
+  async createEvent(eventData) {
     const id = uuidv4();
     const eventNo = `EVT-${Date.now()}`;
     const transactionId = uuidv4();
 
     let validationResult;
     try {
-      validationResult = accessControlService.validateAccess(eventData);
+      validationResult = await accessControlService.validateAccess(eventData);
     } catch (error) {
-      exceptionService.logException({
+      await exceptionService.logException({
         transaction_id: transactionId,
         api_endpoint: '/api/gate-events',
         raw_input: eventData,
@@ -52,7 +52,7 @@ class GateEventService {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    stmt.run(
+    await stmt.run(
       id,
       eventNo,
       eventData.personnel_id || null,
@@ -72,7 +72,7 @@ class GateEventService {
     );
 
     if (!validationResult.allowed) {
-      exceptionService.logException({
+      await exceptionService.logException({
         transaction_id: transactionId,
         api_endpoint: '/api/gate-events',
         raw_input: eventData,
@@ -100,7 +100,7 @@ class GateEventService {
     };
   }
 
-  getEventById(id) {
+  async getEventById(id) {
     const stmt = db.prepare(`
       SELECT 
         ge.*,
@@ -121,10 +121,10 @@ class GateEventService {
       LEFT JOIN visitor_applications va ON ge.visitor_application_id = va.id
       WHERE ge.id = ?
     `);
-    return stmt.get(id);
+    return await stmt.get(id);
   }
 
-  getEvents(filters = {}) {
+  async getEvents(filters = {}) {
     let sql = `
       SELECT 
         ge.*,
@@ -163,11 +163,11 @@ class GateEventService {
     params.push(filters.offset || 0);
 
     const stmt = db.prepare(sql);
-    return stmt.all(...params);
+    return await stmt.all(...params);
   }
 
-  getEventTrace(eventId) {
-    const event = this.getEventById(eventId);
+  async getEventTrace(eventId) {
+    const event = await this.getEventById(eventId);
     if (!event) return null;
 
     const trace = {
@@ -179,14 +179,14 @@ class GateEventService {
       SELECT * FROM exception_logs 
       WHERE related_gate_event_id = ?
     `);
-    trace.related.exceptions = exceptionStmt.all(eventId);
+    trace.related.exceptions = await exceptionStmt.all(eventId);
 
     const correctionStmt = db.prepare(`
       SELECT * FROM manual_corrections 
       WHERE target_record_id = ? AND target_table = 'gate_events'
       ORDER BY created_at DESC
     `);
-    trace.related.corrections = correctionStmt.all(eventId);
+    trace.related.corrections = await correctionStmt.all(eventId);
 
     return trace;
   }

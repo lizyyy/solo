@@ -102,7 +102,7 @@ check('  重复事件返回原始事件', gateEventContent.includes('original_ev
 
 console.log('\n9. 依赖项验证:');
 const pkgJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf8'));
-const requiredDeps = ['express', 'better-sqlite3', 'csv-writer', 'moment', 'uuid'];
+const requiredDeps = ['express', 'sqlite3', 'csv-writer', 'moment', 'uuid'];
 for (const dep of requiredDeps) {
   check(`  ${dep}`, !!pkgJson.dependencies[dep]);
 }

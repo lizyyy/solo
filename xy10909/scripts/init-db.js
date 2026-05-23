@@ -15,8 +15,8 @@ if (!fs.existsSync(reportsDir)) {
 
 const db = require('../src/database/db');
 
-const initTables = () => {
-  db.exec(`
+const initTables = async () => {
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS personnel (
       id TEXT PRIMARY KEY,
       employee_id TEXT UNIQUE,
@@ -161,5 +161,7 @@ const initTables = () => {
   console.log('数据库表初始化完成');
 };
 
-initTables();
-db.close();
+(async () => {
+  await initTables();
+  await db.close();
+})();

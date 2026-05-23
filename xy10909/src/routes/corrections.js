@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const manualCorrectionService = require('../services/manualCorrectionService');
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const correction = manualCorrectionService.createCorrection(req.body);
+    const correction = await manualCorrectionService.createCorrection(req.body);
     res.json({
       success: true,
       data: correction
@@ -17,7 +17,7 @@ router.post('/', (req, res) => {
   }
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const filters = {
       correction_type: req.query.correction_type,
@@ -26,7 +26,7 @@ router.get('/', (req, res) => {
       limit: parseInt(req.query.limit) || 50,
       offset: parseInt(req.query.offset) || 0
     };
-    const corrections = manualCorrectionService.getCorrections(filters);
+    const corrections = await manualCorrectionService.getCorrections(filters);
     res.json({
       success: true,
       data: corrections
@@ -39,9 +39,9 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const correction = manualCorrectionService.getCorrectionById(req.params.id);
+    const correction = await manualCorrectionService.getCorrectionById(req.params.id);
     if (!correction) {
       return res.status(404).json({
         success: false,
@@ -60,9 +60,9 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.get('/target/:table/:recordId', (req, res) => {
+router.get('/target/:table/:recordId', async (req, res) => {
   try {
-    const corrections = manualCorrectionService.getCorrectionsByRecord(
+    const corrections = await manualCorrectionService.getCorrectionsByRecord(
       req.params.table,
       req.params.recordId
     );

@@ -4,9 +4,9 @@ const personnelService = require('../services/personnelService');
 const trainingService = require('../services/trainingService');
 const blacklistService = require('../services/blacklistService');
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const personnel = personnelService.createPersonnel(req.body);
+    const personnel = await personnelService.createPersonnel(req.body);
     res.json({
       success: true,
       data: personnel
@@ -19,7 +19,7 @@ router.post('/', (req, res) => {
   }
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const filters = {
       status: req.query.status,
@@ -28,7 +28,7 @@ router.get('/', (req, res) => {
       limit: parseInt(req.query.limit) || 50,
       offset: parseInt(req.query.offset) || 0
     };
-    const personnel = personnelService.getPersonnel(filters);
+    const personnel = await personnelService.getPersonnel(filters);
     res.json({
       success: true,
       data: personnel
@@ -41,9 +41,9 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const personnel = personnelService.getPersonnelById(req.params.id);
+    const personnel = await personnelService.getPersonnelById(req.params.id);
     if (!personnel) {
       return res.status(404).json({
         success: false,
@@ -62,9 +62,9 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.get('/:id/details', (req, res) => {
+router.get('/:id/details', async (req, res) => {
   try {
-    const personnel = personnelService.getPersonnelWithDetails(req.params.id);
+    const personnel = await personnelService.getPersonnelWithDetails(req.params.id);
     if (!personnel) {
       return res.status(404).json({
         success: false,
@@ -83,9 +83,9 @@ router.get('/:id/details', (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
-    const personnel = personnelService.updatePersonnel(req.params.id, req.body);
+    const personnel = await personnelService.updatePersonnel(req.params.id, req.body);
     res.json({
       success: true,
       data: personnel
@@ -98,9 +98,9 @@ router.put('/:id', (req, res) => {
   }
 });
 
-router.post('/:id/training', (req, res) => {
+router.post('/:id/training', async (req, res) => {
   try {
-    const training = trainingService.createTraining({
+    const training = await trainingService.createTraining({
       ...req.body,
       personnel_id: req.params.id
     });
@@ -116,9 +116,9 @@ router.post('/:id/training', (req, res) => {
   }
 });
 
-router.get('/:id/training', (req, res) => {
+router.get('/:id/training', async (req, res) => {
   try {
-    const training = trainingService.getTrainingByPersonnel(req.params.id);
+    const training = await trainingService.getTrainingByPersonnel(req.params.id);
     res.json({
       success: true,
       data: training
@@ -131,10 +131,10 @@ router.get('/:id/training', (req, res) => {
   }
 });
 
-router.post('/:id/blacklist', (req, res) => {
+router.post('/:id/blacklist', async (req, res) => {
   try {
-    const personnel = personnelService.getPersonnelById(req.params.id);
-    const blacklist = blacklistService.addToBlacklist({
+    const personnel = await personnelService.getPersonnelById(req.params.id);
+    const blacklist = await blacklistService.addToBlacklist({
       ...req.body,
       personnel_id: req.params.id,
       id_card: personnel ? personnel.id_card : req.body.id_card,

@@ -4,7 +4,7 @@ const gateEventService = require('../services/gateEventService');
 
 router.post('/', async (req, res) => {
   try {
-    const result = gateEventService.createEvent(req.body);
+    const result = await gateEventService.createEvent(req.body);
     res.json({
       success: true,
       data: result
@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const filters = {
       person_type: req.query.person_type,
@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
       limit: parseInt(req.query.limit) || 100,
       offset: parseInt(req.query.offset) || 0
     };
-    const events = gateEventService.getEvents(filters);
+    const events = await gateEventService.getEvents(filters);
     res.json({
       success: true,
       data: events
@@ -40,9 +40,9 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const event = gateEventService.getEventById(req.params.id);
+    const event = await gateEventService.getEventById(req.params.id);
     if (!event) {
       return res.status(404).json({
         success: false,
@@ -61,9 +61,9 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.get('/:id/trace', (req, res) => {
+router.get('/:id/trace', async (req, res) => {
   try {
-    const trace = gateEventService.getEventTrace(req.params.id);
+    const trace = await gateEventService.getEventTrace(req.params.id);
     if (!trace) {
       return res.status(404).json({
         success: false,

@@ -14,7 +14,7 @@ class ReportService {
         id, report_no, report_type, start_date, end_date, generated_by, status
       ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
-    insertStmt.run(reportId, reportNo, 'daily', startDate, endDate, generatedBy, 'generating');
+    await insertStmt.run(reportId, reportNo, 'daily', startDate, endDate, generatedBy, 'generating');
 
     const eventsStmt = db.prepare(`
       SELECT 
@@ -31,7 +31,7 @@ class ReportService {
       WHERE ge.event_time >= ? AND ge.event_time <= ?
       ORDER BY ge.event_time DESC
     `);
-    const events = eventsStmt.all(startDate, endDate);
+    const events = await eventsStmt.all(startDate, endDate);
 
     const summary = {
       total_events: events.length,
@@ -80,17 +80,17 @@ class ReportService {
           completed_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
-    updateStmt.run(filePath, events.length, JSON.stringify(summary), reportId);
+    await updateStmt.run(filePath, events.length, JSON.stringify(summary), reportId);
 
     return this.getReportById(reportId);
   }
 
-  getReportById(id) {
+  async getReportById(id) {
     const stmt = db.prepare('SELECT * FROM access_reports WHERE id = ?');
-    return stmt.get(id);
+    return await stmt.get(id);
   }
 
-  getReports(filters = {}) {
+  async getReports(filters = {}) {
     let sql = 'SELECT * FROM access_reports WHERE 1=1';
     const params = [];
 
@@ -109,11 +109,11 @@ class ReportService {
     params.push(filters.offset || 0);
 
     const stmt = db.prepare(sql);
-    return stmt.all(...params);
+    return await stmt.all(...params);
   }
 
-  getReportWithDetails(reportId) {
-    const report = this.getReportById(reportId);
+  async getReportWithDetails(reportId) {
+    const report = await this.getReportById(reportId);
     if (!report) return null;
 
     const eventsStmt = db.prepare(`
@@ -137,7 +137,7 @@ class ReportService {
       ORDER BY ge.event_time DESC
     `);
 
-    report.events = eventsStmt.all(report.start_date, report.end_date);
+    report.events = await eventsStmt.all(report.start_date, report.end_date);
     report.summary_data = JSON.parse(report.summary_data || '{}');
 
     return report;

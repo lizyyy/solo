@@ -3,17 +3,17 @@ const crypto = require('crypto');
 const moment = require('moment');
 
 class AccessControlService {
-  checkBlacklist(idCard, name) {
+  async checkBlacklist(idCard, name) {
     const stmt = db.prepare(`
       SELECT * FROM blacklist 
       WHERE status = 'active' 
       AND (id_card = ? OR name = ?)
       AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
     `);
-    return stmt.get(idCard, name);
+    return await stmt.get(idCard, name);
   }
 
-  checkTrainingValid(personnelId) {
+  async checkTrainingValid(personnelId) {
     const stmt = db.prepare(`
       SELECT * FROM training_status 
       WHERE personnel_id = ? 
@@ -22,15 +22,15 @@ class AccessControlService {
       ORDER BY expiry_date DESC
       LIMIT 1
     `);
-    return stmt.get(personnelId);
+    return await stmt.get(personnelId);
   }
 
-  checkPersonnelActive(personnelId) {
+  async checkPersonnelActive(personnelId) {
     const stmt = db.prepare('SELECT * FROM personnel WHERE id = ? AND status = ?');
-    return stmt.get(personnelId, 'active');
+    return await stmt.get(personnelId, 'active');
   }
 
-  checkVisitorValid(visitorApplicationId, eventTime) {
+  async checkVisitorValid(visitorApplicationId, eventTime) {
     const stmt = db.prepare(`
       SELECT * FROM visitor_applications 
       WHERE id = ? 
@@ -38,10 +38,10 @@ class AccessControlService {
       AND scheduled_start <= ?
       AND scheduled_end >= ?
     `);
-    return stmt.get(visitorApplicationId, eventTime, eventTime);
+    return await stmt.get(visitorApplicationId, eventTime, eventTime);
   }
 
-  checkDuplicateEvent(idCard, gateNo, direction, eventTime) {
+  async checkDuplicateEvent(idCard, gateNo, direction, eventTime) {
     const timeWindow = moment(eventTime).subtract(5, 'seconds').toISOString();
     
     const stmt = db.prepare(`
@@ -53,7 +53,7 @@ class AccessControlService {
       ORDER BY event_time DESC
       LIMIT 1
     `);
-    return stmt.get(idCard, gateNo, direction, timeWindow);
+    return await stmt.get(idCard, gateNo, direction, timeWindow);
   }
 
   generateDedupHash(idCard, gateNo, direction, eventTime) {
@@ -63,7 +63,7 @@ class AccessControlService {
     return crypto.createHash('md5').update(data).digest('hex');
   }
 
-  validateAccess(eventData) {
+  async validateAccess(eventData) {
     const result = {
       allowed: false,
       reason: '',
@@ -74,7 +74,7 @@ class AccessControlService {
       duplicate: null
     };
 
-    const duplicate = this.checkDuplicateEvent(
+    const duplicate = await this.checkDuplicateEvent(
       eventData.id_card,
       eventData.gate_no,
       eventData.direction,
@@ -86,7 +86,7 @@ class AccessControlService {
       return result;
     }
 
-    const blacklistHit = this.checkBlacklist(eventData.id_card, eventData.name);
+    const blacklistHit = await this.checkBlacklist(eventData.id_card, eventData.name);
     if (blacklistHit) {
       result.blacklistHit = blacklistHit;
       result.reason = `黑名单拦截: ${blacklistHit.reason}`;
@@ -99,7 +99,7 @@ class AccessControlService {
         return result;
       }
 
-      const personnel = this.checkPersonnelActive(eventData.personnel_id);
+      const personnel = await this.checkPersonnelActive(eventData.personnel_id);
       if (!personnel) {
         result.personnelValid = false;
         result.reason = '人员档案不存在或已离职';
@@ -107,7 +107,7 @@ class AccessControlService {
       }
       result.personnelValid = true;
 
-      const training = this.checkTrainingValid(eventData.personnel_id);
+      const training = await this.checkTrainingValid(eventData.personnel_id);
       if (!training) {
         result.trainingValid = false;
         result.reason = '安全培训已过期或未通过';
@@ -123,7 +123,7 @@ class AccessControlService {
         return result;
       }
 
-      const visitor = this.checkVisitorValid(
+      const visitor = await this.checkVisitorValid(
         eventData.visitor_application_id,
         eventData.event_time
       );

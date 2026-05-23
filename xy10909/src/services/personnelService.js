@@ -2,7 +2,7 @@ const db = require('../database/db');
 const { v4: uuidv4 } = require('uuid');
 
 class PersonnelService {
-  createPersonnel(data) {
+  async createPersonnel(data) {
     const id = uuidv4();
     
     const stmt = db.prepare(`
@@ -11,7 +11,7 @@ class PersonnelService {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
-    stmt.run(
+    await stmt.run(
       id,
       data.employee_id,
       data.name,
@@ -25,17 +25,17 @@ class PersonnelService {
     return this.getPersonnelById(id);
   }
 
-  getPersonnelById(id) {
+  async getPersonnelById(id) {
     const stmt = db.prepare('SELECT * FROM personnel WHERE id = ?');
-    return stmt.get(id);
+    return await stmt.get(id);
   }
 
-  getPersonnelByIdCard(idCard) {
+  async getPersonnelByIdCard(idCard) {
     const stmt = db.prepare('SELECT * FROM personnel WHERE id_card = ?');
-    return stmt.get(idCard);
+    return await stmt.get(idCard);
   }
 
-  getPersonnel(filters = {}) {
+  async getPersonnel(filters = {}) {
     let sql = 'SELECT * FROM personnel WHERE 1=1';
     const params = [];
 
@@ -59,10 +59,10 @@ class PersonnelService {
     params.push(filters.offset || 0);
 
     const stmt = db.prepare(sql);
-    return stmt.all(...params);
+    return await stmt.all(...params);
   }
 
-  updatePersonnel(id, data) {
+  async updatePersonnel(id, data) {
     const fields = ['employee_id', 'name', 'id_card', 'phone', 'department', 'position', 'status'];
     const updateFields = [];
     const values = [];
@@ -81,13 +81,13 @@ class PersonnelService {
     values.push(id);
     const sql = `UPDATE personnel SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
     const stmt = db.prepare(sql);
-    stmt.run(...values);
+    await stmt.run(...values);
 
     return this.getPersonnelById(id);
   }
 
-  getPersonnelWithDetails(id) {
-    const personnel = this.getPersonnelById(id);
+  async getPersonnelWithDetails(id) {
+    const personnel = await this.getPersonnelById(id);
     if (!personnel) return null;
 
     const trainingStmt = db.prepare(`
@@ -95,20 +95,20 @@ class PersonnelService {
       WHERE personnel_id = ?
       ORDER BY created_at DESC
     `);
-    personnel.training_records = trainingStmt.all(id);
+    personnel.training_records = await trainingStmt.all(id);
 
     const blacklistStmt = db.prepare(`
       SELECT * FROM blacklist 
       WHERE personnel_id = ? OR id_card = ?
     `);
-    personnel.blacklist_records = blacklistStmt.all(id, personnel.id_card);
+    personnel.blacklist_records = await blacklistStmt.all(id, personnel.id_card);
 
     const eventStmt = db.prepare(`
       SELECT * FROM gate_events 
       WHERE personnel_id = ?
       ORDER BY event_time DESC LIMIT 20
     `);
-    personnel.recent_events = eventStmt.all(id);
+    personnel.recent_events = await eventStmt.all(id);
 
     return personnel;
   }

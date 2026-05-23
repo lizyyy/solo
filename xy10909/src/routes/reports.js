@@ -21,7 +21,7 @@ router.post('/daily', async (req, res) => {
   }
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const filters = {
       report_type: req.query.report_type,
@@ -29,7 +29,7 @@ router.get('/', (req, res) => {
       limit: parseInt(req.query.limit) || 50,
       offset: parseInt(req.query.offset) || 0
     };
-    const reports = reportService.getReports(filters);
+    const reports = await reportService.getReports(filters);
     res.json({
       success: true,
       data: reports
@@ -42,9 +42,9 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const report = reportService.getReportById(req.params.id);
+    const report = await reportService.getReportById(req.params.id);
     if (!report) {
       return res.status(404).json({
         success: false,
@@ -63,9 +63,9 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.get('/:id/details', (req, res) => {
+router.get('/:id/details', async (req, res) => {
   try {
-    const report = reportService.getReportWithDetails(req.params.id);
+    const report = await reportService.getReportWithDetails(req.params.id);
     if (!report) {
       return res.status(404).json({
         success: false,

@@ -2,7 +2,7 @@ const db = require('../database/db');
 const { v4: uuidv4 } = require('uuid');
 
 class TrainingService {
-  createTraining(data) {
+  async createTraining(data) {
     const id = uuidv4();
 
     const stmt = db.prepare(`
@@ -12,7 +12,7 @@ class TrainingService {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    stmt.run(
+    await stmt.run(
       id,
       data.personnel_id,
       data.training_type,
@@ -26,21 +26,21 @@ class TrainingService {
     return this.getTrainingById(id);
   }
 
-  getTrainingById(id) {
+  async getTrainingById(id) {
     const stmt = db.prepare('SELECT * FROM training_status WHERE id = ?');
-    return stmt.get(id);
+    return await stmt.get(id);
   }
 
-  getTrainingByPersonnel(personnelId) {
+  async getTrainingByPersonnel(personnelId) {
     const stmt = db.prepare(`
       SELECT * FROM training_status 
       WHERE personnel_id = ?
       ORDER BY created_at DESC
     `);
-    return stmt.all(personnelId);
+    return await stmt.all(personnelId);
   }
 
-  updateTraining(id, data) {
+  async updateTraining(id, data) {
     const fields = ['training_type', 'training_date', 'expiry_date', 'status', 'score', 'certificate_no'];
     const updateFields = [];
     const values = [];
@@ -59,7 +59,7 @@ class TrainingService {
     values.push(id);
     const sql = `UPDATE training_status SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
     const stmt = db.prepare(sql);
-    stmt.run(...values);
+    await stmt.run(...values);
 
     return this.getTrainingById(id);
   }

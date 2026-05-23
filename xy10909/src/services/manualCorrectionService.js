@@ -2,14 +2,14 @@ const db = require('../database/db');
 const { v4: uuidv4 } = require('uuid');
 
 class ManualCorrectionService {
-  createCorrection(correctionData) {
+  async createCorrection(correctionData) {
     const id = uuidv4();
 
     const originalStmt = db.prepare(`
       SELECT * FROM ${correctionData.target_table} 
       WHERE id = ?
     `);
-    const originalRecord = originalStmt.get(correctionData.target_record_id);
+    const originalRecord = await originalStmt.get(correctionData.target_record_id);
 
     const stmt = db.prepare(`
       INSERT INTO manual_corrections (
@@ -18,7 +18,7 @@ class ManualCorrectionService {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    stmt.run(
+    await stmt.run(
       id,
       correctionData.correction_type,
       correctionData.target_record_id,
@@ -29,7 +29,7 @@ class ManualCorrectionService {
       correctionData.corrected_by
     );
 
-    this.applyCorrection(
+    await this.applyCorrection(
       correctionData.target_table,
       correctionData.target_record_id,
       correctionData.corrected_value
@@ -38,7 +38,7 @@ class ManualCorrectionService {
     return this.getCorrectionById(id);
   }
 
-  applyCorrection(tableName, recordId, correctedValue) {
+  async applyCorrection(tableName, recordId, correctedValue) {
     const tablesWithUpdatedAt = ['personnel', 'training_status', 'visitor_applications'];
     const tablesWithoutUpdatedAt = ['gate_events', 'blacklist', 'access_reports', 'exception_logs'];
     const allowedTables = [...tablesWithUpdatedAt, ...tablesWithoutUpdatedAt];
@@ -59,24 +59,24 @@ class ManualCorrectionService {
     sql += ' WHERE id = ?';
     
     const stmt = db.prepare(sql);
-    stmt.run(...values);
+    await stmt.run(...values);
   }
 
-  getCorrectionById(id) {
+  async getCorrectionById(id) {
     const stmt = db.prepare('SELECT * FROM manual_corrections WHERE id = ?');
-    return stmt.get(id);
+    return await stmt.get(id);
   }
 
-  getCorrectionsByRecord(targetTable, targetRecordId) {
+  async getCorrectionsByRecord(targetTable, targetRecordId) {
     const stmt = db.prepare(`
       SELECT * FROM manual_corrections 
       WHERE target_table = ? AND target_record_id = ?
       ORDER BY created_at DESC
     `);
-    return stmt.all(targetTable, targetRecordId);
+    return await stmt.all(targetTable, targetRecordId);
   }
 
-  getCorrections(filters = {}) {
+  async getCorrections(filters = {}) {
     let sql = 'SELECT * FROM manual_corrections WHERE 1=1';
     const params = [];
 
@@ -100,7 +100,7 @@ class ManualCorrectionService {
     params.push(filters.offset || 0);
 
     const stmt = db.prepare(sql);
-    return stmt.all(...params);
+    return await stmt.all(...params);
   }
 }
 

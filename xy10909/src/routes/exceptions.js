@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const exceptionService = require('../services/exceptionService');
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const exception = exceptionService.logException(req.body);
+    const exception = await exceptionService.logException(req.body);
     res.json({
       success: true,
       data: exception
@@ -17,7 +17,7 @@ router.post('/', (req, res) => {
   }
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const filters = {
       resolution_status: req.query.resolution_status,
@@ -25,7 +25,7 @@ router.get('/', (req, res) => {
       limit: parseInt(req.query.limit) || 50,
       offset: parseInt(req.query.offset) || 0
     };
-    const exceptions = exceptionService.getExceptions(filters);
+    const exceptions = await exceptionService.getExceptions(filters);
     res.json({
       success: true,
       data: exceptions
@@ -38,9 +38,9 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const exception = exceptionService.getExceptionById(req.params.id);
+    const exception = await exceptionService.getExceptionById(req.params.id);
     if (!exception) {
       return res.status(404).json({
         success: false,
@@ -59,9 +59,9 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.get('/:id/trace', (req, res) => {
+router.get('/:id/trace', async (req, res) => {
   try {
-    const trace = exceptionService.getExceptionTrace(req.params.id);
+    const trace = await exceptionService.getExceptionTrace(req.params.id);
     if (!trace) {
       return res.status(404).json({
         success: false,
@@ -80,9 +80,9 @@ router.get('/:id/trace', (req, res) => {
   }
 });
 
-router.put('/:id/resolve', (req, res) => {
+router.put('/:id/resolve', async (req, res) => {
   try {
-    const exception = exceptionService.resolveException(
+    const exception = await exceptionService.resolveException(
       req.params.id,
       {
         resolved_by: req.body.resolved_by,

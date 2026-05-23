@@ -10,7 +10,7 @@ if (!fs.existsSync(dataDir)) {
 const db = require('../src/database/db');
 const { v4: uuidv4 } = require('uuid');
 
-const seedData = () => {
+const seedData = async () => {
   console.log('开始初始化样例数据...');
 
   const now = Date.now();
@@ -19,9 +19,9 @@ const seedData = () => {
   const clearOldData = db.prepare(`
     DELETE FROM gate_events WHERE event_no LIKE 'SEED-%'
   `);
-  const deletedEvents = clearOldData.run();
-  if (deletedEvents.changes > 0) {
-    console.log(`清理旧样例闸机事件: ${deletedEvents.changes}条`);
+  const deletedResult = await clearOldData.run();
+  if (deletedResult.changes > 0) {
+    console.log(`清理旧样例闸机事件: ${deletedResult.changes}条`);
   }
 
   const personnel1Id = uuidv4();
@@ -35,24 +35,25 @@ const seedData = () => {
     ON CONFLICT(employee_id) DO NOTHING
   `);
 
-  const insertOrIgnore = (id, empId, name, idCard, phone, dept, pos, status) => {
-    const result = insertPersonnel.run(id, empId, name, idCard, phone, dept, pos, status);
+  const insertOrIgnore = async (id, empId, name, idCard, phone, dept, pos, status) => {
+    const result = await insertPersonnel.run(id, empId, name, idCard, phone, dept, pos, status);
     return result.changes > 0 ? id : null;
   };
 
   let insertedCount = 0;
-  const p1 = insertOrIgnore(personnel1Id, `EMP-S${timestamp}1`, '张三', `110${timestamp}12345678901`, '13800138001', '工程部', '工程师', 'active');
+  const p1 = await insertOrIgnore(personnel1Id, `EMP-S${timestamp}1`, '张三', `110${timestamp}12345678901`, '13800138001', '工程部', '工程师', 'active');
   if (p1) insertedCount++;
-  const p2 = insertOrIgnore(personnel2Id, `EMP-S${timestamp}2`, '李四', `110${timestamp}12345678902`, '13800138002', '安全部', '安全员', 'active');
+  const p2 = await insertOrIgnore(personnel2Id, `EMP-S${timestamp}2`, '李四', `110${timestamp}12345678902`, '13800138002', '安全部', '安全员', 'active');
   if (p2) insertedCount++;
-  const p3 = insertOrIgnore(personnel3Id, `EMP-S${timestamp}3`, '王五', `110${timestamp}12345678903`, '13800138003', '行政部', '主管', 'active');
+  const p3 = await insertOrIgnore(personnel3Id, `EMP-S${timestamp}3`, '王五', `110${timestamp}12345678903`, '13800138003', '行政部', '主管', 'active');
   if (p3) insertedCount++;
-  const p4 = insertOrIgnore(blacklistPersonId, `EMP-S${timestamp}4`, '赵六', `110${timestamp}12345678904`, '13800138004', '外包队', '工人', 'inactive');
+  const p4 = await insertOrIgnore(blacklistPersonId, `EMP-S${timestamp}4`, '赵六', `110${timestamp}12345678904`, '13800138004', '外包队', '工人', 'inactive');
   if (p4) insertedCount++;
 
   console.log(`人员档案处理完成: 新增${insertedCount}条`);
 
-  const allPersonnel = db.prepare('SELECT id, name, id_card, employee_id FROM personnel ORDER BY created_at DESC LIMIT 10').all();
+  const allPersonnelStmt = db.prepare('SELECT id, name, id_card, employee_id FROM personnel ORDER BY created_at DESC LIMIT 10');
+  const allPersonnel = await allPersonnelStmt.all();
   const activePersonnel = allPersonnel.filter(p => p.employee_id && !p.employee_id.includes('4')).slice(0, 2);
   const forTraining = activePersonnel.length >= 2 ? activePersonnel : allPersonnel.slice(0, 2);
   const hostPersonnel = allPersonnel[0] || { id: personnel1Id, name: '张三' };
@@ -68,9 +69,10 @@ const seedData = () => {
   nextYear.setFullYear(nextYear.getFullYear() + 1);
 
   for (const person of forTraining) {
-    const existing = db.prepare('SELECT id FROM training_status WHERE personnel_id = ?').get(person.id);
+    const existingStmt = db.prepare('SELECT id FROM training_status WHERE personnel_id = ?');
+    const existing = await existingStmt.get(person.id);
     if (!existing) {
-      insertTraining.run(
+      await insertTraining.run(
         uuidv4(),
         person.id,
         '安全培训',
@@ -83,15 +85,17 @@ const seedData = () => {
     }
   }
 
-  const existingBlacklist = db.prepare(`
+  const blacklistStmt = db.prepare(`
     SELECT id FROM blacklist WHERE id_card = ? AND status = 'active'
-  `).get(blacklistPerson.id_card);
+  `);
+  const existingBlacklist = await blacklistStmt.get(blacklistPerson.id_card);
 
   if (!existingBlacklist) {
-    db.prepare(`
+    const insertBlacklist = db.prepare(`
       INSERT INTO blacklist (id, personnel_id, id_card, name, reason, status, added_by)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(
+    `);
+    await insertBlacklist.run(
       uuidv4(),
       blacklistPerson.id,
       blacklistPerson.id_card,
@@ -116,7 +120,7 @@ const seedData = () => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  insertVisitor.run(
+  await insertVisitor.run(
     visitor1Id,
     '钱七',
     `110${timestamp}12345678905`,
@@ -141,7 +145,7 @@ const seedData = () => {
 
   const eventTime1 = new Date();
   eventTime1.setHours(8, 30, 0, 0);
-  createEvent.run(
+  await createEvent.run(
     uuidv4(),
     `SEED-${timestamp}-001`,
     forTraining[0] ? forTraining[0].id : null,
@@ -159,7 +163,7 @@ const seedData = () => {
 
   const eventTime2 = new Date();
   eventTime2.setHours(9, 15, 0, 0);
-  createEvent.run(
+  await createEvent.run(
     uuidv4(),
     `SEED-${timestamp}-002`,
     null,
@@ -177,7 +181,7 @@ const seedData = () => {
 
   const eventTime3 = new Date();
   eventTime3.setHours(10, 0, 0, 0);
-  createEvent.run(
+  await createEvent.run(
     uuidv4(),
     `SEED-${timestamp}-003`,
     null,
@@ -208,5 +212,7 @@ const seedData = () => {
   console.log('可重复运行此脚本，不会触发唯一约束冲突！');
 };
 
-seedData();
-db.close();
+(async () => {
+  await seedData();
+  await db.close();
+})();

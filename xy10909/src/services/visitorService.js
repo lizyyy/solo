@@ -2,7 +2,7 @@ const db = require('../database/db');
 const { v4: uuidv4 } = require('uuid');
 
 class VisitorService {
-  createApplication(data) {
+  async createApplication(data) {
     const id = uuidv4();
 
     const stmt = db.prepare(`
@@ -13,7 +13,7 @@ class VisitorService {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    stmt.run(
+    await stmt.run(
       id,
       data.visitor_name,
       data.visitor_id_card || null,
@@ -31,12 +31,12 @@ class VisitorService {
     return this.getApplicationById(id);
   }
 
-  getApplicationById(id) {
+  async getApplicationById(id) {
     const stmt = db.prepare('SELECT * FROM visitor_applications WHERE id = ?');
-    return stmt.get(id);
+    return await stmt.get(id);
   }
 
-  getApplications(filters = {}) {
+  async getApplications(filters = {}) {
     let sql = 'SELECT * FROM visitor_applications WHERE 1=1';
     const params = [];
 
@@ -65,10 +65,10 @@ class VisitorService {
     params.push(filters.offset || 0);
 
     const stmt = db.prepare(sql);
-    return stmt.all(...params);
+    return await stmt.all(...params);
   }
 
-  updateStatus(id, status, approvedBy) {
+  async updateStatus(id, status, approvedBy) {
     const validStatuses = ['pending', 'approved', 'rejected', 'checked_in', 'checked_out', 'cancelled'];
     if (!validStatuses.includes(status)) {
       throw new Error('无效的状态');
@@ -80,27 +80,27 @@ class VisitorService {
       WHERE id = ?
     `);
 
-    stmt.run(status, approvedBy || null, id);
+    await stmt.run(status, approvedBy || null, id);
     return this.getApplicationById(id);
   }
 
-  checkIn(id, actualTime) {
+  async checkIn(id, actualTime) {
     const stmt = db.prepare(`
       UPDATE visitor_applications 
       SET actual_start = ?, status = 'checked_in', updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
-    stmt.run(actualTime || new Date().toISOString(), id);
+    await stmt.run(actualTime || new Date().toISOString(), id);
     return this.getApplicationById(id);
   }
 
-  checkOut(id, actualTime) {
+  async checkOut(id, actualTime) {
     const stmt = db.prepare(`
       UPDATE visitor_applications 
       SET actual_end = ?, status = 'checked_out', updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
-    stmt.run(actualTime || new Date().toISOString(), id);
+    await stmt.run(actualTime || new Date().toISOString(), id);
     return this.getApplicationById(id);
   }
 }
