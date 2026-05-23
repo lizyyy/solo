@@ -1,0 +1,30 @@
+{
+  "name": "fuel-abnormal-cli",
+  "version": "1.0.0",
+  "description": "货车油耗异常检测CLI工具",
+  "main": "dist/index.js",
+  "bin": {
+    "fuel-abnormal": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": ["fuel", "abnormal", "detection", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
