@@ -1,0 +1,9 @@
+手机号,邮箱,公司名,来源渠道,联系人,备注,_duplicateGroup,_isSelected,_mergedFrom
+13800138000,zhangsan@example.com,北京科技有限公司,展会,张三,优质客户,GROUP_1,,"1,2"
+13900139000,lisi@example.com,上海贸易有限公司,展会,李四,完全重复,GROUP_2,,"4,3"
+13700137000,wangwu@example.com,广州实业集团,表单,王五,,,,
+13600136000,zhaoliu@example.com,深圳科技有限公司,展会,赵六,同一邮箱,GROUP_3,,"7,6"
+13500135000,qianqi@test.com,杭州互联网公司,表单,钱七,邮箱缺位,GROUP_4,,"8,9"
+13300133000,zhou@example.com,重庆有限公司,展会,周十,,,,
+13200132000,wu@example.com,南京科技公司,表单,吴十二,同一公司名模糊匹配,GROUP_5,,"14,15"
+,,无联系方式公司,电话,吴十一,无关键信息,,,

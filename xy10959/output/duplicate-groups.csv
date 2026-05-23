@@ -1,0 +1,11 @@
+重复组ID,原始行号,手机号,邮箱,公司名,来源渠道,是否保留
+GROUP_1,1,13800138000,zhangsan@example.com,北京科技有限公司,展会,是
+GROUP_1,2,13800138000,zhang.san@company.com,北京科技有限责任公司,表单,否
+GROUP_2,4,13900139000,lisi@example.com,上海贸易有限公司,展会,是
+GROUP_2,3,13900139000,lisi@example.com,上海贸易公司,电话,否
+GROUP_3,7,,zhaoliu@example.com,深圳科技有限公司,展会,是
+GROUP_3,6,13600136000,zhaoliu@example.com,深圳科技公司,电话,否
+GROUP_4,8,13500135000,,杭州互联网公司,表单,是
+GROUP_4,9,13500135000,qianqi@test.com,杭州互联网有限公司,电话,否
+GROUP_5,14,13200132000,wu@example.com,南京科技公司,表单,是
+GROUP_5,15,13200132000,,南京科技有限责任公司,电话,否

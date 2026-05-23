@@ -1,0 +1,24 @@
+{
+  "name": "lead-deduplication-cli",
+  "version": "1.0.0",
+  "description": "渠道线索去重CLI工具",
+  "main": "cli.js",
+  "bin": {
+    "lead-dedup": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js",
+    "test": "node test.js"
+  },
+  "keywords": ["lead", "deduplication", "csv", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "fuse.js": "^6.6.2",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  }
+}

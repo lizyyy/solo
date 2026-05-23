@@ -1,0 +1,671 @@
+{
+  "summary": {
+    "totalRecords": 13,
+    "cleanedRecords": 8,
+    "duplicateGroups": 5,
+    "duplicateRecords": 10,
+    "mergeSuggestions": 11,
+    "autoMergedFields": 3,
+    "conflictsNeedReview": 8
+  },
+  "duplicateGroups": [
+    {
+      "groupId": "GROUP_1",
+      "selectedRow": 1,
+      "memberRows": [
+        1,
+        2
+      ],
+      "conflicts": [
+        {
+          "duplicateRow": 2,
+          "fields": [
+            {
+              "field": "邮箱",
+              "selectedValue": "zhangsan@example.com",
+              "duplicateValue": "zhang.san@company.com",
+              "duplicateRow": 2
+            },
+            {
+              "field": "公司名",
+              "selectedValue": "北京科技有限公司",
+              "duplicateValue": "北京科技有限责任公司",
+              "duplicateRow": 2
+            },
+            {
+              "field": "来源渠道",
+              "selectedValue": "展会",
+              "duplicateValue": "表单",
+              "duplicateRow": 2
+            }
+          ]
+        }
+      ],
+      "mergedFields": [
+        {
+          "field": "邮箱",
+          "originalValue": "zhangsan@example.com",
+          "alternatives": [
+            {
+              "value": "zhang.san@company.com",
+              "sourceRow": 2,
+              "sourceChannel": "表单"
+            }
+          ],
+          "action": "conflict"
+        },
+        {
+          "field": "公司名",
+          "originalValue": "北京科技有限公司",
+          "alternatives": [
+            {
+              "value": "北京科技有限责任公司",
+              "sourceRow": 2,
+              "sourceChannel": "表单"
+            }
+          ],
+          "action": "conflict"
+        },
+        {
+          "field": "备注",
+          "originalValue": "优质客户",
+          "alternatives": [
+            {
+              "value": "重复手机号",
+              "sourceRow": 2,
+              "sourceChannel": "表单"
+            }
+          ],
+          "action": "conflict"
+        }
+      ],
+      "suggestionCount": 3
+    },
+    {
+      "groupId": "GROUP_2",
+      "selectedRow": 4,
+      "memberRows": [
+        4,
+        3
+      ],
+      "conflicts": [
+        {
+          "duplicateRow": 3,
+          "fields": [
+            {
+              "field": "公司名",
+              "selectedValue": "上海贸易有限公司",
+              "duplicateValue": "上海贸易公司",
+              "duplicateRow": 3
+            },
+            {
+              "field": "来源渠道",
+              "selectedValue": "展会",
+              "duplicateValue": "电话",
+              "duplicateRow": 3
+            }
+          ]
+        }
+      ],
+      "mergedFields": [
+        {
+          "field": "公司名",
+          "originalValue": "上海贸易有限公司",
+          "alternatives": [
+            {
+              "value": "上海贸易公司",
+              "sourceRow": 3,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        }
+      ],
+      "suggestionCount": 1
+    },
+    {
+      "groupId": "GROUP_3",
+      "selectedRow": 7,
+      "memberRows": [
+        7,
+        6
+      ],
+      "conflicts": [
+        {
+          "duplicateRow": 6,
+          "fields": [
+            {
+              "field": "公司名",
+              "selectedValue": "深圳科技有限公司",
+              "duplicateValue": "深圳科技公司",
+              "duplicateRow": 6
+            },
+            {
+              "field": "来源渠道",
+              "selectedValue": "展会",
+              "duplicateValue": "电话",
+              "duplicateRow": 6
+            }
+          ]
+        }
+      ],
+      "mergedFields": [
+        {
+          "field": "手机号",
+          "originalValue": "(空)",
+          "mergedValue": "13600136000",
+          "sourceRow": 6,
+          "sourceChannel": "电话",
+          "action": "auto-filled"
+        },
+        {
+          "field": "公司名",
+          "originalValue": "深圳科技有限公司",
+          "alternatives": [
+            {
+              "value": "深圳科技公司",
+              "sourceRow": 6,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        },
+        {
+          "field": "备注",
+          "originalValue": "同一邮箱",
+          "alternatives": [
+            {
+              "value": "手机号缺位",
+              "sourceRow": 6,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        }
+      ],
+      "suggestionCount": 3
+    },
+    {
+      "groupId": "GROUP_4",
+      "selectedRow": 8,
+      "memberRows": [
+        8,
+        9
+      ],
+      "conflicts": [
+        {
+          "duplicateRow": 9,
+          "fields": [
+            {
+              "field": "公司名",
+              "selectedValue": "杭州互联网公司",
+              "duplicateValue": "杭州互联网有限公司",
+              "duplicateRow": 9
+            },
+            {
+              "field": "来源渠道",
+              "selectedValue": "表单",
+              "duplicateValue": "电话",
+              "duplicateRow": 9
+            }
+          ]
+        }
+      ],
+      "mergedFields": [
+        {
+          "field": "邮箱",
+          "originalValue": "(空)",
+          "mergedValue": "qianqi@test.com",
+          "sourceRow": 9,
+          "sourceChannel": "电话",
+          "action": "auto-filled"
+        },
+        {
+          "field": "公司名",
+          "originalValue": "杭州互联网公司",
+          "alternatives": [
+            {
+              "value": "杭州互联网有限公司",
+              "sourceRow": 9,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        }
+      ],
+      "suggestionCount": 2
+    },
+    {
+      "groupId": "GROUP_5",
+      "selectedRow": 14,
+      "memberRows": [
+        14,
+        15
+      ],
+      "conflicts": [
+        {
+          "duplicateRow": 15,
+          "fields": [
+            {
+              "field": "公司名",
+              "selectedValue": "南京科技公司",
+              "duplicateValue": "南京科技有限责任公司",
+              "duplicateRow": 15
+            },
+            {
+              "field": "来源渠道",
+              "selectedValue": "表单",
+              "duplicateValue": "电话",
+              "duplicateRow": 15
+            }
+          ]
+        }
+      ],
+      "mergedFields": [
+        {
+          "field": "公司名",
+          "originalValue": "南京科技公司",
+          "alternatives": [
+            {
+              "value": "南京科技有限责任公司",
+              "sourceRow": 15,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        },
+        {
+          "field": "备注",
+          "originalValue": "(空)",
+          "mergedValue": "同一公司名模糊匹配",
+          "sourceRow": 15,
+          "sourceChannel": "电话",
+          "action": "auto-filled"
+        }
+      ],
+      "suggestionCount": 2
+    }
+  ],
+  "mergeSuggestions": [
+    {
+      "groupId": "GROUP_1",
+      "field": "邮箱",
+      "type": "conflict",
+      "selectedValue": "zhangsan@example.com",
+      "selectedRow": 1,
+      "selectedChannel": "展会",
+      "alternatives": [
+        {
+          "value": "zhang.san@company.com",
+          "sourceRow": 2,
+          "sourceChannel": "表单"
+        }
+      ],
+      "suggestion": "⚠ 字段冲突\"邮箱\": 当前值\"zhangsan@example.com\"（行 1），另有 1 个备选值需人工确认"
+    },
+    {
+      "groupId": "GROUP_1",
+      "field": "公司名",
+      "type": "conflict",
+      "selectedValue": "北京科技有限公司",
+      "selectedRow": 1,
+      "selectedChannel": "展会",
+      "alternatives": [
+        {
+          "value": "北京科技有限责任公司",
+          "sourceRow": 2,
+          "sourceChannel": "表单"
+        }
+      ],
+      "suggestion": "⚠ 字段冲突\"公司名\": 当前值\"北京科技有限公司\"（行 1），另有 1 个备选值需人工确认"
+    },
+    {
+      "groupId": "GROUP_1",
+      "field": "备注",
+      "type": "conflict",
+      "selectedValue": "优质客户",
+      "selectedRow": 1,
+      "selectedChannel": "展会",
+      "alternatives": [
+        {
+          "value": "重复手机号",
+          "sourceRow": 2,
+          "sourceChannel": "表单"
+        }
+      ],
+      "suggestion": "⚠ 字段冲突\"备注\": 当前值\"优质客户\"（行 1），另有 1 个备选值需人工确认"
+    },
+    {
+      "groupId": "GROUP_2",
+      "field": "公司名",
+      "type": "conflict",
+      "selectedValue": "上海贸易有限公司",
+      "selectedRow": 4,
+      "selectedChannel": "展会",
+      "alternatives": [
+        {
+          "value": "上海贸易公司",
+          "sourceRow": 3,
+          "sourceChannel": "电话"
+        }
+      ],
+      "suggestion": "⚠ 字段冲突\"公司名\": 当前值\"上海贸易有限公司\"（行 4），另有 1 个备选值需人工确认"
+    },
+    {
+      "groupId": "GROUP_3",
+      "field": "手机号",
+      "type": "auto-merged",
+      "originalValue": "(空)",
+      "mergedValue": "13600136000",
+      "sourceRow": 6,
+      "sourceChannel": "电话",
+      "suggestion": "✅ 自动补全\"手机号\": 原值\"(空)\" → 新值\"13600136000\"（来自行 6，电话）"
+    },
+    {
+      "groupId": "GROUP_3",
+      "field": "公司名",
+      "type": "conflict",
+      "selectedValue": "深圳科技有限公司",
+      "selectedRow": 7,
+      "selectedChannel": "展会",
+      "alternatives": [
+        {
+          "value": "深圳科技公司",
+          "sourceRow": 6,
+          "sourceChannel": "电话"
+        }
+      ],
+      "suggestion": "⚠ 字段冲突\"公司名\": 当前值\"深圳科技有限公司\"（行 7），另有 1 个备选值需人工确认"
+    },
+    {
+      "groupId": "GROUP_3",
+      "field": "备注",
+      "type": "conflict",
+      "selectedValue": "同一邮箱",
+      "selectedRow": 7,
+      "selectedChannel": "展会",
+      "alternatives": [
+        {
+          "value": "手机号缺位",
+          "sourceRow": 6,
+          "sourceChannel": "电话"
+        }
+      ],
+      "suggestion": "⚠ 字段冲突\"备注\": 当前值\"同一邮箱\"（行 7），另有 1 个备选值需人工确认"
+    },
+    {
+      "groupId": "GROUP_4",
+      "field": "邮箱",
+      "type": "auto-merged",
+      "originalValue": "(空)",
+      "mergedValue": "qianqi@test.com",
+      "sourceRow": 9,
+      "sourceChannel": "电话",
+      "suggestion": "✅ 自动补全\"邮箱\": 原值\"(空)\" → 新值\"qianqi@test.com\"（来自行 9，电话）"
+    },
+    {
+      "groupId": "GROUP_4",
+      "field": "公司名",
+      "type": "conflict",
+      "selectedValue": "杭州互联网公司",
+      "selectedRow": 8,
+      "selectedChannel": "表单",
+      "alternatives": [
+        {
+          "value": "杭州互联网有限公司",
+          "sourceRow": 9,
+          "sourceChannel": "电话"
+        }
+      ],
+      "suggestion": "⚠ 字段冲突\"公司名\": 当前值\"杭州互联网公司\"（行 8），另有 1 个备选值需人工确认"
+    },
+    {
+      "groupId": "GROUP_5",
+      "field": "公司名",
+      "type": "conflict",
+      "selectedValue": "南京科技公司",
+      "selectedRow": 14,
+      "selectedChannel": "表单",
+      "alternatives": [
+        {
+          "value": "南京科技有限责任公司",
+          "sourceRow": 15,
+          "sourceChannel": "电话"
+        }
+      ],
+      "suggestion": "⚠ 字段冲突\"公司名\": 当前值\"南京科技公司\"（行 14），另有 1 个备选值需人工确认"
+    },
+    {
+      "groupId": "GROUP_5",
+      "field": "备注",
+      "type": "auto-merged",
+      "originalValue": "(空)",
+      "mergedValue": "同一公司名模糊匹配",
+      "sourceRow": 15,
+      "sourceChannel": "电话",
+      "suggestion": "✅ 自动补全\"备注\": 原值\"(空)\" → 新值\"同一公司名模糊匹配\"（来自行 15，电话）"
+    }
+  ],
+  "cleanedRecords": [
+    {
+      "originalRow": 1,
+      "phone": "13800138000",
+      "email": "zhangsan@example.com",
+      "companyName": "北京科技有限公司",
+      "channel": "展会",
+      "duplicateGroup": "GROUP_1",
+      "mergedFromRows": [
+        1,
+        2
+      ],
+      "mergedFields": [
+        {
+          "field": "邮箱",
+          "originalValue": "zhangsan@example.com",
+          "alternatives": [
+            {
+              "value": "zhang.san@company.com",
+              "sourceRow": 2,
+              "sourceChannel": "表单"
+            }
+          ],
+          "action": "conflict"
+        },
+        {
+          "field": "公司名",
+          "originalValue": "北京科技有限公司",
+          "alternatives": [
+            {
+              "value": "北京科技有限责任公司",
+              "sourceRow": 2,
+              "sourceChannel": "表单"
+            }
+          ],
+          "action": "conflict"
+        },
+        {
+          "field": "备注",
+          "originalValue": "优质客户",
+          "alternatives": [
+            {
+              "value": "重复手机号",
+              "sourceRow": 2,
+              "sourceChannel": "表单"
+            }
+          ],
+          "action": "conflict"
+        }
+      ]
+    },
+    {
+      "originalRow": 4,
+      "phone": "13900139000",
+      "email": "lisi@example.com",
+      "companyName": "上海贸易有限公司",
+      "channel": "展会",
+      "duplicateGroup": "GROUP_2",
+      "mergedFromRows": [
+        4,
+        3
+      ],
+      "mergedFields": [
+        {
+          "field": "公司名",
+          "originalValue": "上海贸易有限公司",
+          "alternatives": [
+            {
+              "value": "上海贸易公司",
+              "sourceRow": 3,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        }
+      ]
+    },
+    {
+      "originalRow": 5,
+      "phone": "13700137000",
+      "email": "wangwu@example.com",
+      "companyName": "广州实业集团",
+      "channel": "表单",
+      "duplicateGroup": null,
+      "mergedFromRows": null,
+      "mergedFields": null
+    },
+    {
+      "originalRow": 7,
+      "phone": "13600136000",
+      "email": "zhaoliu@example.com",
+      "companyName": "深圳科技有限公司",
+      "channel": "展会",
+      "duplicateGroup": "GROUP_3",
+      "mergedFromRows": [
+        7,
+        6
+      ],
+      "mergedFields": [
+        {
+          "field": "手机号",
+          "originalValue": "(空)",
+          "mergedValue": "13600136000",
+          "sourceRow": 6,
+          "sourceChannel": "电话",
+          "action": "auto-filled"
+        },
+        {
+          "field": "公司名",
+          "originalValue": "深圳科技有限公司",
+          "alternatives": [
+            {
+              "value": "深圳科技公司",
+              "sourceRow": 6,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        },
+        {
+          "field": "备注",
+          "originalValue": "同一邮箱",
+          "alternatives": [
+            {
+              "value": "手机号缺位",
+              "sourceRow": 6,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        }
+      ]
+    },
+    {
+      "originalRow": 8,
+      "phone": "13500135000",
+      "email": "qianqi@test.com",
+      "companyName": "杭州互联网公司",
+      "channel": "表单",
+      "duplicateGroup": "GROUP_4",
+      "mergedFromRows": [
+        8,
+        9
+      ],
+      "mergedFields": [
+        {
+          "field": "邮箱",
+          "originalValue": "(空)",
+          "mergedValue": "qianqi@test.com",
+          "sourceRow": 9,
+          "sourceChannel": "电话",
+          "action": "auto-filled"
+        },
+        {
+          "field": "公司名",
+          "originalValue": "杭州互联网公司",
+          "alternatives": [
+            {
+              "value": "杭州互联网有限公司",
+              "sourceRow": 9,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        }
+      ]
+    },
+    {
+      "originalRow": 12,
+      "phone": "13300133000",
+      "email": "zhou@example.com",
+      "companyName": "重庆有限公司",
+      "channel": "展会",
+      "duplicateGroup": null,
+      "mergedFromRows": null,
+      "mergedFields": null
+    },
+    {
+      "originalRow": 14,
+      "phone": "13200132000",
+      "email": "wu@example.com",
+      "companyName": "南京科技公司",
+      "channel": "表单",
+      "duplicateGroup": "GROUP_5",
+      "mergedFromRows": [
+        14,
+        15
+      ],
+      "mergedFields": [
+        {
+          "field": "公司名",
+          "originalValue": "南京科技公司",
+          "alternatives": [
+            {
+              "value": "南京科技有限责任公司",
+              "sourceRow": 15,
+              "sourceChannel": "电话"
+            }
+          ],
+          "action": "conflict"
+        },
+        {
+          "field": "备注",
+          "originalValue": "(空)",
+          "mergedValue": "同一公司名模糊匹配",
+          "sourceRow": 15,
+          "sourceChannel": "电话",
+          "action": "auto-filled"
+        }
+      ]
+    },
+    {
+      "originalRow": 13,
+      "phone": "",
+      "email": "",
+      "companyName": "无联系方式公司",
+      "channel": "电话",
+      "duplicateGroup": null,
+      "mergedFromRows": null,
+      "mergedFields": null
+    }
+  ]
+}
