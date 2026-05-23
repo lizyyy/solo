@@ -47,8 +47,10 @@ export interface Claim extends ClaimInput {
   isDuplicate: boolean;
   originalClaimId?: string;
   reportGenerated?: boolean;
+  reportId?: string;
   timeLimitExceeded?: boolean;
   timeLimitReason?: string;
+  responsibilityAnalysis?: ResponsibilityAnalysis;
 }
 
 export interface AuditLog {
@@ -66,4 +68,49 @@ export interface CategoryResult {
   category: ClaimCategory;
   reason: string;
   nextAction: string;
+  responsibilityAnalysis?: ResponsibilityAnalysis;
+}
+
+export interface ResponsibilityAnalysis {
+  responsibility: Responsibility;
+  isVerified: boolean;
+  verificationNotes: string;
+  requiredDocuments: string[];
+  processingPriority: 'high' | 'medium' | 'low';
+}
+
+export interface CompensationReport {
+  id: string;
+  claimId: string;
+  reportNumber: string;
+  generateTime: Date;
+  status: 'pending' | 'approved' | 'rejected' | 'paid';
+  approvedAmount?: number;
+  paymentMethod?: string;
+  paymentTime?: Date;
+  reviewer?: string;
+  reviewNotes?: string;
+  keyFieldsSnapshot: {
+    baggageTag: string;
+    responsibility: Responsibility;
+    photoCount: number;
+    earliestPhotoTime: Date;
+    latestPhotoTime: Date;
+    estimatedValue: number;
+    damageDescription: string;
+  };
+  responsibilityConclusion: string;
+  timeLimitVerification: {
+    arrivalTime: Date;
+    reportingTime: Date;
+    withinLimit: boolean;
+    hoursDiff: number;
+  };
+}
+
+export interface CategoryResult {
+  category: ClaimCategory;
+  reason: string;
+  nextAction: string;
+  responsibilityAnalysis?: ResponsibilityAnalysis;
 }

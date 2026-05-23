@@ -1,4 +1,6 @@
-import { ClaimInput, CategoryResult, ClaimCategory, Responsibility, ResponsibilityAnalysis } from "./types";
+const fs = require('fs');
+
+const classifierContent = `import { ClaimInput, CategoryResult, ClaimCategory, Responsibility, ResponsibilityAnalysis } from "./types";
 
 const REPORTING_TIME_LIMIT_HOURS = 24;
 
@@ -180,3 +182,7 @@ export function classifyClaim(input: ClaimInput): CategoryResult {
     responsibilityAnalysis
   };
 }
+`;
+
+fs.writeFileSync('src/classifier.ts', classifierContent);
+console.log('classifier.ts written successfully');

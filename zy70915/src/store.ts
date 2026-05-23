@@ -1,12 +1,13 @@
-import { Claim, AuditLog } from './types';
+import { Claim, AuditLog, CompensationReport } from "./types";
 
 class DataStore {
   private claims: Map<string, Claim> = new Map();
   private auditLogs: Map<string, AuditLog[]> = new Map();
+  private reports: Map<string, CompensationReport> = new Map();
   private duplicateIndex: Map<string, string> = new Map();
 
   generateDuplicateKey(claim: { baggage: { tagNumber: string; arrivalDate: Date }; passengerName: string }): string {
-    const dateStr = new Date(claim.baggage.arrivalDate).toISOString().split('T')[0];
+    const dateStr = new Date(claim.baggage.arrivalDate).toISOString().split("T")[0];
     return `${claim.baggage.tagNumber}-${dateStr}-${claim.passengerName}`;
   }
 
@@ -48,6 +49,30 @@ class DataStore {
 
   getAuditLogs(claimId: string): AuditLog[] {
     return this.auditLogs.get(claimId) || [];
+  }
+
+  addReport(report: CompensationReport): void {
+    this.reports.set(report.id, report);
+  }
+
+  getReport(id: string): CompensationReport | undefined {
+    return this.reports.get(id);
+  }
+
+  getReportByClaimId(claimId: string): CompensationReport | undefined {
+    return Array.from(this.reports.values()).find(r => r.claimId === claimId);
+  }
+
+  getAllReports(): CompensationReport[] {
+    return Array.from(this.reports.values());
+  }
+
+  updateReport(id: string, updates: Partial<CompensationReport>): CompensationReport | undefined {
+    const report = this.reports.get(id);
+    if (!report) return undefined;
+    const updated = { ...report, ...updates };
+    this.reports.set(id, updated);
+    return updated;
   }
 }
 
