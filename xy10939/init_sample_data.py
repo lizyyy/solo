@@ -5,6 +5,7 @@ from database import SessionLocal, engine
 import models
 import crud
 import schemas
+from datetime import datetime
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -22,22 +23,30 @@ def init_sample_data():
             {"code": "UNDW001", "name": "内衣", "description": "内衣、睡衣等", "sort_order": 5},
             {"code": "ACCE001", "name": "配饰", "description": "围巾、帽子、手套等", "sort_order": 6},
         ]
+        created_cats = 0
         for cat in categories:
             existing = db.query(models.ClothingCategory).filter(models.ClothingCategory.code == cat["code"]).first()
             if not existing:
                 crud.create_clothing_category(db, schemas.ClothingCategoryCreate(**cat))
+                created_cats += 1
                 print(f"创建分类: {cat['name']}")
+        if created_cats == 0:
+            print(f"分类已存在，跳过创建")
 
         orgs = [
             {"code": "ORG001", "name": "希望小学", "contact_person": "张老师", "contact_phone": "13800138001", "address": "北京市朝阳区希望路1号", "description": "贫困地区小学"},
             {"code": "ORG002", "name": "阳光敬老院", "contact_person": "李院长", "contact_phone": "13800138002", "address": "上海市浦东新区阳光路2号", "description": "社区敬老院"},
             {"code": "ORG003", "name": "山区扶贫站", "contact_person": "王站长", "contact_phone": "13800138003", "address": "云南省昆明市山区路3号", "description": "偏远山区扶贫点"},
         ]
+        created_orgs = 0
         for org in orgs:
             existing = db.query(models.DonationOrganization).filter(models.DonationOrganization.code == org["code"]).first()
             if not existing:
                 crud.create_donation_organization(db, schemas.DonationOrganizationCreate(**org))
+                created_orgs += 1
                 print(f"创建机构: {org['name']}")
+        if created_orgs == 0:
+            print(f"机构已存在，跳过创建")
 
         reasons = [
             {"code": "REJ001", "name": "破损严重", "description": "衣物有明显破损、破洞", "sort_order": 1},
@@ -46,14 +55,19 @@ def init_sample_data():
             {"code": "REJ004", "name": "款式过时", "description": "过于老旧不适合捐赠", "sort_order": 4},
             {"code": "REJ005", "name": "特殊衣物", "description": "内衣等不适合二次捐赠的衣物", "sort_order": 5},
         ]
+        created_reasons = 0
         for reason in reasons:
             existing = db.query(models.RejectionReason).filter(models.RejectionReason.code == reason["code"]).first()
             if not existing:
                 crud.create_rejection_reason(db, schemas.RejectionReasonCreate(**reason))
+                created_reasons += 1
                 print(f"创建原因: {reason['name']}")
+        if created_reasons == 0:
+            print(f"淘汰原因已存在，跳过创建")
 
+        timestamp = datetime.now().strftime("%H%M%S")
         batch1 = crud.create_donation_batch(db, schemas.DonationBatchCreate(
-            batch_no="BATCH20240501001",
+            batch_no=f"SAMPLE-BATCH1-{timestamp}",
             donor_name="张三",
             donor_phone="13900139001",
             donor_address="广东省广州市天河区",
@@ -63,7 +77,7 @@ def init_sample_data():
         print(f"创建批次: {batch1.batch_no}")
 
         batch2 = crud.create_donation_batch(db, schemas.DonationBatchCreate(
-            batch_no="BATCH20240501002",
+            batch_no=f"SAMPLE-BATCH2-{timestamp}",
             donor_name="李四",
             donor_phone="13900139002",
             donor_address="深圳市南山区",
@@ -84,6 +98,16 @@ def init_sample_data():
         ]
         created_items = []
         for item in items_batch1:
+            created = crud.create_clothing_item(db, schemas.ClothingItemCreate(**item))
+            created_items.append(created)
+            print(f"创建衣物: {item['name']} - {created.item_no}")
+
+        items_batch2 = [
+            {"batch_id": batch2.id, "name": "灰色卫衣", "brand": "耐克", "color": "灰色", "size": "M", "material": "棉质", "quality_level": 2, "estimated_value": 199.0, "category_id": cat_map.get("上衣")},
+            {"batch_id": batch2.id, "name": "运动短裤", "brand": "阿迪达斯", "color": "黑色", "size": "L", "material": "涤纶", "quality_level": 2, "estimated_value": 129.0, "category_id": cat_map.get("裤子")},
+            {"batch_id": batch2.id, "name": "羊毛大衣", "brand": "恒源祥", "color": "驼色", "size": "XL", "material": "羊毛", "quality_level": 1, "estimated_value": 899.0, "category_id": cat_map.get("外套")},
+        ]
+        for item in items_batch2:
             created = crud.create_clothing_item(db, schemas.ClothingItemCreate(**item))
             created_items.append(created)
             print(f"创建衣物: {item['name']} - {created.item_no}")
@@ -139,12 +163,15 @@ def init_sample_data():
         report = crud.generate_sorting_report(db, batch1.id, operator="系统", summary="第一批捐赠衣物分拣完成，共5件，其中4件合格，1件淘汰")
         print(f"生成分拣报告: {report.report_no}")
 
+        total_items_count = db.query(models.ClothingItem).count()
+
         print("\n样例数据初始化完成!")
-        print(f"共创建 {len(categories)} 个衣物分类")
-        print(f"共创建 {len(orgs)} 个转赠机构")
-        print(f"共创建 {len(reasons)} 个淘汰原因")
-        print(f"共创建 2 个捐赠批次")
-        print(f"共创建 8 件衣物记录")
+        print(f"衣物分类: {len(categories)} 个（本次创建 {created_cats} 个")
+        print(f"转赠机构: {len(orgs)} 个（本次创建 {created_orgs} 个")
+        print(f"淘汰原因: {len(reasons)} 个（本次创建 {created_reasons} 个")
+        print(f"本次创建捐赠批次: 2 个")
+        print(f"本次创建衣物记录: {len(created_items)} 件")
+        print(f"数据库总衣物数: {total_items_count} 件")
         print(f"包含消毒记录、转赠记录、淘汰记录、异常处理")
 
     except Exception as e:
