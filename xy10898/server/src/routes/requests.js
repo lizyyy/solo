@@ -30,8 +30,8 @@ router.post('/', async (req, res) => {
     }
 
     const detectedSensitive = detectSensitiveFields(headers, body);
-    const maskedHeaders = maskSensitiveData(headers || {}, detectedSensitive.filter(f => f.field_path.startsWith('headers.')));
-    const maskedBody = maskSensitiveData(body || {}, detectedSensitive.filter(f => f.field_path.startsWith('body.')));
+    const maskedHeaders = maskSensitiveData(headers || {}, detectedSensitive.filter(f => f.field_path.startsWith('headers.')), 'headers');
+    const maskedBody = maskSensitiveData(body || {}, detectedSensitive.filter(f => f.field_path.startsWith('body.')), 'body');
 
     const id = uuidv4();
     await runQuery(

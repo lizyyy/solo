@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const { v4: uuidv4 } = require('uuid');
+const { detectSensitiveFields, maskSensitiveData } = require('../src/utils/maskUtils');
 
 const dataDir = path.join(__dirname, '../data');
 const dbPath = path.join(dataDir, 'database.db');
@@ -148,81 +149,99 @@ const seedData = async () => {
     const req4Id = uuidv4();
     const req5Id = uuidv4();
 
-    const sensitiveFields1 = JSON.stringify([
-      { field_path: 'headers.Authorization', mask_type: 'hash' },
-      { field_path: 'body.password', mask_type: 'full' }
-    ]);
+    const headers1 = { 'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxfQ...' };
+    const body1 = { username: 'john_doe', password: 'secret123' };
+    const sensitive1 = detectSensitiveFields(headers1, body1);
+    const maskedHeaders1 = maskSensitiveData(headers1, sensitive1.filter(f => f.field_path.startsWith('headers.')), 'headers');
+    const maskedBody1 = maskSensitiveData(body1, sensitive1.filter(f => f.field_path.startsWith('body.')), 'body');
 
     await runQuery(db,
       `INSERT OR IGNORE INTO requests (id, name, method, url, headers, body, sensitive_fields, environment_id, created_by, status, request_hash)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         req1Id, 'User Login - Success', 'POST', '/api/auth/login',
-        JSON.stringify({ 'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxfQ...' }),
-        JSON.stringify({ username: 'john_doe', password: 'secret123' }),
-        sensitiveFields1, env1Id, 'developer_a', 'approved',
+        JSON.stringify(maskedHeaders1),
+        JSON.stringify(maskedBody1),
+        JSON.stringify(sensitive1), env1Id, 'developer_a', 'approved',
         'hash_' + req1Id.substring(0, 8)
       ]
     );
 
-    const sensitiveFields2 = JSON.stringify([
-      { field_path: 'headers.X-API-Key', mask_type: 'partial' }
-    ]);
+    const headers2 = { 'Content-Type': 'application/json', 'X-API-Key': 'abcdefghijklmnopqrstuvwxyz' };
+    const body2 = { username: 'john_doe', password: 'wrongpass' };
+    const sensitive2 = detectSensitiveFields(headers2, body2);
+    const maskedHeaders2 = maskSensitiveData(headers2, sensitive2.filter(f => f.field_path.startsWith('headers.')), 'headers');
+    const maskedBody2 = maskSensitiveData(body2, sensitive2.filter(f => f.field_path.startsWith('body.')), 'body');
 
     await runQuery(db,
       `INSERT OR IGNORE INTO requests (id, name, method, url, headers, body, sensitive_fields, environment_id, created_by, status, request_hash)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         req2Id, 'User Login - Failure (Wrong Password)', 'POST', '/api/auth/login',
-        JSON.stringify({ 'Content-Type': 'application/json', 'X-API-Key': 'abcdefghijklmnopqrstuvwxyz' }),
-        JSON.stringify({ username: 'john_doe', password: 'wrongpass' }),
-        sensitiveFields2, env1Id, 'developer_b', 'rejected',
+        JSON.stringify(maskedHeaders2),
+        JSON.stringify(maskedBody2),
+        JSON.stringify(sensitive2), env1Id, 'developer_b', 'rejected',
         'hash_' + req2Id.substring(0, 8)
       ]
     );
+
+    const headers3 = { 'Accept': 'application/json' };
+    const body3 = {};
+    const sensitive3 = detectSensitiveFields(headers3, body3);
 
     await runQuery(db,
       `INSERT OR IGNORE INTO requests (id, name, method, url, headers, body, sensitive_fields, environment_id, created_by, status, request_hash)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         req3Id, 'Get User Profile', 'GET', '/api/users/123',
-        JSON.stringify({ 'Accept': 'application/json' }),
-        JSON.stringify({}),
-        JSON.stringify([]), env1Id, 'developer_a', 'reviewing',
+        JSON.stringify(headers3),
+        JSON.stringify(body3),
+        JSON.stringify(sensitive3), env1Id, 'developer_a', 'reviewing',
         'hash_' + req3Id.substring(0, 8)
       ]
     );
 
-    const sensitiveFields4 = JSON.stringify([
-      { field_path: 'body.api_secret', mask_type: 'hash' },
-      { field_path: 'body.private_key', mask_type: 'full' }
-    ]);
+    const headers4 = { 'Content-Type': 'application/json', 'X-Signature': 'sha256=abc123...' };
+    const body4 = { 
+      amount: 99.99, 
+      currency: 'USD',
+      api_secret: 'whsec_test12345',
+      private_key: '-----BEGIN PRIVATE KEY-----\nMIIE...',
+      nested: {
+        auth_token: 'nested_token_12345',
+        credentials: {
+          password: 'nested_secret'
+        }
+      }
+    };
+    const sensitive4 = detectSensitiveFields(headers4, body4);
+    const maskedHeaders4 = maskSensitiveData(headers4, sensitive4.filter(f => f.field_path.startsWith('headers.')), 'headers');
+    const maskedBody4 = maskSensitiveData(body4, sensitive4.filter(f => f.field_path.startsWith('body.')), 'body');
 
     await runQuery(db,
       `INSERT OR IGNORE INTO requests (id, name, method, url, headers, body, sensitive_fields, environment_id, created_by, status, request_hash)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         req4Id, 'Payment Webhook - Test', 'POST', '/api/webhook/payment',
-        JSON.stringify({ 'Content-Type': 'application/json', 'X-Signature': 'sha256=abc123...' }),
-        JSON.stringify({ 
-          amount: 99.99, 
-          currency: 'USD',
-          api_secret: 'whsec_test12345',
-          private_key: '-----BEGIN PRIVATE KEY-----\nMIIE...'
-        }),
-        sensitiveFields4, env2Id, 'developer_c', 'pending',
+        JSON.stringify(maskedHeaders4),
+        JSON.stringify(maskedBody4),
+        JSON.stringify(sensitive4), env2Id, 'developer_c', 'pending',
         'hash_' + req4Id.substring(0, 8)
       ]
     );
+
+    const headers5 = { 'Accept': 'application/json' };
+    const body5 = {};
+    const sensitive5 = detectSensitiveFields(headers5, body5);
 
     await runQuery(db,
       `INSERT OR IGNORE INTO requests (id, name, method, url, headers, body, sensitive_fields, environment_id, created_by, status, request_hash)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         req5Id, 'List Products', 'GET', '/api/products?page=1&limit=20',
-        JSON.stringify({ 'Accept': 'application/json' }),
-        JSON.stringify({}),
-        JSON.stringify([]), env1Id, 'developer_a', 'archived',
+        JSON.stringify(headers5),
+        JSON.stringify(body5),
+        JSON.stringify(sensitive5), env1Id, 'developer_a', 'archived',
         'hash_' + req5Id.substring(0, 8)
       ]
     );

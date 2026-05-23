@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-const maskSensitiveData = (data, sensitiveFields, maskType = 'partial') => {
+const maskSensitiveData = (data, sensitiveFields, pathPrefix = '') => {
   if (!data || !sensitiveFields || sensitiveFields.length === 0) {
     return data;
   }
@@ -8,7 +8,13 @@ const maskSensitiveData = (data, sensitiveFields, maskType = 'partial') => {
   const maskedData = JSON.parse(JSON.stringify(data));
   
   sensitiveFields.forEach(field => {
-    const paths = field.field_path.split('.');
+    let fieldPath = field.field_path;
+    
+    if (pathPrefix && fieldPath.startsWith(pathPrefix + '.')) {
+      fieldPath = fieldPath.substring(pathPrefix.length + 1);
+    }
+    
+    const paths = fieldPath.split('.');
     let current = maskedData;
     
     for (let i = 0; i < paths.length - 1; i++) {
@@ -17,7 +23,8 @@ const maskSensitiveData = (data, sensitiveFields, maskType = 'partial') => {
     }
     
     const lastKey = paths[paths.length - 1];
-    if (current[lastKey] !== undefined) {
+    if (current && current[lastKey] !== undefined) {
+      const maskType = field.mask_type || 'partial';
       current[lastKey] = applyMask(current[lastKey], maskType);
     }
   });
@@ -74,7 +81,14 @@ const detectSensitiveFields = (headers, body) => {
       const fullPath = prefix ? `${prefix}.${key}` : key;
       
       if (sensitivePatterns.some(pattern => pattern.test(key))) {
-        detected.push({ field_path: fullPath, mask_type: 'partial' });
+        let maskType = 'partial';
+        
+        if (/password/i.test(key)) maskType = 'full';
+        else if (/secret/i.test(key)) maskType = 'hash';
+        else if (/token/i.test(key)) maskType = 'hash';
+        else if (/private/i.test(key)) maskType = 'full';
+        
+        detected.push({ field_path: fullPath, mask_type: maskType });
       }
       
       if (typeof obj[key] === 'object' && obj[key] !== null) {
@@ -91,6 +105,7 @@ const detectSensitiveFields = (headers, body) => {
 
 module.exports = {
   maskSensitiveData,
+  applyMask,
   generateRequestHash,
   detectSensitiveFields
 };
