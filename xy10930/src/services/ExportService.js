@@ -76,6 +76,7 @@ class ExportService {
 
     const typeMap = {
       'deposit': '收押金',
+      'deposit_frozen': '冻结押金',
       'refund': '退押金',
       'manual_correction': '人工修正'
     };

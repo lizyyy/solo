@@ -70,9 +70,16 @@ GET  /api/customers/:id      - 客户详情
 
 ### 配送单管理
 ```
-POST /api/delivery-orders    - 创建配送单
-GET  /api/delivery-orders/:id - 配送单详情
+POST /api/delivery-orders              - 创建配送单（冻结押金，状态pending）
+GET  /api/delivery-orders/:id          - 配送单详情
+PUT  /api/delivery-orders/:id/confirm  - 确认配送单（押金入账，状态pending→completed）
+PUT  /api/delivery-orders/:id/cancel   - 取消配送单（押金解冻，状态pending→cancelled）
 ```
+
+**配送单状态流转:**
+- `pending`: 已创建，押金已冻结但未正式入账
+- `completed`: 已确认，押金正式入账，桶数量更新
+- `cancelled`: 已取消，押金解冻，桶恢复库存
 
 **创建配送单请求体:**
 ```json
@@ -85,6 +92,13 @@ GET  /api/delivery-orders/:id - 配送单详情
   "order_no": "DO20240115001",       // 可选，不指定自动生成
   "created_by": "操作员A",
   "remark": "备注"
+}
+```
+
+**确认/取消配送单请求体:**
+```json
+{
+  "operator": "操作员A"
 }
 ```
 

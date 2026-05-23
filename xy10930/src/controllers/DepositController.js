@@ -96,6 +96,46 @@ class DepositController {
     }
   }
 
+  async confirmDeliveryOrder(req, res) {
+    try {
+      const { id } = req.params;
+      const { operator } = req.body;
+
+      if (!operator) {
+        return res.status(400).json({ 
+          success: false, 
+          message: '操作人不能为空' 
+        });
+      }
+
+      const order = await depositService.confirmDeliveryOrder(id, operator);
+      res.json({ success: true, data: order });
+    } catch (error) {
+      await depositService.logException(`/api/delivery-orders/${id}/confirm`, req.body, 'confirm_delivery_error', error.message);
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  async cancelDeliveryOrder(req, res) {
+    try {
+      const { id } = req.params;
+      const { operator } = req.body;
+
+      if (!operator) {
+        return res.status(400).json({ 
+          success: false, 
+          message: '操作人不能为空' 
+        });
+      }
+
+      const order = await depositService.cancelDeliveryOrder(id, operator);
+      res.json({ success: true, data: order });
+    } catch (error) {
+      await depositService.logException(`/api/delivery-orders/${id}/cancel`, req.body, 'cancel_delivery_error', error.message);
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
   async createReturnRecord(req, res) {
     try {
       const { customer_id, bucket_nos, deduction_amount, deduction_reason, operator, remark } = req.body;

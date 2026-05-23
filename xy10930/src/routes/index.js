@@ -12,6 +12,8 @@ router.get('/customers/:id', depositController.getCustomer);
 
 router.post('/delivery-orders', depositController.createDeliveryOrder);
 router.get('/delivery-orders/:id', depositController.getDeliveryOrder);
+router.put('/delivery-orders/:id/confirm', depositController.confirmDeliveryOrder);
+router.put('/delivery-orders/:id/cancel', depositController.cancelDeliveryOrder);
 
 router.post('/return-records', depositController.createReturnRecord);
 

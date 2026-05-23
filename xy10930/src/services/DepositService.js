@@ -113,7 +113,7 @@ class DepositService {
          (id, order_no, customer_id, customer_name, delivery_address, bucket_count, deposit_amount, deposit_type, status, created_by)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [orderId, orderNo, data.customer_id, customer.name, data.delivery_address || customer.address, 
-         data.bucket_count, depositAmount, data.deposit_type || 'new', 'completed', data.created_by || 'system']
+         data.bucket_count, depositAmount, data.deposit_type || 'new', 'pending', data.created_by || 'system']
       );
 
       for (const bucket of buckets) {
@@ -131,19 +131,133 @@ class DepositService {
       }
 
       const transactionNo = await this.generateOrderNo('TX');
+      if (await this.checkDuplicateTransaction(transactionNo)) {
+        throw new Error('交易流水号重复，请重试');
+      }
+
       await db.run(
         `INSERT INTO deposit_transactions 
          (id, transaction_no, customer_id, customer_name, type, amount, related_order_id, related_order_no, 
           bucket_ids, bucket_nos, before_balance, after_balance, operator, remark)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [uuidv4(), transactionNo, data.customer_id, customer.name, 'deposit', depositAmount, 
+        [uuidv4(), transactionNo, data.customer_id, customer.name, 'deposit_frozen', depositAmount, 
          orderId, orderNo, buckets.map(b => b.id).join(','), buckets.map(b => b.bucket_no).join(','),
-         customer.total_deposit, customer.total_deposit + depositAmount, data.created_by || 'system', 
-         data.remark || '配送收押金']
+         customer.total_deposit, customer.total_deposit, data.created_by || 'system', 
+         data.remark || '配送冻结押金']
       );
 
-      await this.updateCustomerDeposit(data.customer_id, depositAmount, data.bucket_count);
-      await this.addStatusHistory('delivery_order', orderId, null, 'completed', data.created_by || 'system', '配送单创建完成');
+      await db.run(
+        `UPDATE customers 
+         SET frozen_deposit = frozen_deposit + ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`,
+        [depositAmount, data.customer_id]
+      );
+
+      await this.addStatusHistory('delivery_order', orderId, null, 'pending', data.created_by || 'system', '配送单创建，押金已冻结');
+
+      await db.commit();
+
+      return await this.getDeliveryOrderById(orderId);
+    } catch (error) {
+      await db.rollback();
+      throw error;
+    }
+  }
+
+  async confirmDeliveryOrder(orderId, operator) {
+    const order = await this.getDeliveryOrderById(orderId);
+    if (!order) {
+      throw new Error('配送单不存在');
+    }
+
+    if (order.status !== 'pending') {
+      throw new Error('配送单状态不是待确认，无法确认');
+    }
+
+    const customer = await this.getCustomerById(order.customer_id);
+    if (!customer) {
+      throw new Error('客户不存在');
+    }
+
+    await db.beginTransaction();
+    try {
+      await db.run(
+        `UPDATE delivery_orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        ['completed', orderId]
+      );
+
+      const transactionNo = await this.generateOrderNo('TX');
+      if (await this.checkDuplicateTransaction(transactionNo)) {
+        throw new Error('交易流水号重复，请重试');
+      }
+
+      await db.run(
+        `INSERT INTO deposit_transactions 
+         (id, transaction_no, customer_id, customer_name, type, amount, related_order_id, related_order_no, 
+          bucket_ids, bucket_nos, before_balance, after_balance, operator, remark)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [uuidv4(), transactionNo, order.customer_id, customer.name, 'deposit', order.deposit_amount, 
+         orderId, order.order_no, order.buckets.map(b => b.bucket_id).join(','), 
+         order.buckets.map(b => b.bucket_no).join(','),
+         customer.total_deposit, customer.total_deposit + order.deposit_amount, operator || 'system', 
+         '配送确认，押金正式入账']
+      );
+
+      await db.run(
+        `UPDATE customers 
+         SET total_deposit = total_deposit + ?, 
+             available_deposit = available_deposit + ?,
+             frozen_deposit = frozen_deposit - ?,
+             bucket_count = bucket_count + ?,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`,
+        [order.deposit_amount, order.deposit_amount, order.deposit_amount, order.bucket_count, order.customer_id]
+      );
+
+      await this.addStatusHistory('delivery_order', orderId, 'pending', 'completed', operator || 'system', '配送单确认完成，押金正式入账');
+
+      await db.commit();
+
+      return await this.getDeliveryOrderById(orderId);
+    } catch (error) {
+      await db.rollback();
+      throw error;
+    }
+  }
+
+  async cancelDeliveryOrder(orderId, operator) {
+    const order = await this.getDeliveryOrderById(orderId);
+    if (!order) {
+      throw new Error('配送单不存在');
+    }
+
+    if (order.status !== 'pending') {
+      throw new Error('配送单状态不是待确认，无法取消');
+    }
+
+    await db.beginTransaction();
+    try {
+      await db.run(
+        `UPDATE delivery_orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        ['cancelled', orderId]
+      );
+
+      for (const bucket of order.buckets) {
+        await db.run(
+          `UPDATE buckets SET status = ?, customer_id = NULL, current_delivery_id = NULL, updated_at = CURRENT_TIMESTAMP
+           WHERE id = ?`,
+          ['in_stock', bucket.bucket_id]
+        );
+      }
+
+      await db.run(
+        `UPDATE customers 
+         SET frozen_deposit = frozen_deposit - ?, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`,
+        [order.deposit_amount, order.customer_id]
+      );
+
+      await this.addStatusHistory('delivery_order', orderId, 'pending', 'cancelled', operator || 'system', '配送单已取消，押金解冻');
 
       await db.commit();
 
@@ -225,6 +339,10 @@ class DepositService {
       }
 
       const transactionNo = await this.generateOrderNo('TX');
+      if (await this.checkDuplicateTransaction(transactionNo)) {
+        throw new Error('交易流水号重复，请重试');
+      }
+
       await db.run(
         `INSERT INTO deposit_transactions 
          (id, transaction_no, customer_id, customer_name, type, amount, related_order_id, related_order_no, 
@@ -338,6 +456,10 @@ class DepositService {
         );
 
         const transactionNo = await this.generateOrderNo('TX');
+        if (await this.checkDuplicateTransaction(transactionNo)) {
+          throw new Error('交易流水号重复，请重试');
+        }
+
         await db.run(
           `INSERT INTO deposit_transactions 
            (id, transaction_no, customer_id, customer_name, type, amount, before_balance, after_balance, operator, remark)
