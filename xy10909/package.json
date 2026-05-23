@@ -1,0 +1,23 @@
+{
+  "name": "construction-site-access-api",
+  "version": "1.0.0",
+  "description": "工地人员进出API服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "init-db": "node scripts/init-db.js",
+    "seed-data": "node scripts/seed-data.js",
+    "setup": "npm run init-db && npm run seed-data",
+    "verify": "node scripts/verify-project.js",
+    "test-sample": "node scripts/test-sample.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2",
+    "csv-writer": "^1.6.0",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1"
+  },
+  "keywords": ["construction", "access", "gate", "api"]
+}
