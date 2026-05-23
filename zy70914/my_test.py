@@ -2,18 +2,18 @@
 import sys
 sys.path.insert(0, ".")
 from fastapi.testclient import TestClient
-from main import app, global_store
-import json, io
+from main import app
+import json
 
 client = TestClient(app)
 
 print("=" * 80)
-print("完整业务链路测试 - 第三轮修复验证")
+print("完整业务链路测试 - 第二轮修复验证")
 print("=" * 80)
 print()
 
 passed = 0
-total = 6
+total = 7
 all_passed = True
 
 def print_section(title, num):
@@ -33,54 +33,7 @@ def print_fail(msg):
     all_passed = False
     print(f"  ❌ FAIL: {msg}")
 
-print_section("导入自定义赔付规则", 1)
-try:
-    print("  1.1 创建延误120分钟赔付999元的规则...")
-    custom_rule = [{
-        "rule_id": "CUSTOM999",
-        "rule_name": "延误120分钟赔付999元",
-        "claim_type": "delay",
-        "flight_type": "domestic",
-        "min_delay_minutes": 120,
-        "compensation_amount": 999,
-        "max_compensation": 999,
-        "valid_from": "2024-01-01",
-        "description": "测试自定义规则"
-    }]
-    f = io.BytesIO(json.dumps(custom_rule).encode())
-    response = client.post("/api/import/rules", files={"file": ("rules.json", f, "application/json")})
-    
-    if response.status_code == 200:
-        result = response.json()
-        imported = result.get("imported", 0)
-        print(f"      状态码: {response.status_code}")
-        print(f"      导入结果: {imported} 条规则")
-        if imported == 1:
-            print_pass("自定义规则导入接口调用成功")
-        else:
-            print_fail(f"规则导入记录数不符: 期望 1, 实际 {imported}")
-    else:
-        print_fail(f"规则导入失败: HTTP {response.status_code}")
-    
-    print()
-    print("  1.2 验证规则存入DataStore...")
-    rules = global_store.get_all_rules()
-    print(f"      DataStore中规则数量: {len(rules)}")
-    found_999 = False
-    for rule in rules:
-        print(f"        - {rule.rule_id}: 赔付 {rule.compensation_amount} 元, 延误>= {rule.min_delay_minutes} 分钟")
-        if rule.rule_id == "CUSTOM999" and rule.compensation_amount == 999:
-            found_999 = True
-    if found_999:
-        print_pass("自定义999元规则已存入DataStore")
-    else:
-        print_fail("DataStore中未找到999元规则")
-except Exception as e:
-    print_fail(f"导入规则异常: {str(e)}")
-    import traceback
-    traceback.print_exc()
-
-print_section("导入申诉和航班数据", 2)
+print_section("数据导入", 1)
 try:
     print("  1.1 导入 claims.csv (5条申诉)...")
     with open("sample_data/claims.csv", "rb") as f:

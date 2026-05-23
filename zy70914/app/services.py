@@ -3,6 +3,7 @@ from datetime import datetime, date
 import uuid
 import pandas as pd
 import json
+import csv
 from io import StringIO
 from app.models import (
     ClaimRecord, FlightInfo, PhotoIndex, CompensationRule,
@@ -271,8 +272,9 @@ class DataImporter:
 
 
 class ComparisonEngine:
-    def __init__(self, store: DataStore):
+    def __init__(self, store: DataStore, explainer: 'ExplanationGenerator' = None):
         self.store = store
+        self.explainer = explainer or ExplanationGenerator()
 
     def compare_all(self):
         results = []
@@ -287,6 +289,7 @@ class ComparisonEngine:
         matched_flight = None
         matched_photos = []
         suggested_amount = 0.0
+        applicable_rules = []
 
         matched_flight = self.store.get_flight(claim.flight_no, claim.flight_date)
         if not matched_flight:
@@ -343,10 +346,14 @@ class ComparisonEngine:
 
         if matched_flight:
             delay_minutes = matched_flight.delay_minutes
-            if delay_minutes >= 240:
-                suggested_amount = 400.0
-            elif delay_minutes >= 120:
-                suggested_amount = 200.0
+            for rule in self.store.get_all_rules():
+                if rule.claim_type == claim.claim_type and delay_minutes >= rule.min_delay_minutes:
+                    if rule.max_delay_minutes is None or delay_minutes <= rule.max_delay_minutes:
+                        applicable_rules.append(rule)
+
+            if applicable_rules:
+                applicable_rules.sort(key=lambda r: r.min_delay_minutes, reverse=True)
+                suggested_amount = applicable_rules[0].compensation_amount
             else:
                 suggested_amount = 0.0
 
@@ -367,7 +374,7 @@ class ComparisonEngine:
                     field='claim_amount',
                     expected=0,
                     actual=claim.claim_amount,
-                    description=f'延误时间不足120分钟，不符合赔付条件',
+                    description=f'延误时间不足，不符合赔付条件',
                     suggestion='该申诉不符合延误赔付条件，建议拒绝'
                 ))
 
@@ -399,8 +406,10 @@ class ComparisonEngine:
             final_amount=final_amount,
             discrepancies=discrepancies,
             matched_flight=matched_flight,
-            matched_photos=matched_photos
+            matched_photos=matched_photos,
+            applicable_rules=applicable_rules
         )
+        result.explanation = self.explainer.generate_explanation(result)
         return result
 
 
@@ -475,18 +484,13 @@ class ExplanationGenerator:
         lines.append("")
 
         lines.append("【赔付规则】")
-        if result.matched_flight:
+        if result.applicable_rules:
+            for rule in result.applicable_rules:
+                lines.append(f"  - {rule.rule_name}: {rule.description}")
+                lines.append(f"    延误 >= {rule.min_delay_minutes} 分钟: 赔付 {rule.compensation_amount} 元")
+        elif result.matched_flight:
             delay = result.matched_flight.delay_minutes
-            lines.append(f"  - 延误时间 >= 240 分钟: 赔付 400 元")
-            lines.append(f"  - 延误时间 >= 120 分钟: 赔付 200 元")
-            lines.append(f"  - 延误时间 < 120 分钟: 不予赔付")
-            lines.append(f"")
-            if delay >= 240:
-                lines.append(f"  本次延误 {delay} 分钟，适用规则: 赔付 400 元")
-            elif delay >= 120:
-                lines.append(f"  本次延误 {delay} 分钟，适用规则: 赔付 200 元")
-            else:
-                lines.append(f"  本次延误 {delay} 分钟，不符合赔付条件")
+            lines.append(f"  本次延误 {delay} 分钟，无匹配的赔付规则")
 
         lines.append("")
         lines.append("=" * 60)
@@ -626,11 +630,157 @@ class ReportGenerator:
         return summary
 
     def export_to_csv(self, output_path: str):
-        return {"success": True}
+        results = self.store.get_all_comparison_results()
+        rows = []
+        for result in results:
+            claim = self.store.get_claim(result.claim_id)
+            passenger_name = claim.passenger_name if claim else ''
+            final_status = result.final_status.value if result.final_status else result.auto_status.value
+            rows.append({
+                'claim_id': result.claim_id,
+                'passenger_name': passenger_name,
+                'flight_no': result.flight_no,
+                'flight_date': str(result.flight_date),
+                'claimed_amount': result.claimed_amount,
+                'suggested_amount': result.suggested_amount,
+                'final_amount': result.final_amount,
+                'auto_status': result.auto_status.value,
+                'final_status': final_status,
+                'discrepancy_count': len(result.discrepancies),
+                'explanation': result.explanation
+            })
+        
+        with open(output_path, 'w', newline='', encoding='utf-8-sig') as f:
+            if rows:
+                writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+        
+        return {"success": True, "count": len(rows), "path": output_path}
 
     def export_to_excel(self, output_path: str):
-        return {"success": True}
+        results = self.store.get_all_comparison_results()
+        rows = []
+        for result in results:
+            claim = self.store.get_claim(result.claim_id)
+            passenger_name = claim.passenger_name if claim else ''
+            final_status = result.final_status.value if result.final_status else result.auto_status.value
+            rows.append({
+                'claim_id': result.claim_id,
+                'passenger_name': passenger_name,
+                'flight_no': result.flight_no,
+                'flight_date': str(result.flight_date),
+                'claimed_amount': result.claimed_amount,
+                'suggested_amount': result.suggested_amount,
+                'final_amount': result.final_amount,
+                'auto_status': result.auto_status.value,
+                'final_status': final_status,
+                'discrepancy_count': len(result.discrepancies),
+                'explanation': result.explanation
+            })
+        
+        df = pd.DataFrame(rows)
+        df.to_excel(output_path, index=False, engine='openpyxl')
+        
+        return {"success": True, "count": len(rows), "path": output_path}
 
     def generate_json_report(self):
         return {}
+        return {"success": True, "count": len(rows), "path": output_path}
+
+    def generate_json_report(self):
+        return {}
+
+    def generate_json_report(self):
+        return {}
+            "claim": claim.model_dump(),
+            "comparison_result": result.model_dump() if result else None
+        }
+
+    def generate_summary(self):
+        summary = ReconciliationSummary(batch_id=self.store.batch_id)
+        
+        for result in self.store.comparison_results.values():
+            summary.total_claims += 1
+            summary.total_claimed_amount += result.claimed_amount
+            summary.total_suggested_amount += result.suggested_amount
+            summary.total_approved_amount += result.final_amount
+
+            status = result.review_record.status if result.review_record else result.auto_status
+
+            if status == ReviewStatus.APPROVED:
+                summary.approved_count += 1
+            elif status == ReviewStatus.REJECTED:
+                summary.rejected_count += 1
+            elif status == ReviewStatus.NEED_MORE_INFO:
+                summary.need_more_info_count += 1
+            else:
+                summary.pending_count += 1
+
+            for disc in result.discrepancies:
+                key = disc.type.value
+                summary.discrepancy_breakdown[key] = summary.discrepancy_breakdown.get(key, 0) + 1
+
+        return summary
+
+    def export_to_csv(self, output_path: str):
+        results = self.store.get_all_comparison_results()
+        rows = []
+        for result in results:
+            claim = self.store.get_claim(result.claim_id)
+            passenger_name = claim.passenger_name if claim else ''
+            final_status = result.final_status.value if result.final_status else result.auto_status.value
+            rows.append({
+                'claim_id': result.claim_id,
+                'passenger_name': passenger_name,
+                'flight_no': result.flight_no,
+                'flight_date': str(result.flight_date),
+                'claimed_amount': result.claimed_amount,
+                'suggested_amount': result.suggested_amount,
+                'final_amount': result.final_amount,
+                'auto_status': result.auto_status.value,
+                'final_status': final_status,
+                'discrepancy_count': len(result.discrepancies),
+                'explanation': result.explanation
+            })
+        
+        with open(output_path, 'w', newline='', encoding='utf-8-sig') as f:
+            if rows:
+                writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+        
+        return {"success": True, "count": len(rows), "path": output_path}
+
+    def export_to_excel(self, output_path: str):
+        results = self.store.get_all_comparison_results()
+        rows = []
+        for result in results:
+            claim = self.store.get_claim(result.claim_id)
+            passenger_name = claim.passenger_name if claim else ''
+            final_status = result.final_status.value if result.final_status else result.auto_status.value
+            rows.append({
+                'claim_id': result.claim_id,
+                'passenger_name': passenger_name,
+                'flight_no': result.flight_no,
+                'flight_date': str(result.flight_date),
+                'claimed_amount': result.claimed_amount,
+                'suggested_amount': result.suggested_amount,
+                'final_amount': result.final_amount,
+                'auto_status': result.auto_status.value,
+                'final_status': final_status,
+                'discrepancy_count': len(result.discrepancies),
+                'explanation': result.explanation
+            })
+        
+        df = pd.DataFrame(rows)
+        df.to_excel(output_path, index=False, engine='openpyxl')
+        
+        return {"success": True, "count": len(rows), "path": output_path}
+
+    def generate_json_report(self):
+        return {}
+        return {"success": True, "count": len(rows), "path": output_path}
+
+    def generate_json_report(self):
         return {}
