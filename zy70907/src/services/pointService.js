@@ -18,15 +18,31 @@ class PointService {
     });
   }
 
-  static async createPointDetail(batchId, rawMaterialId, data) {
+  static async createPointDetail(batchId, rawMaterialId, data, isIntraBatchDuplicate = false) {
     const detailId = uuidv4();
     const validation = ValidationService.validatePointData(data);
-    const isDuplicate = data.transaction_no ? await ValidationService.checkDuplicateTransaction(data.transaction_no, batchId) : false;
+    
+    let isDuplicate = false;
+    let duplicateReason = "";
+    
+    if (data.transaction_no) {
+      const crossBatchDuplicate = await ValidationService.checkDuplicateTransaction(data.transaction_no, batchId);
+      if (crossBatchDuplicate) {
+        isDuplicate = true;
+        duplicateReason = "交易编号与其他批次重复";
+      } else if (isIntraBatchDuplicate) {
+        isDuplicate = true;
+        duplicateReason = "交易编号在本批次内重复";
+      }
+    }
+    
     if (isDuplicate) {
       validation.status = "blocked";
-      validation.reasons.push("交易编号重复");
+      validation.reasons.push(duplicateReason);
       validation.nextAction = "resolve_duplicate";
+      validation.hasError = true;
     }
+    
     return new Promise((resolve, reject) => {
       db.run(
         "INSERT INTO point_details (id, batch_id, raw_material_id, member_phone, member_name, member_card_no, transaction_no, transaction_time, transaction_amount, points, product_name, product_category, sales_staff, status, status_reason, next_action) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -37,6 +53,26 @@ class PointService {
         }
       );
     });
+  }
+
+  static detectIntraBatchDuplicates(dataList) {
+    const transactionNos = new Set();
+    const duplicates = new Set();
+    
+    for (let i = 0; i < dataList.length; i++) {
+      const data = dataList[i];
+      if (data.transaction_no && String(data.transaction_no).trim() !== "") {
+        const txNo = String(data.transaction_no).trim();
+        if (transactionNos.has(txNo)) {
+          duplicates.add(i);
+          
+        } else {
+          transactionNos.add(txNo);
+        }
+      }
+    }
+    
+    return duplicates;
   }
 
   static async addTrace(detailId, batchId, action, operator, oldStatus, newStatus, reason, remark = "") {
@@ -55,14 +91,22 @@ class PointService {
 
   static async processBatchData(batchId, dataList, fileName = "") {
     const results = { total: dataList.length, normal: 0, pending: 0, blocked: 0, details: [] };
+    
+    const intraBatchDuplicateIndices = this.detectIntraBatchDuplicates(dataList);
+    
     for (let i = 0; i < dataList.length; i++) {
       const rawData = dataList[i];
+      const isIntraBatchDuplicate = intraBatchDuplicateIndices.has(i);
+      
       const rawMaterial = await this.createRawMaterial(batchId, i + 1, rawData, fileName);
-      const detail = await this.createPointDetail(batchId, rawMaterial.id, rawData);
+      const detail = await this.createPointDetail(batchId, rawMaterial.id, rawData, isIntraBatchDuplicate);
+      
       await this.addTrace(detail.id, batchId, "import_data", "system", null, detail.status, detail.reasons.join("; "), "原始行号: " + (i + 1));
+      
       results[detail.status]++;
       results.details.push({ line_number: i + 1, detail_id: detail.id, status: detail.status, reasons: detail.reasons });
     }
+    
     await BatchService.updateBatchStats(batchId);
     await BatchService.updateBatchStatus(batchId, "processed");
     return results;
