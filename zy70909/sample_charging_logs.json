@@ -1,0 +1,72 @@
+[
+{
+  "log_id": "LOG20240515001",
+  "pile_number": "A01-B03",
+  "start_time": "2024-05-15 08:30:00",
+  "end_time": "2024-05-15 09:15:00",
+  "start_soc": 20,
+  "end_soc": 85,
+  "charged_kwh": 32.5,
+  "voltage": 380,
+  "current": 120,
+  "power": 45.6,
+  "status": "completed",
+  "error_code": null
+},
+{
+  "log_id": "LOG20240515002",
+  "pile_number": "A02-C01",
+  "start_time": "2024-05-15 10:00:00",
+  "end_time": "2024-05-15 10:05:00",
+  "start_soc": 45,
+  "end_soc": 45,
+  "charged_kwh": 0,
+  "voltage": 0,
+  "current": 0,
+  "power": 0,
+  "status": "failed",
+  "error_code": "E001"
+},
+{
+  "log_id": "LOG20240515003",
+  "pile_number": "A05-B12",
+  "start_time": "2024-05-15 11:20:00",
+  "end_time": "2024-05-15 12:00:00",
+  "start_soc": 30,
+  "end_soc": 75,
+  "charged_kwh": 25.0,
+  "voltage": 385,
+  "current": 100,
+  "power": 38.5,
+  "status": "completed",
+  "error_code": null
+},
+{
+  "log_id": "LOG20240515004",
+  "pile_number": "A03-D02",
+  "start_time": "2024-05-15 13:00:00",
+  "end_time": "2024-05-15 13:30:00",
+  "start_soc": 50,
+  "end_soc": 78,
+  "charged_kwh": 18.5,
+  "voltage": 375,
+  "current": 95,
+  "power": 35.6,
+  "status": "completed",
+  "error_code": null
+},
+{
+  "log_id": "LOG20240515005",
+  "pile_number": "B01-A01",
+  "start_time": "2024-05-15 14:00:00",
+  "end_time": "2024-05-15 14:45:00",
+  "start_soc": 15,
+  "end_soc": 90,
+  "charged_kwh": 40.2,
+  "voltage": 390,
+  "current": 130,
+  "power": 50.7,
+  "status": "completed",
+  "error_code": null
+}
+]

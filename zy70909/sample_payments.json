@@ -1,0 +1,79 @@
+[
+{
+  "receipt_id": "PAY202405150001",
+  "order_id": "ORD202405150001",
+  "transaction_id": "WX202405150830001",
+  "amount": 48.75,
+  "payment_time": "2024-05-15 09:15:00",
+  "payment_method": "微信支付",
+  "status": "success",
+  "type": "payment",
+  "source": "小桔充电"
+},
+{
+  "receipt_id": "PAY202405150002",
+  "order_id": "ORD202405150002",
+  "transaction_id": "ALIPAY202405151000002",
+  "amount": 25.00,
+  "payment_time": "2024-05-15 10:00:00",
+  "payment_method": "支付宝",
+  "status": "success",
+  "type": "payment",
+  "source": "特来电"
+},
+{
+  "receipt_id": "PAY202405150003",
+  "order_id": "ORD202405150003",
+  "transaction_id": "UNION202405151200003",
+  "amount": 999.00,
+  "payment_time": "2024-05-15 12:00:00",
+  "payment_method": "银联",
+  "status": "success",
+  "type": "payment",
+  "source": "星星充电"
+},
+{
+  "receipt_id": "PAY202405150004",
+  "order_id": "ORD202405150004",
+  "transaction_id": "WX202405151300004",
+  "amount": 27.75,
+  "payment_time": "2024-05-15 13:00:00",
+  "payment_method": "微信支付",
+  "status": "success",
+  "type": "payment",
+  "source": "小桔充电"
+},
+{
+  "receipt_id": "REF202405150004_1",
+  "order_id": "ORD202405150004",
+  "transaction_id": "WXREF202405151330004",
+  "amount": 27.75,
+  "payment_time": "2024-05-15 13:30:00",
+  "payment_method": "微信支付",
+  "status": "success",
+  "type": "refund",
+  "source": "小桔充电"
+},
+{
+  "receipt_id": "REF202405150004_2",
+  "order_id": "ORD202405150004",
+  "transaction_id": "WXREF202405151400005",
+  "amount": 27.75,
+  "payment_time": "2024-05-15 14:00:00",
+  "payment_method": "微信支付",
+  "status": "success",
+  "type": "refund",
+  "source": "小桔充电"
+},
+{
+  "receipt_id": "PAY202405150005",
+  "order_id": "ORD202405150005",
+  "transaction_id": "WX202405151445006",
+  "amount": 60.30,
+  "payment_time": "2024-05-15 14:45:00",
+  "payment_method": "微信支付",
+  "status": "success",
+  "type": "payment",
+  "source": "小桔充电"
+}
+]
