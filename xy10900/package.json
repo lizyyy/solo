@@ -1,0 +1,16 @@
+{
+  "name": "cold-chain-sign-api",
+  "version": "1.0.0",
+  "description": "冷链温控签收 API 服务",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "json2csv": "^6.0.0-alpha.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1"
+  }
+}
