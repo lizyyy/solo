@@ -65,6 +65,10 @@ class DataStore {
     return this.receipts.get(id);
   }
 
+  getReceiptByReceiptNo(receiptNo) {
+    return Array.from(this.receipts.values()).find(r => r.receiptNo === receiptNo);
+  }
+
   getAllReceipts() {
     return Array.from(this.receipts.values());
   }

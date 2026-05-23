@@ -21,7 +21,8 @@ class ImportService {
             points: parseInt(row.points) || 0,
             transactionDate: row.transactionDate || row.transaction_date,
             cashier: row.cashier,
-            remark: row.remark
+            remark: row.remark,
+            parentReceiptNo: row.parentReceiptNo || row.parent_receipt_no || null
           });
           receipts.push(receipt);
           store.addReceipt(receipt);

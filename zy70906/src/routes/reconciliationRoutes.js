@@ -12,6 +12,7 @@ const routes = (app) => {
   router.post('/import/members', upload.single('file'), reconController.importMembers);
   router.post('/run', reconController.runReconciliation);
   router.get('/list', reconController.getReconciliations);
+  router.get('/report/download', reconController.downloadReport);
   router.get('/report', reconController.getReport);
   router.get('/summary', reconController.getSummary);
   router.get('/:id', reconController.getReconciliation);

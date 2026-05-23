@@ -107,6 +107,17 @@ class ReconciliationController {
     }
   }
 
+  async downloadReport(req, res) {
+    try {
+      const csv = await reportService.generateCSVReport();
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=reconciliation-report.csv');
+      res.send(csv);
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  }
+
   getSummary(req, res) {
     try {
       const recons = store.getAllReconciliations();

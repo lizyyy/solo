@@ -22,7 +22,7 @@ class DiscrepancyDetector {
     }
     
     if (receipt.isReturn()) {
-      const original = store.getReceipt(receipt.parentReceiptNo);
+      const original = store.getReceiptByReceiptNo(receipt.parentReceiptNo);
       if (!original) {
         recon.addDiscrepancy(
           DISCREPANCY_TYPES.RETURN_WITHOUT_ORIGINAL,

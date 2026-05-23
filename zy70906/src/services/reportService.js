@@ -11,6 +11,14 @@ class ReportService {
     };
   }
 
+  async generateCSVReport() {
+    const { Parser } = require('json2csv');
+    const report = await this.generateReconciliationReport();
+    const fields = ['receiptNo', 'memberNo', 'expectedPoints', 'actualPoints', 'pointsDiff', 'status', 'discrepancyTypes', 'reviewer', 'reviewRemark'];
+    const parser = new Parser({ fields });
+    return parser.parse(report.details);
+  }
+
   calculateSummary(recons) {
     const summary = {
       totalRecords: 0,
