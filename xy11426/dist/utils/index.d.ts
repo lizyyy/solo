@@ -1,0 +1,17 @@
+import dayjs from 'dayjs';
+export declare function generateId(): string;
+export declare function now(): string;
+export declare function formatDate(date: Date | string): string;
+export declare function parseDate(dateStr: string): dayjs.Dayjs;
+export declare function isSameDay(date1: string, date2: string): boolean;
+export declare function isAfter(date1: string, date2: string): boolean;
+export declare function isBefore(date1: string, date2: string): boolean;
+export declare function addDays(date: string, days: number): string;
+export declare function fileHash(filePath: string): string;
+export declare function stringHash(str: string): string;
+export declare function validatePhone(phone: string): boolean;
+export declare function validateIdCard(idCard: string): boolean;
+export declare function validatePlateNumber(plate: string): boolean;
+export declare function truncateString(str: string, maxLength: number): string;
+export declare function safeJsonParse<T = any>(str: string, defaultValue?: T | null): T | null;
+export declare function safeJsonStringify(obj: any): string;

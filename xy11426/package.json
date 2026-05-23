@@ -1,0 +1,42 @@
+{
+  "name": "park-visitor-inspect-cli",
+  "version": "1.0.0",
+  "description": "园区访客通行多源导入巡检工具",
+  "main": "dist/index.js",
+  "bin": {
+    "park-inspect": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts"
+  },
+  "keywords": [
+    "visitor",
+    "park",
+    "inspection",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "better-sqlite3": "^11.7.0",
+    "csv-parser": "^3.0.0",
+    "xlsx": "^0.18.5",
+    "dayjs": "^1.11.10",
+    "uuid": "^9.0.1",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "progress": "^2.0.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "@types/node": "^20.10.6",
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/uuid": "^9.0.7",
+    "@types/progress": "^2.0.7"
+  }
+}
