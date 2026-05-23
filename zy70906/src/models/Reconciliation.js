@@ -15,7 +15,7 @@ const DISCREPANCY_TYPES = {
   MANUAL_RECORD: "manual_record",
   MEMBER_LEVEL_MISMATCH: "member_level_mismatch",
   PROMOTION_MISMATCH: "promotion_mismatch",
-  ASSOUNT_MISMATCH: "amount_mismatch"
+  AMOUNT_MISMATCH: "amount_mismatch"
 };
 
 class Reconciliation {

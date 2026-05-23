@@ -51,7 +51,12 @@ class DataStore {
   addReceipt(receiptData) {
     const receipt = new Receipt(receiptData);
     this.receipts.set(receipt.id, receipt);
-    const recon = new Reconciliation({ receipt });
+    const recon = new Reconciliation({
+      receiptId: receipt.id,
+      receiptNo: receipt.receiptNo || receipt.id,
+      memberNo: receipt.memberNo,
+      actualPoints: receipt.points || 0
+    });
     this.reconciliations.set(recon.id, recon);
     return receipt;
   }
