@@ -1,0 +1,27 @@
+{
+  "name": "nursing-home-visit-api",
+  "version": "1.0.0",
+  "description": "养老院探访预约API服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "init-db": "node src/scripts/initDB.js",
+    "seed-data": "node src/scripts/seedData.js",
+    "test": "node src/scripts/testAPI.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4",
+    "json2csv": "^5.0.7",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["nursing-home", "visit", "appointment", "api"],
+  "author": "",
+  "license": "MIT"
+}
