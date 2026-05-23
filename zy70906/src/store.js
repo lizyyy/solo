@@ -25,8 +25,8 @@ class DataStore {
     });
 
     const samplePromotions = [
-      { name: "New Year Promotion", description: "2x points for New Year", pointsMultiplier: 2, startDate: "2024-12-25", endDate: "2025-01-05", storeIds: [], minAmount: 0, maxPoints: 2000 },
-      { name: "Gold Member Bonus", description: "Extra bonus for gold members", pointsMultiplier: 1.5, startDate: "2024-01-01", endDate: "2025-12-31", storeIds: [], minAmount: 100, maxPoints: null }
+      { name: "New Year Promotion", description: "2x points for New Year", pointsMultiplier: 2, startDate: "2024-12-25", endDate: "2025-01-05", storeIds: [], memberLevels: [], minAmount: 0, maxPoints: 2000 },
+      { name: "Gold Member Bonus", description: "Extra bonus for gold members", pointsMultiplier: 1.5, startDate: "2024-01-01", endDate: "2025-12-31", storeIds: [], memberLevels: ["GOLD", "PLATINUM"], minAmount: 100, maxPoints: null }
     ];
     samplePromotions.forEach(p => {
       const promotion = new Promotion(p);

@@ -9,6 +9,7 @@ class Promotion {
     this.startDate = data.startDate;
     this.endDate = data.endDate;
     this.storeIds = data.storeIds || [];
+    this.memberLevels = data.memberLevels || [];
     this.minAmount = parseFloat(data.minAmount) || 0;
     this.maxPoints = parseInt(data.maxPoints) || null;
     this.excludedCategories = data.excludedCategories || [];
@@ -17,13 +18,14 @@ class Promotion {
     this.updatedAt = data.updatedAt || new Date().toISOString();
   }
 
-  isApplicable(transactionDate, storeId, amount) {
+  isApplicable(transactionDate, storeId, amount, memberLevel) {
     if (!this.isActive) return false;
     const txDate = new Date(transactionDate);
     const start = new Date(this.startDate);
     const end = new Date(this.endDate);
     if (txDate < start || txDate > end) return false;
     if (this.storeIds.length > 0 && !this.storeIds.includes(storeId)) return false;
+    if (this.memberLevels.length > 0 && !this.memberLevels.includes(memberLevel)) return false;
     if (this.minAmount > 0 && amount < this.minAmount) return false;
     return true;
   }
@@ -45,6 +47,7 @@ class Promotion {
       startDate: this.startDate,
       endDate: this.endDate,
       storeIds: this.storeIds,
+      memberLevels: this.memberLevels,
       minAmount: this.minAmount,
       maxPoints: this.maxPoints,
       excludedCategories: this.excludedCategories,

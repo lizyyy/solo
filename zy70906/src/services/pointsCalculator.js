@@ -8,7 +8,6 @@ class PointsCalculator {
 
     const basePoints = Math.floor(receipt.amount);
     const memberMultiplier = member.getPointsMultiplier();
-    let finalPoints = basePoints * memberMultiplier;
     const details = {
       baseAmount: receipt.amount,
       basePoints: basePoints,
@@ -18,23 +17,26 @@ class PointsCalculator {
 
     const promotions = store.getAllPromotions();
     let appliedPromotions = [];
+    let maxPromoMultiplier = 1;
     
     for (const promo of promotions) {
-      if (promo.isApplicable(receipt.transactionDate, receipt.storeId, receipt.amount)) {
-        finalPoints *= promo.pointsMultiplier;
-        appliedPromotions.push({
-          id: promo.id,
-          name: promo.name,
-          multiplier: promo.pointsMultiplier,
-          points: finalPoints
-        });
+      if (promo.isApplicable(receipt.transactionDate, receipt.storeId, receipt.amount, member.level)) {
+        if (promo.pointsMultiplier > maxPromoMultiplier) {
+          maxPromoMultiplier = promo.pointsMultiplier;
+          appliedPromotions = [{
+            id: promo.id,
+            name: promo.name,
+            multiplier: promo.pointsMultiplier
+          }];
+        }
       }
     }
+    const finalPoints = Math.floor(basePoints * memberMultiplier * maxPromoMultiplier);
 
     details.appliedPromotions = appliedPromotions;
-    details.finalPoints = Math.floor(finalPoints);
+    details.finalPoints = finalPoints;
 
-    return { points: Math.floor(finalPoints), details };
+    return { points: finalPoints, details };
   }
 
   calculatePointsForReceipt(receipt) {
@@ -47,7 +49,6 @@ class PointsCalculator {
     const recons = store.getAllReconciliations();
     
     for (const recon of recons) {
-      if (recon.status === 'approved' || recon.status === 'rejected') continue;
       const receipt = store.getReceipt(recon.receiptId);
       const member = store.getMember(recon.memberNo);
       if (receipt) {

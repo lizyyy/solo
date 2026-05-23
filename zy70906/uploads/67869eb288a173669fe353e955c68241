@@ -1,0 +1,8 @@
+receiptNo,storeId,storeName,memberNo,type,amount,points,transactionDate,cashier,remark
+R001,S001,Downtown Store,M001,purchase,500.00,750,2024-12-25T10:00:00,Alice,Christmas purchase
+R002,S001,Downtown Store,M002,purchase,150.00,150,2024-12-26T11:00:00,Bob,Regular purchase
+R003,S002,Mall Store,M003,purchase,1000.00,2000,2024-12-27T09:00:00,Carol,Luxury items
+R004,S001,Downtown Store,M004,purchase,80.00,80,2024-12-28T14:00:00,David,Small purchase
+R005,S001,Downtown Store,M001,return,-200.00,-300,2024-12-29T16:00:00,Alice,Return item - wrong size
+R006,S002,Mall Store,M002,manual_add,0,500,2024-12-30T12:00:00,Manager,Manual points adjustment - birthday bonus
+R007,S001,Downtown Store,M003,purchase,300.00,450,2024-12-31T15:00:00,Bob,New year purchase
