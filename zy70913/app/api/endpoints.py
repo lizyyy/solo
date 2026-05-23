@@ -6,6 +6,7 @@ from app.models import Batch, Grievance, BatchStatus, GrievanceStatus, Processin
 from app.schemas import Batch as BatchSchema, Grievance as GrievanceSchema, UploadResponse, BatchResultResponse, ProcessingHistory as ProcessingHistorySchema
 from app.services.import_service import ImportService
 from app.services.rules_engine import RulesEngine
+import json
 
 router = APIRouter()
 
@@ -16,6 +17,44 @@ async def upload_files(
     photo_json: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db)
 ):
+    def get_failure_reason_and_suggestion(grievance):
+        failure_reasons = []
+        suggestions = []
+        
+        if not grievance.is_responsible:
+            failure_reasons.append("非责任航段")
+            suggestions.append("建议转至对应责任航司处理")
+        if grievance.photo_count < 2:
+            failure_reasons.append("照片不足")
+            suggestions.append("建议补充至少2张照片证据（登机牌、现场照片等）")
+        if grievance.final_amount != grievance.apply_amount and grievance.apply_amount > grievance.final_amount:
+            failure_reasons.append("金额超限")
+            suggestions.append("建议调整金额至上限以内，或提交特殊审批")
+        if grievance.is_overdue:
+            failure_reasons.append("超时申报")
+            suggestions.append("建议驳回或走特殊审批流程")
+        
+        return "; ".join(failure_reasons), "; ".join(suggestions)
+
+    def build_item_dict(grievance):
+        original_data = {}
+        if grievance.original_data:
+            try:
+                original_data = json.loads(grievance.original_data)
+            except:
+                pass
+        failure_reason, suggestion = get_failure_reason_and_suggestion(grievance)
+        return {
+            "grievance_no": grievance.grievance_no,
+            "passenger_name": grievance.passenger_name,
+            "flight_no": grievance.flight_no,
+            "incident_type": grievance.incident_type,
+            "apply_amount": grievance.apply_amount,
+            "original_data": original_data,
+            "failure_reason": failure_reason,
+            "suggestion": suggestion
+        }
+
     try:
         grievance_content = await grievance_csv.read()
         grievance_text = grievance_content.decode("utf-8")
@@ -41,15 +80,27 @@ async def upload_files(
         created = ImportService.create_grievance_records(db, batch, grievance_list, flight_map, photo_map)
         engine = RulesEngine(db=db)
         engine.evaluate_batch(created)
-        success = sum(1 for g in created if g.status == GrievanceStatus.APPROVED)
+        
+        normal_items = [g for g in created if g.status == GrievanceStatus.APPROVED]
+        pending_items = [build_item_dict(g) for g in created if g.status == GrievanceStatus.PENDING]
+        failed_items = [build_item_dict(g) for g in created if g.status == GrievanceStatus.REJECTED]
+        
         batch.status = BatchStatus.COMPLETED
-        batch.success_count = success
-        batch.fail_count = len(created) - success
+        batch.success_count = len(normal_items)
+        batch.fail_count = len(failed_items)
+        batch.pending_count = len(pending_items)
         db.commit()
         return UploadResponse(
             success=True, batch_no=batch.batch_no,
             message=f"Processed {len(created)}",
-            total_count=len(created), file_hash=batch.file_hash
+            total_count=len(created),
+            normal_count=len(normal_items),
+            pending_count=len(pending_items),
+            rejected_count=len(failed_items),
+            normal_items=normal_items,
+            pending_items=pending_items,
+            failed_items=failed_items,
+            file_hash=batch.file_hash
         )
     except ValueError as e:
         db.rollback()

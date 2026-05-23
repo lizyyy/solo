@@ -173,6 +173,12 @@ class UploadResponse(BaseModel):
     batch_no: str
     message: str
     total_count: int = 0
+    normal_count: int = 0
+    pending_count: int = 0
+    rejected_count: int = 0
+    normal_items: List["Grievance"] = []
+    pending_items: List[Dict[str, Any]] = []
+    failed_items: List[Dict[str, Any]] = []
     file_hash: Optional[str] = None
 
 
