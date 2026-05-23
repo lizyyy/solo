@@ -1,0 +1,25 @@
+{
+  "name": "rental-deposit-api",
+  "version": "1.0.0",
+  "description": "摄影器材租赁设备押金 API 服务",
+  "main": "src/app.js",
+  "scripts": {
+    "setup": "npm install && npm run init-data",
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "test": "node test/self-test.js",
+    "verify": "node test/self-test.js",
+    "init-data": "node scripts/init-sample-data.js",
+    "demo": "node scripts/init-sample-data.js && node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "body-parser": "^1.20.2",
+    "moment": "^2.29.4"
+  },
+  "keywords": ["rental", "deposit", "api"],
+  "author": "",
+  "license": "ISC"
+}
