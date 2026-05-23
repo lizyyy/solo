@@ -1,0 +1,24 @@
+{
+  "name": "homestay-cleaning-inspector",
+  "version": "1.0.0",
+  "description": "民宿保洁排班多源导入巡检 CLI 工具",
+  "main": "src/cli.js",
+  "bin": {
+    "hci": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/",
+    "demo": "node demo/run-demo.js"
+  },
+  "keywords": ["homestay", "cleaning", "inspection", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "uuid": "^9.0.1"
+  }
+}
