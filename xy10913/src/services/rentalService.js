@@ -119,7 +119,19 @@ async function reportDamage(rentalId, damageType, description, deductionAmount, 
     reported_by: reportedBy
   });
 
-  return { success: true, damageId };
+  const newRemaining = Math.max(0, rental.remaining_deposit - deductionAmount);
+  await Rental.updateRemainingDeposit(rentalId, newRemaining);
+
+  await DepositTransaction.create({
+    rental_id: rentalId,
+    transaction_type: 'damage_deduction',
+    amount: deductionAmount,
+    request_id: 'damage_' + damageId,
+    operator: reportedBy,
+    remark: `损坏扣款: ${damageType} - ${description}`
+  });
+
+  return { success: true, damageId, newRemaining };
 }
 
 async function settleRental(rentalId, actualEndDate, generatedBy) {

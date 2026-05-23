@@ -168,6 +168,7 @@ async function runTests() {
     logTest('创建设备', false, e.message);
   }
 
+  let initialDeposit = 0;
   try {
     const startDate = moment().format('YYYY-MM-DD HH:mm:ss');
     const endDate = moment().add(3, 'days').format('YYYY-MM-DD HH:mm:ss');
@@ -181,14 +182,16 @@ async function runTests() {
       created_by: 'admin'
     });
     rentalId = rentalRes.data && rentalRes.data.data && rentalRes.data.data.id;
+    initialDeposit = rentalRes.data.data.total_deposit || 2000;
     logTest('创建租赁单', rentalRes.statusCode === 201 && rentalId);
   } catch (e) {
     logTest('创建租赁单', false, e.message);
   }
 
+  const freezeReqId = 'REQ_FREEZE_001_' + Date.now();
   try {
     const freezeRes = await request('POST', `/api/rentals/${rentalId}/freeze-deposit`, {
-      request_id: 'REQ_FREEZE_001_' + Date.now(),
+      request_id: freezeReqId,
       operator: 'admin'
     });
     logTest('押金冻结', freezeRes.statusCode === 200 && freezeRes.data && freezeRes.data.success);
@@ -208,6 +211,7 @@ async function runTests() {
     logTest('续租申请', false, e.message);
   }
 
+  let remainingAfterDamage = 0;
   try {
     const damageRes = await request('POST', `/api/rentals/${rentalId}/damage`, {
       damage_type: '划痕',
@@ -215,9 +219,21 @@ async function runTests() {
       deduction_amount: 200,
       reported_by: 'staff'
     });
-    logTest('损坏上报', damageRes.statusCode === 200 && damageRes.data && damageRes.data.success);
+    remainingAfterDamage = damageRes.data && damageRes.data.data && damageRes.data.data.newRemaining;
+    logTest('损坏上报扣款', damageRes.statusCode === 200 && damageRes.data && damageRes.data.success);
   } catch (e) {
-    logTest('损坏上报', false, e.message);
+    logTest('损坏上报扣款', false, e.message);
+  }
+
+  try {
+    const detailsRes = await request('GET', `/api/rentals/${rentalId}`);
+    const transactions = detailsRes.data && detailsRes.data.data && detailsRes.data.data.transactions || [];
+    const hasDamageTx = transactions.some(t => t.transaction_type === 'damage_deduction');
+    const remainingDeposit = detailsRes.data.data.rental.remaining_deposit;
+    logTest('损坏扣款已更新押金余额', remainingDeposit < initialDeposit);
+    logTest('损坏扣款已生成押金流水', hasDamageTx);
+  } catch (e) {
+    logTest('损坏扣款验证', false, e.message);
   }
 
   try {
@@ -233,14 +249,32 @@ async function runTests() {
 
   console.log('\n--- 4. 重复请求（幂等性）测试 ---');
 
+  let txCountBefore = 0;
+  try {
+    const detailsBefore = await request('GET', `/api/rentals/${rentalId}`);
+    txCountBefore = (detailsBefore.data && detailsBefore.data.data && 
+      detailsBefore.data.data.transactions) ? detailsBefore.data.data.transactions.length : 0;
+  } catch (e) {}
+
   try {
     const freezeRes1 = await request('POST', `/api/rentals/${rentalId}/freeze-deposit`, {
-      request_id: 'REQ_FREEZE_001_' + Date.now(),
+      request_id: freezeReqId,
       operator: 'admin'
     });
-    logTest('重复押金冻结（幂等）', freezeRes1.statusCode === 200 && freezeRes1.data && freezeRes1.data.success);
+    const isIdempotent = freezeRes1.data && freezeRes1.data.data && 
+      freezeRes1.data.data.message && freezeRes1.data.data.message.includes('幂等');
+    logTest('重复押金冻结-使用相同request_id', freezeRes1.statusCode === 200 && freezeRes1.data && freezeRes1.data.success);
   } catch (e) {
-    logTest('重复押金冻结（幂等）', false, e.message);
+    logTest('重复押金冻结-使用相同request_id', false, e.message);
+  }
+
+  try {
+    const detailsAfter = await request('GET', `/api/rentals/${rentalId}`);
+    const txCountAfter = (detailsAfter.data && detailsAfter.data.data && 
+      detailsAfter.data.data.transactions) ? detailsAfter.data.data.transactions.length : 0;
+    logTest('重复冻结无副作用-流水记录数不变', txCountBefore === txCountAfter);
+  } catch (e) {
+    logTest('重复冻结无副作用验证', false, e.message);
   }
 
   try {
@@ -249,6 +283,8 @@ async function runTests() {
       extension_days: 2,
       operator: 'admin'
     });
+    const isIdempotent = renewRes1.data && renewRes1.data.data && 
+      renewRes1.data.data.message && renewRes1.data.data.message.includes('幂等');
     logTest('重复续租申请（幂等）', renewRes1.statusCode === 200 && renewRes1.data && renewRes1.data.success);
   } catch (e) {
     logTest('重复续租申请（幂等）', false, e.message);
