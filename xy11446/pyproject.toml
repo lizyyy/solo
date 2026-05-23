@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "charging-pile-inspection"
+version = "0.1.0"
+description = "充电桩巡检多源导入巡检 CLI"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.1.0",
+    "sqlalchemy>=2.0.0",
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.0",
+    "jinja2>=3.1.0",
+    "python-dateutil>=2.8.0",
+    "rich>=13.0.0",
+    "dictdiffer>=0.9.0",
+]
+
+[project.scripts]
+cpi = "cpi_cli.main:cli"
+
+[tool.setuptools.packages.find]
+include = ["cpi_cli*"]
+
+[tool.ruff]
+line-length = 100
