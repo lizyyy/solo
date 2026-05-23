@@ -13,6 +13,11 @@ const ReconciliationTask = {
   },
   updateStatus: (taskId, status, callback) => {
     db.run('UPDATE reconciliation_tasks SET status = ? WHERE task_id = ?', [status, taskId], callback);
+  },
+
+  updateStatistics: (taskId, statistics, callback) => {
+    const statisticsJson = typeof statistics === 'string' ? statistics : JSON.stringify(statistics);
+    db.run('UPDATE reconciliation_tasks SET statistics = ? WHERE task_id = ?', [statisticsJson, taskId], callback);
   }
 };
 

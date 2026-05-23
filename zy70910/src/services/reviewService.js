@@ -216,12 +216,7 @@ const ReviewService = {
             }
           });
 
-          const updatedTask = {
-            ...task,
-            statistics: JSON.stringify(statistics)
-          };
-
-          ReconciliationTask.create(updatedTask, (err) => {
+          ReconciliationTask.updateStatistics(taskId, statistics, (err) => {
             if (err) reject(err);
             else resolve(statistics);
           });
