@@ -82,6 +82,12 @@ app.post("/api/boxes", async (req, res) => {
   try {
     const { batchNo, productType, targetTempMin, targetTempMax } = req.body;
     if (!batchNo || !productType) {
+      await writeExceptionLog(
+        "/api/boxes",
+        { batchNo, productType },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: batchNo, productType"
+      );
       return res.status(400).json({ error: "缺少必填字段: batchNo, productType" });
     }
     const existing = await new Promise(r => 
@@ -149,14 +155,37 @@ app.post("/api/boxes/:boxId/status", async (req, res) => {
   try {
     const { boxId } = req.params;
     const { newStatus, operator, remark } = req.body;
-    if (!newStatus) return res.status(400).json({ error: "缺少必填字段: newStatus" });
+    if (!newStatus) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/status",
+        { boxId, newStatus, operator },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: newStatus"
+      );
+      return res.status(400).json({ error: "缺少必填字段: newStatus" });
+    }
     const box = await new Promise(r => 
       db.get("SELECT current_status FROM cold_chain_boxes WHERE box_id = ?", [boxId], (e, row) => r(row))
     );
-    if (!box) return res.status(404).json({ error: "冷链箱不存在" });
+    if (!box) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/status",
+        { boxId, newStatus, operator },
+        "BOX_NOT_FOUND",
+        `冷链箱不存在: ${boxId}`
+      );
+      return res.status(404).json({ error: "冷链箱不存在" });
+    }
     const fromStatus = box.current_status;
     const allowedTransitions = STATUS_FLOW[fromStatus] || [];
     if (!allowedTransitions.includes(newStatus)) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/status",
+        { boxId, fromStatus, newStatus, operator },
+        "INVALID_STATUS_TRANSITION",
+        `状态转移不允许: ${fromStatus} → ${newStatus}`,
+        { allowedTransitions }
+      );
       return res.status(400).json({
         error: "状态转移不允许",
         fromStatus,
@@ -175,6 +204,12 @@ app.post("/api/boxes/:boxId/status", async (req, res) => {
     );
     res.json({ message: "状态更新成功", data: { boxId, fromStatus, toStatus: newStatus } });
   } catch (error) {
+    await writeExceptionLog(
+      "/api/boxes/:boxId/status",
+      { boxId: req.params.boxId, newStatus: req.body.newStatus, operator: req.body.operator },
+      "DATABASE_ERROR",
+      error.message
+    );
     res.status(500).json({ error: error.message });
   }
 });
@@ -184,12 +219,26 @@ app.post("/api/boxes/:boxId/temperature", async (req, res) => {
     const { boxId } = req.params;
     const { probeId, temperature } = req.body;
     if (!probeId || temperature === undefined) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/temperature",
+        { boxId, probeId, temperature },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: probeId, temperature"
+      );
       return res.status(400).json({ error: "缺少必填字段: probeId, temperature" });
     }
     const box = await new Promise(r => 
       db.get("SELECT * FROM cold_chain_boxes WHERE box_id = ?", [boxId], (e, row) => r(row))
     );
-    if (!box) return res.status(404).json({ error: "冷链箱不存在" });
+    if (!box) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/temperature",
+        { boxId, probeId, temperature },
+        "BOX_NOT_FOUND",
+        `冷链箱不存在: ${boxId}`
+      );
+      return res.status(404).json({ error: "冷链箱不存在" });
+    }
     const isTempValid = validateTemperature(temperature, box.target_temp_min, box.target_temp_max);
     const now = new Date().toISOString();
     await new Promise(r => 
@@ -228,12 +277,26 @@ app.post("/api/boxes/:boxId/signoff", async (req, res) => {
     const { boxId } = req.params;
     const { storeId, storeName, signoffPerson, actualTemp, arrivalTime, signoffRemark } = req.body;
     if (!storeId || !storeName || !signoffPerson) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/signoff",
+        { boxId, storeId, storeName, signoffPerson },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: storeId, storeName, signoffPerson"
+      );
       return res.status(400).json({ error: "缺少必填字段: storeId, storeName, signoffPerson" });
     }
     const box = await new Promise(r => 
       db.get("SELECT * FROM cold_chain_boxes WHERE box_id = ?", [boxId], (e, row) => r(row))
     );
-    if (!box) return res.status(404).json({ error: "冷链箱不存在" });
+    if (!box) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/signoff",
+        { boxId, storeId, storeName, signoffPerson },
+        "BOX_NOT_FOUND",
+        `冷链箱不存在: ${boxId}`
+      );
+      return res.status(404).json({ error: "冷链箱不存在" });
+    }
     
     if (box.current_status !== "ARRIVED" && box.current_status !== "EXCEPTION") {
       await writeExceptionLog(
@@ -294,9 +357,27 @@ app.post("/api/boxes/:boxId/signoff", async (req, res) => {
 app.post("/api/boxes/:boxId/photo", async (req, res) => {
   try {
     const { boxId } = req.params;
-    const { photoType, photoUrl } = req.body;
+    const { photoType, photoUrl, uploader, remark } = req.body;
     if (!photoType || !photoUrl) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/photo",
+        { boxId, photoType, photoUrl },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: photoType, photoUrl"
+      );
       return res.status(400).json({ error: "缺少必填字段: photoType, photoUrl" });
+    }
+    const box = await new Promise(r => 
+      db.get("SELECT * FROM cold_chain_boxes WHERE box_id = ?", [boxId], (e, row) => r(row))
+    );
+    if (!box) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/photo",
+        { boxId, photoType, photoUrl },
+        "BOX_NOT_FOUND",
+        `冷链箱不存在: ${boxId}`
+      );
+      return res.status(404).json({ error: "冷链箱不存在" });
     }
     const photoHash = generateHash({ photoUrl, photoType, boxId });
     const existingPhoto = await new Promise(r => 
@@ -306,12 +387,24 @@ app.post("/api/boxes/:boxId/photo", async (req, res) => {
       return res.json({ message: "照片已存在，幂等返回", data: existingPhoto, isDuplicate: true });
     }
     const now = new Date().toISOString();
-    await new Promise(r => 
-      db.run("INSERT INTO photo_credentials VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [uuidv4(), boxId, photoType, photoUrl, photoHash, now, "", "", now], r)
-    );
+    const insertResult = await new Promise((resolve, reject) => {
+      db.run(
+        "INSERT INTO photo_credentials VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [uuidv4(), boxId, photoType, photoUrl, photoHash, now, uploader || "", remark || "", now],
+        (err) => {
+          if (err) reject(err);
+          else resolve(true);
+        }
+      );
+    });
     res.json({ message: "照片凭证上传成功", data: { photoHash } });
   } catch (error) {
+    await writeExceptionLog(
+      "/api/boxes/:boxId/photo",
+      { boxId: req.params.boxId, photoType: req.body.photoType, photoUrl: req.body.photoUrl },
+      "DATABASE_ERROR",
+      error.message
+    );
     res.status(500).json({ error: error.message });
   }
 });
@@ -324,16 +417,36 @@ app.put("/api/boxes/:boxId/manual-correct", async (req, res) => {
     const { newStatus, operator, reason, targetTempMin, targetTempMax } = req.body;
     
     if (!operator) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/manual-correct",
+        { boxId, newStatus, operator, reason },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: operator（操作人）"
+      );
       return res.status(400).json({ error: "缺少必填字段: operator（操作人）" });
     }
     if (!reason) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/manual-correct",
+        { boxId, newStatus, operator, reason },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: reason（修正原因）"
+      );
       return res.status(400).json({ error: "缺少必填字段: reason（修正原因）" });
     }
     
     const box = await new Promise(r => 
       db.get("SELECT * FROM cold_chain_boxes WHERE box_id = ?", [boxId], (e, row) => r(row))
     );
-    if (!box) return res.status(404).json({ error: "冷链箱不存在" });
+    if (!box) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/manual-correct",
+        { boxId, newStatus, operator, reason },
+        "BOX_NOT_FOUND",
+        `冷链箱不存在: ${boxId}`
+      );
+      return res.status(404).json({ error: "冷链箱不存在" });
+    }
     
     const now = new Date().toISOString();
     const correctedFields = [];
@@ -405,13 +518,27 @@ app.post("/api/boxes/:boxId/review", async (req, res) => {
     const { exceptionType, exceptionDescription, detectedTime, reviewer, operator } = req.body;
     
     if (!exceptionType || !exceptionDescription) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/review",
+        { boxId, exceptionType, exceptionDescription, reviewer },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: exceptionType, exceptionDescription"
+      );
       return res.status(400).json({ error: "缺少必填字段: exceptionType, exceptionDescription" });
     }
     
     const box = await new Promise(r => 
       db.get("SELECT * FROM cold_chain_boxes WHERE box_id = ?", [boxId], (e, row) => r(row))
     );
-    if (!box) return res.status(404).json({ error: "冷链箱不存在" });
+    if (!box) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/review",
+        { boxId, exceptionType, exceptionDescription, reviewer },
+        "BOX_NOT_FOUND",
+        `冷链箱不存在: ${boxId}`
+      );
+      return res.status(404).json({ error: "冷链箱不存在" });
+    }
     
     const reviewId = uuidv4();
     const now = new Date().toISOString();
@@ -450,13 +577,41 @@ app.post("/api/reviews/:reviewId/approve", async (req, res) => {
     const { reviewResult, reviewRemark, reviewer } = req.body;
     
     if (!reviewResult || !reviewer) {
+      await writeExceptionLog(
+        "/api/reviews/:reviewId/approve",
+        { reviewId, reviewResult, reviewer },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: reviewResult, reviewer"
+      );
       return res.status(400).json({ error: "缺少必填字段: reviewResult, reviewer" });
+    }
+    
+    if (reviewResult !== "COMPENSATE" && reviewResult !== "DISMISS") {
+      await writeExceptionLog(
+        "/api/reviews/:reviewId/approve",
+        { reviewId, reviewResult, reviewer },
+        "INVALID_REVIEW_RESULT",
+        `无效的复核结果: ${reviewResult}`,
+        { allowedResults: ["COMPENSATE", "DISMISS"] }
+      );
+      return res.status(400).json({ 
+        error: "无效的复核结果",
+        allowedResults: ["COMPENSATE", "DISMISS"] 
+      });
     }
     
     const review = await new Promise(r => 
       db.get("SELECT * FROM exception_reviews WHERE review_id = ?", [reviewId], (e, row) => r(row))
     );
-    if (!review) return res.status(404).json({ error: "复核记录不存在" });
+    if (!review) {
+      await writeExceptionLog(
+        "/api/reviews/:reviewId/approve",
+        { reviewId, reviewResult, reviewer },
+        "REVIEW_NOT_FOUND",
+        `复核记录不存在: ${reviewId}`
+      );
+      return res.status(404).json({ error: "复核记录不存在" });
+    }
     
     const box = await new Promise(r => 
       db.get("SELECT * FROM cold_chain_boxes WHERE box_id = ?", [review.box_id], (e, row) => r(row))
@@ -512,18 +667,38 @@ app.post("/api/reviews/:reviewId/compensation", async (req, res) => {
     const { compensationType, compensationAmount, responsibleParty, conclusionRemark, approvedBy } = req.body;
     
     if (!compensationType || compensationAmount === undefined) {
+      await writeExceptionLog(
+        "/api/reviews/:reviewId/compensation",
+        { reviewId, compensationType, compensationAmount, approvedBy },
+        "MISSING_REQUIRED_FIELDS",
+        "缺少必填字段: compensationType, compensationAmount"
+      );
       return res.status(400).json({ error: "缺少必填字段: compensationType, compensationAmount" });
     }
     
     const review = await new Promise(r => 
       db.get("SELECT * FROM exception_reviews WHERE review_id = ?", [reviewId], (e, row) => r(row))
     );
-    if (!review) return res.status(404).json({ error: "复核记录不存在" });
+    if (!review) {
+      await writeExceptionLog(
+        "/api/reviews/:reviewId/compensation",
+        { reviewId, compensationType, compensationAmount, approvedBy },
+        "REVIEW_NOT_FOUND",
+        `复核记录不存在: ${reviewId}`
+      );
+      return res.status(404).json({ error: "复核记录不存在" });
+    }
     
     const existingConclusion = await new Promise(r => 
       db.get("SELECT * FROM compensation_conclusions WHERE review_id = ?", [reviewId], (e, row) => r(row))
     );
     if (existingConclusion) {
+      await writeExceptionLog(
+        "/api/reviews/:reviewId/compensation",
+        { reviewId, compensationType, compensationAmount, approvedBy },
+        "DUPLICATE_COMPENSATION",
+        `该复核已存在赔付结论: ${reviewId}`
+      );
       return res.status(400).json({ error: "该复核已存在赔付结论", data: existingConclusion });
     }
     
