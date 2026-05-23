@@ -127,12 +127,14 @@ class ComparisonResult(BaseModel):
     suggested_amount: float = 0.0
     claimed_amount: float = 0.0
     final_amount: float = 0.0
+    final_status: Optional[ReviewStatus] = None
     discrepancies: List[DiscrepancyItem] = Field(default_factory=list)
     matched_flight: Optional[FlightInfo] = None
     matched_photos: List[PhotoIndex] = Field(default_factory=list)
     applicable_rules: List[CompensationRule] = Field(default_factory=list)
-    explanation: str = chr(34) + chr(34) + chr(34) + chr(34)
+    explanation: str = ""
     review_record: Optional[ReviewRecord] = None
+    recalculation_count: int = 0
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
 
