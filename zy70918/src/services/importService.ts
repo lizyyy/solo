@@ -28,7 +28,7 @@ export class ImportService {
           }
         })
         .on('end', () => {
-                                        sults);
+          dataStore.saveServiceOrders(results);
           resolve({ success: errors.length === 0, data: results, errors, totalCount: lineNumber, validCount: results.length });
         })
         .on('error', (err: Error) => {
@@ -36,6 +36,50 @@ export class ImportService {
           resolve({ success: false, data: results, errors, totalCount: lineNumber, validCount: results.length });
         });
     });
+  }
+
+  async importNurseSchedulesFromJSON(filePath: string): Promise<ImportResult<NurseSchedule>> {
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(content);
+      const schedules: NurseSchedule[] = [];
+      const errors: string[] = [];
+      const scheduleArray = Array.isArray(data) ? data : [data];
+      scheduleArray.forEach((item: any, index: number) => {
+        try {
+          const schedule = this.parseNurseSchedule(item);
+          schedules.push(schedule);
+        } catch (e: any) {
+          errors.push(`条目 ${index + 1}: ${e.message}`);
+        }
+      });
+      dataStore.saveSchedules(schedules);
+      return { success: errors.length === 0, data: schedules, errors, totalCount: scheduleArray.length, validCount: schedules.length };
+    } catch (e: any) {
+      return { success: false, data: [], errors: [`JSON解析错误: ${e.message}`], totalCount: 0, validCount: 0 };
+    }
+  }
+
+  async importElderProfilesFromJSON(filePath: string): Promise<ImportResult<ElderProfile>> {
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(content);
+      const elders: ElderProfile[] = [];
+      const errors: string[] = [];
+      const elderArray = Array.isArray(data) ? data : [data];
+      elderArray.forEach((item: any, index: number) => {
+        try {
+          const elder = this.parseElderProfile(item);
+          elders.push(elder);
+        } catch (e: any) {
+          errors.push(`条目 ${index + 1}: ${e.message}`);
+        }
+      });
+      dataStore.saveElders(elders);
+      return { success: errors.length === 0, data: elders, errors, totalCount: elderArray.length, validCount: elders.length };
+    } catch (e: any) {
+      return { success: false, data: [], errors: [`JSON解析错误: ${e.message}`], totalCount: 0, validCount: 0 };
+    }
   }
 
   private parseServiceOrder(data: Record<string, string>, lineNumber: number): ServiceOrder | null {
@@ -60,6 +104,46 @@ export class ImportService {
       cancelReason: data.cancelReason,
       createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
       signedBy: data.signedBy,
+    };
+  }
+
+  private parseNurseSchedule(data: any): NurseSchedule {
+    const requiredFields = ['nurseId', 'nurseName', 'date', 'timeSlots'];
+    const missing = requiredFields.filter(f => !data[f]);
+    if (missing.length > 0) throw new Error(`缺少必填字段: ${missing.join(', ')}`);
+    if (!Array.isArray(data.timeSlots)) throw new Error('timeSlots 必须是数组');
+    return {
+      nurseId: data.nurseId,
+      nurseName: data.nurseName,
+      skills: data.skills || [],
+      district: data.district || '',
+      date: data.date,
+      timeSlots: data.timeSlots.map((slot: any) => ({
+        start: slot.start,
+        end: slot.end,
+        elderId: slot.elderId,
+        elderName: slot.elderName,
+        serviceType: slot.serviceType,
+        status: slot.status || 'scheduled',
+        cancelReason: slot.cancelReason,
+      })),
+    };
+  }
+
+  private parseElderProfile(data: any): ElderProfile {
+    const requiredFields = ['id', 'name', 'idCard', 'phone', 'address', 'district'];
+    const missing = requiredFields.filter(f => !data[f]);
+    if (missing.length > 0) throw new Error(`缺少必填字段: ${missing.join(', ')}`);
+    return {
+      id: data.id,
+      name: data.name,
+      idCard: data.idCard,
+      phone: data.phone,
+      address: data.address,
+      district: data.district,
+      serviceItems: data.serviceItems || [],
+      careLevel: data.careLevel || '',
+      createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
     };
   }
 }
