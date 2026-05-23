@@ -183,7 +183,14 @@ class RecordingAuditor:
                     self.result.bad_rows.append(ticket)
                     continue
                 
-                ticket.duration_seconds = self._parse_duration(ticket.duration_str)
+                duration_result, duration_error = self._parse_duration(ticket.duration_str)
+                ticket.duration_seconds = duration_result
+                
+                if duration_error:
+                    ticket.parse_error = duration_error
+                    self.result.bad_rows.append(ticket)
+                    continue
+                
                 self.tickets.append(ticket)
                 
             except IndexError:
@@ -196,23 +203,23 @@ class RecordingAuditor:
         self.result.total_tickets = len(self.tickets) + len(self.result.bad_rows)
         self.result.valid_tickets = len(self.tickets)
 
-    def _parse_duration(self, duration_str: str) -> Optional[int]:
+    def _parse_duration(self, duration_str: str) -> Tuple[Optional[int], Optional[str]]:
         if not duration_str or duration_str.lower() in ['', 'null', 'none', '-']:
-            return None
+            return (None, None)
         
         match = re.match(r'^(\d+):(\d+)$', duration_str)
         if match:
-            return int(match.group(1)) * 60 + int(match.group(2))
+            return (int(match.group(1)) * 60 + int(match.group(2)), None)
         
         match = re.match(r'^(\d+):(\d+):(\d+)$', duration_str)
         if match:
-            return int(match.group(1)) * 3600 + int(match.group(2)) * 60 + int(match.group(3))
+            return (int(match.group(1)) * 3600 + int(match.group(2)) * 60 + int(match.group(3)), None)
         
         match = re.match(r'^(\d+)\s*(s|sec|秒)?$', duration_str, re.IGNORECASE)
         if match:
-            return int(match.group(1))
+            return (int(match.group(1)), None)
         
-        return None
+        return (None, f"无效时长格式: {duration_str}")
 
     def match_recordings(self) -> None:
         ticket_id_map: Dict[str, List[TicketRow]] = {}
@@ -520,6 +527,8 @@ def run_self_test() -> int:
     rec1 = next((r for r in auditor.recordings if 'T20240100001' in r.file_name), None)
     rec10 = next((r for r in auditor.recordings if 'T20240100010' in r.file_name), None)
     
+    invalid_duration_rows = [t for t in auditor.result.bad_rows if '无效时长' in (t.parse_error or '')]
+    
     test_cases = [
         ("文件扫描", auditor.result.recordings_found == len(test_recordings), f"找到{auditor.result.recordings_found}个录音"),
         ("工单号解析", any(r.parsed_ticket_id == '20240100005' for r in auditor.recordings), "支持多种命名格式"),
@@ -528,8 +537,9 @@ def run_self_test() -> int:
         ("坐席匹配正确", '20240100001' not in [t.ticket_id for t in auditor.tickets if t.missing_reason == '坐席编号不匹配'], "相同坐席不被误判"),
         ("坐席不匹配检测", "坐席编号不匹配" in auditor.result.missing_categories, "正确检测坐席差异(工单A1002 vs 录音A9999)"),
         ("时长差异检测", auditor.result.duration_mismatches >= 1, f"检测时长差异: {auditor.result.duration_mismatches}处(录音180s vs 工单190s)"),
+        ("无效时长检测", len(invalid_duration_rows) >= 1, f"检测无效时长格式: 发现{len(invalid_duration_rows)}条"),
         ("时长过短", "通话时长过短" in auditor.result.missing_categories, "过滤短通话"),
-        ("坏行保留", len(auditor.result.bad_rows) >= 1, f"保留{len(auditor.result.bad_rows)}条异常行原始位置"),
+        ("坏行保留原始行号", all(t.row_number >= 2 for t in auditor.result.bad_rows), f"保留{len(auditor.result.bad_rows)}条异常行原始位置"),
         ("未匹配录音", auditor.result.recordings_unmatched >= 1, "记录无法匹配的录音"),
         ("抽样成功", len(auditor.result.sampled_tickets) == 3, "随机抽样功能正常"),
     ]
