@@ -1,4 +1,4 @@
-const db = require('../src/models/database');
+const { initDatabase } = require('../src/models/database');
 const batchService = require('../src/services/batchService');
 const importService = require('../src/services/importService');
 const orderService = require('../src/services/orderService');
@@ -11,16 +11,20 @@ async function runVerification() {
   console.log('========================================\n');
 
   try {
+    console.log('步骤 0: 初始化数据库');
+    await initDatabase();
+    console.log('  ✓ 数据库初始化完成\n');
+
     console.log('步骤 1: 创建批次');
-    const batch = batchService.createBatch('2024年5月第3批服务单', '系统管理员');
+    const batch = await batchService.createBatch('2024年5月第3批服务单', '系统管理员');
     console.log(`  ✓ 批次创建成功: ${batch.batch_no} (ID: ${batch.id})\n`);
 
     console.log('步骤 2: 导入老人档案');
-    const elderlyResult = importService.importElderlyProfiles(elderlyProfiles, '系统管理员');
+    const elderlyResult = await importService.importElderlyProfiles(elderlyProfiles, '系统管理员');
     console.log(`  ✓ 老人档案导入成功: ${elderlyResult.count} 条\n`);
 
     console.log('步骤 3: 导入护士日历');
-    const nurseResult = importService.importNurseCalendarJson(nurseCalendars, '系统管理员');
+    const nurseResult = await importService.importNurseCalendarJson(nurseCalendars, '系统管理员');
     console.log(`  ✓ 护士导入成功: ${nurseResult.nurseCount} 人`);
     console.log(`  ✓ 日历导入成功: ${nurseResult.calendarCount} 条\n`);
 
@@ -30,59 +34,59 @@ async function runVerification() {
     console.log(`  ✓ 服务单导入成功: ${orderResult.count} / ${orderResult.total} 条\n`);
 
     console.log('步骤 5: 获取服务单列表');
-    const orders = orderService.listOrders({ batch_id: batch.id });
+    const orders = await orderService.listOrders({ batch_id: batch.id });
     console.log(`  ✓ 找到 ${orders.length} 条服务单\n`);
 
     if (orders.length > 0) {
       const order1 = orders[0];
-      const order2 = orders[1];
-      const order3 = orders[2];
+      const order2 = orders[1] || orders[0];
+      const order3 = orders[2] || orders[0];
 
       console.log('步骤 6: 分配护士（技能匹配/跨区测试）');
-      const assigned1 = orderService.assignNurse(order1.id, 'N001', '张站长');
-      console.log(`  ✓ 服务单 ${order1.order_no} 分配护士 N001`);
+      const assigned1 = await orderService.assignNurse(order1.id, 'N001', '张站长');
+      console.log(`  ✓ 服务单 ${assigned1.order_no} 分配护士 N001`);
       console.log(`    - 技能匹配: ${assigned1.skill_match_status}`);
       console.log(`    - 路线状态: ${assigned1.route_status}`);
       console.log(`    - 距离: ${assigned1.distance_km?.toFixed(1)} 公里`);
 
-      const assigned2 = orderService.assignNurse(order2.id, 'N003', '张站长');
-      console.log(`  ✓ 服务单 ${order2.order_no} 分配护士 N003（跨区）`);
+      const assigned2 = await orderService.assignNurse(order2.id, 'N003', '张站长');
+      console.log(`  ✓ 服务单 ${assigned2.order_no} 分配护士 N003（跨区）`);
       console.log(`    - 技能匹配: ${assigned2.skill_match_status}`);
       console.log(`    - 路线状态: ${assigned2.route_status}`);
       console.log(`    - 距离: ${assigned2.distance_km?.toFixed(1)} 公里\n`);
 
       console.log('步骤 7: 标记处理');
-      const processed = orderService.processOrder(order1.id, '张站长', '开始上门服务准备');
-      console.log(`  ✓ 服务单 ${order1.order_no} 状态: ${processed.status}\n`);
+      const processed = await orderService.processOrder(order1.id, '张站长', '开始上门服务准备');
+      console.log(`  ✓ 服务单 ${processed.order_no} 状态: ${processed.status}\n`);
 
       console.log('步骤 8: 退回修改');
-      const returned = orderService.returnOrder(order2.id, '张站长', '护士技能不匹配，缺少言语训练资质，需要重新分配');
-      console.log(`  ✓ 服务单 ${order2.order_no} 状态: ${returned.status}`);
+      const returned = await orderService.returnOrder(order2.id, '张站长', '护士技能不匹配，缺少言语训练资质，需要重新分配');
+      console.log(`  ✓ 服务单 ${returned.order_no} 状态: ${returned.status}`);
       console.log(`    - 退回原因: 护士技能不匹配，缺少言语训练资质\n`);
 
       console.log('步骤 9: 取消补位');
-      const replaced = orderService.replaceNurse(order2.id, 'N002', '李站长', '原护士技能不匹配，安排李护士补位');
-      console.log(`  ✓ 服务单 ${order2.order_no} 更换护士: N003 -> N002\n`);
+      const replaced = await orderService.replaceNurse(order2.id, 'N002', '李站长', '原护士技能不匹配，安排李护士补位');
+      console.log(`  ✓ 服务单 ${replaced.order_no} 更换护士: N003 -> N002\n`);
 
       console.log('步骤 10: 审核通过');
-      const approved = orderService.approveOrder(order1.id, '李站长', '信息核实无误，同意执行');
-      console.log(`  ✓ 服务单 ${order1.order_no} 状态: ${approved.status}\n`);
+      const approved = await orderService.approveOrder(order1.id, '李站长', '信息核实无误，同意执行');
+      console.log(`  ✓ 服务单 ${approved.order_no} 状态: ${approved.status}\n`);
     }
 
     console.log('步骤 11: 查询追踪记录');
-    const records = queryService.queryTrackRecords({});
+    const records = await queryService.queryTrackRecords({});
     console.log(`  ✓ 共找到 ${records.length} 条追踪记录\n`);
 
     console.log('步骤 12: 按护士资质查询');
-    const qualifiedRecords = queryService.queryTrackRecords({ nurse_qualifications: '主管护师' });
+    const qualifiedRecords = await queryService.queryTrackRecords({ nurse_qualifications: '主管护师' });
     console.log(`  ✓ 主管护师相关记录: ${qualifiedRecords.length} 条\n`);
 
     console.log('步骤 13: 按护理项目查询');
-    const careRecords = queryService.queryTrackRecords({ service_items: '血压测量' });
+    const careRecords = await queryService.queryTrackRecords({ service_items: '血压测量' });
     console.log(`  ✓ 血压测量相关记录: ${careRecords.length} 条\n`);
 
     console.log('步骤 14: 上门路线溯源');
-    const routeRecords = queryService.queryTrackRecords({ route_keyword: '朝阳区' });
+    const routeRecords = await queryService.queryTrackRecords({ route_keyword: '朝阳区' });
     console.log(`  ✓ 朝阳区路线相关记录: ${routeRecords.length} 条`);
     if (routeRecords.length > 0) {
       console.log('    路线来源追踪:');
@@ -94,7 +98,7 @@ async function runVerification() {
 
     console.log('步骤 15: 单条记录详情（可解释性验证）');
     if (records.length > 0) {
-      const detail = queryService.getTrackRecordById(records[0].id);
+      const detail = await queryService.getTrackRecordById(records[0].id);
       console.log(`  ✓ 记录编号: ${detail.record_no}`);
       console.log(`  ✓ 状态: ${detail.status}`);
       console.log(`  ✓ 操作: ${detail.action}`);
@@ -105,7 +109,7 @@ async function runVerification() {
 
     console.log('步骤 16: 服务单历史追踪');
     if (orders.length > 0) {
-      const history = queryService.getOrderTrackHistory(orders[0].id);
+      const history = await queryService.getOrderTrackHistory(orders[0].id);
       console.log(`  ✓ 服务单 ${orders[0].order_no} 历史记录: ${history.length} 条`);
       history.forEach((h, i) => {
         console.log(`    ${i + 1}. [${h.handled_at}] ${h.action} - ${h.handled_by}: ${h.reason}`);
@@ -114,7 +118,7 @@ async function runVerification() {
     }
 
     console.log('步骤 17: 导出明细验证');
-    const exportRecords = queryService.queryTrackRecords({});
+    const exportRecords = await queryService.queryTrackRecords({});
     const csv = queryService.exportToCsv(exportRecords);
     const csvLines = csv.split('\n').filter(l => l.trim());
     console.log(`  ✓ 导出CSV行数: ${csvLines.length} 行（含表头）`);
@@ -122,7 +126,7 @@ async function runVerification() {
     console.log(`  ✓ 数据一致性: ${csvLines.length - 1 === exportRecords.length ? '✓ 匹配' : '✗ 不匹配'}\n`);
 
     console.log('步骤 18: 批次统计');
-    const stats = batchService.getBatchStatistics(batch.id);
+    const stats = await batchService.getBatchStatistics(batch.id);
     console.log(`  ✓ 批次总数: ${stats.statistics.total}`);
     console.log(`  ✓ 已处理: ${stats.statistics.processing}`);
     console.log(`  ✓ 已通过: ${stats.statistics.approved}`);

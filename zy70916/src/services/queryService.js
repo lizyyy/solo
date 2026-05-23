@@ -1,7 +1,7 @@
-const db = require('../models/database');
+const { run, get, all } = require('../models/database');
 const { Parser } = require('json2csv');
 
-function queryTrackRecords(filters = {}) {
+async function queryTrackRecords(filters = {}) {
   let query = `
     SELECT 
       tr.*,
@@ -83,7 +83,7 @@ function queryTrackRecords(filters = {}) {
 
   query += ' ORDER BY tr.handled_at DESC';
 
-  const records = db.prepare(query).all(...params);
+  const records = await all(query, params);
   return records.map(record => ({
     ...record,
     route_source: parseRouteSource(record)
@@ -112,8 +112,8 @@ function parseRouteSource(record) {
   return sources;
 }
 
-function getTrackRecordById(id) {
-  return db.prepare(`
+async function getTrackRecordById(id) {
+  return await get(`
     SELECT 
       tr.*,
       so.order_no,
@@ -138,11 +138,11 @@ function getTrackRecordById(id) {
     LEFT JOIN nurses n ON tr.nurse_id = n.nurse_id
     LEFT JOIN batches b ON tr.batch_id = b.id
     WHERE tr.id = ?
-  `).get(id);
+  `, [id]);
 }
 
-function getOrderTrackHistory(orderId) {
-  return db.prepare(`
+async function getOrderTrackHistory(orderId) {
+  return await all(`
     SELECT 
       tr.*,
       n.name as nurse_name
@@ -150,7 +150,7 @@ function getOrderTrackHistory(orderId) {
     LEFT JOIN nurses n ON tr.nurse_id = n.nurse_id
     WHERE tr.service_order_id = ?
     ORDER BY tr.handled_at ASC
-  `).all(orderId);
+  `, [orderId]);
 }
 
 function exportToCsv(records) {
@@ -176,15 +176,11 @@ function exportToCsv(records) {
   return json2csvParser.parse(records);
 }
 
-function getStatistics() {
+async function getStatistics() {
   return {
-    byStatus: db.prepare(`
-      SELECT status, COUNT(*) as count FROM track_records GROUP BY status
-    `).all(),
-    byAction: db.prepare(`
-      SELECT action, COUNT(*) as count FROM track_records GROUP BY action
-    `).all(),
-    byNurse: db.prepare(`
+    byStatus: await all(`SELECT status, COUNT(*) as count FROM track_records GROUP BY status`),
+    byAction: await all(`SELECT action, COUNT(*) as count FROM track_records GROUP BY action`),
+    byNurse: await all(`
       SELECT nurse_id, nurse_name, COUNT(*) as count 
       FROM (
         SELECT tr.nurse_id, n.name as nurse_name 
@@ -193,14 +189,14 @@ function getStatistics() {
         WHERE tr.nurse_id IS NOT NULL
       ) 
       GROUP BY nurse_id
-    `).all(),
-    monthly: db.prepare(`
+    `),
+    monthly: await all(`
       SELECT strftime('%Y-%m', handled_at) as month, COUNT(*) as count 
       FROM track_records 
       GROUP BY month 
       ORDER BY month DESC 
       LIMIT 12
-    `).all()
+    `)
   };
 }
 

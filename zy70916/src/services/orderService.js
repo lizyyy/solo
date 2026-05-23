@@ -1,15 +1,15 @@
-const db = require('../models/database');
+const { run, get, all } = require('../models/database');
 const helpers = require('../utils/helpers');
 
-function getOrderById(id) {
-  return db.prepare('SELECT * FROM service_orders WHERE id = ?').get(id);
+async function getOrderById(id) {
+  return await get('SELECT * FROM service_orders WHERE id = ?', [id]);
 }
 
-function getOrderByNo(orderNo) {
-  return db.prepare('SELECT * FROM service_orders WHERE order_no = ?').get(orderNo);
+async function getOrderByNo(orderNo) {
+  return await get('SELECT * FROM service_orders WHERE order_no = ?', [orderNo]);
 }
 
-function listOrders(filters = {}) {
+async function listOrders(filters = {}) {
   let query = 'SELECT so.*, ep.name as elderly_name, n.name as nurse_name FROM service_orders so LEFT JOIN elderly_profiles ep ON so.elderly_id = ep.elderly_id LEFT JOIN nurses n ON so.nurse_id = n.nurse_id WHERE 1=1';
   const params = [];
 
@@ -39,14 +39,14 @@ function listOrders(filters = {}) {
   }
 
   query += ' ORDER BY so.created_at DESC';
-  return db.prepare(query).all(...params);
+  return await all(query, params);
 }
 
-function assignNurse(orderId, nurseId, handledBy) {
-  const order = getOrderById(orderId);
+async function assignNurse(orderId, nurseId, handledBy) {
+  const order = await getOrderById(orderId);
   if (!order) throw new Error('服务单不存在');
 
-  const nurse = db.prepare('SELECT * FROM nurses WHERE nurse_id = ?').get(nurseId);
+  const nurse = await get('SELECT * FROM nurses WHERE nurse_id = ?', [nurseId]);
   if (!nurse) throw new Error('护士不存在');
 
   const skillCheck = helpers.checkSkillMatch(nurse.skills, order.service_items);
@@ -64,14 +64,14 @@ function assignNurse(orderId, nurseId, handledBy) {
     reason += ` (跨区域: 护士${nurse.district} -> 服务${order.district}, 距离约${distance.toFixed(1)}公里)`;
   }
 
-  const update = db.prepare(`
-    UPDATE service_orders 
+  await run(
+    `UPDATE service_orders 
     SET nurse_id = ?, skill_match_status = ?, route_status = ?, distance_km = ?, updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `);
-  update.run(nurseId, skillCheck.matched ? 'matched' : 'unmatched', districtMatch ? 'same_district' : 'cross_district', distance, orderId);
+    WHERE id = ?`,
+    [nurseId, skillCheck.matched ? 'matched' : 'unmatched', districtMatch ? 'same_district' : 'cross_district', distance, orderId]
+  );
 
-  insertTrackRecord(orderId, order.batch_id, status, action, reason, handledBy, {
+  await insertTrackRecord(orderId, order.batch_id, status, action, reason, handledBy, {
     nurse_id: nurseId,
     nurse_name: nurse.name,
     skill_check: skillCheck,
@@ -79,118 +79,118 @@ function assignNurse(orderId, nurseId, handledBy) {
     distance_km: distance
   });
 
-  return getOrderById(orderId);
+  return await getOrderById(orderId);
 }
 
-function processOrder(orderId, handledBy, reason = '') {
-  return updateOrderStatus(orderId, 'processing', 'process', reason || '开始处理', handledBy);
+async function processOrder(orderId, handledBy, reason = '') {
+  return await updateOrderStatus(orderId, 'processing', 'process', reason || '开始处理', handledBy);
 }
 
-function approveOrder(orderId, handledBy, reason = '') {
-  return updateOrderStatus(orderId, 'approved', 'approve', reason || '审核通过', handledBy);
+async function approveOrder(orderId, handledBy, reason = '') {
+  return await updateOrderStatus(orderId, 'approved', 'approve', reason || '审核通过', handledBy);
 }
 
-function returnOrder(orderId, handledBy, reason) {
+async function returnOrder(orderId, handledBy, reason) {
   if (!reason) throw new Error('退回原因不能为空');
-  return updateOrderStatus(orderId, 'returned', 'return', reason, handledBy);
+  return await updateOrderStatus(orderId, 'returned', 'return', reason, handledBy);
 }
 
-function cancelOrder(orderId, handledBy, reason) {
+async function cancelOrder(orderId, handledBy, reason) {
   if (!reason) throw new Error('取消原因不能为空');
   
-  const order = getOrderById(orderId);
+  const order = await getOrderById(orderId);
   if (!order) throw new Error('服务单不存在');
 
-  const update = db.prepare(`
-    UPDATE service_orders 
+  await run(
+    `UPDATE service_orders 
     SET status = 'cancelled', cancel_reason = ?, updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `);
-  update.run(reason, orderId);
+    WHERE id = ?`,
+    [reason, orderId]
+  );
 
-  insertTrackRecord(orderId, order.batch_id, 'cancelled', 'cancel', reason, handledBy);
+  await insertTrackRecord(orderId, order.batch_id, 'cancelled', 'cancel', reason, handledBy);
 
-  return getOrderById(orderId);
+  return await getOrderById(orderId);
 }
 
-function replaceNurse(orderId, newNurseId, handledBy, reason) {
+async function replaceNurse(orderId, newNurseId, handledBy, reason) {
   if (!reason) throw new Error('补位原因不能为空');
 
-  const order = getOrderById(orderId);
+  const order = await getOrderById(orderId);
   if (!order) throw new Error('服务单不存在');
 
   const oldNurseId = order.nurse_id;
-  const nurse = db.prepare('SELECT * FROM nurses WHERE nurse_id = ?').get(newNurseId);
+  const nurse = await get('SELECT * FROM nurses WHERE nurse_id = ?', [newNurseId]);
   if (!nurse) throw new Error('新护士不存在');
 
-  const update = db.prepare(`
-    UPDATE service_orders 
+  await run(
+    `UPDATE service_orders 
     SET nurse_id = ?, replacement_nurse_id = ?, updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
-  `);
-  update.run(newNurseId, oldNurseId, orderId);
+    WHERE id = ?`,
+    [newNurseId, oldNurseId, orderId]
+  );
 
-  insertTrackRecord(orderId, order.batch_id, order.status, 'replace_nurse', reason, handledBy, {
+  await insertTrackRecord(orderId, order.batch_id, order.status, 'replace_nurse', reason, handledBy, {
     old_nurse_id: oldNurseId,
     new_nurse_id: newNurseId,
     new_nurse_name: nurse.name
   });
 
-  return getOrderById(orderId);
+  return await getOrderById(orderId);
 }
 
-function completeOrder(orderId, handledBy, reason = '') {
-  return updateOrderStatus(orderId, 'completed', 'complete', reason || '服务完成', handledBy);
+async function completeOrder(orderId, handledBy, reason = '') {
+  return await updateOrderStatus(orderId, 'completed', 'complete', reason || '服务完成', handledBy);
 }
 
-function updateOrderStatus(orderId, status, action, reason, handledBy) {
-  const order = getOrderById(orderId);
+async function updateOrderStatus(orderId, status, action, reason, handledBy) {
+  const order = await getOrderById(orderId);
   if (!order) throw new Error('服务单不存在');
 
-  const update = db.prepare(`
-    UPDATE service_orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-  `);
-  update.run(status, orderId);
+  await run(
+    `UPDATE service_orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+    [status, orderId]
+  );
 
-  insertTrackRecord(orderId, order.batch_id, status, action, reason, handledBy);
+  await insertTrackRecord(orderId, order.batch_id, status, action, reason, handledBy);
 
-  updateBatchProcessedCount(order.batch_id);
+  await updateBatchProcessedCount(order.batch_id);
 
-  return getOrderById(orderId);
+  return await getOrderById(orderId);
 }
 
-function insertTrackRecord(orderId, batchId, status, action, reason, handledBy, extraInfo = {}) {
-  const order = getOrderById(orderId);
-  const insert = db.prepare(`
-    INSERT INTO track_records 
+async function insertTrackRecord(orderId, batchId, status, action, reason, handledBy, extraInfo = {}) {
+  const order = await getOrderById(orderId);
+  await run(
+    `INSERT INTO track_records 
     (record_no, service_order_id, batch_id, elderly_id, nurse_id, service_type, status, action, reason, handled_by, route_info, skill_info)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  insert.run(
-    helpers.generateRecordNo(),
-    orderId,
-    batchId,
-    order.elderly_id,
-    order.nurse_id,
-    order.service_type,
-    status,
-    action,
-    reason,
-    handledBy,
-    extraInfo.route_info || JSON.stringify({ distance_km: order.distance_km, district: order.district }),
-    extraInfo.skill_info || JSON.stringify({ skill_match: order.skill_match_status })
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      helpers.generateRecordNo(),
+      orderId,
+      batchId,
+      order.elderly_id,
+      order.nurse_id,
+      order.service_type,
+      status,
+      action,
+      reason,
+      handledBy,
+      JSON.stringify({ distance_km: order.distance_km, district: order.district }),
+      JSON.stringify({ skill_match: order.skill_match_status })
+    ]
   );
 }
 
-function updateBatchProcessedCount(batchId) {
+async function updateBatchProcessedCount(batchId) {
   if (!batchId) return;
   
-  const count = db.prepare(`
-    SELECT COUNT(*) as cnt FROM service_orders WHERE batch_id = ? AND status != 'pending'
-  `).get(batchId);
+  const count = await get(
+    `SELECT COUNT(*) as cnt FROM service_orders WHERE batch_id = ? AND status != 'pending'`,
+    [batchId]
+  );
 
-  db.prepare('UPDATE batches SET processed_count = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(count.cnt, batchId);
+  await run('UPDATE batches SET processed_count = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [count.cnt, batchId]);
 }
 
 module.exports = {

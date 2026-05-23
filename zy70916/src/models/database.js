@@ -73,6 +73,17 @@ function initDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE TABLE IF NOT EXISTS nurse_calendars (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nurse_id TEXT NOT NULL,
+      date TEXT NOT NULL,
+      time_slot TEXT NOT NULL,
+      status TEXT DEFAULT 'available',
+      service_order_id INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(nurse_id, date, time_slot)
+    )`,
     `CREATE TABLE IF NOT EXISTS service_orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       order_no TEXT UNIQUE NOT NULL,
