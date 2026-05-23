@@ -50,6 +50,25 @@ function generateHash(content) {
   return crypto.createHash("md5").update(JSON.stringify(content)).digest("hex");
 }
 
+function writeExceptionLog(apiPath, originalInput, errorType, errorMessage, processingResult = null) {
+  return new Promise((resolve) => {
+    db.run(
+      "INSERT INTO exception_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        uuidv4(),
+        uuidv4(),
+        apiPath,
+        JSON.stringify(originalInput),
+        errorType,
+        errorMessage,
+        processingResult ? JSON.stringify(processingResult) : null,
+        new Date().toISOString()
+      ],
+      () => resolve()
+    );
+  });
+}
+
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
@@ -187,6 +206,13 @@ app.post("/api/boxes/:boxId/temperature", async (req, res) => {
           [uuidv4(), boxId, box.current_status, "EXCEPTION", "TEMP_EXCEPTION", 
            "SYSTEM", `温度异常: ${temperature}°C，正常范围 ${box.target_temp_min}-${box.target_temp_max}°C`, now], r)
       );
+      await writeExceptionLog(
+        "/api/boxes/:boxId/temperature",
+        { boxId, probeId, temperature },
+        "TEMPERATURE_ABNORMAL",
+        `温度采样 ${temperature}°C 超出范围 [${box.target_temp_min}, ${box.target_temp_max}]°C`,
+        { newStatus: "EXCEPTION", tempRange: { min: box.target_temp_min, max: box.target_temp_max } }
+      );
     }
     res.json({
       message: "温度采样上传成功",
@@ -210,6 +236,13 @@ app.post("/api/boxes/:boxId/signoff", async (req, res) => {
     if (!box) return res.status(404).json({ error: "冷链箱不存在" });
     
     if (box.current_status !== "ARRIVED" && box.current_status !== "EXCEPTION") {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/signoff",
+        { boxId, storeId, storeName, signoffPerson, actualTemp },
+        "STATUS_VALIDATION_FAILED",
+        `当前状态 ${box.current_status} 不允许签收`,
+        { allowedStatuses: ["ARRIVED", "EXCEPTION"] }
+      );
       return res.status(400).json({ 
         error: "当前状态不允许签收",
         currentStatus: box.current_status,
@@ -228,7 +261,7 @@ app.post("/api/boxes/:boxId/signoff", async (req, res) => {
       validateTemperature(actualTemp, box.target_temp_min, box.target_temp_max) : true;
     const now = new Date().toISOString();
     await new Promise(r => 
-      db.run("INSERT INTO store_signoffs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      db.run("INSERT INTO store_signoffs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [uuidv4(), boxId, storeId, storeName, signoffPerson, now, arrivalTime || now, actualTemp, signoffRemark || "", now], r)
     );
     const newStatus = isTempValid ? "SIGNED_OFF" : "EXCEPTION";
@@ -241,6 +274,15 @@ app.post("/api/boxes/:boxId/signoff", async (req, res) => {
         db.run("INSERT INTO status_history VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
           [uuidv4(), boxId, box.current_status, newStatus, "SIGN_OFF", signoffPerson,
            isTempValid ? "正常签收" : `签收温度异常: ${actualTemp}°C`, now], r)
+      );
+    }
+    if (!isTempValid) {
+      await writeExceptionLog(
+        "/api/boxes/:boxId/signoff",
+        { boxId, storeId, storeName, signoffPerson, actualTemp },
+        "TEMPERATURE_ABNORMAL",
+        `签收温度 ${actualTemp}°C 超出范围 [${box.target_temp_min}, ${box.target_temp_max}]°C`,
+        { newStatus: "EXCEPTION", tempRange: { min: box.target_temp_min, max: box.target_temp_max } }
       );
     }
     res.json({ message: "签收成功", data: { isTempValid, newStatus } });
@@ -318,6 +360,13 @@ app.put("/api/boxes/:boxId/manual-correct", async (req, res) => {
     
     if (newStatus) {
       if (!MANUAL_CORRECT_ALLOWED_STATUSES.includes(newStatus)) {
+        await writeExceptionLog(
+          "/api/boxes/:boxId/manual-correct",
+          { boxId, newStatus, operator, reason },
+          "MANUAL_CORRECT_DENIED",
+          `人工修正不允许设置状态: ${newStatus}`,
+          { allowedStatuses: MANUAL_CORRECT_ALLOWED_STATUSES }
+        );
         return res.status(400).json({ 
           error: "人工修正不允许设置该状态",
           requestedStatus: newStatus,
