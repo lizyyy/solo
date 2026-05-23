@@ -1,0 +1,26 @@
+{
+  "name": "chain-store-price-tag-api",
+  "version": "1.0.0",
+  "description": "连锁门店价签API服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "init-data": "node scripts/initSampleData.js",
+    "test": "node scripts/testApi.js"
+  },
+  "keywords": ["price-tag", "chain-store", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "joi": "^17.11.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
