@@ -92,6 +92,12 @@ class MarkdownParser:
 
         content = stripped_line
         
+        checkbox_match = re.match(r'^[-*]\s*\[([ xX])\]\s*', content)
+        if checkbox_match:
+            checkbox_status = checkbox_match.group(1)
+            if checkbox_status in ['x', 'X']:
+                action_item.status = "完成"
+        
         delay_reason = self._extract_delay_reason(content)
         if delay_reason:
             action_item.delay_reason = delay_reason
@@ -105,8 +111,9 @@ class MarkdownParser:
             action_item.due_date = due_date
             content = self._remove_date_from_content(content)
 
-        status, content = self._extract_and_remove_status(content)
-        action_item.status = status
+        if action_item.status != "完成":
+            status, content = self._extract_and_remove_status(content)
+            action_item.status = status
 
         content = self._clean_content(content)
         action_item.content = content
@@ -121,6 +128,9 @@ class MarkdownParser:
     def _is_task_line(self, line):
         task_patterns = [
             r'^[-*]\s*\[( |x|X)\]\s*',
+            r'^[-*]\s+@[\w\u4e00-\u9fff]+',
+            r'^[-*]\s+.*\s+(' + '|'.join(re.escape(s) for s in self.status_keywords) + r')$',
+            r'^[-*]\s+.*\d{4}-\d{1,2}-\d{1,2}',
             r'^\d+\.\s*.*负责人[:：]',
             r'^\d+\.\s*.*@[\w\u4e00-\u9fff]+',
             r'^\d+\.\s*.*\d{4}-\d{1,2}-\d{1,2}',
