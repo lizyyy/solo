@@ -16,7 +16,10 @@ db.serialize(() => {
   db.run('DELETE FROM rooms');
   db.run('DELETE FROM buildings');
   db.run('DELETE FROM handlers');
-  console.log('旧数据已清理');
+  
+  db.run("DELETE FROM sqlite_sequence WHERE name IN ('buildings', 'rooms', 'handlers', 'repair_orders', 'reminder_records', 'status_history', 'outsource_assignments', 'completion_proofs', 'exception_records')");
+  
+  console.log('旧数据已清理，自增ID已重置');
 
   const buildings = [
     { building_no: '1栋', building_name: '1号楼', total_floors: 18 },
