@@ -177,7 +177,7 @@ def cancel_reservation(db: Session, cancellation: schemas.CancellationRecordCrea
     
     if penalty_amount > 0:
         group = get_research_group(db, reservation.group_id)
-        group.credit_score = max(0, group.credit_score - penalty_amount / 10)
+        group.credit_score = max(0, group.credit_score - penalty_amount / 200)
     
     db.commit()
     db.refresh(db_cancellation)
@@ -224,7 +224,7 @@ def create_usage_report(db: Session, report: schemas.UsageReportCreate):
     group = get_research_group(db, reservation.group_id)
     
     if overtime_penalty > 0:
-        group.credit_score = max(0, group.credit_score - overtime_penalty / 20)
+        group.credit_score = max(0, group.credit_score - overtime_penalty / 200)
     
     if report.sample_contamination:
         instrument.status = "maintenance"
@@ -292,7 +292,7 @@ def apply_manual_correction(db: Session, correction: schemas.ManualCorrection):
             cancellation.penalty_applied = False
             
             group = get_research_group(db, reservation.group_id)
-            group.credit_score = min(100, group.credit_score + cancellation.penalty_amount / 10)
+            group.credit_score = min(100, group.credit_score + cancellation.penalty_amount / 200)
     
     db.commit()
     db.refresh(reservation)
