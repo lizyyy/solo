@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f9fa;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.method-badge {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.json-preview {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  border-radius: 4px;
+  padding: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.card-hover {
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 2rem;
+  padding-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 0.5rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background-color: #0d6efd;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #0d6efd;
+}
+
+.timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 0.85rem;
+  top: 1.5rem;
+  width: 2px;
+  height: calc(100% - 1rem);
+  background-color: #dee2e6;
+}
