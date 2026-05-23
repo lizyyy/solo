@@ -91,7 +91,16 @@ const correctionContent = fs.readFileSync(path.join(rootDir, 'src/services/manua
 check('  区分有/无updated_at字段的表', correctionContent.includes('tablesWithUpdatedAt') && correctionContent.includes('tablesWithoutUpdatedAt'));
 check('  条件更新updated_at', correctionContent.includes('tablesWithUpdatedAt.includes(tableName)'));
 
-console.log('\n8. 依赖项验证:');
+console.log('\n8. 重复事件去重验证:');
+const accessControlContent = fs.readFileSync(path.join(rootDir, 'src/services/accessControlService.js'), 'utf8');
+const gateEventContent = fs.readFileSync(path.join(rootDir, 'src/services/gateEventService.js'), 'utf8');
+check('  使用5秒时间桶生成dedup_hash', accessControlContent.includes('fiveSecondBucket') || accessControlContent.includes('/ 5) * 5'));
+check('  checkDuplicateEvent直接匹配字段查询', accessControlContent.includes('WHERE id_card = ?') && accessControlContent.includes('AND gate_no = ?') && accessControlContent.includes('AND direction = ?'));
+check('  检测到重复时不插入新记录', gateEventContent.includes('if (validationResult.duplicate)'));
+check('  重复事件返回is_duplicate标记', gateEventContent.includes('is_duplicate: true'));
+check('  重复事件返回原始事件', gateEventContent.includes('original_event:'));
+
+console.log('\n9. 依赖项验证:');
 const pkgJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf8'));
 const requiredDeps = ['express', 'better-sqlite3', 'csv-writer', 'moment', 'uuid'];
 for (const dep of requiredDeps) {

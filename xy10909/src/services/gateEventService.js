@@ -24,6 +24,19 @@ class GateEventService {
       throw error;
     }
 
+    if (validationResult.duplicate) {
+      return {
+        id: validationResult.duplicate.id,
+        event_no: validationResult.duplicate.event_no,
+        transaction_id: transactionId,
+        is_duplicate: true,
+        original_event: validationResult.duplicate,
+        access_result: 'duplicate',
+        access_reason: validationResult.reason,
+        validation_details: validationResult
+      };
+    }
+
     const dedupHash = accessControlService.generateDedupHash(
       eventData.id_card,
       eventData.gate_no,
@@ -80,6 +93,7 @@ class GateEventService {
       id,
       event_no: eventNo,
       transaction_id: transactionId,
+      is_duplicate: false,
       access_result: validationResult.allowed ? 'allowed' : 'denied',
       access_reason: validationResult.reason,
       validation_details: validationResult

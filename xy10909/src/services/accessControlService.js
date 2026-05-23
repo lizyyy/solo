@@ -42,21 +42,24 @@ class AccessControlService {
   }
 
   checkDuplicateEvent(idCard, gateNo, direction, eventTime) {
-    const timeWindow = moment(eventTime).subtract(5, 'seconds').format('YYYY-MM-DD HH:mm:ss');
-    const dedupHash = this.generateDedupHash(idCard, gateNo, direction, eventTime);
+    const timeWindow = moment(eventTime).subtract(5, 'seconds').toISOString();
     
     const stmt = db.prepare(`
       SELECT * FROM gate_events 
-      WHERE dedup_hash = ?
+      WHERE id_card = ?
+      AND gate_no = ?
+      AND direction = ?
       AND event_time >= ?
+      ORDER BY event_time DESC
       LIMIT 1
     `);
-    return stmt.get(dedupHash, timeWindow);
+    return stmt.get(idCard, gateNo, direction, timeWindow);
   }
 
   generateDedupHash(idCard, gateNo, direction, eventTime) {
-    const timeBucket = moment(eventTime).format('YYYY-MM-DD HH:mm:00');
-    const data = `${idCard}|${gateNo}|${direction}|${timeBucket}`;
+    const timestamp = moment(eventTime).unix();
+    const fiveSecondBucket = Math.floor(timestamp / 5) * 5;
+    const data = `${idCard}|${gateNo}|${direction}|${fiveSecondBucket}`;
     return crypto.createHash('md5').update(data).digest('hex');
   }
 
