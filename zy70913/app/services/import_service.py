@@ -143,7 +143,7 @@ class ImportService:
                 apply_amount=float(item.get("apply_amount", 0) or 0),
                 apply_time=ImportService._parse_date(item.get("apply_time")),
                 status=GrievanceStatus.PENDING,
-                original_data=str(item)
+                original_data=json.dumps(item, ensure_ascii=False)
             )
             
             db.add(grievance)

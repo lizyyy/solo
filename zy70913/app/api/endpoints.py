@@ -7,6 +7,7 @@ from app.schemas import Batch as BatchSchema, Grievance as GrievanceSchema, Uplo
 from app.services.import_service import ImportService
 from app.services.rules_engine import RulesEngine
 import json
+import logging
 
 router = APIRouter()
 
@@ -41,8 +42,8 @@ async def upload_files(
         if grievance.original_data:
             try:
                 original_data = json.loads(grievance.original_data)
-            except:
-                pass
+            except Exception as e:
+                logging.warning(f"Failed to parse original_data for grievance {grievance.grievance_no}: {e}, data: {grievance.original_data}")
         failure_reason, suggestion = get_failure_reason_and_suggestion(grievance)
         return {
             "grievance_no": grievance.grievance_no,
@@ -89,6 +90,7 @@ async def upload_files(
         batch.success_count = len(normal_items)
         batch.fail_count = len(failed_items)
         batch.pending_count = len(pending_items)
+        batch.total_count = len(created)
         db.commit()
         return UploadResponse(
             success=True, batch_no=batch.batch_no,
