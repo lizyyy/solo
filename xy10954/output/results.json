@@ -1,0 +1,572 @@
+{
+  "runTime": "2026-05-23T18:19:23.283Z",
+  "inputFiles": {
+    "arrival": "data/arrival.csv",
+    "temperature": "data/temperature.csv"
+  },
+  "threshold": 8,
+  "statistics": {
+    "summary": {
+      "totalProcessed": 8,
+      "totalRejected": 4,
+      "totalAccepted": 4,
+      "totalAnomalies": 4,
+      "totalBadRows": 4,
+      "rejectionRate": 50,
+      "totalQuantity": 1690,
+      "rejectedQuantity": 530
+    },
+    "bySupplier": {
+      "鲜达配送": {
+        "total": 4,
+        "rejected": 2,
+        "accepted": 2,
+        "rejectionRate": 50,
+        "totalQuantity": 1150,
+        "rejectedQuantity": 350,
+        "categories": [
+          "猪肉",
+          "牛肉",
+          "蔬菜",
+          "鸡蛋"
+        ]
+      },
+      "绿源农场": {
+        "total": 2,
+        "rejected": 1,
+        "accepted": 1,
+        "rejectionRate": 50,
+        "totalQuantity": 400,
+        "rejectedQuantity": 100,
+        "categories": [
+          "鱼肉",
+          "鸡肉"
+        ]
+      },
+      "优品生鲜": {
+        "total": 2,
+        "rejected": 1,
+        "accepted": 1,
+        "rejectionRate": 50,
+        "totalQuantity": 140,
+        "rejectedQuantity": 80,
+        "categories": [
+          "虾",
+          "蟹"
+        ]
+      }
+    },
+    "byCategory": {
+      "猪肉": {
+        "total": 1,
+        "rejected": 1,
+        "accepted": 0,
+        "rejectionRate": 100
+      },
+      "牛肉": {
+        "total": 1,
+        "rejected": 1,
+        "accepted": 0,
+        "rejectionRate": 100
+      },
+      "鱼肉": {
+        "total": 1,
+        "rejected": 1,
+        "accepted": 0,
+        "rejectionRate": 100
+      },
+      "虾": {
+        "total": 1,
+        "rejected": 1,
+        "accepted": 0,
+        "rejectionRate": 100
+      },
+      "鸡肉": {
+        "total": 1,
+        "rejected": 0,
+        "accepted": 1,
+        "rejectionRate": 0
+      },
+      "蟹": {
+        "total": 1,
+        "rejected": 0,
+        "accepted": 1,
+        "rejectionRate": 0
+      },
+      "蔬菜": {
+        "total": 1,
+        "rejected": 0,
+        "accepted": 1,
+        "rejectionRate": 0
+      },
+      "鸡蛋": {
+        "total": 1,
+        "rejected": 0,
+        "accepted": 1,
+        "rejectionRate": 0
+      }
+    },
+    "topRejectedSuppliers": [
+      {
+        "supplier": "鲜达配送",
+        "total": 4,
+        "rejected": 2,
+        "accepted": 2,
+        "rejectionRate": 50,
+        "totalQuantity": 1150,
+        "rejectedQuantity": 350,
+        "categories": [
+          "猪肉",
+          "牛肉",
+          "蔬菜",
+          "鸡蛋"
+        ]
+      },
+      {
+        "supplier": "绿源农场",
+        "total": 2,
+        "rejected": 1,
+        "accepted": 1,
+        "rejectionRate": 50,
+        "totalQuantity": 400,
+        "rejectedQuantity": 100,
+        "categories": [
+          "鱼肉",
+          "鸡肉"
+        ]
+      },
+      {
+        "supplier": "优品生鲜",
+        "total": 2,
+        "rejected": 1,
+        "accepted": 1,
+        "rejectionRate": 50,
+        "totalQuantity": 140,
+        "rejectedQuantity": 80,
+        "categories": [
+          "虾",
+          "蟹"
+        ]
+      }
+    ]
+  },
+  "rejectedRecords": [
+    {
+      "batchId": "BATCH001",
+      "supplier": "鲜达配送",
+      "category": "猪肉",
+      "quantity": 200,
+      "arrivalDate": "2024-01-15",
+      "temperature": {
+        "average": 5.17,
+        "max": 9.8,
+        "min": 2.5,
+        "samples": 3,
+        "records": [
+          {
+            "temperature": 2.5,
+            "measureTime": "08:30",
+            "measurePoint": "车厢前部",
+            "_originalRow": 2
+          },
+          {
+            "temperature": 3.2,
+            "measureTime": "08:35",
+            "measurePoint": "车厢中部",
+            "_originalRow": 3
+          },
+          {
+            "temperature": 9.8,
+            "measureTime": "08:40",
+            "measurePoint": "车厢后部",
+            "_originalRow": 4
+          }
+        ]
+      },
+      "_arrivalRow": 2,
+      "_temperatureRows": [
+        2,
+        3,
+        4
+      ],
+      "result": "REJECTED",
+      "rejectionReason": "最高温度 9.8℃ ≥ 阈值 8℃"
+    },
+    {
+      "batchId": "BATCH002",
+      "supplier": "鲜达配送",
+      "category": "牛肉",
+      "quantity": 150,
+      "arrivalDate": "2024-01-15",
+      "temperature": {
+        "average": 7.83,
+        "max": 8.5,
+        "min": 7.2,
+        "samples": 3,
+        "records": [
+          {
+            "temperature": 7.2,
+            "measureTime": "09:00",
+            "measurePoint": "车厢前部",
+            "_originalRow": 5
+          },
+          {
+            "temperature": 8.5,
+            "measureTime": "09:05",
+            "measurePoint": "车厢中部",
+            "_originalRow": 6
+          },
+          {
+            "temperature": 7.8,
+            "measureTime": "09:10",
+            "measurePoint": "车厢后部",
+            "_originalRow": 7
+          }
+        ]
+      },
+      "_arrivalRow": 3,
+      "_temperatureRows": [
+        5,
+        6,
+        7
+      ],
+      "result": "REJECTED",
+      "rejectionReason": "最高温度 8.5℃ ≥ 阈值 8℃"
+    },
+    {
+      "batchId": "BATCH004",
+      "supplier": "绿源农场",
+      "category": "鱼肉",
+      "quantity": 100,
+      "arrivalDate": "2024-01-15",
+      "temperature": {
+        "average": 7.5,
+        "max": 10.2,
+        "min": 5.8,
+        "samples": 3,
+        "records": [
+          {
+            "temperature": 6.5,
+            "measureTime": "10:00",
+            "measurePoint": "车厢前部",
+            "_originalRow": 11
+          },
+          {
+            "temperature": 5.8,
+            "measureTime": "10:05",
+            "measurePoint": "车厢中部",
+            "_originalRow": 12
+          },
+          {
+            "temperature": 10.2,
+            "measureTime": "10:10",
+            "measurePoint": "车厢后部",
+            "_originalRow": 13
+          }
+        ]
+      },
+      "_arrivalRow": 5,
+      "_temperatureRows": [
+        11,
+        12,
+        13
+      ],
+      "result": "REJECTED",
+      "rejectionReason": "最高温度 10.2℃ ≥ 阈值 8℃"
+    },
+    {
+      "batchId": "BATCH005",
+      "supplier": "优品生鲜",
+      "category": "虾",
+      "quantity": 80,
+      "arrivalDate": "2024-01-15",
+      "temperature": {
+        "average": 7.83,
+        "max": 8.2,
+        "min": 7.5,
+        "samples": 3,
+        "records": [
+          {
+            "temperature": 7.8,
+            "measureTime": "10:30",
+            "measurePoint": "车厢前部",
+            "_originalRow": 14
+          },
+          {
+            "temperature": 8.2,
+            "measureTime": "10:35",
+            "measurePoint": "车厢中部",
+            "_originalRow": 15
+          },
+          {
+            "temperature": 7.5,
+            "measureTime": "10:40",
+            "measurePoint": "车厢后部",
+            "_originalRow": 16
+          }
+        ]
+      },
+      "_arrivalRow": 6,
+      "_temperatureRows": [
+        14,
+        15,
+        16
+      ],
+      "result": "REJECTED",
+      "rejectionReason": "最高温度 8.2℃ ≥ 阈值 8℃"
+    }
+  ],
+  "acceptedRecords": [
+    {
+      "batchId": "BATCH003",
+      "supplier": "绿源农场",
+      "category": "鸡肉",
+      "quantity": 300,
+      "arrivalDate": "2024-01-15",
+      "temperature": {
+        "average": 4.17,
+        "max": 4.5,
+        "min": 3.8,
+        "samples": 3,
+        "records": [
+          {
+            "temperature": 4.2,
+            "measureTime": "09:30",
+            "measurePoint": "车厢前部",
+            "_originalRow": 8
+          },
+          {
+            "temperature": 3.8,
+            "measureTime": "09:35",
+            "measurePoint": "车厢中部",
+            "_originalRow": 9
+          },
+          {
+            "temperature": 4.5,
+            "measureTime": "09:40",
+            "measurePoint": "车厢后部",
+            "_originalRow": 10
+          }
+        ]
+      },
+      "_arrivalRow": 4,
+      "_temperatureRows": [
+        8,
+        9,
+        10
+      ],
+      "result": "ACCEPTED",
+      "rejectionReason": null
+    },
+    {
+      "batchId": "BATCH006",
+      "supplier": "优品生鲜",
+      "category": "蟹",
+      "quantity": 60,
+      "arrivalDate": "2024-01-15",
+      "temperature": {
+        "average": 5,
+        "max": 5.2,
+        "min": 4.8,
+        "samples": 2,
+        "records": [
+          {
+            "temperature": 5.2,
+            "measureTime": "11:00",
+            "measurePoint": "车厢前部",
+            "_originalRow": 17
+          },
+          {
+            "temperature": 4.8,
+            "measureTime": "11:05",
+            "measurePoint": "车厢中部",
+            "_originalRow": 18
+          }
+        ]
+      },
+      "_arrivalRow": 7,
+      "_temperatureRows": [
+        17,
+        18
+      ],
+      "result": "ACCEPTED",
+      "rejectionReason": null
+    },
+    {
+      "batchId": "BATCH007",
+      "supplier": "鲜达配送",
+      "category": "蔬菜",
+      "quantity": 500,
+      "arrivalDate": "2024-01-15",
+      "temperature": {
+        "average": 6.83,
+        "max": 7.2,
+        "min": 6.5,
+        "samples": 3,
+        "records": [
+          {
+            "temperature": 6.8,
+            "measureTime": "11:30",
+            "measurePoint": "车厢前部",
+            "_originalRow": 19
+          },
+          {
+            "temperature": 7.2,
+            "measureTime": "11:35",
+            "measurePoint": "车厢中部",
+            "_originalRow": 20
+          },
+          {
+            "temperature": 6.5,
+            "measureTime": "11:40",
+            "measurePoint": "车厢后部",
+            "_originalRow": 21
+          }
+        ]
+      },
+      "_arrivalRow": 8,
+      "_temperatureRows": [
+        19,
+        20,
+        21
+      ],
+      "result": "ACCEPTED",
+      "rejectionReason": null
+    },
+    {
+      "batchId": "BATCH010",
+      "supplier": "鲜达配送",
+      "category": "鸡蛋",
+      "quantity": 300,
+      "arrivalDate": "2024-01-15",
+      "temperature": {
+        "average": 4,
+        "max": 4.2,
+        "min": 3.8,
+        "samples": 2,
+        "records": [
+          {
+            "temperature": 4.2,
+            "measureTime": "12:30",
+            "measurePoint": "车厢前部",
+            "_originalRow": 23
+          },
+          {
+            "temperature": 3.8,
+            "measureTime": "12:35",
+            "measurePoint": "车厢中部",
+            "_originalRow": 24
+          }
+        ]
+      },
+      "_arrivalRow": 11,
+      "_temperatureRows": [
+        23,
+        24
+      ],
+      "result": "ACCEPTED",
+      "rejectionReason": null
+    }
+  ],
+  "anomalyRecords": [
+    {
+      "temperature": 9.8,
+      "measureTime": "08:40",
+      "measurePoint": "车厢后部",
+      "_originalRow": 4,
+      "batchId": "BATCH001",
+      "supplier": "鲜达配送",
+      "category": "猪肉"
+    },
+    {
+      "temperature": 8.5,
+      "measureTime": "09:05",
+      "measurePoint": "车厢中部",
+      "_originalRow": 6,
+      "batchId": "BATCH002",
+      "supplier": "鲜达配送",
+      "category": "牛肉"
+    },
+    {
+      "temperature": 10.2,
+      "measureTime": "10:10",
+      "measurePoint": "车厢后部",
+      "_originalRow": 13,
+      "batchId": "BATCH004",
+      "supplier": "绿源农场",
+      "category": "鱼肉"
+    },
+    {
+      "temperature": 8.2,
+      "measureTime": "10:35",
+      "measurePoint": "车厢中部",
+      "_originalRow": 15,
+      "batchId": "BATCH005",
+      "supplier": "优品生鲜",
+      "category": "虾"
+    }
+  ],
+  "unmatchedArrival": [],
+  "unmatchedTemperature": [
+    {
+      "batchId": "BATCH008",
+      "temperature": "5.5",
+      "measureTime": "12:00",
+      "measurePoint": "车厢前部",
+      "_originalRow": 22,
+      "_sourceFile": "data/temperature.csv"
+    }
+  ],
+  "badRows": [
+    {
+      "batchId": "",
+      "supplier": "绿源农场",
+      "category": "水果",
+      "quantity": "400",
+      "arrivalDate": "2024-01-15",
+      "_originalRow": 9,
+      "_sourceFile": "data/arrival.csv",
+      "_validationErrors": [
+        "缺少必填列: batchId"
+      ],
+      "_fileType": "arrival"
+    },
+    {
+      "batchId": "BATCH009",
+      "supplier": "优品生鲜",
+      "category": "牛奶",
+      "quantity": "250",
+      "arrivalDate": "",
+      "_originalRow": 10,
+      "_sourceFile": "data/arrival.csv",
+      "_validationErrors": [
+        "缺少必填列: arrivalDate"
+      ],
+      "_fileType": "arrival"
+    },
+    {
+      "batchId": "",
+      "temperature": "4.5",
+      "measureTime": "12:40",
+      "measurePoint": "车厢后部",
+      "_originalRow": 25,
+      "_sourceFile": "data/temperature.csv",
+      "_validationErrors": [
+        "缺少必填列: batchId"
+      ],
+      "_fileType": "temperature"
+    },
+    {
+      "batchId": "BATCH011",
+      "temperature": "6.2",
+      "measureTime": "13:00",
+      "measurePoint": "",
+      "_originalRow": 26,
+      "_sourceFile": "data/temperature.csv",
+      "_validationErrors": [
+        "缺少必填列: measurePoint"
+      ],
+      "_fileType": "temperature"
+    }
+  ]
+}
