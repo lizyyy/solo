@@ -1,0 +1,109 @@
+{
+  "report_info": {
+    "generated_at": "2026-05-18T02:38:27.531358",
+    "input_file": "test_clean.csv",
+    "version": "1.0.0"
+  },
+  "summary": {
+    "total_records": 10,
+    "valid_records": 10,
+    "missing_count": 5,
+    "completion_rate": 50.0,
+    "error_count": 0
+  },
+  "by_category": {
+    "安全项": 3,
+    "保养项": 2,
+    "其他": 0
+  },
+  "by_team": {
+    "甲班": {
+      "total": 4,
+      "completed": 1,
+      "missing": 3,
+      "safety_missing": 2,
+      "maintenance_missing": 1,
+      "rate": 25.0,
+      "level": "critical",
+      "level_name": "紧急"
+    },
+    "乙班": {
+      "total": 3,
+      "completed": 1,
+      "missing": 2,
+      "safety_missing": 1,
+      "maintenance_missing": 1,
+      "rate": 33.33333333333333,
+      "level": "critical",
+      "level_name": "紧急"
+    },
+    "丙班": {
+      "total": 3,
+      "completed": 3,
+      "missing": 0,
+      "safety_missing": 0,
+      "maintenance_missing": 0,
+      "rate": 100.0,
+      "level": "critical",
+      "level_name": "紧急"
+    }
+  },
+  "missing_details": [
+    {
+      "date": "2024-05-16",
+      "device_id": "MACH-002",
+      "check_item": "更换润滑油",
+      "team": "甲班",
+      "missing_type": "保养项",
+      "category": "保养项",
+      "is_completed_flag": false,
+      "is_completed_raw": "否",
+      "row_number": 3
+    },
+    {
+      "date": "2024-05-16",
+      "device_id": "MACH-004",
+      "check_item": "清洁过滤器",
+      "team": "乙班",
+      "missing_type": "保养项",
+      "category": "保养项",
+      "is_completed_flag": false,
+      "is_completed_raw": "否",
+      "row_number": 5
+    },
+    {
+      "date": "2024-05-16",
+      "device_id": "MACH-005",
+      "check_item": "检查安全门",
+      "team": "甲班",
+      "missing_type": "安全检查",
+      "category": "安全项",
+      "is_completed_flag": false,
+      "is_completed_raw": "否",
+      "row_number": 6
+    },
+    {
+      "date": "2024-05-16",
+      "device_id": "MACH-007",
+      "check_item": "检查紧急停止",
+      "team": "乙班",
+      "missing_type": "安全",
+      "category": "安全项",
+      "is_completed_flag": false,
+      "is_completed_raw": "否",
+      "row_number": 8
+    },
+    {
+      "date": "2024-05-16",
+      "device_id": "MACH-009",
+      "check_item": "检查报警系统",
+      "team": "甲班",
+      "missing_type": "安全项",
+      "category": "安全项",
+      "is_completed_flag": false,
+      "is_completed_raw": "否",
+      "row_number": 10
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备巡检缺项报告 - 2026-05-18 02:38:27</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; color: #1f2937; background: #f3f4f6; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 32px; }
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 16px; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; padding: 24px 32px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .stat-value { font-size: 32px; font-weight: 700; color: #1e40af; }
+        .stat-label { font-size: 14px; color: #64748b; margin-top: 4px; }
+        .section { padding: 24px 32px; border-bottom: 1px solid #e2e8f0; }
+        .section-title { font-size: 20px; font-weight: 600; color: #1e293b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .section-title::before { content: ''; width: 4px; height: 20px; background: #3b82f6; border-radius: 2px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th { background: #f1f5f9; text-align: left; padding: 12px 16px; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
+        tr:hover { background: #f8fafc; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+        .badge-safety { background: #fef2f2; color: #dc2626; }
+        .badge-maintenance { background: #eff6ff; color: #1d4ed8; }
+        .badge-other { background: #f3f4f6; color: #4b5563; }
+        .level-critical { background: #fef2f2; color: #dc2626; }
+        .level-high { background: #fff7ed; color: #ea580c; }
+        .level-medium { background: #fefce8; color: #ca8a04; }
+        .level-low { background: #f0fdf4; color: #16a34a; }
+        .error-section { background: #fef2f2; border-left: 4px solid #dc2626; padding: 16px; margin: 16px 32px; border-radius: 0 8px 8px 0; }
+        .error-title { font-weight: 600; color: #dc2626; margin-bottom: 8px; }
+        .error-row { font-family: monospace; font-size: 13px; background: white; padding: 8px 12px; margin: 4px 0; border-radius: 4px; border: 1px solid #fecaca; }
+        .chart-container { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; }
+        .chart { flex: 1; min-width: 300px; }
+        .bar-chart { display: flex; align-items: flex-end; gap: 16px; height: 200px; padding: 20px 0; }
+        .bar { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .bar-fill { width: 60px; border-radius: 8px 8px 0 0; margin-bottom: 8px; transition: height 0.3s; }
+        .bar-label { font-size: 12px; color: #64748b; text-align: center; }
+        .bar-value { font-weight: 600; color: #1e293b; }
+        .footer { padding: 24px 32px; text-align: center; color: #64748b; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 设备巡检缺项报告</h1>
+            <p>生成时间: 2026-05-18 02:38:27 | 输入文件: test_clean.csv</p>
+        </div>
+
+        <div class="summary">
+            <div class="stat-card">
+                <div class="stat-value">10</div>
+                <div class="stat-label">总记录数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">10</div>
+                <div class="stat-label">有效记录</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">缺项总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">50.0%</div>
+                <div class="stat-label">完成率</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">异常行数</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">缺项分类统计</h2>
+            <div class="chart-container">
+                <div class="chart">
+                    <div class="bar-chart">
+                        
+                        <div class="bar">
+                            <div class="bar-fill" style="height: 150.0px; background: #dc2626;"></div>
+                            <div class="bar-value">3</div>
+                            <div class="bar-label">安全项</div>
+                        </div>
+                        
+                        <div class="bar">
+                            <div class="bar-fill" style="height: 100.0px; background: #1d4ed8;"></div>
+                            <div class="bar-value">2</div>
+                            <div class="bar-label">保养项</div>
+                        </div>
+                        
+                        <div class="bar">
+                            <div class="bar-fill" style="height: 0.0px; background: #4b5563;"></div>
+                            <div class="bar-value">0</div>
+                            <div class="bar-label">其他</div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">班组缺项汇总</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>班组</th>
+                        <th>总检查项</th>
+                        <th>缺项数</th>
+                        <th>完成率</th>
+                        <th>安全缺项</th>
+                        <th>保养缺项</th>
+                        <th>整改级别</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td><strong>甲班</strong></td>
+                        <td>4</td>
+                        <td>3</td>
+                        <td>25.0%</td>
+                        <td><span class="badge badge-safety">2</span></td>
+                        <td><span class="badge badge-maintenance">1</span></td>
+                        <td><span class="badge level-critical">紧急</span></td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>乙班</strong></td>
+                        <td>3</td>
+                        <td>2</td>
+                        <td>33.3%</td>
+                        <td><span class="badge badge-safety">1</span></td>
+                        <td><span class="badge badge-maintenance">1</span></td>
+                        <td><span class="badge level-critical">紧急</span></td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>丙班</strong></td>
+                        <td>3</td>
+                        <td>0</td>
+                        <td>100.0%</td>
+                        <td><span class="badge badge-safety">0</span></td>
+                        <td><span class="badge badge-maintenance">0</span></td>
+                        <td><span class="badge level-critical">紧急</span></td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">缺项明细</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>行号</th>
+                        <th>巡检日期</th>
+                        <th>设备编号</th>
+                        <th>检查项</th>
+                        <th>班组</th>
+                        <th>缺项类型</th>
+                        <th>分类</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td>#3</td>
+                        <td>2024-05-16</td>
+                        <td>MACH-002</td>
+                        <td>更换润滑油</td>
+                        <td>甲班</td>
+                        <td>保养项</td>
+                        <td>
+                            <span class="badge badge-maintenance">
+                                保养项
+                            </span>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>#5</td>
+                        <td>2024-05-16</td>
+                        <td>MACH-004</td>
+                        <td>清洁过滤器</td>
+                        <td>乙班</td>
+                        <td>保养项</td>
+                        <td>
+                            <span class="badge badge-maintenance">
+                                保养项
+                            </span>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>#6</td>
+                        <td>2024-05-16</td>
+                        <td>MACH-005</td>
+                        <td>检查安全门</td>
+                        <td>甲班</td>
+                        <td>安全检查</td>
+                        <td>
+                            <span class="badge badge-safety">
+                                安全项
+                            </span>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>#8</td>
+                        <td>2024-05-16</td>
+                        <td>MACH-007</td>
+                        <td>检查紧急停止</td>
+                        <td>乙班</td>
+                        <td>安全</td>
+                        <td>
+                            <span class="badge badge-safety">
+                                安全项
+                            </span>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>#10</td>
+                        <td>2024-05-16</td>
+                        <td>MACH-009</td>
+                        <td>检查报警系统</td>
+                        <td>甲班</td>
+                        <td>安全项</td>
+                        <td>
+                            <span class="badge badge-safety">
+                                安全项
+                            </span>
+                        </td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+
+        
+
+        <div class="footer">
+            <p>本报告由设备巡检缺项CLI自动生成</p>
+        </div>
+    </div>
+</body>
+</html>

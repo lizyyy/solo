@@ -1,0 +1,107 @@
+{
+  "report_info": {
+    "generated_at": "2026-05-18T02:38:38.108970",
+    "input_file": "test_dirty.csv",
+    "version": "1.0.0"
+  },
+  "summary": {
+    "total_records": 10,
+    "valid_records": 4,
+    "missing_count": 2,
+    "completion_rate": 0.0,
+    "error_count": 6
+  },
+  "by_category": {
+    "安全项": 2,
+    "保养项": 0,
+    "其他": 0
+  },
+  "by_team": {
+    "甲班": {
+      "total": 2,
+      "completed": 1,
+      "missing": 1,
+      "safety_missing": 1,
+      "maintenance_missing": 0,
+      "rate": 50.0,
+      "level": "critical",
+      "level_name": "紧急"
+    },
+    "乙班": {
+      "total": 1,
+      "completed": 0,
+      "missing": 1,
+      "safety_missing": 1,
+      "maintenance_missing": 0,
+      "rate": 0.0,
+      "level": "critical",
+      "level_name": "紧急"
+    },
+    "丙班": {
+      "total": 1,
+      "completed": 1,
+      "missing": 0,
+      "safety_missing": 0,
+      "maintenance_missing": 0,
+      "rate": 100.0,
+      "level": "critical",
+      "level_name": "紧急"
+    }
+  },
+  "missing_details": [
+    {
+      "date": "2024-05-16",
+      "device_id": "MACH-007",
+      "check_item": "检查紧急停止",
+      "team": "乙班",
+      "missing_type": "安全",
+      "category": "安全项",
+      "is_completed_flag": false,
+      "is_completed_raw": "否",
+      "row_number": 8
+    },
+    {
+      "date": "2024-05-16",
+      "device_id": "MACH-009",
+      "check_item": "检查报警系统",
+      "team": "甲班",
+      "missing_type": "安全项",
+      "category": "安全项",
+      "is_completed_flag": false,
+      "is_completed_raw": "否",
+      "row_number": 10
+    }
+  ],
+  "errors": [
+    {
+      "row_number": 3,
+      "reason": "设备编号为空",
+      "raw_data": "2024-05-16 |  | 更换润滑油 | 甲班 | 保养项 | 否"
+    },
+    {
+      "row_number": 4,
+      "reason": "检查项为空",
+      "raw_data": "2024-05-16 | MACH-003 |  | 乙班 | 安全项 | 是"
+    },
+    {
+      "row_number": 5,
+      "reason": "班组为空",
+      "raw_data": "2024-05-16 | MACH-004 | 清洁过滤器 |  | 保养项 | 否"
+    },
+    {
+      "row_number": 6,
+      "reason": "是否完成为空",
+      "raw_data": "2024-05-16 | MACH-005 | 检查安全门 | 甲班 | 安全检查 | "
+    },
+    {
+      "row_number": 7,
+      "reason": "是否完成值无效: 未知",
+      "raw_data": "2024-05-16 | MACH-006 | 定期维护 | 丙班 | 日常保养 | 未知"
+    },
+    {
+      "row_number": 9,
+      "reason": "设备编号为空",
+      "raw_data": " |  | 清洁地面 | 丁班 | 其他 | 是"
+    }
+  ]
+}
