@@ -1,0 +1,9 @@
+content,assignee,due_date,status,delay_reason,line_number,raw_line,is_valid,source_file,is_delayed
+完成项目需求文档,张三,2026-05-20,待办,,8,- [ ] @张三 完成项目需求文档 2026-05-20,True,meeting_notes.md,True
+开发用户登录模块,李四,2026-05-15,待办,依赖接口未就绪,9,- [ ] @李四 开发用户登录模块 2026-05-15 延期原因: 依赖接口未就绪,True,meeting_notes.md,True
+进行系统测试,王五,2026-05-25,待办,,10,- [ ] @王五 进行系统测试 2026-05-25,True,meeting_notes.md,False
+准备项目演示PPT,张三,2026-05-30,待办,,11,- [ ] @张三 准备项目演示PPT 2026-05-30,True,meeting_notes.md,False
+修复已知Bug,李四,,进行中,,12,- [ ] @李四 修复已知Bug 进行中,True,meeting_notes.md,False
+未分配任务,,,待办,,13,- [ ] 未分配任务 待办,True,meeting_notes.md,False
+准备测试环境,王五,2026-05-18,待办,,15,1. 负责人：王五 准备测试环境 2026-05-18,True,meeting_notes.md,True
+召开需求评审会议,,2026-05-19,待办,,16,待办：召开需求评审会议 2026-05-19,True,meeting_notes.md,True
