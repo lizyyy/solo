@@ -11,13 +11,13 @@ router = APIRouter()
 
 @router.post("/upload", response_model=UploadResponse)
 async def upload_files(
-    grievance_file: UploadFile = File(...),
-    flight_file: Optional[UploadFile] = File(None),
-    photo_file: Optional[UploadFile] = File(None),
+    grievance_csv: UploadFile = File(...),
+    flight_json: Optional[UploadFile] = File(None),
+    photo_json: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db)
 ):
     try:
-        grievance_content = await grievance_file.read()
+        grievance_content = await grievance_csv.read()
         grievance_text = grievance_content.decode("utf-8")
         file_hash = ImportService.generate_file_hash(grievance_content)
         is_duplicate, existing_batch = ImportService.check_duplicate_batch(db, file_hash)
@@ -25,16 +25,17 @@ async def upload_files(
             raise ValueError(f"File already submitted: {existing_batch.batch_no}")
         batch, grievance_list = ImportService.import_grievances_csv(
             db=db, csv_content=grievance_text,
-            file_name=grievance_file.filename, file_hash=file_hash
+            file_name=grievance_csv.filename, file_hash=file_hash
         )
+        
         flight_map = None
-        if flight_file:
-            flight_content = await flight_file.read()
+        if flight_json:
+            flight_content = await flight_json.read()
             flight_map = ImportService.parse_flights_json(flight_content)
         
         photo_map = None
-        if photo_file:
-            photo_content = await photo_file.read()
+        if photo_json:
+            photo_content = await photo_json.read()
             photo_map = ImportService.parse_photos_json(photo_content)
         
         created = ImportService.create_grievance_records(db, batch, grievance_list, flight_map, photo_map)
@@ -87,8 +88,6 @@ def get_grievance(grievance_no: str, db: Session = Depends(get_db)):
     if not g:
         raise HTTPException(status_code=404, detail="Not found")
     return g
-
-
 
 @router.get("/grievances/{grievance_no}/history", response_model=List[ProcessingHistorySchema])
 def get_grievance_history(grievance_no: str, db: Session = Depends(get_db)):
