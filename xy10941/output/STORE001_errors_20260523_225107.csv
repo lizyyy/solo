@@ -1,0 +1,3 @@
+﻿来源系统,文件名,行号,错误信息,原始内容
+收银,cash_01.csv,10,金额格式无效,"{'trade_no': 'POS2024010100008', 'amount': 'invalid', 'time': '2024-01-01 18:00:00', 'is_refund': '0', 'store_id': 'STORE001'}"
+收银,cash_01.csv,11,时间格式无效,"{'trade_no': 'POS2024010100009', 'amount': '123.45', 'time': nan, 'is_refund': '0', 'store_id': 'STORE001'}"
