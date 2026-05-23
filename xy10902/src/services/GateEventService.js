@@ -2,11 +2,19 @@ const GateEvent = require('../models/GateEvent');
 const Vehicle = require('../models/Vehicle');
 const DeductionRecord = require('../models/DeductionRecord');
 const SubscriptionService = require('./SubscriptionService');
+const ExceptionLog = require('../models/ExceptionLog');
 
 class GateEventService {
   static async processEvent(eventData) {
     const existingEvent = await GateEvent.findByEventId(eventData.event_id);
     if (existingEvent) {
+      await ExceptionLog.create({
+        exception_type: 'gate_event_duplicate',
+        raw_input: eventData,
+        error_message: '事件ID已存在，重复上报',
+        processing_result: '返回已处理状态，不重复扣费',
+        api_path: '/api/v1/gate-events'
+      });
       return {
         success: true,
         duplicate: true,
@@ -26,6 +34,13 @@ class GateEventService {
       if (eventResult.success) {
         await GateEvent.markDeduplicated(eventResult.id);
       }
+      await ExceptionLog.create({
+        exception_type: 'gate_event_deduplicated',
+        raw_input: eventData,
+        error_message: '5分钟内同车辆重复事件，已去重',
+        processing_result: '标记去重，不扣费',
+        api_path: '/api/v1/gate-events'
+      });
       return {
         success: true,
         deduplicated: true,
@@ -36,6 +51,13 @@ class GateEventService {
 
     const eventResult = await GateEvent.create(eventData);
     if (!eventResult.success) {
+      await ExceptionLog.create({
+        exception_type: 'gate_event_create_failed',
+        raw_input: eventData,
+        error_message: '事件写入数据库失败',
+        processing_result: '返回失败状态',
+        api_path: '/api/v1/gate-events'
+      });
       return eventResult;
     }
 
@@ -77,6 +99,13 @@ class GateEventService {
             balance_after: balanceAfter
           };
         } else {
+          await ExceptionLog.create({
+            exception_type: 'balance_insufficient',
+            raw_input: eventData,
+            error_message: `余额不足: 当前${vehicle.balance}元, 需${tempFee}元`,
+            processing_result: '返回余额不足，需现场缴费',
+            api_path: '/api/v1/gate-events'
+          });
           deductionResult = {
             type: 'balance_insufficient',
             message: '余额不足，请充值',
@@ -86,6 +115,13 @@ class GateEventService {
         }
       }
     } else {
+      await ExceptionLog.create({
+        exception_type: 'unregistered_vehicle',
+        raw_input: eventData,
+        error_message: '车辆未注册，无账户信息',
+        processing_result: '返回未注册，需现场缴费',
+        api_path: '/api/v1/gate-events'
+      });
       deductionResult = {
         type: 'unregistered',
         message: '未注册车辆',

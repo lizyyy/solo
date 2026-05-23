@@ -3,16 +3,31 @@ const Vehicle = require('../models/Vehicle');
 const MonthlyPlan = require('../models/MonthlyPlan');
 const VehicleSubscription = require('../models/VehicleSubscription');
 const DeductionRecord = require('../models/DeductionRecord');
+const ExceptionLog = require('../models/ExceptionLog');
 
 class SubscriptionService {
   static async createSubscription(plateNumber, planId) {
     const vehicle = await Vehicle.findByPlate(plateNumber);
     if (!vehicle) {
+      await ExceptionLog.create({
+        exception_type: 'subscribe_vehicle_not_found',
+        raw_input: { plateNumber, planId },
+        error_message: '车辆不存在',
+        processing_result: '抛出错误返回400',
+        api_path: '/api/v1/vehicles/subscribe'
+      });
       throw new Error('车辆不存在');
     }
 
     const plan = await MonthlyPlan.findById(planId);
     if (!plan || !plan.is_active) {
+      await ExceptionLog.create({
+        exception_type: 'subscribe_plan_invalid',
+        raw_input: { plateNumber, planId, plan },
+        error_message: '套餐不存在或已停用',
+        processing_result: '抛出错误返回400',
+        api_path: '/api/v1/vehicles/subscribe'
+      });
       throw new Error('套餐不存在或已停用');
     }
 
@@ -25,6 +40,13 @@ class SubscriptionService {
     const endDate = startDate.clone().add(plan.duration_days, 'days');
 
     if (vehicle.balance < plan.price) {
+      await ExceptionLog.create({
+        exception_type: 'subscribe_balance_insufficient',
+        raw_input: { plateNumber, planId, balance: vehicle.balance, price: plan.price },
+        error_message: `账户余额不足: 当前${vehicle.balance}元, 需${plan.price}元`,
+        processing_result: '抛出错误返回400',
+        api_path: '/api/v1/vehicles/subscribe'
+      });
       throw new Error('账户余额不足，请先充值');
     }
 
@@ -85,6 +107,13 @@ class SubscriptionService {
 
   static async recharge(plateNumber, amount) {
     if (amount <= 0) {
+      await ExceptionLog.create({
+        exception_type: 'recharge_invalid_amount',
+        raw_input: { plateNumber, amount },
+        error_message: '充值金额必须大于0',
+        processing_result: '抛出错误返回500',
+        api_path: '/api/v1/vehicles/recharge'
+      });
       throw new Error('充值金额必须大于0');
     }
 
