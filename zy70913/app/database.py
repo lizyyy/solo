@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from contextlib import contextmanager
 from app.config import get_settings
 
 settings = get_settings()
@@ -19,3 +20,17 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+@contextmanager
+def db_session():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def init_db():
+    from app.models import Batch, Grievance, Flight, PhotoIndex, ProcessingHistory
+    Base.metadata.create_all(bind=engine)

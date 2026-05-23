@@ -5,6 +5,6 @@ api_router = APIRouter()
 
 api_router.include_router(
     grievance_router,
-    prefix="/grievance",
+    prefix="/grievances",
     tags=["申诉管理"]
 )

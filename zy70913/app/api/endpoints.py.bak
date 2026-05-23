@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.database import get_db
-from app.models import Batch, Grievance, BatchStatus, GrievanceStatus, ProcessingHistory
-from app.schemas import Batch as BatchSchema, Grievance as GrievanceSchema, UploadResponse, BatchResultResponse, ProcessingHistory as ProcessingHistorySchema
+from app.models import Batch, Grievance, BatchStatus, GrievanceStatus
+from app.schemas import Batch as BatchSchema, Grievance as GrievanceSchema, UploadResponse, BatchResultResponse
 from app.services.import_service import ImportService
 from app.services.rules_engine import RulesEngine
 
@@ -12,8 +12,6 @@ router = APIRouter()
 @router.post("/upload", response_model=UploadResponse)
 async def upload_files(
     grievance_file: UploadFile = File(...),
-    flight_file: Optional[UploadFile] = File(None),
-    photo_file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db)
 ):
     try:
@@ -27,17 +25,7 @@ async def upload_files(
             db=db, csv_content=grievance_text,
             file_name=grievance_file.filename, file_hash=file_hash
         )
-        flight_map = None
-        if flight_file:
-            flight_content = await flight_file.read()
-            flight_map = ImportService.parse_flights_json(flight_content)
-        
-        photo_map = None
-        if photo_file:
-            photo_content = await photo_file.read()
-            photo_map = ImportService.parse_photos_json(photo_content)
-        
-        created = ImportService.create_grievance_records(db, batch, grievance_list, flight_map, photo_map)
+        created = ImportService.create_grievance_records(db, batch, grievance_list)
         engine = RulesEngine(db=db)
         engine.evaluate_batch(created)
         success = sum(1 for g in created if g.status == GrievanceStatus.APPROVED)
@@ -88,11 +76,3 @@ def get_grievance(grievance_no: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Not found")
     return g
 
-
-
-@router.get("/grievances/{grievance_no}/history", response_model=List[ProcessingHistorySchema])
-def get_grievance_history(grievance_no: str, db: Session = Depends(get_db)):
-    grievance = db.query(Grievance).filter(Grievance.grievance_no == grievance_no).first()
-    if not grievance:
-        raise HTTPException(status_code=404, detail="Not found")
-    return db.query(ProcessingHistory).filter(ProcessingHistory.grievance_id == grievance.id).order_by(ProcessingHistory.created_at.asc()).all()
