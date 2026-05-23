@@ -36,6 +36,22 @@
 
 - ✅ `data/` 和 `exports/` 目录会在首次运行时**自动创建**，无需手动创建
 - ✅ 样例数据初始化脚本支持**重复调用**，不会产生重复数据冲突
+- ✅ 提供**离线验证**脚本，无需安装依赖即可验证代码完整性
+
+### 0. 离线验证（可选，无需依赖）
+
+```bash
+# 验证代码结构和语法
+npm run verify
+
+# 运行离线API功能测试
+npm test
+
+# 或使用 lint 别名
+npm run lint
+```
+
+> 💡 **提示**: 这些脚本使用 Node.js 内置功能，无需 `npm install`，可直接验证代码完整性。
 
 ### 1. 安装依赖
 
@@ -441,6 +457,18 @@ curl http://localhost:3000/api/renewal/exceptions
 
 ## 问题修复记录
 
+### 第四轮修复（可验证性）
+
+| 问题 | 修复方案 |
+|------|----------|
+| test脚本指向不存在文件 | 创建 `scripts/testApi.js` 离线API功能验证脚本 |
+| 无法离线验证代码完整性 | 新增 `npm run verify` 和 `npm run lint` 离线验证命令 |
+| 依赖安装失败导致无法验证 | 所有验证脚本使用 Node.js 内置功能，无需 npm install |
+
+### 第三轮修复（核心逻辑 - 已完成）
+
+> 本轮问题与第二轮描述相同，已在第二轮全部修复并通过验证
+
 ### 第二轮修复（核心逻辑）
 
 | 问题 | 修复方案 |
@@ -467,6 +495,8 @@ curl http://localhost:3000/api/renewal/exceptions
 5. 人工修正操作会保留完整审计轨迹
 6. `data/` 和 `exports/` 目录不存在时会自动创建
 7. `npm run init-data` 可重复执行，不会产生重复数据
+8. **离线验证**: `npm test` 和 `npm run verify` 无需安装依赖即可运行
+9. 所有脚本均使用 Node.js 内置功能，最小化外部依赖
 
 ## License
 

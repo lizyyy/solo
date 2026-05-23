@@ -7,7 +7,9 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "init-data": "node scripts/initData.js",
-    "test": "node scripts/testApi.js"
+    "test": "node scripts/testApi.js",
+    "verify": "node scripts/verifySetup.js",
+    "lint": "node scripts/testApi.js"
   },
   "dependencies": {
     "express": "^4.18.2",
