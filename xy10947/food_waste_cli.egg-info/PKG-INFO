@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: food-waste-cli
+Version: 1.0.0
+Summary: 餐饮原料损耗分析CLI工具
+Author: 餐饮损耗分析工具
+Requires-Python: >=3.9
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: jinja2>=3.1.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

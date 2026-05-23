@@ -1,0 +1,18 @@
+[project]
+name = "property-meter-cli"
+version = "0.1.0"
+description = "物业水电抄表数据处理 CLI 工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+meter-cli = "property_meter.cli:main"
+
+[tool.ruff]
+line-length = 100

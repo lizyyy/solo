@@ -199,3 +199,5 @@ class ProcessingException(Base):
     handled_at = Column(DateTime, nullable=True)
     correction_notes = Column(Text, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
+
+    order = relationship("Order", back_populates="exceptions")

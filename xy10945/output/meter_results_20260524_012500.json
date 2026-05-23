@@ -1,0 +1,79 @@
+{
+  "metadata": {
+    "input_file": "/Users/mac/pro/solo/workspaces/xy10945/test_clean.csv",
+    "processed_at": "2026-05-24T01:25:00.694383",
+    "total_records": 6
+  },
+  "summary": {
+    "valid_count": 6,
+    "invalid_count": 0,
+    "abnormal_count": 0,
+    "missing_meter_count": 0,
+    "total_usage_water": 0.0,
+    "total_usage_electric": 390.0
+  },
+  "valid_records": [
+    {
+      "row_number": 2,
+      "household": "1栋101",
+      "meter_number": "DB001",
+      "meter_type": "electric",
+      "previous_reading": 100.0,
+      "current_reading": 150.0,
+      "multiplier": 1.0,
+      "usage": 50.0
+    },
+    {
+      "row_number": 3,
+      "household": "1栋102",
+      "meter_number": "DB002",
+      "meter_type": "electric",
+      "previous_reading": 200.0,
+      "current_reading": 260.0,
+      "multiplier": 1.0,
+      "usage": 60.0
+    },
+    {
+      "row_number": 4,
+      "household": "1栋201",
+      "meter_number": "DB003",
+      "meter_type": "electric",
+      "previous_reading": 150.0,
+      "current_reading": 210.0,
+      "multiplier": 1.0,
+      "usage": 60.0
+    },
+    {
+      "row_number": 5,
+      "household": "1栋202",
+      "meter_number": "DB004",
+      "meter_type": "electric",
+      "previous_reading": 180.0,
+      "current_reading": 250.0,
+      "multiplier": 1.0,
+      "usage": 70.0
+    },
+    {
+      "row_number": 6,
+      "household": "2栋101",
+      "meter_number": "DB005",
+      "meter_type": "electric",
+      "previous_reading": 300.0,
+      "current_reading": 380.0,
+      "multiplier": 1.0,
+      "usage": 80.0
+    },
+    {
+      "row_number": 7,
+      "household": "2栋102",
+      "meter_number": "DB006",
+      "meter_type": "electric",
+      "previous_reading": 220.0,
+      "current_reading": 290.0,
+      "multiplier": 1.0,
+      "usage": 70.0
+    }
+  ],
+  "invalid_records": [],
+  "missing_meters": []
+}

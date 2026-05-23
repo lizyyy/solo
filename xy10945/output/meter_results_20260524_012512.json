@@ -1,0 +1,186 @@
+{
+  "metadata": {
+    "input_file": "/Users/mac/pro/solo/workspaces/xy10945/test_dirty.csv",
+    "processed_at": "2026-05-24T01:25:12.091214",
+    "total_records": 13
+  },
+  "summary": {
+    "valid_count": 1,
+    "invalid_count": 12,
+    "abnormal_count": 1,
+    "missing_meter_count": 0,
+    "total_usage_water": 0.0,
+    "total_usage_electric": 200.0
+  },
+  "valid_records": [
+    {
+      "row_number": 8,
+      "household": "3栋101",
+      "meter_number": "DB007",
+      "meter_type": "electric",
+      "previous_reading": 100.0,
+      "current_reading": 300.0,
+      "multiplier": 1.0,
+      "usage": 200.0
+    }
+  ],
+  "invalid_records": [
+    {
+      "row_number": 2,
+      "error_type": "abnormal_usage",
+      "field_name": null,
+      "message": "用量异常: 50.00，偏离平均值超过2.0倍",
+      "raw_data": {
+        "住户": "1栋101",
+        "表号": "DB001",
+        "上月读数": "100",
+        "本月读数": "150",
+        "倍率": "1"
+      }
+    },
+    {
+      "row_number": 3,
+      "error_type": "missing_field",
+      "field_name": "表号",
+      "message": "表号不能为空",
+      "raw_data": {
+        "住户": "1栋102",
+        "表号": "",
+        "上月读数": "200",
+        "本月读数": "260",
+        "倍率": "1"
+      }
+    },
+    {
+      "row_number": 4,
+      "error_type": "missing_field",
+      "field_name": "住户",
+      "message": "住户名称不能为空",
+      "raw_data": {
+        "住户": "",
+        "表号": "DB003",
+        "上月读数": "150",
+        "本月读数": "210",
+        "倍率": "1"
+      }
+    },
+    {
+      "row_number": 5,
+      "error_type": "invalid_number",
+      "field_name": "本月读数",
+      "message": "本月读数值无效: abc",
+      "raw_data": {
+        "住户": "1栋202",
+        "表号": "DB004",
+        "上月读数": "180",
+        "本月读数": "abc",
+        "倍率": "1"
+      }
+    },
+    {
+      "row_number": 6,
+      "error_type": "reading_decreased",
+      "field_name": null,
+      "message": "本月读数小于上月读数 (280.0 < 300.0)",
+      "raw_data": {
+        "住户": "2栋101",
+        "表号": "DB005",
+        "上月读数": "300",
+        "本月读数": "280",
+        "倍率": "1"
+      }
+    },
+    {
+      "row_number": 7,
+      "error_type": "negative_reading",
+      "field_name": "倍率",
+      "message": "倍率必须大于0: -5.0",
+      "raw_data": {
+        "住户": "2栋102",
+        "表号": "DB006",
+        "上月读数": "220",
+        "本月读数": "290",
+        "倍率": "-5"
+      }
+    },
+    {
+      "row_number": 9,
+      "error_type": "reading_decreased",
+      "field_name": null,
+      "message": "本月读数小于上月读数 (145.0 < 150.0)",
+      "raw_data": {
+        "住户": "3栋102",
+        "表号": "DB008",
+        "上月读数": "150",
+        "本月读数": "145",
+        "倍率": "1"
+      }
+    },
+    {
+      "row_number": 10,
+      "error_type": "missing_field",
+      "field_name": null,
+      "message": "缺少上月读数或本月读数",
+      "raw_data": {
+        "住户": "3栋201",
+        "表号": "DB009",
+        "上月读数": "200",
+        "本月读数": "",
+        "倍率": "1"
+      }
+    },
+    {
+      "row_number": 11,
+      "error_type": "missing_field",
+      "field_name": null,
+      "message": "缺少上月读数或本月读数",
+      "raw_data": {
+        "住户": "3栋202",
+        "表号": "DB010",
+        "上月读数": "",
+        "本月读数": "250",
+        "倍率": "1"
+      }
+    },
+    {
+      "row_number": 12,
+      "error_type": "invalid_number",
+      "field_name": "倍率",
+      "message": "倍率值无效: abc",
+      "raw_data": {
+        "住户": "4栋101",
+        "表号": "DB011",
+        "上月读数": "100",
+        "本月读数": "150",
+        "倍率": "abc"
+      }
+    },
+    {
+      "row_number": 13,
+      "error_type": "negative_reading",
+      "field_name": "倍率",
+      "message": "倍率必须大于0: 0.0",
+      "raw_data": {
+        "住户": "4栋102",
+        "表号": "DB012",
+        "上月读数": "200",
+        "本月读数": "260",
+        "倍率": "0"
+      }
+    },
+    {
+      "row_number": 14,
+      "error_type": "negative_reading",
+      "field_name": "倍率",
+      "message": "倍率必须大于0: -3.0",
+      "raw_data": {
+        "住户": "4栋201",
+        "表号": "DB013",
+        "上月读数": "150",
+        "本月读数": "210",
+        "倍率": "-3"
+      }
+    }
+  ],
+  "missing_meters": []
+}

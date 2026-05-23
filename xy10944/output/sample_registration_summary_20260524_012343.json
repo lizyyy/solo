@@ -1,0 +1,78 @@
+{
+  "input_file": "sample_registration.csv",
+  "start_time": "2026-05-24T01:23:43.692072",
+  "summary": {
+    "total_rows": 8,
+    "columns": [
+      "学生姓名",
+      "护照号",
+      "监护人电话",
+      "饮食禁忌",
+      "年级",
+      "学校",
+      "负责老师"
+    ],
+    "mapped_columns": {
+      "学生姓名": "student_name",
+      "护照号": "passport",
+      "监护人电话": "guardian_phone",
+      "饮食禁忌": "dietary_restriction",
+      "年级": "grade",
+      "学校": "school",
+      "负责老师": "teacher"
+    },
+    "missing_required_fields": [],
+    "cleaned_rows": 4,
+    "error_rows": 4,
+    "duplicate_count": 1
+  },
+  "field_issues": {},
+  "duplicates": [
+    {
+      "passport": "E12345678",
+      "student_names": [
+        "张三",
+        "钱七"
+      ],
+      "original_rows": [
+        2,
+        6
+      ],
+      "count": 2
+    }
+  ],
+  "error_rows": [
+    {
+      "row": 4,
+      "issues": [
+        "护照号: 格式可疑"
+      ]
+    },
+    {
+      "row": 5,
+      "issues": [
+        "护照号: 空值",
+        "监护人电话: 格式可疑",
+        "护照号为空"
+      ]
+    },
+    {
+      "row": 7,
+      "issues": [
+        "护照号: 格式可疑",
+        "监护人电话: 格式可疑"
+      ]
+    },
+    {
+      "row": 8,
+      "issues": [
+        "监护人电话: 格式异常"
+      ]
+    }
+  ],
+  "output_files": {
+    "cleaned": "output/sample_registration_cleaned_20260524_012343.xlsx",
+    "errors": "output/sample_registration_errors_20260524_012343.xlsx",
+    "report": "output/sample_registration_report_20260524_012343.md"
+  }
+}

@@ -11,12 +11,20 @@ const sampleData = async () => {
     ];
     for (const customer of customers) {
         await new Promise((resolve) => {
-            db_1.db.run(`INSERT INTO customers (name, phone, address) VALUES (?, ?, ?)`, [customer.name, customer.phone, customer.address], function (err) {
-                if (err)
-                    console.error(err);
-                else
-                    console.log(`✓ 创建客户: ${customer.name}`);
-                resolve(this.lastID);
+            db_1.db.get(`SELECT id FROM customers WHERE name = ?`, [customer.name], (err, row) => {
+                if (row) {
+                    console.log(`○ 客户已存在: ${customer.name}`);
+                    resolve();
+                }
+                else {
+                    db_1.db.run(`INSERT INTO customers (name, phone, address) VALUES (?, ?, ?)`, [customer.name, customer.phone, customer.address], function (err) {
+                        if (err)
+                            console.error(err);
+                        else
+                            console.log(`✓ 创建客户: ${customer.name}`);
+                        resolve();
+                    });
+                }
             });
         });
     }
@@ -30,14 +38,23 @@ const sampleData = async () => {
     const categoryIds = [];
     for (const category of categories) {
         await new Promise((resolve) => {
-            db_1.db.run(`INSERT INTO categories (name, code, description) VALUES (?, ?, ?)`, [category.name, category.code, category.description], function (err) {
-                if (err)
-                    console.error(err);
-                else {
-                    console.log(`✓ 创建品类: ${category.name}`);
-                    categoryIds.push(this.lastID);
+            db_1.db.get(`SELECT id FROM categories WHERE code = ?`, [category.code], (err, row) => {
+                if (row) {
+                    console.log(`○ 品类已存在: ${category.name}`);
+                    categoryIds.push(row.id);
+                    resolve();
                 }
-                resolve(this.lastID);
+                else {
+                    db_1.db.run(`INSERT INTO categories (name, code, description) VALUES (?, ?, ?)`, [category.name, category.code, category.description], function (err) {
+                        if (err)
+                            console.error(err);
+                        else {
+                            console.log(`✓ 创建品类: ${category.name}`);
+                            categoryIds.push(this.lastID);
+                        }
+                        resolve();
+                    });
+                }
             });
         });
     }
@@ -51,12 +68,20 @@ const sampleData = async () => {
     const today = new Date().toISOString().split('T')[0];
     for (const price of prices) {
         await new Promise((resolve) => {
-            db_1.db.run(`INSERT INTO price_versions (category_id, price, effective_date, version) VALUES (?, ?, ?, ?)`, [price.categoryId, price.price, today, price.version], function (err) {
-                if (err)
-                    console.error(err);
-                else
-                    console.log(`✓ 创建价格版本: 品类${price.categoryId} - ${price.price}元/kg`);
-                resolve(this.lastID);
+            db_1.db.get(`SELECT id FROM price_versions WHERE category_id = ? AND version = ?`, [price.categoryId, price.version], (err, row) => {
+                if (row) {
+                    console.log(`○ 价格版本已存在: 品类${price.categoryId} v${price.version}`);
+                    resolve();
+                }
+                else {
+                    db_1.db.run(`INSERT INTO price_versions (category_id, price, effective_date, version) VALUES (?, ?, ?, ?)`, [price.categoryId, price.price, today, price.version], function (err) {
+                        if (err)
+                            console.error(err);
+                        else
+                            console.log(`✓ 创建价格版本: 品类${price.categoryId} - ${price.price}元/kg`);
+                        resolve();
+                    });
+                }
             });
         });
     }
@@ -67,14 +92,25 @@ const sampleData = async () => {
         { categoryId: 4, ratio: 0.03, description: '正常杂质扣减' },
         { categoryId: 5, ratio: 0.025, description: '正常杂质扣减' }
     ];
+    let deductionCount = 0;
     for (const deduction of deductions) {
         await new Promise((resolve) => {
-            db_1.db.run(`INSERT INTO deduction_ratios (category_id, ratio, description) VALUES (?, ?, ?)`, [deduction.categoryId, deduction.ratio, deduction.description], function (err) {
-                if (err)
-                    console.error(err);
-                else
-                    console.log(`✓ 创建扣杂比例: 品类${deduction.categoryId} - ${deduction.ratio * 100}%`);
-                resolve(this.lastID);
+            db_1.db.get(`SELECT id FROM deduction_ratios WHERE category_id = ?`, [deduction.categoryId], (err, row) => {
+                if (row) {
+                    console.log(`○ 扣杂比例已存在: 品类${deduction.categoryId}`);
+                    resolve();
+                }
+                else {
+                    db_1.db.run(`INSERT INTO deduction_ratios (category_id, ratio, description) VALUES (?, ?, ?)`, [deduction.categoryId, deduction.ratio, deduction.description], function (err) {
+                        if (err)
+                            console.error(err);
+                        else {
+                            console.log(`✓ 创建扣杂比例: 品类${deduction.categoryId} - ${deduction.ratio * 100}%`);
+                            deductionCount++;
+                        }
+                        resolve();
+                    });
+                }
             });
         });
     }

@@ -1,53 +1,31 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const init_1 = require("../database/init");
-const customerDao = __importStar(require("../dao/customerDao"));
-const categoryDao = __importStar(require("../dao/categoryDao"));
-const priceDao = __importStar(require("../dao/priceDao"));
-const weighingService = __importStar(require("../services/weighingService"));
-const settlementService = __importStar(require("../services/settlementService"));
-const settlementDao = __importStar(require("../dao/settlementDao"));
-const db_1 = require("../database/db");
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const sqlite3_1 = __importDefault(require("sqlite3"));
+const testDbPath = path_1.default.join(__dirname, '../../test-e2e.db');
+if (fs_1.default.existsSync(testDbPath)) {
+    fs_1.default.unlinkSync(testDbPath);
+}
+const dbModule = require('../database/db');
+dbModule.db = new sqlite3_1.default.Database(testDbPath);
+const { initDatabase } = require('../database/init');
+const customerDao = require('../dao/customerDao');
+const categoryDao = require('../dao/categoryDao');
+const priceDao = require('../dao/priceDao');
+const weighingService = require('../services/weighingService');
+const settlementService = require('../services/settlementService');
+const settlementDao = require('../dao/settlementDao');
 const runE2ETest = async () => {
     console.log('========================================');
     console.log('  端到端测试：称重到结算完整流程');
     console.log('========================================\n');
     try {
-        await (0, init_1.initDatabase)();
-        console.log('✓ 数据库初始化完成\n');
+        await initDatabase();
+        console.log('✓ 测试数据库初始化完成\n');
         console.log('--- 步骤1：创建测试数据 ---');
         const customerId = await customerDao.createCustomer({
             name: '测试客户',
@@ -55,12 +33,13 @@ const runE2ETest = async () => {
             address: '测试地址'
         });
         console.log(`✓ 创建客户，ID: ${customerId}`);
+        const categoryCode = `TEST${Date.now()}`;
         const categoryId = await categoryDao.createCategory({
             name: '测试品类',
-            code: 'TEST001',
+            code: categoryCode,
             description: '测试用'
         });
-        console.log(`✓ 创建品类，ID: ${categoryId}`);
+        console.log(`✓ 创建品类，ID: ${categoryId}, 编码: ${categoryCode}`);
         const today = new Date().toISOString().split('T')[0];
         await priceDao.createPriceVersion({
             category_id: categoryId,
@@ -147,13 +126,17 @@ const runE2ETest = async () => {
         console.log('  ✓ 所有测试通过！');
         console.log('  称重到结算完整流程验证成功！');
         console.log('========================================');
-        db_1.db.close();
+        dbModule.db.close();
+        fs_1.default.unlinkSync(testDbPath);
         process.exit(0);
     }
     catch (error) {
         console.error('\n✗ 测试失败:', error.message);
         console.error(error.stack);
-        db_1.db.close();
+        try {
+            dbModule.db.close();
+        }
+        catch (e) { }
         process.exit(1);
     }
 };

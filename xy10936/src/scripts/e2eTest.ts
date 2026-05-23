@@ -1,11 +1,23 @@
-import { initDatabase } from '../database/init';
-import * as customerDao from '../dao/customerDao';
-import * as categoryDao from '../dao/categoryDao';
-import * as priceDao from '../dao/priceDao';
-import * as weighingService from '../services/weighingService';
-import * as settlementService from '../services/settlementService';
-import * as settlementDao from '../dao/settlementDao';
-import { db } from '../database/db';
+import fs from 'fs';
+import path from 'path';
+import sqlite3 from 'sqlite3';
+
+const testDbPath = path.join(__dirname, '../../test-e2e.db');
+
+if (fs.existsSync(testDbPath)) {
+  fs.unlinkSync(testDbPath);
+}
+
+const dbModule = require('../database/db');
+dbModule.db = new sqlite3.Database(testDbPath);
+
+const { initDatabase } = require('../database/init');
+const customerDao = require('../dao/customerDao');
+const categoryDao = require('../dao/categoryDao');
+const priceDao = require('../dao/priceDao');
+const weighingService = require('../services/weighingService');
+const settlementService = require('../services/settlementService');
+const settlementDao = require('../dao/settlementDao');
 
 const runE2ETest = async () => {
   console.log('========================================');
@@ -14,7 +26,7 @@ const runE2ETest = async () => {
 
   try {
     await initDatabase();
-    console.log('✓ 数据库初始化完成\n');
+    console.log('✓ 测试数据库初始化完成\n');
 
     console.log('--- 步骤1：创建测试数据 ---');
     
@@ -25,12 +37,13 @@ const runE2ETest = async () => {
     });
     console.log(`✓ 创建客户，ID: ${customerId}`);
 
+    const categoryCode = `TEST${Date.now()}`;
     const categoryId = await categoryDao.createCategory({
       name: '测试品类',
-      code: 'TEST001',
+      code: categoryCode,
       description: '测试用'
     });
-    console.log(`✓ 创建品类，ID: ${categoryId}`);
+    console.log(`✓ 创建品类，ID: ${categoryId}, 编码: ${categoryCode}`);
 
     const today = new Date().toISOString().split('T')[0];
     await priceDao.createPriceVersion({
@@ -133,12 +146,15 @@ const runE2ETest = async () => {
     console.log('  称重到结算完整流程验证成功！');
     console.log('========================================');
 
-    db.close();
+    dbModule.db.close();
+    fs.unlinkSync(testDbPath);
     process.exit(0);
   } catch (error: any) {
     console.error('\n✗ 测试失败:', error.message);
     console.error(error.stack);
-    db.close();
+    try {
+      dbModule.db.close();
+    } catch (e) {}
     process.exit(1);
   }
 };
