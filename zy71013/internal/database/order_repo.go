@@ -138,13 +138,19 @@ func (r *OrderRepo) GetNextOrderNo(prefix string) (string, error) {
 		return "", err
 	}
 
-	var seq int
-	_, err = time.Parse("20060102", maxNo.String[len(prefix)+1:len(prefix)+9])
-	if err == nil {
+	seq := 1
+	if len(maxNo.String) > len(prefix)+1 {
+		seqPart := maxNo.String[len(prefix)+1:]
+		var num int
+		if _, err := fmt.Sscanf(seqPart, "%d", &num); err == nil {
+			seq = num + 1
+		} else {
+			seq = 1
+		}
+	}
+
+	if seq > 9999 {
 		seq = 1
-	} else {
-		fmt.Sscanf(maxNo.String, prefix+"-%d", &seq)
-		seq++
 	}
 
 	return fmt.Sprintf("%s-%04d", prefix, seq), nil

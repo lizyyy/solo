@@ -169,6 +169,51 @@ curl -s -X POST "$BASE_URL/orders/supplement" \
   }" | python3 -m json.tool
 echo ""
 
+echo "=== 测试 8g: 边界测试 - 同一天创建多张同类型处理单稳定性 ==="
+echo "创建第1张 THAW_EXCEPTION 处理单:"
+curl -s -X POST "$BASE_URL/orders" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request_id": "order-stress-001",
+    "batch_no": "DMSO-2024-001",
+    "type": "THAW_EXCEPTION",
+    "created_by": "zhangsan",
+    "needs_review": false
+  }' | python3 -c "import sys,json; d=json.load(sys.stdin); print(f\"  编号: {d['data']['order_no']}\")"
+
+echo "创建第2张 THAW_EXCEPTION 处理单:"
+curl -s -X POST "$BASE_URL/orders" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request_id": "order-stress-002",
+    "batch_no": "DMSO-2024-001",
+    "type": "THAW_EXCEPTION",
+    "created_by": "lisi",
+    "needs_review": false
+  }' | python3 -c "import sys,json; d=json.load(sys.stdin); print(f\"  编号: {d['data']['order_no']}\")"
+
+echo "创建第3张 THAW_EXCEPTION 处理单:"
+curl -s -X POST "$BASE_URL/orders" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request_id": "order-stress-003",
+    "batch_no": "DMSO-2024-001",
+    "type": "THAW_EXCEPTION",
+    "created_by": "wangwu",
+    "needs_review": false
+  }' | python3 -c "import sys,json; d=json.load(sys.stdin); print(f\"  编号: {d['data']['order_no']}\")"
+
+echo "验证所有处理单创建成功，服务未崩溃:"
+curl -s "$BASE_URL/orders" | python3 -c "
+import sys,json
+d = json.load(sys.stdin)
+thaw_orders = [o for o in d['data'] if o['type'] == 'THAW_EXCEPTION']
+print(f'  共创建 {len(thaw_orders)} 张 THAW_EXCEPTION 处理单')
+for o in thaw_orders:
+    print(f'    - {o[\"order_no\"]} ({o[\"status\"]})')
+"
+echo ""
+
 echo "=== 测试 9: 查看所有试剂状态 ==="
 curl -s "$BASE_URL/reagents" | python3 -m json.tool
 echo ""
