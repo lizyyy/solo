@@ -1,0 +1,107 @@
+{
+  "timestamp": "2026-05-24T20:26:42.204325",
+  "summary": {
+    "total_files": 1,
+    "success_count": 1,
+    "failed_count": 0,
+    "output_directory": "/Users/lzy/pro/solo/workspaces/zy71072/output",
+    "success_rate": 100.0
+  },
+  "rule_config": {
+    "clean_metadata": true,
+    "clean_annotations": true,
+    "clean_attachments": true,
+    "clean_javascript": true,
+    "clean_embedded_files": true,
+    "clean_custom_properties": true,
+    "metadata_fields_to_remove": [
+      "author",
+      "creator",
+      "producer",
+      "keywords",
+      "subject",
+      "creationdate",
+      "moddate",
+      "title"
+    ],
+    "annotation_types_to_remove": [
+      "Text",
+      "Highlight",
+      "Underline",
+      "Squiggly",
+      "StrikeOut",
+      "Caret",
+      "Stamp",
+      "Ink",
+      "FreeText",
+      "Popup",
+      "FileAttachment"
+    ],
+    "preserve_fields": [],
+    "replacement_value": ""
+  },
+  "files": [
+    {
+      "input_file": "/Users/lzy/pro/solo/workspaces/zy71072/test_demo.pdf",
+      "output_file": "/Users/lzy/pro/solo/workspaces/zy71072/output/test_demo_sanitized.pdf",
+      "success": true,
+      "exit_code": 0,
+      "exit_code_description": "SUCCESS",
+      "error_message": null,
+      "processing_time_seconds": 0.01,
+      "has_incremental_updates": false,
+      "file_hash": "0154712e21a1fcf242e98a5a31d47be6bacc930e3b2537e9fa4e6eecd7a9354b",
+      "output_hash": "85126eda986f30567dd83a15ff699f6644ccaf3ae3631e51047ec5b703e4ab1d",
+      "original": {
+        "metadata": {
+          "title": "机密文档",
+          "author": "张三",
+          "subject": "这是内部机密文件",
+          "keywords": "机密, 内部, 法务",
+          "creator": "Microsoft Word",
+          "producer": "pikepdf 9.11.0",
+          "creation_date": null,
+          "modification_date": null,
+          "custom_fields": {
+            "Author": "张三",
+            "Title": "机密文档",
+            "Keywords": "机密, 内部, 法务",
+            "Subject": "这是内部机密文件",
+            "Creator": "Microsoft Word",
+            "Producer": "pikepdf 9.11.0"
+          },
+          "has_xmp": false,
+          "xmp_fields": []
+        },
+        "annotations_count": 0,
+        "annotations": [],
+        "attachments_count": 0,
+        "attachments": []
+      },
+      "final": {
+        "metadata": {
+          "title": null,
+          "author": null,
+          "subject": null,
+          "keywords": null,
+          "creator": null,
+          "producer": "pikepdf 9.11.0",
+          "creation_date": null,
+          "modification_date": null,
+          "custom_fields": {},
+          "has_xmp": false,
+          "xmp_fields": []
+        },
+        "annotations_count": 0,
+        "annotations": [],
+        "attachments_count": 0,
+        "attachments": []
+      },
+      "removed": {
+        "annotations_count": 0,
+        "attachments_count": 0,
+        "metadata_cleaned": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "clean_metadata": true,
+  "clean_annotations": true,
+  "clean_attachments": true,
+  "clean_javascript": true,
+  "clean_embedded_files": true,
+  "clean_custom_properties": true,
+  "metadata_fields_to_remove": [
+    "author",
+    "creator",
+    "producer",
+    "keywords",
+    "subject",
+    "creationdate",
+    "moddate",
+    "title"
+  ],
+  "annotation_types_to_remove": [
+    "Text",
+    "Highlight",
+    "Underline",
+    "Squiggly",
+    "StrikeOut",
+    "Caret",
+    "Stamp",
+    "Ink",
+    "FreeText",
+    "Popup",
+    "FileAttachment"
+  ],
+  "preserve_fields": [],
+  "replacement_value": ""
+}

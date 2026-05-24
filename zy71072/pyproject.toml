@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-sanitizer"
+version = "1.0.0"
+description = "PDF元数据脱敏CLI工具 - 清理作者信息、批注、隐藏附件"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+  {name = "Legal Tech Team"}
+]
+dependencies = [
+  "pikepdf>=8.0.0",
+  "PyPDF2>=3.0.0",
+  "click>=8.0.0",
+  "rich>=13.0.0",
+  "python-dotenv>=1.0.0"
+]
+
+[project.scripts]
+pdf-sanitizer = "pdf_sanitizer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39']
