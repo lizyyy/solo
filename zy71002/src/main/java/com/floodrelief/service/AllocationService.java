@@ -30,7 +30,6 @@ public class AllocationService {
     private final ShelterRepository shelterRepository;
     private final MaterialBatchRepository materialRepository;
     private final TransferRecordRepository transferRepository;
-    private final GapReportRepository gapReportRepository;
 
     @Transactional
     public ApiResponse<AllocationRecord> createAllocation(AllocationRequest request) {
