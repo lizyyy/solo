@@ -129,7 +129,7 @@ export class CssParser {
 
       csstree.walk(ast, {
         enter: (node: csstree.CssNode) => {
-          if (node.type === 'Atrule' && node.name === 'font-face' && node.prelude) {
+          if (node.type === 'Atrule' && node.name === 'font-face') {
             const ref = this.parseFontFaceRule(node, filePath, source, includeRemote);
             if (ref) {
               references.push(ref);

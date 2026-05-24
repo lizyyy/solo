@@ -197,14 +197,18 @@ export class SelfTestRunner {
     }
     async testCssParser() {
         const parser = new CssParser(this.testDataDir);
-        const references = await parser.parseAll();
-        return references.length >= 0;
+        const references = await parser.parseAll(true);
+        const hasRoboto = references.some((r) => r.familyName === 'Roboto');
+        const hasOpenSans = references.some((r) => r.familyName === 'Open Sans');
+        const hasRemote = references.some((r) => r.familyName === 'Remote Font');
+        const hasInline = references.some((r) => r.familyName === 'Inline Font');
+        return references.length >= 4 && hasRoboto && hasOpenSans && hasRemote && hasInline;
     }
     async testRemoteFontDetection() {
         const parser = new CssParser(this.testDataDir);
         const references = await parser.parseAll(true);
         const remoteRefs = parser.getRemoteReferences(references);
-        return remoteRefs.length >= 0;
+        return remoteRefs.length >= 1;
     }
     async testLicenseMatching() {
         const manager = new LicenseManager();
@@ -253,7 +257,9 @@ export class SelfTestRunner {
         const engine = new AuditEngine(config);
         const { result } = await engine.run(this.verbose);
         return (result.summary.totalFontFiles > 0 &&
+            result.summary.totalReferences > 0 &&
             result.summary.totalLicenses > 0 &&
+            result.summary.remoteFonts > 0 &&
             result.risks.length > 0);
     }
     async testReportGeneration() {

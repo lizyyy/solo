@@ -1,6 +1,6 @@
 # 字体资产授权审计报告
 
-> 生成时间: 2026/5/24 19:47:55
+> 生成时间: 2026/5/24 22:14:25
 > 工具版本: 1.0.0
 > 项目目录: /Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data
 
@@ -9,10 +9,10 @@
 | 指标 | 数值 |
 |------|------|
 | 字体文件数 | 6 |
-| 字体引用数 | 0 |
+| 字体引用数 | 5 |
 | 授权记录数 | 2 |
 | 缺失授权 | 0 |
-| 远程字体 | 0 |
+| 远程字体 | 1 |
 | 版本冲突 | 1 |
 | 过期授权 | 1 |
 
@@ -22,8 +22,8 @@
 |----------|------|
 | 🔴 CRITICAL | 1 |
 | 🟠 HIGH | 0 |
-| 🟡 MEDIUM | 1 |
-| 🔵 LOW | 0 |
+| 🟡 MEDIUM | 2 |
+| 🔵 LOW | 1 |
 | ⚪ INFO | 1 |
 
 ## 🚨 风险详情
@@ -40,6 +40,17 @@
 }
 ```
 
+### 🟡 MEDIUM: remote_font
+
+检测到 1 个远程字体引用，需要确认是否符合授权条款
+
+**详细信息:**
+```json
+{
+  "remoteFontCount": 1
+}
+```
+
 ### 🟡 MEDIUM: version_conflict
 
 字体 "roboto" 存在多个版本: unknown, 2.0.0, 1.0.0
@@ -53,6 +64,17 @@
     "2.0.0",
     "1.0.0"
   ]
+}
+```
+
+### 🔵 LOW: unmatched_reference
+
+字体引用 "Remote Font" 未找到对应的本地字体文件
+
+**详细信息:**
+```json
+{
+  "familyName": "Remote Font"
 }
 ```
 
@@ -73,7 +95,16 @@
 
 ## 🔗 字体引用清单
 
-未发现字体引用
+| 字体名称 | 来源 | 类型 | 格式 | 远程 |
+|----------|------|------|------|------|
+| Roboto | css | 本地 | - | ❌ |
+| Roboto | css | 本地 | - | ❌ |
+| Open Sans | css | 本地 | woff2, woff | ❌ |
+| Inline Font | inline | 本地 | woff | ❌ |
+
+## ❓ 未匹配的引用
+
+- `Remote Font` in `css/styles.css`
 
 ## 📜 授权清单
 

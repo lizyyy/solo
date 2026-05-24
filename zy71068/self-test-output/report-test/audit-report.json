@@ -1,82 +1,155 @@
 {
   "metadata": {
-    "timestamp": "2026-05-24T11:47:55.127Z",
+    "timestamp": "2026-05-24T14:14:25.207Z",
     "version": "1.0.0",
     "projectDir": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data"
   },
   "fonts": {
     "files": [
       {
-        "id": "fae49f61dd8ef357a16940a6188b074d",
+        "id": "c30d85663ede5a3b2150e97b6f443800",
         "path": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/fonts/OpenSans-Regular.woff2",
         "fileName": "OpenSans-Regular.woff2",
         "familyName": "OpenSans",
         "format": "woff2",
         "size": 100,
-        "lastModified": "2026-05-24T11:47:55.089Z",
+        "lastModified": "2026-05-24T14:14:25.157Z",
         "weight": "400",
         "relativePath": "fonts/OpenSans-Regular.woff2"
       },
       {
-        "id": "bfa2be1426550418de6f93b10edba78b",
+        "id": "56afa6529a6ac3706f8b25f7ab31b717",
         "path": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/fonts/OpenSans-Bold.woff",
         "fileName": "OpenSans-Bold.woff",
         "familyName": "OpenSans",
         "format": "woff",
         "size": 100,
-        "lastModified": "2026-05-24T11:47:55.089Z",
+        "lastModified": "2026-05-24T14:14:25.157Z",
         "weight": "700",
         "relativePath": "fonts/OpenSans-Bold.woff"
       },
       {
-        "id": "8abcd1b4c5a179fc39934a8c1bcb7701",
+        "id": "663cb73fb9ec5a952e2e77e35bf67fdf",
         "path": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/fonts/Roboto-Regular.ttf",
         "fileName": "Roboto-Regular.ttf",
         "familyName": "Roboto",
         "format": "ttf",
         "size": 100,
-        "lastModified": "2026-05-24T11:47:55.087Z",
+        "lastModified": "2026-05-24T14:14:25.155Z",
         "weight": "400",
         "relativePath": "fonts/Roboto-Regular.ttf"
       },
       {
-        "id": "7eb83cff59c53c63bfa810b3adb5b59d",
+        "id": "5935fdf8fd4ec6afe4ac9d9c77c920b8",
         "path": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/fonts/Roboto-Italic-2.0.0.ttf",
         "fileName": "Roboto-Italic-2.0.0.ttf",
         "familyName": "Roboto",
         "format": "ttf",
         "size": 100,
-        "lastModified": "2026-05-24T11:47:55.089Z",
+        "lastModified": "2026-05-24T14:14:25.157Z",
         "version": "2.0.0",
         "style": "italic",
         "relativePath": "fonts/Roboto-Italic-2.0.0.ttf"
       },
       {
-        "id": "039eceb147062dc7da8eda37d826b151",
+        "id": "f9caab4a1a153c85fd0fd86b83fef8d6",
         "path": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/fonts/Roboto-Italic-1.0.0.ttf",
         "fileName": "Roboto-Italic-1.0.0.ttf",
         "familyName": "Roboto",
         "format": "ttf",
         "size": 100,
-        "lastModified": "2026-05-24T11:47:55.089Z",
+        "lastModified": "2026-05-24T14:14:25.157Z",
         "version": "1.0.0",
         "style": "italic",
         "relativePath": "fonts/Roboto-Italic-1.0.0.ttf"
       },
       {
-        "id": "945aecf2cb3a77452a25dc9d43259a68",
+        "id": "541e9d68212ebdea3281910bdec6498b",
         "path": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/fonts/Roboto-Bold.ttf",
         "fileName": "Roboto-Bold.ttf",
         "familyName": "Roboto",
         "format": "ttf",
         "size": 100,
-        "lastModified": "2026-05-24T11:47:55.087Z",
+        "lastModified": "2026-05-24T14:14:25.156Z",
         "weight": "700",
         "relativePath": "fonts/Roboto-Bold.ttf"
       }
     ],
-    "references": [],
-    "unmatchedReferences": []
+    "references": [
+      {
+        "id": "4375d9994507376e0f78e0f4e6adbce5",
+        "source": "css",
+        "sourcePath": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/css/styles.css",
+        "familyName": "Roboto",
+        "urls": [
+          "../fonts/Roboto-Regular.ttf"
+        ],
+        "formats": [],
+        "isRemote": false,
+        "weight": "400",
+        "style": "normal",
+        "relativePath": "css/styles.css"
+      },
+      {
+        "id": "53dbf1a4d8eae5332e2b2b43274e4b46",
+        "source": "css",
+        "sourcePath": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/css/styles.css",
+        "familyName": "Roboto",
+        "urls": [
+          "../fonts/Roboto-Bold.ttf"
+        ],
+        "formats": [],
+        "isRemote": false,
+        "weight": "700",
+        "relativePath": "css/styles.css"
+      },
+      {
+        "id": "0c0304245b6760b489536e272129cbb0",
+        "source": "css",
+        "sourcePath": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/css/styles.css",
+        "familyName": "Open Sans",
+        "urls": [
+          "../fonts/OpenSans-Regular.woff2",
+          "../fonts/OpenSans-Regular.woff"
+        ],
+        "formats": [
+          "woff2",
+          "woff"
+        ],
+        "isRemote": false,
+        "relativePath": "css/styles.css"
+      },
+      {
+        "id": "c198866ac914f552d03a7b16c56ec9e6",
+        "source": "inline",
+        "sourcePath": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/index.html",
+        "familyName": "Inline Font",
+        "urls": [
+          "../fonts/OpenSans-Bold.woff"
+        ],
+        "formats": [
+          "woff"
+        ],
+        "isRemote": false,
+        "relativePath": "index.html"
+      }
+    ],
+    "unmatchedReferences": [
+      {
+        "id": "7ca73e4948d6ab137137a97f300f9cb2",
+        "source": "css",
+        "sourcePath": "/Users/lzy/pro/solo/workspaces/zy71068/self-test-output/test-data/css/styles.css",
+        "familyName": "Remote Font",
+        "urls": [
+          "https://fonts.example.com/remote-font.woff2"
+        ],
+        "formats": [
+          "woff2"
+        ],
+        "isRemote": true,
+        "relativePath": "css/styles.css"
+      }
+    ]
   },
   "licenses": {
     "entries": [
@@ -107,7 +180,7 @@
     ],
     "matched": [
       [
-        "fae49f61dd8ef357a16940a6188b074d",
+        "c30d85663ede5a3b2150e97b6f443800",
         {
           "id": "7c791ebc702a122fcfd9402c7c51621d",
           "familyName": "Open Sans",
@@ -122,7 +195,7 @@
         }
       ],
       [
-        "bfa2be1426550418de6f93b10edba78b",
+        "56afa6529a6ac3706f8b25f7ab31b717",
         {
           "id": "7c791ebc702a122fcfd9402c7c51621d",
           "familyName": "Open Sans",
@@ -137,7 +210,7 @@
         }
       ],
       [
-        "8abcd1b4c5a179fc39934a8c1bcb7701",
+        "663cb73fb9ec5a952e2e77e35bf67fdf",
         {
           "id": "6b9b794e4fc8a58d17659af84984e1b2",
           "familyName": "Roboto",
@@ -152,7 +225,7 @@
         }
       ],
       [
-        "7eb83cff59c53c63bfa810b3adb5b59d",
+        "5935fdf8fd4ec6afe4ac9d9c77c920b8",
         {
           "id": "6b9b794e4fc8a58d17659af84984e1b2",
           "familyName": "Roboto",
@@ -167,7 +240,7 @@
         }
       ],
       [
-        "039eceb147062dc7da8eda37d826b151",
+        "f9caab4a1a153c85fd0fd86b83fef8d6",
         {
           "id": "6b9b794e4fc8a58d17659af84984e1b2",
           "familyName": "Roboto",
@@ -182,7 +255,7 @@
         }
       ],
       [
-        "945aecf2cb3a77452a25dc9d43259a68",
+        "541e9d68212ebdea3281910bdec6498b",
         {
           "id": "6b9b794e4fc8a58d17659af84984e1b2",
           "familyName": "Roboto",
@@ -218,6 +291,24 @@
       }
     },
     {
+      "id": "5cd5604c318d0c774e06ecc4166e0236",
+      "level": "medium",
+      "category": "remote_font",
+      "message": "检测到 1 个远程字体引用，需要确认是否符合授权条款",
+      "details": {
+        "remoteFontCount": 1
+      }
+    },
+    {
+      "id": "ecbe27f93387fdb11cc98cdbd35c36e6",
+      "level": "low",
+      "category": "unmatched_reference",
+      "message": "字体引用 \"Remote Font\" 未找到对应的本地字体文件",
+      "details": {
+        "familyName": "Remote Font"
+      }
+    },
+    {
       "id": "d2af798a670c915677234fce39f96a49",
       "level": "medium",
       "category": "version_conflict",
@@ -234,17 +325,17 @@
   ],
   "summary": {
     "totalFontFiles": 6,
-    "totalReferences": 0,
+    "totalReferences": 5,
     "totalLicenses": 2,
     "missingLicenses": 0,
     "risksByLevel": {
       "critical": 1,
       "high": 0,
-      "medium": 1,
-      "low": 0,
+      "medium": 2,
+      "low": 1,
       "info": 1
     },
-    "remoteFonts": 0,
+    "remoteFonts": 1,
     "versionConflicts": 1,
     "expiredLicenses": 1
   }

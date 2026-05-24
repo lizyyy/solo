@@ -240,9 +240,14 @@ export class SelfTestRunner {
 
   private async testCssParser(): Promise<boolean> {
     const parser = new CssParser(this.testDataDir);
-    const references = await parser.parseAll();
+    const references = await parser.parseAll(true);
 
-    return references.length >= 0;
+    const hasRoboto = references.some((r) => r.familyName === 'Roboto');
+    const hasOpenSans = references.some((r) => r.familyName === 'Open Sans');
+    const hasRemote = references.some((r) => r.familyName === 'Remote Font');
+    const hasInline = references.some((r) => r.familyName === 'Inline Font');
+
+    return references.length >= 4 && hasRoboto && hasOpenSans && hasRemote && hasInline;
   }
 
   private async testRemoteFontDetection(): Promise<boolean> {
@@ -250,7 +255,7 @@ export class SelfTestRunner {
     const references = await parser.parseAll(true);
     const remoteRefs = parser.getRemoteReferences(references);
 
-    return remoteRefs.length >= 0;
+    return remoteRefs.length >= 1;
   }
 
   private async testLicenseMatching(): Promise<boolean> {
@@ -315,7 +320,9 @@ export class SelfTestRunner {
 
     return (
       result.summary.totalFontFiles > 0 &&
+      result.summary.totalReferences > 0 &&
       result.summary.totalLicenses > 0 &&
+      result.summary.remoteFonts > 0 &&
       result.risks.length > 0
     );
   }
